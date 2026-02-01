@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Money Trees — Last Coin Standing</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@500;600;700&display=swap');
+
+:root {
+  /* Bitcoin - warm, organic, golden */
+  --btc-orange: #f7931a;
+  --btc-gold: #ffb840;
+  --btc-amber: #e8a020;
+  --btc-bark: #5a4030;
+  --btc-bark-light: #7a6050;
+  --btc-bg: #0f0d0a;
+  
+  /* Fiat - cold, mechanical, grey */
+  --fiat-steel: #6a7580;
+  --fiat-slate: #4a5560;
+  --fiat-rust: #7a5555;
+  --fiat-cold: #2a3038;
+  --fiat-bark: #454550;
+  --fiat-bg: #0a0c0f;
+  
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-ui: 'Inter', -apple-system, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font-display);
+  color: #ddd;
+  overflow-x: hidden;
+  transition: background 0.5s ease;
+}
+
+body.btc-view {
+  background: linear-gradient(180deg, #100d08 0%, #1a1510 30%, #1a1510 70%, #100d08 100%);
+}
+
+body.fiat-view {
+  background: linear-gradient(180deg, #08090c 0%, #12151a 30%, #12151a 70%, #08090c 100%);
+}
+
+/* ─── HEADER ─── */
+header {
+  text-align: center;
+  padding: 28px 20px 8px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: inherit;
+}
+
+body.btc-view header {
+  background: linear-gradient(180deg, #100d08 0%, rgba(16,13,8,0.95) 100%);
+}
+
+body.fiat-view header {
+  background: linear-gradient(180deg, #08090c 0%, rgba(8,9,12,0.95) 100%);
+}
+
+header h1 {
+  font-weight: 500;
+  font-size: clamp(1.4rem, 4vw, 2.1rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #f0e8e0;
+  margin-bottom: 6px;
+}
+
+header p {
+  font-style: italic;
+  font-weight: 400;
+  color: #908880;
+  font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+}
+
+/* ─── TOGGLE SWITCH ─── */
+.toggle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 20px;
+  position: sticky;
+  top: 70px;
+  z-index: 100;
+}
+
+body.btc-view .toggle-container {
+  background: linear-gradient(180deg, rgba(16,13,8,0.95) 0%, rgba(16,13,8,0) 100%);
+}
+
+body.fiat-view .toggle-container {
+  background: linear-gradient(180deg, rgba(8,9,12,0.95) 0%, rgba(8,9,12,0) 100%);
+}
+
+.toggle-label {
+  font-family: var(--font-ui);
+  font-size: clamp(0.8rem, 2vw, 0.95rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 10px 18px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.toggle-label.btc {
+  color: var(--btc-orange);
+  opacity: 0.5;
+}
+
+.toggle-label.fiat {
+  color: var(--fiat-steel);
+  opacity: 0.5;
+}
+
+.toggle-label.active {
+  opacity: 1;
+}
+
+body.btc-view .toggle-label.btc {
+  background: rgba(247, 147, 26, 0.18);
+  box-shadow: 0 0 24px rgba(247, 147, 26, 0.25);
+}
+
+body.fiat-view .toggle-label.fiat {
+  background: rgba(100, 115, 130, 0.22);
+  box-shadow: 0 0 24px rgba(100, 115, 130, 0.18);
+}
+
+.toggle-switch {
+  width: 64px;
+  height: 32px;
+  background: #1a1a1a;
+  border-radius: 16px;
+  position: relative;
+  cursor: pointer;
+  border: 2px solid #333;
+  transition: all 0.3s ease;
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  top: 2px;
+  transition: all 0.3s ease;
+}
+
+body.btc-view .toggle-switch {
+  border-color: rgba(247, 147, 26, 0.5);
+}
+
+body.btc-view .toggle-switch::after {
+  left: 3px;
+  background: var(--btc-orange);
+  box-shadow: 0 0 12px rgba(247, 147, 26, 0.6);
+}
+
+body.fiat-view .toggle-switch {
+  border-color: rgba(100, 115, 130, 0.5);
+}
+
+body.fiat-view .toggle-switch::after {
+  left: 33px;
+  background: var(--fiat-steel);
+  box-shadow: 0 0 12px rgba(100, 115, 130, 0.4);
+}
+
+/* ─── TREE VIEWS ─── */
+.tree-view {
+  display: none;
+  justify-content: center;
+  padding: 10px 20px 60px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.tree-view.active {
+  display: flex;
+  opacity: 1;
+}
+
+.tree-container {
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+}
+
+.tree-title {
+  font-size: clamp(1.6rem, 4.5vw, 2.2rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.tree-title.btc { color: var(--btc-orange); }
+.tree-title.fiat { color: #8a9298; }
+
+.tree-subtitle {
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+  margin-bottom: 16px;
+  color: #a09890;
+}
+
+body.fiat-view .tree-subtitle {
+  color: #8090a0;
+}
+
+.tree-svg {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+}
+
+/* ─── TREE ELEMENTS ─── */
+.trunk { stroke-linecap: round; }
+.trunk.btc { stroke: var(--btc-bark); }
+.trunk.fiat { stroke: var(--fiat-bark); }
+
+.branch { stroke-linecap: round; }
+.branch.btc { stroke: var(--btc-bark-light); }
+.branch.fiat { stroke: var(--fiat-slate); }
+
+.twig { stroke-linecap: round; opacity: 0.5; }
+.twig.btc { stroke: var(--btc-bark-light); }
+.twig.fiat { stroke: var(--fiat-slate); }
+
+.root { stroke-linecap: round; opacity: 0.35; }
+.root.btc { stroke: var(--btc-bark); }
+.root.fiat { stroke: var(--fiat-bark); }
+
+/* ─── CLUSTER LABELS ─── */
+.cluster-label {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cluster-label.btc { 
+  fill: #ffd080;
+}
+
+.cluster-label.fiat { 
+  fill: #b0c0d0;
+}
+
+.label-bg {
+  fill: rgba(0,0,0,0.7);
+  rx: 5;
+  ry: 5;
+}
+
+/* ─── LEAF ELLIPSES ─── */
+.leaf { cursor: pointer; }
+.leaf:hover .leaf-ellipse {
+  filter: drop-shadow(0 6px 20px rgba(0,0,0,0.7)) brightness(1.1);
+}
+
+.leaf-ellipse {
+  transition: all 0.2s ease;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5));
+}
+
+.leaf-ellipse.btc { 
+  fill: #f7931a;
+}
+.leaf-ellipse.btc-alt { 
+  fill: #ffb030;
+}
+.leaf-ellipse.fiat { 
+  fill: #5a6672;
+}
+.leaf-ellipse.fiat-alt { 
+  fill: #6a4a4a;
+}
+
+/* ─── LEAF TEXT ─── */
+.leaf-text {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  pointer-events: none;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.leaf-text.btc {
+  font-size: 13px;
+  fill: #1a0d00;
+}
+
+.leaf-text.fiat {
+  font-size: 13px;
+  fill: #ffffff;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+}
+
+/* ─── TOOLTIP ─── */
+.tooltip {
+  position: fixed;
+  max-width: 360px;
+  padding: 20px 24px;
+  border-radius: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 1000;
+  line-height: 1.6;
+}
+.tooltip.visible { opacity: 1; }
+
+.tooltip.btc-tip {
+  background: linear-gradient(135deg, rgba(40,32,20,0.98), rgba(30,24,14,0.98));
+  border: 2px solid rgba(247,147,26,0.6);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.75), 0 0 40px rgba(247,147,26,0.12);
+}
+
+.tooltip.fiat-tip {
+  background: linear-gradient(135deg, rgba(26,30,38,0.98), rgba(18,20,26,0.98));
+  border: 2px solid rgba(120,135,155,0.5);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.75);
+}
+
+.tooltip-word {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  letter-spacing: 0.03em;
+}
+.tooltip-word.btc { color: #ffaa33; }
+.tooltip-word.fiat { color: #b8c4d0; }
+
+.tooltip-desc {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: #d8d0c8;
+  line-height: 1.7;
+}
+
+body.fiat-view .tooltip-desc {
+  color: #c8d0d8;
+}
+
+.tooltip-syn {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #999;
+}
+.tooltip-syn span { margin: 0 6px; }
+
+/* ─── FOOTER ─── */
+footer {
+  text-align: center;
+  padding: 30px 20px 50px;
+  font-size: 0.95rem;
+}
+footer a { 
+  color: var(--btc-orange); 
+  text-decoration: none;
+  font-weight: 500;
+}
+footer a:hover { text-decoration: underline; }
+
+body.fiat-view footer a {
+  color: #8a9aa8;
+}
+
+/* ─── MOBILE ─── */
+@media (max-width: 600px) {
+  header { padding: 18px 15px 5px; }
+  .toggle-container { padding: 12px 10px; gap: 12px; top: 60px; }
+  .toggle-label { padding: 8px 14px; font-size: 0.75rem; }
+  .toggle-switch { width: 54px; height: 28px; }
+  .toggle-switch::after { width: 20px; height: 20px; }
+  body.btc-view .toggle-switch::after { left: 3px; }
+  body.fiat-view .toggle-switch::after { left: 27px; }
+  .tree-view { padding: 5px 10px 40px; }
+  .leaf-text { font-size: 11px !important; }
+  .cluster-label { font-size: 11px; }
+  .tooltip { max-width: 300px; padding: 16px 18px; }
+  .tooltip-word { font-size: 1.3rem; }
+  .tooltip-desc { font-size: 1.05rem; }
+}
+</style>
+</head>
+<body class="btc-view">
+
+<header>
+  <h1>The Money Trees</h1>
+  <p>Hover over each leaf to explore the nature of money</p>
+</header>
+
+<div class="toggle-container">
+  <span class="toggle-label btc active" onclick="showTree('btc')">Bitcoin</span>
+  <div class="toggle-switch" onclick="toggleTree()"></div>
+  <span class="toggle-label fiat" onclick="showTree('fiat')">Fiat</span>
+</div>
+
+<!-- BITCOIN TREE VIEW -->
+<div id="btc-view" class="tree-view active">
+  <div class="tree-container">
+    <h2 class="tree-title btc">Bitcoin</h2>
+    <p class="tree-subtitle">Sound money · Sovereignty · Truth</p>
+    <svg id="btc-tree" class="tree-svg" viewBox="0 0 800 1600"></svg>
+  </div>
+</div>
+
+<!-- FIAT TREE VIEW -->
+<div id="fiat-view" class="tree-view">
+  <div class="tree-container">
+    <h2 class="tree-title fiat">Fiat</h2>
+    <p class="tree-subtitle">Broken money · Coercion · Decay</p>
+    <svg id="fiat-tree" class="tree-svg" viewBox="0 0 800 1600"></svg>
+  </div>
+</div>
+
+<div id="tooltip" class="tooltip">
+  <div id="tip-word" class="tooltip-word"></div>
+  <div id="tip-desc" class="tooltip-desc"></div>
+  <div id="tip-syn" class="tooltip-syn"></div>
+</div>
+
+<footer>
+  <a href="https://lastcoinstanding.com">lastcoinstanding.com</a>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// TOGGLE FUNCTIONALITY
+// ═══════════════════════════════════════════════════════════
+let currentView = 'btc';
+
+function showTree(view) {
+  currentView = view;
+  document.body.className = view + '-view';
+  
+  document.getElementById('btc-view').classList.toggle('active', view === 'btc');
+  document.getElementById('fiat-view').classList.toggle('active', view === 'fiat');
+  
+  document.querySelector('.toggle-label.btc').classList.toggle('active', view === 'btc');
+  document.querySelector('.toggle-label.fiat').classList.toggle('active', view === 'fiat');
+  
+  hideTooltip();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleTree() {
+  showTree(currentView === 'btc' ? 'fiat' : 'btc');
+}
+
+// ═══════════════════════════════════════════════════════════
+// WORD DATA - BITCOIN
+// ═══════════════════════════════════════════════════════════
+const btcClusters = [
+  {
+    name: "Sovereignty",
+    words: [
+      { w: "Freedom", desc: "The ability to transact without permission from any authority. Bitcoin restores financial self-determination.", syn: ["Liberty", "Autonomy"] },
+      { w: "Self-custody", desc: "You hold your own keys, your own wealth. No intermediary can freeze, seize, or deny access.", syn: ["Control", "Ownership"] },
+      { w: "Autonomy", desc: "Independence from institutional gatekeepers. Your money answers only to you.", syn: ["Independence"] },
+      { w: "Permissionless", desc: "No application required. No approval needed. Anyone can participate in the network.", syn: ["Open", "Accessible"] },
+      { w: "Sovereign", desc: "Each holder is their own bank, their own central authority over their wealth.", syn: ["Self-ruling"] }
+    ]
+  },
+  {
+    name: "Integrity",
+    words: [
+      { w: "Truth", desc: "An immutable ledger that cannot lie. Every transaction is verifiable, transparent, and permanent.", syn: ["Honesty", "Veracity"] },
+      { w: "Incorruptible", desc: "No entity can alter the rules, manipulate supply, or corrupt the protocol for personal gain.", syn: ["Pure", "Untainted"] },
+      { w: "Transparent", desc: "Open-source code and a public ledger. Anyone can audit, verify, and trust through verification.", syn: ["Open", "Visible"] },
+      { w: "Immutable", desc: "What is written cannot be erased. The ledger is permanent and tamper-proof.", syn: ["Permanent", "Fixed"] },
+      { w: "Trustless", desc: "No need to trust any party. The protocol enforces rules through mathematics, not promises.", syn: ["Verifiable"] }
+    ]
+  },
+  {
+    name: "Scarcity",
+    words: [
+      { w: "21 Million", desc: "The absolute, unalterable cap. No more can ever exist. Digital scarcity perfected.", syn: ["Fixed supply", "Hard cap"] },
+      { w: "Finite", desc: "Unlike fiat which can be printed infinitely, Bitcoin has mathematical limits baked into its code.", syn: ["Limited", "Bounded"] },
+      { w: "Sound", desc: "Money that cannot be debased or diluted. Its purchasing power is protected by code.", syn: ["Hard", "Reliable"] },
+      { w: "Pristine", desc: "Collateral with no counterparty risk. An asset that is no one's liability.", syn: ["Pure", "Clean"] },
+      { w: "Deflationary", desc: "As adoption grows against fixed supply, each unit represents more of the world's value.", syn: ["Appreciating"] }
+    ]
+  },
+  {
+    name: "Resilience",
+    words: [
+      { w: "Antifragile", desc: "Attacks make it stronger. Each challenge overcome proves and improves the network.", syn: ["Robust", "Hardened"] },
+      { w: "Decentralized", desc: "No single point of failure. Thousands of nodes across the globe ensure survival.", syn: ["Distributed"] },
+      { w: "Unstoppable", desc: "No government, corporation, or individual can stop a valid transaction.", syn: ["Censorship-resistant"] },
+      { w: "Persistent", desc: "Running continuously since 2009. The network has never been successfully attacked or shut down.", syn: ["Enduring"] }
+    ]
+  },
+  {
+    name: "Nature",
+    words: [
+      { w: "Organic", desc: "Emerged spontaneously without central planning. Grew through voluntary adoption, not mandate.", syn: ["Natural", "Emergent"] },
+      { w: "Meritocratic", desc: "No privileges, no special access. Everyone plays by the same rules enforced by code.", syn: ["Fair", "Equal"] },
+      { w: "Voluntary", desc: "Adoption by choice, not coercion. People opt in because they recognize its value.", syn: ["Consensual"] },
+      { w: "Elegant", desc: "Simple rules create complex, beautiful order. Satoshi's design is minimalist perfection.", syn: ["Simple", "Beautiful"] }
+    ]
+  },
+  {
+    name: "Energy",
+    words: [
+      { w: "Proof-of-Work", desc: "Real energy expenditure secures the network. Unforgeable costliness creates true value.", syn: ["PoW", "Mining"] },
+      { w: "Grounded", desc: "Anchored to physical reality through energy consumption. Not abstract promises but real resources.", syn: ["Rooted", "Real"] },
+      { w: "Thermodynamic", desc: "Security backed by the laws of physics. Attacking requires expending real-world energy.", syn: ["Physical"] },
+      { w: "Productive", desc: "Mining incentivizes renewable energy development and utilizes stranded power.", syn: ["Efficient"] }
+    ]
+  },
+  {
+    name: "Time",
+    words: [
+      { w: "Lindy", desc: "The longer it survives, the longer it's likely to survive. Each year adds to its life expectancy.", syn: ["Time-tested"] },
+      { w: "Patient", desc: "Rewards low time preference. Encourages saving over consumption, planning over impulse.", syn: ["Long-term"] },
+      { w: "Generational", desc: "Wealth that can be passed down intact. A store of value for centuries, not just years.", syn: ["Legacy", "Heritage"] },
+      { w: "Eternal", desc: "Designed to outlast institutions, governments, and perhaps civilizations.", syn: ["Timeless"] }
+    ]
+  },
+  {
+    name: "Virtue",
+    words: [
+      { w: "Honest", desc: "Cannot lie about supply, cannot hide transactions, cannot pretend to be what it's not.", syn: ["Truthful", "Sincere"] },
+      { w: "Courageous", desc: "Challenges the most powerful institutions on Earth. A peaceful revolution in money.", syn: ["Bold", "Brave"] },
+      { w: "Humble", desc: "No central authority claims credit. No face on the coin. The protocol serves, not rules.", syn: ["Modest"] },
+      { w: "Hopeful", desc: "Offers a path to sound money for all humanity. A tool for human flourishing.", syn: ["Optimistic"] }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════════════
+// WORD DATA - FIAT
+// ═══════════════════════════════════════════════════════════
+const fiatClusters = [
+  {
+    name: "Coercion",
+    words: [
+      { w: "Compulsory", desc: "Legal tender laws force acceptance. You have no choice but to use their money.", syn: ["Mandatory", "Forced"] },
+      { w: "Permissioned", desc: "Every transaction requires approval. Banks, governments, and payment processors are gatekeepers.", syn: ["Controlled"] },
+      { w: "Censored", desc: "Accounts frozen, transactions blocked, access denied. Your money is only yours if they allow it.", syn: ["Blocked", "Silenced"] },
+      { w: "Surveilled", desc: "Every transaction tracked, recorded, analyzed. Financial privacy is extinct.", syn: ["Monitored"] },
+      { w: "Confiscated", desc: "Bail-ins, asset freezes, civil forfeiture. They can take what they claim is yours.", syn: ["Seized", "Stolen"] }
+    ]
+  },
+  {
+    name: "Dishonesty",
+    words: [
+      { w: "Opaque", desc: "Central bank decisions made in closed rooms. The true money supply is unknowable.", syn: ["Hidden", "Secret"] },
+      { w: "Manipulated", desc: "Interest rates, money supply, exchange rates—all artificially controlled.", syn: ["Rigged", "Distorted"] },
+      { w: "Fabricated", desc: "Created from nothing with a keystroke. No backing, no constraint, no substance.", syn: ["Invented"] },
+      { w: "Deceptive", desc: "Inflation is called 'stimulus.' Money printing is 'quantitative easing.' Lies wrapped in jargon.", syn: ["Misleading"] },
+      { w: "Fraudulent", desc: "Fractional reserve banking creates money that doesn't exist. A system built on accounting fiction.", syn: ["Counterfeit"] }
+    ]
+  },
+  {
+    name: "Theft",
+    words: [
+      { w: "Inflation", desc: "The silent tax that steals purchasing power while you sleep. Your savings evaporate.", syn: ["Debasement"] },
+      { w: "Cantillon", desc: "Those closest to the money printer benefit first. Everyone else pays through rising prices.", syn: ["Inequality"] },
+      { w: "Seigniorage", desc: "The profit governments extract by creating money worth more than its cost to produce.", syn: ["Hidden tax"] },
+      { w: "Expropriation", desc: "Bail-ins turn depositors into unwilling bank investors. Your money becomes their capital.", syn: ["Seizure"] }
+    ]
+  },
+  {
+    name: "Fragility",
+    words: [
+      { w: "Centralized", desc: "Single points of failure everywhere. One decision, one hack, one policy can collapse it all.", syn: ["Concentrated"] },
+      { w: "Fragile", desc: "Requires constant intervention to prevent collapse. Held together by faith and force.", syn: ["Brittle", "Weak"] },
+      { w: "Dependent", desc: "Relies on trusted third parties at every step. Trust that is regularly betrayed.", syn: ["Vulnerable"] },
+      { w: "Corruptible", desc: "Human administrators can be bribed, threatened, or simply make mistakes.", syn: ["Exploitable"] },
+      { w: "Unstable", desc: "Boom and bust cycles engineered by monetary policy. Volatility by design.", syn: ["Chaotic"] }
+    ]
+  },
+  {
+    name: "Decay",
+    words: [
+      { w: "Debasement", desc: "Every unit becomes worth less over time. Designed to lose value. Guaranteed to fail.", syn: ["Erosion", "Dilution"] },
+      { w: "Ephemeral", desc: "Average fiat currency lifespan: 27 years. All eventually go to zero.", syn: ["Temporary"] },
+      { w: "Terminal", desc: "The mathematical endpoint of compound inflation is always hyperinflation or collapse.", syn: ["Dying", "Doomed"] },
+      { w: "Unsalvageable", desc: "Too much debt, too much printing. The system cannot be reformed, only replaced.", syn: ["Irreparable"] }
+    ]
+  },
+  {
+    name: "Artifice",
+    words: [
+      { w: "Contrived", desc: "Designed by committees, imposed by decree. Nothing natural about it.", syn: ["Artificial"] },
+      { w: "Arbitrary", desc: "Rules change on political whims. What's allowed today may be forbidden tomorrow.", syn: ["Capricious"] },
+      { w: "Abstract", desc: "Disconnected from physical reality. Numbers on screens backed by nothing but promises.", syn: ["Unreal", "Virtual"] },
+      { w: "Bureaucratic", desc: "Layers of administration extract value and add friction. Paper-pushers everywhere.", syn: ["Administrative"] }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════════════
+// GLOBAL LEAF REGISTRY
+// ═══════════════════════════════════════════════════════════
+const allLeaves = [];
+
+// ═══════════════════════════════════════════════════════════
+// MEASURE TEXT WIDTH (approximate)
+// ═══════════════════════════════════════════════════════════
+function measureTextWidth(text, fontSize) {
+  // Approximate character widths for Inter font at given size
+  // Most chars ~0.55em, narrow chars (i,l,t) ~0.35em, wide chars (m,w) ~0.75em
+  const narrow = 'iltfjr';
+  const wide = 'mwMW';
+  let width = 0;
+  for (const char of text) {
+    if (narrow.includes(char)) width += fontSize * 0.4;
+    else if (wide.includes(char)) width += fontSize * 0.8;
+    else if (char === char.toUpperCase() && char !== char.toLowerCase()) width += fontSize * 0.7;
+    else width += fontSize * 0.58;
+  }
+  return width;
+}
+
+// ═══════════════════════════════════════════════════════════
+// LAYOUT ENGINE - Taller tree, elliptical leaves
+// ═══════════════════════════════════════════════════════════
+function layoutTree(clusters, side) {
+  const W = 800, H = 1600;
+  const trunkX = W / 2;
+  const trunkBase = H - 60;
+  const trunkTop = 80;
+  
+  const leaves = [];
+  const branches = [];
+  const twigs = [];
+  const roots = [];
+  const labels = [];
+  
+  // Track placed ellipses for collision detection
+  const placedShapes = [];
+  
+  const numClusters = clusters.length;
+  const clusterHeight = (trunkBase - trunkTop - 200) / numClusters;
+  
+  clusters.forEach((cluster, ci) => {
+    const nWords = cluster.words.length;
+    
+    // Vertical position for this cluster - well spaced
+    const branchY = trunkTop + 120 + ci * clusterHeight;
+    
+    // Alternate sides
+    const goLeft = ci % 2 === 0;
+    const direction = goLeft ? -1 : 1;
+    
+    // Branch extends outward
+    const branchLen = 100;
+    const branchAngle = direction * (35 + (ci % 3) * 3);
+    const branchRad = branchAngle * Math.PI / 180;
+    
+    const bEndX = trunkX + Math.sin(branchRad) * branchLen;
+    const bEndY = branchY - Math.abs(Math.cos(branchRad)) * branchLen * 0.2;
+    
+    branches.push({ x1: trunkX, y1: branchY, x2: bEndX, y2: bEndY, side });
+    
+    // ── LABEL: On the branch, well before leaves ──
+    const labelX = trunkX + (bEndX - trunkX) * 0.55;
+    const labelY = branchY + (bEndY - branchY) * 0.55 - 28;
+    
+    labels.push({
+      x: labelX,
+      y: labelY,
+      text: cluster.name,
+      side,
+      anchor: 'middle'
+    });
+    
+    // ── Place leaves in grid below branch tip ──
+    const fontSize = 13;
+    const paddingX = 24; // Horizontal padding inside ellipse
+    const paddingY = 16; // Vertical padding inside ellipse
+    const minGap = 18;   // Gap between ellipses
+    
+    // Calculate grid
+    const cols = Math.min(3, nWords);
+    
+    cluster.words.forEach((word, wi) => {
+      // Calculate ellipse size based on word
+      const textWidth = measureTextWidth(word.w, fontSize);
+      const rx = Math.max(45, (textWidth / 2) + paddingX); // Horizontal radius
+      const ry = 24; // Vertical radius (fixed for consistency)
+      
+      // Grid position
+      const row = Math.floor(wi / cols);
+      const col = wi % cols;
+      const colsInRow = Math.min(cols, nWords - row * cols);
+      
+      // Cell sizing based on largest possible ellipse
+      const cellWidth = 120 + minGap;
+      const cellHeight = ry * 2 + minGap + 20;
+      
+      // Position leaves below and outward from branch tip
+      const rowStartX = bEndX + direction * 50 - ((colsInRow - 1) * cellWidth) / 2;
+      
+      let lx = rowStartX + col * cellWidth;
+      let ly = bEndY + 70 + row * cellHeight;
+      
+      // Stagger rows for organic feel
+      if (row % 2 === 1) {
+        lx += direction * 25;
+      }
+      
+      // Collision detection for ellipses
+      let attempts = 0;
+      let hasCollision = true;
+      
+      while (hasCollision && attempts < 50) {
+        hasCollision = false;
+        
+        for (const placed of placedShapes) {
+          // Ellipse-ellipse collision (approximate with scaled distance)
+          const dx = (lx - placed.x) / ((rx + placed.rx) * 0.9);
+          const dy = (ly - placed.y) / ((ry + placed.ry) * 0.9);
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < 1.1) { // Collision threshold
+            hasCollision = true;
+            // Push apart
+            const angle = Math.atan2(ly - placed.y, lx - placed.x);
+            const push = (1.1 - dist) * 30 + 5;
+            lx += Math.cos(angle) * push;
+            ly += Math.sin(angle) * push;
+            break;
+          }
+        }
+        
+        // Keep within bounds
+        lx = Math.max(rx + 30, Math.min(W - rx - 30, lx));
+        ly = Math.max(ry + 30, Math.min(H - ry - 80, ly));
+        
+        attempts++;
+      }
+      
+      // Register shape
+      placedShapes.push({ x: lx, y: ly, rx: rx, ry: ry });
+      
+      // Twig from branch to leaf
+      twigs.push({
+        x1: bEndX,
+        y1: bEndY,
+        x2: lx,
+        y2: ly - ry,
+        side
+      });
+      
+      const alt = wi % 2 === 1;
+      
+      leaves.push({
+        x: lx,
+        y: ly,
+        rx: rx,
+        ry: ry,
+        word: word.w,
+        desc: word.desc,
+        syn: word.syn,
+        side,
+        alt
+      });
+    });
+  });
+  
+  // ── Roots ──
+  const rootAngles = [-50, -22, 22, 50];
+  rootAngles.forEach((a, i) => {
+    const rad = a * Math.PI / 180;
+    const len = 55 + (i % 2) * 25;
+    roots.push({
+      x1: trunkX + ((i < 2) ? -7 : 7),
+      y1: trunkBase,
+      x2: trunkX + Math.sin(rad) * len,
+      y2: trunkBase + Math.cos(rad) * len * 0.4,
+      side
+    });
+  });
+  
+  return { trunkX, trunkBase, trunkTop, branches, twigs, leaves, roots, labels };
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER TREE TO SVG
+// ═══════════════════════════════════════════════════════════
+function renderTree(svgId, clusters, side) {
+  const svg = document.getElementById(svgId);
+  const layout = layoutTree(clusters, side);
+  let html = '';
+  
+  // Roots
+  layout.roots.forEach(r => {
+    html += `<line class="root ${side}" x1="${r.x1}" y1="${r.y1}" x2="${r.x2}" y2="${r.y2}" stroke-width="12"/>`;
+  });
+  
+  // Trunk
+  const tx = layout.trunkX;
+  html += `<path class="trunk ${side}" d="
+    M${tx-20},${layout.trunkBase} 
+    C${tx-18},${layout.trunkBase-400} ${tx-10},${layout.trunkBase-900} ${tx},${layout.trunkTop}
+    C${tx+10},${layout.trunkBase-900} ${tx+18},${layout.trunkBase-400} ${tx+20},${layout.trunkBase}
+    Z" fill="${side==='btc'?'#5a4030':'#454550'}"/>`;
+  
+  // Branches
+  layout.branches.forEach(b => {
+    html += `<line class="branch ${side}" x1="${b.x1}" y1="${b.y1}" x2="${b.x2}" y2="${b.y2}" stroke-width="16"/>`;
+  });
+  
+  // Twigs
+  layout.twigs.forEach(t => {
+    html += `<line class="twig ${side}" x1="${t.x1}" y1="${t.y1}" x2="${t.x2}" y2="${t.y2}" stroke-width="3"/>`;
+  });
+  
+  // Labels with background
+  layout.labels.forEach(l => {
+    const textWidth = l.text.length * 9 + 20;
+    const textHeight = 24;
+    html += `<rect class="label-bg" x="${l.x - textWidth/2}" y="${l.y - textHeight/2 - 1}" width="${textWidth}" height="${textHeight}"/>`;
+    html += `<text class="cluster-label ${side}" x="${l.x}" y="${l.y}" text-anchor="${l.anchor}" dominant-baseline="middle">${l.text}</text>`;
+  });
+  
+  // Leaves (ellipses)
+  layout.leaves.forEach((leaf) => {
+    const ellipseClass = leaf.alt ? `${leaf.side}-alt` : leaf.side;
+    const globalIdx = allLeaves.length;
+    allLeaves.push(leaf);
+    
+    html += `
+      <g class="leaf"
+         onmouseenter="showTooltip(event, ${globalIdx})"
+         onmouseleave="hideTooltip()"
+         onmousemove="moveTooltip(event)"
+         ontouchstart="showTooltip(event, ${globalIdx})">
+        <ellipse class="leaf-ellipse ${ellipseClass}" cx="${leaf.x}" cy="${leaf.y}" rx="${leaf.rx}" ry="${leaf.ry}"/>
+        <text class="leaf-text ${leaf.side}" x="${leaf.x}" y="${leaf.y}">${leaf.word}</text>
+      </g>`;
+  });
+  
+  svg.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOOLTIP
+// ═══════════════════════════════════════════════════════════
+const tooltip = document.getElementById('tooltip');
+const tipWord = document.getElementById('tip-word');
+const tipDesc = document.getElementById('tip-desc');
+const tipSyn = document.getElementById('tip-syn');
+
+function showTooltip(e, leafIndex) {
+  const leaf = allLeaves[leafIndex];
+  if (!leaf) return;
+  
+  tipWord.textContent = leaf.word;
+  tipWord.className = 'tooltip-word ' + leaf.side;
+  tipDesc.textContent = leaf.desc;
+  
+  if (leaf.syn && leaf.syn.length) {
+    tipSyn.innerHTML = 'Related: ' + leaf.syn.map(s => `<span>${s}</span>`).join(' · ');
+    tipSyn.style.display = 'block';
+  } else {
+    tipSyn.style.display = 'none';
+  }
+  
+  tooltip.className = 'tooltip visible ' + (leaf.side === 'btc' ? 'btc-tip' : 'fiat-tip');
+  moveTooltip(e);
+}
+
+function moveTooltip(e) {
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  
+  let x = clientX + 24;
+  let y = clientY - 14;
+  
+  if (x + 370 > window.innerWidth) x = clientX - 380;
+  if (y + 240 > window.innerHeight) y = window.innerHeight - 250;
+  if (y < 10) y = 10;
+  if (x < 10) x = 10;
+  
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+
+function hideTooltip() {
+  tooltip.className = 'tooltip';
+}
+
+document.addEventListener('touchstart', function(e) {
+  if (!e.target.closest('.leaf')) {
+    hideTooltip();
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// INITIALIZE
+// ═══════════════════════════════════════════════════════════
+renderTree('btc-tree', btcClusters, 'btc');
+renderTree('fiat-tree', fiatClusters, 'fiat');
+</script>
+</body>
+</html>
