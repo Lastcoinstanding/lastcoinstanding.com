@@ -642,23 +642,23 @@ function measureTextWidth(text, fontSize) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// LAYOUT ENGINE - Labels positioned clearly above leaves
+// LAYOUT ENGINE - Clear separation between labels and leaves
 // ═══════════════════════════════════════════════════════════
 function layoutTree(clusters, side) {
   const mobile = isMobile();
   
-  // Adjust dimensions for mobile - taller to give more space
+  // Dimensions - extra tall on mobile for proper spacing
   const W = mobile ? 400 : 800;
-  const H = mobile ? 1800 : 1600;  // Taller on mobile for more spacing
+  const H = mobile ? 2000 : 1600;  // Even taller on mobile
   const fontSize = mobile ? 11 : 14;
-  const labelFontSize = mobile ? 12 : 14;
-  const baseRy = mobile ? 22 : 26;
-  const minGap = mobile ? 14 : 18;
+  const labelFontSize = mobile ? 11 : 14;
+  const baseRy = mobile ? 20 : 26;  // Slightly smaller leaves on mobile
+  const minGap = mobile ? 12 : 18;
   const cols = mobile ? 2 : 3;
   
   const trunkX = W / 2;
   const trunkBase = H - 50;
-  const trunkTop = mobile ? 60 : 80;
+  const trunkTop = mobile ? 50 : 80;
   
   const leaves = [];
   const branches = [];
@@ -669,18 +669,18 @@ function layoutTree(clusters, side) {
   const placedShapes = [];
   
   const numClusters = clusters.length;
-  // More space per cluster on mobile
-  const clusterHeight = (trunkBase - trunkTop - (mobile ? 150 : 200)) / numClusters;
+  // More space per cluster
+  const clusterHeight = (trunkBase - trunkTop - (mobile ? 100 : 200)) / numClusters;
   
   clusters.forEach((cluster, ci) => {
     const nWords = cluster.words.length;
-    const branchY = trunkTop + (mobile ? 100 : 120) + ci * clusterHeight;
+    const branchY = trunkTop + (mobile ? 80 : 120) + ci * clusterHeight;
     
     const goLeft = ci % 2 === 0;
     const direction = goLeft ? -1 : 1;
     
-    const branchLen = mobile ? 50 : 100;
-    const branchAngle = direction * (30 + (ci % 3) * 3);
+    const branchLen = mobile ? 40 : 100;
+    const branchAngle = direction * (25 + (ci % 3) * 3);
     const branchRad = branchAngle * Math.PI / 180;
     
     const bEndX = trunkX + Math.sin(branchRad) * branchLen;
@@ -689,10 +689,10 @@ function layoutTree(clusters, side) {
     branches.push({ x1: trunkX, y1: branchY, x2: bEndX, y2: bEndY, side });
     
     // ═══════════════════════════════════════════════════════
-    // LABEL: Position on branch, well ABOVE where leaves start
+    // LABEL: Positioned at the branch tip, ABOVE the branch
     // ═══════════════════════════════════════════════════════
-    const labelX = trunkX + (bEndX - trunkX) * 0.4;  // Closer to trunk
-    const labelY = branchY - (mobile ? 8 : 12);  // Above the branch line
+    const labelX = bEndX;
+    const labelY = bEndY - (mobile ? 18 : 22);  // Above the branch end
     
     labels.push({
       x: labelX,
@@ -704,30 +704,35 @@ function layoutTree(clusters, side) {
     });
     
     // ═══════════════════════════════════════════════════════
-    // LEAVES: Start further below the branch
+    // LEAVES: Start well BELOW the label with guaranteed gap
     // ═══════════════════════════════════════════════════════
-    const paddingX = mobile ? 16 : 24;
-    const leafStartY = bEndY + (mobile ? 65 : 80);  // More clearance from branch/label
+    const paddingX = mobile ? 14 : 24;
+    // Key fix: leaves start much further below the branch/label
+    const labelBottomY = labelY + labelFontSize + 8;  // Bottom of label
+    const leafStartY = labelBottomY + (mobile ? 55 : 70);  // Big gap below label
     
     cluster.words.forEach((word, wi) => {
       const textWidth = measureTextWidth(word.w, fontSize);
-      const rx = Math.max(mobile ? 38 : 50, (textWidth / 2) + paddingX);
+      const rx = Math.max(mobile ? 36 : 50, (textWidth / 2) + paddingX);
       const ry = baseRy;
       
       const row = Math.floor(wi / cols);
       const col = wi % cols;
       const colsInRow = Math.min(cols, nWords - row * cols);
       
-      const cellWidth = (rx * 2) + minGap + (mobile ? 10 : 20);
-      const cellHeight = ry * 2 + minGap + (mobile ? 16 : 18);
+      const cellWidth = (rx * 2) + minGap + (mobile ? 8 : 20);
+      const cellHeight = ry * 2 + minGap + (mobile ? 14 : 18);
       
-      const rowStartX = bEndX + direction * (mobile ? 15 : 50) - ((colsInRow - 1) * cellWidth) / 2;
+      // Center the leaf cluster under the branch
+      const clusterCenterX = bEndX + direction * (mobile ? 10 : 40);
+      const rowStartX = clusterCenterX - ((colsInRow - 1) * cellWidth) / 2;
       
       let lx = rowStartX + col * cellWidth;
       let ly = leafStartY + row * cellHeight;
       
+      // Stagger alternate rows slightly
       if (row % 2 === 1) {
-        lx += direction * (mobile ? 10 : 25);
+        lx += direction * (mobile ? 8 : 20);
       }
       
       // Collision detection
@@ -738,22 +743,22 @@ function layoutTree(clusters, side) {
         hasCollision = false;
         
         for (const placed of placedShapes) {
-          const dx = (lx - placed.x) / ((rx + placed.rx) * 0.9);
-          const dy = (ly - placed.y) / ((ry + placed.ry) * 0.9);
+          const dx = (lx - placed.x) / ((rx + placed.rx) * 0.92);
+          const dy = (ly - placed.y) / ((ry + placed.ry) * 0.92);
           const dist = Math.sqrt(dx * dx + dy * dy);
           
-          if (dist < 1.1) {
+          if (dist < 1.05) {
             hasCollision = true;
             const angle = Math.atan2(ly - placed.y, lx - placed.x);
-            const push = (1.1 - dist) * 25 + 4;
+            const push = (1.05 - dist) * 20 + 3;
             lx += Math.cos(angle) * push;
             ly += Math.sin(angle) * push;
             break;
           }
         }
         
-        lx = Math.max(rx + 15, Math.min(W - rx - 15, lx));
-        ly = Math.max(ry + 15, Math.min(H - ry - 60, ly));
+        lx = Math.max(rx + 10, Math.min(W - rx - 10, lx));
+        ly = Math.max(ry + 10, Math.min(H - ry - 50, ly));
         
         attempts++;
       }
@@ -789,7 +794,7 @@ function layoutTree(clusters, side) {
   const rootAngles = [-50, -22, 22, 50];
   rootAngles.forEach((a, i) => {
     const rad = a * Math.PI / 180;
-    const len = (mobile ? 35 : 55) + (i % 2) * (mobile ? 15 : 25);
+    const len = (mobile ? 30 : 55) + (i % 2) * (mobile ? 12 : 25);
     roots.push({
       x1: trunkX + ((i < 2) ? -5 : 5),
       y1: trunkBase,
@@ -823,7 +828,7 @@ function renderTree(svgId, clusters, side, startIndex) {
   
   // Trunk
   const tx = layout.trunkX;
-  const tw = mobile ? 12 : 20;
+  const tw = mobile ? 10 : 20;
   html += `<path class="trunk ${side}" d="
     M${tx-tw},${layout.trunkBase} 
     C${tx-tw*0.9},${layout.trunkBase-layout.H*0.25} ${tx-tw*0.5},${layout.trunkBase-layout.H*0.55} ${tx},${layout.trunkTop}
@@ -832,20 +837,16 @@ function renderTree(svgId, clusters, side, startIndex) {
   
   // Branches
   layout.branches.forEach(b => {
-    const sw = mobile ? 10 : 16;
+    const sw = mobile ? 8 : 16;
     html += `<line class="branch ${side}" x1="${b.x1}" y1="${b.y1}" x2="${b.x2}" y2="${b.y2}" stroke-width="${sw}"/>`;
   });
   
   // Twigs
   layout.twigs.forEach(t => {
-    html += `<line class="twig ${side}" x1="${t.x1}" y1="${t.y1}" x2="${t.x2}" y2="${t.y2}" stroke-width="2.5"/>`;
+    html += `<line class="twig ${side}" x1="${t.x1}" y1="${t.y1}" x2="${t.x2}" y2="${t.y2}" stroke-width="2"/>`;
   });
   
-  // ═══════════════════════════════════════════════════════
-  // LABELS: Rendered AFTER leaves so they appear on top
-  // ═══════════════════════════════════════════════════════
-  
-  // Leaves first
+  // Leaves (rendered before labels so labels appear on top)
   layout.leaves.forEach((leaf) => {
     const ellipseClass = leaf.alt ? `${leaf.side}-alt` : leaf.side;
     const globalIdx = startIndex + allLeaves.length;
@@ -863,10 +864,10 @@ function renderTree(svgId, clusters, side, startIndex) {
       </g>`;
   });
   
-  // Labels on top (rendered last so they appear above leaves)
+  // Labels (rendered last so they appear on top of everything)
   layout.labels.forEach(l => {
-    const textWidth = l.text.length * (l.fontSize * 0.75) + 20;
-    const textHeight = l.fontSize + 12;
+    const textWidth = l.text.length * (l.fontSize * 0.72) + 18;
+    const textHeight = l.fontSize + 10;
     html += `<rect class="label-bg" x="${l.x - textWidth/2}" y="${l.y - textHeight/2}" width="${textWidth}" height="${textHeight}"/>`;
     html += `<text class="cluster-label ${side}" x="${l.x}" y="${l.y + 1}" text-anchor="${l.anchor}" dominant-baseline="middle" font-size="${l.fontSize}">${l.text}</text>`;
   });
@@ -913,7 +914,6 @@ function moveTooltip(e) {
   const mobile = isMobile();
   
   if (mobile) {
-    // Center tooltip at bottom of screen on mobile
     tooltip.style.left = '16px';
     tooltip.style.right = '16px';
     tooltip.style.bottom = '80px';
@@ -947,7 +947,6 @@ function hideTooltipDelayed() {
   tooltipTimeout = setTimeout(hideTooltip, 2000);
 }
 
-// Hide on tap outside
 document.addEventListener('touchstart', function(e) {
   if (!e.target.closest('.leaf') && !e.target.closest('.tooltip')) {
     hideTooltip();
@@ -963,10 +962,8 @@ function initTrees() {
   renderTree('fiat-tree', fiatClusters, 'fiat', allLeaves.length);
 }
 
-// Initialize
 initTrees();
 
-// Re-render on significant resize (orientation change)
 let lastWidth = window.innerWidth;
 window.addEventListener('resize', function() {
   const newWidth = window.innerWidth;
