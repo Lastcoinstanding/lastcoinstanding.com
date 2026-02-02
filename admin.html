@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Money Trees CMS — Admin</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --btc-orange: #f7931a;
+  --btc-gold: #ffb840;
+  --fiat-steel: #6a7580;
+  --bg-dark: #1a1a1a;
+  --bg-darker: #111;
+  --bg-card: #222;
+  --border: #333;
+  --text: #e0e0e0;
+  --text-muted: #888;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg-darker);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ─── HEADER ─── */
+header {
+  background: var(--bg-dark);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+header h1 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--btc-orange);
+}
+
+header h1 span {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--btc-orange);
+  color: #000;
+}
+
+.btn-primary:hover {
+  background: var(--btc-gold);
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: #2a2a2a;
+}
+
+/* ─── LAYOUT ─── */
+.container {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  height: calc(100vh - 65px);
+}
+
+@media (max-width: 1200px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+  .preview-panel {
+    display: none;
+  }
+}
+
+/* ─── EDITOR PANEL ─── */
+.editor-panel {
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.tree-selector {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.tree-tab {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid transparent;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+
+.tree-tab:hover {
+  background: #2a2a2a;
+}
+
+.tree-tab.active.btc {
+  background: rgba(247, 147, 26, 0.15);
+  border-color: var(--btc-orange);
+  color: var(--btc-orange);
+}
+
+.tree-tab.active.fiat {
+  background: rgba(106, 117, 128, 0.15);
+  border-color: var(--fiat-steel);
+  color: var(--fiat-steel);
+}
+
+/* ─── CLUSTER SECTIONS ─── */
+.cluster-section {
+  background: var(--bg-card);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.cluster-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.cluster-header:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.cluster-name-input {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--btc-orange);
+  width: 200px;
+}
+
+.cluster-name-input:focus {
+  outline: none;
+  border-bottom: 2px solid var(--btc-orange);
+}
+
+.fiat-view .cluster-name-input {
+  color: var(--fiat-steel);
+}
+
+.fiat-view .cluster-name-input:focus {
+  border-bottom-color: var(--fiat-steel);
+}
+
+.cluster-toggle {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  transition: transform 0.2s;
+}
+
+.cluster-section.collapsed .cluster-toggle {
+  transform: rotate(-90deg);
+}
+
+.cluster-section.collapsed .cluster-content {
+  display: none;
+}
+
+.cluster-content {
+  padding: 16px;
+}
+
+/* ─── WORD TABLE ─── */
+.word-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.word-table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.word-table td {
+  padding: 8px 12px;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.word-table tr:last-child td {
+  border-bottom: none;
+}
+
+.word-table input,
+.word-table textarea {
+  width: 100%;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.word-table input:focus,
+.word-table textarea:focus {
+  outline: none;
+  border-color: var(--btc-orange);
+}
+
+.fiat-view .word-table input:focus,
+.fiat-view .word-table textarea:focus {
+  border-color: var(--fiat-steel);
+}
+
+.word-table .word-input {
+  font-weight: 600;
+}
+
+.word-table textarea {
+  min-height: 60px;
+}
+
+.word-table .syn-input {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.col-word { width: 120px; }
+.col-desc { width: auto; }
+.col-syn { width: 150px; }
+.col-actions { width: 40px; }
+
+.delete-word {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 1.1rem;
+  border-radius: 4px;
+}
+
+.delete-word:hover {
+  background: rgba(255,0,0,0.1);
+  color: #e55;
+}
+
+.add-word-btn {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+.add-word-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+}
+
+/* ─── PREVIEW PANEL ─── */
+.preview-panel {
+  background: var(--bg-dark);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.preview-frame {
+  flex: 1;
+  overflow: hidden;
+}
+
+.preview-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  transform-origin: top left;
+}
+
+/* ─── EXPORT MODAL ─── */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s;
+}
+
+.modal-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  background: var(--bg-card);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-size: 1.2rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.modal-close:hover {
+  color: var(--text);
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.export-code {
+  background: var(--bg-darker);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  max-height: 400px;
+  overflow-y: auto;
+  color: #aaa;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #2a2a2a;
+  padding: 14px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s;
+  z-index: 1001;
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.success {
+  border-color: #4a4;
+  background: rgba(68, 170, 68, 0.15);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Money Trees <span>CMS</span></h1>
+  <div class="header-actions">
+    <button class="btn btn-secondary" onclick="resetData()">Reset to Default</button>
+    <button class="btn btn-secondary" onclick="showPreview()">Preview</button>
+    <button class="btn btn-primary" onclick="exportCode()">Export Code</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="editor-panel">
+    <div class="tree-selector">
+      <div class="tree-tab btc active" onclick="switchTree('btc')">Bitcoin Tree</div>
+      <div class="tree-tab fiat" onclick="switchTree('fiat')">Fiat Tree</div>
+    </div>
+    
+    <div id="editor-content"></div>
+  </div>
+  
+  <div class="preview-panel">
+    <div class="preview-header">Live Preview</div>
+    <div class="preview-frame">
+      <iframe id="preview-iframe" srcdoc=""></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal-overlay" id="export-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Export Code</h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom: 16px; color: var(--text-muted);">Copy this code and replace the corresponding section in your index.html file:</p>
+      <pre class="export-code" id="export-code"></pre>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+      <button class="btn btn-primary" onclick="copyCode()">Copy to Clipboard</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA STORE
+// ═══════════════════════════════════════════════════════════
+let currentTree = 'btc';
+
+let btcClusters = [
+  {
+    name: "Sovereignty",
+    words: [
+      { w: "Freedom", desc: "The ability to transact without permission from any authority. Bitcoin restores financial self-determination.", syn: ["Liberty", "Autonomy"] },
+      { w: "Self-custody", desc: "You hold your own keys, your own wealth. No intermediary can freeze, seize, or deny access.", syn: ["Control", "Ownership"] },
+      { w: "Autonomy", desc: "Independence from institutional gatekeepers. Your money answers only to you.", syn: ["Independence"] },
+      { w: "Permissionless", desc: "No application required. No approval needed. Anyone can participate in the network.", syn: ["Open", "Accessible"] },
+      { w: "Sovereign", desc: "Each holder is their own bank, their own central authority over their wealth.", syn: ["Self-ruling"] }
+    ]
+  },
+  {
+    name: "Integrity",
+    words: [
+      { w: "Truth", desc: "An immutable ledger that cannot lie. Every transaction is verifiable, transparent, and permanent.", syn: ["Honesty", "Veracity"] },
+      { w: "Incorruptible", desc: "No entity can alter the rules, manipulate supply, or corrupt the protocol for personal gain.", syn: ["Pure", "Untainted"] },
+      { w: "Transparent", desc: "Open-source code and a public ledger. Anyone can audit, verify, and trust through verification.", syn: ["Open", "Visible"] },
+      { w: "Immutable", desc: "What is written cannot be erased. The ledger is permanent and tamper-proof.", syn: ["Permanent", "Fixed"] },
+      { w: "Trustless", desc: "No need to trust any party. The protocol enforces rules through mathematics, not promises.", syn: ["Verifiable"] }
+    ]
+  },
+  {
+    name: "Scarcity",
+    words: [
+      { w: "21 Million", desc: "The absolute, unalterable cap. No more can ever exist. Digital scarcity perfected.", syn: ["Fixed supply", "Hard cap"] },
+      { w: "Finite", desc: "Unlike fiat which can be printed infinitely, Bitcoin has mathematical limits baked into its code.", syn: ["Limited", "Bounded"] },
+      { w: "Sound", desc: "Money that cannot be debased or diluted. Its purchasing power is protected by code.", syn: ["Hard", "Reliable"] },
+      { w: "Pristine", desc: "Collateral with no counterparty risk. An asset that is no one's liability.", syn: ["Pure", "Clean"] },
+      { w: "Deflationary", desc: "As adoption grows against fixed supply, each unit represents more of the world's value.", syn: ["Appreciating"] }
+    ]
+  },
+  {
+    name: "Resilience",
+    words: [
+      { w: "Antifragile", desc: "Attacks make it stronger. Each challenge overcome proves and improves the network.", syn: ["Robust", "Hardened"] },
+      { w: "Decentralized", desc: "No single point of failure. Thousands of nodes across the globe ensure survival.", syn: ["Distributed"] },
+      { w: "Unstoppable", desc: "No government, corporation, or individual can stop a valid transaction.", syn: ["Censorship-resistant"] },
+      { w: "Persistent", desc: "Running continuously since 2009. The network has never been successfully attacked or shut down.", syn: ["Enduring"] }
+    ]
+  },
+  {
+    name: "Nature",
+    words: [
+      { w: "Organic", desc: "Emerged spontaneously without central planning. Grew through voluntary adoption, not mandate.", syn: ["Natural", "Emergent"] },
+      { w: "Meritocratic", desc: "No privileges, no special access. Everyone plays by the same rules enforced by code.", syn: ["Fair", "Equal"] },
+      { w: "Voluntary", desc: "Adoption by choice, not coercion. People opt in because they recognize its value.", syn: ["Consensual"] },
+      { w: "Elegant", desc: "Simple rules create complex, beautiful order. Satoshi's design is minimalist perfection.", syn: ["Simple", "Beautiful"] }
+    ]
+  },
+  {
+    name: "Energy",
+    words: [
+      { w: "Proof-of-Work", desc: "Real energy expenditure secures the network. Unforgeable costliness creates true value.", syn: ["PoW", "Mining"] },
+      { w: "Grounded", desc: "Anchored to physical reality through energy consumption. Not abstract promises but real resources.", syn: ["Rooted", "Real"] },
+      { w: "Thermodynamic", desc: "Security backed by the laws of physics. Attacking requires expending real-world energy.", syn: ["Physical"] },
+      { w: "Productive", desc: "Mining incentivizes renewable energy development and utilizes stranded power.", syn: ["Efficient"] }
+    ]
+  },
+  {
+    name: "Time",
+    words: [
+      { w: "Lindy", desc: "The longer it survives, the longer it's likely to survive. Each year adds to its life expectancy.", syn: ["Time-tested"] },
+      { w: "Patient", desc: "Rewards low time preference. Encourages saving over consumption, planning over impulse.", syn: ["Long-term"] },
+      { w: "Generational", desc: "Wealth that can be passed down intact. A store of value for centuries, not just years.", syn: ["Legacy", "Heritage"] },
+      { w: "Eternal", desc: "Designed to outlast institutions, governments, and perhaps civilizations.", syn: ["Timeless"] }
+    ]
+  },
+  {
+    name: "Virtue",
+    words: [
+      { w: "Honest", desc: "Cannot lie about supply, cannot hide transactions, cannot pretend to be what it's not.", syn: ["Truthful", "Sincere"] },
+      { w: "Courageous", desc: "Challenges the most powerful institutions on Earth. A peaceful revolution in money.", syn: ["Bold", "Brave"] },
+      { w: "Humble", desc: "No central authority claims credit. No face on the coin. The protocol serves, not rules.", syn: ["Modest"] },
+      { w: "Hopeful", desc: "Offers a path to sound money for all humanity. A tool for human flourishing.", syn: ["Optimistic"] }
+    ]
+  }
+];
+
+let fiatClusters = [
+  {
+    name: "Coercion",
+    words: [
+      { w: "Compulsory", desc: "Legal tender laws force acceptance. You have no choice but to use their money.", syn: ["Mandatory", "Forced"] },
+      { w: "Permissioned", desc: "Every transaction requires approval. Banks, governments, and payment processors are gatekeepers.", syn: ["Controlled"] },
+      { w: "Censored", desc: "Accounts frozen, transactions blocked, access denied. Your money is only yours if they allow it.", syn: ["Blocked", "Silenced"] },
+      { w: "Surveilled", desc: "Every transaction tracked, recorded, analyzed. Financial privacy is extinct.", syn: ["Monitored"] },
+      { w: "Confiscated", desc: "Bail-ins, asset freezes, civil forfeiture. They can take what they claim is yours.", syn: ["Seized", "Stolen"] }
+    ]
+  },
+  {
+    name: "Dishonesty",
+    words: [
+      { w: "Opaque", desc: "Central bank decisions made in closed rooms. The true money supply is unknowable.", syn: ["Hidden", "Secret"] },
+      { w: "Manipulated", desc: "Interest rates, money supply, exchange rates—all artificially controlled.", syn: ["Rigged", "Distorted"] },
+      { w: "Fabricated", desc: "Created from nothing with a keystroke. No backing, no constraint, no substance.", syn: ["Invented"] },
+      { w: "Deceptive", desc: "Inflation is called 'stimulus.' Money printing is 'quantitative easing.' Lies wrapped in jargon.", syn: ["Misleading"] },
+      { w: "Fraudulent", desc: "Fractional reserve banking creates money that doesn't exist. A system built on accounting fiction.", syn: ["Counterfeit"] }
+    ]
+  },
+  {
+    name: "Theft",
+    words: [
+      { w: "Inflation", desc: "The silent tax that steals purchasing power while you sleep. Your savings evaporate.", syn: ["Debasement"] },
+      { w: "Cantillon", desc: "Those closest to the money printer benefit first. Everyone else pays through rising prices.", syn: ["Inequality"] },
+      { w: "Seigniorage", desc: "The profit governments extract by creating money worth more than its cost to produce.", syn: ["Hidden tax"] },
+      { w: "Expropriation", desc: "Bail-ins turn depositors into unwilling bank investors. Your money becomes their capital.", syn: ["Seizure"] }
+    ]
+  },
+  {
+    name: "Fragility",
+    words: [
+      { w: "Centralized", desc: "Single points of failure everywhere. One decision, one hack, one policy can collapse it all.", syn: ["Concentrated"] },
+      { w: "Fragile", desc: "Requires constant intervention to prevent collapse. Held together by faith and force.", syn: ["Brittle", "Weak"] },
+      { w: "Dependent", desc: "Relies on trusted third parties at every step. Trust that is regularly betrayed.", syn: ["Vulnerable"] },
+      { w: "Corruptible", desc: "Human administrators can be bribed, threatened, or simply make mistakes.", syn: ["Exploitable"] },
+      { w: "Unstable", desc: "Boom and bust cycles engineered by monetary policy. Volatility by design.", syn: ["Chaotic"] }
+    ]
+  },
+  {
+    name: "Decay",
+    words: [
+      { w: "Debasement", desc: "Every unit becomes worth less over time. Designed to lose value. Guaranteed to fail.", syn: ["Erosion", "Dilution"] },
+      { w: "Ephemeral", desc: "Average fiat currency lifespan: 27 years. All eventually go to zero.", syn: ["Temporary"] },
+      { w: "Terminal", desc: "The mathematical endpoint of compound inflation is always hyperinflation or collapse.", syn: ["Dying", "Doomed"] },
+      { w: "Unsalvageable", desc: "Too much debt, too much printing. The system cannot be reformed, only replaced.", syn: ["Irreparable"] }
+    ]
+  },
+  {
+    name: "Artifice",
+    words: [
+      { w: "Contrived", desc: "Designed by committees, imposed by decree. Nothing natural about it.", syn: ["Artificial"] },
+      { w: "Arbitrary", desc: "Rules change on political whims. What's allowed today may be forbidden tomorrow.", syn: ["Capricious"] },
+      { w: "Abstract", desc: "Disconnected from physical reality. Numbers on screens backed by nothing but promises.", syn: ["Unreal", "Virtual"] },
+      { w: "Bureaucratic", desc: "Layers of administration extract value and add friction. Paper-pushers everywhere.", syn: ["Administrative"] }
+    ]
+  }
+];
+
+// Store original data for reset
+const originalBtcClusters = JSON.parse(JSON.stringify(btcClusters));
+const originalFiatClusters = JSON.parse(JSON.stringify(fiatClusters));
+
+// ═══════════════════════════════════════════════════════════
+// RENDER EDITOR
+// ═══════════════════════════════════════════════════════════
+function renderEditor() {
+  const clusters = currentTree === 'btc' ? btcClusters : fiatClusters;
+  const container = document.getElementById('editor-content');
+  
+  container.className = currentTree === 'fiat' ? 'fiat-view' : '';
+  
+  let html = '';
+  
+  clusters.forEach((cluster, ci) => {
+    html += `
+      <div class="cluster-section" id="cluster-${ci}">
+        <div class="cluster-header" onclick="toggleCluster(${ci})">
+          <input type="text" class="cluster-name-input" 
+                 value="${cluster.name}" 
+                 onclick="event.stopPropagation()"
+                 onchange="updateClusterName(${ci}, this.value)">
+          <span class="cluster-toggle">▼</span>
+        </div>
+        <div class="cluster-content">
+          <table class="word-table">
+            <thead>
+              <tr>
+                <th class="col-word">Word</th>
+                <th class="col-desc">Description</th>
+                <th class="col-syn">Synonyms</th>
+                <th class="col-actions"></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${cluster.words.map((word, wi) => `
+                <tr>
+                  <td>
+                    <input type="text" class="word-input" value="${word.w}" 
+                           onchange="updateWord(${ci}, ${wi}, 'w', this.value)">
+                  </td>
+                  <td>
+                    <textarea onchange="updateWord(${ci}, ${wi}, 'desc', this.value)">${word.desc}</textarea>
+                  </td>
+                  <td>
+                    <input type="text" class="syn-input" value="${word.syn.join(', ')}" 
+                           onchange="updateSynonyms(${ci}, ${wi}, this.value)"
+                           placeholder="comma separated">
+                  </td>
+                  <td>
+                    <button class="delete-word" onclick="deleteWord(${ci}, ${wi})" title="Delete word">×</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <button class="add-word-btn" onclick="addWord(${ci})">+ Add Word</button>
+        </div>
+      </div>
+    `;
+  });
+  
+  html += `<button class="add-word-btn" style="margin-top: 8px;" onclick="addCluster()">+ Add New Cluster</button>`;
+  
+  container.innerHTML = html;
+  updatePreview();
+}
+
+// ═══════════════════════════════════════════════════════════
+// DATA OPERATIONS
+// ═══════════════════════════════════════════════════════════
+function switchTree(tree) {
+  currentTree = tree;
+  document.querySelectorAll('.tree-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.classList.contains(tree));
+  });
+  renderEditor();
+}
+
+function toggleCluster(ci) {
+  document.getElementById(`cluster-${ci}`).classList.toggle('collapsed');
+}
+
+function updateClusterName(ci, value) {
+  const clusters = currentTree === 'btc' ? btcClusters : fiatClusters;
+  clusters[ci].name = value;
+  updatePreview();
+}
+
+function updateWord(ci, wi, field, value) {
+  const clusters = currentTree === 'btc' ? btcClusters : fiatClusters;
+  clusters[ci].words[wi][field] = value;
+  updatePreview();
+}
+
+function updateSynonyms(ci, wi, value) {
+  const clusters = currentTree === 'btc' ? btcClusters : fiatClusters;
+  clusters[ci].words[wi].syn = value.split(',').map(s => s.trim()).filter(s => s);
+  updatePreview();
+}
+
+function addWord(ci) {
+  const clusters = currentTree === 'btc' ? btcClusters : fiatClusters;
+  clusters[ci].words.push({
+    w: "New Word",
+    desc: "Description goes here.",
+    syn: []
+  });
+  renderEditor();
+}
+
+function deleteWord(ci, wi) {
+  const clusters = currentTree === 'btc' ? btcClusters : fiatClusters;
+  if (clusters[ci].words.length > 1) {
+    clusters[ci].words.splice(wi, 1);
+    renderEditor();
+  } else {
+    showToast('Cannot delete the last word in a cluster');
+  }
+}
+
+function addCluster() {
+  const clusters = currentTree === 'btc' ? btcClusters : fiatClusters;
+  clusters.push({
+    name: "New Cluster",
+    words: [{ w: "Word", desc: "Description", syn: [] }]
+  });
+  renderEditor();
+}
+
+function resetData() {
+  if (confirm('Reset all changes to default? This cannot be undone.')) {
+    btcClusters = JSON.parse(JSON.stringify(originalBtcClusters));
+    fiatClusters = JSON.parse(JSON.stringify(originalFiatClusters));
+    renderEditor();
+    showToast('Data reset to default', 'success');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PREVIEW
+// ═══════════════════════════════════════════════════════════
+function updatePreview() {
+  const iframe = document.getElementById('preview-iframe');
+  const previewHtml = generatePreviewHtml();
+  iframe.srcdoc = previewHtml;
+}
+
+function showPreview() {
+  const previewHtml = generatePreviewHtml();
+  const newWindow = window.open('', '_blank');
+  newWindow.document.write(previewHtml);
+  newWindow.document.close();
+}
+
+function generatePreviewHtml() {
+  // This generates a minimal preview version
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { background: #1a1510; color: #ddd; font-family: sans-serif; padding: 20px; }
+.cluster { margin-bottom: 24px; }
+.cluster-name { color: #f7931a; font-weight: bold; margin-bottom: 8px; }
+.word { display: inline-block; background: #f7931a; color: #000; padding: 6px 14px; border-radius: 20px; margin: 4px; font-weight: 600; font-size: 0.9rem; }
+.fiat .cluster-name { color: #6a7580; }
+.fiat .word { background: #5a6672; color: #fff; }
+</style>
+</head>
+<body>
+<h2 style="color: #f7931a;">Bitcoin Tree</h2>
+${btcClusters.map(c => `
+  <div class="cluster">
+    <div class="cluster-name">${c.name}</div>
+    <div>${c.words.map(w => `<span class="word">${w.w}</span>`).join('')}</div>
+  </div>
+`).join('')}
+
+<h2 style="color: #6a7580; margin-top: 40px;">Fiat Tree</h2>
+<div class="fiat">
+${fiatClusters.map(c => `
+  <div class="cluster">
+    <div class="cluster-name">${c.name}</div>
+    <div>${c.words.map(w => `<span class="word">${w.w}</span>`).join('')}</div>
+  </div>
+`).join('')}
+</div>
+</body>
+</html>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════
+function exportCode() {
+  const btcCode = formatClustersAsCode(btcClusters, 'btcClusters');
+  const fiatCode = formatClustersAsCode(fiatClusters, 'fiatClusters');
+  
+  const fullCode = `// ═══════════════════════════════════════════════════════════
+// WORD DATA - BITCOIN
+// ═══════════════════════════════════════════════════════════
+${btcCode}
+
+// ═══════════════════════════════════════════════════════════
+// WORD DATA - FIAT
+// ═══════════════════════════════════════════════════════════
+${fiatCode}`;
+  
+  document.getElementById('export-code').textContent = fullCode;
+  document.getElementById('export-modal').classList.add('visible');
+}
+
+function formatClustersAsCode(clusters, varName) {
+  const lines = [`const ${varName} = [`];
+  
+  clusters.forEach((cluster, ci) => {
+    lines.push(`  {`);
+    lines.push(`    name: "${cluster.name}",`);
+    lines.push(`    words: [`);
+    
+    cluster.words.forEach((word, wi) => {
+      const synStr = word.syn.map(s => `"${s}"`).join(', ');
+      const desc = word.desc.replace(/"/g, '\\"');
+      const comma = wi < cluster.words.length - 1 ? ',' : '';
+      lines.push(`      { w: "${word.w}", desc: "${desc}", syn: [${synStr}] }${comma}`);
+    });
+    
+    lines.push(`    ]`);
+    lines.push(`  }${ci < clusters.length - 1 ? ',' : ''}`);
+  });
+  
+  lines.push(`];`);
+  return lines.join('\n');
+}
+
+function copyCode() {
+  const code = document.getElementById('export-code').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('Code copied to clipboard!', 'success');
+    closeModal();
+  });
+}
+
+function closeModal() {
+  document.getElementById('export-modal').classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+function showToast(message, type = '') {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = 'toast visible ' + type;
+  setTimeout(() => {
+    toast.classList.remove('visible');
+  }, 3000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+renderEditor();
+</script>
+</body>
+</html>
