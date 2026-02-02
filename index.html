@@ -810,7 +810,7 @@ function layoutTree(clusters, side) {
 // ═══════════════════════════════════════════════════════════
 // RENDER TREE
 // ═══════════════════════════════════════════════════════════
-function renderTree(svgId, clusters, side, startIndex) {
+function renderTree(svgId, clusters, side) {
   const svg = document.getElementById(svgId);
   const layout = layoutTree(clusters, side);
   const mobile = isMobile();
@@ -849,7 +849,7 @@ function renderTree(svgId, clusters, side, startIndex) {
   // Leaves (rendered before labels so labels appear on top)
   layout.leaves.forEach((leaf) => {
     const ellipseClass = leaf.alt ? `${leaf.side}-alt` : leaf.side;
-    const globalIdx = startIndex + allLeaves.length;
+    const globalIdx = allLeaves.length;  // Index is simply the current array length
     allLeaves.push(leaf);
     
     html += `
@@ -958,8 +958,8 @@ document.addEventListener('touchstart', function(e) {
 // ═══════════════════════════════════════════════════════════
 function initTrees() {
   allLeaves = [];
-  renderTree('btc-tree', btcClusters, 'btc', 0);
-  renderTree('fiat-tree', fiatClusters, 'fiat', allLeaves.length);
+  renderTree('btc-tree', btcClusters, 'btc');
+  renderTree('fiat-tree', fiatClusters, 'fiat');
 }
 
 initTrees();
