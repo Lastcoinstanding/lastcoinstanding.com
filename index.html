@@ -650,7 +650,7 @@ function layoutTree(clusters, side) {
   const numClusters = clusters.length;
   
   // Calculate height based on number of clusters for consistent spacing
-  const clusterSpacing = mobile ? 220 : 180;  // Fixed spacing per cluster
+  const clusterSpacing = mobile ? 240 : 200;  // Fixed spacing per cluster
   const baseHeight = mobile ? 300 : 350;  // Top and bottom padding
   
   // Dimensions - height scales with content
@@ -714,7 +714,7 @@ function layoutTree(clusters, side) {
     const paddingX = mobile ? 14 : 24;
     // Key fix: leaves start much further below the branch/label
     const labelBottomY = labelY + labelFontSize + 8;  // Bottom of label
-    const leafStartY = labelBottomY + (mobile ? 55 : 70);  // Big gap below label
+    const leafStartY = labelBottomY + (mobile ? 70 : 85);  // Increased gap below label
     
     cluster.words.forEach((word, wi) => {
       const textWidth = measureTextWidth(word.w, fontSize);
