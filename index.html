@@ -647,9 +647,15 @@ function measureTextWidth(text, fontSize) {
 function layoutTree(clusters, side) {
   const mobile = isMobile();
   
-  // Dimensions - extra tall on mobile for proper spacing
+  const numClusters = clusters.length;
+  
+  // Calculate height based on number of clusters for consistent spacing
+  const clusterSpacing = mobile ? 220 : 180;  // Fixed spacing per cluster
+  const baseHeight = mobile ? 300 : 350;  // Top and bottom padding
+  
+  // Dimensions - height scales with content
   const W = mobile ? 400 : 800;
-  const H = mobile ? 2000 : 1600;  // Even taller on mobile
+  const H = baseHeight + (numClusters * clusterSpacing);
   const fontSize = mobile ? 11 : 14;
   const labelFontSize = mobile ? 11 : 14;
   const baseRy = mobile ? 20 : 26;  // Slightly smaller leaves on mobile
@@ -668,9 +674,8 @@ function layoutTree(clusters, side) {
   
   const placedShapes = [];
   
-  const numClusters = clusters.length;
-  // More space per cluster
-  const clusterHeight = (trunkBase - trunkTop - (mobile ? 100 : 200)) / numClusters;
+  // Fixed spacing per cluster (not divided by numClusters)
+  const clusterHeight = clusterSpacing;
   
   clusters.forEach((cluster, ci) => {
     const nWords = cluster.words.length;
