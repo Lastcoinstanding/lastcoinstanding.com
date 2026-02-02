@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
 <title>The Money Trees — Last Coin Standing</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@500;600;700&display=swap');
 
 :root {
-  /* Bitcoin - warm, organic, golden */
   --btc-orange: #f7931a;
   --btc-gold: #ffb840;
   --btc-amber: #e8a020;
@@ -16,7 +15,6 @@
   --btc-bark-light: #7a6050;
   --btc-bg: #0f0d0a;
   
-  /* Fiat - cold, mechanical, grey */
   --fiat-steel: #6a7580;
   --fiat-slate: #4a5560;
   --fiat-rust: #7a5555;
@@ -53,7 +51,7 @@ body.fiat-view {
 /* ─── HEADER ─── */
 header {
   text-align: center;
-  padding: 28px 20px 8px;
+  padding: 24px 16px 8px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -70,18 +68,18 @@ body.fiat-view header {
 
 header h1 {
   font-weight: 500;
-  font-size: clamp(1.4rem, 4vw, 2.1rem);
-  letter-spacing: 0.1em;
+  font-size: clamp(1.2rem, 5vw, 2.1rem);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #f0e8e0;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 header p {
   font-style: italic;
   font-weight: 400;
   color: #908880;
-  font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+  font-size: clamp(0.85rem, 2.5vw, 1.05rem);
 }
 
 /* ─── TOGGLE SWITCH ─── */
@@ -89,10 +87,10 @@ header p {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 18px;
-  padding: 16px 20px;
+  gap: 14px;
+  padding: 14px 16px;
   position: sticky;
-  top: 70px;
+  top: 60px;
   z-index: 100;
 }
 
@@ -106,12 +104,12 @@ body.fiat-view .toggle-container {
 
 .toggle-label {
   font-family: var(--font-ui);
-  font-size: clamp(0.8rem, 2vw, 0.95rem);
+  font-size: clamp(0.85rem, 3vw, 0.95rem);
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
-  padding: 10px 18px;
+  padding: 10px 16px;
   border-radius: 6px;
   transition: all 0.3s ease;
   user-select: none;
@@ -133,30 +131,31 @@ body.fiat-view .toggle-container {
 
 body.btc-view .toggle-label.btc {
   background: rgba(247, 147, 26, 0.18);
-  box-shadow: 0 0 24px rgba(247, 147, 26, 0.25);
+  box-shadow: 0 0 20px rgba(247, 147, 26, 0.25);
 }
 
 body.fiat-view .toggle-label.fiat {
   background: rgba(100, 115, 130, 0.22);
-  box-shadow: 0 0 24px rgba(100, 115, 130, 0.18);
+  box-shadow: 0 0 20px rgba(100, 115, 130, 0.18);
 }
 
 .toggle-switch {
-  width: 64px;
-  height: 32px;
+  width: 56px;
+  height: 28px;
   background: #1a1a1a;
-  border-radius: 16px;
+  border-radius: 14px;
   position: relative;
   cursor: pointer;
   border: 2px solid #333;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .toggle-switch::after {
   content: '';
   position: absolute;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   top: 2px;
   transition: all 0.3s ease;
@@ -169,7 +168,7 @@ body.btc-view .toggle-switch {
 body.btc-view .toggle-switch::after {
   left: 3px;
   background: var(--btc-orange);
-  box-shadow: 0 0 12px rgba(247, 147, 26, 0.6);
+  box-shadow: 0 0 10px rgba(247, 147, 26, 0.6);
 }
 
 body.fiat-view .toggle-switch {
@@ -177,16 +176,16 @@ body.fiat-view .toggle-switch {
 }
 
 body.fiat-view .toggle-switch::after {
-  left: 33px;
+  left: 29px;
   background: var(--fiat-steel);
-  box-shadow: 0 0 12px rgba(100, 115, 130, 0.4);
+  box-shadow: 0 0 10px rgba(100, 115, 130, 0.4);
 }
 
 /* ─── TREE VIEWS ─── */
 .tree-view {
   display: none;
   justify-content: center;
-  padding: 10px 20px 60px;
+  padding: 10px 12px 60px;
   opacity: 0;
   transition: opacity 0.4s ease;
 }
@@ -203,10 +202,10 @@ body.fiat-view .toggle-switch::after {
 }
 
 .tree-title {
-  font-size: clamp(1.6rem, 4.5vw, 2.2rem);
+  font-size: clamp(1.4rem, 6vw, 2.2rem);
   font-weight: 600;
-  letter-spacing: 0.1em;
-  margin-bottom: 6px;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
   text-transform: uppercase;
 }
 
@@ -216,8 +215,8 @@ body.fiat-view .toggle-switch::after {
 .tree-subtitle {
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(0.95rem, 2.2vw, 1.1rem);
-  margin-bottom: 16px;
+  font-size: clamp(0.9rem, 3vw, 1.1rem);
+  margin-bottom: 12px;
   color: #a09890;
 }
 
@@ -251,19 +250,13 @@ body.fiat-view .tree-subtitle {
 /* ─── CLUSTER LABELS ─── */
 .cluster-label {
   font-family: var(--font-ui);
-  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-.cluster-label.btc { 
-  fill: #ffd080;
-}
-
-.cluster-label.fiat { 
-  fill: #b0c0d0;
-}
+.cluster-label.btc { fill: #ffd080; }
+.cluster-label.fiat { fill: #b0c0d0; }
 
 .label-bg {
   fill: rgba(0,0,0,0.7);
@@ -282,18 +275,10 @@ body.fiat-view .tree-subtitle {
   filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5));
 }
 
-.leaf-ellipse.btc { 
-  fill: #f7931a;
-}
-.leaf-ellipse.btc-alt { 
-  fill: #ffb030;
-}
-.leaf-ellipse.fiat { 
-  fill: #5a6672;
-}
-.leaf-ellipse.fiat-alt { 
-  fill: #6a4a4a;
-}
+.leaf-ellipse.btc { fill: #f7931a; }
+.leaf-ellipse.btc-alt { fill: #ffb030; }
+.leaf-ellipse.fiat { fill: #5a6672; }
+.leaf-ellipse.fiat-alt { fill: #6a4a4a; }
 
 /* ─── LEAF TEXT ─── */
 .leaf-text {
@@ -305,12 +290,10 @@ body.fiat-view .tree-subtitle {
 }
 
 .leaf-text.btc {
-  font-size: 13px;
   fill: #1a0d00;
 }
 
 .leaf-text.fiat {
-  font-size: 13px;
   fill: #ffffff;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
 }
@@ -318,8 +301,8 @@ body.fiat-view .tree-subtitle {
 /* ─── TOOLTIP ─── */
 .tooltip {
   position: fixed;
-  max-width: 360px;
-  padding: 20px 24px;
+  max-width: 340px;
+  padding: 18px 20px;
   border-radius: 12px;
   pointer-events: none;
   opacity: 0;
@@ -343,9 +326,9 @@ body.fiat-view .tree-subtitle {
 
 .tooltip-word {
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   letter-spacing: 0.03em;
 }
 .tooltip-word.btc { color: #ffaa33; }
@@ -353,10 +336,10 @@ body.fiat-view .tree-subtitle {
 
 .tooltip-desc {
   font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 400;
   color: #d8d0c8;
-  line-height: 1.7;
+  line-height: 1.65;
 }
 
 body.fiat-view .tooltip-desc {
@@ -364,21 +347,21 @@ body.fiat-view .tooltip-desc {
 }
 
 .tooltip-syn {
-  margin-top: 14px;
-  padding-top: 14px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid rgba(255,255,255,0.15);
   font-family: var(--font-ui);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
   color: #999;
 }
-.tooltip-syn span { margin: 0 6px; }
+.tooltip-syn span { margin: 0 5px; }
 
 /* ─── FOOTER ─── */
 footer {
   text-align: center;
-  padding: 30px 20px 50px;
-  font-size: 0.95rem;
+  padding: 24px 16px 40px;
+  font-size: 0.9rem;
 }
 footer a { 
   color: var(--btc-orange); 
@@ -391,21 +374,35 @@ body.fiat-view footer a {
   color: #8a9aa8;
 }
 
-/* ─── MOBILE ─── */
+/* ─── MOBILE: Larger leaves and text ─── */
 @media (max-width: 600px) {
-  header { padding: 18px 15px 5px; }
-  .toggle-container { padding: 12px 10px; gap: 12px; top: 60px; }
-  .toggle-label { padding: 8px 14px; font-size: 0.75rem; }
-  .toggle-switch { width: 54px; height: 28px; }
-  .toggle-switch::after { width: 20px; height: 20px; }
-  body.btc-view .toggle-switch::after { left: 3px; }
-  body.fiat-view .toggle-switch::after { left: 27px; }
-  .tree-view { padding: 5px 10px 40px; }
-  .leaf-text { font-size: 11px !important; }
-  .cluster-label { font-size: 11px; }
-  .tooltip { max-width: 300px; padding: 16px 18px; }
-  .tooltip-word { font-size: 1.3rem; }
-  .tooltip-desc { font-size: 1.05rem; }
+  header { padding: 16px 12px 6px; top: 0; }
+  header h1 { font-size: 1.1rem; letter-spacing: 0.06em; }
+  header p { font-size: 0.8rem; }
+  
+  .toggle-container { 
+    padding: 10px 12px; 
+    gap: 10px; 
+    top: 50px; 
+  }
+  .toggle-label { 
+    padding: 8px 12px; 
+    font-size: 0.8rem; 
+  }
+  
+  .tree-view { padding: 8px 8px 40px; }
+  .tree-title { font-size: 1.3rem; }
+  .tree-subtitle { font-size: 0.85rem; margin-bottom: 8px; }
+  
+  .tooltip { 
+    max-width: calc(100vw - 32px); 
+    padding: 14px 16px;
+    left: 16px !important;
+    right: 16px;
+    width: auto;
+  }
+  .tooltip-word { font-size: 1.2rem; }
+  .tooltip-desc { font-size: 1rem; }
 }
 </style>
 </head>
@@ -413,7 +410,7 @@ body.fiat-view footer a {
 
 <header>
   <h1>The Money Trees</h1>
-  <p>Hover over each leaf to explore the nature of money</p>
+  <p>Tap each leaf to explore the nature of money</p>
 </header>
 
 <div class="toggle-container">
@@ -422,21 +419,19 @@ body.fiat-view footer a {
   <span class="toggle-label fiat" onclick="showTree('fiat')">Fiat</span>
 </div>
 
-<!-- BITCOIN TREE VIEW -->
 <div id="btc-view" class="tree-view active">
   <div class="tree-container">
     <h2 class="tree-title btc">Bitcoin</h2>
     <p class="tree-subtitle">Sound money · Sovereignty · Truth</p>
-    <svg id="btc-tree" class="tree-svg" viewBox="0 0 800 1600"></svg>
+    <svg id="btc-tree" class="tree-svg"></svg>
   </div>
 </div>
 
-<!-- FIAT TREE VIEW -->
 <div id="fiat-view" class="tree-view">
   <div class="tree-container">
     <h2 class="tree-title fiat">Fiat</h2>
     <p class="tree-subtitle">Broken money · Coercion · Decay</p>
-    <svg id="fiat-tree" class="tree-svg" viewBox="0 0 800 1600"></svg>
+    <svg id="fiat-tree" class="tree-svg"></svg>
   </div>
 </div>
 
@@ -451,6 +446,13 @@ body.fiat-view footer a {
 </footer>
 
 <script>
+// ═══════════════════════════════════════════════════════════
+// RESPONSIVE DETECTION
+// ═══════════════════════════════════════════════════════════
+function isMobile() {
+  return window.innerWidth <= 600;
+}
+
 // ═══════════════════════════════════════════════════════════
 // TOGGLE FUNCTIONALITY
 // ═══════════════════════════════════════════════════════════
@@ -621,14 +623,12 @@ const fiatClusters = [
 // ═══════════════════════════════════════════════════════════
 // GLOBAL LEAF REGISTRY
 // ═══════════════════════════════════════════════════════════
-const allLeaves = [];
+let allLeaves = [];
 
 // ═══════════════════════════════════════════════════════════
-// MEASURE TEXT WIDTH (approximate)
+// MEASURE TEXT WIDTH
 // ═══════════════════════════════════════════════════════════
 function measureTextWidth(text, fontSize) {
-  // Approximate character widths for Inter font at given size
-  // Most chars ~0.55em, narrow chars (i,l,t) ~0.35em, wide chars (m,w) ~0.75em
   const narrow = 'iltfjr';
   const wide = 'mwMW';
   let width = 0;
@@ -642,13 +642,23 @@ function measureTextWidth(text, fontSize) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// LAYOUT ENGINE - Taller tree, elliptical leaves
+// LAYOUT ENGINE - Responsive sizing
 // ═══════════════════════════════════════════════════════════
 function layoutTree(clusters, side) {
-  const W = 800, H = 1600;
+  const mobile = isMobile();
+  
+  // Adjust dimensions for mobile
+  const W = mobile ? 400 : 800;
+  const H = mobile ? 1400 : 1600;
+  const fontSize = mobile ? 11 : 14;
+  const labelFontSize = mobile ? 11 : 14;
+  const baseRy = mobile ? 22 : 26;
+  const minGap = mobile ? 12 : 18;
+  const cols = mobile ? 2 : 3;
+  
   const trunkX = W / 2;
-  const trunkBase = H - 60;
-  const trunkTop = 80;
+  const trunkBase = H - 50;
+  const trunkTop = mobile ? 60 : 80;
   
   const leaves = [];
   const branches = [];
@@ -656,24 +666,19 @@ function layoutTree(clusters, side) {
   const roots = [];
   const labels = [];
   
-  // Track placed ellipses for collision detection
   const placedShapes = [];
   
   const numClusters = clusters.length;
-  const clusterHeight = (trunkBase - trunkTop - 200) / numClusters;
+  const clusterHeight = (trunkBase - trunkTop - (mobile ? 100 : 200)) / numClusters;
   
   clusters.forEach((cluster, ci) => {
     const nWords = cluster.words.length;
+    const branchY = trunkTop + (mobile ? 70 : 120) + ci * clusterHeight;
     
-    // Vertical position for this cluster - well spaced
-    const branchY = trunkTop + 120 + ci * clusterHeight;
-    
-    // Alternate sides
     const goLeft = ci % 2 === 0;
     const direction = goLeft ? -1 : 1;
     
-    // Branch extends outward
-    const branchLen = 100;
+    const branchLen = mobile ? 60 : 100;
     const branchAngle = direction * (35 + (ci % 3) * 3);
     const branchRad = branchAngle * Math.PI / 180;
     
@@ -682,54 +687,44 @@ function layoutTree(clusters, side) {
     
     branches.push({ x1: trunkX, y1: branchY, x2: bEndX, y2: bEndY, side });
     
-    // ── LABEL: On the branch, well before leaves ──
-    const labelX = trunkX + (bEndX - trunkX) * 0.55;
-    const labelY = branchY + (bEndY - branchY) * 0.55 - 28;
+    // Label
+    const labelX = trunkX + (bEndX - trunkX) * 0.5;
+    const labelY = branchY + (bEndY - branchY) * 0.5 - (mobile ? 20 : 28);
     
     labels.push({
       x: labelX,
       y: labelY,
       text: cluster.name,
       side,
-      anchor: 'middle'
+      anchor: 'middle',
+      fontSize: labelFontSize
     });
     
-    // ── Place leaves in grid below branch tip ──
-    const fontSize = 13;
-    const paddingX = 24; // Horizontal padding inside ellipse
-    const paddingY = 16; // Vertical padding inside ellipse
-    const minGap = 18;   // Gap between ellipses
-    
-    // Calculate grid
-    const cols = Math.min(3, nWords);
+    // Leaves
+    const paddingX = mobile ? 16 : 24;
     
     cluster.words.forEach((word, wi) => {
-      // Calculate ellipse size based on word
       const textWidth = measureTextWidth(word.w, fontSize);
-      const rx = Math.max(45, (textWidth / 2) + paddingX); // Horizontal radius
-      const ry = 24; // Vertical radius (fixed for consistency)
+      const rx = Math.max(mobile ? 38 : 50, (textWidth / 2) + paddingX);
+      const ry = baseRy;
       
-      // Grid position
       const row = Math.floor(wi / cols);
       const col = wi % cols;
       const colsInRow = Math.min(cols, nWords - row * cols);
       
-      // Cell sizing based on largest possible ellipse
-      const cellWidth = 120 + minGap;
-      const cellHeight = ry * 2 + minGap + 20;
+      const cellWidth = (rx * 2) + minGap + (mobile ? 8 : 20);
+      const cellHeight = ry * 2 + minGap + (mobile ? 12 : 18);
       
-      // Position leaves below and outward from branch tip
-      const rowStartX = bEndX + direction * 50 - ((colsInRow - 1) * cellWidth) / 2;
+      const rowStartX = bEndX + direction * (mobile ? 20 : 50) - ((colsInRow - 1) * cellWidth) / 2;
       
       let lx = rowStartX + col * cellWidth;
-      let ly = bEndY + 70 + row * cellHeight;
+      let ly = bEndY + (mobile ? 45 : 70) + row * cellHeight;
       
-      // Stagger rows for organic feel
       if (row % 2 === 1) {
-        lx += direction * 25;
+        lx += direction * (mobile ? 12 : 25);
       }
       
-      // Collision detection for ellipses
+      // Collision detection
       let attempts = 0;
       let hasCollision = true;
       
@@ -737,33 +732,28 @@ function layoutTree(clusters, side) {
         hasCollision = false;
         
         for (const placed of placedShapes) {
-          // Ellipse-ellipse collision (approximate with scaled distance)
           const dx = (lx - placed.x) / ((rx + placed.rx) * 0.9);
           const dy = (ly - placed.y) / ((ry + placed.ry) * 0.9);
           const dist = Math.sqrt(dx * dx + dy * dy);
           
-          if (dist < 1.1) { // Collision threshold
+          if (dist < 1.1) {
             hasCollision = true;
-            // Push apart
             const angle = Math.atan2(ly - placed.y, lx - placed.x);
-            const push = (1.1 - dist) * 30 + 5;
+            const push = (1.1 - dist) * 25 + 4;
             lx += Math.cos(angle) * push;
             ly += Math.sin(angle) * push;
             break;
           }
         }
         
-        // Keep within bounds
-        lx = Math.max(rx + 30, Math.min(W - rx - 30, lx));
-        ly = Math.max(ry + 30, Math.min(H - ry - 80, ly));
+        lx = Math.max(rx + 15, Math.min(W - rx - 15, lx));
+        ly = Math.max(ry + 15, Math.min(H - ry - 60, ly));
         
         attempts++;
       }
       
-      // Register shape
       placedShapes.push({ x: lx, y: ly, rx: rx, ry: ry });
       
-      // Twig from branch to leaf
       twigs.push({
         x1: bEndX,
         y1: bEndY,
@@ -783,18 +773,19 @@ function layoutTree(clusters, side) {
         desc: word.desc,
         syn: word.syn,
         side,
-        alt
+        alt,
+        fontSize: fontSize
       });
     });
   });
   
-  // ── Roots ──
+  // Roots
   const rootAngles = [-50, -22, 22, 50];
   rootAngles.forEach((a, i) => {
     const rad = a * Math.PI / 180;
-    const len = 55 + (i % 2) * 25;
+    const len = (mobile ? 35 : 55) + (i % 2) * (mobile ? 15 : 25);
     roots.push({
-      x1: trunkX + ((i < 2) ? -7 : 7),
+      x1: trunkX + ((i < 2) ? -5 : 5),
       y1: trunkBase,
       x2: trunkX + Math.sin(rad) * len,
       y2: trunkBase + Math.cos(rad) * len * 0.4,
@@ -802,66 +793,77 @@ function layoutTree(clusters, side) {
     });
   });
   
-  return { trunkX, trunkBase, trunkTop, branches, twigs, leaves, roots, labels };
+  return { W, H, trunkX, trunkBase, trunkTop, branches, twigs, leaves, roots, labels };
 }
 
 // ═══════════════════════════════════════════════════════════
-// RENDER TREE TO SVG
+// RENDER TREE
 // ═══════════════════════════════════════════════════════════
-function renderTree(svgId, clusters, side) {
+function renderTree(svgId, clusters, side, startIndex) {
   const svg = document.getElementById(svgId);
   const layout = layoutTree(clusters, side);
+  const mobile = isMobile();
+  
+  // Set viewBox
+  svg.setAttribute('viewBox', `0 0 ${layout.W} ${layout.H}`);
+  
   let html = '';
   
   // Roots
   layout.roots.forEach(r => {
-    html += `<line class="root ${side}" x1="${r.x1}" y1="${r.y1}" x2="${r.x2}" y2="${r.y2}" stroke-width="12"/>`;
+    const sw = mobile ? 8 : 12;
+    html += `<line class="root ${side}" x1="${r.x1}" y1="${r.y1}" x2="${r.x2}" y2="${r.y2}" stroke-width="${sw}"/>`;
   });
   
   // Trunk
   const tx = layout.trunkX;
+  const tw = mobile ? 12 : 20;
   html += `<path class="trunk ${side}" d="
-    M${tx-20},${layout.trunkBase} 
-    C${tx-18},${layout.trunkBase-400} ${tx-10},${layout.trunkBase-900} ${tx},${layout.trunkTop}
-    C${tx+10},${layout.trunkBase-900} ${tx+18},${layout.trunkBase-400} ${tx+20},${layout.trunkBase}
+    M${tx-tw},${layout.trunkBase} 
+    C${tx-tw*0.9},${layout.trunkBase-layout.H*0.25} ${tx-tw*0.5},${layout.trunkBase-layout.H*0.55} ${tx},${layout.trunkTop}
+    C${tx+tw*0.5},${layout.trunkBase-layout.H*0.55} ${tx+tw*0.9},${layout.trunkBase-layout.H*0.25} ${tx+tw},${layout.trunkBase}
     Z" fill="${side==='btc'?'#5a4030':'#454550'}"/>`;
   
   // Branches
   layout.branches.forEach(b => {
-    html += `<line class="branch ${side}" x1="${b.x1}" y1="${b.y1}" x2="${b.x2}" y2="${b.y2}" stroke-width="16"/>`;
+    const sw = mobile ? 10 : 16;
+    html += `<line class="branch ${side}" x1="${b.x1}" y1="${b.y1}" x2="${b.x2}" y2="${b.y2}" stroke-width="${sw}"/>`;
   });
   
   // Twigs
   layout.twigs.forEach(t => {
-    html += `<line class="twig ${side}" x1="${t.x1}" y1="${t.y1}" x2="${t.x2}" y2="${t.y2}" stroke-width="3"/>`;
+    html += `<line class="twig ${side}" x1="${t.x1}" y1="${t.y1}" x2="${t.x2}" y2="${t.y2}" stroke-width="2.5"/>`;
   });
   
-  // Labels with background
+  // Labels
   layout.labels.forEach(l => {
-    const textWidth = l.text.length * 9 + 20;
-    const textHeight = 24;
+    const textWidth = l.text.length * (l.fontSize * 0.7) + 16;
+    const textHeight = l.fontSize + 10;
     html += `<rect class="label-bg" x="${l.x - textWidth/2}" y="${l.y - textHeight/2 - 1}" width="${textWidth}" height="${textHeight}"/>`;
-    html += `<text class="cluster-label ${side}" x="${l.x}" y="${l.y}" text-anchor="${l.anchor}" dominant-baseline="middle">${l.text}</text>`;
+    html += `<text class="cluster-label ${side}" x="${l.x}" y="${l.y}" text-anchor="${l.anchor}" dominant-baseline="middle" font-size="${l.fontSize}">${l.text}</text>`;
   });
   
-  // Leaves (ellipses)
+  // Leaves
   layout.leaves.forEach((leaf) => {
     const ellipseClass = leaf.alt ? `${leaf.side}-alt` : leaf.side;
-    const globalIdx = allLeaves.length;
+    const globalIdx = startIndex + allLeaves.length;
     allLeaves.push(leaf);
     
     html += `
       <g class="leaf"
+         ontouchstart="showTooltip(event, ${globalIdx})"
+         ontouchend="hideTooltipDelayed()"
          onmouseenter="showTooltip(event, ${globalIdx})"
          onmouseleave="hideTooltip()"
-         onmousemove="moveTooltip(event)"
-         ontouchstart="showTooltip(event, ${globalIdx})">
+         onmousemove="moveTooltip(event)">
         <ellipse class="leaf-ellipse ${ellipseClass}" cx="${leaf.x}" cy="${leaf.y}" rx="${leaf.rx}" ry="${leaf.ry}"/>
-        <text class="leaf-text ${leaf.side}" x="${leaf.x}" y="${leaf.y}">${leaf.word}</text>
+        <text class="leaf-text ${leaf.side}" x="${leaf.x}" y="${leaf.y}" font-size="${leaf.fontSize}">${leaf.word}</text>
       </g>`;
   });
   
   svg.innerHTML = html;
+  
+  return allLeaves.length;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -871,8 +873,14 @@ const tooltip = document.getElementById('tooltip');
 const tipWord = document.getElementById('tip-word');
 const tipDesc = document.getElementById('tip-desc');
 const tipSyn = document.getElementById('tip-syn');
+let tooltipTimeout = null;
 
 function showTooltip(e, leafIndex) {
+  if (tooltipTimeout) {
+    clearTimeout(tooltipTimeout);
+    tooltipTimeout = null;
+  }
+  
   const leaf = allLeaves[leafIndex];
   if (!leaf) return;
   
@@ -892,36 +900,73 @@ function showTooltip(e, leafIndex) {
 }
 
 function moveTooltip(e) {
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const mobile = isMobile();
   
-  let x = clientX + 24;
-  let y = clientY - 14;
-  
-  if (x + 370 > window.innerWidth) x = clientX - 380;
-  if (y + 240 > window.innerHeight) y = window.innerHeight - 250;
-  if (y < 10) y = 10;
-  if (x < 10) x = 10;
-  
-  tooltip.style.left = x + 'px';
-  tooltip.style.top = y + 'px';
+  if (mobile) {
+    // Center tooltip at bottom of screen on mobile
+    tooltip.style.left = '16px';
+    tooltip.style.right = '16px';
+    tooltip.style.bottom = '80px';
+    tooltip.style.top = 'auto';
+    tooltip.style.width = 'auto';
+  } else {
+    const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+    
+    let x = clientX + 24;
+    let y = clientY - 14;
+    
+    if (x + 350 > window.innerWidth) x = clientX - 360;
+    if (y + 220 > window.innerHeight) y = window.innerHeight - 230;
+    if (y < 10) y = 10;
+    if (x < 10) x = 10;
+    
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
+    tooltip.style.right = 'auto';
+    tooltip.style.bottom = 'auto';
+    tooltip.style.width = '';
+  }
 }
 
 function hideTooltip() {
   tooltip.className = 'tooltip';
 }
 
+function hideTooltipDelayed() {
+  tooltipTimeout = setTimeout(hideTooltip, 2000);
+}
+
+// Hide on tap outside
 document.addEventListener('touchstart', function(e) {
-  if (!e.target.closest('.leaf')) {
+  if (!e.target.closest('.leaf') && !e.target.closest('.tooltip')) {
     hideTooltip();
   }
 });
 
 // ═══════════════════════════════════════════════════════════
-// INITIALIZE
+// INITIALIZE & HANDLE RESIZE
 // ═══════════════════════════════════════════════════════════
-renderTree('btc-tree', btcClusters, 'btc');
-renderTree('fiat-tree', fiatClusters, 'fiat');
+function initTrees() {
+  allLeaves = [];
+  renderTree('btc-tree', btcClusters, 'btc', 0);
+  renderTree('fiat-tree', fiatClusters, 'fiat', allLeaves.length);
+}
+
+// Initialize
+initTrees();
+
+// Re-render on significant resize (orientation change)
+let lastWidth = window.innerWidth;
+window.addEventListener('resize', function() {
+  const newWidth = window.innerWidth;
+  const crossedBreakpoint = (lastWidth <= 600 && newWidth > 600) || (lastWidth > 600 && newWidth <= 600);
+  
+  if (crossedBreakpoint) {
+    lastWidth = newWidth;
+    initTrees();
+  }
+});
 </script>
 </body>
 </html>
