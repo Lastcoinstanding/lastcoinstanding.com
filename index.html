@@ -259,9 +259,9 @@ body.fiat-view .tree-subtitle {
 .cluster-label.fiat { fill: #b0c0d0; }
 
 .label-bg {
-  fill: rgba(0,0,0,0.7);
-  rx: 5;
-  ry: 5;
+  fill: rgba(0,0,0,0.85);
+  rx: 6;
+  ry: 6;
 }
 
 /* ─── LEAF ELLIPSES ─── */
@@ -642,18 +642,18 @@ function measureTextWidth(text, fontSize) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// LAYOUT ENGINE - Responsive sizing
+// LAYOUT ENGINE - Labels positioned clearly above leaves
 // ═══════════════════════════════════════════════════════════
 function layoutTree(clusters, side) {
   const mobile = isMobile();
   
-  // Adjust dimensions for mobile
+  // Adjust dimensions for mobile - taller to give more space
   const W = mobile ? 400 : 800;
-  const H = mobile ? 1400 : 1600;
+  const H = mobile ? 1800 : 1600;  // Taller on mobile for more spacing
   const fontSize = mobile ? 11 : 14;
-  const labelFontSize = mobile ? 11 : 14;
+  const labelFontSize = mobile ? 12 : 14;
   const baseRy = mobile ? 22 : 26;
-  const minGap = mobile ? 12 : 18;
+  const minGap = mobile ? 14 : 18;
   const cols = mobile ? 2 : 3;
   
   const trunkX = W / 2;
@@ -669,27 +669,30 @@ function layoutTree(clusters, side) {
   const placedShapes = [];
   
   const numClusters = clusters.length;
-  const clusterHeight = (trunkBase - trunkTop - (mobile ? 100 : 200)) / numClusters;
+  // More space per cluster on mobile
+  const clusterHeight = (trunkBase - trunkTop - (mobile ? 150 : 200)) / numClusters;
   
   clusters.forEach((cluster, ci) => {
     const nWords = cluster.words.length;
-    const branchY = trunkTop + (mobile ? 70 : 120) + ci * clusterHeight;
+    const branchY = trunkTop + (mobile ? 100 : 120) + ci * clusterHeight;
     
     const goLeft = ci % 2 === 0;
     const direction = goLeft ? -1 : 1;
     
-    const branchLen = mobile ? 60 : 100;
-    const branchAngle = direction * (35 + (ci % 3) * 3);
+    const branchLen = mobile ? 50 : 100;
+    const branchAngle = direction * (30 + (ci % 3) * 3);
     const branchRad = branchAngle * Math.PI / 180;
     
     const bEndX = trunkX + Math.sin(branchRad) * branchLen;
-    const bEndY = branchY - Math.abs(Math.cos(branchRad)) * branchLen * 0.2;
+    const bEndY = branchY - Math.abs(Math.cos(branchRad)) * branchLen * 0.15;
     
     branches.push({ x1: trunkX, y1: branchY, x2: bEndX, y2: bEndY, side });
     
-    // Label
-    const labelX = trunkX + (bEndX - trunkX) * 0.5;
-    const labelY = branchY + (bEndY - branchY) * 0.5 - (mobile ? 20 : 28);
+    // ═══════════════════════════════════════════════════════
+    // LABEL: Position on branch, well ABOVE where leaves start
+    // ═══════════════════════════════════════════════════════
+    const labelX = trunkX + (bEndX - trunkX) * 0.4;  // Closer to trunk
+    const labelY = branchY - (mobile ? 8 : 12);  // Above the branch line
     
     labels.push({
       x: labelX,
@@ -700,8 +703,11 @@ function layoutTree(clusters, side) {
       fontSize: labelFontSize
     });
     
-    // Leaves
+    // ═══════════════════════════════════════════════════════
+    // LEAVES: Start further below the branch
+    // ═══════════════════════════════════════════════════════
     const paddingX = mobile ? 16 : 24;
+    const leafStartY = bEndY + (mobile ? 65 : 80);  // More clearance from branch/label
     
     cluster.words.forEach((word, wi) => {
       const textWidth = measureTextWidth(word.w, fontSize);
@@ -712,16 +718,16 @@ function layoutTree(clusters, side) {
       const col = wi % cols;
       const colsInRow = Math.min(cols, nWords - row * cols);
       
-      const cellWidth = (rx * 2) + minGap + (mobile ? 8 : 20);
-      const cellHeight = ry * 2 + minGap + (mobile ? 12 : 18);
+      const cellWidth = (rx * 2) + minGap + (mobile ? 10 : 20);
+      const cellHeight = ry * 2 + minGap + (mobile ? 16 : 18);
       
-      const rowStartX = bEndX + direction * (mobile ? 20 : 50) - ((colsInRow - 1) * cellWidth) / 2;
+      const rowStartX = bEndX + direction * (mobile ? 15 : 50) - ((colsInRow - 1) * cellWidth) / 2;
       
       let lx = rowStartX + col * cellWidth;
-      let ly = bEndY + (mobile ? 45 : 70) + row * cellHeight;
+      let ly = leafStartY + row * cellHeight;
       
       if (row % 2 === 1) {
-        lx += direction * (mobile ? 12 : 25);
+        lx += direction * (mobile ? 10 : 25);
       }
       
       // Collision detection
@@ -835,15 +841,11 @@ function renderTree(svgId, clusters, side, startIndex) {
     html += `<line class="twig ${side}" x1="${t.x1}" y1="${t.y1}" x2="${t.x2}" y2="${t.y2}" stroke-width="2.5"/>`;
   });
   
-  // Labels
-  layout.labels.forEach(l => {
-    const textWidth = l.text.length * (l.fontSize * 0.7) + 16;
-    const textHeight = l.fontSize + 10;
-    html += `<rect class="label-bg" x="${l.x - textWidth/2}" y="${l.y - textHeight/2 - 1}" width="${textWidth}" height="${textHeight}"/>`;
-    html += `<text class="cluster-label ${side}" x="${l.x}" y="${l.y}" text-anchor="${l.anchor}" dominant-baseline="middle" font-size="${l.fontSize}">${l.text}</text>`;
-  });
+  // ═══════════════════════════════════════════════════════
+  // LABELS: Rendered AFTER leaves so they appear on top
+  // ═══════════════════════════════════════════════════════
   
-  // Leaves
+  // Leaves first
   layout.leaves.forEach((leaf) => {
     const ellipseClass = leaf.alt ? `${leaf.side}-alt` : leaf.side;
     const globalIdx = startIndex + allLeaves.length;
@@ -859,6 +861,14 @@ function renderTree(svgId, clusters, side, startIndex) {
         <ellipse class="leaf-ellipse ${ellipseClass}" cx="${leaf.x}" cy="${leaf.y}" rx="${leaf.rx}" ry="${leaf.ry}"/>
         <text class="leaf-text ${leaf.side}" x="${leaf.x}" y="${leaf.y}" font-size="${leaf.fontSize}">${leaf.word}</text>
       </g>`;
+  });
+  
+  // Labels on top (rendered last so they appear above leaves)
+  layout.labels.forEach(l => {
+    const textWidth = l.text.length * (l.fontSize * 0.75) + 20;
+    const textHeight = l.fontSize + 12;
+    html += `<rect class="label-bg" x="${l.x - textWidth/2}" y="${l.y - textHeight/2}" width="${textWidth}" height="${textHeight}"/>`;
+    html += `<text class="cluster-label ${side}" x="${l.x}" y="${l.y + 1}" text-anchor="${l.anchor}" dominant-baseline="middle" font-size="${l.fontSize}">${l.text}</text>`;
   });
   
   svg.innerHTML = html;
