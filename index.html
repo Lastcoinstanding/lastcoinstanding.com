@@ -633,11 +633,14 @@ function layoutTree(clusters, side) {
       const cellWidth = (rx * 2) + minGap + (mobile ? 8 : 20);
       const cellHeight = ry * 2 + minGap + (mobile ? 14 : 18);
       
-      const clusterCenterX = bEndX + direction * (mobile ? 10 : 40);
+      // Push leaves much further out in the branch direction, away from the label
+      const outwardOffset = mobile ? 80 : 120;
+      const clusterCenterX = bEndX + direction * outwardOffset;
       const rowStartX = clusterCenterX - ((colsInRow - 1) * cellWidth) / 2;
       
       let lx = rowStartX + col * cellWidth;
-      let ly = leafStartY + row * cellHeight;
+      // Start leaves at same Y as branch, spreading outward not downward
+      let ly = bEndY + (mobile ? 20 : 30) + row * cellHeight;
       
       if (row % 2 === 1) {
         lx += direction * (mobile ? 8 : 20);
