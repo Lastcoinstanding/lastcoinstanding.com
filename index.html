@@ -626,25 +626,24 @@ function layoutTree(clusters, side) {
       const rx = Math.max(mobile ? 36 : 50, (textWidth / 2) + paddingX);
       const ry = baseRy;
       
-      const row = Math.floor(wi / cols);
-      const col = wi % cols;
-      const colsInRow = Math.min(cols, nWords - row * cols);
+      // Seeded random based on word index for consistent randomness
+      const seed1 = Math.sin(wi * 127.1 + ci * 311.7) * 43758.5453;
+      const rand1 = seed1 - Math.floor(seed1);
+      const seed2 = Math.sin(wi * 269.5 + ci * 183.3) * 43758.5453;
+      const rand2 = seed2 - Math.floor(seed2);
+      const seed3 = Math.sin(wi * 419.2 + ci * 371.9) * 43758.5453;
+      const rand3 = seed3 - Math.floor(seed3);
       
-      const cellWidth = (rx * 2) + minGap + (mobile ? 8 : 20);
-      const cellHeight = ry * 2 + minGap + (mobile ? 14 : 18);
+      // Scatter leaves in an arc/cloud pattern around the branch end
+      const spreadX = mobile ? 140 : 200;
+      const spreadY = mobile ? 100 : 140;
       
-      // Push leaves further out in the branch direction, away from the label
-      const outwardOffset = mobile ? 100 : 140;
-      const clusterCenterX = bEndX + direction * outwardOffset;
-      const rowStartX = clusterCenterX - ((colsInRow - 1) * cellWidth) / 2;
+      // Base position: fan out from branch end
+      const angle = (rand1 - 0.5) * Math.PI * 0.8; // -70 to +70 degrees
+      const distance = (mobile ? 50 : 80) + rand2 * (mobile ? 90 : 130);
       
-      let lx = rowStartX + col * cellWidth;
-      // Start leaves at same Y as branch, spreading outward not downward
-      let ly = bEndY + (mobile ? 20 : 30) + row * cellHeight;
-      
-      if (row % 2 === 1) {
-        lx += direction * (mobile ? 8 : 20);
-      }
+      let lx = bEndX + direction * Math.abs(Math.cos(angle)) * distance + (rand3 - 0.5) * spreadX * 0.3;
+      let ly = bEndY + Math.sin(angle) * distance * 0.6 + (rand1 - 0.5) * spreadY * 0.4;
       
       let attempts = 0;
       let hasCollision = true;
