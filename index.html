@@ -596,7 +596,9 @@ function layoutTree(clusters, side) {
     const goLeft = ci % 2 === 0;
     const direction = goLeft ? -1 : 1;
     
-    const branchLen = mobile ? 40 : 100;
+    // Upper branches are longer to give leaves more room
+    const upperBonus = Math.max(0, (numClusters - 1 - ci) * (mobile ? 8 : 15));
+    const branchLen = (mobile ? 40 : 100) + upperBonus;
     const branchAngle = direction * (25 + (ci % 3) * 3);
     const branchRad = branchAngle * Math.PI / 180;
     
