@@ -606,7 +606,11 @@ function layoutTree(clusters, side) {
     branches.push({ x1: trunkX, y1: branchY, x2: bEndX, y2: bEndY, side });
     
     const labelX = bEndX;
-    const labelY = bEndY - (mobile ? 18 : 22);
+    // Upper clusters (first half): label below branch; Lower clusters: label above branch
+    const isUpperHalf = ci < numClusters / 2;
+    const labelY = isUpperHalf 
+      ? bEndY + (mobile ? 24 : 30)   // Below branch for upper clusters
+      : bEndY - (mobile ? 18 : 22);  // Above branch for lower clusters
     
     labels.push({
       x: labelX,
