@@ -565,7 +565,7 @@ function layoutTree(clusters, side) {
   const mobile = isMobile();
   const numClusters = clusters.length;
   
-  const clusterSpacing = mobile ? 240 : 200;
+  const clusterSpacing = mobile ? 270 : 230;
   const baseHeight = mobile ? 300 : 350;
   
   const W = mobile ? 400 : 800;
@@ -619,7 +619,7 @@ function layoutTree(clusters, side) {
     
     const paddingX = mobile ? 14 : 24;
     const labelBottomY = labelY + labelFontSize + 8;
-    const leafStartY = labelBottomY + (mobile ? 70 : 85);
+    const leafStartY = labelBottomY + (mobile ? 90 : 100);
     
     cluster.words.forEach((word, wi) => {
       const textWidth = measureTextWidth(word.w, fontSize);
