@@ -6,76 +6,306 @@
       {
         "name": "Sovereignty",
         "words": [
-          { "word": "Freedom", "description": "The ability to transact without permission from any authority. Bitcoin restores financial self-determination.", "synonyms": ["Liberty", "Autonomy"] },
-          { "word": "Self-custody", "description": "You hold your own keys, your own wealth. No intermediary can freeze, seize, or deny access.", "synonyms": ["Control", "Ownership"] },
-          { "word": "Autonomy", "description": "Independence from institutional gatekeepers. Your money answers only to you.", "synonyms": ["Independence"] },
-          { "word": "Permissionless", "description": "No application required. No approval needed. Anyone can participate in the network.", "synonyms": ["Open", "Accessible"] },
-          { "word": "Sovereign", "description": "Each holder is their own bank, their own central authority over their wealth.", "synonyms": ["Self-ruling"] }
+          {
+            "word": "Freedom",
+            "description": "The ability to transact without permission from any authority. Bitcoin restores financial self-determination.",
+            "synonyms": [
+              "Liberty",
+              "Autonomy"
+            ]
+          },
+          {
+            "word": "Self-custody",
+            "description": "You hold your own keys, your own wealth. No intermediary can freeze, seize, or deny access.",
+            "synonyms": [
+              "Control",
+              "Ownership"
+            ]
+          },
+          {
+            "word": "Autonomy",
+            "description": "Independence from institutional gatekeepers. Your money answers only to you.",
+            "synonyms": [
+              "Independence"
+            ]
+          },
+          {
+            "word": "Permissionless",
+            "description": "No application required. No approval needed. Anyone can participate in the network.",
+            "synonyms": [
+              "Open",
+              "Accessible"
+            ]
+          },
+          {
+            "word": "Sovereign",
+            "description": "Each holder is their own bank, their own central authority over their wealth.",
+            "synonyms": [
+              "Self-ruling"
+            ]
+          }
         ]
       },
       {
         "name": "Integrity",
         "words": [
-          { "word": "Truth", "description": "An immutable ledger that cannot lie. Every transaction is verifiable, transparent, and permanent.", "synonyms": ["Honesty", "Veracity"] },
-          { "word": "Incorruptible", "description": "No entity can alter the rules, manipulate supply, or corrupt the protocol for personal gain.", "synonyms": ["Pure", "Untainted"] },
-          { "word": "Transparent", "description": "Open-source code and a public ledger. Anyone can audit, verify, and trust through verification.", "synonyms": ["Open", "Visible"] },
-          { "word": "Immutable", "description": "What is written cannot be erased. The ledger is permanent and tamper-proof.", "synonyms": ["Permanent", "Fixed"] },
-          { "word": "Trustless", "description": "No need to trust any party. The protocol enforces rules through mathematics, not promises.", "synonyms": ["Verifiable"] }
+          {
+            "word": "Truth",
+            "description": "An immutable ledger that cannot lie. Every transaction is verifiable, transparent, and permanent.",
+            "synonyms": [
+              "Honesty",
+              "Veracity"
+            ]
+          },
+          {
+            "word": "Incorruptible",
+            "description": "No entity can alter the rules, manipulate supply, or corrupt the protocol for personal gain.",
+            "synonyms": [
+              "Pure",
+              "Untainted"
+            ]
+          },
+          {
+            "word": "Transparent",
+            "description": "Open-source code and a public ledger. Anyone can audit, verify, and trust through verification.",
+            "synonyms": [
+              "Open",
+              "Visible"
+            ]
+          },
+          {
+            "word": "Immutable",
+            "description": "What is written cannot be erased. The ledger is permanent and tamper-proof.",
+            "synonyms": [
+              "Permanent",
+              "Fixed"
+            ]
+          },
+          {
+            "word": "Trustless",
+            "description": "No need to trust any party. The protocol enforces rules through mathematics, not promises.",
+            "synonyms": [
+              "Verifiable"
+            ]
+          }
         ]
       },
       {
         "name": "Scarcity",
         "words": [
-          { "word": "21 Million", "description": "The absolute, unalterable cap. No more can ever exist. Digital scarcity perfected.", "synonyms": ["Fixed supply", "Hard cap"] },
-          { "word": "Finite", "description": "Unlike fiat which can be printed infinitely, Bitcoin has mathematical limits baked into its code.", "synonyms": ["Limited", "Bounded"] },
-          { "word": "Sound", "description": "Money that cannot be debased or diluted. Its purchasing power is protected by code.", "synonyms": ["Hard", "Reliable"] },
-          { "word": "Pristine", "description": "Collateral with no counterparty risk. An asset that is no one's liability.", "synonyms": ["Pure", "Clean"] },
-          { "word": "Deflationary", "description": "As adoption grows against fixed supply, each unit represents more of the world's value.", "synonyms": ["Appreciating"] }
+          {
+            "word": "21 Million",
+            "description": "The absolute, unalterable cap. No more can ever exist. Digital scarcity perfected.",
+            "synonyms": [
+              "Fixed supply",
+              "Hard cap"
+            ]
+          },
+          {
+            "word": "Finite",
+            "description": "Unlike fiat which can be printed infinitely, Bitcoin has mathematical limits baked into its code.",
+            "synonyms": [
+              "Limited",
+              "Bounded"
+            ]
+          },
+          {
+            "word": "Sound",
+            "description": "Money that cannot be debased or diluted. Its purchasing power is protected by code.",
+            "synonyms": [
+              "Hard",
+              "Reliable"
+            ]
+          },
+          {
+            "word": "Pristine",
+            "description": "Collateral with no counterparty risk. An asset that is no one's liability.",
+            "synonyms": [
+              "Pure",
+              "Clean"
+            ]
+          },
+          {
+            "word": "Deflationary",
+            "description": "As adoption grows against fixed supply, each unit represents more of the world's value.",
+            "synonyms": [
+              "Appreciating"
+            ]
+          }
         ]
       },
       {
         "name": "Resilience",
         "words": [
-          { "word": "Antifragile", "description": "Attacks make it stronger. Each challenge overcome proves and improves the network.", "synonyms": ["Robust", "Hardened"] },
-          { "word": "Decentralized", "description": "No single point of failure. Thousands of nodes across the globe ensure survival.", "synonyms": ["Distributed"] },
-          { "word": "Unstoppable", "description": "No government, corporation, or individual can stop a valid transaction.", "synonyms": ["Censorship-resistant"] },
-          { "word": "Persistent", "description": "Running continuously since 2009. The network has never been successfully attacked or shut down.", "synonyms": ["Enduring"] }
+          {
+            "word": "Antifragile",
+            "description": "Attacks make it stronger. Each challenge overcome proves and improves the network.",
+            "synonyms": [
+              "Robust",
+              "Hardened"
+            ]
+          },
+          {
+            "word": "Decentralized",
+            "description": "No single point of failure. Thousands of nodes across the globe ensure survival.",
+            "synonyms": [
+              "Distributed"
+            ]
+          },
+          {
+            "word": "Unstoppable",
+            "description": "No government, corporation, or individual can stop a valid transaction.",
+            "synonyms": [
+              "Censorship-resistant"
+            ]
+          },
+          {
+            "word": "Persistent",
+            "description": "Running continuously since 2009. The network has never been successfully attacked or shut down.",
+            "synonyms": [
+              "Enduring"
+            ]
+          }
         ]
       },
       {
         "name": "Nature",
         "words": [
-          { "word": "Organic", "description": "Emerged spontaneously without central planning. Grew through voluntary adoption, not mandate.", "synonyms": ["Natural", "Emergent"] },
-          { "word": "Meritocratic", "description": "No privileges, no special access. Everyone plays by the same rules enforced by code.", "synonyms": ["Fair", "Equal"] },
-          { "word": "Voluntary", "description": "Adoption by choice, not coercion. People opt in because they recognize its value.", "synonyms": ["Consensual"] },
-          { "word": "Elegant", "description": "Simple rules create complex, beautiful order. Satoshi's design is minimalist perfection.", "synonyms": ["Simple", "Beautiful"] }
+          {
+            "word": "Organic",
+            "description": "Emerged spontaneously without central planning. Grew through voluntary adoption, not mandate.",
+            "synonyms": [
+              "Natural",
+              "Emergent"
+            ]
+          },
+          {
+            "word": "Meritocratic",
+            "description": "No privileges, no special access. Everyone plays by the same rules enforced by code.",
+            "synonyms": [
+              "Fair",
+              "Equal"
+            ]
+          },
+          {
+            "word": "Voluntary",
+            "description": "Adoption by choice, not coercion. People opt in because they recognize its value.",
+            "synonyms": [
+              "Consensual"
+            ]
+          },
+          {
+            "word": "Elegant",
+            "description": "Simple rules create complex, beautiful order. Satoshi's design is minimalist perfection.",
+            "synonyms": [
+              "Simple",
+              "Beautiful"
+            ]
+          }
         ]
       },
       {
         "name": "Energy",
         "words": [
-          { "word": "Proof-of-Work", "description": "Real energy expenditure secures the network. Unforgeable costliness creates true value.", "synonyms": ["PoW", "Mining"] },
-          { "word": "Grounded", "description": "Anchored to physical reality through energy consumption. Not abstract promises but real resources.", "synonyms": ["Rooted", "Real"] },
-          { "word": "Thermodynamic", "description": "Security backed by the laws of physics. Attacking requires expending real-world energy.", "synonyms": ["Physical"] },
-          { "word": "Productive", "description": "Mining incentivizes renewable energy development and utilizes stranded power.", "synonyms": ["Efficient"] }
+          {
+            "word": "Proof-of-Work",
+            "description": "Real energy expenditure secures the network. Unforgeable costliness creates true value.",
+            "synonyms": [
+              "PoW",
+              "Mining"
+            ]
+          },
+          {
+            "word": "Grounded",
+            "description": "Anchored to physical reality through energy consumption. Not abstract promises but real resources.",
+            "synonyms": [
+              "Rooted",
+              "Real"
+            ]
+          },
+          {
+            "word": "Thermodynamic",
+            "description": "Security backed by the laws of physics. Attacking requires expending real-world energy.",
+            "synonyms": [
+              "Physical"
+            ]
+          },
+          {
+            "word": "Productive",
+            "description": "Mining incentivizes renewable energy development and utilizes stranded power.",
+            "synonyms": [
+              "Efficient"
+            ]
+          }
         ]
       },
       {
         "name": "Time",
         "words": [
-          { "word": "Lindy", "description": "The longer it survives, the longer it's likely to survive. Each year adds to its life expectancy.", "synonyms": ["Time-tested"] },
-          { "word": "Patient", "description": "Rewards low time preference. Encourages saving over consumption, planning over impulse.", "synonyms": ["Long-term"] },
-          { "word": "Generational", "description": "Wealth that can be passed down intact. A store of value for centuries, not just years.", "synonyms": ["Legacy", "Heritage"] },
-          { "word": "Eternal", "description": "Designed to outlast institutions, governments, and perhaps civilizations.", "synonyms": ["Timeless"] }
+          {
+            "word": "Lindy",
+            "description": "The longer it survives, the longer it's likely to survive. Each year adds to its life expectancy.",
+            "synonyms": [
+              "Time-tested"
+            ]
+          },
+          {
+            "word": "Patient",
+            "description": "Rewards low time preference. Encourages saving over consumption, planning over impulse.",
+            "synonyms": [
+              "Long-term"
+            ]
+          },
+          {
+            "word": "Generational",
+            "description": "Wealth that can be passed down intact. A store of value for centuries, not just years.",
+            "synonyms": [
+              "Legacy",
+              "Heritage"
+            ]
+          },
+          {
+            "word": "Eternal",
+            "description": "Designed to outlast institutions, governments, and perhaps civilizations.",
+            "synonyms": [
+              "Timeless"
+            ]
+          }
         ]
       },
       {
         "name": "Virtue",
         "words": [
-          { "word": "Honest", "description": "Cannot lie about supply, cannot hide transactions, cannot pretend to be what it's not.", "synonyms": ["Truthful", "Sincere"] },
-          { "word": "Courageous", "description": "Challenges the most powerful institutions on Earth. A peaceful revolution in money.", "synonyms": ["Bold", "Brave"] },
-          { "word": "Humble", "description": "No central authority claims credit. No face on the coin. The protocol serves, not rules.", "synonyms": ["Modest"] },
-          { "word": "Hopeful", "description": "Offers a path to sound money for all humanity. A tool for human flourishing.", "synonyms": ["Optimistic"] }
+          {
+            "word": "Honest",
+            "description": "Cannot lie about supply, cannot hide transactions, cannot pretend to be what it's not.",
+            "synonyms": [
+              "Truthful",
+              "Sincere"
+            ]
+          },
+          {
+            "word": "Courageous",
+            "description": "Challenges the most powerful institutions on Earth. A peaceful revolution in money.",
+            "synonyms": [
+              "Bold",
+              "Brave"
+            ]
+          },
+          {
+            "word": "Humble",
+            "description": "No central authority claims credit. No face on the coin. The protocol serves, not rules.",
+            "synonyms": [
+              "Modest"
+            ]
+          },
+          {
+            "word": "Hopeful",
+            "description": "Offers a path to sound money for all humanity. A tool for human flourishing.",
+            "synonyms": [
+              "Optimistic"
+            ]
+          }
         ]
       }
     ]
@@ -87,58 +317,229 @@
       {
         "name": "Coercion",
         "words": [
-          { "word": "Compulsory", "description": "Legal tender laws force acceptance. You have no choice but to use their money.", "synonyms": ["Mandatory", "Forced"] },
-          { "word": "Permissioned", "description": "Every transaction requires approval. Banks, governments, and payment processors are gatekeepers.", "synonyms": ["Controlled"] },
-          { "word": "Censored", "description": "Accounts frozen, transactions blocked, access denied. Your money is only yours if they allow it.", "synonyms": ["Blocked", "Silenced"] },
-          { "word": "Surveilled", "description": "Every transaction tracked, recorded, analyzed. Financial privacy is extinct.", "synonyms": ["Monitored"] },
-          { "word": "Confiscated", "description": "Bail-ins, asset freezes, civil forfeiture. They can take what they claim is yours.", "synonyms": ["Seized", "Stolen"] }
+          {
+            "word": "Compulsory",
+            "description": "Legal tender laws force acceptance. You have no choice but to use their money.",
+            "synonyms": [
+              "Mandatory",
+              "Forced"
+            ]
+          },
+          {
+            "word": "Permissioned",
+            "description": "Every transaction requires approval. Banks, governments, and payment processors are gatekeepers.",
+            "synonyms": [
+              "Controlled"
+            ]
+          },
+          {
+            "word": "Censored",
+            "description": "Accounts frozen, transactions blocked, access denied. Your money is only yours if they allow it.",
+            "synonyms": [
+              "Blocked",
+              "Silenced"
+            ]
+          },
+          {
+            "word": "Surveilled",
+            "description": "Every transaction tracked, recorded, analyzed. Financial privacy is extinct.",
+            "synonyms": [
+              "Monitored"
+            ]
+          },
+          {
+            "word": "Confiscated",
+            "description": "Bail-ins, asset freezes, civil forfeiture. They can take what they claim is yours.",
+            "synonyms": [
+              "Seized",
+              "Stolen"
+            ]
+          }
         ]
       },
       {
         "name": "Dishonesty",
         "words": [
-          { "word": "Opaque", "description": "Central bank decisions made in closed rooms. The true money supply is unknowable.", "synonyms": ["Hidden", "Secret"] },
-          { "word": "Manipulated", "description": "Interest rates, money supply, exchange rates—all artificially controlled.", "synonyms": ["Rigged", "Distorted"] },
-          { "word": "Fabricated", "description": "Created from nothing with a keystroke. No backing, no constraint, no substance.", "synonyms": ["Invented"] },
-          { "word": "Deceptive", "description": "Inflation is called 'stimulus.' Money printing is 'quantitative easing.' Lies wrapped in jargon.", "synonyms": ["Misleading"] },
-          { "word": "Fraudulent", "description": "Fractional reserve banking creates money that doesn't exist. A system built on accounting fiction.", "synonyms": ["Counterfeit"] }
+          {
+            "word": "Opaque",
+            "description": "Central bank decisions made in closed rooms. The true money supply is unknowable.",
+            "synonyms": [
+              "Hidden",
+              "Secret"
+            ]
+          },
+          {
+            "word": "Manipulated",
+            "description": "Interest rates, money supply, exchange rates—all artificially controlled.",
+            "synonyms": [
+              "Rigged",
+              "Distorted"
+            ]
+          },
+          {
+            "word": "Fabricated",
+            "description": "Created from nothing with a keystroke. No backing, no constraint, no substance.",
+            "synonyms": [
+              "Invented"
+            ]
+          },
+          {
+            "word": "Deceptive",
+            "description": "Inflation is called 'stimulus.' Money printing is 'quantitative easing.' Lies wrapped in jargon.",
+            "synonyms": [
+              "Misleading"
+            ]
+          },
+          {
+            "word": "Fraudulent",
+            "description": "Fractional reserve banking creates money that doesn't exist. A system built on accounting fiction.",
+            "synonyms": [
+              "Counterfeit"
+            ]
+          }
         ]
       },
       {
         "name": "Theft",
         "words": [
-          { "word": "Inflation", "description": "The silent tax that steals purchasing power while you sleep. Your savings evaporate.", "synonyms": ["Debasement"] },
-          { "word": "Cantillon", "description": "Those closest to the money printer benefit first. Everyone else pays through rising prices.", "synonyms": ["Inequality"] },
-          { "word": "Seigniorage", "description": "The profit governments extract by creating money worth more than its cost to produce.", "synonyms": ["Hidden tax"] },
-          { "word": "Expropriation", "description": "Bail-ins turn depositors into unwilling bank investors. Your money becomes their capital.", "synonyms": ["Seizure"] }
+          {
+            "word": "Inflation",
+            "description": "The silent tax that steals purchasing power while you sleep. Your savings evaporate.",
+            "synonyms": [
+              "Debasement"
+            ]
+          },
+          {
+            "word": "Cantillon",
+            "description": "Those closest to the money printer benefit first. Everyone else pays through rising prices.",
+            "synonyms": [
+              "Inequality"
+            ]
+          },
+          {
+            "word": "Seigniorage",
+            "description": "The profit governments extract by creating money worth more than its cost to produce.",
+            "synonyms": [
+              "Hidden tax"
+            ]
+          },
+          {
+            "word": "Expropriation",
+            "description": "Bail-ins turn depositors into unwilling bank investors. Your money becomes their capital.",
+            "synonyms": [
+              "Seizure"
+            ]
+          }
         ]
       },
       {
         "name": "Fragility",
         "words": [
-          { "word": "Centralized", "description": "Single points of failure everywhere. One decision, one hack, one policy can collapse it all.", "synonyms": ["Concentrated"] },
-          { "word": "Fragile", "description": "Requires constant intervention to prevent collapse. Held together by faith and force.", "synonyms": ["Brittle", "Weak"] },
-          { "word": "Dependent", "description": "Relies on trusted third parties at every step. Trust that is regularly betrayed.", "synonyms": ["Vulnerable"] },
-          { "word": "Corruptible", "description": "Human administrators can be bribed, threatened, or simply make mistakes.", "synonyms": ["Exploitable"] },
-          { "word": "Unstable", "description": "Boom and bust cycles engineered by monetary policy. Volatility by design.", "synonyms": ["Chaotic"] }
+          {
+            "word": "Centralized",
+            "description": "Single points of failure everywhere. One decision, one hack, one policy can collapse it all.",
+            "synonyms": [
+              "Concentrated"
+            ]
+          },
+          {
+            "word": "Fragile",
+            "description": "Requires constant intervention to prevent collapse. Held together by faith and force.",
+            "synonyms": [
+              "Brittle",
+              "Weak"
+            ]
+          },
+          {
+            "word": "Dependent",
+            "description": "Relies on trusted third parties at every step. Trust that is regularly betrayed.",
+            "synonyms": [
+              "Vulnerable"
+            ]
+          },
+          {
+            "word": "Corruptible",
+            "description": "Human administrators can be bribed, threatened, or simply make mistakes.",
+            "synonyms": [
+              "Exploitable"
+            ]
+          },
+          {
+            "word": "Unstable",
+            "description": "Boom and bust cycles engineered by monetary policy. Volatility by design.",
+            "synonyms": [
+              "Chaotic"
+            ]
+          }
         ]
       },
       {
         "name": "Decay",
         "words": [
-          { "word": "Debasement", "description": "Every unit becomes worth less over time. Designed to lose value. Guaranteed to fail.", "synonyms": ["Erosion", "Dilution"] },
-          { "word": "Ephemeral", "description": "Average fiat currency lifespan: 27 years. All eventually go to zero.", "synonyms": ["Temporary"] },
-          { "word": "Terminal", "description": "The mathematical endpoint of compound inflation is always hyperinflation or collapse.", "synonyms": ["Dying", "Doomed"] },
-          { "word": "Unsalvageable", "description": "Too much debt, too much printing. The system cannot be reformed, only replaced.", "synonyms": ["Irreparable"] }
+          {
+            "word": "Debasement",
+            "description": "Every unit becomes worth less over time. Designed to lose value. Guaranteed to fail.",
+            "synonyms": [
+              "Erosion",
+              "Dilution"
+            ]
+          },
+          {
+            "word": "Ephemeral",
+            "description": "Average fiat currency lifespan: 27 years. All eventually go to zero.",
+            "synonyms": [
+              "Temporary"
+            ]
+          },
+          {
+            "word": "Terminal",
+            "description": "The mathematical endpoint of compound inflation is always hyperinflation or collapse.",
+            "synonyms": [
+              "Dying",
+              "Doomed"
+            ]
+          },
+          {
+            "word": "Unsalvageable",
+            "description": "Too much debt, too much printing. The system cannot be reformed, only replaced.",
+            "synonyms": [
+              "Irreparable"
+            ]
+          }
         ]
       },
       {
         "name": "Artifice",
         "words": [
-          { "word": "Contrived", "description": "Designed by committees, imposed by decree. Nothing natural about it.", "synonyms": ["Artificial"] },
-          { "word": "Arbitrary", "description": "Rules change on political whims. What's allowed today may be forbidden tomorrow.", "synonyms": ["Capricious"] },
-          { "word": "Abstract", "description": "Disconnected from physical reality. Numbers on screens backed by nothing but promises.", "synonyms": ["Unreal", "Virtual"] },
-          { "word": "Bureaucratic", "description": "Layers of administration extract value and add friction. Paper-pushers everywhere.", "synonyms": ["Administrative"] }
+          {
+            "word": "Contrived",
+            "description": "Designed by committees, imposed by decree. Nothing natural about it.",
+            "synonyms": [
+              "Artificial"
+            ]
+          },
+          {
+            "word": "Arbitrary",
+            "description": "Rules change on political whims. What's allowed today may be forbidden tomorrow.",
+            "synonyms": [
+              "Capricious"
+            ]
+          },
+          {
+            "word": "Abstract",
+            "description": "Disconnected from physical reality. Numbers on screens backed by nothing but promises.",
+            "synonyms": [
+              "Unreal",
+              "Virtual"
+            ]
+          },
+          {
+            "word": "Bureaucratic",
+            "description": "Layers of administration extract value and add friction. Paper-pushers everywhere.",
+            "synonyms": [
+              "Administrative"
+            ]
+          }
         ]
       }
     ]
