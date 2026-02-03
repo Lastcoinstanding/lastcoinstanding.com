@@ -565,7 +565,7 @@ function layoutTree(clusters, side) {
   const mobile = isMobile();
   const numClusters = clusters.length;
   
-  const clusterSpacing = mobile ? 270 : 230;
+  const clusterSpacing = mobile ? 300 : 260;
   const baseHeight = mobile ? 400 : 450;
   
   const W = mobile ? 400 : 800;
@@ -606,11 +606,7 @@ function layoutTree(clusters, side) {
     branches.push({ x1: trunkX, y1: branchY, x2: bEndX, y2: bEndY, side });
     
     const labelX = bEndX;
-    // Upper clusters (first half): label below branch; Lower clusters: label above branch
-    const isUpperHalf = ci < numClusters / 2;
-    const labelY = isUpperHalf 
-      ? bEndY + (mobile ? 24 : 30)   // Below branch for upper clusters
-      : bEndY - (mobile ? 18 : 22);  // Above branch for lower clusters
+    const labelY = bEndY - (mobile ? 18 : 22);
     
     labels.push({
       x: labelX,
@@ -637,8 +633,8 @@ function layoutTree(clusters, side) {
       const cellWidth = (rx * 2) + minGap + (mobile ? 8 : 20);
       const cellHeight = ry * 2 + minGap + (mobile ? 14 : 18);
       
-      // Push leaves much further out in the branch direction, away from the label
-      const outwardOffset = mobile ? 80 : 120;
+      // Push leaves further out in the branch direction, away from the label
+      const outwardOffset = mobile ? 100 : 140;
       const clusterCenterX = bEndX + direction * outwardOffset;
       const rowStartX = clusterCenterX - ((colsInRow - 1) * cellWidth) / 2;
       
