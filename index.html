@@ -565,8 +565,8 @@ function layoutTree(clusters, side) {
   const mobile = isMobile();
   const numClusters = clusters.length;
   
-  const clusterSpacing = mobile ? 300 : 260;
-  const baseHeight = mobile ? 400 : 450;
+  const clusterSpacing = mobile ? 240 : 200;
+  const baseHeight = mobile ? 300 : 350;
   
   const W = mobile ? 400 : 800;
   const H = baseHeight + (numClusters * clusterSpacing);
@@ -591,7 +591,7 @@ function layoutTree(clusters, side) {
   
   clusters.forEach((cluster, ci) => {
     const nWords = cluster.words.length;
-    const branchY = trunkTop + (mobile ? 140 : 180) + ci * clusterHeight;
+    const branchY = trunkTop + (mobile ? 80 : 120) + ci * clusterHeight;
     
     const goLeft = ci % 2 === 0;
     const direction = goLeft ? -1 : 1;
@@ -619,31 +619,29 @@ function layoutTree(clusters, side) {
     
     const paddingX = mobile ? 14 : 24;
     const labelBottomY = labelY + labelFontSize + 8;
-    const leafStartY = labelBottomY + (mobile ? 90 : 100);
+    const leafStartY = labelBottomY + (mobile ? 70 : 85);
     
     cluster.words.forEach((word, wi) => {
       const textWidth = measureTextWidth(word.w, fontSize);
       const rx = Math.max(mobile ? 36 : 50, (textWidth / 2) + paddingX);
       const ry = baseRy;
       
-      // Seeded random based on word index for consistent randomness
-      const seed1 = Math.sin(wi * 127.1 + ci * 311.7) * 43758.5453;
-      const rand1 = seed1 - Math.floor(seed1);
-      const seed2 = Math.sin(wi * 269.5 + ci * 183.3) * 43758.5453;
-      const rand2 = seed2 - Math.floor(seed2);
-      const seed3 = Math.sin(wi * 419.2 + ci * 371.9) * 43758.5453;
-      const rand3 = seed3 - Math.floor(seed3);
+      const row = Math.floor(wi / cols);
+      const col = wi % cols;
+      const colsInRow = Math.min(cols, nWords - row * cols);
       
-      // Scatter leaves in an arc/cloud pattern around the branch end
-      const spreadX = mobile ? 140 : 200;
-      const spreadY = mobile ? 100 : 140;
+      const cellWidth = (rx * 2) + minGap + (mobile ? 8 : 20);
+      const cellHeight = ry * 2 + minGap + (mobile ? 14 : 18);
       
-      // Base position: fan out from branch end
-      const angle = (rand1 - 0.5) * Math.PI * 0.8; // -70 to +70 degrees
-      const distance = (mobile ? 50 : 80) + rand2 * (mobile ? 90 : 130);
+      const clusterCenterX = bEndX + direction * (mobile ? 10 : 40);
+      const rowStartX = clusterCenterX - ((colsInRow - 1) * cellWidth) / 2;
       
-      let lx = bEndX + direction * Math.abs(Math.cos(angle)) * distance + (rand3 - 0.5) * spreadX * 0.3;
-      let ly = bEndY + Math.sin(angle) * distance * 0.6 + (rand1 - 0.5) * spreadY * 0.4;
+      let lx = rowStartX + col * cellWidth;
+      let ly = leafStartY + row * cellHeight;
+      
+      if (row % 2 === 1) {
+        lx += direction * (mobile ? 8 : 20);
+      }
       
       let attempts = 0;
       let hasCollision = true;
