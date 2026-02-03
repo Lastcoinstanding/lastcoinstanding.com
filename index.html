@@ -48,6 +48,18 @@ body.fiat-view {
   background: linear-gradient(180deg, #08090c 0%, #12151a 30%, #12151a 70%, #08090c 100%);
 }
 
+/* ─── LOADING STATE ─── */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.2rem;
+  color: var(--btc-orange);
+}
+
+.loading.hidden { display: none; }
+
 /* ─── HEADER ─── */
 header {
   text-align: center;
@@ -374,7 +386,7 @@ body.fiat-view footer a {
   color: #8a9aa8;
 }
 
-/* ─── MOBILE: Larger leaves and text ─── */
+/* ─── MOBILE ─── */
 @media (max-width: 600px) {
   header { padding: 16px 12px 6px; top: 0; }
   header h1 { font-size: 1.1rem; letter-spacing: 0.06em; }
@@ -408,6 +420,8 @@ body.fiat-view footer a {
 </head>
 <body class="btc-view">
 
+<div class="loading" id="loading">Loading...</div>
+
 <header>
   <h1>The Money Trees</h1>
   <p>Tap each leaf to explore the nature of money</p>
@@ -421,16 +435,16 @@ body.fiat-view footer a {
 
 <div id="btc-view" class="tree-view active">
   <div class="tree-container">
-    <h2 class="tree-title btc">Bitcoin</h2>
-    <p class="tree-subtitle">Sound money · Sovereignty · Truth</p>
+    <h2 class="tree-title btc" id="btc-title">Bitcoin</h2>
+    <p class="tree-subtitle" id="btc-subtitle">Sound money · Sovereignty · Truth</p>
     <svg id="btc-tree" class="tree-svg"></svg>
   </div>
 </div>
 
 <div id="fiat-view" class="tree-view">
   <div class="tree-container">
-    <h2 class="tree-title fiat">Fiat</h2>
-    <p class="tree-subtitle">Broken money · Coercion · Decay</p>
+    <h2 class="tree-title fiat" id="fiat-title">Fiat</h2>
+    <p class="tree-subtitle" id="fiat-subtitle">Broken money · Coercion · Decay</p>
     <svg id="fiat-tree" class="tree-svg"></svg>
   </div>
 </div>
@@ -447,6 +461,60 @@ body.fiat-view footer a {
 
 <script>
 // ═══════════════════════════════════════════════════════════
+// DATA - Loaded from data.json
+// ═══════════════════════════════════════════════════════════
+let treeData = null;
+let btcClusters = [];
+let fiatClusters = [];
+let allLeaves = [];
+let currentView = 'btc';
+
+// ═══════════════════════════════════════════════════════════
+// LOAD DATA FROM JSON
+// ═══════════════════════════════════════════════════════════
+async function loadData() {
+  try {
+    const response = await fetch('data.json');
+    if (!response.ok) throw new Error('Failed to load data.json');
+    
+    treeData = await response.json();
+    
+    // Convert JSON format to internal format
+    btcClusters = treeData.bitcoin.clusters.map(cluster => ({
+      name: cluster.name,
+      words: cluster.words.map(w => ({
+        w: w.word,
+        desc: w.description,
+        syn: w.synonyms || []
+      }))
+    }));
+    
+    fiatClusters = treeData.fiat.clusters.map(cluster => ({
+      name: cluster.name,
+      words: cluster.words.map(w => ({
+        w: w.word,
+        desc: w.description,
+        syn: w.synonyms || []
+      }))
+    }));
+    
+    // Update titles
+    document.getElementById('btc-title').textContent = treeData.bitcoin.title;
+    document.getElementById('btc-subtitle').textContent = treeData.bitcoin.subtitle;
+    document.getElementById('fiat-title').textContent = treeData.fiat.title;
+    document.getElementById('fiat-subtitle').textContent = treeData.fiat.subtitle;
+    
+    // Hide loading, render trees
+    document.getElementById('loading').classList.add('hidden');
+    initTrees();
+    
+  } catch (error) {
+    console.error('Error loading data:', error);
+    document.getElementById('loading').textContent = 'Error loading data. Please refresh.';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
 // RESPONSIVE DETECTION
 // ═══════════════════════════════════════════════════════════
 function isMobile() {
@@ -456,8 +524,6 @@ function isMobile() {
 // ═══════════════════════════════════════════════════════════
 // TOGGLE FUNCTIONALITY
 // ═══════════════════════════════════════════════════════════
-let currentView = 'btc';
-
 function showTree(view) {
   currentView = view;
   document.body.className = view + '-view';
@@ -477,155 +543,6 @@ function toggleTree() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// WORD DATA - BITCOIN
-// ═══════════════════════════════════════════════════════════
-const btcClusters = [
-  {
-    name: "Sovereignty",
-    words: [
-      { w: "Freedom", desc: "The ability to transact without permission from any authority. Bitcoin restores financial self-determination.", syn: ["Liberty", "Autonomy"] },
-      { w: "Self-custody", desc: "You hold your own keys, your own wealth. No intermediary can freeze, seize, or deny access.", syn: ["Control", "Ownership"] },
-      { w: "Autonomy", desc: "Independence from institutional gatekeepers. Your money answers only to you.", syn: ["Independence"] },
-      { w: "Permissionless", desc: "No application required. No approval needed. Anyone can participate in the network.", syn: ["Open", "Accessible"] },
-      { w: "Sovereign", desc: "Each holder is their own bank, their own central authority over their wealth.", syn: ["Self-ruling"] }
-    ]
-  },
-  {
-    name: "Integrity",
-    words: [
-      { w: "Truth", desc: "An immutable ledger that cannot lie. Every transaction is verifiable, transparent, and permanent.", syn: ["Honesty", "Veracity"] },
-      { w: "Incorruptible", desc: "No entity can alter the rules, manipulate supply, or corrupt the protocol for personal gain.", syn: ["Pure", "Untainted"] },
-      { w: "Transparent", desc: "Open-source code and a public ledger. Anyone can audit, verify, and trust through verification.", syn: ["Open", "Visible"] },
-      { w: "Immutable", desc: "What is written cannot be erased. The ledger is permanent and tamper-proof.", syn: ["Permanent", "Fixed"] },
-      { w: "Trustless", desc: "No need to trust any party. The protocol enforces rules through mathematics, not promises.", syn: ["Verifiable"] }
-    ]
-  },
-  {
-    name: "Scarcity",
-    words: [
-      { w: "21 Million", desc: "The absolute, unalterable cap. No more can ever exist. Digital scarcity perfected.", syn: ["Fixed supply", "Hard cap"] },
-      { w: "Finite", desc: "Unlike fiat which can be printed infinitely, Bitcoin has mathematical limits baked into its code.", syn: ["Limited", "Bounded"] },
-      { w: "Sound", desc: "Money that cannot be debased or diluted. Its purchasing power is protected by code.", syn: ["Hard", "Reliable"] },
-      { w: "Pristine", desc: "Collateral with no counterparty risk. An asset that is no one's liability.", syn: ["Pure", "Clean"] },
-      { w: "Deflationary", desc: "As adoption grows against fixed supply, each unit represents more of the world's value.", syn: ["Appreciating"] }
-    ]
-  },
-  {
-    name: "Resilience",
-    words: [
-      { w: "Antifragile", desc: "Attacks make it stronger. Each challenge overcome proves and improves the network.", syn: ["Robust", "Hardened"] },
-      { w: "Decentralized", desc: "No single point of failure. Thousands of nodes across the globe ensure survival.", syn: ["Distributed"] },
-      { w: "Unstoppable", desc: "No government, corporation, or individual can stop a valid transaction.", syn: ["Censorship-resistant"] },
-      { w: "Persistent", desc: "Running continuously since 2009. The network has never been successfully attacked or shut down.", syn: ["Enduring"] }
-    ]
-  },
-  {
-    name: "Nature",
-    words: [
-      { w: "Organic", desc: "Emerged spontaneously without central planning. Grew through voluntary adoption, not mandate.", syn: ["Natural", "Emergent"] },
-      { w: "Meritocratic", desc: "No privileges, no special access. Everyone plays by the same rules enforced by code.", syn: ["Fair", "Equal"] },
-      { w: "Voluntary", desc: "Adoption by choice, not coercion. People opt in because they recognize its value.", syn: ["Consensual"] },
-      { w: "Elegant", desc: "Simple rules create complex, beautiful order. Satoshi's design is minimalist perfection.", syn: ["Simple", "Beautiful"] }
-    ]
-  },
-  {
-    name: "Energy",
-    words: [
-      { w: "Proof-of-Work", desc: "Real energy expenditure secures the network. Unforgeable costliness creates true value.", syn: ["PoW", "Mining"] },
-      { w: "Grounded", desc: "Anchored to physical reality through energy consumption. Not abstract promises but real resources.", syn: ["Rooted", "Real"] },
-      { w: "Thermodynamic", desc: "Security backed by the laws of physics. Attacking requires expending real-world energy.", syn: ["Physical"] },
-      { w: "Productive", desc: "Mining incentivizes renewable energy development and utilizes stranded power.", syn: ["Efficient"] }
-    ]
-  },
-  {
-    name: "Time",
-    words: [
-      { w: "Lindy", desc: "The longer it survives, the longer it's likely to survive. Each year adds to its life expectancy.", syn: ["Time-tested"] },
-      { w: "Patient", desc: "Rewards low time preference. Encourages saving over consumption, planning over impulse.", syn: ["Long-term"] },
-      { w: "Generational", desc: "Wealth that can be passed down intact. A store of value for centuries, not just years.", syn: ["Legacy", "Heritage"] },
-      { w: "Eternal", desc: "Designed to outlast institutions, governments, and perhaps civilizations.", syn: ["Timeless"] }
-    ]
-  },
-  {
-    name: "Virtue",
-    words: [
-      { w: "Honest", desc: "Cannot lie about supply, cannot hide transactions, cannot pretend to be what it's not.", syn: ["Truthful", "Sincere"] },
-      { w: "Courageous", desc: "Challenges the most powerful institutions on Earth. A peaceful revolution in money.", syn: ["Bold", "Brave"] },
-      { w: "Humble", desc: "No central authority claims credit. No face on the coin. The protocol serves, not rules.", syn: ["Modest"] },
-      { w: "Hopeful", desc: "Offers a path to sound money for all humanity. A tool for human flourishing.", syn: ["Optimistic"] }
-    ]
-  }
-];
-
-// ═══════════════════════════════════════════════════════════
-// WORD DATA - FIAT
-// ═══════════════════════════════════════════════════════════
-const fiatClusters = [
-  {
-    name: "Coercion",
-    words: [
-      { w: "Compulsory", desc: "Legal tender laws force acceptance. You have no choice but to use their money.", syn: ["Mandatory", "Forced"] },
-      { w: "Permissioned", desc: "Every transaction requires approval. Banks, governments, and payment processors are gatekeepers.", syn: ["Controlled"] },
-      { w: "Censored", desc: "Accounts frozen, transactions blocked, access denied. Your money is only yours if they allow it.", syn: ["Blocked", "Silenced"] },
-      { w: "Surveilled", desc: "Every transaction tracked, recorded, analyzed. Financial privacy is extinct.", syn: ["Monitored"] },
-      { w: "Confiscated", desc: "Bail-ins, asset freezes, civil forfeiture. They can take what they claim is yours.", syn: ["Seized", "Stolen"] }
-    ]
-  },
-  {
-    name: "Dishonesty",
-    words: [
-      { w: "Opaque", desc: "Central bank decisions made in closed rooms. The true money supply is unknowable.", syn: ["Hidden", "Secret"] },
-      { w: "Manipulated", desc: "Interest rates, money supply, exchange rates—all artificially controlled.", syn: ["Rigged", "Distorted"] },
-      { w: "Fabricated", desc: "Created from nothing with a keystroke. No backing, no constraint, no substance.", syn: ["Invented"] },
-      { w: "Deceptive", desc: "Inflation is called 'stimulus.' Money printing is 'quantitative easing.' Lies wrapped in jargon.", syn: ["Misleading"] },
-      { w: "Fraudulent", desc: "Fractional reserve banking creates money that doesn't exist. A system built on accounting fiction.", syn: ["Counterfeit"] }
-    ]
-  },
-  {
-    name: "Theft",
-    words: [
-      { w: "Inflation", desc: "The silent tax that steals purchasing power while you sleep. Your savings evaporate.", syn: ["Debasement"] },
-      { w: "Cantillon", desc: "Those closest to the money printer benefit first. Everyone else pays through rising prices.", syn: ["Inequality"] },
-      { w: "Seigniorage", desc: "The profit governments extract by creating money worth more than its cost to produce.", syn: ["Hidden tax"] },
-      { w: "Expropriation", desc: "Bail-ins turn depositors into unwilling bank investors. Your money becomes their capital.", syn: ["Seizure"] }
-    ]
-  },
-  {
-    name: "Fragility",
-    words: [
-      { w: "Centralized", desc: "Single points of failure everywhere. One decision, one hack, one policy can collapse it all.", syn: ["Concentrated"] },
-      { w: "Fragile", desc: "Requires constant intervention to prevent collapse. Held together by faith and force.", syn: ["Brittle", "Weak"] },
-      { w: "Dependent", desc: "Relies on trusted third parties at every step. Trust that is regularly betrayed.", syn: ["Vulnerable"] },
-      { w: "Corruptible", desc: "Human administrators can be bribed, threatened, or simply make mistakes.", syn: ["Exploitable"] },
-      { w: "Unstable", desc: "Boom and bust cycles engineered by monetary policy. Volatility by design.", syn: ["Chaotic"] }
-    ]
-  },
-  {
-    name: "Decay",
-    words: [
-      { w: "Debasement", desc: "Every unit becomes worth less over time. Designed to lose value. Guaranteed to fail.", syn: ["Erosion", "Dilution"] },
-      { w: "Ephemeral", desc: "Average fiat currency lifespan: 27 years. All eventually go to zero.", syn: ["Temporary"] },
-      { w: "Terminal", desc: "The mathematical endpoint of compound inflation is always hyperinflation or collapse.", syn: ["Dying", "Doomed"] },
-      { w: "Unsalvageable", desc: "Too much debt, too much printing. The system cannot be reformed, only replaced.", syn: ["Irreparable"] }
-    ]
-  },
-  {
-    name: "Artifice",
-    words: [
-      { w: "Contrived", desc: "Designed by committees, imposed by decree. Nothing natural about it.", syn: ["Artificial"] },
-      { w: "Arbitrary", desc: "Rules change on political whims. What's allowed today may be forbidden tomorrow.", syn: ["Capricious"] },
-      { w: "Abstract", desc: "Disconnected from physical reality. Numbers on screens backed by nothing but promises.", syn: ["Unreal", "Virtual"] },
-      { w: "Bureaucratic", desc: "Layers of administration extract value and add friction. Paper-pushers everywhere.", syn: ["Administrative"] }
-    ]
-  }
-];
-
-// ═══════════════════════════════════════════════════════════
-// GLOBAL LEAF REGISTRY
-// ═══════════════════════════════════════════════════════════
-let allLeaves = [];
-
-// ═══════════════════════════════════════════════════════════
 // MEASURE TEXT WIDTH
 // ═══════════════════════════════════════════════════════════
 function measureTextWidth(text, fontSize) {
@@ -642,23 +559,20 @@ function measureTextWidth(text, fontSize) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// LAYOUT ENGINE - Clear separation between labels and leaves
+// LAYOUT ENGINE
 // ═══════════════════════════════════════════════════════════
 function layoutTree(clusters, side) {
   const mobile = isMobile();
-  
   const numClusters = clusters.length;
   
-  // Calculate height based on number of clusters for consistent spacing
-  const clusterSpacing = mobile ? 240 : 200;  // Fixed spacing per cluster
-  const baseHeight = mobile ? 300 : 350;  // Top and bottom padding
+  const clusterSpacing = mobile ? 240 : 200;
+  const baseHeight = mobile ? 300 : 350;
   
-  // Dimensions - height scales with content
   const W = mobile ? 400 : 800;
   const H = baseHeight + (numClusters * clusterSpacing);
   const fontSize = mobile ? 11 : 14;
   const labelFontSize = mobile ? 11 : 14;
-  const baseRy = mobile ? 20 : 26;  // Slightly smaller leaves on mobile
+  const baseRy = mobile ? 20 : 26;
   const minGap = mobile ? 12 : 18;
   const cols = mobile ? 2 : 3;
   
@@ -671,10 +585,8 @@ function layoutTree(clusters, side) {
   const twigs = [];
   const roots = [];
   const labels = [];
-  
   const placedShapes = [];
   
-  // Fixed spacing per cluster (not divided by numClusters)
   const clusterHeight = clusterSpacing;
   
   clusters.forEach((cluster, ci) => {
@@ -693,11 +605,8 @@ function layoutTree(clusters, side) {
     
     branches.push({ x1: trunkX, y1: branchY, x2: bEndX, y2: bEndY, side });
     
-    // ═══════════════════════════════════════════════════════
-    // LABEL: Positioned at the branch tip, ABOVE the branch
-    // ═══════════════════════════════════════════════════════
     const labelX = bEndX;
-    const labelY = bEndY - (mobile ? 18 : 22);  // Above the branch end
+    const labelY = bEndY - (mobile ? 18 : 22);
     
     labels.push({
       x: labelX,
@@ -708,13 +617,9 @@ function layoutTree(clusters, side) {
       fontSize: labelFontSize
     });
     
-    // ═══════════════════════════════════════════════════════
-    // LEAVES: Start well BELOW the label with guaranteed gap
-    // ═══════════════════════════════════════════════════════
     const paddingX = mobile ? 14 : 24;
-    // Key fix: leaves start much further below the branch/label
-    const labelBottomY = labelY + labelFontSize + 8;  // Bottom of label
-    const leafStartY = labelBottomY + (mobile ? 70 : 85);  // Increased gap below label
+    const labelBottomY = labelY + labelFontSize + 8;
+    const leafStartY = labelBottomY + (mobile ? 70 : 85);
     
     cluster.words.forEach((word, wi) => {
       const textWidth = measureTextWidth(word.w, fontSize);
@@ -728,19 +633,16 @@ function layoutTree(clusters, side) {
       const cellWidth = (rx * 2) + minGap + (mobile ? 8 : 20);
       const cellHeight = ry * 2 + minGap + (mobile ? 14 : 18);
       
-      // Center the leaf cluster under the branch
       const clusterCenterX = bEndX + direction * (mobile ? 10 : 40);
       const rowStartX = clusterCenterX - ((colsInRow - 1) * cellWidth) / 2;
       
       let lx = rowStartX + col * cellWidth;
       let ly = leafStartY + row * cellHeight;
       
-      // Stagger alternate rows slightly
       if (row % 2 === 1) {
         lx += direction * (mobile ? 8 : 20);
       }
       
-      // Collision detection
       let attempts = 0;
       let hasCollision = true;
       
@@ -795,7 +697,6 @@ function layoutTree(clusters, side) {
     });
   });
   
-  // Roots
   const rootAngles = [-50, -22, 22, 50];
   rootAngles.forEach((a, i) => {
     const rad = a * Math.PI / 180;
@@ -820,18 +721,15 @@ function renderTree(svgId, clusters, side) {
   const layout = layoutTree(clusters, side);
   const mobile = isMobile();
   
-  // Set viewBox
   svg.setAttribute('viewBox', `0 0 ${layout.W} ${layout.H}`);
   
   let html = '';
   
-  // Roots
   layout.roots.forEach(r => {
     const sw = mobile ? 8 : 12;
     html += `<line class="root ${side}" x1="${r.x1}" y1="${r.y1}" x2="${r.x2}" y2="${r.y2}" stroke-width="${sw}"/>`;
   });
   
-  // Trunk
   const tx = layout.trunkX;
   const tw = mobile ? 10 : 20;
   html += `<path class="trunk ${side}" d="
@@ -840,21 +738,18 @@ function renderTree(svgId, clusters, side) {
     C${tx+tw*0.5},${layout.trunkBase-layout.H*0.55} ${tx+tw*0.9},${layout.trunkBase-layout.H*0.25} ${tx+tw},${layout.trunkBase}
     Z" fill="${side==='btc'?'#5a4030':'#454550'}"/>`;
   
-  // Branches
   layout.branches.forEach(b => {
     const sw = mobile ? 8 : 16;
     html += `<line class="branch ${side}" x1="${b.x1}" y1="${b.y1}" x2="${b.x2}" y2="${b.y2}" stroke-width="${sw}"/>`;
   });
   
-  // Twigs
   layout.twigs.forEach(t => {
     html += `<line class="twig ${side}" x1="${t.x1}" y1="${t.y1}" x2="${t.x2}" y2="${t.y2}" stroke-width="2"/>`;
   });
   
-  // Leaves (rendered before labels so labels appear on top)
   layout.leaves.forEach((leaf) => {
     const ellipseClass = leaf.alt ? `${leaf.side}-alt` : leaf.side;
-    const globalIdx = allLeaves.length;  // Index is simply the current array length
+    const globalIdx = allLeaves.length;
     allLeaves.push(leaf);
     
     html += `
@@ -869,7 +764,6 @@ function renderTree(svgId, clusters, side) {
       </g>`;
   });
   
-  // Labels (rendered last so they appear on top of everything)
   layout.labels.forEach(l => {
     const textWidth = l.text.length * (l.fontSize * 0.72) + 18;
     const textHeight = l.fontSize + 10;
@@ -878,8 +772,6 @@ function renderTree(svgId, clusters, side) {
   });
   
   svg.innerHTML = html;
-  
-  return allLeaves.length;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -959,15 +851,13 @@ document.addEventListener('touchstart', function(e) {
 });
 
 // ═══════════════════════════════════════════════════════════
-// INITIALIZE & HANDLE RESIZE
+// INITIALIZE
 // ═══════════════════════════════════════════════════════════
 function initTrees() {
   allLeaves = [];
   renderTree('btc-tree', btcClusters, 'btc');
   renderTree('fiat-tree', fiatClusters, 'fiat');
 }
-
-initTrees();
 
 let lastWidth = window.innerWidth;
 window.addEventListener('resize', function() {
@@ -979,6 +869,9 @@ window.addEventListener('resize', function() {
     initTrees();
   }
 });
+
+// Load data on page load
+loadData();
 </script>
 </body>
 </html>
