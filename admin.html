@@ -199,7 +199,7 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
 .word-table input:focus, .word-table textarea:focus { outline: none; border-color: var(--btc-orange); }
 .fiat-view .word-table input:focus, .fiat-view .word-table textarea:focus { border-color: var(--fiat-steel); }
 .word-table .word-input { font-weight: 600; }
-.word-table textarea { min-height: 70px; }
+.word-table textarea { min-height: 200px; }
 .word-table .syn-input { font-size: 0.85rem; color: var(--text-muted); }
 
 .col-word { width: 110px; min-width: 110px; }
@@ -211,7 +211,7 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
 
 .word-table .insight-input,
 .word-table .contrast-input {
-  min-height: 80px;
+  min-height: 280px;
   font-size: 0.85rem;
   line-height: 1.5;
 }
@@ -843,10 +843,20 @@ async function init() {
   try {
     const res = await fetch('data.json');
     if (res.ok) {
-      data = await res.json();
-      showToast('Loaded data.json', 'success');
+      const loaded = await res.json();
+      if (loaded.bitcoin && loaded.fiat) {
+        data = loaded;
+        showToast('Loaded data.json', 'success');
+      } else {
+        showToast('Invalid data.json format', '');
+      }
+    } else {
+      showToast('Could not load data.json - using defaults', '');
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error('Failed to load data.json:', e);
+    showToast('Could not load data.json - using defaults', '');
+  }
   renderEditor();
 }
 
