@@ -9,42 +9,62 @@
           {
             "word": "Freedom",
             "description": "The ability to transact without permission from any authority. Bitcoin restores financial self-determination.",
-            "synonyms": ["Liberty", "Autonomy"],
-            "deeperInsight": "For the first time in the modern era, an individual can hold and transfer wealth without requiring approval from any government, bank, or intermediary. This is not merely a convenience—it is a fundamental restoration of financial agency that was quietly stripped away over the past century. Freedom in Bitcoin is not theoretical; it is operational, available to anyone with an internet connection, regardless of nationality, status, or political favor.",
-            "contrast": "Fiat freedom is an illusion. Your bank account exists at the pleasure of institutions that can freeze, surveil, or seize it without your consent. Every transaction passes through gatekeepers who can say no. In fiat, you don't own your money—you have a claim on it, revocable at any time."
+            "synonyms": [
+              "Liberty",
+              "Autonomy"
+            ],
+            "deeperInsight": "For the first time in the modern era, an individual can hold and transfer wealth, even over distance, without requiring approval from any government, bank, or intermediary. This is not merely a convenience - it is a fundamental restoration of financial agency that was quietly stripped away over the past century. Freedom in Bitcoin is not theoretical; it is operational, available to anyone with an internet connection, regardless of nationality, social status, or political favor.",
+            "contrast": "Fiat freedom is an illusion. Your bank account exists at the pleasure of institutions that can freeze, surveil, or seize it without your consent. You are not really free; what appears to be freedom is ultimately permissioned by gatekeepers and the state."
           },
           {
             "word": "Self-custody",
-            "description": "You hold your own keys, your own wealth. No intermediary can freeze, seize, or deny access.",
-            "synonyms": ["Control", "Ownership"],
-            "deeperInsight": "Self-custody means true ownership—not a promise written on someone else's ledger, but actual possession of cryptographic keys that control your wealth. This is a profound shift: for the first time, digital property can be held the way physical gold once was, but with the added benefit of being teleportable, divisible, and verifiable. The phrase 'not your keys, not your coins' is not a slogan; it is a statement of technical reality.",
-            "contrast": "In fiat, custody is always delegated. Your bank balance is an IOU—a liability on their books, an asset on yours only until they decide otherwise. Bail-ins, account freezes, and capital controls remind us periodically that custodial wealth is conditional wealth."
+            "description": "You hold your own keys, your own wealth. No intermediary can freeze, seize, or deny you access.",
+            "synonyms": [
+              "Control",
+              "Ownership"
+            ],
+            "deeperInsight": "Self-custody means true ownership - not a promise written on someone else's ledger, but actual possession of cryptographic keys that control your wealth. This is a profound shift: for the first time, digital property can be held the way physical gold once was, but with the added benefit of being teleportable, divisible, and verifiable. The phrase 'not your keys, not your coins' is not a slogan; it is a recognition of a new form of extreme ownership that is now possible, for the first time.",
+            "contrast": "In fiat, custody is always delegated. Your bank balance is an IOU - a liability on their books, an asset on yours only until they decide otherwise. Bail-ins, account freezes, and capital controls remind us periodically that custodial wealth is conditional wealth."
           },
           {
             "word": "Autonomy",
             "description": "Independence from institutional gatekeepers. Your money answers only to you.",
-            "synonyms": ["Independence", "Self-determination"],
-            "deeperInsight": "Autonomy in Bitcoin means your financial life is not subject to the policies, politics, or failures of any institution. You do not need permission to save, spend, or move your wealth. This independence is not just philosophical—it is practical, technical, and enforceable by mathematics rather than law.",
-            "contrast": "Fiat autonomy is constrained at every turn. Capital controls dictate how much you can move. KYC requirements determine who can participate. Monetary policy decisions made in distant boardrooms erode your purchasing power without your consent. In fiat, your money answers to the state first, and to you second."
+            "synonyms": [
+              "Independence",
+              "Self-determination"
+            ],
+            "deeperInsight": "Autonomy in Bitcoin means your financial life is not subject to the policies, politics, or failures of any institution. You do not need permission to save, spend, or move your wealth. This independence is not just philosophical - it is practical, technical, and enforceable by mathematics rather than law.",
+            "contrast": "Fiat autonomy is constrained at every turn. Capital controls dictate how much you can move. KYC requirements determine who can participate. In fiat, your money answers to the state first, and to you second. Try withdrawing a modest sum from your own bank account and you will often be asked by the bank the purpose of your withdrawal."
           },
           {
             "word": "Permissionless",
             "description": "No application required. No approval needed. Anyone can participate in the network.",
-            "synonyms": ["Open", "Accessible", "Inclusive"],
+            "synonyms": [
+              "Open",
+              "Accessible",
+              "Inclusive"
+            ],
             "deeperInsight": "Bitcoin's permissionless nature is revolutionary: there is no application form, no credit check, no identity verification required to participate. A farmer in rural Africa and a billionaire in Manhattan have identical access to the network. This is not charity or inclusion theater—it is the structural consequence of a protocol that cannot discriminate because it has no capacity to do so.",
             "contrast": "Fiat is permissioned by design. Opening a bank account requires documentation many cannot provide. International transfers require compliance approvals. The unbanked remain unbanked not by choice but by exclusion. Fiat's gatekeepers decide who may participate in the financial system."
           },
           {
             "word": "Sovereign",
             "description": "Each holder is their own bank, their own central authority over their wealth.",
-            "synonyms": ["Self-ruling", "Independent"],
+            "synonyms": [
+              "Self-ruling",
+              "Independent"
+            ],
             "deeperInsight": "Individual sovereignty over wealth was once the province of kings and nation-states. Bitcoin extends this sovereignty to anyone willing to take responsibility for their own keys. You become the final authority over your economic life—no court order, no executive action, no bureaucratic process can override your control without your cooperation.",
             "contrast": "Under fiat, sovereignty over money belongs to the state. Your wealth exists within their system, under their rules, subject to their decisions. You are a subject of monetary policy, not a sovereign over your own finances."
           },
           {
             "word": "Autonomous",
             "description": "Bitcoin operates independently of any single entity, government, or organization.",
-            "synonyms": ["Self-governing", "Independent", "Decentralized"],
+            "synonyms": [
+              "Self-governing",
+              "Independent",
+              "Decentralized"
+            ],
             "deeperInsight": "The Bitcoin network is autonomous in the deepest sense—it requires no ongoing permission, management, or intervention from any party to continue operating. It runs on the distributed consensus of thousands of independent nodes, none of which can unilaterally alter the rules. This autonomy is not a feature that was added; it is the foundational architecture.",
             "contrast": "Fiat currencies are heteronomous by definition—they exist and operate only through continuous intervention by central authorities. Every aspect of fiat money, from supply to distribution to rules of use, is determined by external actors with their own interests and agendas."
           }
@@ -56,42 +76,64 @@
           {
             "word": "Truth",
             "description": "An immutable ledger that cannot lie. Every transaction is verifiable, transparent, and permanent.",
-            "synonyms": ["Honesty", "Veracity"],
+            "synonyms": [
+              "Honesty",
+              "Veracity"
+            ],
             "deeperInsight": "The Bitcoin blockchain is a truth machine—a record that cannot be falsified, edited, or erased. Every transaction ever made is permanently inscribed and independently verifiable by anyone. In a world drowning in misinformation, Bitcoin offers something rare: an objective, incorruptible source of financial truth that no authority can rewrite.",
             "contrast": "Fiat accounting is opaque by design. The true money supply is unknowable. Central bank balance sheets are labyrinthine. Inflation statistics are methodologically adjusted to minimize apparent damage. In fiat, truth is whatever the authorities say it is—until the next revision."
           },
           {
             "word": "Incorruptible",
             "description": "No entity can alter the rules, manipulate supply, or corrupt the protocol for personal gain.",
-            "synonyms": ["Pure", "Untainted", "Inviolable"],
+            "synonyms": [
+              "Pure",
+              "Untainted",
+              "Inviolable"
+            ],
             "deeperInsight": "Bitcoin's incorruptibility is not a promise—it is an architectural fact. The rules are enforced by code running on tens of thousands of independent computers worldwide. No bribe is large enough, no threat credible enough, no power sufficient to corrupt a system with no central point of control. The protocol treats all participants equally, from the most powerful to the most obscure.",
             "contrast": "Fiat systems are inherently corruptible because they concentrate power in human institutions. Central bankers face political pressure. Regulators get captured. Politicians serve short-term interests. The history of fiat is a history of rules being bent, broken, and rewritten to serve those closest to power."
           },
           {
             "word": "Transparent",
             "description": "Open-source code and a public ledger. Anyone can audit, verify, and trust through verification.",
-            "synonyms": ["Open", "Visible", "Auditable"],
+            "synonyms": [
+              "Open",
+              "Visible",
+              "Auditable"
+            ],
             "deeperInsight": "Every line of Bitcoin's code is public. Every transaction is recorded on a ledger anyone can inspect. The total supply is verifiable in real-time by anyone running a node. This radical transparency means trust is not required—verification is always possible. 'Don't trust, verify' is not a slogan; it is an operational principle.",
             "contrast": "Fiat operates behind closed doors. Central bank meetings are confidential. Money creation happens in opaque accounting entries. The actual money supply is estimated, not known. You are asked to trust institutions that have repeatedly proven unworthy of that trust."
           },
           {
             "word": "Immutable",
             "description": "What is written cannot be erased. The ledger is permanent and tamper-proof.",
-            "synonyms": ["Permanent", "Fixed", "Unalterable"],
+            "synonyms": [
+              "Permanent",
+              "Fixed",
+              "Unalterable"
+            ],
             "deeperInsight": "Immutability means that once a Bitcoin transaction is confirmed, it becomes part of an unbreakable chain of cryptographic proofs extending back to the genesis block. No government, no hacker, no catastrophe can undo what has been recorded. This permanence is the foundation of Bitcoin's credibility as a store of value across generations.",
             "contrast": "Fiat records are mutable at the discretion of those in power. Bank balances can be adjusted. Transaction histories can be amended. Even the definition of money itself can be changed overnight, as happened when Nixon closed the gold window in 1971. Nothing in fiat is truly permanent."
           },
           {
             "word": "Trustless",
             "description": "No need to trust any party. The protocol enforces rules through mathematics, not promises.",
-            "synonyms": ["Verifiable", "Cryptographic"],
+            "synonyms": [
+              "Verifiable",
+              "Cryptographic"
+            ],
             "deeperInsight": "Trustlessness is Bitcoin's most misunderstood virtue. It does not mean Bitcoin is untrustworthy—it means trust in third parties is unnecessary. The rules are enforced by mathematics and consensus, not by relying on the good behavior of any institution. You can verify everything yourself. This removes the single greatest point of failure in all prior monetary systems: the humans running them.",
             "contrast": "Fiat is trust-dependent at every layer. You trust your bank to honor your deposits. You trust the central bank to manage supply responsibly. You trust the government not to abuse its monetary privilege. History shows this trust is routinely betrayed—yet fiat offers no alternative to trusting again."
           },
           {
             "word": "Honest",
             "description": "Cannot lie about supply, cannot hide transactions, cannot pretend to be what it's not.",
-            "synonyms": ["Truthful", "Sincere", "Genuine"],
+            "synonyms": [
+              "Truthful",
+              "Sincere",
+              "Genuine"
+            ],
             "deeperInsight": "Bitcoin is constitutionally incapable of dishonesty. The supply schedule is fixed and public. The issuance rate is mathematically determined. No one can print more Bitcoin in a crisis or hide inflation in accounting tricks. This honesty is not a policy choice that could be reversed—it is encoded in the protocol itself.",
             "contrast": "Fiat is institutionally dishonest. Inflation is disguised as 'quantitative easing.' Money printing is called 'stimulus.' CPI calculations are adjusted to understate the true erosion of purchasing power. The entire vocabulary of central banking exists to obscure what is actually happening to your money."
           }
@@ -103,35 +145,52 @@
           {
             "word": "21 Million",
             "description": "The absolute, unalterable cap. No more will ever exist. Mathematics guarantees what politics cannot.",
-            "synonyms": ["Fixed supply", "Hard cap"],
+            "synonyms": [
+              "Fixed supply",
+              "Hard cap"
+            ],
             "deeperInsight": "Twenty-one million is not a target or a guideline—it is an inviolable mathematical constraint. This number cannot be changed by any committee, any crisis, any political pressure. For the first time in human history, we have a monetary asset with absolute, verifiable, credible scarcity. This is not digital gold; it is something gold could never be: provably finite.",
             "contrast": "Fiat has no supply limit by design. Central banks can and do create unlimited quantities whenever politically convenient. The US money supply has expanded by over 40% since 2020 alone. In fiat, scarcity is a temporary illusion that can be dissolved with a keystroke."
           },
           {
             "word": "Scarce",
             "description": "Absolute scarcity achieved for the first time in human history through cryptographic enforcement.",
-            "synonyms": ["Rare", "Limited", "Finite"],
+            "synonyms": [
+              "Rare",
+              "Limited",
+              "Finite"
+            ],
             "deeperInsight": "Scarcity in Bitcoin is not relative or adjustable—it is absolute. Unlike gold, which can always be mined in greater quantities if the price rises high enough, Bitcoin's supply curve is fixed regardless of demand. This creates the hardest money ever known: one that becomes harder still with each halving, until maximum hardness is reached.",
             "contrast": "Fiat scarcity is a contradiction in terms. The entire point of fiat is that supply can be expanded at will. Any apparent constraint is merely a policy choice that can be reversed in the next crisis. Fiat is abundant by design and becomes more abundant over time."
           },
           {
             "word": "Deflationary",
             "description": "Designed to increase in purchasing power over time, rewarding savers rather than punishing them.",
-            "synonyms": ["Appreciating", "Strengthening"],
+            "synonyms": [
+              "Appreciating",
+              "Strengthening"
+            ],
             "deeperInsight": "A deflationary money rewards patience and punishes waste. It encourages saving, careful investment, and long-term thinking. Under a Bitcoin standard, the natural state of prices is to fall as productivity increases—meaning your money buys more tomorrow than today. This aligns the monetary system with human flourishing rather than against it.",
             "contrast": "Fiat is inflationary by explicit policy. Central banks target positive inflation, meaning your money is designed to lose value every year. This forces you into riskier investments, punishes savers, and creates a constant low-grade anxiety about the future purchasing power of your labor."
           },
           {
             "word": "Disciplined",
             "description": "Supply follows a predetermined schedule immune to human temptation or intervention.",
-            "synonyms": ["Constrained", "Predictable", "Rule-bound"],
+            "synonyms": [
+              "Constrained",
+              "Predictable",
+              "Rule-bound"
+            ],
             "deeperInsight": "Monetary discipline in Bitcoin is not achieved through willpower or good governance—it is enforced by protocol. No emergency is urgent enough, no crisis severe enough, no political pressure intense enough to alter the issuance schedule. This discipline is the antidote to centuries of monetary debasement driven by the short-term thinking of those in power.",
             "contrast": "Fiat discipline is an oxymoron. Every constraint on money creation has eventually been abandoned when politically inconvenient. The gold standard was suspended, then abandoned. Debt ceilings are raised. 'Temporary' emergency measures become permanent. Fiat monetary discipline lasts only until the next election cycle."
           },
           {
             "word": "Halving",
             "description": "Every four years, the rate of new Bitcoin creation is cut in half, relentlessly approaching zero.",
-            "synonyms": ["Halvening", "Supply shock"],
+            "synonyms": [
+              "Halvening",
+              "Supply shock"
+            ],
             "deeperInsight": "The halving is Bitcoin's heartbeat of increasing scarcity. Every 210,000 blocks—roughly four years—the block reward is cut in half. This programmatic tightening continues until approximately 2140, when the last fraction of a Bitcoin will be mined. The halving is not a policy that could be changed; it is a mathematical inevitability that makes Bitcoin harder money with each passing epoch.",
             "contrast": "Fiat has no halvings—only doublings. Money supply expansion accelerates over time, not decelerates. Each crisis brings more printing, each decade more debasement. The trajectory of fiat is toward infinite supply; the trajectory of Bitcoin is toward zero new issuance."
           }
@@ -143,42 +202,61 @@
           {
             "word": "Antifragile",
             "description": "Grows stronger from attacks and stress. Each challenge overcome adds to its credibility.",
-            "synonyms": ["Strengthening", "Hardening"],
+            "synonyms": [
+              "Strengthening",
+              "Hardening"
+            ],
             "deeperInsight": "Antifragility, as Nassim Taleb defined it, means gaining from disorder. Bitcoin exemplifies this: every attack it survives, every obituary written, every ban attempted, every technical challenge overcome adds to its credibility and resilience. Sixteen years of continuous operation under constant assault have forged a network that is harder to kill today than ever before.",
             "contrast": "Fiat systems are fragile—they require constant intervention to prevent collapse. Each crisis demands larger bailouts. Each shock reveals new vulnerabilities. The 2008 financial crisis nearly destroyed the global banking system; it was saved only by unprecedented money printing that created the conditions for the next crisis."
           },
           {
             "word": "Decentralized",
             "description": "No single point of failure, no headquarters to raid, no CEO to arrest, no server to shut down.",
-            "synonyms": ["Distributed", "Dispersed"],
+            "synonyms": [
+              "Distributed",
+              "Dispersed"
+            ],
             "deeperInsight": "Decentralization is not merely a technical feature—it is Bitcoin's immune system. With tens of thousands of nodes across every jurisdiction, there is no throat to choke. Governments have tried bans, and Bitcoin routes around them. Exchanges have been shut down, and new ones emerge. The network persists because it exists everywhere and nowhere simultaneously.",
             "contrast": "Fiat is centralized by necessity. Every fiat currency has a central bank, a single point of control and failure. This makes fiat systems efficient for control but brittle under stress. When the center fails—as it periodically does—the entire system seizes up."
           },
           {
             "word": "Indestructible",
             "description": "Cannot be shut down, hacked, or destroyed. Exists as long as one node and one miner remain.",
-            "synonyms": ["Impervious", "Unstoppable"],
+            "synonyms": [
+              "Impervious",
+              "Unstoppable"
+            ],
             "deeperInsight": "To destroy Bitcoin, you would need to simultaneously shut down every node on Earth, eliminate every copy of the blockchain, and prevent anyone from ever starting a new node. This is practically impossible. Even a nuclear war would likely leave Bitcoin intact, running on surviving nodes across multiple continents. The network's redundancy makes it more durable than any institution in human history.",
             "contrast": "Fiat currencies are eminently destructible—they die all the time. Hyperinflation has destroyed currencies from Zimbabwe to Venezuela to Weimar Germany. The average lifespan of a fiat currency is 27 years. The dollar has lost over 97% of its purchasing power since 1913. Fiat is not indestructible; it is slowly self-destructing."
           },
           {
             "word": "Secure",
             "description": "Protected by the most powerful computing network on Earth, burning real energy to secure value.",
-            "synonyms": ["Protected", "Fortified"],
+            "synonyms": [
+              "Protected",
+              "Fortified"
+            ],
             "deeperInsight": "Bitcoin's security is backed by more computational power than any system in history. The cost to attack the network would exceed the GDP of most nations—and the attack would likely fail anyway. This security is not promised by a corporation or guaranteed by a government; it emerges from the economic incentives of millions of participants worldwide.",
             "contrast": "Fiat security depends on institutional trustworthiness. Banks get hacked. Governments seize accounts. Central databases have single points of failure. The security of your fiat wealth depends entirely on the competence and goodwill of institutions you cannot control or verify."
           },
           {
             "word": "Relentless",
             "description": "Bitcoin doesn't stop, negotiate, or compromise. A new block every ten minutes, forever.",
-            "synonyms": ["Unstoppable", "Persistent", "Inexorable"],
+            "synonyms": [
+              "Unstoppable",
+              "Persistent",
+              "Inexorable"
+            ],
             "deeperInsight": "Every ten minutes, on average, a new block is added to the Bitcoin blockchain. This has happened over 800,000 times since 2009, through crashes, bans, pandemics, and every manner of crisis. The protocol does not pause for holidays, does not slow for recessions, does not stop for political transitions. It is relentless in the most literal sense—it simply does not relent.",
             "contrast": "Fiat systems pause, freeze, and fail regularly. Banks close on weekends and holidays. Capital controls halt withdrawals. Exchanges suspend trading during volatility. The fiat system operates at the pleasure of its operators; Bitcoin operates regardless of anyone's pleasure."
           },
           {
             "word": "Lindy",
             "description": "The longer it survives, the longer it's likely to survive. Each year adds to its life expectancy.",
-            "synonyms": ["Time-tested", "Proven"],
+            "synonyms": [
+              "Time-tested",
+              "Proven"
+            ],
             "deeperInsight": "The Lindy effect suggests that the future life expectancy of a non-perishable thing is proportional to its current age. Bitcoin has now survived for sixteen years—through multiple boom-bust cycles, countless predictions of its demise, and every conceivable attack. Each year it survives increases the probability that it will survive the next year, and the next century.",
             "contrast": "Fiat currencies do not benefit from the Lindy effect—they suffer from its inverse. The older a fiat currency gets, the more debasement it has accumulated, the more trust it has squandered, the closer it approaches its inevitable demise. No fiat currency has ever survived long-term without losing most of its value."
           }
@@ -190,28 +268,41 @@
           {
             "word": "Proof-of-Work",
             "description": "Real energy expended, real cost incurred. Value anchored in physics, not promises.",
-            "synonyms": ["Work-based", "Energy-backed"],
+            "synonyms": [
+              "Work-based",
+              "Energy-backed"
+            ],
             "deeperInsight": "Proof-of-work ties Bitcoin's security to the physical world through energy expenditure. This is not waste—it is the unforgeable cost that makes Bitcoin valuable. Just as gold derives value from the difficulty of extraction, Bitcoin derives value from the computational work required to mint new coins and secure transactions. The energy is the point.",
             "contrast": "Fiat is proof-of-nothing. Dollars are created with a keystroke, at zero marginal cost. There is no anchor to physical reality, no unforgeable costliness. The only thing backing fiat is political will—which, as history shows, is infinitely flexible when convenient."
           },
           {
             "word": "Thermodynamic",
             "description": "Value secured by the laws of physics. Energy converted into incorruptible monetary security.",
-            "synonyms": ["Physical", "Energy-bound"],
+            "synonyms": [
+              "Physical",
+              "Energy-bound"
+            ],
             "deeperInsight": "Bitcoin is the first monetary system secured by thermodynamics. The energy expended in mining is converted into an immutable record that cannot be reversed without expending even more energy. This creates a one-way function: easy to verify, practically impossible to fake. The laws of physics, not the laws of men, guarantee Bitcoin's integrity.",
             "contrast": "Fiat obeys no physical laws. Money can be created without energy expenditure, multiplied without cost, and destroyed by policy decision. There is no thermodynamic anchor, no physical constraint, nothing preventing infinite dilution except the temporary restraint of those in charge."
           },
           {
             "word": "Productive",
             "description": "Mining incentivizes renewable energy development and utilizes stranded power that would otherwise be wasted.",
-            "synonyms": ["Efficient", "Constructive"],
+            "synonyms": [
+              "Efficient",
+              "Constructive"
+            ],
             "deeperInsight": "Bitcoin mining gravitates toward the cheapest energy on Earth—which is increasingly renewable or stranded energy that has no other buyer. Flared natural gas, curtailed wind and solar, and stranded hydroelectric power are being monetized by miners. Rather than competing with households for energy, Bitcoin often makes renewable projects economically viable that otherwise wouldn't be.",
             "contrast": "The fiat system's energy footprint is hidden but enormous: thousands of bank branches, millions of ATMs, vast data centers, armored vehicles, and the entire apparatus of financial surveillance and enforcement. This energy use is never questioned because it's distributed and invisible—but it vastly exceeds Bitcoin's transparent consumption."
           },
           {
             "word": "Heartbeat",
             "description": "A new block every ten minutes—Bitcoin is alive, pulsing with the rhythm of decentralized consensus.",
-            "synonyms": ["Pulse", "Rhythm", "Living"],
+            "synonyms": [
+              "Pulse",
+              "Rhythm",
+              "Living"
+            ],
             "deeperInsight": "Bitcoin has a heartbeat: approximately every ten minutes, a new block is added to the chain. This rhythm has continued unbroken since January 3, 2009. Unlike fiat, which sits inert in databases, Bitcoin is constantly in motion—being validated, propagated, and secured by a global network of participants. In this sense, Bitcoin is alive in a way no other money has ever been.",
             "contrast": "Fiat has no heartbeat—it is inert, passive, dead. It sits in ledgers until humans decide to move it. It exists only as entries in databases controlled by institutions. There is no pulse of ongoing verification, no rhythm of consensus, no sign of life independent of its operators."
           }
@@ -223,21 +314,32 @@
           {
             "word": "Patient",
             "description": "Rewards low time preference. Encourages saving over consumption, planning over impulse.",
-            "synonyms": ["Long-term", "Low time preference"],
+            "synonyms": [
+              "Long-term",
+              "Low time preference"
+            ],
             "deeperInsight": "Bitcoin rewards patience. Its deflationary nature means holding is economically rational—your purchasing power increases over time. This encourages low time preference: the ability to delay gratification, think long-term, and invest in the future. A society of patient savers is a society capable of building cathedrals, not just consuming products.",
             "contrast": "Fiat punishes patience and rewards impulsivity. Inflation means your money loses value if you don't spend or invest it immediately. This forces everyone into a high time preference mindset—consume now, worry later. The result is a society optimized for short-term consumption over long-term investment."
           },
           {
             "word": "Generational",
             "description": "Wealth that can be passed down intact. A store of value for centuries, not just years.",
-            "synonyms": ["Legacy", "Heritage", "Multigenerational"],
+            "synonyms": [
+              "Legacy",
+              "Heritage",
+              "Multigenerational"
+            ],
             "deeperInsight": "For the first time, ordinary people can store wealth in a form that can be passed to their children and grandchildren without erosion. A Bitcoin saved today will still be one twenty-one-millionth of the total supply in a hundred years. This makes genuine multigenerational wealth preservation possible outside the halls of dynastic families and institutional trust structures.",
             "contrast": "Fiat wealth cannot be reliably passed between generations. Inflation ensures that dollars saved for grandchildren will be worth a fraction of their original purchasing power. The hundred-year erosion of fiat is not a risk but a certainty—making long-term family wealth preservation impossible without constant active management and risk-taking."
           },
           {
             "word": "Eternal",
             "description": "Designed to outlast institutions, governments, and perhaps civilizations.",
-            "synonyms": ["Timeless", "Perpetual", "Enduring"],
+            "synonyms": [
+              "Timeless",
+              "Perpetual",
+              "Enduring"
+            ],
             "deeperInsight": "Bitcoin is designed for eternity. Its simplicity, decentralization, and lack of dependence on any single entity mean it can persist as long as there are humans who value it. Governments rise and fall, corporations come and go, but the Bitcoin protocol—like mathematics itself—does not depend on any institution for its continued existence.",
             "contrast": "No fiat currency has ever been eternal. Every single one has either failed outright or lost the vast majority of its value. The Roman denarius, the British pound, the American dollar—all have been debased over time. Fiat is designed for political expediency, not permanence."
           }
@@ -249,42 +351,63 @@
           {
             "word": "Courageous",
             "description": "Challenges the most powerful institutions on Earth. A peaceful revolution in money.",
-            "synonyms": ["Bold", "Brave", "Audacious"],
+            "synonyms": [
+              "Bold",
+              "Brave",
+              "Audacious"
+            ],
             "deeperInsight": "Bitcoin is an act of courage encoded in software. It challenges central banks, governments, and the entire apparatus of monetary control that has existed for centuries. Owning Bitcoin is itself a small act of rebellion—a statement that you do not consent to the silent theft of your purchasing power. This peaceful revolution asks for no permission and offers no apology.",
             "contrast": "Fiat is the currency of compliance and conformity. Using it signals acceptance of a system designed to benefit insiders at your expense. There is no courage in fiat—only acquiescence to the monetary status quo."
           },
           {
             "word": "Humble",
             "description": "No central authority claims credit. No face on the coin. The protocol serves, not rules.",
-            "synonyms": ["Modest", "Egoless"],
+            "synonyms": [
+              "Modest",
+              "Egoless"
+            ],
             "deeperInsight": "There is no face on a Bitcoin, no president or monarch claiming credit. Satoshi Nakamoto created the protocol and then disappeared, leaving no ongoing claim to authority or profit. The protocol itself is humble—it makes no promises, claims no special wisdom, and simply enforces the rules that everyone can see and verify.",
             "contrast": "Fiat is the money of ego and authority. Faces of rulers and symbols of state power adorn every note and coin. Central bankers hold press conferences to explain their wisdom. The entire system is built on the presumption that enlightened authorities know better than markets—a presumption repeatedly proven false."
           },
           {
             "word": "Hopeful",
             "description": "Offers a path to sound money for all humanity. A tool for human flourishing.",
-            "synonyms": ["Optimistic", "Promising"],
+            "synonyms": [
+              "Optimistic",
+              "Promising"
+            ],
             "deeperInsight": "Bitcoin represents hope—hope that the seemingly inevitable slide toward monetary dystopia can be arrested. It offers a path toward a world where savers are rewarded, where wealth cannot be arbitrarily confiscated, where financial freedom is a right rather than a privilege. This is not naive optimism; it is a concrete tool for building a better monetary future.",
             "contrast": "Fiat offers no hope, only managed decline. The best-case scenario under fiat is that your money loses value slowly rather than quickly. There is no path to sound money within the fiat system—only varying degrees of unsoundness."
           },
           {
             "word": "Principled",
             "description": "Rules-based, not discretion-based. The protocol follows principles, not political pressures.",
-            "synonyms": ["Rule-bound", "Consistent", "Ethical"],
+            "synonyms": [
+              "Rule-bound",
+              "Consistent",
+              "Ethical"
+            ],
             "deeperInsight": "Bitcoin operates on principles, not discretion. The rules are known in advance and apply equally to everyone. No exception can be made for the politically connected, no bailout arranged for the well-lobbied. This principled operation is not a policy choice but an architectural necessity—the protocol literally cannot play favorites.",
             "contrast": "Fiat is unprincipled by design. Rules change based on political expediency. Bailouts reward failure. Connected institutions receive different treatment than ordinary citizens. The fiat system's flexibility is marketed as a feature, but it is actually the mechanism through which principles are abandoned."
           },
           {
             "word": "Egalitarian",
             "description": "Equal rules for all participants. No privileged access, no special treatment, no insider advantages.",
-            "synonyms": ["Equal", "Fair", "Level"],
+            "synonyms": [
+              "Equal",
+              "Fair",
+              "Level"
+            ],
             "deeperInsight": "Bitcoin is radically egalitarian: the protocol treats every participant identically. A billionaire's transaction follows the same rules as a refugee's. There is no premium service, no special access, no way to buy preferential treatment. This equality is not a policy that could be changed—it is inherent in the protocol's design.",
             "contrast": "Fiat is structurally unequal. The Cantillon effect ensures that those closest to money creation benefit at the expense of everyone else. Banks get bailouts while citizens get inflation. The rules that apply to ordinary people do not apply to the connected elite. Fiat inequality is a feature, not a bug."
           },
           {
             "word": "Leveler",
             "description": "Bitcoin levels the playing field—the same rules apply to the powerful and the powerless.",
-            "synonyms": ["Equalizer", "Democratizing"],
+            "synonyms": [
+              "Equalizer",
+              "Democratizing"
+            ],
             "deeperInsight": "Throughout history, money has been a tool of hierarchy—controlled by kings, priests, and bankers to maintain their position. Bitcoin inverts this: it removes the ability to manipulate money for advantage. The powerful and the powerless play by identical rules. This leveling effect is perhaps Bitcoin's most revolutionary aspect—it removes monetary privilege as a tool of social control.",
             "contrast": "Fiat is a tool of hierarchy and control. Those who control the money supply control society. Central banks, commercial banks, and governments form a monetary aristocracy that benefits from rules that do not apply to ordinary citizens. Fiat entrenches inequality; Bitcoin dissolves it."
           }
@@ -296,42 +419,66 @@
           {
             "word": "Transcendent",
             "description": "Bitcoin exists above any single country, nation, corporation, or institution.",
-            "synonyms": ["Supranational", "Borderless", "Universal"],
+            "synonyms": [
+              "Supranational",
+              "Borderless",
+              "Universal"
+            ],
             "deeperInsight": "Unlike every prior form of money, Bitcoin has no home jurisdiction, no flag, no CEO, and no central authority that can be pressured, co-opted, or shut down. It operates on a plane above the nation-state system entirely—a monetary layer that treats geography as irrelevant. This is not a bug to be fixed but the core feature that makes it viable as a global standard.",
             "contrast": "Fiat currencies are definitionally national—their value and rules subject to the political whims of whoever controls the printing press. The dollar serves American interests; the yuan serves Chinese interests. Bitcoin serves no nation, and therefore can serve all people equally."
           },
           {
             "word": "Emergent",
             "description": "Bitcoin emerged organically from an idea—not designed by a corporation or imposed by a government.",
-            "synonyms": ["Organic", "Spontaneous", "Natural"],
+            "synonyms": [
+              "Organic",
+              "Spontaneous",
+              "Natural"
+            ],
             "deeperInsight": "Bitcoin was not created by a committee, designed by a corporation, or mandated by a government. It emerged from an idea posted pseudonymously online and grew through voluntary adoption. Its strength is precisely that it was not centrally planned—no one could have designed what emerged from millions of independent decisions to participate.",
             "contrast": "Fiat is imposed from above, designed in boardrooms, mandated by legislation. It exists because governments decree it must exist and punish those who refuse to use it. There is nothing organic or emergent about fiat—it is pure top-down imposition."
           },
           {
             "word": "Exogenous",
             "description": "Bitcoin exists outside the fiat system—parallel, independent, with no dependencies on what it replaces.",
-            "synonyms": ["External", "Independent", "Parallel"],
+            "synonyms": [
+              "External",
+              "Independent",
+              "Parallel"
+            ],
             "deeperInsight": "Bitcoin operates on completely separate rails from the fiat system. It does not need the Federal Reserve, does not route through SWIFT, does not depend on any bank or payment processor. This exogenous nature means Bitcoin's success does not require permission from the system it is replacing—it simply exists alongside it, offering an alternative.",
             "contrast": "Fiat improvements must work within the existing system and require permission from incumbents. Every reform must be approved by those who benefit from the status quo. This is why fundamental fiat reform is effectively impossible—the system cannot approve its own replacement."
           },
           {
             "word": "Benign",
             "description": "Bitcoin is the most benign natural monopoly in the world—a monopoly without rent-seeking.",
-            "synonyms": ["Harmless", "Non-extractive", "Beneficial"],
+            "synonyms": [
+              "Harmless",
+              "Non-extractive",
+              "Beneficial"
+            ],
             "deeperInsight": "If Bitcoin becomes the dominant money, it will be a monopoly unlike any before. There is no owner to extract rents, no corporation to maximize profits, no government to tax transactions arbitrarily. The 'monopoly' benefits everyone equally because there is no monopolist. This makes Bitcoin a benign singularity—winner-take-all without the usual costs of concentrated power.",
             "contrast": "Fiat monopolies are malignant by nature. The state's monopoly on money allows it to extract value from every participant through inflation, seigniorage, and financial surveillance. The fiat monopoly has a monopolist—and that monopolist's interests are not aligned with yours."
           },
           {
             "word": "Bearer",
             "description": "True bearer asset—possession is ownership, requiring no third party to validate or transfer.",
-            "synonyms": ["Direct", "Unmediated", "Physical-like"],
+            "synonyms": [
+              "Direct",
+              "Unmediated",
+              "Physical-like"
+            ],
             "deeperInsight": "Bitcoin restores the concept of bearer money that was lost when we moved from physical cash to digital payments. Holding Bitcoin is like holding gold coins—possession is ownership, no counterparty can deny your claim, no institution needs to validate your balance. This bearer property is essential for true financial sovereignty.",
             "contrast": "Fiat is never truly a bearer asset in digital form. Your bank balance is an IOU, a promise to pay that depends on the bank's solvency and willingness. Even physical cash can be demonetized by government decree, as India demonstrated in 2016. In fiat, possession is not ownership—permission is."
           },
           {
             "word": "Audacious",
             "description": "The sheer ambition of Bitcoin—to replace all money, forever—is breathtaking in scope.",
-            "synonyms": ["Bold", "Daring", "Ambitious"],
+            "synonyms": [
+              "Bold",
+              "Daring",
+              "Ambitious"
+            ],
             "deeperInsight": "Bitcoin's implicit claim is audacious beyond measure: that a piece of open-source software can replace all the money in the world, render central banks obsolete, and restructure the global financial system. This would have seemed insane in 2009. It seems merely unlikely now. It may seem inevitable soon. The audacity is not in the claim but in the execution.",
             "contrast": "Fiat makes no audacious claims—it simply persists through inertia and coercion. There is no vision of improvement, no path to sound money, no aspiration beyond maintaining the current system. Fiat's ambition is merely to continue existing; Bitcoin's ambition is to make fiat unnecessary."
           }
@@ -343,14 +490,22 @@
           {
             "word": "Signal",
             "description": "Bitcoin is signal in a world of noise—pure monetary information without distortion.",
-            "synonyms": ["Clarity", "Truth", "Information"],
+            "synonyms": [
+              "Clarity",
+              "Truth",
+              "Information"
+            ],
             "deeperInsight": "In information theory, signal is meaningful data; noise is meaningless interference. Fiat price signals are hopelessly corrupted by manipulation of interest rates, money supply, and exchange rates. Bitcoin offers something unprecedented: a monetary signal free from artificial distortion. Prices denominated in Bitcoin would reflect actual supply and demand, not central bank policy.",
             "contrast": "Fiat is noise masquerading as signal. Every price in fiat is distorted by monetary manipulation. Interest rates don't reflect time preference; they reflect central bank policy. Asset prices don't reflect value; they reflect liquidity injections. The entire fiat information system is compromised at its foundation."
           },
           {
             "word": "Arbitrage",
             "description": "Understanding Bitcoin is itself the arbitrage—information asymmetry that rewards deep study.",
-            "synonyms": ["Opportunity", "Edge", "Insight"],
+            "synonyms": [
+              "Opportunity",
+              "Edge",
+              "Insight"
+            ],
             "deeperInsight": "Bitcoin is information arbitrage: those who understand it deeply have an edge over those who dismiss it without investigation. Every person who spends 100 hours studying Bitcoin becomes convinced of its value. This is not a coincidence but a reflection of the profound gap between Bitcoin's actual properties and its popular perception. The arbitrage opportunity is the knowledge gap.",
             "contrast": "There is no arbitrage in understanding fiat—everyone already knows that fiat loses value over time. The information is public; the outcome is certain. The only 'edge' in fiat is proximity to money creation, which is a privilege, not a skill."
           }
@@ -368,56 +523,88 @@
           {
             "word": "Compulsory",
             "description": "Legal tender laws force acceptance. You have no choice but to use their money.",
-            "synonyms": ["Mandatory", "Forced", "Required"],
+            "synonyms": [
+              "Mandatory",
+              "Forced",
+              "Required"
+            ],
             "deeperInsight": "Legal tender laws compel acceptance of fiat currency for all debts, public and private. This is not a feature of good money—it is an admission that the money would not be chosen voluntarily. Good money needs no law mandating its use; bad money cannot survive without one.",
             "contrast": "Bitcoin has no legal tender laws compelling its acceptance. Every person who uses Bitcoin does so voluntarily, because they have concluded it serves their interests better than the alternatives. Voluntary adoption is the ultimate endorsement."
           },
           {
             "word": "Permissioned",
             "description": "Every transaction requires approval. Banks, governments, and payment processors are gatekeepers.",
-            "synonyms": ["Controlled", "Gated", "Restricted"],
+            "synonyms": [
+              "Controlled",
+              "Gated",
+              "Restricted"
+            ],
             "deeperInsight": "In fiat, you need permission to participate. Opening a bank account requires documentation many lack. International transfers require compliance approval. Large transactions trigger reporting requirements. The entire system is designed around the assumption that authorities have the right to approve or deny your financial activity.",
             "contrast": "Bitcoin is permissionless—no application required, no approval needed. A refugee fleeing persecution and a billionaire moving capital have identical access. The protocol cannot discriminate because it has no mechanism for discrimination."
           },
           {
             "word": "Censored",
             "description": "Accounts frozen, transactions blocked, access denied. Your money is only yours if they allow it.",
-            "synonyms": ["Blocked", "Silenced", "Denied"],
+            "synonyms": [
+              "Blocked",
+              "Silenced",
+              "Denied"
+            ],
             "deeperInsight": "Financial censorship is routine in the fiat world. Accounts are frozen without due process. Transactions are blocked for political reasons. Entire populations are cut off from the global financial system through sanctions. Your access to your own money depends on the continued approval of multiple institutions.",
             "contrast": "Bitcoin cannot be censored. No authority can freeze your Bitcoin, block your transactions, or deny your access. The protocol treats every valid transaction equally, regardless of the sender, recipient, or purpose. Censorship resistance is not a policy but an architectural property."
           },
           {
             "word": "Surveilled",
             "description": "Every transaction tracked, recorded, analyzed. Financial privacy is extinct under fiat.",
-            "synonyms": ["Monitored", "Watched", "Tracked"],
+            "synonyms": [
+              "Monitored",
+              "Watched",
+              "Tracked"
+            ],
             "deeperInsight": "Modern fiat is a surveillance system masquerading as a payment system. Every transaction leaves a permanent record accessible to governments, corporations, and hackers. Your spending patterns reveal your location, relationships, health, politics, and beliefs. Financial privacy—once taken for granted with cash—has been quietly abolished.",
             "contrast": "Bitcoin offers a path back to financial privacy. While not perfectly anonymous by default, Bitcoin can be used privately with proper techniques. More importantly, it establishes the principle that financial surveillance should not be the default—that privacy is a feature, not a bug."
           },
           {
             "word": "Confiscated",
             "description": "Bail-ins, asset freezes, civil forfeiture. They can take what they claim is yours.",
-            "synonyms": ["Seized", "Stolen", "Expropriated"],
+            "synonyms": [
+              "Seized",
+              "Stolen",
+              "Expropriated"
+            ],
             "deeperInsight": "Fiat wealth can be confiscated through multiple mechanisms: direct seizure, bail-ins that convert deposits to equity, inflation that erodes purchasing power, and civil forfeiture that takes assets without conviction. Your property rights in fiat are contingent on the continued restraint of those with the power to take it.",
             "contrast": "Bitcoin, properly secured, cannot be confiscated without your cooperation. No court order can seize Bitcoin from a brain wallet. No government can inflate away your purchasing power. For the first time, ordinary people can hold wealth that is truly beyond the reach of institutional power."
           },
           {
             "word": "Forced",
             "description": "Participation is not optional—you cannot opt out of fiat without opting out of society.",
-            "synonyms": ["Imposed", "Mandatory", "Coerced"],
+            "synonyms": [
+              "Imposed",
+              "Mandatory",
+              "Coerced"
+            ],
             "deeperInsight": "Try to live without using fiat currency: you cannot pay taxes, cannot hold most jobs, cannot participate in most of the economy. Fiat participation is enforced not just by law but by the architecture of modern society. This forced participation is what allows fiat to survive despite its obvious defects.",
             "contrast": "Bitcoin adoption is purely voluntary. No one is forced to use it; everyone who does has chosen to. This voluntary nature means Bitcoin must earn adoption through merit rather than mandate—a much higher bar that produces much better money."
           },
           {
             "word": "Coercive",
             "description": "At its root, fiat money is backed by the threat of state violence, not by intrinsic value.",
-            "synonyms": ["Threatening", "Forceful", "Violent"],
+            "synonyms": [
+              "Threatening",
+              "Forceful",
+              "Violent"
+            ],
             "deeperInsight": "Strip away the euphemisms and fiat money is backed by coercion. Pay your taxes in the mandated currency or face penalties. Accept legal tender or face legal consequences. The entire system rests on the implicit threat of state violence against those who would opt out.",
             "contrast": "Bitcoin is backed by mathematics, energy, and voluntary consensus—not coercion. No one threatens you for not using Bitcoin; it succeeds or fails on its merits alone. This is the fundamental difference between money by force and money by choice."
           },
           {
             "word": "Repression",
             "description": "Fiat enables financial repression—forcing savers into negative real returns to fund government debt.",
-            "synonyms": ["Suppression", "Control", "Restriction"],
+            "synonyms": [
+              "Suppression",
+              "Control",
+              "Restriction"
+            ],
             "deeperInsight": "Financial repression is the deliberate policy of keeping interest rates below inflation, forcing savers to subsidize government borrowing. This quiet theft transfers wealth from ordinary people to debtors—primarily governments. It is not a bug in the fiat system but one of its primary purposes.",
             "contrast": "Bitcoin makes financial repression impossible. You cannot be forced to accept negative real returns when you can simply hold an asset that cannot be debased. Bitcoin is the exit from financial repression that governments desperately hope you never find."
           }
@@ -429,49 +616,77 @@
           {
             "word": "Opaque",
             "description": "Central bank decisions made in closed rooms. The true money supply is unknowable.",
-            "synonyms": ["Hidden", "Secret", "Murky"],
+            "synonyms": [
+              "Hidden",
+              "Secret",
+              "Murky"
+            ],
             "deeperInsight": "The fiat system operates behind a veil of complexity and secrecy. Central bank meetings are confidential. The actual money supply—including shadow banking and derivatives—is impossible to calculate precisely. This opacity is not accidental; it is necessary to hide the ongoing theft from those being robbed.",
             "contrast": "Bitcoin is radically transparent. The code is open-source. The supply is verifiable by anyone running a node. Every transaction is recorded on a public ledger. There are no secrets, no hidden decisions, no opacity. What you see is what you get."
           },
           {
             "word": "Manipulated",
             "description": "Interest rates, money supply, exchange rates—all artificially controlled and distorted.",
-            "synonyms": ["Rigged", "Distorted", "Fixed"],
+            "synonyms": [
+              "Rigged",
+              "Distorted",
+              "Fixed"
+            ],
             "deeperInsight": "Every important price in fiat is manipulated. Interest rates are set by committee, not by markets. Money supply is expanded and contracted by policy decision. Exchange rates are managed through intervention. The entire price system—the foundation of economic calculation—is corrupted at its source.",
             "contrast": "Bitcoin cannot be manipulated by any single entity. The supply follows a predetermined schedule. The price emerges from genuine market activity across thousands of exchanges worldwide. No committee sets the Bitcoin interest rate; no central bank manages its exchange rate."
           },
           {
             "word": "Fabricated",
             "description": "Created from nothing with a keystroke. No backing, no constraint, no substance.",
-            "synonyms": ["Invented", "Conjured", "Artificial"],
+            "synonyms": [
+              "Invented",
+              "Conjured",
+              "Artificial"
+            ],
             "deeperInsight": "Modern fiat is created literally from nothing. A central bank credits an account with numbers that did not previously exist; new money appears. There is no gold being moved, no value being created, no cost being incurred. It is pure fabrication—accounting entries masquerading as wealth.",
             "contrast": "Bitcoin cannot be fabricated. Every Bitcoin that exists was mined through real energy expenditure, following rules that cannot be changed. The unforgeable costliness of Bitcoin production is what gives it value—the exact opposite of fiat's costless fabrication."
           },
           {
             "word": "Deceptive",
             "description": "Inflation is called 'stimulus.' Money printing is 'quantitative easing.' Lies wrapped in jargon.",
-            "synonyms": ["Misleading", "Dishonest", "Euphemistic"],
+            "synonyms": [
+              "Misleading",
+              "Dishonest",
+              "Euphemistic"
+            ],
             "deeperInsight": "The vocabulary of central banking exists to obscure rather than clarify. Currency debasement becomes 'quantitative easing.' Inflation becomes 'price stability.' Bail-outs become 'liquidity provision.' This elaborate linguistic camouflage is necessary because honest language would reveal the ongoing theft.",
             "contrast": "Bitcoin uses plain language because it has nothing to hide. Inflation rate: decreasing toward zero. Supply cap: 21 million, forever. Monetary policy: fixed by protocol. No euphemisms are needed when you're not deceiving anyone."
           },
           {
             "word": "Fraudulent",
             "description": "Fractional reserve banking creates money that doesn't exist. A system built on accounting fiction.",
-            "synonyms": ["Counterfeit", "Fake", "Illegitimate"],
+            "synonyms": [
+              "Counterfeit",
+              "Fake",
+              "Illegitimate"
+            ],
             "deeperInsight": "Fractional reserve banking is legalized fraud. Banks lend money they don't have, creating deposits that don't correspond to actual reserves. The entire system depends on the fiction that all depositors can withdraw simultaneously—which they cannot. When this fiction is exposed, as in bank runs, the fraud becomes apparent.",
             "contrast": "Bitcoin is fully reserved by definition. You either have Bitcoin or you don't. There is no fractional reserve Bitcoin banking because the ledger is public and verifiable. One Bitcoin is one Bitcoin—no fiction required."
           },
           {
             "word": "Misinformation",
             "description": "Fiat itself is misinformation—distorted price signals that corrupt all economic calculation.",
-            "synonyms": ["Noise", "Distortion", "Corruption"],
+            "synonyms": [
+              "Noise",
+              "Distortion",
+              "Corruption"
+            ],
             "deeperInsight": "Jeff Booth's insight: fiat itself is misinformation. When money can be created at will, every price signal becomes unreliable. Asset prices, interest rates, exchange rates—all are distorted by monetary manipulation. Economic actors making decisions based on fiat-denominated prices are navigating with a broken compass.",
             "contrast": "Bitcoin provides clean signal. As a money that cannot be manipulated, Bitcoin-denominated prices would actually reflect supply and demand, not central bank policy. This is not just better money—it's better information for the entire economy."
           },
           {
             "word": "Arsonist",
             "description": "Central bankers create the crises they then claim to be solving.",
-            "synonyms": ["Pyromaniac", "Self-serving", "Circular"],
+            "synonyms": [
+              "Pyromaniac",
+              "Self-serving",
+              "Circular"
+            ],
             "deeperInsight": "Easy money policies fuel asset bubbles, excessive risk-taking, and malinvestment. When these inevitably collapse, central banks position themselves as the heroic firefighters, deploying even more easy money to 'save' the economy—which plants the seeds of the next crisis. The pattern is not accidental but structural: their power depends on perpetual instability.",
             "contrast": "Bitcoin has no firefighters because it needs none. Its monetary policy is fixed, transparent, and immune to human intervention. There are no bubbles to create, no crises to exploit, and no self-interested institution claiming credit for 'stability' that it itself undermined."
           }
@@ -483,56 +698,88 @@
           {
             "word": "Inflation",
             "description": "The silent tax that steals purchasing power while you sleep. Your savings evaporate.",
-            "synonyms": ["Debasement", "Erosion", "Theft"],
+            "synonyms": [
+              "Debasement",
+              "Erosion",
+              "Theft"
+            ],
             "deeperInsight": "Inflation is theft by other means. It takes from savers without their consent, without legislation, without even their awareness. A 2% annual inflation rate—presented as the target—means your money loses half its value every 35 years. This is not a side effect but the purpose: transferring wealth from those who hold money to those who issue it.",
             "contrast": "Bitcoin's fixed supply makes inflation impossible by design. Your Bitcoin cannot be diluted by anyone's decision. A Bitcoin saved today will still be one twenty-one-millionth of the total supply in a hundred years—the only money in history that offers this guarantee."
           },
           {
             "word": "Cantillon",
             "description": "Those closest to the money printer benefit first. Everyone else pays through rising prices.",
-            "synonyms": ["Inequality", "Insider advantage", "Wealth transfer"],
+            "synonyms": [
+              "Inequality",
+              "Insider advantage",
+              "Wealth transfer"
+            ],
             "deeperInsight": "The Cantillon effect describes how newly created money benefits those who receive it first—banks, governments, connected corporations—at the expense of those who receive it last—ordinary workers and savers. By the time new money reaches the general economy, prices have already risen. This is wealth redistribution by stealth, from the many to the few.",
             "contrast": "Bitcoin has no Cantillon effect because there is no money printer to be close to. The issuance schedule is fixed and known. New Bitcoin goes to miners through open competition, not political connection. Everyone operates on equal footing."
           },
           {
             "word": "Seigniorage",
             "description": "The profit governments extract by creating money worth more than its cost to produce.",
-            "synonyms": ["Hidden tax", "Extraction", "Profit"],
+            "synonyms": [
+              "Hidden tax",
+              "Extraction",
+              "Profit"
+            ],
             "deeperInsight": "Seigniorage is the difference between the face value of money and the cost to produce it. For digital fiat, the cost is essentially zero—making seigniorage nearly 100%. This is a hidden tax on everyone who uses the currency, flowing directly to the issuing government. It's free money for the state, paid for by the debasement of your savings.",
             "contrast": "Bitcoin has no seigniorage because there is no issuer capturing profit. The cost of producing Bitcoin (mining) closely tracks its market value. The 'profit' is distributed to miners through open competition, not captured by a monetary authority."
           },
           {
             "word": "Expropriation",
             "description": "Bail-ins turn depositors into unwilling bank investors. Your money becomes their capital.",
-            "synonyms": ["Seizure", "Confiscation", "Taking"],
+            "synonyms": [
+              "Seizure",
+              "Confiscation",
+              "Taking"
+            ],
             "deeperInsight": "Since Cyprus in 2013, bail-ins have been official policy in many jurisdictions. When banks fail, depositors can be forced to convert their deposits into bank equity—expropriation by another name. Your money in the bank is not fully yours; it is conditionally yours, subject to seizure when the bank needs it.",
             "contrast": "Bitcoin in self-custody cannot be bailed in, seized, or converted without your consent and cooperation. There is no counterparty that can claim your Bitcoin as their capital. Possession is ownership, without conditions or contingencies."
           },
           {
             "word": "Parasitic",
             "description": "The financial system extracts rents from productive activity without creating value.",
-            "synonyms": ["Extractive", "Rent-seeking", "Leeching"],
+            "synonyms": [
+              "Extractive",
+              "Rent-seeking",
+              "Leeching"
+            ],
             "deeperInsight": "The fiat financial system has grown to consume an enormous share of economic activity—not by producing value but by positioning itself as an unavoidable middleman. Transaction fees, currency conversion costs, compliance costs, and the sheer overhead of the banking system drain resources from productive activity to feed financial intermediaries.",
             "contrast": "Bitcoin minimizes rent-seeking by minimizing intermediation. Peer-to-peer transactions require no bank. International transfers require no SWIFT. The protocol extracts no rents beyond minimal transaction fees that go to miners securing the network."
           },
           {
             "word": "Counterfeiting",
             "description": "When governments print money, it's 'monetary policy.' When you do it, it's counterfeiting. Same act, different perpetrator.",
-            "synonyms": ["Forgery", "Fabrication", "Fakery"],
+            "synonyms": [
+              "Forgery",
+              "Fabrication",
+              "Fakery"
+            ],
             "deeperInsight": "The only difference between government money printing and counterfeiting is who's doing it. Both create money from nothing, both dilute existing holdings, both transfer wealth from holders to creators. The government merely legalized its own counterfeiting while criminalizing competition.",
             "contrast": "Bitcoin cannot be counterfeited because every Bitcoin is cryptographically verified by the entire network. There is no printing press to seize, no template to copy. Mathematical verification replaces institutional trust."
           },
           {
             "word": "Confiscatory",
             "description": "Inflation is confiscation without legislation—taking your wealth without the honesty of a tax bill.",
-            "synonyms": ["Seizing", "Taking", "Expropriating"],
+            "synonyms": [
+              "Seizing",
+              "Taking",
+              "Expropriating"
+            ],
             "deeperInsight": "Taxation requires legislation, public debate, and accountability. Inflation achieves the same wealth transfer silently, invisibly, and without consent. It is confiscation that never appears on a tax bill, voted on in no legislature, approved by no citizen. This stealth is what makes it politically attractive and morally indefensible.",
             "contrast": "Bitcoin cannot confiscate. There is no mechanism in the protocol to take from one holder and give to another. Your Bitcoin is yours until you choose to transfer it—a concept so basic it shouldn't be revolutionary, yet it is."
           },
           {
             "word": "Asymmetric",
             "description": "Benefits flow to insiders; costs are distributed to everyone else. Heads they win, tails you lose.",
-            "synonyms": ["Unequal", "Unfair", "Rigged"],
+            "synonyms": [
+              "Unequal",
+              "Unfair",
+              "Rigged"
+            ],
             "deeperInsight": "The fiat system is asymmetric by design: privatized gains for insiders, socialized losses for everyone else. Banks pocket profits in good times and receive bailouts in bad times. The Cantillon effect ensures benefits flow to the connected while costs diffuse to the masses. This is not capitalism but a rigged game wearing capitalism's clothes.",
             "contrast": "Bitcoin is symmetric: every participant operates under identical rules. There are no bailouts, no special access, no privatized gains and socialized losses. When you win, you win; when you lose, you lose. This symmetry is what fairness actually looks like."
           }
@@ -544,42 +791,66 @@
           {
             "word": "Centralized",
             "description": "Single points of failure everywhere. One decision, one hack, one policy can collapse it all.",
-            "synonyms": ["Concentrated", "Vulnerable", "Brittle"],
+            "synonyms": [
+              "Concentrated",
+              "Vulnerable",
+              "Brittle"
+            ],
             "deeperInsight": "Fiat systems are centralized at every level: central banks control monetary policy, major banks control payment systems, single points of failure abound. This centralization enables control but creates brittleness. When the center fails—as it did in 2008—the entire system seizes up, requiring massive intervention to prevent collapse.",
             "contrast": "Bitcoin's decentralization means there is no center to fail. The network has no single point of control, no headquarters to raid, no CEO to arrest. It persists because it exists everywhere simultaneously, making it antifragile where fiat is merely fragile."
           },
           {
             "word": "Fragile",
             "description": "Requires constant intervention to prevent collapse. Each crisis demands larger bailouts.",
-            "synonyms": ["Brittle", "Delicate", "Unstable"],
+            "synonyms": [
+              "Brittle",
+              "Delicate",
+              "Unstable"
+            ],
             "deeperInsight": "The fiat system is not just fragile but increasingly so. Each crisis requires larger interventions than the last. The bailouts of 2008 dwarfed those of 2001, which dwarfed those of 1998. The interventions of 2020 dwarfed 2008. This escalating fragility suggests a system approaching its terminal crisis.",
             "contrast": "Bitcoin is antifragile—it gains strength from stress. Every attack survived, every crisis weathered, every prediction of death proven wrong adds to its credibility. The system becomes more robust over time, not less."
           },
           {
             "word": "Discretionary",
             "description": "Monetary policy based on human judgment, subject to politics, error, and corruption.",
-            "synonyms": ["Arbitrary", "Subjective", "Changeable"],
+            "synonyms": [
+              "Arbitrary",
+              "Subjective",
+              "Changeable"
+            ],
             "deeperInsight": "Fiat monetary policy depends on the judgment of a small group of unelected officials. These officials are subject to political pressure, cognitive biases, and the impossibility of centrally planning an economy. The entire system rests on the presumption that a few people know better than markets—a presumption disproven repeatedly.",
             "contrast": "Bitcoin's monetary policy is non-discretionary—fixed by protocol, immune to human judgment or political pressure. The rules are known in advance and apply without exception. This removes the single greatest source of monetary instability: human discretion."
           },
           {
             "word": "Contrived",
             "description": "An artificial construct maintained by force and propaganda, not by intrinsic value.",
-            "synonyms": ["Artificial", "Manufactured", "Imposed"],
+            "synonyms": [
+              "Artificial",
+              "Manufactured",
+              "Imposed"
+            ],
             "deeperInsight": "Fiat money is a contrivance—a social construct maintained through legal mandate and constant propaganda. The entire edifice of modern monetary theory exists to justify and maintain this contrivance. Strip away the laws requiring its use and the narrative supporting its value, and nothing remains.",
             "contrast": "Bitcoin's value emerges from its genuine properties: absolute scarcity, decentralization, censorship resistance. It requires no propaganda because its properties are self-evident to anyone who investigates. It needs no legal mandate because people choose it for rational reasons."
           },
           {
             "word": "Expediency",
             "description": "Short-term political convenience always trumps long-term monetary integrity.",
-            "synonyms": ["Short-termism", "Opportunism", "Convenience"],
+            "synonyms": [
+              "Short-termism",
+              "Opportunism",
+              "Convenience"
+            ],
             "deeperInsight": "Every fiat currency eventually succumbs to political expediency. The gold standard was abandoned when it became inconvenient. Debt ceilings are raised when they bind. 'Temporary' emergency measures become permanent. The half-life of every monetary restraint is measured by how long it takes to become politically inconvenient.",
             "contrast": "Bitcoin cannot yield to expediency. The protocol has no mechanism for 'temporary' exceptions or emergency measures. The rules are the rules, regardless of circumstances. This inflexibility—so often criticized—is actually Bitcoin's greatest strength."
           },
           {
             "word": "Soft Default",
             "description": "Governments don't default openly—they inflate away their debts while pretending to pay.",
-            "synonyms": ["Stealth default", "Hidden default", "Debasement"],
+            "synonyms": [
+              "Stealth default",
+              "Hidden default",
+              "Debasement"
+            ],
             "deeperInsight": "Every fiat government is in a state of continuous soft default. They promise to repay debts in currency units, then ensure those units are worth less when repayment comes due. It's default by another name—dishonest, gradual, but no less real. The question is not whether governments will default but how openly.",
             "contrast": "Bitcoin cannot be soft-defaulted. A debt denominated in Bitcoin must be repaid in Bitcoin of unchanging purchasing power. This makes lenders and borrowers negotiate honestly, without the hidden subsidy of expected debasement."
           }
@@ -591,35 +862,55 @@
           {
             "word": "Malfeasance",
             "description": "The goal of central bankers is now to protect and conceal their accumulated malfeasance.",
-            "synonyms": ["Wrongdoing", "Misconduct", "Corruption"],
+            "synonyms": [
+              "Wrongdoing",
+              "Misconduct",
+              "Corruption"
+            ],
             "deeperInsight": "Central banking has accumulated decades of malfeasance: asset bubbles inflated and popped, wealth transferred from savers to speculators, currencies debased, and crises caused then 'solved' with more of the same. The primary function of modern monetary policy is to prevent this accumulated damage from becoming visible all at once.",
             "contrast": "Bitcoin is incapable of malfeasance because it is incapable of action. It doesn't make decisions that could be corrupt. It doesn't have interests that could conflict with users. The protocol simply executes rules—the same rules for everyone, without favoritism or malice."
           },
           {
             "word": "Captured",
             "description": "Regulators serve the industries they supposedly regulate. The foxes guard the henhouse.",
-            "synonyms": ["Co-opted", "Corrupted", "Controlled"],
+            "synonyms": [
+              "Co-opted",
+              "Corrupted",
+              "Controlled"
+            ],
             "deeperInsight": "Regulatory capture is endemic to fiat: central bankers move to banks, regulators to regulated firms, politicians to lobbying. The revolving door ensures that those who make the rules and those who benefit from them are often the same people. The system regulates itself, with predictable results.",
             "contrast": "Bitcoin cannot be captured because there is no one to capture. There is no Bitcoin central bank to revolve doors with. The protocol has no career interests, no retirement to plan for, no future employers to please. It simply runs, immune to the incentives that corrupt human institutions."
           },
           {
             "word": "Institutional Rot",
             "description": "The slow decay of monetary institutions as their interests diverge from their stated purpose.",
-            "synonyms": ["Decay", "Corruption", "Degradation"],
+            "synonyms": [
+              "Decay",
+              "Corruption",
+              "Degradation"
+            ],
             "deeperInsight": "Monetary institutions were ostensibly created to serve the public interest. Over time, they have been captured by the interests they were meant to regulate and have become self-serving bureaucracies focused on their own perpetuation. This rot is not aberrational but inevitable in institutions without accountability to those they affect.",
             "contrast": "Bitcoin has no institutions to rot. The protocol is maintained by a decentralized group of developers with no corporate hierarchy, no captured board, no institutional interests. Changes require broad consensus and are visible to all. There is no rot because there is nothing to decay."
           },
           {
             "word": "Zombie",
             "description": "Zombie companies kept alive by cheap credit, consuming resources without creating value.",
-            "synonyms": ["Undead", "Artificial", "Propped-up"],
+            "synonyms": [
+              "Undead",
+              "Artificial",
+              "Propped-up"
+            ],
             "deeperInsight": "Zero interest rate policy creates zombie companies—firms that cannot survive without continuous access to cheap credit. These zombies consume resources, employ workers, and appear viable, but create no value. They persist only because the fiat system makes it cheaper to refinance failure than to recognize it.",
             "contrast": "A Bitcoin standard would end the zombie economy. Companies would need to generate actual returns to service debt. Failure would be recognized and resources reallocated to productive uses. Creative destruction would resume, ending the stagnation of zombie capitalism."
           },
           {
             "word": "Mortal",
             "description": "No fiat currency has ever survived long-term. The dollar will join history's monetary graveyard.",
-            "synonyms": ["Dying", "Temporary", "Finite"],
+            "synonyms": [
+              "Dying",
+              "Temporary",
+              "Finite"
+            ],
             "deeperInsight": "Every fiat currency in history has either failed outright or lost the vast majority of its purchasing power. The average lifespan is 27 years. The dollar, at over 50 years since the gold standard ended, is living on borrowed time. Fiat mortality is not a risk but a certainty—the only question is timing.",
             "contrast": "Bitcoin is designed for immortality. With no central point of failure, no dependence on any institution, and rules that cannot be changed, Bitcoin can persist as long as there are humans who value it. It may be the first money with a credible claim to permanence."
           }
@@ -631,21 +922,33 @@
           {
             "word": "Gatekeeping",
             "description": "Access to finance controlled by institutions that decide who may participate.",
-            "synonyms": ["Exclusion", "Restriction", "Barriers"],
+            "synonyms": [
+              "Exclusion",
+              "Restriction",
+              "Barriers"
+            ],
             "deeperInsight": "The fiat financial system is built on gatekeeping. Banks decide who gets accounts. Payment processors decide which businesses can accept payments. Compliance departments decide whose money can move. Billions remain unbanked not by choice but by exclusion from a system that has decided they don't qualify.",
             "contrast": "Bitcoin has no gatekeepers. The protocol cannot ask for identification, cannot assess creditworthiness, cannot decide you don't qualify. If you can generate a key pair, you can use Bitcoin. This is not just inclusion rhetoric—it is architectural reality."
           },
           {
             "word": "Surveillance",
             "description": "Total financial surveillance as the default. Privacy extinct, anonymity impossible.",
-            "synonyms": ["Monitoring", "Tracking", "Watching"],
+            "synonyms": [
+              "Monitoring",
+              "Tracking",
+              "Watching"
+            ],
             "deeperInsight": "Modern fiat is a surveillance system first and a payment system second. Every transaction is recorded, analyzed, and available to authorities. Your financial history reveals your location, relationships, health decisions, political activities—everything. The death of financial privacy happened so gradually most people didn't notice.",
             "contrast": "Bitcoin at least offers the possibility of privacy. While not anonymous by default, it can be used privately with appropriate techniques. More importantly, it establishes that total surveillance should not be the default assumption—that privacy is something worth preserving."
           },
           {
             "word": "Capital Controls",
             "description": "Governments dictating how much of your own money you can move and where.",
-            "synonyms": ["Restrictions", "Limits", "Barriers"],
+            "synonyms": [
+              "Restrictions",
+              "Limits",
+              "Barriers"
+            ],
             "deeperInsight": "Capital controls are the explicit admission that fiat money is not truly yours. Governments routinely restrict how much money can leave their jurisdiction, effectively trapping citizens' wealth within their control. Cyprus, Greece, Argentina, Venezuela—the list of capital control impositions grows every year.",
             "contrast": "Bitcoin ignores borders by design. A million dollars of Bitcoin can be moved internationally with a text message. No capital control can prevent this because there is no physical asset to seize at the border, no bank to order compliance. Your Bitcoin is borderless because the network is borderless."
           }
