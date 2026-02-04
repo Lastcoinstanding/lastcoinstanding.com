@@ -167,9 +167,9 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
 .cluster-toggle { color: var(--text-muted); font-size: 1.2rem; transition: transform 0.2s; padding: 4px; }
 .cluster-section.collapsed .cluster-toggle { transform: rotate(-90deg); }
 .cluster-section.collapsed .cluster-content { display: none; }
-.cluster-content { padding: 16px; }
+.cluster-content { padding: 16px; overflow-x: auto; }
 
-.word-table { width: 100%; border-collapse: collapse; }
+.word-table { width: 100%; border-collapse: collapse; min-width: 950px; }
 .word-table th {
   text-align: left;
   padding: 10px 12px;
@@ -202,10 +202,19 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
 .word-table textarea { min-height: 70px; }
 .word-table .syn-input { font-size: 0.85rem; color: var(--text-muted); }
 
-.col-word { width: 130px; }
-.col-desc { width: auto; }
-.col-syn { width: 160px; }
-.col-actions { width: 40px; }
+.col-word { width: 110px; min-width: 110px; }
+.col-desc { width: 180px; min-width: 150px; }
+.col-insight { width: 220px; min-width: 180px; }
+.col-contrast { width: 220px; min-width: 180px; }
+.col-syn { width: 120px; min-width: 100px; }
+.col-actions { width: 40px; min-width: 40px; }
+
+.word-table .insight-input,
+.word-table .contrast-input {
+  min-height: 80px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
 
 .delete-word {
   background: none;
@@ -313,7 +322,15 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
   .btn { padding: 8px 14px; font-size: 0.85rem; }
   .editor-panel { padding: 16px; }
   .info-box { margin: 16px; }
-  .col-syn { display: none; }
+  .col-syn, .col-insight, .col-contrast { display: none; }
+  .word-table { min-width: unset; }
+  .col-desc { width: auto; }
+}
+
+@media (max-width: 1200px) and (min-width: 769px) {
+  .col-insight, .col-contrast { width: 160px; min-width: 140px; }
+  .word-table .insight-input,
+  .word-table .contrast-input { min-height: 100px; }
 }
 </style>
 </head>
@@ -334,7 +351,7 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
 <div class="info-box">
   <h3>How to Update Your Site</h3>
   <ol>
-    <li>Edit your words, descriptions, and synonyms below</li>
+    <li>Edit words, descriptions, deeper insights, contrasts, and synonyms below</li>
     <li>Click <strong>"🚀 Publish"</strong> to push changes live</li>
     <li>First time? You'll need to enter your <a href="#" onclick="showTokenHelp(); return false;">GitHub token</a> (one-time setup)</li>
   </ol>
@@ -523,6 +540,14 @@ let data = {
   }
 };
 
+// Escape HTML to prevent XSS and handle special characters
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 function renderEditor() {
   const treeKey = currentTree === 'btc' ? 'bitcoin' : 'fiat';
   const treeData = data[treeKey];
@@ -571,6 +596,8 @@ function renderEditor() {
               <tr>
                 <th class="col-word">Word</th>
                 <th class="col-desc">Description</th>
+                <th class="col-insight">Deeper Insight</th>
+                <th class="col-contrast">Contrast</th>
                 <th class="col-syn">Synonyms</th>
                 <th class="col-actions"></th>
               </tr>
@@ -578,8 +605,10 @@ function renderEditor() {
             <tbody>
               ${cluster.words.map((word, wi) => `
                 <tr>
-                  <td><input type="text" class="word-input" value="${word.word}" onchange="updateWord(${ci}, ${wi}, 'word', this.value)"></td>
-                  <td><textarea onchange="updateWord(${ci}, ${wi}, 'description', this.value)">${word.description}</textarea></td>
+                  <td><input type="text" class="word-input" value="${escapeHtml(word.word)}" onchange="updateWord(${ci}, ${wi}, 'word', this.value)"></td>
+                  <td><textarea onchange="updateWord(${ci}, ${wi}, 'description', this.value)">${escapeHtml(word.description || '')}</textarea></td>
+                  <td><textarea class="insight-input" onchange="updateWord(${ci}, ${wi}, 'deeperInsight', this.value)" placeholder="Extended insight...">${escapeHtml(word.deeperInsight || '')}</textarea></td>
+                  <td><textarea class="contrast-input" onchange="updateWord(${ci}, ${wi}, 'contrast', this.value)" placeholder="Contrasting perspective...">${escapeHtml(word.contrast || '')}</textarea></td>
                   <td><input type="text" class="syn-input" value="${(word.synonyms || []).join(', ')}" onchange="updateSynonyms(${ci}, ${wi}, this.value)" placeholder="comma separated"></td>
                   <td><button class="delete-word" onclick="deleteWord(${ci}, ${wi})" title="Delete">×</button></td>
                 </tr>
@@ -626,7 +655,13 @@ function updateSynonyms(ci, wi, value) {
 
 function addWord(ci) {
   const treeKey = currentTree === 'btc' ? 'bitcoin' : 'fiat';
-  data[treeKey].clusters[ci].words.push({ word: "New Word", description: "Description goes here.", synonyms: [] });
+  data[treeKey].clusters[ci].words.push({ 
+    word: "New Word", 
+    description: "Description goes here.", 
+    deeperInsight: "",
+    contrast: "",
+    synonyms: [] 
+  });
   renderEditor();
 }
 
