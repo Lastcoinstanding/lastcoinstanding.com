@@ -206,8 +206,8 @@
               "Strengthening",
               "Hardening"
             ],
-            "deeperInsight": "Antifragility, as Nassim Taleb defined it, means gaining from disorder. Bitcoin exemplifies this: every attack it survives, every obituary written, every ban attempted, every technical challenge overcome adds to its credibility and resilience. Sixteen years of continuous operation under constant assault have forged a network that is harder to kill today than ever before.",
-            "contrast": "Fiat systems are fragile—they require constant intervention to prevent collapse. Each crisis demands larger bailouts. Each shock reveals new vulnerabilities. The 2008 financial crisis nearly destroyed the global banking system; it was saved only by unprecedented money printing that created the conditions for the next crisis."
+            "deeperInsight": "Antifragility, as Nassim Taleb defined it, means gaining from disorder. Bitcoin exemplifies this: every attack it survives, every obituary written, every ban attempted, every technical challenge overcome adds to its credibility and resilience. Every year of continuous operation, under constant assault has forged a network that is harder to kill today than ever before.",
+            "contrast": "Fiat systems are fragile by design - they require constant intervention to prevent collapse. Each crisis demands larger bailouts. Each shock reveals new vulnerabilities. The 2008 financial crisis nearly destroyed the global banking system; it was saved only by unprecedented money printing that created the conditions for the next crisis."
           },
           {
             "word": "Decentralized",
@@ -216,8 +216,8 @@
               "Distributed",
               "Dispersed"
             ],
-            "deeperInsight": "Decentralization is not merely a technical feature—it is Bitcoin's immune system. With tens of thousands of nodes across every jurisdiction, there is no throat to choke. Governments have tried bans, and Bitcoin routes around them. Exchanges have been shut down, and new ones emerge. The network persists because it exists everywhere and nowhere simultaneously.",
-            "contrast": "Fiat is centralized by necessity. Every fiat currency has a central bank, a single point of control and failure. This makes fiat systems efficient for control but brittle under stress. When the center fails—as it periodically does—the entire system seizes up."
+            "deeperInsight": "Decentralization is not merely a technical feature - it is Bitcoin's immune system. With tens of thousands of nodes across every jurisdiction, there is no throat to choke. Governments have tried bans, and Bitcoin routes around them. Exchanges have been shut down, and new ones emerge. The network persists because it exists everywhere and nowhere simultaneously.",
+            "contrast": "Fiat is centralized by necessity. Every fiat currency has a central bank, a single point of control and failure. This makes fiat systems efficient for control but brittle under stress. When the center fails, as it periodically does, the entire system seizes up."
           },
           {
             "word": "Indestructible",
@@ -227,17 +227,17 @@
               "Unstoppable"
             ],
             "deeperInsight": "To destroy Bitcoin, you would need to simultaneously shut down every node on Earth, eliminate every copy of the blockchain, and prevent anyone from ever starting a new node. This is practically impossible. Even a nuclear war would likely leave Bitcoin intact, running on surviving nodes across multiple continents. The network's redundancy makes it more durable than any institution in human history.",
-            "contrast": "Fiat currencies are eminently destructible—they die all the time. Hyperinflation has destroyed currencies from Zimbabwe to Venezuela to Weimar Germany. The average lifespan of a fiat currency is 27 years. The dollar has lost over 97% of its purchasing power since 1913. Fiat is not indestructible; it is slowly self-destructing."
+            "contrast": "Fiat currencies are eminently destructible - they die all the time. Hyperinflation has destroyed currencies from Zimbabwe to Venezuela to Weimar Germany. The average lifespan of a fiat currency is 27 years. The dollar has lost over 97% of its purchasing power since the inception of the Federal Reserve in 1913. Fiat is not indestructible; it is slowly self-destructing, by design."
           },
           {
             "word": "Secure",
-            "description": "Protected by the most powerful computing network on Earth, burning real energy to secure value.",
+            "description": "Protected by the most powerful computing network on Earth, using real energy to secure value.",
             "synonyms": [
               "Protected",
               "Fortified"
             ],
             "deeperInsight": "Bitcoin's security is backed by more computational power than any system in history. The cost to attack the network would exceed the GDP of most nations—and the attack would likely fail anyway. This security is not promised by a corporation or guaranteed by a government; it emerges from the economic incentives of millions of participants worldwide.",
-            "contrast": "Fiat security depends on institutional trustworthiness. Banks get hacked. Governments seize accounts. Central databases have single points of failure. The security of your fiat wealth depends entirely on the competence and goodwill of institutions you cannot control or verify."
+            "contrast": "Fiat security depends on institutional trustworthiness. Banks get hacked. Governments seize accounts. Central databases have single points of failure. The security of your fiat wealth depends entirely on the competence and goodwill of institutions, who have their own interests."
           },
           {
             "word": "Relentless",
@@ -247,8 +247,8 @@
               "Persistent",
               "Inexorable"
             ],
-            "deeperInsight": "Every ten minutes, on average, a new block is added to the Bitcoin blockchain. This has happened over 800,000 times since 2009, through crashes, bans, pandemics, and every manner of crisis. The protocol does not pause for holidays, does not slow for recessions, does not stop for political transitions. It is relentless in the most literal sense—it simply does not relent.",
-            "contrast": "Fiat systems pause, freeze, and fail regularly. Banks close on weekends and holidays. Capital controls halt withdrawals. Exchanges suspend trading during volatility. The fiat system operates at the pleasure of its operators; Bitcoin operates regardless of anyone's pleasure."
+            "deeperInsight": "Every ten minutes, on average, a new block is added to the Bitcoin blockchain. This has   occurred, like clockwork, since Bitcoin launched in 2009, ignoring crashes, bans, pandemics, and every manner of crisis. The protocol does not pause for holidays, does not slow for recessions, does not stop for political transitions. It is relentless in the most literal sense - it simply does not relent.",
+            "contrast": "Fiat systems pause, freeze, and fail regularly. Banks close on weekends and holidays. Capital controls halt withdrawals. Exchanges suspend trading during volatility. The fiat system operates at the pleasure of its operators."
           },
           {
             "word": "Lindy",
@@ -257,8 +257,8 @@
               "Time-tested",
               "Proven"
             ],
-            "deeperInsight": "The Lindy effect suggests that the future life expectancy of a non-perishable thing is proportional to its current age. Bitcoin has now survived for sixteen years—through multiple boom-bust cycles, countless predictions of its demise, and every conceivable attack. Each year it survives increases the probability that it will survive the next year, and the next century.",
-            "contrast": "Fiat currencies do not benefit from the Lindy effect—they suffer from its inverse. The older a fiat currency gets, the more debasement it has accumulated, the more trust it has squandered, the closer it approaches its inevitable demise. No fiat currency has ever survived long-term without losing most of its value."
+            "deeperInsight": "The Lindy effect suggests that the future life expectancy of a non-perishable thing is proportional to its current age. Bitcoin has now survived since 2009, through multiple boom-bust cycles, countless predictions of its demise, and every conceivable attack. Each year it survives increases the probability that it will survive the next year, and the next century, and beyond.",
+            "contrast": "Fiat currencies do not benefit from the Lindy effect - they suffer from its inverse. The older a fiat currency gets, the more debasement it has accumulated, the more trust it has squandered, the closer it approaches its inevitable demise. No fiat currency has ever survived long-term without losing most of its value."
           }
         ]
       },
