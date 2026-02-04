@@ -1,431 +1,306 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
-<title>The Money Trees — Last Coin Standing</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Money Trees</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@500;600;700&display=swap');
-
 :root {
+  --bg-dark: #0a0c0f;
   --btc-orange: #f7931a;
-  --btc-gold: #ffb840;
-  --btc-amber: #e8a020;
-  --btc-bark: #5a4030;
-  --btc-bark-light: #7a6050;
-  --btc-bg: #0f0d0a;
-  
-  --fiat-steel: #6a7580;
-  --fiat-slate: #4a5560;
-  --fiat-rust: #7a5555;
-  --fiat-cold: #2a3038;
-  --fiat-bark: #454550;
-  --fiat-bg: #0a0c0f;
-  
-  --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-ui: 'Inter', -apple-system, sans-serif;
+  --btc-gold: #ffd700;
+  --fiat-gray: #4a5568;
+  --text-light: #e8e0d5;
+  --text-muted: #8b8680;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  background: var(--bg-dark);
+  color: var(--text-light);
   min-height: 100vh;
-  font-family: var(--font-display);
-  color: #ddd;
   overflow-x: hidden;
-  transition: background 0.5s ease;
 }
 
-body.btc-view {
-  background: linear-gradient(180deg, #100d08 0%, #1a1510 30%, #1a1510 70%, #100d08 100%);
-}
-
-body.fiat-view {
-  background: linear-gradient(180deg, #08090c 0%, #12151a 30%, #12151a 70%, #08090c 100%);
-}
-
-/* ─── LOADING STATE ─── */
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  font-size: 1.2rem;
-  color: var(--btc-orange);
-}
-
-.loading.hidden { display: none; }
-
-/* ─── HEADER ─── */
 header {
   text-align: center;
-  padding: 24px 16px 8px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: inherit;
+  padding: 40px 20px 20px;
 }
-
-body.btc-view header {
-  background: linear-gradient(180deg, #100d08 0%, rgba(16,13,8,0.95) 100%);
-}
-
-body.fiat-view header {
-  background: linear-gradient(180deg, #08090c 0%, rgba(8,9,12,0.95) 100%);
-}
-
 header h1 {
-  font-weight: 500;
-  font-size: clamp(1.2rem, 5vw, 2.1rem);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #f0e8e0;
-  margin-bottom: 4px;
-}
-
-header p {
-  font-style: italic;
+  font-size: 2.5rem;
   font-weight: 400;
-  color: #908880;
-  font-size: clamp(0.85rem, 2.5vw, 1.05rem);
+  letter-spacing: 0.15em;
+  color: var(--text-light);
+  margin-bottom: 8px;
+}
+header p {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
-/* ─── TOGGLE SWITCH ─── */
-.toggle-container {
+.arena {
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  position: sticky;
-  top: 60px;
-  z-index: 100;
-}
-
-body.btc-view .toggle-container {
-  background: linear-gradient(180deg, rgba(16,13,8,0.95) 0%, rgba(16,13,8,0) 100%);
-}
-
-body.fiat-view .toggle-container {
-  background: linear-gradient(180deg, rgba(8,9,12,0.95) 0%, rgba(8,9,12,0) 100%);
-}
-
-.toggle-label {
-  font-family: var(--font-ui);
-  font-size: clamp(0.85rem, 3vw, 0.95rem);
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  cursor: pointer;
-  padding: 10px 16px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  user-select: none;
-}
-
-.toggle-label.btc {
-  color: var(--btc-orange);
-  opacity: 0.5;
-}
-
-.toggle-label.fiat {
-  color: var(--fiat-steel);
-  opacity: 0.5;
-}
-
-.toggle-label.active {
-  opacity: 1;
-}
-
-body.btc-view .toggle-label.btc {
-  background: rgba(247, 147, 26, 0.18);
-  box-shadow: 0 0 20px rgba(247, 147, 26, 0.25);
-}
-
-body.fiat-view .toggle-label.fiat {
-  background: rgba(100, 115, 130, 0.22);
-  box-shadow: 0 0 20px rgba(100, 115, 130, 0.18);
-}
-
-.toggle-switch {
-  width: 56px;
-  height: 28px;
-  background: #1a1a1a;
-  border-radius: 14px;
-  position: relative;
-  cursor: pointer;
-  border: 2px solid #333;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-}
-
-.toggle-switch::after {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  top: 2px;
-  transition: all 0.3s ease;
-}
-
-body.btc-view .toggle-switch {
-  border-color: rgba(247, 147, 26, 0.5);
-}
-
-body.btc-view .toggle-switch::after {
-  left: 3px;
-  background: var(--btc-orange);
-  box-shadow: 0 0 10px rgba(247, 147, 26, 0.6);
-}
-
-body.fiat-view .toggle-switch {
-  border-color: rgba(100, 115, 130, 0.5);
-}
-
-body.fiat-view .toggle-switch::after {
-  left: 29px;
-  background: var(--fiat-steel);
-  box-shadow: 0 0 10px rgba(100, 115, 130, 0.4);
-}
-
-/* ─── TREE VIEWS ─── */
-.tree-view {
-  display: none;
-  justify-content: center;
-  padding: 10px 12px 60px;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.tree-view.active {
-  display: flex;
-  opacity: 1;
+  gap: 40px;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .tree-container {
-  width: 100%;
-  max-width: 800px;
+  flex: 1;
+  max-width: 600px;
   text-align: center;
 }
 
 .tree-title {
-  font-size: clamp(1.4rem, 6vw, 2.2rem);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  margin-bottom: 4px;
-  text-transform: uppercase;
+  font-size: 1.6rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+  letter-spacing: 0.1em;
 }
-
 .tree-title.btc { color: var(--btc-orange); }
-.tree-title.fiat { color: #8a9298; }
+.tree-title.fiat { color: #9aa0a8; }
 
 .tree-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
   font-style: italic;
-  font-weight: 400;
-  font-size: clamp(0.9rem, 3vw, 1.1rem);
-  margin-bottom: 12px;
-  color: #a09890;
-}
-
-body.fiat-view .tree-subtitle {
-  color: #8090a0;
+  margin-bottom: 20px;
 }
 
 .tree-svg {
   width: 100%;
-  max-width: 800px;
   height: auto;
+  display: block;
 }
 
-/* ─── TREE ELEMENTS ─── */
-.trunk { stroke-linecap: round; }
-.trunk.btc { stroke: var(--btc-bark); }
-.trunk.fiat { stroke: var(--fiat-bark); }
-
-.branch { stroke-linecap: round; }
-.branch.btc { stroke: var(--btc-bark-light); }
-.branch.fiat { stroke: var(--fiat-slate); }
-
-.twig { stroke-linecap: round; opacity: 0.5; }
-.twig.btc { stroke: var(--btc-bark-light); }
-.twig.fiat { stroke: var(--fiat-slate); }
-
-.root { stroke-linecap: round; opacity: 0.35; }
-.root.btc { stroke: var(--btc-bark); }
-.root.fiat { stroke: var(--fiat-bark); }
-
-/* ─── CLUSTER LABELS ─── */
-.cluster-label {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+.toggle-container {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
 }
 
-.cluster-label.btc { fill: #ffd080; }
-.cluster-label.fiat { fill: #b0c0d0; }
+.toggle-label {
+  font-size: 1.1rem;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+.toggle-label.active { opacity: 1; }
+.toggle-label.btc { color: var(--btc-orange); }
+.toggle-label.fiat { color: #9aa0a8; }
 
-.label-bg {
-  fill: rgba(0,0,0,0.85);
-  rx: 6;
-  ry: 6;
+.toggle-switch {
+  width: 50px;
+  height: 26px;
+  background: #333;
+  border-radius: 13px;
+  cursor: pointer;
+  position: relative;
+}
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background: var(--btc-orange);
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: all 0.3s;
+}
+.fiat-view .toggle-switch::after {
+  left: 26px;
+  background: #9aa0a8;
 }
 
-/* ─── LEAF ELLIPSES ─── */
-.leaf { cursor: pointer; }
-.leaf:hover .leaf-ellipse {
-  filter: drop-shadow(0 6px 20px rgba(0,0,0,0.7)) brightness(1.1);
+.tree-view { display: block; }
+
+#loading {
+  text-align: center;
+  padding: 100px 20px;
+  font-size: 1.2rem;
+  color: var(--text-muted);
 }
+#loading.hidden { display: none; }
 
-.leaf-ellipse {
-  transition: all 0.2s ease;
-  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5));
-}
-
-.leaf-ellipse.btc { fill: #f7931a; }
-.leaf-ellipse.btc-alt { fill: #ffb030; }
-.leaf-ellipse.fiat { fill: #5a6672; }
-.leaf-ellipse.fiat-alt { fill: #6a4a4a; }
-
-/* ─── LEAF TEXT ─── */
-.leaf-text {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  pointer-events: none;
-  text-anchor: middle;
-  dominant-baseline: central;
-}
-
-.leaf-text.btc {
-  fill: #1a0d00;
-}
-
-.leaf-text.fiat {
-  fill: #ffffff;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
-}
-
-/* ─── TOOLTIP ─── */
+/* ENHANCED TOOLTIP STYLES */
 .tooltip {
   position: fixed;
-  max-width: 340px;
-  padding: 18px 20px;
+  display: none;
+  max-width: 420px;
+  padding: 20px 24px;
   border-radius: 12px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-  z-index: 1000;
+  font-size: 0.95rem;
   line-height: 1.6;
+  pointer-events: none;
+  z-index: 1000;
+  max-height: 80vh;
+  overflow-y: auto;
 }
-.tooltip.visible { opacity: 1; }
 
 .tooltip.btc-tip {
-  background: linear-gradient(135deg, rgba(40,32,20,0.98), rgba(30,24,14,0.98));
-  border: 2px solid rgba(247,147,26,0.6);
-  box-shadow: 0 16px 48px rgba(0,0,0,0.75), 0 0 40px rgba(247,147,26,0.12);
+  background: linear-gradient(135deg, rgba(30,28,24,0.97), rgba(20,18,14,0.97));
+  border: 1px solid rgba(247,147,26,0.4);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 20px rgba(247,147,26,0.15);
 }
-
 .tooltip.fiat-tip {
-  background: linear-gradient(135deg, rgba(26,30,38,0.98), rgba(18,20,26,0.98));
-  border: 2px solid rgba(120,135,155,0.5);
-  box-shadow: 0 16px 48px rgba(0,0,0,0.75);
+  background: linear-gradient(135deg, rgba(20,22,28,0.97), rgba(12,14,18,0.97));
+  border: 1px solid rgba(100,110,130,0.4);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
 }
 
 .tooltip-word {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 600;
   margin-bottom: 10px;
   letter-spacing: 0.03em;
 }
-.tooltip-word.btc { color: #ffaa33; }
-.tooltip-word.fiat { color: #b8c4d0; }
+.tooltip-word.btc { color: var(--btc-orange); }
+.tooltip-word.fiat { color: #9aa0a8; }
 
 .tooltip-desc {
-  font-family: var(--font-display);
-  font-size: 1.1rem;
+  color: #d4ccc4;
   font-weight: 400;
-  color: #d8d0c8;
-  line-height: 1.65;
-}
-
-body.fiat-view .tooltip-desc {
-  color: #c8d0d8;
+  margin-bottom: 12px;
 }
 
 .tooltip-syn {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.15);
-  font-family: var(--font-ui);
+  padding: 10px 0;
+  border-top: 1px solid rgba(255,255,255,0.1);
   font-size: 0.85rem;
-  font-weight: 500;
-  color: #999;
+  color: #888;
+  font-style: italic;
 }
-.tooltip-syn span { margin: 0 5px; }
+.tooltip-syn-label {
+  color: #666;
+  font-style: normal;
+  margin-right: 6px;
+}
+.tooltip-syn span { margin: 0 4px; }
 
-/* ─── FOOTER ─── */
+.tooltip-deeper {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.tooltip-deeper-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #666;
+  margin-bottom: 8px;
+  display: block;
+}
+.tooltip-deeper-text {
+  color: #b8b0a8;
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.tooltip-contrast {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  position: relative;
+}
+.tooltip.btc-tip .tooltip-contrast {
+  background: rgba(100,110,130,0.15);
+  border-left: 3px solid rgba(100,110,130,0.5);
+}
+.tooltip.fiat-tip .tooltip-contrast {
+  background: rgba(247,147,26,0.1);
+  border-left: 3px solid rgba(247,147,26,0.5);
+}
+
+.tooltip-contrast-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tooltip.btc-tip .tooltip-contrast-label { color: #7a8594; }
+.tooltip.fiat-tip .tooltip-contrast-label { color: #c9a050; }
+
+.tooltip-contrast-icon { font-size: 0.9rem; }
+
+.tooltip-contrast-text {
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+.tooltip.btc-tip .tooltip-contrast-text { color: #8a9099; }
+.tooltip.fiat-tip .tooltip-contrast-text { color: #c4b090; }
+
 footer {
   text-align: center;
-  padding: 24px 16px 40px;
-  font-size: 0.9rem;
+  padding: 30px 20px 50px;
+  color: #4a4540;
+  font-size: 0.85rem;
 }
-footer a { 
-  color: var(--btc-orange); 
-  text-decoration: none;
-  font-weight: 500;
-}
+footer a { color: var(--btc-orange); text-decoration: none; }
 footer a:hover { text-decoration: underline; }
 
-body.fiat-view footer a {
-  color: #8a9aa8;
-}
-
-/* ─── MOBILE ─── */
-@media (max-width: 600px) {
-  header { padding: 16px 12px 6px; top: 0; }
-  header h1 { font-size: 1.1rem; letter-spacing: 0.06em; }
-  header p { font-size: 0.8rem; }
+@media (max-width: 900px) {
+  .arena { display: none; }
+  .toggle-container { display: flex; }
   
-  .toggle-container { 
-    padding: 10px 12px; 
-    gap: 10px; 
-    top: 50px; 
+  .tree-view {
+    display: none;
+    padding: 0 10px 40px;
   }
-  .toggle-label { 
-    padding: 8px 12px; 
-    font-size: 0.8rem; 
-  }
+  .tree-view.active { display: block; }
   
-  .tree-view { padding: 8px 8px 40px; }
-  .tree-title { font-size: 1.3rem; }
-  .tree-subtitle { font-size: 0.85rem; margin-bottom: 8px; }
+  .tree-container { max-width: 100%; }
   
-  .tooltip { 
-    max-width: calc(100vw - 32px); 
-    padding: 14px 16px;
+  header h1 { font-size: 1.8rem; }
+  header p { font-size: 1rem; }
+  
+  .tooltip {
+    max-width: calc(100vw - 32px);
     left: 16px !important;
-    right: 16px;
-    width: auto;
+    right: 16px !important;
+    font-size: 0.9rem;
+    padding: 16px 18px;
+    max-height: 70vh;
   }
   .tooltip-word { font-size: 1.2rem; }
-  .tooltip-desc { font-size: 1rem; }
+  .tooltip-desc { font-size: 0.95rem; }
+  .tooltip-deeper-text { font-size: 0.85rem; }
+  .tooltip-contrast-text { font-size: 0.85rem; }
 }
 </style>
 </head>
-<body class="btc-view">
-
-<div class="loading" id="loading">Loading...</div>
+<body>
 
 <header>
   <h1>The Money Trees</h1>
-  <p>Tap each leaf to explore the nature of money</p>
+  <p>Hover over each leaf to explore the nature of money</p>
 </header>
+
+<div class="arena">
+  <div class="tree-container">
+    <h2 class="tree-title btc" id="btc-title">Bitcoin</h2>
+    <p class="tree-subtitle" id="btc-subtitle">Sound money · Sovereignty · Truth</p>
+    <svg id="btc-tree" class="tree-svg" viewBox="0 0 560 700"></svg>
+  </div>
+  <div class="tree-container">
+    <h2 class="tree-title fiat" id="fiat-title">Fiat</h2>
+    <p class="tree-subtitle" id="fiat-subtitle">Broken money · Coercion · Decay</p>
+    <svg id="fiat-tree" class="tree-svg" viewBox="0 0 560 700"></svg>
+  </div>
+</div>
 
 <div class="toggle-container">
   <span class="toggle-label btc active" onclick="showTree('btc')">Bitcoin</span>
@@ -435,43 +310,49 @@ body.fiat-view footer a {
 
 <div id="btc-view" class="tree-view active">
   <div class="tree-container">
-    <h2 class="tree-title btc" id="btc-title">Bitcoin</h2>
-    <p class="tree-subtitle" id="btc-subtitle">Sound money · Sovereignty · Truth</p>
-    <svg id="btc-tree" class="tree-svg"></svg>
+    <h2 class="tree-title btc">Bitcoin</h2>
+    <p class="tree-subtitle">Sound money · Sovereignty · Truth</p>
+    <svg id="btc-tree-mobile" class="tree-svg"></svg>
   </div>
 </div>
 
 <div id="fiat-view" class="tree-view">
   <div class="tree-container">
-    <h2 class="tree-title fiat" id="fiat-title">Fiat</h2>
-    <p class="tree-subtitle" id="fiat-subtitle">Broken money · Coercion · Decay</p>
-    <svg id="fiat-tree" class="tree-svg"></svg>
+    <h2 class="tree-title fiat">Fiat</h2>
+    <p class="tree-subtitle">Broken money · Coercion · Decay</p>
+    <svg id="fiat-tree-mobile" class="tree-svg"></svg>
   </div>
 </div>
+
+<div id="loading">Loading...</div>
 
 <div id="tooltip" class="tooltip">
   <div id="tip-word" class="tooltip-word"></div>
   <div id="tip-desc" class="tooltip-desc"></div>
   <div id="tip-syn" class="tooltip-syn"></div>
+  <div id="tip-deeper" class="tooltip-deeper">
+    <span class="tooltip-deeper-label">Deeper Insight</span>
+    <div id="tip-deeper-text" class="tooltip-deeper-text"></div>
+  </div>
+  <div id="tip-contrast" class="tooltip-contrast">
+    <div id="tip-contrast-label" class="tooltip-contrast-label">
+      <span class="tooltip-contrast-icon">↔</span>
+      <span id="tip-contrast-label-text">Fiat Contrast</span>
+    </div>
+    <div id="tip-contrast-text" class="tooltip-contrast-text"></div>
+  </div>
 </div>
 
 <footer>
-  <a href="https://lastcoinstanding.com">lastcoinstanding.com</a>
+  <a href="https://lastcoinstanding.substack.com">lastcoinstanding.substack.com</a>
 </footer>
 
 <script>
-// ═══════════════════════════════════════════════════════════
-// DATA - Loaded from data.json
-// ═══════════════════════════════════════════════════════════
 let treeData = null;
 let btcClusters = [];
 let fiatClusters = [];
-let allLeaves = [];
 let currentView = 'btc';
 
-// ═══════════════════════════════════════════════════════════
-// LOAD DATA FROM JSON
-// ═══════════════════════════════════════════════════════════
 async function loadData() {
   try {
     const response = await fetch('data.json');
@@ -479,13 +360,14 @@ async function loadData() {
     
     treeData = await response.json();
     
-    // Convert JSON format to internal format
     btcClusters = treeData.bitcoin.clusters.map(cluster => ({
       name: cluster.name,
       words: cluster.words.map(w => ({
         w: w.word,
         desc: w.description,
-        syn: w.synonyms || []
+        syn: w.synonyms || [],
+        deeper: w.deeperInsight || '',
+        contrast: w.contrast || ''
       }))
     }));
     
@@ -494,17 +376,17 @@ async function loadData() {
       words: cluster.words.map(w => ({
         w: w.word,
         desc: w.description,
-        syn: w.synonyms || []
+        syn: w.synonyms || [],
+        deeper: w.deeperInsight || '',
+        contrast: w.contrast || ''
       }))
     }));
     
-    // Update titles
     document.getElementById('btc-title').textContent = treeData.bitcoin.title;
     document.getElementById('btc-subtitle').textContent = treeData.bitcoin.subtitle;
     document.getElementById('fiat-title').textContent = treeData.fiat.title;
     document.getElementById('fiat-subtitle').textContent = treeData.fiat.subtitle;
     
-    // Hide loading, render trees
     document.getElementById('loading').classList.add('hidden');
     initTrees();
     
@@ -514,366 +396,213 @@ async function loadData() {
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-// RESPONSIVE DETECTION
-// ═══════════════════════════════════════════════════════════
-function isMobile() {
-  return window.innerWidth <= 600;
-}
+function isMobile() { return window.innerWidth <= 900; }
 
-// ═══════════════════════════════════════════════════════════
-// TOGGLE FUNCTIONALITY
-// ═══════════════════════════════════════════════════════════
 function showTree(view) {
   currentView = view;
   document.body.className = view + '-view';
-  
   document.getElementById('btc-view').classList.toggle('active', view === 'btc');
   document.getElementById('fiat-view').classList.toggle('active', view === 'fiat');
-  
   document.querySelector('.toggle-label.btc').classList.toggle('active', view === 'btc');
   document.querySelector('.toggle-label.fiat').classList.toggle('active', view === 'fiat');
-  
   hideTooltip();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function toggleTree() {
-  showTree(currentView === 'btc' ? 'fiat' : 'btc');
-}
+function toggleTree() { showTree(currentView === 'btc' ? 'fiat' : 'btc'); }
 
-// ═══════════════════════════════════════════════════════════
-// MEASURE TEXT WIDTH
-// ═══════════════════════════════════════════════════════════
-function measureTextWidth(text, fontSize) {
-  const narrow = 'iltfjr';
-  const wide = 'mwMW';
-  let width = 0;
-  for (const char of text) {
-    if (narrow.includes(char)) width += fontSize * 0.4;
-    else if (wide.includes(char)) width += fontSize * 0.8;
-    else if (char === char.toUpperCase() && char !== char.toLowerCase()) width += fontSize * 0.7;
-    else width += fontSize * 0.58;
+function initTrees() {
+  if (isMobile()) {
+    renderTree('btc-tree-mobile', btcClusters, 'btc');
+    renderTree('fiat-tree-mobile', fiatClusters, 'fiat');
+  } else {
+    renderTree('btc-tree', btcClusters, 'btc');
+    renderTree('fiat-tree', fiatClusters, 'fiat');
   }
-  return width;
 }
 
-// ═══════════════════════════════════════════════════════════
-// LAYOUT ENGINE
-// ═══════════════════════════════════════════════════════════
-function layoutTree(clusters, side) {
-  const mobile = isMobile();
-  const numClusters = clusters.length;
+function renderTree(svgId, clusters, type) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  svg.innerHTML = '';
   
-  const clusterSpacing = mobile ? 240 : 200;
-  const baseHeight = mobile ? 300 : 350;
+  const isBtc = type === 'btc';
+  const leafColor = isBtc ? '#f7931a' : '#6a7280';
+  const leafColorLight = isBtc ? '#ffa53a' : '#8a9299';
+  const branchColor = isBtc ? '#5c4a3a' : '#3a3f4a';
+  const textColor = isBtc ? '#1a1510' : '#f0f0f0';
   
-  const W = mobile ? 400 : 800;
-  const H = baseHeight + (numClusters * clusterSpacing);
-  const fontSize = mobile ? 11 : 14;
-  const labelFontSize = mobile ? 11 : 14;
-  const baseRy = mobile ? 20 : 26;
-  const minGap = mobile ? 12 : 18;
-  const cols = mobile ? 2 : 3;
+  let allWords = [];
+  clusters.forEach(c => c.words.forEach(word => allWords.push({ ...word, cluster: c.name })));
   
-  const trunkX = W / 2;
-  const trunkBase = H - 50;
-  const trunkTop = mobile ? 50 : 80;
+  const width = 560, height = 700;
+  const trunkX = width / 2;
+  const trunkBottom = height - 30, trunkTop = height - 180;
+  
+  const trunk = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  trunk.setAttribute('d', `M${trunkX - 15} ${trunkBottom} Q${trunkX - 20} ${trunkTop + 50} ${trunkX - 8} ${trunkTop} L${trunkX + 8} ${trunkTop} Q${trunkX + 20} ${trunkTop + 50} ${trunkX + 15} ${trunkBottom} Z`);
+  trunk.setAttribute('fill', branchColor);
+  svg.appendChild(trunk);
   
   const leaves = [];
-  const branches = [];
-  const twigs = [];
-  const roots = [];
-  const labels = [];
-  const placedShapes = [];
+  const leafRadius = 32, padding = 8;
   
-  const clusterHeight = clusterSpacing;
-  
-  clusters.forEach((cluster, ci) => {
-    const nWords = cluster.words.length;
-    const branchY = trunkTop + (mobile ? 80 : 120) + ci * clusterHeight;
-    
-    const goLeft = ci % 2 === 0;
-    const direction = goLeft ? -1 : 1;
-    
-    // Upper branches are longer to give leaves more room
-    const upperBonus = Math.max(0, (numClusters - 1 - ci) * (mobile ? 8 : 15));
-    const branchLen = (mobile ? 40 : 100) + upperBonus;
-    const branchAngle = direction * (25 + (ci % 3) * 3);
-    const branchRad = branchAngle * Math.PI / 180;
-    
-    const bEndX = trunkX + Math.sin(branchRad) * branchLen;
-    const bEndY = branchY - Math.abs(Math.cos(branchRad)) * branchLen * 0.15;
-    
-    branches.push({ x1: trunkX, y1: branchY, x2: bEndX, y2: bEndY, side });
-    
-    const labelX = bEndX;
-    const labelY = bEndY - (mobile ? 18 : 22);
-    
-    labels.push({
-      x: labelX,
-      y: labelY,
-      text: cluster.name,
-      side,
-      anchor: 'middle',
-      fontSize: labelFontSize
-    });
-    
-    const paddingX = mobile ? 14 : 24;
-    const labelBottomY = labelY + labelFontSize + 8;
-    const leafStartY = labelBottomY + (mobile ? 70 : 85);
-    
-    cluster.words.forEach((word, wi) => {
-      const textWidth = measureTextWidth(word.w, fontSize);
-      const rx = Math.max(mobile ? 36 : 50, (textWidth / 2) + paddingX);
-      const ry = baseRy;
+  allWords.forEach((word, i) => {
+    let placed = false, attempts = 0;
+    while (!placed && attempts < 200) {
+      const angle = Math.random() * Math.PI * 2;
+      const maxRadius = 220 + Math.random() * 40;
+      const r = Math.random() * maxRadius;
+      const x = trunkX + Math.cos(angle) * r * 0.95;
+      const y = trunkTop - 80 - Math.abs(Math.sin(angle)) * r * 0.7 - Math.random() * 100;
       
-      const row = Math.floor(wi / cols);
-      const col = wi % cols;
-      const colsInRow = Math.min(cols, nWords - row * cols);
-      
-      const cellWidth = (rx * 2) + minGap + (mobile ? 8 : 20);
-      const cellHeight = ry * 2 + minGap + (mobile ? 14 : 18);
-      
-      const clusterCenterX = bEndX + direction * (mobile ? 10 : 40);
-      const rowStartX = clusterCenterX - ((colsInRow - 1) * cellWidth) / 2;
-      
-      let lx = rowStartX + col * cellWidth;
-      let ly = leafStartY + row * cellHeight;
-      
-      if (row % 2 === 1) {
-        lx += direction * (mobile ? 8 : 20);
+      if (x < leafRadius + 10 || x > width - leafRadius - 10 || y < leafRadius + 10 || y > trunkTop - 20) {
+        attempts++; continue;
       }
       
-      let attempts = 0;
-      let hasCollision = true;
-      
-      while (hasCollision && attempts < 50) {
-        hasCollision = false;
-        
-        for (const placed of placedShapes) {
-          const dx = (lx - placed.x) / ((rx + placed.rx) * 0.92);
-          const dy = (ly - placed.y) / ((ry + placed.ry) * 0.92);
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          
-          if (dist < 1.05) {
-            hasCollision = true;
-            const angle = Math.atan2(ly - placed.y, lx - placed.x);
-            const push = (1.05 - dist) * 20 + 3;
-            lx += Math.cos(angle) * push;
-            ly += Math.sin(angle) * push;
-            break;
-          }
-        }
-        
-        lx = Math.max(rx + 10, Math.min(W - rx - 10, lx));
-        ly = Math.max(ry + 10, Math.min(H - ry - 50, ly));
-        
-        attempts++;
+      let overlaps = false;
+      for (const leaf of leaves) {
+        const dx = x - leaf.x, dy = y - leaf.y;
+        if (Math.sqrt(dx * dx + dy * dy) < leafRadius * 2 + padding) { overlaps = true; break; }
       }
       
-      placedShapes.push({ x: lx, y: ly, rx: rx, ry: ry });
-      
-      twigs.push({
-        x1: bEndX,
-        y1: bEndY,
-        x2: lx,
-        y2: ly - ry,
-        side
-      });
-      
-      const alt = wi % 2 === 1;
-      
-      leaves.push({
-        x: lx,
-        y: ly,
-        rx: rx,
-        ry: ry,
-        word: word.w,
-        desc: word.desc,
-        syn: word.syn,
-        side,
-        alt,
-        fontSize: fontSize
-      });
-    });
-  });
-  
-  const rootAngles = [-50, -22, 22, 50];
-  rootAngles.forEach((a, i) => {
-    const rad = a * Math.PI / 180;
-    const len = (mobile ? 30 : 55) + (i % 2) * (mobile ? 12 : 25);
-    roots.push({
-      x1: trunkX + ((i < 2) ? -5 : 5),
-      y1: trunkBase,
-      x2: trunkX + Math.sin(rad) * len,
-      y2: trunkBase + Math.cos(rad) * len * 0.4,
-      side
-    });
-  });
-  
-  return { W, H, trunkX, trunkBase, trunkTop, branches, twigs, leaves, roots, labels };
-}
-
-// ═══════════════════════════════════════════════════════════
-// RENDER TREE
-// ═══════════════════════════════════════════════════════════
-function renderTree(svgId, clusters, side) {
-  const svg = document.getElementById(svgId);
-  const layout = layoutTree(clusters, side);
-  const mobile = isMobile();
-  
-  svg.setAttribute('viewBox', `0 0 ${layout.W} ${layout.H}`);
-  
-  let html = '';
-  
-  layout.roots.forEach(r => {
-    const sw = mobile ? 8 : 12;
-    html += `<line class="root ${side}" x1="${r.x1}" y1="${r.y1}" x2="${r.x2}" y2="${r.y2}" stroke-width="${sw}"/>`;
-  });
-  
-  const tx = layout.trunkX;
-  const tw = mobile ? 10 : 20;
-  html += `<path class="trunk ${side}" d="
-    M${tx-tw},${layout.trunkBase} 
-    C${tx-tw*0.9},${layout.trunkBase-layout.H*0.25} ${tx-tw*0.5},${layout.trunkBase-layout.H*0.55} ${tx},${layout.trunkTop}
-    C${tx+tw*0.5},${layout.trunkBase-layout.H*0.55} ${tx+tw*0.9},${layout.trunkBase-layout.H*0.25} ${tx+tw},${layout.trunkBase}
-    Z" fill="${side==='btc'?'#5a4030':'#454550'}"/>`;
-  
-  layout.branches.forEach(b => {
-    const sw = mobile ? 8 : 16;
-    html += `<line class="branch ${side}" x1="${b.x1}" y1="${b.y1}" x2="${b.x2}" y2="${b.y2}" stroke-width="${sw}"/>`;
-  });
-  
-  layout.twigs.forEach(t => {
-    html += `<line class="twig ${side}" x1="${t.x1}" y1="${t.y1}" x2="${t.x2}" y2="${t.y2}" stroke-width="2"/>`;
-  });
-  
-  layout.leaves.forEach((leaf) => {
-    const ellipseClass = leaf.alt ? `${leaf.side}-alt` : leaf.side;
-    const globalIdx = allLeaves.length;
-    allLeaves.push(leaf);
+      if (!overlaps) { leaves.push({ x, y, word }); placed = true; }
+      attempts++;
+    }
     
-    html += `
-      <g class="leaf"
-         ontouchstart="showTooltip(event, ${globalIdx})"
-         ontouchend="hideTooltipDelayed()"
-         onmouseenter="showTooltip(event, ${globalIdx})"
-         onmouseleave="hideTooltip()"
-         onmousemove="moveTooltip(event)">
-        <ellipse class="leaf-ellipse ${ellipseClass}" cx="${leaf.x}" cy="${leaf.y}" rx="${leaf.rx}" ry="${leaf.ry}"/>
-        <text class="leaf-text ${leaf.side}" x="${leaf.x}" y="${leaf.y}" font-size="${leaf.fontSize}">${leaf.word}</text>
-      </g>`;
+    if (!placed) {
+      const row = Math.floor(i / 6), col = i % 6;
+      leaves.push({ x: 60 + col * 80 + (row % 2) * 40, y: 60 + row * 75, word });
+    }
   });
   
-  layout.labels.forEach(l => {
-    const textWidth = l.text.length * (l.fontSize * 0.72) + 18;
-    const textHeight = l.fontSize + 10;
-    html += `<rect class="label-bg" x="${l.x - textWidth/2}" y="${l.y - textHeight/2}" width="${textWidth}" height="${textHeight}"/>`;
-    html += `<text class="cluster-label ${side}" x="${l.x}" y="${l.y + 1}" text-anchor="${l.anchor}" dominant-baseline="middle" font-size="${l.fontSize}">${l.text}</text>`;
+  leaves.forEach(leaf => {
+    const branch = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const startX = trunkX + (leaf.x - trunkX) * 0.1;
+    const midX = trunkX + (leaf.x - trunkX) * 0.5;
+    const midY = trunkTop - (trunkTop - leaf.y) * 0.4;
+    branch.setAttribute('d', `M${startX} ${trunkTop} Q${midX} ${midY} ${leaf.x} ${leaf.y + leafRadius}`);
+    branch.setAttribute('stroke', branchColor);
+    branch.setAttribute('stroke-width', '3');
+    branch.setAttribute('fill', 'none');
+    branch.setAttribute('opacity', '0.6');
+    svg.appendChild(branch);
   });
   
-  svg.innerHTML = html;
+  leaves.forEach(leaf => {
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.style.cursor = 'pointer';
+    
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', leaf.x);
+    circle.setAttribute('cy', leaf.y);
+    circle.setAttribute('r', leafRadius);
+    circle.setAttribute('fill', leafColor);
+    circle.setAttribute('opacity', '0.9');
+    
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', leaf.x);
+    text.setAttribute('y', leaf.y);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('fill', textColor);
+    text.setAttribute('font-size', leaf.word.w.length > 10 ? '9' : '11');
+    text.setAttribute('font-weight', '600');
+    text.setAttribute('font-family', "'Cormorant Garamond', Georgia, serif");
+    text.textContent = leaf.word.w.length > 14 ? leaf.word.w.slice(0, 12) + '…' : leaf.word.w;
+    
+    g.appendChild(circle);
+    g.appendChild(text);
+    
+    g.addEventListener('mouseenter', (e) => {
+      circle.setAttribute('fill', leafColorLight);
+      circle.setAttribute('opacity', '1');
+      showTooltip(e, leaf.word, type);
+    });
+    g.addEventListener('mouseleave', () => {
+      circle.setAttribute('fill', leafColor);
+      circle.setAttribute('opacity', '0.9');
+      hideTooltip();
+    });
+    g.addEventListener('click', (e) => showTooltip(e, leaf.word, type));
+    
+    svg.appendChild(g);
+  });
 }
 
-// ═══════════════════════════════════════════════════════════
-// TOOLTIP
-// ═══════════════════════════════════════════════════════════
-const tooltip = document.getElementById('tooltip');
-const tipWord = document.getElementById('tip-word');
-const tipDesc = document.getElementById('tip-desc');
-const tipSyn = document.getElementById('tip-syn');
-let tooltipTimeout = null;
-
-function showTooltip(e, leafIndex) {
-  if (tooltipTimeout) {
-    clearTimeout(tooltipTimeout);
-    tooltipTimeout = null;
-  }
+function showTooltip(e, word, type) {
+  const tooltip = document.getElementById('tooltip');
+  const tipWord = document.getElementById('tip-word');
+  const tipDesc = document.getElementById('tip-desc');
+  const tipSyn = document.getElementById('tip-syn');
+  const tipDeeper = document.getElementById('tip-deeper');
+  const tipDeeperText = document.getElementById('tip-deeper-text');
+  const tipContrast = document.getElementById('tip-contrast');
+  const tipContrastLabel = document.getElementById('tip-contrast-label-text');
+  const tipContrastText = document.getElementById('tip-contrast-text');
   
-  const leaf = allLeaves[leafIndex];
-  if (!leaf) return;
+  tipWord.textContent = word.w;
+  tipWord.className = 'tooltip-word ' + type;
+  tipDesc.textContent = word.desc;
   
-  tipWord.textContent = leaf.word;
-  tipWord.className = 'tooltip-word ' + leaf.side;
-  tipDesc.textContent = leaf.desc;
-  
-  if (leaf.syn && leaf.syn.length) {
-    tipSyn.innerHTML = 'Related: ' + leaf.syn.map(s => `<span>${s}</span>`).join(' · ');
+  if (word.syn && word.syn.length > 0) {
+    tipSyn.innerHTML = '<span class="tooltip-syn-label">Related:</span>' + word.syn.map(s => `<span>${s}</span>`).join(' · ');
     tipSyn.style.display = 'block';
   } else {
     tipSyn.style.display = 'none';
   }
   
-  tooltip.className = 'tooltip visible ' + (leaf.side === 'btc' ? 'btc-tip' : 'fiat-tip');
-  moveTooltip(e);
+  if (word.deeper && word.deeper.trim()) {
+    tipDeeperText.textContent = word.deeper;
+    tipDeeper.style.display = 'block';
+  } else {
+    tipDeeper.style.display = 'none';
+  }
+  
+  if (word.contrast && word.contrast.trim()) {
+    tipContrastLabel.textContent = type === 'btc' ? 'Fiat Contrast' : 'Bitcoin Contrast';
+    tipContrastText.textContent = word.contrast;
+    tipContrast.style.display = 'block';
+  } else {
+    tipContrast.style.display = 'none';
+  }
+  
+  tooltip.className = 'tooltip ' + type + '-tip';
+  tooltip.style.display = 'block';
+  positionTooltip(e);
 }
 
-function moveTooltip(e) {
-  const mobile = isMobile();
+function positionTooltip(e) {
+  const tooltip = document.getElementById('tooltip');
+  const rect = tooltip.getBoundingClientRect();
+  const vw = window.innerWidth, vh = window.innerHeight;
   
-  if (mobile) {
+  if (isMobile()) {
     tooltip.style.left = '16px';
     tooltip.style.right = '16px';
-    tooltip.style.bottom = '80px';
+    tooltip.style.bottom = '20px';
     tooltip.style.top = 'auto';
-    tooltip.style.width = 'auto';
   } else {
-    const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-    const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-    
-    let x = clientX + 24;
-    let y = clientY - 14;
-    
-    if (x + 350 > window.innerWidth) x = clientX - 360;
-    if (y + 220 > window.innerHeight) y = window.innerHeight - 230;
-    if (y < 10) y = 10;
-    if (x < 10) x = 10;
-    
+    let x = e.clientX + 15, y = e.clientY + 15;
+    if (x + rect.width > vw - 20) x = e.clientX - rect.width - 15;
+    if (y + rect.height > vh - 20) y = vh - rect.height - 20;
+    if (y < 20) y = 20;
     tooltip.style.left = x + 'px';
     tooltip.style.top = y + 'px';
     tooltip.style.right = 'auto';
     tooltip.style.bottom = 'auto';
-    tooltip.style.width = '';
   }
 }
 
-function hideTooltip() {
-  tooltip.className = 'tooltip';
-}
+function hideTooltip() { document.getElementById('tooltip').style.display = 'none'; }
 
-function hideTooltipDelayed() {
-  tooltipTimeout = setTimeout(hideTooltip, 2000);
-}
-
-document.addEventListener('touchstart', function(e) {
-  if (!e.target.closest('.leaf') && !e.target.closest('.tooltip')) {
-    hideTooltip();
-  }
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => { if (treeData) initTrees(); }, 250);
 });
 
-// ═══════════════════════════════════════════════════════════
-// INITIALIZE
-// ═══════════════════════════════════════════════════════════
-function initTrees() {
-  allLeaves = [];
-  renderTree('btc-tree', btcClusters, 'btc');
-  renderTree('fiat-tree', fiatClusters, 'fiat');
-}
-
-let lastWidth = window.innerWidth;
-window.addEventListener('resize', function() {
-  const newWidth = window.innerWidth;
-  const crossedBreakpoint = (lastWidth <= 600 && newWidth > 600) || (lastWidth > 600 && newWidth <= 600);
-  
-  if (crossedBreakpoint) {
-    lastWidth = newWidth;
-    initTrees();
-  }
-});
-
-// Load data on page load
-loadData();
+document.addEventListener('DOMContentLoaded', loadData);
 </script>
 </body>
 </html>
