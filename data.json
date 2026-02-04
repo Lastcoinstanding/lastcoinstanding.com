@@ -80,8 +80,8 @@
               "Honesty",
               "Veracity"
             ],
-            "deeperInsight": "The Bitcoin blockchain is a truth machine—a record that cannot be falsified, edited, or erased. Every transaction ever made is permanently inscribed and independently verifiable by anyone. In a world drowning in misinformation, Bitcoin offers something rare: an objective, incorruptible source of financial truth that no authority can rewrite.",
-            "contrast": "Fiat accounting is opaque by design. The true money supply is unknowable. Central bank balance sheets are labyrinthine. Inflation statistics are methodologically adjusted to minimize apparent damage. In fiat, truth is whatever the authorities say it is—until the next revision."
+            "deeperInsight": "The Bitcoin blockchain is a truth machine - a record that cannot be falsified, edited, or erased. Every transaction ever made is permanently inscribed and independently verifiable by anyone. In a world drowning in misinformation, Bitcoin offers something rare: an objective, incorruptible source of financial truth that no authority can rewrite.",
+            "contrast": "Fiat accounting is opaque by design. The true money supply is unknowable. Central bank are typically not audited. Inflation statistics are methodologically adjusted to downplay the debasement. In fiat, truth is whatever the authorities say it is - until the next revision."
           },
           {
             "word": "Incorruptible",
@@ -91,8 +91,8 @@
               "Untainted",
               "Inviolable"
             ],
-            "deeperInsight": "Bitcoin's incorruptibility is not a promise—it is an architectural fact. The rules are enforced by code running on tens of thousands of independent computers worldwide. No bribe is large enough, no threat credible enough, no power sufficient to corrupt a system with no central point of control. The protocol treats all participants equally, from the most powerful to the most obscure.",
-            "contrast": "Fiat systems are inherently corruptible because they concentrate power in human institutions. Central bankers face political pressure. Regulators get captured. Politicians serve short-term interests. The history of fiat is a history of rules being bent, broken, and rewritten to serve those closest to power."
+            "deeperInsight": "Bitcoin's incorruptibility is not a promise, but an architectural fact. The rules are enforced by code running on tens of thousands of independent computers worldwide. There is no central point of control to manipulate. The protocol treats all participants equally, from the most powerful to the least.",
+            "contrast": "Fiat systems are inherently corruptible because they concentrate power in human institutions. Central bankers face political pressure. Regulators get captured. Politicians serve short-term interests (often their own). The history of fiat is a history of rules being bent, broken, and rewritten to serve those closest to power."
           },
           {
             "word": "Transparent",
