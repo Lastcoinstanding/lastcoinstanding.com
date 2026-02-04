@@ -96,13 +96,13 @@
           },
           {
             "word": "Transparent",
-            "description": "Open-source code and a public ledger. Anyone can audit, verify, and trust through verification.",
+            "description": "Open-source code and a public ledger. Anyone can audit and trust through verification.",
             "synonyms": [
               "Open",
               "Visible",
               "Auditable"
             ],
-            "deeperInsight": "Every line of Bitcoin's code is public. Every transaction is recorded on a ledger anyone can inspect. The total supply is verifiable in real-time by anyone running a node. This radical transparency means trust is not required—verification is always possible. 'Don't trust, verify' is not a slogan; it is an operational principle.",
+            "deeperInsight": "Every line of Bitcoin's code is public. Every transaction is recorded on a ledger anyone can inspect. The total supply is verifiable in real-time by anyone running a node. This radical transparency means trust is not required -verification is always possible. 'Don't trust, verify' is not a slogan; it is an operational principle.",
             "contrast": "Fiat operates behind closed doors. Central bank meetings are confidential. Money creation happens in opaque accounting entries. The actual money supply is estimated, not known. You are asked to trust institutions that have repeatedly proven unworthy of that trust."
           },
           {
@@ -113,8 +113,8 @@
               "Fixed",
               "Unalterable"
             ],
-            "deeperInsight": "Immutability means that once a Bitcoin transaction is confirmed, it becomes part of an unbreakable chain of cryptographic proofs extending back to the genesis block. No government, no hacker, no catastrophe can undo what has been recorded. This permanence is the foundation of Bitcoin's credibility as a store of value across generations.",
-            "contrast": "Fiat records are mutable at the discretion of those in power. Bank balances can be adjusted. Transaction histories can be amended. Even the definition of money itself can be changed overnight, as happened when Nixon closed the gold window in 1971. Nothing in fiat is truly permanent."
+            "deeperInsight": "Bitcoin is an immutable ledger; once any transaction is confirmed, it becomes part of an unbreakable chain of cryptographic proofs extending back to the genesis block. No person, company or government can undo what has been recorded. This permanence is the foundation of Bitcoin's credibility as a store of value across generations.",
+            "contrast": "The fiat ledger is mutable at the discretion of those in power. Bank balances can be adjusted. Transaction histories can be amended. Even the definition of money itself can be changed overnight, as happened when Nixon closed the gold window in 1971. Nothing in fiat is truly permanent."
           },
           {
             "word": "Trustless",
@@ -123,19 +123,19 @@
               "Verifiable",
               "Cryptographic"
             ],
-            "deeperInsight": "Trustlessness is Bitcoin's most misunderstood virtue. It does not mean Bitcoin is untrustworthy—it means trust in third parties is unnecessary. The rules are enforced by mathematics and consensus, not by relying on the good behavior of any institution. You can verify everything yourself. This removes the single greatest point of failure in all prior monetary systems: the humans running them.",
-            "contrast": "Fiat is trust-dependent at every layer. You trust your bank to honor your deposits. You trust the central bank to manage supply responsibly. You trust the government not to abuse its monetary privilege. History shows this trust is routinely betrayed—yet fiat offers no alternative to trusting again."
+            "deeperInsight": "Trustlessness is Bitcoin's most misunderstood virtue. It does not mean Bitcoin is untrustworthy - it means trust in third parties is unnecessary. The rules are enforced by mathematics and protocol consensus, not by relying on the good behavior of any institution. You can verify everything yourself. This removes the single greatest point of failure in all prior monetary systems: the humans running them.",
+            "contrast": "Fiat is trust-dependent at every layer. You trust your bank to honor your deposits. You trust the central bank to manage supply responsibly. You trust the government not to abuse its monetary privilege. History shows this trust is routinely betrayed - yet fiat offers no alternative to trusting again."
           },
           {
             "word": "Honest",
-            "description": "Cannot lie about supply, cannot hide transactions, cannot pretend to be what it's not.",
+            "description": "An honest ledger that cannot lie about supply, transactions or ownership.",
             "synonyms": [
               "Truthful",
               "Sincere",
               "Genuine"
             ],
-            "deeperInsight": "Bitcoin is constitutionally incapable of dishonesty. The supply schedule is fixed and public. The issuance rate is mathematically determined. No one can print more Bitcoin in a crisis or hide inflation in accounting tricks. This honesty is not a policy choice that could be reversed—it is encoded in the protocol itself.",
-            "contrast": "Fiat is institutionally dishonest. Inflation is disguised as 'quantitative easing.' Money printing is called 'stimulus.' CPI calculations are adjusted to understate the true erosion of purchasing power. The entire vocabulary of central banking exists to obscure what is actually happening to your money."
+            "deeperInsight": "Bitcoin's monetary policy is encoded predefined, forever. The supply schedule is fixed and public. The issuance rate is mathematically determined. No one can print more Bitcoin in a crisis or hide inflation in accounting tricks. This honesty is not a policy choice that could be reversed - it is encoded in the protocol itself.",
+            "contrast": "Fiat is institutionally dishonest. Inflation is disguised using gaslighting terms such as 'quantitative easing.' Money printing is called 'stimulus.' CPI calculations are adjusted to understate the true erosion of purchasing power. The entire vocabulary of central banking exists to obscure the odious apparatus of theft."
           }
         ]
       },
