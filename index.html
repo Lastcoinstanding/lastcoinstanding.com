@@ -3,16 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Money Trees</title>
+<title>The Money Trees — Last Coin Standing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg-dark: #0a0c0f;
   --btc-orange: #f7931a;
+  --btc-orange-light: #ffa940;
   --btc-gold: #ffd700;
-  --fiat-gray: #4a5568;
+  --btc-bark: #5a4030;
+  --fiat-gray: #6a7580;
+  --fiat-gray-light: #8a9098;
+  --fiat-bark: #454550;
   --text-light: #e8e0d5;
   --text-muted: #8b8680;
 }
@@ -29,28 +33,37 @@ body {
 
 header {
   text-align: center;
-  padding: 40px 20px 20px;
+  padding: 40px 20px 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(180deg, var(--bg-dark) 0%, rgba(10,12,15,0.95) 100%);
 }
 header h1 {
-  font-size: 2.5rem;
-  font-weight: 400;
-  letter-spacing: 0.15em;
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   color: var(--text-light);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
 }
 header p {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--text-muted);
   font-style: italic;
 }
 
-/* Toggle - visible on both desktop and mobile */
+/* Toggle */
 .toggle-container {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 15px;
-  padding: 20px;
+  padding: 15px;
+  position: sticky;
+  top: 85px;
+  z-index: 100;
+  background: linear-gradient(180deg, rgba(10,12,15,0.95) 0%, rgba(10,12,15,0) 100%);
 }
 
 .toggle-label {
@@ -58,75 +71,80 @@ header p {
   cursor: pointer;
   opacity: 0.5;
   transition: opacity 0.3s;
-  font-weight: 500;
+  font-weight: 600;
 }
 .toggle-label.active { opacity: 1; }
 .toggle-label.btc { color: var(--btc-orange); }
-.toggle-label.fiat { color: #9aa0a8; }
+.toggle-label.fiat { color: var(--fiat-gray-light); }
 
 .toggle-switch {
   width: 60px;
   height: 30px;
-  background: #333;
+  background: #222;
   border-radius: 15px;
   cursor: pointer;
   position: relative;
-  border: 1px solid #444;
+  border: 1px solid #333;
 }
 .toggle-switch::after {
   content: '';
   position: absolute;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   background: var(--btc-orange);
   border-radius: 50%;
   top: 2px;
-  left: 2px;
+  left: 3px;
   transition: all 0.3s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
-.fiat-view .toggle-switch::after {
-  left: 32px;
-  background: #9aa0a8;
+.fiat-active .toggle-switch::after {
+  left: 31px;
+  background: var(--fiat-gray-light);
 }
 
-/* Tree views - only one visible at a time */
+/* Tree views */
 .tree-view {
   display: none;
-  padding: 0 20px 40px;
-  max-width: 800px;
+  padding: 20px;
+  max-width: 900px;
   margin: 0 auto;
 }
 .tree-view.active { display: block; }
 
-.tree-container {
+.tree-header {
   text-align: center;
+  margin-bottom: 30px;
 }
-
 .tree-title {
-  font-size: 2rem;
-  font-weight: 500;
+  font-size: 2.2rem;
+  font-weight: 600;
   margin-bottom: 8px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
 }
 .tree-title.btc { color: var(--btc-orange); }
-.tree-title.fiat { color: #9aa0a8; }
+.tree-title.fiat { color: var(--fiat-gray-light); }
 
 .tree-subtitle {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: var(--text-muted);
   font-style: italic;
-  margin-bottom: 20px;
 }
 
+/* SVG Tree */
 .tree-svg {
   width: 100%;
-  max-width: 700px;
+  max-width: 850px;
   height: auto;
   display: block;
   margin: 0 auto;
 }
 
+/* Cluster section styling */
+.cluster-section {
+  margin-bottom: 60px;
+}
+
+/* Loading */
 #loading {
   text-align: center;
   padding: 100px 20px;
@@ -135,575 +153,537 @@ header p {
 }
 #loading.hidden { display: none; }
 
-/* ENHANCED TOOLTIP STYLES */
+/* TOOLTIP */
 .tooltip {
   position: fixed;
   display: none;
-  max-width: 400px;
-  padding: 18px 22px;
+  max-width: 420px;
+  padding: 20px 24px;
   border-radius: 12px;
-  font-size: 0.95rem;
-  line-height: 1.6;
+  font-size: 1.05rem;
+  line-height: 1.65;
   pointer-events: none;
   z-index: 1000;
-  max-height: 75vh;
+  max-height: 80vh;
   overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
 }
-
-.tooltip.btc-tip {
-  background: linear-gradient(135deg, rgba(30,28,24,0.97), rgba(20,18,14,0.97));
-  border: 1px solid rgba(247,147,26,0.4);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 20px rgba(247,147,26,0.15);
+.tooltip.btc {
+  background: linear-gradient(145deg, rgba(30,25,20,0.98), rgba(20,15,10,0.98));
+  border: 1px solid rgba(247,147,26,0.3);
 }
-.tooltip.fiat-tip {
-  background: linear-gradient(135deg, rgba(20,22,28,0.97), rgba(12,14,18,0.97));
-  border: 1px solid rgba(100,110,130,0.4);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+.tooltip.fiat {
+  background: linear-gradient(145deg, rgba(25,28,35,0.98), rgba(15,18,25,0.98));
+  border: 1px solid rgba(100,120,140,0.3);
 }
 
 .tooltip-word {
-  font-size: 1.3rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   margin-bottom: 10px;
   letter-spacing: 0.03em;
 }
 .tooltip-word.btc { color: var(--btc-orange); }
-.tooltip-word.fiat { color: #9aa0a8; }
+.tooltip-word.fiat { color: var(--fiat-gray-light); }
 
 .tooltip-desc {
-  color: #d4ccc4;
-  font-weight: 400;
-  margin-bottom: 12px;
+  color: #d0ccc5;
+  margin-bottom: 14px;
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
 
-.tooltip-syn {
-  padding: 10px 0;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  font-size: 0.85rem;
-  color: #888;
-  font-style: italic;
-}
-.tooltip-syn-label {
-  color: #666;
-  font-style: normal;
-  margin-right: 6px;
-}
-.tooltip-syn span { margin: 0 4px; }
-
-.tooltip-deeper {
-  margin-top: 14px;
+.tooltip-section {
+  margin-top: 16px;
   padding-top: 14px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid rgba(255,255,255,0.1);
 }
-.tooltip-deeper-label {
-  font-size: 0.75rem;
+.tooltip-section-title {
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #666;
   margin-bottom: 8px;
-  display: block;
+  font-weight: 600;
 }
-.tooltip-deeper-text {
-  color: #b8b0a8;
-  font-size: 0.88rem;
-  line-height: 1.65;
+.tooltip-section-title.btc { color: var(--btc-orange); }
+.tooltip-section-title.fiat { color: var(--fiat-gray-light); }
+
+.tooltip-insight {
+  color: #c5c0b8;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 .tooltip-contrast {
+  color: #a8a5a0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  font-style: italic;
+}
+
+.tooltip-synonyms {
   margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 8px;
-  position: relative;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 0.9rem;
+  color: #908880;
 }
-.tooltip.btc-tip .tooltip-contrast {
-  background: rgba(100,110,130,0.15);
-  border-left: 3px solid rgba(100,110,130,0.5);
-}
-.tooltip.fiat-tip .tooltip-contrast {
-  background: rgba(247,147,26,0.1);
-  border-left: 3px solid rgba(247,147,26,0.5);
-}
-
-.tooltip-contrast-label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.tooltip.btc-tip .tooltip-contrast-label { color: #7a8594; }
-.tooltip.fiat-tip .tooltip-contrast-label { color: #c9a050; }
-
-.tooltip-contrast-icon { font-size: 0.9rem; }
-
-.tooltip-contrast-text {
+.tooltip-synonyms span {
+  display: inline-block;
+  padding: 3px 10px;
+  margin: 3px 4px 3px 0;
+  border-radius: 12px;
   font-size: 0.85rem;
-  line-height: 1.6;
 }
-.tooltip.btc-tip .tooltip-contrast-text { color: #8a9099; }
-.tooltip.fiat-tip .tooltip-contrast-text { color: #c4b090; }
+.tooltip-synonyms span.btc {
+  background: rgba(247,147,26,0.15);
+  color: var(--btc-orange-light);
+}
+.tooltip-synonyms span.fiat {
+  background: rgba(100,120,140,0.2);
+  color: var(--fiat-gray-light);
+}
 
+/* Footer */
 footer {
   text-align: center;
-  padding: 30px 20px 50px;
-  color: #4a4540;
-  font-size: 0.85rem;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
-footer a { color: var(--btc-orange); text-decoration: none; }
-footer a:hover { text-decoration: underline; }
 
-/* Mobile adjustments */
-@media (max-width: 600px) {
-  header h1 { font-size: 1.8rem; }
-  header p { font-size: 1rem; }
-  
-  .toggle-label { font-size: 1.1rem; }
-  
-  .tree-view { padding: 0 10px 40px; }
-  .tree-title { font-size: 1.6rem; }
-  
-  .tooltip {
-    max-width: calc(100vw - 32px);
-    left: 16px !important;
-    right: 16px !important;
-    font-size: 0.9rem;
+/* Responsive */
+@media (max-width: 768px) {
+  header h1 { font-size: 1.5rem; }
+  .tree-title { font-size: 1.8rem; }
+  .tooltip { 
+    max-width: 90vw; 
+    font-size: 0.95rem;
     padding: 16px 18px;
-    max-height: 60vh;
   }
-  .tooltip-word { font-size: 1.15rem; }
-  .tooltip-desc { font-size: 0.9rem; }
-  .tooltip-deeper-text { font-size: 0.82rem; }
-  .tooltip-contrast-text { font-size: 0.82rem; }
+  .tooltip-word { font-size: 1.3rem; }
+  .tooltip-desc { font-size: 1rem; }
 }
 </style>
 </head>
-<body class="btc-view">
+<body>
 
 <header>
   <h1>The Money Trees</h1>
-  <p>Tap each leaf to explore the nature of money</p>
+  <p>Explore the nature of money — hover to discover</p>
 </header>
 
 <div class="toggle-container">
-  <span class="toggle-label btc active" onclick="showTree('btc')">Bitcoin</span>
-  <div class="toggle-switch" onclick="toggleTree()"></div>
-  <span class="toggle-label fiat" onclick="showTree('fiat')">Fiat</span>
+  <span class="toggle-label btc active">Bitcoin</span>
+  <div class="toggle-switch" onclick="toggleView()"></div>
+  <span class="toggle-label fiat">Fiat</span>
 </div>
 
-<div id="btc-view" class="tree-view active">
-  <div class="tree-container">
-    <h2 class="tree-title btc" id="btc-title">Bitcoin</h2>
-    <p class="tree-subtitle" id="btc-subtitle">Sound money · Sovereignty · Truth</p>
-    <svg id="btc-tree" class="tree-svg"></svg>
+<div id="loading">Loading trees...</div>
+
+<div class="tree-view active" id="btc-view">
+  <div class="tree-header">
+    <div class="tree-title btc">Bitcoin</div>
+    <div class="tree-subtitle">Sound money · Sovereignty · Truth</div>
   </div>
+  <svg class="tree-svg" id="btc-tree"></svg>
 </div>
 
-<div id="fiat-view" class="tree-view">
-  <div class="tree-container">
-    <h2 class="tree-title fiat" id="fiat-title">Fiat</h2>
-    <p class="tree-subtitle" id="fiat-subtitle">Broken money · Coercion · Decay</p>
-    <svg id="fiat-tree" class="tree-svg"></svg>
+<div class="tree-view" id="fiat-view">
+  <div class="tree-header">
+    <div class="tree-title fiat">Fiat</div>
+    <div class="tree-subtitle">Broken money · Coercion · Decay</div>
   </div>
+  <svg class="tree-svg" id="fiat-tree"></svg>
 </div>
 
-<div id="loading">Loading...</div>
-
-<div id="tooltip" class="tooltip">
-  <div id="tip-word" class="tooltip-word"></div>
-  <div id="tip-desc" class="tooltip-desc"></div>
-  <div id="tip-syn" class="tooltip-syn"></div>
-  <div id="tip-deeper" class="tooltip-deeper">
-    <span class="tooltip-deeper-label">Deeper Insight</span>
-    <div id="tip-deeper-text" class="tooltip-deeper-text"></div>
+<div class="tooltip" id="tooltip">
+  <div class="tooltip-word" id="tip-word"></div>
+  <div class="tooltip-desc" id="tip-desc"></div>
+  <div class="tooltip-section" id="tip-insight-section">
+    <div class="tooltip-section-title" id="tip-insight-title">Deeper Insight</div>
+    <div class="tooltip-insight" id="tip-insight"></div>
   </div>
-  <div id="tip-contrast" class="tooltip-contrast">
-    <div id="tip-contrast-label" class="tooltip-contrast-label">
-      <span class="tooltip-contrast-icon">↔</span>
-      <span id="tip-contrast-label-text">Fiat Contrast</span>
-    </div>
-    <div id="tip-contrast-text" class="tooltip-contrast-text"></div>
+  <div class="tooltip-section" id="tip-contrast-section">
+    <div class="tooltip-section-title" id="tip-contrast-title">The Contrast</div>
+    <div class="tooltip-contrast" id="tip-contrast"></div>
   </div>
+  <div class="tooltip-synonyms" id="tip-synonyms"></div>
 </div>
 
-<footer>
-  <a href="https://lastcoinstanding.substack.com">lastcoinstanding.substack.com</a>
-</footer>
+<footer>lastcoinstanding.com</footer>
 
 <script>
-let treeData = null;
-let btcClusters = [];
-let fiatClusters = [];
-let currentView = 'btc';
+// Data will be loaded from data.json
+let data = null;
+let allLeaves = [];
 
-async function loadData() {
-  try {
-    const response = await fetch('data.json');
-    if (!response.ok) throw new Error('Failed to load data.json');
-    
-    treeData = await response.json();
-    
-    btcClusters = treeData.bitcoin.clusters.map(cluster => ({
-      name: cluster.name,
-      words: cluster.words.map(w => ({
-        w: w.word,
-        desc: w.description,
-        syn: w.synonyms || [],
-        deeper: w.deeperInsight || '',
-        contrast: w.contrast || ''
-      }))
-    }));
-    
-    fiatClusters = treeData.fiat.clusters.map(cluster => ({
-      name: cluster.name,
-      words: cluster.words.map(w => ({
-        w: w.word,
-        desc: w.description,
-        syn: w.synonyms || [],
-        deeper: w.deeperInsight || '',
-        contrast: w.contrast || ''
-      }))
-    }));
-    
-    document.getElementById('btc-title').textContent = treeData.bitcoin.title;
-    document.getElementById('btc-subtitle').textContent = treeData.bitcoin.subtitle;
-    document.getElementById('fiat-title').textContent = treeData.fiat.title;
-    document.getElementById('fiat-subtitle').textContent = treeData.fiat.subtitle;
-    
+// Load data
+fetch('data.json')
+  .then(r => r.json())
+  .then(d => {
+    data = d;
     document.getElementById('loading').classList.add('hidden');
-    renderTree('btc-tree', btcClusters, 'btc');
-    renderTree('fiat-tree', fiatClusters, 'fiat');
-    
-  } catch (error) {
-    console.error('Error loading data:', error);
+    renderTree('btc-tree', data.bitcoin.clusters, 'btc');
+    renderTree('fiat-tree', data.fiat.clusters, 'fiat');
+  })
+  .catch(e => {
+    console.error('Error loading data:', e);
     document.getElementById('loading').textContent = 'Error loading data. Please refresh.';
+  });
+
+// Toggle view
+function toggleView() {
+  const body = document.body;
+  const btcView = document.getElementById('btc-view');
+  const fiatView = document.getElementById('fiat-view');
+  const btcLabel = document.querySelector('.toggle-label.btc');
+  const fiatLabel = document.querySelector('.toggle-label.fiat');
+  
+  body.classList.toggle('fiat-active');
+  
+  if (body.classList.contains('fiat-active')) {
+    btcView.classList.remove('active');
+    fiatView.classList.add('active');
+    btcLabel.classList.remove('active');
+    fiatLabel.classList.add('active');
+  } else {
+    btcView.classList.add('active');
+    fiatView.classList.remove('active');
+    btcLabel.classList.add('active');
+    fiatLabel.classList.remove('active');
   }
 }
 
-function showTree(view) {
-  currentView = view;
-  document.body.className = view + '-view';
-  document.getElementById('btc-view').classList.toggle('active', view === 'btc');
-  document.getElementById('fiat-view').classList.toggle('active', view === 'fiat');
-  document.querySelector('.toggle-label.btc').classList.toggle('active', view === 'btc');
-  document.querySelector('.toggle-label.fiat').classList.toggle('active', view === 'fiat');
-  hideTooltip();
+// Measure text width
+function measureTextWidth(text, fontSize) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.font = `600 ${fontSize}px 'Cormorant Garamond', Georgia, serif`;
+  return ctx.measureText(text).width;
 }
 
-function toggleTree() { 
-  showTree(currentView === 'btc' ? 'fiat' : 'btc'); 
-}
-
+// Layout and render tree with branches and labels
 function renderTree(svgId, clusters, type) {
   const svg = document.getElementById(svgId);
   if (!svg) return;
   svg.innerHTML = '';
   
   const isBtc = type === 'btc';
-  const leafColor = isBtc ? '#f7931a' : '#6a7280';
-  const leafColorLight = isBtc ? '#ffa53a' : '#8a9299';
-  const branchColor = isBtc ? '#5c4a3a' : '#3a3f4a';
+  const leafColor = isBtc ? '#f7931a' : '#6a7580';
+  const leafColorAlt = isBtc ? '#e88510' : '#5a6570';
+  const branchColor = isBtc ? '#5a4030' : '#454550';
+  const labelColor = isBtc ? '#f7931a' : '#8a9098';
   const textColor = isBtc ? '#1a1510' : '#f0f0f0';
   
-  // Count total words to determine tree height
-  let totalWords = 0;
-  clusters.forEach(c => totalWords += c.words.length);
+  // Calculate dimensions based on content
+  const width = 800;
+  const clusterSpacing = 280;
+  const headerSpace = 80;
+  const footerSpace = 120;
   
-  // Calculate dimensions - expand vertically for more words
-  const width = 600;
-  const baseHeight = 800;
-  const extraHeightPerWord = 12;
-  const height = Math.max(baseHeight, 600 + totalWords * extraHeightPerWord);
+  // Calculate total height based on clusters
+  let totalHeight = headerSpace;
+  clusters.forEach(cluster => {
+    const rows = Math.ceil(cluster.words.length / 3);
+    const clusterHeight = Math.max(clusterSpacing, rows * 85 + 120);
+    totalHeight += clusterHeight;
+  });
+  totalHeight += footerSpace;
   
+  const height = totalHeight;
   svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('preserveAspectRatio', 'xMidYMin meet');
   
   const trunkX = width / 2;
-  const trunkBottom = height - 40;
-  const trunkTop = height - 160;
-  const canopyTop = 50;
+  const trunkTop = headerSpace;
+  const trunkBottom = height - footerSpace + 40;
   
   // Draw trunk
+  const trunkWidth = 22;
   const trunk = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  trunk.setAttribute('d', `M${trunkX - 18} ${trunkBottom} Q${trunkX - 25} ${trunkTop + 60} ${trunkX - 10} ${trunkTop} L${trunkX + 10} ${trunkTop} Q${trunkX + 25} ${trunkTop + 60} ${trunkX + 18} ${trunkBottom} Z`);
+  trunk.setAttribute('d', `
+    M${trunkX - trunkWidth} ${trunkBottom}
+    Q${trunkX - trunkWidth * 0.8} ${trunkBottom - (trunkBottom - trunkTop) * 0.3} ${trunkX - trunkWidth * 0.4} ${trunkTop + 40}
+    L${trunkX + trunkWidth * 0.4} ${trunkTop + 40}
+    Q${trunkX + trunkWidth * 0.8} ${trunkBottom - (trunkBottom - trunkTop) * 0.3} ${trunkX + trunkWidth} ${trunkBottom}
+    Z
+  `);
   trunk.setAttribute('fill', branchColor);
   svg.appendChild(trunk);
   
-  // Larger leaf radius for better readability
-  const leafRadius = 38;
-  const padding = 12;
-  const leaves = [];
-  
-  // Position leaves with better distribution
-  let allWords = [];
-  clusters.forEach(c => c.words.forEach(word => allWords.push({ ...word, cluster: c.name })));
-  
-  // Create organic canopy shape
-  const canopyHeight = trunkTop - canopyTop;
-  const canopyWidth = width - 80;
-  
-  allWords.forEach((word, i) => {
-    let placed = false;
-    let attempts = 0;
-    
-    while (!placed && attempts < 300) {
-      // Distribute throughout canopy area using elliptical distribution
-      const t = Math.random();
-      const angle = Math.random() * Math.PI * 2;
-      
-      // Use layers to fill canopy more evenly
-      const layer = Math.floor(Math.random() * 5);
-      const layerRadius = 0.3 + (layer * 0.15);
-      
-      const rx = (canopyWidth / 2) * layerRadius * (0.7 + Math.random() * 0.3);
-      const ry = (canopyHeight / 2) * layerRadius * (0.6 + Math.random() * 0.4);
-      
-      const x = trunkX + Math.cos(angle) * rx;
-      const centerY = canopyTop + canopyHeight * 0.45;
-      const y = centerY + Math.sin(angle) * ry * 0.8 - (canopyHeight * 0.2);
-      
-      // Check bounds
-      if (x < leafRadius + 20 || x > width - leafRadius - 20 || 
-          y < canopyTop + leafRadius || y > trunkTop - leafRadius - 30) {
-        attempts++;
-        continue;
-      }
-      
-      // Check overlap with existing leaves
-      let overlaps = false;
-      for (const leaf of leaves) {
-        const dx = x - leaf.x, dy = y - leaf.y;
-        if (Math.sqrt(dx * dx + dy * dy) < leafRadius * 2 + padding) { 
-          overlaps = true; 
-          break; 
-        }
-      }
-      
-      if (!overlaps) { 
-        leaves.push({ x, y, word }); 
-        placed = true; 
-      }
-      attempts++;
-    }
-    
-    // Fallback grid placement if random fails
-    if (!placed) {
-      const cols = 6;
-      const row = Math.floor(leaves.length / cols);
-      const col = leaves.length % cols;
-      const gridX = 70 + col * ((width - 140) / (cols - 1));
-      const gridY = canopyTop + 50 + row * (leafRadius * 2 + padding);
-      leaves.push({ x: gridX, y: gridY, word });
-    }
+  // Draw roots
+  const rootAngles = [-35, -15, 15, 35];
+  rootAngles.forEach(angle => {
+    const rad = angle * Math.PI / 180;
+    const root = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const endX = trunkX + Math.sin(rad) * 60;
+    const endY = trunkBottom + Math.cos(rad) * 45;
+    root.setAttribute('d', `M${trunkX} ${trunkBottom} Q${trunkX + Math.sin(rad) * 30} ${trunkBottom + 20} ${endX} ${endY}`);
+    root.setAttribute('stroke', branchColor);
+    root.setAttribute('stroke-width', '10');
+    root.setAttribute('fill', 'none');
+    root.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(root);
   });
   
-  // Draw main branches from trunk to canopy regions
-  const branchPoints = [
-    { x: trunkX - 120, y: trunkTop - 200 },
-    { x: trunkX + 120, y: trunkTop - 200 },
-    { x: trunkX - 80, y: trunkTop - 350 },
-    { x: trunkX + 80, y: trunkTop - 350 },
-    { x: trunkX, y: trunkTop - 450 }
-  ];
+  // Process each cluster
+  let currentY = headerSpace + 60;
   
-  branchPoints.forEach(bp => {
-    if (bp.y > canopyTop) {
-      const mainBranch = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      const midY = trunkTop - (trunkTop - bp.y) * 0.4;
-      mainBranch.setAttribute('d', `M${trunkX} ${trunkTop} Q${trunkX + (bp.x - trunkX) * 0.3} ${midY} ${bp.x} ${bp.y}`);
-      mainBranch.setAttribute('stroke', branchColor);
-      mainBranch.setAttribute('stroke-width', '8');
-      mainBranch.setAttribute('fill', 'none');
-      mainBranch.setAttribute('opacity', '0.7');
-      mainBranch.setAttribute('stroke-linecap', 'round');
-      svg.appendChild(mainBranch);
-    }
-  });
-  
-  // Draw smaller branches to each leaf
-  leaves.forEach(leaf => {
-    // Find nearest branch point
-    let nearestBranch = branchPoints[0];
-    let minDist = Infinity;
-    branchPoints.forEach(bp => {
-      const d = Math.sqrt((bp.x - leaf.x) ** 2 + (bp.y - leaf.y) ** 2);
-      if (d < minDist && bp.y > leaf.y - 100) {
-        minDist = d;
-        nearestBranch = bp;
-      }
-    });
+  clusters.forEach((cluster, ci) => {
+    const goLeft = ci % 2 === 0;
+    const direction = goLeft ? -1 : 1;
+    const numWords = cluster.words.length;
+    const cols = Math.min(3, numWords);
+    const rows = Math.ceil(numWords / cols);
     
+    // Branch parameters
+    const branchAngle = direction * (30 + (ci % 3) * 8);
+    const branchRad = branchAngle * Math.PI / 180;
+    const branchLen = 120;
+    
+    const branchStartX = trunkX;
+    const branchStartY = currentY + 30;
+    const branchEndX = trunkX + Math.sin(branchRad) * branchLen;
+    const branchEndY = branchStartY - Math.abs(Math.cos(branchRad)) * branchLen * 0.2;
+    
+    // Draw branch
     const branch = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const startX = nearestBranch.x + (leaf.x - nearestBranch.x) * 0.3;
-    const startY = nearestBranch.y + (leaf.y - nearestBranch.y) * 0.3;
-    const midX = startX + (leaf.x - startX) * 0.5;
-    const midY = startY + (leaf.y - startY) * 0.3;
-    
-    branch.setAttribute('d', `M${startX} ${startY} Q${midX} ${midY} ${leaf.x} ${leaf.y + leafRadius * 0.8}`);
+    const midX = (branchStartX + branchEndX) / 2;
+    const midY = branchStartY - 10;
+    branch.setAttribute('d', `M${branchStartX} ${branchStartY} Q${midX} ${midY} ${branchEndX} ${branchEndY}`);
     branch.setAttribute('stroke', branchColor);
-    branch.setAttribute('stroke-width', '2');
+    branch.setAttribute('stroke-width', '14');
     branch.setAttribute('fill', 'none');
-    branch.setAttribute('opacity', '0.5');
+    branch.setAttribute('stroke-linecap', 'round');
     svg.appendChild(branch);
-  });
-  
-  // Draw leaves
-  leaves.forEach(leaf => {
-    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    g.style.cursor = 'pointer';
     
-    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    circle.setAttribute('cx', leaf.x);
-    circle.setAttribute('cy', leaf.y);
-    circle.setAttribute('r', leafRadius);
-    circle.setAttribute('fill', leafColor);
-    circle.setAttribute('opacity', '0.9');
+    // Draw cluster label
+    const labelX = branchEndX + direction * 10;
+    const labelY = branchEndY - 25;
     
-    // Larger, more readable text
-    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.setAttribute('x', leaf.x);
-    text.setAttribute('y', leaf.y);
-    text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('dominant-baseline', 'middle');
-    text.setAttribute('fill', textColor);
+    // Label background
+    const labelText = cluster.name;
+    const labelFontSize = 18;
+    const labelWidth = measureTextWidth(labelText, labelFontSize) + 24;
+    const labelHeight = 30;
     
-    // Scale font based on word length
-    let fontSize = 13;
-    if (leaf.word.w.length > 12) fontSize = 10;
-    else if (leaf.word.w.length > 9) fontSize = 11;
-    else if (leaf.word.w.length > 6) fontSize = 12;
+    const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    labelBg.setAttribute('x', goLeft ? labelX - labelWidth : labelX);
+    labelBg.setAttribute('y', labelY - labelHeight / 2);
+    labelBg.setAttribute('width', labelWidth);
+    labelBg.setAttribute('height', labelHeight);
+    labelBg.setAttribute('rx', '4');
+    labelBg.setAttribute('fill', 'rgba(10,12,15,0.9)');
+    labelBg.setAttribute('stroke', isBtc ? 'rgba(247,147,26,0.4)' : 'rgba(100,120,140,0.4)');
+    labelBg.setAttribute('stroke-width', '1');
+    svg.appendChild(labelBg);
     
-    text.setAttribute('font-size', fontSize);
-    text.setAttribute('font-weight', '600');
-    text.setAttribute('font-family', "'Cormorant Garamond', Georgia, serif");
+    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('x', goLeft ? labelX - labelWidth / 2 : labelX + labelWidth / 2);
+    label.setAttribute('y', labelY + 1);
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('dominant-baseline', 'middle');
+    label.setAttribute('fill', labelColor);
+    label.setAttribute('font-size', labelFontSize);
+    label.setAttribute('font-weight', '600');
+    label.setAttribute('font-family', "'Cormorant Garamond', Georgia, serif");
+    label.textContent = labelText;
+    svg.appendChild(label);
     
-    // Truncate very long words
-    let displayText = leaf.word.w;
-    if (displayText.length > 12) {
-      displayText = displayText.slice(0, 10) + '…';
-    }
-    text.textContent = displayText;
+    // Calculate leaf positions
+    const leafRadius = 42;
+    const leafGapX = 100;
+    const leafGapY = 90;
+    const fontSize = 15;
     
-    g.appendChild(circle);
-    g.appendChild(text);
+    const clusterCenterX = branchEndX + direction * 80;
+    const leafStartY = branchEndY + 50;
     
-    g.addEventListener('mouseenter', (e) => {
-      circle.setAttribute('fill', leafColorLight);
-      circle.setAttribute('opacity', '1');
-      circle.setAttribute('r', leafRadius + 3);
-      showTooltip(e, leaf.word, type);
+    cluster.words.forEach((word, wi) => {
+      const row = Math.floor(wi / cols);
+      const col = wi % cols;
+      const colsInThisRow = Math.min(cols, numWords - row * cols);
+      
+      // Center each row
+      const rowWidth = (colsInThisRow - 1) * leafGapX;
+      const rowStartX = clusterCenterX - rowWidth / 2;
+      
+      let leafX = rowStartX + col * leafGapX;
+      let leafY = leafStartY + row * leafGapY;
+      
+      // Slight offset for organic feel
+      leafX += (wi % 2 === 0 ? -8 : 8);
+      leafY += (row % 2 === 0 ? -5 : 5);
+      
+      // Draw twig to leaf
+      const twig = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      const twigMidX = branchEndX + (leafX - branchEndX) * 0.4;
+      const twigMidY = branchEndY + (leafY - branchEndY) * 0.3;
+      twig.setAttribute('d', `M${branchEndX} ${branchEndY} Q${twigMidX} ${twigMidY} ${leafX} ${leafY - leafRadius * 0.7}`);
+      twig.setAttribute('stroke', branchColor);
+      twig.setAttribute('stroke-width', '3');
+      twig.setAttribute('fill', 'none');
+      twig.setAttribute('opacity', '0.6');
+      svg.appendChild(twig);
+      
+      // Draw leaf (ellipse)
+      const wordText = word.word;
+      const textWidth = measureTextWidth(wordText, fontSize);
+      const rx = Math.max(leafRadius, textWidth / 2 + 18);
+      const ry = leafRadius * 0.65;
+      
+      const leafGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      leafGroup.setAttribute('class', 'leaf');
+      leafGroup.setAttribute('style', 'cursor: pointer;');
+      
+      // Store leaf data for tooltip
+      const leafIndex = allLeaves.length;
+      allLeaves.push({
+        word: wordText,
+        desc: word.description,
+        insight: word.deeperInsight,
+        contrast: word.contrast,
+        synonyms: word.synonyms,
+        cluster: cluster.name,
+        type: type
+      });
+      
+      leafGroup.setAttribute('onmouseenter', `showTooltip(event, ${leafIndex})`);
+      leafGroup.setAttribute('onmouseleave', 'hideTooltip()');
+      leafGroup.setAttribute('onmousemove', 'moveTooltip(event)');
+      leafGroup.setAttribute('ontouchstart', `showTooltip(event, ${leafIndex})`);
+      
+      const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+      ellipse.setAttribute('cx', leafX);
+      ellipse.setAttribute('cy', leafY);
+      ellipse.setAttribute('rx', rx);
+      ellipse.setAttribute('ry', ry);
+      ellipse.setAttribute('fill', wi % 2 === 0 ? leafColor : leafColorAlt);
+      ellipse.setAttribute('style', 'transition: transform 0.2s, filter 0.2s;');
+      leafGroup.appendChild(ellipse);
+      
+      // Leaf text
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', leafX);
+      text.setAttribute('y', leafY + 1);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('dominant-baseline', 'middle');
+      text.setAttribute('fill', textColor);
+      text.setAttribute('font-size', fontSize);
+      text.setAttribute('font-weight', '600');
+      text.setAttribute('font-family', "'Cormorant Garamond', Georgia, serif");
+      text.setAttribute('pointer-events', 'none');
+      text.textContent = wordText;
+      leafGroup.appendChild(text);
+      
+      // Hover effect
+      leafGroup.addEventListener('mouseenter', () => {
+        ellipse.style.filter = 'brightness(1.15)';
+        ellipse.style.transform = 'scale(1.05)';
+        ellipse.style.transformOrigin = `${leafX}px ${leafY}px`;
+      });
+      leafGroup.addEventListener('mouseleave', () => {
+        ellipse.style.filter = '';
+        ellipse.style.transform = '';
+      });
+      
+      svg.appendChild(leafGroup);
     });
-    g.addEventListener('mouseleave', () => {
-      circle.setAttribute('fill', leafColor);
-      circle.setAttribute('opacity', '0.9');
-      circle.setAttribute('r', leafRadius);
-      hideTooltip();
-    });
-    g.addEventListener('click', (e) => {
-      e.stopPropagation();
-      showTooltip(e, leaf.word, type);
-    });
     
-    svg.appendChild(g);
+    // Update Y position for next cluster
+    currentY += Math.max(clusterSpacing, rows * leafGapY + 140);
   });
 }
 
-function showTooltip(e, word, type) {
-  const tooltip = document.getElementById('tooltip');
-  const tipWord = document.getElementById('tip-word');
-  const tipDesc = document.getElementById('tip-desc');
-  const tipSyn = document.getElementById('tip-syn');
-  const tipDeeper = document.getElementById('tip-deeper');
-  const tipDeeperText = document.getElementById('tip-deeper-text');
-  const tipContrast = document.getElementById('tip-contrast');
-  const tipContrastLabel = document.getElementById('tip-contrast-label-text');
-  const tipContrastText = document.getElementById('tip-contrast-text');
+// Tooltip functions
+const tooltip = document.getElementById('tooltip');
+
+function showTooltip(e, leafIndex) {
+  const leaf = allLeaves[leafIndex];
+  if (!leaf) return;
   
-  tipWord.textContent = word.w;
-  tipWord.className = 'tooltip-word ' + type;
-  tipDesc.textContent = word.desc;
+  const isBtc = leaf.type === 'btc';
   
-  if (word.syn && word.syn.length > 0) {
-    tipSyn.innerHTML = '<span class="tooltip-syn-label">Related:</span>' + word.syn.map(s => `<span>${s}</span>`).join(' · ');
-    tipSyn.style.display = 'block';
+  // Update tooltip class
+  tooltip.className = 'tooltip ' + leaf.type;
+  
+  // Update content
+  document.getElementById('tip-word').textContent = leaf.word;
+  document.getElementById('tip-word').className = 'tooltip-word ' + leaf.type;
+  document.getElementById('tip-desc').textContent = leaf.desc;
+  
+  // Deeper insight
+  const insightSection = document.getElementById('tip-insight-section');
+  const insightTitle = document.getElementById('tip-insight-title');
+  const insightContent = document.getElementById('tip-insight');
+  if (leaf.insight) {
+    insightSection.style.display = 'block';
+    insightTitle.className = 'tooltip-section-title ' + leaf.type;
+    insightContent.textContent = leaf.insight;
   } else {
-    tipSyn.style.display = 'none';
+    insightSection.style.display = 'none';
   }
   
-  if (word.deeper && word.deeper.trim()) {
-    tipDeeperText.textContent = word.deeper;
-    tipDeeper.style.display = 'block';
+  // Contrast
+  const contrastSection = document.getElementById('tip-contrast-section');
+  const contrastTitle = document.getElementById('tip-contrast-title');
+  const contrastContent = document.getElementById('tip-contrast');
+  if (leaf.contrast) {
+    contrastSection.style.display = 'block';
+    contrastTitle.className = 'tooltip-section-title ' + leaf.type;
+    contrastTitle.textContent = isBtc ? 'Fiat Contrast' : 'Bitcoin Contrast';
+    contrastContent.textContent = leaf.contrast;
   } else {
-    tipDeeper.style.display = 'none';
+    contrastSection.style.display = 'none';
   }
   
-  if (word.contrast && word.contrast.trim()) {
-    tipContrastLabel.textContent = type === 'btc' ? 'Fiat Contrast' : 'Bitcoin Contrast';
-    tipContrastText.textContent = word.contrast;
-    tipContrast.style.display = 'block';
+  // Synonyms
+  const synContainer = document.getElementById('tip-synonyms');
+  if (leaf.synonyms && leaf.synonyms.length > 0) {
+    synContainer.innerHTML = '<strong>Related:</strong> ' + 
+      leaf.synonyms.map(s => `<span class="${leaf.type}">${s}</span>`).join('');
+    synContainer.style.display = 'block';
   } else {
-    tipContrast.style.display = 'none';
+    synContainer.style.display = 'none';
   }
   
-  tooltip.className = 'tooltip ' + type + '-tip';
   tooltip.style.display = 'block';
-  positionTooltip(e);
+  moveTooltip(e);
 }
 
-function positionTooltip(e) {
-  const tooltip = document.getElementById('tooltip');
-  const vw = window.innerWidth, vh = window.innerHeight;
+function moveTooltip(e) {
+  const x = e.clientX || (e.touches && e.touches[0].clientX);
+  const y = e.clientY || (e.touches && e.touches[0].clientY);
   
-  if (vw <= 600) {
-    // Mobile: fixed at bottom
-    tooltip.style.left = '16px';
-    tooltip.style.right = '16px';
-    tooltip.style.bottom = '20px';
-    tooltip.style.top = 'auto';
-    tooltip.style.width = 'auto';
-  } else {
-    // Desktop: follow cursor
-    const rect = tooltip.getBoundingClientRect();
-    let x = e.clientX + 20;
-    let y = e.clientY + 20;
-    
-    if (x + 400 > vw - 20) x = e.clientX - 420;
-    if (y + rect.height > vh - 20) y = vh - rect.height - 20;
-    if (y < 20) y = 20;
-    if (x < 20) x = 20;
-    
-    tooltip.style.left = x + 'px';
-    tooltip.style.top = y + 'px';
-    tooltip.style.right = 'auto';
-    tooltip.style.bottom = 'auto';
-    tooltip.style.width = '';
+  const rect = tooltip.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  
+  let left = x + 20;
+  let top = y + 15;
+  
+  // Keep tooltip in viewport
+  if (left + rect.width > viewportWidth - 20) {
+    left = x - rect.width - 20;
   }
+  if (top + rect.height > viewportHeight - 20) {
+    top = y - rect.height - 15;
+  }
+  if (left < 10) left = 10;
+  if (top < 10) top = 10;
+  
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
 }
 
-function hideTooltip() { 
-  document.getElementById('tooltip').style.display = 'none'; 
+function hideTooltip() {
+  tooltip.style.display = 'none';
 }
 
-// Hide tooltip when clicking elsewhere
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('g')) {
-    hideTooltip();
-  }
-});
-
-// Re-render on resize
-let resizeTimeout;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(() => {
-    if (treeData) {
-      renderTree('btc-tree', btcClusters, 'btc');
-      renderTree('fiat-tree', fiatClusters, 'fiat');
-    }
-  }, 250);
-});
-
-document.addEventListener('DOMContentLoaded', loadData);
+// Hide tooltip on scroll
+window.addEventListener('scroll', hideTooltip);
 </script>
+
 </body>
 </html>
