@@ -158,15 +158,37 @@ header p {
   position: fixed;
   display: none;
   max-width: 420px;
-  padding: 20px 24px;
+  padding: 22px 26px;
   border-radius: 12px;
-  font-size: 1.05rem;
-  line-height: 1.65;
-  pointer-events: none;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  pointer-events: auto;
   z-index: 1000;
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.tooltip-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  color: #999;
+  font-size: 18px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.tooltip-close:hover {
+  background: rgba(255,255,255,0.2);
+  color: #ccc;
 }
 .tooltip.btc {
   background: linear-gradient(145deg, rgba(30,25,20,0.98), rgba(20,15,10,0.98));
@@ -255,14 +277,57 @@ footer {
 /* Responsive */
 @media (max-width: 768px) {
   header h1 { font-size: 1.5rem; }
+  header p { font-size: 0.95rem; }
   .tree-title { font-size: 1.8rem; }
+  .tree-subtitle { font-size: 1.05rem; }
+  
   .tooltip { 
-    max-width: 90vw; 
-    font-size: 0.95rem;
-    padding: 16px 18px;
+    max-width: 92vw;
+    width: 92vw;
+    left: 4vw !important;
+    right: 4vw;
+    font-size: 1.1rem;
+    padding: 20px 20px 24px;
+    line-height: 1.7;
   }
-  .tooltip-word { font-size: 1.3rem; }
-  .tooltip-desc { font-size: 1rem; }
+  .tooltip-close {
+    display: flex;
+  }
+  .tooltip-word { 
+    font-size: 1.5rem; 
+    padding-right: 30px;
+  }
+  .tooltip-desc { 
+    font-size: 1.15rem;
+    line-height: 1.65;
+  }
+  .tooltip-insight,
+  .tooltip-contrast {
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+  .tooltip-section-title {
+    font-size: 0.9rem;
+  }
+  .tooltip-synonyms {
+    font-size: 0.95rem;
+  }
+  .tooltip-synonyms span {
+    font-size: 0.9rem;
+    padding: 4px 12px;
+  }
+}
+
+/* Overlay for mobile tap-to-close */
+.tooltip-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  background: rgba(0,0,0,0.3);
 }
 </style>
 </head>
@@ -297,7 +362,10 @@ footer {
   <svg class="tree-svg" id="fiat-tree"></svg>
 </div>
 
+<div class="tooltip-overlay" id="tooltip-overlay" onclick="hideTooltip()"></div>
+
 <div class="tooltip" id="tooltip">
+  <button class="tooltip-close" onclick="hideTooltip()">✕</button>
   <div class="tooltip-word" id="tip-word"></div>
   <div class="tooltip-desc" id="tip-desc"></div>
   <div class="tooltip-section" id="tip-insight-section">
@@ -369,6 +437,7 @@ function renderTree(svgId, clusters, type) {
   if (!svg) return;
   svg.innerHTML = '';
   
+  const mobile = window.innerWidth <= 768;
   const isBtc = type === 'btc';
   const leafColor = isBtc ? '#f7931a' : '#6a7580';
   const leafColorAlt = isBtc ? '#e88510' : '#5a6570';
@@ -376,17 +445,19 @@ function renderTree(svgId, clusters, type) {
   const labelColor = isBtc ? '#f7931a' : '#8a9098';
   const textColor = isBtc ? '#1a1510' : '#f0f0f0';
   
-  // Calculate dimensions based on content
-  const width = 800;
-  const clusterSpacing = 280;
-  const headerSpace = 80;
-  const footerSpace = 120;
+  // Responsive dimensions
+  const width = mobile ? 380 : 750;
+  const clusterSpacing = mobile ? 180 : 200;
+  const headerSpace = mobile ? 50 : 60;
+  const footerSpace = mobile ? 80 : 100;
   
   // Calculate total height based on clusters
   let totalHeight = headerSpace;
   clusters.forEach(cluster => {
-    const rows = Math.ceil(cluster.words.length / 3);
-    const clusterHeight = Math.max(clusterSpacing, rows * 85 + 120);
+    const cols = mobile ? 2 : 3;
+    const rows = Math.ceil(cluster.words.length / cols);
+    const leafGapY = mobile ? 58 : 70;
+    const clusterHeight = Math.max(clusterSpacing, rows * leafGapY + 90);
     totalHeight += clusterHeight;
   });
   totalHeight += footerSpace;
@@ -397,15 +468,15 @@ function renderTree(svgId, clusters, type) {
   
   const trunkX = width / 2;
   const trunkTop = headerSpace;
-  const trunkBottom = height - footerSpace + 40;
+  const trunkBottom = height - footerSpace + 30;
   
   // Draw trunk
-  const trunkWidth = 22;
+  const trunkWidth = mobile ? 14 : 18;
   const trunk = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   trunk.setAttribute('d', `
     M${trunkX - trunkWidth} ${trunkBottom}
-    Q${trunkX - trunkWidth * 0.8} ${trunkBottom - (trunkBottom - trunkTop) * 0.3} ${trunkX - trunkWidth * 0.4} ${trunkTop + 40}
-    L${trunkX + trunkWidth * 0.4} ${trunkTop + 40}
+    Q${trunkX - trunkWidth * 0.8} ${trunkBottom - (trunkBottom - trunkTop) * 0.3} ${trunkX - trunkWidth * 0.4} ${trunkTop + 30}
+    L${trunkX + trunkWidth * 0.4} ${trunkTop + 30}
     Q${trunkX + trunkWidth * 0.8} ${trunkBottom - (trunkBottom - trunkTop) * 0.3} ${trunkX + trunkWidth} ${trunkBottom}
     Z
   `);
@@ -413,69 +484,71 @@ function renderTree(svgId, clusters, type) {
   svg.appendChild(trunk);
   
   // Draw roots
-  const rootAngles = [-35, -15, 15, 35];
+  const rootAngles = [-30, -10, 10, 30];
   rootAngles.forEach(angle => {
     const rad = angle * Math.PI / 180;
     const root = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const endX = trunkX + Math.sin(rad) * 60;
-    const endY = trunkBottom + Math.cos(rad) * 45;
-    root.setAttribute('d', `M${trunkX} ${trunkBottom} Q${trunkX + Math.sin(rad) * 30} ${trunkBottom + 20} ${endX} ${endY}`);
+    const rootLen = mobile ? 35 : 50;
+    const endX = trunkX + Math.sin(rad) * rootLen;
+    const endY = trunkBottom + Math.cos(rad) * rootLen * 0.7;
+    root.setAttribute('d', `M${trunkX} ${trunkBottom} Q${trunkX + Math.sin(rad) * rootLen * 0.5} ${trunkBottom + 15} ${endX} ${endY}`);
     root.setAttribute('stroke', branchColor);
-    root.setAttribute('stroke-width', '10');
+    root.setAttribute('stroke-width', mobile ? '6' : '8');
     root.setAttribute('fill', 'none');
     root.setAttribute('stroke-linecap', 'round');
     svg.appendChild(root);
   });
   
   // Process each cluster
-  let currentY = headerSpace + 60;
+  let currentY = headerSpace + 40;
   
   clusters.forEach((cluster, ci) => {
     const goLeft = ci % 2 === 0;
     const direction = goLeft ? -1 : 1;
     const numWords = cluster.words.length;
-    const cols = Math.min(3, numWords);
+    const cols = mobile ? 2 : 3;
     const rows = Math.ceil(numWords / cols);
     
-    // Branch parameters
-    const branchAngle = direction * (30 + (ci % 3) * 8);
+    // Branch parameters - varied angles for organic feel
+    const baseAngle = mobile ? 28 : 32;
+    const angleVariation = (ci % 3) * 6;
+    const branchAngle = direction * (baseAngle + angleVariation);
     const branchRad = branchAngle * Math.PI / 180;
-    const branchLen = 120;
+    const branchLen = mobile ? 55 : 90;
     
     const branchStartX = trunkX;
-    const branchStartY = currentY + 30;
+    const branchStartY = currentY + 20;
     const branchEndX = trunkX + Math.sin(branchRad) * branchLen;
-    const branchEndY = branchStartY - Math.abs(Math.cos(branchRad)) * branchLen * 0.2;
+    const branchEndY = branchStartY - Math.abs(Math.cos(branchRad)) * branchLen * 0.15;
     
-    // Draw branch
+    // Draw branch with curve
     const branch = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const midX = (branchStartX + branchEndX) / 2;
-    const midY = branchStartY - 10;
-    branch.setAttribute('d', `M${branchStartX} ${branchStartY} Q${midX} ${midY} ${branchEndX} ${branchEndY}`);
+    const ctrlX = branchStartX + (branchEndX - branchStartX) * 0.6;
+    const ctrlY = branchStartY - 8;
+    branch.setAttribute('d', `M${branchStartX} ${branchStartY} Q${ctrlX} ${ctrlY} ${branchEndX} ${branchEndY}`);
     branch.setAttribute('stroke', branchColor);
-    branch.setAttribute('stroke-width', '14');
+    branch.setAttribute('stroke-width', mobile ? '10' : '12');
     branch.setAttribute('fill', 'none');
     branch.setAttribute('stroke-linecap', 'round');
     svg.appendChild(branch);
     
     // Draw cluster label
-    const labelX = branchEndX + direction * 10;
-    const labelY = branchEndY - 25;
+    const labelFontSize = mobile ? 13 : 16;
+    const labelText = cluster.name;
+    const labelWidth = measureTextWidth(labelText, labelFontSize) + (mobile ? 16 : 20);
+    const labelHeight = mobile ? 22 : 26;
+    const labelX = branchEndX + direction * 6;
+    const labelY = branchEndY - (mobile ? 16 : 20);
     
     // Label background
-    const labelText = cluster.name;
-    const labelFontSize = 18;
-    const labelWidth = measureTextWidth(labelText, labelFontSize) + 24;
-    const labelHeight = 30;
-    
     const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     labelBg.setAttribute('x', goLeft ? labelX - labelWidth : labelX);
     labelBg.setAttribute('y', labelY - labelHeight / 2);
     labelBg.setAttribute('width', labelWidth);
     labelBg.setAttribute('height', labelHeight);
-    labelBg.setAttribute('rx', '4');
-    labelBg.setAttribute('fill', 'rgba(10,12,15,0.9)');
-    labelBg.setAttribute('stroke', isBtc ? 'rgba(247,147,26,0.4)' : 'rgba(100,120,140,0.4)');
+    labelBg.setAttribute('rx', '3');
+    labelBg.setAttribute('fill', 'rgba(10,12,15,0.92)');
+    labelBg.setAttribute('stroke', isBtc ? 'rgba(247,147,26,0.5)' : 'rgba(100,120,140,0.5)');
     labelBg.setAttribute('stroke-width', '1');
     svg.appendChild(labelBg);
     
@@ -491,14 +564,14 @@ function renderTree(svgId, clusters, type) {
     label.textContent = labelText;
     svg.appendChild(label);
     
-    // Calculate leaf positions
-    const leafRadius = 42;
-    const leafGapX = 100;
-    const leafGapY = 90;
-    const fontSize = 15;
+    // Calculate leaf positions - tighter spacing
+    const leafRadius = mobile ? 30 : 38;
+    const leafGapX = mobile ? 68 : 88;
+    const leafGapY = mobile ? 58 : 70;
+    const fontSize = mobile ? 12 : 14;
     
-    const clusterCenterX = branchEndX + direction * 80;
-    const leafStartY = branchEndY + 50;
+    const clusterCenterX = branchEndX + direction * (mobile ? 50 : 65);
+    const leafStartY = branchEndY + (mobile ? 35 : 42);
     
     cluster.words.forEach((word, wi) => {
       const row = Math.floor(wi / cols);
@@ -512,26 +585,26 @@ function renderTree(svgId, clusters, type) {
       let leafX = rowStartX + col * leafGapX;
       let leafY = leafStartY + row * leafGapY;
       
-      // Slight offset for organic feel
-      leafX += (wi % 2 === 0 ? -8 : 8);
-      leafY += (row % 2 === 0 ? -5 : 5);
+      // Slight organic offset
+      leafX += (wi % 2 === 0 ? -4 : 4);
+      leafY += (row % 2 === 0 ? -3 : 3);
       
       // Draw twig to leaf
       const twig = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      const twigMidX = branchEndX + (leafX - branchEndX) * 0.4;
-      const twigMidY = branchEndY + (leafY - branchEndY) * 0.3;
-      twig.setAttribute('d', `M${branchEndX} ${branchEndY} Q${twigMidX} ${twigMidY} ${leafX} ${leafY - leafRadius * 0.7}`);
+      const twigMidX = branchEndX + (leafX - branchEndX) * 0.35;
+      const twigMidY = branchEndY + (leafY - branchEndY) * 0.25;
+      twig.setAttribute('d', `M${branchEndX} ${branchEndY} Q${twigMidX} ${twigMidY} ${leafX} ${leafY - leafRadius * 0.6}`);
       twig.setAttribute('stroke', branchColor);
-      twig.setAttribute('stroke-width', '3');
+      twig.setAttribute('stroke-width', mobile ? '2' : '2.5');
       twig.setAttribute('fill', 'none');
-      twig.setAttribute('opacity', '0.6');
+      twig.setAttribute('opacity', '0.55');
       svg.appendChild(twig);
       
       // Draw leaf (ellipse)
       const wordText = word.word;
       const textWidth = measureTextWidth(wordText, fontSize);
-      const rx = Math.max(leafRadius, textWidth / 2 + 18);
-      const ry = leafRadius * 0.65;
+      const rx = Math.max(leafRadius, textWidth / 2 + (mobile ? 12 : 16));
+      const ry = leafRadius * 0.62;
       
       const leafGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       leafGroup.setAttribute('class', 'leaf');
@@ -591,15 +664,20 @@ function renderTree(svgId, clusters, type) {
       svg.appendChild(leafGroup);
     });
     
-    // Update Y position for next cluster
-    currentY += Math.max(clusterSpacing, rows * leafGapY + 140);
+    // Update Y position for next cluster - tighter spacing
+    currentY += Math.max(clusterSpacing, rows * leafGapY + (mobile ? 85 : 100));
   });
 }
 
 // Tooltip functions
 const tooltip = document.getElementById('tooltip');
+const tooltipOverlay = document.getElementById('tooltip-overlay');
+const isMobile = () => window.innerWidth <= 768;
 
 function showTooltip(e, leafIndex) {
+  e.preventDefault();
+  e.stopPropagation();
+  
   const leaf = allLeaves[leafIndex];
   if (!leaf) return;
   
@@ -649,10 +727,21 @@ function showTooltip(e, leafIndex) {
   }
   
   tooltip.style.display = 'block';
-  moveTooltip(e);
+  
+  if (isMobile()) {
+    // Mobile: show overlay and center tooltip
+    tooltipOverlay.style.display = 'block';
+    tooltip.style.top = '50%';
+    tooltip.style.transform = 'translateY(-50%)';
+    document.body.style.overflow = 'hidden';
+  } else {
+    moveTooltip(e);
+  }
 }
 
 function moveTooltip(e) {
+  if (isMobile()) return;
+  
   const x = e.clientX || (e.touches && e.touches[0].clientX);
   const y = e.clientY || (e.touches && e.touches[0].clientY);
   
@@ -675,14 +764,30 @@ function moveTooltip(e) {
   
   tooltip.style.left = left + 'px';
   tooltip.style.top = top + 'px';
+  tooltip.style.transform = 'none';
 }
 
 function hideTooltip() {
   tooltip.style.display = 'none';
+  tooltipOverlay.style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 // Hide tooltip on scroll
 window.addEventListener('scroll', hideTooltip);
+
+// Re-render on resize (for orientation changes)
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    if (data) {
+      allLeaves = [];
+      renderTree('btc-tree', data.bitcoin.clusters, 'btc');
+      renderTree('fiat-tree', data.fiat.clusters, 'fiat');
+    }
+  }, 250);
+});
 </script>
 
 </body>
