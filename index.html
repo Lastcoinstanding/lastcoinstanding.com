@@ -447,17 +447,17 @@ function renderTree(svgId, clusters, type) {
   
   // Responsive dimensions
   const width = mobile ? 380 : 750;
-  const clusterSpacing = mobile ? 180 : 200;
+  const clusterSpacing = mobile ? 140 : 160; // Tighter vertical spacing
   const headerSpace = mobile ? 50 : 60;
-  const footerSpace = mobile ? 80 : 100;
+  const footerSpace = mobile ? 70 : 90;
   
   // Calculate total height based on clusters
   let totalHeight = headerSpace;
   clusters.forEach(cluster => {
-    const cols = mobile ? 2 : 3;
-    const rows = Math.ceil(cluster.words.length / cols);
-    const leafGapY = mobile ? 58 : 70;
-    const clusterHeight = Math.max(clusterSpacing, rows * leafGapY + 90);
+    const numWords = cluster.words.length;
+    const rows = Math.ceil(numWords / 4); // More spread out
+    const leafGapY = mobile ? 50 : 58;
+    const clusterHeight = Math.max(clusterSpacing, rows * leafGapY + 70);
     totalHeight += clusterHeight;
   });
   totalHeight += footerSpace;
@@ -500,49 +500,48 @@ function renderTree(svgId, clusters, type) {
   });
   
   // Process each cluster
-  let currentY = headerSpace + 40;
+  let currentY = headerSpace + 35;
   
   clusters.forEach((cluster, ci) => {
-    const goLeft = ci % 2 === 0;
-    const direction = goLeft ? -1 : 1;
+    // Alternate which side the branch goes, but leaves spread BOTH sides
+    const branchGoesLeft = ci % 2 === 0;
+    const branchDirection = branchGoesLeft ? -1 : 1;
     const numWords = cluster.words.length;
-    const cols = mobile ? 2 : 3;
-    const rows = Math.ceil(numWords / cols);
     
     // Branch parameters - varied angles for organic feel
-    const baseAngle = mobile ? 28 : 32;
-    const angleVariation = (ci % 3) * 6;
-    const branchAngle = direction * (baseAngle + angleVariation);
+    const baseAngle = mobile ? 25 : 30;
+    const angleVariation = (ci % 3) * 5;
+    const branchAngle = branchDirection * (baseAngle + angleVariation);
     const branchRad = branchAngle * Math.PI / 180;
-    const branchLen = mobile ? 55 : 90;
+    const branchLen = mobile ? 45 : 70;
     
     const branchStartX = trunkX;
-    const branchStartY = currentY + 20;
+    const branchStartY = currentY + 15;
     const branchEndX = trunkX + Math.sin(branchRad) * branchLen;
-    const branchEndY = branchStartY - Math.abs(Math.cos(branchRad)) * branchLen * 0.15;
+    const branchEndY = branchStartY - Math.abs(Math.cos(branchRad)) * branchLen * 0.12;
     
     // Draw branch with curve
     const branch = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     const ctrlX = branchStartX + (branchEndX - branchStartX) * 0.6;
-    const ctrlY = branchStartY - 8;
+    const ctrlY = branchStartY - 6;
     branch.setAttribute('d', `M${branchStartX} ${branchStartY} Q${ctrlX} ${ctrlY} ${branchEndX} ${branchEndY}`);
     branch.setAttribute('stroke', branchColor);
-    branch.setAttribute('stroke-width', mobile ? '10' : '12');
+    branch.setAttribute('stroke-width', mobile ? '9' : '11');
     branch.setAttribute('fill', 'none');
     branch.setAttribute('stroke-linecap', 'round');
     svg.appendChild(branch);
     
-    // Draw cluster label
-    const labelFontSize = mobile ? 13 : 16;
+    // Draw cluster label - position at end of branch
+    const labelFontSize = mobile ? 12 : 15;
     const labelText = cluster.name;
-    const labelWidth = measureTextWidth(labelText, labelFontSize) + (mobile ? 16 : 20);
-    const labelHeight = mobile ? 22 : 26;
-    const labelX = branchEndX + direction * 6;
-    const labelY = branchEndY - (mobile ? 16 : 20);
+    const labelWidth = measureTextWidth(labelText, labelFontSize) + (mobile ? 14 : 18);
+    const labelHeight = mobile ? 20 : 24;
+    const labelX = branchEndX + branchDirection * 5;
+    const labelY = branchEndY - (mobile ? 14 : 16);
     
     // Label background
     const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    labelBg.setAttribute('x', goLeft ? labelX - labelWidth : labelX);
+    labelBg.setAttribute('x', branchGoesLeft ? labelX - labelWidth : labelX);
     labelBg.setAttribute('y', labelY - labelHeight / 2);
     labelBg.setAttribute('width', labelWidth);
     labelBg.setAttribute('height', labelHeight);
@@ -553,7 +552,7 @@ function renderTree(svgId, clusters, type) {
     svg.appendChild(labelBg);
     
     const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    label.setAttribute('x', goLeft ? labelX - labelWidth / 2 : labelX + labelWidth / 2);
+    label.setAttribute('x', branchGoesLeft ? labelX - labelWidth / 2 : labelX + labelWidth / 2);
     label.setAttribute('y', labelY + 1);
     label.setAttribute('text-anchor', 'middle');
     label.setAttribute('dominant-baseline', 'middle');
@@ -564,47 +563,67 @@ function renderTree(svgId, clusters, type) {
     label.textContent = labelText;
     svg.appendChild(label);
     
-    // Calculate leaf positions - tighter spacing
-    const leafRadius = mobile ? 30 : 38;
-    const leafGapX = mobile ? 68 : 88;
-    const leafGapY = mobile ? 58 : 70;
-    const fontSize = mobile ? 12 : 14;
+    // Calculate leaf positions - SPREAD ACROSS BOTH SIDES of branch
+    const leafRadius = mobile ? 28 : 34;
+    const fontSize = mobile ? 11 : 13;
     
-    const clusterCenterX = branchEndX + direction * (mobile ? 50 : 65);
-    const leafStartY = branchEndY + (mobile ? 35 : 42);
+    // Leaves fan out from branch end in a natural canopy pattern
+    const leafStartY = branchEndY + (mobile ? 28 : 35);
     
+    // Create positions that spread both left and right of the branch
+    const positions = [];
+    const spreadWidth = mobile ? 140 : 260; // Total width for leaves
+    const baseX = branchEndX; // Center around branch end
+    
+    // Generate organic positions - mix of rows with varying offsets
     cluster.words.forEach((word, wi) => {
-      const row = Math.floor(wi / cols);
-      const col = wi % cols;
-      const colsInThisRow = Math.min(cols, numWords - row * cols);
+      // Alternate between left and right of branch center
+      const side = wi % 2 === 0 ? -1 : 1;
       
-      // Center each row
-      const rowWidth = (colsInThisRow - 1) * leafGapX;
-      const rowStartX = clusterCenterX - rowWidth / 2;
+      // Calculate base row (roughly 3-4 per row)
+      const effectiveRow = Math.floor(wi / (mobile ? 3 : 4));
+      const posInRow = wi % (mobile ? 3 : 4);
       
-      let leafX = rowStartX + col * leafGapX;
-      let leafY = leafStartY + row * leafGapY;
+      // Horizontal spread - alternate sides with variation
+      const hSpread = mobile ? 50 : 75;
+      let offsetX = side * (hSpread * 0.5 + posInRow * hSpread * 0.4);
       
-      // Slight organic offset
-      leafX += (wi % 2 === 0 ? -4 : 4);
-      leafY += (row % 2 === 0 ? -3 : 3);
+      // Add randomness for organic feel
+      offsetX += (Math.sin(wi * 2.3) * (mobile ? 12 : 20));
       
-      // Draw twig to leaf
+      // Vertical position with variation
+      const vSpacing = mobile ? 48 : 56;
+      let offsetY = effectiveRow * vSpacing;
+      
+      // Stagger vertically for organic feel
+      offsetY += (Math.cos(wi * 1.7) * (mobile ? 10 : 15));
+      offsetY += (wi % 3) * (mobile ? 8 : 12); // Additional stagger
+      
+      positions.push({
+        x: baseX + offsetX,
+        y: leafStartY + offsetY,
+        word: word
+      });
+    });
+    
+    // Draw twigs and leaves
+    positions.forEach((pos, wi) => {
+      // Draw twig from branch to leaf
       const twig = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      const twigMidX = branchEndX + (leafX - branchEndX) * 0.35;
-      const twigMidY = branchEndY + (leafY - branchEndY) * 0.25;
-      twig.setAttribute('d', `M${branchEndX} ${branchEndY} Q${twigMidX} ${twigMidY} ${leafX} ${leafY - leafRadius * 0.6}`);
+      const twigMidX = branchEndX + (pos.x - branchEndX) * 0.3;
+      const twigMidY = branchEndY + (pos.y - branchEndY) * 0.2;
+      twig.setAttribute('d', `M${branchEndX} ${branchEndY} Q${twigMidX} ${twigMidY} ${pos.x} ${pos.y - leafRadius * 0.5}`);
       twig.setAttribute('stroke', branchColor);
-      twig.setAttribute('stroke-width', mobile ? '2' : '2.5');
+      twig.setAttribute('stroke-width', mobile ? '1.5' : '2');
       twig.setAttribute('fill', 'none');
-      twig.setAttribute('opacity', '0.55');
+      twig.setAttribute('opacity', '0.5');
       svg.appendChild(twig);
       
       // Draw leaf (ellipse)
-      const wordText = word.word;
+      const wordText = pos.word.word;
       const textWidth = measureTextWidth(wordText, fontSize);
-      const rx = Math.max(leafRadius, textWidth / 2 + (mobile ? 12 : 16));
-      const ry = leafRadius * 0.62;
+      const rx = Math.max(leafRadius, textWidth / 2 + (mobile ? 10 : 14));
+      const ry = leafRadius * 0.6;
       
       const leafGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       leafGroup.setAttribute('class', 'leaf');
@@ -614,10 +633,10 @@ function renderTree(svgId, clusters, type) {
       const leafIndex = allLeaves.length;
       allLeaves.push({
         word: wordText,
-        desc: word.description,
-        insight: word.deeperInsight,
-        contrast: word.contrast,
-        synonyms: word.synonyms,
+        desc: pos.word.description,
+        insight: pos.word.deeperInsight,
+        contrast: pos.word.contrast,
+        synonyms: pos.word.synonyms,
         cluster: cluster.name,
         type: type
       });
@@ -628,8 +647,8 @@ function renderTree(svgId, clusters, type) {
       leafGroup.setAttribute('ontouchstart', `showTooltip(event, ${leafIndex})`);
       
       const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-      ellipse.setAttribute('cx', leafX);
-      ellipse.setAttribute('cy', leafY);
+      ellipse.setAttribute('cx', pos.x);
+      ellipse.setAttribute('cy', pos.y);
       ellipse.setAttribute('rx', rx);
       ellipse.setAttribute('ry', ry);
       ellipse.setAttribute('fill', wi % 2 === 0 ? leafColor : leafColorAlt);
@@ -638,8 +657,8 @@ function renderTree(svgId, clusters, type) {
       
       // Leaf text
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', leafX);
-      text.setAttribute('y', leafY + 1);
+      text.setAttribute('x', pos.x);
+      text.setAttribute('y', pos.y + 1);
       text.setAttribute('text-anchor', 'middle');
       text.setAttribute('dominant-baseline', 'middle');
       text.setAttribute('fill', textColor);
@@ -654,7 +673,7 @@ function renderTree(svgId, clusters, type) {
       leafGroup.addEventListener('mouseenter', () => {
         ellipse.style.filter = 'brightness(1.15)';
         ellipse.style.transform = 'scale(1.05)';
-        ellipse.style.transformOrigin = `${leafX}px ${leafY}px`;
+        ellipse.style.transformOrigin = `${pos.x}px ${pos.y}px`;
       });
       leafGroup.addEventListener('mouseleave', () => {
         ellipse.style.filter = '';
@@ -664,8 +683,12 @@ function renderTree(svgId, clusters, type) {
       svg.appendChild(leafGroup);
     });
     
-    // Update Y position for next cluster - tighter spacing
-    currentY += Math.max(clusterSpacing, rows * leafGapY + (mobile ? 85 : 100));
+    // Calculate max Y used by this cluster's leaves
+    const maxLeafY = Math.max(...positions.map(p => p.y)) + leafRadius;
+    const clusterBottom = maxLeafY + (mobile ? 25 : 35);
+    
+    // Update Y position for next cluster
+    currentY = clusterBottom;
   });
 }
 
