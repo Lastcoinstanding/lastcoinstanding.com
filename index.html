@@ -286,35 +286,47 @@ footer {
     width: 92vw;
     left: 4vw !important;
     right: 4vw;
-    font-size: 1.1rem;
-    padding: 20px 20px 24px;
-    line-height: 1.7;
+    font-size: 1.15rem;
+    padding: 22px 22px 26px;
+    line-height: 1.75;
   }
   .tooltip-close {
     display: flex;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
   }
   .tooltip-word { 
-    font-size: 1.5rem; 
-    padding-right: 30px;
+    font-size: 1.65rem; 
+    padding-right: 35px;
+    margin-bottom: 12px;
   }
   .tooltip-desc { 
-    font-size: 1.15rem;
-    line-height: 1.65;
+    font-size: 1.2rem;
+    line-height: 1.7;
   }
   .tooltip-insight,
   .tooltip-contrast {
-    font-size: 1.05rem;
-    line-height: 1.6;
+    font-size: 1.1rem;
+    line-height: 1.65;
+  }
+  .tooltip-section {
+    margin-top: 18px;
+    padding-top: 16px;
   }
   .tooltip-section-title {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
   }
   .tooltip-synonyms {
-    font-size: 0.95rem;
+    font-size: 1rem;
+    margin-top: 16px;
+    padding-top: 14px;
   }
   .tooltip-synonyms span {
-    font-size: 0.9rem;
-    padding: 4px 12px;
+    font-size: 0.95rem;
+    padding: 5px 14px;
+    margin: 4px 5px 4px 0;
   }
 }
 
@@ -455,9 +467,9 @@ function renderTree(svgId, clusters, type) {
   let totalHeight = headerSpace;
   clusters.forEach(cluster => {
     const numWords = cluster.words.length;
-    const rows = Math.ceil(numWords / 4); // More spread out
-    const leafGapY = mobile ? 50 : 58;
-    const clusterHeight = Math.max(clusterSpacing, rows * leafGapY + 70);
+    const rows = Math.ceil(numWords / (mobile ? 2 : 3)); // Fewer per row = more rows
+    const leafGapY = mobile ? 52 : 56;
+    const clusterHeight = Math.max(clusterSpacing, rows * leafGapY + (mobile ? 90 : 85));
     totalHeight += clusterHeight;
   });
   totalHeight += footerSpace;
@@ -532,12 +544,12 @@ function renderTree(svgId, clusters, type) {
     svg.appendChild(branch);
     
     // Draw cluster label - position at end of branch
-    const labelFontSize = mobile ? 12 : 15;
+    const labelFontSize = mobile ? 15 : 15;
     const labelText = cluster.name;
-    const labelWidth = measureTextWidth(labelText, labelFontSize) + (mobile ? 14 : 18);
-    const labelHeight = mobile ? 20 : 24;
+    const labelWidth = measureTextWidth(labelText, labelFontSize) + (mobile ? 18 : 18);
+    const labelHeight = mobile ? 26 : 24;
     const labelX = branchEndX + branchDirection * 5;
-    const labelY = branchEndY - (mobile ? 14 : 16);
+    const labelY = branchEndY - (mobile ? 18 : 16);
     
     // Label background
     const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -564,44 +576,79 @@ function renderTree(svgId, clusters, type) {
     svg.appendChild(label);
     
     // Calculate leaf positions - SPREAD ACROSS BOTH SIDES of branch
-    const leafRadius = mobile ? 28 : 34;
-    const fontSize = mobile ? 11 : 13;
+    const leafRadius = mobile ? 34 : 36;
+    const fontSize = mobile ? 12 : 13;
     
     // Leaves fan out from branch end in a natural canopy pattern
-    const leafStartY = branchEndY + (mobile ? 28 : 35);
+    const leafStartY = branchEndY + (mobile ? 36 : 38);
     
     // Create positions that spread both left and right of the branch
     const positions = [];
-    const spreadWidth = mobile ? 140 : 260; // Total width for leaves
+    const spreadWidth = mobile ? 180 : 280; // Total width for leaves
     const baseX = branchEndX; // Center around branch end
     
-    // Generate organic positions - mix of rows with varying offsets
+    // Generate organic positions with collision detection
     cluster.words.forEach((word, wi) => {
       // Alternate between left and right of branch center
       const side = wi % 2 === 0 ? -1 : 1;
       
-      // Calculate base row (roughly 3-4 per row)
-      const effectiveRow = Math.floor(wi / (mobile ? 3 : 4));
-      const posInRow = wi % (mobile ? 3 : 4);
+      // Calculate base row (roughly 2-3 per row for more vertical spread)
+      const effectiveRow = Math.floor(wi / (mobile ? 2 : 3));
+      const posInRow = wi % (mobile ? 2 : 3);
       
-      // Horizontal spread - alternate sides with variation
-      const hSpread = mobile ? 50 : 75;
-      let offsetX = side * (hSpread * 0.5 + posInRow * hSpread * 0.4);
+      // Horizontal spread - alternate sides with more spacing
+      const hSpread = mobile ? 75 : 95;
+      let offsetX = side * (hSpread * 0.6 + posInRow * hSpread * 0.5);
       
-      // Add randomness for organic feel
-      offsetX += (Math.sin(wi * 2.3) * (mobile ? 12 : 20));
+      // Add randomness for organic feel (reduced to prevent overlaps)
+      offsetX += (Math.sin(wi * 2.3) * (mobile ? 8 : 14));
       
       // Vertical position with variation
-      const vSpacing = mobile ? 48 : 56;
+      const vSpacing = mobile ? 52 : 56;
       let offsetY = effectiveRow * vSpacing;
       
       // Stagger vertically for organic feel
-      offsetY += (Math.cos(wi * 1.7) * (mobile ? 10 : 15));
-      offsetY += (wi % 3) * (mobile ? 8 : 12); // Additional stagger
+      offsetY += (Math.cos(wi * 1.7) * (mobile ? 6 : 10));
+      offsetY += (wi % 3) * (mobile ? 5 : 8); // Additional stagger
+      
+      let finalX = baseX + offsetX;
+      let finalY = leafStartY + offsetY;
+      
+      // Calculate this word's ellipse width for proper collision detection
+      const wordText = word.word;
+      const textWidth = measureTextWidth(wordText, fontSize);
+      const thisRx = Math.max(leafRadius, textWidth / 2 + (mobile ? 14 : 18));
+      
+      // Collision check with all previously placed leaves
+      const minDist = mobile ? 72 : 85;
+      let iterations = 0;
+      let hasCollision = true;
+      
+      while (hasCollision && iterations < 15) {
+        hasCollision = false;
+        for (let p of positions) {
+          const dx = finalX - p.x;
+          const dy = finalY - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const requiredDist = (thisRx + p.rx) * 0.85 + 8; // Account for ellipse widths
+          
+          if (dist < requiredDist) {
+            hasCollision = true;
+            // Nudge away more aggressively
+            const nudge = (requiredDist - dist) / 2 + 5;
+            const angle = Math.atan2(dy, dx) || (Math.random() * Math.PI * 2);
+            finalX += Math.cos(angle) * nudge;
+            finalY += Math.sin(angle) * nudge * 0.6; // Less vertical nudge
+            break;
+          }
+        }
+        iterations++;
+      }
       
       positions.push({
-        x: baseX + offsetX,
-        y: leafStartY + offsetY,
+        x: finalX,
+        y: finalY,
+        rx: thisRx,
         word: word
       });
     });
@@ -619,11 +666,10 @@ function renderTree(svgId, clusters, type) {
       twig.setAttribute('opacity', '0.5');
       svg.appendChild(twig);
       
-      // Draw leaf (ellipse)
+      // Draw leaf (ellipse) - use pre-calculated rx
       const wordText = pos.word.word;
-      const textWidth = measureTextWidth(wordText, fontSize);
-      const rx = Math.max(leafRadius, textWidth / 2 + (mobile ? 10 : 14));
-      const ry = leafRadius * 0.6;
+      const rx = pos.rx; // Use stored rx from collision detection
+      const ry = leafRadius * 0.58;
       
       const leafGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       leafGroup.setAttribute('class', 'leaf');
@@ -732,7 +778,8 @@ function showTooltip(e, leafIndex) {
   const contrastContent = document.getElementById('tip-contrast');
   if (leaf.contrast) {
     contrastSection.style.display = 'block';
-    contrastTitle.className = 'tooltip-section-title ' + leaf.type;
+    // Use OPPOSITE color for contrast header
+    contrastTitle.className = 'tooltip-section-title ' + (isBtc ? 'fiat' : 'btc');
     contrastTitle.textContent = isBtc ? 'Fiat Contrast' : 'Bitcoin Contrast';
     contrastContent.textContent = leaf.contrast;
   } else {
