@@ -272,7 +272,7 @@
               "Work-based",
               "Energy-backed"
             ],
-            "deeperInsight": "Proof-of-work ties Bitcoin's security to the physical world through energy expenditure. This is not waste—it is the unforgeable cost that makes Bitcoin valuable. Just as gold derives value from the difficulty of extraction, Bitcoin derives value from the computational work required to mint new coins and secure transactions. The energy is the point.",
+            "deeperInsight": "Proof-of-work ties Bitcoin's security to the physical world through energy expenditure. This is not waste - it is the unforgeable costliness that makes Bitcoin valuable. Just as gold derives value from the difficulty of extraction (and intractable component of its scarcity), Bitcoin derives value from the computational work required to mint new coins and secure transactions. The energy is the point; it's supposed to be difficult - it needs to be.",
             "contrast": "Fiat is proof-of-nothing. Dollars are created with a keystroke, at zero marginal cost. There is no anchor to physical reality, no unforgeable costliness. The only thing backing fiat is political will—which, as history shows, is infinitely flexible when convenient."
           },
           {
@@ -282,8 +282,8 @@
               "Physical",
               "Energy-bound"
             ],
-            "deeperInsight": "Bitcoin is the first monetary system secured by thermodynamics. The energy expended in mining is converted into an immutable record that cannot be reversed without expending even more energy. This creates a one-way function: easy to verify, practically impossible to fake. The laws of physics, not the laws of men, guarantee Bitcoin's integrity.",
-            "contrast": "Fiat obeys no physical laws. Money can be created without energy expenditure, multiplied without cost, and destroyed by policy decision. There is no thermodynamic anchor, no physical constraint, nothing preventing infinite dilution except the temporary restraint of those in charge."
+            "deeperInsight": "Bitcoin is the first monetary system secured by thermodynamics. The energy expended in mining is converted into an immutable record that cannot be reversed without expending even more energy. This creates a one-way function: easy to verify, practically impossible to fake. It turns Bitcoin into an impervious battery of monetary energy.",
+            "contrast": "Fiat obeys no physical laws. Money can be created without energy expenditure, multiplied without cost, and destroyed by policy decision. There is no thermodynamic anchor, no physical constraint, nothing preventing infinite dilution except the temporary, fickle restraint of those in charge."
           },
           {
             "word": "Productive",
@@ -292,19 +292,19 @@
               "Efficient",
               "Constructive"
             ],
-            "deeperInsight": "Bitcoin mining gravitates toward the cheapest energy on Earth—which is increasingly renewable or stranded energy that has no other buyer. Flared natural gas, curtailed wind and solar, and stranded hydroelectric power are being monetized by miners. Rather than competing with households for energy, Bitcoin often makes renewable projects economically viable that otherwise wouldn't be.",
-            "contrast": "The fiat system's energy footprint is hidden but enormous: thousands of bank branches, millions of ATMs, vast data centers, armored vehicles, and the entire apparatus of financial surveillance and enforcement. This energy use is never questioned because it's distributed and invisible—but it vastly exceeds Bitcoin's transparent consumption."
+            "deeperInsight": "Bitcoin mining gravitates toward the cheapest energy on Earth - which is increasingly renewable or stranded energy that has no other buyer. Flared natural gas, curtailed wind and solar, and stranded hydroelectric power are being monetized by miners. Rather than competing with households for energy, Bitcoin often makes renewable projects economically viable that otherwise wouldn't be.",
+            "contrast": "The fiat system's energy footprint is hidden but enormous: thousands of bank branches, millions of ATMs, vast data centers, armored vehicles, and the entire apparatus of financial surveillance and enforcement. This energy use is never questioned because it's distributed and invisible -but it vastly exceeds Bitcoin's transparent consumption. Not to mention the energy (and lives) expended in wars that fiat money alone makes possible."
           },
           {
             "word": "Heartbeat",
-            "description": "A new block every ten minutes—Bitcoin is alive, pulsing with the rhythm of decentralized consensus.",
+            "description": "A new block every ten minutes - Bitcoin is alive, pulsing with the rhythm of decentralized consensus.",
             "synonyms": [
               "Pulse",
               "Rhythm",
               "Living"
             ],
-            "deeperInsight": "Bitcoin has a heartbeat: approximately every ten minutes, a new block is added to the chain. This rhythm has continued unbroken since January 3, 2009. Unlike fiat, which sits inert in databases, Bitcoin is constantly in motion—being validated, propagated, and secured by a global network of participants. In this sense, Bitcoin is alive in a way no other money has ever been.",
-            "contrast": "Fiat has no heartbeat—it is inert, passive, dead. It sits in ledgers until humans decide to move it. It exists only as entries in databases controlled by institutions. There is no pulse of ongoing verification, no rhythm of consensus, no sign of life independent of its operators."
+            "deeperInsight": "Bitcoin has a heartbeat: approximately every ten minutes, a new block is added to the chain. This rhythm has continued unbroken since January 3, 2009. Unlike fiat, which sits inert in databases, Bitcoin is constantly in motion - being validated, propagated, and secured by a global network of participants. In this sense, Bitcoin is alive in a way no other money has ever been.",
+            "contrast": "Fiat has no heartbeat - it is inert, passive, dead. It sits in ledgers until humans decide to move it. It exists only as entries in databases controlled by institutions, and its purchasing power decays inexorably."
           }
         ]
       },
