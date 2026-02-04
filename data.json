@@ -144,13 +144,13 @@
         "words": [
           {
             "word": "21 Million",
-            "description": "The absolute, unalterable cap. No more will ever exist. Mathematics guarantees what politics cannot.",
+            "description": "There will only ever be 21 million bitcoin. This cap is unalterable. Mathematics guarantees what politics cannot.",
             "synonyms": [
               "Fixed supply",
               "Hard cap"
             ],
-            "deeperInsight": "Twenty-one million is not a target or a guideline—it is an inviolable mathematical constraint. This number cannot be changed by any committee, any crisis, any political pressure. For the first time in human history, we have a monetary asset with absolute, verifiable, credible scarcity. This is not digital gold; it is something gold could never be: provably finite.",
-            "contrast": "Fiat has no supply limit by design. Central banks can and do create unlimited quantities whenever politically convenient. The US money supply has expanded by over 40% since 2020 alone. In fiat, scarcity is a temporary illusion that can be dissolved with a keystroke."
+            "deeperInsight": "Twenty-one million is not a target or a guideline - it is an inviolable mathematical constraint. This number cannot be changed by any committee, any crisis, any political pressure. For the first time in human history, we have a monetary asset with absolute, verifiable, credible scarcity. This is not just \"digital gold\"; it is absolute scarcity that is specifically defined at any point in time.",
+            "contrast": "Fiat has no supply limit by design. Central banks can and do create unlimited quantities whenever politically convenient. The US money supply has expanded by over 40% since 2020 alone. "
           },
           {
             "word": "Scarce",
@@ -160,8 +160,8 @@
               "Limited",
               "Finite"
             ],
-            "deeperInsight": "Scarcity in Bitcoin is not relative or adjustable—it is absolute. Unlike gold, which can always be mined in greater quantities if the price rises high enough, Bitcoin's supply curve is fixed regardless of demand. This creates the hardest money ever known: one that becomes harder still with each halving, until maximum hardness is reached.",
-            "contrast": "Fiat scarcity is a contradiction in terms. The entire point of fiat is that supply can be expanded at will. Any apparent constraint is merely a policy choice that can be reversed in the next crisis. Fiat is abundant by design and becomes more abundant over time."
+            "deeperInsight": "Scarcity in Bitcoin is not approximate or adjustable - it is absolute. Unlike gold, which can always be mined in greater quantities if the price rises high enough, Bitcoin's supply curve is fixed regardless of demand. This creates the hardest money ever known: one that becomes harder still over time as bitcoin's inexorable inevitability becomes increasingly obvious to ever more people.",
+            "contrast": "Fiat scarcity is a contradiction in terms. The entire point of fiat is that supply can be expanded at will. Any apparent constraint is merely a policy choice that can be reversed in the next crisis. Fiat is abundant by design and becomes more abundant over time. It is typically expedient for the government to expand the money supply as it is like a hidden tax, affording the government more latitude to spend (or loot)."
           },
           {
             "word": "Deflationary",
@@ -170,8 +170,8 @@
               "Appreciating",
               "Strengthening"
             ],
-            "deeperInsight": "A deflationary money rewards patience and punishes waste. It encourages saving, careful investment, and long-term thinking. Under a Bitcoin standard, the natural state of prices is to fall as productivity increases—meaning your money buys more tomorrow than today. This aligns the monetary system with human flourishing rather than against it.",
-            "contrast": "Fiat is inflationary by explicit policy. Central banks target positive inflation, meaning your money is designed to lose value every year. This forces you into riskier investments, punishes savers, and creates a constant low-grade anxiety about the future purchasing power of your labor."
+            "deeperInsight": "A deflationary money rewards patience and punishes waste. It encourages saving, careful investment, and long-term thinking. Under a Bitcoin standard, the natural state of prices is to fall as productivity increases - meaning your money buys more tomorrow than today. This aligns the monetary system with human flourishing rather than against it.",
+            "contrast": "Fiat is inflationary by explicit policy. Central banks target positive inflation, meaning your money is designed to lose value every year. This forces you into riskier investments, punishes savers, and creates a constant low-grade anxiety about the future purchasing power of your labor. The very concept of saving has essentially been eliminated with fiat money; one is forced to invest (put your money at risk) to have a hope of retaining purchasing power."
           },
           {
             "word": "Disciplined",
@@ -181,8 +181,8 @@
               "Predictable",
               "Rule-bound"
             ],
-            "deeperInsight": "Monetary discipline in Bitcoin is not achieved through willpower or good governance—it is enforced by protocol. No emergency is urgent enough, no crisis severe enough, no political pressure intense enough to alter the issuance schedule. This discipline is the antidote to centuries of monetary debasement driven by the short-term thinking of those in power.",
-            "contrast": "Fiat discipline is an oxymoron. Every constraint on money creation has eventually been abandoned when politically inconvenient. The gold standard was suspended, then abandoned. Debt ceilings are raised. 'Temporary' emergency measures become permanent. Fiat monetary discipline lasts only until the next election cycle."
+            "deeperInsight": "Monetary discipline in Bitcoin is not achieved through willpower or good governance - it is enforced by the protocol. No emergency is urgent enough, no crisis severe enough, no political pressure intense enough to alter the issuance schedule. This discipline is the antidote to centuries of monetary debasement driven by the short-term thinking of those in power.",
+            "contrast": "Fiat discipline is an oxymoron. Every constraint on money creation has gets abandoned when politically expedient. The gold standard was suspended, then abandoned. Debt ceilings are raised every year. 'Temporary' 'emergency' measures become permanent. Fiat monetary discipline lasts only until the next election cycle."
           },
           {
             "word": "Halving",
@@ -191,7 +191,7 @@
               "Halvening",
               "Supply shock"
             ],
-            "deeperInsight": "The halving is Bitcoin's heartbeat of increasing scarcity. Every 210,000 blocks—roughly four years—the block reward is cut in half. This programmatic tightening continues until approximately 2140, when the last fraction of a Bitcoin will be mined. The halving is not a policy that could be changed; it is a mathematical inevitability that makes Bitcoin harder money with each passing epoch.",
+            "deeperInsight": "The halving is Bitcoin's heartbeat of increasing scarcity. Every 210,000 blocks - roughly four years -the block reward is cut in half. This programmatic tightening continues until approximately 2140, when the last fraction of a Bitcoin will be mined. The halving is not a policy that could be changed; it is a mathematical inevitability that makes Bitcoin harder money with each passing epoch.",
             "contrast": "Fiat has no halvings—only doublings. Money supply expansion accelerates over time, not decelerates. Each crisis brings more printing, each decade more debasement. The trajectory of fiat is toward infinite supply; the trajectory of Bitcoin is toward zero new issuance."
           }
         ]
