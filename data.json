@@ -528,7 +528,7 @@
               "Forced",
               "Required"
             ],
-            "deeperInsight": "Legal tender laws compel acceptance of fiat currency for all debts, public and private. This is not a feature of good money—it is an admission that the money would not be chosen voluntarily. Good money needs no law mandating its use; bad money cannot survive without one.",
+            "deeperInsight": "Legal tender laws compel acceptance of fiat currency for all debts, public and private. This is not a feature of good money - it is an admission that the money would not be chosen voluntarily. Good money needs no law mandating its use (this is why gold was the ideal money for thousands of years); bad money cannot survive without one.",
             "contrast": "Bitcoin has no legal tender laws compelling its acceptance. Every person who uses Bitcoin does so voluntarily, because they have concluded it serves their interests better than the alternatives. Voluntary adoption is the ultimate endorsement."
           },
           {
@@ -540,7 +540,7 @@
               "Restricted"
             ],
             "deeperInsight": "In fiat, you need permission to participate. Opening a bank account requires documentation many lack. International transfers require compliance approval. Large transactions trigger reporting requirements. The entire system is designed around the assumption that authorities have the right to approve or deny your financial activity.",
-            "contrast": "Bitcoin is permissionless—no application required, no approval needed. A refugee fleeing persecution and a billionaire moving capital have identical access. The protocol cannot discriminate because it has no mechanism for discrimination."
+            "contrast": "Bitcoin is permissionless - no application required, no approval needed. A refugee fleeing persecution and a billionaire moving capital have identical access. The protocol cannot discriminate because it has no mechanism for discrimination."
           },
           {
             "word": "Censored",
@@ -550,8 +550,8 @@
               "Silenced",
               "Denied"
             ],
-            "deeperInsight": "Financial censorship is routine in the fiat world. Accounts are frozen without due process. Transactions are blocked for political reasons. Entire populations are cut off from the global financial system through sanctions. Your access to your own money depends on the continued approval of multiple institutions.",
-            "contrast": "Bitcoin cannot be censored. No authority can freeze your Bitcoin, block your transactions, or deny your access. The protocol treats every valid transaction equally, regardless of the sender, recipient, or purpose. Censorship resistance is not a policy but an architectural property."
+            "deeperInsight": "Financial censorship is routine in the fiat world. Accounts are frozen without due process. Transactions are blocked for political reasons. Entire populations are cut off from the global financial system through sanctions. Your access to your own money depends on the continued approval of your government and multiple institutions.",
+            "contrast": "Bitcoin cannot be censored. No authority can freeze your bitcoin, block your transactions, or deny your access. The protocol treats every valid transaction equally, regardless of the sender, recipient, or purpose. Censorship resistance is not a policy but an architectural property of the protocol."
           },
           {
             "word": "Surveilled",
@@ -561,30 +561,30 @@
               "Watched",
               "Tracked"
             ],
-            "deeperInsight": "Modern fiat is a surveillance system masquerading as a payment system. Every transaction leaves a permanent record accessible to governments, corporations, and hackers. Your spending patterns reveal your location, relationships, health, politics, and beliefs. Financial privacy—once taken for granted with cash—has been quietly abolished.",
-            "contrast": "Bitcoin offers a path back to financial privacy. While not perfectly anonymous by default, Bitcoin can be used privately with proper techniques. More importantly, it establishes the principle that financial surveillance should not be the default—that privacy is a feature, not a bug."
+            "deeperInsight": "Modern fiat is a surveillance system masquerading as a payment system. Every transaction leaves a permanent record accessible to governments, corporations, and hackers. Your spending patterns reveal your location, relationships, health, politics, and beliefs. Financial privacy - once taken for granted with cash - has been quietly abolished. Governments press for abandonment of cash and embrace digital cash (or even worse, CBDCs) under the guise of modernization, while really looking to secure full surveillance and control over you, your money and your spend behaviors.",
+            "contrast": "Bitcoin offers a path back to financial privacy. While not perfectly anonymous by default, it is pseudonymous. The merits/opportunity of complete privacy on the base layer is ceded to the more important property of full transparency and supply auditability (there are still techniques available to achieve full privacy on the base layer). Instead, full privacy is achieved on 2nd layers - e.g. Lightning Network, Fedimint etc.."
           },
           {
-            "word": "Confiscated",
-            "description": "Bail-ins, asset freezes, civil forfeiture. They can take what they claim is yours.",
+            "word": "Confiscatable",
+            "description": "Bail-ins, asset freezes, civil forfeiture. They can legally take what they claim is yours.",
             "synonyms": [
               "Seized",
               "Stolen",
               "Expropriated"
             ],
-            "deeperInsight": "Fiat wealth can be confiscated through multiple mechanisms: direct seizure, bail-ins that convert deposits to equity, inflation that erodes purchasing power, and civil forfeiture that takes assets without conviction. Your property rights in fiat are contingent on the continued restraint of those with the power to take it.",
-            "contrast": "Bitcoin, properly secured, cannot be confiscated without your cooperation. No court order can seize Bitcoin from a brain wallet. No government can inflate away your purchasing power. For the first time, ordinary people can hold wealth that is truly beyond the reach of institutional power."
+            "deeperInsight": "Fiat wealth can be confiscated through multiple mechanisms: direct seizure, bail-ins that convert deposits to equity, inflation that erodes purchasing power, and civil forfeiture that takes assets without any legal recourse possible. Your property rights in fiat are contingent on the continued restraint of those with the power to take it.",
+            "contrast": "Unconfiscatable. Bitcoin, properly secured, cannot be confiscated without your cooperation. No government can inflate away your purchasing power. For the first time, ordinary people can hold wealth that is truly beyond the reach of institutional power. This is as it should be; your economic energy should be yours, and yours alone. Even if a government somehow bans ownership of the asset (the US did this in 1933 with gold, forcing convertibility of US residents' gold to USD at a fake-low exchange rate), you can simply walk across the border. Unlike every other asset, capital controls can't work with bitcoin (a catch 22 that makes any proposed country 'ban' all the more unlikely as it would simply catalyze capital flight out of a country)."
           },
           {
             "word": "Forced",
-            "description": "Participation is not optional—you cannot opt out of fiat without opting out of society.",
+            "description": "Participation is not optional - you cannot opt out of fiat without opting out of society.",
             "synonyms": [
               "Imposed",
               "Mandatory",
               "Coerced"
             ],
-            "deeperInsight": "Try to live without using fiat currency: you cannot pay taxes, cannot hold most jobs, cannot participate in most of the economy. Fiat participation is enforced not just by law but by the architecture of modern society. This forced participation is what allows fiat to survive despite its obvious defects.",
-            "contrast": "Bitcoin adoption is purely voluntary. No one is forced to use it; everyone who does has chosen to. This voluntary nature means Bitcoin must earn adoption through merit rather than mandate—a much higher bar that produces much better money."
+            "deeperInsight": "Fiat participation is enforced not just by law but by the architecture of modern society. This forced participation is what allows fiat to survive despite its obvious defects. The government has successfully normalized fiat, perversely even making it seem 'modern' or better than what came before - a notion that persists because so few people question or study the subject of money; they do as they are told and do as others do.",
+            "contrast": "Bitcoin adoption is purely voluntary. No one is forced to use it; everyone who does has chosen to. This voluntary nature means Bitcoin must earn adoption through merit and persuasion rather than mandate - a much higher bar that makes bitcoin and its usage all the more credible and legitimate."
           },
           {
             "word": "Coercive",
