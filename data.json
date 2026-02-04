@@ -38,23 +38,23 @@
           },
           {
             "word": "Permissionless",
-            "description": "No application required. No approval needed. Anyone can participate in the network.",
+            "description": "No application required. No approval needed. Anyone can participate in the network. You can onboard to bitcoin now, without asking anyone.",
             "synonyms": [
               "Open",
               "Accessible",
               "Inclusive"
             ],
-            "deeperInsight": "Bitcoin's permissionless nature is revolutionary: there is no application form, no credit check, no identity verification required to participate. A farmer in rural Africa and a billionaire in Manhattan have identical access to the network. This is not charity or inclusion theater—it is the structural consequence of a protocol that cannot discriminate because it has no capacity to do so.",
-            "contrast": "Fiat is permissioned by design. Opening a bank account requires documentation many cannot provide. International transfers require compliance approvals. The unbanked remain unbanked not by choice but by exclusion. Fiat's gatekeepers decide who may participate in the financial system."
+            "deeperInsight": "Bitcoin's permissionless nature is revolutionary: there is no application form, no credit check, no identity verification required to participate. A farmer in rural Africa and a billionaire in Manhattan have identical access to the network. This is not charity or inclusion theater- it is the structural consequence of a protocol that cannot discriminate because it has no capacity to do so.",
+            "contrast": "Fiat is permissioned by design. Opening a bank account requires documentation many cannot provide. International transfers require compliance approvals. The unbanked remain unbanked not by choice but by exclusion. Fiat's gatekeepers decide who may participate in the financial system, and participation is always tenuous and scrutinized."
           },
           {
-            "word": "Sovereign",
-            "description": "Each holder is their own bank, their own central authority over their wealth.",
+            "word": "Self-Sovereign",
+            "description": "Each holder is their own bank, their own authority over their own wealth.",
             "synonyms": [
               "Self-ruling",
               "Independent"
             ],
-            "deeperInsight": "Individual sovereignty over wealth was once the province of kings and nation-states. Bitcoin extends this sovereignty to anyone willing to take responsibility for their own keys. You become the final authority over your economic life—no court order, no executive action, no bureaucratic process can override your control without your cooperation.",
+            "deeperInsight": "Bitcoin enables you to have full control over your wealth that transcends jurisdictions and countries. Your economic energy is now borderless, unconstrained by jurisdictional boundaries. Bitcoin extends this sovereignty to anyone who wants it.",
             "contrast": "Under fiat, sovereignty over money belongs to the state. Your wealth exists within their system, under their rules, subject to their decisions. You are a subject of monetary policy, not a sovereign over your own finances."
           },
           {
@@ -65,8 +65,8 @@
               "Independent",
               "Decentralized"
             ],
-            "deeperInsight": "The Bitcoin network is autonomous in the deepest sense—it requires no ongoing permission, management, or intervention from any party to continue operating. It runs on the distributed consensus of thousands of independent nodes, none of which can unilaterally alter the rules. This autonomy is not a feature that was added; it is the foundational architecture.",
-            "contrast": "Fiat currencies are heteronomous by definition—they exist and operate only through continuous intervention by central authorities. Every aspect of fiat money, from supply to distribution to rules of use, is determined by external actors with their own interests and agendas."
+            "deeperInsight": "The Bitcoin network is autonomous in the deepest sense—it requires no ongoing permission, management, or intervention from any party to continue operating. It runs on the distributed consensus of thousands of independent nodes, none of which can unilaterally alter the rules. It's architecture is self-correcting, to run predictably, independently.",
+            "contrast": "Fiat currencies operate only through continuous intervention by central authorities. Every aspect of fiat money, from supply to distribution to rules of use, is determined by external actors with their own interests and agendas."
           }
         ]
       },
