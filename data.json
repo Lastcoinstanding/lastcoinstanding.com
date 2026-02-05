@@ -621,19 +621,19 @@
               "Secret",
               "Murky"
             ],
-            "deeperInsight": "The fiat system operates behind a veil of complexity and secrecy. Central bank meetings are confidential. The actual money supply—including shadow banking and derivatives—is impossible to calculate precisely. This opacity is not accidental; it is necessary to hide the ongoing theft from those being robbed.",
-            "contrast": "Bitcoin is radically transparent. The code is open-source. The supply is verifiable by anyone running a node. Every transaction is recorded on a public ledger. There are no secrets, no hidden decisions, no opacity. What you see is what you get."
+            "deeperInsight": "The fiat system operates behind a veil of complexity and secrecy. Central bank meetings are confidential. The actual money supply - including shadow banking and derivatives, is impossible to calculate precisely. This opacity is not accidental; it is necessary to hide the silent theft from the population",
+            "contrast": "Bitcoin is radically transparent. The code is open-source. The supply is verifiable by anyone running a node. Every transaction is recorded on a public ledger. There are no secrets, no hidden decisions, no opacity."
           },
           {
             "word": "Manipulated",
-            "description": "Interest rates, money supply, exchange rates—all artificially controlled and distorted.",
+            "description": "Interest rates, money supply, exchange rates -all artificially controlled and distorted.",
             "synonyms": [
               "Rigged",
               "Distorted",
               "Fixed"
             ],
-            "deeperInsight": "Every important price in fiat is manipulated. Interest rates are set by committee, not by markets. Money supply is expanded and contracted by policy decision. Exchange rates are managed through intervention. The entire price system—the foundation of economic calculation—is corrupted at its source.",
-            "contrast": "Bitcoin cannot be manipulated by any single entity. The supply follows a predetermined schedule. The price emerges from genuine market activity across thousands of exchanges worldwide. No committee sets the Bitcoin interest rate; no central bank manages its exchange rate."
+            "deeperInsight": "Every important price in fiat is manipulated. Interest rates are set by committee, not by markets. Money supply is expanded and contracted by policy decision. Exchange rates are managed through intervention. The entire price system - the foundation of economic calculation - is corrupted at its source.",
+            "contrast": "Bitcoin cannot be manipulated by any single entity. The supply follows a predetermined schedule. The price (better described as exchange-rate to fiat) emerges from genuine market activity across thousands of exchanges worldwide. No committee sets the Bitcoin interest rate; no central bank manages its exchange rate."
           },
           {
             "word": "Fabricated",
@@ -643,8 +643,8 @@
               "Conjured",
               "Artificial"
             ],
-            "deeperInsight": "Modern fiat is created literally from nothing. A central bank credits an account with numbers that did not previously exist; new money appears. There is no gold being moved, no value being created, no cost being incurred. It is pure fabrication—accounting entries masquerading as wealth.",
-            "contrast": "Bitcoin cannot be fabricated. Every Bitcoin that exists was mined through real energy expenditure, following rules that cannot be changed. The unforgeable costliness of Bitcoin production is what gives it value—the exact opposite of fiat's costless fabrication."
+            "deeperInsight": "Modern fiat is created literally from nothing. A central bank (and commerical banks, on new loans) credits an account with numbers that did not previously exist; new money appears. There is no gold being moved, no value being created, no cost being incurred. It is pure fabrication - arbitrary accounting entries masquerading as wealth.",
+            "contrast": "Bitcoin cannot be fabricated. Every Bitcoin that exists was mined through real energy expenditure, following rules that cannot be changed. The unforgeable costliness of Bitcoin production is what gives it value - the exact opposite of fiat's costless fabrication."
           },
           {
             "word": "Deceptive",
@@ -654,8 +654,8 @@
               "Dishonest",
               "Euphemistic"
             ],
-            "deeperInsight": "The vocabulary of central banking exists to obscure rather than clarify. Currency debasement becomes 'quantitative easing.' Inflation becomes 'price stability.' Bail-outs become 'liquidity provision.' This elaborate linguistic camouflage is necessary because honest language would reveal the ongoing theft.",
-            "contrast": "Bitcoin uses plain language because it has nothing to hide. Inflation rate: decreasing toward zero. Supply cap: 21 million, forever. Monetary policy: fixed by protocol. No euphemisms are needed when you're not deceiving anyone."
+            "deeperInsight": "The vocabulary of central banking exists to obscure and gaslight rather than clarify. Currency debasement becomes 'quantitative easing.' Inflation becomes 'price stability.' Bail-outs become 'liquidity provision.' This elaborate linguistic camouflage is necessary because honest language would reveal the brazen theft.",
+            "contrast": "Bitcoin uses plain language because it has nothing to hide. Inflation rate: decreasing toward zero. Terminal supply cap: 21 million, forever. Monetary policy: fixed by protocol from inception. No euphemisms are needed when you're not deceiving anyone."
           },
           {
             "word": "Fraudulent",
@@ -665,19 +665,19 @@
               "Fake",
               "Illegitimate"
             ],
-            "deeperInsight": "Fractional reserve banking is legalized fraud. Banks lend money they don't have, creating deposits that don't correspond to actual reserves. The entire system depends on the fiction that all depositors can withdraw simultaneously—which they cannot. When this fiction is exposed, as in bank runs, the fraud becomes apparent.",
-            "contrast": "Bitcoin is fully reserved by definition. You either have Bitcoin or you don't. There is no fractional reserve Bitcoin banking because the ledger is public and verifiable. One Bitcoin is one Bitcoin—no fiction required."
+            "deeperInsight": "Fractional reserve banking is legalized fraud. Banks lend money they don't have, creating deposits that don't correspond to actual reserves. The entire system depends on the fiction that all depositors can withdraw simultaneously - which they cannot. When this fiction is exposed, as in bank runs, the fraud becomes apparent; a game of musical chairs, and there may be very few chairs.",
+            "contrast": "Bitcoin is fully reserved by definition. You either have Bitcoin or you don't. There is no fractional reserve Bitcoin banking because the ledger is public and verifiable. When you own a share of the bitcoin ledger, that share is fixed for eternity."
           },
           {
             "word": "Misinformation",
-            "description": "Fiat itself is misinformation—distorted price signals that corrupt all economic calculation.",
+            "description": "Fiat itself is misinformation - distorted price signals that corrupt all economic calculation.",
             "synonyms": [
               "Noise",
               "Distortion",
               "Corruption"
             ],
-            "deeperInsight": "Jeff Booth's insight: fiat itself is misinformation. When money can be created at will, every price signal becomes unreliable. Asset prices, interest rates, exchange rates—all are distorted by monetary manipulation. Economic actors making decisions based on fiat-denominated prices are navigating with a broken compass.",
-            "contrast": "Bitcoin provides clean signal. As a money that cannot be manipulated, Bitcoin-denominated prices would actually reflect supply and demand, not central bank policy. This is not just better money—it's better information for the entire economy."
+            "deeperInsight": "Jeff Booth's insight: fiat itself is misinformation. When money can be created at will, every price signal becomes unreliable. Asset prices, interest rates, exchange rates all are distorted by monetary manipulation. Economic actors making decisions based on fiat-denominated prices are navigating with a broken compass.",
+            "contrast": "Bitcoin provides clean signal. Because it is structurally inert and entirely predictable in its monetary policy, with no concept of debasement, economic calculation into the future becomes more confident, underpinning longer term investment and associated time horizons."
           },
           {
             "word": "Arsonist",
@@ -687,7 +687,7 @@
               "Self-serving",
               "Circular"
             ],
-            "deeperInsight": "Easy money policies fuel asset bubbles, excessive risk-taking, and malinvestment. When these inevitably collapse, central banks position themselves as the heroic firefighters, deploying even more easy money to 'save' the economy—which plants the seeds of the next crisis. The pattern is not accidental but structural: their power depends on perpetual instability.",
+            "deeperInsight": "Easy money policies fuel asset bubbles, excessive risk-taking, and malinvestment. When these inevitably collapse, central banks position themselves as the heroic firefighters, deploying even more easy money to 'save' the economy - which plants the seeds of the next crisis. The pattern is not accidental but structural: their power depends on perpetual instability, requiring constant intervention.",
             "contrast": "Bitcoin has no firefighters because it needs none. Its monetary policy is fixed, transparent, and immune to human intervention. There are no bubbles to create, no crises to exploit, and no self-interested institution claiming credit for 'stability' that it itself undermined."
           }
         ]
