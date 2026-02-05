@@ -797,7 +797,7 @@
               "Brittle"
             ],
             "deeperInsight": "Fiat systems are centralized at every level: central banks control monetary policy, major banks control payment systems, single points of failure abound. This centralization enables control but creates brittleness. When the center fails—as it did in 2008—the entire system seizes up, requiring massive intervention to prevent collapse.",
-            "contrast": "Bitcoin's decentralization means there is no center to fail. The network has no single point of control, no headquarters to raid, no CEO to arrest. It persists because it exists everywhere simultaneously, making it antifragile where fiat is merely fragile."
+            "contrast": "Bitcoin's decentralization means there is no center to fail. The network has no single point of control, no headquarters to raid, no CEO to arrest. It persists because it exists everywhere simultaneously, making it antifragile where fiat is fragile."
           },
           {
             "word": "Fragile",
@@ -808,7 +808,7 @@
               "Unstable"
             ],
             "deeperInsight": "The fiat system is not just fragile but increasingly so. Each crisis requires larger interventions than the last. The bailouts of 2008 dwarfed those of 2001, which dwarfed those of 1998. The interventions of 2020 dwarfed 2008. This escalating fragility suggests a system approaching its terminal crisis.",
-            "contrast": "Bitcoin is antifragile—it gains strength from stress. Every attack survived, every crisis weathered, every prediction of death proven wrong adds to its credibility. The system becomes more robust over time, not less."
+            "contrast": "Bitcoin is antifragile - it gains strength from stress. Every attack survived, every crisis weathered, every prediction of death proven wrong adds to its credibility. The system becomes more structurally robust over time, not less."
           },
           {
             "word": "Discretionary",
@@ -818,8 +818,8 @@
               "Subjective",
               "Changeable"
             ],
-            "deeperInsight": "Fiat monetary policy depends on the judgment of a small group of unelected officials. These officials are subject to political pressure, cognitive biases, and the impossibility of centrally planning an economy. The entire system rests on the presumption that a few people know better than markets—a presumption disproven repeatedly.",
-            "contrast": "Bitcoin's monetary policy is non-discretionary—fixed by protocol, immune to human judgment or political pressure. The rules are known in advance and apply without exception. This removes the single greatest source of monetary instability: human discretion."
+            "deeperInsight": "Fiat monetary policy depends on the judgment of a small group of unelected officials. These officials are subject to political pressure, cognitive biases, and the impossibility of centrally planning an economy. The entire system rests on the presumption that a few people know better than markets (this even assumes their intent is constructive and benign) - a presumption disproven repeatedly.",
+            "contrast": "Bitcoin's monetary policy is non-discretionary - fixed by protocol, immune to human judgment or political pressure. The rules are known in advance and apply without exception. This removes the single greatest source of monetary instability: human discretion."
           },
           {
             "word": "Contrived",
@@ -829,8 +829,8 @@
               "Manufactured",
               "Imposed"
             ],
-            "deeperInsight": "Fiat money is a contrivance—a social construct maintained through legal mandate and constant propaganda. The entire edifice of modern monetary theory exists to justify and maintain this contrivance. Strip away the laws requiring its use and the narrative supporting its value, and nothing remains.",
-            "contrast": "Bitcoin's value emerges from its genuine properties: absolute scarcity, decentralization, censorship resistance. It requires no propaganda because its properties are self-evident to anyone who investigates. It needs no legal mandate because people choose it for rational reasons."
+            "deeperInsight": "Fiat money is a contrivance -a social construct maintained through legal mandate and constant propaganda. The entire edifice of modern monetary theory exists to justify and maintain this contrivance. Strip away the laws requiring its use and the narrative supporting its value, and nothing remains.",
+            "contrast": "Bitcoin's value emerges from its genuine properties: open, decentralized, secure protocol, bounded by energy, that is absolutely scarce -credibly enforced for the first time in human history. It requires no propaganda because its properties are self-evident to anyone who investigates. It needs no legal mandate because people choose it for rational reasons, voluntarily."
           },
           {
             "word": "Expediency",
@@ -840,19 +840,19 @@
               "Opportunism",
               "Convenience"
             ],
-            "deeperInsight": "Every fiat currency eventually succumbs to political expediency. The gold standard was abandoned when it became inconvenient. Debt ceilings are raised when they bind. 'Temporary' emergency measures become permanent. The half-life of every monetary restraint is measured by how long it takes to become politically inconvenient.",
-            "contrast": "Bitcoin cannot yield to expediency. The protocol has no mechanism for 'temporary' exceptions or emergency measures. The rules are the rules, regardless of circumstances. This inflexibility—so often criticized—is actually Bitcoin's greatest strength."
+            "deeperInsight": "Every fiat currency eventually succumbs to political expediency. The gold standard was abandoned when it became inconvenient. Debt ceilings are raised when the government runs out of money (reducing spending is never even considered). 'Temporary' 'emergency' measures become permanent. The half-life of every monetary restraint is measured by how long it takes to become politically inconvenient.",
+            "contrast": "Bitcoin cannot yield to expediency. The protocol has no mechanism for 'temporary' exceptions or 'emergency' measures. The rules are the rules, regardless of circumstances. This inflexibility - so often criticized - is actually Bitcoin's greatest strength. This indefatigable permanence is the foundation of an ideal money that can move human civilization forward."
           },
           {
             "word": "Soft Default",
-            "description": "Governments don't default openly—they inflate away their debts while pretending to pay.",
+            "description": "Governments don't default openly - they inflate away their debts while pretending to pay.",
             "synonyms": [
               "Stealth default",
               "Hidden default",
               "Debasement"
             ],
-            "deeperInsight": "Every fiat government is in a state of continuous soft default. They promise to repay debts in currency units, then ensure those units are worth less when repayment comes due. It's default by another name—dishonest, gradual, but no less real. The question is not whether governments will default but how openly.",
-            "contrast": "Bitcoin cannot be soft-defaulted. A debt denominated in Bitcoin must be repaid in Bitcoin of unchanging purchasing power. This makes lenders and borrowers negotiate honestly, without the hidden subsidy of expected debasement."
+            "deeperInsight": "Every fiat government is in a state of continuous soft default. They promise to repay debts in currency units, then ensure those units are worth less when repayment comes due. It's default by another name - dishonest, gradual, but no less real. The question is not whether governments will default but how openly.",
+            "contrast": "Bitcoin cannot be soft-defaulted. A debt denominated in Bitcoin must be repaid in Bitcoin of unchanging purchasing power in the Bitcoin network. This makes lenders and borrowers negotiate honestly, without the hidden subsidy of expected debasement in the fiat 'network'."
           }
         ]
       },
