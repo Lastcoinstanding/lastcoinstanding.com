@@ -703,8 +703,8 @@
               "Erosion",
               "Theft"
             ],
-            "deeperInsight": "Inflation is theft by other means. It takes from savers without their consent, without legislation, without even their awareness. A 2% annual inflation rate—presented as the target—means your money loses half its value every 35 years. This is not a side effect but the purpose: transferring wealth from those who hold money to those who issue it.",
-            "contrast": "Bitcoin's fixed supply makes inflation impossible by design. Your Bitcoin cannot be diluted by anyone's decision. A Bitcoin saved today will still be one twenty-one-millionth of the total supply in a hundred years—the only money in history that offers this guarantee."
+            "deeperInsight": "Inflation is theft by other means. It takes from savers without their consent, without legislation, without even their awareness. A 2% \"target\" annual inflation rate is better described as a 2% theft rate. At this level your money loses half its value every 35 years; in reality the half life is more like 7 to 10 years, as real inflation (not government-published CPI) is typically much higher. This is not a side effect but the purpose: transferring wealth from those who hold money to those who issue it.",
+            "contrast": "Bitcoin's fixed supply makes inflation impossible by design. Your Bitcoin cannot be diluted by anyone's decision. A Bitcoin saved today will still be one twenty-one-millionth of the total supply in a hundred years - the only money in history that offers this guarantee, giving it maximum structural predictability."
           },
           {
             "word": "Cantillon",
@@ -714,8 +714,8 @@
               "Insider advantage",
               "Wealth transfer"
             ],
-            "deeperInsight": "The Cantillon effect describes how newly created money benefits those who receive it first—banks, governments, connected corporations—at the expense of those who receive it last—ordinary workers and savers. By the time new money reaches the general economy, prices have already risen. This is wealth redistribution by stealth, from the many to the few.",
-            "contrast": "Bitcoin has no Cantillon effect because there is no money printer to be close to. The issuance schedule is fixed and known. New Bitcoin goes to miners through open competition, not political connection. Everyone operates on equal footing."
+            "deeperInsight": "The Cantillon effect describes how newly created money benefits those who receive it first - banks, governments, connected corporations, at the expense of those who receive it last - ordinary workers and savers. By the time new money reaches the general economy, prices have already risen. This is wealth redistribution by stealth, from the many to the few.",
+            "contrast": "Bitcoin has no Cantillon effect because there is no money printer to be close to. The issuance schedule is fixed and known. New Bitcoin goes to miners through open competition, not political connection. Everyone operates on an equal footing."
           },
           {
             "word": "Seigniorage",
@@ -725,7 +725,7 @@
               "Extraction",
               "Profit"
             ],
-            "deeperInsight": "Seigniorage is the difference between the face value of money and the cost to produce it. For digital fiat, the cost is essentially zero—making seigniorage nearly 100%. This is a hidden tax on everyone who uses the currency, flowing directly to the issuing government. It's free money for the state, paid for by the debasement of your savings.",
+            "deeperInsight": "Seigniorage is the difference between the face value of money and the cost to produce it. For digital fiat, the cost is essentially zero - making seigniorage nearly 100%. This is a hidden tax on everyone who uses the currency, flowing directly to the issuing government. It's free money for the state, paid for by the debasement of your savings.",
             "contrast": "Bitcoin has no seigniorage because there is no issuer capturing profit. The cost of producing Bitcoin (mining) closely tracks its market value. The 'profit' is distributed to miners through open competition, not captured by a monetary authority."
           },
           {
@@ -736,7 +736,7 @@
               "Confiscation",
               "Taking"
             ],
-            "deeperInsight": "Since Cyprus in 2013, bail-ins have been official policy in many jurisdictions. When banks fail, depositors can be forced to convert their deposits into bank equity—expropriation by another name. Your money in the bank is not fully yours; it is conditionally yours, subject to seizure when the bank needs it.",
+            "deeperInsight": "Cyprus in 2013 was a test-bed for how bail-ins can work. When banks fail, depositors can be forced to convert their deposits into bank equity - expropriation by another name. Your money in the bank is not fully yours; it is conditionally yours, subject to seizure when the bank needs it.",
             "contrast": "Bitcoin in self-custody cannot be bailed in, seized, or converted without your consent and cooperation. There is no counterparty that can claim your Bitcoin as their capital. Possession is ownership, without conditions or contingencies."
           },
           {
@@ -748,7 +748,7 @@
               "Leeching"
             ],
             "deeperInsight": "The fiat financial system has grown to consume an enormous share of economic activity—not by producing value but by positioning itself as an unavoidable middleman. Transaction fees, currency conversion costs, compliance costs, and the sheer overhead of the banking system drain resources from productive activity to feed financial intermediaries.",
-            "contrast": "Bitcoin minimizes rent-seeking by minimizing intermediation. Peer-to-peer transactions require no bank. International transfers require no SWIFT. The protocol extracts no rents beyond minimal transaction fees that go to miners securing the network."
+            "contrast": "Peer-to-peer transactions require no intermediaries; once you own bitcoin, you can transact peer-to-peer. The protocol extracts no rents beyond minimal transaction fees that go to miners securing the network."
           },
           {
             "word": "Counterfeiting",
@@ -758,19 +758,19 @@
               "Fabrication",
               "Fakery"
             ],
-            "deeperInsight": "The only difference between government money printing and counterfeiting is who's doing it. Both create money from nothing, both dilute existing holdings, both transfer wealth from holders to creators. The government merely legalized its own counterfeiting while criminalizing competition.",
+            "deeperInsight": "The only difference between government money printing and counterfeiting is who's doing it. Both create money from nothing, both dilute existing holdings, both transfer wealth from holders to creators. The government merely legalized its own counterfeiting while criminalizing competition. The government covers its counterfeiting in a fog of supposed legitimacy.",
             "contrast": "Bitcoin cannot be counterfeited because every Bitcoin is cryptographically verified by the entire network. There is no printing press to seize, no template to copy. Mathematical verification replaces institutional trust."
           },
           {
             "word": "Confiscatory",
-            "description": "Inflation is confiscation without legislation—taking your wealth without the honesty of a tax bill.",
+            "description": "Inflation is confiscation without legislation.",
             "synonyms": [
               "Seizing",
               "Taking",
               "Expropriating"
             ],
             "deeperInsight": "Taxation requires legislation, public debate, and accountability. Inflation achieves the same wealth transfer silently, invisibly, and without consent. It is confiscation that never appears on a tax bill, voted on in no legislature, approved by no citizen. This stealth is what makes it politically attractive and morally indefensible.",
-            "contrast": "Bitcoin cannot confiscate. There is no mechanism in the protocol to take from one holder and give to another. Your Bitcoin is yours until you choose to transfer it—a concept so basic it shouldn't be revolutionary, yet it is."
+            "contrast": "Bitcoin unconfiscatable. There is no mechanism in the protocol to take from one holder and give to another. Your Bitcoin is yours until you choose to transfer it - a concept so basic it shouldn't be revolutionary, yet it is."
           },
           {
             "word": "Asymmetric",
