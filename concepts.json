@@ -1,0 +1,185 @@
+{
+  "meta": {
+    "title": "What Bitcoin Is",
+    "subtitle": "Most people see one dimension. Bitcoin is all of them, simultaneously.",
+    "completionTitle": "The Full Picture",
+    "completionDesc": "Bitcoin is the simultaneous achievement of all these properties — something no previous money has ever accomplished. The question is not whether bitcoin is special. The question is whether you can identify anything else — past, present, or conceivable future — that achieves even half of what you see here.",
+    "completionRelation": "This is <strong>The Bitcoin Migration</strong> — the exodus from an inherently broken monetary network that can't be fixed, to an inherently strong monetary network that can't be broken.",
+    "panelIntro": "Each circle in this geometry represents a critical dimension of what makes bitcoin the ideal money.",
+    "panelIntroSecondary": "No previous money — including gold — has achieved even half of these properties simultaneously. Bitcoin achieves all of them.",
+    "panelCta": "Click any circle to begin"
+  },
+  "concepts": [
+    {
+      "id": "bitcoin",
+      "label": "Bitcoin",
+      "ring": 0,
+      "position": "center",
+      "tag": "The Foundation",
+      "desc": "Bitcoin is the first and only money to simultaneously achieve every property represented here — properties that no previous money, including gold, has ever accomplished together. Each circle represents one critical dimension. Together they describe what is arguably the most important monetary breakthrough in human civilization.",
+      "relation": "Every outer circle flows from and reinforces the center. Bitcoin is not any single property — it is the unprecedented <strong>convergence</strong> of all of them."
+    },
+    {
+      "id": "scarcity",
+      "label": "Absolute Scarcity",
+      "ring": 1,
+      "position": "top",
+      "tag": "Core Property",
+      "desc": "There will only ever be 21 million bitcoin — not approximately, exactly. This is the first absolutely scarce monetary asset in human history. Gold expands at ~2% per year; fiat has no limit at all. Bitcoin is a closed system with zero supply response to demand — a foundational breakthrough in the concept of money itself.",
+      "relation": "Directly enables <strong>Predictable</strong> monetary policy and underpins <strong>Pure Money</strong> status. No issuer can tamper with what is mathematically fixed."
+    },
+    {
+      "id": "pow",
+      "label": "Proof of Work",
+      "ring": 1,
+      "position": "top-right",
+      "tag": "Core Property",
+      "desc": "Every bitcoin is produced through real energy expenditure that cannot be faked, replicated, or shortcut. Proof of work anchors digital scarcity to the physical world — each block is a thermodynamic proof that someone paid a real, unforgeable cost. This is what separates bitcoin from every other digital asset.",
+      "relation": "Anchors <strong>Absolute Scarcity</strong> to reality. Enables <strong>Self-Custody</strong> of an asset with genuine production cost, and makes transactions <strong>Irreversible</strong>."
+    },
+    {
+      "id": "digital",
+      "label": "Digital",
+      "ring": 1,
+      "position": "bottom-right",
+      "tag": "Core Property",
+      "desc": "Bitcoin is native to the internet — a bearer instrument that can be teleported anywhere on Earth. No physical money can settle across distance in real time. No digital fiat is a bearer instrument. Bitcoin is digitally conservative: it can move instantly, but it cannot be copied or double-spent.",
+      "relation": "The digital nature makes bitcoin <strong>Borderless</strong> and enables true <strong>Peer-to-Peer</strong> settlement across any distance, in real time."
+    },
+    {
+      "id": "opensource",
+      "label": "Open Source",
+      "ring": 1,
+      "position": "bottom",
+      "tag": "Core Property",
+      "desc": "Every line of Bitcoin's code is public. Every transaction, every block, every rule is transparent and verifiable by anyone on Earth. There is nothing about bitcoin that is secret, hidden, or permissioned. When opponents criticize open source, they reveal a preference for opacity and control.",
+      "relation": "Transparency is the basis for being <strong>Trustless</strong>. Combined with <strong>Decentralized</strong> enforcement, open source makes the rules unchallengeable."
+    },
+    {
+      "id": "decentralized",
+      "label": "Decentralized",
+      "ring": 1,
+      "position": "bottom-left",
+      "tag": "Core Property",
+      "desc": "Tens of thousands of independent nodes worldwide enforce Bitcoin's rules identically. No headquarters, no CEO, no board of directors. There is no central point of failure to attack, no central authority to capture, and no individual or entity capable of unilaterally influencing the network.",
+      "relation": "Distribution is what makes bitcoin <strong>Antifragile</strong> and <strong>Censorship Resistant</strong>. No single point of failure means no single point of control."
+    },
+    {
+      "id": "immutable",
+      "label": "Immutable",
+      "ring": 1,
+      "position": "top-left",
+      "tag": "Core Property",
+      "desc": "Bitcoin's core monetary policy was fixed at inception and can never change. \"The nature of Bitcoin is such that once version 0.1 was released, the core design was set in stone for the rest of its lifetime.\" — Satoshi Nakamoto. Attempting to change it merely creates a different, inferior network.",
+      "relation": "Immutability ensures <strong>Neutral</strong> rules and protects <strong>Absolute Scarcity</strong>. What cannot be changed, cannot be corrupted."
+    },
+    {
+      "id": "predictable",
+      "label": "Predictable",
+      "ring": 2,
+      "position": "top",
+      "tag": "Emergent Property",
+      "desc": "Bitcoin's emission schedule is known with absolute certainty — every coin that will ever exist, and exactly when. No central bank surprises, no emergency printing, no policy pivots. For the first time in history, you know exactly what the monetary supply will be in 50 years, 100 years, and 1,000 years.",
+      "relation": "Flows directly from <strong>Absolute Scarcity</strong> and <strong>Immutable</strong> rules. Predictability is the foundation of long-term economic planning."
+    },
+    {
+      "id": "selfcustody",
+      "label": "Self-Custody",
+      "ring": 2,
+      "position": "upper-right-a",
+      "tag": "Emergent Property",
+      "desc": "Bitcoin is a true bearer instrument — it can be owned completely, with no dependency on any third party. Self-custody means no rehypothecation risk, no fractional reserve, no confiscation. The trend in bitcoin is toward decentralization of custody, making state expropriation practically impossible.",
+      "relation": "Enabled by <strong>Proof of Work</strong> security and <strong>Digital</strong> portability. This is private property on a level never before possible."
+    },
+    {
+      "id": "noissuer",
+      "label": "No Issuer",
+      "ring": 2,
+      "position": "upper-right-b",
+      "tag": "Emergent Property",
+      "desc": "No government, corporation, or individual controls bitcoin's creation or supply. There is no nexus of power that can be captured, corrupted, or lobbied. This eliminates the path to government expediency that destroyed every gold standard in history — in 1914, 1934, and 1971.",
+      "relation": "Where <strong>Absolute Scarcity</strong> meets <strong>Proof of Work</strong>: the supply is fixed by math, the security by energy. No human issuer is needed — or possible."
+    },
+    {
+      "id": "irreversible",
+      "label": "Irreversible",
+      "ring": 2,
+      "position": "right",
+      "tag": "Emergent Property",
+      "desc": "Bitcoin transactions are final settlement — real money changing hands, not promises or credit. This eliminates systemic fraud, chargebacks, and the hidden costs they impose on global commerce. True digital final settlement over the internet has never existed before.",
+      "relation": "Enabled by <strong>Proof of Work</strong> energy expenditure and <strong>Digital</strong> rails. Irreversibility is what makes bitcoin actual money, not credit."
+    },
+    {
+      "id": "borderless",
+      "label": "Borderless",
+      "ring": 2,
+      "position": "lower-right-a",
+      "tag": "Emergent Property",
+      "desc": "Bitcoin carries no nation-state affiliation. The ~180 fiat currencies fragment the global economy along political lines, adding pointless friction and uncertainty to every cross-border interaction. Bitcoin is a single, universal language of value that works identically for everyone, everywhere.",
+      "relation": "A natural consequence of being <strong>Digital</strong> and <strong>Neutral</strong>. A universal monetary language eliminates the absurdity of foreign exchange."
+    },
+    {
+      "id": "p2p",
+      "label": "Peer-to-Peer",
+      "ring": 2,
+      "position": "lower-right-b",
+      "tag": "Emergent Property",
+      "desc": "Bitcoin enables direct transactions between any two people on Earth with no intermediary required. No bank approval, no processing delay, no denial of service. This restores a direct, human economic relationship that intermediaries have long extracted from.",
+      "relation": "Combines <strong>Digital</strong> portability with <strong>Open Source</strong> rules anyone can verify. Peer-to-peer is the natural state of honest exchange."
+    },
+    {
+      "id": "trustless",
+      "label": "Trustless",
+      "ring": 2,
+      "position": "bottom",
+      "tag": "Emergent Property",
+      "desc": "Bitcoin is verified by mathematics, not by trusting people, institutions, or governments. The rules are enforced by code and physics, not promises. This removes the single greatest vulnerability of every previous monetary system: corruptible human nature.",
+      "relation": "Made possible by <strong>Open Source</strong> transparency and <strong>Decentralized</strong> verification. Trust is replaced by proof."
+    },
+    {
+      "id": "permissionless",
+      "label": "Permissionless",
+      "ring": 2,
+      "position": "lower-left-b",
+      "tag": "Emergent Property",
+      "desc": "No bank account, credit score, or government ID required. Bitcoin is accessible to all 8 billion people on Earth. The ~4 billion unbanked and underbanked globally are no longer excluded from the monetary system by arbitrary gatekeeping.",
+      "relation": "Flows from <strong>Open Source</strong> code and <strong>Decentralized</strong> infrastructure. When there are no gatekeepers, there are no gates."
+    },
+    {
+      "id": "antifragile",
+      "label": "Antifragile",
+      "ring": 2,
+      "position": "lower-left-a",
+      "tag": "Emergent Property",
+      "desc": "Government bans, media campaigns, exchange failures, attempted forks — every assault on bitcoin has made the network stronger and more resilient. Over 16 years of relentless adversarial testing has proven that what cannot be broken cannot be stopped.",
+      "relation": "Emerges from <strong>Decentralized</strong> architecture. The more distributed the network, the more it thrives under attack."
+    },
+    {
+      "id": "censorship",
+      "label": "Censorship Resistant",
+      "ring": 2,
+      "position": "left",
+      "tag": "Emergent Property",
+      "desc": "No entity can freeze, block, or confiscate your bitcoin. When Canada froze protesters' bank accounts and the U.S. seized Russian deposits, they proved that fiat has a kill switch. Bitcoin has no such vulnerability. Your money is yours.",
+      "relation": "The intersection of <strong>Decentralized</strong> enforcement and <strong>Immutable</strong> rules. What no single party controls, no single party can censor."
+    },
+    {
+      "id": "neutral",
+      "label": "Neutral",
+      "ring": 2,
+      "position": "upper-left-a",
+      "tag": "Emergent Property",
+      "desc": "Bitcoin is apolitical and non-sovereign. No nation has special privilege over it. It cannot be weaponized against other nations or their citizens. A good money should be recognized and valued even by your adversaries — otherwise it is merely a nation-state plaything.",
+      "relation": "Protected by <strong>Immutable</strong> rules that cannot favor anyone. Combined with being <strong>Borderless</strong>, bitcoin is the first truly universal money."
+    },
+    {
+      "id": "puremoney",
+      "label": "Pure Money",
+      "ring": 2,
+      "position": "upper-left-b",
+      "tag": "Emergent Property",
+      "desc": "Bitcoin has no alternative industrial or decorative uses — its value is entirely monetary. Unlike gold, whose price is distorted by jewelry and electronics demand, bitcoin is valued solely for what money should be: a ledger of stored economic energy. It is 100% monetary premium — pure money.",
+      "relation": "Where <strong>Immutable</strong> rules meet <strong>Absolute Scarcity</strong>: a fixed, unchangeable monetary asset with no value distortion from non-monetary uses."
+    }
+  ]
+}
