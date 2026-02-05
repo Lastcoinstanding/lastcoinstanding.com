@@ -39,7 +39,7 @@
         .flower-circle.active { stroke: var(--orange); stroke-opacity: 1; fill: rgba(247, 147, 26, 0.06); filter: url(#glow); }
         .hit-area { fill: transparent; stroke: none; cursor: pointer; }
         .float-label { transition: opacity 0.25s ease; pointer-events: none; }
-        .label-text { fill: var(--text-bright); font-size: 15px; font-weight: 700; text-anchor: middle; dominant-baseline: central; paint-order: stroke; stroke: var(--bg); stroke-width: 6px; stroke-linejoin: round; font-family: var(--font); letter-spacing: 0.02em; }
+        .label-text { fill: var(--text-bright); font-size: 15px; font-weight: 700; text-anchor: middle; dominant-baseline: central; paint-order: stroke; stroke: var(--bg); stroke-width: 4px; stroke-linejoin: round; font-family: var(--font); letter-spacing: 0.02em; }
         .progress { margin-top: 28px; width: 100%; max-width: 360px; text-align: center; }
         .progress-track { width: 100%; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background: var(--orange); border-radius: 1px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -68,7 +68,7 @@
         .flower-circle.ring-1.animate-in { animation-delay: 0.5s; }
         .flower-circle.ring-2.animate-in { animation-delay: 0.8s; }
         @media (max-width: 900px) { main { grid-template-columns: 1fr; gap: 24px; } .info-panel { position: static; min-height: auto; order: 2; } .viz-section { order: 1; } header { margin-bottom: 32px; } .page { padding: 32px 16px 48px; } .svg-wrap { max-width: 480px; } }
-        @media (max-width: 600px) { .page { padding: 24px 14px 40px; } header { margin-bottom: 24px; } header h1 { font-size: 1.5rem; } header .subtitle { font-size: 0.82rem; } .svg-wrap { max-width: 100%; } .info-panel { padding: 22px 18px; border-radius: 8px; } .concept-name { font-size: 1.25rem; margin-bottom: 14px; } .concept-desc { font-size: 0.85rem; } .concept-relation { font-size: 0.75rem; } .progress { margin-top: 20px; } .label-text { font-size: 21px; font-weight: 700; stroke-width: 9px; } }
+        @media (max-width: 600px) { .page { padding: 24px 14px 40px; } header { margin-bottom: 24px; } header h1 { font-size: 1.5rem; } header .subtitle { font-size: 0.82rem; } .svg-wrap { max-width: 100%; } .info-panel { padding: 22px 18px; border-radius: 8px; } .concept-name { font-size: 1.25rem; margin-bottom: 14px; } .concept-desc { font-size: 0.85rem; } .concept-relation { font-size: 0.75rem; } .progress { margin-top: 20px; } .label-text { font-size: 21px; font-weight: 700; stroke-width: 3px; } }
         @media (max-width: 380px) { header h1 { font-size: 1.3rem; } .info-panel { padding: 18px 14px; } .concept-name { font-size: 1.1rem; } }
 
         /* ═══ Site Nav ═══ */
@@ -253,7 +253,7 @@ function showLabel(id) {
     const isMobile = window.innerWidth <= 600;
     const fontSize = isMobile ? 21 : 15;
     const lineHeight = fontSize * 1.25;
-    const strokeW = isMobile ? 9 : 6;
+    const strokeW = isMobile ? 3 : 4;
     
     // Clear previous content
     while (l.children.length > 1) l.removeChild(l.lastChild);
