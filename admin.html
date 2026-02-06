@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Money Trees CMS — Admin</title>
+<title>Last Coin Standing — CMS</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -79,6 +79,46 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
 .info-box ol { color: var(--text); font-size: 1rem; line-height: 2; margin-left: 24px; margin-top: 10px; }
 .info-box a { color: var(--btc-orange); }
 
+/* ═══ PAGE SELECTOR ═══ */
+.page-selector {
+  display: flex;
+  gap: 0;
+  margin-bottom: 28px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  background: var(--bg-white);
+}
+
+.page-tab {
+  flex: 1;
+  padding: 16px 24px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  cursor: pointer;
+  background: var(--bg-white);
+  color: var(--text-muted);
+  transition: all 0.2s;
+  text-align: center;
+  border: none;
+  border-right: 1px solid var(--border-light);
+}
+
+.page-tab:last-child { border-right: none; }
+.page-tab:hover { background: var(--bg-page); }
+.page-tab.active { background: var(--btc-orange-light); color: var(--btc-orange); font-weight: 700; }
+
+.page-tab .page-tab-sub {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.page-tab.active .page-tab-sub { color: var(--btc-orange); opacity: 0.7; }
+
+/* ═══ EDITOR ═══ */
 .editor-panel { padding: 28px; max-width: 1400px; margin: 0 auto; }
 .tree-selector { display: flex; gap: 12px; margin-bottom: 28px; }
 
@@ -108,9 +148,10 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
 
 .tree-settings h3 { font-size: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
 .settings-row { display: flex; gap: 20px; flex-wrap: wrap; }
+.settings-row + .settings-row { margin-top: 16px; }
 .setting-field { flex: 1; min-width: 200px; }
 .setting-field label { display: block; font-size: 0.95rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
-.setting-field input {
+.setting-field input, .setting-field textarea {
   width: 100%;
   background: var(--bg-white);
   border: 2px solid var(--border);
@@ -118,9 +159,13 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
   padding: 12px 14px;
   color: var(--text);
   font-size: 1.1rem;
+  font-family: inherit;
+  resize: vertical;
 }
-.setting-field input:focus { outline: none; border-color: var(--btc-orange); }
+.setting-field input:focus, .setting-field textarea:focus { outline: none; border-color: var(--btc-orange); }
+.setting-field textarea { min-height: 80px; line-height: 1.6; }
 
+/* ═══ CLUSTER / WORD TABLE ═══ */
 .cluster-section {
   background: var(--bg-white);
   border-radius: 12px;
@@ -158,7 +203,7 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
 .word-count { font-size: 0.9rem; color: var(--text-muted); background: var(--bg-white); padding: 6px 12px; border-radius: 12px; border: 1px solid var(--border); }
 .cluster-header-right { display: flex; align-items: center; gap: 10px; }
 
-.delete-cluster {
+.delete-btn {
   background: none;
   border: 1px solid #ccc;
   color: #666;
@@ -167,10 +212,10 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
   font-size: 0.95rem;
   border-radius: 4px;
 }
+.delete-btn:hover { background: #fee; border-color: #e55; color: #c33; }
 
-.delete-cluster:hover { background: #fee; border-color: #e55; color: #c33; }
-.cluster-toggle { color: var(--text-muted); font-size: 1.4rem; transition: transform 0.2s; padding: 4px; }
-.cluster-section.collapsed .cluster-toggle { transform: rotate(-90deg); }
+.collapse-toggle { color: var(--text-muted); font-size: 1.4rem; transition: transform 0.2s; padding: 4px; }
+.cluster-section.collapsed .collapse-toggle { transform: rotate(-90deg); }
 .cluster-section.collapsed .cluster-content { display: none; }
 .cluster-content { padding: 20px; overflow-x: auto; }
 
@@ -223,19 +268,9 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
   line-height: 1.6;
 }
 
-.delete-word {
-  background: none;
-  border: 1px solid #ccc;
-  color: #666;
-  cursor: pointer;
-  padding: 8px 12px;
-  font-size: 1.2rem;
-  border-radius: 4px;
-}
+.word-table .delete-btn { padding: 8px 12px; font-size: 1.2rem; }
 
-.delete-word:hover { background: #fee; border-color: #e55; color: #c33; }
-
-.add-word-btn, .add-cluster-btn {
+.add-btn {
   padding: 14px 20px;
   background: var(--bg-page);
   border: 2px dashed var(--border);
@@ -247,9 +282,90 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
   width: 100%;
   margin-top: 16px;
 }
+.add-btn:hover { background: #e8e8e8; color: var(--text); border-color: #bbb; }
 
-.add-word-btn:hover, .add-cluster-btn:hover { background: #e8e8e8; color: var(--text); border-color: #bbb; }
+/* ═══ CONCEPT CARDS (Flower editor) ═══ */
+.concept-card {
+  background: var(--bg-white);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border: 2px solid var(--border);
+  overflow: hidden;
+}
 
+.concept-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--bg-page);
+  border-bottom: 2px solid var(--border);
+  cursor: pointer;
+}
+.concept-card-header:hover { background: #eaeaea; }
+.concept-card-header-left { display: flex; align-items: center; gap: 16px; }
+
+.ring-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.ring-badge.ring-0 { background: var(--btc-orange-light); color: var(--btc-orange); }
+.ring-badge.ring-1 { background: #e0f2fe; color: #0369a1; }
+.ring-badge.ring-2 { background: #f3e8ff; color: #7c3aed; }
+
+.concept-label-input {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+  width: 250px;
+}
+.concept-label-input:focus { outline: none; border-bottom: 2px solid var(--btc-orange); }
+
+.concept-card-header-right { display: flex; align-items: center; gap: 10px; }
+.concept-card.collapsed .concept-card-body { display: none; }
+.concept-card.collapsed .collapse-toggle { transform: rotate(-90deg); }
+
+.concept-card-body {
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.concept-field { display: flex; flex-direction: column; }
+.concept-field.full-width { grid-column: 1 / -1; }
+.concept-field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.concept-field input, .concept-field textarea, .concept-field select {
+  width: 100%;
+  background: var(--bg-white);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+.concept-field input:focus, .concept-field textarea:focus, .concept-field select:focus { outline: none; border-color: var(--btc-orange); background: #fffcf5; }
+.concept-field textarea { min-height: 140px; }
+
+/* ═══ TOAST / MODAL / RESPONSIVE ═══ */
 .toast {
   position: fixed;
   bottom: 24px;
@@ -266,7 +382,6 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
   transition: all 0.3s;
   z-index: 1001;
 }
-
 .toast.visible { opacity: 1; transform: translateY(0); }
 .toast.success { border-color: #4a4; background: #e8f5e9; color: #2e7d32; }
 
@@ -274,59 +389,33 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
 .file-input-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
 
 .modal-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.2s;
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.2s;
 }
-
 .modal-overlay.visible { opacity: 1; visibility: visible; }
 
 .modal {
-  background: var(--bg-white);
-  border-radius: 12px;
-  width: 90%;
-  max-width: 520px;
-  border: 2px solid var(--border);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  background: var(--bg-white); border-radius: 12px; width: 90%; max-width: 520px;
+  border: 2px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.2);
 }
-
-.modal-header {
-  padding: 24px 28px;
-  border-bottom: 2px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
+.modal-header { padding: 24px 28px; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 .modal-header h2 { font-size: 1.3rem; color: var(--text); }
 .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; }
 .modal-close:hover { color: var(--text); }
 .modal-body { padding: 28px; }
 .modal-body p { color: var(--text); font-size: 1rem; line-height: 1.7; margin-bottom: 18px; }
 .modal-body code { background: var(--bg-page); padding: 3px 8px; border-radius: 4px; font-size: 0.95rem; border: 1px solid var(--border); }
-.modal-body input {
-  width: 100%;
-  background: var(--bg-white);
-  border: 2px solid var(--border);
-  border-radius: 6px;
-  padding: 14px 16px;
-  color: var(--text);
-  font-size: 1.05rem;
-  margin-bottom: 10px;
-}
+.modal-body input { width: 100%; background: var(--bg-white); border: 2px solid var(--border); border-radius: 6px; padding: 14px 16px; color: var(--text); font-size: 1.05rem; margin-bottom: 10px; }
 .modal-body input:focus { outline: none; border-color: var(--btc-orange); }
 .modal-body .hint { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
 .modal-body .hint a { color: var(--btc-orange); }
 .modal-footer { padding: 20px 28px; border-top: 2px solid var(--border); display: flex; justify-content: flex-end; gap: 14px; }
 
 .publishing { pointer-events: none; opacity: 0.7; }
+.editor-section { display: none; }
+.editor-section.active { display: block; }
 
 @media (max-width: 768px) {
   header { padding: 14px 18px; }
@@ -337,6 +426,9 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
   .col-syn, .col-insight, .col-contrast { display: none; }
   .word-table { min-width: unset; }
   .col-desc { width: auto; }
+  .page-tab { padding: 12px 14px; font-size: 0.95rem; }
+  .page-tab .page-tab-sub { font-size: 0.72rem; }
+  .concept-card-body { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 1200px) and (min-width: 769px) {
@@ -349,13 +441,13 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
 <body>
 
 <header>
-  <h1>Money Trees <span>CMS</span></h1>
+  <h1>Last Coin Standing <span>CMS</span></h1>
   <div class="header-actions">
     <div class="file-input-wrapper">
-      <button class="btn btn-secondary">Load data.json</button>
+      <button class="btn btn-secondary">Load JSON</button>
       <input type="file" id="file-input" accept=".json" onchange="loadFile(event)">
     </div>
-    <button class="btn btn-secondary" onclick="downloadJSON()">⬇ Download</button>
+    <button class="btn btn-secondary" onclick="downloadCurrentJSON()">⬇ Download</button>
     <button class="btn btn-success" onclick="publishToGitHub()">🚀 Publish</button>
   </div>
 </header>
@@ -363,22 +455,43 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
 <div class="info-box">
   <h3>How to Update Your Site</h3>
   <ol>
-    <li>Edit words, descriptions, deeper insights, contrasts, and synonyms below</li>
+    <li>Choose which page to edit below, then make your changes</li>
     <li>Click <strong>"🚀 Publish"</strong> to push changes live</li>
     <li>First time? You'll need to enter your <a href="#" onclick="showTokenHelp(); return false;">GitHub token</a> (one-time setup)</li>
   </ol>
 </div>
 
 <div class="editor-panel">
-  <div class="tree-selector">
-    <div class="tree-tab btc active" onclick="switchTree('btc')">Bitcoin Tree</div>
-    <div class="tree-tab fiat" onclick="switchTree('fiat')">Fiat Tree</div>
+  <!-- PAGE SELECTOR -->
+  <div class="page-selector">
+    <div class="page-tab active" onclick="switchPage('trees')">
+      The Money Trees
+      <span class="page-tab-sub">data.json</span>
+    </div>
+    <div class="page-tab" onclick="switchPage('flower')">
+      Bitcoin Dimensions
+      <span class="page-tab-sub">concepts.json</span>
+    </div>
   </div>
-  
-  <div id="tree-settings"></div>
-  <div id="editor-content"></div>
+
+  <!-- MONEY TREES EDITOR -->
+  <div class="editor-section active" id="section-trees">
+    <div class="tree-selector">
+      <div class="tree-tab btc active" onclick="switchTree('btc')">Bitcoin Tree</div>
+      <div class="tree-tab fiat" onclick="switchTree('fiat')">Fiat Tree</div>
+    </div>
+    <div id="tree-settings"></div>
+    <div id="editor-content"></div>
+  </div>
+
+  <!-- FLOWER OF LIFE EDITOR -->
+  <div class="editor-section" id="section-flower">
+    <div id="flower-settings"></div>
+    <div id="flower-content"></div>
+  </div>
 </div>
 
+<!-- TOKEN MODAL -->
 <div class="modal-overlay" id="token-modal">
   <div class="modal">
     <div class="modal-header">
@@ -389,7 +502,7 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
       <p>To publish directly, you need a GitHub Personal Access Token. This is stored only in your browser.</p>
       <input type="password" id="token-input" placeholder="Paste your GitHub token here">
       <p class="hint">
-        <a href="https://github.com/settings/tokens/new?description=Money%20Trees%20CMS&scopes=repo" target="_blank">→ Click here to create a token</a><br>
+        <a href="https://github.com/settings/tokens/new?description=Last%20Coin%20Standing%20CMS&scopes=repo" target="_blank">→ Click here to create a token</a><br>
         Select <code>repo</code> scope, then copy the token.
       </p>
     </div>
@@ -403,336 +516,30 @@ header h1 span { color: var(--text-muted); font-weight: 400; }
 <div class="toast" id="toast"></div>
 
 <script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let currentPage = 'trees';
 let currentTree = 'btc';
 
-let data = {
-  "bitcoin": {
-    "title": "Bitcoin",
-    "subtitle": "Sound money · Sovereignty · Truth",
-    "clusters": [
-      {
-        "name": "Sovereignty",
-        "words": [
-          { "word": "Freedom", "description": "The ability to transact without permission from any authority. Bitcoin restores financial self-determination.", "synonyms": ["Liberty", "Autonomy"] },
-          { "word": "Self-custody", "description": "You hold your own keys, your own wealth. No intermediary can freeze, seize, or deny access.", "synonyms": ["Control", "Ownership"] },
-          { "word": "Autonomy", "description": "Independence from institutional gatekeepers. Your money answers only to you.", "synonyms": ["Independence"] },
-          { "word": "Permissionless", "description": "No application required. No approval needed. Anyone can participate in the network.", "synonyms": ["Open", "Accessible"] },
-          { "word": "Sovereign", "description": "Each holder is their own bank, their own central authority over their wealth.", "synonyms": ["Self-ruling"] }
-        ]
-      },
-      {
-        "name": "Integrity",
-        "words": [
-          { "word": "Truth", "description": "An immutable ledger that cannot lie. Every transaction is verifiable, transparent, and permanent.", "synonyms": ["Honesty", "Veracity"] },
-          { "word": "Incorruptible", "description": "No entity can alter the rules, manipulate supply, or corrupt the protocol for personal gain.", "synonyms": ["Pure", "Untainted"] },
-          { "word": "Transparent", "description": "Open-source code and a public ledger. Anyone can audit, verify, and trust through verification.", "synonyms": ["Open", "Visible"] },
-          { "word": "Immutable", "description": "What is written cannot be erased. The ledger is permanent and tamper-proof.", "synonyms": ["Permanent", "Fixed"] },
-          { "word": "Trustless", "description": "No need to trust any party. The protocol enforces rules through mathematics, not promises.", "synonyms": ["Verifiable"] }
-        ]
-      },
-      {
-        "name": "Scarcity",
-        "words": [
-          { "word": "21 Million", "description": "The absolute, unalterable cap. No more can ever exist. Digital scarcity perfected.", "synonyms": ["Fixed supply", "Hard cap"] },
-          { "word": "Finite", "description": "Unlike fiat which can be printed infinitely, Bitcoin has mathematical limits baked into its code.", "synonyms": ["Limited", "Bounded"] },
-          { "word": "Sound", "description": "Money that cannot be debased or diluted. Its purchasing power is protected by code.", "synonyms": ["Hard", "Reliable"] },
-          { "word": "Pristine", "description": "Collateral with no counterparty risk. An asset that is no one's liability.", "synonyms": ["Pure", "Clean"] },
-          { "word": "Deflationary", "description": "As adoption grows against fixed supply, each unit represents more of the world's value.", "synonyms": ["Appreciating"] }
-        ]
-      },
-      {
-        "name": "Resilience",
-        "words": [
-          { "word": "Antifragile", "description": "Attacks make it stronger. Each challenge overcome proves and improves the network.", "synonyms": ["Robust", "Hardened"] },
-          { "word": "Decentralized", "description": "No single point of failure. Thousands of nodes across the globe ensure survival.", "synonyms": ["Distributed"] },
-          { "word": "Unstoppable", "description": "No government, corporation, or individual can stop a valid transaction.", "synonyms": ["Censorship-resistant"] },
-          { "word": "Persistent", "description": "Running continuously since 2009. The network has never been successfully attacked or shut down.", "synonyms": ["Enduring"] }
-        ]
-      },
-      {
-        "name": "Nature",
-        "words": [
-          { "word": "Organic", "description": "Emerged spontaneously without central planning. Grew through voluntary adoption, not mandate.", "synonyms": ["Natural", "Emergent"] },
-          { "word": "Meritocratic", "description": "No privileges, no special access. Everyone plays by the same rules enforced by code.", "synonyms": ["Fair", "Equal"] },
-          { "word": "Voluntary", "description": "Adoption by choice, not coercion. People opt in because they recognize its value.", "synonyms": ["Consensual"] },
-          { "word": "Elegant", "description": "Simple rules create complex, beautiful order. Satoshi's design is minimalist perfection.", "synonyms": ["Simple", "Beautiful"] }
-        ]
-      },
-      {
-        "name": "Energy",
-        "words": [
-          { "word": "Proof-of-Work", "description": "Real energy expenditure secures the network. Unforgeable costliness creates true value.", "synonyms": ["PoW", "Mining"] },
-          { "word": "Grounded", "description": "Anchored to physical reality through energy consumption. Not abstract promises but real resources.", "synonyms": ["Rooted", "Real"] },
-          { "word": "Thermodynamic", "description": "Security backed by the laws of physics. Attacking requires expending real-world energy.", "synonyms": ["Physical"] },
-          { "word": "Productive", "description": "Mining incentivizes renewable energy development and utilizes stranded power.", "synonyms": ["Efficient"] }
-        ]
-      },
-      {
-        "name": "Time",
-        "words": [
-          { "word": "Lindy", "description": "The longer it survives, the longer it's likely to survive. Each year adds to its life expectancy.", "synonyms": ["Time-tested"] },
-          { "word": "Patient", "description": "Rewards low time preference. Encourages saving over consumption, planning over impulse.", "synonyms": ["Long-term"] },
-          { "word": "Generational", "description": "Wealth that can be passed down intact. A store of value for centuries, not just years.", "synonyms": ["Legacy", "Heritage"] },
-          { "word": "Eternal", "description": "Designed to outlast institutions, governments, and perhaps civilizations.", "synonyms": ["Timeless"] }
-        ]
-      },
-      {
-        "name": "Virtue",
-        "words": [
-          { "word": "Honest", "description": "Cannot lie about supply, cannot hide transactions, cannot pretend to be what it's not.", "synonyms": ["Truthful", "Sincere"] },
-          { "word": "Courageous", "description": "Challenges the most powerful institutions on Earth. A peaceful revolution in money.", "synonyms": ["Bold", "Brave"] },
-          { "word": "Humble", "description": "No central authority claims credit. No face on the coin. The protocol serves, not rules.", "synonyms": ["Modest"] },
-          { "word": "Hopeful", "description": "Offers a path to sound money for all humanity. A tool for human flourishing.", "synonyms": ["Optimistic"] }
-        ]
-      }
-    ]
-  },
-  "fiat": {
-    "title": "Fiat",
-    "subtitle": "Broken money · Coercion · Decay",
-    "clusters": [
-      {
-        "name": "Coercion",
-        "words": [
-          { "word": "Compulsory", "description": "Legal tender laws force acceptance. You have no choice but to use their money.", "synonyms": ["Mandatory", "Forced"] },
-          { "word": "Permissioned", "description": "Every transaction requires approval. Banks, governments, and payment processors are gatekeepers.", "synonyms": ["Controlled"] },
-          { "word": "Censored", "description": "Accounts frozen, transactions blocked, access denied. Your money is only yours if they allow it.", "synonyms": ["Blocked", "Silenced"] },
-          { "word": "Surveilled", "description": "Every transaction tracked, recorded, analyzed. Financial privacy is extinct.", "synonyms": ["Monitored"] },
-          { "word": "Confiscated", "description": "Bail-ins, asset freezes, civil forfeiture. They can take what they claim is yours.", "synonyms": ["Seized", "Stolen"] }
-        ]
-      },
-      {
-        "name": "Dishonesty",
-        "words": [
-          { "word": "Opaque", "description": "Central bank decisions made in closed rooms. The true money supply is unknowable.", "synonyms": ["Hidden", "Secret"] },
-          { "word": "Manipulated", "description": "Interest rates, money supply, exchange rates—all artificially controlled.", "synonyms": ["Rigged", "Distorted"] },
-          { "word": "Fabricated", "description": "Created from nothing with a keystroke. No backing, no constraint, no substance.", "synonyms": ["Invented"] },
-          { "word": "Deceptive", "description": "Inflation is called 'stimulus.' Money printing is 'quantitative easing.' Lies wrapped in jargon.", "synonyms": ["Misleading"] },
-          { "word": "Fraudulent", "description": "Fractional reserve banking creates money that doesn't exist. A system built on accounting fiction.", "synonyms": ["Counterfeit"] }
-        ]
-      },
-      {
-        "name": "Theft",
-        "words": [
-          { "word": "Inflation", "description": "The silent tax that steals purchasing power while you sleep. Your savings evaporate.", "synonyms": ["Debasement"] },
-          { "word": "Cantillon", "description": "Those closest to the money printer benefit first. Everyone else pays through rising prices.", "synonyms": ["Inequality"] },
-          { "word": "Seigniorage", "description": "The profit governments extract by creating money worth more than its cost to produce.", "synonyms": ["Hidden tax"] },
-          { "word": "Expropriation", "description": "Bail-ins turn depositors into unwilling bank investors. Your money becomes their capital.", "synonyms": ["Seizure"] }
-        ]
-      },
-      {
-        "name": "Fragility",
-        "words": [
-          { "word": "Centralized", "description": "Single points of failure everywhere. One decision, one hack, one policy can collapse it all.", "synonyms": ["Concentrated"] },
-          { "word": "Fragile", "description": "Requires constant intervention to prevent collapse. Held together by faith and force.", "synonyms": ["Brittle", "Weak"] },
-          { "word": "Dependent", "description": "Relies on trusted third parties at every step. Trust that is regularly betrayed.", "synonyms": ["Vulnerable"] },
-          { "word": "Corruptible", "description": "Human administrators can be bribed, threatened, or simply make mistakes.", "synonyms": ["Exploitable"] },
-          { "word": "Unstable", "description": "Boom and bust cycles engineered by monetary policy. Volatility by design.", "synonyms": ["Chaotic"] }
-        ]
-      },
-      {
-        "name": "Decay",
-        "words": [
-          { "word": "Debasement", "description": "Every unit becomes worth less over time. Designed to lose value. Guaranteed to fail.", "synonyms": ["Erosion", "Dilution"] },
-          { "word": "Ephemeral", "description": "Average fiat currency lifespan: 27 years. All eventually go to zero.", "synonyms": ["Temporary"] },
-          { "word": "Terminal", "description": "The mathematical endpoint of compound inflation is always hyperinflation or collapse.", "synonyms": ["Dying", "Doomed"] },
-          { "word": "Unsalvageable", "description": "Too much debt, too much printing. The system cannot be reformed, only replaced.", "synonyms": ["Irreparable"] }
-        ]
-      },
-      {
-        "name": "Artifice",
-        "words": [
-          { "word": "Contrived", "description": "Designed by committees, imposed by decree. Nothing natural about it.", "synonyms": ["Artificial"] },
-          { "word": "Arbitrary", "description": "Rules change on political whims. What's allowed today may be forbidden tomorrow.", "synonyms": ["Capricious"] },
-          { "word": "Abstract", "description": "Disconnected from physical reality. Numbers on screens backed by nothing but promises.", "synonyms": ["Unreal", "Virtual"] },
-          { "word": "Bureaucratic", "description": "Layers of administration extract value and add friction. Paper-pushers everywhere.", "synonyms": ["Administrative"] }
-        ]
-      }
-    ]
-  }
+let treesData = {
+  "bitcoin": { "title": "Bitcoin", "subtitle": "Sound money", "clusters": [{ "name": "Core", "words": [{ "word": "Freedom", "description": "Default.", "synonyms": [] }] }] },
+  "fiat": { "title": "Fiat", "subtitle": "Broken money", "clusters": [{ "name": "Core", "words": [{ "word": "Compulsory", "description": "Default.", "synonyms": [] }] }] }
 };
 
-// Escape HTML to prevent XSS and handle special characters
+let flowerData = {
+  "meta": { "title": "What Bitcoin Is", "subtitle": "", "completionTitle": "", "completionDesc": "", "completionRelation": "", "panelIntro": "", "panelIntroSecondary": "", "panelCta": "Click any circle to begin" },
+  "concepts": [{ "id": "bitcoin", "label": "Bitcoin", "ring": 0, "position": "center", "tag": "The Foundation", "desc": "", "relation": "" }]
+};
+
+// ═══════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════
 function escapeHtml(text) {
   if (!text) return '';
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
-}
-
-function renderEditor() {
-  const treeKey = currentTree === 'btc' ? 'bitcoin' : 'fiat';
-  const treeData = data[treeKey];
-  const container = document.getElementById('editor-content');
-  const settingsContainer = document.getElementById('tree-settings');
-  
-  container.className = currentTree === 'fiat' ? 'fiat-view' : '';
-  
-  settingsContainer.innerHTML = `
-    <div class="tree-settings">
-      <h3>Tree Settings</h3>
-      <div class="settings-row">
-        <div class="setting-field">
-          <label>Title</label>
-          <input type="text" value="${treeData.title}" onchange="updateTreeSetting('title', this.value)">
-        </div>
-        <div class="setting-field">
-          <label>Subtitle</label>
-          <input type="text" value="${treeData.subtitle}" onchange="updateTreeSetting('subtitle', this.value)">
-        </div>
-      </div>
-    </div>
-  `;
-  
-  let html = '';
-  
-  treeData.clusters.forEach((cluster, ci) => {
-    html += `
-      <div class="cluster-section" id="cluster-${ci}">
-        <div class="cluster-header" onclick="toggleCluster(${ci})">
-          <div class="cluster-header-left">
-            <input type="text" class="cluster-name-input" 
-                   value="${cluster.name}" 
-                   onclick="event.stopPropagation()"
-                   onchange="updateClusterName(${ci}, this.value)">
-            <span class="word-count">${cluster.words.length} words</span>
-          </div>
-          <div class="cluster-header-right">
-            <button class="delete-cluster" onclick="event.stopPropagation(); deleteCluster(${ci})">Delete</button>
-            <span class="cluster-toggle">▼</span>
-          </div>
-        </div>
-        <div class="cluster-content">
-          <table class="word-table">
-            <thead>
-              <tr>
-                <th class="col-word">Word</th>
-                <th class="col-desc">Description</th>
-                <th class="col-insight">Deeper Insight</th>
-                <th class="col-contrast">Contrast</th>
-                <th class="col-syn">Synonyms</th>
-                <th class="col-actions"></th>
-              </tr>
-            </thead>
-            <tbody>
-              ${cluster.words.map((word, wi) => `
-                <tr>
-                  <td><input type="text" class="word-input" value="${escapeHtml(word.word)}" onchange="updateWord(${ci}, ${wi}, 'word', this.value)"></td>
-                  <td><textarea onchange="updateWord(${ci}, ${wi}, 'description', this.value)">${escapeHtml(word.description || '')}</textarea></td>
-                  <td><textarea class="insight-input" onchange="updateWord(${ci}, ${wi}, 'deeperInsight', this.value)" placeholder="Extended insight...">${escapeHtml(word.deeperInsight || '')}</textarea></td>
-                  <td><textarea class="contrast-input" onchange="updateWord(${ci}, ${wi}, 'contrast', this.value)" placeholder="Contrasting perspective...">${escapeHtml(word.contrast || '')}</textarea></td>
-                  <td><input type="text" class="syn-input" value="${(word.synonyms || []).join(', ')}" onchange="updateSynonyms(${ci}, ${wi}, this.value)" placeholder="comma separated"></td>
-                  <td><button class="delete-word" onclick="deleteWord(${ci}, ${wi})" title="Delete">×</button></td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-          <button class="add-word-btn" onclick="addWord(${ci})">+ Add Word</button>
-        </div>
-      </div>
-    `;
-  });
-  
-  html += `<button class="add-cluster-btn" onclick="addCluster()">+ Add New Cluster</button>`;
-  container.innerHTML = html;
-}
-
-function switchTree(tree) {
-  currentTree = tree;
-  document.querySelectorAll('.tree-tab').forEach(tab => tab.classList.toggle('active', tab.classList.contains(tree)));
-  renderEditor();
-}
-
-function toggleCluster(ci) { document.getElementById(`cluster-${ci}`).classList.toggle('collapsed'); }
-
-function updateTreeSetting(field, value) {
-  const treeKey = currentTree === 'btc' ? 'bitcoin' : 'fiat';
-  data[treeKey][field] = value;
-}
-
-function updateClusterName(ci, value) {
-  const treeKey = currentTree === 'btc' ? 'bitcoin' : 'fiat';
-  data[treeKey].clusters[ci].name = value;
-}
-
-function updateWord(ci, wi, field, value) {
-  const treeKey = currentTree === 'btc' ? 'bitcoin' : 'fiat';
-  data[treeKey].clusters[ci].words[wi][field] = value;
-}
-
-function updateSynonyms(ci, wi, value) {
-  const treeKey = currentTree === 'btc' ? 'bitcoin' : 'fiat';
-  data[treeKey].clusters[ci].words[wi].synonyms = value.split(',').map(s => s.trim()).filter(s => s);
-}
-
-function addWord(ci) {
-  const treeKey = currentTree === 'btc' ? 'bitcoin' : 'fiat';
-  data[treeKey].clusters[ci].words.push({ 
-    word: "New Word", 
-    description: "Description goes here.", 
-    deeperInsight: "",
-    contrast: "",
-    synonyms: [] 
-  });
-  renderEditor();
-}
-
-function deleteWord(ci, wi) {
-  const treeKey = currentTree === 'btc' ? 'bitcoin' : 'fiat';
-  if (data[treeKey].clusters[ci].words.length > 1) {
-    data[treeKey].clusters[ci].words.splice(wi, 1);
-    renderEditor();
-  } else {
-    showToast('Cannot delete the last word');
-  }
-}
-
-function addCluster() {
-  const treeKey = currentTree === 'btc' ? 'bitcoin' : 'fiat';
-  data[treeKey].clusters.push({ name: "New Cluster", words: [{ word: "Word", description: "Description", synonyms: [] }] });
-  renderEditor();
-}
-
-function deleteCluster(ci) {
-  const treeKey = currentTree === 'btc' ? 'bitcoin' : 'fiat';
-  if (data[treeKey].clusters.length > 1) {
-    if (confirm(`Delete "${data[treeKey].clusters[ci].name}" cluster?`)) {
-      data[treeKey].clusters.splice(ci, 1);
-      renderEditor();
-    }
-  } else {
-    showToast('Cannot delete the last cluster');
-  }
-}
-
-function downloadJSON() {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'data.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-  showToast('data.json downloaded!', 'success');
-}
-
-function loadFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const loaded = JSON.parse(e.target.result);
-      if (!loaded.bitcoin || !loaded.fiat) throw new Error('Invalid format');
-      data = loaded;
-      renderEditor();
-      showToast('Data loaded!', 'success');
-    } catch (err) {
-      showToast('Error: ' + err.message);
-    }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
 }
 
 function showToast(msg, type = '') {
@@ -742,134 +549,294 @@ function showToast(msg, type = '') {
   setTimeout(() => toast.classList.remove('visible'), 3000);
 }
 
-// GitHub Publishing
+// ═══════════════════════════════════════════════════════════
+// PAGE SWITCHING
+// ═══════════════════════════════════════════════════════════
+function switchPage(page) {
+  currentPage = page;
+  document.querySelectorAll('.page-tab').forEach((tab, i) => {
+    tab.classList.toggle('active', (i === 0 && page === 'trees') || (i === 1 && page === 'flower'));
+  });
+  document.getElementById('section-trees').classList.toggle('active', page === 'trees');
+  document.getElementById('section-flower').classList.toggle('active', page === 'flower');
+  if (page === 'flower') renderFlowerEditor();
+}
+
+// ═══════════════════════════════════════════════════════════
+// MONEY TREES EDITOR
+// ═══════════════════════════════════════════════════════════
+function renderTreeEditor() {
+  const treeKey = currentTree === 'btc' ? 'bitcoin' : 'fiat';
+  const td = treesData[treeKey];
+  const container = document.getElementById('editor-content');
+  const settings = document.getElementById('tree-settings');
+  container.className = currentTree === 'fiat' ? 'fiat-view' : '';
+
+  settings.innerHTML = `
+    <div class="tree-settings">
+      <h3>Tree Settings</h3>
+      <div class="settings-row">
+        <div class="setting-field"><label>Title</label><input type="text" value="${escapeHtml(td.title)}" onchange="updateTreeSetting('title', this.value)"></div>
+        <div class="setting-field"><label>Subtitle</label><input type="text" value="${escapeHtml(td.subtitle)}" onchange="updateTreeSetting('subtitle', this.value)"></div>
+      </div>
+    </div>`;
+
+  let html = '';
+  td.clusters.forEach((cluster, ci) => {
+    html += `
+      <div class="cluster-section" id="cluster-${ci}">
+        <div class="cluster-header" onclick="toggleEl('cluster-${ci}')">
+          <div class="cluster-header-left">
+            <input type="text" class="cluster-name-input" value="${escapeHtml(cluster.name)}" onclick="event.stopPropagation()" onchange="updateClusterName(${ci}, this.value)">
+            <span class="word-count">${cluster.words.length} words</span>
+          </div>
+          <div class="cluster-header-right">
+            <button class="delete-btn" onclick="event.stopPropagation(); deleteCluster(${ci})">Delete</button>
+            <span class="collapse-toggle">▼</span>
+          </div>
+        </div>
+        <div class="cluster-content">
+          <table class="word-table">
+            <thead><tr>
+              <th class="col-word">Word</th><th class="col-desc">Description</th>
+              <th class="col-insight">Deeper Insight</th><th class="col-contrast">Contrast</th>
+              <th class="col-syn">Synonyms</th><th class="col-actions"></th>
+            </tr></thead>
+            <tbody>
+              ${cluster.words.map((w, wi) => `<tr>
+                <td><input type="text" class="word-input" value="${escapeHtml(w.word)}" onchange="updateWord(${ci},${wi},'word',this.value)"></td>
+                <td><textarea onchange="updateWord(${ci},${wi},'description',this.value)">${escapeHtml(w.description||'')}</textarea></td>
+                <td><textarea class="insight-input" onchange="updateWord(${ci},${wi},'deeperInsight',this.value)" placeholder="Extended insight...">${escapeHtml(w.deeperInsight||'')}</textarea></td>
+                <td><textarea class="contrast-input" onchange="updateWord(${ci},${wi},'contrast',this.value)" placeholder="Contrasting perspective...">${escapeHtml(w.contrast||'')}</textarea></td>
+                <td><input type="text" class="syn-input" value="${(w.synonyms||[]).join(', ')}" onchange="updateSynonyms(${ci},${wi},this.value)" placeholder="comma separated"></td>
+                <td><button class="delete-btn" onclick="deleteWord(${ci},${wi})" title="Delete">×</button></td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+          <button class="add-btn" onclick="addWord(${ci})">+ Add Word</button>
+        </div>
+      </div>`;
+  });
+  html += `<button class="add-btn" onclick="addCluster()">+ Add New Cluster</button>`;
+  container.innerHTML = html;
+}
+
+function switchTree(tree) {
+  currentTree = tree;
+  document.querySelectorAll('.tree-tab').forEach(tab => tab.classList.toggle('active', tab.classList.contains(tree)));
+  renderTreeEditor();
+}
+
+function toggleEl(id) { document.getElementById(id).classList.toggle('collapsed'); }
+
+function updateTreeSetting(f, v) { treesData[currentTree === 'btc' ? 'bitcoin' : 'fiat'][f] = v; }
+function updateClusterName(ci, v) { treesData[currentTree === 'btc' ? 'bitcoin' : 'fiat'].clusters[ci].name = v; }
+function updateWord(ci, wi, f, v) { treesData[currentTree === 'btc' ? 'bitcoin' : 'fiat'].clusters[ci].words[wi][f] = v; }
+function updateSynonyms(ci, wi, v) { treesData[currentTree === 'btc' ? 'bitcoin' : 'fiat'].clusters[ci].words[wi].synonyms = v.split(',').map(s=>s.trim()).filter(s=>s); }
+
+function addWord(ci) {
+  treesData[currentTree === 'btc' ? 'bitcoin' : 'fiat'].clusters[ci].words.push({ word: "New Word", description: "", deeperInsight: "", contrast: "", synonyms: [] });
+  renderTreeEditor();
+}
+
+function deleteWord(ci, wi) {
+  const k = currentTree === 'btc' ? 'bitcoin' : 'fiat';
+  if (treesData[k].clusters[ci].words.length > 1) { treesData[k].clusters[ci].words.splice(wi, 1); renderTreeEditor(); }
+  else showToast('Cannot delete the last word');
+}
+
+function addCluster() {
+  treesData[currentTree === 'btc' ? 'bitcoin' : 'fiat'].clusters.push({ name: "New Cluster", words: [{ word: "Word", description: "", deeperInsight: "", contrast: "", synonyms: [] }] });
+  renderTreeEditor();
+}
+
+function deleteCluster(ci) {
+  const k = currentTree === 'btc' ? 'bitcoin' : 'fiat';
+  if (treesData[k].clusters.length > 1) { if (confirm(`Delete "${treesData[k].clusters[ci].name}"?`)) { treesData[k].clusters.splice(ci, 1); renderTreeEditor(); } }
+  else showToast('Cannot delete the last cluster');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FLOWER OF LIFE EDITOR
+// ═══════════════════════════════════════════════════════════
+function renderFlowerEditor() {
+  const s = document.getElementById('flower-settings');
+  const c = document.getElementById('flower-content');
+  const m = flowerData.meta;
+
+  s.innerHTML = `
+    <div class="tree-settings">
+      <h3>Page Settings</h3>
+      <div class="settings-row">
+        <div class="setting-field"><label>Page Title</label><input type="text" value="${escapeHtml(m.title)}" onchange="flowerData.meta.title=this.value"></div>
+        <div class="setting-field"><label>Subtitle</label><input type="text" value="${escapeHtml(m.subtitle)}" onchange="flowerData.meta.subtitle=this.value"></div>
+      </div>
+      <div class="settings-row">
+        <div class="setting-field"><label>Panel Intro</label><textarea onchange="flowerData.meta.panelIntro=this.value">${escapeHtml(m.panelIntro)}</textarea></div>
+        <div class="setting-field"><label>Panel Secondary</label><textarea onchange="flowerData.meta.panelIntroSecondary=this.value">${escapeHtml(m.panelIntroSecondary)}</textarea></div>
+      </div>
+      <div class="settings-row">
+        <div class="setting-field"><label>Panel CTA</label><input type="text" value="${escapeHtml(m.panelCta)}" onchange="flowerData.meta.panelCta=this.value"></div>
+        <div class="setting-field"><label>Completion Title</label><input type="text" value="${escapeHtml(m.completionTitle)}" onchange="flowerData.meta.completionTitle=this.value"></div>
+      </div>
+      <div class="settings-row">
+        <div class="setting-field"><label>Completion Description</label><textarea onchange="flowerData.meta.completionDesc=this.value">${escapeHtml(m.completionDesc)}</textarea></div>
+        <div class="setting-field"><label>Completion Relation (HTML ok)</label><textarea onchange="flowerData.meta.completionRelation=this.value">${escapeHtml(m.completionRelation)}</textarea></div>
+      </div>
+    </div>`;
+
+  const ringLabels = { 0: 'Center', 1: 'Core Property', 2: 'Emergent Property' };
+  let html = `<h3 style="font-size:1rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:16px;">Concepts (${flowerData.concepts.length})</h3>`;
+
+  flowerData.concepts.forEach((con, i) => {
+    html += `
+      <div class="concept-card" id="concept-${i}">
+        <div class="concept-card-header" onclick="toggleEl('concept-${i}')">
+          <div class="concept-card-header-left">
+            <span class="ring-badge ring-${con.ring}">${ringLabels[con.ring] || 'Ring '+con.ring}</span>
+            <input type="text" class="concept-label-input" value="${escapeHtml(con.label)}" onclick="event.stopPropagation()" onchange="flowerData.concepts[${i}].label=this.value">
+          </div>
+          <div class="concept-card-header-right">
+            <button class="delete-btn" onclick="event.stopPropagation(); deleteConcept(${i})">Delete</button>
+            <span class="collapse-toggle">▼</span>
+          </div>
+        </div>
+        <div class="concept-card-body">
+          <div class="concept-field"><label>ID (unique key)</label><input type="text" value="${escapeHtml(con.id)}" onchange="flowerData.concepts[${i}].id=this.value"></div>
+          <div class="concept-field"><label>Tag</label><input type="text" value="${escapeHtml(con.tag)}" onchange="flowerData.concepts[${i}].tag=this.value"></div>
+          <div class="concept-field">
+            <label>Ring</label>
+            <select onchange="flowerData.concepts[${i}].ring=parseInt(this.value); renderFlowerEditor();">
+              <option value="0" ${con.ring===0?'selected':''}>0 — Center</option>
+              <option value="1" ${con.ring===1?'selected':''}>1 — Core Property</option>
+              <option value="2" ${con.ring===2?'selected':''}>2 — Emergent Property</option>
+            </select>
+          </div>
+          <div class="concept-field"><label>Position</label><input type="text" value="${escapeHtml(con.position)}" onchange="flowerData.concepts[${i}].position=this.value" placeholder="e.g. top, top-right, center"></div>
+          <div class="concept-field full-width"><label>Description</label><textarea onchange="flowerData.concepts[${i}].desc=this.value">${escapeHtml(con.desc)}</textarea></div>
+          <div class="concept-field full-width"><label>Relation (HTML ok — use &lt;strong&gt; for cross-references)</label><textarea onchange="flowerData.concepts[${i}].relation=this.value">${escapeHtml(con.relation)}</textarea></div>
+        </div>
+      </div>`;
+  });
+
+  html += `<button class="add-btn" onclick="addConcept()">+ Add New Concept</button>`;
+  c.innerHTML = html;
+}
+
+function addConcept() {
+  flowerData.concepts.push({ id: "new-concept", label: "New Concept", ring: 2, position: "top", tag: "Emergent Property", desc: "", relation: "" });
+  renderFlowerEditor();
+}
+
+function deleteConcept(i) {
+  if (flowerData.concepts.length > 1) { if (confirm(`Delete "${flowerData.concepts[i].label}"?`)) { flowerData.concepts.splice(i, 1); renderFlowerEditor(); } }
+  else showToast('Cannot delete the last concept');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FILE I/O
+// ═══════════════════════════════════════════════════════════
+function downloadCurrentJSON() {
+  const isFlower = currentPage === 'flower';
+  const blob = new Blob([JSON.stringify(isFlower ? flowerData : treesData, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = isFlower ? 'concepts.json' : 'data.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast(`${a.download} downloaded!`, 'success');
+}
+
+function loadFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const loaded = JSON.parse(e.target.result);
+      if (loaded.bitcoin && loaded.fiat) {
+        treesData = loaded; switchPage('trees'); renderTreeEditor();
+        showToast('Loaded data.json (Money Trees)', 'success');
+      } else if (loaded.meta && loaded.concepts) {
+        flowerData = loaded; switchPage('flower'); renderFlowerEditor();
+        showToast('Loaded concepts.json (Flower of Life)', 'success');
+      } else { throw new Error('Unrecognized format'); }
+    } catch (err) { showToast('Error: ' + err.message); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ═══════════════════════════════════════════════════════════
+// GITHUB PUBLISHING
+// ═══════════════════════════════════════════════════════════
 const REPO_OWNER = 'Lastcoinstanding';
 const REPO_NAME = 'lastcoinstanding.com';
-const FILE_PATH = 'data.json';
 
-function getToken() {
-  return localStorage.getItem('github_token');
-}
-
-function saveToken(token) {
-  localStorage.setItem('github_token', token);
-}
-
-function showTokenModal() {
-  document.getElementById('token-modal').classList.add('visible');
-  document.getElementById('token-input').value = getToken() || '';
-}
-
-function closeModal() {
-  document.getElementById('token-modal').classList.remove('visible');
-}
-
-function showTokenHelp() {
-  showTokenModal();
-}
-
+function getToken() { return localStorage.getItem('github_token'); }
+function saveToken(t) { localStorage.setItem('github_token', t); }
+function showTokenModal() { document.getElementById('token-modal').classList.add('visible'); document.getElementById('token-input').value = getToken() || ''; }
+function closeModal() { document.getElementById('token-modal').classList.remove('visible'); }
+function showTokenHelp() { showTokenModal(); }
 function saveTokenAndPublish() {
-  const token = document.getElementById('token-input').value.trim();
-  if (!token) {
-    showToast('Please enter a token');
-    return;
-  }
-  saveToken(token);
-  closeModal();
-  publishToGitHub();
+  const t = document.getElementById('token-input').value.trim();
+  if (!t) { showToast('Please enter a token'); return; }
+  saveToken(t); closeModal(); publishToGitHub();
 }
 
 async function publishToGitHub() {
   const token = getToken();
-  
-  if (!token) {
-    showTokenModal();
-    return;
-  }
-  
-  const publishBtn = document.querySelector('.btn-success');
-  const originalText = publishBtn.textContent;
-  publishBtn.textContent = '⏳ Publishing...';
-  publishBtn.classList.add('publishing');
-  
+  if (!token) { showTokenModal(); return; }
+
+  const isFlower = currentPage === 'flower';
+  const filePath = isFlower ? 'concepts.json' : 'data.json';
+  const data = isFlower ? flowerData : treesData;
+  const label = isFlower ? 'Flower of Life' : 'Money Trees';
+
+  const btn = document.querySelector('.btn-success');
+  const orig = btn.textContent;
+  btn.textContent = '⏳ Publishing...';
+  btn.classList.add('publishing');
+
   try {
-    // Get the current file SHA (needed for updates)
-    const getResponse = await fetch(
-      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`,
-      {
-        headers: {
-          'Authorization': `token ${token}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      }
-    );
-    
+    const getRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
     let sha = null;
-    if (getResponse.ok) {
-      const fileData = await getResponse.json();
-      sha = fileData.sha;
-    }
-    
-    // Prepare the content
+    if (getRes.ok) sha = (await getRes.json()).sha;
+
     const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
-    
-    // Create or update the file
-    const updateResponse = await fetch(
-      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Authorization': `token ${token}`,
-          'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          message: 'Update Money Trees content via CMS',
-          content: content,
-          sha: sha
-        })
-      }
-    );
-    
-    if (updateResponse.ok) {
-      showToast('✓ Published! Site will update in ~30 seconds.', 'success');
-    } else {
-      const error = await updateResponse.json();
-      if (updateResponse.status === 401) {
-        localStorage.removeItem('github_token');
-        showToast('Token invalid or expired. Please re-enter.');
-        showTokenModal();
-      } else {
-        showToast('Error: ' + (error.message || 'Failed to publish'));
-      }
+    const putRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`, {
+      method: 'PUT',
+      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: `Update ${label} content via CMS`, content, sha })
+    });
+
+    if (putRes.ok) showToast(`✓ ${label} published! Site updates in ~30s.`, 'success');
+    else {
+      const err = await putRes.json();
+      if (putRes.status === 401) { localStorage.removeItem('github_token'); showToast('Token invalid or expired.'); showTokenModal(); }
+      else showToast('Error: ' + (err.message || 'Failed'));
     }
-  } catch (err) {
-    showToast('Error: ' + err.message);
-  } finally {
-    publishBtn.textContent = originalText;
-    publishBtn.classList.remove('publishing');
-  }
+  } catch (err) { showToast('Error: ' + err.message); }
+  finally { btn.textContent = orig; btn.classList.remove('publishing'); }
 }
 
+// ═══════════════════════════════════════════════════════════
+// INIT — load both JSON files
+// ═══════════════════════════════════════════════════════════
 async function init() {
+  const loaded = [];
   try {
-    const res = await fetch('data.json');
-    if (res.ok) {
-      const loaded = await res.json();
-      if (loaded.bitcoin && loaded.fiat) {
-        data = loaded;
-        showToast('Loaded data.json', 'success');
-      } else {
-        showToast('Invalid data.json format', '');
-      }
-    } else {
-      showToast('Could not load data.json - using defaults', '');
-    }
-  } catch (e) {
-    console.error('Failed to load data.json:', e);
-    showToast('Could not load data.json - using defaults', '');
-  }
-  renderEditor();
+    const r = await fetch('data.json');
+    if (r.ok) { const d = await r.json(); if (d.bitcoin && d.fiat) { treesData = d; loaded.push('data.json'); } }
+  } catch(e) {}
+  try {
+    const r = await fetch('concepts.json');
+    if (r.ok) { const d = await r.json(); if (d.meta && d.concepts) { flowerData = d; loaded.push('concepts.json'); } }
+  } catch(e) {}
+
+  renderTreeEditor();
+  if (loaded.length) showToast('Loaded ' + loaded.join(' + '), 'success');
+  else showToast('Using defaults — load your JSON files to edit', '');
 }
 
 init();
