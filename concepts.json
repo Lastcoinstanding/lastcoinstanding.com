@@ -1,13 +1,13 @@
 {
   "meta": {
     "title": "What Bitcoin Is",
-    "subtitle": "Most people see one dimension. Bitcoin is all of them, simultaneously.",
+    "subtitle": "Most people just one dimension. Bitcoin is all of them, simultaneously.",
     "completionTitle": "The Full Picture",
     "completionDesc": "Bitcoin is the simultaneous achievement of all these properties — something no previous money has ever accomplished. The question is not whether bitcoin is special. The question is whether you can identify anything else — past, present, or conceivable future — that achieves even half of what you see here.",
     "completionRelation": "This is <strong>The Bitcoin Migration</strong> — the exodus from an inherently broken monetary network that can't be fixed, to an inherently strong monetary network that can't be broken.",
     "panelIntro": "Each circle in this geometry represents a critical dimension of what makes bitcoin the ideal money.",
-    "panelIntroSecondary": "No previous money — including gold — has achieved even half of these properties simultaneously. Bitcoin achieves all of them.",
-    "panelCta": "Click any circle to begin"
+    "panelIntroSecondary": "No previous money, including gold, has achieved even half of these properties simultaneously. Bitcoin achieves all of them.",
+    "panelCta": "Click the center of any circle to begin"
   },
   "concepts": [
     {
