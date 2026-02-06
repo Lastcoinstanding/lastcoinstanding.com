@@ -16,8 +16,8 @@
       "ring": 0,
       "position": "center",
       "tag": "The Foundation",
-      "desc": "Bitcoin is the first and only money to simultaneously achieve every property represented here — properties that no previous money, including gold, has ever accomplished together. Each circle represents one critical dimension. Together they describe what is arguably the most important monetary breakthrough in human civilization.",
-      "relation": "Every outer circle flows from and reinforces the center. Bitcoin is not any single property — it is the unprecedented <strong>convergence</strong> of all of them."
+      "desc": "Bitcoin is the first and only money to simultaneously achieve every property represented here - properties that no previous money, including gold, has ever accomplished together. Each circle represents one critical dimension. Together they describe what is arguably the most important monetary breakthrough in human civilization.",
+      "relation": "Every outer circle flows from and reinforces the center. Bitcoin is not any single property - it is the unprecedented <strong>convergence</strong> of all of them."
     },
     {
       "id": "scarcity",
@@ -25,7 +25,7 @@
       "ring": 1,
       "position": "top",
       "tag": "Core Property",
-      "desc": "There will only ever be 21 million bitcoin — not approximately, exactly. This is the first absolutely scarce monetary asset in human history. Gold expands at ~2% per year; fiat has no limit at all. Bitcoin is a closed system with zero supply response to demand — a foundational breakthrough in the concept of money itself.",
+      "desc": "There will only ever be 21 million bitcoin - not approximately, exactly. This is the first absolutely scarce monetary asset in human history. Gold expands at ~2% per year; fiat has no limit at all. Bitcoin is a closed system with zero supply response to demand - a foundational breakthrough in the concept of money itself.",
       "relation": "Directly enables <strong>Predictable</strong> monetary policy and underpins <strong>Pure Money</strong> status. No issuer can tamper with what is mathematically fixed."
     },
     {
@@ -34,7 +34,7 @@
       "ring": 1,
       "position": "top-right",
       "tag": "Core Property",
-      "desc": "Every bitcoin is produced through real energy expenditure that cannot be faked, replicated, or shortcut. Proof of work anchors digital scarcity to the physical world — each block is a thermodynamic proof that someone paid a real, unforgeable cost. This is what separates bitcoin from every other digital asset.",
+      "desc": "Every bitcoin is produced through real energy expenditure that cannot be faked. Proof of work anchors digital scarcity to the physical world - each block is a thermodynamic proof that someone paid a real, unforgeable cost. This is what separates bitcoin from every other digital asset. Gold similarly has proof of work - the difficulty in mining it. Fiat has zero proof of work.",
       "relation": "Anchors <strong>Absolute Scarcity</strong> to reality. Enables <strong>Self-Custody</strong> of an asset with genuine production cost, and makes transactions <strong>Irreversible</strong>."
     },
     {
@@ -43,7 +43,7 @@
       "ring": 1,
       "position": "bottom-right",
       "tag": "Core Property",
-      "desc": "Bitcoin is native to the internet — a bearer instrument that can be teleported anywhere on Earth. No physical money can settle across distance in real time. No digital fiat is a bearer instrument. Bitcoin is digitally conservative: it can move instantly, but it cannot be copied or double-spent.",
+      "desc": "Bitcoin is native to the internet - a bearer instrument that can be teleported anywhere on Earth. No physical money can settle across distance in real time. No digital fiat is a bearer instrument. Bitcoin is digitally conservative: it can move instantly, but it cannot be copied or double-spent. This properly makes it ideal for global trade and final settlement, in minutes - something that has never existed before in human civilization.",
       "relation": "The digital nature makes bitcoin <strong>Borderless</strong> and enables true <strong>Peer-to-Peer</strong> settlement across any distance, in real time."
     },
     {
@@ -52,7 +52,7 @@
       "ring": 1,
       "position": "bottom",
       "tag": "Core Property",
-      "desc": "Every line of Bitcoin's code is public. Every transaction, every block, every rule is transparent and verifiable by anyone on Earth. There is nothing about bitcoin that is secret, hidden, or permissioned. When opponents criticize open source, they reveal a preference for opacity and control.",
+      "desc": "Every line of Bitcoin's code is public. Every transaction, every block, every rule is transparent and verifiable by anyone on Earth. There is nothing about bitcoin that is secret, hidden, or permissioned. When opponents criticize open source, they inadvertently reveal their preference for opacity and control. Importantly, Bitcoin is also \"open\" to everyone and anyone, globally, everywhere and always.",
       "relation": "Transparency is the basis for being <strong>Trustless</strong>. Combined with <strong>Decentralized</strong> enforcement, open source makes the rules unchallengeable."
     },
     {
@@ -61,7 +61,7 @@
       "ring": 1,
       "position": "bottom-left",
       "tag": "Core Property",
-      "desc": "Tens of thousands of independent nodes worldwide enforce Bitcoin's rules identically. No headquarters, no CEO, no board of directors. There is no central point of failure to attack, no central authority to capture, and no individual or entity capable of unilaterally influencing the network.",
+      "desc": "Tens of thousands of independent nodes worldwide enforce Bitcoin's rules identically. No headquarters, no CEO, no board of directors. There is no central point of failure to attack, no central authority to capture, and no individual or entity capable of unilaterally influencing the network. Importantly it is relatively inexpensive to run a node; most people can do it. Bitcoin is now vastly more decentralized than any other digital monetary network; there is no competition for this absolutely critical dimension of what makes an ideal money.",
       "relation": "Distribution is what makes bitcoin <strong>Antifragile</strong> and <strong>Censorship Resistant</strong>. No single point of failure means no single point of control."
     },
     {
@@ -70,7 +70,7 @@
       "ring": 1,
       "position": "top-left",
       "tag": "Core Property",
-      "desc": "Bitcoin's core monetary policy was fixed at inception and can never change. \"The nature of Bitcoin is such that once version 0.1 was released, the core design was set in stone for the rest of its lifetime.\" — Satoshi Nakamoto. Attempting to change it merely creates a different, inferior network.",
+      "desc": "Bitcoin's core monetary policy was fixed at inception and can never change. \"The nature of Bitcoin is such that once version 0.1 was released, the core design was set in stone for the rest of its lifetime.\" — Satoshi Nakamoto. Attempting to change it merely creates a different, inferior network, with opportunity cost for participation in that inferior network. This introduces a game-theory dimension that makes Bitcoin even more impervious and inevitable.",
       "relation": "Immutability ensures <strong>Neutral</strong> rules and protects <strong>Absolute Scarcity</strong>. What cannot be changed, cannot be corrupted."
     },
     {
@@ -79,7 +79,7 @@
       "ring": 2,
       "position": "top",
       "tag": "Emergent Property",
-      "desc": "Bitcoin's emission schedule is known with absolute certainty — every coin that will ever exist, and exactly when. No central bank surprises, no emergency printing, no policy pivots. For the first time in history, you know exactly what the monetary supply will be in 50 years, 100 years, and 1,000 years.",
+      "desc": "Bitcoin's emission schedule is known with absolute certainty - every coin that will ever exist, and approximately by when. No central bank surprises, no emergency printing, no policy pivots. For the first time in history, you know exactly what the monetary supply will be in 50 years, 100 years, and 1,000 years. If you acquire a share of the monetary network, that share is fixed for eternity. This important property has never existed for any other money in the history of human civilization.",
       "relation": "Flows directly from <strong>Absolute Scarcity</strong> and <strong>Immutable</strong> rules. Predictability is the foundation of long-term economic planning."
     },
     {
