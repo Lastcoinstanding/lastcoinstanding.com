@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About | Last Coin Standing</title>
+  <meta name="description" content="About Last Coin Standing — Bitcoin education through interactive tools, first-principles thinking, and philosophical examination of sound money.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --btc-orange: #f7931a;
+      --bg: #0a0c0f;
+      --text: #e8e0d5;
+      --text-muted: #8b8680;
+      --text-dim: #666;
+      --border: #1a1a1a;
+      --surface: rgba(255,255,255,0.03);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "DM Sans", -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV (matches site exactly) ── */
+    .site-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background: rgba(10, 12, 15, 0.95);
+      border-bottom: 1px solid rgb(26, 26, 26);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      backdrop-filter: blur(12px);
+    }
+    .site-nav .brand {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #555;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .site-nav .brand:hover { color: var(--btc-orange); }
+    .site-nav .nav-links { display: flex; gap: 8px; }
+    .site-nav .nav-links a {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: #666;
+      text-decoration: none;
+      padding: 5px 12px;
+      border-radius: 4px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .site-nav .nav-links a:hover {
+      color: #aaa;
+      background: rgba(255,255,255,0.04);
+    }
+    .site-nav .nav-links a.active {
+      color: var(--btc-orange);
+      background: rgba(247, 147, 26, 0.08);
+    }
+
+    /* ── PAGE LAYOUT ── */
+    .about-page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 60px 32px 80px;
+    }
+
+    /* ── PAGE TITLE ── */
+    .page-title {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 3.2rem;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      text-align: center;
+      color: var(--text);
+      margin-bottom: 60px;
+    }
+
+    /* ── SECTIONS ── */
+    .about-section {
+      margin-bottom: 52px;
+    }
+    .about-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-label {
+      font-family: "DM Sans", -apple-system, sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--btc-orange);
+      margin-bottom: 20px;
+    }
+
+    .about-section p {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--text);
+      margin-bottom: 16px;
+      font-weight: 400;
+    }
+    .about-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ── PHOTO + BIO LAYOUT ── */
+    .bio-header {
+      display: flex;
+      gap: 36px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .bio-photo {
+      width: 180px;
+      min-width: 180px;
+      height: 180px;
+      border-radius: 6px;
+      object-fit: cover;
+      object-position: center 20%;
+      border: 1px solid rgba(247, 147, 26, 0.15);
+    }
+    .bio-name {
+      font-family: "DM Sans", -apple-system, sans-serif;
+      font-size: 1.65rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .bio-handle {
+      font-size: 0.95rem;
+      color: var(--btc-orange);
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+    .bio-text p {
+      font-size: 1.0rem;
+      line-height: 1.75;
+    }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 48px 0;
+    }
+
+    /* ── PUBLISHED LIST ── */
+    .published-list {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+    .published-list li {
+      margin-bottom: 12px;
+      padding-left: 18px;
+      position: relative;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    .published-list li::before {
+      content: "₿";
+      position: absolute;
+      left: 0;
+      color: var(--btc-orange);
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+    .published-list .pub-source {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    .published-list a {
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(247, 147, 26, 0.25);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .published-list a:hover {
+      color: var(--btc-orange);
+      border-color: var(--btc-orange);
+    }
+
+    /* ── CONNECT LINKS ── */
+    .connect-links {
+      display: flex;
+      gap: 24px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+    .connect-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: all 0.25s;
+    }
+    .connect-link:hover {
+      color: var(--btc-orange);
+      border-color: rgba(247, 147, 26, 0.4);
+      background: rgba(247, 147, 26, 0.05);
+    }
+    .connect-link svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* ── CLOSING QUOTE ── */
+    .closing-section p {
+      font-size: 1.1rem;
+      line-height: 1.85;
+      font-style: italic;
+      color: var(--text);
+    }
+    .closing-section .last-line {
+      font-style: normal;
+      font-weight: 500;
+      color: var(--btc-orange);
+      margin-top: 8px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── INLINE LINK STYLE ── */
+    .about-section a {
+      color: var(--btc-orange);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(247, 147, 26, 0.3);
+      transition: border-color 0.2s;
+    }
+    .about-section a:hover {
+      border-color: var(--btc-orange);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .about-page {
+        padding: 40px 20px 60px;
+      }
+      .page-title {
+        font-size: 2.4rem;
+        margin-bottom: 44px;
+      }
+      .bio-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 20px;
+      }
+      .bio-photo {
+        width: 160px;
+        min-width: 160px;
+        height: 160px;
+      }
+      .bio-name, .bio-handle {
+        text-align: center;
+      }
+      .bio-text p {
+        text-align: left;
+      }
+      .connect-links {
+        justify-content: center;
+      }
+      .about-section p {
+        font-size: 1rem;
+      }
+      .site-nav .brand {
+        font-size: 0.65rem;
+      }
+      .site-nav .nav-links a {
+        font-size: 0.78rem;
+        padding: 4px 8px;
+      }
+      .site-nav .nav-links {
+        gap: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV — matches existing site -->
+<nav class="site-nav">
+  <a href="/" class="brand">Last Coin Standing</a>
+  <div class="nav-links">
+    <a href="/">The Money Trees</a>
+    <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+    <a href="/about.html" class="active">About</a>
+  </div>
+</nav>
+
+<main class="about-page">
+
+  <h1 class="page-title">About</h1>
+
+  <!-- SECTION 1: THE MISSION -->
+  <section class="about-section">
+    <div class="section-label">The Mission</div>
+    <p>Last Coin Standing exists to help people better understand Bitcoin — from perspectives and angles they may not have encountered before. This isn't about investment thesis, and it's not a deep dive into the technical underpinnings of the protocol. It's a philosophical examination and appreciation of Bitcoin's unique properties, from first principles: what makes it special, what makes it unprecedented, and why it is likely to become the last coin standing.</p>
+    <p>The interactive tools on this site are designed to drive home these insights with visceral impact.</p>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 2: WHO I AM -->
+  <section class="about-section">
+    <div class="section-label">Who I Am</div>
+
+    <div class="bio-header">
+      <img src="images/profile.jpg" alt="John McCabe" class="bio-photo">
+      <div class="bio-text">
+        <div class="bio-name">John McCabe</div>
+        <div class="bio-handle">@lastcoinstandng</div>
+        <p>I'm a Bitcoin Maxi, putting in my few thousand hours since 2017. I have a degree in Economics and Business from Trinity College Dublin, and an MBA from the Kellogg School of Management at Northwestern University. I've spent 25 years working in Product Management in Silicon Valley, including long stints at Yahoo and Mastercard — the latter focused specifically on merchant loyalty, an expertise I've since turned toward Bitcoin.</p>
+      </div>
+    </div>
+
+    <p>I'm currently working full-time on a Bitcoin venture.</p>
+
+    <p>I've been published in Bitcoin Magazine and have been a guest on a number of Bitcoin podcasts. Bitcoin is the most important of my interests and I devote a significant amount of my time — professional and personal — to better understanding it and helping others understand it, to the extent that I can.</p>
+
+    <ul class="published-list">
+      <li>
+        <span class="pub-source">Bitcoin Magazine</span><br>
+        <a href="https://bitcoinmagazine.com/business/merchant-loyalty-competitive-advantage-reimagined-through-bitcoin" target="_blank" rel="noopener">Merchant Loyalty Competitive Advantage — Reimagined Through Bitcoin</a>
+      </li>
+      <li>
+        <span class="pub-source">Once Bitten! A Bitcoin Podcast · Episode #480</span><br>
+        <a href="https://overcast.fm/+Xf9H0x50I" target="_blank" rel="noopener">Leaving Mastercard To Work On Bitcoin</a>
+      </li>
+      <li>
+        <span class="pub-source">Bitcoin for Millennials · with Bram Kanstein</span><br>
+        <a href="https://www.youtube.com/watch?v=PH6C9AncQEo" target="_blank" rel="noopener">Video Interview</a>
+      </li>
+    </ul>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 3: WHAT YOU'LL FIND HERE -->
+  <section class="about-section">
+    <div class="section-label">What You'll Find Here</div>
+    <p>On this site you'll find interactive tools designed to make Bitcoin's principles tangible — from the <a href="/">Money Trees</a>, which contrast the vocabulary of sound money against the language of fiat, to <a href="/what-bitcoin-is.html">What Bitcoin Is</a>, which explores Bitcoin's unique properties in an interconnected visual format.</p>
+    <p>I also write longer-form pieces on my <a href="https://lastcoinstanding.substack.com" target="_blank" rel="noopener">Substack</a>, exploring the economic, philosophical, and strategic dimensions of the Bitcoin migration. My goal is to provide coherent insights that move you toward a deeper understanding of what Bitcoin is — and an appreciation of why it represents a paradigm shift. More to come.</p>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 4: CONNECT -->
+  <section class="about-section">
+    <div class="section-label">Connect</div>
+    <p>I'm always interested in connecting with others who are thinking seriously about Bitcoin's role in the real economy — whether that's monetary theory, the broader migration from fiat to sound money, or the future Bitcoin is making possible. If you'd like to connect, have me on your podcast, or share ideas, reach out.</p>
+
+    <div class="connect-links">
+      <a href="https://www.linkedin.com/in/jmccabe1/" target="_blank" rel="noopener" class="connect-link">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://lastcoinstanding.substack.com" target="_blank" rel="noopener" class="connect-link">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/></svg>
+        Substack
+      </a>
+      <a href="https://x.com/lastcoinstandng" target="_blank" rel="noopener" class="connect-link">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        @lastcoinstandng
+      </a>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 5: WHY LAST COIN STANDING -->
+  <section class="about-section closing-section">
+    <div class="section-label">Why "Last Coin Standing"?</div>
+    <p>Bitcoin may be the most consequential development since the printing press — a once-in-civilization opportunity to advance human prosperity in a way nothing else can. I write about it, build tools around it, and work on it full-time because I believe its destiny is to become the last coin standing.</p>
+  </section>
+
+</main>
+
+<footer>lastcoinstanding.com</footer>
+
+</body>
+</html>
