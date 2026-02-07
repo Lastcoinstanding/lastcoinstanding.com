@@ -242,7 +242,7 @@ function handleClick(id) {
     concepts.forEach(c => {
         const el = document.getElementById(`circle-${c.id}`);
         el.classList.remove('hover','active','explored');
-        if (c.id === activeId) el.classList.add('active');
+        if (c.id === activeId) { el.classList.add('active'); el.parentNode.appendChild(el); }
         else if (explored.has(c.id)) el.classList.add('explored');
     });
     document.getElementById('svgWrap').classList.add('has-explored');
