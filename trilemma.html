@@ -444,7 +444,7 @@ footer a:hover { text-decoration: underline; }
         <!-- D-Se edge glow -->
         <line x1="250" y1="80" x2="60" y2="400" stroke="#F7931A" stroke-width="6" stroke-opacity="0.08" filter="url(#glow-orange)"/>
 
-        <!-- Edge labels -->
+        <!-- Edge labels — ALL INTER for legibility -->
         <text x="132" y="235" fill="#F7931A" fill-opacity="0.55" font-family="Inter, sans-serif" font-size="18" font-weight="700" letter-spacing="0.12em" transform="rotate(-60, 132, 235)">BITCOIN'S CHOICE</text>
         <text x="250" y="290" fill="#a09890" font-family="Inter, sans-serif" font-size="22" font-weight="500" text-anchor="middle" font-style="italic">"Pick any two"</text>
         <text x="358" y="222" fill="#a09890" font-family="Inter, sans-serif" font-size="17" font-weight="500" text-anchor="middle" font-style="italic" transform="rotate(60, 358, 222)">faster but fragile</text>
@@ -520,10 +520,10 @@ footer a:hover { text-decoration: underline; }
         <div class="panel-label security">SECURITY</div>
         <div class="panel-title">What if Security Is Relaxed?</div>
         <div class="panel-body">
-          <p>Security is the system's resilience against adversaries possessing up to <strong>O(n)</strong> resources. Bitcoin achieves this through Proof of Work — requiring enormous real-world energy expenditure that makes attacks prohibitively expensive. The network's hash rate represents an immovable wall of thermodynamic cost.</p>
+          <p>Security is the system's resilience against adversaries. Bitcoin achieves this through Proof of Work - requiring enormous real-world energy expenditure that makes attacks prohibitively expensive. The network's hash rate represents an immovable wall of thermodynamic cost.</p>
           <p>If you relax security, you get <strong>speed and participation, but vulnerability to attack</strong>. Faster consensus algorithms or lower security thresholds allow more throughput, but they open the door to 51% attacks, double-spending, and ledger manipulation.</p>
           <div class="panel-verdict bad">
-            <strong>The result:</strong> A fast, accessible network — but one that can be seized, censored, or rewritten by a sufficiently motivated adversary. Money that can be manipulated is not sound money.
+            <strong>The result:</strong> A fast, accessible network - but one that can be seized, censored, or rewritten by a sufficiently motivated adversary. Money that can be manipulated is not sound money.
           </div>
           <div class="example-box">
             <div class="example-label">Real-World Failures</div>
@@ -540,15 +540,15 @@ footer a:hover { text-decoration: underline; }
         <div class="panel-label scalability">SCALABILITY</div>
         <div class="panel-title">What if Scalability Is Relaxed?</div>
         <div class="panel-body">
-          <p>Scalability is the capacity to process a transaction volume <strong>O(n)</strong> that significantly exceeds what a single node can handle <strong>O(c)</strong>. High throughput, low fees, instant settlement — the properties every payment network desires.</p>
-          <p>If you relax scalability at the base layer — as Bitcoin does — you preserve <strong>decentralization and security simultaneously</strong>. The base layer becomes a high-integrity settlement medium: slow, deliberate, and unbreakable. Approximately 400,000 transactions per day, each representing final, censorship-resistant settlement.</p>
+          <p>Scalability is the capacity to process high transaction volumes. Superficially this sounds like a great feture; high throughput, low fees, instant settlement - the properties every payment network desires.</p>
+          <p>If you relax scalability at the base layer, as Bitcoin does, you preserve <strong>decentralization and security simultaneously</strong>. The base layer becomes a high-integrity settlement medium: slow, deliberate, and unbreakable. Approximately 400,000 transactions per day, each representing final, censorship-resistant settlement.</p>
           <div class="panel-verdict good">
-            <strong>Bitcoin's choice:</strong> This is the correct tradeoff. The base layer is an armored tank — designed for settlement, not coffee purchases. Scalability is then addressed through <strong>layered architecture</strong>: the Lightning Network, sidechains, and application layers handle high-velocity payments while the base layer preserves monetary integrity.
+            <strong>Bitcoin's choice:</strong> This is the correct tradeoff. The base layer is an armored tank - designed for settlement, not coffee purchases. Scalability is then addressed through <strong>layered architecture</strong>: the Lightning Network, sidechains, and application layers handle high-velocity payments while the base layer preserves monetary integrity.
           </div>
           <div class="example-box">
             <div class="example-label">The Layered Solution</div>
             <div class="example-content">
-              Just as <strong>Fedwire</strong> settles $80 trillion in value with fewer than 20 million transactions per month while Visa handles consumer payments above it — Bitcoin's Layer 1 provides settlement finality while Lightning and other Layer 2 solutions provide speed. Each L1 transaction can represent thousands of bundled L2 payments.
+              Just as <strong>Fedwire</strong> settles $80 trillion in value with fewer than 20 million transactions per month while Visa handles consumer payments above it - Bitcoin's Layer 1 provides settlement finality while Lightning and other Layer 2 solutions provide speed (Lightning can already support more transactions per second than Visa and Mastercard combined). Each L1 transaction can represent thousands of bundled L2 payments.
             </div>
           </div>
         </div>
@@ -560,10 +560,10 @@ footer a:hover { text-decoration: underline; }
   <div class="btc-choice">
     <h2>Why This Is the Only Path to Sound Money</h2>
     <p>
-      Bitcoin solved <strong>decentralization and security together</strong> for the first time in human history. Every other network that has tried to optimize for scalability at the base layer has necessarily sacrificed one or both — and has lost value against Bitcoin as a result.
+      Bitcoin solved <strong>decentralization and security together</strong> for the first time in human history. Every other network that has tried to optimize for scalability at the base layer has necessarily sacrificed one or both.
     </p>
     <p>
-      Bitcoin Cash, Bitcoin SV, Litecoin, and scores of "faster" alternatives all made the same mistake: treating base-layer speed as the priority. The market has consistently rewarded <strong>monetary integrity over transaction velocity</strong>, because a digital asset must establish itself as a credible <strong>Store of Value</strong> before it can function as a <strong>Medium of Exchange</strong>.
+      Bitcoin Cash, Bitcoin SV, Litecoin, and scores of "faster" alternatives all made the same mistake: treating base-layer speed as the priority. The market has consistently rewarded <strong>monetary integrity over transaction velocity</strong>, because a monetary integrity has to be an impervious foundation upon which the any new, global monetary network will be built. Bitcoin's <strong>Medium of Exchange</strong> role, while ultimately critical, is best supported as on 2nd layers.
     </p>
     <p>
       The layered approach is the only architecture that preserves an immutable, decentralized foundation while achieving the throughput required to serve eight billion people.
