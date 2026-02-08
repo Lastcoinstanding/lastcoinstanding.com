@@ -877,17 +877,20 @@ function resetAll() {
         radial.setAttribute('opacity', '0.6');
     }
 
-    // Reset mesh lines
+    // Reset mesh lines - clone and replace to fully reset animation state
     var meshLines = document.querySelectorAll('.mesh-line');
     for (var m = 0; m < meshLines.length; m++) {
-        meshLines[m].classList.remove('active');
-        meshLines[m].style.opacity = '0';
-        meshLines[m].setAttribute('stroke', 'rgba(247,147,26,0.35)');
-        meshLines[m].setAttribute('stroke-dasharray', 'none');
-        // Reset animation
-        meshLines[m].style.animation = 'none';
-        void meshLines[m].offsetHeight;
-        meshLines[m].setAttribute('stroke-dashoffset', '300');
+        var ml = meshLines[m];
+        ml.classList.remove('active');
+        ml.style.animation = 'none';
+        ml.style.opacity = '0';
+        ml.setAttribute('stroke', 'rgba(247,147,26,0.35)');
+        ml.setAttribute('stroke-width', '1');
+        ml.setAttribute('stroke-dasharray', '300');
+        ml.setAttribute('stroke-dashoffset', '300');
+        // Force reflow to reset animation state
+        void ml.offsetWidth;
+        ml.style.animation = '';
     }
 
     // Reset core
