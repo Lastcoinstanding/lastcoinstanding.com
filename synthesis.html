@@ -18,7 +18,7 @@
             --red: #e74c3c;
             --red-dim: rgba(231,76,60,0.15);
             --text: #e8e0d5;
-            --text-dim: #666;
+            --text-dim: #999;
             --text-bright: #f0f0f0;
             --font: 'Outfit', sans-serif;
         }
@@ -38,7 +38,7 @@
         .page { max-width: 1140px; margin: 0 auto; padding: 48px 24px 60px; }
         header { text-align: center; margin-bottom: 48px; }
         header h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; color: var(--orange); letter-spacing: -0.02em; margin-bottom: 10px; }
-        header .subtitle { font-size: clamp(0.85rem, 1.6vw, 1.0rem); color: var(--text-dim); font-weight: 400; letter-spacing: 0.01em; line-height: 1.6; max-width: 560px; margin: 0 auto; }
+        header .subtitle { font-size: clamp(0.85rem, 1.6vw, 1.0rem); color: #bbb; font-weight: 400; letter-spacing: 0.01em; line-height: 1.6; max-width: 560px; margin: 0 auto; }
         header .subtitle .line1 { display: block; margin-bottom: 2px; }
 
         /* ═══ Main Grid ═══ */
@@ -53,9 +53,9 @@
         .progress { margin-top: 24px; width: 100%; max-width: 400px; text-align: center; }
         .progress-track { width: 100%; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background: var(--orange); border-radius: 1px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        .progress-text { margin-top: 10px; font-size: 0.78rem; color: var(--text-dim); font-weight: 400; letter-spacing: 0.03em; }
+        .progress-text { margin-top: 10px; font-size: 0.78rem; color: #aaa; font-weight: 400; letter-spacing: 0.03em; }
         .progress-text span { color: var(--orange); font-weight: 600; }
-        .reset-btn { background: none; border: none; color: var(--text-dim); font-family: var(--font); font-size: 0.72rem; cursor: pointer; margin-left: 12px; text-decoration: underline; text-underline-offset: 2px; opacity: 0; transition: opacity 0.3s ease, color 0.2s ease; pointer-events: none; }
+        .reset-btn { background: none; border: none; color: #aaa; font-family: var(--font); font-size: 0.72rem; cursor: pointer; margin-left: 12px; text-decoration: underline; text-underline-offset: 2px; opacity: 0; transition: opacity 0.3s ease, color 0.2s ease; pointer-events: none; }
         .reset-btn.show { opacity: 1; pointer-events: auto; }
         .reset-btn:hover { color: var(--orange); }
 
@@ -64,22 +64,22 @@
         .info-panel.removal-mode { border-color: rgba(231,76,60,0.2); }
         .info-panel.complete-mode { border-color: rgba(247,147,26,0.2); }
         .panel-default { transition: opacity 0.3s ease; }
-        .panel-default p { color: var(--text-dim); line-height: 1.75; font-size: 0.95rem; font-weight: 400; }
+        .panel-default p { color: #bbb; line-height: 1.75; font-size: 0.95rem; font-weight: 400; }
         .panel-default p + p { margin-top: 14px; }
         .panel-default .cta { display: inline-block; margin-top: 20px; padding: 7px 16px; border: 1px solid #252525; border-radius: 5px; font-size: 0.78rem; color: var(--orange); font-weight: 500; letter-spacing: 0.02em; }
 
         .panel-content { display: none; animation: fadeUp 0.35s ease; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        .concept-tag { font-size: 0.7rem; font-weight: 500; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; }
+        .concept-tag { font-size: 0.7rem; font-weight: 500; color: #aaa; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; }
         .concept-tag.removal { color: var(--red); }
         .concept-name { font-size: 1.35rem; font-weight: 700; color: var(--orange); letter-spacing: -0.01em; margin-bottom: 16px; line-height: 1.2; }
         .concept-name.removal { color: var(--red); }
         .concept-desc { line-height: 1.75; color: var(--text); font-size: 0.92rem; font-weight: 400; }
         .concept-deeper { margin-top: 16px; }
-        .deeper-toggle { background: none; border: 1px solid var(--border); color: var(--text-dim); font-family: var(--font); font-size: 0.75rem; padding: 5px 14px; border-radius: 4px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em; }
+        .deeper-toggle { background: none; border: 1px solid #333; color: #aaa; font-family: var(--font); font-size: 0.75rem; padding: 5px 14px; border-radius: 4px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em; }
         .deeper-toggle:hover { color: var(--orange); border-color: rgba(247,147,26,0.3); }
-        .deeper-content { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); line-height: 1.75; color: var(--text-dim); font-size: 0.85rem; }
+        .deeper-content { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); line-height: 1.75; color: #bbb; font-size: 0.85rem; }
         .deeper-content.show { display: block; animation: fadeUp 0.3s ease; }
 
         .removal-verdict { margin-top: 16px; padding: 14px 16px; background: rgba(231,76,60,0.06); border: 1px solid rgba(231,76,60,0.15); border-radius: 6px; }
@@ -92,20 +92,20 @@
         .completion-panel { animation: fadeUp 0.5s ease; }
         .completion-panel .complete-title { font-size: 1.2rem; font-weight: 700; color: var(--orange); margin-bottom: 14px; }
         .completion-panel .complete-desc { line-height: 1.75; color: var(--text); font-size: 0.92rem; margin-bottom: 16px; }
-        .completion-panel .try-removal { padding: 12px 16px; background: rgba(231,76,60,0.06); border: 1px solid rgba(231,76,60,0.15); border-radius: 6px; font-size: 0.82rem; color: var(--text-dim); line-height: 1.6; }
+        .completion-panel .try-removal { padding: 12px 16px; background: rgba(231,76,60,0.06); border: 1px solid rgba(231,76,60,0.15); border-radius: 6px; font-size: 0.82rem; color: #bbb; line-height: 1.6; }
         .completion-panel .try-removal strong { color: var(--red); font-weight: 600; }
 
         /* ═══ Precursors Section ═══ */
         .precursors { margin-top: 80px; }
         .precursors h2 { font-size: clamp(1.3rem, 3vw, 1.8rem); font-weight: 700; color: var(--text-bright); letter-spacing: -0.02em; margin-bottom: 8px; text-align: center; }
-        .precursors .section-sub { font-size: 0.88rem; color: var(--text-dim); text-align: center; margin-bottom: 40px; line-height: 1.6; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .precursors .section-sub { font-size: 0.88rem; color: #bbb; text-align: center; margin-bottom: 40px; line-height: 1.6; max-width: 600px; margin-left: auto; margin-right: auto; }
         .precursor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         .precursor-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 24px; transition: border-color 0.3s; }
         .precursor-card:hover { border-color: #2a2a2a; }
         .precursor-year { font-size: 0.7rem; font-weight: 500; color: var(--orange); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
         .precursor-name { font-size: 1.1rem; font-weight: 700; color: var(--text-bright); margin-bottom: 10px; }
         .precursor-contrib { font-size: 0.85rem; color: var(--text); line-height: 1.65; margin-bottom: 12px; }
-        .precursor-flaw { font-size: 0.78rem; color: var(--text-dim); line-height: 1.6; padding-top: 10px; border-top: 1px solid var(--border); }
+        .precursor-flaw { font-size: 0.78rem; color: #bbb; line-height: 1.6; padding-top: 10px; border-top: 1px solid var(--border); }
         .precursor-flaw strong { color: var(--red); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
 
         /* ═══ Mesh line animation ═══ */
