@@ -46,35 +46,14 @@ body {
 }
 
 /* ─── NAV ─── */
-.site-nav {
-  position: sticky; top: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0.625rem 1.5rem;
-  background: rgba(10,9,8,0.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  font-family: var(--font-body);
-  min-height: 2.75rem;
-}
-.site-nav .nav-brand {
-  font-family: var(--font-display);
-  font-size: 0.95rem; font-weight: 600;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--orange);
-  text-decoration: none;
-}
-.site-nav .nav-links { display: flex; gap: 1.25rem; }
-.site-nav .nav-links a {
-  font-size: 0.8rem; font-weight: 500;
-  letter-spacing: 0.05em; text-transform: uppercase;
-  color: var(--text-dim); text-decoration: none;
-  transition: color 0.2s;
-  padding: 0.5rem 0;
-  min-height: 2.75rem;
-  display: flex; align-items: center;
-}
-.site-nav .nav-links a:hover { color: var(--text-bright); }
-.site-nav .nav-links a.active { color: var(--orange); }
+.site-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; background: rgba(10,9,8,0.95); border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.site-nav .brand { font-family: var(--font-display); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #555; text-decoration: none; transition: color 0.2s; }
+.site-nav .brand:hover { color: var(--orange); }
+.site-nav .nav-links { display: flex; gap: 8px; }
+.site-nav .nav-links a { font-family: var(--font-display); font-size: 1rem; font-weight: 400; color: #666; text-decoration: none; padding: 8px 16px; border-radius: 4px; transition: color 0.2s, background 0.2s; }
+.site-nav .nav-links a:hover { color: #aaa; background: rgba(255,255,255,0.04); }
+.site-nav .nav-links a.active { color: var(--orange); background: rgba(247,147,26,0.08); font-weight: 600; }
+@media (max-width: 600px) { .site-nav { padding: 10px 14px; } .site-nav .brand { font-size: 0.8rem; letter-spacing: 0.14em; } .site-nav .nav-links a { font-size: 0.9rem; padding: 6px 12px; } }
 
 /* ─── PAGE LAYOUT ─── */
 .page {
@@ -392,9 +371,9 @@ footer a:hover { text-decoration: underline; }
   .panel-verdict { font-size: 0.9rem; }
   .example-box .example-content { font-size: 0.875rem; }
   .site-nav { padding: 0.5rem 0.875rem; }
-  .site-nav .nav-brand { font-size: 0.8rem; }
-  .site-nav .nav-links { gap: 0.75rem; }
-  .site-nav .nav-links a { font-size: 0.7rem; }
+  .site-nav .brand { font-size: 0.8rem; }
+  .site-nav .nav-links { gap: 0.5rem; }
+  .site-nav .nav-links a { font-size: 0.85rem; padding: 6px 10px; }
   .btc-choice h2 { font-size: 1.1rem; }
   .btc-choice p { font-size: 0.925rem; }
   .layer-card { padding: 1rem; }
@@ -406,11 +385,12 @@ footer a:hover { text-decoration: underline; }
 
 <!-- NAV -->
 <nav class="site-nav">
-  <a href="index.html" class="nav-brand">Last Coin Standing</a>
+  <a href="/" class="brand">Last Coin Standing</a>
   <div class="nav-links">
-    <a href="index.html">Money Trees</a>
-    <a href="what-bitcoin-is.html">What Bitcoin Is</a>
-    <a href="trilemma.html" class="active">The Trilemma</a>
+    <a href="/">The Money Trees</a>
+    <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+    <a href="/trilemma.html" class="active">The Trilemma</a>
+    <a href="/about.html">About</a>
   </div>
 </nav>
 
@@ -432,7 +412,7 @@ footer a:hover { text-decoration: underline; }
 
     <!-- SVG TRIANGLE -->
     <div class="triangle-wrap">
-      <svg class="triangle-svg" viewBox="0 0 500 460" xmlns="http://www.w3.org/2000/svg">
+      <svg class="triangle-svg" viewBox="0 0 500 520" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <filter id="glow-orange" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
@@ -457,47 +437,47 @@ footer a:hover { text-decoration: underline; }
         </defs>
 
         <!-- Triangle edges -->
-        <line x1="250" y1="55" x2="60" y2="395" stroke="#F7931A" stroke-width="2.5" stroke-opacity="0.5" id="edge-d-se"/>
-        <line x1="250" y1="55" x2="440" y2="395" stroke="#3a3530" stroke-width="1.5" stroke-opacity="0.5" id="edge-d-sc"/>
-        <line x1="60" y1="395" x2="440" y2="395" stroke="#3a3530" stroke-width="1.5" stroke-opacity="0.5" id="edge-se-sc"/>
+        <line x1="250" y1="80" x2="60" y2="400" stroke="#F7931A" stroke-width="2.5" stroke-opacity="0.5" id="edge-d-se"/>
+        <line x1="250" y1="80" x2="440" y2="400" stroke="#3a3530" stroke-width="1.5" stroke-opacity="0.5" id="edge-d-sc"/>
+        <line x1="60" y1="400" x2="440" y2="400" stroke="#3a3530" stroke-width="1.5" stroke-opacity="0.5" id="edge-se-sc"/>
 
         <!-- D-Se edge glow -->
-        <line x1="250" y1="55" x2="60" y2="395" stroke="#F7931A" stroke-width="6" stroke-opacity="0.08" filter="url(#glow-orange)"/>
+        <line x1="250" y1="80" x2="60" y2="400" stroke="#F7931A" stroke-width="6" stroke-opacity="0.08" filter="url(#glow-orange)"/>
 
         <!-- Edge labels -->
-        <text x="115" y="210" fill="#F7931A" fill-opacity="0.35" font-family="Inter, sans-serif" font-size="8" font-weight="700" letter-spacing="0.14em" transform="rotate(-60, 115, 210)">BITCOIN'S CHOICE</text>
-        <text x="250" y="285" fill="#5a5550" font-family="Inter, sans-serif" font-size="11" font-weight="500" text-anchor="middle" font-style="italic">"Pick any two"</text>
-        <text x="350" y="210" fill="#504840" font-family="Inter, sans-serif" font-size="9" font-style="italic" text-anchor="middle" transform="rotate(60, 350, 210)">faster but fragile</text>
-        <text x="250" y="420" fill="#504840" font-family="Inter, sans-serif" font-size="9" font-style="italic" text-anchor="middle">fast but centralized</text>
+        <text x="122" y="222" fill="#F7931A" fill-opacity="0.55" font-family="Inter, sans-serif" font-size="24" font-weight="700" letter-spacing="0.12em" transform="rotate(-60, 122, 222)">BITCOIN'S CHOICE</text>
+        <text x="250" y="290" fill="#8a8078" font-family="'Cormorant Garamond', Georgia, serif" font-size="30" font-weight="500" text-anchor="middle" font-style="italic">"Pick any two"</text>
+        <text x="358" y="222" fill="#a09890" font-family="'Cormorant Garamond', Georgia, serif" font-size="24" font-style="italic" text-anchor="middle" transform="rotate(60, 358, 222)">faster but fragile</text>
+        <text x="250" y="460" fill="#a09890" font-family="'Cormorant Garamond', Georgia, serif" font-size="24" font-style="italic" text-anchor="middle">fast but centralized</text>
 
         <!-- ─── DECENTRALIZATION NODE (top) ─── -->
         <g id="node-d" class="tri-node" data-vertex="decentralization">
-          <circle cx="250" cy="55" r="44" fill="url(#node-glow-d)" opacity="0" class="glow-circle"/>
-          <circle cx="250" cy="55" r="38" fill="transparent" class="hit-area"/>
-          <circle cx="250" cy="55" r="28" fill="#181410" stroke="#F7931A" stroke-width="2" class="node-ring"/>
-          <text x="250" y="51" fill="#F7931A" font-family="Inter, sans-serif" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="0.06em">D</text>
-          <text x="250" y="63" fill="#F7931A" font-family="Inter, sans-serif" font-size="6" font-weight="600" text-anchor="middle" letter-spacing="0.06em" fill-opacity="0.7">MAX</text>
-          <text x="250" y="14" fill="#d4cec6" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="middle" letter-spacing="0.04em">Decentralization</text>
+          <circle cx="250" cy="80" r="58" fill="url(#node-glow-d)" opacity="0" class="glow-circle"/>
+          <circle cx="250" cy="80" r="50" fill="transparent" class="hit-area"/>
+          <circle cx="250" cy="80" r="40" fill="#181410" stroke="#F7931A" stroke-width="2" class="node-ring"/>
+          <text x="250" y="74" fill="#F7931A" font-family="Inter, sans-serif" font-size="30" font-weight="700" text-anchor="middle" letter-spacing="0.06em">D</text>
+          <text x="250" y="98" fill="#F7931A" font-family="Inter, sans-serif" font-size="20" font-weight="600" text-anchor="middle" letter-spacing="0.08em" fill-opacity="0.8">MAX</text>
+          <text x="250" y="22" fill="#e0d8d0" font-family="'Cormorant Garamond', Georgia, serif" font-size="28" font-weight="600" text-anchor="middle" letter-spacing="0.03em">Decentralization</text>
         </g>
 
         <!-- ─── SECURITY NODE (bottom-left) ─── -->
         <g id="node-se" class="tri-node" data-vertex="security">
-          <circle cx="60" cy="395" r="44" fill="url(#node-glow-se)" opacity="0" class="glow-circle"/>
-          <circle cx="60" cy="395" r="38" fill="transparent" class="hit-area"/>
-          <circle cx="60" cy="395" r="28" fill="#181410" stroke="#F7931A" stroke-width="2" class="node-ring"/>
-          <text x="60" y="391" fill="#F7931A" font-family="Inter, sans-serif" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="0.06em">S</text>
-          <text x="60" y="403" fill="#F7931A" font-family="Inter, sans-serif" font-size="6" font-weight="600" text-anchor="middle" letter-spacing="0.06em" fill-opacity="0.7">MAX</text>
-          <text x="60" y="442" fill="#d4cec6" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="middle" letter-spacing="0.04em">Security</text>
+          <circle cx="60" cy="400" r="58" fill="url(#node-glow-se)" opacity="0" class="glow-circle"/>
+          <circle cx="60" cy="400" r="50" fill="transparent" class="hit-area"/>
+          <circle cx="60" cy="400" r="40" fill="#181410" stroke="#F7931A" stroke-width="2" class="node-ring"/>
+          <text x="60" y="394" fill="#F7931A" font-family="Inter, sans-serif" font-size="30" font-weight="700" text-anchor="middle" letter-spacing="0.06em">S</text>
+          <text x="60" y="418" fill="#F7931A" font-family="Inter, sans-serif" font-size="20" font-weight="600" text-anchor="middle" letter-spacing="0.08em" fill-opacity="0.8">MAX</text>
+          <text x="60" y="484" fill="#e0d8d0" font-family="'Cormorant Garamond', Georgia, serif" font-size="28" font-weight="600" text-anchor="middle" letter-spacing="0.03em">Security</text>
         </g>
 
         <!-- ─── SCALABILITY NODE (bottom-right) ─── -->
         <g id="node-sc" class="tri-node" data-vertex="scalability">
-          <circle cx="440" cy="395" r="44" fill="url(#node-glow-sc)" opacity="0" class="glow-circle"/>
-          <circle cx="440" cy="395" r="38" fill="transparent" class="hit-area"/>
-          <circle cx="440" cy="395" r="28" fill="#181410" stroke="#6a7580" stroke-width="1.5" class="node-ring" stroke-dasharray="4,3"/>
-          <text x="440" y="391" fill="#6a7580" font-family="Inter, sans-serif" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="0.06em">Sc</text>
-          <text x="440" y="403" fill="#6a7580" font-family="Inter, sans-serif" font-size="6" font-weight="600" text-anchor="middle" letter-spacing="0.06em" fill-opacity="0.7">RELAX</text>
-          <text x="440" y="442" fill="#807870" font-family="Inter, sans-serif" font-size="12" font-weight="500" text-anchor="middle" letter-spacing="0.04em">Scalability</text>
+          <circle cx="440" cy="400" r="58" fill="url(#node-glow-sc)" opacity="0" class="glow-circle"/>
+          <circle cx="440" cy="400" r="50" fill="transparent" class="hit-area"/>
+          <circle cx="440" cy="400" r="40" fill="#181410" stroke="#6a7580" stroke-width="1.5" class="node-ring" stroke-dasharray="4,3"/>
+          <text x="440" y="394" fill="#6a7580" font-family="Inter, sans-serif" font-size="30" font-weight="700" text-anchor="middle" letter-spacing="0.06em">Sc</text>
+          <text x="440" y="418" fill="#6a7580" font-family="Inter, sans-serif" font-size="20" font-weight="600" text-anchor="middle" letter-spacing="0.08em" fill-opacity="0.8">RELAX</text>
+          <text x="440" y="484" fill="#a09890" font-family="'Cormorant Garamond', Georgia, serif" font-size="28" font-weight="500" text-anchor="middle" letter-spacing="0.03em">Scalability</text>
         </g>
 
       </svg>
@@ -621,7 +601,7 @@ footer a:hover { text-decoration: underline; }
     Its profound implications for Bitcoin as sound money have been extensively explored by <strong>Jeff Booth</strong>.
   </p>
   <p style="margin-top: 8px;">
-    <a href="index.html">Last Coin Standing</a> · Bitcoin education through contrast and clarity
+    <a href="/">Last Coin Standing</a> · Bitcoin education through contrast and clarity
   </p>
 </footer>
 

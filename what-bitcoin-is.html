@@ -9,15 +9,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #080808;
-            --bg-panel: #0f0f0f;
-            --border: #1a1a1a;
+            --bg: #0a0908;
+            --bg-panel: #141210;
+            --border: #2a2520;
             --orange: #F7931A;
-            --grey-circle: #333;
-            --grey-hover: #555;
-            --text: #e8e0d5;
-            --text-dim: #666;
-            --text-bright: #f0f0f0;
+            --grey-circle: #3a3530;
+            --grey-hover: #5a5550;
+            --text: #d8d2ca;
+            --text-dim: #908880;
+            --text-bright: #f2eee8;
             --font: 'Outfit', sans-serif;
         }
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -43,22 +43,22 @@
         .progress { margin-top: 28px; width: 100%; max-width: 360px; text-align: center; }
         .progress-track { width: 100%; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background: var(--orange); border-radius: 1px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        .progress-text { margin-top: 10px; font-size: 0.78rem; color: var(--text-dim); font-weight: 400; letter-spacing: 0.03em; }
+        .progress-text { margin-top: 10px; font-size: 0.82rem; color: var(--text-dim); font-weight: 400; letter-spacing: 0.03em; }
         .progress-text span { color: var(--orange); font-weight: 600; }
-        .reset-btn { background: none; border: none; color: var(--text-dim); font-family: var(--font); font-size: 0.72rem; cursor: pointer; margin-left: 12px; text-decoration: underline; text-underline-offset: 2px; opacity: 0; transition: opacity 0.3s ease, color 0.2s ease; pointer-events: none; }
+        .reset-btn { background: none; border: none; color: var(--text-dim); font-family: var(--font); font-size: 0.78rem; cursor: pointer; margin-left: 12px; text-decoration: underline; text-underline-offset: 2px; opacity: 0; transition: opacity 0.3s ease, color 0.2s ease; pointer-events: none; }
         .reset-btn.show { opacity: 1; pointer-events: auto; }
         .reset-btn:hover { color: var(--orange); }
         .info-panel { padding: 32px 28px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; position: sticky; top: 32px; min-height: 340px; }
         .panel-default { transition: opacity 0.3s ease; }
-        .panel-default p { color: var(--text-dim); line-height: 1.75; font-size: 0.95rem; font-weight: 400; }
+        .panel-default p { color: #b0a8a0; line-height: 1.75; font-size: 1rem; font-weight: 400; }
         .panel-default p + p { margin-top: 14px; }
-        .panel-default .cta { display: inline-block; margin-top: 20px; padding: 7px 16px; border: 1px solid #252525; border-radius: 5px; font-size: 0.78rem; color: var(--orange); font-weight: 500; letter-spacing: 0.02em; }
+        .panel-default .cta { display: inline-block; margin-top: 20px; padding: 7px 16px; border: 1px solid #252525; border-radius: 5px; font-size: 0.82rem; color: var(--orange); font-weight: 500; letter-spacing: 0.02em; }
         .panel-content { display: none; animation: fadeUp 0.35s ease; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-        .concept-tag { font-size: 0.7rem; font-weight: 500; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; }
+        .concept-tag { font-size: 0.78rem; font-weight: 500; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; }
         .concept-name { font-size: 1.45rem; font-weight: 700; color: var(--orange); letter-spacing: -0.01em; margin-bottom: 18px; line-height: 1.2; }
-        .concept-desc { line-height: 1.75; color: var(--text); font-size: 0.95rem; font-weight: 400; }
-        .concept-relation { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--text-dim); font-weight: 400; line-height: 1.6; }
+        .concept-desc { line-height: 1.75; color: var(--text); font-size: 1rem; font-weight: 400; }
+        .concept-relation { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-dim); font-weight: 400; line-height: 1.6; }
         .concept-relation strong { color: var(--orange); font-weight: 600; }
         @keyframes completePulse { 0%, 100% { stroke-opacity: 0.7; } 50% { stroke-opacity: 1; filter: url(#glow); } }
         .complete .flower-circle.explored { animation: completePulse 2s ease 1; stroke-opacity: 0.8 !important; }
@@ -68,18 +68,18 @@
         .flower-circle.ring-1.animate-in { animation-delay: 0.5s; }
         .flower-circle.ring-2.animate-in { animation-delay: 0.8s; }
         @media (max-width: 900px) { main { grid-template-columns: 1fr; gap: 24px; } .info-panel { position: static; min-height: auto; order: 2; } .viz-section { order: 1; } header { margin-bottom: 32px; } .page { padding: 32px 16px 48px; } .svg-wrap { max-width: 480px; } }
-        @media (max-width: 600px) { .page { padding: 24px 14px 40px; } header { margin-bottom: 24px; } header h1 { font-size: 1.5rem; } header .subtitle { font-size: 0.82rem; } .svg-wrap { max-width: 100%; } .info-panel { padding: 22px 18px; border-radius: 8px; } .concept-name { font-size: 1.25rem; margin-bottom: 14px; } .concept-desc { font-size: 0.85rem; } .concept-relation { font-size: 0.75rem; } .progress { margin-top: 20px; } .label-text { font-size: 21px; font-weight: 700; stroke-width: 3px; } }
+        @media (max-width: 600px) { .page { padding: 24px 14px 40px; } header { margin-bottom: 24px; } header h1 { font-size: 1.5rem; } header .subtitle { font-size: 0.85rem; } .svg-wrap { max-width: 100%; } .info-panel { padding: 22px 18px; border-radius: 8px; } .concept-name { font-size: 1.25rem; margin-bottom: 14px; } .concept-desc { font-size: 0.925rem; } .concept-relation { font-size: 0.82rem; } .progress { margin-top: 20px; } .label-text { font-size: 21px; font-weight: 700; stroke-width: 3px; } }
         @media (max-width: 380px) { header h1 { font-size: 1.3rem; } .info-panel { padding: 18px 14px; } .concept-name { font-size: 1.1rem; } }
 
         /* ═══ Site Nav ═══ */
-        .site-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; background: rgba(8,8,8,0.95); border-bottom: 1px solid #141414; position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .site-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; background: rgba(10,9,8,0.95); border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
         .site-nav .brand { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #555; text-decoration: none; transition: color 0.2s; }
         .site-nav .brand:hover { color: var(--orange); }
         .site-nav .nav-links { display: flex; gap: 8px; }
         .site-nav .nav-links a { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1rem; font-weight: 400; color: #666; text-decoration: none; padding: 8px 16px; border-radius: 4px; transition: color 0.2s, background 0.2s; letter-spacing: 0.01em; }
         .site-nav .nav-links a:hover { color: #aaa; background: rgba(255,255,255,0.04); }
-        .site-nav .nav-links a.active { color: var(--orange); background: rgba(247,147,26,0.08); font-weight: 500; }
-        @media (max-width: 600px) { .site-nav { padding: 10px 14px; } .site-nav .brand { font-size: 0.75rem; letter-spacing: 0.14em; } .site-nav .nav-links a { font-size: 0.85rem; padding: 6px 12px; } }
+        .site-nav .nav-links a.active { color: var(--orange); background: rgba(247,147,26,0.08); font-weight: 600; }
+        @media (max-width: 600px) { .site-nav { padding: 10px 14px; } .site-nav .brand { font-size: 0.8rem; letter-spacing: 0.14em; } .site-nav .nav-links a { font-size: 0.9rem; padding: 6px 12px; } }
     </style>
 </head>
 <body>
