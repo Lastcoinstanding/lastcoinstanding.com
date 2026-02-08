@@ -3,882 +3,334 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Money Trees — Last Coin Standing</title>
+<title>Last Coin Standing — Bitcoin Education Through Contrast and Clarity</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg-dark: #0a0c0f;
-  --btc-orange: #f7931a;
-  --btc-orange-light: #ffa940;
-  --btc-gold: #ffd700;
-  --btc-bark: #5a4030;
-  --fiat-gray: #6a7580;
-  --fiat-gray-light: #8a9098;
-  --fiat-bark: #454550;
-  --text-light: #e8e0d5;
-  --text-muted: #8b8680;
+    --bg: #0a0908;
+    --bg-card: #111010;
+    --border: #1e1c1a;
+    --orange: #F7931A;
+    --orange-dim: rgba(247,147,26,0.08);
+    --text: #d8d2ca;
+    --text-dim: #908880;
+    --text-bright: #f2eee8;
+    --text-body: #d0c8c0;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
 }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg-dark);
-  color: var(--text-light);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-header {
-  text-align: center;
-  padding: 40px 20px 10px;
-  position: sticky;
-  top: 44px;
-  z-index: 100;
-  background: linear-gradient(180deg, var(--bg-dark) 0%, rgba(10,12,15,0.95) 100%);
-}
-header h1 {
-  font-size: 2rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  color: var(--text-light);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-}
-header p {
-  font-size: 1rem;
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-/* Toggle */
-.toggle-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  padding: 15px;
-  position: sticky;
-  top: 129px;
-  z-index: 100;
-  background: linear-gradient(180deg, rgba(10,12,15,0.95) 0%, rgba(10,12,15,0) 100%);
-}
-
-.toggle-label {
-  font-size: 1.2rem;
-  cursor: pointer;
-  opacity: 0.5;
-  transition: opacity 0.3s;
-  font-weight: 600;
-}
-.toggle-label.active { opacity: 1; }
-.toggle-label.btc { color: var(--btc-orange); }
-.toggle-label.fiat { color: var(--fiat-gray-light); }
-
-.toggle-switch {
-  width: 60px;
-  height: 30px;
-  background: #222;
-  border-radius: 15px;
-  cursor: pointer;
-  position: relative;
-  border: 1px solid #333;
-}
-.toggle-switch::after {
-  content: '';
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  background: var(--btc-orange);
-  border-radius: 50%;
-  top: 2px;
-  left: 3px;
-  transition: all 0.3s;
-}
-.fiat-active .toggle-switch::after {
-  left: 31px;
-  background: var(--fiat-gray-light);
-}
-
-/* Tree views */
-.tree-view {
-  display: none;
-  padding: 20px;
-  max-width: 900px;
-  margin: 0 auto;
-}
-.tree-view.active { display: block; }
-
-.tree-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-.tree-title {
-  font-size: 2.2rem;
-  font-weight: 600;
-  margin-bottom: 8px;
-  letter-spacing: 0.08em;
-}
-.tree-title.btc { color: var(--btc-orange); }
-.tree-title.fiat { color: var(--fiat-gray-light); }
-
-.tree-subtitle {
-  font-size: 1.15rem;
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-/* SVG Tree */
-.tree-svg {
-  width: 100%;
-  max-width: 850px;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-}
-
-/* Cluster section styling */
-.cluster-section {
-  margin-bottom: 60px;
-}
-
-/* Loading */
-#loading {
-  text-align: center;
-  padding: 100px 20px;
-  font-size: 1.2rem;
-  color: var(--text-muted);
-}
-#loading.hidden { display: none; }
-
-/* TOOLTIP */
-.tooltip {
-  position: fixed;
-  display: none;
-  max-width: 420px;
-  padding: 22px 26px;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  line-height: 1.7;
-  pointer-events: auto;
-  z-index: 1000;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-}
-
-.tooltip-close {
-  position: absolute;
-  top: 12px;
-  right: 14px;
-  width: 28px;
-  height: 28px;
-  border: none;
-  background: rgba(255,255,255,0.1);
-  border-radius: 50%;
-  color: #999;
-  font-size: 18px;
-  cursor: pointer;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-.tooltip-close:hover {
-  background: rgba(255,255,255,0.2);
-  color: #ccc;
-}
-.tooltip.btc {
-  background: linear-gradient(145deg, rgba(30,25,20,0.98), rgba(20,15,10,0.98));
-  border: 1px solid rgba(247,147,26,0.3);
-}
-.tooltip.fiat {
-  background: linear-gradient(145deg, rgba(25,28,35,0.98), rgba(15,18,25,0.98));
-  border: 1px solid rgba(100,120,140,0.3);
-}
-
-.tooltip-word {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 10px;
-  letter-spacing: 0.03em;
-}
-.tooltip-word.btc { color: var(--btc-orange); }
-.tooltip-word.fiat { color: var(--fiat-gray-light); }
-
-.tooltip-desc {
-  color: #d0ccc5;
-  margin-bottom: 14px;
-  font-size: 1.1rem;
-  line-height: 1.6;
-}
-
-.tooltip-section {
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-}
-.tooltip-section-title {
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-.tooltip-section-title.btc { color: var(--btc-orange); }
-.tooltip-section-title.fiat { color: var(--fiat-gray-light); }
-
-.tooltip-insight {
-  color: #c5c0b8;
-  font-size: 1rem;
-  line-height: 1.6;
-}
-
-.tooltip-contrast {
-  color: #a8a5a0;
-  font-size: 0.95rem;
-  line-height: 1.55;
-  font-style: italic;
-}
-
-.tooltip-synonyms {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  font-size: 0.9rem;
-  color: #908880;
-}
-.tooltip-synonyms span {
-  display: inline-block;
-  padding: 3px 10px;
-  margin: 3px 4px 3px 0;
-  border-radius: 12px;
-  font-size: 0.85rem;
-}
-.tooltip-synonyms span.btc {
-  background: rgba(247,147,26,0.15);
-  color: var(--btc-orange-light);
-}
-.tooltip-synonyms span.fiat {
-  background: rgba(100,120,140,0.2);
-  color: var(--fiat-gray-light);
-}
-
-/* Footer */
-footer {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  header h1 { font-size: 1.5rem; }
-  header p { font-size: 0.95rem; }
-  .tree-title { font-size: 1.8rem; }
-  .tree-subtitle { font-size: 1.05rem; }
-  
-  .tooltip { 
-    max-width: 92vw;
-    width: 92vw;
-    left: 4vw !important;
-    right: 4vw;
-    font-size: 1.15rem;
-    padding: 22px 22px 26px;
-    line-height: 1.75;
-  }
-  .tooltip-close {
-    display: flex;
-    width: 32px;
-    height: 32px;
-    font-size: 20px;
-  }
-  .tooltip-word { 
-    font-size: 1.65rem; 
-    padding-right: 35px;
-    margin-bottom: 12px;
-  }
-  .tooltip-desc { 
-    font-size: 1.2rem;
-    line-height: 1.7;
-  }
-  .tooltip-insight,
-  .tooltip-contrast {
-    font-size: 1.1rem;
-    line-height: 1.65;
-  }
-  .tooltip-section {
-    margin-top: 18px;
-    padding-top: 16px;
-  }
-  .tooltip-section-title {
-    font-size: 0.95rem;
-    margin-bottom: 10px;
-  }
-  .tooltip-synonyms {
-    font-size: 1rem;
-    margin-top: 16px;
-    padding-top: 14px;
-  }
-  .tooltip-synonyms span {
-    font-size: 0.95rem;
-    padding: 5px 14px;
-    margin: 4px 5px 4px 0;
-  }
-}
-
-/* Overlay for mobile tap-to-close */
-.tooltip-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 999;
-  background: rgba(0,0,0,0.3);
-}
-
-/* ═══ Site Nav ═══ */
+/* ═══ NAV (consistent with trilemma — Inter, #999 brand, #aaa links) ═══ */
 .site-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; background: rgba(10,9,8,0.95); border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-.site-nav .brand { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #999; text-decoration: none; transition: color 0.2s; }
-.site-nav .brand:hover { color: var(--btc-orange); }
+.site-nav .brand { font-family: var(--font-body); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #999; text-decoration: none; transition: color 0.2s; }
+.site-nav .brand:hover { color: var(--orange); }
 .site-nav .nav-links { display: flex; gap: 8px; }
-.site-nav .nav-links a { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.9rem; font-weight: 500; color: #aaa; text-decoration: none; padding: 8px 16px; border-radius: 4px; transition: color 0.2s, background 0.2s; }
+.site-nav .nav-links a { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: #aaa; text-decoration: none; padding: 8px 16px; border-radius: 4px; transition: color 0.2s, background 0.2s; }
 .site-nav .nav-links a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
-.site-nav .nav-links a.active { color: var(--btc-orange); background: rgba(247,147,26,0.08); font-weight: 600; }
-@media (max-width: 600px) { .site-nav { padding: 10px 14px; } .site-nav .brand { font-size: 0.72rem; letter-spacing: 0.14em; } .site-nav .nav-links a { font-size: 0.85rem; padding: 6px 12px; } }
+.site-nav .nav-links a.active { color: var(--orange); background: rgba(247,147,26,0.08); font-weight: 600; }
+
+/* Hamburger (hidden on desktop) */
+.hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; z-index: 1100; }
+.hamburger span { display: block; width: 22px; height: 2px; background: #aaa; margin: 5px 0; border-radius: 1px; transition: transform 0.3s, opacity 0.3s, background 0.3s; }
+.hamburger:hover span { background: #ccc; }
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+/* Mobile nav overlay */
+.mobile-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,9,8,0.97); z-index: 1050; flex-direction: column; align-items: center; justify-content: center; gap: 8px; opacity: 0; transition: opacity 0.3s; }
+.mobile-overlay.show { display: flex; opacity: 1; }
+.mobile-overlay a { font-family: var(--font-body); font-size: 1.1rem; font-weight: 500; color: #aaa; text-decoration: none; padding: 14px 32px; border-radius: 6px; transition: color 0.2s, background 0.2s; }
+.mobile-overlay a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
+.mobile-overlay a.active { color: var(--orange); background: rgba(247,147,26,0.08); font-weight: 600; }
+
+@media (max-width: 768px) {
+    .site-nav .nav-links { display: none; }
+    .hamburger { display: block; }
+}
+@media (max-width: 480px) {
+    .site-nav { padding: 10px 14px; }
+    .site-nav .brand { font-size: 0.72rem; letter-spacing: 0.14em; }
+}
+
+/* ═══ HERO ═══ */
+.hero {
+    text-align: center;
+    padding: 5rem 1.5rem 3rem;
+    max-width: 44rem;
+    margin: 0 auto;
+}
+.hero h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2rem, 5vw, 3rem);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-bright);
+    margin-bottom: 1rem;
+}
+.hero .tagline {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1rem, 2.2vw, 1.25rem);
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+.hero .intro {
+    font-family: var(--font-body);
+    font-size: clamp(0.9rem, 1.6vw, 1rem);
+    line-height: 1.8;
+    color: var(--text-body);
+    max-width: 38rem;
+    margin: 0 auto;
+}
+
+/* ═══ CARD GRID ═══ */
+.explore-section {
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 0 1.5rem 5rem;
+}
+.explore-label {
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 2rem;
+}
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+.concept-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 2rem 1.75rem;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: border-color 0.3s, transform 0.25s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+.concept-card:hover {
+    border-color: rgba(247,147,26,0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(247,147,26,0.06);
+}
+.concept-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--orange);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.concept-card:hover::before { opacity: 1; }
+
+.card-icon {
+    width: 48px; height: 48px;
+    margin-bottom: 0.25rem;
+}
+.card-icon svg { width: 100%; height: 100%; }
+
+.card-title {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--text-bright);
+    line-height: 1.2;
+}
+.card-desc {
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: var(--text-body);
+}
+.card-cta {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--orange);
+    letter-spacing: 0.04em;
+    margin-top: auto;
+    padding-top: 0.5rem;
+}
+
+/* ═══ FOOTER ═══ */
+footer {
+    text-align: center;
+    padding: 1.5rem 1.25rem 3rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: #686360;
+    line-height: 1.8;
+}
+footer a { color: var(--orange); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 768px) {
+    .hero { padding: 3.5rem 1.25rem 2rem; }
+    .card-grid { grid-template-columns: 1fr; }
+    .explore-section { padding: 0 1.25rem 3.5rem; }
+}
+@media (max-width: 480px) {
+    .hero { padding: 2.5rem 1rem 1.5rem; }
+    .hero h1 { font-size: 1.6rem; letter-spacing: 0.06em; }
+    .hero .tagline { font-size: 0.95rem; }
+    .hero .intro { font-size: 0.88rem; }
+    .concept-card { padding: 1.5rem 1.25rem; }
+    .card-title { font-size: 1.2rem; }
+    .card-desc { font-size: 0.85rem; }
+    .explore-section { padding: 0 1rem 3rem; }
+}
 </style>
 </head>
 <body>
 
 <nav class="site-nav">
-  <a href="/" class="brand">Last Coin Standing</a>
-  <div class="nav-links">
-    <a href="/" class="active">The Money Trees</a>
+    <a href="/" class="brand">Last Coin Standing</a>
+    <div class="nav-links">
+        <a href="/money-trees.html">The Money Trees</a>
+        <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+        <a href="/synthesis.html">The Synthesis</a>
+        <a href="/trilemma.html">The Trilemma</a>
+        <a href="/about.html">About</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+    </button>
+</nav>
+<div class="mobile-overlay" id="mobileOverlay">
+    <a href="/money-trees.html">The Money Trees</a>
     <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+    <a href="/synthesis.html">The Synthesis</a>
     <a href="/trilemma.html">The Trilemma</a>
     <a href="/about.html">About</a>
-  </div>
-</nav>
-
-<header>
-  <h1>The Money Trees</h1>
-  <p>Explore the nature of money — hover to discover</p>
-</header>
-
-<div class="toggle-container">
-  <span class="toggle-label btc active">Bitcoin</span>
-  <div class="toggle-switch" onclick="toggleView()"></div>
-  <span class="toggle-label fiat">Fiat</span>
 </div>
 
-<div id="loading">Loading trees...</div>
-
-<div class="tree-view active" id="btc-view">
-  <div class="tree-header">
-    <div class="tree-title btc">Bitcoin</div>
-    <div class="tree-subtitle">Sound money · Sovereignty · Truth</div>
-  </div>
-  <svg class="tree-svg" id="btc-tree"></svg>
+<!-- HERO -->
+<div class="hero">
+    <h1>Last Coin Standing</h1>
+    <p class="tagline">Bitcoin education through contrast and clarity</p>
+    <p class="intro">Understanding money requires seeing what makes it work — and what makes it break. Each interactive exploration below examines a different dimension of Bitcoin through the lens of fundamental tradeoffs, irreducible design, and philosophical contrast.</p>
 </div>
 
-<div class="tree-view" id="fiat-view">
-  <div class="tree-header">
-    <div class="tree-title fiat">Fiat</div>
-    <div class="tree-subtitle">Broken money · Coercion · Decay</div>
-  </div>
-  <svg class="tree-svg" id="fiat-tree"></svg>
+<!-- CONCEPT CARDS -->
+<div class="explore-section">
+    <div class="explore-label">Explore</div>
+    <div class="card-grid">
+
+        <!-- The Money Trees -->
+        <a href="/money-trees.html" class="concept-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="14" r="10" stroke="#F7931A" stroke-width="1.5" fill="rgba(247,147,26,0.06)"/>
+                    <line x1="16" y1="24" x2="16" y2="42" stroke="#F7931A" stroke-width="1.5"/>
+                    <circle cx="34" cy="14" r="10" stroke="#6a7580" stroke-width="1.5" fill="rgba(106,117,128,0.06)"/>
+                    <line x1="34" y1="24" x2="34" y2="42" stroke="#6a7580" stroke-width="1.5"/>
+                </svg>
+            </div>
+            <div class="card-title">The Money Trees</div>
+            <div class="card-desc">Two trees, two monetary systems. Watch sound money grow through fixed supply and decentralization — while fiat withers under infinite expansion and central control. Toggle between them to feel the difference.</div>
+            <div class="card-cta">Explore the contrast →</div>
+        </a>
+
+        <!-- What Bitcoin Is -->
+        <a href="/what-bitcoin-is.html" class="concept-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="24" cy="24" r="12" stroke="#F7931A" stroke-width="1.5" fill="none"/>
+                    <circle cx="24" cy="12" r="12" stroke="#F7931A" stroke-width="1" fill="none" opacity="0.4"/>
+                    <circle cx="14" cy="30" r="12" stroke="#F7931A" stroke-width="1" fill="none" opacity="0.4"/>
+                    <circle cx="34" cy="30" r="12" stroke="#F7931A" stroke-width="1" fill="none" opacity="0.4"/>
+                </svg>
+            </div>
+            <div class="card-title">What Bitcoin Is</div>
+            <div class="card-desc">A flower-of-life visualization mapping Bitcoin's core properties — scarcity, decentralization, immutability, and more. Click each petal to understand the interlocking concepts that give Bitcoin its monetary premium.</div>
+            <div class="card-cta">Discover the properties →</div>
+        </a>
+
+        <!-- The Bitcoin Synthesis -->
+        <a href="/synthesis.html" class="concept-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="24" cy="24" r="8" stroke="#F7931A" stroke-width="1.5" fill="rgba(247,147,26,0.06)"/>
+                    <circle cx="24" cy="8" r="5" stroke="#F7931A" stroke-width="1" fill="none"/>
+                    <circle cx="38" cy="16" r="5" stroke="#F7931A" stroke-width="1" fill="none"/>
+                    <circle cx="38" cy="32" r="5" stroke="#F7931A" stroke-width="1" fill="none"/>
+                    <circle cx="24" cy="40" r="5" stroke="#F7931A" stroke-width="1" fill="none"/>
+                    <circle cx="10" cy="32" r="5" stroke="#F7931A" stroke-width="1" fill="none"/>
+                    <circle cx="10" cy="16" r="5" stroke="#F7931A" stroke-width="1" fill="none"/>
+                    <line x1="24" y1="13" x2="24" y2="16" stroke="rgba(247,147,26,0.4)" stroke-width="1"/>
+                    <line x1="33" y1="18" x2="30" y2="20" stroke="rgba(247,147,26,0.4)" stroke-width="1"/>
+                    <line x1="33" y1="30" x2="30" y2="28" stroke="rgba(247,147,26,0.4)" stroke-width="1"/>
+                    <line x1="24" y1="35" x2="24" y2="32" stroke="rgba(247,147,26,0.4)" stroke-width="1"/>
+                    <line x1="15" y1="30" x2="18" y2="28" stroke="rgba(247,147,26,0.4)" stroke-width="1"/>
+                    <line x1="15" y1="18" x2="18" y2="20" stroke="rgba(247,147,26,0.4)" stroke-width="1"/>
+                </svg>
+            </div>
+            <div class="card-title">The Bitcoin Synthesis</div>
+            <div class="card-desc">Six existing ideas. One irreducible discovery. Explore each component that makes Bitcoin work, then try removing one to see exactly what collapses — and why this synthesis could only happen once.</div>
+            <div class="card-cta">Build the circuit →</div>
+        </a>
+
+        <!-- The Trilemma -->
+        <a href="/trilemma.html" class="concept-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="24,6 6,40 42,40" stroke="#F7931A" stroke-width="1.5" fill="none"/>
+                    <circle cx="24" cy="6" r="4" fill="rgba(247,147,26,0.3)" stroke="#F7931A" stroke-width="1"/>
+                    <circle cx="6" cy="40" r="4" fill="rgba(247,147,26,0.3)" stroke="#F7931A" stroke-width="1"/>
+                    <circle cx="42" cy="40" r="4" fill="rgba(106,117,128,0.3)" stroke="#6a7580" stroke-width="1"/>
+                </svg>
+            </div>
+            <div class="card-title">The Trilemma</div>
+            <div class="card-desc">Every blockchain must choose two of three: decentralization, security, or scalability. Explore why Bitcoin deliberately sacrifices speed at the base layer — and why that's exactly the right tradeoff for sound money.</div>
+            <div class="card-cta">Examine the tradeoffs →</div>
+        </a>
+
+    </div>
 </div>
 
-<div class="tooltip-overlay" id="tooltip-overlay" onclick="hideTooltip()"></div>
-
-<div class="tooltip" id="tooltip">
-  <button class="tooltip-close" onclick="hideTooltip()">✕</button>
-  <div class="tooltip-word" id="tip-word"></div>
-  <div class="tooltip-desc" id="tip-desc"></div>
-  <div class="tooltip-section" id="tip-insight-section">
-    <div class="tooltip-section-title" id="tip-insight-title">Deeper Insight</div>
-    <div class="tooltip-insight" id="tip-insight"></div>
-  </div>
-  <div class="tooltip-section" id="tip-contrast-section">
-    <div class="tooltip-section-title" id="tip-contrast-title">The Contrast</div>
-    <div class="tooltip-contrast" id="tip-contrast"></div>
-  </div>
-  <div class="tooltip-synonyms" id="tip-synonyms"></div>
-</div>
-
-<footer>lastcoinstanding.com</footer>
+<footer>
+    <p><a href="/about.html">About</a> this project — built to make Bitcoin's design legible, not just laudable.</p>
+</footer>
 
 <script>
-// Data will be loaded from data.json
-let data = null;
-let allLeaves = [];
-
-// Load data
-fetch('data.json')
-  .then(r => r.json())
-  .then(d => {
-    data = d;
-    document.getElementById('loading').classList.add('hidden');
-    renderTree('btc-tree', data.bitcoin.clusters, 'btc');
-    renderTree('fiat-tree', data.fiat.clusters, 'fiat');
-  })
-  .catch(e => {
-    console.error('Error loading data:', e);
-    document.getElementById('loading').textContent = 'Error loading data. Please refresh.';
-  });
-
-// Toggle view
-function toggleView() {
-  const body = document.body;
-  const btcView = document.getElementById('btc-view');
-  const fiatView = document.getElementById('fiat-view');
-  const btcLabel = document.querySelector('.toggle-label.btc');
-  const fiatLabel = document.querySelector('.toggle-label.fiat');
-  
-  body.classList.toggle('fiat-active');
-  
-  if (body.classList.contains('fiat-active')) {
-    btcView.classList.remove('active');
-    fiatView.classList.add('active');
-    btcLabel.classList.remove('active');
-    fiatLabel.classList.add('active');
-  } else {
-    btcView.classList.add('active');
-    fiatView.classList.remove('active');
-    btcLabel.classList.add('active');
-    fiatLabel.classList.remove('active');
-  }
-}
-
-// Measure text width
-function measureTextWidth(text, fontSize) {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  ctx.font = `600 ${fontSize}px 'Cormorant Garamond', Georgia, serif`;
-  return ctx.measureText(text).width;
-}
-
-// Layout and render tree with branches and labels
-function renderTree(svgId, clusters, type) {
-  const svg = document.getElementById(svgId);
-  if (!svg) return;
-  svg.innerHTML = '';
-  
-  const mobile = window.innerWidth <= 768;
-  const isBtc = type === 'btc';
-  const leafColor = isBtc ? '#f7931a' : '#6a7580';
-  const leafColorAlt = isBtc ? '#e88510' : '#5a6570';
-  const branchColor = isBtc ? '#5a4030' : '#454550';
-  const labelColor = isBtc ? '#f7931a' : '#8a9098';
-  const textColor = isBtc ? '#1a1510' : '#f0f0f0';
-  
-  // Responsive dimensions
-  const width = mobile ? 380 : 750;
-  const clusterSpacing = mobile ? 140 : 160; // Tighter vertical spacing
-  const headerSpace = mobile ? 50 : 60;
-  const footerSpace = mobile ? 70 : 90;
-  
-  // Calculate total height based on clusters
-  let totalHeight = headerSpace;
-  clusters.forEach(cluster => {
-    const numWords = cluster.words.length;
-    const rows = Math.ceil(numWords / (mobile ? 2 : 3)); // Fewer per row = more rows
-    const leafGapY = mobile ? 52 : 56;
-    const clusterHeight = Math.max(clusterSpacing, rows * leafGapY + (mobile ? 90 : 85));
-    totalHeight += clusterHeight;
-  });
-  totalHeight += footerSpace;
-  
-  const height = totalHeight;
-  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-  svg.setAttribute('preserveAspectRatio', 'xMidYMin meet');
-  
-  const trunkX = width / 2;
-  const trunkTop = headerSpace;
-  const trunkBottom = height - footerSpace + 30;
-  
-  // Draw trunk
-  const trunkWidth = mobile ? 14 : 18;
-  const trunk = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  trunk.setAttribute('d', `
-    M${trunkX - trunkWidth} ${trunkBottom}
-    Q${trunkX - trunkWidth * 0.8} ${trunkBottom - (trunkBottom - trunkTop) * 0.3} ${trunkX - trunkWidth * 0.4} ${trunkTop + 30}
-    L${trunkX + trunkWidth * 0.4} ${trunkTop + 30}
-    Q${trunkX + trunkWidth * 0.8} ${trunkBottom - (trunkBottom - trunkTop) * 0.3} ${trunkX + trunkWidth} ${trunkBottom}
-    Z
-  `);
-  trunk.setAttribute('fill', branchColor);
-  svg.appendChild(trunk);
-  
-  // Draw roots
-  const rootAngles = [-30, -10, 10, 30];
-  rootAngles.forEach(angle => {
-    const rad = angle * Math.PI / 180;
-    const root = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const rootLen = mobile ? 35 : 50;
-    const endX = trunkX + Math.sin(rad) * rootLen;
-    const endY = trunkBottom + Math.cos(rad) * rootLen * 0.7;
-    root.setAttribute('d', `M${trunkX} ${trunkBottom} Q${trunkX + Math.sin(rad) * rootLen * 0.5} ${trunkBottom + 15} ${endX} ${endY}`);
-    root.setAttribute('stroke', branchColor);
-    root.setAttribute('stroke-width', mobile ? '6' : '8');
-    root.setAttribute('fill', 'none');
-    root.setAttribute('stroke-linecap', 'round');
-    svg.appendChild(root);
-  });
-  
-  // Process each cluster
-  let currentY = headerSpace + 35;
-  
-  clusters.forEach((cluster, ci) => {
-    // Alternate which side the branch goes, but leaves spread BOTH sides
-    const branchGoesLeft = ci % 2 === 0;
-    const branchDirection = branchGoesLeft ? -1 : 1;
-    const numWords = cluster.words.length;
-    
-    // Branch parameters - varied angles for organic feel
-    const baseAngle = mobile ? 25 : 30;
-    const angleVariation = (ci % 3) * 5;
-    const branchAngle = branchDirection * (baseAngle + angleVariation);
-    const branchRad = branchAngle * Math.PI / 180;
-    const branchLen = mobile ? 45 : 70;
-    
-    const branchStartX = trunkX;
-    const branchStartY = currentY + 15;
-    const branchEndX = trunkX + Math.sin(branchRad) * branchLen;
-    const branchEndY = branchStartY - Math.abs(Math.cos(branchRad)) * branchLen * 0.12;
-    
-    // Draw branch with curve
-    const branch = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const ctrlX = branchStartX + (branchEndX - branchStartX) * 0.6;
-    const ctrlY = branchStartY - 6;
-    branch.setAttribute('d', `M${branchStartX} ${branchStartY} Q${ctrlX} ${ctrlY} ${branchEndX} ${branchEndY}`);
-    branch.setAttribute('stroke', branchColor);
-    branch.setAttribute('stroke-width', mobile ? '9' : '11');
-    branch.setAttribute('fill', 'none');
-    branch.setAttribute('stroke-linecap', 'round');
-    svg.appendChild(branch);
-    
-    // Draw cluster label - position at end of branch
-    const labelFontSize = mobile ? 15 : 15;
-    const labelText = cluster.name;
-    const labelWidth = measureTextWidth(labelText, labelFontSize) + (mobile ? 18 : 18);
-    const labelHeight = mobile ? 26 : 24;
-    const labelX = branchEndX + branchDirection * 5;
-    const labelY = branchEndY - (mobile ? 18 : 16);
-    
-    // Label background
-    const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    labelBg.setAttribute('x', branchGoesLeft ? labelX - labelWidth : labelX);
-    labelBg.setAttribute('y', labelY - labelHeight / 2);
-    labelBg.setAttribute('width', labelWidth);
-    labelBg.setAttribute('height', labelHeight);
-    labelBg.setAttribute('rx', '3');
-    labelBg.setAttribute('fill', 'rgba(10,12,15,0.92)');
-    labelBg.setAttribute('stroke', isBtc ? 'rgba(247,147,26,0.5)' : 'rgba(100,120,140,0.5)');
-    labelBg.setAttribute('stroke-width', '1');
-    svg.appendChild(labelBg);
-    
-    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    label.setAttribute('x', branchGoesLeft ? labelX - labelWidth / 2 : labelX + labelWidth / 2);
-    label.setAttribute('y', labelY + 1);
-    label.setAttribute('text-anchor', 'middle');
-    label.setAttribute('dominant-baseline', 'middle');
-    label.setAttribute('fill', labelColor);
-    label.setAttribute('font-size', labelFontSize);
-    label.setAttribute('font-weight', '600');
-    label.setAttribute('font-family', "'Cormorant Garamond', Georgia, serif");
-    label.textContent = labelText;
-    svg.appendChild(label);
-    
-    // Calculate leaf positions - SPREAD ACROSS BOTH SIDES of branch
-    const leafRadius = mobile ? 34 : 36;
-    const fontSize = mobile ? 12 : 13;
-    
-    // Leaves fan out from branch end in a natural canopy pattern
-    const leafStartY = branchEndY + (mobile ? 36 : 38);
-    
-    // Create positions that spread both left and right of the branch
-    const positions = [];
-    const spreadWidth = mobile ? 180 : 280; // Total width for leaves
-    const baseX = branchEndX; // Center around branch end
-    
-    // Generate organic positions with collision detection
-    cluster.words.forEach((word, wi) => {
-      // Alternate between left and right of branch center
-      const side = wi % 2 === 0 ? -1 : 1;
-      
-      // Calculate base row (roughly 2-3 per row for more vertical spread)
-      const effectiveRow = Math.floor(wi / (mobile ? 2 : 3));
-      const posInRow = wi % (mobile ? 2 : 3);
-      
-      // Horizontal spread - alternate sides with more spacing
-      const hSpread = mobile ? 75 : 95;
-      let offsetX = side * (hSpread * 0.6 + posInRow * hSpread * 0.5);
-      
-      // Add randomness for organic feel (reduced to prevent overlaps)
-      offsetX += (Math.sin(wi * 2.3) * (mobile ? 8 : 14));
-      
-      // Vertical position with variation
-      const vSpacing = mobile ? 52 : 56;
-      let offsetY = effectiveRow * vSpacing;
-      
-      // Stagger vertically for organic feel
-      offsetY += (Math.cos(wi * 1.7) * (mobile ? 6 : 10));
-      offsetY += (wi % 3) * (mobile ? 5 : 8); // Additional stagger
-      
-      let finalX = baseX + offsetX;
-      let finalY = leafStartY + offsetY;
-      
-      // Calculate this word's ellipse width for proper collision detection
-      const wordText = word.word;
-      const textWidth = measureTextWidth(wordText, fontSize);
-      const thisRx = Math.max(leafRadius, textWidth / 2 + (mobile ? 14 : 18));
-      
-      // Collision check with all previously placed leaves
-      const minDist = mobile ? 72 : 85;
-      let iterations = 0;
-      let hasCollision = true;
-      
-      while (hasCollision && iterations < 15) {
-        hasCollision = false;
-        for (let p of positions) {
-          const dx = finalX - p.x;
-          const dy = finalY - p.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const requiredDist = (thisRx + p.rx) * 0.85 + 8; // Account for ellipse widths
-          
-          if (dist < requiredDist) {
-            hasCollision = true;
-            // Nudge away more aggressively
-            const nudge = (requiredDist - dist) / 2 + 5;
-            const angle = Math.atan2(dy, dx) || (Math.random() * Math.PI * 2);
-            finalX += Math.cos(angle) * nudge;
-            finalY += Math.sin(angle) * nudge * 0.6; // Less vertical nudge
-            break;
-          }
-        }
-        iterations++;
-      }
-      
-      positions.push({
-        x: finalX,
-        y: finalY,
-        rx: thisRx,
-        word: word
-      });
+(function() {
+    var hamburger = document.getElementById('hamburger');
+    var overlay = document.getElementById('mobileOverlay');
+    hamburger.addEventListener('click', function() {
+        hamburger.classList.toggle('open');
+        overlay.classList.toggle('show');
+        document.body.style.overflow = overlay.classList.contains('show') ? 'hidden' : '';
     });
-    
-    // Draw twigs and leaves
-    positions.forEach((pos, wi) => {
-      // Draw twig from branch to leaf
-      const twig = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      const twigMidX = branchEndX + (pos.x - branchEndX) * 0.3;
-      const twigMidY = branchEndY + (pos.y - branchEndY) * 0.2;
-      twig.setAttribute('d', `M${branchEndX} ${branchEndY} Q${twigMidX} ${twigMidY} ${pos.x} ${pos.y - leafRadius * 0.5}`);
-      twig.setAttribute('stroke', branchColor);
-      twig.setAttribute('stroke-width', mobile ? '1.5' : '2');
-      twig.setAttribute('fill', 'none');
-      twig.setAttribute('opacity', '0.5');
-      svg.appendChild(twig);
-      
-      // Draw leaf (ellipse) - use pre-calculated rx
-      const wordText = pos.word.word;
-      const rx = pos.rx; // Use stored rx from collision detection
-      const ry = leafRadius * 0.58;
-      
-      const leafGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      leafGroup.setAttribute('class', 'leaf');
-      leafGroup.setAttribute('style', 'cursor: pointer;');
-      
-      // Store leaf data for tooltip
-      const leafIndex = allLeaves.length;
-      allLeaves.push({
-        word: wordText,
-        desc: pos.word.description,
-        insight: pos.word.deeperInsight,
-        contrast: pos.word.contrast,
-        synonyms: pos.word.synonyms,
-        cluster: cluster.name,
-        type: type
-      });
-      
-      leafGroup.setAttribute('onmouseenter', `showTooltip(event, ${leafIndex})`);
-      leafGroup.setAttribute('onmouseleave', 'hideTooltip()');
-      leafGroup.setAttribute('onmousemove', 'moveTooltip(event)');
-      leafGroup.setAttribute('ontouchstart', `showTooltip(event, ${leafIndex})`);
-      
-      const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-      ellipse.setAttribute('cx', pos.x);
-      ellipse.setAttribute('cy', pos.y);
-      ellipse.setAttribute('rx', rx);
-      ellipse.setAttribute('ry', ry);
-      ellipse.setAttribute('fill', wi % 2 === 0 ? leafColor : leafColorAlt);
-      ellipse.setAttribute('style', 'transition: transform 0.2s, filter 0.2s;');
-      leafGroup.appendChild(ellipse);
-      
-      // Leaf text
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', pos.x);
-      text.setAttribute('y', pos.y + 1);
-      text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('dominant-baseline', 'middle');
-      text.setAttribute('fill', textColor);
-      text.setAttribute('font-size', fontSize);
-      text.setAttribute('font-weight', '600');
-      text.setAttribute('font-family', "'Cormorant Garamond', Georgia, serif");
-      text.setAttribute('pointer-events', 'none');
-      text.textContent = wordText;
-      leafGroup.appendChild(text);
-      
-      // Hover effect
-      leafGroup.addEventListener('mouseenter', () => {
-        ellipse.style.filter = 'brightness(1.15)';
-        ellipse.style.transform = 'scale(1.05)';
-        ellipse.style.transformOrigin = `${pos.x}px ${pos.y}px`;
-      });
-      leafGroup.addEventListener('mouseleave', () => {
-        ellipse.style.filter = '';
-        ellipse.style.transform = '';
-      });
-      
-      svg.appendChild(leafGroup);
-    });
-    
-    // Calculate max Y used by this cluster's leaves
-    const maxLeafY = Math.max(...positions.map(p => p.y)) + leafRadius;
-    const clusterBottom = maxLeafY + (mobile ? 25 : 35);
-    
-    // Update Y position for next cluster
-    currentY = clusterBottom;
-  });
-}
-
-// Tooltip functions
-const tooltip = document.getElementById('tooltip');
-const tooltipOverlay = document.getElementById('tooltip-overlay');
-const isMobile = () => window.innerWidth <= 768;
-
-function showTooltip(e, leafIndex) {
-  e.preventDefault();
-  e.stopPropagation();
-  
-  const leaf = allLeaves[leafIndex];
-  if (!leaf) return;
-  
-  const isBtc = leaf.type === 'btc';
-  
-  // Update tooltip class
-  tooltip.className = 'tooltip ' + leaf.type;
-  
-  // Update content
-  document.getElementById('tip-word').textContent = leaf.word;
-  document.getElementById('tip-word').className = 'tooltip-word ' + leaf.type;
-  document.getElementById('tip-desc').textContent = leaf.desc;
-  
-  // Deeper insight
-  const insightSection = document.getElementById('tip-insight-section');
-  const insightTitle = document.getElementById('tip-insight-title');
-  const insightContent = document.getElementById('tip-insight');
-  if (leaf.insight) {
-    insightSection.style.display = 'block';
-    insightTitle.className = 'tooltip-section-title ' + leaf.type;
-    insightContent.textContent = leaf.insight;
-  } else {
-    insightSection.style.display = 'none';
-  }
-  
-  // Contrast
-  const contrastSection = document.getElementById('tip-contrast-section');
-  const contrastTitle = document.getElementById('tip-contrast-title');
-  const contrastContent = document.getElementById('tip-contrast');
-  if (leaf.contrast) {
-    contrastSection.style.display = 'block';
-    // Use OPPOSITE color for contrast header
-    contrastTitle.className = 'tooltip-section-title ' + (isBtc ? 'fiat' : 'btc');
-    contrastTitle.textContent = isBtc ? 'Fiat Contrast' : 'Bitcoin Contrast';
-    contrastContent.textContent = leaf.contrast;
-  } else {
-    contrastSection.style.display = 'none';
-  }
-  
-  // Synonyms
-  const synContainer = document.getElementById('tip-synonyms');
-  if (leaf.synonyms && leaf.synonyms.length > 0) {
-    synContainer.innerHTML = '<strong>Related:</strong> ' + 
-      leaf.synonyms.map(s => `<span class="${leaf.type}">${s}</span>`).join('');
-    synContainer.style.display = 'block';
-  } else {
-    synContainer.style.display = 'none';
-  }
-  
-  tooltip.style.display = 'block';
-  
-  if (isMobile()) {
-    // Mobile: show overlay and center tooltip
-    tooltipOverlay.style.display = 'block';
-    tooltip.style.top = '50%';
-    tooltip.style.transform = 'translateY(-50%)';
-    document.body.style.overflow = 'hidden';
-  } else {
-    moveTooltip(e);
-  }
-}
-
-function moveTooltip(e) {
-  if (isMobile()) return;
-  
-  const x = e.clientX || (e.touches && e.touches[0].clientX);
-  const y = e.clientY || (e.touches && e.touches[0].clientY);
-  
-  const rect = tooltip.getBoundingClientRect();
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-  
-  let left = x + 20;
-  let top = y + 15;
-  
-  // Keep tooltip in viewport
-  if (left + rect.width > viewportWidth - 20) {
-    left = x - rect.width - 20;
-  }
-  if (top + rect.height > viewportHeight - 20) {
-    top = y - rect.height - 15;
-  }
-  if (left < 10) left = 10;
-  if (top < 10) top = 10;
-  
-  tooltip.style.left = left + 'px';
-  tooltip.style.top = top + 'px';
-  tooltip.style.transform = 'none';
-}
-
-function hideTooltip() {
-  tooltip.style.display = 'none';
-  tooltipOverlay.style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-// Hide tooltip on scroll
-window.addEventListener('scroll', hideTooltip);
-
-// Re-render on resize (for orientation changes)
-let resizeTimeout;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(() => {
-    if (data) {
-      allLeaves = [];
-      renderTree('btc-tree', data.bitcoin.clusters, 'btc');
-      renderTree('fiat-tree', data.fiat.clusters, 'fiat');
+    // Close overlay when a link is clicked
+    var overlayLinks = overlay.querySelectorAll('a');
+    for (var i = 0; i < overlayLinks.length; i++) {
+        overlayLinks[i].addEventListener('click', function() {
+            hamburger.classList.remove('open');
+            overlay.classList.remove('show');
+            document.body.style.overflow = '';
+        });
     }
-  }, 250);
-});
+})();
 </script>
-
 </body>
 </html>
