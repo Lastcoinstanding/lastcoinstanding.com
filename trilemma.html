@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Bitcoin Trilemma | Last Coin Standing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0908;
+  --bg-card: #111010;
+  --border: #1e1c1a;
+  --orange: #F7931A;
+  --orange-dim: rgba(247,147,26,0.45);
+  --orange-glow: rgba(247,147,26,0.10);
+  --gold: #ffb840;
+  --green: #4ade80;
+  --green-dim: rgba(74,222,128,0.15);
+  --red: #f87171;
+  --red-dim: rgba(248,113,113,0.12);
+  --grey: #6a7580;
+  --grey-dim: rgba(106,117,128,0.15);
+  --text: #d4cec6;
+  --text-dim: #706860;
+  --text-bright: #f0ece6;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-ui: 'Inter', -apple-system, sans-serif;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-display);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── NAV ─── */
+.site-nav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 24px;
+  background: rgba(10,9,8,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-display);
+}
+.site-nav .nav-brand {
+  font-size: 0.95rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--orange);
+  text-decoration: none;
+}
+.site-nav .nav-links { display: flex; gap: 20px; }
+.site-nav .nav-links a {
+  font-size: 0.8rem; font-weight: 500;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  color: #706860; text-decoration: none;
+  transition: color 0.2s;
+}
+.site-nav .nav-links a:hover { color: var(--text-bright); }
+.site-nav .nav-links a.active { color: var(--orange); }
+
+/* ─── PAGE LAYOUT ─── */
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* ─── HEADER ─── */
+header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+header h1 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-bright);
+  margin-bottom: 10px;
+}
+header .subtitle {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--text-dim);
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto 16px;
+}
+header .intro-text {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: #908880;
+  font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+  line-height: 1.7;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* ─── MAIN CANVAS — TRIANGLE + PANEL ─── */
+.trilemma-stage {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  margin-bottom: 56px;
+}
+
+/* ─── SVG TRIANGLE ─── */
+.triangle-wrap {
+  flex: 0 0 auto;
+  width: 480px;
+  position: relative;
+}
+.triangle-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ─── SIDE PANEL ─── */
+.info-panel {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 28px 28px 24px;
+  min-height: 400px;
+  transition: border-color 0.4s ease;
+}
+.info-panel.highlight-d { border-color: var(--orange); }
+.info-panel.highlight-se { border-color: var(--orange); }
+.info-panel.highlight-sc { border-color: var(--grey); }
+
+.panel-default { animation: fadeIn 0.3s ease; }
+.panel-active { animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-label {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.panel-label.decentralization { color: var(--orange); }
+.panel-label.security { color: var(--orange); }
+.panel-label.scalability { color: var(--grey); }
+
+.panel-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 14px;
+  line-height: 1.3;
+}
+
+.panel-body {
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  line-height: 1.75;
+  color: #b0a8a0;
+}
+.panel-body p { margin-bottom: 14px; }
+.panel-body p:last-child { margin-bottom: 0; }
+
+.panel-body strong {
+  color: var(--text-bright);
+  font-weight: 600;
+}
+
+.panel-verdict {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+.panel-verdict.good {
+  background: var(--green-dim);
+  border-left: 3px solid var(--green);
+  color: #b0d8b8;
+}
+.panel-verdict.bad {
+  background: var(--red-dim);
+  border-left: 3px solid var(--red);
+  color: #d8b0b0;
+}
+.panel-verdict.neutral {
+  background: var(--grey-dim);
+  border-left: 3px solid var(--grey);
+  color: #b0b4b8;
+}
+
+.example-box {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 6px;
+}
+.example-box .example-label {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+.example-box .example-content {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #908880;
+}
+
+/* ─── BITCOIN'S CHOICE SECTION ─── */
+.btc-choice {
+  text-align: center;
+  padding: 40px 28px;
+  background: linear-gradient(135deg, rgba(247,147,26,0.04), rgba(255,184,64,0.02));
+  border: 1px solid rgba(247,147,26,0.12);
+  border-radius: 12px;
+  margin-bottom: 48px;
+}
+.btc-choice h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 16px;
+}
+.btc-choice p {
+  font-family: var(--font-display);
+  font-size: clamp(0.95rem, 1.8vw, 1.08rem);
+  line-height: 1.75;
+  color: #b0a8a0;
+  max-width: 700px;
+  margin: 0 auto 14px;
+}
+.btc-choice p:last-child { margin-bottom: 0; }
+
+/* ─── LAYERS SECTION ─── */
+.layers-section {
+  margin-bottom: 48px;
+}
+.layers-section h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-bright);
+  text-align: center;
+  margin-bottom: 28px;
+}
+.layers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.layer-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px 20px;
+  text-align: center;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.layer-card:hover {
+  border-color: rgba(247,147,26,0.25);
+  transform: translateY(-2px);
+}
+.layer-num {
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 8px;
+}
+.layer-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 8px;
+}
+.layer-desc {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #908880;
+}
+
+/* ─── FOOTER ─── */
+footer {
+  text-align: center;
+  padding: 20px 20px 40px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: #4a4540;
+  line-height: 1.8;
+}
+footer a {
+  color: var(--orange);
+  text-decoration: none;
+}
+footer a:hover { text-decoration: underline; }
+
+/* ─── MOBILE ─── */
+@media (max-width: 860px) {
+  .trilemma-stage {
+    flex-direction: column;
+    align-items: center;
+  }
+  .triangle-wrap {
+    width: 100%;
+    max-width: 420px;
+  }
+  .info-panel {
+    min-height: auto;
+    width: 100%;
+  }
+  .layers-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+  .page { padding: 24px 16px 60px; }
+  .triangle-wrap { max-width: 340px; }
+  .info-panel { padding: 20px 18px 18px; }
+  .panel-title { font-size: 1.25rem; }
+  .site-nav { padding: 8px 14px; }
+  .site-nav .nav-brand { font-size: 0.8rem; }
+  .site-nav .nav-links { gap: 12px; }
+  .site-nav .nav-links a { font-size: 0.7rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="site-nav">
+  <a href="index.html" class="nav-brand">Last Coin Standing</a>
+  <div class="nav-links">
+    <a href="index.html">Money Trees</a>
+    <a href="what-bitcoin-is.html">What Bitcoin Is</a>
+    <a href="trilemma.html" class="active">The Trilemma</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <header>
+    <h1>The Bitcoin Trilemma</h1>
+    <p class="subtitle">Why Bitcoin deliberately sacrifices speed — and why that's exactly right</p>
+    <p class="intro-text">
+      Every blockchain must choose: you can optimize for any two of three foundational properties —
+      <strong>Decentralization</strong>, <strong>Security</strong>, and <strong>Scalability</strong> —
+      but never all three at the base layer. Click each vertex below to explore the tradeoffs.
+    </p>
+  </header>
+
+  <!-- TRIANGLE + PANEL -->
+  <div class="trilemma-stage">
+
+    <!-- SVG TRIANGLE -->
+    <div class="triangle-wrap">
+      <svg class="triangle-svg" viewBox="0 0 500 460" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Orange glow filter -->
+          <filter id="glow-orange" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <!-- Grey glow filter -->
+          <filter id="glow-grey" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <!-- Subtle pulse animation -->
+          <radialGradient id="node-glow-d" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#F7931A" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#F7931A" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="node-glow-se" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#F7931A" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#F7931A" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="node-glow-sc" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#6a7580" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#6a7580" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Triangle edges -->
+        <!-- D ↔ Se (Bitcoin's priority — strong orange) -->
+        <line x1="250" y1="55" x2="60" y2="395" stroke="#F7931A" stroke-width="2.5" stroke-opacity="0.5" id="edge-d-se"/>
+        <!-- D ↔ Sc -->
+        <line x1="250" y1="55" x2="440" y2="395" stroke="#3a3530" stroke-width="1.5" stroke-opacity="0.5" id="edge-d-sc"/>
+        <!-- Se ↔ Sc -->
+        <line x1="60" y1="395" x2="440" y2="395" stroke="#3a3530" stroke-width="1.5" stroke-opacity="0.5" id="edge-se-sc"/>
+
+        <!-- Bitcoin's choice highlight — the D-Se edge glow -->
+        <line x1="250" y1="55" x2="60" y2="395" stroke="#F7931A" stroke-width="6" stroke-opacity="0.08" filter="url(#glow-orange)"/>
+
+        <!-- "BITCOIN'S CHOICE" label along the D-Se edge -->
+        <text x="115" y="210" fill="#F7931A" fill-opacity="0.35" font-family="Inter, sans-serif" font-size="8" font-weight="700" letter-spacing="0.14em" transform="rotate(-60, 115, 210)">BITCOIN'S CHOICE</text>
+
+        <!-- Center label -->
+        <text x="250" y="285" fill="#4a4540" font-family="'Cormorant Garamond', serif" font-size="13" font-weight="500" text-anchor="middle" font-style="italic">"Pick any two"</text>
+
+        <!-- ─── DECENTRALIZATION NODE (top) ─── -->
+        <g id="node-d" class="tri-node" data-vertex="decentralization" style="cursor:pointer">
+          <circle cx="250" cy="55" r="44" fill="url(#node-glow-d)" opacity="0"/>
+          <circle cx="250" cy="55" r="28" fill="#181410" stroke="#F7931A" stroke-width="2" class="node-ring"/>
+          <text x="250" y="51" fill="#F7931A" font-family="Inter, sans-serif" font-size="10" font-weight="700" text-anchor="middle" letter-spacing="0.06em">D</text>
+          <text x="250" y="63" fill="#F7931A" font-family="Inter, sans-serif" font-size="5.5" font-weight="500" text-anchor="middle" letter-spacing="0.06em" fill-opacity="0.7">MAX</text>
+          <!-- Label -->
+          <text x="250" y="14" fill="#d4cec6" font-family="'Cormorant Garamond', serif" font-size="14" font-weight="600" text-anchor="middle" letter-spacing="0.04em">Decentralization</text>
+        </g>
+
+        <!-- ─── SECURITY NODE (bottom-left) ─── -->
+        <g id="node-se" class="tri-node" data-vertex="security" style="cursor:pointer">
+          <circle cx="60" cy="395" r="44" fill="url(#node-glow-se)" opacity="0"/>
+          <circle cx="60" cy="395" r="28" fill="#181410" stroke="#F7931A" stroke-width="2" class="node-ring"/>
+          <text x="60" y="391" fill="#F7931A" font-family="Inter, sans-serif" font-size="10" font-weight="700" text-anchor="middle" letter-spacing="0.06em">S</text>
+          <text x="60" y="403" fill="#F7931A" font-family="Inter, sans-serif" font-size="5.5" font-weight="500" text-anchor="middle" letter-spacing="0.06em" fill-opacity="0.7">MAX</text>
+          <!-- Label -->
+          <text x="60" y="442" fill="#d4cec6" font-family="'Cormorant Garamond', serif" font-size="14" font-weight="600" text-anchor="middle" letter-spacing="0.04em">Security</text>
+        </g>
+
+        <!-- ─── SCALABILITY NODE (bottom-right) ─── -->
+        <g id="node-sc" class="tri-node" data-vertex="scalability" style="cursor:pointer">
+          <circle cx="440" cy="395" r="44" fill="url(#node-glow-sc)" opacity="0"/>
+          <circle cx="440" cy="395" r="28" fill="#181410" stroke="#6a7580" stroke-width="1.5" class="node-ring" stroke-dasharray="4,3"/>
+          <text x="440" y="391" fill="#6a7580" font-family="Inter, sans-serif" font-size="10" font-weight="700" text-anchor="middle" letter-spacing="0.06em">Sc</text>
+          <text x="440" y="403" fill="#6a7580" font-family="Inter, sans-serif" font-size="5.5" font-weight="500" text-anchor="middle" letter-spacing="0.06em" fill-opacity="0.7">RELAX</text>
+          <!-- Label -->
+          <text x="440" y="442" fill="#706860" font-family="'Cormorant Garamond', serif" font-size="14" font-weight="500" text-anchor="middle" letter-spacing="0.04em">Scalability</text>
+        </g>
+
+        <!-- Edge labels: what each pair achieves -->
+        <text x="350" y="210" fill="#504840" font-family="'Cormorant Garamond', serif" font-size="10" font-style="italic" text-anchor="middle" transform="rotate(60, 350, 210)">faster but fragile</text>
+        <text x="250" y="420" fill="#504840" font-family="'Cormorant Garamond', serif" font-size="10" font-style="italic" text-anchor="middle">fast but centralized</text>
+
+      </svg>
+    </div>
+
+    <!-- INFO PANEL -->
+    <div class="info-panel" id="info-panel">
+      <div class="panel-default" id="panel-default">
+        <div class="panel-label" style="color: var(--text-dim);">EXPLORE</div>
+        <div class="panel-title">Click a Vertex</div>
+        <div class="panel-body">
+          <p>Every blockchain protocol faces the same fundamental constraint: it can optimize for any <strong>two</strong> of three properties at its base layer, but never all three simultaneously.</p>
+          <p>This isn't a failure of engineering — it's a structural reality of maintaining a trustless, global ledger. The technical constraint arises from the relationship between <strong>O(c)</strong> — the computational capacity of a regular laptop — and <strong>O(n)</strong> — the total transaction load of the network.</p>
+          <p>Click on <strong>Decentralization</strong>, <strong>Security</strong>, or <strong>Scalability</strong> to explore what happens when each property is relaxed — and why Bitcoin's deliberate choice is the foundation of sound digital money.</p>
+        </div>
+      </div>
+
+      <!-- DECENTRALIZATION PANEL -->
+      <div class="panel-active" id="panel-decentralization" style="display:none">
+        <div class="panel-label decentralization">DECENTRALIZATION</div>
+        <div class="panel-title">What if Decentralization Is Relaxed?</div>
+        <div class="panel-body">
+          <p>Decentralization means that <strong>anyone with a regular laptop</strong> can fully audit the blockchain — verify every transaction, confirm the 21-million supply cap, and validate the integrity of the entire ledger independently. This "computational auditability" is what gives Bitcoin its <strong>monetary hardness</strong>.</p>
+          <p>If you relax decentralization, you get <strong>speed and security, but at the cost of trust</strong>. The network becomes faster because fewer, more powerful nodes handle validation — but now ordinary people can't verify the ledger themselves. You've reintroduced the very counterparty risk Bitcoin was designed to eliminate.</p>
+          <div class="panel-verdict bad">
+            <strong>The result:</strong> A fast, secure database — but one that requires you to trust the operators. Essentially, you've rebuilt Visa with extra steps. If the supply cannot be verified by the individual, the credibility of the asset's scarcity is compromised, eroding its monetary premium.
+          </div>
+          <div class="example-box">
+            <div class="example-label">Real-World Failures</div>
+            <div class="example-content">
+              <strong>Solana</strong> requires enterprise-grade hardware to run a validator, concentrating control among well-funded operators.
+              <strong>BSV</strong> pushed for massive blocks, pricing out ordinary node operators and creating a network where as little as 1% of Bitcoin's miners could execute a 51% attack.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECURITY PANEL -->
+      <div class="panel-active" id="panel-security" style="display:none">
+        <div class="panel-label security">SECURITY</div>
+        <div class="panel-title">What if Security Is Relaxed?</div>
+        <div class="panel-body">
+          <p>Security is the system's resilience against adversaries possessing up to <strong>O(n)</strong> resources. Bitcoin achieves this through Proof of Work — requiring enormous real-world energy expenditure that makes attacks prohibitively expensive. The network's hash rate represents an immovable wall of thermodynamic cost.</p>
+          <p>If you relax security, you get <strong>speed and participation, but vulnerability to attack</strong>. Faster consensus algorithms or lower security thresholds allow more throughput, but they open the door to 51% attacks, double-spending, and ledger manipulation.</p>
+          <div class="panel-verdict bad">
+            <strong>The result:</strong> A fast, accessible network — but one that can be seized, censored, or rewritten by a sufficiently motivated adversary. Money that can be manipulated is not sound money.
+          </div>
+          <div class="example-box">
+            <div class="example-label">Real-World Failures</div>
+            <div class="example-content">
+              <strong>Ethereum Classic</strong> suffered multiple 51% attacks due to its low hash rate relative to Ethereum.
+              <strong>BSV</strong> has been repeatedly reorganized, demonstrating that speed without security is a dangerous illusion. Networks that weaken Proof of Work for speed gain throughput but lose the very immutability that makes a ledger trustworthy.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCALABILITY PANEL -->
+      <div class="panel-active" id="panel-scalability" style="display:none">
+        <div class="panel-label scalability">SCALABILITY</div>
+        <div class="panel-title">What if Scalability Is Relaxed?</div>
+        <div class="panel-body">
+          <p>Scalability is the capacity to process a transaction volume <strong>O(n)</strong> that significantly exceeds what a single node can handle <strong>O(c)</strong>. High throughput, low fees, instant settlement — the properties every payment network desires.</p>
+          <p>If you relax scalability at the base layer — as Bitcoin does — you preserve <strong>decentralization and security simultaneously</strong>. The base layer becomes a high-integrity settlement medium: slow, deliberate, and unbreakable. Approximately 400,000 transactions per day, each representing final, censorship-resistant settlement.</p>
+          <div class="panel-verdict good">
+            <strong>Bitcoin's choice:</strong> This is the correct tradeoff. The base layer is an armored tank — designed for settlement, not coffee purchases. Scalability is then addressed through <strong>layered architecture</strong>: the Lightning Network, sidechains, and application layers handle high-velocity payments while the base layer preserves monetary integrity.
+          </div>
+          <div class="example-box">
+            <div class="example-label">The Layered Solution</div>
+            <div class="example-content">
+              Just as <strong>Fedwire</strong> settles $80 trillion in value with fewer than 20 million transactions per month while Visa handles consumer payments above it — Bitcoin's Layer 1 provides settlement finality while Lightning and other Layer 2 solutions provide speed. Each L1 transaction can represent thousands of bundled L2 payments.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BITCOIN'S CHOICE -->
+  <div class="btc-choice">
+    <h2>Why This Is the Only Path to Sound Money</h2>
+    <p>
+      Bitcoin solved <strong>decentralization and security together</strong> for the first time in human history. Every other network that has tried to optimize for scalability at the base layer has necessarily sacrificed one or both — and has lost value against Bitcoin as a result.
+    </p>
+    <p>
+      Bitcoin Cash, Bitcoin SV, Litecoin, and scores of "faster" alternatives all made the same mistake: treating base-layer speed as the priority. The market has consistently rewarded <strong>monetary integrity over transaction velocity</strong>, because a digital asset must establish itself as a credible <strong>Store of Value</strong> before it can function as a <strong>Medium of Exchange</strong>.
+    </p>
+    <p>
+      The layered approach is the only architecture that preserves an immutable, decentralized foundation while achieving the throughput required to serve eight billion people.
+    </p>
+  </div>
+
+  <!-- LAYERS -->
+  <div class="layers-section">
+    <h2>How Bitcoin Scales Without Compromise</h2>
+    <div class="layers-grid">
+      <div class="layer-card">
+        <div class="layer-num">Layer 1</div>
+        <div class="layer-name">Settlement</div>
+        <div class="layer-desc">The armored core. Optimized for finality, censorship resistance, and monetary immutability. ~400K transactions/day focused on value-density, not velocity.</div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-num">Layer 2</div>
+        <div class="layer-name">Payments</div>
+        <div class="layer-desc">Lightning Network, rollups, and sidechains. High throughput, near-instant finality, negligible fees. Thousands of transactions settle to one L1 entry.</div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-num">Layer 3</div>
+        <div class="layer-name">Applications</div>
+        <div class="layer-desc">Consumer-facing services like Cash App and custodial wallets. Massive ease-of-use for billions of users while the 21M supply cap remains intact underneath.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>
+    The Blockchain Trilemma was first articulated by <strong>Vitalik Buterin</strong> in 2017.
+    Its profound implications for Bitcoin as sound money have been extensively explored by <strong>Jeff Booth</strong>.
+  </p>
+  <p style="margin-top: 8px;">
+    <a href="index.html">Last Coin Standing</a> · Bitcoin education through contrast and clarity
+  </p>
+</footer>
+
+<script>
+(function() {
+  const panels = {
+    default: document.getElementById('panel-default'),
+    decentralization: document.getElementById('panel-decentralization'),
+    security: document.getElementById('panel-security'),
+    scalability: document.getElementById('panel-scalability')
+  };
+  const infoPanel = document.getElementById('info-panel');
+  const nodes = document.querySelectorAll('.tri-node');
+
+  // Edge elements
+  const edgeDSe = document.getElementById('edge-d-se');
+  const edgeDSc = document.getElementById('edge-d-sc');
+  const edgeSeSc = document.getElementById('edge-se-sc');
+
+  let active = null;
+
+  function showPanel(vertex) {
+    // If clicking same vertex, toggle back to default
+    if (active === vertex) {
+      active = null;
+      Object.values(panels).forEach(p => p.style.display = 'none');
+      panels.default.style.display = 'block';
+      infoPanel.className = 'info-panel';
+      resetNodes();
+      resetEdges();
+      return;
+    }
+
+    active = vertex;
+
+    // Hide all panels, show selected
+    Object.values(panels).forEach(p => p.style.display = 'none');
+    panels[vertex].style.display = 'block';
+
+    // Panel border highlight
+    infoPanel.className = 'info-panel';
+    if (vertex === 'decentralization' || vertex === 'security') {
+      infoPanel.classList.add('highlight-d');
+    } else {
+      infoPanel.classList.add('highlight-sc');
+    }
+
+    // Highlight active node, dim others
+    nodes.forEach(n => {
+      const v = n.dataset.vertex;
+      const ring = n.querySelector('.node-ring');
+      if (v === vertex) {
+        ring.style.strokeWidth = '3';
+        ring.style.filter = v === 'scalability' ? 'url(#glow-grey)' : 'url(#glow-orange)';
+        n.querySelector('circle:first-child').style.opacity = '1';
+      } else {
+        ring.style.strokeWidth = v === 'scalability' ? '1.5' : '2';
+        ring.style.filter = 'none';
+        n.querySelector('circle:first-child').style.opacity = '0';
+      }
+    });
+
+    // Highlight relevant edges
+    resetEdges();
+    if (vertex === 'decentralization') {
+      edgeDSe.style.stroke = '#F7931A';
+      edgeDSe.style.strokeOpacity = '0.7';
+      edgeDSc.style.stroke = '#F7931A';
+      edgeDSc.style.strokeOpacity = '0.4';
+    } else if (vertex === 'security') {
+      edgeDSe.style.stroke = '#F7931A';
+      edgeDSe.style.strokeOpacity = '0.7';
+      edgeSeSc.style.stroke = '#F7931A';
+      edgeSeSc.style.strokeOpacity = '0.4';
+    } else if (vertex === 'scalability') {
+      edgeDSc.style.stroke = '#6a7580';
+      edgeDSc.style.strokeOpacity = '0.5';
+      edgeSeSc.style.stroke = '#6a7580';
+      edgeSeSc.style.strokeOpacity = '0.5';
+    }
+  }
+
+  function resetNodes() {
+    nodes.forEach(n => {
+      const ring = n.querySelector('.node-ring');
+      const v = n.dataset.vertex;
+      ring.style.strokeWidth = v === 'scalability' ? '1.5' : '2';
+      ring.style.filter = 'none';
+      n.querySelector('circle:first-child').style.opacity = '0';
+    });
+  }
+
+  function resetEdges() {
+    edgeDSe.style.stroke = '#F7931A';
+    edgeDSe.style.strokeOpacity = '0.5';
+    edgeDSc.style.stroke = '#3a3530';
+    edgeDSc.style.strokeOpacity = '0.5';
+    edgeSeSc.style.stroke = '#3a3530';
+    edgeSeSc.style.strokeOpacity = '0.5';
+  }
+
+  // Click handlers
+  nodes.forEach(n => {
+    n.addEventListener('click', () => showPanel(n.dataset.vertex));
+  });
+
+  // Hover feedback
+  nodes.forEach(n => {
+    n.addEventListener('mouseenter', () => {
+      if (active === n.dataset.vertex) return;
+      const ring = n.querySelector('.node-ring');
+      ring.style.strokeWidth = '3';
+    });
+    n.addEventListener('mouseleave', () => {
+      if (active === n.dataset.vertex) return;
+      const ring = n.querySelector('.node-ring');
+      const v = n.dataset.vertex;
+      ring.style.strokeWidth = v === 'scalability' ? '1.5' : '2';
+    });
+  });
+})();
+</script>
+</body>
+</html>
