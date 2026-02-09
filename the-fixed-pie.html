@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Fixed Pie — Last Coin Standing</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #0a0b0f;
+    --bg-card: #12131a;
+    --bg-card-hover: #1a1b25;
+    --btc-warm: #f7931a;
+    --btc-glow: #f7931a40;
+    --btc-soft: #f7931a18;
+    --fiat-cold: #5a8a9e;
+    --fiat-dim: #5a8a9e40;
+    --fiat-soft: #5a8a9e18;
+    --fiat-red: #c0392b;
+    --text-primary: #e8e6e1;
+    --text-secondary: #8a8880;
+    --text-dim: #55534e;
+    --border: #1e1f2a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* --- Header --- */
+  header {
+    text-align: center;
+    padding: 3rem 0 2rem;
+  }
+
+  header .label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1.2rem;
+  }
+
+  header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    line-height: 1.15;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+  }
+
+  header h1 em {
+    font-style: italic;
+    color: var(--btc-warm);
+  }
+
+  header .subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 540px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* --- Insight callout --- */
+  .insight {
+    text-align: center;
+    padding: 1.5rem 2rem;
+    margin: 1.5rem auto 2.5rem;
+    max-width: 620px;
+    border-left: 2px solid var(--btc-warm);
+    border-right: 2px solid var(--fiat-cold);
+    background: linear-gradient(90deg, var(--btc-soft), transparent, var(--fiat-soft));
+    border-radius: 2px;
+  }
+
+  .insight p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-style: italic;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* --- Dual Pies Layout --- */
+  .pies-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .pies-section {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  .pie-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .pie-panel.btc { border-top: 2px solid var(--btc-warm); }
+  .pie-panel.fiat { border-top: 2px solid var(--fiat-cold); }
+
+  .pie-panel .panel-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .pie-panel.btc .panel-label { color: var(--btc-warm); }
+  .pie-panel.fiat .panel-label { color: var(--fiat-cold); }
+
+  .pie-panel h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+  }
+
+  .pie-canvas-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto 1.5rem;
+    aspect-ratio: 1;
+  }
+
+  .pie-canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  .pie-center-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .pie-center-label .big {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    display: block;
+    line-height: 1.2;
+  }
+
+  .pie-panel.btc .pie-center-label .big { color: var(--btc-warm); }
+  .pie-panel.fiat .pie-center-label .big { color: var(--fiat-cold); }
+
+  .pie-center-label .small {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat .val {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 500;
+    display: block;
+  }
+
+  .pie-panel.btc .stat .val { color: var(--btc-warm); }
+  .pie-panel.fiat .stat .val { color: var(--fiat-cold); }
+
+  .stat .lbl {
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .share-change {
+    margin-top: 1rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 400;
+  }
+
+  .pie-panel.btc .share-change {
+    background: var(--btc-soft);
+    color: var(--btc-warm);
+  }
+
+  .pie-panel.fiat .share-change {
+    background: rgba(192, 57, 43, 0.1);
+    color: var(--fiat-red);
+  }
+
+  /* --- Controls --- */
+  .controls {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .controls h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 1.2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+  }
+
+  .sliders {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .sliders { grid-template-columns: 1fr; gap: 1.5rem; }
+  }
+
+  .slider-group label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.6rem;
+  }
+
+  .slider-group label span.slider-val {
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  .slider-group.btc label span.slider-val { color: var(--btc-warm); }
+  .slider-group.fiat label span.slider-val { color: var(--fiat-cold); }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    outline: none;
+    background: var(--border);
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--bg-deep);
+  }
+
+  .slider-group.btc input[type="range"]::-webkit-slider-thumb { background: var(--btc-warm); }
+  .slider-group.fiat input[type="range"]::-webkit-slider-thumb { background: var(--fiat-cold); }
+
+  .slider-group.btc input[type="range"]::-webkit-slider-runnable-track { background: linear-gradient(90deg, var(--btc-warm), var(--border)); }
+  .slider-group.fiat input[type="range"]::-webkit-slider-runnable-track { background: linear-gradient(90deg, var(--fiat-cold), var(--border)); }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    padding: 0.65rem 1.4rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .btn:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+    border-color: var(--text-dim);
+  }
+
+  .btn.primary {
+    background: var(--btc-warm);
+    color: var(--bg-deep);
+    border-color: var(--btc-warm);
+  }
+
+  .btn.primary:hover {
+    background: #e8850f;
+    border-color: #e8850f;
+  }
+
+  /* --- Timeline / History --- */
+  .timeline {
+    margin-bottom: 2.5rem;
+  }
+
+  .timeline h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 1.2rem;
+    text-align: center;
+    margin-bottom: 1.2rem;
+    color: var(--text-secondary);
+  }
+
+  .timeline-track {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+
+  .timeline-step {
+    flex: 1;
+    min-width: 110px;
+    padding: 1rem 0.8rem;
+    border-left: 1px solid var(--border);
+    position: relative;
+    transition: background 0.3s;
+  }
+
+  .timeline-step:first-child { border-left: none; }
+
+  .timeline-step .yr {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    margin-bottom: 0.4rem;
+  }
+
+  .timeline-step .event {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-step .supply-label {
+    font-size: 0.68rem;
+    font-weight: 500;
+  }
+
+  .timeline-step .supply-label.fiat-supply { color: var(--fiat-cold); }
+  .timeline-step .supply-label.btc-supply { color: var(--btc-warm); }
+
+  .timeline-step:hover {
+    background: var(--bg-card);
+  }
+
+  /* --- Takeaway --- */
+  .takeaway {
+    text-align: center;
+    padding: 3rem 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .takeaway h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(1.4rem, 3vw, 1.8rem);
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+
+  .takeaway h3 em { color: var(--btc-warm); font-style: italic; }
+
+  .takeaway p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    max-width: 560px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-up {
+    animation: fadeUp 0.7s ease-out both;
+  }
+
+  .fade-up-d1 { animation-delay: 0.1s; }
+  .fade-up-d2 { animation-delay: 0.2s; }
+  .fade-up-d3 { animation-delay: 0.35s; }
+  .fade-up-d4 { animation-delay: 0.5s; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="fade-up">
+    <div class="label">Last Coin Standing</div>
+    <h1>The <em>Fixed</em> Pie</h1>
+    <p class="subtitle">Nobody has ever owned part of a truly fixed pie before. Bitcoin changed that. See what happens to your share when supply can't expand — and what happens when it can.</p>
+  </header>
+
+  <div class="insight fade-up fade-up-d1">
+    <p>"In fiat, the pie keeps growing — but your slice keeps shrinking. In Bitcoin, 1/21,000,000 is 1/21,000,000. Forever."</p>
+  </div>
+
+  <div class="pies-section fade-up fade-up-d2">
+    <!-- Bitcoin Pie -->
+    <div class="pie-panel btc">
+      <div class="panel-label">Hard Money</div>
+      <h2>Bitcoin</h2>
+      <div class="pie-canvas-wrap">
+        <canvas id="btcPie" width="560" height="560"></canvas>
+        <div class="pie-center-label">
+          <span class="big" id="btcSharePct">—</span>
+          <span class="small">your share</span>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat">
+          <span class="val" id="btcSupply">21,000,000</span>
+          <span class="lbl">Total Supply</span>
+        </div>
+        <div class="stat">
+          <span class="val" id="btcYourCoins">—</span>
+          <span class="lbl">Your BTC</span>
+        </div>
+        <div class="stat">
+          <span class="val" id="btcHolders">—</span>
+          <span class="lbl">Holders</span>
+        </div>
+      </div>
+      <div class="share-change" id="btcMsg">Your share of Bitcoin never dilutes.</div>
+    </div>
+
+    <!-- Fiat Pie -->
+    <div class="pie-panel fiat">
+      <div class="panel-label">Soft Money</div>
+      <h2>Fiat (USD)</h2>
+      <div class="pie-canvas-wrap">
+        <canvas id="fiatPie" width="560" height="560"></canvas>
+        <div class="pie-center-label">
+          <span class="big" id="fiatSharePct">—</span>
+          <span class="small">your share</span>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat">
+          <span class="val" id="fiatSupply">—</span>
+          <span class="lbl">Money Supply</span>
+        </div>
+        <div class="stat">
+          <span class="val" id="fiatYourDollars">—</span>
+          <span class="lbl">Your USD</span>
+        </div>
+        <div class="stat">
+          <span class="val" id="fiatExpansion">—</span>
+          <span class="lbl">Supply Growth</span>
+        </div>
+      </div>
+      <div class="share-change" id="fiatMsg">Watch what happens as more dollars are printed.</div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls fade-up fade-up-d3">
+    <h3>Adjust the Variables</h3>
+    <div class="sliders">
+      <div class="slider-group btc">
+        <label>New Bitcoin holders enter the network <span class="slider-val" id="btcHoldersVal">100</span></label>
+        <input type="range" id="btcHoldersSlider" min="10" max="1000" value="100" step="10">
+        <label style="margin-top:0.8rem;">Your Bitcoin (BTC) <span class="slider-val" id="btcAmountVal">1.0</span></label>
+        <input type="range" id="btcAmountSlider" min="0.01" max="21" value="1" step="0.01">
+      </div>
+      <div class="slider-group fiat">
+        <label>Years of money printing <span class="slider-val" id="fiatYearsVal">0</span></label>
+        <input type="range" id="fiatYearsSlider" min="0" max="50" value="0" step="1">
+        <label style="margin-top:0.8rem;">Your savings (USD) <span class="slider-val" id="fiatAmountVal">$100,000</span></label>
+        <input type="range" id="fiatAmountSlider" min="1000" max="1000000" value="100000" step="1000">
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" id="btnAnimate">▶ Watch the Dilution</button>
+      <button class="btn" id="btnReset">Reset</button>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline fade-up fade-up-d4">
+    <h3>The History of Expansion</h3>
+    <div class="timeline-track">
+      <div class="timeline-step">
+        <div class="yr">1971</div>
+        <div class="event">Nixon ends gold standard</div>
+        <div class="supply-label fiat-supply">M2: $0.7T</div>
+        <div class="supply-label btc-supply">BTC: n/a</div>
+      </div>
+      <div class="timeline-step">
+        <div class="yr">2000</div>
+        <div class="event">Dot-com bubble</div>
+        <div class="supply-label fiat-supply">M2: $4.9T</div>
+        <div class="supply-label btc-supply">BTC: n/a</div>
+      </div>
+      <div class="timeline-step">
+        <div class="yr">2009</div>
+        <div class="event">Bitcoin genesis block</div>
+        <div class="supply-label fiat-supply">M2: $8.5T</div>
+        <div class="supply-label btc-supply">BTC: 21M cap set</div>
+      </div>
+      <div class="timeline-step">
+        <div class="yr">2020</div>
+        <div class="event">40% of all USD printed</div>
+        <div class="supply-label fiat-supply">M2: $19.4T</div>
+        <div class="supply-label btc-supply">BTC: 18.5M mined</div>
+      </div>
+      <div class="timeline-step">
+        <div class="yr">2024</div>
+        <div class="event">4th halving event</div>
+        <div class="supply-label fiat-supply">M2: $21.2T</div>
+        <div class="supply-label btc-supply">BTC: 19.7M mined</div>
+      </div>
+      <div class="timeline-step">
+        <div class="yr">2140</div>
+        <div class="event">Last Bitcoin mined</div>
+        <div class="supply-label fiat-supply">M2: ∞</div>
+        <div class="supply-label btc-supply">BTC: 21M. Done.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Takeaway -->
+  <div class="takeaway fade-up">
+    <h3>Fiat expands. Your share <em>contracts</em>.<br>Bitcoin is fixed. Your share is <em>yours</em>.</h3>
+    <p>Every dollar printed silently transfers purchasing power from savers to spenders. Bitcoin's fixed supply means that for the first time in history, you can own a piece of a pie that will never grow larger — only more valuable.</p>
+  </div>
+</div>
+
+<script>
+const BTC_TOTAL = 21_000_000;
+const FIAT_BASE = 21_200_000_000_000; // ~$21.2T M2
+const ANNUAL_EXPANSION = 0.07; // ~7% avg fiat expansion
+
+// State
+let state = {
+  btcHolders: 100,
+  btcAmount: 1,
+  fiatYears: 0,
+  fiatAmount: 100000,
+  animating: false,
+};
+
+// Canvases
+const btcCanvas = document.getElementById('btcPie');
+const fiatCanvas = document.getElementById('fiatPie');
+const btcCtx = btcCanvas.getContext('2d');
+const fiatCtx = fiatCanvas.getContext('2d');
+
+// Elements
+const els = {
+  btcSharePct: document.getElementById('btcSharePct'),
+  btcSupply: document.getElementById('btcSupply'),
+  btcYourCoins: document.getElementById('btcYourCoins'),
+  btcHolders: document.getElementById('btcHolders'),
+  btcMsg: document.getElementById('btcMsg'),
+  fiatSharePct: document.getElementById('fiatSharePct'),
+  fiatSupply: document.getElementById('fiatSupply'),
+  fiatYourDollars: document.getElementById('fiatYourDollars'),
+  fiatExpansion: document.getElementById('fiatExpansion'),
+  fiatMsg: document.getElementById('fiatMsg'),
+  btcHoldersVal: document.getElementById('btcHoldersVal'),
+  btcAmountVal: document.getElementById('btcAmountVal'),
+  fiatYearsVal: document.getElementById('fiatYearsVal'),
+  fiatAmountVal: document.getElementById('fiatAmountVal'),
+};
+
+function formatNum(n, decimals = 0) {
+  if (n >= 1e12) return (n / 1e12).toFixed(1) + 'T';
+  if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return n.toLocaleString('en-US', { maximumFractionDigits: decimals });
+  return n.toFixed(decimals);
+}
+
+function drawPie(ctx, canvas, shareRatio, color, glowColor, isGrowing) {
+  const w = canvas.width;
+  const h = canvas.height;
+  const cx = w / 2;
+  const cy = h / 2;
+  const r = w * 0.4;
+  const innerR = w * 0.28;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Background ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.arc(cx, cy, innerR, 0, Math.PI * 2, true);
+  ctx.fillStyle = '#1a1b25';
+  ctx.fill();
+
+  // Your share slice
+  const angle = Math.max(shareRatio * Math.PI * 2, 0.01);
+  const startAngle = -Math.PI / 2;
+
+  // Glow
+  ctx.save();
+  ctx.shadowColor = glowColor;
+  ctx.shadowBlur = 20;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, startAngle, startAngle + angle);
+  ctx.arc(cx, cy, innerR, startAngle + angle, startAngle, true);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.restore();
+
+  // Clean slice on top
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, startAngle, startAngle + angle);
+  ctx.arc(cx, cy, innerR, startAngle + angle, startAngle, true);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+
+  // If fiat is growing, show expansion rings
+  if (isGrowing && state.fiatYears > 0) {
+    const expansionR = r + (state.fiatYears * 0.8);
+    const maxExpR = r + 42;
+    const actualExpR = Math.min(expansionR, maxExpR);
+    ctx.beginPath();
+    ctx.arc(cx, cy, actualExpR, 0, Math.PI * 2);
+    ctx.arc(cx, cy, r, 0, Math.PI * 2, true);
+    ctx.fillStyle = 'rgba(90, 138, 158, 0.08)';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, actualExpR, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(90, 138, 158, 0.15)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+function update() {
+  // Bitcoin calculations
+  const btcShare = state.btcAmount / BTC_TOTAL;
+  const btcPct = (btcShare * 100);
+  const btcPctStr = btcPct < 0.0001 ? btcPct.toExponential(2) : btcPct.toFixed(btcPct < 0.01 ? 6 : 4);
+
+  // Fiat calculations
+  const fiatSupply = FIAT_BASE * Math.pow(1 + ANNUAL_EXPANSION, state.fiatYears);
+  const fiatShare = state.fiatAmount / fiatSupply;
+  const fiatPct = (fiatShare * 100);
+  const fiatPctStr = fiatPct < 0.0001 ? fiatPct.toExponential(2) : fiatPct.toFixed(fiatPct < 0.01 ? 8 : 6);
+
+  const initialFiatShare = state.fiatAmount / FIAT_BASE;
+  const dilutionPct = state.fiatYears > 0 ? ((1 - (fiatShare / initialFiatShare)) * 100).toFixed(1) : 0;
+
+  // Draw pies
+  drawPie(btcCtx, btcCanvas, Math.min(btcShare * 5000, 1), '#f7931a', '#f7931a60', false);
+  drawPie(fiatCtx, fiatCanvas, Math.min(fiatShare * 2e10, 1), '#5a8a9e', '#5a8a9e40', true);
+
+  // Update text
+  els.btcSharePct.textContent = btcPctStr + '%';
+  els.btcSupply.textContent = '21,000,000';
+  els.btcYourCoins.textContent = state.btcAmount.toFixed(state.btcAmount < 1 ? 2 : state.btcAmount < 10 ? 2 : 1);
+  els.btcHolders.textContent = formatNum(state.btcHolders);
+
+  els.fiatSharePct.textContent = fiatPctStr + '%';
+  els.fiatSupply.textContent = '$' + formatNum(fiatSupply);
+  els.fiatYourDollars.textContent = '$' + formatNum(state.fiatAmount);
+  els.fiatExpansion.textContent = state.fiatYears > 0 ? '+' + ((Math.pow(1 + ANNUAL_EXPANSION, state.fiatYears) - 1) * 100).toFixed(0) + '%' : '0%';
+
+  // Messages
+  if (state.btcHolders > 100) {
+    els.btcMsg.textContent = `${formatNum(state.btcHolders)} people joined the network. Your ${state.btcAmount.toFixed(2)} BTC is still ${btcPctStr}% of all Bitcoin. Unchanged.`;
+  } else {
+    els.btcMsg.textContent = 'Your share of Bitcoin never dilutes. No matter how many holders join.';
+  }
+
+  if (state.fiatYears > 0) {
+    els.fiatMsg.textContent = `After ${state.fiatYears} year${state.fiatYears > 1 ? 's' : ''} of ~7% expansion, your share was diluted by ${dilutionPct}%. Your dollars didn't shrink — the pie grew around them.`;
+    els.fiatMsg.style.background = 'rgba(192, 57, 43, 0.1)';
+    els.fiatMsg.style.color = '#c0392b';
+  } else {
+    els.fiatMsg.textContent = 'Watch what happens as more dollars are printed.';
+    els.fiatMsg.style.background = 'rgba(90, 138, 158, 0.08)';
+    els.fiatMsg.style.color = 'var(--fiat-cold)';
+  }
+}
+
+// Slider listeners
+document.getElementById('btcHoldersSlider').addEventListener('input', function() {
+  state.btcHolders = parseInt(this.value);
+  els.btcHoldersVal.textContent = formatNum(state.btcHolders);
+  update();
+});
+
+document.getElementById('btcAmountSlider').addEventListener('input', function() {
+  state.btcAmount = parseFloat(this.value);
+  els.btcAmountVal.textContent = state.btcAmount.toFixed(state.btcAmount < 1 ? 2 : state.btcAmount < 10 ? 2 : 1);
+  update();
+});
+
+document.getElementById('fiatYearsSlider').addEventListener('input', function() {
+  state.fiatYears = parseInt(this.value);
+  els.fiatYearsVal.textContent = this.value;
+  update();
+});
+
+document.getElementById('fiatAmountSlider').addEventListener('input', function() {
+  state.fiatAmount = parseInt(this.value);
+  els.fiatAmountVal.textContent = '$' + formatNum(state.fiatAmount);
+  update();
+});
+
+// Animate button
+document.getElementById('btnAnimate').addEventListener('click', function() {
+  if (state.animating) return;
+  state.animating = true;
+  this.textContent = '⏳ Printing money...';
+
+  const slider = document.getElementById('fiatYearsSlider');
+  const holdersSlider = document.getElementById('btcHoldersSlider');
+  let year = 0;
+  let holders = parseInt(holdersSlider.value);
+
+  const interval = setInterval(() => {
+    year++;
+    if (year <= 50) {
+      slider.value = year;
+      state.fiatYears = year;
+      els.fiatYearsVal.textContent = year;
+
+      // Also increase BTC holders to show network growth
+      holders = Math.min(holders + 20, 1000);
+      holdersSlider.value = holders;
+      state.btcHolders = holders;
+      els.btcHoldersVal.textContent = formatNum(holders);
+
+      update();
+    } else {
+      clearInterval(interval);
+      state.animating = false;
+      document.getElementById('btnAnimate').textContent = '▶ Watch the Dilution';
+    }
+  }, 120);
+});
+
+// Reset
+document.getElementById('btnReset').addEventListener('click', function() {
+  state = { btcHolders: 100, btcAmount: 1, fiatYears: 0, fiatAmount: 100000, animating: false };
+  document.getElementById('btcHoldersSlider').value = 100;
+  document.getElementById('btcAmountSlider').value = 1;
+  document.getElementById('fiatYearsSlider').value = 0;
+  document.getElementById('fiatAmountSlider').value = 100000;
+  els.btcHoldersVal.textContent = '100';
+  els.btcAmountVal.textContent = '1.0';
+  els.fiatYearsVal.textContent = '0';
+  els.fiatAmountVal.textContent = '$100,000';
+  update();
+});
+
+// Handle high-DPI
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  canvas.getContext('2d').scale(dpr, dpr);
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+}
+
+window.addEventListener('resize', () => {
+  setupCanvas(btcCanvas);
+  setupCanvas(fiatCanvas);
+  update();
+});
+
+// Init
+requestAnimationFrame(() => {
+  setupCanvas(btcCanvas);
+  setupCanvas(fiatCanvas);
+  update();
+});
+</script>
+</body>
+</html>
