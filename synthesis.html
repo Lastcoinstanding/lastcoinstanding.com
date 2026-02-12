@@ -3,6 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Google Analytics (GA4) — Replace G-WNGLLPPR5M with your Measurement ID -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WNGLLPPR5M"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-WNGLLPPR5M');
+    </script>
     <!-- SEO -->
     <meta name="description" content="Six existing ideas. One irreducible discovery. Explore each component that makes Bitcoin work, then try removing one to see exactly what collapses — and why this synthesis could only happen once.">
     <link rel="canonical" href="https://lastcoinstanding.com/synthesis.html">
@@ -25,6 +40,22 @@
     <meta name="twitter:image" content="https://lastcoinstanding.com/og-preview.jpg">
 
     <title>The Bitcoin Synthesis — Last Coin Standing</title>
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "@id": "https://lastcoinstanding.com/synthesis.html",
+      "url": "https://lastcoinstanding.com/synthesis.html",
+      "name": "The Bitcoin Synthesis — Why Sound Money Could Only Be Discovered Once",
+      "description": "Six existing ideas. One irreducible discovery. Explore each component that makes Bitcoin work, then try removing one to see exactly what collapses — and why this synthesis could only happen once.",
+      "isPartOf": { "@id": "https://lastcoinstanding.com/#website" },
+      "about": { "@type": "Thing", "name": "Bitcoin", "sameAs": "https://en.wikipedia.org/wiki/Bitcoin" },
+      "publisher": { "@id": "https://lastcoinstanding.com/#organization" },
+      "inLanguage": "en"
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -710,10 +741,17 @@ function deactivateCore() {
    ═══════════════════════════════════════════════ */
 function handleRemoval(id) {
     if (removedId === id) {
-        // Restore
+        // Restore (clicking the same removed component toggles it back)
         restoreFromRemoval();
         showCompletionPanel();
         return;
+    }
+
+    // If another component is already removed, restore it first
+    // This ensures only one component is removed at a time,
+    // reinforcing that ANY single removal breaks the system
+    if (removedId !== null) {
+        restoreFromRemoval();
     }
 
     // Remove a component
