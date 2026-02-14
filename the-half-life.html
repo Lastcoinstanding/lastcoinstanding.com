@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WNGLLPPR5M"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-WNGLLPPR5M');
+    </script>
+
+    <!-- SEO -->
+    <meta name="description" content="How long until your money loses half its value? An interactive exploration of purchasing power decay across USD, Gold, and Bitcoin.">
+    <link rel="canonical" href="https://lastcoinstanding.com/the-half-life.html">
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lastcoinstanding.com/the-half-life.html">
+    <meta property="og:title" content="The Half-Life — Last Coin Standing">
+    <meta property="og:description" content="How long until your money loses half its value? An interactive exploration of purchasing power decay across USD, Gold, and Bitcoin.">
+    <meta property="og:image" content="https://lastcoinstanding.com/og-preview.jpg">
+    <meta property="og:image:width" content="1280">
+    <meta property="og:image:height" content="720">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:site_name" content="Last Coin Standing">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="The Half-Life — Last Coin Standing">
+    <meta name="twitter:description" content="How long until your money loses half its value? An interactive exploration of purchasing power decay across USD, Gold, and Bitcoin.">
+    <meta name="twitter:image" content="https://lastcoinstanding.com/og-preview.jpg">
+
+<title>The Half-Life — Last Coin Standing</title>
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "@id": "https://lastcoinstanding.com/the-half-life.html",
+      "url": "https://lastcoinstanding.com/the-half-life.html",
+      "name": "The Half-Life — Last Coin Standing",
+      "description": "How long until your money loses half its value? An interactive exploration of purchasing power decay across USD, Gold, and Bitcoin.",
+      "isPartOf": { "@id": "https://lastcoinstanding.com/#website" },
+      "publisher": { "@id": "https://lastcoinstanding.com/#organization" },
+      "about": {
+        "@type": "Thing",
+        "name": "Purchasing Power Decay",
+        "description": "The rate at which fiat currency loses purchasing power compared to gold and Bitcoin"
+      },
+      "inLanguage": "en"
+    }
+    </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0908;--bg-card:#111110;--border:#1e1c1a;--border-lt:#2a2826;--orange:#F7931A;--orange-dim:rgba(247,147,26,.45);--orange-glow:rgba(247,147,26,.12);--orange-soft:rgba(247,147,26,.08);--gold:#d4a843;--gold-dim:rgba(212,168,67,.35);--gold-soft:rgba(212,168,67,.10);--red:#c0392b;--red-dim:rgba(192,57,43,.30);--red-soft:rgba(192,57,43,.10);--purple:#7b5ea7;--purple-soft:rgba(123,94,167,.12);--text:#d8d2ca;--text-dim:#908880;--text-bright:#f2eee8;--text-body:#d0c8c0;--text-muted:#706860;--font-d:'Cormorant Garamond',Georgia,serif;--font-b:'Inter',-apple-system,sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:1rem;line-height:1.7;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:1000}
+
+/* NAV */
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:rgba(10,9,8,.95);border-bottom:1px solid #1a1a1a;position:sticky;top:0;z-index:1000;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.site-nav .brand{font-family:var(--font-b);font-size:.8rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#999;text-decoration:none;transition:color .2s}
+.site-nav .brand:hover{color:var(--orange)}
+.site-nav .nav-links{display:flex;gap:4px}
+.site-nav .nav-links a{font-family:var(--font-b);font-size:.85rem;font-weight:500;color:#aaa;text-decoration:none;padding:8px 14px;border-radius:4px;transition:color .2s,background .2s}
+.site-nav .nav-links a:hover{color:#ccc;background:rgba(255,255,255,.04)}
+.site-nav .nav-links a.active{color:var(--orange);background:var(--orange-soft)}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:8px;flex-direction:column;gap:5px}
+.hamburger span{display:block;width:22px;height:2px;background:#aaa;transition:all .3s}
+.hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+.mobile-overlay{display:none;position:fixed;inset:0;top:50px;background:rgba(10,9,8,.98);z-index:999;flex-direction:column;padding:2rem 1.5rem;gap:.5rem}
+.mobile-overlay.show{display:flex}
+.mobile-overlay a{font-family:var(--font-b);font-size:1.1rem;font-weight:500;color:#aaa;text-decoration:none;padding:12px 16px;border-radius:6px;transition:all .2s}
+.mobile-overlay a:hover{color:#ccc;background:rgba(255,255,255,.04)}
+.mobile-overlay a.active{color:var(--orange);background:var(--orange-soft)}
+@media(max-width:768px){.site-nav .nav-links{display:none}.hamburger{display:flex}}
+
+/* PAGE */
+.page{max-width:960px;margin:0 auto;padding:40px 24px 60px}
+.page-header{text-align:center;margin-bottom:32px}
+.page-header h1{font-family:var(--font-d);font-size:clamp(2rem,4.5vw,3rem);font-weight:600;color:var(--text-bright);margin-bottom:12px;letter-spacing:-.01em}
+.page-header h1 .red{color:var(--red)}
+.page-header .subtitle{font-size:1rem;color:var(--text-dim);max-width:600px;margin:0 auto;line-height:1.7}
+.header-quote{max-width:620px;margin:0 auto 16px;text-align:center}
+.header-quote blockquote{font-family:var(--font-d);font-style:italic;font-size:clamp(1rem,1.8vw,1.2rem);font-weight:500;color:var(--text-dim);line-height:1.6;margin-bottom:6px}
+.header-quote cite{font-family:var(--font-b);font-size:.65rem;font-weight:600;letter-spacing:.15em;color:var(--text-muted);font-style:normal;text-transform:uppercase}
+
+/* TABS */
+.tab-nav{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:28px}
+.tab-btn{flex:1;padding:16px 16px;background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;text-align:center;transition:all .25s}
+.tab-btn:hover{background:rgba(255,255,255,.02)}
+.tab-btn .tab-num{display:block;font-family:var(--font-b);font-size:.65rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;transition:color .25s}
+.tab-btn .tab-title{display:block;font-family:var(--font-d);font-size:clamp(1rem,2vw,1.3rem);font-weight:600;color:var(--text-dim);transition:color .25s}
+.tab-btn.active{border-bottom-color:var(--orange)}
+.tab-btn.active .tab-num{color:var(--orange)}
+.tab-btn.active .tab-title{color:var(--text-bright)}
+.tab-content{display:none;animation:tabIn .35s ease}
+.tab-content.active{display:block}
+@keyframes tabIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* TYPOGRAPHY */
+.section-title{font-family:var(--font-d);font-size:clamp(1.3rem,2.5vw,1.8rem);font-weight:600;color:var(--text-bright);margin-bottom:12px}
+.section-title .red{color:var(--red)}
+.section-title .amber{color:var(--orange)}
+.prose{font-size:1rem;color:var(--text-body);line-height:1.8;max-width:720px}
+.prose+.prose{margin-top:12px}
+.prose strong{color:var(--text-bright);font-weight:600}
+.prose .red{color:var(--red);font-weight:500}
+.prose .amber{color:var(--orange);font-weight:500}
+.prose .gold-t{color:var(--gold);font-weight:500}
+
+/* CONTROLS */
+.controls-panel{margin:24px 0 20px;padding:24px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px}
+.control-row{display:flex;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.control-row:last-child{margin-bottom:0}
+.control-label{font-size:.75rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;min-width:120px}
+.control-label.cl-fiat{color:var(--red)}
+.control-label.cl-btc{color:var(--orange)}
+.control-label.cl-time{color:var(--text-dim)}
+.btn-group{display:flex;gap:6px;flex-wrap:wrap}
+.opt-btn{display:flex;flex-direction:column;align-items:center;padding:10px 18px;background:rgba(255,255,255,.02);border:2px solid var(--border);border-radius:8px;cursor:pointer;transition:all .2s;min-width:110px}
+.opt-btn:hover{border-color:var(--border-lt);background:rgba(255,255,255,.04)}
+.opt-btn .opt-name{font-size:.85rem;font-weight:600;color:var(--text-body);margin-bottom:2px}
+.opt-btn .opt-rate{font-size:.72rem;font-weight:500;color:var(--text-muted)}
+.opt-btn.sel-fiat{border-color:var(--red);background:var(--red-soft);box-shadow:0 0 12px rgba(192,57,43,.1)}
+.opt-btn.sel-fiat .opt-name{color:var(--red)}
+.opt-btn.sel-fiat .opt-rate{color:rgba(192,57,43,.7)}
+.opt-btn.sel-btc{border-color:var(--orange);background:var(--orange-soft);box-shadow:0 0 12px rgba(247,147,26,.1)}
+.opt-btn.sel-btc .opt-name{color:var(--orange)}
+.opt-btn.sel-btc .opt-rate{color:var(--orange-dim)}
+.opt-btn.sel-time{border-color:var(--text-dim);background:rgba(255,255,255,.06)}
+.opt-btn.sel-time .opt-name{color:var(--text-bright)}
+@media(max-width:600px){.control-label{min-width:100%;margin-bottom:4px}.opt-btn{min-width:90px;padding:8px 12px}.opt-btn .opt-name{font-size:.8rem}}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:28px;border-left:2px solid var(--border);margin:24px 0}
+.tl-ev{padding:16px 0 28px;position:relative}
+.tl-ev::before{content:'';position:absolute;left:-28px;top:20px;width:8px;height:8px;border-radius:50%;background:var(--red);transform:translateX(-3px);box-shadow:0 0 8px var(--red-dim)}
+.tl-yr{font-size:.75rem;font-weight:600;color:var(--red);letter-spacing:.1em;margin-bottom:4px}
+.tl-ttl{font-family:var(--font-d);font-size:1.2rem;font-weight:600;color:var(--text-bright);margin-bottom:6px}
+.tl-desc{font-size:.95rem;color:var(--text-body);line-height:1.8;max-width:600px}
+.tl-stat{display:inline-block;margin-top:8px;padding:4px 10px;background:var(--red-soft);border:1px solid rgba(192,57,43,.2);border-radius:4px;font-size:.75rem;font-weight:600;color:var(--red);letter-spacing:.05em}
+
+/* CALLOUT */
+.callout{margin:24px 0;padding:24px;background:linear-gradient(135deg,var(--bg-card),rgba(192,57,43,.04));border:1px solid rgba(192,57,43,.15);border-left:3px solid var(--red);border-radius:6px}
+.callout .c-t{font-family:var(--font-d);font-size:1.15rem;font-weight:600;color:var(--text-bright);margin-bottom:8px}
+.callout .c-amt{font-family:var(--font-d);font-size:2rem;font-weight:600;color:var(--red);margin:10px 0 4px}
+.callout .c-body{font-size:.95rem;color:var(--text-body);line-height:1.7}
+.callout .c-items{font-size:.88rem;color:var(--text-dim);font-style:italic;line-height:1.6;margin-top:6px}
+
+/* LEAK GRID */
+.leak-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0}
+@media(max-width:700px){.leak-grid{grid-template-columns:1fr}}
+.lk{padding:20px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;border-bottom:3px solid transparent}
+.lk.lk-f{border-bottom-color:var(--red)}.lk.lk-g{border-bottom-color:var(--gold)}.lk.lk-b{border-bottom-color:var(--orange)}
+.lk .lk-label{font-size:.65rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px}
+.lk-f .lk-label{color:var(--red)}.lk-g .lk-label{color:var(--gold)}.lk-b .lk-label{color:var(--orange)}
+.lk .lk-type{font-family:var(--font-d);font-size:1.15rem;font-weight:600;color:var(--text-bright);margin-bottom:8px}
+.lk .lk-desc{font-size:.92rem;color:var(--text-body);line-height:1.7}
+.lk .lk-who{margin-top:10px;font-size:.78rem;color:var(--text-muted);font-style:italic}
+.govt-note{margin:20px 0;padding:20px 24px;background:var(--purple-soft);border:1px solid rgba(123,94,167,.2);border-left:3px solid var(--purple);border-radius:6px}
+.govt-note p{font-size:.95rem;color:var(--text-body);line-height:1.8}
+.govt-note strong{color:var(--purple);font-weight:600}
+
+/* TAKEAWAY */
+.tk-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+@media(max-width:600px){.tk-grid{grid-template-columns:1fr}}
+.tk{padding:28px;border-radius:8px;border:1px solid var(--border)}
+.tk.tk-f{background:linear-gradient(135deg,var(--bg-card),rgba(192,57,43,.03));border-color:rgba(192,57,43,.15)}
+.tk.tk-b{background:linear-gradient(135deg,var(--bg-card),rgba(247,147,26,.03));border-color:rgba(247,147,26,.15)}
+.tk .tk-icon{font-size:1.5rem;margin-bottom:12px}
+.tk h3{font-family:var(--font-d);font-size:1.2rem;font-weight:600;margin-bottom:10px}
+.tk-f h3{color:var(--red)}.tk-b h3{color:var(--orange)}
+.tk p{font-size:.95rem;color:var(--text-body);line-height:1.8}
+.tk .tk-stat{margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:.75rem;font-weight:600;letter-spacing:.08em}
+.tk-f .tk-stat{color:var(--red)}.tk-b .tk-stat{color:var(--orange)}
+.mining-note{margin:24px 0;padding:20px 24px;background:var(--orange-soft);border:1px solid rgba(247,147,26,.12);border-left:3px solid var(--orange);border-radius:6px}
+.mining-note p{font-size:.92rem;color:var(--text-body);line-height:1.8}
+.mining-note strong{color:var(--orange);font-weight:600}
+footer{text-align:center;padding:32px 24px;color:var(--text-muted);font-size:.9rem;border-top:1px solid var(--border)}
+
+/* SCENARIO SELECTOR */
+.scenario-selector{margin:20px 0 24px;padding:20px 24px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px}
+.scenario-prompt{font-family:var(--font-d);font-size:1.2rem;font-weight:600;color:var(--text-bright);margin-bottom:12px}
+.scenario-selector .btn-group{margin-bottom:10px}
+.scenario-hint{font-size:.82rem;color:var(--text-muted);line-height:1.6}
+
+/* INSIGHT BLOCKS */
+.insight-block{margin-bottom:8px}
+.insight-divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--border-lt),transparent);margin:36px 0}
+
+/* DECAY HERO — the gut punch */
+.decay-hero{margin:28px 0 0;padding:32px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;text-align:center;position:relative;overflow:hidden}
+.decay-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--red)}
+.decay-headline{font-size:1rem;color:var(--text-dim);margin-bottom:8px}
+.decay-number{font-family:var(--font-d);font-size:clamp(4rem,8vw,5.5rem);font-weight:700;color:var(--red);line-height:1;transition:all .5s ease;margin-bottom:2px}
+.decay-years{font-size:1.1rem;font-weight:600;color:var(--text-dim);margin-bottom:24px;letter-spacing:.05em}
+
+/* Decay curve chart */
+.decay-chart-wrap{width:100%;max-width:560px;height:220px;margin:0 auto 20px;position:relative}
+@media(max-width:600px){.decay-chart-wrap{height:180px}}
+canvas#decayChart{width:100%!important;height:100%!important}
+
+.decay-note{font-size:.88rem;color:var(--text-muted);line-height:1.6;max-width:480px;margin:0 auto;transition:opacity .3s}
+
+/* SUPPLY GRID */
+.supply-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0}
+@media(max-width:700px){.supply-grid{grid-template-columns:1fr;gap:12px}}
+.supply-card{padding:22px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;gap:12px}
+.supply-card.sp-fiat{border-top:3px solid var(--red)}
+.supply-card.sp-gold{border-top:3px solid var(--gold)}
+.supply-card.sp-btc{border-top:3px solid var(--orange)}
+.sp-header{display:flex;justify-content:space-between;align-items:baseline}
+.sp-label{font-size:.65rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
+.sp-fiat .sp-label{color:var(--red)}.sp-gold .sp-label{color:var(--gold)}.sp-btc .sp-label{color:var(--orange)}
+.sp-type{font-family:var(--font-d);font-size:1.05rem;font-weight:600;color:var(--text-bright)}
+.sp-viz{margin:4px 0}
+.sp-bar-track{width:100%;height:6px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden}
+.sp-bar-fill{height:100%;border-radius:3px}
+.sp-bar-fiat{background:var(--red)}.sp-bar-gold{background:var(--gold)}.sp-bar-btc{background:var(--orange)}
+.sp-bar-caption{font-size:.7rem;color:var(--text-muted);margin-top:4px}
+.sp-points{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.sp-points li{font-size:.88rem;color:var(--text-body);line-height:1.6;padding-left:16px;position:relative}
+.sp-points li::before{content:'·';position:absolute;left:0;color:var(--text-muted);font-weight:700;font-size:1.1rem;line-height:1.5}
+.sp-fiat .sp-points li::before{color:var(--red)}
+.sp-gold .sp-points li::before{color:var(--gold)}
+.sp-btc .sp-points li::before{color:var(--orange)}
+.sp-beneficiary{font-size:.8rem;color:var(--text-dim)}
+.sp-beneficiary strong{color:var(--text-body);font-weight:600}
+.sp-trajectory{font-size:.72rem;font-weight:600;letter-spacing:.08em;padding:6px 10px;border-radius:4px;text-align:center}
+.sp-traj-fiat{color:var(--red);background:var(--red-soft)}
+.sp-traj-gold{color:var(--gold);background:var(--gold-soft)}
+.sp-traj-btc{color:var(--orange);background:var(--orange-soft)}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="/" class="brand">Last Coin Standing</a>
+  <div class="nav-links">
+    <a href="/money-trees.html">The Money Trees</a>
+    <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+    <a href="/synthesis.html">The Synthesis</a>
+    <a href="/trilemma.html">The Trilemma</a>
+    <a href="/the-half-life.html" class="active">The Half-Life</a>
+    <a href="/about.html">About</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-overlay" id="mobileOverlay">
+  <a href="/money-trees.html">The Money Trees</a>
+  <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+  <a href="/synthesis.html">The Synthesis</a>
+  <a href="/trilemma.html">The Trilemma</a>
+  <a href="/the-half-life.html" class="active">The Half-Life</a>
+  <a href="/about.html">About</a>
+</div>
+
+<div class="page">
+  <div class="page-header">
+    <h1>The <span class="red">Half&#8209;Life</span></h1>
+    <div class="header-quote">
+      <blockquote>"There is no example in nature or any engineering where a leak is required for the system to work efficiently. In virtually all cases, any such leak is fatal."</blockquote>
+      <cite>&#8212; Michael Saylor</cite>
+    </div>
+    <p class="subtitle">How long until your money loses half its value?</p>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="showTab('interactive')">
+      <span class="tab-num">I</span><span class="tab-title">The Half&#8209;Life</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('history')">
+      <span class="tab-num">II</span><span class="tab-title">The Leak</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('takeaway')">
+      <span class="tab-num">III</span><span class="tab-title">The Takeaway</span>
+    </button>
+  </div>
+
+  <!-- TAB 1: THE HALF-LIFE -->
+  <div class="tab-content active" id="tab-interactive">
+
+    <!-- INSIGHT 1: How fast is your dollar dying? -->
+    <div class="insight-block">
+      <h2 class="section-title">How fast is your dollar <span class="red">dying</span>?</h2>
+      <p class="prose">
+        "Half-life" is the time it takes for your money to lose half its purchasing power. The answer depends on the true rate of inflation &#8212; not the government's carefully curated CPI figure, but the actual erosion you experience when buying groceries, housing, healthcare, and education.
+      </p>
+
+      <div class="scenario-selector">
+        <div class="scenario-prompt">What is the true rate of inflation?</div>
+        <div class="btn-group" id="fiatBtns">
+          <button class="opt-btn" data-rate="3.5" onclick="setFiat(this)"><span class="opt-name">CPI Official</span><span class="opt-rate">~3.5% / yr</span></button>
+          <button class="opt-btn sel-fiat" data-rate="8" onclick="setFiat(this)"><span class="opt-name">Shadow Stats</span><span class="opt-rate">~8% / yr</span></button>
+          <button class="opt-btn" data-rate="12" onclick="setFiat(this)"><span class="opt-name">True Asset</span><span class="opt-rate">~12% / yr</span></button>
+        </div>
+        <div class="scenario-hint">CPI is the government's own figure. Shadow Stats uses pre-1980 methodology. True Asset includes housing, healthcare, and education.</div>
+      </div>
+
+      <!-- The gut-punch: big number + decay curve -->
+      <div class="decay-hero">
+        <div class="decay-headline">Your $100 becomes $50 in&#8230;</div>
+        <div class="decay-number" id="fiatHL">8.3</div>
+        <div class="decay-years">years</div>
+
+        <div class="decay-chart-wrap">
+          <canvas id="decayChart"></canvas>
+        </div>
+
+        <div class="decay-note" id="decayNote">At the Shadow Stats rate, the dollar's half-life has compressed from ~20 years to ~8 years. The leak is accelerating.</div>
+      </div>
+    </div>
+
+    <div class="insight-divider"></div>
+
+    <!-- INSIGHT 2: Why is Bitcoin structurally different? -->
+    <div class="insight-block">
+      <h2 class="section-title">Not all money <span class="amber">leaks</span> the same way</h2>
+      <p class="prose">
+        Every money has some form of supply expansion. But the nature of that expansion &#8212; <em>who benefits, why it happens, and whether it can ever stop</em> &#8212; is what separates sound money from broken money.
+      </p>
+
+      <div class="supply-grid">
+        <div class="supply-card sp-fiat">
+          <div class="sp-header">
+            <div class="sp-label">U.S. Dollar</div>
+            <div class="sp-type">Seigniorage</div>
+          </div>
+          <div class="sp-viz">
+            <div class="sp-bar-track"><div class="sp-bar-fill sp-bar-fiat" style="width:100%"></div></div>
+            <div class="sp-bar-caption">Unlimited supply expansion</div>
+          </div>
+          <ul class="sp-points">
+            <li>Supply expanded at will by the state</li>
+            <li>No limit, no schedule, no consent</li>
+            <li>Silent transfer of purchasing power from people to government</li>
+            <li>Taxation without legislation</li>
+          </ul>
+          <div class="sp-beneficiary">Beneficiary &#8594; <strong>The government</strong></div>
+          <div class="sp-trajectory sp-traj-fiat">Half-life trending &#8594; zero</div>
+        </div>
+
+        <div class="supply-card sp-gold">
+          <div class="sp-header">
+            <div class="sp-label">Gold</div>
+            <div class="sp-type">Mining</div>
+          </div>
+          <div class="sp-viz">
+            <div class="sp-bar-track"><div class="sp-bar-fill sp-bar-gold" style="width:40%"></div></div>
+            <div class="sp-bar-caption">~2% per year, perpetual</div>
+          </div>
+          <ul class="sp-points">
+            <li>New supply accrues to miners who did real physical work</li>
+            <li>More benign, but a perpetual constant leak</li>
+            <li>Supply responds to price: higher gold price &#8594; more mining</li>
+            <li>Can never reach zero</li>
+          </ul>
+          <div class="sp-beneficiary">Beneficiary &#8594; <strong>Miners</strong> (real work)</div>
+          <div class="sp-trajectory sp-traj-gold">Half-life &#8776; 35 years, constant</div>
+        </div>
+
+        <div class="supply-card sp-btc">
+          <div class="sp-header">
+            <div class="sp-label">Bitcoin</div>
+            <div class="sp-type">Emission &#8594; Zero</div>
+          </div>
+          <div class="sp-viz">
+            <div class="sp-bar-track"><div class="sp-bar-fill sp-bar-btc" style="width:8%"></div></div>
+            <div class="sp-bar-caption">Pre-defined, halving every ~4 years, terminal</div>
+          </div>
+          <ul class="sp-points">
+            <li>Supply expansion is pre-programmed, decreasing, and terminal</li>
+            <li>Will reach exactly 21 million &#8212; zero supply response to price</li>
+            <li>Anyone can participate in mining, even from home</li>
+            <li>No gatekeepers, no privileged access</li>
+          </ul>
+          <div class="sp-beneficiary">Beneficiary &#8594; <strong>Miners</strong> (open, global, permissionless)</div>
+          <div class="sp-trajectory sp-traj-btc">Half-life trending &#8594; infinity</div>
+        </div>
+      </div>
+
+      <div class="govt-note"><p><strong>The critical distinction:</strong> Fiat inflation is not an unfortunate event beyond anyone's control, like the weather. It is an intentional, structural mechanism &#8212; the silent transfer of economic energy from the people who earned it to the government that printed it. With gold and Bitcoin, any new supply goes to those who did the work. With fiat, it goes to those who hold the printing press.</p></div>
+    </div>
+
+  </div>
+
+  <!-- TAB 2: THE LEAK -->
+  <div class="tab-content" id="tab-history">
+    <h2 class="section-title">The <span class="red">Leak</span></h2>
+    <p class="prose">The U.S. dollar has lost over <strong>95% of its purchasing power</strong> since 1900. This isn't misfortune or accident &#8212; it's the structural consequence of a monetary system designed to expand. Every dollar printed dilutes the value of every dollar already in your pocket. This is not a bug. <strong>It is the mechanism by which governments fund themselves without raising taxes.</strong></p>
+    <p class="prose">The story of this erosion follows a clear pattern: each institutional shift removed a constraint on money creation, and each removal accelerated the leak.</p>
+
+    <div class="timeline">
+      <div class="tl-ev"><div class="tl-yr">1900 &#8212; 1912</div><div class="tl-ttl">The Classical Gold Standard</div><div class="tl-desc">The dollar was legally defined as 0.04838 troy ounces of gold, fixed at $20.67/oz. Prices mean-reverted over decades &#8212; the cost of flour, steak, and eggs barely changed from the mid-19th century through 1912. Money didn't leak.</div><span class="tl-stat">Price level essentially unchanged for 50+ years</span></div>
+      <div class="tl-ev"><div class="tl-yr">1913</div><div class="tl-ttl">Birth of the Federal Reserve</div><div class="tl-desc">The Federal Reserve Act introduced "elastic currency" &#8212; the ability to expand money supply on demand. The historic trade-off: higher average inflation in exchange for lower volatility. The CPI doubled from 9.9 to 20.0 in just seven years. The leak began.</div><span class="tl-stat">Prices doubled in 7 years</span></div>
+      <div class="tl-ev"><div class="tl-yr">1933 &#8212; 1934</div><div class="tl-ttl">Executive Order 6102</div><div class="tl-desc">Private gold ownership outlawed. Gold repriced from $20.67 to $35.00/oz &#8212; a 41% devaluation of the dollar's gold content. Citizens were forced to exchange their gold for paper. The government severed the individual's direct relationship with sound money.</div><span class="tl-stat">41% devaluation overnight</span></div>
+      <div class="tl-ev"><div class="tl-yr">1971</div><div class="tl-ttl">The Nixon Shock</div><div class="tl-desc">The final constraint removed. Dollar convertibility to gold suspended &#8212; ostensibly "temporarily." The dollar became pure fiat: backed by nothing but government decree. The Federal Reserve gained unconstrained ability to expand the money supply. The leak became a flood.</div><span class="tl-stat">wtfhappenedin1971.com</span></div>
+      <div class="tl-ev"><div class="tl-yr">2008 &#8212; Present</div><div class="tl-ttl">Quantitative Easing &amp; Beyond</div><div class="tl-desc">Bank bailouts, pandemic stimulus, 21.4% cumulative inflation in just four years (2020&#8211;2024). Gold reached $5,598/oz by January 2026. The acceleration is unmistakable &#8212; and it isn't slowing down.</div><span class="tl-stat">21.4% cumulative inflation, 2020&#8211;2024</span></div>
+    </div>
+
+    <div class="callout">
+      <div class="c-t">What $10 Used to Buy</div>
+      <div class="c-body">In 1900, $10 could feed a household for four weeks:</div>
+      <div class="c-amt">$10 &#8594; $382</div>
+      <div class="c-items">4 boxes of corn flakes, 3 lbs of oysters, 5 lbs of ribeye steak, 10 lbs of chicken breast, 3 loaves of bread, 3 jars of jam, 6 dozen eggs, 4 lbs of ham, and 7 rolls of breakfast sausage.</div>
+      <div class="c-body" style="margin-top:10px">Today you would need <strong>$382</strong> for the same groceries. That's not a free market at work &#8212; it's a 125-year transfer of purchasing power from citizens to the state.</div>
+    </div>
+
+    <h3 class="section-title" style="font-size:1.3rem;margin-top:32px">Not All Leaks Are the Same</h3>
+    <p class="prose" style="margin-bottom:16px">Every money has some form of supply expansion. But the nature of that expansion &#8212; <em>who benefits, why it happens, and whether it can be controlled</em> &#8212; makes all the difference.</p>
+
+    <div class="leak-grid">
+      <div class="lk lk-f"><div class="lk-label">U.S. Dollar</div><div class="lk-type">Seigniorage</div><div class="lk-desc">Supply expanded at will by the state. No limit, no schedule, no consent. The "leak" is a silent transfer of purchasing power from the people to the government &#8212; taxation without legislation.</div><div class="lk-who">Beneficiary &#8594; The government / issuer</div></div>
+      <div class="lk lk-g"><div class="lk-label">Gold</div><div class="lk-type">Mining</div><div class="lk-desc">Supply expands ~2% per year through physical mining. The new supply accrues to miners who did real work &#8212; more benign, but still a perpetual, constant leak that can never reach zero.</div><div class="lk-who">Beneficiary &#8594; Miners (real work)</div></div>
+      <div class="lk lk-b"><div class="lk-label">Bitcoin</div><div class="lk-type">Emission (&#8594; Zero)</div><div class="lk-desc">Supply expansion is pre-defined, decreasing, and terminal. Halving every ~4 years until reaching 21 million. New supply accrues to miners doing real work &#8212; and anyone can participate, even from home.</div><div class="lk-who">Beneficiary &#8594; Miners (open participation)</div></div>
+    </div>
+
+    <div class="govt-note"><p><strong>The critical distinction:</strong> Fiat inflation is not an unfortunate event beyond anyone's control, like the weather. It is an intentional, structural mechanism &#8212; the silent transfer of economic energy from the people who earned it to the government that printed it. With gold and Bitcoin, any new supply goes to those who did the work. With fiat, it goes to those who hold the printing press.</p></div>
+  </div>
+
+  <!-- TAB 3: TAKEAWAY -->
+  <div class="tab-content" id="tab-takeaway">
+    <h2 class="section-title">The Takeaway</h2>
+    <div class="tk-grid">
+      <div class="tk tk-f"><div class="tk-icon">&#9203;</div><h3>Fiat: Half-Life &#8594; Zero</h3><p>The dollar's half-life is compressing. What took decades to halve now takes years. The leak isn't just persistent &#8212; it's accelerating. Every "emergency" adds more dollars, every crisis shortens the runway. The purchasing power decay of fiat currency is not cyclical. It is terminal.</p><div class="tk-stat">USD purchasing power: &#8722;95% since 1900</div></div>
+      <div class="tk tk-b"><div class="tk-icon">&#9854;</div><h3>Bitcoin: Half-Life &#8594; Infinity</h3><p>Bitcoin's supply inflation is tiny, pre-defined, and decreasing to zero. Its half-life trends toward infinity &#8212; the first money in human history with this property. Its purchasing power gains are not speculation or luck. They are structural: the predictable consequence of absolute scarcity meeting growing recognition.</p><div class="tk-stat">21,000,000 &#8212; forever. No exceptions.</div></div>
+    </div>
+
+    <div class="mining-note"><p><strong>A note on mining:</strong> Both gold and Bitcoin have supply expansion through mining &#8212; new units accruing to those who did real physical or computational work. But there's a crucial difference. Gold mining is perpetual: ~2% per year, forever, with supply responding to price increases. Bitcoin mining is terminal: the emission rate halves every four years and will reach zero. Furthermore, Bitcoin mining is radically open &#8212; anyone can participate, even from home, with modest equipment. There is no government involvement, no privileged access, no gatekeepers. The new supply goes to participants in an open, global, permissionless network.</p></div>
+
+  </div>
+
+</div>
+
+<footer>lastcoinstanding.com</footer>
+
+<script>
+(function(){var h=document.getElementById('hamburger'),o=document.getElementById('mobileOverlay');if(!h||!o)return;h.addEventListener('click',function(){h.classList.toggle('open');o.classList.toggle('show');document.body.style.overflow=o.classList.contains('show')?'hidden':''});var ls=o.querySelectorAll('a');for(var i=0;i<ls.length;i++)ls[i].addEventListener('click',function(){h.classList.remove('open');o.classList.remove('show');document.body.style.overflow=''})})();
+
+function showTab(id){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active')});document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});document.getElementById('tab-'+id).classList.add('active');var m={interactive:0,history:1,takeaway:2};document.querySelectorAll('.tab-btn')[m[id]].classList.add('active');document.querySelector('.tab-nav').scrollIntoView({behavior:'smooth',block:'start'})}
+
+var fiatRate = 8;
+
+function setFiat(b) {
+  document.querySelectorAll('#fiatBtns .opt-btn').forEach(function(x) { x.classList.remove('sel-fiat'); });
+  b.classList.add('sel-fiat');
+  fiatRate = parseFloat(b.dataset.rate);
+  updateDecay();
+}
+
+function halfLife(rate) {
+  return rate <= 0 ? Infinity : Math.log(2) / Math.log(1 + rate / 100);
+}
+
+function drawDecayCurve() {
+  var canvas = document.getElementById('decayChart');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var wrap = canvas.parentElement;
+  var dpr = window.devicePixelRatio || 1;
+
+  canvas.width = wrap.clientWidth * dpr;
+  canvas.height = wrap.clientHeight * dpr;
+  canvas.style.width = wrap.clientWidth + 'px';
+  canvas.style.height = wrap.clientHeight + 'px';
+  ctx.scale(dpr, dpr);
+
+  var W = wrap.clientWidth;
+  var H = wrap.clientHeight;
+  var pad = { t: 20, r: 20, b: 36, l: 48 };
+  var cW = W - pad.l - pad.r;
+  var cH = H - pad.t - pad.b;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Scale: Y = $0–$100, X = 0–30 years
+  var maxYears = 30;
+  function xP(yr) { return pad.l + (yr / maxYears) * cW; }
+  function yP(val) { return pad.t + (1 - val / 100) * cH; }
+
+  var hl = halfLife(fiatRate);
+
+  // Grid lines (subtle)
+  ctx.strokeStyle = 'rgba(255,255,255,.04)';
+  ctx.lineWidth = 1;
+  [75, 50, 25].forEach(function(v) {
+    ctx.beginPath(); ctx.moveTo(pad.l, yP(v)); ctx.lineTo(pad.l + cW, yP(v)); ctx.stroke();
+  });
+
+  // Y-axis labels
+  ctx.fillStyle = 'rgba(255,255,255,.2)';
+  ctx.font = '500 10px Inter, sans-serif';
+  ctx.textAlign = 'right';
+  [100, 75, 50, 25, 0].forEach(function(v) {
+    ctx.fillText('$' + v, pad.l - 8, yP(v) + 4);
+  });
+
+  // X-axis labels
+  ctx.textAlign = 'center';
+  [0, 5, 10, 15, 20, 25, 30].forEach(function(yr) {
+    ctx.fillText(yr + 'y', xP(yr), pad.t + cH + 20);
+  });
+  ctx.textAlign = 'left';
+
+  // --- $50 dashed line ---
+  ctx.strokeStyle = 'rgba(192,57,43,.35)';
+  ctx.setLineDash([5, 4]);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, yP(50));
+  ctx.lineTo(xP(Math.min(hl, maxYears)), yP(50));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // $50 label
+  ctx.fillStyle = 'rgba(192,57,43,.5)';
+  ctx.font = '600 10px Inter, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('$50', pad.l - 8, yP(50) + 4);
+  ctx.textAlign = 'left';
+
+  // --- Vertical dashed line at half-life point ---
+  if (hl <= maxYears) {
+    ctx.strokeStyle = 'rgba(192,57,43,.35)';
+    ctx.setLineDash([5, 4]);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(xP(hl), yP(50));
+    ctx.lineTo(xP(hl), pad.t + cH);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // --- Fill area under curve (loss area) ---
+  ctx.beginPath();
+  ctx.moveTo(xP(0), yP(100));
+  for (var yr = 0; yr <= maxYears; yr += 0.5) {
+    var val = 100 * Math.pow(1 - fiatRate / 100, yr);
+    ctx.lineTo(xP(yr), yP(Math.max(val, 0)));
+  }
+  ctx.lineTo(xP(maxYears), yP(100));
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(192,57,43,.06)';
+  ctx.fill();
+
+  // --- The decay curve ---
+  // Glow
+  ctx.strokeStyle = 'rgba(192,57,43,.2)';
+  ctx.lineWidth = 6;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  for (yr = 0; yr <= maxYears; yr += 0.5) {
+    var val = 100 * Math.pow(1 - fiatRate / 100, yr);
+    var px = xP(yr), py = yP(Math.max(val, 0));
+    yr === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+
+  // Main line
+  ctx.strokeStyle = '#c0392b';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (yr = 0; yr <= maxYears; yr += 0.5) {
+    var val = 100 * Math.pow(1 - fiatRate / 100, yr);
+    var px = xP(yr), py = yP(Math.max(val, 0));
+    yr === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+
+  // --- Intersection dot ---
+  if (hl <= maxYears) {
+    var dotX = xP(hl), dotY = yP(50);
+
+    // Outer glow
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, 8, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(192,57,43,.2)';
+    ctx.fill();
+
+    // Inner dot
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#c0392b';
+    ctx.fill();
+
+    // Label above the dot
+    ctx.fillStyle = '#c0392b';
+    ctx.font = '700 13px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(hl.toFixed(1) + ' years', dotX, dotY - 14);
+    ctx.textAlign = 'left';
+  }
+
+  // $100 start label
+  ctx.fillStyle = 'rgba(255,255,255,.3)';
+  ctx.font = '500 10px Inter, sans-serif';
+  ctx.fillText('$100', pad.l + 4, yP(100) + 14);
+}
+
+function updateDecay() {
+  var hl = halfLife(fiatRate);
+  document.getElementById('fiatHL').textContent = hl.toFixed(1);
+
+  drawDecayCurve();
+
+  // Update contextual note
+  var noteEl = document.getElementById('decayNote');
+  if (fiatRate <= 4) {
+    noteEl.textContent = 'Even at the government\'s own CPI figure, your dollar loses half its value in about 20 years. And most economists agree CPI understates real inflation.';
+  } else if (fiatRate <= 9) {
+    noteEl.textContent = 'Using pre-1980 methodology (before CPI was revised to understate inflation), the dollar\'s half-life compresses to about 8 years. What took a generation now takes less than a decade.';
+  } else {
+    noteEl.textContent = 'When you include housing, healthcare, and education \u2014 the things that actually matter \u2014 the dollar loses half its value in about 6 years. This is not a store of value. It is a melting ice cube.';
+  }
+}
+
+window.addEventListener('load', updateDecay);
+window.addEventListener('resize', drawDecayCurve);
+</script>
+</body>
+</html>
