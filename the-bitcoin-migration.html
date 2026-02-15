@@ -59,90 +59,30 @@
         }
 
         /* ========================================
-           NAVIGATION
+           NAVIGATION (consistent site-nav)
            ======================================== */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            background: rgba(10, 10, 10, 0.92);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(224, 148, 34, 0.1);
-            padding: 0 2rem;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+        .site-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; background: rgba(10,9,8,0.95); border-bottom: 1px solid #1a1a1a; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .site-nav .brand { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #999; text-decoration: none; transition: color 0.2s; }
+        .site-nav .brand:hover { color: var(--amber); }
+        .site-nav .nav-links { display: flex; gap: 8px; }
+        .site-nav .nav-links a { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.9rem; font-weight: 500; color: #aaa; text-decoration: none; padding: 8px 16px; border-radius: 4px; transition: color 0.2s, background 0.2s; }
+        .site-nav .nav-links a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
+        .site-nav .nav-links a.active { color: var(--amber); background: rgba(247,147,26,0.08); font-weight: 600; }
 
-        .nav-logo {
-            font-family: 'Cormorant Garamond', serif;
-            font-weight: 600;
-            font-size: 1.15rem;
-            color: var(--amber);
-            text-decoration: none;
-            letter-spacing: 0.03em;
-        }
+        /* Hamburger (hidden on desktop) */
+        .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; z-index: 1100; }
+        .hamburger span { display: block; width: 22px; height: 2px; background: #aaa; margin: 5px 0; border-radius: 1px; transition: transform 0.3s, opacity 0.3s, background 0.3s; }
+        .hamburger:hover span { background: #ccc; }
+        .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
 
-        .nav-links {
-            display: flex;
-            gap: 1.8rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.78rem;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.55);
-            text-decoration: none;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover { color: var(--amber); }
-        .nav-links a.active { color: var(--amber); }
-
-        .nav-mobile-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.6);
-            font-size: 1.4rem;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
-        .mobile-menu {
-            display: none;
-            position: fixed;
-            top: 60px;
-            left: 0;
-            right: 0;
-            background: rgba(10, 10, 10, 0.97);
-            backdrop-filter: blur(12px);
-            padding: 1.5rem 2rem;
-            z-index: 99;
-            border-bottom: 1px solid rgba(224, 148, 34, 0.1);
-        }
-
-        .mobile-menu.open { display: flex; flex-direction: column; gap: 1rem; }
-
-        .mobile-menu a {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.55);
-            text-decoration: none;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            padding: 0.4rem 0;
-        }
-
-        .mobile-menu a.active { color: var(--amber); }
+        /* Mobile nav overlay */
+        .mobile-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,9,8,0.97); z-index: 1050; flex-direction: column; align-items: center; justify-content: center; gap: 8px; opacity: 0; transition: opacity 0.3s; }
+        .mobile-overlay.show { display: flex; opacity: 1; }
+        .mobile-overlay a { font-family: 'Inter', -apple-system, sans-serif; font-size: 1.1rem; font-weight: 500; color: #aaa; text-decoration: none; padding: 14px 32px; border-radius: 6px; transition: color 0.2s, background 0.2s; }
+        .mobile-overlay a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
+        .mobile-overlay a.active { color: var(--amber); background: rgba(247,147,26,0.08); font-weight: 600; }
 
         /* ========================================
            HERO SECTION
@@ -570,11 +510,11 @@
            ======================================== */
         .progress-bar {
             position: fixed;
-            top: 60px;
+            top: 48px;
             left: 0;
             height: 2px;
             background: var(--amber);
-            z-index: 101;
+            z-index: 999;
             transition: width 0.15s ease-out;
             box-shadow: 0 0 8px rgba(224, 148, 34, 0.4);
         }
@@ -608,8 +548,8 @@
            RESPONSIVE
            ======================================== */
         @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .nav-mobile-toggle { display: block; }
+            .site-nav .nav-links { display: none; }
+            .hamburger { display: block; }
 
             .hero { min-height: 75vh; padding: 7rem 1.5rem 4rem; }
             .hero-meta { flex-direction: column; gap: 0.5rem; }
@@ -625,6 +565,8 @@
         }
 
         @media (max-width: 480px) {
+            .site-nav { padding: 10px 14px; }
+            .site-nav .brand { font-size: 0.72rem; letter-spacing: 0.14em; }
             .hero h1 { font-size: 2.2rem; }
             .hero-subtitle { font-size: 1rem; }
             .reading-container p { font-size: 1.02rem; }
@@ -638,21 +580,23 @@
     <div class="progress-bar" id="progressBar"></div>
 
     <!-- Navigation -->
-    <nav>
-        <a href="/" class="nav-logo">Last Coin Standing</a>
-        <ul class="nav-links">
-            <li><a href="/synthesis.html">Synthesis</a></li>
-            <li><a href="/what-bitcoin-is.html">What Bitcoin Is</a></li>
-            <li><a href="/the-bitcoin-migration.html" class="active">The Migration</a></li>
-            <li><a href="/trilemma.html">Trilemma</a></li>
-            <li><a href="/the-half-life.html">Half-Life</a></li>
-            <li><a href="/money-trees.html">Money Trees</a></li>
-            <li><a href="/about.html">About</a></li>
-        </ul>
-        <button class="nav-mobile-toggle" id="mobileToggle" aria-label="Toggle menu">&#9776;</button>
+    <nav class="site-nav">
+        <a href="/" class="brand">Last Coin Standing</a>
+        <div class="nav-links">
+            <a href="/synthesis.html">The Synthesis</a>
+            <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+            <a href="/the-bitcoin-migration.html" class="active">The Migration</a>
+            <a href="/trilemma.html">The Trilemma</a>
+            <a href="/the-half-life.html">The Half-Life</a>
+            <a href="/money-trees.html">Money Trees</a>
+            <a href="/about.html">About</a>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </button>
     </nav>
 
-    <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-overlay" id="mobileOverlay">
         <a href="/synthesis.html">The Synthesis</a>
         <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
         <a href="/the-bitcoin-migration.html" class="active">The Migration</a>
@@ -1045,10 +989,11 @@
         fadeEls.forEach(el => observer.observe(el));
 
         // Mobile menu toggle
-        const mobileToggle = document.getElementById('mobileToggle');
-        const mobileMenu = document.getElementById('mobileMenu');
-        mobileToggle.addEventListener('click', () => {
-            mobileMenu.classList.toggle('open');
+        const hamburger = document.getElementById('hamburger');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('open');
+            mobileOverlay.classList.toggle('show');
         });
     </script>
 
