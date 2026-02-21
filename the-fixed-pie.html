@@ -3,782 +3,1470 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Fixed Pie — Last Coin Standing</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WNGLLPPR5M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-WNGLLPPR5M');
+</script>
+
+<!-- SEO -->
+<title>The Bitcoin Fixed Share — Last Coin Standing</title>
+<meta name="description" content="Bitcoin's supply is fixed at 21 million — forever. Your share of the monetary network is mathematically guaranteed at the moment of acquisition. Explore what that means compared to gold and fiat.">
+<link rel="canonical" href="https://lastcoinstanding.com/the-fixed-pie.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lastcoinstanding.com/the-fixed-pie.html">
+<meta property="og:title" content="The Bitcoin Fixed Share — Last Coin Standing">
+<meta property="og:description" content="Bitcoin's supply is fixed at 21 million — forever. Your share of the monetary network is mathematically guaranteed at the moment of acquisition.">
+<meta property="og:image" content="https://lastcoinstanding.com/og-preview.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="720">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:site_name" content="Last Coin Standing">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Bitcoin Fixed Share — Last Coin Standing">
+<meta name="twitter:description" content="Bitcoin's supply is fixed at 21 million — forever. Your share of the monetary network is mathematically guaranteed at the moment of acquisition.">
+<meta name="twitter:image" content="https://lastcoinstanding.com/og-preview.jpg">
+
+<!-- JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://lastcoinstanding.com/the-fixed-pie.html",
+  "url": "https://lastcoinstanding.com/the-fixed-pie.html",
+  "name": "The Bitcoin Fixed Share — Last Coin Standing",
+  "description": "An interactive exploration of how monetary supply expansion across USD, Gold, and Bitcoin affects your share of the monetary network over time — and what a permanently fixed share may represent.",
+  "isPartOf": { "@id": "https://lastcoinstanding.com/#website" },
+  "publisher": { "@id": "https://lastcoinstanding.com/#organization" },
+  "about": {
+    "@type": "Thing",
+    "name": "Bitcoin Fixed Supply",
+    "description": "Bitcoin's terminal supply of 21 million and its implications for monetary ownership"
+  },
+  "inLanguage": "en"
+}
+</script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
-  :root {
-    --bg-deep: #0a0b0f;
-    --bg-card: #12131a;
-    --bg-card-hover: #1a1b25;
-    --btc-warm: #f7931a;
-    --btc-glow: #f7931a50;
-    --btc-soft: #f7931a18;
-    --fiat-cold: #5a8a9e;
-    --fiat-dim: #5a8a9e30;
-    --fiat-soft: #5a8a9e12;
-    --fiat-red: #c0392b;
-    --fiat-red-soft: rgba(192,57,43,0.1);
-    --text-primary: #e8e6e1;
-    --text-secondary: #8a8880;
-    --text-dim: #55534e;
-    --border: #1e1f2a;
-  }
+:root {
+  --bg: #0a0908;
+  --bg-card: #111110;
+  --border: #1e1c1a;
+  --border-lt: #2a2826;
+  --orange: #F7931A;
+  --orange-dim: rgba(247,147,26,.45);
+  --orange-glow: rgba(247,147,26,.12);
+  --orange-soft: rgba(247,147,26,.08);
+  --gold: #c9a84c;
+  --gold-dim: rgba(201,168,76,.35);
+  --gold-soft: rgba(201,168,76,.09);
+  --red: #c0392b;
+  --red-dim: rgba(192,57,43,.30);
+  --red-soft: rgba(192,57,43,.10);
+  --text: #d8d2ca;
+  --text-dim: #908880;
+  --text-bright: #f2eee8;
+  --text-body: #d0c8c0;
+  --text-muted: #706860;
+  --font-d: 'Cormorant Garamond', Georgia, serif;
+  --font-b: 'Inter', -apple-system, sans-serif;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-b);
+  font-size: 1rem;
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+/* NAV */
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: rgba(10,9,8,.95);
+  border-bottom: 1px solid #1a1a1a;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.site-nav .brand {
+  font-family: var(--font-b);
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #999;
+  text-decoration: none;
+  transition: color .2s;
+  flex-shrink: 0;
+}
+.site-nav .brand:hover { color: var(--orange); }
+.site-nav .nav-links { display: flex; gap: 2px; flex-wrap: wrap; }
+.site-nav .nav-links a {
+  font-family: var(--font-b);
+  font-size: .82rem;
+  font-weight: 500;
+  color: #aaa;
+  text-decoration: none;
+  padding: 7px 11px;
+  border-radius: 4px;
+  transition: color .2s, background .2s;
+  white-space: nowrap;
+}
+.site-nav .nav-links a:hover { color: #ccc; background: rgba(255,255,255,.04); }
+.site-nav .nav-links a.active { color: var(--orange); background: var(--orange-soft); }
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  flex-direction: column;
+  gap: 5px;
+}
+.hamburger span { display: block; width: 22px; height: 2px; background: #aaa; transition: all .3s; }
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  top: 50px;
+  background: rgba(10,9,8,.98);
+  z-index: 998;
+  flex-direction: column;
+  padding: 2rem 1.5rem;
+  gap: .5rem;
+}
+.mobile-overlay.show { display: flex; }
+.mobile-overlay a {
+  font-family: var(--font-b);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #aaa;
+  text-decoration: none;
+  padding: 12px 16px;
+  border-radius: 6px;
+  transition: all .2s;
+}
+.mobile-overlay a:hover { color: #ccc; background: rgba(255,255,255,.04); }
+.mobile-overlay a.active { color: var(--orange); background: var(--orange-soft); }
+@media (max-width: 768px) {
+  .site-nav .nav-links { display: none; }
+  .hamburger { display: flex; }
+}
 
-  body {
-    background: var(--bg-deep);
-    color: var(--text-primary);
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 300;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+/* PAGE */
+.page { max-width: 960px; margin: 0 auto; padding: 40px 24px 60px; }
+.page-header { text-align: center; margin-bottom: 32px; }
+.page-header h1 {
+  font-family: var(--font-d);
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 12px;
+  letter-spacing: -.01em;
+}
+.page-header h1 .amber { color: var(--orange); }
+.page-header .subtitle {
+  font-size: 1rem;
+  color: var(--text-dim);
+  max-width: 580px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 1000;
-  }
+/* TABS */
+.tab-nav { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+.tab-btn {
+  flex: 1;
+  padding: 16px 12px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  transition: all .25s;
+}
+.tab-btn:hover { background: rgba(255,255,255,.02); }
+.tab-btn .tab-num {
+  display: block;
+  font-family: var(--font-b);
+  font-size: .62rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  transition: color .25s;
+}
+.tab-btn .tab-title {
+  display: block;
+  font-family: var(--font-d);
+  font-size: clamp(.95rem, 2vw, 1.25rem);
+  font-weight: 600;
+  color: var(--text-dim);
+  transition: color .25s;
+}
+.tab-btn.active { border-bottom-color: var(--orange); }
+.tab-btn.active .tab-num { color: var(--orange); }
+.tab-btn.active .tab-title { color: var(--text-bright); }
+.tab-content { display: none; animation: tabIn .35s ease; }
+.tab-content.active { display: block; }
+@keyframes tabIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 2rem 1.5rem 4rem;
-  }
+/* TYPOGRAPHY */
+.section-title {
+  font-family: var(--font-d);
+  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 12px;
+}
+.section-title .amber { color: var(--orange); }
+.section-title .gold-t { color: var(--gold); }
+.section-title .red { color: var(--red); }
+.prose {
+  font-size: .97rem;
+  color: var(--text-body);
+  line-height: 1.8;
+  max-width: 720px;
+}
+.prose + .prose { margin-top: 12px; }
+.prose strong { color: var(--text-bright); font-weight: 600; }
+.prose .amber { color: var(--orange); font-weight: 500; }
+.prose .gold-t { color: var(--gold); font-weight: 500; }
+.prose .red { color: var(--red); font-weight: 500; }
 
-  header {
-    text-align: center;
-    padding: 3rem 0 1.5rem;
-  }
+/* ═══════════════════════════════════════
+   TAB 1 — THE FIXED SLICE
+═══════════════════════════════════════ */
 
-  header .label {
-    font-size: 0.68rem;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 1.2rem;
-  }
+/* Supply overview cards */
+.supply-trio {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 24px 0;
+}
+@media (max-width: 640px) { .supply-trio { grid-template-columns: 1fr; gap: 10px; } }
 
-  header h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 300;
-    font-size: clamp(2.4rem, 6vw, 3.8rem);
-    line-height: 1.15;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-  }
+.supply-card {
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.supply-card.sc-fiat { border-top: 3px solid var(--red); }
+.supply-card.sc-gold { border-top: 3px solid var(--gold); }
+.supply-card.sc-btc  { border-top: 3px solid var(--orange); }
 
-  header h1 em { font-style: italic; color: var(--btc-warm); }
+.sc-label {
+  font-size: .62rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.sc-fiat .sc-label { color: var(--red); }
+.sc-gold .sc-label { color: var(--gold); }
+.sc-btc  .sc-label { color: var(--orange); }
 
-  header .subtitle {
-    font-size: 0.95rem;
-    color: var(--text-secondary);
-    max-width: 560px;
-    margin: 0 auto;
-    line-height: 1.7;
-  }
+.sc-name {
+  font-family: var(--font-d);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-bright);
+}
+.sc-rate {
+  font-size: .85rem;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 4px;
+  display: inline-block;
+  align-self: flex-start;
+}
+.sc-fiat .sc-rate { background: var(--red-soft); color: var(--red); }
+.sc-gold .sc-rate { background: var(--gold-soft); color: var(--gold); }
+.sc-btc  .sc-rate { background: var(--orange-soft); color: var(--orange); }
+.sc-note { font-size: .82rem; color: var(--text-muted); line-height: 1.6; }
 
-  .insight {
-    text-align: center;
-    padding: 1.4rem 2rem;
-    margin: 1.5rem auto 2.5rem;
-    max-width: 640px;
-    border-left: 2px solid var(--btc-warm);
-    border-right: 2px solid var(--fiat-cold);
-    background: linear-gradient(90deg, var(--btc-soft), transparent, var(--fiat-soft));
-    border-radius: 2px;
-  }
+/* CHART HERO */
+.chart-hero {
+  margin: 28px 0 0;
+  padding: 28px 28px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.chart-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--red), var(--gold), var(--orange));
+}
+.chart-heading {
+  font-family: var(--font-d);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 4px;
+}
+.chart-sub {
+  font-size: .8rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
 
-  .insight p {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.1rem;
-    font-style: italic;
-    color: var(--text-secondary);
-    line-height: 1.65;
-  }
+.chart-wrap {
+  width: 100%;
+  height: 280px;
+  position: relative;
+}
+@media (max-width: 600px) { .chart-wrap { height: 220px; } }
 
-  /* Dual pies */
-  .pies-section {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 0;
-    align-items: start;
-    margin-bottom: 2.5rem;
-  }
+canvas#shareChart {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
 
-  @media (max-width: 768px) {
-    .pies-section {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-    .energy-flow { display: none; }
-  }
+/* Legend */
+.chart-legend {
+  display: flex;
+  gap: 20px;
+  margin: 14px 0 20px;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: .78rem;
+  color: var(--text-dim);
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.legend-dot.ld-btc  { background: var(--orange); box-shadow: 0 0 6px var(--orange-dim); }
+.legend-dot.ld-gold { background: var(--gold); }
+.legend-dot.ld-fiat { background: var(--red); }
 
-  .pie-panel {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.8rem 1.5rem 1.5rem;
-    text-align: center;
-  }
+/* Year slider */
+.slider-block { margin-bottom: 0; }
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.slider-header .sl-label {
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.slider-header .sl-value {
+  font-family: var(--font-d);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-bright);
+}
 
-  .pie-panel.btc { border-top: 2px solid var(--btc-warm); }
-  .pie-panel.fiat { border-top: 2px solid var(--fiat-cold); }
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+  background: var(--border);
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--orange);
+  border: 2px solid var(--bg);
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--orange-dim);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--orange);
+  border: 2px solid var(--bg);
+  cursor: pointer;
+}
+.year-marks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+.year-marks span { font-size: .62rem; color: var(--text-muted); }
 
-  .pie-panel .panel-label {
-    font-size: 0.62rem;
-    font-weight: 500;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    margin-bottom: 0.35rem;
-  }
+.replay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 8px 16px;
+  background: none;
+  border: 1px solid var(--border-lt);
+  border-radius: 6px;
+  font-family: var(--font-b);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all .2s;
+}
+.replay-btn:hover { border-color: var(--orange); color: var(--orange); }
 
-  .pie-panel.btc .panel-label { color: var(--btc-warm); }
-  .pie-panel.fiat .panel-label { color: var(--fiat-cold); }
+/* STAT CARDS */
+.stat-trio {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 24px 0;
+}
+@media (max-width: 640px) { .stat-trio { grid-template-columns: 1fr; } }
 
-  .pie-panel h2 {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 400;
-    font-size: 1.35rem;
-    margin-bottom: 0.25rem;
-    color: var(--text-primary);
-  }
+.stat-card {
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color .3s;
+}
+.stat-card.st-fiat { border-left: 3px solid var(--red); }
+.stat-card.st-gold { border-left: 3px solid var(--gold); }
+.stat-card.st-btc  { border-left: 3px solid var(--orange); }
 
-  .pie-panel .panel-desc {
-    font-size: 0.72rem;
-    color: var(--text-dim);
-    margin-bottom: 1.2rem;
-  }
+.st-label {
+  font-size: .62rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.st-fiat .st-label { color: var(--red); }
+.st-gold .st-label { color: var(--gold); }
+.st-btc  .st-label { color: var(--orange); }
 
-  .pie-visual {
-    position: relative;
-    width: 100%;
-    max-width: 300px;
-    margin: 0 auto 1.2rem;
-    aspect-ratio: 1;
-  }
+.st-name {
+  font-size: .82rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.st-big {
+  font-family: var(--font-d);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+  transition: all .4s;
+}
+.st-fiat .st-big { color: var(--red); }
+.st-gold .st-big { color: var(--gold); }
+.st-btc  .st-big { color: var(--orange); }
 
-  .pie-visual canvas { width: 100%; height: 100%; display: block; }
+.st-sub { font-size: .78rem; color: var(--text-muted); }
+.st-verdict {
+  margin-top: 12px;
+  padding: 7px 10px;
+  border-radius: 4px;
+  font-size: .76rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.st-fiat .st-verdict { background: var(--red-soft); color: var(--red); }
+.st-gold .st-verdict { background: var(--gold-soft); color: var(--gold); }
+.st-btc  .st-verdict { background: var(--orange-soft); color: var(--orange); }
 
-  .pie-label-overlay {
-    position: absolute;
-    bottom: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    pointer-events: none;
-  }
+/* TERMINAL SUPPLY NOTE */
+.terminal-note {
+  margin: 24px 0;
+  padding: 18px 22px;
+  background: var(--orange-soft);
+  border: 1px solid rgba(247,147,26,.12);
+  border-left: 3px solid var(--orange);
+  border-radius: 6px;
+}
+.terminal-note p {
+  font-size: .9rem;
+  color: var(--text-body);
+  line-height: 1.75;
+}
+.terminal-note strong { color: var(--orange); font-weight: 600; }
 
-  .pie-label-overlay .pct {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.5rem;
-    font-weight: 600;
-    display: block;
-    line-height: 1.2;
-  }
+/* TAKEAWAY BLOCK */
+.takeaway {
+  margin: 24px 0;
+  padding: 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: center;
+}
+.takeaway h3 {
+  font-family: var(--font-d);
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-weight: 600;
+  color: var(--text-bright);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.takeaway h3 .amber { color: var(--orange); }
+.takeaway h3 .red { color: var(--red); }
+.takeaway p {
+  font-size: .92rem;
+  color: var(--text-dim);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
 
-  .pie-panel.btc .pie-label-overlay .pct { color: var(--btc-warm); }
-  .pie-panel.fiat .pie-label-overlay .pct { color: var(--fiat-cold); }
+/* ═══════════════════════════════════════
+   TAB 2 — THE ENERGY MIGRATION
+═══════════════════════════════════════ */
 
-  .pie-label-overlay .lbl {
-    font-size: 0.65rem;
-    color: var(--text-dim);
-  }
+.thesis-callout {
+  margin: 0 0 24px;
+  padding: 24px;
+  background: linear-gradient(135deg, var(--bg-card), rgba(247,147,26,.04));
+  border: 1px solid rgba(247,147,26,.15);
+  border-left: 3px solid var(--orange);
+  border-radius: 6px;
+}
+.thesis-callout .tc-label {
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 8px;
+}
+.thesis-callout h3 {
+  font-family: var(--font-d);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 10px;
+  line-height: 1.45;
+}
+.thesis-callout p {
+  font-size: .92rem;
+  color: var(--text-body);
+  line-height: 1.8;
+}
 
-  .stats-row {
-    display: flex;
-    justify-content: center;
-    gap: 1.4rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.75rem;
-  }
+.key-fact {
+  margin: 0 0 28px;
+  padding: 20px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+@media (max-width: 600px) { .key-fact { flex-direction: column; gap: 10px; } }
+.kf-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.kf-text h4 {
+  font-family: var(--font-d);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--orange);
+  margin-bottom: 5px;
+}
+.kf-text p { font-size: .88rem; color: var(--text-body); line-height: 1.7; }
 
-  .stat .val { font-size: 0.95rem; font-weight: 500; display: block; }
-  .pie-panel.btc .stat .val { color: var(--btc-warm); }
-  .pie-panel.fiat .stat .val { color: var(--fiat-cold); }
-  .stat .lbl { font-size: 0.62rem; color: var(--text-dim); letter-spacing: 0.04em; }
+/* CAGR CHART */
+.cagr-section {
+  margin: 0 0 28px;
+}
+.cagr-section h3 {
+  font-family: var(--font-d);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 4px;
+}
+.cagr-section .cagr-sub {
+  font-size: .82rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.cagr-chart-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px 24px 16px;
+}
+canvas#cagrChart {
+  width: 100% !important;
+  height: 220px !important;
+  display: block;
+}
+.cagr-note {
+  margin-top: 12px;
+  font-size: .78rem;
+  color: var(--text-muted);
+  text-align: center;
+  font-style: italic;
+}
 
-  .share-msg {
-    margin-top: 0.75rem;
-    padding: 0.55rem 1rem;
-    border-radius: 6px;
-    font-size: 0.76rem;
-    line-height: 1.5;
-  }
+/* PROJECTION */
+.projection-section {
+  padding: 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 0 0 24px;
+  position: relative;
+  overflow: hidden;
+}
+.projection-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: var(--orange);
+}
+.projection-section h3 {
+  font-family: var(--font-d);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 4px;
+}
+.proj-sub { font-size: .83rem; color: var(--text-muted); margin-bottom: 24px; }
 
-  .pie-panel.btc .share-msg { background: var(--btc-soft); color: var(--btc-warm); }
-  .pie-panel.fiat .share-msg { background: var(--fiat-red-soft); color: var(--fiat-red); }
-  .pie-panel.fiat .share-msg.neutral { background: var(--fiat-soft); color: var(--fiat-cold); }
+.proj-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+@media (max-width: 580px) { .proj-controls { grid-template-columns: 1fr; } }
 
-  /* Energy flow */
-  .energy-flow {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 0 0.6rem;
-    min-width: 72px;
-    padding-top: 7rem;
-  }
+.proj-control label {
+  display: block;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.proj-control label span {
+  font-family: var(--font-d);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--orange);
+  float: right;
+  text-transform: none;
+  letter-spacing: 0;
+}
 
-  .energy-flow .arrow {
-    font-size: 1.5rem;
-    color: var(--text-dim);
-    transition: all 0.5s;
-    opacity: 0.35;
-  }
+.proj-outputs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 4px;
+}
+@media (max-width: 640px) { .proj-outputs { grid-template-columns: 1fr; } }
 
-  .energy-flow .arrow.active {
-    color: var(--btc-warm);
-    opacity: 1;
-    text-shadow: 0 0 12px var(--btc-glow);
-  }
+.proj-out {
+  padding: 18px;
+  background: rgba(247,147,26,.05);
+  border: 1px solid rgba(247,147,26,.12);
+  border-radius: 8px;
+  text-align: center;
+}
+.po-period {
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.po-value {
+  font-family: var(--font-d);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--orange);
+  line-height: 1.1;
+  margin-bottom: 4px;
+  transition: all .3s;
+}
+.po-multiplier { font-size: .78rem; color: var(--text-muted); }
 
-  .energy-flow .flow-label {
-    font-size: 0.55rem;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    text-align: center;
-    margin-top: 0.5rem;
-    line-height: 1.5;
-    max-width: 65px;
-  }
+.proj-disclaimer {
+  margin-top: 18px;
+  padding: 14px 18px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: .78rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.proj-disclaimer strong { color: var(--text-dim); }
 
-  /* Controls */
-  .controls {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 2rem;
-    margin-bottom: 2.5rem;
-  }
-
-  .controls h3 {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 400;
-    font-size: 1.15rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-    color: var(--text-secondary);
-  }
-
-  .slider-row { max-width: 600px; margin: 0 auto; }
-
-  .slider-group { margin-bottom: 1.4rem; }
-  .slider-group:last-child { margin-bottom: 0; }
-
-  .slider-group label {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-  }
-
-  .slider-group label .slider-val { font-weight: 500; font-size: 0.9rem; color: var(--text-primary); }
-
-  input[type="range"] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 4px;
-    border-radius: 2px;
-    outline: none;
-    background: var(--border);
-    cursor: pointer;
-  }
-
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 2px solid var(--bg-deep);
-    background: var(--btc-warm);
-    cursor: pointer;
-  }
-
-  .slider-hint {
-    font-size: 0.63rem;
-    color: var(--text-dim);
-    margin-top: 0.3rem;
-  }
-
-  .year-markers {
-    display: flex;
-    justify-content: space-between;
-    max-width: 100%;
-    margin-top: -0.2rem;
-    padding: 0 2px;
-  }
-
-  .year-markers span { font-size: 0.58rem; color: var(--text-dim); }
-
-  .btn-row { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; }
-
-  .btn {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.76rem;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    padding: 0.6rem 1.4rem;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.25s;
-  }
-
-  .btn:hover { background: var(--bg-card-hover); color: var(--text-primary); border-color: var(--text-dim); }
-  .btn.primary { background: var(--btc-warm); color: var(--bg-deep); border-color: var(--btc-warm); }
-  .btn.primary:hover { background: #e8850f; border-color: #e8850f; }
-
-  /* Takeaway */
-  .takeaway {
-    text-align: center;
-    padding: 3rem 2rem;
-    border-top: 1px solid var(--border);
-  }
-
-  .takeaway h3 {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 300;
-    font-size: clamp(1.3rem, 3vw, 1.7rem);
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-    line-height: 1.45;
-  }
-
-  .takeaway h3 em { color: var(--btc-warm); font-style: italic; }
-  .takeaway h3 .fiat-em { color: var(--fiat-red); font-style: italic; }
-
-  .takeaway p {
-    font-size: 0.88rem;
-    color: var(--text-secondary);
-    max-width: 560px;
-    margin: 0 auto;
-    line-height: 1.7;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .fade-up { animation: fadeUp 0.6s ease-out both; }
-  .fd1 { animation-delay: 0.1s; }
-  .fd2 { animation-delay: 0.2s; }
-  .fd3 { animation-delay: 0.35s; }
-  .fd4 { animation-delay: 0.5s; }
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 32px 24px;
+  color: var(--text-muted);
+  font-size: .88rem;
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+}
 </style>
 </head>
 <body>
-<div class="container">
-  <header class="fade-up">
-    <div class="label">Last Coin Standing</div>
-    <h1>The <em>Fixed</em> Pie</h1>
-    <p class="subtitle">What happens to your slice when the pie can never expand — versus a pie that never stops growing?</p>
-  </header>
 
-  <div class="insight fade-up fd1">
-    <p>In fiat, the pie expands endlessly — your slice thins to nothing. In Bitcoin, the pie is structurally bounded at 21 million. Your slice is permanent. 1/21M is 1/21M. Forever.</p>
+<!-- NAV -->
+<nav class="site-nav">
+  <a href="/" class="brand">Last Coin Standing</a>
+  <div class="nav-links">
+    <a href="/the-synthesis.html">The Synthesis</a>
+    <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+    <a href="/the-migration.html">The Migration</a>
+    <a href="/the-trilemma.html">The Bitcoin Trilemma</a>
+    <a href="/the-half-life.html">The Half-Life</a>
+    <a href="/money-trees.html">Money Trees</a>
+    <a href="/the-fixed-pie.html" class="active">The Bitcoin Fixed Share</a>
   </div>
-
-  <div class="pies-section fade-up fd2">
-    <div class="pie-panel btc">
-      <div class="panel-label">Bounded Network</div>
-      <h2>Bitcoin</h2>
-      <div class="panel-desc">21,000,000 — fixed, thermodynamically sound</div>
-      <div class="pie-visual">
-        <canvas id="btcPie"></canvas>
-        <div class="pie-label-overlay">
-          <span class="pct" id="btcPct">—</span>
-          <span class="lbl">your slice</span>
-        </div>
-      </div>
-      <div class="stats-row">
-        <div class="stat"><span class="val">21,000,000</span><span class="lbl">Total Supply</span></div>
-        <div class="stat"><span class="val" id="btcYours">1.0 BTC</span><span class="lbl">Your Slice</span></div>
-        <div class="stat"><span class="val" id="btcDensity">—</span><span class="lbl">Energy Density</span></div>
-      </div>
-      <div class="share-msg" id="btcMsg">Your slice never changes. As monetary energy migrates from fiat, each unit grows denser — more valuable — not thinner.</div>
-    </div>
-
-    <div class="energy-flow">
-      <span class="arrow" id="flowArrow">◀</span>
-      <div class="flow-label" id="flowLabel">monetary energy</div>
-    </div>
-
-    <div class="pie-panel fiat">
-      <div class="panel-label">Expanding Network</div>
-      <h2>Fiat (USD)</h2>
-      <div class="panel-desc">Unbounded — expanding ~7% per year</div>
-      <div class="pie-visual">
-        <canvas id="fiatPie"></canvas>
-        <div class="pie-label-overlay">
-          <span class="pct" id="fiatPct">—</span>
-          <span class="lbl">your slice</span>
-        </div>
-      </div>
-      <div class="stats-row">
-        <div class="stat"><span class="val" id="fiatSupply">$21.2T</span><span class="lbl">Money Supply</span></div>
-        <div class="stat"><span class="val" id="fiatYours">$100K</span><span class="lbl">Your Slice</span></div>
-        <div class="stat"><span class="val" id="fiatDilution">0%</span><span class="lbl">Share Diluted</span></div>
-      </div>
-      <div class="share-msg neutral" id="fiatMsg">Move the slider to watch the pie expand around your dollars. Same savings. Thinner slice.</div>
-    </div>
-  </div>
-
-  <div class="controls fade-up fd3">
-    <h3>How far out are you looking?</h3>
-    <div class="slider-row">
-      <div class="slider-group">
-        <label>Years of monetary expansion <span class="slider-val" id="yearsVal">0 years</span></label>
-        <input type="range" id="yearsSlider" min="0" max="10" value="0" step="1">
-        <div class="year-markers"><span>Today</span><span>5 yrs</span><span>10 yrs</span></div>
-      </div>
-      <div class="slider-group" style="margin-top:1.2rem">
-        <label>Your Bitcoin holdings <span class="slider-val" id="btcVal">1.0 BTC</span></label>
-        <input type="range" id="btcSlider" min="0.01" max="10" value="1" step="0.01">
-        <div class="slider-hint">Drag to see how different positions hold their share</div>
-      </div>
-      <div class="slider-group" style="margin-top:1.2rem">
-        <label>Your fiat savings <span class="slider-val" id="fiatVal">$100,000</span></label>
-        <input type="range" id="fiatSlider" min="1000" max="1000000" value="100000" step="1000">
-      </div>
-    </div>
-    <div class="btn-row">
-      <button class="btn primary" id="btnPlay">▶ Watch 10 Years</button>
-      <button class="btn" id="btnReset">Reset</button>
-    </div>
-  </div>
-
-  <div class="takeaway fade-up fd4">
-    <h3>Fiat expands. Your share <span class="fiat-em">contracts</span>.<br>Bitcoin is fixed. Your share is <em>yours</em>.</h3>
-    <p>Every dollar printed silently transfers monetary energy from savers to spenders. Bitcoin's thermodynamic boundary — 21 million, enforced by energy, math, and consensus — means your slice of the network can never be diluted. Only made denser.</p>
-  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-overlay" id="mobileOverlay">
+  <a href="/the-synthesis.html">The Synthesis</a>
+  <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+  <a href="/the-migration.html">The Migration</a>
+  <a href="/the-trilemma.html">The Bitcoin Trilemma</a>
+  <a href="/the-half-life.html">The Half-Life</a>
+  <a href="/money-trees.html">Money Trees</a>
+  <a href="/the-fixed-pie.html" class="active">The Bitcoin Fixed Share</a>
 </div>
 
+<div class="page">
+  <!-- PAGE HEADER -->
+  <header class="page-header">
+    <h1>The Bitcoin <span class="amber">Fixed</span> Share</h1>
+    <p class="subtitle">Your share of the Bitcoin network is mathematically fixed at the moment of acquisition — and nothing can change that. Watch how that compares to every other form of money.</p>
+  </header>
+
+  <!-- TABS -->
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="slice">
+      <span class="tab-num">Part I</span>
+      <span class="tab-title">The Bitcoin Fixed Share</span>
+    </button>
+    <button class="tab-btn" data-tab="energy">
+      <span class="tab-num">Part II</span>
+      <span class="tab-title">The Energy Migration</span>
+    </button>
+  </div>
+
+  <!-- ═══ TAB 1: THE FIXED SLICE ═══ -->
+  <div class="tab-content active" id="tab-slice">
+
+    <div class="prose">
+      At time zero, holding dollars, gold, or bitcoin looks unremarkable. Everyone has a <em>slice</em>. The difference only becomes visible over time — and it is structural, not incidental.
+    </div>
+
+    <!-- Supply overview -->
+    <div class="supply-trio">
+      <div class="supply-card sc-fiat">
+        <div class="sc-label">Fiat Currency</div>
+        <div class="sc-name">US Dollar</div>
+        <div class="sc-rate">~7% annual supply growth</div>
+        <div class="sc-note">M2 money supply has expanded at roughly 7% per year on average since 1971. Expansion rate is discretionary — there is no upper bound.</div>
+      </div>
+      <div class="supply-card sc-gold">
+        <div class="sc-label">Commodity Money</div>
+        <div class="sc-name">Gold</div>
+        <div class="sc-rate">~2% annual supply growth</div>
+        <div class="sc-note">New mining adds approximately 2% to the above-ground gold supply each year. No one is stealing from you — but the supply expands regardless, quietly shrinking your share of the total forever.</div>
+      </div>
+      <div class="supply-card sc-btc">
+        <div class="sc-label">Bitcoin Network</div>
+        <div class="sc-name">Bitcoin</div>
+        <div class="sc-rate">0% annual supply growth — terminal at 21 million</div>
+        <div class="sc-note">95% of all Bitcoin has already been mined. The protocol enforces a hard cap of 21 million. No authority can change this. Your share is fixed at the moment of acquisition.</div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-hero">
+      <div class="chart-heading">Your Share of the Network Over Time</div>
+      <div class="chart-sub">Starting value = 100% (your share at acquisition). Watch what happens as years pass.</div>
+      <div class="chart-wrap">
+        <canvas id="shareChart"></canvas>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot ld-btc"></div>Bitcoin — 0% supply growth</div>
+        <div class="legend-item"><div class="legend-dot ld-gold"></div>Gold — ~2%/yr supply growth</div>
+        <div class="legend-item"><div class="legend-dot ld-fiat"></div>USD — ~7%/yr supply growth</div>
+      </div>
+      <div class="slider-block">
+        <div class="slider-header">
+          <span class="sl-label">Years from today</span>
+          <span class="sl-value" id="yearDisplay">0 years</span>
+        </div>
+        <input type="range" id="yearSlider" min="0" max="50" value="0" step="1">
+        <div class="year-marks">
+          <span>Today</span><span>10 yrs</span><span>20 yrs</span><span>30 yrs</span><span>40 yrs</span><span>50 yrs</span>
+        </div>
+      </div>
+      <button class="replay-btn" id="replayBtn">↺ Replay animation</button>
+    </div>
+
+    <!-- Stat cards — update dynamically -->
+    <div class="stat-trio">
+      <div class="stat-card st-fiat">
+        <div class="st-label">US Dollar</div>
+        <div class="st-name">% of your original share remaining</div>
+        <div class="st-big" id="fiatShare">100%</div>
+        <div class="st-sub" id="fiatSub">of original position retained</div>
+        <div class="st-verdict" id="fiatVerdict">No years have passed yet.</div>
+      </div>
+      <div class="stat-card st-gold">
+        <div class="st-label">Gold</div>
+        <div class="st-name">% of your original share remaining</div>
+        <div class="st-big" id="goldShare">100%</div>
+        <div class="st-sub" id="goldSub">of original position retained</div>
+        <div class="st-verdict" id="goldVerdict">No years have passed yet.</div>
+      </div>
+      <div class="stat-card st-btc">
+        <div class="st-label">Bitcoin</div>
+        <div class="st-name">% of your original share remaining</div>
+        <div class="st-big" id="btcShare">100%</div>
+        <div class="st-sub" id="btcSub">of original position retained</div>
+        <div class="st-verdict" id="btcVerdict">Structurally fixed at 21M.</div>
+      </div>
+    </div>
+
+    <div class="terminal-note">
+      <p><strong>A note on terminal supply.</strong> Bitcoin's block reward halves roughly every four years and converges to zero around 2140. Today, approximately 95% of all bitcoin have already been mined. For this analysis we use the <strong>terminal 21 million</strong> as the denominator — making the point unambiguous: no matter when you acquire your position, your share of the network's terminal supply is fixed at that moment, and cannot be diluted by any actor, protocol, or political decision.</p>
+    </div>
+
+    <div class="takeaway">
+      <h3>In gold, supply grows benignly — <span class="gold-t">but it grows.</span><br>In fiat, it grows by design — and <span class="red">without limit.</span><br>In Bitcoin, it doesn't grow. <span class="amber">At all. Ever.</span></h3>
+      <p>This isn't a policy preference. It's a protocol guarantee enforced by cryptographic proof-of-work and economic consensus across a distributed network that no single entity controls. Your 1/21M is 1/21M. Forever.</p>
+    </div>
+
+  </div><!-- /tab-slice -->
+
+  <!-- ═══ TAB 2: THE ENERGY MIGRATION ═══ -->
+  <div class="tab-content" id="tab-energy">
+
+    <div class="thesis-callout">
+      <div class="tc-label">The Thesis</div>
+      <h3>A fixed share of a growing network may represent an ever-larger fraction of global economic value.</h3>
+      <p>If you accept that Bitcoin's supply is fixed, the next question is: what does that fixed share represent over time? The hypothesis — backed by 15 years of price history — is that monetary energy is migrating from fiat-denominated systems into the Bitcoin network. Any share of the Bitcoin network you hold today — fixed forever, as we established in Part I — could represent a growing fraction of global economic value as that migration continues.</p>
+    </div>
+
+    <div class="key-fact">
+      <div class="kf-icon">📐</div>
+      <div class="kf-text">
+        <h4>No 4-year holding period has ever produced a negative return.</h4>
+        <p>Bitcoin has experienced multiple 80%+ drawdowns. Yet over any complete 4-year window — through bear markets, exchange collapses, regulatory crackdowns, and mining bans — the 4-year compounded return has been positive without exception. This is not a guarantee of the future. It is an observation about the past.</p>
+      </div>
+    </div>
+
+    <!-- CAGR Chart -->
+    <div class="cagr-section">
+      <h3>Historical 4-Year Rolling Compound Annual Growth Rate (CAGR)</h3>
+      <div class="cagr-sub">Annualized return for every 4-year holding window in Bitcoin's history (approximate, using January prices)</div>
+      <div class="cagr-chart-wrap">
+        <canvas id="cagrChart"></canvas>
+        <div class="cagr-note">All 4-year windows positive. The trend is declining as Bitcoin matures — consistent with a maturing asset of growing market cap.</div>
+      </div>
+      <p style="font-size:.88rem;color:var(--text-body);line-height:1.75;margin-top:14px;">These are <strong style="color:var(--text-bright)">annualized</strong> figures — meaning a 40% CAGR over 4 years doesn't mean 160% total. It means 40% compounded each year, which produces a ~284% total return over the period. The power of annual compounding is precisely what makes these numbers significant.</p>
+    </div>
+
+    <!-- Projection -->
+    <div class="projection-section">
+      <h3>Your Fixed Share — of the Growing Monetary Network</h3>
+      <p class="proj-sub">If your share of the network is fixed, what might it represent — if Bitcoin becomes the dominant, global monetary network, replacing fiat? Explore the thesis with your own assumptions.</p>
+
+      <div class="proj-controls">
+        <div class="proj-control">
+          <label>Starting position <span id="posDisplay">$10,000</span></label>
+          <input type="range" id="posSlider" min="1000" max="200000" value="10000" step="1000">
+        </div>
+        <div class="proj-control">
+          <label>Annual CAGR (Compound Annual Growth Rate) assumption <span id="cagrDisplay">40%</span></label>
+          <input type="range" id="cagrSlider" min="5" max="100" value="40" step="5">
+        </div>
+      </div>
+
+      <div class="proj-outputs">
+        <div class="proj-out">
+          <div class="po-period">4 Years</div>
+          <div class="po-value" id="proj4">$38,416</div>
+          <div class="po-multiplier" id="mult4">3.8× your position</div>
+        </div>
+        <div class="proj-out">
+          <div class="po-period">8 Years</div>
+          <div class="po-value" id="proj8">$147,590</div>
+          <div class="po-multiplier" id="mult8">14.8× your position</div>
+        </div>
+        <div class="proj-out">
+          <div class="po-period">12 Years</div>
+          <div class="po-value" id="proj12">$566,764</div>
+          <div class="po-multiplier" id="mult12">56.7× your position</div>
+        </div>
+      </div>
+
+      <div class="proj-disclaimer">
+        <strong>This is illustrative only.</strong> Past CAGR is not a predictor of future performance. Bitcoin's realized return has declined with each cycle as the asset matures and market cap grows — this is expected and mathematically inevitable. The historical 4-year CAGR average is approximately 65%, declining toward a long-run figure closer to 20–30% over the next decade. The 40% default is a deliberately conservative scenario. This is a thesis — not financial advice.
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <h3>The certainty is your Bitcoin fixed share.<br>The <span class="amber">thesis</span> is the value of what that share may represent.</h3>
+      <p>Part I of this page is structural — it requires no assumptions. Part II requires you to form a view on the trajectory of the Bitcoin network. The evidence supports the thesis. The conclusion is yours to draw.</p>
+    </div>
+
+  </div><!-- /tab-energy -->
+
+</div><!-- /page -->
+
+<footer>
+  © Last Coin Standing — Educational content only. Not financial advice.
+</footer>
+
 <script>
-const BTC_TOTAL = 21_000_000;
-const FIAT_BASE = 21.2e12;
-const ANNUAL_EXPANSION = 0.07;
+/* ─────────────────────────────────────────
+   NAV: Hamburger
+───────────────────────────────────────── */
+const hamburger = document.getElementById('hamburger');
+const mobileOverlay = document.getElementById('mobileOverlay');
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  mobileOverlay.classList.toggle('show');
+});
+mobileOverlay.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    hamburger.classList.remove('open');
+    mobileOverlay.classList.remove('show');
+  });
+});
 
-let state = { years: 0, btcAmount: 1, fiatAmount: 100000, animating: false };
+/* ─────────────────────────────────────────
+   TABS
+───────────────────────────────────────── */
+let cagrChartDrawn = false;
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    const id = btn.dataset.tab;
+    document.getElementById('tab-' + id).classList.add('active');
+    if (id === 'energy' && !cagrChartDrawn) {
+      setTimeout(drawCagrChart, 50);
+      cagrChartDrawn = true;
+    }
+  });
+});
 
-const btcCanvas = document.getElementById('btcPie');
-const fiatCanvas = document.getElementById('fiatPie');
+/* ─────────────────────────────────────────
+   TAB 1: SHARE CHART
+───────────────────────────────────────── */
+let currentYear = 0;
+let animationId = null;
+let animating = false;
 
-function setupCanvas(canvas) {
+const yearSlider  = document.getElementById('yearSlider');
+const yearDisplay = document.getElementById('yearDisplay');
+const replayBtn   = document.getElementById('replayBtn');
+
+function shareRetained(annualGrowth, year) {
+  if (annualGrowth === 0) return 100;
+  return 100 / Math.pow(1 + annualGrowth, year);
+}
+
+function drawShareChart(highlightYear) {
+  const canvas = document.getElementById('shareChart');
   const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.parentElement.getBoundingClientRect();
-  const s = rect.width;
-  canvas.width = s * dpr;
-  canvas.height = s * dpr;
-  canvas.style.width = s + 'px';
-  canvas.style.height = s + 'px';
+  const w = canvas.offsetWidth || 800;
+  const h = canvas.offsetHeight || 280;
+  canvas.width  = w * dpr;
+  canvas.height = h * dpr;
   const ctx = canvas.getContext('2d');
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  return { ctx, s };
-}
+  ctx.scale(dpr, dpr);
 
-/* ─── BTC Pie: fixed-radius, your slice glows brighter with energy ─── */
-function drawBtc(ctx, s) {
-  const cx = s / 2, cy = s / 2, r = s * 0.42;
-  const shareRaw = (state.btcAmount / BTC_TOTAL) * Math.PI * 2;
-  const vis = Math.max(Math.min(shareRaw * 280000, Math.PI * 0.42), 0.035);
-  const density = 1 + state.years * 0.14;
+  const pad = { top: 16, right: 60, bottom: 44, left: 52 };
+  const cw = w - pad.left - pad.right;
+  const ch = h - pad.top - pad.bottom;
+  const maxYear = 50;
 
-  ctx.clearRect(0, 0, s, s);
+  const xOf  = y  => pad.left + (y / maxYear) * cw;
+  const yOf  = pct => pad.top + ch - (pct / 100) * ch;
 
-  // Whole pie
-  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.closePath();
-  ctx.fillStyle = '#151620'; ctx.fill();
-  ctx.strokeStyle = '#22232e'; ctx.lineWidth = 1.2; ctx.stroke();
+  ctx.clearRect(0, 0, w, h);
 
-  // Radial grid (pizza cuts)
-  for (let i = 0; i < 8; i++) {
-    const a = (i / 8) * Math.PI * 2;
-    ctx.beginPath(); ctx.moveTo(cx, cy);
-    ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
-    ctx.strokeStyle = '#1c1d28'; ctx.lineWidth = 0.6; ctx.stroke();
-  }
+  // Grid
+  const gridLevels = [0, 25, 50, 75, 100];
+  ctx.font = `${Math.round(10 * dpr) / dpr}px Inter, sans-serif`;
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  gridLevels.forEach(pct => {
+    const y = yOf(pct);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(pad.left + cw, y);
+    ctx.strokeStyle = pct === 100 ? '#2a2826' : '#1e1c1a';
+    ctx.lineWidth = pct === 100 ? 1.2 : 0.8;
+    ctx.stroke();
+    ctx.fillStyle = '#706860';
+    ctx.fillText(pct + '%', pad.left - 8, y);
+  });
 
-  // Your slice
-  const st = -Math.PI / 2, en = st + vis;
+  // X axis ticks
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#706860';
+  [0, 10, 20, 30, 40, 50].forEach(yr => {
+    const x = xOf(yr);
+    ctx.beginPath();
+    ctx.moveTo(x, pad.top + ch);
+    ctx.lineTo(x, pad.top + ch + 4);
+    ctx.strokeStyle = '#2a2826'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillText(yr === 0 ? 'Today' : yr, x, pad.top + ch + 8);
+  });
 
-  // Glow
-  ctx.save();
-  ctx.shadowColor = `rgba(247,147,26,${0.2 + density * 0.07})`;
-  ctx.shadowBlur = 12 + density * 10;
-  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, st, en); ctx.closePath();
-  ctx.fillStyle = `rgba(247,147,26,${0.65 + density * 0.04})`;
-  ctx.fill();
-  ctx.restore();
+  // X axis label
+  ctx.fillStyle = '#504840';
+  ctx.font = `${Math.round(9 * dpr) / dpr}px Inter, sans-serif`;
+  ctx.fillText('Years', pad.left + cw / 2, pad.top + ch + 30);
 
-  // Solid slice with gradient showing energy density
-  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, st, en); ctx.closePath();
-  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-  g.addColorStop(0, `rgba(247,147,26,${0.95})`);
-  g.addColorStop(0.6, `rgba(247,147,26,${0.65 + density * 0.05})`);
-  g.addColorStop(1, `rgba(247,147,26,${0.5 + density * 0.08})`);
-  ctx.fillStyle = g; ctx.fill();
+  // Draw lines
+  const lines = [
+    { growth: 0,    color: '#F7931A', label: 'Bitcoin', lineWidth: 3 },
+    { growth: 0.02, color: '#c9a84c', label: 'Gold',    lineWidth: 2 },
+    { growth: 0.07, color: '#c0392b', label: 'USD',     lineWidth: 2 },
+  ];
 
-  // Density rings inside slice (energy accumulation)
-  if (state.years > 0) {
-    const n = Math.min(state.years, 8);
-    for (let i = 1; i <= n; i++) {
+  lines.forEach(line => {
+    const yearsToDraw = Math.ceil(highlightYear);
+
+    // Shadow/glow for bitcoin
+    if (line.growth === 0) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(247,147,26,0.25)';
+      ctx.shadowBlur = 8;
+    }
+
+    ctx.beginPath();
+    for (let y = 0; y <= Math.min(yearsToDraw, maxYear); y++) {
+      const px = xOf(y);
+      const py = yOf(shareRetained(line.growth, y));
+      y === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+
+    // Partial last segment (smooth animation)
+    const fracYear = highlightYear - Math.floor(highlightYear);
+    if (fracYear > 0 && yearsToDraw <= maxYear) {
+      const y0 = Math.floor(highlightYear);
+      const y1 = Math.ceil(highlightYear);
+      const px = xOf(y0 + fracYear);
+      const py = yOf(
+        shareRetained(line.growth, y0) * (1 - fracYear) +
+        shareRetained(line.growth, y1) * fracYear
+      );
+      ctx.lineTo(px, py);
+    }
+
+    ctx.strokeStyle = line.color;
+    ctx.lineWidth = line.lineWidth;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    if (line.growth === 0) ctx.restore();
+
+    // Draw future (dim) part — only if not animating
+    if (!animating && highlightYear < maxYear) {
       ctx.beginPath();
-      ctx.arc(cx, cy, r * (0.15 + i * 0.09), st, en);
-      ctx.strokeStyle = `rgba(255,200,100,${0.06 + i * 0.025})`;
-      ctx.lineWidth = 1.2; ctx.stroke();
+      const startY = Math.ceil(highlightYear);
+      for (let y = startY; y <= maxYear; y++) {
+        const px = xOf(y);
+        const py = yOf(shareRetained(line.growth, y));
+        y === startY ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      }
+      ctx.strokeStyle = line.color;
+      ctx.globalAlpha = 0.15;
+      ctx.lineWidth = line.lineWidth;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
     }
-  }
 
-  // Slice edges
-  ctx.strokeStyle = 'rgba(247,147,26,0.55)'; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(cx, cy);
-  ctx.lineTo(cx + Math.cos(st) * r, cy + Math.sin(st) * r); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx, cy);
-  ctx.lineTo(cx + Math.cos(en) * r, cy + Math.sin(en) * r); ctx.stroke();
+    // End label at right edge (at highlightYear position)
+    const endY = Math.min(highlightYear, maxYear);
+    const labelX = xOf(endY) + 6;
+    const labelY = yOf(shareRetained(line.growth, endY));
+    ctx.font = `600 ${Math.round(10 * dpr) / dpr}px Inter, sans-serif`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = line.color;
+    // Only show label if close to right edge
+    if (endY >= maxYear * 0.85 || !animating) {
+      const pct = shareRetained(line.growth, endY);
+      ctx.fillText(line.label, labelX, labelY + (line.growth === 0 ? -8 : 0));
+    }
+  });
 
-  // "YOU" label
-  const mid = st + vis / 2, lr = r * 0.58;
-  ctx.save();
-  ctx.font = `600 ${s * 0.03}px "DM Sans",sans-serif`;
-  ctx.fillStyle = '#0a0b0f'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('YOU', cx + Math.cos(mid) * lr, cy + Math.sin(mid) * lr);
-  ctx.restore();
+  // Cursor line at highlightYear
+  const cx = xOf(highlightYear);
+  ctx.beginPath();
+  ctx.moveTo(cx, pad.top);
+  ctx.lineTo(cx, pad.top + ch);
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 1.2;
+  ctx.setLineDash([4, 5]);
+  ctx.stroke();
+  ctx.setLineDash([]);
 
-  // Fixed label
-  ctx.save();
-  ctx.font = `400 ${s * 0.028}px "DM Sans",sans-serif`;
-  ctx.fillStyle = '#3a3b46'; ctx.textAlign = 'center';
-  ctx.fillText('21M — fixed', cx, cy + r + s * 0.06);
-  ctx.restore();
+  // Dots at cursor
+  [
+    { growth: 0,    color: '#F7931A' },
+    { growth: 0.02, color: '#c9a84c' },
+    { growth: 0.07, color: '#c0392b' },
+  ].forEach(({ growth, color }) => {
+    const pct = shareRetained(growth, highlightYear);
+    const dotX = cx, dotY = yOf(pct);
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, growth === 0 ? 5 : 4, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = '#0a0908';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
 }
 
-/* ─── Fiat Pie: expands outward, your slice gets thinner ─── */
-function drawFiat(ctx, s) {
-  const cx = s / 2, cy = s / 2;
-  const baseR = s * 0.30;
-  const expansion = Math.pow(1 + ANNUAL_EXPANSION, state.years);
-  const expR = Math.min(baseR * Math.pow(expansion, 0.38), s * 0.46);
+function updateStatCards(year) {
+  const fiatPct  = shareRetained(0.07, year);
+  const goldPct  = shareRetained(0.02, year);
+  const btcPct   = 100;
 
-  const currentShare = (state.fiatAmount / (FIAT_BASE * expansion)) * Math.PI * 2;
-  const vis = Math.max(Math.min(currentShare * 8e8, Math.PI * 0.42), 0.035);
+  const fmt = v => v >= 99.9 ? '100%' : v.toFixed(1) + '%';
 
-  const baseShare = (state.fiatAmount / FIAT_BASE) * Math.PI * 2;
-  const baseVis = Math.max(Math.min(baseShare * 8e8, Math.PI * 0.42), 0.035);
+  document.getElementById('fiatShare').textContent = fmt(fiatPct);
+  document.getElementById('goldShare').textContent = fmt(goldPct);
+  document.getElementById('btcShare').textContent  = fmt(btcPct);
 
-  ctx.clearRect(0, 0, s, s);
+  const yr = Math.round(year);
 
-  // Ghost: original pie boundary
-  if (state.years > 0) {
-    ctx.beginPath(); ctx.arc(cx, cy, baseR, 0, Math.PI * 2);
-    ctx.setLineDash([3, 4]); ctx.strokeStyle = '#2a2b36'; ctx.lineWidth = 1; ctx.stroke();
-    ctx.setLineDash([]);
+  if (yr === 0) {
+    document.getElementById('fiatSub').textContent    = 'of original position retained';
+    document.getElementById('goldSub').textContent    = 'of original position retained';
+    document.getElementById('btcSub').textContent     = 'of original position retained';
+    document.getElementById('fiatVerdict').textContent  = 'No years have passed yet.';
+    document.getElementById('goldVerdict').textContent  = 'No years have passed yet.';
+    document.getElementById('btcVerdict').textContent   = 'Structurally fixed at 21M.';
+  } else {
+    const fiatLost = (100 - fiatPct).toFixed(1);
+    const goldLost = (100 - goldPct).toFixed(1);
 
-    ctx.save();
-    ctx.font = `300 ${s * 0.024}px "DM Sans",sans-serif`;
-    ctx.fillStyle = '#35363f'; ctx.textAlign = 'center';
-    ctx.fillText('original pie', cx, cy - baseR - 5);
-    ctx.restore();
+    document.getElementById('fiatSub').textContent    = 'of original share remains after ' + yr + ' yr' + (yr > 1 ? 's' : '');
+    document.getElementById('goldSub').textContent    = 'of original share remains after ' + yr + ' yr' + (yr > 1 ? 's' : '');
+    document.getElementById('btcSub').textContent     = 'of original share — no dilution, ever';
+    document.getElementById('fiatVerdict').textContent  = fiatLost + '% of your share has been quietly transferred to others by new money creation.';
+    document.getElementById('goldVerdict').textContent  = goldLost + '% of your share has been diluted by new mining. The supply expands forever — silently diluting your position.';
+    document.getElementById('btcVerdict').textContent   = 'Your share of 21M is identical to the day you acquired it.';
   }
 
-  // Expanded pie
-  ctx.beginPath(); ctx.arc(cx, cy, expR, 0, Math.PI * 2); ctx.closePath();
-  ctx.fillStyle = '#13141c'; ctx.fill();
-  ctx.strokeStyle = '#22232e'; ctx.lineWidth = 1.2; ctx.stroke();
+  yearDisplay.textContent = yr === 0 ? '0 years' : yr + ' year' + (yr > 1 ? 's' : '');
+  yearSlider.value = yr;
+}
 
-  // Pizza cuts
-  for (let i = 0; i < 8; i++) {
-    const a = (i / 8) * Math.PI * 2;
-    ctx.beginPath(); ctx.moveTo(cx, cy);
-    ctx.lineTo(cx + Math.cos(a) * expR, cy + Math.sin(a) * expR);
-    ctx.strokeStyle = '#1a1b24'; ctx.lineWidth = 0.5; ctx.stroke();
-  }
+function setYear(year) {
+  currentYear = year;
+  drawShareChart(year);
+  updateStatCards(year);
+}
 
-  // Expansion rings
-  if (state.years > 0) {
-    const n = Math.min(state.years, 10);
-    for (let i = 1; i <= n; i++) {
-      const rr = baseR + (expR - baseR) * (i / n);
-      ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(90,138,158,${0.04 + i * 0.008})`;
-      ctx.lineWidth = 0.7; ctx.stroke();
+// Slider
+yearSlider.addEventListener('input', function() {
+  if (animating) return;
+  setYear(+this.value);
+});
+
+// Animation
+function runAnimation() {
+  if (animating) return;
+  animating = true;
+  replayBtn.textContent = '⏸ Playing...';
+  replayBtn.disabled = true;
+  let t = 0;
+  const target = 30;
+  const duration = 3500; // ms
+  const startTime = performance.now();
+
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    // Ease out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    t = eased * target;
+    setYear(t);
+    if (progress < 1) {
+      animationId = requestAnimationFrame(step);
+    } else {
+      animating = false;
+      replayBtn.textContent = '↺ Replay animation';
+      replayBtn.disabled = false;
+      drawShareChart(target); // final clean draw
     }
   }
-
-  // Your slice (thinning)
-  const st = -Math.PI / 2, en = st + vis;
-  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, expR, st, en); ctx.closePath();
-  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, expR);
-  g.addColorStop(0, 'rgba(90,138,158,0.65)');
-  g.addColorStop(1, 'rgba(90,138,158,0.35)');
-  ctx.fillStyle = g; ctx.fill();
-
-  // Ghost line: where your slice USED to be
-  if (state.years > 0) {
-    const ghostEn = st + baseVis;
-    ctx.beginPath(); ctx.moveTo(cx, cy);
-    ctx.lineTo(cx + Math.cos(ghostEn) * expR * 0.55, cy + Math.sin(ghostEn) * expR * 0.55);
-    ctx.setLineDash([2, 3]); ctx.strokeStyle = 'rgba(192,57,43,0.35)'; ctx.lineWidth = 1.2; ctx.stroke();
-    ctx.setLineDash([]);
-
-    // "was here" micro-label
-    const ghMid = (st + ghostEn) / 2, ghR = expR * 0.6;
-    ctx.save();
-    ctx.font = `300 ${s * 0.02}px "DM Sans",sans-serif`;
-    ctx.fillStyle = 'rgba(192,57,43,0.5)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    const glx = cx + Math.cos(ghostEn + 0.06) * (ghR * 0.7);
-    const gly = cy + Math.sin(ghostEn + 0.06) * (ghR * 0.7);
-    ctx.fillText('was', glx, gly);
-    ctx.restore();
-  }
-
-  // Slice edges
-  ctx.strokeStyle = 'rgba(90,138,158,0.45)'; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(cx, cy);
-  ctx.lineTo(cx + Math.cos(st) * expR, cy + Math.sin(st) * expR); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx, cy);
-  ctx.lineTo(cx + Math.cos(en) * expR, cy + Math.sin(en) * expR); ctx.stroke();
-
-  // "YOU"
-  const mid = st + vis / 2, lr = expR * 0.48;
-  ctx.save();
-  ctx.font = `600 ${s * 0.028}px "DM Sans",sans-serif`;
-  ctx.fillStyle = '#0a0b0f'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('YOU', cx + Math.cos(mid) * lr, cy + Math.sin(mid) * lr);
-  ctx.restore();
-
-  // Expanding label
-  ctx.save();
-  ctx.font = `400 ${s * 0.028}px "DM Sans",sans-serif`;
-  ctx.fillStyle = '#3a3b46'; ctx.textAlign = 'center';
-  const supplyLabel = state.years > 0 ? fmtMoney(FIAT_BASE * expansion) + ' — expanding' : '$21.2T — expanding';
-  ctx.fillText(supplyLabel, cx, cy + expR + s * 0.06);
-  ctx.restore();
+  animationId = requestAnimationFrame(step);
 }
+
+replayBtn.addEventListener('click', () => {
+  if (animating) return;
+  setYear(0);
+  setTimeout(runAnimation, 300);
+});
+
+// Resize
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    drawShareChart(currentYear);
+  }, 100);
+});
+
+/* ─────────────────────────────────────────
+   TAB 2: CAGR CHART
+───────────────────────────────────────── */
+const historicalCagrs = [
+  { period: '12→16', cagr: 192 },
+  { period: '13→17', cagr: 170 },
+  { period: '14→18', cagr: 100 },
+  { period: '15→19', cagr: 96  },
+  { period: '16→20', cagr: 103 },
+  { period: '17→21', cagr: 140 },
+  { period: '18→22', cagr: 38  },
+  { period: '19→23', cagr: 48  },
+  { period: '20→24', cagr: 55  },
+  { period: '21→25', cagr: 31  },
+];
+
+function drawCagrChart() {
+  const canvas = document.getElementById('cagrChart');
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.offsetWidth || 800;
+  const h = 220;
+  canvas.width  = w * dpr;
+  canvas.height = h * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const pad = { top: 20, right: 20, bottom: 44, left: 50 };
+  const cw  = w - pad.left - pad.right;
+  const ch  = h - pad.top - pad.bottom;
+  const maxCagr = 220;
+  const barW = (cw / historicalCagrs.length) * 0.6;
+  const gap  = cw / historicalCagrs.length;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Grid
+  [0, 50, 100, 150, 200].forEach(v => {
+    const y = pad.top + ch - (v / maxCagr) * ch;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cw, y);
+    ctx.strokeStyle = v === 0 ? '#2a2826' : '#1a1816';
+    ctx.lineWidth = v === 0 ? 1.2 : 0.7;
+    ctx.stroke();
+    ctx.font = `${Math.round(9 * dpr)/dpr}px Inter, sans-serif`;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#555048';
+    if (v <= 200) ctx.fillText(v + '%', pad.left - 6, y);
+  });
+
+  // Bars
+  historicalCagrs.forEach((d, i) => {
+    const bx  = pad.left + i * gap + (gap - barW) / 2;
+    const bh  = Math.min(d.cagr / maxCagr, 1) * ch;
+    const by  = pad.top + ch - bh;
+    const clampedNote = d.cagr > maxCagr;
+
+    // Color: gradient warm to less warm based on value
+    const intensity = Math.min(d.cagr / 200, 1);
+    const r = Math.round(247);
+    const g = Math.round(100 + 47 * intensity);
+    const b = Math.round(26);
+    const alpha = 0.4 + intensity * 0.5;
+
+    // Bar fill
+    const grad = ctx.createLinearGradient(bx, by, bx, by + bh);
+    grad.addColorStop(0, `rgba(${r},${g},${b},${alpha})`);
+    grad.addColorStop(1, `rgba(${r},${g},${b},${alpha * 0.4})`);
+
+    ctx.fillStyle = grad;
+    const radius = 3;
+    ctx.beginPath();
+    ctx.moveTo(bx + radius, by);
+    ctx.lineTo(bx + barW - radius, by);
+    ctx.arcTo(bx + barW, by, bx + barW, by + radius, radius);
+    ctx.lineTo(bx + barW, by + bh);
+    ctx.lineTo(bx, by + bh);
+    ctx.arcTo(bx, by, bx + radius, by, radius);
+    ctx.closePath();
+    ctx.fill();
+
+    // Border
+    ctx.strokeStyle = `rgba(${r},${g},${b},0.5)`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Value label on top
+    ctx.font = `600 ${Math.round(9 * dpr)/dpr}px Inter, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillStyle = `rgba(${r},${g},${b},0.85)`;
+    const labelText = clampedNote ? d.cagr + '%↑' : d.cagr + '%';
+    ctx.fillText(labelText, bx + barW / 2, by - 3);
+
+    // Period label below
+    ctx.font = `${Math.round(8.5 * dpr)/dpr}px Inter, sans-serif`;
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = '#706860';
+    ctx.fillText(d.period, bx + barW / 2, pad.top + ch + 8);
+  });
+
+  // "All positive ↑" annotation
+  ctx.font = `italic ${Math.round(9 * dpr)/dpr}px Inter, sans-serif`;
+  ctx.fillStyle = 'rgba(247,147,26,0.4)';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('← all windows positive', pad.left + 4, pad.top + ch + 28);
+}
+
+/* ─────────────────────────────────────────
+   TAB 2: PROJECTION
+───────────────────────────────────────── */
+const posSlider   = document.getElementById('posSlider');
+const cagrSlider  = document.getElementById('cagrSlider');
+const posDisplay  = document.getElementById('posDisplay');
+const cagrDisplay = document.getElementById('cagrDisplay');
 
 function fmtMoney(n) {
-  if (n >= 1e12) return '$' + (n / 1e12).toFixed(1) + 'T';
-  if (n >= 1e9) return '$' + (n / 1e9).toFixed(1) + 'B';
-  if (n >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
-  if (n >= 1e3) return '$' + Math.round(n / 1e3) + 'K';
-  return '$' + n;
+  if (n >= 1e9)  return '$' + (n / 1e9).toFixed(1)  + 'B';
+  if (n >= 1e6)  return '$' + (n / 1e6).toFixed(2)  + 'M';
+  if (n >= 1e3)  return '$' + Math.round(n / 100) * 100 >= 1000
+    ? '$' + (n / 1e3).toFixed(1) + 'K' : '$' + n;
+  return '$' + Math.round(n);
 }
 
-function update() {
-  const b = setupCanvas(btcCanvas);
-  const f = setupCanvas(fiatCanvas);
-  drawBtc(b.ctx, b.s);
-  drawFiat(f.ctx, f.s);
-
-  // BTC stats
-  const btcShare = (state.btcAmount / BTC_TOTAL) * 100;
-  const btcPctStr = btcShare < 0.001 ? btcShare.toExponential(2) + '%' : btcShare.toFixed(btcShare < 0.01 ? 5 : 4) + '%';
-  document.getElementById('btcPct').textContent = btcPctStr;
-  document.getElementById('btcYours').textContent = state.btcAmount.toFixed(state.btcAmount < 1 ? 2 : state.btcAmount < 10 ? 2 : 1) + ' BTC';
-  document.getElementById('btcDensity').textContent = state.years > 0 ? '↑ denser' : 'Baseline';
-
-  // Fiat stats
-  const fiatSup = FIAT_BASE * Math.pow(1 + ANNUAL_EXPANSION, state.years);
-  const fiatShare = (state.fiatAmount / fiatSup) * 100;
-  const fiatPctStr = fiatShare < 0.0001 ? fiatShare.toExponential(2) + '%' : fiatShare.toFixed(fiatShare < 0.001 ? 7 : 5) + '%';
-  const initShare = state.fiatAmount / FIAT_BASE;
-  const curShare = state.fiatAmount / fiatSup;
-  const dilution = state.years > 0 ? ((1 - curShare / initShare) * 100).toFixed(1) : '0';
-
-  document.getElementById('fiatPct').textContent = fiatPctStr;
-  document.getElementById('fiatSupply').textContent = fmtMoney(fiatSup);
-  document.getElementById('fiatYours').textContent = fmtMoney(state.fiatAmount);
-  document.getElementById('fiatDilution').textContent = dilution + '%';
-
-  // Messages
-  const btcM = document.getElementById('btcMsg');
-  btcM.textContent = state.years > 0
-    ? `${state.years} year${state.years > 1 ? 's' : ''} pass. Your slice is still exactly ${btcPctStr}. Unchanged. As monetary energy migrates in from fiat, each sat grows denser — worth more.`
-    : 'Your slice never changes. As monetary energy migrates from fiat, each unit grows denser — more valuable — not thinner.';
-
-  const fiatM = document.getElementById('fiatMsg');
-  if (state.years > 0) {
-    fiatM.textContent = `After ${state.years} year${state.years > 1 ? 's' : ''}: the pie expanded to ${fmtMoney(fiatSup)}. Your ${fmtMoney(state.fiatAmount)} is now ${fiatPctStr} — diluted by ${dilution}%. Same dollars. Thinner slice.`;
-    fiatM.classList.remove('neutral');
-  } else {
-    fiatM.textContent = 'Move the slider to watch the pie expand around your dollars. Same savings. Thinner slice.';
-    fiatM.classList.add('neutral');
-  }
-
-  // Arrow
-  const arrow = document.getElementById('flowArrow');
-  const label = document.getElementById('flowLabel');
-  if (state.years > 0) {
-    arrow.classList.add('active'); arrow.textContent = '◀◀';
-    label.textContent = 'energy migrating';
-  } else {
-    arrow.classList.remove('active'); arrow.textContent = '◀';
-    label.textContent = 'monetary energy';
-  }
+function fmtK(n) {
+  if (n >= 1e9) return '$' + (n/1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return '$' + Math.round(n/1000) + 'K';
+  return '$' + Math.round(n);
 }
 
-// Sliders
-document.getElementById('yearsSlider').addEventListener('input', function () {
-  state.years = +this.value;
-  document.getElementById('yearsVal').textContent = this.value + ' year' + (this.value !== '1' ? 's' : '');
-  update();
-});
-document.getElementById('btcSlider').addEventListener('input', function () {
-  state.btcAmount = +this.value;
-  document.getElementById('btcVal').textContent = state.btcAmount.toFixed(state.btcAmount < 1 ? 2 : state.btcAmount < 10 ? 2 : 1) + ' BTC';
-  update();
-});
-document.getElementById('fiatSlider').addEventListener('input', function () {
-  state.fiatAmount = +this.value;
-  document.getElementById('fiatVal').textContent = fmtMoney(state.fiatAmount);
-  update();
+function updateProjection() {
+  const pos  = +posSlider.value;
+  const cagr = +cagrSlider.value / 100;
+
+  posDisplay.textContent  = fmtK(pos);
+  cagrDisplay.textContent = (+cagrSlider.value) + '%';
+
+  const p4  = pos * Math.pow(1 + cagr, 4);
+  const p8  = pos * Math.pow(1 + cagr, 8);
+  const p12 = pos * Math.pow(1 + cagr, 12);
+
+  document.getElementById('proj4').textContent  = fmtK(p4);
+  document.getElementById('proj8').textContent  = fmtK(p8);
+  document.getElementById('proj12').textContent = fmtK(p12);
+
+  document.getElementById('mult4').textContent  = (p4/pos).toFixed(1)  + '× your position';
+  document.getElementById('mult8').textContent  = (p8/pos).toFixed(1)  + '× your position';
+  document.getElementById('mult12').textContent = (p12/pos).toFixed(1) + '× your position';
+}
+
+posSlider.addEventListener('input',  updateProjection);
+cagrSlider.addEventListener('input', updateProjection);
+
+/* ─────────────────────────────────────────
+   INIT
+───────────────────────────────────────── */
+// Init Tab 1 chart
+requestAnimationFrame(() => {
+  drawShareChart(0);
+  updateStatCards(0);
+  setTimeout(runAnimation, 600);
 });
 
-// Animate
-document.getElementById('btnPlay').addEventListener('click', function () {
-  if (state.animating) return;
-  state.animating = true;
-  this.textContent = '⏳ Printing...';
-  const sl = document.getElementById('yearsSlider');
-  let yr = 0;
-  const tick = setInterval(() => {
-    yr++;
-    if (yr <= 10) {
-      sl.value = yr; state.years = yr;
-      document.getElementById('yearsVal').textContent = yr + ' year' + (yr > 1 ? 's' : '');
-      update();
-    } else {
-      clearInterval(tick); state.animating = false;
-      document.getElementById('btnPlay').textContent = '▶ Watch 10 Years';
-    }
-  }, 450);
-});
-
-document.getElementById('btnReset').addEventListener('click', function () {
-  state = { years: 0, btcAmount: 1, fiatAmount: 100000, animating: false };
-  document.getElementById('yearsSlider').value = 0;
-  document.getElementById('btcSlider').value = 1;
-  document.getElementById('fiatSlider').value = 100000;
-  document.getElementById('yearsVal').textContent = '0 years';
-  document.getElementById('btcVal').textContent = '1.0 BTC';
-  document.getElementById('fiatVal').textContent = '$100,000';
-  update();
-});
-
-let rt;
-window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(update, 80); });
-requestAnimationFrame(update);
+// Init Tab 2 projection
+updateProjection();
 </script>
 </body>
 </html>
