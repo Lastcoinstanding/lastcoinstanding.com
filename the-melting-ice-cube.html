@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WNGLLPPR5M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-WNGLLPPR5M');
+</script>
+<title>The Melting Ice Cube — Last Coin Standing</title>
+<meta name="description" content="Holding cash isn't a conservative decision — it's an active one with a quantifiable cost. Explore how inflation erodes treasury value and what a Bitcoin allocation changes for cashflow-positive operating businesses.">
+<link rel="canonical" href="https://lastcoinstanding.com/the-melting-ice-cube.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lastcoinstanding.com/the-melting-ice-cube.html">
+<meta property="og:title" content="The Melting Ice Cube — Last Coin Standing">
+<meta property="og:description" content="If it's not Bitcoin, your money is melting. Explore what a Bitcoin treasury allocation changes for operating businesses.">
+<meta property="og:site_name" content="Last Coin Standing">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","@id":"https://lastcoinstanding.com/the-melting-ice-cube.html","url":"https://lastcoinstanding.com/the-melting-ice-cube.html","name":"The Melting Ice Cube — Last Coin Standing","description":"An interactive exploration of treasury erosion under inflation versus a partial Bitcoin allocation strategy for cashflow-positive operating businesses.","isPartOf":{"@id":"https://lastcoinstanding.com/#website"},"publisher":{"@id":"https://lastcoinstanding.com/#organization"},"inLanguage":"en"}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0908;--bg-card:#111110;--border:#1e1c1a;--border-lt:#2a2826;
+  --orange:#F7931A;--orange-dim:rgba(247,147,26,.45);--orange-glow:rgba(247,147,26,.15);--orange-soft:rgba(247,147,26,.08);
+  --blue:#7ab8d8;--blue-soft:rgba(122,184,216,.08);--blue-dim:rgba(122,184,216,.3);
+  --red:#c0392b;--red-dim:rgba(192,57,43,.30);--red-soft:rgba(192,57,43,.10);
+  --green:#2ecc71;--green-soft:rgba(46,204,113,.09);--green-dim:rgba(46,204,113,.5);
+  --text:#d8d2ca;--text-dim:#908880;--text-bright:#f2eee8;--text-body:#d0c8c0;--text-muted:#706860;
+  --font-d:'Cormorant Garamond',Georgia,serif;--font-b:'Inter',-apple-system,sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:1rem;line-height:1.7;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:1000}
+
+/* NAV */
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:rgba(10,9,8,.95);border-bottom:1px solid #1a1a1a;position:sticky;top:0;z-index:999;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.site-nav .brand{font-family:var(--font-b);font-size:.8rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#999;text-decoration:none;transition:color .2s;flex-shrink:0}
+.site-nav .brand:hover{color:var(--orange)}
+.site-nav .nav-links{display:flex;gap:2px;flex-wrap:wrap}
+.site-nav .nav-links a{font-family:var(--font-b);font-size:.82rem;font-weight:500;color:#aaa;text-decoration:none;padding:7px 11px;border-radius:4px;transition:color .2s,background .2s;white-space:nowrap}
+.site-nav .nav-links a:hover{color:#ccc;background:rgba(255,255,255,.04)}
+.site-nav .nav-links a.active{color:var(--orange);background:var(--orange-soft)}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:8px;flex-direction:column;gap:5px}
+.hamburger span{display:block;width:22px;height:2px;background:#aaa;transition:all .3s}
+.hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+.mobile-overlay{display:none;position:fixed;inset:0;top:50px;background:rgba(10,9,8,.98);z-index:998;flex-direction:column;padding:2rem 1.5rem;gap:.5rem}
+.mobile-overlay.show{display:flex}
+.mobile-overlay a{font-family:var(--font-b);font-size:1.1rem;font-weight:500;color:#aaa;text-decoration:none;padding:12px 16px;border-radius:6px;transition:all .2s}
+.mobile-overlay a:hover{color:#ccc;background:rgba(255,255,255,.04)}
+.mobile-overlay a.active{color:var(--orange);background:var(--orange-soft)}
+@media(max-width:768px){.site-nav .nav-links{display:none}.hamburger{display:flex}}
+
+/* LAYOUT */
+.page{max-width:960px;margin:0 auto;padding:40px 24px 60px}
+.page-header{text-align:center;margin-bottom:28px}
+.page-header h1{font-family:var(--font-d);font-size:clamp(2rem,4.5vw,3rem);font-weight:600;color:var(--text-bright);margin-bottom:12px;letter-spacing:-.01em}
+.page-header .subtitle{font-size:1rem;color:var(--text-dim);max-width:580px;margin:0 auto;line-height:1.7}
+.blue-t{color:var(--blue)}.amber{color:var(--orange)}
+
+/* Saylor quote */
+.saylor-quote{margin:0 auto 32px;max-width:600px;padding:20px 28px;border-left:3px solid var(--orange);background:var(--orange-soft);border-radius:0 6px 6px 0}
+.saylor-quote blockquote{font-family:var(--font-d);font-size:clamp(1.1rem,2.2vw,1.4rem);font-style:italic;font-weight:400;color:var(--text-bright);line-height:1.5;margin-bottom:8px}
+.saylor-quote cite{font-size:.75rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);font-style:normal}
+
+/* TABS */
+.tab-nav{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:32px}
+.tab-btn{flex:1;padding:16px 12px;background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;text-align:center;transition:all .25s}
+.tab-btn:hover{background:rgba(255,255,255,.02)}
+.tab-btn .tab-num{display:block;font-size:.62rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;transition:color .25s}
+.tab-btn .tab-title{display:block;font-family:var(--font-d);font-size:clamp(.9rem,2vw,1.2rem);font-weight:600;color:var(--text-dim);transition:color .25s}
+.tab-btn.active{border-bottom-color:var(--orange)}
+.tab-btn.active .tab-num{color:var(--orange)}
+.tab-btn.active .tab-title{color:var(--text-bright)}
+.tab-content{display:none;animation:tabIn .35s ease}
+.tab-content.active{display:block}
+@keyframes tabIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Typography */
+.prose{font-size:.97rem;color:var(--text-body);line-height:1.8}
+.section-title{font-family:var(--font-d);font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:600;color:var(--text-bright);margin-bottom:12px}
+
+/* Interactive block wrapper — signals user action needed */
+.interactive-block{
+  position:relative;
+  padding:16px;
+  border:2px solid rgba(192,57,43,.6);
+  border-radius:8px;
+  background:rgba(192,57,43,.05);
+  margin-bottom:16px;
+}
+.interactive-block::before{
+  content:'Your input';
+  position:absolute;
+  top:-10px; left:12px;
+  font-size:.6rem;
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--red);
+  background:var(--bg);
+  padding:0 6px;
+}
+.interactive-block-slider{
+  position:relative;
+  padding:16px;
+  border:2px solid rgba(192,57,43,.6);
+  border-radius:8px;
+  background:rgba(192,57,43,.05);
+  margin-bottom:16px;
+}
+.interactive-block-slider::before{
+  content:'Adjust';
+  position:absolute;
+  top:-10px; left:12px;
+  font-size:.6rem;
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--red);
+  background:var(--bg);
+  padding:0 6px;
+}
+/* Fiat expansion schedule card — mirrors Bitcoin epoch card, red theme */
+.mini-stat.ms-fiat-epoch{border-left:3px solid var(--red)}
+.ms-fiat-epoch .ms-label{color:var(--red)}
+.ms-fiat-epoch .ms-big{color:#e8aaaa}
+.ms-tbd{font-size:1.5rem;letter-spacing:.04em}
+
+/* Bitcoin info block — mirrors interactive-block height/structure, orange, no label */
+.btc-info-block{
+  padding:16px;
+  border:2px solid rgba(247,147,26,.55);
+  border-radius:8px;
+  background:rgba(247,147,26,.04);
+}
+.opt-btn.sel-red{background:rgba(192,57,43,.15);border-color:var(--red);color:#e8aaaa}
+.opt-btn.sel-red:hover{background:rgba(192,57,43,.22);border-color:var(--red)}
+/* Override default orange hover for buttons inside interactive-block */
+.interactive-block .opt-btn:hover,
+.interactive-block-slider .opt-btn:hover{border-color:rgba(192,57,43,.6);color:var(--text-dim)}
+.opt-btn{padding:6px 14px;background:none;border:1px solid var(--border-lt);border-radius:4px;font-family:var(--font-b);font-size:.78rem;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all .2s}
+.opt-btn:hover{border-color:var(--orange);color:var(--text-dim)}
+.opt-btn.sel{background:var(--orange-soft);border-color:var(--orange);color:var(--orange)}
+.opt-btn.sel-blue{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+
+/* TAB 1 panels */
+.panels-row{display:grid;grid-template-columns:1fr 40px 1fr;gap:0;align-items:center;margin-bottom:28px}
+@media(max-width:640px){.panels-row{grid-template-columns:1fr}.vs-col{display:none}}
+.vis-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:20px 16px 16px;text-align:center}
+.vis-panel.vp-cash{border-top:3px solid var(--blue)}
+.vis-panel.vp-btc{border-top:3px solid var(--orange)}
+.vp-label{font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin-bottom:2px}
+.vp-cash .vp-label{color:var(--blue)}.vp-btc .vp-label{color:var(--orange)}
+.vp-name{font-family:var(--font-d);font-size:1.05rem;font-weight:600;color:var(--text-bright);margin-bottom:4px}
+.vp-desc{font-size:.72rem;color:var(--text-muted);margin-bottom:14px;line-height:1.5}
+.canvas-wrap{position:relative;width:100%;height:220px}
+@media(max-width:500px){.canvas-wrap{height:180px}}
+canvas.vis-canvas{position:absolute;inset:0;width:100%!important;height:100%!important;display:block}
+.vp-stat{margin-top:12px;font-family:var(--font-d);font-size:1.5rem;font-weight:600;line-height:1.2}
+.vp-cash .vp-stat{color:var(--blue)}.vp-btc .vp-stat{color:var(--orange)}
+.vp-stat-sub{font-size:.73rem;color:var(--text-muted);margin-top:3px}
+.vs-col{display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:1.4rem;font-style:italic;color:var(--text-muted)}
+
+/* Controls */
+.ctrl-block{margin-bottom:24px}
+.ctrl-label{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;display:block}
+input[type="range"]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;outline:none;background:var(--border);cursor:pointer}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--orange);border:2px solid var(--bg);cursor:pointer;box-shadow:0 0 8px var(--orange-dim)}
+input[type="range"]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--orange);border:2px solid var(--bg);cursor:pointer}
+.year-marks{display:flex;justify-content:space-between;margin-top:5px}
+.year-marks span{font-size:.62rem;color:var(--text-muted)}
+.slider-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.slider-header .sl-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)}
+.slider-header .sl-value{font-family:var(--font-d);font-size:1.1rem;font-weight:600;color:var(--text-bright)}
+
+/* Stat trio */
+.stat-trio{display:grid;grid-template-columns:1fr 40px 1fr;gap:10px;margin:20px 0 28px}
+@media(max-width:600px){.stat-trio{grid-template-columns:1fr}}
+.stat-card{padding:16px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px}
+.stat-card.sc-cash{border-left:3px solid var(--blue)}
+.stat-card.sc-hl{border-left:3px solid var(--red)}
+.stat-card.sc-btc{border-left:3px solid var(--orange)}
+.sc-label{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px}
+.sc-cash .sc-label{color:var(--blue)}.sc-hl .sc-label{color:var(--red)}.sc-btc .sc-label{color:var(--orange)}
+.sc-big{font-family:var(--font-d);font-size:1.7rem;font-weight:600;line-height:1;margin-bottom:3px}
+.sc-cash .sc-big{color:var(--blue)}.sc-hl .sc-big{color:var(--red)}.sc-btc .sc-big{color:var(--orange)}
+.sc-sub{font-size:.72rem;color:var(--text-muted);line-height:1.4}
+
+/* Two-column control pair — explicit 3-row grid for alignment */
+.ctrl-pair{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:auto auto auto;
+  column-gap:16px;
+  row-gap:10px;
+  margin-bottom:16px;
+}
+.ctrl-col{display:contents} /* dissolve into grid */
+.btc-zero-wrap{display:contents}
+/* Named grid placement */
+.cp-fiat-title { grid-column:1; grid-row:1; }
+.cp-btc-title  { grid-column:2; grid-row:1; }
+.cp-fiat-ctrl  { grid-column:1; grid-row:2; display:flex; flex-direction:column; }
+.cp-btc-ctrl   { grid-column:2; grid-row:2; display:flex; flex-direction:column; }
+.cp-fiat-hl    { grid-column:1; grid-row:3; }
+.cp-btc-hl     { grid-column:2; grid-row:3; }
+/* Inner boxes fill full cell height */
+.cp-fiat-ctrl .interactive-block,
+.cp-btc-ctrl .btc-info-block { flex:1; display:flex; flex-direction:column; margin-bottom:0; }
+@media(max-width:580px){
+  .ctrl-pair{grid-template-columns:1fr;grid-template-rows:none}
+  .cp-fiat-title{grid-column:1;grid-row:1}
+  .cp-fiat-ctrl {grid-column:1;grid-row:2}
+  .cp-fiat-hl   {grid-column:1;grid-row:3}
+  .cp-btc-title {grid-column:1;grid-row:4}
+  .cp-btc-ctrl  {grid-column:1;grid-row:5}
+  .cp-btc-hl    {grid-column:1;grid-row:6}
+}
+.btc-zero-box{display:inline-flex;align-items:center;gap:10px;padding:6px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:4px;cursor:default;opacity:.65}
+.btc-zero-pct{font-family:var(--font-b);font-size:.78rem;font-weight:600;color:var(--text-muted);letter-spacing:.04em}
+.mini-stat.ms-btc-hl{border-left:3px solid var(--orange)}
+.ms-btc-hl .ms-label{color:var(--orange)}
+.ms-btc-hl .ms-big{color:var(--orange)}
+.ms-inf{font-size:2rem;letter-spacing:-.02em}
+.ms-hl-card{min-height:90px}
+.btc-caveat-small{font-size:.72rem;color:var(--text-muted);line-height:1.6;font-style:italic;margin-bottom:20px;padding:0 2px}
+.btc-epoch-rate{font-family:var(--font-b);font-size:.78rem;font-weight:600;color:var(--orange);letter-spacing:.04em}
+.btc-epoch-label{font-size:.72rem;color:rgba(247,147,26,.65)}
+.mini-stat-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+@media(max-width:580px){.mini-stat-pair{grid-template-columns:1fr}}
+.mini-stat{padding:14px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px}
+.mini-stat.ms-cash{border-left:3px solid var(--red)}
+.mini-stat.ms-btc{border-left:3px solid var(--orange)}
+.ms-label{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px}
+.ms-cash .ms-label{color:var(--red)}.ms-btc .ms-label{color:var(--orange)}
+.ms-big{font-family:var(--font-d);font-size:1.5rem;font-weight:600;line-height:1;margin-bottom:3px}
+.ms-cash .ms-big{color:var(--red)}.ms-btc .ms-big{color:var(--orange)}
+.ms-sub{font-size:.72rem;color:var(--text-muted);line-height:1.4}
+
+/* Insight note */
+.insight-note{margin:0 0 28px;padding:18px 22px;background:rgba(122,184,216,.05);border:1px solid rgba(122,184,216,.12);border-left:3px solid var(--blue);border-radius:6px}
+.insight-note p{font-size:.9rem;color:var(--text-body);line-height:1.75}
+.insight-note strong{color:var(--text-bright);font-weight:600}
+
+/* Takeaway */
+.takeaway{margin:24px 0 0;padding:28px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;text-align:center}
+.takeaway h3{font-family:var(--font-d);font-size:clamp(1.1rem,2.5vw,1.5rem);font-weight:600;color:var(--text-bright);line-height:1.5;margin-bottom:10px}
+.takeaway p{font-size:.9rem;color:var(--text-dim);max-width:580px;margin:0 auto;line-height:1.8}
+
+/* TAB 2 */
+.cashflow-qualifier{margin-bottom:28px;padding:22px 24px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px}
+.cq-title{font-family:var(--font-d);font-size:1.1rem;font-weight:600;color:var(--text-bright);margin-bottom:6px}
+.cq-desc{font-size:.85rem;color:var(--text-body);line-height:1.7;margin-bottom:14px}
+.cq-toggle{display:flex;gap:8px;flex-wrap:wrap}
+.cq-btn{padding:9px 22px;border:1px solid var(--border-lt);border-radius:6px;background:none;font-family:var(--font-b);font-size:.83rem;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text-muted)}
+.cq-btn.yes.sel{background:var(--green-soft);border-color:var(--green-dim);color:var(--green)}
+.cq-btn.no.sel{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.cq-btn:not(.sel):hover{border-color:var(--text-muted);color:var(--text-dim)}
+.risk-warning{display:none;margin-top:14px;padding:14px 18px;background:var(--red-soft);border:1px solid var(--red-dim);border-radius:6px;font-size:.84rem;color:#e8aaaa;line-height:1.7}
+.risk-warning strong{color:#f0bbbb;font-weight:600}
+.risk-warning.show{display:block}
+
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:600px){.calc-grid{grid-template-columns:1fr;gap:12px}}
+.calc-block{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:16px}
+.calc-block-title{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px}
+
+.cagr-note{font-size:.7rem;color:var(--text-muted);margin-top:8px;line-height:1.5}
+.cagr-note a{color:var(--text-muted);text-decoration:underline;opacity:.7}
+.cagr-note a:hover{opacity:1}
+
+.drawdown-disclosure{margin-bottom:20px;padding:12px 16px;border-left:3px solid rgba(192,57,43,.4);background:rgba(192,57,43,.06);border-radius:0 6px 6px 0;font-size:.78rem;color:var(--text-muted);line-height:1.7}
+
+
+.alloc-block{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:20px}
+.alloc-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.alloc-title{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted)}
+.alloc-display{font-family:var(--font-d);font-size:1.6rem;font-weight:700;color:var(--orange)}
+input[type=range].alloc-slider{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:linear-gradient(to right,var(--orange) var(--pct,10%),rgba(255,255,255,.1) var(--pct,10%));outline:none;cursor:pointer}
+input[type=range].alloc-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--orange);border:2px solid #1a1614;box-shadow:0 0 8px rgba(247,147,26,.5);cursor:pointer}
+input[type=range].alloc-slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--orange);border:2px solid #1a1614;cursor:pointer}
+.alloc-ticks{display:flex;justify-content:space-between;margin-top:5px}
+.alloc-ticks span{font-size:.62rem;color:var(--text-muted)}
+
+/* Chart section */
+.chart-section{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.chart-header{padding:16px 20px 0;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px}
+.chart-title{font-family:var(--font-d);font-size:1rem;font-weight:600;color:var(--text-bright)}
+.chart-toggles{display:flex;gap:6px;flex-wrap:wrap}
+.ct-btn{padding:5px 12px;border:1px solid var(--border-lt);border-radius:20px;background:none;font-family:var(--font-b);font-size:.7rem;font-weight:600;cursor:pointer;transition:all .18s;color:var(--text-muted);letter-spacing:.04em}
+.ct-btn.active-btc{border-color:var(--orange);color:var(--orange);background:var(--orange-soft)}
+.ct-btn.active-red{border-color:var(--red);color:#e8aaaa;background:var(--red-soft)}
+.chart-legend{display:flex;gap:16px;flex-wrap:wrap;padding:10px 20px 0;font-size:.7rem;color:var(--text-muted)}
+.cl-item{display:flex;align-items:center;gap:5px}
+.cl-dot{width:10px;height:3px;border-radius:2px;flex-shrink:0}
+.cl-dot.fiat{background:var(--blue)}
+.cl-dot.blend{background:var(--orange)}
+.cl-dot.fullbtc{background:#ffcc66}
+.cl-dot.drawdown{background:var(--red);opacity:.7}
+.chart-canvas-wrap{position:relative;padding:12px 20px 8px}
+canvas#t2Chart{width:100%;display:block;cursor:crosshair}
+/* Year scrubber */
+.year-scrubber{padding:4px 20px 16px}
+.ys-header{display:flex;justify-content:space-between;margin-bottom:4px}
+.ys-label{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)}
+.ys-year{font-family:var(--font-d);font-size:1rem;font-weight:600;color:var(--text-bright)}
+input[type=range].yr-slider{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:linear-gradient(to right,rgba(247,147,26,.6) var(--pct,50%),rgba(255,255,255,.1) var(--pct,50%));outline:none;cursor:pointer}
+input[type=range].yr-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--text-dim);border:2px solid var(--bg);box-shadow:0 0 6px rgba(255,255,255,.2);cursor:pointer}
+input[type=range].yr-slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--text-dim);border:2px solid var(--bg);cursor:pointer}
+
+/* Callout stats row */
+.callout-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:0 20px 18px}
+@media(max-width:520px){.callout-row{grid-template-columns:1fr}}
+.co-stat{padding:12px 14px;border-radius:7px;background:rgba(255,255,255,.03);border:1px solid var(--border)}
+.cos-label{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px}
+.cos-val{font-family:var(--font-d);font-size:1.2rem;font-weight:700;line-height:1.1}
+.cos-sub{font-size:.68rem;color:var(--text-muted);margin-top:2px}
+.co-stat.cs-fiat .cos-label{color:var(--blue)}.co-stat.cs-fiat .cos-val{color:var(--blue)}
+.co-stat.cs-blend .cos-label{color:var(--orange)}.co-stat.cs-blend .cos-val{color:var(--orange)}
+.co-stat.cs-delta .cos-label{color:var(--green)}.co-stat.cs-delta .cos-val{color:var(--green)}
+
+/* TAB 3 */
+.company-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px}
+@media(max-width:700px){.company-cards{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:440px){.company-cards{grid-template-columns:repeat(2,1fr)}}
+.co-card{padding:14px 10px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;text-align:center;cursor:pointer;transition:all .2s}
+.co-card:hover{border-color:var(--border-lt)}
+.co-card.sel{border-color:var(--orange);background:var(--orange-soft)}
+.co-ticker{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px}
+.co-card.sel .co-ticker{color:var(--orange)}
+.co-name{font-family:var(--font-d);font-size:.95rem;font-weight:600;color:var(--text-bright);margin-bottom:2px}
+.co-treasury{font-size:.72rem;color:var(--text-muted)}
+.co-card.sel .co-treasury{color:var(--text-dim)}
+
+.t3-controls{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px;align-items:flex-start}
+.t3-ctrl-label{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;display:block}
+
+.results-section{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:24px}
+.results-header{padding:18px 24px;border-bottom:1px solid var(--border);background:rgba(247,147,26,.04)}
+.results-header h3{font-family:var(--font-d);font-size:1.1rem;font-weight:600;color:var(--text-bright)}
+.results-header .rh-sub{font-size:.78rem;color:var(--text-muted);margin-top:2px}
+.results-table{width:100%;border-collapse:collapse}
+.results-table th{padding:10px 16px;font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);text-align:right;border-bottom:1px solid var(--border);background:rgba(255,255,255,.01)}
+.results-table th:first-child{text-align:left}
+.results-table td{padding:12px 16px;font-size:.88rem;color:var(--text-body);text-align:right;border-bottom:1px solid rgba(255,255,255,.04)}
+.results-table td:first-child{text-align:left;font-weight:600;color:var(--text-bright);font-size:.8rem}
+.results-table tr:last-child td{border-bottom:none}
+.results-table .td-cash{color:var(--blue);font-weight:600}
+.results-table .td-btc{color:var(--orange);font-weight:600}
+.results-table .td-gain{color:var(--green);font-weight:600}
+.results-table .td-dim{color:var(--text-muted)}
+
+.footnote{font-size:.75rem;color:var(--text-muted);line-height:1.6;padding:14px 18px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:6px;margin-bottom:24px}
+.footnote a{color:var(--orange);text-decoration:none}
+.footnote a:hover{text-decoration:underline}
+
+footer{text-align:center;padding:32px 24px;color:var(--text-muted);font-size:.88rem;border-top:1px solid var(--border);margin-top:20px}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="/" class="brand">Last Coin Standing</a>
+  <div class="nav-links">
+    <a href="/synthesis.html">The Synthesis</a>
+    <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+    <a href="/the-bitcoin-migration.html">The Bitcoin Migration</a>
+    <a href="/trilemma.html">The Bitcoin Trilemma</a>
+    <a href="/the-half-life.html">The Half-Life</a>
+    <a href="/money-trees.html">Money Trees</a>
+    <a href="/the-fixed-pie.html">The Bitcoin Fixed Share</a>
+    <a href="/the-melting-ice-cube.html" class="active">The Melting Ice Cube</a>
+    <a href="/about.html">About</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-overlay" id="mobileOverlay">
+  <a href="/synthesis.html">The Synthesis</a>
+  <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+  <a href="/the-bitcoin-migration.html">The Bitcoin Migration</a>
+  <a href="/trilemma.html">The Bitcoin Trilemma</a>
+  <a href="/the-half-life.html">The Half-Life</a>
+  <a href="/money-trees.html">Money Trees</a>
+  <a href="/the-fixed-pie.html">The Bitcoin Fixed Share</a>
+  <a href="/the-melting-ice-cube.html" class="active">The Melting Ice Cube</a>
+  <a href="/about.html">About</a>
+</div>
+
+<div class="page">
+  <header class="page-header">
+    <h1>The <span class="blue-t">Melting</span> Ice Cube</h1>
+    <p class="subtitle">Holding cash isn't a conservative decision. It's an active one — with a quantifiable, ongoing cost. Every treasury is making this choice, whether it knows it or not.</p>
+  </header>
+
+  <div class="saylor-quote">
+    <blockquote>"If it's not #bitcoin, your money is melting."</blockquote>
+    <cite>— Michael Saylor</cite>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="cube">
+      <span class="tab-num">Part I</span>
+      <span class="tab-title">The Ice Cube</span>
+    </button>
+    <button class="tab-btn" data-tab="treasury">
+      <span class="tab-num">Part II</span>
+      <span class="tab-title">Your Treasury</span>
+    </button>
+    <button class="tab-btn" data-tab="companies">
+      <span class="tab-num">Part III</span>
+      <span class="tab-title">Real Companies</span>
+    </button>
+  </div>
+
+  <!-- TAB 1 -->
+  <div class="tab-content active" id="tab-cube">
+    <div class="prose" style="margin-bottom:24px">
+      At time zero, every treasury looks roughly the same — a number on a balance sheet. The difference only becomes visible over time, and it is structural. One asset erodes by design. The other is constitutionally inert: its supply fixed at 21 million, its structure unchanged by any authority, institution, or market condition.
+    </div>
+
+    <!-- Two-column controls: explicit grid for alignment -->
+    <div class="ctrl-pair">
+
+      <!-- Row 1: titles -->
+      <span class="ctrl-label cp-fiat-title">Annual supply expansion rate — Fiat</span>
+      <span class="ctrl-label cp-btc-title">Annual supply issuance rate — Bitcoin</span>
+
+      <!-- Row 2: controls -->
+      <div class="cp-fiat-ctrl">
+        <div class="interactive-block">
+          <div class="opt-group" id="inflBtns" style="margin-bottom:10px">
+            <button class="opt-btn sel-red" data-rate="4" onclick="setInflation(this)">4% low</button>
+            <button class="opt-btn" data-rate="7" onclick="setInflation(this)">7% USD avg</button>
+            <button class="opt-btn" data-rate="10" onclick="setInflation(this)">10% elevated</button>
+            <button class="opt-btn" data-rate="15" onclick="setInflation(this)">15% severe</button>
+          </div>
+          <div class="mini-stat ms-fiat-epoch" style="margin-bottom:0">
+            <div class="ms-label">Fiat Expansion Schedule</div>
+            <div class="ms-sub">No fixed schedule, no ceiling, no protocol — only policy.</div>
+          </div>
+        </div>
+      </div>
+      <div class="cp-btc-ctrl">
+        <div class="btc-info-block">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+            <div class="btc-zero-box">
+              <span class="btc-zero-pct">0%</span>
+              <span style="font-size:.72rem;color:var(--text-muted)">terminal · certain</span>
+            </div>
+            <div class="btc-epoch-box">
+              <span class="btc-epoch-rate" id="issuanceCard">0.83%/yr</span>
+              <span class="btc-epoch-label" id="issuanceSub">now · halving every ~4 yrs</span>
+            </div>
+          </div>
+          <div class="mini-stat ms-btc" style="margin-bottom:0">
+            <div class="ms-label" id="issuanceEpochLabel">Current epoch: 2024–2028</div>
+            <div class="ms-sub">Certainty, not policy — encoded in the protocol</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: half-life cards — guaranteed horizontal alignment -->
+      <div class="mini-stat ms-cash ms-hl-card cp-fiat-hl">
+        <div class="ms-label">Fiat Economic Energy Half-Life</div>
+        <div class="ms-big" id="halfLifeCard">10.2 yrs</div>
+        <div class="ms-sub" id="halfLifeSub">at 7% annual expansion</div>
+      </div>
+      <div class="mini-stat ms-btc-hl ms-hl-card cp-btc-hl">
+        <div class="ms-label">Bitcoin Economic Energy Half-Life</div>
+        <div class="ms-big ms-inf">∞</div>
+        <div class="ms-sub">Supply is fixed — purchasing power in BTC terms does not erode by protocol</div>
+      </div>
+
+    </div>
+
+    <!-- Slider -->
+    <div class="interactive-block-slider">
+      <div class="slider-header">
+        <span class="sl-label">Economic energy remaining, years from today</span>
+        <span class="sl-value" id="yearDisplay1">0 years</span>
+      </div>
+      <input type="range" id="yearSlider1" min="0" max="20" value="0" step="1">
+      <div class="year-marks"><span>Today</span><span>5 yrs</span><span>10 yrs</span><span>15 yrs</span><span>20 yrs</span></div>
+    </div>
+
+    <!-- Visuals — moved below slider, no % beneath canvases -->
+    <div class="panels-row" style="margin-bottom:20px">
+      <div class="vis-panel vp-cash">
+        <div class="vp-label">Fiat Treasury</div>
+        <div class="vp-name">Cash &amp; Near-Cash</div>
+        <div class="vp-desc">Commercial paper, T-bills, money market funds</div>
+        <div class="canvas-wrap"><canvas class="vis-canvas" id="iceCubeCanvas"></canvas></div>
+      </div>
+      <div class="vs-col">vs</div>
+      <div class="vis-panel vp-btc">
+        <div class="vp-label">Bitcoin Treasury</div>
+        <div class="vp-name">A Charged Battery</div>
+        <div class="vp-desc">Fixed supply · no counterparty · structurally inert</div>
+        <div class="canvas-wrap"><canvas class="vis-canvas" id="batteryCanvas"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Economic energy remaining — sole % display -->
+    <div class="stat-trio">
+      <div class="stat-card sc-cash">
+        <div class="sc-label">Fiat Economic Energy Remaining</div>
+        <div class="sc-big" id="cashPctCard">100%</div>
+        <div class="sc-sub" id="cashPctSub">of original purchasing power</div>
+      </div>
+      <div class="stat-card sc-hl" style="visibility:hidden"></div>
+      <div class="stat-card sc-btc">
+        <div class="sc-label">Bitcoin Network — Structural Economic Energy Remaining</div>
+        <div class="sc-big">100%</div>
+        <div class="sc-sub">Supply constitutionally fixed. Always.</div>
+      </div>
+    </div>
+
+    <div class="btc-caveat-small">Note: &gt;95% of all Bitcoin has already been issued. The terminal supply of 21 million is fixed in the protocol — no authority can alter it. The residual issuance rate shown above is a rounding consideration at this stage; the meaningful number is the terminal 0%.</div>
+
+    <div class="insight-note">
+      <p><strong>A note on the battery.</strong> Bitcoin is structurally inert — its supply cannot be expanded by any authority, at any time, for any reason. The battery stays full because the protocol enforces it. The economic value of a Bitcoin treasury <em>can</em> fluctuate — sometimes significantly. What cannot fluctuate is the supply itself. <strong>1 BTC remains 1 BTC regardless of its dollar-exchange rate.</strong> The ice cube, by contrast, melts whether you watch it or not.</p>
+    </div>
+
+    <div class="takeaway">
+      <h3>The question is never whether to take risk.<br>It is <span class="blue-t">which risk</span> you accept <span class="amber">by default.</span></h3>
+      <p>Every treasury holding cash is implicitly accepting inflation risk — the slow, invisible transfer of purchasing power to those who benefit from monetary expansion. Bitcoin offers a structurally different choice. Not risk-free. Differently risky.</p>
+    </div>
+  </div>
+
+  <!-- TAB 2 -->
+  <div class="tab-content" id="tab-treasury">
+    <div class="cashflow-qualifier">
+      <div class="cq-title">Is your business cashflow positive?</div>
+      <div class="cq-desc">A Bitcoin treasury allocation is a strategy for operating businesses — and it is recommended only for those whose day-to-day operations do not depend on drawing from treasury reserves. If operations are funded by revenue, a Bitcoin drawdown is a paper loss you can hold through. If treasury capital is needed to fund operations, a drawdown introduces risk that becomes operational — and potentially existential. This tool covers one thing only: the reallocation of existing treasury assets. It does not recommend changing your operating business, issuing debt, or becoming a Bitcoin-focused company.</div>
+      <div class="cq-toggle">
+        <button class="cq-btn yes sel" id="cqYes" onclick="setCashflow(true)">✓ Yes — cashflow positive</button>
+        <button class="cq-btn no" id="cqNo" onclick="setCashflow(false)">✗ No — or not yet</button>
+      </div>
+      <div class="risk-warning" id="riskWarning">
+        <strong>Proceed with caution.</strong> A Bitcoin treasury strategy introduces risk that may be unnecessary for a business that relies on treasury capital for operations. If a 50–80% Bitcoin drawdown — which has occurred multiple times historically — would create operational stress, that risk may not be worth taking. This tool remains available for educational purposes. The strategy is best revisited when the business reaches sustained cashflow positivity.
+      </div>
+    </div>
+
+    <!-- Assumptions -->
+    <div class="calc-grid">
+      <div class="calc-block">
+        <div class="calc-block-title">Treasury Size</div>
+        <div class="opt-group" id="tSizeBtns">
+          <button class="opt-btn" data-val="100000" onclick="setSize(this)">$100K</button>
+          <button class="opt-btn" data-val="1000000" onclick="setSize(this)">$1M</button>
+          <button class="opt-btn sel" data-val="10000000" onclick="setSize(this)">$10M</button>
+          <button class="opt-btn" data-val="100000000" onclick="setSize(this)">$100M</button>
+          <button class="opt-btn" data-val="1000000000" onclick="setSize(this)">$1B</button>
+        </div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-block-title">Bitcoin Growth Assumption</div>
+        <div class="opt-group" id="cagrBtns">
+          <button class="opt-btn sel" data-val="powerlaw" onclick="setCagr(this)">Power Law model</button>
+          <button class="opt-btn" data-val="20" onclick="setCagr(this)">20% <span style="font-weight:400;font-size:.7em;opacity:.65">moderate</span></button>
+          <button class="opt-btn" data-val="10" onclick="setCagr(this)">10% <span style="font-weight:400;font-size:.7em;opacity:.65">conservative</span></button>
+        </div>
+        <div class="cagr-note" id="cagrNote">Current trend ~36%/yr, declining as adoption matures. Source: <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">porkopolis.io/thechart</a></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-block-title">Fiat Inflation / Money Supply Expansion</div>
+        <div class="opt-group" id="infl2Btns">
+          <button class="opt-btn" data-val="2" onclick="setInfl2(this)">2%</button>
+          <button class="opt-btn" data-val="4" onclick="setInfl2(this)">4%</button>
+          <button class="opt-btn sel" data-val="7" onclick="setInfl2(this)">7% USD avg</button>
+          <button class="opt-btn" data-val="10" onclick="setInfl2(this)">10%</button>
+        </div>
+      </div>
+      <div class="calc-block" style="display:flex;align-items:center;justify-content:center">
+        <div style="text-align:center">
+          <div style="font-family:var(--font-d);font-size:1rem;color:var(--text-dim);margin-bottom:4px">Holding cash is not neutral.</div>
+          <div style="font-size:.78rem;color:var(--text-muted)">It is a choice to accept inflation<br>as the price of certainty.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Allocation slider -->
+    <div class="alloc-block">
+      <div class="alloc-header">
+        <span class="alloc-title">Bitcoin Allocation</span>
+        <span class="alloc-display"><span id="allocPct">10</span>%</span>
+      </div>
+      <input type="range" id="allocSlider" class="alloc-slider" min="1" max="100" value="10" oninput="setAllocSlider(this)">
+      <div class="alloc-ticks">
+        <span>1%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-section">
+      <div class="chart-header">
+        <div class="chart-title">Real purchasing power over 20 years</div>
+        <div class="chart-toggles">
+          <button class="ct-btn" id="togFullBtc" onclick="toggleFullBtc()">Show 100% BTC</button>
+        </div>
+      </div>
+      <div class="chart-legend" id="chartLegend">
+        <div class="cl-item"><div class="cl-dot fiat"></div><span>100% Fiat (baseline)</span></div>
+        <div class="cl-item"><div class="cl-dot blend"></div><span id="legendBlend">10% BTC blend</span></div>
+        <div class="cl-item cl-fullbtc-item" style="display:none"><div class="cl-dot fullbtc"></div><span>100% BTC</span></div>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="t2Chart" height="280"></canvas>
+      </div>
+      <div class="year-scrubber">
+        <div class="ys-header">
+          <span class="ys-label">Expected Treasury Performance over Years</span>
+          <span class="ys-year" id="scrubYearLabel">Year 10</span>
+        </div>
+        <input type="range" id="yearScrubber" class="yr-slider" min="0" max="20" value="10" oninput="setScrubYear(this)">
+      </div>
+      <div class="callout-row">
+        <div class="co-stat cs-fiat">
+          <div class="cos-label">100% Fiat (baseline)</div>
+          <div class="cos-val" id="coFiat">—</div>
+          <div class="cos-sub">Real purchasing power</div>
+        </div>
+        <div class="co-stat cs-blend">
+          <div class="cos-label" id="coBlendLabel">BTC Blend</div>
+          <div class="cos-val" id="coBlend">—</div>
+          <div class="cos-sub" id="coBlendSub">inflation-adjusted</div>
+        </div>
+        <div class="co-stat cs-delta">
+          <div class="cos-label">Advantage</div>
+          <div class="cos-val" id="coDelta">—</div>
+          <div class="cos-sub">vs. 100% fiat</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawdown-disclosure">
+      Bitcoin has experienced drawdowns of 50–80% multiple times historically. For cashflow-positive businesses funded by revenue, a drawdown is a paper loss — not an operational one. No 4-year window in Bitcoin's history has ended below its starting price.
+    </div>
+
+    <div class="footnote">
+      <strong>Power Law model:</strong> The ~36% CAGR assumption is derived from Bitcoin's Power Law trend — a regression model with R²&gt;95% fitting Bitcoin's price to days since the genesis block (3 Jan 2009). The trend growth rate is currently ~42%/yr and declining toward ~30% by 2030 as adoption matures. Source: <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">porkopolis.io/thechart</a>. Not financial advice. Past performance does not guarantee future results.
+    </div>
+  </div>
+
+  <!-- TAB 3 -->
+  <div class="tab-content" id="tab-companies">
+    <div class="prose" style="margin-bottom:16px">
+      These figures are illustrative, based on approximate public treasury data as of 2024–2025. The purpose is not precision — it is perspective. At scale, even a modest allocation changes the arithmetic in ways that are difficult to dismiss.
+    </div>
+
+    <!-- Company selector -->
+    <div style="font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px">Treasury sizes (cash &amp; near-cash equivalents)</div>
+    <div class="company-cards" id="coCards">
+      <div class="co-card sel" data-treasury="157000000000" data-name="Apple" data-ticker="AAPL" onclick="selectCo(this)">
+        <div class="co-ticker">AAPL</div>
+        <div class="co-name">Apple</div>
+        <div class="co-treasury">Treasury ~$157B</div>
+      </div>
+      <div class="co-card" data-treasury="110000000000" data-name="Alphabet" data-ticker="GOOGL" onclick="selectCo(this)">
+        <div class="co-ticker">GOOGL</div>
+        <div class="co-name">Alphabet</div>
+        <div class="co-treasury">Treasury ~$110B</div>
+      </div>
+      <div class="co-card" data-treasury="78000000000" data-name="Microsoft" data-ticker="MSFT" onclick="selectCo(this)">
+        <div class="co-ticker">MSFT</div>
+        <div class="co-name">Microsoft</div>
+        <div class="co-treasury">Treasury ~$78B</div>
+      </div>
+      <div class="co-card" data-treasury="58000000000" data-name="Meta" data-ticker="META" onclick="selectCo(this)">
+        <div class="co-ticker">META</div>
+        <div class="co-name">Meta</div>
+        <div class="co-treasury">Treasury ~$58B</div>
+      </div>
+      <div class="co-card" data-treasury="50000000" data-name="Mid-Size Co." data-ticker="$50M" onclick="selectCo(this)">
+        <div class="co-ticker">$50M</div>
+        <div class="co-name">Mid-Size Co.</div>
+        <div class="co-treasury">Treasury (illustrative)</div>
+      </div>
+    </div>
+
+    <!-- Assumptions — same structure as Tab 2 -->
+    <div class="calc-grid">
+      <div class="calc-block">
+        <div class="calc-block-title">Bitcoin Growth Assumption</div>
+        <div class="opt-group" id="t3CagrBtns">
+          <button class="opt-btn sel" data-val="powerlaw" onclick="setT3Cagr(this)">Power Law model</button>
+          <button class="opt-btn" data-val="20" onclick="setT3Cagr(this)">20% <span style="font-weight:400;font-size:.7em;opacity:.65">moderate</span></button>
+          <button class="opt-btn" data-val="10" onclick="setT3Cagr(this)">10% <span style="font-weight:400;font-size:.7em;opacity:.65">conservative</span></button>
+        </div>
+        <div class="cagr-note" id="t3CagrNote">Current trend ~36%/yr, declining as adoption matures. Source: <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">porkopolis.io/thechart</a></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-block-title">Fiat Inflation / Money Supply Expansion</div>
+        <div class="opt-group" id="t3InflBtns">
+          <button class="opt-btn" data-val="2" onclick="setT3Infl(this)">2%</button>
+          <button class="opt-btn" data-val="4" onclick="setT3Infl(this)">4%</button>
+          <button class="opt-btn sel" data-val="7" onclick="setT3Infl(this)">7% USD avg</button>
+          <button class="opt-btn" data-val="10" onclick="setT3Infl(this)">10%</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Allocation slider -->
+    <div class="alloc-block">
+      <div class="alloc-header">
+        <span class="alloc-title">Bitcoin Allocation</span>
+        <span class="alloc-display"><span id="t3AllocPct">5</span>%</span>
+      </div>
+      <input type="range" id="t3AllocSlider" class="alloc-slider" min="1" max="100" value="5" oninput="setT3AllocSlider(this)">
+      <div class="alloc-ticks">
+        <span>1%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-section">
+      <div class="chart-header">
+        <div class="chart-title" id="t3ChartTitle">Apple — real treasury purchasing power over 20 years</div>
+        <div class="chart-toggles">
+          <button class="ct-btn" id="t3TogFullBtc" onclick="t3ToggleFullBtc()">Show 100% BTC</button>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <div class="cl-item"><div class="cl-dot fiat"></div><span>100% Fiat (baseline)</span></div>
+        <div class="cl-item"><div class="cl-dot blend"></div><span id="t3LegendBlend">5% BTC blend</span></div>
+        <div class="cl-item cl-t3-fullbtc-item" style="display:none"><div class="cl-dot fullbtc"></div><span>100% BTC</span></div>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="t3Chart" height="280"></canvas>
+      </div>
+      <div class="year-scrubber">
+        <div class="ys-header">
+          <span class="ys-label">Expected Treasury Performance over Years</span>
+          <span class="ys-year" id="t3ScrubYearLabel">Year 10</span>
+        </div>
+        <input type="range" id="t3YearScrubber" class="yr-slider" min="0" max="20" value="10" oninput="setT3ScrubYear(this)">
+      </div>
+      <div class="callout-row">
+        <div class="co-stat cs-fiat">
+          <div class="cos-label">100% Fiat (baseline)</div>
+          <div class="cos-val" id="t3CoFiat">—</div>
+          <div class="cos-sub">Real purchasing power</div>
+        </div>
+        <div class="co-stat cs-blend">
+          <div class="cos-label" id="t3CoBlendLabel">BTC Blend</div>
+          <div class="cos-val" id="t3CoBlend">—</div>
+          <div class="cos-sub" id="t3CoBlendSub">inflation-adjusted</div>
+        </div>
+        <div class="co-stat cs-delta">
+          <div class="cos-label">Advantage</div>
+          <div class="cos-val" id="t3CoDelta">—</div>
+          <div class="cos-sub">vs. 100% fiat</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footnote">
+      Treasury figures are approximate, based on publicly available financial data as of 2024–2025, and include cash, short-term investments, and marketable securities. Figures change quarterly and are presented for illustrative purposes only. Not financial advice.
+    </div>
+
+    <div class="takeaway">
+      <h3>Even 1% of Apple's treasury is <span class="amber">$1.57 billion</span> in Bitcoin.<br>The allocation is modest. <span class="blue-t">The math is not.</span></h3>
+      <p>This is not a strategy for companies to become Bitcoin treasury vehicles. It is a question for operating businesses: what is your treasury actually doing — and what does it cost to leave it unchanged?</p>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<footer>© Last Coin Standing — Educational content only. Not financial advice.</footer>
+
+<script>
+/* ── NAV ── */
+(function(){
+  var h=document.getElementById('hamburger'),o=document.getElementById('mobileOverlay');
+  h.addEventListener('click',function(){this.classList.toggle('open');o.classList.toggle('show');});
+  o.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){h.classList.remove('open');o.classList.remove('show');});});
+})();
+
+/* ── TABS ── */
+document.querySelectorAll('.tab-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var tab=this.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active');});
+    this.classList.add('active');
+    document.getElementById('tab-'+tab).classList.add('active');
+    tab1Active=(tab==='cube');
+    if(tab1Active) requestAnimationFrame(renderTab1);
+    if(tab==='treasury') setTimeout(function(){requestAnimationFrame(initT2Chart);},50);
+    if(tab==='companies') setTimeout(function(){requestAnimationFrame(initT3Chart);},50);
+  });
+});
+
+/* ═══════════════════════════════
+   TAB 1 — CANVAS
+═══════════════════════════════ */
+var tab1Active=true;
+var inflation1=7;
+var years1=0;
+var batteryPhase=0;
+var drops=[];
+var dropTimer=0;
+
+var iceCubeCanvas=document.getElementById('iceCubeCanvas');
+var batteryCanvas=document.getElementById('batteryCanvas');
+
+function setupCanvas(canvas){
+  var dpr=window.devicePixelRatio||1;
+  var w=canvas.offsetWidth, h=canvas.offsetHeight;
+  canvas.width=w*dpr; canvas.height=h*dpr;
+  var ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  return {ctx:ctx,w:w,h:h};
+}
+
+function drawIceCube(ctx,W,H,fraction,drops){
+  ctx.clearRect(0,0,W,H);
+  var cx=W/2;
+  var cubeW=Math.min(W*0.62,160);
+  var maxH=H*0.56;
+  var cubeH=Math.max(maxH*fraction,2);
+  var depth=cubeW*0.3;
+  var baseY=H*0.72;
+  var topY=baseY-cubeH;
+  var alpha=0.15+fraction*0.3;
+
+  /* Puddle */
+  var puddleR=cubeW*0.45*(1-fraction)*1.6;
+  if(puddleR>3){
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(cx,baseY+depth*0.35+14,puddleR*1.3,puddleR*0.28,0,0,Math.PI*2);
+    ctx.fillStyle='rgba(100,180,240,0.07)';ctx.fill();
+    ctx.strokeStyle='rgba(120,190,250,0.12)';ctx.lineWidth=0.8;ctx.stroke();
+    ctx.restore();
+  }
+
+  if(fraction<0.02){
+    ctx.fillStyle='rgba(100,180,240,0.35)';
+    ctx.font='500 11px Inter,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('melted',cx,baseY+20);
+    return;
+  }
+
+  /* Right face */
+  ctx.beginPath();
+  ctx.moveTo(cx+cubeW/2,topY);
+  ctx.lineTo(cx+cubeW/2+depth,topY-depth*0.5);
+  ctx.lineTo(cx+cubeW/2+depth,baseY-depth*0.5);
+  ctx.lineTo(cx+cubeW/2,baseY);
+  ctx.closePath();
+  ctx.fillStyle='rgba(80,155,220,'+(alpha*0.75)+')';ctx.fill();
+  ctx.strokeStyle='rgba(140,200,255,'+(0.3+fraction*0.2)+')';ctx.lineWidth=0.8;ctx.stroke();
+
+  /* Front face */
+  var fg=ctx.createLinearGradient(cx-cubeW/2,topY,cx+cubeW/2,baseY);
+  fg.addColorStop(0,'rgba(180,225,255,'+(alpha+0.12)+')');
+  fg.addColorStop(0.45,'rgba(140,200,255,'+alpha+')');
+  fg.addColorStop(1,'rgba(90,165,235,'+(alpha-0.04)+')');
+  ctx.beginPath();ctx.rect(cx-cubeW/2,topY,cubeW,cubeH);
+  ctx.fillStyle=fg;ctx.fill();
+  ctx.strokeStyle='rgba(160,215,255,'+(0.38+fraction*0.18)+')';ctx.lineWidth=1;ctx.stroke();
+
+  /* Top face */
+  ctx.beginPath();
+  ctx.moveTo(cx-cubeW/2,topY);
+  ctx.lineTo(cx-cubeW/2+depth,topY-depth*0.5);
+  ctx.lineTo(cx+cubeW/2+depth,topY-depth*0.5);
+  ctx.lineTo(cx+cubeW/2,topY);
+  ctx.closePath();
+  var tg=ctx.createLinearGradient(cx,topY-depth*0.5,cx,topY);
+  tg.addColorStop(0,'rgba(220,242,255,'+(alpha+0.18)+')');
+  tg.addColorStop(1,'rgba(170,220,255,'+(alpha+0.06)+')');
+  ctx.fillStyle=tg;ctx.fill();
+  ctx.strokeStyle='rgba(200,235,255,'+(0.45+fraction*0.15)+')';ctx.lineWidth=1;ctx.stroke();
+
+  /* Highlight shimmer */
+  if(fraction>0.12&&cubeH>20){
+    ctx.save();
+    ctx.beginPath();ctx.rect(cx-cubeW/2+5,topY+5,cubeW*0.18,cubeH*0.45);
+    var sg=ctx.createLinearGradient(cx-cubeW/2+5,topY,cx-cubeW/2+5+cubeW*0.18,topY);
+    sg.addColorStop(0,'rgba(255,255,255,'+(fraction*0.14)+')');
+    sg.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=sg;ctx.fill();ctx.restore();
+  }
+
+  /* Drops */
+  drops.forEach(function(d){
+    ctx.save();ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+    ctx.fillStyle='rgba(130,195,250,'+d.opacity+')';ctx.fill();ctx.restore();
+  });
+}
+
+function drawBattery(ctx,W,H,phase){
+  ctx.clearRect(0,0,W,H);
+  var cx=W/2;
+  var bW=Math.min(W*0.42,90);
+  var bH=Math.min(H*0.62,170);
+  var bX=cx-bW/2;
+  var bY=H*0.13;
+  var tW=bW*0.38;
+  var tH=bH*0.055;
+  var glow=28+Math.sin(phase)*12;
+
+  /* Ambient radial glow behind battery */
+  var ambient=ctx.createRadialGradient(cx,bY+bH*0.5,0,cx,bY+bH*0.5,bW*1.6);
+  ambient.addColorStop(0,'rgba(247,147,26,'+(0.18+Math.sin(phase)*0.07)+')');
+  ambient.addColorStop(0.5,'rgba(247,147,26,'+(0.06+Math.sin(phase)*0.03)+')');
+  ambient.addColorStop(1,'rgba(247,147,26,0)');
+  ctx.save();
+  ctx.fillStyle=ambient;
+  ctx.fillRect(0,0,W,H);
+  ctx.restore();
+
+  ctx.save();
+  ctx.shadowColor='rgba(247,147,26,'+(0.7+Math.sin(phase)*0.2)+')';
+  ctx.shadowBlur=glow;
+
+  /* Terminal */
+  ctx.beginPath();
+  if(ctx.roundRect) ctx.roundRect(cx-tW/2,bY-tH,tW,tH,2);
+  else ctx.rect(cx-tW/2,bY-tH,tW,tH);
+  ctx.strokeStyle='rgba(247,147,26,0.9)';ctx.lineWidth=2;ctx.stroke();
+
+  /* Body */
+  ctx.beginPath();
+  if(ctx.roundRect) ctx.roundRect(bX,bY,bW,bH,7);
+  else ctx.rect(bX,bY,bW,bH);
+  ctx.strokeStyle='rgba(247,147,26,0.95)';ctx.lineWidth=2.5;ctx.stroke();
+  ctx.restore();
+
+  /* Fill */
+  var fillH=bH*0.91, fillY=bY+bH-fillH-bH*0.045;
+  var fillX=bX+3, fillW=bW-6;
+  ctx.save();
+  ctx.beginPath();
+  if(ctx.roundRect) ctx.roundRect(fillX,fillY,fillW,fillH,5);
+  else ctx.rect(fillX,fillY,fillW,fillH);
+  var fg=ctx.createLinearGradient(fillX,fillY,fillX,fillY+fillH);
+  fg.addColorStop(0,'rgba(255,180,60,0.95)');
+  fg.addColorStop(0.35,'rgba(247,147,26,0.82)');
+  fg.addColorStop(0.7,'rgba(220,120,20,0.75)');
+  fg.addColorStop(1,'rgba(247,147,26,0.88)');
+  ctx.fillStyle=fg;ctx.fill();ctx.restore();
+
+  /* Bright inner highlight strip */
+  ctx.save();ctx.beginPath();
+  if(ctx.roundRect) ctx.roundRect(fillX+4,fillY+5,fillW*0.25,fillH*0.42,3);
+  else ctx.rect(fillX+4,fillY+5,fillW*0.25,fillH*0.42);
+  ctx.fillStyle='rgba(255,230,160,'+(0.30+Math.sin(phase)*0.08)+')';ctx.fill();ctx.restore();
+
+  /* Segment lines */
+  for(var i=1;i<5;i++){
+    var sy=fillY+(fillH/5)*i;
+    ctx.beginPath();ctx.moveTo(fillX+2,sy);ctx.lineTo(fillX+fillW-2,sy);
+    ctx.strokeStyle='rgba(10,9,8,0.25)';ctx.lineWidth=1;ctx.stroke();
+  }
+
+  /* Outer pulse glow ring */
+  var ring=bH*0.55+Math.sin(phase*1.2)*bH*0.04;
+  ctx.save();
+  ctx.globalAlpha=0.22+Math.sin(phase)*0.10;
+  ctx.beginPath();ctx.arc(cx,bY+bH*0.5,ring*0.55,0,Math.PI*2);
+  ctx.strokeStyle='rgba(247,147,26,1)';ctx.lineWidth=10;ctx.stroke();
+  ctx.restore();
+
+  /* Inner pulse glow ring */
+  ctx.save();
+  ctx.globalAlpha=0.15+Math.sin(phase*0.8+1)*0.08;
+  ctx.beginPath();ctx.arc(cx,bY+bH*0.5,ring*0.32,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,200,80,1)';ctx.lineWidth=6;ctx.stroke();
+  ctx.restore();
+
+  /* Label */
+  ctx.save();
+  ctx.shadowColor='rgba(247,147,26,0.9)';
+  ctx.shadowBlur=12;
+  ctx.font='700 '+Math.round(bW*0.19)+'px Inter,sans-serif';
+  ctx.fillStyle='rgba(255,220,100,0.98)';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('100%',cx,bY+bH*0.5);
+  ctx.restore();
+}
+
+function updateDrops(cubeBounds){
+  dropTimer++;
+  var dropEvery=Math.max(3,Math.round(28-inflation1*1.2));
+  var frac=Math.pow(1-inflation1/100,years1);
+  if(dropTimer>=dropEvery&&frac>0.04){
+    dropTimer=0;
+    drops.push({x:cubeBounds.x+(Math.random()*0.7+0.15)*cubeBounds.w,y:cubeBounds.bottom,speed:1.4+Math.random()*1.8,opacity:0.55+Math.random()*0.3,r:1.4+Math.random()*1.8});
+  }
+  for(var i=drops.length-1;i>=0;i--){
+    drops[i].y+=drops[i].speed;drops[i].opacity-=0.012;
+    if(drops[i].y>cubeBounds.baseY+35||drops[i].opacity<=0) drops.splice(i,1);
+  }
+}
+
+function renderTab1(){
+  if(!tab1Active) return;
+  var ib=setupCanvas(iceCubeCanvas);
+  var bb=setupCanvas(batteryCanvas);
+  var fraction=Math.pow(1-inflation1/100,years1);
+
+  var cubeW=Math.min(ib.w*0.62,160);
+  var maxH=ib.h*0.56;
+  var cubeH=Math.max(maxH*fraction,2);
+  var baseY=ib.h*0.72;
+  var cubeBounds={x:ib.w/2-cubeW/2,w:cubeW,bottom:baseY-cubeH,baseY:baseY};
+
+  updateDrops(cubeBounds);
+  drawIceCube(ib.ctx,ib.w,ib.h,fraction,drops);
+  batteryPhase+=0.025;
+  drawBattery(bb.ctx,bb.w,bb.h,batteryPhase);
+
+  var pct=(fraction*100).toFixed(1);
+  document.getElementById('cashPctCard').textContent=pct+'%';
+  document.getElementById('cashPctSub').textContent='at '+inflation1+'% expansion, '+Math.round(years1)+' yr'+(years1!==1?'s':'');
+  var hl=Math.log(2)/Math.log(1/(1-inflation1/100));
+  document.getElementById('halfLifeCard').textContent=hl.toFixed(1)+' yrs';
+  document.getElementById('halfLifeSub').textContent='at '+inflation1+'% annual expansion';
+
+  // Bitcoin issuance rate — halves every ~4 years from today
+  // Current epoch (2024-2028): ~0.83%/yr
+  // Next halving ~2028 = yr 2, then ~2032 = yr 6, ~2036 = yr 10, ~2040 = yr 14, ~2044 = yr 18
+  var baseRate=0.83;
+  var halvings=0;
+  if(years1>=2)  halvings=1;
+  if(years1>=6)  halvings=2;
+  if(years1>=10) halvings=3;
+  if(years1>=14) halvings=4;
+  if(years1>=18) halvings=5;
+  var issuanceRate=(baseRate/Math.pow(2,halvings));
+  var issuanceStr=issuanceRate<0.03?'~0%':issuanceRate.toFixed(2)+'%';
+  var epochLabels=['2024–2028','2028–2032','2032–2036','2036–2040','2040–2044','2044+'];
+  document.getElementById('issuanceCard').textContent=issuanceStr+'/yr';
+  document.getElementById('issuanceSub').textContent='now · halving every ~4 yrs';
+  document.getElementById('issuanceEpochLabel').textContent='Current epoch: '+epochLabels[halvings];
+
+  requestAnimationFrame(renderTab1);
+}
+
+document.getElementById('yearSlider1').addEventListener('input',function(){
+  years1=+this.value;
+  document.getElementById('yearDisplay1').textContent=years1+' year'+(years1!==1?'s':'');
+  drops=[];
+});
+
+function setInflation(btn){
+  document.querySelectorAll('#inflBtns .opt-btn').forEach(function(b){b.classList.remove('sel','sel-blue','sel-red');});
+  inflation1=+btn.dataset.rate;
+  btn.classList.add('sel-red');
+  drops=[];
+}
+
+window.addEventListener('resize',function(){drops=[];});
+requestAnimationFrame(renderTab1);
+
+/* ═══════════════════════════════
+   TAB 2 — TREASURY CHART
+═══════════════════════════════ */
+var t2={size:10000000,alloc:10,cagr:'powerlaw',inflation:7};
+var t2ShowFullBtc=false, t2ScrubYear=10;
+
+function fmtM(n){
+  var abs=Math.abs(n);
+  if(abs>=1e12) return (n<0?'-':'')+'$'+(Math.abs(n)/1e12).toFixed(2)+'T';
+  if(abs>=1e9)  return (n<0?'-':'')+'$'+(Math.abs(n)/1e9).toFixed(2)+'B';
+  if(abs>=1e6)  return (n<0?'-':'')+'$'+(Math.abs(n)/1e6).toFixed(1)+'M';
+  if(abs>=1e3)  return (n<0?'-':'')+'$'+Math.round(Math.abs(n)/1e3)+'K';
+  return (n<0?'-':'')+'$'+Math.round(Math.abs(n));
+}
+function fmtSign(n){return (n>=0?'+':'')+fmtM(n);}
+
+/* Power Law: Price = 1.6e-17 * days^5.77  (porkopolis.io/thechart) */
+var PL_A=1.6e-17, PL_B=5.77;
+var PL_GENESIS=new Date(2009,0,3); // Jan 3, 2009
+function daysFromGenesis(offsetYears){
+  var d=new Date();
+  d.setFullYear(d.getFullYear()+offsetYears);
+  return (d-PL_GENESIS)/(1000*60*60*24);
+}
+function plPrice(offsetYears){
+  return PL_A*Math.pow(daysFromGenesis(offsetYears),PL_B);
+}
+/* Growth factor vs today for Power Law */
+function plGrowthFactor(years){
+  return plPrice(years)/plPrice(0);
+}
+/* Effective CAGR implied by Power Law at a given year */
+function plCAGR(years){
+  if(years===0) return 0;
+  return (Math.pow(plGrowthFactor(years),1/years)-1)*100;
+}
+
+/* BTC growth factor at year Y for chosen model */
+function btcGrowth(years){
+  if(t2.cagr==='powerlaw') return plGrowthFactor(years);
+  return Math.pow(1+t2.cagr/100,years);
+}
+
+/* Series: all in real (inflation-adjusted) purchasing power */
+function fiatSeries(size,infl,yrs){
+  var s=[];for(var y=0;y<=yrs;y++) s.push(size*Math.pow(1-infl/100,y));return s;
+}
+function blendSeries(size,alloc,infl,yrs){
+  var btc=size*(alloc/100),cash=size-btc;
+  var s=[];for(var y=0;y<=yrs;y++)
+    s.push(btc*btcGrowth(y)+cash*Math.pow(1-infl/100,y));
+  return s;
+}
+function fullBtcSeries(size,yrs){
+  var s=[];for(var y=0;y<=yrs;y++) s.push(size*btcGrowth(y));return s;
+}
+
+function drawT2Chart(){
+  var canvas=document.getElementById('t2Chart');
+  if(!canvas) return;
+  var wrap=canvas.closest('.chart-canvas-wrap')||canvas.parentElement;
+  var cssW=wrap?wrap.getBoundingClientRect().width:canvas.offsetWidth;
+  if(!cssW||cssW<100) return;
+  var dpr=window.devicePixelRatio||1;
+  var cssH=300;
+  canvas.style.height=cssH+'px';
+  canvas.width=Math.round(cssW*dpr);
+  canvas.height=Math.round(cssH*dpr);
+  var ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  var W=cssW,H=cssH;
+
+  var PAD={top:18,right:18,bottom:38,left:74};
+  var cW=W-PAD.left-PAD.right;
+  var cH=H-PAD.top-PAD.bottom;
+  var YEARS=20;
+
+  var fs=fiatSeries(t2.size,t2.inflation,YEARS);
+  var bs=blendSeries(t2.size,t2.alloc,t2.inflation,YEARS);
+  var bts=fullBtcSeries(t2.size,YEARS);
+
+  /* Y scale: cap blend series to avoid the chart being unreadable */
+  var maxVal=bs[YEARS];
+  if(t2ShowFullBtc) maxVal=Math.max(maxVal,bts[YEARS]);
+  maxVal*=1.1;
+  var minVal=0;
+
+  function xP(yr){return PAD.left+cW*(yr/YEARS);}
+  function yP(v){return PAD.top+cH*(1-(v-minVal)/(maxVal-minVal));}
+
+  /* Grid lines + Y labels */
+  var yTicks=5;
+  for(var i=0;i<=yTicks;i++){
+    var gv=minVal+(maxVal-minVal)*(i/yTicks);
+    var gy=yP(gv);
+    ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(PAD.left,gy);ctx.lineTo(PAD.left+cW,gy);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.28)';ctx.font='10px Inter,sans-serif';
+    ctx.textAlign='right';ctx.textBaseline='middle';
+    ctx.fillText(fmtM(gv),PAD.left-6,gy);
+  }
+  /* X labels */
+  [0,4,8,12,16,20].forEach(function(yr){
+    ctx.fillStyle='rgba(255,255,255,.28)';ctx.font='10px Inter,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillText('Yr '+yr,xP(yr),H-PAD.bottom+6);
+  });
+
+  /* Draw area fills first */
+  function areaFill(series,color){
+    ctx.beginPath();
+    ctx.moveTo(xP(0),yP(series[0]));
+    for(var y=1;y<=YEARS;y++) ctx.lineTo(xP(y),yP(series[y]));
+    ctx.lineTo(xP(YEARS),yP(minVal));ctx.lineTo(xP(0),yP(minVal));
+    ctx.closePath();ctx.fillStyle=color;ctx.fill();
+  }
+  areaFill(fs,'rgba(122,184,216,0.07)');
+  areaFill(bs,'rgba(247,147,26,0.08)');
+  if(t2ShowFullBtc) areaFill(bts,'rgba(255,204,102,0.05)');
+
+  /* Draw gap fill between fiat and blend */
+  ctx.beginPath();
+  ctx.moveTo(xP(0),yP(bs[0]));
+  for(var y=1;y<=YEARS;y++) ctx.lineTo(xP(y),yP(bs[y]));
+  for(var y2=YEARS;y2>=0;y2--) ctx.lineTo(xP(y2),yP(fs[y2]));
+  ctx.closePath();
+  ctx.fillStyle='rgba(247,147,26,0.06)';ctx.fill();
+
+  /* Draw lines */
+  function drawLine(series,color,width,dash){
+    ctx.beginPath();ctx.lineWidth=width;ctx.strokeStyle=color;
+    if(dash) ctx.setLineDash(dash); else ctx.setLineDash([]);
+    ctx.moveTo(xP(0),yP(series[0]));
+    for(var y=1;y<=YEARS;y++) ctx.lineTo(xP(y),yP(series[y]));
+    ctx.stroke();ctx.setLineDash([]);
+  }
+  if(t2ShowFullBtc) drawLine(bts,'rgba(255,204,102,0.75)',2,[6,3]);
+  drawLine(fs,'rgba(122,184,216,0.9)',2.5);
+  drawLine(bs,'rgba(247,147,26,0.95)',3);
+
+  /* Scrubber vertical line */
+  var sx=xP(t2ScrubYear);
+  ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(sx,PAD.top);ctx.lineTo(sx,PAD.top+cH);ctx.stroke();
+  ctx.setLineDash([]);
+
+  /* Scrubber dots */
+  function dot(val,color){
+    var sy=yP(val);
+    ctx.beginPath();ctx.arc(sx,sy,5,0,Math.PI*2);
+    ctx.fillStyle=color;ctx.fill();
+    ctx.strokeStyle='rgba(10,9,8,0.9)';ctx.lineWidth=1.5;ctx.stroke();
+  }
+  dot(fs[t2ScrubYear],'rgba(122,184,216,1)');
+  dot(bs[t2ScrubYear],'rgba(247,147,26,1)');
+  if(t2ShowFullBtc) dot(bts[t2ScrubYear],'rgba(255,204,102,0.9)');
+
+  /* Update callout cards */
+  var fv=fs[t2ScrubYear],bv=bs[t2ScrubYear],dv=bv-fv;
+  document.getElementById('coFiat').textContent=fmtM(fv);
+  document.getElementById('coBlend').textContent=fmtM(bv);
+  document.getElementById('coDelta').textContent=fmtSign(dv);
+  document.getElementById('coDelta').style.color=dv>=0?'var(--green)':'var(--red)';
+  /* Dynamic blend label showing allocation % */
+  var blendLbl=t2.alloc+'% BTC blend';
+  document.getElementById('coBlendLabel').textContent=blendLbl;
+  document.getElementById('legendBlend').textContent=blendLbl;
+  document.getElementById('scrubYearLabel').textContent='Year '+t2ScrubYear;
+  /* Implied CAGR note for Power Law */
+  if(t2.cagr==='powerlaw'&&t2ScrubYear>0){
+    var implied=plCAGR(t2ScrubYear).toFixed(1);
+    document.getElementById('coBlendSub').textContent='Power Law ~'+implied+'% CAGR at yr '+t2ScrubYear;
+  } else {
+    document.getElementById('coBlendSub').textContent='inflation-adjusted';
+  }
+}
+
+function setAllocSlider(el){
+  t2.alloc=+el.value;
+  var pct=((t2.alloc-1)/99*100).toFixed(0);
+  el.style.setProperty('--pct',pct+'%');
+  document.getElementById('allocPct').textContent=t2.alloc;
+  drawT2Chart();
+}
+function setScrubYear(el){
+  t2ScrubYear=+el.value;
+  el.style.setProperty('--pct',(t2ScrubYear/20*100).toFixed(1)+'%');
+  drawT2Chart();
+}
+function toggleFullBtc(){
+  t2ShowFullBtc=!t2ShowFullBtc;
+  document.getElementById('togFullBtc').classList.toggle('active-btc',t2ShowFullBtc);
+  document.querySelector('.cl-fullbtc-item').style.display=t2ShowFullBtc?'flex':'none';
+  drawT2Chart();
+}
+
+function selBtn(groupId,activeBtn,cls){
+  document.querySelectorAll('#'+groupId+' .opt-btn').forEach(function(b){b.classList.remove('sel','sel-blue');});
+  activeBtn.classList.add(cls||'sel');
+}
+function setCashflow(positive){
+  document.getElementById('cqYes').classList.toggle('sel',positive);
+  document.getElementById('cqNo').classList.toggle('sel',!positive);
+  document.getElementById('riskWarning').classList.toggle('show',!positive);
+}
+function setSize(btn){selBtn('tSizeBtns',btn);t2.size=+btn.dataset.val;drawT2Chart();}
+function setCagr(btn){
+  selBtn('cagrBtns',btn);
+  t2.cagr=btn.dataset.val==='powerlaw'?'powerlaw':+btn.dataset.val;
+  var note=document.getElementById('cagrNote');
+  if(note) note.style.display=(t2.cagr==='powerlaw')?'block':'none';
+  drawT2Chart();
+}
+function setInfl2(btn){selBtn('infl2Btns',btn);t2.inflation=+btn.dataset.val;drawT2Chart();}
+
+/* Init */
+(function(){
+  var sl=document.getElementById('allocSlider');
+  if(sl){var pct=((10-1)/99*100).toFixed(0);sl.style.setProperty('--pct',pct+'%');}
+  var ys=document.getElementById('yearScrubber');
+  if(ys){ys.style.setProperty('--pct','50%');}
+})();
+function initT2Chart(){
+  var c=document.getElementById('t2Chart');
+  if(c&&c.offsetWidth>0) drawT2Chart();
+}
+window.addEventListener('resize',function(){
+  if(document.getElementById('tab-treasury').classList.contains('active')) drawT2Chart();
+});
+
+/* ═══════════════════════════════
+   TAB 3 — REAL COMPANIES
+═══════════════════════════════ */
+var t3={treasury:157000000000,name:'Apple',ticker:'AAPL',alloc:5,cagr:'powerlaw',inflation:7};
+var t3ShowFullBtc=false, t3ScrubYear=10;
+
+function selectCo(card){
+  document.querySelectorAll('#coCards .co-card').forEach(function(c){c.classList.remove('sel');});
+  card.classList.add('sel');
+  t3.treasury=+card.dataset.treasury;
+  t3.name=card.dataset.name;
+  t3.ticker=card.dataset.ticker;
+  drawT3Chart();
+}
+function setT3Cagr(btn){
+  selBtn('t3CagrBtns',btn);
+  t3.cagr=btn.dataset.val==='powerlaw'?'powerlaw':+btn.dataset.val;
+  var note=document.getElementById('t3CagrNote');
+  if(note) note.style.display=(t3.cagr==='powerlaw')?'block':'none';
+  drawT3Chart();
+}
+function setT3Infl(btn){selBtn('t3InflBtns',btn);t3.inflation=+btn.dataset.val;drawT3Chart();}
+function setT3AllocSlider(el){
+  t3.alloc=+el.value;
+  var pct=((t3.alloc-1)/99*100).toFixed(0);
+  el.style.setProperty('--pct',pct+'%');
+  document.getElementById('t3AllocPct').textContent=t3.alloc;
+  drawT3Chart();
+}
+function setT3ScrubYear(el){
+  t3ScrubYear=+el.value;
+  el.style.setProperty('--pct',(t3ScrubYear/20*100).toFixed(1)+'%');
+  drawT3Chart();
+}
+function t3ToggleFullBtc(){
+  t3ShowFullBtc=!t3ShowFullBtc;
+  document.getElementById('t3TogFullBtc').classList.toggle('active-btc',t3ShowFullBtc);
+  document.querySelector('.cl-t3-fullbtc-item').style.display=t3ShowFullBtc?'flex':'none';
+  drawT3Chart();
+}
+
+/* Reuse Power Law helpers from Tab 2 */
+function t3BtcGrowth(years){
+  if(t3.cagr==='powerlaw') return plGrowthFactor(years);
+  return Math.pow(1+t3.cagr/100,years);
+}
+
+function drawT3Chart(){
+  var canvas=document.getElementById('t3Chart');
+  if(!canvas) return;
+  var wrap=canvas.closest('.chart-canvas-wrap')||canvas.parentElement;
+  var cssW=wrap?wrap.getBoundingClientRect().width:canvas.offsetWidth;
+  if(!cssW||cssW<100) return;
+  var dpr=window.devicePixelRatio||1;
+  var cssH=300;
+  canvas.style.height=cssH+'px';
+  canvas.width=Math.round(cssW*dpr);
+  canvas.height=Math.round(cssH*dpr);
+  var ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  var W=cssW,H=cssH;
+  var PAD={top:18,right:18,bottom:38,left:74};
+  var cW=W-PAD.left-PAD.right,cH=H-PAD.top-PAD.bottom,YEARS=20;
+
+  /* Series */
+  var fs=[],bs=[],bts=[];
+  for(var y=0;y<=YEARS;y++){
+    fs.push(t3.treasury*Math.pow(1-t3.inflation/100,y));
+    var btc=t3.treasury*(t3.alloc/100),cash=t3.treasury-btc;
+    bs.push(btc*t3BtcGrowth(y)+cash*Math.pow(1-t3.inflation/100,y));
+    bts.push(t3.treasury*t3BtcGrowth(y));
+  }
+
+  var maxVal=bs[YEARS];
+  if(t3ShowFullBtc) maxVal=Math.max(maxVal,bts[YEARS]);
+  maxVal*=1.1;
+  var minVal=0;
+
+  function xP(yr){return PAD.left+cW*(yr/YEARS);}
+  function yP(v){return PAD.top+cH*(1-(v-minVal)/(maxVal-minVal));}
+
+  /* Grid */
+  for(var i=0;i<=5;i++){
+    var gv=minVal+(maxVal-minVal)*(i/5),gy=yP(gv);
+    ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(PAD.left,gy);ctx.lineTo(PAD.left+cW,gy);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.28)';ctx.font='10px Inter,sans-serif';
+    ctx.textAlign='right';ctx.textBaseline='middle';
+    ctx.fillText(fmtM(gv),PAD.left-6,gy);
+  }
+  [0,4,8,12,16,20].forEach(function(yr){
+    ctx.fillStyle='rgba(255,255,255,.28)';ctx.font='10px Inter,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillText('Yr '+yr,xP(yr),H-PAD.bottom+6);
+  });
+
+  /* Area fills */
+  function areaFill(series,color){
+    ctx.beginPath();ctx.moveTo(xP(0),yP(series[0]));
+    for(var y=1;y<=YEARS;y++) ctx.lineTo(xP(y),yP(series[y]));
+    ctx.lineTo(xP(YEARS),yP(minVal));ctx.lineTo(xP(0),yP(minVal));
+    ctx.closePath();ctx.fillStyle=color;ctx.fill();
+  }
+  areaFill(fs,'rgba(122,184,216,0.07)');
+  areaFill(bs,'rgba(247,147,26,0.08)');
+  if(t3ShowFullBtc) areaFill(bts,'rgba(255,204,102,0.05)');
+  /* Gap fill */
+  ctx.beginPath();ctx.moveTo(xP(0),yP(bs[0]));
+  for(var y=1;y<=YEARS;y++) ctx.lineTo(xP(y),yP(bs[y]));
+  for(var y2=YEARS;y2>=0;y2--) ctx.lineTo(xP(y2),yP(fs[y2]));
+  ctx.closePath();ctx.fillStyle='rgba(247,147,26,0.06)';ctx.fill();
+
+  /* Lines */
+  function drawLine(series,color,width,dash){
+    ctx.beginPath();ctx.lineWidth=width;ctx.strokeStyle=color;
+    if(dash) ctx.setLineDash(dash); else ctx.setLineDash([]);
+    ctx.moveTo(xP(0),yP(series[0]));
+    for(var y=1;y<=YEARS;y++) ctx.lineTo(xP(y),yP(series[y]));
+    ctx.stroke();ctx.setLineDash([]);
+  }
+  if(t3ShowFullBtc) drawLine(bts,'rgba(255,204,102,0.75)',2,[6,3]);
+  drawLine(fs,'rgba(122,184,216,0.9)',2.5);
+  drawLine(bs,'rgba(247,147,26,0.95)',3);
+
+  /* Scrubber */
+  var sx=xP(t3ScrubYear);
+  ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(sx,PAD.top);ctx.lineTo(sx,PAD.top+cH);ctx.stroke();
+  ctx.setLineDash([]);
+  function dot(val,color){
+    ctx.beginPath();ctx.arc(sx,yP(val),5,0,Math.PI*2);
+    ctx.fillStyle=color;ctx.fill();
+    ctx.strokeStyle='rgba(10,9,8,0.9)';ctx.lineWidth=1.5;ctx.stroke();
+  }
+  dot(fs[t3ScrubYear],'rgba(122,184,216,1)');
+  dot(bs[t3ScrubYear],'rgba(247,147,26,1)');
+  if(t3ShowFullBtc) dot(bts[t3ScrubYear],'rgba(255,204,102,0.9)');
+
+  /* Callout cards */
+  var fv=fs[t3ScrubYear],bv=bs[t3ScrubYear],dv=bv-fv;
+  document.getElementById('t3CoFiat').textContent=fmtM(fv);
+  document.getElementById('t3CoBlend').textContent=fmtM(bv);
+  document.getElementById('t3CoDelta').textContent=fmtSign(dv);
+  document.getElementById('t3CoDelta').style.color=dv>=0?'var(--green)':'var(--red)';
+  var lbl=t3.alloc+'% BTC blend';
+  document.getElementById('t3CoBlendLabel').textContent=lbl;
+  document.getElementById('t3LegendBlend').textContent=lbl;
+  document.getElementById('t3ScrubYearLabel').textContent='Year '+t3ScrubYear;
+  document.getElementById('t3ChartTitle').textContent=t3.name+' — real treasury purchasing power over 20 years';
+  if(t3.cagr==='powerlaw'&&t3ScrubYear>0){
+    document.getElementById('t3CoBlendSub').textContent='Power Law ~'+plCAGR(t3ScrubYear).toFixed(1)+'% CAGR at yr '+t3ScrubYear;
+  } else {
+    document.getElementById('t3CoBlendSub').textContent='inflation-adjusted';
+  }
+}
+
+function initT3Chart(){
+  var sl=document.getElementById('t3AllocSlider');
+  if(sl){sl.style.setProperty('--pct',((5-1)/99*100).toFixed(0)+'%');}
+  var ys=document.getElementById('t3YearScrubber');
+  if(ys){ys.style.setProperty('--pct','50%');}
+  var c=document.getElementById('t3Chart');
+  if(c&&c.offsetWidth>0) drawT3Chart();
+}
+window.addEventListener('resize',function(){
+  if(document.getElementById('tab-companies').classList.contains('active')) drawT3Chart();
+});
+</script>
+</body>
+</html>
