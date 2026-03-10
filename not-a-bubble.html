@@ -498,6 +498,7 @@ footer a:hover { color:var(--amber); }
     <p>
       Generate a shareable image with today&rsquo;s date and current price —
       ready to post to X, LinkedIn, or anywhere else.
+      <span id="downloadHint" style="display:none"> Opens as an image — long-press to save to Photos.</span>
     </p>
     <button class="btn-download" id="downloadBtn" onclick="generateDownload()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -505,7 +506,7 @@ footer a:hover { color:var(--amber); }
         <polyline points="7 10 12 15 17 10"/>
         <line x1="12" y1="15" x2="12" y2="3"/>
       </svg>
-      Generate &amp; Download Chart
+      <span id="downloadBtnLabel">Generate &amp; Download Chart</span>
     </button>
   </div>
 
@@ -1168,23 +1169,66 @@ async function generateDownload() {
       32, footerY
     );
 
-    // Download
-    const today    = new Date().toISOString().slice(0,10);
-    const filename = `bitcoin-not-a-bubble-${today}.png`;
-    const link     = document.createElement('a');
-    link.download  = filename;
-    link.href      = EC.toDataURL('image/png');
-    link.click();
+    // Mobile vs Desktop delivery
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+                  || (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
+    const dataUrl  = EC.toDataURL('image/png');
 
-    showToast(`Downloaded: ${filename}`);
+    if (isMobile) {
+      // Open image in new tab — user long-presses to Save to Photos
+      const win = window.open('', '_blank');
+      if (win) {
+        win.document.write(
+          `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>Save Chart to Photos</title>
+          <style>
+            body { margin:0; background:#0a0908; display:flex; flex-direction:column;
+                   align-items:center; padding:1.5rem 1rem; box-sizing:border-box; min-height:100vh; }
+            img  { width:100%; max-width:800px; border-radius:8px; display:block; margin-top:0.75rem; }
+            .tip { color:#e09422; font-family:sans-serif; font-size:1.05rem; font-weight:600;
+                   text-align:center; margin:0 0 0.25rem; }
+            .sub { color:#888; font-family:sans-serif; font-size:0.82rem; text-align:center; }
+          </style></head><body>
+          <p class="tip">&#8595; Long-press the image &rarr; Save to Photos</p>
+          <p class="sub">Then share from your Photos app anywhere you like</p>
+          <img src="${dataUrl}" alt="Bitcoin vs Historical Bubbles — lastcoinstanding.com">
+          </body></html>`
+        );
+        win.document.close();
+      }
+      showToast('Image ready — long-press to save to Photos');
+    } else {
+      const today    = new Date().toISOString().slice(0,10);
+      const filename = `bitcoin-not-a-bubble-${today}.png`;
+      const link     = document.createElement('a');
+      link.download  = filename;
+      link.href      = dataUrl;
+      link.click();
+      showToast(`Downloaded: ${filename}`);
+    }
   } catch(e) {
     console.error(e);
     showToast('Download failed — please try again');
   }
 
   btn.disabled = false;
-  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Generate &amp; Download Chart`;
+  const isMobReset = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+                  || (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
+  const resetLabel = isMobReset ? 'Generate &amp; Save as Image' : 'Generate &amp; Download Chart';
+  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> ${resetLabel}`;
 }
+
+// ─── MOBILE LABEL ───────────────────────────────────────────────────────────
+(function(){
+  const isMob = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+             || (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
+  if (isMob) {
+    const lbl = document.getElementById('downloadBtnLabel');
+    if (lbl) lbl.innerHTML = 'Generate &amp; Save as Image';
+    const hint = document.getElementById('downloadHint');
+    if (hint) hint.style.display = 'inline';
+  }
+})();
 
 // ─── TOAST ────────────────────────────────────────────────────────────────────
 function showToast(msg) {
