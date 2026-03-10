@@ -1132,20 +1132,91 @@ async function generateDownload() {
   const chartW    = exportW - margin.left - margin.right;
   const chartH    = exportH - margin.top  - margin.bottom;
 
-  // ── Temporarily force devicePixelRatio = 1 so Chart.js doesn't double-scale ─
-  const realDPR = window.devicePixelRatio;
-  Object.defineProperty(window, 'devicePixelRatio', {
-    get: () => 1, configurable: true
-  });
-
-  // Force chart to export dimensions and wait for full re-render
-  chart.canvas.style.width  = chartW + 'px';
-  chart.canvas.style.height = chartH + 'px';
-  chart.resize(chartW, chartH);
-  await new Promise(r => setTimeout(r, 500));
-
   try {
-    // Build export canvas at fixed 1600×900
+    // ── Create a hidden offscreen chart at exact export size with DPR=1 ───────
+    // This avoids all Retina/DPR scaling issues completely.
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width  = chartW;
+    tmpCanvas.height = chartH;
+    tmpCanvas.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:'+chartW+'px;height:'+chartH+'px;';
+    document.body.appendChild(tmpCanvas);
+
+    // Clone the annotation plugin for the offscreen chart
+    const offscreenAnnotationPlugin = {
+      id: 'offscreenAnnotations',
+      afterDraw(c) { drawAnnotations(c); },
+    };
+
+    const tmpChart = new Chart(tmpCanvas.getContext('2d'), {
+      type: 'line',
+      data: { datasets: buildDatasets() },
+      options: {
+        responsive: false,
+        maintainAspectRatio: false,
+        devicePixelRatio: 1,   // ← KEY: forces 1:1 pixel rendering
+        animation: false,
+        interaction: { mode: 'nearest', axis: 'x', intersect: false },
+        scales: {
+          x: {
+            type: 'linear',
+            min: genesisMode ? -8.5 : -3.5,
+            max: 9.4,
+            grid: { color: '#201e1c', lineWidth: 0.7, drawBorder: false },
+            border: { display: false },
+            ticks: {
+              color: '#8a8070',
+              font: { family: "'DM Sans', sans-serif", size: 11 },
+              stepSize: 1,
+              callback(v) {
+                if (v === 0) return 'Peak';
+                return v > 0 ? `+${v}` : `${v}`;
+              },
+            },
+            title: {
+              display: true,
+              text: 'Years around peak  (0 = peak)',
+              color: '#9a9088',
+              font: { family: "'DM Sans', sans-serif", size: 12 },
+              padding: { top: 8 },
+            },
+          },
+          y: {
+            min: -8,
+            max: 335,
+            grid: { color: '#201e1c', lineWidth: 0.7, drawBorder: false },
+            border: { display: false },
+            ticks: {
+              color: '#8a8070',
+              font: { family: "'DM Sans', sans-serif", size: 11 },
+              stepSize: 25,
+              callback(v) { return `${v}×`; },
+            },
+            title: {
+              display: true,
+              text: 'Multiple of starting price',
+              color: '#9a9088',
+              font: { family: "'DM Sans', sans-serif", size: 12 },
+            },
+          },
+        },
+        elements: {
+          point: { radius: 0, hoverRadius: 0 },
+          line:  { borderCapStyle: 'round', borderJoinStyle: 'round' },
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false },
+        },
+      },
+      plugins: [offscreenAnnotationPlugin],
+    });
+
+    // Let Chart.js fully render
+    await new Promise(r => setTimeout(r, 400));
+    tmpChart.update('none');
+    await new Promise(r => setTimeout(r, 200));
+
+    // ── Build the export canvas ───────────────────────────────────────────────
     const EC = document.createElement('canvas');
     EC.width  = exportW;
     EC.height = exportH;
@@ -1155,7 +1226,7 @@ async function generateDownload() {
     ec.fillStyle = '#0a0908';
     ec.fillRect(0, 0, exportW, exportH);
 
-    // Subtle grain (light noise)
+    // Subtle grain
     const id = ec.getImageData(0, 0, exportW, exportH);
     for (let i = 0; i < id.data.length; i += 4) {
       const n = (Math.random() - 0.5) * 12;
@@ -1165,10 +1236,14 @@ async function generateDownload() {
     }
     ec.putImageData(id, 0, 0);
 
-    // Draw chart — rendered at exact export size with DPR=1, no scaling artifacts
-    ec.drawImage(chart.canvas, margin.left, margin.top, chartW, chartH);
+    // Draw offscreen chart — guaranteed 1:1 pixel mapping, no DPR issues
+    ec.drawImage(tmpCanvas, margin.left, margin.top, chartW, chartH);
 
-    // ── Title block (top-left) — use Cormorant Garamond to match live page ──
+    // Clean up temp chart
+    tmpChart.destroy();
+    tmpCanvas.remove();
+
+    // ── Title block (top-left) ──
     ec.textAlign    = 'left';
     ec.textBaseline = 'top';
     ec.font         = "500 30px 'Cormorant Garamond', Georgia, serif";
@@ -1188,7 +1263,7 @@ async function generateDownload() {
     ec.fillStyle    = '#e09422';
     ec.fillText('lastcoinstanding.com', exportW - 32, 18);
 
-    // ── Legend (bottom strip, above footer) ──
+    // ── Legend ──
     const legendY = exportH - margin.bottom + 8;
     const items   = [
       { label: 'Bitcoin (2014–present)  •  still climbing', color: '#e09422', lw: 3 },
@@ -1212,7 +1287,7 @@ async function generateDownload() {
       if (lx > exportW - 80) { lx = 32; }
     });
 
-    // ── Footer: date+price (right) and sources (left) ──
+    // ── Footer ──
     const footerY = exportH - 14;
     const todayStr = new Date().toLocaleDateString('en-US',
       {weekday:'short', month:'short', day:'numeric', year:'numeric'});
@@ -1239,7 +1314,6 @@ async function generateDownload() {
     const dataUrl = EC.toDataURL('image/png');
 
     if (isMobile) {
-      // Show in-page overlay — reliable on all mobile browsers
       const overlay = document.getElementById('saveOverlay');
       const img     = document.getElementById('saveOverlayImg');
       img.src       = dataUrl;
@@ -1258,16 +1332,6 @@ async function generateDownload() {
   } catch(e) {
     console.error(e);
     showToast('Download failed — please try again');
-  } finally {
-    // Restore devicePixelRatio
-    Object.defineProperty(window, 'devicePixelRatio', {
-      get: () => realDPR, configurable: true
-    });
-
-    // Restore chart to original responsive size
-    chart.canvas.style.width  = '';
-    chart.canvas.style.height = '';
-    chart.resize();
   }
 
   btn.disabled = false;
