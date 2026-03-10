@@ -1067,13 +1067,28 @@ async function generateDownload() {
   // Ensure latest price
   await fetchLivePrice();
 
-  // Give chart one render cycle to update
-  await new Promise(r => setTimeout(r, 300));
+  // ── Resize chart to full export dimensions for crisp capture ──────────────
+  // This ensures identical quality on mobile and desktop regardless of screen size.
+  const exportW   = 1600, exportH = 900;
+  const margin    = { top:90, bottom:90, left:20, right:20 };
+  const chartW    = exportW - margin.left - margin.right;
+  const chartH    = exportH - margin.top  - margin.bottom;
+
+  // Save original size
+  const origW = chart.canvas.parentElement
+    ? chart.canvas.parentElement.offsetWidth  : chart.canvas.width;
+  const origH = chart.canvas.parentElement
+    ? chart.canvas.parentElement.offsetHeight : chart.canvas.height;
+
+  // Force chart to export dimensions and wait for full re-render
+  chart.canvas.style.width  = chartW + 'px';
+  chart.canvas.style.height = chartH + 'px';
+  chart.resize(chartW, chartH);
+  await new Promise(r => setTimeout(r, 400));
 
   try {
     // Build export canvas at fixed 1600×900
-    const exportW = 1600, exportH = 900;
-    const EC      = document.createElement('canvas');
+    const EC = document.createElement('canvas');
     EC.width  = exportW;
     EC.height = exportH;
     const ec = EC.getContext('2d');
@@ -1092,11 +1107,8 @@ async function generateDownload() {
     }
     ec.putImageData(id, 0, 0);
 
-    // Draw chart canvas scaled to fit with margins
-    const margin = { top:90, bottom:90, left:20, right:20 };
-    const drawW  = exportW - margin.left - margin.right;
-    const drawH  = exportH - margin.top  - margin.bottom;
-    ec.drawImage(chart.canvas, margin.left, margin.top, drawW, drawH);
+    // Draw chart — now rendered at exact export size, no scaling artifacts
+    ec.drawImage(chart.canvas, margin.left, margin.top, chartW, chartH);
 
     // ── Title block (top-left) ──
     ec.textAlign    = 'left';
@@ -1209,6 +1221,11 @@ async function generateDownload() {
   } catch(e) {
     console.error(e);
     showToast('Download failed — please try again');
+  } finally {
+    // Restore chart to original responsive size
+    chart.canvas.style.width  = '';
+    chart.canvas.style.height = '';
+    chart.resize();
   }
 
   btn.disabled = false;
