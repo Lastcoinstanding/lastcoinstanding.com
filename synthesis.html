@@ -768,11 +768,13 @@ function startCircuitPulse() {
     // Orb circles pulse with staggered delays
     for (var i = 0; i < components.length; i++) {
         var circle = document.getElementById('circle-' + components[i].id);
+        circle.style.filter = '';  // clear inline filter so CSS animation wins
         circle.classList.add('circuit-alive');
         circle.style.animationDelay = (i * 0.4) + 's';
     }
     // Core ring pulse
     var coreRing = document.getElementById('core-ring');
+    coreRing.style.filter = '';  // clear inline filter
     coreRing.classList.add('circuit-alive');
     coreRing.style.animationDelay = '0.6s';
     // Radial lines pulse
