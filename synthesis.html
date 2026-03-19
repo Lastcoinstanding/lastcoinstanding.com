@@ -193,12 +193,17 @@
         .mesh-line { stroke-dasharray: 300; stroke-dashoffset: 300; opacity: 0; }
         .mesh-line.active { animation: meshDraw 0.6s ease forwards; }
 
-        /* ═══ Core pulse on completion ═══ */
-        @keyframes corePulse {
-            0% { r: 48; opacity: 0.9; }
-            50% { r: 52; opacity: 1; }
-            100% { r: 48; opacity: 0.9; }
+        /* ═══ Circuit alive pulse on completion ═══ */
+        @keyframes circuitGlow {
+            0%, 100% { filter: drop-shadow(0 0 2px rgba(247,147,26,0.3)); }
+            50% { filter: drop-shadow(0 0 8px rgba(247,147,26,0.7)); }
         }
+        @keyframes meshPulse {
+            0%, 100% { stroke-opacity: 1; }
+            50% { stroke-opacity: 0.35; }
+        }
+        .circuit-alive { animation: circuitGlow 3s ease-in-out infinite; }
+        .mesh-alive { animation: meshPulse 3s ease-in-out infinite; }
 
         /* ═══ Responsive ═══ */
         @media (max-width: 1024px) {
@@ -356,7 +361,7 @@ var components = [
         name: 'Proof of Work',
         shortName: 'Proof of\nWork',
         tagline: 'Component 1 of 6',
-        desc: 'Converts energy into security. Miners compete to solve a cryptographic puzzle, expending measurable, unforgeable work. This makes it prohibitively expensive to attack the network \u2014 the cost of subversion must exceed the cost of honest participation.',
+        desc: 'Converts energy into security. Miners compete in a brute-force lottery \u2014 repeatedly hashing until they find a value below the network\u2019s target. There is no shortcut; only energy expenditure. This makes it prohibitively expensive to attack the network \u2014 the cost of subversion must exceed the cost of honest participation.',
         deeper: 'Rooted in Adam Back\u2019s Hashcash (1997), Bitcoin\u2019s PoW uses two rounds of SHA-256 hashing. Miners search for a nonce that produces a hash below the network\u2019s target. The process is computationally intensive to perform but trivial to verify \u2014 asymmetry that underpins the entire security model.',
         removal: 'Without Proof of Work, there is no cost to proposing blocks. Any actor can flood the network with conflicting histories at zero expense. The entire security model \u2014 which depends on it being more expensive to attack than to participate honestly \u2014 collapses. You get a database, not a decentralized monetary system.',
         verdictLabel: 'System collapses',
@@ -367,7 +372,7 @@ var components = [
         name: 'Difficulty Adjustment',
         shortName: 'Difficulty\nAdjustment',
         tagline: 'Component 2 of 6',
-        desc: 'The network\u2019s metabolism. Every 2,016 blocks (~2 weeks), the protocol recalibrates the mining puzzle difficulty based on total hashrate. More miners join? The puzzle gets harder. Miners leave? It gets easier. This maintains the 10-minute average block time regardless of hardware advances.',
+        desc: 'The network\u2019s metabolism. Every 2,016 blocks (~2 weeks), the protocol recalibrates the target threshold that miners must hash below. More miners join? The target tightens. Miners leave? It loosens. This maintains the 10-minute average block time regardless of hardware advances.',
         deeper: 'The 10-minute block interval is a deliberate engineering choice: long enough for blocks to propagate globally so nodes can converge on one truth, short enough to remain practical. Without this adjustment, Moore\u2019s Law and ASIC development would have accelerated block production to the point where all 21 million bitcoin would have been mined within the first few years.',
         removal: 'Without Difficulty Adjustment, the issuance schedule breaks immediately. As mining hardware improves, blocks are found faster and faster. The fixed 21 million supply gets exhausted in years instead of decades. Worse, the 10-minute propagation window \u2014 which gives global nodes time to converge \u2014 shrinks until the network can no longer maintain consensus.',
         verdictLabel: 'Issuance schedule breaks',
@@ -400,7 +405,7 @@ var components = [
         name: 'Incentive Structure',
         shortName: 'Incentive\nStructure',
         tagline: 'Component 5 of 6',
-        desc: 'Aligns self-interest with network security. Miners receive block rewards (new bitcoin) and transaction fees for honest work. The halving \u2014 cutting rewards 50% every 210,000 blocks (~4 years) \u2014 creates a predictable, diminishing inflation rate that asymptotically approaches the 21 million hard cap.',
+        desc: 'Aligns self-interest with network security. Miners earn a block reward for honest work \u2014 comprising the block subsidy (newly minted bitcoin) and transaction fees. The halving \u2014 cutting the subsidy 50% every 210,000 blocks (~4 years) \u2014 creates a predictable, diminishing issuance rate that asymptotically approaches the 21 million hard cap. As the subsidy shrinks, transaction fees become the primary incentive securing the network.',
         deeper: 'This is Bitcoin\u2019s economic engine. The incentive design means that the most profitable strategy for any rational actor is to play by the rules. A 51% attack, while theoretically possible, would require such massive capital expenditure that the attacker would earn more by mining honestly. Game theory enforces what no regulator could.',
         removal: 'Without the incentive structure, no rational actor expends energy to secure the network. Mining becomes charity work. The hashrate drops to zero, and with it, all security guarantees. Meanwhile, with no fixed supply schedule, the monetary properties that make bitcoin valuable as a store of value \u2014 the entire economic thesis \u2014 disappear.',
         verdictLabel: 'No one secures the network',
@@ -689,6 +694,9 @@ function triggerCompletion() {
         activateCore();
         showCompletionPanel();
         isRemovalMode = true;
+
+        // Add living pulse to the completed circuit
+        startCircuitPulse();
     }, meshLines.length * 60 + 400);
 
     // Make all explored orbs fully bright
@@ -746,6 +754,38 @@ function deactivateCore() {
     ambient.setAttribute('opacity', '0.5');
 }
 
+function startCircuitPulse() {
+    // Mesh lines pulse
+    var meshLines = document.querySelectorAll('.mesh-line.active');
+    for (var i = 0; i < meshLines.length; i++) {
+        meshLines[i].classList.add('mesh-alive');
+        meshLines[i].style.animationDelay = (i * 0.2) + 's';
+    }
+    // Orb circles pulse with staggered delays
+    for (var i = 0; i < components.length; i++) {
+        var circle = document.getElementById('circle-' + components[i].id);
+        circle.classList.add('circuit-alive');
+        circle.style.animationDelay = (i * 0.4) + 's';
+    }
+    // Core ring pulse
+    var coreRing = document.getElementById('core-ring');
+    coreRing.classList.add('circuit-alive');
+    coreRing.style.animationDelay = '0.6s';
+    // Radial lines pulse
+    for (var i = 0; i < components.length; i++) {
+        var radial = document.getElementById('radial-' + components[i].id);
+        radial.classList.add('mesh-alive');
+        radial.style.animationDelay = (i * 0.3 + 0.5) + 's';
+    }
+}
+
+function stopCircuitPulse() {
+    var meshLines = document.querySelectorAll('.mesh-alive');
+    for (var i = 0; i < meshLines.length; i++) meshLines[i].classList.remove('mesh-alive');
+    var alive = document.querySelectorAll('.circuit-alive');
+    for (var i = 0; i < alive.length; i++) alive[i].classList.remove('circuit-alive');
+}
+
 /* ═══════════════════════════════════════════════
    REMOVAL MODE (post-completion)
    ═══════════════════════════════════════════════ */
@@ -768,6 +808,8 @@ function handleRemoval(id) {
     removedId = id;
     var comp = findComp(id);
 
+    // Stop the living pulse — circuit is broken
+    stopCircuitPulse();
     // Dim the removed orb
     var circle = document.getElementById('circle-' + id);
     circle.setAttribute('stroke', '#e74c3c');
@@ -848,6 +890,9 @@ function restoreFromRemoval() {
 
     // Re-activate core
     activateCore();
+
+    // Restart the living pulse — circuit restored
+    startCircuitPulse();
 }
 
 /* ═══════════════════════════════════════════════
