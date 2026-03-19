@@ -193,7 +193,7 @@ header .intro-text strong { color:var(--text-bright); font-weight:600; }
   position:relative;
 }
 .selector-group::before {
-  content:'Chart Start Date';
+  content:'Chart View';
   position:absolute; top:-0.55rem; left:0.75rem;
   font-family:var(--font-body); font-size:0.62rem; font-weight:700;
   letter-spacing:0.14em; text-transform:uppercase;
@@ -201,7 +201,7 @@ header .intro-text strong { color:var(--text-bright); font-weight:600; }
   background:var(--bg-card); padding:0 0.375rem;
 }
 .toggle-group {
-  display:flex; gap:6px;
+  display:flex; gap:6px; flex-wrap:wrap;
 }
 .toggle-btn {
   font-family:var(--font-body); font-size:0.8rem; font-weight:600;
@@ -209,7 +209,7 @@ header .intro-text strong { color:var(--text-bright); font-weight:600; }
   background:none;
   border:1px solid var(--border);
   cursor:pointer;
-  padding:6px 16px;
+  padding:6px 14px;
   border-radius:4px;
   transition:all 0.2s;
   white-space:nowrap;
@@ -224,6 +224,9 @@ header .intro-text strong { color:var(--text-bright); font-weight:600; }
   border-color:var(--amber);
   color:var(--amber);
   font-weight:600;
+}
+@media (max-width:480px) {
+  .toggle-btn { font-size:0.7rem; padding:5px 10px; }
 }
 .live-price {
   display:flex; align-items:center; gap:0.5rem;
@@ -508,12 +511,15 @@ footer a:hover { color:var(--amber); }
   <div class="controls-bar">
     <div class="controls-left">
       <div class="selector-group">
-        <div class="toggle-group" role="group" aria-label="Bitcoin start date">
+        <div class="toggle-group" role="group" aria-label="Chart view">
+          <button class="toggle-btn" id="btnBubble" onclick="setMode('bubble')">
+            Bubble Window (±3 yrs)
+          </button>
           <button class="toggle-btn active" id="btn2014" onclick="setMode('2014')">
-            2014 (default)
+            Since 2014 (default)
           </button>
           <button class="toggle-btn" id="btnGenesis" onclick="setMode('genesis')">
-            2010 (Bitcoin Genesis block)
+            Since 2010 (Genesis)
           </button>
         </div>
       </div>
@@ -707,14 +713,14 @@ const MILESTONES = [
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
 let chart;
-let genesisMode = false;
+let viewMode = '2014';   // '2014' | 'genesis' | 'bubble'
 let livePrice   = 69512.06;
 let liveMult    = 174.2939;
 let liveX       = 8.2437;
 
 // ─── CHART INIT ──────────────────────────────────────────────────────────────
 function getBtcData() {
-  if (genesisMode) {
+  if (viewMode === 'genesis') {
     // Early data + 2014 data (early ends around mid-2014, yahoo starts Sep 2014)
     return [...BTC_DATA_EARLY, ...BTC_DATA_2014];
   }
@@ -753,6 +759,18 @@ function buildDatasets() {
   ];
 }
 
+// ─── SCALE HELPERS ───────────────────────────────────────────────────────────
+function getScaleConfig() {
+  if (viewMode === 'bubble') {
+    return { xMin: -3.5, xMax: 3.5, yMin: -3, yMax: 55, yStep: 5 };
+  }
+  if (viewMode === 'genesis') {
+    return { xMin: -8.5, xMax: 9.4, yMin: -8, yMax: 335, yStep: 25 };
+  }
+  // default: 2014
+  return { xMin: -3.5, xMax: 9.4, yMin: -8, yMax: 335, yStep: 25 };
+}
+
 function initChart() {
   const ctx = document.getElementById('bubbleChart').getContext('2d');
 
@@ -772,8 +790,8 @@ function initChart() {
       scales: {
         x: {
           type: 'linear',
-          min: genesisMode ? -8.5 : -3.5,
-          max: 9.4,
+          min: getScaleConfig().xMin,
+          max: getScaleConfig().xMax,
           grid: { color: '#201e1c', lineWidth: 0.7, drawBorder: false },
           border: { display: false },
           ticks: {
@@ -794,14 +812,14 @@ function initChart() {
           },
         },
         y: {
-          min: -8,
-          max: 335,
+          min: getScaleConfig().yMin,
+          max: getScaleConfig().yMax,
           grid: { color: '#201e1c', lineWidth: 0.7, drawBorder: false },
           border: { display: false },
           ticks: {
             color: '#8a8070',
             font: { family: "'DM Sans', sans-serif", size: 10 },
-            stepSize: 25,
+            stepSize: getScaleConfig().yStep,
             callback(v) { return `${v}×`; },
           },
           title: {
@@ -991,9 +1009,48 @@ function drawCallout(ctx, chart) {
   const xS    = chart.scales.x;
   const yS    = chart.scales.y;
 
+  const bw = 210;
+
+  if (viewMode === 'bubble') {
+    // Bubble window: different message — Bitcoin looks like a bubble here
+    const bh = 98;
+    const bx = xS.getPixelForValue(xS.min + 0.15);
+    const by = yS.getPixelForValue(yS.max) + 8;
+
+    ctx.fillStyle   = 'rgba(10,9,8,0.93)';
+    ctx.strokeStyle = '#e09422';
+    ctx.lineWidth   = 1;
+    roundRect(ctx, bx, by, bw, bh, 6);
+    ctx.fill(); ctx.stroke();
+
+    const lx = bx + 14;
+    ctx.textAlign    = 'left';
+    ctx.textBaseline = 'top';
+
+    ctx.fillStyle = '#e09422';
+    ctx.font      = `700 9px 'DM Sans', sans-serif`;
+    ctx.fillText('ZOOM IN', lx, by + 12);
+
+    const lines2 = [
+      'At this scale, Bitcoin looks',
+      'exactly like every other bubble.',
+      '',
+      'Switch view to see what',
+      'happened next.',
+    ];
+    ctx.fillStyle = '#a09888';
+    ctx.font      = `400 9.5px 'DM Sans', sans-serif`;
+    lines2.forEach((ln, i) => {
+      if (ln.startsWith('Switch')) { ctx.fillStyle = '#d0c8b8'; ctx.font = `600 9.5px 'DM Sans', sans-serif`; }
+      else ctx.fillStyle = '#a09888';
+      ctx.fillText(ln, lx, by + 28 + i * 14);
+    });
+    return;
+  }
+
+  // Default callout for 2014 / genesis modes
   // Place callout in upper-LEFT zone — always empty (bubbles are all near zero)
   // x: from left edge, y: near top
-  const bw = 210;
   const bh = 112;
   const bx = xS.getPixelForValue(xS.min + 0.15);
   const by = yS.getPixelForValue(yS.max - 8) + 8;
@@ -1075,12 +1132,18 @@ function buildLegend() {
 
 // ─── MODE TOGGLE ─────────────────────────────────────────────────────────────
 function setMode(mode) {
-  genesisMode = (mode === 'genesis');
-  document.getElementById('btn2014').classList.toggle('active', !genesisMode);
-  document.getElementById('btnGenesis').classList.toggle('active', genesisMode);
+  viewMode = mode;
+  document.getElementById('btnBubble').classList.toggle('active', mode === 'bubble');
+  document.getElementById('btn2014').classList.toggle('active', mode === '2014');
+  document.getElementById('btnGenesis').classList.toggle('active', mode === 'genesis');
 
+  const sc = getScaleConfig();
   chart.data.datasets[0].data = getBtcData();
-  chart.options.scales.x.min  = genesisMode ? -8.5 : -3.5;
+  chart.options.scales.x.min      = sc.xMin;
+  chart.options.scales.x.max      = sc.xMax;
+  chart.options.scales.y.min      = sc.yMin;
+  chart.options.scales.y.max      = sc.yMax;
+  chart.options.scales.y.ticks.stepSize = sc.yStep;
   chart.update('none');
 }
 
@@ -1159,8 +1222,8 @@ async function generateDownload() {
         scales: {
           x: {
             type: 'linear',
-            min: genesisMode ? -8.5 : -3.5,
-            max: 9.4,
+            min: getScaleConfig().xMin,
+            max: getScaleConfig().xMax,
             grid: { color: '#201e1c', lineWidth: 0.7, drawBorder: false },
             border: { display: false },
             ticks: {
@@ -1181,14 +1244,14 @@ async function generateDownload() {
             },
           },
           y: {
-            min: -8,
-            max: 335,
+            min: getScaleConfig().yMin,
+            max: getScaleConfig().yMax,
             grid: { color: '#201e1c', lineWidth: 0.7, drawBorder: false },
             border: { display: false },
             ticks: {
               color: '#8a8070',
               font: { family: "'DM Sans', sans-serif", size: 11 },
-              stepSize: 25,
+              stepSize: getScaleConfig().yStep,
               callback(v) { return `${v}×`; },
             },
             title: {
