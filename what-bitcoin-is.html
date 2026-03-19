@@ -111,8 +111,8 @@
         .concept-desc { line-height: 1.75; color: var(--text); font-size: 0.95rem; font-weight: 400; }
         .concept-relation { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--text-dim); font-weight: 400; line-height: 1.6; }
         .concept-relation strong { color: var(--orange); font-weight: 600; }
-        @keyframes completePulse { 0%, 100% { stroke-opacity: 0.7; } 50% { stroke-opacity: 1; filter: url(#glow); } }
-        .complete .flower-circle.explored { animation: completePulse 2s ease 1; stroke-opacity: 0.8 !important; }
+        @keyframes completePulse { 0%, 100% { stroke-opacity: 0.7; stroke-width: 1.5; } 50% { stroke-opacity: 1; stroke-width: 3; } }
+        .complete .flower-circle.explored { animation: completePulse 3s ease-in-out infinite; }
         @keyframes circleIn { from { opacity: 0; stroke-dashoffset: 502; } to { opacity: 1; stroke-dashoffset: 0; } }
         .flower-circle.animate-in { stroke-dasharray: 502; animation: circleIn 1s ease forwards; }
         .flower-circle.ring-0.animate-in { animation-delay: 0.2s; }
@@ -433,7 +433,7 @@ function updatePanel(id) {
     ct.style.display = 'none'; void ct.offsetHeight;
     document.getElementById('conceptTag').textContent = c.tag;
     document.getElementById('conceptName').textContent = c.label;
-    document.getElementById('conceptDesc').textContent = c.desc;
+    document.getElementById('conceptDesc').innerHTML = c.desc;
     const rel = document.getElementById('conceptRelation');
     if (c.relation) { rel.innerHTML = c.relation; rel.style.display = 'block'; }
     else rel.style.display = 'none';
@@ -456,7 +456,7 @@ function celebrate() {
     ct.style.display = 'none'; void ct.offsetHeight;
     document.getElementById('conceptTag').textContent = `All ${concepts.length} Dimensions`;
     document.getElementById('conceptName').textContent = meta.completionTitle;
-    document.getElementById('conceptDesc').textContent = meta.completionDesc;
+    document.getElementById('conceptDesc').innerHTML = meta.completionDesc;
     const rel = document.getElementById('conceptRelation');
     rel.innerHTML = meta.completionRelation; rel.style.display = 'block';
     ct.style.display = 'block';
