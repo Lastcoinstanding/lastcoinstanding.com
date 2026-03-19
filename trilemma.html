@@ -252,7 +252,7 @@ footer a:hover { text-decoration: underline; }
         <div class="panel-title">Click a Vertex</div>
         <div class="panel-body">
           <p>Every blockchain protocol faces the same fundamental constraint: it can optimize for any <strong>two</strong> of three properties at its base layer, but never all three simultaneously.</p>
-          <p>This isn't a failure of engineering - it's a structural reality of maintaining a trustless, global ledger. The technical constraint arises from the relationship between the computational capacity of a regular laptop and the total transaction load of the network.</p>
+          <p>This isn't a failure of engineering — it's a structural reality. Keeping the network open to everyone, resistant to attack, and fast enough for global use creates tensions that cannot be engineered away — only navigated through deliberate tradeoffs.</p>
           <p>Click on <strong>Decentralization</strong>, <strong>Security</strong>, or <strong>Scalability</strong> to explore what happens when each property is relaxed - and why Bitcoin's deliberate choice is the foundation of sound digital money.</p>
         </div>
       </div>
@@ -262,7 +262,7 @@ footer a:hover { text-decoration: underline; }
         <div class="panel-body">
           <p>Decentralization means that <strong>anyone with a regular laptop</strong> can fully audit the blockchain — verify every transaction, confirm the 21-million supply cap, and validate the integrity of the entire ledger independently. This "computational auditability" is what gives Bitcoin its <strong>monetary hardness</strong>.</p>
           <p>If you relax decentralization, you get <strong>speed and security, but at the cost of trust</strong>. The network becomes faster because fewer, more powerful nodes handle validation — but now ordinary people can't verify the ledger themselves. You've reintroduced the very counterparty risk Bitcoin was designed to eliminate.</p>
-          <div class="panel-verdict bad"><strong>The result:</strong> A fast, secure database - but one that requires you to trust the operators. Essentially, you've rebuilt Visa with extra steps. If the supply cannot be verified by the individual, the credibility of the asset's scarcity is compromised, eroding its monetary premium.</div>
+          <div class="panel-verdict bad"><strong>The result:</strong> A fast, secure database — but one that requires you to trust the operators. Essentially, you've rebuilt Visa with extra steps. If individuals can no longer run nodes, they lose the ability to verify supply, validate transactions, and participate in consensus — the very foundations of Bitcoin's monetary credibility.</div>
           <div class="example-box"><div class="example-label">Real-World Failures</div><div class="example-content"><strong>Solana</strong> requires enterprise-grade hardware to run a validator, concentrating control among well-funded operators. <strong>BSV</strong> pushed for massive blocks, pricing out ordinary node operators and creating a network where as little as 1% of Bitcoin's miners could execute a 51% attack.</div></div>
         </div>
       </div>
@@ -280,8 +280,8 @@ footer a:hover { text-decoration: underline; }
         <div class="panel-label scalability">SCALABILITY</div>
         <div class="panel-title">What if Scalability Is Relaxed?</div>
         <div class="panel-body">
-          <p>Scalability is the capacity to process high transaction volumes. Superficially this sounds like a great feture; high throughput, low fees, instant settlement - the properties every payment network desires.</p>
-          <p>If you relax scalability at the base layer, as Bitcoin does, you preserve <strong>decentralization and security simultaneously</strong>. The base layer becomes a high-integrity settlement medium: slow, deliberate, and unbreakable. Approximately 400,000 transactions per day, each representing final, censorship-resistant settlement.</p>
+          <p>Scalability is the capacity to process high transaction volumes. Superficially this sounds like a great feature; high throughput, low fees, instant settlement - the properties every payment network desires.</p>
+          <p>If you relax scalability at the base layer, as Bitcoin does, you preserve <strong>decentralization and security simultaneously</strong>. The base layer becomes a high-integrity settlement medium: slow, deliberate, and unbreakable. The throughput is deliberately constrained — approximately 400,000 transactions per day — but each one represents final, irreversible, censorship-resistant settlement. This is a feature, not a limitation.</p>
           <div class="panel-verdict good"><strong>Bitcoin's choice:</strong> This is the correct tradeoff. The base layer is an armored tank - designed for settlement, not coffee purchases. Scalability is then addressed through <strong>layered architecture</strong>: the Lightning Network, sidechains, and application layers handle high-velocity payments while the base layer preserves monetary integrity.</div>
           <div class="example-box"><div class="example-label">The Layered Solution</div><div class="example-content">Just as <strong>Fedwire</strong> settles $80 trillion in value with fewer than 20 million transactions per month while Visa handles consumer payments above it - Bitcoin's Layer 1 provides settlement finality while Lightning and other Layer 2 solutions provide speed (Lightning can already support more transactions per second than Visa and Mastercard combined). Each L1 transaction can represent thousands of bundled L2 payments.</div></div>
         </div>
@@ -291,7 +291,7 @@ footer a:hover { text-decoration: underline; }
   <div class="btc-choice">
     <h2>Why This Is the Only Path to Sound Money</h2>
     <p>Bitcoin solved <strong>decentralization and security together</strong> for the first time in human history. Every other network that has tried to optimize for scalability at the base layer has necessarily sacrificed one or both.</p>
-    <p>Bitcoin Cash, Bitcoin SV, Litecoin, and scores of "faster" alternatives all made the same mistake: treating base-layer speed as the priority. The market has consistently rewarded <strong>monetary integrity over transaction velocity</strong>, because a monetary integrity has to be an impervious foundation upon which the any new, global monetary network will be built. Bitcoin's <strong>Medium of Exchange</strong> role, while ultimately critical, is best supported as on 2nd layers.</p>
+    <p>Bitcoin Cash, Bitcoin SV, Litecoin, and scores of "faster" alternatives all made the same mistake: treating base-layer speed as the priority. But monetary integrity must be the impervious foundation upon which any new, global monetary network is built — speed without soundness is just a faster way to fail. Bitcoin's <strong>Medium of Exchange</strong> role, while ultimately critical, is best delivered through Layer 2 solutions built on top of an uncompromising base layer.</p>
     <p>The layered approach is the only architecture that preserves an immutable, decentralized foundation while achieving the throughput required to serve eight billion people.</p>
   </div>
   <div class="layers-section">
@@ -305,7 +305,7 @@ footer a:hover { text-decoration: underline; }
 </div>
 <footer>
   <p>The Blockchain Trilemma was first articulated by <strong>Vitalik Buterin</strong> in 2017. Its profound implications for Bitcoin as sound money have been extensively explored by <strong>Jeff Booth</strong>.</p>
-  <p style="margin-top: 8px;"><a href="/">Last Coin Standing</a> · Bitcoin education through contrast and clarity</p>
+  <p style="margin-top: 8px;"><a href="/about.html">About</a> &middot; Bitcoin education through contrast and clarity</p>
 </footer>
 <script>
 (function() {
