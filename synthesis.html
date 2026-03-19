@@ -755,9 +755,13 @@ function deactivateCore() {
 }
 
 function startCircuitPulse() {
-    // Mesh lines pulse
+    // Mesh lines: lock drawn state, remove draw animation, then pulse
     var meshLines = document.querySelectorAll('.mesh-line.active');
     for (var i = 0; i < meshLines.length; i++) {
+        meshLines[i].style.strokeDashoffset = '0';
+        meshLines[i].style.opacity = '1';
+        meshLines[i].style.strokeDasharray = 'none';
+        meshLines[i].classList.remove('active');
         meshLines[i].classList.add('mesh-alive');
         meshLines[i].style.animationDelay = (i * 0.2) + 's';
     }
