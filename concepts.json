@@ -16,7 +16,7 @@
       "ring": 0,
       "position": "center",
       "tag": "The Foundation",
-      "desc": "Bitcoin is the first and only money to simultaneously achieve every property represented here - properties that no previous money, including gold, has ever accomplished together. Each circle represents one critical dimension. Together they describe what is arguably the most important monetary breakthrough in human civilization.",
+      "desc": "Bitcoin is a network protocol — the first and only money to simultaneously achieve every property represented here. Properties that no previous money, including gold, has ever accomplished together. Each circle represents one critical dimension. Together they describe what is arguably the most important monetary breakthrough in human civilization.",
       "relation": "Every outer circle flows from and reinforces the center. Bitcoin is not any single property - it is the unprecedented <strong>convergence</strong> of all of them."
     },
     {
@@ -88,7 +88,7 @@
       "ring": 2,
       "position": "upper-right-a",
       "tag": "Emergent Property",
-      "desc": "Bitcoin is a true bearer instrument - it can be owned completely, with no dependency on any third party. Self-custody means no rehypothecation risk, no fractional reserve, no confiscation. The trend in bitcoin is toward decentralization and distribution of custody, making state expropriation or even capital controls practically impossible. While self-custody of physical gold is possible, it can be impractical, especially at scale.",
+      "desc": "Bitcoin is a true bearer instrument - it can be owned completely, with no dependency on any third party. Self-custody means no rehypothecation risk, no fractional reserve, no confiscation. The trend in bitcoin is toward decentralization and distribution of custody, making state expropriation or even capital controls practically impossible. While self-custody of physical gold is possible, it can be impractical, especially at scale, and so tends toward centralization of custody with third parties.",
       "relation": "Enabled by <strong>Proof of Work</strong> security and <strong>Digital</strong> portability. This is private property on a level never before possible."
     },
     {
@@ -115,7 +115,7 @@
       "ring": 2,
       "position": "lower-right-a",
       "tag": "Emergent Property",
-      "desc": "Bitcoin carries no nation-state affiliation. The ~180 fiat currencies fragment the global economy along political lines, adding pointless friction and uncertainty to every cross-border interaction. Bitcoin is a single, universal language of value that works identically for everyone, everywhere.",
+      "desc": "Bitcoin carries no nation-state affiliation. The ~180 fiat currencies fragment the global economy along political lines, adding pointless friction and uncertainty to every cross-border interaction. Bitcoin is a single, universal language of value that works identically for everyone, everywhere, and always.",
       "relation": "A natural consequence of being <strong>Digital</strong> and <strong>Neutral</strong>. A universal monetary language eliminates the absurdity of foreign exchange."
     },
     {
@@ -124,12 +124,12 @@
       "ring": 2,
       "position": "lower-right-b",
       "tag": "Emergent Property",
-      "desc": "Bitcoin enables direct transactions between any two people on Earth with no intermediary required. No bank approval, no processing delay, no denial of service. This restores a direct, human economic relationship that intermediaries have long extracted from.",
+      "desc": "Bitcoin enables direct transactions between any two people on Earth with no intermediary required. No bank approval, no processing delay, no denial of service. This restores a direct, natural, human economic connection that till now intermediaries and gatekeepers have stifled.",
       "relation": "Combines <strong>Digital</strong> portability with <strong>Open Source</strong> rules anyone can verify. Peer-to-peer is the natural state of honest exchange."
     },
     {
       "id": "trustless",
-      "label": "Trustless",
+      "label": "Trustless (Trust-Minimized)",
       "ring": 2,
       "position": "bottom",
       "tag": "Emergent Property",
@@ -160,7 +160,7 @@
       "ring": 2,
       "position": "left",
       "tag": "Emergent Property",
-      "desc": "No entity can freeze, block, or confiscate your bitcoin. When Canada froze protesters' bank accounts and the U.S. seized Russian deposits, they proved that fiat has a kill switch. Bitcoin has no such vulnerability. Your money is yours.",
+      "desc": "No entity can freeze, block, or confiscate your bitcoin. When Canada froze protesters' bank accounts and the U.S. seized Russian deposits, they proved that fiat has a kill switch. Bitcoin has no such vulnerability. Your money is yours; even more importantly \u2014 your share of the Bitcoin monetary network is secure, for eternity. <a href='/the-half-life.html' style='color:#F7931A;'>Learn why \u2192</a>",
       "relation": "The intersection of <strong>Decentralized</strong> enforcement and <strong>Immutable</strong> rules. What no single party controls, no single party can censor."
     },
     {
