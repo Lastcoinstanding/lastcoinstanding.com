@@ -165,14 +165,27 @@ footer a:hover { text-decoration: underline; }
 @media (max-width: 1024px) { .triangle-wrap { width: 24rem; } .trilemma-stage { gap: 1.5rem; } }
 @media (max-width: 768px) { .trilemma-stage { flex-direction: column; align-items: center; } .triangle-wrap { width: 100%; max-width: 26rem; } .info-panel { min-height: auto; width: 100%; } .layers-grid { grid-template-columns: 1fr; gap: 0.75rem; } .page { padding: 1.5rem 1.25rem 3.5rem; } header { margin-bottom: 2rem; } .btc-choice { padding: 1.75rem 1.25rem; } }
 @media (max-width: 480px) { .page { padding: 1.25rem 1rem 3rem; } header h1 { font-size: 1.35rem; letter-spacing: 0.06em; } header .subtitle { font-size: 0.95rem; } header .intro-text { font-size: 0.9rem; } .triangle-wrap { max-width: 20rem; } .info-panel { padding: 1.25rem 1rem; } .panel-title { font-size: 1.2rem; } .panel-body { font-size: 0.925rem; } .panel-verdict { font-size: 0.9rem; } .example-box .example-content { font-size: 0.875rem; } .btc-choice h2 { font-size: 1.1rem; } .btc-choice p { font-size: 0.925rem; } .layer-card { padding: 1rem; } .layer-desc { font-size: 0.875rem; } }
+
+/* Dropdown nav */
+.nav-dropdown { position: relative; display: inline-block; }
+.nav-dropdown-btn { cursor: pointer; user-select: none; }
+.nav-dropdown-menu { display: none; position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); background: rgba(10,9,8,0.97); border: 1px solid rgba(247,147,26,0.15); border-radius: 8px; padding: 10px 0; min-width: 240px; z-index: 200; backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+.nav-dropdown:hover .nav-dropdown-menu { display: block; }
+.nav-dropdown-menu a { display: block; padding: 9px 24px; font-size: 0.88rem; white-space: nowrap; color: #aaa; text-decoration: none; transition: color 0.2s, background 0.2s; }
+.nav-dropdown-menu a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
+.nav-dropdown-menu a.active { color: var(--orange, #F7931A); background: rgba(247,147,26,0.08); font-weight: 600; }
+
 </style>
 </head>
 <body>
 <nav class="site-nav">
   <a href="/" class="brand">Last Coin Standing</a>
-    <div class="nav-links">
-        <a href="/synthesis.html">The Synthesis</a>
+        <div class="nav-links">
+        <div class="nav-dropdown">
+            <a class="nav-dropdown-btn active" href="#">Explorations ▾</a>
+            <div class="nav-dropdown-menu">
         <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+        <a href="/synthesis.html">The Bitcoin Synthesis</a>
         <a href="/the-bitcoin-migration.html">The Bitcoin Migration</a>
         <a href="/trilemma.html" class="active">The Bitcoin Trilemma</a>
         <a href="/the-half-life.html">The Half-Life</a>
@@ -180,20 +193,24 @@ footer a:hover { text-decoration: underline; }
         <a href="/the-fixed-pie.html">The Bitcoin Fixed Share</a>
         <a href="/the-melting-ice-cube.html">The Melting Ice Cube</a>
         <a href="/not-a-bubble.html">Is Bitcoin a Bubble?</a>
+        <a href="/the-opportunity-cost.html">BTC vs. Real Estate</a>
+            </div>
+        </div>
         <a href="/about.html">About</a>
     </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 <div class="mobile-overlay" id="mobileOverlay">
-    <a href="/synthesis.html">The Synthesis</a>
     <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+    <a href="/synthesis.html">The Bitcoin Synthesis</a>
     <a href="/the-bitcoin-migration.html">The Bitcoin Migration</a>
     <a href="/trilemma.html" class="active">The Bitcoin Trilemma</a>
     <a href="/the-half-life.html">The Half-Life</a>
     <a href="/money-trees.html">Money Trees</a>
     <a href="/the-fixed-pie.html">The Bitcoin Fixed Share</a>
-        <a href="/the-melting-ice-cube.html">The Melting Ice Cube</a>
+    <a href="/the-melting-ice-cube.html">The Melting Ice Cube</a>
     <a href="/not-a-bubble.html">Is Bitcoin a Bubble?</a>
+    <a href="/the-opportunity-cost.html">BTC vs. Real Estate</a>
     <a href="/about.html">About</a>
 </div>
 <div class="page">
