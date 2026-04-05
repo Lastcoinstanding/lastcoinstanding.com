@@ -1062,6 +1062,8 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     pieActivateTab(btn.dataset.tab);
     history.replaceState(null,null,'#'+(pieTabMap[btn.dataset.tab]||btn.dataset.tab));
   });
+window.addEventListener("hashchange",pieInitFromHash);
+pieInitFromHash();
 });
 
 /* ─────────────────────────────────────────
