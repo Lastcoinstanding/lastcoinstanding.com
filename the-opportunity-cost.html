@@ -130,24 +130,24 @@
         .page-footer{position:relative;z-index:1;text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);max-width:1000px;margin:0 auto}
         .page-footer p{font-size:0.85rem;color:var(--text-muted);line-height:1.8}
         .page-footer a{color:var(--amber-dim);text-decoration:none}
-        @media(max-width:768px){.hero{padding:6rem 1.5rem 3rem}.content-area{padding:0 1rem 4rem}.chart-container{padding:1.2rem}.chart-wrapper{height:280px}.tab-btn{padding:0.8rem 1rem;font-size:0.75rem}.calc-results{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.site-nav .nav-links{display:none}.hamburger{display:block}.era-block{grid-template-columns:100px 1fr 60px;gap:0.8rem;padding:1rem}.era-ratio .ratio-value{font-size:1.4rem}.era-desc{font-size:0.8rem}}
+        
+/* Hamburger */
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;z-index:1100}
+.hamburger span{display:block;width:22px;height:2px;background:#aaa;margin:5px 0;border-radius:1px;transition:transform 0.3s,opacity 0.3s,background 0.3s}
+.hamburger:hover span{background:#ccc}
+.hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+/* Mobile nav overlay */
+.mobile-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,9,8,0.97);z-index:1050;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.mobile-overlay.show{display:flex;opacity:1}
+.mobile-overlay a{font-family:'DM Sans',sans-serif;font-size:1.1rem;font-weight:500;color:#aaa;text-decoration:none;padding:14px 32px;border-radius:6px;transition:color 0.2s,background 0.2s}
+.mobile-overlay a:hover{color:#ccc;background:rgba(255,255,255,0.04)}
+.mobile-overlay a.active{color:var(--amber);background:rgba(224,148,34,0.08);font-weight:600}
+
+        @media(max-width:768px){.hero{padding:6rem 1.5rem 3rem}.content-area{padding:0 1rem 4rem}.chart-container{padding:1.2rem}.chart-wrapper{height:280px}.tab-btn{padding:0.8rem 1rem;font-size:0.75rem}.calc-results{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.site-nav .nav-links{display:none}.hamburger{display:block}.era-block{grid-template-columns:100px 1fr 60px;gap:0.8rem;padding:1rem}.era-ratio .ratio-value{font-size:1.4rem}.era-desc{font-size:0.8rem}.tab-nav{position:relative;mask-image:linear-gradient(90deg,#000 85%,transparent);-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent)}#totalSummary{grid-template-columns:1fr!important}#dcaResultContainer{margin-left:0}.dca-grid{grid-template-columns:1fr!important}}
         @media(max-width:480px){.chart-wrapper{height:240px}.stats-row{grid-template-columns:1fr}.stat-card .stat-value{font-size:1.8rem}.era-block{grid-template-columns:80px 1fr 55px}.section-intro p{font-size:0.95rem}.narrative p{font-size:0.95rem}}
     
-
-/* Hamburger */
-.hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; z-index: 1100; }
-.hamburger span { display: block; width: 22px; height: 2px; background: #aaa; margin: 5px 0; border-radius: 1px; transition: transform 0.3s, opacity 0.3s, background 0.3s; }
-.hamburger:hover span { background: #ccc; }
-.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
-.hamburger.open span:nth-child(2) { opacity: 0; }
-.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
-
-/* Mobile nav overlay */
-.mobile-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,9,8,0.97); z-index: 1050; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
-.mobile-overlay.show { display: flex; opacity: 1; }
-.mobile-overlay a { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 500; color: #aaa; text-decoration: none; padding: 14px 32px; border-radius: 6px; transition: color 0.2s, background 0.2s; }
-.mobile-overlay a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
-.mobile-overlay a.active { color: var(--amber); background: rgba(224,148,34,0.08); font-weight: 600; }
 
 /* Dropdown nav */
 .nav-dropdown { position: relative; display: inline-block; }
@@ -331,7 +331,7 @@
                     </label>
                     <div id="dcaSection" style="display:none">
                         <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:1.2rem;line-height:1.7;padding:1rem;background:rgba(224,148,34,0.04);border-radius:6px">If you rent instead of buying, your monthly housing cost is typically lower than a mortgage payment. The difference — invested in bitcoin each month — compounds the opportunity cost dramatically over time.</div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+                        <div class="dca-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
                             <div></div>
                             <div id="dcaResultContainer"></div>
                         </div>
