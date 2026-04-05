@@ -388,7 +388,7 @@ footer a:hover { text-decoration: underline; }
     pointer-events: none;
     padding: 2rem 2.5rem;
     background: rgba(20,18,16,0.85);
-    border: 1px solid rgba(247,147,26,0.12);
+    border: 1.5px solid rgba(247,147,26,0.3);
     border-radius: 12px;
     backdrop-filter: blur(8px);
     box-shadow: 0 0 40px rgba(247,147,26,0.04), 0 1px 0 rgba(247,147,26,0.1);
@@ -459,6 +459,39 @@ footer a:hover { text-decoration: underline; }
     background: rgba(247,147,26,0.08);
     border-color: var(--orange);
 }
+
+.insight-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background: rgba(10,9,8,0.7);
+    border: 1px solid rgba(247,147,26,0.25);
+    border-radius: 50%;
+    color: var(--orange);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s, border-color 0.3s;
+    z-index: 10;
+    padding: 0;
+    line-height: 1;
+}
+.insight-arrow:hover {
+    background: rgba(247,147,26,0.12);
+    border-color: var(--orange);
+}
+.insight-arrow.prev { left: -16px; }
+.insight-arrow.next { right: -16px; }
+@media (max-width: 768px) {
+    .insight-arrow { width: 34px; height: 34px; font-size: 0.9rem; }
+    .insight-arrow.prev { left: -6px; }
+    .insight-arrow.next { right: -6px; }
+}
+
 .insight-dots {
     display: flex;
     justify-content: center;
@@ -563,6 +596,8 @@ footer a:hover { text-decoration: underline; }
 <!-- FEATURED INSIGHTS CAROUSEL -->
 <div class="insight-carousel">
     <div class="insight-slides" id="insightSlides">
+        <button class="insight-arrow prev" id="insightPrev" aria-label="Previous">&#8249;</button>
+        <button class="insight-arrow next" id="insightNext" aria-label="Next">&#8250;</button>
 
         <!-- Slide 1: BTC vs Real Estate -->
         <div class="insight-slide active">
@@ -1090,17 +1125,20 @@ footer a:hover { text-decoration: underline; }
 (function() {
     var slides = document.querySelectorAll('.insight-slide');
     var dotsContainer = document.getElementById('insightDots');
+    var prevBtn = document.getElementById('insightPrev');
+    var nextBtn = document.getElementById('insightNext');
     if (!slides.length || !dotsContainer) return;
     
     var current = 0;
     var timer;
+    var autoPlay = true;
     
     // Create dots
     slides.forEach(function(_, i) {
         var dot = document.createElement('button');
         dot.className = 'insight-dot' + (i === 0 ? ' active' : '');
         dot.setAttribute('aria-label', 'Slide ' + (i + 1));
-        dot.addEventListener('click', function() { goTo(i); });
+        dot.addEventListener('click', function() { stopAuto(); goTo(i); });
         dotsContainer.appendChild(dot);
     });
     
@@ -1110,17 +1148,27 @@ footer a:hover { text-decoration: underline; }
         current = n;
         slides[current].classList.add('active');
         dotsContainer.children[current].classList.add('active');
-        resetTimer();
     }
     
     function next() { goTo((current + 1) % slides.length); }
+    function prev() { goTo((current - 1 + slides.length) % slides.length); }
     
-    function resetTimer() {
+    function stopAuto() {
+        autoPlay = false;
+        clearInterval(timer);
+    }
+    
+    function startAuto() {
+        if (!autoPlay) return;
         clearInterval(timer);
         timer = setInterval(next, 7000);
     }
     
-    resetTimer();
+    // Arrow buttons
+    if (prevBtn) prevBtn.addEventListener('click', function() { stopAuto(); prev(); });
+    if (nextBtn) nextBtn.addEventListener('click', function() { stopAuto(); next(); });
+    
+    startAuto();
 })();
 </script>
 </body>
