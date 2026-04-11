@@ -1002,7 +1002,6 @@ footer a:hover { text-decoration: underline; }
     var autoPlay = true;
     var advanceTimer = null;
 
-    // Create dots
     slides.forEach(function(_, i) {
         var dot = document.createElement('button');
         dot.className = 'insight-dot' + (i === 0 ? ' active' : '');
@@ -1013,11 +1012,12 @@ footer a:hover { text-decoration: underline; }
 
     function attachVideo(vid) {
         if (!vid) return;
+        vid.loop = false;
         vid.ontimeupdate = function() {
             if (!vid.duration) return;
-            // Intercept 0.2s before end — pause on true last frame
-            if (vid.currentTime >= vid.duration - 0.2) {
-                vid.ontimeupdate = null; // prevent re-firing
+            // Intercept 0.5s before end to avoid browser reset flash
+            if (vid.currentTime >= vid.duration - 0.5) {
+                vid.ontimeupdate = null;
                 vid.pause();
                 if (autoPlay && !advanceTimer) {
                     advanceTimer = setTimeout(function() {
@@ -1032,10 +1032,10 @@ footer a:hover { text-decoration: underline; }
     function goTo(n) {
         if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
 
-        // Stop previous video cleanly
         var prevVid = slides[current].querySelector('video.carousel-video');
         if (prevVid) {
             prevVid.ontimeupdate = null;
+            prevVid.loop = false;
             prevVid.pause();
             prevVid.currentTime = 0;
         }
@@ -1049,8 +1049,13 @@ footer a:hover { text-decoration: underline; }
         var vid = slides[current].querySelector('video.carousel-video');
         if (vid) {
             if (vid.readyState === 0) { vid.load(); }
+            vid.loop = false;
             vid.currentTime = 0;
-            attachVideo(vid);
+            if (autoPlay) {
+                attachVideo(vid); // intercept near-end for auto advance
+            } else {
+                vid.loop = true;  // user is manually browsing — loop the video
+            }
             vid.play().catch(function(){});
         }
     }
@@ -1061,12 +1066,14 @@ footer a:hover { text-decoration: underline; }
     function stopAuto() {
         autoPlay = false;
         if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
+        // Switch current video to loop mode
+        var vid = slides[current].querySelector('video.carousel-video');
+        if (vid) { vid.ontimeupdate = null; vid.loop = true; }
     }
 
     if (prevBtn) prevBtn.addEventListener('click', function() { stopAuto(); prev(); });
     if (nextBtn) nextBtn.addEventListener('click', function() { stopAuto(); next(); });
 
-    // Initialise first slide
     var firstVid = slides[0].querySelector('video.carousel-video');
     if (firstVid) {
         firstVid.load();
