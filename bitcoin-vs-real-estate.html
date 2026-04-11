@@ -651,6 +651,7 @@
             const lr='color:var(--red)';
             const la='color:var(--amber)';
             totalWrapper.style.display='block';
+            var _bh = (function(){var lh = Math.max(0, totalHouses);var fH = Math.floor(lh);var pt = lh - fH;var ic = "";for (var i = 0; i < Math.min(fH, 15); i++) ic += houseFilled32;if (pt > 0.05) ic += housePartial32;if (fH === 0 && pt <= 0.05) ic += housePartial32;var ov = (fH > 15) ? ('<span style="font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center">+' + (fH - 15) + ' more</span>') : "";return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:0.4rem 0 0.6rem;justify-content:flex-end">' + ic + ov + '</div>';})();
             totalSummary.innerHTML=
                 '<div style="background:var(--bg-card);border:1px solid var(--red-dim);border-radius:8px;padding:1.5rem 2rem">'+
                     '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--red);margin-bottom:0.5rem">\uD83C\uDFE0 House — Total Position</div>'+
@@ -667,7 +668,7 @@
                 '</div>'+
                 '<div style="background:var(--bg-card);border:1px solid var(--amber-dim);border-radius:8px;padding:1.5rem 2rem;text-align:right">'+
                     '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);margin-bottom:0.5rem">\u20BF Bitcoin — Total Position</div>'+
-                    '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.3rem">$'+Math.round(totalBtcNet).toLocaleString()+' <span style="font-size:0.8rem;color:var(--text-muted)">net</span></div>'+
+                    '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.3rem">$'+Math.round(totalBtcNet).toLocaleString()+' <span style="font-size:0.8rem;color:var(--text-muted)">net</span></div>'+_bh+
                     '<div style="font-size:0.78rem;color:var(--amber-dim);margin-bottom:0.6rem">values as of '+asOf+'</div>'+
                     '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'+
                         '<div style="'+ls+la+'">Ownership: <strong>the house, outright</strong></div>'+
