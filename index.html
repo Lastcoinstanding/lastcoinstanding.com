@@ -1034,7 +1034,9 @@ footer a:hover { text-decoration: underline; }
             prevVid.ontimeupdate = null;
             prevVid.loop = false;
             prevVid.pause();
-            prevVid.currentTime = 0;
+            // Do NOT rewind here — we want the outgoing video to hold its
+            // current frame during the cross-fade. It gets rewound on the
+            // way back in (incoming branch sets currentTime = 0 before play).
         }
 
         slides[current].classList.remove('active');
