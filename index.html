@@ -1015,15 +1015,12 @@ footer a:hover { text-decoration: underline; }
         vid.loop = false;
         vid.ontimeupdate = function() {
             if (!vid.duration) return;
-            // Intercept 0.5s before end to avoid browser reset flash
-            if (vid.currentTime >= vid.duration - 0.5) {
+            // Intercept 1.2s before end so the slide cross-fade begins while
+            // the outgoing video is still playing — no freeze, no end-flash.
+            if (vid.currentTime >= vid.duration - 1.2) {
                 vid.ontimeupdate = null;
-                vid.pause();
-                if (autoPlay && !advanceTimer) {
-                    advanceTimer = setTimeout(function() {
-                        advanceTimer = null;
-                        goTo((current + 1) % slides.length);
-                    }, 2000);
+                if (autoPlay) {
+                    goTo((current + 1) % slides.length);
                 }
             }
         };
