@@ -1033,6 +1033,7 @@ footer a:hover { text-decoration: underline; }
             vid.play().catch(function(){});
             // When video ends, wait 1s then advance (if autoPlay still on)
             vid.onended = function() {
+                vid.pause(); // freeze on last frame
                 if (autoPlay) {
                     endedTimer = setTimeout(function() {
                         goTo((current + 1) % slides.length);
@@ -1060,6 +1061,7 @@ footer a:hover { text-decoration: underline; }
         firstVid.load();
         firstVid.play().catch(function(){});
         firstVid.onended = function() {
+            firstVid.pause(); // freeze on last frame
             if (autoPlay) {
                 endedTimer = setTimeout(function() {
                     goTo(1);
