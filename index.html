@@ -1000,7 +1000,7 @@ footer a:hover { text-decoration: underline; }
 
     var current = 0;
     var autoPlay = true;
-    var endedTimer = null;
+    var advanceTimer = null;
 
     // Create dots
     slides.forEach(function(_, i) {
@@ -1011,13 +1011,34 @@ footer a:hover { text-decoration: underline; }
         dotsContainer.appendChild(dot);
     });
 
-    function goTo(n) {
-        // Cancel any pending auto-advance
-        if (endedTimer) { clearTimeout(endedTimer); endedTimer = null; }
+    function attachVideo(vid) {
+        if (!vid) return;
+        vid.ontimeupdate = function() {
+            if (!vid.duration) return;
+            // Intercept 0.2s before end — pause on true last frame
+            if (vid.currentTime >= vid.duration - 0.2) {
+                vid.ontimeupdate = null; // prevent re-firing
+                vid.pause();
+                if (autoPlay && !advanceTimer) {
+                    advanceTimer = setTimeout(function() {
+                        advanceTimer = null;
+                        goTo((current + 1) % slides.length);
+                    }, 2000);
+                }
+            }
+        };
+    }
 
-        // Pause & reset previous slide video
+    function goTo(n) {
+        if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
+
+        // Stop previous video cleanly
         var prevVid = slides[current].querySelector('video.carousel-video');
-        if (prevVid) { prevVid.pause(); prevVid.currentTime = 0; }
+        if (prevVid) {
+            prevVid.ontimeupdate = null;
+            prevVid.pause();
+            prevVid.currentTime = 0;
+        }
 
         slides[current].classList.remove('active');
         dotsContainer.children[current].classList.remove('active');
@@ -1025,21 +1046,12 @@ footer a:hover { text-decoration: underline; }
         slides[current].classList.add('active');
         dotsContainer.children[current].classList.add('active');
 
-        // Load and play new slide video
         var vid = slides[current].querySelector('video.carousel-video');
         if (vid) {
             if (vid.readyState === 0) { vid.load(); }
             vid.currentTime = 0;
+            attachVideo(vid);
             vid.play().catch(function(){});
-            // When video ends, wait 1s then advance (if autoPlay still on)
-            vid.onended = function() {
-                vid.pause(); // freeze on last frame
-                if (autoPlay) {
-                    endedTimer = setTimeout(function() {
-                        goTo((current + 1) % slides.length);
-                    }, 2000);
-                }
-            };
         }
     }
 
@@ -1048,26 +1060,18 @@ footer a:hover { text-decoration: underline; }
 
     function stopAuto() {
         autoPlay = false;
-        if (endedTimer) { clearTimeout(endedTimer); endedTimer = null; }
+        if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
     }
 
-    // Arrow buttons
     if (prevBtn) prevBtn.addEventListener('click', function() { stopAuto(); prev(); });
     if (nextBtn) nextBtn.addEventListener('click', function() { stopAuto(); next(); });
 
-    // Play first slide video on load
+    // Initialise first slide
     var firstVid = slides[0].querySelector('video.carousel-video');
     if (firstVid) {
         firstVid.load();
+        attachVideo(firstVid);
         firstVid.play().catch(function(){});
-        firstVid.onended = function() {
-            firstVid.pause(); // freeze on last frame
-            if (autoPlay) {
-                endedTimer = setTimeout(function() {
-                    goTo(1);
-                }, 2000);
-            }
-        };
     }
 })();
 </script>
