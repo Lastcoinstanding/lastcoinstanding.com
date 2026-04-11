@@ -428,6 +428,13 @@ footer a:hover { text-decoration: underline; }
     border-radius: 9px;
     display: block;
 }
+@media (max-width: 768px) {
+    .carousel-video {
+        min-height: 0;
+        max-height: 280px;
+        object-fit: contain;
+    }
+}
 .insight-text {
     display: flex;
     flex-direction: column;
@@ -535,13 +542,14 @@ footer a:hover { text-decoration: underline; }
     .insight-slide {
         grid-template-columns: 1fr;
         gap: 1.5rem;
-        padding: 0;
+        padding: 0 0.5rem;
     }
     .insight-slides {
-        min-height: 600px;
+        min-height: 640px;
     }
     .insight-visual {
-        min-height: 200px;
+        min-height: 260px;
+        max-height: 280px;
     }
     .insight-headline {
         font-size: 1.25rem;
