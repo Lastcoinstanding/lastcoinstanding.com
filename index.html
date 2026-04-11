@@ -635,7 +635,7 @@ footer a:hover { text-decoration: underline; }
         <!-- Slide 1: BTC vs Real Estate -->
         <div class="insight-slide active">
             <div class="insight-visual video-visual">
-                <video class="carousel-video" id="vid-0" muted loop playsinline preload="none">
+                <video class="carousel-video" id="vid-0" muted playsinline preload="none">
                     <source src="/videos/real-estate.mp4" type="video/mp4">
                 </video>
             </div>
@@ -650,7 +650,7 @@ footer a:hover { text-decoration: underline; }
         <!-- Slide 2: Is Bitcoin a Bubble? -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
-                <video class="carousel-video" id="vid-1" muted loop playsinline preload="none">
+                <video class="carousel-video" id="vid-1" muted playsinline preload="none">
                     <source src="/videos/bubble.mp4" type="video/mp4">
                 </video>
             </div>
@@ -665,7 +665,7 @@ footer a:hover { text-decoration: underline; }
         <!-- Slide 3: The Half-Life -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
-                <video class="carousel-video" id="vid-2" muted loop playsinline preload="none">
+                <video class="carousel-video" id="vid-2" muted playsinline preload="none">
                     <source src="/videos/candle-burn-out.mp4" type="video/mp4">
                 </video>
             </div>
@@ -680,7 +680,7 @@ footer a:hover { text-decoration: underline; }
         <!-- Slide 4: The Melting Ice Cube -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
-                <video class="carousel-video" id="vid-3" muted loop playsinline preload="none">
+                <video class="carousel-video" id="vid-3" muted playsinline preload="none">
                     <source src="/videos/melting-ice-cube.mp4" type="video/mp4">
                 </video>
             </div>
@@ -695,7 +695,7 @@ footer a:hover { text-decoration: underline; }
         <!-- Slide 5: The Synthesis -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
-                <video class="carousel-video" id="vid-4" muted loop playsinline preload="none">
+                <video class="carousel-video" id="vid-4" muted playsinline preload="none">
                     <source src="/videos/synthesis.mp4" type="video/mp4">
                 </video>
             </div>
@@ -711,7 +711,7 @@ footer a:hover { text-decoration: underline; }
         <!-- Slide 6: What Bitcoin Is -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
-                <video class="carousel-video" id="vid-5" muted loop playsinline preload="none">
+                <video class="carousel-video" id="vid-5" muted playsinline preload="none">
                     <source src="/videos/what-bitcoin-is.mp4" type="video/mp4">
                 </video>
             </div>
@@ -726,7 +726,7 @@ footer a:hover { text-decoration: underline; }
         <!-- Slide 7: The Bitcoin Migration -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
-                <video class="carousel-video" id="vid-6" muted loop playsinline preload="none">
+                <video class="carousel-video" id="vid-6" muted playsinline preload="none">
                     <source src="/videos/migration.mp4" type="video/mp4">
                 </video>
             </div>
@@ -741,7 +741,7 @@ footer a:hover { text-decoration: underline; }
         <!-- Slide 8: The Trilemma -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
-                <video class="carousel-video" id="vid-7" muted loop playsinline preload="none">
+                <video class="carousel-video" id="vid-7" muted playsinline preload="none">
                     <source src="/videos/trilemma.mp4" type="video/mp4">
                 </video>
             </div>
@@ -756,7 +756,7 @@ footer a:hover { text-decoration: underline; }
         <!-- Slide 9: Money Trees -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
-                <video class="carousel-video" id="vid-8" muted loop playsinline preload="none">
+                <video class="carousel-video" id="vid-8" muted playsinline preload="none">
                     <source src="/videos/money-trees.mp4" type="video/mp4">
                 </video>
             </div>
@@ -771,7 +771,7 @@ footer a:hover { text-decoration: underline; }
         <!-- Slide 10: The Fixed Pie -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
-                <video class="carousel-video" id="vid-9" muted loop playsinline preload="none">
+                <video class="carousel-video" id="vid-9" muted playsinline preload="none">
                     <source src="/videos/fixed-pie.mp4" type="video/mp4">
                 </video>
             </div>
@@ -997,11 +997,11 @@ footer a:hover { text-decoration: underline; }
     var prevBtn = document.getElementById('insightPrev');
     var nextBtn = document.getElementById('insightNext');
     if (!slides.length || !dotsContainer) return;
-    
+
     var current = 0;
-    var timer;
     var autoPlay = true;
-    
+    var endedTimer = null;
+
     // Create dots
     slides.forEach(function(_, i) {
         var dot = document.createElement('button');
@@ -1010,50 +1010,63 @@ footer a:hover { text-decoration: underline; }
         dot.addEventListener('click', function() { stopAuto(); goTo(i); });
         dotsContainer.appendChild(dot);
     });
-    
+
     function goTo(n) {
+        // Cancel any pending auto-advance
+        if (endedTimer) { clearTimeout(endedTimer); endedTimer = null; }
+
         // Pause & reset previous slide video
         var prevVid = slides[current].querySelector('video.carousel-video');
         if (prevVid) { prevVid.pause(); prevVid.currentTime = 0; }
-        
+
         slides[current].classList.remove('active');
         dotsContainer.children[current].classList.remove('active');
         current = n;
         slides[current].classList.add('active');
         dotsContainer.children[current].classList.add('active');
-        
+
         // Load and play new slide video
         var vid = slides[current].querySelector('video.carousel-video');
         if (vid) {
             if (vid.readyState === 0) { vid.load(); }
             vid.currentTime = 0;
             vid.play().catch(function(){});
+            // When video ends, wait 1s then advance (if autoPlay still on)
+            vid.onended = function() {
+                if (autoPlay) {
+                    endedTimer = setTimeout(function() {
+                        goTo((current + 1) % slides.length);
+                    }, 1000);
+                }
+            };
         }
     }
-    
+
     function next() { goTo((current + 1) % slides.length); }
     function prev() { goTo((current - 1 + slides.length) % slides.length); }
-    
+
     function stopAuto() {
         autoPlay = false;
-        clearInterval(timer);
+        if (endedTimer) { clearTimeout(endedTimer); endedTimer = null; }
     }
-    
-    function startAuto() {
-        if (!autoPlay) return;
-        clearInterval(timer);
-        timer = setInterval(next, 5000);
-    }
-    
+
     // Arrow buttons
     if (prevBtn) prevBtn.addEventListener('click', function() { stopAuto(); prev(); });
     if (nextBtn) nextBtn.addEventListener('click', function() { stopAuto(); next(); });
-    
-    startAuto();
-    
+
     // Play first slide video on load
     var firstVid = slides[0].querySelector('video.carousel-video');
-    if (firstVid) { firstVid.load(); firstVid.play().catch(function(){}); }
+    if (firstVid) {
+        firstVid.load();
+        firstVid.play().catch(function(){});
+        firstVid.onended = function() {
+            if (autoPlay) {
+                endedTimer = setTimeout(function() {
+                    goTo(1);
+                }, 1000);
+            }
+        };
+    }
 })();
 </script>
 </body>
