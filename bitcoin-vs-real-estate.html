@@ -576,12 +576,11 @@
             houseTotalSpent=(monthlyMortgage*mps)+dp+pt+ins+mnt;
             const interestMain=Math.round((monthlyMortgage*mps)-(la-bal));
             hL='$'+Math.round(houseEquity).toLocaleString();
-            hD='<span>Down payment: $'+dp.toLocaleString()+' (20% of $'+hs.toLocaleString()+')</span><br>'+
+            var _fh=Math.max(0,Math.min(20,equityPct*0.20));var _ev='<div style=\"display:flex;align-items:center;gap:0.6rem;margin-bottom:0.8rem\"><svg viewBox=\"0 0 24 24\" width=\"44\" height=\"44\"><defs><clipPath id=\"ec\"><rect x=\"0\" y=\"'+(24-_fh)+'\" width=\"24\" height=\"'+_fh+'\"/></clipPath></defs><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"#5a4a42\" stroke-width=\"1.2\" stroke-linejoin=\"round\"/><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.5\" stroke-linejoin=\"round\" clip-path=\"url(#ec)\"/></svg><span style=\"font-size:0.9rem;color:var(--text)\">'+(equityPct<0?'<span style=\\\'color:var(--red)\\\'>Underwater</span>':equityPct+'% owned')+'</span></div>';hD=_ev+'<span>Down payment: $'+dp.toLocaleString()+' (20% of $'+hs.toLocaleString()+')</span><br>'+
                'Monthly mortgage: $'+Math.round(monthlyMortgage).toLocaleString()+'/mo<br>'+
                'Interest paid so far: <span style="color:var(--red)">$'+interestMain.toLocaleString()+'</span> <span style="font-size:0.78rem;color:var(--text-muted)">(dead money)</span><br>'+
                'Remaining loan: <span style="color:var(--red)">$'+Math.round(bal).toLocaleString()+'</span><br>'+
-               'Rent paid: $0 <span style="font-size:0.78rem;color:var(--text-muted)">(you live in it)</span><br>'+
-               'Equity: '+equityPct+'% of home value';
+               'Rent paid: $0 <span style="font-size:0.78rem;color:var(--text-muted)">(you live in it)</span>';
         }
 
         // ── MAIN CARDS ──
@@ -594,7 +593,7 @@
             '<div class="calc-result-card bitcoin">'+
                 '<h4>\u20BF Bought Bitcoin + Rented ('+sy+') <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">· values as of '+asOf+'</span></h4>'+
                 '<div class="result-value">$'+Math.round(lumpValue).toLocaleString()+' <span style="font-size:0.85rem;color:var(--text-muted)">gross</span></div>'+
-                '<div class="result-detail">'+
+                '<div class="result-detail">'+(function(){var lh=lumpHouses;var fH=Math.floor(lh);var pt=lh-fH;var ic='';var fI='<svg viewBox=\"0 0 24 24\" width=\"28\" height=\"28\" style=\"margin:1px\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/></svg>';var pI='<svg viewBox=\"0 0 24 24\" width=\"28\" height=\"28\" style=\"margin:1px;opacity:0.45\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.2\" stroke-dasharray=\"2 2\" stroke-linejoin=\"round\"/></svg>';for(var i=0;i<Math.min(fH,15);i++)ic+=fI;if(pt>0.05)ic+=pI;var ov=fH>15?'<span style=\"font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center\">+'+(fH-15)+' more</span>':'';return '<div style=\"display:flex;flex-wrap:wrap;align-items:center;gap:0;margin-bottom:0.8rem\">'+ic+ov+'</div>';})()+
                     '<span>Invested: $'+dp.toLocaleString()+'</span><br>'+
                     'BTC purchased: '+bb.toFixed(2)+' @ $'+bs.toLocaleString()+'<br>'+
                     'Est. monthly rent: $'+estRent.toLocaleString()+'/mo <span style="font-size:0.78rem;color:var(--text-muted)">(vs. mortgage $'+Math.round(mortgageMonthly).toLocaleString()+')</span><br>'+
