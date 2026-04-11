@@ -443,8 +443,9 @@
             const fullH=Math.floor(houses);
             const partial=houses-fullH;
             let btcIcons='';
-            for(let i=0;i<Math.min(fullH,20);i++)btcIcons+=houseFilled;
-            if(partial>0.25)btcIcons+=housePartial;
+            for(let i=0;i<Math.min(fullH,15);i++)btcIcons+=houseFilled;
+            if(partial>0.05)btcIcons+=housePartial;
+            if(fullH>15)btcIcons+='<span style="font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center">+'+(fullH-15)+' more\</span>';
             // Mortgage reality
             const loan=s.homePrice-invest;
             const yrsElapsed=2025-s.year;
@@ -464,7 +465,7 @@
             // Mortgage side
             html+='<div>';
             html+='<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem"><div style="font-family:Cormorant Garamond,serif;font-size:1.1rem;color:var(--red)">'+s.year+'</div><div style="font-size:0.82rem;color:var(--text-muted)">$'+invest.toLocaleString()+' → Down payment</div></div>';
-            html+='<div style="min-height:32px">'+houseHollow+'</div>';
+            var fillH=Math.max(0,Math.min(20,equityPct*0.20));var eqHouse='<svg viewBox="0 0 24 24" width="40" height="40" style="margin:1px"><defs><clipPath id="c'+s.year+'"><rect x="0" y="'+(24-fillH)+'" width="24" height="'+fillH+'"/></clipPath></defs><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#5a4a42" stroke-width="1.2" stroke-linejoin="round"/><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linejoin="round" clip-path="url(#c'+s.year+')"/></svg>';html+='<div style="min-height:32px;display:flex;align-items:center;gap:0.5rem">'+eqHouse+'<span style="font-size:0.78rem;color:var(--text-muted)">'+(equityPct<0?'<span style=\'color:var(--red)\'>Underwater</span>':equityPct+'% owned')+'</span></div>';
             html+='<div style="font-size:0.82rem;color:var(--text-muted);margin-top:0.4rem">1 house · '+equityPct+'% equity · <span style="color:var(--red)">$'+bal.toLocaleString()+' still owed</span></div>';
             html+='</div>';
             html+='</div>';
