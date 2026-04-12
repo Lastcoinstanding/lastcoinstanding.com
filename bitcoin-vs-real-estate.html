@@ -319,6 +319,7 @@
                     </div>
                 </div>
                 <div id="calcAssumptions" style="font-size:0.82rem;color:var(--text-muted);margin:0 0 1.5rem;padding:0.8rem 1rem;background:rgba(224,148,34,0.04);border-radius:6px;line-height:1.7"></div>
+                <div class="calc-field" style="margin-top:1rem"><label for="customHomePrice" style="display:flex;align-items:center;gap:0.4rem">Your home price <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><input type="text" id="customHomePrice" inputmode="numeric" placeholder="$336,900 (2020 median)" style="height:46px;width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;padding:0 1rem;border-radius:0"><div id="customHomeDisclosure" style="font-size:0.75rem;color:var(--text-muted);font-style:italic;margin-top:0.4rem;line-height:1.5">Calculations assume your home appreciated at the median rate. Your specific home may have appreciated more or less.</div>
                 <div id="calcResultsContainer" class="calc-results"></div>
             </div>
 
@@ -532,11 +533,11 @@
         const mode=document.querySelector('.toggle-btn.active').dataset.mode;
         const dca=document.getElementById('calcDCA').checked;
         const ey=2025;
-        const hs=homeData[sy],he=homeData[ey],bs=btcData[sy],be=btcData[ey];
+        const medianHs=homeData[sy],medianHe=homeData[ey],bs=btcData[sy],be=btcData[ey];const _customRaw=(document.getElementById('customHomePrice')||{}).value||'';const _customNum=parseFloat(_customRaw.replace(/[$,\s]/g,''));const _customValid=!isNaN(_customNum)&&_customNum>=50000&&_customNum<=10000000;const hs=_customValid?_customNum:medianHs;const he=_customValid?Math.round(_customNum*(medianHe/medianHs)):medianHe;const _isCustom=_customValid;
         const rate=mortgageRates[sy],yrs=ey-sy;
         const dp=mode==='cash'?hs:Math.round(hs*0.2);
         const asOf='April 2025';
-        const medianRef='median home: $'+he.toLocaleString();
+        const medianRef=_isCustom?('vs. your $'+Math.round(hs).toLocaleString()+' home'):('median home: $'+he.toLocaleString());
 
         // Assumptions display
         const assumeEl=document.getElementById('calcAssumptions');
@@ -567,7 +568,7 @@
             var _cv='<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.8rem"><svg viewBox="0 0 24 24" width="32" height="32"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="var(--amber)" fill-opacity="0.18" stroke="#e09422" stroke-width="1.7" stroke-linejoin="round"/></svg><span style="font-size:0.9rem;color:var(--text)">1 house, outright</span></div>';
             hD=_cv+'<span>Cash purchase: $'+hs.toLocaleString()+' ('+sy+' median)</span><br>'+
                'Home appreciation: '+ha+'%<br>'+
-               'Current value: $'+Math.round(he).toLocaleString()+'<br>'+
+               'Current value: $'+Math.round(he).toLocaleString()+(_isCustom?' <span style="font-size:0.78rem;color:var(--text-muted)">(applied same appreciation rate)</span>':'')+'<br>'+
                'Rent paid: $0 <span style="font-size:0.78rem;color:var(--text-muted)">(you live in it)</span><br>'+
                'No debt — but no bitcoin either';
         }else{
@@ -715,7 +716,7 @@
     window.addEventListener('hashchange',initTabFromHash);
     initTabFromHash();
     document.querySelectorAll('.toggle-btn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.toggle-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');runCalculator()})});
-    document.getElementById('calcYear').addEventListener('change',runCalculator);
+    document.getElementById('calcYear').addEventListener('change',function(){var cp=document.getElementById('customHomePrice');if(cp){cp.value='';var y=parseInt(this.value);var m=homeData[y];if(m)cp.placeholder='$'+m.toLocaleString()+' ('+y+' median)';}runCalculator();});var _cpEl=document.getElementById('customHomePrice');if(_cpEl){_cpEl.addEventListener('input',runCalculator);var _yVal=parseInt(document.getElementById('calcYear').value);if(homeData[_yVal])_cpEl.placeholder='$'+homeData[_yVal].toLocaleString()+' ('+_yVal+' median)';}
     document.getElementById('calcDCA').addEventListener('change',function(){
         document.getElementById('dcaSection').style.display=this.checked?'block':'none';
         runCalculator();
