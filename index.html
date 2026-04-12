@@ -381,9 +381,9 @@ footer a:hover { text-decoration: underline; }
 .insight-slide {
     position: absolute;
     top: 0; left: 0; right: 0;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
     align-items: center;
     opacity: 0;
     transition: opacity 0.8s ease;
@@ -419,26 +419,35 @@ footer a:hover { text-decoration: underline; }
     overflow: hidden;
     background: #0a0908;
     border: none;
+    width: 100%;
+    max-width: 960px;
+    aspect-ratio: 16 / 9;
+    min-height: 0;
+    border-radius: 10px;
 }
 .carousel-video {
     width: 100%;
     height: 100%;
-    min-height: 420px;
-    object-fit: contain;
-    border-radius: 9px;
+    min-height: 0;
+    object-fit: cover;
+    border-radius: 10px;
     display: block;
 }
 @media (max-width: 768px) {
     .carousel-video {
         min-height: 0;
-        max-height: 280px;
-        object-fit: contain;
+        max-height: none;
+        object-fit: cover;
     }
 }
 .insight-text {
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    align-items: center;
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto;
+    gap: 0.6rem;
 }
 .insight-label {
     font-family: var(--font-body);
@@ -640,10 +649,9 @@ footer a:hover { text-decoration: underline; }
                 </video>
             </div>
             <div class="insight-text">
-                <div class="insight-label">BTC vs. Real Estate</div>
-                <div class="insight-headline">A house didn't used to be <em>an investment</em></div>
-                <div class="insight-desc">In 2017, $64,700 bought a down payment on a median house — or 14.88 BTC. Today, the house has $220K in debt remaining. The bitcoin could buy 3 houses outright.</div>
-                <a href="/bitcoin-vs-real-estate.html" class="insight-cta">Explore the opportunity cost →</a>
+                <div class="insight-label">Bitcoin vs. Real Estate</div>
+                <div class="insight-headline">Housing became the default store of value <em>by elimination, not merit</em></div>
+                <a href="/bitcoin-vs-real-estate.html" class="insight-cta">See the opportunity cost →</a>
             </div>
         </div>
 
@@ -717,9 +725,8 @@ footer a:hover { text-decoration: underline; }
             </div>
             <div class="insight-text">
                 <div class="insight-label">What Bitcoin Is</div>
-                <div class="insight-headline">The interlocking properties that give Bitcoin its <em>monetary premium</em></div>
-                <div class="insight-desc">A flower-of-life visualization mapping Bitcoin's core properties — scarcity, decentralization, immutability, and more. Click each petal to understand how they interlock.</div>
-                <a href="/what-bitcoin-is.html" class="insight-cta">Discover the properties →</a>
+                <div class="insight-headline">Most people consider just a few dimensions. Bitcoin is <em>all of them, simultaneously</em></div>
+                <a href="/what-bitcoin-is.html" class="insight-cta">See the full picture →</a>
             </div>
         </div>
 
