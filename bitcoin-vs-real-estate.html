@@ -145,7 +145,7 @@
 .mobile-overlay a:hover{color:#ccc;background:rgba(255,255,255,0.04)}
 .mobile-overlay a.active{color:var(--amber);background:rgba(224,148,34,0.08);font-weight:600}
 
-        @media(max-width:768px){.hero{padding:6rem 1.5rem 3rem}.content-area{padding:0 1rem 4rem}.chart-container{padding:1.2rem}.chart-wrapper{height:280px}.tab-btn{padding:0.8rem 1rem;font-size:0.75rem}.calc-results{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.site-nav .nav-links{display:none}.hamburger{display:block}.era-block{grid-template-columns:100px 1fr 60px;gap:0.8rem;padding:1rem}.era-ratio .ratio-value{font-size:1.4rem}.era-desc{font-size:0.8rem}.tab-nav{position:relative;mask-image:linear-gradient(90deg,#000 85%,transparent);-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent)}#totalSummary{grid-template-columns:1fr!important}#dcaResultContainer{margin-left:0}.dca-grid{grid-template-columns:1fr!important}}
+        @media(max-width:768px){.hero{padding:6rem 1.5rem 3rem}.content-area{padding:0 1rem 4rem}.chart-container{padding:1.2rem}.chart-wrapper{height:280px}.tab-btn{padding:0.8rem 1rem;font-size:0.75rem}.calc-results{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.site-nav .nav-links{display:none}.hamburger{display:block}.era-block{grid-template-columns:100px 1fr 60px;gap:0.8rem;padding:1rem}.era-ratio .ratio-value{font-size:1.4rem}.era-desc{font-size:0.8rem}.tab-nav{position:relative;mask-image:linear-gradient(90deg,#000 85%,transparent);-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent)}#totalSummary{grid-template-columns:1fr!important}#dcaResultContainer{margin-left:0}.dca-grid{grid-template-columns:1fr!important}#customInputsRow{grid-template-columns:1fr!important}#scenarioControlRow{grid-template-columns:1fr!important;gap:1rem!important}.toggle-btn{font-size:0.72rem!important;padding:0.7rem 0.5rem!important}}
         @media(max-width:480px){.chart-wrapper{height:240px}.stats-row{grid-template-columns:1fr}.stat-card .stat-value{font-size:1.8rem}.era-block{grid-template-columns:80px 1fr 55px}.section-intro p{font-size:0.95rem}.narrative p{font-size:0.95rem}}
     
 
@@ -308,7 +308,7 @@
             </div>
 
             <div class="calculator">
-                <div style="display:grid;grid-template-columns:200px 1fr;gap:1.2rem;align-items:end;margin-bottom:1rem">
+                <div id="scenarioControlRow" style="display:grid;grid-template-columns:200px 1fr;gap:1.2rem;align-items:end;margin-bottom:1rem">
                     <div class="calc-field"><label>Starting Year</label><select id="calcYear" style="height:46px"><option value="2014">2014</option><option value="2015">2015</option><option value="2016">2016</option><option value="2017" selected>2017</option><option value="2018">2018</option><option value="2019">2019</option><option value="2020">2020</option><option value="2021">2021</option></select></div>
                     <div class="calc-field">
                         <label>Scenario</label>
@@ -319,7 +319,7 @@
                     </div>
                 </div>
                 <div id="calcAssumptions" style="font-size:0.82rem;color:var(--text-muted);margin:0 0 1.5rem;padding:0.8rem 1rem;background:rgba(224,148,34,0.04);border-radius:6px;line-height:1.7"></div>
-                <div class="calc-field" style="margin-top:1rem"><label for="customHomePrice" style="display:flex;align-items:center;gap:0.4rem">Your home price <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><input type="text" id="customHomePrice" inputmode="numeric" placeholder="$336,900 (2020 median)" style="height:46px;width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;padding:0 1rem;border-radius:0"><div id="customHomeDisclosure" style="font-size:0.75rem;color:var(--text-muted);font-style:italic;margin-top:0.4rem;line-height:1.5">Calculations assume your home appreciated at the median rate. Your specific home may have appreciated more or less.</div>
+                <div id="customInputsRow" style="margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem"><div class="calc-field"><label for="customHomePrice" style="display:flex;align-items:center;gap:0.4rem">Your home price <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><input type="text" id="customHomePrice" inputmode="numeric" placeholder="$336,900 (2020 median)" style="height:46px;width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;padding:0 1rem;border-radius:0"></div><div class="calc-field"><label for="customRent" style="display:flex;align-items:center;gap:0.4rem">Your monthly rent <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><input type="text" id="customRent" inputmode="numeric" placeholder="$864 (our estimate)" style="height:46px;width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;padding:0 1rem;border-radius:0"></div></div><div id="customHomeDisclosure" style="font-size:0.75rem;color:var(--text-muted);font-style:italic;margin-top:0.6rem;line-height:1.5">Rent is estimated at ~75% of an equivalent mortgage payment. Your home's appreciation is assumed to match the median. Your actual values may differ &mdash; feel free to enter your own.</div>
                 <div id="calcResultsContainer" class="calc-results"></div>
             </div>
 
@@ -552,7 +552,7 @@
         const lumpValue=bb*be;
         const lumpReturn=((lumpValue-dp)/dp*100).toFixed(0);
         const mortgageMonthly=monthlyPayment(hs*0.8,rate,30);
-        const estRent=Math.round(mortgageMonthly*0.75);
+        const _defaultRent=Math.round(mortgageMonthly*0.75);const _rentRaw=(document.getElementById('customRent')||{}).value||'';const _rentNum=parseFloat(_rentRaw.replace(/[$,\s]/g,''));const _rentValid=!isNaN(_rentNum)&&_rentNum>=100&&_rentNum<=50000;const _isCustomRent=_rentValid;const estRent=_rentValid?Math.round(_rentNum):_defaultRent;
         const totalRentPaid=estRent*yrs*12;
         const lumpNet=lumpValue-totalRentPaid;
         const lumpHouses=lumpNet/he;
@@ -600,7 +600,7 @@
                 '<div class="result-detail">'+(function(){var lh=lumpHouses;var fH=Math.floor(lh);var pt=lh-fH;var ic='';var fI='<svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" style=\"margin:1px\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/></svg>';var pI='<svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" style=\"margin:1px;opacity:0.45\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.2\" stroke-dasharray=\"2 2\" stroke-linejoin=\"round\"/></svg>';for(var i=0;i<Math.min(fH,15);i++)ic+=fI;if(pt>0.05)ic+=pI;var ov=fH>15?'<span style=\"font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center\">+'+(fH-15)+' more</span>':'';return '<div style=\"display:flex;flex-wrap:wrap;align-items:center;gap:0;margin-bottom:0.8rem\">'+ic+ov+'</div>';})()+
                     '<span>Invested: $'+dp.toLocaleString()+'</span><br>'+
                     'BTC purchased: '+bb.toFixed(2)+' @ $'+bs.toLocaleString()+'<br>'+
-                    'Est. monthly rent: $'+estRent.toLocaleString()+'/mo <span style="font-size:0.78rem;color:var(--text-muted)">(vs. mortgage $'+Math.round(mortgageMonthly).toLocaleString()+')</span><br>'+
+                    'Est. monthly rent: $'+estRent.toLocaleString()+'/mo'+(mode==='leverage'?(' <span style="font-size:0.78rem;color:var(--text-muted)">(vs. mortgage $'+Math.round(mortgageMonthly).toLocaleString()+')</span>'):'')+'<br>'+
                     'Total rent paid: $'+totalRentPaid.toLocaleString()+'<br>'+
                     '<span style="color:var(--amber);font-weight:500">Net position: $'+Math.round(lumpNet).toLocaleString()+'</span><br>'+
                     '<span style="color:var(--amber);font-weight:500">You could now buy '+lumpHouses.toFixed(1)+' houses <strong>outright</strong></span> <span style="font-size:0.78rem;color:var(--text-muted)">('+medianRef+')</span><br>'+
@@ -686,6 +686,7 @@
             totalWrapper.style.display='none';
             totalSummary.innerHTML='';
         }
+        var _crUpdate=document.getElementById('customRent');if(_crUpdate&&typeof _defaultRent!=='undefined'){_crUpdate.placeholder='$'+_defaultRent.toLocaleString()+' (our estimate)';}
     }
 
     // EVENT LISTENERS
@@ -716,7 +717,7 @@
     window.addEventListener('hashchange',initTabFromHash);
     initTabFromHash();
     document.querySelectorAll('.toggle-btn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.toggle-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');runCalculator()})});
-    document.getElementById('calcYear').addEventListener('change',function(){var cp=document.getElementById('customHomePrice');if(cp){cp.value='';var y=parseInt(this.value);var m=homeData[y];if(m)cp.placeholder='$'+m.toLocaleString()+' ('+y+' median)';}runCalculator();});var _cpEl=document.getElementById('customHomePrice');if(_cpEl){_cpEl.addEventListener('input',runCalculator);var _yVal=parseInt(document.getElementById('calcYear').value);if(homeData[_yVal])_cpEl.placeholder='$'+homeData[_yVal].toLocaleString()+' ('+_yVal+' median)';}
+    document.getElementById('calcYear').addEventListener('change',function(){var cp=document.getElementById('customHomePrice');if(cp){cp.value='';var y=parseInt(this.value);var m=homeData[y];if(m)cp.placeholder='$'+m.toLocaleString()+' ('+y+' median)';}var cr=document.getElementById('customRent');if(cr){cr.value='';}runCalculator();});var _cpEl=document.getElementById('customHomePrice');if(_cpEl){_cpEl.addEventListener('input',runCalculator);var _yVal=parseInt(document.getElementById('calcYear').value);if(homeData[_yVal])_cpEl.placeholder='$'+homeData[_yVal].toLocaleString()+' ('+_yVal+' median)';}var _crEl=document.getElementById('customRent');if(_crEl){_crEl.addEventListener('input',runCalculator);}
     document.getElementById('calcDCA').addEventListener('change',function(){
         document.getElementById('dcaSection').style.display=this.checked?'block':'none';
         runCalculator();
