@@ -375,25 +375,27 @@ footer a:hover { text-decoration: underline; }
 }
 .insight-slides {
     position: relative;
-    min-height: 500px;
     overflow: hidden;
 }
 .insight-slide {
-    position: absolute;
-    top: 0; left: 0; right: 0;
     display: flex;
     flex-direction: column;
-    gap: 1.75rem;
+    gap: 1.5rem;
     align-items: center;
-    opacity: 0;
-    transition: opacity 0.8s ease;
-    pointer-events: none;
     padding: 0 1rem;
     background: transparent;
     border: none;
     border-radius: 0;
     backdrop-filter: none;
     box-shadow: none;
+    grid-area: 1 / 1;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+}
+.insight-slides {
+    display: grid;
+    grid-template-columns: 1fr;
 }
 .insight-slide.active {
     opacity: 1;
@@ -494,7 +496,7 @@ footer a:hover { text-decoration: underline; }
 
 .insight-arrow {
     position: absolute;
-    top: 50%;
+    top: 28%;
     transform: translateY(-50%);
     width: 40px;
     height: 40px;
@@ -519,9 +521,9 @@ footer a:hover { text-decoration: underline; }
 .insight-arrow.prev { left: -16px; }
 .insight-arrow.next { right: -16px; }
 @media (max-width: 768px) {
-    .insight-arrow { width: 34px; height: 34px; font-size: 0.9rem; }
-    .insight-arrow.prev { left: -6px; }
-    .insight-arrow.next { right: -6px; }
+    .insight-arrow { width: 34px; height: 34px; font-size: 0.9rem; top: 22%; }
+    .insight-arrow.prev { left: 4px; }
+    .insight-arrow.next { right: 4px; }
 }
 
 .insight-dots {
