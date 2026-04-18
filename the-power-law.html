@@ -131,6 +131,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 @media(max-width:768px){
 .chart-wrapper{height:300px}
 .compare-grid{grid-template-columns:1fr}
+[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
 .tab-btn{padding:0.8rem 1rem;font-size:.75rem}
 }
 @media(max-width:480px){
@@ -331,46 +332,160 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <div class="section">
       <h2>A System, Not an Asset</h2>
       <p class="prose">Power laws don't describe assets. They describe <em>systems</em> &mdash; complex, self-organizing structures whose growth is governed by internal feedback dynamics rather than external market sentiment. Stocks fluctuate with earnings and psychology. Commodities respond to supply and demand. But systems &mdash; cities, organisms, networks &mdash; scale according to structural rules that produce predictable mathematical relationships across many orders of magnitude.</p>
-      <p class="prose">The fact that Bitcoin follows a power law is evidence of what it actually is: not an asset to be traded, but a <em>system</em> to be understood. Its growth is <em>proportional</em><sup>1</sup> &mdash; scaling as a constant fraction of its own age &mdash; and <em>sustainable</em><sup>1</sup> &mdash; decelerating naturally as the network matures, avoiding the unsustainable acceleration that collapses exponential systems. This same proportional, sustainable pattern appears across biology, urban science, and network theory. Bitcoin is the latest example &mdash; and understanding the precedents makes its trajectory structurally expected rather than surprising.</p>
+      <p class="prose">The fact that Bitcoin follows a power law is evidence of what it actually is: not an asset to be traded, but a <em>system</em> to be understood. Its growth is <em>proportional</em><sup>1</sup> &mdash; scaling as a constant fraction of its own age &mdash; and <em>sustainable</em><sup>1</sup> &mdash; decelerating naturally as the network matures. This same proportional, sustainable pattern appears across biology, urban science, and network theory. Understanding the precedents makes Bitcoin's trajectory structurally expected rather than surprising.</p>
     </div>
 
+    <!-- ── KLEIBER'S LAW ── -->
     <div class="section">
       <h3>Kleiber's Law: How Life Scales</h3>
-      <p class="prose">In 1932, biologist Max Kleiber discovered that metabolic rate across mammals scales with body mass raised to the power of 0.75. A mouse burns far more energy per gram than an elephant. This isn't a coincidence &mdash; it's a structural law that emerges from the branching architecture of biological distribution networks (circulatory systems, respiratory trees). On a log-log chart, every mammalian species falls on the same straight line.</p>
+      <p class="prose">In 1932, biologist Max Kleiber discovered that metabolic rate across mammals scales with body mass raised to the power of 0.75. A mouse burns far more energy per gram than an elephant. This isn't a coincidence &mdash; it's a structural law that emerges from the <em>branching architecture</em> of biological distribution networks: circulatory systems, respiratory trees, and neural pathways all follow the same fractal branching geometry, and that geometry produces power law scaling.</p>
       <div class="chart-container">
         <div class="chart-title">Kleiber's Law: Metabolic Rate vs. Body Mass</div>
         <div class="chart-subtitle">Log-log scale &middot; Representative mammalian species &middot; Exponent &asymp; 0.75</div>
         <div class="chart-wrapper" style="height:280px"><canvas id="kleiberChart"></canvas></div>
-        <div class="chart-source">Data representative of Kleiber's observations. On a log-log scale, the relationship forms a straight line &mdash; the visual signature of a power law. The same straight line appears in Bitcoin's price chart.</div>
+        <div class="chart-source">Data representative of Kleiber's observations. On a log-log scale, every species falls on the same straight line &mdash; the visual signature of a power law. The same straight line appears in Bitcoin's price history.</div>
       </div>
-      <p class="prose">The key insight isn't just that the relationship exists &mdash; it's that it's <em>proportional and sustainable</em>. Larger mammals don't need exponentially more energy; they achieve greater efficiency through structural scaling. The growth is governed by physics, not by choice. Bitcoin's hash rate (network security) scales with price following an analogous power law &mdash; efficiency increasing predictably with scale, governed not by intention but by structure.</p>
+      <p class="prose">The key insight isn't just that the relationship exists &mdash; it's that it's <em>proportional and sustainable</em>. Larger mammals don't need exponentially more energy; they achieve greater efficiency through structural scaling. The growth is governed by physics, not by intention. Bitcoin's hash rate scales with price following an analogous relationship &mdash; security increasing predictably with value, governed by the same mathematics that governs how elephants breathe.</p>
     </div>
 
+    <!-- ── BRANCHING NETWORKS ── -->
+    <div class="section">
+      <h3>Branching Networks: Nature's Distribution System</h3>
+      <p class="prose">The reason Kleiber's Law works is that biological organisms distribute resources through <em>branching fractal networks</em> &mdash; the same self-similar pattern that appears in river deltas, tree root systems, lightning bolts, and the bronchial passages of lungs. These networks follow a universal scaling principle: each level of branching divides into a predictable number of sub-branches, with the diameter and flow rate at each level following a power law.</p>
+
+      <!-- SVG: Branching network illustration -->
+      <div class="chart-container" style="text-align:center">
+        <div class="chart-title">The Same Branching Pattern, Everywhere</div>
+        <div class="chart-subtitle">From river deltas to blood vessels to Bitcoin's network topology &mdash; fractal branching produces power law scaling</div>
+        <svg viewBox="0 0 800 260" xmlns="http://www.w3.org/2000/svg" style="max-width:720px;margin:1.5rem auto;display:block">
+          <!-- Three branching trees side by side -->
+          <!-- Tree 1: River Delta -->
+          <g transform="translate(130,240)">
+            <text x="0" y="18" fill="#908880" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">River Delta</text>
+            <line x1="0" y1="0" x2="0" y2="-80" stroke="#e09422" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+            <line x1="0" y1="-80" x2="-35" y2="-130" stroke="#e09422" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+            <line x1="0" y1="-80" x2="35" y2="-130" stroke="#e09422" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+            <line x1="-35" y1="-130" x2="-55" y2="-165" stroke="#e09422" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+            <line x1="-35" y1="-130" x2="-20" y2="-170" stroke="#e09422" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+            <line x1="35" y1="-130" x2="20" y2="-170" stroke="#e09422" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+            <line x1="35" y1="-130" x2="55" y2="-165" stroke="#e09422" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+            <line x1="-55" y1="-165" x2="-65" y2="-190" stroke="#e09422" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+            <line x1="-55" y1="-165" x2="-45" y2="-192" stroke="#e09422" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+            <line x1="-20" y1="-170" x2="-28" y2="-195" stroke="#e09422" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+            <line x1="-20" y1="-170" x2="-10" y2="-193" stroke="#e09422" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+            <line x1="20" y1="-170" x2="12" y2="-195" stroke="#e09422" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+            <line x1="20" y1="-170" x2="30" y2="-193" stroke="#e09422" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+            <line x1="55" y1="-165" x2="47" y2="-190" stroke="#e09422" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+            <line x1="55" y1="-165" x2="65" y2="-192" stroke="#e09422" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+          </g>
+          <!-- Tree 2: Vascular System -->
+          <g transform="translate(400,240)">
+            <text x="0" y="18" fill="#908880" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Vascular System</text>
+            <line x1="0" y1="0" x2="0" y2="-80" stroke="#c0392b" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+            <line x1="0" y1="-80" x2="-40" y2="-135" stroke="#c0392b" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+            <line x1="0" y1="-80" x2="40" y2="-135" stroke="#c0392b" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+            <line x1="-40" y1="-135" x2="-60" y2="-170" stroke="#c0392b" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+            <line x1="-40" y1="-135" x2="-25" y2="-175" stroke="#c0392b" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+            <line x1="40" y1="-135" x2="25" y2="-175" stroke="#c0392b" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+            <line x1="40" y1="-135" x2="60" y2="-170" stroke="#c0392b" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+            <line x1="-60" y1="-170" x2="-70" y2="-194" stroke="#c0392b" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+            <line x1="-60" y1="-170" x2="-50" y2="-196" stroke="#c0392b" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+            <line x1="-25" y1="-175" x2="-33" y2="-198" stroke="#c0392b" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+            <line x1="-25" y1="-175" x2="-15" y2="-196" stroke="#c0392b" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+            <line x1="25" y1="-175" x2="17" y2="-198" stroke="#c0392b" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+            <line x1="25" y1="-175" x2="35" y2="-196" stroke="#c0392b" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+            <line x1="60" y1="-170" x2="52" y2="-194" stroke="#c0392b" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+            <line x1="60" y1="-170" x2="70" y2="-196" stroke="#c0392b" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+          </g>
+          <!-- Tree 3: Bitcoin Network -->
+          <g transform="translate(670,240)">
+            <text x="0" y="18" fill="#908880" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Bitcoin Network</text>
+            <line x1="0" y1="0" x2="0" y2="-80" stroke="#F7931A" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+            <line x1="0" y1="-80" x2="-38" y2="-132" stroke="#F7931A" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+            <line x1="0" y1="-80" x2="38" y2="-132" stroke="#F7931A" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+            <line x1="-38" y1="-132" x2="-58" y2="-168" stroke="#F7931A" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+            <line x1="-38" y1="-132" x2="-22" y2="-172" stroke="#F7931A" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+            <line x1="38" y1="-132" x2="22" y2="-172" stroke="#F7931A" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+            <line x1="38" y1="-132" x2="58" y2="-168" stroke="#F7931A" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+            <line x1="-58" y1="-168" x2="-68" y2="-192" stroke="#F7931A" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+            <line x1="-58" y1="-168" x2="-48" y2="-194" stroke="#F7931A" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+            <line x1="-22" y1="-172" x2="-30" y2="-196" stroke="#F7931A" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+            <line x1="-22" y1="-172" x2="-12" y2="-194" stroke="#F7931A" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+            <line x1="22" y1="-172" x2="14" y2="-196" stroke="#F7931A" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+            <line x1="22" y1="-172" x2="32" y2="-194" stroke="#F7931A" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+            <line x1="58" y1="-168" x2="50" y2="-192" stroke="#F7931A" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+            <line x1="58" y1="-168" x2="68" y2="-194" stroke="#F7931A" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+          </g>
+        </svg>
+        <div class="chart-source">The same fractal branching geometry appears in river systems, biological vasculature, and network topologies. Each produces power law scaling because the branching structure distributes resources according to the same mathematical rules, regardless of the medium.</div>
+      </div>
+      <p class="prose">This is the deep structural insight: power laws aren't coincidences that happen to appear in unrelated domains. They emerge from a <em>universal architecture</em> &mdash; branching distribution networks that optimize the transport of resources (blood, water, information, value) across a system. Geoffrey West's work at the Santa Fe Institute showed that this branching geometry is the common root of Kleiber's Law, urban scaling, and network growth. Bitcoin's transaction and mining networks follow the same branching topology, which is why the same mathematical form appears.</p>
+    </div>
+
+    <!-- ── CITY SCALING with dual visual ── -->
     <div class="section">
       <h3>City Scaling: Geoffrey West's 15% Rule</h3>
-      <p class="prose">Physicist Geoffrey West and colleagues at the Santa Fe Institute discovered that cities exhibit a remarkable dual scaling pattern. Physical infrastructure &mdash; roads, pipes, cables &mdash; scales <em>sublinearly</em> (exponent ~0.85), creating economies of scale. But socioeconomic outputs &mdash; GDP, patents, wages, innovation &mdash; scale <em>superlinearly</em> (exponent ~1.15). Every new person added to a city creates more potential social connections, driving disproportionate increases in productivity.</p>
-      <div class="chart-container">
-        <div class="chart-title">Urban Scaling: GDP vs. City Population</div>
-        <div class="chart-subtitle">Log-log scale &middot; Representative global cities &middot; Exponent &asymp; 1.15</div>
-        <div class="chart-wrapper" style="height:280px"><canvas id="cityChart"></canvas></div>
-        <div class="chart-source">Data illustrative of Bettencourt &amp; West (Nature, 2010). Larger cities produce disproportionately more economic output per capita. The superlinear exponent (~1.15) means a city twice as large is ~2.3 times as productive.</div>
+      <p class="prose">Physicist Geoffrey West and colleagues discovered that cities exhibit a remarkable dual scaling pattern. Physical infrastructure scales <em>sublinearly</em> (exponent ~0.85) &mdash; a city twice as large needs only 85% more roads and pipes, not twice as many. But socioeconomic outputs &mdash; GDP, patents, wages, innovation &mdash; scale <em>superlinearly</em> (exponent ~1.15). Every new person added creates more potential connections, driving disproportionate productivity.</p>
+
+      <!-- City growth illustration + chart side by side -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0">
+        <!-- LEFT: City growth phases SVG -->
+        <div class="chart-container" style="margin:0">
+          <div class="chart-title" style="font-size:1.05rem">How a City Grows</div>
+          <div class="chart-subtitle">Each phase produces disproportionately more output</div>
+          <svg viewBox="0 0 340 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;margin:1rem auto">
+            <!-- Concentric growth rings -->
+            <circle cx="170" cy="150" r="130" fill="none" stroke="rgba(247,147,26,0.12)" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <circle cx="170" cy="150" r="95" fill="none" stroke="rgba(247,147,26,0.2)" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <circle cx="170" cy="150" r="60" fill="none" stroke="rgba(247,147,26,0.35)" stroke-width="1.5"/>
+            <circle cx="170" cy="150" r="25" fill="rgba(247,147,26,0.25)" stroke="rgba(247,147,26,0.6)" stroke-width="2"/>
+            <!-- Labels -->
+            <text x="170" y="153" fill="#f2eee8" font-family="Inter,sans-serif" font-size="8" text-anchor="middle" font-weight="600">Village</text>
+            <text x="170" y="163" fill="#908880" font-family="Inter,sans-serif" font-size="7" text-anchor="middle">1K</text>
+            <text x="170" y="98" fill="#d0c8c0" font-family="Inter,sans-serif" font-size="8" text-anchor="middle">Town &middot; 50K</text>
+            <text x="170" y="60" fill="#d0c8c0" font-family="Inter,sans-serif" font-size="8" text-anchor="middle">City &middot; 500K</text>
+            <text x="170" y="26" fill="#d0c8c0" font-family="Inter,sans-serif" font-size="8" text-anchor="middle">Metropolis &middot; 5M</text>
+            <!-- Arrows showing growth -->
+            <line x1="210" y1="150" x2="228" y2="150" stroke="rgba(247,147,26,0.4)" stroke-width="1" marker-end="url(#arrowhead)"/>
+            <line x1="243" y1="150" x2="260" y2="150" stroke="rgba(247,147,26,0.3)" stroke-width="1" marker-end="url(#arrowhead)"/>
+            <!-- GDP multipliers -->
+            <text x="252" y="128" fill="#e09422" font-family="Inter,sans-serif" font-size="7.5" text-anchor="middle" font-weight="600">GDP per capita</text>
+            <text x="252" y="140" fill="#e09422" font-family="Inter,sans-serif" font-size="7" text-anchor="middle">increases 15%</text>
+            <text x="252" y="152" fill="#e09422" font-family="Inter,sans-serif" font-size="7" text-anchor="middle">with each doubling</text>
+            <text x="252" y="164" fill="#e09422" font-family="Inter,sans-serif" font-size="7" text-anchor="middle">of population</text>
+            <defs><marker id="arrowhead" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0 0, 6 2, 0 4" fill="rgba(247,147,26,0.4)"/></marker></defs>
+            <!-- Bottom label -->
+            <text x="170" y="295" fill="#706860" font-family="Inter,sans-serif" font-size="8" text-anchor="middle">Each ring: ~10x population increase</text>
+          </svg>
+        </div>
+        <!-- RIGHT: Mathematical chart -->
+        <div class="chart-container" style="margin:0">
+          <div class="chart-title" style="font-size:1.05rem">The Mathematical Relationship</div>
+          <div class="chart-subtitle">GDP vs. Population &middot; Log-log scale &middot; Exponent ~1.15</div>
+          <div class="chart-wrapper" style="height:240px"><canvas id="cityChart"></canvas></div>
+        </div>
       </div>
-      <p class="prose">The Bitcoin parallel is direct: the ~13% proportional doubling in Bitcoin echoes the ~15% superlinear scaling in cities. Both are systems where each new participant creates more potential connections, driving disproportionate value growth. And notably, cities are among the most durable human institutions &mdash; they outlast companies, governments, and currencies. Systems that scale like cities have the <em>durability characteristics</em> of cities. Companies follow exponential S-curves and eventually die. Cities follow power laws and persist.</p>
+      <div class="chart-source" style="margin-top:0.5rem">Left: cities grow outward in phases, each phase producing disproportionately more economic output per person. Right: the mathematical relationship, plotted log-log, forms the characteristic straight line. Source framework: Bettencourt &amp; West (<em>Nature</em>, 2010).</div>
+
+      <p class="prose" style="margin-top:1.5rem">The Bitcoin parallel is direct: the ~13% proportional doubling in Bitcoin echoes the ~15% superlinear scaling in cities. Both are systems where each new participant creates more potential connections, driving disproportionate value growth. And notably, cities are among the most durable human institutions &mdash; they outlast companies, governments, and currencies. Companies follow exponential S-curves and eventually die. Cities follow power laws and persist. Systems that scale like cities have the <em>durability characteristics</em> of cities.</p>
     </div>
 
+    <!-- ── NETWORK ADOPTION ── -->
     <div class="section">
       <h3>Network Adoption: From Telephones to Bitcoin</h3>
       <p class="prose">The telephone network provides the earliest modern example of power law scaling through adoption. In 1908, AT&amp;T's Theodore Vail observed that a telephone without a connection at the other end is useless &mdash; its value depends entirely on the number of other telephones connected. Robert Metcalfe later formalized this as Metcalfe's Law: the value of a network is proportional to the square of its users.</p>
       <p class="prose">The fax machine's trajectory is even more instructive. In the early 1980s, fax machines were a niche curiosity. But as installations grew from thousands to millions, the value of each device surged &mdash; because the expanding pool of potential recipients made every existing machine more useful. Total network utility scaled roughly as the square of connected machines. Fax crossed a threshold from "niche tool" to "essential business standard" not because the technology improved, but because <em>the network grew</em>.</p>
-      <p class="prose">Bitcoin's adoption follows the same structural dynamic, but with a critical difference: while telephone and fax adoption followed exponential S-curves (fast start, rapid acceleration, eventual saturation), Bitcoin's adoption grows as a power law &mdash; curbed by the difficulty adjustment (which prevents premature completion of the emission schedule) and by investment risk (which moderates the speed at which new participants enter). These curbing mechanisms transform a potentially unstable exponential adoption spike into a <em>proportional, sustainable</em> power law. The growth continues indefinitely but at a naturally decelerating pace &mdash; which is why the Power Law has held for 15 years and counting, rather than accelerating to an unsustainable peak and collapsing.</p>
+      <p class="prose">Bitcoin's adoption follows the same structural dynamic, but with a critical difference: while telephone and fax adoption followed exponential S-curves (fast start, rapid acceleration, eventual saturation), Bitcoin's adoption grows as a power law &mdash; curbed by the difficulty adjustment (which prevents premature completion of the emission schedule) and by investment risk (which moderates the speed at which new participants enter). These curbing mechanisms transform a potentially unstable exponential adoption spike into a <em>proportional, sustainable</em> power law. The growth continues indefinitely but at a naturally decelerating pace &mdash; which is why the Power Law has held for 15 years and counting.</p>
     </div>
 
+    <!-- ── UNIFYING PATTERN ── -->
     <div class="section">
       <h3>The Unifying Pattern</h3>
       <div class="insight-box">
-        <p>Metabolic networks in biology. Social networks in cities. Communication networks in telephones. Transaction and mining networks in Bitcoin. The specific exponents differ, but the underlying mathematical form is the same: complex systems that scale through networks produce power law relationships. Bitcoin's adherence to this pattern is not coincidental &mdash; it is the expected behavior of a network system scaling through adoption.</p>
+        <p>Metabolic networks in biology. Branching distribution systems in rivers and vasculature. Social networks in cities. Communication networks in telephones. Transaction and mining networks in Bitcoin. The specific exponents differ, but the underlying mathematical form is the same: <em>complex systems that scale through networks produce power law relationships.</em></p>
       </div>
-      <p class="prose">This is why the framing matters. If Bitcoin is an "asset," then its price is unpredictable, driven by sentiment and speculation. If Bitcoin is a <em>system</em>, then its scaling behavior is structurally governed &mdash; proportional, sustainable, and consistent with mathematical laws observed across every complex network ever studied. The Power Law is evidence that Bitcoin belongs in the second category.</p>
+      <p class="prose">The pattern extends even further. Earthquake magnitudes follow the Gutenberg-Richter power law &mdash; many small tremors, few large ones, at a mathematically precise ratio. Word frequencies in every human language follow Zipf's Law &mdash; the most common word appears twice as often as the second most common, three times as often as the third. Wealth distribution across populations follows a Pareto power law. In each case, the same mathematical form emerges from systems where many small events and few large events are governed by the same structural dynamics.</p>
+      <p class="prose">Bitcoin's adherence to this ubiquitous pattern is not coincidental. It is the expected behavior of a network system scaling through adoption &mdash; the same mathematics that governs how elephants metabolize, how cities innovate, and how languages organize themselves. This is why the framing matters: if Bitcoin is an "asset," its price is unpredictable. If Bitcoin is a <em>system</em>, its scaling behavior is structurally governed &mdash; proportional, sustainable, and consistent with mathematical laws observed across every complex network ever studied.</p>
     </div>
 
   </div>
