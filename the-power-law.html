@@ -139,6 +139,55 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .milestones-table{font-size:.8rem}
 .milestones-table td,.milestones-table th{padding:.6rem .5rem}
 }
+
+/* PROJECTION WIDGET */
+.proj-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1.5rem 2rem;margin:2rem 0}
+.proj-controls{display:flex;align-items:center;gap:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.proj-controls label{font-size:.82rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.proj-controls input[type="range"]{flex:1;min-width:200px;accent-color:var(--orange)}
+.proj-controls .year-display{font-family:var(--font-d);font-size:1.6rem;color:var(--amber);font-weight:600;min-width:60px}
+.proj-results{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.proj-card{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:6px;padding:1rem 1.2rem;text-align:center}
+.proj-card .proj-label{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.5rem}
+.proj-card .proj-label.floor{color:rgba(76,175,80,0.8)}
+.proj-card .proj-label.trend{color:var(--amber)}
+.proj-card .proj-label.ceiling{color:rgba(192,57,43,0.7)}
+.proj-card .proj-price{font-family:var(--font-d);font-size:1.4rem;font-weight:600;color:var(--text-bright)}
+.proj-card .proj-detail{font-size:.78rem;color:var(--text-muted);margin-top:.4rem;line-height:1.5}
+
+/* CALCULATOR */
+.calc-section{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:2rem;margin-bottom:2rem}
+.calc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.calc-field label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:.4rem}
+.calc-field input,.calc-field select{height:44px;width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font-b);font-size:.92rem;padding:0 1rem;border-radius:4px}
+.calc-field select{cursor:pointer}
+.calc-field input:focus,.calc-field select:focus{outline:none;border-color:var(--amber)}
+.scenario-btns{display:flex;gap:0;margin-bottom:1.5rem}
+.scenario-btn{flex:1;padding:.8rem;font-family:var(--font-b);font-size:.8rem;font-weight:500;background:rgba(255,255,255,.02);border:1px solid var(--border);color:var(--text-muted);cursor:pointer;transition:all .2s;text-align:center}
+.scenario-btn:first-child{border-radius:4px 0 0 4px}
+.scenario-btn:last-child{border-radius:0 4px 4px 0}
+.scenario-btn.active{background:var(--orange-soft);color:var(--amber);border-color:rgba(247,147,26,.3);font-weight:600}
+.calc-results-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.5rem}
+.calc-card{border:1px solid var(--border);border-radius:8px;padding:1.5rem;background:rgba(255,255,255,.01)}
+.calc-card h4{font-family:var(--font-b);font-size:.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem}
+.calc-card h4.btc{color:var(--amber)}
+.calc-card h4.house{color:var(--text-muted)}
+.calc-card .big-number{font-family:var(--font-d);font-size:1.8rem;font-weight:600;color:var(--text-bright);margin-bottom:.8rem}
+.calc-card .detail-line{font-size:.85rem;color:var(--text-body);line-height:1.8}
+.calc-card .detail-line strong{color:var(--text-bright)}
+.calc-card .detail-line .highlight{color:var(--amber);font-weight:600}
+.calc-card .detail-line .negative{color:var(--red)}
+.calc-summary{text-align:center;margin-top:1.5rem;padding:1.2rem;background:rgba(224,148,34,.04);border-radius:6px;border:1px solid rgba(224,148,34,.12)}
+.calc-summary .summary-big{font-family:var(--font-d);font-size:1.5rem;font-weight:600;color:var(--amber)}
+.calc-summary .summary-detail{font-size:.85rem;color:var(--text-body);margin-top:.4rem}
+
+@media(max-width:768px){
+.proj-results{grid-template-columns:1fr}
+.calc-grid{grid-template-columns:1fr}
+.calc-results-grid{grid-template-columns:1fr}
+.proj-controls{flex-direction:column;align-items:stretch}
+}
+
 </style>
 </head>
 <body>
@@ -286,6 +335,25 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <div class="chart-subtitle">Power Law fitted to 2010&ndash;2014 data only, projected forward vs. actual prices</div>
         <div class="chart-wrapper" style="height:380px"><canvas id="oosChart"></canvas></div>
         <div class="chart-source">Green line: regression fitted using only data from 2010&ndash;2014 (~700 data points). Orange dots: actual prices 2015&ndash;present. The early model captures the long-term trajectory without access to any post-2014 data.</div>
+      </div>
+    </div>
+
+
+    <!-- PRICE PROJECTION WIDGET -->
+    <div class="section">
+      <h2>Project a Future Date</h2>
+      <p class="prose">Use the slider to see what the Power Law model projects for any year. The floor represents the most conservative estimate (R&sup2; &gt; 0.99); the trend is the median fair value; the ceiling marks the historical upper boundary.</p>
+      <div class="proj-widget">
+        <div class="proj-controls">
+          <label>Year</label>
+          <input type="range" id="projSlider" min="2025" max="2045" value="2030" step="1">
+          <div class="year-display" id="projYear">2030</div>
+        </div>
+        <div class="proj-results" id="projResults">
+          <div class="proj-card"><div class="proj-label floor">Floor (0.42&times;)</div><div class="proj-price" id="projFloor">—</div><div class="proj-detail" id="projFloorDetail"></div></div>
+          <div class="proj-card"><div class="proj-label trend">Trend (Fair Value)</div><div class="proj-price" id="projTrend">—</div><div class="proj-detail" id="projTrendDetail"></div></div>
+          <div class="proj-card"><div class="proj-label ceiling">Ceiling (3&times;)</div><div class="proj-price" id="projCeiling">—</div><div class="proj-detail" id="projCeilingDetail"></div></div>
+        </div>
       </div>
     </div>
 
@@ -569,10 +637,67 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <!-- TAB 4: CALCULATOR (placeholder) -->
   <!-- ═══════════════════════════════════════════ -->
   <div class="tab-content" id="tab-calculator">
-    <div class="section" style="text-align:center;padding:4rem 0">
-      <h2>Forward-Looking Calculator</h2>
-      <p class="prose" style="max-width:600px;margin:1rem auto">Project the Power Law forward and compare against housing, gold, and traditional assets. Coming soon.</p>
+
+    <div class="section">
+      <h2>Bitcoin vs. Real Estate: Forward</h2>
+      <p class="prose">The <a href="/bitcoin-vs-real-estate.html" style="color:var(--amber)">retrospective calculator</a> showed what <em>did</em> happen when you chose Bitcoin over a house. This calculator asks: what does the Power Law model suggest happens <em>going forward</em>? Enter your own assumptions and compare.</p>
+      <p class="annotation">This calculator uses the Power Law model as its Bitcoin price assumption. The Power Law is an empirical observation with a 95%+ R&sup2; fit, not a guarantee. See <a href="#summary" style="color:var(--amber)">Tab 1</a> for the full explanation and caveats. This is not investment advice.</p>
     </div>
+
+    <div class="calc-section">
+      <!-- Scenario Selection -->
+      <div style="margin-bottom:1.2rem">
+        <label style="font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:.5rem">Power Law Scenario</label>
+        <div class="scenario-btns">
+          <button class="scenario-btn active" data-scenario="floor">Floor (Conservative)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &gt; 0.99</span></button>
+          <button class="scenario-btn" data-scenario="trend">Trend (Fair Value)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &asymp; 0.95</span></button>
+          <button class="scenario-btn" data-scenario="upper">Upper (Bull Case)<br><span style="font-size:.7rem;opacity:.7">Historical peaks</span></button>
+        </div>
+      </div>
+
+      <!-- Inputs -->
+      <div class="calc-grid">
+        <div class="calc-field">
+          <label>Investment Amount ($)</label>
+          <input type="text" id="fwdAmount" value="60,000" inputmode="numeric">
+        </div>
+        <div class="calc-field">
+          <label>Time Horizon</label>
+          <select id="fwdHorizon">
+            <option value="5">5 years (2030)</option>
+            <option value="10" selected>10 years (2035)</option>
+            <option value="15">15 years (2040)</option>
+            <option value="20">20 years (2045)</option>
+          </select>
+        </div>
+        <div class="calc-field">
+          <label>Current BTC Price ($)</label>
+          <input type="text" id="fwdBtcNow" value="84,000" inputmode="numeric">
+        </div>
+      </div>
+      <div class="calc-grid">
+        <div class="calc-field">
+          <label>Home Price Today ($)</label>
+          <input type="text" id="fwdHomePrice" value="420,000" inputmode="numeric">
+        </div>
+        <div class="calc-field">
+          <label>Home Appreciation (%/yr)</label>
+          <input type="text" id="fwdHomeAppreciation" value="3.5" inputmode="decimal">
+        </div>
+        <div class="calc-field">
+          <label>Mortgage Rate (%)</label>
+          <input type="text" id="fwdMortgageRate" value="6.8" inputmode="decimal">
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div id="fwdResults"></div>
+    </div>
+
+    <div class="annotation" style="margin-top:1rem">
+      <strong>How this works:</strong> The Bitcoin projection uses the Power Law model (Porkopolis coefficients). The housing projection assumes constant annual appreciation. Mortgage assumes 20%% down, 30-year fixed. Property taxes at 1.2%% annually, insurance ~$150/mo, maintenance at 1%% of home value annually. <a href="/bitcoin-vs-real-estate.html" style="color:var(--amber)">See the retrospective version &rarr;</a>
+    </div>
+
   </div>
 
 </div>
@@ -1137,6 +1262,163 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
       }
     }
   });
+})();
+
+
+// ═══════ TOOL A: PRICE PROJECTION WIDGET ═══════
+(function(){
+  var slider = document.getElementById('projSlider');
+  var yearEl = document.getElementById('projYear');
+  if(!slider) return;
+
+  function updateProjection(){
+    var year = parseInt(slider.value);
+    yearEl.textContent = year;
+    var days = (year - 2009) * 365.25;
+    var trend = plPrice(days);
+    var floor = trend * PL_FLOOR;
+    var ceil = trend * PL_CEIL;
+    var doublingFactor = Math.pow(2, 1/PL_B);
+    var daysToDouble = Math.round(days * (doublingFactor - 1));
+    var yearsToDouble = (daysToDouble/365.25).toFixed(1);
+
+    function fmt(v){ return v >= 1000000 ? '$'+( v/1000000).toFixed(2)+'M' : '$'+Math.round(v).toLocaleString(); }
+
+    document.getElementById('projFloor').textContent = fmt(floor);
+    document.getElementById('projTrend').textContent = fmt(trend);
+    document.getElementById('projCeiling').textContent = fmt(ceil);
+    document.getElementById('projFloorDetail').textContent = 'Most conservative boundary';
+    document.getElementById('projTrendDetail').textContent = 'Days to double: '+daysToDouble.toLocaleString()+' ('+yearsToDouble+' yrs)';
+    document.getElementById('projCeilingDetail').textContent = 'Historical bull market peaks';
+  }
+
+  slider.addEventListener('input', updateProjection);
+  updateProjection();
+})();
+
+// ═══════ TOOL B: FORWARD CALCULATOR ═══════
+(function(){
+  var resultsEl = document.getElementById('fwdResults');
+  if(!resultsEl) return;
+
+  var scenario = 'floor';
+
+  // Scenario buttons
+  document.querySelectorAll('.scenario-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.scenario-btn').forEach(function(b){b.classList.remove('active')});
+      btn.classList.add('active');
+      scenario = btn.dataset.scenario;
+      runFwdCalc();
+    });
+  });
+
+  function parseNum(id){
+    var el = document.getElementById(id);
+    if(!el) return 0;
+    return parseFloat(el.value.replace(/[$,%\s]/g,'')) || 0;
+  }
+
+  function fmt(v){ return '$'+Math.round(v).toLocaleString(); }
+
+  function runFwdCalc(){
+    var amount = parseNum('fwdAmount');
+    var horizonYrs = parseInt(document.getElementById('fwdHorizon').value);
+    var btcNow = parseNum('fwdBtcNow');
+    var homePrice = parseNum('fwdHomePrice');
+    var homeAppr = parseNum('fwdHomeAppreciation') / 100;
+    var mortRate = parseNum('fwdMortgageRate');
+
+    if(amount <= 0 || btcNow <= 0 || homePrice <= 0) return;
+
+    var startYear = 2025;
+    var endYear = startYear + horizonYrs;
+
+    // ── BITCOIN SIDE ──
+    var btcBought = amount / btcNow;
+    var futureDays = (endYear - 2009) * 365.25;
+    var futureTrend = plPrice(futureDays);
+    var futureFloor = futureTrend * PL_FLOOR;
+    var futureCeil = futureTrend * PL_CEIL;
+
+    var futurePrice;
+    var scenarioLabel;
+    if(scenario === 'floor'){ futurePrice = futureFloor; scenarioLabel = 'Floor (conservative)'; }
+    else if(scenario === 'trend'){ futurePrice = futureTrend; scenarioLabel = 'Trend (fair value)'; }
+    else { futurePrice = futureCeil; scenarioLabel = 'Upper (bull case)'; }
+
+    var btcValue = btcBought * futurePrice;
+    var btcReturn = ((btcValue - amount) / amount * 100).toFixed(0);
+    var btcCAGR = ((Math.pow(btcValue/amount, 1/horizonYrs) - 1) * 100).toFixed(1);
+
+    // ── HOUSE SIDE ──
+    var downPmt = homePrice * 0.2;
+    var loanAmt = homePrice * 0.8;
+    var mr = mortRate / 100 / 12;
+    var nPayments = 360;
+    var monthlyMort = mr > 0 ? loanAmt * (mr * Math.pow(1+mr, nPayments)) / (Math.pow(1+mr, nPayments) - 1) : loanAmt / nPayments;
+    var futureHomeValue = homePrice * Math.pow(1 + homeAppr, horizonYrs);
+
+    // Remaining balance after horizonYrs
+    var monthsPaid = horizonYrs * 12;
+    var bal = loanAmt;
+    for(var i = 0; i < Math.min(monthsPaid, nPayments); i++){
+      bal = bal * (1 + mr) - monthlyMort;
+    }
+    bal = Math.max(0, bal);
+    var equity = futureHomeValue - bal;
+
+    // Total cost of ownership
+    var totalMortPaid = monthlyMort * Math.min(monthsPaid, nPayments);
+    var propTax = homePrice * 0.012 * horizonYrs;
+    var insurance = 150 * 12 * horizonYrs;
+    var maintenance = homePrice * 0.01 * horizonYrs;
+    var totalHouseCost = downPmt + totalMortPaid + propTax + insurance + maintenance;
+    var interestPaid = totalMortPaid - (loanAmt - bal);
+    var houseCAGR = ((Math.pow(futureHomeValue/homePrice, 1/horizonYrs) - 1) * 100).toFixed(1);
+
+    // How many houses could BTC buy
+    var housesCanBuy = btcValue / futureHomeValue;
+
+    // ── RENDER ──
+    resultsEl.innerHTML =
+      '<div class="calc-results-grid">' +
+        '<div class="calc-card">' +
+          '<h4 class="btc">&#8383; Bitcoin ('+scenarioLabel+')</h4>' +
+          '<div class="big-number">'+fmt(btcValue)+'</div>' +
+          '<div class="detail-line">Invested: '+fmt(amount)+' at '+fmt(btcNow)+'/BTC</div>' +
+          '<div class="detail-line">BTC purchased: '+btcBought.toFixed(4)+' BTC</div>' +
+          '<div class="detail-line">Projected BTC price ('+endYear+'): <strong>'+fmt(futurePrice)+'</strong></div>' +
+          '<div class="detail-line">Total return: <span class="highlight">'+btcReturn+'%</span></div>' +
+          '<div class="detail-line">Implied CAGR: <span class="highlight">'+btcCAGR+'%</span></div>' +
+          '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted)">No leverage. No interest. No taxes. No maintenance.</div>' +
+        '</div>' +
+        '<div class="calc-card">' +
+          '<h4 class="house">&#127968; Buy a House</h4>' +
+          '<div class="big-number">'+fmt(equity)+'</div>' +
+          '<div class="detail-line">Home price today: '+fmt(homePrice)+'</div>' +
+          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(futureHomeValue)+' ('+houseCAGR+'%/yr)</div>' +
+          '<div class="detail-line">Down payment: '+fmt(downPmt)+' (20%)</div>' +
+          '<div class="detail-line">Monthly mortgage: '+fmt(monthlyMort)+'/mo at '+mortRate+'%</div>' +
+          '<div class="detail-line">Interest paid: <span class="negative">'+fmt(interestPaid)+'</span></div>' +
+          '<div class="detail-line">Remaining loan: '+(bal > 0 ? '<span class="negative">'+fmt(bal)+'</span>' : 'Paid off')+'</div>' +
+          '<div class="detail-line">Total cost of ownership: <span class="negative">'+fmt(totalHouseCost)+'</span></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="calc-summary">' +
+        '<div class="summary-big">'+housesCanBuy.toFixed(1)+' houses</div>' +
+        '<div class="summary-detail">With '+fmt(amount)+' in Bitcoin ('+scenarioLabel+'), you could buy <strong>'+housesCanBuy.toFixed(1)+' houses</strong> outright in '+endYear+' — no mortgage, no interest, no debt.</div>' +
+      '</div>';
+  }
+
+  // Event listeners
+  ['fwdAmount','fwdBtcNow','fwdHomePrice','fwdHomeAppreciation','fwdMortgageRate'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener('input', runFwdCalc);
+  });
+  document.getElementById('fwdHorizon').addEventListener('change', runFwdCalc);
+
+  runFwdCalc();
 })();
 
 </script>
