@@ -201,8 +201,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
     <div class="hero-insight">
       <div class="hero-stat">For every 13% increase in Bitcoin's age, <em>the trend price doubles.</em></div>
-      <p class="hero-body">This relationship &mdash; <em>proportional</em>, not exponential &mdash; has held across 15 years and nine orders of magnitude, from $0.01 to $100,000. It describes growth that naturally decelerates as the network matures: fast enough to be transformative, slow enough to be <em>sustainable</em>.<sup title="The characterization of Bitcoin's power law growth as 'proportional and sustainable' originates from Matthew Mežinskis (Porkopolis Economics).">1</sup> It is not an investment thesis. It is an empirical observation about how Bitcoin scales.</p>
-      <p class="hero-body">The model is called the <strong>Power Law</strong>. Its R&sup2; exceeds 95%. Its structural floor &mdash; the boundary below which Bitcoin has never sustained a daily close &mdash; has survived every major stress test of the last decade, including the March 2020 COVID crash and the 2022 FTX collapse. And it has held not only in-sample but out-of-sample: first identified in 2014, every subsequent year has confirmed the trajectory.</p>
+      <p class="hero-body">This relationship &mdash; <em>proportional</em><sup title="The characterization of Bitcoin's power law growth as 'proportional and sustainable' originates from Matthew Mežinskis (Porkopolis Economics).">1</sup>, not exponential &mdash; has held across 15 years and nine orders of magnitude, from $0.01 to $100,000. It describes growth that naturally decelerates as the network matures: fast enough to be transformative, slow enough to be <em>sustainable</em>.<sup title="The characterization of Bitcoin's power law growth as 'proportional and sustainable' originates from Matthew Mežinskis (Porkopolis Economics).">1</sup> It is not an investment thesis. It is an empirical observation about how Bitcoin scales.</p>
+      <p class="hero-body">The model is called the <strong>Power Law</strong>. Its R&sup2; exceeds 95%.<sup title="R² (R-squared) measures how well a statistical model fits observed data. A value of 1.0 means the model explains 100% of the variation; 0 means none. An R² above 0.95 is exceptionally rare for any financial model and indicates the Power Law explains more than 95% of Bitcoin's long-term price variation.">2</sup> Its structural floor &mdash; the boundary below which Bitcoin has never sustained a daily close &mdash; has survived every major stress test of the last decade, including the March 2020 COVID crash and the 2022 FTX collapse. And it has held not only in-sample but out-of-sample: first identified in 2014, every subsequent year has confirmed the trajectory.</p>
     </div>
 
     <!-- INTERACTIVE CHART -->
@@ -229,8 +229,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <h3>How the Power Law Differs from Stock-to-Flow</h3>
       <div class="compare-grid">
         <div class="compare-col stf">
-          <h4>Stock-to-Flow (S2F)</h4>
-          <p>Driven by <strong>scarcity</strong> &mdash; models price as a function of supply halvings. Predicts exponential growth that must accelerate forever. Failed to predict the 2021&ndash;2022 cycle, missing targets significantly. Implies Bitcoin is valuable because it is <em>rare</em>.</p>
+          <h4>Stock-to-Flow (S2F)<sup title="The Stock-to-Flow model, created by pseudonymous analyst PlanB in 2019, became one of the most widely followed Bitcoin price models during the 2020–2021 bull market. It predicted Bitcoin would reach $100K–$288K by late 2021 based on the post-halving supply reduction. When the price peaked at ~$69K and subsequently fell to ~$16K, the model's predictions were off by 50–80%, leading to widespread criticism and abandonment by many of its former advocates.">3</sup></h4>
+          <p>Driven by <strong>scarcity</strong> &mdash; models price as a function of supply halvings. Gained wide popularity during 2020&ndash;2021 but predicts exponential growth that must accelerate forever. Failed to predict the 2021&ndash;2022 cycle, missing targets by 50&ndash;80%. Implies Bitcoin is valuable because it is <em>rare</em>.</p>
         </div>
         <div class="compare-col pl">
           <h4>The Power Law</h4>
@@ -299,20 +299,119 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <!-- TAB 2: IN NATURE (placeholder) -->
   <!-- ═══════════════════════════════════════════ -->
   <div class="tab-content" id="tab-nature">
-    <div class="section" style="text-align:center;padding:4rem 0">
-      <h2>Power Laws in Nature</h2>
-      <p class="prose" style="max-width:600px;margin:1rem auto">From mammalian metabolism to city growth to network adoption &mdash; the same mathematical pattern appears across complex systems. Coming soon.</p>
+
+    <div class="section">
+      <h2>Power Laws Are Everywhere</h2>
+      <p class="prose">The Power Law isn't a Bitcoin invention. It's a mathematical pattern that appears across biology, physics, and urban science &mdash; wherever complex systems scale. Bitcoin is the latest example of a relationship observed in phenomena spanning billions of years and dozens of scientific disciplines. Understanding where else power laws appear is what makes Bitcoin's adherence to one structurally expected rather than coincidental.</p>
     </div>
+
+    <div class="section">
+      <h3>Kleiber's Law: Mammalian Metabolism</h3>
+      <div class="insight-box">
+        <p>An elephant's metabolic rate is not proportional to its body mass &mdash; it scales to the &frac34; power. Larger mammals are more energy-efficient per gram of tissue than smaller ones. This relationship holds across every mammalian species ever measured.</p>
+      </div>
+      <p class="prose">In 1932, biologist Max Kleiber discovered that metabolic rate scales with body mass raised to the power of 0.75. A mouse burns far more energy per gram than a whale. This isn't a coincidence or an approximation &mdash; it's a mathematical law that emerges from the structure of biological distribution networks (the branching patterns of circulatory systems).</p>
+      <p class="prose">Bitcoin exhibits an analogous scaling relationship: its hash rate (a measure of network security) scales with price following a power law. Just as larger mammals achieve greater metabolic efficiency, larger Bitcoin networks achieve greater security efficiency. The pattern is the same &mdash; efficiency increasing predictably with scale, governed not by intention but by structure.</p>
+    </div>
+
+    <div class="section">
+      <h3>City Scaling: Geoffrey West's 15% Rule</h3>
+      <div class="insight-box">
+        <p>When a city doubles in population, its infrastructure needs increase by only 85% &mdash; but its economic output increases by 115%. Cities are superlinear scaling systems: bigger means disproportionately more productive.</p>
+      </div>
+      <p class="prose">Physicist Geoffrey West and colleagues at the Santa Fe Institute discovered that cities exhibit a remarkable dual scaling pattern, published in <em>Nature</em> (Bettencourt &amp; West, 2010). Physical infrastructure &mdash; roads, water pipes, electrical cables &mdash; scales <em>sublinearly</em> with population (exponent ~0.85), creating economies of scale. But socioeconomic outputs &mdash; GDP, patents, wages, even crime &mdash; scale <em>superlinearly</em> (exponent ~1.15). Every new person added to a city creates more potential social connections, driving disproportionate increases in productivity and innovation.</p>
+      <p class="prose">Bitcoin parallels this urban scaling pattern. Its value increases superlinearly with adoption &mdash; each new participant creates more potential transaction connections, driving disproportionate increases in network value. The ~13% proportional doubling in Bitcoin echoes the ~15% superlinear scaling in cities. Different systems, same mathematical fingerprint. And notably, cities are among the most durable human institutions &mdash; they outlast companies, governments, and currencies. Scaling like a city implicitly means having the durability characteristics of a city.</p>
+    </div>
+
+    <div class="section">
+      <h3>The Curbed Pandemic: Why Power Law, Not Exponential</h3>
+      <div class="insight-box">
+        <p>Viruses typically spread exponentially. But when a spreading phenomenon encounters a curbing mechanism &mdash; partial immunity, risk awareness, or structural resistance &mdash; exponential growth transforms into a power law. Unstable explosion becomes sustainable scaling.</p>
+      </div>
+      <p class="prose">Many technologies follow an exponential S-curve of adoption: slow start, rapid acceleration, eventual saturation. Bitcoin doesn't follow this pattern. Its adoption grows as a power law of approximately t&sup3; &mdash; cubic in time, not exponential. Why?</p>
+      <p class="prose">The answer lies in two curbing mechanisms built into Bitcoin's protocol. First, the <strong>difficulty adjustment</strong>: every 2,016 blocks, the network recalibrates mining difficulty to maintain a consistent block time, preventing runaway acceleration in network growth. Second, <strong>investment risk</strong>: Bitcoin's volatility naturally moderates the speed of adoption, as each new participant must overcome a psychological and financial threshold to enter. These two mechanisms &mdash; one protocol-level, one behavioral &mdash; transform what could be an unstable exponential spike into a stable, sustainable power law. The result is growth that continues indefinitely but at a naturally decelerating pace.</p>
+    </div>
+
+    <div class="section">
+      <h3>The Pattern</h3>
+      <p class="prose">Across all these examples, the same structural insight recurs: <em>complex systems that scale through networks produce power law relationships</em>. Metabolic networks in biology. Social networks in cities. Transaction and mining networks in Bitcoin. The specific exponents differ (0.75 for metabolism, 1.15 for cities, 5.77 for Bitcoin price vs. time), but the underlying mathematical form is the same. Bitcoin's power law isn't an anomaly. It's the expected behavior of a complex network scaling through adoption &mdash; the same mathematics that governs how elephants breathe and how cities grow.</p>
+    </div>
+
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
   <!-- TAB 3: THEORY (placeholder) -->
   <!-- ═══════════════════════════════════════════ -->
   <div class="tab-content" id="tab-theory">
-    <div class="section" style="text-align:center;padding:4rem 0">
-      <h2>The Theory in Depth</h2>
-      <p class="prose" style="max-width:600px;margin:1rem auto">The structural explanation for why the Power Law emerges from Bitcoin's protocol design &mdash; difficulty adjustment, feedback loops, and network scaling. Coming soon.</p>
+
+    <div class="section">
+      <h2>Why the Power Law Emerges</h2>
+      <p class="prose">The Power Law isn't just a curve that happens to fit Bitcoin's price history. There is a structural explanation for <em>why</em> it emerges from Bitcoin's protocol design &mdash; an explanation that connects adoption dynamics, network theory, and the protocol's own built-in constraints.</p>
     </div>
+
+    <div class="section">
+      <h3>The Derivation: From Adoption to Price</h3>
+      <p class="prose">The Power Law exponent of ~5.8 isn't arbitrary. It can be derived from two established principles working in combination.</p>
+      <div class="insight-box">
+        <p><strong>Step 1:</strong> Bitcoin's user adoption grows as a power of time: Users &prop; t&sup3; (cubic growth, curbed by risk and the difficulty adjustment).<br>
+        <strong>Step 2:</strong> Network value follows Metcalfe's Law: Value &prop; Users&sup2; (each new user creates connections with all existing users).<br>
+        <strong>Step 3:</strong> Combining: Price &prop; (t&sup3;)&sup2; = t&#8310; &asymp; t<sup>5.8</sup> (empirically measured).</p>
+      </div>
+      <p class="prose">Three steps, each grounded in an established principle, producing the observed exponent. This is the closest the model has to a first-principles derivation &mdash; and while it doesn't constitute formal proof, it suggests the Power Law emerges from Bitcoin's structural properties rather than being a coincidental curve fit.</p>
+    </div>
+
+    <div class="section">
+      <h3>The Difficulty Adjustment: Bitcoin's Thermostat</h3>
+      <p class="prose">Every 2,016 blocks (approximately two weeks), Bitcoin recalibrates the difficulty of mining to maintain a consistent block time of roughly 10 minutes. This mechanism is the single most important structural reason Bitcoin follows a power law rather than an exponential curve.</p>
+      <p class="prose">Without it, a surge in mining activity would produce blocks faster and faster, accelerating supply issuance and network growth in a self-reinforcing exponential spiral. The difficulty adjustment acts as a <em>thermostat</em> &mdash; when the network heats up, difficulty increases, naturally moderating the pace. When activity cools, difficulty decreases, preventing collapse. This built-in governor transforms potentially unstable exponential dynamics into the stable, self-regulating power law we observe.</p>
+    </div>
+
+    <div class="section">
+      <h3>The Triple Feedback Loop</h3>
+      <p class="prose">Bitcoin's growth trajectory is sustained by three interconnected feedback loops that reinforce each other:</p>
+      <div class="compare-box" style="border-left:3px solid var(--amber)">
+        <p class="prose" style="margin-bottom:0.8rem"><strong style="color:var(--amber)">Adoption &rarr; Value:</strong> As more people use Bitcoin, network value increases (Metcalfe's Law). Each new participant creates more potential connections, driving disproportionate value growth.</p>
+        <p class="prose" style="margin-bottom:0.8rem"><strong style="color:var(--amber)">Value &rarr; Security:</strong> Higher value attracts more mining power, increasing the hash rate and making the network exponentially more expensive to attack.</p>
+        <p class="prose" style="margin-bottom:0"><strong style="color:var(--amber)">Security &rarr; Trust &rarr; Adoption:</strong> Greater security makes the network more reliable and trustworthy, attracting new users &mdash; restarting the cycle.</p>
+      </div>
+      <p class="prose">These three loops are self-reinforcing but not self-accelerating &mdash; the difficulty adjustment and investment risk act as natural governors that keep the system in the power law regime rather than tipping into unsustainable exponential acceleration.</p>
+    </div>
+
+    <div class="section">
+      <h3>Why the Floor Is More Predictable Than the Trend</h3>
+      <p class="prose">A counterintuitive finding: the Power Law's structural floor has a <em>higher</em> R&sup2; (often exceeding 0.99) than the median trend (~0.95). The floor is more predictable than the average. Why?</p>
+      <p class="prose">Market peaks are driven by <strong>top-side noise</strong> &mdash; speculation, leverage, psychology, and media cycles that vary wildly in magnitude from one cycle to the next. The 2013 peak was far more extreme relative to trend than the 2021 peak. This variability at the top introduces noise into the median regression.</p>
+      <p class="prose">Market bottoms are governed by <strong>bottom-side physics</strong> &mdash; the marginal cost of mining production and the price at which long-term holders refuse to sell. These constraints are rooted in energy expenditure and game theory, not in psychology. The minimum valuation is structurally determined, making it far more mathematically predictable than the average or peak valuations. This is why we default to the floor scenario in our calculator &mdash; it's not just the most conservative estimate, it's the most <em>reliable</em> one.</p>
+    </div>
+
+    <div class="section">
+      <h3>Volatility Compression</h3>
+      <p class="prose">As Bitcoin matures, the magnitude of its price cycles compresses. Each successive cycle sees smaller percentage deviations from trend:</p>
+      <div class="insight-box">
+        <p>Cycle 1: Price peaked at roughly <strong>8&times;</strong> over trend.<br>
+        Cycle 2&ndash;3: Peaks at roughly <strong>4&ndash;5&times;</strong> over trend.<br>
+        Cycle 4: Price peaked at roughly <strong>2.5&times;</strong> over trend.</p>
+      </div>
+      <p class="prose">This narrowing is a natural consequence of power law dynamics &mdash; as the network grows and matures, the system becomes more resistant to speculative swings. The same amount of new capital produces proportionally less price impact. Volatility doesn't disappear, but it compresses, transitioning Bitcoin from a nascent, hyper-volatile network toward a stable global monetary asset. Each cycle is less dramatic than the last.</p>
+    </div>
+
+    <div class="section">
+      <h3>Zero Monetary Entropy</h3>
+      <p class="prose">Most monetary systems require continuous expansion to function &mdash; fiat currencies must grow their supply to service compounding debt, creating an inherently inflationary dynamic that physicist Geoffrey West warns leads toward structural instability.</p>
+      <p class="prose">Bitcoin has <em>zero monetary entropy</em>. Its supply is fixed at 21 million. It does not require open-ended growth to maintain its value or its network. This property means Bitcoin's power law trajectory is not dependent on perpetual monetary expansion &mdash; unlike fiat systems, which must inflate or collapse. Bitcoin's growth is driven by adoption, not by monetary dilution. When adoption eventually plateaus, Bitcoin doesn't need to find new sources of growth to sustain itself. It simply is.</p>
+      <p class="prose">This connects directly to the arguments made elsewhere on this site: in <a href="/the-half-life.html" style="color:var(--amber)">The Half-Life</a>, fiat's purchasing power decays continuously because inflation is structurally necessary. In <a href="/the-melting-ice-cube.html" style="color:var(--amber)">The Melting Ice Cube</a>, holding cash is an active decision with a quantifiable cost. The Power Law provides the mathematical framework for understanding <em>why</em> these dynamics exist &mdash; and why Bitcoin, with its fixed supply and adoption-driven scaling, follows a fundamentally different trajectory.</p>
+    </div>
+
+    <div class="section">
+      <h3>Further Reading</h3>
+      <p class="prose">This page presents a high-level structural summary. For the full mathematical treatment and ongoing research, the definitive resources are:</p>
+      <p class="prose" style="margin-bottom:0.5rem"><a href="https://giovannisantostasi.medium.com/the-bitcoin-power-law-theory-962dfaf99ee9" target="_blank" style="color:var(--amber)">Giovanni Santostasi: The Bitcoin Power Law Theory</a> &mdash; the foundational essay presenting the full theoretical framework.</p>
+      <p class="prose" style="margin-bottom:0.5rem"><a href="https://www.porkopolis.io/thechart/" target="_blank" style="color:var(--amber)">Porkopolis Economics: The Chart</a> &mdash; the most widely cited implementation with interactive visualizations and methodology.</p>
+      <p class="prose" style="margin-bottom:0.5rem"><a href="https://b1m.io/" target="_blank" style="color:var(--amber)">b1m.io</a> &mdash; Fred Krueger's live dashboard tracking the Power Law in real time with current statistics.</p>
+      <p class="prose" style="margin-bottom:0.5rem"><a href="https://medium.com/@fulgur.ventures/bitcoin-power-law-theory-executive-summary-report-837e6f00347e" target="_blank" style="color:var(--amber)">Fulgur Ventures: Executive Summary</a> &mdash; the best structured academic-style overview of the theory.</p>
+      <p class="prose">For the broader scientific foundation of power laws in complex systems: Geoffrey West, <em>Scale: The Universal Laws of Growth, Innovation, Sustainability, and the Pace of Life in Companies, Cities, and People</em> (Penguin, 2017).</p>
+    </div>
+
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
@@ -411,17 +510,26 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
       scales: {
         x: {
           type: 'logarithmic',
-          title: {display: true, text: 'Days since Genesis Block (log scale)', color: '#706860', font: {size: 11}},
+          title: {display: true, text: 'Year (log scale — days since Genesis Block, Jan 3 2009)', color: '#706860', font: {size: 11}},
           grid: {color: 'rgba(255,255,255,0.04)'},
           ticks: {
             color: '#706860',
             font: {size: 10},
             callback: function(v){
-              // Convert days to approximate year
               var yr = 2009 + v/365.25;
-              if(yr%2 < 0.5 && yr >= 2010 && yr <= 2028) return Math.round(yr).toString();
+              var rounded = Math.round(yr);
+              if(Math.abs(yr - rounded) < 0.3 && rounded >= 2010 && rounded <= 2028 && rounded % 2 === 0) return rounded.toString();
               return '';
+            },
+            maxTicksLimit: 12
+          },
+          afterBuildTicks: function(axis){
+            // Override with year-based ticks for clearer labeling
+            var yearTicks = [];
+            for(var y = 2010; y <= 2028; y += 2){
+              yearTicks.push({value: (y - 2009) * 365.25});
             }
+            axis.ticks = yearTicks.map(function(t){return {value: t.value}});
           }
         },
         y: {
@@ -473,10 +581,14 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
               var ratio = (p/tv).toFixed(2);
               var lines = [];
               if(item.datasetIndex === 0){
+                var doublingFactor = Math.pow(2, 1/PL_B);
+                var daysToDouble = Math.round(d * (doublingFactor - 1));
+                var yearsToDouble = (daysToDouble/365.25).toFixed(1);
                 lines.push('Price: $' + p.toLocaleString(undefined,{maximumFractionDigits:2}));
                 lines.push('Trend: $' + Math.round(tv).toLocaleString());
                 lines.push('Floor: $' + Math.round(fv).toLocaleString());
                 lines.push('Position: ' + ratio + 'x trend');
+                lines.push('Days to double: ' + daysToDouble.toLocaleString() + ' (' + yearsToDouble + ' yrs)');
               } else {
                 lines.push('$' + Math.round(p).toLocaleString());
               }
