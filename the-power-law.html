@@ -329,40 +329,48 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <div class="tab-content" id="tab-nature">
 
     <div class="section">
-      <h2>Power Laws Are Everywhere</h2>
-      <p class="prose">The Power Law isn't a Bitcoin invention. It's a mathematical pattern that appears across biology, physics, and urban science &mdash; wherever complex systems scale. Bitcoin is the latest example of a relationship observed in phenomena spanning billions of years and dozens of scientific disciplines. Understanding where else power laws appear is what makes Bitcoin's adherence to one structurally expected rather than coincidental.</p>
+      <h2>A System, Not an Asset</h2>
+      <p class="prose">Power laws don't describe assets. They describe <em>systems</em> &mdash; complex, self-organizing structures whose growth is governed by internal feedback dynamics rather than external market sentiment. Stocks fluctuate with earnings and psychology. Commodities respond to supply and demand. But systems &mdash; cities, organisms, networks &mdash; scale according to structural rules that produce predictable mathematical relationships across many orders of magnitude.</p>
+      <p class="prose">The fact that Bitcoin follows a power law is evidence of what it actually is: not an asset to be traded, but a <em>system</em> to be understood. Its growth is <em>proportional</em><sup>1</sup> &mdash; scaling as a constant fraction of its own age &mdash; and <em>sustainable</em><sup>1</sup> &mdash; decelerating naturally as the network matures, avoiding the unsustainable acceleration that collapses exponential systems. This same proportional, sustainable pattern appears across biology, urban science, and network theory. Bitcoin is the latest example &mdash; and understanding the precedents makes its trajectory structurally expected rather than surprising.</p>
     </div>
 
     <div class="section">
-      <h3>Kleiber's Law: Mammalian Metabolism</h3>
-      <div class="insight-box">
-        <p>An elephant's metabolic rate is not proportional to its body mass &mdash; it scales to the &frac34; power. Larger mammals are more energy-efficient per gram of tissue than smaller ones. This relationship holds across every mammalian species ever measured.</p>
+      <h3>Kleiber's Law: How Life Scales</h3>
+      <p class="prose">In 1932, biologist Max Kleiber discovered that metabolic rate across mammals scales with body mass raised to the power of 0.75. A mouse burns far more energy per gram than an elephant. This isn't a coincidence &mdash; it's a structural law that emerges from the branching architecture of biological distribution networks (circulatory systems, respiratory trees). On a log-log chart, every mammalian species falls on the same straight line.</p>
+      <div class="chart-container">
+        <div class="chart-title">Kleiber's Law: Metabolic Rate vs. Body Mass</div>
+        <div class="chart-subtitle">Log-log scale &middot; Representative mammalian species &middot; Exponent &asymp; 0.75</div>
+        <div class="chart-wrapper" style="height:280px"><canvas id="kleiberChart"></canvas></div>
+        <div class="chart-source">Data representative of Kleiber's observations. On a log-log scale, the relationship forms a straight line &mdash; the visual signature of a power law. The same straight line appears in Bitcoin's price chart.</div>
       </div>
-      <p class="prose">In 1932, biologist Max Kleiber discovered that metabolic rate scales with body mass raised to the power of 0.75. A mouse burns far more energy per gram than a whale. This isn't a coincidence or an approximation &mdash; it's a mathematical law that emerges from the structure of biological distribution networks (the branching patterns of circulatory systems).</p>
-      <p class="prose">Bitcoin exhibits an analogous scaling relationship: its hash rate (a measure of network security) scales with price following a power law. Just as larger mammals achieve greater metabolic efficiency, larger Bitcoin networks achieve greater security efficiency. The pattern is the same &mdash; efficiency increasing predictably with scale, governed not by intention but by structure.</p>
+      <p class="prose">The key insight isn't just that the relationship exists &mdash; it's that it's <em>proportional and sustainable</em>. Larger mammals don't need exponentially more energy; they achieve greater efficiency through structural scaling. The growth is governed by physics, not by choice. Bitcoin's hash rate (network security) scales with price following an analogous power law &mdash; efficiency increasing predictably with scale, governed not by intention but by structure.</p>
     </div>
 
     <div class="section">
       <h3>City Scaling: Geoffrey West's 15% Rule</h3>
-      <div class="insight-box">
-        <p>When a city doubles in population, its infrastructure needs increase by only 85% &mdash; but its economic output increases by 115%. Cities are superlinear scaling systems: bigger means disproportionately more productive.</p>
+      <p class="prose">Physicist Geoffrey West and colleagues at the Santa Fe Institute discovered that cities exhibit a remarkable dual scaling pattern. Physical infrastructure &mdash; roads, pipes, cables &mdash; scales <em>sublinearly</em> (exponent ~0.85), creating economies of scale. But socioeconomic outputs &mdash; GDP, patents, wages, innovation &mdash; scale <em>superlinearly</em> (exponent ~1.15). Every new person added to a city creates more potential social connections, driving disproportionate increases in productivity.</p>
+      <div class="chart-container">
+        <div class="chart-title">Urban Scaling: GDP vs. City Population</div>
+        <div class="chart-subtitle">Log-log scale &middot; Representative global cities &middot; Exponent &asymp; 1.15</div>
+        <div class="chart-wrapper" style="height:280px"><canvas id="cityChart"></canvas></div>
+        <div class="chart-source">Data illustrative of Bettencourt &amp; West (Nature, 2010). Larger cities produce disproportionately more economic output per capita. The superlinear exponent (~1.15) means a city twice as large is ~2.3 times as productive.</div>
       </div>
-      <p class="prose">Physicist Geoffrey West and colleagues at the Santa Fe Institute discovered that cities exhibit a remarkable dual scaling pattern, published in <em>Nature</em> (Bettencourt &amp; West, 2010). Physical infrastructure &mdash; roads, water pipes, electrical cables &mdash; scales <em>sublinearly</em> with population (exponent ~0.85), creating economies of scale. But socioeconomic outputs &mdash; GDP, patents, wages, even crime &mdash; scale <em>superlinearly</em> (exponent ~1.15). Every new person added to a city creates more potential social connections, driving disproportionate increases in productivity and innovation.</p>
-      <p class="prose">Bitcoin parallels this urban scaling pattern. Its value increases superlinearly with adoption &mdash; each new participant creates more potential transaction connections, driving disproportionate increases in network value. The ~13% proportional doubling in Bitcoin echoes the ~15% superlinear scaling in cities. Different systems, same mathematical fingerprint. And notably, cities are among the most durable human institutions &mdash; they outlast companies, governments, and currencies. Scaling like a city implicitly means having the durability characteristics of a city.</p>
+      <p class="prose">The Bitcoin parallel is direct: the ~13% proportional doubling in Bitcoin echoes the ~15% superlinear scaling in cities. Both are systems where each new participant creates more potential connections, driving disproportionate value growth. And notably, cities are among the most durable human institutions &mdash; they outlast companies, governments, and currencies. Systems that scale like cities have the <em>durability characteristics</em> of cities. Companies follow exponential S-curves and eventually die. Cities follow power laws and persist.</p>
     </div>
 
     <div class="section">
-      <h3>The Curbed Pandemic: Why Power Law, Not Exponential</h3>
-      <div class="insight-box">
-        <p>Viruses typically spread exponentially. But when a spreading phenomenon encounters a curbing mechanism &mdash; partial immunity, risk awareness, or structural resistance &mdash; exponential growth transforms into a power law. Unstable explosion becomes sustainable scaling.</p>
-      </div>
-      <p class="prose">Many technologies follow an exponential S-curve of adoption: slow start, rapid acceleration, eventual saturation. Bitcoin doesn't follow this pattern. Its adoption grows as a power law of approximately t&sup3; &mdash; cubic in time, not exponential. Why?</p>
-      <p class="prose">The answer lies in two curbing mechanisms built into Bitcoin's protocol. First, the <strong>difficulty adjustment</strong>: every 2,016 blocks, the network recalibrates mining difficulty to maintain a consistent block time, preventing runaway acceleration in network growth. Second, <strong>investment risk</strong>: Bitcoin's volatility naturally moderates the speed of adoption, as each new participant must overcome a psychological and financial threshold to enter. These two mechanisms &mdash; one protocol-level, one behavioral &mdash; transform what could be an unstable exponential spike into a stable, sustainable power law. The result is growth that continues indefinitely but at a naturally decelerating pace.</p>
+      <h3>Network Adoption: From Telephones to Bitcoin</h3>
+      <p class="prose">The telephone network provides the earliest modern example of power law scaling through adoption. In 1908, AT&amp;T's Theodore Vail observed that a telephone without a connection at the other end is useless &mdash; its value depends entirely on the number of other telephones connected. Robert Metcalfe later formalized this as Metcalfe's Law: the value of a network is proportional to the square of its users.</p>
+      <p class="prose">The fax machine's trajectory is even more instructive. In the early 1980s, fax machines were a niche curiosity. But as installations grew from thousands to millions, the value of each device surged &mdash; because the expanding pool of potential recipients made every existing machine more useful. Total network utility scaled roughly as the square of connected machines. Fax crossed a threshold from "niche tool" to "essential business standard" not because the technology improved, but because <em>the network grew</em>.</p>
+      <p class="prose">Bitcoin's adoption follows the same structural dynamic, but with a critical difference: while telephone and fax adoption followed exponential S-curves (fast start, rapid acceleration, eventual saturation), Bitcoin's adoption grows as a power law &mdash; curbed by the difficulty adjustment (which prevents premature completion of the emission schedule) and by investment risk (which moderates the speed at which new participants enter). These curbing mechanisms transform a potentially unstable exponential adoption spike into a <em>proportional, sustainable</em> power law. The growth continues indefinitely but at a naturally decelerating pace &mdash; which is why the Power Law has held for 15 years and counting, rather than accelerating to an unsustainable peak and collapsing.</p>
     </div>
 
     <div class="section">
-      <h3>The Pattern</h3>
-      <p class="prose">Across all these examples, the same structural insight recurs: <em>complex systems that scale through networks produce power law relationships</em>. Metabolic networks in biology. Social networks in cities. Transaction and mining networks in Bitcoin. The specific exponents differ (0.75 for metabolism, 1.15 for cities, 5.77 for Bitcoin price vs. time), but the underlying mathematical form is the same. Bitcoin's power law isn't an anomaly. It's the expected behavior of a complex network scaling through adoption &mdash; the same mathematics that governs how elephants breathe and how cities grow.</p>
+      <h3>The Unifying Pattern</h3>
+      <div class="insight-box">
+        <p>Metabolic networks in biology. Social networks in cities. Communication networks in telephones. Transaction and mining networks in Bitcoin. The specific exponents differ, but the underlying mathematical form is the same: complex systems that scale through networks produce power law relationships. Bitcoin's adherence to this pattern is not coincidental &mdash; it is the expected behavior of a network system scaling through adoption.</p>
+      </div>
+      <p class="prose">This is why the framing matters. If Bitcoin is an "asset," then its price is unpredictable, driven by sentiment and speculation. If Bitcoin is a <em>system</em>, then its scaling behavior is structurally governed &mdash; proportional, sustainable, and consistent with mathematical laws observed across every complex network ever studied. The Power Law is evidence that Bitcoin belongs in the second category.</p>
     </div>
 
   </div>
@@ -391,7 +399,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <div class="section">
       <h3>The Difficulty Adjustment: Bitcoin's Thermostat</h3>
       <p class="prose">Every 2,016 blocks (approximately two weeks), Bitcoin recalibrates the difficulty of mining to maintain a consistent block time of roughly 10 minutes. This mechanism is the single most important structural reason Bitcoin follows a power law rather than an exponential curve.</p>
-      <p class="prose">Without it, a surge in mining activity would produce blocks faster and faster, accelerating supply issuance and network growth in a self-reinforcing exponential spiral. The difficulty adjustment acts as a <em>thermostat</em> &mdash; when the network heats up, difficulty increases, naturally moderating the pace. When activity cools, difficulty decreases, preventing collapse. This built-in governor transforms potentially unstable exponential dynamics into the stable, self-regulating power law we observe.</p>
+      <p class="prose">Without it, a surge in mining activity would produce blocks faster and faster, completing the emission schedule prematurely and destabilizing the network's carefully calibrated supply curve. The difficulty adjustment acts as a <em>thermostat</em> &mdash; when the network heats up, difficulty increases, naturally moderating the pace. When activity cools, difficulty decreases, preventing collapse. This built-in governor transforms potentially unstable exponential dynamics into the stable, self-regulating power law we observe.</p>
     </div>
 
     <div class="section">
@@ -884,6 +892,130 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
                         'Ratio: '+(p/earlyPred).toFixed(2)+'x prediction'];
               }
               return 'Model: $'+Math.round(p).toLocaleString();
+            }
+          }
+        }
+      }
+    }
+  });
+})();
+
+
+// ═══════ KLEIBER'S LAW CHART ═══════
+(function(){
+  var ctx = document.getElementById('kleiberChart');
+  if(!ctx) return;
+
+  // Representative mammalian data: [body mass kg, metabolic rate watts]
+  // Kleiber's law: rate = 70 * mass^0.75 (in kcal/day, converted approximately)
+  var mammals = [
+    {name:'Mouse', mass:0.02, rate:0.34},
+    {name:'Rat', mass:0.3, rate:2.5},
+    {name:'Rabbit', mass:2, rate:10},
+    {name:'Cat', mass:4, rate:16},
+    {name:'Dog', mass:15, rate:45},
+    {name:'Sheep', mass:50, rate:115},
+    {name:'Human', mass:70, rate:150},
+    {name:'Pig', mass:120, rate:220},
+    {name:'Cow', mass:500, rate:650},
+    {name:'Horse', mass:600, rate:750},
+    {name:'Elephant', mass:4000, rate:3500}
+  ];
+
+  var points = mammals.map(function(m){ return {x:m.mass, y:m.rate}; });
+  var trendLine = [];
+  for(var m=0.01; m<=10000; m*=2){
+    trendLine.push({x:m, y:3.5*Math.pow(m,0.75)});
+  }
+
+  new Chart(ctx, {
+    type:'scatter',
+    data:{
+      datasets:[
+        {label:'Mammalian species',data:points,pointRadius:4,pointBackgroundColor:'rgba(247,147,26,0.8)',pointBorderWidth:0,order:1},
+        {label:'Power law (mass^0.75)',data:trendLine,type:'line',borderColor:'rgba(224,148,34,0.6)',borderWidth:2,pointRadius:0,fill:false,order:2}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        x:{type:'logarithmic',title:{display:true,text:'Body Mass (kg, log scale)',color:'#706860',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#706860',font:{size:9},callback:function(v){if([0.01,0.1,1,10,100,1000,10000].indexOf(v)>=0)return v>=1?v+'kg':v+'kg';return''}}},
+        y:{type:'logarithmic',title:{display:true,text:'Metabolic Rate (watts, log scale)',color:'#706860',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#706860',font:{size:9},callback:function(v){if([0.1,1,10,100,1000,10000].indexOf(v)>=0)return v;return''}}}
+      },
+      plugins:{
+        legend:{display:true,position:'top',labels:{color:'#908880',font:{size:10,family:'Inter'},boxWidth:10,padding:12,usePointStyle:true}},
+        tooltip:{backgroundColor:'rgba(10,9,8,0.95)',titleColor:'#f2eee8',bodyColor:'#d0c8c0',borderColor:'rgba(247,147,26,0.3)',borderWidth:1,padding:10,displayColors:false,
+          callbacks:{
+            title:function(items){
+              var mass = items[0].raw.x;
+              var m = mammals.find(function(mm){return Math.abs(mm.mass-mass)<mass*0.01});
+              return m ? m.name : '';
+            },
+            label:function(item){
+              if(item.datasetIndex===0) return ['Mass: '+item.raw.x+' kg','Metabolic rate: '+item.raw.y+' W'];
+              return '';
+            }
+          }
+        }
+      }
+    }
+  });
+})();
+
+// ═══════ CITY SCALING CHART ═══════
+(function(){
+  var ctx = document.getElementById('cityChart');
+  if(!ctx) return;
+
+  // Representative city data: [population millions, GDP billions USD]
+  // Illustrative of West's superlinear scaling (exponent ~1.15)
+  var cities = [
+    {name:'Zurich',pop:0.4,gdp:55},
+    {name:'Denver',pop:0.7,gdp:85},
+    {name:'San Francisco',pop:0.87,gdp:130},
+    {name:'Madrid',pop:3.3,gdp:230},
+    {name:'Berlin',pop:3.6,gdp:200},
+    {name:'Singapore',pop:5.5,gdp:400},
+    {name:'Hong Kong',pop:7.4,gdp:370},
+    {name:'London',pop:9,gdp:850},
+    {name:'Seoul',pop:10,gdp:700},
+    {name:'Shanghai',pop:26,gdp:700},
+    {name:'Tokyo',pop:37,gdp:1900},
+    {name:'New York',pop:20,gdp:1800}
+  ];
+
+  var points = cities.map(function(c){return {x:c.pop,y:c.gdp}});
+  var trendLine = [];
+  for(var p=0.2;p<=50;p*=1.5){
+    trendLine.push({x:p,y:90*Math.pow(p,1.15)});
+  }
+
+  new Chart(ctx, {
+    type:'scatter',
+    data:{
+      datasets:[
+        {label:'Global cities',data:points,pointRadius:4,pointBackgroundColor:'rgba(247,147,26,0.8)',pointBorderWidth:0,order:1},
+        {label:'Power law (pop^1.15)',data:trendLine,type:'line',borderColor:'rgba(224,148,34,0.6)',borderWidth:2,pointRadius:0,fill:false,order:2}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        x:{type:'logarithmic',title:{display:true,text:'Population (millions, log scale)',color:'#706860',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#706860',font:{size:9},callback:function(v){if([0.1,0.5,1,2,5,10,20,50].indexOf(v)>=0)return v+'M';return''}}},
+        y:{type:'logarithmic',title:{display:true,text:'GDP (billions USD, log scale)',color:'#706860',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#706860',font:{size:9},callback:function(v){if([10,50,100,200,500,1000,2000,5000].indexOf(v)>=0)return '$'+v+'B';return''}}}
+      },
+      plugins:{
+        legend:{display:true,position:'top',labels:{color:'#908880',font:{size:10,family:'Inter'},boxWidth:10,padding:12,usePointStyle:true}},
+        tooltip:{backgroundColor:'rgba(10,9,8,0.95)',titleColor:'#f2eee8',bodyColor:'#d0c8c0',borderColor:'rgba(247,147,26,0.3)',borderWidth:1,padding:10,displayColors:false,
+          callbacks:{
+            title:function(items){
+              var pop=items[0].raw.x;
+              var c=cities.find(function(cc){return Math.abs(cc.pop-pop)<pop*0.05});
+              return c?c.name:'';
+            },
+            label:function(item){
+              if(item.datasetIndex===0) return ['Population: '+item.raw.x+'M','GDP: $'+item.raw.y+'B'];
+              return '';
             }
           }
         }
