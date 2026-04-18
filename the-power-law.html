@@ -10,12 +10,12 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WNGLLPPR5M"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-WNGLLPPR5M');</script>
-<title>The Power Law — Last Coin Standing</title>
+<title>Bitcoin and The Power Law — Last Coin Standing</title>
 <meta name="description" content="For every 13%% increase in Bitcoin's age, the trend price doubles. An interactive exploration of the Power Law — proportional, sustainable growth across 15 years and nine orders of magnitude.">
 <link rel="canonical" href="https://lastcoinstanding.com/the-power-law.html">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://lastcoinstanding.com/the-power-law.html">
-<meta property="og:title" content="The Power Law — Last Coin Standing">
+<meta property="og:title" content="Bitcoin and The Power Law — Last Coin Standing">
 <meta property="og:description" content="For every 13%% increase in Bitcoin's age, the trend price doubles. Proportional and sustainable growth across nine orders of magnitude.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -158,7 +158,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <a href="/the-melting-ice-cube.html">The Melting Ice Cube</a>
         <a href="/not-a-bubble.html">Is Bitcoin a Bubble?</a>
         <a href="/bitcoin-vs-real-estate.html">BTC vs. Real Estate</a>
-        <a href="/the-power-law.html" class="active">The Power Law</a>
+        <a href="/the-power-law.html" class="active">Bitcoin &amp; The Power Law</a>
       </div>
     </div>
   </div>
@@ -176,13 +176,13 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <a href="/the-melting-ice-cube.html">The Melting Ice Cube</a>
     <a href="/not-a-bubble.html">Is Bitcoin a Bubble?</a>
     <a href="/bitcoin-vs-real-estate.html">BTC vs. Real Estate</a>
-    <a href="/the-power-law.html" class="active">The Power Law</a>
+    <a href="/the-power-law.html" class="active">Bitcoin &amp; The Power Law</a>
     <a href="/about.html">About</a>
 </div>
 
 <div class="page">
   <div class="page-header">
-    <h1>The Power Law</h1>
+    <h1>Bitcoin and The Power Law</h1>
     <p class="subtitle">Bitcoin's growth follows the same mathematical pattern found in city scaling, biological metabolism, and network adoption. Not a prediction &mdash; an observation.</p>
   </div>
 
@@ -225,6 +225,20 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
 
     <!-- S2F COMPARISON -->
+
+    <!-- DECLINING CAGR vs S&P 500 -->
+    <div class="section">
+      <h2>How Bitcoin's Growth Rate Compares</h2>
+      <p class="prose">Because Bitcoin follows a power law, its annualized growth rate naturally declines over time. But even as it decelerates, the projected returns remain substantially higher than traditional equity markets for decades. The table below shows the Power Law's implied CAGR (Compound Annual Growth Rate) from each starting year to 2035, compared to the S&amp;P 500's historical average of roughly 10% per year.<sup title="This comparison of declining Bitcoin CAGR against traditional equity returns is inspired by analysis from Matthew Mežinskis (Porkopolis Economics).">4</sup></p>
+      <div class="chart-container">
+        <div class="chart-title">Power Law Implied CAGR vs. S&amp;P 500</div>
+        <div class="chart-subtitle">Projected annualized return from each year to 2035, using trend (fair value) line</div>
+        <div class="chart-wrapper" style="height:320px"><canvas id="cagrChart"></canvas></div>
+        <div class="chart-source">CAGR calculated from Power Law trend values. S&amp;P 500 historical average ~10% annualized (nominal). Bitcoin's CAGR declines because the Power Law describes proportional, not exponential, growth &mdash; but remains above equity-market averages for decades.</div>
+      </div>
+      <p class="prose">The key insight: even the <em>decelerating</em> version of Bitcoin's growth outperforms the historical average of the world's most successful equity index. This isn't a prediction &mdash; it's what the model's trajectory implies if the 15-year pattern continues. The growth slows, but the slowed growth is still extraordinary by any traditional benchmark.</p>
+    </div>
+
     <div class="compare-box">
       <h3>How the Power Law Differs from Stock-to-Flow</h3>
       <div class="compare-grid">
@@ -258,6 +272,20 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         </tbody>
       </table>
       <div class="annotation">The model's creator, Giovanni Santostasi, cautions against projections beyond ~2040, when Bitcoin's market cap would approach levels where the current growth regime must naturally transition. Projections beyond that horizon should be treated with increasing skepticism.</div>
+    </div>
+
+
+    <!-- OUT-OF-SAMPLE VALIDATION -->
+    <div class="section">
+      <h2>Out-of-Sample Validation</h2>
+      <p class="prose">The strongest evidence for any model is its performance on data it was never fitted to. The Power Law was first identified by Giovanni Santostasi in 2014 and formally published by Matthew Me&#x17E;inskis in 2018. Every year since publication has been an out-of-sample test &mdash; the model was fitted to data that existed at the time, and subsequent prices have continued tracking the trajectory.</p>
+      <p class="prose">The chart below demonstrates this directly: the green line shows the Power Law regression fitted to only the first five years of data (2010&ndash;2014). The orange dots show all actual prices since then. If the early-data model were merely overfitting, its projection would diverge from reality as time passed. Instead, the early-fitted regression has tracked Bitcoin's actual price across the subsequent decade with remarkable fidelity &mdash; through multiple bull and bear cycles, regulatory shifts, and black-swan events.</p>
+      <div class="chart-container">
+        <div class="chart-title">Early Data Predicts the Future</div>
+        <div class="chart-subtitle">Power Law fitted to 2010&ndash;2014 data only, projected forward vs. actual prices</div>
+        <div class="chart-wrapper" style="height:380px"><canvas id="oosChart"></canvas></div>
+        <div class="chart-source">Green line: regression fitted using only data from 2010&ndash;2014 (~700 data points). Orange dots: actual prices 2015&ndash;present. The early model captures the long-term trajectory without access to any post-2014 data.</div>
+      </div>
     </div>
 
     <!-- CAVEATS -->
@@ -580,17 +608,22 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
               var tv = plPrice(d), fv = tv*PL_FLOOR, cv = tv*PL_CEIL;
               var ratio = (p/tv).toFixed(2);
               var lines = [];
+              var doublingFactor = Math.pow(2, 1/PL_B);
+              var daysToDouble = Math.round(d * (doublingFactor - 1));
+              var yearsToDouble = (daysToDouble/365.25).toFixed(1);
               if(item.datasetIndex === 0){
-                var doublingFactor = Math.pow(2, 1/PL_B);
-                var daysToDouble = Math.round(d * (doublingFactor - 1));
-                var yearsToDouble = (daysToDouble/365.25).toFixed(1);
                 lines.push('Price: $' + p.toLocaleString(undefined,{maximumFractionDigits:2}));
                 lines.push('Trend: $' + Math.round(tv).toLocaleString());
                 lines.push('Floor: $' + Math.round(fv).toLocaleString());
                 lines.push('Position: ' + ratio + 'x trend');
                 lines.push('Days to double: ' + daysToDouble.toLocaleString() + ' (' + yearsToDouble + ' yrs)');
+              } else if(item.datasetIndex === 1){
+                lines.push('Trend: $' + Math.round(p).toLocaleString());
+                lines.push('Floor: $' + Math.round(fv).toLocaleString());
+                lines.push('Ceiling: $' + Math.round(cv).toLocaleString());
+                lines.push('Days to double: ' + daysToDouble.toLocaleString() + ' (' + yearsToDouble + ' yrs)');
               } else {
-                lines.push('$' + Math.round(p).toLocaleString());
+                return [];
               }
               return lines;
             }
@@ -629,6 +662,236 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
 
 // ═══════ NAV ═══════
 (function(){var h=document.getElementById('hamburger'),o=document.getElementById('mobileOverlay');if(!h||!o)return;h.addEventListener('click',function(){h.classList.toggle('open');o.classList.toggle('show');document.body.style.overflow=o.classList.contains('show')?'hidden':''});var ls=o.querySelectorAll('a');for(var i=0;i<ls.length;i++)ls[i].addEventListener('click',function(){h.classList.remove('open');o.classList.remove('show');document.body.style.overflow=''})})();
+
+// ═══════ CAGR COMPARISON CHART ═══════
+(function(){
+  var ctx = document.getElementById('cagrChart');
+  if(!ctx) return;
+
+  var targetYear = 2035;
+  var targetDays = (targetYear - 2009) * 365.25;
+  var targetPrice = plPrice(targetDays);
+
+  var years = [];
+  var cagrValues = [];
+  var sp500Line = [];
+
+  for(var y = 2015; y <= 2030; y++){
+    var startDays = (y - 2009) * 365.25;
+    var startPrice = plPrice(startDays);
+    var yrsHeld = targetYear - y;
+    if(yrsHeld <= 0) continue;
+    var cagr = (Math.pow(targetPrice / startPrice, 1/yrsHeld) - 1) * 100;
+    years.push(y.toString());
+    cagrValues.push(+cagr.toFixed(1));
+    sp500Line.push(10);
+  }
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: years,
+      datasets: [
+        {
+          label: 'Bitcoin Power Law CAGR to 2035',
+          data: cagrValues,
+          backgroundColor: 'rgba(247,147,26,0.5)',
+          borderColor: 'rgba(247,147,26,0.8)',
+          borderWidth: 1,
+          borderRadius: 3
+        },
+        {
+          label: 'S&P 500 Historical Avg (~10%)',
+          data: sp500Line,
+          type: 'line',
+          borderColor: 'rgba(150,150,150,0.6)',
+          borderWidth: 2,
+          borderDash: [6,3],
+          pointRadius: 0,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          grid: {color: 'rgba(255,255,255,0.04)'},
+          ticks: {color: '#706860', font: {size: 10}},
+          title: {display: true, text: 'Year of Bitcoin purchase', color: '#706860', font: {size: 11}}
+        },
+        y: {
+          grid: {color: 'rgba(255,255,255,0.04)'},
+          ticks: {color: '#706860', font: {size: 10}, callback: function(v){return v+'%'}},
+          title: {display: true, text: 'Implied CAGR to 2035', color: '#706860', font: {size: 11}},
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {color: '#908880', font: {size: 11, family: 'Inter'}, boxWidth: 12, padding: 16}
+        },
+        tooltip: {
+          backgroundColor: 'rgba(10,9,8,0.95)',
+          titleColor: '#f2eee8',
+          bodyColor: '#d0c8c0',
+          borderColor: 'rgba(247,147,26,0.3)',
+          borderWidth: 1,
+          padding: 12,
+          callbacks: {
+            label: function(item){
+              if(item.datasetIndex === 0) return 'Bitcoin CAGR: ' + item.raw + '%';
+              return 'S&P 500 avg: ~10%';
+            }
+          }
+        }
+      }
+    }
+  });
+})();
+
+// ═══════ OUT-OF-SAMPLE CHART ═══════
+(function(){
+  var ctx = document.getElementById('oosChart');
+  if(!ctx) return;
+
+  // Split data into training (<=2014) and test (>2014)
+  var cutoffDays = (2015 - 2009) * 365.25; // ~2192 days
+  var trainData = PL_DATA.filter(function(d){ return d[0] <= cutoffDays; });
+  var testData = PL_DATA.filter(function(d){ return d[0] > cutoffDays; });
+
+  // Fit power law to training data only using least squares on log-log
+  // log(price) = log(a) + b*log(days)
+  var sumX=0, sumY=0, sumXY=0, sumX2=0, n=0;
+  trainData.forEach(function(d){
+    if(d[1] > 0){
+      var lx = Math.log(d[0]), ly = Math.log(d[1]);
+      sumX += lx; sumY += ly; sumXY += lx*ly; sumX2 += lx*lx; n++;
+    }
+  });
+  var earlyB = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
+  var earlyLogA = (sumY - earlyB*sumX) / n;
+  var earlyA = Math.exp(earlyLogA);
+
+  function earlyPlPrice(days){ return earlyA * Math.pow(days, earlyB); }
+
+  // Generate early-fit projection line (extending to present + 1yr)
+  var maxD = PL_DATA[PL_DATA.length-1][0] + 365;
+  var earlyLine = [];
+  for(var d = trainData[0][0]; d <= maxD; d += 30){
+    earlyLine.push({x: d, y: earlyPlPrice(d)});
+  }
+
+  // Training scatter (dimmer)
+  var trainScatter = trainData.map(function(d){ return {x:d[0], y:d[1]}; });
+  // Test scatter (brighter)
+  var testScatter = testData.map(function(d){ return {x:d[0], y:d[1]}; });
+
+  new Chart(ctx, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        {
+          label: 'Training data (2010–2014)',
+          data: trainScatter,
+          pointRadius: 2,
+          pointBackgroundColor: 'rgba(150,150,150,0.5)',
+          pointBorderWidth: 0,
+          order: 2
+        },
+        {
+          label: 'Out-of-sample prices (2015–present)',
+          data: testScatter,
+          pointRadius: 1.8,
+          pointBackgroundColor: 'rgba(247,147,26,0.7)',
+          pointBorderWidth: 0,
+          order: 2
+        },
+        {
+          label: 'Regression fitted to 2010–2014 only',
+          data: earlyLine,
+          type: 'line',
+          borderColor: 'rgba(76,175,80,0.8)',
+          borderWidth: 2.5,
+          pointRadius: 0,
+          fill: false,
+          order: 3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          type: 'logarithmic',
+          title: {display: true, text: 'Year (log scale)', color: '#706860', font: {size: 11}},
+          grid: {color: 'rgba(255,255,255,0.04)'},
+          ticks: {
+            color: '#706860', font: {size: 10},
+            callback: function(v){
+              var yr = 2009 + v/365.25;
+              var r = Math.round(yr);
+              if(Math.abs(yr-r)<0.3 && r>=2010 && r<=2028 && r%2===0) return r.toString();
+              return '';
+            },
+            maxTicksLimit: 12
+          },
+          afterBuildTicks: function(axis){
+            var ticks = [];
+            for(var y=2010;y<=2028;y+=2) ticks.push({value:(y-2009)*365.25});
+            axis.ticks = ticks.map(function(t){return {value:t.value}});
+          }
+        },
+        y: {
+          type: 'logarithmic',
+          title: {display: true, text: 'Price USD (log scale)', color: '#706860', font: {size: 11}},
+          grid: {color: 'rgba(255,255,255,0.04)'},
+          ticks: {
+            color: '#706860', font: {size: 10},
+            callback: function(v){
+              if([0.01,0.1,1,10,100,1000,10000,100000,1000000].indexOf(v)>=0){
+                return '$'+(v>=1000?(v/1000)+'K':v<1?v:v.toLocaleString());
+              }
+              return '';
+            }
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: true, position: 'top',
+          labels: {color:'#908880',font:{size:11,family:'Inter'},boxWidth:12,padding:16,usePointStyle:true}
+        },
+        tooltip: {
+          backgroundColor:'rgba(10,9,8,0.95)',titleColor:'#f2eee8',bodyColor:'#d0c8c0',
+          borderColor:'rgba(247,147,26,0.3)',borderWidth:1,padding:12,displayColors:false,
+          callbacks: {
+            title: function(items){
+              var d = items[0].raw.x;
+              var date = new Date((GENESIS_TS+d*86400)*1000);
+              return date.toLocaleDateString('en-US',{year:'numeric',month:'short'});
+            },
+            label: function(item){
+              var p = item.raw.y, d = item.raw.x;
+              var earlyPred = earlyPlPrice(d);
+              if(item.datasetIndex <= 1){
+                return ['Price: $'+p.toLocaleString(undefined,{maximumFractionDigits:2}),
+                        'Early model prediction: $'+Math.round(earlyPred).toLocaleString(),
+                        'Ratio: '+(p/earlyPred).toFixed(2)+'x prediction'];
+              }
+              return 'Model: $'+Math.round(p).toLocaleString();
+            }
+          }
+        }
+      }
+    }
+  });
+})();
+
 </script>
 </body>
 </html>
