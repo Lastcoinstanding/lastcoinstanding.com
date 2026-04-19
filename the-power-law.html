@@ -182,6 +182,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .calc-card h4.house,.calc-card.house h4{color:var(--red)}
 .calc-card .invested-line{font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:.3rem}
 .calc-card .invested-line strong{color:var(--text-dim);font-weight:500;text-transform:none;letter-spacing:0;font-size:.92rem}
+.calc-card .period-label{font-size:.68rem;text-transform:uppercase;letter-spacing:1.8px;color:var(--text-muted);font-weight:500;margin-bottom:.5rem;opacity:.85}
+.calc-card .period-divider{border-top:1px dashed var(--border);margin:1rem 0 .9rem}
 .calc-card .big-number{font-family:var(--font-d);font-size:2rem;font-weight:600;color:var(--text-bright);margin-bottom:.2rem;line-height:1.15}
 .calc-card.bitcoin .big-number{color:var(--amber)}
 .calc-card.house .big-number{color:var(--text-dim)}
@@ -1500,19 +1502,22 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
     // ── RENDER: BITCOIN CARD (left) ──
     var btcHtml =
       '<div class="calc-card bitcoin">' +
-        '<h4>&#8383; Bought Bitcoin + Rented ('+startYear+') <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">\u00b7 values as of '+asOf+'</span></h4>' +
+        '<h4>&#8383; Bought Bitcoin + Rented ('+startYear+')</h4>' +
+        '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
         '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong></div>' +
+        '<div class="period-divider"></div>' +
+        '<div class="period-label">'+endYear+' \u00b7 Projected</div>' +
         '<div class="big-number">'+fmt(btcNet)+' <span style="font-size:.8rem;color:var(--text-muted)">net</span></div>' +
-        '<div class="big-number-label">projected net position ('+endYear+')</div>' +
+        '<div class="big-number-label">projected net position</div>' +
         houseIconsHtml +
         '<div class="detail-line">BTC purchased: '+btcBought.toFixed(4)+' @ '+fmt(btcNow)+'/BTC</div>' +
-        '<div class="detail-line">Projected BTC price ('+endYear+'): <strong>'+fmt(futurePrice)+'</strong></div>' +
+        '<div class="detail-line">Projected BTC price: <strong>'+fmt(futurePrice)+'</strong></div>' +
         '<div class="detail-line">Gross BTC value: '+fmt(btcValue)+'</div>' +
         '<div class="detail-line">Est. monthly rent: '+fmt(impliedRent)+'/mo <span style="font-size:.78rem;color:var(--text-muted)">(75% of equivalent mortgage)</span></div>' +
         '<div class="detail-line">Total rent paid: <span class="negative">'+fmt(totalRentPaid)+'</span></div>' +
         '<div class="detail-line">Total return: <span class="highlight">'+btcReturn+'%</span></div>' +
         (btcCAGR !== '—' ? '<div class="detail-line">Implied CAGR: <span class="highlight">'+btcCAGR+'%</span></div>' : '') +
-        '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">(projected home value '+endYear+': '+fmt(futureHomeValue)+' each)</span></div>' +
+        '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">(projected home value: '+fmt(futureHomeValue)+' each)</span></div>' +
         '<div class="detail-line" style="margin-top:.6rem;font-size:.78rem;color:var(--text-muted)">No leverage. No interest. No property taxes. No maintenance.</div>' +
       '</div>';
 
@@ -1521,10 +1526,13 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
     if(method === 'mortgage'){
       houseHtml =
         '<div class="calc-card house">' +
-          '<h4>&#127968; Bought the House ('+startYear+') <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">\u00b7 values as of '+asOf+'</span></h4>' +
+          '<h4>&#127968; Bought the House ('+startYear+')</h4>' +
+          '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
           '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(20% down of '+fmt(homePrice)+')</span></div>' +
+          '<div class="period-divider"></div>' +
+          '<div class="period-label">'+endYear+' \u00b7 Projected</div>' +
           '<div class="big-number">'+fmt(equity)+'</div>' +
-          '<div class="big-number-label">projected equity ('+endYear+')</div>' +
+          '<div class="big-number-label">projected equity</div>' +
           '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(futureHomeValue)+' ('+houseCAGR+'%/yr)</div>' +
           '<div class="detail-line">Monthly mortgage: '+fmt(monthlyMort)+'/mo at '+mortRate+'%</div>' +
           '<div class="detail-line">Interest paid: <span class="negative">'+fmt(interestPaid)+'</span> <span style="font-size:.78rem;color:var(--text-muted)">(dead money)</span></div>' +
@@ -1535,10 +1543,13 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
     } else {
       houseHtml =
         '<div class="calc-card house">' +
-          '<h4>&#127968; Bought the House ('+startYear+') <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">\u00b7 values as of '+asOf+'</span></h4>' +
+          '<h4>&#127968; Bought the House ('+startYear+')</h4>' +
+          '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
           '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(cash, paid in full)</span></div>' +
+          '<div class="period-divider"></div>' +
+          '<div class="period-label">'+endYear+' \u00b7 Projected</div>' +
           '<div class="big-number">'+fmt(futureHomeValue)+'</div>' +
-          '<div class="big-number-label">projected home value ('+endYear+')</div>' +
+          '<div class="big-number-label">projected home value</div>' +
           '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(futureHomeValue)+' ('+houseCAGR+'%/yr)</div>' +
           '<div class="detail-line">Mortgage: $0 <span style="font-size:.78rem;color:var(--text-muted)">(no debt)</span></div>' +
           '<div class="detail-line">Interest paid: $0</div>' +
