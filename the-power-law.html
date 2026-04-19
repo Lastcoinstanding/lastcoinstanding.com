@@ -1481,6 +1481,22 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
     var totalHouseCost = amount + totalMortPaid + propTax + insurance + maintenance;
     var houseCAGR = ((Math.pow(futureHomeValue/homePrice, 1/horizonYrs) - 1) * 100).toFixed(1);
 
+    // ── HOUSES SUMMARY (computed early so it can go inside the Bitcoin card) ──
+    var housesCanBuy = Math.max(0, btcNet / futureHomeValue);
+
+    // House-icon visualization (mirrors retrospective pattern)
+    function buildHouseIcons(n){
+      var fI = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+      var pI = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px;opacity:0.45"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.2" stroke-dasharray="2 2" stroke-linejoin="round"/></svg>';
+      var fH = Math.floor(n), pt = n - fH, ic = '';
+      for(var i = 0; i < Math.min(fH, 15); i++) ic += fI;
+      if(pt > 0.05) ic += pI;
+      if(fH === 0 && pt <= 0.05) ic += pI;
+      var ov = fH > 15 ? '<span style="font-size:.8rem;color:var(--amber);margin-left:.4rem;align-self:center">+'+(fH-15)+' more</span>' : '';
+      return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:.6rem 0 .8rem">' + ic + ov + '</div>';
+    }
+    var houseIconsHtml = buildHouseIcons(housesCanBuy);
+
     // ── RENDER: BITCOIN CARD (left) ──
     var btcHtml =
       '<div class="calc-card bitcoin">' +
@@ -1488,6 +1504,7 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
         '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong></div>' +
         '<div class="big-number">'+fmt(btcNet)+' <span style="font-size:.8rem;color:var(--text-muted)">net</span></div>' +
         '<div class="big-number-label">projected net position ('+endYear+')</div>' +
+        houseIconsHtml +
         '<div class="detail-line">BTC purchased: '+btcBought.toFixed(4)+' @ '+fmt(btcNow)+'/BTC</div>' +
         '<div class="detail-line">Projected BTC price ('+endYear+'): <strong>'+fmt(futurePrice)+'</strong></div>' +
         '<div class="detail-line">Gross BTC value: '+fmt(btcValue)+'</div>' +
@@ -1495,7 +1512,8 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
         '<div class="detail-line">Total rent paid: <span class="negative">'+fmt(totalRentPaid)+'</span></div>' +
         '<div class="detail-line">Total return: <span class="highlight">'+btcReturn+'%</span></div>' +
         (btcCAGR !== '—' ? '<div class="detail-line">Implied CAGR: <span class="highlight">'+btcCAGR+'%</span></div>' : '') +
-        '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted)">No leverage. No interest. No property taxes. No maintenance.</div>' +
+        '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">(projected home value '+endYear+': '+fmt(futureHomeValue)+' each)</span></div>' +
+        '<div class="detail-line" style="margin-top:.6rem;font-size:.78rem;color:var(--text-muted)">No leverage. No interest. No property taxes. No maintenance.</div>' +
       '</div>';
 
     // ── RENDER: HOUSE CARD (right) ──
@@ -1504,7 +1522,7 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
       houseHtml =
         '<div class="calc-card house">' +
           '<h4>&#127968; Bought the House ('+startYear+') <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">\u00b7 values as of '+asOf+'</span></h4>' +
-          '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(20% down)</span></div>' +
+          '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(20% down of '+fmt(homePrice)+')</span></div>' +
           '<div class="big-number">'+fmt(equity)+'</div>' +
           '<div class="big-number-label">projected equity ('+endYear+')</div>' +
           '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(futureHomeValue)+' ('+houseCAGR+'%/yr)</div>' +
@@ -1530,16 +1548,8 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
         '</div>';
     }
 
-    // ── Summary ──
-    var housesCanBuy = btcNet / futureHomeValue;
-    var summaryHtml =
-      '<div class="calc-summary">' +
-        '<div class="summary-big">'+housesCanBuy.toFixed(1)+' houses</div>' +
-        '<div class="summary-detail">Your Bitcoin net position ('+scenarioLabel+') could buy <strong>'+housesCanBuy.toFixed(1)+' houses</strong> outright in '+endYear+' \u2014 no mortgage, no interest, no debt.</div>' +
-      '</div>';
-
     resultsEl.innerHTML =
-      '<div class="calc-results-grid">' + btcHtml + houseHtml + '</div>' + summaryHtml;
+      '<div class="calc-results-grid">' + btcHtml + houseHtml + '</div>';
 
     // ── ADVANCED SECTION ──
     renderAdvanced({
