@@ -335,8 +335,8 @@
                     <div id="dcaSection" style="display:none">
                         <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:1.2rem;line-height:1.7;padding:1rem;background:rgba(224,148,34,0.04);border-radius:6px">If you rent instead of buying, your monthly housing cost is typically lower than a mortgage payment. The difference — invested in bitcoin each month — compounds the opportunity cost dramatically over time.</div>
                         <div class="dca-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
-                            <div></div>
                             <div id="dcaResultContainer"></div>
+                            <div></div>
                         </div>
                     </div>
                 </div>
@@ -591,11 +591,6 @@
 
         // ── MAIN CARDS ──
         document.getElementById('calcResultsContainer').innerHTML=
-            '<div class="calc-result-card house">'+
-                '<h4>\uD83C\uDFE0 Bought the House ('+sy+') <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">· values as of '+asOf+'</span></h4>'+
-                '<div class="result-value">'+hL+'</div>'+
-                '<div class="result-detail">'+hD+'</div>'+
-            '</div>'+
             '<div class="calc-result-card bitcoin">'+
                 '<h4>\u20BF Bought Bitcoin + Rented ('+sy+') <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">· values as of '+asOf+'</span></h4>'+
                 '<div class="result-value">$'+Math.round(lumpValue).toLocaleString()+' <span style="font-size:0.85rem;color:var(--text-muted)">gross</span></div>'+
@@ -608,6 +603,11 @@
                     '<span style="color:var(--amber);font-weight:500">You could now buy '+lumpHouses.toFixed(1)+' houses <strong>outright</strong></span> <span style="font-size:0.78rem;color:var(--text-muted)">('+medianRef+')</span><br>'+
                     '<span style="font-size:0.78rem;color:var(--text-muted);display:block;margin-top:0.4rem">No leverage. No interest. No property taxes. No maintenance.</span>'+
                 '</div>'+
+            '</div>'+
+            '<div class="calc-result-card house">'+
+                '<h4>\uD83C\uDFE0 Bought the House ('+sy+') <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">· values as of '+asOf+'</span></h4>'+
+                '<div class="result-value">'+hL+'</div>'+
+                '<div class="result-detail">'+hD+'</div>'+
             '</div>';
 
         // ── DCA SECTION ──
@@ -654,22 +654,9 @@
             const lr='color:var(--red)';
             const la='color:var(--amber)';
             totalWrapper.style.display='block';
-            var _bh = (function(){var hf='<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.5" stroke-linejoin="round"/></svg>';var hp='<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px;opacity:0.3"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.5" stroke-dasharray="2 2" stroke-linejoin="round"/></svg>';var lh=Math.max(0,totalHouses);var fH=Math.floor(lh);var pt=lh-fH;var ic="";for(var i=0;i<Math.min(fH,15);i++)ic+=hf;if(pt>0.05)ic+=hp;if(fH===0&&pt<=0.05)ic+=hp;var ov=fH>15?('<span style="font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center">+'+(fH-15)+' more</span>'):"";return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:0.4rem 0 0.6rem;justify-content:flex-end">'+ic+ov+'</div>';})();
+            var _bh = (function(){var hf='<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.5" stroke-linejoin="round"/></svg>';var hp='<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px;opacity:0.3"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.5" stroke-dasharray="2 2" stroke-linejoin="round"/></svg>';var lh=Math.max(0,totalHouses);var fH=Math.floor(lh);var pt=lh-fH;var ic="";for(var i=0;i<Math.min(fH,15);i++)ic+=hf;if(pt>0.05)ic+=hp;if(fH===0&&pt<=0.05)ic+=hp;var ov=fH>15?('<span style="font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center">+'+(fH-15)+' more</span>'):"";return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:0.4rem 0 0.6rem">'+ic+ov+'</div>';})();
             totalSummary.innerHTML=
-                '<div style="background:var(--bg-card);border:1px solid var(--red-dim);border-radius:8px;padding:1.5rem 2rem">'+
-                    '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--red);margin-bottom:0.5rem">\uD83C\uDFE0 House — Total Position</div>'+
-                    '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--text-dim);margin-bottom:0.3rem">$'+Math.round(houseEquity).toLocaleString()+'</div>'+(function(){var fh=Math.max(0,Math.min(20,equityPct*0.20));var st=equityPct>=100?'#e09422':'#c0392b';return '<div style="display:flex;align-items:center;gap:0.6rem;margin:0.4rem 0 0.6rem"><svg viewBox="0 0 24 24" width="32" height="32"><defs><clipPath id="tlc"><rect x="0" y="'+(24-fh)+'" width="24" height="'+fh+'"/></clipPath></defs>'+'<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="'+st+'" stroke-width="1.5" stroke-linejoin="round"/>'+'<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.7" stroke-linejoin="round" clip-path="url(#tlc)"/></svg>'+'<span style="font-size:0.85rem;color:var(--text-muted)">'+(equityPct>=100?'fully owned':equityPct+'% owned')+'</span></div>';})()+
-                    '<div style="font-size:0.78rem;'+lm+';margin-bottom:0.6rem">values as of '+asOf+'</div>'+
-                    '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'+
-                        '<div style="'+ls+lm+'">Ownership: <span style="color:var(--text)">'+equityPct+'% of 1 home</span></div>'+
-                        (mode==='leverage'?'<div style="'+ls+lr+'">Debt outstanding: $'+Math.round(remainingBal).toLocaleString()+'</div>':'')+
-                        (mode==='leverage'?'<div style="'+ls+lr+'">Interest paid: $'+interestPaid.toLocaleString()+' <span style="'+lm+';font-size:0.78rem">(dead money)</span></div>':'')+
-                        (mode==='leverage'?'<div style="'+ls+lr+'">Debt-free: '+debtFreeYear+' <span style="'+lm+'">('+yrsRemaining+' yrs away)</span></div>':'')+
-                        '<div style="'+ls+lm+'">Rent paid: $0 <span style="font-size:0.78rem">(you live in it)</span></div>'+
-                        '<div style="'+ls+'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: $'+houseOutflow.toLocaleString()+'</div>'+
-                    '</div>'+
-                '</div>'+
-                '<div style="background:var(--bg-card);border:1px solid var(--amber-dim);border-radius:8px;padding:1.5rem 2rem;text-align:right">'+
+                '<div style="background:var(--bg-card);border:1px solid var(--amber-dim);border-radius:8px;padding:1.5rem 2rem">'+
                     '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);margin-bottom:0.5rem">\u20BF Bitcoin — Total Position</div>'+
                     '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.3rem">$'+Math.round(totalBtcNet).toLocaleString()+' <span style="font-size:0.8rem;color:var(--text-muted)">net</span></div>'+_bh+
                     '<div style="font-size:0.78rem;color:var(--amber-dim);margin-bottom:0.6rem">values as of '+asOf+'</div>'+
@@ -681,6 +668,19 @@
                         '<div style="'+ls+la+';font-weight:600">You could now buy '+extraHouses.toFixed(1)+' additional houses, also outright <span style="color:var(--text-muted);font-weight:400;font-size:0.82rem">('+(1+extraHouses).toFixed(1)+' total)</span></div>'+
                         '<div style="'+ls+'color:var(--text-dim)">Rent paid: $'+totalRentPaid.toLocaleString()+'</div>'+
                         '<div style="'+ls+'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: $'+btcOutflow.toLocaleString()+'</div>'+
+                    '</div>'+
+                '</div>'+
+                '<div style="background:var(--bg-card);border:1px solid var(--red-dim);border-radius:8px;padding:1.5rem 2rem">'+
+                    '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--red);margin-bottom:0.5rem">\uD83C\uDFE0 House — Total Position</div>'+
+                    '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--text-dim);margin-bottom:0.3rem">$'+Math.round(houseEquity).toLocaleString()+'</div>'+(function(){var fh=Math.max(0,Math.min(20,equityPct*0.20));var st=equityPct>=100?'#e09422':'#c0392b';return '<div style="display:flex;align-items:center;gap:0.6rem;margin:0.4rem 0 0.6rem"><svg viewBox="0 0 24 24" width="32" height="32"><defs><clipPath id="tlc"><rect x="0" y="'+(24-fh)+'" width="24" height="'+fh+'"/></clipPath></defs>'+'<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="'+st+'" stroke-width="1.5" stroke-linejoin="round"/>'+'<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.7" stroke-linejoin="round" clip-path="url(#tlc)"/></svg>'+'<span style="font-size:0.85rem;color:var(--text-muted)">'+(equityPct>=100?'fully owned':equityPct+'% owned')+'</span></div>';})()+
+                    '<div style="font-size:0.78rem;'+lm+';margin-bottom:0.6rem">values as of '+asOf+'</div>'+
+                    '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'+
+                        '<div style="'+ls+lm+'">Ownership: <span style="color:var(--text)">'+equityPct+'% of 1 home</span></div>'+
+                        (mode==='leverage'?'<div style="'+ls+lr+'">Debt outstanding: $'+Math.round(remainingBal).toLocaleString()+'</div>':'')+
+                        (mode==='leverage'?'<div style="'+ls+lr+'">Interest paid: $'+interestPaid.toLocaleString()+' <span style="'+lm+';font-size:0.78rem">(dead money)</span></div>':'')+
+                        (mode==='leverage'?'<div style="'+ls+lr+'">Debt-free: '+debtFreeYear+' <span style="'+lm+'">('+yrsRemaining+' yrs away)</span></div>':'')+
+                        '<div style="'+ls+lm+'">Rent paid: $0 <span style="font-size:0.78rem">(you live in it)</span></div>'+
+                        '<div style="'+ls+'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: $'+houseOutflow.toLocaleString()+'</div>'+
                     '</div>'+
                 '</div>';
         }else{
