@@ -183,7 +183,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .calc-card .invested-line{font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:.3rem}
 .calc-card .invested-line strong{color:var(--text-dim);font-weight:500;text-transform:none;letter-spacing:0;font-size:.92rem}
 .calc-card .period-label{font-size:.68rem;text-transform:uppercase;letter-spacing:1.8px;color:var(--text-muted);font-weight:500;margin-bottom:.5rem;opacity:.85}
-.calc-card .period-divider{border-top:1px dashed var(--border);margin:1rem 0 .9rem}
+.calc-card .period-divider{border-top:2px dashed rgba(255,255,255,0.12);margin:1rem 0 .9rem}
 .calc-card .big-number{font-family:var(--font-d);font-size:2rem;font-weight:600;color:var(--text-bright);margin-bottom:.2rem;line-height:1.15}
 .calc-card.bitcoin .big-number{color:var(--amber)}
 .calc-card.house .big-number{color:var(--text-dim)}
@@ -1486,6 +1486,34 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
     // ── HOUSES SUMMARY (computed early so it can go inside the Bitcoin card) ──
     var housesCanBuy = Math.max(0, btcNet / futureHomeValue);
 
+    // Equity % for the house card ownership visual (mortgage mode only)
+    var equityPct = futureHomeValue > 0 ? Math.round((equity / futureHomeValue) * 100) : 0;
+
+    // ── House-ownership visual (single house icon, mirrors retrospective pattern) ──
+    // Mortgage: red outline with amber fill-overlay scaled to equity %
+    function buildOwnershipVisual(){
+      if(method === 'cash'){
+        return '<div style="display:flex;align-items:center;gap:.6rem;margin:.2rem 0 .9rem">' +
+          '<svg viewBox="0 0 24 24" width="32" height="32">' +
+            '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="var(--amber)" fill-opacity="0.18" stroke="#e09422" stroke-width="1.7" stroke-linejoin="round"/>' +
+          '</svg>' +
+          '<span style="font-size:.9rem;color:var(--text)">1 house, outright</span>' +
+        '</div>';
+      }
+      var _fh = Math.max(0, Math.min(20, equityPct * 0.20));
+      var outlineColor = equityPct >= 100 ? '#e09422' : '#c0392b';
+      var label = equityPct < 0 ? '<span style="color:var(--red)">Underwater</span>' : equityPct + '% owned';
+      return '<div style="display:flex;align-items:center;gap:.6rem;margin:.2rem 0 .9rem">' +
+        '<svg viewBox="0 0 24 24" width="32" height="32">' +
+          '<defs><clipPath id="ecFwd"><rect x="0" y="'+(24-_fh)+'" width="24" height="'+_fh+'"/></clipPath></defs>' +
+          '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="'+outlineColor+'" stroke-width="1.5" stroke-linejoin="round"/>' +
+          '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linejoin="round" clip-path="url(#ecFwd)"/>' +
+        '</svg>' +
+        '<span style="font-size:.9rem;color:var(--text)">'+label+'</span>' +
+      '</div>';
+    }
+    var ownershipVisual = buildOwnershipVisual();
+
     // House-icon visualization (mirrors retrospective pattern)
     function buildHouseIcons(n){
       var fI = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linejoin="round"/></svg>';
@@ -1533,6 +1561,7 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
           '<div class="period-label">'+endYear+' \u00b7 Projected</div>' +
           '<div class="big-number">'+fmt(equity)+'</div>' +
           '<div class="big-number-label">projected equity</div>' +
+          ownershipVisual +
           '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(futureHomeValue)+' ('+houseCAGR+'%/yr)</div>' +
           '<div class="detail-line">Monthly mortgage: '+fmt(monthlyMort)+'/mo at '+mortRate+'%</div>' +
           '<div class="detail-line">Interest paid: <span class="negative">'+fmt(interestPaid)+'</span> <span style="font-size:.78rem;color:var(--text-muted)">(dead money)</span></div>' +
@@ -1550,6 +1579,7 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
           '<div class="period-label">'+endYear+' \u00b7 Projected</div>' +
           '<div class="big-number">'+fmt(futureHomeValue)+'</div>' +
           '<div class="big-number-label">projected home value</div>' +
+          ownershipVisual +
           '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(futureHomeValue)+' ('+houseCAGR+'%/yr)</div>' +
           '<div class="detail-line">Mortgage: $0 <span style="font-size:.78rem;color:var(--text-muted)">(no debt)</span></div>' +
           '<div class="detail-line">Interest paid: $0</div>' +
