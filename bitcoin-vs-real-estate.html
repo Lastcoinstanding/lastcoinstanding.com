@@ -128,6 +128,8 @@
         .calc-result-card .invested-line{font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:0.3rem}
         .calc-result-card .invested-line strong{color:var(--text-dim);font-weight:500;text-transform:none;letter-spacing:0;font-size:0.92rem}
         .calc-result-card .invested-line .note{text-transform:none;letter-spacing:0;font-size:0.75rem;color:var(--text-muted)}
+        .calc-result-card .period-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:1.8px;color:var(--text-muted);font-weight:500;margin-bottom:0.5rem;opacity:0.85}
+        .calc-result-card .period-divider{border-top:1px dashed var(--border);margin:1rem 0 0.9rem}
         .calc-result-card .result-detail{font-size:0.9rem;color:var(--text-muted);line-height:1.7}
         .calc-result-card .result-detail span{color:var(--text-dim)}
         .page-footer{position:relative;z-index:1;text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);max-width:1000px;margin:0 auto}
@@ -594,8 +596,11 @@
         // ── MAIN CARDS ──
         document.getElementById('calcResultsContainer').innerHTML=
             '<div class="calc-result-card bitcoin">'+
-                '<h4>\u20BF Bought Bitcoin + Rented ('+sy+') <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">· values as of '+asOf+'</span></h4>'+
+                '<h4>\u20BF Bought Bitcoin + Rented ('+sy+')</h4>'+
+                '<div class="period-label">'+sy+' \u00B7 At Purchase</div>'+
                 '<div class="invested-line">Invested <strong>$'+dp.toLocaleString()+'</strong>'+(mode==='leverage'?' <span class="note">(20% down)</span>':' <span class="note">(cash equivalent)</span>')+'</div>'+
+                '<div class="period-divider"></div>'+
+                '<div class="period-label">As of '+asOf+'</div>'+
                 '<div class="result-value">$'+Math.round(lumpValue).toLocaleString()+' <span style="font-size:0.85rem;color:var(--text-muted)">gross</span></div>'+
                 '<div class="result-detail">'+(function(){var lh=lumpHouses;var fH=Math.floor(lh);var pt=lh-fH;var ic='';var fI='<svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" style=\"margin:1px\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/></svg>';var pI='<svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" style=\"margin:1px;opacity:0.45\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.2\" stroke-dasharray=\"2 2\" stroke-linejoin=\"round\"/></svg>';for(var i=0;i<Math.min(fH,15);i++)ic+=fI;if(pt>0.05)ic+=pI;var ov=fH>15?'<span style=\"font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center\">+'+(fH-15)+' more</span>':'';return '<div style=\"display:flex;flex-wrap:wrap;align-items:center;gap:0;margin-bottom:0.8rem\">'+ic+ov+'</div>';})()+
                     'BTC purchased: '+bb.toFixed(2)+' @ $'+bs.toLocaleString()+'<br>'+
@@ -607,8 +612,11 @@
                 '</div>'+
             '</div>'+
             '<div class="calc-result-card house">'+
-                '<h4>\uD83C\uDFE0 Bought the House ('+sy+') <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">· values as of '+asOf+'</span></h4>'+
+                '<h4>\uD83C\uDFE0 Bought the House ('+sy+')</h4>'+
+                '<div class="period-label">'+sy+' \u00B7 At Purchase</div>'+
                 '<div class="invested-line">Invested <strong>$'+dp.toLocaleString()+'</strong>'+(mode==='leverage'?' <span class="note">(20% down of $'+hs.toLocaleString()+')</span>':' <span class="note">(cash, paid in full)</span>')+'</div>'+
+                '<div class="period-divider"></div>'+
+                '<div class="period-label">As of '+asOf+'</div>'+
                 '<div class="result-value">'+hL+'</div>'+
                 '<div class="result-detail">'+hD+'</div>'+
             '</div>';
