@@ -77,6 +77,17 @@ Can a reader who taps this CTA actually *do what it promises*? "Calculate the me
 - **Accent orange** `#e09422` for active/interactive elements.
 - Cool tones (blue, gray, green) are used sparingly and only where philosophically necessary; they read off-register if used decoratively.
 
+### Warm / cool camp semantics (from WMHTB state system)
+
+When visually encoding a spectrum of monies or states, **warmth is earned by structural soundness; coolness signals captured or failing monies.** The WMHTB page encodes this explicitly across four states:
+
+- **Resonant** (Bitcoin): warm orange `#F7931A` — animated, pulsing, alive
+- **Depleted** (Gold): warm umber `#a06a28` — static, dim, honorable
+- **Decaying** (USD): cool slate `#6a7580` — static, off-register
+- **Dying** (Hyperinflating fiat): darker slate `#454550` — broken coupling, dashed lines
+
+The **warm/cool boundary sits between Gold and USD** — not between Bitcoin and everything else. This is a philosophically loaded choice: commodity money (gold), even when impractical, retains the register; fiat money, once unmoored, does not. Preserve this boundary in any future state-based visualization.
+
 ### Compositional principles
 
 - **Unmarked objects carry arguments.** No Bitcoin logos on coins. No signage on houses. No ornamentation on the persistent/central subject. Structural facts don't need labels.
@@ -125,6 +136,31 @@ Three slides (Fixed Pie, Money Trees' right tree, Is Bitcoin a Bubble) share the
 
 Short deployment delay (~30-60s) after GitHub push. Retry live URL checks after a pause. **Videos are aggressively cached by browsers** — use hard refresh or incognito to verify new video deployments. For future video swaps, consider cache-busting query parameters (`?v=YYYY-MM-DD`) on video source URLs.
 
+### Open Graph / Twitter card meta tags — REQUIRED on every shareable page
+
+Every user-facing page must include the full set of social meta tags, not just `og:type` / `og:url` / `og:title` / `og:description`. Without `og:image` + `twitter:card`, links unfurl as text-only on Twitter and Facebook — visually indistinguishable from broken links. The standard block is:
+
+```html
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lastcoinstanding.com/<page>.html">
+<meta property="og:title" content="<Page Title> — Last Coin Standing">
+<meta property="og:description" content="<under 160 chars>">
+<meta property="og:image" content="https://lastcoinstanding.com/og-preview.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="720">
+<meta property="og:image:type" content="image/jpeg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<Page Title> — Last Coin Standing">
+<meta name="twitter:description" content="<same as og:description>">
+<meta name="twitter:image" content="https://lastcoinstanding.com/og-preview.jpg">
+```
+
+Use the generic `og-preview.jpg` unless the page has a custom OG image (like `bitcoin-vs-real-estate-og.png`). Audit existing pages before shipping new ones — Power Law and WMHTB both shipped without these initially and had to be retrofitted.
+
+### Typography: Cormorant for display only
+
+Cormorant Garamond is **display-only, 1.5rem floor**. Below 1.5rem use Inter — at body sizes Cormorant italic becomes unreadable and the mix looks unintentional. Use Cormorant for H1, H2, hero subtitles; Inter for body, captions, editorial labels (even when italicized). Property names and card titles: Inter 500-weight, not Cormorant.
+
 ### Responsive design standard
 
 Mobile-first, fluid grids, flexible images, `rem`/`em` units. Breakpoints: 480/768/1024px. Minimum 44px tap targets.
@@ -141,7 +177,7 @@ For HTML files that exceed fetch token limits, use `curl | tail -n 300` rather t
 
 ### Homepage carousel
 
-Ten featured insight slides, each pairing:
+Twelve featured insight slides, each pairing:
 - A 16:9 atmospheric silent video (720p, ~3-10MB)
 - A three-beat minimalist text block (label + headline + CTA)
 
@@ -155,18 +191,39 @@ Each concept has its own dedicated page (trilemma.html, money-trees.html, the-ha
 
 Every carousel CTA should invite the specific interaction the destination page provides. The site's pedagogy is hands-on: remove a component, model your treasury, find your number, calculate the melt.
 
-## 9. Open tasks and future rename considerations
+## 9. Interaction design principles (from WMHTB)
+
+The What Money Has To Be page consolidated four principles worth preserving for future interactive pages:
+
+### Categorical over continuous
+
+When a distinction is about **kind, not degree**, use state buttons not sliders. WMHTB's four-preset selector (Bitcoin / Gold / USD / Hyperinflating fiat) is categorical — these aren't points on a spectrum, they are different categories of monetary regime. Sliders would falsely imply interpolation between them. This principle applies to any page where the user switches between discrete cases rather than tuning a parameter.
+
+### One interactive control per page, visually firm
+
+If a page has only one primary interactive control, **visually distinguish it from everything that merely responds to it**. WMHTB's 12 property cards each contain state-indicator pills that look button-like but are read-only — they reflect the preset selection, not individual clickability. Without clear demarcation between "the control" and "the response," users try to tap indicators and feel confused when nothing happens. The fix is structural: wrap the control in a labeled panel with its own enclosure (border, tint, "SELECT A MONEY TO COMPARE" label), and make response elements subtler (transparent borders with only the active state fully bordered).
+
+### Subtle-enclosure grouping pattern
+
+For grouping related properties without heavy visual weight: **1px border `#1e1c1a`, 3px radius, 1.5rem padding, `rgba(255,255,255,0.015)` tint**. State-neutral — does not change with the active preset. Used in WMHTB for all four property groupings (SoV, MoE, UoA, Structural). This is the site's default "these belong together" treatment, distinct from the stronger preset-panel enclosure which signals interactivity.
+
+### Hierarchical nesting over flat width
+
+When a page has a natural visual hierarchy (e.g., triangle → UoA properties → cross-cutting structural properties), nest the narrower sections under the element they belong to, rather than letting them span full width. The cross-cutting Structural Properties section on WMHTB sits inside the center-stack column (matching the UoA box width) rather than spanning the full 1240px page, which preserves the "these belong to the center argument" relationship visually.
+
+## 10. Open tasks and future rename considerations
 
 - **`/synthesis.html` → `/the-bitcoin-synthesis.html`** URL alignment to match label convention.
 - **"The Fixed Pie" concept rename pass.** "Fixed" reads as limitation in ordinary language; the concept's actual thesis is permanence/imperviousness to dilution. Candidates: "The Share That Holds," "Your Permanent Share," "What Cannot Be Diluted." A rename touches: homepage carousel label, nav dropdown, tool page, sitemap, internal links, meta tags.
 - ~~**Mobile responsive tweak** on Bitcoin vs. Real Estate page~~ — completed (now 3-col input row with responsive stacking).
 - **Audit of `.insight-desc` blocks** on older carousel slides — the minimalist pattern drops these; ensure consistency across the set.
+- ~~**OG/Twitter card meta tags on WMHTB and Power Law pages**~~ — completed (both pages retrofitted with full social meta tag block).
 
 ---
 
-_See section 13 for latest Chart.js patterns. See section 10 for Power Law page details._
+_See section 14 for latest Chart.js patterns. See section 11 for Power Law page details. See section 12 for WMHTB page details._
 
-## 10. Bitcoin and The Power Law (`/the-power-law.html`)
+## 11. Bitcoin and The Power Law (`/the-power-law.html`)
 
 **Added:** April 18, 2026. A four-tab page presenting the Bitcoin Power Law as an accessible but intellectually rigorous explainer, with an interactive forward-looking calculator.
 
@@ -264,11 +321,37 @@ Full credits section lists: Giovanni Santostasi (theory creator), Matthew Mežin
 - City growth video for Tab 2: Grok-generated cinematic video of a city growing from village to metropolis, paired with mathematical chart
 - Interactive out-of-sample slider: let user choose regression cutoff date and see how early-fitted model predicts subsequent years
 - PAGR concept: "Proportional Annual Growth Rate" as alternative to CAGR — concept discussed but not yet coined on the page (risk of premature neologism)
-- Homepage carousel slot for Power Law page (needs video concept + copy)
+- ~~Homepage carousel slot for Power Law page~~ — completed (slide 3, video deployed).
 
-## 11. Homepage carousel — completed set (10 slides)
+## 12. What Money Has To Be (`/what-money-has-to-be.html`)
 
-All 10 slides deployed with 16:9 widescreen silent videos, minimalist copy pattern (label + headline + CTA, no `.insight-desc`).
+The site's most foundational concept page. Thesis: a good money must simultaneously serve as Store of Value (persistence across time), Medium of Exchange (movement across space), and Unit of Account (shared measurement). These three functions are structurally coupled — unbundling degrades each. Bitcoin is the first money to deliver all three simultaneously.
+
+### Structural elements
+
+- **Four-preset state system** — Bitcoin / Gold / USD / Hyperinflating fiat. Categorical, not continuous (see Section 9). Each preset updates the full page: triangle node colors + animation state, coupling-line styles (solid pulsing orange for Resonant, dashed slate for Dying, etc.), and all 12 property descriptor cells.
+- **Triangle visualization** — three nodes (SoV top, MoE bottom-left, UoA bottom-right) connected by coupling lines. Uses Synthesis-style `circuitGlow` keyframe and Melting-Ice-Cube-style `nodeBreathe` layered box-shadows, synced on 3s period. SVG `feGaussianBlur + feMerge` filter needs `filterUnits="userSpaceOnUse"` — the default `objectBoundingBox` collapses on horizontal lines.
+- **Flanking property columns** — SoV on the left flank, MoE on the right flank, UoA + Structural Properties in the center stack below the triangle. Structural Properties are cross-cutting (affect all three functions) and live inside the center column at UoA's width, not spanning full page.
+- **Closing sections** — "Money vs. Currency?" (defends the claim that the three functions are not unbundleable) and "Additively stronger than the sum of its parts" (closes on Bitcoin as a category of thing, first-and-also-last). Closing callout links to Adam Back's 2-minute summary on Bitcoin's narrow design space — same link used at end of Synthesis page, creating cross-page structural reference.
+
+### Copy patterns established here
+
+- **≤15 words per property descriptor cell.** Forces concision and rewards the reader.
+- **USD = Hyperinflating at MoE layer.** Editorial insight locked during prose review: on Settlement finality, Cross-border friction, and Open-source, USD and Hyperinflating fiat read the same. The difference between them lives at SoV — when a reader clicks USD → Hyper, they see where the divergence actually is.
+- **"not just the first money, but thereby also the last"** — the "also" is load-bearing. Without it, first-and-last reads as one claim (obvious). With it, the second claim becomes distinct (Bitcoin is a one-time discovery, not an iterable technology) which is the argument many readers miss.
+
+### Cross-links
+
+- From Half-Life (via Durability / "persistence across time")
+- From Synthesis (as companion: six components / three functions)
+
+### Page-specific design lessons
+
+All four principles in Section 9 originated here. See that section for the general patterns; this section documents the page-specific application.
+
+## 13. Homepage carousel — completed set (12 slides)
+
+All 12 slides deployed with 16:9 widescreen silent videos, minimalist copy pattern (label + headline + CTA, no `.insight-desc`).
 
 ### Typography tune
 
@@ -281,18 +364,20 @@ All 10 slides deployed with 16:9 widescreen silent videos, minimalist copy patte
 
 | # | Slide | Headline | Video concept |
 |---|-------|----------|---------------|
-| 1 | Bitcoin vs. Real Estate | Housing became the default store of value by elimination, not merit | Golden hour → twilight → dark silhouette |
-| 2 | Is Bitcoin a Bubble? | A thing isn't a bubble simply because it has been called one | ~10 bubbles burst; one amber object remains impervious |
-| 3 | The Half-Life | How long until your money loses half its value? | Candle burning down asymptotically |
-| 4 | The Melting Ice Cube | Holding cash is not safety. It's an active decision with an ongoing cost | Ice cube melts to fragment on weathered wood |
-| 5 | The Bitcoin Synthesis | Six components. One irreducible synthesis | Six antique keys assemble into clockwork mechanism |
-| 6 | What Bitcoin Is | Most people consider just a few dimensions. Bitcoin is all of them, simultaneously | Raw mineral crystal, traveling amber light |
-| 7 | The Bitcoin Migration | From what can't be fixed, to what can't be broken | Heavy wooden door opens ~2/3, amber light |
-| 8 | The Trilemma | Some problems are navigated, not solved | Three geometric counterweights in coupled sway |
-| 9 | The Money Trees | Two systems. Different roots. One outcome | Two trees; left withers, right unchanged |
-| 10 | The Fixed Pie | Your share remains undiluted — for eternity | Unmarked gold coin; surrounding coins dissolve |
+| 1 | What Money Has To Be | One money must do three things at once — or it cannot do any of them | Three ornate brass lenses on oak workbench, candle behind; each shows same flame |
+| 2 | Bitcoin vs. Real Estate | Housing became the default store of value by elimination, not merit | Golden hour → twilight → dark silhouette |
+| 3 | Bitcoin and The Power Law | For every 13% increase in Bitcoin's age, the trend price doubles | Town at dusk, lawful illumination pattern |
+| 4 | Is Bitcoin a Bubble? | A thing isn't a bubble simply because it has been called one | ~10 bubbles burst; one amber object remains impervious |
+| 5 | The Half-Life | How long until your money loses half its value? | Candle burning down asymptotically |
+| 6 | The Melting Ice Cube | Holding cash is not safety. It's an active decision with an ongoing cost | Ice cube melts to fragment on weathered wood |
+| 7 | The Bitcoin Synthesis | Six components. One irreducible synthesis | Six antique keys assemble into clockwork mechanism |
+| 8 | What Bitcoin Is | Most people consider just a few dimensions. Bitcoin is all of them, simultaneously | Raw mineral crystal, traveling amber light |
+| 9 | The Bitcoin Migration | From what can't be fixed, to what can't be broken | Heavy wooden door opens ~2/3, amber light |
+| 10 | The Trilemma | Some problems are navigated, not solved | Three geometric counterweights in coupled sway |
+| 11 | The Money Trees | Two systems. Different roots. One outcome | Two trees; left withers, right unchanged |
+| 12 | The Fixed Pie | Your share remains undiluted — for eternity | Unmarked gold coin; surrounding coins dissolve |
 
-## 12. Bitcoin vs. Real Estate — custom interest rate input
+## 14. Bitcoin vs. Real Estate — custom interest rate input
 
 **Added:** April 18, 2026. Third optional input field "Your interest rate" on Tab 3 (Postponed Purchase calculator).
 
@@ -304,7 +389,7 @@ All 10 slides deployed with 16:9 widescreen silent videos, minimalist copy patte
 - Flows through to: monthly payment, remaining balance, total cost, rent estimate, DCA savings
 - Mobile responsive at 768px and 480px stacks to single column
 
-## 13. Chart.js patterns and lessons
+## 15. Chart.js patterns and lessons
 
 - **Version:** 4.4.1 via CDN (`cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js`)
 - **Log-log charts:** Use `type: 'scatter'` with both axes set to `type: 'logarithmic'`. Trend lines as `type: 'line'` datasets overlaid.
