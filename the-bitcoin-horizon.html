@@ -107,52 +107,52 @@ em.mark {
 a { color: var(--amber); text-decoration: none; border-bottom: 1px solid rgba(224,148,34,0.3); transition: border-color 0.2s; }
 a:hover { border-bottom-color: var(--amber); }
 
-/* Layout — §16-compliant: wide outer container, narrow inner paragraphs */
+/* Layout — wide outer container; let prose, headings, charts, and tables size naturally
+   (matches reference-page convention; supersedes earlier §16 paragraph-level constraints) */
 .wrap { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
 .wrap-narrow { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
 .wrap-wide { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
 
-/* Inside body sections, prose paragraphs constrain to 65ch reading width */
-section .wrap p,
-section .wrap-narrow p,
-section .wrap-wide p { max-width: 65ch; }
-section .wrap p.lead,
-section .wrap-narrow p.lead,
-section .wrap-wide p.lead { max-width: 60ch; }
-section .wrap h2,
-section .wrap-narrow h2,
-section .wrap-wide h2 { max-width: 30ch; }
-section .wrap h3,
-section .wrap-narrow h3,
-section .wrap-wide h3 { max-width: 36ch; }
-
 section { padding: 4.5rem 0; border-top: 1px solid var(--border); }
 section:first-of-type { border-top: none; }
 
-/* Nav */
-nav.top {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(10, 9, 8, 0.85);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  padding: 0.9rem 1.5rem;
+/* Nav — standard site-wide pattern (consistent with all other tool pages) */
+.site-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; background: rgba(10,9,8,0.95); border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.site-nav .brand { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #999; text-decoration: none; transition: color 0.2s; border: none; }
+.site-nav .brand:hover { color: var(--amber); }
+.site-nav .nav-links { display: flex; gap: 8px; }
+.site-nav .nav-links a { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.9rem; font-weight: 500; color: #aaa; text-decoration: none; padding: 8px 16px; border-radius: 4px; transition: color 0.2s, background 0.2s; border: none; }
+.site-nav .nav-links a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
+.site-nav .nav-links a.active { color: var(--amber); background: rgba(224,148,34,0.08); font-weight: 600; }
+
+.nav-dropdown { position: relative; display: inline-block; }
+.nav-dropdown-btn { cursor: pointer; user-select: none; }
+.nav-dropdown-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: rgba(10,9,8,0.97); border: 1px solid rgba(224,148,34,0.15); border-radius: 8px; padding: 8px 0; min-width: 240px; z-index: 200; backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.4); margin-top: 0; }
+.nav-dropdown:hover .nav-dropdown-menu { display: block; }
+.nav-dropdown-menu a { display: block; padding: 9px 24px; font-size: 0.88rem; white-space: nowrap; color: #aaa; text-decoration: none; transition: color 0.2s, background 0.2s; border: none; }
+.nav-dropdown-menu a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
+.nav-dropdown-menu a.active { color: var(--amber); background: rgba(224,148,34,0.08); font-weight: 600; }
+
+.hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; z-index: 1100; }
+.hamburger span { display: block; width: 22px; height: 2px; background: #aaa; margin: 5px 0; border-radius: 1px; transition: transform 0.3s, opacity 0.3s, background 0.3s; }
+.hamburger:hover span { background: #ccc; }
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+.mobile-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,9,8,0.97); z-index: 1050; flex-direction: column; align-items: center; justify-content: center; gap: 8px; opacity: 0; transition: opacity 0.3s; }
+.mobile-overlay.show { display: flex; opacity: 1; }
+.mobile-overlay a { font-family: 'Inter', -apple-system, sans-serif; font-size: 1.1rem; font-weight: 500; color: #aaa; text-decoration: none; padding: 14px 32px; border-radius: 6px; transition: color 0.2s, background 0.2s; border: none; }
+.mobile-overlay a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
+.mobile-overlay a.active { color: var(--amber); background: rgba(224,148,34,0.08); font-weight: 600; }
+
+@media (max-width: 768px) {
+  .site-nav .nav-links { display: none; }
+  .hamburger { display: block; }
 }
-nav.top .inner {
-  max-width: 1100px; margin: 0 auto;
-  display: flex; justify-content: space-between; align-items: center;
-}
-nav.top .brand {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.4rem; font-style: italic;
-  color: var(--ink);
-  border: none;
-}
-nav.top .home {
-  font-size: 0.82rem;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  color: var(--ink-dim);
-  border: none;
+@media (max-width: 480px) {
+  .site-nav { padding: 10px 14px; }
+  .site-nav .brand { font-size: 0.72rem; letter-spacing: 0.14em; }
 }
 
 /* Hero — §16-compliant: centered block, centered text */
@@ -630,6 +630,7 @@ input[type="number"] {
   border: 1px solid var(--border);
   border-radius: 3px;
   width: 100%;
+  max-width: 200px;
   min-height: 44px;
 }
 .slider-field { position: relative; }
@@ -818,12 +819,50 @@ footer .f-line {
 </head>
 <body>
 
-<nav class="top">
-  <div class="inner">
+<nav class="site-nav">
     <a href="/" class="brand">Last Coin Standing</a>
-    <a href="/" class="home">Home</a>
-  </div>
+    <div class="nav-links">
+        <div class="nav-dropdown">
+            <a class="nav-dropdown-btn active" href="#">Explorations &#x25BE;</a>
+            <div class="nav-dropdown-menu">
+                <a href="/what-money-has-to-be.html">What Money Has To Be</a>
+                <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+                <a href="/synthesis.html">The Bitcoin Synthesis</a>
+                <a href="/the-bitcoin-migration.html">The Bitcoin Migration</a>
+                <a href="/trilemma.html">The Bitcoin Trilemma</a>
+                <a href="/the-half-life.html">The Half-Life</a>
+                <a href="/money-trees.html">Money Trees</a>
+                <a href="/the-fixed-pie.html">The Bitcoin Fixed Share</a>
+                <a href="/the-melting-ice-cube.html">The Melting Ice Cube</a>
+                <a href="/not-a-bubble.html">Is Bitcoin a Bubble?</a>
+                <a href="/bitcoin-vs-real-estate.html">BTC vs. Real Estate</a>
+                <a href="/the-power-law.html">Bitcoin &amp; The Power Law</a>
+                <a href="/the-bitcoin-horizon.html" class="active">The Bitcoin Horizon</a>
+            </div>
+        </div>
+        <a href="/about.html">About</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+    </button>
 </nav>
+
+<div class="mobile-overlay" id="mobileOverlay">
+    <a href="/what-money-has-to-be.html">What Money Has To Be</a>
+    <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+    <a href="/synthesis.html">The Bitcoin Synthesis</a>
+    <a href="/the-bitcoin-migration.html">The Bitcoin Migration</a>
+    <a href="/trilemma.html">The Bitcoin Trilemma</a>
+    <a href="/the-half-life.html">The Half-Life</a>
+    <a href="/money-trees.html">Money Trees</a>
+    <a href="/the-fixed-pie.html">The Bitcoin Fixed Share</a>
+    <a href="/the-melting-ice-cube.html">The Melting Ice Cube</a>
+    <a href="/not-a-bubble.html">Is Bitcoin a Bubble?</a>
+    <a href="/bitcoin-vs-real-estate.html">BTC vs. Real Estate</a>
+    <a href="/the-power-law.html">Bitcoin &amp; The Power Law</a>
+    <a href="/the-bitcoin-horizon.html" class="active">The Bitcoin Horizon</a>
+    <a href="/about.html">About</a>
+</div>
 
 <main>
 
@@ -1854,6 +1893,16 @@ document.getElementById('periodSlider').addEventListener('input', e => {
 
 setPreset('2021-11');
 
+</script>
+
+<script>
+  // Mobile menu toggle
+  const hamburger = document.getElementById('hamburger');
+  const mobileOverlay = document.getElementById('mobileOverlay');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileOverlay.classList.toggle('show');
+  });
 </script>
 
 </body>
