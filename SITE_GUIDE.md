@@ -402,7 +402,7 @@ All 12 slides deployed with 16:9 widescreen silent videos, minimalist copy patte
 
 ## 16. Page layout & content centering
 
-Every tool page uses a **centered hero block** above a **wide outer container** with **narrow inner constraints applied at the paragraph level**. This three-part pattern is what makes the existing tool pages read as composed and centered rather than column-leaning. It must be followed by every new page; existing pages already conform.
+Every tool page uses a **centered hero block** above a **wide outer container**, and lets prose, headings, charts, and tables fill that container naturally. Do not constrain prose at the paragraph level — it creates a visual mismatch with full-width charts and tables and reads as drift.
 
 ### The pattern
 
@@ -415,34 +415,32 @@ Every tool page uses a **centered hero block** above a **wide outer container** 
 **Body container (mandatory):**
 - Outer wrapper: `max-width: 1000–1240px`, `margin: 0 auto`, with horizontal padding
 - Use a single wide outer wrapper for the whole section body, not multiple narrow wrappers per section
+- **Do not apply paragraph-level `max-width` constraints.** Let prose fill the container width, the way every reference page does. The line-length-ergonomics argument for paragraph constraints is real in the abstract but loses to the visual asymmetry it creates when adjacent charts and tables fill the full container.
 
-**Inner reading width (mandatory):**
-- Apply the reading-width constraint at the **paragraph level**, not at the wrapper level
-- Recommended values: `p { max-width: 65ch }`, `p.lead { max-width: 60ch }`, `h2 { max-width: 30ch }`, `h3 { max-width: 36ch }`
-- Set these as section-scoped rules on the wrapper class (e.g. `section .wrap p { max-width: 65ch }`), not as inline styles
+### Why this rule looks the way it does
 
-### Why this works (and why a single narrow wrapper does not)
-
-Constraining only the paragraph keeps the **container wide** so charts, tables, calculators, and other components can fill the available width and visually anchor the page in the viewport center. Applying the width constraint to a 780px wrapper instead leaves ~330px of empty space per side on a typical desktop viewport, and every component inside — even if individually centered — reads as drifting toward the left.
-
-This is the failure mode the Horizon page exhibited in v0.3 (April 2026), corrected in v0.4 by switching from a 780px `wrap-narrow` to a 1100px wrapper with paragraph-level reading-width constraints. The four reference pages (Half-Life, Power Law, WMHTB, Bitcoin vs. Real Estate) all conformed to the wider-container pattern by convention; v0.4 made it an explicit rule.
+The first version of this section (April 25, 2026 morning) prescribed paragraph-level reading-width constraints (`p { max-width: 65ch }`, etc.) on the theory that long line-lengths hurt readability. The Horizon page implemented it that way and the result was an obvious visual mismatch: prose at ~700px, charts at ~1100px, with a noticeable empty corridor down the right side of every prose section while charts filled the container. The reference pages I had audited (Half-Life, Power Law, WMHTB, Bitcoin vs. RE) don't do paragraph-level constraints — their prose just runs wide. On a 1440px+ viewport that's marginally less optimal for line-length, but visually consistent. **Visual consistency wins; the rule was corrected in the same day.**
 
 ### Reference page conformance (April 2026 audit)
 
-| Page | Hero pattern | Outer container |
-|---|---|---|
-| Half-Life | `.page-header { text-align: center }` + subtitle `max-width: 600px; margin: 0 auto` | `.container { max-width: 1240px }` |
-| Power Law | `.page-header { text-align: center }` + `.hero-insight { max-width: 780px; margin: 0 auto; text-align: center }` | `.container { max-width: 1240px }` |
-| WMHTB | `.hero { text-align: center }` + `.subtitle { max-width: 680px; margin: 0 auto }` | `.container { max-width: 1240px }` |
-| Bitcoin vs. RE | `.hero { text-align: center; max-width: 820px; margin: 0 auto }` | `.content-area { max-width: 1000px }` |
-| Bitcoin Horizon (v0.4+) | `.hero-block { text-align: center; max-width: 820px; margin: 0 auto }` | `.wrap { max-width: 1100px }` |
+| Page | Hero pattern | Outer container | Paragraph-level constraints |
+|---|---|---|---|
+| Half-Life | `.page-header { text-align: center }` + subtitle `max-width: 600px; margin: 0 auto` | `.container { max-width: 1240px }` | None |
+| Power Law | `.page-header { text-align: center }` + `.hero-insight { max-width: 780px; margin: 0 auto; text-align: center }` | `.container { max-width: 1240px }` | None |
+| WMHTB | `.hero { text-align: center }` + `.subtitle { max-width: 680px; margin: 0 auto }` | `.container { max-width: 1240px }` | None |
+| Bitcoin vs. RE | `.hero { text-align: center; max-width: 820px; margin: 0 auto }` | `.content-area { max-width: 1000px }` | None |
+| Bitcoin Horizon | `.hero-block { text-align: center; max-width: 820px; margin: 0 auto }` | `.wrap { max-width: 1100px }` | None |
 
 ### Ancillary typography rules (cross-references)
 
 Several typography failures co-occur with layout issues and should be checked together:
 
-- **Cormorant Garamond is display-only, 1.5rem floor** (per §7). Below 1.5rem — captions, footnotes, disclosures, chart annotations — use Inter. Cormorant italic at small sizes is the most common manifestation of this rule being violated. The Horizon v0.3 chart caption and calculator footnote violated this; both were corrected in v0.4 to Inter at `--ink-dim` color.
-- **Disclosures and footnotes use Inter at `--ink-dim`** (not `--ink-faint`), `0.88rem`, `line-height: 1.55`, with `max-width: 72ch` if multi-sentence.
+- **Cormorant Garamond is display-only, 1.5rem floor** (per §7). Below 1.5rem — captions, footnotes, disclosures, chart annotations — use Inter. Cormorant italic at small sizes is the most common manifestation of this rule being violated.
+- **Disclosures and footnotes use Inter at `--ink-dim`** (not `--ink-faint`), `0.88rem`, `line-height: 1.55`. If a disclosure is multi-sentence and centered, `max-width: 72ch` keeps it from sprawling — but this is on the *callout/disclosure box itself*, not on the body prose paragraphs of the page.
+
+### Lesson banked
+
+When the urge strikes to add a "thoughtful" reading-width constraint on prose: don't. The site already solved this problem implicitly through wide containers and consistent typography. Adding constraints to fix an imagined ergonomics problem creates a real visual problem.
 
 ---
 
