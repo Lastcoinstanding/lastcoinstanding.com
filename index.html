@@ -346,7 +346,7 @@ footer a:hover { text-decoration: underline; }
 .nav-dropdown { position: relative; display: inline-block; }
 .nav-dropdown-btn { cursor: pointer; user-select: none; }
 .nav-dropdown-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: rgba(10,9,8,0.97); border: 1px solid rgba(247,147,26,0.15); border-radius: 8px; padding: 8px 0; min-width: 240px; z-index: 200; backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.4); margin-top: 0; }
-.nav-dropdown:hover .nav-dropdown-menu { display: block; }
+.nav-dropdown:hover .nav-dropdown-menu, .nav-dropdown.open .nav-dropdown-menu { display: block; }
 .nav-dropdown-menu a { display: block; padding: 9px 24px; font-size: 0.88rem; white-space: nowrap; color: #aaa; text-decoration: none; transition: color 0.2s, background 0.2s; }
 .nav-dropdown-menu a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
 .nav-dropdown-menu a.active { color: var(--orange, #F7931A); background: rgba(247,147,26,0.08); font-weight: 600; }
@@ -1199,6 +1199,47 @@ footer a:hover { text-decoration: underline; }
     }
 })();
 </script>
+
+<script>
+/* Nav UX enhancement — click-outside, click-toggle for desktop dropdown, Escape */
+(function() {
+  var ham = document.getElementById('hamburger');
+  var mob = document.getElementById('mobileOverlay');
+  var dd = document.querySelector('.nav-dropdown');
+  var ddBtn = document.querySelector('.nav-dropdown-btn');
+  function closeMobile() {
+    if (ham) ham.classList.remove('open');
+    if (mob) mob.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  function closeDropdown() {
+    if (dd) dd.classList.remove('open');
+  }
+  if (ddBtn && dd) {
+    ddBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      dd.classList.toggle('open');
+    });
+  }
+  if (mob) {
+    mob.addEventListener('click', function(e) {
+      if (e.target === mob) closeMobile();
+    });
+    var links = mob.querySelectorAll('a');
+    for (var i = 0; i < links.length; i++) {
+      links[i].addEventListener('click', closeMobile);
+    }
+  }
+  document.addEventListener('click', function(e) {
+    if (dd && !dd.contains(e.target)) closeDropdown();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { closeMobile(); closeDropdown(); }
+  });
+})();
+</script>
+
 </body>
 </html>
 
