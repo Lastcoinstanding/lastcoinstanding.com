@@ -142,7 +142,7 @@
 .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
 
 /* Mobile nav overlay */
-.mobile-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,9,8,0.97); z-index: 1050; flex-direction: column; align-items: center; justify-content: center; gap: 8px; opacity: 0; transition: opacity 0.3s; }
+.mobile-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,9,8,0.97); z-index: 1050; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; opacity: 0; transition: opacity 0.3s; padding: 4.5rem 1rem 2.5rem; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .mobile-overlay.show { display: flex; opacity: 1; }
 .mobile-overlay a { font-family: 'Inter', -apple-system, sans-serif; font-size: 1.1rem; font-weight: 500; color: #aaa; text-decoration: none; padding: 14px 32px; border-radius: 6px; transition: color 0.2s, background 0.2s; }
 .mobile-overlay a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
