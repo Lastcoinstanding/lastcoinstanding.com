@@ -434,6 +434,9 @@ footer a:hover { text-decoration: underline; }
     object-fit: cover;
     border-radius: 10px;
     display: block;
+    /* Modest luminance lift so darker source videos (e.g. Power Law dusk, Real Estate twilight)
+       stay legible on the carousel without compromising the brighter ones (Horizon, Money Trees). */
+    filter: brightness(1.08) contrast(1.05);
 }
 @media (max-width: 768px) {
     .carousel-video {
@@ -604,6 +607,7 @@ footer a:hover { text-decoration: underline; }
         <a href="/not-a-bubble.html">Is Bitcoin a Bubble?</a>
         <a href="/bitcoin-vs-real-estate.html">BTC vs. Real Estate</a>
         <a href="/the-power-law.html">Bitcoin &amp; The Power Law</a>
+        <a href="/the-bitcoin-horizon.html">The Bitcoin Horizon</a>
             </div>
         </div>
         <a href="/about.html">About</a>
@@ -625,6 +629,7 @@ footer a:hover { text-decoration: underline; }
     <a href="/not-a-bubble.html">Is Bitcoin a Bubble?</a>
     <a href="/bitcoin-vs-real-estate.html">BTC vs. Real Estate</a>
     <a href="/the-power-law.html">Bitcoin &amp; The Power Law</a>
+    <a href="/the-bitcoin-horizon.html">The Bitcoin Horizon</a>
     <a href="/about.html">About</a>
 </div>
 
@@ -690,7 +695,21 @@ footer a:hover { text-decoration: underline; }
             </div>
         </div>
 
-        <!-- Slide 4: Is Bitcoin a Bubble? -->
+        <!-- Slide 4: The Bitcoin Horizon -->
+        <div class="insight-slide">
+            <div class="insight-visual video-visual">
+                <video class="carousel-video" id="vid-11" muted playsinline preload="none">
+                    <source src="/videos/horizon.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="insight-text">
+                <div class="insight-label">The Bitcoin Horizon</div>
+                <div class="insight-headline">What looks like turbulence over the course of a day is <em>trajectory over the course of a decade.</em></div>
+                <a href="/the-bitcoin-horizon.html" class="insight-cta">Find your time horizon &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Slide 5: Is Bitcoin a Bubble? -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-1" muted playsinline preload="none">
@@ -704,7 +723,7 @@ footer a:hover { text-decoration: underline; }
             </div>
         </div>
 
-        <!-- Slide 5: The Half-Life -->
+        <!-- Slide 6: The Half-Life -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-2" muted playsinline preload="none">
@@ -718,7 +737,7 @@ footer a:hover { text-decoration: underline; }
             </div>
         </div>
 
-        <!-- Slide 6: The Melting Ice Cube -->
+        <!-- Slide 7: The Melting Ice Cube -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-3" muted playsinline preload="none">
@@ -732,7 +751,7 @@ footer a:hover { text-decoration: underline; }
             </div>
         </div>
 
-        <!-- Slide 7: The Synthesis -->
+        <!-- Slide 8: The Synthesis -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-4" muted playsinline preload="none">
@@ -747,7 +766,7 @@ footer a:hover { text-decoration: underline; }
         </div>
 
 
-        <!-- Slide 8: What Bitcoin Is -->
+        <!-- Slide 9: What Bitcoin Is -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-5" muted playsinline preload="none">
@@ -761,7 +780,7 @@ footer a:hover { text-decoration: underline; }
             </div>
         </div>
 
-        <!-- Slide 9: The Bitcoin Migration -->
+        <!-- Slide 10: The Bitcoin Migration -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-6" muted playsinline preload="none">
@@ -775,7 +794,7 @@ footer a:hover { text-decoration: underline; }
             </div>
         </div>
 
-        <!-- Slide 10: The Trilemma -->
+        <!-- Slide 11: The Trilemma -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-7" muted playsinline preload="none">
@@ -789,7 +808,7 @@ footer a:hover { text-decoration: underline; }
             </div>
         </div>
 
-        <!-- Slide 11: Money Trees -->
+        <!-- Slide 12: Money Trees -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-8" muted playsinline preload="none">
@@ -803,7 +822,7 @@ footer a:hover { text-decoration: underline; }
             </div>
         </div>
 
-        <!-- Slide 12: The Fixed Pie -->
+        <!-- Slide 13: The Fixed Pie -->
         <div class="insight-slide">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-9" muted playsinline preload="none">
@@ -865,6 +884,28 @@ footer a:hover { text-decoration: underline; }
             <div class="card-title">Bitcoin and The Power Law</div>
             <div class="card-desc">Bitcoin grows proportionally, not exponentially. For every ~13% increase in Bitcoin's age, the trend price doubles. Explore the empirical law governing Bitcoin's scaling &mdash; then project it forward against a house purchase, 5 to 20 years out.</div>
             <div class="card-cta">Run the projection &rarr;</div>
+        </a>
+
+        <!-- The Bitcoin Horizon -->
+        <a href="/the-bitcoin-horizon.html" class="concept-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Stable horizon line (the long-term trajectory) -->
+                    <line x1="6" y1="18" x2="42" y2="18" stroke="#F7931A" stroke-width="1.6" stroke-linecap="round"/>
+                    <!-- Chaotic short-term oscillation below, narrowing as it approaches the right -->
+                    <path d="M6 38 Q9 30, 12 38 T18 36 T24 34 T30 32 T36 30 T42 28"
+                          stroke="#e09422" stroke-width="1.4" stroke-linecap="round" fill="none" opacity="0.85"/>
+                    <!-- Convergence dot where chaos meets trajectory -->
+                    <circle cx="42" cy="23" r="1.8" fill="#F7931A"/>
+                    <!-- Faint axis ticks on the left to suggest measurement -->
+                    <line x1="6" y1="14" x2="8" y2="14" stroke="#e09422" stroke-width="0.8" opacity="0.4"/>
+                    <line x1="6" y1="22" x2="8" y2="22" stroke="#e09422" stroke-width="0.8" opacity="0.4"/>
+                    <line x1="6" y1="30" x2="8" y2="30" stroke="#e09422" stroke-width="0.8" opacity="0.4"/>
+                </svg>
+            </div>
+            <div class="card-title">The Bitcoin Horizon</div>
+            <div class="card-desc">Volatility is not risk &mdash; they are different categories. Bitcoin behaves the way it does because it is a system being adopted, not an asset being priced. Across fifteen years of price history, no rolling holding period of forty-one months or more has ever ended in nominal loss. Try it against the worst entry points.</div>
+            <div class="card-cta">Find your time horizon &rarr;</div>
         </a>
 
         <!-- BTC vs. Real Estate -->
