@@ -130,7 +130,7 @@ Three slides (Fixed Pie, Money Trees' right tree, Is Bitcoin a Bubble) share the
 - `base64 -w 0` on Linux (prevents line-wrap corruption of binary files).
 - Raw file fetches via `raw.githubusercontent.com`.
 - Repo: `Lastcoinstanding/lastcoinstanding.com`, branch `main`.
-- PAT scope needed: `public_repo`. **Delete PAT immediately after session.**
+- PAT scope needed: `public_repo`.
 
 ### Cloudflare Pages caching
 
@@ -400,4 +400,50 @@ All 12 slides deployed with 16:9 widescreen silent videos, minimalist copy patte
 
 ---
 
-_Last updated: April 18, 2026. Update this document as editorial decisions crystallize into principles worth preserving._
+## 16. Page layout & content centering
+
+Every tool page uses a **centered hero block** above a **wide outer container** with **narrow inner constraints applied at the paragraph level**. This three-part pattern is what makes the existing tool pages read as composed and centered rather than column-leaning. It must be followed by every new page; existing pages already conform.
+
+### The pattern
+
+**Hero block (mandatory):**
+- `text-align: center` on the hero block itself
+- `max-width: 820–1100px` on the hero block, with `margin: 0 auto`
+- Hero subtitle (when present): narrower constraint, `max-width: 600–680px`, also `margin: 0 auto`
+- The H1 inside the hero gets `text-align: center` and `margin: 0 auto`
+
+**Body container (mandatory):**
+- Outer wrapper: `max-width: 1000–1240px`, `margin: 0 auto`, with horizontal padding
+- Use a single wide outer wrapper for the whole section body, not multiple narrow wrappers per section
+
+**Inner reading width (mandatory):**
+- Apply the reading-width constraint at the **paragraph level**, not at the wrapper level
+- Recommended values: `p { max-width: 65ch }`, `p.lead { max-width: 60ch }`, `h2 { max-width: 30ch }`, `h3 { max-width: 36ch }`
+- Set these as section-scoped rules on the wrapper class (e.g. `section .wrap p { max-width: 65ch }`), not as inline styles
+
+### Why this works (and why a single narrow wrapper does not)
+
+Constraining only the paragraph keeps the **container wide** so charts, tables, calculators, and other components can fill the available width and visually anchor the page in the viewport center. Applying the width constraint to a 780px wrapper instead leaves ~330px of empty space per side on a typical desktop viewport, and every component inside — even if individually centered — reads as drifting toward the left.
+
+This is the failure mode the Horizon page exhibited in v0.3 (April 2026), corrected in v0.4 by switching from a 780px `wrap-narrow` to a 1100px wrapper with paragraph-level reading-width constraints. The four reference pages (Half-Life, Power Law, WMHTB, Bitcoin vs. Real Estate) all conformed to the wider-container pattern by convention; v0.4 made it an explicit rule.
+
+### Reference page conformance (April 2026 audit)
+
+| Page | Hero pattern | Outer container |
+|---|---|---|
+| Half-Life | `.page-header { text-align: center }` + subtitle `max-width: 600px; margin: 0 auto` | `.container { max-width: 1240px }` |
+| Power Law | `.page-header { text-align: center }` + `.hero-insight { max-width: 780px; margin: 0 auto; text-align: center }` | `.container { max-width: 1240px }` |
+| WMHTB | `.hero { text-align: center }` + `.subtitle { max-width: 680px; margin: 0 auto }` | `.container { max-width: 1240px }` |
+| Bitcoin vs. RE | `.hero { text-align: center; max-width: 820px; margin: 0 auto }` | `.content-area { max-width: 1000px }` |
+| Bitcoin Horizon (v0.4+) | `.hero-block { text-align: center; max-width: 820px; margin: 0 auto }` | `.wrap { max-width: 1100px }` |
+
+### Ancillary typography rules (cross-references)
+
+Several typography failures co-occur with layout issues and should be checked together:
+
+- **Cormorant Garamond is display-only, 1.5rem floor** (per §7). Below 1.5rem — captions, footnotes, disclosures, chart annotations — use Inter. Cormorant italic at small sizes is the most common manifestation of this rule being violated. The Horizon v0.3 chart caption and calculator footnote violated this; both were corrected in v0.4 to Inter at `--ink-dim` color.
+- **Disclosures and footnotes use Inter at `--ink-dim`** (not `--ink-faint`), `0.88rem`, `line-height: 1.55`, with `max-width: 72ch` if multi-sentence.
+
+---
+
+_Last updated: April 25, 2026. Update this document as editorial decisions crystallize into principles worth preserving._
