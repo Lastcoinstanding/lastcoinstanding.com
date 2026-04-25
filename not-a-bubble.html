@@ -119,9 +119,8 @@ body {
 .mobile-overlay {
   display:none; position:fixed; inset:0;
   background:rgba(10,9,8,0.97); z-index:1050;
-  flex-direction:column; align-items:center; justify-content:center; gap:8px;
-  opacity:0; transition:opacity 0.3s;
-}
+  flex-direction:column; align-items:center; justify-content: flex-start; gap:8px;
+  opacity:0; transition:opacity 0.3s; padding: 4.5rem 1rem 2.5rem; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .mobile-overlay.show { display:flex; opacity:1; }
 .mobile-overlay a {
   font-family:var(--font-body); font-size:1.1rem; font-weight:500;
