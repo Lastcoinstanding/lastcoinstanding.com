@@ -378,6 +378,18 @@
 .nav-dropdown-menu a.active { color: var(--orange, #F7931A); background: rgba(247,147,26,0.08); font-weight: 600; }
 
 </style>
+<style id="canonical-footer-css">
+/* ─── Canonical footer ─── */
+.site-footer { background: #0a0908; padding: 4rem 2rem 3rem; text-align: center; border-top: 1px solid rgba(224,148,34,0.08); margin-top: 4rem; }
+.site-footer .footer-cta { max-width: 540px; margin: 0 auto; }
+.site-footer .footer-cta h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 500; color: #ece4d6; margin: 0 0 0.9rem; }
+.site-footer .footer-cta p { font-family: 'Inter', sans-serif; font-size: 0.85rem; color: rgba(255,255,255,0.42); line-height: 1.6; margin: 0 0 2.4rem; }
+.site-footer .footer-nav { display: flex; justify-content: center; gap: 1.5rem 2rem; flex-wrap: wrap; max-width: 960px; margin: 0 auto 2.6rem; }
+.site-footer .footer-nav a { font-family: 'Inter', sans-serif; font-size: 0.72rem; color: rgba(255,255,255,0.36); text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.3s; border-bottom: none; }
+.site-footer .footer-nav a:hover { color: #e09422; }
+.site-footer .footer-line { width: 40px; height: 1px; background: rgba(224,148,34,0.3); margin: 0 auto 1.4rem; }
+.site-footer .footer-copy { font-family: 'Inter', sans-serif; font-size: 0.7rem; color: rgba(255,255,255,0.22); letter-spacing: 0.04em; }
+</style>
 </head>
 <body>
 
@@ -514,7 +526,30 @@
 
 </main>
 
-<footer><a href="/about.html">About</a> &middot; Bitcoin education through contrast and clarity</footer>
+<footer class="site-footer">
+    <div class="footer-cta">
+        <h3>Continue Exploring</h3>
+        <p>Each interactive visualization on Last Coin Standing examines a different dimension of Bitcoin through contrast, tradeoffs, and philosophical clarity.</p>
+    </div>
+    <nav class="footer-nav">
+        <a href="/what-money-has-to-be.html">What Money Has To Be</a>
+        <a href="/what-bitcoin-is.html">What Bitcoin Is</a>
+        <a href="/synthesis.html">The Bitcoin Synthesis</a>
+        <a href="/the-bitcoin-migration.html">The Bitcoin Migration</a>
+        <a href="/trilemma.html">The Bitcoin Trilemma</a>
+        <a href="/the-half-life.html">The Half-Life</a>
+        <a href="/money-trees.html">Money Trees</a>
+        <a href="/the-fixed-pie.html">The Bitcoin Fixed Share</a>
+        <a href="/the-melting-ice-cube.html">The Melting Ice Cube</a>
+        <a href="/not-a-bubble.html">Is Bitcoin a Bubble?</a>
+        <a href="/bitcoin-vs-real-estate.html">BTC vs. Real Estate</a>
+        <a href="/the-power-law.html">Bitcoin &amp; The Power Law</a>
+        <a href="/the-bitcoin-horizon.html">The Bitcoin Horizon</a>
+        <a href="/about.html">About</a>
+    </nav>
+    <div class="footer-line"></div>
+    <div class="footer-copy">&copy; 2026 Last Coin Standing &mdash; Bitcoin education through contrast and clarity</div>
+</footer>
 
 <script>
 (function() {
