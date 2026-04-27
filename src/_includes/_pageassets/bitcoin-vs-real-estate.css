@@ -15,8 +15,8 @@
         .hero-label{font-size:0.8rem;text-transform:uppercase;letter-spacing:3px;color:var(--amber-dim);margin-bottom:1.5rem}
         .hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,5vw,3.8rem);font-weight:300;line-height:1.2;color:var(--text);margin-bottom:0.6rem}
         .hero h1 em{color:var(--amber);font-style:italic}
-        .hero .hero-subtitle{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:400;font-style:italic;color:var(--text-muted);margin-bottom:1.8rem;letter-spacing:0.5px}
-        .hero .subtitle{font-size:1.1rem;color:var(--text-dim);max-width:620px;margin:0 auto 2rem;line-height:1.8;font-weight:300}
+        .hero .hero-subtitle{font-family:'Source Serif 4',serif;font-size:clamp(1.05rem,2vw,1.3rem);font-weight:400;font-style:italic;color:var(--text-muted);margin-bottom:1.8rem;letter-spacing:0.5px;line-height:1.6}
+        .hero .subtitle{font-size:1.1rem;color:var(--text-dim);max-width:620px;margin:0 auto 2rem;line-height:1.8;font-weight:400}
         .content-area{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:0 2rem 6rem}
         .tab-nav{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:3rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
         .tab-nav::-webkit-scrollbar{display:none}
@@ -90,7 +90,7 @@
         .calc-result-card .invested-line{font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:0.3rem}
         .calc-result-card .invested-line strong{color:var(--text-dim);font-weight:500;text-transform:none;letter-spacing:0;font-size:0.92rem}
         .calc-result-card .invested-line .note{text-transform:none;letter-spacing:0;font-size:0.75rem;color:var(--text-muted)}
-        .calc-result-card .period-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:1.8px;color:var(--text-muted);font-weight:500;margin-bottom:0.5rem;opacity:0.85}
+        .calc-result-card .period-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:1.8px;color:var(--text-muted);font-weight:500;margin-bottom:0.5rem;opacity:0.85}
         .calc-result-card .period-divider{border-top:2px dashed rgba(255,255,255,0.12);margin:1rem 0 0.9rem}
         .calc-result-card .result-detail{font-size:0.9rem;color:var(--text-muted);line-height:1.7}
         .calc-result-card .result-detail span{color:var(--text-dim)}
