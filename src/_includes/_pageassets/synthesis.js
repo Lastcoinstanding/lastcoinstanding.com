@@ -92,7 +92,20 @@ var precursors = [
 /* ═══════════════════════════════════════════════
    STATE
    ═══════════════════════════════════════════════ */
-var CX = 250, CY = 250, RING_R = 160, ORB_R = 46, CORE_R = 48;
+/* On narrow mobile viewports, the SVG renders at ~340-380px width given the
+   500-unit viewBox. Default 11-unit labels would render at ~7.5-8.4px which
+   falls below the 14px legibility threshold. Bumping ORB_R and the label
+   font on mobile keeps text readable while preserving the layout's logic.
+   See STYLE_GUIDE anti-pattern §5.10 + SITE_GUIDE §10. */
+var IS_MOBILE = (typeof window !== 'undefined') &&
+                window.matchMedia &&
+                window.matchMedia('(max-width: 768px)').matches;
+var CX = 250, CY = 250;
+var RING_R = IS_MOBILE ? 175 : 160;
+var ORB_R = IS_MOBILE ? 65 : 46;
+var CORE_R = 48;
+var LABEL_FONT_SIZE = IS_MOBILE ? 18 : 11;
+var LABEL_LINE_SPACING = IS_MOBILE ? 22 : 14;
 var explored = {};
 var activeId = null;
 var isComplete = false;
@@ -198,10 +211,10 @@ function buildSVG() {
         for (var li = 0; li < textLines.length; li++) {
             var txt = svgEl('text', {
                 x: pos.x,
-                y: pos.y + (li - (textLines.length - 1) / 2) * 14,
+                y: pos.y + (li - (textLines.length - 1) / 2) * LABEL_LINE_SPACING,
                 'text-anchor': 'middle', 'dominant-baseline': 'central',
                 fill: '#999', 'font-family': "'Outfit', sans-serif",
-                'font-size': '11', 'font-weight': '600',
+                'font-size': String(LABEL_FONT_SIZE), 'font-weight': '600',
                 'letter-spacing': '0.03em', 'class': 'orb-label',
                 id: 'label-' + comp.id + '-' + li
             });
