@@ -64,7 +64,7 @@ h3 { font-size: clamp(1.4rem, 2.2vw, 1.7rem); margin-bottom: 0.8rem; }
   color: var(--amber);
   opacity: 0.85;
 }
-p { margin-bottom: 1.1em; color: var(--ink); max-width: 68ch; }
+p { margin-bottom: 1.1em; color: var(--ink); }
 p.lead { font-size: 1.18rem; line-height: 1.55; max-width: 64ch; color: var(--ink); }
 
 em.mark {
@@ -78,10 +78,10 @@ em.mark {
 a { color: var(--amber); text-decoration: none; border-bottom: 1px solid rgba(224,148,34,0.3); transition: border-color 0.2s; }
 a:hover { border-bottom-color: var(--amber); }
 
-/* Layout — wide outer container; let elements size to container naturally */
-.wrap { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
-.wrap-narrow { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
-.wrap-wide { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+/* Layout — canonical 960px page width per STYLE_GUIDE §4.2; matches Power Law, Half-Life, Fixed Pie, Melting Ice Cube */
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
+.wrap-narrow { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
+.wrap-wide { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
 
 section { padding: 4.5rem 0; border-top: 1px solid var(--border); }
 section:first-of-type { border-top: none; }

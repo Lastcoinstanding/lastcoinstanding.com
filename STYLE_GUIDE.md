@@ -131,7 +131,9 @@ The palette is dark by default. Migration's essay-mode is the only cream-backgro
 
 ### 4.2 Container width (per §16 of `SITE_GUIDE.md`)
 
-Use a wide outer container (1000–1240px). **Do not apply paragraph-level max-width constraints.** Let prose fill the container width naturally — this prevents the visual mismatch between narrow text and full-width charts/tables.
+The canonical page-content container is `max-width: 960px`. This is the value used by Power Law, Half-Life, Fixed Pie, and Melting Ice Cube. Up to ~1100px is acceptable for pages with wider visual content (charts, two-column grids), but stay within 960–1100px for narrative pages — content that's noticeably wider than 1100px makes line-lengths uncomfortable; content noticeably narrower than 960px wastes desktop real estate and feels visually inconsistent next to the canonical pages.
+
+**Do not apply paragraph-level max-width constraints.** Let prose fill the container width naturally — this prevents the visual mismatch between narrow text floating inside a wider container with empty space on either side.
 
 The exception: page hero subtitles can have `max-width: 680px` to keep them visually balanced under a centered title. Apply this only to hero subtitles, not to body prose.
 
@@ -151,6 +153,7 @@ These have all been observed on the site and need fixing.
 8. **Inconsistent tab styling across pages.** → Use the canonical tab component (§6.2).
 9. **Low-contrast text below 0.5 opacity.** Migration cover subtitle hits this. → Keep text-on-dark above 0.6 opacity for body text; mini-labels can go to 0.5 if size is ≥0.7rem.
 10. **SVG-rendered text below 14px effective size on mobile.** Synthesis component circles hit this. → Add mobile breakpoint that bumps SVG container or text size.
+11. **Paragraph-level `max-width` constraints that fight the page container.** A global `p { max-width: 68ch }` (or similar) makes body text float as a narrow column inside a wider container, leaving visible empty space on the right and creating visual inconsistency vs. canonical pages where prose fills the container. → Remove the global `p` constraint; let prose fill its parent. Per-element constraints on specific cards (intro blocks, callouts, pull-quotes) are still fine — the anti-pattern is the *global* `p` rule.
 
 ---
 
