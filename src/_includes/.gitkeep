@@ -1,0 +1,2 @@
+# This file exists so git tracks the empty src/_includes/ directory.
+# Once layouts and partials are added in Phase 2, this file can be removed.
