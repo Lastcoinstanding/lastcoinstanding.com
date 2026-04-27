@@ -32,7 +32,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .page{max-width:960px;margin:0 auto;padding:40px 24px 60px}
 .page-header{text-align:center;margin-bottom:40px}
 .page-header h1{font-family:var(--font-d);font-size:clamp(2rem,4.5vw,3rem);font-weight:600;color:var(--text-bright);margin-bottom:12px;letter-spacing:-.01em}
-.subtitle{font-family:var(--font-d);font-size:clamp(1rem,1.8vw,1.15rem);color:var(--text-dim);line-height:1.7;max-width:700px;margin:0 auto;font-style:italic;font-weight:400}
+.subtitle{font-family:'Source Serif 4',serif;font-size:clamp(1.05rem,2vw,1.3rem);color:var(--text-dim);line-height:1.6;max-width:700px;margin:0 auto;font-style:italic;font-weight:400}
 
 /* HERO */
 .hero-insight{max-width:780px;margin:0 auto 3rem;text-align:center}
@@ -54,7 +54,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .chart-title{font-family:var(--font-d);font-size:1.3rem;font-weight:600;color:var(--text-bright);margin-bottom:4px}
 .chart-subtitle{font-size:.8rem;color:var(--text-muted);margin-bottom:1rem}
 .chart-wrapper{position:relative;height:420px}
-.chart-source{font-size:.72rem;color:var(--text-muted);margin-top:1rem;line-height:1.5}
+.chart-source{font-size:.78rem;color:var(--text-muted);margin-top:1rem;line-height:1.5}
 
 /* SECTIONS */
 .section{margin-bottom:3rem}
@@ -98,7 +98,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 /* INSIGHT BOX */
 .insight-box{background:rgba(224,148,34,.04);border-left:3px solid var(--amber);padding:1.2rem 1.5rem;margin:2rem 0;border-radius:0 6px 6px 0}
-.insight-box p{font-family:var(--font-d);font-size:1.05rem;font-style:italic;color:var(--text-body);line-height:1.7;margin:0}
+.insight-box p{font-family:'Source Serif 4',serif;font-size:clamp(1.05rem,2vw,1.3rem);font-style:italic;color:var(--text-body);line-height:1.6;margin:0;font-weight:400}
 
 /* ANNOTATION */
 .annotation{font-size:.82rem;color:var(--text-muted);line-height:1.7;margin:1.5rem 0;padding:1rem 1.2rem;background:rgba(255,255,255,.015);border-radius:6px}
