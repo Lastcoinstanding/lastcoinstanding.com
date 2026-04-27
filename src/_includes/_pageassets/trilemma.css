@@ -48,7 +48,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
 
 .page { max-width: 67.5rem; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
 header { text-align: center; margin-bottom: 3rem; }
-header h1 { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.6rem, 4.5vw, 2.4rem); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-bright); margin-bottom: 0.625rem; }
+header h1 { font-family: var(--font-display); font-weight: 500; font-size: clamp(2rem, 4vw, 3.4rem); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-bright); margin-bottom: 0.625rem; }
 header .subtitle { font-family: 'Source Serif 4', serif; font-style: italic; font-weight: 400; color: var(--text-dim); font-size: clamp(1rem, 2vw, 1.2rem); line-height: 1.6; max-width: 37.5rem; margin: 0 auto 1rem; }
 header .intro-text { font-family: var(--font-body); font-weight: 400; color: var(--text-body); font-size: clamp(0.9rem, 1.8vw, 1rem); line-height: 1.75; max-width: 42.5rem; margin: 0 auto; }
 header .intro-text strong { color: var(--text-bright); font-weight: 600; }
@@ -82,12 +82,12 @@ header .intro-text strong { color: var(--text-bright); font-weight: 600; }
 .example-box .example-content { font-family: var(--font-body); font-size: 0.925rem; line-height: 1.7; color: #b8b0a8; }
 .example-box .example-content strong { color: var(--text-bright); font-weight: 600; }
 .btc-choice { text-align: center; padding: 2.5rem 1.75rem; background: linear-gradient(135deg, rgba(247,147,26,0.04), rgba(255,184,64,0.02)); border: 1px solid rgba(247,147,26,0.12); border-radius: 0.75rem; margin-bottom: 3rem; }
-.btc-choice h2 { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.2rem, 3vw, 1.6rem); letter-spacing: 0.06em; text-transform: uppercase; color: var(--orange); margin-bottom: 1rem; }
+.btc-choice h2 { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.8rem, 3.4vw, 2.6rem); color: var(--orange); margin-bottom: 1rem; }
 .btc-choice p { font-family: var(--font-body); font-size: clamp(0.925rem, 1.6vw, 1rem); line-height: 1.8; color: var(--text-body); max-width: 43.75rem; margin: 0 auto 0.875rem; }
 .btc-choice p:last-child { margin-bottom: 0; }
 .btc-choice p strong { color: var(--text-bright); font-weight: 600; }
 .layers-section { margin-bottom: 3rem; }
-.layers-section h2 { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.1rem, 2.5vw, 1.4rem); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-bright); text-align: center; margin-bottom: 1.75rem; }
+.layers-section h2 { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.8rem, 3.4vw, 2.6rem); color: var(--text-bright); text-align: center; margin-bottom: 1.75rem; }
 .layers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
 .layer-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.625rem; padding: 1.375rem 1.25rem; text-align: center; transition: border-color 0.3s, transform 0.3s; }
 .layer-card:hover { border-color: rgba(247,147,26,0.25); transform: translateY(-2px); }
@@ -101,7 +101,7 @@ footer a:hover { text-decoration: underline; }
 
 @media (max-width: 1024px) { .triangle-wrap { width: 24rem; } .trilemma-stage { gap: 1.5rem; } }
 @media (max-width: 768px) { .trilemma-stage { flex-direction: column; align-items: center; } .triangle-wrap { width: 100%; max-width: 26rem; } .info-panel { min-height: auto; width: 100%; } .layers-grid { grid-template-columns: 1fr; gap: 0.75rem; } .page { padding: 1.5rem 1.25rem 3.5rem; } header { margin-bottom: 2rem; } .btc-choice { padding: 1.75rem 1.25rem; } }
-@media (max-width: 480px) { .page { padding: 1.25rem 1rem 3rem; } header h1 { font-size: 1.35rem; letter-spacing: 0.06em; } header .subtitle { font-size: 0.95rem; } header .intro-text { font-size: 0.9rem; } .triangle-wrap { max-width: 20rem; } .info-panel { padding: 1.25rem 1rem; } .panel-title { font-size: 1.2rem; } .panel-body { font-size: 0.925rem; } .panel-verdict { font-size: 0.9rem; } .example-box .example-content { font-size: 0.875rem; } .btc-choice h2 { font-size: 1.1rem; } .btc-choice p { font-size: 0.925rem; } .layer-card { padding: 1rem; } .layer-desc { font-size: 0.875rem; } }
+@media (max-width: 480px) { .page { padding: 1.25rem 1rem 3rem; } header h1 { font-size: 1.7rem; letter-spacing: 0.06em; } header .subtitle { font-size: 0.95rem; } header .intro-text { font-size: 0.9rem; } .triangle-wrap { max-width: 20rem; } .info-panel { padding: 1.25rem 1rem; } .panel-title { font-size: 1.2rem; } .panel-body { font-size: 0.925rem; } .panel-verdict { font-size: 0.9rem; } .example-box .example-content { font-size: 0.875rem; } .btc-choice p { font-size: 0.925rem; } .layer-card { padding: 1rem; } .layer-desc { font-size: 0.875rem; } }
 
 /* Dropdown nav */
 .nav-dropdown { position: relative; display: inline-block; }
