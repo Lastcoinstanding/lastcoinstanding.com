@@ -20,9 +20,13 @@
         .content-area{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:0 2rem 6rem}
         .tab-nav{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:3rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
         .tab-nav::-webkit-scrollbar{display:none}
-        .tab-btn{font-family:'Inter', -apple-system, sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);background:none;border:none;padding:1rem 1.5rem;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.3s;white-space:nowrap;flex-shrink:0;min-height:48px}
-        .tab-btn:hover{color:var(--text-dim)}
-        .tab-btn.active{color:var(--amber);border-bottom-color:var(--amber)}
+        .tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;padding:1rem 0.75rem;cursor:pointer;text-align:center;transition:all 0.25s;min-height:56px;flex-shrink:0}
+        .tab-btn:hover{background:rgba(255,255,255,0.02)}
+        .tab-btn .tab-num{display:block;font-family:'Inter', -apple-system, sans-serif;font-size:0.65rem;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;transition:color 0.25s}
+        .tab-btn .tab-title{display:block;font-family:'Inter', -apple-system, sans-serif;font-size:0.95rem;font-weight:500;color:var(--text-dim);transition:color 0.25s}
+        .tab-btn.active{border-bottom-color:var(--amber)}
+        .tab-btn.active .tab-num{color:var(--amber)}
+        .tab-btn.active .tab-title{color:var(--text);font-weight:600}
         .tab-panel{animation:fadeIn 0.5s ease}
         .tab-panel.js-hidden{display:none}.tab-panel.active{display:block}
         @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -109,7 +113,7 @@
 .mobile-overlay a.active{color:var(--amber);background:rgba(224,148,34,0.08);font-weight:600}
 
         @media(max-width:768px){
-    #customInputsRow{grid-template-columns:1fr !important;}.hero{padding:6rem 1.5rem 3rem}.content-area{padding:0 1rem 4rem}.chart-container{padding:1.2rem}.chart-wrapper{height:280px}.tab-btn{padding:0.8rem 1rem;font-size:0.75rem}.calc-results{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.site-nav .nav-links{display:none}.hamburger{display:block}.era-block{grid-template-columns:100px 1fr 60px;gap:0.8rem;padding:1rem}.era-ratio .ratio-value{font-size:1.4rem}.era-desc{font-size:0.8rem}.tab-nav{position:relative;mask-image:linear-gradient(90deg,#000 85%,transparent);-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent)}#totalSummary{grid-template-columns:1fr!important}#dcaResultContainer{margin-left:0}.dca-grid{grid-template-columns:1fr!important}#customInputsRow{grid-template-columns:1fr!important}#scenarioControlRow{grid-template-columns:1fr!important;gap:1rem!important}.toggle-btn{font-size:0.72rem!important;padding:0.7rem 0.5rem!important}}
+    #customInputsRow{grid-template-columns:1fr !important;}.hero{padding:6rem 1.5rem 3rem}.content-area{padding:0 1rem 4rem}.chart-container{padding:1.2rem}.chart-wrapper{height:280px}.tab-btn{flex:0 0 auto;padding:0.7rem 0.9rem;min-height:52px}.tab-btn .tab-title{font-size:0.85rem;white-space:nowrap}.calc-results{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.site-nav .nav-links{display:none}.hamburger{display:block}.era-block{grid-template-columns:100px 1fr 60px;gap:0.8rem;padding:1rem}.era-ratio .ratio-value{font-size:1.4rem}.era-desc{font-size:0.8rem}.tab-nav{position:relative;mask-image:linear-gradient(90deg,#000 85%,transparent);-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent)}#totalSummary{grid-template-columns:1fr!important}#dcaResultContainer{margin-left:0}.dca-grid{grid-template-columns:1fr!important}#customInputsRow{grid-template-columns:1fr!important}#scenarioControlRow{grid-template-columns:1fr!important;gap:1rem!important}.toggle-btn{font-size:0.72rem!important;padding:0.7rem 0.5rem!important}}
         @media(max-width:480px){
     #customInputsRow{grid-template-columns:1fr !important;}.chart-wrapper{height:240px}.stats-row{grid-template-columns:1fr}.stat-card .stat-value{font-size:1.8rem}.era-block{grid-template-columns:80px 1fr 55px}.section-intro p{font-size:0.95rem}.narrative p{font-size:0.95rem}}
     
