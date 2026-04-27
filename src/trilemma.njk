@@ -1,0 +1,121 @@
+---
+layout: base.njk
+permalink: /trilemma.html
+slug: trilemma
+eleventyComputed:
+  head_extras: "{% include '_pageassets/trilemma-head.html' %}"
+  page_styles: "{% include '_pageassets/trilemma.css' %}"
+  page_scripts: "{% include '_pageassets/trilemma.js' %}"
+---
+<div class="page">
+  <header>
+    <h1>The Bitcoin Trilemma</h1>
+    <p class="subtitle">Why Bitcoin deliberately sacrifices speed — and why that's exactly right</p>
+    <p class="intro-text">Every blockchain must choose: you can optimize for any two of three foundational properties — <strong>Decentralization</strong>, <strong>Security</strong>, and <strong>Scalability</strong> — but never all three at the base layer. Click each vertex below to explore the tradeoffs.</p>
+  </header>
+  <div class="trilemma-stage">
+    <div class="triangle-wrap">
+      <svg class="triangle-svg" viewBox="0 0 500 520" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow-orange" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="glow-grey" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <radialGradient id="node-glow-d" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#F7931A" stop-opacity="0.25"/><stop offset="100%" stop-color="#F7931A" stop-opacity="0"/></radialGradient>
+          <radialGradient id="node-glow-se" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#F7931A" stop-opacity="0.25"/><stop offset="100%" stop-color="#F7931A" stop-opacity="0"/></radialGradient>
+          <radialGradient id="node-glow-sc" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#6a7580" stop-opacity="0.2"/><stop offset="100%" stop-color="#6a7580" stop-opacity="0"/></radialGradient>
+        </defs>
+        <line x1="250" y1="80" x2="60" y2="400" stroke="#F7931A" stroke-width="2.5" stroke-opacity="0.5" id="edge-d-se"/>
+        <line x1="250" y1="80" x2="440" y2="400" stroke="#3a3530" stroke-width="1.5" stroke-opacity="0.5" id="edge-d-sc"/>
+        <line x1="60" y1="400" x2="440" y2="400" stroke="#3a3530" stroke-width="1.5" stroke-opacity="0.5" id="edge-se-sc"/>
+        <line x1="250" y1="80" x2="60" y2="400" stroke="#F7931A" stroke-width="6" stroke-opacity="0.08" filter="url(#glow-orange)"/>
+        <text x="140" y="230" fill="#F7931A" fill-opacity="0.55" font-family="Inter, sans-serif" font-size="16" font-weight="700" letter-spacing="0.10em" text-anchor="middle" transform="rotate(-60, 140, 230)">BITCOIN'S CHOICE</text>
+        <text x="250" y="290" fill="#a09890" font-family="Inter, sans-serif" font-size="22" font-weight="500" text-anchor="middle" font-style="italic">"Pick any two"</text>
+        <text x="358" y="222" fill="#a09890" font-family="Inter, sans-serif" font-size="17" font-weight="500" text-anchor="middle" font-style="italic" transform="rotate(60, 358, 222)">faster but fragile</text>
+        <text x="250" y="460" fill="#a09890" font-family="Inter, sans-serif" font-size="17" font-weight="500" text-anchor="middle" font-style="italic">fast but centralized</text>
+        <g id="node-d" class="tri-node" data-vertex="decentralization">
+          <circle cx="250" cy="80" r="58" fill="url(#node-glow-d)" opacity="0" class="glow-circle"/>
+          <circle cx="250" cy="80" r="50" fill="transparent" class="hit-area"/>
+          <circle cx="250" cy="80" r="40" fill="#181410" stroke="#F7931A" stroke-width="2" class="node-ring"/>
+          <text x="250" y="74" fill="#F7931A" font-family="Inter, sans-serif" font-size="30" font-weight="700" text-anchor="middle" letter-spacing="0.06em">D</text>
+          <text x="250" y="98" fill="#F7931A" font-family="Inter, sans-serif" font-size="20" font-weight="600" text-anchor="middle" letter-spacing="0.08em" fill-opacity="0.8">MAX</text>
+          <text x="250" y="22" fill="#e0d8d0" font-family="Inter, sans-serif" font-size="22" font-weight="600" text-anchor="middle" letter-spacing="0.03em">Decentralization</text>
+        </g>
+        <g id="node-se" class="tri-node" data-vertex="security">
+          <circle cx="60" cy="400" r="58" fill="url(#node-glow-se)" opacity="0" class="glow-circle"/>
+          <circle cx="60" cy="400" r="50" fill="transparent" class="hit-area"/>
+          <circle cx="60" cy="400" r="40" fill="#181410" stroke="#F7931A" stroke-width="2" class="node-ring"/>
+          <text x="60" y="394" fill="#F7931A" font-family="Inter, sans-serif" font-size="30" font-weight="700" text-anchor="middle" letter-spacing="0.06em">S</text>
+          <text x="60" y="418" fill="#F7931A" font-family="Inter, sans-serif" font-size="20" font-weight="600" text-anchor="middle" letter-spacing="0.08em" fill-opacity="0.8">MAX</text>
+          <text x="60" y="484" fill="#e0d8d0" font-family="Inter, sans-serif" font-size="22" font-weight="600" text-anchor="middle" letter-spacing="0.03em">Security</text>
+        </g>
+        <g id="node-sc" class="tri-node" data-vertex="scalability">
+          <circle cx="440" cy="400" r="58" fill="url(#node-glow-sc)" opacity="0" class="glow-circle"/>
+          <circle cx="440" cy="400" r="50" fill="transparent" class="hit-area"/>
+          <circle cx="440" cy="400" r="40" fill="#181410" stroke="#6a7580" stroke-width="1.5" class="node-ring" stroke-dasharray="4,3"/>
+          <text x="440" y="394" fill="#6a7580" font-family="Inter, sans-serif" font-size="30" font-weight="700" text-anchor="middle" letter-spacing="0.06em">Sc</text>
+          <text x="440" y="418" fill="#6a7580" font-family="Inter, sans-serif" font-size="20" font-weight="600" text-anchor="middle" letter-spacing="0.08em" fill-opacity="0.8">RELAX</text>
+          <text x="440" y="484" fill="#a09890" font-family="Inter, sans-serif" font-size="22" font-weight="500" text-anchor="middle" letter-spacing="0.03em">Scalability</text>
+        </g>
+      </svg>
+    </div>
+    <div class="info-panel" id="info-panel">
+      <div class="panel-default" id="panel-default">
+        <div class="panel-label" style="color: var(--text-dim);">EXPLORE</div>
+        <div class="panel-title">Click a Vertex</div>
+        <div class="panel-body">
+          <p>Every blockchain protocol faces the same fundamental constraint: it can optimize for any <strong>two</strong> of three properties at its base layer, but never all three simultaneously.</p>
+          <p>This isn't a failure of engineering — it's a structural reality. Keeping the network open to everyone, resistant to attack, and fast enough for global use creates tensions that cannot be engineered away — only navigated through deliberate tradeoffs.</p>
+          <p>Click on <strong>Decentralization</strong>, <strong>Security</strong>, or <strong>Scalability</strong> to explore what happens when each property is relaxed - and why Bitcoin's deliberate choice is the foundation of sound digital money.</p>
+        </div>
+      </div>
+      <div class="panel-active" id="panel-decentralization" style="display:none">
+        <div class="panel-label decentralization">DECENTRALIZATION</div>
+        <div class="panel-title">What if Decentralization Is Relaxed?</div>
+        <div class="panel-body">
+          <p>Decentralization means that <strong>anyone with a regular laptop</strong> can fully audit the blockchain — verify every transaction, confirm the 21-million supply cap, and validate the integrity of the entire ledger independently. This "computational auditability" is what gives Bitcoin its <strong>monetary hardness</strong>.</p>
+          <p>If you relax decentralization, you get <strong>speed and security, but at the cost of trust</strong>. The network becomes faster because fewer, more powerful nodes handle validation — but now ordinary people can't verify the ledger themselves. You've reintroduced the very counterparty risk Bitcoin was designed to eliminate.</p>
+          <div class="panel-verdict bad"><strong>The result:</strong> A fast, secure database — but one that requires you to trust the operators. Essentially, you've rebuilt Visa with extra steps. If individuals can no longer run nodes, they lose the ability to verify supply, validate transactions, and participate in consensus — the very foundations of Bitcoin's monetary credibility.</div>
+          <div class="example-box"><div class="example-label">Real-World Failures</div><div class="example-content"><strong>Solana</strong> requires enterprise-grade hardware to run a validator, concentrating control among well-funded operators. <strong>BSV</strong> pushed for massive blocks, pricing out ordinary node operators and creating a network where as little as 1% of Bitcoin's miners could execute a 51% attack.</div></div>
+        </div>
+      </div>
+      <div class="panel-active" id="panel-security" style="display:none">
+        <div class="panel-label security">SECURITY</div>
+        <div class="panel-title">What if Security Is Relaxed?</div>
+        <div class="panel-body">
+          <p>Security is the system's resilience against adversaries. Bitcoin achieves this through Proof of Work - requiring enormous real-world energy expenditure that makes attacks prohibitively expensive. The network's hash rate represents an immovable wall of thermodynamic cost.</p>
+          <p>If you relax security, you get <strong>speed and participation, but vulnerability to attack</strong>. Faster consensus algorithms or lower security thresholds allow more throughput, but they open the door to 51% attacks, double-spending, and ledger manipulation.</p>
+          <div class="panel-verdict bad"><strong>The result:</strong> A fast, accessible network - but one that can be seized, censored, or rewritten by a sufficiently motivated adversary. Money that can be manipulated is not sound money.</div>
+          <div class="example-box"><div class="example-label">Real-World Failures</div><div class="example-content"><strong>Ethereum Classic</strong> suffered multiple 51% attacks due to its low hash rate relative to Ethereum. <strong>BSV</strong> has been repeatedly reorganized, demonstrating that speed without security is a dangerous illusion. Networks that weaken Proof of Work for speed gain throughput but lose the very immutability that makes a ledger trustworthy.</div></div>
+        </div>
+      </div>
+      <div class="panel-active" id="panel-scalability" style="display:none">
+        <div class="panel-label scalability">SCALABILITY</div>
+        <div class="panel-title">What if Scalability Is Relaxed?</div>
+        <div class="panel-body">
+          <p>Scalability is the capacity to process high transaction volumes. Superficially this sounds like a great feature; high throughput, low fees, instant settlement - the properties every payment network desires.</p>
+          <p>If you relax scalability at the base layer, as Bitcoin does, you preserve <strong>decentralization and security simultaneously</strong>. The base layer becomes a high-integrity settlement medium: slow, deliberate, and unbreakable. The throughput is deliberately constrained — approximately 400,000 transactions per day — but each one represents final, irreversible, censorship-resistant settlement. This is a feature, not a limitation.</p>
+          <div class="panel-verdict good"><strong>Bitcoin's choice:</strong> This is the correct tradeoff. The base layer is an armored tank - designed for settlement, not coffee purchases. Scalability is then addressed through <strong>layered architecture</strong>: the Lightning Network, sidechains, and application layers handle high-velocity payments while the base layer preserves monetary integrity.</div>
+          <div class="example-box"><div class="example-label">The Layered Solution</div><div class="example-content">Just as <strong>Fedwire</strong> settles $80 trillion in value with fewer than 20 million transactions per month while Visa handles consumer payments above it - Bitcoin's Layer 1 provides settlement finality while Lightning and other Layer 2 solutions provide speed (Lightning can already support more transactions per second than Visa and Mastercard combined). Each L1 transaction can represent thousands of bundled L2 payments.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="btc-choice">
+    <h2>Why This Is the Only Path to Sound Money</h2>
+    <p>Bitcoin solved <strong>decentralization and security together</strong> for the first time in human history. Every other network that has tried to optimize for scalability at the base layer has necessarily sacrificed one or both.</p>
+    <p>Bitcoin Cash, Bitcoin SV, Litecoin, and scores of "faster" alternatives all made the same mistake: treating base-layer speed as the priority. But monetary integrity must be the impervious foundation upon which any new, global monetary network is built — speed without soundness is just a faster way to fail. Bitcoin's <strong>Medium of Exchange</strong> role, while ultimately critical, is best delivered through Layer 2 solutions built on top of an uncompromising base layer.</p>
+    <p>The layered approach is the only architecture that preserves an immutable, decentralized foundation while achieving the throughput required to serve eight billion people.</p>
+  </div>
+  <div class="layers-section">
+    <h2>How Bitcoin Scales Without Compromise</h2>
+    <div class="layers-grid">
+      <div class="layer-card"><div class="layer-num">Layer 1</div><div class="layer-name">Settlement</div><div class="layer-desc">The armored core. Optimized for finality, censorship resistance, and monetary immutability. ~400K transactions/day focused on value-density, not velocity.</div></div>
+      <div class="layer-card"><div class="layer-num">Layer 2</div><div class="layer-name">Payments</div><div class="layer-desc">Lightning Network, rollups, and sidechains. High throughput, near-instant finality, negligible fees. Thousands of transactions settle to one L1 entry.</div></div>
+      <div class="layer-card"><div class="layer-num">Layer 3</div><div class="layer-name">Applications</div><div class="layer-desc">Consumer-facing services like Cash App and custodial wallets. Massive ease-of-use for billions of users while the 21M supply cap remains intact underneath.</div></div>
+    </div>
+  </div>
+</div>
+<section class="page-attribution" style="padding: 3rem 2rem 1rem; max-width: 720px; margin: 0 auto; text-align: center; border-top: 1px solid rgba(224,148,34,0.08);">
+    <p style="font-family:'Inter',sans-serif; font-size:0.82rem; color:rgba(255,255,255,0.5); line-height:1.7; margin:0;">
+        The Blockchain Trilemma was first articulated by <strong style="color:rgba(255,255,255,0.75);">Vitalik Buterin</strong> in 2017. Its profound implications for Bitcoin as sound money have been extensively explored by <strong style="color:rgba(255,255,255,0.75);">Jeff Booth</strong>.
+    </p>
+</section>

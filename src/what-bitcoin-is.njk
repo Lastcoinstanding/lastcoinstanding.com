@@ -1,0 +1,56 @@
+---
+layout: base.njk
+permalink: /what-bitcoin-is.html
+slug: what-bitcoin-is
+eleventyComputed:
+  head_extras: "{% include '_pageassets/what-bitcoin-is-head.html' %}"
+  page_styles: "{% include '_pageassets/what-bitcoin-is.css' %}"
+  page_scripts: "{% include '_pageassets/what-bitcoin-is.js' %}"
+---
+<div class="page">
+        <header>
+            <h1 id="pageTitle">What Bitcoin Is</h1>
+            <p class="subtitle" id="pageSubtitle"></p>
+        </header>
+        <main>
+            <div class="viz-section">
+                <div class="svg-wrap" id="svgWrap">
+                    <svg id="flower" viewBox="-260 -270 520 540" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="blur"/>
+                                <feFlood flood-color="#F7931A" flood-opacity="0.35"/>
+                                <feComposite in2="blur" operator="in" result="colorblur"/>
+                                <feMerge><feMergeNode in="colorblur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                        </defs>
+                        <g id="circles-group"></g>
+                        <g id="hit-group"></g>
+                        <g class="float-label" id="floatLabel" style="opacity:0">
+                            <rect rx="4" ry="4" fill="rgba(8,8,10,0.88)" x="0" y="0" width="0" height="0"></rect>
+                        </g>
+                    </svg>
+                </div>
+                <div class="progress">
+                    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+                    <p class="progress-text">
+                        <span id="count">0</span> of <span id="totalCount">0</span> dimensions illuminated
+                        <button class="reset-btn" id="resetBtn" onclick="resetAll()">reset</button>
+                    </p>
+                </div>
+            </div>
+            <div class="info-panel" id="panel">
+                <div class="panel-default" id="panelDefault">
+                    <p id="panelIntro"></p>
+                    <p id="panelIntroSecondary"></p>
+                    <span class="cta" id="panelCta"></span>
+                </div>
+                <div class="panel-content" id="panelContent">
+                    <p class="concept-tag" id="conceptTag"></p>
+                    <h2 class="concept-name" id="conceptName"></h2>
+                    <p class="concept-desc" id="conceptDesc"></p>
+                    <div class="concept-relation" id="conceptRelation"></div>
+                </div>
+            </div>
+        </main>
+    </div>

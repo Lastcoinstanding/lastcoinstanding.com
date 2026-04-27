@@ -1,0 +1,149 @@
+---
+layout: base.njk
+permalink: /not-a-bubble.html
+slug: not-a-bubble
+eleventyComputed:
+  head_extras: "{% include '_pageassets/not-a-bubble-head.html' %}"
+  page_styles: "{% include '_pageassets/not-a-bubble.css' %}"
+  page_scripts: "{% include '_pageassets/not-a-bubble.js' %}"
+---
+<div class="page">
+  <header>
+    <h1>Is Bitcoin a Bubble?</h1>
+    <div class="amber-rule"></div>
+    <p class="subtitle">Bitcoin vs. Every Famous Asset Bubble in History</p>
+    <p class="intro-text">
+      Every bubble in history followed the same pattern: a dramatic rise,
+      a collapse to near-zero, and a permanent flatline. Bitcoin has been declared
+      dead <strong>over 400 times</strong>. It has survived three major crashes — each time
+      recovering to new all-time highs. Compare that to any bubble in the chart below.
+    </p>
+  </header>
+
+  <!-- Controls -->
+  <div class="controls-bar">
+    <div class="controls-left">
+      <div class="selector-group">
+        <div class="toggle-group" role="group" aria-label="Chart view">
+          <button class="toggle-btn" id="btnBubble" onclick="setMode('bubble')">
+            Bubble Window (±3 yrs)
+          </button>
+          <button class="toggle-btn active" id="btn2014" onclick="setMode('2014')">
+            Since 2014 (default)
+          </button>
+          <button class="toggle-btn" id="btnGenesis" onclick="setMode('genesis')">
+            Since 2010 (Genesis)
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="live-price">
+      <div class="live-dot"></div>
+      <span class="live-price-text">
+        <span class="live-price-label">Current Bitcoin Price</span>
+        <span id="livePriceVal">loading…</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-wrap">
+    <canvas id="bubbleChart" role="img" aria-label="Interactive chart comparing Bitcoin price history to famous asset bubbles"></canvas>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend-wrap" id="legendWrap"></div>
+
+  <!-- Download -->
+  <div class="download-section">
+    <p>
+      Generate a shareable image with today&rsquo;s date and current price —
+      ready to post to X, LinkedIn, or anywhere else.
+      <span id="downloadHint" style="display:none"> Opens as an image — long-press to save to Photos.</span>
+    </p>
+    <button class="btn-download" id="downloadBtn" onclick="generateDownload()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      <span id="downloadBtnLabel">Generate &amp; Download Chart</span>
+    </button>
+  </div>
+
+  <!-- Insight cards -->
+  <div class="insight-section">
+    <div class="insight-card">
+      <div class="ic-label">Historical Bubbles</div>
+      <div class="ic-value">7 of 7</div>
+      <div class="ic-desc">
+        Every classical bubble — Tulip Mania, Mississippi, South Sea, Tech, Depression,
+        Japan, 2008 — collapsed to near-zero and never recovered.
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="ic-label">Bitcoin Major Crashes</div>
+      <div class="ic-value">3 survived</div>
+      <div class="ic-desc">
+        Bitcoin has crashed over 80% three times (2011, 2018, 2022). Each time,
+        it not only recovered — it exceeded its previous peak.
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="ic-label">2025 ATH Multiple</div>
+      <div class="ic-value" id="athMultiple">~310×</div>
+      <div class="ic-desc">
+        At its 2025 peak, Bitcoin reached over 310× its 2014 price.
+        Tulip Mania, widely considered the greatest bubble ever, peaked at just 50×.
+      </div>
+    </div>
+  </div>
+
+  <!-- Essay -->
+  <div class="essay">
+    <h2>The Pattern That Didn't Repeat</h2>
+    <p>
+      A bubble has a signature. It rises. It peaks. It collapses. And it never comes back.
+      That is the definition — not the rise, but the permanent collapse.
+      Tulip prices in 1637 never recovered. Mississippi Company shares went to zero.
+      The South Sea Bubble wiped out fortunes permanently. The Nasdaq took 15 years
+      to recover its 2000 peak, and many of its constituents never did.
+    </p>
+    <p>
+      Bitcoin has been called a bubble in every year of its existence.
+      It has obliged its critics with crashes of 80%, 85%, 77%.
+      And then it did something no bubble has ever done:
+      <strong>it came back, and it went higher</strong>.
+    </p>
+    <p>
+      This chart does not make a price prediction. It makes a structural observation.
+      Whatever Bitcoin is — it does not behave like a bubble. And if it doesn't behave
+      like one, perhaps it is time to ask what it actually is.
+    </p>
+  </div>
+
+  <div class="sources">
+    Bitcoin price data: Yahoo Finance &middot;
+    Historical bubbles: Mackay <em>Extraordinary Popular Delusions</em>,
+    Garber <em>Famous First Bubbles</em>, Yale SOM, St. Louis FRED &middot;
+    Inspired by <a href="https://www.convoyinvestments.com" target="_blank" rel="noopener">Convoy Investments</a> (2021)
+  </div>
+</div>
+
+
+
+<div class="save-overlay" id="saveOverlay">
+  <div class="save-overlay-header">
+    <button class="save-overlay-back" id="saveOverlayBack">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Chart
+    </button>
+  </div>
+  <div class="save-overlay-body">
+    <p class="save-overlay-tip">&#8595; Long-press the image &rarr; Save to Photos</p>
+    <p class="save-overlay-sub">Then share from your Photos app anywhere you like</p>
+    <img id="saveOverlayImg" src="" alt="Bitcoin vs Historical Bubbles — lastcoinstanding.com">
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>

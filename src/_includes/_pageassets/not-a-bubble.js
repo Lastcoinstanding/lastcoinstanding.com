@@ -1,0 +1,830 @@
+
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const START_PRICE = 398.8210144042969;
+const PEAK_2017_MS = new Date('2017-12-16').getTime();
+
+const BTC_DATA_2014 = [{"x": -3.2361, "y": 1.0}, {"x": -3.217, "y": 0.9457}, {"x": -3.1978, "y": 0.8036}, {"x": -3.1786, "y": 0.9492}, {"x": -3.1595, "y": 0.9767}, {"x": -3.1403, "y": 0.8894}, {"x": -3.1211, "y": 0.8171}, {"x": -3.102, "y": 0.9108}, {"x": -3.0828, "y": 0.9726}, {"x": -3.0637, "y": 0.9216}, {"x": -3.0445, "y": 0.9479}, {"x": -3.0253, "y": 0.9405}, {"x": -3.0062, "y": 0.8817}, {"x": -2.987, "y": 0.8045}, {"x": -2.9678, "y": 0.7954}, {"x": -2.9487, "y": 0.6624}, {"x": -2.9295, "y": 0.6661}, {"x": -2.9103, "y": 0.5274}, {"x": -2.8912, "y": 0.6362}, {"x": -2.872, "y": 0.5691}, {"x": -2.8528, "y": 0.5602}, {"x": -2.8337, "y": 0.5888}, {"x": -2.8145, "y": 0.5917}, {"x": -2.7953, "y": 0.6524}, {"x": -2.7762, "y": 0.6879}, {"x": -2.757, "y": 0.7181}, {"x": -2.7379, "y": 0.6719}, {"x": -2.7187, "y": 0.6086}, {"x": -2.6995, "y": 0.6534}, {"x": -2.6804, "y": 0.5921}, {"x": -2.6612, "y": 0.5581}, {"x": -2.642, "y": 0.5502}, {"x": -2.6229, "y": 0.6027}, {"x": -2.6037, "y": 0.6025}, {"x": -2.5845, "y": 0.5938}, {"x": -2.5654, "y": 0.6042}, {"x": -2.5462, "y": 0.5772}, {"x": -2.527, "y": 0.5588}, {"x": -2.5079, "y": 0.5856}, {"x": -2.4887, "y": 0.6117}, {"x": -2.4695, "y": 0.6244}, {"x": -2.4504, "y": 0.6818}, {"x": -2.4312, "y": 0.7795}, {"x": -2.412, "y": 0.6861}, {"x": -2.3929, "y": 0.7339}, {"x": -2.3737, "y": 0.7086}, {"x": -2.3546, "y": 0.6647}, {"x": -2.3354, "y": 0.6482}, {"x": -2.3162, "y": 0.5721}, {"x": -2.2971, "y": 0.5736}, {"x": -2.2779, "y": 0.6014}, {"x": -2.2587, "y": 0.578}, {"x": -2.2396, "y": 0.5797}, {"x": -2.2204, "y": 0.5836}, {"x": -2.2012, "y": 0.5974}, {"x": -2.1821, "y": 0.6195}, {"x": -2.1629, "y": 0.656}, {"x": -2.1437, "y": 0.7113}, {"x": -2.1246, "y": 0.816}, {"x": -2.1054, "y": 0.9362}, {"x": -2.0862, "y": 0.8028}, {"x": -2.0671, "y": 0.8137}, {"x": -2.0479, "y": 0.931}, {"x": -2.0287, "y": 0.9748}, {"x": -2.0096, "y": 1.0876}, {"x": -1.9904, "y": 1.11}, {"x": -1.9713, "y": 1.0602}, {"x": -1.9521, "y": 1.0782}, {"x": -1.9329, "y": 1.1233}, {"x": -1.9138, "y": 0.9586}, {"x": -1.8946, "y": 1.0104}, {"x": -1.8754, "y": 0.9246}, {"x": -1.8563, "y": 0.9443}, {"x": -1.8371, "y": 1.0211}, {"x": -1.8179, "y": 1.1002}, {"x": -1.7988, "y": 1.087}, {"x": -1.7796, "y": 1.0223}, {"x": -1.7604, "y": 1.0382}, {"x": -1.7413, "y": 1.0374}, {"x": -1.7221, "y": 1.0701}, {"x": -1.7029, "y": 1.0554}, {"x": -1.6838, "y": 1.057}, {"x": -1.6646, "y": 1.0717}, {"x": -1.6454, "y": 1.1498}, {"x": -1.6263, "y": 1.133}, {"x": -1.6071, "y": 1.1498}, {"x": -1.588, "y": 1.1473}, {"x": -1.5688, "y": 1.1016}, {"x": -1.5496, "y": 1.3195}, {"x": -1.5305, "y": 1.4417}, {"x": -1.5113, "y": 1.6869}, {"x": -1.4921, "y": 1.9151}, {"x": -1.473, "y": 1.5781}, {"x": -1.4538, "y": 1.6515}, {"x": -1.4346, "y": 1.6282}, {"x": -1.4155, "y": 1.7037}, {"x": -1.3963, "y": 1.6581}, {"x": -1.3771, "y": 1.5663}, {"x": -1.358, "y": 1.4861}, {"x": -1.3388, "y": 1.4304}, {"x": -1.3196, "y": 1.4576}, {"x": -1.3005, "y": 1.439}, {"x": -1.2813, "y": 1.5261}, {"x": -1.2621, "y": 1.5213}, {"x": -1.243, "y": 1.5292}, {"x": -1.2238, "y": 1.5065}, {"x": -1.2047, "y": 1.5317}, {"x": -1.1855, "y": 1.5464}, {"x": -1.1663, "y": 1.6088}, {"x": -1.1472, "y": 1.6475}, {"x": -1.128, "y": 1.7598}, {"x": -1.1088, "y": 1.7841}, {"x": -1.0897, "y": 1.7603}, {"x": -1.0705, "y": 1.833}, {"x": -1.0513, "y": 1.8355}, {"x": -1.0322, "y": 1.9404}, {"x": -1.013, "y": 1.93}, {"x": -0.9938, "y": 1.9822}, {"x": -0.9747, "y": 2.2471}, {"x": -0.9555, "y": 2.5032}, {"x": -0.9363, "y": 2.2847}, {"x": -0.9172, "y": 2.0606}, {"x": -0.898, "y": 2.3185}, {"x": -0.8789, "y": 2.3055}, {"x": -0.8597, "y": 2.5759}, {"x": -0.8405, "y": 2.5053}, {"x": -0.8214, "y": 2.6274}, {"x": -0.8022, "y": 2.9216}, {"x": -0.783, "y": 3.1772}, {"x": -0.7639, "y": 3.0625}, {"x": -0.7447, "y": 2.5995}, {"x": -0.7255, "y": 2.424}, {"x": -0.7064, "y": 2.7636}, {"x": -0.6872, "y": 2.9785}, {"x": -0.668, "y": 2.9661}, {"x": -0.6489, "y": 3.0269}, {"x": -0.6297, "y": 3.3797}, {"x": -0.6105, "y": 4.0036}, {"x": -0.5914, "y": 4.5356}, {"x": -0.5722, "y": 5.1181}, {"x": -0.553, "y": 5.4054}, {"x": -0.5339, "y": 6.2981}, {"x": -0.5147, "y": 7.4171}, {"x": -0.4956, "y": 6.3896}, {"x": -0.4764, "y": 6.4927}, {"x": -0.4572, "y": 6.2847}, {"x": -0.4381, "y": 6.3147}, {"x": -0.4189, "y": 4.8388}, {"x": -0.3997, "y": 6.8462}, {"x": -0.3806, "y": 6.9133}, {"x": -0.3614, "y": 8.0586}, {"x": -0.3422, "y": 10.2133}, {"x": -0.3231, "y": 10.2494}, {"x": -0.3039, "y": 10.9896}, {"x": -0.2847, "y": 11.4913}, {"x": -0.2656, "y": 10.3378}, {"x": -0.2464, "y": 8.9837}, {"x": -0.2272, "y": 9.2343}, {"x": -0.2081, "y": 11.0419}, {"x": -0.1889, "y": 11.5603}, {"x": -0.1697, "y": 14.2374}, {"x": -0.1506, "y": 15.0655}, {"x": -0.1314, "y": 15.4301}, {"x": -0.1123, "y": 18.5733}, {"x": -0.0931, "y": 14.9191}, {"x": -0.0739, "y": 20.1506}, {"x": -0.0548, "y": 23.3953}, {"x": -0.0356, "y": 28.3917}, {"x": -0.0164, "y": 38.7527}, {"x": 0.0027, "y": 47.9935}, {"x": 0.0219, "y": 34.9174}, {"x": 0.0411, "y": 35.4956}, {"x": 0.0602, "y": 41.3158}, {"x": 0.0794, "y": 34.5318}, {"x": 0.0986, "y": 29.086}, {"x": 0.1177, "y": 29.5529}, {"x": 0.1369, "y": 20.7537}, {"x": 0.1561, "y": 20.385}, {"x": 0.1752, "y": 26.4575}, {"x": 0.1944, "y": 24.2333}, {"x": 0.2136, "y": 28.8666}, {"x": 0.2327, "y": 24.0174}, {"x": 0.2519, "y": 20.62}, {"x": 0.271, "y": 21.3022}, {"x": 0.2902, "y": 17.1612}, {"x": 0.3094, "y": 17.6107}, {"x": 0.3285, "y": 20.8843}, {"x": 0.3477, "y": 22.0712}, {"x": 0.3669, "y": 23.6173}, {"x": 0.386, "y": 24.2084}, {"x": 0.4052, "y": 21.8743}, {"x": 0.4244, "y": 21.346}, {"x": 0.4435, "y": 18.475}, {"x": 0.4627, "y": 19.3577}, {"x": 0.4819, "y": 17.0152}, {"x": 0.501, "y": 16.2962}, {"x": 0.5202, "y": 15.4787}, {"x": 0.5394, "y": 16.0117}, {"x": 0.5585, "y": 16.9848}, {"x": 0.5777, "y": 15.9461}, {"x": 0.5969, "y": 18.6011}, {"x": 0.616, "y": 20.6069}, {"x": 0.6352, "y": 17.7234}, {"x": 0.6543, "y": 15.8535}, {"x": 0.6735, "y": 16.3133}, {"x": 0.6927, "y": 16.8177}, {"x": 0.7118, "y": 18.2355}, {"x": 0.731, "y": 15.7987}, {"x": 0.7502, "y": 16.3411}, {"x": 0.7693, "y": 16.8262}, {"x": 0.7885, "y": 16.6129}, {"x": 0.8077, "y": 16.5562}, {"x": 0.8268, "y": 15.7738}, {"x": 0.846, "y": 16.2538}, {"x": 0.8652, "y": 16.2639}, {"x": 0.8843, "y": 15.9874}, {"x": 0.9035, "y": 16.0756}, {"x": 0.9227, "y": 14.1004}, {"x": 0.9418, "y": 10.0546}, {"x": 0.961, "y": 10.3803}, {"x": 0.9802, "y": 9.0623}, {"x": 0.9993, "y": 8.1561}, {"x": 1.0185, "y": 10.027}, {"x": 1.0376, "y": 9.6935}, {"x": 1.0568, "y": 10.2217}, {"x": 1.076, "y": 8.9086}, {"x": 1.0951, "y": 9.0291}, {"x": 1.1143, "y": 8.9864}, {"x": 1.1335, "y": 8.6856}, {"x": 1.1526, "y": 9.2527}, {"x": 1.1718, "y": 9.2117}, {"x": 1.191, "y": 9.5542}, {"x": 1.2101, "y": 9.6464}, {"x": 1.2293, "y": 9.9082}, {"x": 1.2485, "y": 10.0928}, {"x": 1.2676, "y": 10.0851}, {"x": 1.2868, "y": 10.2939}, {"x": 1.306, "y": 13.0357}, {"x": 1.3251, "y": 12.9575}, {"x": 1.3443, "y": 13.3256}, {"x": 1.3634, "y": 13.2519}, {"x": 1.3826, "y": 14.5321}, {"x": 1.4018, "y": 17.4825}, {"x": 1.4209, "y": 20.5548}, {"x": 1.4401, "y": 21.7471}, {"x": 1.4593, "y": 21.922}, {"x": 1.4784, "y": 19.277}, {"x": 1.4976, "y": 22.5527}, {"x": 1.5168, "y": 27.2187}, {"x": 1.5359, "y": 27.1228}, {"x": 1.5551, "y": 28.7117}, {"x": 1.5743, "y": 25.7159}, {"x": 1.5934, "y": 26.5761}, {"x": 1.6126, "y": 23.9528}, {"x": 1.6318, "y": 27.5065}, {"x": 1.6509, "y": 28.8941}, {"x": 1.6701, "y": 25.941}, {"x": 1.6893, "y": 25.4212}, {"x": 1.7084, "y": 24.467}, {"x": 1.7276, "y": 26.1804}, {"x": 1.7467, "y": 25.9458}, {"x": 1.7659, "y": 25.2504}, {"x": 1.7851, "y": 20.3204}, {"x": 1.8042, "y": 20.0294}, {"x": 1.8234, "y": 20.864}, {"x": 1.8426, "y": 20.616}, {"x": 1.8617, "y": 23.9499}, {"x": 1.8809, "y": 23.1566}, {"x": 1.9001, "y": 22.7057}, {"x": 1.9192, "y": 21.5083}, {"x": 1.9384, "y": 17.6719}, {"x": 1.9576, "y": 18.6156}, {"x": 1.9767, "y": 18.9668}, {"x": 1.9959, "y": 17.9336}, {"x": 2.0151, "y": 18.8345}, {"x": 2.0342, "y": 18.6115}, {"x": 2.0534, "y": 18.5831}, {"x": 2.0726, "y": 20.5418}, {"x": 2.0917, "y": 21.83}, {"x": 2.1109, "y": 21.5556}, {"x": 2.13, "y": 23.43}, {"x": 2.1492, "y": 25.3665}, {"x": 2.1684, "y": 24.9095}, {"x": 2.1875, "y": 24.8846}, {"x": 2.2067, "y": 21.4694}, {"x": 2.2259, "y": 20.3302}, {"x": 2.245, "y": 13.5206}, {"x": 2.2642, "y": 14.6187}, {"x": 2.2834, "y": 14.8489}, {"x": 2.3025, "y": 17.028}, {"x": 2.3217, "y": 17.4792}, {"x": 2.3409, "y": 18.0267}, {"x": 2.36, "y": 19.2564}, {"x": 2.3792, "y": 22.3094}, {"x": 2.3984, "y": 21.9558}, {"x": 2.4175, "y": 24.2483}, {"x": 2.4367, "y": 22.0409}, {"x": 2.4559, "y": 23.7226}, {"x": 2.475, "y": 24.4693}, {"x": 2.4942, "y": 23.5363}, {"x": 2.5133, "y": 23.3278}, {"x": 2.5325, "y": 22.9265}, {"x": 2.5517, "y": 22.7519}, {"x": 2.5708, "y": 23.2598}, {"x": 2.59, "y": 23.0324}, {"x": 2.6092, "y": 24.8361}, {"x": 2.6283, "y": 27.7157}, {"x": 2.6475, "y": 29.2756}, {"x": 2.6667, "y": 29.8199}, {"x": 2.6858, "y": 29.2483}, {"x": 2.705, "y": 29.3653}, {"x": 2.7242, "y": 25.7769}, {"x": 2.7433, "y": 25.8857}, {"x": 2.7625, "y": 27.4265}, {"x": 2.7817, "y": 27.0178}, {"x": 2.8008, "y": 26.7528}, {"x": 2.82, "y": 28.5446}, {"x": 2.8392, "y": 28.7933}, {"x": 2.8583, "y": 32.6742}, {"x": 2.8775, "y": 34.4443}, {"x": 2.8966, "y": 38.8133}, {"x": 2.9158, "y": 40.0069}, {"x": 2.935, "y": 46.0608}, {"x": 2.9541, "y": 45.5781}, {"x": 2.9733, "y": 48.5058}, {"x": 2.9925, "y": 47.9974}, {"x": 3.0116, "y": 58.8667}, {"x": 3.0308, "y": 65.8749}, {"x": 3.05, "y": 82.1973}, {"x": 3.0691, "y": 96.1746}, {"x": 3.0883, "y": 89.7427}, {"x": 3.1075, "y": 80.9621}, {"x": 3.1266, "y": 83.0306}, {"x": 3.1458, "y": 97.5461}, {"x": 3.165, "y": 122.1533}, {"x": 3.1841, "y": 144.2751}, {"x": 3.2033, "y": 113.178}, {"x": 3.2225, "y": 128.3952}, {"x": 3.2416, "y": 148.6941}, {"x": 3.2608, "y": 144.2337}, {"x": 3.2799, "y": 140.2904}, {"x": 3.2991, "y": 147.3306}, {"x": 3.3183, "y": 150.9574}, {"x": 3.3374, "y": 140.9559}, {"x": 3.3566, "y": 122.8728}, {"x": 3.3758, "y": 141.9962}, {"x": 3.3949, "y": 146.0112}, {"x": 3.4141, "y": 116.4835}, {"x": 3.4333, "y": 87.1834}, {"x": 3.4524, "y": 89.459}, {"x": 3.4716, "y": 89.921}, {"x": 3.4908, "y": 98.0336}, {"x": 3.5099, "y": 89.5096}, {"x": 3.5291, "y": 86.8802}, {"x": 3.5483, "y": 88.4802}, {"x": 3.5674, "y": 85.8535}, {"x": 3.5866, "y": 79.727}, {"x": 3.6057, "y": 88.6367}, {"x": 3.6249, "y": 100.2327}, {"x": 3.6441, "y": 109.819}, {"x": 3.6632, "y": 117.9652}, {"x": 3.6824, "y": 123.6686}, {"x": 3.7016, "y": 122.4355}, {"x": 3.7207, "y": 129.766}, {"x": 3.7399, "y": 115.4986}, {"x": 3.7591, "y": 118.4998}, {"x": 3.7782, "y": 108.3407}, {"x": 3.7974, "y": 120.8561}, {"x": 3.8166, "y": 137.3337}, {"x": 3.8357, "y": 154.339}, {"x": 3.8549, "y": 152.7774}, {"x": 3.8741, "y": 153.7506}, {"x": 3.8932, "y": 158.7855}, {"x": 3.9124, "y": 164.1509}, {"x": 3.9316, "y": 147.2602}, {"x": 3.9507, "y": 143.5442}, {"x": 3.9699, "y": 123.787}, {"x": 3.989, "y": 125.6161}, {"x": 4.0082, "y": 117.1127}, {"x": 4.0274, "y": 127.3993}, {"x": 4.0465, "y": 118.7129}, {"x": 4.0657, "y": 105.0887}, {"x": 4.0849, "y": 108.1033}, {"x": 4.104, "y": 90.9601}, {"x": 4.1232, "y": 95.0742}, {"x": 4.1424, "y": 106.3445}, {"x": 4.1615, "y": 105.8056}, {"x": 4.1807, "y": 96.3625}, {"x": 4.1999, "y": 94.5532}, {"x": 4.219, "y": 96.3339}, {"x": 4.2382, "y": 94.9039}, {"x": 4.2574, "y": 103.4244}, {"x": 4.2765, "y": 117.3973}, {"x": 4.2957, "y": 116.4772}, {"x": 4.3149, "y": 105.8311}, {"x": 4.334, "y": 99.5859}, {"x": 4.3532, "y": 98.9649}, {"x": 4.3723, "y": 96.457}, {"x": 4.3915, "y": 85.3999}, {"x": 4.4107, "y": 78.4941}, {"x": 4.4298, "y": 76.0334}, {"x": 4.449, "y": 73.8325}, {"x": 4.4682, "y": 74.9877}, {"x": 4.4873, "y": 67.1044}, {"x": 4.5065, "y": 51.5351}, {"x": 4.5257, "y": 52.7236}, {"x": 4.5448, "y": 48.3853}, {"x": 4.564, "y": 52.3053}, {"x": 4.5832, "y": 52.1019}, {"x": 4.6023, "y": 56.69}, {"x": 4.6215, "y": 58.5147}, {"x": 4.6407, "y": 58.111}, {"x": 4.6598, "y": 60.9781}, {"x": 4.679, "y": 53.9944}, {"x": 4.6982, "y": 49.187}, {"x": 4.7173, "y": 50.1145}, {"x": 4.7365, "y": 54.584}, {"x": 4.7556, "y": 48.6923}, {"x": 4.7748, "y": 47.1442}, {"x": 4.794, "y": 47.751}, {"x": 4.8131, "y": 48.7598}, {"x": 4.8323, "y": 48.3126}, {"x": 4.8515, "y": 49.0621}, {"x": 4.8706, "y": 51.7415}, {"x": 4.8898, "y": 52.4709}, {"x": 4.909, "y": 41.0043}, {"x": 4.9281, "y": 40.85}, {"x": 4.9473, "y": 41.2331}, {"x": 4.9665, "y": 42.9528}, {"x": 4.9856, "y": 42.8869}, {"x": 5.0048, "y": 42.0188}, {"x": 5.024, "y": 42.2294}, {"x": 5.0431, "y": 41.6856}, {"x": 5.0623, "y": 42.8542}, {"x": 5.0815, "y": 52.3563}, {"x": 5.1006, "y": 56.969}, {"x": 5.1198, "y": 59.6121}, {"x": 5.1389, "y": 57.5588}, {"x": 5.1581, "y": 54.6315}, {"x": 5.1773, "y": 60.9989}, {"x": 5.1964, "y": 59.0772}, {"x": 5.2156, "y": 56.2546}, {"x": 5.2348, "y": 55.5737}, {"x": 5.2539, "y": 70.3039}, {"x": 5.2731, "y": 70.1927}, {"x": 5.2923, "y": 70.7067}, {"x": 5.3114, "y": 71.042}, {"x": 5.3306, "y": 76.0124}, {"x": 5.3498, "y": 69.1824}, {"x": 5.3689, "y": 73.3883}, {"x": 5.3881, "y": 71.3477}, {"x": 5.4073, "y": 67.5256}, {"x": 5.4264, "y": 67.0823}, {"x": 5.4456, "y": 70.4217}, {"x": 5.4648, "y": 67.9981}, {"x": 5.4839, "y": 65.0421}, {"x": 5.5031, "y": 66.0352}, {"x": 5.5222, "y": 76.4259}, {"x": 5.5414, "y": 76.7782}, {"x": 5.5606, "y": 75.6511}, {"x": 5.5797, "y": 75.8464}, {"x": 5.5989, "y": 75.4337}, {"x": 5.6181, "y": 73.4046}, {"x": 5.6372, "y": 72.8193}, {"x": 5.6564, "y": 73.4237}, {"x": 5.6756, "y": 65.6675}, {"x": 5.6947, "y": 65.417}, {"x": 5.7139, "y": 65.1158}, {"x": 5.7331, "y": 64.7715}, {"x": 5.7522, "y": 66.5316}, {"x": 5.7714, "y": 65.8361}, {"x": 5.7906, "y": 70.1662}, {"x": 5.8097, "y": 70.0442}, {"x": 5.8289, "y": 68.0999}, {"x": 5.848, "y": 75.2064}, {"x": 5.8672, "y": 86.6015}, {"x": 5.8864, "y": 87.8824}, {"x": 5.9055, "y": 92.9101}, {"x": 5.9247, "y": 93.7427}, {"x": 5.9439, "y": 93.9748}, {"x": 5.963, "y": 100.2414}, {"x": 5.9822, "y": 109.7728}, {"x": 6.0014, "y": 103.7174}, {"x": 6.0205, "y": 107.8582}, {"x": 6.0397, "y": 105.9753}, {"x": 6.0589, "y": 110.1825}, {"x": 6.078, "y": 104.7996}, {"x": 6.0972, "y": 104.1715}, {"x": 6.1164, "y": 105.3996}, {"x": 6.1355, "y": 106.7737}, {"x": 6.1547, "y": 121.0917}, {"x": 6.1739, "y": 130.6916}, {"x": 6.193, "y": 129.7154}, {"x": 6.2122, "y": 158.3853}, {"x": 6.2313, "y": 173.0596}, {"x": 6.2505, "y": 171.482}, {"x": 6.2697, "y": 168.5823}, {"x": 6.2888, "y": 178.8613}, {"x": 6.308, "y": 173.919}, {"x": 6.3272, "y": 164.8327}, {"x": 6.3463, "y": 162.7964}, {"x": 6.3655, "y": 158.2495}, {"x": 6.3847, "y": 160.5511}, {"x": 6.4038, "y": 154.0751}, {"x": 6.423, "y": 166.1857}, {"x": 6.4422, "y": 171.8016}, {"x": 6.4613, "y": 169.8797}, {"x": 6.4805, "y": 174.6347}, {"x": 6.4997, "y": 167.0901}, {"x": 6.5188, "y": 158.4189}, {"x": 6.538, "y": 157.159}, {"x": 6.5572, "y": 140.0355}, {"x": 6.5763, "y": 152.4187}, {"x": 6.5955, "y": 170.89}, {"x": 6.6146, "y": 171.1441}, {"x": 6.6338, "y": 145.722}, {"x": 6.653, "y": 147.2327}, {"x": 6.6721, "y": 146.6421}, {"x": 6.6913, "y": 161.3093}, {"x": 6.7105, "y": 143.7374}, {"x": 6.7296, "y": 137.5092}, {"x": 6.7488, "y": 148.3945}, {"x": 6.768, "y": 159.5922}, {"x": 6.7871, "y": 164.5733}, {"x": 6.8063, "y": 157.5116}, {"x": 6.8255, "y": 157.5929}, {"x": 6.8446, "y": 173.0142}, {"x": 6.8638, "y": 170.3253}, {"x": 6.883, "y": 172.3608}, {"x": 6.9021, "y": 201.7802}, {"x": 6.9213, "y": 225.2786}, {"x": 6.9405, "y": 245.7589}, {"x": 6.9596, "y": 243.9184}, {"x": 6.9788, "y": 253.8382}, {"x": 6.9979, "y": 261.5176}, {"x": 7.0171, "y": 238.4652}, {"x": 7.0363, "y": 234.5168}, {"x": 7.0554, "y": 246.514}, {"x": 7.0746, "y": 236.9194}, {"x": 7.0938, "y": 253.4711}, {"x": 7.1129, "y": 257.4651}, {"x": 7.1321, "y": 244.9444}, {"x": 7.1513, "y": 241.9634}, {"x": 7.1704, "y": 241.1484}, {"x": 7.1896, "y": 241.3963}, {"x": 7.2088, "y": 236.3174}, {"x": 7.2279, "y": 202.0983}, {"x": 7.2471, "y": 207.0595}, {"x": 7.2663, "y": 215.7719}, {"x": 7.2854, "y": 206.4448}, {"x": 7.3046, "y": 196.1143}, {"x": 7.3238, "y": 209.8309}, {"x": 7.3429, "y": 213.5652}, {"x": 7.3621, "y": 235.08}, {"x": 7.3812, "y": 236.487}, {"x": 7.4004, "y": 261.0353}, {"x": 7.4196, "y": 266.9017}, {"x": 7.4387, "y": 273.3943}, {"x": 7.4579, "y": 264.9111}, {"x": 7.4771, "y": 265.266}, {"x": 7.4962, "y": 264.6601}, {"x": 7.5154, "y": 253.2142}, {"x": 7.5346, "y": 271.7649}, {"x": 7.5537, "y": 273.8874}, {"x": 7.5729, "y": 298.6706}, {"x": 7.5921, "y": 294.1189}, {"x": 7.6112, "y": 299.504}, {"x": 7.6304, "y": 286.3883}, {"x": 7.6496, "y": 299.1486}, {"x": 7.6687, "y": 294.5007}, {"x": 7.6879, "y": 284.4846}, {"x": 7.707, "y": 271.3917}, {"x": 7.7262, "y": 278.7406}, {"x": 7.7454, "y": 289.3721}, {"x": 7.7645, "y": 289.1174}, {"x": 7.7837, "y": 281.1352}, {"x": 7.8029, "y": 309.6965}, {"x": 7.822, "y": 288.7756}, {"x": 7.8412, "y": 272.4699}, {"x": 7.8604, "y": 287.0271}, {"x": 7.8795, "y": 277.4167}, {"x": 7.8987, "y": 262.573}, {"x": 7.9179, "y": 236.1387}, {"x": 7.937, "y": 217.654}, {"x": 7.9562, "y": 226.6538}, {"x": 7.9754, "y": 226.6822}, {"x": 7.9945, "y": 221.0896}, {"x": 8.0137, "y": 222.2093}, {"x": 8.0329, "y": 220.2387}, {"x": 8.052, "y": 229.2093}, {"x": 8.0712, "y": 227.7399}, {"x": 8.0903, "y": 234.7781}, {"x": 8.1095, "y": 217.0704}, {"x": 8.1287, "y": 193.005}, {"x": 8.1478, "y": 176.1811}, {"x": 8.167, "y": 172.4788}, {"x": 8.1862, "y": 169.6485}, {"x": 8.2053, "y": 164.8311}, {"x": 8.2245, "y": 165.412}, {"x": 8.2437, "y": 174.2939}];
+const BTC_DATA_EARLY = [{"x": -7.4141, "y": 0.0002}, {"x": -7.2909, "y": 0.0002}, {"x": -7.1239, "y": 0.0006}, {"x": -6.9569, "y": 0.0008}, {"x": -6.7953, "y": 0.0023}, {"x": -6.5435, "y": 0.08}, {"x": -6.4613, "y": 0.0338}, {"x": -6.2916, "y": 0.0125}, {"x": -6.0424, "y": 0.007}, {"x": -5.7933, "y": 0.0113}, {"x": -5.2895, "y": 0.0256}, {"x": -4.9555, "y": 0.0336}, {"x": -4.7091, "y": 0.3611}, {"x": -4.5421, "y": 0.2207}, {"x": -4.0465, "y": 2.9161}, {"x": -3.989, "y": 1.6047}, {"x": -3.9562, "y": 1.9307}, {"x": -3.6277, "y": 1.1283}];
+
+const BUBBLES = [
+  {
+    label: 'Tulip Mania', dates: '1634–1637', duration: '3 yrs', color: '#5aaa3c', lw: 1.8,
+    data: [{x:-3.0,y:1.0},{x:-2.5,y:1.1},{x:-2.0,y:1.2},{x:-1.5,y:1.4},
+           {x:-1.0,y:2.0},{x:-0.75,y:3.5},{x:-0.5,y:7.0},{x:-0.3,y:15.0},
+           {x:-0.15,y:32.0},{x:-0.08,y:43.0},{x:0.0,y:50.0},
+           {x:0.04,y:22.0},{x:0.08,y:6.0},{x:0.15,y:2.0},
+           {x:0.3,y:1.3},{x:0.6,y:1.0},{x:1.0,y:0.9},{x:2.0,y:0.9},{x:3.0,y:0.9}]
+  },
+  {
+    label: 'Mississippi Bubble', dates: '1718–1720', duration: '2 yrs', color: '#3a6fd0', lw: 1.8,
+    data: [{x:-2.0,y:1.0},{x:-1.5,y:1.5},{x:-1.0,y:3.5},{x:-0.5,y:9.0},
+           {x:-0.25,y:17.0},{x:-0.1,y:24.0},{x:0.0,y:30.0},
+           {x:0.08,y:18.0},{x:0.2,y:9.0},{x:0.4,y:4.0},
+           {x:0.7,y:2.0},{x:1.0,y:1.3},{x:1.5,y:1.0},{x:2.0,y:0.9},{x:3.0,y:0.9}]
+  },
+  {
+    label: 'South Sea Bubble', dates: '1719–1721', duration: '2 yrs', color: '#8f5ed0', lw: 1.8,
+    data: [{x:-2.0,y:1.0},{x:-1.5,y:1.2},{x:-1.0,y:1.5},{x:-0.5,y:3.0},
+           {x:-0.25,y:5.5},{x:-0.1,y:7.5},{x:0.0,y:8.5},
+           {x:0.08,y:5.5},{x:0.2,y:2.5},{x:0.5,y:1.5},
+           {x:1.0,y:0.9},{x:1.5,y:0.9},{x:2.0,y:0.9}]
+  },
+  {
+    label: 'Tech Bubble', dates: '1994–2002', duration: '8 yrs', color: '#3fc4cc', lw: 1.8,
+    data: [{x:-6.0,y:1.0},{x:-5.0,y:1.2},{x:-4.0,y:1.4},{x:-3.0,y:1.7},
+           {x:-2.0,y:2.3},{x:-1.5,y:2.9},{x:-1.0,y:3.8},{x:-0.5,y:5.5},
+           {x:0.0,y:7.2},{x:0.5,y:5.0},{x:1.0,y:3.5},{x:1.5,y:2.6},
+           {x:2.0,y:2.1},{x:2.5,y:1.9},{x:3.0,y:1.7},{x:4.0,y:1.6}]
+  },
+  {
+    label: 'Financial Crisis Stocks', dates: '2006–2009', duration: '3 yrs', color: '#d07030', lw: 1.5,
+    data: [{x:-1.0,y:1.0},{x:-0.5,y:1.15},{x:-0.25,y:1.23},{x:0.0,y:1.23},
+           {x:0.25,y:1.0},{x:0.5,y:0.85},{x:1.0,y:0.65},{x:1.5,y:0.55},
+           {x:2.0,y:0.68},{x:2.5,y:0.8},{x:3.0,y:0.95}]
+  },
+  {
+    label: 'Japanese Stocks', dates: '1982–1992', duration: '10 yrs', color: '#8899bb', lw: 1.5,
+    data: [{x:-8.0,y:1.0},{x:-6.0,y:1.4},{x:-5.0,y:1.8},{x:-4.0,y:2.3},
+           {x:-3.0,y:3.0},{x:-2.0,y:3.8},{x:-1.0,y:4.8},{x:0.0,y:5.7},
+           {x:0.5,y:4.2},{x:1.0,y:3.5},{x:1.5,y:3.0},{x:2.0,y:2.7},
+           {x:3.0,y:2.3},{x:4.0,y:2.0},{x:5.0,y:1.8}]
+  },
+  {
+    label: 'Great Depression Stocks', dates: '1923–1932', duration: '9 yrs', color: '#cc9988', lw: 1.5,
+    data: [{x:-6.0,y:1.0},{x:-4.0,y:1.5},{x:-3.0,y:1.9},{x:-2.0,y:2.5},
+           {x:-1.5,y:3.0},{x:-1.0,y:3.4},{x:-0.5,y:3.7},{x:0.0,y:3.8},
+           {x:0.25,y:2.8},{x:0.5,y:2.0},{x:1.0,y:1.2},{x:1.5,y:0.7},
+           {x:2.0,y:0.5},{x:3.0,y:0.4},{x:4.0,y:0.45}]
+  },
+];
+
+// Milestones on Bitcoin line for annotation
+const MILESTONES = [
+  { x: 0.003, y: 47.99, label: '2017 Peak', price: 19141,
+     ax: -1.6,  ay: 78,   ha: 'center' },
+  { x: 0.999, y: 8.16,  label: '2018 Low',  price: 3253,
+     ax: 2.2,   ay: 28,   ha: 'left'   },
+  { x: 3.893, y: 158.79,label: '2021 ATH',  price: 63327,
+     ax: 5.3,   ay: 188,  ha: 'left'   },
+  { x: 4.928, y: 40.85, label: '2022 Crash',price: 16292,
+     ax: 6.1,   ay: 62,   ha: 'left'   },
+  { x: 7.803, y: 309.70,label: '2025 ATH',  price: 123513,
+     ax: 5.8,   ay: 285,  ha: 'left'   },
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let chart;
+let viewMode = '2014';   // '2014' | 'genesis' | 'bubble'
+let livePrice   = 69512.06;
+let liveMult    = 174.2939;
+let liveX       = 8.2437;
+
+// ─── CHART INIT ──────────────────────────────────────────────────────────────
+function getBtcData() {
+  if (viewMode === 'genesis') {
+    // Early data + 2014 data (early ends around mid-2014, yahoo starts Sep 2014)
+    return [...BTC_DATA_EARLY, ...BTC_DATA_2014];
+  }
+  return BTC_DATA_2014;
+}
+
+function buildDatasets() {
+  return [
+    // Bitcoin — on top
+    {
+      label: 'Bitcoin',
+      data: getBtcData(),
+      borderColor: '#e09422',
+      backgroundColor: 'transparent',
+      borderWidth: 2.6,
+      showLine: true,
+      pointRadius: 0,
+      pointHoverRadius: 0,
+      pointStyle: false,
+      tension: 0,
+      order: 0,
+    },
+    ...BUBBLES.map(b => ({
+      label: b.label,
+      data: b.data,
+      borderColor: b.color,
+      backgroundColor: 'transparent',
+      borderWidth: b.lw,
+      showLine: true,
+      pointRadius: 0,
+      pointHoverRadius: 0,
+      pointStyle: false,
+      tension: 0.25,
+      order: 1,
+    }))
+  ];
+}
+
+// ─── SCALE HELPERS ───────────────────────────────────────────────────────────
+function getScaleConfig() {
+  if (viewMode === 'bubble') {
+    return { xMin: -3.5, xMax: 3.5, yMin: -3, yMax: 55, yStep: 5 };
+  }
+  if (viewMode === 'genesis') {
+    return { xMin: -8.5, xMax: 9.4, yMin: -8, yMax: 335, yStep: 25 };
+  }
+  // default: 2014
+  return { xMin: -3.5, xMax: 9.4, yMin: -8, yMax: 335, yStep: 25 };
+}
+
+function initChart() {
+  const ctx = document.getElementById('bubbleChart').getContext('2d');
+
+  const annotationPlugin = {
+    id: 'customAnnotations',
+    afterDraw(chart) { drawAnnotations(chart); },
+  };
+
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: { datasets: buildDatasets() },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 600, easing: 'easeInOutQuart' },
+      interaction: { mode: 'nearest', axis: 'x', intersect: false },
+      scales: {
+        x: {
+          type: 'linear',
+          min: getScaleConfig().xMin,
+          max: getScaleConfig().xMax,
+          grid: { color: '#201e1c', lineWidth: 0.7, drawBorder: false },
+          border: { display: false },
+          ticks: {
+            color: '#8a8070',
+            font: { family: "'DM Sans', sans-serif", size: 10 },
+            stepSize: 1,
+            callback(v) {
+              if (v === 0) return 'Peak';
+              return v > 0 ? `+${v}` : `${v}`;
+            },
+          },
+          title: {
+            display: true,
+            text: 'Years around peak  (0 = peak)',
+            color: '#9a9088',
+            font: { family: "'DM Sans', sans-serif", size: 11 },
+            padding: { top: 8 },
+          },
+        },
+        y: {
+          min: getScaleConfig().yMin,
+          max: getScaleConfig().yMax,
+          grid: { color: '#201e1c', lineWidth: 0.7, drawBorder: false },
+          border: { display: false },
+          ticks: {
+            color: '#8a8070',
+            font: { family: "'DM Sans', sans-serif", size: 10 },
+            stepSize: getScaleConfig().yStep,
+            callback(v) { return `${v}×`; },
+          },
+          title: {
+            display: true,
+            text: 'Multiple of starting price',
+            color: '#9a9088',
+            font: { family: "'DM Sans', sans-serif", size: 11 },
+          },
+        },
+      },
+      elements: {
+        point: { radius: 0, hoverRadius: 0 },
+        line:  { borderCapStyle: 'round', borderJoinStyle: 'round' },
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#141210',
+          borderColor: '#2a2420',
+          borderWidth: 1,
+          titleColor: '#d0c8c0',
+          bodyColor: '#908880',
+          padding: 10,
+          titleFont: { family: "'DM Sans', sans-serif", size: 12, weight: '600' },
+          bodyFont: { family: "'DM Sans', sans-serif", size: 11 },
+          callbacks: {
+            filter(item) { return item.datasetIndex === 0; },
+            title(items) {
+              const xYrs = items[0].parsed.x;
+              const ms = PEAK_2017_MS + xYrs * 365.25 * 24 * 3600 * 1000;
+              const d = new Date(ms);
+              return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            },
+            label(item) {
+              const y = item.parsed.y;
+              const p = y * START_PRICE;
+              return [
+                `${y.toFixed(1)}× starting price`,
+                `≈ $${Math.round(p).toLocaleString()}`,
+              ];
+            },
+          },
+        },
+      },
+    },
+    plugins: [annotationPlugin],
+  });
+
+  buildLegend();
+}
+
+// ─── CUSTOM ANNOTATIONS ───────────────────────────────────────────────────────
+function drawAnnotations(chart) {
+  const ctx   = chart.ctx;
+  const xS    = chart.scales.x;
+  const yS    = chart.scales.y;
+  const px    = v => xS.getPixelForValue(v);
+  const py    = v => yS.getPixelForValue(v);
+
+  ctx.save();
+
+  // Peak dashed line
+  ctx.strokeStyle = '#2a3040';
+  ctx.lineWidth   = 1;
+  ctx.setLineDash([4, 5]);
+  ctx.beginPath();
+  ctx.moveTo(px(0), yS.top);
+  ctx.lineTo(px(0), yS.bottom);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // ── Milestone annotations on Bitcoin line ──
+  MILESTONES.forEach(m => {
+    const dotX = px(m.x);
+    const dotY = py(m.y);
+    const lblX = px(m.ax);
+    const lblY = py(m.ay);
+
+    // Skip if out of current x range
+    if (m.x < xS.min - 0.2 || m.x > xS.max + 0.2) return;
+
+    // Arrow line
+    ctx.beginPath();
+    ctx.strokeStyle = '#3a3830';
+    ctx.lineWidth   = 0.9;
+    ctx.moveTo(dotX, dotY);
+    ctx.lineTo(lblX + (m.ha === 'left' ? -6 : 6), lblY);
+    ctx.stroke();
+
+    // Dot on Bitcoin line
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#e09422';
+    ctx.fill();
+
+    // Label box
+    const lines    = [m.label, `$${m.price.toLocaleString()}`];
+    const fontSize = 9.5;
+    ctx.font       = `500 ${fontSize}px 'DM Sans', sans-serif`;
+    const tw0      = ctx.measureText(lines[0]).width;
+    const tw1      = ctx.measureText(lines[1]).width;
+    const boxW     = Math.max(tw0, tw1) + 16;
+    const boxH     = 30;
+    const boxX     = m.ha === 'left' ? lblX - 6 : lblX - boxW + 6;
+    const boxY     = lblY - boxH / 2;
+
+    ctx.fillStyle   = 'rgba(12,11,10,0.92)';
+    ctx.strokeStyle = '#2a2820';
+    ctx.lineWidth   = 0.8;
+    roundRect(ctx, boxX, boxY, boxW, boxH, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle  = '#ccc8c0';
+    ctx.textAlign  = m.ha === 'left' ? 'left' : 'right';
+    ctx.textBaseline = 'middle';
+    const txX = m.ha === 'left' ? boxX + 8 : boxX + boxW - 8;
+    ctx.fillText(lines[0], txX, lblY - 7);
+    ctx.fillStyle = '#887868';
+    ctx.font      = `400 ${fontSize - 0.5}px 'DM Sans', sans-serif`;
+    ctx.fillText(lines[1], txX, lblY + 7);
+  });
+
+  // ── Current price dot + label ──
+  const nowDotX = px(liveX);
+  const nowDotY = py(liveMult);
+  if (liveX >= xS.min && liveX <= xS.max) {
+    ctx.beginPath();
+    ctx.arc(nowDotX, nowDotY, 7, 0, Math.PI * 2);
+    ctx.fillStyle = '#e09422';
+    ctx.shadowColor = '#e09422';
+    ctx.shadowBlur  = 18;
+    ctx.fill();
+    // Inner bright core
+    ctx.beginPath();
+    ctx.arc(nowDotX, nowDotY, 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffd070';
+    ctx.shadowBlur = 6;
+    ctx.fill();
+    ctx.shadowBlur  = 0;
+
+    ctx.font         = `600 10px 'DM Sans', sans-serif`;
+    ctx.fillStyle    = '#e09422';
+    ctx.textAlign    = 'left';
+    ctx.textBaseline = 'middle';
+    const todayDate  = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const todayText  = `Today  $${Math.round(livePrice).toLocaleString()}`;
+    const subText    = `(${liveMult.toFixed(1)}× start)`;
+    const tw         = Math.max(ctx.measureText(todayText).width, ctx.measureText(subText).width) + 20;
+    const bx = nowDotX + 10;
+    const by = nowDotY - 20;
+
+    ctx.fillStyle   = 'rgba(12,11,10,0.94)';
+    ctx.strokeStyle = '#e09422';
+    ctx.lineWidth   = 1;
+    roundRect(ctx, bx, by, tw, 36, 5);
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle  = '#e09422';
+    ctx.textAlign  = 'left';
+    ctx.font       = `600 10px 'DM Sans', sans-serif`;
+    ctx.fillText(todayText, bx + 10, by + 12);
+    ctx.fillStyle  = '#887060';
+    ctx.font       = `400 9px 'DM Sans', sans-serif`;
+    ctx.fillText(subText, bx + 10, by + 26);
+  }
+
+  // ── Insight callout box (upper-left, always empty zone) ──
+  drawCallout(ctx, chart);
+
+  // ── Branding — lower-right, source attribution style ──
+  const brandX = chart.chartArea.right - 8;
+  const brandY = chart.chartArea.bottom - 10;
+  ctx.textAlign    = 'right';
+  ctx.textBaseline = 'bottom';
+  ctx.font         = `600 11px 'DM Sans', sans-serif`;
+  ctx.fillStyle    = '#504840';
+  ctx.fillText('Source: lastcoinstanding.com', brandX + 1, brandY + 1);
+  ctx.fillStyle    = '#786860';
+  ctx.fillText('Source: lastcoinstanding.com', brandX, brandY);
+
+  ctx.restore();
+}
+
+function drawCallout(ctx, chart) {
+  const ca    = chart.chartArea;
+  const xS    = chart.scales.x;
+  const yS    = chart.scales.y;
+
+  const bw = 210;
+
+  if (viewMode === 'bubble') {
+    // Bubble window: different message — Bitcoin looks like a bubble here
+    const bh = 98;
+    const bx = xS.getPixelForValue(xS.min + 0.15);
+    const by = yS.getPixelForValue(yS.max) + 8;
+
+    ctx.fillStyle   = 'rgba(10,9,8,0.93)';
+    ctx.strokeStyle = '#e09422';
+    ctx.lineWidth   = 1;
+    roundRect(ctx, bx, by, bw, bh, 6);
+    ctx.fill(); ctx.stroke();
+
+    const lx = bx + 14;
+    ctx.textAlign    = 'left';
+    ctx.textBaseline = 'top';
+
+    ctx.fillStyle = '#e09422';
+    ctx.font      = `700 9px 'DM Sans', sans-serif`;
+    ctx.fillText('ZOOM IN', lx, by + 12);
+
+    const lines2 = [
+      'At this scale, Bitcoin looks',
+      'exactly like every other bubble.',
+      '',
+      'Switch view to see what',
+      'happened next.',
+    ];
+    ctx.fillStyle = '#a09888';
+    ctx.font      = `400 9.5px 'DM Sans', sans-serif`;
+    lines2.forEach((ln, i) => {
+      if (ln.startsWith('Switch')) { ctx.fillStyle = '#d0c8b8'; ctx.font = `600 9.5px 'DM Sans', sans-serif`; }
+      else ctx.fillStyle = '#a09888';
+      ctx.fillText(ln, lx, by + 28 + i * 14);
+    });
+    return;
+  }
+
+  // Default callout for 2014 / genesis modes
+  // Place callout in upper-LEFT zone — always empty (bubbles are all near zero)
+  // x: from left edge, y: near top
+  const bh = 112;
+  const bx = xS.getPixelForValue(xS.min + 0.15);
+  const by = yS.getPixelForValue(yS.max - 8) + 8;
+
+  ctx.fillStyle   = 'rgba(10,9,8,0.93)';
+  ctx.strokeStyle = '#e09422';
+  ctx.lineWidth   = 1;
+  roundRect(ctx, bx, by, bw, bh, 6);
+  ctx.fill(); ctx.stroke();
+
+  const lx = bx + 14;
+  ctx.textAlign    = 'left';
+  ctx.textBaseline = 'top';
+
+  ctx.fillStyle = '#e09422';
+  ctx.font      = `700 9px 'DM Sans', sans-serif`;
+  ctx.fillText('THE PATTERN', lx, by + 12);
+
+  const lines2 = [
+    '✗  All 7 bubbles → collapsed, never',
+    '    recovered',
+    '',
+    '✓  Bitcoin → 3 crashes, 3 new ATHs',
+    '',
+    'This is not bubble behavior.',
+  ];
+  ctx.fillStyle = '#a09888';
+  ctx.font      = `400 9.5px 'DM Sans', sans-serif`;
+  lines2.forEach((ln, i) => {
+    if (ln.startsWith('✓')) ctx.fillStyle = '#e09422';
+    else if (ln.startsWith('This')) { ctx.fillStyle = '#d0c8b8'; ctx.font = `600 9.5px 'DM Sans', sans-serif`; }
+    else ctx.fillStyle = '#a09888';
+    ctx.fillText(ln, lx, by + 28 + i * 14);
+  });
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+// ─── LEGEND ──────────────────────────────────────────────────────────────────
+function buildLegend() {
+  const wrap = document.getElementById('legendWrap');
+  wrap.innerHTML = '';
+
+  // Bitcoin entry
+  const btcItem = document.createElement('div');
+  btcItem.className = 'legend-item btc';
+  btcItem.innerHTML = `
+    <div class="legend-line" style="background:#e09422; height:3px;"></div>
+    <span>Bitcoin (2014–present) &middot; 12+ yrs &middot; <em style="color:#e09422">still climbing</em></span>`;
+  wrap.appendChild(btcItem);
+
+  // Separator
+  const sep = document.createElement('div');
+  sep.style.cssText = 'width:100%; height:0; border-top:1px solid #1e1c1a; margin:2px 0;';
+  wrap.appendChild(sep);
+
+  // Bubbles
+  BUBBLES.forEach(b => {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = `
+      <div class="legend-line" style="background:${b.color};"></div>
+      <span>${b.label} (${b.dates}) &middot; ${b.duration}</span>`;
+    wrap.appendChild(item);
+  });
+}
+
+// ─── MODE TOGGLE ─────────────────────────────────────────────────────────────
+function setMode(mode) {
+  viewMode = mode;
+  document.getElementById('btnBubble').classList.toggle('active', mode === 'bubble');
+  document.getElementById('btn2014').classList.toggle('active', mode === '2014');
+  document.getElementById('btnGenesis').classList.toggle('active', mode === 'genesis');
+
+  const sc = getScaleConfig();
+  chart.data.datasets[0].data = getBtcData();
+  chart.options.scales.x.min      = sc.xMin;
+  chart.options.scales.x.max      = sc.xMax;
+  chart.options.scales.y.min      = sc.yMin;
+  chart.options.scales.y.max      = sc.yMax;
+  chart.options.scales.y.ticks.stepSize = sc.yStep;
+  chart.update('none');
+}
+
+// ─── LIVE PRICE ──────────────────────────────────────────────────────────────
+async function fetchLivePrice() {
+  try {
+    const r = await fetch(
+      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
+      { cache: 'no-store' }
+    );
+    if (!r.ok) throw new Error('API error');
+    const d = await r.json();
+    const p = d.bitcoin.usd;
+    livePrice = p;
+    liveMult  = p / START_PRICE;
+
+    // Compute x for today relative to 2017 peak
+    liveX = (Date.now() - PEAK_2017_MS) / (365.25 * 24 * 3600 * 1000);
+
+    document.getElementById('livePriceVal').textContent =
+      `$${p.toLocaleString('en-US', {maximumFractionDigits:0})}`;
+
+    // Update ATH multiple card
+    const athMultiple = (123513 / START_PRICE).toFixed(0);
+    document.getElementById('athMultiple').textContent = `~${athMultiple}×`;
+
+    if (chart) chart.update('none');
+  } catch(e) {
+    document.getElementById('livePriceVal').textContent =
+      `$${Math.round(livePrice).toLocaleString()} (cached)`;
+  }
+}
+
+// ─── DOWNLOAD ─────────────────────────────────────────────────────────────────
+async function generateDownload() {
+  const btn = document.getElementById('downloadBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.22-8.56"/></svg> Generating…`;
+
+  // Ensure latest price
+  await fetchLivePrice();
+
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+                || (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
+
+  // ── Export dimensions ──────────────────────────────────────────────────────
+  const exportW   = 1600, exportH = 900;
+  const margin    = { top:90, bottom:90, left:20, right:20 };
+  const chartW    = exportW - margin.left - margin.right;
+  const chartH    = exportH - margin.top  - margin.bottom;
+
+  try {
+    // ── Create a hidden offscreen chart at exact export size with DPR=1 ───────
+    // This avoids all Retina/DPR scaling issues completely.
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width  = chartW;
+    tmpCanvas.height = chartH;
+    tmpCanvas.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:'+chartW+'px;height:'+chartH+'px;';
+    document.body.appendChild(tmpCanvas);
+
+    // Clone the annotation plugin for the offscreen chart
+    const offscreenAnnotationPlugin = {
+      id: 'offscreenAnnotations',
+      afterDraw(c) { drawAnnotations(c); },
+    };
+
+    const tmpChart = new Chart(tmpCanvas.getContext('2d'), {
+      type: 'line',
+      data: { datasets: buildDatasets() },
+      options: {
+        responsive: false,
+        maintainAspectRatio: false,
+        devicePixelRatio: 1,   // ← KEY: forces 1:1 pixel rendering
+        animation: false,
+        interaction: { mode: 'nearest', axis: 'x', intersect: false },
+        scales: {
+          x: {
+            type: 'linear',
+            min: getScaleConfig().xMin,
+            max: getScaleConfig().xMax,
+            grid: { color: '#201e1c', lineWidth: 0.7, drawBorder: false },
+            border: { display: false },
+            ticks: {
+              color: '#8a8070',
+              font: { family: "'DM Sans', sans-serif", size: 11 },
+              stepSize: 1,
+              callback(v) {
+                if (v === 0) return 'Peak';
+                return v > 0 ? `+${v}` : `${v}`;
+              },
+            },
+            title: {
+              display: true,
+              text: 'Years around peak  (0 = peak)',
+              color: '#9a9088',
+              font: { family: "'DM Sans', sans-serif", size: 12 },
+              padding: { top: 8 },
+            },
+          },
+          y: {
+            min: getScaleConfig().yMin,
+            max: getScaleConfig().yMax,
+            grid: { color: '#201e1c', lineWidth: 0.7, drawBorder: false },
+            border: { display: false },
+            ticks: {
+              color: '#8a8070',
+              font: { family: "'DM Sans', sans-serif", size: 11 },
+              stepSize: getScaleConfig().yStep,
+              callback(v) { return `${v}×`; },
+            },
+            title: {
+              display: true,
+              text: 'Multiple of starting price',
+              color: '#9a9088',
+              font: { family: "'DM Sans', sans-serif", size: 12 },
+            },
+          },
+        },
+        elements: {
+          point: { radius: 0, hoverRadius: 0 },
+          line:  { borderCapStyle: 'round', borderJoinStyle: 'round' },
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false },
+        },
+      },
+      plugins: [offscreenAnnotationPlugin],
+    });
+
+    // Let Chart.js fully render
+    await new Promise(r => setTimeout(r, 400));
+    tmpChart.update('none');
+    await new Promise(r => setTimeout(r, 200));
+
+    // ── Build the export canvas ───────────────────────────────────────────────
+    const EC = document.createElement('canvas');
+    EC.width  = exportW;
+    EC.height = exportH;
+    const ec = EC.getContext('2d');
+
+    // Background
+    ec.fillStyle = '#0a0908';
+    ec.fillRect(0, 0, exportW, exportH);
+
+    // Subtle grain
+    const id = ec.getImageData(0, 0, exportW, exportH);
+    for (let i = 0; i < id.data.length; i += 4) {
+      const n = (Math.random() - 0.5) * 12;
+      id.data[i]   = Math.max(0, id.data[i]   + n);
+      id.data[i+1] = Math.max(0, id.data[i+1] + n);
+      id.data[i+2] = Math.max(0, id.data[i+2] + n);
+    }
+    ec.putImageData(id, 0, 0);
+
+    // Draw offscreen chart — guaranteed 1:1 pixel mapping, no DPR issues
+    ec.drawImage(tmpCanvas, margin.left, margin.top, chartW, chartH);
+
+    // Clean up temp chart
+    tmpChart.destroy();
+    tmpCanvas.remove();
+
+    // ── Title block (top-left) ──
+    ec.textAlign    = 'left';
+    ec.textBaseline = 'top';
+    ec.font         = "500 30px 'Cormorant Garamond', Georgia, serif";
+    ec.fillStyle    = '#f0ebe5';
+    ec.fillText('Rise and Fall of Famous Asset Bubbles', 32, 16);
+    ec.font         = "italic 400 17px 'Cormorant Garamond', Georgia, serif";
+    ec.fillStyle    = '#908880';
+    ec.fillText('Bitcoin vs. Every Historical Bubble  —  Updated ' +
+      new Date().toLocaleDateString('en-US', {month:'long', year:'numeric'}), 32, 52);
+
+    // ── Branding: top-right ──
+    ec.textAlign    = 'right';
+    ec.textBaseline = 'top';
+    ec.font         = "bold 22px 'DM Sans', -apple-system, sans-serif";
+    ec.fillStyle    = '#7a4010';
+    ec.fillText('lastcoinstanding.com', exportW - 31, 19);
+    ec.fillStyle    = '#e09422';
+    ec.fillText('lastcoinstanding.com', exportW - 32, 18);
+
+    // ── Legend ──
+    const legendY = exportH - margin.bottom + 8;
+    const items   = [
+      { label: 'Bitcoin (2014–present)  •  still climbing', color: '#e09422', lw: 3 },
+      ...BUBBLES.map(b => ({ label: `${b.label} (${b.dates})  ${b.duration}`, color: b.color, lw: 2 })),
+    ];
+    ec.font         = "400 11px 'DM Sans', -apple-system, sans-serif";
+    ec.textBaseline = 'middle';
+    ec.textAlign    = 'left';
+    let lx = 32;
+    const ly = legendY + 14;
+    items.forEach(item => {
+      ec.strokeStyle = item.color;
+      ec.lineWidth   = item.lw;
+      ec.beginPath();
+      ec.moveTo(lx, ly); ec.lineTo(lx + 18, ly);
+      ec.stroke();
+      ec.fillStyle = (item.color === '#e09422') ? '#d0c8b8' : '#887878';
+      const txt = item.label;
+      ec.fillText(txt, lx + 22, ly);
+      lx += ec.measureText(txt).width + 38;
+      if (lx > exportW - 80) { lx = 32; }
+    });
+
+    // ── Footer ──
+    const footerY = exportH - 14;
+    const todayStr = new Date().toLocaleDateString('en-US',
+      {weekday:'short', month:'short', day:'numeric', year:'numeric'});
+
+    ec.font         = "600 14px 'DM Sans', -apple-system, sans-serif";
+    ec.fillStyle    = '#e09422';
+    ec.textAlign    = 'right';
+    ec.textBaseline = 'bottom';
+    ec.fillText(
+      `Current Bitcoin Price: $${Math.round(livePrice).toLocaleString()}  ·  ${todayStr}`,
+      exportW - 32, footerY
+    );
+
+    ec.font         = "400 12px 'DM Sans', -apple-system, sans-serif";
+    ec.fillStyle    = '#786e66';
+    ec.textAlign    = 'left';
+    ec.textBaseline = 'bottom';
+    ec.fillText(
+      'Data: Yahoo Finance  ·  Historical bubbles: Mackay, Garber, Yale SOM, St. Louis FRED',
+      32, footerY
+    );
+
+    // ── Deliver the image ──
+    const dataUrl = EC.toDataURL('image/png');
+
+    if (isMobile) {
+      const overlay = document.getElementById('saveOverlay');
+      const img     = document.getElementById('saveOverlayImg');
+      img.src       = dataUrl;
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+      showToast('Image ready — long-press to save to Photos');
+    } else {
+      const today    = new Date().toISOString().slice(0,10);
+      const filename = `bitcoin-not-a-bubble-${today}.png`;
+      const link     = document.createElement('a');
+      link.download  = filename;
+      link.href      = dataUrl;
+      link.click();
+      showToast(`Downloaded: ${filename}`);
+    }
+  } catch(e) {
+    console.error(e);
+    showToast('Download failed — please try again');
+  }
+
+  btn.disabled = false;
+  const resetLabel = isMobile ? 'Generate &amp; Save as Image' : 'Generate &amp; Download Chart';
+  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> ${resetLabel}`;
+}
+
+// ─── MOBILE LABEL ───────────────────────────────────────────────────────────
+(function(){
+  const isMob = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+             || (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
+  if (isMob) {
+    const lbl = document.getElementById('downloadBtnLabel');
+    if (lbl) lbl.innerHTML = 'Generate &amp; Save as Image';
+    const hint = document.getElementById('downloadHint');
+    if (hint) hint.style.display = 'inline';
+  }
+})();
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─── NAV ──────────────────────────────────────────────────────────────────────
+(function() {
+  const h = document.getElementById('hamburger');
+  const o = document.getElementById('mobileOverlay');
+  if (!h || !o) return;
+  h.addEventListener('click', () => {
+    const open = o.classList.toggle('show');
+    h.classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+  o.querySelectorAll('a').forEach(a =>
+    a.addEventListener('click', () => {
+      o.classList.remove('show');
+      h.classList.remove('open');
+      document.body.style.overflow = '';
+    })
+  );
+})();
+
+// ─── SAVE OVERLAY BACK ───────────────────────────────────────────────────────
+(function() {
+  const backBtn = document.getElementById('saveOverlayBack');
+  const overlay = document.getElementById('saveOverlay');
+  if (!backBtn || !overlay) return;
+  backBtn.addEventListener('click', () => {
+    overlay.classList.remove('show');
+    document.body.style.overflow = '';
+    // Free memory from the data URL
+    const img = document.getElementById('saveOverlayImg');
+    if (img) img.src = '';
+  });
+})();
+
+// ─── BOOT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  initChart();
+  fetchLivePrice();
+  // Refresh price every 2 minutes
+  setInterval(fetchLivePrice, 120000);
+});
+
+// Spin keyframe for loading indicator
+const style = document.createElement('style');
+style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+document.head.appendChild(style);

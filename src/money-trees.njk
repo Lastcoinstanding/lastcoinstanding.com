@@ -1,0 +1,54 @@
+---
+layout: base.njk
+permalink: /money-trees.html
+slug: money-trees
+eleventyComputed:
+  head_extras: "{% include '_pageassets/money-trees-head.html' %}"
+  page_styles: "{% include '_pageassets/money-trees.css' %}"
+  page_scripts: "{% include '_pageassets/money-trees.js' %}"
+---
+<header>
+  <h1>The Money Trees</h1>
+  <p>Explore the nature of money — hover to discover</p>
+</header>
+
+<div class="toggle-container">
+  <span class="toggle-label btc active">Bitcoin</span>
+  <div class="toggle-switch" onclick="toggleView()"></div>
+  <span class="toggle-label fiat">Fiat</span>
+</div>
+
+<div id="loading">Loading trees...</div>
+
+<div class="tree-view active" id="btc-view">
+  <div class="tree-header">
+    <div class="tree-title btc">Bitcoin</div>
+    <div class="tree-subtitle">Sound money · Sovereignty · Truth</div>
+  </div>
+  <svg class="tree-svg" id="btc-tree"></svg>
+</div>
+
+<div class="tree-view" id="fiat-view">
+  <div class="tree-header">
+    <div class="tree-title fiat">Fiat</div>
+    <div class="tree-subtitle">Broken money · Coercion · Decay</div>
+  </div>
+  <svg class="tree-svg" id="fiat-tree"></svg>
+</div>
+
+<div class="tooltip-overlay" id="tooltip-overlay" onclick="hideTooltip()"></div>
+
+<div class="tooltip" id="tooltip">
+  <button class="tooltip-close" onclick="hideTooltip()">✕</button>
+  <div class="tooltip-word" id="tip-word"></div>
+  <div class="tooltip-desc" id="tip-desc"></div>
+  <div class="tooltip-section" id="tip-insight-section">
+    <div class="tooltip-section-title" id="tip-insight-title">Deeper Insight</div>
+    <div class="tooltip-insight" id="tip-insight"></div>
+  </div>
+  <div class="tooltip-section" id="tip-contrast-section">
+    <div class="tooltip-section-title" id="tip-contrast-title">The Contrast</div>
+    <div class="tooltip-contrast" id="tip-contrast"></div>
+  </div>
+  <div class="tooltip-synonyms" id="tip-synonyms"></div>
+</div>

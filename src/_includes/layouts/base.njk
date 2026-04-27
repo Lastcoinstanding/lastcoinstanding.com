@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{ head_extras | safe }}
+{%- if page_styles %}
+    <style>
+{{ page_styles | safe }}
+    </style>
+{%- endif %}
+<style id="canonical-footer-css">
+/* ─── Canonical footer ─── */
+.site-footer { background: #0a0908; padding: 4rem 2rem 3rem; text-align: center; border-top: 1px solid rgba(224,148,34,0.08); margin-top: 4rem; }
+.site-footer .footer-cta { max-width: 540px; margin: 0 auto; }
+.site-footer .footer-cta h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 500; color: #ece4d6; margin: 0 0 0.9rem; }
+.site-footer .footer-cta p { font-family: 'Inter', sans-serif; font-size: 0.85rem; color: rgba(255,255,255,0.42); line-height: 1.6; margin: 0 0 2.4rem; }
+.site-footer .footer-nav { display: flex; justify-content: center; gap: 1.5rem 2rem; flex-wrap: wrap; max-width: 960px; margin: 0 auto 2.6rem; }
+.site-footer .footer-nav a { font-family: 'Inter', sans-serif; font-size: 0.72rem; color: rgba(255,255,255,0.36); text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.3s; border-bottom: none; }
+.site-footer .footer-nav a:hover { color: #e09422; }
+.site-footer .footer-line { width: 40px; height: 1px; background: rgba(224,148,34,0.3); margin: 0 auto 1.4rem; }
+.site-footer .footer-copy { font-family: 'Inter', sans-serif; font-size: 0.7rem; color: rgba(255,255,255,0.22); letter-spacing: 0.04em; }
+</style>
+</head>
+<body>
+{{ body_chrome | safe }}
+    <!-- Navigation -->
+    <nav class="site-nav">
+        <a href="/" class="brand">Last Coin Standing</a>
+            <div class="nav-links">
+        <div class="nav-dropdown">
+            <a class="nav-dropdown-btn" href="#">Explorations ▾</a>
+            <div class="nav-dropdown-menu">
+{%- for e in explorations %}
+        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}</a>
+{%- endfor %}
+            </div>
+        </div>
+        <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
+    </div>
+        <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </nav>
+    <div class="mobile-overlay" id="mobileOverlay">
+{%- for e in explorations %}
+        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}</a>
+{%- endfor %}
+        <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
+    </div>
+
+{{ content | safe }}
+
+<footer class="site-footer">
+    <div class="footer-cta">
+        <h3>Continue Exploring</h3>
+        <p>Each interactive visualization on Last Coin Standing examines a different dimension of Bitcoin through contrast, tradeoffs, and philosophical clarity.</p>
+    </div>
+    <nav class="footer-nav">
+{%- for e in explorations %}
+        <a href="/{{ e.slug }}.html">{{ e.title | safe }}</a>
+{%- endfor %}
+        <a href="/about.html">About</a>
+    </nav>
+    <div class="footer-line"></div>
+    <div class="footer-copy">&copy; 2026 Last Coin Standing &mdash; Bitcoin education through contrast and clarity</div>
+</footer>
+
+{%- if page_scripts %}
+    <script>
+{{ page_scripts | safe }}
+    </script>
+{%- endif %}
+
+<script>
+/* Nav UX enhancement — click-outside, click-toggle for desktop dropdown, Escape */
+(function() {
+  var ham = document.getElementById('hamburger');
+  var mob = document.getElementById('mobileOverlay');
+  var dd = document.querySelector('.nav-dropdown');
+  var ddBtn = document.querySelector('.nav-dropdown-btn');
+  function closeMobile() {
+    if (ham) ham.classList.remove('open');
+    if (mob) mob.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  function closeDropdown() {
+    if (dd) dd.classList.remove('open');
+  }
+  if (ddBtn && dd) {
+    ddBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      dd.classList.toggle('open');
+    });
+  }
+  if (mob) {
+    mob.addEventListener('click', function(e) {
+      if (e.target === mob) closeMobile();
+    });
+    var links = mob.querySelectorAll('a');
+    for (var i = 0; i < links.length; i++) {
+      links[i].addEventListener('click', closeMobile);
+    }
+  }
+  document.addEventListener('click', function(e) {
+    if (dd && !dd.contains(e.target)) closeDropdown();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { closeMobile(); closeDropdown(); }
+  });
+})();
+</script>
+
+</body>
+</html>
