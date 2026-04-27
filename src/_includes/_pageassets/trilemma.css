@@ -49,7 +49,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
 .page { max-width: 67.5rem; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
 header { text-align: center; margin-bottom: 3rem; }
 header h1 { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.6rem, 4.5vw, 2.4rem); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-bright); margin-bottom: 0.625rem; }
-header .subtitle { font-family: var(--font-display); font-style: italic; font-weight: 400; color: var(--text-dim); font-size: clamp(1rem, 2vw, 1.2rem); line-height: 1.6; max-width: 37.5rem; margin: 0 auto 1rem; }
+header .subtitle { font-family: 'Source Serif 4', serif; font-style: italic; font-weight: 400; color: var(--text-dim); font-size: clamp(1rem, 2vw, 1.2rem); line-height: 1.6; max-width: 37.5rem; margin: 0 auto 1rem; }
 header .intro-text { font-family: var(--font-body); font-weight: 400; color: var(--text-body); font-size: clamp(0.9rem, 1.8vw, 1rem); line-height: 1.75; max-width: 42.5rem; margin: 0 auto; }
 header .intro-text strong { color: var(--text-bright); font-weight: 600; }
 .trilemma-stage { display: flex; gap: 2.5rem; align-items: flex-start; margin-bottom: 3.5rem; }

@@ -107,7 +107,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
 }
 
 .hero .tagline {
-    font-family: var(--font-display);
+    font-family: 'Source Serif 4', serif;
     font-style: italic;
     font-weight: 400;
     font-size: clamp(1.05rem, 2.2vw, 1.35rem);
