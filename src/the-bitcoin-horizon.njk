@@ -1,0 +1,411 @@
+---
+layout: base.njk
+permalink: /the-bitcoin-horizon.html
+slug: the-bitcoin-horizon
+eleventyComputed:
+  head_extras: "{% include '_pageassets/the-bitcoin-horizon-head.html' %}"
+  page_styles: "{% include '_pageassets/the-bitcoin-horizon.css' %}"
+  page_scripts: "{% include '_pageassets/the-bitcoin-horizon.js' %}"
+---
+<main>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-block">
+    <span class="label">The Bitcoin Horizon</span>
+    <h1>Bitcoin is better understood as a <em>monetizing</em> system rather than a <em>volatile</em> asset.</h1>
+  </div>
+</section>
+
+<!-- ═══ INTRO PARAGRAPH (replaces §1) ═══ -->
+<section class="intro">
+  <div class="intro-block">
+    <p>Bitcoin's volatility is the most-cited reason given to avoid it. <em>This page makes two counter-arguments using data:</em> that volatility is not the same as risk, and that Bitcoin behaves the way it does because it is a system being adopted, not an asset being priced. Both arguments depend on a single shift &mdash; looking at a longer time horizon than people usually do.</p>
+  </div>
+</section>
+
+<!-- ═══ §1 — VOLATILITY IS NOT RISK ═══ -->
+<section id="not-risk">
+  <div class="wrap-narrow">
+    <span class="label section-label">§1 &mdash; Reframing Volatility</span>
+    <h2>Volatility is not risk</h2>
+    <span class="draft-note">Draft copy &mdash; review</span>
+
+    <p>Two words used as synonyms, which are not synonyms.</p>
+
+    <p><strong style="color:var(--amber); font-weight:500;">Volatility</strong> is the <em>short-term</em> movement of price. It is observable by the day, the week, the month. It is how the market digests information in real time.</p>
+
+    <p><strong style="color:var(--amber); font-weight:500;">Risk</strong> is something else entirely. Risk is the <em>probability</em> of permanent loss of purchasing power, weighted by how <em>severe</em> that loss would be. It involves both how likely a bad outcome is and how bad it would be &mdash; and is what's left after the holding period closes, not what fluctuates during it. The two words describe different categories of thing, and treating them as interchangeable is the central error this page is here to undo.</p>
+
+    <p>The argument is not new. In his 2014 letter to Berkshire Hathaway shareholders, Warren Buffett made it plainly, about equities:</p>
+
+    <div class="callout">
+      <p class="quote">"Volatility is far from synonymous with risk. Popular formulas that equate the two terms lead students, investors and CEOs astray."</p>
+      <p class="attrib">Warren Buffett &middot; Berkshire Hathaway annual letter, 2014</p>
+    </div>
+
+    <p>Buffett's fuller argument is that currency-denominated instruments &mdash; cash, Treasuries, money-market holdings &mdash; are <em>riskier</em> than volatile equity portfolios over long time horizons, because the volatility of equities resolves into a positive long-term nominal trend, while the apparent stability of cash conceals a <em>guaranteed</em> negative one. Cash feels safe over the next month, and is corrosive over the next decade. The short-term comfort is the long-term danger. Any short-term discomfort is the price of the long-term position.</p>
+
+    <p>Applied to Bitcoin, the argument does not weaken. It strengthens. The historical long-horizon return on diversified equities is roughly 10% per year. Bitcoin's, at any holding period of sufficient length, has been multiples of that. If Buffett's reasoning holds against cash on behalf of equities, it holds more forcefully against cash on behalf of Bitcoin.</p>
+
+    <p>Buffett is not alone:</p>
+
+    <ul class="chorus">
+      <li>The discipline's emphasis on volatility as a measure of risk is nonsense.<span class="who">Charlie Munger</span></li>
+      <li>Volatility is a welcome creator of opportunity, not a hazard to avoid.<span class="who">Seth Klarman</span></li>
+      <li>The biggest investment risk is not the volatility of prices, but whether you will suffer a permanent loss of capital.<span class="who">Li Lu</span></li>
+    </ul>
+
+    <h3 style="margin-top:2.5rem;">The fiat-side counterpart</h3>
+
+    <p>There is a symmetry worth noticing. Fiat currency has low nominal volatility and high structural risk: its purchasing power halves on a regular schedule, but does so quietly, without daily price movement to alarm the holder. Bitcoin has high nominal volatility and &mdash; over a long enough time horizon &mdash; structurally low risk: its purchasing power moves loudly, but it has historically moved in one net direction; up and to the right.</p>
+
+    <p>Volatility and risk can fall into any combination. The grid below maps the four. The diagonal cells are where the misunderstanding lives:</p>
+
+    <div class="quadrant-wrap">
+      <table class="quadrant-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Low volatility</th>
+            <th>High volatility</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th class="row-head">Low risk</th>
+            <td class="cell-rare">(rare &mdash; short-term cash, short-duration Treasuries)</td>
+            <td class="cell-bitcoin"><strong>Bitcoin</strong>, over long time horizons</td>
+          </tr>
+          <tr>
+            <th class="row-head">High risk</th>
+            <td class="cell-fiat"><strong>Fiat currency</strong>, over long time horizons</td>
+            <td class="cell-spec">Speculative penny stocks, lottery tickets</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Most people place fiat in the <em>top-left</em> (low risk, low volatility) and Bitcoin in the <em>bottom-right</em> (high risk, high volatility). Both placements are wrong. Fiat actually sits in the bottom-left &mdash; quietly bleeding purchasing power. Bitcoin actually sits in the top-right &mdash; loud, but over a long enough time horizon, structurally safe. The volatility we can see misleads us about the risk we can't.</p>
+
+    <a href="/the-half-life.html" class="crosslink">
+      <div class="cl-label">Companion argument</div>
+      <div class="cl-title">The Half-Life</div>
+      <p class="cl-body">The fiat-side of the argument, examined directly: a calculator that shows how long it takes for purchasing power to halve under sustained monetary debasement.</p>
+    </a>
+
+    <h3 style="margin-top:2.6rem;">An honest objection</h3>
+
+    <p>The counter to Buffett is real and worth naming. The common form it takes: <em>volatility is risk for real people, because real people panic-sell at the bottom.</em> Discipline is easy to prescribe and hard to practice. Most investors cannot watch a portfolio halve and do nothing; <em>"don't just stand there; do something"</em> is a natural instinct. But there are cases where the real lesson is <em>"don't just do something; stand there."</em></p>
+
+    <p>This is an argument against behavior, not an argument against the distinction. And the page's answer to it is structural, not motivational. The next section shows that at a sufficient time horizon, the behavioral problem has no opportunity to become a loss &mdash; because across fifteen years of Bitcoin's history, no such window has ever closed in the red.</p>
+  </div>
+</section>
+
+<!-- ═══ §2 — THE EMPIRICAL ANCHOR ═══ -->
+<section id="anchor">
+  <div class="wrap-narrow">
+    <span class="label section-label">§2 &mdash; The empirical anchor</span>
+    <h2>Forty-one months</h2>
+    <span class="draft-note">Draft copy &mdash; review</span>
+
+    <p class="lead">Across approximately fifteen years of Bitcoin's recorded price history, no rolling holding period of forty-one months or more has ever ended in nominal loss.</p>
+
+    <p>The claim is empirical, not theoretical. It is the direct observation of monthly Bitcoin closing prices across the dataset, accessed April 2026, and is consistent with calculations published by Case Bitcoin and by bitcoinisthebettermoney.com, which maintain independent rolling-return analyses.</p>
+
+    <p>Below is the same finding shown two ways. First, against the S&amp;P 500, comparing the full range of outcomes &mdash; worst, median, and best &mdash; available at each holding period. Second, in the calculator that follows, where you can pick your own scenario.</p>
+
+    <div class="chart-panel">
+      <div class="chart-title">Rolling CAGR by holding period: full range, Bitcoin vs. S&amp;P 500</div>
+      <div class="chart-holder"><canvas id="cagrCompareChart"></canvas></div>
+      <p class="chart-caption">Each pair of bars shows the range of CAGR outcomes (worst start to best start) at that holding period; the marker shows the median. Bitcoin's worst-case at four years and beyond stays positive; the S&amp;P 500's does not. The y-axis is clipped at 200% for legibility &mdash; Bitcoin's best-case 1-year CAGR exceeds 4,000% (early 2013), but the upper tail is not where the volatility argument lives. S&amp;P figures are approximate, drawn from broad historical sources.</p>
+    </div>
+
+    <p style="margin-top:2rem;">Three other figures worth knowing &mdash; conventional risk-adjusted measures applied to Bitcoin in the period 2020&ndash;2025, with what each one actually means:</p>
+
+    <div class="stat-defs">
+      <div class="stat-row">
+        <div class="s-num">0.96</div>
+        <div class="s-def"><strong>Bitcoin's Sharpe ratio (2020&ndash;early 2024)</strong>, against the S&amp;P 500's 0.65 over the same period. The Sharpe ratio measures excess return per unit of volatility &mdash; higher is better. By this conventional risk-adjusted measure, Bitcoin outperformed the S&amp;P 500. Source: Fidelity Digital Assets.</div>
+      </div>
+      <div class="stat-row">
+        <div class="s-num">1.86</div>
+        <div class="s-def"><strong>Sortino ratio over the same period</strong>, nearly double the Sharpe. Sortino is like Sharpe but penalizes only <em>downside</em> volatility, not all volatility. The fact that Sortino is much higher than Sharpe means most of Bitcoin's volatility was to the upside &mdash; price movement that benefited holders, not harmed them.</div>
+      </div>
+      <div class="stat-row">
+        <div class="s-num">1.2&times;</div>
+        <div class="s-def"><strong>Realized-volatility ratio of IBIT to SPY, mid-2025</strong>, down from 5.7&times; a year earlier. Bitcoin (via the IBIT ETF) is now only fractionally more volatile day-to-day than the S&amp;P 500 itself. The premise of the volatility objection is itself in retreat.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ §3 — INTERACTIVE CALCULATOR ═══ -->
+<section id="calculator">
+  <div class="wrap-narrow">
+    <span class="label section-label">§3 &mdash; Interactive</span>
+    <h2>The Bitcoin Time Horizon calculator</h2>
+    <span class="draft-note">Draft copy &mdash; review</span>
+
+    <p>The presets below are essentially the worst times in Bitcoin's history to have started buying &mdash; cycle peaks where most retail entered. Pick one, or pick a custom date. Pick a holding period. The chart below tracks how the position evolved month by month, with the time spent below water shaded red. Across a long enough time horizon, even the worst entry points have closed positive.</p>
+
+    <div class="calc">
+      <div class="control-panel">
+        <span class="cp-label">Configure your scenario</span>
+
+        <div class="two-col">
+          <div class="field">
+            <label class="field-label">Worst entry points (cycle tops)</label>
+            <div class="btn-row" id="presetRow">
+              <button type="button" data-date="2017-12" class="preset">Dec 2017 top</button>
+              <button type="button" data-date="2021-11" class="preset">Nov 2021 top</button>
+              <button type="button" data-date="2025-10" class="preset">Oct 2025 top</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label">Or pick any date</label>
+            <div class="btn-row">
+              <button type="button" data-custom="1" class="preset" id="customBtn">Custom date</button>
+            </div>
+            <div class="date-picker" id="datePicker">
+              <input type="month" id="customDate" min="2011-01" max="2026-04" value="2020-03">
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="field">
+            <label class="field-label">Investment type</label>
+            <div class="btn-row" id="typeRow">
+              <button type="button" data-type="lump" class="type-btn active">Lump sum</button>
+              <button type="button" data-type="dca" class="type-btn">DCA</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" id="amountLabel">Amount (USD)</label>
+            <input type="number" id="amount" value="10000" min="100" step="100">
+          </div>
+        </div>
+
+        <div class="field" id="cadenceField" style="display:none;">
+          <label class="field-label">Cadence</label>
+          <div class="btn-row" id="cadenceRow">
+            <button type="button" data-cadence="weekly" class="cad-btn">Weekly</button>
+            <button type="button" data-cadence="monthly" class="cad-btn active">Monthly</button>
+          </div>
+        </div>
+
+        <div class="field slider-field">
+          <div class="slider-label-row">
+            <label class="field-label" style="margin:0;">Holding period</label>
+            <span class="slider-value"><span id="periodMonths">48</span><span class="unit"><span id="periodLabel">months</span></span></span>
+          </div>
+          <input type="range" id="periodSlider" min="1" max="120" value="48" step="1">
+          <div class="slider-range-marks">
+            <span>1 month</span>
+            <span id="midMark">41 months</span>
+            <span id="endMark">Today</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="calc-footnote">Past results are empirical facts about Bitcoin's price history, not predictions about its future. Calculations use monthly closes; DCA simulations assume purchases at month-end. The slider's maximum is automatically clamped to today.</p>
+
+      <div class="progression-chart-wrap">
+        <div class="pc-title">Portfolio value over time</div>
+        <div class="progression-chart-holder"><canvas id="progressionChart"></canvas></div>
+      </div>
+
+      <div class="output-grid" id="outputs">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <a href="/the-power-law.html" class="crosslink" style="margin-top:2.6rem;">
+      <div class="cl-label">Looking forward?</div>
+      <div class="cl-title">The Power Law calculator</div>
+      <p class="cl-body">For projections from today into the future, using the power-law floor / trend / ceiling bounds, see the forward-looking calculator on the Power Law page.</p>
+    </a>
+  </div>
+</section>
+
+<!-- ═══ §4 — WHY BITCOIN BEHAVES DIFFERENTLY ═══ -->
+<section id="why-different">
+  <div class="wrap-wide">
+    <span class="label section-label">§4 &mdash; The structural reason</span>
+    <h2>Why Bitcoin behaves differently</h2>
+    <span class="draft-note">Draft copy &mdash; review; comparison grid is the centerpiece</span>
+
+    <p>Bitcoin is not an <em>asset</em> like other assets. The most useful single sentence about it is: <em class="mark">it is a network being adopted, not a price being discovered.</em> <em>Adoption</em> is the variable that drives the returns, and adoption is what gives the volatility its distinctive shape. Once the comparison below is laid out side by side, two things become clear:</p>
+
+    <ol class="point-list">
+      <li>Bitcoin's returns and volatility profile are not anomalies that need explaining. They are the natural shape of an adoption curve.</li>
+      <li>The metrics built for other assets &mdash; Sharpe ratios, daily volatility, "fair value" multiples &mdash; apply less cleanly to a network being adopted, because the underlying variable is different.</li>
+    </ol>
+
+    <div class="compare-table-wrap">
+      <p class="scroll-hint">Swipe to see all columns &rarr;</p>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Equities</th>
+            <th>Bonds</th>
+            <th>Gold</th>
+            <th class="btc-col">Bitcoin</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="row-label">What it is</td>
+            <td>Shares of a company's earnings</td>
+            <td>Debt instrument paying interest</td>
+            <td>Physical commodity</td>
+            <td class="btc-col"><strong>A protocol; a network</strong></td>
+          </tr>
+          <tr>
+            <td class="row-label">Returns driven by</td>
+            <td>Earnings, multiples</td>
+            <td>Interest rates</td>
+            <td>Scarcity, sentiment</td>
+            <td class="btc-col"><strong>Adoption</strong></td>
+          </tr>
+          <tr>
+            <td class="row-label">Long-horizon CAGR</td>
+            <td>~10%</td>
+            <td>~3&ndash;5%</td>
+            <td>~2&ndash;3%</td>
+            <td class="btc-col"><strong>~30%+ (decreasing predictably)</strong></td>
+          </tr>
+          <tr>
+            <td class="row-label">Volatility shape</td>
+            <td>Persistent, moderate</td>
+            <td>Low, persistent</td>
+            <td>Moderate, persistent</td>
+            <td class="btc-col"><strong>High, but compressing each cycle</strong></td>
+          </tr>
+          <tr>
+            <td class="row-label">Has a destination?</td>
+            <td>No (oscillates around levels)</td>
+            <td>No</td>
+            <td>No</td>
+            <td class="btc-col"><strong>Yes (full adoption)</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin-top:2rem;">The bottom row is the one that does the most work. Every other tradeable asset is a thing the market <em>oscillates around a level for</em>. Bitcoin is a thing the market is <em>going somewhere with</em>. That distinction explains the rest of the table. Returns of ~30% are the rate of adoption translated into price. Volatility that compresses each cycle is what an adoption process looks like as it approaches its destination. Sharpe ratios calibrated for assets-oscillating-around-levels do not produce meaningful numbers when applied to a network being adopted &mdash; the input variable is wrong.</p>
+
+    <h3 style="margin-top:2.4rem;">The denominator mismatch</h3>
+
+    <p>This is the technical name for the last point. The Sharpe ratio &mdash; the standard instrument for evaluating whether an asset's returns justify its risk &mdash; uses <em>daily</em> realized volatility in its denominator. For an allocation measured in years, the daily-volatility denominator is the wrong tool:</p>
+
+    <div class="mismatch-wrap">
+      <p class="scroll-hint">Swipe to see all columns &rarr;</p>
+      <table class="mismatch-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>What Sharpe uses</th>
+            <th>What's actually relevant for Bitcoin</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="row-label">Numerator (return)</td>
+            <td>Annualized return over the period</td>
+            <td class="match">Same &mdash; correctly framed</td>
+          </tr>
+          <tr>
+            <td class="row-label">Denominator (volatility)</td>
+            <td class="mismatch"><strong>Daily price movement</strong></td>
+            <td class="mismatch"><strong>Volatility over the holding period</strong></td>
+          </tr>
+          <tr>
+            <td class="row-label">Practical effect</td>
+            <td>Penalizes daily wobbles you never had to act on</td>
+            <td class="match">Measures the uncertainty you actually face</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Compute the equivalent ratio with a four-year volatility denominator &mdash; the time horizon over which loss has not historically occurred &mdash; and the risk-adjusted picture inverts. What institutional analysis calls "Bitcoin's elevated risk" is largely an artifact of using a one-day measurement instrument to assess a multi-year holding horizon. Match the time windows, and the conclusion changes.</p>
+
+    <h3 style="margin-top:2.4rem;">Volatility is compressing on schedule</h3>
+
+    <p>One last piece. Bitcoin's volatility is not just declining over time &mdash; it is declining <em class="mark">predictably</em>. Giovanni Santostasi's analysis of Bitcoin's bull-market peaks shows that each successive peak has been smaller than the last by a margin that fits an exponential decay curve with a goodness-of-fit (R&sup2;) of 0.98 &mdash; meaning the model explains 98% of the variation in observed peak heights. Early cycles produced bubble growth rates of roughly 1.6% per day; recent cycles have seen that rate fall to about 0.46% per day. Bitcoin's volatility is decreasing at a rate that can be written down, on a curve that has held across more than a decade.</p>
+
+    <a href="/the-power-law.html" class="crosslink">
+      <div class="cl-label">Structural model</div>
+      <div class="cl-title">Bitcoin and the Power Law</div>
+      <p class="cl-body">The mathematical model behind Bitcoin's long-run trajectory and its compression dynamics, with a forward-looking calculator.</p>
+    </a>
+  </div>
+</section>
+
+<!-- ═══ §5 — CLOSE: ADOPTION IS THE DESTINATION ═══ -->
+<section id="close">
+  <div class="wrap-narrow">
+    <span class="label section-label">§5 &mdash; A final observation</span>
+    <h2>Adoption is the destination</h2>
+    <span class="draft-note">Draft copy &mdash; review; closing line still in workshop</span>
+
+    <p>Bitcoin is the only major financial asset with two clearly defined states: <em>zero adoption</em>, at the genesis block in January 2009, and <em>full adoption</em>, at some endpoint not yet reached. Everything in between is the <em>transition</em>.</p>
+
+    <p>Adoption is generally a one-way street. Networks that establish themselves do not usually return to obscurity. The path is not smooth &mdash; it has reversals, fits and starts &mdash; but it has direction, and the direction does not change at the same rate the daily price does.</p>
+
+    <p>The volatility that the world objects to is the legible signature of that transition in the price record. It is what an adoption process looks like to a market trying to price each step. As adoption proceeds, the volatility decreases: the network is closer to its destination, the marginal new adopter moves the price less, and there is less remaining distance to traverse. When the transition completes, the volatility resolves &mdash; but so does the entry window.</p>
+
+    <p style="font-family:'Cormorant Garamond', serif; font-style:italic; font-size:1.4rem; line-height:1.4; margin-top:2.2rem; color:var(--ink); max-width:48ch;">
+      What looks like turbulence over the course of a day is trajectory over the course of a decade. The time frame decides which one you are seeing.
+    </p>
+  </div>
+</section>
+
+<!-- ═══ §6 — FURTHER READING ═══ -->
+<section id="reading">
+  <div class="wrap-narrow">
+    <span class="label section-label">§6 &mdash; Further reading</span>
+    <h2>Sources and primary references</h2>
+    <ul class="reading">
+      <li>
+        <span class="r-src">Warren Buffett &middot; Berkshire Hathaway 2014 Annual Letter</span>
+        <span class="r-desc">The canonical articulation of the volatility-versus-risk distinction, applied to equities versus cash.</span>
+      </li>
+      <li>
+        <span class="r-src">Fidelity Digital Assets &middot; A Closer Look at Bitcoin's Volatility</span>
+        <span class="r-desc">Sharpe and Sortino analysis, volatility-versus-market-cap data, volatility history by cycle.</span>
+      </li>
+      <li>
+        <span class="r-src">BlackRock / iShares &middot; Bitcoin Volatility Trends</span>
+        <span class="r-desc">Includes a drawdown-to-four-year-forward-return table that independently substantiates the time-horizon argument, using institutional data.</span>
+      </li>
+      <li>
+        <span class="r-src">Giovanni Santostasi &middot; Understanding Bitcoin's Predictability (Monte Carlo Simulation of Power Law Dynamics)</span>
+        <span class="r-desc">The source of the volatility-compression data: bubble growth-rate decay and peak-compression R&sup2;.</span>
+      </li>
+      <li>
+        <span class="r-src">Case Bitcoin &middot; Macro Charts</span>
+        <span class="r-desc">Independent rolling-return and risk-adjusted-return calculations across holding periods.</span>
+      </li>
+      <li>
+        <span class="r-src">CFA Institute &middot; Still Misperceived? A Fresh Look at Bitcoin Volatility</span>
+        <span class="r-desc">Academic treatment of the perception gap between Bitcoin's measured and reputed volatility.</span>
+      </li>
+      <li>
+        <span class="r-src">Nassim Nicholas Taleb &middot; Antifragile</span>
+        <span class="r-desc">The broader framework for why systems mislabeled as fragile through volatility-as-risk thinking are often the most robust.</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+
+
+<!-- ═══ DATA + LOGIC ═══ -->

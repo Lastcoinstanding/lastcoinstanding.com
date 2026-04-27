@@ -1,0 +1,252 @@
+---
+layout: base.njk
+permalink: /what-money-has-to-be.html
+slug: what-money-has-to-be
+eleventyComputed:
+  head_extras: "{% include '_pageassets/what-money-has-to-be-head.html' %}"
+  page_styles: "{% include '_pageassets/what-money-has-to-be.css' %}"
+  page_scripts: "{% include '_pageassets/what-money-has-to-be.js' %}"
+---
+<!-- SVG filter definitions (defined once, referenced by coupling lines) -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- filterUnits="userSpaceOnUse" ensures the filter region is absolute,
+         not derived from each element's bbox. Without this, a perfectly horizontal
+         line has a zero-height bbox, which collapses the default objectBoundingBox
+         filter region and the filter output vanishes. -->
+    <filter id="glow-line"
+            filterUnits="userSpaceOnUse"
+            x="-10" y="-10" width="560" height="480">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+</svg>
+
+<div class="container">
+
+  <!-- Hero -->
+  <header class="hero">
+    <h1>What Money Has To Be</h1>
+    <p class="subtitle">Persistence across time. Movement across space. Shared measurement.<br>
+    Three functions, structurally coupled. One money.</p>
+  </header>
+
+  <!-- Preset control panel -->
+  <div class="preset-panel">
+    <div class="preset-panel-label">Select a money to compare</div>
+    <div class="presets" role="tablist" aria-label="Select a money">
+      <button class="preset-btn active" data-money="bitcoin">Bitcoin</button>
+      <button class="preset-btn" data-money="gold">Gold</button>
+      <button class="preset-btn" data-money="usd">USD</button>
+      <button class="preset-btn" data-money="hyperinflating">Hyperinflating fiat</button>
+    </div>
+  </div>
+
+  <!-- Main layout: SoV left | Triangle | MoE right -->
+  <div class="main-layout">
+
+    <!-- SoV column (left flank) -->
+    <div class="property-column" data-column="sov">
+      <div class="column-header">
+        <div class="column-title">Store of Value</div>
+        <div class="column-subtitle">persistence across time</div>
+      </div>
+
+      <div class="property" data-prop="monetary-inflation">
+        <div class="property-name">Monetary inflation</div>
+        <div class="property-states">
+          <button class="state-btn" data-state="zero">Zero</button>
+          <button class="state-btn" data-state="low">Low</button>
+          <button class="state-btn" data-state="high">High</button>
+          <button class="state-btn" data-state="extreme">Extreme</button>
+        </div>
+        <div class="property-desc"></div>
+      </div>
+
+      <div class="property" data-prop="terminal-scarcity">
+        <div class="property-name">Terminal scarcity</div>
+        <div class="property-states">
+          <button class="state-btn" data-state="absolute">Absolute</button>
+          <button class="state-btn" data-state="elastic">Elastic</button>
+        </div>
+        <div class="property-desc"></div>
+      </div>
+
+      <div class="property" data-prop="confiscation-risk">
+        <div class="property-name">Confiscation risk</div>
+        <div class="property-states">
+          <button class="state-btn" data-state="bearer">Bearer</button>
+          <button class="state-btn" data-state="confiscatable">Confiscatable</button>
+        </div>
+        <div class="property-desc"></div>
+      </div>
+
+      <div class="property" data-prop="durability">
+        <div class="property-name">Durability over time</div>
+        <div class="property-states">
+          <button class="state-btn" data-state="persistent">Persistent</button>
+          <button class="state-btn" data-state="slow-decay">Slow decay</button>
+          <button class="state-btn" data-state="rapid-decay">Rapid decay</button>
+        </div>
+        <div class="property-desc"></div>
+      </div>
+    </div>
+
+    <!-- Triangle (center) + UoA stack -->
+    <div class="center-stack">
+      <div class="triangle-wrap">
+        <div class="triangle" role="img" aria-label="Three functions of money arranged as a triangle">
+        <svg class="couplings" viewBox="0 0 540 460">
+          <!-- Lines terminate at each circle's edge (radius 90 from center) -->
+          <line class="coupling-line resonant" id="line-sov-moe" x1="221.3" y1="165.7" x2="138.7" y2="294.3"/>
+          <line class="coupling-line resonant" id="line-sov-uoa" x1="318.7" y1="165.7" x2="401.3" y2="294.3"/>
+          <line class="coupling-line resonant" id="line-moe-uoa" x1="180"   y1="370"   x2="360"   y2="370"/>
+        </svg>
+        <div class="node node-sov resonant" id="node-sov">
+          <div class="node-label">Store of Value</div>
+          <div class="node-desc">persistence across time</div>
+        </div>
+        <div class="node node-moe resonant" id="node-moe">
+          <div class="node-label">Medium of<br>Exchange</div>
+          <div class="node-desc">movement across space</div>
+        </div>
+        <div class="node node-uoa resonant" id="node-uoa">
+          <div class="node-label">Unit of Account</div>
+          <div class="node-desc">shared measurement</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UoA row (inside center-stack, directly below triangle) -->
+    <div class="uoa-row">
+      <div class="column-header">
+        <div class="column-title">Unit of Account</div>
+        <div class="column-subtitle">shared measurement</div>
+      </div>
+      <div class="uoa-props">
+        <div class="property" data-prop="denominator-stability">
+          <div class="property-name">Denominator stability</div>
+          <div class="property-states">
+            <button class="state-btn" data-state="fixed">Fixed</button>
+            <button class="state-btn" data-state="drifting">Drifting</button>
+            <button class="state-btn" data-state="unmoored">Unmoored</button>
+          </div>
+          <div class="property-desc"></div>
+        </div>
+
+        <div class="property" data-prop="long-horizon">
+          <div class="property-name">Long-horizon predictability</div>
+          <div class="property-states">
+            <button class="state-btn" data-state="decades">Decades</button>
+            <button class="state-btn" data-state="years">Years</button>
+            <button class="state-btn" data-state="months">Months</button>
+          </div>
+          <div class="property-desc"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cross-cutting (inside center-stack, below UoA, same width) -->
+    <div class="cross-cutting">
+      <div class="cross-cutting-header">
+        <div class="cross-cutting-title">Structural properties</div>
+        <div class="cross-cutting-subtitle">cross-cutting — affect all three functions</div>
+      </div>
+      <div class="cross-cutting-grid">
+        <div class="property" data-prop="non-sovereign">
+          <div class="property-name">Non-sovereign</div>
+          <div class="property-states">
+            <button class="state-btn" data-state="non-sovereign">Non-sovereign</button>
+            <button class="state-btn" data-state="state-captured">State-captured</button>
+          </div>
+          <div class="property-desc"></div>
+        </div>
+        <div class="property" data-prop="open-source">
+          <div class="property-name">Open-source</div>
+          <div class="property-states">
+            <button class="state-btn" data-state="open">Open</button>
+            <button class="state-btn" data-state="closed">Closed</button>
+          </div>
+          <div class="property-desc"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /center-stack -->
+
+    <!-- MoE column (right flank) -->
+    <div class="property-column" data-column="moe">
+      <div class="column-header">
+        <div class="column-title">Medium of Exchange</div>
+        <div class="column-subtitle">movement across space</div>
+      </div>
+
+      <div class="property" data-prop="settlement-finality">
+        <div class="property-name">Settlement finality</div>
+        <div class="property-states">
+          <button class="state-btn" data-state="final">Final</button>
+          <button class="state-btn" data-state="reversible">Reversible</button>
+        </div>
+        <div class="property-desc"></div>
+      </div>
+
+      <div class="property" data-prop="permissionless-access">
+        <div class="property-name">Permissionless access</div>
+        <div class="property-states">
+          <button class="state-btn" data-state="permissionless">Permissionless</button>
+          <button class="state-btn" data-state="gatekept">Gatekept</button>
+        </div>
+        <div class="property-desc"></div>
+      </div>
+
+      <div class="property" data-prop="cross-border-friction">
+        <div class="property-name">Cross-border friction</div>
+        <div class="property-states">
+          <button class="state-btn" data-state="universal">Universal</button>
+          <button class="state-btn" data-state="fragmented">Fragmented</button>
+          <button class="state-btn" data-state="blocked">Blocked</button>
+        </div>
+        <div class="property-desc"></div>
+      </div>
+
+      <div class="property" data-prop="divisibility">
+        <div class="property-name">Divisibility</div>
+        <div class="property-states">
+          <button class="state-btn" data-state="high">High</button>
+          <button class="state-btn" data-state="medium">Medium</button>
+          <button class="state-btn" data-state="low">Low</button>
+        </div>
+        <div class="property-desc"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Downstream sections -->
+  <section class="section">
+    <h2>Money vs. Currency?</h2>
+    <p>Some people use the term <em>currency</em> as a reasonable approach to solving the medium-of-exchange problem, while excusing it from a store-of-value role. Similarly, the same people use the term <em>money</em> when talking about gold — where the store-of-value role is primary — and likewise excuse its limitations as a medium of exchange. This duality has been normalized, perhaps because there has never been a single thing that could perfectly occupy both roles simultaneously.</p>
+    <p>The idea of two things "built for purpose" vs. a single thing doing both is, on the surface, a convincing one — the rule of thumb works in most scenarios. My mountain bike is best for climbing rugged terrain; my racing bike is better on flat roads. The rule breaks, however, when it comes to money.</p>
+    <p>The three functions are not independent layers. A medium of exchange that points at a decaying store of value inherits that decay: Gresham's Law, resurrected — holders spend the weak money first and keep the strong. A unit of account tethered to an unstable denominator is no unit of account at all; it is a measuring stick that keeps shrinking. And a store of value that cannot move across space is impractical for trade. Every attempt to isolate one function collapses the others.</p>
+    <p>Until Bitcoin, an ideal money had never existed.</p>
+  </section>
+
+  <section class="section">
+    <h2>Additively stronger than the sum of its parts</h2>
+    <p>These three functions are not a menu. They are one thing expressed through three faces — and until Bitcoin, no money had ever simultaneously satisfied all three. Gold came closest on time but stumbled on space. Fiat extended across space but forfeits time. Stablecoins isolate movement but borrow decay from the denominator beneath them.</p>
+    <p>Bitcoin holds all three in structural resonance for the first time in monetary history. Not a better version of what came before. A different category of thing altogether — not just the first money, but thereby also the last.</p>
+  </section>
+
+  <aside class="closing-callout">
+    <div class="closing-callout-inner">
+      <p class="callout-lede">Why there can only be one.</p>
+      <p class="callout-body">As Adam Back — inventor of Hashcash, cited in the Bitcoin whitepaper — explains: Bitcoin's design space is narrower than it appears. Any deviation introduces a compromise greater than the supposed benefit. The parameters aren't arbitrary; they sit in equilibrium. This is why Bitcoin is more accurately understood as a discovery than an invention — and why there won't be a second one.</p>
+      <a class="callout-link" href="https://x.com/LastCoinStandng/status/1714789695622955431" target="_blank" rel="noopener">Watch the 2-minute summary →</a>
+    </div>
+  </aside>
+
+</div>

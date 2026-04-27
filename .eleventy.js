@@ -1,20 +1,54 @@
 // Eleventy configuration for lastcoinstanding.com
-//
-// PHASE 1 (current): Scaffolding only. The build runs but produces an empty
-// _site/ because src/ has no input files yet. The live site continues to be
-// served by Cloudflare Pages from the repo root HTML files (untouched).
-//
-// PHASE 2 (next): Migrate the-bitcoin-migration.html as the pilot page.
-// PHASE 3: Migrate remaining pages incrementally.
-// PHASE 4: Switch Cloudflare Pages build to `npm run build` with output `_site`.
 
 module.exports = function (eleventyConfig) {
-  // Templating: Nunjucks for both .html and .njk
   eleventyConfig.setTemplateFormats(["html", "njk", "md"]);
 
-  // Pass through static assets unchanged when they appear in src/
-  // (No-op in Phase 1; relevant once we start moving files in)
-  // eleventyConfig.addPassthroughCopy("src/assets");
+  // Static assets: copy from repo root into _site/ at build time.
+  // Path is relative to the project root (where .eleventy.js lives).
+  // Each entry maps source-path -> destination-path-within-output.
+  const staticAssets = [
+    'hero-bg.jpg',
+    'profile.jpg',
+    'apple-touch-icon.png',
+    'favicon.ico',
+    'favicon.svg',
+    'favicon-16x16.png',
+    'favicon-32x32.png',
+    'favicon-192x192.png',
+    'sitemap.xml',
+    'concepts.json',
+    'data.json',
+    // OG cards
+    'og-image.jpg',
+    'og-preview.jpg',
+    'og-about.jpg',
+    'og-money-trees.jpg',
+    'og-not-a-bubble.jpg',
+    'og-synthesis.jpg',
+    'og-the-bitcoin-horizon.jpg',
+    'og-the-bitcoin-migration.jpg',
+    'og-the-fixed-pie.jpg',
+    'og-the-half-life.jpg',
+    'og-the-melting-ice-cube.jpg',
+    'og-the-power-law.jpg',
+    'og-trilemma.jpg',
+    'og-what-bitcoin-is.jpg',
+    'og-what-money-has-to-be.jpg',
+    'og-bitcoin-vs-real-estate.jpg',
+    'bitcoin-vs-real-estate-og.png',
+    // Admin tool stays as standalone HTML
+    'admin.html',
+    // Misc legacy
+    'json-ld-snippets.html',
+    'the-opportunity-cost.html',
+  ];
+
+  staticAssets.forEach(asset => {
+    eleventyConfig.addPassthroughCopy({ [asset]: asset });
+  });
+
+  // Videos folder — only enable when present locally (production has it; local test may not)
+  // eleventyConfig.addPassthroughCopy({ 'videos': 'videos' });
 
   return {
     dir: {

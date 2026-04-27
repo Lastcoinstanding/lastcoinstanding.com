@@ -1,0 +1,99 @@
+---
+layout: base.njk
+permalink: /synthesis.html
+slug: synthesis
+eleventyComputed:
+  head_extras: "{% include '_pageassets/synthesis-head.html' %}"
+  page_styles: "{% include '_pageassets/synthesis.css' %}"
+  page_scripts: "{% include '_pageassets/synthesis.js' %}"
+---
+<div class="page">
+        <header>
+            <h1>The Bitcoin Synthesis</h1>
+            <p class="subtitle">
+                <span class="line1">Six essential components. One irreducible discovery.</span>
+                Why sound money could only be discovered once.
+            </p>
+        </header>
+
+        <main>
+            <div class="viz-section">
+                <div class="svg-wrap">
+                    <svg id="synthesis-svg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="4" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                            <filter id="glow-soft">
+                                <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                            <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="rgba(247,147,26,0.10)"/>
+                                <stop offset="100%" stop-color="rgba(247,147,26,0)"/>
+                            </radialGradient>
+                            <radialGradient id="coreGradActive" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="rgba(247,147,26,0.18)"/>
+                                <stop offset="100%" stop-color="rgba(247,147,26,0)"/>
+                            </radialGradient>
+                        </defs>
+
+                        <!-- Ambient glow behind core -->
+                        <circle id="core-ambient" cx="250" cy="250" r="80" fill="url(#coreGrad)" opacity="0.5"/>
+
+                        <!-- Mesh connections (hidden until completion) -->
+                        <g id="mesh-lines"></g>
+
+                        <!-- Radial connection lines (orb to center) -->
+                        <g id="radial-lines"></g>
+
+                        <!-- Component orbs -->
+                        <g id="component-orbs"></g>
+
+                        <!-- Central Bitcoin core -->
+                        <g id="core-group">
+                            <circle id="core-ring" cx="250" cy="250" r="48" fill="none" stroke="#333" stroke-width="2" opacity="0.6"/>
+                            <circle id="core-fill" cx="250" cy="250" r="48" fill="rgba(15,15,15,0.8)"/>
+                            <text id="core-text-btc" x="250" y="244" text-anchor="middle" fill="#555" font-family="'Outfit', sans-serif" font-size="13" font-weight="700" letter-spacing="0.08em">BITCOIN</text>
+                            <text id="core-text-sym" x="250" y="262" text-anchor="middle" fill="#444" font-family="'Outfit', sans-serif" font-size="9" font-weight="400" letter-spacing="0.06em">&#x20BF;</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Progress bar -->
+                <div class="progress">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="progress-text">
+                        <span id="progressCount">0</span> of 6 components explored
+                        <button class="reset-btn" id="resetBtn" onclick="resetAll()">reset</button>
+                    </p>
+                </div>
+            </div>
+
+            <div class="info-panel" id="infoPanel">
+                <div class="panel-default" id="panelDefault">
+                    <p>Bitcoin is not a single invention &#8212; it is an irreducible synthesis of six components that work together to create a cohesive solution to the problem of money.</p>
+                    <p>Each component is necessary. Remove any one, and the system doesn&#8217;t merely weaken &#8212; it becomes fundamentally untenable.</p>
+                    <p class="cta">&#8592; Click each component to explore</p>
+                </div>
+                <div class="panel-content" id="panelContent"></div>
+            </div>
+        </main>
+
+        <!-- Precursors Section -->
+        <section class="precursors">
+            <h2>The Shoulders It Stands On</h2>
+            <p class="section-sub">Bitcoin was not the first attempt at digital money. Each predecessor contributed a critical piece &#8212; and each fell short for a specific, instructive reason.</p>
+            <div class="precursor-grid" id="precursorGrid"></div>
+        </section>
+
+        <aside class="related-link" style="max-width:720px;margin:4rem auto 2rem;padding:1.75rem;border:1px solid rgba(247,147,26,0.18);border-radius:3px;background:rgba(247,147,26,0.03);font-family:'Inter',-apple-system,sans-serif;">
+            <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#908880;margin-bottom:0.8rem;">Related</div>
+            <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.35rem;font-weight:500;color:#f2eee8;line-height:1.3;margin-bottom:0.7rem;">Six components. Three functions. One money.</div>
+            <p style="font-size:0.98rem;line-height:1.7;color:#d0c8c0;margin-bottom:1rem;">The Synthesis explains how Bitcoin holds together structurally &mdash; what its six components are and why removing any one is fatal. Its companion asks why it holds together at all: what money has to be in the first place, and why three functions have to live in the same instrument.</p>
+            <a href="/what-money-has-to-be.html" style="font-size:0.9rem;font-weight:500;color:#F7931A;text-decoration:none;border-bottom:1px solid rgba(247,147,26,0.4);padding-bottom:2px;">See the three functions &rarr;</a>
+        </aside>
+    </div>

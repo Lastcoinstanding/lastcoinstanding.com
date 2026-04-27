@@ -1,0 +1,388 @@
+---
+layout: base.njk
+permalink: /the-melting-ice-cube.html
+slug: the-melting-ice-cube
+eleventyComputed:
+  head_extras: "{% include '_pageassets/the-melting-ice-cube-head.html' %}"
+  page_styles: "{% include '_pageassets/the-melting-ice-cube.css' %}"
+  page_scripts: "{% include '_pageassets/the-melting-ice-cube.js' %}"
+---
+<div class="page">
+  <header class="page-header">
+    <h1>The <span class="blue-t">Melting</span> Ice Cube</h1>
+    <p class="subtitle">Holding cash isn't a conservative decision. It's an active one — with a quantifiable, ongoing cost. Every treasury is making this choice, whether it knows it or not.</p>
+  </header>
+
+  <div class="saylor-quote">
+    <blockquote>"If it's not #bitcoin, your money is melting."</blockquote>
+    <cite>— Michael Saylor</cite>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="cube">
+      <span class="tab-num">Part I</span>
+      <span class="tab-title">The Ice Cube</span>
+    </button>
+    <button class="tab-btn" data-tab="treasury">
+      <span class="tab-num">Part II</span>
+      <span class="tab-title">Your Treasury</span>
+    </button>
+    <button class="tab-btn" data-tab="companies">
+      <span class="tab-num">Part III</span>
+      <span class="tab-title">Real Companies</span>
+    </button>
+  </div>
+
+  <!-- TAB 1 -->
+  <div class="tab-content active" id="tab-cube">
+    <div class="prose" style="margin-bottom:24px">
+      At time zero, every treasury looks roughly the same — a number on a balance sheet. The difference only becomes visible over time, and it is structural. One asset erodes by design. The other is constitutionally inert: its supply fixed at 21 million, its structure unchanged by any authority, institution, or market condition.
+    </div>
+
+    <!-- Two-column controls: explicit grid for alignment -->
+    <div class="ctrl-pair">
+
+      <!-- Row 1: titles -->
+      <span class="ctrl-label cp-fiat-title">Annual supply expansion rate — Fiat</span>
+      <span class="ctrl-label cp-btc-title">Annual supply issuance rate — Bitcoin</span>
+
+      <!-- Row 2: controls -->
+      <div class="cp-fiat-ctrl">
+        <div class="interactive-block">
+          <div class="opt-group" id="inflBtns" style="margin-bottom:10px">
+            <button class="opt-btn sel-red" data-rate="4" onclick="setInflation(this)">4% low</button>
+            <button class="opt-btn" data-rate="7" onclick="setInflation(this)">7% USD avg</button>
+            <button class="opt-btn" data-rate="10" onclick="setInflation(this)">10% elevated</button>
+            <button class="opt-btn" data-rate="15" onclick="setInflation(this)">15% severe</button>
+          </div>
+          <div class="mini-stat ms-fiat-epoch" style="margin-bottom:0">
+            <div class="ms-label">Fiat Expansion Schedule</div>
+            <div class="ms-sub">No fixed schedule, no ceiling, no protocol — only policy.</div>
+          </div>
+        </div>
+      </div>
+      <div class="cp-btc-ctrl">
+        <div class="btc-info-block">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+            <div class="btc-zero-box">
+              <span class="btc-zero-pct">0%</span>
+              <span style="font-size:.72rem;color:var(--text-muted)">terminal · certain</span>
+            </div>
+            <div class="btc-epoch-box">
+              <span class="btc-epoch-rate" id="issuanceCard">0.83%/yr</span>
+              <span class="btc-epoch-label" id="issuanceSub">now · halving every ~4 yrs</span>
+            </div>
+          </div>
+          <div class="mini-stat ms-btc" style="margin-bottom:0">
+            <div class="ms-label" id="issuanceEpochLabel">Current epoch: 2024–2028</div>
+            <div class="ms-sub">Certainty, not policy — encoded in the protocol</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: half-life cards — guaranteed horizontal alignment -->
+      <div class="mini-stat ms-cash ms-hl-card cp-fiat-hl">
+        <div class="ms-label">Fiat Economic Energy Half-Life</div>
+        <div class="ms-big" id="halfLifeCard">10.2 yrs</div>
+        <div class="ms-sub" id="halfLifeSub">at 7% annual expansion</div>
+      </div>
+      <div class="mini-stat ms-btc-hl ms-hl-card cp-btc-hl">
+        <div class="ms-label">Bitcoin Economic Energy Half-Life</div>
+        <div class="ms-big ms-inf">∞</div>
+        <div class="ms-sub">Supply is fixed — purchasing power in BTC terms does not erode by protocol</div>
+      </div>
+
+    </div>
+
+    <!-- Slider -->
+    <div class="interactive-block-slider">
+      <div class="slider-header">
+        <span class="sl-label">Economic energy remaining, years from today</span>
+        <span class="sl-value" id="yearDisplay1">0 years</span>
+      </div>
+      <input type="range" id="yearSlider1" min="0" max="20" value="0" step="1">
+      <div class="year-marks"><span>Today</span><span>5 yrs</span><span>10 yrs</span><span>15 yrs</span><span>20 yrs</span></div>
+    </div>
+
+    <!-- Visuals — moved below slider, no % beneath canvases -->
+    <div class="panels-row" style="margin-bottom:20px">
+      <div class="vis-panel vp-cash">
+        <div class="vp-label">Fiat Treasury</div>
+        <div class="vp-name">Cash &amp; Near-Cash</div>
+        <div class="vp-desc">Commercial paper, T-bills, money market funds</div>
+        <div class="canvas-wrap"><canvas class="vis-canvas" id="iceCubeCanvas"></canvas></div>
+      </div>
+      <div class="vs-col">vs</div>
+      <div class="vis-panel vp-btc">
+        <div class="vp-label">Bitcoin Treasury</div>
+        <div class="vp-name">A Charged Battery</div>
+        <div class="vp-desc">Fixed supply · no counterparty · structurally inert</div>
+        <div class="canvas-wrap"><canvas class="vis-canvas" id="batteryCanvas"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Economic energy remaining — sole % display -->
+    <div class="stat-trio">
+      <div class="stat-card sc-cash">
+        <div class="sc-label">Fiat Economic Energy Remaining</div>
+        <div class="sc-big" id="cashPctCard">100%</div>
+        <div class="sc-sub" id="cashPctSub">of original purchasing power</div>
+      </div>
+      <div class="stat-card sc-hl" style="visibility:hidden"></div>
+      <div class="stat-card sc-btc">
+        <div class="sc-label">Bitcoin Network — Structural Economic Energy Remaining</div>
+        <div class="sc-big">100%</div>
+        <div class="sc-sub">Supply constitutionally fixed. Always.</div>
+      </div>
+    </div>
+
+    <div class="btc-caveat-small">Note: &gt;95% of all Bitcoin has already been issued. The terminal supply of 21 million is fixed in the protocol — no authority can alter it. The residual issuance rate shown above is a rounding consideration at this stage; the meaningful number is the terminal 0%.</div>
+
+    <div class="insight-note">
+      <p><strong>A note on the battery.</strong> Bitcoin is structurally inert — its supply cannot be expanded by any authority, at any time, for any reason. The battery stays full because the protocol enforces it. The economic value of a Bitcoin treasury <em>can</em> fluctuate — sometimes significantly. What cannot fluctuate is the supply itself. <strong>1 BTC remains 1 BTC regardless of its dollar-exchange rate.</strong> The ice cube, by contrast, melts whether you watch it or not.</p>
+    </div>
+
+    <div class="takeaway">
+      <h3>The question is never whether to take risk.<br>It is <span class="blue-t">which risk</span> you accept <span class="amber">by default.</span></h3>
+      <p>Every treasury holding cash is implicitly accepting inflation risk — the slow, invisible transfer of purchasing power to those who benefit from monetary expansion. Bitcoin offers a structurally different choice. Not risk-free. Differently risky.</p>
+    </div>
+  </div>
+
+  <!-- TAB 2 -->
+  <div class="tab-content" id="tab-treasury">
+    <div class="cashflow-qualifier">
+      <div class="cq-title">Is your business cashflow positive?</div>
+      <div class="cq-desc">A Bitcoin treasury allocation is a strategy for operating businesses — and it is recommended only for those whose day-to-day operations do not depend on drawing from treasury reserves. If operations are funded by revenue, a Bitcoin drawdown is a paper loss you can hold through. If treasury capital is needed to fund operations, a drawdown introduces risk that becomes operational — and potentially existential. This tool covers one thing only: the reallocation of existing treasury assets. It does not recommend changing your operating business, issuing debt, or becoming a Bitcoin-focused company.</div>
+      <div class="cq-toggle">
+        <button class="cq-btn yes sel" id="cqYes" onclick="setCashflow(true)">✓ Yes — cashflow positive</button>
+        <button class="cq-btn no" id="cqNo" onclick="setCashflow(false)">✗ No — or not yet</button>
+      </div>
+      <div class="risk-warning" id="riskWarning">
+        <strong>Proceed with caution.</strong> A Bitcoin treasury strategy introduces risk that may be unnecessary for a business that relies on treasury capital for operations. If a 50–80% Bitcoin drawdown — which has occurred multiple times historically — would create operational stress, that risk may not be worth taking. This tool remains available for educational purposes. The strategy is best revisited when the business reaches sustained cashflow positivity.
+      </div>
+    </div>
+
+    <!-- Assumptions -->
+    <div class="calc-grid">
+      <div class="calc-block">
+        <div class="calc-block-title">Treasury Size</div>
+        <div class="opt-group" id="tSizeBtns">
+          <button class="opt-btn" data-val="100000" onclick="setSize(this)">$100K</button>
+          <button class="opt-btn" data-val="1000000" onclick="setSize(this)">$1M</button>
+          <button class="opt-btn sel" data-val="10000000" onclick="setSize(this)">$10M</button>
+          <button class="opt-btn" data-val="100000000" onclick="setSize(this)">$100M</button>
+          <button class="opt-btn" data-val="1000000000" onclick="setSize(this)">$1B</button>
+        </div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-block-title">Bitcoin Growth Assumption</div>
+        <div class="opt-group" id="cagrBtns">
+          <button class="opt-btn sel" data-val="powerlaw" onclick="setCagr(this)">Power Law model</button>
+          <button class="opt-btn" data-val="20" onclick="setCagr(this)">20% <span style="font-weight:400;font-size:.7em;opacity:.65">moderate</span></button>
+          <button class="opt-btn" data-val="10" onclick="setCagr(this)">10% <span style="font-weight:400;font-size:.7em;opacity:.65">conservative</span></button>
+        </div>
+        <div class="cagr-note" id="cagrNote">Current trend ~36%/yr, declining as adoption matures. Source: <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">porkopolis.io/thechart</a></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-block-title">Fiat Inflation / Money Supply Expansion</div>
+        <div class="opt-group" id="infl2Btns">
+          <button class="opt-btn" data-val="2" onclick="setInfl2(this)">2%</button>
+          <button class="opt-btn" data-val="4" onclick="setInfl2(this)">4%</button>
+          <button class="opt-btn sel" data-val="7" onclick="setInfl2(this)">7% USD avg</button>
+          <button class="opt-btn" data-val="10" onclick="setInfl2(this)">10%</button>
+        </div>
+      </div>
+      <div class="calc-block" style="display:flex;align-items:center;justify-content:center">
+        <div style="text-align:center">
+          <div style="font-family:var(--font-d);font-size:1rem;color:var(--text-dim);margin-bottom:4px">Holding cash is not neutral.</div>
+          <div style="font-size:.78rem;color:var(--text-muted)">It is a choice to accept inflation<br>as the price of certainty.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Allocation slider -->
+    <div class="alloc-block">
+      <div class="alloc-header">
+        <span class="alloc-title">Bitcoin Allocation</span>
+        <span class="alloc-display"><span id="allocPct">10</span>%</span>
+      </div>
+      <input type="range" id="allocSlider" class="alloc-slider" min="1" max="100" value="10" oninput="setAllocSlider(this)">
+      <div class="alloc-ticks">
+        <span>1%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-section">
+      <div class="chart-header">
+        <div class="chart-title">Real purchasing power over 20 years</div>
+        <div class="chart-toggles">
+          <button class="ct-btn" id="togFullBtc" onclick="toggleFullBtc()">Show 100% BTC</button>
+        </div>
+      </div>
+      <div class="chart-legend" id="chartLegend">
+        <div class="cl-item"><div class="cl-dot fiat"></div><span>100% Fiat (baseline)</span></div>
+        <div class="cl-item"><div class="cl-dot blend"></div><span id="legendBlend">10% BTC blend</span></div>
+        <div class="cl-item cl-fullbtc-item" style="display:none"><div class="cl-dot fullbtc"></div><span>100% BTC</span></div>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="t2Chart" height="280"></canvas>
+      </div>
+      <div class="year-scrubber">
+        <div class="ys-header">
+          <span class="ys-label">Expected Treasury Performance over Years</span>
+          <span class="ys-year" id="scrubYearLabel">Year 10</span>
+        </div>
+        <input type="range" id="yearScrubber" class="yr-slider" min="0" max="20" value="10" oninput="setScrubYear(this)">
+      </div>
+      <div class="callout-row">
+        <div class="co-stat cs-fiat">
+          <div class="cos-label">100% Fiat (baseline)</div>
+          <div class="cos-val" id="coFiat">—</div>
+          <div class="cos-sub">Real purchasing power</div>
+        </div>
+        <div class="co-stat cs-blend">
+          <div class="cos-label" id="coBlendLabel">BTC Blend</div>
+          <div class="cos-val" id="coBlend">—</div>
+          <div class="cos-sub" id="coBlendSub">inflation-adjusted</div>
+        </div>
+        <div class="co-stat cs-delta">
+          <div class="cos-label">Advantage</div>
+          <div class="cos-val" id="coDelta">—</div>
+          <div class="cos-sub">vs. 100% fiat</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawdown-disclosure">
+      Bitcoin has experienced drawdowns of 50–80% multiple times historically. For cashflow-positive businesses funded by revenue, a drawdown is a paper loss — not an operational one. No 4-year window in Bitcoin's history has ended below its starting price.
+    </div>
+
+    <div class="footnote">
+      <strong>Power Law model:</strong> The ~36% CAGR assumption is derived from Bitcoin's Power Law trend — a regression model with R²&gt;95% fitting Bitcoin's price to days since the genesis block (3 Jan 2009). The trend growth rate is currently ~42%/yr and declining toward ~30% by 2030 as adoption matures. Source: <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">porkopolis.io/thechart</a>. Not financial advice. Past performance does not guarantee future results.
+    </div>
+  </div>
+
+  <!-- TAB 3 -->
+  <div class="tab-content" id="tab-companies">
+    <div class="prose" style="margin-bottom:16px">
+      These figures are illustrative, based on approximate public treasury data as of 2024–2025. The purpose is not precision — it is perspective. At scale, even a modest allocation changes the arithmetic in ways that are difficult to dismiss.
+    </div>
+
+    <!-- Company selector -->
+    <div style="font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px">Treasury sizes (cash &amp; near-cash equivalents)</div>
+    <div class="company-cards" id="coCards">
+      <div class="co-card sel" data-treasury="157000000000" data-name="Apple" data-ticker="AAPL" onclick="selectCo(this)">
+        <div class="co-ticker">AAPL</div>
+        <div class="co-name">Apple</div>
+        <div class="co-treasury">Treasury ~$157B</div>
+      </div>
+      <div class="co-card" data-treasury="110000000000" data-name="Alphabet" data-ticker="GOOGL" onclick="selectCo(this)">
+        <div class="co-ticker">GOOGL</div>
+        <div class="co-name">Alphabet</div>
+        <div class="co-treasury">Treasury ~$110B</div>
+      </div>
+      <div class="co-card" data-treasury="78000000000" data-name="Microsoft" data-ticker="MSFT" onclick="selectCo(this)">
+        <div class="co-ticker">MSFT</div>
+        <div class="co-name">Microsoft</div>
+        <div class="co-treasury">Treasury ~$78B</div>
+      </div>
+      <div class="co-card" data-treasury="58000000000" data-name="Meta" data-ticker="META" onclick="selectCo(this)">
+        <div class="co-ticker">META</div>
+        <div class="co-name">Meta</div>
+        <div class="co-treasury">Treasury ~$58B</div>
+      </div>
+      <div class="co-card" data-treasury="50000000" data-name="Mid-Size Co." data-ticker="$50M" onclick="selectCo(this)">
+        <div class="co-ticker">$50M</div>
+        <div class="co-name">Mid-Size Co.</div>
+        <div class="co-treasury">Treasury (illustrative)</div>
+      </div>
+    </div>
+
+    <!-- Assumptions — same structure as Tab 2 -->
+    <div class="calc-grid">
+      <div class="calc-block">
+        <div class="calc-block-title">Bitcoin Growth Assumption</div>
+        <div class="opt-group" id="t3CagrBtns">
+          <button class="opt-btn sel" data-val="powerlaw" onclick="setT3Cagr(this)">Power Law model</button>
+          <button class="opt-btn" data-val="20" onclick="setT3Cagr(this)">20% <span style="font-weight:400;font-size:.7em;opacity:.65">moderate</span></button>
+          <button class="opt-btn" data-val="10" onclick="setT3Cagr(this)">10% <span style="font-weight:400;font-size:.7em;opacity:.65">conservative</span></button>
+        </div>
+        <div class="cagr-note" id="t3CagrNote">Current trend ~36%/yr, declining as adoption matures. Source: <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">porkopolis.io/thechart</a></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-block-title">Fiat Inflation / Money Supply Expansion</div>
+        <div class="opt-group" id="t3InflBtns">
+          <button class="opt-btn" data-val="2" onclick="setT3Infl(this)">2%</button>
+          <button class="opt-btn" data-val="4" onclick="setT3Infl(this)">4%</button>
+          <button class="opt-btn sel" data-val="7" onclick="setT3Infl(this)">7% USD avg</button>
+          <button class="opt-btn" data-val="10" onclick="setT3Infl(this)">10%</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Allocation slider -->
+    <div class="alloc-block">
+      <div class="alloc-header">
+        <span class="alloc-title">Bitcoin Allocation</span>
+        <span class="alloc-display"><span id="t3AllocPct">5</span>%</span>
+      </div>
+      <input type="range" id="t3AllocSlider" class="alloc-slider" min="1" max="100" value="5" oninput="setT3AllocSlider(this)">
+      <div class="alloc-ticks">
+        <span>1%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-section">
+      <div class="chart-header">
+        <div class="chart-title" id="t3ChartTitle">Apple — real treasury purchasing power over 20 years</div>
+        <div class="chart-toggles">
+          <button class="ct-btn" id="t3TogFullBtc" onclick="t3ToggleFullBtc()">Show 100% BTC</button>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <div class="cl-item"><div class="cl-dot fiat"></div><span>100% Fiat (baseline)</span></div>
+        <div class="cl-item"><div class="cl-dot blend"></div><span id="t3LegendBlend">5% BTC blend</span></div>
+        <div class="cl-item cl-t3-fullbtc-item" style="display:none"><div class="cl-dot fullbtc"></div><span>100% BTC</span></div>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="t3Chart" height="280"></canvas>
+      </div>
+      <div class="year-scrubber">
+        <div class="ys-header">
+          <span class="ys-label">Expected Treasury Performance over Years</span>
+          <span class="ys-year" id="t3ScrubYearLabel">Year 10</span>
+        </div>
+        <input type="range" id="t3YearScrubber" class="yr-slider" min="0" max="20" value="10" oninput="setT3ScrubYear(this)">
+      </div>
+      <div class="callout-row">
+        <div class="co-stat cs-fiat">
+          <div class="cos-label">100% Fiat (baseline)</div>
+          <div class="cos-val" id="t3CoFiat">—</div>
+          <div class="cos-sub">Real purchasing power</div>
+        </div>
+        <div class="co-stat cs-blend">
+          <div class="cos-label" id="t3CoBlendLabel">BTC Blend</div>
+          <div class="cos-val" id="t3CoBlend">—</div>
+          <div class="cos-sub" id="t3CoBlendSub">inflation-adjusted</div>
+        </div>
+        <div class="co-stat cs-delta">
+          <div class="cos-label">Advantage</div>
+          <div class="cos-val" id="t3CoDelta">—</div>
+          <div class="cos-sub">vs. 100% fiat</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footnote">
+      Treasury figures are approximate, based on publicly available financial data as of 2024–2025, and include cash, short-term investments, and marketable securities. Figures change quarterly and are presented for illustrative purposes only. Not financial advice.
+    </div>
+
+    <div class="takeaway">
+      <h3>Even 1% of Apple's treasury is <span class="amber">$1.57 billion</span> in Bitcoin.<br>The allocation is modest. <span class="blue-t">The math is not.</span></h3>
+      <p>This is not a strategy for companies to become Bitcoin treasury vehicles. It is a question for operating businesses: what is your treasury actually doing — and what does it cost to leave it unchanged?</p>
+    </div>
+  </div>
+
+</div><!-- /page -->

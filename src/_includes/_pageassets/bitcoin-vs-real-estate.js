@@ -1,0 +1,349 @@
+
+    const homeData={1965:20000,1970:23400,1975:39300,1980:64600,1985:82800,1990:122900,1995:133900,2000:169000,2005:240900,2010:222900,2013:268900,2014:282800,2015:294000,2016:306200,2017:323500,2018:326400,2019:321500,2020:336900,2021:401700,2022:454900,2023:426100,2024:420300,2025:416900};
+    const incomeData={1965:6957,1970:9867,1975:13719,1980:21023,1985:23620,1990:29940,1995:34076,2000:42148,2005:46326,2010:49276,2013:51939,2014:53657,2015:56516,2016:59039,2017:61372,2018:63179,2019:68703,2020:67521,2021:70784,2022:74580,2023:80610,2024:81500,2025:83150};
+    const btcData={2013:732,2014:530,2015:272,2016:567,2017:4348,2018:7565,2019:7362,2020:11072,2021:47458,2022:19657,2023:28233,2024:62682,2025:88000};
+    const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54,2019:3.94,2020:3.11,2021:2.96,2022:5.34,2023:6.81,2024:6.72,2025:6.80};
+
+    const gridColor='rgba(224,148,34,0.06)',tickColor='#6a6256',amber='#e09422',amberLight='rgba(224,148,34,0.15)',red='#c0392b',redLight='rgba(192,57,43,0.15)',textColor='#e8e0d4',greenColor='#27ae60';
+    Chart.defaults.font.family="'DM Sans',sans-serif";Chart.defaults.font.size=12;Chart.defaults.color=tickColor;
+    function cso(t){return{grid:{color:gridColor,drawBorder:false},ticks:{color:tickColor,font:{size:11}},title:{display:!!t,text:t,color:tickColor,font:{size:11,weight:400}}}}
+
+    // TAB 1: ERA BAR CHART
+    const eraLabels=['Gold Standard\n1890–1912','Fed Era\n1913–1943','Bretton Woods\n1944–1971','Early Fiat\n1971–2000','Late Fiat\n2000–2025','2025 →\n?'];
+    const eraRatios=[2.0,2.5,2.5,3.5,5.0,null];
+    new Chart(document.getElementById('eraBarChart'),{type:'bar',data:{labels:eraLabels,datasets:[{label:'Home-Price-to-Income Ratio',data:[2.0,2.5,2.5,3.5,5.0,null],backgroundColor:['rgba(39,174,96,0.7)','rgba(224,148,34,0.5)','rgba(224,148,34,0.6)','rgba(192,57,43,0.55)','rgba(192,57,43,0.75)','transparent'],borderColor:[greenColor,amber,amber,red,red,'transparent'],borderWidth:1.5,borderRadius:4,barPercentage:0.7}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,filter:c=>c.parsed.y!==null,callbacks:{title:c=>c[0].label.replace('\n',' · '),label:c=>'~'+c.parsed.y.toFixed(1)+'× income'}}},scales:{x:{...cso(),ticks:{color:function(c){return c.index===5?red:tickColor},font:{size:9},maxRotation:0,callback:function(v,i){return eraLabels[i].split('\n')}}},y:{...cso('Home-Price-to-Income Ratio'),min:0,max:6,ticks:{color:tickColor,font:{size:10},stepSize:1,callback:v=>v+'×'}}}}});
+
+    // TAB 1: DIVERGENCE
+    const divYears=[1985,1990,1995,2000,2005,2010,2015,2020,2025];
+    const homeIdx=divYears.map(y=>+((homeData[y]/homeData[1985])*100).toFixed(1));
+    const incIdx=divYears.map(y=>+((incomeData[y]/incomeData[1985])*100).toFixed(1));
+    new Chart(document.getElementById('divergenceChart'),{type:'line',data:{labels:divYears.map(String),datasets:[{label:'Home Prices',data:homeIdx,borderColor:red,backgroundColor:redLight,borderWidth:2.5,pointRadius:3,fill:true,tension:0.3},{label:'Household Income',data:incIdx,borderColor:greenColor,backgroundColor:'rgba(39,174,96,0.08)',borderWidth:2.5,pointRadius:3,fill:true,tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:24,color:tickColor,font:{size:10}}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(0)+' (indexed)'}}},scales:{x:{...cso()},y:{...cso('Index (1985 = 100)'),min:80}}}});
+
+    // TAB 2: BTC HOUSE with trend projection
+    const btcYears=Object.keys(btcData).map(Number);
+    const btcHouseValues=btcYears.map(y=>+(homeData[y]/btcData[y]).toFixed(1));
+    // Project trend to 2032 using log-linear regression on historical data
+    const projYears=[2026,2027,2028,2029,2030,2031,2032];
+    const allLabels=[...btcYears.map(String),...projYears.map(String)];
+    // Simple exponential decay projection from observed trend (~98.6% decline over 12 years)
+    const lastVal=btcHouseValues[btcHouseValues.length-1];
+    const projValues=projYears.map((y,i)=>{const decay=Math.pow(0.72,i+1);return+(lastVal*decay).toFixed(2)});
+    const historicalFull=[...btcHouseValues,...projYears.map(()=>null)];
+    const trendFull=[...btcYears.map(()=>null),...[lastVal,...projValues.slice(0,-1)]];
+    // Smooth trend line across full range for visual
+    const trendLineData=btcYears.map((y,i)=>{const t=(y-2013)/(2032-2013);return+(367*Math.pow(1.5/367,t)).toFixed(2)});
+    const trendLineFull=[...trendLineData,...projYears.map((y)=>{const t=(y-2013)/(2032-2013);return+(367*Math.pow(1.5/367,t)).toFixed(2)})];
+    new Chart(document.getElementById('btcHouseChart'),{type:'line',data:{labels:allLabels,datasets:[{label:'Actual',data:historicalFull,borderColor:amber,backgroundColor:amberLight,borderWidth:2.5,pointBackgroundColor:amber,pointRadius:4,pointHoverRadius:7,fill:true,tension:0.3},{label:'Trend',data:trendLineFull,borderColor:'rgba(224,148,34,0.4)',backgroundColor:'transparent',borderWidth:2,borderDash:[8,4],pointRadius:0,tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:20,color:tickColor,font:{size:10},filter:item=>item.text!=='Projection'}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,callbacks:{title:c=>c[0].label,label:c=>{const y=parseInt(c.label);const isProj=y>2025;if(c.datasetIndex===1)return'Trend: ~'+c.parsed.y.toFixed(1)+' BTC';if(isProj)return null;return[c.parsed.y.toFixed(1)+' BTC','House: $'+(homeData[y]||0).toLocaleString(),'BTC price: $'+(btcData[y]||0).toLocaleString()]}}}},scales:{x:{...cso(),ticks:{color:function(c){return c.index>12?'rgba(106,98,86,0.5)':tickColor},font:{size:9}}},y:{...cso('Bitcoin Required'),type:'logarithmic',min:1,ticks:{color:tickColor,font:{size:10},callback:v=>{const a=[1,2,5,10,20,50,100,200,500];return a.includes(v)?v.toLocaleString():''}}}}}});
+
+    // TAB 2: OPPORTUNITY COST CHART (indexed, log scale, fixed tooltips)
+    const ssHomeIdx=btcYears.map(y=>+((homeData[y]/homeData[2013])*100).toFixed(1));
+    const ssBtcIdx=btcYears.map(y=>+((btcData[y]/btcData[2013])*100).toFixed(1));
+    new Chart(document.getElementById('seesawChart'),{type:'line',data:{labels:btcYears.map(String),datasets:[{label:'Bitcoin',data:ssBtcIdx,borderColor:amber,backgroundColor:'rgba(224,148,34,0.08)',borderWidth:2.5,pointRadius:3,tension:0.3,fill:true},{label:'Housing',data:ssHomeIdx,borderColor:red,backgroundColor:'transparent',borderWidth:2.5,pointRadius:3,tension:0.3,borderDash:[6,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:24,color:tickColor,font:{size:10}}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,callbacks:{label:c=>{const pct=(c.parsed.y-100).toFixed(0);const sign=pct>=0?'+':'';return c.dataset.label+': '+sign+Number(pct).toLocaleString()+'% since 2013'}}}},scales:{x:{...cso()},y:{...cso('Growth of $1 Invested'),type:'logarithmic',min:30,ticks:{color:tickColor,font:{size:10},callback:v=>{const a=[50,100,200,500,1000,2000,5000,10000,12000];if(!a.includes(v))return'';if(v===100)return'$1 (start)';return'$'+(v/100).toFixed(0)}}}}}});
+
+    // TAB 2: HOUSES VISUAL with mortgage comparison
+    (function(){
+        const invest=60000;const endBtc=88000;const endHome=416900;
+        const scenarios=[
+            {year:2015,btcPrice:272,homePrice:294000,rate:3.85},
+            {year:2017,btcPrice:4348,homePrice:323500,rate:3.99},
+            {year:2019,btcPrice:7362,homePrice:321500,rate:3.94},
+            {year:2020,btcPrice:11072,homePrice:336900,rate:3.11}
+        ];
+        const houseFilled='<svg viewBox="0 0 24 24" width="26" height="26" style="margin:1px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3))"><path d="M3 13l9-9 9 9" fill="none" stroke="#e09422" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v7a1 1 0 001 1h12a1 1 0 001-1v-7" fill="none" stroke="#e09422" stroke-width="1.5"/><path d="M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.2"/></svg>';
+        const housePartial='<svg viewBox="0 0 24 24" width="26" height="26" style="margin:1px;opacity:0.25"><path d="M3 13l9-9 9 9" fill="none" stroke="#e09422" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v7a1 1 0 001 1h12a1 1 0 001-1v-7" fill="none" stroke="#e09422" stroke-width="1.5"/><path d="M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.2"/></svg>';
+        const houseFilled32=houseFilled.replace('width="26" height="26"','width="32" height="32"');
+        const housePartial32=housePartial.replace('width="26" height="26"','width="32" height="32"');
+        const houseHollow='<svg viewBox="0 0 24 24" width="26" height="26" style="margin:1px;opacity:0.35"><path d="M3 13l9-9 9 9" fill="none" stroke="#c0392b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v7a1 1 0 001 1h12a1 1 0 001-1v-7" fill="none" stroke="#c0392b" stroke-width="1.2" stroke-dasharray="3 2"/><path d="M10 20v-5h4v5" fill="none" stroke="#c0392b" stroke-width="1" stroke-dasharray="2 2"/></svg>';
+        function mp(p,r,y){const mr=r/100/12,n=y*12;return p*(mr*Math.pow(1+mr,n))/(Math.pow(1+mr,n)-1)}
+        let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;padding:0 0 0.8rem;border-bottom:1px solid var(--border);margin-bottom:0.2rem"><div style="border-right:1px solid var(--border);padding-right:1.5rem;font-size:0.82rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);font-weight:500">₿ Bought Bitcoin</div><div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--red);font-weight:500">🏠 Bought the House</div></div>';
+        scenarios.forEach(s=>{
+            const btcBought=invest/s.btcPrice;
+            const btcValue=btcBought*endBtc;
+            const houses=btcValue/endHome;
+            const fullH=Math.floor(houses);
+            const partial=houses-fullH;
+            let btcIcons='';
+            for(let i=0;i<Math.min(fullH,15);i++)btcIcons+=houseFilled;
+            if(partial>0.05)btcIcons+=housePartial;
+            if(fullH>15)btcIcons+='<span style="font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center">+'+(fullH-15)+' more\</span>';
+            // Mortgage reality
+            const loan=s.homePrice-invest;
+            const yrsElapsed=2025-s.year;
+            const monthlyPmt=mp(loan,s.rate,30);
+            const totalPaid=Math.round(invest+(monthlyPmt*yrsElapsed*12));
+            const mr2=s.rate/100/12;let bal=loan;for(let i=0;i<yrsElapsed*12;i++)bal=bal*(1+mr2)-monthlyPmt;bal=Math.max(0,Math.round(bal));
+            const equity=endHome-bal;
+            const equityPct=Math.round((equity/endHome)*100);
+
+            html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;padding:1.2rem 0;border-bottom:1px solid var(--border)">';
+            // BTC side
+            html+='<div style="border-right:1px solid var(--border);padding-right:1.5rem">';
+            html+='<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem"><div style="font-family:Cormorant Garamond,serif;font-size:1.1rem;color:var(--amber)">'+s.year+'</div><div style="font-size:0.82rem;color:var(--text-muted)">$'+invest.toLocaleString()+' → Bitcoin</div></div>';
+            html+='<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;line-height:1;min-height:32px">'+btcIcons+'</div>';
+            html+='<div style="font-size:0.85rem;color:var(--amber);margin-top:0.4rem;font-weight:500">'+houses.toFixed(1)+' houses <strong>outright</strong> · no debt</div>';
+            html+='</div>';
+            // Mortgage side
+            html+='<div>';
+            html+='<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem"><div style="font-family:Cormorant Garamond,serif;font-size:1.1rem;color:var(--red)">'+s.year+'</div><div style="font-size:0.82rem;color:var(--text-muted)">$'+invest.toLocaleString()+' → Down payment</div></div>';
+            var fillH=Math.max(0,Math.min(20,equityPct*0.20));var eqHouse='<svg viewBox="0 0 24 24" width="26" height="26" style="margin:1px"><defs><clipPath id="c'+s.year+'"><rect x="0" y="'+(24-fillH)+'" width="24" height="'+fillH+'"/></clipPath></defs><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="'+(equityPct>=100?'#e09422':'#c0392b')+'" stroke-width="1.5" stroke-linejoin="round"/><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linejoin="round" clip-path="url(#c'+s.year+')"/></svg>';html+='<div style="min-height:32px;display:flex;align-items:center;gap:0.5rem">'+eqHouse+'<span style="font-size:0.78rem;color:var(--text-muted)">'+(equityPct<0?'<span style=\'color:var(--red)\'>Underwater</span>':equityPct+'% owned')+'</span></div>';
+            html+='<div style="font-size:0.82rem;color:var(--text-muted);margin-top:0.4rem">1 house · '+equityPct+'% equity · <span style="color:var(--red)">$'+bal.toLocaleString()+' still owed</span></div>';
+            html+='</div>';
+            html+='</div>';
+        });
+        document.getElementById('housesVisual').innerHTML=html;
+    })();
+
+    // TAB 2: COMPARISON TABLE (fixed column)
+    (function(){
+        const startYears=[2014,2016,2018,2020,2022];
+        const endY=2025;
+        const thStyle='padding:0.6rem 0.8rem;color:var(--text-muted);font-size:0.78rem;text-transform:uppercase;letter-spacing:1px';
+        let rows='<tr style="border-bottom:1px solid var(--border)"><td style="'+thStyle+'">Start Year</td><td style="'+thStyle+'">BTC Return</td><td style="'+thStyle+'">Housing Return</td><td style="'+thStyle+'">Difference</td></tr>';
+        startYears.forEach(y=>{
+            const btcR=((btcData[endY]-btcData[y])/btcData[y]*100).toFixed(0);
+            const homeR=((homeData[endY]-homeData[y])/homeData[y]*100).toFixed(0);
+            const ratio=Math.round(btcR/Math.max(homeR,1));
+            rows+='<tr style="border-bottom:1px solid rgba(224,148,34,0.06)"><td style="padding:0.6rem 0.8rem;color:var(--text);font-weight:500">'+y+' → '+endY+'</td><td style="padding:0.6rem 0.8rem;color:var(--amber);font-weight:500">+'+Number(btcR).toLocaleString()+'%</td><td style="padding:0.6rem 0.8rem;color:var(--text-dim)">+'+(homeR<0?'':'')+homeR+'%</td><td style="padding:0.6rem 0.8rem;color:var(--amber);font-size:0.75rem">BTC returned '+ratio+' to 1</td></tr>';
+        });
+        document.getElementById('returnTable').innerHTML=rows;
+    })();
+
+    // TAB 4: BURDEN - line chart with threshold lines
+    function monthlyPayment(p,r,y){const mr=r/100/12,n=y*12;if(mr===0)return p/n;return p*(mr*Math.pow(1+mr,n))/(Math.pow(1+mr,n)-1)}
+    const burdenYears=btcYears;
+    const burdenValues=burdenYears.map(y=>{const p=homeData[y],d=p*0.2,l=p-d,r=mortgageRates[y],m=monthlyPayment(l,r,30),mi=incomeData[y]/12;return+((m/mi)*100).toFixed(1)});
+    // Threshold datasets
+    const costBurdened=burdenYears.map(()=>30);
+    const severelyBurdened=burdenYears.map(()=>40);
+    const breakingPoint=burdenYears.map(()=>50);
+    new Chart(document.getElementById('burdenChart'),{type:'line',data:{labels:burdenYears.map(String),datasets:[
+        {label:'Mortgage as % of Income',data:burdenValues,borderColor:amber,backgroundColor:amberLight,borderWidth:2.5,pointBackgroundColor:burdenValues.map(v=>v>=30?red:amber),pointRadius:5,pointHoverRadius:7,fill:true,tension:0.3},
+        {label:'Cost-Burdened (30%)',data:costBurdened,borderColor:'rgba(192,57,43,0.5)',borderWidth:1.5,borderDash:[8,4],pointRadius:0,fill:false},
+        {label:'Severely Burdened (40%)',data:severelyBurdened,borderColor:'rgba(192,57,43,0.3)',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false},
+        {label:'Breaking Point (50%)',data:breakingPoint,borderColor:'rgba(192,57,43,0.2)',borderWidth:1,borderDash:[2,4],pointRadius:0,fill:false}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:false,padding:16,color:tickColor,font:{size:9},filter:item=>item.text!=='Mortgage as % of Income'}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,filter:c=>c.datasetIndex===0,callbacks:{label:c=>{const v=c.parsed.y;const status=v>=30?' — cost-burdened':'';return v.toFixed(1)+'% of gross income'+status}}}},scales:{x:{...cso()},y:{...cso('% of Gross Monthly Income'),min:0,max:55,ticks:{color:tickColor,font:{size:10},stepSize:10,callback:v=>v+'%'}}}}});
+
+    // TAB 4: TOTAL COST - with gap multiplier labels
+    const costYears=[2015,2018,2021,2025];
+    const purchasePrices=costYears.map(y=>homeData[y]);
+    const totalCosts=costYears.map(y=>{const p=homeData[y],d=p*0.2,l=p-d,r=mortgageRates[y],m=monthlyPayment(l,r,30),tt=p*0.012*30,ti=1800*30,tm=p*0.01*30;return Math.round(d+(m*360)+tt+ti+tm)});
+    const costLabels=costYears.map(y=>'Purchased '+y);
+    const costMultipliers=costYears.map((y,i)=>(totalCosts[i]/purchasePrices[i]).toFixed(1));
+    // Custom plugin to draw multiplier labels
+    const multiplierPlugin={id:'multiplierLabels',afterDraw:function(chart){
+        const ctx=chart.ctx;const meta=chart.getDatasetMeta(1);
+        meta.data.forEach((bar,i)=>{
+            const x=bar.x;const y=bar.y-8;
+            ctx.save();ctx.textAlign='center';ctx.textBaseline='bottom';
+            ctx.font='bold 15px DM Sans,sans-serif';ctx.fillStyle=red;
+            ctx.fillText(costMultipliers[i]+'×',x,y-14);
+            ctx.font='11px DM Sans,sans-serif';ctx.fillStyle='#9a9080';
+            ctx.fillText('purchase price',x,y);
+            ctx.restore();
+        });
+    }};
+    new Chart(document.getElementById('totalCostChart'),{type:'bar',data:{labels:costLabels,datasets:[{label:'Purchase Price',data:purchasePrices,backgroundColor:'rgba(224,148,34,0.4)',borderColor:amber,borderWidth:1,borderRadius:3},{label:'True All-In Cost',data:totalCosts,backgroundColor:'rgba(192,57,43,0.5)',borderColor:red,borderWidth:1,borderRadius:3}]},plugins:[multiplierPlugin],options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:20,color:tickColor,font:{size:10}}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,callbacks:{label:c=>{if(c.datasetIndex===1)return c.dataset.label+': $'+c.parsed.y.toLocaleString()+' ('+costMultipliers[c.dataIndex]+'× purchase price)';return c.dataset.label+': $'+c.parsed.y.toLocaleString()}}}},scales:{x:{...cso(),ticks:{font:{size:9}}},y:{...cso('US Dollars'),ticks:{color:tickColor,font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
+
+    // TAB 3: CALCULATOR
+    function runCalculator(){
+        const sy=parseInt(document.getElementById('calcYear').value);
+        const mode=document.querySelector('.toggle-btn.active').dataset.mode;
+        const dca=document.getElementById('calcDCA').checked;
+        const ey=2025;
+        const medianHs=homeData[sy],medianHe=homeData[ey],bs=btcData[sy],be=btcData[ey];const _customRaw=(document.getElementById('customHomePrice')||{}).value||'';const _customNum=parseFloat(_customRaw.replace(/[$,\s]/g,''));const _customValid=!isNaN(_customNum)&&_customNum>=50000&&_customNum<=10000000;const hs=_customValid?_customNum:medianHs;const he=_customValid?Math.round(_customNum*(medianHe/medianHs)):medianHe;const _isCustom=_customValid;
+        const _prevailingRate=mortgageRates[sy];const _rateRaw=(document.getElementById('customRate')||{}).value||'';const _rateNum=parseFloat(_rateRaw.replace(/[%\s]/g,''));const _rateValid=!isNaN(_rateNum)&&_rateNum>=0.5&&_rateNum<=15;const rate=_rateValid?_rateNum:_prevailingRate;const _isCustomRate=_rateValid;const yrs=ey-sy;
+        const dp=mode==='cash'?hs:Math.round(hs*0.2);
+        const asOf='April 2025';
+        const medianRef=_isCustom?('vs. your $'+Math.round(hs).toLocaleString()+' home'):('median home: $'+he.toLocaleString());
+
+        // Assumptions display
+        const assumeEl=document.getElementById('calcAssumptions');
+        if(mode==='cash'){
+            assumeEl.innerHTML='<strong style="color:var(--text-dim)">Scenario:</strong> You had $'+dp.toLocaleString()+' in '+sy+' (median home price). You either bought the house outright in cash, or invested the full amount in bitcoin and continued renting.';
+        }else{
+            assumeEl.innerHTML='<strong style="color:var(--text-dim)">Scenario:</strong> You had $'+dp.toLocaleString()+' in '+sy+' (20% of median home price $'+hs.toLocaleString()+'). You either used it as a down payment with a 30-year fixed mortgage at '+rate+'%'+(_isCustomRate?' <span style="font-size:0.78rem;color:var(--text-muted)">(vs. prevailing '+_prevailingRate+'%)</span>':'')+', or invested it in bitcoin and rented instead.';
+        }
+
+        // ── SHARED CALCS ──
+        const bb=dp/bs;
+        const lumpValue=bb*be;
+        const lumpReturn=((lumpValue-dp)/dp*100).toFixed(0);
+        const mortgageMonthly=monthlyPayment(hs*0.8,rate,30);
+        const _defaultRent=Math.round(mortgageMonthly*0.75);const _rentRaw=(document.getElementById('customRent')||{}).value||'';const _rentNum=parseFloat(_rentRaw.replace(/[$,\s]/g,''));const _rentValid=!isNaN(_rentNum)&&_rentNum>=100&&_rentNum<=50000;const _isCustomRent=_rentValid;const estRent=_rentValid?Math.round(_rentNum):_defaultRent;
+        const totalRentPaid=estRent*yrs*12;
+        const lumpNet=lumpValue-totalRentPaid;
+        const lumpHouses=lumpNet/he;
+
+        // ── HOUSE SIDE ──
+        let houseEquity=0,monthlyMortgage=0,houseTotalSpent=0,remainingBal=0,equityPct=0,debtFreeYear=sy+30;
+        let hL,hD;
+        if(mode==='cash'){
+            const ha=((he-hs)/hs*100).toFixed(1);
+            houseEquity=he;houseTotalSpent=hs;remainingBal=0;equityPct=100;debtFreeYear=sy;
+            monthlyMortgage=mortgageMonthly;
+            hL='$'+Math.round(he).toLocaleString();
+            var _cv='<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.8rem"><svg viewBox="0 0 24 24" width="32" height="32"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="var(--amber)" fill-opacity="0.18" stroke="#e09422" stroke-width="1.7" stroke-linejoin="round"/></svg><span style="font-size:0.9rem;color:var(--text)">1 house, outright</span></div>';
+            hD=_cv+'Home appreciation: '+ha+'%<br>'+
+               'Current value: $'+Math.round(he).toLocaleString()+(_isCustom?' <span style="font-size:0.78rem;color:var(--text-muted)">(applied same appreciation rate)</span>':'')+'<br>'+
+               'Rent paid: $0 <span style="font-size:0.78rem;color:var(--text-muted)">(you live in it)</span><br>'+
+               'No debt — but no bitcoin either';
+        }else{
+            const la=hs*0.8;monthlyMortgage=monthlyPayment(la,rate,30);
+            const mps=yrs*12;const r=rate/100/12;
+            let bal=la;for(let i=0;i<mps;i++)bal=bal*(1+r)-monthlyMortgage;bal=Math.max(0,bal);
+            remainingBal=bal;houseEquity=he-bal;equityPct=Math.round((houseEquity/he)*100);debtFreeYear=sy+30;
+            const pt=hs*0.012*yrs,ins=150*mps,mnt=hs*0.01*yrs;
+            houseTotalSpent=(monthlyMortgage*mps)+dp+pt+ins+mnt;
+            const interestMain=Math.round((monthlyMortgage*mps)-(la-bal));
+            hL='$'+Math.round(houseEquity).toLocaleString();
+            var _fh=Math.max(0,Math.min(20,equityPct*0.20));var _ev='<div style=\"display:flex;align-items:center;gap:0.6rem;margin-bottom:0.8rem\"><svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\"><defs><clipPath id=\"ec\"><rect x=\"0\" y=\"'+(24-_fh)+'\" width=\"24\" height=\"'+_fh+'\"/></clipPath></defs><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"'+(equityPct>=100?'#e09422':'#c0392b')+'\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.5\" stroke-linejoin=\"round\" clip-path=\"url(#ec)\"/></svg><span style=\"font-size:0.9rem;color:var(--text)\">'+(equityPct<0?'<span style=\\\'color:var(--red)\\\'>Underwater</span>':equityPct+'% owned')+'</span></div>';hD=_ev+
+               'Monthly mortgage: $'+Math.round(monthlyMortgage).toLocaleString()+'/mo<br>'+
+               'Interest paid so far: <span style="color:var(--red)">$'+interestMain.toLocaleString()+'</span> <span style="font-size:0.78rem;color:var(--text-muted)">(dead money)</span><br>'+
+               'Remaining loan: <span style="color:var(--red)">$'+Math.round(bal).toLocaleString()+'</span><br>'+
+               'Rent paid: $0 <span style="font-size:0.78rem;color:var(--text-muted)">(you live in it)</span>';
+        }
+
+        // ── MAIN CARDS ──
+        document.getElementById('calcResultsContainer').innerHTML=
+            '<div class="calc-result-card bitcoin">'+
+                '<h4>\u20BF Bought Bitcoin + Rented ('+sy+')</h4>'+
+                '<div class="period-label">'+sy+' \u00B7 Purchased</div>'+
+                '<div class="invested-line">Invested <strong>$'+dp.toLocaleString()+'</strong>'+(mode==='leverage'?' <span class="note">(20% down)</span>':' <span class="note">(cash equivalent)</span>')+'</div>'+
+                '<div class="period-divider"></div>'+
+                '<div class="period-label">'+asOf+' \u00B7 Current</div>'+
+                '<div class="result-value">$'+Math.round(lumpValue).toLocaleString()+' <span style="font-size:0.85rem;color:var(--text-muted)">gross</span></div>'+
+                '<div class="result-detail">'+(function(){var lh=lumpHouses;var fH=Math.floor(lh);var pt=lh-fH;var ic='';var fI='<svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" style=\"margin:1px\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/></svg>';var pI='<svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" style=\"margin:1px;opacity:0.45\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.2\" stroke-dasharray=\"2 2\" stroke-linejoin=\"round\"/></svg>';for(var i=0;i<Math.min(fH,15);i++)ic+=fI;if(pt>0.05)ic+=pI;var ov=fH>15?'<span style=\"font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center\">+'+(fH-15)+' more</span>':'';return '<div style=\"display:flex;flex-wrap:wrap;align-items:center;gap:0;margin-bottom:0.8rem\">'+ic+ov+'</div>';})()+
+                    'BTC purchased: '+bb.toFixed(2)+' @ $'+bs.toLocaleString()+'<br>'+
+                    'Est. monthly rent: $'+estRent.toLocaleString()+'/mo'+(mode==='leverage'?(' <span style="font-size:0.78rem;color:var(--text-muted)">(vs. mortgage $'+Math.round(mortgageMonthly).toLocaleString()+')</span>'):'')+'<br>'+
+                    'Total rent paid: $'+totalRentPaid.toLocaleString()+'<br>'+
+                    '<span style="color:var(--amber);font-weight:500">Net position: $'+Math.round(lumpNet).toLocaleString()+'</span><br>'+
+                    '<span style="color:var(--amber);font-weight:500">You could now buy '+lumpHouses.toFixed(1)+' houses <strong>outright</strong></span> <span style="font-size:0.78rem;color:var(--text-muted)">('+medianRef+')</span><br>'+
+                    '<span style="font-size:0.78rem;color:var(--text-muted);display:block;margin-top:0.4rem">No leverage. No interest. No property taxes. No maintenance.</span>'+
+                '</div>'+
+            '</div>'+
+            '<div class="calc-result-card house">'+
+                '<h4>\uD83C\uDFE0 Bought the House ('+sy+')</h4>'+
+                '<div class="period-label">'+sy+' \u00B7 Purchased</div>'+
+                '<div class="invested-line">Invested <strong>$'+dp.toLocaleString()+'</strong>'+(mode==='leverage'?' <span class="note">(20% down of $'+hs.toLocaleString()+')</span>':' <span class="note">(cash, paid in full)</span>')+'</div>'+
+                '<div class="period-divider"></div>'+
+                '<div class="period-label">'+asOf+' \u00B7 Current</div>'+
+                '<div class="result-value">'+hL+'</div>'+
+                '<div class="result-detail">'+hD+'</div>'+
+            '</div>';
+
+        // ── DCA SECTION ──
+        const dcaContainer=document.getElementById('dcaResultContainer');
+        const totalSummary=document.getElementById('totalSummary');
+        const totalWrapper=document.getElementById('totalSummaryWrapper');
+
+        if(dca){
+            const monthlySavings=Math.round(mortgageMonthly-estRent);
+            let dcaBtc=0,dcaTotalInvested=0;
+            for(let yr=sy;yr<ey;yr++){
+                const ybp=btcData[yr]||btcData[ey];
+                dcaBtc+=(monthlySavings/ybp)*12;
+                dcaTotalInvested+=monthlySavings*12;
+            }
+            const dcaValue=dcaBtc*be;
+            const totalBtc=bb+dcaBtc;
+            const totalBtcValue=totalBtc*be;
+            const totalBtcNet=totalBtcValue-totalRentPaid;
+            const totalHouses=totalBtcNet/he;
+            const extraHouses=totalHouses-1;
+            const totalInvested=dp+dcaTotalInvested;
+            const yrsRemaining=debtFreeYear-2025;
+            const principalRepaid=(hs*0.8)-remainingBal;
+            const interestPaid=Math.round((mortgageMonthly*yrs*12)-principalRepaid);
+            const houseOutflow=Math.round(houseTotalSpent);
+            const btcOutflow=Math.round(totalInvested+totalRentPaid);
+
+            dcaContainer.innerHTML=
+                '<div class="calc-result-card bitcoin" style="border-style:dashed">'+
+                    '<h4>\u20BF Monthly DCA — Rent vs. Mortgage Savings</h4>'+
+                    '<div class="result-value">$'+Math.round(dcaValue).toLocaleString()+'</div>'+
+                    '<div class="result-detail">'+
+                        'Est. mortgage: $'+Math.round(mortgageMonthly).toLocaleString()+'/mo<br>'+
+                        'Est. rent: $'+estRent.toLocaleString()+'/mo<br>'+
+                        'Monthly DCA into BTC: <span style="color:var(--amber)">$'+monthlySavings.toLocaleString()+'/mo</span><br>'+
+                        'BTC accumulated: '+dcaBtc.toFixed(2)+' BTC<br>'+
+                        '<span>Total invested via DCA: $'+dcaTotalInvested.toLocaleString()+'</span>'+
+                    '</div>'+
+                '</div>';
+
+            const ls='font-size:0.88rem;line-height:2.2;';
+            const lm='color:var(--text-muted)';
+            const lr='color:var(--red)';
+            const la='color:var(--amber)';
+            totalWrapper.style.display='block';
+            var _bh = (function(){var hf='<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.5" stroke-linejoin="round"/></svg>';var hp='<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px;opacity:0.3"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.5" stroke-dasharray="2 2" stroke-linejoin="round"/></svg>';var lh=Math.max(0,totalHouses);var fH=Math.floor(lh);var pt=lh-fH;var ic="";for(var i=0;i<Math.min(fH,15);i++)ic+=hf;if(pt>0.05)ic+=hp;if(fH===0&&pt<=0.05)ic+=hp;var ov=fH>15?('<span style="font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center">+'+(fH-15)+' more</span>'):"";return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:0.4rem 0 0.6rem">'+ic+ov+'</div>';})();
+            totalSummary.innerHTML=
+                '<div style="background:var(--bg-card);border:1px solid var(--amber-dim);border-radius:8px;padding:1.5rem 2rem">'+
+                    '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);margin-bottom:0.5rem">\u20BF Bitcoin — Total Position</div>'+
+                    '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.3rem">$'+Math.round(totalBtcNet).toLocaleString()+' <span style="font-size:0.8rem;color:var(--text-muted)">net</span></div>'+_bh+
+                    '<div style="font-size:0.78rem;color:var(--amber-dim);margin-bottom:0.6rem">values as of '+asOf+'</div>'+
+                    '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'+
+                        '<div style="'+ls+la+'">You could now buy <strong>the house, outright</strong></div>'+
+                        '<div style="'+ls+la+'">Debt outstanding: $0</div>'+
+                        (mode==='leverage'?'<div style="'+ls+la+'">Interest paid: $0</div>':'')+
+                        '<div style="'+ls+la+'">Debt-free: <strong>now</strong></div>'+
+                        '<div style="'+ls+la+';font-weight:600">You could now buy '+extraHouses.toFixed(1)+' additional houses, also outright <span style="color:var(--text-muted);font-weight:400;font-size:0.82rem">('+(1+extraHouses).toFixed(1)+' total)</span></div>'+
+                        '<div style="'+ls+'color:var(--text-dim)">Rent paid: $'+totalRentPaid.toLocaleString()+'</div>'+
+                        '<div style="'+ls+'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: $'+btcOutflow.toLocaleString()+'</div>'+
+                    '</div>'+
+                '</div>'+
+                '<div style="background:var(--bg-card);border:1px solid var(--red-dim);border-radius:8px;padding:1.5rem 2rem">'+
+                    '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--red);margin-bottom:0.5rem">\uD83C\uDFE0 House — Total Position</div>'+
+                    '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--text-dim);margin-bottom:0.3rem">$'+Math.round(houseEquity).toLocaleString()+'</div>'+(function(){var fh=Math.max(0,Math.min(20,equityPct*0.20));var st=equityPct>=100?'#e09422':'#c0392b';return '<div style="display:flex;align-items:center;gap:0.6rem;margin:0.4rem 0 0.6rem"><svg viewBox="0 0 24 24" width="32" height="32"><defs><clipPath id="tlc"><rect x="0" y="'+(24-fh)+'" width="24" height="'+fh+'"/></clipPath></defs>'+'<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="'+st+'" stroke-width="1.5" stroke-linejoin="round"/>'+'<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.7" stroke-linejoin="round" clip-path="url(#tlc)"/></svg>'+'<span style="font-size:0.85rem;color:var(--text-muted)">'+(equityPct>=100?'fully owned':equityPct+'% owned')+'</span></div>';})()+
+                    '<div style="font-size:0.78rem;'+lm+';margin-bottom:0.6rem">values as of '+asOf+'</div>'+
+                    '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'+
+                        '<div style="'+ls+lm+'">Ownership: <span style="color:var(--text)">'+equityPct+'% of 1 home</span></div>'+
+                        (mode==='leverage'?'<div style="'+ls+lr+'">Debt outstanding: $'+Math.round(remainingBal).toLocaleString()+'</div>':'')+
+                        (mode==='leverage'?'<div style="'+ls+lr+'">Interest paid: $'+interestPaid.toLocaleString()+' <span style="'+lm+';font-size:0.78rem">(dead money)</span></div>':'')+
+                        (mode==='leverage'?'<div style="'+ls+lr+'">Debt-free: '+debtFreeYear+' <span style="'+lm+'">('+yrsRemaining+' yrs away)</span></div>':'')+
+                        '<div style="'+ls+lm+'">Rent paid: $0 <span style="font-size:0.78rem">(you live in it)</span></div>'+
+                        '<div style="'+ls+'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: $'+houseOutflow.toLocaleString()+'</div>'+
+                    '</div>'+
+                '</div>';
+        }else{
+            dcaContainer.innerHTML='';
+            totalWrapper.style.display='none';
+            totalSummary.innerHTML='';
+        }
+        var _crUpdate=document.getElementById('customRent');if(_crUpdate&&typeof _defaultRent!=='undefined'){_crUpdate.placeholder='$'+_defaultRent.toLocaleString()+' (our estimate)';}
+    }
+
+    // EVENT LISTENERS
+    // Hash-based tab routing
+    var tabMap={'crisis':'affordability','btc-house':'priced-in-bitcoin','calculator':'postponed-purchase','ceiling':'the-ceiling'};
+    var reverseMap={};Object.keys(tabMap).forEach(function(k){reverseMap[tabMap[k]]=k});
+    function activateTab(tabId){
+        document.querySelectorAll('.tab-btn').forEach(function(x){x.classList.remove('active')});
+        document.querySelectorAll('.tab-panel').forEach(function(x){x.classList.remove('active');x.classList.add('js-hidden')});
+        var btn=document.querySelector('.tab-btn[data-tab="'+tabId+'"]');
+        var panel=document.getElementById('panel-'+tabId);
+        if(btn)btn.classList.add('active');
+        if(panel){panel.classList.add('active');panel.classList.remove('js-hidden')}
+        setTimeout(function(){window.dispatchEvent(new Event('resize'))},100);
+    }
+    function initTabFromHash(){
+        var hash=window.location.hash.replace('#','');
+        if(hash&&reverseMap[hash]){activateTab(reverseMap[hash])}
+        else{
+            document.querySelectorAll('.tab-panel').forEach(function(x){if(!x.classList.contains('active'))x.classList.add('js-hidden')});
+        }
+    }
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.addEventListener('click',function(){
+        activateTab(b.dataset.tab);
+        var slug=tabMap[b.dataset.tab]||b.dataset.tab;
+        history.replaceState(null,null,'#'+slug);
+    })});
+    window.addEventListener('hashchange',initTabFromHash);
+    initTabFromHash();
+    document.querySelectorAll('.toggle-btn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.toggle-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');runCalculator()})});
+    document.getElementById('calcYear').addEventListener('change',function(){var cp=document.getElementById('customHomePrice');if(cp){cp.value='';var y=parseInt(this.value);var m=homeData[y];if(m)cp.placeholder='$'+m.toLocaleString()+' ('+y+' median)';}var cr=document.getElementById('customRent');if(cr){cr.value='';}var crt=document.getElementById('customRate');if(crt){crt.value='';var yr=parseInt(this.value);var mr=mortgageRates&&mortgageRates[yr];if(mr)crt.placeholder=mr+'% ('+yr+' avg)';}runCalculator();});var _cpEl=document.getElementById('customHomePrice');if(_cpEl){_cpEl.addEventListener('input',runCalculator);var _yVal=parseInt(document.getElementById('calcYear').value);if(homeData[_yVal])_cpEl.placeholder='$'+homeData[_yVal].toLocaleString()+' ('+_yVal+' median)';}var _crEl=document.getElementById('customRent');if(_crEl){_crEl.addEventListener('input',runCalculator);}var _crtEl=document.getElementById('customRate');if(_crtEl){_crtEl.addEventListener('input',runCalculator);var _yrInit=parseInt(document.getElementById('calcYear').value);if(mortgageRates[_yrInit])_crtEl.placeholder=mortgageRates[_yrInit]+'% ('+_yrInit+' avg)';}
+    document.getElementById('calcDCA').addEventListener('change',function(){
+        document.getElementById('dcaSection').style.display=this.checked?'block':'none';
+        runCalculator();
+    });
+    runCalculator();
+    

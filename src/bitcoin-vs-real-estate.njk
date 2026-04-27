@@ -1,0 +1,196 @@
+---
+layout: base.njk
+permalink: /bitcoin-vs-real-estate.html
+slug: bitcoin-vs-real-estate
+eleventyComputed:
+  head_extras: "{% include '_pageassets/bitcoin-vs-real-estate-head.html' %}"
+  page_styles: "{% include '_pageassets/bitcoin-vs-real-estate.css' %}"
+  page_scripts: "{% include '_pageassets/bitcoin-vs-real-estate.js' %}"
+  body_chrome: "{% include '_pageassets/bitcoin-vs-real-estate-chrome.html' %}"
+---
+<section class="hero">
+        <div class="hero-label">Monetary Structure × Real Estate</div>
+        <h1><em>Bitcoin</em> vs. Real Estate</h1>
+        <div class="hero-subtitle">The Opportunity Cost</div>
+        <p class="subtitle">A house didn't used to be an investment. Under sound money, it was shelter — bought with savings, costing two to three years of income. Fiat money broke that. Bitcoin fixes it.</p>
+    </section>
+
+    <main class="content-area">
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="calculator">The Postponed Purchase</button>
+            <button class="tab-btn" data-tab="btc-house">A Home Priced in Bitcoin</button>
+            <button class="tab-btn" data-tab="ceiling">The Ceiling</button>
+            <button class="tab-btn" data-tab="crisis">The Affordability Crisis</button>
+        </div>
+
+        <!-- TAB 1 -->
+        <div class="tab-panel" id="panel-crisis">
+            <div class="section-intro">
+                <h2>A House Didn't Used to Be <em>an Investment</em></h2>
+                <p>For most of American history, a house was shelter. A consumable. Something you saved for and bought outright. The home-price-to-income ratio hovered around 2–3× for decades under sound money — the classical gold standard, the belle époque, even the managed gold standard of Bretton Woods. Then fiat happened. Each loosening of the monetary constraints — the Federal Reserve Act (1913), Roosevelt's break from gold convertibility (1933), the Nixon Shock (1971) — pushed housing further from utility value and closer to its current role: the world's largest store of value, inflated by the structural failure of the money itself.</p>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card"><div class="stat-value" style="color:var(--green)">~2×</div><div class="stat-label">Price-to-Income · Gold Standard</div></div>
+                <div class="stat-card"><div class="stat-value">~3×</div><div class="stat-label">Price-to-Income · Bretton Woods</div></div>
+                <div class="stat-card"><div class="stat-value negative">5.0×</div><div class="stat-label">Price-to-Income · 2025</div></div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">Home-Price-to-Income Ratio by Monetary Regime</div>
+                <div class="chart-subtitle">135 years of US housing affordability across five monetary eras · 1890–2025</div>
+                <div class="chart-wrapper"><canvas id="eraBarChart"></canvas></div>
+                <div class="chart-source">Sources: Shiller Home Price Index (1890–), U.S. Census Bureau (MSPUS), BLS, FRED. Pre-1950 ratios derived from historical wage and housing data.</div>
+            </div>
+
+            <div class="narrative"><p>The pattern is unmistakable. Under the classical gold standard, with the dollar pegged at $20.67 per ounce, housing prices tracked incomes closely. The Federal Reserve Act of 1913 introduced the machinery of monetary expansion, but the gold peg initially constrained it. <strong>The critical inflection came in April 1933</strong>, when Roosevelt revoked gold convertibility and transformed federal debt from a claim on gold into a claim on dollars — what economists call the "Nominal Revolution." This enabled unbacked fiscal expansion that reflated asset prices, including housing, without a corresponding rise in real incomes. The 1971 Nixon Shock completed the transition, removing the last constraint. <em>Each step loosened the monetary straitjacket; each step pushed housing further from shelter toward speculation.</em></p></div>
+
+            <div class="chart-container" style="padding:0.5rem 0">
+                <div style="padding:1.5rem 2rem 0.5rem"><div class="chart-title">The Monetary Eras</div><div class="chart-subtitle">How each regime change altered the structural relationship between housing and income</div></div>
+                <div class="era-timeline">
+                    <div class="era-block sound"><div class="era-period">1890 – 1912</div><div class="era-info"><div class="era-name">Classical Gold Standard</div><div class="era-desc">Dollar pegged at $20.67/oz. No mechanism to reflate assets. Housing prices essentially flat in real terms for decades. Deflationary orthodoxy — houses bought with savings.</div></div><div class="era-ratio"><div class="ratio-value">~2×</div><div class="ratio-label">ratio</div></div></div>
+                    <div class="era-block transition"><div class="era-period">1913 – 1943</div><div class="era-info"><div class="era-name">Federal Reserve Era &amp; the Nominal Revolution</div><div class="era-desc">Fed created in 1913. Price level inflated 60% above the long-run average by the 1920s. The resulting debt-deflation crash of the early 1930s crushed both prices and incomes. In April 1933, Roosevelt broke gold convertibility — transforming federal debt from a claim on gold into a claim on dollars. This "Nominal Revolution" enabled unbacked fiscal expansion, but the Depression and WW2 suppressed the ratio through the period.</div></div><div class="era-ratio"><div class="ratio-value">~2.5×</div><div class="ratio-label">ratio</div></div></div>
+                    <div class="era-block transition"><div class="era-period">1944 – 1971</div><div class="era-info"><div class="era-name">Bretton Woods — Managed Gold Standard</div><div class="era-desc">Global debt becomes claims to dollars, not gold directly. Semblance of constraint maintained. GI Bill subsidizes homeownership. Ratio stable but creeping upward as the machinery of monetary expansion, established in 1913–1933, begins to compound.</div></div><div class="era-ratio"><div class="ratio-value">~2.5×</div><div class="ratio-label">ratio</div></div></div>
+                    <div class="era-block fiat"><div class="era-period">1971 – 2000</div><div class="era-info"><div class="era-name">Pure Fiat — Early Era</div><div class="era-desc">Nixon severs last link to gold. No remaining constraint on monetary expansion. Capital flees to real assets. Housing transforms from shelter to store of value. The ratio climbs relentlessly.</div></div><div class="era-ratio"><div class="ratio-value">~3.5×</div><div class="ratio-label">ratio</div></div></div>
+                    <div class="era-block fiat"><div class="era-period">2000 – 2025</div><div class="era-info"><div class="era-name">Pure Fiat — Late Era</div><div class="era-desc">Dot-com crash, 2008 crisis, COVID stimulus — each met with massive unbacked fiscal expansion. $5 trillion+ in pandemic response alone. Housing reaches historic peaks relative to income.</div></div><div class="era-ratio"><div class="ratio-value">~5×</div><div class="ratio-label">ratio</div></div></div>
+                    <div class="era-block fiat" style="border-bottom:none;background:rgba(192,57,43,0.04)"><div class="era-period" style="color:var(--red)">2025 → ?</div><div class="era-info"><div class="era-name" style="color:var(--red)">How Much Further?</div><div class="era-desc">Without a structural change to the monetary system, the ratio has no anchor. More fiscal expansion, more monetary debasement, more capital forced into housing. But a counterforce has emerged — bitcoin, the first money with a fixed supply, is absorbing the store-of-value premium that fiat money forced into real estate. The question is no longer how high the ratio can go. The question is whether bitcoin reverses it.</div></div><div class="era-ratio"><div class="ratio-value" style="color:var(--red)">?</div><div class="ratio-label">ratio</div></div></div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">The Divergence: Home Prices vs. Incomes</div>
+                <div class="chart-subtitle">Indexed to 100 in 1985 — nominal growth comparison · Home prices up +403%, incomes up +252%</div>
+                <div class="chart-wrapper"><canvas id="divergenceChart"></canvas></div>
+                <div class="chart-source">Sources: U.S. Census Bureau, Bureau of Labor Statistics, FRED</div>
+            </div>
+
+            <div class="narrative"><p>For over a century, this trend has been unbroken — because there was no alternative. No asset could absorb the store-of-value premium that broken money was forcing into housing. Gold was confiscated, regulated, and impractical for daily savings. Bonds were denominated in the same depreciating currency. Stocks required expertise and carried counterparty risk. Housing became the default by elimination, not by merit. <strong>Bitcoin changes this equation structurally.</strong> As a bearer asset with absolute scarcity, zero carrying costs, and no counterparty risk, it offers what housing never could — a pure store of value that doesn't require a mortgage, property taxes, or maintenance. <em>If bitcoin absorbs even a fraction of the monetary premium currently trapped in global real estate, the home-price-to-income ratio begins its reversion toward the historical norm of 2–3×.</em></p></div>
+
+            <div class="annotation"><strong>The fiat premium in housing:</strong> The gap between the home-price line and the income line in the chart above is the store-of-value premium that broken money has forced into real estate. Under a sound money standard, these lines tracked closely — as they did for most of American history. Bitcoin offers the structural path back to a world where houses are priced at their utility value, not their monetary premium. Explore the next tab to see this in action.</div>
+        </div>
+
+        <!-- TAB 2 -->
+        <div class="tab-panel" id="panel-btc-house">
+            <div class="section-intro"><h2>Your Home Has Been <em>Deflating</em></h2><p style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;color:var(--text-muted);margin-bottom:1.2rem">measured in the new sound money standard</p><p>You think your house appreciated. In dollar terms, it did. But price the same house in bitcoin — the first money with an absolutely fixed supply — and the picture inverts entirely. What looks like relentless appreciation reveals itself as relentless depreciation. The house isn't getting more valuable. The dollar is getting weaker. And bitcoin is exposing it.</p></div>
+            <div class="stats-row">
+                <div class="stat-card"><div class="stat-value">367</div><div class="stat-label">BTC for a House · 2013</div></div>
+                <div class="stat-card"><div class="stat-value">74</div><div class="stat-label">BTC for a House · 2017</div></div>
+                <div class="stat-card"><div class="stat-value">~5</div><div class="stat-label">BTC for a House · 2025</div></div>
+                <div class="stat-card"><div class="stat-value">?</div><div class="stat-label">BTC for a House · 2030</div></div>
+            </div>
+            <div class="chart-container"><div class="chart-title">BTC Required to Buy the Median US House</div><div class="chart-subtitle">Annual average bitcoin price vs. median home sale price · 2013–2025, with projected trend to 2032</div><div class="chart-wrapper"><canvas id="btcHouseChart"></canvas></div><div class="chart-source">Sources: FRED (MSPUS), CoinGecko, CoinMarketCap — annual averages. Projected trend based on historical trajectory; not a price prediction.</div></div>
+            <div class="narrative"><p>Yes, the line is volatile — Bitcoin is volatile. But look at the <em>direction</em>. In 2013, you needed 367 bitcoin to buy the median US house. By 2025, you needed roughly 5. That's a 98.6% decline in the bitcoin-denominated cost of housing. <strong>No amount of fiat appreciation in home values can disguise what is happening on this chart.</strong> The house is demonetizing — shedding its store-of-value premium — as bitcoin absorbs the monetary energy that was artificially trapped in real estate. The trend line tells you where this is heading, even if the path is jagged.</p></div>
+
+            <!-- Houses You Could Buy visual -->
+            <div class="chart-container">
+                <div class="chart-title">What If You Had Bought Bitcoin Instead?</div>
+                <div class="chart-subtitle">$60,000 — used as a down payment vs. invested in bitcoin. Two very different realities.</div>
+                <div id="housesVisual" style="padding:1rem 0"></div>
+                <div class="chart-source">Based on $60,000 at each year's average BTC price, valued at 2025 BTC price of $88,000 vs. 2025 median home of $416,900. Mortgage assumes 20% down, 30-year fixed at prevailing rate.</div>
+            </div>
+
+            <div class="chart-container"><div class="chart-title">The Real Opportunity Cost of Buying a House</div><div class="chart-subtitle">Growth of $1 invested in 2013 — bitcoin vs. housing (log scale)</div><div class="chart-wrapper"><canvas id="seesawChart"></canvas></div><div class="chart-source">Sources: FRED, CoinGecko</div></div>
+
+            <!-- Multi-year comparison table -->
+            <div class="chart-container" style="padding:1.5rem 2rem">
+                <div class="chart-title">It's Not Just Since 2013</div>
+                <div class="chart-subtitle">Bitcoin outperformed housing from every starting year — even recent ones</div>
+                <div style="margin-top:1rem;overflow-x:auto">
+                    <table id="returnTable" style="width:100%;border-collapse:collapse;font-size:0.8rem"></table>
+                </div>
+            </div>
+
+            <div class="annotation"><strong>The structural argument:</strong> Real estate is the largest manifestation of broken money — trillions in value sitting in walls, roofs and land, not because of use value, but because fiat currency can't hold value on its own. Bitcoin is the counter-force. As it monetizes, housing demonetizes back toward utility value. Under sound money, houses cost 2–3× income. We are heading back there — the trajectory is a matter of when, not if.</div>
+        </div>
+
+        <!-- TAB 3 -->
+        <div class="tab-panel active" id="panel-calculator">
+            <div class="section-intro"><h2>What If You <em>Postponed</em> the House Purchase?</h2><p>The conventional wisdom says: buy a house as soon as you can. Lock in a mortgage. Build equity. But what if you took the money you would have used as a down payment and bought bitcoin instead? The historical data suggests that after a few years, you wouldn't just buy that house — you could buy it outright, with no mortgage, and possibly buy several. This is not investment advice. It is a structural observation about the trajectory of sound money versus fiat-inflated assets.</p></div>
+
+            <div class="narrative" style="margin-top:0;margin-bottom:2.5rem;padding:2rem 2.5rem;border-left-width:3px">
+                <p style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;line-height:1.7;color:var(--text)">Buying bitcoin is not "missing out on a house." It is a <em>postponed</em> house purchase — one where you might buy the same house for a fraction of its current bitcoin cost, potentially outright, without thirty years of debt servitude. <strong>The question is not whether you want a house. The question is whether you want a mortgage.</strong></p>
+            </div>
+
+            <div class="calculator">
+                <div id="scenarioControlRow" style="display:grid;grid-template-columns:200px 1fr;gap:1.2rem;align-items:end;margin-bottom:1rem">
+                    <div class="calc-field"><label>Starting Year</label><select id="calcYear" style="height:46px"><option value="2014">2014</option><option value="2015">2015</option><option value="2016">2016</option><option value="2017" selected>2017</option><option value="2018">2018</option><option value="2019">2019</option><option value="2020">2020</option><option value="2021">2021</option></select></div>
+                    <div class="calc-field">
+                        <label>Scenario</label>
+                        <div class="toggle-group" style="margin-bottom:0">
+                            <button class="toggle-btn" data-mode="cash" style="height:46px">Cash Purchase</button>
+                            <button class="toggle-btn active" data-mode="leverage" style="height:46px">20% Down + Mortgage</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="calcAssumptions" style="font-size:0.82rem;color:var(--text-muted);margin:0 0 1.5rem;padding:0.8rem 1rem;background:rgba(224,148,34,0.04);border-radius:6px;line-height:1.7"></div>
+                <div id="customInputsRow" style="margin-top:1rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem"><div class="calc-field"><label for="customHomePrice" style="display:flex;align-items:center;gap:0.4rem">Your home price <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><input type="text" id="customHomePrice" inputmode="numeric" placeholder="$336,900 (2020 median)" style="height:46px;width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;padding:0 1rem;border-radius:0"></div><div class="calc-field"><label for="customRent" style="display:flex;align-items:center;gap:0.4rem">Your monthly rent <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><input type="text" id="customRent" inputmode="numeric" placeholder="$864 (our estimate)" style="height:46px;width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;padding:0 1rem;border-radius:0"></div><div class="calc-field"><label for="customRate" style="display:flex;align-items:center;gap:0.4rem">Your interest rate <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><input type="text" id="customRate" inputmode="decimal" placeholder="3.11% (2020 avg)" style="height:46px;width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;padding:0 1rem;border-radius:0"></div></div><div id="customHomeDisclosure" style="font-size:0.75rem;color:var(--text-muted);font-style:italic;margin-top:0.6rem;line-height:1.5">Rent is estimated at ~75% of an equivalent mortgage payment. Mortgage rate defaults to the prevailing 30-year fixed average for the selected year. Your home's appreciation is assumed to match the median. Your actual values may differ &mdash; feel free to enter your own.</div>
+                <div id="calcResultsContainer" class="calc-results"></div>
+            </div>
+
+            <!-- DCA Layer - aligned to bitcoin (right) side -->
+            <div class="calculator" style="margin-top:0;border-top:none;border-radius:0 0 8px 8px;padding-top:0">
+                <div style="border-top:1px dashed var(--border);padding-top:1.5rem;margin-top:0">
+                    <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem">
+                        <input type="checkbox" id="calcDCA" style="accent-color:var(--amber);width:16px;height:16px;cursor:pointer">
+                        <span><strong style="color:var(--amber)">Go deeper:</strong> What if you also DCA the rent-vs-mortgage savings into bitcoin each month?</span>
+                    </label>
+                    <div id="dcaSection" style="display:none">
+                        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:1.2rem;line-height:1.7;padding:1rem;background:rgba(224,148,34,0.04);border-radius:6px">If you rent instead of buying, your monthly housing cost is typically lower than a mortgage payment. The difference — invested in bitcoin each month — compounds the opportunity cost dramatically over time.</div>
+                        <div class="dca-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+                            <div id="dcaResultContainer"></div>
+                            <div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Summary - aligned with calculator containers above -->
+            <div class="calculator" id="totalSummaryWrapper" style="display:none;margin-top:0;border-top:none;border-radius:0 0 8px 8px;padding:1.5rem 2rem">
+                <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:1rem;text-align:center">Total Comparison</div>
+                <div id="totalSummary" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem"></div>
+            </div>
+
+            <div class="narrative"><p>The mortgage is often described as "leverage" — and it is. A 20% down payment gives you 5:1 exposure to house price appreciation. But leverage has a cost. Over 30 years at typical rates, <strong>you pay roughly double the purchase price</strong> in total — the house plus the interest. Add property taxes (which never stop), insurance, and maintenance, and the true cost of ownership becomes staggering. All for an asset that, priced in bitcoin, is deflating. <em>Bitcoin requires no leverage, no interest payments, no property taxes, and no maintenance. You simply buy and hold.</em></p></div>
+        </div>
+
+        <!-- TAB 4 -->
+        <div class="tab-panel" id="panel-ceiling">
+            <div class="section-intro"><h2>How Much More Income <em>Can a Mortgage Consume?</em></h2><p>If house prices keep rising relative to incomes, at some point people simply cannot afford the monthly payment — regardless of interest rates, loan terms, or creative financing. This ratio has a structural ceiling, and we may be approaching it. Meanwhile, bitcoin has no such ceiling — its adoption is still in the early innings, and its scarcity is absolute.</p></div>
+
+            <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+                <div class="stat-card"><div class="stat-value" style="color:var(--green)">$1,100</div><div class="stat-label">Avg Mortgage Payment · 2015</div><div style="font-size:0.82rem;color:var(--text-muted);margin-top:0.3rem">21% of income</div></div>
+                <div class="stat-card"><div class="stat-value">$1,500</div><div class="stat-label">Avg Mortgage Payment · 2020</div><div style="font-size:0.82rem;color:var(--text-muted);margin-top:0.3rem">27% of income</div></div>
+                <div class="stat-card"><div class="stat-value negative">$2,200</div><div class="stat-label">Avg Mortgage Payment · 2025</div><div style="font-size:0.82rem;color:var(--red);margin-top:0.3rem">32% of income</div></div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">The Ceiling Has Already Been Breached</div>
+                <div class="chart-subtitle">Monthly mortgage payment as % of median household income · 2013–2025, with threshold lines</div>
+                <div class="chart-wrapper"><canvas id="burdenChart"></canvas></div>
+                <div class="chart-source">Sources: FRED (MSPUS, MORTGAGE30US), Census Bureau — assumes 20% down, 30-year fixed at prevailing rate</div>
+            </div>
+
+            <div class="narrative"><p>A household spending more than 30% of gross income on housing is considered "cost-burdened" by the US Department of Housing and Urban Development. <strong>The median American household is now at or beyond this threshold.</strong> After accounting for taxes, insurance, and maintenance, the true burden is even higher. The trend is clear and the math is inescapable: either prices fall, incomes rise dramatically, or the system restructures. <em>There are only three possible outcomes — a housing crash, hyperinflation of wages (which means hyperinflation of everything), or a structural shift where housing sheds its store-of-value premium. Bitcoin offers the third path.</em></p></div>
+
+            <div class="chart-container">
+                <div class="chart-title">The True Cost of Homeownership</div>
+                <div class="chart-subtitle">Purchase price vs. total all-in cost — by year of purchase</div>
+                <div class="chart-wrapper"><canvas id="totalCostChart"></canvas></div>
+                <div class="chart-source">Calculated using median home price at year of purchase, prevailing 30-year fixed rate, 20% down, 1.2% annual property tax, ~$150/mo insurance, 1% annual maintenance</div>
+            </div>
+
+            <div class="annotation"><strong>The hidden cost of "building equity":</strong> On a $417,000 house purchased in 2025 at 6.8% interest with 20% down, the total cost over 30 years — including interest, property taxes, insurance, and maintenance — exceeds $1 million. The mortgage doesn't just finance a house; it finances a bank's profit margin for three decades. Under a sound money standard, houses are bought with savings. Bitcoin makes that possible again.</div>
+        </div>
+    </main>
+
+    <section class="data-attribution" style="padding: 3rem 2rem 1rem; max-width: 720px; margin: 0 auto; text-align: center; border-top: 1px solid rgba(224,148,34,0.08);">
+    <p style="font-family:'Inter',sans-serif; font-size:0.78rem; color:rgba(255,255,255,0.42); line-height:1.7; margin:0;">
+        Data sources: Federal Reserve Bank of St. Louis (FRED), U.S. Census Bureau, Bureau of Labor Statistics, Shiller Home Price Index, CoinGecko, CoinMarketCap.
+        <br><br>
+        This page presents structural monetary observations, not investment advice. Historical data does not guarantee future outcomes.
+    </p>
+</section>
+
+
+    
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Bitcoin vs. Real Estate — The Opportunity Cost","description":"A house didn't used to be an investment. Explore 135 years of data showing how monetary regime changes transformed housing from shelter into the world's largest store of value.","url":"https://lastcoinstanding.com/bitcoin-vs-real-estate.html","isPartOf":{"@type":"WebSite","name":"Last Coin Standing","url":"https://lastcoinstanding.com"},"about":[{"@type":"Thing","name":"Bitcoin"},{"@type":"Thing","name":"Housing Market"},{"@type":"Thing","name":"Monetary Policy"},{"@type":"Thing","name":"Gold Standard"}]}</script>

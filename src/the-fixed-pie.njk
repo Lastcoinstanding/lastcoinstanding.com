@@ -1,0 +1,194 @@
+---
+layout: base.njk
+permalink: /the-fixed-pie.html
+slug: the-fixed-pie
+eleventyComputed:
+  head_extras: "{% include '_pageassets/the-fixed-pie-head.html' %}"
+  page_styles: "{% include '_pageassets/the-fixed-pie.css' %}"
+  page_scripts: "{% include '_pageassets/the-fixed-pie.js' %}"
+  body_chrome: "{% include '_pageassets/the-fixed-pie-chrome.html' %}"
+---
+<div class="page">
+  <!-- PAGE HEADER -->
+  <header class="page-header">
+    <h1>The Bitcoin <span class="amber">Fixed</span> Share</h1>
+    <p class="subtitle">Your share of the Bitcoin network is mathematically fixed at the moment of acquisition - and nothing can change that. Watch how that compares to every other form of money.</p>
+  </header>
+
+  <!-- TABS -->
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="slice">
+      <span class="tab-num">Part I</span>
+      <span class="tab-title">The Bitcoin Fixed Share</span>
+    </button>
+    <button class="tab-btn" data-tab="energy">
+      <span class="tab-num">Part II</span>
+      <span class="tab-title">The Monetary Energy Migration</span>
+    </button>
+  </div>
+
+  <!-- ═══ TAB 1: THE FIXED SLICE ═══ -->
+  <div class="tab-content active" id="tab-slice">
+
+    <div class="prose">
+      At time zero, acquiring dollars, gold, or bitcoin achieves a <em>share</em> of that monetary system. As time passes two of these three monetary systems reduce your share - and this reduction is structural, not incidental.
+    </div>
+
+    <!-- Supply overview -->
+    <div class="supply-trio">
+      <div class="supply-card sc-fiat">
+        <div class="sc-label">Fiat Currency</div>
+        <div class="sc-name">US Dollar</div>
+        <div class="sc-rate">~7% annual supply growth</div>
+        <div class="sc-note">M2 money supply has expanded at roughly 7% per year on average since 1971. Expansion rate is discretionary - there is no upper bound.</div>
+      </div>
+      <div class="supply-card sc-gold">
+        <div class="sc-label">Commodity Money</div>
+        <div class="sc-name">Gold</div>
+        <div class="sc-rate">~2% annual supply growth</div>
+        <div class="sc-note">New mining adds approximately 2% to the above-ground gold supply each year. No one is stealing from you - but the supply expands regardless, quietly shrinking your share of the total forever.</div>
+      </div>
+      <div class="supply-card sc-btc">
+        <div class="sc-label">Bitcoin Network</div>
+        <div class="sc-name">Bitcoin</div>
+        <div class="sc-rate">0% annual supply growth - terminal at 21 million</div>
+        <div class="sc-note">95% of all Bitcoin has already been mined. The protocol enforces a hard cap of 21 million. No authority can change this. Your share is fixed at the moment of acquisition.</div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-hero">
+      <div class="chart-heading">Your Share of the Monetary System Over Time</div>
+      <div class="chart-sub">Starting value = 100% (your share at acquisition). Watch what happens as years pass.</div>
+      <div class="chart-wrap">
+        <canvas id="shareChart"></canvas>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot ld-btc"></div>Bitcoin - 0% supply growth</div>
+        <div class="legend-item"><div class="legend-dot ld-gold"></div>Gold - ~2%/yr supply growth</div>
+        <div class="legend-item"><div class="legend-dot ld-fiat"></div>USD - ~7%/yr supply growth</div>
+      </div>
+      <div class="slider-block">
+        <div class="slider-header">
+          <span class="sl-label">Years from today</span>
+          <span class="sl-value" id="yearDisplay">0 years</span>
+        </div>
+        <input type="range" id="yearSlider" min="0" max="50" value="0" step="1">
+        <div class="year-marks">
+          <span>Today</span><span>10 yrs</span><span>20 yrs</span><span>30 yrs</span><span>40 yrs</span><span>50 yrs</span>
+        </div>
+      </div>
+      <button class="replay-btn" id="replayBtn">↺ Replay animation</button>
+    </div>
+
+    <!-- Stat cards - update dynamically -->
+    <div class="stat-trio">
+      <div class="stat-card st-fiat">
+        <div class="st-label">US Dollar</div>
+        <div class="st-name">% of your original share remaining</div>
+        <div class="st-big" id="fiatShare">100%</div>
+        <div class="st-sub" id="fiatSub">of original position retained</div>
+        <div class="st-verdict" id="fiatVerdict">No years have passed yet.</div>
+      </div>
+      <div class="stat-card st-gold">
+        <div class="st-label">Gold</div>
+        <div class="st-name">% of your original share remaining</div>
+        <div class="st-big" id="goldShare">100%</div>
+        <div class="st-sub" id="goldSub">of original position retained</div>
+        <div class="st-verdict" id="goldVerdict">No years have passed yet.</div>
+      </div>
+      <div class="stat-card st-btc">
+        <div class="st-label">Bitcoin</div>
+        <div class="st-name">% of your original share remaining</div>
+        <div class="st-big" id="btcShare">100%</div>
+        <div class="st-sub" id="btcSub">of original position retained</div>
+        <div class="st-verdict" id="btcVerdict">Structurally fixed at 21M.</div>
+      </div>
+    </div>
+
+    <div class="terminal-note">
+      <p><strong>A note on terminal supply.</strong> Bitcoin's block subsidy halves roughly every four years and converges to zero around 2140. (The block subsidy is the deterministic, protocol-enforced portion of the block reward - the transaction fee component is variable and expected to grow in economic value over time.) Today, approximately 95% of all bitcoin have already been mined. For this analysis we use the <strong>terminal 21 million</strong> as the denominator - making the point unambiguous: no matter when you acquire your position, your share of the network's terminal supply is fixed at that moment, and cannot be diluted by any actor, protocol-change, or political decision.</p>
+    </div>
+
+    <div class="takeaway">
+      <h3>In gold, supply grows benignly - <span class="gold-t">but it grows.</span><br>In fiat, it grows by design - and <span class="red">without limit.</span><br>In Bitcoin, it doesn't grow. <span class="amber">At all. Ever.</span></h3>
+      <p>This isn't a policy preference. It's a protocol guarantee enforced by cryptographic proof-of-work and economic consensus across a distributed network that no single entity controls. Your 1/21M is 1/21M. Forever.</p>
+    </div>
+
+  </div><!-- /tab-slice -->
+
+  <!-- ═══ TAB 2: THE MONETARY ENERGY MIGRATION ═══ -->
+  <div class="tab-content" id="tab-energy">
+
+    <div class="thesis-callout">
+      <div class="tc-label">The Thesis</div>
+      <h3>A fixed share of a growing network may represent an ever-larger fraction of global economic value.</h3>
+      <p>If you accept that Bitcoin's supply is fixed, the next question is: what does that fixed share represent over time? The hypothesis - backed by 15 years of price history - is that monetary energy is migrating from fiat-denominated systems into the Bitcoin network. Any share of the Bitcoin network you hold today - fixed forever, as we established in Part I - could represent a growing fraction of global economic value as that migration continues.</p>
+    </div>
+
+    <div class="key-fact">
+      <div class="kf-icon">📐</div>
+      <div class="kf-text">
+        <h4>No 4-year holding period has ever produced a negative return.</h4>
+        <p>Bitcoin has experienced multiple 80%+ drawdowns. Yet over any complete 4-year window - through bear markets, exchange collapses, regulatory crackdowns, and mining bans - the 4-year compounded return has been positive without exception. This is not a guarantee of the future. It is an observation about the past.</p>
+      </div>
+    </div>
+
+    <!-- CAGR Chart -->
+    <div class="cagr-section">
+      <h3>Historical 4-Year Rolling Compound Annual Growth Rate (CAGR)</h3>
+      <div class="cagr-sub">Annualized return for every 4-year holding window in Bitcoin's history (approximate, using January prices)</div>
+      <div class="cagr-chart-wrap">
+        <canvas id="cagrChart"></canvas>
+        <div class="cagr-note">All 4-year windows positive. The trend is declining as Bitcoin matures - consistent with a maturing asset of growing market cap.</div>
+      </div>
+      <p style="font-size:.88rem;color:var(--text-body);line-height:1.75;margin-top:14px;">These are <strong style="color:var(--text-bright)">annualized</strong> figures - meaning a 40% CAGR over 4 years doesn't mean 160% total. It means 40% compounded each year, which produces a ~284% total return over the period. The power of annual compounding is precisely what makes these numbers significant.</p>
+    </div>
+
+    <!-- Projection -->
+    <div class="projection-section">
+      <h3>Your Fixed Share - of the Growing Monetary Network</h3>
+      <p class="proj-sub">If your share of the network is fixed, what might it represent - if Bitcoin becomes the dominant, global monetary network, replacing fiat? Explore the thesis with your own assumptions.</p>
+
+      <div class="proj-controls">
+        <div class="proj-control">
+          <label>Starting position <span id="posDisplay">$10,000</span></label>
+          <input type="range" id="posSlider" min="1000" max="200000" value="10000" step="1000">
+        </div>
+        <div class="proj-control">
+          <label>Annual CAGR (Compound Annual Growth Rate) assumption <span id="cagrDisplay">40%</span></label>
+          <input type="range" id="cagrSlider" min="5" max="100" value="40" step="5">
+        </div>
+      </div>
+
+      <div class="proj-outputs">
+        <div class="proj-out">
+          <div class="po-period">4 Years</div>
+          <div class="po-value" id="proj4">$38,416</div>
+          <div class="po-multiplier" id="mult4">3.8× your position</div>
+        </div>
+        <div class="proj-out">
+          <div class="po-period">8 Years</div>
+          <div class="po-value" id="proj8">$147,590</div>
+          <div class="po-multiplier" id="mult8">14.8× your position</div>
+        </div>
+        <div class="proj-out">
+          <div class="po-period">12 Years</div>
+          <div class="po-value" id="proj12">$566,764</div>
+          <div class="po-multiplier" id="mult12">56.7× your position</div>
+        </div>
+      </div>
+
+      <div class="proj-disclaimer">
+        <strong>This is illustrative only.</strong> Past CAGR is not a predictor of future performance. Bitcoin's realized return has declined with each cycle as the asset matures and market cap grows - this is expected and mathematically inevitable. The historical 4-year CAGR average is approximately 65%, declining toward a long-run figure closer to 20–30% over the next decade. The 40% default is a deliberately conservative scenario. This is a thesis - not financial advice.
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <h3>The certainty is your Bitcoin fixed share.<br>The <span class="amber">thesis</span> is the value of what that share may represent.</h3>
+      <p>Part I of this page is structural - it requires no assumptions. Part II requires you to form a view on the trajectory of the Bitcoin network. The evidence supports the thesis. The conclusion is yours to draw.</p>
+    </div>
+
+  </div><!-- /tab-energy -->
+
+</div><!-- /page -->
