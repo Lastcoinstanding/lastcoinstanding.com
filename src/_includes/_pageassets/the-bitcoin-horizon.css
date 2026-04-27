@@ -743,9 +743,10 @@ input[type="range"]::-moz-range-thumb {
 }
 .reading li:last-child { border-bottom: none; }
 .reading .r-src {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.18rem;
+  font-family: 'Source Serif 4', serif;
+  font-size: clamp(1rem, 1.85vw, 1.18rem);
   font-style: italic;
+  line-height: 1.5;
   display: block;
   margin-bottom: 0.3rem;
   color: var(--ink);
