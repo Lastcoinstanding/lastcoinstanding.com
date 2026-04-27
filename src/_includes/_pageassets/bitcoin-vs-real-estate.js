@@ -5,7 +5,7 @@
     const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54,2019:3.94,2020:3.11,2021:2.96,2022:5.34,2023:6.81,2024:6.72,2025:6.80};
 
     const gridColor='rgba(224,148,34,0.06)',tickColor='#6a6256',amber='#e09422',amberLight='rgba(224,148,34,0.15)',red='#c0392b',redLight='rgba(192,57,43,0.15)',textColor='#e8e0d4',greenColor='#27ae60';
-    Chart.defaults.font.family="'DM Sans',sans-serif";Chart.defaults.font.size=12;Chart.defaults.color=tickColor;
+    Chart.defaults.font.family="'Inter', -apple-system, sans-serif";Chart.defaults.font.size=12;Chart.defaults.color=tickColor;
     function cso(t){return{grid:{color:gridColor,drawBorder:false},ticks:{color:tickColor,font:{size:11}},title:{display:!!t,text:t,color:tickColor,font:{size:11,weight:400}}}}
 
     // TAB 1: ERA BAR CHART
@@ -135,9 +135,9 @@
         meta.data.forEach((bar,i)=>{
             const x=bar.x;const y=bar.y-8;
             ctx.save();ctx.textAlign='center';ctx.textBaseline='bottom';
-            ctx.font='bold 15px DM Sans,sans-serif';ctx.fillStyle=red;
+            ctx.font='bold 15px Inter, sans-serif';ctx.fillStyle=red;
             ctx.fillText(costMultipliers[i]+'×',x,y-14);
-            ctx.font='11px DM Sans,sans-serif';ctx.fillStyle='#9a9080';
+            ctx.font='11px Inter, sans-serif';ctx.fillStyle='#9a9080';
             ctx.fillText('purchase price',x,y);
             ctx.restore();
         });

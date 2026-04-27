@@ -40,7 +40,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .tab-btn{flex:1;padding:16px 16px;background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;text-align:center;transition:all .25s}
 .tab-btn:hover{background:rgba(255,255,255,.02)}
 .tab-btn .tab-num{display:block;font-family:var(--font-b);font-size:.65rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;transition:color .25s}
-.tab-btn .tab-title{display:block;font-family:var(--font-d);font-size:clamp(1rem,2vw,1.3rem);font-weight:600;color:var(--text-dim);transition:color .25s}
+.tab-btn .tab-title{display:block;font-family:var(--font-d);font-size:clamp(1rem,2vw,1.3rem);font-weight:500;color:var(--text-dim);transition:color .25s}
 .tab-btn.active{border-bottom-color:var(--orange)}
 .tab-btn.active .tab-num{color:var(--orange)}
 .tab-btn.active .tab-title{color:var(--text-bright)}

@@ -172,6 +172,16 @@
             .info-panel { padding: 18px 14px; }
             .concept-name { font-size: 1.05rem; }
         }
+
+        /* SVG orb labels: bump on mobile so component text stays legible
+           (mitigates anti-pattern §5.10 — SVG text below 14px effective).
+           Renders in viewBox user units; scales proportionally with container. */
+        @media (max-width: 768px) {
+            #synthesis-svg .orb-label { font-size: 13px; }
+        }
+        @media (max-width: 480px) {
+            #synthesis-svg .orb-label { font-size: 14px; }
+        }
     
 /* Dropdown nav */
 .nav-dropdown { position: relative; display: inline-block; }
