@@ -15,7 +15,7 @@
         body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
         .page { max-width: 1140px; margin: 0 auto; padding: 48px 24px 60px; }
         header { text-align: center; margin-bottom: 48px; }
-        header h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; color: var(--orange); letter-spacing: -0.02em; margin-bottom: 10px; }
+        header h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 3.4rem); font-weight: 500; color: var(--text-bright); letter-spacing: -0.01em; margin-bottom: 10px; }
         header .subtitle { font-size: clamp(0.9rem, 1.8vw, 1.05rem); color: var(--text-dim); font-weight: 400; letter-spacing: 0.01em; }
         main { display: grid; grid-template-columns: 1fr 360px; gap: 48px; align-items: start; }
         .viz-section { display: flex; flex-direction: column; align-items: center; }
