@@ -62,6 +62,11 @@ Items where the right call needs either visual review or a designer's judgment r
 - [ ] **Horizon body-prose `<em>` cascade question.** "riskier" and "guaranteed" in §2 looked like serif italic in screenshots when they should presumably be Inter italic. Possible cascade leak; worth investigating.
 - [ ] **Real Estate `.hero h1` weight 300.** Only page using this thin weight (vs canonical wt 500). Cormorant 300 IS loaded so it renders as designed, but: intentional choice or copy-paste accident? Flagged in commit `a224e5f`.
 - [ ] **Real Estate pull-quote pattern** (`bitcoin-vs-real-estate.njk` L123). Uses Cormorant upright with italic em emphasis on "postponed". §6.3 says pull-quotes on dark should use Source Serif italic, but the partial-italic case isn't explicitly covered. Worth review during eventual site-wide pull-quote consolidation.
+- [ ] **Not-a-Bubble §5.3 uppercase Cormorant treatments** (`header h1` "IS BITCOIN A BUBBLE?" with letter-spacing 0.1em; `.essay h2` "THE PATTERN THAT DIDN'T REPEAT" with letter-spacing 0.07em). These are §5.3 candidates ("Wide-tracked uppercase Cormorant"), but §2.1 explicitly permits uppercase for h1, the sizes are large enough that strokes don't muddy, and the uppercase treatment reads as a deliberate editorial choice for this page's rhetorical framing. Confirm whether to keep as a documented exception or unify with Inter caps per §5.3.
+
+## 7. Audit gaps (process improvements)
+
+- [x] **Phase 5 §5.7 audit was incomplete.** The prior session's "all 10 anti-patterns resolved" status missed Not-a-Bubble — DM Sans was still being loaded and used as `--font-body` site-wide on that page. Caught and fixed in commit `<NEW>`. Process implication: when running anti-pattern audits, grep all `_pageassets/*-head.html` AND all `_pageassets/*.css` for the offending pattern, not just the page where the issue was first noticed. Item closed by the fix itself; logging here for the record so future audits learn from it.
 
 ---
 
