@@ -48,7 +48,7 @@ module.exports = function (eleventyConfig) {
   });
 
   // Videos folder — only enable when present locally (production has it; local test may not)
-  // eleventyConfig.addPassthroughCopy({ 'videos': 'videos' });
+  eleventyConfig.addPassthroughCopy({ 'videos': 'videos' });
 
   return {
     dir: {
