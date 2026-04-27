@@ -66,7 +66,7 @@ Items where the right call needs either visual review or a designer's judgment r
 
 ## 7. Audit gaps (process improvements)
 
-- [x] **Phase 5 §5.7 audit was incomplete.** The prior session's "all 10 anti-patterns resolved" status missed Not-a-Bubble — DM Sans was still being loaded and used as `--font-body` site-wide on that page. Caught and fixed in commit `<NEW>`. Process implication: when running anti-pattern audits, grep all `_pageassets/*-head.html` AND all `_pageassets/*.css` for the offending pattern, not just the page where the issue was first noticed. Item closed by the fix itself; logging here for the record so future audits learn from it.
+- [x] **Phase 5 §5.7 audit was incomplete.** The prior session's "all 10 anti-patterns resolved" status missed Not-a-Bubble — DM Sans was still being loaded and used as `--font-body` site-wide on that page. Caught and fixed in commit `89011ea`. Process implication: when running anti-pattern audits, grep all `_pageassets/*-head.html` AND all `_pageassets/*.css` for the offending pattern, not just the page where the issue was first noticed. Item closed by the fix itself; logging here for the record so future audits learn from it.
 
 ---
 
