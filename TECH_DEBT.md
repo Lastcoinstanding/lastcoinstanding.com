@@ -22,13 +22,15 @@ A running list of known issues, inconsistencies, and architectural improvements 
 ## 2. Type system compliance
 
 - [ ] **Coordinated §5.2 sweep across calculator/explorer-tier pages.** Multiple selectors per page violate STYLE_GUIDE §5.2 ("Cormorant at <1.3rem with weight ≥600"). The prescribed fix is mechanical — drop weight from 600 → 500 — but the surface area is large enough that it warrants a single coordinated pass with screenshot review. Status by page:
-  - **Half-Life** — original survey list still pending: `section-title`, `tl-ttl`, `callout c-t`, `lk-type`, `tk h3`, `scenario-prompt`. Plus likely more — needs full re-audit in line with the Fixed Pie scope below.
+  - **Half-Life** — [x] effectively complete in commit `d375426`. Six selectors fixed (`.tl-ttl`, `.callout .c-t`, `.lk .lk-type`, `.tk h3`, `.scenario-prompt`, `.sp-type`). Note on provenance: these fixes were sitting as uncommitted local edits in `the-half-life.css` from a prior session and were swept into the Fixed Pie commit by `git add -A`. Surfaced and documented post-commit. The `.section-title` selector originally listed in this entry is at clamp(1.3rem,...) — at the §5.2 floor, not below — so not a strict §5.2 hit; the calc-tier wt-600 deviation is captured on item #5 instead.
   - **Power Law** — `.section h3` (1.2rem wt 600) flagged in commit `fdce1fc`. Likely more on full re-audit.
-  - **Melting Ice Cube** — commit `31c0f58` shipped tab-title §5.2 fix but missed the broader surface. Specifically: `.section-title` clamp(1.2rem,2.5vw,1.6rem) wt 600 hits at 1.2rem mobile. Full re-audit pending.
+  - **Melting Ice Cube** — commit `31c0f58` shipped tab-title §5.2 fix but missed the broader surface. Specifically: `.section-title` clamp(1.2rem,2.5vw,1.6rem) wt 600 hits at 1.2rem mobile (this IS a strict §5.2 hit unlike Half-Life's). Full re-audit pending.
   - **Real Estate** — not yet audited for §5.2.
-  - **Fixed Pie** — [x] complete in commit `<this commit>`: 9 selectors fixed (`.tab-btn .tab-title`, `.sc-name`, `.chart-heading`, `.slider-header .sl-value`, `.takeaway h3`, `.kf-text h4`, `.cagr-section h3`, `.projection-section h3`, `.proj-control label span`).
+  - **Fixed Pie** — [x] complete in commit `d375426`: 9 selectors fixed (`.tab-btn .tab-title`, `.sc-name`, `.chart-heading`, `.slider-header .sl-value`, `.takeaway h3`, `.kf-text h4`, `.cagr-section h3`, `.projection-section h3`, `.proj-control label span`).
   
   Process improvement learned from Fixed Pie audit: when a calc-tier page comes up for screenshot review, audit the FULL §5.2 surface — every Cormorant selector with size <1.3rem and weight ≥600 — not just the most visually-prominent offenders. This avoids the kind of retroactive miss noted on MIC above.
+  
+  Process improvement #2 (from the Half-Life sweep-up incident): always run `git status` before staging to confirm only intended files have changes; uncommitted work from prior sessions can otherwise hitchhike on focused commits without notice.
   - [ ] Bundle here: Power Law `.section h3` (1.2rem wt 600) — same §5.2 hit, identical fix. Flagged in commit `fdce1fc`.
 
 ## 3. Sales-readiness
