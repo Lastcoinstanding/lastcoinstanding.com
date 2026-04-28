@@ -136,7 +136,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .calc-section{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:2rem;margin-bottom:2rem}
 .calc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.5rem}
 .calc-field label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:.4rem}
-.calc-field label .opt{font-size:.68rem;text-transform:none;letter-spacing:0;color:var(--text-muted);font-weight:400;margin-left:.3rem}
+.calc-field label .opt{font-size:.7rem;text-transform:none;letter-spacing:0;color:var(--text-muted);font-weight:400;margin-left:.3rem}
 .calc-field input,.calc-field select{height:44px;width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font-b);font-size:.92rem;padding:0 1rem;border-radius:4px}
 .calc-field select{cursor:pointer}
 .calc-field input:focus,.calc-field select:focus{outline:none;border-color:var(--amber)}
@@ -159,7 +159,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .calc-card h4.house,.calc-card.house h4{color:var(--red)}
 .calc-card .invested-line{font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:.3rem}
 .calc-card .invested-line strong{color:var(--text-dim);font-weight:500;text-transform:none;letter-spacing:0;font-size:.92rem}
-.calc-card .period-label{font-size:.68rem;text-transform:uppercase;letter-spacing:1.8px;color:var(--text-muted);font-weight:500;margin-bottom:.5rem;opacity:.85}
+.calc-card .period-label{font-size:.7rem;text-transform:uppercase;letter-spacing:1.8px;color:var(--text-muted);font-weight:500;margin-bottom:.5rem;opacity:.85}
 .calc-card .period-divider{border-top:2px dashed rgba(255,255,255,0.12);margin:1rem 0 .9rem}
 .calc-card .big-number{font-family:var(--font-d);font-size:2rem;font-weight:600;color:var(--text-bright);margin-bottom:.2rem;line-height:1.15}
 .calc-card.bitcoin .big-number{color:var(--amber)}
