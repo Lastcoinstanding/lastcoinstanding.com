@@ -21,7 +21,14 @@ A running list of known issues, inconsistencies, and architectural improvements 
 
 ## 2. Type system compliance
 
-- [ ] **Half-Life weight-600 audit.** Multiple selectors violate STYLE_GUIDE §5.2 ("Cormorant at <1.3rem with weight ≥600"): `section-title`, `tl-ttl`, `callout c-t`, `lk-type`, `tk h3`, `scenario-prompt`. Same fix pattern as the prior tab-title fix.
+- [ ] **Coordinated §5.2 sweep across calculator/explorer-tier pages.** Multiple selectors per page violate STYLE_GUIDE §5.2 ("Cormorant at <1.3rem with weight ≥600"). The prescribed fix is mechanical — drop weight from 600 → 500 — but the surface area is large enough that it warrants a single coordinated pass with screenshot review. Status by page:
+  - **Half-Life** — original survey list still pending: `section-title`, `tl-ttl`, `callout c-t`, `lk-type`, `tk h3`, `scenario-prompt`. Plus likely more — needs full re-audit in line with the Fixed Pie scope below.
+  - **Power Law** — `.section h3` (1.2rem wt 600) flagged in commit `fdce1fc`. Likely more on full re-audit.
+  - **Melting Ice Cube** — commit `31c0f58` shipped tab-title §5.2 fix but missed the broader surface. Specifically: `.section-title` clamp(1.2rem,2.5vw,1.6rem) wt 600 hits at 1.2rem mobile. Full re-audit pending.
+  - **Real Estate** — not yet audited for §5.2.
+  - **Fixed Pie** — [x] complete in commit `<this commit>`: 9 selectors fixed (`.tab-btn .tab-title`, `.sc-name`, `.chart-heading`, `.slider-header .sl-value`, `.takeaway h3`, `.kf-text h4`, `.cagr-section h3`, `.projection-section h3`, `.proj-control label span`).
+  
+  Process improvement learned from Fixed Pie audit: when a calc-tier page comes up for screenshot review, audit the FULL §5.2 surface — every Cormorant selector with size <1.3rem and weight ≥600 — not just the most visually-prominent offenders. This avoids the kind of retroactive miss noted on MIC above.
   - [ ] Bundle here: Power Law `.section h3` (1.2rem wt 600) — same §5.2 hit, identical fix. Flagged in commit `fdce1fc`.
 
 ## 3. Sales-readiness

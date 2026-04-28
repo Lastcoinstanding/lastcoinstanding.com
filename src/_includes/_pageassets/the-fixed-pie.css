@@ -160,7 +160,7 @@ body::before {
 .tab-btn .tab-num {
   display: block;
   font-family: var(--font-b);
-  font-size: .62rem;
+  font-size: .65rem;
   font-weight: 600;
   letter-spacing: .2em;
   text-transform: uppercase;
@@ -171,8 +171,8 @@ body::before {
 .tab-btn .tab-title {
   display: block;
   font-family: var(--font-d);
-  font-size: clamp(.95rem, 2vw, 1.25rem);
-  font-weight: 600;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 500;
   color: var(--text-dim);
   transition: color .25s;
 }
@@ -233,7 +233,7 @@ body::before {
 .supply-card.sc-btc  { border-top: 3px solid var(--orange); }
 
 .sc-label {
-  font-size: .62rem;
+  font-size: .7rem;
   font-weight: 600;
   letter-spacing: .14em;
   text-transform: uppercase;
@@ -245,7 +245,7 @@ body::before {
 .sc-name {
   font-family: var(--font-d);
   font-size: 1.15rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-bright);
 }
 .sc-rate {
@@ -280,7 +280,7 @@ body::before {
 .chart-heading {
   font-family: var(--font-d);
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-bright);
   margin-bottom: 4px;
 }
@@ -345,7 +345,7 @@ canvas#shareChart {
 .slider-header .sl-value {
   font-family: var(--font-d);
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-bright);
 }
 
@@ -382,7 +382,7 @@ input[type="range"]::-moz-range-thumb {
   justify-content: space-between;
   margin-top: 5px;
 }
-.year-marks span { font-size: .62rem; color: var(--text-muted); }
+.year-marks span { font-size: .7rem; color: var(--text-muted); }
 
 .replay-btn {
   display: inline-flex;
@@ -424,7 +424,7 @@ input[type="range"]::-moz-range-thumb {
 .stat-card.st-btc  { border-left: 3px solid var(--orange); }
 
 .st-label {
-  font-size: .62rem;
+  font-size: .7rem;
   font-weight: 600;
   letter-spacing: .14em;
   text-transform: uppercase;
@@ -492,7 +492,7 @@ input[type="range"]::-moz-range-thumb {
 .takeaway h3 {
   font-family: var(--font-d);
   font-size: clamp(1.2rem, 2.5vw, 1.6rem);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-bright);
   line-height: 1.5;
   margin-bottom: 10px;
@@ -520,7 +520,7 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 6px;
 }
 .thesis-callout .tc-label {
-  font-size: .62rem;
+  font-size: .7rem;
   font-weight: 700;
   letter-spacing: .2em;
   text-transform: uppercase;
@@ -560,7 +560,7 @@ input[type="range"]::-moz-range-thumb {
 .kf-text h4 {
   font-family: var(--font-d);
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--orange);
   margin-bottom: 5px;
 }
@@ -573,7 +573,7 @@ input[type="range"]::-moz-range-thumb {
 .cagr-section h3 {
   font-family: var(--font-d);
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-bright);
   margin-bottom: 4px;
 }
@@ -620,7 +620,7 @@ canvas#cagrChart {
 .projection-section h3 {
   font-family: var(--font-d);
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-bright);
   margin-bottom: 4px;
 }
@@ -646,7 +646,7 @@ canvas#cagrChart {
 .proj-control label span {
   font-family: var(--font-d);
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--orange);
   float: right;
   text-transform: none;
@@ -669,7 +669,7 @@ canvas#cagrChart {
   text-align: center;
 }
 .po-period {
-  font-size: .68rem;
+  font-size: .7rem;
   font-weight: 600;
   letter-spacing: .12em;
   text-transform: uppercase;
