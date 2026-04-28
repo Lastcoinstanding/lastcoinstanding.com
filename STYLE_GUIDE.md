@@ -47,6 +47,18 @@ One residual surface: `not-a-bubble.js` Chart.js + canvas font calls still refer
 /* --font-body: 'Outfit', sans-serif;       *//* system/diagrammatic pages — declared per-page */
 ```
 
+### Font loading
+
+Inter must be loaded with italic@400 and italic@500 in addition to its upright weights. Without these, body-prose `<em>` (and any other Inter element with `font-style: italic`) falls back to browser-synthesized faux italic — non-deterministic across browsers/OSes, and produces inferior glyphs versus a real italic font. Site-wide fix shipped in commit `2391882`.
+
+When introducing a new page, copy the head.html font URL from a peer of the same register (editorial → an existing editorial page; system-diagrammatic → Synthesis or What Bitcoin Is). Don't construct a font URL from scratch — the canonical Inter declaration is:
+
+```
+Inter:ital,wght@0,<upright_weights>;1,400;1,500
+```
+
+The same logic applies to any other family that's used italic anywhere on the site: declare both the upright weights you use and any italic weights you use; never rely on browser font-synthesis.
+
 ---
 
 ## 2. Type scale
