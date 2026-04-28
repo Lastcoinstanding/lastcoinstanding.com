@@ -21,17 +21,25 @@ A running list of known issues, inconsistencies, and architectural improvements 
 
 ## 2. Type system compliance
 
-- [ ] **Coordinated §5.2 sweep across calculator/explorer-tier pages.** Multiple selectors per page violate STYLE_GUIDE §5.2 ("Cormorant at <1.3rem with weight ≥600"). The prescribed fix is mechanical — drop weight from 600 → 500 — but the surface area is large enough that it warrants a single coordinated pass with screenshot review. Status by page:
-  - **Half-Life** — [x] effectively complete in commit `d375426`. Six selectors fixed (`.tl-ttl`, `.callout .c-t`, `.lk .lk-type`, `.tk h3`, `.scenario-prompt`, `.sp-type`). Note on provenance: these fixes were sitting as uncommitted local edits in `the-half-life.css` from a prior session and were swept into the Fixed Pie commit by `git add -A`. Surfaced and documented post-commit. The `.section-title` selector originally listed in this entry is at clamp(1.3rem,...) — at the §5.2 floor, not below — so not a strict §5.2 hit; the calc-tier wt-600 deviation is captured on item #5 instead.
-  - **Power Law** — [x] effectively complete in commit `<this commit>`. One selector (`.section h3`, the one originally flagged in commit `fdce1fc`) fixed via uncommitted prior-session work surfaced after the Half-Life sweep-up incident.
-  - **Melting Ice Cube** — [x] effectively complete in commit `<this commit>`. Ten selectors fixed: `.section-title`, `.vp-name`, `.slider-header .sl-value`, `.takeaway h3`, `.cq-title`, `.chart-title`, `.ys-year`, `.cos-val` (wt 700 → 500), `.co-name`, `.results-header h3`. Same provenance as Half-Life — uncommitted prior-session work surfaced and shipped deliberately this time. This effectively closes the audit gap noted on commit `31c0f58`.
-  - **Real Estate** — not yet audited for §5.2.
+- [x] **Coordinated §5.2 sweep across calculator/explorer-tier pages.** Multiple selectors per page violate STYLE_GUIDE §5.2 ("Cormorant at <1.3rem with weight ≥600"). The prescribed fix is mechanical — drop weight from 600 → 500 — but the surface area is large enough that it warrants a single coordinated pass with screenshot review. Status by page:
+  - **Half-Life** — [x] complete in commit `d375426`. Six selectors fixed (`.tl-ttl`, `.callout .c-t`, `.lk .lk-type`, `.tk h3`, `.scenario-prompt`, `.sp-type`). Note on provenance: these fixes were sitting as uncommitted local edits in `the-half-life.css` from a prior session and were swept into the Fixed Pie commit by `git add -A`. Surfaced and documented post-commit. The `.section-title` selector originally listed in this entry is at clamp(1.3rem,...) — at the §5.2 floor, not below — so not a strict §5.2 hit; the calc-tier wt-600 deviation is captured on item #5 instead.
+  - **Power Law** — [x] complete in commit `6359515`. One selector (`.section h3`, the one originally flagged in commit `fdce1fc`) fixed via uncommitted prior-session work surfaced after the Half-Life sweep-up incident.
+  - **Melting Ice Cube** — [x] complete in commit `6359515`. Ten selectors fixed: `.section-title`, `.vp-name`, `.slider-header .sl-value`, `.takeaway h3`, `.cq-title`, `.chart-title`, `.ys-year`, `.cos-val` (wt 700 → 500), `.co-name`, `.results-header h3`. Same provenance as Half-Life — uncommitted prior-session work surfaced and shipped deliberately this time. This effectively closes the audit gap noted on commit `31c0f58`.
+  - **Real Estate** — [x] audited 2026-04-28 during the coordinated-sweep verification; **no §5.2 hits**. Page uses Cormorant at clamp(2.4rem,5vw,3.8rem) wt 300, clamp(1.6rem,3vw,2.2rem) wt 400, and 1.7rem/2rem/2.2rem wt 600 (all ≥1.3rem). Cleanest of the calc-tier on this anti-pattern.
   - **Fixed Pie** — [x] complete in commit `d375426`: 9 selectors fixed (`.tab-btn .tab-title`, `.sc-name`, `.chart-heading`, `.slider-header .sl-value`, `.takeaway h3`, `.kf-text h4`, `.cagr-section h3`, `.projection-section h3`, `.proj-control label span`).
   
   Process improvement learned from Fixed Pie audit: when a calc-tier page comes up for screenshot review, audit the FULL §5.2 surface — every Cormorant selector with size <1.3rem and weight ≥600 — not just the most visually-prominent offenders. This avoids the kind of retroactive miss noted on MIC above.
   
   Process improvement #2 (from the Half-Life sweep-up incident): always run `git status` before staging to confirm only intended files have changes; uncommitted work from prior sessions can otherwise hitchhike on focused commits without notice.
-  - [ ] Bundle here: Power Law `.section h3` (1.2rem wt 600) — same §5.2 hit, identical fix. Flagged in commit `fdce1fc`.
+  
+  Process improvement #3 (from 2026-04-28 verification session): when the user authorizes a "coordinated sweep" across multiple pages, **first run `git status` and `git log --oneline -10` to establish a true baseline state**, BEFORE running an audit. The placeholder text `<this commit>` on TECH_DEBT.md item #2 misled this session into believing the sweep was outstanding when it had actually been completed in commits `d375426` and `6359515`. An hour of audit work was no-op'd against an already-fixed working tree.
+  - [x] Bundle here closed: Power Law `.section h3` (1.2rem wt 600) fixed in `6359515`.
+
+- [ ] **Mobile-floor sweep — Half-Life and Power Law caps labels.** Audit on 2026-04-28 found 5 selectors below STYLE_GUIDE §2.3's 0.7rem mobile floor that aren't compensated by §2.1's smallest-label slot tracking spec (0.65rem requires letter-spacing ≥0.2em):
+  - **Half-Life** — `.header-quote cite` (0.65rem, ls 0.15em); `.lk .lk-label` (0.65rem, ls 0.18em); `.sp-label` (0.65rem, ls 0.18em). All three are at 0.65rem with tracking just below the 0.2em smallest-label spec. Either bump tracking to 0.2em or bump size to 0.7rem.
+  - **Power Law** — `.calc-field label .opt` (0.68rem, no tracking compensation); `.calc-card .period-label` (0.68rem, ls 1.8px ≈ 0.11em). Bump to 0.7rem.
+  
+  Ship as a small page-pair commit when convenient — these aren't visually catastrophic but they read as inconsistent with the MIC and Fixed Pie mobile-floor work already done.
 
 ## 3. Sales-readiness
 
