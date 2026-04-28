@@ -66,7 +66,17 @@ Items where the right call needs either visual review or a designer's judgment r
 
 ## 7. Audit gaps (process improvements)
 
-- [x] **Phase 5 §5.7 audit was incomplete.** The prior session's "all 10 anti-patterns resolved" status missed Not-a-Bubble — DM Sans was still being loaded and used as `--font-body` site-wide on that page. Caught and fixed in commit `89011ea`. Process implication: when running anti-pattern audits, grep all `_pageassets/*-head.html` AND all `_pageassets/*.css` for the offending pattern, not just the page where the issue was first noticed. Item closed by the fix itself; logging here for the record so future audits learn from it.
+- [x] **Phase 5 §5.7 audit was incomplete — Real Estate-only fix.** The prior session's "all 10 anti-patterns resolved" status missed Not-a-Bubble — DM Sans was still being loaded and used as `--font-body` site-wide on that page. Caught and fixed in commit `89011ea`. Process implication: when running anti-pattern audits, grep all `_pageassets/*-head.html` AND all `_pageassets/*.css` for the offending pattern, not just the page where the issue was first noticed.
+
+- [ ] **§5.7 sweep — four more pages still have rogue sans-serifs.** Site-wide grep on 2026-04-27 (during Melting Ice Cube audit) found:
+  - `index` — loads DM Sans, used as `--font-reading: 'DM Sans'`
+  - `money-trees` — loads DM Sans, applied directly
+  - `synthesis` — loads **Outfit** (a third sans-serif family — not previously on §5.7's radar), used as `--font: 'Outfit'`
+  - `what-bitcoin-is` — loads Outfit, used as `--font: 'Outfit'`
+  
+  Recommend a coordinated cleanup pass with screenshot review per page rather than blind drive-by fixes — body-font swaps can have non-obvious knock-on effects on layout density. Priority is medium–high since this directly affects "consistency-by-default" (4 of 15 pages currently render in non-canonical sans-serifs).
+
+  Tangentially: STYLE_GUIDE §5.7 should be amended to call out Outfit by name once fixed, currently only references DM Sans by example.
 
 ---
 
