@@ -10,18 +10,32 @@ Last updated: 2026-04-26 (initial draft from survey of 7 pages)
 
 ## 1. Type system
 
-The site uses **four typefaces**. Each has one job. Don't introduce a fifth without revising this guide.
+The site uses **five typefaces**. Each has one job. Don't introduce a sixth without revising this guide.
 
 | Family | Role | Where it appears |
 |---|---|---|
 | **Cormorant Garamond** | Display | h1, h2, large pull quotes, drop caps, inline italic emphasis at display sizes, "section closer" flourish at 1.35rem |
 | **EB Garamond** | Essay body | Long-form prose paragraphs, TOC links, key concepts — **only on cream/parchment background** |
 | **Source Serif** (italic) | Small-size italic flourish | OG card subtitles, page hero subtitles where an italic serif is wanted |
-| **Inter** | Everything else | Body on dark backgrounds, all UI labels, captions, page subtitles where no italic flourish is wanted, tabs, buttons, metadata |
+| **Inter** | Editorial sans-serif | Body on dark backgrounds, UI labels, captions, page subtitles, tabs, buttons, metadata — on reading-prose / editorial pages (Index, Money Trees, The Bitcoin Migration, The Bitcoin Horizon, What Money Has To Be, and currently the calculator-tier pages) |
+| **Outfit** | System / diagrammatic sans-serif | Body, panel labels, technical descriptors — on diagrammatic pages where the page is fundamentally a structural specification (currently: The Bitcoin Synthesis, What Bitcoin Is) |
+
+### Sans-serif register: editorial vs. system-diagrammatic
+
+The two sans-serif families are not interchangeable. Each carries a register:
+
+- **Inter** is humanist — it reads warm, editorial, literary. Right for prose-driven pages where the reader is moving through paragraphs of argument, narrative, or contrast.
+- **Outfit** is geometric/schematic — it reads engineered, structural, specification-like. Right for diagrammatic pages where the page IS the system spec (component diagrams, structural-property frameworks) and the prose serves the diagram, not vice versa.
+
+When introducing a new page, ask: *is this a piece of writing, or is it a diagram with explanatory copy?* Editorial pages get Inter. System/diagrammatic pages get Outfit. **Don't mix within a page.** **Don't choose by aesthetic preference** — choose by page character.
+
+The calculator-tier pages (Power Law, Half-Life, Fixed Pie, Melting Ice Cube, Real Estate) currently use Inter. A case can be made they're closer to system-diagrammatic in character (chart-and-control surfaces, technical descriptors, less reading prose). Logged in TECH_DEBT as an open coordinated decision; do not change in isolation.
 
 ### Anti-pattern: DM Sans
 
-DM Sans currently appears only on the BTC vs. Real Estate tabs. It does the same job as Inter. **Consolidate all DM Sans use to Inter.** Don't reintroduce.
+DM Sans was previously rogue on Real Estate, Not-a-Bubble, Index, and Money Trees. It does the same job as Inter but is not part of the canonical type system. **Don't reintroduce.** Cleaned up via commits 89011ea (Not-a-Bubble CSS), 6c6c7c2 (Index, Money Trees).
+
+One residual surface: `not-a-bubble.js` Chart.js + canvas font calls still reference DM Sans for chart-label rendering. Logged in TECH_DEBT — chart-canvas font selection may have different metric considerations than CSS body prose; pending separate decision.
 
 ### CSS variables
 
@@ -29,7 +43,8 @@ DM Sans currently appears only on the BTC vs. Real Estate tabs. It does the same
 --font-display: 'Cormorant Garamond', serif;
 --font-essay: 'EB Garamond', serif;
 --font-flourish: 'Source Serif 4', serif;  /* always paired with font-style: italic */
---font-body: 'Inter', sans-serif;
+--font-body: 'Inter', sans-serif;           /* editorial pages — default */
+/* --font-body: 'Outfit', sans-serif;       *//* system/diagrammatic pages — declared per-page */
 ```
 
 ---
@@ -149,7 +164,7 @@ These have all been observed on the site and need fixing.
 4. **Inter Bold Orange as page title.** Outlier on What Bitcoin Is and The Bitcoin Synthesis only. → Use canonical Cormorant per §2.1.
 5. **Peer labels with diverging typography.** When three items are conceptually equal (e.g., the Trilemma triangle edges), they should share typography and differ by *one variable* (typically color). → Unify type; vary by color or weight, not by case+weight+style+font all at once.
 6. **Editorial attributions inside the shared footer.** Page-specific citations (Vitalik Buterin on Trilemma, data sources on Real Estate) are *content*, not chrome. → Use a `.page-attribution` content section above the canonical footer (see §6.5).
-7. **Multiple sans-serif families.** DM Sans on Real Estate. → Consolidate to Inter.
+7. **Sans-serif chosen by aesthetic preference rather than page register.** The right question for a new page is not "which sans do I like?" but "is this page editorial (Inter) or system/diagrammatic (Outfit)?" — see §1. DM Sans was previously rogue on multiple pages and is forbidden in either register; cleaned up via 89011ea + 6c6c7c2.
 8. **Inconsistent tab styling across pages.** → Use the canonical tab component (§6.2).
 9. **Low-contrast text below 0.5 opacity.** Migration cover subtitle hits this. → Keep text-on-dark above 0.6 opacity for body text; mini-labels can go to 0.5 if size is ≥0.7rem.
 10. **SVG-rendered text below 14px effective size on mobile.** Synthesis component circles hit this. → Add mobile breakpoint that bumps SVG container or text size.

@@ -82,6 +82,8 @@ A running list of known issues, inconsistencies, and architectural improvements 
   
   Sales context: (b) reads as more publication-grade and substantial; (a) preserves the dense-utility feel of the calculator pages. Worth a deliberate decision.
 
+- [ ] **Calculator-tier font register — Inter or Outfit?** All five calc-tier pages currently use Inter (the editorial register, per STYLE_GUIDE §1 tier system). A case can be made they're closer in character to system-diagrammatic — chart-and-control surfaces, technical descriptors, less reading prose — and would benefit from Outfit's geometric/schematic feel (the same rationale that justified keeping Outfit on Synthesis + What Bitcoin Is in commit `6c6c7c2`). Worth deciding in coordination with the §2.1 scale question above: same five pages, same coordinated-sweep risk profile, and the two decisions interact (Outfit at the existing tier-actual sizes vs. Outfit at canonical §2.1 sizes vs. Inter at either — four possible end states).
+
 ## 6. Page-specific minor / design judgment
 
 Items where the right call needs either visual review or a designer's judgment rather than a mechanical fix.
@@ -97,15 +99,15 @@ Items where the right call needs either visual review or a designer's judgment r
 
 - [x] **Phase 5 §5.7 audit was incomplete — Real Estate-only fix.** The prior session's "all 10 anti-patterns resolved" status missed Not-a-Bubble — DM Sans was still being loaded and used as `--font-body` site-wide on that page. Caught and fixed in commit `89011ea`. Process implication: when running anti-pattern audits, grep all `_pageassets/*-head.html` AND all `_pageassets/*.css` for the offending pattern, not just the page where the issue was first noticed.
 
-- [ ] **§5.7 sweep — four more pages still have rogue sans-serifs.** Site-wide grep on 2026-04-27 (during Melting Ice Cube audit) found:
-  - `index` — loads DM Sans, used as `--font-reading: 'DM Sans'`
-  - `money-trees` — loads DM Sans, applied directly
-  - `synthesis` — loads **Outfit** (a third sans-serif family — not previously on §5.7's radar), used as `--font: 'Outfit'`
-  - `what-bitcoin-is` — loads Outfit, used as `--font: 'Outfit'`
+- [x] **§5.7 sweep — closed via split decision (commit `6c6c7c2`).** Site-wide grep on 2026-04-27 found 4 pages with non-canonical sans-serifs. Resolution split along page-character lines rather than uniform consolidation:
+  - `index` — DM Sans → Inter (`6c6c7c2`)
+  - `money-trees` — DM Sans → Inter (`6c6c7c2`)
+  - `synthesis` — Outfit → **kept** (documented in STYLE_GUIDE §1 as canonical for system/diagrammatic pages)
+  - `what-bitcoin-is` — Outfit → **kept** (same rationale)
   
-  Recommend a coordinated cleanup pass with screenshot review per page rather than blind drive-by fixes — body-font swaps can have non-obvious knock-on effects on layout density. Priority is medium–high since this directly affects "consistency-by-default" (4 of 15 pages currently render in non-canonical sans-serifs).
+  Rationale: Outfit's geometric/schematic character actively reinforces the diagram-spec voice on Synthesis + What Bitcoin Is in a way Inter would soften. Editorial pages (reading-prose) get Inter; system/diagrammatic pages (the page IS a structural specification) get Outfit. STYLE_GUIDE §1 amended to codify the tier system + forward-looking guidance for new pages. §5 item 7 reframed from "consolidate to Inter" to "choose by page register".
 
-  Tangentially: STYLE_GUIDE §5.7 should be amended to call out Outfit by name once fixed, currently only references DM Sans by example.
+- [ ] **not-a-bubble.js DM Sans → Inter swap (residual from §5.7 sweep).** ~25 hardcoded `'DM Sans', sans-serif` references in Chart.js options + `ctx.font` canvas declarations (L160–728 in `src/_includes/_pageassets/not-a-bubble.js`). Not part of the §5.7 CSS sweep — these are chart-label rendering where DM Sans's narrower metrics may have been deliberately chosen for tight numeric labels. Decision criteria: do the chart labels visibly degrade if swapped to Inter? Mostly low-risk swap (both humanist sans), but warrants screenshot-verified pass rather than blind global replace. Page is on the editorial register (not system-diagrammatic) so the canonical choice is Inter; question is whether the chart-rendering context wants something different.
 
 ---
 
