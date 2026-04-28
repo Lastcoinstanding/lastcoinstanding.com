@@ -35,11 +35,11 @@ A running list of known issues, inconsistencies, and architectural improvements 
   Process improvement #3 (from 2026-04-28 verification session): when the user authorizes a "coordinated sweep" across multiple pages, **first run `git status` and `git log --oneline -10` to establish a true baseline state**, BEFORE running an audit. The placeholder text `<this commit>` on TECH_DEBT.md item #2 misled this session into believing the sweep was outstanding when it had actually been completed in commits `d375426` and `6359515`. An hour of audit work was no-op'd against an already-fixed working tree.
   - [x] Bundle here closed: Power Law `.section h3` (1.2rem wt 600) fixed in `6359515`.
 
-- [ ] **Mobile-floor sweep — Half-Life and Power Law caps labels.** Audit on 2026-04-28 found 5 selectors below STYLE_GUIDE §2.3's 0.7rem mobile floor that aren't compensated by §2.1's smallest-label slot tracking spec (0.65rem requires letter-spacing ≥0.2em):
-  - **Half-Life** — `.header-quote cite` (0.65rem, ls 0.15em); `.lk .lk-label` (0.65rem, ls 0.18em); `.sp-label` (0.65rem, ls 0.18em). All three are at 0.65rem with tracking just below the 0.2em smallest-label spec. Either bump tracking to 0.2em or bump size to 0.7rem.
-  - **Power Law** — `.calc-field label .opt` (0.68rem, no tracking compensation); `.calc-card .period-label` (0.68rem, ls 1.8px ≈ 0.11em). Bump to 0.7rem.
+- [x] **Mobile-floor sweep — Half-Life and Power Law caps labels.** Audit on 2026-04-28 found 5 selectors below STYLE_GUIDE §2.3's 0.7rem mobile floor that aren't compensated by §2.1's smallest-label slot tracking spec (0.65rem requires letter-spacing ≥0.2em). Closed in commit `dcb9470`.
+  - **Half-Life** — `.header-quote cite` (0.65 → 0.7rem), `.lk .lk-label` (0.65 → 0.7rem), `.sp-label` (0.65 → 0.7rem)
+  - **Power Law** — `.calc-field label .opt` (0.68 → 0.7rem), `.calc-card .period-label` (0.68 → 0.7rem)
   
-  Ship as a small page-pair commit when convenient — these aren't visually catastrophic but they read as inconsistent with the MIC and Fixed Pie mobile-floor work already done.
+  All 5 fixes preserve weight/color/tracking — only size moved.
 
 ## 3. Sales-readiness
 
