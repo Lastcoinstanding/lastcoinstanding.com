@@ -59,7 +59,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* SECTIONS */
 .section{margin-bottom:3rem}
 .section h2{font-family:var(--font-d);font-size:1.5rem;font-weight:600;color:var(--text-bright);margin-bottom:1rem}
-.section h3{font-family:var(--font-d);font-size:1.2rem;font-weight:600;color:var(--text-bright);margin-bottom:0.8rem}
+.section h3{font-family:var(--font-d);font-size:1.2rem;font-weight:500;color:var(--text-bright);margin-bottom:0.8rem}
 .prose{font-size:.95rem;color:var(--text-body);line-height:1.8;margin-bottom:1.2rem}
 .prose em{color:var(--amber);font-style:italic}
 
