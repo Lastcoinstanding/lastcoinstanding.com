@@ -11,7 +11,7 @@
     --text-body: #d0c8c0;
     --font-display: 'Cormorant Garamond', Georgia, serif;
     --font-body: 'Inter', -apple-system, sans-serif;
-    --font-reading: 'DM Sans', sans-serif;
+    --font-reading: 'Inter', -apple-system, sans-serif;
 }
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
