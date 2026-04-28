@@ -43,7 +43,19 @@ A running list of known issues, inconsistencies, and architectural improvements 
 
 ## 3. Sales-readiness
 
-- [ ] **OG card audit.** Verify Open Graph cards render correctly on all pages and look good when shared externally. Becomes important once links start being shared in Sales conversations. Worth doing before any meaningful external sharing.
+- [x] **OG card audit.** Two-phase audit completed 2026-04-28.
+  
+  **Phase 1** (commit `a99fcde`) — mechanical: added `og:image:alt` and `twitter:image:alt` to all 15 pages (was: 0 pages); standardized title separator to em dash on the 3 outliers (`bitcoin-vs-real-estate`, `the-bitcoin-migration`, `the-fixed-pie`); added missing `og:image:type` on 2 pages; **fixed real bug** — `the-bitcoin-migration` declared `og:image:width=1200, og:image:height=630` but the actual file is `1280×720`, which would have caused cropping on platforms that respect declared dimensions for layout (Facebook, LinkedIn).
+  
+  **Phase 2** (commit `47db5f5`) — editorial: enriched `og:title` and `twitter:title` on 6 pages from bland `[Page] — Last Coin Standing` to rich `[Page] — [Why framing]`, matching the existing pattern on Synthesis / Trilemma / Bubble / Money Trees / What Bitcoin Is. About left intentionally minimal (about pages don't benefit from hooks). Pattern preserved: browser `<title>` stays minimal/branded, only OG/Twitter titles carry the rich framing.
+  
+  Verified during audit: all 16 OG image files present at correct 1280×720 dimensions, all properly registered in `.eleventy.js` staticAssets list, all visually consistent with site brand template (dark background, Cormorant title, italic tagline, glowing Bitcoin glyph, brand header + URL footer).
+
+- [ ] **Minor OG description tightening — half-life and melting-ice-cube.** After Phase 2's title enrichment, two pages now have visible redundancy between the rich `og:title` and the `og:description` (which still leads with the same hook):
+  - **the-half-life:** title now asks "How Long Until Your Money Loses Half Its Value"; desc opens with "How long until your money loses half of its value? An interactive…" — could tighten desc to lead with the elaboration: "An interactive exploration of purchasing power decay across USD, Gold, and Bitcoin."
+  - **the-melting-ice-cube:** title now leads with the Saylor quote; desc opens with the same Saylor quote — could tighten desc to: "Explore what a Bitcoin treasury allocation changes for operating businesses."
+  
+  Not blocking — both patterns work fine on social. The reinforcement just reads as heavy. Worth a 5-minute tightening pass when convenient.
 
 ## 4. Width treatments
 
