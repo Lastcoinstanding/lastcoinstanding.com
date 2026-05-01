@@ -15,7 +15,6 @@ A running list of known issues, inconsistencies, and architectural improvements 
 
 ## 1. Architecture & DRY
 
-- [ ] **Hamburger architectural fix.** Centralize the OPEN handler in `base.njk` rather than duplicating it per-page. The Real Estate mobile hamburger regression fixed in commit `a0dfcb6` was caused by this duplication pattern. Affects all pages with mobile nav.
 - [ ] **Canonical nav CSS deduplication.** Extract nav styling into a shared partial; currently duplicated across page CSS files.
   - [ ] Bundle here: Horizon `.wrap` / `.wrap-narrow` / `.wrap-wide` are now identical (960px after commit `55fe517`) and could be consolidated. Also remove the dead `.intro .wrap-narrow` rule at L785 of `the-bitcoin-horizon.css` — orphaned reference, no markup uses that combo.
 
@@ -107,6 +106,8 @@ Items where the right call needs either visual review or a designer's judgment r
 ## Recently closed
 
 Move items here when shipped, with commit SHA. Keep the last 5–10 for reference; archive older ones to git history when this section gets long.
+
+- [x] **Hamburger architectural fix (commits `55319e2` Phase A + `2bbf85d` Phase B).** Centralized the mobile-nav OPEN handler in `base.njk`, eliminating per-page duplication that had caused the Real Estate hamburger regression in commit `a0dfcb6`. Pre-fix surface: 15 distinct implementations across 14 .js files + 1 inline head.html script, in 6 stylistic variants. Behavioral audit caught real divergence — body-scroll-lock on open was present on 8/15 pages, close-on-link-click was present on 12/15, defensive null guard on 10/15. The centralized handler implements all three universally; pages that were missing them silently gained them. Phase A deployed and verified live before Phase B's deletions; Phase B verified by site-wide grep returning zero remaining handlers in pageassets, plus deployed-HTML check on Horizon and Half-Life confirming the canonical handler runs and duplicates are absent. Net change: 16 files, +16 insertions, −206 deletions (-190 LOC). The Real Estate hamburger regression class of bug is now architecturally impossible: there is one source of truth. Companion item in §1 (Canonical nav CSS deduplication) remains open — that's a different, more complex problem (per-page CSS has subtle variations needing page-by-page visual diff).
 
 - [x] **OG description tightening — half-life and melting-ice-cube (commit `4777094`).** Phase 2's og:title enrichment (commit `47db5f5`) left both pages with descriptions that opened with the same hook as the new title. Tightened so each tag carries its own weight in the social card. Half-Life: 6 locations updated (meta name=description, og:description, og:image:alt, twitter:description, twitter:image:alt, JSON-LD WebPage description) — all leading question dropped, kept the elaboration. Melting Ice Cube: 4 social-card locations updated (og:description, og:image:alt, twitter:description, twitter:image:alt) — Saylor melting-ice-cube quote dropped from the lead. MIC's meta name=description left intentionally as-is (already substantively different from og:description — longer SEO-oriented copy, doesn't echo the og:title). Result is a deliberate asymmetry between MIC's SEO description and social descriptions; both work standalone, different audiences/contexts.
 
