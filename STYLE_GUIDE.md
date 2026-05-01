@@ -384,6 +384,24 @@ Single-line tonal grace note, typically before a CTA at the end of a section. Sy
 
 Migration's first paragraph is the canonical case. Use only in essay-mode contexts.
 
+### 6.8 Site nav (canonical)
+
+The site nav (hamburger, mobile overlay, dropdown, brand) is rendered by base.njk and styled by `<style id="canonical-nav-css">` in the same file. Centralized in commit `9937cc5` (Phase 1) with per-page CSS reduced to deliberate-divergence overrides only across `67d7bd8`, `0e69ec6`, and `1780bda`.
+
+When introducing a new page, **don't write nav CSS unless something needs to deliberately diverge.** The canonical block covers structural and typographic properties for `.site-nav`, `.brand`, `.nav-links`, `.hamburger`, `.mobile-overlay`, and `.nav-dropdown*`. Source order: canonical loads BEFORE page_styles in the head, so per-page CSS naturally overrides canonical when needed.
+
+What stays per-page when needed:
+
+- **Palette accent colors** — `.brand:hover`, `.nav-links a.active`, `.mobile-overlay a.active`, `.nav-dropdown-menu a.active`. The active/hover *color* varies by page palette (`var(--orange)` on calc-tier pages = `#F7931A`, `var(--amber)` on Migration/Horizon/BvRE/Not-a-Bubble = `#e09422`). Canonical declares the *structural* properties (background, font-weight) so per-page CSS only needs to declare the color override.
+- **Calc-tier overlay design** — Power Law / Half-Life / Fixed Pie / Melting Ice Cube / What Money Has To Be use a "below-nav drawer" mobile overlay (`top: 50px; padding: 2rem 1.5rem; gap: .5rem; z-index: 998-999; no opacity transition`) instead of canonical's full-coverage overlay. Reason: chart context stays visible while the menu is open.
+- **Calc-tier hamburger touch target** — `padding: 8px` on `.hamburger` instead of canonical's `4px`. Larger touch target on calc-tier pages.
+- **Calc-tier nav-links sizing** — tighter `font-size` and `padding` (and `gap: 4px` or `2px` instead of `8px`) to fit more nav items in narrow chart-control surfaces.
+- **Page-specific responsive overrides** — e.g. `@media (max-width: 480px) { .site-nav { padding: 10px 14px; } }` is declared per-page; canonical doesn't have a 480px breakpoint for this.
+- **Migration `position: fixed`** — paired with the page's progress-bar at `top: 48px`. The progress bar depends on the nav being position-fixed; sticky might also work but is untested with this layout.
+- **Bitcoin vs. Real Estate custom site-nav** — substantially divergent pre-existing design (`z-index: 100`, `padding: 0.8rem 2rem`, `background: rgba(10,9,8,0.92)`). Preserved as-is; this page also styles `.nav-dropdown-btn` as a full nav-link (custom design).
+
+When you find yourself writing more than ~7-8 lines of nav CSS in a new page, stop and check whether the difference is genuinely deliberate vs. drift. Drift-class differences (color tokens with different names that resolve to the same hex, property order variations, `var(--font-body)` vs literal `'Inter'` when both resolve to Inter) should NOT be reintroduced — let canonical handle them.
+
 ---
 
 ## 7. Mobile considerations
