@@ -13,25 +13,20 @@ html{font-size:100%}
 body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:1rem;line-height:1.7;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:1000}
 
-/* NAV */
-.site-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:rgba(10,9,8,.95);border-bottom:1px solid #1a1a1a;position:sticky;top:0;z-index:999;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.site-nav .brand{font-family:var(--font-b);font-size:.8rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#999;text-decoration:none;transition:color .2s;flex-shrink:0}
-.site-nav .brand:hover{color:var(--orange)}
-.site-nav .nav-links{display:flex;gap:2px;flex-wrap:wrap}
-.site-nav .nav-links a{font-family:var(--font-b);font-size:.82rem;font-weight:500;color:#aaa;text-decoration:none;padding:7px 11px;border-radius:4px;transition:color .2s,background .2s;white-space:nowrap}
-.site-nav .nav-links a:hover{color:#ccc;background:rgba(255,255,255,.04)}
-.site-nav .nav-links a.active{color:var(--orange);background:var(--orange-soft)}
-.hamburger{display:none;background:none;border:none;cursor:pointer;padding:8px;flex-direction:column;gap:5px}
-.hamburger span{display:block;width:22px;height:2px;background:#aaa;transition:all .3s}
-.hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
-.hamburger.open span:nth-child(2){opacity:0}
-.hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
-.mobile-overlay{display:none;position:fixed;inset:0;top:50px;background:rgba(10,9,8,.98);z-index:998;flex-direction:column;padding:2rem 1.5rem;gap:.5rem; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.mobile-overlay.show{display:flex}
-.mobile-overlay a{font-family:var(--font-b);font-size:1.1rem;font-weight:500;color:#aaa;text-decoration:none;padding:12px 16px;border-radius:6px;transition:all .2s}
-.mobile-overlay a:hover{color:#ccc;background:rgba(255,255,255,.04)}
-.mobile-overlay a.active{color:var(--orange);background:var(--orange-soft)}
-@media(max-width:768px){.site-nav .nav-links{display:none}.hamburger{display:flex}}
+/* NAV — calc-tier overrides on canonical-nav-css (base.njk).
+   Uses tighter sizing than Power Law/Half-Life because MIC has more
+   nav items and they need to fit horizontally without overflow. */
+.site-nav .brand { flex-shrink: 0; }
+.site-nav .nav-links { gap: 2px; flex-wrap: wrap; }
+.site-nav .nav-links a { font-size: .82rem; padding: 7px 11px; white-space: nowrap; }
+.hamburger { padding: 8px; }
+.mobile-overlay { top: 50px; height: auto; bottom: 0; padding: 2rem 1.5rem; gap: .5rem; z-index: 998; align-items: stretch; opacity: 1; transition: none; }
+.mobile-overlay a { padding: 12px 16px; }
+
+/* Palette accents */
+.site-nav .brand:hover { color: var(--orange); }
+.site-nav .nav-links a.active { color: var(--orange); background: var(--orange-soft); font-weight: 600; }
+.mobile-overlay a.active { color: var(--orange); background: var(--orange-soft); font-weight: 600; }
 
 /* LAYOUT */
 .page{max-width:960px;margin:0 auto;padding:40px 24px 60px}
@@ -339,12 +334,6 @@ input[type=range].yr-slider::-moz-range-thumb{width:18px;height:18px;border-radi
 
 footer{text-align:center;padding:32px 24px;color:var(--text-muted);font-size:.88rem;border-top:1px solid var(--border);margin-top:20px}
 
-/* Dropdown nav */
-.nav-dropdown { position: relative; display: inline-block; }
-.nav-dropdown-btn { cursor: pointer; user-select: none; }
-.nav-dropdown-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: rgba(10,9,8,0.97); border: 1px solid rgba(247,147,26,0.15); border-radius: 8px; padding: 8px 0; min-width: 240px; z-index: 200; backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.4); margin-top: 0; }
-.nav-dropdown:hover .nav-dropdown-menu, .nav-dropdown.open .nav-dropdown-menu { display: block; }
-.nav-dropdown-menu a { display: block; padding: 9px 24px; font-size: 0.88rem; white-space: nowrap; color: #aaa; text-decoration: none; transition: color 0.2s, background 0.2s; }
-.nav-dropdown-menu a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
-.nav-dropdown-menu a.active { color: var(--orange, #F7931A); background: rgba(247,147,26,0.08); font-weight: 600; }
+/* Dropdown nav: structure inherited from canonical-nav-css; active accent matches calc-tier var(--orange) palette */
+.nav-dropdown-menu a.active { color: var(--orange); background: rgba(247,147,26,0.08); font-weight: 600; }
 
