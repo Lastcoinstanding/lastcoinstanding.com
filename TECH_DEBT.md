@@ -81,11 +81,7 @@ A running list of known issues, inconsistencies, and architectural improvements 
 
 Items where the right call needs either visual review or a designer's judgment rather than a mechanical fix.
 
-- [ ] **Horizon `footer .f-brand`** (1.3rem italic Cormorant). Possible §5.1 hit, not yet screenshot-confirmed.
-- [ ] **Horizon `em.mark`** (1.08em amber italic Cormorant for inline emphasis). §1 allows Cormorant inline italic at display sizes; in body prose it's borderline. Need a body-prose screenshot before deciding.
-- [ ] **Real Estate `.hero h1` weight 300.** Only page using this thin weight (vs canonical wt 500). Cormorant 300 IS loaded so it renders as designed, but: intentional choice or copy-paste accident? Flagged in commit `a224e5f`.
 - [ ] **Real Estate pull-quote pattern** (`bitcoin-vs-real-estate.njk` L123). Uses Cormorant upright with italic em emphasis on "postponed". §6.3 says pull-quotes on dark should use Source Serif italic, but the partial-italic case isn't explicitly covered. Worth review during eventual site-wide pull-quote consolidation.
-- [ ] **Not-a-Bubble §5.3 uppercase Cormorant treatments** (`header h1` "IS BITCOIN A BUBBLE?" with letter-spacing 0.1em; `.essay h2` "THE PATTERN THAT DIDN'T REPEAT" with letter-spacing 0.07em). These are §5.3 candidates ("Wide-tracked uppercase Cormorant"), but §2.1 explicitly permits uppercase for h1, the sizes are large enough that strokes don't muddy, and the uppercase treatment reads as a deliberate editorial choice for this page's rhetorical framing. Confirm whether to keep as a documented exception or unify with Inter caps per §5.3.
 
 ## 7. Audit gaps (process improvements)
 
@@ -106,6 +102,15 @@ Items where the right call needs either visual review or a designer's judgment r
 ## Recently closed
 
 Move items here when shipped, with commit SHA. Keep the last 5–10 for reference; archive older ones to git history when this section gets long.
+
+- [x] **Tier 3 page-specific judgment bundle — three documented exceptions (STYLE_GUIDE update only, no code change).** Screenshot-driven review on 2026-05-01 of three flagged items, all approved as deliberate exceptions to §5 anti-pattern rules. Documented inline in STYLE_GUIDE §5 under a new "Documented exceptions" sub-section so future readers can't miss them.
+  - **Horizon `em.mark`** — Cormorant italic at 1.15rem on dark violates §5.1 in the abstract, but reads well in practice: amber color carries emphasis weight independently of stroke detail, phrases are sentence-fragments where Cormorant italic shows its character, and the typeface clash against Inter body prose is the editorial signal (authorial register-shift, like a pull-quote inline). Used sparingly (~2 instances on Horizon).
+  - **Not-a-Bubble uppercase Cormorant** — page hero "IS BITCOIN A BUBBLE?" + section heading "THE PATTERN THAT DIDN'T REPEAT" violate §5.3 in the abstract, but the page is a polemic and the wide-tracked uppercase register matches its argumentative register. Tracking is restrained (~0.04em), letterspacing even. Per-page exception only.
+  - **Real Estate `.hero h1` weight 300** — deviates from §2.1's wt 500 canonical. Lightness reads as deliberate editorial choice (magazine-cover feel, reinforced by "The Opportunity Cost" subtitle), not accident. Cormorant 300 is loaded and renders as designed. Per-page exception only.
+  
+  Pattern observation: all three are cases where a generally-good rule needs documentation of when it doesn't apply. The "Documented exceptions" section in STYLE_GUIDE §5 is now the canonical place for these — future similar judgments should land there rather than getting lost in commit messages.
+
+- [x] **Horizon footer dead-CSS removal (commit `26c8fbf`).** TECH_DEBT §6 had flagged Horizon `.f-brand` as a possible §5.1 anti-pattern (Cormorant italic at 1.3rem on dark). Audit found it isn't an anti-pattern at all — it's orphaned CSS. The .f-brand selector + sibling .f-line + parent `footer { ... }` block exist in the stylesheet but no markup uses them; only the canonical `.site-footer` from base.njk renders. 19 lines of dead CSS removed; no visual change. Likely a remnant from before the Eleventy refactor centralized the footer into base.njk.
 
 - [x] **Hamburger architectural fix (commits `55319e2` Phase A + `2bbf85d` Phase B).** Centralized the mobile-nav OPEN handler in `base.njk`, eliminating per-page duplication that had caused the Real Estate hamburger regression in commit `a0dfcb6`. Pre-fix surface: 15 distinct implementations across 14 .js files + 1 inline head.html script, in 6 stylistic variants. Behavioral audit caught real divergence — body-scroll-lock on open was present on 8/15 pages, close-on-link-click was present on 12/15, defensive null guard on 10/15. The centralized handler implements all three universally; pages that were missing them silently gained them. Phase A deployed and verified live before Phase B's deletions; Phase B verified by site-wide grep returning zero remaining handlers in pageassets, plus deployed-HTML check on Horizon and Half-Life confirming the canonical handler runs and duplicates are absent. Net change: 16 files, +16 insertions, −206 deletions (-190 LOC). The Real Estate hamburger regression class of bug is now architecturally impossible: there is one source of truth. Companion item in §1 (Canonical nav CSS deduplication) remains open — that's a different, more complex problem (per-page CSS has subtle variations needing page-by-page visual diff).
 

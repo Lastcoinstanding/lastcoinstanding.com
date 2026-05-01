@@ -182,6 +182,16 @@ These have all been observed on the site and need fixing.
 10. **SVG-rendered text below 14px effective size on mobile.** Synthesis component circles hit this. → Add mobile breakpoint that bumps SVG container or text size.
 11. **Paragraph-level `max-width` constraints that fight the page container.** A global `p { max-width: 68ch }` (or similar) makes body text float as a narrow column inside a wider container, leaving visible empty space on the right and creating visual inconsistency vs. canonical pages where prose fills the container. → Remove the global `p` constraint; let prose fill its parent. Per-element constraints on specific cards (intro blocks, callouts, pull-quotes) are still fine — the anti-pattern is the *global* `p` rule.
 
+### Documented exceptions
+
+These violate one of the rules above (or §2.1's canonical scale) but are kept deliberately because the typographic register-shift is doing real editorial work that the canonical treatment wouldn't. Reviewed and approved 2026-05-01.
+
+- **Horizon `em.mark` — Cormorant italic at 1.15rem on dark (violates §5.1).** Inline emphasis on Horizon's thesis sentences (e.g. "*it is a network being adopted, not a price being discovered.*"). The amber color carries the emphasis weight independently of stroke detail, the phrases are sentence-fragments rather than single words (Cormorant italic shows its character better in extended phrases), and the typeface clash against Inter body prose is the editorial signal — it reads as authorial register-shift, like a pull-quote inline. Switching to Inter italic would still mark the emphasis but lose the gravitas. Used sparingly (~2 instances on the page).
+
+- **Not-a-Bubble uppercase Cormorant — page hero "IS BITCOIN A BUBBLE?" and section heading "THE PATTERN THAT DIDN'T REPEAT" (violates §5.3).** This page is a polemic. The wide-tracked uppercase register matches the page's argumentative register — hard structural assertions presented as headline statements. The tracking is restrained (~0.04em, not extreme) and the letterspacing is even. Cormorant's strengths *are* being fought here; that's the point. Per-page exception only — do not extrapolate this to other pages.
+
+- **Real Estate `.hero h1` Cormorant weight 300 (deviates from §2.1's wt 500 canonical).** "*Bitcoin* vs. Real Estate" with amber italic "Bitcoin" against the lighter-weight roman "vs. Real Estate" creates an editorial, almost magazine-cover feel reinforced by the page's "The Opportunity Cost" subtitle — the most contemplative/essayistic of the calculator-tier pages. Cormorant 300 is loaded and renders as designed (this is not a faux-weight fallback). Per-page exception only — do not extrapolate to other calc-tier pages without a deliberate paired decision.
+
 ---
 
 ## 6. Component recipes
