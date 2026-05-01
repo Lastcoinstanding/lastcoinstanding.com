@@ -69,7 +69,7 @@
 {%- endif %}
 
 <script>
-/* Nav UX enhancement — click-outside, click-toggle for desktop dropdown, Escape */
+/* Canonical nav UX — hamburger open/close, dropdown click-toggle, click-outside, Escape, link-click close */
 (function() {
   var ham = document.getElementById('hamburger');
   var mob = document.getElementById('mobileOverlay');
@@ -98,6 +98,14 @@
     for (var i = 0; i < links.length; i++) {
       links[i].addEventListener('click', closeMobile);
     }
+  }
+  if (ham && mob) {
+    ham.addEventListener('click', function() {
+      var willOpen = !mob.classList.contains('show');
+      ham.classList.toggle('open', willOpen);
+      mob.classList.toggle('show', willOpen);
+      document.body.style.overflow = willOpen ? 'hidden' : '';
+    });
   }
   document.addEventListener('click', function(e) {
     if (dd && !dd.contains(e.target)) closeDropdown();
