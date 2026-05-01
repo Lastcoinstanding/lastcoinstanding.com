@@ -78,10 +78,11 @@ em.mark {
 a { color: var(--amber); text-decoration: none; border-bottom: 1px solid rgba(224,148,34,0.3); transition: border-color 0.2s; }
 a:hover { border-bottom-color: var(--amber); }
 
-/* Layout — canonical 960px page width per STYLE_GUIDE §4.2; matches Power Law, Half-Life, Fixed Pie, Melting Ice Cube */
-.wrap { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
-.wrap-narrow { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
-.wrap-wide { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
+/* Layout — canonical 960px page width per STYLE_GUIDE §4.2; matches Power Law, Half-Life, Fixed Pie, Melting Ice Cube.
+   .wrap-narrow and .wrap-wide were once different widths (consolidated to 960px in commit 55fe517);
+   selectors kept distinct in markup so the semantic intent (narrative vs. comparison-table-wide containers) is
+   preserved if they ever diverge again. */
+.wrap-narrow, .wrap-wide { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
 
 section { padding: 4.5rem 0; border-top: 1px solid var(--border); }
 section:first-of-type { border-top: none; }
@@ -736,5 +737,4 @@ input[type="range"]::-moz-range-thumb {
   .callout { padding: 1.2rem 1.3rem; }
   .callout .quote { font-size: 1.2rem; }
   .control-panel { padding: 1.2rem; }
-  .intro .wrap-narrow { font-size: 1.2rem; }
 }
