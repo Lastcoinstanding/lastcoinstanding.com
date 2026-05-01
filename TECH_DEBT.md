@@ -51,12 +51,6 @@ A running list of known issues, inconsistencies, and architectural improvements 
   
   Verified during audit: all 16 OG image files present at correct 1280×720 dimensions, all properly registered in `.eleventy.js` staticAssets list, all visually consistent with site brand template (dark background, Cormorant title, italic tagline, glowing Bitcoin glyph, brand header + URL footer).
 
-- [ ] **Minor OG description tightening — half-life and melting-ice-cube.** After Phase 2's title enrichment, two pages now have visible redundancy between the rich `og:title` and the `og:description` (which still leads with the same hook):
-  - **the-half-life:** title now asks "How Long Until Your Money Loses Half Its Value"; desc opens with "How long until your money loses half of its value? An interactive…" — could tighten desc to lead with the elaboration: "An interactive exploration of purchasing power decay across USD, Gold, and Bitcoin."
-  - **the-melting-ice-cube:** title now leads with the Saylor quote; desc opens with the same Saylor quote — could tighten desc to: "Explore what a Bitcoin treasury allocation changes for operating businesses."
-  
-  Not blocking — both patterns work fine on social. The reinforcement just reads as heavy. Worth a 5-minute tightening pass when convenient.
-
 ## 4. Width treatments
 
 - [ ] **Width outliers vs. canonical 960px.** Five pages (Power Law / Half-Life / Fixed Pie / Melting Ice Cube / Horizon as of commit `55fe517`) use the 960px canonical. Two outliers:
@@ -113,5 +107,7 @@ Items where the right call needs either visual review or a designer's judgment r
 ## Recently closed
 
 Move items here when shipped, with commit SHA. Keep the last 5–10 for reference; archive older ones to git history when this section gets long.
+
+- [x] **OG description tightening — half-life and melting-ice-cube (commit `4777094`).** Phase 2's og:title enrichment (commit `47db5f5`) left both pages with descriptions that opened with the same hook as the new title. Tightened so each tag carries its own weight in the social card. Half-Life: 6 locations updated (meta name=description, og:description, og:image:alt, twitter:description, twitter:image:alt, JSON-LD WebPage description) — all leading question dropped, kept the elaboration. Melting Ice Cube: 4 social-card locations updated (og:description, og:image:alt, twitter:description, twitter:image:alt) — Saylor melting-ice-cube quote dropped from the lead. MIC's meta name=description left intentionally as-is (already substantively different from og:description — longer SEO-oriented copy, doesn't echo the og:title). Result is a deliberate asymmetry between MIC's SEO description and social descriptions; both work standalone, different audiences/contexts.
 
 - [x] **Horizon body-prose `<em>` rendering issue (commit `2391882`).** Originally logged as a possible cascade leak — "riskier" and "guaranteed" in §1 looked off in screenshots. Investigation found no CSS rule explaining the rendering. Actual root cause: **no Inter italic was loaded on any page site-wide** — every head.html font URL specified Inter at upright weights only. The browser was falling back to font-synthesis (faux italic) for every body-prose `<em>` on every page. Fixed by adding italic@400 + italic@500 to the Inter declaration in all 15 head.html files; codified as canonical in STYLE_GUIDE §1 "Font loading". Process implication: a "page-specific cascade question" turned out to be a site-wide font-loading bug — the diagnostic value of investigating the smaller question was high. When a rendering issue resists a CSS-rule explanation, check the @font-face / font URL load before assuming cascade.
