@@ -1,16 +1,4 @@
 
-  (function() {
-    var hb = document.getElementById('hamburger');
-    var mo = document.getElementById('mobileOverlay');
-    if (hb && mo) {
-      hb.addEventListener('click', function() {
-        hb.classList.toggle('open');
-        mo.classList.toggle('show');
-      });
-    }
-  })();
-
-
   // ═══ Data model ═══
   const monies = {
     bitcoin: {

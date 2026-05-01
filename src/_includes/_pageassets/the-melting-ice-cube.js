@@ -1,11 +1,4 @@
 
-/* ── NAV ── */
-(function(){
-  var h=document.getElementById('hamburger'),o=document.getElementById('mobileOverlay');
-  h.addEventListener('click',function(){this.classList.toggle('open');o.classList.toggle('show');});
-  o.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){h.classList.remove('open');o.classList.remove('show');});});
-})();
-
 /* ── TABS ── */
 // Hash-based tab routing
 var iceTabMap={'cube':'the-ice-cube','treasury':'treasury-model','companies':'real-companies'};

@@ -1,21 +1,5 @@
 
-(function() {
-    var hamburger = document.getElementById('hamburger');
-    var overlay = document.getElementById('mobileOverlay');
-    hamburger.addEventListener('click', function() {
-        hamburger.classList.toggle('open');
-        overlay.classList.toggle('show');
-        document.body.style.overflow = overlay.classList.contains('show') ? 'hidden' : '';
-    });
-    var overlayLinks = overlay.querySelectorAll('a');
-    for (var i = 0; i < overlayLinks.length; i++) {
-        overlayLinks[i].addEventListener('click', function() {
-            hamburger.classList.remove('open');
-            overlay.classList.remove('show');
-            document.body.style.overflow = '';
-        });
-    }
-})();
+
 
 
 // Insight Carousel

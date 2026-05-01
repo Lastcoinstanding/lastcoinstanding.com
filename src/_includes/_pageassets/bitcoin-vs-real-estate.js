@@ -1,18 +1,4 @@
 
-    /* Mobile hamburger toggle (regression fix; was dropped during Phase 3 refactor).
-       Pattern matches Half-Life and the other canonical pages — see base.njk for
-       the corresponding close-on-link-click + close-on-overlay-click + Escape
-       handlers that work in concert with this open handler. */
-    (function(){
-        var h = document.getElementById('hamburger'), o = document.getElementById('mobileOverlay');
-        if (!h || !o) return;
-        h.addEventListener('click', function() {
-            h.classList.toggle('open');
-            o.classList.toggle('show');
-            document.body.style.overflow = o.classList.contains('show') ? 'hidden' : '';
-        });
-    })();
-
     const homeData={1965:20000,1970:23400,1975:39300,1980:64600,1985:82800,1990:122900,1995:133900,2000:169000,2005:240900,2010:222900,2013:268900,2014:282800,2015:294000,2016:306200,2017:323500,2018:326400,2019:321500,2020:336900,2021:401700,2022:454900,2023:426100,2024:420300,2025:416900};
     const incomeData={1965:6957,1970:9867,1975:13719,1980:21023,1985:23620,1990:29940,1995:34076,2000:42148,2005:46326,2010:49276,2013:51939,2014:53657,2015:56516,2016:59039,2017:61372,2018:63179,2019:68703,2020:67521,2021:70784,2022:74580,2023:80610,2024:81500,2025:83150};
     const btcData={2013:732,2014:530,2015:272,2016:567,2017:4348,2018:7565,2019:7362,2020:11072,2021:47458,2022:19657,2023:28233,2024:62682,2025:88000};

@@ -32,12 +32,4 @@
             });
         }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
         fadeEls.forEach(el => observer.observe(el));
-
-        // Mobile menu toggle
-        const hamburger = document.getElementById('hamburger');
-        const mobileOverlay = document.getElementById('mobileOverlay');
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('open');
-            mobileOverlay.classList.toggle('show');
-        });
     

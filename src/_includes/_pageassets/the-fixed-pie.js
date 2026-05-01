@@ -1,21 +1,5 @@
 
 /* ─────────────────────────────────────────
-   NAV: Hamburger
-───────────────────────────────────────── */
-const hamburger = document.getElementById('hamburger');
-const mobileOverlay = document.getElementById('mobileOverlay');
-hamburger.addEventListener('click', () => {
-  hamburger.classList.toggle('open');
-  mobileOverlay.classList.toggle('show');
-});
-mobileOverlay.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', () => {
-    hamburger.classList.remove('open');
-    mobileOverlay.classList.remove('show');
-  });
-});
-
-/* ─────────────────────────────────────────
    TABS
 ───────────────────────────────────────── */
 let cagrChartDrawn = false;

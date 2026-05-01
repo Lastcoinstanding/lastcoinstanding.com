@@ -621,13 +621,3 @@ document.getElementById('periodSlider').addEventListener('input', e => {
 });
 
 setPreset('2021-11');
-
-
-
-// Mobile menu toggle
-const hamburger = document.getElementById('hamburger');
-const mobileOverlay = document.getElementById('mobileOverlay');
-hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('open');
-    mobileOverlay.classList.toggle('show');
-});

@@ -783,25 +783,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// ─── NAV ──────────────────────────────────────────────────────────────────────
-(function() {
-  const h = document.getElementById('hamburger');
-  const o = document.getElementById('mobileOverlay');
-  if (!h || !o) return;
-  h.addEventListener('click', () => {
-    const open = o.classList.toggle('show');
-    h.classList.toggle('open', open);
-    document.body.style.overflow = open ? 'hidden' : '';
-  });
-  o.querySelectorAll('a').forEach(a =>
-    a.addEventListener('click', () => {
-      o.classList.remove('show');
-      h.classList.remove('open');
-      document.body.style.overflow = '';
-    })
-  );
-})();
-
 // ─── SAVE OVERLAY BACK ───────────────────────────────────────────────────────
 (function() {
   const backBtn = document.getElementById('saveOverlayBack');

@@ -1,5 +1,5 @@
 
-(function(){var h=document.getElementById('hamburger'),o=document.getElementById('mobileOverlay');if(!h||!o)return;h.addEventListener('click',function(){h.classList.toggle('open');o.classList.toggle('show');document.body.style.overflow=o.classList.contains('show')?'hidden':''});var ls=o.querySelectorAll('a');for(var i=0;i<ls.length;i++)ls[i].addEventListener('click',function(){h.classList.remove('open');o.classList.remove('show');document.body.style.overflow=''})})();
+
 
 function showTab(id){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active')});document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});document.getElementById('tab-'+id).classList.add('active');var m={interactive:0,history:1,takeaway:2};document.querySelectorAll('.tab-btn')[m[id]].classList.add('active');document.querySelector('.tab-nav').scrollIntoView({behavior:'smooth',block:'start'})}
 

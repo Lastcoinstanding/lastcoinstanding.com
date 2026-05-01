@@ -204,9 +204,6 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
   }
 })();
 
-// ═══════ NAV ═══════
-(function(){var h=document.getElementById('hamburger'),o=document.getElementById('mobileOverlay');if(!h||!o)return;h.addEventListener('click',function(){h.classList.toggle('open');o.classList.toggle('show');document.body.style.overflow=o.classList.contains('show')?'hidden':''});var ls=o.querySelectorAll('a');for(var i=0;i<ls.length;i++)ls[i].addEventListener('click',function(){h.classList.remove('open');o.classList.remove('show');document.body.style.overflow=''})})();
-
 // ═══════ CAGR COMPARISON CHART ═══════
 (function(){
   var ctx = document.getElementById('cagrChart');
