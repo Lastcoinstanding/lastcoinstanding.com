@@ -757,25 +757,6 @@ input[type="range"]::-moz-range-thumb {
   line-height: 1.5;
 }
 
-/* Footer */
-footer {
-  padding: 3rem 0 4rem;
-  border-top: 1px solid var(--border);
-  text-align: center;
-}
-footer .f-brand {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 1.3rem;
-  color: var(--ink-dim);
-  margin-bottom: 0.5rem;
-}
-footer .f-line {
-  font-size: 0.8rem;
-  color: var(--ink-faint);
-  letter-spacing: 1px;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
   section { padding: 3.2rem 0; }
