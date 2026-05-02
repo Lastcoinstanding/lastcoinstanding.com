@@ -5,7 +5,7 @@ slug: the-half-life
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-half-life-head.html' %}"
   page_styles: "{% include '_pageassets/the-half-life.css' %}"
-  page_scripts: "{% include '_pageassets/the-half-life.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/the-half-life.js' %}"
 ---
 <div class="page">
   <div class="page-header">
@@ -42,24 +42,31 @@ eleventyComputed:
       <div class="scenario-selector">
         <div class="scenario-prompt">What is the true rate of inflation?</div>
         <div class="btn-group" id="fiatBtns">
-          <button class="opt-btn" data-rate="3.5" onclick="setFiat(this)"><span class="opt-name">CPI Official</span><span class="opt-rate">~3.5% / yr</span></button>
-          <button class="opt-btn sel-fiat" data-rate="8" onclick="setFiat(this)"><span class="opt-name">Shadow Stats</span><span class="opt-rate">~8% / yr</span></button>
-          <button class="opt-btn" data-rate="12" onclick="setFiat(this)"><span class="opt-name">True Asset</span><span class="opt-rate">~12% / yr</span></button>
+          <button class="opt-btn" data-preset="cpi-official" onclick="setFiat(this)"><span class="opt-name">CPI Official</span><span class="opt-rate">3.5% / yr</span></button>
+          <button class="opt-btn" data-preset="m2-growth" onclick="setFiat(this)"><span class="opt-name">M2 growth</span><span class="opt-rate">6.5% / yr</span></button>
+          <button class="opt-btn" data-preset="shadow-stats" onclick="setFiat(this)"><span class="opt-name">Shadow Stats</span><span class="opt-rate">8% / yr</span></button>
+          <button class="opt-btn" data-preset="custom" onclick="setFiat(this)"><span class="opt-name">Custom</span><span class="opt-rate" id="customRateLabel">enter your own</span></button>
         </div>
-        <div class="scenario-hint">CPI is the government's own figure. Shadow Stats uses pre-1980 methodology. True Asset includes housing, healthcare, and education.</div>
+        <div id="customRateRow" style="display:none;margin-top:.6rem;font-family:var(--font-b);font-size:.85rem;color:var(--text-dim)">
+          <label for="customRateInput">Your rate: </label>
+          <input type="number" id="customRateInput" inputmode="decimal" step="0.1" min="-50" max="500" style="width:80px;padding:4px 8px;background:var(--bg);border:1px solid var(--border);color:var(--text-bright);font-family:inherit;font-size:.95rem;border-radius:0">
+          <span style="color:var(--text-muted)">% / yr</span>
+        </div>
+        <div class="scenario-hint">CPI is the government's published figure. M2 growth (the default) is the rate of US money-supply expansion over the last 50 years — the most accurate measure of monetary debasement. Shadow Stats applies pre-1980 CPI methodology. Custom lets you enter your own rate (saved on this device only, never transmitted).</div>
+        <div class="scenario-hint" style="margin-top:.4rem;font-size:.75rem"><a href="#" onclick="resetFiat(event)" style="color:var(--text-muted);text-decoration:underline">Reset to defaults</a></div>
       </div>
 
       <!-- The gut-punch: big number + decay curve -->
       <div class="decay-hero">
         <div class="decay-headline">Your $100 becomes equivalent to $50 in&#8230;</div>
-        <div class="decay-number" id="fiatHL">8.3</div>
+        <div class="decay-number" id="fiatHL">11.0</div>
         <div class="decay-years">years</div>
 
         <div class="decay-chart-wrap">
           <canvas id="decayChart"></canvas>
         </div>
 
-        <div class="decay-note" id="decayNote">At the Shadow Stats rate, the dollar's half-life has compressed from ~20 years to ~8 years. The leak is accelerating.</div>
+        <div class="decay-note" id="decayNote">At the 50-year average rate of M2 money supply growth — the most accurate measure of monetary debasement — your dollar's half-life is about 11 years. What used to take a generation to debase 50% now takes about a decade.</div>
       </div>
     </div>
 

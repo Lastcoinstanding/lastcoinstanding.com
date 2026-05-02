@@ -1,24 +1,94 @@
 
-
-
 function showTab(id){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active')});document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});document.getElementById('tab-'+id).classList.add('active');var m={interactive:0,history:1,takeaway:2};document.querySelectorAll('.tab-btn')[m[id]].classList.add('active');document.querySelector('.tab-nav').scrollIntoView({behavior:'smooth',block:'start'})}
 
-var fiatRate = 8;
+// Inflation state — driven entirely by the sitewide ModelingAssumptions API.
+// fiatRate is computed from the current preset/customValue on every read.
+function getFiatRate() {
+  return window.ModelingAssumptions.get('inflation').value;
+}
+
+// Half-life uses the canonical math helper (ln(2)/ln(1+r))
+function halfLife(rate) {
+  return window.CalcHelpers.purchasingPowerHalfLife(rate);
+}
 
 function setFiat(b) {
+  var preset = b.dataset.preset;
+  // Toggle visual selection
   document.querySelectorAll('#fiatBtns .opt-btn').forEach(function(x) { x.classList.remove('sel-fiat'); });
   b.classList.add('sel-fiat');
-  fiatRate = parseFloat(b.dataset.rate);
+
+  // Show or hide custom input row
+  var customRow = document.getElementById('customRateRow');
+  if (preset === 'custom') {
+    customRow.style.display = '';
+    var input = document.getElementById('customRateInput');
+    var current = window.ModelingAssumptions.get('inflation');
+    // If we have a stored custom value, surface it; otherwise leave the field empty
+    var stored = parseFloat(localStorage.getItem('lcs.inflation.customValue'));
+    if (isFinite(stored)) {
+      input.value = stored;
+      window.ModelingAssumptions.set('inflation', 'custom', stored);
+    } else {
+      input.value = '';
+      input.focus();
+      // Don't write a custom preset until user actually enters a value
+      return;
+    }
+  } else {
+    customRow.style.display = 'none';
+    window.ModelingAssumptions.set('inflation', preset);
+  }
   updateDecay();
 }
 
-function halfLife(rate) {
-  return rate <= 0 ? Infinity : Math.log(2) / Math.log(1 + rate / 100);
+// Wire up the custom-rate input: writes through to ModelingAssumptions on change
+function bindCustomRateInput() {
+  var input = document.getElementById('customRateInput');
+  if (!input) return;
+  input.addEventListener('input', function() {
+    var v = parseFloat(input.value);
+    if (isFinite(v)) {
+      window.ModelingAssumptions.set('inflation', 'custom', v);
+      updateDecay();
+    }
+  });
+}
+
+function resetFiat(e) {
+  e.preventDefault();
+  window.ModelingAssumptions.reset();
+  syncFiatUI();
+  updateDecay();
+}
+
+// Sync the button group + custom-input UI to match the current ModelingAssumptions state.
+// Called on page load and on cross-tab storage events.
+function syncFiatUI() {
+  var current = window.ModelingAssumptions.get('inflation');
+  document.querySelectorAll('#fiatBtns .opt-btn').forEach(function(btn) {
+    if (btn.dataset.preset === current.preset) {
+      btn.classList.add('sel-fiat');
+    } else {
+      btn.classList.remove('sel-fiat');
+    }
+  });
+  var customRow = document.getElementById('customRateRow');
+  if (current.preset === 'custom') {
+    customRow.style.display = '';
+    var input = document.getElementById('customRateInput');
+    if (input.value === '' || parseFloat(input.value) !== current.value) {
+      input.value = current.value;
+    }
+  } else {
+    customRow.style.display = 'none';
+  }
 }
 
 function drawDecayCurve() {
   var canvas = document.getElementById('decayChart');
   if (!canvas) return;
+  var fiatRate = getFiatRate();
   var ctx = canvas.getContext('2d');
   var wrap = canvas.parentElement;
   var dpr = window.devicePixelRatio || 1;
@@ -99,7 +169,7 @@ function drawDecayCurve() {
   ctx.beginPath();
   ctx.moveTo(xP(0), yP(100));
   for (var yr = 0; yr <= maxYears; yr += 0.5) {
-    var val = 100 * Math.pow(1 - fiatRate / 100, yr);
+    var val = 100 / Math.pow(1 + fiatRate / 100, yr);
     ctx.lineTo(xP(yr), yP(Math.max(val, 0)));
   }
   ctx.lineTo(xP(maxYears), yP(100));
@@ -115,7 +185,7 @@ function drawDecayCurve() {
   ctx.lineJoin = 'round';
   ctx.beginPath();
   for (yr = 0; yr <= maxYears; yr += 0.5) {
-    var val = 100 * Math.pow(1 - fiatRate / 100, yr);
+    var val = 100 / Math.pow(1 + fiatRate / 100, yr);
     var px = xP(yr), py = yP(Math.max(val, 0));
     yr === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
   }
@@ -126,7 +196,7 @@ function drawDecayCurve() {
   ctx.lineWidth = 2.5;
   ctx.beginPath();
   for (yr = 0; yr <= maxYears; yr += 0.5) {
-    var val = 100 * Math.pow(1 - fiatRate / 100, yr);
+    var val = 100 / Math.pow(1 + fiatRate / 100, yr);
     var px = xP(yr), py = yP(Math.max(val, 0));
     yr === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
   }
@@ -163,21 +233,39 @@ function drawDecayCurve() {
 }
 
 function updateDecay() {
+  var fiatRate = getFiatRate();
   var hl = halfLife(fiatRate);
-  document.getElementById('fiatHL').textContent = hl.toFixed(1);
+  document.getElementById('fiatHL').textContent = isFinite(hl) ? hl.toFixed(1) : '\u221E';
 
   drawDecayCurve();
 
-  // Update contextual note
+  // Update contextual note based on rate band (canonical thresholds map to
+  // CPI Official 3.5%, M2 growth 6.5%, Shadow Stats 8%, plus Custom)
   var noteEl = document.getElementById('decayNote');
   if (fiatRate <= 4) {
-    noteEl.textContent = 'Even at the government\'s own CPI figure, your dollar loses half of its value in about 20 years. And most economists agree that CPI understates real inflation.';
-  } else if (fiatRate <= 9) {
-    noteEl.textContent = 'Using pre-1980 methodology (before CPI was revised to understate inflation), the dollar\'s half-life compresses to about 9 years. What used to take a generation to debase 50% now takes less than a decade.';
+    noteEl.textContent = 'Even at the government\u2019s own CPI figure, your dollar loses half of its value in about 20 years. And most economists agree that CPI understates real inflation.';
+  } else if (fiatRate <= 7) {
+    noteEl.textContent = 'At the 50-year average rate of M2 money supply growth \u2014 the most accurate measure of monetary debasement \u2014 your dollar\u2019s half-life is about 11 years. What used to take a generation to debase 50% now takes about a decade.';
+  } else if (fiatRate <= 10) {
+    noteEl.textContent = 'Using pre-1980 CPI methodology, the dollar\u2019s half-life compresses to about 9 years. The methodology revisions since then have systematically reduced reported inflation, but the underlying monetary expansion continued.';
   } else {
-    noteEl.textContent = 'When you include housing, healthcare, and education \u2014 the things that actually matter \u2014 the dollar loses half of its value in about 6 years. This is not a store of value. It is a melting ice cube.';
+    noteEl.textContent = 'At rates this high, the dollar\u2019s half-life compresses to a handful of years. This is the territory of currency crises and emerging-market debasement \u2014 not a stable store of value.';
   }
 }
 
-window.addEventListener('load', updateDecay);
+window.addEventListener('load', function() {
+  syncFiatUI();
+  bindCustomRateInput();
+  updateDecay();
+});
 window.addEventListener('resize', drawDecayCurve);
+
+// Subscribe to canonical changes (e.g. cross-tab updates, reset events)
+if (window.ModelingAssumptions && window.ModelingAssumptions.subscribe) {
+  window.ModelingAssumptions.subscribe(function(dim) {
+    if (dim === 'inflation' || dim === '*') {
+      syncFiatUI();
+      updateDecay();
+    }
+  });
+}
