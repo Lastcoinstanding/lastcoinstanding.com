@@ -15,13 +15,9 @@ A running list of known issues, inconsistencies, and architectural improvements 
 
 ## 1. Architecture & DRY
 
-- [ ] **Power Law forward tab — Stage 5b output reconciliation (Path A completion).** Stage 5a (commit `cfa8214`) migrated input pickers to canonical real-terms framing but kept outputs in nominal terms. Per the Path A design agreement, this is intentionally intermediate — Stage 5b deflates all output values to today's purchasing power as the primary display, with nominal-equivalents shown alongside (per Option C, real primary + nominal in tooltip / supporting text). Surface area: four output paths (mortgage cash, mortgage with DCA, mortgage with S&P, all-cash equivalents) need consistent treatment; "How this works" annotation needs rewrite removing the temporary asymmetry note. Math infrastructure (CalcHelpers.deflateToToday) already in place.
-
 - [ ] **Stage 2: rich card-based modeling-assumption selector component.** Replace the ad-hoc preset buttons currently used by Half-Life (commit `3bd24e6`), MIC (commit `fab5453`), and Power Law (commit `cfa8214`) with the proper card-based selector documented in STYLE_GUIDE §3.5: each preset rendered as a card showing the headline value, label, one-line context, and an expandable "How this is built" breakdown with per-component citations (component bullets sourced to DATA_AUDIT.md). First-time visitors see expanded breakdowns; returning visitors see collapsed cards (sessionStorage). Apply to all calculator pages including any future ones. Built once against the existing ModelingAssumptions API; all call sites just swap their button-group markup for the new component.
 
 - [ ] **MIC inflation picker consolidation.** Currently three separate button groups on MIC sync to the same canonical state (commit `fab5453`); per the canonical's "two-zone calculator layout" principle in STYLE_GUIDE §3.5, this should be one picker at the top of the page in the baseline-assumptions zone, with the three scenes consuming it. Defer to Stage 2 alongside the rich card UI work, since this is a layout restructure that benefits from being done together with the broader UI work.
-
-- [ ] **Bitcoin vs. Real Estate canonical adoption.** BvRE's retrospective tab uses historical home prices and rates from FRED (no projection inputs), so doesn't need realEstate canonical wiring. But its forward-looking calculator path (if/when added) and any inflation-related copy across the page should use the canonical. Smaller scope than Power Law's; can ship in Stage 1.5 alongside Stage 5b or in Stage 2.
 
 ## 2. Type system compliance
 
@@ -87,6 +83,12 @@ _(no open items)_
 ## Recently closed
 
 Move items here when shipped, with commit SHA. Keep the last 5–10 for reference; archive older ones to git history when this section gets long.
+
+- [x] **Stage 1.5 modeling-assumptions follow-on — Power Law output reconciliation + BvRE canonical adoption (`dfed9e6`, this commit).** Closes the temporary asymmetry shipped at the end of Stage 1, where Power Law's forward tab inputs used real-terms framing but outputs displayed as nominal future dollars.
+  - `dfed9e6` — Power Law Stage 5b: Path A completion. All projected dollar amounts (btcNet, equity, futureHomeValue, dcaValue, spFV, futurePrice, btcValue) now display in today's purchasing power as primary, with nominal-equivalents shown alongside in dim secondary lines. Returns and CAGRs computed against real values (now showing real percentages, smaller than the prior nominal numbers but more honest). Approach 3 (pragmatic hybrid) — accumulated payment streams (rent, interest, total cost of ownership) keep their nominal magnitudes with explicit "accumulated" annotations. "How this works" annotation rewritten to describe shipped state. Math sanity-check confirmed real future home value via deflate(nominalFV) and via direct realFutureValue() agree to the dollar.
+  - This commit (BvRE) — Wired shared modules into BvRE's page_scripts. BvRE's narrative copy was already fully aligned with the canonical's framing ("monetary debasement," "fiat dilution," "broken money") and the page has no hardcoded inflation rates in its JS (uses historical FRED data, not projections). The shared-module wiring makes any future forward-looking input cheap to add and ensures cross-page inflation stickiness flows through to BvRE if narrative copy ever surfaces the user's chosen rate.
+  
+  Cumulative effect of Stage 1.5: Power Law's forward calculator now operates in consistent real-terms framing throughout — the comparison between Bitcoin and real estate is in today's purchasing power on both sides, no longer mixing nominal-on-one-side / real-on-other. The site's calculator pages are now uniformly canonical-driven. Remaining open items in §1 (Stage 2 rich card UI, MIC consolidation) are layout/UX work, not architectural; the canonical foundation itself is settled.
 
 - [x] **Stage 1 modeling-assumptions canonical — six commits (`51a9c2e`, `c3ae3f4`, `3bd24e6`, `fab5453`, `cfa8214`, this commit).** Established sitewide-sticky modeling-assumption framework per a multi-session design discussion. Six-commit sequence:
   1. `51a9c2e` — DATA_AUDIT.md created with 18 citation rows seeded; six-month refresh cadence
