@@ -303,6 +303,8 @@ Roman-numeral tab numbering is the canonical pattern (Half-Life). UPPERCASE trac
 
 For pull-quotes on dark backgrounds (non-essay pages), substitute `font-family: var(--font-flourish)` (Source Serif italic) and ink colors.
 
+**Scope note.** §6.3 covers cited quotes — someone else's words pulled out for emphasis (Migration's three pull-quotes are the canonical examples). It does *not* cover authorial commentary blocks where the page's author is speaking in their own voice. Those are a distinct pattern: visually similar (left border, indented box) but typographically different (Inter body, not Source Serif italic; emphasis via inline `<em>` rather than the whole block being italic). Bitcoin vs. Real Estate uses `.narrative` for this — six instances on that page, with the calculator-tab framing block at L122 carrying inline Cormorant overrides for additional weight at a key UI moment. Authorial-commentary blocks remain page-specific patterns, not site-wide components; document them inline in their page's CSS.
+
 ### 6.4 Two-tone title
 
 ```html
