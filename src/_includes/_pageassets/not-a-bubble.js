@@ -157,7 +157,7 @@ function initChart() {
           border: { display: false },
           ticks: {
             color: '#8a8070',
-            font: { family: "'DM Sans', sans-serif", size: 10 },
+            font: { family: "'Inter', sans-serif", size: 10 },
             stepSize: 1,
             callback(v) {
               if (v === 0) return 'Peak';
@@ -168,7 +168,7 @@ function initChart() {
             display: true,
             text: 'Years around peak  (0 = peak)',
             color: '#9a9088',
-            font: { family: "'DM Sans', sans-serif", size: 11 },
+            font: { family: "'Inter', sans-serif", size: 11 },
             padding: { top: 8 },
           },
         },
@@ -179,7 +179,7 @@ function initChart() {
           border: { display: false },
           ticks: {
             color: '#8a8070',
-            font: { family: "'DM Sans', sans-serif", size: 10 },
+            font: { family: "'Inter', sans-serif", size: 10 },
             stepSize: getScaleConfig().yStep,
             callback(v) { return `${v}×`; },
           },
@@ -187,7 +187,7 @@ function initChart() {
             display: true,
             text: 'Multiple of starting price',
             color: '#9a9088',
-            font: { family: "'DM Sans', sans-serif", size: 11 },
+            font: { family: "'Inter', sans-serif", size: 11 },
           },
         },
       },
@@ -204,8 +204,8 @@ function initChart() {
           titleColor: '#d0c8c0',
           bodyColor: '#908880',
           padding: 10,
-          titleFont: { family: "'DM Sans', sans-serif", size: 12, weight: '600' },
-          bodyFont: { family: "'DM Sans', sans-serif", size: 11 },
+          titleFont: { family: "'Inter', sans-serif", size: 12, weight: '600' },
+          bodyFont: { family: "'Inter', sans-serif", size: 11 },
           callbacks: {
             filter(item) { return item.datasetIndex === 0; },
             title(items) {
@@ -279,7 +279,7 @@ function drawAnnotations(chart) {
     // Label box
     const lines    = [m.label, `$${m.price.toLocaleString()}`];
     const fontSize = 9.5;
-    ctx.font       = `500 ${fontSize}px 'DM Sans', sans-serif`;
+    ctx.font       = `500 ${fontSize}px 'Inter', sans-serif`;
     const tw0      = ctx.measureText(lines[0]).width;
     const tw1      = ctx.measureText(lines[1]).width;
     const boxW     = Math.max(tw0, tw1) + 16;
@@ -300,7 +300,7 @@ function drawAnnotations(chart) {
     const txX = m.ha === 'left' ? boxX + 8 : boxX + boxW - 8;
     ctx.fillText(lines[0], txX, lblY - 7);
     ctx.fillStyle = '#887868';
-    ctx.font      = `400 ${fontSize - 0.5}px 'DM Sans', sans-serif`;
+    ctx.font      = `400 ${fontSize - 0.5}px 'Inter', sans-serif`;
     ctx.fillText(lines[1], txX, lblY + 7);
   });
 
@@ -322,7 +322,7 @@ function drawAnnotations(chart) {
     ctx.fill();
     ctx.shadowBlur  = 0;
 
-    ctx.font         = `600 10px 'DM Sans', sans-serif`;
+    ctx.font         = `600 10px 'Inter', sans-serif`;
     ctx.fillStyle    = '#e09422';
     ctx.textAlign    = 'left';
     ctx.textBaseline = 'middle';
@@ -341,10 +341,10 @@ function drawAnnotations(chart) {
 
     ctx.fillStyle  = '#e09422';
     ctx.textAlign  = 'left';
-    ctx.font       = `600 10px 'DM Sans', sans-serif`;
+    ctx.font       = `600 10px 'Inter', sans-serif`;
     ctx.fillText(todayText, bx + 10, by + 12);
     ctx.fillStyle  = '#887060';
-    ctx.font       = `400 9px 'DM Sans', sans-serif`;
+    ctx.font       = `400 9px 'Inter', sans-serif`;
     ctx.fillText(subText, bx + 10, by + 26);
   }
 
@@ -356,7 +356,7 @@ function drawAnnotations(chart) {
   const brandY = chart.chartArea.bottom - 10;
   ctx.textAlign    = 'right';
   ctx.textBaseline = 'bottom';
-  ctx.font         = `600 11px 'DM Sans', sans-serif`;
+  ctx.font         = `600 11px 'Inter', sans-serif`;
   ctx.fillStyle    = '#504840';
   ctx.fillText('Source: lastcoinstanding.com', brandX + 1, brandY + 1);
   ctx.fillStyle    = '#786860';
@@ -389,7 +389,7 @@ function drawCallout(ctx, chart) {
     ctx.textBaseline = 'top';
 
     ctx.fillStyle = '#e09422';
-    ctx.font      = `700 9px 'DM Sans', sans-serif`;
+    ctx.font      = `700 9px 'Inter', sans-serif`;
     ctx.fillText('ZOOM IN', lx, by + 12);
 
     const lines2 = [
@@ -400,9 +400,9 @@ function drawCallout(ctx, chart) {
       'happened next.',
     ];
     ctx.fillStyle = '#a09888';
-    ctx.font      = `400 9.5px 'DM Sans', sans-serif`;
+    ctx.font      = `400 9.5px 'Inter', sans-serif`;
     lines2.forEach((ln, i) => {
-      if (ln.startsWith('Switch')) { ctx.fillStyle = '#d0c8b8'; ctx.font = `600 9.5px 'DM Sans', sans-serif`; }
+      if (ln.startsWith('Switch')) { ctx.fillStyle = '#d0c8b8'; ctx.font = `600 9.5px 'Inter', sans-serif`; }
       else ctx.fillStyle = '#a09888';
       ctx.fillText(ln, lx, by + 28 + i * 14);
     });
@@ -427,7 +427,7 @@ function drawCallout(ctx, chart) {
   ctx.textBaseline = 'top';
 
   ctx.fillStyle = '#e09422';
-  ctx.font      = `700 9px 'DM Sans', sans-serif`;
+  ctx.font      = `700 9px 'Inter', sans-serif`;
   ctx.fillText('THE PATTERN', lx, by + 12);
 
   const lines2 = [
@@ -439,10 +439,10 @@ function drawCallout(ctx, chart) {
     'This is not bubble behavior.',
   ];
   ctx.fillStyle = '#a09888';
-  ctx.font      = `400 9.5px 'DM Sans', sans-serif`;
+  ctx.font      = `400 9.5px 'Inter', sans-serif`;
   lines2.forEach((ln, i) => {
     if (ln.startsWith('✓')) ctx.fillStyle = '#e09422';
-    else if (ln.startsWith('This')) { ctx.fillStyle = '#d0c8b8'; ctx.font = `600 9.5px 'DM Sans', sans-serif`; }
+    else if (ln.startsWith('This')) { ctx.fillStyle = '#d0c8b8'; ctx.font = `600 9.5px 'Inter', sans-serif`; }
     else ctx.fillStyle = '#a09888';
     ctx.fillText(ln, lx, by + 28 + i * 14);
   });
@@ -589,7 +589,7 @@ async function generateDownload() {
             border: { display: false },
             ticks: {
               color: '#8a8070',
-              font: { family: "'DM Sans', sans-serif", size: 11 },
+              font: { family: "'Inter', sans-serif", size: 11 },
               stepSize: 1,
               callback(v) {
                 if (v === 0) return 'Peak';
@@ -600,7 +600,7 @@ async function generateDownload() {
               display: true,
               text: 'Years around peak  (0 = peak)',
               color: '#9a9088',
-              font: { family: "'DM Sans', sans-serif", size: 12 },
+              font: { family: "'Inter', sans-serif", size: 12 },
               padding: { top: 8 },
             },
           },
@@ -611,7 +611,7 @@ async function generateDownload() {
             border: { display: false },
             ticks: {
               color: '#8a8070',
-              font: { family: "'DM Sans', sans-serif", size: 11 },
+              font: { family: "'Inter', sans-serif", size: 11 },
               stepSize: getScaleConfig().yStep,
               callback(v) { return `${v}×`; },
             },
@@ -619,7 +619,7 @@ async function generateDownload() {
               display: true,
               text: 'Multiple of starting price',
               color: '#9a9088',
-              font: { family: "'DM Sans', sans-serif", size: 12 },
+              font: { family: "'Inter', sans-serif", size: 12 },
             },
           },
         },
@@ -681,7 +681,7 @@ async function generateDownload() {
     // ── Branding: top-right ──
     ec.textAlign    = 'right';
     ec.textBaseline = 'top';
-    ec.font         = "bold 22px 'DM Sans', -apple-system, sans-serif";
+    ec.font         = "bold 22px 'Inter', -apple-system, sans-serif";
     ec.fillStyle    = '#7a4010';
     ec.fillText('lastcoinstanding.com', exportW - 31, 19);
     ec.fillStyle    = '#e09422';
@@ -693,7 +693,7 @@ async function generateDownload() {
       { label: 'Bitcoin (2014–present)  •  still climbing', color: '#e09422', lw: 3 },
       ...BUBBLES.map(b => ({ label: `${b.label} (${b.dates})  ${b.duration}`, color: b.color, lw: 2 })),
     ];
-    ec.font         = "400 11px 'DM Sans', -apple-system, sans-serif";
+    ec.font         = "400 11px 'Inter', -apple-system, sans-serif";
     ec.textBaseline = 'middle';
     ec.textAlign    = 'left';
     let lx = 32;
@@ -716,7 +716,7 @@ async function generateDownload() {
     const todayStr = new Date().toLocaleDateString('en-US',
       {weekday:'short', month:'short', day:'numeric', year:'numeric'});
 
-    ec.font         = "600 14px 'DM Sans', -apple-system, sans-serif";
+    ec.font         = "600 14px 'Inter', -apple-system, sans-serif";
     ec.fillStyle    = '#e09422';
     ec.textAlign    = 'right';
     ec.textBaseline = 'bottom';
@@ -725,7 +725,7 @@ async function generateDownload() {
       exportW - 32, footerY
     );
 
-    ec.font         = "400 12px 'DM Sans', -apple-system, sans-serif";
+    ec.font         = "400 12px 'Inter', -apple-system, sans-serif";
     ec.fillStyle    = '#786e66';
     ec.textAlign    = 'left';
     ec.textBaseline = 'bottom';
