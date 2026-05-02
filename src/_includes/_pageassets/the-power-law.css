@@ -1,7 +1,7 @@
 
 :root{--bg:#0a0908;--bg-card:#111110;--border:#1e1c1a;--border-lt:#2a2826;--orange:#F7931A;--orange-dim:rgba(247,147,26,.45);--orange-glow:rgba(247,147,26,.12);--orange-soft:rgba(247,147,26,.08);--gold:#d4a843;--gold-dim:rgba(212,168,67,.35);--gold-soft:rgba(212,168,67,.10);--red:#c0392b;--red-dim:rgba(192,57,43,.30);--red-soft:rgba(192,57,43,.10);--amber:#e09422;--text:#d8d2ca;--text-dim:#908880;--text-bright:#f2eee8;--text-body:#d0c8c0;--text-muted:#706860;--font-d:'Cormorant Garamond',Georgia,serif;--font-b:'Inter',-apple-system,sans-serif}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:1rem;line-height:1.7;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:1.05rem;line-height:1.7;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:1000}
 /* NAV — calc-tier overrides on canonical-nav-css (base.njk).
    Same pattern as the-half-life.css: tighter sizing for chart-control
@@ -22,14 +22,14 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 .page{max-width:960px;margin:0 auto;padding:40px 24px 60px}
 .page-header{text-align:center;margin-bottom:40px}
-.page-header h1{font-family:var(--font-d);font-size:clamp(2rem,4.5vw,3rem);font-weight:600;color:var(--text-bright);margin-bottom:12px;letter-spacing:-.01em}
+.page-header h1{font-family:var(--font-d);font-size:clamp(2rem,4vw,3.4rem);font-weight:500;color:var(--text-bright);margin-bottom:12px;letter-spacing:-.01em}
 .subtitle{font-family:'Source Serif 4',serif;font-size:clamp(1.05rem,2vw,1.3rem);color:var(--text-dim);line-height:1.6;max-width:700px;margin:0 auto;font-style:italic;font-weight:400}
 
 /* HERO */
 .hero-insight{max-width:780px;margin:0 auto 3rem;text-align:center}
-.hero-stat{font-family:var(--font-d);font-size:clamp(1.4rem,3vw,2rem);font-weight:600;color:var(--text-bright);line-height:1.35;margin-bottom:1.2rem}
+.hero-stat{font-family:var(--font-d);font-size:clamp(1.6rem,3.4vw,2.4rem);font-weight:500;color:var(--text-bright);line-height:1.35;margin-bottom:1.2rem}
 .hero-stat em{color:var(--amber);font-style:italic}
-.hero-body{font-size:.95rem;color:var(--text-body);line-height:1.8;margin-bottom:1rem}
+.hero-body{font-size:1.05rem;color:var(--text-body);line-height:1.7;margin-bottom:1rem}
 .hero-body strong{color:var(--text-bright);font-weight:600}
 
 /* TABS */
@@ -49,9 +49,9 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 /* SECTIONS */
 .section{margin-bottom:3rem}
-.section h2{font-family:var(--font-d);font-size:1.5rem;font-weight:600;color:var(--text-bright);margin-bottom:1rem}
-.section h3{font-family:var(--font-d);font-size:1.2rem;font-weight:500;color:var(--text-bright);margin-bottom:0.8rem}
-.prose{font-size:.95rem;color:var(--text-body);line-height:1.8;margin-bottom:1.2rem}
+.section h2{font-family:var(--font-d);font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:500;color:var(--text-bright);margin-bottom:1rem;line-height:1.2}
+.section h3{font-family:var(--font-d);font-size:clamp(1.4rem,2.4vw,1.8rem);font-weight:500;color:var(--text-bright);margin-bottom:0.8rem}
+.prose{font-size:1.05rem;color:var(--text-body);line-height:1.7;margin-bottom:1.2rem}
 .prose em{color:var(--amber);font-style:italic}
 
 /* MILESTONES TABLE */
