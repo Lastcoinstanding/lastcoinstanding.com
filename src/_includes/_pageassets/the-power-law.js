@@ -675,7 +675,13 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
     var horizonYrs = parseInt(horizonSel.value);
     var btcNow = parseNum('fwdBtcNow');
     var homePrice = parseNum('fwdHomePrice');
-    var homeAppr = parseNum('fwdHomeAppreciation') / 100;
+    // Home appreciation input is now in REAL terms (per canonical §3.5).
+    // Combine with sitewide inflation to get nominal rate for the math below,
+    // which produces nominal future values.
+    var homeApprReal = parseNum('fwdHomeAppreciation');
+    var inflRate = window.ModelingAssumptions.get('inflation').value;
+    var homeApprNominalPct = window.CalcHelpers.realToNominal(homeApprReal, inflRate);
+    var homeAppr = homeApprNominalPct / 100;
     var mortRate = parseNum('fwdMortgageRate');
 
     if(btcNow <= 0 || homePrice <= 0) return;
@@ -894,14 +900,17 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
         '</div>';
       rightEl.innerHTML = '';
     } else {
-      // Cash: S&P investment of imputed rent savings
-      var rate = parseNum('fwdAdvancedRate') / 100;
-      if(rate <= 0) rate = 0.07;
+      // Cash: S&P investment of imputed rent savings.
+      // Input is REAL return per canonical §3.5; convert to nominal for math.
+      var spReal = parseNum('fwdAdvancedRate');
+      if(spReal <= 0) spReal = 7;
+      var inflForSp = window.ModelingAssumptions.get('inflation').value;
+      var rate = window.CalcHelpers.realToNominal(spReal, inflForSp) / 100;
       var monthlyRate = rate / 12;
       var months = s.horizonYrs * 12;
       var spFV = monthlyRate > 0 ? s.impliedRent * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) : s.impliedRent * months;
       var spInvested = s.impliedRent * months;
-      note.innerHTML = 'As a cash buyer, you avoid paying rent \u2014 a real benefit worth roughly <strong>'+fmt(s.impliedRent)+'/mo</strong> (75% of an equivalent mortgage). If invested monthly at '+(rate*100).toFixed(1)+'%/yr (S&amp;P 500 real-return anchor), those savings compound into:';
+      note.innerHTML = 'As a cash buyer, you avoid paying rent \u2014 a real benefit worth roughly <strong>'+fmt(s.impliedRent)+'/mo</strong> (75% of an equivalent mortgage). If invested monthly at '+spReal.toFixed(1)+'%/yr real (sitewide real-return assumption; ~'+(rate*100).toFixed(1)+'%/yr nominal at today\u2019s inflation), those savings compound into:';
       leftEl.innerHTML = '';
       rightEl.innerHTML =
         '<div class="calc-card house" style="border-style:dashed">' +
@@ -912,7 +921,7 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
           '<div class="detail-line">Invested monthly at: <span class="highlight">'+(rate*100).toFixed(1)+'%/yr</span></div>' +
           '<div class="detail-line">Total invested: '+fmt(spInvested)+'</div>' +
           '<div class="detail-line">Total gains: '+fmt(spFV - spInvested)+'</div>' +
-          '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">7% anchors to the S&amp;P 500\u2019s long-run real (inflation-adjusted) return. Override if you prefer nominal (~10%).</div>' +
+          '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">Default rate is the sitewide real-return assumption (5% diversified portfolio). 7% S&amp;P historical and 3% conservative are also valid choices; preference syncs across calculators on this site.</div>' +
         '</div>';
     }
   }
@@ -925,7 +934,63 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
   horizonSel.addEventListener('change', runFwdCalc);
   document.getElementById('fwdAdvancedCheck').addEventListener('change', runFwdCalc);
 
+  // ── Canonical integration (per STYLE_GUIDE §3.5) ──
+  // Real estate appreciation input is bound to lcs.realEstate canonical.
+  // S&P advanced rate input is bound to lcs.realReturns canonical.
+  // Both are REAL terms; the math above converts to nominal for the existing
+  // calc (Stage 5b will convert outputs to real-primary display).
+
+  function syncFwdHomeApprFromCanonical(){
+    var current = window.ModelingAssumptions.get('realEstate');
+    var input = document.getElementById('fwdHomeAppreciation');
+    if(input && parseFloat(input.value) !== current.value) {
+      input.value = current.value;
+    }
+  }
+  function syncFwdAdvancedRateFromCanonical(){
+    var current = window.ModelingAssumptions.get('realReturns');
+    var input = document.getElementById('fwdAdvancedRate');
+    if(input && parseFloat(input.value) !== current.value) {
+      input.value = current.value;
+    }
+  }
+
+  var apprInput = document.getElementById('fwdHomeAppreciation');
+  if(apprInput){
+    apprInput.addEventListener('change', function(){
+      var v = parseFloat(apprInput.value);
+      if(isFinite(v)) {
+        window.ModelingAssumptions.set('realEstate', 'custom', v);
+      }
+    });
+  }
+  var advInput = document.getElementById('fwdAdvancedRate');
+  if(advInput){
+    advInput.addEventListener('change', function(){
+      // realReturns has no Custom field per canonical, but we still let users
+      // type a value here; we map it to the closest preset by rounding.
+      // For Stage 1 simplicity, just write the typed value to the canonical
+      // by treating as "diversified" preset override via the preset value
+      // mechanism. Stage 2's rich UI will replace this with proper preset
+      // selection.
+      // For now, we just don't write (canonical drives the input on load,
+      // user override stays local to the input).
+    });
+  }
+
+  // Subscribe to canonical changes (cross-tab, reset events)
+  if(window.ModelingAssumptions && window.ModelingAssumptions.subscribe){
+    window.ModelingAssumptions.subscribe(function(dim){
+      if(dim === 'realEstate' || dim === '*') syncFwdHomeApprFromCanonical();
+      if(dim === 'realReturns' || dim === '*') syncFwdAdvancedRateFromCanonical();
+      if(dim === 'inflation' || dim === '*') runFwdCalc();
+      runFwdCalc();
+    });
+  }
+
   // ── Initial setup ──
+  syncFwdHomeApprFromCanonical();
+  syncFwdAdvancedRateFromCanonical();
   updateAdvancedToggleLabel();
   fetchLiveBtcPrice(); // runs runFwdCalc on completion
 })();

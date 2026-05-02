@@ -5,7 +5,7 @@ slug: the-power-law
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-power-law-head.html' %}"
   page_styles: "{% include '_pageassets/the-power-law.css' %}"
-  page_scripts: "{% include '_pageassets/the-power-law.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/the-power-law.js' %}"
 ---
 <div class="page">
   <div class="page-header">
@@ -458,17 +458,17 @@ eleventyComputed:
       </div>
       <div class="calc-grid">
         <div class="calc-field">
-          <label>Home Appreciation (%/yr)</label>
+          <label>Home Appreciation <span class="opt">(% real / yr)</span></label>
           <input type="text" id="fwdHomeAppreciation" value="3.5" inputmode="decimal">
         </div>
         <div class="calc-field" id="fwdMortgageRateField">
-          <label>Mortgage Rate (%)</label>
+          <label>Mortgage Rate <span class="opt">(% nominal)</span></label>
           <input type="text" id="fwdMortgageRate" value="6.8" inputmode="decimal">
         </div>
         <div class="calc-field" style="visibility:hidden"><label>&nbsp;</label><input type="text" disabled></div>
       </div>
 
-      <div class="footnote-date" id="fwdInvestmentFootnote">Your up-front investment is derived from the home price and purchase method. Projections anchored to January 1 of the selected year.</div>
+      <div class="footnote-date" id="fwdInvestmentFootnote">Home appreciation is in real (inflation-adjusted) terms; mortgage rate is nominal as written. Sitewide inflation rate (currently 6.5% M2-growth default; see Half-Life or Melting Ice Cube) is used internally to reconcile the two. Your up-front investment is derived from the home price and purchase method. Projections anchored to January 1 of the selected year.</div>
 
       <!-- Results -->
       <div id="fwdResults"></div>
@@ -478,7 +478,7 @@ eleventyComputed:
         <label class="advanced-toggle-label">
           <input type="checkbox" id="fwdAdvancedCheck">
           <span id="fwdAdvancedText"></span>
-          <span id="fwdAdvancedRateWrap" style="display:none">at <input type="text" id="fwdAdvancedRate" value="7" inputmode="decimal">% / yr</span>
+          <span id="fwdAdvancedRateWrap" style="display:none">at <input type="text" id="fwdAdvancedRate" value="7" inputmode="decimal">% real / yr</span>
         </label>
         <div id="fwdAdvancedContent" style="display:none">
           <div class="advanced-note" id="fwdAdvancedNote"></div>
@@ -491,7 +491,7 @@ eleventyComputed:
     </div>
 
     <div class="annotation" style="margin-top:1rem">
-      <strong>How this works:</strong> The Bitcoin projection uses the Power Law model (Porkopolis coefficients). The housing projection assumes constant annual appreciation. Mortgage assumes 20% down, 30-year fixed. Property taxes at 1.2% annually, insurance ~$150/mo, maintenance at 1% of home value annually. Rent in the Bitcoin + rent path is estimated at 75% of an equivalent mortgage payment. <a href="/bitcoin-vs-real-estate.html" style="color:var(--amber)">See the retrospective version &rarr;</a>
+      <strong>How this works:</strong> The Bitcoin projection uses the Power Law model (Porkopolis coefficients). Home appreciation is in real (inflation-adjusted) terms; the calculator combines it internally with the sitewide inflation rate to drive the nominal home value path. Mortgage assumes 20% down, 30-year fixed; mortgage rate is nominal as written. Property taxes at 1.2% annually, insurance ~$150/mo, maintenance at 1% of home value annually. Rent in the Bitcoin + rent path is estimated at 75% of an equivalent mortgage payment. <em>Note: results are currently displayed in nominal future dollars; a future update will show today's-purchasing-power equivalents alongside.</em> <a href="/bitcoin-vs-real-estate.html" style="color:var(--amber)">See the retrospective version &rarr;</a>
     </div>
 
   </div>
