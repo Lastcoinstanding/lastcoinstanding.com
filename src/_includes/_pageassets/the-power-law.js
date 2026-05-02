@@ -686,6 +686,28 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
 
     if(btcNow <= 0 || homePrice <= 0) return;
 
+    // ── Stage 5b helpers — real-terms display layer ──
+    // Math throughout this function continues to produce NOMINAL future values
+    // (the existing calculations are unchanged). At display time we deflate
+    // those values to today's purchasing power using the sitewide inflation
+    // rate, and present real as primary with nominal as secondary.
+    function toReal(nominalFutureValue) {
+      return window.CalcHelpers.deflateToToday(nominalFutureValue, inflRate, horizonYrs);
+    }
+    // Format a value pair for real-primary display: real value as primary,
+    // nominal-equivalent shown in a smaller dim secondary line below.
+    function fmtDual(nominalValue, realValueOpt) {
+      var real = (realValueOpt !== undefined) ? realValueOpt : toReal(nominalValue);
+      return '<span class="dual-real">'+fmt(real)+'</span>' +
+             '<span class="dual-nominal" style="display:block;font-size:.7rem;color:var(--text-muted);font-weight:400;letter-spacing:0;text-transform:none">'+fmt(nominalValue)+' nominal</span>';
+    }
+    // Inline variant for use inside detail-line prose where the dual treatment
+    // should be compact (real (nominal nominal)).
+    function fmtDualInline(nominalValue, realValueOpt) {
+      var real = (realValueOpt !== undefined) ? realValueOpt : toReal(nominalValue);
+      return fmt(real) + ' <span style="font-size:.78rem;color:var(--text-muted)">('+fmt(nominalValue)+' nominal)</span>';
+    }
+
     var startYear = NOW_YEAR;
     var endYear = startYear + horizonYrs;
     var asOf = 'Jan 1, ' + endYear;
@@ -715,11 +737,25 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
 
     var btcValue = btcBought * futurePrice;
     var btcNet = btcValue - totalRentPaid;
-    var btcReturn = ((btcNet - amount) / amount * 100).toFixed(0);
-    var btcCAGR = btcNet > 0 ? ((Math.pow(btcNet/amount, 1/horizonYrs) - 1) * 100).toFixed(1) : '—';
+    // Real-terms equivalents (today's purchasing power)
+    var btcValueReal = toReal(btcValue);
+    var futurePriceReal = toReal(futurePrice);
+    // For btcNet: btcValue is a future-dollar amount (deflate to real);
+    // totalRentPaid is accumulated nominal payments — first-order approximation,
+    // we treat its dollar magnitude as today's-equivalent purchasing power
+    // (each monthly payment is in then-dollars, but the user thinks of rent as
+    // a today's-dollar cost; per Approach 3 we don't do per-payment deflation
+    // at this stage). The accumulated totals retain their nominal magnitudes.
+    var btcNetReal = btcValueReal - totalRentPaid;
+    // Returns and CAGRs computed against real values for consistency with the
+    // real-primary display. Real return is the honest "purchasing-power gain"
+    // figure; nominal return would inflate the apparent gain by inflation.
+    var btcReturn = ((btcNetReal - amount) / amount * 100).toFixed(0);
+    var btcCAGR = btcNetReal > 0 ? ((Math.pow(btcNetReal/amount, 1/horizonYrs) - 1) * 100).toFixed(1) : '—';
 
     // ── HOUSE SIDE ──
     var futureHomeValue = homePrice * Math.pow(1 + homeAppr, horizonYrs);
+    var futureHomeValueReal = toReal(futureHomeValue);
     var bal = 0, equity = futureHomeValue, interestPaid = 0, totalMortPaid = 0;
     if(method === 'mortgage'){
       var monthsPaid = horizonYrs * 12;
@@ -732,15 +768,23 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
       totalMortPaid = monthlyMort * Math.min(monthsPaid, nPayments);
       interestPaid = totalMortPaid - (loanAmt - bal);
     }
+    // Real equity: equity = futureHomeValue - bal, both at end-of-horizon
+    // dollars; deflate to today's purchasing power
+    var equityReal = toReal(equity);
 
     var propTax = homePrice * 0.012 * horizonYrs;
     var insurance = 150 * 12 * horizonYrs;
     var maintenance = homePrice * 0.01 * horizonYrs;
     var totalHouseCost = amount + totalMortPaid + propTax + insurance + maintenance;
-    var houseCAGR = ((Math.pow(futureHomeValue/homePrice, 1/horizonYrs) - 1) * 100).toFixed(1);
+    // House CAGR: real appreciation rate is exactly the canonical homeApprReal
+    // input (the user picked it). Display that directly rather than recomputing.
+    var houseCAGR = homeApprReal.toFixed(1);
 
-    // ── HOUSES SUMMARY (computed early so it can go inside the Bitcoin card) ──
-    var housesCanBuy = Math.max(0, btcNet / futureHomeValue);
+    // ── HOUSES SUMMARY ──
+    // Ratio is dimension-independent: btcNet/futureHomeValue (both nominal) =
+    // btcNetReal/futureHomeValueReal. Use real values to keep the result well-
+    // defined when btcNetReal goes near zero.
+    var housesCanBuy = Math.max(0, btcNetReal / futureHomeValueReal);
 
     // Equity % for the house card ownership visual (mortgage mode only)
     var equityPct = futureHomeValue > 0 ? Math.round((equity / futureHomeValue) * 100) : 0;
@@ -790,18 +834,19 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
         '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
         '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong></div>' +
         '<div class="period-divider"></div>' +
-        '<div class="period-label">'+endYear+' \u00b7 Projected</div>' +
-        '<div class="big-number">'+fmt(btcNet)+' <span style="font-size:.8rem;color:var(--text-muted)">net</span></div>' +
-        '<div class="big-number-label">projected net position</div>' +
+        '<div class="period-label">'+endYear+' \u00b7 Projected (real, today\u2019s $)</div>' +
+        '<div class="big-number">'+fmt(btcNetReal)+' <span style="font-size:.8rem;color:var(--text-muted)">net</span></div>' +
+        '<div class="big-number-label">projected net position in today\u2019s purchasing power</div>' +
+        '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(btcNet)+' nominal</div>' +
         houseIconsHtml +
         '<div class="detail-line">BTC purchased: '+btcBought.toFixed(4)+' @ '+fmt(btcNow)+'/BTC</div>' +
-        '<div class="detail-line">Projected BTC price: <strong>'+fmt(futurePrice)+'</strong></div>' +
-        '<div class="detail-line">Gross BTC value: '+fmt(btcValue)+'</div>' +
+        '<div class="detail-line">Projected BTC price: <strong>'+fmt(futurePriceReal)+'</strong> <span style="font-size:.78rem;color:var(--text-muted)">today\u2019s $ (~'+fmt(futurePrice)+' nominal)</span></div>' +
+        '<div class="detail-line">Gross BTC value: '+fmt(btcValueReal)+' <span style="font-size:.78rem;color:var(--text-muted)">(~'+fmt(btcValue)+' nominal)</span></div>' +
         '<div class="detail-line">Est. monthly rent: '+fmt(impliedRent)+'/mo <span style="font-size:.78rem;color:var(--text-muted)">(75% of equivalent mortgage)</span></div>' +
-        '<div class="detail-line">Total rent paid: <span class="negative">'+fmt(totalRentPaid)+'</span></div>' +
-        '<div class="detail-line">Total return: <span class="highlight">'+btcReturn+'%</span></div>' +
-        (btcCAGR !== '—' ? '<div class="detail-line">Implied CAGR: <span class="highlight">'+btcCAGR+'%</span></div>' : '') +
-        '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">(projected home value: '+fmt(futureHomeValue)+' each)</span></div>' +
+        '<div class="detail-line">Total rent paid: <span class="negative">'+fmt(totalRentPaid)+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
+        '<div class="detail-line">Total real return: <span class="highlight">'+btcReturn+'%</span> <span style="font-size:.72rem;color:var(--text-muted)">in purchasing-power terms</span></div>' +
+        (btcCAGR !== '—' ? '<div class="detail-line">Implied real CAGR: <span class="highlight">'+btcCAGR+'%</span></div>' : '') +
+        '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">(projected home value: '+fmt(futureHomeValueReal)+' each in today\u2019s $)</span></div>' +
         '<div class="detail-line" style="margin-top:.6rem;font-size:.78rem;color:var(--text-muted)">No leverage. No interest. No property taxes. No maintenance.</div>' +
       '</div>';
 
@@ -814,16 +859,17 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
           '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
           '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(20% down of '+fmt(homePrice)+')</span></div>' +
           '<div class="period-divider"></div>' +
-          '<div class="period-label">'+endYear+' \u00b7 Projected</div>' +
-          '<div class="big-number">'+fmt(equity)+'</div>' +
-          '<div class="big-number-label">projected equity</div>' +
+          '<div class="period-label">'+endYear+' \u00b7 Projected (real, today\u2019s $)</div>' +
+          '<div class="big-number">'+fmt(equityReal)+'</div>' +
+          '<div class="big-number-label">projected equity in today\u2019s purchasing power</div>' +
+          '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(equity)+' nominal</div>' +
           ownershipVisual +
-          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(futureHomeValue)+' ('+houseCAGR+'%/yr)</div>' +
+          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(futureHomeValueReal)+' <span style="font-size:.78rem;color:var(--text-muted)">today\u2019s $ (~'+fmt(futureHomeValue)+' nominal); '+houseCAGR+'%/yr real</span></div>' +
           '<div class="detail-line">Monthly mortgage: '+fmt(monthlyMort)+'/mo at '+mortRate+'%</div>' +
-          '<div class="detail-line">Interest paid: <span class="negative">'+fmt(interestPaid)+'</span> <span style="font-size:.78rem;color:var(--text-muted)">(dead money)</span></div>' +
+          '<div class="detail-line">Interest paid: <span class="negative">'+fmt(interestPaid)+'</span> <span style="font-size:.78rem;color:var(--text-muted)">(dead money, accumulated)</span></div>' +
           '<div class="detail-line">Remaining loan: '+(bal > 0 ? '<span class="negative">'+fmt(bal)+'</span>' : 'Paid off')+'</div>' +
           '<div class="detail-line">Rent paid: $0 <span style="font-size:.78rem;color:var(--text-muted)">(you live in it)</span></div>' +
-          '<div class="detail-line">Total cost of ownership: <span class="negative">'+fmt(totalHouseCost)+'</span></div>' +
+          '<div class="detail-line">Total cost of ownership: <span class="negative">'+fmt(totalHouseCost)+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
         '</div>';
     } else {
       houseHtml =
@@ -832,15 +878,16 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
           '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
           '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(cash, paid in full)</span></div>' +
           '<div class="period-divider"></div>' +
-          '<div class="period-label">'+endYear+' \u00b7 Projected</div>' +
-          '<div class="big-number">'+fmt(futureHomeValue)+'</div>' +
-          '<div class="big-number-label">projected home value</div>' +
+          '<div class="period-label">'+endYear+' \u00b7 Projected (real, today\u2019s $)</div>' +
+          '<div class="big-number">'+fmt(futureHomeValueReal)+'</div>' +
+          '<div class="big-number-label">projected home value in today\u2019s purchasing power</div>' +
+          '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(futureHomeValue)+' nominal</div>' +
           ownershipVisual +
-          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(futureHomeValue)+' ('+houseCAGR+'%/yr)</div>' +
+          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(futureHomeValueReal)+' <span style="font-size:.78rem;color:var(--text-muted)">today\u2019s $ (~'+fmt(futureHomeValue)+' nominal); '+houseCAGR+'%/yr real</span></div>' +
           '<div class="detail-line">Mortgage: $0 <span style="font-size:.78rem;color:var(--text-muted)">(no debt)</span></div>' +
           '<div class="detail-line">Interest paid: $0</div>' +
           '<div class="detail-line">Rent paid: $0 <span style="font-size:.78rem;color:var(--text-muted)">(you live in it)</span></div>' +
-          '<div class="detail-line">Total cost of ownership: <span class="negative">'+fmt(totalHouseCost)+'</span></div>' +
+          '<div class="detail-line">Total cost of ownership: <span class="negative">'+fmt(totalHouseCost)+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
           '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">Cash buyer avoids rent \u2014 a real benefit not captured in projected value. Toggle "Go deeper" below to model it.</div>' +
         '</div>';
     }
@@ -850,7 +897,7 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
 
     // ── ADVANCED SECTION ──
     renderAdvanced({
-      method: method, amount: amount, horizonYrs: horizonYrs,
+      method: method, amount: amount, horizonYrs: horizonYrs, inflRate: inflRate,
       startYear: startYear, endYear: endYear,
       monthlyMort: monthlyMort, impliedRent: impliedRent, totalRentPaid: totalRentPaid,
       btcNow: btcNow, futurePrice: futurePrice, btcValue: btcValue, btcBought: btcBought,
@@ -870,6 +917,11 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
     }
     content.style.display = 'block';
 
+    // Local helper for deflating the advanced section's future values to today's $
+    function toReal(nominalFutureValue) {
+      return window.CalcHelpers.deflateToToday(nominalFutureValue, s.inflRate, s.horizonYrs);
+    }
+
     if(s.method === 'mortgage'){
       // DCA the rent-vs-mortgage savings into BTC, using geometric interpolation of price over horizon
       var monthlySavings = Math.max(0, s.monthlyMort - s.impliedRent);
@@ -884,18 +936,20 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
         }
       }
       var dcaValue = dcaBtc * s.futurePrice;
+      var dcaValueReal = toReal(dcaValue);
       var dcaTotalInvested = monthlySavings * totalMonths;
       note.innerHTML = 'If you rent instead of buying, your monthly housing cost is ~75% of a mortgage payment. The difference \u2014 <strong>'+fmt(monthlySavings)+'/mo</strong> \u2014 invested in bitcoin each month compounds the opportunity cost over the horizon.';
       leftEl.innerHTML =
         '<div class="calc-card bitcoin" style="border-style:dashed">' +
           '<h4>&#8383; Monthly DCA \u2014 Rent vs. Mortgage Savings</h4>' +
-          '<div class="big-number">'+fmt(dcaValue)+'</div>' +
-          '<div class="big-number-label">projected DCA value ('+s.endYear+')</div>' +
+          '<div class="big-number">'+fmt(dcaValueReal)+'</div>' +
+          '<div class="big-number-label">projected DCA value in today\u2019s purchasing power ('+s.endYear+')</div>' +
+          '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(dcaValue)+' nominal</div>' +
           '<div class="detail-line">Est. mortgage: '+fmt(s.monthlyMort)+'/mo</div>' +
           '<div class="detail-line">Est. rent: '+fmt(s.impliedRent)+'/mo</div>' +
           '<div class="detail-line">Monthly DCA into BTC: <span class="highlight">'+fmt(monthlySavings)+'/mo</span></div>' +
           '<div class="detail-line">BTC accumulated: '+dcaBtc.toFixed(4)+' BTC</div>' +
-          '<div class="detail-line">Total invested via DCA: '+fmt(dcaTotalInvested)+'</div>' +
+          '<div class="detail-line">Total invested via DCA: '+fmt(dcaTotalInvested)+' <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
           '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">DCA assumes BTC price follows a smooth geometric path from today\u2019s price to the projected endpoint.</div>' +
         '</div>';
       rightEl.innerHTML = '';
@@ -909,18 +963,20 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
       var monthlyRate = rate / 12;
       var months = s.horizonYrs * 12;
       var spFV = monthlyRate > 0 ? s.impliedRent * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) : s.impliedRent * months;
+      var spFVReal = toReal(spFV);
       var spInvested = s.impliedRent * months;
       note.innerHTML = 'As a cash buyer, you avoid paying rent \u2014 a real benefit worth roughly <strong>'+fmt(s.impliedRent)+'/mo</strong> (75% of an equivalent mortgage). If invested monthly at '+spReal.toFixed(1)+'%/yr real (sitewide real-return assumption; ~'+(rate*100).toFixed(1)+'%/yr nominal at today\u2019s inflation), those savings compound into:';
       leftEl.innerHTML = '';
       rightEl.innerHTML =
         '<div class="calc-card house" style="border-style:dashed">' +
           '<h4>&#128200; Imputed Rent &rarr; S&amp;P 500</h4>' +
-          '<div class="big-number">'+fmt(spFV)+'</div>' +
-          '<div class="big-number-label">projected portfolio ('+s.endYear+')</div>' +
+          '<div class="big-number">'+fmt(spFVReal)+'</div>' +
+          '<div class="big-number-label">projected portfolio in today\u2019s purchasing power ('+s.endYear+')</div>' +
+          '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(spFV)+' nominal</div>' +
           '<div class="detail-line">Rent avoided: '+fmt(s.impliedRent)+'/mo</div>' +
-          '<div class="detail-line">Invested monthly at: <span class="highlight">'+(rate*100).toFixed(1)+'%/yr</span></div>' +
-          '<div class="detail-line">Total invested: '+fmt(spInvested)+'</div>' +
-          '<div class="detail-line">Total gains: '+fmt(spFV - spInvested)+'</div>' +
+          '<div class="detail-line">Invested monthly at: <span class="highlight">'+spReal.toFixed(1)+'%/yr real</span></div>' +
+          '<div class="detail-line">Total invested: '+fmt(spInvested)+' <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
+          '<div class="detail-line">Total real gains: '+fmt(spFVReal - spInvested)+' <span style="font-size:.72rem;color:var(--text-muted)">in today\u2019s purchasing power</span></div>' +
           '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">Default rate is the sitewide real-return assumption (5% diversified portfolio). 7% S&amp;P historical and 3% conservative are also valid choices; preference syncs across calculators on this site.</div>' +
         '</div>';
     }
