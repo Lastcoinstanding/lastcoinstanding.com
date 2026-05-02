@@ -158,11 +158,17 @@ The palette is dark by default. Migration's essay-mode is the only cream-backgro
 
 ### 4.2 Container width (per §16 of `SITE_GUIDE.md`)
 
-The canonical page-content container is `max-width: 960px`. This is the value used by Power Law, Half-Life, Fixed Pie, and Melting Ice Cube. Up to ~1100px is acceptable for pages with wider visual content (charts, two-column grids), but stay within 960–1100px for narrative pages — content that's noticeably wider than 1100px makes line-lengths uncomfortable; content noticeably narrower than 960px wastes desktop real estate and feels visually inconsistent next to the canonical pages.
+The site uses two main width tiers, plus a documented mixed-content pattern.
 
-**Do not apply paragraph-level max-width constraints.** Let prose fill the container width naturally — this prevents the visual mismatch between narrow text floating inside a wider container with empty space on either side.
+**Editorial tier — 960px (canonical).** Used by Power Law, Half-Life, Fixed Pie, Melting Ice Cube, Horizon, Migration, Money Trees, About, Index, and What Money Has To Be. The reading-prose width that produces comfortable line-lengths for sustained text. This is the default for any new page that's primarily Inter body prose; deviating wider degrades narrative readability.
 
-The exception: page hero subtitles can have `max-width: 680px` to keep them visually balanced under a centered title. Apply this only to hero subtitles, not to body prose.
+**System-diagrammatic tier — ~1140px.** Used by Synthesis (1140px), What Bitcoin Is (1140px), and Trilemma (1080px, marginally tighter). These pages lead with a centered SVG diagram or interactive visual that benefits from horizontal stage-room; the surrounding explanation panels position around the diagram, not on a reading-prose grid. The tier is not used for body prose. New pages of this character should target 1140px to harmonize with the existing two; 1080px is acceptable as a close-but-distinct value if the diagram's natural extent calls for it.
+
+**Mixed-content pattern — wide page + constrained essay.** Used by Not-a-Bubble (1152px page, 44rem ≈ 704px essay block). Pattern: hero chart needs the page width, but a closing essay needs prose-grade line-length. Solution is to set the page wide enough for the chart and apply a narrower `max-width` to the essay block specifically (NOT to individual paragraphs). This is the only sanctioned use of an inner max-width on prose; the constraint must apply to the essay block as a whole.
+
+**Do not apply paragraph-level max-width constraints in single-tier pages.** On editorial-tier pages, let prose fill the 960px container naturally — paragraph-level constraints create the "narrow text floating in a wider container" mismatch this rule is designed to prevent. The mixed-content pattern above is the documented exception, and it constrains the essay *block*, not individual paragraphs within it.
+
+**Hero subtitles** can have `max-width: 680px` independent of tier, to keep them visually balanced under a centered title. Apply this only to hero subtitles, not to body prose.
 
 ---
 

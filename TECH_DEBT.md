@@ -51,11 +51,7 @@ _(no open items)_
 
 ## 4. Width treatments
 
-- [ ] **Width outliers vs. canonical 960px.** Five pages (Power Law / Half-Life / Fixed Pie / Melting Ice Cube / Horizon as of commit `55fe517`) use the 960px canonical. Two outliers:
-  - Trilemma at 1080px (within §4.2 tolerance, marginal)
-  - Not-a-Bubble at 1152px (exceeds §4.2's 1100px ceiling by 52px)
-  
-  Decide whether to converge or document as deliberate exceptions per page character.
+_(no open items)_
 
 ## 5. Cross-page strategic — biggest open item
 
@@ -101,6 +97,8 @@ Items where the right call needs either visual review or a designer's judgment r
 ## Recently closed
 
 Move items here when shipped, with commit SHA. Keep the last 5–10 for reference; archive older ones to git history when this section gets long.
+
+- [x] **Width outliers vs. canonical 960px — formalized as deliberate tiers (STYLE_GUIDE §4.2 revision, no code change).** Audit revealed a richer reality than the original TECH_DEBT flag suggested: alongside Trilemma (1080px) and Not-a-Bubble (1152px), Synthesis and What Bitcoin Is *also* sit at 1140px — outside the original §4.2 "up to ~1100px" ceiling, just unflagged. The actual practice across the site is a coherent two-tier system plus one mixed-content pattern, which §4.2 was under-describing. Revised §4.2 to formalize: (1) **Editorial tier 960px** for prose-led pages (the canonical, used by 10+ pages including Power Law, Half-Life, Migration, Horizon); (2) **System-diagrammatic tier ~1140px** for SVG-led / interactive-diagram pages (Synthesis 1140, What Bitcoin Is 1140, Trilemma 1080) where horizontal stage-room serves the centered visual; (3) **Mixed-content pattern** for pages with a hero chart that needs page width but a closing essay that needs prose-grade line-length (Not-a-Bubble 1152 page + 44rem essay block) — the only sanctioned use of an inner max-width on prose, and it must apply to the essay block as a whole, not paragraph-by-paragraph. With §4.2 revised to match practice, all four "outlier" pages are documented as deliberate; Trilemma and Not-a-Bubble in particular are no longer outliers but legitimate examples of tiers 2 and 3. No CSS changes — the tiers were already coherent, the documentation just hadn't caught up.
 
 - [x] **Horizon `.wrap` consolidation + orphaned rule removal (commit `68e52af`).** Three cleanups on `the-bitcoin-horizon.css`. (1) Deleted the bare `.wrap` rule — markup audit found no `class="wrap"` elements on Horizon (only `.wrap-narrow` ×5 and `.wrap-wide` ×1), so it was dead code, not just redundant. (2) Consolidated `.wrap-narrow` and `.wrap-wide` (bit-identical declarations since `55fe517`) into a single grouped-selector rule, keeping both class names valid in markup so the semantic distinction (narrative containers vs §4's comparison-table section) is preserved. (3) Removed the orphaned `.intro .wrap-narrow` rule from the 768px @media block — the `.intro` section in markup contains only `.intro-block` and a `<p>`, no `.wrap-narrow` element nested inside; the selector never matched anything. Closes the last open item in §1 Architecture & DRY.
 
