@@ -39,7 +39,7 @@ The site uses three typographic registers, mapped by page character:
 
 When introducing a new page, ask: *is this primarily a piece of writing (with or without supporting charts and tools)? Is it primarily a chart explorer? Or is the page itself a diagram?* Editorial gets §2.1 + Inter. Chart-explorer gets §2.5 + Inter. System-diagrammatic gets §2.1 + Outfit. **Don't mix within a page.** **Don't choose by aesthetic preference** — choose by page character.
 
-A common shape that belongs in the editorial tier: a page that contains both an essay tab and a calculator or chart-explorer tab. The editorial frame holds; the calculator's own controls use UI typography (§2.3) at the tab level. Bitcoin vs. Real Estate is the canonical example — its page-frame typography is editorial (with a documented hero weight-300 exception per §5), and the calculator tab sits comfortably inside that frame using UI controls. Power Law and Half-Life follow this pattern after the migration shipped in commits `[POWER_LAW_SHA]` / `[HALF_LIFE_SHA]`.
+A common shape that belongs in the editorial tier: a page that contains both an essay tab and a calculator or chart-explorer tab. The editorial frame holds; the calculator's own controls use UI typography (§2.3) at the tab level. Bitcoin vs. Real Estate is the canonical example — its page-frame typography is editorial (with a documented hero weight-300 exception per §5), and the calculator tab sits comfortably inside that frame using UI controls. Power Law and Half-Life follow this pattern after the migration shipped in commits `4aa777d` / `9780b4c`.
 
 ### Anti-pattern: DM Sans
 
@@ -128,7 +128,7 @@ A compact alternative to §2.1 for pages where every tab is chart-led with brief
 
 **Use this tier only when the page has no prose tab.** If a page has any essay-grade tab, the editorial scale (§2.1) is correct — even if the other tabs are chart-led — because the page-frame typography is set by the most prose-heavy tab. Bitcoin vs. Real Estate, Power Law, and Half-Life all contain calculator or chart tabs but have at least one substantive prose tab, so they belong on §2.1, not here. See §1's tier mapping for the full classification.
 
-This tier was historically called "calc-tier," a label that conflated functional character (page contains a calculator) with typographic register. Renamed and clarified after the audit shipped in commits `[POWER_LAW_SHA]` / `[HALF_LIFE_SHA]`.
+This tier was historically called "calc-tier," a label that conflated functional character (page contains a calculator) with typographic register. Renamed and clarified after the audit shipped in commits `4aa777d` / `9780b4c`.
 
 ---
 

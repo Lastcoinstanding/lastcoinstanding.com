@@ -53,24 +53,9 @@ _(no open items)_
 
 _(no open items)_
 
-## 5. Cross-page strategic — biggest open item
+## 5. Cross-page strategic
 
-- [ ] **STYLE_GUIDE §2.1 vs. calculator/explorer-tier actual practice.** Five pages (Power Law, Half-Life, Fixed Pie, Melting Ice Cube, Real Estate) share a near-identical type system that diverges from §2.1's canonical scale in the same direction:
-  
-  | Slot | Tier-actual | §2.1 canonical |
-  |---|---|---|
-  | h1 | `clamp(2rem,4.5vw,3rem)` wt 600 | `clamp(2rem,4vw,3.4rem)` wt 500 |
-  | h2 | ~1.5rem wt 600 | `clamp(1.8rem,3.4vw,2.6rem)` wt 500 |
-  | h3 | 1.1–1.2rem wt 600 | `clamp(1.4rem,2.4vw,1.8rem)` wt 500 |
-  | body | 0.95–1rem | 1.05rem |
-  
-  Two paths:
-  - **(a) Codify the practice.** Amend §2.1 to add a calculator/explorer-tier scale. Less work, ships fast, accepts the smaller/heavier feel as deliberate.
-  - **(b) Migrate upward to §2.1.** Apply §2.1's stated values to all five pages. Bigger headings, lighter weight, bigger body — visually significant change; pages would feel more publication-grade, like Migration / Horizon.
-  
-  Sales context: (b) reads as more publication-grade and substantial; (a) preserves the dense-utility feel of the calculator pages. Worth a deliberate decision.
-
-- [ ] **Calculator-tier font register — Inter or Outfit?** All five calc-tier pages currently use Inter (the editorial register, per STYLE_GUIDE §1 tier system). A case can be made they're closer in character to system-diagrammatic — chart-and-control surfaces, technical descriptors, less reading prose — and would benefit from Outfit's geometric/schematic feel (the same rationale that justified keeping Outfit on Synthesis + What Bitcoin Is in commit `6c6c7c2`). Worth deciding in coordination with the §2.1 scale question above: same five pages, same coordinated-sweep risk profile, and the two decisions interact (Outfit at the existing tier-actual sizes vs. Outfit at canonical §2.1 sizes vs. Inter at either — four possible end states).
+_(no open items)_
 
 ## 6. Page-specific minor / design judgment
 
@@ -96,6 +81,8 @@ _(no open items)_
 ## Recently closed
 
 Move items here when shipped, with commit SHA. Keep the last 5–10 for reference; archive older ones to git history when this section gets long.
+
+- [x] **§5 Tier 2 calc-tier paired decision — resolved as three smaller decisions (commits `787fcda` STYLE_GUIDE rename, `4aa777d` Power Law migration, `9780b4c` Half-Life migration, this commit closing).** The original entries framed this as "5 pages, 4 end-states." Audit of tab content reframed it: "calc-tier" was conflating functional character (does the page contain a calculator?) with typographic register (smaller/heavier headings). The 5 pages were actually 3 sub-groups: (1) editorial pages with mixed tab character — Power Law (3,683 words across 4 tabs incl. 985-word essay tab), Half-Life (1,404 words across 3 tabs incl. 626-word essay tab), and Real Estate (already on §2.1-aligned typography). (2) Genuinely chart-led pages with no essay tab — Fixed Pie (2 chart-led tabs), Melting Ice Cube (3 chart-led tabs). (3) Real Estate is already correctly classified as editorial. Resolution: Power Law and Half-Life migrated to §2.1 canonical (h1 +13% cap, lighter; h2 ~doubled at desktop, lighter; body +5%; all transitioning from wt 600 → wt 500 to match Migration/Horizon). Fixed Pie and MIC stay where they are, with the spec codified as a deliberate STYLE_GUIDE §2.5 "chart-explorer tier" rather than drift from §2.1. The font register sub-question (Inter vs Outfit) collapsed once tab content was audited — all 5 pages have authorial argument running through their prose, which is the editorial register marker; Outfit is for pages where the page IS the spec (Synthesis, What Bitcoin Is). Inter is correct for all 5. Documented in STYLE_GUIDE §1 (page-character tiers), §2.5 (chart-explorer scale), §5 (Real Estate exception language updated), §6.8 (compact-nav variant renamed and decoupled from typographic tier). The "calc-tier" label is retired across the doc; remaining references are explicitly historical (the renaming events). Process learning: when a TECH_DEBT entry frames a coordinated decision across N pages, audit each page's *content* before assuming they belong together — typographic similarity at the h1 level can mask very different functional characters across the rest of the page. Tab-by-tab audits were the unlock for this one.
 
 - [x] **§6 BvRE "pull-quote pattern" re-categorized — STYLE_GUIDE §6.3 scope clarified.** The original entry framed the question as "§6.3 says pull-quotes on dark should use Source Serif italic, but BvRE's partial-italic case isn't explicitly covered." Audit found this was miscategorizing the pattern. BvRE doesn't use a pull-quote at all — it uses `.narrative`, a sibling component used six times on the page as the canonical authorial-commentary block (Inter body, amber `<em>` italic emphasis via inline `<em>`, slight `<strong>` bold). Pull-quotes (§6.3) are *cited* quotes — someone else's words pulled for emphasis (Migration's three are the canonical examples). Authorial-commentary blocks are the page author speaking in their own voice. Visually similar (left border, indented box), typographically distinct (Inter vs Source Serif italic; per-element emphasis vs whole-block italic). The L122 instance the entry flagged carries inline Cormorant overrides for additional weight at the calculator-tab framing — a deliberate one-off variant of `.narrative`, not drift. STYLE_GUIDE §6.3 amended with a "Scope note" that distinguishes the two patterns and explicitly identifies authorial-commentary blocks as page-specific patterns rather than site-wide components. No code changes — the BvRE pattern is correct as-is once the component boundary is clear.
 
