@@ -168,6 +168,101 @@ The palette is dark by default. Migration's essay-mode is the only cream-backgro
 
 ---
 
+## 3.5 Modeling assumptions canonical
+
+Sitewide values used by every calculator. The site has a single point of view on inflation, real returns, and real estate appreciation; every calculator that needs these values pulls from this canonical, and a user's choice on any one calculator persists across all of them.
+
+### Two-zone calculator layout
+
+Calculator pages organize their inputs into two visually distinct zones:
+
+- **Baseline assumptions zone** — at the top of the inputs section. Slow-changing, sitewide-sticky, rarely revisited after first selection. Inflation, real return, real estate appreciation, growth model selections live here.
+- **Active variables zone** — inline below. Page-specific, never sticky, never sitewide. The user iteratively plays with these. Bitcoin holdings, contribution amounts, retirement age, target lifestyle expenses, etc. live here.
+
+The two zones are visually distinct (different backgrounds or borders, clear separation) so the user understands at a glance which inputs are world-shape assumptions vs. specific-question variables.
+
+### Inflation / monetary debasement
+
+Four-card picker, default = 6.5% (M2 growth).
+
+| # | Value | Label | Framing |
+|---|---|---|---|
+| 1 | 3.5% | CPI Official | Government's published CPI. Most economists agree it under-reports actual purchasing-power loss. |
+| 2 | **6.5%** *(default)* | M2 growth (true inflation) | 50-year US average money-supply growth. The most accurate measure of monetary debasement. |
+| 3 | 8% | Shadow Stats | John Williams's pre-1980 CPI methodology. A widely-cited alternative methodology that argues CPI revisions since 1980 systematically understate inflation. |
+| 4 | user-input | Custom rate | For other currencies, alternative methodologies, or your own assumptions. |
+
+**Component decomposition** (used in the rich card UI per Stage 2):
+
+- **CPI Official 3.5%** — Long-run BLS CPI-U average (~3.3%), rounded to 3.5%. Excludes asset prices; uses owner-equivalent rent rather than house prices; methodology revisions since 1980 reduce reported figure.
+- **M2 growth 6.5%** — 50-yr US M2 average (~6.8%) rounded to 6.5%. The headline 6.5% is monetary expansion itself. Subtracting real GDP growth (~2.5%) gives the price-inflation rate (~4.3%) most people experience as "inflation"; the larger figure is the actual debasement.
+- **Shadow Stats 8%** — Anchored to John Williams's reconstructed pre-1980 CPI methodology. Adjusts for hedonic adjustments and basket changes that critics argue have understated CPI since the early 1980s. Treat as one credible alternative; methodology is debated.
+- **Custom** — For non-US currencies (Eurozone ~5%, UK ~6%, Japan ~3%, Argentina 100%+), deflationary stress-testing (negative values valid), or user's own assumptions.
+
+**localStorage keys:** `lcs.inflation.preset` (string: `cpi-official` | `m2-growth` | `shadow-stats` | `custom`), `lcs.inflation.customValue` (number, persisted even when preset != custom so re-selecting Custom restores last value).
+
+### Real returns (diversified portfolio)
+
+Three-card picker, no Custom field. Default = 5% (diversified portfolio).
+
+| # | Value | Label | Framing |
+|---|---|---|---|
+| 1 | 3% real | Conservative | Pessimistic forward-looking estimate. Reflects elevated valuations, demographic headwinds, lower expected returns from Vanguard, GMO, and others. |
+| 2 | **5% real** *(default)* | Diversified portfolio | Long-run real return for a typical 60/40 stocks/bonds portfolio. The honest baseline for most users' actual asset allocation. |
+| 3 | 7% real | S&P 500 historical | The S&P 500's long-run real return. Achieved only with full equity exposure and discipline through every drawdown. |
+
+**Component decomposition:**
+
+- **Conservative 3%** — Vanguard 10-yr forward US equity assumptions ~3.5–5% nominal; GMO 7-yr forecasts often −2 to +2% real; 3% sits at the optimistic end of the pessimist range.
+- **Diversified portfolio 5%** — S&P 500 long-run real return ~6.7% × 60% + US 10-yr Treasury long-run real ~2.0% × 40% = ~4.8%, rounded to 5%. Most users' retirement money is in target-date funds; this is the realistic baseline.
+- **S&P 500 historical 7%** — S&P 500 real return 1928–2024 ~6.7%, rounded to 7%. Assumes full reinvestment of dividends, full holding through 1929/1973/2000/2008 drawdowns.
+
+**localStorage key:** `lcs.realReturns.preset` (string: `conservative` | `diversified` | `sp500-historical`).
+
+### Real estate appreciation
+
+Four-card picker including Custom. Default = 3.5% real (Recent decades). All values in **real** terms; UI shows nominal-equivalent based on the selected inflation rate.
+
+| # | Value | Label | Framing |
+|---|---|---|---|
+| 1 | 1% real | Long-run real | Case-Shiller's century-long real home appreciation. Homes have rarely been a real-return investment in their own right; wealth-building reputation comes from leverage, tax advantages, and forced savings. |
+| 2 | **3.5% real** *(default)* | Recent decades | Real appreciation since 2000, driven by falling rates, monetary expansion, supply constraints. Historically anomalous. |
+| 3 | 5.5% real | Optimistic / continued boom | Top-end forecast assuming continued monetary expansion, supply constraints, rate suppression. Bull-case housing thesis. |
+| 4 | user-input | Custom rate | For other markets, down-market scenarios (negative values for stress-testing), or your own assumptions. |
+
+**Component decomposition:**
+
+- **Long-run 1%** — Case-Shiller US National HPI real terms 1890–2024 ~0.4%, rounded up to 1% for a slightly more generous baseline. At 6.5% M2 inflation, equivalent to ~7.5% nominal.
+- **Recent decades 3.5%** — Case-Shiller 2000–2024 real ~3.7%, rounded to 3.5%. At 6.5% M2 inflation, ~10% nominal — close to the 2000–2024 actual nominal experience. Driven by falling rates (Fed funds 6%→0%) and supply constraints; unlikely to persist if rates normalize.
+- **Optimistic 5.5%** — Best 25-yr Case-Shiller real return windows reach ~5%, e.g. 1997–2022; 5.5% as bull-case extrapolation. At 6.5% inflation, ~12% nominal — aggressive but not unprecedented in specific markets.
+- **Custom** — Local market data (Zillow / Redfin), market-correction scenarios (−5% to 0% real), non-US markets (Tokyo flat since 1990; UK ~3% real; emerging markets vary widely).
+
+**localStorage keys:** `lcs.realEstate.preset`, `lcs.realEstate.customValue`.
+
+### Active variables — never sticky
+
+Bitcoin holdings, contribution amounts, retirement age, target lifestyle expenses, and similar **page-specific** inputs are never persisted across pages. These are active variables (the things the user iteratively explores in a single sitting), not baseline assumptions. Each calculator manages its own active-variable state without writing to localStorage.
+
+The principle: assumptions about the world are sitewide; questions specific to "what does this mean for me on this page" are local.
+
+### Privacy and reset
+
+- All localStorage values stored on-device only; never transmitted.
+- Each calculator's assumption panel includes a "Reset to defaults" link that clears all `lcs.*` keys and re-applies defaults.
+- A small persistent footnote near the picker reads: *"Saved on this device only. Never transmitted."*
+
+### Implementation infrastructure
+
+A shared JS module (`src/_includes/_pageassets/shared/modeling-assumptions.js`) exposes a clean API for read/write/subscribe across all calculator pages. Pages import from this single source rather than each writing localStorage logic inline. The Stage 2 rich card-based selector component will be built against the same API. Sources for all cited values are tracked in `DATA_AUDIT.md` with six-month audit cadence.
+
+### Stage 1 vs. Stage 2
+
+**Stage 1 (current):** Existing calculators adopt the canonical *values* and labels in their existing per-page UI styles (preset buttons, no rich card decomposition yet), with localStorage stickiness wired up. Half-Life, Melting Ice Cube, and Power Law forward-looking tab updated to match.
+
+**Stage 2 (future):** A rich card-based selector component built once and applied across all calculator pages. Replaces ad-hoc preset buttons with full decomposition cards showing how each value is built (component bullets with per-component citations). First-time visitors see expanded breakdowns; returning visitors see collapsed cards. Two-zone calculator layout fully realized visually.
+
+---
+
 ## 4. Alignment principles
 
 ### 4.1 The default rule
