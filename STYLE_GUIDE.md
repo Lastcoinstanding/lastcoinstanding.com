@@ -17,7 +17,7 @@ The site uses **five typefaces**. Each has one job. Don't introduce a sixth with
 | **Cormorant Garamond** | Display | h1, h2, large pull quotes, drop caps, inline italic emphasis at display sizes, "section closer" flourish at 1.35rem |
 | **EB Garamond** | Essay body | Long-form prose paragraphs, TOC links, key concepts — **only on cream/parchment background** |
 | **Source Serif** (italic) | Small-size italic flourish | OG card subtitles, page hero subtitles where an italic serif is wanted |
-| **Inter** | Editorial sans-serif | Body on dark backgrounds, UI labels, captions, page subtitles, tabs, buttons, metadata — on reading-prose / editorial pages (Index, Money Trees, The Bitcoin Migration, The Bitcoin Horizon, What Money Has To Be, and currently the calculator-tier pages) |
+| **Inter** | Editorial sans-serif | Body on dark backgrounds, UI labels, captions, page subtitles, tabs, buttons, metadata — on editorial pages and chart-explorer pages (see tier mapping below) |
 | **Outfit** | System / diagrammatic sans-serif | Body, panel labels, technical descriptors — on diagrammatic pages where the page is fundamentally a structural specification (currently: The Bitcoin Synthesis, What Bitcoin Is) |
 
 ### Sans-serif register: editorial vs. system-diagrammatic
@@ -29,7 +29,17 @@ The two sans-serif families are not interchangeable. Each carries a register:
 
 When introducing a new page, ask: *is this a piece of writing, or is it a diagram with explanatory copy?* Editorial pages get Inter. System/diagrammatic pages get Outfit. **Don't mix within a page.** **Don't choose by aesthetic preference** — choose by page character.
 
-The calculator-tier pages (Power Law, Half-Life, Fixed Pie, Melting Ice Cube, Real Estate) currently use Inter. A case can be made they're closer to system-diagrammatic in character (chart-and-control surfaces, technical descriptors, less reading prose). Logged in TECH_DEBT as an open coordinated decision; do not change in isolation.
+### Page-character tiers (typographic register)
+
+The site uses three typographic registers, mapped by page character:
+
+- **Editorial pages** — prose-led pages and pages with a substantive prose tab. Use §2.1 canonical scale + Inter body. Includes Index, Money Trees, The Bitcoin Migration, The Bitcoin Horizon, What Money Has To Be, About, Bitcoin vs. Real Estate, Power Law, Half-Life. The criterion is presence of authorial argument the reader is meant to settle into and read — even if the page also has charts and an interactive tool, if it contains an essay-grade tab, it belongs here.
+- **Chart-explorer pages** — pages where every tab is chart-led with brief explanatory copy and no essay tab. Use §2.5 chart-explorer scale + Inter body. Currently: The Fixed Pie, The Melting Ice Cube. Compact h1 + heavier weights + tighter body suit the dense-utility character.
+- **System-diagrammatic pages** — pages where the page IS a structural specification (component diagrams, structural-property frameworks). Use §2.1 canonical scale + Outfit body. Currently: The Bitcoin Synthesis, What Bitcoin Is, Trilemma. The diagram defines the page; prose serves the diagram.
+
+When introducing a new page, ask: *is this primarily a piece of writing (with or without supporting charts and tools)? Is it primarily a chart explorer? Or is the page itself a diagram?* Editorial gets §2.1 + Inter. Chart-explorer gets §2.5 + Inter. System-diagrammatic gets §2.1 + Outfit. **Don't mix within a page.** **Don't choose by aesthetic preference** — choose by page character.
+
+A common shape that belongs in the editorial tier: a page that contains both an essay tab and a calculator or chart-explorer tab. The editorial frame holds; the calculator's own controls use UI typography (§2.3) at the tab level. Bitcoin vs. Real Estate is the canonical example — its page-frame typography is editorial (with a documented hero weight-300 exception per §5), and the calculator tab sits comfortably inside that frame using UI controls. Power Law and Half-Life follow this pattern after the migration shipped in commits `[POWER_LAW_SHA]` / `[HALF_LIFE_SHA]`.
 
 ### Anti-pattern: DM Sans
 
@@ -104,6 +114,21 @@ All sizes use `clamp()` for fluid responsive scaling. The first value is the mob
 |---|---|---|
 | OG card subtitle | `30px` (fixed) | rendered at 1280×720 |
 | Page hero subtitle (when italic wanted) | `clamp(1.05rem, 2vw, 1.3rem)` | use this **instead of** Cormorant italic at small sizes |
+
+### 2.5 Chart-explorer tier (deliberate variant)
+
+A compact alternative to §2.1 for pages where every tab is chart-led with brief explanatory copy and no essay tab. Currently: The Fixed Pie, The Melting Ice Cube. Heavier weights and slightly tighter body suit the dense-utility character of chart-and-control surfaces; the smaller h1 cap keeps the page-frame from competing with the chart for attention.
+
+| Slot | Size | Weight | Notes |
+|---|---|---|---|
+| Page h1 | `clamp(2rem, 4.5vw, 3rem)` | 600 | Cormorant; ~13% smaller cap than §2.1, heavier weight |
+| Section h2 | `clamp(1.2rem, 2.5vw, 1.6rem)` | 500–600 | Cormorant; significantly tighter than §2.1's 2.6rem cap |
+| Body paragraph | `0.95–1rem` | 400 | Inter; line-height 1.7–1.8 |
+| Subsection h3 | `1.1–1.2rem` | 500 | Cormorant or Inter depending on slot |
+
+**Use this tier only when the page has no prose tab.** If a page has any essay-grade tab, the editorial scale (§2.1) is correct — even if the other tabs are chart-led — because the page-frame typography is set by the most prose-heavy tab. Bitcoin vs. Real Estate, Power Law, and Half-Life all contain calculator or chart tabs but have at least one substantive prose tab, so they belong on §2.1, not here. See §1's tier mapping for the full classification.
+
+This tier was historically called "calc-tier," a label that conflated functional character (page contains a calculator) with typographic register. Renamed and clarified after the audit shipped in commits `[POWER_LAW_SHA]` / `[HALF_LIFE_SHA]`.
 
 ---
 
@@ -196,7 +221,7 @@ These violate one of the rules above (or §2.1's canonical scale) but are kept d
 
 - **Not-a-Bubble uppercase Cormorant — page hero "IS BITCOIN A BUBBLE?" and section heading "THE PATTERN THAT DIDN'T REPEAT" (violates §5.3).** This page is a polemic. The wide-tracked uppercase register matches the page's argumentative register — hard structural assertions presented as headline statements. The tracking is restrained (~0.04em, not extreme) and the letterspacing is even. Cormorant's strengths *are* being fought here; that's the point. Per-page exception only — do not extrapolate this to other pages.
 
-- **Real Estate `.hero h1` Cormorant weight 300 (deviates from §2.1's wt 500 canonical).** "*Bitcoin* vs. Real Estate" with amber italic "Bitcoin" against the lighter-weight roman "vs. Real Estate" creates an editorial, almost magazine-cover feel reinforced by the page's "The Opportunity Cost" subtitle — the most contemplative/essayistic of the calculator-tier pages. Cormorant 300 is loaded and renders as designed (this is not a faux-weight fallback). Per-page exception only — do not extrapolate to other calc-tier pages without a deliberate paired decision.
+- **Real Estate `.hero h1` Cormorant weight 300 (deviates from §2.1's wt 500 canonical).** "*Bitcoin* vs. Real Estate" with amber italic "Bitcoin" against the lighter-weight roman "vs. Real Estate" creates an editorial, magazine-cover feel that reinforces the page's "The Opportunity Cost" framing. Cormorant 300 is loaded and renders as designed (this is not a faux-weight fallback). Real Estate is an editorial-tier page per §1 — the weight-300 hero is a deliberate single-page deepening of that register, not a calc-tier compromise. Per-page exception only — do not extrapolate.
 
 ---
 
@@ -400,10 +425,11 @@ When introducing a new page, **don't write nav CSS unless something needs to del
 
 What stays per-page when needed:
 
-- **Palette accent colors** — `.brand:hover`, `.nav-links a.active`, `.mobile-overlay a.active`, `.nav-dropdown-menu a.active`. The active/hover *color* varies by page palette (`var(--orange)` on calc-tier pages = `#F7931A`, `var(--amber)` on Migration/Horizon/BvRE/Not-a-Bubble = `#e09422`). Canonical declares the *structural* properties (background, font-weight) so per-page CSS only needs to declare the color override.
-- **Calc-tier overlay design** — Power Law / Half-Life / Fixed Pie / Melting Ice Cube / What Money Has To Be use a "below-nav drawer" mobile overlay (`top: 50px; padding: 2rem 1.5rem; gap: .5rem; z-index: 998-999; no opacity transition`) instead of canonical's full-coverage overlay. Reason: chart context stays visible while the menu is open.
-- **Calc-tier hamburger touch target** — `padding: 8px` on `.hamburger` instead of canonical's `4px`. Larger touch target on calc-tier pages.
-- **Calc-tier nav-links sizing** — tighter `font-size` and `padding` (and `gap: 4px` or `2px` instead of `8px`) to fit more nav items in narrow chart-control surfaces.
+- **Palette accent colors** — `.brand:hover`, `.nav-links a.active`, `.mobile-overlay a.active`, `.nav-dropdown-menu a.active`. The active/hover *color* varies by page palette (`var(--orange)` on the compact-nav pages below = `#F7931A`, `var(--amber)` on Migration/Horizon/BvRE/Not-a-Bubble = `#e09422`). Canonical declares the *structural* properties (background, font-weight) so per-page CSS only needs to declare the color override.
+- **Compact-nav variant** — Power Law / Half-Life / Fixed Pie / Melting Ice Cube / What Money Has To Be share a set of nav overrides for chart-page UX (these pages carry chart context that should stay visible during nav interaction). The variant is independent of typographic tier — it applies whether the page uses §2.1 (Power Law, Half-Life) or §2.5 (Fixed Pie, MIC). Specifics:
+  - **Below-nav drawer overlay** — `top: 50px; padding: 2rem 1.5rem; gap: .5rem; z-index: 998-999; no opacity transition` instead of canonical's full-coverage overlay. Reason: chart context stays visible while the menu is open.
+  - **Larger hamburger touch target** — `padding: 8px` on `.hamburger` instead of canonical's `4px`.
+  - **Tighter nav-links sizing** — smaller `font-size` and `padding` (and `gap: 4px` or `2px` instead of `8px`) to fit more nav items in narrow chart-control surfaces.
 - **Page-specific responsive overrides** — e.g. `@media (max-width: 480px) { .site-nav { padding: 10px 14px; } }` is declared per-page; canonical doesn't have a 480px breakpoint for this.
 - **Migration `position: fixed`** — paired with the page's progress-bar at `top: 48px`. The progress bar depends on the nav being position-fixed; sticky might also work but is untested with this layout.
 - **Bitcoin vs. Real Estate custom site-nav** — substantially divergent pre-existing design (`z-index: 100`, `padding: 0.8rem 2rem`, `background: rgba(10,9,8,0.92)`). Preserved as-is; this page also styles `.nav-dropdown-btn` as a full nav-link (custom design).
