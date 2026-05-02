@@ -5,7 +5,7 @@ slug: the-melting-ice-cube
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-melting-ice-cube-head.html' %}"
   page_styles: "{% include '_pageassets/the-melting-ice-cube.css' %}"
-  page_scripts: "{% include '_pageassets/the-melting-ice-cube.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/the-melting-ice-cube.js' %}"
 ---
 <div class="page">
   <header class="page-header">
@@ -50,11 +50,15 @@ eleventyComputed:
       <div class="cp-fiat-ctrl">
         <div class="interactive-block">
           <div class="opt-group" id="inflBtns" style="margin-bottom:10px">
-            <button class="opt-btn sel-red" data-rate="4" onclick="setInflation(this)">4% low</button>
-            <button class="opt-btn" data-rate="7" onclick="setInflation(this)">7% USD avg</button>
-            <button class="opt-btn" data-rate="10" onclick="setInflation(this)">10% elevated</button>
-            <button class="opt-btn" data-rate="15" onclick="setInflation(this)">15% severe</button>
+            <button class="opt-btn" data-preset="cpi-official" onclick="setMicInflation(this)">CPI 3.5%</button>
+            <button class="opt-btn" data-preset="m2-growth" onclick="setMicInflation(this)">M2 6.5%</button>
+            <button class="opt-btn" data-preset="shadow-stats" onclick="setMicInflation(this)">Shadow 8%</button>
+            <button class="opt-btn" data-preset="custom" onclick="setMicInflation(this)">Custom</button>
           </div>
+          <div class="mic-custom-row" data-group="inflBtns" style="display:none;margin-top:.4rem;font-family:var(--font-b);font-size:.85rem;color:var(--text-dim)">
+            <label>Your rate: <input type="number" class="mic-custom-input" inputmode="decimal" step="0.1" min="-50" max="500" style="width:70px;padding:3px 6px;background:var(--bg);border:1px solid var(--border);color:var(--text-bright);font-family:inherit;font-size:.9rem;border-radius:0">% / yr</label>
+          </div>
+          <div style="margin-top:.3rem;font-family:var(--font-b);font-size:.7rem;color:var(--text-muted);font-style:italic"><a href="#" onclick="resetMicInflation(event)" style="color:inherit;text-decoration:underline">Reset to defaults</a> &middot; saved on this device only</div>
           <div class="mini-stat ms-fiat-epoch" style="margin-bottom:0">
             <div class="ms-label">Fiat Expansion Schedule</div>
             <div class="ms-sub">No fixed schedule, no ceiling, no protocol — only policy.</div>
@@ -186,10 +190,13 @@ eleventyComputed:
       <div class="calc-block">
         <div class="calc-block-title">Fiat Inflation / Money Supply Expansion</div>
         <div class="opt-group" id="infl2Btns">
-          <button class="opt-btn" data-val="2" onclick="setInfl2(this)">2%</button>
-          <button class="opt-btn" data-val="4" onclick="setInfl2(this)">4%</button>
-          <button class="opt-btn sel" data-val="7" onclick="setInfl2(this)">7% USD avg</button>
-          <button class="opt-btn" data-val="10" onclick="setInfl2(this)">10%</button>
+          <button class="opt-btn" data-preset="cpi-official" onclick="setMicInflation(this)">CPI 3.5%</button>
+          <button class="opt-btn" data-preset="m2-growth" onclick="setMicInflation(this)">M2 6.5%</button>
+          <button class="opt-btn" data-preset="shadow-stats" onclick="setMicInflation(this)">Shadow 8%</button>
+          <button class="opt-btn" data-preset="custom" onclick="setMicInflation(this)">Custom</button>
+        </div>
+        <div class="mic-custom-row" data-group="infl2Btns" style="display:none;margin-top:.4rem;font-family:var(--font-b);font-size:.85rem;color:var(--text-dim)">
+          <label>Your rate: <input type="number" class="mic-custom-input" inputmode="decimal" step="0.1" min="-50" max="500" style="width:70px;padding:3px 6px;background:var(--bg);border:1px solid var(--border);color:var(--text-bright);font-family:inherit;font-size:.9rem;border-radius:0">% / yr</label>
         </div>
       </div>
       <div class="calc-block" style="display:flex;align-items:center;justify-content:center">
@@ -313,10 +320,13 @@ eleventyComputed:
       <div class="calc-block">
         <div class="calc-block-title">Fiat Inflation / Money Supply Expansion</div>
         <div class="opt-group" id="t3InflBtns">
-          <button class="opt-btn" data-val="2" onclick="setT3Infl(this)">2%</button>
-          <button class="opt-btn" data-val="4" onclick="setT3Infl(this)">4%</button>
-          <button class="opt-btn sel" data-val="7" onclick="setT3Infl(this)">7% USD avg</button>
-          <button class="opt-btn" data-val="10" onclick="setT3Infl(this)">10%</button>
+          <button class="opt-btn" data-preset="cpi-official" onclick="setMicInflation(this)">CPI 3.5%</button>
+          <button class="opt-btn" data-preset="m2-growth" onclick="setMicInflation(this)">M2 6.5%</button>
+          <button class="opt-btn" data-preset="shadow-stats" onclick="setMicInflation(this)">Shadow 8%</button>
+          <button class="opt-btn" data-preset="custom" onclick="setMicInflation(this)">Custom</button>
+        </div>
+        <div class="mic-custom-row" data-group="t3InflBtns" style="display:none;margin-top:.4rem;font-family:var(--font-b);font-size:.85rem;color:var(--text-dim)">
+          <label>Your rate: <input type="number" class="mic-custom-input" inputmode="decimal" step="0.1" min="-50" max="500" style="width:70px;padding:3px 6px;background:var(--bg);border:1px solid var(--border);color:var(--text-bright);font-family:inherit;font-size:.9rem;border-radius:0">% / yr</label>
         </div>
       </div>
     </div>

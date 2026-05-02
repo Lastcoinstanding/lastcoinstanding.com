@@ -33,7 +33,8 @@ iceInitFromHash();
    TAB 1 — CANVAS
 ═══════════════════════════════ */
 var tab1Active=true;
-var inflation1=7;
+// inflation1 is computed from the canonical ModelingAssumptions on every read
+function getInflation1(){return window.ModelingAssumptions.get('inflation').value;}
 var years1=0;
 var batteryPhase=0;
 var drops=[];
@@ -222,9 +223,10 @@ function drawBattery(ctx,W,H,phase){
 }
 
 function updateDrops(cubeBounds){
+  var inflation1=getInflation1();
   dropTimer++;
   var dropEvery=Math.max(3,Math.round(28-inflation1*1.2));
-  var frac=Math.pow(1-inflation1/100,years1);
+  var frac=1/Math.pow(1+inflation1/100,years1);
   if(dropTimer>=dropEvery&&frac>0.04){
     dropTimer=0;
     drops.push({x:cubeBounds.x+(Math.random()*0.7+0.15)*cubeBounds.w,y:cubeBounds.bottom,speed:1.4+Math.random()*1.8,opacity:0.55+Math.random()*0.3,r:1.4+Math.random()*1.8});
@@ -237,9 +239,10 @@ function updateDrops(cubeBounds){
 
 function renderTab1(){
   if(!tab1Active) return;
+  var inflation1=getInflation1();
   var ib=setupCanvas(iceCubeCanvas);
   var bb=setupCanvas(batteryCanvas);
-  var fraction=Math.pow(1-inflation1/100,years1);
+  var fraction=1/Math.pow(1+inflation1/100,years1);
 
   var cubeW=Math.min(ib.w*0.62,160);
   var maxH=ib.h*0.56;
@@ -255,8 +258,8 @@ function renderTab1(){
   var pct=(fraction*100).toFixed(1);
   document.getElementById('cashPctCard').textContent=pct+'%';
   document.getElementById('cashPctSub').textContent='at '+inflation1+'% expansion, '+Math.round(years1)+' yr'+(years1!==1?'s':'');
-  var hl=Math.log(2)/Math.log(1/(1-inflation1/100));
-  document.getElementById('halfLifeCard').textContent=hl.toFixed(1)+' yrs';
+  var hl=window.CalcHelpers.purchasingPowerHalfLife(inflation1);
+  document.getElementById('halfLifeCard').textContent=(isFinite(hl)?hl.toFixed(1):'\u221E')+' yrs';
   document.getElementById('halfLifeSub').textContent='at '+inflation1+'% annual expansion';
 
   // Bitcoin issuance rate — halves every ~4 years from today
@@ -285,11 +288,102 @@ document.getElementById('yearSlider1').addEventListener('input',function(){
   drops=[];
 });
 
-function setInflation(btn){
-  document.querySelectorAll('#inflBtns .opt-btn').forEach(function(b){b.classList.remove('sel','sel-blue','sel-red');});
-  inflation1=+btn.dataset.rate;
-  btn.classList.add('sel-red');
+// Unified inflation setter — writes to the sitewide canonical, all three button
+// groups (inflBtns, infl2Btns, t3InflBtns) sync to it.
+function setMicInflation(btn){
+  var preset=btn.dataset.preset;
+  if(preset==='custom'){
+    // Show all custom-input rows; if a stored custom value exists, surface it
+    var stored=parseFloat(localStorage.getItem('lcs.inflation.customValue'));
+    showMicCustomRows(true);
+    if(isFinite(stored)){
+      window.ModelingAssumptions.set('inflation','custom',stored);
+      // Sync inputs to stored value
+      document.querySelectorAll('.mic-custom-input').forEach(function(inp){inp.value=stored;});
+    } else {
+      // Focus first input for entry; don't write a custom preset until user enters value
+      var firstInput=document.querySelector('.mic-custom-input');
+      if(firstInput){firstInput.value='';firstInput.focus();}
+      // Visually mark Custom buttons as selected even without a stored value
+      syncMicInflationButtons('custom');
+      drops=[]; drawT2Chart(); drawT3Chart();
+      return;
+    }
+  } else {
+    showMicCustomRows(false);
+    window.ModelingAssumptions.set('inflation',preset);
+  }
   drops=[];
+  drawT2Chart();
+  drawT3Chart();
+}
+
+// Reset link handler
+function resetMicInflation(e){
+  e.preventDefault();
+  window.ModelingAssumptions.reset();
+  showMicCustomRows(false);
+  syncMicInflation();
+  drops=[];
+  drawT2Chart();
+  drawT3Chart();
+}
+
+// Show or hide all three custom-input rows together
+function showMicCustomRows(show){
+  document.querySelectorAll('.mic-custom-row').forEach(function(row){
+    row.style.display=show?'':'none';
+  });
+}
+
+// Sync the visual selection across all three button groups to match the
+// current canonical state. Called on load and on canonical-change events.
+function syncMicInflationButtons(activePreset){
+  ['inflBtns','infl2Btns','t3InflBtns'].forEach(function(groupId){
+    var group=document.getElementById(groupId);
+    if(!group) return;
+    group.querySelectorAll('.opt-btn').forEach(function(btn){
+      btn.classList.remove('sel','sel-blue','sel-red');
+      if(btn.dataset.preset===activePreset){
+        // Use sel-red on the first group (matches existing visual style),
+        // sel on the others
+        if(groupId==='inflBtns') btn.classList.add('sel-red');
+        else btn.classList.add('sel');
+      }
+    });
+  });
+}
+
+function syncMicInflation(){
+  var current=window.ModelingAssumptions.get('inflation');
+  syncMicInflationButtons(current.preset);
+  if(current.preset==='custom'){
+    showMicCustomRows(true);
+    document.querySelectorAll('.mic-custom-input').forEach(function(inp){
+      if(parseFloat(inp.value)!==current.value) inp.value=current.value;
+    });
+  } else {
+    showMicCustomRows(false);
+  }
+}
+
+// Bind all custom-input fields to write through to the canonical
+function bindMicCustomInputs(){
+  document.querySelectorAll('.mic-custom-input').forEach(function(input){
+    input.addEventListener('input',function(){
+      var v=parseFloat(input.value);
+      if(isFinite(v)){
+        window.ModelingAssumptions.set('inflation','custom',v);
+        // Sync the OTHER inputs so all three reflect the same value
+        document.querySelectorAll('.mic-custom-input').forEach(function(other){
+          if(other!==input) other.value=v;
+        });
+        drops=[];
+        drawT2Chart();
+        drawT3Chart();
+      }
+    });
+  });
 }
 
 window.addEventListener('resize',function(){drops=[];});
@@ -298,7 +392,9 @@ requestAnimationFrame(renderTab1);
 /* ═══════════════════════════════
    TAB 2 — TREASURY CHART
 ═══════════════════════════════ */
-var t2={size:10000000,alloc:10,cagr:'powerlaw',inflation:7};
+// t2.inflation now reads from the sitewide canonical via getInflation1()
+var t2={size:10000000,alloc:10,cagr:'powerlaw'};
+Object.defineProperty(t2,'inflation',{get:function(){return getInflation1();}});
 var t2ShowFullBtc=false, t2ScrubYear=10;
 
 function fmtM(n){
@@ -340,12 +436,12 @@ function btcGrowth(years){
 
 /* Series: all in real (inflation-adjusted) purchasing power */
 function fiatSeries(size,infl,yrs){
-  var s=[];for(var y=0;y<=yrs;y++) s.push(size*Math.pow(1-infl/100,y));return s;
+  var s=[];for(var y=0;y<=yrs;y++) s.push(size*Math.pow(1+infl/100,-y));return s;
 }
 function blendSeries(size,alloc,infl,yrs){
   var btc=size*(alloc/100),cash=size-btc;
   var s=[];for(var y=0;y<=yrs;y++)
-    s.push(btc*btcGrowth(y)+cash*Math.pow(1-infl/100,y));
+    s.push(btc*btcGrowth(y)+cash*Math.pow(1+infl/100,-y));
   return s;
 }
 function fullBtcSeries(size,yrs){
@@ -508,7 +604,7 @@ function setCagr(btn){
   if(note) note.style.display=(t2.cagr==='powerlaw')?'block':'none';
   drawT2Chart();
 }
-function setInfl2(btn){selBtn('infl2Btns',btn);t2.inflation=+btn.dataset.val;drawT2Chart();}
+function setInfl2(btn){setMicInflation(btn);}
 
 /* Init */
 (function(){
@@ -528,7 +624,9 @@ window.addEventListener('resize',function(){
 /* ═══════════════════════════════
    TAB 3 — REAL COMPANIES
 ═══════════════════════════════ */
-var t3={treasury:157000000000,name:'Apple',ticker:'AAPL',alloc:5,cagr:'powerlaw',inflation:7};
+// t3.inflation now reads from the sitewide canonical via getInflation1()
+var t3={treasury:157000000000,name:'Apple',ticker:'AAPL',alloc:5,cagr:'powerlaw'};
+Object.defineProperty(t3,'inflation',{get:function(){return getInflation1();}});
 var t3ShowFullBtc=false, t3ScrubYear=10;
 
 function selectCo(card){
@@ -546,7 +644,7 @@ function setT3Cagr(btn){
   if(note) note.style.display=(t3.cagr==='powerlaw')?'block':'none';
   drawT3Chart();
 }
-function setT3Infl(btn){selBtn('t3InflBtns',btn);t3.inflation=+btn.dataset.val;drawT3Chart();}
+function setT3Infl(btn){setMicInflation(btn);}
 function setT3AllocSlider(el){
   t3.alloc=+el.value;
   var pct=((t3.alloc-1)/99*100).toFixed(0);
@@ -592,9 +690,9 @@ function drawT3Chart(){
   /* Series */
   var fs=[],bs=[],bts=[];
   for(var y=0;y<=YEARS;y++){
-    fs.push(t3.treasury*Math.pow(1-t3.inflation/100,y));
+    fs.push(t3.treasury*Math.pow(1+t3.inflation/100,-y));
     var btc=t3.treasury*(t3.alloc/100),cash=t3.treasury-btc;
-    bs.push(btc*t3BtcGrowth(y)+cash*Math.pow(1-t3.inflation/100,y));
+    bs.push(btc*t3BtcGrowth(y)+cash*Math.pow(1+t3.inflation/100,-y));
     bts.push(t3.treasury*t3BtcGrowth(y));
   }
 
@@ -692,3 +790,21 @@ function initT3Chart(){
 window.addEventListener('resize',function(){
   if(document.getElementById('tab-companies').classList.contains('active')) drawT3Chart();
 });
+
+// ─── Canonical inflation integration ──────────────────────
+// Sync UI to canonical state on load, bind custom inputs, subscribe to changes.
+window.addEventListener('load',function(){
+  syncMicInflation();
+  bindMicCustomInputs();
+});
+if(window.ModelingAssumptions && window.ModelingAssumptions.subscribe){
+  window.ModelingAssumptions.subscribe(function(dim){
+    if(dim==='inflation'||dim==='*'){
+      syncMicInflation();
+      drops=[];
+      // Re-render whichever charts are present
+      if(document.getElementById('t2Chart')) drawT2Chart();
+      if(document.getElementById('t3Chart')) drawT3Chart();
+    }
+  });
+}
