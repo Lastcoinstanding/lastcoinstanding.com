@@ -2,6 +2,13 @@
 layout: base.njk
 permalink: /the-melting-ice-cube.html
 slug: the-melting-ice-cube
+related:
+  - slug: the-half-life
+    desc: "The personal-balance-sheet view of the same problem. Half-Life zooms out to all dollar holders; this page focuses on corporate cash specifically."
+  - slug: the-power-law
+    desc: "Forward-looking projection for treasuries that allocate to bitcoin. Use the calculator to model your own scenarios."
+  - slug: bitcoin-vs-real-estate
+    desc: "Another asset class often used to escape fiat decay. See how housing has actually performed against bitcoin."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-melting-ice-cube-head.html' %}"
   page_styles: "{% include '_pageassets/the-melting-ice-cube.css' %}"
@@ -394,5 +401,7 @@ eleventyComputed:
       <p>This is not a strategy for companies to become Bitcoin treasury vehicles. It is a question for operating businesses: what is your treasury actually doing — and what does it cost to leave it unchanged?</p>
     </div>
   </div>
+
+{% include 'components/related.njk' %}
 
 </div><!-- /page -->

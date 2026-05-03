@@ -2,6 +2,13 @@
 layout: base.njk
 permalink: /synthesis.html
 slug: synthesis
+related:
+  - slug: trilemma
+    desc: "The trilemma is the operational frame for one of the six components. Worth understanding alongside the synthesis."
+  - slug: what-money-has-to-be
+    desc: "The requirements side of the synthesis — three functions that any money must serve, and why they have to live in the same instrument."
+  - slug: the-bitcoin-migration
+    desc: "The action that follows from the case: if Bitcoin holds together as money, the next question is what to do about it."
 eleventyComputed:
   head_extras: "{% include '_pageassets/synthesis-head.html' %}"
   page_styles: "{% include '_pageassets/synthesis.css' %}"
@@ -90,10 +97,5 @@ eleventyComputed:
             <div class="precursor-grid" id="precursorGrid"></div>
         </section>
 
-        <aside class="related-link" style="max-width:720px;margin:4rem auto 2rem;padding:1.75rem;border:1px solid rgba(247,147,26,0.18);border-radius:3px;background:rgba(247,147,26,0.03);font-family:'Inter',-apple-system,sans-serif;">
-            <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#908880;margin-bottom:0.8rem;">Related</div>
-            <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.35rem;font-weight:500;color:#f2eee8;line-height:1.3;margin-bottom:0.7rem;">Six components. Three functions. One money.</div>
-            <p style="font-size:0.98rem;line-height:1.7;color:#d0c8c0;margin-bottom:1rem;">The Synthesis explains how Bitcoin holds together structurally &mdash; what its six components are and why removing any one is fatal. Its companion asks why it holds together at all: what money has to be in the first place, and why three functions have to live in the same instrument.</p>
-            <a href="/what-money-has-to-be.html" style="font-size:0.9rem;font-weight:500;color:#F7931A;text-decoration:none;border-bottom:1px solid rgba(247,147,26,0.4);padding-bottom:2px;">See the three functions &rarr;</a>
-        </aside>
+        {% include 'components/related.njk' %}
     </div>

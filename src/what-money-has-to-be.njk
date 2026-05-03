@@ -2,6 +2,13 @@
 layout: base.njk
 permalink: /what-money-has-to-be.html
 slug: what-money-has-to-be
+related:
+  - slug: the-half-life
+    desc: "When durability fails — the empirical case showing how fast the dollar's purchasing power decays under different inflation regimes."
+  - slug: what-bitcoin-is
+    desc: "From requirements to instantiation. If you accept what money has to be, the question is whether anything actually delivers on those requirements."
+  - slug: synthesis
+    desc: "How the three functions and six components fit together. Removing any one breaks the whole."
 eleventyComputed:
   head_extras: "{% include '_pageassets/what-money-has-to-be-head.html' %}"
   page_styles: "{% include '_pageassets/what-money-has-to-be.css' %}"
@@ -248,5 +255,7 @@ eleventyComputed:
       <a class="callout-link" href="https://x.com/LastCoinStandng/status/1714789695622955431" target="_blank" rel="noopener">Watch the 2-minute summary →</a>
     </div>
   </aside>
+
+  {% include 'components/related.njk' %}
 
 </div>

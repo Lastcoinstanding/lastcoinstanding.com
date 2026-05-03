@@ -2,6 +2,13 @@
 layout: base.njk
 permalink: /bitcoin-vs-real-estate.html
 slug: bitcoin-vs-real-estate
+related:
+  - slug: the-power-law
+    desc: "The forward-looking companion. BvRE is the retrospective question; Power Law is the projection question. Same comparison, opposite directions in time."
+  - slug: the-half-life
+    desc: "The inflation backdrop that frames why housing has appreciated as much as it has — and why bitcoin is the natural comparison."
+  - slug: the-melting-ice-cube
+    desc: "What inflation does to cash reserves. The motive force behind both housing and bitcoin as inflation hedges."
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-vs-real-estate-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-vs-real-estate.css' %}"
@@ -205,4 +212,6 @@ eleventyComputed:
 
 
     
+    {% include 'components/related.njk' %}
+
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Bitcoin vs. Real Estate — The Opportunity Cost","description":"A house didn't used to be an investment. Explore 135 years of data showing how monetary regime changes transformed housing from shelter into the world's largest store of value.","url":"https://lastcoinstanding.com/bitcoin-vs-real-estate.html","isPartOf":{"@type":"WebSite","name":"Last Coin Standing","url":"https://lastcoinstanding.com"},"about":[{"@type":"Thing","name":"Bitcoin"},{"@type":"Thing","name":"Housing Market"},{"@type":"Thing","name":"Monetary Policy"},{"@type":"Thing","name":"Gold Standard"}]}</script>

@@ -2,6 +2,13 @@
 layout: base.njk
 permalink: /the-bitcoin-migration.html
 slug: the-bitcoin-migration
+related:
+  - slug: synthesis
+    desc: "The structural case underlying the migration argument — why people are moving and what they're moving to."
+  - slug: the-half-life
+    desc: "The empirical pressure behind the migration. Money that loses half its value every decade creates real urgency to find an alternative."
+  - slug: bitcoin-vs-real-estate
+    desc: "The decision-frame for one of the most common destinations people have used: real estate. See the head-to-head with Bitcoin."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-bitcoin-migration-head.html' %}"
   page_styles: "{% include '_pageassets/the-bitcoin-migration.css' %}"
@@ -352,6 +359,8 @@ eleventyComputed:
 
         </div>
     </main>
+
+    {% include 'components/related.njk' %}
 
     <div class="transition-out-of-reading"></div>
 

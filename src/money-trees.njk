@@ -2,6 +2,13 @@
 layout: base.njk
 permalink: /money-trees.html
 slug: money-trees
+related:
+  - slug: the-half-life
+    desc: "What infinite expansion does to the dollar in the language of decay curves. The other side of the same monetary story."
+  - slug: the-melting-ice-cube
+    desc: "The corporate-treasury view of fiat dilution. Same problem, different scale."
+  - slug: what-bitcoin-is
+    desc: "The contrast frames the question: if fiat is the withering tree, what's the alternative built on fundamentally different principles?"
 eleventyComputed:
   head_extras: "{% include '_pageassets/money-trees-head.html' %}"
   page_styles: "{% include '_pageassets/money-trees.css' %}"
@@ -52,3 +59,5 @@ eleventyComputed:
   </div>
   <div class="tooltip-synonyms" id="tip-synonyms"></div>
 </div>
+
+{% include 'components/related.njk' %}

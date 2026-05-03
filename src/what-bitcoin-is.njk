@@ -2,6 +2,13 @@
 layout: base.njk
 permalink: /what-bitcoin-is.html
 slug: what-bitcoin-is
+related:
+  - slug: synthesis
+    desc: "How Bitcoin's six components hold together — and why removing any one is fatal to the whole."
+  - slug: trilemma
+    desc: "The decentralization-security-scalability tradeoff that every monetary network faces, and how Bitcoin resolves it at the base layer."
+  - slug: what-money-has-to-be
+    desc: "The functional requirements any money must meet. The case for why Bitcoin is money begins here."
 eleventyComputed:
   head_extras: "{% include '_pageassets/what-bitcoin-is-head.html' %}"
   page_styles: "{% include '_pageassets/what-bitcoin-is.css' %}"
@@ -53,4 +60,5 @@ eleventyComputed:
                 </div>
             </div>
         </main>
+        {% include 'components/related.njk' %}
     </div>

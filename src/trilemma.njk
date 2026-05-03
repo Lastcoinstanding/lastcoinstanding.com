@@ -2,6 +2,13 @@
 layout: base.njk
 permalink: /trilemma.html
 slug: trilemma
+related:
+  - slug: synthesis
+    desc: "The trilemma is one component within a larger structural picture. Synthesis shows how all six pieces interlock."
+  - slug: what-bitcoin-is
+    desc: "The trilemma is operational; this is the broader case for why Bitcoin's resolution of it matters."
+  - slug: the-power-law
+    desc: "How Bitcoin's resolution of the trilemma drives its long-run trajectory in price and adoption."
 eleventyComputed:
   head_extras: "{% include '_pageassets/trilemma-head.html' %}"
   page_styles: "{% include '_pageassets/trilemma.css' %}"
@@ -114,6 +121,7 @@ eleventyComputed:
     </div>
   </div>
 </div>
+{% include 'components/related.njk' %}
 <section class="page-attribution" style="padding: 3rem 2rem 1rem; max-width: 720px; margin: 0 auto; text-align: center; border-top: 1px solid rgba(224,148,34,0.08);">
     <p style="font-family:'Inter',sans-serif; font-size:0.82rem; color:rgba(255,255,255,0.5); line-height:1.7; margin:0;">
         The Blockchain Trilemma was first articulated by <strong style="color:rgba(255,255,255,0.75);">Vitalik Buterin</strong> in 2017. Its profound implications for Bitcoin as sound money have been extensively explored by <strong style="color:rgba(255,255,255,0.75);">Jeff Booth</strong>.

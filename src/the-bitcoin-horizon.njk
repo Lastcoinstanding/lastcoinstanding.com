@@ -2,6 +2,13 @@
 layout: base.njk
 permalink: /the-bitcoin-horizon.html
 slug: the-bitcoin-horizon
+related:
+  - slug: the-power-law
+    desc: "The model behind the long-run trajectory. Horizon argues for the time-scale; Power Law gives the equation."
+  - slug: not-a-bubble
+    desc: "The volatility-decay analysis lands a structural argument for why bitcoin's price behavior isn't bubble-like."
+  - slug: the-fixed-pie
+    desc: "Owning a fixed slice of a maturing network is what the Horizon argument implies in practice. See your own share."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-bitcoin-horizon-head.html' %}"
   page_styles: "{% include '_pageassets/the-bitcoin-horizon.css' %}"
@@ -401,6 +408,6 @@ eleventyComputed:
 
 </main>
 
-
+{% include 'components/related.njk' %}
 
 <!-- ═══ DATA + LOGIC ═══ -->

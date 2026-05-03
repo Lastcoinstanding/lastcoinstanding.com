@@ -2,6 +2,13 @@
 layout: base.njk
 permalink: /the-fixed-pie.html
 slug: the-fixed-pie
+related:
+  - slug: synthesis
+    desc: "The fixed-share property is one of bitcoin's six structural components. See how it interlocks with the others."
+  - slug: the-power-law
+    desc: "How a fixed-share-of-a-growing-network projects forward in price. The math behind the upside."
+  - slug: the-bitcoin-horizon
+    desc: "Long-range projections that complement the fixed-share argument — what owning a fixed slice means as the network matures."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-fixed-pie-head.html' %}"
   page_styles: "{% include '_pageassets/the-fixed-pie.css' %}"
@@ -190,5 +197,7 @@ eleventyComputed:
     </div>
 
   </div><!-- /tab-energy -->
+
+{% include 'components/related.njk' %}
 
 </div><!-- /page -->

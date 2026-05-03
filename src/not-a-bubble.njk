@@ -2,6 +2,13 @@
 layout: base.njk
 permalink: /not-a-bubble.html
 slug: not-a-bubble
+related:
+  - slug: the-power-law
+    desc: "The model that explains why bitcoin's price behavior isn't bubble-like even when it looks volatile. The trajectory is structural, not speculative."
+  - slug: synthesis
+    desc: "The case for why bitcoin holds together as money — the structural argument behind why it isn't a bubble."
+  - slug: the-bitcoin-horizon
+    desc: "The volatility-decay analysis showing bitcoin's price behavior compressing predictably over time. Quantifies what the no-bubble case implies."
 eleventyComputed:
   head_extras: "{% include '_pageassets/not-a-bubble-head.html' %}"
   page_styles: "{% include '_pageassets/not-a-bubble.css' %}"
@@ -145,5 +152,7 @@ eleventyComputed:
     <img id="saveOverlayImg" src="" alt="Bitcoin vs Historical Bubbles — lastcoinstanding.com">
   </div>
 </div>
+
+{% include 'components/related.njk' %}
 
 <div class="toast" id="toast"></div>

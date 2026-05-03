@@ -2,6 +2,13 @@
 layout: base.njk
 permalink: /the-power-law.html
 slug: the-power-law
+related:
+  - slug: bitcoin-vs-real-estate
+    desc: "The retrospective companion. Power Law is the projection question; BvRE asks the same comparison looking backward at historical data."
+  - slug: the-bitcoin-horizon
+    desc: "The long-range view of bitcoin's trajectory — volatility decay and the institutional case that complements the Power Law projection."
+  - slug: the-fixed-pie
+    desc: "The supply-side basis for the Power Law model. A fixed share of a growing network is the structural underpinning of the curve."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-power-law-head.html' %}"
   page_styles: "{% include '_pageassets/the-power-law.css' %}"
@@ -495,5 +502,7 @@ eleventyComputed:
     </div>
 
   </div>
+
+  {% include 'components/related.njk' %}
 
 </div>
