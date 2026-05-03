@@ -1,20 +1,25 @@
 /* ─── Calculators constellation page ─── */
+/* Mirrors the homepage card aesthetic for visual continuity (concept-card pattern). */
 
 :root {
   --bg: #0a0908;
   --bg-card: #111110;
   --border: #1e1c1a;
-  --border-lt: #2a2826;
   --amber: #e09422;
+  --orange: #F7931A;
   --amber-soft: rgba(224, 148, 34, 0.08);
   --amber-dim: rgba(224, 148, 34, 0.35);
   --text: #d8d2ca;
   --text-bright: #f2eee8;
+  --text-body: #c8c2b8;
   --text-dim: #908880;
   --text-muted: #706860;
-  --font-d: 'Cormorant Garamond', Georgia, serif;
-  --font-b: 'Inter', -apple-system, sans-serif;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-reading: 'EB Garamond', Georgia, serif;
+  --font-body: 'Inter', -apple-system, sans-serif;
 }
+
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 
 .calculators-page {
   max-width: 1100px;
@@ -32,7 +37,7 @@
 }
 
 .calculators-page h1 {
-  font-family: var(--font-d);
+  font-family: var(--font-display);
   font-size: clamp(2.4rem, 5vw, 3.6rem);
   font-weight: 500;
   line-height: 1.05;
@@ -42,7 +47,7 @@
 }
 
 .calculators-page .hero-lede {
-  font-family: var(--font-b);
+  font-family: var(--font-body);
   font-size: 1.05rem;
   line-height: 1.6;
   color: var(--text);
@@ -51,7 +56,7 @@
 }
 
 .calculators-page .hero-meta {
-  font-family: var(--font-b);
+  font-family: var(--font-body);
   font-size: 0.78rem;
   color: var(--text-muted);
   font-style: italic;
@@ -59,11 +64,11 @@
   margin: 0;
 }
 
-/* ─── Card grid ─── */
+/* ─── Card grid (mirrors homepage .card-grid) ─── */
 .calc-card-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.4rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
   margin-top: 2.5rem;
 }
 
@@ -71,61 +76,84 @@
   .calc-card-grid { grid-template-columns: 1fr; gap: 1rem; }
 }
 
-/* ─── Card ─── */
+/* ─── Tile (mirrors homepage .concept-card) ─── */
 .calc-tile {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.6rem 1.6rem 1.4rem;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  transition: border-color 0.25s, transform 0.25s;
+  border-radius: 0.75rem;
+  padding: 2rem 1.75rem;
   text-decoration: none;
   color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: border-color 0.3s, transform 0.25s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
 }
 
 .calc-tile.live:hover {
-  border-color: var(--amber-dim);
-  transform: translateY(-2px);
+  border-color: rgba(247, 147, 26, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(247, 147, 26, 0.06);
 }
 
+/* Orange top-bar on hover — homepage signature */
+.calc-tile.live::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--orange);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.calc-tile.live:hover::before { opacity: 1; }
+
+.calc-tile-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 0.25rem;
+}
+
+.calc-tile-icon svg { width: 100%; height: 100%; }
+
 .calc-tile-name {
-  font-family: var(--font-d);
-  font-size: 1.5rem;
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
   color: var(--text-bright);
-  margin: 0 0 0.45rem;
-  letter-spacing: -0.005em;
-  line-height: 1.15;
+  margin: 0;
+  line-height: 1.2;
 }
 
 .calc-tile-question {
-  font-family: var(--font-b);
+  font-family: var(--font-body);
   font-size: 0.85rem;
   color: var(--amber);
   font-style: italic;
-  margin: 0 0 0.9rem;
+  margin: 0;
   line-height: 1.45;
 }
 
 .calc-tile-desc {
-  font-family: var(--font-b);
+  font-family: var(--font-reading);
   font-size: 0.92rem;
-  color: var(--text);
-  line-height: 1.55;
-  margin: 0 0 1.2rem;
-  flex: 1;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--text-body);
+  margin: 0;
 }
 
 .calc-tile-cta {
-  font-family: var(--font-b);
+  font-family: var(--font-body);
   font-size: 0.78rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--amber);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--orange);
   margin-top: auto;
+  padding-top: 0.5rem;
 }
 
 .calc-tile-cta::after {
@@ -140,37 +168,22 @@
 
 /* ─── Coming soon variant ─── */
 .calc-tile.coming-soon {
-  opacity: 0.65;
+  opacity: 0.55;
   cursor: default;
 }
 
-.calc-tile.coming-soon:hover {
-  border-color: var(--border);
-  transform: none;
-}
-
-.calc-tile.coming-soon .calc-tile-name {
-  color: var(--text-dim);
-}
-
-.calc-tile.coming-soon .calc-tile-question {
-  color: var(--text-muted);
-}
-
-.calc-tile.coming-soon .calc-tile-cta {
-  color: var(--text-muted);
-}
-
-.calc-tile.coming-soon .calc-tile-cta::after {
-  content: '';
-}
+.calc-tile.coming-soon .calc-tile-name { color: var(--text-dim); }
+.calc-tile.coming-soon .calc-tile-question { color: var(--text-muted); }
+.calc-tile.coming-soon .calc-tile-cta { color: var(--text-muted); }
+.calc-tile.coming-soon .calc-tile-cta::after { content: ''; }
+.calc-tile.coming-soon .calc-tile-icon svg { opacity: 0.5; }
 
 .coming-soon-badge {
   position: absolute;
-  top: 1.1rem;
-  right: 1.2rem;
-  font-family: var(--font-b);
-  font-size: 0.62rem;
+  top: 1.4rem;
+  right: 1.5rem;
+  font-family: var(--font-body);
+  font-size: 0.6rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -180,6 +193,7 @@
   border-radius: 3px;
   padding: 3px 8px;
   line-height: 1.1;
+  opacity: 1.5; /* visually anchor against the dimmed card */
 }
 
 /* ─── Cross-bucket nav hint ─── */
@@ -187,7 +201,7 @@
   margin-top: 3.5rem;
   padding-top: 2rem;
   border-top: 1px solid var(--border);
-  font-family: var(--font-b);
+  font-family: var(--font-body);
   font-size: 0.85rem;
   color: var(--text-dim);
   line-height: 1.6;
