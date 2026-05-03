@@ -34,6 +34,8 @@
 .nav-dropdown-menu a { display: block; padding: 9px 24px; font-size: 0.88rem; white-space: nowrap; color: #aaa; text-decoration: none; transition: color 0.2s, background 0.2s; }
 .nav-dropdown-menu a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
 .nav-dropdown-menu a.active { color: #e09422; background: rgba(247,147,26,0.08); font-weight: 600; }
+.nav-dropdown-legend { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.7rem; font-style: italic; color: rgba(255,255,255,0.4); padding: 8px 24px 4px; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.06); white-space: nowrap; }
+.mobile-legend { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.78rem; font-style: italic; color: rgba(255,255,255,0.42); padding: 1.6rem 32px 0; margin-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.06); }
 .nav-interactive-marker { color: #e09422; font-size: 0.7em; opacity: 0.7; margin-left: 2px; line-height: 1; vertical-align: 0.05em; }
 .mobile-section-label { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.65rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.18em; margin: 0.9rem 0 0.2rem; padding: 0 32px; }
 .mobile-section-label:first-child { margin-top: 0; }
@@ -79,6 +81,7 @@
 {%- for e in explorations %}{% if e.category == 'foundations' %}
         <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}</a>
 {%- endif %}{%- endfor %}
+                <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
             </div>
         </div>
         <div class="nav-dropdown{% if currentCat == 'arguments' %} active-bucket{% endif %}">
@@ -87,6 +90,7 @@
 {%- for e in explorations %}{% if e.category == 'arguments' %}
         <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}</a>
 {%- endif %}{%- endfor %}
+                <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
             </div>
         </div>
         <div class="nav-dropdown{% if currentCat == 'numbers' %} active-bucket{% endif %}">
@@ -95,6 +99,7 @@
 {%- for e in explorations %}{% if e.category == 'numbers' %}
         <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}</a>
 {%- endif %}{%- endfor %}
+                <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
             </div>
         </div>
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
@@ -115,6 +120,7 @@
         <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}</a>
 {%- endif %}{%- endfor %}
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
+        <div class="mobile-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
     </div>
 
 {{ content | safe }}
