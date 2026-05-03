@@ -587,6 +587,46 @@ A standalone destination at `/calculators.html` that introduces every personal-d
 
 **Adding a new calculator to the constellation:** edit `src/calculators.njk` directly to add a new `<a class="calc-tile live">` (or coming-soon `<div>`). The constellation page is intentionally NOT data-driven from `_data/explorations.json` — it's a curated destination with deliberate ordering, descriptions, and question framings that don't fit a flat schema. Update the `is_calculator: true` flag on the corresponding explorations entry too, for consistency. Both updates happen in the same commit when a new calculator ships.
 
+### 6.10 Related component (cross-reference cards)
+
+A reusable Nunjucks include at `src/_includes/components/related.njk` that renders a "Continue exploring" card group from a page's front-matter. Used by every page that wants to surface thematic next-steps to the reader. CSS lives in `base.njk`'s canonical-footer-css block so any page using the component gets styling for free.
+
+**Front-matter schema.** Each page declares a `related:` array. Three formats supported per entry:
+
+```yaml
+related:
+  # Bare slug — internal page, label/description from explorations data
+  - the-half-life
+
+  # Object form for internal pages — adds a custom description and optional
+  # label override (label defaults to the page's title from explorations.json)
+  - slug: the-melting-ice-cube
+    desc: "The corporate-treasury view of the same problem."
+    label: "View the corporate side"        # optional
+    fragment: calculator                     # optional — links to /...html#calculator
+
+  # External link — Substack, YouTube, or other off-site companion content
+  - url: https://substack.com/p/why-i-built-power-law
+    title: "Why I built the Power Law calculator"
+    kind: substack                           # substack | youtube | external (default)
+    desc: "The story behind the tool, in long-form."
+    label: "Read on Substack"                # optional CTA text
+```
+
+**Rendering rules.**
+- The component is a graceful no-op when `related:` is empty or missing — no markup at all.
+- Internal slugs are joined against `_data/explorations.json` to pull the page's title, category, and interactive flag. The category is shown as a small caps marker above the card title (FOUNDATIONS / THE ARGUMENTS / THE NUMBERS) so users see at a glance which bucket the related page belongs to.
+- The interactive marker (•) appears next to the bucket label if the related page has `interactive: true`, mirroring the nav treatment.
+- External entries get a kind-specific marker ("Substack ↗" / "Video ↗" / "External ↗") and `target="_blank" rel="noopener"`.
+
+**Visual character.** Mirrors the homepage's `concept-card` pattern at smaller scale — same hover-lift, amber border on hover, orange top-bar appearing on hover, Cormorant title, dim caps marker. Cards are `auto-fit minmax(280px, 1fr)` so 3 fit comfortably on desktop, stack on mobile.
+
+**Placement.** Insert `{% include 'components/related.njk' %}` near the bottom of the page's main content, before the closing wrapper div. Component handles its own top-border and spacing. Page-level placement (not inside a tab) so users see the related links regardless of which tab they were in last.
+
+**When to use a related-card vs. inline link.** Use an inline `<a>` for inline references in body prose ("see the half-life of the dollar"). Use the related component for the deliberate end-of-page "now go here" moment with two-or-three thematically chosen next steps. Don't use both for the same destination on the same page — pick the placement that does more work.
+
+**Migration of older inline ad-hoc related blocks.** Several pages had hand-built related blocks before this component existed (e.g. Half-Life had an inline aside linking to *What Money Has To Be*). The migration pattern: move the destination into `related:` front-matter, copy the description text, delete the inline block. The new component renders a card that does the same work in a consistent visual treatment.
+
 ---
 
 ## 7. Mobile considerations

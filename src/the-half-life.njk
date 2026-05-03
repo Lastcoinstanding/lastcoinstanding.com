@@ -2,6 +2,13 @@
 layout: base.njk
 permalink: /the-half-life.html
 slug: the-half-life
+related:
+  - slug: the-melting-ice-cube
+    desc: "The corporate-treasury view of the same problem. Watch what inflation does to public companies' cash reserves."
+  - slug: bitcoin-vs-real-estate
+    desc: "The decision that follows: if money is melting, where do you put it instead? See bitcoin head-to-head with housing."
+  - slug: what-money-has-to-be
+    desc: "Durability is only the first function of money. A money that holds across time still has to move across space and serve as a shared measurement."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-half-life-head.html' %}"
   page_styles: "{% include '_pageassets/the-half-life.css' %}"
@@ -195,13 +202,8 @@ eleventyComputed:
 
     <div class="mining-note"><p><strong>A note on mining:</strong> Both gold and Bitcoin have supply expansion through mining &#8212; new units accruing to those who did real physical or computational-brute-force work. But there's a crucial difference. Gold mining is perpetual: ~2% per year, forever, with supply responding to price increases. Bitcoin's terminal supply is fixed: the issuance rate halves every four years and will reach zero in the year ~2140. Furthermore, Bitcoin mining is radically open &#8212; anyone can participate, even from home, with modest equipment. There is no government involvement, no privileged access, no gatekeepers. The remaining supply goes to participants in an open, global, permissionless network.</p></div>
 
-    <aside class="related-link" style="max-width:720px;margin:3rem auto 0;padding:1.75rem 1.75rem;border:1px solid rgba(247,147,26,0.18);border-radius:3px;background:rgba(247,147,26,0.03);font-family:'Inter',-apple-system,sans-serif;">
-      <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#908880;margin-bottom:0.8rem;">Related</div>
-      <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.35rem;font-weight:500;color:#f2eee8;line-height:1.3;margin-bottom:0.7rem;">Durability is only the first function of money.</div>
-      <p style="font-size:0.98rem;line-height:1.7;color:#d0c8c0;margin-bottom:1rem;">A money that holds across time still has to move across space and serve as a shared measurement. Durability alone isn't enough &mdash; the three functions are structurally coupled, and the half-life is only one dimension of the problem.</p>
-      <a href="/what-money-has-to-be.html" style="font-size:0.9rem;font-weight:500;color:#F7931A;text-decoration:none;border-bottom:1px solid rgba(247,147,26,0.4);padding-bottom:2px;">See the three functions &rarr;</a>
-    </aside>
-
   </div>
+
+  {% include 'components/related.njk' %}
 
 </div>

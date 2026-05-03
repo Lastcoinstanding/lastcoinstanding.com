@@ -1,0 +1,81 @@
+{#
+  Related component — reusable cross-reference card group.
+  Documented in STYLE_GUIDE.md §6.10.
+
+  Page front-matter declares `related:` as an array. Two formats supported:
+
+    related:
+      - the-half-life                    # bare slug -> internal page
+      - slug: the-melting-ice-cube       # explicit slug form
+        label: "View the corporate side" # optional override label
+      - url: https://substack.com/...    # external URL
+        title: "Why I built this tool"
+        kind: substack                   # for icon/marker
+        label: "Read the article"
+
+  If `related:` is missing or empty, the component renders nothing.
+  Internal slugs are joined against _data/explorations.json to pull
+  title, category, interactive flag automatically.
+
+  External entries are rendered with a small "external" indicator.
+  Recognized `kind` values for visual treatment:
+    substack | youtube | external (default)
+#}
+
+{%- if related and related.length > 0 -%}
+<aside class="related-block">
+  <div class="related-label">Continue exploring</div>
+  <div class="related-grid">
+{%- for r in related %}
+  {#- Normalize: bare string slug, or object with slug, or object with url -#}
+  {%- if r is string -%}
+    {%- set entry = { slug: r } -%}
+  {%- else -%}
+    {%- set entry = r -%}
+  {%- endif -%}
+
+  {%- if entry.url -%}
+    {#- External link: Substack, YouTube, or other off-site companion content -#}
+    {%- set kind = entry.kind or 'external' -%}
+    <a href="{{ entry.url }}" class="related-card external kind-{{ kind }}" target="_blank" rel="noopener">
+      <div class="related-kind-marker">
+        {%- if kind == 'substack' -%}
+          <span class="kind-label">Substack &nearr;</span>
+        {%- elif kind == 'youtube' -%}
+          <span class="kind-label">Video &nearr;</span>
+        {%- else -%}
+          <span class="kind-label">External &nearr;</span>
+        {%- endif -%}
+      </div>
+      <h3 class="related-card-title">{{ entry.title | safe }}</h3>
+      {%- if entry.desc %}<p class="related-card-desc">{{ entry.desc | safe }}</p>{%- endif %}
+      {%- if entry.label %}<span class="related-card-cta">{{ entry.label }}</span>{%- endif %}
+    </a>
+  {%- else -%}
+    {#- Internal slug: look up in explorations data -#}
+    {%- set found = false -%}
+    {%- for e in explorations -%}
+      {%- if e.slug == entry.slug -%}
+        {%- set found = e -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if found -%}
+      <a href="/{{ found.slug }}.html{% if entry.fragment %}#{{ entry.fragment }}{% endif %}" class="related-card internal cat-{{ found.category }}">
+        <div class="related-kind-marker">
+          <span class="kind-label">
+            {%- if found.category == 'foundations' -%}Foundations
+            {%- elif found.category == 'arguments' -%}The Arguments
+            {%- elif found.category == 'numbers' -%}The Numbers
+            {%- endif -%}
+            {%- if found.interactive %} <span class="related-interactive-marker" aria-label="Interactive">&bull;</span>{%- endif -%}
+          </span>
+        </div>
+        <h3 class="related-card-title">{{ entry.label or found.title | safe }}</h3>
+        {%- if entry.desc %}<p class="related-card-desc">{{ entry.desc | safe }}</p>{%- endif %}
+      </a>
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor %}
+  </div>
+</aside>
+{%- endif -%}
