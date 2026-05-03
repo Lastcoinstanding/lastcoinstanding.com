@@ -34,6 +34,9 @@
 .nav-dropdown-menu a { display: block; padding: 9px 24px; font-size: 0.88rem; white-space: nowrap; color: #aaa; text-decoration: none; transition: color 0.2s, background 0.2s; }
 .nav-dropdown-menu a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
 .nav-dropdown-menu a.active { color: #e09422; background: rgba(247,147,26,0.08); font-weight: 600; }
+.nav-interactive-marker { color: #e09422; font-size: 0.7em; opacity: 0.7; margin-left: 2px; line-height: 1; vertical-align: 0.05em; }
+.mobile-section-label { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.65rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.18em; margin: 0.9rem 0 0.2rem; padding: 0 32px; }
+.mobile-section-label:first-child { margin-top: 0; }
 @media (max-width: 768px) {
   .site-nav .nav-links { display: none; }
   .hamburger { display: block; }
@@ -50,9 +53,14 @@
 .site-footer .footer-cta { max-width: 540px; margin: 0 auto; }
 .site-footer .footer-cta h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 500; color: #ece4d6; margin: 0 0 0.9rem; }
 .site-footer .footer-cta p { font-family: 'Inter', sans-serif; font-size: 0.85rem; color: rgba(255,255,255,0.42); line-height: 1.6; margin: 0 0 2.4rem; }
-.site-footer .footer-nav { display: flex; justify-content: center; gap: 1.5rem 2rem; flex-wrap: wrap; max-width: 960px; margin: 0 auto 2.6rem; }
+.site-footer .footer-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem 2rem; max-width: 960px; margin: 0 auto 2.6rem; text-align: left; }
+.site-footer .footer-nav-section { display: flex; flex-direction: column; gap: 0.55rem; }
+.site-footer .footer-nav-label { font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 600; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.16em; margin-bottom: 0.35rem; }
 .site-footer .footer-nav a { font-family: 'Inter', sans-serif; font-size: 0.72rem; color: rgba(255,255,255,0.36); text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.3s; border-bottom: none; }
 .site-footer .footer-nav a:hover { color: #e09422; }
+@media (max-width: 768px) {
+  .site-footer .footer-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); text-align: left; }
+}
 .site-footer .footer-line { width: 40px; height: 1px; background: rgba(224,148,34,0.3); margin: 0 auto 1.4rem; }
 .site-footer .footer-copy { font-family: 'Inter', sans-serif; font-size: 0.7rem; color: rgba(255,255,255,0.22); letter-spacing: 0.04em; }
 </style>
@@ -63,12 +71,30 @@
     <nav class="site-nav">
         <a href="/" class="brand">Last Coin Standing</a>
             <div class="nav-links">
-        <div class="nav-dropdown">
-            <a class="nav-dropdown-btn" href="#">Explorations ▾</a>
+        {%- set currentCat = "" -%}
+        {%- for e in explorations -%}{%- if e.slug == slug -%}{%- set currentCat = e.category -%}{%- endif -%}{%- endfor -%}
+        <div class="nav-dropdown{% if currentCat == 'foundations' %} active-bucket{% endif %}">
+            <a class="nav-dropdown-btn{% if currentCat == 'foundations' %} active{% endif %}" href="#">Foundations &#9662;</a>
             <div class="nav-dropdown-menu">
-{%- for e in explorations %}
-        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}</a>
-{%- endfor %}
+{%- for e in explorations %}{% if e.category == 'foundations' %}
+        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}</a>
+{%- endif %}{%- endfor %}
+            </div>
+        </div>
+        <div class="nav-dropdown{% if currentCat == 'arguments' %} active-bucket{% endif %}">
+            <a class="nav-dropdown-btn{% if currentCat == 'arguments' %} active{% endif %}" href="#">The Arguments &#9662;</a>
+            <div class="nav-dropdown-menu">
+{%- for e in explorations %}{% if e.category == 'arguments' %}
+        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}</a>
+{%- endif %}{%- endfor %}
+            </div>
+        </div>
+        <div class="nav-dropdown{% if currentCat == 'numbers' %} active-bucket{% endif %}">
+            <a class="nav-dropdown-btn{% if currentCat == 'numbers' %} active{% endif %}" href="#">The Numbers &#9662;</a>
+            <div class="nav-dropdown-menu">
+{%- for e in explorations %}{% if e.category == 'numbers' %}
+        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}</a>
+{%- endif %}{%- endfor %}
             </div>
         </div>
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
@@ -76,9 +102,18 @@
         <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
     </nav>
     <div class="mobile-overlay" id="mobileOverlay">
-{%- for e in explorations %}
-        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}</a>
-{%- endfor %}
+        <div class="mobile-section-label">Foundations</div>
+{%- for e in explorations %}{% if e.category == 'foundations' %}
+        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}</a>
+{%- endif %}{%- endfor %}
+        <div class="mobile-section-label">The Arguments</div>
+{%- for e in explorations %}{% if e.category == 'arguments' %}
+        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}</a>
+{%- endif %}{%- endfor %}
+        <div class="mobile-section-label">The Numbers</div>
+{%- for e in explorations %}{% if e.category == 'numbers' %}
+        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}</a>
+{%- endif %}{%- endfor %}
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
     </div>
 
@@ -90,10 +125,28 @@
         <p>Each interactive visualization on Last Coin Standing examines a different dimension of Bitcoin through contrast, tradeoffs, and philosophical clarity.</p>
     </div>
     <nav class="footer-nav">
-{%- for e in explorations %}
-        <a href="/{{ e.slug }}.html">{{ e.title | safe }}</a>
-{%- endfor %}
-        <a href="/about.html">About</a>
+        <div class="footer-nav-section">
+            <div class="footer-nav-label">Foundations</div>
+{%- for e in explorations %}{% if e.category == 'foundations' %}
+            <a href="/{{ e.slug }}.html">{{ e.title | safe }}</a>
+{%- endif %}{%- endfor %}
+        </div>
+        <div class="footer-nav-section">
+            <div class="footer-nav-label">The Arguments</div>
+{%- for e in explorations %}{% if e.category == 'arguments' %}
+            <a href="/{{ e.slug }}.html">{{ e.title | safe }}</a>
+{%- endif %}{%- endfor %}
+        </div>
+        <div class="footer-nav-section">
+            <div class="footer-nav-label">The Numbers</div>
+{%- for e in explorations %}{% if e.category == 'numbers' %}
+            <a href="/{{ e.slug }}.html">{{ e.title | safe }}</a>
+{%- endif %}{%- endfor %}
+        </div>
+        <div class="footer-nav-section">
+            <div class="footer-nav-label">Site</div>
+            <a href="/about.html">About</a>
+        </div>
     </nav>
     <div class="footer-line"></div>
     <div class="footer-copy">&copy; 2026 Last Coin Standing &mdash; Bitcoin education through contrast and clarity</div>
@@ -110,22 +163,30 @@
 (function() {
   var ham = document.getElementById('hamburger');
   var mob = document.getElementById('mobileOverlay');
-  var dd = document.querySelector('.nav-dropdown');
-  var ddBtn = document.querySelector('.nav-dropdown-btn');
+  var dds = document.querySelectorAll('.nav-dropdown');
   function closeMobile() {
     if (ham) ham.classList.remove('open');
     if (mob) mob.classList.remove('show');
     document.body.style.overflow = '';
   }
-  function closeDropdown() {
-    if (dd) dd.classList.remove('open');
+  function closeAllDropdowns(except) {
+    for (var i = 0; i < dds.length; i++) {
+      if (dds[i] !== except) dds[i].classList.remove('open');
+    }
   }
-  if (ddBtn && dd) {
-    ddBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      dd.classList.toggle('open');
-    });
+  // Each dropdown's button toggles its own dropdown and closes the others.
+  for (var j = 0; j < dds.length; j++) {
+    (function(dd) {
+      var btn = dd.querySelector('.nav-dropdown-btn');
+      if (!btn) return;
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var willOpen = !dd.classList.contains('open');
+        closeAllDropdowns(dd);
+        dd.classList.toggle('open', willOpen);
+      });
+    })(dds[j]);
   }
   if (mob) {
     mob.addEventListener('click', function(e) {
@@ -145,10 +206,13 @@
     });
   }
   document.addEventListener('click', function(e) {
-    if (dd && !dd.contains(e.target)) closeDropdown();
+    // Close any dropdown whose contents the click did not land in
+    for (var i = 0; i < dds.length; i++) {
+      if (!dds[i].contains(e.target)) dds[i].classList.remove('open');
+    }
   });
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') { closeMobile(); closeDropdown(); }
+    if (e.key === 'Escape') { closeMobile(); closeAllDropdowns(); }
   });
 })();
 </script>

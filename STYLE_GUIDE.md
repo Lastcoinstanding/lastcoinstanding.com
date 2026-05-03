@@ -533,6 +533,46 @@ When you find yourself writing more than ~7-8 lines of nav CSS in a new page, st
 
 ---
 
+### 6.9 Bucketed nav with content-character categories
+
+Phase 1B reorganized the site's flat exploration list into three content-character buckets, plus standalone About. Future pages slot into the right bucket via their `category` field in `_data/explorations.json`.
+
+**Buckets:**
+
+- **Foundations** — definitional / primer content (e.g. *What Money Has To Be*, *What Bitcoin Is*, *Synthesis*, *Trilemma*). `category: "foundations"`.
+- **The Arguments** — narrative cases making the bitcoin argument (e.g. *Migration*, *Half-Life*, *Money Trees*, *Melting Ice Cube*, *Bubble*). `category: "arguments"`.
+- **The Numbers** — quantitative comparison and projection (e.g. *Fixed Share*, *BvRE*, *Power Law*, *Horizon*). `category: "numbers"`.
+
+A fourth top-level link (Calculators) leads to the standalone calculator constellation page (Commit 2 of Phase 1B). About remains its own top-level link.
+
+**Schema:** every entry in `_data/explorations.json` has these fields:
+
+```json
+{
+  "slug": "the-half-life",
+  "title": "The Half-Life",
+  "category": "arguments",
+  "interactive": true,
+  "is_calculator": false
+}
+```
+
+- `category` (string, required): one of `foundations`, `arguments`, `numbers`. Determines which dropdown the entry appears under.
+- `interactive` (boolean, required): `true` if the page has interactive UI elements (input fields, sliders, button-driven calculations, scrubbable charts). Items with `interactive: true` get a small amber dot marker (•) next to their nav link, marketing the site's character as an interactive tool collection rather than flat essays. Marker class is `.nav-interactive-marker`.
+- `is_calculator` (boolean, required): `true` ONLY for personal-decision tools — calculators that take inputs about the user's life (their home price, their bitcoin holdings, their retirement age, etc.) and help them make or evaluate a real-life decision. By this stricter definition: BvRE, Power Law (forward tab), and the future retirement calculator are calculators. Half-Life, MIC, Fixed Share, Horizon are interactive demonstrations or projections without a personal decision-support frame; they get `is_calculator: false`. The Calculators constellation page reads from this flag to populate its content.
+
+**Active-state behavior:** when the user is on a page in bucket X, the bucket-X dropdown button gets the active styling (amber color, amber-tint background, font-weight 600). Other dropdowns stay default. The link to the current page within its dropdown also gets the active styling. About is its own top-level link with separate active handling. This is implemented via a single `currentCat` lookup at the top of the nav block in `base.njk` that finds the current page's category from the explorations data.
+
+**Footer:** mirrors the bucket structure. Four columns on desktop (Foundations, The Arguments, The Numbers, Site), two on mobile. Each column has a `.footer-nav-label` header and the relevant entries below. The Site column has just About for now; future site-utility pages (e.g. methodology, FAQ) would join it.
+
+**Mobile overlay:** the hamburger overlay shows three labeled sections plus About at the bottom. Section labels use `.mobile-section-label` (small caps, dim color) to separate without making each item heavier.
+
+**Multi-dropdown JS:** the canonical nav JS in `base.njk` was updated to handle multiple dropdowns. Each dropdown's button toggles its own dropdown (closing the others first); click-outside closes all. The previous single-dropdown `querySelector` was replaced with iteration over `querySelectorAll('.nav-dropdown')`. Hover-open still works on desktop via CSS; click-toggle is for mobile/touch.
+
+**Adding a new page:** set `category`, `interactive`, and `is_calculator` in the explorations data. The page automatically appears in the right dropdown, with the right marker, and is automatically picked up by the constellation page if applicable. No nav-rendering changes required.
+
+---
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.
