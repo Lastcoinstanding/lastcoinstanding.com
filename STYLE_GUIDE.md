@@ -636,6 +636,65 @@ related:
 
 **Migration of older inline ad-hoc related blocks.** Several pages had hand-built related blocks before this component existed (e.g. Half-Life had an inline aside linking to *What Money Has To Be*). The migration pattern: move the destination into `related:` front-matter, copy the description text, delete the inline block. The new component renders a card that does the same work in a consistent visual treatment.
 
+### 6.11 Tool-framing strip (collapsible disclaimer)
+
+A persistent "for exploration only" disclaimer applied to calculator pages and decision-implying argument pages. Lives between the page hero and the tool/calculator content. Component file: `src/_includes/components/tool-framing.njk`. CSS in `base.njk`.
+
+**When to apply.** Page risk-stratification:
+
+- **Apply** to personal-decision tools (Power Law forward calc, BvRE, future retirement calculator) and to decision-implying argument pages (Half-Life, Melting Ice Cube). These are pages where a user could reasonably read the page as a buy/sell signal.
+- **Skip** for pure-essay pages (foundations, narrative arguments without inputs), low-risk demonstrations (Fixed Pie, Horizon), and index/landing pages that don't directly invite tool interaction (e.g. the Calculators constellation page — disclaimer is shown on the downstream tool pages, repeating it on the index would be duplicate-disclaimer fatigue).
+
+**Behavior.**
+- First-time visitors (no sessionStorage flag): rendered in expanded state with full disclaimer body and a × dismiss button.
+- Returning visitors within the same browser session (flag set): rendered in collapsed state as a small "ⓘ For exploration only · click to read full disclaimer" button that re-expands on click.
+- State persists per-tab via sessionStorage key `lcs.toolFraming.dismissed`. Intentionally NOT localStorage — a fresh browser session should re-show the full disclaimer once.
+
+**Wording (canonical).**
+
+> **For exploration only.** This tool is for educational and informational purposes; nothing here is financial advice. Bitcoin involves significant risk including potential total loss. Consult a qualified financial advisor before making decisions based on what you see here.
+
+The "Bitcoin involves significant risk including potential total loss" sentence is the most consequential — it explicitly names the downside in direct voice. Don't soften.
+
+**Visual character.** Amber-tinted background and border (rgba ~0.04 / 0.18). Amber 3px left-edge accent on the expanded state. No red anywhere (per §3 color usage). Reads as "information affordance," not "alert banner."
+
+**Placement convention.** Insert `{% include 'components/tool-framing.njk' %}` between the page-header div and the tab-nav (or first calculator content block). After the page title and any introductory copy, before the user touches the tool. Pages adopting tabs: place outside the tab-content blocks so the strip is visible regardless of which tab the user lands on.
+
+### 6.12 Companion content (off-site deep-dives)
+
+Distinct from Related (§6.10). Where Related surfaces lateral moves *within* the site (other pages here), Companion surfaces vertical moves *off* the site — longer-form treatments of *this* page's specific topic. Substack articles, YouTube videos, podcast appearances. Component file: `src/_includes/components/companion-content.njk`. CSS in `base.njk`.
+
+**When to use.**
+- Use Companion for deep-dive content the author has produced *about this page specifically*. Example: a Substack article walking through how to use the Power Law calculator and why it was built.
+- Don't use Companion for general background reading or third-party content. The component implies authorial endorsement of the linked content as the deeper version of this page's topic.
+- A page can have both Related and Companion blocks (Related renders first, Companion below it).
+
+**Front-matter schema.**
+
+```yaml
+companion:
+  - url: https://lastcoinstanding.substack.com/p/why-i-built-power-law
+    title: "Why I built the Power Law calculator"
+    kind: substack          # substack | youtube | podcast | external
+    desc: "The story behind the tool, in long-form."
+  - url: https://www.youtube.com/watch?v=...
+    title: "Walkthrough: using the Power Law calculator"
+    kind: youtube
+    desc: "10-minute video tour of the calculator and how to interpret its outputs."
+```
+
+**Rendering rules.**
+- Graceful no-op when `companion:` is missing or empty — no markup at all.
+- Each entry renders as a horizontal row: kind label on left ("Substack ↗" / "Video ↗" / "Podcast ↗"), title + optional desc on right.
+- Single-column layout. Companion content is typically 1-2 items per page; full-width rows read better than narrow cards.
+- All links open in a new tab via `target="_blank" rel="noopener"`.
+
+**Visual treatment is intentionally quieter than Related.** Companion content is supplementary, not a peer alternative. No Cormorant title at full weight, no card-grid, no orange top-bar on hover. Subtle border, gentle hover-tint.
+
+**Placement.** Insert `{% include 'components/companion-content.njk' %}` near the bottom of the page, AFTER the Related component. Reading order: main content → "Continue exploring" (lateral on-site) → "Going deeper" (vertical off-site). Both blocks lead the user away from the current page; ordering them this way (lateral first, then vertical) gives priority to keeping users on the site.
+
+**When the first piece of companion content ships.** Add the entry to the page's `companion:` front-matter array. The component renders immediately — no other markup or CSS changes needed. When you publish a Substack article walking through the Power Law calculator, that's a one-line edit to `the-power-law.njk`'s front-matter. Same for a YouTube video. The component is staged on Power Law and BvRE in commit 5 (empty `companion: []` arrays) so the front-matter slot exists ready for population.
+
 ---
 
 ## 7. Mobile considerations
