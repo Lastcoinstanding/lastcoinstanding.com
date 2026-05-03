@@ -1,0 +1,60 @@
+{#
+  Tool-framing strip — collapsible "for exploration only" disclaimer.
+  Documented in STYLE_GUIDE.md §6.11.
+
+  Placement: between page hero and calculator inputs, after the page's
+  main title and any introductory copy.
+
+  Behavior:
+    - First-time visitors: expanded by default with full disclaimer text
+      and a × dismiss affordance
+    - Returning visitors (sessionStorage flag set): collapsed to a small
+      ⓘ indicator that can be re-expanded by clicking
+    - sessionStorage scoped per-tab (intentionally not localStorage —
+      the disclaimer should re-appear in a fresh browser session)
+
+  Pages opt in by adding {% include 'components/tool-framing.njk' %}
+  near the top of their content.
+#}
+
+<aside class="tool-framing" id="toolFraming" data-state="expanded" aria-label="Tool framing and disclaimer">
+  <div class="tool-framing-collapsed">
+    <button class="tool-framing-toggle" type="button" data-action="expand" aria-label="Show disclaimer">
+      <span class="tool-framing-icon" aria-hidden="true">&#9432;</span>
+      <span class="tool-framing-collapsed-text">For exploration only &middot; click to read full disclaimer</span>
+    </button>
+  </div>
+  <div class="tool-framing-expanded">
+    <div class="tool-framing-content">
+      <div class="tool-framing-label">For exploration only</div>
+      <p class="tool-framing-body">This tool is for educational and informational purposes; nothing here is financial advice. Bitcoin involves significant risk including potential total loss. Consult a qualified financial advisor before making decisions based on what you see here.</p>
+    </div>
+    <button class="tool-framing-dismiss" type="button" data-action="dismiss" aria-label="Dismiss disclaimer">&times;</button>
+  </div>
+</aside>
+
+<script>
+(function() {
+  var el = document.getElementById('toolFraming');
+  if (!el) return;
+  var KEY = 'lcs.toolFraming.dismissed';
+
+  // Read dismissed state from sessionStorage (per-tab; resets on new session)
+  var dismissed = false;
+  try { dismissed = sessionStorage.getItem(KEY) === 'true'; } catch(e) {}
+  if (dismissed) el.setAttribute('data-state', 'collapsed');
+
+  el.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    var action = btn.getAttribute('data-action');
+    if (action === 'dismiss') {
+      el.setAttribute('data-state', 'collapsed');
+      try { sessionStorage.setItem(KEY, 'true'); } catch(e) {}
+    } else if (action === 'expand') {
+      el.setAttribute('data-state', 'expanded');
+      try { sessionStorage.setItem(KEY, 'false'); } catch(e) {}
+    }
+  });
+})();
+</script>
