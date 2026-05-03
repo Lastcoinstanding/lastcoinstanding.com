@@ -399,6 +399,15 @@ Use for: section labels (`EXPLORE`, `EMERGENT PROPERTY`, `RELATED`), date-author
 
 Roman-numeral tab numbering is the canonical pattern (Half-Life). UPPERCASE tracked-text tabs (Real Estate's current pattern) should be migrated to this.
 
+**URL fragment / deep-link support.** Every multi-tab page should support URL-fragment deep-linking so external links and the constellation page can target a specific tab directly (e.g. `/the-power-law.html#calculator`). Convention:
+
+- Tab IDs match the URL fragment one-to-one. If the fragment is `#calculator`, the tab ID should be `calculator` or `tab-calculator` with a clear short-name convention.
+- On page load, read `window.location.hash` and activate the matching tab. If hash is empty or unknown, fall back to default tab.
+- Bind a `hashchange` listener so the user can navigate via browser back/forward and the tab follows.
+- When the user clicks a tab, update the URL hash via `history.replaceState(null, null, '#'+tabId)` so the URL stays shareable. Use `replaceState`, not `pushState`, to avoid spamming history with every click.
+
+Pages currently supporting fragment deep-links: Half-Life (`#interactive` / `#history` / `#takeaway`), Melting Ice Cube (`#cube` / `#treasury` / `#companies`), Power Law (`#summary` / `#nature` / `#theory` / `#calculator`), Bitcoin vs. Real Estate (`#calculator` and others, with internal tabMap), Fixed Pie (`#slice` / `#energy`). The Bitcoin Horizon is a single-section page so browser-default `#calculator` scroll-to-anchor handles it without JS.
+
 ### 6.3 Pull-quote
 
 ```html

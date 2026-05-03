@@ -1,5 +1,29 @@
 
-function showTab(id){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active')});document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});document.getElementById('tab-'+id).classList.add('active');var m={interactive:0,history:1,takeaway:2};document.querySelectorAll('.tab-btn')[m[id]].classList.add('active');document.querySelector('.tab-nav').scrollIntoView({behavior:'smooth',block:'start'})}
+function showTab(id, suppressHash){
+  document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+  var el = document.getElementById('tab-'+id);
+  if(!el) return false;
+  el.classList.add('active');
+  var m={interactive:0,history:1,takeaway:2};
+  document.querySelectorAll('.tab-btn')[m[id]].classList.add('active');
+  document.querySelector('.tab-nav').scrollIntoView({behavior:'smooth',block:'start'});
+  if(!suppressHash){
+    try { history.replaceState(null, null, '#'+id); } catch(e) {}
+  }
+  return true;
+}
+
+// Initialize from URL hash on load (e.g. /the-half-life.html#interactive opens the
+// Interactive tab directly). Falls back to default if hash is empty or unknown.
+function initHalfLifeTabFromHash(){
+  var hash = window.location.hash.replace('#','');
+  if(hash) {
+    showTab(hash, true);
+  }
+}
+window.addEventListener('hashchange', initHalfLifeTabFromHash);
+window.addEventListener('load', initHalfLifeTabFromHash);
 
 // Inflation state — driven entirely by the sitewide ModelingAssumptions API.
 // fiatRate is computed from the current preset/customValue on every read.
