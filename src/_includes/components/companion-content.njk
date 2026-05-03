@@ -1,0 +1,50 @@
+{#
+  Companion content — off-site deep-dive content for the current page.
+  Documented in STYLE_GUIDE.md §6.12.
+
+  Distinct from the Related component (§6.10):
+    - Related = lateral moves WITHIN the site (other pages here)
+    - Companion = vertical moves OFF the site (longer-form treatments
+      of THIS page's specific topic — Substack articles, YouTube
+      videos, podcast appearances, etc.)
+
+  Page front-matter declares `companion:` as an array. Each entry:
+
+    companion:
+      - url: https://lastcoinstanding.substack.com/p/...
+        title: "Why I built the Power Law calculator"
+        kind: substack                       # substack | youtube | podcast | external
+        desc: "The story behind the tool, in long-form."
+
+  Renders nothing if `companion:` is missing or empty — graceful no-op.
+  All entries open in a new tab (target=_blank, rel=noopener).
+
+  Visual treatment is intentionally quieter than Related —
+  supplementary content, not a lateral suggestion. Lives below the
+  Related block when both are present on the same page.
+#}
+
+{%- if companion and companion.length > 0 -%}
+<aside class="companion-block">
+  <div class="companion-label">Going deeper</div>
+  <div class="companion-list">
+{%- for c in companion %}
+  {%- set kind = c.kind or 'external' -%}
+    <a href="{{ c.url }}" class="companion-item kind-{{ kind }}" target="_blank" rel="noopener">
+      <div class="companion-kind">
+        {%- if kind == 'substack' -%}Substack
+        {%- elif kind == 'youtube' -%}Video
+        {%- elif kind == 'podcast' -%}Podcast
+        {%- else -%}External
+        {%- endif -%}
+        <span class="companion-arrow">&nearr;</span>
+      </div>
+      <div class="companion-text">
+        <h4 class="companion-title">{{ c.title | safe }}</h4>
+        {%- if c.desc %}<p class="companion-desc">{{ c.desc | safe }}</p>{%- endif %}
+      </div>
+    </a>
+{%- endfor %}
+  </div>
+</aside>
+{%- endif -%}
