@@ -1,0 +1,50 @@
+---
+layout: base.njk
+permalink: /calculators.html
+slug: calculators
+eleventyComputed:
+  head_extras: "{% include '_pageassets/calculators-head.html' %}"
+  page_styles: "{% include '_pageassets/calculators.css' %}"
+---
+<main class="calculators-page">
+
+  <header class="page-header">
+    <h1>Calculators</h1>
+    <p class="hero-lede">Tools to help you think through Bitcoin decisions in your own life — past, present, and future.</p>
+    <p class="hero-meta">For exploration only. Not financial advice. Bitcoin involves significant risk including potential total loss.</p>
+  </header>
+
+  <div class="calc-card-grid">
+
+    <!-- BvRE -->
+    <a href="/bitcoin-vs-real-estate.html#calculator" class="calc-tile live">
+      <h2 class="calc-tile-name">BTC vs. Real Estate</h2>
+      <p class="calc-tile-question">What if you'd bought bitcoin instead of a house?</p>
+      <p class="calc-tile-desc">Pick a year, a home price, and a purchase method. See what bitcoin would have done with the same money over the same period — head-to-head, with full mortgage and ownership costs accounted for.</p>
+      <span class="calc-tile-cta">Open</span>
+    </a>
+
+    <!-- Power Law forward calc -->
+    <a href="/the-power-law.html#calculator" class="calc-tile live">
+      <h2 class="calc-tile-name">Bitcoin &amp; The Power Law</h2>
+      <p class="calc-tile-question">What should I do with my buying decision today?</p>
+      <p class="calc-tile-desc">Use the Power Law projection to compare buying a house today vs. buying bitcoin today, over your chosen horizon. Outputs in today's purchasing power, with full mortgage and rental scenarios.</p>
+      <span class="calc-tile-cta">Open</span>
+    </a>
+
+    <!-- Retirement (coming soon) -->
+    <div class="calc-tile coming-soon">
+      <span class="coming-soon-badge">Coming soon</span>
+      <h2 class="calc-tile-name">Bitcoin for Retirement</h2>
+      <p class="calc-tile-question">When can I retire if bitcoin is part of the plan?</p>
+      <p class="calc-tile-desc">A retirement model that treats bitcoin as a first-class asset. Inputs: your starting position, contribution rate, target lifestyle, retirement age. Outputs: scenario comparison across conservative and aggressive assumptions, in real terms throughout.</p>
+      <span class="calc-tile-cta">In development</span>
+    </div>
+
+  </div>
+
+  <div class="nav-hint">
+    <p>Looking for a different kind of tool? <strong>The Numbers</strong> in the main navigation includes interactive demonstrations of bitcoin&rsquo;s supply share (<a href="/the-fixed-pie.html">The Fixed Share</a>) and long-range projections (<a href="/the-bitcoin-horizon.html">The Bitcoin Horizon</a>). The pages in <strong>The Arguments</strong> include interactive views of the dollar&rsquo;s decay (<a href="/the-half-life.html">The Half-Life</a>) and corporate-treasury debasement (<a href="/the-melting-ice-cube.html">The Melting Ice Cube</a>) — useful for thinking, even if not directly about your own life.</p>
+  </div>
+
+</main>

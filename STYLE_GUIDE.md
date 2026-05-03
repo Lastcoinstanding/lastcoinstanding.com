@@ -571,6 +571,22 @@ A fourth top-level link (Calculators) leads to the standalone calculator constel
 
 **Adding a new page:** set `category`, `interactive`, and `is_calculator` in the explorations data. The page automatically appears in the right dropdown, with the right marker, and is automatically picked up by the constellation page if applicable. No nav-rendering changes required.
 
+### 6.9.1 Calculators constellation page (`/calculators.html`)
+
+A standalone destination at `/calculators.html` that introduces every personal-decision calculator with a card description, separate from the bucket dropdowns. Accessible via the top-level "Calculators" nav slot (between The Numbers and About). Reached two ways: directly via the standalone link, and indirectly via The Numbers dropdown for users navigating by content character.
+
+**Why a separate page rather than just a dropdown:** dropdowns can only show names. The constellation page introduces each calculator with a one-or-two-sentence description framing the question it answers (*"What if you'd bought bitcoin instead of a house?"* / *"What should I do with my buying decision today?"*). This is decision-support orientation, not just a list — it helps users pick the right tool for *their* question.
+
+**Content character:** the constellation page features only `is_calculator: true` items, per the strict definition codified in §6.9 (personal-decision tools that take inputs about the user's life and help them make or evaluate a real decision). Currently: BvRE, Power Law (forward tab), and the future retirement calculator. Interactive demonstrations like Half-Life, MIC, Fixed Share, and Horizon are surfaced via The Numbers / The Arguments dropdowns and via a closing "nav-hint" paragraph on the constellation page itself, but they don't get a tile.
+
+**Card structure:** each tile (`.calc-tile`) has a name (Cormorant title), question line (italic amber, the user's-life framing), description prose, and CTA. Live tiles are anchor elements with hover-lift; coming-soon tiles are divs with the `.coming-soon` modifier (dimmed, no hover-lift, no functioning link). Cards link to the calculator's tab via URL fragment (e.g. `/the-power-law.html#calculator`) so the user lands directly on the working tab — relies on per-page tab handling to honor URL fragments (verified separately, per Phase 1B Commit 4).
+
+**Coming-soon pattern:** any tile that represents a planned-but-unbuilt page uses `.calc-tile.coming-soon` with a `.coming-soon-badge` in the corner reading "COMING SOON" (small caps, amber on amber-soft background, amber-dim border). The tile body shows the same name/question/description as a live tile so users see the conceptual shape, but the CTA reads "In development" instead of "Open" and the card is dimmed to ~65% opacity. **This pattern is reusable site-wide** — any forthcoming page (future explorations, Substack articles, YouTube videos) can adopt the same `.coming-soon` modifier on similar card structures. When the page ships, switch the tile from `<div class="calc-tile coming-soon">` to `<a href="..." class="calc-tile live">` and remove the badge.
+
+**Hero copy:** the page lede reads *"Tools to help you think through Bitcoin decisions in your own life — past, present, and future."* This frames the constellation as decision-support, not feature-showcase. Subordinate caveat line acknowledges the exploration/risk framing that Phase 1C will later codify into a tool-framing strip across all calculator pages.
+
+**Adding a new calculator to the constellation:** edit `src/calculators.njk` directly to add a new `<a class="calc-tile live">` (or coming-soon `<div>`). The constellation page is intentionally NOT data-driven from `_data/explorations.json` — it's a curated destination with deliberate ordering, descriptions, and question framings that don't fit a flat schema. Update the `is_calculator: true` flag on the corresponding explorations entry too, for consistency. Both updates happen in the same commit when a new calculator ships.
+
 ---
 
 ## 7. Mobile considerations
