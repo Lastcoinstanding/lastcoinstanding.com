@@ -222,20 +222,21 @@
     return new Date(year, today.getMonth(), today.getDate());
   }
 
-  // ─── Default scenario (hardcoded for commit 3; commit 4 wires sliders)
-  var DEFAULT_SCENARIO = {
+  // ─── Scenario state — mutable, drives all chart math
+  //                 Sliders update this object; chart reads from it.
+  //                 (Withdrawal rate slider added in commit 4.2 with Sustainability readout.)
+  var SCENARIO = {
     btcStack: 1.0,
     targetIncomeUSD: 100000,
     retirementYear: 2045,
     yearsInRetirement: 30,
-    withdrawalRatePct: 6,    // unused in commit 3's simple income-driven drawdown
     monthlyDcaUSD: 0
   };
 
   // ─── Project user's stack value year-by-year under sell-as-needed
-  // For commit 3: pre-retirement BTC count constant (DCA=$0). Post-retirement,
-  // sell each year enough BTC to cover nominal target income. Returns
-  // {points, depletionYear} where points is [{x:year, y:usdValue}].
+  // Pre-retirement: BTC count grows via DCA accumulation (12 × monthly / yearly trend price).
+  // Post-retirement: each year, sell BTC to cover nominal target income.
+  // Returns {points, depletionYear} where points is [{x:year, y:usdValue}].
   function projectStackOverTime(scenario, growthModelKey, inflationPct) {
     var today = new Date();
     var startYear = today.getFullYear();
@@ -247,8 +248,6 @@
     var depletionYear = null;
 
     // Choose which growth-model trajectory drives the value-projection math.
-    // For commit 3, all three options use Power Law trajectories at different
-    // bands; commit 7 introduces the Linear-CAGR-with-decay variant.
     function projPrice(date) {
       var trend = plPriceAtDate(date);
       if (growthModelKey === 'powerlaw-floor') return trend * PL_FLOOR;
@@ -261,14 +260,18 @@
       var price = projPrice(d);
 
       if (y < scenario.retirementYear) {
-        // Pre-retirement: the user "is" the chosen growth-model curve
-        // (no separate drawdown line drawn — would just overlay trend/floor
-        // exactly at btcStack=1, which collides visually). Track BTC count
-        // forward in case future commits add DCA accumulation.
-        // No point pushed for the chart here.
+        // Pre-retirement DCA accumulation. Simple year-end approximation:
+        // BTC added this year = 12 × monthly contribution / year-end trend price.
+        // (More precise: integrate over the year; for projection-chart purposes
+        // this approximation tracks the long-run DCA effect closely.)
+        if (scenario.monthlyDcaUSD > 0 && price > 0) {
+          stackBtc += (12 * scenario.monthlyDcaUSD) / price;
+        }
+        // No drawdown line drawn pre-retirement — user "is" the chosen
+        // growth-model curve at btcStack (t).
       } else if (y === scenario.retirementYear) {
-        // Drawdown line begins here, anchored at the user's stack value
-        // (btcStack × growth-model price at retirement).
+        // Drawdown line begins here, at the user's stack value at retirement
+        // (after any accumulated DCA contributions).
         points.push({ x: y, y: stackBtc * price });
       } else {
         // Post-retirement: sell BTC to cover nominal target income
@@ -339,9 +342,9 @@
     var inflation = window.ModelingAssumptions.get('inflation');
 
     var startYear = (new Date()).getFullYear();
-    var endYear = DEFAULT_SCENARIO.retirementYear + DEFAULT_SCENARIO.yearsInRetirement;
+    var endYear = SCENARIO.retirementYear + SCENARIO.yearsInRetirement;
     var bands = buildBands(startYear, endYear);
-    var stack = projectStackOverTime(DEFAULT_SCENARIO, growth.preset, inflation.value);
+    var stack = projectStackOverTime(SCENARIO, growth.preset, inflation.value);
 
     // Update title to reflect the chart's actual time range
     var titleEl = document.getElementById('projectionTitle');
@@ -402,7 +405,7 @@
 
     var verticalLines = [
       { x: startYear, label: 'Today', color: 'rgba(224,148,34,0.45)', labelColor: '#e09422' },
-      { x: DEFAULT_SCENARIO.retirementYear, label: 'Retirement (' + DEFAULT_SCENARIO.retirementYear + ')', color: 'rgba(236,228,214,0.35)', labelColor: '#ece4d6' }
+      { x: SCENARIO.retirementYear, label: 'Retirement (' + SCENARIO.retirementYear + ')', color: 'rgba(236,228,214,0.35)', labelColor: '#ece4d6' }
     ];
     if (stack.depletionYear) {
       verticalLines.push({ x: stack.depletionYear, label: 'Stack depleted (' + stack.depletionYear + ')', color: 'rgba(236,228,214,0.25)', labelColor: 'rgba(236,228,214,0.7)' });
@@ -411,7 +414,11 @@
     if (chart) {
       chart.data.datasets = datasets;
       chart.options.plugins.verticalMarkers.lines = verticalLines;
-      chart.update();
+      // Update x-axis range in case retirement-year or years-in-retirement changed
+      chart.options.scales.x.min = startYear;
+      chart.options.scales.x.max = endYear;
+      // 'none' = no animation — snappy response during slider drag
+      chart.update('none');
       return;
     }
 
@@ -423,7 +430,7 @@
         responsive: true,
         maintainAspectRatio: false,
         parsing: false,
-        animation: { duration: 250 },
+        animation: { duration: 0 },
         interaction: { intersect: false, mode: 'index' },
         layout: { padding: { top: 36, right: 8 } },
         scales: {
@@ -519,16 +526,55 @@
       .catch(function(){ updateStatusLine(LIVE_BTC_FALLBACK, 'fallback'); });
   }
 
+  // ─── Slider wiring — drag any slider, watch the chart move
+  //     rAF coalescing: update at most once per frame regardless of how many
+  //     'input' events fire during a drag. Snappy + no flicker.
+  var SLIDER_CONFIG = [
+    { key: 'targetIncomeUSD',   parse: parseInt,   fmt: function(v){ return '$' + Math.round(v).toLocaleString(); } },
+    { key: 'retirementYear',    parse: parseInt,   fmt: function(v){ return String(v); } },
+    { key: 'btcStack',          parse: parseFloat, fmt: function(v){ return v.toFixed(1) + ' BTC'; } },
+    { key: 'monthlyDcaUSD',     parse: parseInt,   fmt: function(v){ return '$' + Math.round(v).toLocaleString() + '/mo'; } },
+    { key: 'yearsInRetirement', parse: parseInt,   fmt: function(v){ return v + ' yrs'; } }
+  ];
+
+  var renderRaf = null;
+  function scheduleRender() {
+    if (renderRaf) return;
+    renderRaf = requestAnimationFrame(function(){
+      renderRaf = null;
+      renderChart();
+    });
+  }
+
+  function wireSliders() {
+    SLIDER_CONFIG.forEach(function(cfg){
+      var input = document.getElementById('slider-' + cfg.key);
+      var valEl = document.getElementById('val-' + cfg.key);
+      if (!input || !valEl) return;
+      // Sync initial display from SCENARIO state
+      input.value = SCENARIO[cfg.key];
+      valEl.textContent = cfg.fmt(SCENARIO[cfg.key]);
+      // 'input' fires during drag (continuous); 'change' fires on release
+      input.addEventListener('input', function(){
+        var v = cfg.parse(input.value);
+        SCENARIO[cfg.key] = v;
+        valEl.textContent = cfg.fmt(v);
+        scheduleRender();
+      });
+    });
+  }
+
   // ─── Re-render chart when inflation or growth model changes
   if (window.ModelingAssumptions.subscribe) {
     window.ModelingAssumptions.subscribe(function(dim){
       if (dim === 'inflation' || dim === 'btcGrowthModel' || dim === '*') {
-        renderChart();
+        scheduleRender();
       }
     });
   }
 
   // ─── Initial run
+  wireSliders();
   renderChart();
   fetchLiveBtcPrice();
 })();

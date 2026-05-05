@@ -68,8 +68,88 @@ eleventyComputed:
       </div>
     </div>
 
+    <!-- LIVE EXPLORATION — slider clusters per §9.2.5 -->
+    <div class="live-explore" id="liveExplore">
+      <div class="live-explore-header">
+        <span class="live-explore-label">Live exploration &mdash; drag any slider</span>
+        <span class="live-explore-help">Watch the projected curve move as you adjust your scenario.</span>
+      </div>
+
+      <!-- TARGET CLUSTER (weightier register — what you want) -->
+      <div class="slider-cluster cluster-target">
+        <div class="cluster-label">
+          <span class="cluster-label-main">Target outcomes</span>
+          <span class="cluster-label-help">&mdash; what you want; drag to explore the lifestyle/timeline tradeoff</span>
+        </div>
+        <div class="slider-grid grid-target">
+
+          <div class="slider-control" data-key="targetIncomeUSD">
+            <div class="slider-row">
+              <span class="slider-name">Target annual income
+                <span class="help-tip" tabindex="0">?<span class="tip-content">Annual retirement income in today&rsquo;s dollars. Drag to explore: more income means the stack lasts fewer years; less income means it lasts longer or reaches escape velocity.</span></span>
+              </span>
+              <span class="slider-val" id="val-targetIncomeUSD">$100,000</span>
+            </div>
+            <input type="range" id="slider-targetIncomeUSD" min="20000" max="500000" step="5000" value="100000" aria-label="Target annual income">
+          </div>
+
+          <div class="slider-control" data-key="retirementYear">
+            <div class="slider-row">
+              <span class="slider-name">Retirement year
+                <span class="help-tip" tabindex="0">?<span class="tip-content">When retirement starts. Drag later to let the stack grow more before drawdown begins; earlier to retire sooner with a smaller stack.</span></span>
+              </span>
+              <span class="slider-val" id="val-retirementYear">2045</span>
+            </div>
+            <input type="range" id="slider-retirementYear" min="2030" max="2070" step="1" value="2045" aria-label="Retirement year">
+          </div>
+
+        </div>
+      </div>
+
+      <!-- MEANS CLUSTER (standard register — how you get there) -->
+      <div class="slider-cluster cluster-means">
+        <div class="cluster-label">
+          <span class="cluster-label-main">Means</span>
+          <span class="cluster-label-help">&mdash; how you get there; the parameters you control</span>
+        </div>
+        <div class="slider-grid grid-means">
+
+          <div class="slider-control" data-key="btcStack">
+            <div class="slider-row">
+              <span class="slider-name">Bitcoin stack
+                <span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin held or planned. Drag to explore: how does the picture change at 0.5, 5, or 25 BTC?</span></span>
+              </span>
+              <span class="slider-val" id="val-btcStack">1.0 BTC</span>
+            </div>
+            <input type="range" id="slider-btcStack" min="0" max="50" step="0.1" value="1" aria-label="Bitcoin stack">
+          </div>
+
+          <div class="slider-control" data-key="monthlyDcaUSD">
+            <div class="slider-row">
+              <span class="slider-name">Monthly DCA
+                <span class="help-tip" tabindex="0">?<span class="tip-content">Dollar-cost averaging contribution per month between today and retirement. Each month adds BTC at the prevailing trend price.</span></span>
+              </span>
+              <span class="slider-val" id="val-monthlyDcaUSD">$0/mo</span>
+            </div>
+            <input type="range" id="slider-monthlyDcaUSD" min="0" max="5000" step="100" value="0" aria-label="Monthly dollar-cost averaging">
+          </div>
+
+          <div class="slider-control" data-key="yearsInRetirement">
+            <div class="slider-row">
+              <span class="slider-name">Years in retirement
+                <span class="help-tip" tabindex="0">?<span class="tip-content">How long the stack needs to support your target income. Longer windows make depletion more likely at the same withdrawal rate.</span></span>
+              </span>
+              <span class="slider-val" id="val-yearsInRetirement">30 yrs</span>
+            </div>
+            <input type="range" id="slider-yearsInRetirement" min="10" max="50" step="1" value="30" aria-label="Years in retirement">
+          </div>
+
+        </div>
+      </div>
+    </div>
+
     <div class="construction-note">
-      <p><strong>Slider clusters and Sustainability readout follow.</strong> The chart above projects a default scenario (1 BTC, $100K target income, 2045 retirement, 30-year retirement window, 6% withdrawal, no ongoing DCA). Sliders to drive your own scenario land in commit 4.</p>
+      <p><strong>Withdrawal rate slider + Sustainability readout follow in commit 4.2.</strong> The readout will surface Years stack lasts, Stack value at retirement, and an escape-velocity spectrum bar &mdash; with the withdrawal-rate slider gaining its proper meaning alongside it.</p>
     </div>
 
     <!-- BASELINE ASSUMPTIONS — bordered cluster, expanded by default,
