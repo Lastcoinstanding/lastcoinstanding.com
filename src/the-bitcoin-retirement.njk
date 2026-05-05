@@ -13,7 +13,7 @@ companion: []
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-bitcoin-retirement-head.html' %}"
   page_styles: "{% include '_pageassets/the-bitcoin-retirement.css' %}"
-  page_scripts: "{% include '_pageassets/the-bitcoin-retirement.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/the-bitcoin-retirement.js' %}"
 ---
 <div class="page">
 
@@ -45,10 +45,93 @@ eleventyComputed:
   <!-- TAB 2: THE CALCULATOR (active) -->
   <!-- ═══════════════════════════════════════════ -->
   <div class="tab-content active" id="tab-calculator">
+
     <div class="construction-note">
-      <p><strong>Under construction.</strong> The interactive calculator is being built. The page route, navigation, and tab structure are live; the projection chart, slider clusters, and Sustainability readout follow as construction continues.</p>
-      <p>In the meantime, explore <a href="/calculators.html">other calculators</a> on the site &mdash; <a href="/the-power-law.html">Bitcoin and The Power Law</a> covers the growth model this calculator will be built around.</p>
+      <p><strong>Calculator UI under construction.</strong> The projection chart, slider clusters, and Sustainability readout follow as construction continues. The baseline assumptions cluster below is live and saves your preferences across sessions and pages.</p>
     </div>
+
+    <!-- BASELINE ASSUMPTIONS — bordered cluster, expanded by default,
+         with Hide affordance. Per RETIREMENT_CALCULATOR_DESIGN §9.2.9. -->
+    <div class="baseline-cluster" id="baselineCluster">
+      <div class="baseline-cluster-header">
+        <span class="title">Baseline assumptions</span>
+        <span class="help">Inflation rate &middot; Bitcoin growth model &middot; Traditional portfolio benchmark &mdash; adjust if you want to model a different world.</span>
+        <a href="#" class="hide-link" id="baselineToggle">Hide</a>
+      </div>
+
+      <div class="baseline-cluster-body" id="baselineBody">
+
+        <div class="picker-group">
+          <div class="picker-label">Inflation rate <span class="help">&mdash; what's eating your purchasing power</span></div>
+          <div class="picker cols-4" data-dim="inflation">
+            <button type="button" class="picker-card" data-preset="cpi-official">
+              <span class="val">3.5%</span>
+              <span class="name">CPI Official</span>
+            </button>
+            <button type="button" class="picker-card" data-preset="m2-growth">
+              <span class="val">6.5%</span>
+              <span class="name">M2 growth (true inflation)</span>
+            </button>
+            <button type="button" class="picker-card" data-preset="shadow-stats">
+              <span class="val">8%</span>
+              <span class="name">Shadow Stats</span>
+            </button>
+            <button type="button" class="picker-card" data-preset="custom">
+              <span class="val">Custom</span>
+              <span class="name">Your own rate</span>
+            </button>
+          </div>
+          <div class="custom-input-wrap" id="inflationCustomWrap" hidden>
+            <label for="inflationCustom">Custom rate (%)</label>
+            <input type="number" id="inflationCustom" min="-50" max="500" step="0.1" inputmode="decimal">
+          </div>
+        </div>
+
+        <div class="picker-group">
+          <div class="picker-label">Bitcoin growth model <span class="help">&mdash; how price evolves over time</span></div>
+          <div class="picker cols-3" data-dim="btcGrowthModel">
+            <button type="button" class="picker-card" data-preset="powerlaw-floor">
+              <span class="val">Power Law</span>
+              <span class="name">Floor band (5th percentile)</span>
+            </button>
+            <button type="button" class="picker-card" data-preset="powerlaw-trend">
+              <span class="val">Power Law</span>
+              <span class="name">Trend line (default)</span>
+            </button>
+            <button type="button" class="picker-card" data-preset="linear-cagr-decay">
+              <span class="val">Linear CAGR</span>
+              <span class="name">With decay (secondary)</span>
+            </button>
+          </div>
+          <a href="/the-power-law.html#summary" class="powerlaw-link">What is the Power Law? &rarr;</a>
+        </div>
+
+        <div class="picker-group">
+          <div class="picker-label">Traditional portfolio benchmark <span class="help">&mdash; for comparison only; what your money would earn in a traditional 60/40 portfolio after inflation</span></div>
+          <div class="picker cols-3" data-dim="realReturns">
+            <button type="button" class="picker-card" data-preset="conservative">
+              <span class="val">3% real</span>
+              <span class="name">Conservative</span>
+            </button>
+            <button type="button" class="picker-card" data-preset="diversified">
+              <span class="val">5% real</span>
+              <span class="name">Diversified portfolio</span>
+            </button>
+            <button type="button" class="picker-card" data-preset="sp500-historical">
+              <span class="val">7% real</span>
+              <span class="name">S&amp;P 500 historical</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="zone-footer">
+          <span class="footer-text">Saved on this device only. Never transmitted.</span>
+          <a href="#" class="reset-link" id="baselineReset">Reset baseline to defaults</a>
+        </div>
+
+      </div><!-- /.baseline-cluster-body -->
+    </div><!-- /.baseline-cluster -->
+
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
