@@ -117,7 +117,7 @@ body {
 }
 .construction-note p {
   font-family: var(--font-body);
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   line-height: 1.7;
   color: var(--ink-dim);
   margin: 0 0 0.9rem;
@@ -130,6 +130,10 @@ body {
 @media (max-width: 720px) {
   .page { padding: 24px 16px 40px; }
   .construction-note { margin: 2rem auto 1.5rem; padding: 1.5rem 1.2rem; }
+  .tab-btn { padding: 0.85rem 0.7rem; font-size: 0.74rem; }
+}
+@media (max-width: 420px) {
+  .tab-btn { padding: 0.75rem 0.4rem; font-size: 0.7rem; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -148,16 +152,16 @@ body {
 .picker.cols-3 { grid-template-columns: repeat(3, 1fr); }
 
 .picker-label {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 500;
   color: var(--ink-bright);
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.7rem;
   display: flex;
   align-items: baseline;
   gap: 0.6rem;
 }
 .picker-label .help {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   color: var(--ink-faint);
   font-weight: 400;
   font-style: italic;
@@ -167,7 +171,7 @@ body {
   background: transparent;
   border: 1px solid var(--border-faint);
   border-radius: 5px;
-  padding: 0.75rem 0.75rem;
+  padding: 0.8rem 0.85rem;
   cursor: pointer;
   transition: all 0.2s;
   text-align: left;
@@ -187,14 +191,14 @@ body {
   font-weight: 500;
   color: var(--ink-bright);
   display: block;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
   letter-spacing: -0.01em;
 }
 .picker-card .name {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   color: var(--ink-dim);
   display: block;
-  line-height: 1.3;
+  line-height: 1.4;
 }
 .picker-card.active .val { color: var(--amber); }
 
@@ -213,18 +217,18 @@ body {
 }
 .custom-input-wrap[hidden] { display: none; }
 .custom-input-wrap label {
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   color: var(--ink-dim);
 }
 .custom-input-wrap input {
   width: 8em;
-  padding: 0.4rem 0.6rem;
+  padding: 0.45rem 0.65rem;
   background: rgba(0,0,0,0.25);
   border: 1px solid var(--border);
   border-radius: 3px;
   color: var(--ink-bright);
   font-family: var(--font-body);
-  font-size: 0.92rem;
+  font-size: 0.95rem;
 }
 .custom-input-wrap input:focus {
   outline: none;
@@ -240,7 +244,7 @@ a.powerlaw-link:active {
   display: inline-block;
   margin-top: 0.65rem;
   margin-left: 0.5rem; /* nests visually under the growth-model picker per §9.2.4 */
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   color: var(--amber);
   text-decoration: none;
   border-bottom: 1px solid rgba(224,148,34,0.4);
@@ -258,7 +262,7 @@ a.powerlaw-link:hover {
   margin-top: 1.25rem;
   padding-top: 0.85rem;
   border-top: 1px dashed var(--border-faint);
-  font-size: 0.75rem;
+  font-size: 0.82rem;
   color: var(--ink-faint);
   display: flex;
   justify-content: space-between;
@@ -295,22 +299,23 @@ a.powerlaw-link:hover {
   border-bottom: 1px dashed var(--border-faint);
 }
 .baseline-cluster-header .title {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: var(--ink-bright);
   font-weight: 500;
   letter-spacing: 0.01em;
 }
 .baseline-cluster-header .help {
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   color: var(--ink-faint);
   font-style: italic;
   font-weight: 400;
   flex: 1;
+  line-height: 1.5;
 }
 .baseline-cluster-header .hide-link,
 .baseline-cluster-header .hide-link:link,
 .baseline-cluster-header .hide-link:visited {
-  font-size: 0.74rem;
+  font-size: 0.82rem;
   color: var(--amber);
   text-decoration: none;
   opacity: 0.7;
@@ -388,22 +393,22 @@ a.powerlaw-link:hover {
   align-items: baseline;
   flex-wrap: wrap;
   gap: 0.6rem 1.25rem;
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.1rem;
   margin-top: 0.5rem;
   background: rgba(0,0,0,0.20);
   border: 1px solid var(--border-faint);
   border-bottom: none;
   border-radius: 6px 6px 0 0;
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   color: var(--ink-dim);
-  line-height: 1.55;
+  line-height: 1.6;
 }
 .chart-status-line .status-prose { flex: 1; min-width: 18em; }
 .chart-status-line strong { color: var(--ink-bright); font-weight: 500; }
 .chart-status-line a.powerlaw-link {
   margin-top: 0;
   margin-left: 0;
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -413,7 +418,7 @@ a.powerlaw-link:hover {
   background: rgba(0,0,0,0.20);
   border: 1px solid var(--border-faint);
   border-radius: 0 0 6px 6px;
-  padding: 1rem 1.25rem 1.25rem;
+  padding: 1.1rem 1.35rem 1.35rem;
 }
 .chart-status-line + .projection {
   margin-top: 0;
@@ -425,25 +430,27 @@ a.powerlaw-link:hover {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 0.4rem 1rem;
-  margin-bottom: 0.85rem;
+  margin-bottom: 1rem;
 }
 .projection-title {
   font-family: var(--font-display);
-  font-size: 1.1rem;
-  font-weight: 500;
+  font-size: 1.3rem;
+  font-weight: 600;
   color: var(--ink-bright);
+  margin-bottom: 4px;
+  line-height: 1.25;
 }
 .projection-legend {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   color: var(--ink-dim);
 }
-.legend-item { display: inline-flex; align-items: center; gap: 0.4rem; }
+.legend-item { display: inline-flex; align-items: center; gap: 0.45rem; }
 .swatch {
   display: inline-block;
-  width: 14px; height: 2px;
+  width: 16px; height: 2px;
   background: var(--amber);
 }
 .swatch-trend { background: var(--amber); height: 2.5px; }
@@ -452,14 +459,14 @@ a.powerlaw-link:hover {
   height: 0;
   border-top: 1.6px dashed var(--amber);
   opacity: 0.7;
-  width: 16px;
+  width: 18px;
 }
 .swatch-upper {
   background: transparent;
   height: 0;
   border-top: 1.2px dashed var(--amber);
   opacity: 0.30;
-  width: 16px;
+  width: 18px;
 }
 .swatch-stack { background: var(--ink-bright); opacity: 0.85; height: 2px; }
 
@@ -471,13 +478,14 @@ a.powerlaw-link:hover {
 
 @media (max-width: 720px) {
   .chart-status-line {
-    font-size: 0.78rem;
-    padding: 0.7rem 0.85rem;
+    font-size: 0.85rem;
+    padding: 0.75rem 0.9rem;
   }
   .chart-status-line .status-prose { min-width: 100%; }
-  .chart-status-line a.powerlaw-link { font-size: 0.74rem; }
-  .projection { padding: 0.85rem 0.85rem 1rem; }
+  .chart-status-line a.powerlaw-link { font-size: 0.78rem; }
+  .projection { padding: 0.95rem 0.9rem 1.1rem; }
+  .projection-title { font-size: 1.15rem; }
   .projection-header { flex-direction: column; align-items: flex-start; }
-  .projection-legend { width: 100%; }
+  .projection-legend { width: 100%; font-size: 0.74rem; }
   .chart-wrapper { height: 320px; }
 }
