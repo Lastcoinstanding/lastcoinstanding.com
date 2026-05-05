@@ -261,9 +261,14 @@
       var price = projPrice(d);
 
       if (y < scenario.retirementYear) {
-        // Pre-retirement, no DCA in default scenario → BTC count constant
-        points.push({ x: y, y: stackBtc * price });
+        // Pre-retirement: the user "is" the chosen growth-model curve
+        // (no separate drawdown line drawn — would just overlay trend/floor
+        // exactly at btcStack=1, which collides visually). Track BTC count
+        // forward in case future commits add DCA accumulation.
+        // No point pushed for the chart here.
       } else if (y === scenario.retirementYear) {
+        // Drawdown line begins here, anchored at the user's stack value
+        // (btcStack × growth-model price at retirement).
         points.push({ x: y, y: stackBtc * price });
       } else {
         // Post-retirement: sell BTC to cover nominal target income
@@ -420,6 +425,7 @@
         parsing: false,
         animation: { duration: 250 },
         interaction: { intersect: false, mode: 'index' },
+        layout: { padding: { top: 28, right: 8 } },
         scales: {
           x: {
             type: 'linear',
