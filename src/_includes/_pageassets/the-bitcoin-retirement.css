@@ -1,0 +1,133 @@
+/* The Bitcoin Retirement — page-level styles
+ * Phase 3 / commit 1: scaffolding only.
+ * The full calculator visual treatment lands across commits 2–7
+ * (chart, slider clusters, Sustainability readout, baseline cluster,
+ * supplemental link cards, account-type toggle).
+ */
+
+:root {
+  --bg-page: #0a0908;
+  --bg-card: #14110d;
+  --border: rgba(224,148,34,0.15);
+  --border-strong: rgba(224,148,34,0.30);
+  --border-faint: rgba(224,148,34,0.08);
+  --amber: #e09422;
+  --amber-bright: #F7931A;
+  --amber-soft: rgba(224,148,34,0.08);
+  --ink-bright: #ece4d6;
+  --ink: #ccc6b8;
+  --ink-dim: #968b7a;
+  --ink-faint: #5a5247;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-flourish: 'Source Serif 4', Georgia, serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  background: var(--bg-page);
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Page wrapper ─── */
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px 60px;
+}
+
+/* ─── Page header (h1 + subtitle, per STYLE_GUIDE §2.1) ─── */
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-weight: 500;
+  color: var(--ink-bright);
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+.subtitle {
+  font-family: var(--font-flourish);
+  font-style: italic;
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  color: var(--ink-dim);
+  line-height: 1.6;
+  max-width: 700px;
+  margin: 0 auto;
+  font-weight: 400;
+}
+
+/* ─── Tab nav (per STYLE_GUIDE §2.5) ─── */
+.tab-nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.tab-btn {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink-dim);
+  background: none;
+  border: none;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--ink); }
+.tab-btn.active {
+  color: var(--amber);
+  border-bottom-color: var(--amber);
+  font-weight: 600;
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ─── Construction note (commit-1 placeholder; removed as commits 2–13 land) ─── */
+.construction-note {
+  max-width: 640px;
+  margin: 4rem auto 2rem;
+  padding: 2rem 1.6rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--amber);
+  border-radius: 4px;
+  text-align: left;
+}
+.construction-note p {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--ink-dim);
+  margin: 0 0 0.9rem;
+}
+.construction-note p:last-child { margin-bottom: 0; }
+.construction-note strong { color: var(--ink-bright); font-weight: 600; }
+.construction-note a { color: var(--amber); text-decoration: underline; text-underline-offset: 2px; }
+.construction-note a:hover { color: var(--amber-bright); }
+
+@media (max-width: 720px) {
+  .page { padding: 24px 16px 40px; }
+  .construction-note { margin: 2rem auto 1.5rem; padding: 1.5rem 1.2rem; }
+}

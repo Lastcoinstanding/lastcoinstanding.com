@@ -13,5 +13,6 @@
   { "slug": "the-fixed-pie",          "title": "The Bitcoin Fixed Share",    "category": "numbers",     "interactive": true,  "is_calculator": false },
   { "slug": "bitcoin-vs-real-estate", "title": "BTC vs. Real Estate",        "category": "numbers",     "interactive": true,  "is_calculator": true  },
   { "slug": "the-power-law",          "title": "Bitcoin &amp; The Power Law", "category": "numbers",    "interactive": true,  "is_calculator": true  },
+  { "slug": "the-bitcoin-retirement", "title": "The Bitcoin Retirement",     "category": "numbers",     "interactive": true,  "is_calculator": true  },
   { "slug": "the-bitcoin-horizon",    "title": "The Bitcoin Horizon",        "category": "numbers",     "interactive": true,  "is_calculator": false }
 ]
