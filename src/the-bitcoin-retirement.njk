@@ -46,8 +46,30 @@ eleventyComputed:
   <!-- ═══════════════════════════════════════════ -->
   <div class="tab-content active" id="tab-calculator">
 
+    <!-- CHART STATUS LINE — current price + Power Law context -->
+    <div class="chart-status-line" id="chartStatusLine">
+      <span class="status-prose"><strong>Today:</strong> <span id="statusPrice">$&mdash;</span> / BTC &mdash; sits at <strong><span id="statusRatio">&mdash;</span></strong> the Power Law trend; historically, price has been below this level <strong>80%</strong> of the time.</span>
+      <a href="/the-power-law.html#summary" class="powerlaw-link">What is the Power Law? &rarr;</a>
+    </div>
+
+    <!-- PROJECTION CHART — the workspace centerpiece -->
+    <div class="projection">
+      <div class="projection-header">
+        <span class="projection-title" id="projectionTitle">Projected stack value</span>
+        <div class="projection-legend">
+          <div class="legend-item"><span class="swatch swatch-trend"></span>Trend (central case)</div>
+          <div class="legend-item"><span class="swatch swatch-floor"></span>Floor band (conservative anchor)</div>
+          <div class="legend-item"><span class="swatch swatch-upper"></span>Upper band (spikes)</div>
+          <div class="legend-item"><span class="swatch swatch-stack"></span>Your stack (drawdown)</div>
+        </div>
+      </div>
+      <div class="chart-wrapper">
+        <canvas id="projectionChart"></canvas>
+      </div>
+    </div>
+
     <div class="construction-note">
-      <p><strong>Calculator UI under construction.</strong> The projection chart, slider clusters, and Sustainability readout follow as construction continues. The baseline assumptions cluster below is live and saves your preferences across sessions and pages.</p>
+      <p><strong>Slider clusters and Sustainability readout follow.</strong> The chart above projects a default scenario (1 BTC, $100K target income, 2045 retirement, 30-year retirement window, 6% withdrawal, no ongoing DCA). Sliders to drive your own scenario land in commit 4.</p>
     </div>
 
     <!-- BASELINE ASSUMPTIONS — bordered cluster, expanded by default,
