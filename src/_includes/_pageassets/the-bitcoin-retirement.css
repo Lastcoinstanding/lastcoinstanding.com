@@ -83,7 +83,7 @@ body {
 }
 .tab-btn {
   font-family: var(--font-body);
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   font-weight: 500;
   color: var(--ink-dim);
   background: none;
@@ -444,7 +444,7 @@ a.powerlaw-link:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   color: var(--ink-dim);
 }
 .legend-item { display: inline-flex; align-items: center; gap: 0.45rem; }
@@ -486,6 +486,6 @@ a.powerlaw-link:hover {
   .projection { padding: 0.95rem 0.9rem 1.1rem; }
   .projection-title { font-size: 1.15rem; }
   .projection-header { flex-direction: column; align-items: flex-start; }
-  .projection-legend { width: 100%; font-size: 0.74rem; }
+  .projection-legend { width: 100%; font-size: 0.78rem; }
   .chart-wrapper { height: 320px; }
 }
