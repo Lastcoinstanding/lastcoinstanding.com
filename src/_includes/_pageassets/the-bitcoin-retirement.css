@@ -376,3 +376,108 @@ a.powerlaw-link:hover {
     padding: 1rem 1.1rem 1.2rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Phase 3 / commit 3 — Projection chart + status line
+   §7.3 asymmetric band treatment + §9.2 architecture diagram.
+═══════════════════════════════════════════════════════════════ */
+
+/* ─── Chart status line (just above the chart) ─── */
+.chart-status-line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.25rem;
+  padding: 0.75rem 1rem;
+  margin-top: 0.5rem;
+  background: rgba(0,0,0,0.20);
+  border: 1px solid var(--border-faint);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  font-size: 0.82rem;
+  color: var(--ink-dim);
+  line-height: 1.55;
+}
+.chart-status-line .status-prose { flex: 1; min-width: 18em; }
+.chart-status-line strong { color: var(--ink-bright); font-weight: 500; }
+.chart-status-line a.powerlaw-link {
+  margin-top: 0;
+  margin-left: 0;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ─── Projection container ─── */
+.projection {
+  background: rgba(0,0,0,0.20);
+  border: 1px solid var(--border-faint);
+  border-radius: 0 0 6px 6px;
+  padding: 1rem 1.25rem 1.25rem;
+}
+.chart-status-line + .projection {
+  margin-top: 0;
+  border-top: 1px dashed var(--border-faint);
+}
+.projection-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin-bottom: 0.85rem;
+}
+.projection-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--ink-bright);
+}
+.projection-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+}
+.legend-item { display: inline-flex; align-items: center; gap: 0.4rem; }
+.swatch {
+  display: inline-block;
+  width: 14px; height: 2px;
+  background: var(--amber);
+}
+.swatch-trend { background: var(--amber); height: 2.5px; }
+.swatch-floor {
+  background: transparent;
+  height: 0;
+  border-top: 1.6px dashed var(--amber);
+  opacity: 0.7;
+  width: 16px;
+}
+.swatch-upper {
+  background: transparent;
+  height: 0;
+  border-top: 1.2px dashed var(--amber);
+  opacity: 0.30;
+  width: 16px;
+}
+.swatch-stack { background: var(--ink-bright); opacity: 0.85; height: 2px; }
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  height: 400px;
+}
+
+@media (max-width: 720px) {
+  .chart-status-line {
+    font-size: 0.78rem;
+    padding: 0.7rem 0.85rem;
+  }
+  .chart-status-line .status-prose { min-width: 100%; }
+  .chart-status-line a.powerlaw-link { font-size: 0.74rem; }
+  .projection { padding: 0.85rem 0.85rem 1rem; }
+  .projection-header { flex-direction: column; align-items: flex-start; }
+  .projection-legend { width: 100%; }
+  .chart-wrapper { height: 320px; }
+}
