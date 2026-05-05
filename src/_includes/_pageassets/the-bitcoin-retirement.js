@@ -489,14 +489,25 @@
   }
 
   // ─── Status line: live BTC price + ratio to today's Power Law trend
+  //                  + dynamic percentile (where current price sits in
+  //                  the historical distribution of trend ratios)
   function updateStatusLine(currentPrice, source) {
     var priceEl = document.getElementById('statusPrice');
     var ratioEl = document.getElementById('statusRatio');
+    var pctEl = document.getElementById('statusPercentile');
     if (!priceEl || !ratioEl) return;
     var todayTrend = plPriceAtDate(new Date());
     var ratio = currentPrice / todayTrend;
     priceEl.textContent = '$' + Math.round(currentPrice).toLocaleString();
     ratioEl.textContent = ratio.toFixed(2) + '\u00d7';
+    if (pctEl && window.CalcHelpers && window.CalcHelpers.percentileBelowRatio) {
+      var pct = window.CalcHelpers.percentileBelowRatio(ratio);
+      if (pct === null || !isFinite(pct)) {
+        pctEl.textContent = '\u2014';
+      } else {
+        pctEl.textContent = Math.round(pct) + '%';
+      }
+    }
     if (source === 'fallback') {
       priceEl.title = 'Live price fetch failed; showing fallback value.';
     }
