@@ -320,9 +320,9 @@
         if (m.label) {
           ctx.setLineDash([]);
           ctx.fillStyle = m.labelColor || '#ece4d6';
-          ctx.font = '500 10px Inter, sans-serif';
+          ctx.font = '500 12px Inter, sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText(m.label, xPx, yScale.top - 6);
+          ctx.fillText(m.label, xPx, yScale.top - 8);
         }
       });
       ctx.restore();
@@ -425,7 +425,7 @@
         parsing: false,
         animation: { duration: 250 },
         interaction: { intersect: false, mode: 'index' },
-        layout: { padding: { top: 28, right: 8 } },
+        layout: { padding: { top: 36, right: 8 } },
         scales: {
           x: {
             type: 'linear',
@@ -434,8 +434,8 @@
             title: { display: false },
             grid: { color: 'rgba(224,148,34,0.05)' },
             ticks: {
-              color: '#5a5247',
-              font: { family: 'Inter, sans-serif', size: 10 },
+              color: '#7a7367',
+              font: { family: 'Inter, sans-serif', size: 11 },
               stepSize: 10,
               callback: function(v){ return Math.round(v); }
             }
@@ -445,8 +445,8 @@
             position: 'left',
             grid: { color: 'rgba(224,148,34,0.06)' },
             ticks: {
-              color: '#5a5247',
-              font: { family: 'Inter, sans-serif', size: 10 },
+              color: '#7a7367',
+              font: { family: 'Inter, sans-serif', size: 11 },
               callback: function(v){
                 if (v >= 1e9) return '$' + (v/1e9).toFixed(0) + 'B';
                 if (v >= 1e6) return '$' + (v/1e6).toFixed(0) + 'M';
