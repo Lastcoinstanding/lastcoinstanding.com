@@ -18,6 +18,7 @@
      lcs.realReturns.preset         conservative | diversified | sp500-historical
      lcs.realEstate.preset          long-run | recent-decades | optimistic | custom
      lcs.realEstate.customValue     number
+     lcs.btcGrowthModel.preset      powerlaw-floor | powerlaw-trend | linear-cagr-decay
 
    The "custom value" is preserved when a user switches to a non-custom preset,
    so re-selecting Custom restores the last value they entered.
@@ -54,6 +55,17 @@
         'custom': null
       },
       hasCustom: true
+    },
+    btcGrowthModel: {
+      // Used by /the-bitcoin-retirement.html. Value is a model identifier
+      // (string), not a rate — calculator code maps it to projection logic.
+      defaultPreset: 'powerlaw-trend',
+      presetValues: {
+        'powerlaw-floor': 'powerlaw-floor',
+        'powerlaw-trend': 'powerlaw-trend',
+        'linear-cagr-decay': 'linear-cagr-decay'
+      },
+      hasCustom: false
     }
   };
 
