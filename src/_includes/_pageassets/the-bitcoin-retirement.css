@@ -454,37 +454,16 @@ a.powerlaw-link:hover {
 .legend-item { display: inline-flex; align-items: center; gap: 0.45rem; }
 .swatch {
   display: inline-block;
-  width: 16px; height: 2px;
+  width: 22px; height: 8px;
   background: var(--amber);
+  border-radius: 1px;
 }
-.swatch-trend { background: var(--amber); height: 2.5px; }
-.swatch-floor {
-  background: transparent;
-  height: 0;
-  border-top: 1.6px dashed var(--amber);
-  opacity: 0.7;
-  width: 18px;
-}
-.swatch-upper {
-  background: transparent;
-  height: 0;
-  border-top: 1.2px dashed var(--amber);
-  opacity: 0.30;
-  width: 18px;
-}
-.swatch-stack { background: var(--ink-bright); opacity: 0.85; height: 2px; }
-.swatch-current {
-  background: transparent;
-  height: 0;
-  border-top: 1.5px dashed rgba(236,228,214,0.55);
-  width: 18px;
-}
-.swatch-benchmark {
-  background: transparent;
-  height: 0;
-  border-top: 1.4px dashed rgba(160,150,135,0.7);
-  width: 18px;
-}
+.swatch-trend { background: #e09422; height: 8px; }
+.swatch-floor { background: #a85f0d; height: 8px; }
+.swatch-upper { background: #e8b56d; height: 8px; }
+.swatch-stack { background: #ece4d6; height: 8px; }
+.swatch-current { background: #a89c8a; height: 8px; }
+.swatch-benchmark { background: #7a8084; height: 8px; }
 
 .chart-wrapper {
   position: relative;
