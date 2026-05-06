@@ -270,7 +270,9 @@
   // ─── Project user's stack value year-by-year under sell-as-needed
   // Pre-retirement: BTC count grows via DCA accumulation (12 × monthly / yearly trend price).
   // Post-retirement: each year, sell BTC to cover nominal target income.
-  // Returns {points, depletionYear} where points is [{x:year, y:usdValue}].
+  // Returns {points, btcPoints, depletionYear} where points is [{x:year, y:usdValue}]
+  // and btcPoints is [{x:year, btc:count, usd:value}] used by the BTC-count
+  // annotation plugin to label the drawdown line at anchor years.
   function projectStackOverTime(scenario, growthModelKey, inflationPct) {
     var today = new Date();
     var startYear = today.getFullYear();
@@ -279,6 +281,7 @@
 
     var stackBtc = scenario.btcStack;
     var points = [];
+    var btcPoints = [];
     var depletionYear = null;
 
     for (var y = startYear; y <= endYear; y++) {
@@ -295,10 +298,12 @@
         // interaction aligned across all four series. Chart.js renders null as a
         // gap (no visible line pre-retirement, same as before).
         points.push({ x: y, y: null });
+        btcPoints.push({ x: y, btc: stackBtc, usd: null });
       } else if (y === scenario.retirementYear) {
         // Drawdown line begins here, at the user's stack value at retirement
         // (after any accumulated DCA contributions).
         points.push({ x: y, y: stackBtc * price });
+        btcPoints.push({ x: y, btc: stackBtc, usd: stackBtc * price });
       } else {
         // Post-retirement: sell BTC to cover nominal target income
         var yearsFromToday = y - startYear;
@@ -309,9 +314,10 @@
           depletionYear = y;
         }
         points.push({ x: y, y: stackBtc * price });
+        btcPoints.push({ x: y, btc: stackBtc, usd: stackBtc * price });
       }
     }
-    return { points: points, depletionYear: depletionYear, startYear: startYear, endYear: endYear };
+    return { points: points, btcPoints: btcPoints, depletionYear: depletionYear, startYear: startYear, endYear: endYear };
   }
 
   // ─── Build trend / floor / upper-band point arrays for the chart's bands
@@ -357,6 +363,80 @@
       ctx.restore();
     }
   };
+
+  // ─── BTC-count annotation plugin: dots + "X.XX BTC" labels at anchor years
+  // along the user's drawdown line. Bitcoin-native readers care not just about
+  // the dollar value of remaining stack but the BTC count itself; this gives
+  // them that dimension at a glance without a second Y-axis.
+  var btcCountPlugin = {
+    id: 'btcCountAnnotations',
+    afterDatasetsDraw: function(chart) {
+      var cfg = chart.options.plugins.btcCountAnnotations;
+      var anchors = cfg && cfg.anchors;
+      if (!anchors || !anchors.length) return;
+      var ctx = chart.ctx;
+      var xScale = chart.scales.x, yScale = chart.scales.y;
+      ctx.save();
+      ctx.font = '500 11px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      anchors.forEach(function(a) {
+        if (a.usd === null || a.usd === undefined || !isFinite(a.usd) || a.usd <= 0) return;
+        var xPx = xScale.getPixelForValue(a.x);
+        var yPx = yScale.getPixelForValue(a.usd);
+        // Dot on the drawdown line
+        ctx.fillStyle = 'rgba(236,228,214,0.9)';
+        ctx.beginPath();
+        ctx.arc(xPx, yPx, 3, 0, 2 * Math.PI);
+        ctx.fill();
+        // Label above the dot
+        ctx.fillStyle = '#ece4d6';
+        ctx.fillText(a.btc.toFixed(2) + ' BTC', xPx, yPx - 8);
+      });
+      ctx.restore();
+    }
+  };
+
+  // ─── Pick 2-4 anchor years across the drawdown window for BTC-count labels.
+  // Anchors are evenly distributed: retirement, +⅓, +⅔, end (or last year before
+  // depletion). Shorter retirement windows get fewer anchors to avoid crowding.
+  function pickBtcAnchors(retirementYear, yearsInRetirement, depletionYear, btcPoints) {
+    if (!btcPoints || !btcPoints.length || yearsInRetirement < 1) return [];
+    var lastYear = depletionYear
+      ? Math.max(retirementYear, depletionYear - 1)
+      : retirementYear + yearsInRetirement;
+    var span = lastYear - retirementYear;
+    if (span < 0) return [];
+
+    var candidates;
+    if (yearsInRetirement >= 9 && span >= 3) {
+      candidates = [
+        retirementYear,
+        retirementYear + Math.round(span / 3),
+        retirementYear + Math.round(2 * span / 3),
+        lastYear
+      ];
+    } else if (yearsInRetirement >= 4 && span >= 2) {
+      candidates = [retirementYear, retirementYear + Math.round(span / 2), lastYear];
+    } else {
+      candidates = [retirementYear, lastYear];
+    }
+
+    // Dedupe and lookup BTC counts; drop any without a usable usd value
+    var seen = {};
+    var anchors = [];
+    candidates.forEach(function(y) {
+      if (seen[y]) return;
+      seen[y] = true;
+      var pt = null;
+      for (var i = 0; i < btcPoints.length; i++) {
+        if (btcPoints[i].x === y) { pt = btcPoints[i]; break; }
+      }
+      if (pt && pt.usd !== null && isFinite(pt.usd) && pt.usd > 0 && pt.btc >= 0) {
+        anchors.push({ x: y, btc: pt.btc, usd: pt.usd });
+      }
+    });
+    return anchors;
+  }
 
   // ─── Chart instance + render/update
   var chart = null;
@@ -437,9 +517,12 @@
       verticalLines.push({ x: stack.depletionYear, label: 'Stack depleted (' + stack.depletionYear + ')', color: 'rgba(236,228,214,0.25)', labelColor: 'rgba(236,228,214,0.7)' });
     }
 
+    var btcAnchors = pickBtcAnchors(SCENARIO.retirementYear, SCENARIO.yearsInRetirement, stack.depletionYear, stack.btcPoints);
+
     if (chart) {
       chart.data.datasets = datasets;
       chart.options.plugins.verticalMarkers.lines = verticalLines;
+      chart.options.plugins.btcCountAnnotations.anchors = btcAnchors;
       // Update x-axis range in case retirement-year or years-in-retirement changed
       chart.options.scales.x.min = startYear;
       chart.options.scales.x.max = endYear;
@@ -521,10 +604,11 @@
               }
             }
           },
-          verticalMarkers: { lines: verticalLines }
+          verticalMarkers: { lines: verticalLines },
+          btcCountAnnotations: { anchors: btcAnchors }
         }
       },
-      plugins: [verticalLinePlugin]
+      plugins: [verticalLinePlugin, btcCountPlugin]
     });
   }
 
@@ -571,7 +655,7 @@
   //       null     → no coupling (yearsInRetirement only affects depletion)
   var SLIDER_CONFIG = [
     { key: 'targetIncomeUSD',   parse: parseInt,   fmt: function(v){ return '$' + Math.round(v).toLocaleString(); }, updates: 'rate',   min: 20000, max: 500000 },
-    { key: 'retirementYear',    parse: parseInt,   fmt: function(v){ return String(v); },                            updates: 'rate',   min: 2030,  max: 2070 },
+    { key: 'retirementYear',    parse: parseInt,   fmt: function(v){ return String(v); },                            updates: 'rate',   min: 2026,  max: 2070 },
     { key: 'btcStack',          parse: parseFloat, fmt: function(v){ return v.toFixed(1) + ' BTC'; },                updates: 'rate',   min: 0,     max: 50 },
     { key: 'withdrawalRatePct', parse: parseFloat, fmt: function(v){ return v.toFixed(1) + '%'; },                   updates: 'income', min: 2,     max: 15 },
     { key: 'monthlyDcaUSD',     parse: parseInt,   fmt: function(v){ return '$' + Math.round(v).toLocaleString() + '/mo'; }, updates: 'rate', min: 0, max: 5000 },
