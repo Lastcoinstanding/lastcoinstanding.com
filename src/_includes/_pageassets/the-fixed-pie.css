@@ -162,9 +162,6 @@ body::before {
   flex-direction: column;
   gap: 10px;
 }
-.supply-card.sc-fiat { border-top: 3px solid var(--red); }
-.supply-card.sc-gold { border-top: 3px solid var(--gold); }
-.supply-card.sc-btc  { border-top: 3px solid var(--orange); }
 
 .sc-label {
   font-size: .7rem;
@@ -353,9 +350,6 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 8px;
   transition: border-color .3s;
 }
-.stat-card.st-fiat { border-left: 3px solid var(--red); }
-.stat-card.st-gold { border-left: 3px solid var(--gold); }
-.stat-card.st-btc  { border-left: 3px solid var(--orange); }
 
 .st-label {
   font-size: .7rem;
@@ -404,7 +398,6 @@ input[type="range"]::-moz-range-thumb {
   padding: 18px 22px;
   background: var(--orange-soft);
   border: 1px solid rgba(247,147,26,.12);
-  border-left: 3px solid var(--orange);
   border-radius: 6px;
 }
 .terminal-note p {
@@ -450,7 +443,6 @@ input[type="range"]::-moz-range-thumb {
   padding: 24px;
   background: linear-gradient(135deg, var(--bg-card), rgba(247,147,26,.04));
   border: 1px solid rgba(247,147,26,.15);
-  border-left: 3px solid var(--orange);
   border-radius: 6px;
 }
 .thesis-callout .tc-label {
@@ -645,4 +637,5 @@ footer {
 
 /* Dropdown nav: structure inherited from canonical-nav-css; active accent matches calc-tier var(--orange) palette */
 .nav-dropdown-menu a.active { color: var(--orange); background: rgba(247,147,26,0.08); font-weight: 600; }
+
 

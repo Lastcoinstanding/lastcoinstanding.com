@@ -244,7 +244,6 @@ header .intro-text strong { color:var(--text-bright); font-weight:600; }
   padding:1.25rem 1.25rem 1.25rem 1.5rem;
   background:var(--bg-card);
   border:1px solid var(--border);
-  border-left:2px solid var(--amber);
   border-radius:0.5rem;
 }
 .insight-card .ic-label {
@@ -356,4 +355,5 @@ footer a:hover { color:var(--amber); }
 }
 
 /* Dropdown nav: structure inherited from canonical-nav-css; active state matches canonical */
+
 

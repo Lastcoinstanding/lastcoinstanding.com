@@ -58,9 +58,9 @@ header .intro-text strong { color: var(--text-bright); font-weight: 600; }
 .panel-body strong { color: var(--text-bright); font-weight: 600; }
 .panel-verdict { margin-top: 1.125rem; padding: 0.875rem 1rem; border-radius: 0.5rem; font-family: var(--font-body); font-size: 0.95rem; line-height: 1.7; }
 .panel-verdict strong { font-weight: 700; }
-.panel-verdict.good { background: var(--green-dim); border-left: 3px solid var(--green); color: #c4e8cc; }
-.panel-verdict.bad { background: var(--red-dim); border-left: 3px solid var(--red); color: #e8c4c4; }
-.panel-verdict.neutral { background: var(--grey-dim); border-left: 3px solid var(--grey); color: #c0c4c8; }
+.panel-verdict.good { background: var(--green-dim); color: #c4e8cc; }
+.panel-verdict.bad { background: var(--red-dim); color: #e8c4c4; }
+.panel-verdict.neutral { background: var(--grey-dim); color: #c0c4c8; }
 .example-box { margin-top: 1rem; padding: 0.75rem 0.875rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 0.375rem; }
 .example-box .example-label { font-family: var(--font-body); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.375rem; }
 .example-box .example-content { font-family: var(--font-body); font-size: 0.925rem; line-height: 1.7; color: #b8b0a8; }
@@ -89,4 +89,5 @@ footer a:hover { text-decoration: underline; }
 
 /* Dropdown nav palette accent (structure inherited from canonical-nav-css) */
 .nav-dropdown-menu a.active { color: var(--orange, #F7931A); background: rgba(247,147,26,0.08); font-weight: 600; }
+
 
