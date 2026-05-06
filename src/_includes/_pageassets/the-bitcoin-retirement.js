@@ -438,6 +438,51 @@
     return anchors;
   }
 
+  // ─── Project a traditional 60/40 portfolio over the same window for
+  // visual comparison (§9.2.1: realReturns picker drives this line).
+  // Same starting capital as the bitcoin drawdown line (btcStack × trend
+  // price today), same DCA contributions pre-retirement, same nominal
+  // income withdrawals post-retirement. Grows at nominal = (1+real)(1+infl)−1.
+  // Returns an array of {x:year, y:usd|null} aligned with the bitcoin lines.
+  function projectTraditionalPortfolio(scenario, realReturnPct, inflationPct, startingCapital) {
+    var startYear = (new Date()).getFullYear();
+    var endYear = scenario.retirementYear + scenario.yearsInRetirement;
+    var realRate = realReturnPct / 100;
+    var infl = inflationPct / 100;
+    // Nominal compounding rate via Fisher equation
+    var nominalRate = (1 + realRate) * (1 + infl) - 1;
+
+    var balance = startingCapital;
+    var points = [];
+
+    for (var y = startYear; y <= endYear; y++) {
+      if (y < scenario.retirementYear) {
+        // Pre-retirement: balance compounds + DCA goes into the portfolio
+        // (mirrors the bitcoin DCA flow but into 60/40 instead of BTC)
+        var dcaAnnual = (scenario.monthlyDcaUSD || 0) * 12;
+        balance = balance * (1 + nominalRate) + dcaAnnual;
+        // Hide pre-retirement segment to match the drawdown line's null prefix —
+        // keeps tooltip-index alignment clean across all five datasets.
+        points.push({ x: y, y: null });
+      } else if (y === scenario.retirementYear) {
+        // Drawdown line begins here at the carried-forward balance
+        points.push({ x: y, y: balance });
+      } else {
+        // Post-retirement: compound, then withdraw target nominal income
+        var yearsFromToday = y - startYear;
+        var nominalIncome = scenario.targetIncomeUSD * Math.pow(1 + infl, yearsFromToday);
+        balance = balance * (1 + nominalRate) - nominalIncome;
+        if (balance <= 0) {
+          balance = 0;
+          points.push({ x: y, y: null });
+        } else {
+          points.push({ x: y, y: balance });
+        }
+      }
+    }
+    return points;
+  }
+
   // ─── Chart instance + render/update
   var chart = null;
   function renderChart() {
@@ -446,11 +491,18 @@
 
     var growth = window.ModelingAssumptions.get('btcGrowthModel');
     var inflation = window.ModelingAssumptions.get('inflation');
+    var realReturns = window.ModelingAssumptions.get('realReturns');
 
     var startYear = (new Date()).getFullYear();
     var endYear = SCENARIO.retirementYear + SCENARIO.yearsInRetirement;
     var bands = buildBands(startYear, endYear);
     var stack = projectStackOverTime(SCENARIO, growth.preset, inflation.value);
+
+    // Starting capital for the benchmark line: match the bitcoin drawdown
+    // line's anchor (btcStack × trend price today). Apples-to-apples comparison
+    // — both lines start at the same dollars.
+    var startingCapital = SCENARIO.btcStack * projPriceForGrowth(dateForYear(startYear), 'powerlaw-trend');
+    var benchmark = projectTraditionalPortfolio(SCENARIO, realReturns.value, inflation.value, startingCapital);
 
     // Update title to reflect the chart's actual time range
     var titleEl = document.getElementById('projectionTitle');
@@ -506,6 +558,23 @@
         fill: false,
         tension: 0.2,
         order: 2
+      },
+      // ─── Traditional 60/40 benchmark — dashed muted gray, supplementary ───
+      // Visually subordinate per design doc §9.2.1 ("for comparison only;
+      // not core to the calc's primary computation"). Same starting capital
+      // as the bitcoin drawdown above, so the two lines are directly
+      // comparable. Picks up the realReturns picker value (3% / 5% / 7%).
+      {
+        label: 'Traditional 60/40 (' + realReturns.value + '% real)',
+        data: benchmark,
+        type: 'line',
+        borderColor: 'rgba(160,150,135,0.7)',
+        borderWidth: 1.4,
+        borderDash: [5, 4],
+        pointRadius: 0,
+        fill: false,
+        tension: 0.2,
+        order: 6
       }
     ];
 
@@ -822,7 +891,7 @@
   // ─── Re-render chart when inflation or growth model changes
   if (window.ModelingAssumptions.subscribe) {
     window.ModelingAssumptions.subscribe(function(dim){
-      if (dim === 'inflation' || dim === 'btcGrowthModel' || dim === '*') {
+      if (dim === 'inflation' || dim === 'btcGrowthModel' || dim === 'realReturns' || dim === '*') {
         scheduleRender();
       }
     });

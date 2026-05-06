@@ -473,6 +473,12 @@ a.powerlaw-link:hover {
   width: 18px;
 }
 .swatch-stack { background: var(--ink-bright); opacity: 0.85; height: 2px; }
+.swatch-benchmark {
+  background: transparent;
+  height: 0;
+  border-top: 1.4px dashed rgba(160,150,135,0.7);
+  width: 18px;
+}
 
 .chart-wrapper {
   position: relative;
@@ -839,7 +845,14 @@ a.powerlaw-link:hover {
 }
 .spectrum-marker.escape {
   background: #f0b860;
-  box-shadow: 0 0 0 1px rgba(224,148,34,0.85), 0 0 14px rgba(240,184,96,0.55);
+  /* Layered halo — reads as "you've crossed the threshold" rather than just
+     "your marker is over here." Tight inner ring + medium glow + soft outer
+     halo. Honest about residual modeling uncertainty (no halo is loud) but
+     visually distinct from any in-the-spectrum marker treatment. */
+  box-shadow:
+    0 0 0 1.5px rgba(224,148,34,0.95),
+    0 0 18px rgba(240,184,96,0.75),
+    0 0 32px rgba(240,184,96,0.35);
 }
 .spectrum-labels {
   display: flex;
