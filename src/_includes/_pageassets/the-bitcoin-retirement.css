@@ -537,7 +537,6 @@ a.powerlaw-link:hover {
 .cluster-target {
   background: rgba(224,148,34,0.04);
   border: 1px solid rgba(224,148,34,0.18);
-  border-left: 3px solid var(--amber);
 }
 .cluster-means {
   background: rgba(0,0,0,0.18);
@@ -753,7 +752,6 @@ a.powerlaw-link:hover {
   padding: 1.25rem 1.4rem 1.4rem;
   background: rgba(224,148,34,0.04);
   border: 1px solid rgba(224,148,34,0.18);
-  border-left: 3px solid var(--amber);
   border-radius: 6px;
 }
 .sustainability-header {

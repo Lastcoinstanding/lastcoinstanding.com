@@ -564,7 +564,13 @@
     // Starting capital for the benchmark line: match the bitcoin drawdown
     // line's anchor (btcStack × trend price today). Apples-to-apples comparison
     // — both lines start at the same dollars.
-    var startingCapital = SCENARIO.btcStack * trendPriceToday;
+    // Benchmark "starting capital" = btcStack at LIVE market price, i.e.
+    // what you'd actually have if you sold today. Matches the
+    // current-trajectory line's starting point — both lines now share an
+    // honest "if you sold today" basis. Previously used trendPriceToday
+    // which inflated the benchmark by 1/currentRatio (~1.7x at 0.59x
+    // trend), making the 60/40 comparison artificially favourable.
+    var startingCapital = SCENARIO.btcStack * liveBtcPrice;
     var benchmark = projectTraditionalPortfolio(SCENARIO, realReturns.value, inflation.value, startingCapital);
 
     // Update title to reflect the chart's actual time range
