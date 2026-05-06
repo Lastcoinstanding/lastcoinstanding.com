@@ -431,7 +431,7 @@
         maintainAspectRatio: false,
         parsing: false,
         animation: { duration: 0 },
-        interaction: { intersect: false, mode: 'index' },
+        interaction: { intersect: false, mode: 'x' },
         layout: { padding: { top: 36, right: 8 } },
         scales: {
           x: {
