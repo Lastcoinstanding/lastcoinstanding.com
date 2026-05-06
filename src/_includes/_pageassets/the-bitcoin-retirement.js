@@ -210,6 +210,12 @@
   // CoinGecko fallback if live fetch fails (updated periodically)
   var LIVE_BTC_FALLBACK = 108000;
 
+  // Live BTC price — updated by updateStatusLine() once the CoinGecko fetch
+  // resolves. Used by renderChart() to anchor the "current trajectory" line
+  // (5th dataset on the chart). Initialised to the fallback so the line
+  // renders sensibly before the fetch completes.
+  var liveBtcPrice = LIVE_BTC_FALLBACK;
+
   function daysSince(date) {
     return (date.getTime() - GENESIS.getTime()) / (1000 * 60 * 60 * 24);
   }
@@ -273,11 +279,21 @@
   // Returns {points, btcPoints, depletionYear} where points is [{x:year, y:usdValue}]
   // and btcPoints is [{x:year, btc:count, usd:value}] used by the BTC-count
   // annotation plugin to label the drawdown line at anchor years.
-  function projectStackOverTime(scenario, growthModelKey, inflationPct) {
+  //
+  // Optional priceMultiplier: scales the price returned by the growth model
+  // (default 1.0). Used by the "current trajectory" line, which projects under
+  // the assumption that BTC stays at its current ratio to trend. Multiplying
+  // price scales both the dollar value of remaining stack AND how much BTC
+  // gets sold each year to cover the (unchanged) nominal income — so a stack
+  // priced below trend depletes faster, as it should.
+  function projectStackOverTime(scenario, growthModelKey, inflationPct, priceMultiplier) {
     var today = new Date();
     var startYear = today.getFullYear();
     var endYear = scenario.retirementYear + scenario.yearsInRetirement;
     var infl = inflationPct / 100;
+    var multiplier = (priceMultiplier === undefined || priceMultiplier === null || !isFinite(priceMultiplier))
+      ? 1
+      : priceMultiplier;
 
     var stackBtc = scenario.btcStack;
     var points = [];
@@ -286,7 +302,7 @@
 
     for (var y = startYear; y <= endYear; y++) {
       var d = dateForYear(y);
-      var price = projPriceForGrowth(d, growthModelKey);
+      var price = projPriceForGrowth(d, growthModelKey) * multiplier;
 
       if (y < scenario.retirementYear) {
         // Pre-retirement DCA accumulation. Simple year-end approximation:
@@ -498,10 +514,18 @@
     var bands = buildBands(startYear, endYear);
     var stack = projectStackOverTime(SCENARIO, growth.preset, inflation.value);
 
+    // Current-trajectory line: same projection, but with prices scaled by
+    // today's actual ratio to trend (i.e., assume BTC stays at this discount
+    // or premium). Anchored to the live BTC price, so the line starts at the
+    // user's actual mark-to-market stack value rather than the at-trend value.
+    var trendPriceToday = projPriceForGrowth(dateForYear(startYear), 'powerlaw-trend');
+    var currentRatio = (trendPriceToday > 0) ? (liveBtcPrice / trendPriceToday) : 1;
+    var currentTrajectory = projectStackOverTime(SCENARIO, 'powerlaw-trend', inflation.value, currentRatio);
+
     // Starting capital for the benchmark line: match the bitcoin drawdown
     // line's anchor (btcStack × trend price today). Apples-to-apples comparison
     // — both lines start at the same dollars.
-    var startingCapital = SCENARIO.btcStack * projPriceForGrowth(dateForYear(startYear), 'powerlaw-trend');
+    var startingCapital = SCENARIO.btcStack * trendPriceToday;
     var benchmark = projectTraditionalPortfolio(SCENARIO, realReturns.value, inflation.value, startingCapital);
 
     // Update title to reflect the chart's actual time range
@@ -558,6 +582,25 @@
         fill: false,
         tension: 0.2,
         order: 2
+      },
+      // ─── Current trajectory — same projection at today's actual ratio to
+      // trend, anchored to live BTC price. Sibling of the drawdown line: same
+      // ink-bright color family but dashed and dimmer to signal "this is the
+      // below-trend (or above-trend) view." Starts at the user's actual
+      // mark-to-market stack value today, addresses the apparent year-1
+      // discrepancy where the chart used to show stack at trend price even
+      // though BTC currently trades below trend.
+      {
+        label: 'Your stack (current trajectory, ' + currentRatio.toFixed(2) + '\u00d7 trend)',
+        data: currentTrajectory.points,
+        type: 'line',
+        borderColor: 'rgba(236,228,214,0.55)',
+        borderWidth: 1.5,
+        borderDash: [4, 3],
+        pointRadius: 0,
+        fill: false,
+        tension: 0.2,
+        order: 3
       },
       // ─── Traditional 60/40 benchmark — dashed muted gray, supplementary ───
       // Visually subordinate per design doc §9.2.1 ("for comparison only;
@@ -685,6 +728,10 @@
   //                  + dynamic percentile (where current price sits in
   //                  the historical distribution of trend ratios)
   function updateStatusLine(currentPrice, source) {
+    // Capture the live price for any module-level consumers (chart's
+    // current-trajectory line, etc.). Even if the page elements below are
+    // missing, downstream callers should still see the fresh value.
+    liveBtcPrice = currentPrice;
     var priceEl = document.getElementById('statusPrice');
     var ratioEl = document.getElementById('statusRatio');
     var pctEl = document.getElementById('statusPercentile');
@@ -708,8 +755,8 @@
   function fetchLiveBtcPrice() {
     fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', { cache: 'no-store' })
       .then(function(r){ return r.ok ? r.json() : Promise.reject(); })
-      .then(function(d){ updateStatusLine(d.bitcoin.usd, 'live'); })
-      .catch(function(){ updateStatusLine(LIVE_BTC_FALLBACK, 'fallback'); });
+      .then(function(d){ updateStatusLine(d.bitcoin.usd, 'live'); scheduleRender(); })
+      .catch(function(){ updateStatusLine(LIVE_BTC_FALLBACK, 'fallback'); scheduleRender(); });
   }
 
   // ─── Slider wiring + coupling

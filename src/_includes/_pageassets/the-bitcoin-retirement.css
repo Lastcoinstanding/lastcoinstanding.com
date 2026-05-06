@@ -473,6 +473,12 @@ a.powerlaw-link:hover {
   width: 18px;
 }
 .swatch-stack { background: var(--ink-bright); opacity: 0.85; height: 2px; }
+.swatch-current {
+  background: transparent;
+  height: 0;
+  border-top: 1.5px dashed rgba(236,228,214,0.55);
+  width: 18px;
+}
 .swatch-benchmark {
   background: transparent;
   height: 0;
