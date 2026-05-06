@@ -499,6 +499,45 @@
     return points;
   }
 
+  // ─── Plugin: bandFill — subtle amber tint between Floor (idx 0) and Upper
+  //     (idx 2) bands. Visually groups the three power-law lines as a
+  //     bounded channel, distinct from the portfolio-value lines (per user
+  //     feedback). Drawn before datasets so it sits behind every line.
+  var bandFillPlugin = {
+    id: 'bandFill',
+    beforeDatasetsDraw: function(chart) {
+      var floorMeta = chart.getDatasetMeta(0);
+      var upperMeta = chart.getDatasetMeta(2);
+      if (!floorMeta || !upperMeta) return;
+      var floorPts = floorMeta.data;
+      var upperPts = upperMeta.data;
+      if (!floorPts || !upperPts || floorPts.length === 0 || upperPts.length === 0) return;
+      if (floorMeta.hidden || upperMeta.hidden) return;
+
+      var ctx = chart.ctx;
+      var area = chart.chartArea;
+      ctx.save();
+      // Clip to chart area in case any path segment falls outside (e.g. with
+      // an explicit y-axis max that crops the upper band).
+      ctx.beginPath();
+      ctx.rect(area.left, area.top, area.right - area.left, area.bottom - area.top);
+      ctx.clip();
+
+      ctx.beginPath();
+      ctx.moveTo(floorPts[0].x, floorPts[0].y);
+      for (var i = 1; i < floorPts.length; i++) {
+        ctx.lineTo(floorPts[i].x, floorPts[i].y);
+      }
+      for (var j = upperPts.length - 1; j >= 0; j--) {
+        ctx.lineTo(upperPts[j].x, upperPts[j].y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(224,148,34,0.05)';
+      ctx.fill();
+      ctx.restore();
+    }
+  };
+
   // ─── Chart instance + render/update
   var chart = null;
   function renderChart() {
@@ -647,6 +686,30 @@
       4: currentTrajectory.btcPoints
     };
 
+    // Compute explicit y-axis bounds from actual data. Chart.js's log-scale
+    // auto-axis was producing inconsistent min values when the benchmark
+    // dataset's shape shifted at the depletion threshold (small target-income
+    // changes around the threshold caused the y-axis min to jump from $40K
+    // to $10M). Setting min/max explicitly bypasses that.
+    var yMinObs = Infinity, yMaxObs = -Infinity;
+    for (var di = 0; di < datasets.length; di++) {
+      var pts = datasets[di].data;
+      if (!pts) continue;
+      for (var pi = 0; pi < pts.length; pi++) {
+        var pt = pts[pi];
+        if (pt && isFinite(pt.y) && pt.y > 0) {
+          if (pt.y < yMinObs) yMinObs = pt.y;
+          if (pt.y > yMaxObs) yMaxObs = pt.y;
+        }
+      }
+    }
+    if (!isFinite(yMinObs) || !isFinite(yMaxObs)) {
+      yMinObs = 1000; yMaxObs = 1e9;
+    }
+    // Half-decade padding above and below so lines aren't pinned to the edge
+    var yMin = yMinObs * 0.5;
+    var yMax = yMaxObs * 2;
+
     if (chart) {
       chart.data.datasets = datasets;
       chart.options.plugins.verticalMarkers.lines = verticalLines;
@@ -655,6 +718,9 @@
       // Update x-axis range in case retirement-year or years-in-retirement changed
       chart.options.scales.x.min = startYear;
       chart.options.scales.x.max = endYear;
+      // Explicit y-axis bounds — stops Chart.js auto-scale from quirking
+      chart.options.scales.y.min = yMin;
+      chart.options.scales.y.max = yMax;
       // 'none' = no animation — snappy response during slider drag
       chart.update('none');
       return;
@@ -688,6 +754,8 @@
           y: {
             type: 'logarithmic',
             position: 'left',
+            min: yMin,
+            max: yMax,
             grid: { color: 'rgba(224,148,34,0.06)' },
             ticks: {
               color: '#7a7367',
@@ -761,7 +829,7 @@
           btcCountAnnotations: { anchors: btcAnchors }
         }
       },
-      plugins: [verticalLinePlugin, btcCountPlugin]
+      plugins: [bandFillPlugin, verticalLinePlugin, btcCountPlugin]
     });
     chart._btcDataByDataset = btcDataByDataset;
   }
