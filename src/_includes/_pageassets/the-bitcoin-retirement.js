@@ -262,13 +262,13 @@
       if (y < scenario.retirementYear) {
         // Pre-retirement DCA accumulation. Simple year-end approximation:
         // BTC added this year = 12 × monthly contribution / year-end trend price.
-        // (More precise: integrate over the year; for projection-chart purposes
-        // this approximation tracks the long-run DCA effect closely.)
         if (scenario.monthlyDcaUSD > 0 && price > 0) {
           stackBtc += (12 * scenario.monthlyDcaUSD) / price;
         }
-        // No drawdown line drawn pre-retirement — user "is" the chosen
-        // growth-model curve at btcStack (t).
+        // Push null so dataset length matches the band datasets — keeps index-mode
+        // interaction aligned across all four series. Chart.js renders null as a
+        // gap (no visible line pre-retirement, same as before).
+        points.push({ x: y, y: null });
       } else if (y === scenario.retirementYear) {
         // Drawdown line begins here, at the user's stack value at retirement
         // (after any accumulated DCA contributions).
@@ -431,7 +431,7 @@
         maintainAspectRatio: false,
         parsing: false,
         animation: { duration: 0 },
-        interaction: { intersect: false, mode: 'x' },
+        interaction: { intersect: false, mode: 'index' },
         layout: { padding: { top: 36, right: 8 } },
         scales: {
           x: {
@@ -473,6 +473,13 @@
             bodyColor: '#ccc6b8',
             padding: 10,
             displayColors: true,
+            filter: function(tooltipItem) {
+              // Skip rows with null y-value — the user-stack drawdown line is
+              // null pre-retirement (so the tooltip doesn't read "$0" before the
+              // drawdown actually begins).
+              var v = tooltipItem.parsed && tooltipItem.parsed.y;
+              return v !== null && v !== undefined && isFinite(v) && v > 0;
+            },
             callbacks: {
               title: function(items){ return items[0] && items[0].parsed ? 'Year ' + Math.round(items[0].parsed.x) : ''; },
               label: function(ctx){
