@@ -629,6 +629,59 @@
     return '$' + Math.round(v).toLocaleString();
   }
 
+  // ─── Escape velocity spectrum positioning (§9.2.6)
+  // Returns { position 0..1, achieved bool, detail string }.
+  // Left half (0..0.5): stack depletes; position scaled by yearsLasted/window.
+  // Right half (0.5..1.0): escape velocity; position scaled by tanh of the
+  // ratio of final-to-retirement real stack value (so a stack that grows in
+  // real terms sits further right than one that just survives).
+  function computeEscapeVelocity(proj, scenario, inflationPct) {
+    if (proj.depletionYear !== null) {
+      var depletedAt = Math.max(0, proj.depletionYear - scenario.retirementYear);
+      var pos = 0.5 * (depletedAt / Math.max(1, scenario.yearsInRetirement));
+      return {
+        position: Math.max(0.02, Math.min(0.50, pos)),
+        achieved: false,
+        detail: 'Stack depletes ' + depletedAt + ' year' + (depletedAt === 1 ? '' : 's') + ' into retirement at this withdrawal.'
+      };
+    }
+    // Escape velocity: stack survives the projection window.
+    // Compare real final stack value to real stack-at-retirement.
+    var startYear = (new Date()).getFullYear();
+    var infl = inflationPct / 100;
+    var firstPoint = null;
+    for (var i = 0; i < proj.points.length; i++) {
+      if (proj.points[i].y !== null && proj.points[i].y > 0) { firstPoint = proj.points[i]; break; }
+    }
+    var lastPoint = proj.points[proj.points.length - 1];
+    if (!firstPoint || !lastPoint || lastPoint.y === null || lastPoint.y <= 0) {
+      return { position: 0.55, achieved: true, detail: 'Stack survives the projection window.' };
+    }
+    var realFirst = firstPoint.y / Math.pow(1 + infl, firstPoint.x - startYear);
+    var realLast  = lastPoint.y  / Math.pow(1 + infl, lastPoint.x  - startYear);
+    var ratio = realLast / realFirst;
+    var pos = 0.5 + 0.5 * (Math.tanh(Math.log(Math.max(0.05, ratio))) + 1) / 2;
+    var detail;
+    if (ratio >= 1.05) {
+      detail = 'Stack grows ' + ratio.toFixed(1) + '\u00d7 in real terms over the window \u2014 comfortably above escape velocity.';
+    } else if (ratio >= 0.85) {
+      detail = 'Stack roughly maintains real value through the window \u2014 right at escape velocity.';
+    } else {
+      detail = 'Stack survives the window but loses some real value (' + (ratio * 100).toFixed(0) + '% of starting real value at the end).';
+    }
+    return { position: Math.min(0.98, Math.max(0.52, pos)), achieved: true, detail: detail };
+  }
+
+  function updateSpectrum(proj, scenario, inflationPct) {
+    var marker = document.getElementById('spectrumMarker');
+    var detailEl = document.getElementById('spectrumDetail');
+    if (!marker || !detailEl) return;
+    var ev = computeEscapeVelocity(proj, scenario, inflationPct);
+    marker.style.left = (ev.position * 100).toFixed(2) + '%';
+    marker.classList.toggle('escape', ev.achieved);
+    detailEl.textContent = ev.detail;
+  }
+
   function updateSustainability() {
     var growthModel = window.ModelingAssumptions.get('btcGrowthModel');
     var inflation = window.ModelingAssumptions.get('inflation');
@@ -648,6 +701,8 @@
     }
     var stackEl = document.getElementById('sustStackValue');
     if (stackEl) stackEl.textContent = formatCurrencyShort(stackReal);
+
+    updateSpectrum(proj, SCENARIO, inflation.value);
   }
 
   var renderRaf = null;
