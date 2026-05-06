@@ -580,7 +580,8 @@ a.powerlaw-link:hover {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 0.6rem;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.6rem;
 }
 .slider-name {
   font-size: 0.95rem;
