@@ -106,10 +106,10 @@ eleventyComputed:
         </div>
       </div>
 
-      <!-- MEANS CLUSTER (standard register — how you get there) -->
+      <!-- INPUTS CLUSTER (standard register — how you get there) -->
       <div class="slider-cluster cluster-means">
         <div class="cluster-label">
-          <span class="cluster-label-main">Means</span>
+          <span class="cluster-label-main">Inputs</span>
           <span class="cluster-label-help">&mdash; how you get there; the parameters you control</span>
         </div>
         <div class="slider-grid grid-means">
@@ -158,7 +158,7 @@ eleventyComputed:
       </div>
     </div>
 
-    <!-- SUSTAINABILITY READOUT — §9.2.7 (values only; spectrum bar lands in 4.3) -->
+    <!-- SUSTAINABILITY READOUT — §9.2.7 -->
     <div class="sustainability" id="sustainabilityCard">
       <div class="sustainability-header">
         <span class="sustainability-label">Sustainability</span>
@@ -175,10 +175,20 @@ eleventyComputed:
           <div class="value-display" id="sustStackValue">&mdash;</div>
         </div>
       </div>
-    </div>
 
-    <div class="construction-note">
-      <p><strong>Escape velocity spectrum bar follows in commit 4.3.</strong> The bar will visualize the continuum from depletion (left) to escape velocity (right), with a marker showing where your current scenario sits. The &ldquo;&infin; &mdash; escape velocity&rdquo; readout above is the right-end of that same spectrum.</p>
+      <!-- ESCAPE VELOCITY SPECTRUM BAR — §9.2.6 -->
+      <div class="sustainability-spectrum">
+        <div class="spectrum-track" id="spectrumTrack">
+          <div class="spectrum-threshold-tick"></div>
+          <div class="spectrum-marker" id="spectrumMarker" style="left: 50%"></div>
+        </div>
+        <div class="spectrum-labels">
+          <span class="spectrum-label-left">Depleting</span>
+          <span class="spectrum-label-mid">Threshold</span>
+          <span class="spectrum-label-right">Escape velocity</span>
+        </div>
+        <div class="spectrum-detail" id="spectrumDetail">&mdash;</div>
+      </div>
     </div>
 
     <!-- BASELINE ASSUMPTIONS — bordered cluster, expanded by default,
