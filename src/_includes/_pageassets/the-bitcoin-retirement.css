@@ -394,9 +394,9 @@ a.powerlaw-link:hover {
 /* ─── Chart status line (just above the chart) ─── */
 .chart-status-line {
   display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.6rem 1.25rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.45rem;
   padding: 0.85rem 1.1rem;
   margin-top: 0.5rem;
   background: rgba(0,0,0,0.20);
@@ -407,14 +407,14 @@ a.powerlaw-link:hover {
   color: var(--ink-dim);
   line-height: 1.6;
 }
-.chart-status-line .status-prose { flex: 1; min-width: 18em; }
+.chart-status-line .status-prose { display: block; }
 .chart-status-line strong { color: var(--ink-bright); font-weight: 500; }
 .chart-status-line a.powerlaw-link {
+  align-self: flex-end;
   margin-top: 0;
   margin-left: 0;
   font-size: 0.85rem;
   white-space: nowrap;
-  flex-shrink: 0;
 }
 
 /* ─── Projection container ─── */
@@ -445,8 +445,8 @@ a.powerlaw-link:hover {
   line-height: 1.25;
 }
 .projection-legend {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem 1rem;
   font-size: 0.85rem;
   color: var(--ink-dim);
@@ -481,7 +481,7 @@ a.powerlaw-link:hover {
   .projection { padding: 0.95rem 0.9rem 1.1rem; }
   .projection-title { font-size: 1.15rem; }
   .projection-header { flex-direction: column; align-items: flex-start; }
-  .projection-legend { width: 100%; font-size: 0.78rem; }
+  .projection-legend { width: 100%; font-size: 0.78rem; grid-template-columns: 1fr 1fr; }
   .chart-wrapper { height: 320px; }
 }
 
