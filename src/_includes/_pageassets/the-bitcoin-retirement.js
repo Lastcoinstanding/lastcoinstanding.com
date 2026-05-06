@@ -224,14 +224,48 @@
 
   // ─── Scenario state — mutable, drives all chart math
   //                 Sliders update this object; chart reads from it.
-  //                 (Withdrawal rate slider added in commit 4.2 with Sustainability readout.)
   var SCENARIO = {
     btcStack: 1.0,
     targetIncomeUSD: 100000,
     retirementYear: 2045,
     yearsInRetirement: 30,
-    monthlyDcaUSD: 0
+    monthlyDcaUSD: 0,
+    withdrawalRatePct: 6.0
   };
+
+  // ─── Growth-model price helper — shared by stack-projection + sustainability math
+  function projPriceForGrowth(date, growthModelKey) {
+    var trend = plPriceAtDate(date);
+    if (growthModelKey === 'powerlaw-floor') return trend * PL_FLOOR;
+    // 'powerlaw-trend' (default) and 'linear-cagr-decay' both use trend until commit 7
+    return trend;
+  }
+
+  // ─── Stack value at retirement (after pre-retirement DCA accumulation)
+  // Returns nominal value in retirement-year dollars.
+  function computeStackAtRetirement(scenario, growthModelKey) {
+    var startYear = (new Date()).getFullYear();
+    var stack = scenario.btcStack;
+    for (var y = startYear; y < scenario.retirementYear; y++) {
+      var d = dateForYear(y);
+      var price = projPriceForGrowth(d, growthModelKey);
+      if (scenario.monthlyDcaUSD > 0 && price > 0) {
+        stack += (12 * scenario.monthlyDcaUSD) / price;
+      }
+    }
+    var retDate = dateForYear(scenario.retirementYear);
+    var retPrice = projPriceForGrowth(retDate, growthModelKey);
+    return { stackBtc: stack, retPrice: retPrice, nominal: stack * retPrice };
+  }
+
+  // ─── Real (today's $) stack value at retirement
+  function realStackAtRetirement(scenario, growthModelKey, inflationPct) {
+    var info = computeStackAtRetirement(scenario, growthModelKey);
+    var startYear = (new Date()).getFullYear();
+    var yearsToRet = scenario.retirementYear - startYear;
+    var deflator = Math.pow(1 + inflationPct / 100, yearsToRet);
+    return info.nominal / deflator;
+  }
 
   // ─── Project user's stack value year-by-year under sell-as-needed
   // Pre-retirement: BTC count grows via DCA accumulation (12 × monthly / yearly trend price).
@@ -247,17 +281,9 @@
     var points = [];
     var depletionYear = null;
 
-    // Choose which growth-model trajectory drives the value-projection math.
-    function projPrice(date) {
-      var trend = plPriceAtDate(date);
-      if (growthModelKey === 'powerlaw-floor') return trend * PL_FLOOR;
-      // 'powerlaw-trend' (default) and 'linear-cagr-decay' both use trend in commit 3
-      return trend;
-    }
-
     for (var y = startYear; y <= endYear; y++) {
       var d = dateForYear(y);
-      var price = projPrice(d);
+      var price = projPriceForGrowth(d, growthModelKey);
 
       if (y < scenario.retirementYear) {
         // Pre-retirement DCA accumulation. Simple year-end approximation:
@@ -533,16 +559,96 @@
       .catch(function(){ updateStatusLine(LIVE_BTC_FALLBACK, 'fallback'); });
   }
 
-  // ─── Slider wiring — drag any slider, watch the chart move
-  //     rAF coalescing: update at most once per frame regardless of how many
-  //     'input' events fire during a drag. Snappy + no flicker.
+  // ─── Slider wiring + coupling
+  //     §9.2.5: "as you move one [slider], the others update to stay
+  //     mathematically consistent." The income/rate pair is kept consistent
+  //     with stackValueAtRetirement (today's $) via:
+  //         targetIncome ≈ (withdrawalRate / 100) × stackValueRealAtRet
+  //
+  //     'updates' tag controls which coupled slider gets adjusted on drag:
+  //       'rate'   → income held; rate recomputed from new stack
+  //       'income' → rate held;   income recomputed
+  //       null     → no coupling (yearsInRetirement only affects depletion)
   var SLIDER_CONFIG = [
-    { key: 'targetIncomeUSD',   parse: parseInt,   fmt: function(v){ return '$' + Math.round(v).toLocaleString(); } },
-    { key: 'retirementYear',    parse: parseInt,   fmt: function(v){ return String(v); } },
-    { key: 'btcStack',          parse: parseFloat, fmt: function(v){ return v.toFixed(1) + ' BTC'; } },
-    { key: 'monthlyDcaUSD',     parse: parseInt,   fmt: function(v){ return '$' + Math.round(v).toLocaleString() + '/mo'; } },
-    { key: 'yearsInRetirement', parse: parseInt,   fmt: function(v){ return v + ' yrs'; } }
+    { key: 'targetIncomeUSD',   parse: parseInt,   fmt: function(v){ return '$' + Math.round(v).toLocaleString(); }, updates: 'rate',   min: 20000, max: 500000 },
+    { key: 'retirementYear',    parse: parseInt,   fmt: function(v){ return String(v); },                            updates: 'rate',   min: 2030,  max: 2070 },
+    { key: 'btcStack',          parse: parseFloat, fmt: function(v){ return v.toFixed(1) + ' BTC'; },                updates: 'rate',   min: 0,     max: 50 },
+    { key: 'withdrawalRatePct', parse: parseFloat, fmt: function(v){ return v.toFixed(1) + '%'; },                   updates: 'income', min: 2,     max: 15 },
+    { key: 'monthlyDcaUSD',     parse: parseInt,   fmt: function(v){ return '$' + Math.round(v).toLocaleString() + '/mo'; }, updates: 'rate', min: 0, max: 5000 },
+    { key: 'yearsInRetirement', parse: parseInt,   fmt: function(v){ return v + ' yrs'; },                           updates: null,     min: 10,    max: 50 }
   ];
+  var SLIDER_BY_KEY = {};
+  SLIDER_CONFIG.forEach(function(c){ SLIDER_BY_KEY[c.key] = c; });
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  // Update both the slider input (thumb position) and the value-display
+  // for a given key. Used when coupling adjusts a slider programmatically.
+  function syncSliderUI(key) {
+    var cfg = SLIDER_BY_KEY[key];
+    if (!cfg) return;
+    var input = document.getElementById('slider-' + key);
+    var valEl = document.getElementById('val-' + key);
+    if (!input || !valEl) return;
+    input.value = SCENARIO[key];
+    valEl.textContent = cfg.fmt(SCENARIO[key]);
+  }
+
+  function recomputeCoupledFromIncomeOrMeans() {
+    // Income held; rate derived from current stack value
+    var growthModel = window.ModelingAssumptions.get('btcGrowthModel');
+    var inflation = window.ModelingAssumptions.get('inflation');
+    var stackReal = realStackAtRetirement(SCENARIO, growthModel.preset, inflation.value);
+    if (stackReal > 0) {
+      var newRate = (SCENARIO.targetIncomeUSD / stackReal) * 100;
+      var rateCfg = SLIDER_BY_KEY.withdrawalRatePct;
+      SCENARIO.withdrawalRatePct = clamp(newRate, rateCfg.min, rateCfg.max);
+    }
+    syncSliderUI('withdrawalRatePct');
+  }
+
+  function recomputeCoupledFromRate() {
+    // Rate held; income derived from current stack value
+    var growthModel = window.ModelingAssumptions.get('btcGrowthModel');
+    var inflation = window.ModelingAssumptions.get('inflation');
+    var stackReal = realStackAtRetirement(SCENARIO, growthModel.preset, inflation.value);
+    if (stackReal > 0) {
+      var newIncome = (SCENARIO.withdrawalRatePct / 100) * stackReal;
+      var incomeCfg = SLIDER_BY_KEY.targetIncomeUSD;
+      SCENARIO.targetIncomeUSD = clamp(newIncome, incomeCfg.min, incomeCfg.max);
+    }
+    syncSliderUI('targetIncomeUSD');
+  }
+
+  // ─── Sustainability readout — Years stack lasts + Stack value at retirement
+  function formatCurrencyShort(v) {
+    if (!isFinite(v) || v <= 0) return '$0';
+    if (v >= 1e9) return '$' + (v/1e9).toFixed(2) + 'B';
+    if (v >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
+    if (v >= 1e3) return '$' + Math.round(v/1e3) + 'K';
+    return '$' + Math.round(v).toLocaleString();
+  }
+
+  function updateSustainability() {
+    var growthModel = window.ModelingAssumptions.get('btcGrowthModel');
+    var inflation = window.ModelingAssumptions.get('inflation');
+    var stackReal = realStackAtRetirement(SCENARIO, growthModel.preset, inflation.value);
+    var proj = projectStackOverTime(SCENARIO, growthModel.preset, inflation.value);
+
+    var yearsEl = document.getElementById('sustYearsLast');
+    if (yearsEl) {
+      if (proj.depletionYear) {
+        var n = proj.depletionYear - SCENARIO.retirementYear;
+        yearsEl.textContent = '~' + n + (n === 1 ? ' year' : ' years');
+        yearsEl.classList.remove('escape-velocity');
+      } else {
+        yearsEl.textContent = '\u221E \u2014 escape velocity';
+        yearsEl.classList.add('escape-velocity');
+      }
+    }
+    var stackEl = document.getElementById('sustStackValue');
+    if (stackEl) stackEl.textContent = formatCurrencyShort(stackReal);
+  }
 
   var renderRaf = null;
   function scheduleRender() {
@@ -550,6 +656,7 @@
     renderRaf = requestAnimationFrame(function(){
       renderRaf = null;
       renderChart();
+      updateSustainability();
     });
   }
 
@@ -561,11 +668,13 @@
       // Sync initial display from SCENARIO state
       input.value = SCENARIO[cfg.key];
       valEl.textContent = cfg.fmt(SCENARIO[cfg.key]);
-      // 'input' fires during drag (continuous); 'change' fires on release
       input.addEventListener('input', function(){
         var v = cfg.parse(input.value);
         SCENARIO[cfg.key] = v;
         valEl.textContent = cfg.fmt(v);
+        // Coupling: update the partner slider (income↔rate)
+        if (cfg.updates === 'rate') recomputeCoupledFromIncomeOrMeans();
+        else if (cfg.updates === 'income') recomputeCoupledFromRate();
         scheduleRender();
       });
     });
@@ -582,6 +691,10 @@
 
   // ─── Initial run
   wireSliders();
+  // Reconcile defaults: income held; derive withdrawal rate from current
+  // stack-at-retirement so the visible values are internally consistent.
+  recomputeCoupledFromIncomeOrMeans();
   renderChart();
+  updateSustainability();
   fetchLiveBtcPrice();
 })();

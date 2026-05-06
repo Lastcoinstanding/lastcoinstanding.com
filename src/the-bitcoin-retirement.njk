@@ -124,6 +124,16 @@ eleventyComputed:
             <input type="range" id="slider-btcStack" min="0" max="50" step="0.1" value="1" aria-label="Bitcoin stack">
           </div>
 
+          <div class="slider-control" data-key="withdrawalRatePct">
+            <div class="slider-row">
+              <span class="slider-name">Withdrawal rate
+                <span class="help-tip" tabindex="0">?<span class="tip-content">Effective annual withdrawal as a percentage of your stack at retirement (in today&rsquo;s dollars). Coupled with target income: drag this and target income adjusts; drag target income and this adjusts.</span></span>
+              </span>
+              <span class="slider-val" id="val-withdrawalRatePct">6.0%</span>
+            </div>
+            <input type="range" id="slider-withdrawalRatePct" min="2" max="15" step="0.1" value="6" aria-label="Withdrawal rate">
+          </div>
+
           <div class="slider-control" data-key="monthlyDcaUSD">
             <div class="slider-row">
               <span class="slider-name">Monthly DCA
@@ -148,8 +158,27 @@ eleventyComputed:
       </div>
     </div>
 
+    <!-- SUSTAINABILITY READOUT — §9.2.7 (values only; spectrum bar lands in 4.3) -->
+    <div class="sustainability" id="sustainabilityCard">
+      <div class="sustainability-header">
+        <span class="sustainability-label">Sustainability</span>
+      </div>
+      <div class="sustainability-values">
+        <div class="value-block">
+          <div class="value-label">Years stack lasts</div>
+          <div class="value-display" id="sustYearsLast">&mdash;</div>
+        </div>
+        <div class="value-block">
+          <div class="value-label">Stack value at retirement
+            <span class="help-tip" tabindex="0">?<span class="tip-content">In today&rsquo;s dollars (inflation-adjusted), the projected value of your stack the moment retirement begins &mdash; before drawdown.</span></span>
+          </div>
+          <div class="value-display" id="sustStackValue">&mdash;</div>
+        </div>
+      </div>
+    </div>
+
     <div class="construction-note">
-      <p><strong>Withdrawal rate slider + Sustainability readout follow in commit 4.2.</strong> The readout will surface Years stack lasts, Stack value at retirement, and an escape-velocity spectrum bar &mdash; with the withdrawal-rate slider gaining its proper meaning alongside it.</p>
+      <p><strong>Escape velocity spectrum bar follows in commit 4.3.</strong> The bar will visualize the continuum from depletion (left) to escape velocity (right), with a marker showing where your current scenario sits. The &ldquo;&infin; &mdash; escape velocity&rdquo; readout above is the right-end of that same spectrum.</p>
     </div>
 
     <!-- BASELINE ASSUMPTIONS — bordered cluster, expanded by default,
