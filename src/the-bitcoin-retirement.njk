@@ -57,10 +57,12 @@ eleventyComputed:
       <div class="projection-header">
         <span class="projection-title" id="projectionTitle">Projected stack value</span>
         <div class="projection-legend">
+          <div class="legend-group-label">Bitcoin price &mdash; per bitcoin</div>
           <div class="legend-item"><span class="swatch swatch-trend"></span>Trend (central case)</div>
           <div class="legend-item"><span class="swatch swatch-floor"></span>Floor band (conservative anchor)</div>
           <div class="legend-item"><span class="swatch swatch-upper"></span>Upper band (spikes)</div>
-          <div class="legend-item"><span class="swatch swatch-stack"></span>Your stack (drawdown)</div>
+          <div class="legend-group-label">Portfolio value &mdash; total stack</div>
+          <div class="legend-item"><span class="swatch swatch-stack"></span>Your stack (drawdown strategy)</div>
           <div class="legend-item"><span class="swatch swatch-current"></span>Your stack (current trajectory)</div>
           <div class="legend-item"><span class="swatch swatch-benchmark"></span>Traditional 60/40 (same starting capital)</div>
         </div>
@@ -185,11 +187,14 @@ eleventyComputed:
           <div class="spectrum-marker" id="spectrumMarker" style="left: 50%"></div>
         </div>
         <div class="spectrum-labels">
-          <span class="spectrum-label-left">Depleting</span>
-          <span class="spectrum-label-mid">Threshold</span>
-          <span class="spectrum-label-right">Escape velocity</span>
+          <span class="spectrum-label-left">Depleting<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack runs out before retirement ends. You&rsquo;d need to extend the horizon, lower target income, or raise the stack to reach sustainability.</span></span></span>
+          <span class="spectrum-label-mid">Threshold<span class="help-tip" tabindex="0">?<span class="tip-content">Break-even &mdash; the stack lasts exactly through retirement, neither growing nor depleting in real terms.</span></span></span>
+          <span class="spectrum-label-right">Escape velocity<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack grows faster than you draw it down. Purchasing power increases over retirement instead of being consumed; the stack lasts indefinitely.</span></span></span>
         </div>
-        <div class="spectrum-detail" id="spectrumDetail">&mdash;</div>
+        <div class="spectrum-detail-wrap">
+          <span class="spectrum-detail" id="spectrumDetail">&mdash;</span>
+          <span class="help-tip spectrum-detail-tip" tabindex="0">?<span class="tip-content">In today&rsquo;s dollars (inflation-adjusted). The multiplier compares your stack value at the END of retirement to its value at the START, after stripping out inflation. Above 1&times; means you finish wealthier than you started.</span></span>
+        </div>
       </div>
     </div>
 

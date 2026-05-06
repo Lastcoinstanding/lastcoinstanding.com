@@ -576,7 +576,7 @@
       },
       // ─── User's stack drawdown — solid white-ish, primary visual weight ───
       {
-        label: 'Your stack (drawdown)',
+        label: 'Your stack (drawdown strategy)',
         data: stack.points,
         type: 'line',
         borderColor: '#ece4d6',
@@ -637,10 +637,21 @@
 
     var btcAnchors = pickBtcAnchors(SCENARIO.retirementYear, SCENARIO.yearsInRetirement, stack.depletionYear, stack.btcPoints);
 
+    // Index map for the tooltip callback: which datasets have associated
+    // BTC counts that vary by year. Drawdown (index 3) and current
+    // trajectory (index 4) — the user-stack lines — both have btcPoints
+    // arrays where each entry is {x: year, btc: count, usd: value}. The
+    // tooltip uses this to append "(N.NN BTC)" to those rows.
+    var btcDataByDataset = {
+      3: stack.btcPoints,
+      4: currentTrajectory.btcPoints
+    };
+
     if (chart) {
       chart.data.datasets = datasets;
       chart.options.plugins.verticalMarkers.lines = verticalLines;
       chart.options.plugins.btcCountAnnotations.anchors = btcAnchors;
+      chart._btcDataByDataset = btcDataByDataset;
       // Update x-axis range in case retirement-year or years-in-retirement changed
       chart.options.scales.x.min = startYear;
       chart.options.scales.x.max = endYear;
@@ -718,6 +729,30 @@
                 else if (v >= 1e6) formatted = '$' + (v/1e6).toFixed(2) + 'M';
                 else if (v >= 1e3) formatted = '$' + (v/1e3).toFixed(0) + 'K';
                 else formatted = '$' + v.toFixed(0);
+                // Index 0 = Floor, 1 = Trend, 2 = Upper — these are
+                // per-bitcoin price lines. Suffix "(per BTC)" makes that
+                // explicit so the user doesn't conflate them with stack
+                // values, especially deep in time when numbers grow large.
+                var i = ctx.datasetIndex;
+                if (i === 0 || i === 1 || i === 2) {
+                  formatted += ' (per BTC)';
+                } else if (i === 3 || i === 4) {
+                  // Stack lines — look up BTC count for this year.
+                  // Drawdown (3) and current trajectory (4) hold different
+                  // BTC counts at the same year because the price multiplier
+                  // differs, so showing both is informative.
+                  var btcMap = ctx.chart && ctx.chart._btcDataByDataset;
+                  if (btcMap && btcMap[i]) {
+                    var year = Math.round(ctx.parsed.x);
+                    var pts = btcMap[i];
+                    for (var j = 0; j < pts.length; j++) {
+                      if (Math.round(pts[j].x) === year && isFinite(pts[j].btc)) {
+                        formatted += ' (' + pts[j].btc.toFixed(2) + ' BTC)';
+                        break;
+                      }
+                    }
+                  }
+                }
                 return label + ': ' + formatted;
               }
             }
@@ -728,6 +763,7 @@
       },
       plugins: [verticalLinePlugin, btcCountPlugin]
     });
+    chart._btcDataByDataset = btcDataByDataset;
   }
 
   // ─── Status line: live BTC price + ratio to today's Power Law trend
@@ -880,11 +916,13 @@
 
   function updateSpectrum(proj, scenario, inflationPct) {
     var marker = document.getElementById('spectrumMarker');
+    var track = document.getElementById('spectrumTrack');
     var detailEl = document.getElementById('spectrumDetail');
     if (!marker || !detailEl) return;
     var ev = computeEscapeVelocity(proj, scenario, inflationPct);
     marker.style.left = (ev.position * 100).toFixed(2) + '%';
     marker.classList.toggle('escape', ev.achieved);
+    if (track) track.classList.toggle('escape', ev.achieved);
     detailEl.textContent = ev.detail;
   }
 
