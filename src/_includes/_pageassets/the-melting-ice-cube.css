@@ -99,7 +99,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   padding:0 6px;
 }
 /* Fiat expansion schedule card — mirrors Bitcoin epoch card, red theme */
-.mini-stat.ms-fiat-epoch{border-left:3px solid var(--red)}
+.mini-stat.ms-fiat-epoch{}
 .ms-fiat-epoch .ms-label{color:var(--red)}
 .ms-fiat-epoch .ms-big{color:#e8aaaa}
 .ms-tbd{font-size:1.5rem;letter-spacing:.04em}
@@ -125,8 +125,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .panels-row{display:grid;grid-template-columns:1fr 40px 1fr;gap:0;align-items:center;margin-bottom:28px}
 @media(max-width:640px){.panels-row{grid-template-columns:1fr}.vs-col{display:none}}
 .vis-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:20px 16px 16px;text-align:center}
-.vis-panel.vp-cash{border-top:3px solid var(--blue)}
-.vis-panel.vp-btc{border-top:3px solid var(--orange)}
+.vis-panel.vp-cash{}
+.vis-panel.vp-btc{}
 .vp-label{font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin-bottom:2px}
 .vp-cash .vp-label{color:var(--blue)}.vp-btc .vp-label{color:var(--orange)}
 .vp-name{font-family:var(--font-d);font-size:1.05rem;font-weight:500;color:var(--text-bright);margin-bottom:4px}
@@ -155,9 +155,9 @@ input[type="range"]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;b
 .stat-trio{display:grid;grid-template-columns:1fr 40px 1fr;gap:10px;margin:20px 0 28px}
 @media(max-width:600px){.stat-trio{grid-template-columns:1fr}}
 .stat-card{padding:16px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px}
-.stat-card.sc-cash{border-left:3px solid var(--blue)}
-.stat-card.sc-hl{border-left:3px solid var(--red)}
-.stat-card.sc-btc{border-left:3px solid var(--orange)}
+.stat-card.sc-cash{}
+.stat-card.sc-hl{}
+.stat-card.sc-btc{}
 .sc-label{font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px}
 .sc-cash .sc-label{color:var(--blue)}.sc-hl .sc-label{color:var(--red)}.sc-btc .sc-label{color:var(--orange)}
 .sc-big{font-family:var(--font-d);font-size:1.7rem;font-weight:600;line-height:1;margin-bottom:3px}
@@ -196,7 +196,7 @@ input[type="range"]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;b
 }
 .btc-zero-box{display:inline-flex;align-items:center;gap:10px;padding:6px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:4px;cursor:default;opacity:.65}
 .btc-zero-pct{font-family:var(--font-b);font-size:.78rem;font-weight:600;color:var(--text-muted);letter-spacing:.04em}
-.mini-stat.ms-btc-hl{border-left:3px solid var(--orange)}
+.mini-stat.ms-btc-hl{}
 .ms-btc-hl .ms-label{color:var(--orange)}
 .ms-btc-hl .ms-big{color:var(--orange)}
 .ms-inf{font-size:2rem;letter-spacing:-.02em}
@@ -207,8 +207,8 @@ input[type="range"]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;b
 .mini-stat-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
 @media(max-width:580px){.mini-stat-pair{grid-template-columns:1fr}}
 .mini-stat{padding:14px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px}
-.mini-stat.ms-cash{border-left:3px solid var(--red)}
-.mini-stat.ms-btc{border-left:3px solid var(--orange)}
+.mini-stat.ms-cash{}
+.mini-stat.ms-btc{}
 .ms-label{font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px}
 .ms-cash .ms-label{color:var(--red)}.ms-btc .ms-label{color:var(--orange)}
 .ms-big{font-family:var(--font-d);font-size:1.5rem;font-weight:600;line-height:1;margin-bottom:3px}
@@ -336,4 +336,5 @@ footer{text-align:center;padding:32px 24px;color:var(--text-muted);font-size:.88
 
 /* Dropdown nav: structure inherited from canonical-nav-css; active accent matches calc-tier var(--orange) palette */
 .nav-dropdown-menu a.active { color: var(--orange); background: rgba(247,147,26,0.08); font-weight: 600; }
+
 

@@ -154,9 +154,9 @@ canvas#decayChart{width:100%!important;height:100%!important}
 .supply-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0}
 @media(max-width:700px){.supply-grid{grid-template-columns:1fr;gap:12px}}
 .supply-card{padding:22px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;gap:12px}
-.supply-card.sp-fiat{border-top:3px solid var(--red)}
-.supply-card.sp-gold{border-top:3px solid var(--gold)}
-.supply-card.sp-btc{border-top:3px solid var(--orange)}
+.supply-card.sp-fiat{}
+.supply-card.sp-gold{}
+.supply-card.sp-btc{}
 .sp-header{display:flex;justify-content:space-between;align-items:baseline}
 .sp-label{font-size:.7rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
 .sp-fiat .sp-label{color:var(--red)}.sp-gold .sp-label{color:var(--gold)}.sp-btc .sp-label{color:var(--orange)}
@@ -181,4 +181,5 @@ canvas#decayChart{width:100%!important;height:100%!important}
 
 /* Dropdown nav: structure inherited from canonical-nav-css; active accent matches calc-tier var(--orange) palette */
 .nav-dropdown-menu a.active { color: var(--orange); background: rgba(247,147,26,0.08); font-weight: 600; }
+
 
