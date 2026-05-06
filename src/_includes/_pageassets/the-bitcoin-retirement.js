@@ -132,6 +132,38 @@
     });
   }
 
+  // ─── Account type toggle — documentary v1 (no math impact, contextual only)
+  function bindAccountType() {
+    var grid = document.querySelector('.picker-account');
+    var note = document.getElementById('accountTypeNote');
+    if (!grid || !note) return;
+    var STORAGE_KEY = 'lcs_acctType';
+    var NOTES = {
+      regular:    '<strong>Regular account.</strong> Each sell is a taxable event; long-term capital gains rates apply for holdings longer than one year. <em>v1 projections are pretax.</em>',
+      retirement: '<strong>Retirement account.</strong> No taxable events on internal sells. Withdrawals are taxed as ordinary income (Traditional IRA / 401k) or untaxed if qualified (Roth). <em>v1 projections are pretax.</em>'
+    };
+    function apply(state) {
+      var cards = grid.querySelectorAll('.picker-card');
+      cards.forEach(function(c){
+        var match = c.dataset.account === state;
+        c.classList.toggle('active', match);
+        c.setAttribute('aria-pressed', match ? 'true' : 'false');
+      });
+      note.innerHTML = NOTES[state] || NOTES.regular;
+      note.dataset.state = state;
+      try { localStorage.setItem(STORAGE_KEY, state); } catch(e) {}
+    }
+    var initial = 'regular';
+    try { var stored = localStorage.getItem(STORAGE_KEY); if (stored === 'retirement' || stored === 'regular') initial = stored; } catch(e) {}
+    apply(initial);
+    grid.addEventListener('click', function(e){
+      var card = e.target.closest('.picker-card');
+      if (!card || !grid.contains(card)) return;
+      var state = card.dataset.account;
+      if (state === 'regular' || state === 'retirement') apply(state);
+    });
+  }
+
   // ─── Hide / Show baseline cluster body, with localStorage persistence
   function bindHideToggle() {
     var cluster = document.getElementById('baselineCluster');
@@ -185,6 +217,7 @@
   bindCustomInflationInput();
   bindHideToggle();
   bindResetLink();
+  bindAccountType();
 })();
 
 /* ════════════════════════════════════════════════════════════════

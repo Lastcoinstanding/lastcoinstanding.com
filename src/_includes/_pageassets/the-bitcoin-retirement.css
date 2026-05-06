@@ -283,6 +283,39 @@ a.powerlaw-link:hover {
   border-bottom-color: var(--amber);
 }
 
+/* ─── Account Type section — documentary v1 toggle, sits between
+       Sustainability and Baseline assumptions. v1 model is pretax;
+       this surface is contextual only. ─── */
+.account-type-section {
+  margin-top: 1.75rem;
+  padding: 1.1rem 1.25rem;
+  background: rgba(0,0,0,0.12);
+  border: 1px solid var(--border-faint);
+  border-radius: 6px;
+}
+.account-type-section .picker-label {
+  margin-bottom: 0.6rem;
+}
+.picker.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.account-type-note {
+  margin: 0.85rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--ink-dim);
+  font-style: italic;
+}
+.account-type-note strong {
+  font-style: normal;
+  color: var(--ink-bright);
+  font-weight: 500;
+}
+.account-type-note em {
+  color: var(--ink-faint);
+}
+@media (max-width: 640px) {
+  .picker.cols-2 { grid-template-columns: 1fr; }
+}
+
 /* ─── Baseline cluster wrapper ─── */
 .baseline-cluster {
   margin-top: 2rem;
