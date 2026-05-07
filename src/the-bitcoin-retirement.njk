@@ -163,7 +163,7 @@ eleventyComputed:
           <div class="slider-control" data-key="retirementYear">
             <div class="slider-row">
               <span class="slider-name">Retirement year
-                <span class="help-tip" tabindex="0">?<span class="tip-content">When retirement starts. Drag later to let the stack grow more before drawdown begins; earlier to retire sooner with a smaller stack.</span></span>
+                <span class="help-tip" tabindex="0">?<span class="tip-content">When retirement starts. Drag later to let the projected value of your stack grow before retirement-drawdown begins, or earlier to retire sooner with a lower projected stack value.</span></span>
               </span>
               <span class="slider-val" id="val-retirementYear">2045</span>
             </div>
@@ -184,7 +184,7 @@ eleventyComputed:
           <div class="slider-control" data-key="btcStack">
             <div class="slider-row">
               <span class="slider-name">Bitcoin stack
-                <span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin held or planned. Drag to explore: how does the picture change at 0.5, 5, or 25 BTC?</span></span>
+                <span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin held or planned to be held. Drag to explore: how does the picture change at 0.5, 5, or 25 BTC?</span></span>
               </span>
               <span class="slider-val" id="val-btcStack">1.0 BTC</span>
             </div>
@@ -251,12 +251,14 @@ eleventyComputed:
       </div>
       <div class="sustainability-values">
         <div class="value-block">
-          <div class="value-label">Projected years stack lasts</div>
+          <div class="value-label">Projected years stack lasts
+            <span class="help-tip" tabindex="0">?<span class="tip-content">Projected amount of time your chosen retirement income will last, based on the projected Power Law trend price of bitcoin over time.</span></span>
+          </div>
           <div class="value-display" id="sustYearsLast">&mdash;</div>
         </div>
         <div class="value-block">
           <div class="value-label">Projected stack value at retirement
-            <span class="help-tip" tabindex="0">?<span class="tip-content">In today&rsquo;s dollars (inflation-adjusted), the projected value of your stack the moment retirement begins &mdash; before drawdown.</span></span>
+            <span class="help-tip" tabindex="0">?<span class="tip-content">In today&rsquo;s dollars (inflation-adjusted), the projected value of your stack the moment retirement begins &mdash; before drawdown. Based on the projected Power Law trend price of bitcoin over time.</span></span>
           </div>
           <div class="value-display" id="sustStackValue">&mdash;</div>
         </div>
@@ -269,9 +271,9 @@ eleventyComputed:
           <div class="spectrum-marker" id="spectrumMarker" style="left: 50%"></div>
         </div>
         <div class="spectrum-labels">
-          <span class="spectrum-label-left">Depleting<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack runs out before retirement ends. You&rsquo;d need to extend the horizon, lower target income, or raise the stack to reach sustainability.</span></span></span>
-          <span class="spectrum-label-mid">Threshold<span class="help-tip" tabindex="0">?<span class="tip-content">Break-even &mdash; the stack lasts exactly through retirement, neither growing nor depleting in real terms.</span></span></span>
-          <span class="spectrum-label-right">Escape velocity<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack grows faster than you draw it down. Purchasing power increases over retirement instead of being consumed; the stack lasts indefinitely.</span></span></span>
+          <span class="spectrum-label-left">Depleting<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack runs out before retirement ends. You&rsquo;d need to extend the horizon, lower target income, or raise the stack to reach sustainability. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
+          <span class="spectrum-label-mid">Threshold<span class="help-tip" tabindex="0">?<span class="tip-content">Break-even &mdash; the stack lasts exactly through retirement, neither growing nor depleting in real terms. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
+          <span class="spectrum-label-right">Escape velocity<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack grows faster than you draw it down. Purchasing power increases over retirement instead of being consumed; the stack lasts indefinitely. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
         </div>
         <div class="spectrum-detail-wrap">
           <span class="spectrum-detail" id="spectrumDetail">&mdash;</span>

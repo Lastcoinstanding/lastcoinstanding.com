@@ -1219,8 +1219,11 @@ a.powerlaw-link:hover {
 
   /* ─── Hide global page chrome ─── */
   nav, header.site-header, .site-nav, .site-header,
+  .tool-framing,                    /* disclaimer button strip at top of page */
   .tool-framing-strip, .tool-framing-expanded,
   footer, .site-footer,
+  .footer-cta,                      /* "Continue Exploring" h3 above related cards */
+  .related-block, .related-grid,    /* the related-card tiles */
   .related-set, .related-section, .related-cards,
   .companion-content, .companion-section {
     display: none !important;
