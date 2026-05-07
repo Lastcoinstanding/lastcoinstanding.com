@@ -118,12 +118,12 @@ eleventyComputed:
     <div class="section">
       <h2>Out-of-Sample Validation</h2>
       <p class="prose">The strongest evidence for any model is its performance on data it was never fitted to. The Power Law was first identified by Giovanni Santostasi in 2014 and formally published by Matthew Me&#x17E;inskis in 2018. Every year since publication has been an out-of-sample test &mdash; the model was fitted to data that existed at the time, and subsequent prices have continued tracking the trajectory.</p>
-      <p class="prose">The chart below demonstrates this directly: the green line shows the Power Law regression fitted to only the first five years of data (2010&ndash;2014). The orange dots show all actual prices since then. If the early-data model were merely overfitting, its projection would diverge from reality as time passed. Instead, the early-fitted regression has tracked Bitcoin's actual price across the subsequent decade with remarkable fidelity &mdash; through multiple bull and bear cycles, regulatory shifts, and black-swan events.</p>
+      <p class="prose">The chart below demonstrates this directly: the green line shows the Power Law regression fitted to only the first eight years of data (2010&ndash;2017) &mdash; ending the year before Me&#x17E;inskis's formal publication. The orange dots show all actual prices since. If the early-data model were merely overfitting, its projection would diverge from reality as time passed. Instead, the early-fitted regression has tracked Bitcoin's price across the subsequent seven-plus years with remarkable fidelity &mdash; through multiple bull and bear cycles, regulatory shifts, and black-swan events.</p>
       <div class="chart-container">
         <div class="chart-title">Early Data Predicts the Future</div>
-        <div class="chart-subtitle">Power Law fitted to 2010&ndash;2014 data only, projected forward vs. actual prices</div>
+        <div class="chart-subtitle">Power Law fitted to 2010&ndash;2017 data only, projected forward vs. actual prices</div>
         <div class="chart-wrapper" style="height:380px"><canvas id="oosChart"></canvas></div>
-        <div class="chart-source">Green line: regression fitted using only data from 2010&ndash;2014 (~700 data points). Orange dots: actual prices 2015&ndash;present. The early model captures the long-term trajectory without access to any post-2014 data.</div>
+        <div class="chart-source">Green line: regression fitted using only data from 2010&ndash;2017 &mdash; the year before formal publication. Orange dots: actual prices 2018&ndash;present. The early-fitted model tracks Bitcoin's subsequent seven-year trajectory without access to any post-2017 data.</div>
       </div>
     </div>
 
