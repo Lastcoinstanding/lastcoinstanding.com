@@ -1,8 +1,8 @@
 /* The Bitcoin Retirement — page-level styles
- * Phase 3 / commit 1: scaffolding only.
- * The full calculator visual treatment lands across commits 2–7
- * (chart, slider clusters, Sustainability readout, baseline cluster,
- * supplemental link cards, account-type toggle).
+ * Phase 3: scaffolding, calculator surface, prose tabs.
+ * Calculator components: chart, slider clusters, Sustainability readout,
+ * baseline cluster, supplemental link cards. Essay-prose tier covers the
+ * Question, Strategies, and Math tabs.
  */
 
 :root {
@@ -528,39 +528,6 @@ a.powerlaw-link:hover {
 .zone-footer .reset-link:hover {
   color: var(--amber);
   border-bottom-color: var(--amber);
-}
-
-/* ─── Account Type section — documentary v1 toggle, sits between
-       Sustainability and Baseline assumptions. v1 model is pretax;
-       this surface is contextual only. ─── */
-.account-type-section {
-  margin-top: 1.75rem;
-  padding: 1.1rem 1.25rem;
-  background: rgba(0,0,0,0.12);
-  border: 1px solid var(--border-faint);
-  border-radius: 6px;
-}
-.account-type-section .picker-label {
-  margin-bottom: 0.6rem;
-}
-.picker.cols-2 { grid-template-columns: repeat(2, 1fr); }
-.account-type-note {
-  margin: 0.85rem 0 0;
-  font-size: 0.85rem;
-  line-height: 1.55;
-  color: var(--ink-dim);
-  font-style: italic;
-}
-.account-type-note strong {
-  font-style: normal;
-  color: var(--ink-bright);
-  font-weight: 500;
-}
-.account-type-note em {
-  color: var(--ink-faint);
-}
-@media (max-width: 640px) {
-  .picker.cols-2 { grid-template-columns: 1fr; }
 }
 
 /* ─── Baseline cluster wrapper ─── */

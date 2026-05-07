@@ -238,29 +238,6 @@ eleventyComputed:
       </div>
     </div>
 
-    <!-- ACCOUNT TYPE — documentary v1 toggle, §9.2 layout. v1 model is pretax;
-         this toggle is contextual education only — surfaces the tax framing
-         without baking it into the math. Phase 3.5 sibling pages (Disciplined
-         Rebalancing especially) carry the computational tax modeling. -->
-    <div class="account-type-section">
-      <div class="picker-label">Bitcoin account type
-        <span class="help">&mdash; tax context for sell-as-needed</span>
-      </div>
-      <div class="picker cols-2 picker-account" data-dim="accountType">
-        <button type="button" class="picker-card active" data-account="regular" aria-pressed="true">
-          <span class="val">Regular</span>
-          <span class="name">Taxable account &mdash; sells trigger capital gains</span>
-        </button>
-        <button type="button" class="picker-card" data-account="retirement" aria-pressed="false">
-          <span class="val">Retirement</span>
-          <span class="name">IRA / 401k &mdash; tax-advantaged on internal sells</span>
-        </button>
-      </div>
-      <p class="account-type-note" id="accountTypeNote" data-state="regular">
-        <strong>Regular account.</strong> Each sell is a taxable event; long-term capital gains rates apply for holdings longer than one year. <em>v1 projections are pretax.</em>
-      </p>
-    </div>
-
     <!-- BASELINE ASSUMPTIONS — bordered cluster, expanded by default,
          with Hide affordance. Per RETIREMENT_CALCULATOR_DESIGN §9.2.9. -->
     <div class="baseline-cluster" id="baselineCluster">
@@ -377,7 +354,7 @@ eleventyComputed:
 
       <p class="prose">We do not try to model sequence-of-returns risk in any rigorous Monte-Carlo sense. We instead show the floor, trend, and upper Power Law bands on the projection chart and let you inspect what each implies for your scenario. This is honest about the model&rsquo;s limits.</p>
 
-      <p class="prose">We do not bake taxes into the projection. The Account Type toggle below the readout is <em>contextual, not computational</em> &mdash; the v1 model is pretax throughout. Each sale in a regular taxable account is a taxable event, with long-term capital gains rates applying for holdings longer than one year; sales inside a Traditional IRA or 401(k) are not individually taxed, but withdrawals are taxed as ordinary income; qualified Roth withdrawals are untaxed. The illustrative line on the income slider&rsquo;s tooltip &mdash; <em>&ldquo;a 20% effective tax would reduce real take-home to roughly 80%&rdquo;</em> &mdash; exists to acknowledge the magnitude of the consideration without inviting the false precision a tax-rate slider would produce.</p>
+      <p class="prose">We do not bake taxes into the projection. The v1 model is pretax throughout, and for the foundational sell-as-needed approach that is honest rather than evasive &mdash; the structural arithmetic of stack value, withdrawal pressure, and real-terms sustainability runs the same regardless of account type. Tax treatment becomes computationally distinct in the supplemental frameworks; sales inside a Traditional IRA or 401(k) avoid the per-sell taxable event a regular account incurs, which materially changes how rebalancing math behaves. That distinction earns its surface on the disciplined-rebalancing canvas, where it belongs. The illustrative line on the income slider&rsquo;s tooltip &mdash; <em>&ldquo;a 20% effective tax would reduce real take-home to roughly 80%&rdquo;</em> &mdash; exists to acknowledge the magnitude of the consideration without inviting the false precision a tax-rate slider would produce.</p>
 
       <p class="prose">What sell-as-needed requires is structurally minimal: a stack, a target, the willingness to sell. It is the approach that asks the least of the user&rsquo;s time, infrastructure, and conviction.</p>
 
@@ -511,7 +488,7 @@ eleventyComputed:
 
       <p class="prose">The v1 model is pretax throughout. Every dollar shown &mdash; on the slider, in the readout, on the chart &mdash; is gross of taxes.</p>
 
-      <p class="prose">The Account Type toggle below the readout is contextual, not computational. It explains the tax treatment that applies to the user&rsquo;s scenario but does not bake an effective rate into the projection. The illustrative line in the income slider tooltip &mdash; <em>&ldquo;a 20% effective tax would reduce real take-home to roughly 80%&rdquo;</em> &mdash; exists to acknowledge the magnitude without inviting the false precision a tax-rate slider would produce.</p>
+      <p class="prose">For sell-as-needed, this is computationally honest: the structural math is account-type-agnostic, since each withdrawal is treated identically by the model regardless of what kind of account holds the bitcoin. Tax-distinct mechanics surface on the supplemental frameworks &mdash; notably disciplined rebalancing inside a tax-advantaged account, where internal sells avoid tax events and the rebalancing math materially diverges. The illustrative line in the income slider tooltip &mdash; <em>&ldquo;a 20% effective tax would reduce real take-home to roughly 80%&rdquo;</em> &mdash; exists to acknowledge the magnitude without inviting the false precision a tax-rate slider would produce.</p>
 
       <p class="prose">This is a deliberate choice. Effective tax rates depend on holding period, basis, federal and state brackets, NIIT eligibility, and Social Security crossover effects. A single &ldquo;effective tax rate&rdquo; slider would let users dial in whatever felt comfortable while feeling more precise &mdash; which is worse than not modeling tax at all. The 4% rule and the Trinity Study work in pretax dollars by convention; this calculator follows the same convention.</p>
 
