@@ -261,3 +261,43 @@
     .purchase-btn { padding: 0.65rem 0.5rem; font-size: 0.72rem; }
     .advanced-grid { grid-template-columns: 1fr; gap: 1rem; }
 }
+
+/* ───────────────────────────────────────────────
+   PROJECTION CARD STYLING — matches retrospective fidelity
+   The migrated forward-calculator JS (from /the-power-law.js)
+   emits these legacy class names: .calc-results-grid, .calc-card.bitcoin
+   /.house, .big-number, .detail-line, .highlight, .negative. The
+   retrospective calculator uses parallel-but-different names
+   (.calc-results, .calc-result-card, .result-value, .result-detail) —
+   to keep the JS faithful to the original Power Law version, we add
+   matching styles here with the same visual language as retrospective.
+   Fixed 2026-05-07: prior migration (commit 0b2d203) ported only the
+   scaffolding selectors and missed the card presentation; result was
+   plain-text rendering inside the projection mode.
+   ─────────────────────────────────────────────── */
+.calc-results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+.calc-card { border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; background: rgba(255,255,255,0.01); }
+.calc-card.bitcoin { background: linear-gradient(135deg, var(--amber-glow), transparent); border-color: var(--amber-dim); }
+.calc-card.house { background: linear-gradient(135deg, rgba(192,57,43,0.08), transparent); border-color: var(--red-dim); }
+.calc-card h4 { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 0.8rem; }
+.calc-card.bitcoin h4 { color: var(--amber); }
+.calc-card.house h4 { color: var(--red); }
+.calc-card .invested-line { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 0.3rem; }
+.calc-card .invested-line strong { color: var(--text-dim); font-weight: 500; text-transform: none; letter-spacing: 0; font-size: 0.92rem; }
+.calc-card .period-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.8px; color: var(--text-muted); font-weight: 500; margin-bottom: 0.5rem; opacity: 0.85; }
+.calc-card .period-divider { border-top: 2px dashed rgba(255,255,255,0.12); margin: 1rem 0 0.9rem; }
+.calc-card .big-number { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 2rem; font-weight: 600; color: var(--text); margin-bottom: 0.2rem; line-height: 1.15; }
+.calc-card.bitcoin .big-number { color: var(--amber); }
+.calc-card.house .big-number { color: var(--text-dim); }
+.calc-card .big-number-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.9rem; line-height: 1.5; }
+.calc-card .detail-line { font-size: 0.88rem; color: var(--text); line-height: 1.8; }
+.calc-card .detail-line strong { color: var(--text); font-weight: 600; }
+.calc-card .detail-line .highlight { color: var(--amber); font-weight: 600; }
+.calc-card .detail-line .negative { color: var(--red); }
+
+/* Mobile: stack the two cards vertically */
+@media (max-width: 768px) {
+  .calc-results-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .calc-card { padding: 1.2rem; }
+  .calc-card .big-number { font-size: 1.7rem; }
+}
