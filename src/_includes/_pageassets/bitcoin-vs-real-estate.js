@@ -867,4 +867,25 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
         var current = toggle.dataset.activeMode || 'retrospective';
         setMode(current === 'retrospective' ? 'projection' : 'retrospective');
     });
+
+    // Auto-activate projection mode when arriving with a deep-link.
+    // Recognized hashes:
+    //   #calc-mode-projection     — direct deep-link to projection mode
+    //   #projection                — short alias used in some cross-links
+    // The base tab routing handles #calculator (default tab). When the
+    // page lands with one of the projection hashes, we ensure the tab
+    // is also calculator (where the toggle lives) and then flip the mode.
+    function applyHashToMode(){
+        var h = location.hash.replace('#','');
+        if(h === 'calc-mode-projection' || h === 'projection'){
+            // Make sure the calculator tab is active first
+            var calcTabBtn = document.querySelector('.tab-btn[data-tab="calculator"]');
+            if(calcTabBtn && !calcTabBtn.classList.contains('active')){
+                calcTabBtn.click();
+            }
+            setMode('projection');
+        }
+    }
+    applyHashToMode();
+    window.addEventListener('hashchange', applyHashToMode);
 })();

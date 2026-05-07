@@ -185,6 +185,16 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
 
 // ═══════ TABS ═══════
 (function(){
+  // Hash-based redirect: the projection real-estate calculator that
+  // previously lived at /the-power-law.html#calculator now lives at
+  // /bitcoin-vs-real-estate.html#calc-mode-projection (Phase 4 restructure
+  // commits 0b2d203 + 36c13a0). Carry inbound deep-links over so users
+  // arriving from old bookmarks or external links still land on the tool.
+  if(location.hash === '#calculator'){
+    location.replace('/bitcoin-vs-real-estate.html#calc-mode-projection');
+    return;
+  }
+
   var btns = document.querySelectorAll('.tab-btn');
   btns.forEach(function(b){
     b.addEventListener('click', function(){
