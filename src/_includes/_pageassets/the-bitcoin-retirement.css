@@ -324,6 +324,33 @@ body {
   }
 }
 
+/* Very narrow viewports: math tables can't always squeeze 3 columns into 343px
+   of content area; allow horizontal scroll while preserving the table layout
+   (cells still wrap their text — overflow-x is only the fallback if a row
+   genuinely cannot fit). Prose paragraph also gets defensive overflow-wrap so
+   long strings (Trinity Study URLs, equation variable names) don't push the
+   page wider. */
+@media (max-width: 480px) {
+  .essay-prose .math-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .essay-prose .math-table th,
+  .essay-prose .math-table td {
+    padding: 0.4rem 0.55rem;
+  }
+  .essay-prose .prose {
+    overflow-wrap: anywhere;
+  }
+  .essay-prose .math-block {
+    padding: 0.6rem 0.75rem;
+  }
+  .essay-prose .math-eq {
+    font-size: 0.8rem;
+  }
+}
+
 /* ─── Construction note (commit-1 placeholder; removed as commits 2–13 land) ─── */
 .construction-note {
   max-width: 640px;
@@ -368,7 +395,7 @@ body {
   gap: 8px;
 }
 .picker.cols-4 { grid-template-columns: repeat(4, 1fr); }
-.picker.cols-3 { grid-template-columns: repeat(4, 1fr); }
+.picker.cols-3 { grid-template-columns: repeat(3, 1fr); }
 
 .picker-label {
   font-size: 0.95rem;
