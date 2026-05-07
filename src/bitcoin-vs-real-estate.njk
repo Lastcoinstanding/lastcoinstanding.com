@@ -127,6 +127,30 @@ eleventyComputed:
 
         <!-- TAB 3 -->
         <div class="tab-panel active" id="panel-calculator">
+
+            <!--
+              DUAL-MODE TOGGLE: Retrospective ↔ Projection.
+              The two calculators share this panel as a temporal pair —
+              same comparison, opposite directions in time. Inspired by
+              the Money Trees toggle pattern (yin-yang duality).
+            -->
+            <div class="calc-mode-toggle" data-active-mode="retrospective" role="tablist" aria-label="Calculator mode">
+                <button type="button" class="calc-mode-label retrospective active" data-mode="retrospective" role="tab" aria-selected="true" aria-controls="calc-mode-retrospective">
+                    <span class="calc-mode-name">Retrospective</span>
+                    <span class="calc-mode-sub">What if you'd bought bitcoin?</span>
+                </button>
+                <button type="button" class="calc-mode-switch" aria-label="Toggle calculator mode">
+                    <span class="calc-mode-thumb"></span>
+                </button>
+                <button type="button" class="calc-mode-label projection" data-mode="projection" role="tab" aria-selected="false" aria-controls="calc-mode-projection">
+                    <span class="calc-mode-name">Projection</span>
+                    <span class="calc-mode-sub">What might happen going forward?</span>
+                </button>
+            </div>
+
+            <!-- RETROSPECTIVE MODE (default) -->
+            <div class="calc-mode-content active" id="calc-mode-retrospective" role="tabpanel" aria-labelledby="retrospective-tab">
+
             <div class="section-intro"><h2>What If You <em>Postponed</em> the House Purchase?</h2><p>The conventional wisdom says: buy a house as soon as you can. Lock in a mortgage. Build equity. But what if you took the money you would have used as a down payment and bought bitcoin instead? The historical data suggests that after a few years, you wouldn't just buy that house — you could buy it outright, with no mortgage, and possibly buy several. This is not investment advice. It is a structural observation about the trajectory of sound money versus fiat-inflated assets.</p></div>
 
             <div class="narrative" style="margin-top:0;margin-bottom:2.5rem;padding:2rem 2.5rem;border-left-width:3px">
@@ -173,6 +197,91 @@ eleventyComputed:
             </div>
 
             <div class="narrative"><p>The mortgage is often described as "leverage" — and it is. A 20% down payment gives you 5:1 exposure to house price appreciation. But leverage has a cost. Over 30 years at typical rates, <strong>you pay roughly double the purchase price</strong> in total — the house plus the interest. Add property taxes (which never stop), insurance, and maintenance, and the true cost of ownership becomes staggering. All for an asset that, priced in bitcoin, is deflating. <em>Bitcoin requires no leverage, no interest payments, no property taxes, and no maintenance. You simply buy and hold.</em></p></div>
+
+            </div><!-- /calc-mode-retrospective -->
+
+            <!-- PROJECTION MODE (migrated from /the-power-law.html#calculator) -->
+            <div class="calc-mode-content" id="calc-mode-projection" role="tabpanel" aria-labelledby="projection-tab">
+
+                <div class="section-intro"><h2>What Might Happen <em>Going Forward?</em></h2><p>The retrospective calculator above shows what <em>did</em> happen when you chose bitcoin over a house. This calculator asks the same question forward: what does the Power Law model suggest happens from here? Enter your own assumptions and compare. The projection is built on the Power Law growth model; market behavior may diverge.</p></div>
+
+                <p class="annotation" style="font-size:.85rem;color:var(--text-muted);font-style:italic;margin:0 0 2rem;line-height:1.7">This calculator uses the <a href="/the-power-law.html" style="color:var(--amber)">Power Law model</a> as its bitcoin price assumption. The Power Law is an empirical observation with a 95%+ R&sup2; fit, not a guarantee. This is not investment advice.</p>
+
+                <div class="calc-section">
+                    <!-- Power Law Scenario Selection -->
+                    <div style="margin-bottom:1rem">
+                        <label style="font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:.5rem">Power Law Scenario</label>
+                        <div class="scenario-btns">
+                            <button class="scenario-btn active" data-scenario="floor">Floor (Conservative)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &gt; 0.99</span></button>
+                            <button class="scenario-btn" data-scenario="trend">Trend (Fair Value)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &asymp; 0.95</span></button>
+                            <button class="scenario-btn" data-scenario="upper">Upper (Bull Case)<br><span style="font-size:.7rem;opacity:.7">Historical peaks</span></button>
+                        </div>
+                    </div>
+
+                    <!-- Purchase Method Selection -->
+                    <div style="margin-bottom:1.2rem">
+                        <label style="font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:.5rem">Purchase Method</label>
+                        <div class="purchase-btns">
+                            <button class="purchase-btn" data-method="cash">Cash Purchase</button>
+                            <button class="purchase-btn active" data-method="mortgage">20% Down + Mortgage</button>
+                        </div>
+                    </div>
+
+                    <!-- Primary Inputs -->
+                    <div class="calc-grid">
+                        <div class="calc-field">
+                            <label>Home Price Today ($)</label>
+                            <input type="text" id="fwdHomePrice" value="420,000" inputmode="numeric">
+                        </div>
+                        <div class="calc-field">
+                            <label>Time Horizon</label>
+                            <select id="fwdHorizon"></select>
+                        </div>
+                        <div class="calc-field">
+                            <label>Current BTC Price ($) <span class="opt" id="fwdBtcPriceStatus">loading&hellip;</span></label>
+                            <input type="text" id="fwdBtcNow" value="" inputmode="numeric" placeholder="fetching live price&hellip;">
+                        </div>
+                    </div>
+                    <div class="calc-grid">
+                        <div class="calc-field">
+                            <label>Home Appreciation <span class="opt">(% real / yr)</span></label>
+                            <input type="text" id="fwdHomeAppreciation" value="3.5" inputmode="decimal">
+                        </div>
+                        <div class="calc-field" id="fwdMortgageRateField">
+                            <label>Mortgage Rate <span class="opt">(% nominal)</span></label>
+                            <input type="text" id="fwdMortgageRate" value="6.8" inputmode="decimal">
+                        </div>
+                        <div class="calc-field" style="visibility:hidden"><label>&nbsp;</label><input type="text" disabled></div>
+                    </div>
+
+                    <div class="footnote-date" id="fwdInvestmentFootnote">Home appreciation is in real (inflation-adjusted) terms; mortgage rate is nominal as written. Sitewide inflation rate (currently 6.5% M2-growth default; see Half-Life or Melting Ice Cube) is used internally to reconcile the two. Your up-front investment is derived from the home price and purchase method. Projections anchored to January 1 of the selected year.</div>
+
+                    <!-- Results -->
+                    <div id="fwdResults"></div>
+
+                    <!-- Advanced toggle (DCA or S&P) -->
+                    <div class="advanced-section">
+                        <label class="advanced-toggle-label">
+                            <input type="checkbox" id="fwdAdvancedCheck">
+                            <span id="fwdAdvancedText"></span>
+                            <span id="fwdAdvancedRateWrap" style="display:none">at <input type="text" id="fwdAdvancedRate" value="7" inputmode="decimal">% real / yr</span>
+                        </label>
+                        <div id="fwdAdvancedContent" style="display:none">
+                            <div class="advanced-note" id="fwdAdvancedNote"></div>
+                            <div class="advanced-grid">
+                                <div id="fwdAdvancedLeft"></div>
+                                <div id="fwdAdvancedRight"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="annotation" style="margin-top:1rem;font-size:.85rem;color:var(--text-muted);line-height:1.7">
+                    <strong style="color:var(--text-dim)">How this works:</strong> The bitcoin projection uses the Power Law model (Porkopolis coefficients). Home appreciation is in real (inflation-adjusted) terms; the calculator combines it internally with the sitewide inflation rate to drive the nominal home value path. Mortgage assumes 20% down, 30-year fixed; mortgage rate is nominal as written. Property taxes at 1.2% annually, insurance ~$150/mo, maintenance at 1% of home value annually. Rent in the bitcoin + rent path is estimated at 75% of an equivalent mortgage payment. <em>Projected dollar amounts are shown in today's purchasing power (real terms) as the primary value, with nominal future dollars shown alongside. Returns and CAGRs are computed on the real values. Accumulated payment streams (rent, interest, total cost of ownership) are shown as their nominal sum.</em>
+                </div>
+
+            </div><!-- /calc-mode-projection -->
+
         </div>
 
         <!-- TAB 4 -->
