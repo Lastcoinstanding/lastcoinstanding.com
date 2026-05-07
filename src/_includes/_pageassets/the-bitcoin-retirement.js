@@ -168,6 +168,92 @@
     });
   }
 
+  // ─── Print population — copy live screen state into print-only blocks
+  // Triggered on beforeprint so the printed PDF reflects current sliders.
+  // Per RETIREMENT_CALCULATOR_DESIGN §8.1.
+  function bindPrintPopulation() {
+    function pickerSelectedLabel(dim) {
+      var card = document.querySelector('[data-dim="' + dim + '"] .picker-card.active');
+      if (!card) return '—';
+      var val = card.querySelector('.val');
+      var name = card.querySelector('.name');
+      var v = val ? val.textContent.trim() : '';
+      var n = name ? name.textContent.trim() : '';
+      return v && n ? (v + ' — ' + n) : (v || n || '—');
+    }
+    function txtById(id) {
+      var el = document.getElementById(id);
+      return el ? el.textContent.trim() : '—';
+    }
+    function populate() {
+      // Date
+      var d = new Date();
+      var dateEl = document.getElementById('printDate');
+      if (dateEl) {
+        dateEl.textContent = d.toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+      }
+
+      // Inputs table
+      var rows = [
+        ['Target annual retirement income', txtById('val-targetIncomeUSD')],
+        ['Retirement year',                 txtById('val-retirementYear')],
+        ['Bitcoin stack',                   txtById('val-btcStack')],
+        ['Withdrawal rate',                 txtById('val-withdrawalRatePct')],
+        ['Monthly DCA',                     txtById('val-monthlyDcaUSD')],
+        ['Years in retirement',             txtById('val-yearsInRetirement')],
+        ['Inflation rate',                  pickerSelectedLabel('inflation')],
+        ['Bitcoin growth model',            pickerSelectedLabel('btcGrowthModel')],
+        ['Traditional benchmark',           pickerSelectedLabel('realReturns')]
+      ];
+      var tbody = document.getElementById('printInputsBody');
+      if (tbody) {
+        tbody.innerHTML = '';
+        rows.forEach(function(r){
+          var tr = document.createElement('tr');
+          var labelTd = document.createElement('td');
+          labelTd.className = 'print-input-label';
+          labelTd.textContent = r[0];
+          var valTd = document.createElement('td');
+          valTd.className = 'print-input-value';
+          valTd.textContent = r[1];
+          tr.appendChild(labelTd);
+          tr.appendChild(valTd);
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Sustainability values — copy text + escape-velocity class state
+      var screenYears = document.getElementById('sustYearsLast');
+      var printYears = document.getElementById('printYearsLast');
+      if (screenYears && printYears) {
+        printYears.textContent = screenYears.textContent.trim();
+        printYears.classList.toggle('escape-velocity',
+          screenYears.classList.contains('escape-velocity'));
+      }
+      var screenStack = document.getElementById('sustStackValue');
+      var printStack = document.getElementById('printStackValue');
+      if (screenStack && printStack) {
+        printStack.textContent = screenStack.textContent.trim();
+      }
+
+      // Sustainability detail line — already prose-formatted on screen
+      var screenDetail = document.getElementById('spectrumDetail');
+      var printDetail = document.getElementById('printSustDetail');
+      if (screenDetail && printDetail) {
+        printDetail.textContent = screenDetail.textContent.trim();
+      }
+    }
+    // Run on any print intent — covers Cmd/Ctrl-P, browser menu, system print
+    window.addEventListener('beforeprint', populate);
+    // Some browsers (Safari mobile) don't fire beforeprint reliably; also
+    // pre-populate once at load so the data is in place even if the event
+    // never fires. Inputs that change after load won't update without
+    // beforeprint — acceptable trade-off for cross-browser robustness.
+    populate();
+  }
+
   // ─── Cross-tab sync: re-render when any baseline dim changes
   if (MA.subscribe) {
     MA.subscribe(function(dim){
@@ -185,6 +271,7 @@
   bindCustomInflationInput();
   bindHideToggle();
   bindResetLink();
+  bindPrintPopulation();
 })();
 
 /* ════════════════════════════════════════════════════════════════

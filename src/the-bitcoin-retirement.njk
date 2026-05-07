@@ -86,6 +86,29 @@ eleventyComputed:
   <!-- ═══════════════════════════════════════════ -->
   <div class="tab-content active" id="tab-calculator">
 
+    <!-- PRINT-ONLY: header + inputs table. Appears before chart in print order
+         only; display:none on screen. Populated by JS on `beforeprint`.
+         Per RETIREMENT_CALCULATOR_DESIGN §8.1 (single-page PDF output). -->
+    <div class="print-only print-block print-block-pre" aria-hidden="true">
+      <div class="print-page-head">
+        <div class="print-brand">LAST COIN STANDING</div>
+        <div class="print-meta">
+          <span class="print-url">lastcoinstanding.com/the-bitcoin-retirement</span>
+          <span class="print-meta-sep">&middot;</span>
+          <span id="printDate">&mdash;</span>
+        </div>
+      </div>
+      <h2 class="print-title">The Bitcoin Retirement &mdash; Scenario</h2>
+      <table class="print-inputs-table">
+        <thead>
+          <tr><th colspan="2">Inputs</th></tr>
+        </thead>
+        <tbody id="printInputsBody">
+          <!-- rows populated by JS on beforeprint -->
+        </tbody>
+      </table>
+    </div>
+
     <!-- CHART STATUS LINE — current price + Power Law context -->
     <div class="chart-status-line" id="chartStatusLine">
       <span class="status-prose"><strong>Today:</strong> <span id="statusPrice">$&mdash;</span> / BTC &mdash; sits at <strong><span id="statusRatio">&mdash;</span></strong> the Power Law trend; historically, BTC has been below this price <strong><span id="statusPercentile">&mdash;</span></strong> of the time.</span>
@@ -200,6 +223,25 @@ eleventyComputed:
 
         </div>
       </div>
+    </div>
+
+    <!-- PRINT-ONLY: sustainability summary + disclaimer footer. Appears
+         after chart in print order only; display:none on screen.
+         Populated by JS on `beforeprint`. -->
+    <div class="print-only print-block print-block-post" aria-hidden="true">
+      <h3 class="print-section-title">Sustainability</h3>
+      <div class="print-sust-grid">
+        <div>
+          <div class="print-sust-label">Projected years stack lasts</div>
+          <div class="print-sust-value" id="printYearsLast">&mdash;</div>
+        </div>
+        <div>
+          <div class="print-sust-label">Projected stack value at retirement</div>
+          <div class="print-sust-value" id="printStackValue">&mdash;</div>
+        </div>
+      </div>
+      <p class="print-sust-detail" id="printSustDetail">&mdash;</p>
+      <p class="print-disclaimer">For exploration and education only. Not financial advice. The projection is built on the Power Law growth model; market behavior may diverge. See lastcoinstanding.com/the-bitcoin-retirement for the live calculator and full disclaimer.</p>
     </div>
 
     <!-- SUSTAINABILITY READOUT — §9.2.7 -->

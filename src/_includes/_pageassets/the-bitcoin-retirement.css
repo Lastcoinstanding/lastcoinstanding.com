@@ -1181,3 +1181,245 @@ a.powerlaw-link:hover {
 @media (max-width: 600px) {
   .spectrum-detail-wrap { font-size: 0.85rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Print stylesheet — single-page PDF output
+   Per RETIREMENT_CALCULATOR_DESIGN §8.1. Strips screen chrome
+   (nav, framing, tabs, sliders, pickers, prose tabs, hide affordance,
+   help-tip icons) and reformats the calculator surface as a
+   document. Two print-only blocks (.print-block-pre before chart,
+   .print-block-post after chart) provide structured header, inputs
+   table, sustainability summary, and disclaimer. Populated by JS
+   on `beforeprint` from live screen state.
+═══════════════════════════════════════════════════════════════ */
+
+/* Hidden on screen by default — only appears in print */
+.print-only { display: none; }
+
+@media print {
+  /* ─── Reset to black-on-white for ink-friendliness ─── */
+  :root {
+    --bg-page: white;
+    --bg-card: white;
+    --ink: #1a1a1a;
+    --ink-bright: black;
+    --ink-dim: #333;
+    --ink-faint: #666;
+    --border: #999;
+    --border-strong: #555;
+    --border-faint: #ccc;
+    --amber: #b06a18;            /* darker amber for ink contrast */
+    --amber-bright: #8a4f10;
+    --amber-soft: rgba(176,106,24,0.08);
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* ─── Hide global page chrome ─── */
+  nav, header.site-header, .site-nav, .site-header,
+  .tool-framing-strip, .tool-framing-expanded,
+  footer, .site-footer,
+  .related-set, .related-section, .related-cards,
+  .companion-content, .companion-section {
+    display: none !important;
+  }
+
+  /* ─── Hide retirement-page chrome ─── */
+  .page-header,                    /* h1 + subtitle (print has its own) */
+  .tab-nav,                         /* tab buttons */
+  .tab-content:not(.active),        /* Question, Strategies, Math */
+  .chart-status-line,               /* live BTC price status above chart */
+  .live-explore,                    /* slider clusters */
+  .sustainability,                  /* on-screen readout (print has its own) */
+  .baseline-cluster,                /* picker grid (selected values listed in inputs table) */
+  .help-tip,                        /* ? icons and tooltips */
+  .construction-note,
+  .powerlaw-link {
+    display: none !important;
+  }
+
+  /* ─── Calculator tab content: tighten layout ─── */
+  .page {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .tab-content.active { display: block; }
+
+  /* ─── Show print-only blocks ─── */
+  .print-only { display: block; }
+
+  /* ─── Print page head ─── */
+  .print-page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid #999;
+    padding-bottom: 6pt;
+    margin-bottom: 10pt;
+  }
+  .print-brand {
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 9pt;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+  }
+  .print-meta {
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 8.5pt;
+    color: #666;
+  }
+  .print-meta-sep {
+    margin: 0 0.4em;
+    color: #999;
+  }
+  .print-url { font-weight: 500; color: #1a1a1a; }
+
+  /* ─── Print title ─── */
+  .print-title {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 18pt;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    color: black;
+    margin: 0 0 12pt;
+  }
+
+  /* ─── Inputs table ─── */
+  .print-inputs-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 14pt;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 9.5pt;
+  }
+  .print-inputs-table thead th {
+    text-align: left;
+    font-size: 8pt;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #666;
+    border-bottom: 1px solid #555;
+    padding: 4pt 0;
+  }
+  .print-inputs-table tbody td {
+    padding: 3pt 6pt 3pt 0;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+  }
+  .print-inputs-table .print-input-label {
+    color: #333;
+    width: 50%;
+  }
+  .print-inputs-table .print-input-value {
+    color: black;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ─── Projection chart — tighten the container for print ─── */
+  .projection {
+    background: none !important;
+    border: 1px solid #999 !important;
+    border-radius: 0 !important;
+    padding: 8pt 8pt 6pt !important;
+    margin: 0 0 12pt !important;
+    page-break-inside: avoid;
+  }
+  .projection-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 4pt !important;
+    margin-bottom: 6pt !important;
+  }
+  .projection-title {
+    font-family: "Cormorant Garamond", Georgia, serif !important;
+    font-size: 12pt !important;
+    color: black !important;
+    margin: 0 !important;
+  }
+  .projection-legend {
+    grid-template-columns: 1fr 1fr 1fr !important;
+    font-size: 7.5pt !important;
+    color: #333 !important;
+    gap: 2pt 6pt !important;
+  }
+  .legend-group-label {
+    font-size: 6.5pt !important;
+    color: #666 !important;
+    margin-top: 2pt !important;
+    margin-bottom: 0 !important;
+  }
+  .swatch {
+    width: 14px !important;
+    height: 4px !important;
+  }
+  .chart-wrapper {
+    height: 280pt !important;
+    page-break-inside: avoid;
+  }
+
+  /* ─── Sustainability summary (print-only) ─── */
+  .print-section-title {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 14pt;
+    font-weight: 500;
+    color: black;
+    margin: 0 0 6pt;
+  }
+  .print-sust-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8pt 16pt;
+    margin-bottom: 8pt;
+    page-break-inside: avoid;
+  }
+  .print-sust-label {
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 8pt;
+    color: #666;
+    margin-bottom: 2pt;
+  }
+  .print-sust-value {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 14pt;
+    font-weight: 500;
+    color: black;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+  }
+  .print-sust-value.escape-velocity {
+    font-style: italic;
+    color: #b06a18;       /* dark amber */
+  }
+  .print-sust-detail {
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 9pt;
+    color: #333;
+    line-height: 1.45;
+    margin: 0 0 14pt;
+  }
+
+  /* ─── Disclaimer footer ─── */
+  .print-disclaimer {
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 7.5pt;
+    color: #555;
+    line-height: 1.4;
+    margin: 0;
+    padding-top: 8pt;
+    border-top: 1px solid #ddd;
+    font-style: italic;
+  }
+
+  /* ─── Page setup ─── */
+  @page {
+    margin: 14mm 12mm 12mm 12mm;
+    size: letter;
+  }
+}
