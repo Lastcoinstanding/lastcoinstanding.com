@@ -104,6 +104,108 @@ body {
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
+/* ─── Essay prose for Question and Strategies tabs ─── */
+.essay-prose {
+  max-width: 720px;
+  margin: 1.5rem auto 2rem;
+  padding: 0 1rem;
+}
+.essay-prose .section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 500;
+  color: var(--ink-bright);
+  line-height: 1.2;
+  margin: 2.4rem 0 0.9rem;
+  letter-spacing: -0.005em;
+}
+.essay-prose .section-title:first-child {
+  margin-top: 0;
+}
+.essay-prose .prose {
+  font-family: var(--font-body);
+  font-size: 1.04rem;
+  line-height: 1.72;
+  color: var(--ink);
+  margin: 0 0 1.1rem;
+}
+.essay-prose .prose:last-child {
+  margin-bottom: 0;
+}
+.essay-prose .prose strong {
+  color: var(--ink-bright);
+  font-weight: 600;
+}
+.essay-prose .prose a {
+  color: var(--amber);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  transition: color 0.15s;
+}
+.essay-prose .prose a:hover {
+  color: var(--amber-bright);
+}
+.essay-prose .prose.closing {
+  margin-top: 2rem;
+  font-size: 1.1rem;
+  color: var(--ink-bright);
+}
+.essay-prose .prose.teaser-link {
+  margin-top: 1.4rem;
+  margin-bottom: 0.4rem;
+}
+.essay-prose .prose.teaser-link a {
+  text-decoration: none;
+  border-bottom: 1px solid var(--amber-soft);
+  padding-bottom: 1px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.essay-prose .prose.teaser-link a:hover {
+  border-bottom-color: var(--amber);
+}
+.essay-prose .prose.teaser-link .phase-tag {
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  font-style: italic;
+  margin-left: 0.4rem;
+}
+.essay-prose .essay-callout {
+  margin: 2rem auto;
+  padding: 1.4rem 1.8rem;
+  background: var(--amber-soft);
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 1.18rem;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--ink-bright);
+  text-align: center;
+  max-width: 600px;
+}
+.essay-prose .essay-callout em {
+  font-style: italic;
+  color: var(--ink-bright);
+}
+@media (max-width: 640px) {
+  .essay-prose {
+    margin: 1rem auto 1.5rem;
+    padding: 0 0.5rem;
+  }
+  .essay-prose .section-title {
+    margin-top: 1.8rem;
+    margin-bottom: 0.7rem;
+  }
+  .essay-prose .prose {
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+  .essay-prose .essay-callout {
+    padding: 1rem 1.1rem;
+    font-size: 1.05rem;
+  }
+}
+
 /* ─── Construction note (commit-1 placeholder; removed as commits 2–13 land) ─── */
 .construction-note {
   max-width: 640px;
