@@ -28,7 +28,7 @@ eleventyComputed:
     <button class="tab-btn active" data-tab="summary">The Power Law</button>
     <button class="tab-btn" data-tab="nature">In Nature</button>
     <button class="tab-btn" data-tab="theory">The Theory</button>
-    <button class="tab-btn" data-tab="calculator">Calculator</button>
+    <button class="tab-btn" data-tab="channel">The Channel</button>
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
@@ -421,87 +421,48 @@ eleventyComputed:
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
-  <!-- TAB 4: CALCULATOR (placeholder) -->
+  <!-- TAB 4: THE CHANNEL — interactive Power Law visualization -->
   <!-- ═══════════════════════════════════════════ -->
-  <div class="tab-content" id="tab-calculator">
+  <div class="tab-content" id="tab-channel">
 
     <div class="section">
-      <h2>Bitcoin vs. Real Estate: Forward</h2>
-      <p class="prose">The <a href="/bitcoin-vs-real-estate.html" style="color:var(--amber)">retrospective calculator</a> showed what <em>did</em> happen when you chose Bitcoin over a house. This calculator asks: what does the Power Law model suggest happens <em>going forward</em>? Enter your own assumptions and compare.</p>
-      <p class="annotation">This calculator uses the Power Law model as its Bitcoin price assumption. The Power Law is an empirical observation with a 95%+ R&sup2; fit, not a guarantee. See <a href="#summary" style="color:var(--amber)">Tab 1</a> for the full explanation and caveats. This is not investment advice.</p>
+      <h2>The Channel</h2>
+      <p class="prose">The Power Law isn't a single price line &mdash; it's a <em>channel</em>. A structured corridor with a conservative floor at 0.42&times; trend, the central trend itself, and an upper boundary at 3&times; trend. Bitcoin oscillates inside this channel: hugging the floor in deep drawdowns, spiking against the upper band in euphoria, returning to trend across the cycle. The chart below shows the channel across Bitcoin's lifetime, with daily price overlaid.</p>
+      <p class="prose">Toggle the time axis below to see the same model two ways. <strong>Linear time</strong> shows the bands as expanding curves &mdash; the lived experience of Bitcoin's price. <strong>Logarithmic time</strong> collapses them into straight lines &mdash; the underlying mathematics. Both views are correct. They are the same Power Law rendered in different coordinate systems.</p>
     </div>
 
-    <div class="calc-section">
-      <!-- Power Law Scenario Selection -->
-      <div style="margin-bottom:1rem">
-        <label style="font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:.5rem">Power Law Scenario</label>
-        <div class="scenario-btns">
-          <button class="scenario-btn active" data-scenario="floor">Floor (Conservative)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &gt; 0.99</span></button>
-          <button class="scenario-btn" data-scenario="trend">Trend (Fair Value)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &asymp; 0.95</span></button>
-          <button class="scenario-btn" data-scenario="upper">Upper (Bull Case)<br><span style="font-size:.7rem;opacity:.7">Historical peaks</span></button>
-        </div>
-      </div>
-
-      <!-- Purchase Method Selection -->
-      <div style="margin-bottom:1.2rem">
-        <label style="font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:.5rem">Purchase Method</label>
-        <div class="purchase-btns">
-          <button class="purchase-btn" data-method="cash">Cash Purchase</button>
-          <button class="purchase-btn active" data-method="mortgage">20% Down + Mortgage</button>
-        </div>
-      </div>
-
-      <!-- Primary Inputs -->
-      <div class="calc-grid">
-        <div class="calc-field">
-          <label>Home Price Today ($)</label>
-          <input type="text" id="fwdHomePrice" value="420,000" inputmode="numeric">
-        </div>
-        <div class="calc-field">
-          <label>Time Horizon</label>
-          <select id="fwdHorizon"></select>
-        </div>
-        <div class="calc-field">
-          <label>Current BTC Price ($) <span class="opt" id="fwdBtcPriceStatus">loading&hellip;</span></label>
-          <input type="text" id="fwdBtcNow" value="" inputmode="numeric" placeholder="fetching live price&hellip;">
-        </div>
-      </div>
-      <div class="calc-grid">
-        <div class="calc-field">
-          <label>Home Appreciation <span class="opt">(% real / yr)</span></label>
-          <input type="text" id="fwdHomeAppreciation" value="3.5" inputmode="decimal">
-        </div>
-        <div class="calc-field" id="fwdMortgageRateField">
-          <label>Mortgage Rate <span class="opt">(% nominal)</span></label>
-          <input type="text" id="fwdMortgageRate" value="6.8" inputmode="decimal">
-        </div>
-        <div class="calc-field" style="visibility:hidden"><label>&nbsp;</label><input type="text" disabled></div>
-      </div>
-
-      <div class="footnote-date" id="fwdInvestmentFootnote">Home appreciation is in real (inflation-adjusted) terms; mortgage rate is nominal as written. Sitewide inflation rate (currently 6.5% M2-growth default; see Half-Life or Melting Ice Cube) is used internally to reconcile the two. Your up-front investment is derived from the home price and purchase method. Projections anchored to January 1 of the selected year.</div>
-
-      <!-- Results -->
-      <div id="fwdResults"></div>
-
-      <!-- Advanced toggle (DCA or S&P) -->
-      <div class="advanced-section">
-        <label class="advanced-toggle-label">
-          <input type="checkbox" id="fwdAdvancedCheck">
-          <span id="fwdAdvancedText"></span>
-          <span id="fwdAdvancedRateWrap" style="display:none">at <input type="text" id="fwdAdvancedRate" value="7" inputmode="decimal">% real / yr</span>
-        </label>
-        <div id="fwdAdvancedContent" style="display:none">
-          <div class="advanced-note" id="fwdAdvancedNote"></div>
-          <div class="advanced-grid">
-            <div id="fwdAdvancedLeft"></div>
-            <div id="fwdAdvancedRight"></div>
-          </div>
-        </div>
-      </div>
+    <!-- POROKOPOLIS CREDIT (prominent) -->
+    <div class="porkopolis-credit">
+      <div class="porkopolis-credit-label">Channel framework &amp; coefficients</div>
+      <p>The Power Law channel framework on this page &mdash; the structural floor at 0.42&times; trend, the upper band at 3&times; trend, and the daily-close-as-stress-test convention &mdash; was developed and refined by <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener"><strong>Matthew Me&zcaron;inskis</strong></a> at <a href="https://www.porkopolis.io" target="_blank" rel="noopener">Porkopolis Economics</a>. This visualization is built on his coefficients (a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.77) and band ratios. For the canonical version with live data and ongoing analysis, see <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">Porkopolis: The Chart</a> directly.</p>
     </div>
 
-    <div class="annotation" style="margin-top:1rem">
-      <strong>How this works:</strong> The Bitcoin projection uses the Power Law model (Porkopolis coefficients). Home appreciation is in real (inflation-adjusted) terms; the calculator combines it internally with the sitewide inflation rate to drive the nominal home value path. Mortgage assumes 20% down, 30-year fixed; mortgage rate is nominal as written. Property taxes at 1.2% annually, insurance ~$150/mo, maintenance at 1% of home value annually. Rent in the Bitcoin + rent path is estimated at 75% of an equivalent mortgage payment. <em>Projected dollar amounts are shown in today&rsquo;s purchasing power (real terms) as the primary value, with nominal future dollars shown alongside. Returns and CAGRs are computed on the real values. Accumulated payment streams (rent, interest, total cost of ownership) are shown as their nominal sum.</em> <a href="/bitcoin-vs-real-estate.html" style="color:var(--amber)">See the retrospective version &rarr;</a>
+    <!-- INTERACTIVE CHANNEL CHART -->
+    <div class="channel-container">
+      <div class="channel-controls">
+        <div class="channel-axis-toggle" role="tablist" aria-label="Time axis scale">
+          <button type="button" class="channel-axis-btn active" data-axis="linear" role="tab" aria-selected="true">Linear time</button>
+          <button type="button" class="channel-axis-btn" data-axis="log" role="tab" aria-selected="false">Log time</button>
+        </div>
+        <div class="channel-band-toggles" role="group" aria-label="Band visibility">
+          <label class="channel-band-toggle"><input type="checkbox" data-band="floor" checked><span>Floor</span></label>
+          <label class="channel-band-toggle"><input type="checkbox" data-band="trend" checked><span>Trend</span></label>
+          <label class="channel-band-toggle"><input type="checkbox" data-band="upper" checked><span>Upper</span></label>
+          <label class="channel-band-toggle"><input type="checkbox" data-band="history" checked><span>Price history</span></label>
+        </div>
+      </div>
+      <div class="channel-chart-wrapper"><canvas id="channelChart"></canvas></div>
+      <div class="channel-status" id="channelStatus">Loading current price&hellip;</div>
+    </div>
+
+    <div class="section">
+      <h3>Why two views?</h3>
+      <p class="prose">A power law is a relationship where one quantity scales as a power of another. For bitcoin, price scales as days-since-genesis raised to the power of 5.77. On a <strong>linear-time</strong> axis with a logarithmic price scale, that relationship looks like a curve: each successive price doubling takes longer in calendar time. On a <strong>log-log</strong> axis &mdash; both scales logarithmic &mdash; the curve straightens into a line. The slope of that line is the exponent.</p>
+      <p class="prose">The two views serve different mental models. Linear time matches how we experience markets &mdash; long periods near one price level, then sudden moves to the next. Log-log shows the underlying mathematics &mdash; a clean linear relationship that has held for fifteen years across nine orders of magnitude. Toggling between them is itself the educational point.</p>
+    </div>
+
+    <div class="annotation">
+      The Power Law is an empirical observation, not a guarantee. The model has held with R&sup2; above 0.95 across Bitcoin's lifetime, but past adherence does not guarantee future adherence. See <a href="#nature" style="color:var(--amber)">In Nature</a> and <a href="#theory" style="color:var(--amber)">The Theory</a> for the conceptual underpinning, or <a href="/the-bitcoin-retirement.html" style="color:var(--amber)">The Bitcoin Retirement</a> and <a href="/bitcoin-vs-real-estate.html#calc-mode-projection" style="color:var(--amber)">BTC vs. Real Estate (projection)</a> to see the channel applied as a forward projection.
     </div>
 
   </div>

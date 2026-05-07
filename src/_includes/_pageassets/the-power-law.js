@@ -589,465 +589,269 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
   updateProjection();
 })();
 
-// ═══════ TOOL B: FORWARD CALCULATOR ═══════
+// ═══════ THE CHANNEL — interactive Power Law visualization (Tab 4) ═══════
+//
+// Builds a Chart.js scatter chart with three Power Law band lines (Floor,
+// Trend, Upper) and a fourth dataset for historical price (PL_DATA), plus
+// a Today marker. Two axis modes — Linear time (default) and Log time —
+// switchable via the .channel-axis-toggle controls. Each band can be
+// individually hidden via .channel-band-toggle checkboxes. Live BTC price
+// is fetched from CoinGecko for the status line; falls back to the most
+// recent PL_DATA sample if the fetch fails.
+//
+// Replaces the previous Tool B: Forward Calculator (now lives at
+// /bitcoin-vs-real-estate.html#calc-mode-projection — see commit 0b2d203
+// and the Phase 4 restructure).
 (function(){
-  var resultsEl = document.getElementById('fwdResults');
-  if(!resultsEl) return;
+  var canvas = document.getElementById('channelChart');
+  if(!canvas) return;
 
-  var scenario = 'floor';
-  var method = 'mortgage';
-  var LIVE_BTC_FALLBACK = 84000;
+  // Today in days-since-genesis
+  var todayD = (Date.now()/1000 - GENESIS_TS) / 86400;
+  var minD = PL_DATA[0][0];
+  var futureD = todayD + 365.25 * 5; // project 5 years past today
 
-  // ── Populate time horizon based on current year ──
-  var NOW_YEAR = new Date().getFullYear();
-  var horizonSel = document.getElementById('fwdHorizon');
-  [5, 10, 15, 20].forEach(function(h, i){
-    var opt = document.createElement('option');
-    opt.value = h;
-    opt.textContent = h + ' years (' + (NOW_YEAR + h) + ')';
-    if(i === 1) opt.selected = true;
-    horizonSel.appendChild(opt);
-  });
-
-  // ── Live BTC price fetch (CoinGecko; same as Is Bitcoin a Bubble tool) ──
-  function fetchLiveBtcPrice(){
-    var input = document.getElementById('fwdBtcNow');
-    var status = document.getElementById('fwdBtcPriceStatus');
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', {cache:'no-store'})
-      .then(function(r){ return r.ok ? r.json() : Promise.reject(); })
-      .then(function(d){
-        var p = Math.round(d.bitcoin.usd);
-        input.value = p.toLocaleString();
-        if(status) status.textContent = '(live)';
-        runFwdCalc();
-      })
-      .catch(function(){
-        input.value = LIVE_BTC_FALLBACK.toLocaleString();
-        if(status) status.textContent = '(fallback)';
-        runFwdCalc();
-      });
+  // Generate band lines: trend / floor / upper, sampled every 30 days
+  var trendLine = [], floorLine = [], upperLine = [];
+  for(var d = minD; d <= futureD; d += 30){
+    var t = plPrice(d);
+    trendLine.push({x: d, y: t});
+    floorLine.push({x: d, y: t * PL_FLOOR});
+    upperLine.push({x: d, y: t * PL_CEIL});
   }
 
-  // ── Power Law scenario buttons ──
-  document.querySelectorAll('.scenario-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      document.querySelectorAll('.scenario-btn').forEach(function(b){b.classList.remove('active')});
-      btn.classList.add('active');
-      scenario = btn.dataset.scenario;
-      runFwdCalc();
-    });
-  });
+  // Historical price as dataset
+  var historicalLine = PL_DATA.map(function(p){ return {x: p[0], y: p[1]}; });
 
-  // ── Purchase method buttons ──
-  document.querySelectorAll('.purchase-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      document.querySelectorAll('.purchase-btn').forEach(function(b){b.classList.remove('active')});
-      btn.classList.add('active');
-      method = btn.dataset.method;
-      // Reset the advanced toggle when switching methods (the toggle means different things in each)
-      var check = document.getElementById('fwdAdvancedCheck');
-      if(check) check.checked = false;
-      updateAdvancedToggleLabel();
-      runFwdCalc();
-    });
-  });
+  // Today marker (single point)
+  var todayPrice = plPrice(todayD);
 
-  function parseNum(id){
-    var el = document.getElementById(id);
-    if(!el) return 0;
-    return parseFloat(el.value.replace(/[$,%\s]/g,'')) || 0;
-  }
-  function fmt(v){ return '$'+Math.round(v).toLocaleString(); }
+  // Theming
+  var amber = 'rgba(247,147,26,0.9)';
+  var rust = '#b04525';
+  var gold = '#e8c820';
+  var muted = 'rgba(160,160,160,0.55)';
+  var historyColor = 'rgba(232,224,210,0.8)';
 
-  function updateAdvancedToggleLabel(){
-    var text = document.getElementById('fwdAdvancedText');
-    var rateWrap = document.getElementById('fwdAdvancedRateWrap');
-    if(method === 'mortgage'){
-      text.innerHTML = '<strong>Go deeper:</strong> DCA the rent-vs-mortgage savings into bitcoin each month?';
-      rateWrap.style.display = 'none';
-    } else {
-      text.innerHTML = '<strong>Go deeper:</strong> Invest imputed rent savings (what the cash buyer isn\u2019t paying) in the S&amp;P 500';
-      rateWrap.style.display = 'inline-flex';
+  // Plugin: render a "Today" vertical line across the chart
+  var todayLinePlugin = {
+    id: 'todayLine',
+    afterDatasetsDraw: function(chart){
+      var xScale = chart.scales.x;
+      var area = chart.chartArea;
+      if(!xScale || !area) return;
+      var xPos = xScale.getPixelForValue(todayD);
+      if(xPos < area.left || xPos > area.right) return;
+      var ctx = chart.ctx;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(247,147,26,0.4)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4,4]);
+      ctx.beginPath();
+      ctx.moveTo(xPos, area.top);
+      ctx.lineTo(xPos, area.bottom);
+      ctx.stroke();
+      ctx.fillStyle = amber;
+      ctx.font = '10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Today', xPos, area.top + 12);
+      ctx.restore();
     }
-  }
+  };
 
-  function runFwdCalc(){
-    var horizonYrs = parseInt(horizonSel.value);
-    var btcNow = parseNum('fwdBtcNow');
-    var homePrice = parseNum('fwdHomePrice');
-    // Home appreciation input is now in REAL terms (per canonical §3.5).
-    // Combine with sitewide inflation to get nominal rate for the math below,
-    // which produces nominal future values.
-    var homeApprReal = parseNum('fwdHomeAppreciation');
-    var inflRate = window.ModelingAssumptions.get('inflation').value;
-    var homeApprNominalPct = window.CalcHelpers.realToNominal(homeApprReal, inflRate);
-    var homeAppr = homeApprNominalPct / 100;
-    var mortRate = parseNum('fwdMortgageRate');
-
-    if(btcNow <= 0 || homePrice <= 0) return;
-
-    // ── Stage 5b helpers — real-terms display layer ──
-    // Math throughout this function continues to produce NOMINAL future values
-    // (the existing calculations are unchanged). At display time we deflate
-    // those values to today's purchasing power using the sitewide inflation
-    // rate, and present real as primary with nominal as secondary.
-    function toReal(nominalFutureValue) {
-      return window.CalcHelpers.deflateToToday(nominalFutureValue, inflRate, horizonYrs);
-    }
-    // Format a value pair for real-primary display: real value as primary,
-    // nominal-equivalent shown in a smaller dim secondary line below.
-    function fmtDual(nominalValue, realValueOpt) {
-      var real = (realValueOpt !== undefined) ? realValueOpt : toReal(nominalValue);
-      return '<span class="dual-real">'+fmt(real)+'</span>' +
-             '<span class="dual-nominal" style="display:block;font-size:.7rem;color:var(--text-muted);font-weight:400;letter-spacing:0;text-transform:none">'+fmt(nominalValue)+' nominal</span>';
-    }
-    // Inline variant for use inside detail-line prose where the dual treatment
-    // should be compact (real (nominal nominal)).
-    function fmtDualInline(nominalValue, realValueOpt) {
-      var real = (realValueOpt !== undefined) ? realValueOpt : toReal(nominalValue);
-      return fmt(real) + ' <span style="font-size:.78rem;color:var(--text-muted)">('+fmt(nominalValue)+' nominal)</span>';
-    }
-
-    var startYear = NOW_YEAR;
-    var endYear = startYear + horizonYrs;
-    var asOf = 'Jan 1, ' + endYear;
-
-    // ── Derive investment amount from home price + method ──
-    var amount = (method === 'cash') ? homePrice : homePrice * 0.2;
-
-    // ── Mortgage math (needed for both modes: implied rent = 75% of equivalent mortgage) ──
-    var loanAmt = homePrice * 0.8;
-    var mr = mortRate / 100 / 12;
-    var nPayments = 360;
-    var monthlyMort = mr > 0 ? loanAmt * (mr * Math.pow(1+mr, nPayments)) / (Math.pow(1+mr, nPayments) - 1) : loanAmt / nPayments;
-    var impliedRent = monthlyMort * 0.75;
-    var totalRentPaid = impliedRent * 12 * horizonYrs;
-
-    // ── BITCOIN SIDE ──
-    var btcBought = amount / btcNow;
-    var futureDays = (endYear - 2009) * 365.25;
-    var futureTrend = plPrice(futureDays);
-    var futureFloor = futureTrend * PL_FLOOR;
-    var futureCeil = futureTrend * PL_CEIL;
-
-    var futurePrice, scenarioLabel;
-    if(scenario === 'floor'){ futurePrice = futureFloor; scenarioLabel = 'Floor (conservative)'; }
-    else if(scenario === 'trend'){ futurePrice = futureTrend; scenarioLabel = 'Trend (fair value)'; }
-    else { futurePrice = futureCeil; scenarioLabel = 'Upper (bull case)'; }
-
-    var btcValue = btcBought * futurePrice;
-    var btcNet = btcValue - totalRentPaid;
-    // Real-terms equivalents (today's purchasing power)
-    var btcValueReal = toReal(btcValue);
-    var futurePriceReal = toReal(futurePrice);
-    // For btcNet: btcValue is a future-dollar amount (deflate to real);
-    // totalRentPaid is accumulated nominal payments — first-order approximation,
-    // we treat its dollar magnitude as today's-equivalent purchasing power
-    // (each monthly payment is in then-dollars, but the user thinks of rent as
-    // a today's-dollar cost; per Approach 3 we don't do per-payment deflation
-    // at this stage). The accumulated totals retain their nominal magnitudes.
-    var btcNetReal = btcValueReal - totalRentPaid;
-    // Returns and CAGRs computed against real values for consistency with the
-    // real-primary display. Real return is the honest "purchasing-power gain"
-    // figure; nominal return would inflate the apparent gain by inflation.
-    var btcReturn = ((btcNetReal - amount) / amount * 100).toFixed(0);
-    var btcCAGR = btcNetReal > 0 ? ((Math.pow(btcNetReal/amount, 1/horizonYrs) - 1) * 100).toFixed(1) : '—';
-
-    // ── HOUSE SIDE ──
-    var futureHomeValue = homePrice * Math.pow(1 + homeAppr, horizonYrs);
-    var futureHomeValueReal = toReal(futureHomeValue);
-    var bal = 0, equity = futureHomeValue, interestPaid = 0, totalMortPaid = 0;
-    if(method === 'mortgage'){
-      var monthsPaid = horizonYrs * 12;
-      bal = loanAmt;
-      for(var i = 0; i < Math.min(monthsPaid, nPayments); i++){
-        bal = bal * (1 + mr) - monthlyMort;
-      }
-      bal = Math.max(0, bal);
-      equity = futureHomeValue - bal;
-      totalMortPaid = monthlyMort * Math.min(monthsPaid, nPayments);
-      interestPaid = totalMortPaid - (loanAmt - bal);
-    }
-    // Real equity: equity = futureHomeValue - bal, both at end-of-horizon
-    // dollars; deflate to today's purchasing power
-    var equityReal = toReal(equity);
-
-    var propTax = homePrice * 0.012 * horizonYrs;
-    var insurance = 150 * 12 * horizonYrs;
-    var maintenance = homePrice * 0.01 * horizonYrs;
-    var totalHouseCost = amount + totalMortPaid + propTax + insurance + maintenance;
-    // House CAGR: real appreciation rate is exactly the canonical homeApprReal
-    // input (the user picked it). Display that directly rather than recomputing.
-    var houseCAGR = homeApprReal.toFixed(1);
-
-    // ── HOUSES SUMMARY ──
-    // Ratio is dimension-independent: btcNet/futureHomeValue (both nominal) =
-    // btcNetReal/futureHomeValueReal. Use real values to keep the result well-
-    // defined when btcNetReal goes near zero.
-    var housesCanBuy = Math.max(0, btcNetReal / futureHomeValueReal);
-
-    // Equity % for the house card ownership visual (mortgage mode only)
-    var equityPct = futureHomeValue > 0 ? Math.round((equity / futureHomeValue) * 100) : 0;
-
-    // ── House-ownership visual (single house icon, mirrors retrospective pattern) ──
-    // Mortgage: red outline with amber fill-overlay scaled to equity %
-    function buildOwnershipVisual(){
-      if(method === 'cash'){
-        return '<div style="display:flex;align-items:center;gap:.6rem;margin:.2rem 0 .9rem">' +
-          '<svg viewBox="0 0 24 24" width="32" height="32">' +
-            '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="var(--amber)" fill-opacity="0.18" stroke="#e09422" stroke-width="1.7" stroke-linejoin="round"/>' +
-          '</svg>' +
-          '<span style="font-size:.9rem;color:var(--text)">1 house, outright</span>' +
-        '</div>';
-      }
-      var _fh = Math.max(0, Math.min(20, equityPct * 0.20));
-      var outlineColor = equityPct >= 100 ? '#e09422' : '#c0392b';
-      var label = equityPct < 0 ? '<span style="color:var(--red)">Underwater</span>' : equityPct + '% owned';
-      return '<div style="display:flex;align-items:center;gap:.6rem;margin:.2rem 0 .9rem">' +
-        '<svg viewBox="0 0 24 24" width="32" height="32">' +
-          '<defs><clipPath id="ecFwd"><rect x="0" y="'+(24-_fh)+'" width="24" height="'+_fh+'"/></clipPath></defs>' +
-          '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="'+outlineColor+'" stroke-width="1.5" stroke-linejoin="round"/>' +
-          '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linejoin="round" clip-path="url(#ecFwd)"/>' +
-        '</svg>' +
-        '<span style="font-size:.9rem;color:var(--text)">'+label+'</span>' +
-      '</div>';
-    }
-    var ownershipVisual = buildOwnershipVisual();
-
-    // House-icon visualization (mirrors retrospective pattern)
-    function buildHouseIcons(n){
-      var fI = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linejoin="round"/></svg>';
-      var pI = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px;opacity:0.45"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.2" stroke-dasharray="2 2" stroke-linejoin="round"/></svg>';
-      var fH = Math.floor(n), pt = n - fH, ic = '';
-      for(var i = 0; i < Math.min(fH, 15); i++) ic += fI;
-      if(pt > 0.05) ic += pI;
-      if(fH === 0 && pt <= 0.05) ic += pI;
-      var ov = fH > 15 ? '<span style="font-size:.8rem;color:var(--amber);margin-left:.4rem;align-self:center">+'+(fH-15)+' more</span>' : '';
-      return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:.6rem 0 .8rem">' + ic + ov + '</div>';
-    }
-    var houseIconsHtml = buildHouseIcons(housesCanBuy);
-
-    // ── RENDER: BITCOIN CARD (left) ──
-    var btcHtml =
-      '<div class="calc-card bitcoin">' +
-        '<h4>&#8383; Bought Bitcoin + Rented ('+startYear+')</h4>' +
-        '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
-        '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong></div>' +
-        '<div class="period-divider"></div>' +
-        '<div class="period-label">'+endYear+' \u00b7 Projected (real, today\u2019s $)</div>' +
-        '<div class="big-number">'+fmt(btcNetReal)+' <span style="font-size:.8rem;color:var(--text-muted)">net</span></div>' +
-        '<div class="big-number-label">projected net position in today\u2019s purchasing power</div>' +
-        '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(btcNet)+' nominal</div>' +
-        houseIconsHtml +
-        '<div class="detail-line">BTC purchased: '+btcBought.toFixed(4)+' @ '+fmt(btcNow)+'/BTC</div>' +
-        '<div class="detail-line">Projected BTC price: <strong>'+fmt(futurePriceReal)+'</strong> <span style="font-size:.78rem;color:var(--text-muted)">today\u2019s $ (~'+fmt(futurePrice)+' nominal)</span></div>' +
-        '<div class="detail-line">Gross BTC value: '+fmt(btcValueReal)+' <span style="font-size:.78rem;color:var(--text-muted)">(~'+fmt(btcValue)+' nominal)</span></div>' +
-        '<div class="detail-line">Est. monthly rent: '+fmt(impliedRent)+'/mo <span style="font-size:.78rem;color:var(--text-muted)">(75% of equivalent mortgage)</span></div>' +
-        '<div class="detail-line">Total rent paid: <span class="negative">'+fmt(totalRentPaid)+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
-        '<div class="detail-line">Total real return: <span class="highlight">'+btcReturn+'%</span> <span style="font-size:.72rem;color:var(--text-muted)">in purchasing-power terms</span></div>' +
-        (btcCAGR !== '—' ? '<div class="detail-line">Implied real CAGR: <span class="highlight">'+btcCAGR+'%</span></div>' : '') +
-        '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">(projected home value: '+fmt(futureHomeValueReal)+' each in today\u2019s $)</span></div>' +
-        '<div class="detail-line" style="margin-top:.6rem;font-size:.78rem;color:var(--text-muted)">No leverage. No interest. No property taxes. No maintenance.</div>' +
-      '</div>';
-
-    // ── RENDER: HOUSE CARD (right) ──
-    var houseHtml;
-    if(method === 'mortgage'){
-      houseHtml =
-        '<div class="calc-card house">' +
-          '<h4>&#127968; Bought the House ('+startYear+')</h4>' +
-          '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
-          '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(20% down of '+fmt(homePrice)+')</span></div>' +
-          '<div class="period-divider"></div>' +
-          '<div class="period-label">'+endYear+' \u00b7 Projected (real, today\u2019s $)</div>' +
-          '<div class="big-number">'+fmt(equityReal)+'</div>' +
-          '<div class="big-number-label">projected equity in today\u2019s purchasing power</div>' +
-          '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(equity)+' nominal</div>' +
-          ownershipVisual +
-          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(futureHomeValueReal)+' <span style="font-size:.78rem;color:var(--text-muted)">today\u2019s $ (~'+fmt(futureHomeValue)+' nominal); '+houseCAGR+'%/yr real</span></div>' +
-          '<div class="detail-line">Monthly mortgage: '+fmt(monthlyMort)+'/mo at '+mortRate+'%</div>' +
-          '<div class="detail-line">Interest paid: <span class="negative">'+fmt(interestPaid)+'</span> <span style="font-size:.78rem;color:var(--text-muted)">(dead money, accumulated)</span></div>' +
-          '<div class="detail-line">Remaining loan: '+(bal > 0 ? '<span class="negative">'+fmt(bal)+'</span>' : 'Paid off')+'</div>' +
-          '<div class="detail-line">Rent paid: $0 <span style="font-size:.78rem;color:var(--text-muted)">(you live in it)</span></div>' +
-          '<div class="detail-line">Total cost of ownership: <span class="negative">'+fmt(totalHouseCost)+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
-        '</div>';
-    } else {
-      houseHtml =
-        '<div class="calc-card house">' +
-          '<h4>&#127968; Bought the House ('+startYear+')</h4>' +
-          '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
-          '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(cash, paid in full)</span></div>' +
-          '<div class="period-divider"></div>' +
-          '<div class="period-label">'+endYear+' \u00b7 Projected (real, today\u2019s $)</div>' +
-          '<div class="big-number">'+fmt(futureHomeValueReal)+'</div>' +
-          '<div class="big-number-label">projected home value in today\u2019s purchasing power</div>' +
-          '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(futureHomeValue)+' nominal</div>' +
-          ownershipVisual +
-          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(futureHomeValueReal)+' <span style="font-size:.78rem;color:var(--text-muted)">today\u2019s $ (~'+fmt(futureHomeValue)+' nominal); '+houseCAGR+'%/yr real</span></div>' +
-          '<div class="detail-line">Mortgage: $0 <span style="font-size:.78rem;color:var(--text-muted)">(no debt)</span></div>' +
-          '<div class="detail-line">Interest paid: $0</div>' +
-          '<div class="detail-line">Rent paid: $0 <span style="font-size:.78rem;color:var(--text-muted)">(you live in it)</span></div>' +
-          '<div class="detail-line">Total cost of ownership: <span class="negative">'+fmt(totalHouseCost)+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
-          '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">Cash buyer avoids rent \u2014 a real benefit not captured in projected value. Toggle "Go deeper" below to model it.</div>' +
-        '</div>';
-    }
-
-    resultsEl.innerHTML =
-      '<div class="calc-results-grid">' + btcHtml + houseHtml + '</div>';
-
-    // ── ADVANCED SECTION ──
-    renderAdvanced({
-      method: method, amount: amount, horizonYrs: horizonYrs, inflRate: inflRate,
-      startYear: startYear, endYear: endYear,
-      monthlyMort: monthlyMort, impliedRent: impliedRent, totalRentPaid: totalRentPaid,
-      btcNow: btcNow, futurePrice: futurePrice, btcValue: btcValue, btcBought: btcBought,
-      futureHomeValue: futureHomeValue, scenarioLabel: scenarioLabel, equity: equity, btcNet: btcNet
-    });
-  }
-
-  function renderAdvanced(s){
-    var check = document.getElementById('fwdAdvancedCheck');
-    var content = document.getElementById('fwdAdvancedContent');
-    var note = document.getElementById('fwdAdvancedNote');
-    var leftEl = document.getElementById('fwdAdvancedLeft');
-    var rightEl = document.getElementById('fwdAdvancedRight');
-    if(!check.checked){
-      content.style.display = 'none';
-      return;
-    }
-    content.style.display = 'block';
-
-    // Local helper for deflating the advanced section's future values to today's $
-    function toReal(nominalFutureValue) {
-      return window.CalcHelpers.deflateToToday(nominalFutureValue, s.inflRate, s.horizonYrs);
-    }
-
-    if(s.method === 'mortgage'){
-      // DCA the rent-vs-mortgage savings into BTC, using geometric interpolation of price over horizon
-      var monthlySavings = Math.max(0, s.monthlyMort - s.impliedRent);
-      var dcaBtc = 0;
-      var totalMonths = s.horizonYrs * 12;
-      if(monthlySavings > 0 && s.btcNow > 0 && s.futurePrice > 0){
-        for(var m = 0; m < totalMonths; m++){
-          // Geometric interpolation from btcNow to futurePrice
-          var frac = m / totalMonths;
-          var monthPrice = s.btcNow * Math.pow(s.futurePrice/s.btcNow, frac);
-          dcaBtc += monthlySavings / monthPrice;
+  var chart = new Chart(canvas, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        {
+          label: 'Floor (0.42× trend)',
+          data: floorLine,
+          borderColor: rust,
+          borderWidth: 1.6,
+          borderDash: [6,3],
+          pointRadius: 0,
+          showLine: true,
+          tension: 0.2,
+          order: 3
+        },
+        {
+          label: 'Trend (central case)',
+          data: trendLine,
+          borderColor: amber,
+          borderWidth: 2.5,
+          pointRadius: 0,
+          showLine: true,
+          tension: 0.2,
+          order: 2
+        },
+        {
+          label: 'Upper (3× trend)',
+          data: upperLine,
+          borderColor: gold,
+          borderWidth: 1.2,
+          borderDash: [1,6],
+          pointRadius: 0,
+          showLine: true,
+          tension: 0.2,
+          order: 4
+        },
+        {
+          label: 'Historical price',
+          data: historicalLine,
+          borderColor: historyColor,
+          backgroundColor: 'rgba(232,224,210,0.05)',
+          borderWidth: 1.4,
+          pointRadius: 0,
+          showLine: true,
+          fill: false,
+          tension: 0.15,
+          order: 1
+        }
+      ]
+    },
+    plugins: [todayLinePlugin],
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'nearest', axis: 'x', intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          align: 'center',
+          labels: {
+            usePointStyle: true,
+            pointStyle: 'circle',
+            padding: 14,
+            color: 'rgba(180,180,180,0.85)',
+            font: { size: 11 }
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(10,9,8,0.95)',
+          borderColor: 'rgba(247,147,26,0.6)',
+          borderWidth: 1,
+          titleColor: amber,
+          bodyColor: '#ddd',
+          callbacks: {
+            title: function(items){
+              if(!items.length) return '';
+              var d = items[0].parsed.x;
+              var date = new Date(GENESIS_TS*1000 + d*86400*1000);
+              return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
+            },
+            label: function(item){
+              var v = item.parsed.y;
+              var fmt;
+              if(v >= 1e6) fmt = '$' + (v/1e6).toFixed(2) + 'M';
+              else if(v >= 1000) fmt = '$' + (v/1000).toFixed(1) + 'K';
+              else if(v >= 1) fmt = '$' + v.toFixed(2);
+              else fmt = '$' + v.toFixed(4);
+              return item.dataset.label + ': ' + fmt;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          title: { display: true, text: 'Time (year)', color: muted, font: {size:11}},
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: {
+            color: muted,
+            maxTicksLimit: 10,
+            callback: function(v){
+              var date = new Date(GENESIS_TS*1000 + v*86400*1000);
+              return date.getFullYear();
+            }
+          }
+        },
+        y: {
+          type: 'logarithmic',
+          title: { display: true, text: 'BTC Price (USD)', color: muted, font: {size:11}},
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: {
+            color: muted,
+            callback: function(v){
+              if(v >= 1e6) return '$' + (v/1e6) + 'M';
+              if(v >= 1000) return '$' + (v/1000) + 'K';
+              if(v >= 1) return '$' + v;
+              return '$' + v.toFixed(2);
+            }
+          }
         }
       }
-      var dcaValue = dcaBtc * s.futurePrice;
-      var dcaValueReal = toReal(dcaValue);
-      var dcaTotalInvested = monthlySavings * totalMonths;
-      note.innerHTML = 'If you rent instead of buying, your monthly housing cost is ~75% of a mortgage payment. The difference \u2014 <strong>'+fmt(monthlySavings)+'/mo</strong> \u2014 invested in bitcoin each month compounds the opportunity cost over the horizon.';
-      leftEl.innerHTML =
-        '<div class="calc-card bitcoin" style="border-style:dashed">' +
-          '<h4>&#8383; Monthly DCA \u2014 Rent vs. Mortgage Savings</h4>' +
-          '<div class="big-number">'+fmt(dcaValueReal)+'</div>' +
-          '<div class="big-number-label">projected DCA value in today\u2019s purchasing power ('+s.endYear+')</div>' +
-          '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(dcaValue)+' nominal</div>' +
-          '<div class="detail-line">Est. mortgage: '+fmt(s.monthlyMort)+'/mo</div>' +
-          '<div class="detail-line">Est. rent: '+fmt(s.impliedRent)+'/mo</div>' +
-          '<div class="detail-line">Monthly DCA into BTC: <span class="highlight">'+fmt(monthlySavings)+'/mo</span></div>' +
-          '<div class="detail-line">BTC accumulated: '+dcaBtc.toFixed(4)+' BTC</div>' +
-          '<div class="detail-line">Total invested via DCA: '+fmt(dcaTotalInvested)+' <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
-          '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">DCA assumes BTC price follows a smooth geometric path from today\u2019s price to the projected endpoint.</div>' +
-        '</div>';
-      rightEl.innerHTML = '';
-    } else {
-      // Cash: S&P investment of imputed rent savings.
-      // Input is REAL return per canonical §3.5; convert to nominal for math.
-      var spReal = parseNum('fwdAdvancedRate');
-      if(spReal <= 0) spReal = 7;
-      var inflForSp = window.ModelingAssumptions.get('inflation').value;
-      var rate = window.CalcHelpers.realToNominal(spReal, inflForSp) / 100;
-      var monthlyRate = rate / 12;
-      var months = s.horizonYrs * 12;
-      var spFV = monthlyRate > 0 ? s.impliedRent * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) : s.impliedRent * months;
-      var spFVReal = toReal(spFV);
-      var spInvested = s.impliedRent * months;
-      note.innerHTML = 'As a cash buyer, you avoid paying rent \u2014 a real benefit worth roughly <strong>'+fmt(s.impliedRent)+'/mo</strong> (75% of an equivalent mortgage). If invested monthly at '+spReal.toFixed(1)+'%/yr real (sitewide real-return assumption; ~'+(rate*100).toFixed(1)+'%/yr nominal at today\u2019s inflation), those savings compound into:';
-      leftEl.innerHTML = '';
-      rightEl.innerHTML =
-        '<div class="calc-card house" style="border-style:dashed">' +
-          '<h4>&#128200; Imputed Rent &rarr; S&amp;P 500</h4>' +
-          '<div class="big-number">'+fmt(spFVReal)+'</div>' +
-          '<div class="big-number-label">projected portfolio in today\u2019s purchasing power ('+s.endYear+')</div>' +
-          '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(spFV)+' nominal</div>' +
-          '<div class="detail-line">Rent avoided: '+fmt(s.impliedRent)+'/mo</div>' +
-          '<div class="detail-line">Invested monthly at: <span class="highlight">'+spReal.toFixed(1)+'%/yr real</span></div>' +
-          '<div class="detail-line">Total invested: '+fmt(spInvested)+' <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
-          '<div class="detail-line">Total real gains: '+fmt(spFVReal - spInvested)+' <span style="font-size:.72rem;color:var(--text-muted)">in today\u2019s purchasing power</span></div>' +
-          '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">Default rate is the sitewide real-return assumption (5% diversified portfolio). 7% S&amp;P historical and 3% conservative are also valid choices; preference syncs across calculators on this site.</div>' +
-        '</div>';
     }
-  }
-
-  // ── Event listeners ──
-  ['fwdBtcNow','fwdHomePrice','fwdHomeAppreciation','fwdMortgageRate','fwdAdvancedRate'].forEach(function(id){
-    var el = document.getElementById(id);
-    if(el) el.addEventListener('input', runFwdCalc);
   });
-  horizonSel.addEventListener('change', runFwdCalc);
-  document.getElementById('fwdAdvancedCheck').addEventListener('change', runFwdCalc);
 
-  // ── Canonical integration (per STYLE_GUIDE §3.5) ──
-  // Real estate appreciation input is bound to lcs.realEstate canonical.
-  // S&P advanced rate input is bound to lcs.realReturns canonical.
-  // Both are REAL terms; the math above converts to nominal for the existing
-  // calc (Stage 5b will convert outputs to real-primary display).
+  // Axis toggle handler
+  document.querySelectorAll('.channel-axis-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.channel-axis-btn').forEach(function(x){
+        x.classList.remove('active');
+        x.setAttribute('aria-selected', 'false');
+      });
+      b.classList.add('active');
+      b.setAttribute('aria-selected', 'true');
+      var newType = b.dataset.axis === 'log' ? 'logarithmic' : 'linear';
+      chart.options.scales.x.type = newType;
+      // For log time, x axis can't be 0 (logarithmic), and PL_DATA starts at 592 days — we're fine
+      chart.update('none');
+    });
+  });
 
-  function syncFwdHomeApprFromCanonical(){
-    var current = window.ModelingAssumptions.get('realEstate');
-    var input = document.getElementById('fwdHomeAppreciation');
-    if(input && parseFloat(input.value) !== current.value) {
-      input.value = current.value;
-    }
+  // Band visibility toggles
+  // Dataset indices: 0=Floor, 1=Trend, 2=Upper, 3=History
+  var bandIndex = { floor: 0, trend: 1, upper: 2, history: 3 };
+  document.querySelectorAll('.channel-band-toggle input').forEach(function(input){
+    input.addEventListener('change', function(){
+      var idx = bandIndex[input.dataset.band];
+      if(idx === undefined) return;
+      chart.setDatasetVisibility(idx, input.checked);
+      chart.update('none');
+    });
+  });
+
+  // Status line: live BTC price + position relative to channel
+  var statusEl = document.getElementById('channelStatus');
+  function fmtUSD(v){
+    if(v >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
+    if(v >= 1000) return '$' + (v/1000).toFixed(1) + 'K';
+    return '$' + Math.round(v).toLocaleString();
   }
-  function syncFwdAdvancedRateFromCanonical(){
-    var current = window.ModelingAssumptions.get('realReturns');
-    var input = document.getElementById('fwdAdvancedRate');
-    if(input && parseFloat(input.value) !== current.value) {
-      input.value = current.value;
+  function updateStatus(currentPrice, isLive){
+    if(!statusEl) return;
+    var multiplier = currentPrice / todayPrice;
+    var bandLabel;
+    if(multiplier < PL_FLOOR){
+      bandLabel = '<span style="color:'+rust+'">below floor</span>';
+    } else if(multiplier < 1){
+      bandLabel = 'within Floor &rarr; Trend zone';
+    } else if(multiplier < PL_CEIL){
+      bandLabel = '<span style="color:'+amber+'">within Trend &rarr; Upper zone</span>';
+    } else {
+      bandLabel = '<span style="color:'+gold+'">above upper band</span>';
     }
+    var src = isLive ? '' : ' <span style="opacity:0.6">(last sample)</span>';
+    statusEl.innerHTML =
+      '<strong>Today:</strong> ' + fmtUSD(currentPrice) + src +
+      ' &middot; <span style="color:var(--amber)">' + multiplier.toFixed(2) + '&times; trend</span>' +
+      ' &middot; ' + bandLabel +
+      ' <span style="opacity:0.55;margin-left:0.5rem">(Power Law trend = ' + fmtUSD(todayPrice) + ')</span>';
   }
 
-  var apprInput = document.getElementById('fwdHomeAppreciation');
-  if(apprInput){
-    apprInput.addEventListener('change', function(){
-      var v = parseFloat(apprInput.value);
-      if(isFinite(v)) {
-        window.ModelingAssumptions.set('realEstate', 'custom', v);
+  // Try to fetch live BTC; fall back to last PL_DATA sample
+  fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
+    .then(function(r){ return r.ok ? r.json() : Promise.reject(); })
+    .then(function(j){
+      if(j && j.bitcoin && j.bitcoin.usd){
+        updateStatus(j.bitcoin.usd, true);
+      } else {
+        updateStatus(PL_DATA[PL_DATA.length-1][1], false);
       }
+    })
+    .catch(function(){
+      updateStatus(PL_DATA[PL_DATA.length-1][1], false);
     });
-  }
-  var advInput = document.getElementById('fwdAdvancedRate');
-  if(advInput){
-    advInput.addEventListener('change', function(){
-      // realReturns has no Custom field per canonical, but we still let users
-      // type a value here; we map it to the closest preset by rounding.
-      // For Stage 1 simplicity, just write the typed value to the canonical
-      // by treating as "diversified" preset override via the preset value
-      // mechanism. Stage 2's rich UI will replace this with proper preset
-      // selection.
-      // For now, we just don't write (canonical drives the input on load,
-      // user override stays local to the input).
-    });
-  }
-
-  // Subscribe to canonical changes (cross-tab, reset events)
-  if(window.ModelingAssumptions && window.ModelingAssumptions.subscribe){
-    window.ModelingAssumptions.subscribe(function(dim){
-      if(dim === 'realEstate' || dim === '*') syncFwdHomeApprFromCanonical();
-      if(dim === 'realReturns' || dim === '*') syncFwdAdvancedRateFromCanonical();
-      if(dim === 'inflation' || dim === '*') runFwdCalc();
-      runFwdCalc();
-    });
-  }
-
-  // ── Initial setup ──
-  syncFwdHomeApprFromCanonical();
-  syncFwdAdvancedRateFromCanonical();
-  updateAdvancedToggleLabel();
-  fetchLiveBtcPrice(); // runs runFwdCalc on completion
 })();
 

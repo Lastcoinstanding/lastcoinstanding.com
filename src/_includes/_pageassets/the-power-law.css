@@ -181,3 +181,140 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 }
 
 
+
+/* ═══════════════════════════════════════════════════════════════════
+   THE CHANNEL (Tab 4) — interactive Power Law visualization
+   Replaces the previous Tool B Forward Calculator. Chart-led surface
+   with axis-mode toggle + band visibility checkboxes + Today marker
+   + live status line. Prominent Porkopolis credit at top.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Porkopolis credit block */
+.porkopolis-credit {
+  background: rgba(224,148,34,0.04);
+  border: 1px solid rgba(224,148,34,0.18);
+  border-radius: 8px;
+  padding: 1.4rem 1.7rem;
+  margin: 0 0 2rem;
+  position: relative;
+}
+.porkopolis-credit-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--amber);
+  font-weight: 500;
+  margin-bottom: 0.6rem;
+}
+.porkopolis-credit p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+.porkopolis-credit a { color: var(--amber); text-decoration: none; }
+.porkopolis-credit a:hover { text-decoration: underline; }
+.porkopolis-credit strong { color: var(--text-bright, #e8e0d2); }
+
+/* Channel chart container */
+.channel-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem 1.8rem;
+  margin-bottom: 2rem;
+}
+
+/* Top row of controls */
+.channel-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Linear / Log time axis toggle (segmented buttons) */
+.channel-axis-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.channel-axis-btn {
+  background: rgba(255,255,255,0.02);
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-b);
+  font-size: 0.78rem;
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+.channel-axis-btn:last-child { border-right: none; }
+.channel-axis-btn:hover { color: var(--text-dim); }
+.channel-axis-btn.active {
+  background: rgba(224,148,34,0.1);
+  color: var(--amber);
+}
+
+/* Band visibility toggles */
+.channel-band-toggles {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.channel-band-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  user-select: none;
+}
+.channel-band-toggle input {
+  accent-color: var(--amber);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+/* Chart canvas wrapper */
+.channel-chart-wrapper {
+  height: 460px;
+  position: relative;
+}
+
+/* Status line below chart */
+.channel-status {
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  line-height: 1.7;
+}
+.channel-status strong {
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+/* Mobile breakpoint */
+@media (max-width: 720px) {
+  .channel-container { padding: 1.1rem 1.2rem; }
+  .channel-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+  .channel-band-toggles { gap: 0.85rem; }
+  .channel-chart-wrapper { height: 380px; }
+  .porkopolis-credit { padding: 1.1rem 1.2rem; }
+  .channel-status { font-size: 0.78rem; }
+}
