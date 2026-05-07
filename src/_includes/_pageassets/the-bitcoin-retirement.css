@@ -104,11 +104,33 @@ body {
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-/* ─── Essay prose for Question and Strategies tabs ─── */
+/* ─── Essay prose for Question, Strategies, and Math tabs ─── */
 .essay-prose {
   max-width: 720px;
   margin: 1.5rem auto 2rem;
   padding: 0 1rem;
+}
+
+/* Tab thesis header — Power-Law-style hero claim that anchors each prose tab.
+   Placed at the top of each .essay-prose container; centered, large display
+   type with amber-italic emphasis on the punchy half of the claim. */
+.essay-prose .tab-thesis {
+  text-align: center;
+  margin: 0 auto 2.4rem;
+  max-width: 780px;
+}
+.essay-prose .tab-thesis h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  font-weight: 500;
+  color: var(--ink-bright);
+  line-height: 1.35;
+  margin: 0;
+  letter-spacing: -0.005em;
+}
+.essay-prose .tab-thesis em {
+  color: var(--amber);
+  font-style: italic;
 }
 .essay-prose .section-title {
   font-family: var(--font-display);
@@ -187,10 +209,93 @@ body {
   font-style: italic;
   color: var(--ink-bright);
 }
+
+/* Math tab — specification-style helpers: equation blocks, parameter tables,
+   honest-limits lists. Reused inside .essay-prose alongside .prose paragraphs. */
+.essay-prose .math-block {
+  margin: 1rem 0 1.4rem;
+  padding: 0.9rem 1.2rem;
+  background: rgba(0,0,0,0.22);
+  border: 1px solid var(--border-faint);
+  border-radius: 5px;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+  overflow-x: auto;
+}
+.essay-prose .math-eq {
+  font-size: 0.95rem;
+  color: var(--ink-bright);
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.essay-prose .math-eq + .math-eq {
+  margin-top: 0.4rem;
+}
+.essay-prose .math-eq.math-eq-small {
+  font-size: 0.84rem;
+  color: var(--ink-dim);
+  margin-top: 0.4rem;
+  white-space: normal;
+}
+.essay-prose .math-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0 1.4rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+.essay-prose .math-table th,
+.essay-prose .math-table td {
+  text-align: left;
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid var(--border-faint);
+  vertical-align: top;
+}
+.essay-prose .math-table th {
+  color: var(--ink-bright);
+  font-weight: 500;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom-color: var(--ink-faint);
+}
+.essay-prose .math-table td {
+  color: var(--ink);
+}
+.essay-prose .math-list {
+  margin: 0.4rem 0 1.4rem 1.2rem;
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+.essay-prose .math-list li {
+  margin-bottom: 0.55rem;
+  padding-left: 0.3rem;
+}
+.essay-prose .math-list li::marker {
+  color: var(--ink-faint);
+}
+.essay-prose .math-list strong {
+  color: var(--ink-bright);
+  font-weight: 600;
+}
+.essay-prose .math-list a {
+  color: var(--amber);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.essay-prose .math-list a:hover {
+  color: var(--amber-bright);
+}
 @media (max-width: 640px) {
   .essay-prose {
     margin: 1rem auto 1.5rem;
     padding: 0 0.5rem;
+  }
+  .essay-prose .tab-thesis {
+    margin-bottom: 1.6rem;
   }
   .essay-prose .section-title {
     margin-top: 1.8rem;
@@ -203,6 +308,19 @@ body {
   .essay-prose .essay-callout {
     padding: 1rem 1.1rem;
     font-size: 1.05rem;
+  }
+  .essay-prose .math-block {
+    padding: 0.7rem 0.9rem;
+  }
+  .essay-prose .math-eq {
+    font-size: 0.85rem;
+  }
+  .essay-prose .math-table {
+    font-size: 0.88rem;
+  }
+  .essay-prose .math-table th,
+  .essay-prose .math-table td {
+    padding: 0.45rem 0.5rem;
   }
 }
 

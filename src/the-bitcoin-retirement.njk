@@ -38,6 +38,10 @@ eleventyComputed:
   <div class="tab-content" id="tab-question">
     <div class="essay-prose">
 
+      <div class="tab-thesis">
+        <h2>Three legitimate questions, <em>each with a defensible range</em>.</h2>
+      </div>
+
       <p class="prose">Retirement planning was built for portfolios that compound at seven percent real per year (target rate) and draw down at four percent per year. The &ldquo;four-percent rule&rdquo; has held up across most thirty-year sequences in the historical record; the <a href="https://www.bogleheads.org/wiki/Trinity_study" target="_blank" rel="noopener">Trinity Study</a> put numbers on what most people had intuited for as long as retirement has existed. Save enough for retirement, withdraw modestly, hope the markets cooperate.</p>
 
       <p class="prose">Bitcoin doesn&rsquo;t fit that template. Its growth profile under the <a href="/the-power-law.html">Power Law</a> has remained meaningfully above traditional-asset returns for the entire foreseeable retirement window. The gap is the whole problem (and opportunity) that this calculator looks to address.</p>
@@ -347,6 +351,10 @@ eleventyComputed:
   <div class="tab-content" id="tab-strategies">
     <div class="essay-prose">
 
+      <div class="tab-thesis">
+        <h2>Three frameworks for one stack &mdash; <em>different shapes of risk, not different reward levels</em>.</h2>
+      </div>
+
       <p class="prose">A bitcoin position can be drawn down for retirement in more than one way. The choice between approaches matters &mdash; and matters more than most retirement essays acknowledge &mdash; because the strategies available here are different <em>in kind</em>, not just degree.</p>
 
       <p class="prose"><em>Sell as needed</em> is the foundational approach: the same mechanic the <a href="https://www.bogleheads.org/wiki/Trinity_study" target="_blank" rel="noopener">Trinity Study</a> describes for traditional portfolios, applied to a more volatile asset. <em>Borrow against your stack</em> delays the selling and substitutes leveraged risk in its place. <em>Disciplined rebalancing</em>, available primarily inside retirement accounts, captures volatility through bounded triggers &mdash; sell at a percentile, rebuy at the trend.</p>
@@ -410,8 +418,126 @@ eleventyComputed:
   <!-- TAB 4: THE MATH -->
   <!-- ═══════════════════════════════════════════ -->
   <div class="tab-content" id="tab-math">
-    <div class="construction-note">
-      <p><strong>Coming soon.</strong> The Math tab will document the projection mechanics, withdrawal-rate framework, escape-velocity threshold, and the modeling assumptions that drive the calculator.</p>
+    <div class="essay-prose">
+
+      <div class="tab-thesis">
+        <h2>How the math works &mdash; <em>and what it cannot tell you</em>.</h2>
+      </div>
+
+      <p class="prose">This tab is the source. Every projection on the calculator tab is computed from the parameters and equations below. Nothing is hidden; no magic constants. Where the model has limits &mdash; and it has several &mdash; they are named explicitly.</p>
+
+      <h2 class="section-title">The price model</h2>
+
+      <p class="prose">Bitcoin price projections use the Power Law trend, with constants matching <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">Porkopolis Economics</a>&rsquo; published coefficients:</p>
+
+      <div class="math-block">
+        <div class="math-eq">Price(t) = a &times; (days since Genesis)<sup>b</sup></div>
+        <div class="math-eq math-eq-small">where a = 1.6 &times; 10<sup>&minus;17</sup>, b = 5.77, Genesis = 3 January 2009</div>
+      </div>
+
+      <p class="prose">The floor and upper bands are multiplicative envelopes around trend:</p>
+
+      <div class="math-block">
+        <div class="math-eq">Floor(t) = 0.42 &times; Price(t)</div>
+        <div class="math-eq">Upper(t) = 3.0 &times; Price(t)</div>
+      </div>
+
+      <p class="prose">The floor is the boundary below which Bitcoin has never sustained a daily close in fifteen years; its R&sup2; against actual lows exceeds 0.99. The upper band is calibrated against historical cycle peaks and is best read as a spike envelope, not a sustained level. For the deeper treatment of why bitcoin follows this model, see <a href="/the-power-law.html">Bitcoin and the Power Law</a>.</p>
+
+      <h2 class="section-title">The stack projection</h2>
+
+      <p class="prose">Two phases: pre-retirement <em>accumulation</em> and post-retirement <em>drawdown</em>.</p>
+
+      <p class="prose"><strong>Accumulation.</strong> For each year between today and retirement, the dollar-cost-averaging contribution buys bitcoin at that year&rsquo;s modeled trend price:</p>
+
+      <div class="math-block">
+        <div class="math-eq">stack<sub>y+1</sub> = stack<sub>y</sub> + (12 &times; monthly DCA) &divide; Price(y)</div>
+      </div>
+
+      <p class="prose"><strong>Drawdown.</strong> For each retirement year, sell enough bitcoin at that year&rsquo;s modeled price to cover the target income, adjusted for inflation:</p>
+
+      <div class="math-block">
+        <div class="math-eq">withdrawal<sub>y</sub> = target income &times; (1 + inflation)<sup>(y &minus; retirement year)</sup></div>
+        <div class="math-eq">btc sold<sub>y</sub> = withdrawal<sub>y</sub> &divide; Price(y)</div>
+        <div class="math-eq">stack<sub>y+1</sub> = stack<sub>y</sub> &minus; btc sold<sub>y</sub></div>
+      </div>
+
+      <p class="prose">When the user is dragging the income slider, the implied withdrawal rate at retirement (income &divide; stack value at retirement) is computed as a derived value. When the user is thinking in percentage-rate terms, the same calculation runs in reverse to produce the implied dollar income.</p>
+
+      <h2 class="section-title">Sustainability and escape velocity</h2>
+
+      <p class="prose">The Sustainability readout reports two figures: <em>projected years stack lasts</em> and <em>projected stack value at retirement</em>. The spectrum bar maps the stack&rsquo;s real-terms multiplier &mdash; the ratio of the stack&rsquo;s purchasing power at the end of retirement to its purchasing power at the start &mdash; onto a continuum:</p>
+
+      <div class="math-block">
+        <div class="math-eq">real multiplier = (stack<sub>end</sub> &divide; stack<sub>start</sub>) &divide; (1 + inflation)<sup>years in retirement</sup></div>
+      </div>
+
+      <p class="prose">The thresholds:</p>
+
+      <table class="math-table">
+        <thead>
+          <tr><th>Real multiplier</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>&lt; 1&times;</td><td>Depleting &mdash; finishes with less purchasing power than started</td></tr>
+          <tr><td>= 1&times;</td><td>Threshold &mdash; breaks even after inflation</td></tr>
+          <tr><td>&gt; 1&times;</td><td>Escape velocity &mdash; stack grows faster than it is drawn down</td></tr>
+        </tbody>
+      </table>
+
+      <p class="prose"><em>Escape velocity</em> means the math closes for an indefinite horizon under the model. It does not mean bitcoin will continue to grow at the rate the model implies, and it does not guarantee any particular year will resemble the projection.</p>
+
+      <h2 class="section-title">Inflation and real terms</h2>
+
+      <p class="prose">Every dollar amount on the calculator is in <em>today&rsquo;s dollars</em>. The projection inflation-adjusts the target income so that the user&rsquo;s lifestyle stays constant in purchasing power across retirement. The inflation rate is selectable from the baseline assumptions:</p>
+
+      <table class="math-table">
+        <thead>
+          <tr><th>Preset</th><th>Rate</th><th>Source</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>CPI Official</td><td>3.5%</td><td>Bureau of Labor Statistics, long-term average</td></tr>
+          <tr><td>M2 Growth (true inflation)</td><td>6.5%</td><td>Federal Reserve M2 expansion, long-term</td></tr>
+          <tr><td>Shadow Stats</td><td>8.0%</td><td>ShadowStats.com alternative measure</td></tr>
+          <tr><td>Custom</td><td>user-set</td><td>any rate the user chooses</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="section-title">Traditional 60/40 benchmark</h2>
+
+      <p class="prose">The blue-gray comparison line on the projection chart represents a Traditional 60/40 portfolio with the same starting capital (today&rsquo;s stack value at the live BTC price). It compounds at a real return rate &mdash; selectable from the baseline assumptions &mdash; using the Fisher equation to produce nominal growth, and applies the same DCA contributions and inflation-adjusted withdrawals as the bitcoin scenario. This makes it a fair direct comparator: same money, same goal, different asset.</p>
+
+      <h2 class="section-title">Tax handling</h2>
+
+      <p class="prose">The v1 model is pretax throughout. Every dollar shown &mdash; on the slider, in the readout, on the chart &mdash; is gross of taxes.</p>
+
+      <p class="prose">The Account Type toggle below the readout is contextual, not computational. It explains the tax treatment that applies to the user&rsquo;s scenario but does not bake an effective rate into the projection. The illustrative line in the income slider tooltip &mdash; <em>&ldquo;a 20% effective tax would reduce real take-home to roughly 80%&rdquo;</em> &mdash; exists to acknowledge the magnitude without inviting the false precision a tax-rate slider would produce.</p>
+
+      <p class="prose">This is a deliberate choice. Effective tax rates depend on holding period, basis, federal and state brackets, NIIT eligibility, and Social Security crossover effects. A single &ldquo;effective tax rate&rdquo; slider would let users dial in whatever felt comfortable while feeling more precise &mdash; which is worse than not modeling tax at all. The 4% rule and the Trinity Study work in pretax dollars by convention; this calculator follows the same convention.</p>
+
+      <h2 class="section-title">What the model does not do</h2>
+
+      <p class="prose">Honest about limits:</p>
+
+      <ul class="math-list">
+        <li><strong>No sequence-of-returns risk (Monte Carlo).</strong> The floor, trend, and upper bands are shown together so users can read what each scenario implies. A stochastic simulation would produce a confidence-interval shape the model cannot truthfully claim.</li>
+        <li><strong>No state capital gains.</strong> Federal long-term capital gains framing is the reference; users in higher-tax states will see steeper effective drag than the unmentioned default suggests.</li>
+        <li><strong>No holding-period transitions.</strong> Average-cost basis is assumed; long-term capital gains rates apply uniformly to all sales.</li>
+        <li><strong>No leverage.</strong> Borrow-against modeling lives on its own <a href="/borrowing-against-your-stack.html">sibling page</a>.</li>
+        <li><strong>No rebalancing.</strong> Disciplined rebalancing modeling lives on its own <a href="/disciplined-rebalancing.html">sibling page</a>.</li>
+        <li><strong>No multi-stack split.</strong> Users with bitcoin in different account types (regular plus IRA) can run the calculator twice with different inputs; v1 does not blend them.</li>
+      </ul>
+
+      <h2 class="section-title">Sources</h2>
+
+      <ul class="math-list">
+        <li>Power Law coefficients: <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">Porkopolis Economics &mdash; The Chart</a></li>
+        <li>Genesis Block: 3 January 2009 (block 0, &ldquo;Chancellor on brink of second bailout for banks&rdquo;)</li>
+        <li>Live BTC price: <a href="https://www.coingecko.com/" target="_blank" rel="noopener">CoinGecko</a> public API</li>
+        <li>Trinity Study: <a href="https://www.bogleheads.org/wiki/Trinity_study" target="_blank" rel="noopener">Cooley, Hubbard, &amp; Walz (1998)</a>; William Bengen&rsquo;s 4% rule (1994)</li>
+        <li>Inflation presets: BLS CPI, Federal Reserve M2, <a href="https://www.shadowstats.com/" target="_blank" rel="noopener">ShadowStats</a></li>
+      </ul>
+
     </div>
   </div>
 
