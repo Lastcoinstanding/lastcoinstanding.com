@@ -927,6 +927,13 @@ a.powerlaw-link:hover {
   outline: none;
 }
 .help-tip .tip-content {
+  /* Hidden state uses display:none rather than opacity:0 — opacity:0 keeps
+     the absolute-positioned 240px-wide element in layout, which on mobile
+     causes horizontal page overflow whenever a ? icon sits within 120px
+     of the viewport's right edge (e.g., slider-row icons next to value
+     displays). Cost: lose the smooth fade transition; benefit: page no
+     longer scrolls horizontally on mobile. */
+  display: none;
   position: absolute;
   bottom: calc(100% + 8px);
   left: 50%;
@@ -943,15 +950,20 @@ a.powerlaw-link:hover {
   text-align: left;
   letter-spacing: 0;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.15s;
   z-index: 10;
   box-shadow: 0 6px 18px rgba(0,0,0,0.5);
 }
 .help-tip:hover .tip-content,
 .help-tip:focus .tip-content {
-  opacity: 1;
+  display: block;
   pointer-events: auto;
+}
+/* Narrow viewports: cap tooltip width so it can't exceed viewport when
+   shown — even if its parent ? icon is near the right edge. */
+@media (max-width: 480px) {
+  .help-tip .tip-content {
+    width: min(240px, calc(100vw - 32px));
+  }
 }
 
 /* ─── Range input — site-consistent amber-on-dark slider ─── */
