@@ -28,6 +28,21 @@
 }
 
 /* ───────────────────────────────────────────────
+   TAB VISIBILITY
+   Standard pattern from other tabbed pages on the site
+   (the-power-law.css, the-half-life.css, the-melting-ice-cube.css).
+   Without these rules, all tab-content blocks render simultaneously
+   stacked vertically. The .active class is toggled by the tab
+   routing IIFE in disciplined-rebalancing.js.
+   ─────────────────────────────────────────────── */
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: tabIn 0.35s ease; }
+@keyframes tabIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ───────────────────────────────────────────────
    BELIEF CONTEXT CALLOUT
    Soft prerequisite cue that links to /the-power-law for users
    who haven't engaged with the model yet. Visually distinct from
