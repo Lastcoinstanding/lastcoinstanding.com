@@ -1020,3 +1020,82 @@ input[type="range"]::-moz-range-track {
     .dr-math-chart-container { height: 320px; padding: 0.7rem; }
     .dr-math-disclosure { padding: 1.1rem 1.2rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════ */
+/* CHANNEL VIZ — anchor at top of Calculator tab               */
+/* ═══════════════════════════════════════════════════════════ */
+.dr-channel-viz {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem 1.7rem;
+    margin-bottom: 1.8rem;
+}
+.dr-channel-viz-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 0.95rem;
+}
+.dr-channel-chart-wrapper {
+    height: 460px;
+    position: relative;
+}
+.dr-channel-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.1rem 1.4rem;
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+.dr-swatch-floor    { background: var(--red);    width: 14px; height: 0; border-top: 1.5px dashed var(--red); }
+.dr-swatch-trend    { background: var(--amber);  width: 14px; height: 2.5px; border-radius: 1px; }
+.dr-swatch-upper    { background: transparent;   width: 14px; height: 0; border-top: 1.5px dotted #e8c820; }
+.dr-swatch-history  { background: rgba(232,224,210,0.7); width: 14px; height: 2px; border-radius: 1px; }
+.dr-swatch-sellline { background: transparent;   width: 14px; height: 0; border-top: 1.5px dashed #e09422; }
+.dr-swatch-rebuyline{ background: transparent;   width: 14px; height: 0; border-top: 1.5px dashed var(--green); }
+
+/* Porkopolis attribution — scoped to this page; mirrors the
+ * .porkopolis-credit treatment on /the-power-law without sharing CSS. */
+.dr-channel-attribution {
+    margin-top: 1.2rem;
+    padding: 0.95rem 1.15rem;
+    background: rgba(224,148,34,0.04);
+    border: 1px solid rgba(224,148,34,0.18);
+    border-radius: 6px;
+    font-size: 0.83rem;
+    line-height: 1.65;
+    color: var(--text-dim);
+}
+.dr-channel-attribution-label {
+    display: block;
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--amber);
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+}
+.dr-channel-attribution a { color: var(--amber); text-decoration: none; }
+.dr-channel-attribution a:hover { text-decoration: underline; }
+.dr-channel-attribution strong { color: #e8e0d2; }
+.dr-channel-attribution code {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(224,148,34,0.12);
+    padding: 0.05rem 0.32rem;
+    border-radius: 3px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+}
+
+/* Mobile */
+@media (max-width: 720px) {
+    .dr-channel-viz { padding: 1.1rem 1.2rem; }
+    .dr-channel-chart-wrapper { height: 360px; }
+    .dr-channel-legend { gap: 0.7rem 1rem; font-size: 0.74rem; }
+    .dr-channel-attribution { padding: 0.85rem 1rem; font-size: 0.78rem; }
+}

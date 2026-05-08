@@ -107,6 +107,31 @@ eleventyComputed:
 
         <div class="dr-calculator">
 
+            <!-- ═══════════════════ CHANNEL VIZ ═══════════════════ -->
+            <!-- The Power Law channel as a discipline. Floor / Trend / Upper -->
+            <!-- bands plus historical price, with the user's sell and rebuy -->
+            <!-- thresholds rendered as parallel-to-trend lines that move as -->
+            <!-- the user adjusts the percentile sliders. Forward projection -->
+            <!-- markers (sell triggers ▼, rebuy triggers ▲) are populated -->
+            <!-- once the user enters a stack value. Channel framework + -->
+            <!-- coefficients credit Mežinskis / Porkopolis (see /the-power-law). -->
+            <div class="dr-channel-viz">
+                <div class="dr-channel-viz-title">The channel — your thresholds against fifteen years of history</div>
+                <div class="dr-channel-chart-wrapper"><canvas id="drChannelChart"></canvas></div>
+                <div class="dr-channel-legend">
+                    <span class="dr-legend-item"><span class="dr-legend-swatch dr-swatch-floor"></span>Floor (0.42&times; trend)</span>
+                    <span class="dr-legend-item"><span class="dr-legend-swatch dr-swatch-trend"></span>Trend</span>
+                    <span class="dr-legend-item"><span class="dr-legend-swatch dr-swatch-upper"></span>Upper (3.0&times; trend)</span>
+                    <span class="dr-legend-item"><span class="dr-legend-swatch dr-swatch-history"></span>Historical price</span>
+                    <span class="dr-legend-item"><span class="dr-legend-swatch dr-swatch-sellline"></span>Your sell threshold</span>
+                    <span class="dr-legend-item"><span class="dr-legend-swatch dr-swatch-rebuyline"></span>Your rebuy threshold</span>
+                </div>
+                <div class="dr-channel-attribution">
+                    <span class="dr-channel-attribution-label">Channel framework &amp; coefficients</span>
+                    The Power Law channel &mdash; the floor at 0.42&times; trend, the upper band at 3&times; trend, and the daily-close convention &mdash; was developed by <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener"><strong>Matthew Me&zcaron;inskis</strong></a> at <a href="https://www.porkopolis.io" target="_blank" rel="noopener">Porkopolis Economics</a>. Coefficients used: <code>a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup></code>, <code>b&nbsp;=&nbsp;5.77</code>. See <a href="/the-power-law#channel">The Channel</a> for the canonical view.
+                </div>
+            </div>
+
             <!-- PRESET SHORTCUTS -->
             <div class="dr-presets">
                 <label>Quick start</label>

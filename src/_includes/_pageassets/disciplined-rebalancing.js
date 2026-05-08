@@ -214,9 +214,380 @@ var PL_DATA=[[592.0,0.07],[604.0,0.07],[616.0,0.06],[628.0,0.06],[640.0,0.06],[6
   if(location.hash.replace('#','') === 'math'){
     setTimeout(render, 80);
   }
+
 })();
 
-// ═══════ CALCULATOR MODULE ═══════
+// ═══════ CHANNEL VIZ — Calculator tab anchor visualization ═══════
+//
+// Shows the Power Law channel (floor / trend / upper) with historical
+// price overlay AND the user's sell/rebuy thresholds as parallel-to-trend
+// lines that update live as the percentile sliders move. Once the user
+// enters a stack value, the calculator IIFE dispatches a 'dr:simResult'
+// CustomEvent and we paint the simulated forward price path plus
+// trigger markers (▼ sell, ▲ rebuy) on top.
+//
+// X-axis: linear days-from-genesis; year-formatting tick callback
+// (matches the Tab 4 'Channel' chart on /the-power-law and the Math
+// tab companion chart — no chartjs date-adapter needed).
+// Y-axis: logarithmic USD price, autoscaled.
+//
+// Mežinskis / Porkopolis attribution lives in the markup below the chart.
+(function(){
+  var canvas = document.getElementById('drChannelChart');
+  if(!canvas) return;
+  if(typeof Chart === 'undefined') return;
+
+  // ─── X-DOMAIN ───
+  // Min: PL_DATA[0][0] (first historical sample; ~mid-2010)
+  // Max: today + horizon × 365.25 (extends to user's projection end)
+  // Today is fixed at script-load time.
+  var todayD = (Date.now()/1000 - GENESIS_TS) / 86400;
+  var minD = PL_DATA[0][0];
+  function maxD(){
+    var horizonEl = document.getElementById('drHorizon');
+    var horizon = horizonEl ? parseInt(horizonEl.value) : 20;
+    return todayD + horizon * 365.25;
+  }
+
+  // ─── BAND DATA ───
+  // Sampled every 30 days for performance (matches Tab 4 cadence).
+  function bandData(){
+    var trend = [], floor = [], upper = [];
+    var hi = maxD();
+    for(var d = minD; d <= hi; d += 30){
+      var t = plPrice(d);
+      trend.push({x: d, y: t});
+      floor.push({x: d, y: t * PL_FLOOR});
+      upper.push({x: d, y: t * PL_CEIL});
+    }
+    return { trend: trend, floor: floor, upper: upper };
+  }
+
+  // User's threshold lines: ratio × trend at every day. Same x-grid
+  // as the bands so they update cheaply (just rebuild y values).
+  function thresholdData(ratio){
+    var line = [];
+    var hi = maxD();
+    for(var d = minD; d <= hi; d += 30){
+      line.push({x: d, y: plPrice(d) * ratio});
+    }
+    return line;
+  }
+
+  // Historical price as scatter data (PL_DATA is already day-indexed).
+  var historicalData = PL_DATA.map(function(p){ return {x: p[0], y: p[1]}; });
+
+  // ─── PERCENTILE → RATIO (mirrors calc IIFE; computed once at init) ───
+  // We re-derive these here so the channel viz can render thresholds
+  // BEFORE the calc IIFE runs (e.g. before the user enters a stack).
+  var historicalRatios = [];
+  for(var i = 0; i < PL_DATA.length; i++){
+    var d = PL_DATA[i][0], p = PL_DATA[i][1];
+    var t = plPrice(d);
+    if(t > 0) historicalRatios.push(p / t);
+  }
+  historicalRatios.sort(function(a,b){ return a-b; });
+  function percentileToRatio(P){
+    if(P <= 0) return historicalRatios[0];
+    if(P >= 100) return historicalRatios[historicalRatios.length-1];
+    var idx = (P/100) * (historicalRatios.length - 1);
+    var lo = Math.floor(idx), hi = Math.ceil(idx);
+    if(lo === hi) return historicalRatios[lo];
+    var frac = idx - lo;
+    return historicalRatios[lo] * (1-frac) + historicalRatios[hi] * frac;
+  }
+
+  // ─── COLORS ───
+  var amber = '#e09422';
+  var rust = '#c0392b';
+  var gold = '#e8c820';
+  var historyColor = 'rgba(232,224,210,0.7)';
+  var sellColor = '#e09422';
+  var rebuyColor = '#27ae60';
+  var muted = 'rgba(160,160,160,0.55)';
+
+  // ─── "TODAY" VERTICAL LINE PLUGIN (mirrors Tab 4) ───
+  var todayLinePlugin = {
+    id: 'drTodayLine',
+    afterDatasetsDraw: function(chart){
+      var xScale = chart.scales.x;
+      var area = chart.chartArea;
+      if(!xScale || !area) return;
+      var xPos = xScale.getPixelForValue(todayD);
+      if(xPos < area.left || xPos > area.right) return;
+      var ctx = chart.ctx;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(224,148,34,0.4)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4,4]);
+      ctx.beginPath();
+      ctx.moveTo(xPos, area.top);
+      ctx.lineTo(xPos, area.bottom);
+      ctx.stroke();
+      ctx.fillStyle = amber;
+      ctx.font = '10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Today', xPos, area.top + 12);
+      ctx.restore();
+    }
+  };
+
+  // ─── INITIAL RENDER ───
+  var bands = bandData();
+  // Read default slider values to render initial threshold lines
+  var sellEl = document.getElementById('drSellPct');
+  var rebuyEl = document.getElementById('drRebuyPct');
+  var initialSellRatio = sellEl ? percentileToRatio(parseInt(sellEl.value)) : 1.78;
+  var initialRebuyRatio = rebuyEl ? percentileToRatio(parseInt(rebuyEl.value)) : 0.87;
+
+  // Dataset index map — used by update functions
+  var DS = {
+    floor: 0, trend: 1, upper: 2,
+    sellLine: 3, rebuyLine: 4,
+    history: 5,
+    forwardPath: 6,
+    sellMarkers: 7, rebuyMarkers: 8
+  };
+
+  var chart = new Chart(canvas, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        // 0: Floor band
+        {
+          label: 'Floor (0.42× trend)',
+          data: bands.floor,
+          borderColor: rust,
+          borderWidth: 1.4,
+          borderDash: [6, 3],
+          pointRadius: 0,
+          showLine: true,
+          tension: 0.2,
+          order: 5
+        },
+        // 1: Trend
+        {
+          label: 'Trend',
+          data: bands.trend,
+          borderColor: amber,
+          borderWidth: 2,
+          pointRadius: 0,
+          showLine: true,
+          tension: 0.2,
+          order: 4
+        },
+        // 2: Upper band
+        {
+          label: 'Upper (3.0× trend)',
+          data: bands.upper,
+          borderColor: gold,
+          borderWidth: 1.2,
+          borderDash: [1, 5],
+          pointRadius: 0,
+          showLine: true,
+          tension: 0.2,
+          order: 6
+        },
+        // 3: User's sell-threshold line (parallel to trend, scaled by sellRatio)
+        {
+          label: 'Your sell threshold',
+          data: thresholdData(initialSellRatio),
+          borderColor: sellColor,
+          borderWidth: 1.6,
+          borderDash: [8, 4],
+          pointRadius: 0,
+          showLine: true,
+          tension: 0.2,
+          order: 2
+        },
+        // 4: User's rebuy-threshold line
+        {
+          label: 'Your rebuy threshold',
+          data: thresholdData(initialRebuyRatio),
+          borderColor: rebuyColor,
+          borderWidth: 1.6,
+          borderDash: [8, 4],
+          pointRadius: 0,
+          showLine: true,
+          tension: 0.2,
+          order: 3
+        },
+        // 5: Historical price
+        {
+          label: 'Historical price',
+          data: historicalData,
+          borderColor: historyColor,
+          borderWidth: 1.2,
+          pointRadius: 0,
+          showLine: true,
+          tension: 0.15,
+          order: 1
+        },
+        // 6: Forward-projected discipline price path (populated on sim event)
+        {
+          label: 'Projected price',
+          data: [],
+          borderColor: 'rgba(232,224,210,0.45)',
+          borderWidth: 1,
+          borderDash: [3, 3],
+          pointRadius: 0,
+          showLine: true,
+          tension: 0.2,
+          order: 0
+        },
+        // 7: Sell markers (▼)
+        {
+          label: 'Sell triggers',
+          data: [],
+          borderColor: sellColor,
+          backgroundColor: sellColor,
+          pointStyle: 'triangle',
+          pointRotation: 180,
+          pointRadius: 7,
+          pointHoverRadius: 9,
+          showLine: false,
+          order: 0
+        },
+        // 8: Rebuy markers (▲)
+        {
+          label: 'Rebuy triggers',
+          data: [],
+          borderColor: rebuyColor,
+          backgroundColor: rebuyColor,
+          pointStyle: 'triangle',
+          pointRadius: 7,
+          pointHoverRadius: 9,
+          showLine: false,
+          order: 0
+        }
+      ]
+    },
+    plugins: [todayLinePlugin],
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'nearest', axis: 'x', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(10,9,8,0.95)',
+          borderColor: 'rgba(224,148,34,0.5)',
+          borderWidth: 1,
+          titleColor: amber,
+          bodyColor: '#ddd',
+          callbacks: {
+            title: function(items){
+              if(!items.length) return '';
+              var d = new Date(GENESIS_TS*1000 + items[0].parsed.x*86400*1000);
+              return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+            },
+            label: function(item){
+              var v = item.parsed.y;
+              var fmt;
+              if(v >= 1e6) fmt = '$' + (v/1e6).toFixed(2) + 'M';
+              else if(v >= 1000) fmt = '$' + (v/1000).toFixed(1) + 'K';
+              else if(v >= 1) fmt = '$' + v.toFixed(2);
+              else fmt = '$' + v.toFixed(4);
+              return item.dataset.label + ': ' + fmt;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          title: { display: true, text: 'Year', color: muted, font: { size: 10 } },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          min: minD,
+          ticks: {
+            color: muted,
+            maxTicksLimit: 10,
+            callback: function(v){
+              var date = new Date(GENESIS_TS*1000 + v*86400*1000);
+              return date.getFullYear();
+            }
+          }
+        },
+        y: {
+          type: 'logarithmic',
+          title: { display: true, text: 'BTC price (USD)', color: muted, font: { size: 10 } },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: {
+            color: muted,
+            callback: function(v){
+              if(v >= 1e6) return '$' + (v/1e6) + 'M';
+              if(v >= 1000) return '$' + (v/1000) + 'K';
+              if(v >= 1) return '$' + v;
+              return '$' + v.toFixed(2);
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // ─── DYNAMIC UPDATES ───
+
+  // Update threshold lines when user moves sell/rebuy sliders.
+  // Cheap: just rebuild the y-values for two datasets.
+  function updateThresholds(){
+    if(!sellEl || !rebuyEl) return;
+    var sr = percentileToRatio(parseInt(sellEl.value));
+    var rr = percentileToRatio(parseInt(rebuyEl.value));
+    chart.data.datasets[DS.sellLine].data = thresholdData(sr);
+    chart.data.datasets[DS.rebuyLine].data = thresholdData(rr);
+    chart.update('none');
+  }
+
+  // Rebuild bands + thresholds when horizon changes (extends x-domain).
+  function updateXDomain(){
+    bands = bandData();
+    chart.data.datasets[DS.floor].data = bands.floor;
+    chart.data.datasets[DS.trend].data = bands.trend;
+    chart.data.datasets[DS.upper].data = bands.upper;
+    updateThresholds(); // re-extends sell/rebuy lines to new max
+  }
+
+  if(sellEl) sellEl.addEventListener('input', updateThresholds);
+  if(rebuyEl) rebuyEl.addEventListener('input', updateThresholds);
+  var horizonEl = document.getElementById('drHorizon');
+  if(horizonEl) horizonEl.addEventListener('input', updateXDomain);
+
+  // Listen for simulation results from the calculator IIFE.
+  // Forward-projected path (in actual USD prices, days-from-genesis x)
+  // and trigger markers populate datasets 6/7/8.
+  document.addEventListener('dr:simResult', function(ev){
+    var detail = ev.detail || {};
+    var result = detail.result;
+    if(!result || !result.sim){
+      // Stack cleared — wipe the projection-related datasets.
+      chart.data.datasets[DS.forwardPath].data = [];
+      chart.data.datasets[DS.sellMarkers].data = [];
+      chart.data.datasets[DS.rebuyMarkers].data = [];
+      chart.update('none');
+      return;
+    }
+    var sim = result.sim;
+    // Forward price path: convert daysFromToday → daysFromGenesis
+    chart.data.datasets[DS.forwardPath].data = sim.seriesPath.map(function(pt){
+      return { x: pt.day + todayD, y: pt.price };
+    });
+    // Trigger markers
+    var sells = [], rebuys = [];
+    sim.trades.forEach(function(t){
+      var point = { x: t.day + todayD, y: t.price };
+      if(t.type === 'sell') sells.push(point);
+      else if(t.type === 'rebuy') rebuys.push(point);
+    });
+    chart.data.datasets[DS.sellMarkers].data = sells;
+    chart.data.datasets[DS.rebuyMarkers].data = rebuys;
+    chart.update('none');
+  });
+
+})();
+
+// ═══════ CALCULATOR ═══════
+// Math engine + percentile computation + state machine + UI wiring.
 (function(){
   // Bail if calculator surface not present (e.g., hash deep-link to non-calc tab and elements stripped)
   if(!document.getElementById('drStack')) return;
@@ -678,6 +1049,8 @@ var PL_DATA=[[592.0,0.07],[604.0,0.07],[616.0,0.06],[628.0,0.06],[640.0,0.06],[6
     var stackVal = parseFloat(elStack.value);
     if(!stackVal || stackVal <= 0){
       elOutput.style.display = 'none';
+      // Notify channel viz to clear forward-projection datasets.
+      document.dispatchEvent(new CustomEvent('dr:simResult', { detail: { result: null } }));
       return;
     }
 
@@ -699,6 +1072,14 @@ var PL_DATA=[[592.0,0.07],[604.0,0.07],[616.0,0.06],[628.0,0.06],[640.0,0.06],[6
     renderAccountPanel(result, params);
     renderTradeTable(result, params);
     renderChart(result);
+
+    // Notify the channel viz: forward path + trigger markers.
+    // Decoupled via CustomEvent so the calc IIFE doesn't need to know
+    // whether the channel viz is wired up. See the channel viz IIFE
+    // for the listener (handles the null case as a clear signal).
+    document.dispatchEvent(new CustomEvent('dr:simResult', {
+      detail: { result: result, params: params }
+    }));
   }
 
   function runIfReady(){
