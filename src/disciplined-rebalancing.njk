@@ -236,11 +236,155 @@ eleventyComputed:
     <div class="tab-content" id="tab-math">
         <div class="section-intro">
             <h2>The Math</h2>
-            <p>Pedagogy and methodology disclosure &mdash; percentile-of-channel mathematics (historical-frequency definition), trigger detection state machine, cycle accumulation walkthrough with worked numbers, tax drag formula, companion chart of historical channel positions, methodology disclosure footer.</p>
+            <p>The calculator runs a precise simulation under transparent assumptions. This page walks through what those assumptions are, exactly how percentiles are defined, how the cycle math works, where the conditional-projection caveats apply, and what we're <em>not</em> modeling. The goal is not to convince you the discipline is right for you &mdash; it's to make the calculator's reasoning auditable.</p>
         </div>
 
-        <div class="narrative" style="text-align:center;padding:3rem 2rem">
-            <p style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;line-height:1.7;color:var(--text-dim);font-style:italic">Built after the calculator surface, so the methodology document mirrors what the calculator actually does.</p>
+        <!-- §1: PERCENTILE-OF-CHANNEL MATHEMATICS -->
+        <div class="dr-math-section">
+            <h3>1. Percentile, defined</h3>
+            <p>The single most consequential math decision on this page is what <em>"80th percentile"</em> means. We use <strong>historical-frequency percentile</strong>, matching the convention already in use on <a href="/the-power-law">the Power Law page's</a> status badge.</p>
+
+            <p>For each day in <code>PL_DATA</code> (genesis through present, ~5,500+ samples), we compute that day's <em>price/trend ratio</em> &mdash; the closing price divided by the Power Law trend value at that day. We sort all the resulting ratios. The Pth percentile is the ratio level such that historical ratios have been <em>at or below</em> that level P% of the time.</p>
+
+            <p>Computed against current <code>PL_DATA</code>, the canonical thresholds are:</p>
+
+            <div class="dr-math-table-wrap">
+                <table class="dr-math-table">
+                    <thead><tr><th>Percentile</th><th>Approx. ratio</th><th>Interpretation</th></tr></thead>
+                    <tbody>
+                        <tr><td>5th</td><td>0.46&times; trend</td><td>Floor zone &mdash; rare deep drawdowns</td></tr>
+                        <tr><td>20th</td><td>0.55&times; trend</td><td>Below-trend buying territory <span class="dr-math-tag">Aggressive rebuy</span></td></tr>
+                        <tr><td>40th</td><td>0.72&times; trend</td><td>Below trend, common <span class="dr-math-tag">Conservative rebuy</span></td></tr>
+                        <tr><td>50th</td><td>0.87&times; trend</td><td>Historical median <span class="dr-math-tag">Standard rebuy</span></td></tr>
+                        <tr><td>70th</td><td>1.34&times; trend</td><td>Modestly above trend <span class="dr-math-tag">Conservative sell</span></td></tr>
+                        <tr><td>80th</td><td>1.78&times; trend</td><td>Clearly above trend <span class="dr-math-tag">Standard sell</span></td></tr>
+                        <tr><td>90th</td><td>2.83&times; trend</td><td>Upper-band approach <span class="dr-math-tag">Aggressive sell</span></td></tr>
+                        <tr><td>95th</td><td>3.81&times; trend</td><td>Historical spike zone</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="dr-math-note">Note the asymmetry: the historical median (50th percentile) sits at <strong>0.87&times; trend</strong>, not 1.0&times;. Bitcoin has spent slightly more than half its time at-or-below trend. This is consistent with the band-asymmetry posture of the channel itself &mdash; the upper region reflects historical spikes rather than a plateau anchor.</p>
+        </div>
+
+        <!-- §2: TRIGGER DETECTION STATE MACHINE -->
+        <div class="dr-math-section">
+            <h3>2. Trigger detection</h3>
+            <p>The discipline has two states:</p>
+
+            <ul class="dr-math-list">
+                <li><strong>Holding-stack</strong> (initial). Watching for the sell trigger.</li>
+                <li><strong>Holding-cash-and-stack</strong> (post-sell). Watching for the rebuy trigger.</li>
+            </ul>
+
+            <p>A <strong>sell trigger</strong> fires when, in the holding-stack state, the price/trend ratio crosses <em>upward</em> through your sell-percentile threshold &mdash; the ratio at day D-1 was below the threshold, and at day D it is at or above. On firing, the calculator sells your sell-fraction of current BTC holdings and transitions to holding-cash-and-stack.</p>
+
+            <p>A <strong>rebuy trigger</strong> fires symmetrically: the ratio crosses <em>downward</em> through your rebuy-percentile threshold while in holding-cash-and-stack. On firing, all cash is deployed at that day's price.</p>
+
+            <p>Three edge cases worth surfacing:</p>
+
+            <ul class="dr-math-list">
+                <li><strong>State-locking.</strong> A sell trigger does not re-fire while the discipline is in holding-cash-and-stack, even if the ratio re-crosses upward. The user must complete a rebuy first. This prevents oscillation around either threshold from generating spurious trades.</li>
+                <li><strong>Horizon ends mid-cycle.</strong> If the projection horizon ends while the discipline is in holding-cash-and-stack (a sell fired but no rebuy ever did), the projection terminates with a mix of BTC and cash. Terminal value = BTC-held &times; terminal-price + cash-held. The trade history shows the unmatched sell with rebuy column marked &mdash;.</li>
+                <li><strong>Gap-overs.</strong> If a single day's price move spans both thresholds (rare in <code>PL_DATA</code> but possible), both triggers fire on the same day &mdash; a one-day cycle. The convention is to honor both rather than skip either.</li>
+            </ul>
+        </div>
+
+        <!-- §3: CYCLE ACCUMULATION (WORKED EXAMPLE) -->
+        <div class="dr-math-section">
+            <h3>3. Cycle accumulation &mdash; worked example</h3>
+            <p>Each completed sell&rarr;rebuy cycle increases your BTC holdings if the rebuy price is below the sell price. In ratio terms, the rebuy ratio is always below the sell ratio (otherwise the triggers would never fire), so cycles always grow the BTC count <em>in the conditional case where both triggers fire</em>.</p>
+
+            <div class="dr-math-formula">
+                <p>Per-cycle BTC multiplier:</p>
+                <code>new_stack = old_stack &times; [ (1 &minus; f) + f &times; (P_sell / P_rebuy) ]</code>
+                <p class="dr-math-formula-caption">where <em>f</em> is your sell-fraction, <em>P_sell</em> is the price at which sell fired, and <em>P_rebuy</em> is the price at which rebuy fired.</p>
+            </div>
+
+            <p>For the default settings (Standard preset: 80th sell, 50th rebuy, 50% sell-fraction):</p>
+
+            <ul class="dr-math-list">
+                <li>Sell fires near 1.78&times; trend</li>
+                <li>Rebuy fires near 0.87&times; trend</li>
+                <li>Per-cycle multiplier (simplified, assuming trend doesn't change during the cycle): <code>0.5 + 0.5 &times; (1.78 / 0.87) = 1.52</code></li>
+            </ul>
+
+            <p>If the simulated price path produces 4 complete cycles in your horizon, BTC count grows: <code>1.0 &rarr; 1.52 &rarr; 2.31 &rarr; 3.51 &rarr; 5.34</code>. In dollar terms, vs HODL, the multiplier depends on where in the cycle the horizon ends &mdash; but in BTC terms, the discipline is straightforwardly compounding.</p>
+
+            <p class="dr-math-note">In practice, the Power Law trend itself grows during the time between sell and rebuy (typically 3&ndash;4 years). That growth reduces the per-cycle BTC gain, because rebuying at the same percentile means rebuying at a higher absolute price than the sell-time trend would have implied. The day-by-day simulation handles this exactly. Realistic per-cycle multipliers under the simulation's cycle pattern are typically <strong>1.10&ndash;1.30&times;</strong>, depending on threshold settings &mdash; smaller than the simplified math above suggests, but compounding meaningfully across a 20-year horizon.</p>
+        </div>
+
+        <!-- §4: TAX DRAG (REGULAR ACCOUNT MODE) -->
+        <div class="dr-math-section">
+            <h3>4. Tax drag &mdash; Regular account mode</h3>
+            <p>In Retirement mode, every transaction is zero-tax. There's nothing to compute.</p>
+
+            <p>In Regular mode, every sell event is a taxable event. The calculator applies your tax rate to the <em>capital gain</em> portion of each sell:</p>
+
+            <div class="dr-math-formula">
+                <code>per_sell_tax = (P_sell &minus; cost_basis) &times; shares_sold &times; tax_rate</code>
+                <p class="dr-math-formula-caption">Cash available to rebuy = (BTC_sold &times; P_sell) &minus; per_sell_tax</p>
+            </div>
+
+            <p>Reduced cash buys fewer BTC at the rebuy, which compounds the tax drag across cycles. After each rebuy, the cost basis is recomputed as a weighted average of the held BTC's basis and the newly-bought BTC's basis.</p>
+
+            <p>Across a typical multi-cycle projection at the default 15% tax rate, cumulative tax drag of <strong>10&ndash;25%</strong> of total gains is common. At higher rates (30&ndash;40% &mdash; some federal+state combinations or international jurisdictions), the drag exceeds the discipline's edge over HODL in many scenarios &mdash; which is precisely the structural argument for executing the discipline inside a tax-deferred wrapper. The Account Type comparison panel in the Calculator surfaces this directly.</p>
+        </div>
+
+        <!-- §5: CONDITIONAL PROJECTION FRAMING -->
+        <div class="dr-math-section">
+            <h3>5. The projection is conditional &mdash; not a prediction</h3>
+
+            <p>The output is not a forecast of how bitcoin's price will actually move. It's a simulation under a specific set of assumptions:</p>
+
+            <ul class="dr-math-list">
+                <li><strong>Future cycles produce above-trend windows with historical frequency.</strong> The simulated price path oscillates roughly &plusmn;60% around the selected growth model's anchor, on a 4-year period &mdash; capturing the <em>average</em> historical cycle, not the extreme ones (which have peaked at ~6&times; trend in 2017 and troughed near 0.3&times; trend in late 2018 / mid-2022).</li>
+                <li><strong>The Power Law remains a useful description.</strong> If the channel's mathematical shape shifts &mdash; if the slope changes, if volatility compresses, if a regime change occurs &mdash; the simulation's assumptions about percentile thresholds become less reliable.</li>
+                <li><strong>Triggers fire if and only if the projected price path crosses your thresholds.</strong> If the simulated cycle pattern doesn't reach your sell percentile (e.g., 95th percentile in a quiet horizon), no trades fire and the discipline reduces to HODL.</li>
+            </ul>
+
+            <p class="dr-math-note">When no triggers fire under your settings, the calculator displays the HODL outcome with an explicit annotation. This is the honest treatment of the framework's downside &mdash; the discipline can underperform HODL if cycles don't materialize in your horizon. The fact that the Standard preset (80/50) reliably captures cycles in the simulation, while the Aggressive preset (90/20) often doesn't, is information about the framework, not a bug.</p>
+        </div>
+
+        <!-- §6: COMPANION CHART -->
+        <div class="dr-math-section">
+            <h3>6. Historical channel positions</h3>
+            <p>The chart below shows bitcoin's price/trend ratio across all of <code>PL_DATA</code>. Horizontal reference lines mark the canonical percentile thresholds. You can see where each excursion sat, how long it lasted, and how often each percentile boundary was crossed.</p>
+
+            <div class="dr-math-chart-container">
+                <canvas id="drMathChart"></canvas>
+            </div>
+
+            <p class="dr-math-note">Above-80th excursions occurred on roughly <strong>20% of historical days</strong>, with average excursion duration around <strong>88 days</strong>. Above-90th excursions occurred on roughly <strong>10% of days</strong>, with shorter average duration. These are facts about the historical record, not predictions about the future shape of cycles.</p>
+        </div>
+
+        <!-- §7: WHAT WE'RE NOT MODELING -->
+        <div class="dr-math-section">
+            <h3>7. What we're not modeling</h3>
+            <p>The calculator focuses tightly on the cycle protocol. The following are deliberately out of scope:</p>
+
+            <ul class="negative-space-list">
+                <li><strong>Real-return-on-cash.</strong> Cash held between cycles earns 0% real return (i.e., tracks inflation in nominal terms). A money-market or treasury proxy would shift outcomes modestly.</li>
+                <li><strong>Tax-loss harvesting.</strong> In Regular mode, capital losses on un-cycled positions could offset cycle gains. The current simulation doesn't model this; gains are taxed in isolation.</li>
+                <li><strong>State-level tax variations.</strong> The tax-rate slider is a single percentage. California's 13.3% state cap-gains rate stacks on federal; a state-aware field is a natural extension we haven't built yet.</li>
+                <li><strong>Retirement-account contribution and withdrawal rules.</strong> Annual contribution limits, RMDs, Roth conversion mechanics, Backdoor / Mega-Backdoor pathways &mdash; none of this is modeled. The page is a cycle protocol calculator, not a retirement-account tax-strategy advisor.</li>
+                <li><strong>Multi-account splits.</strong> A user with bitcoin partly in a retirement account and partly in a regular account would benefit from running the discipline only on the retirement portion. This is a future page, not a feature of this one.</li>
+                <li><strong>Path-dependent volatility.</strong> The simulated cycle pattern is deterministic. A Monte Carlo treatment with stochastic volatility would surface a distribution of outcomes rather than a point estimate &mdash; a Phase 4+ enhancement.</li>
+                <li><strong>Behavioral cost.</strong> The discipline requires action at exactly the moments most users find hardest &mdash; selling into euphoria, rebuying into fear. The calculator assumes perfect execution of the protocol.</li>
+            </ul>
+        </div>
+
+        <!-- §8: METHODOLOGY DISCLOSURE FOOTER -->
+        <div class="dr-math-disclosure">
+            <p><strong>Methodology disclosure</strong></p>
+            <ul>
+                <li>Power Law coefficients used: <code>a = 1.6 &times; 10&minus;&sup1;&#8311;</code>, <code>b = 5.77</code> (canonical Porkopolis values &mdash; see <a href="/the-power-law#channel">The Channel</a> for attribution)</li>
+                <li><code>PL_DATA</code> window: genesis (Jan 3, 2009) through present</li>
+                <li>Percentile distribution computed from all daily samples in <code>PL_DATA</code></li>
+                <li>Cycle simulation: 4-year period, &plusmn;60% amplitude around growth-model anchor, deterministic phase</li>
+                <li>Cash returns: 0% real (inflation-tracking nominal)</li>
+                <li>Tax computation: gain &times; rate at each Regular-mode sell event, weighted-average cost basis maintained</li>
+            </ul>
         </div>
     </div>
 

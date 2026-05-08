@@ -48,6 +48,162 @@ varPL_DATA=[[592.0,0.07],[604.0,0.07],[616.0,0.06],[628.0,0.06],[640.0,0.06],[65
   }
 })();
 
+// ═══════ MATH TAB CHART ═══════
+// Companion chart for the Math tab: historical price/trend ratio
+// across all of PL_DATA, with horizontal reference lines at canonical
+// percentile thresholds. Renders lazily — only when the Math tab
+// becomes active, to avoid Chart.js startup cost on initial page load.
+(function(){
+  var rendered = false;
+  var canvas = document.getElementById('drMathChart');
+  if(!canvas) return;
+
+  function render(){
+    if(rendered) return;
+    rendered = true;
+    if(typeof Chart === 'undefined') return;
+
+    // Build the historical ratio series from PL_DATA
+    var GENESIS = new Date(2009, 0, 3).getTime();
+    var ratioSeries = [];
+    for(var i = 0; i < PL_DATA.length; i++){
+      var d = PL_DATA[i][0], p = PL_DATA[i][1];
+      var trend = plPrice(d);
+      if(trend > 0){
+        ratioSeries.push({
+          x: GENESIS + d * 86400000,
+          y: p / trend
+        });
+      }
+    }
+
+    // Horizontal reference percentile lines — values match the
+    // canonical thresholds documented in the percentile table above.
+    var refs = [
+      { y: 0.87, label: '50th — historical median', color: 'rgba(255,255,255,0.25)' },
+      { y: 1.34, label: '70th', color: 'rgba(224,148,34,0.35)' },
+      { y: 1.78, label: '80th', color: 'rgba(224,148,34,0.55)' },
+      { y: 2.83, label: '90th', color: 'rgba(224,148,34,0.75)' }
+    ];
+
+    // Build datasets: one for the historical ratio line, plus
+    // straight horizontal lines for each reference percentile.
+    // Each reference is rendered as a 2-point dataset spanning the
+    // x-domain at constant y.
+    var xMin = ratioSeries[0].x;
+    var xMax = ratioSeries[ratioSeries.length-1].x;
+    var refDatasets = refs.map(function(r){
+      return {
+        label: r.label,
+        data: [{x: xMin, y: r.y}, {x: xMax, y: r.y}],
+        borderColor: r.color,
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderDash: [4, 4],
+        pointRadius: 0,
+        tension: 0,
+        order: 1
+      };
+    });
+
+    var ctx = canvas.getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        datasets: [{
+          label: 'Bitcoin price / Power Law trend',
+          data: ratioSeries,
+          borderColor: 'rgba(224,148,34,0.85)',
+          backgroundColor: 'rgba(224,148,34,0.08)',
+          borderWidth: 1.4,
+          pointRadius: 0,
+          tension: 0.1,
+          fill: false,
+          order: 0
+        }].concat(refDatasets)
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'nearest', axis: 'x', intersect: false },
+        scales: {
+          x: {
+            type: 'time',
+            time: { unit: 'year', displayFormats: { year: 'yyyy' } },
+            grid: { color: 'rgba(255,255,255,0.03)' },
+            ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } }
+          },
+          y: {
+            type: 'logarithmic',
+            min: 0.25,
+            max: 7,
+            grid: { color: 'rgba(255,255,255,0.04)' },
+            ticks: {
+              color: 'rgba(255,255,255,0.5)',
+              font: { size: 10 },
+              callback: function(v){
+                if(v === 0.5 || v === 1 || v === 2 || v === 3 || v === 5) return v + '×';
+                return '';
+              }
+            },
+            title: { display: true, text: 'Price / trend', color: 'rgba(255,255,255,0.6)', font: { size: 11 } }
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: {
+              color: 'rgba(255,255,255,0.65)',
+              font: { size: 10 },
+              boxWidth: 18,
+              padding: 8,
+              filter: function(item){
+                // Only show labeled reference percentiles + main series
+                return true;
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0,0,0,0.85)',
+            titleColor: 'rgba(255,255,255,0.9)',
+            bodyColor: 'rgba(255,255,255,0.8)',
+            borderColor: 'rgba(224,148,34,0.4)',
+            borderWidth: 1,
+            callbacks: {
+              title: function(items){
+                if(!items.length) return '';
+                var d = new Date(items[0].parsed.x);
+                return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+              },
+              label: function(item){
+                if(item.dataset.label.indexOf('th') !== -1 && item.dataset.label.indexOf('historical') === -1){
+                  return null;
+                }
+                return item.dataset.label + ': ' + item.parsed.y.toFixed(2) + '×';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Trigger render when math tab is activated
+  var mathBtn = document.querySelector('.tab-btn[data-tab="math"]');
+  if(mathBtn){
+    mathBtn.addEventListener('click', function(){
+      // Defer one tick so tab activation completes first
+      setTimeout(render, 30);
+    });
+  }
+
+  // Initial-page-load case: if landing on #math, render now
+  if(location.hash.replace('#','') === 'math'){
+    setTimeout(render, 80);
+  }
+})();
+
 // ═══════ CALCULATOR MODULE ═══════
 (function(){
   // Bail if calculator surface not present (e.g., hash deep-link to non-calc tab and elements stripped)

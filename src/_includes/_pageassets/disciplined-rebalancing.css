@@ -516,3 +516,257 @@
     #drTradeTable { font-size: 0.74rem; }
     #drTradeTable th, #drTradeTable td { padding: 0.45rem 0.5rem; }
 }
+
+/* ═══════════════════════════════════════════════════
+   MATH TAB
+   Pedagogy + methodology disclosure. Designed for
+   read-through density: substantive prose, occasional
+   reference tables and formulas, one companion chart,
+   methodology footer.
+   ═══════════════════════════════════════════════════ */
+
+.dr-math-section {
+    margin: 2.5rem 0;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+}
+.dr-math-section:last-of-type {
+    border-bottom: none;
+}
+.dr-math-section h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.55rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 1rem;
+    letter-spacing: -0.01em;
+}
+.dr-math-section p {
+    font-size: 0.97rem;
+    line-height: 1.75;
+    color: var(--text);
+    margin: 0 0 1rem;
+}
+.dr-math-section p code,
+.dr-math-section li code {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.86em;
+    background: rgba(255,255,255,0.04);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    color: var(--amber);
+}
+.dr-math-section a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(224,148,34,0.5);
+}
+.dr-math-section a:hover {
+    border-bottom-style: solid;
+}
+
+/* Note / caveat block — softer register for editorial asides */
+.dr-math-note {
+    background: rgba(224,148,34,0.04);
+    border-left: 2px solid var(--amber);
+    padding: 0.95rem 1.2rem;
+    margin: 1.4rem 0 0.5rem;
+    font-size: 0.92rem !important;
+    line-height: 1.7 !important;
+    color: var(--text-dim) !important;
+}
+.dr-math-note strong {
+    color: var(--text);
+    font-weight: 500;
+}
+
+/* Lists in Math tab */
+.dr-math-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 1.2rem;
+}
+.dr-math-list li {
+    position: relative;
+    padding: 0.55rem 0 0.55rem 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text);
+    border-bottom: 1px dashed rgba(255,255,255,0.05);
+}
+.dr-math-list li:last-child {
+    border-bottom: none;
+}
+.dr-math-list li::before {
+    content: "·";
+    position: absolute;
+    left: 0.4rem;
+    top: 0.3rem;
+    font-size: 1.4rem;
+    color: var(--amber);
+}
+.dr-math-list li strong {
+    color: var(--text);
+    font-weight: 500;
+}
+
+/* Reference table for percentile thresholds */
+.dr-math-table-wrap {
+    overflow-x: auto;
+    margin: 1.2rem 0 1.4rem;
+}
+.dr-math-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+.dr-math-table th,
+.dr-math-table td {
+    text-align: left;
+    padding: 0.6rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+}
+.dr-math-table th {
+    color: var(--text-dim);
+    font-weight: 500;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: rgba(255,255,255,0.02);
+}
+.dr-math-table td:first-child {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.85rem;
+    color: var(--amber);
+    width: 90px;
+}
+.dr-math-table td:nth-child(2) {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.85rem;
+    color: var(--text);
+    width: 130px;
+}
+.dr-math-tag {
+    display: inline-block;
+    margin-left: 0.6rem;
+    padding: 0.1rem 0.5rem;
+    background: rgba(224,148,34,0.1);
+    border: 1px solid rgba(224,148,34,0.3);
+    border-radius: 10px;
+    font-size: 0.7rem;
+    color: var(--amber);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 500;
+}
+
+/* Formula blocks */
+.dr-math-formula {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.1rem 1.3rem;
+    margin: 1.3rem 0;
+}
+.dr-math-formula p {
+    margin: 0 0 0.55rem !important;
+    font-size: 0.88rem !important;
+    color: var(--text-dim) !important;
+}
+.dr-math-formula p:last-child {
+    margin: 0.8rem 0 0 !important;
+}
+.dr-math-formula code {
+    display: block;
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.95rem !important;
+    color: var(--amber) !important;
+    background: transparent !important;
+    padding: 0.4rem 0 !important;
+    line-height: 1.5;
+    word-break: break-word;
+}
+.dr-math-formula-caption {
+    font-size: 0.85rem !important;
+    color: var(--text-dim) !important;
+    font-style: italic;
+}
+
+/* Companion chart container */
+.dr-math-chart-container {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    margin: 1.4rem 0;
+    height: 380px;
+    position: relative;
+}
+.dr-math-chart-container canvas {
+    max-height: 100%;
+}
+
+/* Methodology disclosure footer */
+.dr-math-disclosure {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.4rem 1.6rem;
+    margin: 3rem 0 2rem;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+.dr-math-disclosure p {
+    margin: 0 0 0.6rem;
+    color: var(--text);
+    font-size: 0.85rem !important;
+    line-height: 1.6 !important;
+}
+.dr-math-disclosure p strong {
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-weight: 500;
+}
+.dr-math-disclosure ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.dr-math-disclosure li {
+    padding: 0.4rem 0;
+    line-height: 1.6;
+    border-bottom: 1px dashed rgba(255,255,255,0.05);
+}
+.dr-math-disclosure li:last-child {
+    border-bottom: none;
+}
+.dr-math-disclosure code {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.82rem;
+    color: var(--amber);
+    background: transparent;
+    padding: 0;
+}
+.dr-math-disclosure a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(224,148,34,0.5);
+}
+.dr-math-disclosure a:hover { border-bottom-style: solid; }
+
+/* Mobile adjustments for Math tab */
+@media (max-width: 720px) {
+    .dr-math-section h3 { font-size: 1.35rem; }
+    .dr-math-section p { font-size: 0.92rem; }
+    .dr-math-list li { font-size: 0.9rem; }
+    .dr-math-table th, .dr-math-table td { padding: 0.5rem 0.6rem; font-size: 0.84rem; }
+    .dr-math-table td:first-child { width: 70px; }
+    .dr-math-table td:nth-child(2) { width: 100px; }
+    .dr-math-tag { display: block; margin: 0.2rem 0 0; padding: 0.05rem 0.4rem; font-size: 0.65rem; }
+    .dr-math-formula code { font-size: 0.84rem !important; }
+    .dr-math-chart-container { height: 320px; padding: 0.7rem; }
+    .dr-math-disclosure { padding: 1.1rem 1.2rem; }
+}
