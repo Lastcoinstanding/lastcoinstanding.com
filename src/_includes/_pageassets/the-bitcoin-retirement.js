@@ -287,11 +287,11 @@
   if (typeof Chart === 'undefined') return;
   if (!window.ModelingAssumptions) return;
 
-  // ─── Power Law constants (canonical, mirroring the-power-law.js)
-  var PL_A = 1.6e-17;
-  var PL_B = 5.77;
-  var PL_FLOOR = 0.42;
-  var PL_CEIL = 3.0;
+  // PL_A, PL_B, PL_FLOOR, PL_CEIL, plPrice() come from shared/power-law-data.js
+  // (loaded before this file via njk page_scripts).
+  // GENESIS as a Date object and daysSince() remain local — they're a date-API
+  // convention specific to this file's chart math, distinct from the shared
+  // module's GENESIS_TS (Unix-timestamp seconds).
   var GENESIS = new Date(Date.UTC(2009, 0, 3)); // Jan 3, 2009 UTC
 
   // CoinGecko fallback if live fetch fails (updated periodically)
@@ -305,9 +305,6 @@
 
   function daysSince(date) {
     return (date.getTime() - GENESIS.getTime()) / (1000 * 60 * 60 * 24);
-  }
-  function plPrice(days) {
-    return PL_A * Math.pow(days, PL_B);
   }
   function plPriceAtDate(date) { return plPrice(daysSince(date)); }
   function dateForYear(year) {

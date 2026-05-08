@@ -350,13 +350,11 @@
 
 /* ═══════════════════════════════════════════════════════════════════
    PROJECTION CALCULATOR — migrated from /the-power-law.js
-   Lives inside #calc-mode-projection. Power Law constants and plPrice
-   helper are scoped here (not in shared/, since this is the only
-   non-Power-Law page using them at present).
+   Lives inside #calc-mode-projection. PL_A, PL_B, PL_FLOOR, PL_CEIL,
+   GENESIS_TS, and plPrice() are now provided by shared/power-law-data.js
+   (loaded before this file via njk page_scripts) — same source of
+   truth as /the-power-law and /disciplined-rebalancing.
    ═══════════════════════════════════════════════════════════════════ */
-var PL_A = 1.6e-17, PL_B = 5.77, PL_FLOOR = 0.42, PL_CEIL = 3.0;
-var GENESIS_TS = 1230940800;
-function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
 
 // ═══════ TOOL B: FORWARD CALCULATOR ═══════
 (function(){
