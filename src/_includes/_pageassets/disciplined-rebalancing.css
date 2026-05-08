@@ -1,0 +1,98 @@
+/* ───────────────────────────────────────────────
+   DISCIPLINED REBALANCING — PAGE CSS
+
+   Page-specific styles. Most chrome (hero, tab nav, sections,
+   prose, tool-framing, related, etc.) is inherited from the
+   sitewide stylesheet. Adds:
+     - Color tokens (matches BvRE convention)
+     - Belief-context callout (new pattern, soft prerequisite cue)
+     - Negative-space list (new pattern, "what this is not" framing)
+
+   Calculator-specific styling (input surface, projection chart,
+   trade history table, etc.) ships in subsequent commits.
+   ─────────────────────────────────────────────── */
+
+:root {
+    --bg: #0a0908;
+    --bg-card: #141210;
+    --amber: #e09422;
+    --amber-dim: #b8791c;
+    --amber-glow: rgba(224,148,34,0.15);
+    --text: #e8e0d4;
+    --text-dim: #9a9080;
+    --text-muted: #6a6256;
+    --red: #c0392b;
+    --red-dim: rgba(192,57,43,0.6);
+    --green: #27ae60;
+    --border: rgba(224,148,34,0.12);
+}
+
+/* ───────────────────────────────────────────────
+   BELIEF CONTEXT CALLOUT
+   Soft prerequisite cue that links to /the-power-law for users
+   who haven't engaged with the model yet. Visually distinct from
+   .narrative (which is a quotation/emphasis pattern); this is
+   a meta-context cue, not editorial body.
+   ─────────────────────────────────────────────── */
+.belief-context {
+    background: rgba(224,148,34,0.04);
+    border: 1px solid rgba(224,148,34,0.18);
+    border-radius: 8px;
+    padding: 1.4rem 1.7rem;
+    margin: 2rem 0 2.5rem;
+}
+.belief-context-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--amber);
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+}
+.belief-context p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+}
+.belief-context a {
+    color: var(--amber);
+    text-decoration: none;
+}
+.belief-context a:hover {
+    text-decoration: underline;
+}
+
+/* ───────────────────────────────────────────────
+   NEGATIVE-SPACE LIST
+   The "what this is not" pattern. Used in the Question tab to
+   carve away mistaken framings before locking in what the
+   discipline IS. Slightly muted register vs ordinary prose,
+   with a subtle left-border to mark the negative-space framing.
+   ─────────────────────────────────────────────── */
+.negative-space-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 1.5rem;
+}
+.negative-space-list li {
+    border-left: 2px solid var(--border);
+    padding: 0.55rem 0 0.55rem 1.2rem;
+    margin-bottom: 0.85rem;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+}
+.negative-space-list li:last-child {
+    margin-bottom: 0;
+}
+.negative-space-list li strong {
+    color: var(--text);
+    font-weight: 500;
+}
+
+/* Mobile tweaks */
+@media (max-width: 720px) {
+    .belief-context { padding: 1.1rem 1.2rem; }
+    .negative-space-list li { padding-left: 0.95rem; font-size: 0.88rem; }
+}

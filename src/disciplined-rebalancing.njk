@@ -2,33 +2,129 @@
 layout: base.njk
 permalink: /disciplined-rebalancing.html
 slug: disciplined-rebalancing
-related: []
+related:
+  - slug: the-power-law
+    desc: "The foundational page. The Channel tab visualizes the bands — floor, trend, upper — that this discipline turns into bounded triggers. Prerequisite reading if you haven't yet engaged with the model."
+  - slug: the-bitcoin-retirement
+    desc: "The primary retirement calculator from which this is the sibling. Sell-as-needed mechanics live there; the disciplined-rebalancing protocol lives here. Different question, different methodology."
+  - slug: bitcoin-vs-real-estate
+    desc: "Where the Power Law channel is applied as a forward decision frame in projection mode. Different question (housing vs holding), same channel underneath."
+  - slug: the-half-life
+    desc: "The inflation backdrop that motivates wrapper-protected long-duration holdings — and the context within which the rebalancing discipline makes structural sense."
 companion: []
 eleventyComputed:
   head_extras: "{% include '_pageassets/disciplined-rebalancing-head.html' %}"
-  page_styles: "{% include '_pageassets/coming-soon-stub.css' %}"
+  page_styles: "{% include '_pageassets/disciplined-rebalancing.css' %}"
+  page_scripts: "{% include '_pageassets/disciplined-rebalancing.js' %}"
+  body_chrome: "{% include '_pageassets/bitcoin-vs-real-estate-chrome.html' %}"
 ---
-<div class="page">
+<section class="hero">
+    <div class="hero-label">Power Law &times; Retirement Wrappers</div>
+    <h1><em>Disciplined</em> Rebalancing</h1>
+    <div class="hero-subtitle">The Channel as Protocol</div>
+    <p class="subtitle">When the Power Law channel becomes more than a model &mdash; when its bounded oscillations become triggers, and its asymmetric character becomes a discipline. Sell at percentile, rebuy at percentile, inside a wrapper that absorbs the friction. Two sentences. Observable conditions. No speculation about <em>where price is going</em>.</p>
+</section>
 
-  <div class="page-header">
-    <h1>Disciplined Rebalancing</h1>
-    <p class="subtitle">A supplemental retirement framework &mdash; sell at percentile, rebuy at trend, inside a tax-advantaged account.</p>
-  </div>
+<main class="content-area">
+    {% include 'components/tool-framing.njk' %}
 
-  <div style="text-align: center;">
-    <span class="cs-badge">Phase 3.5 &mdash; coming soon</span>
-  </div>
+    <div class="tab-nav">
+        <button class="tab-btn active" data-tab="question">
+            <span class="tab-num">I</span>
+            <span class="tab-title">The Question</span>
+        </button>
+        <button class="tab-btn" data-tab="calculator">
+            <span class="tab-num">II</span>
+            <span class="tab-title">Calculator</span>
+        </button>
+        <button class="tab-btn" data-tab="math">
+            <span class="tab-num">III</span>
+            <span class="tab-title">The Math</span>
+        </button>
+    </div>
 
-  <div class="cs-content">
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB I: THE QUESTION — editorial framing essay -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="tab-content active" id="tab-question">
 
-    <p class="stub-prose">Disciplined rebalancing is a retirement framework for users with bitcoin held inside a retirement account, where the tax friction that makes most other rebalancing approaches impractical does not apply. The mechanic is bounded by the Power Law channels: when bitcoin&rsquo;s price runs to a high percentile of the trend, sell a defined fraction of the stack; when it returns to or below the trend, rebuy. The discipline is in the triggers &mdash; observable, structurally constrained, and not a function of the user&rsquo;s intuition about market timing.</p>
+        <div class="section-intro">
+            <h2>How can the Power Law channel itself become a <em>discipline?</em></h2>
+            <p>The Power Law page makes a structural argument: bitcoin's price oscillates inside a bounded channel, with a conservative floor at 0.42&times; trend, a central trend, and an upper boundary at 3&times; trend that historical excursions briefly touch. Across fifteen years and nine orders of magnitude, that channel has held with R&sup2; above 0.95. Most readers encounter this as a model to believe or reject.</p>
+            <p>There is another reading. The channel can be treated not as a forecast but as a <em>protocol</em>. If price oscillates between bounds, then bounded triggers &mdash; sell when the historical distribution says you're in a high-percentile zone, rebuy when it says you're in a low-percentile zone &mdash; transform the model from a thing-you-believe-in into a thing-you-act-on. The channel becomes a discipline.</p>
+        </div>
 
-    <p class="stub-prose">This page is in active development. It will carry its own framing essay, an input surface for percentile triggers and rebuy thresholds, and an output projection that traces the stack across multiple Power Law cycles. The framework requires bitcoin held inside a retirement account, a tolerance for active rebalancing, and at least soft conviction in the Power Law as a guiding model &mdash; which is why it gets its own canvas rather than being folded into the foundational calculator.</p>
+        <div class="narrative" style="margin-top:0;margin-bottom:2.5rem;padding:2rem 2.5rem;border-left-width:3px">
+            <p style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;line-height:1.7;color:var(--text)">This isn't active trading. It isn't market timing. It isn't speculation about <em>where price is going</em>. It is a disciplined response to <em>where price is, relative to a structural channel</em>. The triggers are observable, the actions are bounded, and the framework is articulable in two sentences. Inside a retirement-account wrapper where buys and sells generate no tax events, <strong>the only cost of being wrong about a sell-and-rebuy bet is the bitcoin you fail to capture if the rebuy doesn't materialize.</strong></p>
+        </div>
 
-    <p class="stub-prose">For the foundational retirement framework &mdash; sell as needed &mdash; return to the primary calculator.</p>
+        <div class="section">
+            <h3>The structural argument</h3>
+            <p class="prose">The framework rests on three observations.</p>
+            <p class="prose">First, the channel's <strong>asymmetry is real</strong>. The floor at 0.42&times; trend has been a structural backstop &mdash; bitcoin has never sustained a daily close below it across multiple regulatory shocks, exchange collapses, and macro crises. The upper band at 3&times; trend is different in character: a brief-spike zone visited only at cycle euphoria peaks. The two bounds are not symmetric; they are not analogous; and the discipline that lives between them must respect that asymmetry.</p>
+            <p class="prose">Second, the historical distribution of <strong>price relative to trend</strong> is well-defined. Bitcoin has spent roughly half its history at or below trend, half above it. The 80th percentile of historical position corresponds to a specific multiple of trend; the 20th percentile to another. These are facts about the data, not predictions about the future. The Calculator tab's percentile sliders surface exactly these historical-frequency anchors so the user can see, in real time, how often a given trigger condition has actually existed.</p>
+            <p class="prose">Third, inside a <strong>retirement-account wrapper</strong>, the rebalancing protocol generates no tax events. Sells trigger no capital gains; rebuys reset no holding-period clocks; the only friction is the bitcoin you fail to capture if a sell-and-rebuy bet doesn't complete. Outside that wrapper, every speculative sale is a taxable event, and the framework collapses into something far less defensible &mdash; the Calculator's account-type toggle makes that cost explicit.</p>
+            <p class="prose">These three observations combine into the discipline: <em>Sell a defined fraction of the stack when price reaches a high-percentile zone. Re-buy when it returns to a lower-percentile zone. Accept that some cycles won't trigger; accept that the discipline only works inside a wrapper that absorbs the friction.</em></p>
+        </div>
 
-    <a class="back-link" href="/the-bitcoin-retirement.html#calculator">&larr; Back to the Bitcoin Retirement calculator</a>
+        <div class="section">
+            <h3>Audience and entry point</h3>
+            <p class="prose">The framework explicitly assumes one structural prerequisite: bitcoin held inside a retirement-account wrapper, or funds that could be moved into one. Self-directed IRAs, Roth conversions, solo-401(k) plans &mdash; the mechanism varies; the wrapper is what matters. The Calculator's account-type toggle exists to make this concrete: selecting <em>Regular</em> surfaces the tax drag that turns the discipline from <em>defensible</em> into <em>questionable</em>.</p>
+            <p class="prose">The audience explicitly includes users who don't yet hold bitcoin in a retirement account but could move funds into one. The framework itself is part of the argument for why that move might be considered. The page is not gated; anyone can read it. The retirement-account context is surfaced as a structural prerequisite, not as a credentialing check.</p>
+        </div>
 
-  </div>
+        <!-- Soft belief context callout -->
+        <div class="belief-context">
+            <div class="belief-context-label">A note on prerequisite reading</div>
+            <p><strong>This approach uses the Power Law to define its sell and rebuy triggers.</strong> If the Power Law isn't a model you find useful for bitcoin's price trajectory, this framework probably isn't either. The <a href="/the-power-law.html">Power Law page</a> lays out the model and its evidence &mdash; including the out-of-sample validation and the channel asymmetry &mdash; for readers who want to assess it directly before using it.</p>
+        </div>
 
-</div>
+        <div class="section">
+            <h3>What this is <em>not</em></h3>
+            <ul class="negative-space-list">
+                <li><strong>Not active trading.</strong> The triggers fire on percentile crossings of a defined channel, not chart patterns or sentiment shifts. Cycles complete on the order of years, not weeks.</li>
+                <li><strong>Not market timing speculation.</strong> The framework makes no claim about <em>when</em> the next trigger will fire &mdash; only about <em>how to act</em> if and when one does. The conditional projection is honest about this.</li>
+                <li><strong>Not signal-driven decision making.</strong> The triggers are observable percentile positions in a structurally-defined channel, not interpretive judgments about cycle tops, sentiment regimes, or technical levels.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>What gets settled &mdash; and what doesn't</h3>
+            <p class="prose">The Calculator tab computes outcomes under the user's assumptions: their thresholds, their time horizon, their account type, their tax rate, their growth model. It produces a conditional projection &mdash; <em>"under the assumption that future cycles produce above-trend windows with historical frequency, here is how the discipline performs vs. holding through."</em></p>
+            <p class="prose">What it does not settle: whether to follow the framework. Whether retirement-wrapped bitcoin makes sense for your situation. Whether your tax bracket warrants the slider you've chosen. Whether the next cycle will materialize, or in what shape. The calculator computes outcomes under your assumptions. The decision is yours.</p>
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB II: CALCULATOR — being built next -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="tab-content" id="tab-calculator">
+        <div class="section-intro">
+            <h2>Calculator</h2>
+            <p>Interactive calculator surface &mdash; input surface (stack, percentile sliders, sell-fraction, account type, horizon, growth model), real-time historical-frequency stat block, projection chart with trade markers, multi-cycle trade history table, and account-type tax-drag comparison panel.</p>
+        </div>
+
+        <div class="narrative" style="text-align:center;padding:3rem 2rem">
+            <p style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;line-height:1.7;color:var(--text-dim);font-style:italic">Being built next. The Question tab above lays out the framework; the Math tab will document the methodology. The Calculator surface lands in the next ship.</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB III: THE MATH — pedagogy and methodology -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="tab-content" id="tab-math">
+        <div class="section-intro">
+            <h2>The Math</h2>
+            <p>Pedagogy and methodology disclosure &mdash; percentile-of-channel mathematics (historical-frequency definition), trigger detection state machine, cycle accumulation walkthrough with worked numbers, tax drag formula, companion chart of historical channel positions, methodology disclosure footer.</p>
+        </div>
+
+        <div class="narrative" style="text-align:center;padding:3rem 2rem">
+            <p style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;line-height:1.7;color:var(--text-dim);font-style:italic">Built after the calculator surface, so the methodology document mirrors what the calculator actually does.</p>
+        </div>
+    </div>
+
+    {% include 'components/related.njk' %}
+    {% include 'components/companion-content.njk' %}
+
+</main>
