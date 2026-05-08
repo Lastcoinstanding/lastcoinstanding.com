@@ -203,31 +203,31 @@ varPL_DATA=[[592.0,0.07],[604.0,0.07],[616.0,0.06],[628.0,0.06],[640.0,0.06],[65
   }
 
   // ─── PRICE PATH MODEL (cyclical projection) ───
-  // Simulates a 4-year cycle pattern oscillating ±60% around the
-  // selected growth model's anchor. This is the conditional-projection
-  // assumption: future cycles produce above-trend windows with
-  // historical-frequency. Phase set so peak occurs at year 1, trough
-  // at year 3, repeating.
-  function priceAtFutureDays(daysFromToday){
-    var todayDay = (Date.now()/1000 - GENESIS_TS) / 86400;
-    var futureDay = todayDay + daysFromToday;
-    var trend = plPrice(futureDay);
-    var anchor = (growthModel === 'floor') ? PL_FLOOR : (growthModel === 'upper') ? PL_CEIL : 1.0;
-    var phaseYears = daysFromToday / 365.25;
-    // sin starts at 0, peaks at year 1 (sin = 1), troughs at year 3 (sin = -1)
-    var phase = (phaseYears / 4) * 2 * Math.PI;
-    var ratio = anchor * (1 + 0.6 * Math.sin(phase));
-    return { trend: trend, price: trend * ratio, ratio: ratio / anchor * (anchor) }; // ratio normalized to trend baseline (matches percentile thresholds)
-  }
-  // ratio relative to TREND (not anchor) — what the percentile thresholds compare against
+  // Simulates a 4-year cycle pattern oscillating between historically-
+  // realistic min and max ratios. For Trend growth model, that range
+  // is roughly 25th-percentile (0.55× trend) to 80th-percentile (1.85×
+  // trend) — matching the "average historical cycle" rather than the
+  // extreme cycles (which have peaked at 6× and troughed at 0.3×).
+  // This IS the conditional-projection assumption: "above-trend
+  // windows with historical frequency" maps to ~80th percentile
+  // amplitude, which Standard/Conservative presets can capture.
+  // Aggressive preset (90th) requires above-historical-average cycles
+  // to fire — and honestly surfaces as such.
+  // Phase: cyclical01 = 0 at horizon start (mid-cycle on the way up),
+  // peak at year 1, mid on way down at year 2, trough at year 3,
+  // back to mid by year 4, repeating.
   function priceTrendRatio(daysFromToday){
     var todayDay = (Date.now()/1000 - GENESIS_TS) / 86400;
     var futureDay = todayDay + daysFromToday;
     var trend = plPrice(futureDay);
-    var anchor = (growthModel === 'floor') ? PL_FLOOR : (growthModel === 'upper') ? PL_CEIL : 1.0;
     var phase = (daysFromToday/365.25) / 4 * 2 * Math.PI;
-    var cyclicalMult = 1 + 0.6 * Math.sin(phase);
-    return { trend: trend, price: trend * anchor * cyclicalMult, ratio: anchor * cyclicalMult };
+    var cyclical01 = (1 + Math.sin(phase)) / 2; // normalize sin to 0..1
+    var minRatio, maxRatio;
+    if(growthModel === 'floor')      { minRatio = 0.30; maxRatio = 0.55; }
+    else if(growthModel === 'upper') { minRatio = 1.50; maxRatio = 4.00; }
+    else                             { minRatio = 0.55; maxRatio = 1.85; }
+    var ratio = minRatio + (maxRatio - minRatio) * cyclical01;
+    return { trend: trend, price: trend * ratio, ratio: ratio };
   }
 
   // ─── SIMULATION ENGINE ───
