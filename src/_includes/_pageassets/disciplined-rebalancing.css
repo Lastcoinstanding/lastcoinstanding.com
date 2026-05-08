@@ -96,3 +96,423 @@
     .belief-context { padding: 1.1rem 1.2rem; }
     .negative-space-list li { padding-left: 0.95rem; font-size: 0.88rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   CALCULATOR SURFACE
+   The interactive surface inside #tab-calculator. Inputs, presets,
+   thresholds, account-type/tax-rate, secondary inputs, the historical-
+   frequency stat block, and the output region (hero metric + chart +
+   trade table + account-type panel).
+   ═══════════════════════════════════════════════════════════════════ */
+
+.dr-calculator {
+    background: var(--bg-card, rgba(255,255,255,0.02));
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+/* ─── PRESET BUTTONS ─── */
+.dr-presets { margin-bottom: 1.8rem; }
+.dr-presets > label {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 0.6rem;
+}
+.dr-preset-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.6rem;
+}
+.dr-preset-btn {
+    padding: 0.85rem 0.8rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 4px;
+    font-family: 'Inter', -apple-system, sans-serif;
+    transition: all 0.15s;
+    text-align: center;
+}
+.dr-preset-btn:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+.dr-preset-btn.active {
+    background: rgba(224,148,34,0.1);
+    border-color: rgba(247,147,26,0.35);
+    color: var(--amber);
+}
+.dr-preset-name {
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+}
+.dr-preset-meta {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-family: 'SF Mono', 'Monaco', monospace;
+}
+.dr-preset-btn.active .dr-preset-meta { color: var(--amber); opacity: 0.85; }
+
+/* ─── INPUT GRID + FIELD STYLES ─── */
+.dr-input-grid,
+.dr-secondary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin-bottom: 1.4rem;
+}
+.dr-thresholds {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+}
+.dr-field { display: flex; flex-direction: column; }
+.dr-field > label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.dr-field-note {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    opacity: 0.7;
+}
+.dr-field-readout {
+    font-size: 0.7rem;
+    text-transform: none;
+    letter-spacing: 0.3px;
+    color: var(--text-dim);
+    font-weight: 400;
+    font-family: 'SF Mono', 'Monaco', monospace;
+}
+
+/* Text input with unit */
+.dr-input-with-unit {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.dr-input-with-unit input {
+    width: 100%;
+    height: 44px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.95rem;
+    padding: 0 3rem 0 1rem;
+    border-radius: 4px;
+}
+.dr-input-with-unit input:focus { outline: none; border-color: var(--amber); }
+.dr-unit {
+    position: absolute;
+    right: 1rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+    pointer-events: none;
+}
+
+/* Range sliders */
+.dr-field input[type="range"] {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: 0.3rem;
+    cursor: pointer;
+}
+.dr-field input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--amber);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--bg);
+    transition: transform 0.15s;
+}
+.dr-field input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.dr-field input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--amber);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--bg);
+}
+
+/* ─── ACCOUNT-TYPE TOGGLE / GROWTH-MODEL TOGGLE ─── */
+.dr-account-section { margin: 1.4rem 0; }
+.dr-account-row,
+.dr-tax-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+}
+.dr-account-row > label,
+.dr-tax-row > label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    min-width: 130px;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+.dr-tax-row input[type="range"] { flex: 1; max-width: 320px; }
+.dr-toggle-group {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.dr-toggle-btn,
+.dr-growth-btn {
+    background: rgba(255,255,255,0.02);
+    border: none;
+    border-right: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    padding: 0.55rem 1.1rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.dr-toggle-btn:last-child,
+.dr-growth-btn:last-child { border-right: none; }
+.dr-toggle-btn:hover,
+.dr-growth-btn:hover { color: var(--text); }
+.dr-toggle-btn.active,
+.dr-growth-btn.active {
+    background: rgba(224,148,34,0.1);
+    color: var(--amber);
+}
+
+/* ─── HISTORICAL-FREQUENCY STAT BLOCK ─── */
+.dr-stat-block {
+    background: rgba(224,148,34,0.04);
+    border: 1px solid rgba(224,148,34,0.18);
+    border-radius: 6px;
+    padding: 1.1rem 1.3rem;
+    margin: 1.4rem 0;
+}
+.dr-stat-block-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--amber);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+.dr-stat-block p {
+    margin: 0;
+    font-size: 0.86rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+}
+.dr-stat-block strong { color: var(--text); font-weight: 500; }
+
+/* ═══════════════ OUTPUT REGION ═══════════════ */
+.dr-output { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed var(--border); }
+
+/* Hero metric */
+.dr-hero-metric {
+    text-align: center;
+    background: rgba(224,148,34,0.04);
+    border: 1px solid rgba(224,148,34,0.18);
+    border-radius: 8px;
+    padding: 2rem 1.5rem;
+    margin-bottom: 2rem;
+}
+.dr-hero-prefix {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+.dr-hero-multiplier {
+    display: block;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 3rem;
+    font-weight: 600;
+    color: var(--amber);
+    line-height: 1.1;
+    margin-bottom: 0.4rem;
+}
+.dr-hero-context {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    font-style: italic;
+    margin-bottom: 0.8rem;
+}
+.dr-hero-secondary {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    border-top: 1px dashed var(--border);
+    padding-top: 0.8rem;
+    margin-top: 0.4rem;
+}
+.dr-hero-secondary strong { color: var(--text-dim); }
+
+/* Projection chart */
+.dr-chart-container {
+    background: rgba(255,255,255,0.01);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.3rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.dr-chart-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 0.85rem;
+}
+.dr-chart-wrapper { height: 380px; position: relative; }
+.dr-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.3rem;
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+.dr-legend-item { display: inline-flex; align-items: center; gap: 0.4rem; }
+.dr-legend-swatch {
+    display: inline-block;
+    width: 14px;
+    text-align: center;
+    line-height: 1;
+    font-size: 0.7rem;
+}
+.dr-swatch-discipline { background: var(--amber); width: 14px; height: 3px; border-radius: 1px; }
+.dr-swatch-hodl { background: rgba(154,144,128,0.55); width: 14px; height: 3px; border-radius: 1px; }
+.dr-swatch-sell { color: var(--red); }
+.dr-swatch-rebuy { color: var(--green); }
+
+/* Account-type comparison panel (Regular mode) */
+.dr-account-panel {
+    background: rgba(192,57,43,0.04);
+    border: 1px solid rgba(192,57,43,0.2);
+    border-radius: 6px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1.5rem;
+}
+.dr-account-panel-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--red);
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+}
+.dr-account-panel p { margin: 0.3rem 0; font-size: 0.88rem; color: var(--text-dim); line-height: 1.6; }
+.dr-account-panel strong { color: var(--text); }
+.dr-account-panel .dr-comparison-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.35rem 0;
+}
+
+/* Trade history table */
+.dr-trade-history { margin-bottom: 1.5rem; }
+.dr-trade-history-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 0.6rem;
+}
+.dr-table-wrapper { overflow-x: auto; }
+#drTradeTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    font-family: 'SF Mono', 'Monaco', monospace;
+}
+#drTradeTable th,
+#drTradeTable td {
+    padding: 0.55rem 0.75rem;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+}
+#drTradeTable th {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: right;
+}
+#drTradeTable th:first-child,
+#drTradeTable td:first-child { text-align: left; }
+#drTradeTable td { color: var(--text-dim); }
+#drTradeTable tr.dr-trade-sell td { color: var(--text-dim); }
+#drTradeTable tr.dr-trade-rebuy td { color: var(--text); }
+#drTradeTable .dr-trade-empty { text-align: center; color: var(--text-muted); font-style: italic; padding: 1.5rem; font-family: inherit; font-size: 0.9rem; }
+
+/* Methodology footnote */
+.dr-methodology-note {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    padding: 1rem 1.2rem;
+    background: rgba(255,255,255,0.02);
+    border-radius: 4px;
+    border-left: 2px solid var(--border);
+}
+.dr-methodology-note strong { color: var(--text-dim); font-weight: 500; }
+
+/* ─── MOBILE ─── */
+@media (max-width: 720px) {
+    .dr-calculator { padding: 1.4rem 1.2rem; }
+    .dr-input-grid,
+    .dr-secondary-grid { grid-template-columns: 1fr; gap: 1rem; }
+    .dr-preset-btns { grid-template-columns: 1fr; gap: 0.5rem; }
+    .dr-preset-btn { padding: 0.7rem; }
+    .dr-account-row,
+    .dr-tax-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+    .dr-account-row > label,
+    .dr-tax-row > label { min-width: 0; }
+    .dr-toggle-group { width: 100%; }
+    .dr-toggle-btn,
+    .dr-growth-btn { flex: 1; padding: 0.6rem 0.4rem; font-size: 0.72rem; }
+    .dr-hero-multiplier { font-size: 2.4rem; }
+    .dr-chart-wrapper { height: 320px; }
+    .dr-chart-legend { gap: 0.85rem; font-size: 0.72rem; }
+    #drTradeTable { font-size: 0.74rem; }
+    #drTradeTable th, #drTradeTable td { padding: 0.45rem 0.5rem; }
+}

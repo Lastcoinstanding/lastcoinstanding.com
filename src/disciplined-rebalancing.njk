@@ -97,16 +97,136 @@ eleventyComputed:
     </div>
 
     <!-- ═══════════════════════════════════════════ -->
-    <!-- TAB II: CALCULATOR — being built next -->
+    <!-- TAB II: CALCULATOR — interactive surface -->
     <!-- ═══════════════════════════════════════════ -->
     <div class="tab-content" id="tab-calculator">
         <div class="section-intro">
             <h2>Calculator</h2>
-            <p>Interactive calculator surface &mdash; input surface (stack, percentile sliders, sell-fraction, account type, horizon, growth model), real-time historical-frequency stat block, projection chart with trade markers, multi-cycle trade history table, and account-type tax-drag comparison panel.</p>
+            <p>Enter your stack, set your thresholds, choose your account type. The projection compares the discipline against holding through under the same growth model. The historical-frequency stat block updates in real time as you adjust the percentile sliders &mdash; that's the credibility anchor for the conditional projection.</p>
         </div>
 
-        <div class="narrative" style="text-align:center;padding:3rem 2rem">
-            <p style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;line-height:1.7;color:var(--text-dim);font-style:italic">Being built next. The Question tab above lays out the framework; the Math tab will document the methodology. The Calculator surface lands in the next ship.</p>
+        <div class="dr-calculator">
+
+            <!-- PRESET SHORTCUTS -->
+            <div class="dr-presets">
+                <label>Quick start</label>
+                <div class="dr-preset-btns">
+                    <button class="dr-preset-btn" data-preset="conservative">
+                        <span class="dr-preset-name">Conservative</span>
+                        <span class="dr-preset-meta">70 / 40 / 35%</span>
+                    </button>
+                    <button class="dr-preset-btn active" data-preset="standard">
+                        <span class="dr-preset-name">Standard</span>
+                        <span class="dr-preset-meta">80 / 50 / 50%</span>
+                    </button>
+                    <button class="dr-preset-btn" data-preset="aggressive">
+                        <span class="dr-preset-name">Aggressive</span>
+                        <span class="dr-preset-meta">90 / 20 / 65%</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PRIMARY INPUTS: STACK + HORIZON -->
+            <div class="dr-input-grid">
+                <div class="dr-field">
+                    <label>Bitcoin stack <span class="dr-field-note">never saved</span></label>
+                    <div class="dr-input-with-unit">
+                        <input type="text" id="drStack" inputmode="decimal" placeholder="e.g. 1.5">
+                        <span class="dr-unit">BTC</span>
+                    </div>
+                </div>
+                <div class="dr-field">
+                    <label>Time horizon <span id="drHorizonValue" class="dr-field-readout">20 years</span></label>
+                    <input type="range" id="drHorizon" min="10" max="40" value="20" step="1">
+                </div>
+            </div>
+
+            <!-- THRESHOLD SLIDERS -->
+            <div class="dr-thresholds">
+                <div class="dr-field">
+                    <label>Sell percentile <span id="drSellPctReadout" class="dr-field-readout">80th &middot; ~1.78&times; trend &middot; 20% of history</span></label>
+                    <input type="range" id="drSellPct" min="60" max="95" value="80" step="5">
+                </div>
+                <div class="dr-field">
+                    <label>Rebuy percentile <span id="drRebuyPctReadout" class="dr-field-readout">50th &middot; ~0.87&times; trend &middot; historical median</span></label>
+                    <input type="range" id="drRebuyPct" min="5" max="55" value="50" step="5">
+                </div>
+                <div class="dr-field">
+                    <label>Sell fraction <span id="drSellFracReadout" class="dr-field-readout">50% of stack at each sell event</span></label>
+                    <input type="range" id="drSellFrac" min="5" max="100" value="50" step="5">
+                </div>
+            </div>
+
+            <!-- ACCOUNT TYPE + CONDITIONAL TAX RATE -->
+            <div class="dr-account-section">
+                <div class="dr-account-row">
+                    <label>Account type</label>
+                    <div class="dr-toggle-group">
+                        <button class="dr-toggle-btn active" data-account="retirement">Retirement</button>
+                        <button class="dr-toggle-btn" data-account="regular">Regular</button>
+                    </div>
+                </div>
+                <div class="dr-tax-row" id="drTaxRow" style="display:none">
+                    <label>Tax rate <span id="drTaxRateValue" class="dr-field-readout">15%</span></label>
+                    <input type="range" id="drTaxRate" min="0" max="40" value="15" step="1">
+                </div>
+            </div>
+
+            <!-- SECONDARY INPUTS: INFLATION + GROWTH MODEL -->
+            <div class="dr-secondary-grid">
+                <div class="dr-field">
+                    <label>Inflation rate <span id="drInflationValue" class="dr-field-readout">6.5% / yr</span></label>
+                    <input type="range" id="drInflation" min="2" max="10" value="6.5" step="0.5">
+                </div>
+                <div class="dr-field">
+                    <label>Bitcoin growth model</label>
+                    <div class="dr-toggle-group">
+                        <button class="dr-growth-btn" data-growth="floor">Floor</button>
+                        <button class="dr-growth-btn active" data-growth="trend">Trend</button>
+                        <button class="dr-growth-btn" data-growth="upper">Upper</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HISTORICAL-FREQUENCY STAT BLOCK -->
+            <div class="dr-stat-block" id="drStatBlock">
+                <div class="dr-stat-block-label">Historical-frequency anchors at your settings</div>
+                <p id="drStatBlockText">Enter your stack to see projection results.</p>
+            </div>
+
+            <!-- ═══════════════════ OUTPUT ═══════════════════ -->
+            <div class="dr-output" id="drOutput" style="display:none">
+
+                <!-- Hero metric -->
+                <div class="dr-hero-metric" id="drHero"></div>
+
+                <!-- Projection chart -->
+                <div class="dr-chart-container">
+                    <div class="dr-chart-title">Projection &mdash; discipline vs. holding through</div>
+                    <div class="dr-chart-wrapper"><canvas id="drChart"></canvas></div>
+                    <div class="dr-chart-legend">
+                        <span class="dr-legend-item"><span class="dr-legend-swatch dr-swatch-discipline"></span>Discipline (your settings)</span>
+                        <span class="dr-legend-item"><span class="dr-legend-swatch dr-swatch-hodl"></span>HODL baseline</span>
+                        <span class="dr-legend-item"><span class="dr-legend-swatch dr-swatch-sell">&#9660;</span>Sell event</span>
+                        <span class="dr-legend-item"><span class="dr-legend-swatch dr-swatch-rebuy">&#9650;</span>Rebuy event</span>
+                    </div>
+                </div>
+
+                <!-- Account-type comparison panel (Regular only) -->
+                <div class="dr-account-panel" id="drAccountPanel" style="display:none"></div>
+
+                <!-- Trade history table -->
+                <div class="dr-trade-history">
+                    <div class="dr-trade-history-title">Trade history</div>
+                    <div class="dr-table-wrapper"><table id="drTradeTable"></table></div>
+                </div>
+
+                <!-- Methodology footnote -->
+                <div class="dr-methodology-note">
+                    <strong>Conditional projection:</strong> outcomes are computed under a 4-year cycle pattern oscillating &plusmn;60% around the selected growth model's anchor. Triggers fire when the simulated price/trend ratio crosses your threshold percentiles. Real-dollar values shown; nominal values reflect the inflation rate. The discipline only captures cycles that materialize &mdash; if no triggers fire in your horizon, the result reduces to HODL.
+                </div>
+            </div>
+
         </div>
     </div>
 
