@@ -72,6 +72,30 @@ eleventyComputed:
       <span class="calc-tile-cta">Explore scenarios</span>
     </a>
 
+    <!-- Disciplined Rebalancing — oscillating wave crossing two threshold lines -->
+    <a href="/disciplined-rebalancing.html#calculator" class="calc-tile live">
+      <div class="calc-tile-icon">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Upper threshold line -->
+          <line x1="8" y1="16" x2="40" y2="16" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
+          <!-- Trend line (median) -->
+          <line x1="8" y1="24" x2="40" y2="24" stroke="#e09422" stroke-width="1" opacity="0.35"/>
+          <!-- Lower threshold line -->
+          <line x1="8" y1="32" x2="40" y2="32" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
+          <!-- Oscillating price wave crossing both thresholds -->
+          <path d="M 8 24 Q 14 14, 18 16 Q 22 18, 26 30 Q 30 36, 34 32 Q 38 28, 40 24" stroke="#F7931A" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Sell marker (▼ where wave crosses upper threshold going down) -->
+          <path d="M 18 12 L 21 12 L 19.5 15 Z" fill="#F7931A"/>
+          <!-- Rebuy marker (▲ where wave crosses lower threshold going up) -->
+          <path d="M 32 36 L 35 36 L 33.5 33 Z" fill="#F7931A"/>
+        </svg>
+      </div>
+      <h2 class="calc-tile-name">Disciplined Rebalancing</h2>
+      <p class="calc-tile-question">How can the Power Law channel itself become a discipline?</p>
+      <p class="calc-tile-desc">A bounded protocol for retirement-wrapped bitcoin: sell at percentile triggers, rebuy at lower-percentile triggers. The Power Law channel becomes a set of observable conditions to act on rather than a model to merely believe in. Conditional projection, honest treatment of underperformance, no speculation about <em>where price is going</em>.</p>
+      <span class="calc-tile-cta">Run the discipline</span>
+    </a>
+
   </div>
 
   <div class="nav-hint">
