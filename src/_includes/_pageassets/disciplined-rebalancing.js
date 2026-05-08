@@ -63,15 +63,18 @@ var PL_DATA=[[592.0,0.07],[604.0,0.07],[616.0,0.06],[628.0,0.06],[640.0,0.06],[6
     rendered = true;
     if(typeof Chart === 'undefined') return;
 
-    // Build the historical ratio series from PL_DATA
-    var GENESIS = new Date(2009, 0, 3).getTime();
+    // Build the historical ratio series from PL_DATA.
+    // X values are days-from-genesis (raw PL_DATA[i][0]), matching the
+    // Power Law Channel chart's pattern. Linear x-axis + tick callback
+    // formats years — avoids the chartjs date-adapter dependency that
+    // 'type: time' would require (not loaded site-wide).
     var ratioSeries = [];
     for(var i = 0; i < PL_DATA.length; i++){
       var d = PL_DATA[i][0], p = PL_DATA[i][1];
       var trend = plPrice(d);
       if(trend > 0){
         ratioSeries.push({
-          x: GENESIS + d * 86400000,
+          x: d,
           y: p / trend
         });
       }
@@ -128,10 +131,18 @@ var PL_DATA=[[592.0,0.07],[604.0,0.07],[616.0,0.06],[628.0,0.06],[640.0,0.06],[6
         interaction: { mode: 'nearest', axis: 'x', intersect: false },
         scales: {
           x: {
-            type: 'time',
-            time: { unit: 'year', displayFormats: { year: 'yyyy' } },
+            type: 'linear',
             grid: { color: 'rgba(255,255,255,0.03)' },
-            ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } }
+            ticks: {
+              color: 'rgba(255,255,255,0.5)',
+              font: { size: 10 },
+              maxTicksLimit: 10,
+              callback: function(v){
+                // v is days-from-genesis; convert to year
+                var date = new Date(GENESIS_TS*1000 + v*86400*1000);
+                return date.getFullYear();
+              }
+            }
           },
           y: {
             type: 'logarithmic',
@@ -173,7 +184,8 @@ var PL_DATA=[[592.0,0.07],[604.0,0.07],[616.0,0.06],[628.0,0.06],[640.0,0.06],[6
             callbacks: {
               title: function(items){
                 if(!items.length) return '';
-                var d = new Date(items[0].parsed.x);
+                // parsed.x is days-from-genesis (linear axis); convert to date
+                var d = new Date(GENESIS_TS*1000 + items[0].parsed.x*86400*1000);
                 return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
               },
               label: function(item){
