@@ -121,6 +121,18 @@ Power Law constants are also duplicated in `/the-bitcoin-retirement.js` and `/di
 
 The Channel page's prominent Porkopolis credit block is the canonical attribution; pages that *apply* the channel framework (BvRE projection, retirement, disciplined rebalancing) link forward to The Channel rather than re-stating attribution. Intended editorial pattern.
 
+**Out-of-sample chart coefficient refit (commit `6604126`, 2026-05-07).** The "Early Data Predicts the Future" chart on Power Law Tab 1 was refit on the same day as the main Phase 4 commits, as a follow-up correction. The chart performs an in-browser least-squares regression on a training window of `PL_DATA` and projects forward; before the refit, the cutoff was end-of-2014 (slope **6.787**, dominated by the 2013 Mt. Gox rally on a small training sample), producing a ~4× over-projection by 2025. After the refit, the cutoff is end-of-2017 (slope **5.657**, OOS bias near zero, within 2% of the canonical Porkopolis coefficient `b = 5.77`).
+
+| Constant | Before refit | After refit | Used by |
+|---|---|---|---|
+| `a` (out-of-sample chart only) | 1.5×10⁻²⁰ | 3.9×10⁻¹⁷ | Power Law Tab 1 OOS chart |
+| `b` (out-of-sample chart only) | 6.787 | 5.657 | Power Law Tab 1 OOS chart |
+| Canonical `PL_A` (sitewide) | 1.6×10⁻¹⁷ | unchanged | The Channel, BvRE projection, retirement, DR |
+| Canonical `PL_B` (sitewide) | 5.77 | unchanged | The Channel, BvRE projection, retirement, DR |
+| `PL_DATA` (historical price series) | unchanged | unchanged | All channel-applying pages |
+
+The OOS chart is the only place on the site that *fits its own* coefficients; everywhere else uses the canonical Porkopolis values directly. No source data changed — only the training-window cutoff for the in-browser regression.
+
 ---
 
 ## Audit log
