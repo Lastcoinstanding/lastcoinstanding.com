@@ -864,52 +864,136 @@
     renderHistoricalSummary(bt, sellRatio, rebuyRatio);
   }
 
-  // Render the "Historical signals" summary block. Format: total
-  // counts, then ALL triggers in chronological order (earliest at
-  // top, most recent at bottom — matches reading direction). Also
-  // names the current state (would-be-holding-stack vs would-be-
-  // holding-cash-and-stack) since "what would I be doing today" is
-  // a useful framing.
+  // Render the "Historical signals" block. Bounded table with one
+  // row per trigger event, a final "Today" row anchoring current
+  // state, and a summary line + volatility-compression note below.
+  // Cumulative-BTC column tracks the running stack from a 1.0
+  // starting position, directly comparable to a 1.0 BTC HODL.
   function renderHistoricalSummary(bt, sellRatio, rebuyRatio){
     var summaryEl = document.getElementById('drHistSignals');
     if(!summaryEl) return;
-    var sells = bt.trades.filter(function(t){ return t.type === 'sell'; });
-    var rebuys = bt.trades.filter(function(t){ return t.type === 'rebuy'; });
-    // Show all trades chronologically (earliest first).
-    // Per session 2026-05-09 user feedback: 'reordering from earliest
-    // to latest as this feels more natural (reading from top to
-    // bottom, matching chronologically)'.
-    var listToShow = bt.trades.slice();
 
     var sellPctEl = document.getElementById('drSellPct');
     var rebuyPctEl = document.getElementById('drRebuyPct');
     var sellPct = sellPctEl ? sellPctEl.value : '?';
     var rebuyPct = rebuyPctEl ? rebuyPctEl.value : '?';
 
-    var stateLine = bt.finalState === 'holding-stack'
-      ? 'Currently <strong>holding stack</strong> (waiting for next sell signal).'
-      : 'Currently <strong>holding cash + stack</strong> (waiting for rebuy signal).';
-
-    var html = '';
+    // Empty case — current settings produced no triggers.
     if(bt.trades.length === 0){
-      html = '<p class="dr-hist-signals-empty">At sell ' + sellPct + 'th &middot; rebuy ' + rebuyPct + 'th, the strategy would have fired <strong>zero</strong> triggers across ' + PL_DATA.length + ' historical price samples (~15 years). Bitcoin never crossed your sell threshold from below or your rebuy threshold from above. Try a less extreme percentile.</p>';
-    } else {
-      html = '<p class="dr-hist-signals-headline">At your current settings (sell ' + sellPct + 'th &middot; rebuy ' + rebuyPct + 'th), the strategy would have fired <strong>' + sells.length + ' sell signal' + (sells.length === 1 ? '' : 's') + '</strong> and <strong>' + rebuys.length + ' rebuy signal' + (rebuys.length === 1 ? '' : 's') + '</strong> across ~15 years of bitcoin history. ' + stateLine + '</p>';
-      html += '<ul class="dr-hist-signals-list">';
-      listToShow.forEach(function(t){
-        var date = new Date(GENESIS_TS*1000 + t.day*86400*1000);
-        var dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
-        var priceStr;
-        if(t.price >= 1e6) priceStr = '$' + (t.price/1e6).toFixed(2) + 'M';
-        else if(t.price >= 1000) priceStr = '$' + (t.price/1000).toFixed(1) + 'K';
-        else if(t.price >= 1) priceStr = '$' + t.price.toFixed(2);
-        else priceStr = '$' + t.price.toFixed(4);
-        var glyph = t.type === 'sell' ? '<span class="dr-hist-glyph dr-hist-glyph-sell">▼</span>' : '<span class="dr-hist-glyph dr-hist-glyph-rebuy">▲</span>';
-        var verb = t.type === 'sell' ? 'SELL' : 'REBUY';
-        html += '<li>' + glyph + ' <span class="dr-hist-date">' + dateStr + '</span> &middot; <strong>' + verb + '</strong> at ' + priceStr + ' <span class="dr-hist-ratio">(' + t.ratio.toFixed(2) + '× trend)</span></li>';
-      });
-      html += '</ul>';
+      summaryEl.innerHTML = '<p class="dr-hist-signals-empty">At sell ' + sellPct + 'th &middot; rebuy ' + rebuyPct + 'th, the strategy would have fired <strong>zero</strong> triggers across ' + PL_DATA.length + ' historical price samples (~15 years). Bitcoin never crossed your sell threshold from below or your rebuy threshold from above. Try a less extreme percentile.</p>';
+      return;
     }
+
+    // Format helpers — local closures to keep this function self-contained.
+    function fmtPrice(p){
+      if(p >= 1e6) return '$' + (p/1e6).toFixed(2) + 'M';
+      if(p >= 1000) return '$' + (p/1000).toFixed(1) + 'K';
+      if(p >= 1) return '$' + p.toFixed(2);
+      return '$' + p.toFixed(4);
+    }
+    function fmtBTC(b){
+      if(Math.abs(b) >= 0.01) return b.toFixed(2);
+      return b.toFixed(4);
+    }
+    function fmtCash(c){
+      if(c >= 1e6) return '$' + (c/1e6).toFixed(2) + 'M';
+      if(c >= 1000) return '$' + (c/1000).toFixed(1) + 'K';
+      return '$' + c.toFixed(0);
+    }
+    function fmtMonth(day){
+      var date = new Date(GENESIS_TS*1000 + day*86400*1000);
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+    }
+    function fmtCumulative(btc, cash){
+      var s = fmtBTC(btc) + ' BTC';
+      if(cash > 1) s += ' + ' + fmtCash(cash);
+      return s;
+    }
+
+    // ── HEADLINE ──
+    var html = '<p class="dr-hist-signals-headline">At your current settings (sell ' + sellPct + 'th &middot; rebuy ' + rebuyPct + 'th), starting from <strong>1.00 BTC</strong>, the strategy would have fired <strong>' + bt.sellsCount + ' sell signal' + (bt.sellsCount === 1 ? '' : 's') + '</strong> and <strong>' + bt.rebuysCount + ' rebuy signal' + (bt.rebuysCount === 1 ? '' : 's') + '</strong> across ~15 years of bitcoin history.</p>';
+
+    // ── TABLE ──
+    html += '<div class="dr-hist-table-wrap"><table class="dr-hist-table">';
+    html += '<thead><tr>'
+         +    '<th class="dr-col-date">Date</th>'
+         +    '<th class="dr-col-action">Action</th>'
+         +    '<th class="dr-col-price">Price</th>'
+         +    '<th class="dr-col-ratio">Ratio</th>'
+         +    '<th class="dr-col-delta">&Delta; BTC</th>'
+         +    '<th class="dr-col-cum">Cumulative</th>'
+         +  '</tr></thead><tbody>';
+
+    // Trigger rows in chronological order.
+    bt.trades.forEach(function(t){
+      var verb = t.type === 'sell' ? 'SELL' : 'REBUY';
+      var glyph = t.type === 'sell' ? '&#9660;' : '&#9650;';
+      var actionClass = t.type === 'sell' ? 'dr-act-sell' : 'dr-act-rebuy';
+      var deltaSign = t.deltaBTC >= 0 ? '+' : '&minus;';
+      var deltaAbs = Math.abs(t.deltaBTC);
+      html += '<tr>'
+           +    '<td class="dr-col-date">' + fmtMonth(t.day) + '</td>'
+           +    '<td class="dr-col-action ' + actionClass + '"><span class="dr-act-glyph">' + glyph + '</span> ' + verb + '</td>'
+           +    '<td class="dr-col-price">' + fmtPrice(t.price) + '</td>'
+           +    '<td class="dr-col-ratio">' + t.ratio.toFixed(2) + '&times;</td>'
+           +    '<td class="dr-col-delta">' + deltaSign + fmtBTC(deltaAbs) + '</td>'
+           +    '<td class="dr-col-cum">' + fmtCumulative(t.cumBTC, t.cumCash) + '</td>'
+           +  '</tr>';
+    });
+
+    // ── TODAY ROW ──
+    var todayStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+    var stateLabel, stateClass;
+    if(bt.finalState === 'holding-stack'){
+      stateLabel = 'waiting to sell';
+      stateClass = 'dr-state-wait-sell';
+    } else {
+      stateLabel = 'waiting to rebuy';
+      stateClass = 'dr-state-wait-rebuy';
+    }
+
+    html += '<tr class="dr-hist-today">'
+         +    '<td class="dr-col-date"><strong>' + todayStr + '</strong> <span class="dr-today-tag">today</span></td>'
+         +    '<td class="dr-col-action ' + stateClass + '"><em>' + stateLabel + '</em></td>'
+         +    '<td class="dr-col-price">' + fmtPrice(bt.currentPrice) + '</td>'
+         +    '<td class="dr-col-ratio">' + (bt.currentRatio !== null ? bt.currentRatio.toFixed(2) + '&times;' : '&mdash;') + '</td>'
+         +    '<td class="dr-col-delta">&mdash;</td>'
+         +    '<td class="dr-col-cum"><strong>' + fmtCumulative(bt.btcHeld, bt.cashHeld) + '</strong></td>'
+         +  '</tr>';
+    html += '</tbody></table></div>';
+
+    // ── SUMMARY LINE ──
+    var multiplier = bt.btcHeld; // started at 1.0, so this is the HODL multiple in BTC terms
+    var multStr = multiplier.toFixed(2) + '&times; HODL';
+    var deltaPct = Math.abs((multiplier - 1) * 100);
+    var deltaPctStr = deltaPct >= 10 ? deltaPct.toFixed(0) + '%' : deltaPct.toFixed(1) + '%';
+    var directionWord = multiplier >= 1.0 ? 'gained' : 'lost';
+    var summaryClass = multiplier >= 1.0 ? 'dr-hist-summary-up' : 'dr-hist-summary-down';
+
+    // Tax-drag note when in regular mode and tax was actually paid.
+    var acctBtn = document.querySelector('[data-account].active');
+    var accountType = acctBtn ? acctBtn.dataset.account : 'retirement';
+    var taxFootnote = '';
+    if(accountType === 'regular'){
+      var totalTax = 0;
+      for(var ti = 0; ti < bt.trades.length; ti++) totalTax += (bt.trades[ti].taxPaid || 0);
+      if(totalTax > 0){
+        taxFootnote = ' Cumulative capital-gains tax across these sells: <strong>' + fmtCash(totalTax) + '</strong>.';
+      }
+    }
+
+    html += '<div class="dr-hist-summary ' + summaryClass + '">'
+         +    '<p>Across ~15 years and <strong>' + bt.cyclesCompleted + ' completed cycle' + (bt.cyclesCompleted === 1 ? '' : 's') + '</strong>, this configuration ended with <strong>' + fmtBTC(bt.btcHeld) + ' BTC</strong>'
+         +    (bt.cashHeld > 1 ? ' plus <strong>' + fmtCash(bt.cashHeld) + '</strong> in cash' : '')
+         +    ' &mdash; ' + multStr + ' (' + directionWord + ' ' + deltaPctStr + ' vs. holding through).' + taxFootnote + '</p>'
+         +    '<p class="dr-hist-summary-honest">A fact about the historical record &mdash; not a forecast.</p>'
+         +  '</div>';
+
+    // ── VOLATILITY-COMPRESSION NOTE ──
+    html += '<div class="dr-hist-volatility-note">'
+         +    '<p><strong>A note on cycle amplitudes.</strong> Bitcoin&rsquo;s cycles have been compressing in amplitude. Cycle 1 peaked near 8&times; trend in 2011; recent cycles peak closer to 2&times; trend. Future cycles will likely fire less-extreme triggers than 2011 or 2017 &mdash; both because the market is larger and more liquid, and because the upside multiples have visibly narrowed across recent cycles. <a href="/the-power-law#theory">See the Power Law Theory tab</a> for the underlying math.</p>'
+         +  '</div>';
+
     summaryEl.innerHTML = html;
   }
 

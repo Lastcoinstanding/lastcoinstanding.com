@@ -1199,6 +1199,126 @@ input[type="range"]::-moz-range-track {
 .dr-hist-date  { color: var(--text); }
 .dr-hist-ratio { color: var(--text-muted); font-size: 0.78rem; }
 
+/* ─── NEW BOUNDED TABLE (replaces .dr-hist-signals-list) ─── */
+.dr-hist-table-wrap {
+    margin: 0.5rem 0 0.9rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.dr-hist-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 0.84rem;
+    color: var(--text-dim);
+}
+.dr-hist-table thead th {
+    text-align: left;
+    font-weight: 500;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    padding: 0.35rem 0.6rem 0.4rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    white-space: nowrap;
+}
+.dr-hist-table tbody td {
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px dashed rgba(255,255,255,0.05);
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.dr-hist-table tbody tr:last-child td { border-bottom: none; }
+.dr-hist-table .dr-col-date { color: var(--text); }
+.dr-hist-table .dr-col-action { font-weight: 500; }
+.dr-hist-table .dr-col-action.dr-act-sell  { color: var(--amber); }
+.dr-hist-table .dr-col-action.dr-act-rebuy { color: var(--green); }
+.dr-hist-table .dr-col-action .dr-act-glyph {
+    display: inline-block;
+    width: 12px;
+    margin-right: 0.2rem;
+    font-size: 0.78rem;
+}
+.dr-hist-table .dr-col-price  { color: var(--text); }
+.dr-hist-table .dr-col-ratio  { color: var(--text-muted); font-size: 0.78rem; }
+.dr-hist-table .dr-col-delta  { color: var(--text); font-variant-numeric: tabular-nums; }
+.dr-hist-table .dr-col-cum    { color: var(--text); font-variant-numeric: tabular-nums; }
+
+/* Today row — anchors the timeline at current state */
+.dr-hist-table tr.dr-hist-today td {
+    border-top: 1px solid rgba(224,148,34,0.22);
+    border-bottom: none;
+    background: rgba(224,148,34,0.04);
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+}
+.dr-today-tag {
+    display: inline-block;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--amber);
+    margin-left: 0.35rem;
+    font-weight: 400;
+    font-family: Inter, sans-serif;
+}
+.dr-state-wait-sell  { color: var(--amber); }
+.dr-state-wait-rebuy { color: var(--green); }
+.dr-state-wait-sell em, .dr-state-wait-rebuy em { font-style: italic; }
+
+/* Summary line below the table */
+.dr-hist-summary {
+    margin: 0.9rem 0 0.6rem;
+    padding: 0.7rem 0.9rem;
+    background: rgba(255,255,255,0.02);
+    border-left: 2px solid var(--text-muted);
+    border-radius: 3px;
+}
+.dr-hist-summary p {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+}
+.dr-hist-summary p + p { margin-top: 0.35rem; }
+.dr-hist-summary strong { color: var(--text); }
+.dr-hist-summary.dr-hist-summary-up   { border-left-color: var(--green); }
+.dr-hist-summary.dr-hist-summary-down { border-left-color: var(--amber); }
+.dr-hist-summary-honest {
+    font-size: 0.78rem !important;
+    color: var(--text-muted) !important;
+    font-style: italic;
+}
+
+/* Volatility-compression note */
+.dr-hist-volatility-note {
+    margin-top: 0.9rem;
+    padding: 0.7rem 0.9rem;
+    background: rgba(160,160,160,0.04);
+    border: 1px dashed rgba(255,255,255,0.06);
+    border-radius: 4px;
+}
+.dr-hist-volatility-note p {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.62;
+    color: var(--text-dim);
+}
+.dr-hist-volatility-note strong { color: var(--text); font-weight: 500; }
+.dr-hist-volatility-note a { color: var(--amber); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.dr-hist-volatility-note a:hover { text-decoration-thickness: 2px; }
+
+/* Mobile — scale type, but never let column widths collapse */
+@media (max-width: 720px){
+    .dr-hist-table { font-size: 0.78rem; }
+    .dr-hist-table thead th { font-size: 0.62rem; padding: 0.3rem 0.45rem 0.3rem; }
+    .dr-hist-table tbody td { padding: 0.3rem 0.45rem; }
+    .dr-hist-table .dr-col-ratio { font-size: 0.72rem; }
+    .dr-hist-summary p { font-size: 0.84rem; }
+    .dr-hist-volatility-note p { font-size: 0.78rem; }
+}
+
 /* Porkopolis attribution — scoped to this page; mirrors the
  * .porkopolis-credit treatment on /the-power-law without sharing CSS. */
 .dr-channel-attribution {
