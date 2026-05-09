@@ -1072,8 +1072,28 @@
 
   if(sellEl) sellEl.addEventListener('input', updateThresholds);
   if(rebuyEl) rebuyEl.addEventListener('input', updateThresholds);
+  // drHorizon is no longer in the DOM (historical-only redesign), but
+  // keep the guarded query so the code is robust if/when sliders evolve.
   var horizonEl = document.getElementById('drHorizon');
   if(horizonEl) horizonEl.addEventListener('input', updateXDomain);
+
+  // Sell-fraction, tax-rate, and account-type each materially change
+  // backtest output (Δ BTC magnitude, tax drag, cumulative BTC) without
+  // touching threshold lines or marker positions on the chart. Re-run
+  // the backtest so the table + summary refresh; chart datasets for
+  // bands and historical markers don't change so chart.update is cheap.
+  var sellFracEl = document.getElementById('drSellFrac');
+  if(sellFracEl) sellFracEl.addEventListener('input', updateThresholds);
+  var taxRateEl = document.getElementById('drTaxRate');
+  if(taxRateEl) taxRateEl.addEventListener('input', updateThresholds);
+  document.querySelectorAll('[data-account]').forEach(function(b){
+    b.addEventListener('click', function(){
+      // Brief defer — calc IIFE's click handler runs first, sets the
+      // .active class on the toggle, then this fires and the backtest
+      // re-reads account type via querySelector('[data-account].active').
+      setTimeout(updateThresholds, 0);
+    });
+  });
 
   // Listen for simulation results from the calculator IIFE.
   // Forward-projected path (in actual USD prices, days-from-genesis x)
@@ -1112,7 +1132,7 @@
 // Math engine + percentile computation + state machine + UI wiring.
 (function(){
   // Bail if calculator surface not present (e.g., hash deep-link to non-calc tab and elements stripped)
-  if(!document.getElementById('drStack')) return;
+  if(!document.getElementById('drSellPct')) return;
 
   // ─── PRECOMPUTE PERCENTILE-TO-RATIO MAPPING ───
   // For each historical day in PL_DATA, compute price/trend ratio. Sort.
@@ -1159,16 +1179,13 @@
   var STORAGE_PREFIX = 'dr:';
   // Stack is intentionally NOT in this list — sitewide convention §8.2
   var STICKY = {
-    drHorizon: 'horizon',
     drSellPct: 'sellPct',
     drRebuyPct: 'rebuyPct',
     drSellFrac: 'sellFrac',
-    drTaxRate: 'taxRate',
-    drInflation: 'inflation'
+    drTaxRate: 'taxRate'
   };
   var STICKY_TOGGLE = {
     accountType: 'retirement',
-    growthModel: 'trend',
     preset: 'standard'
   };
 
@@ -1190,16 +1207,14 @@
     // bare value assignment). Without this, returning visitors with
     // non-default sliders in localStorage would see channel-viz state
     // matching the defaults rather than their stored settings.
-    ['drSellPct', 'drRebuyPct', 'drSellFrac', 'drHorizon'].forEach(function(id){
+    ['drSellPct', 'drRebuyPct', 'drSellFrac', 'drTaxRate'].forEach(function(id){
       var el = document.getElementById(id);
       if(el) el.dispatchEvent(new Event('input', { bubbles: true }));
     });
     // Toggles
     var aT = loadSetting('accountType') || 'retirement';
-    var gM = loadSetting('growthModel') || 'trend';
     var pS = loadSetting('preset') || 'standard';
     setAccountType(aT, true);
-    setGrowthModel(gM, true);
     // preset is informational only; sliders carry the actual values
     document.querySelectorAll('.dr-preset-btn').forEach(function(b){
       b.classList.toggle('active', b.dataset.preset === pS);
@@ -1234,32 +1249,30 @@
     saveSetting('rebuyPct', p.rebuyPct);
     saveSetting('sellFrac', p.sellFrac);
     updateReadouts();
-    runIfReady();
   }
 
-  // ─── ACCOUNT TYPE / GROWTH MODEL TOGGLES ───
+  // ─── ACCOUNT TYPE TOGGLE ───
   var accountType = 'retirement';
-  var growthModel = 'trend';
 
   function setAccountType(type, silent){
     accountType = type;
     document.querySelectorAll('[data-account]').forEach(function(b){
       b.classList.toggle('active', b.dataset.account === type);
     });
-    elTaxRow.style.display = (type === 'regular') ? 'flex' : 'none';
-    if(!silent){ saveSetting('accountType', type); runIfReady(); }
+    if(elTaxRow) elTaxRow.style.display = (type === 'regular') ? 'flex' : 'none';
+    if(!silent){
+      saveSetting('accountType', type);
+      // Channel viz reads account-type via querySelector('[data-account].active')
+      // each backtest run; fire a synthetic 'input' on the tax-rate slider so
+      // its existing listener re-runs the backtest with the new account-type
+      // (and tax-rate visibility now reflecting the toggle).
+      if(elTaxRate) elTaxRate.dispatchEvent(new Event('input', { bubbles: true }));
+    }
   }
-  function setGrowthModel(model, silent){
-    growthModel = model;
-    document.querySelectorAll('[data-growth]').forEach(function(b){
-      b.classList.toggle('active', b.dataset.growth === model);
-    });
-    if(!silent){ saveSetting('growthModel', model); runIfReady(); }
-  }
+  // setGrowthModel removed — growth-model toggle no longer in DOM.
 
   // ─── READOUT UPDATES (live) ───
   function updateReadouts(){
-    elHorizonValue.textContent = elHorizon.value + ' years';
     var sP = parseInt(elSellPct.value);
     var rP = parseInt(elRebuyPct.value);
     var sF = parseInt(elSellFrac.value);
@@ -1268,19 +1281,9 @@
     elSellPctReadout.innerHTML = sP + 'th &middot; ~' + sR.toFixed(2) + '× trend &middot; ' + (100-sP) + '% of history';
     elRebuyPctReadout.innerHTML = rP + 'th &middot; ~' + rR.toFixed(2) + '× trend &middot; ' + (rP === 50 ? 'historical median' : (rP < 50 ? rP + '% below trend' : 'above trend'));
     elSellFracReadout.textContent = sF + '% of stack at each sell event';
-    elTaxRateValue.textContent = elTaxRate.value + '%';
-    elInflationValue.textContent = elInflation.value + '% / yr';
-    updateStatBlock(sP, rP);
+    if(elTaxRateValue) elTaxRateValue.textContent = elTaxRate.value + '%';
   }
-
-  function updateStatBlock(sellPct, rebuyPct){
-    var sR = percentileToRatio(sellPct);
-    var rR = percentileToRatio(rebuyPct);
-    var aboveSellPct = 100 - sellPct;
-    var belowRebuyPct = rebuyPct;
-    elStatBlock.innerHTML =
-      'At your settings (sell <strong>' + sellPct + 'th</strong> / rebuy <strong>' + rebuyPct + 'th</strong>): bitcoin has crossed the ' + sellPct + 'th percentile in <strong>' + aboveSellPct + '%</strong> of historical days (price ≥ ' + sR.toFixed(2) + '× trend). It has been at-or-below the ' + rebuyPct + 'th percentile in <strong>' + belowRebuyPct + '%</strong> of historical days (≤ ' + rR.toFixed(2) + '× trend). These are facts about the data, not predictions about the future.';
-  }
+  // updateStatBlock removed — drStatBlock element is gone.
 
   // ─── PRICE PATH MODEL (cyclical projection) ───
   // Simulates a 4-year cycle pattern oscillating between historically-
@@ -1629,7 +1632,10 @@
   }
 
   // ─── EVENT WIRING ───
-  elStack.addEventListener('input', runIfReady);
+  // (No stack input or forward-sim runner anymore — historical-only redesign.
+  // The channel viz IIFE handles the backtest rerun via its own listeners
+  // on the same sliders + account toggle; calc IIFE here just persists
+  // sticky values, updates readouts, and manages preset-active state.)
 
   Object.keys(STICKY).forEach(function(elId){
     var el = document.getElementById(elId);
@@ -1648,7 +1654,7 @@
         b.classList.toggle('active', b.dataset.preset === matched);
       });
       saveSetting('preset', matched || '');
-      runIfReady();
+      updateReadouts();
     });
   });
 
@@ -1658,9 +1664,7 @@
   document.querySelectorAll('[data-account]').forEach(function(b){
     b.addEventListener('click', function(){ setAccountType(b.dataset.account); });
   });
-  document.querySelectorAll('[data-growth]').forEach(function(b){
-    b.addEventListener('click', function(){ setGrowthModel(b.dataset.growth); });
-  });
+  // Note: [data-growth] buttons no longer in DOM — historical-only redesign.
 
   // ─── INIT ───
   loadStickyValues();
