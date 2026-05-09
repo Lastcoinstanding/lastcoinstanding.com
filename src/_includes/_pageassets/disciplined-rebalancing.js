@@ -418,15 +418,22 @@
       var tolerance = 90; // days
       var items = [];
       chart.getSortedVisibleDatasetMetas().forEach(function(meta){
-        var data = meta.data;
-        if(!data || data.length === 0) return;
+        var elements = meta.data;
+        var rawData = chart.data && chart.data.datasets && chart.data.datasets[meta.index]
+          ? chart.data.datasets[meta.index].data : null;
+        if(!elements || elements.length === 0 || !rawData) return;
         var bestIdx = -1;
         var bestDist = Infinity;
-        for(var i = 0; i < data.length; i++){
-          var pt = data[i];
-          if(!pt || pt.skip) continue;
-          var ptX = pt.parsed ? pt.parsed.x : null;
-          if(ptX == null) continue;
+        for(var i = 0; i < elements.length; i++){
+          var el = elements[i];
+          if(!el || el.skip) continue;
+          // Read the raw scatter point ({x, y}) — Point elements don't
+          // expose parsed data directly in Chart.js v4. The dataset's
+          // raw data is the source of truth and matches the element
+          // array index 1:1 by construction.
+          var raw = rawData[i];
+          var ptX = (raw && typeof raw === 'object') ? raw.x : null;
+          if(ptX == null || isNaN(ptX)) continue;
           var dist = Math.abs(ptX - cursorDataX);
           if(dist < bestDist){
             bestDist = dist;
@@ -434,7 +441,7 @@
           }
         }
         if(bestIdx === -1 || bestDist > tolerance) return;
-        items.push({ element: data[bestIdx], datasetIndex: meta.index, index: bestIdx });
+        items.push({ element: elements[bestIdx], datasetIndex: meta.index, index: bestIdx });
       });
       return items;
     };
