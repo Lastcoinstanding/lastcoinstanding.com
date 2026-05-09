@@ -754,6 +754,59 @@ input[type="range"]::-moz-range-track {
 }
 .dr-methodology-note strong { color: var(--text-dim); font-weight: 500; }
 
+/* ═══════ FAILURE MODES SECTION ═══════
+ * Honest disclosure of how the strategy can underperform. Visually
+ * distinct from .dr-methodology-note (which is a methodology note,
+ * not a risk callout) — uses the rust accent (red-dim) for the
+ * border-left, signaling 'read this carefully' without going to
+ * alarmist red. Body prose is at standard reading size, not the
+ * smaller .dr-methodology-note size — these failure modes deserve
+ * full attention, not footnote treatment. */
+.dr-failure-modes {
+    margin: 1.5rem 0;
+    padding: 1.4rem 1.6rem;
+    background: rgba(192,57,43,0.04);
+    border: 1px solid rgba(192,57,43,0.2);
+    border-left: 3px solid var(--red);
+    border-radius: 6px;
+}
+.dr-failure-modes-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--red);
+    font-weight: 500;
+    margin-bottom: 0.85rem;
+}
+.dr-failure-modes-intro {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin: 0 0 1.2rem;
+}
+.dr-failure-mode {
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed rgba(192,57,43,0.18);
+}
+.dr-failure-mode:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+.dr-failure-mode-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.18rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.35;
+    margin-bottom: 0.6rem;
+}
+.dr-failure-mode p {
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin: 0 0 0.7rem;
+}
+.dr-failure-mode p:last-child { margin-bottom: 0; }
+.dr-failure-mode strong { color: var(--text); font-weight: 500; }
+
 /* ─── MOBILE ─── */
 @media (max-width: 720px) {
     .dr-calculator { padding: 1.4rem 1.2rem; }
