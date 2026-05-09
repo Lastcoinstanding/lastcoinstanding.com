@@ -226,6 +226,14 @@
   if(!canvas) return;
   if(typeof Chart === 'undefined') return;
 
+  // Narrow-viewport flag: drives compact tooltip styling. matchMedia
+  // is supported everywhere we ship; the fallback is the default
+  // (desktop) tooltip if matchMedia is unavailable. Read once at
+  // chart-init — rotation/resize across the threshold is rare in
+  // practice and the visual penalty for a stale value is mild.
+  var isNarrowViewport = (typeof window !== 'undefined' &&
+    window.matchMedia && window.matchMedia('(max-width: 480px)').matches);
+
   // ─── X-DOMAIN ───
   // Min: PL_DATA[0][0] (first historical sample; ~mid-2010)
   // Max: today + horizon × 365.25 (extends to user's projection end)
@@ -427,18 +435,30 @@
       // it falls outside tolerance and gets dropped (better than a
       // misplaced indicator).
       //
-      // 15-pixel tolerance: at the chart's typical ~50 px/year on
-      // desktop, that's about 110 days — generous enough that bands
-      // (sampled every 30 days, ~4 px apart) always intersect, and
-      // sparse markers only show when the cursor is genuinely near
-      // them. Past mid-2025 (end of historical data), the historical
-      // price line's last point is hundreds of pixels from the cursor
-      // and gets correctly dropped.
-      var pixelTolerance = 15;
+      // Two tolerances:
+      //   - 15 px for line/band datasets (Floor, Trend, Upper, sell/
+      //     rebuy thresholds, Historical price, forward path). At the
+      //     chart's ~50 px/year desktop scale that's ~110 days,
+      //     generous enough that bands (sampled every 30 days, ~4 px
+      //     apart) always intersect.
+      //   - 6 px for sparse marker datasets (Historical sell/rebuy
+      //     trigger ▼/▲, Forward sell/rebuy trigger ▼/▲ — datasets
+      //     7-10). Otherwise on a narrow mobile chart (~240px wide,
+      //     ~6 px/year) the 15-px window covers ~2.5 years of history,
+      //     and the tooltip lights up rows for sell/rebuy triggers
+      //     years away from the cursor — even though the user can see
+      //     all the historical markers on the chart already as ▼/▲.
+      //     Tighter tolerance makes the marker rows additive only when
+      //     the cursor is genuinely near a marker, on both desktop
+      //     and mobile.
+      var lineTolerance = 15;
+      var markerTolerance = 6;
       var items = [];
       chart.getSortedVisibleDatasetMetas().forEach(function(meta){
         var elements = meta.data;
         if(!elements || elements.length === 0) return;
+        // Marker datasets are 7,8,9,10 (sell/rebuy/histSell/histRebuy).
+        var tol = meta.index >= 7 ? markerTolerance : lineTolerance;
         var bestIdx = -1;
         var bestDist = Infinity;
         for(var i = 0; i < elements.length; i++){
@@ -461,7 +481,7 @@
             bestIdx = i;
           }
         }
-        if(bestIdx === -1 || bestDist > pixelTolerance) return;
+        if(bestIdx === -1 || bestDist > tol) return;
         items.push({ element: elements[bestIdx], datasetIndex: meta.index, index: bestIdx });
       });
       return items;
@@ -621,6 +641,19 @@
           borderWidth: 1,
           titleColor: amber,
           bodyColor: '#ddd',
+          // Compact on narrow viewports: at 375px viewport the chart's
+          // inner plot area is only ~150px wide, so a default-sized
+          // tooltip card with 6+ rows of full-length labels (e.g.
+          // "Floor (0.42× trend): $5.4K") covers most of the chart
+          // surface. Smaller font + tighter padding + shortened band
+          // labels reclaim ~40% of the tooltip footprint without losing
+          // information density. Read once at chart-init; no need to
+          // re-evaluate on resize since rotation between mobile and
+          // desktop layouts also reloads the page in practice.
+          titleFont: { size: isNarrowViewport ? 11 : 13 },
+          bodyFont:  { size: isNarrowViewport ? 11 : 13 },
+          padding:   isNarrowViewport ? 6 : 10,
+          boxPadding: isNarrowViewport ? 3 : 5,
           callbacks: {
             title: function(items){
               if(!items.length) return '';
@@ -634,7 +667,16 @@
               else if(v >= 1000) fmt = '$' + (v/1000).toFixed(1) + 'K';
               else if(v >= 1) fmt = '$' + v.toFixed(2);
               else fmt = '$' + v.toFixed(4);
-              return item.dataset.label + ': ' + fmt;
+              // Shorten band labels on narrow viewports — the (0.42×
+              // trend) and (3.0× trend) suffixes are also visible in
+              // the legend below the chart, so dropping them from
+              // the tooltip avoids redundant on-chart real estate.
+              var label = item.dataset.label;
+              if(isNarrowViewport){
+                if(label === 'Floor (0.42× trend)') label = 'Floor';
+                else if(label === 'Upper (3.0× trend)') label = 'Upper';
+              }
+              return label + ': ' + fmt;
             }
           }
         }

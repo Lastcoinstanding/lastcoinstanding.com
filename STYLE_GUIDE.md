@@ -780,6 +780,7 @@ The guard prevents the hidden-canvas corruption. The `ResizeObserver` catches th
 - Tabs use `overflow-x: auto` for horizontal scroll on narrow viewports.
 - Tables in §4 of pages with comparison grids show a "Swipe to see all columns →" affordance on mobile.
 - Mobile nav: hamburger toggle, full-screen overlay, click-outside to close, Escape to close.
+- **Chart.js tooltips on narrow viewports.** Default font and padding are sized for desktop. On a 375px viewport the chart's inner plot area is ~150px wide, and a default-sized tooltip card with 6+ dataset rows covers most of the chart. Pages with multi-dataset tooltips should branch on `window.matchMedia('(max-width: 480px)').matches` at chart-init and apply: `titleFont: { size: 11 }`, `bodyFont: { size: 11 }`, `padding: 6`, `boxPadding: 3`. Also shorten labels that carry parenthetical detail already visible in the legend (e.g. "Floor (0.42× trend)" → "Floor"). For sparse marker-only datasets (sell/rebuy ▼/▲ triggers, etc.), give those datasets a tighter pixel-tolerance in the interaction mode so they don't show in the tooltip when the cursor is years away — on a narrow chart a generic 15-pixel tolerance can span 2–3 years and pulls in markers the user already sees on the chart itself. See Disciplined Rebalancing channel viz `xPerDataset` mode for the canonical implementation.
 
 ---
 
