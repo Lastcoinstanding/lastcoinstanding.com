@@ -81,10 +81,12 @@
 }
 .hero-subtitle {
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: clamp(1.2rem, 2.2vw, 1.5rem);
-    font-style: italic;
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    font-style: normal;
     color: var(--text-dim);
-    margin-bottom: 1.8rem;
+    margin: 0 auto 1.8rem;
+    max-width: 720px;
+    line-height: 1.5;
     letter-spacing: 0.005em;
 }
 .hero .subtitle {
