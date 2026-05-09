@@ -135,7 +135,7 @@ eleventyComputed:
                 <!-- application — no choice of starting point, no -->
                 <!-- exclusions, no parameters beyond the user's thresholds. -->
                 <div class="dr-hist-signals-block">
-                    <div class="dr-hist-signals-label">Historical signals at your current settings<button type="button" class="dr-tt" aria-label="What is this?"><i>i</i><span class="dr-tt-card">A backtest of your current sell and rebuy threshold settings, applied to bitcoin's actual historical price record (~15 years of monthly samples). Walks through history day by day; logs every threshold crossing as a trigger event. Updates live as you move the sliders. <strong>Same algorithm as the forward projection &mdash; the only difference is real history vs. simulated cycles.</strong></span></button></div>
+                    <div class="dr-hist-signals-label">Historical signals at your current settings<button type="button" class="dr-tt" aria-label="What is this?">?<span class="dr-tt-card">A backtest of your current sell and rebuy threshold settings, applied to bitcoin's actual historical price record (~15 years of monthly samples). Walks through history day by day; logs every threshold crossing as a trigger event. Updates live as you move the sliders. <strong>Same algorithm as the forward projection &mdash; the only difference is real history vs. simulated cycles.</strong></span></button></div>
                     <div id="drHistSignals"></div>
                 </div>
 
@@ -147,7 +147,7 @@ eleventyComputed:
 
             <!-- PRESET SHORTCUTS -->
             <div class="dr-presets">
-                <label>Quick start<button type="button" class="dr-tt" aria-label="What does this do?"><i>i</i><span class="dr-tt-card">Three preset configurations of the discipline. Each preset sets <strong>sell percentile / rebuy percentile / sell fraction</strong> in one click; you can then adjust the sliders below. Conservative trades less frequently and at less extreme prices; Aggressive at extremes; Standard is the historical-frequency middle ground.</span></button></label>
+                <label>Quick start<button type="button" class="dr-tt" aria-label="What does this do?">?<span class="dr-tt-card">Three preset configurations of the discipline. Each preset sets <strong>sell percentile / rebuy percentile / sell fraction</strong> in one click; you can then adjust the sliders below. Conservative trades less frequently and at less extreme prices; Aggressive at extremes; Standard is the historical-frequency middle ground.</span></button></label>
                 <div class="dr-preset-btns">
                     <button class="dr-preset-btn" data-preset="conservative">
                         <span class="dr-preset-name">Conservative</span>
@@ -167,14 +167,14 @@ eleventyComputed:
             <!-- PRIMARY INPUTS: STACK + HORIZON -->
             <div class="dr-input-grid">
                 <div class="dr-field">
-                    <label>Bitcoin stack <span class="dr-field-note">never saved</span><button type="button" class="dr-tt" aria-label="About this input"><i>i</i><span class="dr-tt-card">Your starting bitcoin position. Used only to compute the projection &mdash; it is never saved, transmitted, or written to localStorage. Clears on page reload.</span></button></label>
+                    <label>Bitcoin stack <span class="dr-field-note">never saved</span><button type="button" class="dr-tt" aria-label="About this input">?<span class="dr-tt-card">Your starting bitcoin position. Used only to compute the projection &mdash; it is never saved, transmitted, or written to localStorage. Clears on page reload.</span></button></label>
                     <div class="dr-input-with-unit">
                         <input type="text" id="drStack" inputmode="decimal" placeholder="e.g. 1.5">
                         <span class="dr-unit">BTC</span>
                     </div>
                 </div>
                 <div class="dr-field">
-                    <label>Time horizon <span id="drHorizonValue" class="dr-field-readout">20 years</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input"><i>i</i><span class="dr-tt-card">How many years the projection runs forward. Longer horizons let more cycles complete; shorter horizons may end mid-cycle. The simulation assumes a ~4-year cycle pattern based on bitcoin's historical cadence.</span></button></label>
+                    <label>Time horizon <span id="drHorizonValue" class="dr-field-readout">20 years</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">How many years the projection runs forward. Longer horizons let more cycles complete; shorter horizons may end mid-cycle. The simulation assumes a ~4-year cycle pattern based on bitcoin's historical cadence.</span></button></label>
                     <input type="range" id="drHorizon" min="10" max="40" value="20" step="1">
                 </div>
             </div>
@@ -182,15 +182,15 @@ eleventyComputed:
             <!-- THRESHOLD SLIDERS -->
             <div class="dr-thresholds">
                 <div class="dr-field">
-                    <label>Sell percentile <span id="drSellPctReadout" class="dr-field-readout">80th &middot; ~1.78&times; trend &middot; 20% of history</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input"><i>i</i><span class="dr-tt-card">The price-to-trend ratio at-or-above which you sell. The 80th percentile means selling when bitcoin is priced higher than 80% of historical days, relative to its long-term Power Law trend. <strong>Higher percentile = rarer triggers at more extreme prices; lower percentile = more frequent triggers at less extreme prices.</strong></span></button></label>
+                    <label>Sell percentile <span id="drSellPctReadout" class="dr-field-readout">80th &middot; ~1.78&times; trend &middot; 20% of history</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">The price-to-trend ratio at-or-above which you sell. The 80th percentile means selling when bitcoin is priced higher than 80% of historical days, relative to its long-term Power Law trend. <strong>Higher percentile = rarer triggers at more extreme prices; lower percentile = more frequent triggers at less extreme prices.</strong></span></button></label>
                     <input type="range" id="drSellPct" min="60" max="95" value="80" step="5">
                 </div>
                 <div class="dr-field">
-                    <label>Rebuy percentile <span id="drRebuyPctReadout" class="dr-field-readout">50th &middot; ~0.87&times; trend &middot; historical median</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input"><i>i</i><span class="dr-tt-card">The price-to-trend ratio at-or-below which you rebuy after a sell. The 50th percentile is the historical median (~0.87&times; trend). <strong>Lower percentile = waits for deeper drawdowns: higher returns if the rebuy fires, but lower probability it fires within your horizon at all.</strong></span></button></label>
+                    <label>Rebuy percentile <span id="drRebuyPctReadout" class="dr-field-readout">50th &middot; ~0.87&times; trend &middot; historical median</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">The price-to-trend ratio at-or-below which you rebuy after a sell. The 50th percentile is the historical median (~0.87&times; trend). <strong>Lower percentile = waits for deeper drawdowns: higher returns if the rebuy fires, but lower probability it fires within your horizon at all.</strong></span></button></label>
                     <input type="range" id="drRebuyPct" min="5" max="55" value="50" step="5">
                 </div>
                 <div class="dr-field">
-                    <label>Sell fraction <span id="drSellFracReadout" class="dr-field-readout">50% of stack at each sell event</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input"><i>i</i><span class="dr-tt-card">What portion of your stack to sell at each sell trigger. 50% sells half; 100% sells all. <strong>Lower fractions retain upside if bitcoin keeps climbing past your trigger; higher fractions maximize the rebuy opportunity but risk leaving you under-allocated if the rebuy never fires.</strong></span></button></label>
+                    <label>Sell fraction <span id="drSellFracReadout" class="dr-field-readout">50% of stack at each sell event</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">What portion of your stack to sell at each sell trigger. 50% sells half; 100% sells all. <strong>Lower fractions retain upside if bitcoin keeps climbing past your trigger; higher fractions maximize the rebuy opportunity but risk leaving you under-allocated if the rebuy never fires.</strong></span></button></label>
                     <input type="range" id="drSellFrac" min="5" max="100" value="50" step="5">
                 </div>
             </div>
@@ -198,14 +198,14 @@ eleventyComputed:
             <!-- ACCOUNT TYPE + CONDITIONAL TAX RATE -->
             <div class="dr-account-section">
                 <div class="dr-account-row">
-                    <label>Account type<button type="button" class="dr-tt" aria-label="About this input"><i>i</i><span class="dr-tt-card"><strong>Retirement:</strong> a Roth IRA, traditional IRA, 401(k), or similar tax-advantaged wrapper &mdash; sells generate no immediate tax, gains compound the bitcoin position without leakage. <strong>Regular:</strong> a standard taxable account &mdash; each sell triggers capital gains tax on realized gains since position established (or last rebought, weighted-average cost basis).</span></button></label>
+                    <label>Account type<button type="button" class="dr-tt" aria-label="About this input">?<span class="dr-tt-card"><strong>Retirement:</strong> a Roth IRA, traditional IRA, 401(k), or similar tax-advantaged wrapper &mdash; sells generate no immediate tax, gains compound the bitcoin position without leakage. <strong>Regular:</strong> a standard taxable account &mdash; each sell triggers capital gains tax on realized gains since position established (or last rebought, weighted-average cost basis).</span></button></label>
                     <div class="dr-toggle-group">
                         <button class="dr-toggle-btn active" data-account="retirement">Retirement</button>
                         <button class="dr-toggle-btn" data-account="regular">Regular</button>
                     </div>
                 </div>
                 <div class="dr-tax-row" id="drTaxRow" style="display:none">
-                    <label>Tax rate <span id="drTaxRateValue" class="dr-field-readout">15%</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input"><i>i</i><span class="dr-tt-card">Your effective marginal capital gains tax rate. US federal long-term gains run 0&ndash;20% plus state. Short-term gains (held under one year) are taxed as ordinary income. Use whatever rate matches your jurisdiction and bracket.</span></button></label>
+                    <label>Tax rate <span id="drTaxRateValue" class="dr-field-readout">15%</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">Your effective marginal capital gains tax rate. US federal long-term gains run 0&ndash;20% plus state. Short-term gains (held under one year) are taxed as ordinary income. Use whatever rate matches your jurisdiction and bracket.</span></button></label>
                     <input type="range" id="drTaxRate" min="0" max="40" value="15" step="1">
                 </div>
             </div>
@@ -213,11 +213,11 @@ eleventyComputed:
             <!-- SECONDARY INPUTS: INFLATION + GROWTH MODEL -->
             <div class="dr-secondary-grid">
                 <div class="dr-field">
-                    <label>Inflation rate <span id="drInflationValue" class="dr-field-readout">6.5% / yr</span><button type="button" class="dr-tt" aria-label="About this input"><i>i</i><span class="dr-tt-card">Used to express the projection in real (inflation-adjusted) dollars. Higher inflation reduces the real-dollar value of future bitcoin holdings; doesn't affect the BTC count or the cycle math itself.</span></button></label>
+                    <label>Inflation rate <span id="drInflationValue" class="dr-field-readout">6.5% / yr</span><button type="button" class="dr-tt" aria-label="About this input">?<span class="dr-tt-card">Used to express the projection in real (inflation-adjusted) dollars. Higher inflation reduces the real-dollar value of future bitcoin holdings; doesn't affect the BTC count or the cycle math itself.</span></button></label>
                     <input type="range" id="drInflation" min="2" max="10" value="6.5" step="0.5">
                 </div>
                 <div class="dr-field">
-                    <label>Bitcoin growth model<button type="button" class="dr-tt dr-tt-right" aria-label="About this input"><i>i</i><span class="dr-tt-card">How fast you assume bitcoin's central trajectory grows over the horizon. <strong>Floor:</strong> tracks the Power Law floor (0.42&times; trend) &mdash; pessimistic. <strong>Trend:</strong> tracks the trend itself &mdash; central case. <strong>Upper:</strong> tracks the upper band (3&times; trend) &mdash; optimistic. The simulated cycle pattern oscillates &plusmn;60% around the chosen anchor.</span></button></label>
+                    <label>Bitcoin growth model<button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">How fast you assume bitcoin's central trajectory grows over the horizon. <strong>Floor:</strong> tracks the Power Law floor (0.42&times; trend) &mdash; pessimistic. <strong>Trend:</strong> tracks the trend itself &mdash; central case. <strong>Upper:</strong> tracks the upper band (3&times; trend) &mdash; optimistic. The simulated cycle pattern oscillates &plusmn;60% around the chosen anchor.</span></button></label>
                     <div class="dr-toggle-group">
                         <button class="dr-growth-btn" data-growth="floor">Floor</button>
                         <button class="dr-growth-btn active" data-growth="trend">Trend</button>
@@ -236,12 +236,12 @@ eleventyComputed:
             <div class="dr-output" id="drOutput" style="display:none">
 
                 <!-- Hero metric -->
-                <div class="dr-hero-title">Estimated outcome<button type="button" class="dr-tt" aria-label="What does this mean?"><i>i</i><span class="dr-tt-card">BTC accumulated at the end of the horizon, expressed as a multiple of HODL (just holding through). <strong>3&times; HODL</strong> means 3 BTC at horizon end if you started with 1 BTC. The multiplier reflects only completed cycles inside your horizon &mdash; if no cycles fire, the result reduces to <strong>1&times; HODL</strong>. Computed under your selected growth model and a &plusmn;60% cyclical pattern.</span></button></div>
+                <div class="dr-hero-title">Estimated outcome<button type="button" class="dr-tt" aria-label="What does this mean?">?<span class="dr-tt-card">BTC accumulated at the end of the horizon, expressed as a multiple of HODL (just holding through). <strong>3&times; HODL</strong> means 3 BTC at horizon end if you started with 1 BTC. The multiplier reflects only completed cycles inside your horizon &mdash; if no cycles fire, the result reduces to <strong>1&times; HODL</strong>. Computed under your selected growth model and a &plusmn;60% cyclical pattern.</span></button></div>
                 <div class="dr-hero-metric" id="drHero"></div>
 
                 <!-- Projection chart -->
                 <div class="dr-chart-container">
-                    <div class="dr-chart-title">Projection &mdash; discipline vs. holding through<button type="button" class="dr-tt" aria-label="How is this projected?"><i>i</i><span class="dr-tt-card">Both lines run the same simulated bitcoin price under your selected growth model with a <strong>&plusmn;60% cyclical pattern around the anchor</strong> (a stylized 4-year cycle, not a forecast of when peaks and troughs occur). The discipline line sells a fraction of stack on upward crossings of your sell threshold and rebuys with cash on downward crossings of your rebuy threshold. The HODL line holds straight through. Triangle markers show the simulated trigger events.</span></button></div>
+                    <div class="dr-chart-title">Projection &mdash; discipline vs. holding through<button type="button" class="dr-tt" aria-label="How is this projected?">?<span class="dr-tt-card">Both lines run the same simulated bitcoin price under your selected growth model with a <strong>&plusmn;60% cyclical pattern around the anchor</strong> (a stylized 4-year cycle, not a forecast of when peaks and troughs occur). The discipline line sells a fraction of stack on upward crossings of your sell threshold and rebuys with cash on downward crossings of your rebuy threshold. The HODL line holds straight through. Triangle markers show the simulated trigger events.</span></button></div>
                     <div class="dr-chart-wrapper"><canvas id="drChart"></canvas></div>
                     <div class="dr-chart-legend">
                         <span class="dr-legend-item"><span class="dr-legend-swatch dr-swatch-discipline"></span>Discipline (your settings)</span>
@@ -256,7 +256,7 @@ eleventyComputed:
 
                 <!-- Trade history table -->
                 <div class="dr-trade-history">
-                    <div class="dr-trade-history-title">Trade history<button type="button" class="dr-tt" aria-label="How to read this table"><i>i</i><span class="dr-tt-card">Every simulated trigger event in chronological order. <strong>Day</strong> = days from today. <strong>Type</strong> = sell or rebuy. <strong>Price</strong> = simulated price at the trigger. <strong>BTC &Delta;</strong> and <strong>Cash &Delta;</strong> = position changes from this trade. <strong>Ratio</strong> = price-to-trend ratio at the trigger (matches your sell or rebuy percentile). <strong>Tax</strong> column appears only for Regular accounts &mdash; capital gains tax owed on this sell.</span></button></div>
+                    <div class="dr-trade-history-title">Trade history<button type="button" class="dr-tt" aria-label="How to read this table">?<span class="dr-tt-card">Every simulated trigger event in chronological order. <strong>Day</strong> = days from today. <strong>Type</strong> = sell or rebuy. <strong>Price</strong> = simulated price at the trigger. <strong>BTC &Delta;</strong> and <strong>Cash &Delta;</strong> = position changes from this trade. <strong>Ratio</strong> = price-to-trend ratio at the trigger (matches your sell or rebuy percentile). <strong>Tax</strong> column appears only for Regular accounts &mdash; capital gains tax owed on this sell.</span></button></div>
                     <div class="dr-table-wrapper"><table id="drTradeTable"></table></div>
                 </div>
 

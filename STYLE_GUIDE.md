@@ -695,6 +695,34 @@ companion:
 
 **When the first piece of companion content ships.** Add the entry to the page's `companion:` front-matter array. The component renders immediately — no other markup or CSS changes needed. When you publish a Substack article walking through the Power Law calculator, that's a one-line edit to `the-power-law.njk`'s front-matter. Same for a YouTube video. The component is staged on Power Law and BvRE in commit 5 (empty `companion: []` arrays) so the front-matter slot exists ready for population.
 
+### 6.11 Help-tip / inline tooltip
+
+Small `?`-in-circle trigger sitting next to a label or section title; expands a dark tooltip card on hover, focus, or tap. Use whenever an input, output, or label is non-obvious enough to benefit from one or two sentences of explanation, but not important enough to displace into the page's body prose. Inputs on a calculator surface are the canonical case.
+
+**Glyph: `?`, not `i`.** Question-mark-in-a-circle is the convention across the site (Bitcoin Retirement uses `.help-tip`, Disciplined Rebalancing uses `.dr-tt`). Letter-i variants — italic `i`, plain `i`, lowercase `ⓘ` — read as ornament rather than help affordance and are visually less assertive at small sizes. Information-circle is reserved for non-help affordances if ever needed (currently nowhere).
+
+**Mandatory pattern:**
+
+```html
+<!-- Inside a label, after the label text -->
+<label>Sell percentile
+  <span class="help-tip" tabindex="0">?<span class="tip-content">
+    The price-to-trend ratio at-or-above which you sell. Higher
+    percentile = rarer triggers at more extreme prices.
+  </span></span>
+</label>
+```
+
+The trigger is `tabindex="0"` (or a real `<button>`) so it's keyboard-focusable and the tooltip opens via `:focus` as well as `:hover`. The card is a sibling `<span>` with absolute positioning. Use `display: none / block` (not `opacity: 0/1`) for the show/hide state — `opacity: 0` keeps the absolutely-positioned card in layout, which on mobile causes horizontal page overflow whenever the trigger sits within the card's width of the right edge. Lesson banked from `the-bitcoin-retirement.css` (commit referenced inline in that file).
+
+**Sizing and color.** 14×14px circle. Border-color and text color both `--text-muted` (or whatever the page's equivalent muted ink is); on `:hover` and `:focus`, both shift to `--amber`. Card width 240px (cap at `min(240px, calc(100vw - 32px))` on narrow viewports). Card body Inter at 0.8rem, line-height 1.5; `--text` (or page equivalent ink-bright) for body copy, `--bg-card` background, amber-translucent border, soft shadow.
+
+**Placement of the card.** Default: `top: calc(100% + 8px); left: 0` — opens below and to the right of the trigger. For triggers near the right edge of a row, add a right-anchored modifier (e.g. `.dr-tt-right` on Disciplined Rebalancing, or just `right: 0; left: auto;` inline) so the card opens leftward. Centering the card horizontally over the trigger is also fine when the trigger sits in the middle of a row, but anchoring to one edge is more predictable across responsive layouts.
+
+**Copy guidance.** One to two sentences. Surface the *what* and the *why this matters* — leave deeper methodology explanation to a Math tab or Methodology footnote. If a tooltip starts needing a paragraph to do its job, the right answer is to surface a methodology section with an anchor link from the tooltip, not to grow the tooltip into a paragraph.
+
+**When NOT to use.** Don't add tooltips on every label by default. Use them where the label *itself* doesn't carry enough of the meaning — e.g. "Sell percentile" needs a tooltip because the percentile-of-what is non-obvious; "Bitcoin stack" with a "never saved" inline note may not need one. The page's tooltip density should track the page's intrinsic complexity, not be a stylistic flourish.
+
 ---
 
 ## 7. Mobile considerations

@@ -1241,67 +1241,70 @@ input[type="range"]::-moz-range-track {
 }
 
 /* ═══════════════════════════════════════════════════════════ */
-/* TOOLTIPS — small ⓘ buttons inline with labels               */
+/* TOOLTIPS — small ? buttons inline with labels               */
 /* ═══════════════════════════════════════════════════════════ */
-/* Reusable pattern. Trigger is a real <button> for native focus
- * and tap support; tooltip card opens on :hover, :focus, and
- * :focus-within. No JS. Card is always positioned below+left of
- * the trigger to avoid overflow on right edges of the page. */
+/* Matches the .help-tip pattern on /the-bitcoin-retirement
+ * (Style Guide §6.11). Trigger is a real <button> for native focus
+ * + tap support; tooltip card opens on :hover and :focus. No JS.
+ * Card is positioned below+left of the trigger by default to avoid
+ * right-edge overflow; .dr-tt-right anchors right for triggers
+ * that themselves sit near the right edge. */
 .dr-tt {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     margin-left: 0.4rem;
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
+    background: transparent;
+    border: 1px solid var(--text-muted);
     color: var(--text-muted);
     font-family: 'Inter', sans-serif;
-    font-size: 0.62rem;
-    font-style: italic;
-    font-weight: 600;
+    font-size: 0.65rem;
+    font-style: normal;
+    font-weight: 400;
     line-height: 1;
     text-align: center;
-    justify-content: center;
     cursor: help;
     padding: 0;
     position: relative;
     vertical-align: middle;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition: border-color 0.15s, color 0.15s;
 }
 .dr-tt:hover,
 .dr-tt:focus {
-    background: rgba(224,148,34,0.12);
-    color: var(--amber);
     border-color: var(--amber);
+    color: var(--amber);
     outline: none;
 }
 .dr-tt-card {
-    visibility: hidden;
-    opacity: 0;
+    /* display:none rather than opacity:0 so the absolute element
+     * doesn't stay in layout when hidden — prevents narrow-viewport
+     * horizontal overflow when a ? sits near the right edge. Same
+     * lesson as /the-bitcoin-retirement's .help-tip .tip-content. */
+    display: none;
     position: absolute;
     top: calc(100% + 8px);
     left: 0;
-    width: 280px;
+    width: 240px;
     max-width: calc(100vw - 32px);
-    padding: 0.75rem 0.95rem;
+    padding: 0.7rem 0.9rem;
     background: var(--bg-card, #141210);
     border: 1px solid rgba(224,148,34,0.5);
-    border-radius: 6px;
-    color: var(--text-dim);
+    border-radius: 4px;
+    color: var(--text);
     font-family: 'Inter', sans-serif;
-    font-size: 0.83rem;
+    font-size: 0.8rem;
     font-style: normal;
     font-weight: 400;
-    line-height: 1.55;
+    line-height: 1.5;
     text-align: left;
     text-transform: none;
     letter-spacing: 0;
     z-index: 50;
     pointer-events: none;
-    transition: opacity 0.18s, visibility 0.18s;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5);
 }
 .dr-tt-card strong { color: var(--text); font-weight: 500; }
 .dr-tt-card code {
@@ -1319,11 +1322,11 @@ input[type="range"]::-moz-range-track {
 
 .dr-tt:hover .dr-tt-card,
 .dr-tt:focus .dr-tt-card {
-    visibility: visible;
-    opacity: 1;
+    display: block;
+    pointer-events: auto;
 }
 
 /* Mobile */
-@media (max-width: 720px) {
-    .dr-tt-card { width: 240px; font-size: 0.8rem; }
+@media (max-width: 480px) {
+    .dr-tt-card { width: min(240px, calc(100vw - 32px)); font-size: 0.78rem; }
 }

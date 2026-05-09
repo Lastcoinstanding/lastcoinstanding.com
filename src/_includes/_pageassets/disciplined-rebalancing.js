@@ -672,16 +672,21 @@
   }
 
   // Render the "Historical signals" summary block. Format: total
-  // counts, then the most recent 5 triggers in chronological order
-  // (newest first), with date + price + ratio. Also names the current
-  // state (would-be-holding-stack vs would-be-holding-cash-and-stack)
-  // since "what would I be doing today" is a useful framing.
+  // counts, then ALL triggers in chronological order (earliest at
+  // top, most recent at bottom — matches reading direction). Also
+  // names the current state (would-be-holding-stack vs would-be-
+  // holding-cash-and-stack) since "what would I be doing today" is
+  // a useful framing.
   function renderHistoricalSummary(bt, sellRatio, rebuyRatio){
     var summaryEl = document.getElementById('drHistSignals');
     if(!summaryEl) return;
     var sells = bt.trades.filter(function(t){ return t.type === 'sell'; });
     var rebuys = bt.trades.filter(function(t){ return t.type === 'rebuy'; });
-    var recent = bt.trades.slice(-5).reverse(); // newest first
+    // Show all trades chronologically (earliest first).
+    // Per session 2026-05-09 user feedback: 'reordering from earliest
+    // to latest as this feels more natural (reading from top to
+    // bottom, matching chronologically)'.
+    var listToShow = bt.trades.slice();
 
     var sellPctEl = document.getElementById('drSellPct');
     var rebuyPctEl = document.getElementById('drRebuyPct');
@@ -698,7 +703,7 @@
     } else {
       html = '<p class="dr-hist-signals-headline">At your current settings (sell ' + sellPct + 'th &middot; rebuy ' + rebuyPct + 'th), the strategy would have fired <strong>' + sells.length + ' sell signal' + (sells.length === 1 ? '' : 's') + '</strong> and <strong>' + rebuys.length + ' rebuy signal' + (rebuys.length === 1 ? '' : 's') + '</strong> across ~15 years of bitcoin history. ' + stateLine + '</p>';
       html += '<ul class="dr-hist-signals-list">';
-      recent.forEach(function(t){
+      listToShow.forEach(function(t){
         var date = new Date(GENESIS_TS*1000 + t.day*86400*1000);
         var dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
         var priceStr;
