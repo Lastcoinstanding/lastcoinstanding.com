@@ -130,6 +130,48 @@ A compact alternative to §2.1 for pages where every tab is chart-led with brief
 
 This tier was historically called "calc-tier," a label that conflated functional character (page contains a calculator) with typographic register. Renamed and clarified after the audit shipped in commits `4aa777d` / `9780b4c`.
 
+### 2.6 Essay-prose tier (prose-tab inside an interactive page)
+
+A third tier between §2.1 canonical editorial and §2.5 chart-explorer, designed for long-form essay content embedded inside an interactive page (Bitcoin Retirement's Question / Strategies / Math tabs are the canonical example).
+
+```css
+.essay-prose                 /* container — max-width 720px, centered */
+.essay-prose .tab-thesis     /* Power-Law-style hero claim, top of tab */
+.essay-prose .section-title  /* H2 — Cormorant, clamped 1.6–2.2rem */
+.essay-prose .prose          /* paragraph — Inter 1.04rem, line-height 1.72 */
+.essay-prose .prose strong   /* ink-bright bold for emphatic terms */
+.essay-prose .prose em       /* inherits ink, italic for conceptual emphasis */
+.essay-prose .prose.closing  /* slightly larger ink-bright italic close */
+.essay-prose .prose.teaser-link   /* forward-pointer with phase-tag */
+.essay-prose .essay-callout  /* centered amber-tinted blockquote */
+```
+
+**Tab-thesis pattern (anchoring header).** Each prose-led tab opens with a centered Cormorant Garamond claim, with amber-italic emphasis on the punchy half:
+
+```html
+<div class="tab-thesis">
+  <h2>Three legitimate questions, <em>each with a defensible range</em>.</h2>
+</div>
+```
+
+This parallels the Power Law page's `.hero-stat` pattern but uses the host page's design tokens. Anchors the reader before the lede prose begins. The pattern: `[setup phrase], em-amber [punchy claim].` Setup is in `--ink-bright`; the em-tag is colored `--amber` and italicized. Used on Question, Strategies, and Math tabs.
+
+**Math tab specification helpers.** For specification-style content (equations, parameter tables, honest-limits lists):
+
+```css
+.essay-prose .math-block     /* monospace equation panel, dark tinted bg */
+.essay-prose .math-eq        /* equation typography */
+.essay-prose .math-eq-small  /* annotation/footnote variant */
+.essay-prose .math-table     /* parameter tables, ink-bright caps headers */
+.essay-prose .math-list      /* honest-limits + sources lists */
+```
+
+The math-block uses monospace (`SF Mono`, `Monaco`, `Consolas`, `Courier New`) with `overflow-x: auto` for long equations on narrow viewports. Equations use `<sub>` and `<sup>` for proper subscript/superscript rendering of variables and exponents.
+
+**When to use this tier.** Appropriate for: editorial essays embedded in a multi-tab calculator/explorer page (Question, Strategies); specification documentation embedded in a multi-tab page (Math); any prose content that needs Cormorant + Inter editorial register but lives inside a `tab-content` container rather than as the page's primary content. *Not* appropriate for pages that are entirely prose (those are §2.1) or pages that are primarily chart-led (those are §2.5).
+
+**Mobile breakpoints.** All essay-prose elements collapse cleanly at 640px. At 480px, math-tables get `display: block; overflow-x: auto` as a defensive fallback for 3-column tables; prose paragraphs get `overflow-wrap: anywhere` to prevent long URLs or equation variable names from causing page overflow.
+
 ---
 
 ## 3. Color tokens
@@ -307,6 +349,8 @@ These have all been observed on the site and need fixing.
 9. **Low-contrast text below 0.5 opacity.** Migration cover subtitle hits this. → Keep text-on-dark above 0.6 opacity for body text; mini-labels can go to 0.5 if size is ≥0.7rem.
 10. **SVG-rendered text below 14px effective size on mobile.** Synthesis component circles hit this. → Add mobile breakpoint that bumps SVG container or text size.
 11. **Paragraph-level `max-width` constraints that fight the page container.** A global `p { max-width: 68ch }` (or similar) makes body text float as a narrow column inside a wider container, leaving visible empty space on the right and creating visual inconsistency vs. canonical pages where prose fills the container. → Remove the global `p` constraint; let prose fill its parent. Per-element constraints on specific cards (intro blocks, callouts, pull-quotes) are still fine — the anti-pattern is the *global* `p` rule.
+
+12. **Decorative 3px-side or 3px-top accent borders on cards.** Vestigial visual signal that earns no editorial benefit. The structural relationship between cards is what carries meaning, not a colored stripe. Color-coding (Fixed Pie's money-type cards, Half-Life's preset rates) is preserved through colored title text and progress bars; the stripe was redundant. → Drop decorative side/top borders site-wide. Preserve only borders that serve a *structural* role — `.tab-btn.active` indicator (transparent → colored bottom border), `.timeline` 2px structural rail on Half-Life History tab, timeline event dots, card containers' overall 1px border. Sweep applied across 8 page CSS files plus `.tool-framing-expanded` on `base.njk`. If a new page adds a decorative `border-left: 3px` or `border-top: 2px` accent, review against this principle before landing.
 
 ### Documented exceptions
 
@@ -770,6 +814,236 @@ if (typeof ResizeObserver !== 'undefined') {
 The guard prevents the hidden-canvas corruption. The `ResizeObserver` catches the canvas going from 0×0 to real dimensions (when the user activates the tab) and runs the deferred fix exactly once. ResizeObserver is well-supported in evergreen browsers (Chrome 64+, Safari 13.4+, Firefox 69+); when absent, the deferred path silently doesn't fire and the worst case is a slightly stale chart on first tab-view, which is the original bug — i.e. the fallback is no worse than not having the pattern.
 
 **Where this lives in practice.** Disciplined Rebalancing's channel viz uses this pattern (see the `pendingLayoutFix` / `ResizeObserver` block in `disciplined-rebalancing.js`). New chart-bearing pages that use the `.tab-content` system should adopt it whenever sticky-values or any other init-time event can change the chart's data domain. Pages whose chart is the only thing on the page (no tabs, always visible) don't need it — the canvas always has dimensions when init runs.
+
+### 6.15 OG card generation pattern
+
+A reusable Python + Pillow generator for site OG cards (1280×720 JPG) lives in the dev environment. Visual register matches the existing site cards:
+
+- Dark `#0a0908` background with subtle Gaussian noise + soft vignette
+- Top-left: Inter caps brand label (`LAST COIN STANDING`) with 40px amber rule underneath
+- Center-left: Cormorant Garamond Medium title (84px), italic tagline (30px) wrapped to 540px max
+- Bottom-left: Inter URL (`LASTCOINSTANDING.COM`) in `--ink-faint`
+- Right side: faded amber Bitcoin glyph with multi-pass radial halo + particle dust
+- Cormorant Garamond doesn't include U+20BF (₿); use Inter for that single character
+
+Save as JPEG quality 88 with `optimize=True` to land at ~85–95 KB per card, matching the size of existing OG images. Fonts fetched from Google Fonts at generation time; no font assets committed.
+
+### 6.16 Print stylesheet pattern (single-page PDF)
+
+Pattern for adding print stylesheets to calculator pages. Reusable for any future calculator that needs a printable scenario summary.
+
+**Architecture.** Two `display: none` print-only blocks interleaved in the calculator DOM:
+
+```html
+<div class="tab-content active" id="tab-calculator">
+
+  <!-- PRINT-ONLY: header + inputs (appears before chart in print) -->
+  <div class="print-only print-block print-block-pre" aria-hidden="true">
+    <div class="print-page-head">
+      <div class="print-brand">LAST COIN STANDING</div>
+      <div class="print-meta">
+        <span class="print-url">lastcoinstanding.com/[page-slug]</span>
+        <span class="print-meta-sep">·</span>
+        <span id="printDate">—</span>
+      </div>
+    </div>
+    <h2 class="print-title">[Page Name] — Scenario</h2>
+    <table class="print-inputs-table">
+      <thead><tr><th colspan="2">Inputs</th></tr></thead>
+      <tbody id="printInputsBody"><!-- populated by JS --></tbody>
+    </table>
+  </div>
+
+  <!-- Regular calculator UI (most hidden in print, chart visible) -->
+  ...
+
+  <!-- PRINT-ONLY: outputs + footer (appears after chart in print) -->
+  <div class="print-only print-block print-block-post" aria-hidden="true">
+    <h3 class="print-section-title">[Output section label]</h3>
+    <div class="print-sust-grid"><!-- two value-blocks --></div>
+    <p class="print-sust-detail" id="printSustDetail">—</p>
+    <p class="print-disclaimer">For exploration and education only. ...</p>
+  </div>
+</div>
+```
+
+DOM order produces the right print sequence naturally: header → inputs → chart → outputs → footer.
+
+**CSS structure.**
+
+```css
+/* Default: hidden on screen */
+.print-only { display: none; }
+
+@media print {
+  /* Override CSS variables for ink-friendliness */
+  :root {
+    --bg-page: white;
+    --ink-bright: black;
+    --amber: #b06a18;            /* darker amber for ink contrast */
+  }
+  body { background: white !important; color: black !important; }
+
+  /* Hide screen chrome — actual class names matter, audit against rendered HTML */
+  nav, header.site-header, .site-nav, .site-header,
+  .tool-framing,                    /* disclaimer button strip */
+  footer, .site-footer,
+  .footer-cta,                      /* "Continue Exploring" h3 */
+  .related-block, .related-grid,    /* related-card tiles */
+  .page-header, .tab-nav,
+  .tab-content:not(.active),
+  .help-tip                         /* ? icons and tooltips */
+  { display: none !important; }
+
+  /* Show print-only blocks */
+  .print-only { display: block; }
+
+  /* Tighten the chart container for print */
+  .projection { padding: 8pt !important; page-break-inside: avoid; }
+  .chart-wrapper { height: 280pt !important; page-break-inside: avoid; }
+
+  @page { margin: 14mm 12mm 12mm 12mm; size: letter; }
+}
+```
+
+**JS state population on `beforeprint`.**
+
+```javascript
+function bindPrintPopulation() {
+  function populate() {
+    document.getElementById('printDate').textContent =
+      new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    // Build #printInputsBody from existing screen value displays
+    // Copy output values to print blocks (preserve classes like escape-velocity)
+  }
+  window.addEventListener('beforeprint', populate);
+  populate();  // Safari-mobile fallback (beforeprint is unreliable there)
+}
+```
+
+**Critical: audit selectors against actual rendered HTML.** The print stylesheet's "hide screen chrome" selectors must match the actual class names in rendered output, not speculative names. Verify with `curl https://[site] | grep class=` before shipping. The Bitcoin Retirement initial print ship missed two: `.tool-framing` (not `.tool-framing-strip`) and `.footer-cta` + `.related-block` (not `.related-set`). Fixed in commit `64ae655`.
+
+**Page-break management.** Charts and grouped output panels carry `page-break-inside: avoid` to keep them whole. On letter-size paper at default zoom, a typical scenario lands cleanly on one page; on A4 it should also fit. Audit print preview at letter and adjust font-size / spacing as needed.
+
+### 6.17 Calc-mode-toggle (Money-Trees-style yin-yang)
+
+**Use case:** When a page surface holds two conceptually-paired views or modes that shouldn't be diluted into separate tabs. Best for *temporal duality* (past/future, before/after) or *binary opposition* (with/without, A/B). Inspired by the Money Trees page's Bitcoin/Fiat toggle. Canonical implementation: BvRE Calculator tab (Retrospective / Projection).
+
+**Core principle:** Two equal-weight labels flank a sliding switch in the middle. The switch physically moves left↔right (or top↔bottom on mobile) when toggled, communicating "these are paired by design, not just two unrelated options."
+
+```html
+<div class="calc-mode-toggle" data-active-mode="retrospective" role="tablist" aria-label="Calculator mode">
+  <button type="button" class="calc-mode-label retrospective active"
+          data-mode="retrospective" role="tab" aria-selected="true"
+          aria-controls="calc-mode-retrospective">
+    <span class="calc-mode-name">Retrospective</span>
+    <span class="calc-mode-sub">What if you'd bought bitcoin?</span>
+  </button>
+  <button type="button" class="calc-mode-switch" aria-label="Toggle calculator mode">
+    <span class="calc-mode-thumb"></span>
+  </button>
+  <button type="button" class="calc-mode-label projection"
+          data-mode="projection" role="tab" aria-selected="false"
+          aria-controls="calc-mode-projection">
+    <span class="calc-mode-name">Projection</span>
+    <span class="calc-mode-sub">What might happen going forward?</span>
+  </button>
+</div>
+
+<div class="calc-mode-content active" id="calc-mode-retrospective" role="tabpanel">[content for mode 1]</div>
+<div class="calc-mode-content" id="calc-mode-projection" role="tabpanel">[content for mode 2]</div>
+```
+
+**Visual design.** Two labels at 0.5 opacity when inactive, full when active. Active label color signals the mode (gray/cool for retrospective, amber for projection in BvRE). Label structure: Cormorant Garamond title (1.5rem) + Inter subtitle (0.78rem, italic, muted). Switch: 64×32px pill (mobile: 32×64px). Track shifts color when active mode is on the right side. Thumb (24×24px circle) slides with `transition: left 0.3s cubic-bezier(.4,.0,.2,1)`. Active state driven by `data-active-mode` attribute on `.calc-mode-toggle` parent; CSS uses attribute selector to swap thumb position and track color. Both labels and the central switch are clickable.
+
+**JS pattern.**
+
+```js
+(function bindCalcModeToggle(){
+  var toggle = document.querySelector('.calc-mode-toggle');
+  if(!toggle) return;
+  var labels = toggle.querySelectorAll('.calc-mode-label');
+  var switchBtn = toggle.querySelector('.calc-mode-switch');
+  var contents = document.querySelectorAll('.calc-mode-content');
+
+  function setMode(mode){
+    toggle.dataset.activeMode = mode;
+    labels.forEach(function(l){
+      var isActive = l.dataset.mode === mode;
+      l.classList.toggle('active', isActive);
+      l.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    contents.forEach(function(c){
+      c.classList.toggle('active', c.id === 'calc-mode-' + mode);
+    });
+  }
+
+  labels.forEach(function(l){ l.addEventListener('click', function(){ setMode(l.dataset.mode); }); });
+  switchBtn.addEventListener('click', function(){
+    setMode(toggle.dataset.activeMode === 'retrospective' ? 'projection' : 'retrospective');
+  });
+})();
+```
+
+Mobile breakpoint at **640px** stacks the toggle vertically and rotates the switch (32×64, thumb slides top↔bottom). See `/src/_includes/_pageassets/bitcoin-vs-real-estate.css` for the canonical CSS.
+
+**When to use this vs. tabs.** Use this when the two views are a *paired set* and the page already has tabs at a higher level (sub-toggle inside a tab works well). Use this when the conceptual relationship is a duality (past/future, A/B, with/without). Use tabs instead when there are 3+ views, or when the views are *parallel* rather than *paired*.
+
+### 6.18 Porkopolis credit block
+
+**Use case:** Prominent attribution to Matthew Mežinskis at Porkopolis Economics for the Power Law channel framework. Use any time a page references the channel framework (floor at 0.42× trend, upper at 3× trend, daily-close stress-test convention) or applies it as a decision frame.
+
+**Core principle:** Credit should be prominent — not a footnote, not buried in a Sources block — but it shouldn't dominate the page either. An amber-tinted callout with an uppercase label and 1–2 sentences of attribution.
+
+```html
+<div class="porkopolis-credit">
+  <div class="porkopolis-credit-label">Channel framework &amp; coefficients</div>
+  <p>The Power Law channel framework on this page &mdash; the structural floor at 0.42&times; trend, the upper band at 3&times; trend, and the daily-close-as-stress-test convention &mdash; was developed and refined by <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener"><strong>Matthew Me&zcaron;inskis</strong></a> at <a href="https://www.porkopolis.io" target="_blank" rel="noopener">Porkopolis Economics</a>. This visualization is built on his coefficients (a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.77) and band ratios. For the canonical version with live data and ongoing analysis, see <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">Porkopolis: The Chart</a> directly.</p>
+</div>
+```
+
+**Visual design.** Background `rgba(224,148,34,0.04)` (very light amber tint), border `1px solid rgba(224,148,34,0.18)`. Label uppercase, 0.7rem, letter-spacing 1.5px, amber, weight 500. Body 0.95rem, line-height 1.7, in `--text-dim`. Links amber, underline on hover. Mežinskis name `<strong>` for emphasis. Mobile: padding tightens to 1.1rem 1.2rem at 720px breakpoint.
+
+**Where to use it.**
+
+- **The Channel page** (Tab 4 of Power Law) — canonical home; credit block at the top of tab content, before the chart.
+- **Future pages applying the channel framework** — where attribution context is needed (e.g. a smaller variant for inline references on Disciplined Rebalancing).
+- **Not needed on** retirement page or BvRE projection mode — these pages cross-link to The Channel page where the credit is prominent. Convention: link forward to The Channel for full attribution; quietly reference Porkopolis coefficients in methodology footnotes when needed.
+
+See `/src/_includes/_pageassets/the-power-law.css` for the canonical CSS.
+
+### 6.19 Channel control surface (axis toggle + band visibility)
+
+**Use case:** Any chart where the user benefits from controlling the axis scale or hiding/showing individual datasets. Established for The Channel page; reusable for any future analytical chart.
+
+```html
+<div class="channel-container">
+  <div class="channel-controls">
+    <div class="channel-axis-toggle" role="tablist" aria-label="Time axis scale">
+      <button type="button" class="channel-axis-btn active" data-axis="linear">Linear time</button>
+      <button type="button" class="channel-axis-btn" data-axis="log">Log time</button>
+    </div>
+    <div class="channel-band-toggles" role="group" aria-label="Band visibility">
+      <label class="channel-band-toggle"><input type="checkbox" data-band="floor" checked><span>Floor</span></label>
+      <label class="channel-band-toggle"><input type="checkbox" data-band="trend" checked><span>Trend</span></label>
+      <label class="channel-band-toggle"><input type="checkbox" data-band="upper" checked><span>Upper</span></label>
+      <label class="channel-band-toggle"><input type="checkbox" data-band="history" checked><span>Price history</span></label>
+    </div>
+  </div>
+  <div class="channel-chart-wrapper"><canvas id="channelChart"></canvas></div>
+  <div class="channel-status" id="channelStatus">[live status line]</div>
+</div>
+```
+
+**Visual design.** Container: `--bg-card` background, `--border` 1px outline, 8px radius, 1.5rem 1.8rem padding. Controls row: flex space-between, wraps on mobile, border-bottom separator. Axis toggle: segmented buttons (sharing borders); active state = amber tint background + amber text. Band toggles: standard checkbox + label pairs, accent-color amber, 0.82rem text in `--text-dim`. Chart wrapper: fixed height 460px desktop, 380px mobile (lets Chart.js compute proportions cleanly). Status line: monospace (`SF Mono` / `Monaco`), 0.85rem in `--text-muted`, separated from chart by border-top.
+
+Mobile breakpoint at **720px** collapses controls to vertical stack, shrinks chart to 380px, status line to 0.78rem.
+
+**When to use it.** The Channel page (canonical home). Future analytical charts with multi-band data and axis-mode-relevance. *Not* for simple display charts where users don't need controls — the pattern is for *interactive analysis*, not just visualization.
+
+### Naming convention reminder
+
+Three patterns above follow the convention `{purpose}-{role}`: `calc-mode-*`, `porkopolis-credit*`, `channel-*`. When introducing future patterns, prefer this convention over generic names like `.toggle` or `.controls` to avoid collisions across pages.
 
 ---
 
