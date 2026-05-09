@@ -695,7 +695,7 @@ companion:
 
 **When the first piece of companion content ships.** Add the entry to the page's `companion:` front-matter array. The component renders immediately — no other markup or CSS changes needed. When you publish a Substack article walking through the Power Law calculator, that's a one-line edit to `the-power-law.njk`'s front-matter. Same for a YouTube video. The component is staged on Power Law and BvRE in commit 5 (empty `companion: []` arrays) so the front-matter slot exists ready for population.
 
-### 6.11 Help-tip / inline tooltip
+### 6.13 Help-tip / inline tooltip
 
 Small `?`-in-circle trigger sitting next to a label or section title; expands a dark tooltip card on hover, focus, or tap. Use whenever an input, output, or label is non-obvious enough to benefit from one or two sentences of explanation, but not important enough to displace into the page's body prose. Inputs on a calculator surface are the canonical case.
 
@@ -722,6 +722,54 @@ The trigger is `tabindex="0"` (or a real `<button>`) so it's keyboard-focusable 
 **Copy guidance.** One to two sentences. Surface the *what* and the *why this matters* — leave deeper methodology explanation to a Math tab or Methodology footnote. If a tooltip starts needing a paragraph to do its job, the right answer is to surface a methodology section with an anchor link from the tooltip, not to grow the tooltip into a paragraph.
 
 **When NOT to use.** Don't add tooltips on every label by default. Use them where the label *itself* doesn't carry enough of the meaning — e.g. "Sell percentile" needs a tooltip because the percentile-of-what is non-obvious; "Bitcoin stack" with a "never saved" inline note may not need one. The page's tooltip density should track the page's intrinsic complexity, not be a stylistic flourish.
+
+### 6.14 Chart inside a hidden tab — deferred layout
+
+A pattern for any Chart.js chart whose container ancestor has `display: none` at script-execution time — the canonical case is a chart inside `.tab-content` that isn't the active tab on page load. Without this pattern, layout-changing chart updates fired during page initialization read the canvas's 0×0 dimensions and corrupt every element's pixel position to 0; the chart appears broken when the user finally clicks into the tab.
+
+**Where this bites.** Sticky-values restoration (`localStorage` → slider → `dispatchEvent('input')` chain at end of page-init IIFE) commonly triggers a re-layout on a hidden chart. So does any data-driven scale change that fires during init. Even `chart.update('none')` looks like a no-op layout-wise, but Chart.js v4's layout cache survives it more aggressively than the docs suggest — once stale element positions are baked at canvas-width 0, subsequent `update('none')` calls don't fix them.
+
+**The right invalidation call.** Empirically (Chart.js 4.4.x):
+
+| Call | Behavior on stale layout cache |
+|---|---|
+| `chart.update('none')` | Doesn't fix |
+| `chart.update()` (default) | Doesn't fix |
+| `chart.update('reset')` | Fixes, but flickers (resets to base y-values then animates back) |
+| `chart.resize()` | No-op when canvas dimensions haven't changed |
+| `chart.update('resize')` | **Fixes, no flicker, no dimension dependency** |
+
+`chart.update('resize')` is the right call for layout-changing updates that don't change the canvas size — e.g. data-domain shrinks (horizon-slider tick), x-scale max recompute, anything that ought to invalidate element pixel positions without changing the canvas itself.
+
+**Mandatory pattern when the chart can be initialized inside a hidden ancestor:**
+
+```js
+var pendingLayoutFix = false;
+
+function applyDataChange(){
+  // ... mutate chart.data.datasets[*].data ...
+  chart.update('none');                  // cheap data-only update
+  if (canvas.clientWidth > 0) {
+    chart.update('resize');               // layout-cache invalidation
+  } else {
+    pendingLayoutFix = true;              // defer; canvas is hidden
+  }
+}
+
+if (typeof ResizeObserver !== 'undefined') {
+  var ro = new ResizeObserver(function(){
+    if (pendingLayoutFix && canvas.clientWidth > 0) {
+      pendingLayoutFix = false;
+      chart.update('resize');
+    }
+  });
+  ro.observe(canvas);
+}
+```
+
+The guard prevents the hidden-canvas corruption. The `ResizeObserver` catches the canvas going from 0×0 to real dimensions (when the user activates the tab) and runs the deferred fix exactly once. ResizeObserver is well-supported in evergreen browsers (Chrome 64+, Safari 13.4+, Firefox 69+); when absent, the deferred path silently doesn't fire and the worst case is a slightly stale chart on first tab-view, which is the original bug — i.e. the fallback is no worse than not having the pattern.
+
+**Where this lives in practice.** Disciplined Rebalancing's channel viz uses this pattern (see the `pendingLayoutFix` / `ResizeObserver` block in `disciplined-rebalancing.js`). New chart-bearing pages that use the `.tab-content` system should adopt it whenever sticky-values or any other init-time event can change the chart's data domain. Pages whose chart is the only thing on the page (no tabs, always visible) don't need it — the canvas always has dimensions when init runs.
 
 ---
 
