@@ -266,6 +266,48 @@
   // Historical price as scatter data (PL_DATA is already day-indexed).
   var historicalData = PL_DATA.map(function(p){ return {x: p[0], y: p[1]}; });
 
+  // ─── HISTORICAL BACKTEST ───
+  // Walks PL_DATA day-by-day applying the user's sell/rebuy/fraction
+  // logic — same trigger algorithm as the calculator's runSimulation,
+  // but on real historical price data instead of the synthetic ±60%
+  // cycle pattern. Returns a chronological list of trigger events
+  // that would have fired if the user had been running this strategy
+  // since the first PL_DATA sample (~mid-2010).
+  //
+  // Honest-application choice: starts holding-stack at PL_DATA[0]
+  // (no choice of "starting point" that could be cherry-picked) and
+  // runs through the full historical record. The only inputs are
+  // the user's threshold ratios; nothing else is tunable, nothing
+  // is excluded. If the strategy never crosses a threshold, the
+  // backtest returns an empty trade list.
+  function runHistoricalBacktest(sellRatio, rebuyRatio){
+    var trades = [];
+    var state = 'holding-stack';
+    var prevRatio = null;
+    for(var i = 0; i < PL_DATA.length; i++){
+      var d = PL_DATA[i][0];
+      var p = PL_DATA[i][1];
+      var t = plPrice(d);
+      if(t <= 0) continue;
+      var ratio = p / t;
+      if(prevRatio !== null){
+        if(state === 'holding-stack'){
+          if(prevRatio < sellRatio && ratio >= sellRatio){
+            trades.push({ day: d, price: p, ratio: ratio, type: 'sell' });
+            state = 'holding-cash-and-stack';
+          }
+        } else {
+          if(prevRatio > rebuyRatio && ratio <= rebuyRatio){
+            trades.push({ day: d, price: p, ratio: ratio, type: 'rebuy' });
+            state = 'holding-stack';
+          }
+        }
+      }
+      prevRatio = ratio;
+    }
+    return { trades: trades, finalState: state };
+  }
+
   // ─── PERCENTILE → RATIO (mirrors calc IIFE; computed once at init) ───
   // We re-derive these here so the channel viz can render thresholds
   // BEFORE the calc IIFE runs (e.g. before the user enters a stack).
@@ -335,7 +377,8 @@
     sellLine: 3, rebuyLine: 4,
     history: 5,
     forwardPath: 6,
-    sellMarkers: 7, rebuyMarkers: 8
+    sellMarkers: 7, rebuyMarkers: 8,
+    histSellMarkers: 9, histRebuyMarkers: 10
   };
 
   var chart = new Chart(canvas, {
@@ -448,6 +491,33 @@
           pointHoverRadius: 9,
           showLine: false,
           order: 0
+        },
+        // 9: HISTORICAL Sell markers (▼) — what would have fired in real history.
+        // Smaller + lower-opacity than forward markers so the eye distinguishes
+        // "this happened" from "this is projected".
+        {
+          label: 'Historical sell',
+          data: [],
+          borderColor: 'rgba(224,148,34,0.55)',
+          backgroundColor: 'rgba(224,148,34,0.35)',
+          pointStyle: 'triangle',
+          pointRotation: 180,
+          pointRadius: 4.5,
+          pointHoverRadius: 7,
+          showLine: false,
+          order: 1
+        },
+        // 10: HISTORICAL Rebuy markers (▲)
+        {
+          label: 'Historical rebuy',
+          data: [],
+          borderColor: 'rgba(39,174,96,0.55)',
+          backgroundColor: 'rgba(39,174,96,0.35)',
+          pointStyle: 'triangle',
+          pointRadius: 4.5,
+          pointHoverRadius: 7,
+          showLine: false,
+          order: 1
         }
       ]
     },
@@ -535,15 +605,78 @@
 
   // ─── DYNAMIC UPDATES ───
 
-  // Update threshold lines when user moves sell/rebuy sliders.
-  // Cheap: just rebuild the y-values for two datasets.
+  // Update threshold lines + historical backtest when user moves
+  // sell/rebuy sliders. Threshold lines are cheap (rebuild y-values
+  // for two datasets). Backtest is also cheap — ~480 PL_DATA samples,
+  // a single linear pass.
   function updateThresholds(){
     if(!sellEl || !rebuyEl) return;
     var sr = percentileToRatio(parseInt(sellEl.value));
     var rr = percentileToRatio(parseInt(rebuyEl.value));
     chart.data.datasets[DS.sellLine].data = thresholdData(sr);
     chart.data.datasets[DS.rebuyLine].data = thresholdData(rr);
+    updateBacktest(sr, rr);
     chart.update('none');
+  }
+
+  // Run the historical backtest at the user's current settings and
+  // (a) paint history-marker datasets on the chart, (b) re-render the
+  // "Historical signals at your current settings" summary block.
+  function updateBacktest(sellRatio, rebuyRatio){
+    var bt = runHistoricalBacktest(sellRatio, rebuyRatio);
+    var hSells = [], hRebuys = [];
+    bt.trades.forEach(function(t){
+      var pt = { x: t.day, y: t.price };
+      if(t.type === 'sell') hSells.push(pt);
+      else hRebuys.push(pt);
+    });
+    chart.data.datasets[DS.histSellMarkers].data = hSells;
+    chart.data.datasets[DS.histRebuyMarkers].data = hRebuys;
+    renderHistoricalSummary(bt, sellRatio, rebuyRatio);
+  }
+
+  // Render the "Historical signals" summary block. Format: total
+  // counts, then the most recent 5 triggers in chronological order
+  // (newest first), with date + price + ratio. Also names the current
+  // state (would-be-holding-stack vs would-be-holding-cash-and-stack)
+  // since "what would I be doing today" is a useful framing.
+  function renderHistoricalSummary(bt, sellRatio, rebuyRatio){
+    var summaryEl = document.getElementById('drHistSignals');
+    if(!summaryEl) return;
+    var sells = bt.trades.filter(function(t){ return t.type === 'sell'; });
+    var rebuys = bt.trades.filter(function(t){ return t.type === 'rebuy'; });
+    var recent = bt.trades.slice(-5).reverse(); // newest first
+
+    var sellPctEl = document.getElementById('drSellPct');
+    var rebuyPctEl = document.getElementById('drRebuyPct');
+    var sellPct = sellPctEl ? sellPctEl.value : '?';
+    var rebuyPct = rebuyPctEl ? rebuyPctEl.value : '?';
+
+    var stateLine = bt.finalState === 'holding-stack'
+      ? 'Currently <strong>holding stack</strong> (waiting for next sell signal).'
+      : 'Currently <strong>holding cash + stack</strong> (waiting for rebuy signal).';
+
+    var html = '';
+    if(bt.trades.length === 0){
+      html = '<p class="dr-hist-signals-empty">At sell ' + sellPct + 'th &middot; rebuy ' + rebuyPct + 'th, the strategy would have fired <strong>zero</strong> triggers across ' + PL_DATA.length + ' historical price samples (~15 years). Bitcoin never crossed your sell threshold from below or your rebuy threshold from above. Try a less extreme percentile.</p>';
+    } else {
+      html = '<p class="dr-hist-signals-headline">At your current settings (sell ' + sellPct + 'th &middot; rebuy ' + rebuyPct + 'th), the strategy would have fired <strong>' + sells.length + ' sell signal' + (sells.length === 1 ? '' : 's') + '</strong> and <strong>' + rebuys.length + ' rebuy signal' + (rebuys.length === 1 ? '' : 's') + '</strong> across ~15 years of bitcoin history. ' + stateLine + '</p>';
+      html += '<ul class="dr-hist-signals-list">';
+      recent.forEach(function(t){
+        var date = new Date(GENESIS_TS*1000 + t.day*86400*1000);
+        var dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+        var priceStr;
+        if(t.price >= 1e6) priceStr = '$' + (t.price/1e6).toFixed(2) + 'M';
+        else if(t.price >= 1000) priceStr = '$' + (t.price/1000).toFixed(1) + 'K';
+        else if(t.price >= 1) priceStr = '$' + t.price.toFixed(2);
+        else priceStr = '$' + t.price.toFixed(4);
+        var glyph = t.type === 'sell' ? '<span class="dr-hist-glyph dr-hist-glyph-sell">▼</span>' : '<span class="dr-hist-glyph dr-hist-glyph-rebuy">▲</span>';
+        var verb = t.type === 'sell' ? 'SELL' : 'REBUY';
+        html += '<li>' + glyph + ' <span class="dr-hist-date">' + dateStr + '</span> &middot; <strong>' + verb + '</strong> at ' + priceStr + ' <span class="dr-hist-ratio">(' + t.ratio.toFixed(2) + '× trend)</span></li>';
+      });
+      html += '</ul>';
+    }
+    summaryEl.innerHTML = html;
   }
 
   // Rebuild bands + thresholds when horizon changes (extends x-domain).
@@ -552,8 +685,12 @@
     chart.data.datasets[DS.floor].data = bands.floor;
     chart.data.datasets[DS.trend].data = bands.trend;
     chart.data.datasets[DS.upper].data = bands.upper;
-    updateThresholds(); // re-extends sell/rebuy lines to new max
+    updateThresholds(); // re-extends sell/rebuy lines + re-runs backtest
   }
+
+  // Initial backtest at script-load (before any user interaction).
+  updateBacktest(initialSellRatio, initialRebuyRatio);
+  chart.update('none');
 
   if(sellEl) sellEl.addEventListener('input', updateThresholds);
   if(rebuyEl) rebuyEl.addEventListener('input', updateThresholds);

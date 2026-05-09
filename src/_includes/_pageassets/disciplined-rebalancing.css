@@ -1067,6 +1067,83 @@ input[type="range"]::-moz-range-track {
 .dr-swatch-sellline { background: transparent;   width: 14px; height: 0; border-top: 1.5px dashed #e09422; }
 .dr-swatch-rebuyline{ background: transparent;   width: 14px; height: 0; border-top: 1.5px dashed var(--green); }
 
+/* Legend glyphs for the historical-signal markers — match the
+ * chart's muted/translucent color treatment so the legend reads
+ * correctly against the bright forward-projection markers (which
+ * use solid amber / green and are explained inline by the
+ * Estimated outcome chart's own legend). */
+.dr-legend-glyph {
+    display: inline-block;
+    width: 14px;
+    text-align: center;
+    line-height: 1;
+    font-size: 0.78rem;
+}
+.dr-legend-glyph-histsell  { color: rgba(224,148,34,0.65); }
+.dr-legend-glyph-histrebuy { color: rgba(39,174,96,0.65); }
+
+/* Historical signals summary block — sits below the channel chart
+ * legend, above the Porkopolis attribution. Shows a backtest of
+ * the user's current threshold settings against PL_DATA. */
+.dr-hist-signals-block {
+    margin-top: 1.2rem;
+    padding: 1rem 1.2rem;
+    background: rgba(255,255,255,0.015);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+}
+.dr-hist-signals-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--text-muted);
+    margin-bottom: 0.6rem;
+    /* The label hosts a tooltip — let the trigger live alongside text */
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+}
+.dr-hist-signals-headline {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin: 0 0 0.7rem;
+}
+.dr-hist-signals-headline strong { color: var(--text); }
+.dr-hist-signals-empty {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin: 0;
+}
+.dr-hist-signals-empty strong { color: var(--amber); }
+.dr-hist-signals-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 0.85rem;
+    line-height: 1.65;
+    color: var(--text-dim);
+}
+.dr-hist-signals-list li {
+    padding: 0.18rem 0;
+    border-bottom: 1px dashed rgba(255,255,255,0.04);
+}
+.dr-hist-signals-list li:last-child { border-bottom: none; }
+.dr-hist-signals-list strong { color: var(--text); font-weight: 500; }
+.dr-hist-glyph {
+    display: inline-block;
+    width: 14px;
+    text-align: center;
+    margin-right: 0.35rem;
+    font-size: 0.78rem;
+}
+.dr-hist-glyph-sell  { color: var(--amber); }
+.dr-hist-glyph-rebuy { color: var(--green); }
+.dr-hist-date  { color: var(--text); }
+.dr-hist-ratio { color: var(--text-muted); font-size: 0.78rem; }
+
 /* Porkopolis attribution — scoped to this page; mirrors the
  * .porkopolis-credit treatment on /the-power-law without sharing CSS. */
 .dr-channel-attribution {
