@@ -88,8 +88,8 @@
     letter-spacing: 0.005em;
 }
 .hero .subtitle {
-    font-size: 1rem;
-    line-height: 1.8;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.7;
     color: var(--text-dim);
     max-width: 680px;
     margin: 0 auto;
@@ -103,14 +103,15 @@
     .hero { padding: 3.5rem 1.25rem 2rem; }
 }
 
-/* Section intros and prose blocks — narrower for reading */
+/* Section intros — let prose fill the container width per Style
+ * Guide §16 / anti-pattern #11. Font sizing matches the canonical
+ * `.prose` from /the-power-law (1.05rem / line-height 1.7). */
 .section-intro {
-    max-width: 760px;
-    margin: 0 auto 2rem;
+    margin: 0 0 2rem;
 }
 .section-intro h2 {
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
     font-weight: 500;
     color: var(--text);
     line-height: 1.15;
@@ -119,8 +120,8 @@
 }
 .section-intro h2 em { font-style: italic; color: var(--amber); }
 .section-intro p {
-    font-size: 1.02rem;
-    line-height: 1.75;
+    font-size: 1.05rem;
+    line-height: 1.7;
     color: var(--text-dim);
 }
 .section-intro p em { color: var(--text); font-style: italic; }

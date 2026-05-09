@@ -117,7 +117,7 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        interaction: { mode: 'nearest', axis: 'x', intersect: false },
+        interaction: { mode: 'index', axis: 'x', intersect: false },
         scales: {
           x: {
             type: 'linear',
@@ -455,7 +455,7 @@
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: 'nearest', axis: 'x', intersect: false },
+      interaction: { mode: 'index', axis: 'x', intersect: false },
       plugins: {
         legend: { display: false },
         tooltip: {
