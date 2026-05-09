@@ -806,6 +806,16 @@
       var el = document.getElementById(elId);
       if(stored != null && el) el.value = stored;
     });
+    // Dispatch 'input' on the threshold sliders so the channel viz IIFE
+    // picks up the restored values (its threshold-line and historical-
+    // backtest update path is wired to slider 'input' events, not to a
+    // bare value assignment). Without this, returning visitors with
+    // non-default sliders in localStorage would see channel-viz state
+    // matching the defaults rather than their stored settings.
+    ['drSellPct', 'drRebuyPct', 'drSellFrac', 'drHorizon'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.dispatchEvent(new Event('input', { bubbles: true }));
+    });
     // Toggles
     var aT = loadSetting('accountType') || 'retirement';
     var gM = loadSetting('growthModel') || 'trend';
@@ -829,6 +839,15 @@
     elSellPct.value = p.sellPct;
     elRebuyPct.value = p.rebuyPct;
     elSellFrac.value = p.sellFrac;
+    // Dispatch 'input' on each slider whose value changed programmatically.
+    // The channel viz IIFE listens directly for slider 'input' events to
+    // refresh threshold lines + the historical backtest, and those listeners
+    // don't fire from a bare value assignment. Without these dispatches,
+    // clicking a preset would leave the channel viz showing the previous
+    // settings' threshold lines and historical-signal markers.
+    elSellPct.dispatchEvent(new Event('input', { bubbles: true }));
+    elRebuyPct.dispatchEvent(new Event('input', { bubbles: true }));
+    elSellFrac.dispatchEvent(new Event('input', { bubbles: true }));
     document.querySelectorAll('.dr-preset-btn').forEach(function(b){
       b.classList.toggle('active', b.dataset.preset === name);
     });
