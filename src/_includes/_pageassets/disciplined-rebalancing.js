@@ -776,16 +776,50 @@
   //   - chart.update() (default mode) → still stale
   //   - chart.update('reset') → fixes positions but flickers (bases
   //     y-values out then animates back in)
-  //   - chart.resize() → fixes positions, no flicker
-  // resize() forces a full layout pass that invalidates the cache, then
-  // every controller's updateElements runs against the fresh scale.
+  //   - chart.resize() → no-op when canvas dimensions are unchanged,
+  //     which is exactly the case here (the canvas size doesn't change
+  //     when horizon does, only the data domain shrinks)
+  //   - chart.update('resize') → fixes positions, no flicker, no
+  //     dependency on canvas dimensions changing. This is the call
+  //     Chart.js makes internally during a real resize-after-layout-
+  //     change pass; invoking it directly forces the layout cache to
+  //     invalidate without the visual reset that 'reset' mode causes.
+  //
+  // Guard: if the canvas isn't laid out yet (parent #tab-calculator
+  // is display:none — the common case at page load when sticky values
+  // fires the horizon input event before the user has navigated to
+  // the calculator tab), skip the update and queue a deferred fix.
+  // The ResizeObserver below catches the canvas going from 0×0 to
+  // real dimensions and runs the update then.
+  var pendingLayoutFix = false;
   function updateXDomain(){
     bands = bandData();
     chart.data.datasets[DS.floor].data = bands.floor;
     chart.data.datasets[DS.trend].data = bands.trend;
     chart.data.datasets[DS.upper].data = bands.upper;
     updateThresholds(); // re-extends sell/rebuy lines + re-runs backtest
-    chart.resize();
+    if(canvas.clientWidth > 0){
+      chart.update('resize');
+    } else {
+      pendingLayoutFix = true;
+    }
+  }
+
+  // ResizeObserver catches the canvas going from 0×0 (hidden tab) to
+  // real dimensions (user clicked into the calculator tab). When that
+  // transition happens AND we deferred a layout fix during the page-
+  // load updateXDomain, run update('resize') so element positions
+  // catch up to the current scale. Well-supported in evergreen
+  // browsers; degrades to a slightly-stale chart on first calculator-
+  // tab view if ResizeObserver is unavailable.
+  if(typeof ResizeObserver !== 'undefined'){
+    var ro = new ResizeObserver(function(){
+      if(pendingLayoutFix && canvas.clientWidth > 0){
+        pendingLayoutFix = false;
+        chart.update('resize');
+      }
+    });
+    ro.observe(canvas);
   }
 
   // Initial backtest at script-load (before any user interaction).
