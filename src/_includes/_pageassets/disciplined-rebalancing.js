@@ -410,37 +410,58 @@
   // version-dependent helper.
   if(Chart.Interaction && Chart.Interaction.modes && !Chart.Interaction.modes.xPerDataset){
     Chart.Interaction.modes.xPerDataset = function(chart, e, options, useFinalPosition){
-      var pixelX = (e && typeof e.x === 'number') ? e.x : null;
-      if(pixelX == null || !chart.scales || !chart.scales.x) return [];
-      var cursorDataX = chart.scales.x.getValueForPixel(pixelX);
-      if(cursorDataX == null || isNaN(cursorDataX)) return [];
+      var cursorPixelX = (e && typeof e.x === 'number') ? e.x : null;
+      if(cursorPixelX == null) return [];
 
-      var tolerance = 90; // days
+      // Pixel-space comparison. Earlier versions did this in data-space
+      // (compute cursorDataX via scale.getValueForPixel, compare to each
+      // raw point's data x) — but Chart.js's tooltip draws active-point
+      // indicator circles at element.x (pixel-space). If element.x has
+      // drifted out of sync with the underlying raw data (stale layout
+      // after an update path didn't refresh elements), data-space match
+      // could find the right index but the element renders at the wrong
+      // pixel — circles appear far from the cursor while tooltip values
+      // look correct. Comparing cursor pixel directly to element pixel
+      // ensures the items we return have circles at the actual cursor
+      // position; if any element is stale-positioned far from cursor,
+      // it falls outside tolerance and gets dropped (better than a
+      // misplaced indicator).
+      //
+      // 15-pixel tolerance: at the chart's typical ~50 px/year on
+      // desktop, that's about 110 days — generous enough that bands
+      // (sampled every 30 days, ~4 px apart) always intersect, and
+      // sparse markers only show when the cursor is genuinely near
+      // them. Past mid-2025 (end of historical data), the historical
+      // price line's last point is hundreds of pixels from the cursor
+      // and gets correctly dropped.
+      var pixelTolerance = 15;
       var items = [];
       chart.getSortedVisibleDatasetMetas().forEach(function(meta){
         var elements = meta.data;
-        var rawData = chart.data && chart.data.datasets && chart.data.datasets[meta.index]
-          ? chart.data.datasets[meta.index].data : null;
-        if(!elements || elements.length === 0 || !rawData) return;
+        if(!elements || elements.length === 0) return;
         var bestIdx = -1;
         var bestDist = Infinity;
         for(var i = 0; i < elements.length; i++){
           var el = elements[i];
           if(!el || el.skip) continue;
-          // Read the raw scatter point ({x, y}) — Point elements don't
-          // expose parsed data directly in Chart.js v4. The dataset's
-          // raw data is the source of truth and matches the element
-          // array index 1:1 by construction.
-          var raw = rawData[i];
-          var ptX = (raw && typeof raw === 'object') ? raw.x : null;
-          if(ptX == null || isNaN(ptX)) continue;
-          var dist = Math.abs(ptX - cursorDataX);
+          // Element pixel x — Chart.js v4 sets this on Point elements
+          // during layout. Use getProps for animation-aware reads when
+          // the chart is mid-animation; falls back to direct read.
+          var elX;
+          if(useFinalPosition && typeof el.getProps === 'function'){
+            var props = el.getProps(['x'], true);
+            elX = props && typeof props.x === 'number' ? props.x : el.x;
+          } else {
+            elX = el.x;
+          }
+          if(elX == null || isNaN(elX)) continue;
+          var dist = Math.abs(elX - cursorPixelX);
           if(dist < bestDist){
             bestDist = dist;
             bestIdx = i;
           }
         }
-        if(bestIdx === -1 || bestDist > tolerance) return;
+        if(bestIdx === -1 || bestDist > pixelTolerance) return;
         items.push({ element: elements[bestIdx], datasetIndex: meta.index, index: bestIdx });
       });
       return items;
