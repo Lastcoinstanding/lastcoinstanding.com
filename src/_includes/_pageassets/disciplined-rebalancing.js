@@ -226,49 +226,6 @@
   if(!canvas) return;
   if(typeof Chart === 'undefined') return;
 
-  // ─── CUSTOM INTERACTION MODE: 'uniqueX' ───
-  // Wraps Chart.js's built-in 'x' mode and dedupes the returned items
-  // by dataset, keeping only the point closest to the cursor's data-x
-  // per dataset.
-  //
-  // Why: with 'mode: x' alone, datasets sampled densely along the
-  // x-axis (e.g. our historical price dataset, ~12-day PL_DATA cadence)
-  // can return two adjacent points within Chart.js's x-proximity test,
-  // showing up as two tooltip rows for the same series at the same
-  // hover point ('Historical price: $420' AND 'Historical price: $375'
-  // for the same Nov-2014 hover, observed in user review). Bands at
-  // 30-day cadence don't trigger this because their spacing exceeds
-  // the proximity tolerance.
-  //
-  // Custom mode registers globally (Chart.Interaction.modes is a
-  // shared namespace), but registration is idempotent and the mode
-  // is only consumed by charts that opt in via 'mode: uniqueX'.
-  if(Chart.Interaction && Chart.Interaction.modes && !Chart.Interaction.modes.uniqueX){
-    Chart.Interaction.modes.uniqueX = function(chart, e, options, useFinalPosition){
-      var xItems = Chart.Interaction.modes.x(chart, e, options, useFinalPosition);
-      if(!xItems.length || !chart.scales || !chart.scales.x) return xItems;
-      // Convert event pixel x → data x for distance comparisons.
-      var pos = Chart.helpers && Chart.helpers.getRelativePosition
-        ? Chart.helpers.getRelativePosition(e, chart)
-        : { x: e.x, y: e.y };
-      var cursorX = chart.scales.x.getValueForPixel(pos.x);
-      var byDataset = new Map();
-      xItems.forEach(function(item){
-        var ds = chart.data.datasets[item.datasetIndex];
-        var pt = ds && ds.data ? ds.data[item.index] : null;
-        if(!pt || pt.x == null) return;
-        var distance = Math.abs(pt.x - cursorX);
-        var existing = byDataset.get(item.datasetIndex);
-        if(!existing || distance < existing.distance){
-          byDataset.set(item.datasetIndex, { item: item, distance: distance });
-        }
-      });
-      var result = [];
-      byDataset.forEach(function(v){ result.push(v.item); });
-      return result;
-    };
-  }
-
   // ─── X-DOMAIN ───
   // Min: PL_DATA[0][0] (first historical sample; ~mid-2010)
   // Max: today + horizon × 365.25 (extends to user's projection end)
@@ -424,6 +381,22 @@
     histSellMarkers: 9, histRebuyMarkers: 10
   };
 
+  // ─── CURSOR TRACKING ───
+  // Tracks the cursor's data-x (days from genesis) while the mouse is
+  // over the canvas. Used by the tooltip filter to keep only items
+  // whose data point actually sits near the cursor — necessary because
+  // 'mode: index' looks up the same INDEX across all datasets, but our
+  // datasets don't share an x-grid. Index N in the bands (sampled every
+  // 30 days from minD) maps to a different x than index N in the
+  // historical price dataset (PL_DATA's own ~480-point grid) or index
+  // N in the sparse marker datasets. So even though the bands at index
+  // N are at the cursor's x, the historical price at the same index
+  // can be at a totally different x — and we must filter it out.
+  // Updated by the canvas mousemove listener attached after chart
+  // creation; reset to null on mouseleave (filter then passes all,
+  // which is fine because there's no cursor active).
+  var cursorDataX = null;
+
   var chart = new Chart(canvas, {
     type: 'scatter',
     data: {
@@ -568,7 +541,7 @@
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: 'uniqueX', axis: 'x', intersect: false },
+      interaction: { mode: 'index', axis: 'x', intersect: false },
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -577,6 +550,33 @@
           borderWidth: 1,
           titleColor: amber,
           bodyColor: '#ddd',
+          // ─── TOOLTIP FILTER ───
+          // 'mode: index' returns one item per dataset at a single shared
+          // index. For datasets that share an x-grid (the four band-
+          // derived series — floor / trend / upper / sell threshold /
+          // rebuy threshold — all sample every 30 days from genesis to
+          // horizon end), index N maps to the same x. For datasets that
+          // DON'T share that grid (historical price has its own ~480-
+          // point grid; markers are sparse; forward path is the
+          // simulation's monthly grid), index N maps to a different x —
+          // and a tooltip row that says 'Historical price: $19K' next to
+          // a band reading at year 2040 is misleading.
+          //
+          // Filter rule: drop any item whose data point's x is more than
+          // 90 days from the cursor's actual data x (tracked by the
+          // canvas mousemove listener below). 90 days is generous enough
+          // to never drop a legitimate band reading (bands are at most
+          // 30 days from cursor by construction) but tight enough to
+          // drop wrong-index bleed-through.
+          //
+          // If cursorDataX is null (cursor not on canvas, or tracking
+          // hasn't initialized yet), pass all — the tooltip-up-to-this-
+          // point behavior was the right fallback when no cursor info
+          // is available.
+          filter: function(item){
+            if(cursorDataX == null) return true;
+            return Math.abs(item.parsed.x - cursorDataX) <= 90;
+          },
           callbacks: {
             title: function(items){
               if(!items.length) return '';
@@ -626,6 +626,27 @@
         }
       }
     }
+  });
+
+  // ─── CURSOR TRACKING (canvas listeners) ───
+  // Attached after the chart is created so chart.scales.x is available
+  // for the pixel-to-data conversion. mousemove updates cursorDataX
+  // continuously while the mouse is over the canvas; mouseleave resets
+  // it to null so the tooltip filter falls back to passing-all behavior
+  // when the cursor isn't on the chart.
+  //
+  // Doing this via a direct DOM listener (rather than via Chart.js's
+  // tooltip.caretX, which we tried in commit 57d9aff) avoids the
+  // stale-caret timing bug where caretX hadn't been updated for the
+  // current frame when the filter callback ran.
+  canvas.addEventListener('mousemove', function(ev){
+    if(!chart.scales || !chart.scales.x){ cursorDataX = null; return; }
+    var rect = canvas.getBoundingClientRect();
+    var pixelX = ev.clientX - rect.left;
+    cursorDataX = chart.scales.x.getValueForPixel(pixelX);
+  });
+  canvas.addEventListener('mouseleave', function(){
+    cursorDataX = null;
   });
 
   // ─── DYNAMIC UPDATES ───
