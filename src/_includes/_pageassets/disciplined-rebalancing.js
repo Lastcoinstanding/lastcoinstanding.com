@@ -464,6 +464,24 @@
           borderWidth: 1,
           titleColor: amber,
           bodyColor: '#ddd',
+          // Pixel-proximity filter. With 'mode: index', Chart.js looks up
+          // the same index across all datasets — fine when datasets share
+          // an x-grid (bands sample every 30 days from genesis to horizon
+          // end), but the historical price dataset has its own ~480-point
+          // grid mapped to PL_DATA days. Its index N maps to a different
+          // x than the bands' index N. Without this filter, hovering at
+          // year 2040 would show a stale 'Historical price: $19K (day
+          // 5020)' alongside the bands at day 11662 — index 200 of
+          // historical_data, not because anything was at year 2040 in
+          // history. Solution: only show items whose data-point pixel x
+          // is within 5 px of the tooltip caret x.
+          filter: function(item){
+            if(!item.chart || !item.chart.tooltip) return true;
+            var caretX = item.chart.tooltip.caretX;
+            var ptX = item.element ? item.element.x : null;
+            if(caretX == null || ptX == null) return true;
+            return Math.abs(ptX - caretX) < 5;
+          },
           callbacks: {
             title: function(items){
               if(!items.length) return '';
