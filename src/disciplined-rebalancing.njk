@@ -147,19 +147,19 @@ eleventyComputed:
 
             <!-- PRESET SHORTCUTS -->
             <div class="dr-presets">
-                <label>Quick start<button type="button" class="dr-tt" aria-label="What does this do?">?<span class="dr-tt-card">Three preset configurations of the discipline. Each preset sets <strong>sell percentile / rebuy percentile / sell fraction</strong> in one click; you can then adjust the sliders below. Conservative trades less frequently and at less extreme prices; Aggressive at extremes; Standard is the historical-frequency middle ground.</span></button></label>
+                <label>Quick start<button type="button" class="dr-tt" aria-label="What does this do?">?<span class="dr-tt-card">Three preset configurations of the discipline. Each preset sets <strong>sell percentile / rebuy percentile</strong> in one click; you can then adjust the sliders below. Conservative trades more often at less extreme prices; Aggressive at extremes; Standard is the historical-frequency middle ground. Every cycle sells the entire position and rebuys it back &mdash; results scale linearly to whatever portion of your stack you'd actually run the discipline on.</span></button></label>
                 <div class="dr-preset-btns">
                     <button class="dr-preset-btn" data-preset="conservative">
                         <span class="dr-preset-name">Conservative</span>
-                        <span class="dr-preset-meta">70 / 40 / 35%</span>
+                        <span class="dr-preset-meta">70 / 40</span>
                     </button>
                     <button class="dr-preset-btn active" data-preset="standard">
                         <span class="dr-preset-name">Standard</span>
-                        <span class="dr-preset-meta">80 / 50 / 50%</span>
+                        <span class="dr-preset-meta">80 / 50</span>
                     </button>
                     <button class="dr-preset-btn" data-preset="aggressive">
                         <span class="dr-preset-name">Aggressive</span>
-                        <span class="dr-preset-meta">90 / 20 / 65%</span>
+                        <span class="dr-preset-meta">90 / 20</span>
                     </button>
                 </div>
             </div>
@@ -173,10 +173,6 @@ eleventyComputed:
                 <div class="dr-field">
                     <label>Rebuy percentile <span id="drRebuyPctReadout" class="dr-field-readout">50th &middot; ~0.87&times; trend &middot; historical median</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">The price-to-trend ratio at-or-below which you rebuy after a sell. The 50th percentile is the historical median (~0.87&times; trend). <strong>Lower percentile = waits for deeper drawdowns: more BTC captured per rebuy when it fires, but historically fired less often.</strong></span></button></label>
                     <input type="range" id="drRebuyPct" min="5" max="55" value="50" step="5">
-                </div>
-                <div class="dr-field">
-                    <label>Sell fraction <span id="drSellFracReadout" class="dr-field-readout">50% of stack at each sell event</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">What portion of your stack to sell at each sell trigger. 50% sells half; 100% sells all. <strong>Lower fractions retain upside if bitcoin keeps climbing past your trigger; higher fractions maximize the rebuy opportunity but risk leaving you under-allocated if the rebuy never fires.</strong></span></button></label>
-                    <input type="range" id="drSellFrac" min="5" max="100" value="50" step="5">
                 </div>
             </div>
 
@@ -213,7 +209,7 @@ eleventyComputed:
                 <div class="dr-failure-mode">
                     <div class="dr-failure-mode-title">2. The rebuy fires above your prior sell price &mdash; you end up with less bitcoin than HODL.</div>
                     <p>Both triggers can execute correctly &mdash; sell at the high percentile, rebuy at the low percentile &mdash; and you can still finish a cycle holding less bitcoin than if you'd just held through. This isn't a hypothetical. It has happened multiple times in bitcoin's actual history &mdash; the table above makes this visible whenever <em>cumulative BTC</em> falls below 1.00 across a sell&rarr;rebuy pair.</p>
-                    <p><strong>The most striking example:</strong> at Standard 80/50 settings, the strategy sold in March 2013 at <strong>$70</strong> (1.78&times; trend). The next rebuy didn't fire until January 2015, by which time bitcoin was trading at <strong>$234</strong> (0.73&times; trend). Both triggers fired correctly &mdash; high sell, low rebuy &mdash; but the rebuy executed at <strong>3.3&times; the prior sell price</strong>. Selling 50% at $70 and rebuying with that cash at $234 leaves you with <strong>0.65 BTC vs. 1.0 BTC</strong> for HODL through that span.</p>
+                    <p><strong>The most striking example:</strong> at Standard 80/50 settings, the strategy sold in March 2013 at <strong>$70</strong> (1.78&times; trend). The next rebuy didn't fire until January 2015, by which time bitcoin was trading at <strong>$234</strong> (0.73&times; trend). Both triggers fired correctly &mdash; high sell, low rebuy &mdash; but the rebuy executed at <strong>3.3&times; the prior sell price</strong>. Selling the full position at $70 and rebuying it all back at $234 leaves you with <strong>0.30 BTC vs. 1.0 BTC</strong> for HODL through that span &mdash; the discipline kept 30% of the stack while HODL kept 100%, even though both triggers fired exactly as designed.</p>
                     <p>The mechanism: triggers are defined relative to the trend, but rebalancing happens in absolute dollars. When the underlying trend grows fast between cycles &mdash; which it did during bitcoin's early years &mdash; the percentile-relative low can sit higher in absolute dollars than the percentile-relative high of the previous cycle. The strategy still &lsquo;worked&rsquo; in trend-relative terms; it just underperformed HODL in absolute BTC count.</p>
                     <p>Recent cycles have been less punishing because trend growth has slowed (each successive doubling takes longer in calendar time, by construction of the Power Law) and because cycle amplitudes have compressed. But the failure mode is structural, not historical-only.</p>
                 </div>
@@ -269,7 +265,7 @@ eleventyComputed:
                 <li><strong>Holding-cash-and-stack</strong> (post-sell). Watching for the rebuy trigger.</li>
             </ul>
 
-            <p>A <strong>sell trigger</strong> fires when, in the holding-stack state, the price/trend ratio crosses <em>upward</em> through your sell-percentile threshold &mdash; the ratio at day D-1 was below the threshold, and at day D it is at or above. On firing, the calculator sells your sell-fraction of current BTC holdings and transitions to holding-cash-and-stack.</p>
+            <p>A <strong>sell trigger</strong> fires when, in the holding-stack state, the price/trend ratio crosses <em>upward</em> through your sell-percentile threshold &mdash; the ratio at day D-1 was below the threshold, and at day D it is at or above. On firing, the calculator sells the entire BTC position at that day's price and transitions to holding-cash-and-stack.</p>
 
             <p>A <strong>rebuy trigger</strong> fires symmetrically: the ratio crosses <em>downward</em> through your rebuy-percentile threshold while in holding-cash-and-stack. On firing, all cash is deployed at that day's price.</p>
 
@@ -285,23 +281,25 @@ eleventyComputed:
         <!-- §3: CYCLE ACCUMULATION (WORKED EXAMPLE) -->
         <div class="dr-math-section">
             <h3>3. Cycle accumulation &mdash; worked example</h3>
-            <p>Each completed sell&rarr;rebuy cycle increases your BTC holdings if the rebuy price is below the sell price. In ratio terms, the rebuy ratio is always below the sell ratio (otherwise the triggers would never fire), so cycles always grow the BTC count <em>in the conditional case where both triggers fire</em>.</p>
+            <p>Each completed sell&rarr;rebuy cycle changes your BTC count by exactly the ratio of the two prices. With the entire position sold at each trigger and rebought at the next, cumulative BTC compounds multiplicatively:</p>
 
             <div class="dr-math-formula">
                 <p>Per-cycle BTC multiplier:</p>
-                <code>new_stack = old_stack &times; [ (1 &minus; f) + f &times; (P_sell / P_rebuy) ]</code>
-                <p class="dr-math-formula-caption">where <em>f</em> is your sell-fraction, <em>P_sell</em> is the price at which sell fired, and <em>P_rebuy</em> is the price at which rebuy fired.</p>
+                <code>new_stack = old_stack &times; (P_sell / P_rebuy)</code>
+                <p class="dr-math-formula-caption">where <em>P_sell</em> is the price at which sell fired and <em>P_rebuy</em> is the price at which the next rebuy fired.</p>
             </div>
 
-            <p>For the default settings (Standard preset: 80th sell, 50th rebuy, 50% sell-fraction):</p>
+            <p>The discipline grows BTC if and only if <em>P_sell</em> &gt; <em>P_rebuy</em>. In ratio-relative terms, this is always true (sell ratio &gt; rebuy ratio by construction). In absolute-dollar terms, it is only sometimes true &mdash; this is the structural failure mode documented in <em>How this strategy can fail</em> on the Calculator tab. When trend grows fast between cycles, a low-percentile rebuy can land above a high-percentile sell from the previous cycle.</p>
+
+            <p>For the default settings (Standard preset: 80th sell, 50th rebuy):</p>
 
             <ul class="dr-math-list">
                 <li>Sell fires near 1.78&times; trend</li>
                 <li>Rebuy fires near 0.87&times; trend</li>
-                <li>Per-cycle multiplier (simplified, assuming trend doesn't change during the cycle): <code>0.5 + 0.5 &times; (1.78 / 0.87) = 1.52</code></li>
+                <li>Per-cycle multiplier (simplified, assuming trend doesn't change during the cycle): <code>1.78 / 0.87 = 2.05&times;</code></li>
             </ul>
 
-            <p>If a 1.0 BTC starting position runs through 4 complete cycles in the historical record, BTC count compounds: <code>1.0 &rarr; 1.52 &rarr; 2.31 &rarr; 3.51 &rarr; 5.34</code> at the simplified per-cycle gain shown above. The actual historical record produces smaller per-cycle multipliers &mdash; for the reason described next.</p>
+            <p>If a 1.0 BTC starting position runs through 4 complete cycles where the trend doesn't grow at all, BTC count compounds: <code>1.0 &rarr; 2.05 &rarr; 4.20 &rarr; 8.61 &rarr; 17.6</code>. The actual historical record produces dramatically smaller multipliers &mdash; sometimes negative ones &mdash; for the reason described next.</p>
 
             <p class="dr-math-note">In practice, the Power Law trend itself grows during the time between sell and rebuy (typically 3&ndash;4 years). That growth reduces the per-cycle BTC gain, because rebuying at the same percentile means rebuying at a higher absolute price than the sell-time trend would have implied. The day-by-day backtest handles this exactly &mdash; the table on the Calculator tab shows what happens at each historical trigger, including the cycles where the discipline ended with <em>fewer</em> BTC than HODL because the rebuy fired above the prior sell price (visible whenever cumulative BTC falls below 1.00). Realistic per-cycle multipliers in the historical record are typically <strong>0.95&ndash;1.30&times;</strong>, depending on threshold settings and which cycle you look at.</p>
         </div>

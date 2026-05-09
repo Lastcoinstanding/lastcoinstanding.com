@@ -296,7 +296,6 @@
   //
   // params:
   //   sellRatio, rebuyRatio  — price/trend ratios that fire triggers
-  //   sellFraction           — 0..1, fraction of held BTC sold per sell trigger
   //   accountType            — 'retirement' (no tax) or 'regular' (capital-gains drag)
   //   taxRate                — 0..1, applied to gain at each sell in 'regular' mode
   //
@@ -307,12 +306,21 @@
   //   btcHeld, cashHeld, costBasis: end-of-record state
   //   currentDay, currentPrice, currentRatio: latest PL_DATA sample
   //   sellsCount, rebuysCount, cyclesCompleted
-  function runHistoricalBacktest(sellRatio, rebuyRatio, sellFraction, accountType, taxRate){
+  function runHistoricalBacktest(sellRatio, rebuyRatio, accountType, taxRate){
     // Defaults — preserve old call-site behavior for any caller that
     // still passes only (sellRatio, rebuyRatio).
-    if(typeof sellFraction !== 'number') sellFraction = 0.5;
     if(typeof accountType !== 'string') accountType = 'retirement';
     if(typeof taxRate !== 'number') taxRate = 0;
+
+    // Sell fraction is now fixed at 100% — at each sell trigger the entire
+    // BTC position is converted to cash; at each rebuy trigger all cash is
+    // converted back to BTC. This makes the cycle dynamics directly
+    // visible (cumulative BTC after one cycle = sellPrice / rebuyPrice)
+    // and matches the framing decision documented in session 2026-05-09:
+    // the page is a unit-level demonstration users mentally scale to
+    // their own portion-allocation, not a "what would my whole stack do"
+    // simulation.
+    var sellFraction = 1.0;
 
     var trades = [];
     var state = 'holding-stack';
@@ -834,17 +842,15 @@
     chart.update('none');
   }
 
-  // Read sell-fraction / account-type / tax-rate from the DOM.
-  // These live in the calculator IIFE's controls; the channel viz
-  // doesn't own them, so we read them directly each backtest run.
+  // Read account-type / tax-rate from the DOM. These live in the
+  // calculator IIFE's controls; the channel viz doesn't own them, so
+  // we read them directly each backtest run.
   function readBacktestParams(){
-    var sfEl = document.getElementById('drSellFrac');
-    var sellFraction = sfEl ? parseFloat(sfEl.value) / 100 : 0.5;
     var acctBtn = document.querySelector('[data-account].active');
     var accountType = acctBtn ? acctBtn.dataset.account : 'retirement';
     var trEl = document.getElementById('drTaxRate');
     var taxRate = trEl ? parseFloat(trEl.value) / 100 : 0;
-    return { sellFraction: sellFraction, accountType: accountType, taxRate: taxRate };
+    return { accountType: accountType, taxRate: taxRate };
   }
 
   // Run the historical backtest at the user's current settings and
@@ -852,7 +858,7 @@
   // "Historical signals at your current settings" summary block.
   function updateBacktest(sellRatio, rebuyRatio){
     var params = readBacktestParams();
-    var bt = runHistoricalBacktest(sellRatio, rebuyRatio, params.sellFraction, params.accountType, params.taxRate);
+    var bt = runHistoricalBacktest(sellRatio, rebuyRatio, params.accountType, params.taxRate);
     var hSells = [], hRebuys = [];
     bt.trades.forEach(function(t){
       var pt = { x: t.day, y: t.price };
@@ -943,12 +949,28 @@
 
     // ── TODAY ROW ──
     var todayStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+
+    // Threshold prices in absolute USD at today's trend value. Drives the
+    // state label so users see "HODLing until $X" rather than just "waiting
+    // to sell" — concrete trigger price reinforces that the strategy isn't
+    // firing imminently when X is far above current price.
+    var trendNow = bt.currentDay !== null ? plPrice(bt.currentDay) : null;
+    var sellThresholdPrice = trendNow ? sellRatio * trendNow : null;
+    var rebuyThresholdPrice = trendNow ? rebuyRatio * trendNow : null;
+    function fmtThresholdPrice(p){
+      if(p === null) return '—';
+      if(p >= 1e6) return '$' + (p/1e6).toFixed(2) + 'M';
+      if(p >= 1000) return '$' + Math.round(p/1000) + 'K';
+      if(p >= 1) return '$' + p.toFixed(0);
+      return '$' + p.toFixed(2);
+    }
+
     var stateLabel, stateClass;
     if(bt.finalState === 'holding-stack'){
-      stateLabel = 'waiting to sell';
+      stateLabel = 'HODLing until ' + fmtThresholdPrice(sellThresholdPrice);
       stateClass = 'dr-state-wait-sell';
     } else {
-      stateLabel = 'waiting to rebuy';
+      stateLabel = 'Holding cash until ' + fmtThresholdPrice(rebuyThresholdPrice);
       stateClass = 'dr-state-wait-rebuy';
     }
 
@@ -1077,13 +1099,11 @@
   var horizonEl = document.getElementById('drHorizon');
   if(horizonEl) horizonEl.addEventListener('input', updateXDomain);
 
-  // Sell-fraction, tax-rate, and account-type each materially change
-  // backtest output (Δ BTC magnitude, tax drag, cumulative BTC) without
-  // touching threshold lines or marker positions on the chart. Re-run
-  // the backtest so the table + summary refresh; chart datasets for
-  // bands and historical markers don't change so chart.update is cheap.
-  var sellFracEl = document.getElementById('drSellFrac');
-  if(sellFracEl) sellFracEl.addEventListener('input', updateThresholds);
+  // Tax-rate and account-type each materially change backtest output
+  // (tax drag, cumulative BTC) without touching threshold lines or
+  // marker positions on the chart. Re-run the backtest so the table
+  // + summary refresh; chart datasets for bands and historical markers
+  // don't change so chart.update is cheap.
   var taxRateEl = document.getElementById('drTaxRate');
   if(taxRateEl) taxRateEl.addEventListener('input', updateThresholds);
   document.querySelectorAll('[data-account]').forEach(function(b){
@@ -1132,8 +1152,6 @@
   var elSellPctReadout = document.getElementById('drSellPctReadout');
   var elRebuyPct = document.getElementById('drRebuyPct');
   var elRebuyPctReadout = document.getElementById('drRebuyPctReadout');
-  var elSellFrac = document.getElementById('drSellFrac');
-  var elSellFracReadout = document.getElementById('drSellFracReadout');
   var elTaxRate = document.getElementById('drTaxRate');
   var elTaxRateValue = document.getElementById('drTaxRateValue');
   var elTaxRow = document.getElementById('drTaxRow');
@@ -1144,7 +1162,6 @@
   var STICKY = {
     drSellPct: 'sellPct',
     drRebuyPct: 'rebuyPct',
-    drSellFrac: 'sellFrac',
     drTaxRate: 'taxRate'
   };
   var STICKY_TOGGLE = {
@@ -1170,7 +1187,7 @@
     // bare value assignment). Without this, returning visitors with
     // non-default sliders in localStorage would see channel-viz state
     // matching the defaults rather than their stored settings.
-    ['drSellPct', 'drRebuyPct', 'drSellFrac', 'drTaxRate'].forEach(function(id){
+    ['drSellPct', 'drRebuyPct', 'drTaxRate'].forEach(function(id){
       var el = document.getElementById(id);
       if(el) el.dispatchEvent(new Event('input', { bubbles: true }));
     });
@@ -1186,31 +1203,26 @@
 
   // ─── PRESETS ───
   var PRESETS = {
-    conservative: { sellPct: 70, rebuyPct: 40, sellFrac: 35 },
-    standard:     { sellPct: 80, rebuyPct: 50, sellFrac: 50 },
-    aggressive:   { sellPct: 90, rebuyPct: 20, sellFrac: 65 }
+    conservative: { sellPct: 70, rebuyPct: 40 },
+    standard:     { sellPct: 80, rebuyPct: 50 },
+    aggressive:   { sellPct: 90, rebuyPct: 20 }
   };
   function applyPreset(name){
     var p = PRESETS[name]; if(!p) return;
     elSellPct.value = p.sellPct;
     elRebuyPct.value = p.rebuyPct;
-    elSellFrac.value = p.sellFrac;
     // Dispatch 'input' on each slider whose value changed programmatically.
     // The channel viz IIFE listens directly for slider 'input' events to
     // refresh threshold lines + the historical backtest, and those listeners
-    // don't fire from a bare value assignment. Without these dispatches,
-    // clicking a preset would leave the channel viz showing the previous
-    // settings' threshold lines and historical-signal markers.
+    // don't fire from a bare value assignment.
     elSellPct.dispatchEvent(new Event('input', { bubbles: true }));
     elRebuyPct.dispatchEvent(new Event('input', { bubbles: true }));
-    elSellFrac.dispatchEvent(new Event('input', { bubbles: true }));
     document.querySelectorAll('.dr-preset-btn').forEach(function(b){
       b.classList.toggle('active', b.dataset.preset === name);
     });
     saveSetting('preset', name);
     saveSetting('sellPct', p.sellPct);
     saveSetting('rebuyPct', p.rebuyPct);
-    saveSetting('sellFrac', p.sellFrac);
     updateReadouts();
   }
 
@@ -1238,12 +1250,10 @@
   function updateReadouts(){
     var sP = parseInt(elSellPct.value);
     var rP = parseInt(elRebuyPct.value);
-    var sF = parseInt(elSellFrac.value);
     var sR = percentileToRatio(sP);
     var rR = percentileToRatio(rP);
     elSellPctReadout.innerHTML = sP + 'th &middot; ~' + sR.toFixed(2) + '× trend &middot; ' + (100-sP) + '% of history';
     elRebuyPctReadout.innerHTML = rP + 'th &middot; ~' + rR.toFixed(2) + '× trend &middot; ' + (rP === 50 ? 'historical median' : (rP < 50 ? rP + '% below trend' : 'above trend'));
-    elSellFracReadout.textContent = sF + '% of stack at each sell event';
     if(elTaxRateValue) elTaxRateValue.textContent = elTaxRate.value + '%';
   }
   // updateStatBlock removed — drStatBlock element is gone.
@@ -1263,7 +1273,7 @@
       var matched = null;
       Object.keys(PRESETS).forEach(function(name){
         var p = PRESETS[name];
-        if(p.sellPct == elSellPct.value && p.rebuyPct == elRebuyPct.value && p.sellFrac == elSellFrac.value){
+        if(p.sellPct == elSellPct.value && p.rebuyPct == elRebuyPct.value){
           matched = name;
         }
       });
