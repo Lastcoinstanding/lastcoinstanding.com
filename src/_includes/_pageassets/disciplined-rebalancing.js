@@ -381,21 +381,64 @@
     histSellMarkers: 9, histRebuyMarkers: 10
   };
 
-  // ─── CURSOR TRACKING ───
-  // Tracks the cursor's data-x (days from genesis) while the mouse is
-  // over the canvas. Used by the tooltip filter to keep only items
-  // whose data point actually sits near the cursor — necessary because
-  // 'mode: index' looks up the same INDEX across all datasets, but our
-  // datasets don't share an x-grid. Index N in the bands (sampled every
-  // 30 days from minD) maps to a different x than index N in the
-  // historical price dataset (PL_DATA's own ~480-point grid) or index
-  // N in the sparse marker datasets. So even though the bands at index
-  // N are at the cursor's x, the historical price at the same index
-  // can be at a totally different x — and we must filter it out.
-  // Updated by the canvas mousemove listener attached after chart
-  // creation; reset to null on mouseleave (filter then passes all,
-  // which is fine because there's no cursor active).
-  var cursorDataX = null;
+  // ─── CUSTOM INTERACTION MODE: 'xPerDataset' ───
+  // Chart.js's built-in 'mode: index' fails on this chart because
+  // datasets don't share an x-grid: bands sample every 30 days from
+  // minD across the full horizon (1300+ points by 2046), historical
+  // price uses PL_DATA's ~480-point cadence (denser at ~12-day
+  // spacing in the historical range), markers are sparse. With axis:
+  // 'x' Chart.js picks the dataset whose nearest-in-x point is
+  // closest to cursor, which in the historical range is usually
+  // historical price (denser locally). It then applies THAT index
+  // to all datasets — bands[N] where N comes from historical_price's
+  // index ends up at a completely different year than the cursor.
+  // Result observed in user screenshots: active-point circles
+  // appear at year ~2014 when cursor is at year ~2019.
+  //
+  // 'mode: x' has its own problem (point hitRadius defaults to 1px,
+  // bands at 30-day cadence are ~1.5px apart on wide charts, cursor
+  // frequently lands between two band points and Chart.js returns
+  // nothing).
+  //
+  // Custom mode: iterate each dataset independently, find the data
+  // point with the closest x to cursor, return ONE item per dataset
+  // (within a 90-day tolerance so bands don't show when cursor is
+  // outside the chart's data range, and the historical price stops
+  // showing past ~mid-2025). Self-contained — uses e.x (which Chart
+  // .js pre-resolves to canvas-relative pixels) plus chart.scales.x.
+  // No dependency on Chart.helpers.getRelativePosition or any other
+  // version-dependent helper.
+  if(Chart.Interaction && Chart.Interaction.modes && !Chart.Interaction.modes.xPerDataset){
+    Chart.Interaction.modes.xPerDataset = function(chart, e, options, useFinalPosition){
+      var pixelX = (e && typeof e.x === 'number') ? e.x : null;
+      if(pixelX == null || !chart.scales || !chart.scales.x) return [];
+      var cursorDataX = chart.scales.x.getValueForPixel(pixelX);
+      if(cursorDataX == null || isNaN(cursorDataX)) return [];
+
+      var tolerance = 90; // days
+      var items = [];
+      chart.getSortedVisibleDatasetMetas().forEach(function(meta){
+        var data = meta.data;
+        if(!data || data.length === 0) return;
+        var bestIdx = -1;
+        var bestDist = Infinity;
+        for(var i = 0; i < data.length; i++){
+          var pt = data[i];
+          if(!pt || pt.skip) continue;
+          var ptX = pt.parsed ? pt.parsed.x : null;
+          if(ptX == null) continue;
+          var dist = Math.abs(ptX - cursorDataX);
+          if(dist < bestDist){
+            bestDist = dist;
+            bestIdx = i;
+          }
+        }
+        if(bestIdx === -1 || bestDist > tolerance) return;
+        items.push({ element: data[bestIdx], datasetIndex: meta.index, index: bestIdx });
+      });
+      return items;
+    };
+  }
 
   var chart = new Chart(canvas, {
     type: 'scatter',
@@ -541,7 +584,7 @@
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: 'index', axis: 'x', intersect: false },
+      interaction: { mode: 'xPerDataset', intersect: false },
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -550,33 +593,6 @@
           borderWidth: 1,
           titleColor: amber,
           bodyColor: '#ddd',
-          // ─── TOOLTIP FILTER ───
-          // 'mode: index' returns one item per dataset at a single shared
-          // index. For datasets that share an x-grid (the four band-
-          // derived series — floor / trend / upper / sell threshold /
-          // rebuy threshold — all sample every 30 days from genesis to
-          // horizon end), index N maps to the same x. For datasets that
-          // DON'T share that grid (historical price has its own ~480-
-          // point grid; markers are sparse; forward path is the
-          // simulation's monthly grid), index N maps to a different x —
-          // and a tooltip row that says 'Historical price: $19K' next to
-          // a band reading at year 2040 is misleading.
-          //
-          // Filter rule: drop any item whose data point's x is more than
-          // 90 days from the cursor's actual data x (tracked by the
-          // canvas mousemove listener below). 90 days is generous enough
-          // to never drop a legitimate band reading (bands are at most
-          // 30 days from cursor by construction) but tight enough to
-          // drop wrong-index bleed-through.
-          //
-          // If cursorDataX is null (cursor not on canvas, or tracking
-          // hasn't initialized yet), pass all — the tooltip-up-to-this-
-          // point behavior was the right fallback when no cursor info
-          // is available.
-          filter: function(item){
-            if(cursorDataX == null) return true;
-            return Math.abs(item.parsed.x - cursorDataX) <= 90;
-          },
           callbacks: {
             title: function(items){
               if(!items.length) return '';
@@ -626,27 +642,6 @@
         }
       }
     }
-  });
-
-  // ─── CURSOR TRACKING (canvas listeners) ───
-  // Attached after the chart is created so chart.scales.x is available
-  // for the pixel-to-data conversion. mousemove updates cursorDataX
-  // continuously while the mouse is over the canvas; mouseleave resets
-  // it to null so the tooltip filter falls back to passing-all behavior
-  // when the cursor isn't on the chart.
-  //
-  // Doing this via a direct DOM listener (rather than via Chart.js's
-  // tooltip.caretX, which we tried in commit 57d9aff) avoids the
-  // stale-caret timing bug where caretX hadn't been updated for the
-  // current frame when the filter callback ran.
-  canvas.addEventListener('mousemove', function(ev){
-    if(!chart.scales || !chart.scales.x){ cursorDataX = null; return; }
-    var rect = canvas.getBoundingClientRect();
-    var pixelX = ev.clientX - rect.left;
-    cursorDataX = chart.scales.x.getValueForPixel(pixelX);
-  });
-  canvas.addEventListener('mouseleave', function(){
-    cursorDataX = null;
   });
 
   // ─── DYNAMIC UPDATES ───
