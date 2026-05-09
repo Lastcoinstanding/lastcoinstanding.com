@@ -754,11 +754,29 @@
   }
 
   // Rebuild bands + thresholds when horizon changes (extends x-domain).
+  // The non-band datasets (historical price, forward path, markers) get
+  // their data arrays reassigned to fresh refs (.slice()) — same content,
+  // new identity. Chart.js v4 skips re-laying-out elements when a
+  // dataset's data array reference hasn't changed, so without this the
+  // band scale extends but the OTHER datasets' element pixel positions
+  // remain on the OLD scale and they render in the wrong place. The
+  // most visible symptom is the historical price line ending hundreds
+  // of pixels to the left of the Today line — its last data point is
+  // at Apr 2026 (~30 days before today) and should sit right next to
+  // the Today line, but renders at year ~2021 because that's where
+  // pixel position for day 6304 used to be when the chart was wider.
   function updateXDomain(){
     bands = bandData();
     chart.data.datasets[DS.floor].data = bands.floor;
     chart.data.datasets[DS.trend].data = bands.trend;
     chart.data.datasets[DS.upper].data = bands.upper;
+    var d = chart.data.datasets;
+    if(d[DS.history] && d[DS.history].data) d[DS.history].data = d[DS.history].data.slice();
+    if(d[DS.forwardPath] && d[DS.forwardPath].data) d[DS.forwardPath].data = d[DS.forwardPath].data.slice();
+    if(d[DS.sellMarkers] && d[DS.sellMarkers].data) d[DS.sellMarkers].data = d[DS.sellMarkers].data.slice();
+    if(d[DS.rebuyMarkers] && d[DS.rebuyMarkers].data) d[DS.rebuyMarkers].data = d[DS.rebuyMarkers].data.slice();
+    if(d[DS.histSellMarkers] && d[DS.histSellMarkers].data) d[DS.histSellMarkers].data = d[DS.histSellMarkers].data.slice();
+    if(d[DS.histRebuyMarkers] && d[DS.histRebuyMarkers].data) d[DS.histRebuyMarkers].data = d[DS.histRebuyMarkers].data.slice();
     updateThresholds(); // re-extends sell/rebuy lines + re-runs backtest
   }
 
