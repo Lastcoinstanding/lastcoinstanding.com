@@ -267,7 +267,7 @@ _See section 14 for latest Chart.js patterns. See section 11 for Power Law page 
 
 ## 11. Bitcoin and The Power Law (`/the-power-law.html`)
 
-**Added:** April 18, 2026. A four-tab page presenting the Bitcoin Power Law as an accessible but intellectually rigorous explainer, with an interactive forward-looking calculator.
+**Added:** April 18, 2026. **Refreshed:** May 7, 2026 (Phase 4 restructure). A four-tab page presenting the Bitcoin Power Law as an accessible but intellectually rigorous explainer. *Foundational page about the Power Law model itself — not a calculator page.* The model home; visualizations and explainers anchor the conceptual framework that other pages then *apply*. After Phase 4, Tab 4 — "The Channel" — is an interactive visualization of the bands across bitcoin's lifetime, not a forward-looking calculator (the projection calculator now lives on BvRE; see §14).
 
 ### Model parameters (Porkopolis coefficients)
 
@@ -334,14 +334,24 @@ Full credits section lists: Giovanni Santostasi (theory creator), Matthew Mežin
 - Zero monetary entropy: fixed supply, no dependence on perpetual expansion; cross-links to Half-Life and Melting Ice Cube pages
 - Further Reading links to all primary sources
 
-### Tab 4: Forward-Looking Calculator
+### Tab 4: The Channel
 
-- Scenario selection: Floor (default, conservative) / Trend / Upper toggle buttons
-- Six inputs: investment amount ($60K default), time horizon (5/10/15/20 years), current BTC price ($84K), home price ($420K), home appreciation (3.5%/yr), mortgage rate (6.8%)
-- Two result cards: Bitcoin side (projected value, CAGR, return %) vs House side (projected value, equity, monthly mortgage, interest paid, remaining loan, total cost of ownership)
-- Summary bar: "You could buy X.X houses outright in [year]"
-- Cross-reference to retrospective calculator on bitcoin-vs-real-estate.html
-- Disclaimer: not investment advice, model-based projection
+**NEW after Phase 4 (commit `36c13a0`).** Replaces the forward-looking calculator that previously lived here.
+
+- Interactive deep-dive on the Power Law channel: bands across bitcoin's lifetime with daily price overlaid. Chart.js scatter with four datasets (Floor, Trend, Upper, Historical price) plus a custom `todayLinePlugin` rendering a dashed vertical "Today" marker.
+- **Linear-time / Log-time axis toggle** swaps the x-axis scale between `linear` and `logarithmic`. Educational design move: same Power Law looks like curves on linear-time, straight lines on log-log; toggling between them is itself the lesson.
+- **Band visibility toggles** — three checkboxes (Floor, Trend, Upper) plus a Price History toggle. Uses `chart.setDatasetVisibility()`.
+- **Live status line** below chart: current BTC spot via CoinGecko, with `PL_DATA` graceful fallback.
+- **Prominent Porkopolis credit block** at top of Tab — amber-tinted callout naming Matthew Mežinskis at Porkopolis Economics for the channel framework + coefficients, with direct link to `porkopolis.io/thechart`. The canonical attribution surface for the framework. Pages that *apply* the channel forward (BvRE projection, Bitcoin Retirement, Disciplined Rebalancing) link back here rather than re-stating attribution. See `STYLE_GUIDE` Porkopolis credit-block component spec.
+- **Tab nav button** uses `data-tab="channel"`; the tab-routing JS reads `data-tab` and matches to `id="tab-{value}"` so no other JS changed.
+
+### What's no longer here (was Tab 4 before Phase 4)
+
+The previous Tab 4 was **"Calculator"** (`data-tab="calculator"`) — a forward-looking real-estate calculator. That calculator was migrated to BvRE's Calculator tab as the projection mode (commit `0b2d203`); Tab 4 was rewritten as The Channel (commit `36c13a0`). Inbound `/the-power-law.html#calculator` deep-links **redirect** client-side via `location.replace()` to `/bitcoin-vs-real-estate.html#calc-mode-projection` (top of TABS IIFE; runs before any tab logic). Cross-link role: BvRE hosts both retrospective and projection real-estate calculators; Power Law is the *model* they apply, not a competing decision frame.
+
+### Tool A vs The Channel
+
+Tab 1 has a small interactive widget — **"Project a Future Date"** (`#projSlider`) — that gives Floor / Trend / Ceiling price *numbers* at a user-selected year. Preserved unchanged through Phase 4. The Channel (Tab 4) gives the visual context; Tool A gives point estimates. Same model, different reads. Editorially complementary.
 
 ### Price data
 
@@ -419,17 +429,73 @@ All 12 slides deployed with 16:9 widescreen silent videos, minimalist copy patte
 | 11 | The Money Trees | Two systems. Different roots. One outcome | Two trees; left withers, right unchanged |
 | 12 | The Fixed Pie | Your share remains undiluted — for eternity | Unmarked gold coin; surrounding coins dissolve |
 
-## 14. Bitcoin vs. Real Estate — custom interest rate input
+## 14. Bitcoin vs. Real Estate (`/bitcoin-vs-real-estate.html`)
 
-**Added:** April 18, 2026. Third optional input field "Your interest rate" on Tab 3 (Postponed Purchase calculator).
+**Added:** April 18, 2026. **Refreshed:** May 7, 2026 (Phase 4 restructure). Decision-frame page for the bitcoin-vs-housing question. After Phase 4 hosts both retrospective and projection calculators on the same canvas, paired via a temporal toggle.
 
-- Grid changed from 2-col to 3-col (1fr 1fr 1fr) for the three optional inputs
+### Tab structure (4 tabs)
+
+| Tab | `data-tab` | Panel id | Notes |
+|---|---|---|---|
+| The Postponed Purchase | `calculator` | `panel-calculator` | The dual-mode calculator (default tab; see sub-section below) |
+| A Home Priced in Bitcoin | `btc-house` | `panel-btc-house` | Historical comparison: same house in dollars vs. in bitcoin over time |
+| The Ceiling | `ceiling` | `panel-ceiling` | Affordability ceiling chart |
+| The Affordability Crisis | `crisis` | `panel-crisis` | Home-price-to-income ratio across monetary eras (Nominal Revolution, Bretton Woods, etc.) |
+
+Tab nav order is *not* the same as DOM order — `panel-calculator` is the active default and lives mid-page in the DOM. Tab nav controls visibility.
+
+### Calculator tab dual-mode pattern (NEW — Phase 4)
+
+The Calculator tab hosts two calculators paired via a Money-Trees-style toggle (commit `0b2d203`):
+
+- **Retrospective mode** (default) — pick a past year, see what bitcoin would have done with the same money over the same period
+- **Projection mode** — use the Power Law to compare buying a house *today* vs. holding bitcoin *today*, over a chosen horizon. Migrated from the former Power Law Tab 4.
+
+Architecturally:
+
+```
+#panel-calculator
+├── .calc-mode-toggle [data-active-mode]
+│   ├── .calc-mode-label.retrospective (button)
+│   ├── .calc-mode-switch (sliding switch, central)
+│   └── .calc-mode-label.projection (button)
+├── #calc-mode-retrospective (.calc-mode-content.active by default)
+│   └── [retrospective UI]
+└── #calc-mode-projection (.calc-mode-content)
+    └── [projection UI, migrated from former Power Law Tab 4]
+```
+
+The toggle is a sub-tab; tab routing remains at the parent (4-tab nav). User flips between modes without leaving the Calculator tab. See `STYLE_GUIDE` calc-mode-toggle pattern for the canonical recipe.
+
+### Deep-link routing
+
+Three hashes resolve cleanly:
+
+| Hash | Behavior |
+|---|---|
+| `#calculator` | Calculator tab (default), retrospective mode |
+| `#calc-mode-projection` | Calculator tab AND projection mode auto-activated |
+| `#projection` | Same as `#calc-mode-projection` (alias) |
+
+`applyHashToMode()` inside the BvRE js handles both initial page load and subsequent `hashchange` events. The pattern is reusable for any future page with sub-mode states reachable via hash.
+
+### Custom interest-rate input (Retrospective mode)
+
+Third optional input field "Your interest rate" on Retrospective mode (originally added April 18, 2026):
+
+- Grid is 3-col (1fr 1fr 1fr) for the three optional inputs
 - Custom rate overrides `mortgageRates[sy]` throughout all calculations
 - Shows `(vs. prevailing X%)` parenthetical in scenario text when custom rate active
 - Clears on year change; placeholder updates to show new year's average
-- Clamped 0.5%-15%
+- Clamped 0.5%–15%
 - Flows through to: monthly payment, remaining balance, total cost, rent estimate, DCA savings
 - Mobile responsive at 768px and 480px stacks to single column
+
+### Cross-link role
+
+- BvRE applies the Power Law channel as a forward projection (in Projection mode); BvRE's related-set points to The Channel page (Power Law Tab 4) as the canonical visualization of the bands.
+- BvRE no longer describes Power Law as a "forward-looking companion" — the projection lives here now. BvRE describes Power Law as "the growth model behind the projection."
+- The retirement page applies the same channel as a retirement projection; both BvRE and retirement reference Power Law as the model home.
 
 ## 15. Chart.js patterns and lessons
 
@@ -486,4 +552,105 @@ When the urge strikes to add a "thoughtful" reading-width constraint on prose: d
 
 ---
 
-_Last updated: April 27, 2026. Update this document as editorial decisions crystallize into principles worth preserving._
+## 17. The Bitcoin Retirement (`/the-bitcoin-retirement.html`)
+
+**Added:** May 2026. A four-tab editorial-tier calculator page exploring how a bitcoin position supports a retirement. Architecture: graph-first, exploration-first — the chart leads, sliders sit beneath as the primary interaction surface, a single Sustainability readout replaces the traditional headline-number pattern.
+
+### The three legitimate questions
+
+The page frames retirement-with-bitcoin around three interrelated questions, none with a single answer:
+
+1. *How much BTC do I need?* — pedagogical scaffolding (currently in prose; static visualization is a deferred enhancement)
+2. *When can I retire?* — interactive (Retirement year slider in the target cluster)
+3. *What income can I retire on?* — interactive (Target annual income slider in the target cluster)
+
+The two interactive questions share the same continuous math; users drag whichever slider matches the question they are asking, and the rest of the readout updates to stay consistent.
+
+### Tab structure
+
+| Tab | Character | Content |
+|---|---|---|
+| The Question | Editorial prose | The decumulation paradox, three legitimate questions, strategy plurality posture |
+| The Calculator | Tool-led | Live slider clusters, Power Law projection chart, Sustainability readout |
+| The Strategies | Editorial prose | Three frameworks (sell-as-needed deep, borrow-against teaser, disciplined-rebalancing teaser) |
+| The Math | Specification-led | Equations, parameter tables, honest limits |
+
+Each prose tab opens with a Cormorant Garamond thesis statement (`.tab-thesis`) — a centered Power-Law-style hero claim that anchors the tab. See `STYLE_GUIDE` essay-prose tier for the pattern.
+
+### Model parameters
+
+The calculator uses Porkopolis Power Law coefficients, matching `/the-power-law.html`:
+
+- `Price(t) = a × (days since Genesis)^b`, where `a = 1.6 × 10⁻¹⁷`, `b = 5.77`
+- Genesis Block: 3 January 2009
+- Floor multiplier: `0.42 × trend`
+- Upper multiplier: `3.0 × trend`
+- Live BTC price via CoinGecko, falling back to `LIVE_BTC_FALLBACK = 108000`
+- Default withdrawal rate: 6% (sliderable 2–15%); Trinity-Study 4% rule referenced as anchor in slider labels but is not the default — bitcoin's growth profile under the Power Law makes 6% the more honest default
+
+### Chart datasets (six lines, asymmetric treatment)
+
+| Dataset | Color | Stroke | Role |
+|---|---|---|---|
+| Floor band | `#b04525` (rust) | dashed `[6,3]` 1.6px | Conservative anchor |
+| Trend | `#e09422` (signature amber) | solid 2.5px | Central case |
+| Upper band | `#e8c820` (gold) | sparse-dashed `[1,6]` 1.2px | Spike envelope |
+| Drawdown | `#ece4d6` (cream) | solid 2px | User stack under sell-as-needed |
+| Current trajectory | `#a89c8a` (muted tan) | dashed `[4,3]` 1.5px | Anchored to live BTC price |
+| Traditional 60/40 | `#5e7a92` (cool blue-gray) | dashed `[5,4]` 1.4px | Real-return benchmark |
+
+Trend, drawdown, current-trajectory render with full saturation; floor and upper render with reduced visual weight to emphasize trend as the central case. A `bandFillPlugin` adds subtle amber `rgba(224,148,34,0.05)` fill between floor and upper. The legend has two group labels (`Power Law bands — per bitcoin` for the top three lines, `Portfolio value — total stack` for the bottom three).
+
+### Sustainability readout
+
+Single readout card with two values plus a spectrum bar:
+
+- *Projected years stack lasts* (or "∞ — escape velocity")
+- *Projected stack value at retirement* (in today's dollars, inflation-adjusted)
+
+Spectrum bar maps the stack's real-terms multiplier (`(stack_end / stack_start) / (1 + inflation)^years`) onto a Depleting → Threshold → Escape velocity continuum. The threshold tick at 1× indicates real-terms break-even.
+
+**Power Law disclosure pattern.** All five tooltip targets on the sustainability surface — *Projected years stack lasts*, *Projected stack value at retirement*, and the three spectrum-bar zones (Depleting, Threshold, Escape velocity) — carry a one-line disclosure that the projection assumes the Power Law trend price. Deliberately repetitive: tooltips are read independently, so each must be honest in isolation. Pattern documented in `STYLE_GUIDE` help-tip section.
+
+### Tax treatment (no Account Type toggle)
+
+The v1 model is **pretax throughout**. There is no Account Type toggle on this page — earlier iterations included a documentary-only toggle (Regular vs Retirement) that was later removed because it implied differentiation the math didn't actually deliver. The structural arithmetic of sell-as-needed (stack value over time, withdrawal pressure, real-terms sustainability) runs the same regardless of account type.
+
+Tax-distinct mechanics surface on the sibling Disciplined Rebalancing page, where IRA-internal sells avoid the per-sell taxable event a regular account incurs and the rebalancing math materially diverges. The Account Type concept returns there as a primary computational input.
+
+The illustrative tax line in the income slider tooltip — *"a 20% effective tax would reduce real take-home to roughly 80%"* — is preserved as a one-line magnitude acknowledgment, appropriate in any retirement context.
+
+### Print output
+
+`Cmd/Ctrl+P` produces a single-page PDF with: header strip (brand + URL + date) → page title → 9-row inputs table (6 sliders + 3 baseline picker selections) → projection chart → sustainability summary → disclaimer footer. Pattern is reusable for sibling pages — documented in `STYLE_GUIDE` print stylesheet section.
+
+### Voice / editorial register
+
+Editorial-tier per `STYLE_GUIDE §1` (it has prose tabs); typography matches §2.1 canonical with Inter body and Cormorant display. Voice calibrated against the user's *Bitcoin Migration* essay: long structured sentences with semicolons; italicized conceptual emphasis on terms like *structurally*, *contextual not computational*, *delays*; concession-and-pivot moves; sober, intelligent register; no jargon-as-drama.
+
+The site does not endorse retirement strategies; it presents them. The Strategies tab's *"these are for entertainment only"* and the Math tab's *"What the model does not do"* honesty preserve the descriptive-not-prescriptive register.
+
+### Cross-linking
+
+- **Related** (`§6.10`): cross-links to `the-power-law` (the price model behind the projection), `bitcoin-vs-real-estate` (retrospective decision-support companion), `the-half-life` (decay of cash over time)
+- The Power Law text in the Question and Strategies essays hyperlinks to `/the-power-law.html` for users who want to drill into the model
+- The Math tab references both the Power Law page and the Disciplined Rebalancing page
+
+---
+
+## 18. Editorial reading order (after Phase 4)
+
+For a reader new to the site landing on the calculators:
+
+1. **The Bitcoin Retirement** — most life-relevant, anchors most directly on the channel, provides motivation
+2. **BvRE — Retrospective mode** — the historical case that bitcoin has been the better store of value vs. housing
+3. **BvRE — Projection mode** — the same question forward; introduces the channel framing without going deep
+4. **The Power Law — The Channel tab** — the foundational visualization; readers arrive ready to grok the framework
+5. **The Power Law — other tabs** — the deeper conceptual case (Theory, In Nature)
+6. **Disciplined Rebalancing** — applies the channel as a sell-and-rebuy protocol; deepest specialization
+
+Phase 4 strengthens this reading order by separating *application* (BvRE, retirement, disciplined rebalancing) from *foundation* (Power Law).
+
+---
+
+_Last updated: May 2026. Update this document as editorial decisions crystallize into principles worth preserving._
