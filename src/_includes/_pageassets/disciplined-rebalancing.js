@@ -754,30 +754,38 @@
   }
 
   // Rebuild bands + thresholds when horizon changes (extends x-domain).
-  // The non-band datasets (historical price, forward path, markers) get
-  // their data arrays reassigned to fresh refs (.slice()) — same content,
-  // new identity. Chart.js v4 skips re-laying-out elements when a
-  // dataset's data array reference hasn't changed, so without this the
-  // band scale extends but the OTHER datasets' element pixel positions
-  // remain on the OLD scale and they render in the wrong place. The
-  // most visible symptom is the historical price line ending hundreds
-  // of pixels to the left of the Today line — its last data point is
-  // at Apr 2026 (~30 days before today) and should sit right next to
-  // the Today line, but renders at year ~2021 because that's where
-  // pixel position for day 6304 used to be when the chart was wider.
+  // Rebuild bands + thresholds when horizon changes (extends x-domain).
+  //
+  // chart.resize() at the end is load-bearing. The natural call here is
+  // chart.update('none') (via updateThresholds), but on the FIRST call
+  // after initial chart construction Chart.js v4 doesn't fully recompute
+  // element pixel positions — even though the new band data triggers a
+  // scale-max change and the controllers are invoked, the layout cache
+  // from the chart's first render survives and elements at every
+  // dataset (bands AND historical AND markers) keep pixel positions
+  // computed against the previous scale. The visible symptom (caught
+  // by sticky-values restoring horizon=10 at page load with the slider
+  // HTML default at 20): historical price line ends ~250 pixels left
+  // of the Today line, with hover at the line's end correctly showing
+  // 'Apr 2026' for the data but circles rendering at the year-2021
+  // pixel position.
+  //
+  // Verified empirically (puppeteer harness with localStorage seeded
+  // to dr:horizon=10):
+  //   - chart.update('none') alone → elements stale at every dataset
+  //   - chart.update() (default mode) → still stale
+  //   - chart.update('reset') → fixes positions but flickers (bases
+  //     y-values out then animates back in)
+  //   - chart.resize() → fixes positions, no flicker
+  // resize() forces a full layout pass that invalidates the cache, then
+  // every controller's updateElements runs against the fresh scale.
   function updateXDomain(){
     bands = bandData();
     chart.data.datasets[DS.floor].data = bands.floor;
     chart.data.datasets[DS.trend].data = bands.trend;
     chart.data.datasets[DS.upper].data = bands.upper;
-    var d = chart.data.datasets;
-    if(d[DS.history] && d[DS.history].data) d[DS.history].data = d[DS.history].data.slice();
-    if(d[DS.forwardPath] && d[DS.forwardPath].data) d[DS.forwardPath].data = d[DS.forwardPath].data.slice();
-    if(d[DS.sellMarkers] && d[DS.sellMarkers].data) d[DS.sellMarkers].data = d[DS.sellMarkers].data.slice();
-    if(d[DS.rebuyMarkers] && d[DS.rebuyMarkers].data) d[DS.rebuyMarkers].data = d[DS.rebuyMarkers].data.slice();
-    if(d[DS.histSellMarkers] && d[DS.histSellMarkers].data) d[DS.histSellMarkers].data = d[DS.histSellMarkers].data.slice();
-    if(d[DS.histRebuyMarkers] && d[DS.histRebuyMarkers].data) d[DS.histRebuyMarkers].data = d[DS.histRebuyMarkers].data.slice();
     updateThresholds(); // re-extends sell/rebuy lines + re-runs backtest
+    chart.resize();
   }
 
   // Initial backtest at script-load (before any user interaction).
