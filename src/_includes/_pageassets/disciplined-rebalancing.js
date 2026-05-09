@@ -381,6 +381,14 @@
     histSellMarkers: 9, histRebuyMarkers: 10
   };
 
+  // Tracks the cursor's data-x value (days-from-genesis) while the mouse
+  // is over the chart canvas. Used by the tooltip filter to skip items
+  // whose data point doesn't actually live near the cursor — necessary
+  // because 'mode: index' lookups can return stale points from sparse
+  // datasets. Updated by the canvas mousemove listener attached after
+  // the chart is instantiated; reset to null on mouseleave.
+  var cursorDataX = null;
+
   var chart = new Chart(canvas, {
     type: 'scatter',
     data: {
@@ -534,23 +542,34 @@
           borderWidth: 1,
           titleColor: amber,
           bodyColor: '#ddd',
-          // Pixel-proximity filter. With 'mode: index', Chart.js looks up
-          // the same index across all datasets — fine when datasets share
-          // an x-grid (bands sample every 30 days from genesis to horizon
-          // end), but the historical price dataset has its own ~480-point
-          // grid mapped to PL_DATA days. Its index N maps to a different
-          // x than the bands' index N. Without this filter, hovering at
-          // year 2040 would show a stale 'Historical price: $19K (day
-          // 5020)' alongside the bands at day 11662 — index 200 of
-          // historical_data, not because anything was at year 2040 in
-          // history. Solution: only show items whose data-point pixel x
-          // is within 5 px of the tooltip caret x.
+          // Tolerance filter against the cursor's actual data-x.
+          //
+          // Why: with 'mode: index', Chart.js looks up the same index across
+          // all datasets. Bands sample every 30 days from genesis to horizon
+          // end and share an x-grid; historical price has its own ~480-point
+          // PL_DATA grid; trigger-marker datasets are sparse. Index N in one
+          // dataset can map to a very different x than index N in another.
+          // Without filtering, hovering at year 2040 would show a stale
+          // 'Historical price: $19K (day 5020)' alongside bands at day 11662
+          // — index 200 of historical_data, not because anything was at year
+          // 2040 in history.
+          //
+          // Earlier (commit 57d9aff) attempted to filter via 'item.chart
+          // .tooltip.caretX' but that value is set by Chart.js *during*
+          // tooltip computation and is often stale (from the previous
+          // render) when the filter callback runs — leading to all items
+          // being filtered out, blank tooltip body. Caught in user review.
+          //
+          // Fix: track the cursor's actual data-x ourselves via a mousemove
+          // listener on the canvas (see below), store it in the closure-
+          // scoped 'cursorDataX', and compare each item's parsed.x against
+          // it. 60-day tolerance comfortably catches the bands' 30-day
+          // cadence; markers (sparse, only at trigger days) only show when
+          // the cursor is genuinely close to them, which is the desired
+          // behavior.
           filter: function(item){
-            if(!item.chart || !item.chart.tooltip) return true;
-            var caretX = item.chart.tooltip.caretX;
-            var ptX = item.element ? item.element.x : null;
-            if(caretX == null || ptX == null) return true;
-            return Math.abs(ptX - caretX) < 5;
+            if(cursorDataX == null) return true;
+            return Math.abs(item.parsed.x - cursorDataX) <= 60;
           },
           callbacks: {
             title: function(items){
@@ -601,6 +620,23 @@
         }
       }
     }
+  });
+
+  // ─── CURSOR TRACKING ───
+  // Track the cursor's data-x while it's over the canvas. The tooltip
+  // filter (above) reads cursorDataX to decide which items are 'really
+  // near' the cursor versus 'index-coincidence near'. Doing this via
+  // a direct DOM mousemove listener — rather than relying on Chart.js's
+  // tooltip.caretX — avoids the stale-caretX-during-filter timing bug
+  // that produced blank-tooltip behavior in commit 57d9aff.
+  canvas.addEventListener('mousemove', function(ev){
+    var rect = canvas.getBoundingClientRect();
+    var pixelX = ev.clientX - rect.left;
+    if(!chart.scales || !chart.scales.x){ cursorDataX = null; return; }
+    cursorDataX = chart.scales.x.getValueForPixel(pixelX);
+  });
+  canvas.addEventListener('mouseleave', function(){
+    cursorDataX = null;
   });
 
   // ─── DYNAMIC UPDATES ───
