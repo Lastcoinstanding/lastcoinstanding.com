@@ -226,6 +226,49 @@
   if(!canvas) return;
   if(typeof Chart === 'undefined') return;
 
+  // ─── CUSTOM INTERACTION MODE: 'uniqueX' ───
+  // Wraps Chart.js's built-in 'x' mode and dedupes the returned items
+  // by dataset, keeping only the point closest to the cursor's data-x
+  // per dataset.
+  //
+  // Why: with 'mode: x' alone, datasets sampled densely along the
+  // x-axis (e.g. our historical price dataset, ~12-day PL_DATA cadence)
+  // can return two adjacent points within Chart.js's x-proximity test,
+  // showing up as two tooltip rows for the same series at the same
+  // hover point ('Historical price: $420' AND 'Historical price: $375'
+  // for the same Nov-2014 hover, observed in user review). Bands at
+  // 30-day cadence don't trigger this because their spacing exceeds
+  // the proximity tolerance.
+  //
+  // Custom mode registers globally (Chart.Interaction.modes is a
+  // shared namespace), but registration is idempotent and the mode
+  // is only consumed by charts that opt in via 'mode: uniqueX'.
+  if(Chart.Interaction && Chart.Interaction.modes && !Chart.Interaction.modes.uniqueX){
+    Chart.Interaction.modes.uniqueX = function(chart, e, options, useFinalPosition){
+      var xItems = Chart.Interaction.modes.x(chart, e, options, useFinalPosition);
+      if(!xItems.length || !chart.scales || !chart.scales.x) return xItems;
+      // Convert event pixel x → data x for distance comparisons.
+      var pos = Chart.helpers && Chart.helpers.getRelativePosition
+        ? Chart.helpers.getRelativePosition(e, chart)
+        : { x: e.x, y: e.y };
+      var cursorX = chart.scales.x.getValueForPixel(pos.x);
+      var byDataset = new Map();
+      xItems.forEach(function(item){
+        var ds = chart.data.datasets[item.datasetIndex];
+        var pt = ds && ds.data ? ds.data[item.index] : null;
+        if(!pt || pt.x == null) return;
+        var distance = Math.abs(pt.x - cursorX);
+        var existing = byDataset.get(item.datasetIndex);
+        if(!existing || distance < existing.distance){
+          byDataset.set(item.datasetIndex, { item: item, distance: distance });
+        }
+      });
+      var result = [];
+      byDataset.forEach(function(v){ result.push(v.item); });
+      return result;
+    };
+  }
+
   // ─── X-DOMAIN ───
   // Min: PL_DATA[0][0] (first historical sample; ~mid-2010)
   // Max: today + horizon × 365.25 (extends to user's projection end)
@@ -525,7 +568,7 @@
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: 'x', axis: 'x', intersect: false },
+      interaction: { mode: 'uniqueX', axis: 'x', intersect: false },
       plugins: {
         legend: { display: false },
         tooltip: {
