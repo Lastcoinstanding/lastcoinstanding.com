@@ -288,32 +288,136 @@
   // the user's threshold ratios; nothing else is tunable, nothing
   // is excluded. If the strategy never crosses a threshold, the
   // backtest returns an empty trade list.
-  function runHistoricalBacktest(sellRatio, rebuyRatio){
+  // Walks PL_DATA day by day; records every threshold crossing as a
+  // trigger event AND tracks the running BTC + cash + cost-basis state
+  // across cycles. Starting position is 1.0 BTC at the cost basis of
+  // the first PL_DATA price, so cumulative BTC is comparable to a
+  // 1.0-BTC HODL across the same span.
+  //
+  // params:
+  //   sellRatio, rebuyRatio  — price/trend ratios that fire triggers
+  //   sellFraction           — 0..1, fraction of held BTC sold per sell trigger
+  //   accountType            — 'retirement' (no tax) or 'regular' (capital-gains drag)
+  //   taxRate                — 0..1, applied to gain at each sell in 'regular' mode
+  //
+  // returns:
+  //   trades: per-trigger events with {day, price, ratio, type,
+  //           deltaBTC, cumBTC, cumCash, taxPaid, costBasis}
+  //   finalState: 'holding-stack' | 'holding-cash-and-stack'
+  //   btcHeld, cashHeld, costBasis: end-of-record state
+  //   currentDay, currentPrice, currentRatio: latest PL_DATA sample
+  //   sellsCount, rebuysCount, cyclesCompleted
+  function runHistoricalBacktest(sellRatio, rebuyRatio, sellFraction, accountType, taxRate){
+    // Defaults — preserve old call-site behavior for any caller that
+    // still passes only (sellRatio, rebuyRatio).
+    if(typeof sellFraction !== 'number') sellFraction = 0.5;
+    if(typeof accountType !== 'string') accountType = 'retirement';
+    if(typeof taxRate !== 'number') taxRate = 0;
+
     var trades = [];
     var state = 'holding-stack';
     var prevRatio = null;
+
+    // Stack-tracking. Start at 1.0 BTC so cumulative is directly
+    // comparable to HODL through the same window. Cost basis seeds
+    // at the first historical price so capital-gains math has a
+    // concrete starting value (matters for 'regular' tax accounting).
+    var btcHeld = 1.0;
+    var cashHeld = 0;
+    var costBasis = PL_DATA.length > 0 ? PL_DATA[0][1] : 0;
+
     for(var i = 0; i < PL_DATA.length; i++){
       var d = PL_DATA[i][0];
       var p = PL_DATA[i][1];
       var t = plPrice(d);
       if(t <= 0) continue;
       var ratio = p / t;
+
       if(prevRatio !== null){
         if(state === 'holding-stack'){
           if(prevRatio < sellRatio && ratio >= sellRatio){
-            trades.push({ day: d, price: p, ratio: ratio, type: 'sell' });
+            // SELL — sellFraction of held BTC at price p.
+            var btcSold = btcHeld * sellFraction;
+            var grossProceeds = btcSold * p;
+            var taxPaid = 0;
+            if(accountType === 'regular'){
+              var gain = (p - costBasis) * btcSold;
+              if(gain > 0) taxPaid = gain * taxRate;
+            }
+            var netProceeds = grossProceeds - taxPaid;
+
+            btcHeld -= btcSold;
+            cashHeld += netProceeds;
+            // Cost basis of remaining BTC unchanged on a sell.
+
+            trades.push({
+              day: d, price: p, ratio: ratio, type: 'sell',
+              deltaBTC: -btcSold,
+              cumBTC: btcHeld,
+              cumCash: cashHeld,
+              taxPaid: taxPaid,
+              costBasis: costBasis
+            });
             state = 'holding-cash-and-stack';
           }
         } else {
           if(prevRatio > rebuyRatio && ratio <= rebuyRatio){
-            trades.push({ day: d, price: p, ratio: ratio, type: 'rebuy' });
+            // REBUY — convert all held cash back to BTC at price p.
+            var btcBought = cashHeld / p;
+            // Weighted-average cost basis on the new total BTC.
+            var totalCost = btcHeld * costBasis + cashHeld;
+            var newTotal = btcHeld + btcBought;
+            costBasis = newTotal > 0 ? totalCost / newTotal : 0;
+
+            btcHeld += btcBought;
+            cashHeld = 0;
+
+            trades.push({
+              day: d, price: p, ratio: ratio, type: 'rebuy',
+              deltaBTC: btcBought,
+              cumBTC: btcHeld,
+              cumCash: cashHeld,
+              taxPaid: 0,
+              costBasis: costBasis
+            });
             state = 'holding-stack';
           }
         }
       }
       prevRatio = ratio;
     }
-    return { trades: trades, finalState: state };
+
+    // Latest PL_DATA sample is "today" for the historical-record view
+    // (no live price fetch on this page; PL_DATA is the same series
+    // the channel viz draws, so the Today row stays internally
+    // consistent with what the chart shows).
+    var lastIdx = PL_DATA.length - 1;
+    var lastDay = lastIdx >= 0 ? PL_DATA[lastIdx][0] : null;
+    var lastPrice = lastIdx >= 0 ? PL_DATA[lastIdx][1] : null;
+    var lastTrend = lastDay !== null ? plPrice(lastDay) : null;
+    var lastRatio = (lastTrend && lastTrend > 0) ? lastPrice / lastTrend : null;
+
+    var sellsCount = 0, rebuysCount = 0;
+    for(var k = 0; k < trades.length; k++){
+      if(trades[k].type === 'sell') sellsCount++;
+      else if(trades[k].type === 'rebuy') rebuysCount++;
+    }
+
+    return {
+      trades: trades,
+      finalState: state,
+      btcHeld: btcHeld,
+      cashHeld: cashHeld,
+      costBasis: costBasis,
+      currentDay: lastDay,
+      currentPrice: lastPrice,
+      currentRatio: lastRatio,
+      sellsCount: sellsCount,
+      rebuysCount: rebuysCount,
+      // A "cycle" = a sell event followed by a rebuy event. Trailing
+      // unmatched sell is an open cycle (still in cash-and-stack state).
+      cyclesCompleted: Math.min(sellsCount, rebuysCount)
+    };
   }
 
   // ─── PERCENTILE → RATIO (mirrors calc IIFE; computed once at init) ───
@@ -730,11 +834,25 @@
     chart.update('none');
   }
 
+  // Read sell-fraction / account-type / tax-rate from the DOM.
+  // These live in the calculator IIFE's controls; the channel viz
+  // doesn't own them, so we read them directly each backtest run.
+  function readBacktestParams(){
+    var sfEl = document.getElementById('drSellFrac');
+    var sellFraction = sfEl ? parseFloat(sfEl.value) / 100 : 0.5;
+    var acctBtn = document.querySelector('[data-account].active');
+    var accountType = acctBtn ? acctBtn.dataset.account : 'retirement';
+    var trEl = document.getElementById('drTaxRate');
+    var taxRate = trEl ? parseFloat(trEl.value) / 100 : 0;
+    return { sellFraction: sellFraction, accountType: accountType, taxRate: taxRate };
+  }
+
   // Run the historical backtest at the user's current settings and
   // (a) paint history-marker datasets on the chart, (b) re-render the
   // "Historical signals at your current settings" summary block.
   function updateBacktest(sellRatio, rebuyRatio){
-    var bt = runHistoricalBacktest(sellRatio, rebuyRatio);
+    var params = readBacktestParams();
+    var bt = runHistoricalBacktest(sellRatio, rebuyRatio, params.sellFraction, params.accountType, params.taxRate);
     var hSells = [], hRebuys = [];
     bt.trades.forEach(function(t){
       var pt = { x: t.day, y: t.price };
