@@ -211,7 +211,7 @@ For HTML files that exceed fetch token limits, use `curl | tail -n 300` rather t
 
 ### Homepage carousel
 
-Twelve featured insight slides, each pairing:
+Fifteen featured insight slides, each pairing:
 - A 16:9 atmospheric silent video (720p, ~3-10MB)
 - A three-beat minimalist text block (label + headline + CTA)
 
@@ -401,9 +401,9 @@ The site's most foundational concept page. Thesis: a good money must simultaneou
 
 All four principles in Section 9 originated here. See that section for the general patterns; this section documents the page-specific application.
 
-## 13. Homepage carousel — completed set (12 slides)
+## 13. Homepage carousel — completed set (15 slides)
 
-All 12 slides deployed with 16:9 widescreen silent videos, minimalist copy pattern (label + headline + CTA, no `.insight-desc`).
+All 15 slides deployed with 16:9 widescreen silent videos, minimalist copy pattern (label + headline + CTA, no `.insight-desc`).
 
 ### Typography tune
 
@@ -419,15 +419,18 @@ All 12 slides deployed with 16:9 widescreen silent videos, minimalist copy patte
 | 1 | What Money Has To Be | One money must do three things at once — or it cannot do any of them | Three ornate brass lenses on oak workbench, candle behind; each shows same flame |
 | 2 | Bitcoin vs. Real Estate | Housing became the default store of value by elimination, not merit | Golden hour → twilight → dark silhouette |
 | 3 | Bitcoin and The Power Law | For every 13% increase in Bitcoin's age, the trend price doubles | Town at dusk, lawful illumination pattern |
-| 4 | Is Bitcoin a Bubble? | A thing isn't a bubble simply because it has been called one | ~10 bubbles burst; one amber object remains impervious |
-| 5 | The Half-Life | How long until your money loses half its value? | Candle burning down asymptotically |
-| 6 | The Melting Ice Cube | Holding cash is not safety. It's an active decision with an ongoing cost | Ice cube melts to fragment on weathered wood |
-| 7 | The Bitcoin Synthesis | Six components. One irreducible synthesis | Six antique keys assemble into clockwork mechanism |
-| 8 | What Bitcoin Is | Most people consider just a few dimensions. Bitcoin is all of them, simultaneously | Raw mineral crystal, traveling amber light |
-| 9 | The Bitcoin Migration | From what can't be fixed, to what can't be broken | Heavy wooden door opens ~2/3, amber light |
-| 10 | The Trilemma | Some problems are navigated, not solved | Three geometric counterweights in coupled sway |
-| 11 | The Money Trees | Two systems. Different roots. One outcome | Two trees; left withers, right unchanged |
-| 12 | The Fixed Pie | Your share remains undiluted — for eternity | Unmarked gold coin; surrounding coins dissolve |
+| 4 | The Bitcoin Horizon | What looks like turbulence over the course of a day is trajectory over the course of a decade | Small ship at golden hour, crossing toward the horizon; near-shore chop, steady distant line; persistence-through-turbulence |
+| 5 | Is Bitcoin a Bubble? | A thing isn't a bubble simply because it has been called one | ~10 bubbles burst; one amber object remains impervious |
+| 6 | The Half-Life | How long until your money loses half its value? | Candle burning down asymptotically |
+| 7 | The Melting Ice Cube | Holding cash is not safety. It's an active decision with an ongoing cost | Ice cube melts to fragment on weathered wood |
+| 8 | The Bitcoin Synthesis | Six components. One irreducible synthesis | Six antique keys assemble into clockwork mechanism |
+| 9 | What Bitcoin Is | Most people consider just a few dimensions. Bitcoin is all of them, simultaneously | Raw mineral crystal, traveling amber light |
+| 10 | The Bitcoin Migration | From what can't be fixed, to what can't be broken | Heavy wooden door opens ~2/3, amber light |
+| 11 | The Trilemma | Some problems are navigated, not solved | Three geometric counterweights in coupled sway |
+| 12 | The Money Trees | Two systems. Different roots. One outcome | Two trees; left withers, right unchanged |
+| 13 | The Bitcoin Retirement | A stack that lasts a lifetime — or runs out before you do | Solitary mature tree in golden-hour meadow; sun moves from behind canopy to streaming rays through it; latent-state opening, persistence across the arc |
+| 14 | Disciplined Rebalancing | A model you believe in is a protocol you can run | Wheat field at golden hour, ears swaying in coupled bounded oscillation; fixed camera, stable disequilibrium |
+| 15 | The Fixed Pie | Your share remains undiluted — for eternity | Unmarked gold coin; surrounding coins dissolve |
 
 ## 14. Bitcoin vs. Real Estate (`/bitcoin-vs-real-estate.html`)
 
