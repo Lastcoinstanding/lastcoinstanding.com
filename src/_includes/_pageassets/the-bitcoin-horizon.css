@@ -51,7 +51,6 @@ h1, h2, h3 {
   line-height: 1.2;
   color: var(--ink);
 }
-h1 { font-size: clamp(2.5rem, 5vw, 3.75rem); }
 h2 { font-size: clamp(1.85rem, 3vw, 2.4rem); margin-bottom: 1.1rem; }
 h3 { font-size: clamp(1.4rem, 2.2vw, 1.7rem); margin-bottom: 0.8rem; }
 
@@ -95,11 +94,11 @@ section:first-of-type { border-top: none; }
 
 .nav-dropdown-menu a.active { color: var(--amber); background: rgba(247,147,26,0.08); font-weight: 600; }
 
-/* Hero — §16-compliant: centered block, centered text */
+/* Hero — canonical editorial Pattern 1 per Style Guide §2.1.
+ * No min-height (lets content size the section), no eyebrow caps-label
+ * (page name lives in nav + <title>), no separate intro section. */
 .hero {
-  min-height: 60vh;
-  display: flex; align-items: center;
-  padding: 4rem 0 3rem;
+  padding: 3rem 0 2rem;
   border-top: none;
 }
 .hero .wrap-narrow,
@@ -110,33 +109,25 @@ section:first-of-type { border-top: none; }
   text-align: center;
   padding: 0 1.5rem;
 }
-.hero .label { margin-bottom: 1.2rem; display: inline-block; }
 .hero h1 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
   max-width: 22ch;
   margin: 0 auto 1.2rem;
   letter-spacing: -0.015em;
   text-align: center;
 }
 .hero h1 em { color: var(--amber); font-style: italic; font-weight: 400; }
-
-/* Intro paragraph — also centered per §16 */
-.intro {
-  padding: 2.5rem 0 1rem;
-  border-top: 1px solid var(--border);
-}
-.intro .intro-block {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
+.hero .subtitle {
   font-family: 'Source Serif 4', serif;
   font-style: italic;
+  font-weight: 400;
   font-size: clamp(1.05rem, 2vw, 1.3rem);
   line-height: 1.6;
   color: var(--ink-dim);
-  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
 }
-.intro p { max-width: none; color: var(--ink-dim); }
-.intro em { color: var(--ink); font-style: italic; }
+.hero .subtitle em { color: var(--ink); font-style: italic; }
 
 /* Section labels */
 .section-label { display: block; margin-bottom: 0.7rem; }
