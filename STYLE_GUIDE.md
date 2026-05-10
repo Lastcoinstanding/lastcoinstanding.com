@@ -339,22 +339,32 @@ A shared JS module (`src/_includes/_pageassets/shared/modeling-assumptions.js`) 
 
 ### 4.2 Container width (per §16 of `SITE_GUIDE.md`)
 
-The site uses two main width tiers, plus a documented mixed-content pattern.
+The site uses three canonical width tiers. **Every page must adopt one of these tiers.** Non-canonical container widths (e.g. 1000px, 1080px, 1100px-as-outlier) are tech debt; existing instances should be migrated on any layout-touching update pass.
 
-**Editorial tier — 960px (canonical).** Used by Power Law, Half-Life, Fixed Pie, Melting Ice Cube, Horizon, Migration, Money Trees, About, Index, and What Money Has To Be. The reading-prose width that produces comfortable line-lengths for sustained text. This is the default for any new page that's primarily Inter body prose; deviating wider degrades narrative readability.
+**Canonical inventory:**
 
-**System-diagrammatic tier — ~1140px.** Used by Synthesis (1140px), What Bitcoin Is (1140px), and Trilemma (1080px, marginally tighter). These pages lead with a centered SVG diagram or interactive visual that benefits from horizontal stage-room; the surrounding explanation panels position around the diagram, not on a reading-prose grid. The tier is not used for body prose. New pages of this character should target 1140px to harmonize with the existing two; 1080px is acceptable as a close-but-distinct value if the diagram's natural extent calls for it.
+| Tier | Page width | Essay block | Used by |
+|---|---|---|---|
+| Editorial | **960px** | none (prose fills) | Power Law, Half-Life, Fixed Pie, Melting Ice Cube, Horizon, Migration, Money Trees, About, Index, What Money Has To Be |
+| Mixed-content | **1100px** | **880px centered** | Disciplined Rebalancing, Bitcoin vs Real Estate, Not-a-Bubble |
+| System-diagrammatic | **1140px** | none | Synthesis, What Bitcoin Is, Trilemma |
 
-**Mixed-content pattern — wide page + constrained essay.** Used by Not-a-Bubble (1152px page, 44rem ≈ 704px essay block). Pattern: hero chart needs the page width, but a closing essay needs prose-grade line-length. Solution is to set the page wide enough for the chart and apply a narrower `max-width` to the essay block specifically (NOT to individual paragraphs). This is the only sanctioned use of an inner max-width on prose; the constraint must apply to the essay block as a whole.
+**Editorial tier — 960px (canonical).** The reading-prose width that produces comfortable line-lengths for sustained text. This is the default for any new page that's primarily Inter body prose; deviating wider degrades narrative readability. Prose fills the container naturally; do not apply inner max-widths.
 
-**Constrained blocks MUST be centered with `margin: 0 auto`.** A constrained essay block without auto margins left-aligns within the wider container, leaving visible empty space on the right — the "narrow text floating with empty right column" anti-pattern. Canonical pattern, from Not-a-Bubble:
+**System-diagrammatic tier — 1140px.** Used by pages that lead with a centered SVG diagram or interactive visual benefiting from horizontal stage-room; the surrounding explanation panels position around the diagram, not on a reading-prose grid. The tier is not used for body prose. New pages of this character target 1140px to harmonize with the existing pages.
+
+**Mixed-content pattern — wide page + constrained essay.** Page width **1100px**, essay block **880px** centered. Used by Disciplined Rebalancing, Bitcoin vs Real Estate, and Not-a-Bubble. Pattern: hero chart needs the page width, but a closing essay needs prose-grade line-length. Solution is to set the page wide enough for the chart and apply a narrower `max-width` to the essay block specifically (NOT to individual paragraphs). This is the only sanctioned use of an inner max-width on prose; the constraint must apply to the essay block as a whole.
+
+**Constrained blocks MUST be centered with `margin: 0 auto`.** A constrained essay block without auto margins left-aligns within the wider container, leaving visible empty space on the right — the "narrow text floating with empty right column" anti-pattern. Canonical pattern:
 
 ```css
-.page  { max-width: 72rem; margin: 0 auto; }   /* 1152px wide page */
-.essay { max-width: 44rem; margin: 0 auto; }   /* 704px essay block, centered */
+.page  { max-width: 1100px; margin: 0 auto; }   /* mixed-content page width */
+.essay { max-width:  880px; margin: 0 auto; }   /* essay block, centered */
 ```
 
 The constrained block's `margin: 0 auto` is what makes the essay sit in the optical center of the page. Constraint without centering is an incomplete fix and visually worse than no constraint at all.
+
+**880px essay block is the canonical reading width on mixed-content tier**, chosen to match the editorial-tier effective prose width (~912px on a 960px page minus padding). Editorial and mixed-content pages therefore read body prose at visually similar column widths even though their page containers differ. Earlier values (704px / 720px / 760px) are pre-canonical and should be migrated to 880px on any update pass touching layout.
 
 **Do not apply paragraph-level max-width constraints in single-tier pages.** On editorial-tier pages, let prose fill the 960px container naturally — paragraph-level constraints create the "narrow text floating in a wider container" mismatch this rule is designed to prevent. The mixed-content pattern above is the documented exception, and it constrains the essay *block*, not individual paragraphs within it. When refactoring an existing page that has paragraph-level constraints (anti-pattern #11), the fix is to lift the `max-width` up to the wrapping block element (`.section`, `.essay`, `.narrative`, etc.) and add `margin: 0 auto` there.
 
