@@ -4,6 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 {{ head_extras | safe }}
+<style id="canonical-body-css">
+/* ─── Site-wide body invariants ─── */
+/* Source of truth for body font-family, size, and line-height.
+   Every page inherits these unless it deliberately overrides
+   (e.g. cream-bg essay pages would set font-family: EB Garamond
+   in their page_styles, which load AFTER this block and win by
+   source order). Pages still set their own body { background, color }
+   to match their palette — those properties merge with the rules
+   here. See STYLE_GUIDE.md §1 'Site-wide <body> rule' and §2.3
+   'Site-wide body invariants' for rationale. Without this default,
+   pages that omit a body { font-family } rule fall back to browser-
+   default Times New Roman — a failure mode that shipped on DR for
+   months before being caught. */
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+</style>
 <style id="canonical-nav-css">
 /* ─── Canonical nav (mobile + desktop) ─── */
 /* Source of truth for site-nav, hamburger, mobile-overlay, nav-dropdown.
