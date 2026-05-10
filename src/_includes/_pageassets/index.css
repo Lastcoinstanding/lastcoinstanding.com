@@ -242,17 +242,6 @@ footer a:hover { text-decoration: underline; }
     border-top: 1px solid rgba(247,147,26,0.15);
     border-bottom: 1px solid rgba(247,147,26,0.15);
 }
-.insight-carousel::before {
-    content: 'FEATURED INSIGHT';
-    display: block;
-    text-align: center;
-    font-family: var(--font-body);
-    font-size: 0.7rem;
-    letter-spacing: 3px;
-    color: var(--orange);
-    margin-bottom: 1.5rem;
-    opacity: 0.7;
-}
 .insight-slides {
     position: relative;
     overflow: hidden;

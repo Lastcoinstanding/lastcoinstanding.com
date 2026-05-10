@@ -10,13 +10,22 @@
     var nextBtn = document.getElementById('insightNext');
     if (!slides.length || !dotsContainer) return;
 
-    var current = 0;
+    // Start on a random slide so returning visitors don't always see
+    // the same opening item; cycle order from there is unchanged.
+    var current = Math.floor(Math.random() * slides.length);
     var autoPlay = true;
     var advanceTimer = null;
 
+    // The HTML hardcodes .active on slide 0; if random pick is different,
+    // swap the active class to the chosen starting slide.
+    if (current !== 0) {
+        slides[0].classList.remove('active');
+        slides[current].classList.add('active');
+    }
+
     slides.forEach(function(_, i) {
         var dot = document.createElement('button');
-        dot.className = 'insight-dot' + (i === 0 ? ' active' : '');
+        dot.className = 'insight-dot' + (i === current ? ' active' : '');
         dot.setAttribute('aria-label', 'Slide ' + (i + 1));
         dot.addEventListener('click', function() { stopAuto(); goTo(i); });
         dotsContainer.appendChild(dot);
@@ -85,10 +94,26 @@
     if (prevBtn) prevBtn.addEventListener('click', function() { stopAuto(); prev(); });
     if (nextBtn) nextBtn.addEventListener('click', function() { stopAuto(); next(); });
 
-    var firstVid = slides[0].querySelector('video.carousel-video');
+    var firstVid = slides[current].querySelector('video.carousel-video');
     if (firstVid) {
         firstVid.load();
         attachVideo(firstVid);
         firstVid.play().catch(function(){});
     }
+
+    // Make the whole slide surface clickable — visitors can click the
+    // video, title, or subtitle (not just the CTA button) to navigate.
+    // The visible CTA stays as a wayfinding cue. Arrow buttons and
+    // CTA link have their own handlers and aren't intercepted.
+    slides.forEach(function(slide) {
+        var cta = slide.querySelector('a.insight-cta');
+        if (!cta) return;
+        var href = cta.getAttribute('href');
+        slide.style.cursor = 'pointer';
+        slide.addEventListener('click', function(e) {
+            // Let nested links (the CTA itself, mostly) handle their own click
+            if (e.target.closest('a')) return;
+            window.location.href = href;
+        });
+    });
 })();
