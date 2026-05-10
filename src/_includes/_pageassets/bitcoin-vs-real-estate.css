@@ -39,10 +39,10 @@
         .tab-panel{animation:fadeIn 0.5s ease}
         .tab-panel.js-hidden{display:none}.tab-panel.active{display:block}
         @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-        .section-intro{margin-bottom:2.5rem}
+        .section-intro{margin:0 auto 2.5rem;max-width:700px}
         .section-intro h2{font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,3vw,2.2rem);font-weight:400;color:var(--text);margin-bottom:1rem}
         .section-intro h2 em{color:var(--amber);font-style:italic}
-        .section-intro p{font-size:1rem;color:var(--text-dim);max-width:700px;line-height:1.8}
+        .section-intro p{font-size:1rem;color:var(--text-dim);line-height:1.8}
         .section-intro p strong{color:var(--text);font-weight:500}
         .chart-container{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:2rem;margin-bottom:2rem;position:relative}
         .chart-container .chart-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:var(--text);margin-bottom:0.3rem}
