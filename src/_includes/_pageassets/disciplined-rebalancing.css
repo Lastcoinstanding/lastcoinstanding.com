@@ -105,11 +105,16 @@
     .hero { padding: 3.5rem 1.25rem 2rem; }
 }
 
-/* Section intros — let prose fill the container width per Style
- * Guide §16 / anti-pattern #11. Font sizing matches the canonical
- * `.prose` from /the-power-law (1.05rem / line-height 1.7). */
+/* Section intros — 720px constrained essay-block width, centered.
+ * Per Style Guide §4.2 mixed-content pattern: this page's container
+ * is 1100px to accommodate the channel viz on the Calculator tab,
+ * so prose-grade content (ledes, narrative blocks, math sections)
+ * lives inside narrower centered blocks rather than filling the
+ * full container. Font sizing matches canonical .prose tier
+ * (1.05rem / line-height 1.7) from /the-power-law and /the-half-life. */
 .section-intro {
-    margin: 0 0 2rem;
+    margin: 0 auto 2rem;
+    max-width: 720px;
 }
 .section-intro h2 {
     font-family: 'Cormorant Garamond', Georgia, serif;
@@ -128,11 +133,19 @@
 }
 .section-intro p em { color: var(--text); font-style: italic; }
 
-/* Question tab prose — keep readable column width */
+/* Question tab — block-level essay constraints per Style Guide
+ * §4.2 mixed-content pattern. Each top-level block (.section,
+ * .narrative, .belief-context) gets a 720px max-width with
+ * margin: 0 auto, so the constrained reading column sits in
+ * the optical center of the 1100px page container. The
+ * .section-intro at the top of the tab is already constrained
+ * by the global rule above. */
+#tab-question .section,
 #tab-question .narrative,
-#tab-question h3,
-#tab-question p:not(.belief-context p) {
-    max-width: 760px;
+#tab-question .belief-context {
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
 }
 #tab-question h3 {
     font-family: 'Cormorant Garamond', Georgia, serif;
@@ -150,9 +163,16 @@
 }
 #tab-question p em { font-style: italic; color: var(--amber-dim); }
 
-/* Math tab — same column width treatment */
-#tab-math .dr-math-section {
-    max-width: 760px;
+/* Math tab — same block-level pattern. Each .dr-math-section is
+ * a top-level block; constraining the section gives all child
+ * elements (paragraphs, lists, formulas, tables) the proper
+ * reading column width without paragraph-level rules. Also
+ * covers .dr-math-disclosure (footer methodology block). */
+#tab-math .dr-math-section,
+#tab-math .dr-math-disclosure {
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* ───────────────────────────────────────────────
