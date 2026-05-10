@@ -69,6 +69,10 @@ Inter:ital,wght@0,<upright_weights>;1,400;1,500
 
 The same logic applies to any other family that's used italic anywhere on the site: declare both the upright weights you use and any italic weights you use; never rely on browser font-synthesis.
 
+### Site-wide `<body>` rule
+
+The canonical body font-family, font-size, and line-height live in `base.njk` and apply to every page automatically. New pages should NOT declare their own `body { font-family / font-size / line-height }` rule — see §2.3 for the canonical values and the rationale. A page omitting all body styling used to silently fall back to Times New Roman (the browser default serif), which manifested on Disciplined Rebalancing for months before being caught — the `base.njk` default eliminates this failure mode.
+
 ---
 
 ## 2. Type scale
@@ -98,7 +102,7 @@ All sizes use `clamp()` for fluid responsive scaling. The first value is the mob
 
 | Slot | Size | Weight | Notes |
 |---|---|---|---|
-| Body paragraph (dark bg) | `1.05rem` | 400 | line-height 1.6, max-width ~680px |
+| Body paragraph (dark bg) | `1.05rem` | 400 | line-height 1.7 |
 | Page subtitle (dark bg) | `clamp(1rem, 2vw, 1.2rem)` | 400 | color text-dim |
 | UI label, button text | `0.85rem` | 500 | |
 | Tab label | `0.95–1rem` | 500 | see §6.2 |
@@ -107,6 +111,21 @@ All sizes use `clamp()` for fluid responsive scaling. The first value is the mob
 | Smallest label | `0.65rem` | 500 | letter-spacing 0.2em, uppercase — tab numbering, etc. |
 
 **Mobile floor:** never render UI text below `0.7rem` on a 375px viewport. SVG-rendered interactive labels (Synthesis component circles, etc.) must remain ≥14px effective rendered size at narrow viewports.
+
+**Site-wide body invariants (set in `base.njk`, not per-page).** The site-wide `<body>` rule lives in `base.njk` and sets the canonical body font-family, size, and line-height for every page. New pages do NOT need to declare a `body { font-family / font-size / line-height }` rule of their own — they inherit. Pages still set their own `body { background, color }` to match their palette, and may set their own `font-family` to override (cream-bg essay pages using EB Garamond, for example), but the size and line-height should not be re-declared at the body level. The canonical values are:
+
+```css
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+```
+
+A page omitting its own body rule entirely (as Disciplined Rebalancing did pre-fix) used to fall back to browser-default Times New Roman; the global rule now prevents that failure mode site-wide. CSS variables for body font (`--font-b`, `--font-body`, `--font` — all currently in use across different pages) are technical debt to be unified in a future pass; treat the global `body` rule above as the source of truth, not the variables.
+
+**Per-tab body prose must match canonical `1.05rem / 1.7`.** On multi-tab pages where each tab's prose has its own selector, the temptation is to tune type per tab (Question tab at 1rem / 1.8 felt different from Math tab at 1.05rem / 1.7 on Disciplined Rebalancing for several months — the divergence wasn't intentional, just inconsistent application). All editorial prose on dark backgrounds is `1.05rem` with `1.7` line-height, regardless of which tab or section it lives in.
 
 ### 2.4 Italic flourish (Source Serif italic)
 
