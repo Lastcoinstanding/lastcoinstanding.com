@@ -328,7 +328,16 @@ The site uses two main width tiers, plus a documented mixed-content pattern.
 
 **Mixed-content pattern — wide page + constrained essay.** Used by Not-a-Bubble (1152px page, 44rem ≈ 704px essay block). Pattern: hero chart needs the page width, but a closing essay needs prose-grade line-length. Solution is to set the page wide enough for the chart and apply a narrower `max-width` to the essay block specifically (NOT to individual paragraphs). This is the only sanctioned use of an inner max-width on prose; the constraint must apply to the essay block as a whole.
 
-**Do not apply paragraph-level max-width constraints in single-tier pages.** On editorial-tier pages, let prose fill the 960px container naturally — paragraph-level constraints create the "narrow text floating in a wider container" mismatch this rule is designed to prevent. The mixed-content pattern above is the documented exception, and it constrains the essay *block*, not individual paragraphs within it.
+**Constrained blocks MUST be centered with `margin: 0 auto`.** A constrained essay block without auto margins left-aligns within the wider container, leaving visible empty space on the right — the "narrow text floating with empty right column" anti-pattern. Canonical pattern, from Not-a-Bubble:
+
+```css
+.page  { max-width: 72rem; margin: 0 auto; }   /* 1152px wide page */
+.essay { max-width: 44rem; margin: 0 auto; }   /* 704px essay block, centered */
+```
+
+The constrained block's `margin: 0 auto` is what makes the essay sit in the optical center of the page. Constraint without centering is an incomplete fix and visually worse than no constraint at all.
+
+**Do not apply paragraph-level max-width constraints in single-tier pages.** On editorial-tier pages, let prose fill the 960px container naturally — paragraph-level constraints create the "narrow text floating in a wider container" mismatch this rule is designed to prevent. The mixed-content pattern above is the documented exception, and it constrains the essay *block*, not individual paragraphs within it. When refactoring an existing page that has paragraph-level constraints (anti-pattern #11), the fix is to lift the `max-width` up to the wrapping block element (`.section`, `.essay`, `.narrative`, etc.) and add `margin: 0 auto` there.
 
 **Hero subtitles** can have `max-width: 680px` independent of tier, to keep them visually balanced under a centered title. Apply this only to hero subtitles, not to body prose.
 
@@ -348,7 +357,7 @@ These have all been observed on the site and need fixing.
 8. **Inconsistent tab styling across pages.** → Use the canonical tab component (§6.2).
 9. **Low-contrast text below 0.5 opacity.** Migration cover subtitle hits this. → Keep text-on-dark above 0.6 opacity for body text; mini-labels can go to 0.5 if size is ≥0.7rem.
 10. **SVG-rendered text below 14px effective size on mobile.** Synthesis component circles hit this. → Add mobile breakpoint that bumps SVG container or text size.
-11. **Paragraph-level `max-width` constraints that fight the page container.** A global `p { max-width: 68ch }` (or similar) makes body text float as a narrow column inside a wider container, leaving visible empty space on the right and creating visual inconsistency vs. canonical pages where prose fills the container. → Remove the global `p` constraint; let prose fill its parent. Per-element constraints on specific cards (intro blocks, callouts, pull-quotes) are still fine — the anti-pattern is the *global* `p` rule.
+11. **Paragraph-level `max-width` constraints that fight the page container.** A global `p { max-width: 68ch }` (or similar) makes body text float as a narrow column inside a wider container, leaving visible empty space on the right and creating visual inconsistency vs. canonical pages where prose fills the container. → Remove the global `p` constraint; let prose fill its parent. If a narrower reading column is required (mixed-content pattern, see §4.2), apply the `max-width` to the wrapping *block* element (`.section`, `.essay`, `.narrative`) AND add `margin: 0 auto` so the block centers in the container. Per-element constraints on specific cards (intro blocks, callouts, pull-quotes) are still fine — the anti-pattern is the *global* `p` rule and any constrained block missing its centering margins.
 
 12. **Decorative 3px-side or 3px-top accent borders on cards.** Vestigial visual signal that earns no editorial benefit. The structural relationship between cards is what carries meaning, not a colored stripe. Color-coding (Fixed Pie's money-type cards, Half-Life's preset rates) is preserved through colored title text and progress bars; the stripe was redundant. → Drop decorative side/top borders site-wide. Preserve only borders that serve a *structural* role — `.tab-btn.active` indicator (transparent → colored bottom border), `.timeline` 2px structural rail on Half-Life History tab, timeline event dots, card containers' overall 1px border. Sweep applied across 8 page CSS files plus `.tool-framing-expanded` on `base.njk`. If a new page adds a decorative `border-left: 3px` or `border-top: 2px` accent, review against this principle before landing.
 
