@@ -114,7 +114,7 @@
  * (1.05rem / line-height 1.7) from /the-power-law and /the-half-life. */
 .section-intro {
     margin: 0 auto 2rem;
-    max-width: 720px;
+    max-width: 880px;
 }
 .section-intro h2 {
     font-family: 'Cormorant Garamond', Georgia, serif;
@@ -135,7 +135,7 @@
 
 /* Question tab — block-level essay constraints per Style Guide
  * §4.2 mixed-content pattern. Each top-level block (.section,
- * .narrative, .belief-context) gets a 720px max-width with
+ * .narrative, .belief-context) gets an 880px max-width with
  * margin: 0 auto, so the constrained reading column sits in
  * the optical center of the 1100px page container. The
  * .section-intro at the top of the tab is already constrained
@@ -143,7 +143,7 @@
 #tab-question .section,
 #tab-question .narrative,
 #tab-question .belief-context {
-    max-width: 720px;
+    max-width: 880px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -170,7 +170,7 @@
  * covers .dr-math-disclosure (footer methodology block). */
 #tab-math .dr-math-section,
 #tab-math .dr-math-disclosure {
-    max-width: 720px;
+    max-width: 880px;
     margin-left: auto;
     margin-right: auto;
 }
