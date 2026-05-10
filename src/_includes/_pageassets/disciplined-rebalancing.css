@@ -531,7 +531,7 @@ input[type="range"]::-moz-range-track {
  * slider movement. */
 .dr-field-explainer {
     margin: 0.45rem 0 0;
-    font-size: 0.78rem;
+    font-size: 0.88rem;
     line-height: 1.55;
     color: var(--text-muted);
     padding: 0.5rem 0.7rem;
@@ -544,7 +544,7 @@ input[type="range"]::-moz-range-track {
     font-weight: 500;
 }
 @media (max-width: 720px){
-    .dr-field-explainer { font-size: 0.74rem; padding: 0.45rem 0.6rem; }
+    .dr-field-explainer { font-size: 0.82rem; padding: 0.45rem 0.6rem; }
 }
 
 /* Text input with unit */
@@ -1297,14 +1297,14 @@ input[type="range"]::-moz-range-track {
     .dr-era-btn-detail { display: none; }
 }
 .dr-hist-signals-headline {
-    font-size: 0.88rem;
+    font-size: 1rem;
     line-height: 1.6;
     color: var(--text-dim);
     margin: 0 0 0.7rem;
 }
 .dr-hist-signals-headline strong { color: var(--text); }
 .dr-hist-signals-empty {
-    font-size: 0.88rem;
+    font-size: 1rem;
     line-height: 1.6;
     color: var(--text-dim);
     margin: 0;
@@ -1347,7 +1347,7 @@ input[type="range"]::-moz-range-track {
     width: 100%;
     border-collapse: collapse;
     font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    font-size: 0.84rem;
+    font-size: 0.92rem;
     color: var(--text-dim);
 }
 .dr-hist-table thead th {
@@ -1415,7 +1415,7 @@ input[type="range"]::-moz-range-track {
 }
 .dr-hist-summary p {
     margin: 0;
-    font-size: 0.92rem;
+    font-size: 1rem;
     line-height: 1.6;
     color: var(--text-dim);
 }
@@ -1439,7 +1439,7 @@ input[type="range"]::-moz-range-track {
 }
 .dr-hist-volatility-note p {
     margin: 0;
-    font-size: 0.84rem;
+    font-size: 0.92rem;
     line-height: 1.62;
     color: var(--text-dim);
 }
@@ -1449,12 +1449,12 @@ input[type="range"]::-moz-range-track {
 
 /* Mobile — scale type, but never let column widths collapse */
 @media (max-width: 720px){
-    .dr-hist-table { font-size: 0.78rem; }
+    .dr-hist-table { font-size: 0.84rem; }
     .dr-hist-table thead th { font-size: 0.62rem; padding: 0.3rem 0.45rem 0.3rem; }
     .dr-hist-table tbody td { padding: 0.3rem 0.45rem; }
-    .dr-hist-table .dr-col-ratio { font-size: 0.72rem; }
-    .dr-hist-summary p { font-size: 0.84rem; }
-    .dr-hist-volatility-note p { font-size: 0.78rem; }
+    .dr-hist-table .dr-col-ratio { font-size: 0.78rem; }
+    .dr-hist-summary p { font-size: 0.92rem; }
+    .dr-hist-volatility-note p { font-size: 0.84rem; }
 }
 
 /* ─── PRESET COMPARISON BLOCK ─── */
@@ -1482,7 +1482,7 @@ input[type="range"]::-moz-range-track {
     width: 100%;
     border-collapse: collapse;
     font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    font-size: 0.84rem;
+    font-size: 0.92rem;
     color: var(--text-dim);
     margin-bottom: 0.6rem;
 }
@@ -1537,7 +1537,7 @@ input[type="range"]::-moz-range-track {
 
 .dr-preset-commentary p {
     margin: 0.6rem 0 0;
-    font-size: 0.92rem;
+    font-size: 1.02rem;
     line-height: 1.62;
     color: var(--text-dim);
 }
@@ -1546,12 +1546,12 @@ input[type="range"]::-moz-range-track {
 .dr-preset-commentary p em { color: var(--amber); font-style: normal; font-weight: 500; }
 
 @media (max-width: 720px){
-    .dr-preset-table { font-size: 0.78rem; }
+    .dr-preset-table { font-size: 0.84rem; }
     .dr-preset-table thead th { font-size: 0.62rem; padding: 0.3rem 0.45rem; }
     .dr-preset-table tbody td { padding: 0.45rem 0.45rem; }
-    .dr-preset-table .dr-pc-preset .dr-pc-spec { font-size: 0.72rem; }
-    .dr-preset-table .dr-pc-trades { font-size: 0.72rem; }
-    .dr-preset-commentary p { font-size: 0.84rem; }
+    .dr-preset-table .dr-pc-preset .dr-pc-spec { font-size: 0.78rem; }
+    .dr-preset-table .dr-pc-trades { font-size: 0.78rem; }
+    .dr-preset-commentary p { font-size: 0.92rem; }
 }
 
 /* Porkopolis attribution — scoped to this page; mirrors the

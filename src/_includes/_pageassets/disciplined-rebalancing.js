@@ -848,10 +848,12 @@
 
   // Era state — controls the historical window the table + Today row +
   // summary + volatility note all reflect. Persists to localStorage so a
-  // returning reader who switched to 'since-2015' last visit stays there.
-  // Default = 'full' (full historical record from 2010+).
+  // returning reader who switched to 'full' last visit stays there.
+  // Default = 'since-2015' (post-volatility-compression era — more
+  // representative of the future than the extreme early-bitcoin
+  // cycles that no longer reflect modern dynamics).
   var startOf2015Day = (Date.UTC(2015, 0, 1) / 1000 - GENESIS_TS) / 86400;
-  var currentEra = 'full';
+  var currentEra = 'since-2015';
   try {
     var storedEra = localStorage.getItem('dr:era');
     if(storedEra === 'since-2015' || storedEra === 'full') currentEra = storedEra;
