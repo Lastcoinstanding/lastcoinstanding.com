@@ -1412,6 +1412,30 @@
   });
   // Note: [data-growth] buttons no longer in DOM — historical-only redesign.
 
+  // ─── CUSTOMIZE COLLAPSE TOGGLE ───
+  // Default-closed; expanded state persists in localStorage so a
+  // returning customizer stays in customize-on mode. ARIA attributes
+  // (aria-expanded on the button, hidden on the body) are kept in
+  // sync for screen-reader correctness.
+  var customizeToggle = document.getElementById('drCustomizeToggle');
+  var customizeBody = document.getElementById('drCustomizeBody');
+  function setCustomizeOpen(open, persist){
+    if(!customizeToggle || !customizeBody) return;
+    customizeToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if(open){ customizeBody.removeAttribute('hidden'); }
+    else { customizeBody.setAttribute('hidden', ''); }
+    if(persist) saveSetting('customizeOpen', open ? '1' : '0');
+  }
+  if(customizeToggle){
+    customizeToggle.addEventListener('click', function(){
+      var nowOpen = customizeToggle.getAttribute('aria-expanded') !== 'true';
+      setCustomizeOpen(nowOpen, true);
+    });
+  }
+  // Restore stored state at init (default = closed)
+  var storedCustomize = loadSetting('customizeOpen');
+  if(storedCustomize === '1') setCustomizeOpen(true, false);
+
   // ─── INIT ───
   loadStickyValues();
   updateReadouts();

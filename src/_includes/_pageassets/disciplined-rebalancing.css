@@ -366,6 +366,75 @@ input[type="range"]::-moz-range-track {
     margin: 2rem 0;
 }
 
+/* ─── CUSTOMIZE COLLAPSE (advanced controls behind a toggle) ─── */
+/* Wraps the preset / threshold / account-type controls so the page
+ * reads as essay-with-tables by default. Engaged readers click the
+ * toggle to reveal the calculator surface; their open/closed state
+ * persists across visits via dr:customizeOpen in localStorage. */
+.dr-customize {
+    margin: 1.4rem 0 0;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.012);
+    overflow: hidden;
+}
+.dr-customize-toggle {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    width: 100%;
+    padding: 0.85rem 1.1rem;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    color: var(--text);
+    font-family: inherit;
+    text-align: left;
+    transition: background 0.12s ease;
+}
+.dr-customize-toggle:hover { background: rgba(255,255,255,0.025); }
+.dr-customize-toggle:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: -2px;
+}
+.dr-customize-toggle-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--text);
+    font-weight: 500;
+}
+.dr-customize-toggle-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    flex: 1;
+}
+.dr-customize-toggle-chevron {
+    color: var(--amber);
+    font-size: 0.85rem;
+    transition: transform 0.18s ease;
+    display: inline-block;
+    line-height: 1;
+}
+.dr-customize-toggle[aria-expanded="true"] .dr-customize-toggle-chevron {
+    transform: rotate(90deg);
+}
+.dr-customize-body {
+    padding: 0.4rem 1.1rem 1.1rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+.dr-customize-body[hidden] { display: none; }
+/* Inside the customize body, the contained sections (.dr-presets,
+ * .dr-thresholds, .dr-account-section) keep their existing styles
+ * but trim the top margin a little so they sit comfortably below
+ * the toggle's bottom border. */
+.dr-customize-body > .dr-presets:first-child { margin-top: 1rem; }
+@media (max-width: 720px){
+    .dr-customize-toggle { gap: 0.5rem; padding: 0.7rem 0.85rem; }
+    .dr-customize-toggle-hint { display: none; }
+    .dr-customize-body { padding: 0.3rem 0.85rem 0.9rem; }
+}
+
 /* ─── PRESET BUTTONS ─── */
 .dr-presets { margin-bottom: 1.8rem; }
 .dr-presets > label {

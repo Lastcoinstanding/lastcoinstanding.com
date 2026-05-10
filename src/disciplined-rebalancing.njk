@@ -141,6 +141,76 @@ eleventyComputed:
                     <div id="drHistSignals"></div>
                 </div>
 
+                <!-- ═══ CUSTOMIZE (collapsible controls) ═══ -->
+                <!-- Quick-start presets, threshold sliders, and account -->
+                <!-- type are advanced-reader controls. Default-collapsed -->
+                <!-- so the page reads as essay-with-tables for casual -->
+                <!-- visitors; expanded state persists in localStorage so -->
+                <!-- returning customizers stay in customize-on mode. -->
+                <!-- Position is intentional: directly between the per- -->
+                <!-- setting historical table (above) and the preset -->
+                <!-- comparison (below), so an engaged reader can adjust -->
+                <!-- controls and see both surfaces update in the same -->
+                <!-- viewport without losing context. -->
+                <div class="dr-customize" id="drCustomize">
+                    <button type="button" class="dr-customize-toggle" id="drCustomizeToggle" aria-expanded="false" aria-controls="drCustomizeBody">
+                        <span class="dr-customize-toggle-label">Customize settings</span>
+                        <span class="dr-customize-toggle-hint">adjust thresholds, presets, account type</span>
+                        <span class="dr-customize-toggle-chevron" aria-hidden="true">&#9656;</span>
+                    </button>
+                    <div class="dr-customize-body" id="drCustomizeBody" hidden>
+
+                        <!-- PRESET SHORTCUTS -->
+                        <div class="dr-presets">
+                            <label>Quick start<button type="button" class="dr-tt" aria-label="What does this do?">?<span class="dr-tt-card">Three preset configurations of the discipline. Each preset sets <strong>sell percentile / rebuy percentile</strong> in one click; you can then adjust the sliders below. Conservative trades more often at less extreme prices; Aggressive at extremes; Standard is the historical-frequency middle ground. Every cycle sells the entire position and rebuys it back &mdash; results scale linearly to whatever portion of your stack you'd actually run the discipline on.</span></button></label>
+                            <div class="dr-preset-btns">
+                                <button class="dr-preset-btn" data-preset="conservative">
+                                    <span class="dr-preset-name">Conservative</span>
+                                    <span class="dr-preset-meta">70 / 40</span>
+                                </button>
+                                <button class="dr-preset-btn active" data-preset="standard">
+                                    <span class="dr-preset-name">Standard</span>
+                                    <span class="dr-preset-meta">80 / 50</span>
+                                </button>
+                                <button class="dr-preset-btn" data-preset="aggressive">
+                                    <span class="dr-preset-name">Aggressive</span>
+                                    <span class="dr-preset-meta">90 / 20</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- THRESHOLD SLIDERS -->
+                        <div class="dr-thresholds">
+                            <div class="dr-field">
+                                <label>Sell percentile <span id="drSellPctReadout" class="dr-field-readout">80th percentile</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">The price-to-trend ratio at-or-above which you sell. The 80th percentile means selling when bitcoin is priced higher than 80% of historical days, relative to its long-term Power Law trend. <strong>Higher percentile = rarer triggers at more extreme prices; lower percentile = more frequent triggers at less extreme prices.</strong></span></button></label>
+                                <input type="range" id="drSellPct" min="60" max="95" value="80" step="5">
+                                <p id="drSellPctExplainer" class="dr-field-explainer"></p>
+                            </div>
+                            <div class="dr-field">
+                                <label>Rebuy percentile <span id="drRebuyPctReadout" class="dr-field-readout">50th percentile</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">The price-to-trend ratio at-or-below which you rebuy after a sell. The 50th percentile is the historical median (~0.87&times; trend). <strong>Lower percentile = waits for deeper drawdowns: more BTC captured per rebuy when it fires, but historically fired less often.</strong></span></button></label>
+                                <input type="range" id="drRebuyPct" min="5" max="55" value="50" step="5">
+                                <p id="drRebuyPctExplainer" class="dr-field-explainer"></p>
+                            </div>
+                        </div>
+
+                        <!-- ACCOUNT TYPE + CONDITIONAL TAX RATE -->
+                        <div class="dr-account-section">
+                            <div class="dr-account-row">
+                                <label>Account type<button type="button" class="dr-tt" aria-label="About this input">?<span class="dr-tt-card"><strong>Retirement:</strong> a Roth IRA, traditional IRA, 401(k), or similar tax-advantaged wrapper &mdash; sells generate no immediate tax, gains compound the bitcoin position without leakage. <strong>Regular:</strong> a standard taxable account &mdash; each sell triggers capital gains tax on realized gains since position established (or last rebought, weighted-average cost basis).</span></button></label>
+                                <div class="dr-toggle-group">
+                                    <button class="dr-toggle-btn active" data-account="retirement">Retirement</button>
+                                    <button class="dr-toggle-btn" data-account="regular">Regular</button>
+                                </div>
+                            </div>
+                            <div class="dr-tax-row" id="drTaxRow" style="display:none">
+                                <label>Tax rate <span id="drTaxRateValue" class="dr-field-readout">15%</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">Your effective marginal capital gains tax rate. US federal long-term gains run 0&ndash;20% plus state. Short-term gains (held under one year) are taxed as ordinary income. Use whatever rate matches your jurisdiction and bracket.</span></button></label>
+                                <input type="range" id="drTaxRate" min="0" max="40" value="15" step="1">
+                            </div>
+                        </div>
+
+                    </div><!-- /.dr-customize-body -->
+                </div><!-- /.dr-customize -->
+
                 <!-- ═══ PRESET COMPARISON ═══ -->
                 <!-- Three presets × two historical windows (full record / -->
                 <!-- since 2015). Color-graded × HODL cells make the dual- -->
@@ -156,54 +226,6 @@ eleventyComputed:
                 <div class="dr-channel-attribution">
                     <span class="dr-channel-attribution-label">Channel framework &amp; coefficients</span>
                     The Power Law channel &mdash; the floor at 0.42&times; trend, the upper band at 3&times; trend, and the daily-close convention &mdash; was developed by <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener"><strong>Matthew Me&zcaron;inskis</strong></a> at <a href="https://www.porkopolis.io" target="_blank" rel="noopener">Porkopolis Economics</a>. Coefficients used: <code>a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup></code>, <code>b&nbsp;=&nbsp;5.77</code>. See <a href="/the-power-law#channel">The Channel</a> for the canonical view.
-                </div>
-            </div>
-
-            <!-- PRESET SHORTCUTS -->
-            <div class="dr-presets">
-                <label>Quick start<button type="button" class="dr-tt" aria-label="What does this do?">?<span class="dr-tt-card">Three preset configurations of the discipline. Each preset sets <strong>sell percentile / rebuy percentile</strong> in one click; you can then adjust the sliders below. Conservative trades more often at less extreme prices; Aggressive at extremes; Standard is the historical-frequency middle ground. Every cycle sells the entire position and rebuys it back &mdash; results scale linearly to whatever portion of your stack you'd actually run the discipline on.</span></button></label>
-                <div class="dr-preset-btns">
-                    <button class="dr-preset-btn" data-preset="conservative">
-                        <span class="dr-preset-name">Conservative</span>
-                        <span class="dr-preset-meta">70 / 40</span>
-                    </button>
-                    <button class="dr-preset-btn active" data-preset="standard">
-                        <span class="dr-preset-name">Standard</span>
-                        <span class="dr-preset-meta">80 / 50</span>
-                    </button>
-                    <button class="dr-preset-btn" data-preset="aggressive">
-                        <span class="dr-preset-name">Aggressive</span>
-                        <span class="dr-preset-meta">90 / 20</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- THRESHOLD SLIDERS -->
-            <div class="dr-thresholds">
-                <div class="dr-field">
-                    <label>Sell percentile <span id="drSellPctReadout" class="dr-field-readout">80th percentile</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">The price-to-trend ratio at-or-above which you sell. The 80th percentile means selling when bitcoin is priced higher than 80% of historical days, relative to its long-term Power Law trend. <strong>Higher percentile = rarer triggers at more extreme prices; lower percentile = more frequent triggers at less extreme prices.</strong></span></button></label>
-                    <input type="range" id="drSellPct" min="60" max="95" value="80" step="5">
-                    <p id="drSellPctExplainer" class="dr-field-explainer"></p>
-                </div>
-                <div class="dr-field">
-                    <label>Rebuy percentile <span id="drRebuyPctReadout" class="dr-field-readout">50th percentile</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">The price-to-trend ratio at-or-below which you rebuy after a sell. The 50th percentile is the historical median (~0.87&times; trend). <strong>Lower percentile = waits for deeper drawdowns: more BTC captured per rebuy when it fires, but historically fired less often.</strong></span></button></label>
-                    <input type="range" id="drRebuyPct" min="5" max="55" value="50" step="5">
-                    <p id="drRebuyPctExplainer" class="dr-field-explainer"></p>
-                </div>
-            </div>
-
-            <!-- ACCOUNT TYPE + CONDITIONAL TAX RATE -->
-            <div class="dr-account-section">
-                <div class="dr-account-row">
-                    <label>Account type<button type="button" class="dr-tt" aria-label="About this input">?<span class="dr-tt-card"><strong>Retirement:</strong> a Roth IRA, traditional IRA, 401(k), or similar tax-advantaged wrapper &mdash; sells generate no immediate tax, gains compound the bitcoin position without leakage. <strong>Regular:</strong> a standard taxable account &mdash; each sell triggers capital gains tax on realized gains since position established (or last rebought, weighted-average cost basis).</span></button></label>
-                    <div class="dr-toggle-group">
-                        <button class="dr-toggle-btn active" data-account="retirement">Retirement</button>
-                        <button class="dr-toggle-btn" data-account="regular">Regular</button>
-                    </div>
-                </div>
-                <div class="dr-tax-row" id="drTaxRow" style="display:none">
-                    <label>Tax rate <span id="drTaxRateValue" class="dr-field-readout">15%</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">Your effective marginal capital gains tax rate. US federal long-term gains run 0&ndash;20% plus state. Short-term gains (held under one year) are taxed as ordinary income. Use whatever rate matches your jurisdiction and bracket.</span></button></label>
-                    <input type="range" id="drTaxRate" min="0" max="40" value="15" step="1">
                 </div>
             </div>
 
