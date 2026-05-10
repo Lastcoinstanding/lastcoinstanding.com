@@ -127,7 +127,7 @@ section:first-of-type { border-top: none; }
   max-width: 700px;
   margin: 0 auto;
 }
-.hero .subtitle em { color: var(--ink); font-style: italic; }
+.hero .subtitle em { color: var(--amber); font-style: italic; }
 
 /* Section labels */
 .section-label { display: block; margin-bottom: 0.7rem; }
