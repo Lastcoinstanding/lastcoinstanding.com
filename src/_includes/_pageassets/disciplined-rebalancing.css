@@ -1238,16 +1238,63 @@ input[type="range"]::-moz-range-track {
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 6px;
 }
+.dr-hist-signals-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.8rem;
+    margin-bottom: 0.6rem;
+    flex-wrap: wrap;
+}
 .dr-hist-signals-label {
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 1.4px;
     color: var(--text-muted);
-    margin-bottom: 0.6rem;
     /* The label hosts a tooltip — let the trigger live alongside text */
     display: flex;
     align-items: center;
     gap: 0.1rem;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+/* Era toggle — pill-button group at the top-right of the historical
+ * signals header. Picks the historical window the table reflects:
+ * 'Full record (2010+)' or 'Since 2015'. State persists across visits. */
+.dr-era-toggle {
+    display: inline-flex;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 14px;
+    overflow: hidden;
+    flex: 0 0 auto;
+}
+.dr-era-btn {
+    background: transparent;
+    border: 0;
+    padding: 0.32rem 0.75rem;
+    font-family: inherit;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease;
+    line-height: 1.2;
+}
+.dr-era-btn + .dr-era-btn { border-left: 1px solid rgba(255,255,255,0.08); }
+.dr-era-btn:hover { background: rgba(255,255,255,0.03); color: var(--text); }
+.dr-era-btn.active {
+    background: rgba(224,148,34,0.18);
+    color: var(--amber);
+    font-weight: 500;
+}
+.dr-era-btn-detail {
+    color: inherit;
+    opacity: 0.7;
+    margin-left: 0.18rem;
+    font-weight: 400;
+}
+@media (max-width: 540px){
+    .dr-era-btn { padding: 0.3rem 0.55rem; font-size: 0.68rem; }
+    .dr-era-btn-detail { display: none; }
 }
 .dr-hist-signals-headline {
     font-size: 0.88rem;

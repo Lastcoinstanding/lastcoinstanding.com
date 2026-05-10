@@ -846,7 +846,18 @@
     chart.update('none');
   }
 
-  // Read account-type / tax-rate from the DOM. These live in the
+  // Era state — controls the historical window the table + Today row +
+  // summary + volatility note all reflect. Persists to localStorage so a
+  // returning reader who switched to 'since-2015' last visit stays there.
+  // Default = 'full' (full historical record from 2010+).
+  var startOf2015Day = (Date.UTC(2015, 0, 1) / 1000 - GENESIS_TS) / 86400;
+  var currentEra = 'full';
+  try {
+    var storedEra = localStorage.getItem('dr:era');
+    if(storedEra === 'since-2015' || storedEra === 'full') currentEra = storedEra;
+  } catch(e){}
+
+  // Read account-type / tax-rate / era from the DOM. These live in the
   // calculator IIFE's controls; the channel viz doesn't own them, so
   // we read them directly each backtest run.
   function readBacktestParams(){
@@ -854,7 +865,8 @@
     var accountType = acctBtn ? acctBtn.dataset.account : 'retirement';
     var trEl = document.getElementById('drTaxRate');
     var taxRate = trEl ? parseFloat(trEl.value) / 100 : 0;
-    return { accountType: accountType, taxRate: taxRate };
+    var minDay = currentEra === 'since-2015' ? startOf2015Day : null;
+    return { accountType: accountType, taxRate: taxRate, minDay: minDay };
   }
 
   // Run the historical backtest at the user's current settings and
@@ -862,7 +874,7 @@
   // "Historical signals at your current settings" summary block.
   function updateBacktest(sellRatio, rebuyRatio){
     var params = readBacktestParams();
-    var bt = runHistoricalBacktest(sellRatio, rebuyRatio, params.accountType, params.taxRate);
+    var bt = runHistoricalBacktest(sellRatio, rebuyRatio, params.accountType, params.taxRate, params.minDay);
     var hSells = [], hRebuys = [];
     bt.trades.forEach(function(t){
       var pt = { x: t.day, y: t.price };
@@ -921,7 +933,11 @@
     }
 
     // ── HEADLINE ──
-    var html = '<p class="dr-hist-signals-headline">At your current settings (sell ' + sellPct + 'th &middot; rebuy ' + rebuyPct + 'th), starting from <strong>1.00 BTC</strong>, the strategy would have fired <strong>' + bt.sellsCount + ' sell signal' + (bt.sellsCount === 1 ? '' : 's') + '</strong> and <strong>' + bt.rebuysCount + ' rebuy signal' + (bt.rebuysCount === 1 ? '' : 's') + '</strong> across ~15 years of bitcoin history.</p>';
+    var eraSpan = currentEra === 'since-2015'
+      ? 'across the post-2015 record (~11 years)'
+      : 'across ~15 years of bitcoin history';
+    var startSpan = currentEra === 'since-2015' ? '<strong>1.00 BTC in 2015</strong>' : '<strong>1.00 BTC</strong>';
+    var html = '<p class="dr-hist-signals-headline">At your current settings (sell ' + sellPct + 'th &middot; rebuy ' + rebuyPct + 'th), starting from ' + startSpan + ', the strategy would have fired <strong>' + bt.sellsCount + ' sell signal' + (bt.sellsCount === 1 ? '' : 's') + '</strong> and <strong>' + bt.rebuysCount + ' rebuy signal' + (bt.rebuysCount === 1 ? '' : 's') + '</strong> ' + eraSpan + '.</p>';
 
     // ── TABLE ──
     html += '<div class="dr-hist-table-wrap"><table class="dr-hist-table">';
@@ -1016,9 +1032,16 @@
          +  '</div>';
 
     // ── VOLATILITY-COMPRESSION NOTE ──
-    html += '<div class="dr-hist-volatility-note">'
-         +    '<p><strong>Why the post-2015 column matters.</strong> Bitcoin&rsquo;s cycle amplitudes have shrunk dramatically &mdash; Cycle 1 peaked near 8&times; trend in 2011, recent cycles closer to 2&times;. The full-record column reflects an era of extreme volatility that won&rsquo;t repeat at the same magnitudes. The post-2015 column reflects the market that volatility compression has produced, and that the next cycle is more likely to resemble. <a href="/the-power-law#theory">See the Power Law Theory tab</a> for the underlying math.</p>'
-         +  '</div>';
+    // Adapts to current era. In full-record mode it argues for why the
+    // post-2015 view matters; in since-2015 mode it points the user
+    // toward what the full record would expose.
+    var volNoteHtml;
+    if(currentEra === 'since-2015'){
+      volNoteHtml = '<p><strong>You&rsquo;re viewing the post-volatility-compression era.</strong> Bitcoin&rsquo;s cycle amplitudes have shrunk dramatically over time &mdash; Cycle 1 peaked near 8&times; trend in 2011, recent cycles closer to 2&times;. This view excludes the early-history cycles whose magnitudes likely won&rsquo;t repeat. Switching to the full record above shows what would have happened across all of bitcoin&rsquo;s history including those extreme cycles &mdash; the strategy&rsquo;s structural worst case. <a href="/the-power-law#theory">See the Power Law Theory tab</a> for the underlying math.</p>';
+    } else {
+      volNoteHtml = '<p><strong>Why the post-2015 view matters.</strong> Bitcoin&rsquo;s cycle amplitudes have shrunk dramatically &mdash; Cycle 1 peaked near 8&times; trend in 2011, recent cycles closer to 2&times;. The full-record view above reflects an era of extreme volatility that won&rsquo;t repeat at the same magnitudes. Switching to <em>Since 2015</em> reflects the market that volatility compression has produced, and that the next cycle is more likely to resemble. <a href="/the-power-law#theory">See the Power Law Theory tab</a> for the underlying math.</p>';
+    }
+    html += '<div class="dr-hist-volatility-note">' + volNoteHtml + '</div>';
 
     summaryEl.innerHTML = html;
   }
@@ -1203,6 +1226,32 @@
       setTimeout(updateThresholds, 0);
     });
   });
+
+  // ─── ERA TOGGLE ───
+  // Two buttons in the historical-signals header: 'Full record (2010+)'
+  // and 'Since 2015'. Clicking switches the window the table + Today
+  // row + summary + volatility note all reflect. State persists in
+  // localStorage so a returning reader stays in the era they last chose.
+  var eraButtons = document.querySelectorAll('.dr-era-btn');
+  function syncEraButtons(){
+    eraButtons.forEach(function(b){
+      b.classList.toggle('active', b.dataset.era === currentEra);
+      b.setAttribute('aria-pressed', b.dataset.era === currentEra ? 'true' : 'false');
+    });
+  }
+  eraButtons.forEach(function(b){
+    b.addEventListener('click', function(){
+      var newEra = b.dataset.era;
+      if(newEra === currentEra) return;
+      currentEra = newEra;
+      try { localStorage.setItem('dr:era', currentEra); } catch(e){}
+      syncEraButtons();
+      updateThresholds();
+    });
+  });
+  // Sync initial active state to whatever currentEra was loaded as
+  // (may have been 'since-2015' if previously stored).
+  syncEraButtons();
 
   // (No 'dr:simResult' listener — calculator IIFE no longer dispatches
   // forward-simulation results since the historical-only redesign.
