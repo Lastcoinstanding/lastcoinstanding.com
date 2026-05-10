@@ -139,6 +139,18 @@ eleventyComputed:
                     <div id="drHistSignals"></div>
                 </div>
 
+                <!-- ═══ PRESET COMPARISON ═══ -->
+                <!-- Three presets × two historical windows (full record / -->
+                <!-- since 2015). Color-graded × HODL cells make the dual- -->
+                <!-- window finding scannable. The 'since 2015' column is -->
+                <!-- the editorial anchor: every preset beats HODL when -->
+                <!-- the analysis is restricted to the post-volatility- -->
+                <!-- compression era. -->
+                <div class="dr-preset-comparison-block">
+                    <div class="dr-preset-comparison-label">The three presets, across two historical windows<button type="button" class="dr-tt" aria-label="What is this?">?<span class="dr-tt-card">Each preset run against (a) the full historical record from 2010 onward and (b) only cycles starting 2015 or later. Comparing the two columns shows how much of each preset&rsquo;s historical performance is driven by bitcoin&rsquo;s extreme early-volatility era vs. its post-volatility-compression maturation.</span></button></div>
+                    <div id="drPresetComparison"></div>
+                </div>
+
                 <div class="dr-channel-attribution">
                     <span class="dr-channel-attribution-label">Channel framework &amp; coefficients</span>
                     The Power Law channel &mdash; the floor at 0.42&times; trend, the upper band at 3&times; trend, and the daily-close convention &mdash; was developed by <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener"><strong>Matthew Me&zcaron;inskis</strong></a> at <a href="https://www.porkopolis.io" target="_blank" rel="noopener">Porkopolis Economics</a>. Coefficients used: <code>a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup></code>, <code>b&nbsp;=&nbsp;5.77</code>. See <a href="/the-power-law#channel">The Channel</a> for the canonical view.

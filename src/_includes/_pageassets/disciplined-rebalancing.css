@@ -1319,6 +1319,103 @@ input[type="range"]::-moz-range-track {
     .dr-hist-volatility-note p { font-size: 0.78rem; }
 }
 
+/* ─── PRESET COMPARISON BLOCK ─── */
+/* Three rows × two windows × color-graded × HODL cells, plus a
+ * direct-voice contextual paragraph below. The dual-window framing
+ * is the editorial anchor of the calculator tab. */
+.dr-preset-comparison-block {
+    margin-top: 1.4rem;
+    padding: 1rem 1.2rem;
+    background: rgba(255,255,255,0.015);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+}
+.dr-preset-comparison-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--text-muted);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+}
+.dr-preset-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 0.84rem;
+    color: var(--text-dim);
+    margin-bottom: 0.6rem;
+}
+.dr-preset-table thead th {
+    text-align: left;
+    font-weight: 500;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    padding: 0.35rem 0.6rem 0.4rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    white-space: nowrap;
+}
+.dr-preset-table tbody td {
+    padding: 0.55rem 0.6rem;
+    border-bottom: 1px dashed rgba(255,255,255,0.05);
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.dr-preset-table tbody tr:last-child td { border-bottom: none; }
+.dr-preset-table .dr-pc-preset { color: var(--text); }
+.dr-preset-table .dr-pc-preset .dr-pc-spec {
+    color: var(--text-muted);
+    margin-left: 0.4rem;
+    font-size: 0.78rem;
+}
+.dr-preset-table .dr-pc-trades { color: var(--text-muted); font-size: 0.78rem; }
+.dr-preset-table .dr-pc-window {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    border-radius: 3px;
+}
+/* × HODL cell colors — tuned to convey the meta-finding at-a-glance */
+.dr-pc-window.dr-mult-red {
+    background: rgba(192,57,43,0.18);
+    color: #e88575;
+}
+.dr-pc-window.dr-mult-amber {
+    background: rgba(224,148,34,0.16);
+    color: #e0a85a;
+}
+.dr-pc-window.dr-mult-green {
+    background: rgba(39,174,96,0.16);
+    color: #5dc17e;
+}
+.dr-pc-window.dr-mult-bright-green {
+    background: rgba(39,174,96,0.28);
+    color: #7ee09c;
+}
+
+.dr-preset-commentary p {
+    margin: 0.6rem 0 0;
+    font-size: 0.92rem;
+    line-height: 1.62;
+    color: var(--text-dim);
+}
+.dr-preset-commentary p:first-child { margin-top: 0.7rem; }
+.dr-preset-commentary p strong { color: var(--text); }
+.dr-preset-commentary p em { color: var(--amber); font-style: normal; font-weight: 500; }
+
+@media (max-width: 720px){
+    .dr-preset-table { font-size: 0.78rem; }
+    .dr-preset-table thead th { font-size: 0.62rem; padding: 0.3rem 0.45rem; }
+    .dr-preset-table tbody td { padding: 0.45rem 0.45rem; }
+    .dr-preset-table .dr-pc-preset .dr-pc-spec { font-size: 0.72rem; }
+    .dr-preset-table .dr-pc-trades { font-size: 0.72rem; }
+    .dr-preset-commentary p { font-size: 0.84rem; }
+}
+
 /* Porkopolis attribution — scoped to this page; mirrors the
  * .porkopolis-credit treatment on /the-power-law without sharing CSS. */
 .dr-channel-attribution {
