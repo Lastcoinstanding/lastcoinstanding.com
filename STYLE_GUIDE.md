@@ -89,6 +89,35 @@ All sizes use `clamp()` for fluid responsive scaling. The first value is the mob
 | **Subsection h3** | `clamp(1.4rem, 2.4vw, 1.8rem)` | 500 | Mixed | Card titles, layer-card names |
 | **Section closer flourish** | `1.35rem` | 500 | Mixed | "Six components. Three functions. One money." — single-line tonal grace note before a CTA |
 
+**Canonical hero patterns.** Two patterns, one per page-type. Pages that drift from these read as visually inconsistent with the rest of the site.
+
+**Pattern 1 — Editorial hero** (long-form prose pages: Power Law, Half-Life, Melting Ice Cube, Fixed Pie, Migration, Money Trees, Bitcoin Horizon, Money Trees, About):
+
+```css
+.page-header h1   /* clamp(2rem, 4vw, 3.4rem), Cormorant Garamond, weight 500 */
+.subtitle         /* clamp(1.05rem, 2vw, 1.3rem), Source Serif 4 italic, weight 400 */
+                  /* color text-dim, max-width 700px, line-height 1.6 */
+```
+
+No eyebrow caps-label above the h1 (the page name lives in the nav and the `<title>`). No `min-height` on the hero — let content size the section naturally. Hero padding canonical: `3rem 0 2rem` or similar; nothing approaching `60vh`.
+
+**Pattern 2 — Tool/calculator hero** (interactive pages: Half-Life-as-tool, BvRE, Disciplined Rebalancing, Bitcoin Retirement):
+
+```css
+.page-header h1   /* same as Pattern 1 */
+.subtitle         /* 1rem, Inter regular (sans-serif), weight 400 */
+                  /* color text-dim, max-width ~600px, line-height 1.7 */
+```
+
+Inter for the subtitle (not Source Serif italic) — the pragmatic register matches the calculator's nature. Below the subtitle: `FOR EXPLORATION ONLY` disclaimer banner, then tab navigation. Same no-eyebrow / no-min-height rules as Pattern 1.
+
+**Anti-patterns (caught in audit, do not introduce):**
+- `min-height: 60vh` (or any hero min-height) — leaves no content above the fold
+- Caps eyebrow above h1 — duplicates the nav
+- h1 max larger than `3.4rem` — drifts from the canonical scale
+- `font-weight: 300` on subtitle Source Serif — too thin, breaks the Power Law-as-reference pattern; canonical is `400`
+- Separate `.intro` section between hero and first content section with its own border-top — creates visible disconnect; lede paragraph should sit naturally after the subtitle
+
 ### 2.2 Essay body (EB Garamond, on cream)
 
 | Slot | Size | Weight | Notes |
