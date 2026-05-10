@@ -1339,8 +1339,38 @@
     var rP = parseInt(elRebuyPct.value);
     var sR = percentileToRatio(sP);
     var rR = percentileToRatio(rP);
-    elSellPctReadout.innerHTML = sP + 'th &middot; ~' + sR.toFixed(2) + '× trend &middot; ' + (100-sP) + '% of history';
-    elRebuyPctReadout.innerHTML = rP + 'th &middot; ~' + rR.toFixed(2) + '× trend &middot; ' + (rP === 50 ? 'historical median' : (rP < 50 ? rP + '% below trend' : 'above trend'));
+
+    // Today's threshold prices in absolute USD — concrete anchor for
+    // what the slider value means right now. Trend at today's day
+    // sets the reference; the percentile-derived ratio scales it.
+    var todayD = (Date.now()/1000 - GENESIS_TS) / 86400;
+    var trendNow = plPrice(todayD);
+    var sellThresholdToday = sR * trendNow;
+    var rebuyThresholdToday = rR * trendNow;
+    function fmtThresh(p){
+      if(p >= 1e6) return '$' + (p/1e6).toFixed(2) + 'M';
+      if(p >= 1000) return '$' + Math.round(p/1000) + 'K';
+      return '$' + p.toFixed(0);
+    }
+
+    // Tight inline readout — just the percentile name
+    elSellPctReadout.innerHTML = sP + 'th percentile';
+    elRebuyPctReadout.innerHTML = rP + 'th percentile';
+
+    // Full prose explainer below each slider — same data points the
+    // old inline readout carried, but spelled out for readers who'd
+    // otherwise need to do mental math (per session 2026-05-09 user
+    // feedback). Updates live with slider movement.
+    var sellEx = document.getElementById('drSellPctExplainer');
+    if(sellEx){
+      sellEx.innerHTML = 'Sell trigger fires when bitcoin reaches the <strong>' + sP + 'th percentile</strong> of its Power Law channel position &mdash; about <strong>' + sR.toFixed(2) + '&times; trend</strong>, or roughly <strong>' + fmtThresh(sellThresholdToday) + '</strong> at today&rsquo;s trend value. Bitcoin has historically traded at-or-above this level only <strong>' + (100-sP) + '%</strong> of the time.';
+    }
+    var rebuyEx = document.getElementById('drRebuyPctExplainer');
+    if(rebuyEx){
+      var medianClause = (rP === 50) ? ' &mdash; the historical median' : '';
+      rebuyEx.innerHTML = 'Rebuy trigger fires when bitcoin falls back to the <strong>' + rP + 'th percentile</strong>' + medianClause + ' &mdash; about <strong>' + rR.toFixed(2) + '&times; trend</strong>, or roughly <strong>' + fmtThresh(rebuyThresholdToday) + '</strong> at today&rsquo;s trend value. Bitcoin has historically traded at-or-below this level <strong>' + rP + '%</strong> of the time.';
+    }
+
     if(elTaxRateValue) elTaxRateValue.textContent = elTaxRate.value + '%';
   }
   // updateStatBlock removed — drStatBlock element is gone.

@@ -179,12 +179,14 @@ eleventyComputed:
             <!-- THRESHOLD SLIDERS -->
             <div class="dr-thresholds">
                 <div class="dr-field">
-                    <label>Sell percentile <span id="drSellPctReadout" class="dr-field-readout">80th &middot; ~1.78&times; trend &middot; 20% of history</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">The price-to-trend ratio at-or-above which you sell. The 80th percentile means selling when bitcoin is priced higher than 80% of historical days, relative to its long-term Power Law trend. <strong>Higher percentile = rarer triggers at more extreme prices; lower percentile = more frequent triggers at less extreme prices.</strong></span></button></label>
+                    <label>Sell percentile <span id="drSellPctReadout" class="dr-field-readout">80th percentile</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">The price-to-trend ratio at-or-above which you sell. The 80th percentile means selling when bitcoin is priced higher than 80% of historical days, relative to its long-term Power Law trend. <strong>Higher percentile = rarer triggers at more extreme prices; lower percentile = more frequent triggers at less extreme prices.</strong></span></button></label>
                     <input type="range" id="drSellPct" min="60" max="95" value="80" step="5">
+                    <p id="drSellPctExplainer" class="dr-field-explainer"></p>
                 </div>
                 <div class="dr-field">
-                    <label>Rebuy percentile <span id="drRebuyPctReadout" class="dr-field-readout">50th &middot; ~0.87&times; trend &middot; historical median</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">The price-to-trend ratio at-or-below which you rebuy after a sell. The 50th percentile is the historical median (~0.87&times; trend). <strong>Lower percentile = waits for deeper drawdowns: more BTC captured per rebuy when it fires, but historically fired less often.</strong></span></button></label>
+                    <label>Rebuy percentile <span id="drRebuyPctReadout" class="dr-field-readout">50th percentile</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">The price-to-trend ratio at-or-below which you rebuy after a sell. The 50th percentile is the historical median (~0.87&times; trend). <strong>Lower percentile = waits for deeper drawdowns: more BTC captured per rebuy when it fires, but historically fired less often.</strong></span></button></label>
                     <input type="range" id="drRebuyPct" min="5" max="55" value="50" step="5">
+                    <p id="drRebuyPctExplainer" class="dr-field-explainer"></p>
                 </div>
             </div>
 

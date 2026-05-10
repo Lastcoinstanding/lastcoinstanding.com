@@ -456,6 +456,28 @@ input[type="range"]::-moz-range-track {
     font-family: 'SF Mono', 'Monaco', monospace;
 }
 
+/* Full-sentence prose explainer below a slider — same data points the
+ * inline readout carried, but spelled out for readers who prefer a
+ * natural-language description over a compact spec. Updates live with
+ * slider movement. */
+.dr-field-explainer {
+    margin: 0.45rem 0 0;
+    font-size: 0.78rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+    padding: 0.5rem 0.7rem;
+    background: rgba(255,255,255,0.02);
+    border-left: 2px solid rgba(255,255,255,0.08);
+    border-radius: 0 3px 3px 0;
+}
+.dr-field-explainer strong {
+    color: var(--text-dim);
+    font-weight: 500;
+}
+@media (max-width: 720px){
+    .dr-field-explainer { font-size: 0.74rem; padding: 0.45rem 0.6rem; }
+}
+
 /* Text input with unit */
 .dr-input-with-unit {
     position: relative;
