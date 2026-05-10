@@ -1026,8 +1026,11 @@
       }
     }
 
+    var summarySpan = currentEra === 'since-2015'
+      ? 'Across the post-2015 record (~11 years)'
+      : 'Across ~15 years';
     html += '<div class="dr-hist-summary ' + summaryClass + '">'
-         +    '<p>Across ~15 years and <strong>' + bt.cyclesCompleted + ' completed cycle' + (bt.cyclesCompleted === 1 ? '' : 's') + '</strong>, this configuration ended with <strong>' + fmtBTC(bt.btcHeld) + ' BTC</strong>'
+         +    '<p>' + summarySpan + ' and <strong>' + bt.cyclesCompleted + ' completed cycle' + (bt.cyclesCompleted === 1 ? '' : 's') + '</strong>, this configuration ended with <strong>' + fmtBTC(bt.btcHeld) + ' BTC</strong>'
          +    (bt.cashHeld > 1 ? ' plus <strong>' + fmtCash(bt.cashHeld) + '</strong> in cash' : '')
          +    ' &mdash; ' + multStr + ' (' + directionWord + ' ' + deltaPctStr + ' vs. holding through).' + taxFootnote + '</p>'
          +    '<p class="dr-hist-summary-honest">A fact about the historical record &mdash; not a forecast.</p>'
