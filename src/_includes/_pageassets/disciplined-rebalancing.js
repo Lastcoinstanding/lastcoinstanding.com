@@ -206,6 +206,125 @@
 
 })();
 
+// ═══════ QUESTION-TAB CHANNEL CHART ═══════
+//
+// Simplified orientation chart for Tab 1 (The Question). Shows just
+// floor / trend / upper / historical-price — no user threshold lines,
+// no trigger markers, no projection path. Job is purely to make the
+// channel concept visible before the essay's structural argument
+// unfolds below. Same logarithmic Y-axis and year-formatting X-axis
+// as the Calculator-tab chart so visual register is consistent across
+// tabs without sharing chart instance state.
+//
+// Lazy-render-friendly: Tab 1 is the default active tab so the chart
+// renders on initial page load. If the user lands on a different tab
+// via URL hash, the canvas still exists but is in an inactive (hidden)
+// tab-content; Chart.js handles that fine.
+(function(){
+  var canvas = document.getElementById('drQuestionChannelChart');
+  if(!canvas) return;
+  if(typeof Chart === 'undefined') return;
+
+  var amber  = '#e09422';
+  var rust   = '#c0392b';
+  var gold   = '#e8c820';
+  var muted  = 'rgba(160,160,160,0.55)';
+  var priceColor = 'rgba(232,224,210,0.55)';
+
+  // X-domain: full historical record. No forward projection on this
+  // chart — the Question tab discusses the historical channel, not
+  // future paths.
+  var minD = PL_DATA[0][0];
+  var maxD = PL_DATA[PL_DATA.length - 1][0];
+
+  // Band data sampled every 30 days for performance (matches the
+  // Calculator chart cadence).
+  var trend = [], floor = [], upper = [];
+  for(var d = minD; d <= maxD; d += 30){
+    var t = plPrice(d);
+    trend.push({x: d, y: t});
+    floor.push({x: d, y: t * PL_FLOOR});
+    upper.push({x: d, y: t * PL_CEIL});
+  }
+  var historicalData = PL_DATA.map(function(p){ return {x: p[0], y: p[1]}; });
+
+  // Tooltip year-formatter: matches the X-axis tick callback.
+  function dayToYear(d){
+    return new Date(GENESIS_TS*1000 + d*86400*1000).getFullYear();
+  }
+  function dayToDateLabel(d){
+    var date = new Date(GENESIS_TS*1000 + d*86400*1000);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[date.getMonth()] + ' ' + date.getFullYear();
+  }
+  function fmtUSD(v){
+    if(v >= 1e6) return '$' + (v/1e6).toFixed(1) + 'M';
+    if(v >= 1000) return '$' + (v/1000).toFixed(v >= 10000 ? 0 : 1) + 'K';
+    if(v >= 1) return '$' + v.toFixed(2);
+    return '$' + v.toFixed(3);
+  }
+
+  new Chart(canvas, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        { label: 'Floor (0.42× trend)', data: floor, borderColor: rust, borderWidth: 1.4, borderDash: [6, 3], pointRadius: 0, showLine: true, tension: 0.2, order: 4 },
+        { label: 'Trend',               data: trend, borderColor: amber, borderWidth: 2,                  pointRadius: 0, showLine: true, tension: 0.2, order: 3 },
+        { label: 'Upper (3.0× trend)',  data: upper, borderColor: gold,  borderWidth: 1.2, borderDash: [1, 5], pointRadius: 0, showLine: true, tension: 0.2, order: 5 },
+        { label: 'Historical price',    data: historicalData, borderColor: priceColor, borderWidth: 1.1, pointRadius: 0, showLine: true, tension: 0.15, order: 1 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(20,20,20,0.95)',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          padding: 10,
+          titleColor: '#e0e0e0',
+          bodyColor: '#c8c8c8',
+          callbacks: {
+            title: function(items){ return dayToDateLabel(items[0].parsed.x); },
+            label: function(ctx){ return ctx.dataset.label + ': ' + fmtUSD(ctx.parsed.y); }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          title: { display: true, text: 'Year', color: muted, font: { size: 10 } },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          min: minD,
+          max: maxD,
+          ticks: {
+            color: muted,
+            maxTicksLimit: 10,
+            callback: function(v){ return dayToYear(v); }
+          }
+        },
+        y: {
+          type: 'logarithmic',
+          title: { display: true, text: 'BTC price (USD)', color: muted, font: { size: 10 } },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: {
+            color: muted,
+            callback: function(v){
+              if(v >= 1e6) return '$' + (v/1e6) + 'M';
+              if(v >= 1000) return '$' + (v/1000) + 'K';
+              if(v >= 1) return '$' + v;
+              return '$' + v.toFixed(2);
+            }
+          }
+        }
+      }
+    }
+  });
+})();
+
 // ═══════ CHANNEL VIZ — Calculator tab anchor visualization ═══════
 //
 // Shows the Power Law channel (floor / trend / upper) with historical
