@@ -231,22 +231,58 @@
   var muted  = 'rgba(160,160,160,0.55)';
   var priceColor = 'rgba(232,224,210,0.55)';
 
-  // X-domain: full historical record. No forward projection on this
-  // chart — the Question tab discusses the historical channel, not
-  // future paths.
+  // X-domain: full historical record + ~5 years of forward projection.
+  // The projection isn't a forecast — it's the channel structure
+  // extended through plPrice() — so readers can see that the channel
+  // doesn't stop at today; it's a structural argument about where
+  // future price action will likely fall, not just a back-fit to
+  // history.
   var minD = PL_DATA[0][0];
-  var maxD = PL_DATA[PL_DATA.length - 1][0];
+  var todayD = PL_DATA[PL_DATA.length - 1][0];  // last real-price day
+  var futureD = todayD + (5 * 365);             // ~5 years projection
 
   // Band data sampled every 30 days for performance (matches the
-  // Calculator chart cadence).
+  // Calculator chart cadence). Bands extend through futureD; the
+  // historical price line ends at todayD (real data only).
   var trend = [], floor = [], upper = [];
-  for(var d = minD; d <= maxD; d += 30){
+  for(var d = minD; d <= futureD; d += 30){
     var t = plPrice(d);
     trend.push({x: d, y: t});
     floor.push({x: d, y: t * PL_FLOOR});
     upper.push({x: d, y: t * PL_CEIL});
   }
   var historicalData = PL_DATA.map(function(p){ return {x: p[0], y: p[1]}; });
+
+  // Subtle vertical 'today' line plugin — visually separates the
+  // historical record from the projection so the bands' continuation
+  // forward reads as 'the structure extends' rather than 'I forgot
+  // to clip the line.'
+  var todayLinePlugin = {
+    id: 'qChartTodayLine',
+    afterDatasetsDraw: function(chart){
+      var xScale = chart.scales.x;
+      if(!xScale) return;
+      var x = xScale.getPixelForValue(todayD);
+      if(x < xScale.left || x > xScale.right) return;
+      var ctx = chart.ctx;
+      var top = chart.chartArea.top;
+      var bot = chart.chartArea.bottom;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, top);
+      ctx.lineTo(x, bot);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.font = '10px Inter, system-ui, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('today', x + 4, top + 10);
+      ctx.restore();
+    }
+  };
 
   // Tooltip year-formatter: matches the X-axis tick callback.
   function dayToYear(d){
@@ -266,6 +302,7 @@
 
   new Chart(canvas, {
     type: 'scatter',
+    plugins: [todayLinePlugin],
     data: {
       datasets: [
         { label: 'Floor (0.42× trend)', data: floor, borderColor: rust, borderWidth: 1.4, borderDash: [6, 3], pointRadius: 0, showLine: true, tension: 0.2, order: 4 },
@@ -277,7 +314,12 @@
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
+      // 'x' (not 'index') aligns the four datasets by X-coordinate, not array
+      // index. The bands are sampled every 30 days but historicalData is daily,
+      // so index-based alignment was making items[0].parsed.x diverge from the
+      // cursor's actual X by years. With mode 'x' the cursor's X is canonical
+      // and each dataset's nearest point at that X is what appears in the tooltip.
+      interaction: { mode: 'x', intersect: false },
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -299,7 +341,7 @@
           title: { display: true, text: 'Year', color: muted, font: { size: 10 } },
           grid: { color: 'rgba(255,255,255,0.04)' },
           min: minD,
-          max: maxD,
+          max: futureD,
           ticks: {
             color: muted,
             maxTicksLimit: 10,
