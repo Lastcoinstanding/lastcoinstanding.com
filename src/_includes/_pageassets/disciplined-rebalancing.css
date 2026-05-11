@@ -1481,6 +1481,74 @@ input[type="range"]::-moz-range-track {
 /* Three rows × two windows × color-graded × HODL cells, plus a
  * direct-voice contextual paragraph below. The dual-window framing
  * is the editorial anchor of the calculator tab. */
+/* Account-state badge — appears at the top of the historical signals
+ * summary block, making the account-type assumption visible right next
+ * to the result. Click flips the account-type toggle (delegated handler
+ * in the JS). Two state variants for the colour treatment.
+ *
+ * Retirement variant: subtle amber, signals "the analytical baseline".
+ * Regular variant: slightly more muted, signals "you've taken on tax drag". */
+.dr-account-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0 0 0.65rem 0;
+    padding: 0.35rem 0.7rem 0.35rem 0.6rem;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 3px;
+    font-family: inherit;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: background 0.14s, border-color 0.14s, color 0.14s;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.dr-account-badge:hover,
+.dr-account-badge:focus-visible {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.14);
+    color: var(--text);
+    outline: none;
+}
+.dr-account-badge-prefix {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+.dr-account-badge-value {
+    font-size: 0.86rem;
+    font-weight: 500;
+    color: var(--text);
+}
+.dr-account-badge-retirement .dr-account-badge-value { color: var(--amber); }
+.dr-account-badge-regular    .dr-account-badge-value { color: var(--text); }
+.dr-account-badge-flip {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.4px;
+    padding-left: 0.5rem;
+    border-left: 1px solid rgba(255,255,255,0.08);
+}
+.dr-account-badge:hover .dr-account-badge-flip,
+.dr-account-badge:focus-visible .dr-account-badge-flip {
+    color: var(--amber);
+}
+@media (max-width: 540px){
+    .dr-account-badge {
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        padding: 0.3rem 0.55rem;
+    }
+    .dr-account-badge-flip {
+        border-left: none;
+        padding-left: 0;
+        flex-basis: 100%;
+    }
+}
+
 .dr-preset-comparison-block {
     margin-top: 1.4rem;
     padding: 1rem 1.2rem;
