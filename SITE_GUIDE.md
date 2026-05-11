@@ -160,7 +160,7 @@ The site is built by **Eleventy 3.1.5** from `src/` templates, deployed by Cloud
 - `base64 -w 0` on Linux (prevents line-wrap corruption of binary files)
 - Raw file fetches via `raw.githubusercontent.com`
 - Repo: `Lastcoinstanding/lastcoinstanding.com`, branch `main`
-- PAT scope needed: `public_repo`. **Rotate PAT after work session.**
+- PAT scope needed: `public_repo` (or fine-grained equivalent: `Contents: read/write` + `Pull requests: read/write`, scoped to this repo). **PATs are reusable across multi-day sessions** for this personal site — paste once, reuse across conversations as needed; rotate every ~30 days or when expiration warrants, not after each session. The blast radius of a leaked token is bounded to this public-content repo and fully recoverable from git history, which is what makes the convenience tradeoff reasonable here.
 
 ### Cloudflare Pages caching
 
