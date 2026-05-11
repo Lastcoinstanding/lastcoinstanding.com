@@ -241,17 +241,42 @@
   var todayD = PL_DATA[PL_DATA.length - 1][0];  // last real-price day
   var futureD = todayD + (5 * 365);             // ~5 years projection
 
-  // Band data sampled every 30 days for performance (matches the
-  // Calculator chart cadence). Bands extend through futureD; the
-  // historical price line ends at todayD (real data only).
-  var trend = [], floor = [], upper = [];
+  // All four datasets share the SAME X cadence (30-day stride). This
+  // is what unblocks mode:'index' for the tooltip — when datasets
+  // share X values, dataset[N] maps to the same X across all four,
+  // and the tooltip gets exactly one value per dataset at the cursor.
+  //
+  // Earlier attempts: mode:'index' with mismatched cadences (30-day
+  // bands + daily price) gave wrong dates; mode:'x' with the same
+  // mismatch gave duplicate entries because two adjacent dense
+  // samples often fell within the cursor's X tolerance. Uniform
+  // sampling makes both problems disappear.
+  //
+  // For the historical price line, the daily PL_DATA is binned into
+  // the 30-day grid by finding the nearest PL_DATA sample to each
+  // grid day. Projection-range grid days get null (Chart.js skips
+  // nulls when drawing and we filter them from tooltips below).
+  var priceByDay = {};
+  for(var pi = 0; pi < PL_DATA.length; pi++){
+    priceByDay[PL_DATA[pi][0]] = PL_DATA[pi][1];
+  }
+  function nearestPriceAt(d){
+    if(priceByDay[d] !== undefined) return priceByDay[d];
+    for(var off = 1; off <= 15; off++){
+      if(priceByDay[d - off] !== undefined) return priceByDay[d - off];
+      if(priceByDay[d + off] !== undefined) return priceByDay[d + off];
+    }
+    return null;
+  }
+
+  var trend = [], floor = [], upper = [], historicalData = [];
   for(var d = minD; d <= futureD; d += 30){
     var t = plPrice(d);
     trend.push({x: d, y: t});
     floor.push({x: d, y: t * PL_FLOOR});
     upper.push({x: d, y: t * PL_CEIL});
+    historicalData.push({x: d, y: d <= todayD ? nearestPriceAt(d) : null});
   }
-  var historicalData = PL_DATA.map(function(p){ return {x: p[0], y: p[1]}; });
 
   // Subtle vertical 'today' line plugin — visually separates the
   // historical record from the projection so the bands' continuation
@@ -308,18 +333,17 @@
         { label: 'Floor (0.42× trend)', data: floor, borderColor: rust, borderWidth: 1.4, borderDash: [6, 3], pointRadius: 0, showLine: true, tension: 0.2, order: 4 },
         { label: 'Trend',               data: trend, borderColor: amber, borderWidth: 2,                  pointRadius: 0, showLine: true, tension: 0.2, order: 3 },
         { label: 'Upper (3.0× trend)',  data: upper, borderColor: gold,  borderWidth: 1.2, borderDash: [1, 5], pointRadius: 0, showLine: true, tension: 0.2, order: 5 },
-        { label: 'Historical price',    data: historicalData, borderColor: priceColor, borderWidth: 1.1, pointRadius: 0, showLine: true, tension: 0.15, order: 1 }
+        { label: 'Historical price',    data: historicalData, borderColor: priceColor, borderWidth: 1.1, pointRadius: 0, showLine: true, tension: 0.15, order: 1, spanGaps: false }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      // 'x' (not 'index') aligns the four datasets by X-coordinate, not array
-      // index. The bands are sampled every 30 days but historicalData is daily,
-      // so index-based alignment was making items[0].parsed.x diverge from the
-      // cursor's actual X by years. With mode 'x' the cursor's X is canonical
-      // and each dataset's nearest point at that X is what appears in the tooltip.
-      interaction: { mode: 'x', intersect: false },
+      // mode:'index' is correct here because all four datasets share
+      // identical X values (uniform 30-day stride). Each dataset[N] maps
+      // to the same X, so the tooltip gets one value per dataset at the
+      // cursor's nearest grid day — no duplicates, no missing entries.
+      interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -331,7 +355,13 @@
           bodyColor: '#c8c8c8',
           callbacks: {
             title: function(items){ return dayToDateLabel(items[0].parsed.x); },
-            label: function(ctx){ return ctx.dataset.label + ': ' + fmtUSD(ctx.parsed.y); }
+            label: function(ctx){
+              // Skip null y-values — historicalData has nulls in the
+              // projection range; without this, the tooltip would show
+              // 'Historical price: $NaN' for any grid day past today.
+              if(ctx.parsed.y == null || isNaN(ctx.parsed.y)) return null;
+              return ctx.dataset.label + ': ' + fmtUSD(ctx.parsed.y);
+            }
           }
         }
       },
