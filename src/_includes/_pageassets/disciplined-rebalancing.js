@@ -1089,7 +1089,7 @@
     }
     function fmtMult(m){ return m.toFixed(2) + '×'; }
 
-    var html = '<table class="dr-preset-table">';
+    var html = '<div class="dr-preset-table-wrap"><table class="dr-preset-table">';
     html += '<thead><tr>'
          +    '<th class="dr-pc-preset">Preset</th>'
          +    '<th class="dr-pc-trades">Triggers</th>'
@@ -1119,7 +1119,7 @@
       html += '</tr>';
     });
 
-    html += '</tbody></table>';
+    html += '</tbody></table></div>';
 
     // ── CONTEXTUAL PARAGRAPH (direct voice) ──
     html += '<div class="dr-preset-commentary">'
