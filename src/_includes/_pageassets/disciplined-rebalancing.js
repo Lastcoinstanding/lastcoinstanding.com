@@ -1077,12 +1077,25 @@
   // strategy mostly fails" to "the strategy mostly works". The reader
   // is asked to judge which era the future will resemble.
   //
-  // Static once at page load — the comparison shows preset behavior
-  // against the historical record, which doesn't change as the user
-  // moves their personal sliders.
+  // Re-renders on account-type / tax-rate change so the dual-window
+  // multipliers reflect the user's current account assumption (per-
+  // setting sliders still don't affect this block — it shows the
+  // three named presets against the historical record).
   function renderPresetComparison(){
     var el = document.getElementById('drPresetComparison');
     if(!el) return;
+
+    // Read current account-type and tax-rate from DOM so the table
+    // reflects the user's assumption — same pattern as readBacktestParams
+    // for the historical-summary block above. Means the dual-window
+    // numbers move in lockstep with the per-setting summary and the
+    // user can't be looking at two different account assumptions in
+    // the same viewport.
+    var acctBtn = document.querySelector('[data-account].active');
+    var pcAccountType = acctBtn ? acctBtn.dataset.account : 'retirement';
+    var pcTrEl = document.getElementById('drTaxRate');
+    var pcTaxRate = pcTrEl ? parseFloat(pcTrEl.value) / 100 : 0;
+    var pcTaxPct = pcTrEl ? parseInt(pcTrEl.value) : 15;
 
     // Jan 1, 2015 in days-from-genesis. Hardcoded boundary — see
     // editorial rationale in the contextual paragraph below the table:
@@ -1107,7 +1120,13 @@
     }
     function fmtMult(m){ return m.toFixed(2) + '×'; }
 
-    var html = '<div class="dr-preset-table-wrap"><table class="dr-preset-table">';
+    // Caption: reflects the current account-type assumption so readers
+    // see what tax framing the multipliers below were computed under.
+    var captionHtml = (pcAccountType === 'retirement')
+      ? '<p class="dr-preset-caption"><strong>Retirement account</strong> &mdash; no per-sell tax. Multipliers below show pure cycle-multiplier behavior.</p>'
+      : '<p class="dr-preset-caption"><strong>Regular account &middot; ' + pcTaxPct + '% capital-gains tax</strong> per sell. Multipliers below include tax drag at every trigger.</p>';
+
+    var html = captionHtml + '<div class="dr-preset-table-wrap"><table class="dr-preset-table">';
     html += '<thead><tr>'
          +    '<th class="dr-pc-preset">Preset</th>'
          +    '<th class="dr-pc-trades">Triggers</th>'
@@ -1118,8 +1137,8 @@
     presets.forEach(function(p){
       var sR = percentileToRatio(p.sellPct);
       var rR = percentileToRatio(p.rebuyPct);
-      var btFull = runHistoricalBacktest(sR, rR, 'retirement', 0);
-      var bt2015 = runHistoricalBacktest(sR, rR, 'retirement', 0, startOf2015);
+      var btFull = runHistoricalBacktest(sR, rR, pcAccountType, pcTaxRate);
+      var bt2015 = runHistoricalBacktest(sR, rR, pcAccountType, pcTaxRate, startOf2015);
 
       // Cumulative position (BTC + cash-converted-to-BTC at latest price)
       // for fair × HODL — if the strategy ends mid-cycle holding cash,
@@ -1141,7 +1160,7 @@
 
     // ── CONTEXTUAL PARAGRAPH (direct voice) ──
     html += '<div class="dr-preset-commentary">'
-         +    '<p>The strategy&rsquo;s verdict is era-dependent, not good or bad full-stop. Across the full historical record, two of three default presets <em>destroy</em> bitcoin &mdash; Conservative ends with 20% of HODL, Standard with 61%. The damage is concentrated in a single cycle: <strong>March 2013 SELL at $70 &rarr; January 2015 REBUY at $230</strong>, a 0.30&times; cycle multiplier. During bitcoin&rsquo;s most extreme-volatility era, the Power Law trend grew faster than any percentile-based threshold could keep up with. A correctly-fired sell at the 80th percentile in 2013 was rebuying into a higher absolute price two years later, even as the ratio dropped.</p>'
+         +    '<p>The strategy&rsquo;s verdict is era-dependent, not good or bad full-stop. Across the full historical record, <em>even in a retirement account</em>, two of three default presets destroy bitcoin &mdash; Conservative ends with 20% of HODL, Standard with 61%. The damage is concentrated in a single cycle: <strong>March 2013 SELL at $70 &rarr; January 2015 REBUY at $230</strong>, a 0.30&times; cycle multiplier. During bitcoin&rsquo;s most extreme-volatility era, the Power Law trend grew faster than any percentile-based threshold could keep up with. A correctly-fired sell at the 80th percentile in 2013 was rebuying into a higher absolute price two years later, even as the ratio dropped.</p>'
          +    '<p>Restricted to cycles since 2015, every preset beats HODL. The Aggressive setting nearly quadruples it. The post-2015 cycles &mdash; 2017&ndash;18, the 2019 micro-cycle, 2020&ndash;22 &mdash; produced reasonable BTC gains at every threshold combination, because the volatility compression that has since become the dominant feature of bitcoin&rsquo;s price action started kicking in around then.</p>'
          +    '<p>The reader&rsquo;s judgment, then, is which era the future will resemble. If you believe bitcoin will keep behaving like 2010&ndash;2014 &mdash; orders of magnitude in calendar years, percentile thresholds blown out by absolute price moves &mdash; the strategy is a cautionary tale and HODL is the answer. If you believe the volatility compression evident since 2015 reflects a maturing market that will continue, the strategy has historical merit at every preset, and the most aggressive settings deliver the most edge.</p>'
          +    '<p>One more dimension worth naming: the setting that performs best historically is also the one that asks the least of you in lived experience. Aggressive 90/20 fires triggers so rarely that you spend most of the time HODLing &mdash; the default Bitcoiner posture anyway. Conservative 70/40 fires triggers more often, so you spend more time in cash-and-anxious state, and you also end with the worst BTC outcome at full-record. The &lsquo;scary&rsquo; Aggressive setting is actually the least psychologically demanding to live with.</p>'
@@ -1224,7 +1243,9 @@
   updateBacktest(initialSellRatio, initialRebuyRatio);
   chart.update('none');
 
-  // Preset comparison block — three presets × two windows. Static, runs once.
+  // Preset comparison block — three presets × two windows. Re-renders
+  // when account-type or tax-rate change so the dual-window multipliers
+  // reflect the user's current account assumption.
   renderPresetComparison();
 
   if(sellEl) sellEl.addEventListener('input', updateThresholds);
@@ -1240,13 +1261,20 @@
   // + summary refresh; chart datasets for bands and historical markers
   // don't change so chart.update is cheap.
   var taxRateEl = document.getElementById('drTaxRate');
-  if(taxRateEl) taxRateEl.addEventListener('input', updateThresholds);
+  if(taxRateEl) taxRateEl.addEventListener('input', function(){
+    updateThresholds();
+    renderPresetComparison();
+  });
   document.querySelectorAll('[data-account]').forEach(function(b){
     b.addEventListener('click', function(){
       // Brief defer — calc IIFE's click handler runs first, sets the
       // .active class on the toggle, then this fires and the backtest
       // re-reads account type via querySelector('[data-account].active').
-      setTimeout(updateThresholds, 0);
+      // Both per-setting summary and the three-presets table re-render.
+      setTimeout(function(){
+        updateThresholds();
+        renderPresetComparison();
+      }, 0);
     });
   });
 
