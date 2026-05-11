@@ -1233,6 +1233,61 @@ input[type="range"]::-moz-range-track {
 .dr-swatch-sellline { background: transparent;   width: 14px; height: 0; border-top: 1.5px dashed #e09422; }
 .dr-swatch-rebuyline{ background: transparent;   width: 14px; height: 0; border-top: 1.5px dashed var(--green); }
 
+/* ── Question-tab simplified channel chart ──
+ * Orientation visual at the top of Tab 1 (The Question). Mirrors the
+ * Calculator-tab .dr-channel-viz visual language at slightly smaller
+ * scale (340px chart height vs 460px). Strips out the user's threshold
+ * lines / trigger markers since this tab is about understanding the
+ * channel, not configuring it. */
+.dr-q-channel-viz {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.3rem 1.5rem;
+    margin: 0 0 2.2rem;
+}
+.dr-q-channel-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 0.9rem;
+}
+.dr-q-channel-chart-wrapper {
+    height: 340px;
+    position: relative;
+}
+.dr-q-channel-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.95rem 1.3rem;
+    margin-top: 0.9rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.76rem;
+    color: var(--text-muted);
+}
+.dr-q-channel-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.dr-q-swatch {
+    display: inline-block;
+    width: 16px;
+    height: 0;
+}
+.dr-q-swatch-floor { border-top: 1.5px dashed var(--red); }
+.dr-q-swatch-trend { height: 2.5px; background: var(--amber); border-radius: 1px; }
+.dr-q-swatch-upper { border-top: 1.5px dotted #e8c820; }
+.dr-q-swatch-price { height: 1.5px; background: rgba(232,224,210,0.55); border-radius: 1px; }
+
+@media (max-width: 720px){
+    .dr-q-channel-viz { padding: 1.1rem 1.1rem; }
+    .dr-q-channel-chart-wrapper { height: 280px; }
+    .dr-q-channel-legend { gap: 0.6rem 0.95rem; font-size: 0.72rem; }
+}
+
 /* Legend glyphs for the historical-signal markers — match the
  * chart's muted/translucent color treatment so the legend reads
  * correctly against the bright forward-projection markers (which
