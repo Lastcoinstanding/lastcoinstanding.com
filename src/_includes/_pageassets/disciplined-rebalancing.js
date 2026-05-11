@@ -206,6 +206,125 @@
 
 })();
 
+// ═══════ QUESTION-TAB CHANNEL CHART ═══════
+//
+// Simplified orientation chart for Tab 1 (The Question). Shows just
+// floor / trend / upper / historical-price — no user threshold lines,
+// no trigger markers, no projection path. Job is purely to make the
+// channel concept visible before the essay's structural argument
+// unfolds below. Same logarithmic Y-axis and year-formatting X-axis
+// as the Calculator-tab chart so visual register is consistent across
+// tabs without sharing chart instance state.
+//
+// Lazy-render-friendly: Tab 1 is the default active tab so the chart
+// renders on initial page load. If the user lands on a different tab
+// via URL hash, the canvas still exists but is in an inactive (hidden)
+// tab-content; Chart.js handles that fine.
+(function(){
+  var canvas = document.getElementById('drQuestionChannelChart');
+  if(!canvas) return;
+  if(typeof Chart === 'undefined') return;
+
+  var amber  = '#e09422';
+  var rust   = '#c0392b';
+  var gold   = '#e8c820';
+  var muted  = 'rgba(160,160,160,0.55)';
+  var priceColor = 'rgba(232,224,210,0.55)';
+
+  // X-domain: full historical record. No forward projection on this
+  // chart — the Question tab discusses the historical channel, not
+  // future paths.
+  var minD = PL_DATA[0][0];
+  var maxD = PL_DATA[PL_DATA.length - 1][0];
+
+  // Band data sampled every 30 days for performance (matches the
+  // Calculator chart cadence).
+  var trend = [], floor = [], upper = [];
+  for(var d = minD; d <= maxD; d += 30){
+    var t = plPrice(d);
+    trend.push({x: d, y: t});
+    floor.push({x: d, y: t * PL_FLOOR});
+    upper.push({x: d, y: t * PL_CEIL});
+  }
+  var historicalData = PL_DATA.map(function(p){ return {x: p[0], y: p[1]}; });
+
+  // Tooltip year-formatter: matches the X-axis tick callback.
+  function dayToYear(d){
+    return new Date(GENESIS_TS*1000 + d*86400*1000).getFullYear();
+  }
+  function dayToDateLabel(d){
+    var date = new Date(GENESIS_TS*1000 + d*86400*1000);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[date.getMonth()] + ' ' + date.getFullYear();
+  }
+  function fmtUSD(v){
+    if(v >= 1e6) return '$' + (v/1e6).toFixed(1) + 'M';
+    if(v >= 1000) return '$' + (v/1000).toFixed(v >= 10000 ? 0 : 1) + 'K';
+    if(v >= 1) return '$' + v.toFixed(2);
+    return '$' + v.toFixed(3);
+  }
+
+  new Chart(canvas, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        { label: 'Floor (0.42× trend)', data: floor, borderColor: rust, borderWidth: 1.4, borderDash: [6, 3], pointRadius: 0, showLine: true, tension: 0.2, order: 4 },
+        { label: 'Trend',               data: trend, borderColor: amber, borderWidth: 2,                  pointRadius: 0, showLine: true, tension: 0.2, order: 3 },
+        { label: 'Upper (3.0× trend)',  data: upper, borderColor: gold,  borderWidth: 1.2, borderDash: [1, 5], pointRadius: 0, showLine: true, tension: 0.2, order: 5 },
+        { label: 'Historical price',    data: historicalData, borderColor: priceColor, borderWidth: 1.1, pointRadius: 0, showLine: true, tension: 0.15, order: 1 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(20,20,20,0.95)',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          padding: 10,
+          titleColor: '#e0e0e0',
+          bodyColor: '#c8c8c8',
+          callbacks: {
+            title: function(items){ return dayToDateLabel(items[0].parsed.x); },
+            label: function(ctx){ return ctx.dataset.label + ': ' + fmtUSD(ctx.parsed.y); }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          title: { display: true, text: 'Year', color: muted, font: { size: 10 } },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          min: minD,
+          max: maxD,
+          ticks: {
+            color: muted,
+            maxTicksLimit: 10,
+            callback: function(v){ return dayToYear(v); }
+          }
+        },
+        y: {
+          type: 'logarithmic',
+          title: { display: true, text: 'BTC price (USD)', color: muted, font: { size: 10 } },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: {
+            color: muted,
+            callback: function(v){
+              if(v >= 1e6) return '$' + (v/1e6) + 'M';
+              if(v >= 1000) return '$' + (v/1000) + 'K';
+              if(v >= 1) return '$' + v;
+              return '$' + v.toFixed(2);
+            }
+          }
+        }
+      }
+    }
+  });
+})();
+
 // ═══════ CHANNEL VIZ — Calculator tab anchor visualization ═══════
 //
 // Shows the Power Law channel (floor / trend / upper) with historical
@@ -1017,6 +1136,8 @@
     // Tax-drag note when in regular mode and tax was actually paid.
     var acctBtn = document.querySelector('[data-account].active');
     var accountType = acctBtn ? acctBtn.dataset.account : 'retirement';
+    var trEl = document.getElementById('drTaxRate');
+    var taxPct = trEl ? parseInt(trEl.value) : 15;
     var taxFootnote = '';
     if(accountType === 'regular'){
       var totalTax = 0;
@@ -1026,10 +1147,26 @@
       }
     }
 
+    // Account-state badge: makes the assumption that drives this result
+    // visible at the result. Click flips the account-type toggle below.
+    var badgeLabel = (accountType === 'retirement')
+      ? 'Retirement account'
+      : 'Regular account &middot; ' + taxPct + '% tax';
+    var badgeFlipTo = (accountType === 'retirement') ? 'regular' : 'retirement';
+    var badgeFlipLabel = (accountType === 'retirement') ? 'switch to regular' : 'switch to retirement';
+    var badgeHtml = '<button type="button" class="dr-account-badge dr-account-badge-' + accountType + '" '
+                  + 'data-flip-to="' + badgeFlipTo + '" '
+                  + 'aria-label="Account assumption: ' + (accountType === 'retirement' ? 'Retirement' : 'Regular ' + taxPct + '%') + '. Click to ' + badgeFlipLabel + '.">'
+                  + '<span class="dr-account-badge-prefix">Showing</span>'
+                  + '<span class="dr-account-badge-value">' + badgeLabel + '</span>'
+                  + '<span class="dr-account-badge-flip">' + badgeFlipLabel + ' &rlarr;</span>'
+                  + '</button>';
+
     var summarySpan = currentEra === 'since-2015'
       ? 'Across the post-2015 record (~11 years)'
       : 'Across ~15 years';
     html += '<div class="dr-hist-summary ' + summaryClass + '">'
+         +    badgeHtml
          +    '<p>' + summarySpan + ' and <strong>' + bt.cyclesCompleted + ' completed cycle' + (bt.cyclesCompleted === 1 ? '' : 's') + '</strong>, this configuration ended with <strong>' + fmtBTC(bt.btcHeld) + ' BTC</strong>'
          +    (bt.cashHeld > 1 ? ' plus <strong>' + fmtCash(bt.cashHeld) + '</strong> in cash' : '')
          +    ' &mdash; ' + multStr + ' (' + directionWord + ' ' + deltaPctStr + ' vs. holding through).' + taxFootnote + '</p>'
@@ -1059,12 +1196,25 @@
   // strategy mostly fails" to "the strategy mostly works". The reader
   // is asked to judge which era the future will resemble.
   //
-  // Static once at page load — the comparison shows preset behavior
-  // against the historical record, which doesn't change as the user
-  // moves their personal sliders.
+  // Re-renders on account-type / tax-rate change so the dual-window
+  // multipliers reflect the user's current account assumption (per-
+  // setting sliders still don't affect this block — it shows the
+  // three named presets against the historical record).
   function renderPresetComparison(){
     var el = document.getElementById('drPresetComparison');
     if(!el) return;
+
+    // Read current account-type and tax-rate from DOM so the table
+    // reflects the user's assumption — same pattern as readBacktestParams
+    // for the historical-summary block above. Means the dual-window
+    // numbers move in lockstep with the per-setting summary and the
+    // user can't be looking at two different account assumptions in
+    // the same viewport.
+    var acctBtn = document.querySelector('[data-account].active');
+    var pcAccountType = acctBtn ? acctBtn.dataset.account : 'retirement';
+    var pcTrEl = document.getElementById('drTaxRate');
+    var pcTaxRate = pcTrEl ? parseFloat(pcTrEl.value) / 100 : 0;
+    var pcTaxPct = pcTrEl ? parseInt(pcTrEl.value) : 15;
 
     // Jan 1, 2015 in days-from-genesis. Hardcoded boundary — see
     // editorial rationale in the contextual paragraph below the table:
@@ -1089,7 +1239,13 @@
     }
     function fmtMult(m){ return m.toFixed(2) + '×'; }
 
-    var html = '<div class="dr-preset-table-wrap"><table class="dr-preset-table">';
+    // Caption: reflects the current account-type assumption so readers
+    // see what tax framing the multipliers below were computed under.
+    var captionHtml = (pcAccountType === 'retirement')
+      ? '<p class="dr-preset-caption"><strong>Retirement account</strong> &mdash; no per-sell tax. Multipliers below show pure cycle-multiplier behavior.</p>'
+      : '<p class="dr-preset-caption"><strong>Regular account &middot; ' + pcTaxPct + '% capital-gains tax</strong> per sell. Multipliers below include tax drag at every trigger.</p>';
+
+    var html = captionHtml + '<div class="dr-preset-table-wrap"><table class="dr-preset-table">';
     html += '<thead><tr>'
          +    '<th class="dr-pc-preset">Preset</th>'
          +    '<th class="dr-pc-trades">Triggers</th>'
@@ -1100,8 +1256,8 @@
     presets.forEach(function(p){
       var sR = percentileToRatio(p.sellPct);
       var rR = percentileToRatio(p.rebuyPct);
-      var btFull = runHistoricalBacktest(sR, rR, 'retirement', 0);
-      var bt2015 = runHistoricalBacktest(sR, rR, 'retirement', 0, startOf2015);
+      var btFull = runHistoricalBacktest(sR, rR, pcAccountType, pcTaxRate);
+      var bt2015 = runHistoricalBacktest(sR, rR, pcAccountType, pcTaxRate, startOf2015);
 
       // Cumulative position (BTC + cash-converted-to-BTC at latest price)
       // for fair × HODL — if the strategy ends mid-cycle holding cash,
@@ -1123,7 +1279,7 @@
 
     // ── CONTEXTUAL PARAGRAPH (direct voice) ──
     html += '<div class="dr-preset-commentary">'
-         +    '<p>The strategy&rsquo;s verdict is era-dependent, not good or bad full-stop. Across the full historical record, two of three default presets <em>destroy</em> bitcoin &mdash; Conservative ends with 20% of HODL, Standard with 61%. The damage is concentrated in a single cycle: <strong>March 2013 SELL at $70 &rarr; January 2015 REBUY at $230</strong>, a 0.30&times; cycle multiplier. During bitcoin&rsquo;s most extreme-volatility era, the Power Law trend grew faster than any percentile-based threshold could keep up with. A correctly-fired sell at the 80th percentile in 2013 was rebuying into a higher absolute price two years later, even as the ratio dropped.</p>'
+         +    '<p>The strategy&rsquo;s verdict is era-dependent, not good or bad full-stop. Across the full historical record, <em>even in a retirement account</em>, two of three default presets destroy bitcoin &mdash; Conservative ends with 20% of HODL, Standard with 61%. The damage is concentrated in a single cycle: <strong>March 2013 SELL at $70 &rarr; January 2015 REBUY at $230</strong>, a 0.30&times; cycle multiplier. During bitcoin&rsquo;s most extreme-volatility era, the Power Law trend grew faster than any percentile-based threshold could keep up with. A correctly-fired sell at the 80th percentile in 2013 was rebuying into a higher absolute price two years later, even as the ratio dropped.</p>'
          +    '<p>Restricted to cycles since 2015, every preset beats HODL. The Aggressive setting nearly quadruples it. The post-2015 cycles &mdash; 2017&ndash;18, the 2019 micro-cycle, 2020&ndash;22 &mdash; produced reasonable BTC gains at every threshold combination, because the volatility compression that has since become the dominant feature of bitcoin&rsquo;s price action started kicking in around then.</p>'
          +    '<p>The reader&rsquo;s judgment, then, is which era the future will resemble. If you believe bitcoin will keep behaving like 2010&ndash;2014 &mdash; orders of magnitude in calendar years, percentile thresholds blown out by absolute price moves &mdash; the strategy is a cautionary tale and HODL is the answer. If you believe the volatility compression evident since 2015 reflects a maturing market that will continue, the strategy has historical merit at every preset, and the most aggressive settings deliver the most edge.</p>'
          +    '<p>One more dimension worth naming: the setting that performs best historically is also the one that asks the least of you in lived experience. Aggressive 90/20 fires triggers so rarely that you spend most of the time HODLing &mdash; the default Bitcoiner posture anyway. Conservative 70/40 fires triggers more often, so you spend more time in cash-and-anxious state, and you also end with the worst BTC outcome at full-record. The &lsquo;scary&rsquo; Aggressive setting is actually the least psychologically demanding to live with.</p>'
@@ -1206,7 +1362,9 @@
   updateBacktest(initialSellRatio, initialRebuyRatio);
   chart.update('none');
 
-  // Preset comparison block — three presets × two windows. Static, runs once.
+  // Preset comparison block — three presets × two windows. Re-renders
+  // when account-type or tax-rate change so the dual-window multipliers
+  // reflect the user's current account assumption.
   renderPresetComparison();
 
   if(sellEl) sellEl.addEventListener('input', updateThresholds);
@@ -1222,13 +1380,20 @@
   // + summary refresh; chart datasets for bands and historical markers
   // don't change so chart.update is cheap.
   var taxRateEl = document.getElementById('drTaxRate');
-  if(taxRateEl) taxRateEl.addEventListener('input', updateThresholds);
+  if(taxRateEl) taxRateEl.addEventListener('input', function(){
+    updateThresholds();
+    renderPresetComparison();
+  });
   document.querySelectorAll('[data-account]').forEach(function(b){
     b.addEventListener('click', function(){
       // Brief defer — calc IIFE's click handler runs first, sets the
       // .active class on the toggle, then this fires and the backtest
       // re-reads account type via querySelector('[data-account].active').
-      setTimeout(updateThresholds, 0);
+      // Both per-setting summary and the three-presets table re-render.
+      setTimeout(function(){
+        updateThresholds();
+        renderPresetComparison();
+      }, 0);
     });
   });
 
@@ -1388,6 +1553,24 @@
     }
   }
   // setGrowthModel removed — growth-model toggle no longer in DOM.
+
+  // Delegated click handler for the .dr-account-badge button rendered inside
+  // .dr-hist-summary. The badge is re-rendered on every backtest update
+  // (innerHTML replacement of #drHistSignals), so we delegate from the
+  // stable parent rather than re-binding each render. Click flips the
+  // account-type via the existing toggle buttons, reusing all existing
+  // listeners (save-setting, tax-row visibility, backtest re-run).
+  var drHistSignalsEl = document.getElementById('drHistSignals');
+  if(drHistSignalsEl){
+    drHistSignalsEl.addEventListener('click', function(e){
+      var badge = e.target.closest('.dr-account-badge');
+      if(!badge) return;
+      var flipTo = badge.dataset.flipTo;
+      if(!flipTo) return;
+      var targetBtn = document.querySelector('[data-account="' + flipTo + '"]');
+      if(targetBtn) targetBtn.click();
+    });
+  }
 
   // ─── READOUT UPDATES (live) ───
   function updateReadouts(){

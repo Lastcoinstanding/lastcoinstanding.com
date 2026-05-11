@@ -1233,6 +1233,61 @@ input[type="range"]::-moz-range-track {
 .dr-swatch-sellline { background: transparent;   width: 14px; height: 0; border-top: 1.5px dashed #e09422; }
 .dr-swatch-rebuyline{ background: transparent;   width: 14px; height: 0; border-top: 1.5px dashed var(--green); }
 
+/* ── Question-tab simplified channel chart ──
+ * Orientation visual at the top of Tab 1 (The Question). Mirrors the
+ * Calculator-tab .dr-channel-viz visual language at slightly smaller
+ * scale (340px chart height vs 460px). Strips out the user's threshold
+ * lines / trigger markers since this tab is about understanding the
+ * channel, not configuring it. */
+.dr-q-channel-viz {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.3rem 1.5rem;
+    margin: 0 0 2.2rem;
+}
+.dr-q-channel-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 0.9rem;
+}
+.dr-q-channel-chart-wrapper {
+    height: 340px;
+    position: relative;
+}
+.dr-q-channel-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.95rem 1.3rem;
+    margin-top: 0.9rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.76rem;
+    color: var(--text-muted);
+}
+.dr-q-channel-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.dr-q-swatch {
+    display: inline-block;
+    width: 16px;
+    height: 0;
+}
+.dr-q-swatch-floor { border-top: 1.5px dashed var(--red); }
+.dr-q-swatch-trend { height: 2.5px; background: var(--amber); border-radius: 1px; }
+.dr-q-swatch-upper { border-top: 1.5px dotted #e8c820; }
+.dr-q-swatch-price { height: 1.5px; background: rgba(232,224,210,0.55); border-radius: 1px; }
+
+@media (max-width: 720px){
+    .dr-q-channel-viz { padding: 1.1rem 1.1rem; }
+    .dr-q-channel-chart-wrapper { height: 280px; }
+    .dr-q-channel-legend { gap: 0.6rem 0.95rem; font-size: 0.72rem; }
+}
+
 /* Legend glyphs for the historical-signal markers — match the
  * chart's muted/translucent color treatment so the legend reads
  * correctly against the bright forward-projection markers (which
@@ -1481,6 +1536,74 @@ input[type="range"]::-moz-range-track {
 /* Three rows × two windows × color-graded × HODL cells, plus a
  * direct-voice contextual paragraph below. The dual-window framing
  * is the editorial anchor of the calculator tab. */
+/* Account-state badge — appears at the top of the historical signals
+ * summary block, making the account-type assumption visible right next
+ * to the result. Click flips the account-type toggle (delegated handler
+ * in the JS). Two state variants for the colour treatment.
+ *
+ * Retirement variant: subtle amber, signals "the analytical baseline".
+ * Regular variant: slightly more muted, signals "you've taken on tax drag". */
+.dr-account-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0 0 0.65rem 0;
+    padding: 0.35rem 0.7rem 0.35rem 0.6rem;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 3px;
+    font-family: inherit;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: background 0.14s, border-color 0.14s, color 0.14s;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.dr-account-badge:hover,
+.dr-account-badge:focus-visible {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.14);
+    color: var(--text);
+    outline: none;
+}
+.dr-account-badge-prefix {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+.dr-account-badge-value {
+    font-size: 0.86rem;
+    font-weight: 500;
+    color: var(--text);
+}
+.dr-account-badge-retirement .dr-account-badge-value { color: var(--amber); }
+.dr-account-badge-regular    .dr-account-badge-value { color: var(--text); }
+.dr-account-badge-flip {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.4px;
+    padding-left: 0.5rem;
+    border-left: 1px solid rgba(255,255,255,0.08);
+}
+.dr-account-badge:hover .dr-account-badge-flip,
+.dr-account-badge:focus-visible .dr-account-badge-flip {
+    color: var(--amber);
+}
+@media (max-width: 540px){
+    .dr-account-badge {
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        padding: 0.3rem 0.55rem;
+    }
+    .dr-account-badge-flip {
+        border-left: none;
+        padding-left: 0;
+        flex-basis: 100%;
+    }
+}
+
 .dr-preset-comparison-block {
     margin-top: 1.4rem;
     padding: 1rem 1.2rem;
@@ -1503,6 +1626,20 @@ input[type="range"]::-moz-range-track {
  * the 720px-breakpoint sizing). Wrapper-scoped overflow-x:auto keeps the
  * page from scrolling horizontally; scroll-shadow hints suggest scrollability
  * without a visible scrollbar on most mobile browsers. */
+/* Caption above the presets table: reflects the current account-type
+ * assumption (retirement / regular + tax%). Strong-tagged opening clause
+ * carries the assumption; muted text after carries the methodology note. */
+.dr-preset-caption {
+    margin: 0 0 0.55rem 0;
+    font-size: 0.86rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+}
+.dr-preset-caption strong {
+    color: var(--text);
+    font-weight: 500;
+}
+
 .dr-preset-table-wrap {
     width: 100%;
     overflow-x: auto;
