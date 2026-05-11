@@ -1498,6 +1498,20 @@ input[type="range"]::-moz-range-track {
     align-items: center;
     gap: 0.1rem;
 }
+/* Table scroll-wrapper: the presets table is content-wide on narrow viewports
+ * (Conservative 70/40 + ×HODL columns push it past ~380px viewports even at
+ * the 720px-breakpoint sizing). Wrapper-scoped overflow-x:auto keeps the
+ * page from scrolling horizontally; scroll-shadow hints suggest scrollability
+ * without a visible scrollbar on most mobile browsers. */
+.dr-preset-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background:
+        linear-gradient(to right, rgba(255,255,255,0.015), rgba(255,255,255,0.015)) local,
+        linear-gradient(to right, rgba(255,255,255,0.03), rgba(255,255,255,0)) left/14px 100% no-repeat scroll,
+        linear-gradient(to left,  rgba(255,255,255,0.03), rgba(255,255,255,0)) right/14px 100% no-repeat scroll;
+}
 .dr-preset-table {
     width: 100%;
     border-collapse: collapse;
