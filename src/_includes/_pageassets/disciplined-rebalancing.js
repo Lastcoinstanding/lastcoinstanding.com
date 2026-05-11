@@ -1017,6 +1017,8 @@
     // Tax-drag note when in regular mode and tax was actually paid.
     var acctBtn = document.querySelector('[data-account].active');
     var accountType = acctBtn ? acctBtn.dataset.account : 'retirement';
+    var trEl = document.getElementById('drTaxRate');
+    var taxPct = trEl ? parseInt(trEl.value) : 15;
     var taxFootnote = '';
     if(accountType === 'regular'){
       var totalTax = 0;
@@ -1026,10 +1028,26 @@
       }
     }
 
+    // Account-state badge: makes the assumption that drives this result
+    // visible at the result. Click flips the account-type toggle below.
+    var badgeLabel = (accountType === 'retirement')
+      ? 'Retirement account'
+      : 'Regular account &middot; ' + taxPct + '% tax';
+    var badgeFlipTo = (accountType === 'retirement') ? 'regular' : 'retirement';
+    var badgeFlipLabel = (accountType === 'retirement') ? 'switch to regular' : 'switch to retirement';
+    var badgeHtml = '<button type="button" class="dr-account-badge dr-account-badge-' + accountType + '" '
+                  + 'data-flip-to="' + badgeFlipTo + '" '
+                  + 'aria-label="Account assumption: ' + (accountType === 'retirement' ? 'Retirement' : 'Regular ' + taxPct + '%') + '. Click to ' + badgeFlipLabel + '.">'
+                  + '<span class="dr-account-badge-prefix">Showing</span>'
+                  + '<span class="dr-account-badge-value">' + badgeLabel + '</span>'
+                  + '<span class="dr-account-badge-flip">' + badgeFlipLabel + ' &rlarr;</span>'
+                  + '</button>';
+
     var summarySpan = currentEra === 'since-2015'
       ? 'Across the post-2015 record (~11 years)'
       : 'Across ~15 years';
     html += '<div class="dr-hist-summary ' + summaryClass + '">'
+         +    badgeHtml
          +    '<p>' + summarySpan + ' and <strong>' + bt.cyclesCompleted + ' completed cycle' + (bt.cyclesCompleted === 1 ? '' : 's') + '</strong>, this configuration ended with <strong>' + fmtBTC(bt.btcHeld) + ' BTC</strong>'
          +    (bt.cashHeld > 1 ? ' plus <strong>' + fmtCash(bt.cashHeld) + '</strong> in cash' : '')
          +    ' &mdash; ' + multStr + ' (' + directionWord + ' ' + deltaPctStr + ' vs. holding through).' + taxFootnote + '</p>'
@@ -1388,6 +1406,24 @@
     }
   }
   // setGrowthModel removed — growth-model toggle no longer in DOM.
+
+  // Delegated click handler for the .dr-account-badge button rendered inside
+  // .dr-hist-summary. The badge is re-rendered on every backtest update
+  // (innerHTML replacement of #drHistSignals), so we delegate from the
+  // stable parent rather than re-binding each render. Click flips the
+  // account-type via the existing toggle buttons, reusing all existing
+  // listeners (save-setting, tax-row visibility, backtest re-run).
+  var drHistSignalsEl = document.getElementById('drHistSignals');
+  if(drHistSignalsEl){
+    drHistSignalsEl.addEventListener('click', function(e){
+      var badge = e.target.closest('.dr-account-badge');
+      if(!badge) return;
+      var flipTo = badge.dataset.flipTo;
+      if(!flipTo) return;
+      var targetBtn = document.querySelector('[data-account="' + flipTo + '"]');
+      if(targetBtn) targetBtn.click();
+    });
+  }
 
   // ─── READOUT UPDATES (live) ───
   function updateReadouts(){
