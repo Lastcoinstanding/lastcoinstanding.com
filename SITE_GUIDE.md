@@ -189,6 +189,8 @@ Every user-facing page must include the full set of social meta tags. Without `o
 
 Each page has a custom `og-<slug>.jpg` card (1280×720, left-aligned text + Bitcoin "B" on right; rendered at 2x via Playwright). The Migration page's pre-refactor metadata claimed 1200×630 — the actual cards are 1280×720, and the post-refactor templates use the correct dimensions. Audit existing pages before shipping new ones.
 
+**Deploy-gate (silent failure mode):** the JPEG filename must be added to the `staticAssets` array in `.eleventy.js` — without that, Eleventy never copies the file to `_site/`, Cloudflare serves the SPA HTML fallback at 200 OK (`Content-Type: text/html`), and social shares unfurl broken. The meta tags look fine, the repo file looks fine, but the asset is silently undeployed. The folder-level passthrough that covers `videos/` does **not** apply to OG cards at repo root; each one must be registered by name. Verify after every new card with `curl -I https://lastcoinstanding.com/og-<slug>.jpg` — should return `image/jpeg`, not `text/html`.
+
 ### Typography: Cormorant for display only
 
 Cormorant Garamond is **display-only, 1.5rem floor**. Below 1.5rem use Inter — at body sizes Cormorant italic becomes unreadable and the mix looks unintentional. Use Cormorant for H1, H2, hero subtitles; Inter for body, captions, editorial labels (even when italicized). Property names and card titles: Inter 500-weight, not Cormorant.
