@@ -53,6 +53,23 @@ eleventyComputed:
             <p>There is another reading. The channel can be treated not as a forecast but as a <em>protocol</em>. If price oscillates between bounds, then bounded triggers &mdash; sell when the historical distribution says you're in a high-percentile zone, rebuy when it says you're in a low-percentile zone &mdash; transform the model from a thing-you-believe-in into a thing-you-act-on. The channel becomes a discipline.</p>
         </div>
 
+        <!-- ═══════════════════ CHANNEL ORIENTATION CHART ═══════════════════ -->
+        <!-- Simplified version of the Calculator-tab chart: just floor, trend, -->
+        <!-- upper bound, and historical price. Strips out the user's threshold -->
+        <!-- lines and trigger markers — those belong in the Calculator. This  -->
+        <!-- chart's job is to make 'channel', 'floor', 'trend', 'upper bound'  -->
+        <!-- concrete before the essay's structural argument unfolds below.   -->
+        <div class="dr-q-channel-viz">
+            <div class="dr-q-channel-title">The Power Law channel &mdash; fifteen years of bitcoin price against floor, trend, and upper bound</div>
+            <div class="dr-q-channel-chart-wrapper"><canvas id="drQuestionChannelChart"></canvas></div>
+            <div class="dr-q-channel-legend">
+                <span class="dr-q-channel-legend-item"><span class="dr-q-swatch dr-q-swatch-floor"></span>Floor (0.42&times; trend)</span>
+                <span class="dr-q-channel-legend-item"><span class="dr-q-swatch dr-q-swatch-trend"></span>Trend</span>
+                <span class="dr-q-channel-legend-item"><span class="dr-q-swatch dr-q-swatch-upper"></span>Upper (3.0&times; trend)</span>
+                <span class="dr-q-channel-legend-item"><span class="dr-q-swatch dr-q-swatch-price"></span>Historical price</span>
+            </div>
+        </div>
+
         <div class="narrative" style="margin-top:0;margin-bottom:2.5rem;padding:2rem 2.5rem;border-left-width:3px">
             <p style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;line-height:1.7;color:var(--text)">This isn't active trading. It isn't market timing. It isn't speculation about <em>where price is going</em>. It is a disciplined response to <em>where price is, relative to a structural channel</em>. The triggers are observable, the actions are bounded, and the framework is articulable in two sentences. Inside a retirement-account wrapper where buys and sells generate no tax events, <strong>the only cost of being wrong about a sell-and-rebuy bet is the bitcoin you fail to capture if the rebuy doesn't materialize.</strong></p>
         </div>
