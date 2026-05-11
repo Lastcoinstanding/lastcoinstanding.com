@@ -1571,6 +1571,20 @@ input[type="range"]::-moz-range-track {
  * the 720px-breakpoint sizing). Wrapper-scoped overflow-x:auto keeps the
  * page from scrolling horizontally; scroll-shadow hints suggest scrollability
  * without a visible scrollbar on most mobile browsers. */
+/* Caption above the presets table: reflects the current account-type
+ * assumption (retirement / regular + tax%). Strong-tagged opening clause
+ * carries the assumption; muted text after carries the methodology note. */
+.dr-preset-caption {
+    margin: 0 0 0.55rem 0;
+    font-size: 0.86rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+}
+.dr-preset-caption strong {
+    color: var(--text);
+    font-weight: 500;
+}
+
 .dr-preset-table-wrap {
     width: 100%;
     overflow-x: auto;
