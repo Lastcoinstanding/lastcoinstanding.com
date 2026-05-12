@@ -1019,3 +1019,246 @@
 .bas-calc-output-section .bas-calc-outputs {
     margin: 0 0 0.2rem;
 }
+
+/* ───────────────────────────────────────────────
+   15. HELP-TIP (canonical §6.13 pattern — '?' glyph
+       in a 14×14 circle, sibling tooltip with absolute
+       positioning, display:none/block per the §6.13
+       lesson about absolute-positioned cards and mobile
+       overflow)
+   ─────────────────────────────────────────────── */
+.help-tip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid var(--text-muted);
+    border-radius: 50%;
+    cursor: help;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+    position: relative;
+    transition: color 0.2s, border-color 0.2s;
+    user-select: none;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+.help-tip:hover,
+.help-tip:focus {
+    color: var(--amber);
+    border-color: var(--amber);
+    outline: none;
+}
+.help-tip .tip-content {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: min(260px, calc(100vw - 32px));
+    padding: 0.85rem 1rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text);
+    background: var(--bg-card);
+    border: 1px solid rgba(224,148,34,0.25);
+    border-radius: 5px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.55);
+    z-index: 50;
+    text-align: left;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: normal;
+}
+.help-tip .tip-content strong { color: var(--text); font-weight: 600; }
+.help-tip .tip-content em { color: var(--amber-dim); font-style: italic; }
+.help-tip .tip-content a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(224,148,34,0.4);
+    transition: border-color 0.2s;
+}
+.help-tip .tip-content a:hover { border-color: var(--amber); }
+.help-tip:hover .tip-content,
+.help-tip:focus .tip-content,
+.help-tip:focus-within .tip-content { display: block; }
+
+/* Right-anchored variant for help-tips near the right edge of a row */
+.help-tip.help-tip-right .tip-content { left: auto; right: 0; }
+
+/* Preset-button variant: the help-tip sits *next to* the preset button
+   inside a flex wrapper, so the tooltip should open beneath the button. */
+.bas-calc-preset-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.help-tip-preset {
+    width: 13px;
+    height: 13px;
+    font-size: 0.6rem;
+}
+.help-tip-preset.help-tip-warning {
+    color: rgba(192,57,43,0.7);
+    border-color: rgba(192,57,43,0.5);
+}
+.help-tip-preset.help-tip-warning:hover,
+.help-tip-preset.help-tip-warning:focus { color: #e87f6f; border-color: #c0392b; }
+
+/* ───────────────────────────────────────────────
+   16. COST-SECTION CLARIFIER (small caveat below the
+       'Cost surface' label clarifying that interest is
+       interest-only with indefinite term)
+   ─────────────────────────────────────────────── */
+.bas-calc-output-section-clarifier {
+    display: block;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text-muted);
+    text-transform: none;
+    letter-spacing: 0.005em;
+    font-style: italic;
+    margin-top: 0.3rem;
+}
+
+/* ───────────────────────────────────────────────
+   17. LOAN PROFILE (replaces the free-form .bas-calc-interp
+       paragraph block — a scannable check-list with status
+       icons that summarises the loan's structural conditions,
+       followed by conditional strategic-context blocks)
+   ─────────────────────────────────────────────── */
+.bas-calc-profile {
+    margin: 2rem auto 0;
+    max-width: 880px;
+    padding: 1.6rem 1.8rem 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.bas-calc-profile-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 1rem;
+    letter-spacing: -0.005em;
+}
+.bas-calc-profile-checks {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.5rem;
+}
+.bas-calc-profile-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text);
+}
+.bas-calc-profile-check:last-child { border-bottom: none; padding-bottom: 0.4rem; }
+.bas-calc-profile-check-empty {
+    color: var(--text-muted);
+    font-style: italic;
+    border-bottom: none;
+    justify-content: center;
+    padding: 1rem 0;
+}
+/* Status icon: 18×18 circle with the symbol centered */
+.bas-calc-profile-icon {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-top: 1px;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+.bas-calc-profile-icon-good {
+    background: rgba(39,174,96,0.15);
+    color: var(--green);
+    border: 1px solid rgba(39,174,96,0.45);
+}
+.bas-calc-profile-icon-warn {
+    background: rgba(224,148,34,0.15);
+    color: var(--amber);
+    border: 1px solid rgba(224,148,34,0.45);
+}
+.bas-calc-profile-icon-bad {
+    background: rgba(192,57,43,0.15);
+    color: #e87f6f;
+    border: 1px solid rgba(192,57,43,0.5);
+}
+.bas-calc-profile-icon-info {
+    background: rgba(154,144,128,0.12);
+    color: var(--text-dim);
+    border: 1px solid rgba(154,144,128,0.35);
+}
+.bas-calc-profile-body { flex: 1; min-width: 0; }
+.bas-calc-profile-body strong {
+    color: var(--text);
+    font-weight: 600;
+}
+.bas-calc-profile-body .bas-calc-profile-detail {
+    display: block;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin-top: 0.15rem;
+}
+
+/* Strategic-context notes (rendered conditionally below the checks).
+   These keep the editorial Cormorant register because they carry
+   editorial weight at a key UI moment — same pattern as Bitcoin vs
+   Real Estate's .narrative calculator-tab framing block (per
+   STYLE_GUIDE §6.3 scope note). */
+.bas-calc-profile-notes:empty { display: none; }
+.bas-calc-profile-notes .bas-calc-profile-note {
+    margin: 1.1rem 0 0;
+    padding: 1.1rem 1.3rem 1.1rem 1.5rem;
+    background: rgba(255,255,255,0.02);
+    border-left: 2px solid var(--amber);
+    border-radius: 0 4px 4px 0;
+}
+.bas-calc-profile-notes .bas-calc-profile-note p {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--text);
+    margin: 0 0 0.6rem;
+}
+.bas-calc-profile-notes .bas-calc-profile-note p:last-child { margin-bottom: 0; }
+.bas-calc-profile-notes .bas-calc-profile-note p strong { color: var(--amber); font-weight: 600; }
+.bas-calc-profile-notes .bas-calc-profile-note p em { color: var(--amber-dim); font-style: italic; }
+.bas-calc-profile-notes .bas-calc-profile-note p a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(224,148,34,0.35);
+}
+.bas-calc-profile-notes .bas-calc-profile-note p a:hover { border-color: var(--amber); }
+.bas-calc-profile-notes .bas-calc-profile-note-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.5rem;
+    display: block;
+}
