@@ -874,3 +874,148 @@
     color: var(--amber-dim);
 }
 .bas-calc-roadmap li strong { color: var(--text); font-weight: 600; }
+
+/* ───────────────────────────────────────────────
+   12. DETAILS BLOCK (used to collapse the cautionary-record
+       case studies in the Question tab — bad-category examples
+       available for readers who want them, hidden by default
+       so they don't dominate the visible page)
+   ─────────────────────────────────────────────── */
+.bas-details {
+    margin: 1.4rem 0 1.6rem;
+    padding: 0;
+    background: rgba(255,255,255,0.018);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    transition: border-color 0.2s, background 0.2s;
+}
+.bas-details:hover { border-color: rgba(224,148,34,0.18); }
+.bas-details summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 0.95rem 1.4rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+    border-radius: 6px;
+    user-select: none;
+    transition: color 0.2s, background 0.2s;
+}
+.bas-details summary::-webkit-details-marker { display: none; }
+.bas-details summary::marker { content: ''; }
+.bas-details summary:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+.bas-details-icon {
+    display: inline-block;
+    color: var(--amber);
+    margin-right: 0.5rem;
+    transition: transform 0.25s;
+    font-size: 1.1em;
+    line-height: 1;
+}
+.bas-details[open] .bas-details-icon { transform: rotate(90deg); }
+.bas-details-body {
+    padding: 0 1.4rem 1.2rem;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    margin-top: 0.1rem;
+    padding-top: 1rem;
+}
+.bas-details-body p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin: 0 0 0.85rem;
+}
+.bas-details-body p:last-child { margin-bottom: 0; }
+.bas-details-body p strong { color: var(--text); }
+.bas-details-body p em { color: var(--amber-dim); font-style: italic; }
+
+/* ───────────────────────────────────────────────
+   13. COST-SURFACE INPUT ROW (interest rate + presets)
+   The risk-surface input grid above stays 2-column; this row
+   sits beneath it, full-width, with the rate slider plus three
+   preset buttons that snap to typical scenarios.
+   ─────────────────────────────────────────────── */
+.bas-calc-inputs-cost {
+    margin: 1rem 0 0;
+    padding: 1.5rem 2rem 1.4rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-top: 1px dashed rgba(224,148,34,0.15);
+    border-radius: 0 0 8px 8px;
+    margin-top: -1px;
+}
+@media (max-width: 720px) {
+    .bas-calc-inputs-cost { padding: 1.2rem 1.4rem; }
+}
+.bas-calc-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 0.7rem 0 0.3rem;
+}
+.bas-calc-preset {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    padding: 0.45rem 0.85rem;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.bas-calc-preset:hover {
+    border-color: rgba(224,148,34,0.4);
+    color: var(--text);
+    background: rgba(224,148,34,0.05);
+}
+.bas-calc-preset.bas-calc-preset-active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(224,148,34,0.08);
+}
+.bas-calc-preset.bas-calc-preset-warning {
+    color: #c0392b;
+    border-color: rgba(192,57,43,0.3);
+}
+.bas-calc-preset.bas-calc-preset-warning:hover {
+    color: #e87f6f;
+    border-color: rgba(192,57,43,0.5);
+    background: rgba(192,57,43,0.05);
+}
+.bas-calc-preset.bas-calc-preset-warning.bas-calc-preset-active {
+    color: #e87f6f;
+    border-color: #c0392b;
+    background: rgba(192,57,43,0.08);
+}
+
+/* Make the bas-calc-field-hint that lives in cost-inputs slightly
+   more breathing room above */
+.bas-calc-inputs-cost .bas-calc-field-hint {
+    margin-top: 0.5rem;
+}
+
+/* ───────────────────────────────────────────────
+   14. OUTPUT SECTIONS (risk vs cost) — adds a quiet
+       eyebrow label above each 3-card row so the user
+       can see at a glance which lens they're looking at
+   ─────────────────────────────────────────────── */
+.bas-calc-output-section {
+    margin: 1.6rem 0 0;
+}
+.bas-calc-output-section-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 0.6rem 0.2rem;
+}
+.bas-calc-output-section .bas-calc-outputs {
+    margin: 0 0 0.2rem;
+}
