@@ -1343,3 +1343,168 @@
     margin: 0 3px;
     border-radius: 1px;
 }
+
+/* ───────────────────────────────────────────────
+   19. BORROW vs. SELL COMPARISON SECTION
+   The editorial heart of the calculator — side-by-side
+   modelling of the two paths over the chosen horizon.
+   ─────────────────────────────────────────────── */
+.bas-calc-bvs-section {
+    margin: 2.5rem auto 0;
+    padding: 1.8rem 2rem 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.bas-calc-bvs-header {
+    margin-bottom: 1.4rem;
+}
+.bas-calc-bvs-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 0.6rem;
+    letter-spacing: -0.005em;
+}
+.bas-calc-bvs-subtitle {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    margin: 0;
+}
+.bas-calc-bvs-subtitle em { color: var(--amber-dim); font-style: italic; }
+
+/* Input row — three controls side by side, stack on mobile */
+.bas-calc-bvs-inputs {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 1.4rem 1.8rem;
+    padding: 1.3rem 1.5rem;
+    margin-bottom: 1.4rem;
+    background: rgba(255,255,255,0.018);
+    border: 1px solid rgba(224,148,34,0.08);
+    border-radius: 6px;
+}
+@media (max-width: 720px) {
+    .bas-calc-bvs-inputs {
+        grid-template-columns: 1fr;
+        padding: 1.1rem 1.2rem;
+        gap: 1.2rem;
+    }
+}
+
+/* Comparison cards — two paths side by side */
+.bas-calc-bvs-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin-bottom: 1.2rem;
+}
+@media (max-width: 720px) {
+    .bas-calc-bvs-comparison {
+        grid-template-columns: 1fr;
+        gap: 0.9rem;
+    }
+}
+.bas-calc-bvs-path {
+    padding: 1.4rem 1.5rem;
+    background: rgba(255,255,255,0.018);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.bas-calc-bvs-path-borrow {
+    border-color: rgba(39,174,96,0.22);
+    background: rgba(39,174,96,0.02);
+}
+.bas-calc-bvs-path-borrow .bas-calc-bvs-path-label { color: var(--green); }
+.bas-calc-bvs-path-sell {
+    border-color: rgba(224,148,34,0.18);
+}
+.bas-calc-bvs-path-sell .bas-calc-bvs-path-label { color: var(--amber); }
+.bas-calc-bvs-path-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.35rem;
+}
+.bas-calc-bvs-path-tagline {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+.bas-calc-bvs-path-headline {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+}
+.bas-calc-bvs-path-sublabel {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 1rem;
+}
+.bas-calc-bvs-path-rows {
+    margin-top: 0.3rem;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    padding-top: 0.7rem;
+}
+.bas-calc-bvs-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.85rem;
+}
+.bas-calc-bvs-row:last-child { border-bottom: none; padding-bottom: 0.2rem; }
+.bas-calc-bvs-row-label {
+    color: var(--text-dim);
+}
+.bas-calc-bvs-row-value {
+    color: var(--text);
+    font-weight: 500;
+}
+.bas-calc-bvs-row-value-terminal {
+    color: var(--text);
+    font-weight: 600;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.05rem;
+}
+
+/* Verdict — final line summarising the delta */
+.bas-calc-bvs-verdict {
+    padding: 1.2rem 1.4rem;
+    background: rgba(224,148,34,0.04);
+    border-left: 2px solid var(--amber);
+    border-radius: 0 4px 4px 0;
+}
+.bas-calc-bvs-verdict p {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.1rem;
+    line-height: 1.55;
+    color: var(--text);
+    margin: 0;
+}
+.bas-calc-bvs-verdict p strong { color: var(--amber); font-weight: 600; }
+.bas-calc-bvs-verdict p em { color: var(--amber-dim); font-style: italic; }
+.bas-calc-bvs-verdict-borrow-wins { border-left-color: var(--green); background: rgba(39,174,96,0.04); }
+.bas-calc-bvs-verdict-borrow-wins p strong { color: var(--green); }
+.bas-calc-bvs-verdict-sell-wins   { border-left-color: var(--amber); background: rgba(224,148,34,0.04); }
+.bas-calc-bvs-verdict-sell-wins   p strong { color: var(--amber); }
+.bas-calc-bvs-verdict-error       { border-left-color: #c0392b; background: rgba(192,57,43,0.04); }
+.bas-calc-bvs-verdict-error       p strong { color: #e87f6f; }
