@@ -31,12 +31,16 @@ eleventyComputed:
             <span class="tab-num">I</span>
             <span class="tab-title">The Question</span>
         </button>
-        <button class="tab-btn" data-tab="calculator">
+        <button class="tab-btn" data-tab="loan-health">
             <span class="tab-num">II</span>
-            <span class="tab-title">Calculator</span>
+            <span class="tab-title">Loan Health</span>
+        </button>
+        <button class="tab-btn" data-tab="borrow-vs-sell">
+            <span class="tab-num">III</span>
+            <span class="tab-title">Borrow vs. Sell</span>
         </button>
         <button class="tab-btn" data-tab="math">
-            <span class="tab-num">III</span>
+            <span class="tab-num">IV</span>
             <span class="tab-title">The Math</span>
         </button>
     </div>
@@ -241,12 +245,12 @@ eleventyComputed:
     </div>
 
     <!-- ═══════════════════════════════════════════ -->
-    <!-- TAB II: CALCULATOR — interactive surface       -->
+    <!-- TAB II: LOAN HEALTH — will this loan survive?  -->
     <!-- ═══════════════════════════════════════════ -->
-    <div class="tab-content" id="tab-calculator">
+    <div class="tab-content" id="tab-loan-health">
         <div class="section-intro">
-            <h2>Calculator</h2>
-            <p>Set your stack, current price, and the loan you'd actually need. The chart places your liquidation price on the Power Law channel &mdash; the vertical space between today's price and your liquidation marker is your structural buffer. If that marker sits below the channel floor, bitcoin would need to break its long-term structural support before liquidation. If it sits in the upper channel, routine mean-reversion gets you there.</p>
+            <h2>Loan Health</h2>
+            <p>Test whether the loan you're considering would survive bitcoin's drawdowns. Set your stack, current price, and the loan you'd need; the chart places your liquidation price on the Power Law channel &mdash; the vertical space between today's price and your liquidation marker is your structural buffer. If that marker sits below the channel floor, bitcoin would need to break its long-term structural support before liquidation. The Borrow vs. Sell tab next door uses the same loan figures to compare borrowing against an outright sale.</p>
         </div>
 
         <div class="bas-calc">
@@ -337,19 +341,6 @@ eleventyComputed:
                     <div class="bas-calc-field-hint">Click a preset (sets both rate and liquidation LTV for that category) or drag either slider to override. The rehypothecating preset is included to make the subsidy visible &mdash; <em>that subsidy is the failure mode the Question tab argues against.</em></div>
                 </div>
             </div>
-
-            <!-- ═════ SUB-TAB NAV ═════ -->
-            <!-- Two analytical surfaces within the Calculator tab:                -->
-            <!--   Sub-tab IIa: Loan health  — will this loan survive?            -->
-            <!--   Sub-tab IIb: Borrow vs. sell — should I borrow or sell?         -->
-            <!-- Shared inputs above stay sticky for both surfaces.                -->
-            <nav class="bas-calc-subtab-nav">
-                <button type="button" class="bas-calc-subtab-btn bas-calc-subtab-active" data-subtab="subtab-loan-health">Loan health</button>
-                <button type="button" class="bas-calc-subtab-btn" data-subtab="subtab-bvs">Borrow vs. sell</button>
-            </nav>
-
-            <!-- ═════ SUB-TAB IIa: LOAN HEALTH ═════ -->
-            <div class="bas-calc-subtab bas-calc-subtab-active" id="subtab-loan-health">
 
             <!-- ─── OUTPUT CARDS — RISK SURFACE ─── -->
             <div class="bas-calc-output-section">
@@ -450,117 +441,12 @@ eleventyComputed:
                 </div>
             </div>
 
-            </div><!-- ═════ end SUB-TAB IIa: Loan health ═════ -->
-
-            <!-- ═════ SUB-TAB IIb: BORROW vs. SELL ═════ -->
-            <!-- The strategic-decision surface: should I borrow or sell? -->
-            <!-- Distinct from Loan health (which asks: will this loan    -->
-            <!-- survive?). Scenario summary card at top recaps the loan  -->
-            <!-- parameters from above so the user doesn't have to scroll -->
-            <!-- to remember what was entered.                            -->
-            <div class="bas-calc-subtab" id="subtab-bvs">
-
-                <!-- ─── Scenario summary (mirrors current loan parameters) ─── -->
-                <div class="bas-calc-bvs-scenario">
-                    <div class="bas-calc-bvs-scenario-label">Your scenario from above</div>
-                    <div class="bas-calc-bvs-scenario-grid">
-                        <div class="bas-calc-bvs-scenario-item">
-                            <span class="bas-calc-bvs-scenario-key">Stack</span>
-                            <span class="bas-calc-bvs-scenario-val" id="basBvsScenarioStack">&mdash;</span>
-                        </div>
-                        <div class="bas-calc-bvs-scenario-item">
-                            <span class="bas-calc-bvs-scenario-key">Loan amount</span>
-                            <span class="bas-calc-bvs-scenario-val" id="basBvsScenarioLoan">&mdash;</span>
-                        </div>
-                        <div class="bas-calc-bvs-scenario-item">
-                            <span class="bas-calc-bvs-scenario-key">Interest rate</span>
-                            <span class="bas-calc-bvs-scenario-val" id="basBvsScenarioRate">&mdash;</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bas-calc-bvs-section">
-                    <div class="bas-calc-bvs-header">
-                        <h3 class="bas-calc-bvs-title">Borrow vs. sell &mdash; what each path leaves you with</h3>
-                        <p class="bas-calc-bvs-subtitle">Over the chosen horizon, both paths fund the same dollar need. Future bitcoin price is the <em>Power Law trend at the end of the horizon</em> &mdash; the central-tendency expectation, not a forecast. Borrowing wins when the cost of paying interest is less than the BTC saved by not selling at today's price.</p>
-                    </div>
-
-                    <!-- ─── Inputs specific to this comparison ─── -->
-                    <div class="bas-calc-bvs-inputs">
-                        <div class="bas-calc-field">
-                            <div class="bas-calc-field-label bas-calc-field-label-with-display">
-                                <span>
-                                    Time horizon
-                                    <span class="help-tip" tabindex="0">?<span class="tip-content">How long until you'd repay the loan (borrow path) or how long to project forward (sell path). Both paths are evaluated at the same future date so the comparison is apples-to-apples. Longer horizon = more time for bitcoin to appreciate = more advantage to the borrow path (but also more cumulative interest).</span></span>
-                                </span>
-                                <span class="bas-calc-field-display"><span id="basHorizonDisplay">5</span> years</span>
-                            </div>
-                            <input type="range" id="basHorizon" min="1" max="15" value="5" step="1">
-                        </div>
-
-                        <div class="bas-calc-field">
-                            <label class="bas-calc-field-label" for="basCostBasis">
-                                Cost basis per BTC (USD)
-                                <span class="help-tip" tabindex="0">?<span class="tip-content">The average price per BTC at which you originally bought your stack. Used to compute capital gains tax in the sell path. Defaults to today's price (no embedded gain &mdash; the most conservative assumption for the sell path). Use the presets to model typical cycle entry points or enter your actual basis.</span></span>
-                            </label>
-                            <input type="number" id="basCostBasis" value="" step="100" min="0">
-                            <!-- Cost basis presets: typical cycle entry points -->
-                            <div class="bas-calc-bvs-cb-presets">
-                                <button type="button" class="bas-calc-bvs-cb-preset" data-cb="today">Today</button>
-                                <button type="button" class="bas-calc-bvs-cb-preset" data-cb="2yr">2 yr ago &asymp;</button>
-                                <button type="button" class="bas-calc-bvs-cb-preset" data-cb="4yr">4 yr ago &asymp;</button>
-                                <button type="button" class="bas-calc-bvs-cb-preset" data-cb="genesis">Pre-2020 &asymp;</button>
-                            </div>
-                        </div>
-
-                        <div class="bas-calc-field">
-                            <div class="bas-calc-field-label bas-calc-field-label-with-display">
-                                <span>
-                                    Capital gains tax rate
-                                    <span class="help-tip" tabindex="0">?<span class="tip-content">Your effective long-term capital gains tax rate. US federal LTCG is 0%, 15%, or 20% depending on bracket; state tax may add more. Use 0% if your bitcoin is held in a tax-advantaged account (IRA, Roth, etc.).</span></span>
-                                </span>
-                                <span class="bas-calc-field-display"><span id="basCapGainsDisplay">20</span>%</span>
-                            </div>
-                            <input type="range" id="basCapGains" min="0" max="40" value="20" step="1">
-                        </div>
-                    </div>
-
-                    <!-- ─── Comparison cards ─── -->
-                    <div class="bas-calc-bvs-comparison">
-                        <div class="bas-calc-bvs-path bas-calc-bvs-path-borrow">
-                            <div class="bas-calc-bvs-path-label">Borrow path</div>
-                            <div class="bas-calc-bvs-path-tagline">Keep the stack &middot; pay interest &middot; repay at horizon</div>
-                            <div class="bas-calc-bvs-path-headline" id="basBvsBorrowHeadline">&mdash; BTC</div>
-                            <div class="bas-calc-bvs-path-sublabel">retained at end of horizon</div>
-                            <div class="bas-calc-bvs-path-rows" id="basBvsBorrowRows">
-                                <!-- Populated by JS -->
-                            </div>
-                        </div>
-                        <div class="bas-calc-bvs-path bas-calc-bvs-path-sell">
-                            <div class="bas-calc-bvs-path-label">Sell path</div>
-                            <div class="bas-calc-bvs-path-tagline">Sell some now &middot; net loan amount after tax &middot; hold the rest</div>
-                            <div class="bas-calc-bvs-path-headline" id="basBvsSellHeadline">&mdash; BTC</div>
-                            <div class="bas-calc-bvs-path-sublabel">retained at end of horizon</div>
-                            <div class="bas-calc-bvs-path-rows" id="basBvsSellRows">
-                                <!-- Populated by JS -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ─── Verdict line ─── -->
-                    <div class="bas-calc-bvs-verdict" id="basBvsVerdict">
-                        <p>Enter a stack, current price, and loan amount above to compare the two paths.</p>
-                    </div>
-                </div>
-
-            </div><!-- ═════ end SUB-TAB IIb: Borrow vs. sell ═════ -->
-
-            <!-- ─── COMING NEXT (visible regardless of active sub-tab) ─── -->
+            <!-- ─── COMING NEXT (roadmap stays at bottom of Loan Health) ─── -->
             <div class="bas-calc-roadmap">
                 <div class="bas-calc-roadmap-label">Coming in subsequent commits</div>
                 <ul>
-                    <li><strong>Borrow-vs-sell comparison.</strong> Total interest cost over horizon against capital-gains tax saved, with BTC opportunity cost computed against the same Power Law channel. Tactical/strategic toggle for short-horizon need vs. perpetual leverage cases.</li>
                     <li><strong>Early-repayment scenario.</strong> The Disciplined-Rebalancing extension: plan to repay the loan when bitcoin reaches a high channel position. Outputs BTC required to repay, BTC retained, and the net cycle outcome &mdash; using the cycle peak to extinguish the loan and remove the recurring obligation.</li>
+                    <li><strong>Tactical / strategic toggle on Borrow vs. Sell.</strong> Current model is tactical (repay at horizon). The strategic case is perpetual leverage (never repay; refinance forward).</li>
                     <li><strong>Historical safety backtest.</strong> Would this LTV have survived bitcoin's worst historical drawdowns? Yes/no plus the closest call.</li>
                     <li><strong>Counterparty default scenario.</strong> Your lender goes Celsius-style. Recovery distributions by archetype: Celsius (partial), BlockFi (100% but ~2 years locked), Genesis (full in-kind), Voyager (~70%), worst-case zero.</li>
                     <li><strong>DeFi infrastructure scenario.</strong> Wrapping depeg, oracle stale, bridge exploit. Loss = collateral, recovery near zero.</li>
@@ -572,32 +458,253 @@ eleventyComputed:
     </div>
 
     <!-- ═══════════════════════════════════════════ -->
-    <!-- TAB III: THE MATH — methodology notes (stub) -->
+    <!-- TAB III: BORROW vs. SELL — should I borrow or sell? -->
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- Self-contained calculator. Shares stack / price / loan / rate    -->
+    <!-- with Loan Health via a JS sync layer (localStorage-backed) so    -->
+    <!-- the user only enters those once. BvS-specific inputs (horizon,   -->
+    <!-- cost basis, capital gains tax) live only on this tab.            -->
+    <div class="tab-content" id="tab-borrow-vs-sell">
+        <div class="section-intro">
+            <h2>Borrow vs. Sell</h2>
+            <p>Two paths for the same dollar need: borrow against your stack and pay interest, or sell some bitcoin outright. This tab evaluates both at the end of your chosen horizon, using the Power Law trend as the future-price expectation. Stack, current price, loan amount, and interest rate mirror your inputs on Loan Health (change one, the other updates). The horizon, cost basis, and tax rate are specific to the decision being modelled here.</p>
+        </div>
+
+        <div class="bas-calc">
+
+            <!-- ─── Shared inputs (mirror Loan Health via state sync) ─── -->
+            <div class="bas-calc-inputs">
+                <div class="bas-calc-field">
+                    <label class="bas-calc-field-label" for="bvsBtcStack">
+                        BTC stack
+                        <span class="help-tip" tabindex="0">?<span class="tip-content">The quantity of bitcoin you'd pledge as collateral. Mirrors the BTC stack input on Loan Health &mdash; change either, both update.</span></span>
+                    </label>
+                    <input type="number" id="bvsBtcStack" value="1.0" step="0.01" min="0" max="100000">
+                    <div class="bas-calc-field-hint">Quantity of bitcoin available as collateral.</div>
+                </div>
+
+                <div class="bas-calc-field">
+                    <label class="bas-calc-field-label" for="bvsBtcPrice">
+                        Current BTC price (USD)
+                        <span class="help-tip" tabindex="0">?<span class="tip-content">Mirrors the Current BTC price input on Loan Health. Auto-filled from the most recent monthly sample; edit to model a different starting price.</span></span>
+                    </label>
+                    <input type="number" id="bvsBtcPrice" value="" step="100" min="0" max="100000000">
+                    <div class="bas-calc-field-hint">Auto-populated from the most recent monthly sample.</div>
+                </div>
+
+                <div class="bas-calc-field">
+                    <label class="bas-calc-field-label" for="bvsLoanAmount">
+                        Loan amount (USD)
+                        <span class="help-tip" tabindex="0">?<span class="tip-content">The dollar amount you'd actually need. Mirrors the Loan amount input on Loan Health &mdash; change either, both update.</span></span>
+                    </label>
+                    <input type="number" id="bvsLoanAmount" value="10000" step="100" min="0" max="1000000000">
+                    <div class="bas-calc-field-hint">The amount you'd need either way &mdash; borrowed against the stack or netted from selling.</div>
+                </div>
+            </div>
+
+            <!-- ─── Interest rate (shared with Loan Health) + provider presets ─── -->
+            <div class="bas-calc-inputs-cost">
+                <div class="bas-calc-field">
+                    <div class="bas-calc-field-label bas-calc-field-label-with-display">
+                        <span>
+                            Interest rate (APR)
+                            <span class="help-tip" tabindex="0">?<span class="tip-content">Mirrors the Interest rate input on Loan Health. Most bitcoin-backed loans are interest-only with bullet repayment &mdash; you pay interest monthly; the principal stays outstanding until you choose to repay it (or, in the borrow path here, until horizon).</span></span>
+                        </span>
+                        <span class="bas-calc-field-display"><span id="bvsInterestRateDisplay">10.0</span>%</span>
+                    </div>
+                    <input type="range" id="bvsInterestRate" min="2" max="20" value="10" step="0.5">
+                    <div class="bas-calc-presets">
+                        <div class="bas-calc-preset-wrap">
+                            <button type="button" class="bas-calc-preset-bvs" data-rate="10">Tier-1 CeFi &asymp; 10%</button>
+                            <span class="help-tip help-tip-preset" tabindex="0">?<span class="tip-content">Tier-1 non-rehypothecating CeFi. Sets rate to 10%. (Liquidation LTV not relevant on this tab; visit Loan Health for the full provider preset.) <a href="#question">See Question tab &rsaquo;</a></span></span>
+                        </div>
+                        <div class="bas-calc-preset-wrap">
+                            <button type="button" class="bas-calc-preset-bvs" data-rate="14">Multisig &asymp; 14%</button>
+                            <span class="help-tip help-tip-preset" tabindex="0">?<span class="tip-content">Collaborative-custody multisig. Sets rate to 14%. <a href="#question">See Question tab &rsaquo;</a></span></span>
+                        </div>
+                        <div class="bas-calc-preset-wrap">
+                            <button type="button" class="bas-calc-preset-bvs bas-calc-preset-warning" data-rate="3">Rehypothecating &asymp; 3%</button>
+                            <span class="help-tip help-tip-preset help-tip-warning" tabindex="0">?<span class="tip-content">Platforms that subsidise low headline rates by re-lending your collateral. <strong>The structural failure mode that took down Celsius, BlockFi, Genesis, and Voyager.</strong> Included to make the subsidy effect visible. <a href="#question">See Question tab &rsaquo;</a></span></span>
+                        </div>
+                    </div>
+                    <div class="bas-calc-field-hint">Click a preset (sets rate) or drag the slider. Liquidation LTV lives on the Loan Health tab.</div>
+                </div>
+            </div>
+
+            <!-- ─── BvS-specific inputs (horizon / cost basis / tax rate) ─── -->
+            <div class="bas-calc-bvs-section">
+                <div class="bas-calc-bvs-header">
+                    <h3 class="bas-calc-bvs-title">The comparison &mdash; what each path leaves you with</h3>
+                    <p class="bas-calc-bvs-subtitle">Both paths fund the same dollar need. Future bitcoin price is the <em>Power Law trend at the end of the horizon</em> &mdash; the central-tendency expectation, not a forecast. Borrowing wins when the opportunity cost of the BTC you'd sell exceeds the cumulative interest of carrying the loan.</p>
+                </div>
+
+                <div class="bas-calc-bvs-inputs">
+                    <div class="bas-calc-field">
+                        <div class="bas-calc-field-label bas-calc-field-label-with-display">
+                            <span>
+                                Time horizon
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">How long until you'd repay the loan (borrow path) or how long to project forward (sell path). Both paths are evaluated at the same future date so the comparison is apples-to-apples. Longer horizon = more time for bitcoin to appreciate = more advantage to the borrow path (but also more cumulative interest).</span></span>
+                            </span>
+                            <span class="bas-calc-field-display"><span id="bvsHorizonDisplay">5</span> years</span>
+                        </div>
+                        <input type="range" id="bvsHorizon" min="1" max="15" value="5" step="1">
+                    </div>
+
+                    <div class="bas-calc-field">
+                        <label class="bas-calc-field-label" for="bvsCostBasis">
+                            Cost basis per BTC (USD)
+                            <span class="help-tip" tabindex="0">?<span class="tip-content">The average price per BTC at which you originally bought your stack. Used to compute capital gains tax in the sell path. Defaults to today's price (no embedded gain &mdash; the most conservative assumption for the sell path). Use the presets to model typical cycle entry points.</span></span>
+                        </label>
+                        <input type="number" id="bvsCostBasis" value="" step="100" min="0">
+                        <div class="bas-calc-bvs-cb-presets">
+                            <button type="button" class="bas-calc-bvs-cb-preset" data-cb="today">Today</button>
+                            <button type="button" class="bas-calc-bvs-cb-preset" data-cb="2yr">2 yr ago &asymp;</button>
+                            <button type="button" class="bas-calc-bvs-cb-preset" data-cb="4yr">4 yr ago &asymp;</button>
+                            <button type="button" class="bas-calc-bvs-cb-preset" data-cb="genesis">Pre-2020 &asymp;</button>
+                        </div>
+                    </div>
+
+                    <div class="bas-calc-field">
+                        <div class="bas-calc-field-label bas-calc-field-label-with-display">
+                            <span>
+                                Capital gains tax rate
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">Your effective long-term capital gains tax rate. US federal LTCG is 0%, 15%, or 20% depending on bracket; state tax may add more. Use 0% if your bitcoin is held in a tax-advantaged account (IRA, Roth, etc.).</span></span>
+                            </span>
+                            <span class="bas-calc-field-display"><span id="bvsCapGainsDisplay">20</span>%</span>
+                        </div>
+                        <input type="range" id="bvsCapGains" min="0" max="40" value="20" step="1">
+                    </div>
+                </div>
+
+                <!-- ─── Comparison cards ─── -->
+                <div class="bas-calc-bvs-comparison">
+                    <div class="bas-calc-bvs-path bas-calc-bvs-path-borrow">
+                        <div class="bas-calc-bvs-path-label">Borrow path</div>
+                        <div class="bas-calc-bvs-path-tagline">Keep the stack &middot; pay interest &middot; repay at horizon</div>
+                        <div class="bas-calc-bvs-path-headline" id="basBvsBorrowHeadline">&mdash; BTC</div>
+                        <div class="bas-calc-bvs-path-sublabel">retained at end of horizon</div>
+                        <div class="bas-calc-bvs-path-rows" id="basBvsBorrowRows">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                    <div class="bas-calc-bvs-path bas-calc-bvs-path-sell">
+                        <div class="bas-calc-bvs-path-label">Sell path</div>
+                        <div class="bas-calc-bvs-path-tagline">Sell some now &middot; net loan amount after tax &middot; hold the rest</div>
+                        <div class="bas-calc-bvs-path-headline" id="basBvsSellHeadline">&mdash; BTC</div>
+                        <div class="bas-calc-bvs-path-sublabel">retained at end of horizon</div>
+                        <div class="bas-calc-bvs-path-rows" id="basBvsSellRows">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── Verdict line ─── -->
+                <div class="bas-calc-bvs-verdict" id="basBvsVerdict">
+                    <p>Enter a stack, current price, and loan amount above to compare the two paths.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB IV: THE MATH — methodology and formulas -->
     <!-- ═══════════════════════════════════════════ -->
     <div class="tab-content" id="tab-math">
         <div class="section-intro">
             <h2>The Math</h2>
-            <p>Methodology notes for the calculator, plus a deeper-dive section on the structural concepts surfaced in the Question tab. In active development alongside the calculator.</p>
+            <p>The formulas the two calculators use, the data sources behind them, and what's deliberately not modelled. Held to the same standard as the math tab on the page's siblings &mdash; explicit about assumptions, transparent about gaps.</p>
         </div>
 
-        <div class="bas-cs-stub">
-            <div class="bas-cs-stub-header">In active development</div>
+        <div class="bas-math">
 
-            <div class="bas-cs-stub-section">
-                <h3>Planned content</h3>
-                <ul class="negative-space-list">
-                    <li><strong>Liquidation-price derivation</strong> &mdash; the math behind the calculator's headline output, including how the LTV / margin-call / liquidation-threshold structure works on representative platforms.</li>
-                    <li><strong>Power Law channel methodology</strong> &mdash; coefficient reference and link back to <a href="/the-power-law.html">the foundational page</a>; how channel-position percentiles map to drawdown buffer in this context.</li>
-                    <li><strong>Borrow-vs-sell decision math</strong> &mdash; the G &gt; R arithmetic walked through carefully, with the tactical vs. strategic time-horizon distinction surfaced explicitly.</li>
-                    <li><strong>The &ldquo;Infrastructure Failure Gap&rdquo; explainer</strong> &mdash; the structural risk that healthy positions can be liquidated when oracles fail or networks congest, beyond what LTV alone protects against.</li>
-                    <li><strong>Source-verification appendix</strong> &mdash; sourcing for every numerical claim that appears in the Question tab. Drafted alongside research synthesis; will be published with the page.</li>
-                    <li><strong>What we're not modeling</strong> &mdash; the explicit list of factors deliberately out of scope (forward-rate uncertainty, jurisdictional tax variation, etc.), following the DR-page convention.</li>
+            <!-- ─── 1. THE POWER LAW CHANNEL ─── -->
+            <div class="bas-math-section">
+                <h3 class="bas-math-section-title">The Power Law channel</h3>
+                <p class="bas-math-prose">Every channel-position and future-price calculation on this page uses the bitcoin Power Law, originated by Giovanni Santostasi and developed into the channel framework by Matthew Me&#382;inskis at Porkopolis Economics. The trend line is:</p>
+                <div class="bas-math-eq">P(d) = 10<sup>&minus;17.668 + 5.846 &times; log<sub>10</sub>(d)</sup></div>
+                <p class="bas-math-prose">where <em>d</em> is days since the bitcoin genesis block (3 January 2009). The channel floor sits at <strong>0.42&times; the trend</strong>; the upper bound at <strong>3.0&times; the trend</strong>. Both have been respected across every cycle since the early years.</p>
+                <p class="bas-math-prose">For derivation and historical fit, see <a href="/the-power-law.html">the Power Law page</a>.</p>
+            </div>
+
+            <!-- ─── 2. LOAN HEALTH MATH ─── -->
+            <div class="bas-math-section">
+                <h3 class="bas-math-section-title">Loan Health</h3>
+                <p class="bas-math-prose">Your current loan-to-value ratio:</p>
+                <div class="bas-math-eq">LTV = loan / (stack &times; price)</div>
+                <p class="bas-math-prose">The price at which your collateral is forcibly sold, given the lender's Liquidation LTV trigger:</p>
+                <div class="bas-math-eq">P<sub>liq</sub> = loan / (stack &times; liquidation_LTV)</div>
+                <p class="bas-math-prose">Drawdown buffer &mdash; the percentage bitcoin can fall before forced sale:</p>
+                <div class="bas-math-eq">drawdown_to_liq = 1 &minus; (LTV / liquidation_LTV)</div>
+                <p class="bas-math-prose">Annual carrying cost (interest-only model, no principal amortisation):</p>
+                <div class="bas-math-eq">annual_interest = loan &times; rate</div>
+                <p class="bas-math-prose">Annual cost as a fraction of stack value &mdash; the figure to compare against bitcoin's compound annual growth rate for the G &gt; R structural check:</p>
+                <div class="bas-math-eq">annual_cost_pct = annual_interest / (stack &times; price)</div>
+
+                <p class="bas-math-prose">LTV zone classification is computed <em>relative</em> to the Liquidation LTV trigger, not as absolute bands, so a 30% LTV against an 82% threshold reads as conservative while the same 30% against a 50% threshold reads as moderate:</p>
+                <div class="bas-math-table">
+                    <div class="bas-math-table-row bas-math-table-header"><span>ratio = LTV / liquidation_LTV</span><span>Zone</span></div>
+                    <div class="bas-math-table-row"><span>ratio &lt; 0.50</span><span>Conservative</span></div>
+                    <div class="bas-math-table-row"><span>0.50 &le; ratio &lt; 0.80</span><span>Moderate</span></div>
+                    <div class="bas-math-table-row"><span>ratio &ge; 0.80</span><span>Aggressive</span></div>
+                </div>
+
+                <p class="bas-math-prose">Channel position of the liquidation price, relative to today's Power Law trend:</p>
+                <div class="bas-math-table">
+                    <div class="bas-math-table-row bas-math-table-header"><span>P<sub>liq</sub> / P(today)</span><span>Position</span></div>
+                    <div class="bas-math-table-row"><span>&lt; 0.42</span><span>Below channel floor</span></div>
+                    <div class="bas-math-table-row"><span>0.42 to 1.00</span><span>Between floor and trend</span></div>
+                    <div class="bas-math-table-row"><span>1.00 to 3.00</span><span>Above trend</span></div>
+                    <div class="bas-math-table-row"><span>&ge; 3.00</span><span>Above upper bound</span></div>
+                </div>
+            </div>
+
+            <!-- ─── 3. BORROW VS. SELL MATH ─── -->
+            <div class="bas-math-section">
+                <h3 class="bas-math-section-title">Borrow vs. Sell</h3>
+                <p class="bas-math-prose">The future bitcoin price used in both paths is the Power Law trend at the end of the horizon:</p>
+                <div class="bas-math-eq">P<sub>future</sub> = P(today<sub>days</sub> + horizon_years &times; 365.25)</div>
+                <p class="bas-math-prose">This is a <em>central-tendency expectation</em>, not a forecast. Bitcoin can sit above or below the trend for extended periods; the comparison's directional verdict is more robust than its dollar-figure precision.</p>
+
+                <h4 class="bas-math-subsection-title">Sell path</h4>
+                <p class="bas-math-prose">To net <em>loan</em> after capital gains tax when selling at today's price:</p>
+                <div class="bas-math-eq">gain_per_BTC = max(0, price &minus; cost_basis)</div>
+                <div class="bas-math-eq">tax_per_BTC = gain_per_BTC &times; tax_rate</div>
+                <div class="bas-math-eq">net_per_BTC = price &minus; tax_per_BTC</div>
+                <div class="bas-math-eq">BTC<sub>sold,now</sub> = loan / net_per_BTC</div>
+                <div class="bas-math-eq">terminal_wealth<sub>sell</sub> = (stack &minus; BTC<sub>sold,now</sub>) &times; P<sub>future</sub></div>
+
+                <h4 class="bas-math-subsection-title">Borrow path</h4>
+                <p class="bas-math-prose">Cumulative interest paid over the horizon (simple, interest-only, paid from external income rather than from the stack):</p>
+                <div class="bas-math-eq">cumulative_interest = loan &times; rate &times; horizon_years</div>
+                <p class="bas-math-prose">At horizon, sell just enough BTC at P<sub>future</sub> to repay the loan principal &mdash; capital gains tax is owed on the future gain:</p>
+                <div class="bas-math-eq">gain_per_BTC<sub>future</sub> = max(0, P<sub>future</sub> &minus; cost_basis)</div>
+                <div class="bas-math-eq">net_per_BTC<sub>future</sub> = P<sub>future</sub> &minus; gain_per_BTC<sub>future</sub> &times; tax_rate</div>
+                <div class="bas-math-eq">BTC<sub>sold,horizon</sub> = loan / net_per_BTC<sub>future</sub></div>
+                <div class="bas-math-eq">terminal_wealth<sub>borrow</sub> = (stack &minus; BTC<sub>sold,horizon</sub>) &times; P<sub>future</sub> &minus; cumulative_interest</div>
+
+                <h4 class="bas-math-subsection-title">Opportunity cost (shown in each card)</h4>
+                <p class="bas-math-prose">The value of BTC sold at the horizon's trend price &mdash; what those coins <em>would</em> have been worth had they been held:</p>
+                <div class="bas-math-eq">opp_cost = BTC<sub>sold</sub> &times; P<sub>future</sub></div>
+                <p class="bas-math-prose">Dominant cost on the sell path (lots of BTC sold now). Small on the borrow path (few BTC sold at horizon to repay). The structural argument for borrowing reduces to: <em>does the opportunity cost of the BTC you'd sell exceed the cumulative interest of carrying the loan?</em></p>
+            </div>
+
+            <!-- ─── 4. WHAT'S NOT MODELLED ─── -->
+            <div class="bas-math-section">
+                <h3 class="bas-math-section-title">What's not modelled</h3>
+                <p class="bas-math-prose">Several real-world dimensions are deliberately out of scope to keep the page readable. Each is logged for follow-up:</p>
+                <ul class="bas-math-list">
+                    <li><strong>Variable interest rates.</strong> Rate is held constant across the horizon. Real CeFi loan rates can shift with macro conditions.</li>
+                    <li><strong>Margin call windows.</strong> Many platforms post a margin call before forced sale, giving the borrower a chance to top up collateral. The calculator assumes a clean trigger at the Liquidation LTV.</li>
+                    <li><strong>DCA accumulation.</strong> The stack is held constant. Continued accumulation over the horizon would improve both paths' outcomes.</li>
+                    <li><strong>Loan refinancing / perpetual leverage.</strong> The borrow path assumes a single repayment at horizon. The strategic case (never repay; refinance forward indefinitely) is on the roadmap.</li>
+                    <li><strong>Counterparty default.</strong> Celsius / BlockFi / Genesis / Voyager-style failure not modelled. Recovery distributions by archetype are on the roadmap.</li>
+                    <li><strong>DeFi infrastructure exploits.</strong> Oracle stale, bridge depeg, wrapping risks are not modelled. Loss in those scenarios is typically the full collateral with near-zero recovery; that's a separate roadmap item.</li>
+                    <li><strong>Tax detail beyond federal LTCG.</strong> Only US-style federal long-term capital gains modelled. State, city, foreign-jurisdiction tax not included. Short-term gains (holding period &lt;1 year) not modelled &mdash; if the stack is recent, the actual tax burden on the sell path will be higher than shown.</li>
+                    <li><strong>Multi-cycle path dependency.</strong> The horizon's endpoint is the Power Law trend regardless of what bitcoin does in between. The 100-BTC-at-$100 thought experiment from the Question tab is a useful corrective: the structural argument doesn't depend on smooth appreciation.</li>
                 </ul>
             </div>
 
-            <div class="bas-cs-stub-cta">
-                <p>This tab gets fleshed out as the calculator is implemented &mdash; the methodology notes describe what the calculator actually computes, so the two are built together.</p>
-            </div>
         </div>
     </div>
 
