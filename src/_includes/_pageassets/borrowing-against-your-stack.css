@@ -3,16 +3,21 @@
 
    Page-specific styles. Chrome rules (hero, tab nav, sections,
    prose, belief-context, negative-space-list) are lifted from
-   the Disciplined Rebalancing page for consistent visual
-   register across the two related calculators.
+   the Disciplined Rebalancing page for consistent visual register
+   across the two related calculators.
 
-   Page-specific additions:
-     - .bas-tier      three-tier rehypothecation hierarchy cards
-     - .bas-cs-stub   Calculator and Math tab "in development" stubs
-     - .bas-viz-placeholder   inline placeholder for the CAGR chart
-
-   Calculator-specific styling (input surface, channel chart,
-   loss-scenario backtests, etc.) ships in subsequent commits.
+   Sections:
+   1. CSS variables (color tokens)
+   2. Page width constraints (content-area, hero)
+   3. Section-intro and per-tab essay constraints
+   4. Tab navigation
+   5. Narrative pull-out block
+   6. Belief-context callout
+   7. Negative-space list
+   8. BAS-tier cards (three-tier rehypothecation hierarchy)
+   9. BAS-cs-stub (used in Math tab still in development)
+  10. BAS-viz-placeholder (inline placeholder for CAGR chart)
+  11. Calculator surface (input grid, output cards, channel chart)
    ─────────────────────────────────────────────── */
 
 :root {
@@ -27,12 +32,11 @@
     --red: #c0392b;
     --red-dim: rgba(192,57,43,0.6);
     --green: #27ae60;
+    --green-dim: rgba(39,174,96,0.6);
     --border: rgba(224,148,34,0.12);
 }
 
-/* ───────────────────────────────────────────────
-   PAGE WIDTH CONSTRAINTS — matches DR convention
-   ─────────────────────────────────────────────── */
+/* ─── 2. PAGE WIDTH CONSTRAINTS ─── */
 .content-area {
     position: relative;
     max-width: 1100px;
@@ -84,9 +88,7 @@
     .hero { padding: 3.5rem 1.25rem 2rem; }
 }
 
-/* ───────────────────────────────────────────────
-   SECTION-INTRO and per-tab essay constraints
-   ─────────────────────────────────────────────── */
+/* ─── 3. SECTION-INTRO + PER-TAB ESSAY CONSTRAINTS ─── */
 .section-intro {
     margin: 0 auto 2rem;
     max-width: 880px;
@@ -109,7 +111,6 @@
 .section-intro p em { color: var(--text); font-style: italic; }
 .section-intro p strong { color: var(--text); font-weight: 600; }
 
-/* Question tab — block-level essay constraints */
 #tab-question .section,
 #tab-question .narrative,
 #tab-question .belief-context {
@@ -142,20 +143,23 @@
 }
 #tab-question p em { font-style: italic; color: var(--amber-dim); }
 #tab-question p strong { color: var(--text); font-weight: 600; }
+#tab-question p a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(224,148,34,0.3);
+    transition: border-color 0.2s;
+}
+#tab-question p a:hover { border-color: var(--amber); }
+#tab-question p a em { color: var(--amber); }
 
-/* Calculator + Math tabs — same essay block constraints for stub content */
-#tab-calculator .section-intro,
 #tab-math .section-intro,
-#tab-calculator .bas-cs-stub,
 #tab-math .bas-cs-stub {
     max-width: 880px;
     margin-left: auto;
     margin-right: auto;
 }
 
-/* ───────────────────────────────────────────────
-   TAB NAVIGATION — Half-Life-pattern, matches DR
-   ─────────────────────────────────────────────── */
+/* ─── 4. TAB NAVIGATION ─── */
 .tab-nav {
     display: flex;
     gap: 0;
@@ -211,10 +215,7 @@
     .tab-btn .tab-title { font-size: 0.95rem; }
 }
 
-/* ───────────────────────────────────────────────
-   NARRATIVE BLOCK — pull-out callout used in opening
-   and in the Arbitrum-community-quote section
-   ─────────────────────────────────────────────── */
+/* ─── 5. NARRATIVE BLOCK ─── */
 .narrative {
     background: rgba(255,255,255,0.015);
     border-left: 2px solid var(--amber);
@@ -230,9 +231,7 @@
     margin: 0;
 }
 
-/* ───────────────────────────────────────────────
-   BELIEF CONTEXT CALLOUT — Power Law prerequisite cue
-   ─────────────────────────────────────────────── */
+/* ─── 6. BELIEF CONTEXT CALLOUT ─── */
 .belief-context {
     background: rgba(224, 148, 34, 0.035);
     border: 1px solid rgba(224, 148, 34, 0.15);
@@ -261,13 +260,9 @@
     border-bottom: 1px solid rgba(224,148,34,0.4);
     transition: border-color 0.2s;
 }
-.belief-context a:hover {
-    border-color: var(--amber);
-}
+.belief-context a:hover { border-color: var(--amber); }
 
-/* ───────────────────────────────────────────────
-   NEGATIVE-SPACE LIST — disciplined "what this is" lists
-   ─────────────────────────────────────────────── */
+/* ─── 7. NEGATIVE-SPACE LIST ─── */
 .negative-space-list {
     list-style: none;
     padding: 0;
@@ -281,13 +276,8 @@
     line-height: 1.6;
     color: var(--text-dim);
 }
-.negative-space-list li:last-child {
-    border-bottom: none;
-}
-.negative-space-list li strong {
-    color: var(--text);
-    font-weight: 600;
-}
+.negative-space-list li:last-child { border-bottom: none; }
+.negative-space-list li strong { color: var(--text); font-weight: 600; }
 .negative-space-list li em { color: var(--amber-dim); font-style: italic; }
 .negative-space-list li::before {
     content: "—";
@@ -303,14 +293,7 @@
 }
 .negative-space-list li a:hover { border-color: var(--amber); }
 
-/* ───────────────────────────────────────────────
-   BAS-TIER HIERARCHY (three-tier rehypothecation cards)
-
-   Visual treatment for the "verifiable → contractual → fail"
-   hierarchy in the rehypothecation section. The .bas-tier-fail
-   modifier gives the bottom tier a desaturated red accent to
-   visually signal that it doesn't meet the standard.
-   ─────────────────────────────────────────────── */
+/* ─── 8. BAS-TIER HIERARCHY (three-tier rehypothecation cards) ─── */
 .bas-tier {
     display: flex;
     gap: 1.4rem;
@@ -336,10 +319,7 @@
     color: var(--amber);
     line-height: 1;
 }
-.bas-tier-body {
-    flex: 1;
-    min-width: 0;
-}
+.bas-tier-body { flex: 1; min-width: 0; }
 .bas-tier-title {
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 1.2rem;
@@ -364,14 +344,9 @@
     background: rgba(192,57,43,0.14);
     color: rgba(232,128,113,0.95);
 }
-.bas-tier-fail .bas-tier-title {
-    color: rgba(232,128,113,0.95);
-}
+.bas-tier-fail .bas-tier-title { color: rgba(232,128,113,0.95); }
 
-/* ───────────────────────────────────────────────
-   BAS-CS-STUB — "in active development" sections for
-   Calculator and Math tabs while they're being built
-   ─────────────────────────────────────────────── */
+/* ─── 9. BAS-CS-STUB (Math tab development stub) ─── */
 .bas-cs-stub {
     margin: 2rem auto 0;
     padding: 2.2rem 2.4rem;
@@ -390,9 +365,7 @@
     padding-bottom: 0.9rem;
     border-bottom: 1px solid rgba(224,148,34,0.15);
 }
-.bas-cs-stub-section {
-    margin-bottom: 2.2rem;
-}
+.bas-cs-stub-section { margin-bottom: 2.2rem; }
 .bas-cs-stub-section:last-of-type { margin-bottom: 0; }
 .bas-cs-stub-section h3 {
     font-family: 'Cormorant Garamond', Georgia, serif;
@@ -431,10 +404,7 @@
     text-align: center;
 }
 
-/* ───────────────────────────────────────────────
-   BAS-VIZ-PLACEHOLDER — inline placeholder for the
-   CAGR-vs-interest-rate chart while it's in development
-   ─────────────────────────────────────────────── */
+/* ─── 10. BAS-VIZ-PLACEHOLDER ─── */
 .bas-viz-placeholder {
     margin: 1.5rem 0;
     padding: 3rem 2rem;
@@ -450,14 +420,309 @@
     letter-spacing: 0.02em;
 }
 
-/* ───────────────────────────────────────────────
-   GENERIC LINK STYLING inside .prose for Question tab
-   ─────────────────────────────────────────────── */
-#tab-question p a {
-    color: var(--amber);
-    text-decoration: none;
-    border-bottom: 1px solid rgba(224,148,34,0.3);
-    transition: border-color 0.2s;
+/* ═══════════════════════════════════════════════
+   11. CALCULATOR SURFACE
+   First-slice: inputs (stack, current price, loan amount,
+   liquidation threshold), three output cards (LTV, liquidation
+   BTC price, channel position), and the Power Law channel chart.
+   Borrow-vs-sell comparison, interest cost, and loss-scenario
+   backtests come in subsequent commits.
+   ═══════════════════════════════════════════════ */
+
+.bas-calc {
+    margin: 2rem auto 0;
+    max-width: 1040px;
 }
-#tab-question p a:hover { border-color: var(--amber); }
-#tab-question p a em { color: var(--amber); }
+
+/* Input grid — 2 columns on wide, 1 column on narrow.
+   Each .bas-calc-field is a labeled control (number input or slider). */
+.bas-calc-inputs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.6rem 2.2rem;
+    padding: 1.8rem 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+@media (max-width: 720px) {
+    .bas-calc-inputs {
+        grid-template-columns: 1fr;
+        padding: 1.4rem 1.4rem;
+        gap: 1.4rem;
+    }
+}
+.bas-calc-field { display: flex; flex-direction: column; gap: 0.5rem; }
+.bas-calc-field-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+}
+.bas-calc-field-hint {
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+}
+.bas-calc-field input[type="number"] {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 0.55rem 0.8rem;
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+.bas-calc-field input[type="number"]:focus {
+    outline: none;
+    border-color: var(--amber);
+}
+.bas-calc-field input[type="number"]::-webkit-outer-spin-button,
+.bas-calc-field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.bas-calc-field input[type="number"] { -moz-appearance: textfield; }
+
+/* Slider control */
+.bas-calc-field input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: rgba(224,148,34,0.18);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    margin: 8px 0;
+}
+.bas-calc-field input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--amber);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 1px rgba(224,148,34,0.4);
+    cursor: grab;
+}
+.bas-calc-field input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+.bas-calc-field input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--amber);
+    border: 2px solid var(--bg);
+    cursor: grab;
+}
+
+/* Slider label includes inline display value */
+.bas-calc-field-label-with-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.7rem;
+}
+.bas-calc-field-label-with-display .bas-calc-field-display {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--amber);
+    letter-spacing: 0.02em;
+    text-transform: none;
+}
+
+/* Output cards — three across, each surfacing one of the headline numbers */
+.bas-calc-outputs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 1.6rem 0;
+}
+@media (max-width: 720px) {
+    .bas-calc-outputs { grid-template-columns: 1fr; gap: 0.7rem; }
+}
+.bas-calc-output-card {
+    padding: 1.3rem 1.4rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+.bas-calc-output-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+.bas-calc-output-value {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.85rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+}
+.bas-calc-output-value.bas-calc-output-zoned {
+    font-size: 1.4rem;
+    font-weight: 500;
+}
+.bas-calc-output-sub {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--text-dim);
+    margin-top: 0.15rem;
+}
+.bas-calc-output-zone {
+    display: inline-block;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.55rem;
+    border-radius: 3px;
+    margin-top: 0.4rem;
+    align-self: flex-start;
+}
+/* Zone color modifiers (used on .bas-calc-output-zone or .bas-calc-output-value.bas-calc-output-zoned) */
+.bas-zone-good {
+    color: var(--green);
+    background: rgba(39,174,96,0.1);
+    border: 1px solid rgba(39,174,96,0.25);
+}
+.bas-zone-warn {
+    color: var(--amber);
+    background: rgba(224,148,34,0.1);
+    border: 1px solid rgba(224,148,34,0.25);
+}
+.bas-zone-bad {
+    color: #e87f6f;
+    background: rgba(192,57,43,0.1);
+    border: 1px solid rgba(192,57,43,0.3);
+}
+/* When zone is applied directly to .bas-calc-output-value, override default text color
+   but lose the background pill (the entire value is colored, not boxed) */
+.bas-calc-output-value.bas-calc-output-zoned.bas-zone-good { background: none; border: none; padding: 0; color: var(--green); }
+.bas-calc-output-value.bas-calc-output-zoned.bas-zone-warn { background: none; border: none; padding: 0; color: var(--amber); }
+.bas-calc-output-value.bas-calc-output-zoned.bas-zone-bad  { background: none; border: none; padding: 0; color: #e87f6f; }
+
+/* Chart wrapper */
+.bas-calc-chart-wrapper {
+    margin: 2rem 0 1.5rem;
+    padding: 1.6rem 1.8rem 1.2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.bas-calc-chart-title {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+.bas-calc-chart-canvas {
+    position: relative;
+    height: 380px;
+    width: 100%;
+}
+.bas-calc-chart-canvas canvas { display: block; max-width: 100%; }
+@media (max-width: 720px) {
+    .bas-calc-chart-wrapper { padding: 1.1rem 1rem 0.9rem; }
+    .bas-calc-chart-canvas { height: 280px; }
+}
+.bas-calc-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.1rem 1.6rem;
+    margin-top: 1rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+}
+.bas-calc-legend-item { display: inline-flex; align-items: center; gap: 0.45rem; }
+.bas-calc-swatch {
+    width: 16px;
+    height: 3px;
+    border-radius: 1px;
+    display: inline-block;
+}
+.bas-calc-swatch.bas-calc-swatch-floor   { background: rgba(224,148,34,0.5); }
+.bas-calc-swatch.bas-calc-swatch-trend   { background: rgba(224,148,34,0.8); height: 2.5px; }
+.bas-calc-swatch.bas-calc-swatch-upper   { background: rgba(224,148,34,0.5); }
+.bas-calc-swatch.bas-calc-swatch-history { background: rgba(232,224,212,0.8); height: 2.5px; }
+.bas-calc-swatch.bas-calc-swatch-liq     { background: var(--red); }
+.bas-calc-swatch.bas-calc-swatch-current { width: 10px; height: 10px; border-radius: 50%; background: var(--green); }
+
+/* Interpretation paragraph below the chart */
+.bas-calc-interp {
+    margin: 1.5rem auto 0;
+    max-width: 880px;
+    padding: 1.4rem 1.8rem;
+    background: rgba(255,255,255,0.018);
+    border-left: 2px solid var(--amber);
+    border-radius: 0 4px 4px 0;
+}
+.bas-calc-interp p {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--text);
+    margin: 0 0 0.7rem;
+}
+.bas-calc-interp p:last-child { margin-bottom: 0; }
+.bas-calc-interp p strong { color: var(--amber); font-weight: 600; }
+
+/* "Coming next" note below the live calculator — sets expectations
+   about what's not yet wired (backtests, borrow-vs-sell, etc.) */
+.bas-calc-roadmap {
+    margin: 2rem auto 0;
+    max-width: 880px;
+    padding: 1.3rem 1.6rem;
+    border: 1px dashed rgba(224,148,34,0.2);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.012);
+}
+.bas-calc-roadmap-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.7rem;
+}
+.bas-calc-roadmap ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.bas-calc-roadmap li {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    padding: 0.35rem 0 0.35rem 1.2rem;
+    position: relative;
+}
+.bas-calc-roadmap li::before {
+    content: "›";
+    position: absolute;
+    left: 0;
+    color: var(--amber-dim);
+}
+.bas-calc-roadmap li strong { color: var(--text); font-weight: 600; }
