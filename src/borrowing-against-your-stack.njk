@@ -298,6 +298,22 @@ eleventyComputed:
                 </div>
             </div>
 
+            <!-- ─── INTEREST COST BY PROVIDER ─── -->
+            <!-- Position math (above) tells you where liquidation sits. -->
+            <!-- Cost math (below) tells you what the loan actually costs   -->
+            <!-- to carry per month. Three cards corresponding to the three  -->
+            <!-- approved categories from the Up Front section; DeFi card    -->
+            <!-- present for completeness with explicit dismissal indicator. -->
+            <div class="bas-calc-provider-section">
+                <div class="bas-calc-provider-header">
+                    <div class="bas-calc-provider-title">Interest cost by provider category</div>
+                    <div class="bas-calc-provider-subtitle">Monthly and annual interest at typical mid-range APRs as of mid-2026. <em>The no-rehypothecation premium is the visible cost of buying out of Celsius-style risk.</em></div>
+                </div>
+                <div class="bas-calc-provider-grid" id="basProviderCards">
+                    <!-- Populated by JS — see renderInterestScenarios() -->
+                </div>
+            </div>
+
             <!-- ─── CHANNEL CHART ─── -->
             <div class="bas-calc-chart-wrapper">
                 <div class="bas-calc-chart-title">Your liquidation price on the Power Law channel</div>
@@ -321,7 +337,8 @@ eleventyComputed:
             <div class="bas-calc-roadmap">
                 <div class="bas-calc-roadmap-label">Coming in subsequent commits</div>
                 <ul>
-                    <li><strong>Borrow-vs-sell comparison.</strong> Interest cost against capital-gains tax saved, with BTC opportunity cost over a chosen horizon. Tactical/strategic toggle for short-horizon need vs. perpetual leverage cases.</li>
+                    <li><strong>Borrow-vs-sell comparison.</strong> Total interest cost over horizon against capital-gains tax saved, with BTC opportunity cost computed against the same Power Law channel. Tactical/strategic toggle for short-horizon need vs. perpetual leverage cases.</li>
+                    <li><strong>Early-repayment scenario.</strong> The Disciplined-Rebalancing extension: plan to repay the loan when bitcoin reaches a high channel position. Outputs BTC required to repay, BTC retained, and the net cycle outcome — using the cycle peak to extinguish the loan and remove the recurring obligation.</li>
                     <li><strong>Historical safety backtest.</strong> Would this LTV have survived bitcoin's worst historical drawdowns? Yes/no plus the closest call.</li>
                     <li><strong>Counterparty default scenario.</strong> Your lender goes Celsius-style. Recovery distributions by archetype: Celsius (partial), BlockFi (100% but ~2 years locked), Genesis (full in-kind), Voyager (~70%), worst-case zero.</li>
                     <li><strong>DeFi infrastructure scenario.</strong> Wrapping depeg, oracle stale, bridge exploit. Loss = collateral, recovery near zero.</li>
