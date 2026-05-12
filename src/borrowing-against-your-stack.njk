@@ -15,7 +15,7 @@ companion: []
 eleventyComputed:
   head_extras: "{% include '_pageassets/borrowing-against-your-stack-head.html' %}"
   page_styles: "{% include '_pageassets/borrowing-against-your-stack.css' %}"
-  page_scripts: "{% include '_pageassets/borrowing-against-your-stack.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/borrowing-against-your-stack.js' %}"
 ---
 <section class="hero">
     <h1><em>Borrowing</em> Against Your Stack</h1>
@@ -239,49 +239,96 @@ eleventyComputed:
     </div>
 
     <!-- ═══════════════════════════════════════════ -->
-    <!-- TAB II: CALCULATOR — interactive surface (stub) -->
+    <!-- TAB II: CALCULATOR — interactive surface       -->
     <!-- ═══════════════════════════════════════════ -->
     <div class="tab-content" id="tab-calculator">
         <div class="section-intro">
             <h2>Calculator</h2>
-            <p>Active development. The interactive surface below is being built around the editorial spine on the previous tab &mdash; scenario modeling for a proposed loan against your stack, with the Power Law channel position as the primary timing dial.</p>
+            <p>Set your stack, current price, and the loan you'd actually need. The chart places your liquidation price on the Power Law channel &mdash; the vertical space between today's price and your liquidation marker is your structural buffer. If that marker sits below the channel floor, bitcoin would need to break its long-term structural support before liquidation. If it sits in the upper channel, routine mean-reversion gets you there.</p>
         </div>
 
-        <div class="bas-cs-stub">
-            <div class="bas-cs-stub-header">In active development</div>
+        <div class="bas-calc">
 
-            <div class="bas-cs-stub-section">
-                <h3>Primary surface: scenario modeling</h3>
-                <p class="prose"><strong>Inputs:</strong> BTC stack, loan amount needed (USD), provider category (multisig / Tier-1 CeFi / DeFi / custom-LTV), interest rate (auto-suggested by category, override-able), time horizon.</p>
-                <p class="prose"><strong>Outputs:</strong></p>
-                <ul class="negative-space-list">
-                    <li><strong>Liquidation BTC price</strong> &mdash; the headline number, plus the percent drawdown survivable from current price.</li>
-                    <li><strong>Channel position of your liquidation price</strong> &mdash; the editorially distinctive output. Your liquidation price plotted directly on the Power Law channel chart, with the negative space between liquidation marker and the channel floor making your structural buffer visible at a glance.</li>
-                    <li><strong>Historical safety check</strong> &mdash; would this LTV have survived bitcoin's worst historical drawdowns?</li>
-                    <li><strong>Borrow-vs-sell comparison</strong> &mdash; interest paid against capital-gains tax saved, with BTC opportunity cost over the horizon. Tactical/strategic toggle for short-horizon need vs. perpetual leverage cases.</li>
-                    <li><strong>0% borrowing baseline slider</strong> &mdash; the just-HODL anchor, preserved from past-Claude's design notes, to make the genuinely conservative alternative continuously visible.</li>
+            <!-- ─── INPUT GRID ─── -->
+            <div class="bas-calc-inputs">
+                <div class="bas-calc-field">
+                    <label class="bas-calc-field-label" for="basBtcStack">BTC stack</label>
+                    <input type="number" id="basBtcStack" value="1.0" step="0.01" min="0" max="100000">
+                    <div class="bas-calc-field-hint">Quantity of bitcoin available as collateral.</div>
+                </div>
+
+                <div class="bas-calc-field">
+                    <label class="bas-calc-field-label" for="basBtcPrice">Current BTC price (USD)</label>
+                    <input type="number" id="basBtcPrice" value="" step="100" min="0" max="100000000">
+                    <div class="bas-calc-field-hint">Auto-populated from the most recent monthly sample. Edit if you want to model a different starting price.</div>
+                </div>
+
+                <div class="bas-calc-field">
+                    <label class="bas-calc-field-label" for="basLoanAmount">Loan amount (USD)</label>
+                    <input type="number" id="basLoanAmount" value="10000" step="100" min="0" max="1000000000">
+                    <div class="bas-calc-field-hint">The amount you'd actually need to borrow. The LTV (loan as % of stack value) is shown in the output.</div>
+                </div>
+
+                <div class="bas-calc-field">
+                    <div class="bas-calc-field-label bas-calc-field-label-with-display">
+                        <span>Liquidation threshold</span>
+                        <span class="bas-calc-field-display"><span id="basLiqThresholdDisplay">80</span>%</span>
+                    </div>
+                    <input type="range" id="basLiqThreshold" min="70" max="95" value="80" step="1">
+                    <div class="bas-calc-field-hint">LTV at which collateral is forcibly sold. Tier-1 CeFi typical: 80&ndash;85%. Multisig: 75&ndash;80%. Predatory: 95&ndash;97%.</div>
+                </div>
+            </div>
+
+            <!-- ─── OUTPUT CARDS ─── -->
+            <div class="bas-calc-outputs">
+                <div class="bas-calc-output-card">
+                    <div class="bas-calc-output-label">Your LTV</div>
+                    <div class="bas-calc-output-value" id="basLtvOut">&mdash;</div>
+                    <div class="bas-calc-output-zone bas-zone-good" id="basLtvZone">&mdash;</div>
+                </div>
+                <div class="bas-calc-output-card">
+                    <div class="bas-calc-output-label">Liquidation BTC price</div>
+                    <div class="bas-calc-output-value" id="basLiqPrice">$&mdash;</div>
+                    <div class="bas-calc-output-sub" id="basLiqDrawdown">&mdash;</div>
+                </div>
+                <div class="bas-calc-output-card">
+                    <div class="bas-calc-output-label">Channel position of liquidation</div>
+                    <div class="bas-calc-output-value bas-calc-output-zoned" id="basChannelPos">&mdash;</div>
+                    <div class="bas-calc-output-sub" id="basChannelHint">&mdash;</div>
+                </div>
+            </div>
+
+            <!-- ─── CHANNEL CHART ─── -->
+            <div class="bas-calc-chart-wrapper">
+                <div class="bas-calc-chart-title">Your liquidation price on the Power Law channel</div>
+                <div class="bas-calc-chart-canvas"><canvas id="basChannelChart"></canvas></div>
+                <div class="bas-calc-chart-legend">
+                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-floor"></span>Floor (0.42&times; trend)</span>
+                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-trend"></span>Trend</span>
+                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-upper"></span>Upper (3.0&times; trend)</span>
+                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-history"></span>Historical price</span>
+                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-current"></span>Current price</span>
+                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-liq"></span>Your liquidation price</span>
+                </div>
+            </div>
+
+            <!-- ─── INTERPRETATION ─── -->
+            <div class="bas-calc-interp" id="basInterp">
+                <p>Enter a stack size, current price, and loan amount above to see your liquidation position on the Power Law channel.</p>
+            </div>
+
+            <!-- ─── COMING NEXT ─── -->
+            <div class="bas-calc-roadmap">
+                <div class="bas-calc-roadmap-label">Coming in subsequent commits</div>
+                <ul>
+                    <li><strong>Borrow-vs-sell comparison.</strong> Interest cost against capital-gains tax saved, with BTC opportunity cost over a chosen horizon. Tactical/strategic toggle for short-horizon need vs. perpetual leverage cases.</li>
+                    <li><strong>Historical safety backtest.</strong> Would this LTV have survived bitcoin's worst historical drawdowns? Yes/no plus the closest call.</li>
+                    <li><strong>Counterparty default scenario.</strong> Your lender goes Celsius-style. Recovery distributions by archetype: Celsius (partial), BlockFi (100% but ~2 years locked), Genesis (full in-kind), Voyager (~70%), worst-case zero.</li>
+                    <li><strong>DeFi infrastructure scenario.</strong> Wrapping depeg, oracle stale, bridge exploit. Loss = collateral, recovery near zero.</li>
+                    <li><strong>0% borrowing baseline.</strong> The just-HODL anchor as a continuously visible alternative to whatever scenario you're modeling.</li>
                 </ul>
             </div>
 
-            <div class="bas-cs-stub-section">
-                <h3>Backtest scenarios: what happens when it goes wrong</h3>
-                <p class="prose">Three loss-scenario backtests run against the user's inputs, each mapping to one of the risk categories the Question tab walked through:</p>
-                <ul class="negative-space-list">
-                    <li><strong>Liquidation scenario</strong> &mdash; aggressive LTV plus historical drawdown (2018, 2020 Black Thursday, 2022). Forces collateral sale near the bottom. Shows BTC stack outcome with and without that liquidation event.</li>
-                    <li><strong>Counterparty default scenario</strong> &mdash; your lender goes Celsius-style. Recovery distributions by archetype: Celsius (partial), BlockFi (100% but ~2 years locked), Genesis (full in-kind), Voyager (~70%), worst-case zero.</li>
-                    <li><strong>DeFi infrastructure scenario</strong> &mdash; wrapping depeg, oracle stale, bridge exploit (Kelp DAO&ndash;style). Loss = your collateral, recovery near zero.</li>
-                </ul>
-                <p class="prose">The page makes abstract risks concrete by saying <em>here is exactly what happens to your stack in each scenario, in BTC and in dollars, against your inputs.</em></p>
-            </div>
-
-            <div class="bas-cs-stub-section">
-                <h3>Headline visual</h3>
-                <p class="prose">The Power Law channel chart (rendered in the DR-page style), with two markers placed on it: <em>current bitcoin price</em> and <em>your liquidation price under the proposed loan</em>. The vertical space between them makes the strategy's structural buffer visible at a glance. Same chart updates live as you adjust LTV, stack, and loan amount.</p>
-            </div>
-
-            <div class="bas-cs-stub-cta">
-                <p>The calculator is the next step in the page's build sequence. The shape above is what's being implemented &mdash; not what's still being decided.</p>
-            </div>
         </div>
     </div>
 
