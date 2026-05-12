@@ -415,6 +415,79 @@ eleventyComputed:
                 </div>
             </div>
 
+            <!-- ─── BORROW vs. SELL COMPARISON ─── -->
+            <!-- The editorial heart of the calculator: side-by-side modelling     -->
+            <!-- of two paths over the chosen horizon. Future BTC price uses the  -->
+            <!-- Power Law trend at end-of-horizon — central-tendency expectation, -->
+            <!-- not a forecast. Each path's terminal wealth and BTC retained     -->
+            <!-- shown, with a verdict line summarising the delta.                 -->
+            <div class="bas-calc-bvs-section">
+                <div class="bas-calc-bvs-header">
+                    <h3 class="bas-calc-bvs-title">Borrow vs. sell &mdash; what each path leaves you with</h3>
+                    <p class="bas-calc-bvs-subtitle">Over the chosen horizon, both paths fund the same dollar need. Future bitcoin price is the <em>Power Law trend at the end of the horizon</em> &mdash; the central-tendency expectation, not a forecast. Borrowing wins when the cost of paying interest is less than the BTC saved by not selling at today's price.</p>
+                </div>
+
+                <!-- ─── Inputs specific to this comparison ─── -->
+                <div class="bas-calc-bvs-inputs">
+                    <div class="bas-calc-field">
+                        <div class="bas-calc-field-label bas-calc-field-label-with-display">
+                            <span>
+                                Time horizon
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">How long until you'd repay the loan (borrow path) or how long to project forward (sell path). Both paths are evaluated at the same future date so the comparison is apples-to-apples. Longer horizon = more time for bitcoin to appreciate = more advantage to the borrow path (but also more cumulative interest).</span></span>
+                            </span>
+                            <span class="bas-calc-field-display"><span id="basHorizonDisplay">5</span> years</span>
+                        </div>
+                        <input type="range" id="basHorizon" min="1" max="15" value="5" step="1">
+                    </div>
+
+                    <div class="bas-calc-field">
+                        <label class="bas-calc-field-label" for="basCostBasis">
+                            Cost basis per BTC (USD)
+                            <span class="help-tip" tabindex="0">?<span class="tip-content">The average price per BTC at which you originally bought your stack. Used to compute capital gains tax in the sell path. Defaults to current price (no embedded gain &mdash; the most conservative assumption for the sell path). Lower basis = bigger tax bill on sale = bigger advantage to the borrow path.</span></span>
+                        </label>
+                        <input type="number" id="basCostBasis" value="" step="100" min="0">
+                    </div>
+
+                    <div class="bas-calc-field">
+                        <div class="bas-calc-field-label bas-calc-field-label-with-display">
+                            <span>
+                                Capital gains tax rate
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">Your effective long-term capital gains tax rate. US federal LTCG is 0%, 15%, or 20% depending on bracket; state tax may add more. Use 0% if your bitcoin is held in a tax-advantaged account (IRA, Roth, etc.).</span></span>
+                            </span>
+                            <span class="bas-calc-field-display"><span id="basCapGainsDisplay">20</span>%</span>
+                        </div>
+                        <input type="range" id="basCapGains" min="0" max="40" value="20" step="1">
+                    </div>
+                </div>
+
+                <!-- ─── Comparison cards ─── -->
+                <div class="bas-calc-bvs-comparison">
+                    <div class="bas-calc-bvs-path bas-calc-bvs-path-borrow">
+                        <div class="bas-calc-bvs-path-label">Borrow path</div>
+                        <div class="bas-calc-bvs-path-tagline">Keep the stack &middot; pay interest &middot; repay at horizon</div>
+                        <div class="bas-calc-bvs-path-headline" id="basBvsBorrowHeadline">&mdash; BTC</div>
+                        <div class="bas-calc-bvs-path-sublabel">at end of horizon</div>
+                        <div class="bas-calc-bvs-path-rows" id="basBvsBorrowRows">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                    <div class="bas-calc-bvs-path bas-calc-bvs-path-sell">
+                        <div class="bas-calc-bvs-path-label">Sell path</div>
+                        <div class="bas-calc-bvs-path-tagline">Sell some now &middot; net loan amount after tax &middot; hold the rest</div>
+                        <div class="bas-calc-bvs-path-headline" id="basBvsSellHeadline">&mdash; BTC</div>
+                        <div class="bas-calc-bvs-path-sublabel">at end of horizon</div>
+                        <div class="bas-calc-bvs-path-rows" id="basBvsSellRows">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── Verdict line ─── -->
+                <div class="bas-calc-bvs-verdict" id="basBvsVerdict">
+                    <p>Enter a stack, current price, and loan amount above to compare the two paths.</p>
+                </div>
+            </div>
+
             <!-- ─── LOAN PROFILE (replaces free-form interpretation prose) ─── -->
             <!-- A scannable check-list summarising the structural conditions     -->
             <!-- of the loan as configured. Each check is a fact-stating         -->
