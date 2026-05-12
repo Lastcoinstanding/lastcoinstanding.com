@@ -2,33 +2,320 @@
 layout: base.njk
 permalink: /borrowing-against-your-stack.html
 slug: borrowing-against-your-stack
-related: []
+related:
+  - slug: the-power-law
+    desc: "The foundational page. The Channel framing — floor, trend, upper — is the structural timing dial that decides whether a loan originated today has room to survive bitcoin's next drawdown. Prerequisite reading if you haven't yet engaged with the model."
+  - slug: the-bitcoin-retirement
+    desc: "The primary retirement framework where borrowing first surfaces as one possible supplement to sell-as-needed. This page extends that conversation into its own canvas, with the full custody/rehypothecation/liquidation surface."
+  - slug: disciplined-rebalancing
+    desc: "The sibling page on the other side of the same coin — sell at percentile inside a wrapper. Different mechanism, same channel underneath, same audience reasoning about how to hold across cycles."
+  - slug: bitcoin-vs-real-estate
+    desc: "Where the borrow-vs-sell decision frame meets the housing decision specifically. The natural cross-link for readers thinking about a primary-residence purchase against the stack."
 companion: []
 eleventyComputed:
   head_extras: "{% include '_pageassets/borrowing-against-your-stack-head.html' %}"
-  page_styles: "{% include '_pageassets/coming-soon-stub.css' %}"
+  page_styles: "{% include '_pageassets/borrowing-against-your-stack.css' %}"
+  page_scripts: "{% include '_pageassets/borrowing-against-your-stack.js' %}"
 ---
-<div class="page">
+<section class="hero">
+    <h1><em>Borrowing</em> Against Your Stack</h1>
+    <div class="hero-subtitle">Bitcoin as collateral instead of selling it &mdash; with HODL as the legitimate baseline and the structural risks made fully visible.</div>
+    <p class="subtitle">The reflex to dismiss borrowing-against-bitcoin as anti-ethos misses the most important question: <em>compared to what?</em> When the alternative is selling part of your stack to fund a genuine life-event need, the borrow-and-retain path deserves careful evaluation against its actual risks. This page is built to make that evaluation possible &mdash; and to make it possible to walk away on reflection, knowing exactly what you're walking away from.</p>
+</section>
 
-  <div class="page-header">
-    <h1>Borrowing Against Your Stack</h1>
-    <p class="subtitle">A supplemental retirement framework &mdash; using bitcoin as collateral instead of selling it.</p>
-  </div>
+<main class="content-area">
+    {% include 'components/tool-framing.njk' %}
 
-  <div style="text-align: center;">
-    <span class="cs-badge">Phase 3.5 &mdash; coming soon</span>
-  </div>
+    <div class="tab-nav">
+        <button class="tab-btn active" data-tab="question">
+            <span class="tab-num">I</span>
+            <span class="tab-title">The Question</span>
+        </button>
+        <button class="tab-btn" data-tab="calculator">
+            <span class="tab-num">II</span>
+            <span class="tab-title">Calculator</span>
+        </button>
+        <button class="tab-btn" data-tab="math">
+            <span class="tab-num">III</span>
+            <span class="tab-title">The Math</span>
+        </button>
+    </div>
 
-  <div class="cs-content">
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB I: THE QUESTION — editorial framing essay -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="tab-content active" id="tab-question">
 
-    <p class="stub-prose">Borrowing against your bitcoin stack uses the asset as collateral for a loan, the proceeds of which fund retirement income. The bitcoin itself is not sold &mdash; the appeal is that the stack continues to compound under the Power Law while the loan provides liquid spending power. The trade is real: instead of triggering taxable sales, you accrue interest, and the loan principal eventually has to be repaid. For most users, that repayment ultimately comes from the stack itself, which is why the strategy is structurally a <em>tactical modifier</em> on sell-as-needed rather than a peer alternative.</p>
+        <div class="section-intro">
+            <h2>&ldquo;Compared to <em>what?</em>&rdquo;</h2>
+            <p>For many bitcoiners, the phrase <em>borrowing against your bitcoin</em> triggers a reflex toward dismissal &mdash; anti-ethos, reckless, scam-adjacent, a way to lose your stack to the same kinds of platforms that took down depositors in 2022. The reflex isn't unreasonable. The history this page walks through gives it plenty of justification.</p>
+            <p>But the reflex misses the single most important question in any decision: <em>compared to what?</em></p>
+            <p>Consider a scenario that should sit at the front of every bitcoiner's mind when this question comes up. Imagine someone, years ago, holding 100 BTC when bitcoin was $100. Their entire stack: $10,000. They face a medical emergency requiring $5,000.</p>
+            <p>The instinctive answer is <em>sell 50 BTC</em>. The decision is clean. No debt to manage, no interest accruing, no liquidation threshold to monitor. Selling half the stack feels straightforward.</p>
+            <p>But play that decision forward. Bitcoin is now near $110,000. The 50 BTC sold to fund the surgery &mdash; that was the easy decision. The 50 BTC retained is worth $5.5 million.</p>
+            <p>The hypothetical alternative: borrow the $5,000 against the full 100 BTC stack, repay the loan from day-job income over the following months, retain all 100 BTC. That stack today is worth <strong>$11 million</strong>.</p>
+            <p>The difference between the two paths is <em>five and a half million dollars</em>. From a single decision, made years before the appreciation would have made the cost obvious.</p>
+        </div>
 
-    <p class="stub-prose">This page is in active development. It will carry its own framing essay, an interactive risk surface (loan-to-value ratios, liquidation prices, interest-rate compounding, the percentage of stack borrowed), and a slider that lets you see what 0% borrowing looks like as the genuinely conservative baseline. The framework deserves a full canvas rather than a corner of the foundational calculator &mdash; both because the cognitive load (LTV, liquidation, interest) is meaningfully heavier and because the cultural load (the <em>&ldquo;never sell&rdquo;</em> mythology, the recent failures of overleveraged borrowing platforms) demands editorial care.</p>
+        <div class="narrative" style="margin-top:0;margin-bottom:2.5rem;padding:2rem 2.5rem;border-left-width:3px">
+            <p style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;line-height:1.7;color:var(--text)">This is hindsight, of course &mdash; the borrower in that scenario couldn't have known with certainty that bitcoin would compound the way it did. But the structural argument doesn't depend on certainty about exact numbers. It depends on whether you believe bitcoin's long-run trajectory continues to produce a compound annual growth rate meaningfully higher than your cost of debt. If you do &mdash; which is presumably why you hold any bitcoin at all &mdash; then <strong>every coin sold today is a coin that compounds for someone else.</strong> Every coin retained, when retention is possible, compounds for you.</p>
+        </div>
 
-    <p class="stub-prose">For the foundational retirement framework &mdash; sell as needed &mdash; return to the primary calculator.</p>
+        <div class="section">
+            <p class="prose">Today the magnitudes are smaller because bitcoin's trailing four-year CAGR has compressed from its early-period highs to roughly 39%. But the structural argument is identical. The reader making this decision today, with 2 BTC at $110,000 facing a $50,000 medical bill, is in exactly the same structural position as the reader years ago with 100 BTC at $100. The asymmetry is the same: <em>the upside of borrowing-and-retaining is the entire future appreciation of the bitcoin that would have been sold.</em> The downside is the interest cost of the loan, structured against the tail risks that the rest of this page exists to detail.</p>
+            <!-- ═══════════════════ CAGR-VS-INTEREST VIZ (placeholder) ═══════════════════ -->
+            <!-- Small inline chart — bitcoin's rolling four-year CAGR over the last decade,    -->
+            <!-- with horizontal bands showing typical CeFi lending rates (8–12%) and          -->
+            <!-- collaborative-custody multisig rates (12–16%). Makes G > R visible.            -->
+            <!-- To be implemented after sign-off on overall page structure.                    -->
+            <div class="bas-viz-placeholder" aria-hidden="true">
+                <div class="bas-viz-placeholder-label">[ Chart: bitcoin 4-year rolling CAGR vs. typical lending rates &mdash; in development ]</div>
+            </div>
+            <p class="prose">The point isn't that borrowing is always better than selling. The point is that <em>the decision can't be evaluated honestly without weighing both paths.</em> The reflexive &ldquo;just sell some&rdquo; answer treats the sale as if it has no cost beyond the immediate fiat received. It does. Selling forecloses the future of the coin sold.</p>
+        </div>
 
-    <a class="back-link" href="/the-bitcoin-retirement.html#calculator">&larr; Back to the Bitcoin Retirement calculator</a>
+        <div class="section">
+            <h3>What this page actually is</h3>
+            <p class="prose">This page isn't promoting borrowing against bitcoin. It's also not against it. The page exists because the decision is consequential enough &mdash; and the landscape complex enough &mdash; that <em>blind entry into this strategy is the worst possible outcome.</em> We've seen what blind entry produces: Celsius depositors becoming unsecured creditors, BlockFi customers locked for two years, Genesis funds tied up in bankruptcy proceedings, retail holders surprised to discover that the lender they trusted was lending out their bitcoin to leveraged third parties they had no idea existed.</p>
+            <p class="prose">The page is built around a specific editorial mission. <em>The reader walks away in one of two states.</em> Either they've identified the lowest-risk, highest-integrity version of borrowing &mdash; the version that meets the standards described below &mdash; and concluded the trade is worth making for their specific need. Or they've concluded, on reflection, that the trade isn't worth it for them, and they continue to HODL.</p>
+            <p class="prose">Both are good outcomes. The bad outcome &mdash; the one this page exists to prevent &mdash; is the reader sleepwalking into one of the wrong versions because they didn't know what to look for.</p>
+            <p class="prose">A practical framing that helps the self-assessment: distinguish <em>need</em> from <em>want.</em> The structural argument for borrowing rather than selling is strongest when the alternative is selling to fund a real life-event need &mdash; surgery, education, a primary home, business capital that will generate income, a tax obligation. The argument weakens substantially when the alternative is <em>waiting</em> &mdash; when the immediate liquidity would fund something you could equally fund later, in fiat, after the bitcoin has had more time to appreciate. Selling some bitcoin in a few years to buy the same Ferrari is structurally a different trade than borrowing against the stack to buy it now and incurring new risks before then. The patience option is usually free. <em>The borrowing option carries new risks that didn't exist before you originated the loan.</em></p>
+            <p class="prose">If you can wait, wait. The strategy on this page is for the cases where you genuinely can't.</p>
+        </div>
 
-  </div>
+        <div class="section">
+            <h3>Up front: what we recommend, and what we don't</h3>
+            <p class="prose">The cautionary record below is detailed. Before walking through it, here's what the page actually concludes &mdash; so the failure cases don't leave you running for the exits before we've had the chance to point you at the responsible versions.</p>
 
-</div>
+            <p class="prose"><strong>Approaches that meet a bar of serious consideration:</strong></p>
+            <ul class="negative-space-list">
+                <li><strong>Collaborative-custody multisig</strong> (Unchained, Anchor Watch, Onramp) &mdash; your bitcoin sits on-chain in a multisig you or anyone can verify at any moment. <em>The highest standard.</em></li>
+                <li><strong>Tier-1 non-rehypothecating CeFi</strong> (Ledn, APX Lending, Strike, Salt, Arch, Aven, Figure, Coinbase's Morpho-integrated lending) &mdash; full custody but explicit, contractual, regulated, transparent. Convenient and credible, with the trade-off of full counterparty trust.</li>
+                <li><strong>Bitcoin-native Layer 2 lending</strong> (Citrea, Stacks, Rootstock) &mdash; small but architecturally promising; where the long-term trajectory points.</li>
+                <li><strong>Bitcoin-collateralized residential mortgages</strong> &mdash; Milo, Better/Coinbase's Fannie-Mae-conforming product, Horizon. Long-duration, much higher overcollateralization, structurally different enough from the other categories that they get their own treatment on a dedicated page &mdash; see <a href="/bitcoin-backed-mortgages.html"><em>Bitcoin-Backed Mortgages &rarr;</em></a>. The category is bitcoin-only at the GSE level (no crypto, no gold), which is itself a meaningful indicator of where regulated finance has landed on collateral quality.</li>
+            </ul>
+
+            <p class="prose"><strong>Approaches we cover briefly for completeness but don't take seriously:</strong></p>
+            <ul class="negative-space-list">
+                <li><strong>DeFi via wrapped BTC</strong> (Aave, Morpho, Compound, Euler, etc.) &mdash; the April 2026 Kelp DAO / Aave / Arbitrum cascade demonstrated definitively that these systems are centralized in practice. Detailed below.</li>
+                <li><strong>Rehypothecating CeFi</strong> (Nexo, Binance Loans, Matrixport) &mdash; the structural failure mode that produced every catastrophic collapse of 2022.</li>
+                <li><strong>Predatory-LTV platforms</strong> (YouHodler-style 90/97 LTV) &mdash; included only as a concrete example of what aggressive terms look like on paper.</li>
+            </ul>
+
+            <p class="prose">If you find the cautionary record concerning, that's the appropriate response. <em>The point isn't to scare you out of the entire topic. It's to scare you out of the wrong versions of it.</em></p>
+        </div>
+
+        <div class="section">
+            <h3>Two strategies, one mechanism</h3>
+            <p class="prose">Borrowing against bitcoin can be one of two distinct things, and conflating them is the most common mistake retail readers make.</p>
+
+            <h4>The tactical use</h4>
+            <p class="prose">You need liquidity for a specific event &mdash; a home down payment, business capital, a tax bill, a medical emergency. Selling bitcoin would trigger capital gains and end your position in those coins permanently. Borrowing lets you fund the need while keeping the stack intact, with the loan repaid eventually from external income, refinancing, or &mdash; if the situation worsens &mdash; eventually from the stack itself. This is the framing most readers start with, and for the use cases the previous section called <em>needs</em>, it's often the right one.</p>
+
+            <h4>The strategic use</h4>
+            <p class="prose">The asset compounds faster than the cost of debt. Debt-to-value ratio <em>declines</em> over time even as you keep borrowing. The stack never has to be sold. Under current US tax law, your heirs inherit at step-up basis, eliminating the capital gain on the appreciated portion entirely. This is the <em>Buy-Borrow-Die</em> strategy that has shaped how wealthy families relate to appreciating assets for over a century &mdash; the NYC real-estate dynasties leveraged a version of it; Michael Saylor articulated the bitcoin version explicitly through MicroStrategy (now Strategy) for years.</p>
+            <p class="prose"><em>The math of perpetual borrowing is real, but it isn't easy.</em> If asset growth rate G exceeds your borrowing rate R sustainably, a loan taken today at LTV of X/V<sub>0</sub> becomes X(1+R)/[V<sub>0</sub>(1+G)] one year later. When G &gt; R, that fraction shrinks. Compound across decades and the LTV trends <em>down</em>, not up, even as you draw further loans against the appreciating collateral.</p>
+            <p class="prose">The historical examples support the principle, though with more nuance than the folklore version. The NYC dynasties (Astors, Vanderbilts, Rockefellers) did hold real estate across generations using a version of this strategy &mdash; but they also sold selectively, used trusts, and benefited from estate planning machinery far beyond borrowing. Jeff Bezos has used Amazon-stock-backed credit, but he has also been a sizeable net seller of stock over the years.</p>
+            <p class="prose">The Saylor case is recent and revealing. After five years of explicit &ldquo;never sell&rdquo; public commitments &mdash; &ldquo;Sell a kidney if you must, but keep the BTC,&rdquo; &ldquo;BTC is the exit strategy&rdquo; &mdash; Strategy's Q1 2026 earnings call on May 5 included an explicit reversal. CEO Phong Le confirmed the company will likely sell some bitcoin to fund preferred dividend obligations, framing it as <em>&ldquo;math over ideology.&rdquo;</em> Saylor himself, in a follow-up interview, reframed his prior &ldquo;never sell&rdquo; rhetoric as <em>&ldquo;strategic brushback aimed at short sellers&rdquo;</em> &mdash; i.e., positioning years of public commitments as marketing rather than literal policy.</p>
+            <p class="prose"><em>This is the most committed institutional practitioner of the perpetual-borrowing thesis acknowledging that the strategy has limits when balance-sheet obligations require it.</em> The thesis isn't undermined by this &mdash; Strategy is still a buyer on net, the long-run logic still holds &mdash; but it becomes more honest about itself. Even Strategy hedged. Anyone modeling this strategy for themselves should know that.</p>
+            <p class="prose"><em>Which strategy you're actually running depends on whether your asset's compound growth rate exceeds your interest rate across your time horizon &mdash; and, more practically, whether you can survive the drawdowns along the way.</em> The Power Law channel and a conservative LTV are the two levers that decide the answer. The Calculator on the next tab makes this concrete.</p>
+        </div>
+
+        <div class="section">
+            <h3>The four categories of bitcoin lender</h3>
+            <p class="prose">Not every lender operates with the same ethos. The bitcoin-aligned approaches &mdash; those built around verifiable on-chain segregation, no rehypothecation, transparent collateral, and bitcoin-only focus &mdash; sit on one side of the market. The crypto-ethos approaches sit on the other, with material structural differences in how your collateral is held and what happens when anything goes wrong.</p>
+
+            <h4>Bitcoin-aligned approaches</h4>
+            <p class="prose"><strong>Collaborative-custody multisig.</strong> <em>The structural gold standard.</em> Your collateral is held in a 2-of-3 multisig (Unchained's flagship model) or a Multi-Institution Custody arrangement spreading keys across independent qualified custodians (Onramp, Anchor Watch). In every version of this model, your bitcoin remains on-chain, identifiable, and provably <em>yours</em> &mdash; not commingled with the lender's other operations, not lent out to third parties, not legally transferred to the platform on deposit. The collateral's presence and segregation is verifiable by anyone, at any time, cryptographically. This is the only category in which bitcoin's foundational rule &mdash; <em>don't trust, verify</em> &mdash; actually applies to the rehypothecation question. Anchor Watch goes further with Trident time-locked recovery paths and Lloyd's-of-London insurance up to $100 million against key loss or physical coercion. The cost of this category is higher (typical APRs run 12&ndash;16%) precisely because the lender can't subsidize rates by re-lending your collateral.</p>
+
+            <p class="prose"><strong>Tier-1 non-rehypothecating CeFi.</strong> <em>The convenient entry point.</em> Ledn, APX Lending, Strike, Salt, Arch Lending, Aven, Figure, and Coinbase's Morpho-integrated lending product all operate with full custody but explicit no-rehypothecation policies. Your bitcoin sits in segregated accounts at qualified custodians (BitGo, Fidelity Digital Assets, Anchorage Digital). The trade-off is that the no-rehypothecation guarantee is <em>contractual</em> &mdash; backed by a written policy, regulatory oversight, and bankruptcy law &mdash; but not <em>verifiable</em> in the way an on-chain multisig is. You're trusting the platform's operational integrity to honor what it has promised. Ledn's S&amp;P BBB- rating on its 2026 securitization is the strongest institutional endorsement any of these have achieved.</p>
+
+            <p class="prose"><strong>Bitcoin-native Layer 2 lending.</strong> <em>The architecturally promising frontier.</em> Citrea (a ZK-rollup that launched mainnet in January 2026, using BitVM2 for trust-minimized exits), Stacks with its sBTC primitive, Rootstock with its long uptime record. The structural argument: bring smart-contract functionality to bitcoin without ever wrapping it onto a foreign chain. Still small in 2026 &mdash; TVL across the category remains modest compared to Ethereum-based DeFi &mdash; but the trust-minimized exit primitive (BitVM2) addresses the structural failure mode that has defined cross-chain bridges for the last six years. Worth monitoring as the next several years unfold.</p>
+
+            <h4>Crypto-ethos approaches (covered for completeness only)</h4>
+
+            <p class="prose"><strong>DeFi via wrapped BTC.</strong> Aave, Morpho Blue, Spark, Compound V3, Euler V2 are the most prominent. The marketing claim is that smart contracts replace human custody, oracles replace platform operations, code replaces fiduciary responsibility &mdash; that the system is <em>trustless</em> and <em>decentralized</em>.</p>
+
+            <p class="prose">The April 2026 Kelp DAO / Aave / Arbitrum cascade definitively refuted that claim through the protocols' own behavior. An attacker exploited a 1-of-1 LayerZero verifier configuration, forged a cross-chain message, and minted 116,500 unbacked rsETH (~$292 million). Within 46 minutes, Kelp DAO's <em>emergency pauser multisig</em> froze rsETH contracts across Ethereum mainnet and 20+ L2s. Within hours, Aave's <em>Protocol Guardian</em> froze rsETH markets on V3 and V4, then proactively froze WETH markets on Core, Prime, Arbitrum, Base, Mantle, and Linea. SparkLend, Fluid, Compound V3, and Euler independently froze their rsETH markets. Ethena paused its LayerZero bridges. Lido paused earnETH deposits. Three days later, the Arbitrum Security Council unilaterally froze 30,766 ETH (~$71M) connected to the exploiter's wallet, moving it into a governance-controlled custodial holding account. An industry-wide $300 million coordinated backstop, branded <em>DeFi United</em>, was organized to make affected holders whole. Weeks later, Aave's DAO voted to <em>deliberately adjust oracle parameters to create a deficit inside the attacker's positions</em> &mdash; manipulating the price feeds the protocol depends on to make forced liquidations against a specific actor technically possible.</p>
+
+            <div class="narrative" style="margin-top:1.5rem;margin-bottom:2rem;padding:1.75rem 2.25rem;border-left-width:3px">
+                <p style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;line-height:1.6;color:var(--text);font-style:italic">A community member observing the Arbitrum freeze captured the lesson cleanly: &ldquo;This exposes Arbitrum as a multisig wallet that can unilaterally freeze and steal funds. Which honestly may be a good option &mdash; let's just accept bitcoin is the only real decentralized chain, the rest are centralized but without KYC.&rdquo;</p>
+            </div>
+
+            <p class="prose"><em>That sentence makes the case better than this page can rephrase it.</em> What the 2026 cascade demonstrated isn't that DeFi has occasional security incidents &mdash; it's that the entire stack is built on admin keys, guardian multisigs, security councils, and discretionary governance interventions, and that all of those mechanisms are deployed instantly when the system is under stress. For an audience that understands what bitcoin's actual decentralization means, evaluating these systems as serious lending venues for the bitcoin stack is a category error. <em>The infrastructure that competes with bitcoin-aligned lending is centralized &mdash; just centralized without KYC, and without the regulatory accountability that comes with explicit custody.</em></p>
+
+            <p class="prose">This page treats DeFi as a confirmation of dismissal rather than a risk to manage. The category's failures aren't the reason to avoid it; the <em>response to those failures</em> is.</p>
+
+            <p class="prose"><strong>Rehypothecating CeFi.</strong> Nexo, Binance Loans, Matrixport. These platforms subsidize their headline rates (Nexo advertises borrowing rates as low as 2.9%) by lending out user collateral to third parties &mdash; generating yield on assets that don't belong to them, with the profit funding the lower stated rates. <em>This is the structural failure mode that took down Celsius, BlockFi, Genesis, and Voyager between 2022 and 2023.</em> Subsidized rates aren't a benefit; they're a signal that the lender is making money somewhere structural &mdash; and that somewhere is your collateral commingled with other obligations.</p>
+
+            <p class="prose"><strong>Predatory-LTV platforms.</strong> YouHodler offers up to 90% opening LTV with a 97% liquidation threshold &mdash; a ~7% drawdown to liquidation. These platforms exist legally and have customers; the only useful purpose served by mentioning them on this page is to make concrete what aggressive terms look like on paper, so readers can pattern-match against them when they appear elsewhere.</p>
+        </div>
+
+        <div class="section">
+            <h3>The single biggest variable: rehypothecation</h3>
+            <p class="prose">If you remember nothing else from this page, remember this: <em>rehypothecation is the structural axis on which every other risk turns.</em></p>
+            <p class="prose">Every catastrophic failure of bitcoin-backed lending in the last decade &mdash; Celsius, BlockFi, Genesis, Voyager &mdash; was a rehypothecation failure at its core. The lender re-lent depositor collateral to third parties to generate yield, those third parties were over-leveraged, the contagion propagated, and depositors discovered they'd been operating in a black box where the lender owed them their bitcoin back but no longer had it.</p>
+            <p class="prose">What the post-2022 regulatory environment has done is eliminate most of the explicit rehypothecation models from the regulated tier. What it hasn't eliminated is the underlying temptation. Lenders that can't lend out collateral can't subsidize rates. The &ldquo;no-rehypothecation premium&rdquo; &mdash; the higher APR you pay for the safer structure &mdash; is the visible cost of buying out of the systemic risk Celsius exposed.</p>
+            <p class="prose">For a bitcoin-ethos audience, there's a clear hierarchy of confidence:</p>
+
+            <div class="bas-tier">
+                <div class="bas-tier-rank">1</div>
+                <div class="bas-tier-body">
+                    <div class="bas-tier-title">Verifiable non-rehypothecation</div>
+                    <p>Your bitcoin sits on-chain in a multisig wallet you or anyone can audit at any moment. The collateral's presence and segregation is cryptographically provable. Trust requirement: near-zero. This is what bitcoin's <em>don't trust, verify</em> principle actually looks like applied to lending. <strong>This is the standard.</strong></p>
+                </div>
+            </div>
+
+            <div class="bas-tier">
+                <div class="bas-tier-rank">2</div>
+                <div class="bas-tier-body">
+                    <div class="bas-tier-title">Contractual non-rehypothecation</div>
+                    <p>The lender promises in writing, backed by regulatory accountability, that they will not rehypothecate. Verifiable only through audit, attestation, and bankruptcy proceedings if something goes wrong. Trust requirement: substantial &mdash; in the lender's operational integrity, continued solvency, and the legal infrastructure that backs the promise. <em>Acceptable as a convenient alternative to (1), with eyes open about what's being traded.</em></p>
+                </div>
+            </div>
+
+            <div class="bas-tier bas-tier-fail">
+                <div class="bas-tier-rank">3</div>
+                <div class="bas-tier-body">
+                    <div class="bas-tier-title">Rehypothecation present</div>
+                    <p>Whether disclosed or hidden. <em>Fails the standard regardless of regulatory veneer.</em> The &ldquo;supposed tail risk&rdquo; of rehypothecation may not even be tail &mdash; every catastrophic failure in this market's history came from this exact mechanism. There is no &ldquo;carefully managed rehypothecation&rdquo; that meets a bitcoin-ethos standard.</p>
+                </div>
+            </div>
+
+            <p class="prose">The hidden-complexity warning extends beyond direct lenders. Structured products that wrap bitcoin or bitcoin-adjacent equities (covered-call ETFs, leveraged BTC notes, certain MSTR-derivative products) often disclose leverage and effective rehypothecation deep in their prospectus fine print &mdash; page-40 territory, where retail buyers rarely read. <em>The structural pattern is the same: implicit leverage that's not visible on the surface, structured to be discovered only when something has already gone wrong.</em></p>
+        </div>
+
+        <div class="section">
+            <h3>The cautionary record</h3>
+            <p class="prose">These case studies are referenced rather than dwelt on. They have to be in the room &mdash; <em>each failure was foreseeable in hindsight, with warning signs that bitcoin holders alert to the structural questions on this page would have recognized in advance</em> &mdash; but the point isn't to dwell. It's to give the reader pattern-recognition for what's already happened, so the next instance is easier to identify.</p>
+
+            <p class="prose"><strong>Celsius Network (2022).</strong> Pledged user collateral multiple times across what bankruptcy filings later called an <em>&ldquo;endless rehypothecation chain.&rdquo;</em> Internal staff reportedly referred to themselves as <em>&ldquo;Ponzi Consultants.&rdquo;</em> The bankruptcy ruling (Judge Glenn, SDNY, January 2023) established that &ldquo;Earn&rdquo; account assets were property of the bankruptcy estate, not the user &mdash; <em>depositors became unsecured creditors.</em> Recovery: partial.</p>
+
+            <p class="prose"><strong>BlockFi (2022).</strong> Insolvency caused by exposure to FTX/Alameda contagion. Achieved a rare 100% recovery for allowed claims through a $874.5 million settlement with the FTX estate plus monetization of those claims at a premium &mdash; but the process took nearly two years, during which depositor funds were locked.</p>
+
+            <p class="prose"><strong>Genesis Global Capital (2023).</strong> Failed after the 3AC default. The NYAG secured a $2 billion settlement establishing a &ldquo;Victims' Fund&rdquo; that delivered full in-kind recoveries and uniquely allowed creditors to benefit from bitcoin's appreciation during the bankruptcy stay rather than being capped at petition-date values.</p>
+
+            <p class="prose"><strong>Voyager Digital (2022).</strong> Concentrated its lending book into a single counterparty (3AC again) under explicit marketing claims that a bankruptcy court later called <em>&ldquo;unequivocally false.&rdquo;</em> Recovery: approximately 70%, with the process further marred by a 2024 data breach exposing creditor personal information.</p>
+
+            <p class="prose"><strong>The DeFi failures of 2024&ndash;2026.</strong> Detailed above with the Kelp DAO / Aave / Arbitrum cascade as the anchor case study. Other notable instances during this period: Drift Protocol ($285 million administrative key compromise, April 1, 2026), ZeroLend (shut down after multi-chain fragmentation made liquidation infrastructure unmaintainable), Step Finance ($40 million treasury loss from a single executive's compromised device), MakerDAO's 2020 &ldquo;Black Thursday&rdquo; (Ethereum network congestion paralyzed keeper bots; a single bot acquired $8.32 million of ETH collateral for 0 DAI in bid auctions). The pattern across these is a mix of administrative-access compromise, oracle and bridge failure, and the same emergency-multisig responses that demonstrated the underlying centralization.</p>
+
+            <p class="prose">The lessons across all of these failures cluster into four:</p>
+            <ul class="negative-space-list">
+                <li><strong>Ownership is a legal fiction without the keys.</strong> Depositors on centralized platforms are legally categorized as unsecured creditors in insolvency &mdash; your &ldquo;ownership&rdquo; is a contractual claim, not a property right.</li>
+                <li><strong>Yield is the price of tail risk.</strong> Aggressive yields are a lagging indicator of aggressive rehypothecation. If the platform's economics don't make sense at face-value rates, they're being made up somewhere structural.</li>
+                <li><strong>Technical liquidation is a certainty during stress.</strong> Even healthy positions can be force-liquidated when oracles fail, networks congest, or platforms go down &mdash; the <em>Infrastructure Failure Gap</em> where you have the funds but can't physically deliver them.</li>
+                <li><strong>The only zero-counterparty position is self-custody.</strong> Every other configuration is a bet on someone else's integrity, solvency, or code.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>When borrowing makes sense</h3>
+            <p class="prose">Two structural conditions decide whether borrowing against bitcoin works for you. Both are addressed concretely by the calculator on the next tab; they're framed here as the conceptual question the calculator answers.</p>
+
+            <p class="prose"><strong>The first is your channel position.</strong> The Power Law channel &mdash; bitcoin's structural floor, trend, and upper bound across fifteen years of price history &mdash; is the cleanest available frame for <em>when</em> to originate a loan. Borrowing when bitcoin is trading near the channel floor (a deeply oversold position relative to long-run trend) gives you the maximum drawdown buffer before liquidation. Borrowing near the upper bound puts you at high risk of being liquidated by routine mean-reversion, even if your long-run G &gt; R thesis is intact.</p>
+
+            <p class="prose"><em>This isn't market timing in the speculative sense.</em> It's structural-risk timing &mdash; the same channel that the <a href="/disciplined-rebalancing.html">Disciplined Rebalancing page</a> uses to identify high-percentile sell zones is what tells you, here, that originating a loan in a 90th-percentile zone is taking on additional liquidation risk you don't have to take. The calculator on the next tab makes this visible: it places your liquidation price directly on the Power Law channel chart, so you can see at a glance whether your loan is structurally exposed or structurally buffered.</p>
+
+            <p class="prose"><strong>The second is your LTV.</strong> Tier-1 CeFi platforms recommend 30&ndash;40% LTV as the conservative range; collaborative-custody multisig lenders typically operate in the same band or slightly more conservative. At 30% LTV, bitcoin can fall roughly 60% from origination before hitting a typical 80% liquidation threshold &mdash; enough buffer to survive even bitcoin's worst historical drawdowns. At 50% LTV, the buffer shrinks to roughly 35%, which has been breached multiple times in the past decade. <em>The lower your LTV, the longer your strategy survives.</em></p>
+
+            <p class="prose">A useful self-check the calculator surfaces directly: calculate your liquidation BTC price under your proposed loan. If that price is below the Power Law floor, you have strong structural buffer &mdash; bitcoin would need to break the channel for you to be liquidated. If your liquidation price is above the trend, you're betting on continued strength rather than buying yourself room to be wrong. <em>Both can be rational positions, but only one is conservative.</em></p>
+        </div>
+
+        <!-- Soft belief context callout -->
+        <div class="belief-context">
+            <div class="belief-context-label">A note on prerequisite reading</div>
+            <p><strong>This approach uses the Power Law channel as the timing dial for every loan-origination decision.</strong> If the Power Law isn't a model you find useful for bitcoin's price trajectory, the channel-position framing on this page won't be either. The <a href="/the-power-law.html">Power Law page</a> lays out the model and its evidence &mdash; including the out-of-sample validation and the channel asymmetry &mdash; for readers who want to assess it directly before using it.</p>
+        </div>
+
+        <div class="section">
+            <h3>What HODL actually wins</h3>
+            <p class="prose">For most readers, most of the time, the answer to &ldquo;should I borrow against my bitcoin?&rdquo; remains <em>probably not</em>.</p>
+            <p class="prose">HODL &mdash; unencumbered, self-custodied, zero-counterparty &mdash; captures the full Power Law upside without any of the structural risks this page has spent a lot of words detailing. There's no margin call. No liquidation event. No lender to fail. No oracle to manipulate. No wrapping bridge to exploit. No prospectus footnote to surprise you in year three. The bitcoin grows or it doesn't, and you continue to hold it either way.</p>
+            <p class="prose">The decision to borrow against your stack is a decision to trade some of that absolute safety for liquidity &mdash; and <em>the trade is worth making only when both the use case is a genuine need and the structural conditions support survival.</em> The calculator on the next tab lets you test, against your inputs, whether your specific proposed loan clears that bar.</p>
+            <p class="prose">What HODL gives up is liquidity &mdash; and for many readers, especially those facing genuine life events (surgery, education, a primary home, business capital), that liquidity matters in ways the &ldquo;just HODL&rdquo; answer can't address. <em>The point of this page isn't to talk anyone out of borrowing. It's to give you the structural literacy to do it survivably, if you decide to do it at all &mdash; or to walk away from the strategy entirely, on reflection, knowing exactly what you're walking away from.</em></p>
+            <p class="prose">Both endings are good endings. The bad ending is the one where the reader sleepwalks in.</p>
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB II: CALCULATOR — interactive surface (stub) -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="tab-content" id="tab-calculator">
+        <div class="section-intro">
+            <h2>Calculator</h2>
+            <p>Active development. The interactive surface below is being built around the editorial spine on the previous tab &mdash; scenario modeling for a proposed loan against your stack, with the Power Law channel position as the primary timing dial.</p>
+        </div>
+
+        <div class="bas-cs-stub">
+            <div class="bas-cs-stub-header">In active development</div>
+
+            <div class="bas-cs-stub-section">
+                <h3>Primary surface: scenario modeling</h3>
+                <p class="prose"><strong>Inputs:</strong> BTC stack, loan amount needed (USD), provider category (multisig / Tier-1 CeFi / DeFi / custom-LTV), interest rate (auto-suggested by category, override-able), time horizon.</p>
+                <p class="prose"><strong>Outputs:</strong></p>
+                <ul class="negative-space-list">
+                    <li><strong>Liquidation BTC price</strong> &mdash; the headline number, plus the percent drawdown survivable from current price.</li>
+                    <li><strong>Channel position of your liquidation price</strong> &mdash; the editorially distinctive output. Your liquidation price plotted directly on the Power Law channel chart, with the negative space between liquidation marker and the channel floor making your structural buffer visible at a glance.</li>
+                    <li><strong>Historical safety check</strong> &mdash; would this LTV have survived bitcoin's worst historical drawdowns?</li>
+                    <li><strong>Borrow-vs-sell comparison</strong> &mdash; interest paid against capital-gains tax saved, with BTC opportunity cost over the horizon. Tactical/strategic toggle for short-horizon need vs. perpetual leverage cases.</li>
+                    <li><strong>0% borrowing baseline slider</strong> &mdash; the just-HODL anchor, preserved from past-Claude's design notes, to make the genuinely conservative alternative continuously visible.</li>
+                </ul>
+            </div>
+
+            <div class="bas-cs-stub-section">
+                <h3>Backtest scenarios: what happens when it goes wrong</h3>
+                <p class="prose">Three loss-scenario backtests run against the user's inputs, each mapping to one of the risk categories the Question tab walked through:</p>
+                <ul class="negative-space-list">
+                    <li><strong>Liquidation scenario</strong> &mdash; aggressive LTV plus historical drawdown (2018, 2020 Black Thursday, 2022). Forces collateral sale near the bottom. Shows BTC stack outcome with and without that liquidation event.</li>
+                    <li><strong>Counterparty default scenario</strong> &mdash; your lender goes Celsius-style. Recovery distributions by archetype: Celsius (partial), BlockFi (100% but ~2 years locked), Genesis (full in-kind), Voyager (~70%), worst-case zero.</li>
+                    <li><strong>DeFi infrastructure scenario</strong> &mdash; wrapping depeg, oracle stale, bridge exploit (Kelp DAO&ndash;style). Loss = your collateral, recovery near zero.</li>
+                </ul>
+                <p class="prose">The page makes abstract risks concrete by saying <em>here is exactly what happens to your stack in each scenario, in BTC and in dollars, against your inputs.</em></p>
+            </div>
+
+            <div class="bas-cs-stub-section">
+                <h3>Headline visual</h3>
+                <p class="prose">The Power Law channel chart (rendered in the DR-page style), with two markers placed on it: <em>current bitcoin price</em> and <em>your liquidation price under the proposed loan</em>. The vertical space between them makes the strategy's structural buffer visible at a glance. Same chart updates live as you adjust LTV, stack, and loan amount.</p>
+            </div>
+
+            <div class="bas-cs-stub-cta">
+                <p>The calculator is the next step in the page's build sequence. The shape above is what's being implemented &mdash; not what's still being decided.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB III: THE MATH — methodology notes (stub) -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="tab-content" id="tab-math">
+        <div class="section-intro">
+            <h2>The Math</h2>
+            <p>Methodology notes for the calculator, plus a deeper-dive section on the structural concepts surfaced in the Question tab. In active development alongside the calculator.</p>
+        </div>
+
+        <div class="bas-cs-stub">
+            <div class="bas-cs-stub-header">In active development</div>
+
+            <div class="bas-cs-stub-section">
+                <h3>Planned content</h3>
+                <ul class="negative-space-list">
+                    <li><strong>Liquidation-price derivation</strong> &mdash; the math behind the calculator's headline output, including how the LTV / margin-call / liquidation-threshold structure works on representative platforms.</li>
+                    <li><strong>Power Law channel methodology</strong> &mdash; coefficient reference and link back to <a href="/the-power-law.html">the foundational page</a>; how channel-position percentiles map to drawdown buffer in this context.</li>
+                    <li><strong>Borrow-vs-sell decision math</strong> &mdash; the G &gt; R arithmetic walked through carefully, with the tactical vs. strategic time-horizon distinction surfaced explicitly.</li>
+                    <li><strong>The &ldquo;Infrastructure Failure Gap&rdquo; explainer</strong> &mdash; the structural risk that healthy positions can be liquidated when oracles fail or networks congest, beyond what LTV alone protects against.</li>
+                    <li><strong>Source-verification appendix</strong> &mdash; sourcing for every numerical claim that appears in the Question tab. Drafted alongside research synthesis; will be published with the page.</li>
+                    <li><strong>What we're not modeling</strong> &mdash; the explicit list of factors deliberately out of scope (forward-rate uncertainty, jurisdictional tax variation, etc.), following the DR-page convention.</li>
+                </ul>
+            </div>
+
+            <div class="bas-cs-stub-cta">
+                <p>This tab gets fleshed out as the calculator is implemented &mdash; the methodology notes describe what the calculator actually computes, so the two are built together.</p>
+            </div>
+        </div>
+    </div>
+
+    {% include 'components/related.njk' %}
+    {% include 'components/companion-content.njk' %}
+
+</main>
