@@ -2,17 +2,24 @@
 // BORROWING AGAINST YOUR STACK — page logic
 //
 // Three-tab page: Question / Calculator / Math. This file handles
-// tab routing + the Calculator's first-slice math (LTV → liquidation
-// price → channel position) and the Power Law channel chart.
+// tab routing + the Calculator's interactive math and Power Law
+// channel chart.
 //
-// Subsequent commits will add: interest-rate and horizon inputs,
-// borrow-vs-sell comparison (interest cost vs. capital-gains-tax
-// saved), three loss-scenario backtests (liquidation / counterparty
-// default / DeFi infrastructure), and the 0% borrowing baseline.
+// Current scope:
+//   • LTV / liquidation-price / channel-position math (risk surface)
+//   • Interest rate input + monthly/annual repayment burden (cost surface)
+//   • Interpretation paragraph that incorporates mean-reversion opportunity
+//     cost at low PL positions and the borrow-low/repay-high (Disciplined-
+//     Rebalancing-mirror) framing
+//   • Power Law channel chart with current-price marker and liquidation-
+//     price horizontal line projected forward
+//
+// Subsequent commits will add: borrow-vs-sell comparison, structured
+// early-repayment surface, historical-drawdown backtest, counterparty
+// default scenario, DeFi infrastructure scenario, 0% baseline anchor.
 //
 // PL_DATA + PL_A/B/FLOOR/CEIL + GENESIS_TS + plPrice() come from
-// shared/power-law-data.js (loaded before this file via njk
-// page_scripts). Tab-routing pattern matches Disciplined Rebalancing.
+// shared/power-law-data.js (loaded before this file via njk page_scripts).
 // ═══════════════════════════════════════════════════════════════════
 
 // ═══════ TAB ROUTING ═══════
@@ -31,7 +38,6 @@
       history.replaceState(null, '', '#' + b.dataset.tab);
     });
   });
-  // Honor deep-link via URL hash on initial load
   var hash = location.hash.replace('#','');
   if(hash){
     var target = document.querySelector('[data-tab="'+hash+'"]');
@@ -41,40 +47,38 @@
 
 
 // ═══════ CALCULATOR ═══════
-// Input → output flow:
-//   1. User sets stack, current price, loan amount, liquidation threshold.
-//   2. We compute LTV = loan / (stack * price), color-coded by zone.
-//   3. We compute liquidation price = loan / (stack * threshold).
-//   4. We compute drawdown to liq = (price - liqPrice) / price.
-//   5. We compute channel position of liq = liqPrice / plPrice(today).
-//   6. Chart renders Power Law channel with current and liquidation markers.
-//
-// The channel-position output is the page's editorially distinctive
-// number — it's what tells you whether you have structural buffer
-// (liq below floor → safe even if bitcoin breaks trend) or you're
-// betting on continued strength (liq above trend → routine mean-
-// reversion liquidates you). The Question tab references both zones
-// explicitly; the Calculator surfaces which one your inputs put you in.
 (function(){
   var stackInput = document.getElementById('basBtcStack');
-  if (!stackInput) return; // calculator markup not present (e.g. on stub-only build)
+  if (!stackInput) return;
 
-  var priceInput        = document.getElementById('basBtcPrice');
-  var loanInput         = document.getElementById('basLoanAmount');
-  var liqThresholdSlider = document.getElementById('basLiqThreshold');
-
+  // ─── Risk-surface inputs ───
+  var priceInput          = document.getElementById('basBtcPrice');
+  var loanInput           = document.getElementById('basLoanAmount');
+  var liqThresholdSlider  = document.getElementById('basLiqThreshold');
   var liqThresholdDisplay = document.getElementById('basLiqThresholdDisplay');
-  var ltvOut            = document.getElementById('basLtvOut');
-  var ltvZoneLabel      = document.getElementById('basLtvZone');
-  var liqPriceOut       = document.getElementById('basLiqPrice');
-  var liqDrawdownOut    = document.getElementById('basLiqDrawdown');
-  var channelPosOut     = document.getElementById('basChannelPos');
-  var channelHintOut    = document.getElementById('basChannelHint');
-  var interpOut         = document.getElementById('basInterp');
 
-  // Auto-fill the current BTC price from the most recent PL_DATA sample,
-  // rounded to the nearest hundred. The page is editorial reference; we
-  // accept a slight lag rather than depending on a live price feed.
+  // ─── Cost-surface inputs ───
+  var rateSlider          = document.getElementById('basInterestRate');
+  var rateDisplay         = document.getElementById('basInterestRateDisplay');
+  var presetBtns          = document.querySelectorAll('.bas-calc-preset');
+
+  // ─── Risk-surface outputs ───
+  var ltvOut          = document.getElementById('basLtvOut');
+  var ltvZoneLabel    = document.getElementById('basLtvZone');
+  var liqPriceOut     = document.getElementById('basLiqPrice');
+  var liqDrawdownOut  = document.getElementById('basLiqDrawdown');
+  var channelPosOut   = document.getElementById('basChannelPos');
+  var channelHintOut  = document.getElementById('basChannelHint');
+
+  // ─── Cost-surface outputs ───
+  var monthlyOut         = document.getElementById('basMonthlyInterest');
+  var annualOut          = document.getElementById('basAnnualInterest');
+  var annualSubOut       = document.getElementById('basAnnualInterestSub');
+  var annualPctStackOut  = document.getElementById('basAnnualPctStack');
+
+  var interpOut = document.getElementById('basInterp');
+
+  // Auto-fill current BTC price from most recent PL_DATA sample
   if (typeof PL_DATA !== 'undefined' && PL_DATA.length) {
     var latest = PL_DATA[PL_DATA.length - 1];
     if (!priceInput.value || priceInput.value === '0') {
@@ -84,6 +88,7 @@
 
   var chart = null;
 
+  // ─── Formatters ───
   function fmtUsd(n) {
     if (n >= 1e9) return '$' + (n/1e9).toFixed(2) + 'B';
     if (n >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
@@ -99,130 +104,52 @@
     return (Date.now()/1000 - GENESIS_TS) / 86400;
   }
 
-  // LTV zone classification — used to color-code the LTV output card
-  // and to surface a one-word interpretation alongside the number.
-  // Bands match the Question tab's recommendations:
-  //   <40% conservative, 40-60% moderate, >60% aggressive.
+  // ─── Zone classifiers ───
+  // LTV zones match the Question tab's bands: <40% conservative,
+  // 40-60% moderate, >60% aggressive.
   function ltvZone(ltv) {
     if (ltv < 0.40) return { label: 'Conservative', cls: 'bas-zone-good' };
     if (ltv < 0.60) return { label: 'Moderate',     cls: 'bas-zone-warn' };
     return                 { label: 'Aggressive',   cls: 'bas-zone-bad'  };
   }
-
-  // Channel-position classification — maps liquidation-price-as-multiple-
-  // of-today's-trend to the descriptive zones used in the Question tab.
+  // Channel zones map liq-price-as-multiple-of-today's-trend to descriptive
+  // labels matching the Question tab.
   function channelZone(liqRatio) {
     if (liqRatio < PL_FLOOR) {
-      return {
-        label: 'Below channel floor',
-        cls: 'bas-zone-good',
-        hint: 'Bitcoin would need to break the long-term structural floor for liquidation.'
-      };
+      return { label: 'Below channel floor',  cls: 'bas-zone-good',
+               hint:  'Bitcoin would need to break the long-term structural floor for liquidation.' };
     }
     if (liqRatio < 1.0) {
-      return {
-        label: 'Between floor and trend',
-        cls: 'bas-zone-warn',
-        hint: 'Floor has held historically; some buffer but less than the conservative case.'
-      };
+      return { label: 'Between floor and trend', cls: 'bas-zone-warn',
+               hint:  'Floor has held historically; some buffer but less than the conservative case.' };
     }
     if (liqRatio < PL_CEIL) {
-      return {
-        label: 'In upper channel',
-        cls: 'bas-zone-bad',
-        hint: 'Routine mean-reversion to trend would liquidate this position.'
-      };
+      return { label: 'In upper channel', cls: 'bas-zone-bad',
+               hint:  'Routine mean-reversion to trend would liquidate this position.' };
     }
-    return {
-      label: 'Above channel ceiling',
-      cls: 'bas-zone-bad',
-      hint: 'Liquidation requires bitcoin to be above 3× trend — very exposed.'
-    };
+    return { label: 'Above channel ceiling', cls: 'bas-zone-bad',
+             hint:  'Liquidation requires bitcoin to be above 3× trend — very exposed.' };
   }
-
-  // ═══════ PROVIDER CATEGORIES ═══════
-  // Three approved categories from the Question tab's Up Front section,
-  // with typical APR ranges as of mid-2026. The DeFi category is included
-  // for comparison only — the Question tab explicitly dismisses it, and
-  // the card surfaces that dismissal visually rather than burying it.
-  //
-  // APR midpoints are deliberately used as defaults rather than range
-  // extremes. The editorial point of the three cards is the spread
-  // between provider archetypes, not the lowest possible rate. Hardcoded
-  // here rather than slider-controlled because individual rate-shopping
-  // isn't the editorial frame — the page's frame is which structural
-  // tier a user chooses to operate in.
-  var PROVIDERS = [
-    {
-      key: 'multisig',
-      name: 'Collaborative-custody multisig',
-      examples: 'Unchained, Anchor Watch, Onramp',
-      aprRange: '12–16%',
-      aprDefault: 14,
-      note: 'Verifiable on-chain custody. The highest standard. Higher rate is the no-rehypothecation premium — the visible cost of buying out of Celsius-style risk.',
-      tone: 'good'
-    },
-    {
-      key: 'cefi',
-      name: 'Tier-1 non-rehypothecating CeFi',
-      examples: 'Ledn, APX, Strike, Salt, Arch, Aven, Figure, Coinbase/Morpho',
-      aprRange: '8–12%',
-      aprDefault: 10,
-      note: 'Contractual no-rehypothecation, regulated, transparent. Convenient entry point with the trade-off of full counterparty trust.',
-      tone: 'neutral'
-    },
-    {
-      key: 'defi',
-      name: 'DeFi via wrapped BTC',
-      examples: 'Aave, Morpho, Compound, Euler',
-      aprRange: '5–9%',
-      aprDefault: 7,
-      note: 'Dismissed on the Question tab. Rates appear lower because oracle, bridge, and emergency-governance failure modes are not priced into the headline number.',
-      tone: 'bad'
-    }
-  ];
-
-  function renderInterestScenarios(loan) {
-    var container = document.getElementById('basProviderCards');
-    if (!container) return;
-    if (!(loan > 0)) {
-      // Render empty-state placeholders so the visual structure persists
-      // before the user enters a loan amount.
-      container.innerHTML = PROVIDERS.map(function(p) {
-        return '<div class="bas-provider-card bas-provider-card-' + p.tone + '">' +
-          '<div class="bas-provider-card-name">' + p.name + '</div>' +
-          '<div class="bas-provider-card-apr">' + p.aprRange + ' typical &middot; using ' + p.aprDefault + '%</div>' +
-          '<div class="bas-provider-card-cost"><span class="bas-provider-card-cost-label">Monthly</span><span class="bas-provider-card-cost-val">—</span></div>' +
-          '<div class="bas-provider-card-cost"><span class="bas-provider-card-cost-label">Annual</span><span class="bas-provider-card-cost-val">—</span></div>' +
-          '<div class="bas-provider-card-examples">' + p.examples + '</div>' +
-          '<div class="bas-provider-card-note">' + p.note + '</div>' +
-          (p.tone === 'bad' ? '<div class="bas-provider-card-dismissed">⚠ Covered for completeness only</div>' : '') +
-          '</div>';
-      }).join('');
-      return;
-    }
-    container.innerHTML = PROVIDERS.map(function(p) {
-      var monthly = loan * (p.aprDefault / 100) / 12;
-      var annual  = loan * (p.aprDefault / 100);
-      return '<div class="bas-provider-card bas-provider-card-' + p.tone + '">' +
-        '<div class="bas-provider-card-name">' + p.name + '</div>' +
-        '<div class="bas-provider-card-apr">' + p.aprRange + ' typical &middot; using ' + p.aprDefault + '%</div>' +
-        '<div class="bas-provider-card-cost"><span class="bas-provider-card-cost-label">Monthly</span><span class="bas-provider-card-cost-val">' + fmtUsd(monthly) + '</span></div>' +
-        '<div class="bas-provider-card-cost"><span class="bas-provider-card-cost-label">Annual</span><span class="bas-provider-card-cost-val">' + fmtUsd(annual) + '</span></div>' +
-        '<div class="bas-provider-card-examples">' + p.examples + '</div>' +
-        '<div class="bas-provider-card-note">' + p.note + '</div>' +
-        (p.tone === 'bad' ? '<div class="bas-provider-card-dismissed">⚠ Covered for completeness only</div>' : '') +
-        '</div>';
-    }).join('');
+  // Current-price-relative-to-trend classifier — used by the interpretation
+  // paragraph to know whether to surface the mean-reversion / borrow-low-
+  // repay-high framing.
+  function originationZone(currentRatio) {
+    if (currentRatio < PL_FLOOR)  return 'deep-low';   // below floor — exceptional
+    if (currentRatio < 0.85)      return 'low';         // bottom half of channel
+    if (currentRatio < 1.4)       return 'mid';         // near trend
+    if (currentRatio < 2.2)       return 'high';        // upper channel
+    return 'extreme';                                   // near or above ceiling
   }
 
   function recompute() {
-    var stack         = parseFloat(stackInput.value)        || 0;
-    var price         = parseFloat(priceInput.value)        || 0;
-    var loan          = parseFloat(loanInput.value)         || 0;
-    var liqThreshold  = parseFloat(liqThresholdSlider.value)/ 100;
+    var stack         = parseFloat(stackInput.value)         || 0;
+    var price         = parseFloat(priceInput.value)         || 0;
+    var loan          = parseFloat(loanInput.value)          || 0;
+    var liqThreshold  = parseFloat(liqThresholdSlider.value) / 100;
+    var rate          = parseFloat(rateSlider.value)         || 0;
 
     liqThresholdDisplay.textContent = liqThresholdSlider.value;
+    rateDisplay.textContent         = rate.toFixed(1);
 
     if (stack <= 0 || price <= 0 || loan <= 0) {
       ltvOut.textContent = '—';
@@ -230,98 +157,158 @@
       liqDrawdownOut.textContent = '—';
       channelPosOut.textContent = '—';
       channelHintOut.textContent = '—';
+      monthlyOut.textContent = '$—';
+      annualOut.textContent = '$—';
+      annualSubOut.textContent = '—';
+      annualPctStackOut.textContent = '—';
       interpOut.innerHTML = '<p>Enter a stack size, current price, and loan amount above to see your liquidation position on the Power Law channel.</p>';
-      renderInterestScenarios(0);
       return;
     }
 
+    // ─── Risk math ───
     var stackUsd      = stack * price;
     var ltv           = loan / stackUsd;
     var liqPrice      = loan / (stack * liqThreshold);
     var drawdownToLiq = (price - liqPrice) / price;
-
     var todayDays     = daysSinceGenesis();
     var trendToday    = plPrice(todayDays);
     var liqRatio      = liqPrice / trendToday;
-    var currentRatio  = price / trendToday;
+    var currentRatio  = price    / trendToday;
+
+    // ─── Cost math ───
+    // Simple interest, USD-denominated. The current page intentionally
+    // doesn't model compound interest or amortization — most bitcoin-
+    // backed loans are interest-only with bullet repayment, and the
+    // editorial point we want to surface is the monthly carry burden
+    // and the annual-cost-vs-stack-value ratio (the G > R comparison).
+    var annualInterest    = loan * (rate/100);
+    var monthlyInterest   = annualInterest / 12;
+    var annualPctOfStack  = annualInterest / stackUsd;
 
     var lz = ltvZone(ltv);
     var cz = channelZone(liqRatio);
+    var oz = originationZone(currentRatio);
 
     // ─── Output cards ───
-    ltvOut.textContent = pct(ltv, 1);
+    ltvOut.textContent       = pct(ltv, 1);
     ltvZoneLabel.textContent = lz.label;
-    ltvZoneLabel.className = 'bas-calc-output-zone ' + lz.cls;
+    ltvZoneLabel.className   = 'bas-calc-output-zone ' + lz.cls;
 
-    liqPriceOut.textContent = fmtUsd(liqPrice);
+    liqPriceOut.textContent    = fmtUsd(liqPrice);
     liqDrawdownOut.textContent = 'BTC must fall ' + pct(drawdownToLiq, 0) +
       ' from $' + Math.round(price).toLocaleString();
 
-    channelPosOut.textContent = cz.label;
-    channelPosOut.className = 'bas-calc-output-value bas-calc-output-zoned ' + cz.cls;
+    channelPosOut.textContent  = cz.label;
+    channelPosOut.className    = 'bas-calc-output-value bas-calc-output-zoned ' + cz.cls;
     channelHintOut.textContent = cz.hint;
 
-    // ─── Interest cost cards (three provider categories) ───
-    renderInterestScenarios(loan);
+    monthlyOut.textContent        = fmtUsd(monthlyInterest);
+    annualOut.textContent         = fmtUsd(annualInterest);
+    annualSubOut.textContent      = pct(rate/100, 1) + ' of your $' +
+      Math.round(loan).toLocaleString() + ' loan principal';
+    annualPctStackOut.textContent = pct(annualPctOfStack, 2);
 
     // ─── Interpretation paragraph ───
-    // Pairs the liquidation-defensive view (where your buffer sits)
-    // with the upside / opportunity-cost view (what's the offensive case
-    // for borrowing-not-selling at this channel position). Tab 1's 100 BTC
-    // thought experiment makes the upside argument; here we instantiate it
-    // for the user's specific channel position.
-    var interpSafety;
-    var interpUpside = '';
-    if (liqRatio < PL_FLOOR) {
-      interpSafety = 'Your liquidation price sits <strong>below the channel floor</strong> — bitcoin would need to break the long-term structural support that has held across every cycle of the last fifteen years for your position to liquidate. This is the conservative zone the Question tab references.';
-    } else if (liqRatio < 1.0) {
-      interpSafety = 'Your liquidation price sits <strong>between the floor and the trend</strong>. The floor has held across multiple historical drawdowns, but you have less buffer than the most conservative case. A typical bear-market drawdown would bring price close to but not through your liquidation.';
-    } else if (liqRatio < PL_CEIL) {
-      interpSafety = 'Your liquidation price sits <strong>above the trend</strong>. Routine mean-reversion to trend would liquidate this position. The Question tab calls this "betting on continued strength" rather than "buying room to be wrong."';
-    } else {
-      interpSafety = 'Your liquidation price sits <strong>above the upper channel bound</strong>. Bitcoin would have to remain at extended cycle-peak levels to keep this position alive — a position that requires euphoria to survive.';
-    }
-
-    // Upside / opportunity-cost framing — completes the editorial logic
-    // from the Question tab's "Compared to what?" opening. Borrowing
-    // when bitcoin is low in the channel isn't just defensively safer;
-    // it's offensively higher-leverage because the asymmetric mean
-    // reversion is toward higher prices. Selling at low channel position
-    // is the inverse — locking in a low sale price and losing the
-    // appreciation that mean reversion implies.
-    if (currentRatio < 1.0) {
-      interpUpside = '<p>Bitcoin currently trades at <strong>' + currentRatio.toFixed(2) + '× trend</strong> — below the long-term Power Law trend line. The structural pull is <em>toward</em> trend over the medium term, which means the opportunity cost of selling here is asymmetric: every bitcoin sold at this channel position is sold near the bottom of the mean-reversion arc. This is the offensive case for borrowing-rather-than-selling that the opening of the Question tab walks through with the 100-BTC thought experiment.</p>';
-    } else if (currentRatio < PL_CEIL) {
-      interpUpside = '<p>Bitcoin currently trades at <strong>' + currentRatio.toFixed(2) + '× trend</strong> — above the long-term Power Law trend. Mean reversion at this position is downward toward trend, not upward. The case for borrowing-rather-than-selling weakens at higher channel positions; <a href="/disciplined-rebalancing.html">disciplined rebalancing</a> (selling at high percentile inside a tax wrapper) may be the more structurally aligned alternative if you don\'t need liquidity urgently.</p>';
-    } else {
-      interpUpside = '<p>Bitcoin currently trades at <strong>' + currentRatio.toFixed(2) + '× trend</strong> — at or above the upper channel bound (3× trend). Historically these zones have been brief excursions, not sustained levels. Originating a new loan at this position is taking the maximum liquidation risk available; the structural-buffer argument that motivates borrowing-rather-than-selling functionally inverts here.</p>';
-    }
-
-    interpOut.innerHTML =
-      '<p>At <strong>' + pct(ltv, 1) + '</strong> LTV against <strong>' + stack.toFixed(2) + ' BTC</strong>, ' +
-      'your <strong>' + fmtUsd(loan) + '</strong> loan liquidates if BTC falls to <strong>' +
-      fmtUsd(liqPrice) + '</strong> — a <strong>' + pct(drawdownToLiq, 0) +
-      '</strong> drawdown from today\'s price.</p>' +
-      '<p>' + interpSafety + '</p>' +
-      interpUpside;
+    interpOut.innerHTML = generateInterpretation({
+      stack: stack, price: price, loan: loan, ltv: ltv,
+      liqPrice: liqPrice, drawdownToLiq: drawdownToLiq,
+      liqRatio: liqRatio, currentRatio: currentRatio,
+      annualInterest: annualInterest, rate: rate,
+      annualPctOfStack: annualPctOfStack,
+      lz: lz, cz: cz, oz: oz
+    });
 
     renderChart(price, liqPrice);
   }
 
+  // ─── Interpretation generator ───
+  // Builds a contextualized paragraph in the page's editorial voice.
+  // The text adapts to four signals:
+  //   1. LTV zone (conservative / moderate / aggressive)
+  //   2. Channel zone of liquidation price (below floor → above ceiling)
+  //   3. Origination zone (where is current price in the channel? affects
+  //      the mean-reversion opportunity-cost framing)
+  //   4. Annual interest cost as % of stack — the G > R comparison
+  function generateInterpretation(s) {
+    var blocks = [];
+
+    // Block 1: the headline numbers, conversationally
+    blocks.push(
+      '<p>At <strong>' + pct(s.ltv, 1) + '</strong> LTV against ' +
+      '<strong>' + s.stack.toFixed(2) + ' BTC</strong>, your <strong>' +
+      fmtUsd(s.loan) + '</strong> loan liquidates if BTC falls to <strong>' +
+      fmtUsd(s.liqPrice) + '</strong> — a <strong>' + pct(s.drawdownToLiq, 0) +
+      '</strong> drawdown from today\'s price. Carrying cost: <strong>' +
+      fmtUsd(s.annualInterest / 12) + '/month</strong> (' + s.rate.toFixed(1) +
+      '% APR on the principal).</p>'
+    );
+
+    // Block 2: channel-position-of-liquidation framing
+    var safetyBlock;
+    if (s.liqRatio < PL_FLOOR) {
+      safetyBlock = 'Your liquidation price sits <strong>below the channel floor</strong> — bitcoin would need to break the long-term structural support that has held across every cycle of the last fifteen years for your position to liquidate. This is the conservative zone the Question tab references.';
+    } else if (s.liqRatio < 1.0) {
+      safetyBlock = 'Your liquidation price sits <strong>between the floor and the trend</strong>. The floor has held across multiple historical drawdowns, but you have less buffer than the most conservative case. A typical bear-market drawdown would bring price close to but not through your liquidation.';
+    } else if (s.liqRatio < PL_CEIL) {
+      safetyBlock = 'Your liquidation price sits <strong>above the trend</strong>. Routine mean-reversion to trend would liquidate this position. The Question tab calls this "betting on continued strength" rather than "buying room to be wrong."';
+    } else {
+      safetyBlock = 'Your liquidation price sits <strong>above the upper channel bound</strong>. Bitcoin would have to remain at extended cycle-peak levels to keep this position alive — a position that requires euphoria to survive.';
+    }
+    blocks.push('<p>' + safetyBlock + '</p>');
+
+    // Block 3: origination-zone mean-reversion framing
+    // Only surfaces when the user is originating at a low PL position —
+    // because that's where the opportunity-cost asymmetry is most acute.
+    if (s.oz === 'deep-low' || s.oz === 'low') {
+      blocks.push(
+        '<p><em>One asymmetry worth seeing.</em> You\'re originating this loan ' +
+        (s.oz === 'deep-low'
+          ? 'with bitcoin <strong>below the Power Law floor</strong> — a position the channel has reached only briefly across fifteen years of history. '
+          : 'in the <strong>lower half of the Power Law channel</strong>. ') +
+        'That means you\'re not just maximally buffered from forced liquidation. You\'re also retaining the coin during what the channel suggests is a <strong>high-expected-return window</strong>. The alternative — selling some bitcoin to fund the same need at this price — would crystallize fiat at a structural low <em>and</em> forgo whatever mean-reversion upside the channel implies for the coins you didn\'t keep. Borrowing here is the trade where both sides of the asymmetry point the same way.</p>'
+      );
+
+      // Block 4: borrow-low / repay-high callout — only at the very low end
+      if (s.oz === 'deep-low') {
+        blocks.push(
+          '<p><em>A strategic variant worth knowing about.</em> The channel position you\'re originating at is structurally similar to the trigger band on the <a href="/disciplined-rebalancing.html">Disciplined Rebalancing page</a> — except inverted in time. Where Disciplined Rebalancing sells at a high-percentile zone and rebuys at a low-percentile zone, the mirror strategy is to <strong>borrow at a low-percentile zone and repay from appreciated BTC at a high-percentile zone</strong>. The destination is the same — <em>"took some off the table at the top"</em> — but the BAS variant gets you liquidity at the bottom along the way, and the psychological framing is sharper: paying off the loan with appreciated bitcoin at the cycle peak feels like <em>releasing an obligation</em> rather than <em>selling</em>. Same financial outcome, different emotional register for the same underlying decision. A structured surface for modeling this is on the calculator\'s roadmap.</p>'
+        );
+      }
+    }
+
+    // Block 5: cost-side commentary — only when something noteworthy
+    // Aggressive LTV with low rate ⇒ rehypothecation warning.
+    if (s.rate <= 5 && s.ltv > 0.30) {
+      blocks.push(
+        '<p><em>A note on the rate.</em> The rate you\'ve selected is in the territory where lenders subsidize their headline number by re-lending your collateral. Tier-1 non-rehypothecating CeFi rates run 8–12%; collaborative-custody multisig rates run 12–16%. Anything substantially below that is paying for the subsidy by accepting rehypothecation risk &mdash; the structural failure mode that took down Celsius, BlockFi, Genesis, and Voyager. <em>Cheap rates are the price of tail risk, not its absence.</em></p>'
+      );
+    }
+
+    // Block 6: G > R check — does bitcoin's CAGR clear the carrying cost?
+    // Only surface when both rate and currentRatio data points are present.
+    var bitcoinCagrEstimate = 0.39; // editorial: trailing 4-year CAGR per Question tab
+    if (s.rate > 0) {
+      if (s.rate/100 < bitcoinCagrEstimate * 0.5) {
+        // Loan is structurally accretive even under conservative growth assumptions
+        blocks.push(
+          '<p><em>The G &gt; R structural check.</em> Your loan costs ' + pct(s.annualPctOfStack, 2) +
+          ' of stack value per year. Bitcoin\'s trailing four-year CAGR has run around 39%. As long as the asset compounds faster than the carrying cost — even materially below the historical pace — the loan is <strong>structurally accretive</strong> rather than dilutive. The Question tab calls this the perpetual-borrowing math.</p>'
+        );
+      }
+    }
+
+    return blocks.join('\n');
+  }
+
   // ═══════ CHART ═══════
-  // Power Law channel chart with two markers: current price and liquidation
-  // price. The liquidation line extends horizontally from today forward;
-  // as time passes, the channel's floor rises through that line — making
-  // the "your buffer grows with time" point visible without a separate
-  // explainer.
   function renderChart(currentPrice, liqPrice) {
     if (typeof Chart === 'undefined') return;
     var canvas = document.getElementById('basChannelChart');
     if (!canvas) return;
 
     var todayDays  = daysSinceGenesis();
-    var futureDays = todayDays + 365 * 5; // 5 years forward
-    var startDays  = 592; // first PL_DATA day
+    var futureDays = todayDays + 365 * 5;
+    var startDays  = 592;
 
     var floorPts = [], trendPts = [], upperPts = [];
     for (var d = startDays; d <= futureDays; d += 30) {
@@ -330,8 +317,8 @@
       trendPts.push({ x: d, y: t });
       upperPts.push({ x: d, y: t * PL_CEIL });
     }
-    var historyPts   = PL_DATA.map(function(p){ return { x: p[0], y: p[1] }; });
-    var currentDot   = [{ x: todayDays, y: currentPrice }];
+    var historyPts    = PL_DATA.map(function(p){ return { x: p[0], y: p[1] }; });
+    var currentDot    = [{ x: todayDays, y: currentPrice }];
     var liqLineSeries = [{ x: todayDays, y: liqPrice }, { x: futureDays, y: liqPrice }];
 
     if (chart) chart.destroy();
@@ -425,29 +412,35 @@
     });
   }
 
-  // Wire inputs — recompute on every change.
+  // ─── Wire inputs ───
   ['input','change'].forEach(function(evt){
-    [stackInput, priceInput, loanInput, liqThresholdSlider].forEach(function(el){
+    [stackInput, priceInput, loanInput, liqThresholdSlider, rateSlider].forEach(function(el){
       el.addEventListener(evt, recompute);
     });
   });
 
-  // When calculator tab activates, render. The chart needs a visible
-  // canvas at construction time for responsive sizing.
+  // ─── Preset buttons set the rate slider and recompute ───
+  presetBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var r = parseFloat(btn.dataset.rate);
+      if (isNaN(r)) return;
+      rateSlider.value = r;
+      // Visual feedback: mark the active preset
+      presetBtns.forEach(function(b){ b.classList.remove('bas-calc-preset-active'); });
+      btn.classList.add('bas-calc-preset-active');
+      recompute();
+    });
+  });
+
+  // Lazy chart render on calculator-tab activation
   var calcBtn = document.querySelector('.tab-btn[data-tab="calculator"]');
   if (calcBtn) {
-    calcBtn.addEventListener('click', function(){
-      setTimeout(recompute, 30);
-    });
+    calcBtn.addEventListener('click', function(){ setTimeout(recompute, 30); });
   }
-  // If the calculator tab is the initial active tab (URL hash deep-link),
-  // do an initial compute. Otherwise compute lazily on activation.
+
+  // If calculator is the initial active tab (URL hash deep-link), compute now
   if (document.getElementById('tab-calculator') &&
       document.getElementById('tab-calculator').classList.contains('active')) {
     recompute();
-  } else {
-    // Pre-compute outputs (text) so they're populated when tab opens,
-    // but don't render chart yet — Chart.js needs visible dimensions.
-    // (Cheap fallback: just leave outputs as their placeholder text.)
   }
 })();
