@@ -299,13 +299,13 @@ eleventyComputed:
                 <div class="bas-calc-field">
                     <div class="bas-calc-field-label bas-calc-field-label-with-display">
                         <span>
-                            Liquidation threshold
-                            <span class="help-tip" tabindex="0">?<span class="tip-content">The LTV at which the lender forcibly sells your collateral to repay the loan. Tier-1 CeFi typical: 80&ndash;85%. Collaborative-custody multisig: 75&ndash;80%. Predatory platforms: 95&ndash;97%. Lower threshold = wider margin-call window before liquidation.</span></span>
+                            Liquidation LTV
+                            <span class="help-tip" tabindex="0">?<span class="tip-content">The loan-to-value ratio that <strong>triggers a forced sale</strong> of your collateral &mdash; set by the lender's policy, not by you. Different from <strong>Your LTV</strong> (your current ratio, shown in the output). The gap between your current LTV and this threshold is your drawdown buffer. Tier-1 CeFi: 80&ndash;85%. Collaborative-custody multisig: 75&ndash;80%. Predatory: 95&ndash;97%.</span></span>
                         </span>
                         <span class="bas-calc-field-display"><span id="basLiqThresholdDisplay">80</span>%</span>
                     </div>
                     <input type="range" id="basLiqThreshold" min="70" max="95" value="80" step="1">
-                    <div class="bas-calc-field-hint">LTV at which collateral is forcibly sold. Tier-1 CeFi typical: 80&ndash;85%. Multisig: 75&ndash;80%. Predatory: 95&ndash;97%.</div>
+                    <div class="bas-calc-field-hint">The LTV that triggers forced sale, set by the lender. Different from <em>Your LTV</em> in the output &mdash; the gap between the two is your drawdown buffer. Tier-1 CeFi: 80&ndash;85%. Multisig: 75&ndash;80%. Predatory: 95&ndash;97%.</div>
                 </div>
             </div>
 
@@ -322,19 +322,19 @@ eleventyComputed:
                     <input type="range" id="basInterestRate" min="2" max="20" value="10" step="0.5">
                     <div class="bas-calc-presets">
                         <div class="bas-calc-preset-wrap">
-                            <button type="button" class="bas-calc-preset" data-rate="10">Tier-1 CeFi &asymp; 10%</button>
-                            <span class="help-tip help-tip-preset" tabindex="0">?<span class="tip-content">Tier-1 non-rehypothecating CeFi (Ledn, APX, Strike, Salt, Arch, Aven, Figure, Coinbase). Full custody at qualified custodians, contractual no-rehypothecation, regulated. <a href="#question">See Question tab &rsaquo;</a></span></span>
+                            <button type="button" class="bas-calc-preset" data-rate="10" data-threshold="82">Tier-1 CeFi &asymp; 10%</button>
+                            <span class="help-tip help-tip-preset" tabindex="0">?<span class="tip-content">Tier-1 non-rehypothecating CeFi (Ledn, APX, Strike, Salt, Arch, Aven, Figure, Coinbase). Full custody at qualified custodians, contractual no-rehypothecation, regulated. Clicking this preset sets rate to 10% and Liquidation LTV to 82% (mid of the typical 80&ndash;85% range). <a href="#question">See Question tab &rsaquo;</a></span></span>
                         </div>
                         <div class="bas-calc-preset-wrap">
-                            <button type="button" class="bas-calc-preset" data-rate="14">Multisig &asymp; 14%</button>
-                            <span class="help-tip help-tip-preset" tabindex="0">?<span class="tip-content">Collaborative-custody multisig (Unchained, Anchor Watch, Onramp). On-chain segregation you can verify cryptographically &mdash; the structural gold standard. Higher rate because the lender can't subsidise by re-lending your collateral. <a href="#question">See Question tab &rsaquo;</a></span></span>
+                            <button type="button" class="bas-calc-preset" data-rate="14" data-threshold="77">Multisig &asymp; 14%</button>
+                            <span class="help-tip help-tip-preset" tabindex="0">?<span class="tip-content">Collaborative-custody multisig (Unchained, Anchor Watch, Onramp). On-chain segregation you can verify cryptographically &mdash; the structural gold standard. Higher rate because the lender can't subsidise by re-lending your collateral. Clicking this preset sets rate to 14% and Liquidation LTV to 77% (mid of the typical 75&ndash;80% range). <a href="#question">See Question tab &rsaquo;</a></span></span>
                         </div>
                         <div class="bas-calc-preset-wrap">
-                            <button type="button" class="bas-calc-preset bas-calc-preset-warning" data-rate="3">Rehypothecating &asymp; 3%</button>
+                            <button type="button" class="bas-calc-preset bas-calc-preset-warning" data-rate="3" data-threshold="80">Rehypothecating &asymp; 3%</button>
                             <span class="help-tip help-tip-preset help-tip-warning" tabindex="0">?<span class="tip-content">Platforms that subsidise low headline rates by re-lending your collateral to third parties (Nexo, Binance Loans, Matrixport). <strong>The structural failure mode that took down Celsius, BlockFi, Genesis, and Voyager.</strong> Included as an option so you can see the subsidy effect; the page doesn't recommend it. <a href="#question">See Question tab &rsaquo;</a></span></span>
                         </div>
                     </div>
-                    <div class="bas-calc-field-hint">Click a preset or drag the slider. The rehypothecating-CeFi preset is included to make visible how aggressively those platforms subsidize their rates &mdash; <em>that subsidy is the failure mode the Question tab argues against.</em></div>
+                    <div class="bas-calc-field-hint">Click a preset (sets both rate and liquidation LTV for that category) or drag either slider to override. The rehypothecating preset is included to make the subsidy visible &mdash; <em>that subsidy is the failure mode the Question tab argues against.</em></div>
                 </div>
             </div>
 
@@ -346,6 +346,21 @@ eleventyComputed:
                         <div class="bas-calc-output-label">Your LTV</div>
                         <div class="bas-calc-output-value" id="basLtvOut">&mdash;</div>
                         <div class="bas-calc-output-zone bas-zone-good" id="basLtvZone">&mdash;</div>
+                        <!-- ─── LTV METER ─── -->
+                        <!-- Horizontal 0-100% bar with green/amber/red fill -->
+                        <!-- to current LTV and a red vertical marker at the    -->
+                        <!-- Liquidation LTV. The visible gap between fill end  -->
+                        <!-- and marker is the drawdown buffer made visceral.    -->
+                        <div class="bas-calc-ltv-meter">
+                            <div class="bas-calc-ltv-meter-bar">
+                                <div class="bas-calc-ltv-meter-fill" id="basLtvMeterFill"></div>
+                                <div class="bas-calc-ltv-meter-marker" id="basLtvMeterMarker"></div>
+                            </div>
+                            <div class="bas-calc-ltv-meter-legend">
+                                <span><span class="bas-calc-ltv-meter-swatch bas-calc-ltv-meter-swatch-current" id="basLtvMeterCurrentSwatch"></span><span id="basLtvMeterCurrentLabel">&mdash;</span> current</span>
+                                <span><span class="bas-calc-ltv-meter-swatch bas-calc-ltv-meter-swatch-trigger"></span><span id="basLtvMeterTriggerLabel">&mdash;</span> liquidation</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="bas-calc-output-card">
                         <div class="bas-calc-output-label">Liquidation BTC price</div>
