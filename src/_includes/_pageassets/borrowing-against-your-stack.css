@@ -1262,3 +1262,84 @@
     margin-bottom: 0.5rem;
     display: block;
 }
+
+/* ───────────────────────────────────────────────
+   18. LTV METER (mini bar inside the Your-LTV card)
+   Shows current LTV as a colored fill on a 0-100%
+   horizontal scale, with a red vertical marker at the
+   Liquidation LTV. The gap between fill and marker is
+   the user's drawdown buffer made visible.
+   The fill colour matches the LTV zone classification
+   (good/warn/bad) so the visual and the zone pill stay
+   coherent. Marker stays red regardless — it represents
+   the lender-set threshold which is structurally fixed
+   relative to the user's current position.
+   ─────────────────────────────────────────────── */
+.bas-calc-ltv-meter {
+    margin-top: 0.85rem;
+}
+.bas-calc-ltv-meter-bar {
+    position: relative;
+    height: 5px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    overflow: visible;
+}
+.bas-calc-ltv-meter-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: 3px 0 0 3px;
+    transition: width 0.25s ease, background-color 0.2s;
+    background: var(--green);
+}
+.bas-calc-ltv-meter-fill.bas-calc-ltv-meter-fill-good { background: var(--green); }
+.bas-calc-ltv-meter-fill.bas-calc-ltv-meter-fill-warn { background: var(--amber); }
+.bas-calc-ltv-meter-fill.bas-calc-ltv-meter-fill-bad  { background: #c0392b; }
+.bas-calc-ltv-meter-marker {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    width: 2px;
+    background: #c0392b;
+    border-radius: 1px;
+    transition: left 0.25s ease;
+    box-shadow: 0 0 4px rgba(192,57,43,0.4);
+}
+.bas-calc-ltv-meter-legend {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    gap: 0.5rem;
+}
+.bas-calc-ltv-meter-legend > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+.bas-calc-ltv-meter-swatch {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    flex: 0 0 auto;
+}
+.bas-calc-ltv-meter-swatch-current {
+    border-radius: 50%;
+    background: var(--green);
+    transition: background-color 0.2s;
+}
+.bas-calc-ltv-meter-swatch-current.bas-calc-ltv-meter-swatch-good { background: var(--green); }
+.bas-calc-ltv-meter-swatch-current.bas-calc-ltv-meter-swatch-warn { background: var(--amber); }
+.bas-calc-ltv-meter-swatch-current.bas-calc-ltv-meter-swatch-bad  { background: #c0392b; }
+.bas-calc-ltv-meter-swatch-trigger {
+    width: 2px;
+    height: 10px;
+    background: #c0392b;
+    margin: 0 3px;
+    border-radius: 1px;
+}
