@@ -60,6 +60,7 @@
   // ─── Cost-surface inputs ───
   var rateSlider          = document.getElementById('basInterestRate');
   var rateDisplay         = document.getElementById('basInterestRateDisplay');
+  var bvsRateDisplay      = document.getElementById('bvsInterestRateDisplay');
   var presetBtns          = document.querySelectorAll('.bas-calc-preset');
 
   // ─── Risk-surface outputs ───
@@ -88,21 +89,20 @@
   var ltvMeterTriggerLabel   = document.getElementById('basLtvMeterTriggerLabel');
 
   // ─── Borrow-vs-sell inputs and outputs ───
-  var horizonSlider     = document.getElementById('basHorizon');
-  var horizonDisplay    = document.getElementById('basHorizonDisplay');
-  var costBasisInput    = document.getElementById('basCostBasis');
-  var capGainsSlider    = document.getElementById('basCapGains');
-  var capGainsDisplay   = document.getElementById('basCapGainsDisplay');
+  // BvS now lives in its own top-level tab. Inputs are prefixed bvs* to
+  // distinguish from the Loan Health tab's bas* inputs. The four shared
+  // values (stack, price, loan, rate) appear on BOTH tabs and stay in
+  // sync via the state-sync layer initialised at the end of this IIFE.
+  var horizonSlider     = document.getElementById('bvsHorizon');
+  var horizonDisplay    = document.getElementById('bvsHorizonDisplay');
+  var costBasisInput    = document.getElementById('bvsCostBasis');
+  var capGainsSlider    = document.getElementById('bvsCapGains');
+  var capGainsDisplay   = document.getElementById('bvsCapGainsDisplay');
   var bvsBorrowHeadline = document.getElementById('basBvsBorrowHeadline');
   var bvsBorrowRows     = document.getElementById('basBvsBorrowRows');
   var bvsSellHeadline   = document.getElementById('basBvsSellHeadline');
   var bvsSellRows       = document.getElementById('basBvsSellRows');
   var bvsVerdict        = document.getElementById('basBvsVerdict');
-
-  // ─── BvS scenario summary refs (recap of shared inputs above) ───
-  var bvsScenarioStack  = document.getElementById('basBvsScenarioStack');
-  var bvsScenarioLoan   = document.getElementById('basBvsScenarioLoan');
-  var bvsScenarioRate   = document.getElementById('basBvsScenarioRate');
 
   // ─── Cost-basis presets (typical bitcoiner entry points) ───
   // Editorially-anchored to recognizable cycle moments. The "today"
@@ -210,6 +210,7 @@
 
     liqThresholdDisplay.textContent = liqThresholdSlider.value;
     rateDisplay.textContent         = rate.toFixed(1);
+    if (bvsRateDisplay) bvsRateDisplay.textContent = rate.toFixed(1);
 
     if (stack <= 0 || price <= 0 || loan <= 0) {
       ltvOut.textContent = '—';
@@ -235,9 +236,6 @@
       if (bvsSellHeadline)   bvsSellHeadline.textContent   = '— BTC';
       if (bvsBorrowRows)     bvsBorrowRows.innerHTML       = '';
       if (bvsSellRows)       bvsSellRows.innerHTML         = '';
-      if (bvsScenarioStack)  bvsScenarioStack.textContent  = '—';
-      if (bvsScenarioLoan)   bvsScenarioLoan.textContent   = '—';
-      if (bvsScenarioRate)   bvsScenarioRate.textContent   = '—';
       if (bvsVerdict) {
         bvsVerdict.className = 'bas-calc-bvs-verdict';
         bvsVerdict.innerHTML = '<p>Enter a stack, current price, and loan amount above to compare the two paths.</p>';
@@ -657,12 +655,8 @@
       return n.toFixed(4) + ' BTC';
     }
 
-    // ─── Update scenario-summary card (recaps shared inputs above) ───
-    if (bvsScenarioStack && ctx) {
-      bvsScenarioStack.textContent = fmtBtc(ctx.stack);
-      bvsScenarioLoan.textContent  = fmtUsd(ctx.loan);
-      bvsScenarioRate.textContent  = ctx.rate.toFixed(1) + '% APR';
-    }
+    // ─── Scenario summary panel removed (now lives as a self-contained tab
+    //     with its own inputs visible at the top). ───
 
     var horizonYears = r.horizonYears;
 
@@ -846,11 +840,16 @@
     });
   }
 
-  // ─── Wire inputs ───
+  // ─── Wire tab-specific inputs to recompute ───
+  // Shared inputs (stack / price / loan / rate) are wired by the
+  // state-sync layer below (where the mirror + persist + recompute
+  // happens in one event handler). Only tab-specific inputs are wired
+  // directly to recompute here:
+  //   Loan-Health-only: liquidation threshold
+  //   BvS-only: horizon, cost basis, capital gains tax
   ['input','change'].forEach(function(evt){
-    [stackInput, priceInput, loanInput, liqThresholdSlider, rateSlider,
-     horizonSlider, costBasisInput, capGainsSlider].forEach(function(el){
-      el.addEventListener(evt, recompute);
+    [liqThresholdSlider, horizonSlider, costBasisInput, capGainsSlider].forEach(function(el){
+      if (el) el.addEventListener(evt, recompute);
     });
   });
 
@@ -871,18 +870,56 @@
     });
   });
 
-  // ─── Sub-tab toggle ───
-  // Two analytical surfaces within the Calculator tab. Default = Loan health.
-  var subtabBtns = document.querySelectorAll('.bas-calc-subtab-btn');
-  var subtabs    = document.querySelectorAll('.bas-calc-subtab');
-  subtabBtns.forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var target = btn.dataset.subtab;
-      subtabBtns.forEach(function(b){ b.classList.remove('bas-calc-subtab-active'); });
-      subtabs.forEach(function(s){ s.classList.remove('bas-calc-subtab-active'); });
-      btn.classList.add('bas-calc-subtab-active');
-      var targetEl = document.getElementById(target);
-      if (targetEl) targetEl.classList.add('bas-calc-subtab-active');
+  // ─── State-sync layer for shared inputs across the two calculator tabs ───
+  // BTC stack, current price, loan amount, and interest rate appear on
+  // BOTH the Loan Health tab (basX inputs) and the Borrow vs. Sell tab
+  // (bvsX inputs). The sync layer:
+  //   1. Hydrates each pair from localStorage on page load
+  //   2. Mirrors any change on one input into its pair partner
+  //   3. Persists each change to localStorage
+  //   4. Triggers recompute() so outputs on both tabs stay current
+  //
+  // Tab-specific inputs (Liquidation LTV on Loan Health; Horizon /
+  // Cost basis / Cap gains tax on BvS) are not synced.
+  var SHARED_PAIRS = [
+    { key: 'bas_stack',     ids: ['basBtcStack',     'bvsBtcStack']     },
+    { key: 'bas_price',     ids: ['basBtcPrice',     'bvsBtcPrice']     },
+    { key: 'bas_loan',      ids: ['basLoanAmount',   'bvsLoanAmount']   },
+    { key: 'bas_rate',      ids: ['basInterestRate', 'bvsInterestRate'] }
+  ];
+
+  // Hydrate shared inputs from localStorage (if present, and only if non-empty)
+  SHARED_PAIRS.forEach(function(p){
+    try {
+      var v = window.localStorage && localStorage.getItem(p.key);
+      if (v !== null && v !== '' && !isNaN(parseFloat(v))) {
+        p.ids.forEach(function(id){
+          var el = document.getElementById(id);
+          if (el) el.value = v;
+        });
+      }
+    } catch (e) { /* localStorage disabled / quota / etc. — fall back to defaults */ }
+  });
+
+  // Wire bidirectional sync: change in one input updates its pair partner,
+  // persists to localStorage, and re-runs recompute.
+  SHARED_PAIRS.forEach(function(p){
+    p.ids.forEach(function(id){
+      var el = document.getElementById(id);
+      if (!el) return;
+      ['input','change'].forEach(function(evt){
+        el.addEventListener(evt, function(){
+          // Persist
+          try { localStorage.setItem(p.key, el.value); } catch (e) {}
+          // Mirror to pair partner(s)
+          p.ids.forEach(function(otherId){
+            if (otherId === id) return;
+            var other = document.getElementById(otherId);
+            if (other && other.value !== el.value) other.value = el.value;
+          });
+          recompute();
+        });
+      });
     });
   });
 
@@ -904,15 +941,41 @@
     });
   });
 
-  // Lazy chart render on calculator-tab activation
-  var calcBtn = document.querySelector('.tab-btn[data-tab="calculator"]');
-  if (calcBtn) {
-    calcBtn.addEventListener('click', function(){ setTimeout(recompute, 30); });
-  }
+  // ─── BvS rate-preset buttons ───
+  // Sets rate ONLY (BvS tab has no Liquidation LTV slider; that's owned
+  // by Loan Health). Rate change syncs to Loan Health via the shared-pair
+  // wiring above.
+  var bvsPresetBtns = document.querySelectorAll('.bas-calc-preset-bvs');
+  bvsPresetBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var r = parseFloat(btn.dataset.rate);
+      if (isNaN(r)) return;
+      var bvsRate = document.getElementById('bvsInterestRate');
+      var basRate = document.getElementById('basInterestRate');
+      if (bvsRate) bvsRate.value = r;
+      if (basRate) basRate.value = r;
+      try { localStorage.setItem('bas_rate', r); } catch (e) {}
+      bvsPresetBtns.forEach(function(b){ b.classList.remove('bas-calc-preset-active'); });
+      btn.classList.add('bas-calc-preset-active');
+      recompute();
+    });
+  });
 
-  // If calculator is the initial active tab (URL hash deep-link), compute now
-  if (document.getElementById('tab-calculator') &&
-      document.getElementById('tab-calculator').classList.contains('active')) {
+  // Lazy chart render on tab activation. Two paths: Loan Health (which
+  // hosts the chart) and Borrow vs. Sell (which doesn't, but still needs
+  // recompute so its comparison cards update if the user lands directly
+  // via URL fragment).
+  var lhTabBtn  = document.querySelector('.tab-btn[data-tab="loan-health"]');
+  var bvsTabBtn = document.querySelector('.tab-btn[data-tab="borrow-vs-sell"]');
+  if (lhTabBtn)  lhTabBtn.addEventListener('click',  function(){ setTimeout(recompute, 30); });
+  if (bvsTabBtn) bvsTabBtn.addEventListener('click', function(){ setTimeout(recompute, 30); });
+
+  // If either calculator tab is the initial active tab (URL hash
+  // deep-link), compute immediately so outputs aren't blank.
+  var lhTab  = document.getElementById('tab-loan-health');
+  var bvsTab = document.getElementById('tab-borrow-vs-sell');
+  if ((lhTab  && lhTab.classList.contains('active')) ||
+      (bvsTab && bvsTab.classList.contains('active'))) {
     recompute();
   }
 })();
