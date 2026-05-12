@@ -251,29 +251,57 @@ eleventyComputed:
 
         <div class="bas-calc">
 
+            <!-- ─── CHANNEL CHART (moved to top per reviewer feedback) ─── -->
+            <!-- Headline visual; the chart contextualises the inputs below.    -->
+            <!-- Updates live as the user adjusts stack / price / loan / threshold. -->
+            <div class="bas-calc-chart-wrapper">
+                <div class="bas-calc-chart-title">Your liquidation price on the Power Law channel</div>
+                <div class="bas-calc-chart-canvas"><canvas id="basChannelChart"></canvas></div>
+                <div class="bas-calc-chart-legend">
+                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-floor"></span>Floor (0.42&times; trend)</span>
+                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-trend"></span>Trend</span>
+                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-upper"></span>Upper (3.0&times; trend)</span>
+                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-history"></span>Historical price</span>
+                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-current"></span>Current price</span>
+                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-liq"></span>Your liquidation price</span>
+                </div>
+            </div>
+
             <!-- ─── INPUT GRID (RISK / POSITION) ─── -->
             <div class="bas-calc-inputs">
                 <div class="bas-calc-field">
-                    <label class="bas-calc-field-label" for="basBtcStack">BTC stack</label>
+                    <label class="bas-calc-field-label" for="basBtcStack">
+                        BTC stack
+                        <span class="help-tip" tabindex="0">?<span class="tip-content">The quantity of bitcoin you'd pledge as collateral for the loan. Self-custodied or held at a qualified custodian &mdash; either way, this is your collateral position.</span></span>
+                    </label>
                     <input type="number" id="basBtcStack" value="1.0" step="0.01" min="0" max="100000">
                     <div class="bas-calc-field-hint">Quantity of bitcoin available as collateral.</div>
                 </div>
 
                 <div class="bas-calc-field">
-                    <label class="bas-calc-field-label" for="basBtcPrice">Current BTC price (USD)</label>
+                    <label class="bas-calc-field-label" for="basBtcPrice">
+                        Current BTC price (USD)
+                        <span class="help-tip" tabindex="0">?<span class="tip-content">Auto-filled from the most recent monthly sample in the page's Power Law dataset. Override to model a different starting price &mdash; e.g. to see what your loan would look like if originated at a higher or lower point in the cycle.</span></span>
+                    </label>
                     <input type="number" id="basBtcPrice" value="" step="100" min="0" max="100000000">
-                    <div class="bas-calc-field-hint">Auto-populated from the most recent monthly sample. Edit if you want to model a different starting price.</div>
+                    <div class="bas-calc-field-hint">Auto-populated from the most recent monthly sample. Edit to model a different starting price.</div>
                 </div>
 
                 <div class="bas-calc-field">
-                    <label class="bas-calc-field-label" for="basLoanAmount">Loan amount (USD)</label>
+                    <label class="bas-calc-field-label" for="basLoanAmount">
+                        Loan amount (USD)
+                        <span class="help-tip" tabindex="0">?<span class="tip-content">The dollar amount you'd actually borrow. The calculator derives your LTV (loan / stack value) and shows the resulting liquidation price. Most lenders impose a minimum (often $1,000&ndash;$10,000) and a maximum based on stack size and category.</span></span>
+                    </label>
                     <input type="number" id="basLoanAmount" value="10000" step="100" min="0" max="1000000000">
                     <div class="bas-calc-field-hint">The amount you'd actually need to borrow. The LTV (loan as % of stack value) is shown in the output.</div>
                 </div>
 
                 <div class="bas-calc-field">
                     <div class="bas-calc-field-label bas-calc-field-label-with-display">
-                        <span>Liquidation threshold</span>
+                        <span>
+                            Liquidation threshold
+                            <span class="help-tip" tabindex="0">?<span class="tip-content">The LTV at which the lender forcibly sells your collateral to repay the loan. Tier-1 CeFi typical: 80&ndash;85%. Collaborative-custody multisig: 75&ndash;80%. Predatory platforms: 95&ndash;97%. Lower threshold = wider margin-call window before liquidation.</span></span>
+                        </span>
                         <span class="bas-calc-field-display"><span id="basLiqThresholdDisplay">80</span>%</span>
                     </div>
                     <input type="range" id="basLiqThreshold" min="70" max="95" value="80" step="1">
@@ -285,14 +313,26 @@ eleventyComputed:
             <div class="bas-calc-inputs-cost">
                 <div class="bas-calc-field">
                     <div class="bas-calc-field-label bas-calc-field-label-with-display">
-                        <span>Interest rate (APR)</span>
+                        <span>
+                            Interest rate (APR)
+                            <span class="help-tip" tabindex="0">?<span class="tip-content">Annual percentage rate charged on the loan principal. Most bitcoin-backed loans are <strong>interest-only with bullet repayment</strong> &mdash; you pay interest monthly and the principal stays outstanding until you choose to repay it. Tier-1 CeFi: 8&ndash;12%. Collaborative-custody multisig: 12&ndash;16%. Aggressive-DeFi: variable.</span></span>
+                        </span>
                         <span class="bas-calc-field-display"><span id="basInterestRateDisplay">10.0</span>%</span>
                     </div>
                     <input type="range" id="basInterestRate" min="2" max="20" value="10" step="0.5">
                     <div class="bas-calc-presets">
-                        <button type="button" class="bas-calc-preset" data-rate="10">Tier-1 CeFi &asymp; 10%</button>
-                        <button type="button" class="bas-calc-preset" data-rate="14">Multisig &asymp; 14%</button>
-                        <button type="button" class="bas-calc-preset bas-calc-preset-warning" data-rate="3">Rehypothecating &asymp; 3%</button>
+                        <div class="bas-calc-preset-wrap">
+                            <button type="button" class="bas-calc-preset" data-rate="10">Tier-1 CeFi &asymp; 10%</button>
+                            <span class="help-tip help-tip-preset" tabindex="0">?<span class="tip-content">Tier-1 non-rehypothecating CeFi (Ledn, APX, Strike, Salt, Arch, Aven, Figure, Coinbase). Full custody at qualified custodians, contractual no-rehypothecation, regulated. <a href="#question">See Question tab &rsaquo;</a></span></span>
+                        </div>
+                        <div class="bas-calc-preset-wrap">
+                            <button type="button" class="bas-calc-preset" data-rate="14">Multisig &asymp; 14%</button>
+                            <span class="help-tip help-tip-preset" tabindex="0">?<span class="tip-content">Collaborative-custody multisig (Unchained, Anchor Watch, Onramp). On-chain segregation you can verify cryptographically &mdash; the structural gold standard. Higher rate because the lender can't subsidise by re-lending your collateral. <a href="#question">See Question tab &rsaquo;</a></span></span>
+                        </div>
+                        <div class="bas-calc-preset-wrap">
+                            <button type="button" class="bas-calc-preset bas-calc-preset-warning" data-rate="3">Rehypothecating &asymp; 3%</button>
+                            <span class="help-tip help-tip-preset help-tip-warning" tabindex="0">?<span class="tip-content">Platforms that subsidise low headline rates by re-lending your collateral to third parties (Nexo, Binance Loans, Matrixport). <strong>The structural failure mode that took down Celsius, BlockFi, Genesis, and Voyager.</strong> Included as an option so you can see the subsidy effect; the page doesn't recommend it. <a href="#question">See Question tab &rsaquo;</a></span></span>
+                        </div>
                     </div>
                     <div class="bas-calc-field-hint">Click a preset or drag the slider. The rehypothecating-CeFi preset is included to make visible how aggressively those platforms subsidize their rates &mdash; <em>that subsidy is the failure mode the Question tab argues against.</em></div>
                 </div>
@@ -322,12 +362,15 @@ eleventyComputed:
 
             <!-- ─── OUTPUT CARDS — COST SURFACE ─── -->
             <div class="bas-calc-output-section">
-                <div class="bas-calc-output-section-label">Cost surface &mdash; what the loan actually costs you</div>
+                <div class="bas-calc-output-section-label">
+                    Cost surface &mdash; what the loan actually costs you
+                    <span class="bas-calc-output-section-clarifier">Interest-only carry; loan principal stays outstanding until you choose to repay it.</span>
+                </div>
                 <div class="bas-calc-outputs">
                     <div class="bas-calc-output-card">
-                        <div class="bas-calc-output-label">Monthly interest</div>
+                        <div class="bas-calc-output-label">Monthly interest payment</div>
                         <div class="bas-calc-output-value" id="basMonthlyInterest">$&mdash;</div>
-                        <div class="bas-calc-output-sub">Ongoing carry &mdash; can you afford this every month?</div>
+                        <div class="bas-calc-output-sub">Interest only &mdash; no contribution to principal. Can you afford this every month?</div>
                     </div>
                     <div class="bas-calc-output-card">
                         <div class="bas-calc-output-label">Annual interest</div>
@@ -343,11 +386,10 @@ eleventyComputed:
             </div>
 
             <!-- ─── INTEREST COST BY PROVIDER ─── -->
-            <!-- Position math (above) tells you where liquidation sits. -->
-            <!-- Cost math (below) tells you what the loan actually costs   -->
-            <!-- to carry per month. Three cards corresponding to the three  -->
-            <!-- approved categories from the Up Front section; DeFi card    -->
-            <!-- present for completeness with explicit dismissal indicator. -->
+            <!-- Side-by-side comparison of carrying cost across the three        -->
+            <!-- approved lender categories, plus a dismissed-DeFi card for       -->
+            <!-- the structural-contrast point. Populated by JS so the comparison  -->
+            <!-- updates live as the user changes loan amount.                     -->
             <div class="bas-calc-provider-section">
                 <div class="bas-calc-provider-header">
                     <div class="bas-calc-provider-title">Interest cost by provider category</div>
@@ -358,23 +400,23 @@ eleventyComputed:
                 </div>
             </div>
 
-            <!-- ─── CHANNEL CHART ─── -->
-            <div class="bas-calc-chart-wrapper">
-                <div class="bas-calc-chart-title">Your liquidation price on the Power Law channel</div>
-                <div class="bas-calc-chart-canvas"><canvas id="basChannelChart"></canvas></div>
-                <div class="bas-calc-chart-legend">
-                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-floor"></span>Floor (0.42&times; trend)</span>
-                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-trend"></span>Trend</span>
-                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-upper"></span>Upper (3.0&times; trend)</span>
-                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-history"></span>Historical price</span>
-                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-current"></span>Current price</span>
-                    <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-liq"></span>Your liquidation price</span>
+            <!-- ─── LOAN PROFILE (replaces free-form interpretation prose) ─── -->
+            <!-- A scannable check-list summarising the structural conditions     -->
+            <!-- of the loan as configured. Each check is a fact-stating         -->
+            <!-- assessment (Conservative LTV / Liquidation below floor / etc.)  -->
+            <!-- with a status icon (good / warn / bad).                         -->
+            <!-- Strategic editorial notes (mean-reversion asymmetry, borrow-    -->
+            <!-- low/repay-high) surface conditionally below the checks for the -->
+            <!-- specific PL positions where they're editorially relevant.      -->
+            <div class="bas-calc-profile">
+                <h3 class="bas-calc-profile-title">Loan profile</h3>
+                <ul class="bas-calc-profile-checks" id="basProfileChecks">
+                    <li class="bas-calc-profile-check bas-calc-profile-check-empty">Enter a stack size, current price, and loan amount above to see the loan profile.</li>
+                </ul>
+                <div class="bas-calc-profile-notes" id="basProfileNotes">
+                    <!-- Conditional strategic-context blocks; rendered only when      -->
+                    <!-- editorially relevant (deep-low PL origination, etc.).        -->
                 </div>
-            </div>
-
-            <!-- ─── INTERPRETATION ─── -->
-            <div class="bas-calc-interp" id="basInterp">
-                <p>Enter a stack size, current price, and loan amount above to see your liquidation position on the Power Law channel.</p>
             </div>
 
             <!-- ─── COMING NEXT ─── -->
@@ -382,7 +424,7 @@ eleventyComputed:
                 <div class="bas-calc-roadmap-label">Coming in subsequent commits</div>
                 <ul>
                     <li><strong>Borrow-vs-sell comparison.</strong> Total interest cost over horizon against capital-gains tax saved, with BTC opportunity cost computed against the same Power Law channel. Tactical/strategic toggle for short-horizon need vs. perpetual leverage cases.</li>
-                    <li><strong>Early-repayment scenario.</strong> The Disciplined-Rebalancing extension: plan to repay the loan when bitcoin reaches a high channel position. Outputs BTC required to repay, BTC retained, and the net cycle outcome — using the cycle peak to extinguish the loan and remove the recurring obligation.</li>
+                    <li><strong>Early-repayment scenario.</strong> The Disciplined-Rebalancing extension: plan to repay the loan when bitcoin reaches a high channel position. Outputs BTC required to repay, BTC retained, and the net cycle outcome &mdash; using the cycle peak to extinguish the loan and remove the recurring obligation.</li>
                     <li><strong>Historical safety backtest.</strong> Would this LTV have survived bitcoin's worst historical drawdowns? Yes/no plus the closest call.</li>
                     <li><strong>Counterparty default scenario.</strong> Your lender goes Celsius-style. Recovery distributions by archetype: Celsius (partial), BlockFi (100% but ~2 years locked), Genesis (full in-kind), Voyager (~70%), worst-case zero.</li>
                     <li><strong>DeFi infrastructure scenario.</strong> Wrapping depeg, oracle stale, bridge exploit. Loss = collateral, recovery near zero.</li>
