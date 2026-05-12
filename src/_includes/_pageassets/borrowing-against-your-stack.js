@@ -80,6 +80,13 @@
   var profileNotesOut  = document.getElementById('basProfileNotes');
   var providerCardsOut = document.getElementById('basProviderCards');
 
+  // ─── LTV meter element refs ───
+  var ltvMeterFill           = document.getElementById('basLtvMeterFill');
+  var ltvMeterMarker         = document.getElementById('basLtvMeterMarker');
+  var ltvMeterCurrentSwatch  = document.getElementById('basLtvMeterCurrentSwatch');
+  var ltvMeterCurrentLabel   = document.getElementById('basLtvMeterCurrentLabel');
+  var ltvMeterTriggerLabel   = document.getElementById('basLtvMeterTriggerLabel');
+
   // Auto-fill current BTC price from most recent PL_DATA sample
   if (typeof PL_DATA !== 'undefined' && PL_DATA.length) {
     var latest = PL_DATA[PL_DATA.length - 1];
@@ -107,12 +114,25 @@
   }
 
   // ─── Zone classifiers ───
-  // LTV zones match the Question tab's bands: <40% conservative,
-  // 40-60% moderate, >60% aggressive.
-  function ltvZone(ltv) {
-    if (ltv < 0.40) return { label: 'Conservative', cls: 'bas-zone-good' };
-    if (ltv < 0.60) return { label: 'Moderate',     cls: 'bas-zone-warn' };
-    return                 { label: 'Aggressive',   cls: 'bas-zone-bad'  };
+  // LTV zones based on the RATIO of current LTV to liquidation threshold.
+  // Threshold-relative is more meaningful than absolute bands when the
+  // liquidation threshold itself varies by lender category — a 50% LTV
+  // is conservative against a 95% predatory threshold (53% of trigger)
+  // but aggressive against a 60% multisig threshold (83% of trigger).
+  // <50% of trigger: Conservative — well buffered
+  // 50-80% of trigger: Moderate — buffer narrowing
+  // >=80% of trigger: Aggressive — close to forced sale
+  function ltvZone(ltv, threshold) {
+    if (!threshold || threshold <= 0) {
+      // Defensive fallback to absolute bands if threshold isn't supplied
+      if (ltv < 0.40) return { label: 'Conservative', cls: 'bas-zone-good' };
+      if (ltv < 0.60) return { label: 'Moderate',     cls: 'bas-zone-warn' };
+      return                 { label: 'Aggressive',   cls: 'bas-zone-bad'  };
+    }
+    var ratio = ltv / threshold;
+    if (ratio < 0.50) return { label: 'Conservative', cls: 'bas-zone-good' };
+    if (ratio < 0.80) return { label: 'Moderate',     cls: 'bas-zone-warn' };
+    return                  { label: 'Aggressive',   cls: 'bas-zone-bad'  };
   }
   // Channel zones map liq-price-as-multiple-of-today's-trend to descriptive
   // labels matching the Question tab.
@@ -165,6 +185,11 @@
       annualPctStackOut.textContent = '—';
       profileChecksOut.innerHTML = '<li class="bas-calc-profile-check bas-calc-profile-check-empty">Enter a stack size, current price, and loan amount above to see the loan profile.</li>';
       profileNotesOut.innerHTML = '';
+      // Reset LTV meter so it doesn't show stale values
+      if (ltvMeterFill)         ltvMeterFill.style.width = '0%';
+      if (ltvMeterMarker)       ltvMeterMarker.style.left = (liqThreshold * 100) + '%';
+      if (ltvMeterCurrentLabel) ltvMeterCurrentLabel.textContent = '—';
+      if (ltvMeterTriggerLabel) ltvMeterTriggerLabel.textContent = pct(liqThreshold, 0);
       // Provider cards still render (they only need loan amount) but show em-dashes
       renderProviderCards(0);
       return;
@@ -190,7 +215,7 @@
     var monthlyInterest   = annualInterest / 12;
     var annualPctOfStack  = annualInterest / stackUsd;
 
-    var lz = ltvZone(ltv);
+    var lz = ltvZone(ltv, liqThreshold);
     var cz = channelZone(liqRatio);
     var oz = originationZone(currentRatio);
 
@@ -198,6 +223,22 @@
     ltvOut.textContent       = pct(ltv, 1);
     ltvZoneLabel.textContent = lz.label;
     ltvZoneLabel.className   = 'bas-calc-output-zone ' + lz.cls;
+
+    // ─── LTV meter (visualizes current LTV vs. Liquidation LTV) ───
+    // Cap displayed positions at 100% so the bar can't overflow even in
+    // pathological inputs (loan > stack value, threshold > 100%).
+    var ltvDisplayPct       = Math.min(Math.max(ltv * 100, 0), 100);
+    var thresholdDisplayPct = Math.min(Math.max(liqThreshold * 100, 0), 100);
+    var zoneKey             = lz.cls.replace('bas-zone-', ''); // good/warn/bad
+    if (ltvMeterFill) {
+      ltvMeterFill.style.width  = ltvDisplayPct + '%';
+      ltvMeterFill.className    = 'bas-calc-ltv-meter-fill bas-calc-ltv-meter-fill-' + zoneKey;
+    }
+    if (ltvMeterMarker)        ltvMeterMarker.style.left = thresholdDisplayPct + '%';
+    if (ltvMeterCurrentSwatch) ltvMeterCurrentSwatch.className =
+        'bas-calc-ltv-meter-swatch bas-calc-ltv-meter-swatch-current bas-calc-ltv-meter-swatch-' + zoneKey;
+    if (ltvMeterCurrentLabel)  ltvMeterCurrentLabel.textContent = pct(ltv, 1);
+    if (ltvMeterTriggerLabel)  ltvMeterTriggerLabel.textContent = pct(liqThreshold, 0);
 
     liqPriceOut.textContent    = fmtUsd(liqPrice);
     liqDrawdownOut.textContent = 'BTC must fall ' + pct(drawdownToLiq, 0) +
@@ -218,6 +259,7 @@
       stack: stack, price: price, loan: loan, ltv: ltv,
       liqPrice: liqPrice, drawdownToLiq: drawdownToLiq,
       liqRatio: liqRatio, currentRatio: currentRatio,
+      threshold: liqThreshold,
       annualInterest: annualInterest, monthlyInterest: monthlyInterest, rate: rate,
       annualPctOfStack: annualPctOfStack,
       lz: lz, cz: cz, oz: oz
@@ -247,25 +289,18 @@
   function generateLoanProfile(s) {
     var checks = [];
 
-    // Check 1: LTV assessment
-    if (s.ltv < 0.40) {
-      checks.push({
-        status: 'good',
-        title: 'LTV is conservative',
-        detail: pct(s.ltv, 1) + ' &mdash; within the recommended 30&ndash;40% safe band.'
-      });
-    } else if (s.ltv < 0.60) {
-      checks.push({
-        status: 'warn',
-        title: 'LTV is moderate',
-        detail: pct(s.ltv, 1) + ' &mdash; above the conservative band; less drawdown buffer than recommended.'
-      });
+    // Check 1: LTV assessment — uses the threshold-relative zone so the
+    // check, the output-card zone pill, and the LTV meter fill colour
+    // all agree.
+    var zoneKey = s.lz.cls.replace('bas-zone-', ''); // good/warn/bad
+    var ltvDetail = pct(s.ltv, 1) + ' &mdash; with Liquidation LTV at ' + pct(s.threshold, 0) +
+                    ', your LTV is ' + (s.ltv / s.threshold * 100).toFixed(0) + '% of the way to the trigger.';
+    if (zoneKey === 'good') {
+      checks.push({ status: 'good', title: 'LTV is conservative', detail: ltvDetail });
+    } else if (zoneKey === 'warn') {
+      checks.push({ status: 'warn', title: 'LTV is moderate', detail: ltvDetail });
     } else {
-      checks.push({
-        status: 'bad',
-        title: 'LTV is aggressive',
-        detail: pct(s.ltv, 1) + ' &mdash; above 60%; small drawdowns put you at liquidation risk.'
-      });
+      checks.push({ status: 'bad', title: 'LTV is aggressive', detail: ltvDetail });
     }
 
     // Check 2: Channel position of liquidation price (the page's headline insight)
@@ -579,12 +614,16 @@
     });
   });
 
-  // ─── Preset buttons set the rate slider and recompute ───
+  // ─── Preset buttons set rate + threshold and recompute ───
+  // Each preset gives a coherent provider scenario: rate AND liquidation
+  // LTV move together to reflect typical category values. The user can
+  // still drag either slider afterward to override.
   presetBtns.forEach(function(btn){
     btn.addEventListener('click', function(){
       var r = parseFloat(btn.dataset.rate);
-      if (isNaN(r)) return;
-      rateSlider.value = r;
+      var t = parseFloat(btn.dataset.threshold);
+      if (!isNaN(r)) rateSlider.value         = r;
+      if (!isNaN(t)) liqThresholdSlider.value = t;
       // Visual feedback: mark the active preset
       presetBtns.forEach(function(b){ b.classList.remove('bas-calc-preset-active'); });
       btn.classList.add('bas-calc-preset-active');
