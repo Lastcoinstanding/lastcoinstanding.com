@@ -140,6 +140,82 @@
     };
   }
 
+  // ═══════ PROVIDER CATEGORIES ═══════
+  // Three approved categories from the Question tab's Up Front section,
+  // with typical APR ranges as of mid-2026. The DeFi category is included
+  // for comparison only — the Question tab explicitly dismisses it, and
+  // the card surfaces that dismissal visually rather than burying it.
+  //
+  // APR midpoints are deliberately used as defaults rather than range
+  // extremes. The editorial point of the three cards is the spread
+  // between provider archetypes, not the lowest possible rate. Hardcoded
+  // here rather than slider-controlled because individual rate-shopping
+  // isn't the editorial frame — the page's frame is which structural
+  // tier a user chooses to operate in.
+  var PROVIDERS = [
+    {
+      key: 'multisig',
+      name: 'Collaborative-custody multisig',
+      examples: 'Unchained, Anchor Watch, Onramp',
+      aprRange: '12–16%',
+      aprDefault: 14,
+      note: 'Verifiable on-chain custody. The highest standard. Higher rate is the no-rehypothecation premium — the visible cost of buying out of Celsius-style risk.',
+      tone: 'good'
+    },
+    {
+      key: 'cefi',
+      name: 'Tier-1 non-rehypothecating CeFi',
+      examples: 'Ledn, APX, Strike, Salt, Arch, Aven, Figure, Coinbase/Morpho',
+      aprRange: '8–12%',
+      aprDefault: 10,
+      note: 'Contractual no-rehypothecation, regulated, transparent. Convenient entry point with the trade-off of full counterparty trust.',
+      tone: 'neutral'
+    },
+    {
+      key: 'defi',
+      name: 'DeFi via wrapped BTC',
+      examples: 'Aave, Morpho, Compound, Euler',
+      aprRange: '5–9%',
+      aprDefault: 7,
+      note: 'Dismissed on the Question tab. Rates appear lower because oracle, bridge, and emergency-governance failure modes are not priced into the headline number.',
+      tone: 'bad'
+    }
+  ];
+
+  function renderInterestScenarios(loan) {
+    var container = document.getElementById('basProviderCards');
+    if (!container) return;
+    if (!(loan > 0)) {
+      // Render empty-state placeholders so the visual structure persists
+      // before the user enters a loan amount.
+      container.innerHTML = PROVIDERS.map(function(p) {
+        return '<div class="bas-provider-card bas-provider-card-' + p.tone + '">' +
+          '<div class="bas-provider-card-name">' + p.name + '</div>' +
+          '<div class="bas-provider-card-apr">' + p.aprRange + ' typical &middot; using ' + p.aprDefault + '%</div>' +
+          '<div class="bas-provider-card-cost"><span class="bas-provider-card-cost-label">Monthly</span><span class="bas-provider-card-cost-val">—</span></div>' +
+          '<div class="bas-provider-card-cost"><span class="bas-provider-card-cost-label">Annual</span><span class="bas-provider-card-cost-val">—</span></div>' +
+          '<div class="bas-provider-card-examples">' + p.examples + '</div>' +
+          '<div class="bas-provider-card-note">' + p.note + '</div>' +
+          (p.tone === 'bad' ? '<div class="bas-provider-card-dismissed">⚠ Covered for completeness only</div>' : '') +
+          '</div>';
+      }).join('');
+      return;
+    }
+    container.innerHTML = PROVIDERS.map(function(p) {
+      var monthly = loan * (p.aprDefault / 100) / 12;
+      var annual  = loan * (p.aprDefault / 100);
+      return '<div class="bas-provider-card bas-provider-card-' + p.tone + '">' +
+        '<div class="bas-provider-card-name">' + p.name + '</div>' +
+        '<div class="bas-provider-card-apr">' + p.aprRange + ' typical &middot; using ' + p.aprDefault + '%</div>' +
+        '<div class="bas-provider-card-cost"><span class="bas-provider-card-cost-label">Monthly</span><span class="bas-provider-card-cost-val">' + fmtUsd(monthly) + '</span></div>' +
+        '<div class="bas-provider-card-cost"><span class="bas-provider-card-cost-label">Annual</span><span class="bas-provider-card-cost-val">' + fmtUsd(annual) + '</span></div>' +
+        '<div class="bas-provider-card-examples">' + p.examples + '</div>' +
+        '<div class="bas-provider-card-note">' + p.note + '</div>' +
+        (p.tone === 'bad' ? '<div class="bas-provider-card-dismissed">⚠ Covered for completeness only</div>' : '') +
+        '</div>';
+    }).join('');
+  }
+
   function recompute() {
     var stack         = parseFloat(stackInput.value)        || 0;
     var price         = parseFloat(priceInput.value)        || 0;
@@ -155,6 +231,7 @@
       channelPosOut.textContent = '—';
       channelHintOut.textContent = '—';
       interpOut.innerHTML = '<p>Enter a stack size, current price, and loan amount above to see your liquidation position on the Power Law channel.</p>';
+      renderInterestScenarios(0);
       return;
     }
 
@@ -184,9 +261,17 @@
     channelPosOut.className = 'bas-calc-output-value bas-calc-output-zoned ' + cz.cls;
     channelHintOut.textContent = cz.hint;
 
+    // ─── Interest cost cards (three provider categories) ───
+    renderInterestScenarios(loan);
+
     // ─── Interpretation paragraph ───
-    // Contextualizes the numbers in the editorial frame from the Question tab.
+    // Pairs the liquidation-defensive view (where your buffer sits)
+    // with the upside / opportunity-cost view (what's the offensive case
+    // for borrowing-not-selling at this channel position). Tab 1's 100 BTC
+    // thought experiment makes the upside argument; here we instantiate it
+    // for the user's specific channel position.
     var interpSafety;
+    var interpUpside = '';
     if (liqRatio < PL_FLOOR) {
       interpSafety = 'Your liquidation price sits <strong>below the channel floor</strong> — bitcoin would need to break the long-term structural support that has held across every cycle of the last fifteen years for your position to liquidate. This is the conservative zone the Question tab references.';
     } else if (liqRatio < 1.0) {
@@ -197,12 +282,28 @@
       interpSafety = 'Your liquidation price sits <strong>above the upper channel bound</strong>. Bitcoin would have to remain at extended cycle-peak levels to keep this position alive — a position that requires euphoria to survive.';
     }
 
+    // Upside / opportunity-cost framing — completes the editorial logic
+    // from the Question tab's "Compared to what?" opening. Borrowing
+    // when bitcoin is low in the channel isn't just defensively safer;
+    // it's offensively higher-leverage because the asymmetric mean
+    // reversion is toward higher prices. Selling at low channel position
+    // is the inverse — locking in a low sale price and losing the
+    // appreciation that mean reversion implies.
+    if (currentRatio < 1.0) {
+      interpUpside = '<p>Bitcoin currently trades at <strong>' + currentRatio.toFixed(2) + '× trend</strong> — below the long-term Power Law trend line. The structural pull is <em>toward</em> trend over the medium term, which means the opportunity cost of selling here is asymmetric: every bitcoin sold at this channel position is sold near the bottom of the mean-reversion arc. This is the offensive case for borrowing-rather-than-selling that the opening of the Question tab walks through with the 100-BTC thought experiment.</p>';
+    } else if (currentRatio < PL_CEIL) {
+      interpUpside = '<p>Bitcoin currently trades at <strong>' + currentRatio.toFixed(2) + '× trend</strong> — above the long-term Power Law trend. Mean reversion at this position is downward toward trend, not upward. The case for borrowing-rather-than-selling weakens at higher channel positions; <a href="/disciplined-rebalancing.html">disciplined rebalancing</a> (selling at high percentile inside a tax wrapper) may be the more structurally aligned alternative if you don\'t need liquidity urgently.</p>';
+    } else {
+      interpUpside = '<p>Bitcoin currently trades at <strong>' + currentRatio.toFixed(2) + '× trend</strong> — at or above the upper channel bound (3× trend). Historically these zones have been brief excursions, not sustained levels. Originating a new loan at this position is taking the maximum liquidation risk available; the structural-buffer argument that motivates borrowing-rather-than-selling functionally inverts here.</p>';
+    }
+
     interpOut.innerHTML =
       '<p>At <strong>' + pct(ltv, 1) + '</strong> LTV against <strong>' + stack.toFixed(2) + ' BTC</strong>, ' +
       'your <strong>' + fmtUsd(loan) + '</strong> loan liquidates if BTC falls to <strong>' +
       fmtUsd(liqPrice) + '</strong> — a <strong>' + pct(drawdownToLiq, 0) +
       '</strong> drawdown from today\'s price.</p>' +
-      '<p>' + interpSafety + '</p>';
+      '<p>' + interpSafety + '</p>' +
+      interpUpside;
 
     renderChart(price, liqPrice);
   }
