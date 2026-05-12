@@ -1508,3 +1508,142 @@
 .bas-calc-bvs-verdict-sell-wins   p strong { color: var(--amber); }
 .bas-calc-bvs-verdict-error       { border-left-color: #c0392b; background: rgba(192,57,43,0.04); }
 .bas-calc-bvs-verdict-error       p strong { color: #e87f6f; }
+
+/* ───────────────────────────────────────────────
+   20. SUB-TAB NAV (within the Calculator tab)
+   Two surfaces inside one tab: Loan health and
+   Borrow vs. sell. Visually lighter than main-tab
+   nav so the hierarchy stays clear.
+   ─────────────────────────────────────────────── */
+.bas-calc-subtab-nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin: 2.5rem 0 1.8rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.bas-calc-subtab-nav::-webkit-scrollbar { display: none; }
+.bas-calc-subtab-btn {
+    flex: 1;
+    padding: 0.95rem 1.2rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    transition: color 0.2s, border-color 0.2s;
+    text-align: center;
+    letter-spacing: 0.005em;
+}
+.bas-calc-subtab-btn:hover { color: var(--amber-dim); }
+.bas-calc-subtab-btn.bas-calc-subtab-active {
+    color: var(--amber);
+    border-bottom-color: var(--amber);
+    font-weight: 600;
+}
+.bas-calc-subtab { display: none; }
+.bas-calc-subtab.bas-calc-subtab-active { display: block; }
+
+/* ───────────────────────────────────────────────
+   21. SCENARIO SUMMARY (top of BvS sub-tab)
+   Shows the loan parameters from the shared inputs
+   above so the user doesn't have to scroll up to
+   recall their scenario.
+   ─────────────────────────────────────────────── */
+.bas-calc-bvs-scenario {
+    margin: 0 auto 1.8rem;
+    padding: 1rem 1.4rem 1.05rem;
+    background: rgba(224,148,34,0.04);
+    border: 1px solid rgba(224,148,34,0.18);
+    border-left: 2px solid var(--amber);
+    border-radius: 0 4px 4px 0;
+}
+.bas-calc-bvs-scenario-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.6rem;
+}
+.bas-calc-bvs-scenario-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem 1.6rem;
+}
+@media (max-width: 600px) {
+    .bas-calc-bvs-scenario-grid { grid-template-columns: 1fr 1fr; }
+}
+.bas-calc-bvs-scenario-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+.bas-calc-bvs-scenario-key {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.bas-calc-bvs-scenario-val {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.005em;
+}
+
+/* ───────────────────────────────────────────────
+   22. COST BASIS PRESETS (BvS-specific)
+   Quick-pick entry points for typical bitcoiner
+   purchase scenarios. Clicking sets the cost basis
+   input to that value and re-runs the comparison.
+   ─────────────────────────────────────────────── */
+.bas-calc-bvs-cb-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.55rem;
+}
+.bas-calc-bvs-cb-preset {
+    padding: 0.32rem 0.6rem;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(224,148,34,0.18);
+    border-radius: 3px;
+    color: var(--text-dim);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.005em;
+}
+.bas-calc-bvs-cb-preset:hover {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(224,148,34,0.05);
+}
+.bas-calc-bvs-cb-preset.bas-calc-bvs-cb-preset-active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(224,148,34,0.08);
+    font-weight: 500;
+}
+
+/* Row-label help-tip styling — smaller and inline */
+.bas-calc-bvs-row-label .help-tip {
+    margin-left: 0.25rem;
+    width: 12px;
+    height: 12px;
+    font-size: 0.55rem;
+}
+
+/* Section spacing inside BvS subtab */
+.bas-calc-subtab .bas-calc-bvs-section { margin-top: 0; }
+.bas-calc-subtab .bas-calc-profile     { margin-top: 0; }
