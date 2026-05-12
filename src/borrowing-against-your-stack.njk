@@ -187,25 +187,27 @@ eleventyComputed:
 
         <div class="section">
             <h3>The cautionary record</h3>
-            <p class="prose">These case studies are referenced rather than dwelt on. They have to be in the room &mdash; <em>each failure was foreseeable in hindsight, with warning signs that bitcoin holders alert to the structural questions on this page would have recognized in advance</em> &mdash; but the point isn't to dwell. It's to give the reader pattern-recognition for what's already happened, so the next instance is easier to identify.</p>
+            <p class="prose">A few words on what the historical record actually shows. <em>Every catastrophic failure of bitcoin-backed lending in the last decade was a failure of the rehypothecating-CeFi or DeFi categories described above &mdash; not the bitcoin-aligned approaches the page recommends.</em> Celsius, BlockFi, Genesis, Voyager all engaged in the practice that defines the bottom tier of the rehypothecation hierarchy. The DeFi cascade detailed earlier was an architecture-level failure of the wrapped-BTC category. None of these were collaborative-custody multisig failures. None were Tier-1 non-rehypothecating CeFi failures. The collapses on record are the predictable failures of the structural choices the page already tells you to avoid.</p>
+            <p class="prose">That framing matters because the same failures, read without it, can produce the wrong takeaway &mdash; <em>that lending against bitcoin is dangerous in general</em>, rather than the actual lesson: <em>that the specific structural choices these companies made were dangerous, and avoiding those choices is the point of this page</em>.</p>
 
-            <p class="prose"><strong>Celsius Network (2022).</strong> Pledged user collateral multiple times across what bankruptcy filings later called an <em>&ldquo;endless rehypothecation chain.&rdquo;</em> Internal staff reportedly referred to themselves as <em>&ldquo;Ponzi Consultants.&rdquo;</em> The bankruptcy ruling (Judge Glenn, SDNY, January 2023) established that &ldquo;Earn&rdquo; account assets were property of the bankruptcy estate, not the user &mdash; <em>depositors became unsecured creditors.</em> Recovery: partial.</p>
-
-            <p class="prose"><strong>BlockFi (2022).</strong> Insolvency caused by exposure to FTX/Alameda contagion. Achieved a rare 100% recovery for allowed claims through a $874.5 million settlement with the FTX estate plus monetization of those claims at a premium &mdash; but the process took nearly two years, during which depositor funds were locked.</p>
-
-            <p class="prose"><strong>Genesis Global Capital (2023).</strong> Failed after the 3AC default. The NYAG secured a $2 billion settlement establishing a &ldquo;Victims' Fund&rdquo; that delivered full in-kind recoveries and uniquely allowed creditors to benefit from bitcoin's appreciation during the bankruptcy stay rather than being capped at petition-date values.</p>
-
-            <p class="prose"><strong>Voyager Digital (2022).</strong> Concentrated its lending book into a single counterparty (3AC again) under explicit marketing claims that a bankruptcy court later called <em>&ldquo;unequivocally false.&rdquo;</em> Recovery: approximately 70%, with the process further marred by a 2024 data breach exposing creditor personal information.</p>
-
-            <p class="prose"><strong>The DeFi failures of 2024&ndash;2026.</strong> Detailed above with the Kelp DAO / Aave / Arbitrum cascade as the anchor case study. Other notable instances during this period: Drift Protocol ($285 million administrative key compromise, April 1, 2026), ZeroLend (shut down after multi-chain fragmentation made liquidation infrastructure unmaintainable), Step Finance ($40 million treasury loss from a single executive's compromised device), MakerDAO's 2020 &ldquo;Black Thursday&rdquo; (Ethereum network congestion paralyzed keeper bots; a single bot acquired $8.32 million of ETH collateral for 0 DAI in bid auctions). The pattern across these is a mix of administrative-access compromise, oracle and bridge failure, and the same emergency-multisig responses that demonstrated the underlying centralization.</p>
-
-            <p class="prose">The lessons across all of these failures cluster into four:</p>
+            <p class="prose">The four lessons that emerge across the cluster:</p>
             <ul class="negative-space-list">
-                <li><strong>Ownership is a legal fiction without the keys.</strong> Depositors on centralized platforms are legally categorized as unsecured creditors in insolvency &mdash; your &ldquo;ownership&rdquo; is a contractual claim, not a property right.</li>
-                <li><strong>Yield is the price of tail risk.</strong> Aggressive yields are a lagging indicator of aggressive rehypothecation. If the platform's economics don't make sense at face-value rates, they're being made up somewhere structural.</li>
+                <li><strong>Ownership is a legal fiction without the keys.</strong> Depositors on centralized platforms are legally categorized as unsecured creditors in insolvency &mdash; your &ldquo;ownership&rdquo; is a contractual claim, not a property right. (This is what collaborative-custody multisig structurally avoids.)</li>
+                <li><strong>Yield is the price of tail risk.</strong> Aggressive yields and aggressively low borrow rates are lagging indicators of aggressive rehypothecation. If the platform's economics don't make sense at face-value rates, they're being made up somewhere structural.</li>
                 <li><strong>Technical liquidation is a certainty during stress.</strong> Even healthy positions can be force-liquidated when oracles fail, networks congest, or platforms go down &mdash; the <em>Infrastructure Failure Gap</em> where you have the funds but can't physically deliver them.</li>
                 <li><strong>The only zero-counterparty position is self-custody.</strong> Every other configuration is a bet on someone else's integrity, solvency, or code.</li>
             </ul>
+
+            <details class="bas-details">
+                <summary><span class="bas-details-icon">&rsaquo;</span> Per-company detail (Celsius, BlockFi, Genesis, Voyager, DeFi 2024&ndash;26)</summary>
+                <div class="bas-details-body">
+                    <p class="prose"><strong>Celsius Network (2022) &mdash; rehypothecating CeFi.</strong> Pledged user collateral multiple times across what bankruptcy filings later called an <em>&ldquo;endless rehypothecation chain.&rdquo;</em> Internal staff reportedly referred to themselves as <em>&ldquo;Ponzi Consultants.&rdquo;</em> The bankruptcy ruling (Judge Glenn, SDNY, January 2023) established that &ldquo;Earn&rdquo; account assets were property of the bankruptcy estate, not the user &mdash; <em>depositors became unsecured creditors.</em> Recovery: partial.</p>
+                    <p class="prose"><strong>BlockFi (2022) &mdash; rehypothecating CeFi.</strong> Insolvency caused by exposure to FTX/Alameda contagion. Achieved a rare 100% recovery for allowed claims through a $874.5 million settlement with the FTX estate plus monetization of those claims at a premium &mdash; but the process took nearly two years, during which depositor funds were locked.</p>
+                    <p class="prose"><strong>Genesis Global Capital (2023) &mdash; rehypothecating CeFi.</strong> Failed after the 3AC default. The NYAG secured a $2 billion settlement establishing a &ldquo;Victims' Fund&rdquo; that delivered full in-kind recoveries and uniquely allowed creditors to benefit from bitcoin's appreciation during the bankruptcy stay rather than being capped at petition-date values.</p>
+                    <p class="prose"><strong>Voyager Digital (2022) &mdash; rehypothecating CeFi.</strong> Concentrated its lending book into a single counterparty (3AC again) under explicit marketing claims that a bankruptcy court later called <em>&ldquo;unequivocally false.&rdquo;</em> Recovery: approximately 70%, with the process further marred by a 2024 data breach exposing creditor personal information.</p>
+                    <p class="prose"><strong>DeFi 2024&ndash;2026 &mdash; wrapped-BTC and cross-chain.</strong> Anchor case study (Kelp DAO / Aave / Arbitrum) detailed above. Other notable instances: Drift Protocol ($285 million administrative key compromise, April 1, 2026), ZeroLend (shut down after multi-chain fragmentation made liquidation infrastructure unmaintainable), Step Finance ($40 million treasury loss from a single executive's compromised device), MakerDAO's 2020 &ldquo;Black Thursday&rdquo; (Ethereum network congestion paralyzed keeper bots; a single bot acquired $8.32 million of ETH collateral for 0 DAI in bid auctions). The pattern across these is a mix of administrative-access compromise, oracle and bridge failure, and the same emergency-multisig responses that demonstrated the underlying centralization.</p>
+                </div>
+            </details>
         </div>
 
         <div class="section">
@@ -249,7 +251,7 @@ eleventyComputed:
 
         <div class="bas-calc">
 
-            <!-- ─── INPUT GRID ─── -->
+            <!-- ─── INPUT GRID (RISK / POSITION) ─── -->
             <div class="bas-calc-inputs">
                 <div class="bas-calc-field">
                     <label class="bas-calc-field-label" for="basBtcStack">BTC stack</label>
@@ -279,22 +281,64 @@ eleventyComputed:
                 </div>
             </div>
 
-            <!-- ─── OUTPUT CARDS ─── -->
-            <div class="bas-calc-outputs">
-                <div class="bas-calc-output-card">
-                    <div class="bas-calc-output-label">Your LTV</div>
-                    <div class="bas-calc-output-value" id="basLtvOut">&mdash;</div>
-                    <div class="bas-calc-output-zone bas-zone-good" id="basLtvZone">&mdash;</div>
+            <!-- ─── INPUT (COST) ─── -->
+            <div class="bas-calc-inputs-cost">
+                <div class="bas-calc-field">
+                    <div class="bas-calc-field-label bas-calc-field-label-with-display">
+                        <span>Interest rate (APR)</span>
+                        <span class="bas-calc-field-display"><span id="basInterestRateDisplay">10.0</span>%</span>
+                    </div>
+                    <input type="range" id="basInterestRate" min="2" max="20" value="10" step="0.5">
+                    <div class="bas-calc-presets">
+                        <button type="button" class="bas-calc-preset" data-rate="10">Tier-1 CeFi &asymp; 10%</button>
+                        <button type="button" class="bas-calc-preset" data-rate="14">Multisig &asymp; 14%</button>
+                        <button type="button" class="bas-calc-preset bas-calc-preset-warning" data-rate="3">Rehypothecating &asymp; 3%</button>
+                    </div>
+                    <div class="bas-calc-field-hint">Click a preset or drag the slider. The rehypothecating-CeFi preset is included to make visible how aggressively those platforms subsidize their rates &mdash; <em>that subsidy is the failure mode the Question tab argues against.</em></div>
                 </div>
-                <div class="bas-calc-output-card">
-                    <div class="bas-calc-output-label">Liquidation BTC price</div>
-                    <div class="bas-calc-output-value" id="basLiqPrice">$&mdash;</div>
-                    <div class="bas-calc-output-sub" id="basLiqDrawdown">&mdash;</div>
+            </div>
+
+            <!-- ─── OUTPUT CARDS — RISK SURFACE ─── -->
+            <div class="bas-calc-output-section">
+                <div class="bas-calc-output-section-label">Risk surface &mdash; what happens if bitcoin falls</div>
+                <div class="bas-calc-outputs">
+                    <div class="bas-calc-output-card">
+                        <div class="bas-calc-output-label">Your LTV</div>
+                        <div class="bas-calc-output-value" id="basLtvOut">&mdash;</div>
+                        <div class="bas-calc-output-zone bas-zone-good" id="basLtvZone">&mdash;</div>
+                    </div>
+                    <div class="bas-calc-output-card">
+                        <div class="bas-calc-output-label">Liquidation BTC price</div>
+                        <div class="bas-calc-output-value" id="basLiqPrice">$&mdash;</div>
+                        <div class="bas-calc-output-sub" id="basLiqDrawdown">&mdash;</div>
+                    </div>
+                    <div class="bas-calc-output-card">
+                        <div class="bas-calc-output-label">Channel position of liquidation</div>
+                        <div class="bas-calc-output-value bas-calc-output-zoned" id="basChannelPos">&mdash;</div>
+                        <div class="bas-calc-output-sub" id="basChannelHint">&mdash;</div>
+                    </div>
                 </div>
-                <div class="bas-calc-output-card">
-                    <div class="bas-calc-output-label">Channel position of liquidation</div>
-                    <div class="bas-calc-output-value bas-calc-output-zoned" id="basChannelPos">&mdash;</div>
-                    <div class="bas-calc-output-sub" id="basChannelHint">&mdash;</div>
+            </div>
+
+            <!-- ─── OUTPUT CARDS — COST SURFACE ─── -->
+            <div class="bas-calc-output-section">
+                <div class="bas-calc-output-section-label">Cost surface &mdash; what the loan actually costs you</div>
+                <div class="bas-calc-outputs">
+                    <div class="bas-calc-output-card">
+                        <div class="bas-calc-output-label">Monthly interest</div>
+                        <div class="bas-calc-output-value" id="basMonthlyInterest">$&mdash;</div>
+                        <div class="bas-calc-output-sub">Ongoing carry &mdash; can you afford this every month?</div>
+                    </div>
+                    <div class="bas-calc-output-card">
+                        <div class="bas-calc-output-label">Annual interest</div>
+                        <div class="bas-calc-output-value" id="basAnnualInterest">$&mdash;</div>
+                        <div class="bas-calc-output-sub" id="basAnnualInterestSub">&mdash;</div>
+                    </div>
+                    <div class="bas-calc-output-card">
+                        <div class="bas-calc-output-label">Annual cost as &times; stack value</div>
+                        <div class="bas-calc-output-value" id="basAnnualPctStack">&mdash;</div>
+                        <div class="bas-calc-output-sub">If bitcoin's CAGR exceeds this, the loan is structurally accretive.</div>
+                    </div>
                 </div>
             </div>
 
