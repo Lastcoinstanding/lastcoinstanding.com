@@ -1303,9 +1303,17 @@
     ];
 
     function multClass(m){
-      // Color scale: red < 0.5 < amber < 1.0 < green < 2.0 < bright-green
-      if(m < 0.5) return 'dr-mult-red';
-      if(m < 1.0) return 'dr-mult-amber';
+      // Color scale (revised): red < 1.0 < green < 2.0 < bright-green.
+      //
+      // Editorial decision: any result < 1.0× means the strategy
+      // ended with FEWER bitcoin than holding through. That's failure
+      // by definition — the rebalancing logic destroyed BTC value
+      // versus the HODL baseline. Earlier two-band split (red < 0.5,
+      // amber 0.5–1.0) was misleading: it framed 0.61× as "not so bad,"
+      // when 0.61× means ~39% of the stack was traded away for nothing.
+      // A failed strategy is failed; severity gradation below the line
+      // implies a second-place finish that doesn't exist.
+      if(m < 1.0) return 'dr-mult-red';
       if(m < 2.0) return 'dr-mult-green';
       return 'dr-mult-bright-green';
     }
