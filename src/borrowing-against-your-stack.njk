@@ -604,7 +604,7 @@ eleventyComputed:
                     </div>
                     <div class="bas-calc-bvs-path bas-calc-bvs-path-sell">
                         <div class="bas-calc-bvs-path-label">Sell path</div>
-                        <div class="bas-calc-bvs-path-tagline">Sell some now &middot; net loan amount after tax &middot; hold the rest</div>
+                        <div class="bas-calc-bvs-path-tagline">Sell some now &middot; net loan after tax &middot; hold rest</div>
                         <div class="bas-calc-bvs-path-headline" id="basBvsSellHeadline">&mdash; BTC</div>
                         <div class="bas-calc-bvs-path-sublabel">retained at end of horizon</div>
                         <div class="bas-calc-bvs-path-rows" id="basBvsSellRows">
@@ -618,13 +618,14 @@ eleventyComputed:
                     <p>Enter a stack, current price, and loan amount above to compare the three paths.</p>
                 </div>
 
-                <!-- ─── Risk disclosure (one-line caveat) ─── -->
-                <!-- The math above measures terminal wealth only. Two structural    -->
-                <!-- risks are not priced in: liquidation during drawdowns and       -->
-                <!-- counterparty failure. Both are covered in dedicated surfaces    -->
-                <!-- elsewhere on the page; this caveat points readers to them.     -->
+                <!-- ─── Risk disclosure (borrow-path-scoped) ─── -->
+                <!-- Liquidation risk and counterparty risk are features of   -->
+                <!-- the borrow path ALONE — HODL has no lender; sell         -->
+                <!-- concludes the moment the sale clears. The caveat is      -->
+                <!-- explicitly scoped to borrow and styled with the green    -->
+                <!-- accent so the visual ties it to the Borrow card.         -->
                 <div class="bas-calc-bvs-caveat">
-                    <strong>What the math leaves out:</strong> the comparison above measures only terminal-wealth math at the Power Law trend. It doesn't price in <a href="#loan-health">liquidation risk during drawdowns</a> (covered on Loan Health &mdash; the LTV meter and channel-position math) or <a href="#question">counterparty risk if the lender fails</a> (covered in The Question &mdash; the structural argument for verifiable, non-rehypothecating custody). The cheapest active path isn't automatically the right one if those tail risks aren't tolerable for your situation.
+                    <strong>What the borrow path leaves out:</strong> the math above measures only terminal-wealth math at the Power Law trend. Borrowing also carries <a href="#loan-health">liquidation risk during drawdowns</a> (covered on Loan Health &mdash; the LTV meter and channel-position math) and <a href="#question">counterparty risk if the lender fails</a> (covered in The Question &mdash; the structural argument for verifiable, non-rehypothecating custody). Neither HODL nor selling carries these tail risks; they're features of the borrow path alone. The cheapest active path isn't automatically the right one if those risks aren't tolerable for your situation.
                 </div>
             </div>
 
