@@ -550,3 +550,135 @@
     border-bottom: 1px solid rgba(224,148,34,0.08);
 }
 .bbm-checklist-framing em { color: var(--amber-dim); font-style: italic; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   HELP-TIP — canonical §6.13 pattern
+   Mirrors the style block from borrowing-against-your-stack.css so
+   the BBM page's calculator inputs (and the new regulatory tooltips
+   in the calculator section) render correctly. Same dimensions,
+   same hover behavior, same .reg-note-label eyebrow for the
+   regulatory variant.
+   ═══════════════════════════════════════════════════════════════ */
+.help-tip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid var(--text-muted);
+    border-radius: 50%;
+    cursor: help;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+    position: relative;
+    transition: color 0.2s, border-color 0.2s;
+    user-select: none;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+.help-tip:hover,
+.help-tip:focus {
+    color: var(--amber);
+    border-color: var(--amber);
+    outline: none;
+}
+.help-tip .tip-content {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: min(260px, calc(100vw - 32px));
+    padding: 0.85rem 1rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text);
+    background: var(--bg-card);
+    border: 1px solid rgba(224,148,34,0.25);
+    border-radius: 5px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.55);
+    z-index: 50;
+    text-align: left;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: normal;
+}
+.help-tip .tip-content strong { color: var(--text); font-weight: 600; }
+.help-tip .tip-content em { color: var(--amber-dim); font-style: italic; }
+.help-tip:hover .tip-content,
+.help-tip:focus .tip-content,
+.help-tip:focus-within .tip-content { display: block; }
+
+/* Right-anchored variant — when the tip sits close to the right edge */
+.help-tip.help-tip-right .tip-content { left: auto; right: 0; }
+
+/* Regulatory-caution variant — subtle amber accent + § glyph in markup
+   so readers pattern-match these as "tax / regulatory cautions" rather
+   than generic "more info" tooltips. */
+.help-tip-reg {
+    color: rgba(224,148,34,0.55);
+    border-color: rgba(224,148,34,0.4);
+}
+.help-tip-reg:hover, .help-tip-reg:focus {
+    color: var(--amber);
+    border-color: var(--amber);
+}
+.help-tip-reg .tip-content {
+    border-color: rgba(224,148,34,0.4);
+}
+.help-tip-reg .tip-content .reg-note-label {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.5rem;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   MATH & METHODOLOGY APPENDIX — compact disclosure of the
+   calculator's assumptions, sized smaller than body prose so
+   it reads as appendix material not editorial weight.
+   ═══════════════════════════════════════════════════════════════ */
+.bbm-math {
+    margin-top: 2rem;
+    padding: 1.4rem 1.6rem;
+    background: rgba(255,255,255,0.012);
+    border: 1px solid var(--border);
+    border-left: 2px solid rgba(154,144,128,0.40);
+    border-radius: 0 4px 4px 0;
+}
+.bbm-math-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.85rem;
+}
+.bbm-math p {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin: 0 0 0.7rem;
+}
+.bbm-math p:last-child { margin-bottom: 0; }
+.bbm-math em { color: var(--amber-dim); font-style: italic; }
+.bbm-math code {
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 0.78rem;
+    color: var(--text);
+    background: rgba(224,148,34,0.06);
+    padding: 0.05rem 0.4rem;
+    border-radius: 3px;
+}
