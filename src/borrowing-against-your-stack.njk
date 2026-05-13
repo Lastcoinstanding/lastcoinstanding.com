@@ -617,6 +617,15 @@ eleventyComputed:
                 <div class="bas-calc-bvs-verdict" id="basBvsVerdict">
                     <p>Enter a stack, current price, and loan amount above to compare the three paths.</p>
                 </div>
+
+                <!-- ─── Risk disclosure (one-line caveat) ─── -->
+                <!-- The math above measures terminal wealth only. Two structural    -->
+                <!-- risks are not priced in: liquidation during drawdowns and       -->
+                <!-- counterparty failure. Both are covered in dedicated surfaces    -->
+                <!-- elsewhere on the page; this caveat points readers to them.     -->
+                <div class="bas-calc-bvs-caveat">
+                    <strong>What the math leaves out:</strong> the comparison above measures only terminal-wealth math at the Power Law trend. It doesn't price in <a href="#loan-health">liquidation risk during drawdowns</a> (covered on Loan Health &mdash; the LTV meter and channel-position math) or <a href="#question">counterparty risk if the lender fails</a> (covered in The Question &mdash; the structural argument for verifiable, non-rehypothecating custody). The cheapest active path isn't automatically the right one if those tail risks aren't tolerable for your situation.
+                </div>
             </div>
 
         </div>
