@@ -1402,6 +1402,16 @@
     gap: 1.2rem;
     margin-bottom: 1.2rem;
 }
+/* Three-column variant — used when the HODL baseline card is present */
+.bas-calc-bvs-comparison.bas-calc-bvs-comparison-3col {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+@media (max-width: 900px) {
+    .bas-calc-bvs-comparison.bas-calc-bvs-comparison-3col {
+        grid-template-columns: 1fr;
+        gap: 0.9rem;
+    }
+}
 @media (max-width: 720px) {
     .bas-calc-bvs-comparison {
         grid-template-columns: 1fr;
@@ -1416,6 +1426,16 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
+}
+/* HODL card — the wealth-maximising baseline. Muted/neutral palette so
+   it reads as "reference state" rather than "this is the answer." */
+.bas-calc-bvs-path-hodl {
+    border-color: rgba(154,144,128,0.28);
+    background: rgba(255,255,255,0.012);
+}
+.bas-calc-bvs-path-hodl .bas-calc-bvs-path-label {
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
 }
 .bas-calc-bvs-path-borrow {
     border-color: rgba(39,174,96,0.22);
