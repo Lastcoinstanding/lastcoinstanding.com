@@ -227,111 +227,120 @@ eleventyComputed:
 
             <div class="bbm-calc">
 
-                <!-- ─── Inputs grid ─── -->
-                <div class="bbm-calc-inputs">
-                    <div class="bbm-calc-field">
-                        <label class="bbm-calc-field-label" for="bbmHomePrice">
-                            Home price (USD)
-                            <span class="help-tip" tabindex="0">?<span class="tip-content">The purchase price of the home you&rsquo;re modelling. The 20% conventional down payment defaults sit below; adjust the down-payment percentage if you&rsquo;re modelling a different configuration.</span></span>
-                        </label>
-                        <input type="number" id="bbmHomePrice" value="500000" step="10000" min="50000" max="50000000">
-                    </div>
+                <!-- ═══════════════ INPUTS — slider-cluster pattern (STYLE_GUIDE §6.16) ═══════════════ -->
 
-                    <div class="bbm-calc-field">
-                        <div class="bbm-calc-field-label bbm-calc-field-label-with-display">
-                            <span>
-                                Down payment
-                                <span class="help-tip" tabindex="0">?<span class="tip-content">The down-payment percentage of home price. 20% is the conventional figure that avoids private mortgage insurance.</span></span>
-                            </span>
-                            <span class="bbm-calc-field-display"><span id="bbmDownPctDisplay">20</span>%</span>
+                <!-- Cluster 1 (weightier register): the scenario you're modelling -->
+                <div class="slider-cluster cluster-target">
+                    <div class="cluster-label">
+                        <span class="cluster-label-main">The scenario</span>
+                        <span class="cluster-label-help">&mdash; the home, the stack, and the horizon you&rsquo;re evaluating</span>
+                    </div>
+                    <div class="slider-grid grid-4">
+
+                        <div class="slider-control">
+                            <div class="slider-row">
+                                <span class="slider-name">Home price<span class="help-tip" tabindex="0">?<span class="tip-content">The purchase price of the home you&rsquo;re modelling. The 20% conventional down payment defaults sit below; adjust the down-payment percentage if you&rsquo;re modelling a different configuration.</span></span></span>
+                                <span class="slider-val" id="bbmHomePriceVal">$500,000</span>
+                            </div>
+                            <input type="range" id="bbmHomePrice" min="200000" max="2000000" value="500000" step="25000" aria-label="Home price">
                         </div>
-                        <input type="range" id="bbmDownPct" min="5" max="50" value="20" step="1">
-                    </div>
 
-                    <div class="bbm-calc-field">
-                        <label class="bbm-calc-field-label" for="bbmBtcStack">
-                            BTC stack
-                            <span class="help-tip" tabindex="0">?<span class="tip-content">Your bitcoin stack. Mirrors the BTC stack input on the Borrowing Against Your Stack page &mdash; change either, both update.</span></span>
-                        </label>
-                        <input type="number" id="bbmBtcStack" value="3.0" step="0.01" min="0" max="100000">
-                    </div>
-
-                    <div class="bbm-calc-field">
-                        <label class="bbm-calc-field-label" for="bbmBtcPrice">
-                            Current BTC price (USD)
-                            <span class="help-tip" tabindex="0">?<span class="tip-content">Mirrors the Current BTC price input on the Borrowing Against Your Stack page. Auto-filled from the most recent monthly sample.</span></span>
-                        </label>
-                        <input type="number" id="bbmBtcPrice" value="" step="100" min="0" max="100000000">
-                    </div>
-
-                    <div class="bbm-calc-field">
-                        <label class="bbm-calc-field-label" for="bbmCostBasis">
-                            Cost basis per BTC (USD)
-                            <span class="help-tip" tabindex="0">?<span class="tip-content">Your average price per BTC when you acquired the stack. Used to compute capital gains tax owed in the Sell path. Defaults to today&rsquo;s price (no embedded gain, the most conservative input for the sell path).</span></span>
-                        </label>
-                        <input type="number" id="bbmCostBasis" value="" step="100" min="0">
-                    </div>
-
-                    <div class="bbm-calc-field">
-                        <div class="bbm-calc-field-label bbm-calc-field-label-with-display">
-                            <span>
-                                Standard mortgage rate
-                                <span class="help-tip" tabindex="0">?<span class="tip-content">The rate on a conventional 30-year primary mortgage. Same primary mortgage applies under both paths; it&rsquo;s the base rate that the bitcoin-backed second-lien premium gets added to.</span></span>
-                            </span>
-                            <span class="bbm-calc-field-display"><span id="bbmMortRateDisplay">7.0</span>%</span>
+                        <div class="slider-control">
+                            <div class="slider-row">
+                                <span class="slider-name">Down payment<span class="help-tip" tabindex="0">?<span class="tip-content">The down-payment percentage of home price. 20% is the conventional figure that avoids private mortgage insurance.</span></span></span>
+                                <span class="slider-val" id="bbmDownPctVal">20%</span>
+                            </div>
+                            <input type="range" id="bbmDownPct" min="5" max="50" value="20" step="1" aria-label="Down payment percent">
                         </div>
-                        <input type="range" id="bbmMortRate" min="3" max="10" value="7" step="0.25">
-                    </div>
 
-                    <div class="bbm-calc-field">
-                        <div class="bbm-calc-field-label bbm-calc-field-label-with-display">
-                            <span>
-                                Second-lien premium
-                                <span class="help-tip" tabindex="0">?<span class="tip-content">How many percentage points above the standard mortgage rate the bitcoin-backed second-lien carries. Source reports give a range of 0.5&ndash;1.5pp; 1.0pp is the middle of that range. The premium is the cost of the regulated custody, specialized monitoring, and absence of rehypothecation revenue.</span></span>
-                            </span>
-                            <span class="bbm-calc-field-display">+<span id="bbmPremiumDisplay">1.0</span>pp</span>
+                        <div class="slider-control">
+                            <div class="slider-row">
+                                <span class="slider-name">BTC stack<span class="help-tip" tabindex="0">?<span class="tip-content">Your bitcoin stack. Mirrors the BTC stack input on the Borrowing Against Your Stack page &mdash; change either, both update.</span></span></span>
+                                <span class="slider-val" id="bbmBtcStackVal">3 BTC</span>
+                            </div>
+                            <input type="range" id="bbmBtcStack" min="0.1" max="20" value="3" step="0.1" aria-label="BTC stack">
                         </div>
-                        <input type="range" id="bbmPremium" min="0.25" max="2.5" value="1.0" step="0.25">
-                    </div>
 
-                    <div class="bbm-calc-field">
-                        <div class="bbm-calc-field-label bbm-calc-field-label-with-display">
-                            <span>
-                                Time horizon
-                                <span class="help-tip" tabindex="0">?<span class="tip-content">How many years out to project the comparison. The Power Law trend price at this horizon is the future-BTC-price input. Both paths are evaluated at the same future date so the comparison is apples-to-apples.</span></span>
-                            </span>
-                            <span class="bbm-calc-field-display"><span id="bbmHorizonDisplay">15</span> years</span>
+                        <div class="slider-control">
+                            <div class="slider-row">
+                                <span class="slider-name">Time horizon<span class="help-tip" tabindex="0">?<span class="tip-content">How many years out to project the comparison. The Power Law trend price at this horizon is the future-BTC-price input. Both paths are evaluated at the same future date so the comparison is apples-to-apples.</span></span></span>
+                                <span class="slider-val" id="bbmHorizonVal">15 years</span>
+                            </div>
+                            <input type="range" id="bbmHorizon" min="3" max="30" value="15" step="1" aria-label="Time horizon">
                         </div>
-                        <input type="range" id="bbmHorizon" min="3" max="30" value="15" step="1">
-                    </div>
 
-                    <div class="bbm-calc-field">
-                        <div class="bbm-calc-field-label bbm-calc-field-label-with-display">
-                            <span>
-                                Capital gains tax rate
-                                <span class="help-tip" tabindex="0">?<span class="tip-content">Your effective long-term capital gains tax rate. Only relevant to the Sell path &mdash; tax owed when BTC is sold for the down payment. US federal LTCG is 0%, 15%, or 20% depending on bracket; state tax may add more.</span></span>
-                            </span>
-                            <span class="bbm-calc-field-display"><span id="bbmCapGainsDisplay">20</span>%</span>
-                        </div>
-                        <input type="range" id="bbmCapGains" min="0" max="40" value="20" step="1">
                     </div>
                 </div>
 
-                <!-- ─── Two-card terminal-wealth comparison ─── -->
-                <div class="bbm-calc-comparison">
-                    <div class="bbm-calc-path bbm-calc-path-pledge">
-                        <div class="bbm-calc-path-label">Pledge path</div>
-                        <div class="bbm-calc-path-tagline">Second-lien at premium &middot; full stack stays in custody &middot; no taxable event</div>
-                        <div class="bbm-calc-path-headline" id="bbmPledgeHeadline">&mdash; BTC</div>
-                        <div class="bbm-calc-path-sublabel">retained at end of horizon</div>
-                        <div class="bbm-calc-path-rows" id="bbmPledgeRows"></div>
+                <!-- Cluster 2 (standard register): financing & tax parameters -->
+                <div class="slider-cluster cluster-means">
+                    <div class="cluster-label">
+                        <span class="cluster-label-main">Financing &amp; tax assumptions</span>
+                        <span class="cluster-label-help">&mdash; the rate environment, the stack&rsquo;s embedded gain, and your bracket</span>
                     </div>
-                    <div class="bbm-calc-path bbm-calc-path-sell">
-                        <div class="bbm-calc-path-label">Sell path</div>
-                        <div class="bbm-calc-path-tagline">Sell BTC for down payment &middot; pay cap gains now &middot; no premium interest</div>
-                        <div class="bbm-calc-path-headline" id="bbmSellHeadline">&mdash; BTC</div>
-                        <div class="bbm-calc-path-sublabel">retained at end of horizon</div>
-                        <div class="bbm-calc-path-rows" id="bbmSellRows"></div>
+                    <div class="slider-grid grid-5">
+
+                        <div class="slider-control">
+                            <div class="slider-row">
+                                <span class="slider-name">Current BTC price<span class="help-tip" tabindex="0">?<span class="tip-content">Mirrors the Current BTC price input on the Borrowing Against Your Stack page. Auto-filled from the most recent monthly Power Law sample on first load.</span></span></span>
+                                <span class="slider-val" id="bbmBtcPriceVal">$72,000</span>
+                            </div>
+                            <input type="range" id="bbmBtcPrice" min="30000" max="300000" value="72000" step="1000" aria-label="Current BTC price">
+                        </div>
+
+                        <div class="slider-control">
+                            <div class="slider-row">
+                                <span class="slider-name">Cost basis per BTC<span class="help-tip" tabindex="0">?<span class="tip-content">Your average price per BTC when you acquired the stack. Used to compute capital gains tax owed in the Sell path. Defaults to today&rsquo;s price (no embedded gain &mdash; the most conservative input for the sell path).</span></span></span>
+                                <span class="slider-val" id="bbmCostBasisVal">$72,000</span>
+                            </div>
+                            <input type="range" id="bbmCostBasis" min="0" max="200000" value="72000" step="1000" aria-label="Cost basis per BTC">
+                        </div>
+
+                        <div class="slider-control">
+                            <div class="slider-row">
+                                <span class="slider-name">Standard mortgage rate<span class="help-tip" tabindex="0">?<span class="tip-content">The rate on a conventional 30-year primary mortgage. Same primary mortgage applies under both paths; it&rsquo;s the base rate that the bitcoin-backed second-lien premium gets added to.</span></span></span>
+                                <span class="slider-val" id="bbmMortRateVal">7.0%</span>
+                            </div>
+                            <input type="range" id="bbmMortRate" min="3" max="10" value="7" step="0.25" aria-label="Standard mortgage rate">
+                        </div>
+
+                        <div class="slider-control">
+                            <div class="slider-row">
+                                <span class="slider-name">Second-lien premium<span class="help-tip" tabindex="0">?<span class="tip-content">How many percentage points above the standard mortgage rate the bitcoin-backed second-lien carries. Source reports give a range of 0.5&ndash;1.5pp; 1.0pp is the middle of that range.</span></span></span>
+                                <span class="slider-val" id="bbmPremiumVal">+1.00pp</span>
+                            </div>
+                            <input type="range" id="bbmPremium" min="0.25" max="2.5" value="1.0" step="0.25" aria-label="Second-lien premium">
+                        </div>
+
+                        <div class="slider-control">
+                            <div class="slider-row">
+                                <span class="slider-name">Capital gains tax<span class="help-tip" tabindex="0">?<span class="tip-content">Your effective long-term capital gains tax rate. Only relevant to the Sell path &mdash; tax owed when BTC is sold for the down payment. US federal LTCG is 0%, 15%, or 20% depending on bracket; state tax may add more.</span></span></span>
+                                <span class="slider-val" id="bbmCapGainsVal">20%</span>
+                            </div>
+                            <input type="range" id="bbmCapGains" min="0" max="40" value="20" step="1" aria-label="Capital gains tax rate">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ═══════════════ OUTCOMES — calc-result-card pattern (STYLE_GUIDE §6.17) ═══════════════ -->
+
+                <div class="calc-results">
+                    <div class="calc-result-card pledge">
+                        <h4>Pledge path</h4>
+                        <p class="result-tagline">Second-lien at premium &middot; full stack stays in custody &middot; no taxable event</p>
+                        <div class="result-sublabel">Retained at end of horizon</div>
+                        <div class="result-value" id="bbmPledgeHeadline">&mdash; BTC</div>
+                        <div class="period-divider"></div>
+                        <div class="result-detail" id="bbmPledgeRows"></div>
+                    </div>
+                    <div class="calc-result-card sell">
+                        <h4>Sell path</h4>
+                        <p class="result-tagline">Sell BTC for down payment &middot; pay cap gains now &middot; no premium interest</p>
+                        <div class="result-sublabel">Retained at end of horizon</div>
+                        <div class="result-value" id="bbmSellHeadline">&mdash; BTC</div>
+                        <div class="period-divider"></div>
+                        <div class="result-detail" id="bbmSellRows"></div>
                     </div>
                 </div>
 
