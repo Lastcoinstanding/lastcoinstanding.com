@@ -37,7 +37,7 @@ eleventyComputed:
         </button>
         <button class="tab-btn" data-tab="borrow-vs-sell">
             <span class="tab-num">III</span>
-            <span class="tab-title">Borrow vs. Sell</span>
+            <span class="tab-title">Borrow vs. Sell vs. HODL</span>
         </button>
         <button class="tab-btn" data-tab="math">
             <span class="tab-num">IV</span>
@@ -458,16 +458,20 @@ eleventyComputed:
     </div>
 
     <!-- ═══════════════════════════════════════════ -->
-    <!-- TAB III: BORROW vs. SELL — should I borrow or sell? -->
+    <!-- TAB III: BORROW vs. SELL vs. HODL              -->
     <!-- ═══════════════════════════════════════════ -->
     <!-- Self-contained calculator. Shares stack / price / loan / rate    -->
     <!-- with Loan Health via a JS sync layer (localStorage-backed) so    -->
     <!-- the user only enters those once. BvS-specific inputs (horizon,   -->
     <!-- cost basis, capital gains tax) live only on this tab.            -->
+    <!-- Three paths compared:                                             -->
+    <!--   HODL   — don't borrow, don't sell, forgo the need              -->
+    <!--   BORROW — loan against stack, repay at horizon                  -->
+    <!--   SELL   — crystallize BTC at today's price                       -->
     <div class="tab-content" id="tab-borrow-vs-sell">
         <div class="section-intro">
-            <h2>Borrow vs. Sell</h2>
-            <p>Two paths for the same dollar need: borrow against your stack and pay interest, or sell some bitcoin outright. This tab evaluates both at the end of your chosen horizon, using the Power Law trend as the future-price expectation. Stack, current price, loan amount, and interest rate mirror your inputs on Loan Health (change one, the other updates). The horizon, cost basis, and tax rate are specific to the decision being modelled here.</p>
+            <h2>Borrow vs. Sell vs. HODL</h2>
+            <p>Three paths for a hypothetical dollar need over your chosen horizon. <strong>HODL</strong> doesn't fund the need at all &mdash; it preserves the most wealth, by definition. <strong>Borrow</strong> takes a loan against the stack and repays at horizon. <strong>Sell</strong> crystallizes BTC at today's price to fund the need. The HODL path quantifies the wealth cost of <em>any</em> active decision; the borrow-vs-sell comparison tells you the cheaper of the two active paths if the need is real. Future bitcoin price is the Power Law trend at end-of-horizon &mdash; central-tendency expectation, not a forecast.</p>
         </div>
 
         <div class="bas-calc">
@@ -534,8 +538,8 @@ eleventyComputed:
             <!-- ─── BvS-specific inputs (horizon / cost basis / tax rate) ─── -->
             <div class="bas-calc-bvs-section">
                 <div class="bas-calc-bvs-header">
-                    <h3 class="bas-calc-bvs-title">The comparison &mdash; what each path leaves you with</h3>
-                    <p class="bas-calc-bvs-subtitle">Both paths fund the same dollar need. Future bitcoin price is the <em>Power Law trend at the end of the horizon</em> &mdash; the central-tendency expectation, not a forecast. Borrowing wins when the opportunity cost of the BTC you'd sell exceeds the cumulative interest of carrying the loan.</p>
+                    <h3 class="bas-calc-bvs-title">Three paths &mdash; what each leaves you with</h3>
+                    <p class="bas-calc-bvs-subtitle">Borrow and sell both fund the dollar need today; HODL doesn't (you forgo the spending). <strong>HODL always preserves the most wealth at horizon</strong> &mdash; it's the mathematical reference. The verdict below quantifies what each active path <em>costs</em> in terminal wealth and identifies the cheaper of the two when the need is real.</p>
                 </div>
 
                 <div class="bas-calc-bvs-inputs">
@@ -543,7 +547,7 @@ eleventyComputed:
                         <div class="bas-calc-field-label bas-calc-field-label-with-display">
                             <span>
                                 Time horizon
-                                <span class="help-tip" tabindex="0">?<span class="tip-content">How long until you'd repay the loan (borrow path) or how long to project forward (sell path). Both paths are evaluated at the same future date so the comparison is apples-to-apples. Longer horizon = more time for bitcoin to appreciate = more advantage to the borrow path (but also more cumulative interest).</span></span>
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">How long until you'd repay the loan (borrow path) or how long to project forward (sell path / HODL path). All three paths are evaluated at the same future date so the comparison is apples-to-apples. Longer horizon = more time for bitcoin to appreciate.</span></span>
                             </span>
                             <span class="bas-calc-field-display"><span id="bvsHorizonDisplay">5</span> years</span>
                         </div>
@@ -576,8 +580,19 @@ eleventyComputed:
                     </div>
                 </div>
 
-                <!-- ─── Comparison cards ─── -->
-                <div class="bas-calc-bvs-comparison">
+                <!-- ─── Three comparison cards ─── -->
+                <!-- HODL is leftmost (the baseline / wealth-maximizing reference). -->
+                <!-- Borrow and Sell follow as the two active alternatives.         -->
+                <div class="bas-calc-bvs-comparison bas-calc-bvs-comparison-3col">
+                    <div class="bas-calc-bvs-path bas-calc-bvs-path-hodl">
+                        <div class="bas-calc-bvs-path-label">Just HODL</div>
+                        <div class="bas-calc-bvs-path-tagline">Don't borrow &middot; don't sell &middot; forgo the need</div>
+                        <div class="bas-calc-bvs-path-headline" id="basBvsHodlHeadline">&mdash; BTC</div>
+                        <div class="bas-calc-bvs-path-sublabel">retained at end of horizon</div>
+                        <div class="bas-calc-bvs-path-rows" id="basBvsHodlRows">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
                     <div class="bas-calc-bvs-path bas-calc-bvs-path-borrow">
                         <div class="bas-calc-bvs-path-label">Borrow path</div>
                         <div class="bas-calc-bvs-path-tagline">Keep the stack &middot; pay interest &middot; repay at horizon</div>
@@ -598,9 +613,9 @@ eleventyComputed:
                     </div>
                 </div>
 
-                <!-- ─── Verdict line ─── -->
+                <!-- ─── Verdict line (three-path) ─── -->
                 <div class="bas-calc-bvs-verdict" id="basBvsVerdict">
-                    <p>Enter a stack, current price, and loan amount above to compare the two paths.</p>
+                    <p>Enter a stack, current price, and loan amount above to compare the three paths.</p>
                 </div>
             </div>
 
@@ -665,6 +680,13 @@ eleventyComputed:
                 <p class="bas-math-prose">The future bitcoin price used in both paths is the Power Law trend at the end of the horizon:</p>
                 <div class="bas-math-eq">P<sub>future</sub> = P(today<sub>days</sub> + horizon_years &times; 365.25)</div>
                 <p class="bas-math-prose">This is a <em>central-tendency expectation</em>, not a forecast. Bitcoin can sit above or below the trend for extended periods; the comparison's directional verdict is more robust than its dollar-figure precision.</p>
+
+                <h4 class="bas-math-subsection-title">HODL path (baseline)</h4>
+                <p class="bas-math-prose">No loan, no sale, no tax, no interest:</p>
+                <div class="bas-math-eq">terminal_wealth<sub>hodl</sub> = stack &times; P<sub>future</sub></div>
+                <p class="bas-math-prose">Mathematically always the highest of the three terminal-wealth figures &mdash; HODL sells zero BTC and pays zero interest. The HODL number is the wealth-maximising reference; the borrow and sell paths quantify what each active decision <em>costs</em> relative to it.</p>
+                <div class="bas-math-eq">cost_vs_hodl<sub>borrow</sub> = terminal_wealth<sub>hodl</sub> &minus; terminal_wealth<sub>borrow</sub></div>
+                <div class="bas-math-eq">cost_vs_hodl<sub>sell</sub>   = terminal_wealth<sub>hodl</sub> &minus; terminal_wealth<sub>sell</sub></div>
 
                 <h4 class="bas-math-subsection-title">Sell path</h4>
                 <p class="bas-math-prose">To net <em>loan</em> after capital gains tax when selling at today's price:</p>
