@@ -287,3 +287,266 @@
     margin: 0 0 1rem;
     letter-spacing: -0.005em;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PLEDGE vs SELL CALCULATOR (section 6b)
+
+   Mirrors the .bas-calc pattern from the borrowing page for visual
+   consistency — inputs grid + 2-card comparison + verdict + chart.
+   Prefix .bbm-calc-* keeps the styles scoped to this page.
+
+   Components:
+     .bbm-calc                 — outer wrapper
+     .bbm-calc-inputs          — inputs grid (3 cols desktop, 1 col mobile)
+     .bbm-calc-field           — single input field (label + control)
+     .bbm-calc-comparison      — 2-card comparison (Pledge / Sell)
+     .bbm-calc-path            — single path card
+     .bbm-calc-path-pledge     — pledge variant (amber accent — like HODL/baseline on BvS)
+     .bbm-calc-path-sell       — sell variant (slate-blue accent — like Sell on BvS)
+     .bbm-calc-verdict         — verdict line summarising the crossover
+     .bbm-calc-chart-wrap      — Chart.js host + label + caption
+   ═══════════════════════════════════════════════════════════════ */
+
+.bbm-calc {
+    margin-top: 1.5rem;
+    padding: 1.5rem 1.6rem 1.8rem;
+    background: rgba(255,255,255,0.012);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+/* ─── Inputs grid ─── */
+.bbm-calc-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem 1.2rem;
+    margin-bottom: 1.5rem;
+}
+@media (max-width: 820px) {
+    .bbm-calc-inputs { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 540px) {
+    .bbm-calc-inputs { grid-template-columns: 1fr; gap: 0.85rem; }
+}
+.bbm-calc-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.bbm-calc-field-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+}
+.bbm-calc-field-label-with-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+.bbm-calc-field-display {
+    color: var(--amber);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+.bbm-calc-field input[type=number] {
+    width: 100%;
+    padding: 0.55rem 0.7rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    box-sizing: border-box;
+}
+.bbm-calc-field input[type=number]:focus {
+    outline: none;
+    border-color: var(--amber);
+    background: rgba(255,255,255,0.06);
+}
+.bbm-calc-field input[type=range] {
+    width: 100%;
+    margin: 0.2rem 0;
+    accent-color: var(--amber);
+}
+
+/* ─── Two-card comparison (Pledge / Sell) ─── */
+.bbm-calc-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+}
+@media (max-width: 720px) {
+    .bbm-calc-comparison { grid-template-columns: 1fr; gap: 0.9rem; }
+}
+.bbm-calc-path {
+    padding: 1.15rem 1.2rem;
+    background: rgba(255,255,255,0.018);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.bbm-calc-path-pledge {
+    border-color: rgba(224,148,34,0.22);
+    background: rgba(224,148,34,0.025);
+}
+.bbm-calc-path-pledge .bbm-calc-path-label { color: var(--amber); }
+.bbm-calc-path-sell {
+    border-color: rgba(122,149,168,0.30);
+    background: rgba(122,149,168,0.03);
+}
+.bbm-calc-path-sell .bbm-calc-path-label { color: #8aa3b5; }
+.bbm-calc-path-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.35rem;
+}
+.bbm-calc-path-tagline {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    font-style: italic;
+    min-height: 2.2em;
+}
+.bbm-calc-path-headline {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.9rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.05;
+    letter-spacing: -0.005em;
+    margin-bottom: 0.15rem;
+}
+.bbm-calc-path-sublabel {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-bottom: 0.9rem;
+}
+.bbm-calc-path-rows {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 0.55rem;
+}
+.bbm-calc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.82rem;
+}
+.bbm-calc-row:last-child { border-bottom: none; }
+.bbm-calc-row-label {
+    color: var(--text-dim);
+    flex: 1;
+    min-width: 0;
+}
+.bbm-calc-row-value {
+    color: var(--text);
+    font-weight: 500;
+    text-align: right;
+    white-space: nowrap;
+}
+.bbm-calc-row-value-terminal {
+    color: var(--text);
+    font-weight: 600;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.05rem;
+}
+.bbm-calc-path-pledge .bbm-calc-row-value-terminal { color: var(--amber); }
+.bbm-calc-path-sell .bbm-calc-row-value-terminal { color: #8aa3b5; }
+
+/* ─── Verdict ─── */
+.bbm-calc-verdict {
+    padding: 1.1rem 1.3rem;
+    background: rgba(224,148,34,0.04);
+    border-left: 2px solid var(--amber);
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 1.4rem;
+}
+.bbm-calc-verdict p {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.05rem;
+    line-height: 1.55;
+    color: var(--text);
+    margin: 0;
+}
+.bbm-calc-verdict p strong { color: var(--amber); font-weight: 600; }
+.bbm-calc-verdict p em { color: var(--amber-dim); font-style: italic; }
+.bbm-calc-verdict p strong.verdict-pledge { color: var(--amber); }
+.bbm-calc-verdict p strong.verdict-sell   { color: #8aa3b5; }
+.bbm-calc-verdict-pledge-wins {
+    border-left-color: var(--amber);
+    background: rgba(224,148,34,0.04);
+}
+.bbm-calc-verdict-sell-wins {
+    border-left-color: #8aa3b5;
+    background: rgba(122,149,168,0.04);
+}
+.bbm-calc-verdict-sell-wins p strong { color: #8aa3b5; }
+
+/* ─── Chart ─── */
+.bbm-calc-chart-wrap {
+    margin-top: 0.5rem;
+}
+.bbm-calc-chart-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.7rem;
+}
+.bbm-calc-chart-host {
+    position: relative;
+    width: 100%;
+    height: 360px;
+    background: rgba(255,255,255,0.015);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.5rem;
+    box-sizing: border-box;
+}
+@media (max-width: 720px) {
+    .bbm-calc-chart-host { height: 280px; }
+}
+.bbm-calc-chart-caption {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    margin-top: 0.6rem;
+    padding: 0 0.2rem;
+}
+.bbm-calc-chart-caption em { color: var(--amber-dim); font-style: italic; }
+
+/* Compliance checklist framing line (added to the existing checklist) */
+.bbm-checklist-framing {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    margin: 0 0 0.9rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid rgba(224,148,34,0.08);
+}
+.bbm-checklist-framing em { color: var(--amber-dim); font-style: italic; }
