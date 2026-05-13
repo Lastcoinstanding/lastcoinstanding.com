@@ -707,11 +707,14 @@
       row('Net wealth at year ' + horizonYears      + tip('Stack at horizon &times; the Power Law trend price at year ' + horizonYears + '. Mathematically the highest of the three paths &mdash; HODL sells nothing and pays nothing, so its terminal wealth is the wealth-maximising baseline.'), fmtUsd(r.hodl.terminalWealth), true);
 
     // ─── Borrow path card ───
+    // Labels match HODL and Sell row-for-row for visual alignment; the
+    // timing context ("at horizon" / "now") that was previously in the
+    // label now lives in the tooltip for each row.
     bvsBorrowHeadline.textContent = fmtBtc(r.borrow.btcRetained);
     bvsBorrowRows.innerHTML =
       row('Need funded today'                       + tip('The loan amount, available in cash today. Same dollar figure as the sell path; HODL funds nothing.'),                                                                                                                                  fmtUsd(r.loan)) +
-      row('BTC sold at horizon to repay'            + tip('At year ' + horizonYears + ', the trend price is higher than today, so fewer BTC are needed to repay the same loan principal. The structural advantage of the borrow path.'),                                                          fmtBtc(r.borrow.btcSoldAtHorizon)) +
-      row('Cap gains tax (at horizon)'              + tip('Capital gains tax owed when those BTC are sold at year ' + horizonYears + ' to repay the loan. Cost basis is your original purchase price; the gain is the difference between that and the future trend price.'),                       fmtUsd(r.borrow.taxPaid)) +
+      row('BTC sold'                                + tip('Sold <strong>at horizon</strong> to repay the loan principal. At year ' + horizonYears + ', the trend price is higher than today, so fewer BTC are needed to repay the same loan amount &mdash; the structural advantage of borrowing.'), fmtBtc(r.borrow.btcSoldAtHorizon)) +
+      row('Cap gains tax'                           + tip('Owed <strong>at horizon</strong> when those BTC are sold. Cost basis is your original purchase price; the gain is the difference between that and the future trend price.'),                                                            fmtUsd(r.borrow.taxPaid)) +
       row('Cumulative interest paid'                + tip('Total interest paid over the full horizon &mdash; paid from external income, not from the bitcoin stack. Simple-interest model: loan &times; rate &times; horizon years.'),                                                              fmtUsd(r.borrow.cumulativeInterest)) +
       row('Net wealth at year ' + horizonYears      + tip('Value of BTC retained at horizon (at the future trend price), minus the cumulative interest paid along the way. Always less than HODL &mdash; the difference is the wealth cost of funding the need this way.'),                        fmtUsd(r.borrow.terminalWealth), true);
 
@@ -719,8 +722,8 @@
     bvsSellHeadline.textContent = fmtBtc(r.sell.btcRetained);
     bvsSellRows.innerHTML =
       row('Need funded today'                       + tip('The loan amount, available in cash today &mdash; net of capital gains tax. Same dollar figure as the borrow path; HODL funds nothing.'),                                                                                                fmtUsd(r.loan)) +
-      row('BTC sold now to net loan'                + tip('Bitcoin sold at today\'s price to net the loan amount after capital gains tax. Higher cost basis or lower tax rate means fewer BTC sold.'),                                                                                              fmtBtc(r.sell.btcSold)) +
-      row('Cap gains tax (now)'                     + tip('Capital gains tax owed today when the BTC is sold. Will be $0 if your cost basis equals today\'s price (no embedded gain) &mdash; use the cost-basis presets to model typical cycle entry points.'),                                    fmtUsd(r.sell.taxPaid)) +
+      row('BTC sold'                                + tip('Sold <strong>now</strong> at today\'s price to net the loan amount after capital gains tax. Higher cost basis or lower tax rate means fewer BTC sold.'),                                                                                  fmtBtc(r.sell.btcSold)) +
+      row('Cap gains tax'                           + tip('Owed <strong>now</strong> when the BTC is sold. Will be $0 if your cost basis equals today\'s price (no embedded gain) &mdash; use the cost-basis presets to model typical cycle entry points.'),                                          fmtUsd(r.sell.taxPaid)) +
       row('Cumulative interest paid'                + tip('Zero &mdash; the sell path has no interest cost, because there\'s no loan.'),                                                                                                                                                            '$0') +
       row('Net wealth at year ' + horizonYears      + tip('Value of BTC retained at horizon (at the future trend price). Always less than HODL &mdash; the difference is the wealth cost of funding the need this way.'),                                                                          fmtUsd(r.sell.terminalWealth), true);
 
