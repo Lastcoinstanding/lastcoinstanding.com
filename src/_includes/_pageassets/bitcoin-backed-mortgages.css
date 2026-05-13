@@ -18,6 +18,44 @@
      .bbm-checklist-bad    — red-tinted "trade fails the bar" list
    ═══════════════════════════════════════════════════════════════ */
 
+/* ─── Canonical color tokens (System A — matches BvRE / DR / Disciplined
+   Rebalancing convention) ───
+   Every page on the site defines its own :root block; base.njk's
+   canonical-body-css only handles font-family/size/line-height and
+   explicitly notes that "Pages still set their own body { background,
+   color } to match their palette". Omitting this block (as the first
+   six versions of this page did) leaves every var() reference unresolved
+   and falls back to browser default — visible as stark-white body text
+   instead of the cream-on-dark register the rest of the site uses.
+   ─── */
+:root {
+    --bg: #0a0908;
+    --bg-card: #141210;
+    --amber: #e09422;
+    --amber-dim: #b8791c;
+    --amber-glow: rgba(224,148,34,0.15);
+    --text: #e8e0d4;
+    --text-dim: #9a9080;
+    --text-muted: #6a6256;
+    --red: #c0392b;
+    --red-dim: rgba(192,57,43,0.6);
+    --green: #27ae60;
+    --border: rgba(224,148,34,0.12);
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* Inline emphasis on body prose — sparing amber accent for key terms and
+   numerical claims, matching the Power Law / DR convention. Body bold
+   stays in --text (cream), not amber, to preserve typographic hierarchy. */
+.bbm-page strong { color: var(--text); font-weight: 600; }
+.bbm-page em { color: var(--text); font-style: italic; }
+.bbm-page a { color: var(--amber); text-decoration: underline; text-decoration-color: rgba(224,148,34,0.4); text-underline-offset: 2px; }
+.bbm-page a:hover { text-decoration-color: var(--amber); }
+
 .bbm-page {
     max-width: 880px;
     margin: 0 auto;
