@@ -1693,10 +1693,6 @@ input[type="range"]::-moz-range-track {
     background: rgba(192,57,43,0.18);
     color: #e88575;
 }
-.dr-pc-window.dr-mult-amber {
-    background: rgba(224,148,34,0.16);
-    color: #e0a85a;
-}
 .dr-pc-window.dr-mult-green {
     background: rgba(39,174,96,0.16);
     color: #5dc17e;
