@@ -1,0 +1,221 @@
+---
+layout: base.njk
+permalink: /bitcoin-backed-mortgages.html
+slug: bitcoin-backed-mortgages
+related:
+  - slug: borrowing-against-your-stack
+    desc: "The umbrella treatment of bitcoin-backed lending in all its forms — Tier-1 CeFi, multisig, DeFi, mortgages. This page extends the mortgage category specifically, where the structure differs enough from the other categories to deserve its own canvas."
+  - slug: bitcoin-vs-real-estate
+    desc: "The structural framing on bitcoin as the alternative store-of-value to real estate. The natural prerequisite for any reader asking whether to use the stack to enter the housing market at all."
+  - slug: the-power-law
+    desc: "The growth model that makes the long-duration pledge-instead-of-sale case work. If bitcoin's CAGR exceeds your mortgage rate over the duration, the pledged collateral compounds away the loan."
+  - slug: the-bitcoin-retirement
+    desc: "The framework where housing decisions sit inside a broader retirement plan. Mortgages that don't force liquidation extend the bitcoin retirement runway in ways traditional debt products cannot."
+companion: []
+eleventyComputed:
+  head_extras: "{% include '_pageassets/bitcoin-backed-mortgages-head.html' %}"
+  page_styles: "{% include '_pageassets/bitcoin-backed-mortgages.css' %}"
+---
+<section class="hero">
+    <h1><em>Bitcoin-Backed</em> Mortgages</h1>
+    <div class="hero-subtitle">Pledge, don&rsquo;t sell &mdash; what the Fannie-Mae-conforming product actually is, why it has no margin call, and when it makes sense for the bitcoin-rich.</div>
+    <p class="subtitle">For most of the last decade, the &ldquo;crypto-rich, cash-poor&rdquo; bitcoiner faced a binary at the housing transaction: sell BTC for the down payment and crystallize the gain, or stay out of the housing market entirely. The 2025&ndash;26 Fannie-Mae-conforming product co-built by Coinbase, Better Home &amp; Finance, and the GSE itself is the first regulated US offering to break that binary &mdash; and it&rsquo;s structurally different from the CeFi bitcoin-backed loans that defined the prior decade in ways that matter editorially.</p>
+</section>
+
+<main class="content-area">
+    {% include 'components/tool-framing.njk' %}
+
+    <article class="bbm-page">
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 1: The pledge instead of the sale                        -->
+        <!-- The opening framing. Why this product exists, what it solves.   -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-intro">
+                <h2>The pledge instead of the sale</h2>
+                <p>According to industry data cited by the issuing parties, roughly <strong>41% of American families with the income to qualify for a conforming mortgage can&rsquo;t close on one for lack of liquid cash for the down payment</strong> &mdash; even when their balance sheet includes substantial non-traditional wealth. For a bitcoin holder, the friction is sharper than it looks. The instinct &mdash; sell some BTC, cover the down payment, get the house &mdash; is the same instinct that the rest of this site exists to push back against. Selling forecloses the future of the coin sold.</p>
+            </div>
+
+            <p class="prose">The structural argument on <a href="/borrowing-against-your-stack.html"><em>Borrowing Against Your Stack</em></a> applies in full here: if you believe bitcoin&rsquo;s long-run trajectory continues to produce a compound annual growth rate meaningfully higher than your cost of debt, every coin sold today is a coin that compounds for someone else. <em>For the housing transaction specifically, that argument has been theoretically clean for years but practically blocked by the lack of a regulated product that lets a bitcoiner pledge the stack instead of selling it.</em> The Fannie-Mae-conforming offering closes that gap.</p>
+
+            <p class="prose">The category is currently bitcoin-only at the GSE level. Crypto-backed mortgages have existed for years through private offerings (Milo, the original Bitcoin-backed origination platform, was the most prominent), but the Coinbase / Better Home / Fannie Mae product is the first to bring bitcoin pledging inside the conforming-loan envelope &mdash; with all the institutional infrastructure that implies. <em>That regulators landed on bitcoin specifically, rather than &ldquo;crypto&rdquo; broadly, is itself a meaningful signal about where the regulated tier has come down on collateral quality.</em></p>
+        </div>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 2: Anatomy of the product                                -->
+        <!-- The mechanical description. Who plays what role.                -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="section">
+            <h3>Anatomy of the product</h3>
+            <p class="prose">The transaction is a <strong>two-loan structure</strong>, not a single bitcoin-backed mortgage. The primary mortgage is a standard 30-year conforming loan against the property &mdash; everything traditional about a mortgage applies to that piece. Riding alongside it is a <em>second-lien down-payment loan</em> collateralized by pledged bitcoin (or USDC) held with a regulated custodian. The pair operates together: the second-lien funds the down payment so the borrower doesn&rsquo;t have to sell BTC; the primary mortgage covers the rest in the conventional way.</p>
+
+            <div class="bbm-roles">
+                <div class="bbm-role">
+                    <div class="bbm-role-name">Fannie Mae</div>
+                    <p>Sets conforming standards. The GSE wrapper is what makes this product fundamentally different from the prior decade of CeFi BTC-backed lending &mdash; it brings federal oversight, securitization-grade underwriting, and the standard mortgage-servicing infrastructure to a product whose collateral is digital.</p>
+                </div>
+                <div class="bbm-role">
+                    <div class="bbm-role-name">Better Home &amp; Finance</div>
+                    <p>Originates and services the loan. The mortgage-industry counterparty providing the underwriting, payment processing, escrow, and servicing rails. Closing-day experience is mostly indistinguishable from a conventional mortgage from the borrower&rsquo;s side.</p>
+                </div>
+                <div class="bbm-role">
+                    <div class="bbm-role-name">Coinbase</div>
+                    <p>Holds the pledged collateral as the regulated custodian. The bitcoin (or USDC) sits in segregated accounts under the same custody framework that institutional holders use &mdash; not commingled, not rehypothecated, not lent out to third parties. PPSI-designated stablecoins under the GENIUS Act qualify; non-PPSI stablecoins don&rsquo;t.</p>
+                </div>
+            </div>
+
+            <p class="prose">The economics of the bitcoin-backed second-lien typically run <strong>0.5 to 1.5 percentage points</strong> above the standard 30-year mortgage rate. That spread is the cost of the regulated custody, the specialized monitoring, and the absence of rehypothecation revenue that subsidizes rates on CeFi BTC loans. It&rsquo;s a meaningful number to model against your alternatives &mdash; especially the alternative of selling for the down payment, where the &ldquo;cost&rdquo; is the forgone future appreciation of the BTC sold rather than a visible interest rate.</p>
+        </div>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 3: The structural difference — no margin call            -->
+        <!-- The single most important structural feature. Why CeFi BTC      -->
+        <!-- loans aren't the precedent reader expects.                       -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="section">
+            <h3>The structural difference: no margin call</h3>
+            <p class="prose"><em>This is the feature that separates the Fannie-Mae-conforming product from every CeFi bitcoin-backed loan that came before it.</em> Traditional CeFi BTC lending uses an LTV trigger &mdash; a market-driven liquidation threshold that forces sale of collateral the moment bitcoin&rsquo;s price puts the LTV above some pre-set band (typically 75&ndash;90%). In a meaningful drawdown, a healthy borrower paying interest on time can still have their position closed by the market.</p>
+
+            <p class="prose">The mortgage product structurally eliminates this. <strong>Market movements alone do not trigger liquidation of the pledged collateral.</strong> Risk management is aligned with the standard real-estate delinquency timeline, not the crypto-LTV one. The sequence is identical to any conforming mortgage:</p>
+
+            <div class="bbm-sequence">
+                <div class="bbm-step">
+                    <div class="bbm-step-rank">1</div>
+                    <div class="bbm-step-body">
+                        <div class="bbm-step-title">Missed payment</div>
+                        <p>You miss a scheduled monthly mortgage payment. Nothing happens to the pledged collateral.</p>
+                    </div>
+                </div>
+                <div class="bbm-step">
+                    <div class="bbm-step-rank">2</div>
+                    <div class="bbm-step-body">
+                        <div class="bbm-step-title">Notification &amp; grace period</div>
+                        <p>The servicer reaches out for standard late-payment resolution &mdash; exactly as on any conforming loan. Bitcoin price during this window is irrelevant.</p>
+                    </div>
+                </div>
+                <div class="bbm-step">
+                    <div class="bbm-step-rank">3</div>
+                    <div class="bbm-step-body">
+                        <div class="bbm-step-title">Delinquency (Days 1&ndash;59)</div>
+                        <p>The loan is marked delinquent. <em>The pledged collateral remains untouched regardless of bitcoin&rsquo;s price movements.</em> A 50% drawdown during this window changes nothing about your collateral.</p>
+                    </div>
+                </div>
+                <div class="bbm-step bbm-step-action">
+                    <div class="bbm-step-rank">4</div>
+                    <div class="bbm-step-body">
+                        <div class="bbm-step-title">Actionable default (Day 60+)</div>
+                        <p>Only after the borrower is at least 60 days delinquent &mdash; the same threshold that initiates the foreclosure process on any conforming mortgage &mdash; does the collateral become subject to liquidation to cover the debt.</p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="prose">The implication is large for any bitcoiner who has internalized the <em>Loan Health</em> framework on the <a href="/borrowing-against-your-stack.html#loan-health">borrowing page</a>: the liquidation-price math that dominates the CeFi case largely doesn&rsquo;t apply here. <strong>Your liquidation risk is now driven by your ability to make monthly mortgage payments, not by bitcoin&rsquo;s drawdown profile.</strong> The Power Law channel still matters &mdash; but as the long-duration thesis behind why the pledge is worth making, not as the timing dial for liquidation survival.</p>
+
+            <div class="narrative" style="margin-top:1.5rem;margin-bottom:2rem;padding:1.75rem 2.25rem;border-left-width:3px">
+                <p style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;line-height:1.6;color:var(--text);font-style:italic">The structural failure mode of the prior decade of bitcoin-backed lending &mdash; force-liquidation of healthy borrowers by routine market volatility &mdash; is absent here by design. That doesn&rsquo;t make this product universally appropriate. It does make it categorically different from the CeFi loans that defined the prior history.</p>
+            </div>
+        </div>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 4: The three pledge advantages                           -->
+        <!-- The fiscal/operational benefits of pledging vs selling.         -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="section">
+            <h3>Three advantages of pledging instead of selling</h3>
+            <p class="prose">The fiscal mechanics behind why a bitcoiner would prefer this product to selling for a down payment break down into three distinct benefits.</p>
+
+            <div class="bbm-advantages">
+                <div class="bbm-advantage">
+                    <div class="bbm-advantage-num">01</div>
+                    <div class="bbm-advantage-title">Portfolio integrity</div>
+                    <p>The position is preserved. Selling 1 BTC at today&rsquo;s price to fund a down payment trades that 1 BTC&rsquo;s entire future trajectory &mdash; including the long-duration Power Law trend &mdash; for the immediate fiat amount. Pledging it instead keeps that coin in your stack, compounding for you, while still funding the down payment.</p>
+                </div>
+                <div class="bbm-advantage">
+                    <div class="bbm-advantage-num">02</div>
+                    <div class="bbm-advantage-title">Tax deferral</div>
+                    <p>Selling triggers a capital-gains event &mdash; up to 20% federal LTCG plus any state tax. Pledging is a loan against the asset, not a disposition, and so the tax liability stays attached to the asset at its original basis. The gain only realizes if and when you actually sell. <em>Important caveat in the regulatory note below: the &sect;1259 constructive sale doctrine limits this, and the mortgage product is specifically structured to avoid triggering it.</em></p>
+                </div>
+                <div class="bbm-advantage">
+                    <div class="bbm-advantage-num">03</div>
+                    <div class="bbm-advantage-title">Yield offsetting</div>
+                    <p>If the collateral pledged is a PPSI-designated stablecoin (USDC under the GENIUS Act) rather than bare bitcoin, the holder can in many configurations continue to earn yield on the pledged balance &mdash; partially offsetting the mortgage interest. The economics there depend on platform-specific terms; the structural availability is the point.</p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 5: The compliance reality                                -->
+        <!-- The tax tracing rules, the deduction limits.                    -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="section">
+            <h3>The compliance reality</h3>
+            <p class="prose">Three regulatory features the borrower has to navigate concretely:</p>
+
+            <p class="prose"><strong>The &sect;1259 design.</strong> Section 1259 of the IRS code &mdash; the &ldquo;constructive sale&rdquo; doctrine that the 2026 PARITY Act explicitly extended to digital assets &mdash; deems an asset sold for tax purposes if its owner enters offsetting positions that substantially eliminate price risk and gain. The Coinbase / Better Home / Fannie Mae structure is <em>specifically</em> designed to avoid triggering this: no mandatory price-based hedges, no market-driven liquidations, no margin call. The borrower retains full price exposure on the pledged collateral, which is precisely what keeps the pledge a loan rather than a deemed sale. <em>This is editorial intent on the part of the product&rsquo;s designers, not coincidence.</em></p>
+
+            <p class="prose"><strong>Loan tracing for interest deductibility.</strong> IRS rules require that proceeds of a loan be traced to their use to determine whether the interest is deductible. Mortgage interest on the primary mortgage is deductible under the standard home-acquisition rules (subject to the 2026 cap on itemized deductions at 35% for top earners). The second-lien down-payment loan also generally qualifies as acquisition debt if the proceeds are documented as funding the down payment specifically. <em>The documentation burden falls on the borrower &mdash; maintain separate accounts, signed loan agreements, and quarterly custodian statements so the audit trail is clean if the IRS ever asks.</em></p>
+
+            <p class="prose"><strong>The standard-deduction trade-off.</strong> The 2026 standard deduction is $16,100 single / $32,200 joint. For many borrowers, itemizing for the mortgage interest deduction only beats the standard deduction in the first several years of the loan, when interest is largest relative to principal. The deduction is real but smaller than the marketing on these products sometimes implies &mdash; <em>model it explicitly against your bracket and likely loan size before counting on it.</em></p>
+
+            <div class="bbm-checklist">
+                <div class="bbm-checklist-label">Compliance checklist</div>
+                <ul>
+                    <li>Dedicated bank account for the second-lien proceeds and the down payment disbursement &mdash; makes IRS tracing trivial</li>
+                    <li>Signed copies of <em>both</em> loan agreements (primary mortgage and second-lien) retained for the life of the loans</li>
+                    <li>Quarterly custodian statements from Coinbase confirming the status and amount of pledged collateral</li>
+                    <li>Form 1098 (or equivalent) interest summaries from the servicer at year-end for each loan</li>
+                    <li>Annual reconciliation between the pledged collateral statement and the LTV ratio implied by the loan balance and market value</li>
+                </ul>
+            </div>
+        </div>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 6: When this makes sense — and when it doesn't           -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="section">
+            <h3>When this makes sense &mdash; and when it doesn&rsquo;t</h3>
+
+            <p class="prose"><em>This page isn&rsquo;t recommending bitcoin-backed mortgages.</em> Like the parent <a href="/borrowing-against-your-stack.html">Borrowing Against Your Stack</a> page, the editorial mission is structural literacy: walk the reader through what the product is, how it&rsquo;s different from its CeFi predecessors, what risks remain, and what the trade-off actually is &mdash; so the decision is evaluable rather than reflexive.</p>
+
+            <p class="prose">The trade clears the bar when several conditions are met together:</p>
+
+            <ul class="bbm-checklist-good">
+                <li>You&rsquo;re buying a <em>primary residence</em>, not a speculative investment property. The product&rsquo;s economics are designed around long-duration owner-occupancy.</li>
+                <li>You have the income to service the monthly mortgage payments from your day-job cash flow. The &ldquo;no margin call&rdquo; feature only protects you against price volatility; it doesn&rsquo;t protect you against income loss.</li>
+                <li>Your bitcoin stack is large enough that the pledged collateral represents a modest fraction of the total &mdash; ideally well below 50% &mdash; so a Day-60 default scenario doesn&rsquo;t risk forcing liquidation of the bulk of your position.</li>
+                <li>You&rsquo;d rather not crystallize the capital-gains liability on the pledged BTC at this stage of your life. The tax deferral compounds across decades for younger holders especially.</li>
+                <li>You believe bitcoin&rsquo;s long-run trajectory continues to produce a compound annual growth rate meaningfully higher than the mortgage rate over the duration of the loan. <em>This is the Power Law channel argument; it has to be true for the pledge to be the better path.</em></li>
+            </ul>
+
+            <p class="prose">The trade fails the bar when:</p>
+
+            <ul class="bbm-checklist-bad">
+                <li>The use case is anything other than primary-residence purchase &mdash; investment property, second home for speculative purposes, vacation home as a discretionary asset</li>
+                <li>The mortgage payments stretch your monthly cash flow such that any income disruption puts the entire structure at risk</li>
+                <li>You don&rsquo;t actually believe in the long-duration bitcoin appreciation case &mdash; in which case selling some BTC for the down payment is genuinely the cheaper path, since you&rsquo;re not giving up appreciation you don&rsquo;t expect to see</li>
+                <li>You&rsquo;d be relying on the mortgage-interest tax deduction to make the economics work &mdash; the deduction is smaller than marketed and the standard-deduction comparison usually narrows it materially</li>
+            </ul>
+        </div>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 7: Connection back to the broader argument               -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="section">
+            <h3>How this fits inside the broader argument</h3>
+
+            <p class="prose">The bitcoin-backed mortgage is one specific use case inside the broader question the <a href="/borrowing-against-your-stack.html">Borrowing Against Your Stack</a> page exists to answer. It happens to be the one where the structural argument lands cleanest, because the product itself was designed around the structural objection &mdash; CeFi&rsquo;s force-liquidation failure mode &mdash; that defined the previous decade of bitcoin-backed lending.</p>
+
+            <p class="prose">The full hierarchy of bitcoin-backed lending categories sits on that broader page. Mortgages sit on the &ldquo;serious consideration&rdquo; tier alongside collaborative-custody multisig and Tier-1 non-rehypothecating CeFi &mdash; with the distinguishing feature that this is the only category in which a 30-year duration, a 60-day-not-60-minutes liquidation buffer, and federal GSE oversight all apply simultaneously. <em>For the specific use case of funding a primary-residence purchase against an appreciated bitcoin stack, those features are difficult to beat.</em></p>
+
+            <p class="prose">As with the rest of the site, the right reading isn&rsquo;t &ldquo;this is the answer.&rdquo; The right reading is: <em>here&rsquo;s the structural detail you need to evaluate whether it&rsquo;s the answer for your specific situation</em>. If the structural fit lines up, this is the cleanest version of the trade currently available in the US regulated tier. If it doesn&rsquo;t, the page has done its job by helping you walk away on reflection rather than sleepwalking in.</p>
+        </div>
+
+    </article>
+</main>
