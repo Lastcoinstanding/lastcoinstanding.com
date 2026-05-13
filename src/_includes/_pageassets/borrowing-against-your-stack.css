@@ -1092,6 +1092,37 @@
 /* Right-anchored variant for help-tips near the right edge of a row */
 .help-tip.help-tip-right .tip-content { left: auto; right: 0; }
 
+/* Regulatory-caution variant of the help-tip — subtle visual distinction
+   so readers can pattern-match these as "tax / regulatory cautions"
+   rather than generic "more info" tooltips. Used inline at three
+   editorially relevant points in The Question (S1259 constructive sale,
+   interest-deductibility loan tracing, and state licensing). Standard
+   minimum-disruption pattern: same circle dimensions and hover behavior
+   as the base help-tip, but the resting state picks up a soft amber
+   border (vs the muted grey on the base tip), and the glyph inside is
+   § rather than ?, which is rare enough in editorial copy to register
+   without being noisy. */
+.help-tip-reg {
+    color: rgba(224,148,34,0.55);
+    border-color: rgba(224,148,34,0.4);
+}
+.help-tip-reg:hover, .help-tip-reg:focus {
+    color: var(--amber);
+    border-color: var(--amber);
+}
+.help-tip-reg .tip-content {
+    border-color: rgba(224,148,34,0.4);
+}
+.help-tip-reg .tip-content .reg-note-label {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.5rem;
+}
+
 /* Preset-button variant: the help-tip sits *next to* the preset button
    inside a flex wrapper, so the tooltip should open beneath the button. */
 .bas-calc-preset-wrap {
