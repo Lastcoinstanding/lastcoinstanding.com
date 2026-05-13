@@ -1399,12 +1399,13 @@
 .bas-calc-bvs-comparison {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.2rem;
+    gap: 1rem;
     margin-bottom: 1.2rem;
 }
 /* Three-column variant — used when the HODL baseline card is present */
 .bas-calc-bvs-comparison.bas-calc-bvs-comparison-3col {
     grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.8rem;
 }
 @media (max-width: 900px) {
     .bas-calc-bvs-comparison.bas-calc-bvs-comparison-3col {
@@ -1419,7 +1420,7 @@
     }
 }
 .bas-calc-bvs-path {
-    padding: 1.4rem 1.5rem;
+    padding: 1.15rem 1.2rem;
     background: rgba(255,255,255,0.018);
     border: 1px solid var(--border);
     border-radius: 6px;
@@ -1528,6 +1529,43 @@
 .bas-calc-bvs-verdict-sell-wins   p strong { color: var(--amber); }
 .bas-calc-bvs-verdict-error       { border-left-color: #c0392b; background: rgba(192,57,43,0.04); }
 .bas-calc-bvs-verdict-error       p strong { color: #e87f6f; }
+
+/* ───────────────────────────────────────────────
+   Risk-disclosure caveat (below the verdict)
+   The BvS math measures terminal-wealth only; the
+   caveat block points readers to the surfaces that
+   cover the two structural risks not modelled here
+   (liquidation; counterparty failure). Visually
+   subordinate to the verdict — neutral border,
+   muted text, italic.
+   ─────────────────────────────────────────────── */
+.bas-calc-bvs-caveat {
+    margin-top: 1rem;
+    padding: 0.9rem 1.2rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    font-style: italic;
+    border-left: 2px solid rgba(154,144,128,0.35);
+    background: rgba(255,255,255,0.015);
+    border-radius: 0 3px 3px 0;
+}
+.bas-calc-bvs-caveat strong {
+    color: var(--text);
+    font-weight: 600;
+    font-style: normal;
+}
+.bas-calc-bvs-caveat a {
+    color: var(--amber-dim);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(224,148,34,0.3);
+    transition: color 0.2s, border-color 0.2s;
+}
+.bas-calc-bvs-caveat a:hover {
+    color: var(--amber);
+    border-color: var(--amber);
+}
 
 /* ───────────────────────────────────────────────
    20. BVS RATE PRESETS — separate selector so the LH
