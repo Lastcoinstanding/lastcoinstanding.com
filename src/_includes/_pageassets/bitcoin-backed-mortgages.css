@@ -1,0 +1,289 @@
+/* ═══════════════════════════════════════════════════════════════
+   BITCOIN-BACKED MORTGAGES — page-specific styles
+
+   This file contains styles specific to the Bitcoin-Backed Mortgages
+   page. Global typography, colors, .section, .section-intro, .prose,
+   .narrative come from the base stylesheet. The components here are:
+
+     .bbm-page             — outer article wrapper (max-width container)
+     .bbm-roles            — 3-column role-card grid (Fannie / Better / Coinbase)
+     .bbm-role             — individual role card
+     .bbm-sequence         — vertical numbered list (delinquency steps 1–4)
+     .bbm-step             — single numbered step
+     .bbm-step-action      — the "Day 60+ default" step gets a red accent
+     .bbm-advantages       — 3-column grid for the three pledge advantages
+     .bbm-advantage        — individual advantage card with large numeric label
+     .bbm-checklist        — amber-bordered compliance-list block
+     .bbm-checklist-good   — green-tinted "trade clears the bar" list
+     .bbm-checklist-bad    — red-tinted "trade fails the bar" list
+   ═══════════════════════════════════════════════════════════════ */
+
+.bbm-page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 0 4rem;
+}
+
+
+/* ───────────────────────────────────────────────
+   Roles grid — Fannie / Better / Coinbase
+   3 columns on desktop, 1 column below 720px.
+   ─────────────────────────────────────────────── */
+.bbm-roles {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0 1.8rem;
+}
+@media (max-width: 720px) {
+    .bbm-roles { grid-template-columns: 1fr; gap: 0.85rem; }
+}
+.bbm-role {
+    padding: 1.2rem 1.4rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(224,148,34,0.18);
+    border-left: 2px solid var(--amber);
+    border-radius: 0 4px 4px 0;
+    display: flex;
+    flex-direction: column;
+}
+.bbm-role-name {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.7rem;
+}
+.bbm-role p {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text);
+    margin: 0;
+}
+
+
+/* ───────────────────────────────────────────────
+   Sequence — the 4-step delinquency timeline
+   Vertical list of numbered steps; the final step
+   (Day 60+ default) gets a red accent to mark it
+   as the actionable threshold.
+   ─────────────────────────────────────────────── */
+.bbm-sequence {
+    margin: 1.5rem 0 1.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+.bbm-step {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 1.1rem;
+    align-items: start;
+    padding: 1rem 1.2rem 1.05rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-left: 2px solid rgba(154,144,128,0.45);
+    border-radius: 0 4px 4px 0;
+}
+.bbm-step-rank {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--text-muted);
+    border-radius: 50%;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: var(--text-dim);
+}
+.bbm-step-body { min-width: 0; }
+.bbm-step-title {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+}
+.bbm-step-body p {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin: 0;
+}
+/* Step 4 — actionable default — picks up a soft red accent because it's
+   the threshold at which collateral becomes at risk. Editorially the
+   "this is where it matters" moment in the sequence. */
+.bbm-step-action {
+    border-left-color: rgba(192,57,43,0.55);
+    background: rgba(192,57,43,0.025);
+}
+.bbm-step-action .bbm-step-rank {
+    border-color: rgba(192,57,43,0.55);
+    color: #e88575;
+}
+.bbm-step-action .bbm-step-title { color: #e88575; }
+
+
+/* ───────────────────────────────────────────────
+   Advantages — the 3 cards (portfolio integrity,
+   tax deferral, yield offsetting). Large display
+   numerals (01 / 02 / 03) as the visual anchor.
+   ─────────────────────────────────────────────── */
+.bbm-advantages {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+@media (max-width: 820px) {
+    .bbm-advantages { grid-template-columns: 1fr; gap: 0.85rem; }
+}
+.bbm-advantage {
+    padding: 1.4rem 1.5rem 1.5rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(39,174,96,0.22);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+}
+.bbm-advantage-num {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--green);
+    line-height: 1;
+    margin-bottom: 0.6rem;
+    opacity: 0.65;
+    letter-spacing: -0.01em;
+}
+.bbm-advantage-title {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.55rem;
+    letter-spacing: 0.005em;
+}
+.bbm-advantage p {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.86rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin: 0;
+}
+.bbm-advantage p em { color: var(--text); font-style: italic; }
+
+
+/* ───────────────────────────────────────────────
+   Compliance checklist — amber-bordered block
+   listing the five docs to maintain for IRS audit
+   defense. Visually anchored to the prose above.
+   ─────────────────────────────────────────────── */
+.bbm-checklist {
+    margin: 1.5rem 0 0;
+    padding: 1.3rem 1.6rem 1.4rem;
+    background: rgba(224,148,34,0.04);
+    border-left: 2px solid var(--amber);
+    border-radius: 0 4px 4px 0;
+}
+.bbm-checklist-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.85rem;
+}
+.bbm-checklist ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.bbm-checklist li {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--text);
+    padding: 0.45rem 0 0.45rem 1.3rem;
+    border-bottom: 1px solid rgba(224,148,34,0.08);
+    position: relative;
+}
+.bbm-checklist li:last-child { border-bottom: none; }
+.bbm-checklist li::before {
+    content: "›";
+    position: absolute;
+    left: 0;
+    top: 0.45rem;
+    color: var(--amber);
+    font-weight: 600;
+}
+.bbm-checklist li em { color: var(--amber-dim); font-style: italic; }
+
+
+/* ───────────────────────────────────────────────
+   Trade-clears-the-bar / trade-fails-the-bar lists
+   Green-tinted "good" list; red-tinted "bad" list.
+   Same visual structure, paired colors.
+   ─────────────────────────────────────────────── */
+.bbm-checklist-good,
+.bbm-checklist-bad {
+    margin: 1rem 0 1.5rem;
+    padding: 0.5rem 0 0.5rem 0;
+    list-style: none;
+}
+.bbm-checklist-good li,
+.bbm-checklist-bad li {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--text);
+    padding: 0.6rem 0 0.6rem 1.4rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    position: relative;
+}
+.bbm-checklist-good li:last-child,
+.bbm-checklist-bad li:last-child { border-bottom: none; }
+.bbm-checklist-good li em,
+.bbm-checklist-bad li em { color: var(--amber-dim); font-style: italic; }
+
+.bbm-checklist-good li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 0.6rem;
+    color: var(--green);
+    font-weight: 600;
+}
+.bbm-checklist-bad li::before {
+    content: "✗";
+    position: absolute;
+    left: 0;
+    top: 0.6rem;
+    color: #e88575;
+    font-weight: 600;
+}
+
+
+/* ───────────────────────────────────────────────
+   Section heading rhythm — match the borrowing page
+   pattern of h3 leading each subsection, more space
+   above than below.
+   ─────────────────────────────────────────────── */
+.bbm-page .section { margin-bottom: 3rem; }
+.bbm-page .section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.7rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 1rem;
+    letter-spacing: -0.005em;
+}
