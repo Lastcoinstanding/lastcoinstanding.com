@@ -64,20 +64,29 @@
   }
 
   // ─── Element refs ───
+  // All inputs are now sliders (slider-cluster pattern per STYLE_GUIDE
+  // §6.16). Each slider has a sibling .slider-val span that shows its
+  // formatted current value (populated by updateSliderVals() below).
   var homePriceInput   = document.getElementById('bbmHomePrice');
   var downPctSlider    = document.getElementById('bbmDownPct');
-  var downPctDisplay   = document.getElementById('bbmDownPctDisplay');
   var stackInput       = document.getElementById('bbmBtcStack');
   var priceInput       = document.getElementById('bbmBtcPrice');
   var costBasisInput   = document.getElementById('bbmCostBasis');
   var mortRateSlider   = document.getElementById('bbmMortRate');
-  var mortRateDisplay  = document.getElementById('bbmMortRateDisplay');
   var premiumSlider    = document.getElementById('bbmPremium');
-  var premiumDisplay   = document.getElementById('bbmPremiumDisplay');
   var horizonSlider    = document.getElementById('bbmHorizon');
-  var horizonDisplay   = document.getElementById('bbmHorizonDisplay');
   var capGainsSlider   = document.getElementById('bbmCapGains');
-  var capGainsDisplay  = document.getElementById('bbmCapGainsDisplay');
+
+  // Slider-val displays — formatted current-value spans next to each slider
+  var homePriceVal     = document.getElementById('bbmHomePriceVal');
+  var downPctVal       = document.getElementById('bbmDownPctVal');
+  var stackVal         = document.getElementById('bbmBtcStackVal');
+  var priceVal         = document.getElementById('bbmBtcPriceVal');
+  var costBasisVal     = document.getElementById('bbmCostBasisVal');
+  var mortRateVal      = document.getElementById('bbmMortRateVal');
+  var premiumVal       = document.getElementById('bbmPremiumVal');
+  var horizonVal       = document.getElementById('bbmHorizonVal');
+  var capGainsVal      = document.getElementById('bbmCapGainsVal');
 
   var pledgeHeadline   = document.getElementById('bbmPledgeHeadline');
   var pledgeRows       = document.getElementById('bbmPledgeRows');
@@ -88,14 +97,12 @@
 
   if(!homePriceInput || !chartCanvas) return;
 
-  // ─── Auto-populate price + cost basis from latest PL sample if empty ───
-  if(!priceInput.value || priceInput.value === '0'){
-    var latest = PL_DATA[PL_DATA.length - 1];
-    priceInput.value = Math.round(latest[1] / 100) * 100;
-  }
-  if(!costBasisInput.value || costBasisInput.value === '0'){
-    costBasisInput.value = priceInput.value;
-  }
+  // ─── Auto-populate price + cost basis from latest PL sample on first load ───
+  // localStorage values from BAY (if present) override the PL sample.
+  var latest = PL_DATA[PL_DATA.length - 1];
+  var latestPrice = Math.round(latest[1] / 1000) * 1000;
+  priceInput.value = latestPrice;
+  costBasisInput.value = latestPrice;
 
   // ─── Hydrate shared state from localStorage (set by the BAY page) ───
   var SHARED = [
@@ -126,12 +133,16 @@
     var horizon      = parseInt(horizonSlider.value, 10)  || 1;
     var taxRate      = parseFloat(capGainsSlider.value)   / 100;
 
-    // Update display labels
-    downPctDisplay.textContent  = downPctSlider.value;
-    mortRateDisplay.textContent = parseFloat(mortRateSlider.value).toFixed(1);
-    premiumDisplay.textContent  = parseFloat(premiumSlider.value).toFixed(2);
-    horizonDisplay.textContent  = horizon;
-    capGainsDisplay.textContent = capGainsSlider.value;
+    // ─── Update slider-val displays (formatted current values) ───
+    homePriceVal.textContent = fmtUsd(homePrice);
+    downPctVal.textContent   = downPctSlider.value + '%';
+    stackVal.textContent     = (stack === Math.floor(stack) ? stack.toFixed(0) : stack.toFixed(1)) + ' BTC';
+    priceVal.textContent     = fmtUsd(price);
+    costBasisVal.textContent = fmtUsd(costBasis);
+    mortRateVal.textContent  = parseFloat(mortRateSlider.value).toFixed(2) + '%';
+    premiumVal.textContent   = '+' + parseFloat(premiumSlider.value).toFixed(2) + 'pp';
+    horizonVal.textContent   = horizon + ' years';
+    capGainsVal.textContent  = capGainsSlider.value + '%';
 
     // Persist shared inputs to localStorage so BAY picks them up too
     try {
@@ -284,8 +295,9 @@
   }
 
   function row(label, value, terminal){
-    return '<div class="bbm-calc-row"><span class="bbm-calc-row-label">' + label + '</span>' +
-      '<span class="bbm-calc-row-value' + (terminal ? ' bbm-calc-row-value-terminal' : '') + '">' + value + '</span></div>';
+    return '<div class="row' + (terminal ? ' row-terminal' : '') + '">' +
+      '<span class="row-label">' + label + '</span>' +
+      '<span class="row-val">' + value + '</span></div>';
   }
 
   function renderChart(years, pledgeSeries, sellSeries, crossoverYear, sellFeasible, pledgeFeasible){
