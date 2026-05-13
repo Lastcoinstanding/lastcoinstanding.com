@@ -746,20 +746,30 @@
       var borrowCheaper = r.borrow.costVsHodl < r.sell.costVsHodl;
       var cheaperLabel  = borrowCheaper ? 'borrowing' : 'selling';
       var costlierLabel = borrowCheaper ? 'selling'   : 'borrowing';
+      // Color classes for the cheaper/costlier active paths, used in the
+      // "if the spending is real" line so the recommended path's color
+      // matches its card and the matching number/word in the same color.
+      var cheaperCls    = borrowCheaper ? 'verdict-borrow' : 'verdict-sell';
+      var costlierCls   = borrowCheaper ? 'verdict-sell'   : 'verdict-borrow';
       var cheaperCost   = borrowCheaper ? r.borrow.costVsHodl : r.sell.costVsHodl;
       var costlierCost  = borrowCheaper ? r.sell.costVsHodl   : r.borrow.costVsHodl;
       var savings       = costlierCost - cheaperCost;
       verdictCls = borrowCheaper ? 'bas-calc-bvs-verdict-borrow-wins' : 'bas-calc-bvs-verdict-sell-wins';
       verdictHtml =
-        '<p>At year <strong>' + horizonYears + '</strong>, <strong>HODL</strong> preserves the most wealth: ' +
-        '<strong>' + fmtUsd(r.hodl.terminalWealth) + '</strong>. Any active path costs you wealth in exchange for the ' +
+        '<p>At year <strong>' + horizonYears + '</strong>, ' +
+        '<strong class="verdict-hodl">HODL</strong> preserves the most wealth: ' +
+        '<strong class="verdict-hodl">' + fmtUsd(r.hodl.terminalWealth) + '</strong>. ' +
+        'Any active path costs you wealth in exchange for the ' +
         fmtUsd(r.loan) + ' in spending power today &mdash; ' +
-        'borrowing costs <strong>' + fmtUsd(r.borrow.costVsHodl) + '</strong>; ' +
-        'selling costs <strong>' + fmtUsd(r.sell.costVsHodl) + '</strong>.' +
+        'borrowing costs <strong class="verdict-borrow">' + fmtUsd(r.borrow.costVsHodl) + '</strong>; ' +
+        'selling costs <strong class="verdict-sell">' + fmtUsd(r.sell.costVsHodl) + '</strong>.' +
         '</p><p style="margin-top:0.6rem;">' +
-        '<em>If the spending is real: ' + cheaperLabel + ' is <strong>' + fmtUsd(savings) + ' cheaper</strong> than ' +
-        costlierLabel + '. If the spending can wait, HODL preserves the ' + fmtUsd(cheaperCost) +
-        ' the cheapest active path would otherwise cost &mdash; the true opportunity cost of the decision itself.</em>' +
+        '<em>If the spending is real: <span class="verdict-' + (borrowCheaper ? 'borrow' : 'sell') + '">' + cheaperLabel + '</span> is ' +
+        '<strong class="' + cheaperCls + '">' + fmtUsd(savings) + ' cheaper</strong> than ' +
+        '<span class="' + costlierCls + '">' + costlierLabel + '</span>. ' +
+        'If the spending can wait, <span class="verdict-hodl">HODL</span> preserves the ' +
+        '<strong class="verdict-hodl">' + fmtUsd(cheaperCost) + '</strong> ' +
+        'the cheapest active path would otherwise cost &mdash; the true opportunity cost of the decision itself.</em>' +
         '</p>';
     }
     bvsVerdict.className = 'bas-calc-bvs-verdict ' + verdictCls;
