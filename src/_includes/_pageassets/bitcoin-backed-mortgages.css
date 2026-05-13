@@ -292,18 +292,16 @@
 
    Mirrors the .bas-calc pattern from the borrowing page for visual
    consistency — inputs grid + 2-card comparison + verdict + chart.
-   Prefix .bbm-calc-* keeps the styles scoped to this page.
+   Prefix .bbm-calc-* keeps page-specific styles scoped.
 
    Components:
      .bbm-calc                 — outer wrapper
-     .bbm-calc-inputs          — inputs grid (3 cols desktop, 1 col mobile)
-     .bbm-calc-field           — single input field (label + control)
-     .bbm-calc-comparison      — 2-card comparison (Pledge / Sell)
-     .bbm-calc-path            — single path card
-     .bbm-calc-path-pledge     — pledge variant (amber accent — like HODL/baseline on BvS)
-     .bbm-calc-path-sell       — sell variant (slate-blue accent — like Sell on BvS)
      .bbm-calc-verdict         — verdict line summarising the crossover
      .bbm-calc-chart-wrap      — Chart.js host + label + caption
+
+   Inputs and outcomes use the canonical .slider-cluster (§6.16)
+   and .calc-result-card (§6.17) patterns defined at the top of
+   this file.
    ═══════════════════════════════════════════════════════════════ */
 
 .bbm-calc {
