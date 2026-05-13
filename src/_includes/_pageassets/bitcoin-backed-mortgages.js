@@ -157,6 +157,13 @@
       return;
     }
 
+    // ─── 250% collateralization requirement ───
+    // The product requires $2.50 of pledged BTC per $1.00 of down-payment credit
+    // (40% LTV on pledged assets). The full stack value must cover this.
+    var requiredCollateral = downPayment * 2.5;
+    var stackValueNow = stack * price;
+    var pledgeFeasible = stackValueNow >= requiredCollateral;
+
     // ─── Sell-path mechanics ───
     var gainPerBtc    = Math.max(0, price - costBasis);
     var taxPerBtc     = gainPerBtc * taxRate;
@@ -211,14 +218,24 @@
     }
 
     // ─── Render Pledge card ───
-    pledgeHeadline.textContent = fmtBtc(pledgeStack);
-    pledgeRows.innerHTML =
-      row('Down payment funded',                                              fmtUsd(downPayment)) +
-      row('BTC sold to fund',                                                  '0 (pledged instead)') +
-      row('Cap gains tax paid now',                                            '$0') +
-      row('Cumulative interest premium @ year ' + horizon,                     fmtUsd(cumulativePremiumInterest)) +
-      row('BTC value at year ' + horizon + ' (PL trend)',                      fmtUsd(pledgeStack * futurePrice)) +
-      row('Net wealth at year ' + horizon,                                     fmtUsd(pledgeTerminalWealth), true);
+    if(pledgeFeasible){
+      pledgeHeadline.textContent = fmtBtc(pledgeStack);
+      pledgeRows.innerHTML =
+        row('Down payment funded',                                              fmtUsd(downPayment)) +
+        row('Required collateral (250%)',                                       fmtUsd(requiredCollateral) + ' &middot; ' + fmtBtc(requiredCollateral / price)) +
+        row('BTC sold to fund',                                                  '0 (pledged instead)') +
+        row('Cap gains tax paid now',                                            '$0') +
+        row('Cumulative interest premium @ year ' + horizon,                     fmtUsd(cumulativePremiumInterest)) +
+        row('BTC value at year ' + horizon + ' (PL trend)',                      fmtUsd(pledgeStack * futurePrice)) +
+        row('Net wealth at year ' + horizon,                                     fmtUsd(pledgeTerminalWealth), true);
+    } else {
+      pledgeHeadline.textContent = 'N/A';
+      var shortfall = requiredCollateral - stackValueNow;
+      pledgeRows.innerHTML =
+        row('Required collateral (250%)',                                       fmtUsd(requiredCollateral)) +
+        row('Your stack value now',                                              fmtUsd(stackValueNow)) +
+        row('Shortfall',                                                         fmtUsd(shortfall));
+    }
 
     // ─── Render Sell card ───
     if(sellFeasible){
@@ -238,8 +255,12 @@
     // ─── Verdict ───
     var verdictCls = 'bbm-calc-verdict';
     var verdictHtml;
-    if(!sellFeasible){
-      verdictHtml = '<p><strong>The sell path isn\u2019t feasible.</strong> At your current price and cost basis, netting the ' + fmtUsd(downPayment) + ' down payment after tax would require selling ' + fmtBtc(btcSold) + ' \u2014 more than your stack. The pledge path remains the only option (or buy a less expensive home).</p>';
+    if(!pledgeFeasible && !sellFeasible){
+      verdictHtml = '<p><strong>Neither path is feasible with this configuration.</strong> The pledge path requires ' + fmtUsd(requiredCollateral) + ' in collateral (250% of the down payment) but your stack is worth only ' + fmtUsd(stackValueNow) + ' at the current price. The sell path requires ' + fmtBtc(btcSold) + ' to net the down payment after tax but you have only ' + fmtBtc(stack) + '. Consider a smaller home, a larger down-payment percentage that brings the figure within reach, or growing the stack first.</p>';
+    } else if(!pledgeFeasible){
+      verdictHtml = '<p><strong>The pledge path isn\u2019t feasible.</strong> The product requires <strong>' + fmtUsd(requiredCollateral) + '</strong> in pledged bitcoin (250% of the down payment) but your stack is worth <strong>' + fmtUsd(stackValueNow) + '</strong> at the current price &mdash; a shortfall of ' + fmtUsd(requiredCollateral - stackValueNow) + '. The sell path remains available, or you could revisit when bitcoin&rsquo;s price brings the collateral within reach.</p>';
+    } else if(!sellFeasible){
+      verdictHtml = '<p><strong>The sell path isn\u2019t feasible.</strong> At your current price and cost basis, netting the ' + fmtUsd(downPayment) + ' down payment after tax would require selling ' + fmtBtc(btcSold) + ' &mdash; more than your stack. The pledge path remains the only option (or buy a less expensive home).</p>';
     } else {
       var pledgeWins = pledgeTerminalWealth > sellTerminalWealth;
       var winnerLabel = pledgeWins ? 'Pledge' : 'Sell';
@@ -265,7 +286,7 @@
     verdict.innerHTML = verdictHtml;
 
     // ─── Render the chart ───
-    renderChart(years, pledgeSeries, sellSeries, crossoverYear, sellFeasible);
+    renderChart(years, pledgeSeries, sellSeries, crossoverYear, sellFeasible, pledgeFeasible);
   }
 
   function row(label, value, terminal){
@@ -273,11 +294,12 @@
       '<span class="bbm-calc-row-value' + (terminal ? ' bbm-calc-row-value-terminal' : '') + '">' + value + '</span></div>';
   }
 
-  function renderChart(years, pledgeSeries, sellSeries, crossoverYear, sellFeasible){
+  function renderChart(years, pledgeSeries, sellSeries, crossoverYear, sellFeasible, pledgeFeasible){
     if(!chartCanvas || typeof Chart === 'undefined') return;
 
-    var datasets = [
-      {
+    var datasets = [];
+    if(pledgeFeasible){
+      datasets.push({
         label: 'Pledge path',
         data: pledgeSeries,
         borderColor: '#e09422',
@@ -287,8 +309,8 @@
         pointHoverRadius: 4,
         tension: 0.1,
         fill: false,
-      }
-    ];
+      });
+    }
     if(sellFeasible){
       datasets.push({
         label: 'Sell path',
