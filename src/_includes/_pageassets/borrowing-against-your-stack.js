@@ -102,6 +102,8 @@
   var bvsBorrowRows     = document.getElementById('basBvsBorrowRows');
   var bvsSellHeadline   = document.getElementById('basBvsSellHeadline');
   var bvsSellRows       = document.getElementById('basBvsSellRows');
+  var bvsHodlHeadline   = document.getElementById('basBvsHodlHeadline');
+  var bvsHodlRows       = document.getElementById('basBvsHodlRows');
   var bvsVerdict        = document.getElementById('basBvsVerdict');
 
   // ─── Cost-basis presets (typical bitcoiner entry points) ───
@@ -234,8 +236,10 @@
       // Reset borrow-vs-sell area to empty state
       if (bvsBorrowHeadline) bvsBorrowHeadline.textContent = '— BTC';
       if (bvsSellHeadline)   bvsSellHeadline.textContent   = '— BTC';
+      if (bvsHodlHeadline)   bvsHodlHeadline.textContent   = '— BTC';
       if (bvsBorrowRows)     bvsBorrowRows.innerHTML       = '';
       if (bvsSellRows)       bvsSellRows.innerHTML         = '';
+      if (bvsHodlRows)       bvsHodlRows.innerHTML         = '';
       if (bvsVerdict) {
         bvsVerdict.className = 'bas-calc-bvs-verdict';
         bvsVerdict.innerHTML = '<p>Enter a stack, current price, and loan amount above to compare the two paths.</p>';
@@ -620,16 +624,39 @@
     var sellTerminalWealth   = sellRetained   * futurePrice;
     var borrowTerminalWealth = borrowRetained * futurePrice - cumulativeInterest;
 
+    // ─── HODL path (baseline / wealth-maximising reference) ───
+    // No loan taken, no BTC sold. Mathematically always the highest
+    // terminal wealth — by definition, since it sells zero BTC and pays
+    // zero interest. The HODL card quantifies the opportunity cost of
+    // any active decision: the wealth the user gives up to fund the
+    // dollar need today.
+    var hodlRetained        = stack;
+    var hodlTerminalWealth  = stack * futurePrice;
+
+    // Costs vs HODL — how much terminal wealth each active path gives up
+    // to fund the dollar need today.
+    var borrowCostVsHodl = hodlTerminalWealth - borrowTerminalWealth;
+    var sellCostVsHodl   = hodlTerminalWealth - sellTerminalWealth;
+
     return {
       futurePrice:           futurePrice,
       horizonYears:          horizonYears,
+      loan:                  loan,
       sellPathFeasible:      sellPathFeasible,
       borrowPathFeasible:    borrowPathFeasible,
+      hodl: {
+        btcRetained:         hodlRetained,
+        terminalWealth:      hodlTerminalWealth,
+        btcSold:             0,
+        taxPaid:             0,
+        cumulativeInterest:  0
+      },
       sell: {
         btcSold:             btcSoldNow,
         taxPaid:             btcSoldNow * taxPerBtcNow,
         btcRetained:         sellRetained,
         terminalWealth:      sellTerminalWealth,
+        costVsHodl:          sellCostVsHodl
       },
       borrow: {
         cumulativeInterest:  cumulativeInterest,
@@ -637,9 +664,10 @@
         taxPaid:             btcSoldAtHorizon * taxPerBtcFuture,
         btcRetained:         borrowRetained,
         terminalWealth:      borrowTerminalWealth,
+        costVsHodl:          borrowCostVsHodl
       },
       deltaWealth:           borrowTerminalWealth - sellTerminalWealth,
-      deltaBtcRetained:      borrowRetained - sellRetained,
+      deltaBtcRetained:      borrowRetained - sellRetained
     };
   }
 
@@ -665,56 +693,71 @@
       return '<span class="help-tip" tabindex="0">?<span class="tip-content">' + text + '</span></span>';
     }
 
-    // Borrow-path opportunity cost: value of the small amount of BTC
-    // sold at horizon to repay the loan, valued at the future trend price.
-    // (Less than the sell path's opportunity cost because fewer BTC sold.)
-    var borrowOppCost = r.borrow.btcSoldAtHorizon * r.futurePrice;
-    // Sell-path opportunity cost: value of BTC sold NOW, valued at the
-    // future trend price — the appreciation forgone by selling.
-    var sellOppCost   = r.sell.btcSold * r.futurePrice;
+    // ─── HODL path card (leftmost — wealth-maximising baseline) ───
+    // No loan, no sale, no tax, no interest. Full stack retained;
+    // net wealth = stack × future trend price. The "Need funded today: $0"
+    // row is the editorial point — HODL preserves wealth at the cost
+    // of forgoing the spending power.
+    bvsHodlHeadline.textContent = fmtBtc(r.hodl.btcRetained);
+    bvsHodlRows.innerHTML =
+      row('Need funded today'                       + tip('HODL doesn\'t fund any dollar need &mdash; the spending power that borrow and sell provide is forgone here. The trade-off: zero wealth cost, zero spending power today.'),                                                              '$0') +
+      row('BTC sold'                                + tip('No bitcoin is sold in the HODL path. The stack is preserved intact through the horizon.'),                                                                                                                                            'None') +
+      row('Cap gains tax'                           + tip('No taxable event in the HODL path. The cost basis carries forward unchanged.'),                                                                                                                                                       '$0') +
+      row('Cumulative interest paid'                + tip('Zero &mdash; no loan is taken in the HODL path.'),                                                                                                                                                                                    '$0') +
+      row('Net wealth at year ' + horizonYears      + tip('Stack at horizon &times; the Power Law trend price at year ' + horizonYears + '. Mathematically the highest of the three paths &mdash; HODL sells nothing and pays nothing, so its terminal wealth is the wealth-maximising baseline.'), fmtUsd(r.hodl.terminalWealth), true);
 
-    // Borrow path card
+    // ─── Borrow path card ───
     bvsBorrowHeadline.textContent = fmtBtc(r.borrow.btcRetained);
     bvsBorrowRows.innerHTML =
-      row('BTC sold at horizon to repay'           + tip('At year ' + horizonYears + ', the trend price is higher than today, so fewer BTC are needed to repay the same loan principal. This is the structural advantage of the borrow path.'), fmtBtc(r.borrow.btcSoldAtHorizon)) +
-      row('Cap gains tax (at horizon)'             + tip('Capital gains tax owed when those BTC are sold at year ' + horizonYears + ' to repay the loan. Cost basis is your original purchase price; the gain is the difference between that and the future trend price.'),                                                                                fmtUsd(r.borrow.taxPaid)) +
-      row('Opportunity cost of sold BTC'           + tip('Value of the BTC sold at horizon, at the future trend price. This is what the small amount of BTC would have been worth had you not had to sell to repay the loan.'),                                                                                                                fmtUsd(borrowOppCost)) +
-      row('Cumulative interest paid'               + tip('Total interest paid over the full horizon — paid from external income, not from the bitcoin stack. Simple-interest model: loan × rate × horizon years.'),                                                                                                                              fmtUsd(r.borrow.cumulativeInterest)) +
-      row('Net wealth at year ' + horizonYears     + tip('Value of all BTC retained at horizon (at the future trend price), minus the cumulative interest paid along the way.'),                                                                                                                                                                fmtUsd(r.borrow.terminalWealth), true);
+      row('Need funded today'                       + tip('The loan amount, available in cash today. Same dollar figure as the sell path; HODL funds nothing.'),                                                                                                                                  fmtUsd(r.loan)) +
+      row('BTC sold at horizon to repay'            + tip('At year ' + horizonYears + ', the trend price is higher than today, so fewer BTC are needed to repay the same loan principal. The structural advantage of the borrow path.'),                                                          fmtBtc(r.borrow.btcSoldAtHorizon)) +
+      row('Cap gains tax (at horizon)'              + tip('Capital gains tax owed when those BTC are sold at year ' + horizonYears + ' to repay the loan. Cost basis is your original purchase price; the gain is the difference between that and the future trend price.'),                       fmtUsd(r.borrow.taxPaid)) +
+      row('Cumulative interest paid'                + tip('Total interest paid over the full horizon &mdash; paid from external income, not from the bitcoin stack. Simple-interest model: loan &times; rate &times; horizon years.'),                                                              fmtUsd(r.borrow.cumulativeInterest)) +
+      row('Net wealth at year ' + horizonYears      + tip('Value of BTC retained at horizon (at the future trend price), minus the cumulative interest paid along the way. Always less than HODL &mdash; the difference is the wealth cost of funding the need this way.'),                        fmtUsd(r.borrow.terminalWealth), true);
 
-    // Sell path card
+    // ─── Sell path card ───
     bvsSellHeadline.textContent = fmtBtc(r.sell.btcRetained);
     bvsSellRows.innerHTML =
-      row('BTC sold now to net loan'               + tip('Bitcoin sold at today\'s price to net the loan amount after capital gains tax. Higher cost basis or lower tax rate means fewer BTC sold.'),                                                                                                                                          fmtBtc(r.sell.btcSold)) +
-      row('Cap gains tax (now)'                    + tip('Capital gains tax owed today when the BTC is sold. Will be $0 if your cost basis equals today\'s price (no embedded gain) — use the cost-basis presets to model typical cycle entry points.'),                                                                                       fmtUsd(r.sell.taxPaid)) +
-      row('Opportunity cost of sold BTC'           + tip('Value of the BTC sold now, at the future trend price. This is the appreciation you forgo by crystallizing the position at today\'s price. The single biggest cost of the sell path — and the structural argument for borrowing instead.'),                                          fmtUsd(sellOppCost)) +
-      row('Cumulative interest paid'               + tip('Zero — the sell path has no interest cost, because there\'s no loan.'),                                                                                                                                                                                                              fmtUsd(0)) +
-      row('Net wealth at year ' + horizonYears     + tip('Value of all BTC retained at horizon (at the future trend price). No interest cost to subtract because there\'s no loan in this path.'),                                                                                                                                              fmtUsd(r.sell.terminalWealth), true);
+      row('Need funded today'                       + tip('The loan amount, available in cash today &mdash; net of capital gains tax. Same dollar figure as the borrow path; HODL funds nothing.'),                                                                                                fmtUsd(r.loan)) +
+      row('BTC sold now to net loan'                + tip('Bitcoin sold at today\'s price to net the loan amount after capital gains tax. Higher cost basis or lower tax rate means fewer BTC sold.'),                                                                                              fmtBtc(r.sell.btcSold)) +
+      row('Cap gains tax (now)'                     + tip('Capital gains tax owed today when the BTC is sold. Will be $0 if your cost basis equals today\'s price (no embedded gain) &mdash; use the cost-basis presets to model typical cycle entry points.'),                                    fmtUsd(r.sell.taxPaid)) +
+      row('Cumulative interest paid'                + tip('Zero &mdash; the sell path has no interest cost, because there\'s no loan.'),                                                                                                                                                            '$0') +
+      row('Net wealth at year ' + horizonYears      + tip('Value of BTC retained at horizon (at the future trend price). Always less than HODL &mdash; the difference is the wealth cost of funding the need this way.'),                                                                          fmtUsd(r.sell.terminalWealth), true);
 
-    // Verdict line — different cls + copy depending on outcome
+    // ─── Three-path verdict ───
+    // Lead with HODL as the wealth-maximising reference, then compare
+    // what each active path costs vs hodling, then recommend the
+    // cheaper of the two active paths.
     var verdictCls, verdictHtml;
     if (!r.sellPathFeasible) {
       verdictCls = 'bas-calc-bvs-verdict-error';
-      verdictHtml = '<p><strong>The sell path isn\'t feasible at these inputs.</strong> To net the loan amount after tax, you\'d need to sell more BTC than you have. Either reduce the loan amount or this becomes a borrow-only decision.</p>';
+      verdictHtml = '<p><strong>The sell path isn\'t feasible at these inputs.</strong> To net the loan amount after tax, you\'d need to sell more BTC than you have. HODL still preserves the full stack worth ' + fmtUsd(r.hodl.terminalWealth) + ' at year ' + horizonYears + '; borrowing remains an option if the need is real.</p>';
     } else if (!r.borrowPathFeasible) {
       verdictCls = 'bas-calc-bvs-verdict-error';
       verdictHtml = '<p><strong>The borrow path isn\'t feasible to fully unwind at horizon.</strong> The trend price at year ' + horizonYears + ' isn\'t high enough to repay the loan from a fraction of your stack at the configured tax rate.</p>';
-    } else if (r.deltaWealth > 0) {
-      verdictCls = 'bas-calc-bvs-verdict-borrow-wins';
-      verdictHtml = '<p>At year <strong>' + horizonYears + '</strong>, the borrow path retains <strong>' +
-        fmtBtc(r.deltaBtcRetained).replace(' BTC', '') + ' more BTC</strong> than the sell path &mdash; worth ' +
-        '<strong>' + fmtUsd(r.deltaWealth) + '</strong> at the trend price of ' + fmtUsd(r.futurePrice) +
-        '/BTC. The opportunity cost of the BTC you\'d have sold (' + fmtUsd(sellOppCost) +
-        ') exceeds the cumulative interest of carrying the loan (' + fmtUsd(r.borrow.cumulativeInterest) + ').</p>';
-    } else if (r.deltaWealth < 0) {
-      verdictCls = 'bas-calc-bvs-verdict-sell-wins';
-      verdictHtml = '<p>At year <strong>' + horizonYears + '</strong>, the sell path leaves you with <strong>' +
-        fmtUsd(Math.abs(r.deltaWealth)) + ' more wealth</strong> than borrowing &mdash; the cumulative interest cost ' +
-        '(<strong>' + fmtUsd(r.borrow.cumulativeInterest) + '</strong>) exceeds the opportunity cost of the BTC you\'d have sold ' +
-        '(' + fmtUsd(sellOppCost) + '). This usually flips on longer horizons, lower interest rates, or a lower cost basis (bigger tax bill on the sell path).</p>';
-    } else {
+    } else if (!r.loan || r.loan === 0) {
       verdictCls = '';
-      verdictHtml = '<p>At year <strong>' + horizonYears + '</strong>, the two paths are essentially equivalent in terminal wealth.</p>';
+      verdictHtml = '<p>Enter a loan amount above to model the cost of funding it three different ways.</p>';
+    } else {
+      // Both active paths feasible — three-way comparison
+      var borrowCheaper = r.borrow.costVsHodl < r.sell.costVsHodl;
+      var cheaperLabel  = borrowCheaper ? 'borrowing' : 'selling';
+      var costlierLabel = borrowCheaper ? 'selling'   : 'borrowing';
+      var cheaperCost   = borrowCheaper ? r.borrow.costVsHodl : r.sell.costVsHodl;
+      var costlierCost  = borrowCheaper ? r.sell.costVsHodl   : r.borrow.costVsHodl;
+      var savings       = costlierCost - cheaperCost;
+      verdictCls = borrowCheaper ? 'bas-calc-bvs-verdict-borrow-wins' : 'bas-calc-bvs-verdict-sell-wins';
+      verdictHtml =
+        '<p>At year <strong>' + horizonYears + '</strong>, <strong>HODL</strong> preserves the most wealth: ' +
+        '<strong>' + fmtUsd(r.hodl.terminalWealth) + '</strong>. Any active path costs you wealth in exchange for the ' +
+        fmtUsd(r.loan) + ' in spending power today &mdash; ' +
+        'borrowing costs <strong>' + fmtUsd(r.borrow.costVsHodl) + '</strong>; ' +
+        'selling costs <strong>' + fmtUsd(r.sell.costVsHodl) + '</strong>.' +
+        '</p><p style="margin-top:0.6rem;">' +
+        '<em>If the spending is real: ' + cheaperLabel + ' is <strong>' + fmtUsd(savings) + ' cheaper</strong> than ' +
+        costlierLabel + '. If the spending can wait, HODL preserves the ' + fmtUsd(cheaperCost) +
+        ' the cheapest active path would otherwise cost &mdash; the true opportunity cost of the decision itself.</em>' +
+        '</p>';
     }
     bvsVerdict.className = 'bas-calc-bvs-verdict ' + verdictCls;
     bvsVerdict.innerHTML = verdictHtml;
