@@ -1428,25 +1428,31 @@
     flex-direction: column;
     min-width: 0;
 }
-/* HODL card — the wealth-maximising baseline. Muted/neutral palette so
-   it reads as "reference state" rather than "this is the answer." */
+/* HODL card — the wealth-maximising baseline (the purist default).
+   Amber treatment signals "respect the conservative path" — same warm
+   accent as the site's primary palette, but lighter saturation than
+   the borrow/green or sell/slate active alternatives. */
 .bas-calc-bvs-path-hodl {
-    border-color: rgba(154,144,128,0.28);
-    background: rgba(255,255,255,0.012);
+    border-color: rgba(224,148,34,0.22);
+    background: rgba(224,148,34,0.025);
 }
 .bas-calc-bvs-path-hodl .bas-calc-bvs-path-label {
-    color: var(--text-dim);
-    letter-spacing: 0.2em;
+    color: var(--amber);
+    letter-spacing: 0.18em;
 }
 .bas-calc-bvs-path-borrow {
     border-color: rgba(39,174,96,0.22);
     background: rgba(39,174,96,0.02);
 }
 .bas-calc-bvs-path-borrow .bas-calc-bvs-path-label { color: var(--green); }
+/* Sell card — slate-blue. Distinct from amber (HODL) and green (borrow)
+   so a glance distinguishes all three. Cooler tone reads as "active
+   alternative" without alarm. */
 .bas-calc-bvs-path-sell {
-    border-color: rgba(224,148,34,0.18);
+    border-color: rgba(122,149,168,0.30);
+    background: rgba(122,149,168,0.03);
 }
-.bas-calc-bvs-path-sell .bas-calc-bvs-path-label { color: var(--amber); }
+.bas-calc-bvs-path-sell .bas-calc-bvs-path-label { color: #8aa3b5; }
 .bas-calc-bvs-path-label {
     font-family: 'Inter', -apple-system, sans-serif;
     font-size: 0.7rem;
@@ -1462,6 +1468,10 @@
     color: var(--text-muted);
     margin-bottom: 1rem;
     font-style: italic;
+    /* Reserve 2 lines of vertical space regardless of content length, so
+       row-by-row alignment across the 3 cards is preserved even if one
+       tagline wraps and the others don't. */
+    min-height: 2.2em;
 }
 .bas-calc-bvs-path-headline {
     font-family: 'Cormorant Garamond', Georgia, serif;
@@ -1506,6 +1516,12 @@
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 1.05rem;
 }
+/* Colorize the terminal Net-wealth value to match each card's accent —
+   so the reader's eye connects card → terminal value → verdict copy
+   without having to re-read labels. */
+.bas-calc-bvs-path-hodl   .bas-calc-bvs-row-value-terminal { color: var(--amber); }
+.bas-calc-bvs-path-borrow .bas-calc-bvs-row-value-terminal { color: var(--green); }
+.bas-calc-bvs-path-sell   .bas-calc-bvs-row-value-terminal { color: #8aa3b5; }
 
 /* Verdict — final line summarising the delta */
 .bas-calc-bvs-verdict {
@@ -1525,19 +1541,32 @@
 .bas-calc-bvs-verdict p em { color: var(--amber-dim); font-style: italic; }
 .bas-calc-bvs-verdict-borrow-wins { border-left-color: var(--green); background: rgba(39,174,96,0.04); }
 .bas-calc-bvs-verdict-borrow-wins p strong { color: var(--green); }
-.bas-calc-bvs-verdict-sell-wins   { border-left-color: var(--amber); background: rgba(224,148,34,0.04); }
-.bas-calc-bvs-verdict-sell-wins   p strong { color: var(--amber); }
+.bas-calc-bvs-verdict-sell-wins   { border-left-color: #8aa3b5; background: rgba(122,149,168,0.04); }
+.bas-calc-bvs-verdict-sell-wins   p strong { color: #8aa3b5; }
 .bas-calc-bvs-verdict-error       { border-left-color: #c0392b; background: rgba(192,57,43,0.04); }
 .bas-calc-bvs-verdict-error       p strong { color: #e87f6f; }
 
+/* Path-colored emphasis inside the verdict copy. Specificity (0,3,1)
+   beats `bas-calc-bvs-verdict-borrow-wins p strong` (0,2,1), so these
+   override the win-state color rule for path-specific values. */
+.bas-calc-bvs-verdict p strong.verdict-hodl,
+.bas-calc-bvs-verdict p span.verdict-hodl   { color: var(--amber); }
+.bas-calc-bvs-verdict p strong.verdict-borrow,
+.bas-calc-bvs-verdict p span.verdict-borrow { color: var(--green); }
+.bas-calc-bvs-verdict p strong.verdict-sell,
+.bas-calc-bvs-verdict p span.verdict-sell   { color: #8aa3b5; }
+.bas-calc-bvs-verdict p em.verdict-hodl       { color: var(--amber-dim); }
+.bas-calc-bvs-verdict p em.verdict-borrow     { color: var(--green-dim); }
+.bas-calc-bvs-verdict p em.verdict-sell       { color: rgba(122,149,168,0.7); }
+
 /* ───────────────────────────────────────────────
    Risk-disclosure caveat (below the verdict)
-   The BvS math measures terminal-wealth only; the
-   caveat block points readers to the surfaces that
-   cover the two structural risks not modelled here
-   (liquidation; counterparty failure). Visually
-   subordinate to the verdict — neutral border,
-   muted text, italic.
+   Scoped specifically to the BORROW path: liquidation
+   and counterparty risks are features of borrowing
+   alone (neither HODL nor selling carries them). Green
+   left-border ties it visually to the Borrow card.
+   Visually subordinate to the verdict — italic body,
+   smaller font, muted color.
    ─────────────────────────────────────────────── */
 .bas-calc-bvs-caveat {
     margin-top: 1rem;
@@ -1547,24 +1576,25 @@
     line-height: 1.55;
     color: var(--text-dim);
     font-style: italic;
-    border-left: 2px solid rgba(154,144,128,0.35);
-    background: rgba(255,255,255,0.015);
+    border-left: 2px solid rgba(39,174,96,0.35);
+    background: rgba(39,174,96,0.02);
     border-radius: 0 3px 3px 0;
 }
 .bas-calc-bvs-caveat strong {
-    color: var(--text);
+    color: var(--green);
     font-weight: 600;
     font-style: normal;
+    letter-spacing: 0.005em;
 }
 .bas-calc-bvs-caveat a {
-    color: var(--amber-dim);
+    color: var(--green);
     text-decoration: none;
-    border-bottom: 1px solid rgba(224,148,34,0.3);
+    border-bottom: 1px solid rgba(39,174,96,0.35);
     transition: color 0.2s, border-color 0.2s;
 }
 .bas-calc-bvs-caveat a:hover {
-    color: var(--amber);
-    border-color: var(--amber);
+    color: #3acc7a;
+    border-color: #3acc7a;
 }
 
 /* ───────────────────────────────────────────────
