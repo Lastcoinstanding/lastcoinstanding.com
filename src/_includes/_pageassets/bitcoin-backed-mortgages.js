@@ -32,25 +32,18 @@
   if(typeof PL_DATA === 'undefined' || !PL_DATA.length) return;
 
   // ─── Power Law trend price at a given days-from-genesis ───
-  // Same coefficients used across the site. d in days.
-  function plPrice(d){
-    if(d <= 0) return 0;
-    return Math.pow(10, -17.668 + 5.846 * Math.log10(d));
-  }
+  // Use GENESIS_TS exported by the shared PL_DATA module (seconds since
+  // epoch) - same pattern as the BAY calculator. PL_DATA format is
+  // [days_since_genesis, price_usd] pairs, not [date_string, price].
+  // plPrice() also comes from the shared module.
 
-  // Days since genesis for the latest sample (proxy for "today")
-  var GENESIS_MS = Date.UTC(2009, 0, 3);
-  var DAY_MS = 86400 * 1000;
-  function daysSinceGenesis(date){
-    return (date.getTime() - GENESIS_MS) / DAY_MS;
+  function daysSinceGenesisNow(){
+    return (Date.now()/1000 - GENESIS_TS) / 86400;
   }
-  // Use the date of the latest PL_DATA sample as "today"
-  var latestSample = PL_DATA[PL_DATA.length - 1];
-  var todayDays = daysSinceGenesis(new Date(latestSample[0]));
 
   function plPriceAtYear(year){
     // Power Law price at (today + year × 365.25 days)
-    return plPrice(todayDays + year * 365.25);
+    return plPrice(daysSinceGenesisNow() + year * 365.25);
   }
 
   // ─── Formatting helpers ───
@@ -97,7 +90,8 @@
 
   // ─── Auto-populate price + cost basis from latest PL sample if empty ───
   if(!priceInput.value || priceInput.value === '0'){
-    priceInput.value = Math.round(latestSample[1] / 100) * 100;
+    var latest = PL_DATA[PL_DATA.length - 1];
+    priceInput.value = Math.round(latest[1] / 100) * 100;
   }
   if(!costBasisInput.value || costBasisInput.value === '0'){
     costBasisInput.value = priceInput.value;
