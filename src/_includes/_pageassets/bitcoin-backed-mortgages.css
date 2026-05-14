@@ -924,6 +924,42 @@ body {
     color: var(--text-muted);
     margin-bottom: 0.85rem;
 }
+
+/* ─── Math & methodology appendix: collapsible <details> ─── */
+/* Wrap the bbm-math block in a <details> so it collapses by default.
+   The <summary> mimics the original bbm-math-label visual register
+   (uppercase muted Inter caption) but reads as clickable. Default
+   browser disclosure triangle preserved for affordance; cursor: pointer
+   and a subtle hover state confirm interactivity. */
+.bbm-math-collapsible {
+    margin-top: 2rem;
+}
+.bbm-math-collapsible > .bbm-math {
+    margin-top: 0.75rem;
+}
+.bbm-math-summary {
+    cursor: pointer;
+    display: list-item;
+    list-style-position: outside;
+    margin-left: 1rem;
+    padding: 0.5rem 0;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    transition: color 120ms ease;
+}
+.bbm-math-summary:hover,
+.bbm-math-summary:focus {
+    color: var(--text);
+    outline: none;
+}
+.bbm-math-collapsible[open] > .bbm-math-summary {
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
 .bbm-math p {
     font-family: 'Inter', -apple-system, sans-serif;
     font-size: 0.85rem;
