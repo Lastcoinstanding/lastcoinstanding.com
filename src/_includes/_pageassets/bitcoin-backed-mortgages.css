@@ -16,6 +16,12 @@
      .bbm-checklist        — amber-bordered compliance-list block
      .bbm-checklist-good   — green-tinted "trade clears the bar" list
      .bbm-checklist-bad    — red-tinted "trade fails the bar" list
+     .bbm-math-collapsible — collapsed <details> wrapper for the math
+                             appendix; the <summary> child gets the
+                             .bbm-math-summary class. Added in Batch 2
+                             (2026-05-14) when the math appendix
+                             converted from always-visible to
+                             expand-on-click.
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── Canonical color tokens (System A — matches BvRE / DR / Disciplined
