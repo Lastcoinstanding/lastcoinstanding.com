@@ -1,0 +1,335 @@
+/* ═══════════════════════════════════════════════════════════════
+   BITCOIN VS. THE STOCK MARKET — page-specific styles
+
+   Page-specific components only. Global typography, colors,
+   .section, .section-intro, .prose, .calc-result-card, and slider
+   patterns come from the base stylesheet and STYLE_GUIDE_14.
+
+     .bvsm-page             — outer article wrapper
+     .bvsm-calc             — calculator section wrapper
+     .bvsm-presets          — preset-button row
+     .bvsm-preset           — single preset button (toggleable)
+     .bvsm-results-grid     — 4-column result-card grid
+     .bvsm-result           — single result card (with color variant)
+     .bvsm-verdict          — verdict line below calculator
+     .bvsm-chart-wrap       — chart container with label + caption
+     .bvsm-projection-*     — projection-section components
+     .bvsm-math-collapsible — collapsed <details> appendix (matches BBM)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Canonical color tokens (System A) ─── */
+:root {
+    --bg: #0a0908;
+    --bg-card: #141210;
+    --amber: #e09422;
+    --amber-dim: #b8791c;
+    --amber-glow: rgba(224,148,34,0.15);
+    --text: #e8e0d4;
+    --text-dim: #9a9080;
+    --text-muted: #6a6256;
+    --red: #c0392b;
+    --red-dim: rgba(192,57,43,0.6);
+    --green: #27ae60;
+    --border: rgba(224,148,34,0.12);
+    /* Comparator brand colors (used in result cards + chart strokes) */
+    --bvsm-btc:  #e09422;
+    --bvsm-sp:   #8aa3b5;
+    --bvsm-ndq:  #6fa68f;
+    --bvsm-gold: #c9a85a;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* Prose register matches DR/BBM: cream strong @ 700, amber-dim em */
+.bvsm-page .prose strong { color: var(--text); font-weight: 700; }
+.bvsm-page .prose em { color: var(--amber-dim); font-style: italic; }
+
+.bvsm-page .section-intro h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.6rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 0.5rem 0;
+}
+.bvsm-page .section-intro p {
+    color: var(--text-dim);
+    margin: 0 0 1.5rem 0;
+}
+.bvsm-page .section-intro em {
+    color: var(--amber-dim);
+}
+
+/* ─── Outer article wrapper ─── */
+.bvsm-page {
+    max-width: 920px;
+    margin: 0 auto;
+}
+
+/* ─── Calculator surface ─── */
+.bvsm-calc {
+    margin: 2rem 0;
+    padding: 1.5rem 1.6rem;
+    background: rgba(255,255,255,0.018);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.bvsm-calc h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 1rem 0;
+}
+
+/* ─── Preset button row ─── */
+.bvsm-presets {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+.bvsm-presets-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-right: 0.5rem;
+}
+.bvsm-preset {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.4rem 0.85rem;
+    cursor: pointer;
+    transition: all 120ms ease;
+}
+.bvsm-preset:hover,
+.bvsm-preset:focus {
+    color: var(--text);
+    border-color: var(--amber-dim);
+    outline: none;
+}
+.bvsm-preset.is-active {
+    color: var(--amber);
+    border-color: var(--amber);
+    background: var(--amber-glow);
+}
+
+/* ─── Result-card grid ─── */
+.bvsm-results-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+@media (max-width: 900px) {
+    .bvsm-results-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 540px) {
+    .bvsm-results-grid { grid-template-columns: 1fr; }
+}
+
+.bvsm-result {
+    padding: 1rem 1.1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    border-top: 3px solid var(--text-muted);
+}
+.bvsm-result-btc  { border-top-color: var(--bvsm-btc); }
+.bvsm-result-sp   { border-top-color: var(--bvsm-sp); }
+.bvsm-result-ndq  { border-top-color: var(--bvsm-ndq); }
+.bvsm-result-gold { border-top-color: var(--bvsm-gold); }
+
+.bvsm-result h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin: 0 0 0.5rem 0;
+}
+.bvsm-result-btc h4  { color: var(--bvsm-btc); }
+.bvsm-result-sp h4   { color: var(--bvsm-sp); }
+.bvsm-result-ndq h4  { color: var(--bvsm-ndq); }
+.bvsm-result-gold h4 { color: var(--bvsm-gold); }
+
+.bvsm-result .result-sublabel {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+.bvsm-result .result-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.1rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+}
+.bvsm-result-rows {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+}
+.bvsm-result-rows .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.2rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.bvsm-result-rows .row:last-child { border-bottom: none; }
+.bvsm-result-rows .row-label { color: var(--text-muted); }
+.bvsm-result-rows .row-val { color: var(--text); }
+
+/* ─── Verdict line ─── */
+.bvsm-verdict {
+    margin: 1.5rem 0 1rem 0;
+    padding: 1rem 1.2rem;
+    background: rgba(224,148,34,0.04);
+    border-left: 2px solid var(--amber);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+.bvsm-verdict strong {
+    color: var(--amber);
+}
+
+/* ─── Chart container ─── */
+.bvsm-chart-wrap {
+    margin-top: 1.5rem;
+}
+.bvsm-chart-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 0.75rem;
+}
+.bvsm-chart-caption {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 0.5rem;
+}
+
+/* ─── Projection chart section ─── */
+.bvsm-projection-wrap {
+    margin: 2rem 0;
+    padding: 1.5rem 1.6rem;
+    background: rgba(255,255,255,0.018);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.bvsm-projection-chart-wrap {
+    margin-top: 1.5rem;
+}
+.bvsm-projection-results {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 1rem 1.2rem;
+    background: var(--bg-card);
+    border-radius: 6px;
+}
+.bvsm-proj-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.bvsm-proj-row:last-child { border-bottom: none; }
+.bvsm-proj-asset {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+.bvsm-proj-asset-btc  { color: var(--bvsm-btc); }
+.bvsm-proj-asset-sp   { color: var(--bvsm-sp); }
+.bvsm-proj-asset-ndq  { color: var(--bvsm-ndq); }
+.bvsm-proj-asset-gold { color: var(--bvsm-gold); }
+.bvsm-proj-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--text);
+}
+.bvsm-proj-note {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* ─── Math & methodology appendix: collapsible <details> (mirrors BBM) ─── */
+.bvsm-math-collapsible {
+    margin-top: 2rem;
+}
+.bvsm-math-collapsible > .bvsm-math {
+    margin-top: 0.75rem;
+    padding: 1.4rem 1.6rem;
+    background: rgba(255,255,255,0.018);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+.bvsm-math-summary {
+    cursor: pointer;
+    display: list-item;
+    list-style-position: outside;
+    margin-left: 1rem;
+    padding: 0.5rem 0;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    transition: color 120ms ease;
+}
+.bvsm-math-summary:hover,
+.bvsm-math-summary:focus {
+    color: var(--text);
+    outline: none;
+}
+.bvsm-math-collapsible[open] > .bvsm-math-summary {
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+.bvsm-math p {
+    font-size: 0.92rem;
+    color: var(--text-dim);
+    margin-bottom: 0.9rem;
+    line-height: 1.6;
+}
+.bvsm-math p strong { color: var(--text); font-weight: 600; }
+.bvsm-math p em { color: var(--amber-dim); }
+.bvsm-math code {
+    font-family: 'Inter', monospace;
+    font-size: 0.85em;
+    background: rgba(255,255,255,0.04);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+}
