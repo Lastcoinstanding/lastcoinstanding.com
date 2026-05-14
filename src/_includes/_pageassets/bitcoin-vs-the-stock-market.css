@@ -214,6 +214,19 @@ body {
 .bvsm-chart-wrap {
     margin-top: 1.5rem;
 }
+/* Chart.js v4 sizing pattern: with maintainAspectRatio:false + responsive:true,
+   the canvas's immediate parent must have a fixed pixel height. Otherwise the
+   canvas grows unboundedly vertical and the chart becomes a useless spike. */
+.bvsm-chart-canvas {
+    position: relative;
+    height: 380px;
+    width: 100%;
+}
+.bvsm-chart-canvas-tall {
+    position: relative;
+    height: 440px;
+    width: 100%;
+}
 .bvsm-chart-label {
     font-family: 'Inter', sans-serif;
     font-size: 0.72rem;

@@ -100,7 +100,9 @@ eleventyComputed:
 
                 <div class="bvsm-chart-wrap">
                     <div class="bvsm-chart-label">Wealth-over-time &mdash; lump sum invested at the chosen start date</div>
-                    <canvas id="bvsmLumpChart" height="380" role="img" aria-label="Chart comparing wealth over time for a lump-sum investment in bitcoin, the S&P 500 total return index, the NASDAQ Composite, and gold, starting from the chosen date."></canvas>
+                    <div class="bvsm-chart-canvas">
+                        <canvas id="bvsmLumpChart" role="img" aria-label="Chart comparing wealth over time for a lump-sum investment in bitcoin, the S&P 500 total return index, the NASDAQ Composite, and gold, starting from the chosen date."></canvas>
+                    </div>
                     <p class="bvsm-chart-caption" id="bvsmLumpChartCaption">Log-scale Y-axis. All four series start at the same dollar amount on the start date and track their respective asset&rsquo;s value through today.</p>
                 </div>
             </div>
@@ -180,7 +182,9 @@ eleventyComputed:
 
                 <div class="bvsm-chart-wrap">
                     <div class="bvsm-chart-label">Portfolio value over time &mdash; weekly DCA from the chosen start date</div>
-                    <canvas id="bvsmDcaChart" height="380" role="img" aria-label="Chart comparing portfolio value over time for weekly dollar-cost-averaging into bitcoin, the S&P 500 total return, the NASDAQ Composite, and gold."></canvas>
+                    <div class="bvsm-chart-canvas">
+                        <canvas id="bvsmDcaChart" role="img" aria-label="Chart comparing portfolio value over time for weekly dollar-cost-averaging into bitcoin, the S&P 500 total return, the NASDAQ Composite, and gold."></canvas>
+                    </div>
                     <p class="bvsm-chart-caption">Log-scale Y-axis. The dashed line shows cumulative dollars invested as a reference; the solid lines show the portfolio value of each asset over time.</p>
                 </div>
             </div>
@@ -219,8 +223,10 @@ eleventyComputed:
 
                 <div class="bvsm-projection-chart-wrap">
                     <div class="bvsm-chart-label">Projected wealth over the chosen horizon &mdash; trend lines only</div>
-                    <canvas id="bvsmProjectionChart" height="420" role="img" aria-label="Chart projecting the wealth trajectory for a hypothetical investment today in bitcoin, the S&P 500, NASDAQ, and gold over the chosen horizon, using each asset's long-run trend.">
-                    </canvas>
+                    <div class="bvsm-chart-canvas-tall">
+                        <canvas id="bvsmProjectionChart" role="img" aria-label="Chart projecting the wealth trajectory for a hypothetical investment today in bitcoin, the S&P 500, NASDAQ, and gold over the chosen horizon, using each asset's long-run trend.">
+                        </canvas>
+                    </div>
                     <p class="bvsm-chart-caption">Log-scale Y-axis. Bitcoin follows the canonical Power Law trend used elsewhere on the site (<code>P(d) = 1.6 &times; 10<sup>&minus;17</sup> &times; d<sup>5.77</sup></code>). Comparator trends compound at their approximate historical nominal CAGRs (S&amp;P 500 ~10%, NASDAQ ~12%, gold ~7%) &mdash; central-tendency expectations, not forecasts.</p>
                 </div>
 
