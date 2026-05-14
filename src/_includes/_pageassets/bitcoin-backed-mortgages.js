@@ -187,7 +187,7 @@
     capGainsVal.textContent  = capGainsSlider.value + '%';
     if(earlyRepayVal){
       earlyRepayVal.textContent = (repayYear >= horizon)
-        ? 'never (full term)'
+        ? 'never'
         : 'year ' + repayYear;
     }
 
@@ -597,7 +597,7 @@
         if(isNaN(v)) return;
         horizonSlider.value = v;
         // Also clamp early-repayment to the new horizon so the
-        // 'never (full term)' label stays consistent at the slider max
+        // 'never' label stays consistent at the slider max
         if(earlyRepaySlider){
           earlyRepaySlider.max = v;
           if(parseInt(earlyRepaySlider.value, 10) > v) earlyRepaySlider.value = v;
