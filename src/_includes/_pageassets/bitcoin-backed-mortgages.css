@@ -48,11 +48,26 @@ body {
     color: var(--text);
 }
 
-/* Inline emphasis on body prose — sparing amber accent for key terms and
-   numerical claims, matching the Power Law / DR convention. Body bold
-   stays in --text (cream), not amber, to preserve typographic hierarchy. */
-.bbm-page strong { color: var(--text); font-weight: 600; }
+/* Inline emphasis on body prose — matches DR's pattern as confirmed by
+   a computed-style audit against /disciplined-rebalancing (same System A
+   palette). The reference page's prose breaks up visually because
+   <em>italic shifts to amber-dim while <strong>bold stays in cream</strong></em>
+   at weight 700 — that one-axis colour shift creates rhythm across dense
+   prose without pulling the eye onto every bold run.
+
+   Earlier BBM versions used cream-for-both and weight 600, which made
+   bold-dense paragraphs read as a single uniform-bright slab and weakened
+   the bold itself. v8 brings the pattern in line with DR.
+
+   Strong stays cream page-wide. Em is cream page-wide BUT inside .prose
+   it shifts to amber-dim — this scoping is deliberate: component cards
+   (.bbm-role, .bbm-step, .bbm-advantage, .bbm-checklist) often use <em>
+   for inline emphasis where the surrounding card already carries an amber
+   tint, so amber-dim italic would clash. Keep prose chromatic; keep
+   components quiet. */
+.bbm-page strong { color: var(--text); font-weight: 700; }
 .bbm-page em { color: var(--text); font-style: italic; }
+.bbm-page .prose em { color: var(--amber-dim); }
 .bbm-page a { color: var(--amber); text-decoration: underline; text-decoration-color: rgba(224,148,34,0.4); text-underline-offset: 2px; }
 .bbm-page a:hover { text-decoration-color: var(--amber); }
 
@@ -61,6 +76,43 @@ body {
     margin: 0 auto;
     padding: 0 0 4rem;
 }
+
+
+/* ───────────────────────────────────────────────
+   Section intro — h2 + lede paragraph pattern used
+   at the opening of the article (Section 1). The
+   audit found BBM had no rule for this selector,
+   so h2 fell through to base.njk's body-font
+   inheritance (Inter sans-serif at browser-default
+   heading weight). Reference pages (DR, Power Law)
+   use Cormorant Garamond at the same display tier
+   as h1, just smaller. This rule brings BBM into
+   register with the family.
+
+   Mirrors DR's §.section-intro block exactly so a
+   future reader audit sees the same structural
+   pattern across pages in the System A palette.
+   ─────────────────────────────────────────────── */
+.section-intro {
+    margin: 0 auto 2rem;
+    max-width: 880px;
+}
+.section-intro h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.15;
+    margin: 0 0 1rem;
+    letter-spacing: -0.5px;
+}
+.section-intro h2 em { font-style: italic; color: var(--amber); }
+.section-intro p {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+}
+.section-intro p em { color: var(--text); font-style: italic; }
 
 
 /* ───────────────────────────────────────────────
