@@ -3,29 +3,60 @@
 
    Pledge vs Sell comparison for funding a home down payment.
 
-   Two paths, both evaluated at the same horizon:
+   Three paths, all evaluated at the same horizon:
 
    PLEDGE:
-     - Take a second-lien at (standard mortgage rate + premium)
-     - BTC stack stays in custody — full stack appreciates per Power Law
-     - Cumulative cost = down_payment × premium × horizon (simple-interest
-       approximation, matching the BvS calculator on the parent page)
-     - At horizon: wealth = stack × P_powerLaw(t) − cumulative_interest_premium
+     - Take the Coinbase/Better/Fannie-Mae product
+     - BOTH loans (primary + second-lien) carry the combined rate of
+       (standard 30-yr rate + premium); the premium applies to the
+       full borrowed amount per the published product structure,
+       not only to the second-lien. The borrower keeps the full BTC
+       stack — it appreciates per Power Law.
+     - Cost-of-pledge delta vs the sell baseline:
+         (down_payment × rate + home_price × premium) × horizon
+       — simple-interest approximation, matching the parent BvS
+       calculator convention. The two terms decompose as:
+         · down_payment × rate × t  — base-rate interest on the
+           down-payment portion, which the sell path doesn't borrow
+           at all (and so doesn't pay)
+         · home_price × premium × t  — the premium portion applied
+           to the entire mortgage (per Coinbase's blog)
+     - Early-repayment input caps the interest accrual: if the user
+       repays the second-lien at year R, the cost contribution
+       stops at R rather than continuing to horizon. Released
+       collateral funds the rest of the home (or refinances the
+       primary at the standard rate); calc treats the cost as
+       'paused' from year R onward.
+     - At horizon: wealth = stack × P_powerLaw(t) − cost(min(t, R))
 
    SELL:
-     - Sell enough BTC at today's price to net the down payment after tax
-     - BTC stack reduced by btcSold; no second-lien interest
+     - Sell enough BTC at today's price to net the down payment
+       after tax. Take a normal Fannie-Mae conforming mortgage on
+       the rest at the standard rate (no premium).
+     - BTC stack reduced by btcSold; no premium interest cost; cap
+       gains paid upfront.
      - At horizon: wealth = (stack − btcSold) × P_powerLaw(t)
 
-   The home value and primary mortgage are identical across both paths,
-   so they cancel out in the delta. The chart plots wealth-over-time for
-   both paths and marks the crossover year if it falls inside the horizon.
+   HOLD (0% borrowing baseline):
+     - Don't buy the house at all. Keep the full stack untouched.
+     - At horizon: wealth = stack × P_powerLaw(t)
+     - This is the 'genuinely conservative baseline' per
+       RETIREMENT_CALCULATOR_DESIGN §4.2 — the reference against
+       which both Pledge and Sell represent decisions to commit
+       BTC to a home purchase. Both Pledge and Sell carry a cost
+       relative to this baseline; the calc surfaces that cost as
+       the gap between the lines on the chart.
+
+   Tactical / strategic preset toggle scopes the horizon to either
+   5y (tactical — short-term cash-flow framing) or 30y (strategic —
+   full-duration appreciation framing). The slider remains the
+   canonical control; the toggle is a one-click preset.
 
    Shared state with the borrowing page (BAY):
-     stack / price / costBasis / capGainsTax sync via localStorage so the
-     user's inputs persist across the two pages. Mortgage-specific inputs
-     (home price, down payment %, mortgage rate, premium, horizon) are
-     local to this page only.
+     stack / price / costBasis / capGainsTax sync via localStorage
+     so the user's inputs persist across the two pages. Mortgage-
+     specific inputs (home price, down payment %, mortgage rate,
+     premium, horizon, early-repayment) are local to this page.
    ═══════════════════════════════════════════════════════════════ */
 
 (function(){
@@ -76,6 +107,7 @@
   var premiumSlider    = document.getElementById('bbmPremium');
   var horizonSlider    = document.getElementById('bbmHorizon');
   var capGainsSlider   = document.getElementById('bbmCapGains');
+  var earlyRepaySlider = document.getElementById('bbmEarlyRepay');
 
   // Slider-val displays — formatted current-value spans next to each slider
   var homePriceVal     = document.getElementById('bbmHomePriceVal');
@@ -87,6 +119,10 @@
   var premiumVal       = document.getElementById('bbmPremiumVal');
   var horizonVal       = document.getElementById('bbmHorizonVal');
   var capGainsVal      = document.getElementById('bbmCapGainsVal');
+  var earlyRepayVal    = document.getElementById('bbmEarlyRepayVal');
+
+  // Tactical/strategic preset buttons (set horizon when clicked)
+  var presetButtons    = document.querySelectorAll('.bbm-horizon-preset');
 
   var pledgeHeadline   = document.getElementById('bbmPledgeHeadline');
   var pledgeRows       = document.getElementById('bbmPledgeRows');
@@ -132,6 +168,12 @@
     var premium      = parseFloat(premiumSlider.value)    / 100;
     var horizon      = parseInt(horizonSlider.value, 10)  || 1;
     var taxRate      = parseFloat(capGainsSlider.value)   / 100;
+    // Early-repayment year: 0..horizon means 'pay off the second-lien at
+    // year R'. Default value of horizon (slider max) means 'never repay
+    // early' — interest accrues for the full horizon. Clamped to horizon.
+    var repayYear    = earlyRepaySlider ? parseInt(earlyRepaySlider.value, 10) : horizon;
+    if(repayYear > horizon) repayYear = horizon;
+    if(repayYear < 0) repayYear = 0;
 
     // ─── Update slider-val displays (formatted current values) ───
     homePriceVal.textContent = fmtUsd(homePrice);
@@ -143,6 +185,11 @@
     premiumVal.textContent   = '+' + parseFloat(premiumSlider.value).toFixed(2) + 'pp';
     horizonVal.textContent   = horizon + ' years';
     capGainsVal.textContent  = capGainsSlider.value + '%';
+    if(earlyRepayVal){
+      earlyRepayVal.textContent = (repayYear >= horizon)
+        ? 'never (full term)'
+        : 'year ' + repayYear;
+    }
 
     // Persist shared inputs to localStorage so BAY picks them up too
     try {
@@ -181,32 +228,67 @@
     // ─── Future price (at horizon) per Power Law trend ───
     var futurePrice    = plPriceAtYear(horizon);
 
-    // ─── Pledge path: full stack retained; pay premium interest over horizon ───
-    var cumulativePremiumInterest = downPayment * premium * horizon; // simple-interest model
+    // ─── Pledge-path cost differential (corrected math, v9) ───
+    // Coinbase's product blog confirms BOTH loans (primary + second-lien)
+    // share the combined rate of (standard rate + premium); the premium
+    // applies to the entire borrowed amount, not only to the second-lien.
+    //
+    // Under sell path: borrow (homePrice − downPayment) at standard rate.
+    // Under pledge path: borrow homePrice at (rate + premium).
+    //
+    // Interest-cost differential over t years (simple-interest approximation):
+    //   pledge − sell
+    //   = homePrice × (rate + premium) × t − (homePrice − downPayment) × rate × t
+    //   = downPayment × rate × t + homePrice × premium × t
+    //
+    // The earlier model (downPayment × premium × t only) undercounted by
+    // a ~12× factor at typical inputs; v9 corrects this and breaks the
+    // cost out into the two structural components for transparency in
+    // the result-card detail rows.
+    //
+    // Early-repayment caps both terms at min(t, repayYear). The
+    // released collateral funds primary refinance or the pledge cost
+    // simply ends — the calc treats post-repayment years as zero-cost
+    // for both terms.
+    function pledgeCostAtYear(t){
+      var capped = Math.min(t, repayYear);
+      return downPayment * mortRate * capped + homePrice * premium * capped;
+    }
+
+    // ─── Pledge path: full stack retained; pay corrected interest delta ───
+    var cumulativePremiumInterest = pledgeCostAtYear(horizon);
     var pledgeStack    = stack;
     var pledgeTerminalWealth = pledgeStack * futurePrice - cumulativePremiumInterest;
 
     // ─── Sell path: reduced stack, no premium interest, tax already paid ───
     var sellTerminalWealth = sellFeasible ? (sellStack * futurePrice) : 0;
 
+    // ─── HOLD (0% borrowing baseline): no home purchase at all ───
+    // The 'genuinely conservative baseline' — the user keeps their full
+    // stack, buys no house, takes no loan. Plotted as a reference line
+    // on the chart so both Pledge and Sell can be seen as decisions
+    // relative to it. Always feasible (no eligibility math).
+    var holdTerminalWealth = stack * futurePrice;
+
     // ─── Year-by-year wealth trajectory (for chart) ───
-    // Pledge wealth at year t = stack × P_powerLaw(t) − downPayment × premium × t
-    // Sell wealth at year t   = (stack − btcSold) × P_powerLaw(t)
     var years = [];
     var pledgeSeries = [];
     var sellSeries = [];
+    var holdSeries = [];
     var crossoverYear = null;
     var prevDelta = pledgeTerminalWealth - sellTerminalWealth; // sentinel
     for(var t = 0; t <= horizon; t++){
       var pAtT = plPriceAtYear(t);
-      var pledgeAtT = pledgeStack * pAtT - downPayment * premium * t;
+      var pledgeAtT = pledgeStack * pAtT - pledgeCostAtYear(t);
       var sellAtT   = sellFeasible ? (sellStack * pAtT) : 0;
+      var holdAtT   = stack * pAtT;
       years.push(t);
       pledgeSeries.push(pledgeAtT);
       sellSeries.push(sellAtT);
+      holdSeries.push(holdAtT);
       // Crossover: when pledge wealth first exceeds sell wealth (or vice versa).
       // Pledge starts ahead (at t=0, full stack vs reduced stack at current price),
-      // BUT cumulative interest premium can pull it below sell over time.
+      // BUT cumulative interest cost can pull it below sell over time.
       // Look for sign change in (pledge − sell).
       var delta = pledgeAtT - sellAtT;
       if(t > 0 && Math.sign(delta) !== Math.sign(prevDelta) && Math.sign(prevDelta) !== 0){
@@ -225,12 +307,23 @@
     // ─── Render Pledge card ───
     if(pledgeFeasible){
       pledgeHeadline.textContent = fmtBtc(pledgeStack);
+      var interestRows;
+      if(repayYear >= horizon){
+        interestRows =
+          row('Premium portion (full mortgage)',                                fmtUsd(homePrice * premium * horizon)) +
+          row('Base-rate portion (down-payment loan)',                          fmtUsd(downPayment * mortRate * horizon));
+      } else {
+        interestRows =
+          row('Premium portion (full mortgage, years 0&ndash;' + repayYear + ')', fmtUsd(homePrice * premium * repayYear)) +
+          row('Base-rate portion (down-payment loan, years 0&ndash;' + repayYear + ')', fmtUsd(downPayment * mortRate * repayYear));
+      }
       pledgeRows.innerHTML =
         row('Down payment funded',                                              fmtUsd(downPayment)) +
         row('Required collateral (250%)',                                       fmtUsd(requiredCollateral) + ' &middot; ' + fmtBtc(requiredCollateral / price)) +
         row('BTC sold to fund',                                                  '0 (pledged instead)') +
         row('Cap gains tax paid now',                                            '$0') +
-        row('Cumulative interest premium @ year ' + horizon,                     fmtUsd(cumulativePremiumInterest)) +
+        interestRows +
+        row('Total cost of pledge path @ year ' + horizon,                       fmtUsd(cumulativePremiumInterest)) +
         row('BTC value at year ' + horizon + ' (PL trend)',                      fmtUsd(pledgeStack * futurePrice)) +
         row('Net wealth at year ' + horizon,                                     fmtUsd(pledgeTerminalWealth), true);
     } else {
@@ -278,20 +371,23 @@
       if(crossoverYear !== null && crossoverYear > 0 && crossoverYear <= horizon){
         crossoverStr = ' Crossover lands at <strong>year ' + crossoverYear.toFixed(1) + '</strong>, beyond which the ' + (pledgeWins ? 'pledge path' : 'sell path') + ' is the wealthier finish.';
       } else if(pledgeWins){
-        crossoverStr = ' The pledge path is wealthier at every point in your horizon \u2014 cumulative interest premium never outpaces the appreciation captured by retaining the BTC.';
+        crossoverStr = ' The pledge path is wealthier at every point in your horizon \u2014 cumulative interest cost never outpaces the appreciation captured by retaining the BTC.';
       } else {
-        crossoverStr = ' The sell path is wealthier at every point in your horizon \u2014 the cumulative interest premium dominates the value of BTC retained.';
+        crossoverStr = ' The sell path is wealthier at every point in your horizon \u2014 the cumulative interest cost dominates the value of BTC retained.';
       }
+      // Reference the HOLD baseline so users see the cost of buying-at-all
+      var holdDelta = holdTerminalWealth - Math.max(pledgeTerminalWealth, sellTerminalWealth);
+      var holdStr = ' For reference, simply <strong>holding the stack and not buying the home at all</strong> finishes at <strong>' + fmtUsd(holdTerminalWealth) + '</strong> &mdash; ' + fmtUsd(holdDelta) + ' more than the better of the two purchase paths. That gap is the all-in cost of acquiring the home, against which the Pledge vs Sell comparison is the second-order decision.';
       verdictHtml =
         '<p>At year <strong>' + horizon + '</strong>, the <strong class="' + winnerCls + '">' + winnerLabel + '</strong> path retains ' +
         '<strong class="' + winnerCls + '">' + fmtUsd(delta) + ' more wealth</strong> than the ' + loserLabel + ' path. ' +
-        'BTC trend price at year ' + horizon + ': <strong>' + fmtUsd(futurePrice) + '/BTC</strong>.' + crossoverStr + '</p>';
+        'BTC trend price at year ' + horizon + ': <strong>' + fmtUsd(futurePrice) + '/BTC</strong>.' + crossoverStr + holdStr + '</p>';
     }
     verdict.className = verdictCls;
     verdict.innerHTML = verdictHtml;
 
     // ─── Render the chart ───
-    renderChart(years, pledgeSeries, sellSeries, crossoverYear, sellFeasible, pledgeFeasible);
+    renderChart(years, pledgeSeries, sellSeries, holdSeries, crossoverYear, sellFeasible, pledgeFeasible);
   }
 
   function row(label, value, terminal){
@@ -300,10 +396,29 @@
       '<span class="row-val">' + value + '</span></div>';
   }
 
-  function renderChart(years, pledgeSeries, sellSeries, crossoverYear, sellFeasible, pledgeFeasible){
+  function renderChart(years, pledgeSeries, sellSeries, holdSeries, crossoverYear, sellFeasible, pledgeFeasible){
     if(!chartCanvas || typeof Chart === 'undefined') return;
 
     var datasets = [];
+
+    // HOLD baseline first so it draws behind the Pledge/Sell lines.
+    // Always shown — it's the 0% borrowing reference. Muted tan
+    // dashed weight 1.5px so it reads as 'background reference' not
+    // 'primary path'. Matches the retirement-page baseline convention.
+    if(holdSeries && holdSeries.length){
+      datasets.push({
+        label: 'Hold (no purchase)',
+        data: holdSeries,
+        borderColor: '#a89c8a',
+        backgroundColor: 'rgba(168,156,138,0.06)',
+        borderWidth: 1.5,
+        borderDash: [4, 3],
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        tension: 0.1,
+        fill: false,
+      });
+    }
     if(pledgeFeasible){
       datasets.push({
         label: 'Pledge path',
@@ -445,11 +560,52 @@
 
   // ─── Wire all inputs to recompute ───
   var inputs = [homePriceInput, downPctSlider, stackInput, priceInput, costBasisInput,
-                mortRateSlider, premiumSlider, horizonSlider, capGainsSlider];
+                mortRateSlider, premiumSlider, horizonSlider, capGainsSlider,
+                earlyRepaySlider];
   ['input','change'].forEach(function(evt){
     inputs.forEach(function(el){ if(el) el.addEventListener(evt, compute); });
   });
 
-  // Initial compute
+  // ─── Tactical/strategic horizon presets ───
+  // Each .bbm-horizon-preset button carries a data-horizon attribute.
+  // Clicking sets the horizon slider to that value and triggers compute.
+  // The slider remains the canonical control; the buttons are a
+  // one-click shortcut between three named framings:
+  //   tactical (5y)   — near-term cash-flow comparison
+  //   standard (15y)  — typical mid-horizon
+  //   strategic (30y) — full mortgage duration / strategic framing
+  // When the user uses the slider, the active-state styling is
+  // recomputed from the current horizon value.
+  function syncPresetActive(){
+    if(!presetButtons || !presetButtons.length) return;
+    var current = parseInt(horizonSlider.value, 10);
+    presetButtons.forEach(function(btn){
+      var v = parseInt(btn.getAttribute('data-horizon'), 10);
+      if(v === current) btn.classList.add('is-active');
+      else btn.classList.remove('is-active');
+    });
+  }
+  if(presetButtons && presetButtons.length){
+    presetButtons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var v = parseInt(btn.getAttribute('data-horizon'), 10);
+        if(isNaN(v)) return;
+        horizonSlider.value = v;
+        // Also clamp early-repayment to the new horizon so the
+        // 'never (full term)' label stays consistent at the slider max
+        if(earlyRepaySlider){
+          earlyRepaySlider.max = v;
+          if(parseInt(earlyRepaySlider.value, 10) > v) earlyRepaySlider.value = v;
+        }
+        syncPresetActive();
+        compute();
+      });
+    });
+    // Resync on direct slider use, too
+    horizonSlider.addEventListener('input', syncPresetActive);
+  }
+
+  // ─── Initial compute ───
+  syncPresetActive();
   compute();
 })();

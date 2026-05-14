@@ -592,6 +592,52 @@ body {
 .slider-grid.grid-3 { grid-template-columns: repeat(3, 1fr); }
 .slider-grid.grid-4 { grid-template-columns: repeat(4, 1fr); }
 .slider-grid.grid-5 { grid-template-columns: repeat(5, 1fr); }
+
+
+/* ───────────────────────────────────────────────
+   Horizon preset toggle — tactical/standard/strategic
+   Three small inline buttons sitting between the
+   slider's name/value row and the range input. The
+   active state lights up amber when the horizon
+   slider's current value matches the button's
+   data-horizon. Kept visually subtle: amber border,
+   bg transparent, hover lifts slightly. The point
+   is a 1-click preset, not a primary CTA.
+   ─────────────────────────────────────────────── */
+.bbm-horizon-presets {
+    display: flex;
+    gap: 0.3rem;
+    margin: 0.35rem 0 0.5rem;
+}
+.bbm-horizon-preset {
+    flex: 1;
+    background: transparent;
+    border: 1px solid rgba(224,148,34,0.22);
+    border-radius: 4px;
+    padding: 0.32rem 0.4rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+}
+.bbm-horizon-preset:hover {
+    border-color: rgba(224,148,34,0.5);
+    color: var(--text);
+    background: rgba(224,148,34,0.04);
+}
+.bbm-horizon-preset:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 1px;
+}
+.bbm-horizon-preset.is-active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(224,148,34,0.08);
+    font-weight: 600;
+}
 @media (max-width: 880px) {
     .slider-grid.grid-3, .slider-grid.grid-4, .slider-grid.grid-5 {
         grid-template-columns: 1fr 1fr;
