@@ -1,0 +1,1836 @@
+/* ───────────────────────────────────────────────
+   BORROWING AGAINST YOUR STACK — PAGE CSS
+
+   Page-specific styles. Chrome rules (hero, tab nav, sections,
+   prose, belief-context, negative-space-list) are lifted from
+   the Disciplined Rebalancing page for consistent visual register
+   across the two related calculators.
+
+   Sections:
+   1. CSS variables (color tokens)
+   2. Page width constraints (content-area, hero)
+   3. Section-intro and per-tab essay constraints
+   4. Tab navigation
+   5. Narrative pull-out block
+   6. Belief-context callout
+   7. Negative-space list
+   8. BAS-tier cards (three-tier rehypothecation hierarchy)
+   9. BAS-cs-stub (used in Math tab still in development)
+  10. BAS-viz-placeholder (inline placeholder for CAGR chart)
+  11. Calculator surface (input grid, output cards, channel chart)
+   ─────────────────────────────────────────────── */
+
+:root {
+    --bg: #0a0908;
+    --bg-card: #141210;
+    --amber: #e09422;
+    --amber-dim: #b8791c;
+    --amber-glow: rgba(224,148,34,0.15);
+    --text: #e8e0d4;
+    --text-dim: #9a9080;
+    --text-muted: #6a6256;
+    --red: #c0392b;
+    --red-dim: rgba(192,57,43,0.6);
+    --green: #27ae60;
+    --green-dim: rgba(39,174,96,0.6);
+    --border: rgba(224,148,34,0.12);
+}
+
+/* ─── 2. PAGE WIDTH CONSTRAINTS ─── */
+.content-area {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem 5rem;
+}
+.hero {
+    position: relative;
+    text-align: center;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 5rem 2rem 3rem;
+}
+.hero h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(2.8rem, 5.5vw, 4.5rem);
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    margin: 0 0 0.6rem;
+}
+.hero h1 em {
+    font-style: italic;
+    color: var(--amber);
+    font-weight: 500;
+}
+.hero-subtitle {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    font-style: normal;
+    color: var(--text-dim);
+    margin: 0 auto 1.8rem;
+    max-width: 720px;
+    line-height: 1.5;
+    letter-spacing: 0.005em;
+}
+.hero .subtitle {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.7;
+    color: var(--text-dim);
+    max-width: 680px;
+    margin: 0 auto;
+    font-weight: 400;
+}
+.hero .subtitle em { color: var(--text); font-style: italic; }
+@media (max-width: 720px) {
+    .content-area { padding: 0 1.25rem 3rem; }
+    .hero { padding: 3.5rem 1.25rem 2rem; }
+}
+
+/* ─── 3. SECTION-INTRO + PER-TAB ESSAY CONSTRAINTS ─── */
+.section-intro {
+    margin: 0 auto 2rem;
+    max-width: 880px;
+}
+.section-intro h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.15;
+    margin: 0 0 1rem;
+    letter-spacing: -0.005em;
+}
+.section-intro h2 em { font-style: italic; color: var(--amber); }
+.section-intro p {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+}
+.section-intro p em { color: var(--text); font-style: italic; }
+.section-intro p strong { color: var(--text); font-weight: 600; }
+
+#tab-question .section,
+#tab-question .narrative,
+#tab-question .belief-context {
+    max-width: 880px;
+    margin-left: auto;
+    margin-right: auto;
+}
+#tab-question h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.7rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 2.5rem 0 1rem;
+    letter-spacing: -0.005em;
+}
+#tab-question h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 1.8rem 0 0.7rem;
+    letter-spacing: -0.003em;
+    font-style: italic;
+}
+#tab-question p {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin: 0 0 1.2rem;
+}
+#tab-question p em { font-style: italic; color: var(--amber-dim); }
+#tab-question p strong { color: var(--text); font-weight: 600; }
+#tab-question p a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(224,148,34,0.3);
+    transition: border-color 0.2s;
+}
+#tab-question p a:hover { border-color: var(--amber); }
+#tab-question p a em { color: var(--amber); }
+
+#tab-math .section-intro,
+#tab-math .bas-cs-stub {
+    max-width: 880px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ─── 4. TAB NAVIGATION ─── */
+.tab-nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin: 1.8rem 0 2.5rem;
+}
+.tab-btn {
+    flex: 1;
+    padding: 1.1rem 1rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.25s;
+    font-family: inherit;
+}
+.tab-btn:hover { background: rgba(255,255,255,0.02); }
+.tab-btn .tab-num {
+    display: block;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    transition: color 0.25s;
+}
+.tab-btn .tab-title {
+    display: block;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    font-weight: 500;
+    color: var(--text-dim);
+    transition: color 0.25s;
+    letter-spacing: 0.005em;
+}
+.tab-btn.active { border-bottom-color: var(--amber); }
+.tab-btn.active .tab-num { color: var(--amber); }
+.tab-btn.active .tab-title { color: var(--text); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: tabIn 0.35s ease; }
+@keyframes tabIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 720px) {
+    .tab-btn { padding: 0.85rem 0.5rem; }
+    .tab-btn .tab-num { font-size: 0.6rem; letter-spacing: 0.15em; }
+    .tab-btn .tab-title { font-size: 0.95rem; }
+}
+
+/* ─── 5. NARRATIVE BLOCK ─── */
+.narrative {
+    background: rgba(255,255,255,0.015);
+    border-left: 2px solid var(--amber);
+    padding: 1.8rem 2.2rem;
+    margin: 2rem 0;
+    border-radius: 0 4px 4px 0;
+}
+.narrative p {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin: 0;
+}
+
+/* ─── 6. BELIEF CONTEXT CALLOUT ─── */
+.belief-context {
+    background: rgba(224, 148, 34, 0.035);
+    border: 1px solid rgba(224, 148, 34, 0.15);
+    border-radius: 6px;
+    padding: 1.6rem 1.9rem;
+    margin: 2.5rem 0;
+}
+.belief-context-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.7rem;
+}
+.belief-context p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin: 0;
+}
+.belief-context a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(224,148,34,0.4);
+    transition: border-color 0.2s;
+}
+.belief-context a:hover { border-color: var(--amber); }
+
+/* ─── 7. NEGATIVE-SPACE LIST ─── */
+.negative-space-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.4rem 0 2rem;
+}
+.negative-space-list li {
+    position: relative;
+    padding: 0.9rem 0 0.9rem 1.6rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+}
+.negative-space-list li:last-child { border-bottom: none; }
+.negative-space-list li strong { color: var(--text); font-weight: 600; }
+.negative-space-list li em { color: var(--amber-dim); font-style: italic; }
+.negative-space-list li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: var(--amber-dim);
+    font-weight: 500;
+}
+.negative-space-list li a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(224,148,34,0.3);
+}
+.negative-space-list li a:hover { border-color: var(--amber); }
+
+/* ─── 8. BAS-TIER HIERARCHY (three-tier rehypothecation cards) ─── */
+.bas-tier {
+    display: flex;
+    gap: 1.4rem;
+    margin: 1.4rem 0;
+    padding: 1.5rem 1.8rem;
+    background: rgba(224,148,34,0.025);
+    border: 1px solid rgba(224,148,34,0.12);
+    border-radius: 6px;
+    align-items: flex-start;
+}
+.bas-tier-rank {
+    flex: 0 0 auto;
+    width: 2.4rem;
+    height: 2.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(224,148,34,0.12);
+    border-radius: 50%;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--amber);
+    line-height: 1;
+}
+.bas-tier-body { flex: 1; min-width: 0; }
+.bas-tier-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.002em;
+}
+.bas-tier-body p {
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin: 0;
+}
+.bas-tier-body p em { color: var(--amber-dim); font-style: italic; }
+.bas-tier-body p strong { color: var(--text); font-weight: 600; }
+.bas-tier-fail {
+    background: rgba(192,57,43,0.04);
+    border-color: rgba(192,57,43,0.2);
+}
+.bas-tier-fail .bas-tier-rank {
+    background: rgba(192,57,43,0.14);
+    color: rgba(232,128,113,0.95);
+}
+.bas-tier-fail .bas-tier-title { color: rgba(232,128,113,0.95); }
+
+/* ─── 9. BAS-CS-STUB (Math tab development stub) ─── */
+.bas-cs-stub {
+    margin: 2rem auto 0;
+    padding: 2.2rem 2.4rem;
+    background: rgba(255,255,255,0.015);
+    border: 1px dashed rgba(224,148,34,0.2);
+    border-radius: 8px;
+}
+.bas-cs-stub-header {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 1.6rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid rgba(224,148,34,0.15);
+}
+.bas-cs-stub-section { margin-bottom: 2.2rem; }
+.bas-cs-stub-section:last-of-type { margin-bottom: 0; }
+.bas-cs-stub-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 0.8rem;
+    letter-spacing: -0.003em;
+}
+.bas-cs-stub-section p {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--text-dim);
+    margin: 0 0 0.9rem;
+}
+.bas-cs-stub-section p em { color: var(--amber-dim); font-style: italic; }
+.bas-cs-stub-section p strong { color: var(--text); font-weight: 600; }
+.bas-cs-stub-section a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(224,148,34,0.3);
+}
+.bas-cs-stub-section a:hover { border-color: var(--amber); }
+.bas-cs-stub-cta {
+    margin-top: 1.8rem;
+    padding-top: 1.3rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+.bas-cs-stub-cta p {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    font-style: italic;
+    margin: 0;
+    text-align: center;
+}
+
+/* ─── 10. BAS-VIZ-PLACEHOLDER ─── */
+.bas-viz-placeholder {
+    margin: 1.5rem 0;
+    padding: 3rem 2rem;
+    background: rgba(255,255,255,0.015);
+    border: 1px dashed rgba(255,255,255,0.08);
+    border-radius: 6px;
+    text-align: center;
+}
+.bas-viz-placeholder-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+}
+
+/* ═══════════════════════════════════════════════
+   11. CALCULATOR SURFACE
+   First-slice: inputs (stack, current price, loan amount,
+   liquidation threshold), three output cards (LTV, liquidation
+   BTC price, channel position), and the Power Law channel chart.
+   Borrow-vs-sell comparison, interest cost, and loss-scenario
+   backtests come in subsequent commits.
+   ═══════════════════════════════════════════════ */
+
+.bas-calc {
+    margin: 2rem auto 0;
+    max-width: 1040px;
+}
+
+/* Input grid — 2 columns on wide, 1 column on narrow.
+   Each .bas-calc-field is a labeled control (number input or slider). */
+.bas-calc-inputs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.6rem 2.2rem;
+    padding: 1.8rem 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+@media (max-width: 720px) {
+    .bas-calc-inputs {
+        grid-template-columns: 1fr;
+        padding: 1.4rem 1.4rem;
+        gap: 1.4rem;
+    }
+}
+.bas-calc-field { display: flex; flex-direction: column; gap: 0.5rem; }
+.bas-calc-field-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+}
+.bas-calc-field-hint {
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+}
+.bas-calc-field input[type="number"] {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 0.55rem 0.8rem;
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+.bas-calc-field input[type="number"]:focus {
+    outline: none;
+    border-color: var(--amber);
+}
+.bas-calc-field input[type="number"]::-webkit-outer-spin-button,
+.bas-calc-field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.bas-calc-field input[type="number"] { -moz-appearance: textfield; }
+
+/* Slider control */
+.bas-calc-field input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: rgba(224,148,34,0.18);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    margin: 8px 0;
+}
+.bas-calc-field input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--amber);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 1px rgba(224,148,34,0.4);
+    cursor: grab;
+}
+.bas-calc-field input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+.bas-calc-field input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--amber);
+    border: 2px solid var(--bg);
+    cursor: grab;
+}
+
+/* Slider label includes inline display value */
+.bas-calc-field-label-with-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.7rem;
+}
+.bas-calc-field-label-with-display .bas-calc-field-display {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--amber);
+    letter-spacing: 0.02em;
+    text-transform: none;
+}
+
+/* Output cards — three across, each surfacing one of the headline numbers */
+.bas-calc-outputs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 1.6rem 0;
+}
+@media (max-width: 720px) {
+    .bas-calc-outputs { grid-template-columns: 1fr; gap: 0.7rem; }
+}
+.bas-calc-output-card {
+    padding: 1.3rem 1.4rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+.bas-calc-output-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+.bas-calc-output-value {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.85rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+}
+.bas-calc-output-value.bas-calc-output-zoned {
+    font-size: 1.4rem;
+    font-weight: 500;
+}
+.bas-calc-output-sub {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--text-dim);
+    margin-top: 0.15rem;
+}
+.bas-calc-output-zone {
+    display: inline-block;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.55rem;
+    border-radius: 3px;
+    margin-top: 0.4rem;
+    align-self: flex-start;
+}
+/* Zone color modifiers (used on .bas-calc-output-zone or .bas-calc-output-value.bas-calc-output-zoned) */
+.bas-zone-good {
+    color: var(--green);
+    background: rgba(39,174,96,0.1);
+    border: 1px solid rgba(39,174,96,0.25);
+}
+.bas-zone-warn {
+    color: var(--amber);
+    background: rgba(224,148,34,0.1);
+    border: 1px solid rgba(224,148,34,0.25);
+}
+.bas-zone-bad {
+    color: #e87f6f;
+    background: rgba(192,57,43,0.1);
+    border: 1px solid rgba(192,57,43,0.3);
+}
+/* When zone is applied directly to .bas-calc-output-value, override default text color
+   but lose the background pill (the entire value is colored, not boxed) */
+.bas-calc-output-value.bas-calc-output-zoned.bas-zone-good { background: none; border: none; padding: 0; color: var(--green); }
+.bas-calc-output-value.bas-calc-output-zoned.bas-zone-warn { background: none; border: none; padding: 0; color: var(--amber); }
+.bas-calc-output-value.bas-calc-output-zoned.bas-zone-bad  { background: none; border: none; padding: 0; color: #e87f6f; }
+
+/* ─── Interest cost scenarios (3 provider categories) ───
+   Sits between the headline output cards and the chart. Three side-by-side
+   cards comparing typical APR by provider archetype, with monthly + annual
+   interest dollar amounts. The DeFi card gets a desaturated red border tint
+   plus an explicit "covered for completeness only" footer so the lower rate
+   doesn't read as a recommendation. */
+.bas-calc-provider-section {
+    margin: 2rem 0 1rem;
+}
+.bas-calc-provider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.9rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.bas-calc-provider-title {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+.bas-calc-provider-subtitle {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+.bas-calc-provider-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+@media (max-width: 900px) {
+    .bas-calc-provider-grid { grid-template-columns: 1fr; gap: 0.8rem; }
+}
+.bas-provider-card {
+    padding: 1.3rem 1.4rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    position: relative;
+    min-width: 0;
+}
+.bas-provider-card-good {
+    border-color: rgba(39,174,96,0.22);
+}
+.bas-provider-card-good::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--green);
+    opacity: 0.65;
+    border-radius: 6px 6px 0 0;
+}
+.bas-provider-card-neutral {
+    border-color: rgba(224,148,34,0.22);
+}
+.bas-provider-card-neutral::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--amber);
+    opacity: 0.55;
+    border-radius: 6px 6px 0 0;
+}
+.bas-provider-card-bad {
+    border-color: rgba(192,57,43,0.3);
+    background: rgba(192,57,43,0.025);
+}
+.bas-provider-card-bad::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--red);
+    opacity: 0.55;
+    border-radius: 6px 6px 0 0;
+}
+.bas-provider-card-name {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.002em;
+    line-height: 1.2;
+}
+.bas-provider-card-apr {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.75rem;
+    color: var(--amber);
+    letter-spacing: 0.04em;
+    font-weight: 600;
+}
+.bas-provider-card-cost {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.bas-provider-card-cost:last-of-type { border-bottom: none; padding-bottom: 0.1rem; }
+.bas-provider-card-cost-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.bas-provider-card-cost-val {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.005em;
+}
+.bas-provider-card-examples {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-style: italic;
+    line-height: 1.45;
+    margin-top: 0.2rem;
+}
+.bas-provider-card-note {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+}
+.bas-provider-card-dismissed {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.72rem;
+    color: #e87f6f;
+    letter-spacing: 0.04em;
+    padding-top: 0.5rem;
+    margin-top: 0.2rem;
+    border-top: 1px solid rgba(192,57,43,0.15);
+}
+
+/* Chart wrapper */
+.bas-calc-chart-wrapper {
+    margin: 2rem 0 1.5rem;
+    padding: 1.6rem 1.8rem 1.2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.bas-calc-chart-title {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+.bas-calc-chart-canvas {
+    position: relative;
+    height: 380px;
+    width: 100%;
+}
+.bas-calc-chart-canvas canvas { display: block; max-width: 100%; }
+@media (max-width: 720px) {
+    .bas-calc-chart-wrapper { padding: 1.1rem 1rem 0.9rem; }
+    .bas-calc-chart-canvas { height: 280px; }
+}
+.bas-calc-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.1rem 1.6rem;
+    margin-top: 1rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+}
+.bas-calc-legend-item { display: inline-flex; align-items: center; gap: 0.45rem; }
+.bas-calc-swatch {
+    width: 16px;
+    height: 3px;
+    border-radius: 1px;
+    display: inline-block;
+}
+.bas-calc-swatch.bas-calc-swatch-floor   { background: rgba(224,148,34,0.5); }
+.bas-calc-swatch.bas-calc-swatch-trend   { background: rgba(224,148,34,0.8); height: 2.5px; }
+.bas-calc-swatch.bas-calc-swatch-upper   { background: rgba(224,148,34,0.5); }
+.bas-calc-swatch.bas-calc-swatch-history { background: rgba(232,224,212,0.8); height: 2.5px; }
+.bas-calc-swatch.bas-calc-swatch-liq     { background: var(--red); }
+.bas-calc-swatch.bas-calc-swatch-current { width: 10px; height: 10px; border-radius: 50%; background: var(--green); }
+
+/* Interpretation paragraph below the chart */
+.bas-calc-interp {
+    margin: 1.5rem auto 0;
+    max-width: 880px;
+    padding: 1.4rem 1.8rem;
+    background: rgba(255,255,255,0.018);
+    border-left: 2px solid var(--amber);
+    border-radius: 0 4px 4px 0;
+}
+.bas-calc-interp p {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--text);
+    margin: 0 0 0.7rem;
+}
+.bas-calc-interp p:last-child { margin-bottom: 0; }
+.bas-calc-interp p strong { color: var(--amber); font-weight: 600; }
+
+/* "Coming next" note below the live calculator — sets expectations
+   about what's not yet wired (backtests, borrow-vs-sell, etc.) */
+.bas-calc-roadmap {
+    margin: 2rem auto 0;
+    max-width: 880px;
+    padding: 1.3rem 1.6rem;
+    border: 1px dashed rgba(224,148,34,0.2);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.012);
+}
+.bas-calc-roadmap-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.7rem;
+}
+.bas-calc-roadmap ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.bas-calc-roadmap li {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    padding: 0.35rem 0 0.35rem 1.2rem;
+    position: relative;
+}
+.bas-calc-roadmap li::before {
+    content: "›";
+    position: absolute;
+    left: 0;
+    color: var(--amber-dim);
+}
+.bas-calc-roadmap li strong { color: var(--text); font-weight: 600; }
+
+/* ───────────────────────────────────────────────
+   12. DETAILS BLOCK (used to collapse the cautionary-record
+       case studies in the Question tab — bad-category examples
+       available for readers who want them, hidden by default
+       so they don't dominate the visible page)
+   ─────────────────────────────────────────────── */
+.bas-details {
+    margin: 1.4rem 0 1.6rem;
+    padding: 0;
+    background: rgba(255,255,255,0.018);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    transition: border-color 0.2s, background 0.2s;
+}
+.bas-details:hover { border-color: rgba(224,148,34,0.18); }
+.bas-details summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 0.95rem 1.4rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+    border-radius: 6px;
+    user-select: none;
+    transition: color 0.2s, background 0.2s;
+}
+.bas-details summary::-webkit-details-marker { display: none; }
+.bas-details summary::marker { content: ''; }
+.bas-details summary:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+.bas-details-icon {
+    display: inline-block;
+    color: var(--amber);
+    margin-right: 0.5rem;
+    transition: transform 0.25s;
+    font-size: 1.1em;
+    line-height: 1;
+}
+.bas-details[open] .bas-details-icon { transform: rotate(90deg); }
+.bas-details-body {
+    padding: 0 1.4rem 1.2rem;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    margin-top: 0.1rem;
+    padding-top: 1rem;
+}
+.bas-details-body p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin: 0 0 0.85rem;
+}
+.bas-details-body p:last-child { margin-bottom: 0; }
+.bas-details-body p strong { color: var(--text); }
+.bas-details-body p em { color: var(--amber-dim); font-style: italic; }
+
+/* ───────────────────────────────────────────────
+   13. COST-SURFACE INPUT ROW (interest rate + presets)
+   The risk-surface input grid above stays 2-column; this row
+   sits beneath it, full-width, with the rate slider plus three
+   preset buttons that snap to typical scenarios.
+   ─────────────────────────────────────────────── */
+.bas-calc-inputs-cost {
+    margin: 1rem 0 0;
+    padding: 1.5rem 2rem 1.4rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-top: 1px dashed rgba(224,148,34,0.15);
+    border-radius: 0 0 8px 8px;
+    margin-top: -1px;
+}
+@media (max-width: 720px) {
+    .bas-calc-inputs-cost { padding: 1.2rem 1.4rem; }
+}
+.bas-calc-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 0.7rem 0 0.3rem;
+}
+.bas-calc-preset {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    padding: 0.45rem 0.85rem;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.bas-calc-preset:hover {
+    border-color: rgba(224,148,34,0.4);
+    color: var(--text);
+    background: rgba(224,148,34,0.05);
+}
+.bas-calc-preset.bas-calc-preset-active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(224,148,34,0.08);
+}
+.bas-calc-preset.bas-calc-preset-warning {
+    color: #c0392b;
+    border-color: rgba(192,57,43,0.3);
+}
+.bas-calc-preset.bas-calc-preset-warning:hover {
+    color: #e87f6f;
+    border-color: rgba(192,57,43,0.5);
+    background: rgba(192,57,43,0.05);
+}
+.bas-calc-preset.bas-calc-preset-warning.bas-calc-preset-active {
+    color: #e87f6f;
+    border-color: #c0392b;
+    background: rgba(192,57,43,0.08);
+}
+
+/* Make the bas-calc-field-hint that lives in cost-inputs slightly
+   more breathing room above */
+.bas-calc-inputs-cost .bas-calc-field-hint {
+    margin-top: 0.5rem;
+}
+
+/* ───────────────────────────────────────────────
+   14. OUTPUT SECTIONS (risk vs cost) — adds a quiet
+       eyebrow label above each 3-card row so the user
+       can see at a glance which lens they're looking at
+   ─────────────────────────────────────────────── */
+.bas-calc-output-section {
+    margin: 1.6rem 0 0;
+}
+.bas-calc-output-section-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 0.6rem 0.2rem;
+}
+.bas-calc-output-section .bas-calc-outputs {
+    margin: 0 0 0.2rem;
+}
+
+/* ───────────────────────────────────────────────
+   15. HELP-TIP (canonical §6.13 pattern — '?' glyph
+       in a 14×14 circle, sibling tooltip with absolute
+       positioning, display:none/block per the §6.13
+       lesson about absolute-positioned cards and mobile
+       overflow)
+   ─────────────────────────────────────────────── */
+.help-tip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid var(--text-muted);
+    border-radius: 50%;
+    cursor: help;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+    position: relative;
+    transition: color 0.2s, border-color 0.2s;
+    user-select: none;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+.help-tip:hover,
+.help-tip:focus {
+    color: var(--amber);
+    border-color: var(--amber);
+    outline: none;
+}
+.help-tip .tip-content {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: min(260px, calc(100vw - 32px));
+    padding: 0.85rem 1rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text);
+    background: var(--bg-card);
+    border: 1px solid rgba(224,148,34,0.25);
+    border-radius: 5px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.55);
+    z-index: 50;
+    text-align: left;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: normal;
+}
+.help-tip .tip-content strong { color: var(--text); font-weight: 600; }
+.help-tip .tip-content em { color: var(--amber-dim); font-style: italic; }
+.help-tip .tip-content a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(224,148,34,0.4);
+    transition: border-color 0.2s;
+}
+.help-tip .tip-content a:hover { border-color: var(--amber); }
+.help-tip:hover .tip-content,
+.help-tip:focus .tip-content,
+.help-tip:focus-within .tip-content { display: block; }
+
+/* Right-anchored variant for help-tips near the right edge of a row */
+.help-tip.help-tip-right .tip-content { left: auto; right: 0; }
+
+/* Regulatory-caution variant of the help-tip — subtle visual distinction
+   so readers can pattern-match these as "tax / regulatory cautions"
+   rather than generic "more info" tooltips. Used inline at three
+   editorially relevant points in The Question (S1259 constructive sale,
+   interest-deductibility loan tracing, and state licensing). Standard
+   minimum-disruption pattern: same circle dimensions and hover behavior
+   as the base help-tip, but the resting state picks up a soft amber
+   border (vs the muted grey on the base tip), and the glyph inside is
+   § rather than ?, which is rare enough in editorial copy to register
+   without being noisy. */
+.help-tip-reg {
+    color: rgba(224,148,34,0.55);
+    border-color: rgba(224,148,34,0.4);
+}
+.help-tip-reg:hover, .help-tip-reg:focus {
+    color: var(--amber);
+    border-color: var(--amber);
+}
+.help-tip-reg .tip-content {
+    border-color: rgba(224,148,34,0.4);
+}
+.help-tip-reg .tip-content .reg-note-label {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.5rem;
+}
+
+/* Preset-button variant: the help-tip sits *next to* the preset button
+   inside a flex wrapper, so the tooltip should open beneath the button. */
+.bas-calc-preset-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.help-tip-preset {
+    width: 13px;
+    height: 13px;
+    font-size: 0.6rem;
+}
+.help-tip-preset.help-tip-warning {
+    color: rgba(192,57,43,0.7);
+    border-color: rgba(192,57,43,0.5);
+}
+.help-tip-preset.help-tip-warning:hover,
+.help-tip-preset.help-tip-warning:focus { color: #e87f6f; border-color: #c0392b; }
+
+/* ───────────────────────────────────────────────
+   16. COST-SECTION CLARIFIER (small caveat below the
+       'Cost surface' label clarifying that interest is
+       interest-only with indefinite term)
+   ─────────────────────────────────────────────── */
+.bas-calc-output-section-clarifier {
+    display: block;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text-muted);
+    text-transform: none;
+    letter-spacing: 0.005em;
+    font-style: italic;
+    margin-top: 0.3rem;
+}
+
+/* ───────────────────────────────────────────────
+   17. LOAN PROFILE (replaces the free-form .bas-calc-interp
+       paragraph block — a scannable check-list with status
+       icons that summarises the loan's structural conditions,
+       followed by conditional strategic-context blocks)
+   ─────────────────────────────────────────────── */
+.bas-calc-profile {
+    margin: 2rem auto 0;
+    max-width: 880px;
+    padding: 1.6rem 1.8rem 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.bas-calc-profile-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 1rem;
+    letter-spacing: -0.005em;
+}
+.bas-calc-profile-checks {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.5rem;
+}
+.bas-calc-profile-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text);
+}
+.bas-calc-profile-check:last-child { border-bottom: none; padding-bottom: 0.4rem; }
+.bas-calc-profile-check-empty {
+    color: var(--text-muted);
+    font-style: italic;
+    border-bottom: none;
+    justify-content: center;
+    padding: 1rem 0;
+}
+/* Status icon: 18×18 circle with the symbol centered */
+.bas-calc-profile-icon {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-top: 1px;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+.bas-calc-profile-icon-good {
+    background: rgba(39,174,96,0.15);
+    color: var(--green);
+    border: 1px solid rgba(39,174,96,0.45);
+}
+.bas-calc-profile-icon-warn {
+    background: rgba(224,148,34,0.15);
+    color: var(--amber);
+    border: 1px solid rgba(224,148,34,0.45);
+}
+.bas-calc-profile-icon-bad {
+    background: rgba(192,57,43,0.15);
+    color: #e87f6f;
+    border: 1px solid rgba(192,57,43,0.5);
+}
+.bas-calc-profile-icon-info {
+    background: rgba(154,144,128,0.12);
+    color: var(--text-dim);
+    border: 1px solid rgba(154,144,128,0.35);
+}
+.bas-calc-profile-body { flex: 1; min-width: 0; }
+.bas-calc-profile-body strong {
+    color: var(--text);
+    font-weight: 600;
+}
+.bas-calc-profile-body .bas-calc-profile-detail {
+    display: block;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin-top: 0.15rem;
+}
+
+/* Strategic-context notes (rendered conditionally below the checks).
+   These keep the editorial Cormorant register because they carry
+   editorial weight at a key UI moment — same pattern as Bitcoin vs
+   Real Estate's .narrative calculator-tab framing block (per
+   STYLE_GUIDE §6.3 scope note). */
+.bas-calc-profile-notes:empty { display: none; }
+.bas-calc-profile-notes .bas-calc-profile-note {
+    margin: 1.1rem 0 0;
+    padding: 1.1rem 1.3rem 1.1rem 1.5rem;
+    background: rgba(255,255,255,0.02);
+    border-left: 2px solid var(--amber);
+    border-radius: 0 4px 4px 0;
+}
+.bas-calc-profile-notes .bas-calc-profile-note p {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--text);
+    margin: 0 0 0.6rem;
+}
+.bas-calc-profile-notes .bas-calc-profile-note p:last-child { margin-bottom: 0; }
+.bas-calc-profile-notes .bas-calc-profile-note p strong { color: var(--amber); font-weight: 600; }
+.bas-calc-profile-notes .bas-calc-profile-note p em { color: var(--amber-dim); font-style: italic; }
+.bas-calc-profile-notes .bas-calc-profile-note p a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(224,148,34,0.35);
+}
+.bas-calc-profile-notes .bas-calc-profile-note p a:hover { border-color: var(--amber); }
+.bas-calc-profile-notes .bas-calc-profile-note-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* ───────────────────────────────────────────────
+   18. LTV METER (mini bar inside the Your-LTV card)
+   Shows current LTV as a colored fill on a 0-100%
+   horizontal scale, with a red vertical marker at the
+   Liquidation LTV. The gap between fill and marker is
+   the user's drawdown buffer made visible.
+   The fill colour matches the LTV zone classification
+   (good/warn/bad) so the visual and the zone pill stay
+   coherent. Marker stays red regardless — it represents
+   the lender-set threshold which is structurally fixed
+   relative to the user's current position.
+   ─────────────────────────────────────────────── */
+.bas-calc-ltv-meter {
+    margin-top: 0.85rem;
+}
+.bas-calc-ltv-meter-bar {
+    position: relative;
+    height: 5px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    overflow: visible;
+}
+.bas-calc-ltv-meter-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: 3px 0 0 3px;
+    transition: width 0.25s ease, background-color 0.2s;
+    background: var(--green);
+}
+.bas-calc-ltv-meter-fill.bas-calc-ltv-meter-fill-good { background: var(--green); }
+.bas-calc-ltv-meter-fill.bas-calc-ltv-meter-fill-warn { background: var(--amber); }
+.bas-calc-ltv-meter-fill.bas-calc-ltv-meter-fill-bad  { background: #c0392b; }
+.bas-calc-ltv-meter-marker {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    width: 2px;
+    background: #c0392b;
+    border-radius: 1px;
+    transition: left 0.25s ease;
+    box-shadow: 0 0 4px rgba(192,57,43,0.4);
+}
+.bas-calc-ltv-meter-legend {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    gap: 0.5rem;
+}
+.bas-calc-ltv-meter-legend > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+.bas-calc-ltv-meter-swatch {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    flex: 0 0 auto;
+}
+.bas-calc-ltv-meter-swatch-current {
+    border-radius: 50%;
+    background: var(--green);
+    transition: background-color 0.2s;
+}
+.bas-calc-ltv-meter-swatch-current.bas-calc-ltv-meter-swatch-good { background: var(--green); }
+.bas-calc-ltv-meter-swatch-current.bas-calc-ltv-meter-swatch-warn { background: var(--amber); }
+.bas-calc-ltv-meter-swatch-current.bas-calc-ltv-meter-swatch-bad  { background: #c0392b; }
+.bas-calc-ltv-meter-swatch-trigger {
+    width: 2px;
+    height: 10px;
+    background: #c0392b;
+    margin: 0 3px;
+    border-radius: 1px;
+}
+
+/* ───────────────────────────────────────────────
+   19. BORROW vs. SELL COMPARISON SECTION
+   The editorial heart of the calculator — side-by-side
+   modelling of the two paths over the chosen horizon.
+   ─────────────────────────────────────────────── */
+.bas-calc-bvs-section {
+    margin: 2.5rem auto 0;
+    padding: 1.8rem 2rem 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.bas-calc-bvs-header {
+    margin-bottom: 1.4rem;
+}
+.bas-calc-bvs-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 0.6rem;
+    letter-spacing: -0.005em;
+}
+.bas-calc-bvs-subtitle {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    margin: 0;
+}
+.bas-calc-bvs-subtitle em { color: var(--amber-dim); font-style: italic; }
+
+/* Input row — three controls side by side, stack on mobile */
+.bas-calc-bvs-inputs {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 1.4rem 1.8rem;
+    padding: 1.3rem 1.5rem;
+    margin-bottom: 1.4rem;
+    background: rgba(255,255,255,0.018);
+    border: 1px solid rgba(224,148,34,0.08);
+    border-radius: 6px;
+}
+@media (max-width: 720px) {
+    .bas-calc-bvs-inputs {
+        grid-template-columns: 1fr;
+        padding: 1.1rem 1.2rem;
+        gap: 1.2rem;
+    }
+}
+
+/* Comparison cards — two paths side by side */
+.bas-calc-bvs-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+}
+/* Three-column variant — used when the HODL baseline card is present */
+.bas-calc-bvs-comparison.bas-calc-bvs-comparison-3col {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.8rem;
+}
+@media (max-width: 900px) {
+    .bas-calc-bvs-comparison.bas-calc-bvs-comparison-3col {
+        grid-template-columns: 1fr;
+        gap: 0.9rem;
+    }
+}
+@media (max-width: 720px) {
+    .bas-calc-bvs-comparison {
+        grid-template-columns: 1fr;
+        gap: 0.9rem;
+    }
+}
+.bas-calc-bvs-path {
+    padding: 1.15rem 1.2rem;
+    background: rgba(255,255,255,0.018);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+/* HODL card — the wealth-maximising baseline (the purist default).
+   Amber treatment signals "respect the conservative path" — same warm
+   accent as the site's primary palette, but lighter saturation than
+   the borrow/green or sell/slate active alternatives. */
+.bas-calc-bvs-path-hodl {
+    border-color: rgba(224,148,34,0.22);
+    background: rgba(224,148,34,0.025);
+}
+.bas-calc-bvs-path-hodl .bas-calc-bvs-path-label {
+    color: var(--amber);
+    letter-spacing: 0.18em;
+}
+.bas-calc-bvs-path-borrow {
+    border-color: rgba(39,174,96,0.22);
+    background: rgba(39,174,96,0.02);
+}
+.bas-calc-bvs-path-borrow .bas-calc-bvs-path-label { color: var(--green); }
+/* Sell card — slate-blue. Distinct from amber (HODL) and green (borrow)
+   so a glance distinguishes all three. Cooler tone reads as "active
+   alternative" without alarm. */
+.bas-calc-bvs-path-sell {
+    border-color: rgba(122,149,168,0.30);
+    background: rgba(122,149,168,0.03);
+}
+.bas-calc-bvs-path-sell .bas-calc-bvs-path-label { color: #8aa3b5; }
+.bas-calc-bvs-path-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.35rem;
+}
+.bas-calc-bvs-path-tagline {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    font-style: italic;
+    /* Reserve 2 lines of vertical space regardless of content length, so
+       row-by-row alignment across the 3 cards is preserved even if one
+       tagline wraps and the others don't. */
+    min-height: 2.2em;
+}
+.bas-calc-bvs-path-headline {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+}
+.bas-calc-bvs-path-sublabel {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 1rem;
+}
+.bas-calc-bvs-path-rows {
+    margin-top: 0.3rem;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    padding-top: 0.7rem;
+}
+.bas-calc-bvs-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.85rem;
+}
+.bas-calc-bvs-row:last-child { border-bottom: none; padding-bottom: 0.2rem; }
+.bas-calc-bvs-row-label {
+    color: var(--text-dim);
+}
+.bas-calc-bvs-row-value {
+    color: var(--text);
+    font-weight: 500;
+}
+.bas-calc-bvs-row-value-terminal {
+    color: var(--text);
+    font-weight: 600;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.05rem;
+}
+/* Colorize the terminal Net-wealth value to match each card's accent —
+   so the reader's eye connects card → terminal value → verdict copy
+   without having to re-read labels. */
+.bas-calc-bvs-path-hodl   .bas-calc-bvs-row-value-terminal { color: var(--amber); }
+.bas-calc-bvs-path-borrow .bas-calc-bvs-row-value-terminal { color: var(--green); }
+.bas-calc-bvs-path-sell   .bas-calc-bvs-row-value-terminal { color: #8aa3b5; }
+
+/* Verdict — final line summarising the delta */
+.bas-calc-bvs-verdict {
+    padding: 1.2rem 1.4rem;
+    background: rgba(224,148,34,0.04);
+    border-left: 2px solid var(--amber);
+    border-radius: 0 4px 4px 0;
+}
+.bas-calc-bvs-verdict p {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.1rem;
+    line-height: 1.55;
+    color: var(--text);
+    margin: 0;
+}
+.bas-calc-bvs-verdict p strong { color: var(--amber); font-weight: 600; }
+.bas-calc-bvs-verdict p em { color: var(--amber-dim); font-style: italic; }
+.bas-calc-bvs-verdict-borrow-wins { border-left-color: var(--green); background: rgba(39,174,96,0.04); }
+.bas-calc-bvs-verdict-borrow-wins p strong { color: var(--green); }
+.bas-calc-bvs-verdict-sell-wins   { border-left-color: #8aa3b5; background: rgba(122,149,168,0.04); }
+.bas-calc-bvs-verdict-sell-wins   p strong { color: #8aa3b5; }
+.bas-calc-bvs-verdict-error       { border-left-color: #c0392b; background: rgba(192,57,43,0.04); }
+.bas-calc-bvs-verdict-error       p strong { color: #e87f6f; }
+
+/* Path-colored emphasis inside the verdict copy. Specificity (0,3,1)
+   beats `bas-calc-bvs-verdict-borrow-wins p strong` (0,2,1), so these
+   override the win-state color rule for path-specific values. */
+.bas-calc-bvs-verdict p strong.verdict-hodl,
+.bas-calc-bvs-verdict p span.verdict-hodl   { color: var(--amber); }
+.bas-calc-bvs-verdict p strong.verdict-borrow,
+.bas-calc-bvs-verdict p span.verdict-borrow { color: var(--green); }
+.bas-calc-bvs-verdict p strong.verdict-sell,
+.bas-calc-bvs-verdict p span.verdict-sell   { color: #8aa3b5; }
+.bas-calc-bvs-verdict p em.verdict-hodl       { color: var(--amber-dim); }
+.bas-calc-bvs-verdict p em.verdict-borrow     { color: var(--green-dim); }
+.bas-calc-bvs-verdict p em.verdict-sell       { color: rgba(122,149,168,0.7); }
+
+/* ───────────────────────────────────────────────
+   Risk-disclosure caveat (below the verdict)
+   Scoped specifically to the BORROW path: liquidation
+   and counterparty risks are features of borrowing
+   alone (neither HODL nor selling carries them). Green
+   left-border ties it visually to the Borrow card.
+   Visually subordinate to the verdict — italic body,
+   smaller font, muted color.
+   ─────────────────────────────────────────────── */
+.bas-calc-bvs-caveat {
+    margin-top: 1rem;
+    padding: 0.9rem 1.2rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    font-style: italic;
+    border-left: 2px solid rgba(39,174,96,0.35);
+    background: rgba(39,174,96,0.02);
+    border-radius: 0 3px 3px 0;
+}
+.bas-calc-bvs-caveat strong {
+    color: var(--green);
+    font-weight: 600;
+    font-style: normal;
+    letter-spacing: 0.005em;
+}
+.bas-calc-bvs-caveat a {
+    color: var(--green);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(39,174,96,0.35);
+    transition: color 0.2s, border-color 0.2s;
+}
+.bas-calc-bvs-caveat a:hover {
+    color: #3acc7a;
+    border-color: #3acc7a;
+}
+
+/* ───────────────────────────────────────────────
+   20. BVS RATE PRESETS — separate selector so the LH
+   preset wiring (which sets both rate and threshold)
+   doesn't accidentally pick up the BvS variant
+   (which sets rate only — threshold lives on LH).
+   Visual style mirrors .bas-calc-preset.
+   ─────────────────────────────────────────────── */
+.bas-calc-preset-bvs {
+    padding: 0.5rem 0.95rem;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(224,148,34,0.18);
+    border-radius: 3px;
+    color: var(--text-dim);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.005em;
+}
+.bas-calc-preset-bvs:hover {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(224,148,34,0.05);
+}
+.bas-calc-preset-bvs.bas-calc-preset-active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(224,148,34,0.08);
+    font-weight: 500;
+}
+.bas-calc-preset-bvs.bas-calc-preset-warning {
+    border-color: rgba(192,57,43,0.35);
+    color: rgba(232,127,111,0.75);
+}
+.bas-calc-preset-bvs.bas-calc-preset-warning:hover,
+.bas-calc-preset-bvs.bas-calc-preset-warning.bas-calc-preset-active {
+    border-color: #c0392b;
+    color: #e87f6f;
+    background: rgba(192,57,43,0.05);
+}
+
+/* ───────────────────────────────────────────────
+   21. COST BASIS PRESETS (BvS-specific)
+   Quick-pick entry points for typical bitcoiner
+   purchase scenarios.
+   ─────────────────────────────────────────────── */
+.bas-calc-bvs-cb-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.55rem;
+}
+.bas-calc-bvs-cb-preset {
+    padding: 0.32rem 0.6rem;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(224,148,34,0.18);
+    border-radius: 3px;
+    color: var(--text-dim);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.005em;
+}
+.bas-calc-bvs-cb-preset:hover {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(224,148,34,0.05);
+}
+.bas-calc-bvs-cb-preset.bas-calc-bvs-cb-preset-active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(224,148,34,0.08);
+    font-weight: 500;
+}
+
+/* Row-label help-tip styling — smaller and inline */
+.bas-calc-bvs-row-label .help-tip {
+    margin-left: 0.25rem;
+    width: 12px;
+    height: 12px;
+    font-size: 0.55rem;
+}
+
+/* ───────────────────────────────────────────────
+   22. THE MATH TAB — methodology, formulas, tables
+   Inter prose for explanations, monospaced-ish for
+   equations (Cormorant italic for variables to match
+   the editorial register without going LaTeX-heavy).
+   ─────────────────────────────────────────────── */
+.bas-math {
+    max-width: 760px;
+    margin: 0 auto;
+}
+.bas-math-section {
+    margin-bottom: 2.6rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+}
+.bas-math-section:last-child { border-bottom: none; }
+.bas-math-section-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.7rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 1rem;
+    letter-spacing: -0.005em;
+}
+.bas-math-subsection-title {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 1.6rem 0 0.7rem;
+}
+.bas-math-prose {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--text);
+    margin: 0 0 0.9rem;
+}
+.bas-math-prose em      { color: var(--amber-dim); font-style: italic; }
+.bas-math-prose strong  { color: var(--text); font-weight: 600; }
+.bas-math-prose a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(224,148,34,0.35);
+    transition: border-color 0.2s;
+}
+.bas-math-prose a:hover { border-color: var(--amber); }
+.bas-math-eq {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--text);
+    background: rgba(255,255,255,0.02);
+    border-left: 2px solid var(--amber);
+    padding: 0.75rem 1.2rem;
+    margin: 0.8rem 0 1rem;
+    border-radius: 0 3px 3px 0;
+    overflow-x: auto;
+    letter-spacing: 0.01em;
+}
+.bas-math-eq sub, .bas-math-eq sup { font-size: 0.7em; }
+.bas-math-table {
+    margin: 0.9rem 0 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.85rem;
+}
+.bas-math-table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+}
+.bas-math-table-row:last-child { border-bottom: none; }
+.bas-math-table-row span:first-child {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 0.95rem;
+}
+.bas-math-table-header {
+    background: rgba(224,148,34,0.04);
+    color: var(--amber);
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.bas-math-table-header span:first-child {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-style: normal;
+    font-size: 0.75rem;
+}
+.bas-math-list {
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+.bas-math-list li {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--text);
+    padding: 0.6rem 0 0.6rem 1.2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    position: relative;
+}
+.bas-math-list li:last-child { border-bottom: none; }
+.bas-math-list li::before {
+    content: "›";
+    position: absolute;
+    left: 0;
+    top: 0.6rem;
+    color: var(--amber);
+    font-weight: 600;
+}
+.bas-math-list li strong { color: var(--text); font-weight: 600; }

@@ -38,6 +38,7 @@ module.exports = function (eleventyConfig) {
     'og-the-bitcoin-retirement.jpg',
     'og-disciplined-rebalancing.jpg',
     'og-borrowing-against-your-stack.jpg',
+    'og-bitcoin-backed-mortgages.jpg',
     'bitcoin-vs-real-estate-og.png',
     // Admin tool stays as standalone HTML
     'admin.html',

@@ -1,19 +1,121 @@
 [
-  { "slug": "what-money-has-to-be",   "title": "What Money Has To Be",       "category": "foundations", "interactive": false, "is_calculator": false },
-  { "slug": "what-bitcoin-is",        "title": "What Bitcoin Is",            "category": "foundations", "interactive": false, "is_calculator": false },
-  { "slug": "synthesis",              "title": "The Bitcoin Synthesis",      "category": "foundations", "interactive": false, "is_calculator": false },
-  { "slug": "trilemma",               "title": "The Bitcoin Trilemma",       "category": "foundations", "interactive": false, "is_calculator": false },
-
-  { "slug": "the-bitcoin-migration",  "title": "The Bitcoin Migration",      "category": "arguments",   "interactive": false, "is_calculator": false },
-  { "slug": "the-half-life",          "title": "The Half-Life",              "category": "arguments",   "interactive": true,  "is_calculator": false },
-  { "slug": "money-trees",            "title": "Money Trees",                "category": "arguments",   "interactive": false, "is_calculator": false },
-  { "slug": "the-melting-ice-cube",   "title": "The Melting Ice Cube",       "category": "arguments",   "interactive": true,  "is_calculator": false },
-  { "slug": "not-a-bubble",           "title": "Is Bitcoin a Bubble?",       "category": "arguments",   "interactive": false, "is_calculator": false },
-
-  { "slug": "the-fixed-pie",          "title": "The Bitcoin Fixed Share",    "category": "numbers",     "interactive": true,  "is_calculator": false },
-  { "slug": "bitcoin-vs-real-estate", "title": "BTC vs. Real Estate",        "category": "numbers",     "interactive": true,  "is_calculator": true  },
-  { "slug": "the-power-law",          "title": "Bitcoin &amp; The Power Law", "category": "numbers",    "interactive": true,  "is_calculator": true  },
-  { "slug": "the-bitcoin-retirement", "title": "The Bitcoin Retirement",     "category": "numbers",     "interactive": true,  "is_calculator": true  },
-  { "slug": "disciplined-rebalancing","title": "Disciplined Rebalancing",    "category": "numbers",     "interactive": true,  "is_calculator": true  },
-  { "slug": "the-bitcoin-horizon",    "title": "The Bitcoin Horizon",        "category": "numbers",     "interactive": true,  "is_calculator": false }
+  {
+    "slug": "what-money-has-to-be",
+    "title": "What Money Has To Be",
+    "category": "foundations",
+    "interactive": false,
+    "is_calculator": false
+  },
+  {
+    "slug": "what-bitcoin-is",
+    "title": "What Bitcoin Is",
+    "category": "foundations",
+    "interactive": false,
+    "is_calculator": false
+  },
+  {
+    "slug": "synthesis",
+    "title": "The Bitcoin Synthesis",
+    "category": "foundations",
+    "interactive": false,
+    "is_calculator": false
+  },
+  {
+    "slug": "trilemma",
+    "title": "The Bitcoin Trilemma",
+    "category": "foundations",
+    "interactive": false,
+    "is_calculator": false
+  },
+  {
+    "slug": "the-bitcoin-migration",
+    "title": "The Bitcoin Migration",
+    "category": "arguments",
+    "interactive": false,
+    "is_calculator": false
+  },
+  {
+    "slug": "the-half-life",
+    "title": "The Half-Life",
+    "category": "arguments",
+    "interactive": true,
+    "is_calculator": false
+  },
+  {
+    "slug": "money-trees",
+    "title": "Money Trees",
+    "category": "arguments",
+    "interactive": false,
+    "is_calculator": false
+  },
+  {
+    "slug": "the-melting-ice-cube",
+    "title": "The Melting Ice Cube",
+    "category": "arguments",
+    "interactive": true,
+    "is_calculator": false
+  },
+  {
+    "slug": "not-a-bubble",
+    "title": "Is Bitcoin a Bubble?",
+    "category": "arguments",
+    "interactive": false,
+    "is_calculator": false
+  },
+  {
+    "slug": "the-fixed-pie",
+    "title": "The Bitcoin Fixed Share",
+    "category": "numbers",
+    "interactive": true,
+    "is_calculator": false
+  },
+  {
+    "slug": "bitcoin-vs-real-estate",
+    "title": "BTC vs. Real Estate",
+    "category": "numbers",
+    "interactive": true,
+    "is_calculator": true
+  },
+  {
+    "slug": "the-power-law",
+    "title": "Bitcoin &amp; The Power Law",
+    "category": "numbers",
+    "interactive": true,
+    "is_calculator": true
+  },
+  {
+    "slug": "the-bitcoin-retirement",
+    "title": "The Bitcoin Retirement",
+    "category": "numbers",
+    "interactive": true,
+    "is_calculator": true
+  },
+  {
+    "slug": "disciplined-rebalancing",
+    "title": "Disciplined Rebalancing",
+    "category": "numbers",
+    "interactive": true,
+    "is_calculator": true
+  },
+  {
+    "slug": "borrowing-against-your-stack",
+    "title": "Borrowing Against Your Stack",
+    "category": "numbers",
+    "interactive": true,
+    "is_calculator": true
+  },
+  {
+    "slug": "bitcoin-backed-mortgages",
+    "title": "Bitcoin-Backed Mortgages",
+    "category": "numbers",
+    "interactive": true,
+    "is_calculator": true
+  },
+  {
+    "slug": "the-bitcoin-horizon",
+    "title": "The Bitcoin Horizon",
+    "category": "numbers",
+    "interactive": true,
+    "is_calculator": false
+  }
 ]
