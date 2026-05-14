@@ -674,7 +674,7 @@ body {
    sliders sit on a common horizontal line across the row. */
 .slider-grid.grid-4 .slider-row,
 .slider-grid.grid-5 .slider-row {
-    min-height: 3.5rem;
+    min-height: 4rem;
 }
 .cluster-means .slider-row {
     flex-direction: column;
