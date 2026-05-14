@@ -401,24 +401,11 @@
 
     var datasets = [];
 
-    // HOLD baseline first so it draws behind the Pledge/Sell lines.
-    // Always shown — it's the 0% borrowing reference. Muted tan
-    // dashed weight 1.5px so it reads as 'background reference' not
-    // 'primary path'. Matches the retirement-page baseline convention.
-    if(holdSeries && holdSeries.length){
-      datasets.push({
-        label: 'Hold (no purchase)',
-        data: holdSeries,
-        borderColor: '#a89c8a',
-        backgroundColor: 'rgba(168,156,138,0.06)',
-        borderWidth: 1.5,
-        borderDash: [4, 3],
-        pointRadius: 0,
-        pointHoverRadius: 4,
-        tension: 0.1,
-        fill: false,
-      });
-    }
+    // PLEDGE and SELL paths are drawn first so HOLD (added last, drawn on top)
+    // shows its dashes through any overlap regions. Without this, scenarios
+    // where Pledge tracks Hold closely (small premium / large stack / no
+    // early repay) produce a chart where the Hold line is invisible because
+    // the solid Pledge stroke fully covers it.
     if(pledgeFeasible){
       datasets.push({
         label: 'Pledge path',
@@ -439,6 +426,24 @@
         borderColor: '#8aa3b5',
         backgroundColor: 'rgba(122,149,168,0.10)',
         borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        tension: 0.1,
+        fill: false,
+      });
+    }
+    // HOLD baseline drawn LAST so its dashes are visible through the Pledge/
+    // Sell strokes in overlap regions. Always shown — it's the 0% borrowing
+    // reference. Muted tan, dashed weight 1.75px with longer dash segments
+    // for visibility. Reads as 'reference overlay' rather than 'primary path'.
+    if(holdSeries && holdSeries.length){
+      datasets.push({
+        label: 'Hold (no purchase)',
+        data: holdSeries,
+        borderColor: '#bfae97',
+        backgroundColor: 'rgba(191,174,151,0.06)',
+        borderWidth: 1.75,
+        borderDash: [7, 4],
         pointRadius: 0,
         pointHoverRadius: 4,
         tension: 0.1,
