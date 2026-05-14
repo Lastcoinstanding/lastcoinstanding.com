@@ -262,7 +262,7 @@ eleventyComputed:
 
                         <div class="slider-control">
                             <div class="slider-row">
-                                <span class="slider-name">Home price<span class="help-tip" tabindex="0">?<span class="tip-content">The purchase price of the home you&rsquo;re modelling. The 20% conventional down payment defaults sit below; adjust the down-payment percentage if you&rsquo;re modelling a different configuration.</span></span></span>
+                                <span class="slider-name">Home <span class="slider-name-nobreak">price<span class="help-tip" tabindex="0">?<span class="tip-content">The purchase price of the home you&rsquo;re modelling. The 20% conventional down payment defaults sit below; adjust the down-payment percentage if you&rsquo;re modelling a different configuration.</span></span></span>
                                 <span class="slider-val" id="bbmHomePriceVal">$500,000</span>
                             </div>
                             <input type="range" id="bbmHomePrice" min="200000" max="2000000" value="500000" step="25000" aria-label="Home price">
@@ -270,7 +270,7 @@ eleventyComputed:
 
                         <div class="slider-control">
                             <div class="slider-row">
-                                <span class="slider-name">Down payment<span class="help-tip" tabindex="0">?<span class="tip-content">The down-payment percentage of home price. 20% is the conventional figure that avoids private mortgage insurance.</span></span></span>
+                                <span class="slider-name">Down <span class="slider-name-nobreak">payment<span class="help-tip" tabindex="0">?<span class="tip-content">The down-payment percentage of home price. 20% is the conventional figure that avoids private mortgage insurance.</span></span></span></span>
                                 <span class="slider-val" id="bbmDownPctVal">20%</span>
                             </div>
                             <input type="range" id="bbmDownPct" min="5" max="50" value="20" step="1" aria-label="Down payment percent">
@@ -278,7 +278,7 @@ eleventyComputed:
 
                         <div class="slider-control">
                             <div class="slider-row">
-                                <span class="slider-name">BTC stack<span class="help-tip" tabindex="0">?<span class="tip-content">Your bitcoin stack. Mirrors the BTC stack input on the Borrowing Against Your Stack page &mdash; change either, both update.</span></span></span>
+                                <span class="slider-name">BTC <span class="slider-name-nobreak">stack<span class="help-tip" tabindex="0">?<span class="tip-content">Your bitcoin stack. Mirrors the BTC stack input on the Borrowing Against Your Stack page &mdash; change either, both update.</span></span></span></span>
                                 <span class="slider-val" id="bbmBtcStackVal">3 BTC</span>
                             </div>
                             <input type="range" id="bbmBtcStack" min="0.1" max="20" value="3" step="0.1" aria-label="BTC stack">
@@ -286,20 +286,20 @@ eleventyComputed:
 
                         <div class="slider-control">
                             <div class="slider-row">
-                                <span class="slider-name">Time horizon<span class="help-tip" tabindex="0">?<span class="tip-content">How many years out to project the comparison. The Power Law trend price at this horizon is the future-BTC-price input. Both paths are evaluated at the same future date so the comparison is apples-to-apples. The Tactical / Standard / Strategic buttons are one-click presets.</span></span></span>
+                                <span class="slider-name">Time <span class="slider-name-nobreak">horizon<span class="help-tip" tabindex="0">?<span class="tip-content">How many years out to project the comparison. The Power Law trend price at this horizon is the future-BTC-price input. Both paths are evaluated at the same future date so the comparison is apples-to-apples. The Tactical / Standard / Strategic buttons are one-click presets.</span></span></span></span>
                                 <span class="slider-val" id="bbmHorizonVal">15 years</span>
                             </div>
+                            <input type="range" id="bbmHorizon" min="3" max="30" value="15" step="1" aria-label="Time horizon">
                             <div class="bbm-horizon-presets" role="group" aria-label="Horizon presets">
                                 <button type="button" class="bbm-horizon-preset" data-horizon="5">Tactical&nbsp;5y</button>
                                 <button type="button" class="bbm-horizon-preset" data-horizon="15">Standard&nbsp;15y</button>
                                 <button type="button" class="bbm-horizon-preset" data-horizon="30">Strategic&nbsp;30y</button>
                             </div>
-                            <input type="range" id="bbmHorizon" min="3" max="30" value="15" step="1" aria-label="Time horizon">
                         </div>
 
                         <div class="slider-control">
                             <div class="slider-row">
-                                <span class="slider-name">Pay-off year<span class="help-tip" tabindex="0">?<span class="tip-content">The year you fully repay the second-lien (from cash flow, a windfall, or refinancing the primary to a standard-rate mortgage). The premium interest stops accruing at that year. Default is &ldquo;never&rdquo; (the slider sits at the horizon&rsquo;s max), meaning the cost accrues for the full term.</span></span></span>
+                                <span class="slider-name">Pay-off <span class="slider-name-nobreak">year<span class="help-tip" tabindex="0">?<span class="tip-content">The year you fully repay the second-lien (from cash flow, a windfall, or refinancing the primary to a standard-rate mortgage). The premium interest stops accruing at that year. Default is &ldquo;never&rdquo; (the slider sits at the horizon&rsquo;s max), meaning the cost accrues for the full term.</span></span></span></span>
                                 <span class="slider-val" id="bbmEarlyRepayVal">never</span>
                             </div>
                             <input type="range" id="bbmEarlyRepay" min="0" max="30" value="30" step="1" aria-label="Early repayment year">
@@ -318,7 +318,7 @@ eleventyComputed:
 
                         <div class="slider-control">
                             <div class="slider-row">
-                                <span class="slider-name">Current BTC price<span class="help-tip" tabindex="0">?<span class="tip-content">Mirrors the Current BTC price input on the Borrowing Against Your Stack page. Auto-filled from the most recent monthly Power Law sample on first load.</span></span></span>
+                                <span class="slider-name">Current BTC <span class="slider-name-nobreak">price<span class="help-tip" tabindex="0">?<span class="tip-content">Mirrors the Current BTC price input on the Borrowing Against Your Stack page. Auto-filled from the most recent monthly Power Law sample on first load.</span></span></span></span>
                                 <span class="slider-val" id="bbmBtcPriceVal">$72,000</span>
                             </div>
                             <input type="range" id="bbmBtcPrice" min="30000" max="300000" value="72000" step="1000" aria-label="Current BTC price">
@@ -326,7 +326,7 @@ eleventyComputed:
 
                         <div class="slider-control">
                             <div class="slider-row">
-                                <span class="slider-name">Cost basis per BTC<span class="help-tip" tabindex="0">?<span class="tip-content">Your average price per BTC when you acquired the stack. Used to compute capital gains tax owed in the Sell path. Defaults to today&rsquo;s price (no embedded gain &mdash; the most conservative input for the sell path).</span></span></span>
+                                <span class="slider-name">Cost basis per <span class="slider-name-nobreak">BTC<span class="help-tip" tabindex="0">?<span class="tip-content">Your average price per BTC when you acquired the stack. Used to compute capital gains tax owed in the Sell path. Defaults to today&rsquo;s price (no embedded gain &mdash; the most conservative input for the sell path).</span></span></span></span>
                                 <span class="slider-val" id="bbmCostBasisVal">$72,000</span>
                             </div>
                             <input type="range" id="bbmCostBasis" min="0" max="200000" value="72000" step="1000" aria-label="Cost basis per BTC">
@@ -334,7 +334,7 @@ eleventyComputed:
 
                         <div class="slider-control">
                             <div class="slider-row">
-                                <span class="slider-name">Standard mortgage rate<span class="help-tip" tabindex="0">?<span class="tip-content">The rate on a conventional 30-year primary mortgage. Same primary mortgage applies under both paths; it&rsquo;s the base rate that the bitcoin-backed second-lien premium gets added to.</span></span></span>
+                                <span class="slider-name">Standard mortgage <span class="slider-name-nobreak">rate<span class="help-tip" tabindex="0">?<span class="tip-content">The rate on a conventional 30-year primary mortgage. Same primary mortgage applies under both paths; it&rsquo;s the base rate that the bitcoin-backed second-lien premium gets added to.</span></span></span></span>
                                 <span class="slider-val" id="bbmMortRateVal">7.0%</span>
                             </div>
                             <input type="range" id="bbmMortRate" min="3" max="10" value="7" step="0.25" aria-label="Standard mortgage rate">
@@ -342,7 +342,7 @@ eleventyComputed:
 
                         <div class="slider-control">
                             <div class="slider-row">
-                                <span class="slider-name">Combined-product premium<span class="help-tip" tabindex="0">?<span class="tip-content">How many percentage points above a standard 30-year the combined Better/Coinbase product carries. Source reports give a range of 0.5&ndash;1.5pp; 1.0pp is the middle of that range. Per Coinbase&rsquo;s product blog, both loans (primary + second-lien) share the same rate, so this premium applies to the entire borrowed amount, not only to the second-lien portion.</span></span></span>
+                                <span class="slider-name">Combined-product <span class="slider-name-nobreak">premium<span class="help-tip" tabindex="0">?<span class="tip-content">How many percentage points above a standard 30-year the combined Better/Coinbase product carries. Source reports give a range of 0.5&ndash;1.5pp; 1.0pp is the middle of that range. Per Coinbase&rsquo;s product blog, both loans (primary + second-lien) share the same rate, so this premium applies to the entire borrowed amount, not only to the second-lien portion.</span></span></span></span>
                                 <span class="slider-val" id="bbmPremiumVal">+1.00pp</span>
                             </div>
                             <input type="range" id="bbmPremium" min="0.25" max="2.5" value="1.0" step="0.25" aria-label="Second-lien premium">
@@ -350,7 +350,7 @@ eleventyComputed:
 
                         <div class="slider-control">
                             <div class="slider-row">
-                                <span class="slider-name">Capital gains tax<span class="help-tip" tabindex="0">?<span class="tip-content">Your effective long-term capital gains tax rate. Only relevant to the Sell path &mdash; tax owed when BTC is sold for the down payment. US federal LTCG is 0%, 15%, or 20% depending on bracket; state tax may add more.</span></span></span>
+                                <span class="slider-name">Capital gains <span class="slider-name-nobreak">tax<span class="help-tip" tabindex="0">?<span class="tip-content">Your effective long-term capital gains tax rate. Only relevant to the Sell path &mdash; tax owed when BTC is sold for the down payment. US federal LTCG is 0%, 15%, or 20% depending on bracket; state tax may add more.</span></span></span></span></span>
                                 <span class="slider-val" id="bbmCapGainsVal">20%</span>
                             </div>
                             <input type="range" id="bbmCapGains" min="0" max="40" value="20" step="1" aria-label="Capital gains tax rate">

@@ -688,6 +688,18 @@ body {
     color: var(--text);
     line-height: 1.3;
 }
+/* Keep the last word of a slider's label and its help-tip on one line.
+   Without this, the inline-flex help-tip ('?' indicator) creates a wrap
+   opportunity at its boundary and can be pushed onto its own line by a
+   narrow column, growing the label area's height and misaligning the
+   slider below it from neighbouring columns. With the last word + tip
+   in a nowrap wrapper, the rest of the label still wraps freely but the
+   tip stays glued to the final word — so the label is at most 2-3 lines
+   regardless of column width, and the 4rem min-height above is enough
+   to align every column's slider. */
+.slider-name-nobreak {
+    white-space: nowrap;
+}
 .slider-val {
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 1.1rem;
