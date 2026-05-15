@@ -206,7 +206,7 @@ eleventyComputed:
 
             <p class="prose">The retrospective evidence above answers the question for someone considering a position who would have started at any of the dates the page covers. The forward question for someone deciding right now is: <strong>over the horizon I&rsquo;ll actually hold this, where is the trend headed?</strong></p>
 
-            <p class="prose">The chart below plots the Power Law trend for bitcoin against the long-run historical trend lines for the S&amp;P 500, NASDAQ-100, and gold, extrapolated forward at each comparator&rsquo;s historical CAGR. The Power Law is a <em>central-tendency expectation</em>, not a forecast &mdash; bitcoin spends roughly half its time above the trend and half below, and deviations within cycles can be very large in either direction. The trend says where bitcoin is most likely to be over the long horizon, not what will happen in any particular year. The same caveat applies to the comparator trends &mdash; the S&amp;P 500 has had stretches of decade-long underperformance and decade-long outperformance against its own long-run CAGR.</p>
+            <p class="prose">The chart below plots <strong>two</strong> bitcoin trajectories against the long-run trend lines for the S&amp;P 500, NASDAQ-100, and gold. The first is a <em>trend-basis</em> projection &mdash; it assumes today&rsquo;s price sits at the Power Law trend value and projects forward at the trend&rsquo;s growth rate; this is the conservative read. The second is a <em>current-price</em> projection &mdash; it anchors to today&rsquo;s actual market price and projects forward at the same trend, which means the line starts above the trend-basis line when bitcoin is below trend (a discount, like today&rsquo;s ~35% gap) and below it when bitcoin is above trend (a premium, like a cycle top). <strong>The vertical gap between the two lines at year zero is the entry-quality signal:</strong> a positive gap means you&rsquo;re entering at a discount and capture the mean-reversion on top of the trend; a negative gap means you&rsquo;re paying a premium that trend says will fade. The Power Law itself is a <em>central-tendency expectation</em>, not a forecast &mdash; bitcoin spends roughly half its time above the trend and half below, and deviations within cycles can be very large in either direction.</p>
 
             <div class="bvsm-projection-wrap">
                 <div class="slider-cluster">
@@ -230,14 +230,19 @@ eleventyComputed:
                         <canvas id="bvsmProjectionChart" role="img" aria-label="Chart projecting the wealth trajectory for a hypothetical investment today in bitcoin, the S&P 500, NASDAQ-100, and gold over the chosen horizon, using each asset's long-run trend.">
                         </canvas>
                     </div>
-                    <p class="bvsm-chart-caption">Log-scale Y-axis. Bitcoin follows the canonical Power Law trend used elsewhere on the site (<code>P(d) = 1.6 &times; 10<sup>&minus;17</sup> &times; d<sup>5.77</sup></code>). Comparator trends compound at their approximate historical nominal CAGRs (S&amp;P 500 ~10.9%, NASDAQ-100 ~16.3%, gold ~7%) &mdash; central-tendency expectations, not forecasts.</p>
+                    <p class="bvsm-chart-caption">Log-scale Y-axis. Two bitcoin lines: solid is the trend basis (assumes today is fair value), dashed is the current-price basis (captures the gap to trend). Both follow the canonical Power Law (<code>P(d) = 1.6 &times; 10<sup>&minus;17</sup> &times; d<sup>5.77</sup></code>) forward. Comparator trends compound at their approximate historical nominal CAGRs (S&amp;P 500 ~10.9%, NASDAQ-100 ~16.3%, gold ~7%) &mdash; central-tendency expectations, not forecasts.</p>
                 </div>
 
                 <div class="bvsm-projection-results">
                     <div class="bvsm-proj-row">
-                        <span class="bvsm-proj-asset bvsm-proj-asset-btc">Bitcoin</span>
-                        <span class="bvsm-proj-value" id="bvsmProjBtcValue">&mdash;</span>
-                        <span class="bvsm-proj-note">at Power Law trend</span>
+                        <span class="bvsm-proj-asset bvsm-proj-asset-btc">Bitcoin (trend basis)</span>
+                        <span class="bvsm-proj-value" id="bvsmProjBtcTrendValue">&mdash;</span>
+                        <span class="bvsm-proj-note">conservative; trend forward from today</span>
+                    </div>
+                    <div class="bvsm-proj-row">
+                        <span class="bvsm-proj-asset bvsm-proj-asset-btc">Bitcoin (current price)</span>
+                        <span class="bvsm-proj-value" id="bvsmProjBtcMarketValue">&mdash;</span>
+                        <span class="bvsm-proj-note">includes today&rsquo;s discount/premium to trend</span>
                     </div>
                     <div class="bvsm-proj-row">
                         <span class="bvsm-proj-asset bvsm-proj-asset-sp">S&amp;P 500</span>

@@ -521,31 +521,39 @@
     var ndqToday = NDQ_TR_DATA[NDQ_TR_DATA.length - 1][1];
     var goldToday = GOLD_DATA[GOLD_DATA.length - 1][1];
 
-    var SP_CAGR = 0.10, NDQ_CAGR = 0.1626, GOLD_CAGR = 0.07;
+    var SP_CAGR = 0.1086, NDQ_CAGR = 0.1626, GOLD_CAGR = 0.07;
 
-    // Anchor BTC's projection line to today's *trend* price (not today's market
-    // price) so all four series start at investAmt at y=0 and diverge by their
-    // forward growth rate. Earlier code divided by btcToday (market), which
-    // produced a y=0 BTC value of investAmt × (trend_today / market_today) —
-    // i.e. $17k for a $10k investment when BTC is ~35% below trend, breaking
-    // the apples-to-apples trend-comparison this chart is supposed to be.
+    // The §3 chart plots TWO bitcoin lines to capture both the conservative
+    // forward-trend projection AND the current discount/premium to trend:
+    //
+    //   Line 1 — Trend basis: assumes today is fair value, projects Power Law
+    //     forward. Starts at investAmt. Cleanest 'central-tendency forward'
+    //     read for someone modelling the next 10-30 years from trend.
+    //
+    //   Line 2 — Current-price basis: anchors to today's market price and
+    //     projects forward at trend. Captures whether today is a discount
+    //     (line starts ABOVE trend-basis — market below trend, like today's
+    //     ~35% discount) or a premium (line starts BELOW — at a cycle top).
+    //     The vertical gap at y=0 is the entry-quality signal.
     var btcTrendToday = plBtcPrice(daysSinceGenesisFromDate(todayDate));
 
     var labels = [];
-    var btcData = [], spData = [], ndqData = [], goldData = [];
+    var btcTrendData = [], btcMarketData = [], spData = [], ndqData = [], goldData = [];
     for (var y = 0; y <= horizonYears; y++) {
       labels.push('+' + y + 'y');
-      // BTC: Power Law at (today_days + y*365.25), normalised to investAmt at y=0
       var d = daysSinceGenesisFromDate(todayDate) + y * 365.25;
       var btcTrendPrice = plBtcPrice(d);
-      var btcTrendValue = investAmt * (btcTrendPrice / btcTrendToday);
-      btcData.push(btcTrendValue);
+      // Line 1: trend basis (starts at investAmt)
+      btcTrendData.push(investAmt * (btcTrendPrice / btcTrendToday));
+      // Line 2: current-price basis (starts at investAmt × trend_today / market_today)
+      btcMarketData.push(investAmt * (btcTrendPrice / btcToday));
       spData.push(investAmt * Math.pow(1 + SP_CAGR, y));
       ndqData.push(investAmt * Math.pow(1 + NDQ_CAGR, y));
       goldData.push(investAmt * Math.pow(1 + GOLD_CAGR, y));
     }
 
-    document.getElementById('bvsmProjBtcValue').textContent  = fmtUsd(btcData[btcData.length-1]);
+    document.getElementById('bvsmProjBtcTrendValue').textContent  = fmtUsd(btcTrendData[btcTrendData.length-1]);
+    document.getElementById('bvsmProjBtcMarketValue').textContent = fmtUsd(btcMarketData[btcMarketData.length-1]);
     document.getElementById('bvsmProjSpValue').textContent   = fmtUsd(spData[spData.length-1]);
     document.getElementById('bvsmProjNdqValue').textContent  = fmtUsd(ndqData[ndqData.length-1]);
     document.getElementById('bvsmProjGoldValue').textContent = fmtUsd(goldData[goldData.length-1]);
@@ -554,10 +562,11 @@
     if (!canvas || typeof Chart === 'undefined') return;
 
     var datasets = [
-      { label: 'Bitcoin (Power Law)', data: btcData, borderColor: '#e09422', borderWidth: 2.2, fill: false, tension: 0.05, pointRadius: 0 },
-      { label: 'S&P 500 (10% CAGR)', data: spData, borderColor: '#8aa3b5', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 },
-      { label: 'NASDAQ-100 (16% CAGR)', data: ndqData, borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 },
-      { label: 'Gold (7% CAGR)', data: goldData, borderColor: '#c9a85a', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 }
+      { label: 'Bitcoin (trend basis)',  data: btcTrendData,  borderColor: '#e09422', borderWidth: 2.2, fill: false, tension: 0.05, pointRadius: 0 },
+      { label: 'Bitcoin (current price)', data: btcMarketData, borderColor: '#e09422', borderWidth: 2.2, borderDash: [6, 4], fill: false, tension: 0.05, pointRadius: 0 },
+      { label: 'S&P 500 (10.9% CAGR)',   data: spData,        borderColor: '#8aa3b5', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 },
+      { label: 'NASDAQ-100 (16.3% CAGR)', data: ndqData,       borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 },
+      { label: 'Gold (7% CAGR)',         data: goldData,      borderColor: '#c9a85a', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 }
     ];
 
     if (projChart) projChart.destroy();
