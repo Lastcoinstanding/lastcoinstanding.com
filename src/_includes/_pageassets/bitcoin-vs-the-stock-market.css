@@ -346,3 +346,73 @@ body {
     padding: 0.1em 0.35em;
     border-radius: 3px;
 }
+
+/* ─── Help-tip pattern ─────────────────────────────────────────────────
+   Standard tooltip indicator used across the site: '?' circle that
+   reveals a .tip-content panel on hover/focus. The BvSM page was
+   originally missing these rules, which left all .tip-content panels
+   visible inline (a latent bug discovered when adding tooltips to the
+   §3 proj-asset result rows, where the parent .bvsm-proj-asset's
+   text-transform: uppercase and letter-spacing: 0.1em made the
+   uncollapsed tooltip text especially disruptive). Pattern copied from
+   bitcoin-backed-mortgages.css and bitcoin-retirement.css. */
+
+.help-tip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid var(--text-muted);
+    border-radius: 50%;
+    cursor: help;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+    position: relative;
+    transition: color 0.2s, border-color 0.2s;
+    user-select: none;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+.help-tip:hover,
+.help-tip:focus {
+    color: var(--amber);
+    border-color: var(--amber);
+    outline: none;
+}
+.help-tip .tip-content {
+    display: none;
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: #1a1612;
+    border: 1px solid #3a3328;
+    border-radius: 6px;
+    padding: 0.7rem 0.85rem;
+    width: 280px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--text);
+    text-align: left;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+    /* Defeat any text-transform / letter-spacing inherited from a styled
+       parent (e.g. .bvsm-proj-asset's uppercase tracking). */
+    letter-spacing: normal;
+    text-transform: none;
+}
+.help-tip .tip-content strong { color: var(--text); font-weight: 600; }
+.help-tip .tip-content em { color: var(--amber-dim); font-style: italic; }
+.help-tip:hover .tip-content,
+.help-tip:focus .tip-content,
+.help-tip:focus-within .tip-content {
+    display: block;
+}
