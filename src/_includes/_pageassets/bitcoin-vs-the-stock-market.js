@@ -1,16 +1,280 @@
 /* ═══════════════════════════════════════════════════════════════
    BITCOIN VS. THE STOCK MARKET — calculators + charts
 
-   Three interactive surfaces:
-     §1 Lump-sum calculator at cyclical-top presets
-     §2 Weekly DCA calculator
-     §3 Forward projection (Power Law vs comparator CAGRs)
+   Four interactive surfaces:
+     §1 Power Law cautionary-tale viz (NEW — Path A step 2)
+     §2 Lump-sum calculator at cyclical-top presets
+     §3 Weekly DCA calculator
+     §4 Forward projection (Power Law vs comparator CAGRs)
+
+   §2-4 will be restructured in Path A step 3 — §2 and §3 merge into
+   a unified Lump-sum/DCA calculator with a mode toggle. §4 keeps its
+   current dual-line BTC projection shape and drops gold.
 
    Bitcoin price data: site-wide PL_DATA (loaded via shared module).
    Comparator data: embedded monthly closes built from documented
    annual returns with linear interpolation. Approximate for
    prototype use; NotebookLM-verified daily series will refine.
    ═══════════════════════════════════════════════════════════════ */
+
+
+/* ═══════ §1 — Power Law cautionary-tale viz ═══════
+   Plots BTC price (PL_DATA monthly samples + a current point) on a
+   log Y axis against the Power Law trend across 2010-today, with
+   annotated markers at each cyclical top, each cyclical floor, and
+   today's position. The viz makes the page's lead editorial argument
+   visible at a glance: top multiples have compressed from 12× over
+   trend in 2013 to barely 1.1× in 2024-2025 (the maturation thesis),
+   floors have stayed in a tight 0.41-0.66× band across four cycles,
+   and today's 0.59× position sits squarely inside the historical
+   floor range.
+
+   Pattern follows the Power Law page's Channel chart: scatter type,
+   linear X (days-since-genesis with year-formatted ticks), log Y,
+   custom afterDatasetsDraw plugin to render the annotation markers
+   and labels on top of the line datasets.
+
+   All annotation positions and multiples computed against canonical
+   coefficients PL_A=1.6e-17, PL_B=5.77 (Mežinskis/Porkopolis), and
+   the May 14, 2026 site-wide reference price of $81,741. */
+
+(function() {
+  if (typeof PL_DATA === 'undefined' || typeof Chart === 'undefined') return;
+
+  // May 14, 2026 reference (matches the site-wide today price)
+  var TODAY_DAYS = 6340;
+  var TODAY_PRICE = 81741;
+
+  // Build BTC price series: PL_DATA samples + an appended today point so
+  // the historical line extends to the present and the today marker sits
+  // on a real data point rather than floating off the line's end.
+  var historicalLine = PL_DATA.map(function(p) { return { x: p[0], y: p[1] }; });
+  historicalLine.push({ x: TODAY_DAYS, y: TODAY_PRICE });
+
+  // Sample the trend every 30 days for a smooth dashed curve
+  var trendLine = [];
+  for (var d = PL_DATA[0][0]; d <= TODAY_DAYS; d += 30) {
+    trendLine.push({ x: d, y: plPrice(d) });
+  }
+
+  // Cyclical-top markers: days_since_genesis, market price, trend multiple, year label.
+  // Multiples computed: market_price / plPrice(days). See computeDeviations.py history.
+  var TOPS = [
+    { d: 1792, p: 1147,    m: 12.13, lbl: '2013'     },
+    { d: 3270, p: 19500,   m:  6.41, lbl: '2017'     },
+    { d: 4694, p: 69000,   m:  2.82, lbl: '2021'     },
+    { d: 5549, p: 73000,   m:  1.14, lbl: '2024 Mar' },
+    { d: 6121, p: 126200,  m:  1.12, lbl: '2025 ATH' }
+  ];
+
+  // Cyclical-floor markers (canonical post-top lows + 2024 mid-cycle dip)
+  var FLOORS = [
+    { d: 2203, p: 172,     m: 0.55, lbl: '2015'     },
+    { d: 3633, p: 3200,    m: 0.57, lbl: '2018'     },
+    { d: 5070, p: 15500,   m: 0.41, lbl: '2022'     },
+    { d: 5693, p: 49000,   m: 0.66, lbl: '2024 Aug' }
+  ];
+
+  var TODAY_MARKER = { d: TODAY_DAYS, p: TODAY_PRICE, m: 0.59 };
+
+  // Palette — matches the Power Law page Channel chart conventions where
+  // applicable, with new top/floor accent colors for the deviation markers.
+  var amberDash    = 'rgba(247,147,26,0.85)';
+  var topColor     = '#d4533a';   // muted rust — for above-trend markers
+  var floorColor   = '#5a9d7d';   // muted sage — for below-trend markers
+  var todayColor   = '#f7931a';   // bright amber — for the today highlight
+  var historyColor = 'rgba(232,224,210,0.85)';
+  var muted        = 'rgba(170,170,170,0.7)';
+
+  // Custom plugin: draws all annotation markers + labels above the line layers.
+  // Markers use the chart's actual scales via getPixelForValue, so positions
+  // stay correct under resize and zoom.
+  var markersPlugin = {
+    id: 'bvsmPlMarkers',
+    afterDatasetsDraw: function(chart) {
+      var ctx = chart.ctx;
+      var xs = chart.scales.x;
+      var ys = chart.scales.y;
+
+      function drawMarker(item, color, labelAbove) {
+        var x = xs.getPixelForValue(item.d);
+        var y = ys.getPixelForValue(item.p);
+        ctx.beginPath();
+        ctx.arc(x, y, 4.5, 0, 2 * Math.PI);
+        ctx.fillStyle = color;
+        ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+        // Multiple label (primary, in marker color)
+        ctx.font = '600 10.5px Inter, sans-serif';
+        ctx.fillStyle = color;
+        ctx.textAlign = 'center';
+        var primaryY = labelAbove ? y - 10 : y + 16;
+        ctx.fillText(item.m.toFixed(2) + '\u00d7', x, primaryY);
+        // Year sub-label (muted, smaller)
+        ctx.font = '500 9px Inter, sans-serif';
+        ctx.fillStyle = muted;
+        var subY = labelAbove ? y - 22 : y + 28;
+        ctx.fillText(item.lbl, x, subY);
+      }
+
+      // Order: floors first (background), tops second, today last (foreground)
+      FLOORS.forEach(function(m) { drawMarker(m, floorColor, false); });
+      TOPS.forEach(function(m)   { drawMarker(m, topColor,   true);  });
+
+      // Today marker — larger, with concentric rings and a distinct label
+      var tx = xs.getPixelForValue(TODAY_MARKER.d);
+      var ty = ys.getPixelForValue(TODAY_MARKER.p);
+      // Outer halo
+      ctx.beginPath();
+      ctx.arc(tx, ty, 11, 0, 2 * Math.PI);
+      ctx.strokeStyle = 'rgba(247,147,26,0.35)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // Mid ring
+      ctx.beginPath();
+      ctx.arc(tx, ty, 7, 0, 2 * Math.PI);
+      ctx.strokeStyle = 'rgba(247,147,26,0.75)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      // Core dot
+      ctx.beginPath();
+      ctx.arc(tx, ty, 4, 0, 2 * Math.PI);
+      ctx.fillStyle = todayColor;
+      ctx.fill();
+      // Label — anchored to the left of the dot since today is near the
+      // right edge of the chart area; offset by 16px to clear the rings
+      ctx.font = '700 11px Inter, sans-serif';
+      ctx.fillStyle = todayColor;
+      ctx.textAlign = 'right';
+      ctx.fillText('You are here', tx - 16, ty - 2);
+      ctx.font = '500 10px Inter, sans-serif';
+      ctx.fillStyle = muted;
+      ctx.fillText('0.59\u00d7 trend', tx - 16, ty + 12);
+    }
+  };
+
+  function initPowerLawViz() {
+    var canvas = document.getElementById('bvsmPowerLawChart');
+    if (!canvas) return;
+
+    new Chart(canvas, {
+      type: 'scatter',
+      data: {
+        datasets: [
+          {
+            label: 'Power Law trend',
+            data: trendLine,
+            borderColor: amberDash,
+            borderWidth: 1.6,
+            borderDash: [6, 4],
+            pointRadius: 0,
+            showLine: true,
+            tension: 0,
+            order: 2
+          },
+          {
+            label: 'Bitcoin price',
+            data: historicalLine,
+            borderColor: historyColor,
+            borderWidth: 1.5,
+            pointRadius: 0,
+            showLine: true,
+            tension: 0.15,
+            fill: false,
+            order: 1
+          }
+        ]
+      },
+      plugins: [markersPlugin],
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'nearest', axis: 'x', intersect: false },
+        // Top padding for above-trend top labels; right padding for today label
+        layout: { padding: { top: 28, right: 12, bottom: 8, left: 8 } },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            align: 'end',
+            labels: {
+              padding: 12,
+              color: 'rgba(180,180,180,0.85)',
+              font: { size: 11, family: 'Inter, sans-serif' },
+              boxWidth: 28,
+              boxHeight: 2
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(10,9,8,0.95)',
+            borderColor: 'rgba(247,147,26,0.6)',
+            borderWidth: 1,
+            titleColor: '#e09422',
+            bodyColor: '#ddd',
+            callbacks: {
+              title: function(items) {
+                if (!items.length) return '';
+                var d = items[0].parsed.x;
+                var date = new Date(GENESIS_TS * 1000 + d * 86400 * 1000);
+                return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
+              },
+              label: function(item) {
+                var v = item.parsed.y;
+                var fmt;
+                if (v >= 1000) fmt = '$' + (v / 1000).toFixed(1) + 'K';
+                else if (v >= 1) fmt = '$' + v.toFixed(2);
+                else fmt = '$' + v.toFixed(4);
+                return item.dataset.label + ': ' + fmt;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            type: 'linear',
+            grid: { color: 'rgba(255,255,255,0.04)' },
+            ticks: {
+              color: muted,
+              maxTicksLimit: 9,
+              font: { size: 10, family: 'Inter, sans-serif' },
+              callback: function(v) {
+                var date = new Date(GENESIS_TS * 1000 + v * 86400 * 1000);
+                return date.getFullYear();
+              }
+            }
+          },
+          y: {
+            type: 'logarithmic',
+            grid: { color: 'rgba(255,255,255,0.04)' },
+            ticks: {
+              color: muted,
+              font: { size: 10, family: 'Inter, sans-serif' },
+              callback: function(v) {
+                if (v === 1 || v === 10 || v === 100 || v === 1000 ||
+                    v === 10000 || v === 100000 || v === 1000000) {
+                  if (v >= 1000) return '$' + (v / 1000) + 'K';
+                  return '$' + v;
+                }
+                return '';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPowerLawViz);
+  } else {
+    initPowerLawViz();
+  }
+})();
+
+
+/* ═══════ §2-4 calculators + projection (existing surfaces) ═══════ */
 
 (function(){
   'use strict';

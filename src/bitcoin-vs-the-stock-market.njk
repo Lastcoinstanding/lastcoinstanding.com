@@ -29,18 +29,54 @@ eleventyComputed:
     <article class="bvsm-page">
 
         <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!-- SECTION 1: What if you bought at the worst time?                -->
-        <!-- The fear-confronting section. Lump-sum at each cyclical top.    -->
+        <!-- SECTION 1: Reading bitcoin through the Power Law (Path A step 2) -->
+        <!-- Non-interactive cautionary-tale viz. Plots BTC price vs. trend -->
+        <!-- across 2010-today with annotated cyclical-top, cyclical-floor, -->
+        <!-- and 'you are here' markers. Lead editorial argument:           -->
+        <!--   1. Tops have compressed dramatically (maturation thesis)     -->
+        <!--   2. Floors have stayed in a stable band                       -->
+        <!--   3. Today sits inside the historical floor range              -->
+        <!-- Bridges into §2 with Framing B's 'you have a tool you can      -->
+        <!-- read in real time' line.                                       -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-intro">
+                <h2>Reading bitcoin through the Power Law</h2>
+                <p><em>Why this isn&rsquo;t 2013 bitcoin &mdash; and why today&rsquo;s price may be the most useful signal on the chart.</em></p>
+            </div>
+
+            <p class="prose">Every cyclical top in bitcoin&rsquo;s history was visible as a top in real time. Every cycle floor was visible as a floor. The pattern isn&rsquo;t subtle when you plot bitcoin&rsquo;s price against its long-run <a href="/the-power-law.html">Power Law trend</a> &mdash; tops register as measurable deviations above trend; floors register as measurable deviations below it. The chart below plots both across 16 years of price history, plus today&rsquo;s position.</p>
+
+            <div class="bvsm-chart-wrap">
+                <canvas id="bvsmPowerLawChart" class="bvsm-chart-canvas-tall"></canvas>
+                <p class="bvsm-chart-caption">Historical BTC price (white) vs. Power Law trend (dashed amber), log-scale Y axis. Numbers next to each marker are the cycle&rsquo;s trend-deviation multiple. Top markers (rust) register at &ge;1.0&times; trend; floor markers (sage) at &le;1.0&times; trend. Today&rsquo;s position is highlighted at 0.59&times; &mdash; well below trend, inside the historical floor band.</p>
+            </div>
+
+            <p class="prose">Two things are immediately visible in the chart that qualitative narratives about bitcoin tend to miss.</p>
+
+            <p class="prose"><strong>First, tops are getting smaller.</strong> Bitcoin&rsquo;s cyclical peaks have compressed dramatically: 12.1&times; over trend in 2013, 6.4&times; in 2017, 2.8&times; in 2021, and just 1.1&times; in both the March 2024 top and the October 2025 all-time high. (The 12.1&times; in 2013 reflects early bitcoin&rsquo;s pre-institutional regime, when retail-driven overshoots were far more violent than anything since &mdash; and the compression from 12&times; to 1.1&times; <em>is</em> the maturation evidence.) The euphoric overshoots that defined the early asset have faded every cycle. This is the maturation thesis &mdash; institutional capital, regulated ETF flows, roughly 6.4% of supply held in ETPs, treasury allocations at 49+ public companies, 23 nation-state holders &mdash; rendered as a single visual fact: tops aren&rsquo;t what they used to be.</p>
+
+            <p class="prose"><strong>Second, floors have stayed structurally stable.</strong> Across four different cycles spanning a 90&times; range of absolute prices, the cycle bottoms have all registered between 0.41&times; and 0.66&times; trend &mdash; a tight band. The downside reference hasn&rsquo;t moved while the upside has compressed toward it. The within-cycle entry-price spread has gone from 22&times; (2013 top vs. 2015 floor) to 1.7&times; (2024 March top vs. 2024 August dip). Timing matters less now than it used to; the boundaries are tighter on both sides.</p>
+
+            <p class="prose"><strong>And today sits at 0.59&times; trend</strong> &mdash; squarely inside the historical floor range, between the 2022 post-FTX low (0.41&times;) and the 2024 mid-cycle dip (0.66&times;). By the framework&rsquo;s own logic, this is structurally favorable entry territory: bitcoin is roughly 41% below where its long-run trend says it should be, while the October 2025 all-time high only managed 12% above trend. Bitcoin has spent more &ldquo;distance&rdquo; below trend than above it in this cycle.</p>
+
+            <p class="prose">The chart isn&rsquo;t a forecast &mdash; the Power Law is a central-tendency expectation, not a prediction, and the asset can stay below or above trend for extended periods. The point is that you have a structural reference for reading entry quality in real time. The scenarios below stress-test that reference against the worst-case version of itself: what would have happened if you&rsquo;d actually bought at each of the five cyclical tops marked above? The answer rhymes across every cycle &mdash; and it isn&rsquo;t what the &ldquo;what if I&rsquo;d bought the top&rdquo; objection assumes.</p>
+        </div>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 2: What if you bought at the worst time?                -->
+        <!-- Lump-sum at each cyclical top. Bridges from §1's viz; presets   -->
+        <!-- match the top markers on the §1 chart one-for-one. Will merge   -->
+        <!-- with §3 (DCA) into a unified calculator in Path A step 3.       -->
         <!-- ═══════════════════════════════════════════════════════════════ -->
         <div class="section">
             <div class="section-intro">
                 <h2>What if you bought at the worst time?</h2>
-                <p><em>The fear-confronting scenario, anchored on each of the five major bitcoin cyclical tops.</em></p>
+                <p><em>Lump-sum at the cyclical top, held forward to today.</em></p>
             </div>
 
-            <p class="prose">The standard objection to buying bitcoin is some version of: <em>what if I buy in right before the crash?</em> The history of bitcoin includes several spectacular crashes &mdash; 80%+ drawdowns from the local top in late 2011, late 2013, late 2017, late 2021, the 2024 ATH&rsquo;s subsequent retracement, and the October 2025 all-time high that bitcoin remains roughly 35% below as of this writing. <strong>For someone considering an entry today, the relevant question isn&rsquo;t whether crashes happen &mdash; they do. It&rsquo;s what would have happened if you&rsquo;d been the unluckiest possible investor and bought at the literal top of each one.</strong></p>
-
-            <p class="prose">The calculator below lets you pick a major cyclical top, an amount, and see what a lump-sum invested on that day would be worth today &mdash; against the same amount in the S&amp;P 500 (total return, with dividends reinvested), the NASDAQ-100 (total return), and gold (spot). The five anchored presets correspond to the local tops most likely to feature in a skeptical investor&rsquo;s memory &mdash; including the October 2025 all-time high, the most recent top and the one whose hold horizon is shortest.</p>
+            <p class="prose">Each of the five top markers on the chart above represents a moment a buyer might (reasonably) call the worst possible entry. The calculator below stress-tests exactly that scenario: pick one of the cyclical tops, an amount, and see what a lump-sum invested on that day would be worth today against the same amount in the S&amp;P 500 (total return, with dividends reinvested), the NASDAQ-100 (total return), and gold (spot). The five presets match the top markers on the chart one-for-one &mdash; the worst-case lens deliberately stays anchored on entries the framework calls structurally bad.</p>
 
             <!-- ─── Lump-sum calculator surface ─── -->
             <div class="bvsm-calc">
