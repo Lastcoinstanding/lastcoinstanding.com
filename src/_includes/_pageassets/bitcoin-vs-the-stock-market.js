@@ -53,8 +53,21 @@
 
   // Sample the trend every 30 days for a smooth dashed curve
   var trendLine = [];
+  var floorLine = [];
+  var ceilingLine = [];
   for (var d = PL_DATA[0][0]; d <= TODAY_DAYS; d += 30) {
-    trendLine.push({ x: d, y: plPrice(d) });
+    var trendY = plPrice(d);
+    trendLine.push({ x: d, y: trendY });
+    // Bands: 0.42× floor + 3× ceiling, matching the Power Law page's
+    // canonical band coefficients. These give the chart its 'corridor'
+    // visualization — peaks register as breaks above the ceiling,
+    // floors as approaches to the floor band. Per JM screenshot review:
+    // the maturation story is clearer when readers can see that the
+    // 2024 March + 2025 ATH tops at 1.12-1.14× are INSIDE the band
+    // (no longer breaking above ceiling) while 2013/2017/2021 tops
+    // broke ABOVE it, sometimes dramatically (12.13× in 2013).
+    floorLine.push({   x: d, y: trendY * 0.42 });
+    ceilingLine.push({ x: d, y: trendY * 3.0  });
   }
 
   // Cyclical-top markers: days_since_genesis, market price, trend multiple, year label.
@@ -163,6 +176,28 @@
       type: 'scatter',
       data: {
         datasets: [
+          {
+            label: 'Ceiling (3× trend)',
+            data: ceilingLine,
+            borderColor: 'rgba(212,83,58,0.55)',
+            borderWidth: 1.1,
+            borderDash: [3, 5],
+            pointRadius: 0,
+            showLine: true,
+            tension: 0,
+            order: 4
+          },
+          {
+            label: 'Floor (0.42× trend)',
+            data: floorLine,
+            borderColor: 'rgba(90,157,125,0.55)',
+            borderWidth: 1.1,
+            borderDash: [3, 5],
+            pointRadius: 0,
+            showLine: true,
+            tension: 0,
+            order: 3
+          },
           {
             label: 'Power Law trend',
             data: trendLine,
@@ -682,16 +717,29 @@
       rowHtml('Multiple', fmtMultiple(ndqValue / amount)) +
       rowHtml('CAGR', (ndqCagr * 100).toFixed(1) + '%');
 
-    // Verdict
+    // Verdict — restructured per JM screenshot feedback: the original
+    // text was too binary (won/lost), which forced mental gymnastics
+    // when the 2021/2024/2025 presets came back roughly even or
+    // underwater. The new logic frames each result honestly while
+    // pointing the reader to the longer-horizon presets where the
+    // page's argument has fully played out. The default preset
+    // (2013 top, ~12y) is in the 'btcWon at long horizon' branch
+    // so the first impression on page load is the strong win case.
     var btcVsSp = btcValue / spValue;
     var btcWon = btcValue > spValue && btcValue > ndqValue;
     var verdictText;
-    if (years < 2) {
-      verdictText = '<strong>The horizon from this start date is under 2 years</strong> &mdash; the long-horizon argument hasn\'t had time to play out yet. Try one of the older preset dates to see how multi-year holds compared.';
+    if (years < 1) {
+      // Very recent top (2025 ATH at ~7mo): pre-argument horizon
+      verdictText = '<strong>Less than a year of history.</strong> Bitcoin is currently at ' + fmtMultiple(btcVsSp) + ' the S&amp;P 500 position (' + fmtUsd(btcValue) + ' vs. ' + fmtUsd(spValue) + '). This is well below the 5-to-10-year horizon the page&rsquo;s argument depends on. <strong>The 2017 top preset (~8y) and 2013 top preset (~12y) show what the same scenario looks like once that horizon is reached</strong> &mdash; both show bitcoin pulling decisively ahead.';
+    } else if (years < 3) {
+      // Short horizon (2024 Mar at ~2y): too early to draw the conclusion
+      verdictText = 'After <strong>' + years.toFixed(1) + ' years</strong> from ' + fmtDate(startDate) + ', the bitcoin position is at <strong>' + fmtMultiple(btcVsSp) + ' the S&amp;P 500 position</strong> (' + fmtUsd(btcValue) + ' vs. ' + fmtUsd(spValue) + '). Still a short horizon by the page&rsquo;s argument. <strong>Try the 2017 (~8y) or 2013 (~12y) presets to see the pattern after the long-horizon argument has had time to play out.</strong>';
     } else if (btcWon) {
+      // Long horizon, BTC dominates (2013 + 2017 cases): the strong-argument message
       verdictText = 'Over <strong>' + years.toFixed(1) + ' years</strong> from ' + fmtDate(startDate) + ' to today, the bitcoin position is worth <strong>' + fmtMultiple(btcVsSp) + ' the S&amp;P 500 position</strong>, despite starting at a cyclical top. Holding through the drawdowns paid off.';
     } else {
-      verdictText = 'Over <strong>' + years.toFixed(1) + ' years</strong> from ' + fmtDate(startDate) + ', the bitcoin position has not yet pulled ahead of every equity comparator. Bitcoin: ' + fmtUsd(btcValue) + '. S&amp;P 500: ' + fmtUsd(spValue) + '.';
+      // Medium horizon, BTC roughly even (2021 case at ~4.5y): honest framing
+      verdictText = 'Over <strong>' + years.toFixed(1) + ' years</strong> from ' + fmtDate(startDate) + ', the bitcoin position is at <strong>' + fmtMultiple(btcVsSp) + ' the S&amp;P 500 position</strong> (' + fmtUsd(btcValue) + ' vs. ' + fmtUsd(spValue) + ') &mdash; roughly even or modestly behind. This is still inside the page&rsquo;s 5-to-10-year horizon zone; the 2017 and 2013 presets show what tends to happen as the horizon extends further.';
     }
     document.getElementById('bvsmVerdict').innerHTML = verdictText;
 

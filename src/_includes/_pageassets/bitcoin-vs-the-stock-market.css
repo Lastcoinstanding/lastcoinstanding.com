@@ -24,9 +24,14 @@
     --amber: #e09422;
     --amber-dim: #b8791c;
     --amber-glow: rgba(224,148,34,0.15);
-    --text: #e8e0d4;
-    --text-dim: #9a9080;
-    --text-muted: #6a6256;
+    /* Text palette matches the Power Law page (#d8d2ca body + #f2eee8 bright
+       + #908880 dim) so cross-page reading registers feel consistent. The
+       earlier --text: #e8e0d4 was too bright against the dark background;
+       this triplet matches what the rest of the editorial-flat pages use. */
+    --text: #d8d2ca;
+    --text-bright: #f2eee8;
+    --text-dim: #908880;
+    --text-muted: #706860;
     --red: #c0392b;
     --red-dim: rgba(192,57,43,0.6);
     --green: #27ae60;
