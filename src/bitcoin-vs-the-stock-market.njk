@@ -17,16 +17,17 @@ eleventyComputed:
   page_styles: "{% include '_pageassets/bitcoin-vs-the-stock-market.css' %}"
   page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/bitcoin-vs-the-stock-market.js' %}"
 ---
-<section class="hero">
+<div class="page-header">
     <h1><em>Bitcoin</em> vs. The Stock Market</h1>
-    <div class="hero-subtitle">What the historical record actually says about buying bitcoin at the worst possible moment &mdash; or every week through every cycle &mdash; versus the same in the S&amp;P 500, NASDAQ-100, or gold.</div>
-    <p class="subtitle">If you&rsquo;ve never bought bitcoin and are weighing it against a normal index-fund portfolio, the question that gates the decision is some version of: <em>it&rsquo;s volatile and what if I buy in at exactly the wrong time?</em> The honest answer lives in the historical record. This page anchors on the five scariest scenarios &mdash; lump-sum purchases at the literal top of each bitcoin cycle, including the most recent one in October 2025 &mdash; and walks through what would have happened against the S&amp;P 500, NASDAQ-100, and gold over the years that followed. Then it extends the argument forward, using the Power Law trend to show how long the bitcoin advantage is likely to last for the typical investor&rsquo;s 10-to-15 year horizon.</p>
-</section>
+    <p class="subtitle">What the historical record actually says about buying bitcoin at the worst possible moment &mdash; or every week through every cycle &mdash; versus the same in the S&amp;P 500, NASDAQ-100, or gold.</p>
+</div>
 
 <main class="content-area">
     {% include 'components/tool-framing.njk' %}
 
     <article class="bvsm-page">
+
+        <p class="prose">If you&rsquo;ve never bought bitcoin and are weighing it against a normal index-fund portfolio, the question that gates the decision is some version of: <em>it&rsquo;s volatile and what if I buy in at exactly the wrong time?</em> The honest answer lives in the historical record. This page anchors on the five scariest scenarios &mdash; lump-sum purchases at the literal top of each bitcoin cycle, including the most recent one in October 2025 &mdash; and walks through what would have happened against the S&amp;P 500, NASDAQ-100, and gold over the years that followed. Then it extends the argument forward, using the <a href="/the-power-law.html">Power Law</a> trend to show how long the bitcoin advantage is likely to last for the typical investor&rsquo;s 10-to-15 year horizon.</p>
 
         <!-- ═══════════════════════════════════════════════════════════════ -->
         <!-- SECTION 1: Reading bitcoin through the Power Law (Path A step 2) -->
@@ -48,7 +49,10 @@ eleventyComputed:
             <p class="prose">Every cyclical top in bitcoin&rsquo;s history was visible as a top in real time. Every cycle floor was visible as a floor. The pattern isn&rsquo;t subtle when you plot bitcoin&rsquo;s price against its long-run <a href="/the-power-law.html">Power Law trend</a> &mdash; tops register as measurable deviations above trend; floors register as measurable deviations below it. The chart below plots both across 16 years of price history, plus today&rsquo;s position.</p>
 
             <div class="bvsm-chart-wrap">
-                <canvas id="bvsmPowerLawChart" class="bvsm-chart-canvas-tall"></canvas>
+                <div class="bvsm-chart-label">Bitcoin price vs. Power Law trend, with cyclical-top and floor markers</div>
+                <div class="bvsm-chart-canvas-tall">
+                    <canvas id="bvsmPowerLawChart" role="img" aria-label="Bitcoin price plotted against the Power Law trend across 16 years, with annotated markers at each cyclical top showing the trend-deviation multiple, each cycle floor showing its trend-deviation multiple, and the current position at 0.59× trend."></canvas>
+                </div>
                 <p class="bvsm-chart-caption">Historical BTC price (white) vs. Power Law trend (dashed amber), log-scale Y axis. Numbers next to each marker are the cycle&rsquo;s trend-deviation multiple. Top markers (rust) register at &ge;1.0&times; trend; floor markers (sage) at &le;1.0&times; trend. Today&rsquo;s position is highlighted at 0.59&times; &mdash; well below trend, inside the historical floor band.</p>
             </div>
 
