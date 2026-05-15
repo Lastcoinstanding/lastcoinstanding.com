@@ -416,3 +416,83 @@ body {
 .help-tip:focus-within .tip-content {
     display: block;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE-HEADER (top-of-page hero, per STYLE_GUIDE §2.1)
+   ═══════════════════════════════════════════════════════════════
+   Cormorant Garamond display h1 with amber-italic em accent, Inter
+   sans-serif subtitle, centered max-width container with generous
+   top padding so the page opens with breathing room rather than
+   crashing into the global nav. Matches the editorial-flat pattern
+   used by /bitcoin-backed-mortgages and the .page-header tier of
+   STYLE_GUIDE §2.1 (Bitcoin Retirement uses the same h1 family but
+   layers Source Serif italic on the subtitle; we use Inter here
+   since Source Serif isn't loaded on this page).
+
+   The BvSM page previously had no .page-header CSS at all — this
+   region was rendering with browser defaults (left-aligned, system
+   sans-serif h1, no padding, no centering, no semantic accent on
+   the em-tagged 'Bitcoin' lead-in word). The new §1 viz shipped on
+   top of that latent gap, which made the contrast between the
+   broken hero and the properly-styled §1 section especially
+   visible. Fixed here so the whole top-of-page sequence reads as
+   one coherent editorial register. */
+
+.page-header {
+    text-align: center;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 5rem 2rem 3.5rem;
+}
+.page-header h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    margin: 0 0 1.25rem 0;
+}
+.page-header h1 em {
+    color: var(--amber);
+    font-style: italic;
+    font-weight: 500;
+}
+.page-header .subtitle {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.7;
+    color: var(--text-dim);
+    max-width: 700px;
+    margin: 0 auto;
+    font-weight: 400;
+}
+.page-header .subtitle em { color: var(--text); font-style: italic; }
+@media (max-width: 720px) {
+    .page-header { padding: 3.5rem 1.25rem 2.25rem; }
+}
+
+
+/* ─── Base prose typography (lead paragraphs + body) ───
+   Anchors .bvsm-page .prose to an explicit register rather than
+   relying on inheritance from the (un-defined) site-level prose
+   rules. Font size and line-height tuned for editorial readability
+   at the 920px content width — matches the registers used on BBM
+   and the BvRE essay tab. The strong / em rules already in this
+   file (around line 47) layer on top of this base. */
+
+.bvsm-page .prose {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 1.04rem;
+    line-height: 1.72;
+    color: var(--text);
+    margin: 0 0 1.5rem 0;
+}
+.bvsm-page .prose a {
+    color: var(--amber);
+    text-decoration: underline;
+    text-decoration-color: rgba(224,148,34,0.4);
+    text-underline-offset: 2px;
+}
+.bvsm-page .prose a:hover { text-decoration-color: var(--amber); }
