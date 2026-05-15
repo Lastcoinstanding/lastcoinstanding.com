@@ -496,3 +496,60 @@ body {
     text-underline-offset: 2px;
 }
 .bvsm-page .prose a:hover { text-decoration-color: var(--amber); }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   MODE TOGGLE — Lump sum / Weekly DCA (Path A step 3)
+   ═══════════════════════════════════════════════════════════════
+   Button-group toggle at the top of the unified calculator. Two
+   modes: 'lump' (single lump-sum at start date) and 'dca' (weekly
+   DCA from start date through today). Active state uses the same
+   amber-border treatment as .bvsm-preset.is-active for visual
+   consistency across the calculator's button surfaces. */
+
+.bvsm-mode-toggle {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+.bvsm-mode {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-dim);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.bvsm-mode:hover {
+    color: var(--text);
+    background: rgba(224,148,34,0.05);
+    border-color: rgba(224,148,34,0.3);
+}
+.bvsm-mode.is-active {
+    color: var(--text);
+    background: rgba(224,148,34,0.1);
+    border-color: var(--amber);
+}
+
+
+/* ─── 3-column results grid (gold dropped from comparator stack) ───
+   Override of the default 4-col .bvsm-results-grid. The §4 projection
+   results-row still uses the 4-col grid; only the §2 unified
+   calculator gets the 3-col treatment via .bvsm-results-grid-3. */
+
+.bvsm-results-grid.bvsm-results-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 900px) {
+    .bvsm-results-grid.bvsm-results-grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 540px) {
+    .bvsm-results-grid.bvsm-results-grid-3 { grid-template-columns: 1fr; }
+}

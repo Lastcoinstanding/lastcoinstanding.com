@@ -520,234 +520,283 @@
     return SP500_TR_DATA[SP500_TR_DATA.length - 1][0];
   }
 
-  /* ───────────── §1: Lump-sum calculator ───────────── */
+  /* ───────────── §2: Unified calculator (Lump sum / Weekly DCA) ───────────── */
+  /* Replaces the previous separate LSI + DCA functions per Path A step 3.
+     A single calcMode state ('lump' or 'dca') drives the math branch in
+     recomputeCalc(); setMode() handles the UI labels, slider range, and
+     active-state classes on the mode toggle. Result cards, chart canvas,
+     verdict, and start-date slider are SHARED across both modes — only
+     the amount slider's range (1000-100000 step 1000 for lump vs 10-1000
+     step 10 for DCA) and the labels switch. Chart instance is destroyed
+     and recreated on each recompute since the dataset shapes differ. */
 
-  var lumpChart = null;
+  var calcChart = null;
+  var calcMode = 'lump';
 
-  function recomputeLumpSum() {
-    var startEl = document.getElementById('bvsmStartDate');
-    var amountEl = document.getElementById('bvsmLumpAmount');
+  var SLIDER_RANGES = {
+    lump: { min: 1000, max: 100000, step: 1000, value: 10000 },
+    dca:  { min: 10,   max: 1000,   step: 10,   value: 100   }
+  };
+
+  // Per-mode labels — applied by setMode() so the UI re-skins on toggle.
+  var MODE_LABELS = {
+    lump: {
+      heading:      'Lump sum at the cyclical top',
+      presetsLabel: 'Bought at:',
+      amountLabel:  'Lump-sum amount',
+      amountTip:    'The hypothetical dollar amount invested as a single lump sum on the start date. The calculation tracks what that amount would have become in each asset class through today.',
+      btcSub:       'Value today',
+      spSub:        'Value today (total return)',
+      ndqSub:       'Value today (total return)',
+      chartLabel:   'Wealth-over-time — lump sum invested at the chosen start date',
+      chartCaption: 'Log-scale Y-axis. All three series start at the same dollar amount on the start date and track their respective asset\'s value through today.'
+    },
+    dca: {
+      heading:      'Weekly DCA from the chosen start date',
+      presetsLabel: 'DCA started:',
+      amountLabel:  'Weekly amount',
+      amountTip:    'The dollar amount bought each week. For modelling simplicity the simulation aggregates by month: weekly buys are converted to monthly buys at month-end-close prices.',
+      btcSub:       'Portfolio value today',
+      spSub:        'Portfolio value today (TR)',
+      ndqSub:       'Portfolio value today (TR)',
+      chartLabel:   'Portfolio value over time — weekly DCA from the chosen start date',
+      chartCaption: 'Log-scale Y-axis. The dashed line shows cumulative dollars invested as a reference; the solid lines show the portfolio value of each asset over time.'
+    }
+  };
+
+  function setMode(newMode, opts) {
+    opts = opts || {};
+    calcMode = newMode;
+
+    // Toggle button active states
+    document.querySelectorAll('.bvsm-mode').forEach(function(btn) {
+      var active = btn.getAttribute('data-mode') === newMode;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+
+    var L = MODE_LABELS[newMode];
+
+    // Update text-only labels
+    var setText = function(id, val) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = val;
+    };
+    setText('bvsmCalcHeading',  L.heading);
+    setText('bvsmPresetsLabel', L.presetsLabel);
+    setText('bvsmBtcSublabel',  L.btcSub);
+    setText('bvsmSpSublabel',   L.spSub);
+    setText('bvsmNdqSublabel',  L.ndqSub);
+    setText('bvsmChartLabel',   L.chartLabel);
+    setText('bvsmChartCaption', L.chartCaption);
+
+    // Amount label — preserve the nested help-tip span, update only the
+    // leading text node and the tip-content text
+    var amountLabelEl = document.getElementById('bvsmAmountLabel');
+    if (amountLabelEl && amountLabelEl.firstChild) {
+      amountLabelEl.firstChild.nodeValue = L.amountLabel;
+    }
+    var amountTipEl = document.getElementById('bvsmAmountTip');
+    if (amountTipEl) amountTipEl.textContent = L.amountTip;
+
+    // Amount slider range + reset to mode default (preserves user's start-
+    // date selection but resets amount, since the units differ between modes)
+    var amountEl = document.getElementById('bvsmAmount');
+    var range = SLIDER_RANGES[newMode];
+    if (amountEl && !opts.skipSliderReset) {
+      amountEl.min  = range.min;
+      amountEl.max  = range.max;
+      amountEl.step = range.step;
+      amountEl.value = range.value;
+    }
+
+    recomputeCalc();
+  }
+
+  function recomputeCalc() {
+    var startEl  = document.getElementById('bvsmStartDate');
+    var amountEl = document.getElementById('bvsmAmount');
     if (!startEl || !amountEl) return;
+
     var startDate = sliderIndexToDate(parseInt(startEl.value, 10));
     var amount = parseFloat(amountEl.value);
-    document.getElementById('bvsmStartDateVal').textContent = fmtDate(startDate);
-    document.getElementById('bvsmLumpAmountVal').textContent = fmtUsd(amount);
 
-    // Initial prices
+    document.getElementById('bvsmStartDateVal').textContent = fmtDate(startDate);
+    document.getElementById('bvsmAmountVal').textContent = fmtUsd(amount);
+
+    if (calcMode === 'lump') {
+      computeLumpResults(startDate, amount);
+    } else {
+      computeDcaResults(startDate, amount);
+    }
+  }
+
+  function rowHtml(label, value) {
+    return '<div class="row"><span class="row-label">' + label + '</span><span class="row-val">' + value + '</span></div>';
+  }
+
+  function findStartIdx(startDate) {
+    for (var i = 0; i < SP500_TR_DATA.length; i++) {
+      if (SP500_TR_DATA[i][0] === startDate) return i;
+    }
+    // Nearest by absolute date diff
+    var target = new Date(startDate).getTime();
+    var minDiff = Infinity, bestIdx = -1;
+    for (var j = 0; j < SP500_TR_DATA.length; j++) {
+      var diff = Math.abs(new Date(SP500_TR_DATA[j][0]).getTime() - target);
+      if (diff < minDiff) { minDiff = diff; bestIdx = j; }
+    }
+    return bestIdx;
+  }
+
+  function computeLumpResults(startDate, amount) {
     var btc0 = btcPriceOnDate(startDate);
     var sp0  = valueOnDate(SP500_TR_DATA, startDate);
-    var ndq0 = valueOnDate(NDQ_TR_DATA, startDate);
-    var gold0 = valueOnDate(GOLD_DATA, startDate);
+    var ndq0 = valueOnDate(NDQ_TR_DATA,  startDate);
 
-    // Final prices (today)
     var today = todayISO();
     var btc1 = btcPriceOnDate(today);
     var sp1  = valueOnDate(SP500_TR_DATA, today);
-    var ndq1 = valueOnDate(NDQ_TR_DATA, today);
-    var gold1 = valueOnDate(GOLD_DATA, today);
+    var ndq1 = valueOnDate(NDQ_TR_DATA,  today);
 
-    var btcValue  = amount * (btc1 / btc0);
-    var spValue   = amount * (sp1 / sp0);
-    var ndqValue  = amount * (ndq1 / ndq0);
-    var goldValue = amount * (gold1 / gold0);
+    var btcValue = amount * (btc1 / btc0);
+    var spValue  = amount * (sp1  / sp0);
+    var ndqValue = amount * (ndq1 / ndq0);
 
-    var years = (new Date(today) - new Date(startDate)) / (365.25 * 86400000);
-    var btcCagr  = Math.pow(btcValue/amount, 1/years) - 1;
-    var spCagr   = Math.pow(spValue/amount, 1/years) - 1;
-    var ndqCagr  = Math.pow(ndqValue/amount, 1/years) - 1;
-    var goldCagr = Math.pow(goldValue/amount, 1/years) - 1;
+    var years   = (new Date(today) - new Date(startDate)) / (365.25 * 86400000);
+    var btcCagr = Math.pow(btcValue / amount, 1 / years) - 1;
+    var spCagr  = Math.pow(spValue  / amount, 1 / years) - 1;
+    var ndqCagr = Math.pow(ndqValue / amount, 1 / years) - 1;
 
-    document.getElementById('bvsmBtcValue').textContent  = fmtUsd(btcValue);
-    document.getElementById('bvsmSpValue').textContent   = fmtUsd(spValue);
-    document.getElementById('bvsmNdqValue').textContent  = fmtUsd(ndqValue);
-    document.getElementById('bvsmGoldValue').textContent = fmtUsd(goldValue);
+    document.getElementById('bvsmBtcValue').textContent = fmtUsd(btcValue);
+    document.getElementById('bvsmSpValue').textContent  = fmtUsd(spValue);
+    document.getElementById('bvsmNdqValue').textContent = fmtUsd(ndqValue);
 
-    function rowHtml(label, value) {
-      return '<div class="row"><span class="row-label">' + label + '</span><span class="row-val">' + value + '</span></div>';
-    }
     document.getElementById('bvsmBtcRows').innerHTML =
-      rowHtml('Multiple', fmtMultiple(btcValue/amount)) +
-      rowHtml('CAGR', (btcCagr*100).toFixed(1) + '%');
+      rowHtml('Multiple', fmtMultiple(btcValue / amount)) +
+      rowHtml('CAGR', (btcCagr * 100).toFixed(1) + '%');
     document.getElementById('bvsmSpRows').innerHTML =
-      rowHtml('Multiple', fmtMultiple(spValue/amount)) +
-      rowHtml('CAGR', (spCagr*100).toFixed(1) + '%');
+      rowHtml('Multiple', fmtMultiple(spValue / amount)) +
+      rowHtml('CAGR', (spCagr * 100).toFixed(1) + '%');
     document.getElementById('bvsmNdqRows').innerHTML =
-      rowHtml('Multiple', fmtMultiple(ndqValue/amount)) +
-      rowHtml('CAGR', (ndqCagr*100).toFixed(1) + '%');
-    document.getElementById('bvsmGoldRows').innerHTML =
-      rowHtml('Multiple', fmtMultiple(goldValue/amount)) +
-      rowHtml('CAGR', (goldCagr*100).toFixed(1) + '%');
+      rowHtml('Multiple', fmtMultiple(ndqValue / amount)) +
+      rowHtml('CAGR', (ndqCagr * 100).toFixed(1) + '%');
 
     // Verdict
     var btcVsSp = btcValue / spValue;
-    var verdictEl = document.getElementById('bvsmLumpVerdict');
-    var btcWon = btcValue > spValue && btcValue > ndqValue && btcValue > goldValue;
+    var btcWon = btcValue > spValue && btcValue > ndqValue;
     var verdictText;
     if (years < 2) {
       verdictText = '<strong>The horizon from this start date is under 2 years</strong> &mdash; the long-horizon argument hasn\'t had time to play out yet. Try one of the older preset dates to see how multi-year holds compared.';
     } else if (btcWon) {
       verdictText = 'Over <strong>' + years.toFixed(1) + ' years</strong> from ' + fmtDate(startDate) + ' to today, the bitcoin position is worth <strong>' + fmtMultiple(btcVsSp) + ' the S&amp;P 500 position</strong>, despite starting at a cyclical top. Holding through the drawdowns paid off.';
     } else {
-      verdictText = 'Over <strong>' + years.toFixed(1) + ' years</strong> from ' + fmtDate(startDate) + ', the bitcoin position has not yet pulled ahead of every comparator. Bitcoin: ' + fmtUsd(btcValue) + '. S&amp;P 500: ' + fmtUsd(spValue) + '.';
+      verdictText = 'Over <strong>' + years.toFixed(1) + ' years</strong> from ' + fmtDate(startDate) + ', the bitcoin position has not yet pulled ahead of every equity comparator. Bitcoin: ' + fmtUsd(btcValue) + '. S&amp;P 500: ' + fmtUsd(spValue) + '.';
     }
-    verdictEl.innerHTML = verdictText;
+    document.getElementById('bvsmVerdict').innerHTML = verdictText;
 
-    // Update chart
-    renderLumpChart(startDate, amount, btc0, sp0, ndq0, gold0);
+    renderLumpChart(startDate, amount, btc0, sp0, ndq0);
   }
 
-  function renderLumpChart(startDate, amount, btc0, sp0, ndq0, gold0) {
-    var canvas = document.getElementById('bvsmLumpChart');
-    if (!canvas || typeof Chart === 'undefined') return;
-
-    // Build wealth-over-time arrays at monthly resolution from startDate to today
-    var labels = [];
-    var btcData = [], spData = [], ndqData = [], goldData = [];
-
-    var startIdx = -1;
-    for (var i = 0; i < SP500_TR_DATA.length; i++) {
-      if (SP500_TR_DATA[i][0] === startDate) { startIdx = i; break; }
-    }
-    if (startIdx === -1) {
-      // Find nearest
-      var target = new Date(startDate).getTime();
-      var minDiff = Infinity;
-      for (var i = 0; i < SP500_TR_DATA.length; i++) {
-        var diff = Math.abs(new Date(SP500_TR_DATA[i][0]).getTime() - target);
-        if (diff < minDiff) { minDiff = diff; startIdx = i; }
-      }
-    }
-
-    for (var i = startIdx; i < SP500_TR_DATA.length; i++) {
-      var dateStr = SP500_TR_DATA[i][0];
-      labels.push(dateStr.substring(0,7));  // yyyy-mm
-      btcData.push(amount * (btcPriceOnDate(dateStr) / btc0));
-      spData.push(amount * (SP500_TR_DATA[i][1] / sp0));
-      ndqData.push(amount * (NDQ_TR_DATA[i][1] / ndq0));
-      goldData.push(amount * (GOLD_DATA[i][1] / gold0));
-    }
-
-    var datasets = [
-      { label: 'Bitcoin', data: btcData, borderColor: '#e09422', borderWidth: 2.2, fill: false, tension: 0.1, pointRadius: 0 },
-      { label: 'S&P 500 (TR)', data: spData, borderColor: '#8aa3b5', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 },
-      { label: 'NASDAQ-100 (TR)', data: ndqData, borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 },
-      { label: 'Gold', data: goldData, borderColor: '#c9a85a', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 }
-    ];
-
-    if (lumpChart) lumpChart.destroy();
-    lumpChart = new Chart(canvas, {
-      type: 'line',
-      data: { labels: labels, datasets: datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: { position: 'top', labels: { color: '#9a9080', font: { family: 'Inter', size: 11 } } },
-          tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + fmtUsd(ctx.parsed.y); } } }
-        },
-        scales: {
-          x: { ticks: { color: '#6a6256', font: { size: 10 }, maxTicksLimit: 10 }, grid: { color: 'rgba(255,255,255,0.04)' } },
-          y: { type: 'logarithmic', ticks: { color: '#6a6256', font: { size: 10 }, callback: function(v){ return fmtUsd(v); } }, grid: { color: 'rgba(255,255,255,0.04)' } }
-        }
-      }
-    });
-  }
-
-  /* ───────────── §2: DCA calculator ───────────── */
-
-  var dcaChart = null;
-
-  function recomputeDca() {
-    var startEl = document.getElementById('bvsmDcaStartDate');
-    var weeklyEl = document.getElementById('bvsmDcaWeekly');
-    if (!startEl || !weeklyEl) return;
-    var startDate = sliderIndexToDate(parseInt(startEl.value, 10));
-    var weeklyAmt = parseFloat(weeklyEl.value);
+  function computeDcaResults(startDate, amount) {
+    var weeklyAmt = amount;
     var monthlyAmt = weeklyAmt * 52 / 12;
 
-    document.getElementById('bvsmDcaStartDateVal').textContent = fmtDate(startDate);
-    document.getElementById('bvsmDcaWeeklyVal').textContent = fmtUsd(weeklyAmt);
+    var startIdx = findStartIdx(startDate);
 
-    var startIdx = -1;
-    for (var i = 0; i < SP500_TR_DATA.length; i++) {
-      if (SP500_TR_DATA[i][0] === startDate) { startIdx = i; break; }
-    }
-    if (startIdx === -1) {
-      var target = new Date(startDate).getTime();
-      var minDiff = Infinity;
-      for (var i = 0; i < SP500_TR_DATA.length; i++) {
-        var diff = Math.abs(new Date(SP500_TR_DATA[i][0]).getTime() - target);
-        if (diff < minDiff) { minDiff = diff; startIdx = i; }
-      }
-    }
-
-    // Simulate monthly DCA: each month buy monthlyAmt at that month's close
     var labels = [];
-    var investedSeries = [], btcSeries = [], spSeries = [], ndqSeries = [], goldSeries = [];
-    var btcUnits = 0, spUnits = 0, ndqUnits = 0, goldUnits = 0;
+    var investedSeries = [], btcSeries = [], spSeries = [], ndqSeries = [];
+    var btcUnits = 0, spUnits = 0, ndqUnits = 0;
     var totalInvested = 0;
 
     for (var i = startIdx; i < SP500_TR_DATA.length; i++) {
       var dateStr = SP500_TR_DATA[i][0];
       var btcP = btcPriceOnDate(dateStr);
-      var spP = SP500_TR_DATA[i][1];
+      var spP  = SP500_TR_DATA[i][1];
       var ndqP = NDQ_TR_DATA[i][1];
-      var goldP = GOLD_DATA[i][1];
 
-      btcUnits  += monthlyAmt / btcP;
-      spUnits   += monthlyAmt / spP;
-      ndqUnits  += monthlyAmt / ndqP;
-      goldUnits += monthlyAmt / goldP;
+      btcUnits += monthlyAmt / btcP;
+      spUnits  += monthlyAmt / spP;
+      ndqUnits += monthlyAmt / ndqP;
       totalInvested += monthlyAmt;
 
-      labels.push(dateStr.substring(0,7));
+      labels.push(dateStr.substring(0, 7));
       investedSeries.push(totalInvested);
       btcSeries.push(btcUnits * btcP);
       spSeries.push(spUnits * spP);
       ndqSeries.push(ndqUnits * ndqP);
-      goldSeries.push(goldUnits * goldP);
     }
 
-    var btcFinal = btcSeries[btcSeries.length - 1];
-    var spFinal = spSeries[spSeries.length - 1];
-    var ndqFinal = ndqSeries[ndqSeries.length - 1];
-    var goldFinal = goldSeries[goldSeries.length - 1];
+    var btcFinal = btcSeries[btcSeries.length - 1] || 0;
+    var spFinal  = spSeries[spSeries.length - 1]  || 0;
+    var ndqFinal = ndqSeries[ndqSeries.length - 1] || 0;
 
-    document.getElementById('bvsmDcaBtcValue').textContent  = fmtUsd(btcFinal);
-    document.getElementById('bvsmDcaSpValue').textContent   = fmtUsd(spFinal);
-    document.getElementById('bvsmDcaNdqValue').textContent  = fmtUsd(ndqFinal);
-    document.getElementById('bvsmDcaGoldValue').textContent = fmtUsd(goldFinal);
+    document.getElementById('bvsmBtcValue').textContent = fmtUsd(btcFinal);
+    document.getElementById('bvsmSpValue').textContent  = fmtUsd(spFinal);
+    document.getElementById('bvsmNdqValue').textContent = fmtUsd(ndqFinal);
 
-    function rowHtml(label, value) {
-      return '<div class="row"><span class="row-label">' + label + '</span><span class="row-val">' + value + '</span></div>';
-    }
     function rowsFor(final) {
+      var divisor = Math.max(totalInvested, 1);
       return rowHtml('Total invested', fmtUsd(totalInvested)) +
-             rowHtml('Multiple', fmtMultiple(final / totalInvested));
+             rowHtml('Multiple', fmtMultiple(final / divisor));
     }
-    document.getElementById('bvsmDcaBtcRows').innerHTML  = rowsFor(btcFinal);
-    document.getElementById('bvsmDcaSpRows').innerHTML   = rowsFor(spFinal);
-    document.getElementById('bvsmDcaNdqRows').innerHTML  = rowsFor(ndqFinal);
-    document.getElementById('bvsmDcaGoldRows').innerHTML = rowsFor(goldFinal);
+    document.getElementById('bvsmBtcRows').innerHTML = rowsFor(btcFinal);
+    document.getElementById('bvsmSpRows').innerHTML  = rowsFor(spFinal);
+    document.getElementById('bvsmNdqRows').innerHTML = rowsFor(ndqFinal);
 
-    var verdictText = 'After <strong>' + (labels.length / 12).toFixed(1) + ' years</strong> of weekly DCA from ' + fmtDate(startDate) + ', total invested: ' + fmtUsd(totalInvested) + '. The bitcoin position is worth <strong>' + fmtUsd(btcFinal) + '</strong>, the S&amp;P 500 position <strong>' + fmtUsd(spFinal) + '</strong>. Bitcoin / S&amp;P 500 ratio: <strong>' + fmtMultiple(btcFinal / spFinal) + '</strong>.';
-    document.getElementById('bvsmDcaVerdict').innerHTML = verdictText;
+    var verdictText;
+    if (totalInvested === 0 || labels.length === 0) {
+      verdictText = '<strong>Pick a start date earlier than today</strong> to see the DCA outcome.';
+    } else {
+      verdictText = 'After <strong>' + (labels.length / 12).toFixed(1) + ' years</strong> of weekly DCA from ' + fmtDate(startDate) + ', total invested: ' + fmtUsd(totalInvested) + '. The bitcoin position is worth <strong>' + fmtUsd(btcFinal) + '</strong>, the S&amp;P 500 position <strong>' + fmtUsd(spFinal) + '</strong>. Bitcoin / S&amp;P 500 ratio: <strong>' + fmtMultiple(btcFinal / Math.max(spFinal, 1)) + '</strong>.';
+    }
+    document.getElementById('bvsmVerdict').innerHTML = verdictText;
 
-    // Render chart
-    var canvas = document.getElementById('bvsmDcaChart');
+    renderDcaChart(labels, investedSeries, btcSeries, spSeries, ndqSeries);
+  }
+
+  function renderLumpChart(startDate, amount, btc0, sp0, ndq0) {
+    var canvas = document.getElementById('bvsmCalcChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    var labels = [];
+    var btcData = [], spData = [], ndqData = [];
+    var startIdx = findStartIdx(startDate);
+
+    for (var i = startIdx; i < SP500_TR_DATA.length; i++) {
+      var dateStr = SP500_TR_DATA[i][0];
+      labels.push(dateStr.substring(0, 7));
+      btcData.push(amount * (btcPriceOnDate(dateStr) / btc0));
+      spData.push(amount * (SP500_TR_DATA[i][1] / sp0));
+      ndqData.push(amount * (NDQ_TR_DATA[i][1] / ndq0));
+    }
+
+    var datasets = [
+      { label: 'Bitcoin',         data: btcData, borderColor: '#e09422', borderWidth: 2.2, fill: false, tension: 0.1, pointRadius: 0 },
+      { label: 'S&P 500 (TR)',    data: spData,  borderColor: '#8aa3b5', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 },
+      { label: 'NASDAQ-100 (TR)', data: ndqData, borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 }
+    ];
+
+    drawCalcChart(canvas, labels, datasets);
+  }
+
+  function renderDcaChart(labels, investedSeries, btcSeries, spSeries, ndqSeries) {
+    var canvas = document.getElementById('bvsmCalcChart');
     if (!canvas || typeof Chart === 'undefined') return;
 
     var datasets = [
-      { label: 'Bitcoin', data: btcSeries, borderColor: '#e09422', borderWidth: 2.2, fill: false, tension: 0.1, pointRadius: 0 },
-      { label: 'S&P 500 (TR)', data: spSeries, borderColor: '#8aa3b5', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 },
-      { label: 'NASDAQ-100 (TR)', data: ndqSeries, borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 },
-      { label: 'Gold', data: goldSeries, borderColor: '#c9a85a', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 },
-      { label: 'Cumulative invested', data: investedSeries, borderColor: '#bfae97', borderWidth: 1.4, borderDash: [5,4], fill: false, tension: 0.1, pointRadius: 0 }
+      { label: 'Bitcoin',             data: btcSeries,      borderColor: '#e09422', borderWidth: 2.2, fill: false, tension: 0.1, pointRadius: 0 },
+      { label: 'S&P 500 (TR)',        data: spSeries,       borderColor: '#8aa3b5', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 },
+      { label: 'NASDAQ-100 (TR)',     data: ndqSeries,      borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 },
+      { label: 'Cumulative invested', data: investedSeries, borderColor: '#bfae97', borderWidth: 1.4, borderDash: [5, 4], fill: false, tension: 0.1, pointRadius: 0 }
     ];
 
-    if (dcaChart) dcaChart.destroy();
-    dcaChart = new Chart(canvas, {
+    drawCalcChart(canvas, labels, datasets);
+  }
+
+  function drawCalcChart(canvas, labels, datasets) {
+    if (calcChart) calcChart.destroy();
+    calcChart = new Chart(canvas, {
       type: 'line',
       data: { labels: labels, datasets: datasets },
       options: {
@@ -781,56 +830,44 @@
 
     var todayDate = new Date(todayISO());
     var btcToday = btcPriceOnDate(todayISO());
-    var spToday = SP500_TR_DATA[SP500_TR_DATA.length - 1][1];
-    var ndqToday = NDQ_TR_DATA[NDQ_TR_DATA.length - 1][1];
-    var goldToday = GOLD_DATA[GOLD_DATA.length - 1][1];
 
-    var SP_CAGR = 0.1086, NDQ_CAGR = 0.1626, GOLD_CAGR = 0.07;
+    var SP_CAGR = 0.1086, NDQ_CAGR = 0.1626;
 
-    // The §3 chart plots TWO bitcoin lines to capture both the conservative
+    // The §4 chart plots TWO bitcoin lines to capture both the conservative
     // forward-trend projection AND the current discount/premium to trend:
     //
     //   Line 1 — Trend basis: assumes today is fair value, projects Power Law
-    //     forward. Starts at investAmt. Cleanest 'central-tendency forward'
-    //     read for someone modelling the next 10-30 years from trend.
-    //
+    //     forward. Starts at investAmt.
     //   Line 2 — Current-price basis: anchors to today's market price and
-    //     projects forward at trend. Captures whether today is a discount
-    //     (line starts ABOVE trend-basis — market below trend, like today's
-    //     ~35% discount) or a premium (line starts BELOW — at a cycle top).
-    //     The vertical gap at y=0 is the entry-quality signal.
+    //     projects forward at trend. Captures whether today is a discount or
+    //     premium to trend; vertical gap at y=0 is the entry-quality signal.
     var btcTrendToday = plBtcPrice(daysSinceGenesisFromDate(todayDate));
 
     var labels = [];
-    var btcTrendData = [], btcMarketData = [], spData = [], ndqData = [], goldData = [];
+    var btcTrendData = [], btcMarketData = [], spData = [], ndqData = [];
     for (var y = 0; y <= horizonYears; y++) {
       labels.push('+' + y + 'y');
       var d = daysSinceGenesisFromDate(todayDate) + y * 365.25;
       var btcTrendPrice = plBtcPrice(d);
-      // Line 1: trend basis (starts at investAmt)
       btcTrendData.push(investAmt * (btcTrendPrice / btcTrendToday));
-      // Line 2: current-price basis (starts at investAmt × trend_today / market_today)
       btcMarketData.push(investAmt * (btcTrendPrice / btcToday));
       spData.push(investAmt * Math.pow(1 + SP_CAGR, y));
       ndqData.push(investAmt * Math.pow(1 + NDQ_CAGR, y));
-      goldData.push(investAmt * Math.pow(1 + GOLD_CAGR, y));
     }
 
-    document.getElementById('bvsmProjBtcTrendValue').textContent  = fmtUsd(btcTrendData[btcTrendData.length-1]);
-    document.getElementById('bvsmProjBtcMarketValue').textContent = fmtUsd(btcMarketData[btcMarketData.length-1]);
-    document.getElementById('bvsmProjSpValue').textContent   = fmtUsd(spData[spData.length-1]);
-    document.getElementById('bvsmProjNdqValue').textContent  = fmtUsd(ndqData[ndqData.length-1]);
-    document.getElementById('bvsmProjGoldValue').textContent = fmtUsd(goldData[goldData.length-1]);
+    document.getElementById('bvsmProjBtcTrendValue').textContent  = fmtUsd(btcTrendData[btcTrendData.length - 1]);
+    document.getElementById('bvsmProjBtcMarketValue').textContent = fmtUsd(btcMarketData[btcMarketData.length - 1]);
+    document.getElementById('bvsmProjSpValue').textContent  = fmtUsd(spData[spData.length - 1]);
+    document.getElementById('bvsmProjNdqValue').textContent = fmtUsd(ndqData[ndqData.length - 1]);
 
     var canvas = document.getElementById('bvsmProjectionChart');
     if (!canvas || typeof Chart === 'undefined') return;
 
     var datasets = [
-      { label: 'Bitcoin (trend basis)',  data: btcTrendData,  borderColor: '#e09422', borderWidth: 2.2, fill: false, tension: 0.05, pointRadius: 0 },
+      { label: 'Bitcoin (trend basis)',   data: btcTrendData,  borderColor: '#e09422', borderWidth: 2.2, fill: false, tension: 0.05, pointRadius: 0 },
       { label: 'Bitcoin (current price)', data: btcMarketData, borderColor: '#e09422', borderWidth: 2.2, borderDash: [6, 4], fill: false, tension: 0.05, pointRadius: 0 },
-      { label: 'S&P 500 (10.9% CAGR)',   data: spData,        borderColor: '#8aa3b5', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 },
-      { label: 'NASDAQ-100 (16.3% CAGR)', data: ndqData,       borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 },
-      { label: 'Gold (7% CAGR)',         data: goldData,      borderColor: '#c9a85a', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 }
+      { label: 'S&P 500 (10.9% CAGR)',    data: spData,        borderColor: '#8aa3b5', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 },
+      { label: 'NASDAQ-100 (16.3% CAGR)', data: ndqData,       borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 }
     ];
 
     if (projChart) projChart.destroy();
@@ -856,65 +893,55 @@
   /* ───────────── Wire up controls ───────────── */
 
   function wireUp() {
-    // Lump-sum presets
-    document.querySelectorAll('.bvsm-preset:not(.bvsm-dca-preset)').forEach(function(btn) {
+    // Mode toggle (lump / dca)
+    document.querySelectorAll('.bvsm-mode').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        document.querySelectorAll('.bvsm-preset:not(.bvsm-dca-preset)').forEach(function(b){ b.classList.remove('is-active'); });
+        var mode = btn.getAttribute('data-mode');
+        if (mode !== calcMode) setMode(mode);
+      });
+    });
+
+    // Preset row (single row now — applies to whichever mode is active)
+    document.querySelectorAll('.bvsm-preset').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.bvsm-preset').forEach(function(b){ b.classList.remove('is-active'); });
         btn.classList.add('is-active');
         var dateStr = btn.getAttribute('data-preset-date');
-        // Find slider index for this date
         for (var i = 0; i < SP500_TR_DATA.length; i++) {
           if (SP500_TR_DATA[i][0] >= dateStr) {
             document.getElementById('bvsmStartDate').value = i;
             break;
           }
         }
-        recomputeLumpSum();
-      });
-    });
-    // DCA presets
-    document.querySelectorAll('.bvsm-dca-preset').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.bvsm-dca-preset').forEach(function(b){ b.classList.remove('is-active'); });
-        btn.classList.add('is-active');
-        var dateStr = btn.getAttribute('data-preset-date');
-        for (var i = 0; i < SP500_TR_DATA.length; i++) {
-          if (SP500_TR_DATA[i][0] >= dateStr) {
-            document.getElementById('bvsmDcaStartDate').value = i;
-            break;
-          }
-        }
-        recomputeDca();
+        recomputeCalc();
       });
     });
 
-    // Slider listeners
-    ['bvsmStartDate','bvsmLumpAmount'].forEach(function(id){
+    // Calculator slider listeners
+    ['bvsmStartDate', 'bvsmAmount'].forEach(function(id) {
       var el = document.getElementById(id);
-      if (el) el.addEventListener('input', recomputeLumpSum);
+      if (el) el.addEventListener('input', recomputeCalc);
     });
-    ['bvsmDcaStartDate','bvsmDcaWeekly'].forEach(function(id){
-      var el = document.getElementById(id);
-      if (el) el.addEventListener('input', recomputeDca);
-    });
-    ['bvsmProjHorizon','bvsmProjInvest'].forEach(function(id){
+
+    // Forward-projection slider listeners (§4 unchanged)
+    ['bvsmProjHorizon', 'bvsmProjInvest'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.addEventListener('input', recomputeProjection);
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-      wireUp();
-      recomputeLumpSum();
-      recomputeDca();
-      recomputeProjection();
-    });
-  } else {
+  function init() {
     wireUp();
-    recomputeLumpSum();
-    recomputeDca();
+    // Initial render — setMode('lump', skipSliderReset:true) preserves the
+    // HTML's default amount value (10000) rather than overwriting it.
+    setMode('lump', { skipSliderReset: true });
     recomputeProjection();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 
 })();
