@@ -671,10 +671,12 @@ body {
    Without a floor on the row height, every column's slider input ends up
    at a different y-position and the cluster looks jagged. Reserve enough
    space in the label/value row for the longest reasonable label so the
-   sliders sit on a common horizontal line across the row. */
+   sliders sit on a common horizontal line across the row. The 4.5rem
+   floor comfortably accommodates 3 lines of label at the smaller 0.85rem
+   font size (3 × 0.85 × 1.3 ≈ 3.32rem) with breathing room. */
 .slider-grid.grid-4 .slider-row,
 .slider-grid.grid-5 .slider-row {
-    min-height: 4rem;
+    min-height: 4.5rem;
 }
 .cluster-means .slider-row {
     flex-direction: column;
@@ -683,7 +685,7 @@ body {
 }
 .slider-name {
     font-family: 'Inter', -apple-system, sans-serif;
-    font-size: 0.92rem;
+    font-size: 0.85rem;
     font-weight: 500;
     color: var(--text);
     line-height: 1.3;
@@ -702,7 +704,7 @@ body {
 }
 .slider-val {
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 500;
     color: var(--amber);
     white-space: nowrap;
