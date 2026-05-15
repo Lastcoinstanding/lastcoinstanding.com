@@ -589,3 +589,115 @@ body {
 .bvsm-mode {
     min-width: 110px;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SLIDER PATTERN (Path A step 4 — canonical Bitcoin-Retirement
+   slider treatment, adapted to BvSM's variables)
+   ═══════════════════════════════════════════════════════════════
+   Source: /the-bitcoin-retirement.css. The retirement page uses
+   --ink-bright + --bg-page; BvSM uses --text-bright + --bg. Markup
+   pattern (now matching BvSM as of this commit):
+     .slider-control
+       .slider-row          (name + value, baseline-aligned)
+         .slider-name       (label, with optional help-tip)
+         .slider-val        (current value, tabular-nums amber)
+       input[type=range]    (amber-on-dark, hover-scaling thumb)
+   Wrapped inside .slider-grid containers (.grid-2 = 2 cols, etc).
+   Container .slider-cluster gives the whole block a subtle
+   bordered card with breathing-room padding. */
+
+/* ─── Cluster container ─── */
+.slider-cluster {
+    margin-bottom: 1.5rem;
+    padding: 1.1rem 1.25rem 1.25rem;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border);
+}
+
+/* ─── Individual slider control ─── */
+.slider-control {
+    padding: 0.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+.slider-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.6rem;
+}
+.slider-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-bright);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+.slider-val {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--amber);
+    letter-spacing: -0.005em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ─── Range input — amber-on-dark slider ─── */
+.slider-control input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: rgba(224,148,34,0.18);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    margin: 4px 0;
+}
+.slider-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--amber);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 1px rgba(224,148,34,0.4);
+    cursor: grab;
+    transition: transform 0.1s, box-shadow 0.15s;
+}
+.slider-control input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--amber);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 1px rgba(224,148,34,0.4);
+    cursor: grab;
+}
+.slider-control input[type="range"]:hover::-webkit-slider-thumb {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 2px rgba(224,148,34,0.5);
+}
+.slider-control input[type="range"]:active::-webkit-slider-thumb {
+    cursor: grabbing;
+}
+
+/* ─── Mobile breakpoint ─── */
+@media (max-width: 720px) {
+    .slider-cluster { padding: 0.95rem 1rem 1.05rem; }
+    .slider-val { font-size: 1.1rem; }
+}
+
+/* ─── grid- modifier classes (BvSM-local; not on base.njk) ─── */
+.slider-grid { display: grid; gap: 1.1rem 2rem; }
+.slider-grid.grid-2 { grid-template-columns: 1fr 1fr; }
+@media (max-width: 720px) {
+    .slider-grid.grid-2 { grid-template-columns: 1fr; gap: 0.9rem; }
+}

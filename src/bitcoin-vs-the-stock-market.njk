@@ -112,21 +112,27 @@ eleventyComputed:
                 <div class="slider-cluster">
                     <div class="slider-grid grid-2">
                         <div class="slider-control">
-                            <span class="slider-name">Start date<span class="help-tip" tabindex="0">?<span class="tip-content">The date the position begins. In lump-sum and horizon modes this is the day the single investment is made; in weekly DCA mode it&rsquo;s the day the weekly buys start. Use the preset buttons above to jump to a cyclical top, or drag the slider for any date from 2010 onwards.</span></span></span>
-                            <span class="slider-val" id="bvsmStartDateVal">Nov 30, 2013</span>
+                            <div class="slider-row">
+                                <span class="slider-name">Start date<span class="help-tip" tabindex="0">?<span class="tip-content">The date the position begins. In lump-sum and horizon modes this is the day the single investment is made; in weekly DCA mode it&rsquo;s the day the weekly buys start. Use the preset buttons above to jump to a cyclical top, or drag the slider for any date from 2010 onwards.</span></span></span>
+                                <span class="slider-val" id="bvsmStartDateVal">Nov 30, 2013</span>
+                            </div>
                             <input type="range" id="bvsmStartDate" min="0" max="195" step="1" value="46">
                         </div>
                         <div class="slider-control">
-                            <span class="slider-name" id="bvsmAmountLabel">Lump-sum amount<span class="help-tip" tabindex="0">?<span class="tip-content" id="bvsmAmountTip">The hypothetical dollar amount invested as a single lump sum on the start date. The calculation tracks what that amount would have become in each asset class through today.</span></span></span>
-                            <span class="slider-val" id="bvsmAmountVal">$10,000</span>
+                            <div class="slider-row">
+                                <span class="slider-name" id="bvsmAmountLabel">Lump-sum amount<span class="help-tip" tabindex="0">?<span class="tip-content" id="bvsmAmountTip">The hypothetical dollar amount invested as a single lump sum on the start date. The calculation tracks what that amount would have become in each asset class through today.</span></span></span>
+                                <span class="slider-val" id="bvsmAmountVal">$10,000</span>
+                            </div>
                             <input type="range" id="bvsmAmount" min="1000" max="100000" step="1000" value="10000">
                         </div>
                     </div>
                     <!-- Horizon slider row: visible only in 'Held N years' mode -->
                     <div class="slider-grid bvsm-horizon-row" id="bvsmHorizonRow">
                         <div class="slider-control">
-                            <span class="slider-name">Horizon (years held from start)<span class="help-tip" tabindex="0">?<span class="tip-content">How many years the position is held from the start date. For older start dates where this horizon falls within historical data, the result is the actual outcome. For recent start dates where the horizon extends past today, the calculator projects forward from today using the Power Law trend for bitcoin and the historical long-run CAGRs (10.9% for the S&amp;P 500, 16.3% for the NASDAQ-100) for the equity comparators.</span></span></span>
-                            <span class="slider-val" id="bvsmHorizonVal">10 years</span>
+                            <div class="slider-row">
+                                <span class="slider-name">Horizon (years held from start)<span class="help-tip" tabindex="0">?<span class="tip-content">How many years the position is held from the start date. For older start dates where this horizon falls within historical data, the result is the actual outcome. For recent start dates where the horizon extends past today, the calculator projects forward from today using the Power Law trend for bitcoin and the historical long-run CAGRs (10.9% for the S&amp;P 500, 16.3% for the NASDAQ-100) for the equity comparators.</span></span></span>
+                                <span class="slider-val" id="bvsmHorizonVal">10 years</span>
+                            </div>
                             <input type="range" id="bvsmHorizon" min="1" max="15" step="1" value="10">
                         </div>
                     </div>
@@ -190,13 +196,17 @@ eleventyComputed:
                 <div class="slider-cluster">
                     <div class="slider-grid grid-2">
                         <div class="slider-control">
-                            <span class="slider-name">Projection horizon<span class="help-tip" tabindex="0">?<span class="tip-content">How many years forward from today to project. The Power Law trend continues to compound at its decreasing-CAGR rate; the comparator trends compound at their historical CAGRs. Marker dots indicate the projected value at the chosen horizon.</span></span></span>
-                            <span class="slider-val" id="bvsmProjHorizonVal">15 years</span>
+                            <div class="slider-row">
+                                <span class="slider-name">Projection horizon<span class="help-tip" tabindex="0">?<span class="tip-content">How many years forward from today to project. The Power Law trend continues to compound at its decreasing-CAGR rate; the comparator trends compound at their historical CAGRs. Marker dots indicate the projected value at the chosen horizon.</span></span></span>
+                                <span class="slider-val" id="bvsmProjHorizonVal">15 years</span>
+                            </div>
                             <input type="range" id="bvsmProjHorizon" min="5" max="40" step="1" value="15">
                         </div>
                         <div class="slider-control">
-                            <span class="slider-name">Investment today<span class="help-tip" tabindex="0">?<span class="tip-content">A hypothetical amount invested today in each asset. Used to project the dollar value of that investment at the chosen horizon under each trend.</span></span></span>
-                            <span class="slider-val" id="bvsmProjInvestVal">$10,000</span>
+                            <div class="slider-row">
+                                <span class="slider-name">Investment today<span class="help-tip" tabindex="0">?<span class="tip-content">A hypothetical amount invested today in each asset. Used to project the dollar value of that investment at the chosen horizon under each trend.</span></span></span>
+                                <span class="slider-val" id="bvsmProjInvestVal">$10,000</span>
+                            </div>
                             <input type="range" id="bvsmProjInvest" min="1000" max="100000" step="1000" value="10000">
                         </div>
                     </div>
