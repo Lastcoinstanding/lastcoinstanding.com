@@ -523,14 +523,22 @@
 
     var SP_CAGR = 0.10, NDQ_CAGR = 0.1626, GOLD_CAGR = 0.07;
 
+    // Anchor BTC's projection line to today's *trend* price (not today's market
+    // price) so all four series start at investAmt at y=0 and diverge by their
+    // forward growth rate. Earlier code divided by btcToday (market), which
+    // produced a y=0 BTC value of investAmt × (trend_today / market_today) —
+    // i.e. $17k for a $10k investment when BTC is ~35% below trend, breaking
+    // the apples-to-apples trend-comparison this chart is supposed to be.
+    var btcTrendToday = plBtcPrice(daysSinceGenesisFromDate(todayDate));
+
     var labels = [];
     var btcData = [], spData = [], ndqData = [], goldData = [];
     for (var y = 0; y <= horizonYears; y++) {
       labels.push('+' + y + 'y');
-      // BTC: Power Law at (today_days + y*365.25)
+      // BTC: Power Law at (today_days + y*365.25), normalised to investAmt at y=0
       var d = daysSinceGenesisFromDate(todayDate) + y * 365.25;
       var btcTrendPrice = plBtcPrice(d);
-      var btcTrendValue = investAmt * (btcTrendPrice / btcToday);
+      var btcTrendValue = investAmt * (btcTrendPrice / btcTrendToday);
       btcData.push(btcTrendValue);
       spData.push(investAmt * Math.pow(1 + SP_CAGR, y));
       ndqData.push(investAmt * Math.pow(1 + NDQ_CAGR, y));
