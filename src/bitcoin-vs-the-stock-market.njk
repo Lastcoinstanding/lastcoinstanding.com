@@ -235,12 +235,12 @@ eleventyComputed:
 
                 <div class="bvsm-projection-results">
                     <div class="bvsm-proj-row">
-                        <span class="bvsm-proj-asset bvsm-proj-asset-btc">Bitcoin (trend basis)</span>
+                        <span class="bvsm-proj-asset bvsm-proj-asset-btc">Bitcoin (trend basis)<span class="help-tip" tabindex="0">?<span class="tip-content">The conservative projection. Assumes today&rsquo;s bitcoin price sits at the Power Law trend value (whether or not it actually does) and projects forward at the trend&rsquo;s growth rate. Use this as the central-case expectation if you don&rsquo;t want to assume mean-reversion. At year zero this line equals the investment amount; at the chosen horizon it equals investment &times; trend growth over the period.</span></span></span>
                         <span class="bvsm-proj-value" id="bvsmProjBtcTrendValue">&mdash;</span>
                         <span class="bvsm-proj-note">conservative; trend forward from today</span>
                     </div>
                     <div class="bvsm-proj-row">
-                        <span class="bvsm-proj-asset bvsm-proj-asset-btc">Bitcoin (current price)</span>
+                        <span class="bvsm-proj-asset bvsm-proj-asset-btc">Bitcoin (current price)<span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When bitcoin sits below trend (today&rsquo;s case, ~35% below), this line starts <em>above</em> the trend-basis line &mdash; the gap is the additional gain you&rsquo;d capture if today&rsquo;s market price mean-reverts to trend over the horizon. When above trend at a cycle top, this line starts <em>below</em> the trend-basis line &mdash; the gap is the premium that trend says will fade. The two lines converge when the market is at trend.</span></span></span>
                         <span class="bvsm-proj-value" id="bvsmProjBtcMarketValue">&mdash;</span>
                         <span class="bvsm-proj-note">includes today&rsquo;s discount/premium to trend</span>
                     </div>
