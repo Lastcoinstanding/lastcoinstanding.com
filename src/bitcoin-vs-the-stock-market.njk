@@ -1,0 +1,308 @@
+---
+layout: base.njk
+permalink: /bitcoin-vs-the-stock-market.html
+slug: bitcoin-vs-the-stock-market
+related:
+  - slug: the-power-law
+    desc: "The growth model that underpins this page's forward projection. The Power Law is the central-tendency expectation for bitcoin's long-run trajectory; this page applies it to the question of how bitcoin compares to conventional indexes for someone deciding right now."
+  - slug: the-bitcoin-retirement
+    desc: "The companion page that picks up where this one leaves off. If this page answers should I start, the Retirement page answers can I retire on it. Together they bookend the bitcoiner journey from entry to exit."
+  - slug: bitcoin-vs-real-estate
+    desc: "The retrospective + projective comparison structure applied to housing instead of equities. If you're weighing bitcoin against multiple asset classes, both pages run the same kind of analysis with different comparators."
+  - slug: disciplined-rebalancing
+    desc: "If you've internalized the long-horizon argument and want a framework for actively managing the position through cycles, the rebalancing page covers the sell-and-rebuy protocol that exploits the channel."
+companion: []
+eleventyComputed:
+  head_extras: "{% include '_pageassets/bitcoin-vs-the-stock-market-head.html' %}"
+  page_styles: "{% include '_pageassets/bitcoin-vs-the-stock-market.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/bitcoin-vs-the-stock-market.js' %}"
+---
+<section class="hero">
+    <h1><em>Bitcoin</em> vs. The Stock Market</h1>
+    <div class="hero-subtitle">What the historical record actually says about buying bitcoin at the worst possible moment &mdash; or every week through every cycle &mdash; versus the same in the S&amp;P 500, NASDAQ-100, or gold.</div>
+    <p class="subtitle">If you&rsquo;ve never bought bitcoin and are weighing it against a normal index-fund portfolio, the question that gates the decision is some version of: <em>it&rsquo;s volatile and what if I buy in at exactly the wrong time?</em> The honest answer lives in the historical record. This page anchors on the five scariest scenarios &mdash; lump-sum purchases at the literal top of each bitcoin cycle, including the most recent one in October 2025 &mdash; and walks through what would have happened against the S&amp;P 500, NASDAQ-100, and gold over the years that followed. Then it extends the argument forward, using the Power Law trend to show how long the bitcoin advantage is likely to last for the typical investor&rsquo;s 10-to-15 year horizon.</p>
+</section>
+
+<main class="content-area">
+    {% include 'components/tool-framing.njk' %}
+
+    <article class="bvsm-page">
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 1: What if you bought at the worst time?                -->
+        <!-- The fear-confronting section. Lump-sum at each cyclical top.    -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-intro">
+                <h2>What if you bought at the worst time?</h2>
+                <p><em>The fear-confronting scenario, anchored on each of the four major bitcoin cyclical tops.</em></p>
+            </div>
+
+            <p class="prose">The standard objection to buying bitcoin is some version of: <em>what if I buy in right before the crash?</em> The history of bitcoin includes several spectacular crashes &mdash; 80%+ drawdowns from the local top in late 2011, late 2013, late 2017, late 2021, and the 2024 ATH&rsquo;s subsequent retracement. <strong>For someone considering an entry today, the relevant question isn&rsquo;t whether crashes happen &mdash; they do. It&rsquo;s what would have happened if you&rsquo;d been the unluckiest possible investor and bought at the literal top of each one.</strong></p>
+
+            <p class="prose">The calculator below lets you pick a major cyclical top, an amount, and see what a lump-sum invested on that day would be worth today &mdash; against the same amount in the S&amp;P 500 (total return, with dividends reinvested), the NASDAQ-100 (total return), and gold (spot). The five anchored presets correspond to the local tops most likely to feature in a skeptical investor&rsquo;s memory &mdash; including the October 2025 all-time high, the most recent top and the one whose hold horizon is shortest.</p>
+
+            <!-- ─── Lump-sum calculator surface ─── -->
+            <div class="bvsm-calc">
+                <h3>Lump-sum at the cyclical top</h3>
+
+                <div class="bvsm-presets">
+                    <span class="bvsm-presets-label">Bought at:</span>
+                    <button class="bvsm-preset is-active" data-preset-date="2013-11-30" data-preset-label="2013 top">2013 top</button>
+                    <button class="bvsm-preset" data-preset-date="2017-12-17" data-preset-label="2017 top">2017 top</button>
+                    <button class="bvsm-preset" data-preset-date="2021-11-10" data-preset-label="2021 top">2021 top</button>
+                    <button class="bvsm-preset" data-preset-date="2024-03-14" data-preset-label="2024 top">2024 top</button>
+                    <button class="bvsm-preset" data-preset-date="2025-10-06" data-preset-label="2025 top">2025 top</button>
+                </div>
+
+                <div class="slider-cluster">
+                    <div class="slider-grid grid-2">
+                        <div class="slider-control">
+                            <span class="slider-name">Start date<span class="help-tip" tabindex="0">?<span class="tip-content">The date the lump sum is invested. Use one of the four preset buttons above to jump to a major bitcoin cyclical top, or drag the slider to choose any date from 2010-01-01 onwards.</span></span></span>
+                            <span class="slider-val" id="bvsmStartDateVal">Nov 30, 2013</span>
+                            <input type="range" id="bvsmStartDate" min="0" max="195" step="1" value="46">
+                        </div>
+                        <div class="slider-control">
+                            <span class="slider-name">Lump-sum amount<span class="help-tip" tabindex="0">?<span class="tip-content">The hypothetical dollar amount invested as a single lump sum on the start date. The calculation tracks what that amount would have become in each asset class through today.</span></span></span>
+                            <span class="slider-val" id="bvsmLumpAmountVal">$10,000</span>
+                            <input type="range" id="bvsmLumpAmount" min="1000" max="100000" step="1000" value="10000">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bvsm-results-grid">
+                    <div class="calc-result-card bvsm-result bvsm-result-btc">
+                        <h4>Bitcoin</h4>
+                        <div class="result-sublabel">Value today</div>
+                        <div class="result-value" id="bvsmBtcValue">&mdash;</div>
+                        <div class="bvsm-result-rows" id="bvsmBtcRows"></div>
+                    </div>
+                    <div class="calc-result-card bvsm-result bvsm-result-sp">
+                        <h4>S&amp;P 500</h4>
+                        <div class="result-sublabel">Value today (total return)</div>
+                        <div class="result-value" id="bvsmSpValue">&mdash;</div>
+                        <div class="bvsm-result-rows" id="bvsmSpRows"></div>
+                    </div>
+                    <div class="calc-result-card bvsm-result bvsm-result-ndq">
+                        <h4>NASDAQ-100</h4>
+                        <div class="result-sublabel">Value today (total return)</div>
+                        <div class="result-value" id="bvsmNdqValue">&mdash;</div>
+                        <div class="bvsm-result-rows" id="bvsmNdqRows"></div>
+                    </div>
+                    <div class="calc-result-card bvsm-result bvsm-result-gold">
+                        <h4>Gold</h4>
+                        <div class="result-sublabel">Value today</div>
+                        <div class="result-value" id="bvsmGoldValue">&mdash;</div>
+                        <div class="bvsm-result-rows" id="bvsmGoldRows"></div>
+                    </div>
+                </div>
+
+                <div class="bvsm-verdict" id="bvsmLumpVerdict"></div>
+
+                <div class="bvsm-chart-wrap">
+                    <div class="bvsm-chart-label">Wealth-over-time &mdash; lump sum invested at the chosen start date</div>
+                    <div class="bvsm-chart-canvas">
+                        <canvas id="bvsmLumpChart" role="img" aria-label="Chart comparing wealth over time for a lump-sum investment in bitcoin, the S&P 500 total return index, the NASDAQ-100 total return index, and gold, starting from the chosen date."></canvas>
+                    </div>
+                    <p class="bvsm-chart-caption" id="bvsmLumpChartCaption">Log-scale Y-axis. All four series start at the same dollar amount on the start date and track their respective asset&rsquo;s value through today.</p>
+                </div>
+            </div>
+
+            <p class="prose"><em>The 2025-top preset deserves a specific caveat.</em> It&rsquo;s the most recent cyclical top covered here and has had the least time to play out &mdash; bitcoin reached its all-time high of approximately $126K on October 6, 2025, and as of this writing in mid-2026 the price sits roughly 35% below that level. If you started from that scenario, your hold has been less than a year and you are currently underwater on the comparison against gold and the S&amp;P 500. The page&rsquo;s argument depends on long-enough holding periods. The point of including the 2025 preset is to be honest about what the historical record actually says: less than a year after the most recent top, the picture is meaningfully less favorable than at older tops where five or ten years of compounding have already happened. The 2017-top and 2021-top presets show what the same scenario tends to look like after five-plus years of patience.</p>
+        </div>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 2: What if you bought a little every week?              -->
+        <!-- The DCA simulation. Same anchor dates, dollar-cost-averaging.   -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-intro">
+                <h2>What if you bought a little every week?</h2>
+                <p><em>The dollar-cost-averaging case &mdash; smaller buys, more often, smoothing the worst-timing risk.</em></p>
+            </div>
+
+            <p class="prose"><strong>The standard counterargument to the lump-sum scenarios above:</strong> <em>OK, but I wouldn&rsquo;t have bought lump-sum at the top &mdash; I would have eased in.</em> Fair enough. The calculator below simulates weekly dollar-cost-averaging into bitcoin against the same weekly DCA into the S&amp;P 500, NASDAQ-100, and gold. Same start dates, same weekly amount, no cherry-picking of entry points.</p>
+
+            <p class="prose">DCA smooths the worst-timing risk because most of the dollars get deployed at prices other than the peak. The question is whether the resulting positions, measured by total wealth accumulated, favor bitcoin or the conventional comparators. The answer in the historical record &mdash; for every anchor date the page tests &mdash; is bitcoin.</p>
+
+            <!-- ─── DCA calculator surface ─── -->
+            <div class="bvsm-calc">
+                <h3>Weekly DCA from the chosen start date</h3>
+
+                <div class="bvsm-presets">
+                    <span class="bvsm-presets-label">DCA started:</span>
+                    <button class="bvsm-preset bvsm-dca-preset is-active" data-preset-date="2017-12-17" data-preset-label="Since the 2017 top">Since the 2017 top</button>
+                    <button class="bvsm-preset bvsm-dca-preset" data-preset-date="2021-11-10" data-preset-label="Since the 2021 top">Since the 2021 top</button>
+                    <button class="bvsm-preset bvsm-dca-preset" data-preset-date="2020-01-01" data-preset-label="Since Jan 2020">Since Jan 2020</button>
+                </div>
+
+                <div class="slider-cluster">
+                    <div class="slider-grid grid-2">
+                        <div class="slider-control">
+                            <span class="slider-name">Start date<span class="help-tip" tabindex="0">?<span class="tip-content">The date weekly DCA begins. The simulation buys the weekly amount at month-end-close prices through today.</span></span></span>
+                            <span class="slider-val" id="bvsmDcaStartDateVal">Dec 17, 2017</span>
+                            <input type="range" id="bvsmDcaStartDate" min="0" max="195" step="1" value="94">
+                        </div>
+                        <div class="slider-control">
+                            <span class="slider-name">Weekly amount<span class="help-tip" tabindex="0">?<span class="tip-content">The dollar amount bought each week. For modelling simplicity the simulation aggregates by month: weekly buys are converted to monthly buys at month-end-close prices.</span></span></span>
+                            <span class="slider-val" id="bvsmDcaWeeklyVal">$100</span>
+                            <input type="range" id="bvsmDcaWeekly" min="10" max="1000" step="10" value="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bvsm-results-grid">
+                    <div class="calc-result-card bvsm-result bvsm-result-btc">
+                        <h4>Bitcoin</h4>
+                        <div class="result-sublabel">Portfolio value today</div>
+                        <div class="result-value" id="bvsmDcaBtcValue">&mdash;</div>
+                        <div class="bvsm-result-rows" id="bvsmDcaBtcRows"></div>
+                    </div>
+                    <div class="calc-result-card bvsm-result bvsm-result-sp">
+                        <h4>S&amp;P 500</h4>
+                        <div class="result-sublabel">Portfolio value today (TR)</div>
+                        <div class="result-value" id="bvsmDcaSpValue">&mdash;</div>
+                        <div class="bvsm-result-rows" id="bvsmDcaSpRows"></div>
+                    </div>
+                    <div class="calc-result-card bvsm-result bvsm-result-ndq">
+                        <h4>NASDAQ-100</h4>
+                        <div class="result-sublabel">Portfolio value today (TR)</div>
+                        <div class="result-value" id="bvsmDcaNdqValue">&mdash;</div>
+                        <div class="bvsm-result-rows" id="bvsmDcaNdqRows"></div>
+                    </div>
+                    <div class="calc-result-card bvsm-result bvsm-result-gold">
+                        <h4>Gold</h4>
+                        <div class="result-sublabel">Portfolio value today</div>
+                        <div class="result-value" id="bvsmDcaGoldValue">&mdash;</div>
+                        <div class="bvsm-result-rows" id="bvsmDcaGoldRows"></div>
+                    </div>
+                </div>
+
+                <div class="bvsm-verdict" id="bvsmDcaVerdict"></div>
+
+                <div class="bvsm-chart-wrap">
+                    <div class="bvsm-chart-label">Portfolio value over time &mdash; weekly DCA from the chosen start date</div>
+                    <div class="bvsm-chart-canvas">
+                        <canvas id="bvsmDcaChart" role="img" aria-label="Chart comparing portfolio value over time for weekly dollar-cost-averaging into bitcoin, the S&P 500 total return, the NASDAQ-100 total return, and gold."></canvas>
+                    </div>
+                    <p class="bvsm-chart-caption">Log-scale Y-axis. The dashed line shows cumulative dollars invested as a reference; the solid lines show the portfolio value of each asset over time.</p>
+                </div>
+            </div>
+
+            <p class="prose"><strong>A note on DCA versus lump-sum, since the page is being fair to the reader who&rsquo;d ease in:</strong> <a href="https://investor.vanguard.com/investor-resources-education/online-trading/dollar-cost-averaging-vs-lump-sum" target="_blank" rel="noopener">Vanguard&rsquo;s research</a> on this question &mdash; across decades of equity-market history &mdash; finds that <strong>lump-sum investing beats dollar-cost averaging in roughly two-thirds of historical 12-month windows</strong>. The mechanism is simple: markets spend more time going up than down, so deploying capital later (on average) means buying at higher prices. DCA&rsquo;s value is real, but it&rsquo;s primarily a <em>regret-minimization</em> tool that prevents the worst single-day-entry outcome, not a return-maximization strategy. The page leads with the lump-sum-at-the-top scenarios in &sect;1 precisely because they&rsquo;re the most-feared outcome &mdash; if the historical record handles even those cases at the horizons that matter, the case for DCA-as-a-better-alternative gets weaker, not stronger.</p>
+        </div>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 3: How long does the bitcoin advantage last?            -->
+        <!-- The forward projection: Power Law vs comparator trends.         -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-intro">
+                <h2>How long does the bitcoin advantage last?</h2>
+                <p><em>The forward projection &mdash; what the Power Law trend says about the next 10 to 30 years.</em></p>
+            </div>
+
+            <p class="prose">The retrospective evidence above answers the question for someone considering a position who would have started at any of the dates the page covers. The forward question for someone deciding right now is: <strong>over the horizon I&rsquo;ll actually hold this, where is the trend headed?</strong></p>
+
+            <p class="prose">The chart below plots the Power Law trend for bitcoin against the long-run historical trend lines for the S&amp;P 500, NASDAQ-100, and gold, extrapolated forward at each comparator&rsquo;s historical CAGR. The Power Law is a <em>central-tendency expectation</em>, not a forecast &mdash; bitcoin spends roughly half its time above the trend and half below, and deviations within cycles can be very large in either direction. The trend says where bitcoin is most likely to be over the long horizon, not what will happen in any particular year. The same caveat applies to the comparator trends &mdash; the S&amp;P 500 has had stretches of decade-long underperformance and decade-long outperformance against its own long-run CAGR.</p>
+
+            <div class="bvsm-projection-wrap">
+                <div class="slider-cluster">
+                    <div class="slider-grid grid-2">
+                        <div class="slider-control">
+                            <span class="slider-name">Projection horizon<span class="help-tip" tabindex="0">?<span class="tip-content">How many years forward from today to project. The Power Law trend continues to compound at its decreasing-CAGR rate; the comparator trends compound at their historical CAGRs. Marker dots indicate the projected value at the chosen horizon.</span></span></span>
+                            <span class="slider-val" id="bvsmProjHorizonVal">15 years</span>
+                            <input type="range" id="bvsmProjHorizon" min="5" max="40" step="1" value="15">
+                        </div>
+                        <div class="slider-control">
+                            <span class="slider-name">Investment today<span class="help-tip" tabindex="0">?<span class="tip-content">A hypothetical amount invested today in each asset. Used to project the dollar value of that investment at the chosen horizon under each trend.</span></span></span>
+                            <span class="slider-val" id="bvsmProjInvestVal">$10,000</span>
+                            <input type="range" id="bvsmProjInvest" min="1000" max="100000" step="1000" value="10000">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bvsm-projection-chart-wrap">
+                    <div class="bvsm-chart-label">Projected wealth over the chosen horizon &mdash; trend lines only</div>
+                    <div class="bvsm-chart-canvas-tall">
+                        <canvas id="bvsmProjectionChart" role="img" aria-label="Chart projecting the wealth trajectory for a hypothetical investment today in bitcoin, the S&P 500, NASDAQ-100, and gold over the chosen horizon, using each asset's long-run trend.">
+                        </canvas>
+                    </div>
+                    <p class="bvsm-chart-caption">Log-scale Y-axis. Bitcoin follows the canonical Power Law trend used elsewhere on the site (<code>P(d) = 1.6 &times; 10<sup>&minus;17</sup> &times; d<sup>5.77</sup></code>). Comparator trends compound at their approximate historical nominal CAGRs (S&amp;P 500 ~10.9%, NASDAQ-100 ~16.3%, gold ~7%) &mdash; central-tendency expectations, not forecasts.</p>
+                </div>
+
+                <div class="bvsm-projection-results">
+                    <div class="bvsm-proj-row">
+                        <span class="bvsm-proj-asset bvsm-proj-asset-btc">Bitcoin</span>
+                        <span class="bvsm-proj-value" id="bvsmProjBtcValue">&mdash;</span>
+                        <span class="bvsm-proj-note">at Power Law trend</span>
+                    </div>
+                    <div class="bvsm-proj-row">
+                        <span class="bvsm-proj-asset bvsm-proj-asset-sp">S&amp;P 500</span>
+                        <span class="bvsm-proj-value" id="bvsmProjSpValue">&mdash;</span>
+                        <span class="bvsm-proj-note">at 10.9% nominal CAGR</span>
+                    </div>
+                    <div class="bvsm-proj-row">
+                        <span class="bvsm-proj-asset bvsm-proj-asset-ndq">NASDAQ-100</span>
+                        <span class="bvsm-proj-value" id="bvsmProjNdqValue">&mdash;</span>
+                        <span class="bvsm-proj-note">at 16.3% nominal CAGR</span>
+                    </div>
+                    <div class="bvsm-proj-row">
+                        <span class="bvsm-proj-asset bvsm-proj-asset-gold">Gold</span>
+                        <span class="bvsm-proj-value" id="bvsmProjGoldValue">&mdash;</span>
+                        <span class="bvsm-proj-note">at 7% nominal CAGR</span>
+                    </div>
+                </div>
+            </div>
+
+            <p class="prose">For an investor with a typical decision horizon &mdash; 10 to 15 years &mdash; the Power Law trend keeps bitcoin meaningfully above all three comparators by a wide margin, with the gap measured in multiples rather than basis points. The convergence dates &mdash; where the Power Law trend eventually meets each comparator&rsquo;s trend line &mdash; sit far enough in the future that they&rsquo;re irrelevant to a typical investor&rsquo;s holding window. The relevant fact for someone deciding today isn&rsquo;t when the trend lines meet; <em>it&rsquo;s that they don&rsquo;t meet inside the horizon over which the typical investor actually holds.</em></p>
+        </div>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 4: The long-horizon argument (synthesis)                -->
+        <!-- Pulls together retrospective + projective into mental model.    -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-intro">
+                <h2>The long-horizon argument</h2>
+                <p><em>Tying the historical evidence to the decision a reader is making today.</em></p>
+            </div>
+
+            <p class="prose"><strong>Volatility is a horizon-dependent concern.</strong> A 50% drawdown is terrifying at six-month horizons and noise at ten-year horizons. The historical record in &sect;1 and &sect;2 above is the empirical version of this claim: every worst-timed lump-sum entry the page tests at horizons of five years or longer produced more wealth than the S&amp;P 500 over the same period. The horizon-dependence shows up sharply when the recent past is sliced at different windows. Through May 2026, at a one-year horizon &mdash; measuring from roughly the October 2025 cycle top &mdash; gold has returned about <strong>+45%</strong>, the S&amp;P 500 about <strong>+27%</strong>, and bitcoin about <strong>&minus;21%</strong>. At five years, bitcoin (<strong>+74%</strong>) trails the S&amp;P 500 (<strong>+80%</strong>) modestly and gold&rsquo;s recent rally (<strong>+152%</strong>) decisively. At ten years, bitcoin&rsquo;s roughly <strong>17,000%</strong> total return dwarfs the S&amp;P 500&rsquo;s <strong>264%</strong> and gold&rsquo;s <strong>265%</strong>. Same asset, same comparators, three completely different stories &mdash; <em>the drama isn&rsquo;t in the asset, it&rsquo;s in the horizon you use to measure it.</em></p>
+
+            <p class="prose"><strong>Time in market applies differently at different CAGRs.</strong> A 10%-CAGR asset doubles in about seven years. A 25%-CAGR asset doubles in under three. Compounding advantage over long horizons is exponential, not linear &mdash; which is why a relatively small allocation to a high-trend asset, held across years, can materially shift a portfolio outcome even when most of the portfolio is in conventional assets. <em>The relevant question isn&rsquo;t whether bitcoin is volatile (it is) or risky (it is) or might fail (it might).</em> It&rsquo;s whether a small position, held long enough, with a clear understanding of the trend, compounds to something that materially changes the holder&rsquo;s financial picture. The historical record says yes at every horizon the page tests.</p>
+
+            <p class="prose"><strong>Gold&rsquo;s recent run is worth a note on its own.</strong> Gold has rallied strongly over the last several years, posting some of its best annualized returns since the 1970s. That run was driven by central-bank buying, currency debasement concerns, and the same long-cycle store-of-value rotation that bitcoiners argue eventually benefits bitcoin disproportionately. Gold&rsquo;s market cap sits around $25 trillion at recent prices; bitcoin&rsquo;s is roughly an order of magnitude smaller. If the store-of-value rotation that propelled gold continues and bitcoin captures even a modest share of that flow, the disproportionate effect on bitcoin&rsquo;s price reflects the math of compounding into a smaller asset, not a claim that bitcoin will displace gold entirely.</p>
+
+            <p class="prose"><strong>Bitcoin&rsquo;s volatility itself is changing structurally.</strong> A pattern emerged in 2025 that didn&rsquo;t appear in earlier cycles: bitcoin posted a fresh all-time high (~$126K in October) while realized volatility printed decade-lows in the same window &mdash; new ATH and new ATL volatility, simultaneously. The MVRV ratio (market value to realized cost basis) has held steady around 2.0&times; through the recent top, against 4&ndash;6&times; peaks at the 2017 and 2021 highs. The institutional infrastructure has thickened: roughly <strong>6.4% of supply</strong> now sits in spot bitcoin ETPs; <strong>23 nation-states</strong> are net accumulators; <strong>49+ public companies</strong> hold corporate treasury positions of more than 1,000 BTC each. None of this guarantees the trend continues; all of it makes a sudden mean-reversion to earlier-cycle volatility behavior less likely. The asset that the ten-year backtests on this page are measuring is empirically migrating &mdash; slowly but visibly &mdash; from speculative-crypto behavior toward something closer to a high-vol equity allocation with a structural tailwind.</p>
+
+            <p class="prose">As with the rest of this site, the right reading isn&rsquo;t <em>&ldquo;this is the answer.&rdquo;</em> The right reading is: <strong>here&rsquo;s the historical record and the trend the model expects from here, presented honestly &mdash; including the cases where the picture is less favorable.</strong> The decision about whether to take a position, how large, and over what horizon is yours. The page has done its job by giving you enough structural detail to make that decision with eyes open.</p>
+
+            <!-- ─── Math & methodology appendix (collapsed by default) ─── -->
+            <details class="bvsm-math-collapsible">
+                <summary class="bvsm-math-summary">Math &amp; methodology &mdash; click to expand the data sources and formulas behind the calculators</summary>
+                <div class="bvsm-math">
+
+                    <p><strong>Bitcoin price data.</strong> Daily-close BTC/USD prices since the bitcoin genesis block (January 3, 2009), as embedded in the site-wide <code>PL_DATA</code> array. For the retrospective calculators on this page, the BTC price on each preset top date is interpolated from the daily data.</p>
+
+                    <p><strong>S&amp;P 500 total return.</strong> Monthly closes built from documented annual total-return figures (price return plus dividends reinvested) sourced from S&amp;P Dow Jones Indices, Damodaran (NYU Stern), and Slickcharts. The annual returns are documented to within ~10 basis points across sources. Monthly closes between year-ends are linearly interpolated. <em>This is an approximation for prototype purposes &mdash; specifically, it smooths over intra-year volatility. A NotebookLM-verified daily series will refine the calculations in a later iteration.</em></p>
+
+                    <p><strong>NASDAQ-100 total return (<code>^XNDX</code>).</strong> Same methodology as the S&amp;P 500, using documented annual total-return figures for the NASDAQ-100 Index. The NASDAQ-100 excludes financials and concentrates roughly 52&ndash;55% in information technology; long-run nominal CAGR is approximately <strong>16.3%</strong> over the 18-year window 2007&ndash;2026 (with a recent 10-year CAGR closer to <strong>18.8%</strong>). The page uses NASDAQ-100 rather than the broader Composite because the institutional-investor literature treats <code>^XNDX</code> as the canonical tech-tilted comparator; the Composite&rsquo;s long-run CAGR sits a few percentage points lower.</p>
+
+                    <p><strong>Gold.</strong> Monthly closes built from annual percentage changes in the LBMA AM Fix (USD spot). World Gold Council data. Same interpolation methodology and same prototype-approximation caveat. <em>Note for implementation</em>: gold exposure via ETF carries materially different cost structures &mdash; GLDM (0.10% expense ratio) is roughly four times cheaper to hold than GLD (0.40% ER) for an identical exposure; GLD also carries a 28% collectibles capital-gains tax rate in U.S. taxable accounts. The page&rsquo;s gold series tracks spot performance and does not subtract ETF expense ratios.</p>
+
+                    <p><strong>Power Law trend.</strong> The site-wide canonical Power Law trend used by every calculator on this site, <code>P(d) = 1.6 &times; 10<sup>&minus;17</sup> &times; d<sup>5.77</sup></code>, where <code>d</code> is days since the bitcoin genesis block (January 3, 2009). The model is canonically associated with Matthew Me&zcaron;inskis (Porkopolis Economics, 2018) and Giovanni Santostasi (2018); R<sup>2</sup> exceeds 0.95 across the full 2010&ndash;2026 fit window. The same coefficients power the projections on the <a href="/the-power-law.html">Power Law page</a>, the <a href="/the-bitcoin-retirement.html">Bitcoin Retirement</a> page, and the <a href="/bitcoin-backed-mortgages.html">Bitcoin-Backed Mortgages</a> page. Critics including Adrian Morris (overfitting) and Tim Stolte/Amdax (log-time-scaling cointegration concerns) have published methodological critiques; defenders (Burger &amp; Santostasi; Fulgur Ventures) have published rebuttals showing the residuals are stationary and the out-of-sample fit has improved over six years of post-publication validation. Santostasi himself states the theory is falsifiable: sustained deviation from the trend for an extended period would invalidate it.</p>
+
+                    <p><strong>Comparator forward trends.</strong> For the projection chart, the comparator trends compound at their approximate historical nominal CAGRs: S&amp;P 500 at <strong>10.9%</strong> (1992&ndash;2026 total return per Damodaran/SP DJI), NASDAQ-100 at <strong>16.3%</strong> (2007&ndash;2026 long-run; recent-10y closer to 18.8%), gold at <strong>7%</strong> (post-1970 nominal). These are central-tendency expectations; the trend the bitcoin Power Law projects exceeds every comparator&rsquo;s expected CAGR for several decades before slope-matching occurs. <em>Approximate trend-line convergence dates</em> &mdash; the year by which the comparator&rsquo;s constant-CAGR trajectory catches the Power Law trend, starting from today &mdash; are around <strong>2066&ndash;2080 for NASDAQ-100</strong>, <strong>2139 for the S&amp;P 500</strong>, and <strong>2251 for gold</strong>. The practical implication isn&rsquo;t the year &mdash; it&rsquo;s that the bitcoin advantage persists for the entire 10-to-30-year horizon any current investor would meaningfully care about.</p>
+
+                    <p><strong>What the calculators don&rsquo;t model.</strong> Tax treatment (pre-tax comparison only). Transaction costs and platform fees. Currency: USD throughout. Capital-gains realization on rebalancing. <strong>Survivorship bias</strong> &mdash; bitcoin has survived to be measured; many crypto peers (BCH, BSV, XRP, ETC and a long tail of altcoins) have not. Empirical research suggests omitting failed-asset returns inflates measured CAGRs by approximately <strong>0.9&ndash;2.1% per year</strong>; the bitcoin numbers on this page benefit from that bias by virtue of being bitcoin-specific, but readers comparing crypto-asset-class performance to equities should adjust the headline returns downward by that range. The lump-sum and DCA calculations assume the position was held without sale or rebalancing through to today.</p>
+
+                </div>
+            </details>
+        </div>
+
+    </article>
+</main>
