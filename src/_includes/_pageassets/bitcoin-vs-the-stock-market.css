@@ -738,3 +738,19 @@ body {
     background: rgba(224,148,34,0.1);
     border-color: var(--amber);
 }
+
+
+/* ─── Channel-multiple annotation on preset buttons ───
+   Inside each <button class="bvsm-preset"> the date label is the primary
+   anchor and the trend multiple in parentheses is secondary context.
+   Dimmer color + slightly smaller font puts the multiple in its place
+   without making the button feel cluttered. */
+.bvsm-preset-multiple {
+    color: var(--text-dim);
+    font-size: 0.85em;
+    font-weight: 400;
+    margin-left: 0.2em;
+}
+.bvsm-preset.is-active .bvsm-preset-multiple {
+    color: var(--amber-dim);
+}
