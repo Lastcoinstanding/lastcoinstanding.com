@@ -84,6 +84,13 @@
     "is_calculator": true
   },
   {
+    "slug": "bitcoin-vs-the-stock-market",
+    "title": "Bitcoin vs. The Stock Market",
+    "category": "numbers",
+    "interactive": true,
+    "is_calculator": false
+  },
+  {
     "slug": "the-bitcoin-retirement",
     "title": "The Bitcoin Retirement",
     "category": "numbers",
