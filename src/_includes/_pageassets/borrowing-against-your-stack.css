@@ -1835,13 +1835,58 @@
 }
 .bas-math-list li strong { color: var(--text); font-weight: 600; }
 
-/* ─── CAGR-VS-RATES CHART CAPTION ─── */
-/* Companion caption beneath the inline CAGR-vs-rates chart in §1. */
-.bas-cagr-chart-caption {
-    font-size: 0.86rem;
-    line-height: 1.55;
+/* ─── CAGR-VS-RATES CHART: toggle + as-of callout ─── */
+/* Companion controls for the inline CAGR-vs-rates chart in §1. Toggle  */
+/* follows STYLE_GUIDE §6.22 (chart time-range toggle), BAS-scoped.     */
+/* As-of callout follows STYLE_GUIDE §6.21 with dynamic values from JS. */
+
+.bas-cagr-range-toggle {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 0 0 1rem;
+}
+.bas-cagr-range-btn {
+    background: transparent;
     color: var(--text-dim);
-    margin-top: 0.9rem;
-    padding: 0 0.4rem;
-    font-style: italic;
+    border: none;
+    padding: 0.42rem 0.95rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    border-right: 1px solid var(--border);
+    transition: background 0.12s ease, color 0.12s ease;
+}
+.bas-cagr-range-btn:last-child { border-right: none; }
+.bas-cagr-range-btn:hover { color: var(--text); }
+.bas-cagr-range-btn.active {
+    background: rgba(224, 148, 34, 0.12);
+    color: var(--amber);
+}
+
+.bas-cagr-as-of-callout {
+    background: rgba(224, 148, 34, 0.04);
+    border-left: 3px solid var(--amber);
+    padding: 0.95rem 1.2rem;
+    margin: 1.1rem 0 0.2rem;
+    border-radius: 0 4px 4px 0;
+}
+.bas-cagr-as-of-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.45rem;
+}
+.bas-cagr-as-of-body {
+    font-size: 0.93rem;
+    line-height: 1.55;
+    color: var(--text);
+}
+.bas-cagr-as-of-body strong {
+    color: var(--text-bright);
+    font-weight: 600;
 }

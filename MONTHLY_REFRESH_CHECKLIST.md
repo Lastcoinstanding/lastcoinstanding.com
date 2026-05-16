@@ -107,6 +107,11 @@ values read correctly:
 - BvSM §1 — *"As of [Month]"* callout with multiple-of-trend value
 - BvSM §3 — *"As of [Month]"* callout with forward-projection anchor
 - BvSM page header — any in-prose current-state references
+- BAYB §1 — *"As of [Month]"* callout below the CAGR-vs-rates chart with
+  trend CAGR (~46% currently), realized CAGR (~13% currently), and
+  trend-multiple gap clause. Self-computing from PL_DATA's last sample
+  at page load — refresh confirmation is *"the date in the callout
+  matches the current month."*
 
 If a derived value reads wrong, the most likely cause is a per-page TODAY
 constant that wasn't updated in lockstep with the shared module.
@@ -121,9 +126,14 @@ Quick post-refresh checks to confirm everything's coherent:
    are here" pulse at the actual current price level, the as-of callouts
    read with the current month, the chart caption shows the right
    trailing date, and the §3 forward projection anchor is correct.
-3. **Load Power Law live** — same checks against this page since it
+3. **Load BAYB live** — verify the §1 CAGR-vs-rates chart's as-of
+   callout date matches the current month, the trend CAGR value reads
+   in the 40–50% range (gradually decreasing as bitcoin's day-count
+   grows), and the realized CAGR value matches the trailing-4-year
+   computation against the new PL_DATA sample.
+4. **Load Power Law live** — same checks against this page since it
    shares the model.
-4. **Cross-check pages** — Bitcoin Retirement, Disciplined Rebalancing,
+5. **Cross-check pages** — Bitcoin Retirement, Disciplined Rebalancing,
    BvRE, and any future page that uses the shared Power Law model
    should all show the same "you are here" position.
 

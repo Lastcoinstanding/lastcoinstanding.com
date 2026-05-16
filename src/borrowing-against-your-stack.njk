@@ -66,21 +66,30 @@ eleventyComputed:
         </div>
 
         <div class="section">
-            <p class="prose">Today the magnitudes are smaller because bitcoin's trailing four-year CAGR has compressed from its early-period highs to roughly 39%. But the structural argument is identical. The reader making this decision today, with 2 BTC at $110,000 facing a $50,000 medical bill, is in exactly the same structural position as the reader years ago with 100 BTC at $100. The asymmetry is the same: <em>the upside of borrowing-and-retaining is the entire future appreciation of the bitcoin that would have been sold.</em> The downside is the interest cost of the loan<span class="help-tip help-tip-reg" tabindex="0">&sect;<span class="tip-content"><span class="reg-note-label">Regulatory note &middot; Interest deductibility</span>Whether interest on a bitcoin-backed loan is tax-deductible depends entirely on what the proceeds funded (the IRS &ldquo;loan tracing&rdquo; rules). Deductible against <em>investment income</em> if proceeds went to taxable investments; deductible as a <em>business expense</em> if used for business capital. <strong>Not deductible</strong> if used for personal consumption (lifestyle spending, vacations, debt consolidation). Keep documentation tying each dollar of borrowed money to its use &mdash; the burden of proof is yours.</span></span>, structured against the tail risks that the rest of this page exists to detail.</p>
+            <p class="prose">Today the magnitudes are smaller because bitcoin's trailing four-year CAGR has compressed from its early-period highs. But the structural argument is identical. The reader making this decision today, with 2 BTC at $110,000 facing a $50,000 medical bill, is in exactly the same structural position as the reader years ago with 100 BTC at $100. The asymmetry is the same: <em>the upside of borrowing-and-retaining is the entire future appreciation of the bitcoin that would have been sold.</em> The downside is the interest cost of the loan<span class="help-tip help-tip-reg" tabindex="0">&sect;<span class="tip-content"><span class="reg-note-label">Regulatory note &middot; Interest deductibility</span>Whether interest on a bitcoin-backed loan is tax-deductible depends entirely on what the proceeds funded (the IRS &ldquo;loan tracing&rdquo; rules). Deductible against <em>investment income</em> if proceeds went to taxable investments; deductible as a <em>business expense</em> if used for business capital. <strong>Not deductible</strong> if used for personal consumption (lifestyle spending, vacations, debt consolidation). Keep documentation tying each dollar of borrowed money to its use &mdash; the burden of proof is yours.</span></span>, structured against the tail risks that the rest of this page exists to detail.</p>
             <!-- ═══════════════════ CAGR-VS-INTEREST VIZ ═══════════════════ -->
             <!-- Bitcoin's 4-year rolling CAGR over the last decade, with horizontal -->
             <!-- bands showing typical CeFi lending rates (8–12%) and collaborative- -->
-            <!-- custody multisig rates (12–16%). Makes G > R visible — and surfaces -->
-            <!-- honestly that G has compressed substantially toward R in recent     -->
-            <!-- cycles. Computed in bayb.js (IIFE: CAGR-vs-Rates chart) from        -->
-            <!-- shared PL_DATA monthly samples.                                     -->
+            <!-- custody multisig rates (12–16%), AND the Power Law trend CAGR       -->
+            <!-- overlaid. Two stories visible: model-predicted growth rate (smooth, -->
+            <!-- ~46% currently) vs realized growth rate (volatile, ~13% currently). -->
+            <!-- The gap = how far below trend bitcoin is. Toggle for All-time /    -->
+            <!-- Recent 2y to drill into the modern compression. As-of callout      -->
+            <!-- below renders dynamic values from PL_DATA at page load.            -->
             <div class="bas-calc-chart-wrapper">
                 <div class="bas-calc-chart-title">Bitcoin 4-year rolling CAGR vs. typical lending rates</div>
+                <div class="bas-cagr-range-toggle" role="tablist">
+                    <button class="bas-cagr-range-btn active" data-range="all" role="tab" aria-selected="true">All-time</button>
+                    <button class="bas-cagr-range-btn"        data-range="2y"  role="tab" aria-selected="false">Recent 2y</button>
+                </div>
                 <div class="bas-calc-chart-canvas">
                     <canvas id="cagrVsRatesChart"></canvas>
                 </div>
-                <div class="bas-cagr-chart-caption">
-                    Bitcoin&rsquo;s 4-year CAGR has compressed across cycles &mdash; from triple-digit highs in the early 2010s to roughly one-to-two times typical bitcoin-backed lending rates today. Visible: how often G has exceeded R historically; and how the margin has narrowed.
+                <div class="bas-cagr-as-of-callout">
+                    <div class="bas-cagr-as-of-label" id="cagrAsOfLabel">AS OF &mdash;</div>
+                    <div class="bas-cagr-as-of-body">
+                        Bitcoin&rsquo;s Power Law trend predicts a <strong><span id="cagrTrendValue">&mdash;</span> 4-year CAGR</strong> at its current point on the channel. Realized 4-year CAGR is currently <strong><span id="cagrRealizedValue">&mdash;</span></strong> &mdash; <span id="cagrGapClause">the gap reflects how far below trend bitcoin is sitting right now</span>. When price reverts toward trend, realized CAGR closes the gap.
+                    </div>
                 </div>
             </div>
             <p class="prose">The point isn't that borrowing is always better than selling. The point is that <em>the decision can't be evaluated honestly without weighing both paths.</em> The reflexive &ldquo;just sell some&rdquo; answer treats the sale as if it has no cost beyond the immediate fiat received. It does. Selling forecloses the future of the coin sold.</p>

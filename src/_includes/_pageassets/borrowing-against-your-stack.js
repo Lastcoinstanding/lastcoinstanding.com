@@ -1037,93 +1037,154 @@
 })();
 
 // ═════════════════════════════════════════════════════════════════════
-// CAGR-VS-RATES CHART — Bitcoin 4-year rolling CAGR vs lending-rate bands
+// CAGR-VS-RATES CHART — Bitcoin 4-year rolling CAGR vs lending-rate bands,
+// with Power Law trend CAGR overlaid for context. All-time / Recent 2y
+// toggle. Dynamic as-of callout values from PL_DATA.
 //
-// Renders an inline chart in §1 (the "magnitudes are smaller now" section)
-// that overlays bitcoin's historical 4-year rolling CAGR against horizontal
-// bands at typical CeFi (8–12%) and multisig (12–16%) lending rates.
+// Two stories visible:
+//   1. Power Law trend CAGR (dashed amber) — what the model predicts
+//      the growth rate to be from the channel position, independent of
+//      where current price sits inside the channel.
+//   2. Realized 4-year rolling CAGR (solid amber) — what bitcoin
+//      actually did over each trailing 4-year window.
+//
+// The gap between them = how far below (or above) trend bitcoin's
+// price sat at each historical point. Currently bitcoin is ~0.59× trend,
+// so realized CAGR is well below trend-implied CAGR — but the structural
+// growth rate per the model remains intact.
 //
 // Computed from PL_DATA at page-load time so the trailing edge stays
 // fresh with each monthly refresh (MONTHLY_REFRESH_CHECKLIST.md §1).
-// Earlier-period values (>250%) are clipped at the top of the y-axis to
-// keep the modern-era compression story visible; the very early years
-// (2014-2016) saw 4-year CAGRs in the 400-800% range and would
-// overwhelm the recent values if shown in full.
 // ═════════════════════════════════════════════════════════════════════
 (function(){
   var canvas = document.getElementById('cagrVsRatesChart');
   if (!canvas || typeof Chart === 'undefined' || typeof PL_DATA === 'undefined') return;
 
-  var WINDOW_DAYS = 1460;      // 4 years
-  var Y_MAX       = 250;        // clip to this; early outliers exceed
-  var X_MIN_DAYS  = 2400;       // start chart ~late 2015 (skip extreme early CAGRs)
+  var WINDOW_DAYS       = 1460;  // 4 years
+  var X_MIN_ALLTIME     = 2400;  // ~late 2015 — skip extreme early outliers
+  var Y_MAX_ALLTIME     = 250;   // clip; early peaks exceed
+  var Y_MAX_RECENT      = 70;    // tight zoom for the modern compression
+  var RECENT_WINDOW_DAYS = 730;   // ~2 years
+  var GENESIS_TS_LOCAL  = (typeof GENESIS_TS !== 'undefined') ? GENESIS_TS : 1230940800;
+  var PL_A_LOCAL        = (typeof PL_A        !== 'undefined') ? PL_A        : 1.6e-17;
+  var PL_B_LOCAL        = (typeof PL_B        !== 'undefined') ? PL_B        : 5.77;
 
-  // Compute 4-year rolling CAGR series from PL_DATA monthly samples.
-  // For each sample, find the bracketing pair 4 years earlier and
-  // log-linearly interpolate to get the price-then. CAGR then is the
-  // 4th-root annualized return.
-  function compute4yCAGR() {
+  function trendPrice(days) { return PL_A_LOCAL * Math.pow(days, PL_B_LOCAL); }
+
+  // ── Compute realized 4-year rolling CAGR series from PL_DATA samples
+  function computeRealizedCAGR() {
     var out = [];
     for (var i = 0; i < PL_DATA.length; i++) {
       var dNow = PL_DATA[i][0], pNow = PL_DATA[i][1];
       var dPast = dNow - WINDOW_DAYS;
       if (dPast < PL_DATA[0][0]) continue;
-
-      // Find bracketing pair via reverse linear scan (monthly data, ≤ ~120 steps)
       var prev = -1;
       for (var j = i; j >= 0; j--) {
         if (PL_DATA[j][0] <= dPast) { prev = j; break; }
       }
       if (prev < 0 || prev >= PL_DATA.length - 1) continue;
-
       var d0 = PL_DATA[prev][0],     p0 = PL_DATA[prev][1];
       var d1 = PL_DATA[prev + 1][0], p1 = PL_DATA[prev + 1][1];
       var t  = (dPast - d0) / (d1 - d0);
-      var pPast = p0 * Math.pow(p1 / p0, t);  // log-linear interp on price
+      var pPast = p0 * Math.pow(p1 / p0, t);
       var cagr  = Math.pow(pNow / pPast, 0.25) - 1;
       out.push({ x: dNow, y: cagr * 100 });
     }
     return out;
   }
 
-  var cagrPts = compute4yCAGR();
-  if (!cagrPts.length) return;
+  // ── Compute Power Law trend CAGR at each date (model-implied growth rate)
+  // For each PL_DATA date, trend_CAGR = (trend_price(d) / trend_price(d - 4y))^(1/4) - 1
+  function computeTrendCAGR() {
+    var out = [];
+    for (var i = 0; i < PL_DATA.length; i++) {
+      var dNow = PL_DATA[i][0];
+      var dPast = dNow - WINDOW_DAYS;
+      if (dPast < 365) continue; // trend formula not meaningful for tiny day values
+      var ratio = trendPrice(dNow) / trendPrice(dPast);
+      var cagr  = Math.pow(ratio, 0.25) - 1;
+      out.push({ x: dNow, y: cagr * 100 });
+    }
+    return out;
+  }
 
-  // Window the data — drop pre-X_MIN_DAYS points (extreme early CAGRs)
-  // and clip any y > Y_MAX to keep modern-era compression visible.
-  var windowed = cagrPts
-    .filter(function(p) { return p.x >= X_MIN_DAYS; })
-    .map(function(p) { return { x: p.x, y: Math.min(p.y, Y_MAX) }; });
+  var realized = computeRealizedCAGR();
+  var trend    = computeTrendCAGR();
+  if (!realized.length || !trend.length) return;
 
-  // For shaded lending-rate bands, we need horizontal line datasets at the
-  // band boundaries, with fill: -1 to fill between consecutive datasets.
-  // Pattern: top16% (no fill) → 12% (fills 12–16 multisig band) →
-  //          8% (fills 8–12 CeFi band).
-  var xMin = windowed[0].x, xMax = windowed[windowed.length - 1].x;
-  var lineAt = function(y) { return [{x: xMin, y: y}, {x: xMax, y: y}]; };
+  // ── Render the dated as-of callout from the most recent samples
+  var lastSample        = realized[realized.length - 1];
+  var lastSampleDate    = new Date(GENESIS_TS_LOCAL * 1000 + lastSample.x * 86400 * 1000);
+  var dateStr           = lastSampleDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' }).toUpperCase();
+  var realizedNow       = lastSample.y;
+  var trendNow          = trend[trend.length - 1].y;
+  var lastSamplePrice   = PL_DATA[PL_DATA.length - 1][1];
+  var lastSampleTrendP  = trendPrice(lastSample.x);
+  var trendMultiple     = lastSamplePrice / lastSampleTrendP;  // e.g. 0.59
+  var fmt = function(n, p) { return n.toFixed(p == null ? 1 : p) + '%'; };
 
-  var GENESIS_TS_LOCAL = (typeof GENESIS_TS !== 'undefined') ? GENESIS_TS : 1230940800;
+  var asOfLabel    = document.getElementById('cagrAsOfLabel');
+  var trendValueEl = document.getElementById('cagrTrendValue');
+  var realValueEl  = document.getElementById('cagrRealizedValue');
+  var gapClauseEl  = document.getElementById('cagrGapClause');
+  if (asOfLabel)    asOfLabel.textContent    = 'AS OF ' + dateStr;
+  if (trendValueEl) trendValueEl.textContent = '~' + fmt(trendNow, 0);
+  if (realValueEl)  realValueEl.textContent  = '~' + fmt(realizedNow, 0);
+  if (gapClauseEl) {
+    if (trendMultiple < 0.95) {
+      gapClauseEl.textContent = 'the gap reflects how far below trend bitcoin is sitting right now (~' + trendMultiple.toFixed(2) + '× trend)';
+    } else if (trendMultiple > 1.1) {
+      gapClauseEl.textContent = 'bitcoin is trading above trend (~' + trendMultiple.toFixed(2) + '× trend), so realized currently exceeds the model rate';
+    } else {
+      gapClauseEl.textContent = 'bitcoin is trading near trend (~' + trendMultiple.toFixed(2) + '× trend), so realized and model-implied rates are close';
+    }
+  }
 
-  new Chart(canvas, {
+  // ── Build datasets. Pre-create both All-time and Recent 2y data
+  //    slices. Toggle changes scales.x.min/max and scales.y.max.
+  var xMaxData = realized[realized.length - 1].x;
+  var lineAt = function(y, xMin, xMax) {
+    return [{x: xMin, y: y}, {x: xMax, y: y}];
+  };
+
+  // Initial mode: All-time
+  var currentMode = 'all';
+  var currentXMin = X_MIN_ALLTIME;
+  var currentXMax = xMaxData;
+  var currentYMax = Y_MAX_ALLTIME;
+
+  // Realized data clipped to current Y_MAX
+  function clipRealizedToMode(yMax) {
+    return realized.map(function(p) { return { x: p.x, y: Math.min(p.y, yMax) }; });
+  }
+  function clipTrendToMode(yMax) {
+    return trend.map(function(p) { return { x: p.x, y: Math.min(p.y, yMax) }; });
+  }
+
+  var chart = new Chart(canvas, {
     type: 'line',
     data: {
       datasets: [
-        // Band 1: multisig 12-16% (filled between 16% top and 12% bottom)
-        { label: 'Multisig 16% (top)', data: lineAt(16),
-          borderColor: 'rgba(224,148,34,0)', borderWidth: 0,
-          pointRadius: 0, fill: false, order: 5 },
-        { label: 'Multisig 12% (bottom)', data: lineAt(12),
-          borderColor: 'rgba(224,148,34,0)', borderWidth: 0,
-          backgroundColor: 'rgba(224,148,34,0.10)',
-          pointRadius: 0, fill: '-1', order: 5 },
+        // Band 1: multisig 12-16% (filled between top 16% line and bottom 12% line)
+        { label: 'Multisig 16% (top)', data: lineAt(16, X_MIN_ALLTIME, xMaxData),
+          borderColor: 'rgba(224,148,34,0.30)', borderWidth: 1, borderDash: [3,3],
+          pointRadius: 0, fill: false, order: 6 },
+        { label: 'Multisig 12% (bottom)', data: lineAt(12, X_MIN_ALLTIME, xMaxData),
+          borderColor: 'rgba(224,148,34,0.30)', borderWidth: 1, borderDash: [3,3],
+          backgroundColor: 'rgba(224,148,34,0.18)',
+          pointRadius: 0, fill: '-1', order: 6 },
         // Band 2: CeFi 8-12% (filled between 12% top and 8% bottom)
-        { label: 'CeFi 8% (bottom)', data: lineAt(8),
-          borderColor: 'rgba(224,148,34,0)', borderWidth: 0,
-          backgroundColor: 'rgba(224,148,34,0.05)',
-          pointRadius: 0, fill: '-1', order: 5 },
-        // BTC 4-year rolling CAGR — the hero line
-        { label: 'BTC 4-year rolling CAGR', data: windowed,
-          borderColor: '#e09422', borderWidth: 2,
+        { label: 'CeFi 8% (bottom)', data: lineAt(8, X_MIN_ALLTIME, xMaxData),
+          borderColor: 'rgba(224,148,34,0.30)', borderWidth: 1, borderDash: [3,3],
+          backgroundColor: 'rgba(224,148,34,0.10)',
+          pointRadius: 0, fill: '-1', order: 6 },
+        // Power Law trend CAGR — model-implied (dashed, secondary)
+        { label: 'Power Law trend CAGR', data: clipTrendToMode(Y_MAX_ALLTIME),
+          borderColor: 'rgba(224,148,34,0.55)', borderWidth: 1.6, borderDash: [6,4],
+          pointRadius: 0, fill: false, order: 2, tension: 0 },
+        // BTC realized 4-year rolling CAGR — hero line (solid, bright)
+        { label: 'BTC 4-year rolling CAGR (realized)', data: clipRealizedToMode(Y_MAX_ALLTIME),
+          borderColor: '#e09422', borderWidth: 2.2,
           pointRadius: 0, pointHoverRadius: 4,
           tension: 0.25, fill: false, order: 1 }
       ]
@@ -1141,8 +1202,9 @@
           borderColor: 'rgba(224,148,34,0.4)',
           borderWidth: 1,
           filter: function(item) {
-            // Suppress band-line entries; only show the BTC CAGR line
-            return item.dataset.label === 'BTC 4-year rolling CAGR';
+            var lbl = item.dataset.label;
+            return lbl === 'BTC 4-year rolling CAGR (realized)' ||
+                   lbl === 'Power Law trend CAGR';
           },
           callbacks: {
             title: function(items) {
@@ -1151,7 +1213,10 @@
               return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
             },
             label: function(item) {
-              return 'BTC 4-year CAGR: ' + item.parsed.y.toFixed(1) + '%';
+              var lbl = item.dataset.label === 'Power Law trend CAGR'
+                ? 'Trend CAGR (model)'
+                : 'Realized CAGR';
+              return lbl + ': ' + item.parsed.y.toFixed(1) + '%';
             },
             afterBody: function() {
               return ['', 'CeFi rates: 8–12%', 'Multisig rates: 12–16%'];
@@ -1162,8 +1227,8 @@
       scales: {
         x: {
           type: 'linear',
-          min: X_MIN_DAYS,
-          max: cagrPts[cagrPts.length - 1].x,
+          min: X_MIN_ALLTIME,
+          max: xMaxData,
           grid: { color: 'rgba(255,255,255,0.04)' },
           ticks: {
             color: 'rgba(255,255,255,0.5)',
@@ -1179,7 +1244,7 @@
         },
         y: {
           min: 0,
-          max: Y_MAX,
+          max: Y_MAX_ALLTIME,
           grid: { color: 'rgba(255,255,255,0.04)' },
           ticks: {
             color: 'rgba(255,255,255,0.5)',
@@ -1189,5 +1254,52 @@
         }
       }
     }
+  });
+
+  // ── Time-range toggle handler
+  function setMode(mode) {
+    currentMode = mode;
+    if (mode === 'all') {
+      currentXMin = X_MIN_ALLTIME;
+      currentXMax = xMaxData;
+      currentYMax = Y_MAX_ALLTIME;
+    } else {
+      currentXMin = xMaxData - RECENT_WINDOW_DAYS;
+      currentXMax = xMaxData;
+      currentYMax = Y_MAX_RECENT;
+    }
+    chart.data.datasets[0].data = lineAt(16, currentXMin, currentXMax);
+    chart.data.datasets[1].data = lineAt(12, currentXMin, currentXMax);
+    chart.data.datasets[2].data = lineAt(8,  currentXMin, currentXMax);
+    chart.data.datasets[3].data = clipTrendToMode(currentYMax);
+    chart.data.datasets[4].data = clipRealizedToMode(currentYMax);
+    chart.options.scales.x.min = currentXMin;
+    chart.options.scales.x.max = currentXMax;
+    chart.options.scales.y.max = currentYMax;
+    if (mode === '2y') {
+      chart.options.scales.x.ticks.callback = function(v) {
+        var d = new Date(GENESIS_TS_LOCAL * 1000 + v * 86400 * 1000);
+        return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+      };
+    } else {
+      chart.options.scales.x.ticks.callback = function(v) {
+        var d = new Date(GENESIS_TS_LOCAL * 1000 + v * 86400 * 1000);
+        return d.getFullYear();
+      };
+    }
+    chart.update();
+  }
+
+  var toggleBtns = document.querySelectorAll('.bas-cagr-range-btn');
+  toggleBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      toggleBtns.forEach(function(b) {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      setMode(btn.getAttribute('data-range'));
+    });
   });
 })();
