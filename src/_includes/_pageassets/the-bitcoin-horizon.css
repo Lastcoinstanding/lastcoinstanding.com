@@ -724,7 +724,7 @@ input[type="range"]::-moz-range-thumb {
 /* Responsive */
 @media (max-width: 768px) {
   section { padding: 3.2rem 0; }
-  .hero { min-height: 50vh; padding: 2.5rem 0; }
+  .hero { padding: 2.5rem 0; }
   .callout { padding: 1.2rem 1.3rem; }
   .callout .quote { font-size: 1.2rem; }
   .control-panel { padding: 1.2rem; }
