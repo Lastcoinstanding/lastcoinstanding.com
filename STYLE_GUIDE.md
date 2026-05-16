@@ -117,6 +117,9 @@ Inter for the subtitle (not Source Serif italic) — the pragmatic register matc
 - h1 max larger than `3.4rem` — drifts from the canonical scale
 - `font-weight: 300` on subtitle Source Serif — too thin, breaks the Power Law-as-reference pattern; canonical is `400`
 - Separate `.intro` section between hero and first content section with its own border-top — creates visible disconnect; lede paragraph should sit naturally after the subtitle
+- **Hard-coded h2 `font-size` without a `clamp()`** — e.g. `font-size: 2.6rem` instead of `font-size: clamp(1.8rem, 3.4vw, 2.6rem)`. The fixed value gets applied at every breakpoint, so mobile inherits the desktop max and produces oversized headings that wrap badly. Always use the canonical clamp expression for `h2`; same for `h1` and `h3` with their respective canonical ranges. Caught on BvSM in the May 2026 audit.
+
+**Mobile line-wrap policy.** All `h1`, `h2`, and `h3` elements receive `text-wrap: balance` site-wide via the `<style id="canonical-typography-css">` block in `base.njk`. This applies before any per-page CSS loads, so every page gets balanced line wrapping by default — avoids the orphan-word problem on mobile (e.g. "Up front: what we recommend, **and** / what we don't" or "What if you bought at the / **worst time?**" — both observed in the May 2026 audit). Browser support: Chrome 114+, Edge 114+, Firefox 121+, Safari 17.5+. Pre-2024 browsers fall back to default greedy wrap — progressive enhancement, no visual regression. Per-page CSS that needs different wrap behavior on a specific heading can override with `text-wrap: wrap` (default) or `text-wrap: pretty`.
 
 ### 2.2 Essay body (EB Garamond, on cream)
 

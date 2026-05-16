@@ -67,6 +67,19 @@ body {
   .hamburger { display: block; }
 }
 </style>
+<style id="canonical-typography-css">
+/* ─── Site-wide heading typography invariants ─── */
+/* Single rule applied to every page: text-wrap: balance distributes  */
+/* heading content across lines to avoid orphan words and awkward     */
+/* greedy wraps on mobile. Per-page CSS still controls font-family    */
+/* and font-size; this only handles line-balancing. Progressive       */
+/* enhancement — pre-2024 browsers fall back to default greedy wrap   */
+/* without visual regression. See STYLE_GUIDE.md §2.1 for the         */
+/* canonical h1/h2/h3 size scale this complements.                    */
+h1, h2, h3 {
+  text-wrap: balance;
+}
+</style>
 {%- if page_styles %}
     <style>
 {{ page_styles | safe }}

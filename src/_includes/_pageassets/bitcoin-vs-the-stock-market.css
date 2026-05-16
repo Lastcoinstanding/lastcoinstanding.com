@@ -54,7 +54,7 @@ body {
 
 .bvsm-page .section-intro h2 {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 2.6rem;
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
     font-weight: 500;
     color: var(--text);
     margin: 0 0 0.5rem 0;
