@@ -1834,3 +1834,14 @@
     font-weight: 600;
 }
 .bas-math-list li strong { color: var(--text); font-weight: 600; }
+
+/* ─── CAGR-VS-RATES CHART CAPTION ─── */
+/* Companion caption beneath the inline CAGR-vs-rates chart in §1. */
+.bas-cagr-chart-caption {
+    font-size: 0.86rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    margin-top: 0.9rem;
+    padding: 0 0.4rem;
+    font-style: italic;
+}

@@ -67,13 +67,21 @@ eleventyComputed:
 
         <div class="section">
             <p class="prose">Today the magnitudes are smaller because bitcoin's trailing four-year CAGR has compressed from its early-period highs to roughly 39%. But the structural argument is identical. The reader making this decision today, with 2 BTC at $110,000 facing a $50,000 medical bill, is in exactly the same structural position as the reader years ago with 100 BTC at $100. The asymmetry is the same: <em>the upside of borrowing-and-retaining is the entire future appreciation of the bitcoin that would have been sold.</em> The downside is the interest cost of the loan<span class="help-tip help-tip-reg" tabindex="0">&sect;<span class="tip-content"><span class="reg-note-label">Regulatory note &middot; Interest deductibility</span>Whether interest on a bitcoin-backed loan is tax-deductible depends entirely on what the proceeds funded (the IRS &ldquo;loan tracing&rdquo; rules). Deductible against <em>investment income</em> if proceeds went to taxable investments; deductible as a <em>business expense</em> if used for business capital. <strong>Not deductible</strong> if used for personal consumption (lifestyle spending, vacations, debt consolidation). Keep documentation tying each dollar of borrowed money to its use &mdash; the burden of proof is yours.</span></span>, structured against the tail risks that the rest of this page exists to detail.</p>
-            <!-- ═══════════════════ CAGR-VS-INTEREST VIZ (placeholder) ═══════════════════ -->
-            <!-- Small inline chart — bitcoin's rolling four-year CAGR over the last decade,    -->
-            <!-- with horizontal bands showing typical CeFi lending rates (8–12%) and          -->
-            <!-- collaborative-custody multisig rates (12–16%). Makes G > R visible.            -->
-            <!-- To be implemented after sign-off on overall page structure.                    -->
-            <div class="bas-viz-placeholder" aria-hidden="true">
-                <div class="bas-viz-placeholder-label">[ Chart: bitcoin 4-year rolling CAGR vs. typical lending rates &mdash; in development ]</div>
+            <!-- ═══════════════════ CAGR-VS-INTEREST VIZ ═══════════════════ -->
+            <!-- Bitcoin's 4-year rolling CAGR over the last decade, with horizontal -->
+            <!-- bands showing typical CeFi lending rates (8–12%) and collaborative- -->
+            <!-- custody multisig rates (12–16%). Makes G > R visible — and surfaces -->
+            <!-- honestly that G has compressed substantially toward R in recent     -->
+            <!-- cycles. Computed in bayb.js (IIFE: CAGR-vs-Rates chart) from        -->
+            <!-- shared PL_DATA monthly samples.                                     -->
+            <div class="bas-calc-chart-wrapper">
+                <div class="bas-calc-chart-title">Bitcoin 4-year rolling CAGR vs. typical lending rates</div>
+                <div class="bas-calc-chart-canvas">
+                    <canvas id="cagrVsRatesChart"></canvas>
+                </div>
+                <div class="bas-cagr-chart-caption">
+                    Bitcoin&rsquo;s 4-year CAGR has compressed across cycles &mdash; from triple-digit highs in the early 2010s to roughly one-to-two times typical bitcoin-backed lending rates today. Visible: how often G has exceeded R historically; and how the margin has narrowed.
+                </div>
             </div>
             <p class="prose">The point isn't that borrowing is always better than selling. The point is that <em>the decision can't be evaluated honestly without weighing both paths.</em> The reflexive &ldquo;just sell some&rdquo; answer treats the sale as if it has no cost beyond the immediate fiat received. It does. Selling forecloses the future of the coin sold.</p>
         </div>

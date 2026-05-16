@@ -1035,3 +1035,159 @@
     recompute();
   }
 })();
+
+// ═════════════════════════════════════════════════════════════════════
+// CAGR-VS-RATES CHART — Bitcoin 4-year rolling CAGR vs lending-rate bands
+//
+// Renders an inline chart in §1 (the "magnitudes are smaller now" section)
+// that overlays bitcoin's historical 4-year rolling CAGR against horizontal
+// bands at typical CeFi (8–12%) and multisig (12–16%) lending rates.
+//
+// Computed from PL_DATA at page-load time so the trailing edge stays
+// fresh with each monthly refresh (MONTHLY_REFRESH_CHECKLIST.md §1).
+// Earlier-period values (>250%) are clipped at the top of the y-axis to
+// keep the modern-era compression story visible; the very early years
+// (2014-2016) saw 4-year CAGRs in the 400-800% range and would
+// overwhelm the recent values if shown in full.
+// ═════════════════════════════════════════════════════════════════════
+(function(){
+  var canvas = document.getElementById('cagrVsRatesChart');
+  if (!canvas || typeof Chart === 'undefined' || typeof PL_DATA === 'undefined') return;
+
+  var WINDOW_DAYS = 1460;      // 4 years
+  var Y_MAX       = 250;        // clip to this; early outliers exceed
+  var X_MIN_DAYS  = 2400;       // start chart ~late 2015 (skip extreme early CAGRs)
+
+  // Compute 4-year rolling CAGR series from PL_DATA monthly samples.
+  // For each sample, find the bracketing pair 4 years earlier and
+  // log-linearly interpolate to get the price-then. CAGR then is the
+  // 4th-root annualized return.
+  function compute4yCAGR() {
+    var out = [];
+    for (var i = 0; i < PL_DATA.length; i++) {
+      var dNow = PL_DATA[i][0], pNow = PL_DATA[i][1];
+      var dPast = dNow - WINDOW_DAYS;
+      if (dPast < PL_DATA[0][0]) continue;
+
+      // Find bracketing pair via reverse linear scan (monthly data, ≤ ~120 steps)
+      var prev = -1;
+      for (var j = i; j >= 0; j--) {
+        if (PL_DATA[j][0] <= dPast) { prev = j; break; }
+      }
+      if (prev < 0 || prev >= PL_DATA.length - 1) continue;
+
+      var d0 = PL_DATA[prev][0],     p0 = PL_DATA[prev][1];
+      var d1 = PL_DATA[prev + 1][0], p1 = PL_DATA[prev + 1][1];
+      var t  = (dPast - d0) / (d1 - d0);
+      var pPast = p0 * Math.pow(p1 / p0, t);  // log-linear interp on price
+      var cagr  = Math.pow(pNow / pPast, 0.25) - 1;
+      out.push({ x: dNow, y: cagr * 100 });
+    }
+    return out;
+  }
+
+  var cagrPts = compute4yCAGR();
+  if (!cagrPts.length) return;
+
+  // Window the data — drop pre-X_MIN_DAYS points (extreme early CAGRs)
+  // and clip any y > Y_MAX to keep modern-era compression visible.
+  var windowed = cagrPts
+    .filter(function(p) { return p.x >= X_MIN_DAYS; })
+    .map(function(p) { return { x: p.x, y: Math.min(p.y, Y_MAX) }; });
+
+  // For shaded lending-rate bands, we need horizontal line datasets at the
+  // band boundaries, with fill: -1 to fill between consecutive datasets.
+  // Pattern: top16% (no fill) → 12% (fills 12–16 multisig band) →
+  //          8% (fills 8–12 CeFi band).
+  var xMin = windowed[0].x, xMax = windowed[windowed.length - 1].x;
+  var lineAt = function(y) { return [{x: xMin, y: y}, {x: xMax, y: y}]; };
+
+  var GENESIS_TS_LOCAL = (typeof GENESIS_TS !== 'undefined') ? GENESIS_TS : 1230940800;
+
+  new Chart(canvas, {
+    type: 'line',
+    data: {
+      datasets: [
+        // Band 1: multisig 12-16% (filled between 16% top and 12% bottom)
+        { label: 'Multisig 16% (top)', data: lineAt(16),
+          borderColor: 'rgba(224,148,34,0)', borderWidth: 0,
+          pointRadius: 0, fill: false, order: 5 },
+        { label: 'Multisig 12% (bottom)', data: lineAt(12),
+          borderColor: 'rgba(224,148,34,0)', borderWidth: 0,
+          backgroundColor: 'rgba(224,148,34,0.10)',
+          pointRadius: 0, fill: '-1', order: 5 },
+        // Band 2: CeFi 8-12% (filled between 12% top and 8% bottom)
+        { label: 'CeFi 8% (bottom)', data: lineAt(8),
+          borderColor: 'rgba(224,148,34,0)', borderWidth: 0,
+          backgroundColor: 'rgba(224,148,34,0.05)',
+          pointRadius: 0, fill: '-1', order: 5 },
+        // BTC 4-year rolling CAGR — the hero line
+        { label: 'BTC 4-year rolling CAGR', data: windowed,
+          borderColor: '#e09422', borderWidth: 2,
+          pointRadius: 0, pointHoverRadius: 4,
+          tension: 0.25, fill: false, order: 1 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', axis: 'x', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(0,0,0,0.85)',
+          titleColor: 'rgba(255,255,255,0.9)',
+          bodyColor: 'rgba(255,255,255,0.8)',
+          borderColor: 'rgba(224,148,34,0.4)',
+          borderWidth: 1,
+          filter: function(item) {
+            // Suppress band-line entries; only show the BTC CAGR line
+            return item.dataset.label === 'BTC 4-year rolling CAGR';
+          },
+          callbacks: {
+            title: function(items) {
+              if (!items.length) return '';
+              var d = new Date(GENESIS_TS_LOCAL * 1000 + items[0].parsed.x * 86400 * 1000);
+              return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+            },
+            label: function(item) {
+              return 'BTC 4-year CAGR: ' + item.parsed.y.toFixed(1) + '%';
+            },
+            afterBody: function() {
+              return ['', 'CeFi rates: 8–12%', 'Multisig rates: 12–16%'];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          min: X_MIN_DAYS,
+          max: cagrPts[cagrPts.length - 1].x,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: {
+            color: 'rgba(255,255,255,0.5)',
+            font: { size: 10 },
+            callback: function(v) {
+              var d = new Date(GENESIS_TS_LOCAL * 1000 + v * 86400 * 1000);
+              return d.getFullYear();
+            },
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 8
+          }
+        },
+        y: {
+          min: 0,
+          max: Y_MAX,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: {
+            color: 'rgba(255,255,255,0.5)',
+            font: { size: 10 },
+            callback: function(v) { return v + '%'; }
+          }
+        }
+      }
+    }
+  });
+})();
