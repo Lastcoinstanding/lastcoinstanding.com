@@ -406,7 +406,7 @@ The site's most foundational concept page. Thesis: a good money must simultaneou
 
 All four principles in Section 9 originated here. See that section for the general patterns; this section documents the page-specific application.
 
-## 13. Homepage carousel — completed set (15 slides)
+## 13. Homepage carousel — completed set (16 slides)
 
 All 15 slides deployed with 16:9 widescreen silent videos, minimalist copy pattern (label + headline + CTA, no `.insight-desc`).
 
@@ -436,21 +436,17 @@ All 15 slides deployed with 16:9 widescreen silent videos, minimalist copy patte
 | 13 | The Bitcoin Retirement | A stack that lasts a lifetime — or runs out before you do | Solitary mature tree in golden-hour meadow; sun moves from behind canopy to streaming rays through it; latent-state opening, persistence across the arc |
 | 14 | Disciplined Rebalancing | A model you believe in is a protocol you can run | Wheat field at golden hour, ears swaying in coupled bounded oscillation; fixed camera, stable disequilibrium |
 | 15 | The Fixed Pie | Your share remains undiluted — for eternity | Unmarked gold coin; surrounding coins dissolve |
+| 16 | Bitcoin vs. The Stock Market | Three growth curves. One decisive horizon | Three trees in a meadow at golden hour; the middle tree grows dramatically taller and fuller-canopied over 10 seconds while the flanking trees mature modestly; latent-state opening, divergent outcomes from identical conditions |
 
-### Pending additions
+### Iteration record — slide 16 (May 2026)
 
-- **Slide 16 — Bitcoin vs. The Stock Market.** Page shipped May 2026; carousel slide queued pending Grok Imagine video iteration to a satisfying take. Slide copy: label `BITCOIN VS. THE STOCK MARKET`, headline *"Three growth curves. One decisive horizon."*, CTA *"Stress-test every entry"*. Video direction (after May 2026 iteration): *three trees in a meadow at golden hour; over 10 seconds the middle tree grows dramatically taller and fuller-canopied than the two flanking trees, which mature modestly. Painterly, atmospheric, no labels, no audio.* When the video lands, move this entry into the main inventory table above as slide 16, and remove this subsection.
+The BvSM slide took two video briefs to land. Captured here because the lesson generalizes to any future *bitcoin vs X* comparison slide; the prompt-craft principle now lives in §6 ("Comparison metaphors: prefer living elements over industrial ones").
 
-#### Iteration record (informs future page video briefs)
+The first brief proposed *three glass vessels filling at different rates under candlelight* — a comparison metaphor mechanically right (different fill rates = different growth rates, the amber vessel cresting and overflowing). Output was technically correct but the lab-bench register fought the site's atmospheric/lived-in voice; the cooler vessels also rose more than the brief specified, weakening the growth differential the slide depends on.
 
-The first-pass video brief proposed *three glass vessels filling at different rates under candlelight* — a comparison metaphor reading mechanically right (different fill rates = different growth rates, with the amber vessel cresting and overflowing as the bitcoin payoff). The output was technically correct but the lab-bench register fought the site's atmospheric/lived-in voice; the cooler vessels also rose more than the brief specified, weakening the growth differential.
+The trees brief — *three young trees in a meadow at golden hour, middle one growing dramatically more* — produced a substantially stronger take on first try. Living-element comparisons read more naturally than industrial-element ones in the site's tonal grammar; *single-element-with-different-states* (one tree grows more than another) is also more reliable than *multi-element-with-different-behaviors* (one vessel fills at a different rhythm than another) because the former matches a familiar time-lapse nature pattern while the latter requires Grok to invent visual logic.
 
-The trees brief — *three young trees in a meadow at golden hour, middle one growing dramatically more* — produced a substantially stronger take on first try. Read of what worked:
-
-- **Living-element comparisons read more naturally than industrial-element comparisons.** Three trees growing at different rates feels metaphorically *honest* in a way that three vessels filling at different rates feels staged. The site's tonal grammar (golden hour, weathered surfaces, found-not-arranged) already lives in the natural-element register.
-- **Single-element-with-different-states is more reliable than multi-element-with-different-behaviors.** Grok handles "this tree grows more than that tree" better than "this vessel fills at a different rhythm than that vessel" — the former is a familiar pattern from time-lapse nature footage, the latter requires the model to invent visual logic.
-
-The trees direction has light visual overlap with three other tree-themed slides (slide 12 Money Trees / two trees; slide 13 Bitcoin Retirement / one tree). Adjacency is broken up by slide 14 (wheat field) and slide 15 (gold coin) sitting between 13 and 16, and the framings read distinct enough that the shared visual vocabulary reinforces site identity rather than producing monotony — the carousel's overall grammar is part of what makes the set feel like one artifact.
+The trees direction has light visual overlap with two other tree-themed slides (slide 12 Money Trees / two trees, slide 13 Bitcoin Retirement / one tree). Adjacency is broken by slide 14 (wheat field) and slide 15 (gold coin) between slides 13 and 16; framings differ enough (centered single vs wide three) that the shared visual vocabulary reinforces site identity rather than producing monotony — the carousel's overall grammar is part of what makes the set feel like one artifact.
 
 ## 14. Bitcoin vs. Real Estate (`/bitcoin-vs-real-estate.html`)
 
@@ -732,7 +728,7 @@ Dual BTC line treatment — *trend-basis projection* (solid, starting from the P
 
 ### Open enhancements
 
-- **Carousel slide (slide 16).** Pending final Grok Imagine video take. Slide copy locked: label `BITCOIN VS. THE STOCK MARKET`, headline *"Three growth curves. One decisive horizon."*, CTA *"Stress-test every entry"*. Video direction (after May 2026 iteration): *three trees in a meadow at golden hour, the middle tree growing dramatically taller and fuller-canopied than the two flanking ones over 10 seconds. Painterly, atmospheric, no labels, no audio.* When the final take lands, update `§13` carousel inventory.
+- **Carousel slide (slide 16) — shipped May 2026.** Trees-in-meadow video landed in carousel position 16; see `§13` inventory and iteration record.
 - **Heatmap visualization.** A start-date × horizon grid showing BTC outperformance vs S&P across every entry window. Deferred until after the carousel slide ships; could land as a §3 enhancement or a separate sub-page depending on how the visualization wants to live.
 - **Live BTC price fetch (Phase 2).** Currently using hardcoded `TODAY_DAYS` and `TODAY_PRICE` constants refreshed monthly per `MONTHLY_REFRESH_CHECKLIST.md`. Live fetch is on the Tech Debt list but deferred — see the checklist's *"Why not live fetch"* section.
 
