@@ -1,0 +1,343 @@
+# New Page Launch Checklist — Last Coin Standing
+
+Every new exploration page that ships on the site needs the same set of
+integration steps to land *cleanly* — wired into the nav, discoverable from
+the homepage, indexed in the sitemap, decorated with proper social cards,
+cross-linked with companion pages, and reflected in the documentation. The
+checklist below is the runnable procedure. Run it once per page launch;
+each item is independent and can be checked off as it lands.
+
+Companion docs:
+
+- `SITE_GUIDE.md` — editorial and structural conventions (page sections,
+  carousel inventory, reading order)
+- `STYLE_GUIDE.md` — typography, color tokens, component recipes
+- `TECH_DEBT.md` — open architectural items
+- `MONTHLY_REFRESH_CHECKLIST.md` — recurring time-sensitive maintenance
+  separate from per-page launch
+
+---
+
+## 1. Page implementation
+
+Assumed complete by the time you reach this checklist. The page is a
+`src/<slug>.njk` template with a `base.njk` layout, page-scoped assets in
+`src/_includes/_pageassets/<slug>/`, and a clean dev build. Skip ahead.
+
+## 2. Eleventy/build wiring
+
+Verify the page's front-matter has the four expected fields:
+
+```yaml
+---
+layout: base.njk
+permalink: /<slug>.html
+slug: <slug>
+eleventyComputed:
+  head_extras:  "{% include '_pageassets/<slug>-head.html' %}"
+  page_styles:  "{% include '_pageassets/<slug>.css' %}"
+  page_scripts: "{% include '_pageassets/<slug>.js' %}"
+  body_chrome:  "{% include '_pageassets/<slug>-chrome.html' %}"  # if needed
+---
+```
+
+If the page uses shared assets (e.g., `power-law-data.js`), include them
+explicitly in `page_scripts` with `\n` between includes — Eleventy renders
+them in order.
+
+## 3. Navigation entry points
+
+### `src/_data/explorations.json` — the canonical exploration registry
+
+Add a new entry to the array:
+
+```json
+{
+  "slug": "<slug>",
+  "title": "<Display Title>",
+  "category": "<foundations | arguments | numbers>",
+  "interactive": true | false,
+  "is_calculator": true | false
+}
+```
+
+- **`category`** determines which top-nav dropdown the entry appears under
+  (Foundations / The Arguments / The Numbers). See `STYLE_GUIDE §6.9`.
+- **`interactive`** — `true` if the page has buttons, sliders, scrubbable
+  charts, or any user-driven UI. Adds the amber • marker next to the
+  nav link.
+- **`is_calculator`** — `true` *only* for personal-decision tools that
+  take inputs about the user's life (home price, retirement age, target
+  income, etc.). Decision-implying pages without personal inputs (e.g.
+  BvSM's hypothetical-amount calculator) get `false`. See `STYLE_GUIDE
+  §6.9` for the strict definition; this flag controls inclusion on the
+  Calculators constellation page.
+
+Validate the JSON after editing — HTML quotes inside JSON strings must be
+single-quoted or unicode-escaped:
+
+```bash
+python3 -c "import json; json.load(open('src/_data/explorations.json'))"
+```
+
+### `sitemap.xml` — search-engine discoverability
+
+Add the page URL at priority `0.9`. Group with other top-level exploration
+pages:
+
+```xml
+<url><loc>https://lastcoinstanding.com/<slug></loc><priority>0.9</priority></url>
+```
+
+If the page has named sections worth indexing as fragments (per the BvRE
+pattern), add fragment URLs at priority `0.8`:
+
+```xml
+<url><loc>https://lastcoinstanding.com/<slug>#section</loc><priority>0.8</priority></url>
+```
+
+## 4. Cross-linking via `related:` front-matter
+
+Use the `STYLE_GUIDE §6.10` related-component pattern. The new page should
+*both* link to companion pages AND have companion pages link back to it.
+
+### On the new page
+
+```yaml
+related:
+  - slug: <companion-slug>
+    desc: "One-sentence framing of why this related page matters in this context."
+```
+
+Pick 3–4 companions. Editorial criteria:
+
+- One page that's *foundational* to this page's argument (typically Power Law)
+- One page that's *thematically adjacent* (decision-frame siblings)
+- One page that's *contextually deeper* (where to go after engaging here)
+
+### On the companion pages
+
+For each companion you linked TO, add the new page to their `related:`
+array as well. This is the bidirectional discipline — if A points to B,
+B should point back to A.
+
+## 5. Homepage
+
+The homepage's Explore section has multiple subsections (Latest, Foundations,
+The Arguments, The Numbers). New pages land in their categorical subsection
+*and* in Latest while they're still fresh.
+
+### `src/index.njk` — concept card
+
+Add an `<a class="concept-card">` block in the appropriate subsection (the
+one matching the page's `category`). The card has four parts:
+
+- `.card-icon` — a custom inline SVG, 48×48 viewBox, that visually telegraphs
+  the page's argument (not a generic icon). Examples: BvSM's three-curves
+  growth-rate icon, Power Law's exponential curve, Money Trees' two-trees
+  icon. Use amber `#e09422` or BTC-orange `#F7931A` for primary strokes
+  and complementary muted colors for secondary elements.
+- `.card-title` — the page's display title (matches `explorations.json`)
+- `.card-desc` — one or two sentences in the site's editorial register,
+  matching the voice of other concept cards in the same subsection. The
+  description should make the page's *question* or *argument* visible,
+  not just describe what the page contains.
+- `.card-cta` — usually `Read more →` for prose pages, the specific
+  interaction for tool pages (e.g., `Find your number →`, `Run the comparison →`)
+
+### Latest subsection
+
+`Latest` is a rolling 2–3 card display of the most recent ships. When a
+new page lands, evaluate whether it should bump an older entry. Default
+behavior: insert the new card at the top of Latest; if Latest is already
+at 3 cards, evaluate which to remove (typically the oldest of the three).
+
+## 6. Tool-framing strip
+
+If the page is decision-implying — meaning a reader could reasonably read
+it as a buy/sell signal — include the `tool-framing` component near the
+top of the page body:
+
+```html
+{% include 'components/tool-framing.njk' %}
+```
+
+See `STYLE_GUIDE §6.11` for when to apply vs skip. Decision tools
+(BvSM, BvRE, Power Law forward calc, Retirement, Disciplined Rebalancing)
+get the strip. Pure-essay pages (Foundations, narrative Arguments without
+inputs) and low-risk demonstrations (Fixed Pie, Horizon) skip it.
+
+## 7. OG / social card
+
+### Generate the image
+
+Run the OG card generator with the page's display title and a one-sentence
+italic subtitle (often the carousel headline). Follow `STYLE_GUIDE §6.15`:
+
+- Output: `og-<slug>.jpg`, 1280×720, JPEG quality 88, target ~75–95 KB
+- The right half is composited from the canonical Power Law template —
+  preserves the textured atmospheric ₿ + ember sparks + paper-canvas grain
+  that define the refined family
+- The left half is procedurally generated grain background with text
+  rendered on top
+- Title in Cormorant Garamond SemiBold, italic subtitle in Cormorant
+  Garamond Italic, LCS header and URL in Inter Medium
+
+Place the file at the repo root (`og-<slug>.jpg`) alongside the other
+OG images.
+
+### Wire the meta tags
+
+In `src/_includes/_pageassets/<slug>-head.html`, add the full social-card
+meta tag block. Follow the BvSM head HTML as the reference. Required tags:
+
+```html
+<meta name="description" content="...">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lastcoinstanding.com/<slug>.html">
+<meta property="og:title" content="<Page Title> — Last Coin Standing">
+<meta property="og:description" content="...">
+<meta property="og:image" content="https://lastcoinstanding.com/og-<slug>.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="720">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:alt" content="...">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<Page Title> — Last Coin Standing">
+<meta name="twitter:description" content="...">
+<meta name="twitter:image" content="https://lastcoinstanding.com/og-<slug>.jpg">
+<meta name="twitter:image:alt" content="...">
+```
+
+### `.eleventy.js` static asset registration
+
+Add the OG image to the `staticAssets` config so it gets copied into `dist/`
+on build. Without this, Cloudflare serves the page's HTML at the OG image
+URL — a silent failure mode that produces broken social cards on X/Twitter
+without any visible build error.
+
+```javascript
+eleventyConfig.addPassthroughCopy('og-<slug>.jpg');
+```
+
+### Post-deploy verification
+
+After deploy, hit the OG image URL directly and verify the response:
+
+```bash
+curl -I https://lastcoinstanding.com/og-<slug>.jpg
+```
+
+Must return `Content-Type: image/jpeg` and the expected file size. If it
+returns `Content-Type: text/html`, the `.eleventy.js` staticAsset
+registration is missing.
+
+Test the social card preview with the actual X/LinkedIn debuggers:
+
+- X: <https://cards-dev.twitter.com/validator> (legacy validator) or
+  paste the URL into a draft post
+- LinkedIn: <https://www.linkedin.com/post-inspector/>
+- Facebook: <https://developers.facebook.com/tools/debug/>
+
+## 8. Carousel slide
+
+A new page doesn't ship with its carousel slide immediately — the slide
+needs a Grok Imagine video that takes iteration. The carousel slide can
+land in a follow-up PR.
+
+When the video is ready:
+
+- Strip audio + thumbnail stream with `ffmpeg -c:v copy -an input.mp4 output.mp4`
+- Target file size 3–10 MB, 720p, 10 seconds, silent (verified)
+- Add the slide config to the homepage carousel data
+- Update `SITE_GUIDE §13` to promote the page's entry from "Pending
+  additions" into the main inventory table
+
+See `SITE_GUIDE §6` for prompt-craft patterns and tonal-camp guidance.
+
+## 9. Documentation
+
+### `SITE_GUIDE.md`
+
+Add a new page section parallel to existing page sections (§14 BvRE, §17
+Bitcoin Retirement, §19 BvSM are the references). The section should
+document:
+
+- Page-level thesis and structural elements
+- Tab structure or section structure if applicable
+- Key editorial moves and decisions worth preserving
+- Page-specific design lessons that emerged during the build
+- Cross-linking strategy
+- Open enhancements (carousel slide pending, deferred ideas, etc.)
+
+Update the **editorial reading order** (§18) to place the page in the
+right position — most accessible / requires-least-personal-context first,
+deepest specialization last.
+
+If the page introduces a tonal-camp variant or carousel slide concept
+worth recording, add a note in **§13 Homepage carousel** under "Pending
+additions" with the proposed slide copy and video direction.
+
+### `STYLE_GUIDE.md`
+
+If the page introduces new component patterns (eyebrows, callouts, toggles,
+input groups, etc.), add a new recipe in §6 following the existing recipe
+format: markup example, CSS, behavior notes, "when to use it / when to
+skip" guidance. Use the next available `§6.N` number; if the pattern is
+page-scoped via prefix, document the unprefixed canonical form and note
+the prefix in the recipe text.
+
+### `TECH_DEBT.md`
+
+If the page surfaces new tech debt — duplicate constants that should be
+consolidated, near-canonical components that diverge, deferred enhancements
+— add an open item under the appropriate section. Close items in the
+"Recently closed" section if the page's work resolved any.
+
+### `MONTHLY_REFRESH_CHECKLIST.md`
+
+If the page bakes in any time-sensitive constants (TODAY_PRICE, TODAY_DAYS,
+as-of date strings, chart freshness captions, monthly PL_DATA samples),
+add the page's file path under §2 "Page-level TODAY constants" so the
+monthly grep doesn't miss it.
+
+## 10. Verification
+
+Before announcing the page or sharing the URL externally:
+
+- **Load the page in browser** — render, scroll, interact. Verify all
+  sections appear and respond.
+- **Mobile responsive check** — open at 375px viewport. Verify the
+  responsive treatments work (no horizontal scroll, tap targets ≥ 44px,
+  text legible).
+- **Nav check** — verify the new entry appears in its category dropdown
+  with the correct interactive marker, and the active-state styling works
+  when you're on the page.
+- **Homepage card click** — verify the homepage concept card navigates
+  correctly.
+- **Cross-links click-through** — click each `related:` card on the page
+  and the back-links from companion pages.
+- **OG card preview** — share the URL in a draft X/LinkedIn post (don't
+  publish) and verify the card unfurls correctly with title, description,
+  and image.
+- **Console clean** — open DevTools, verify no JS errors or 404s on page
+  load.
+
+---
+
+## Worked example — BvSM (May 2026)
+
+For reference, the BvSM launch ran through this checklist as follows:
+
+- **§3 explorations.json** — added `{slug: "bitcoin-vs-the-stock-market", category: "numbers", interactive: true, is_calculator: false}`
+- **§3 sitemap.xml** — added `<url><loc>...bitcoin-vs-the-stock-market</loc><priority>0.9</priority></url>`
+- **§4 related** — linked from BvSM to Power Law, Bitcoin Retirement, BvRE, Disciplined Rebalancing; bidirectional links added on those pages too
+- **§5 homepage** — concept card in The Numbers subsection with custom three-curves SVG icon (one rising amber line plus two flatter sage/blue-grey lines)
+- **§6 tool-framing** — included (decision-implying page)
+- **§7 OG card** — `og-bitcoin-vs-the-stock-market.jpg` generated via §6.15 two-tier procedure; meta tags wired in head HTML; passthroughCopy added in `.eleventy.js`; post-deploy curl returned `image/jpeg`, 82,675 bytes
+- **§8 carousel slide** — pending Grok Imagine video; entry in SITE_GUIDE §13 "Pending additions" with proposed copy and video direction (three trees with one growing taller / fuller canopy)
+- **§9 docs** — SITE_GUIDE §19 added (page section with four-arc structure, editorial moves, design lessons); STYLE_GUIDE §6.20–6.25 added (six new component recipes: section eyebrow, as-of callout, chart time-range toggle, "you are here" pulse marker, combined presets+slider input group, inline preset annotation); MONTHLY_REFRESH_CHECKLIST.md created (covering TODAY_PRICE/TODAY_DAYS and as-of date strings)
+
+The page landed cleanly into the site's information architecture; the only
+thing left is the carousel video, which doesn't gate the page being
+production-ready and shareable.

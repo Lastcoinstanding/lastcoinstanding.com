@@ -4,6 +4,8 @@ _A working reference for the editorial voice, visual vocabulary, and technical p
 
 _For typography, color tokens, component recipes, and visual anti-patterns, see the companion **`STYLE_GUIDE.md`** at repo root. The Site Guide owns voice, content, and technical architecture; the Style Guide owns visual implementation details._
 
+_For runnable procedures, two checklists at repo root: **`NEW_PAGE_CHECKLIST.md`** for everything that needs to land when a new exploration page ships (nav entries, sitemap, social cards, cross-links, docs); **`MONTHLY_REFRESH_CHECKLIST.md`** for recurring time-sensitive maintenance (TODAY constants, as-of dates, chart freshness captions). Open these when shipping or maintaining; the guides above are reference, the checklists are protocol._
+
 ---
 
 ## 1. Editorial posture
@@ -123,6 +125,7 @@ Three slides (Fixed Pie, Money Trees' right tree, Is Bitcoin a Bubble) share the
 - **Persistent objects do not grow, glow, or triumph.** Bitcoin's persistence is continuation of what it already was, not victory over what failed.
 - **"Not X; Y"** as a prompt pattern. "Not six things that unlock something else, but six things whose combination is itself the thing." Explicit framing of what the composition is not helps steer Grok away from generic interpretations.
 - **Unprompted Grok choices often do philosophical work.** First question for unexpected visual elements is *what is it arguing*, not *should I remove it*.
+- **Comparison metaphors: prefer living elements over industrial ones.** When the slide's argument is *"three things behave differently under the same conditions"* (the canonical pattern for any *bitcoin vs X* comparison page), choose three trees, three plants, three flames, three streams — not three vessels, three lanterns, three instruments. The site's tonal grammar (golden hour, weathered surfaces, found-not-arranged, lived-in) already lives in the natural-element register; industrial elements fight that voice even when the metaphor is mechanically right. **Single-element-with-different-states** ("this tree grows more than that tree") is also more reliable than **multi-element-with-different-behaviors** ("this vessel fills at a different rhythm than that vessel") — Grok handles the former easily because it's a familiar pattern from time-lapse nature footage; the latter requires the model to invent visual logic. The BvSM iteration (May 2026) confirmed this: vessels-filling produced a technically-correct take that didn't feel in-family; trees-growing produced a substantially stronger result on first try. See `§13` carousel inventory iteration record.
 
 ## 7. Technical patterns
 
@@ -436,7 +439,18 @@ All 15 slides deployed with 16:9 widescreen silent videos, minimalist copy patte
 
 ### Pending additions
 
-- **Slide 16 — Bitcoin vs. The Stock Market.** Page shipped May 2026; carousel slide queued pending Grok Imagine video. Proposed slide copy: label `BITCOIN VS. THE STOCK MARKET`, headline *"Three growth curves. One decisive horizon."*, CTA *"Stress-test every entry"*. Video direction: *three glass vessels filling at different rates under candlelight, the amber vessel surging and overflowing while the cooler vessels rise modestly* (primary); *three brass lanterns brightening at twilight, the amber one in pulses* (fallback). When the video lands, move this entry into the main inventory table above as slide 16, and remove this subsection.
+- **Slide 16 — Bitcoin vs. The Stock Market.** Page shipped May 2026; carousel slide queued pending Grok Imagine video iteration to a satisfying take. Slide copy: label `BITCOIN VS. THE STOCK MARKET`, headline *"Three growth curves. One decisive horizon."*, CTA *"Stress-test every entry"*. Video direction (after May 2026 iteration): *three trees in a meadow at golden hour; over 10 seconds the middle tree grows dramatically taller and fuller-canopied than the two flanking trees, which mature modestly. Painterly, atmospheric, no labels, no audio.* When the video lands, move this entry into the main inventory table above as slide 16, and remove this subsection.
+
+#### Iteration record (informs future page video briefs)
+
+The first-pass video brief proposed *three glass vessels filling at different rates under candlelight* — a comparison metaphor reading mechanically right (different fill rates = different growth rates, with the amber vessel cresting and overflowing as the bitcoin payoff). The output was technically correct but the lab-bench register fought the site's atmospheric/lived-in voice; the cooler vessels also rose more than the brief specified, weakening the growth differential.
+
+The trees brief — *three young trees in a meadow at golden hour, middle one growing dramatically more* — produced a substantially stronger take on first try. Read of what worked:
+
+- **Living-element comparisons read more naturally than industrial-element comparisons.** Three trees growing at different rates feels metaphorically *honest* in a way that three vessels filling at different rates feels staged. The site's tonal grammar (golden hour, weathered surfaces, found-not-arranged) already lives in the natural-element register.
+- **Single-element-with-different-states is more reliable than multi-element-with-different-behaviors.** Grok handles "this tree grows more than that tree" better than "this vessel fills at a different rhythm than that vessel" — the former is a familiar pattern from time-lapse nature footage, the latter requires the model to invent visual logic.
+
+The trees direction has light visual overlap with three other tree-themed slides (slide 12 Money Trees / two trees; slide 13 Bitcoin Retirement / one tree). Adjacency is broken up by slide 14 (wheat field) and slide 15 (gold coin) sitting between 13 and 16, and the framings read distinct enough that the shared visual vocabulary reinforces site identity rather than producing monotony — the carousel's overall grammar is part of what makes the set feel like one artifact.
 
 ## 14. Bitcoin vs. Real Estate (`/bitcoin-vs-real-estate.html`)
 
@@ -718,7 +732,7 @@ Dual BTC line treatment — *trend-basis projection* (solid, starting from the P
 
 ### Open enhancements
 
-- **Carousel slide (slide 16).** Pending Grok Imagine video iteration. Slide copy proposed: label `BITCOIN VS. THE STOCK MARKET`, headline *"Three growth curves. One decisive horizon."*, CTA *"Stress-test every entry"*. Video direction: *three glass vessels filling under candlelight at different rates*, primary; *three lanterns brightening at twilight*, alternative. When the video lands, update `§13` carousel inventory.
+- **Carousel slide (slide 16).** Pending final Grok Imagine video take. Slide copy locked: label `BITCOIN VS. THE STOCK MARKET`, headline *"Three growth curves. One decisive horizon."*, CTA *"Stress-test every entry"*. Video direction (after May 2026 iteration): *three trees in a meadow at golden hour, the middle tree growing dramatically taller and fuller-canopied than the two flanking ones over 10 seconds. Painterly, atmospheric, no labels, no audio.* When the final take lands, update `§13` carousel inventory.
 - **Heatmap visualization.** A start-date × horizon grid showing BTC outperformance vs S&P across every entry window. Deferred until after the carousel slide ships; could land as a §3 enhancement or a separate sub-page depending on how the visualization wants to live.
 - **Live BTC price fetch (Phase 2).** Currently using hardcoded `TODAY_DAYS` and `TODAY_PRICE` constants refreshed monthly per `MONTHLY_REFRESH_CHECKLIST.md`. Live fetch is on the Tech Debt list but deferred — see the checklist's *"Why not live fetch"* section.
 
