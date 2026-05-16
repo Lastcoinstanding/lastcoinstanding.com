@@ -434,6 +434,10 @@ All 15 slides deployed with 16:9 widescreen silent videos, minimalist copy patte
 | 14 | Disciplined Rebalancing | A model you believe in is a protocol you can run | Wheat field at golden hour, ears swaying in coupled bounded oscillation; fixed camera, stable disequilibrium |
 | 15 | The Fixed Pie | Your share remains undiluted — for eternity | Unmarked gold coin; surrounding coins dissolve |
 
+### Pending additions
+
+- **Slide 16 — Bitcoin vs. The Stock Market.** Page shipped May 2026; carousel slide queued pending Grok Imagine video. Proposed slide copy: label `BITCOIN VS. THE STOCK MARKET`, headline *"Three growth curves. One decisive horizon."*, CTA *"Stress-test every entry"*. Video direction: *three glass vessels filling at different rates under candlelight, the amber vessel surging and overflowing while the cooler vessels rise modestly* (primary); *three brass lanterns brightening at twilight, the amber one in pulses* (fallback). When the video lands, move this entry into the main inventory table above as slide 16, and remove this subsection.
+
 ## 14. Bitcoin vs. Real Estate (`/bitcoin-vs-real-estate.html`)
 
 **Added:** April 18, 2026. **Refreshed:** May 7, 2026 (Phase 4 restructure). Decision-frame page for the bitcoin-vs-housing question. After Phase 4 hosts both retrospective and projection calculators on the same canvas, paired via a temporal toggle.
@@ -647,14 +651,76 @@ The site does not endorse retirement strategies; it presents them. The Strategie
 
 For a reader new to the site landing on the calculators:
 
-1. **The Bitcoin Retirement** — most life-relevant, anchors most directly on the channel, provides motivation
-2. **BvRE — Retrospective mode** — the historical case that bitcoin has been the better store of value vs. housing
-3. **BvRE — Projection mode** — the same question forward; introduces the channel framing without going deep
-4. **The Power Law — The Channel tab** — the foundational visualization; readers arrive ready to grok the framework
-5. **The Power Law — other tabs** — the deeper conceptual case (Theory, In Nature)
-6. **Disciplined Rebalancing** — applies the channel as a sell-and-rebuy protocol; deepest specialization
+1. **Bitcoin vs. The Stock Market** — most accessible entry point; the comparison everyone has in their head (*"what would have happened if I'd bought bitcoin instead of the index?"*); no property or retirement timeline required; introduces the Power Law as the structural reference without requiring deep engagement with it
+2. **The Bitcoin Retirement** — most life-relevant, anchors most directly on the channel, provides motivation
+3. **BvRE — Retrospective mode** — the historical case that bitcoin has been the better store of value vs. housing
+4. **BvRE — Projection mode** — the same question forward; introduces the channel framing without going deep
+5. **The Power Law — The Channel tab** — the foundational visualization; readers arrive ready to grok the framework
+6. **The Power Law — other tabs** — the deeper conceptual case (Theory, In Nature)
+7. **Disciplined Rebalancing** — applies the channel as a sell-and-rebuy protocol; deepest specialization
 
-Phase 4 strengthens this reading order by separating *application* (BvRE, retirement, disciplined rebalancing) from *foundation* (Power Law).
+Phase 4 strengthens this reading order by separating *application* (BvSM, BvRE, retirement, disciplined rebalancing) from *foundation* (Power Law). BvSM was added at the top of the reading order in May 2026 because it requires the least personal context from the reader and proves the framework with the broadest comparator most readers already trust.
+
+---
+
+## 19. Bitcoin vs. The Stock Market (`/bitcoin-vs-the-stock-market.html`)
+
+**Added:** May 2026. A decision-frame page for the bitcoin-vs-equities question, structured as a four-section progressive argument that uses the Power Law as the structural reference and the historical record as the stress test. Sits in The Numbers bucket per `_data/explorations.json` (`category: "numbers"`, `interactive: true`, `is_calculator: false` — the calculator takes a hypothetical dollar amount but does not take inputs about the user's life, so it doesn't earn a tile on the Calculators constellation page).
+
+### Four-section progressive arc
+
+The page reads as a single argument unfolding across four registers, each marked by a `.section-eyebrow` pill above its `h2` (see `STYLE_GUIDE §6.20`):
+
+| § | Eyebrow | Section | Character |
+|---|---|---|---|
+| 1 | `FRAMEWORK` | The Power Law as cautionary tale | Visual + prose introduction to the model |
+| 2 | `LOOKING BACK` | What the historical record says | Unified calculator (Lump sum / Weekly DCA toggle) |
+| 3 | `LOOKING FORWARD` | The forward projection | Dual BTC trend-basis + current-price line vs S&P / NDQ |
+| 4 | `TAKEAWAY` | The long-horizon argument | Synthesis, convergence sentence, methodology link |
+
+The eyebrow pattern was introduced on this page; the four-step structure is reusable on any page with a present-tense argument that benefits from a past → future → synthesis arc.
+
+### Editorial moves
+
+- **Strict conservatism in §2.** The four preset entries (2013 top, 2017 top, 2021 top, 2025 ATH) are the *worst-case historical entries*. Annotating each with its multiple-of-trend (12.1× / 6.4× / 2.8× / 1.12×, via `STYLE_GUIDE §6.25`) makes explicit *how much more elevated* the earlier tops were than the most recent one — pre-empting the *"but those were different times"* objection by showing the reader the actual quantitative distance.
+- **As-of callouts in §1 and §3.** Time-sensitive claims (*"bitcoin is currently 0.59× trend"*, *"trend value at today ≈ $138,580"*) are surfaced in dated callout boxes (`STYLE_GUIDE §6.21`) rather than buried in prose. Honest dating preserves editorial discipline as the page ages between refreshes; see `MONTHLY_REFRESH_CHECKLIST.md`.
+- **Convergence sentence in §4.** *"Even at the 40-year horizon, bitcoin's trendline expected returns remain substantially higher than any conventional stock-market comparator."* This sentence is the page's load-bearing claim — it acknowledges that the gap narrows asymptotically (true, mathematically) while reasserting that the gap doesn't close for any reader's actual investing horizon (also true). Earlier drafts that tried to be more precise about convergence years ("around 2066-2080 for NDQ, ~2139 for SP") read as quantitative theater; the looser sentence does more honest work.
+
+### Power Law cautionary tale viz (§1)
+
+The §1 chart pairs the full nine-orders-of-magnitude price series with five cyclical-top markers, four floor markers, and a *"you are here"* pulse (`STYLE_GUIDE §6.23`) at the current `(TODAY_DAYS, TODAY_PRICE)` point. Two viewing modes — *All-time* and *Recent 2y* — switch via a time-range toggle (`STYLE_GUIDE §6.22`) so the reader can either see the structural argument or zoom into recent-cycle entry-quality context.
+
+### Calculator (§2) — unified calc with two modes
+
+Single calculator UI; *Lump sum* and *Weekly DCA* are selected via a Money-Trees-style yin-yang mode toggle (`STYLE_GUIDE §6.17`). The four cyclical-top presets and the start-date slider sit inside a unified `.start-input-group` enclosure (`STYLE_GUIDE §6.24`); selecting a preset sets the slider; moving the slider clears the active preset. Chart sits above the result cards (verdict + multiple-of-stock + multiple-of-trend); decision was made to put the chart first so the reader sees the shape before the numbers.
+
+Removed in iteration:
+
+- The earlier *Held N years* mode was dropped in favor of always-cumulative results — the *N years* framing turned into a partial-data hazard (a user could pick a long N that included only six months of actual data).
+- A gold comparator was dropped from §2. Adding gold weakened the page's argument (which is *bitcoin vs equities*, not *bitcoin vs all alternative stores of value*); the cleaner pair was strictly stronger.
+
+### Forward projection (§3)
+
+Dual BTC line treatment — *trend-basis projection* (solid, starting from the Power Law trend price at TODAY) and *current-price projection* (dashed, starting from TODAY_PRICE itself, i.e., 0.59× trend at the time of writing). The dashed line is the honest *what if the current discount holds* baseline; the solid line is the *what if bitcoin returns to trend* central case. Both are plotted against S&P 500 TR (10.86% CAGR) and NDQ-100 TR (16.26% CAGR) projections from the same starting wealth.
+
+### Page-specific design lessons (worth preserving)
+
+- **Section eyebrows earn their place on long-scroll pages.** This page is 4,500+ words; the eyebrow pills make the four registers visually distinct so the reader can scroll-skim and know which kind of section they're in. On shorter pages eyebrows read as overdesigned (see `STYLE_GUIDE §6.20`).
+- **As-of callouts are an editorial-honesty pattern, not a UI flourish.** They force the writer to keep present-tense claims accurate as the page ages — and they give the reader a reason to trust the dated claims more than the un-dated prose. Pattern reusable on any page making time-sensitive structural claims.
+- **The "you are here" pulse beats chart annotations** when the *position relative to a structural envelope* is the editorial point. A static label competes with the price line for attention; a pulsing halo signals *attention here* without obscuring the data.
+- **Strict conservatism framing.** When the comparison being made is "bitcoin vs X," and bitcoin has historically outperformed, the page is *automatically* vulnerable to the *"yeah but you cherry-picked"* objection. The defense isn't to argue against cherry-picking — it's to *pre-cherry-pick the worst-case*. The four cyclical-top presets in §2 are the worst possible entries; if bitcoin still wins from those, the page's argument survives the strongest version of the objection.
+
+### Cross-linking
+
+- **Related** (`§6.10`): cross-links to `the-power-law` (the growth model behind the projection), `the-bitcoin-retirement` (companion: *if this answers should I start, the Retirement page answers can I retire on it*), `bitcoin-vs-real-estate` (same comparison machinery, different decision frame), `disciplined-rebalancing` (the protocol layered on top once the position is established)
+- The Power Law text in §1 hyperlinks to `/the-power-law.html` for users who want to drill into the model
+- The §4 takeaway prose ends pointing forward into the Bitcoin Retirement page
+
+### Open enhancements
+
+- **Carousel slide (slide 16).** Pending Grok Imagine video iteration. Slide copy proposed: label `BITCOIN VS. THE STOCK MARKET`, headline *"Three growth curves. One decisive horizon."*, CTA *"Stress-test every entry"*. Video direction: *three glass vessels filling under candlelight at different rates*, primary; *three lanterns brightening at twilight*, alternative. When the video lands, update `§13` carousel inventory.
+- **Heatmap visualization.** A start-date × horizon grid showing BTC outperformance vs S&P across every entry window. Deferred until after the carousel slide ships; could land as a §3 enhancement or a separate sub-page depending on how the visualization wants to live.
+- **Live BTC price fetch (Phase 2).** Currently using hardcoded `TODAY_DAYS` and `TODAY_PRICE` constants refreshed monthly per `MONTHLY_REFRESH_CHECKLIST.md`. Live fetch is on the Tech Debt list but deferred — see the checklist's *"Why not live fetch"* section.
 
 ---
 

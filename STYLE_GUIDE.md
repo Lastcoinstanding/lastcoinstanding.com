@@ -884,16 +884,32 @@ The guard prevents the hidden-canvas corruption. The `ResizeObserver` catches th
 
 ### 6.15 OG card generation pattern
 
-A reusable Python + Pillow generator for site OG cards (1280×720 JPG) lives in the dev environment. Visual register matches the existing site cards:
+A reusable Python + Pillow generator for site OG cards (1280×720 JPG) lives in the dev environment (not committed — fonts and the canonical template image are fetched at generation time). Visual register matches the canonical refined cards (Power Law, BvRE, WMHTB, BvSM).
 
-- Dark `#0a0908` background with subtle Gaussian noise + soft vignette
-- Top-left: Inter caps brand label (`LAST COIN STANDING`) with 40px amber rule underneath
-- Center-left: Cormorant Garamond Medium title (84px), italic tagline (30px) wrapped to 540px max
-- Bottom-left: Inter URL (`LASTCOINSTANDING.COM`) in `--ink-faint`
-- Right side: faded amber Bitcoin glyph with multi-pass radial halo + particle dust
-- Cormorant Garamond doesn't include U+20BF (₿); use Inter for that single character
+**Two-tier approach** — the technique that distinguishes refined cards from earlier generations:
 
-Save as JPEG quality 88 with `optimize=True` to land at ~85–95 KB per card, matching the size of existing OG images. Fonts fetched from Google Fonts at generation time; no font assets committed.
+- **Right half preserved from a canonical template.** The atmospheric Bitcoin glyph (textured ₿ with soft multi-pass radial halo + ember-dust particles + paper-canvas grain) is the *signature* of the refined family. Rather than regenerating it per card (drift-prone), the generator composites the right half of an existing canonical card — `og-the-power-law.jpg` is the reference template — into every new card. The template's right portion (roughly `x >= 620`) is hard-pasted onto the working canvas; the seam is feathered into the left side over `x = 620..820` with an alpha gradient.
+
+- **Left half built procedurally.** The text region (LCS header, title, italic subtitle, URL footer) sits on a procedurally-generated dark grain background. Three layers: (1) base color `#100D0A` (near-black with slight warm undertone) — *not* `#0a0908`, which reads as too-pure black against the right half's warmer cast; (2) multi-scale Gaussian noise — `gauss(0, 3.5)` for coarse variation plus `gauss(0, 5.0)` for grain, with the green and blue channels at slightly lower amplitude than red to preserve the warm undertone; (3) 5–10 wear marks — large soft amber-tinted ellipses at low alpha (~12/255), blurred by `radius=2.5`. Apply a final `radius=0.6` Gaussian blur to settle the noise into paper-grain rather than reading as digital noise. A per-card seed lets you vary the procedural pattern slightly between cards while keeping the family consistent.
+
+**Layout coordinates** (1280×720 canvas):
+
+| Element | Position | Font | Size | Color |
+|---|---|---|---|---|
+| `LAST COIN STANDING` header | `(100, 110)`, letterspaced ~5.5px | Inter Medium | 18px | `#827A6E` (TEXT_MUTED) |
+| Amber rule under header | `(100, 144) → (200, 144)`, 2px | — | — | `#E09422` (AMBER) |
+| Title (Cormorant) | `(100, 245)`, line-height 95px | Cormorant Garamond SemiBold | 78px | `#F2EEE8` (TEXT_BRIGHT) |
+| Italic subtitle | `(100, ~340)`, word-wrap at 480px | Cormorant Garamond Italic | 30px | `#BEB2A0` (TEXT_DIM) |
+| URL footer | `(100, 668)`, letterspaced ~4.5px | Inter Medium | 18px | `#827A6E` (TEXT_MUTED) |
+
+**Font sourcing.** Cormorant Garamond pulled at generation time via the Google Fonts CSS API (`https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap`) — parse the latin font-face blocks for woff2 URLs, download, convert to TTF via `fontTools`. Inter via the `fonts-inter` apt package (system-installed). No font assets committed to the repo.
+
+**Save as JPEG quality 88 with `optimize=True`** to land at ~75–95 KB per card, matching the size of existing OG images. Cormorant Garamond doesn't include U+20BF (`₿`); use Inter for that single character if it appears in a title.
+
+**When you generate a card,** use the page's headline (carousel slide headline, if defined) as the italic subtitle text. Keep the subtitle under three wrapped lines at the 480px max-width — longer subtitles compete visually with the right-half atmosphere.
+
+**The "unrefined" anti-pattern.** Two earlier-generation cards (Disciplined Rebalancing v1, Bitcoin Retirement v1) used a clean digital solid-orange ₿ with simple radial glow instead of the textured atmospheric ₿. Both were regenerated in May 2026 using the two-tier approach above. The unrefined style reads as e-commerce / digital-product and breaks the family. If a new card looks digital instead of atmospheric, the right half wasn't composited from the canonical template.
+
 
 ### 6.16 Print stylesheet pattern (single-page PDF)
 
@@ -1108,9 +1124,299 @@ Mobile breakpoint at **720px** collapses controls to vertical stack, shrinks cha
 
 **When to use it.** The Channel page (canonical home). Future analytical charts with multi-band data and axis-mode-relevance. *Not* for simple display charts where users don't need controls — the pattern is for *interactive analysis*, not just visualization.
 
+### 6.20 Section eyebrow (`section-eyebrow`)
+
+A small uppercase amber pill placed above an `h2` to orient the reader at major editorial transitions on a long-scroll page. Introduced on BvSM to mark the four-section progressive arc: *Framework → Looking Back → Looking Forward → Takeaway*. The pattern is reusable on any multi-section page whose argument unfolds across distinct registers.
+
+**Markup:**
+
+```html
+<div class="section-eyebrow">FRAMEWORK</div>
+<h2>The Power Law as cautionary tale</h2>
+```
+
+**CSS:**
+
+```css
+.section-eyebrow {
+  display: inline-block;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(224, 148, 34, 0.08);
+  border: 1px solid rgba(224, 148, 34, 0.22);
+  color: var(--amber);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 1.2rem;
+}
+```
+
+**When to use it.** Long pages (1500+ words / 4+ scroll sections) where the reader benefits from a "you are entering a new register" marker. Skip on shorter pages — eyebrows on a 600-word page read as overdesigned.
+
+**Vocabulary discipline.** Eyebrow labels should be single-word or two-word categorical markers (`FRAMEWORK`, `LOOKING BACK`, `THE PROTOCOL`, `TAKEAWAY`), not section titles. The `h2` underneath is the section title; the eyebrow is the *kind* of section. If the eyebrow paraphrases the `h2`, drop the eyebrow.
+
+### 6.21 As-of callout (`as-of-callout`)
+
+A bordered callout that surfaces a time-sensitive data point (e.g., *"bitcoin is currently 0.59× trend"*) with explicit as-of dating. Introduced on BvSM §1 and §3 to honestly stamp every present-moment claim with the freshness date that backs it. The pattern preserves editorial honesty as the page ages between monthly refreshes (see `MONTHLY_REFRESH_CHECKLIST.md`).
+
+**Markup:**
+
+```html
+<div class="as-of-callout">
+  <div class="as-of-label">AS OF MAY 2026</div>
+  <div class="as-of-body">
+    Bitcoin sits at <strong>0.59× trend</strong> — about 41% below the
+    Power Law trendline. By the historical distribution this is inside
+    the lower-percentile band where prior cyclical floors have sat.
+  </div>
+</div>
+```
+
+**CSS:**
+
+```css
+.as-of-callout {
+  background: rgba(224, 148, 34, 0.04);
+  border-left: 3px solid var(--amber);
+  padding: 1rem 1.3rem;
+  margin: 1.6rem 0;
+  border-radius: 0 4px 4px 0;
+}
+.as-of-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.5rem;
+}
+.as-of-body {
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+.as-of-body strong {
+  color: var(--text-bright);
+  font-weight: 600;
+}
+```
+
+**Update discipline.** The date string is hardcoded; refresh monthly in lockstep with `TODAY_DAYS` / `TODAY_PRICE` (see `MONTHLY_REFRESH_CHECKLIST.md §3`). When you update the constants, grep the page for `AS OF` and update every callout to the current month.
+
+### 6.22 Chart time-range toggle (`chart-range-toggle`)
+
+A segmented button group placed above a chart to switch between viewing windows (e.g., *All-time* vs *Recent 2y*). Introduced on the BvSM §1 Power Law chart to let the reader either see the full nine-orders-of-magnitude sweep or zoom into recent cycles for entry-quality context.
+
+**Markup:**
+
+```html
+<div class="chart-range-toggle" role="tablist">
+  <button class="range-btn active" data-range="all" role="tab" aria-selected="true">All-time</button>
+  <button class="range-btn"        data-range="2y"  role="tab" aria-selected="false">Recent 2y</button>
+</div>
+```
+
+**CSS** (canonical pattern shared with §6.19 Channel control surface's axis toggle):
+
+```css
+.chart-range-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.8rem;
+}
+.range-btn {
+  background: transparent;
+  color: var(--text-dim);
+  border: none;
+  padding: 0.4rem 0.95rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border-right: 1px solid var(--border);
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.range-btn:last-child { border-right: none; }
+.range-btn.active {
+  background: rgba(224, 148, 34, 0.12);
+  color: var(--amber);
+}
+```
+
+**JS** sets the Chart.js `scales.x.min` and `scales.x.max` on click and calls `chart.update()`. For log-scale price axes, recompute `scales.y.min` to the local-window minimum to avoid a near-empty plot when zooming in.
+
+**When to use it.** Charts where two viewing windows tell genuinely different stories — long-arc structural argument vs near-term entry-quality context. Don't use for charts where the entire data window is the argument (e.g., the 135-year housing series on BvRE — there is no "recent" view that adds anything).
+
+### 6.23 "You are here" pulse marker (`you-are-here-pulse`)
+
+An animated radial halo positioned at the current-state data point on a chart, drawing the reader's eye to *where we are now* relative to the broader pattern. Introduced on BvSM §1 to mark today's bitcoin position inside the Power Law channel without resorting to a chart annotation that visually competes with the price line.
+
+**Markup** — a positioned `div` sibling of the chart canvas, both inside a `position: relative` wrapper:
+
+```html
+<div class="chart-wrapper">
+  <canvas id="pl-chart"></canvas>
+  <div class="you-are-here-pulse" id="pl-pulse"></div>
+</div>
+```
+
+**CSS:**
+
+```css
+.chart-wrapper { position: relative; height: 460px; }
+.you-are-here-pulse {
+  position: absolute;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+  display: none;  /* JS toggles to block once positioned */
+}
+.you-are-here-pulse::before,
+.you-are-here-pulse::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--amber);
+}
+.you-are-here-pulse::before {
+  animation: pulse-halo 2.2s ease-out infinite;
+  opacity: 0.45;
+}
+.you-are-here-pulse::after {
+  transform: scale(0.35);
+  box-shadow: 0 0 8px var(--amber);
+}
+@keyframes pulse-halo {
+  0%   { transform: scale(0.35); opacity: 0.55; }
+  100% { transform: scale(3.2);  opacity: 0; }
+}
+```
+
+**JS positioning** — Chart.js `afterRender` plugin sets `left` / `top` to the pixel coordinates of the (`TODAY_DAYS`, `TODAY_PRICE`) point so the pulse follows the chart's responsive resize:
+
+```javascript
+const pulsePlugin = {
+  id: 'youAreHerePulse',
+  afterRender(chart) {
+    const xScale = chart.scales.x, yScale = chart.scales.y;
+    const x = xScale.getPixelForValue(TODAY_DAYS);
+    const y = yScale.getPixelForValue(TODAY_PRICE);
+    const pulse = document.getElementById('pl-pulse');
+    pulse.style.left = (x - 8) + 'px';
+    pulse.style.top  = (y - 8) + 'px';
+    pulse.style.display = 'block';
+  }
+};
+```
+
+**Per-page CSS scoping note.** Animation `pulse-halo` should be page-scoped (`bvsm-pulse-halo` or similar) if multiple chart pages adopt this pattern, to keep keyframe collisions unambiguous. If promoted to shared, rename to `lcs-pulse-halo` once.
+
+### 6.24 Combined presets + slider input group (`start-input-group`)
+
+A visual enclosure that frames a preset-button row and a slider as one logical input — used when the user can either *pick a named scenario* (preset) or *dial in a custom point* (slider) for the same parameter. Introduced on BvSM §2 to combine four cyclical-top presets (2013 top, 2017 top, 2021 top, 2025 ATH) with a free-scrubbing start-date slider, both setting the same `start_date` variable.
+
+**Markup:**
+
+```html
+<div class="start-input-group">
+  <div class="cluster-label">
+    <span class="cluster-label-main">Start date</span>
+    <span class="cluster-label-help">— pick a named entry or scrub the slider</span>
+  </div>
+  <div class="preset-row">
+    <button class="preset-btn" data-start="2013-12-04">
+      2013 top <span class="preset-multiple">(12.1×)</span>
+    </button>
+    <button class="preset-btn" data-start="2017-12-17">
+      2017 top <span class="preset-multiple">(6.4×)</span>
+    </button>
+    <button class="preset-btn" data-start="2021-11-10">
+      2021 top <span class="preset-multiple">(2.8×)</span>
+    </button>
+    <button class="preset-btn" data-start="2025-01-20">
+      2025 ATH <span class="preset-multiple">(1.12×)</span>
+    </button>
+  </div>
+  <input type="range" class="start-slider" min="..." max="..." value="...">
+  <div class="slider-readout">Start: <strong>15 Dec 2017</strong></div>
+</div>
+```
+
+**CSS:**
+
+```css
+.start-input-group {
+  background: rgba(224, 148, 34, 0.04);
+  border: 1px solid rgba(224, 148, 34, 0.20);
+  border-radius: 8px;
+  padding: 1.2rem 1.5rem;
+  margin: 1.5rem 0;
+}
+.preset-row {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin: 0.8rem 0 1rem;
+}
+.preset-btn {
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.45rem 0.9rem;
+  border-radius: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.preset-btn:hover { border-color: rgba(224, 148, 34, 0.35); }
+.preset-btn.active {
+  background: rgba(224, 148, 34, 0.14);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+```
+
+**Behavior pattern — slider clears preset.** When the user clicks a preset, it sets the slider value AND adds `.active` to the preset button. When the user moves the slider, the JS clears `.active` from all preset buttons (the slider's freely-scrubbed value isn't one of the named scenarios anymore). This preserves the *"you are on a named scenario right now"* signal honestly.
+
+**When to use it.** Inputs where named scenarios carry editorial weight (the four cyclical-top entries above are the page's *worst-case stress test* — naming them is a pedagogical choice) AND the user might also want to dial in something between or outside the named points. Skip when the inputs are purely continuous (just use a slider) or purely categorical (just use buttons).
+
+### 6.25 Inline preset annotation (`preset-multiple`)
+
+A small parenthetical annotation inside a preset button text, showing a *value-at-that-preset* that helps the reader understand the relative scale of the named options. Used on the BvSM §2 preset row to show each cyclical top's multiple-of-trend (e.g., `2013 top (12.1×)`), making explicit how dramatically more elevated the earlier tops were than the most recent one.
+
+**Markup** — inline `<span>` inside the preset button:
+
+```html
+<button class="preset-btn" data-start="2013-12-04">
+  2013 top <span class="preset-multiple">(12.1×)</span>
+</button>
+```
+
+**CSS:**
+
+```css
+.preset-multiple {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  font-weight: 400;
+  margin-left: 0.15rem;
+}
+.preset-btn.active .preset-multiple {
+  color: rgba(224, 148, 34, 0.75);
+}
+```
+
+**Vocabulary discipline.** The annotation should be a *comparable number on the same axis* across all presets — not a mix of magnitudes and absolute prices. The BvSM annotation is multiple-of-trend for all four (12.1× / 6.4× / 2.8× / 1.12×), which lets the reader compare the entries at a glance. Mixing units inside the annotation (e.g., `(12.1×) / ($1,150) / (high) / (recent)`) defeats the purpose.
+
 ### Naming convention reminder
 
-Three patterns above follow the convention `{purpose}-{role}`: `calc-mode-*`, `porkopolis-credit*`, `channel-*`. When introducing future patterns, prefer this convention over generic names like `.toggle` or `.controls` to avoid collisions across pages.
+Several patterns above follow the convention `{purpose}-{role}`: `calc-mode-*`, `porkopolis-credit*`, `channel-*`, `start-input-*`. When introducing future patterns, prefer this convention over generic names like `.toggle` or `.controls` to avoid collisions across pages. Recipes §6.20–6.25 above were introduced on BvSM in May 2026 and are currently page-scoped (`.bvsm-section-eyebrow`, `.bvsm-as-of-callout`, etc. in the live page CSS); the recipe names above use the unprefixed canonical form. When a second consumer of any of these patterns arrives, promote the CSS into the shared layer and drop the prefix.
 
 ---
 
