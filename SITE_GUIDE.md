@@ -406,7 +406,7 @@ The site's most foundational concept page. Thesis: a good money must simultaneou
 
 All four principles in Section 9 originated here. See that section for the general patterns; this section documents the page-specific application.
 
-## 13. Homepage carousel — completed set (16 slides)
+## 13. Homepage carousel — completed set (17 slides)
 
 All 15 slides deployed with 16:9 widescreen silent videos, minimalist copy pattern (label + headline + CTA, no `.insight-desc`).
 
@@ -437,6 +437,7 @@ All 15 slides deployed with 16:9 widescreen silent videos, minimalist copy patte
 | 14 | Disciplined Rebalancing | A model you believe in is a protocol you can run | Wheat field at golden hour, ears swaying in coupled bounded oscillation; fixed camera, stable disequilibrium |
 | 15 | The Fixed Pie | Your share remains undiluted — for eternity | Unmarked gold coin; surrounding coins dissolve |
 | 16 | Bitcoin vs. The Stock Market | Three growth curves. One decisive horizon | Three trees in a meadow at golden hour; the middle tree grows dramatically taller and fuller-canopied over 10 seconds while the flanking trees mature modestly; latent-state opening, divergent outcomes from identical conditions |
+| 17 | Borrowing Against Your Stack | Every coin sold today is a coin that compounds for someone else | Solitary ancient standing stone — weathered, lichen-marked, ~six feet tall — in a golden-hour meadow; tall grasses bend in gentle wind, long shadow extends from the stone across the foreground; the stone itself does not move; quiet persistence as the visual argument |
 
 ### Iteration record — slide 16 (May 2026)
 
