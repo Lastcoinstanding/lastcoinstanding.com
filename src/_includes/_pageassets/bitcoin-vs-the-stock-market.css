@@ -560,29 +560,9 @@ body {
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   HORIZON MODE — third calculator mode added per Path A iteration
-   ═══════════════════════════════════════════════════════════════
-   The 'Held N years' mode adds a third input slider (horizon in
-   years) that's only relevant when this mode is active. The row
-   below contains the horizon slider control; visibility is toggled
-   by .bvsm-calc.is-horizon-mode (class set by setMode() in the JS).
-   Layout uses the same .slider-grid base styling so spacing and
-   gap match the existing 2-column row above. */
-
-.bvsm-horizon-row {
-    display: none;
-    grid-template-columns: 1fr;
-    margin-top: 1.1rem;
-}
-.bvsm-calc.is-horizon-mode .bvsm-horizon-row {
-    display: grid;
-}
-
 /* ─── Mode toggle: allow wrap on narrow viewports ───
-   3 buttons at min-width 110px each = 330px before gap.
-   At smaller widths flex-wrap lets buttons stack rather than
-   compress to unreadable widths. */
+   2 buttons at min-width 110px each. At smaller widths flex-wrap lets
+   buttons stack rather than compress to unreadable widths. */
 .bvsm-mode-toggle {
     flex-wrap: wrap;
 }
@@ -753,4 +733,72 @@ body {
 }
 .bvsm-preset.is-active .bvsm-preset-multiple {
     color: var(--amber-dim);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   START-INPUT GROUP — visual unification of presets + slider
+   ═══════════════════════════════════════════════════════════════
+   Per JM round 8 feedback: the preset buttons and the start-date
+   slider are two ways to set the same input, but they appeared as
+   two visually disconnected things. Wrapping them in a single
+   .bvsm-start-input-group container with a thin border-bottom
+   separates them visually from the amount slider below while
+   grouping them as a single conceptual "Start date" control. */
+.bvsm-start-input-group {
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid rgba(224,148,34,0.1);
+    margin-bottom: 1.25rem;
+}
+.bvsm-start-input-group .bvsm-presets {
+    margin-bottom: 1rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AS-OF CALLOUT — visually distinct treatment for time-sensitive data
+   ═══════════════════════════════════════════════════════════════
+   Per JM round 8 feedback: inline "(as of May 2026)" was too quiet
+   for time-sensitive data points. The callout box makes data
+   freshness visually obvious — readers immediately see "this number
+   depends on when the page was last updated" rather than mistaking
+   it for permanent prose. Applied to:
+     • §1 "Bitcoin sits at 0.59× trend" (current market position)
+     • §3 forward projection "Bitcoin sits 35% below trend value"
+   Both callouts contain the same structural pattern: amber-pill date
+   label at top, body explaining the time-sensitive claim, italic
+   tail noting "this reverses when bitcoin trades above trend". The
+   reversal-notice future-proofs the framing for when BTC moves above
+   trend without needing prose rewrites. */
+.bvsm-as-of-callout {
+    margin: 1.25rem 0 1.5rem;
+    padding: 1rem 1.25rem 1.05rem;
+    background: rgba(224,148,34,0.04);
+    border: 1px solid rgba(224,148,34,0.22);
+    border-left: 3px solid var(--amber);
+    border-radius: 4px;
+}
+.bvsm-as-of-callout-label {
+    display: inline-block;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.55rem;
+}
+.bvsm-as-of-callout-body {
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+.bvsm-as-of-callout-body em {
+    color: var(--text-dim);
+    font-style: italic;
+}
+.bvsm-as-of-callout-body strong {
+    color: var(--text-bright);
+    font-weight: 600;
 }

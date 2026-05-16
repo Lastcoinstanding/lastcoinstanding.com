@@ -550,8 +550,7 @@
 
   var SLIDER_RANGES = {
     lump:    { min: 1000, max: 100000, step: 1000, value: 10000 },
-    dca:     { min: 10,   max: 1000,   step: 10,   value: 100   },
-    horizon: { min: 1000, max: 100000, step: 1000, value: 10000 }
+    dca:     { min: 10,   max: 1000,   step: 10,   value: 100   }
   };
 
   // Per-mode labels — applied by setMode() so the UI re-skins on toggle.
@@ -577,17 +576,6 @@
       ndqSub:       'Portfolio value today (TR)',
       chartLabel:   'Portfolio value over time — weekly DCA from the chosen start date',
       chartCaption: 'Log-scale Y-axis. The dashed line shows cumulative dollars invested as a reference; the solid lines show the portfolio value of each asset over time.'
-    },
-    horizon: {
-      heading:      'Lump sum held for the chosen horizon',
-      presetsLabel: 'Bought at:',
-      amountLabel:  'Lump-sum amount',
-      amountTip:    'The hypothetical dollar amount invested as a single lump sum on the start date. The calculation tracks what that amount would be worth at the chosen horizon — historical outcome where the horizon falls within real data, projected forward from today where it extends past today.',
-      btcSub:       'Value at horizon',
-      spSub:        'Value at horizon (TR)',
-      ndqSub:       'Value at horizon (TR)',
-      chartLabel:   'Wealth-over-time across the horizon — historical (solid) + projected forward from today (dashed)',
-      chartCaption: 'Log-scale Y-axis. Solid line segments are historical. Dashed segments are projected forward from today using the Power Law trend for bitcoin and the long-run historical CAGRs (10.9% S&P 500, 16.3% NASDAQ-100) for the equity comparators.'
     }
   };
 
@@ -601,11 +589,6 @@
       btn.classList.toggle('is-active', active);
       btn.setAttribute('aria-selected', active ? 'true' : 'false');
     });
-
-    // Toggle is-horizon-mode class on the calc container so the CSS
-    // can reveal the horizon slider row only when this mode is active
-    var calcEl = document.getElementById('bvsmCalc');
-    if (calcEl) calcEl.classList.toggle('is-horizon-mode', newMode === 'horizon');
 
     var L = MODE_LABELS[newMode];
 
@@ -660,11 +643,6 @@
       computeLumpResults(startDate, amount);
     } else if (calcMode === 'dca') {
       computeDcaResults(startDate, amount);
-    } else if (calcMode === 'horizon') {
-      var horizonEl = document.getElementById('bvsmHorizon');
-      var horizonYears = horizonEl ? parseInt(horizonEl.value, 10) : 10;
-      document.getElementById('bvsmHorizonVal').textContent = horizonYears + ' year' + (horizonYears === 1 ? '' : 's');
-      computeHorizonResults(startDate, amount, horizonYears);
     }
   }
 
@@ -805,90 +783,6 @@
     renderDcaChart(labels, investedSeries, btcSeries, spSeries, ndqSeries);
   }
 
-  /* ─── Horizon mode: lump sum held for N years ───
-     Locks the elapsed time across presets so the 2024/2025 tops aren't
-     compared to today (where they've had only weeks/months to compound)
-     against the 2013/2017 tops (8-12 years of compounding). The horizon
-     slider sets target_date = start_date + N years. Where target_date
-     falls within historical data, the result is the historical outcome.
-     Where it extends past today, the calculator projects forward from
-     today's actual values using the canonical Power Law trend (for BTC)
-     and the long-run historical CAGRs (10.86% S&P 500, 16.26% NDQ-100). */
-
-  function computeHorizonResults(startDate, amount, horizonYears) {
-    var startDateObj = new Date(startDate);
-    var targetDateObj = new Date(startDateObj);
-    targetDateObj.setFullYear(targetDateObj.getFullYear() + horizonYears);
-    var targetDateStr = targetDateObj.toISOString().substring(0, 10);
-
-    var todayDateObj = new Date(todayISO());
-    var todayMs = todayDateObj.getTime();
-    var targetMs = targetDateObj.getTime();
-    var isProjection = targetMs > todayMs;
-
-    // Initial prices at start_date
-    var btc0 = btcPriceOnDate(startDate);
-    var sp0  = valueOnDate(SP500_TR_DATA, startDate);
-    var ndq0 = valueOnDate(NDQ_TR_DATA,  startDate);
-
-    // Final prices at target_date — historical lookup if inside data,
-    // forward projection from today if beyond.
-    var btcAtTarget, spAtTarget, ndqAtTarget;
-    if (!isProjection) {
-      btcAtTarget = btcPriceOnDate(targetDateStr);
-      spAtTarget  = valueOnDate(SP500_TR_DATA, targetDateStr);
-      ndqAtTarget = valueOnDate(NDQ_TR_DATA,  targetDateStr);
-    } else {
-      var btcToday = btcPriceOnDate(todayISO());
-      var spToday  = SP500_TR_DATA[SP500_TR_DATA.length - 1][1];
-      var ndqToday = NDQ_TR_DATA[NDQ_TR_DATA.length - 1][1];
-
-      var yearsFromToday = (targetMs - todayMs) / (365.25 * 86400000);
-      var targetDays = daysSinceGenesisFromDate(targetDateObj);
-      // BTC forward: Power Law trend ratio from today to target,
-      // anchored at today's actual market price (not at-trend price)
-      var btcGrowth = plPrice(targetDays) / plPrice(TODAY_DAYS);
-      var spGrowth  = Math.pow(1 + 0.1086, yearsFromToday);
-      var ndqGrowth = Math.pow(1 + 0.1626, yearsFromToday);
-
-      btcAtTarget = btcToday * btcGrowth;
-      spAtTarget  = spToday  * spGrowth;
-      ndqAtTarget = ndqToday * ndqGrowth;
-    }
-
-    var btcValue = amount * (btcAtTarget / btc0);
-    var spValue  = amount * (spAtTarget  / sp0);
-    var ndqValue = amount * (ndqAtTarget / ndq0);
-
-    document.getElementById('bvsmBtcValue').textContent = fmtUsd(btcValue);
-    document.getElementById('bvsmSpValue').textContent  = fmtUsd(spValue);
-    document.getElementById('bvsmNdqValue').textContent = fmtUsd(ndqValue);
-
-    var methodLabel = isProjection ? 'projected' : 'historical';
-    document.getElementById('bvsmBtcRows').innerHTML =
-      rowHtml('Multiple', fmtMultiple(btcValue / amount)) +
-      rowHtml('Method', methodLabel);
-    document.getElementById('bvsmSpRows').innerHTML =
-      rowHtml('Multiple', fmtMultiple(spValue / amount)) +
-      rowHtml('Method', methodLabel);
-    document.getElementById('bvsmNdqRows').innerHTML =
-      rowHtml('Multiple', fmtMultiple(ndqValue / amount)) +
-      rowHtml('Method', methodLabel);
-
-    // Verdict — explicit about historical-vs-projected and consistent
-    // across presets (same N-year horizon for all of them)
-    var btcVsSp = btcValue / spValue;
-    var verdictText;
-    if (isProjection) {
-      verdictText = 'At the <strong>' + horizonYears + '-year mark</strong> (' + fmtDate(targetDateStr) + '), the bitcoin position is <em>projected</em> to be worth <strong>' + fmtMultiple(btcVsSp) + ' the S&amp;P 500 position</strong> (' + fmtUsd(btcValue) + ' vs. ' + fmtUsd(spValue) + '). Projection method: Power Law trend forward from today\'s actual bitcoin price; equity comparators compound at their long-run historical CAGRs (S&amp;P 500 ~10.9%, NASDAQ-100 ~16.3%). Try the 2013 and 2017 presets at the same horizon &mdash; those are fully historical and show the pattern the projection rests on.';
-    } else {
-      verdictText = 'At the <strong>' + horizonYears + '-year mark</strong> from ' + fmtDate(startDate) + ' (' + fmtDate(targetDateStr) + '), the bitcoin position was worth <strong>' + fmtMultiple(btcVsSp) + ' the S&amp;P 500 position</strong> (' + fmtUsd(btcValue) + ' vs. ' + fmtUsd(spValue) + '). This is historical &mdash; no projection involved.';
-    }
-    document.getElementById('bvsmVerdict').innerHTML = verdictText;
-
-    renderHorizonChart(startDate, targetDateObj, todayDateObj, amount, btc0, sp0, ndq0);
-  }
-
   function renderLumpChart(startDate, amount, btc0, sp0, ndq0) {
     var canvas = document.getElementById('bvsmCalcChart');
     if (!canvas || typeof Chart === 'undefined') return;
@@ -923,76 +817,6 @@
       { label: 'S&P 500 (TR)',        data: spSeries,       borderColor: '#8aa3b5', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 },
       { label: 'NASDAQ-100 (TR)',     data: ndqSeries,      borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 },
       { label: 'Cumulative invested', data: investedSeries, borderColor: '#bfae97', borderWidth: 1.4, borderDash: [5, 4], fill: false, tension: 0.1, pointRadius: 0 }
-    ];
-
-    drawCalcChart(canvas, labels, datasets);
-  }
-
-  /* Horizon-mode chart: walks monthly from start_date to target_date,
-     using historical data through today and projected values beyond.
-     The transitionIdx is the last historical sample; Chart.js segment.
-     borderDash makes segments at or after that index render dashed,
-     visually marking the historical→projection boundary on each line. */
-  function renderHorizonChart(startDate, targetDateObj, todayDateObj, amount, btc0, sp0, ndq0) {
-    var canvas = document.getElementById('bvsmCalcChart');
-    if (!canvas || typeof Chart === 'undefined') return;
-
-    var startObj = new Date(startDate);
-    var todayMs  = todayDateObj.getTime();
-    var stopMs   = targetDateObj.getTime();
-
-    var btcToday = btcPriceOnDate(todayISO());
-    var spToday  = SP500_TR_DATA[SP500_TR_DATA.length - 1][1];
-    var ndqToday = NDQ_TR_DATA[NDQ_TR_DATA.length - 1][1];
-    var plToday  = plPrice(TODAY_DAYS);
-
-    var labels = [];
-    var btcData = [], spData = [], ndqData = [];
-    var transitionIdx = -1;
-    var i = 0;
-    var monthDate = new Date(startObj);
-
-    while (monthDate.getTime() <= stopMs) {
-      var monthMs   = monthDate.getTime();
-      var monthFull = monthDate.toISOString().substring(0, 10);
-      labels.push(monthDate.toISOString().substring(0, 7));
-
-      if (monthMs <= todayMs) {
-        // Historical
-        btcData.push(amount * (btcPriceOnDate(monthFull) / btc0));
-        spData.push( amount * (valueOnDate(SP500_TR_DATA, monthFull) / sp0));
-        ndqData.push(amount * (valueOnDate(NDQ_TR_DATA,  monthFull) / ndq0));
-        transitionIdx = i;
-      } else {
-        // Projected forward from today's actual values
-        var yearsForward = (monthMs - todayMs) / (365.25 * 86400000);
-        var monthDays = daysSinceGenesisFromDate(monthDate);
-        var btcGrowth = plPrice(monthDays) / plToday;
-        var spGrowth  = Math.pow(1 + 0.1086, yearsForward);
-        var ndqGrowth = Math.pow(1 + 0.1626, yearsForward);
-        btcData.push(amount * ((btcToday * btcGrowth) / btc0));
-        spData.push( amount * ((spToday  * spGrowth)  / sp0));
-        ndqData.push(amount * ((ndqToday * ndqGrowth) / ndq0));
-      }
-
-      monthDate.setMonth(monthDate.getMonth() + 1);
-      i++;
-    }
-
-    // Capture transitionIdx for the closure — segments at or beyond
-    // this index are projected and rendered dashed
-    var firstProjectedIdx = transitionIdx + 1;
-    var segmentDash = function(ctx) {
-      return ctx.p1DataIndex >= firstProjectedIdx ? [5, 5] : undefined;
-    };
-
-    var datasets = [
-      { label: 'Bitcoin',         data: btcData, borderColor: '#e09422', borderWidth: 2.2, fill: false, tension: 0.1, pointRadius: 0,
-        segment: { borderDash: segmentDash } },
-      { label: 'S&P 500 (TR)',    data: spData,  borderColor: '#8aa3b5', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0,
-        segment: { borderDash: segmentDash } },
-      { label: 'NASDAQ-100 (TR)', data: ndqData, borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0,
-        segment: { borderDash: segmentDash } }
     ];
 
     drawCalcChart(canvas, labels, datasets);
@@ -1121,15 +945,24 @@
       });
     });
 
-    // Calculator slider listeners
-    // Calculator slider listeners (start date + amount + horizon).
-    // Horizon slider only has visible effect in horizon mode but the
-    // listener is wired unconditionally — recomputeCalc() reads
-    // calcMode and only consults the horizon value when relevant.
-    ['bvsmStartDate', 'bvsmAmount', 'bvsmHorizon'].forEach(function(id) {
-      var el = document.getElementById(id);
-      if (el) el.addEventListener('input', recomputeCalc);
-    });
+    // Calculator slider listeners. Start-date drag also clears any
+    // is-active preset highlight — once the user moves the slider
+    // manually they're off-preset, so the UI shouldn't keep one lit.
+    // e.isTrusted gate ensures programmatic setters (preset clicks
+    // setting the slider value) don't trigger the clear.
+    var startEl = document.getElementById('bvsmStartDate');
+    if (startEl) {
+      startEl.addEventListener('input', function(e) {
+        if (e.isTrusted) {
+          document.querySelectorAll('.bvsm-preset.is-active').forEach(function(b){
+            b.classList.remove('is-active');
+          });
+        }
+        recomputeCalc();
+      });
+    }
+    var amountElLst = document.getElementById('bvsmAmount');
+    if (amountElLst) amountElLst.addEventListener('input', recomputeCalc);
 
     // Forward-projection slider listeners (§4 unchanged)
     ['bvsmProjHorizon', 'bvsmProjInvest'].forEach(function(id) {
