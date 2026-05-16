@@ -50,10 +50,14 @@ eleventyComputed:
 
             <div class="bvsm-chart-wrap">
                 <div class="bvsm-chart-label">Bitcoin price vs. Power Law trend, with cyclical-top and floor markers</div>
+                <div class="bvsm-pl-range-toggle" role="tablist" aria-label="Chart time range">
+                    <button class="bvsm-pl-range is-active" data-range="all" role="tab" aria-selected="true">All time</button>
+                    <button class="bvsm-pl-range" data-range="recent" role="tab" aria-selected="false">Recent (2y)</button>
+                </div>
                 <div class="bvsm-chart-canvas-tall">
                     <canvas id="bvsmPowerLawChart" role="img" aria-label="Bitcoin price plotted against the Power Law trend across 16 years, with annotated markers at each cyclical top showing the trend-deviation multiple, each cycle floor showing its trend-deviation multiple, and the current position at 0.59× trend."></canvas>
                 </div>
-                <p class="bvsm-chart-caption">Historical BTC price (white) vs. Power Law trend (dashed amber), log-scale Y axis. Numbers next to each marker are the cycle&rsquo;s trend-deviation multiple. Top markers (rust) register at &ge;1.0&times; trend; floor markers (sage) at &le;1.0&times; trend. Today&rsquo;s position is highlighted at 0.59&times; &mdash; well below trend, inside the historical floor band.</p>
+                <p class="bvsm-chart-caption">Historical BTC price (white) vs. Power Law trend (dashed amber), log-scale Y axis. Numbers next to each marker are the cycle&rsquo;s trend-deviation multiple. Top markers (rust) register at &ge;1.0&times; trend; floor markers (sage) at &le;1.0&times; trend. Today&rsquo;s position is highlighted at 0.59&times; <em>(as of May&nbsp;2026)</em> &mdash; well below trend, inside the historical floor band. Use the time-range toggle above to zoom into the most recent cycle.</p>
             </div>
 
             <p class="prose">Two things are immediately visible in the chart that qualitative narratives about bitcoin tend to miss.</p>
@@ -62,7 +66,7 @@ eleventyComputed:
 
             <p class="prose"><strong>Second, floors have stayed structurally stable.</strong> Across four different cycles spanning a 90&times; range of absolute prices, the cycle bottoms have all registered between 0.41&times; and 0.66&times; trend &mdash; a tight band. The downside reference hasn&rsquo;t moved while the upside has compressed toward it. The within-cycle entry-price spread has gone from 22&times; (2013 top vs. 2015 floor) to 1.7&times; (2024 March top vs. 2024 August dip). Timing matters less now than it used to; the boundaries are tighter on both sides.</p>
 
-            <p class="prose"><strong>And today sits at 0.59&times; trend</strong> &mdash; squarely inside the historical floor range, between the 2022 post-FTX low (0.41&times;) and the 2024 mid-cycle dip (0.66&times;). By the framework&rsquo;s own logic, this is structurally favorable entry territory: bitcoin is roughly 41% below where its long-run trend says it should be, while the October 2025 all-time high only managed 12% above trend. Bitcoin has spent more &ldquo;distance&rdquo; below trend than above it in this cycle.</p>
+            <p class="prose"><strong>And today sits at 0.59&times; trend</strong> <em>(as of May&nbsp;2026)</em> &mdash; squarely inside the historical floor range, between the 2022 post-FTX low (0.41&times;) and the 2024 mid-cycle dip (0.66&times;). By the framework&rsquo;s own logic, this is structurally favorable entry territory: bitcoin is roughly 41% below where its long-run trend says it should be, while the October 2025 all-time high only managed 12% above trend. Bitcoin has spent more &ldquo;distance&rdquo; below trend than above it in this cycle.</p>
 
             <p class="prose">The chart isn&rsquo;t a forecast &mdash; the Power Law is a central-tendency expectation, not a prediction, and the asset can stay below or above trend for extended periods. The point is that you have a structural reference for reading entry quality in real time. The scenarios below stress-test that reference against the worst-case version of itself: what would have happened if you&rsquo;d actually bought at each of the five cyclical tops marked above? The answer rhymes across every cycle &mdash; and it isn&rsquo;t what the &ldquo;what if I&rsquo;d bought the top&rdquo; objection assumes.</p>
         </div>

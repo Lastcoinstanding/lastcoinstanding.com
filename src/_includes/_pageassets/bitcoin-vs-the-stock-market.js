@@ -112,6 +112,10 @@
       function drawMarker(item, color, labelAbove) {
         var x = xs.getPixelForValue(item.d);
         var y = ys.getPixelForValue(item.p);
+        // Skip markers that fall outside the visible chart area (when zoomed
+        // to the recent-cycle range, the older markers are clipped out).
+        // Small tolerance so a marker exactly at the edge still renders.
+        if (x < chart.chartArea.left - 4 || x > chart.chartArea.right + 4) return;
         ctx.beginPath();
         ctx.arc(x, y, 4.5, 0, 2 * Math.PI);
         ctx.fillStyle = color;
@@ -172,7 +176,7 @@
     var canvas = document.getElementById('bvsmPowerLawChart');
     if (!canvas) return;
 
-    new Chart(canvas, {
+    var plChart = new Chart(canvas, {
       type: 'scatter',
       data: {
         datasets: [
@@ -298,6 +302,35 @@
           }
         }
       }
+    });
+
+    // ─── Time-range toggle: All time / Recent 2y ───
+    // When 'Recent' is active, zoom the X-axis to roughly the last 2.5 years
+    // (TODAY_DAYS − 900 ≈ Dec 2023), which captures the four most recent
+    // markers (2024 Mar top, 2024 Aug floor, 2025 ATH, today). The Y-axis
+    // is left to auto-scale so the floor/ceiling bands stay in view.
+    document.querySelectorAll('.bvsm-pl-range').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.bvsm-pl-range').forEach(function(b){
+          b.classList.remove('is-active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-selected', 'true');
+        var range = btn.getAttribute('data-range');
+        if (range === 'recent') {
+          plChart.options.scales.x.min = TODAY_DAYS - 900;
+          plChart.options.scales.x.max = TODAY_DAYS + 60;
+          // Bump the X-axis tick density up in the zoomed view so the
+          // year labels along the X don't collapse to just 2 values
+          plChart.options.scales.x.ticks.maxTicksLimit = 5;
+        } else {
+          plChart.options.scales.x.min = undefined;
+          plChart.options.scales.x.max = undefined;
+          plChart.options.scales.x.ticks.maxTicksLimit = 9;
+        }
+        plChart.update();
+      });
     });
   }
 

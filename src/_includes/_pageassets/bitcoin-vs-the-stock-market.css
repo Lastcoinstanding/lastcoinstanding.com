@@ -701,3 +701,40 @@ body {
 @media (max-width: 720px) {
     .slider-grid.grid-2 { grid-template-columns: 1fr; gap: 0.9rem; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   §1 CHART TIME-RANGE TOGGLE  (added per JM feedback round 7 —
+   the recent end of the §1 chart is congested at full-timeline
+   zoom because all the recent markers cluster in the last ~10%
+   of the X-axis. The toggle lets the reader zoom to the most
+   recent ~2.5 years so the 2024 Mar / 2024 Aug / 2025 ATH /
+   today markers spread out with room to read.)
+   ═══════════════════════════════════════════════════════════════ */
+.bvsm-pl-range-toggle {
+    display: flex;
+    gap: 0.4rem;
+    margin: 0.25rem 0 0.75rem;
+}
+.bvsm-pl-range {
+    padding: 0.3rem 0.85rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.bvsm-pl-range:hover {
+    color: var(--text);
+    background: rgba(224,148,34,0.05);
+    border-color: rgba(224,148,34,0.3);
+}
+.bvsm-pl-range.is-active {
+    color: var(--text);
+    background: rgba(224,148,34,0.1);
+    border-color: var(--amber);
+}
