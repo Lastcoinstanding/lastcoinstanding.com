@@ -802,3 +802,104 @@ body {
     color: var(--text-bright);
     font-weight: 600;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION EYEBROWS — past/present/future temporal framing
+   ═══════════════════════════════════════════════════════════════
+   Per JM round-9 feedback: the page's four sections divide naturally
+   into Framework / Looking back / Looking forward / Takeaway, and
+   making that arc visible at a glance helps the reader hold the
+   retrospective-vs-prospective distinction (the most important
+   conceptual divide on the page). Small uppercase amber eyebrow
+   above each h2 carries the orientation without weighing down the
+   section copy. */
+.section-eyebrow {
+    display: inline-block;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.65rem;
+    padding: 0.2rem 0.7rem;
+    background: rgba(224, 148, 34, 0.08);
+    border: 1px solid rgba(224, 148, 34, 0.25);
+    border-radius: 999px;
+}
+/* Past/Future variants — slightly different border emphasis so the
+   retrospective vs projection sections feel visually distinct from
+   the bookend Framework / Takeaway sections. */
+.section-eyebrow-past,
+.section-eyebrow-future {
+    border-color: rgba(224, 148, 34, 0.35);
+    background: rgba(224, 148, 34, 0.12);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   "YOU ARE HERE" PULSE — animated marker halo
+   ═══════════════════════════════════════════════════════════════
+   Per JM round-9 feedback: the static orange dot at today's
+   position should feel alive — "breathe" — to convey that bitcoin
+   is a live asset, not a museum piece. Implementation: positioned
+   div over the chart canvas, two CSS-animated rings expanding out
+   and fading. JS just sets left/top to the marker's pixel coords
+   after each chart render — animation runs declaratively in CSS,
+   no JS animation loop burning battery.
+   The chart canvas container (.bvsm-chart-canvas-tall) gets
+   position:relative so the absolute-positioned pulse is anchored
+   to it rather than to the page. */
+.bvsm-chart-canvas-tall {
+    position: relative;
+}
+.bvsm-you-are-here-pulse {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    z-index: 2;
+}
+.bvsm-you-are-here-pulse.is-visible {
+    opacity: 1;
+}
+/* Two pulse rings, offset by half the animation period so the
+   rhythm feels continuous rather than discrete. */
+.bvsm-you-are-here-pulse::before,
+.bvsm-you-are-here-pulse::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid rgba(224, 148, 34, 0.7);
+    transform: translate(-50%, -50%) scale(1);
+    animation: bvsmPulseRing 2.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+.bvsm-you-are-here-pulse::after {
+    animation-delay: 1.3s;
+}
+@keyframes bvsmPulseRing {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.85;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(4);
+        opacity: 0;
+    }
+}
+/* Respect reduced-motion preference — disable the pulse for users
+   who've asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+    .bvsm-you-are-here-pulse::before,
+    .bvsm-you-are-here-pulse::after {
+        animation: none;
+    }
+}

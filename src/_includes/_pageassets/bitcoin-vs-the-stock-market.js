@@ -172,6 +172,33 @@
     }
   };
 
+  /* ─── Pulse-position plugin ───
+     Positions the .bvsm-you-are-here-pulse DOM element over the
+     "you are here" marker after every chart render. The pulse
+     animation itself is CSS-driven; this plugin just keeps the
+     element anchored to the marker's pixel coords as the chart
+     resizes, the time-range toggle switches, or the page reflows. */
+  var pulsePositionPlugin = {
+    id: 'pulsePosition',
+    afterRender: function(chart) {
+      var pulse = document.getElementById('bvsmYouAreHerePulse');
+      if (!pulse || !chart.scales || !chart.scales.x || !chart.scales.y) return;
+      var x = chart.scales.x.getPixelForValue(TODAY_DAYS);
+      var y = chart.scales.y.getPixelForValue(TODAY_PRICE);
+      // Hide if the marker falls outside the visible chart area
+      // (won't happen in current toggles, but defensive for future
+      // additions like a deeper "Recent (6mo)" zoom).
+      if (x < chart.chartArea.left - 4 || x > chart.chartArea.right + 4 ||
+          y < chart.chartArea.top  - 4 || y > chart.chartArea.bottom + 4) {
+        pulse.classList.remove('is-visible');
+        return;
+      }
+      pulse.style.left = x + 'px';
+      pulse.style.top  = y + 'px';
+      pulse.classList.add('is-visible');
+    }
+  };
+
   function initPowerLawViz() {
     var canvas = document.getElementById('bvsmPowerLawChart');
     if (!canvas) return;
@@ -226,7 +253,7 @@
           }
         ]
       },
-      plugins: [markersPlugin],
+      plugins: [markersPlugin, pulsePositionPlugin],
       options: {
         responsive: true,
         maintainAspectRatio: false,

@@ -42,6 +42,7 @@ eleventyComputed:
         <!-- ═══════════════════════════════════════════════════════════════ -->
         <div class="section">
             <div class="section-intro">
+                <div class="section-eyebrow">Framework</div>
                 <h2>Reading bitcoin through the Power Law</h2>
                 <p><em>Why this isn&rsquo;t 2013 bitcoin &mdash; and why today&rsquo;s price may be the most useful signal on the chart.</em></p>
             </div>
@@ -56,8 +57,12 @@ eleventyComputed:
                 </div>
                 <div class="bvsm-chart-canvas-tall">
                     <canvas id="bvsmPowerLawChart" role="img" aria-label="Bitcoin price plotted against the Power Law trend across 16 years, with annotated markers at each cyclical top showing the trend-deviation multiple, each cycle floor showing its trend-deviation multiple, and the current position at 0.59× trend."></canvas>
+                    <!-- Pulse halo positioned over the "you are here" marker.
+                         JS sets left/top to the marker's pixel coords after
+                         every chart render; CSS handles the ring animation. -->
+                    <div class="bvsm-you-are-here-pulse" id="bvsmYouAreHerePulse" aria-hidden="true"></div>
                 </div>
-                <p class="bvsm-chart-caption">Historical BTC price (white) vs. Power Law trend (dashed amber), log-scale Y axis. Numbers next to each marker are the cycle&rsquo;s trend-deviation multiple. Top markers (rust) register at &ge;1.0&times; trend; floor markers (sage) at &le;1.0&times; trend. The current position is highlighted with a "you are here" marker. Use the time-range toggle above to zoom into the most recent cycle.</p>
+                <p class="bvsm-chart-caption">Historical BTC price (white) vs. Power Law trend (dashed amber), log-scale Y axis. Numbers next to each marker are the cycle&rsquo;s trend-deviation multiple. Top markers (rust) register at &ge;1.0&times; trend; floor markers (sage) at &le;1.0&times; trend. <em>Price line uses monthly close samples through mid-April&nbsp;2026; the &ldquo;you are here&rdquo; marker shows the price at last page refresh (May&nbsp;14,&nbsp;2026).</em> Use the time-range toggle above to zoom into the most recent cycle.</p>
             </div>
 
             <p class="prose">Two things are immediately visible in the chart that qualitative narratives about bitcoin tend to miss.</p>
@@ -88,6 +93,7 @@ eleventyComputed:
         <!-- ═══════════════════════════════════════════════════════════════ -->
         <div class="section">
             <div class="section-intro">
+                <div class="section-eyebrow section-eyebrow-past">Looking back</div>
                 <h2>What if you bought at the worst time?</h2>
                 <p><em>The worst-case stress test &mdash; pick a cyclical top, then choose between a lump sum held to today or weekly DCA from that day forward.</em></p>
             </div>
@@ -194,6 +200,7 @@ eleventyComputed:
         <!-- ═══════════════════════════════════════════════════════════════ -->
         <div class="section">
             <div class="section-intro">
+                <div class="section-eyebrow section-eyebrow-future">Looking forward</div>
                 <h2>How long does the bitcoin advantage last?</h2>
                 <p><em>The forward projection &mdash; what the Power Law trend says about the next 10 to 30 years.</em></p>
             </div>
@@ -270,6 +277,7 @@ eleventyComputed:
         <!-- ═══════════════════════════════════════════════════════════════ -->
         <div class="section">
             <div class="section-intro">
+                <div class="section-eyebrow">Takeaway</div>
                 <h2>The long-horizon argument</h2>
                 <p><em>Tying the historical evidence to the decision a reader is making today.</em></p>
             </div>
