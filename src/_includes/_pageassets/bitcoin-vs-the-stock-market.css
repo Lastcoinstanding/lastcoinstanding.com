@@ -1187,6 +1187,12 @@ body {
   font-size: 0.82rem;
 }
 .bvsm-heatmap-tooltip-row strong { color: var(--text-bright); font-weight: 600; }
+.bvsm-heatmap-tooltip-avgprice {
+  margin-top: 0.25rem;
+  padding-top: 0.25rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.06);
+}
+.bvsm-heatmap-tooltip-avgprice span { color: var(--text-dim); font-style: italic; font-size: 0.78rem; }
 .bvsm-heatmap-tooltip-outperf {
   margin-top: 0.35rem;
   padding-top: 0.35rem;
