@@ -56,6 +56,20 @@ eleventyComputed:
 
       <p class="prose">The form of the answer is shaped by the same Power Law model that drives the calculator on the next tab &mdash; how many bitcoin would fund a $100K-per-year retirement at different target years. The visualization is useful for orienting yourself to the magnitudes involved. It is not, in practice, the question most people face. Most people arriving here either already have a bitcoin position, or are in a position to sell some existing assets to acquire one; their question is what that position supports, not how to reach a target count.</p>
 
+      {# ─── Smitty-style static visualization (§3.1)
+           "BTC needed to retire on $100K/year, by retirement year, under
+           Power Law trend price." Pedagogical scaffolding: read the answer,
+           don't drag sliders. The interactive version of this same math
+           lives on the Calculator tab next door. #}
+      <figure class="smitty-fig" aria-labelledby="smittyCaption">
+        <div class="chart-wrapper smitty-chart-wrapper">
+          <canvas id="smittyChart"></canvas>
+        </div>
+        <figcaption class="smitty-caption" id="smittyCaption">
+          BTC needed to fund a <strong>$100K-per-year retirement</strong> at the <a href="https://www.bogleheads.org/wiki/Trinity_study" target="_blank" rel="noopener">4% rule</a> ($2.5M principal), priced at Power Law trend.
+        </figcaption>
+      </figure>
+
       <p class="prose"><strong>When can I retire?</strong> The question for someone with a target lifestyle in mind. The answer involves a tradeoff of variables that include: withdrawal rate, a growth model, and an expectation about how many years retirement needs to last. For users still accumulating, the answer doubles as a finish line &mdash; <em>how long would I need to keep working and contributing before this stack supports the lifestyle I want?</em> For users with a position already roughly fixed, the answer is a projection: <em>under these assumptions, this is the year the math works out.</em></p>
 
       <p class="prose"><strong>What income can I retire on?</strong> For some people, the answer here may be the least income that will allow them to survive comfortably, and thereby they may prioritize an earlier retirement vs. other people who may be looking for not just a survival-income, but a richer more affluent lifestyle, in which case they may be willing to continue to work longer (or just wait longer, in the case of a static bitcoin stack) to avail of the higher retirement income.</p>

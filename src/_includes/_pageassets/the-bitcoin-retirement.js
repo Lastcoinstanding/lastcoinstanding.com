@@ -1155,3 +1155,180 @@
   updateSustainability();
   fetchLiveBtcPrice();
 })();
+
+/* ════════════════════════════════════════════════════════════════
+   Smitty-style static viz on the Question tab — §3.1
+   ════════════════════════════════════════════════════════════════
+   "BTC needed to retire on $100K/year, by retirement year, under
+   Power Law trend price." Pedagogical scaffolding for the user
+   before they reach the Calculator tab. Read the answer; no
+   sliders here. The interactive version of this same math lives
+   on the Calculator tab next door.
+
+   Math
+     principal_needed = $100K / 0.04            (4% rule)
+                      = $2,500,000
+     btc_needed(year) = principal_needed
+                      / plPrice(days_since_genesis(Jan 1 of year))
+
+   PL_A, PL_B, GENESIS_TS, and plPrice() are globals provided by
+   shared/power-law-data.js (loaded before this file via the .njk
+   page_scripts include).
+
+   Render timing
+     The Question tab is not default-active — Chart.js can't size
+     a canvas whose parent has display:none. So we render on the
+     first activation of the tab, either via the hash deep-link
+     handler in the tab-switching IIFE at the top of this file
+     (which runs before this block on load), or via tab-button
+     click. Once rendered, the chart is static; no re-renders.
+═══════════════════════════════════════════════════════════════════ */
+
+(function() {
+  var canvas = document.getElementById('smittyChart');
+  if (!canvas || typeof Chart === 'undefined' || typeof plPrice !== 'function') return;
+
+  var rendered = false;
+
+  function render() {
+    if (rendered) return;
+
+    // Canvas must be visible (non-zero offsetWidth) before Chart.js can
+    // size it correctly. If the tab is still mid-activation, defer one
+    // animation frame to let layout settle.
+    if (canvas.offsetWidth === 0) {
+      requestAnimationFrame(render);
+      return;
+    }
+    rendered = true;
+
+    var SMITTY_PRINCIPAL = 2500000;  // $100K / 4% rule
+    var todayYear = (new Date()).getFullYear();
+    var endYear = todayYear + 30;
+
+    // Build the BTC-needed curve, one point per year
+    var data = [];
+    for (var y = todayYear; y <= endYear; y++) {
+      var d = new Date(y, 0, 1);
+      var daysSinceGenesis = (d.getTime() / 1000 - GENESIS_TS) / 86400;
+      var trendPrice = plPrice(daysSinceGenesis);
+      data.push({ x: y, y: SMITTY_PRINCIPAL / trendPrice });
+    }
+
+    // Anchor years: today, +10, +20, +30. Each gets a dot + "X BTC" label.
+    var anchorYears = [todayYear, todayYear + 10, todayYear + 20, todayYear + 30];
+    var anchors = [];
+    anchorYears.forEach(function(y) {
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].x === y) { anchors.push({ x: y, btc: data[i].y }); break; }
+      }
+    });
+
+    // Custom plugin: anchor dots + labels, mirrors the btcCountPlugin
+    // pattern used on the projection chart upstream in this file.
+    var anchorPlugin = {
+      id: 'smittyAnchors',
+      afterDatasetsDraw: function(chart) {
+        var ctx = chart.ctx;
+        var xScale = chart.scales.x, yScale = chart.scales.y;
+        ctx.save();
+        ctx.textAlign = 'center';
+        anchors.forEach(function(a) {
+          var xPx = xScale.getPixelForValue(a.x);
+          var yPx = yScale.getPixelForValue(a.btc);
+          // Amber dot on the line
+          ctx.fillStyle = '#E09422';
+          ctx.beginPath();
+          ctx.arc(xPx, yPx, 4, 0, 2 * Math.PI);
+          ctx.fill();
+          // Cream "X BTC" label above the dot
+          ctx.fillStyle = '#ece4d6';
+          ctx.font = '500 12px Inter, sans-serif';
+          var label = a.btc >= 1
+            ? a.btc.toFixed(1) + ' BTC'
+            : a.btc.toFixed(2) + ' BTC';
+          ctx.fillText(label, xPx, yPx - 11);
+        });
+        ctx.restore();
+      }
+    };
+
+    var ctx = canvas.getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        datasets: [{
+          label: 'BTC needed',
+          data: data,
+          parsing: false,
+          borderColor: '#E09422',
+          backgroundColor: 'rgba(224,148,34,0.10)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.25,
+          pointRadius: 0,
+          pointHoverRadius: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        parsing: false,
+        animation: { duration: 0 },
+        layout: { padding: { top: 28, right: 40, bottom: 4, left: 8 } },
+        scales: {
+          x: {
+            type: 'linear',
+            min: todayYear,
+            max: endYear,
+            grid: { color: 'rgba(224,148,34,0.04)' },
+            ticks: {
+              color: '#7a7367',
+              font: { family: 'Inter, sans-serif', size: 11 },
+              stepSize: 5,
+              callback: function(v) { return Math.round(v); }
+            }
+          },
+          y: {
+            type: 'logarithmic',
+            min: 0.04,
+            max: 30,
+            grid: { color: 'rgba(224,148,34,0.05)' },
+            ticks: {
+              color: '#7a7367',
+              font: { family: 'Inter, sans-serif', size: 11 },
+              callback: function(v) {
+                // Label only powers of ten — log scale gets noisy otherwise
+                var log = Math.log10(v);
+                if (Math.abs(log - Math.round(log)) > 0.001) return '';
+                if (v >= 1) return v + ' BTC';
+                return v.toFixed(Math.abs(log)) + ' BTC';
+              }
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false }
+        }
+      },
+      plugins: [anchorPlugin]
+    });
+  }
+
+  // Render if the Question tab is already active at page load (hash deep-link).
+  function tryRenderIfActive() {
+    var pane = document.getElementById('tab-question');
+    if (pane && pane.classList.contains('active')) render();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryRenderIfActive);
+  } else {
+    tryRenderIfActive();
+  }
+
+  // First click on the Question tab button triggers the render.
+  document.querySelectorAll('.tab-btn[data-tab="question"]').forEach(function(btn) {
+    btn.addEventListener('click', render);
+  });
+})();

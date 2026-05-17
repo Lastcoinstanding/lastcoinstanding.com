@@ -731,6 +731,49 @@ a.powerlaw-link:hover {
   height: 400px;
 }
 
+/* ─── Smitty-style static viz on the Question tab (§3.1) ───────────
+   Pedagogical reference: "BTC needed to retire on $100K/year, by year,
+   at Power Law trend." Embedded inline in the essay prose, smaller
+   and lighter-weight than the main projection chart on the Calculator
+   tab. Caption sits below in italics, mirroring magazine-figure
+   convention. */
+.smitty-fig {
+  margin: 2rem auto 2.25rem;
+  max-width: 720px;
+  text-align: center;
+}
+.smitty-chart-wrapper {
+  height: 280px;
+}
+.smitty-caption {
+  margin-top: 0.85rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #8a8275;
+  line-height: 1.45;
+}
+.smitty-caption strong {
+  color: #c8c2b8;
+  font-weight: 500;
+}
+.smitty-caption a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(224,148,34,0.35);
+  text-underline-offset: 2px;
+}
+.smitty-caption a:hover {
+  color: #ece4d6;
+  text-decoration-color: rgba(224,148,34,0.65);
+}
+
+@media (max-width: 720px) {
+  .smitty-fig { margin: 1.5rem auto 1.75rem; }
+  .smitty-chart-wrapper { height: 240px; }
+  .smitty-caption { font-size: 0.8rem; }
+}
+
 @media (max-width: 720px) {
   .chart-status-line {
     font-size: 0.85rem;

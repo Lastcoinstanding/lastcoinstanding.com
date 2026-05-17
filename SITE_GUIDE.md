@@ -580,7 +580,7 @@ When the urge strikes to add a "thoughtful" reading-width constraint on prose: d
 
 The page frames retirement-with-bitcoin around three interrelated questions, none with a single answer:
 
-1. *How much BTC do I need?* — pedagogical scaffolding (currently in prose; static visualization is a deferred enhancement)
+1. *How much BTC do I need?* — pedagogical scaffolding (prose + static Smitty-style visualization on the Question tab)
 2. *When can I retire?* — interactive (Retirement year slider in the target cluster)
 3. *What income can I retire on?* — interactive (Target annual income slider in the target cluster)
 
