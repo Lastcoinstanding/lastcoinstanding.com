@@ -5,6 +5,7 @@
 
   <!-- The Numbers — interactive data pages (highest crawl priority after home) -->
   <url><loc>https://lastcoinstanding.com/bitcoin-vs-the-stock-market</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://lastcoinstanding.com/heatmap</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://lastcoinstanding.com/the-power-law</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://lastcoinstanding.com/the-bitcoin-retirement</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://lastcoinstanding.com/bitcoin-vs-real-estate</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>

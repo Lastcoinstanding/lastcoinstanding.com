@@ -1503,6 +1503,22 @@
 
   // Click-to-jump from heatmap cell → §2 calculator
   function jumpToCalc(startStr, mode) {
+    // Standalone /heatmap context detection: the §2 calculator only exists
+    // on the BvSM page itself. If its slider is absent, this click came
+    // from the standalone heatmap page — there's nowhere local to jump to.
+    // Navigate the user to BvSM with the cell's params as a query string,
+    // and processIncomingParams() on the destination will re-apply them.
+    // Hash anchor #bvsmCalc lands the user on the calculator on arrival;
+    // smoothScroll on apply is a no-op since browser jumped there already.
+    var slider = document.getElementById('bvsmStartDate');
+    if (!slider) {
+      window.location.href = '/bitcoin-vs-the-stock-market.html'
+        + '?start=' + encodeURIComponent(startStr)
+        + '&mode='  + encodeURIComponent(mode)
+        + '#bvsmCalc';
+      return;
+    }
+
     // 1. Align mode toggle in §2 calc to the heatmap's mode
     var currentMode = document.querySelector('.bvsm-mode.is-active');
     if (currentMode && currentMode.getAttribute('data-mode') !== mode) {
@@ -1511,8 +1527,6 @@
     }
 
     // 2. Match the start date to an SP500_TR_DATA index for the slider
-    var slider = document.getElementById('bvsmStartDate');
-    if (!slider) return;
     for (var i = 0; i < SP500_TR_DATA.length; i++) {
       if (SP500_TR_DATA[i][0] >= startStr) {
         slider.value = i;
@@ -1531,6 +1545,22 @@
     // 5. Smooth-scroll the calculator into view
     var calcEl = document.getElementById('bvsmCalc');
     if (calcEl) calcEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Read ?start=YYYY-MM-DD&mode=lump|dca from URL and apply to §2 calc.
+  // The standalone /heatmap page uses these params to deep-link a specific
+  // cell's scenario into the full calculator when the user clicks "explore".
+  // Guarded on slider presence so it no-ops on standalone (where it'd be
+  // called before navigation).
+  function processIncomingParams() {
+    var slider = document.getElementById('bvsmStartDate');
+    if (!slider) return;  // not on BvSM page
+    var params = new URLSearchParams(window.location.search);
+    var startParam = params.get('start');
+    var modeParam  = params.get('mode');
+    if (startParam && (modeParam === 'lump' || modeParam === 'dca')) {
+      jumpToCalc(startParam, modeParam);
+    }
   }
 
   function wireHeatmapToggles() {
@@ -1564,9 +1594,13 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', function() {
+      init();
+      processIncomingParams();
+    });
   } else {
     init();
+    processIncomingParams();
   }
 
   // Heatmap init runs after the §2 init so the calculator's IDs/state

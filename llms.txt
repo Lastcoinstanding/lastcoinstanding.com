@@ -39,6 +39,7 @@ Data-driven analyses with interactive calculators. Backed by historical price da
 
 ## Tools
 
+- [The Bitcoin Heatmap](https://lastcoinstanding.com/heatmap.html): Standalone interactive — bitcoin's outperformance against the S&P 500 and NASDAQ-100 across every monthly entry from 2010 and every common holding horizon, in one grid. Click-to-explore navigates to the full Bitcoin vs. Stock Market article with the cell's parameters pre-loaded.
 - [Calculators](https://lastcoinstanding.com/calculators.html): Central hub linking to every interactive calculator across the site.
 
 ## About

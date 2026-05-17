@@ -1,0 +1,159 @@
+/* ============================================================
+   /heatmap — standalone-page-specific styles only.
+   The heatmap component itself (bvsm-heatmap-*) is styled in
+   bitcoin-vs-the-stock-market.css, which is loaded alongside
+   this file. The rules here cover the hero, the CTA back to
+   the full BvSM article, and the standalone layout container.
+   ============================================================ */
+
+body {
+  background: #0a0908;
+  color: #d8d2ca;
+  font-family: 'Inter', -apple-system, sans-serif;
+  /* Match BvSM page; bvsm.css will lay down body invariants too */
+}
+
+.heatmap-standalone {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 2rem 5rem;
+}
+
+/* ─── Hero ─────────────────────────────────────────────────── */
+.heatmap-hero {
+  padding: 4.5rem 0 2.6rem;
+  text-align: center;
+  max-width: 880px;
+  margin: 0 auto;
+}
+.heatmap-hero h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #f2eee8;
+  margin: 0 0 1rem;
+  line-height: 1.05;
+}
+.heatmap-hero h1 em {
+  font-style: italic;
+  color: #e09422;
+}
+.heatmap-hero .subtitle {
+  font-family: 'Source Serif 4', 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  color: #c8c0b4;
+  line-height: 1.55;
+  margin: 0 auto 1.6rem;
+  max-width: 720px;
+}
+.heatmap-hero .heatmap-howto {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: 640px;
+}
+.heatmap-hero .heatmap-howto strong {
+  color: #e09422;
+  font-weight: 600;
+}
+
+/* ─── Heatmap wrapper override ─────────────────────────────── */
+/* On BvSM the heatmap sits inside .bvsm-page > .section > .section-intro,
+   inheriting that section's vertical rhythm. On standalone we strip
+   that scaffold — the heatmap-wrapper sits directly in the page flow
+   and needs its own top/bottom breathing room. */
+.heatmap-standalone .bvsm-page {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+.heatmap-standalone .bvsm-heatmap-wrapper {
+  margin: 0 0 3rem;
+}
+
+/* ─── CTA section ──────────────────────────────────────────── */
+.heatmap-cta {
+  margin: 3.5rem auto 0;
+  max-width: 880px;
+  padding: 0 0.5rem;
+}
+.heatmap-cta-inner {
+  background: linear-gradient(135deg, rgba(247, 147, 26, 0.06), rgba(247, 147, 26, 0.02));
+  border: 1px solid rgba(247, 147, 26, 0.22);
+  border-radius: 10px;
+  padding: 2.4rem 2.2rem 2.6rem;
+  text-align: center;
+}
+.heatmap-cta-label {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #e09422;
+  margin-bottom: 0.9rem;
+}
+.heatmap-cta-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.6rem, 3vw, 2.05rem);
+  font-weight: 500;
+  color: #f2eee8;
+  letter-spacing: -0.005em;
+  margin: 0 0 1rem;
+  line-height: 1.2;
+}
+.heatmap-cta p {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.97rem;
+  line-height: 1.65;
+  color: #c8c0b4;
+  margin: 0 auto 1.8rem;
+  max-width: 600px;
+}
+.heatmap-cta-button {
+  display: inline-block;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #0a0908;
+  background: #F7931A;
+  text-decoration: none;
+  padding: 0.85rem 1.6rem;
+  border-radius: 6px;
+  transition: background 0.2s, transform 0.2s;
+}
+.heatmap-cta-button:hover {
+  background: #ffa830;
+  transform: translateY(-1px);
+}
+
+/* ─── Mobile ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .heatmap-standalone {
+    padding: 0 1rem 3rem;
+  }
+  .heatmap-hero {
+    padding: 2.6rem 0 1.8rem;
+  }
+  .heatmap-cta {
+    margin-top: 2.4rem;
+  }
+  .heatmap-cta-inner {
+    padding: 1.8rem 1.4rem 2rem;
+  }
+}
+@media (max-width: 480px) {
+  .heatmap-hero {
+    padding: 2rem 0 1.4rem;
+  }
+  .heatmap-hero .heatmap-howto {
+    font-size: 0.86rem;
+  }
+}
