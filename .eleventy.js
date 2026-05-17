@@ -16,6 +16,7 @@ module.exports = function (eleventyConfig) {
     'favicon-32x32.png',
     'favicon-192x192.png',
     'sitemap.xml',
+    'llms.txt',
     'concepts.json',
     'data.json',
     // OG cards

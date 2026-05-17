@@ -301,7 +301,82 @@ as-of date strings, chart freshness captions, monthly PL_DATA samples),
 add the page's file path under §2 "Page-level TODAY constants" so the
 monthly grep doesn't miss it.
 
-## 10. Verification
+## 10. SEO + analytics
+
+Every new page must ship with the same SEO baseline as the rest of the
+site. Establishing this in the new-page workflow (rather than retrofitting
+later) avoids the gaps caught in the May 2026 audit: 3 pages missing
+Google Analytics, 3 missing canonical URLs, 7 missing from the sitemap,
+1 missing OG image, 10 missing JSON-LD structured data.
+
+The per-page `_pageassets/<slug>-head.html` file MUST include all of
+the following. Copy from a complete reference (e.g.
+`bitcoin-vs-the-stock-market-head.html`) when creating a new one:
+
+- **Favicons** — 5 link tags for SVG, ICO, two PNG sizes, apple-touch-icon.
+- **Google Analytics** — the GA4 snippet with measurement ID
+  `G-WNGLLPPR5M`. Two `<script>` tags: async loader + inline config.
+  Missing GA = the page produces no analytics signal, period.
+- **Title tag** — `<title>Page Name — Last Coin Standing</title>`.
+  Under 60 characters where possible.
+- **Meta description** — single declarative sentence, 140-155
+  characters, no marketing language. Should read as a useful summary
+  even out of context.
+- **Canonical link** — `<link rel="canonical" href="https://lastcoinstanding.com/<slug>.html">`.
+  Self-referential. Required for every page even if there are no
+  duplicates today; protects against future URL parameter drift.
+- **Open Graph tags** — `og:type`, `og:url`, `og:title`,
+  `og:description`, `og:image`, `og:image:width`, `og:image:height`,
+  `og:image:type`, `og:image:alt`. The image must be 1280×720 JPEG;
+  every new page needs a custom `/og-<slug>.jpg` per §7 of this
+  checklist.
+- **Twitter card tags** — `twitter:card=summary_large_image`,
+  `twitter:title`, `twitter:description`, `twitter:image`,
+  `twitter:image:alt`. Same content as OG but separately declared so
+  Twitter's older parser picks them up reliably.
+- **Font preconnects + Google Fonts stylesheet** — matches the site's
+  Cormorant + Inter (+ Source Serif 4 for some pages) loading pattern.
+
+Additionally for content-type pages (essays, data-analysis pages):
+
+- **JSON-LD structured data** — `<script type="application/ld+json">`
+  block with `Article` or `WebPage` schema. At minimum: `@type`,
+  `headline`, `description`, `author`, `publisher`, `datePublished`.
+  This is the signal Google AI Overviews, Perplexity, ChatGPT search,
+  and other AI engines use to understand what the page is about and
+  decide whether to cite it. Half the site was missing this in the
+  May 2026 audit; AI search visibility was correspondingly weaker
+  than it should have been. Reference: `the-fixed-pie-head.html`,
+  `synthesis-head.html`, `index-head.html` — all have working
+  JSON-LD to copy from.
+
+After creating the head file, two more places to update:
+
+- **`sitemap.xml`** — add the new page URL with appropriate priority
+  (`0.9` for interactive Numbers pages, `0.8` for editorial Arguments
+  and Foundations, `0.5-0.7` for hubs and meta). Without this entry,
+  search engines find the page slowly (via link crawling) instead of
+  immediately (via sitemap discovery).
+- **`llms.txt`** — add the page to the appropriate section
+  (Foundations / The Arguments / The Numbers / Tools) with a one-line
+  description. This is the curated map AI search engines use to
+  understand the site's content shape; entries here are more likely
+  to be surfaced in AI-generated answers about Bitcoin topics the
+  page covers.
+
+Verification commands for SEO presence on a deployed page (replace
+`<slug>` with the page slug):
+
+```
+curl -sL https://lastcoinstanding.com/<slug> | grep -cE "gtag|googletagmanager"
+curl -sL https://lastcoinstanding.com/<slug> | grep -c 'rel="canonical"'
+curl -sL https://lastcoinstanding.com/<slug> | grep -c "og:image"
+curl -sL https://lastcoinstanding.com/<slug> | grep -c "application/ld+json"
+```
+
+Each command should return at least `1`. Zero indicates a gap.
+
+## 11. Verification
 
 Before announcing the page or sharing the URL externally:
 

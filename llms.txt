@@ -1,0 +1,46 @@
+# Last Coin Standing
+
+> Bitcoin education through interactive visualizations and rigorous editorial analysis. The site examines sound money, monetary tradeoffs, and Bitcoin's irreducible design through contrast and clarity — combining long-form arguments with interactive calculators that let readers stress-test the claims against historical data.
+
+Each page is a self-contained exploration. The site does not provide financial advice; it provides frameworks, data, and tools so readers can think through Bitcoin decisions themselves.
+
+## Foundations
+
+Conceptual underpinnings of money and Bitcoin.
+
+- [What Money Has To Be](https://lastcoinstanding.com/what-money-has-to-be.html): The three structurally-coupled functions of money — hold value across time, move across space, serve as a shared unit of measurement. Interactive comparison of bitcoin, gold, the US dollar, and a hyperinflating fiat.
+- [What Bitcoin Is](https://lastcoinstanding.com/what-bitcoin-is.html): Bitcoin's core monetary properties — scarcity, decentralization, immutability, censorship-resistance — visualized as interlocking petals.
+- [The Bitcoin Synthesis](https://lastcoinstanding.com/synthesis.html): Six existing ideas combined into one irreducible monetary discovery. Explore each component, then remove one to see what collapses.
+- [The Bitcoin Trilemma](https://lastcoinstanding.com/trilemma.html): The decentralization / security / scalability tradeoff. Why Bitcoin deliberately sacrifices base-layer speed for the other two.
+
+## The Arguments
+
+Editorial essays on Bitcoin's role as the monetary endgame.
+
+- [The Bitcoin Migration](https://lastcoinstanding.com/the-bitcoin-migration.html): The exodus from an inherently broken monetary network that can't be fixed, to an inherently strong one that can't be broken. A long-form exploration of what money is, why fiat fails, and why Bitcoin is the answer.
+- [The Half-Life](https://lastcoinstanding.com/the-half-life.html): How long until cash loses half its value? Interactive decay curve under different inflation assumptions, then a comparison of supply mechanics across fiat, gold, and Bitcoin.
+- [Money Trees](https://lastcoinstanding.com/money-trees.html): Sound money and fiat money as two different root systems with different outcomes — fixed supply versus infinite expansion.
+- [The Melting Ice Cube](https://lastcoinstanding.com/the-melting-ice-cube.html): Holding cash isn't conservatism — it's an active decision with a quantifiable ongoing cost. Interactive treasury model.
+- [Is Bitcoin a Bubble?](https://lastcoinstanding.com/not-a-bubble.html): Every historical bubble followed a pattern of collapse to permanent zero. Bitcoin has crashed 80%+ three times and reached new all-time highs each time. The bubble checklist, applied honestly.
+
+## The Numbers
+
+Data-driven analyses with interactive calculators. Backed by historical price data, transparent math, and explicit assumptions.
+
+- [Bitcoin and The Power Law](https://lastcoinstanding.com/the-power-law.html): The empirical law governing Bitcoin's price scaling — for every ~13% increase in Bitcoin's age, the trend price doubles. The structural reference for reading entry quality.
+- [Bitcoin vs. The Stock Market](https://lastcoinstanding.com/bitcoin-vs-the-stock-market.html): Bitcoin against the S&P 500 and NASDAQ-100 across every monthly entry from 2010 and every common holding horizon. 100% win rate at 7+ year horizons. Includes an interactive outperformance heatmap covering ~1,500 (start-date, horizon) windows.
+- [Bitcoin vs. Real Estate](https://lastcoinstanding.com/bitcoin-vs-real-estate.html): The structural relationship between housing costs, incomes, and Bitcoin. The true opportunity cost of buying a house instead of Bitcoin.
+- [The Bitcoin Horizon](https://lastcoinstanding.com/the-bitcoin-horizon.html): Volatility versus risk as different categories. No rolling 41-month or longer Bitcoin window has ever ended in nominal loss.
+- [The Bitcoin Fixed Share](https://lastcoinstanding.com/the-fixed-pie.html): The 21-million supply ceiling and what mathematically-fixed share of a monetary network actually means.
+- [The Bitcoin Retirement](https://lastcoinstanding.com/the-bitcoin-retirement.html): Required stack size at withdrawal age against long-run trend growth. Adjustable assumptions, transparent math, no advice.
+- [Disciplined Rebalancing](https://lastcoinstanding.com/disciplined-rebalancing.html): Percentile-trigger rebalancing applied to fifteen years of price data. Turning the Power Law channel from a model into a protocol.
+- [Borrowing Against Your Stack](https://lastcoinstanding.com/borrowing-against-your-stack.html): The cautionary version of using Bitcoin as collateral — rehypothecation tiers, liquidation distance under stress, interest cost versus retained-coin appreciation. Strong emphasis on the failure modes.
+- [Bitcoin-Backed Mortgages](https://lastcoinstanding.com/bitcoin-backed-mortgages.html): Mortgage scenarios with Bitcoin collateral. Same caution profile as the broader borrowing page.
+
+## Tools
+
+- [Calculators](https://lastcoinstanding.com/calculators.html): Central hub linking to every interactive calculator across the site.
+
+## About
+
+- [About](https://lastcoinstanding.com/about.html): About the site and its author. Long Coin Standing is an independent editorial project; it accepts no advertising and offers no financial advice.
