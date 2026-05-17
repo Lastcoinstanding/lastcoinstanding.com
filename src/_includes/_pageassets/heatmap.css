@@ -1,25 +1,32 @@
 /* ============================================================
-   /heatmap — standalone-page-specific styles only.
-   The heatmap component itself (bvsm-heatmap-*) is styled in
-   bitcoin-vs-the-stock-market.css, which is loaded alongside
-   this file. The rules here cover the hero, the CTA back to
-   the full BvSM article, and the standalone layout container.
+   /heatmap — standalone-page-specific styles (v2).
+
+   v2 rebuild: full-canvas heatmap (no horizontal scroll on
+   desktop), sidebar reflows from right-rail to horizontal stat
+   strip below the heatmap, §2 calculator rendered inline below.
+   Wrapper max-width expanded from 1180 → 1400 to give the
+   heatmap a more expansive canvas.
+
+   The heatmap component itself (.bvsm-heatmap-*) is styled in
+   bitcoin-vs-the-stock-market.css; rules here OVERRIDE that
+   file where standalone layout needs to differ. Source order:
+   bvsm.css loads first, heatmap.css second (per heatmap.njk
+   eleventyComputed page_styles), so these rules win by source
+   order without needing higher specificity.
    ============================================================ */
 
 body {
   background: #0a0908;
   color: #d8d2ca;
-  font-family: 'Inter', -apple-system, sans-serif;
-  /* Match BvSM page; bvsm.css will lay down body invariants too */
 }
 
 .heatmap-standalone {
-  max-width: 1180px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 2rem 5rem;
+  padding: 0 1.5rem 5rem;
 }
 
-/* ─── Hero ─────────────────────────────────────────────────── */
+/* ─── Hero — narrower than the heatmap canvas ───────────────── */
 .heatmap-hero {
   padding: 4.5rem 0 2.6rem;
   text-align: center;
@@ -63,23 +70,167 @@ body {
   font-weight: 600;
 }
 
-/* ─── Heatmap wrapper override ─────────────────────────────── */
-/* On BvSM the heatmap sits inside .bvsm-page > .section > .section-intro,
-   inheriting that section's vertical rhythm. On standalone we strip
-   that scaffold — the heatmap-wrapper sits directly in the page flow
-   and needs its own top/bottom breathing room. */
+/* ─── .bvsm-page wrapper neutralization ─────────────────────── */
+/* On BvSM, .bvsm-page has its own padding/background/max-width.
+   On standalone we want it as a transparent grouping wrapper so
+   our outer .heatmap-standalone controls the page width. */
 .heatmap-standalone .bvsm-page {
   background: transparent;
   padding: 0;
   margin: 0;
-}
-.heatmap-standalone .bvsm-heatmap-wrapper {
-  margin: 0 0 3rem;
+  max-width: none;
 }
 
-/* ─── CTA section ──────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   HEATMAP COMPONENT — full-canvas overrides
+═══════════════════════════════════════════════════════════════ */
+
+.heatmap-component {
+  margin: 0 0 2.4rem;
+}
+
+/* Layout: switch from 2-column grid (heatmap | sidebar) to a
+   simple vertical stack — heatmap first, sidebar as a stat strip
+   below. */
+.heatmap-standalone .bvsm-heatmap-layout {
+  display: block;
+}
+.heatmap-standalone .bvsm-heatmap-main {
+  width: 100%;
+  /* The right-edge gradient affordance (bvsm.css ::after on .bvsm-
+     heatmap-main) is a scroll-cue that's not needed when the grid
+     fits the container without overflow. Hide on desktop; restore
+     on mobile where horizontal scrolling returns. */
+}
+.heatmap-standalone .bvsm-heatmap-main::after {
+  display: none;
+}
+
+/* Grid columns: from a fixed 7px width to minmax(0, 1fr) fill on
+   desktop, so all ~197 monthly columns distribute evenly across
+   the available container width. Yields ~6-7px per column on
+   wide screens with no horizontal scroll. */
+.heatmap-standalone .bvsm-heatmap-grid,
+.heatmap-standalone .bvsm-heatmap-xaxis {
+  grid-template-columns: repeat(var(--hm-cols, 197), minmax(0, 1fr));
+  width: 100%;
+}
+.heatmap-standalone .bvsm-heatmap-scroll-container {
+  overflow-x: hidden;
+  /* Also reset the scrollbar-color since no scrollbar will appear */
+}
+
+/* ─── Sidebar as horizontal stat strip ──────────────────────── */
+/* Sidebar's internal markup (built by bvsm.js renderSidebar):
+     <div class="bvsm-heatmap-sidebar-title">…</div>
+     <ul class="bvsm-heatmap-sidebar-list">
+       <li>…</li> × 3
+     </ul>
+     <div class="bvsm-heatmap-sidebar-foot">…</div>
+   We restyle the container as a horizontal stat-card strip with
+   the title as a small left rail, the 3 bullets as a 3-column
+   grid, and the foot as a small caption underneath. */
+.heatmap-standalone .bvsm-heatmap-sidebar {
+  position: static;        /* override the sticky positioning from bvsm.css */
+  width: 100%;
+  max-width: none;
+  margin: 1.6rem 0 0;
+  padding: 1.4rem 1.6rem 1.2rem;
+  background: rgba(247, 147, 26, 0.04);
+  border: 1px solid rgba(247, 147, 26, 0.18);
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "title  list"
+    "foot   foot";
+  column-gap: 1.5rem;
+  row-gap: 0.8rem;
+  align-items: start;
+}
+.heatmap-standalone .bvsm-heatmap-sidebar-title {
+  grid-area: title;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #e09422;
+  white-space: nowrap;
+  padding-top: 0.45rem;
+  border: none;
+  margin: 0;
+}
+.heatmap-standalone .bvsm-heatmap-sidebar-list {
+  grid-area: list;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.heatmap-standalone .bvsm-heatmap-sidebar-list li {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.78);
+  /* Remove the bullet marker entirely — visual separation comes
+     from the grid columns. */
+  list-style: none;
+}
+.heatmap-standalone .bvsm-heatmap-sidebar-list li::before {
+  content: none;  /* if bvsm.css adds a ::before bullet, hide it */
+}
+.heatmap-standalone .bvsm-heatmap-sidebar-list li strong {
+  color: #f2eee8;
+  font-weight: 600;
+}
+.heatmap-standalone .bvsm-heatmap-sidebar-num {
+  color: #e09422;
+  font-weight: 600;
+}
+.heatmap-standalone .bvsm-heatmap-sidebar-foot {
+  grid-area: foot;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.36);
+  padding-top: 0.7rem;
+  margin-top: 0.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: right;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   §2 CALC INLINE — deep-dive section
+═══════════════════════════════════════════════════════════════ */
+
+.heatmap-deepdive {
+  margin: 4rem 0 0;
+  padding-top: 3rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.heatmap-deepdive-intro {
+  max-width: 880px;
+  margin: 0 auto 2rem;
+  text-align: center;
+}
+.heatmap-deepdive-intro .section-eyebrow {
+  display: inline-block;
+  margin-bottom: 0.8rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CTA — third act
+═══════════════════════════════════════════════════════════════ */
+
 .heatmap-cta {
-  margin: 3.5rem auto 0;
+  margin: 4.5rem auto 0;
   max-width: 880px;
   padding: 0 0.5rem;
 }
@@ -134,7 +285,10 @@ body {
   transform: translateY(-1px);
 }
 
-/* ─── Mobile ───────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE — restore horizontal scroll, stack sidebar bullets
+═══════════════════════════════════════════════════════════════ */
+
 @media (max-width: 768px) {
   .heatmap-standalone {
     padding: 0 1rem 3rem;
@@ -142,8 +296,45 @@ body {
   .heatmap-hero {
     padding: 2.6rem 0 1.8rem;
   }
+
+  /* Restore fixed-pixel column width and horizontal scrolling.
+     ~197 cells × 5px = ~985px wide; viewport ~390-768px; scroll
+     is the only way to show the full tapestry on phones. */
+  .heatmap-standalone .bvsm-heatmap-grid,
+  .heatmap-standalone .bvsm-heatmap-xaxis {
+    grid-template-columns: repeat(var(--hm-cols, 197), 5px);
+  }
+  .heatmap-standalone .bvsm-heatmap-scroll-container {
+    overflow-x: auto;
+  }
+  /* Right-edge gradient scroll-cue is useful again on mobile */
+  .heatmap-standalone .bvsm-heatmap-main::after {
+    display: block;
+  }
+
+  /* Stat strip stacks vertically on narrow screens */
+  .heatmap-standalone .bvsm-heatmap-sidebar {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "title"
+      "list"
+      "foot";
+    padding: 1.2rem 1.2rem 1rem;
+  }
+  .heatmap-standalone .bvsm-heatmap-sidebar-list {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .heatmap-standalone .bvsm-heatmap-sidebar-foot {
+    text-align: left;
+  }
+
+  .heatmap-deepdive {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+  }
   .heatmap-cta {
-    margin-top: 2.4rem;
+    margin-top: 3rem;
   }
   .heatmap-cta-inner {
     padding: 1.8rem 1.4rem 2rem;

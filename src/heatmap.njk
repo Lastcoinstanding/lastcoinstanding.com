@@ -10,26 +10,42 @@ eleventyComputed:
   page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/bitcoin-vs-the-stock-market.js' %}"
 ---
 {# ═══════════════════════════════════════════════════════════════════
-   /heatmap — standalone carve-out of the BvSM §2b heatmap.
+   /heatmap — standalone full-tapestry interactive (v2)
 
-   The strategic thesis: the heatmap is the empirical bottom line of the
-   BvSM article. As a standalone page it serves a different job from the
-   article — it's the hook, the shareable artifact, the thing a curious
-   visitor lands on and engages with before they're committed to reading
-   3,000 words of prose. The page should let the viz do the work, then
-   funnel engaged visitors back into the full argument.
+   Iteration on v1 (initial carve-out). JM feedback after the first ship:
+   the page had a horizontal scrollbar on the heatmap (only a slice of
+   the tapestry was visible at a time), and clicking a cell navigated
+   *away* to /bitcoin-vs-the-stock-market — taking the user out of the
+   page they'd just landed on.
 
-   Architecture: this page reuses the BvSM heatmap component verbatim
-   (same markup, same CSS, same JS). The only new ingredients are the
-   hero framing, the CTA section, and a small JS extension to
-   jumpToCalc() that detects standalone context and navigates to the
-   BvSM page with the clicked-cell's parameters as a URL query string.
-   The BvSM page's init reads those params and applies them to its §2
-   calculator on load — closing the loop.
+   v2 fixes both. Three structural changes:
 
-   Editorial framing: deliberately minimal. Hero gets the reader oriented
-   in 3 sentences. The viz is the page. The CTA at the bottom is the
-   primary outbound link.
+   1) Full-canvas heatmap. The sidebar (THE PATTERN stat block) moves
+      from a 280px right-rail to a horizontal stat strip BELOW the
+      heatmap. The grid columns switch from a fixed 7px width to
+      minmax(0, 1fr) fill on desktop, so all ~197 monthly columns
+      fit edge-to-edge with no scrollbar. Mobile keeps the fixed-width
+      column + horizontal scroll (no other way to show 197 cells on
+      a phone). The wrapper max-width also expanded from 1180px to
+      1400px to give the heatmap a more expansive canvas.
+
+   2) §2 calc inline. The full BvSM §2 calculator markup is rendered
+      directly below the heatmap. Same DOM IDs, same JS bindings;
+      bvsm.js's existing init() picks it up identically to BvSM page.
+      jumpToCalc() now finds its slider locally (no longer needs the
+      cross-page navigation branch — though that branch stays in
+      bvsm.js as a defensive fallback). Clicking a heatmap cell now
+      scrolls down to the calc with the scenario pre-loaded, and the
+      chart renders the wealth path for that window. No navigation
+      away from /heatmap.
+
+   3) CTA moves down. Now appears at the bottom, after the user has
+      had a chance to engage with both the macro view (heatmap) and
+      the micro view (single-scenario chart). It's the third act of
+      the page: "see the full editorial argument that contextualizes
+      what you've just explored."
+
+   Result: a single immersive page. Macro → micro → narrative.
 ═══════════════════════════════════════════════════════════════════ #}
 
 <main class="heatmap-standalone">
@@ -40,79 +56,158 @@ eleventyComputed:
             Every monthly entry since 2010, every common holding horizon &mdash; bitcoin's outperformance against the S&amp;P 500 and the NASDAQ-100 across roughly 1,500 possible windows, in one grid.
         </p>
         <p class="heatmap-howto">
-            Amber means bitcoin won; red means it lost; intensity shows by how much. <strong>Click any cell to load that exact entry into the full calculator.</strong>
+            Amber means bitcoin won; red means it lost; intensity shows by how much. <strong>Click any cell to load that exact entry into the calculator below.</strong>
         </p>
     </section>
 
-    {# ═══ HEATMAP — markup mirrors bvsm.njk §2b verbatim ═══════════
-       Wrapped in .bvsm-page to satisfy a handful of descendant
-       selectors in bvsm.css that scope to that ancestor. The IDs
-       match BvSM exactly; bvsm.js's initHeatmap() guards on
-       #bvsmHeatmapGrid presence and will pick this up identically.
-       The §1/§2/§3 modules in bvsm.js no-op cleanly here because
-       their target IDs don't exist on this page.
-
-       One editorial deviation from BvSM: the legend note. On the
-       article page it says "load that start date in the calculator
-       above" because the §2 calc is literally above the heatmap.
-       Here there IS no calc above — the click navigates to the
-       full BvSM page — so the note reflects that destination.
-       ═════════════════════════════════════════════════════════════ #}
     <div class="bvsm-page">
-        <div class="bvsm-heatmap-wrapper">
-            <div class="bvsm-heatmap-controls">
-                <div class="bvsm-heatmap-control-group">
-                    <span class="bvsm-heatmap-control-label">Bitcoin compared to:</span>
-                    <button class="bvsm-heatmap-cmp-btn is-active" data-hm-cmp="sp500" type="button">S&amp;P 500 TR</button>
-                    <button class="bvsm-heatmap-cmp-btn"           data-hm-cmp="ndq"   type="button">NASDAQ-100 TR</button>
-                </div>
-                <div class="bvsm-heatmap-control-group">
-                    <span class="bvsm-heatmap-control-label">Bitcoin mode:</span>
-                    <button class="bvsm-heatmap-mode-btn is-active" data-hm-mode="lump" type="button">Lump-sum</button>
-                    <button class="bvsm-heatmap-mode-btn"           data-hm-mode="dca"  type="button">Weekly DCA</button>
-                </div>
-            </div>
 
-            <div class="bvsm-heatmap-layout">
-                <div class="bvsm-heatmap-main">
-                    <div class="bvsm-heatmap-scroll-container" id="bvsmHeatmapScroll">
-                        <div class="bvsm-heatmap-yaxis" id="bvsmHeatmapYaxis"></div>
-                        <div class="bvsm-heatmap-gridwrap">
-                            <div class="bvsm-heatmap-grid" id="bvsmHeatmapGrid"></div>
-                            <div class="bvsm-heatmap-xaxis" id="bvsmHeatmapXaxis"></div>
-                        </div>
+        {# ═══ HEATMAP COMPONENT — full canvas, sidebar reflows below ═#}
+        <section class="heatmap-component">
+            <div class="bvsm-heatmap-wrapper">
+                <div class="bvsm-heatmap-controls">
+                    <div class="bvsm-heatmap-control-group">
+                        <span class="bvsm-heatmap-control-label">Bitcoin compared to:</span>
+                        <button class="bvsm-heatmap-cmp-btn is-active" data-hm-cmp="sp500" type="button">S&amp;P 500 TR</button>
+                        <button class="bvsm-heatmap-cmp-btn"           data-hm-cmp="ndq"   type="button">NASDAQ-100 TR</button>
                     </div>
-                    <div class="bvsm-heatmap-legend">
-                        <div class="bvsm-heatmap-legend-scale">
-                            <span class="bvsm-heatmap-legend-cell" data-tier="loss-deep">&lt;&#x2212;50%</span>
-                            <span class="bvsm-heatmap-legend-cell" data-tier="loss">&#x2212;50% &mdash; &#x2212;10%</span>
-                            <span class="bvsm-heatmap-legend-cell" data-tier="flat">&#x00B1;10%</span>
-                            <span class="bvsm-heatmap-legend-cell" data-tier="win-mild">+10% &mdash; 2&times;</span>
-                            <span class="bvsm-heatmap-legend-cell" data-tier="win-mid">2&times; &mdash; 5&times;</span>
-                            <span class="bvsm-heatmap-legend-cell" data-tier="win-deep">&gt;5&times;</span>
-                        </div>
-                        <div class="bvsm-heatmap-legend-note">Color = bitcoin&rsquo;s outperformance multiple over the comparator. Click any cell to explore that start date in the full calculator.</div>
+                    <div class="bvsm-heatmap-control-group">
+                        <span class="bvsm-heatmap-control-label">Bitcoin mode:</span>
+                        <button class="bvsm-heatmap-mode-btn is-active" data-hm-mode="lump" type="button">Lump-sum</button>
+                        <button class="bvsm-heatmap-mode-btn"           data-hm-mode="dca"  type="button">Weekly DCA</button>
                     </div>
                 </div>
 
-                <aside class="bvsm-heatmap-sidebar" id="bvsmHeatmapSidebar" aria-label="Pattern summary"></aside>
+                <div class="bvsm-heatmap-layout">
+                    <div class="bvsm-heatmap-main">
+                        <div class="bvsm-heatmap-scroll-container" id="bvsmHeatmapScroll">
+                            <div class="bvsm-heatmap-yaxis" id="bvsmHeatmapYaxis"></div>
+                            <div class="bvsm-heatmap-gridwrap">
+                                <div class="bvsm-heatmap-grid" id="bvsmHeatmapGrid"></div>
+                                <div class="bvsm-heatmap-xaxis" id="bvsmHeatmapXaxis"></div>
+                            </div>
+                        </div>
+                        <div class="bvsm-heatmap-legend">
+                            <div class="bvsm-heatmap-legend-scale">
+                                <span class="bvsm-heatmap-legend-cell" data-tier="loss-deep">&lt;&#x2212;50%</span>
+                                <span class="bvsm-heatmap-legend-cell" data-tier="loss">&#x2212;50% &mdash; &#x2212;10%</span>
+                                <span class="bvsm-heatmap-legend-cell" data-tier="flat">&#x00B1;10%</span>
+                                <span class="bvsm-heatmap-legend-cell" data-tier="win-mild">+10% &mdash; 2&times;</span>
+                                <span class="bvsm-heatmap-legend-cell" data-tier="win-mid">2&times; &mdash; 5&times;</span>
+                                <span class="bvsm-heatmap-legend-cell" data-tier="win-deep">&gt;5&times;</span>
+                            </div>
+                            <div class="bvsm-heatmap-legend-note">Color = bitcoin&rsquo;s outperformance multiple over the comparator. Click any cell to load that scenario into the calculator below.</div>
+                        </div>
+                    </div>
+
+                    {# Sidebar element kept exactly as on BvSM — bvsm.js's
+                       renderSidebar() populates this with the title + 3
+                       pattern bullets + footer. heatmap.css restyles the
+                       container as a horizontal stat strip below the
+                       heatmap rather than the original right-rail. #}
+                    <aside class="bvsm-heatmap-sidebar" id="bvsmHeatmapSidebar" aria-label="Pattern summary"></aside>
+                </div>
+
+                <div class="bvsm-heatmap-tooltip" id="bvsmHeatmapTooltip" role="tooltip" aria-hidden="true"></div>
+            </div>
+        </section>
+
+        {# ═══ DEEP-DIVE: §2 calculator inline ═════════════════════════
+           Verbatim copy of bvsm.njk §2 lines 106-188 — same IDs, same
+           structure, so bvsm.js's init() wires it up identically.
+           Surrounding BvSM prose (cyclical-tops context, lump-vs-DCA
+           Vanguard note, 2025-ATH caveat) is intentionally omitted; on
+           this page the calc is a tool driven by the heatmap above,
+           not a step in the BvSM argument flow.
+           ═════════════════════════════════════════════════════════════ #}
+        <section class="heatmap-deepdive">
+            <div class="section-intro heatmap-deepdive-intro">
+                <div class="section-eyebrow section-eyebrow-past">Explore a scenario</div>
+                <h2>The wealth path, one entry at a time</h2>
+                <p><em>Every cell above is one scenario. Click any cell to load it &mdash; or use the controls directly to dial in any start date, mode, or amount.</em></p>
             </div>
 
-            <div class="bvsm-heatmap-tooltip" id="bvsmHeatmapTooltip" role="tooltip" aria-hidden="true"></div>
-        </div>
-    </div>
+            <div class="bvsm-calc" id="bvsmCalc">
+                <h3 id="bvsmCalcHeading">Lump sum at the cyclical top</h3>
 
-    {# ═══ CTA — the page's primary outbound link ═══════════════════
-       This is the hook-to-article conversion point. Visitors who
-       engaged with the heatmap (clicked a cell, scrolled the
-       horizons, toggled comparator) are warm leads for the full
-       argument. Make this prominent and the link unambiguous.
+                <div class="bvsm-mode-toggle" role="tablist" aria-label="Calculator mode">
+                    <button class="bvsm-mode is-active" data-mode="lump" role="tab" aria-selected="true">Lump sum</button>
+                    <button class="bvsm-mode" data-mode="dca" role="tab" aria-selected="false">Weekly DCA</button>
+                </div>
+
+                <div class="slider-cluster">
+                    <div class="bvsm-start-input-group">
+                        <div class="bvsm-presets">
+                            <span class="bvsm-presets-label" id="bvsmPresetsLabel">Bought at:</span>
+                            <button class="bvsm-preset is-active" data-preset-date="2013-11-30" data-preset-label="2013 top">2013 top <span class="bvsm-preset-multiple">(12.1&times;)</span></button>
+                            <button class="bvsm-preset" data-preset-date="2017-12-17" data-preset-label="2017 top">2017 top <span class="bvsm-preset-multiple">(6.4&times;)</span></button>
+                            <button class="bvsm-preset" data-preset-date="2021-11-10" data-preset-label="2021 top">2021 top <span class="bvsm-preset-multiple">(2.8&times;)</span></button>
+                            <button class="bvsm-preset" data-preset-date="2025-10-06" data-preset-label="2025 ATH">2025 ATH <span class="bvsm-preset-multiple">(1.12&times;)</span></button>
+                        </div>
+                        <div class="slider-control">
+                            <div class="slider-row">
+                                <span class="slider-name">Start date<span class="help-tip" tabindex="0">?<span class="tip-content">The date the position begins. Use the preset buttons above to jump to a cyclical top, or drag the slider for any date from 2010 onwards. In lump-sum mode this is the day the single investment is made; in weekly DCA mode it&rsquo;s the day the weekly buys start.</span></span></span>
+                                <span class="slider-val" id="bvsmStartDateVal">Nov 30, 2013</span>
+                            </div>
+                            <input type="range" id="bvsmStartDate" min="0" max="195" step="1" value="46">
+                        </div>
+                    </div>
+                    <div class="slider-control">
+                        <div class="slider-row">
+                            <span class="slider-name" id="bvsmAmountLabel">Lump-sum amount<span class="help-tip" tabindex="0">?<span class="tip-content" id="bvsmAmountTip">The hypothetical dollar amount invested as a single lump sum on the start date. The calculation tracks what that amount would have become in each asset class through today.</span></span></span>
+                            <span class="slider-val" id="bvsmAmountVal">$10,000</span>
+                        </div>
+                        <input type="range" id="bvsmAmount" min="1000" max="100000" step="1000" value="10000">
+                    </div>
+                </div>
+
+                <div class="bvsm-chart-wrap">
+                    <div class="bvsm-chart-label" id="bvsmChartLabel">Wealth-over-time &mdash; lump sum invested at the chosen start date</div>
+                    <div class="bvsm-chart-canvas">
+                        <canvas id="bvsmCalcChart" role="img" aria-label="Chart comparing investment value over time for bitcoin, the S&P 500 total return index, and the NASDAQ-100 total return index, in the chosen mode (lump sum or weekly DCA)."></canvas>
+                    </div>
+                    <p class="bvsm-chart-caption" id="bvsmChartCaption">Log-scale Y-axis. All three series start at the same dollar amount on the start date and track their respective asset&rsquo;s value through today.</p>
+                </div>
+
+                <div class="bvsm-results-grid bvsm-results-grid-3">
+                    <div class="calc-result-card bvsm-result bvsm-result-btc">
+                        <h4>Bitcoin</h4>
+                        <div class="result-sublabel" id="bvsmBtcSublabel">Value today</div>
+                        <div class="result-value" id="bvsmBtcValue">&mdash;</div>
+                        <div class="bvsm-result-rows" id="bvsmBtcRows"></div>
+                    </div>
+                    <div class="calc-result-card bvsm-result bvsm-result-sp">
+                        <h4>S&amp;P 500</h4>
+                        <div class="result-sublabel" id="bvsmSpSublabel">Value today (total return)</div>
+                        <div class="result-value" id="bvsmSpValue">&mdash;</div>
+                        <div class="bvsm-result-rows" id="bvsmSpRows"></div>
+                    </div>
+                    <div class="calc-result-card bvsm-result bvsm-result-ndq">
+                        <h4>NASDAQ-100</h4>
+                        <div class="result-sublabel" id="bvsmNdqSublabel">Value today (total return)</div>
+                        <div class="result-value" id="bvsmNdqValue">&mdash;</div>
+                        <div class="bvsm-result-rows" id="bvsmNdqRows"></div>
+                    </div>
+                </div>
+
+                <div class="bvsm-verdict" id="bvsmVerdict"></div>
+            </div>
+        </section>
+
+    </div>{# /.bvsm-page #}
+
+    {# ═══ CTA: third act, the editorial argument ═══════════════════
+       Now positioned after the user has engaged with both the macro
+       view (heatmap tapestry) and the micro view (single-scenario
+       calculator). The pitch shifts: instead of 'see the argument',
+       it's 'now see the full editorial framing that contextualizes
+       what you just explored — including the forward projection.'
        ═════════════════════════════════════════════════════════════ #}
     <section class="heatmap-cta">
         <div class="heatmap-cta-inner">
             <div class="heatmap-cta-label">See the full argument</div>
             <h2 class="heatmap-cta-title">Bitcoin vs. The Stock Market</h2>
-            <p>This grid is the empirical bottom line of a longer analysis. The full page builds the case from the start &mdash; the Power Law framework that anticipated the pattern, individual cyclical-top stress tests against the worst possible entries, and the forward projection across a typical investor's holding horizon.</p>
+            <p>You've explored the historical record. The full page builds the argument around it &mdash; the Power Law framework that anticipates this pattern, individual cyclical-top stress tests, the forward projection across a typical investor's holding horizon, and the takeaway.</p>
             <a href="/bitcoin-vs-the-stock-market.html" class="heatmap-cta-button">Read &laquo;Bitcoin vs. The Stock Market&raquo; &rarr;</a>
         </div>
     </section>
