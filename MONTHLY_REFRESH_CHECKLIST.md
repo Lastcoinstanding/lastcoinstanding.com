@@ -141,7 +141,7 @@ Quick post-refresh checks to confirm everything's coherent:
 
 The 2026-05-17 OG rollout introduced **product-forward OG cards** that
 embed live chart screenshots in their composition (STYLE_GUIDE §6.15.2).
-Five cards in this family will visibly drift from current data after a
+Four cards in this family will visibly drift from current data after a
 monthly refresh and should be regenerated:
 
 | OG card file | Live visual embedded |
@@ -150,18 +150,17 @@ monthly refresh and should be regenerated:
 | `og-bitcoin-vs-the-stock-market.jpg` | the §2 wealth-curve chart |
 | `og-the-bitcoin-retirement.jpg` | the projection chart with current-state annotations |
 | `og-calculators.jpg` | the featured-row mini-renderers (which themselves embed live data) |
-| `og-image.jpg` (homepage) | static `hero-bg.jpg` background — **no data dependency** |
 
-Of these, `og-image.jpg` doesn't actually need regenerating (its bitcoin
-glyph is a static asset, not a chart). The other four embed `weeklyBtc`
-/ `PL_DATA` / projection state, so each monthly refresh advances the
-visible window by one month and changes the embedded values.
+Each card embeds `weeklyBtc` / `PL_DATA` / projection state, so each monthly
+refresh advances the visible window by one month and changes the embedded
+values. The homepage (`og-image.jpg`) was migrated to the brand-forward
+family on 2026-05-17 — its glyph is static atmospheric artwork with no data
+dependency, so it is excluded from this regeneration step.
 
-**Regeneration is one command** (once `build-ogs.py` lives in the repo
-per TECH_DEBT §1 — currently in `/tmp/og-investigation/build-ogs.py`):
+**Regeneration is one command:**
 
 ```bash
-python3 scripts/build-og-images.py        # or wherever the script lives
+npm run build-ogs       # or: python3 scripts/build-og-images.py
 ```
 
 The script visits each page in headless Chromium, clones or screenshots

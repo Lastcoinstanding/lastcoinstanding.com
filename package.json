@@ -6,7 +6,8 @@
   "scripts": {
     "build": "eleventy",
     "serve": "eleventy --serve",
-    "watch": "eleventy --watch"
+    "watch": "eleventy --watch",
+    "build-ogs": "python3 scripts/build-og-images.py"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.1.5"
