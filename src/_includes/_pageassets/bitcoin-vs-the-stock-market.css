@@ -968,9 +968,34 @@ body {
   gap: 1.5rem;
   align-items: flex-start;
 }
+.bvsm-heatmap-wrapper,
+.bvsm-heatmap-layout,
+.bvsm-heatmap-main {
+  /* Belt-and-suspenders: every ancestor of the scroll container is
+     explicitly viewport-constrained. Prevents any single mis-sized
+     descendant from pushing the document wider than viewport, which
+     was a contributor to the page-level horizontal scroll on mobile. */
+  max-width: 100%;
+}
 .bvsm-heatmap-main {
   flex: 1 1 auto;
-  min-width: 0;  /* allow flex child to shrink */
+  min-width: 0;  /* allow flex child to shrink below content size */
+  position: relative;  /* anchor for the right-edge scroll-affordance gradient */
+}
+/* Right-edge gradient signals "more content this way" — needed because
+   mobile browsers hide native scrollbars when idle, leaving no
+   affordance that the heatmap is horizontally scrollable. */
+.bvsm-heatmap-main::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 24px;
+  height: calc(100% - 1.6rem);  /* exclude the x-axis labels below */
+  background: linear-gradient(to right, transparent, rgba(20, 18, 14, 0.85));
+  pointer-events: none;
+  z-index: 3;
+  border-radius: 0 4px 4px 0;
 }
 .bvsm-heatmap-scroll-container {
   display: flex;
@@ -982,6 +1007,33 @@ body {
   overflow-y: hidden;
   position: relative;
   padding: 0.5rem 0 0 0;
+  /* Critical for the mobile bug: contains horizontal scroll-chaining
+     to this element. Without this, when the user touch-drags the
+     heatmap and hits its edge (or starts the drag at all on some
+     browsers), the gesture bubbles up to the page and scrolls the
+     whole document. With overscroll-behavior-x: contain, the scroll
+     stays inside the heatmap. */
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  /* Make the scrollbar visible on desktop. Native scrollbars on macOS
+     and many modern browsers hide by default, leaving no indication
+     that the region scrolls. Explicit styling here matches the site's
+     amber-on-dark register and gives users a clear affordance. */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(224, 148, 34, 0.4) rgba(255, 255, 255, 0.04);
+}
+.bvsm-heatmap-scroll-container::-webkit-scrollbar { height: 10px; }
+.bvsm-heatmap-scroll-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 5px;
+}
+.bvsm-heatmap-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(224, 148, 34, 0.4);
+  border-radius: 5px;
+  transition: background 0.15s ease;
+}
+.bvsm-heatmap-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(224, 148, 34, 0.7);
 }
 .bvsm-heatmap-yaxis {
   display: grid;

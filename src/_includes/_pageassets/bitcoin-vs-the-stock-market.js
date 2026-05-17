@@ -1466,6 +1466,13 @@
     function hideTip() {
       tip.style.opacity = 0;
       tip.setAttribute('aria-hidden', 'true');
+      // Reset absolute position. The tooltip uses position: absolute and
+      // only its opacity is changed on hide — if its last-set left/top
+      // values land outside the viewport, they extend the document's
+      // scroll-width even while invisible, which on mobile contributes
+      // to page-level horizontal scroll. Parking it at 0,0 removes that.
+      tip.style.left = '0';
+      tip.style.top  = '0';
     }
 
     grid.addEventListener('mouseover', function(ev) {
