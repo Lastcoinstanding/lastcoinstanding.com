@@ -1191,12 +1191,12 @@ body {
   height: 12px;
   border-radius: 2px;
 }
-.bvsm-heatmap-legend-cell[data-tier="loss-deep"]::before { background: rgba(196, 70, 60, 0.78); }
-.bvsm-heatmap-legend-cell[data-tier="loss"]::before      { background: rgba(196, 70, 60, 0.38); }
-.bvsm-heatmap-legend-cell[data-tier="flat"]::before      { background: rgba(255, 255, 255, 0.10); border: 1px solid rgba(255,255,255,0.12); }
-.bvsm-heatmap-legend-cell[data-tier="win-mild"]::before  { background: rgba(224, 148, 34, 0.25); }
-.bvsm-heatmap-legend-cell[data-tier="win-mid"]::before   { background: rgba(224, 148, 34, 0.55); }
-.bvsm-heatmap-legend-cell[data-tier="win-deep"]::before  { background: rgba(224, 148, 34, 0.95); }
+.bvsm-heatmap-legend-cell[data-tier="loss-deep"]::before { background: #BE3A30; }
+.bvsm-heatmap-legend-cell[data-tier="loss"]::before      { background: #6B2A23; }
+.bvsm-heatmap-legend-cell[data-tier="flat"]::before      { background: #1F1F1F; border: 1px solid rgba(255,255,255,0.18); }
+.bvsm-heatmap-legend-cell[data-tier="win-mild"]::before  { background: #E5D070; }
+.bvsm-heatmap-legend-cell[data-tier="win-mid"]::before   { background: #F5C240; }
+.bvsm-heatmap-legend-cell[data-tier="win-deep"]::before  { background: #F7931A; }
 .bvsm-heatmap-legend-note {
   font-family: 'Inter', -apple-system, sans-serif;
   font-size: 0.78rem;

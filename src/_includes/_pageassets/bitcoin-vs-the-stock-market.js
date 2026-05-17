@@ -1232,16 +1232,21 @@
     return 'win-deep';                        // > 5×
   }
 
-  // Color for each tier — amber gradient for wins, muted red for losses
+  // Color for each tier — solid amber-yellow gradient for wins, solid
+  // red for losses, near-black for flat. The previous palette varied
+  // alpha over a single amber base (rgba(224,148,34, .25/.55/.95)),
+  // which let the dim amber tier blur into the dim red tier against
+  // the dark page background. Solid colors give every tier a distinct
+  // hue so positive/negative are unmistakable at the 7-px cell scale.
   function hmColor(tier) {
     switch (tier) {
       case 'future':    return 'transparent';
-      case 'loss-deep': return 'rgba(196, 70, 60, 0.78)';
-      case 'loss':      return 'rgba(196, 70, 60, 0.38)';
-      case 'flat':      return 'rgba(255, 255, 255, 0.05)';
-      case 'win-mild':  return 'rgba(224, 148, 34, 0.25)';
-      case 'win-mid':   return 'rgba(224, 148, 34, 0.55)';
-      case 'win-deep':  return 'rgba(224, 148, 34, 0.95)';
+      case 'loss-deep': return '#BE3A30';     // bright red
+      case 'loss':      return '#6B2A23';     // dim red
+      case 'flat':      return '#1F1F1F';     // near-black, no chromatic claim
+      case 'win-mild':  return '#E5D070';     // pale yellow
+      case 'win-mid':   return '#F5C240';     // golden yellow
+      case 'win-deep':  return '#F7931A';     // bitcoin orange
     }
     return 'transparent';
   }
@@ -1433,30 +1438,34 @@
       var cmpKey = document.querySelector('.bvsm-heatmap-cmp-btn.is-active');
       var cmpName = cmpKey && cmpKey.getAttribute('data-hm-cmp') === 'ndq' ? 'NDQ' : 'S&P';
 
-      // Mode-conditional price row.
-      //   - Lump-sum: show the entry price (BTC on the window's start date).
-      //     This is what the buyer actually paid — the row's window header
-      //     and the x-axis both name that same month, so matching them in
-      //     the price field is the least confusing option.
-      //   - Weekly DCA: show the cost basis as 'Avg buy price' (the
-      //     arithmetic mean of weekly BTC prices across the window
-      //     IS the cost basis when contributions are equal $1/week).
-      //     The previous label was 'Avg BTC price' which left readers
-      //     guessing what window it averaged over.
-      var priceLabel, priceVal;
+      // Mode-conditional price row(s).
+      //   - Lump-sum: one row, 'Entry price' = BTC on the window's
+      //     start date. That's what the buyer actually paid.
+      //   - Weekly DCA: TWO rows. 'Entry price' (same as lump-sum
+      //     would have paid that day) AND 'Avg buy price' (the
+      //     cost basis under uniform weekly contributions). Showing
+      //     both surfaces the front-loading trade-off: for long
+      //     rising windows entry << avg buy, which is the visual
+      //     signature of 'lump-sum would have beaten DCA across
+      //     this same window.' For falling/sideways windows the
+      //     two are close, or entry > avg buy, which means DCA
+      //     reduced the cost basis below where a lump-sum entry
+      //     buyer would have started.
+      var priceRows;
       if (cellMode === 'dca') {
-        priceLabel = 'Avg buy price';
-        priceVal   = avgBtc;
+        priceRows =
+          '<div class="bvsm-heatmap-tooltip-row bvsm-heatmap-tooltip-avgprice"><span>Entry price</span><strong>' + fmtBtcPrice(entryBtc) + '</strong></div>' +
+          '<div class="bvsm-heatmap-tooltip-row bvsm-heatmap-tooltip-avgprice"><span>Avg buy price</span><strong>' + fmtBtcPrice(avgBtc) + '</strong></div>';
       } else {
-        priceLabel = 'Entry price';
-        priceVal   = entryBtc;
+        priceRows =
+          '<div class="bvsm-heatmap-tooltip-row bvsm-heatmap-tooltip-avgprice"><span>Entry price</span><strong>' + fmtBtcPrice(entryBtc) + '</strong></div>';
       }
 
       // Tooltip rows:
       //   1. Window header (start → end · horizon)
       //   2. Bitcoin return
       //   3. Comparator return
-      //   4. Entry price / Avg buy price (mode-conditional, see above)
+      //   4. Entry price (always) + Avg buy price (DCA only)
       //   5. Outperformance multiple (highlighted)
       //   6. Click-to-load CTA
       tip.innerHTML =
@@ -1464,7 +1473,7 @@
         ' &rarr; ' + fmtDateShort(endD) + ' &middot; ' + hLabel + '</div>' +
         '<div class="bvsm-heatmap-tooltip-row"><span>Bitcoin</span><strong>' + fmtRet(btcRet) + '</strong></div>' +
         '<div class="bvsm-heatmap-tooltip-row"><span>' + cmpName + '</span><strong>' + fmtRet(cmpRet) + '</strong></div>' +
-        '<div class="bvsm-heatmap-tooltip-row bvsm-heatmap-tooltip-avgprice"><span>' + priceLabel + '</span><strong>' + fmtBtcPrice(priceVal) + '</strong></div>' +
+        priceRows +
         '<div class="bvsm-heatmap-tooltip-row bvsm-heatmap-tooltip-outperf"><span>BTC outperformance</span><strong>' + fmtMult(outperf) + '</strong></div>' +
         '<div class="bvsm-heatmap-tooltip-cta">click to load in calculator</div>';
 
