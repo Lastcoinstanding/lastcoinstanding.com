@@ -235,7 +235,7 @@
   function tierColor(tier) {
     return {
       'loss-deep': '#BE3A30', 'loss': '#6B2A23', 'flat': '#1F1F1F',
-      'win-mild':  '#E5D070', 'win-mid': '#F5C240', 'win-deep': '#F7931A',
+      'win-mild':  '#E0BC50', 'win-mid': '#F5C240', 'win-deep': '#F7931A',
       'future':    '#1a1a1a'
     }[tier];
   }

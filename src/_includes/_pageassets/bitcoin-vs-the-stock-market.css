@@ -1194,7 +1194,7 @@ body {
 .bvsm-heatmap-legend-cell[data-tier="loss-deep"]::before { background: #BE3A30; }
 .bvsm-heatmap-legend-cell[data-tier="loss"]::before      { background: #6B2A23; }
 .bvsm-heatmap-legend-cell[data-tier="flat"]::before      { background: #1F1F1F; border: 1px solid rgba(255,255,255,0.18); }
-.bvsm-heatmap-legend-cell[data-tier="win-mild"]::before  { background: #E5D070; }
+.bvsm-heatmap-legend-cell[data-tier="win-mild"]::before  { background: #E0BC50; }
 .bvsm-heatmap-legend-cell[data-tier="win-mid"]::before   { background: #F5C240; }
 .bvsm-heatmap-legend-cell[data-tier="win-deep"]::before  { background: #F7931A; }
 .bvsm-heatmap-legend-note {
@@ -1212,6 +1212,13 @@ body {
   padding: 1rem 1.1rem;
   align-self: stretch;
 }
+.bvsm-heatmap-sidebar-label {
+  /* Wraps the title + the mode/comparator label so they group as the
+     pattern panel's combined header. Default block stacking on BvSM
+     (title above foot); on /heatmap the parent grid puts the whole
+     label-block in the left column with the bullet list on the right. */
+  margin-bottom: 0.7rem;
+}
 .bvsm-heatmap-sidebar-title {
   font-family: 'Inter', -apple-system, sans-serif;
   font-size: 0.72rem;
@@ -1219,7 +1226,7 @@ body {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--amber);
-  margin-bottom: 0.7rem;
+  margin: 0;
 }
 .bvsm-heatmap-sidebar-list {
   list-style: none;
@@ -1240,11 +1247,9 @@ body {
   font-weight: 600;
 }
 .bvsm-heatmap-sidebar-foot {
-  margin-top: 0.8rem;
-  padding-top: 0.6rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  margin-top: 0.25rem;
   font-family: 'Inter', -apple-system, sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   letter-spacing: 0.04em;
   color: var(--text-dim);
   text-transform: uppercase;

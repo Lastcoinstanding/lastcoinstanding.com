@@ -1244,8 +1244,8 @@
       case 'loss-deep': return '#BE3A30';     // bright red
       case 'loss':      return '#6B2A23';     // dim red
       case 'flat':      return '#1F1F1F';     // near-black, no chromatic claim
-      case 'win-mild':  return '#E5D070';     // pale yellow
-      case 'win-mid':   return '#F5C240';     // golden yellow
+      case 'win-mild':  return '#E0BC50';     // golden yellow (bumped from #E5D070 — was reading as washed-out)
+      case 'win-mid':   return '#F5C240';     // golden amber-yellow
       case 'win-deep':  return '#F7931A';     // bitcoin orange
     }
     return 'transparent';
@@ -1408,11 +1408,13 @@
     }
 
     el.innerHTML =
-      '<div class="bvsm-heatmap-sidebar-title">The pattern</div>' +
+      '<div class="bvsm-heatmap-sidebar-label">' +
+        '<div class="bvsm-heatmap-sidebar-title">The pattern</div>' +
+        '<div class="bvsm-heatmap-sidebar-foot">' + modeLabel + ' &middot; vs ' + cmpName + '</div>' +
+      '</div>' +
       '<ul class="bvsm-heatmap-sidebar-list">' +
       bullets.map(function(b) { return '<li>' + b + '</li>'; }).join('') +
-      '</ul>' +
-      '<div class="bvsm-heatmap-sidebar-foot">' + modeLabel + ' &middot; vs ' + cmpName + '</div>';
+      '</ul>';
   }
 
   // Tooltip handling — single floating element repositioned on cell hover/tap

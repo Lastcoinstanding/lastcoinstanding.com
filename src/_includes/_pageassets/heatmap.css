@@ -137,7 +137,10 @@ body {
 
 /* The sidebar element now sits directly inside .bvsm-page, BEFORE
    the heatmap-component. Restyle as a compact horizontal stat
-   strip rather than the right-rail vertical block. */
+   strip rather than the right-rail vertical block.
+   v2 (2026-05-17): switched from "title | list | foot" 3-column to
+   "label | list" 2-column. The label-block holds title above the
+   mode/comparator metadata so they group as the panel's header. */
 .heatmap-standalone .bvsm-heatmap-sidebar {
   position: static;
   width: 100%;
@@ -148,13 +151,19 @@ body {
   border: 1px solid rgba(247, 147, 26, 0.18);
   border-radius: 8px;
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  grid-template-areas: "title list foot";
-  column-gap: 1.5rem;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "label list";
+  column-gap: 1.8rem;
   align-items: center;
 }
+.heatmap-standalone .bvsm-heatmap-sidebar-label {
+  grid-area: label;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+}
 .heatmap-standalone .bvsm-heatmap-sidebar-title {
-  grid-area: title;
   font-family: 'Inter', -apple-system, sans-serif;
   font-size: 0.65rem;
   font-weight: 600;
@@ -196,7 +205,6 @@ body {
   font-weight: 600;
 }
 .heatmap-standalone .bvsm-heatmap-sidebar-foot {
-  grid-area: foot;
   font-family: 'Inter', -apple-system, sans-serif;
   font-size: 0.62rem;
   font-weight: 500;
@@ -367,9 +375,8 @@ body {
   .heatmap-standalone .bvsm-heatmap-sidebar {
     grid-template-columns: 1fr;
     grid-template-areas:
-      "title"
-      "list"
-      "foot";
+      "label"
+      "list";
     row-gap: 0.7rem;
     padding: 1rem 1.2rem 0.9rem;
   }
