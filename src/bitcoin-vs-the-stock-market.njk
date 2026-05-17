@@ -198,6 +198,63 @@ eleventyComputed:
         <!-- SECTION 3: How long does the bitcoin advantage last?            -->
         <!-- The forward projection: Power Law vs comparator trends.         -->
         <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- §2b LOOKING BACK · ALL ENTRIES — the heatmap                    -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="section">
+            <div class="section-intro">
+                <div class="section-eyebrow section-eyebrow-past">Looking back &middot; all entries</div>
+                <h2>Across every entry, every horizon</h2>
+                <p><em>The aggregate stress test &mdash; every monthly entry, every common horizon, in one grid.</em></p>
+            </div>
+
+            <p class="prose">The calculator above runs one scenario at a time. The grid below runs every scenario at once: every monthly start date from January 2010 through today, against every common holding horizon. Each cell is one window &mdash; one entry, one horizon &mdash; and the color shows whether bitcoin outperformed the chosen comparator over that window, and by how much.</p>
+
+            <p class="prose">Two patterns surface immediately. At <strong>short horizons</strong> (six months, one year) there are real losses to find &mdash; visible red pockets that line up with cyclical-top entries. At <strong>long horizons</strong> (seven years and up) every cell is amber: there is no historical window over which a 7+ year holder failed to outperform the index. The page's argument across the prose chapters above is the same argument the heatmap makes visually &mdash; <em>the horizons that matter still produced wealth, even from the worst entries</em>.</p>
+
+            <div class="bvsm-heatmap-wrapper">
+                <div class="bvsm-heatmap-controls">
+                    <div class="bvsm-heatmap-control-group">
+                        <span class="bvsm-heatmap-control-label">Compare against:</span>
+                        <button class="bvsm-heatmap-cmp-btn is-active" data-hm-cmp="sp500" type="button">S&amp;P 500 TR</button>
+                        <button class="bvsm-heatmap-cmp-btn"           data-hm-cmp="ndq"   type="button">NASDAQ-100 TR</button>
+                    </div>
+                    <div class="bvsm-heatmap-control-group">
+                        <span class="bvsm-heatmap-control-label">Mode:</span>
+                        <button class="bvsm-heatmap-mode-btn is-active" data-hm-mode="lump" type="button">Lump-sum</button>
+                        <button class="bvsm-heatmap-mode-btn"           data-hm-mode="dca"  type="button">Weekly DCA</button>
+                    </div>
+                </div>
+
+                <div class="bvsm-heatmap-layout">
+                    <div class="bvsm-heatmap-main">
+                        <div class="bvsm-heatmap-scroll-container" id="bvsmHeatmapScroll">
+                            <div class="bvsm-heatmap-yaxis" id="bvsmHeatmapYaxis"></div>
+                            <div class="bvsm-heatmap-gridwrap">
+                                <div class="bvsm-heatmap-grid" id="bvsmHeatmapGrid"></div>
+                                <div class="bvsm-heatmap-xaxis" id="bvsmHeatmapXaxis"></div>
+                            </div>
+                        </div>
+                        <div class="bvsm-heatmap-legend">
+                            <div class="bvsm-heatmap-legend-scale">
+                                <span class="bvsm-heatmap-legend-cell" data-tier="loss-deep">&lt;&#x2212;50%</span>
+                                <span class="bvsm-heatmap-legend-cell" data-tier="loss">&#x2212;50% &mdash; &#x2212;10%</span>
+                                <span class="bvsm-heatmap-legend-cell" data-tier="flat">&#x00B1;10%</span>
+                                <span class="bvsm-heatmap-legend-cell" data-tier="win-mild">+10% &mdash; 2&times;</span>
+                                <span class="bvsm-heatmap-legend-cell" data-tier="win-mid">2&times; &mdash; 5&times;</span>
+                                <span class="bvsm-heatmap-legend-cell" data-tier="win-deep">&gt;5&times;</span>
+                            </div>
+                            <div class="bvsm-heatmap-legend-note">Color = bitcoin&rsquo;s outperformance multiple over the comparator. Click any cell to load that start date in the calculator above.</div>
+                        </div>
+                    </div>
+
+                    <aside class="bvsm-heatmap-sidebar" id="bvsmHeatmapSidebar" aria-label="Pattern summary"></aside>
+                </div>
+
+                <div class="bvsm-heatmap-tooltip" id="bvsmHeatmapTooltip" role="tooltip" aria-hidden="true"></div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
         <div class="section">
             <div class="section-intro">
                 <div class="section-eyebrow section-eyebrow-future">Looking forward</div>

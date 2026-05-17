@@ -1006,10 +1006,464 @@
     recomputeProjection();
   }
 
+  /* ═══════════════════════════════════════════════════════════════
+     §2b HEATMAP — outperformance grid across all entries × horizons.
+
+     Reuses SP500_TR_DATA, NDQ_TR_DATA, PL_DATA, valueOnDate, btcAt-style
+     log-linear interp from outer-scope. Each cell is one (start_date,
+     horizon) window; color encodes the multiple (1+BTC_return) /
+     (1+cmp_return) − 1. Toggles drive comparator (SP/NDQ) and mode
+     (lump-sum/DCA). Click a cell → jump to the §2 calc populated with
+     that start date and mode.
+
+     Mobile: grid horizontally scrolls inside .bvsm-heatmap-scroll-
+     container; Y-axis labels stay sticky-left so horizon labels remain
+     visible at any scroll position.
+     ═══════════════════════════════════════════════════════════════ */
+
+  var HM_HORIZONS = [6, 12, 24, 36, 48, 60, 84, 120];  // months
+  var HM_HORIZON_LABELS = ['6mo', '1y', '2y', '3y', '4y', '5y', '7y', '10y'];
+
+  // Genesis-relative day count for a JS Date object
+  function daysFromGenesis(d) {
+    return Math.floor((d.getTime() / 1000 - 1230940800) / 86400);
+  }
+
+  // BTC price at given genesis-day via log-linear interp on PL_DATA
+  function btcPriceAt(days) {
+    if (typeof PL_DATA === 'undefined') return null;
+    if (days <= PL_DATA[0][0]) return PL_DATA[0][1];
+    if (days >= PL_DATA[PL_DATA.length - 1][0]) return PL_DATA[PL_DATA.length - 1][1];
+    for (var i = 0; i < PL_DATA.length - 1; i++) {
+      if (PL_DATA[i][0] <= days && days <= PL_DATA[i+1][0]) {
+        var t = (days - PL_DATA[i][0]) / (PL_DATA[i+1][0] - PL_DATA[i][0]);
+        return PL_DATA[i][1] * Math.pow(PL_DATA[i+1][1] / PL_DATA[i][1], t);
+      }
+    }
+    return null;
+  }
+
+  // Build the list of monthly start dates (Jan 2010 → today, mid-month)
+  function buildStartDates() {
+    var out = [];
+    var todayStr = SP500_TR_DATA[SP500_TR_DATA.length - 1][0];
+    var today = new Date(todayStr);
+    var year = 2010, month = 1;
+    while (true) {
+      var d = new Date(year, month - 1, 15);
+      if (d >= today) break;
+      out.push(d);
+      month += 1;
+      if (month > 12) { month = 1; year += 1; }
+    }
+    return out;
+  }
+
+  // Add N months to a Date (preserves day-of-month at 15)
+  function addMonths(d, n) {
+    var year = d.getFullYear();
+    var month = d.getMonth() + n;
+    while (month >= 12) { year += 1; month -= 12; }
+    return new Date(year, month, 15);
+  }
+
+  // Compute the outperformance multiple for one (start, horizon, cmp, mode) cell.
+  // Returns null if the window extends past today (future).
+  function hmCellValue(startDate, horizonMonths, cmpSeries, mode) {
+    var endDate = addMonths(startDate, horizonMonths);
+    var todayStr = SP500_TR_DATA[SP500_TR_DATA.length - 1][0];
+    if (endDate > new Date(todayStr)) return null;
+
+    var startStr = isoDate(startDate);
+    var endStr   = isoDate(endDate);
+
+    if (mode === 'lump') {
+      var btcStart = btcPriceAt(daysFromGenesis(startDate));
+      var btcEnd   = btcPriceAt(daysFromGenesis(endDate));
+      var cmpStart = valueOnDate(cmpSeries, startStr);
+      var cmpEnd   = valueOnDate(cmpSeries, endStr);
+      if (!btcStart || !btcEnd || !cmpStart || !cmpEnd) return null;
+      var btcRet = btcEnd / btcStart - 1;
+      var cmpRet = cmpEnd / cmpStart - 1;
+      return { btcRet: btcRet, cmpRet: cmpRet, outperf: (1 + btcRet) / (1 + cmpRet) - 1 };
+    }
+
+    // DCA: weekly contributions from startDate forward through endDate.
+    // Per-week BTC and comparator units accumulate; final value computed
+    // against (btc, cmp) prices at endDate.
+    var weeks = Math.floor((endDate - startDate) / (7 * 86400 * 1000));
+    if (weeks < 4) return null;  // not meaningful with too few weeks
+    var totalContrib = 0;
+    var btcUnits = 0, cmpUnits = 0;
+    for (var w = 0; w < weeks; w++) {
+      var d = new Date(startDate.getTime() + w * 7 * 86400 * 1000);
+      var bp = btcPriceAt(daysFromGenesis(d));
+      var cp = valueOnDate(cmpSeries, isoDate(d));
+      if (!bp || !cp) continue;
+      var weeklyContrib = 100;  // arbitrary unit; ratios are scale-invariant
+      btcUnits += weeklyContrib / bp;
+      cmpUnits += weeklyContrib / cp;
+      totalContrib += weeklyContrib;
+    }
+    if (totalContrib === 0) return null;
+    var btcEndPrice = btcPriceAt(daysFromGenesis(endDate));
+    var cmpEndPrice = valueOnDate(cmpSeries, endStr);
+    if (!btcEndPrice || !cmpEndPrice) return null;
+    var btcFinal = btcUnits * btcEndPrice;
+    var cmpFinal = cmpUnits * cmpEndPrice;
+    var btcDcaRet = btcFinal / totalContrib - 1;
+    var cmpDcaRet = cmpFinal / totalContrib - 1;
+    return { btcRet: btcDcaRet, cmpRet: cmpDcaRet, outperf: (1 + btcDcaRet) / (1 + cmpDcaRet) - 1 };
+  }
+
+  // ISO date string (YYYY-MM-DD) from a JS Date
+  function isoDate(d) {
+    return d.getFullYear() + '-' +
+           ('0' + (d.getMonth() + 1)).slice(-2) + '-' +
+           ('0' + d.getDate()).slice(-2);
+  }
+
+  // Map outperformance multiple → color tier (used for both fill and tooltip)
+  // Tiers correspond to the legend swatches in the markup.
+  function hmTier(outperf) {
+    if (outperf === null) return 'future';
+    if (outperf < -0.5) return 'loss-deep';
+    if (outperf < -0.1) return 'loss';
+    if (outperf < 0.1)  return 'flat';
+    if (outperf < 1.0)  return 'win-mild';   // up to 2× = 100%
+    if (outperf < 4.0)  return 'win-mid';    // 2× — 5×
+    return 'win-deep';                        // > 5×
+  }
+
+  // Color for each tier — amber gradient for wins, muted red for losses
+  function hmColor(tier) {
+    switch (tier) {
+      case 'future':    return 'transparent';
+      case 'loss-deep': return 'rgba(196, 70, 60, 0.78)';
+      case 'loss':      return 'rgba(196, 70, 60, 0.38)';
+      case 'flat':      return 'rgba(255, 255, 255, 0.05)';
+      case 'win-mild':  return 'rgba(224, 148, 34, 0.25)';
+      case 'win-mid':   return 'rgba(224, 148, 34, 0.55)';
+      case 'win-deep':  return 'rgba(224, 148, 34, 0.95)';
+    }
+    return 'transparent';
+  }
+
+  // Pretty-format a return number for the tooltip
+  function fmtRet(r) {
+    if (r === null || r === undefined || !isFinite(r)) return '—';
+    if (Math.abs(r) >= 10) return (r >= 0 ? '+' : '') + (r * 100).toFixed(0) + '%';
+    return (r >= 0 ? '+' : '') + (r * 100).toFixed(1) + '%';
+  }
+  function fmtMult(m) {
+    if (m === null || m === undefined || !isFinite(m)) return '—';
+    if (m >= 4) return (m + 1).toFixed(1) + '×';
+    if (m >= 1) return (m * 100).toFixed(0) + '% better';
+    if (m >= 0) return (m * 100).toFixed(1) + '% better';
+    return (m * 100).toFixed(1) + '%';
+  }
+
+  function fmtDateShort(d) {
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  // Render the entire heatmap grid + axes + sidebar
+  function renderHeatmap() {
+    var grid       = document.getElementById('bvsmHeatmapGrid');
+    var yaxis      = document.getElementById('bvsmHeatmapYaxis');
+    var xaxis      = document.getElementById('bvsmHeatmapXaxis');
+    var sidebar    = document.getElementById('bvsmHeatmapSidebar');
+    if (!grid || !yaxis || !xaxis || !sidebar) return;
+
+    var cmpKey  = document.querySelector('.bvsm-heatmap-cmp-btn.is-active');
+    var modeBtn = document.querySelector('.bvsm-heatmap-mode-btn.is-active');
+    var cmp     = cmpKey ? cmpKey.getAttribute('data-hm-cmp') : 'sp500';
+    var mode    = modeBtn ? modeBtn.getAttribute('data-hm-mode') : 'lump';
+    var cmpData = cmp === 'ndq' ? NDQ_TR_DATA : SP500_TR_DATA;
+    var cmpName = cmp === 'ndq' ? 'NASDAQ-100 TR' : 'S&P 500 TR';
+
+    var startDates = buildStartDates();
+    var nCols = startDates.length;
+
+    // CSS variables drive grid sizing
+    grid.style.setProperty('--hm-cols', nCols);
+    xaxis.style.setProperty('--hm-cols', nCols);
+
+    // Clear existing cells
+    grid.innerHTML = '';
+    yaxis.innerHTML = '';
+    xaxis.innerHTML = '';
+
+    // Y-axis horizon labels (top → bottom = longest → shortest, which
+    // puts the "always green" rows at the top as the headline takeaway)
+    var horizonsRev = HM_HORIZONS.slice().reverse();
+    var horizonLabelsRev = HM_HORIZON_LABELS.slice().reverse();
+    horizonLabelsRev.forEach(function(lbl) {
+      var el = document.createElement('div');
+      el.className = 'bvsm-heatmap-yaxis-label';
+      el.textContent = lbl;
+      yaxis.appendChild(el);
+    });
+
+    // Compute & render cells row-by-row, with summary stats per horizon
+    // captured for sidebar use.
+    var perHorizonStats = {};
+    horizonsRev.forEach(function(h, rowIdx) {
+      var rowWins = 0, rowTotal = 0, rowSumOutperf = 0;
+      for (var c = 0; c < nCols; c++) {
+        var cell = document.createElement('div');
+        cell.className = 'bvsm-heatmap-cell';
+        var sd = startDates[c];
+        var val = hmCellValue(sd, h, cmpData, mode);
+        var tier;
+        if (val === null) {
+          tier = 'future';
+          cell.classList.add('is-future');
+        } else {
+          tier = hmTier(val.outperf);
+          if (val.outperf > 0) rowWins += 1;
+          rowTotal += 1;
+          rowSumOutperf += val.outperf;
+          cell.setAttribute('data-start', isoDate(sd));
+          cell.setAttribute('data-horizon', h);
+          cell.setAttribute('data-btc-ret', val.btcRet.toFixed(4));
+          cell.setAttribute('data-cmp-ret', val.cmpRet.toFixed(4));
+          cell.setAttribute('data-outperf', val.outperf.toFixed(4));
+          cell.setAttribute('data-tier', tier);
+        }
+        cell.style.background = hmColor(tier);
+        grid.appendChild(cell);
+      }
+      perHorizonStats[h] = {
+        wins: rowWins,
+        total: rowTotal,
+        winPct: rowTotal > 0 ? (rowWins / rowTotal) : 0,
+        avgOutperf: rowTotal > 0 ? (rowSumOutperf / rowTotal) : 0
+      };
+    });
+
+    // X-axis year labels — sparse, every ~12 cells starting at first January
+    var lastYearShown = null;
+    for (var c = 0; c < nCols; c++) {
+      var lbl = document.createElement('div');
+      lbl.className = 'bvsm-heatmap-xaxis-label';
+      var y = startDates[c].getFullYear();
+      if (y !== lastYearShown && startDates[c].getMonth() === 0) {
+        lbl.textContent = y;
+        lastYearShown = y;
+      }
+      xaxis.appendChild(lbl);
+    }
+
+    // Sidebar: three punchline bullets pulled from the computed stats
+    renderSidebar(sidebar, perHorizonStats, cmpName, mode);
+  }
+
+  // Pull out the three sharpest summary bullets from the per-horizon stats.
+  // Bullet 1: longest horizon where win rate hit 100%.
+  // Bullet 2: the 7y row (or whichever long horizon best illustrates).
+  // Bullet 3: the short horizon where losses still exist, named honestly.
+  function renderSidebar(el, stats, cmpName, mode) {
+    var modeLabel = mode === 'dca' ? 'Weekly DCA' : 'Lump-sum';
+    var bullets = [];
+
+    // Find longest horizon where win rate is 100%
+    var perfectHorizons = HM_HORIZONS.filter(function(h) {
+      return stats[h] && stats[h].total > 0 && stats[h].wins === stats[h].total;
+    });
+    if (perfectHorizons.length) {
+      var minPerfect = perfectHorizons[0];  // smallest = earliest threshold
+      var label7y = HM_HORIZON_LABELS[HM_HORIZONS.indexOf(minPerfect)];
+      bullets.push(
+        '<strong>' + label7y + '+ horizons:</strong> bitcoin outperformed ' + cmpName +
+        ' in <strong>100% of cases</strong> &mdash; ' +
+        '<span class="bvsm-heatmap-sidebar-num">' + stats[minPerfect].wins + ' of ' +
+        stats[minPerfect].total + '</span> windows.'
+      );
+    }
+
+    // The 7y or longest horizon — magnitude of median outperformance
+    var bigH = 84;  // 7y
+    if (stats[bigH] && stats[bigH].total > 0) {
+      var avg = stats[bigH].avgOutperf;
+      bullets.push(
+        '<strong>At 7-year horizons,</strong> average outperformance is ' +
+        '<span class="bvsm-heatmap-sidebar-num">' + fmtMult(avg) + '</span> ' +
+        'over the comparator.'
+      );
+    }
+
+    // Short-horizon honest disclosure
+    var shortH = 12;
+    if (stats[shortH] && stats[shortH].total > 0) {
+      var winPct = (stats[shortH].winPct * 100).toFixed(0);
+      var lossWindows = stats[shortH].total - stats[shortH].wins;
+      bullets.push(
+        '<strong>At 1-year horizons,</strong> bitcoin won in ' + winPct + '% of cases &mdash; ' +
+        'leaving <span class="bvsm-heatmap-sidebar-num">' + lossWindows + ' window' +
+        (lossWindows === 1 ? '' : 's') + '</span> where it didn&rsquo;t. Short-horizon entry timing matters; long-horizon entry timing doesn&rsquo;t.'
+      );
+    }
+
+    el.innerHTML =
+      '<div class="bvsm-heatmap-sidebar-title">The pattern</div>' +
+      '<ul class="bvsm-heatmap-sidebar-list">' +
+      bullets.map(function(b) { return '<li>' + b + '</li>'; }).join('') +
+      '</ul>' +
+      '<div class="bvsm-heatmap-sidebar-foot">' + modeLabel + ' &middot; vs ' + cmpName + '</div>';
+  }
+
+  // Tooltip handling — single floating element repositioned on cell hover/tap
+  function attachHeatmapInteractions() {
+    var grid = document.getElementById('bvsmHeatmapGrid');
+    var tip  = document.getElementById('bvsmHeatmapTooltip');
+    if (!grid || !tip) return;
+
+    function showTipForCell(cell, ev) {
+      var startStr = cell.getAttribute('data-start');
+      var horizon  = parseInt(cell.getAttribute('data-horizon'), 10);
+      var btcRet   = parseFloat(cell.getAttribute('data-btc-ret'));
+      var cmpRet   = parseFloat(cell.getAttribute('data-cmp-ret'));
+      var outperf  = parseFloat(cell.getAttribute('data-outperf'));
+      if (!startStr) { tip.style.opacity = 0; return; }
+
+      var hLabel = HM_HORIZON_LABELS[HM_HORIZONS.indexOf(horizon)];
+      var startD = new Date(startStr);
+      var endD   = addMonths(startD, horizon);
+      var cmpKey = document.querySelector('.bvsm-heatmap-cmp-btn.is-active');
+      var cmpName = cmpKey && cmpKey.getAttribute('data-hm-cmp') === 'ndq' ? 'NDQ' : 'S&P';
+
+      tip.innerHTML =
+        '<div class="bvsm-heatmap-tooltip-head">' + fmtDateShort(startD) +
+        ' &rarr; ' + fmtDateShort(endD) + ' &middot; ' + hLabel + '</div>' +
+        '<div class="bvsm-heatmap-tooltip-row"><span>Bitcoin</span><strong>' + fmtRet(btcRet) + '</strong></div>' +
+        '<div class="bvsm-heatmap-tooltip-row"><span>' + cmpName + '</span><strong>' + fmtRet(cmpRet) + '</strong></div>' +
+        '<div class="bvsm-heatmap-tooltip-row bvsm-heatmap-tooltip-outperf"><span>BTC outperformance</span><strong>' + fmtMult(outperf) + '</strong></div>' +
+        '<div class="bvsm-heatmap-tooltip-cta">click to load in calculator</div>';
+
+      // Position above the cell (or below if near top of viewport)
+      var rect = cell.getBoundingClientRect();
+      var tipRect = tip.getBoundingClientRect();
+      var winW = window.innerWidth;
+      var preferAbove = rect.top > 160;
+      var x = rect.left + rect.width / 2 + window.scrollX;
+      var y = preferAbove
+        ? rect.top + window.scrollY - tipRect.height - 8
+        : rect.bottom + window.scrollY + 8;
+      // Constrain horizontally
+      if (x - tipRect.width / 2 < 12) x = tipRect.width / 2 + 12;
+      if (x + tipRect.width / 2 > winW - 12) x = winW - tipRect.width / 2 - 12;
+      tip.style.left = (x - tipRect.width / 2) + 'px';
+      tip.style.top  = y + 'px';
+      tip.style.opacity = 1;
+      tip.setAttribute('aria-hidden', 'false');
+    }
+
+    function hideTip() {
+      tip.style.opacity = 0;
+      tip.setAttribute('aria-hidden', 'true');
+    }
+
+    grid.addEventListener('mouseover', function(ev) {
+      var cell = ev.target.closest('.bvsm-heatmap-cell');
+      if (!cell || cell.classList.contains('is-future')) { hideTip(); return; }
+      showTipForCell(cell, ev);
+    });
+    grid.addEventListener('mouseleave', hideTip);
+    grid.addEventListener('touchstart', function(ev) {
+      var cell = ev.target.closest('.bvsm-heatmap-cell');
+      if (!cell || cell.classList.contains('is-future')) return;
+      showTipForCell(cell, ev);
+    }, { passive: true });
+
+    // Click-to-jump: load the cell's start date into the §2 calculator,
+    // align mode, scroll to the calculator block.
+    grid.addEventListener('click', function(ev) {
+      var cell = ev.target.closest('.bvsm-heatmap-cell');
+      if (!cell || cell.classList.contains('is-future')) return;
+      var startStr = cell.getAttribute('data-start');
+      if (!startStr) return;
+      var modeBtn = document.querySelector('.bvsm-heatmap-mode-btn.is-active');
+      var hmMode  = modeBtn ? modeBtn.getAttribute('data-hm-mode') : 'lump';
+      jumpToCalc(startStr, hmMode);
+      hideTip();
+    });
+  }
+
+  // Click-to-jump from heatmap cell → §2 calculator
+  function jumpToCalc(startStr, mode) {
+    // 1. Align mode toggle in §2 calc to the heatmap's mode
+    var currentMode = document.querySelector('.bvsm-mode.is-active');
+    if (currentMode && currentMode.getAttribute('data-mode') !== mode) {
+      var newModeBtn = document.querySelector('.bvsm-mode[data-mode="' + mode + '"]');
+      if (newModeBtn) newModeBtn.click();
+    }
+
+    // 2. Match the start date to an SP500_TR_DATA index for the slider
+    var slider = document.getElementById('bvsmStartDate');
+    if (!slider) return;
+    for (var i = 0; i < SP500_TR_DATA.length; i++) {
+      if (SP500_TR_DATA[i][0] >= startStr) {
+        slider.value = i;
+        break;
+      }
+    }
+
+    // 3. Clear any active preset (user is now on a custom date)
+    document.querySelectorAll('.bvsm-preset.is-active').forEach(function(b) {
+      b.classList.remove('is-active');
+    });
+
+    // 4. Trigger §2 recompute via synthetic input event (handler picks it up)
+    slider.dispatchEvent(new Event('input', { bubbles: true }));
+
+    // 5. Smooth-scroll the calculator into view
+    var calcEl = document.getElementById('bvsmCalc');
+    if (calcEl) calcEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function wireHeatmapToggles() {
+    document.querySelectorAll('.bvsm-heatmap-cmp-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.bvsm-heatmap-cmp-btn').forEach(function(b) {
+          b.classList.remove('is-active');
+        });
+        btn.classList.add('is-active');
+        renderHeatmap();
+      });
+    });
+    document.querySelectorAll('.bvsm-heatmap-mode-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.bvsm-heatmap-mode-btn').forEach(function(b) {
+          b.classList.remove('is-active');
+        });
+        btn.classList.add('is-active');
+        renderHeatmap();
+      });
+    });
+  }
+
+  function initHeatmap() {
+    if (!document.getElementById('bvsmHeatmapGrid')) return;
+    if (typeof PL_DATA === 'undefined' || typeof SP500_TR_DATA === 'undefined') return;
+    wireHeatmapToggles();
+    renderHeatmap();
+    attachHeatmapInteractions();
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
+  }
+
+  // Heatmap init runs after the §2 init so the calculator's IDs/state
+  // are wired by the time click-to-jump dispatches against them.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHeatmap);
+  } else {
+    initHeatmap();
   }
 
 })();
