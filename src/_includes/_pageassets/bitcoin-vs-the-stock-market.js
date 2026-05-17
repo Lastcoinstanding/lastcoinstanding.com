@@ -1178,7 +1178,8 @@
         btcRet: btcRet,
         cmpRet: cmpRet,
         outperf: (1 + btcRet) / (1 + cmpRet) - 1,
-        avgBtc: avgBtc
+        avgBtc: avgBtc,
+        entryBtc: btcStart
       };
     }
 
@@ -1198,7 +1199,8 @@
       btcRet: btcDcaRet,
       cmpRet: cmpDcaRet,
       outperf: (1 + btcDcaRet) / (1 + cmpDcaRet) - 1,
-      avgBtc: avgBtc
+      avgBtc: avgBtc,
+      entryBtc: weeklyBtc[startW]
     };
   }
 
@@ -1314,13 +1316,15 @@
           rowSumOutperf += val.outperf;
           cellHtml.push(
             '<div class="bvsm-heatmap-cell" ' +
-            'data-start="'    + isoDate(sd) + '" ' +
-            'data-horizon="'  + h + '" ' +
-            'data-btc-ret="'  + val.btcRet.toFixed(4)  + '" ' +
-            'data-cmp-ret="'  + val.cmpRet.toFixed(4)  + '" ' +
-            'data-outperf="'  + val.outperf.toFixed(4) + '" ' +
-            'data-avg-btc="'  + val.avgBtc.toFixed(2)  + '" ' +
-            'data-tier="'     + tier + '" ' +
+            'data-start="'     + isoDate(sd) + '" ' +
+            'data-horizon="'   + h + '" ' +
+            'data-btc-ret="'   + val.btcRet.toFixed(4)   + '" ' +
+            'data-cmp-ret="'   + val.cmpRet.toFixed(4)   + '" ' +
+            'data-outperf="'   + val.outperf.toFixed(4)  + '" ' +
+            'data-avg-btc="'   + val.avgBtc.toFixed(2)   + '" ' +
+            'data-entry-btc="' + val.entryBtc.toFixed(2) + '" ' +
+            'data-mode="'      + mode + '" ' +
+            'data-tier="'      + tier + '" ' +
             'style="background:' + hmColor(tier) + '"></div>'
           );
         }
@@ -1413,12 +1417,14 @@
     if (!grid || !tip) return;
 
     function showTipForCell(cell, ev) {
-      var startStr = cell.getAttribute('data-start');
-      var horizon  = parseInt(cell.getAttribute('data-horizon'), 10);
-      var btcRet   = parseFloat(cell.getAttribute('data-btc-ret'));
-      var cmpRet   = parseFloat(cell.getAttribute('data-cmp-ret'));
-      var outperf  = parseFloat(cell.getAttribute('data-outperf'));
-      var avgBtc   = parseFloat(cell.getAttribute('data-avg-btc'));
+      var startStr  = cell.getAttribute('data-start');
+      var horizon   = parseInt(cell.getAttribute('data-horizon'), 10);
+      var btcRet    = parseFloat(cell.getAttribute('data-btc-ret'));
+      var cmpRet    = parseFloat(cell.getAttribute('data-cmp-ret'));
+      var outperf   = parseFloat(cell.getAttribute('data-outperf'));
+      var avgBtc    = parseFloat(cell.getAttribute('data-avg-btc'));
+      var entryBtc  = parseFloat(cell.getAttribute('data-entry-btc'));
+      var cellMode  = cell.getAttribute('data-mode') || 'lump';
       if (!startStr) { tip.style.opacity = 0; return; }
 
       var hLabel = HM_HORIZON_LABELS[HM_HORIZONS.indexOf(horizon)];
@@ -1427,13 +1433,30 @@
       var cmpKey = document.querySelector('.bvsm-heatmap-cmp-btn.is-active');
       var cmpName = cmpKey && cmpKey.getAttribute('data-hm-cmp') === 'ndq' ? 'NDQ' : 'S&P';
 
+      // Mode-conditional price row.
+      //   - Lump-sum: show the entry price (BTC on the window's start date).
+      //     This is what the buyer actually paid — the row's window header
+      //     and the x-axis both name that same month, so matching them in
+      //     the price field is the least confusing option.
+      //   - Weekly DCA: show the cost basis as 'Avg buy price' (the
+      //     arithmetic mean of weekly BTC prices across the window
+      //     IS the cost basis when contributions are equal $1/week).
+      //     The previous label was 'Avg BTC price' which left readers
+      //     guessing what window it averaged over.
+      var priceLabel, priceVal;
+      if (cellMode === 'dca') {
+        priceLabel = 'Avg buy price';
+        priceVal   = avgBtc;
+      } else {
+        priceLabel = 'Entry price';
+        priceVal   = entryBtc;
+      }
+
       // Tooltip rows:
       //   1. Window header (start → end · horizon)
       //   2. Bitcoin return
       //   3. Comparator return
-      //   4. Avg BTC price during window (arithmetic mean of weekly samples;
-      //      added in response to user request — gives readers a concrete
-      //      anchor for "what price was bitcoin during this period")
+      //   4. Entry price / Avg buy price (mode-conditional, see above)
       //   5. Outperformance multiple (highlighted)
       //   6. Click-to-load CTA
       tip.innerHTML =
@@ -1441,7 +1464,7 @@
         ' &rarr; ' + fmtDateShort(endD) + ' &middot; ' + hLabel + '</div>' +
         '<div class="bvsm-heatmap-tooltip-row"><span>Bitcoin</span><strong>' + fmtRet(btcRet) + '</strong></div>' +
         '<div class="bvsm-heatmap-tooltip-row"><span>' + cmpName + '</span><strong>' + fmtRet(cmpRet) + '</strong></div>' +
-        '<div class="bvsm-heatmap-tooltip-row bvsm-heatmap-tooltip-avgprice"><span>Avg BTC price</span><strong>' + fmtBtcPrice(avgBtc) + '</strong></div>' +
+        '<div class="bvsm-heatmap-tooltip-row bvsm-heatmap-tooltip-avgprice"><span>' + priceLabel + '</span><strong>' + fmtBtcPrice(priceVal) + '</strong></div>' +
         '<div class="bvsm-heatmap-tooltip-row bvsm-heatmap-tooltip-outperf"><span>BTC outperformance</span><strong>' + fmtMult(outperf) + '</strong></div>' +
         '<div class="bvsm-heatmap-tooltip-cta">click to load in calculator</div>';
 
