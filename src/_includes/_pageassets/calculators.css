@@ -142,6 +142,20 @@
   display: block;
 }
 
+/* Tools-grid tile illustrations are icon-sized — their viewBoxes
+   (~80×60) are square-ish, so unconstrained `width: 100%` would
+   blow them up to fill the entire preview area. Constrain by
+   max-height so they sit centered like small icons with visible
+   breathing room. Featured tiles keep the default full-width
+   behavior — their viewBoxes (e.g. 400×110 for the BvSM chart and
+   the live mini-heatmap) are wide, so full-width scaling lands at
+   a sensible height naturally. */
+.calc-tile:not(.calc-tile-featured) .calc-tile-preview svg {
+  max-height: 105px;
+  max-width: 150px;
+  width: auto;
+}
+
 /* Live preview area — give SVG more breathing room horizontally */
 .calc-tile-preview-live {
   padding: 1rem 1.2rem 1rem !important;
