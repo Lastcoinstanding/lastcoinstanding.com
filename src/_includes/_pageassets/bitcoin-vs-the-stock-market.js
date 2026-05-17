@@ -1542,9 +1542,21 @@
     // 4. Trigger §2 recompute via synthetic input event (handler picks it up)
     slider.dispatchEvent(new Event('input', { bubbles: true }));
 
-    // 5. Smooth-scroll the calculator into view
-    var calcEl = document.getElementById('bvsmCalc');
-    if (calcEl) calcEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // 5. Smooth-scroll the calculator into view — UNLESS we're on the
+    // standalone /heatmap page. On BvSM the heatmap (§2b) sits below
+    // the §2 calc, so a cell click should bring the calc into view —
+    // the result is otherwise off-screen. On /heatmap the heatmap and
+    // the chart are intentionally adjacent and both visible at once;
+    // a scroll on every click would push the heatmap up out of the
+    // viewport and break the click-cell-watch-chart immersive loop
+    // (the page would be repositioning instead of the chart updating
+    // in place). The .heatmap-standalone class is set on /heatmap's
+    // <main> element and absent on BvSM, giving us a clean context
+    // discriminator.
+    if (!document.querySelector('.heatmap-standalone')) {
+      var calcEl = document.getElementById('bvsmCalc');
+      if (calcEl) calcEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   // Read ?start=YYYY-MM-DD&mode=lump|dca from URL and apply to §2 calc.
