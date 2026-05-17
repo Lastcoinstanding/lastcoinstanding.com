@@ -1232,8 +1232,7 @@
         var ctx = chart.ctx;
         var xScale = chart.scales.x, yScale = chart.scales.y;
         ctx.save();
-        ctx.textAlign = 'center';
-        anchors.forEach(function(a) {
+        anchors.forEach(function(a, idx) {
           var xPx = xScale.getPixelForValue(a.x);
           var yPx = yScale.getPixelForValue(a.btc);
           // Amber dot on the line
@@ -1241,13 +1240,20 @@
           ctx.beginPath();
           ctx.arc(xPx, yPx, 4, 0, 2 * Math.PI);
           ctx.fill();
-          // Cream "X BTC" label above the dot
-          ctx.fillStyle = '#ece4d6';
-          ctx.font = '500 12px Inter, sans-serif';
-          var label = a.btc >= 1
+          // Label: BTC count + year. Each anchor is its own scenario; the
+          // explicit year-in-label is the strongest defense against the
+          // visual misreading as a single-stack drawdown.
+          // Edge anchors use left/right alignment so labels stay inside
+          // the plot area rather than overflowing the canvas.
+          var btcText = a.btc >= 1
             ? a.btc.toFixed(1) + ' BTC'
             : a.btc.toFixed(2) + ' BTC';
-          ctx.fillText(label, xPx, yPx - 11);
+          ctx.textAlign = (idx === 0) ? 'left'
+                        : (idx === anchors.length - 1) ? 'right'
+                        : 'center';
+          ctx.fillStyle = '#ece4d6';
+          ctx.font = '500 12px Inter, sans-serif';
+          ctx.fillText(btcText, xPx, yPx - 11);
         });
         ctx.restore();
       }
@@ -1281,6 +1287,13 @@
             type: 'linear',
             min: todayYear,
             max: endYear,
+            title: {
+              display: true,
+              text: 'Retirement year',
+              color: '#8a8275',
+              font: { family: 'Inter, sans-serif', size: 11, weight: '500' },
+              padding: { top: 8 }
+            },
             grid: { color: 'rgba(224,148,34,0.04)' },
             ticks: {
               color: '#7a7367',
@@ -1293,6 +1306,12 @@
             type: 'logarithmic',
             min: 0.04,
             max: 30,
+            title: {
+              display: true,
+              text: 'BTC needed at trend price',
+              color: '#8a8275',
+              font: { family: 'Inter, sans-serif', size: 11, weight: '500' }
+            },
             grid: { color: 'rgba(224,148,34,0.05)' },
             ticks: {
               color: '#7a7367',

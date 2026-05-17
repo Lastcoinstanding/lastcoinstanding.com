@@ -743,7 +743,7 @@ a.powerlaw-link:hover {
   text-align: center;
 }
 .smitty-chart-wrapper {
-  height: 280px;
+  height: 320px;
 }
 .smitty-caption {
   margin-top: 0.85rem;
@@ -770,7 +770,7 @@ a.powerlaw-link:hover {
 
 @media (max-width: 720px) {
   .smitty-fig { margin: 1.5rem auto 1.75rem; }
-  .smitty-chart-wrapper { height: 240px; }
+  .smitty-chart-wrapper { height: 280px; }
   .smitty-caption { font-size: 0.8rem; }
 }
 
