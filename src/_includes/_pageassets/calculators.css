@@ -1,225 +1,283 @@
-/* ─── Calculators constellation page ─── */
-/* Mirrors the homepage card aesthetic for visual continuity (concept-card pattern). */
+/* ============================================================
+   /calculators — Pathway A v1: tools gallery layout
+   ============================================================
+   Restructured from the previous text-list of 5 tile-with-icon
+   entries into a polished gallery. Two visual tiers:
+   - Featured row: 2 tiles side-by-side on desktop, larger preview
+     area (~200px+), the heatmap tile carries a live SVG render
+     via #mini-heatmap (calculators-minis.js)
+   - Tools grid: 3-col responsive grid of 10 smaller tiles with
+     SVG illustrations of each tool's signature visual
 
-:root {
-  --bg: #0a0908;
-  --bg-card: #111110;
-  --border: #1e1c1a;
-  --amber: #e09422;
-  --orange: #F7931A;
-  --amber-soft: rgba(224, 148, 34, 0.08);
-  --amber-dim: rgba(224, 148, 34, 0.35);
-  --text: #d8d2ca;
-  --text-bright: #f2eee8;
-  --text-body: #c8c2b8;
-  --text-dim: #908880;
-  --text-muted: #706860;
-  --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-reading: 'EB Garamond', Georgia, serif;
-  --font-body: 'Inter', -apple-system, sans-serif;
-}
-
-body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+   Color palette: matches site convention — amber (#e09422 base,
+   #F7931A bright) on dark (page bg ~#0a0908, tile bg #15130f for
+   slight elevation; preview bg matches page bg for recessed
+   feel). Typography: Cormorant Garamond for tile names,
+   Inter for everything else. Loaded via base.njk canonical
+   typography stack.
+   ============================================================ */
 
 .calculators-page {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 4rem 2rem 5rem;
+  padding: 2rem 1.5rem 4rem;
 }
 
-@media (max-width: 768px) {
-  .calculators-page { padding: 2.5rem 1.25rem 3.5rem; }
+/* ─── Hero ─── */
+.calc-hero {
+  text-align: center;
+  max-width: 820px;
+  margin: 0 auto 3.5rem;
+  padding: 2rem 0 1rem;
 }
 
-/* ─── Page header ─── */
-.calculators-page .page-header {
+.calc-hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.5rem, 5vw, 3.6rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #e8e6e3;
+  margin: 0 0 1rem;
+  line-height: 1.1;
+}
+
+.calc-hero-lede {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(1rem, 1.6vw, 1.18rem);
+  line-height: 1.6;
+  color: #b6b1a8;
+  margin: 0;
+}
+
+/* ─── Section row + heading ─── */
+.calc-row {
   margin-bottom: 3rem;
 }
 
-.calculators-page h1 {
-  font-family: var(--font-display);
-  font-size: clamp(2.4rem, 5vw, 3.6rem);
-  font-weight: 500;
-  line-height: 1.05;
-  color: var(--text-bright);
-  margin: 0 0 1.2rem;
-  letter-spacing: -0.01em;
+.calc-row-heading {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #888;
+  margin: 0 0 1.1rem;
+  padding-left: 0.2rem;
 }
 
-.calculators-page .hero-lede {
-  font-family: var(--font-body);
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: var(--text);
-  max-width: 640px;
-  margin: 0 0 0.6rem;
-}
-
-.calculators-page .hero-meta {
-  font-family: var(--font-body);
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  font-style: italic;
-  max-width: 640px;
-  margin: 0;
-}
-
-/* ─── Card grid (mirrors homepage .card-grid) ─── */
-.calc-card-grid {
+/* ─── Tile grids ─── */
+.calc-tile-grid {
   display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+}
+
+.calc-tile-grid-featured {
   grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
-  margin-top: 2.5rem;
+  gap: 1.5rem;
 }
 
-@media (max-width: 720px) {
-  .calc-card-grid { grid-template-columns: 1fr; gap: 1rem; }
+@media (max-width: 980px) {
+  .calc-tile-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .calc-tile-grid-featured {
+    grid-template-columns: 1fr;
+  }
 }
 
-/* ─── Tile (mirrors homepage .concept-card) ─── */
+@media (max-width: 620px) {
+  .calc-tile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Tile base ─── */
 .calc-tile {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  padding: 2rem 1.75rem;
-  text-decoration: none;
-  color: inherit;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  transition: border-color 0.3s, transform 0.25s, box-shadow 0.3s;
-  position: relative;
+  background: #15130f;
+  border: 1px solid #2a2622;
+  border-radius: 8px;
   overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
 }
 
-.calc-tile.live:hover {
-  border-color: rgba(247, 147, 26, 0.3);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 32px rgba(247, 147, 26, 0.06);
+.calc-tile:hover,
+.calc-tile:focus-visible {
+  border-color: #e09422;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  outline: none;
 }
 
-/* Orange top-bar on hover — homepage signature */
-.calc-tile.live::before {
-  content: '';
+/* ─── Preview area ─── */
+.calc-tile-preview {
+  position: relative;
+  background: #0a0908;
+  border-bottom: 1px solid #2a2622;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+}
+
+/* Featured tile preview — taller */
+.calc-tile-featured .calc-tile-preview {
+  min-height: 200px;
+  padding: 1.5rem 1.5rem 1.3rem;
+}
+
+/* Tools tile preview — shorter */
+.calc-tile:not(.calc-tile-featured) .calc-tile-preview {
+  min-height: 130px;
+}
+
+.calc-tile-preview svg {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Live preview area — give SVG more breathing room horizontally */
+.calc-tile-preview-live {
+  padding: 1rem 1.2rem 1rem !important;
+}
+
+#mini-heatmap {
+  width: 100%;
+}
+
+#mini-heatmap svg {
+  width: 100%;
+  height: auto;
+}
+
+/* "Live" badge — pulsing amber indicator */
+.calc-tile-live-badge {
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--orange);
-  opacity: 0;
-  transition: opacity 0.3s;
+  top: 0.7rem;
+  right: 0.7rem;
+  background: rgba(247, 147, 26, 0.13);
+  color: #F7931A;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem 0.2rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid rgba(247, 147, 26, 0.32);
+  z-index: 2;
 }
 
-.calc-tile.live:hover::before { opacity: 1; }
-
-.calc-tile-icon {
-  width: 48px;
-  height: 48px;
-  margin-bottom: 0.25rem;
+.calc-tile-live-badge::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #F7931A;
+  margin-right: 5px;
+  vertical-align: 1px;
+  animation: live-pulse 2s ease-in-out infinite;
 }
 
-.calc-tile-icon svg { width: 100%; height: 100%; }
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+/* ─── Tile body ─── */
+.calc-tile-body {
+  padding: 1.1rem 1.3rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.calc-tile-featured .calc-tile-body {
+  padding: 1.3rem 1.5rem 1.5rem;
+}
 
 .calc-tile-name {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: var(--text-bright);
-  margin: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+  margin: 0 0 0.55rem;
+  color: #e8e6e3;
   line-height: 1.2;
+  text-wrap: balance;
 }
 
-.calc-tile-question {
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  color: var(--amber);
-  font-style: italic;
-  margin: 0;
-  line-height: 1.45;
+.calc-tile-featured .calc-tile-name {
+  font-size: 1.6rem;
 }
 
-.calc-tile-desc {
-  font-family: var(--font-reading);
+.calc-tile-tagline {
+  font-family: 'Inter', sans-serif;
   font-size: 0.92rem;
-  font-weight: 300;
-  line-height: 1.7;
-  color: var(--text-body);
-  margin: 0;
+  line-height: 1.5;
+  color: #a8a39a;
+  margin: 0 0 1.1rem;
+  flex: 1;
+}
+
+.calc-tile-featured .calc-tile-tagline {
+  font-size: 0.98rem;
 }
 
 .calc-tile-cta {
-  font-family: var(--font-body);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--orange);
-  margin-top: auto;
-  padding-top: 0.5rem;
-}
-
-.calc-tile-cta::after {
-  content: ' →';
-  display: inline-block;
-  transition: transform 0.25s;
-}
-
-.calc-tile.live:hover .calc-tile-cta::after {
-  transform: translateX(3px);
-}
-
-/* ─── Coming soon variant ─── */
-.calc-tile.coming-soon {
-  opacity: 0.55;
-  cursor: default;
-}
-
-.calc-tile.coming-soon .calc-tile-name { color: var(--text-dim); }
-.calc-tile.coming-soon .calc-tile-question { color: var(--text-muted); }
-.calc-tile.coming-soon .calc-tile-cta { color: var(--text-muted); }
-.calc-tile.coming-soon .calc-tile-cta::after { content: ''; }
-.calc-tile.coming-soon .calc-tile-icon svg { opacity: 0.5; }
-
-.coming-soon-badge {
-  position: absolute;
-  top: 1.4rem;
-  right: 1.5rem;
-  font-family: var(--font-body);
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--amber);
-  background: var(--amber-soft);
-  border: 1px solid var(--amber-dim);
-  border-radius: 3px;
-  padding: 3px 8px;
-  line-height: 1.1;
-  opacity: 1.5; /* visually anchor against the dimmed card */
-}
-
-/* ─── Cross-bucket nav hint ─── */
-.calculators-page .nav-hint {
-  margin-top: 3.5rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--border);
-  font-family: var(--font-body);
+  font-family: 'Inter', sans-serif;
   font-size: 0.85rem;
-  color: var(--text-dim);
-  line-height: 1.6;
-  max-width: 640px;
-}
-
-.calculators-page .nav-hint strong {
-  color: var(--text);
   font-weight: 500;
+  color: #F7931A;
+  letter-spacing: 0.01em;
+  transition: color 200ms ease, transform 200ms ease;
+  margin-top: auto;
 }
 
-.calculators-page .nav-hint a {
-  color: var(--amber);
-  text-decoration: none;
-  border-bottom: 1px solid var(--amber-dim);
-  transition: border-color 0.2s;
+/* Featured CTA — button-styled for emphasis */
+.calc-tile-featured .calc-tile-cta {
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid rgba(247, 147, 26, 0.35);
+  border-radius: 4px;
+  background: rgba(247, 147, 26, 0.05);
+  align-self: flex-start;
+  font-size: 0.88rem;
+  transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
 }
 
-.calculators-page .nav-hint a:hover {
-  border-bottom-color: var(--amber);
+.calc-tile-featured:hover .calc-tile-cta {
+  background: rgba(247, 147, 26, 0.13);
+  border-color: #F7931A;
+  color: #ffae3d;
+}
+
+.calc-tile:not(.calc-tile-featured):hover .calc-tile-cta {
+  color: #ffae3d;
+}
+
+/* ─── Mobile tweaks ─── */
+@media (max-width: 620px) {
+  .calculators-page {
+    padding: 1rem 1rem 3rem;
+  }
+  .calc-hero {
+    margin-bottom: 2.5rem;
+    padding: 1.5rem 0 0.5rem;
+  }
+  .calc-row {
+    margin-bottom: 2.2rem;
+  }
+  .calc-tile-featured .calc-tile-preview {
+    min-height: 160px;
+  }
+  .calc-tile-featured .calc-tile-name {
+    font-size: 1.45rem;
+  }
 }

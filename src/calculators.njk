@@ -5,126 +5,340 @@ slug: calculators
 eleventyComputed:
   head_extras: "{% include '_pageassets/calculators-head.html' %}"
   page_styles: "{% include '_pageassets/calculators.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/calculators-minis.js' %}"
 ---
+{# ═══════════════════════════════════════════════════════════════════
+   /calculators — Pathway A v1: tools gallery
+
+   Restructured from a 5-tile text-list into a polished gallery that
+   functions as the canonical entry point for every interactive tool
+   on the site. JM's framing: 'each tile shows an actual live
+   thumbnail of the tool's heart (mini heatmap, mini chart, mini
+   retirement curve…) with an Open button.' This v1 ships the
+   gallery structure plus ONE live preview (the heatmap, as the
+   showcase proof-of-concept). Other tiles use polished SVG
+   illustrations; subsequent iterations can promote them to live
+   renders one at a time.
+
+   Hierarchy:
+   - Featured row (2 tiles, large): Heatmap (live) + BvSM (chart-SVG)
+   - Tools grid (10 tiles, 3-col on desktop): all other Numbers-tier
+     interactive tools + the two Arguments-tier interactive ones
+     (Half-Life, Melting Ice Cube). The Calculators page becomes the
+     comprehensive tools surface; the previous footer 'nav-hint'
+     directing readers to The Numbers / The Arguments for the rest
+     becomes obsolete since everything's right here.
+
+   Includes previously-missing tools: /heatmap and
+   /bitcoin-vs-the-stock-market (calculator section). Both were
+   linked elsewhere on the site but didn't appear on this hub.
+
+   Notes for future iterations:
+   - Live preview pattern is established by #mini-heatmap →
+     calculators-minis.js → renderMiniHeatmap. Adding more live
+     previews (mini-bvsm-chart, mini-retirement-curve, mini-power-
+     law-channel, etc.) follows the same shape: add a target div
+     in the tile markup, write a renderer in calculators-minis.js.
+   - SP500_TR_DATA is duplicated between calculators-minis.js and
+     bitcoin-vs-the-stock-market.js. Marked 'TR-SYNC' in both
+     files. Future cleanup: extract to shared/comparator-data.js.
+═══════════════════════════════════════════════════════════════════ #}
+
 <main class="calculators-page">
 
-  <header class="page-header">
-    <h1>Calculators</h1>
-    <p class="hero-lede">Tools to help you think through Bitcoin decisions in your own life — past, present, and future.</p>
+  <header class="calc-hero">
+    <h1>Tools</h1>
+    <p class="calc-hero-lede">
+      A working gallery of interactive tools to think through bitcoin decisions in your own life &mdash; past, present, and future.
+    </p>
   </header>
 
-  <div class="calc-card-grid">
+  {# ═══ FEATURED ROW ════════════════════════════════════════════════
+     Two tiles, side-by-side on desktop. The Heatmap tile carries a
+     live mini-render targeting #mini-heatmap (calculators-minis.js).
+     The BvSM tile uses a static-but-evocative SVG showing three
+     ascending curves on a log-grid — visually says 'wealth
+     comparison over time' without needing live data on this page.
+     ═════════════════════════════════════════════════════════════ #}
+  <section class="calc-row calc-row-featured" aria-labelledby="featured-heading">
+    <h2 id="featured-heading" class="calc-row-heading">Featured</h2>
 
-    <!-- BvRE — house outline + bitcoin symbol (matches homepage card icon) -->
-    <a href="/bitcoin-vs-real-estate.html#calculator" class="calc-tile live">
-      <div class="calc-tile-icon">
-        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 26L24 12L40 26" stroke="#e09422" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          <path d="M12 24V38H36V24" stroke="#e09422" stroke-width="1.5" stroke-linejoin="round" fill="rgba(224,148,34,0.05)"/>
-          <text x="24" y="34" text-anchor="middle" fill="#e09422" font-size="13" font-weight="700" font-family="sans-serif">&#8383;</text>
-          <line x1="18" y1="42" x2="30" y2="42" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2" opacity="0.5"/>
-        </svg>
-      </div>
-      <h2 class="calc-tile-name">BTC vs. Real Estate</h2>
-      <p class="calc-tile-question">Bitcoin or a house &mdash; looking back, or looking forward?</p>
-      <p class="calc-tile-desc">A dual-mode calculator. <strong>Retrospective:</strong> pick a past year and see what bitcoin would have done with the same money over the same period &mdash; head-to-head, with full mortgage and ownership costs. <strong>Projection:</strong> use the Power Law to compare buying a house today vs. holding bitcoin today, over your chosen horizon, with outputs in today's purchasing power.</p>
-      <span class="calc-tile-cta">Run the comparison</span>
-    </a>
+    <div class="calc-tile-grid calc-tile-grid-featured">
 
-    <!-- Power Law — log-log axes + trend line (matches homepage card icon) -->
-    <a href="/the-power-law.html#channel" class="calc-tile live">
-      <div class="calc-tile-icon">
-        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <line x1="8" y1="40" x2="42" y2="40" stroke="#e09422" stroke-width="1" opacity="0.35"/>
-          <line x1="8" y1="6" x2="8" y2="40" stroke="#e09422" stroke-width="1" opacity="0.35"/>
-          <line x1="10" y1="38" x2="42" y2="8" stroke="#F7931A" stroke-width="1.8" stroke-linecap="round"/>
-          <circle cx="14" cy="35" r="1.2" fill="#e09422"/>
-          <circle cx="18" cy="32" r="1.2" fill="#e09422"/>
-          <circle cx="22" cy="28" r="1.2" fill="#e09422"/>
-          <circle cx="26" cy="23" r="1.2" fill="#e09422"/>
-          <circle cx="30" cy="19" r="1.2" fill="#e09422"/>
-          <circle cx="34" cy="14" r="1.2" fill="#e09422"/>
-        </svg>
-      </div>
-      <h2 class="calc-tile-name">Bitcoin &amp; The Power Law</h2>
-      <p class="calc-tile-question">What is the channel, and where does bitcoin sit inside it?</p>
-      <p class="calc-tile-desc">An interactive view of the Power Law channel &mdash; floor, trend, upper band &mdash; across bitcoin's lifetime, with daily price overlaid. Toggle between linear-time (curves) and log-log (straight lines) to see the same model two ways. The foundational page that anchors the projections used elsewhere.</p>
-      <span class="calc-tile-cta">Explore the channel</span>
-    </a>
+      {# Tile 1 — The Bitcoin Heatmap (LIVE preview) #}
+      <a href="/heatmap.html" class="calc-tile calc-tile-featured calc-tile-live" aria-label="Open The Bitcoin Heatmap">
+        <div class="calc-tile-preview calc-tile-preview-live">
+          <div id="mini-heatmap"></div>
+          <span class="calc-tile-live-badge">Live</span>
+        </div>
+        <div class="calc-tile-body">
+          <h3 class="calc-tile-name">The Bitcoin Heatmap</h3>
+          <p class="calc-tile-tagline">Every monthly entry, every common horizon &mdash; bitcoin&rsquo;s outperformance against the S&amp;P 500 and NASDAQ-100 in one grid.</p>
+          <span class="calc-tile-cta">Open &rarr;</span>
+        </div>
+      </a>
 
-    <!-- Retirement — clock face with bitcoin symbol -->
-    <a href="/the-bitcoin-retirement.html#calculator" class="calc-tile live">
-      <div class="calc-tile-icon">
-        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="24" cy="24" r="18" stroke="#e09422" stroke-width="1.5" fill="none" opacity="0.85"/>
-          <line x1="24" y1="11" x2="24" y2="14" stroke="#e09422" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
-          <line x1="24" y1="34" x2="24" y2="37" stroke="#e09422" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
-          <line x1="11" y1="24" x2="14" y2="24" stroke="#e09422" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
-          <line x1="34" y1="24" x2="37" y2="24" stroke="#e09422" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
-          <line x1="24" y1="24" x2="24" y2="16" stroke="#F7931A" stroke-width="1.8" stroke-linecap="round"/>
-          <line x1="24" y1="24" x2="32" y2="28" stroke="#F7931A" stroke-width="1.4" stroke-linecap="round"/>
-          <text x="24" y="27" text-anchor="middle" fill="#e09422" font-size="8" font-weight="700" font-family="sans-serif" opacity="0.0">&#8383;</text>
-        </svg>
-      </div>
-      <h2 class="calc-tile-name">The Bitcoin Retirement</h2>
-      <p class="calc-tile-question">When can I retire on bitcoin?</p>
-      <p class="calc-tile-desc">A scenario laboratory built on Power Law projections. Drag the sliders to explore three retirement questions: how much bitcoin do you need, when can you retire, on what income. The sustainability readout shows years lasted, real-terms stack value, and escape velocity.</p>
-      <span class="calc-tile-cta">Explore scenarios</span>
-    </a>
+      {# Tile 2 — Bitcoin vs. The Stock Market #}
+      <a href="/bitcoin-vs-the-stock-market.html#bvsmCalc" class="calc-tile calc-tile-featured" aria-label="Open Bitcoin vs. The Stock Market calculator">
+        <div class="calc-tile-preview">
+          <svg viewBox="0 0 400 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block" preserveAspectRatio="xMidYMid meet">
+            {# log-scale gridlines #}
+            <line x1="20" y1="20"  x2="392" y2="20"  stroke="#2a2a2a" stroke-width="0.5" stroke-dasharray="2 3"/>
+            <line x1="20" y1="50"  x2="392" y2="50"  stroke="#2a2a2a" stroke-width="0.5" stroke-dasharray="2 3"/>
+            <line x1="20" y1="80"  x2="392" y2="80"  stroke="#2a2a2a" stroke-width="0.5" stroke-dasharray="2 3"/>
+            <line x1="20" y1="20"  x2="20"  y2="100" stroke="#2a2a2a" stroke-width="0.5"/>
+            <line x1="20" y1="100" x2="392" y2="100" stroke="#2a2a2a" stroke-width="0.5"/>
+            {# S&P 500 — gentle linear ascent #}
+            <path d="M 20 85 Q 100 80 200 72 T 392 60" stroke="#5fc6d4" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+            {# NASDAQ-100 — slightly steeper #}
+            <path d="M 20 85 Q 100 76 200 65 T 392 45" stroke="#7fd4b8" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+            {# BTC — dramatic, with cycle wobbles on the way up #}
+            <path d="M 20 95 C 60 80 80 30 110 50 C 130 65 145 25 180 35 C 200 42 215 18 250 40 C 270 55 285 28 320 32 C 345 35 360 20 392 22" stroke="#F7931A" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            {# Legend dots #}
+            <circle cx="30" cy="14" r="2" fill="#F7931A"/>
+            <text x="36" y="17" font-size="7" font-family="Inter, sans-serif" fill="#aaa">Bitcoin</text>
+            <circle cx="100" cy="14" r="2" fill="#7fd4b8"/>
+            <text x="106" y="17" font-size="7" font-family="Inter, sans-serif" fill="#aaa">NASDAQ-100</text>
+            <circle cx="190" cy="14" r="2" fill="#5fc6d4"/>
+            <text x="196" y="17" font-size="7" font-family="Inter, sans-serif" fill="#aaa">S&amp;P 500</text>
+            {# Year tick labels #}
+            <text x="22"  y="108" font-size="6" font-family="Inter, sans-serif" fill="#666">2010</text>
+            <text x="200" y="108" font-size="6" font-family="Inter, sans-serif" fill="#666" text-anchor="middle">2018</text>
+            <text x="388" y="108" font-size="6" font-family="Inter, sans-serif" fill="#666" text-anchor="end">2026</text>
+          </svg>
+        </div>
+        <div class="calc-tile-body">
+          <h3 class="calc-tile-name">Bitcoin vs. The Stock Market</h3>
+          <p class="calc-tile-tagline">The wealth-over-time stress test &mdash; bitcoin against the S&amp;P 500 and NASDAQ-100 across any holding window since 2010.</p>
+          <span class="calc-tile-cta">Open &rarr;</span>
+        </div>
+      </a>
 
-    <!-- Disciplined Rebalancing — oscillating wave crossing two threshold lines -->
-    <a href="/disciplined-rebalancing.html#calculator" class="calc-tile live">
-      <div class="calc-tile-icon">
-        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Upper threshold line -->
-          <line x1="8" y1="16" x2="40" y2="16" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
-          <!-- Trend line (median) -->
-          <line x1="8" y1="24" x2="40" y2="24" stroke="#e09422" stroke-width="1" opacity="0.35"/>
-          <!-- Lower threshold line -->
-          <line x1="8" y1="32" x2="40" y2="32" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
-          <!-- Oscillating price wave crossing both thresholds -->
-          <path d="M 8 24 Q 14 14, 18 16 Q 22 18, 26 30 Q 30 36, 34 32 Q 38 28, 40 24" stroke="#F7931A" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-          <!-- Sell marker (▼ where wave crosses upper threshold going down) -->
-          <path d="M 18 12 L 21 12 L 19.5 15 Z" fill="#F7931A"/>
-          <!-- Rebuy marker (▲ where wave crosses lower threshold going up) -->
-          <path d="M 32 36 L 35 36 L 33.5 33 Z" fill="#F7931A"/>
-        </svg>
-      </div>
-      <h2 class="calc-tile-name">Disciplined Rebalancing</h2>
-      <p class="calc-tile-question">How can the Power Law channel itself become a discipline?</p>
-      <p class="calc-tile-desc">A bounded protocol for retirement-wrapped bitcoin: sell at percentile triggers, rebuy at lower-percentile triggers. The Power Law channel becomes a set of observable conditions to act on rather than a model to merely believe in. Conditional projection, honest treatment of underperformance, no speculation about <em>where price is going</em>.</p>
-      <span class="calc-tile-cta">Run the discipline</span>
-    </a>
+    </div>
+  </section>
 
-    <!-- Borrowing Against Your Stack — bitcoin coin retained, light/value flowing outward without coin moving -->
-    <a href="/borrowing-against-your-stack.html#calculator" class="calc-tile live">
-      <div class="calc-tile-icon">
-        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Anchor coin (the retained stack) — bitcoin symbol in a circle -->
-          <circle cx="24" cy="24" r="9" stroke="#F7931A" stroke-width="1.8" fill="rgba(247,147,26,0.10)"/>
-          <text x="24" y="28" text-anchor="middle" fill="#F7931A" font-size="11" font-weight="700" font-family="sans-serif">&#8383;</text>
-          <!-- Outflow lines (value drawn against the stack) — small dashed lines extending outward, NOT removing the coin -->
-          <line x1="24" y1="11" x2="24" y2="5"  stroke="#e09422" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.55"/>
-          <line x1="37" y1="24" x2="43" y2="24" stroke="#e09422" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.55"/>
-          <line x1="24" y1="37" x2="24" y2="43" stroke="#e09422" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.55"/>
-          <line x1="11" y1="24" x2="5"  y2="24" stroke="#e09422" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.55"/>
-          <!-- Diagonal dashes for the four quadrants -->
-          <line x1="32" y1="16" x2="38" y2="10" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2" opacity="0.4"/>
-          <line x1="32" y1="32" x2="38" y2="38" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2" opacity="0.4"/>
-          <line x1="16" y1="32" x2="10" y2="38" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2" opacity="0.4"/>
-          <line x1="16" y1="16" x2="10" y2="10" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2" opacity="0.4"/>
-        </svg>
-      </div>
-      <h2 class="calc-tile-name">Borrowing Against Your Stack</h2>
-      <p class="calc-tile-question">When does borrowing against bitcoin make more sense than selling?</p>
-      <p class="calc-tile-desc">The structural argument: every coin sold today is a coin that compounds for someone else. But the strategy carries real tail risks — Celsius, BlockFi, Genesis are the cautionary record. Model a specific scenario against your stack and a target loan: see liquidation distance under stressed price paths, total interest cost vs. retained-coin upside, and the rehypothecation-tier comparison that distinguishes the structurally cleanest version from the worst.</p>
-      <span class="calc-tile-cta">Model the scenario</span>
-    </a>
+  {# ═══ TOOLS GRID ══════════════════════════════════════════════════
+     10 tiles, 3-col responsive grid. Each tile has a preview area
+     with a tool-signature SVG illustration, then name + 1-line
+     tagline + 'Open →' CTA. Order is roughly by user value /
+     decision impact (retirement & rebalancing front, foundational
+     viz toward the back).
+     ═════════════════════════════════════════════════════════════ #}
+  <section class="calc-row" aria-labelledby="tools-heading">
+    <h2 id="tools-heading" class="calc-row-heading">All tools</h2>
 
-  </div>
+    <div class="calc-tile-grid">
 
-  <div class="nav-hint">
-    <p>Looking for a different kind of tool? <strong>The Numbers</strong> in the main navigation includes interactive demonstrations of bitcoin&rsquo;s supply share (<a href="/the-fixed-pie.html">The Fixed Share</a>) and long-range projections (<a href="/the-bitcoin-horizon.html">The Bitcoin Horizon</a>). The pages in <strong>The Arguments</strong> include interactive views of the dollar&rsquo;s decay (<a href="/the-half-life.html">The Half-Life</a>) and corporate-treasury debasement (<a href="/the-melting-ice-cube.html">The Melting Ice Cube</a>) — useful for thinking, even if not directly about your own life.</p>
-  </div>
+      {# Retirement — clock-face icon, the planning question #}
+      <a href="/the-bitcoin-retirement.html#calculator" class="calc-tile">
+        <div class="calc-tile-preview">
+          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+            <circle cx="40" cy="30" r="22" stroke="#e09422" stroke-width="1.4" fill="rgba(247,147,26,0.04)" opacity="0.85"/>
+            <line x1="40" y1="13" x2="40" y2="17" stroke="#e09422" stroke-width="1" opacity="0.6"/>
+            <line x1="40" y1="43" x2="40" y2="47" stroke="#e09422" stroke-width="1" opacity="0.6"/>
+            <line x1="23" y1="30" x2="27" y2="30" stroke="#e09422" stroke-width="1" opacity="0.6"/>
+            <line x1="53" y1="30" x2="57" y2="30" stroke="#e09422" stroke-width="1" opacity="0.6"/>
+            <line x1="40" y1="30" x2="40" y2="20" stroke="#F7931A" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="40" y1="30" x2="48" y2="34" stroke="#F7931A" stroke-width="1.3" stroke-linecap="round"/>
+            <circle cx="40" cy="30" r="1.4" fill="#F7931A"/>
+          </svg>
+        </div>
+        <div class="calc-tile-body">
+          <h3 class="calc-tile-name">The Bitcoin Retirement</h3>
+          <p class="calc-tile-tagline">When can I retire on bitcoin? Drag the sliders &mdash; see how much you need, when, and on what income.</p>
+          <span class="calc-tile-cta">Open &rarr;</span>
+        </div>
+      </a>
+
+      {# Disciplined Rebalancing — oscillating wave + thresholds #}
+      <a href="/disciplined-rebalancing.html#calculator" class="calc-tile">
+        <div class="calc-tile-preview">
+          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+            <line x1="8" y1="18" x2="72" y2="18" stroke="#e09422" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.6"/>
+            <line x1="8" y1="30" x2="72" y2="30" stroke="#e09422" stroke-width="0.8" opacity="0.35"/>
+            <line x1="8" y1="42" x2="72" y2="42" stroke="#e09422" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.6"/>
+            <path d="M 8 30 Q 18 14 26 18 Q 34 22 42 40 Q 50 48 58 42 Q 66 36 72 30" stroke="#F7931A" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 26 12 L 30 12 L 28 16 Z" fill="#F7931A"/>
+            <path d="M 56 48 L 60 48 L 58 44 Z" fill="#F7931A"/>
+          </svg>
+        </div>
+        <div class="calc-tile-body">
+          <h3 class="calc-tile-name">Disciplined Rebalancing</h3>
+          <p class="calc-tile-tagline">Turn the Power Law channel into a protocol &mdash; sell at upper-band triggers, rebuy at lower.</p>
+          <span class="calc-tile-cta">Open &rarr;</span>
+        </div>
+      </a>
+
+      {# The Power Law — log-log scatter + trend line #}
+      <a href="/the-power-law.html#channel" class="calc-tile">
+        <div class="calc-tile-preview">
+          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+            <line x1="8" y1="52" x2="72" y2="52" stroke="#2a2a2a" stroke-width="0.6"/>
+            <line x1="8" y1="8"  x2="8"  y2="52" stroke="#2a2a2a" stroke-width="0.6"/>
+            <line x1="10" y1="50" x2="72" y2="10" stroke="#F7931A" stroke-width="1.6" stroke-linecap="round"/>
+            <circle cx="14" cy="48" r="0.9" fill="#e09422"/>
+            <circle cx="20" cy="44" r="0.9" fill="#e09422"/>
+            <circle cx="26" cy="40" r="0.9" fill="#e09422"/>
+            <circle cx="34" cy="36" r="0.9" fill="#e09422"/>
+            <circle cx="42" cy="28" r="0.9" fill="#e09422"/>
+            <circle cx="50" cy="22" r="0.9" fill="#e09422"/>
+            <circle cx="58" cy="18" r="0.9" fill="#e09422"/>
+            <circle cx="66" cy="14" r="0.9" fill="#e09422"/>
+          </svg>
+        </div>
+        <div class="calc-tile-body">
+          <h3 class="calc-tile-name">Bitcoin &amp; The Power Law</h3>
+          <p class="calc-tile-tagline">Where does bitcoin sit inside the channel &mdash; floor, trend, upper band &mdash; that anchors every projection on this site?</p>
+          <span class="calc-tile-cta">Open &rarr;</span>
+        </div>
+      </a>
+
+      {# BTC vs. Real Estate — house + bitcoin #}
+      <a href="/bitcoin-vs-real-estate.html#calculator" class="calc-tile">
+        <div class="calc-tile-preview">
+          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+            <path d="M16 34L40 16L64 34" stroke="#e09422" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M22 32V50H58V32" stroke="#e09422" stroke-width="1.4" stroke-linejoin="round" fill="rgba(224,148,34,0.05)"/>
+            <text x="40" y="46" text-anchor="middle" fill="#F7931A" font-size="14" font-weight="700" font-family="sans-serif">&#8383;</text>
+          </svg>
+        </div>
+        <div class="calc-tile-body">
+          <h3 class="calc-tile-name">BTC vs. Real Estate</h3>
+          <p class="calc-tile-tagline">Bitcoin or a house &mdash; looking back, or projecting forward? Full mortgage and ownership costs included.</p>
+          <span class="calc-tile-cta">Open &rarr;</span>
+        </div>
+      </a>
+
+      {# Borrowing Against Your Stack — coin + outflow dashes #}
+      <a href="/borrowing-against-your-stack.html#calculator" class="calc-tile">
+        <div class="calc-tile-preview">
+          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+            <circle cx="40" cy="30" r="13" stroke="#F7931A" stroke-width="1.8" fill="rgba(247,147,26,0.10)"/>
+            <text x="40" y="35" text-anchor="middle" fill="#F7931A" font-size="14" font-weight="700" font-family="sans-serif">&#8383;</text>
+            <line x1="40" y1="13" x2="40" y2="6"   stroke="#e09422" stroke-width="1.1" stroke-dasharray="2 2" opacity="0.55"/>
+            <line x1="57" y1="30" x2="64" y2="30"  stroke="#e09422" stroke-width="1.1" stroke-dasharray="2 2" opacity="0.55"/>
+            <line x1="40" y1="47" x2="40" y2="54"  stroke="#e09422" stroke-width="1.1" stroke-dasharray="2 2" opacity="0.55"/>
+            <line x1="23" y1="30" x2="16" y2="30"  stroke="#e09422" stroke-width="1.1" stroke-dasharray="2 2" opacity="0.55"/>
+            <line x1="50" y1="20" x2="56" y2="14"  stroke="#e09422" stroke-width="0.9" stroke-dasharray="2 2" opacity="0.4"/>
+            <line x1="50" y1="40" x2="56" y2="46"  stroke="#e09422" stroke-width="0.9" stroke-dasharray="2 2" opacity="0.4"/>
+            <line x1="30" y1="40" x2="24" y2="46"  stroke="#e09422" stroke-width="0.9" stroke-dasharray="2 2" opacity="0.4"/>
+            <line x1="30" y1="20" x2="24" y2="14"  stroke="#e09422" stroke-width="0.9" stroke-dasharray="2 2" opacity="0.4"/>
+          </svg>
+        </div>
+        <div class="calc-tile-body">
+          <h3 class="calc-tile-name">Borrowing Against Your Stack</h3>
+          <p class="calc-tile-tagline">When does borrowing make more sense than selling? Model liquidation distance vs. retained-coin upside.</p>
+          <span class="calc-tile-cta">Open &rarr;</span>
+        </div>
+      </a>
+
+      {# Bitcoin-Backed Mortgages — house with bitcoin lock #}
+      <a href="/bitcoin-backed-mortgages.html#calculator" class="calc-tile">
+        <div class="calc-tile-preview">
+          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+            <path d="M22 30L40 14L58 30" stroke="#e09422" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M26 28V46H54V28" stroke="#e09422" stroke-width="1.4" stroke-linejoin="round" fill="rgba(224,148,34,0.05)"/>
+            <line x1="40" y1="34" x2="40" y2="46" stroke="#e09422" stroke-width="0.8" opacity="0.45"/>
+            <line x1="32" y1="40" x2="48" y2="40" stroke="#e09422" stroke-width="0.8" opacity="0.45"/>
+            <circle cx="18" cy="48" r="6" stroke="#F7931A" stroke-width="1.6" fill="rgba(247,147,26,0.10)"/>
+            <text x="18" y="51" text-anchor="middle" fill="#F7931A" font-size="7" font-weight="700" font-family="sans-serif">&#8383;</text>
+            <line x1="23" y1="46" x2="28" y2="42" stroke="#F7931A" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="calc-tile-body">
+          <h3 class="calc-tile-name">Bitcoin-Backed Mortgages</h3>
+          <p class="calc-tile-tagline">Buy the house with bitcoin as collateral &mdash; the structural mortgage trade-off across counterparty tiers.</p>
+          <span class="calc-tile-cta">Open &rarr;</span>
+        </div>
+      </a>
+
+      {# The Bitcoin Horizon — long-range projection curve #}
+      <a href="/the-bitcoin-horizon.html#explorer" class="calc-tile">
+        <div class="calc-tile-preview">
+          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+            <line x1="8" y1="50" x2="72" y2="50" stroke="#2a2a2a" stroke-width="0.6"/>
+            <line x1="8" y1="8"  x2="8"  y2="50" stroke="#2a2a2a" stroke-width="0.6"/>
+            {# Upper band, trend, lower band #}
+            <path d="M 8 38 Q 30 26 50 14 T 72 6"  stroke="#e09422" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.5" fill="none"/>
+            <path d="M 8 44 Q 30 36 50 26 T 72 18" stroke="#F7931A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            <path d="M 8 48 Q 30 44 50 38 T 72 30" stroke="#e09422" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.5" fill="none"/>
+            <circle cx="22" cy="42" r="0.9" fill="#e09422"/>
+            <circle cx="34" cy="36" r="0.9" fill="#e09422"/>
+            <circle cx="44" cy="30" r="0.9" fill="#e09422"/>
+            <circle cx="54" cy="24" r="0.9" fill="#e09422"/>
+          </svg>
+        </div>
+        <div class="calc-tile-body">
+          <h3 class="calc-tile-name">The Bitcoin Horizon</h3>
+          <p class="calc-tile-tagline">Long-range Power Law projection across an investor&rsquo;s lifetime &mdash; floor, trend, upper band.</p>
+          <span class="calc-tile-cta">Open &rarr;</span>
+        </div>
+      </a>
+
+      {# The Bitcoin Fixed Share — pie with one slice highlighted #}
+      <a href="/the-fixed-pie.html" class="calc-tile">
+        <div class="calc-tile-preview">
+          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+            <circle cx="40" cy="30" r="20" stroke="#2a2a2a" stroke-width="1" fill="#1a1a1a"/>
+            <path d="M 40 30 L 40 10 A 20 20 0 0 1 56 20 Z" fill="#F7931A"/>
+            <path d="M 40 30 L 56 20 A 20 20 0 0 1 60 30 Z" fill="#e09422" opacity="0.7"/>
+            <path d="M 40 30 L 60 30 A 20 20 0 0 1 40 50 Z" fill="#5c4a1f" opacity="0.6"/>
+            <path d="M 40 30 L 40 50 A 20 20 0 0 1 20 30 Z" fill="#3a3025" opacity="0.6"/>
+            <path d="M 40 30 L 20 30 A 20 20 0 0 1 40 10 Z" fill="#2a2218" opacity="0.6"/>
+            <text x="40" y="34" text-anchor="middle" fill="#0a0908" font-size="9" font-weight="700" font-family="sans-serif">&#8383;</text>
+          </svg>
+        </div>
+        <div class="calc-tile-body">
+          <h3 class="calc-tile-name">The Bitcoin Fixed Share</h3>
+          <p class="calc-tile-tagline">What does owning a piece of 21 million actually mean as a share of all the bitcoin there will ever be?</p>
+          <span class="calc-tile-cta">Open &rarr;</span>
+        </div>
+      </a>
+
+      {# The Half-Life — decay curve with quarters marked #}
+      <a href="/the-half-life.html" class="calc-tile">
+        <div class="calc-tile-preview">
+          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+            <line x1="8" y1="50" x2="72" y2="50" stroke="#2a2a2a" stroke-width="0.6"/>
+            <line x1="8" y1="8"  x2="8"  y2="50" stroke="#2a2a2a" stroke-width="0.6"/>
+            <line x1="8" y1="29" x2="72" y2="29" stroke="#3a3a3a" stroke-width="0.5" stroke-dasharray="2 2"/>
+            <line x1="8" y1="40" x2="72" y2="40" stroke="#3a3a3a" stroke-width="0.5" stroke-dasharray="2 2"/>
+            <line x1="8" y1="45" x2="72" y2="45" stroke="#3a3a3a" stroke-width="0.5" stroke-dasharray="2 2"/>
+            <path d="M 8 10 C 20 12 30 22 40 30 C 50 38 60 44 72 48" stroke="#F7931A" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+            <text x="4" y="13" font-size="6" font-family="Inter, sans-serif" fill="#e09422" text-anchor="end">$1</text>
+            <text x="4" y="31" font-size="5.5" font-family="Inter, sans-serif" fill="#888" text-anchor="end">½</text>
+            <text x="4" y="42" font-size="5.5" font-family="Inter, sans-serif" fill="#888" text-anchor="end">¼</text>
+          </svg>
+        </div>
+        <div class="calc-tile-body">
+          <h3 class="calc-tile-name">The Half-Life</h3>
+          <p class="calc-tile-tagline">Watch the dollar&rsquo;s purchasing power decay &mdash; half by half, generation by generation.</p>
+          <span class="calc-tile-cta">Open &rarr;</span>
+        </div>
+      </a>
+
+      {# The Melting Ice Cube — ice cube + bitcoin alternative #}
+      <a href="/the-melting-ice-cube.html" class="calc-tile">
+        <div class="calc-tile-preview">
+          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+            <path d="M 22 16 L 38 12 L 50 18 L 48 36 L 28 38 Z" stroke="#5fc6d4" stroke-width="1.2" fill="rgba(95,198,212,0.08)" stroke-linejoin="round"/>
+            <line x1="22" y1="16" x2="28" y2="22" stroke="#5fc6d4" stroke-width="0.7" opacity="0.6"/>
+            <line x1="38" y1="12" x2="40" y2="20" stroke="#5fc6d4" stroke-width="0.7" opacity="0.6"/>
+            <line x1="50" y1="18" x2="44" y2="22" stroke="#5fc6d4" stroke-width="0.7" opacity="0.6"/>
+            <path d="M 32 38 Q 30 42 28 46" stroke="#5fc6d4" stroke-width="0.8" fill="none" opacity="0.5" stroke-dasharray="1.5 2"/>
+            <path d="M 40 38 Q 40 43 41 48" stroke="#5fc6d4" stroke-width="0.8" fill="none" opacity="0.5" stroke-dasharray="1.5 2"/>
+            <circle cx="60" cy="40" r="8" stroke="#F7931A" stroke-width="1.4" fill="rgba(247,147,26,0.10)"/>
+            <text x="60" y="44" text-anchor="middle" fill="#F7931A" font-size="9" font-weight="700" font-family="sans-serif">&#8383;</text>
+          </svg>
+        </div>
+        <div class="calc-tile-body">
+          <h3 class="calc-tile-name">The Melting Ice Cube</h3>
+          <p class="calc-tile-tagline">Corporate treasuries against monetary debasement &mdash; bitcoin as the dollar-melt antidote.</p>
+          <span class="calc-tile-cta">Open &rarr;</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
 
 </main>
