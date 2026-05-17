@@ -782,12 +782,12 @@ Six-tier solid-color palette mapped from outperformance multiple. Documented can
 
 - The BvSM page's §2 heatmap section visually references this page; clicking a cell on either heatmap loads the scenario into the BvSM calculator (on BvSM) or has no effect (on /heatmap standalone — see open enhancement below)
 - Listed as a featured tile on `/calculators` (Tools index) with a live mini-heatmap preview
-- `og-heatmap.jpg` is the dedicated OG card — product-forward (§6.15.2), generated via `build-ogs.py`
+- `og-heatmap.jpg` is the dedicated OG card — product-forward (§6.15.2), regenerated via `npm run build-ogs` (`scripts/build-og-images.py`)
 
 ### Open enhancements
 
 - **Cell-click on /heatmap standalone.** Currently a no-op on the standalone page (gated by `.heatmap-standalone` class check). Could add a deep-link to BvSM with scenario params (`/bitcoin-vs-the-stock-market#start=YYYY-MM&horizon=Xy`) so the click navigates with intent preserved. Trigger criteria: user demand for this flow.
-- **OG image regeneration cadence.** The heatmap OG embeds a clone of the live grid; when new monthly data lands (per `MONTHLY_REFRESH_CHECKLIST`), the OG goes slightly stale. Plan to re-run `build-ogs.py` after each monthly refresh — currently not part of the checklist.
+- **OG image regeneration cadence.** The heatmap OG embeds a screenshot of the live grid; when new monthly data lands (per `MONTHLY_REFRESH_CHECKLIST` §6), the OG goes slightly stale. Refresh with `npm run build-ogs` after each monthly data refresh — covered in the checklist.
 
 ---
 
