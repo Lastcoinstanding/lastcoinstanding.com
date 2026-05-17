@@ -169,22 +169,35 @@ inputs) and low-risk demonstrations (Fixed Pie, Horizon) skip it.
 
 ## 7. OG / social card
 
-### Generate the image
+### Choose a pattern
 
-Run the OG card generator with the page's display title and a one-sentence
-italic subtitle (often the carousel headline). Follow `STYLE_GUIDE §6.15`:
+Two OG generation approaches exist on the site, documented in STYLE_GUIDE §6.15. Pick based on the page's character:
+
+| Pattern | When to use | Pipeline |
+|---|---|---|
+| §6.15.1 brand-forward | Page is conceptual / essayistic; no strong single visual hero | Python + Pillow two-tier composite |
+| §6.15.2 product-forward | Page's hero IS an interactive visual (chart, grid, mosaic) | Playwright + live page DOM clone |
+
+If unsure, look at the page's H1 and ask: would a screenshot of the page communicate the argument? If yes, product-forward will land harder. If no, brand-forward keeps the family identity.
+
+### Generate the image — brand-forward (§6.15.1)
+
+Run the Pillow generator with the page's display title and a one-sentence italic subtitle (often the carousel headline). Follow `STYLE_GUIDE §6.15.1`:
 
 - Output: `og-<slug>.jpg`, 1280×720, JPEG quality 88, target ~75–95 KB
-- The right half is composited from the canonical Power Law template —
-  preserves the textured atmospheric ₿ + ember sparks + paper-canvas grain
-  that define the refined family
-- The left half is procedurally generated grain background with text
-  rendered on top
-- Title in Cormorant Garamond SemiBold, italic subtitle in Cormorant
-  Garamond Italic, LCS header and URL in Inter Medium
+- The right half is composited from the canonical Power Law template — preserves the textured atmospheric ₿ + ember sparks + paper-canvas grain that define the refined family
+- The left half is procedurally generated grain background with text rendered on top
+- Title in Cormorant Garamond SemiBold, italic subtitle in Cormorant Garamond Italic, LCS header and URL in Inter Medium
 
-Place the file at the repo root (`og-<slug>.jpg`) alongside the other
-OG images.
+### Generate the image — product-forward (§6.15.2)
+
+Run `build-ogs.py` (or its in-repo successor at `scripts/build-og-images.py` once moved — see TECH_DEBT §1). The script will need a per-page entry that names the hero strategy (live DOM clone, canvas screenshot, or background-image layer) and the editorial chrome content (title with italic-amber accent, subtitle, stats line, URL). Follow the existing entries (`build_bvsm`, `build_retirement`, `build_tools`, `build_homepage`) as templates.
+
+- Output: `og-<slug>.jpg`, 1280×720, JPEG quality 82, target ~40–70 KB
+- Shared editorial chrome matches §6.15.2 layout (Cormorant title with italic amber accent, Inter subtitle, dot+wordmark brand mark top-right, stats line + URL bottom row, subtle amber-glow gradient at top right)
+- The hero visual comes from the actual live page — chart, grid, or asset
+
+Place the file at the repo root (`og-<slug>.jpg`) alongside the other OG images.
 
 ### Wire the meta tags
 
@@ -214,7 +227,7 @@ meta tag block. Follow the BvSM head HTML as the reference. Required tags:
 Add the OG image to the `staticAssets` config so it gets copied into `dist/`
 on build. Without this, Cloudflare serves the page's HTML at the OG image
 URL — a silent failure mode that produces broken social cards on X/Twitter
-without any visible build error.
+without any visible build error. (Documented in STYLE_GUIDE §6.15.3.)
 
 ```javascript
 eleventyConfig.addPassthroughCopy('og-<slug>.jpg');
@@ -238,6 +251,11 @@ Test the social card preview with the actual X/LinkedIn debuggers:
   paste the URL into a draft post
 - LinkedIn: <https://www.linkedin.com/post-inspector/>
 - Facebook: <https://developers.facebook.com/tools/debug/>
+- All-in-one preview: <https://metatags.io/>
+
+### If product-forward — note the data dependency
+
+Product-forward OGs embed live chart data and go stale when the underlying data refreshes. After this page ships, add an entry to `MONTHLY_REFRESH_CHECKLIST §6` so the OG gets regenerated alongside the data refresh.
 
 ## 8. Carousel slide
 

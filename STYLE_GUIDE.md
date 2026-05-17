@@ -259,6 +259,30 @@ The palette is dark by default. Migration's essay-mode is the only cream-backgro
 - Never use red except for explicit warning labels (`FATAL FLAW:` on Synthesis is the canonical case).
 - Two-tone titles: first word `--ink-bright`, emphasized word `--amber`. Use sparingly — Half-Life pattern is the canonical case.
 
+### Heatmap tier palette (canonical)
+
+The Bitcoin Heatmap (`/heatmap` and the BvSM in-page heatmap section) uses a six-tier solid-color palette mapped from BTC's outperformance multiple over the comparator. **Solid hex per tier, not alpha-varying a single base** — an earlier version varied the alpha on one amber and one red base color (`rgba(224,148,34, .25/.55/.95)` / `rgba(196,70,60, .38/.78)`); against the dark page background, dim amber and dim red converged into the same muddy-brown chromatic neighborhood, making positive cells look like negative ones at the 7-px cell scale. Solid hex per tier fixes that:
+
+```
+loss-deep   #BE3A30   bright red          (outperf < -0.5)
+loss        #6B2A23   dim red             (-0.5 ≤ outperf < -0.1)
+flat        #1F1F1F   near-black          (-0.1 ≤ outperf < +0.1; no chromatic claim)
+win-mild    #E0BC50   golden yellow       (+0.1 ≤ outperf < +1.0; i.e. up to 2×)
+win-mid     #F5C240   golden amber-yellow (+1.0 ≤ outperf < +4.0; i.e. 2× to 5×)
+win-deep    #F7931A   bitcoin orange      (outperf ≥ +4.0; i.e. >5×)
+future      transparent                   (window extends past today)
+```
+
+The progression deep-orange → golden-yellow → pale-yellow on the win side is intentional: all three read as "warm / positive" but with clear visual hierarchy (most-saturated = strongest outperformance). The single-step from `#1F1F1F` (flat) up to `#E0BC50` (mild positive) and down to `#6B2A23` (mild negative) crosses the chromatic axis sharply enough that a viewer can identify win-vs-loss at thumbnail scale without reading the legend.
+
+**Synced across three files** — when changing the palette, update all three together (no inheritance chain, no shared variable yet):
+
+- `src/_includes/_pageassets/bitcoin-vs-the-stock-market.js` — `hmColor(tier)` function (canonical source)
+- `src/_includes/_pageassets/bitcoin-vs-the-stock-market.css` — `.bvsm-heatmap-legend-cell[data-tier="*"]::before` rules (legend swatches)
+- `src/_includes/_pageassets/calculators-minis.js` — `tierColor(tier)` function in the /tools mini-heatmap renderer
+
+A future cleanup could lift this to a shared CSS variable + JS constant; not done yet because the duplication is small (six tokens) and stable.
+
 ---
 
 ## 3.5 Modeling assumptions canonical
@@ -887,6 +911,17 @@ The guard prevents the hidden-canvas corruption. The `ResizeObserver` catches th
 
 ### 6.15 OG card generation pattern
 
+The site has **two complementary OG generation approaches**, used depending on whether the page's visual hero is conceptual (brand-forward) or product-forward (showing the actual interactive tool).
+
+| Pattern | When to use | Pipeline | Examples |
+|---|---|---|---|
+| §6.15.1 brand-forward | Page has no strong single visual; conceptual / essay register | Python + Pillow, two-tier composite | Power Law, BvRE, WMHTB, Half-Life, Money Trees, Synthesis, Migration, Trilemma |
+| §6.15.2 product-forward | Page's hero IS an interactive visual (chart, grid, mosaic) | Playwright, live page DOM clone | Heatmap, BvSM (May 2026), Retirement (May 2026), Tools, Homepage (May 2026) |
+
+When building a new page, pick the pattern that matches the page's character — if the tool/visualization IS the argument, product-forward shows that; if the argument is conceptual or essayistic, brand-forward keeps the family identity.
+
+### 6.15.1 OG card — brand-forward (Pillow two-tier)
+
 A reusable Python + Pillow generator for site OG cards (1280×720 JPG) lives in the dev environment (not committed — fonts and the canonical template image are fetched at generation time). Visual register matches the canonical refined cards (Power Law, BvRE, WMHTB, BvSM).
 
 **Two-tier approach** — the technique that distinguishes refined cards from earlier generations:
@@ -912,6 +947,50 @@ A reusable Python + Pillow generator for site OG cards (1280×720 JPG) lives in 
 **When you generate a card,** use the page's headline (carousel slide headline, if defined) as the italic subtitle text. Keep the subtitle under three wrapped lines at the 480px max-width — longer subtitles compete visually with the right-half atmosphere.
 
 **The "unrefined" anti-pattern.** Two earlier-generation cards (Disciplined Rebalancing v1, Bitcoin Retirement v1) used a clean digital solid-orange ₿ with simple radial glow instead of the textured atmospheric ₿. Both were regenerated in May 2026 using the two-tier approach above. The unrefined style reads as e-commerce / digital-product and breaks the family. If a new card looks digital instead of atmospheric, the right half wasn't composited from the canonical template.
+
+### 6.15.2 OG card — product-forward (Playwright live-DOM clone)
+
+Used when the page's argument IS the visual — a chart, an interactive grid, a tile mosaic. Rather than describing the tool in text, the OG shows the tool directly, framed in editorial chrome that names the page and surfaces the key takeaway. Established in the 2026-05-17 OG rollout (heatmap → BvSM → Retirement → Tools → Homepage).
+
+**Pipeline.** A Playwright script (`build-ogs.py`, currently outside the repo — see TECH_DEBT) opens each page in a headless browser, waits for the page's own JS to render its visual hero, then either (a) clones the relevant DOM into an injected OG frame, (b) captures the visual as a static PNG/data-URL and embeds it as `<img>` in the frame, or (c) uses the page's own background image asset as a composition layer. The frame uses Google Fonts (already loaded by the visited page) for typography. Rendered at 2x device-scale for crispness, then downsampled to 1280×720 via Pillow `Image.LANCZOS` and saved at JPEG quality 82 with `optimize=True, progressive=True`. Final files land at ~40–70 KB.
+
+**Per-page hero strategy** (encodes the trade-offs):
+
+- **Live DOM clone** (heatmap, tools) — fastest. The grid/tile structure clones cleanly because it's HTML/CSS, not canvas bitmap. Risk: intersection-observer-triggered mini renderers need to actually paint before clone time; for tools, the script first scrolls the featured row into view and waits ~3.5s, then screenshots the row's bounding box as a PNG rather than cloning (more reliable than DOM cloning when intersection observers are involved).
+- **Canvas screenshot via `canvas.toDataURL()`** (BvSM, Retirement) — for Chart.js canvases, cloning the DOM does NOT carry the bitmap. Call `canvas.toDataURL('image/png')` on the live element, base64-decode, embed as `<img src="data:image/png;base64,...">` in the OG frame. Always scrollIntoView the canvas before capture so the chart has fully rendered.
+- **Background image** (homepage) — when the page itself uses a hero image as its identity (the `/hero-bg.jpg` textured ₿), use that same asset as a right-anchored `cover` background on the OG canvas with the same dark-to-transparent gradient overlay the live page applies. Reproduces the page's visual signature exactly.
+
+**Shared editorial chrome** (so all product-forward cards read as a family with the brand-forward cards):
+
+| Element | Position | Font | Size | Color |
+|---|---|---|---|---|
+| Title (e.g. *Bitcoin* vs. The Stock Market) | top-left, `padding 48 64` | Cormorant Garamond, weight 500, italic accent in amber | 56px | `#f2eee8` (em: `#F7931A`) |
+| Subtitle (one-sentence Inter description) | beneath title | Inter, weight 400 | 19px | `#c8c2b8` |
+| Brand mark (•&nbsp;LAST COIN STANDING) | top-right | Inter, weight 600 | 12px caps, letterspaced 0.22em | `rgba(255,255,255,0.55)` with amber dot |
+| Hero visual | center, ~`flex: 1` | — | typically 350-380px tall | — |
+| Stats line (key takeaway) | bottom-left | Inter, weight 400 | 16.5px | `#d6cfc3`, `strong` in amber |
+| URL | bottom-right | Inter, weight 500 | 13px caps, letterspaced 0.16em | `rgba(255,255,255,0.5)` |
+
+Background is `linear-gradient(135deg, #0a0908 0%, #15130f 100%)` with a subtle `radial-gradient(ellipse at top right, rgba(247, 147, 26, 0.07) 0%, transparent 55%)` amber-glow accent at the top right.
+
+**Italic-amber accent in titles.** Every product-forward card has at least one word italicized in `#F7931A` matching the page's own H1 styling (`<em>Bitcoin</em>`, `<em>Tools</em>`, `<em>Coin</em>` for the homepage). This is the visual hook that ties the OG family back to the site's typographic identity.
+
+**Validation.** After deploy, the OG image URL must return `HTTP 200` with `Content-Type: image/jpeg` (a Cloudflare HTML fallback at 200 status is the silent failure mode — see §6.15.3 below). Validate the social card preview via metatags.io, Facebook's debugger, or by pasting the URL into a draft tweet.
+
+**Regeneration discipline.** Product-forward OGs embed live chart data. When the underlying data refreshes (BTC weekly prices, comparator returns), the OGs go stale. Plan to re-run `build-ogs.py` after each data refresh — see `MONTHLY_REFRESH_CHECKLIST.md`. Brand-forward OGs (§6.15.1) don't have this dependency.
+
+### 6.15.3 OG staticAsset registration (applies to both patterns)
+
+Eleventy's repo-root passthrough is opt-in per file (the folder-level passthrough only covers `videos/`). Every new OG image must be added to the `staticAssets` array in `.eleventy.js`:
+
+```javascript
+const staticAssets = [
+  // ... existing entries ...
+  'og-<slug>.jpg',
+];
+```
+
+Without this, Cloudflare serves the page's HTML at the OG image URL — a phantom-200 failure mode that produces broken social cards on Twitter/LinkedIn/Slack without any visible build error. Detection: `curl -I https://lastcoinstanding.com/og-<slug>.jpg` must return `Content-Type: image/jpeg`, not `text/html`. This bit us in the past (commit `64ae655`-era; TECH_DEBT lists the historical fix) — the lesson stuck.
 
 
 ### 6.16 Print stylesheet pattern (single-page PDF)

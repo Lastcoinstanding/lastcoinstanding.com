@@ -137,6 +137,57 @@ Quick post-refresh checks to confirm everything's coherent:
    BvRE, and any future page that uses the shared Power Law model
    should all show the same "you are here" position.
 
+## 6. OG image regeneration (product-forward cards)
+
+The 2026-05-17 OG rollout introduced **product-forward OG cards** that
+embed live chart screenshots in their composition (STYLE_GUIDE §6.15.2).
+Five cards in this family will visibly drift from current data after a
+monthly refresh and should be regenerated:
+
+| OG card file | Live visual embedded |
+|---|---|
+| `og-heatmap.jpg` | full heatmap grid, all entry months to today |
+| `og-bitcoin-vs-the-stock-market.jpg` | the §2 wealth-curve chart |
+| `og-the-bitcoin-retirement.jpg` | the projection chart with current-state annotations |
+| `og-calculators.jpg` | the featured-row mini-renderers (which themselves embed live data) |
+| `og-image.jpg` (homepage) | static `hero-bg.jpg` background — **no data dependency** |
+
+Of these, `og-image.jpg` doesn't actually need regenerating (its bitcoin
+glyph is a static asset, not a chart). The other four embed `weeklyBtc`
+/ `PL_DATA` / projection state, so each monthly refresh advances the
+visible window by one month and changes the embedded values.
+
+**Regeneration is one command** (once `build-ogs.py` lives in the repo
+per TECH_DEBT §1 — currently in `/tmp/og-investigation/build-ogs.py`):
+
+```bash
+python3 scripts/build-og-images.py        # or wherever the script lives
+```
+
+The script visits each page in headless Chromium, clones or screenshots
+the live visual, composes the editorial chrome, downsamples to 1280×720,
+and writes the four updated JPGs to the repo root. Re-commit alongside
+the monthly refresh commit (or as an immediate follow-up); the same
+filenames are reused so no head-file or `.eleventy.js` changes are
+needed.
+
+**Brand-forward OG cards** (STYLE_GUIDE §6.15.1 — Power Law, BvRE,
+WMHTB, Half-Life, Money Trees, Synthesis, Migration, Trilemma, etc.)
+do NOT need this. Their composition is conceptual / atmospheric and
+has no data dependency. Leave them alone during refresh.
+
+**Verification after regeneration:**
+
+```bash
+curl -I https://lastcoinstanding.com/og-heatmap.jpg
+```
+
+Must return `HTTP 200` with `Content-Type: image/jpeg`. Then validate
+the social card preview via metatags.io or a draft tweet. X/Facebook
+will cache the previous version; first new share triggers re-scrape, or
+use [Facebook's debugger](https://developers.facebook.com/tools/debug/)
+to force a fresh fetch.
+
 ## Why not live fetch?
 
 Live BTC price fetch via CoinGecko (or similar) is a Phase 2 enhancement

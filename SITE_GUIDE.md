@@ -730,8 +730,64 @@ Dual BTC line treatment — *trend-basis projection* (solid, starting from the P
 ### Open enhancements
 
 - **Carousel slide (slide 16) — shipped May 2026.** Trees-in-meadow video landed in carousel position 16; see `§13` inventory and iteration record.
-- **Heatmap visualization.** A start-date × horizon grid showing BTC outperformance vs S&P across every entry window. Deferred until after the carousel slide ships; could land as a §3 enhancement or a separate sub-page depending on how the visualization wants to live.
+- **Heatmap visualization — shipped May 2026.** Initially deferred; now shipped both as an in-page §2 visualization on BvSM AND as a standalone `/heatmap` marquee page. See §20 below.
 - **Live BTC price fetch (Phase 2).** Currently using hardcoded `TODAY_DAYS` and `TODAY_PRICE` constants refreshed monthly per `MONTHLY_REFRESH_CHECKLIST.md`. Live fetch is on the Tech Debt list but deferred — see the checklist's *"Why not live fetch"* section.
+
+---
+
+## 20. The Bitcoin Heatmap (`/heatmap.html`)
+
+**Added:** May 2026 (commits `7f87e8` initial → `448c30` v2 full-canvas → `852c7b` v3 width+pattern-above → `5b6d7b` v4 no-scroll-on-click; subsequent refinement series `61361b` axis labels + mode-aware tooltip → `652471` palette + legend → `5a005a` polish). Standalone marquee page presenting the heatmap as the page-level argument — every monthly entry since 2010, every common holding horizon, in a single colored grid. Companion to the BvSM page's §2 visualization but with no calculator chart below; the heatmap IS the page.
+
+### What the page argues
+
+A grid where rows are holding-period horizons (6mo / 1y / 2y / 3y / 4y / 5y / 7y / 10y, longest at top) and columns are entry months from 2010 to today. Each cell's color encodes BTC's outperformance multiple over the comparator (S&P 500 TR or NASDAQ-100 TR) for that (entry, horizon) window. The eye reads the staircase: dense bright orange across the top-left (long horizons + early entries = always wins by huge multiples), gradient through golden yellow to pale yellow as horizons shorten and entries get more recent, scattered red where short-horizon entries near cyclical tops haven't recovered yet. The page's takeaway lives in the pattern strip above the heatmap: at 4y+ horizons, bitcoin outperformed in 100% of cases (149 of 149 windows); at 7y, average outperformance is 164.5×; at 1y, bitcoin won in 74% of cases — *short-horizon entry timing matters; long-horizon entry timing doesn't*.
+
+### Page architecture
+
+The standalone page reuses the BvSM heatmap component — same JS (`bvsm.js` IIFE), same CSS (`bvsm-heatmap-*` selectors), same data pipeline. The standalone-specific layout is gated by a `.heatmap-standalone` class on `<main>`, which CSS overrides in `heatmap.css` use to:
+
+- Move the pattern strip from a right-rail sidebar (BvSM behavior) to a horizontal label-block-above-grid layout
+- Restructure the y-axis sticky-left wrapper to carry both the *"HOLDING PERIOD"* axis title (rotated -90°) AND the horizon labels, so both stay glued to the left edge during horizontal scroll on mobile
+- Expand the grid to full canvas width on desktop (no horizontal scroll); preserve the BvSM-style fixed-cell-width + horizontal scroll on mobile
+- Disable the cell-click `scrollIntoView` behavior that BvSM uses to bring the calc chart into view (irrelevant when there's no chart below)
+
+### Interaction model
+
+- **Click any cell** → loads the (entry, horizon) scenario into the BvSM calculator (on BvSM only; on `/heatmap` standalone the click is a no-op since the calc chart doesn't exist on this page — see `TECH_DEBT` for whether to add a "open in BvSM" deep-link)
+- **Mode toggle** (Lump-sum / Weekly DCA) — switches the entire grid between two outperformance interpretations
+- **Comparator toggle** (S&P 500 TR / NASDAQ-100 TR) — switches the comparator series
+- **Hover cell** → tooltip with: window start → end · horizon · BTC return · comparator return · price row(s) · outperformance multiple · "click to load" CTA
+
+### Mode-aware tooltip price row
+
+The tooltip's price row is mode-conditional:
+
+- **Lump-sum mode:** single row, `Entry price: $X` where X is `weeklyBtc[startW]` — the BTC price at the start of the window. This is what the lump-sum buyer actually paid; matches the row's window header and the x-axis column for that month.
+- **Weekly DCA mode:** TWO rows, `Entry price: $X` AND `Avg buy price: $Y`. Entry price is the same start-date BTC price (so the user can mentally compare to the lump-sum counterfactual); Avg buy price is the arithmetic mean of weekly BTC prices across the window (which IS the cost basis under uniform $1/week contributions). Showing both surfaces the front-loading trade-off: for long rising windows entry << avg buy, which is the visual signature of *"lump-sum would have beaten DCA across this same window."* For falling/sideways windows the two are close, or entry > avg buy, which means DCA reduced the cost basis below the lump-sum entry point.
+
+Implementation: every cell carries `data-entry-btc`, `data-avg-btc`, AND `data-mode` attributes; the tooltip handler reads `data-mode` and branches on which row(s) to render. `entryBtc` is part of `hmCellValue`'s return object in both modes (cheap to compute; `weeklyBtc[startW]` is already in scope).
+
+### Color palette
+
+Six-tier solid-color palette mapped from outperformance multiple. Documented canonically in `STYLE_GUIDE §3` — "Heatmap tier palette (canonical)". Synced across three files (`bvsm.js` hmColor, `bvsm.css` legend swatches, `calculators-minis.js` tierColor in the /tools mini-heatmap renderer).
+
+### Editorial moves
+
+- **"red means it lost (so far)"** — the subtitle frames any loss cell as a window-bounded outcome, not a verdict. Two-word editorial nod that the long-term Power Law trajectory keeps going regardless of any single short-horizon loss. Distinguishes a loss WINDOW (which the cell shows) from a permanent loss (which would be a different and stronger claim).
+- **Axis labels (rotated y-axis title, x-axis title with directional arrow)** — added 2026-05-17 after JM noted "what are the rows and columns" wasn't obvious without explicit labels. *HOLDING PERIOD* runs vertically along the y-axis (writing-mode: vertical-rl + transform: rotate(180deg) to read bottom-to-top); *ENTRY MONTH →* sits horizontally centered below the year ticks. Both in small caps Inter, dim color, so they read as axis annotation rather than competing chrome.
+- **Mode/comparator metadata grouped with the panel title** — the pattern strip's *LUMP-SUM · VS S&P 500 TR* footer sits directly beneath *THE PATTERN* title rather than floating in the far-right corner (where it was in v1). Co-locating title + its metadata is cleaner info hierarchy.
+
+### Cross-linking
+
+- The BvSM page's §2 heatmap section visually references this page; clicking a cell on either heatmap loads the scenario into the BvSM calculator (on BvSM) or has no effect (on /heatmap standalone — see open enhancement below)
+- Listed as a featured tile on `/calculators` (Tools index) with a live mini-heatmap preview
+- `og-heatmap.jpg` is the dedicated OG card — product-forward (§6.15.2), generated via `build-ogs.py`
+
+### Open enhancements
+
+- **Cell-click on /heatmap standalone.** Currently a no-op on the standalone page (gated by `.heatmap-standalone` class check). Could add a deep-link to BvSM with scenario params (`/bitcoin-vs-the-stock-market#start=YYYY-MM&horizon=Xy`) so the click navigates with intent preserved. Trigger criteria: user demand for this flow.
+- **OG image regeneration cadence.** The heatmap OG embeds a clone of the live grid; when new monthly data lands (per `MONTHLY_REFRESH_CHECKLIST`), the OG goes slightly stale. Plan to re-run `build-ogs.py` after each monthly refresh — currently not part of the checklist.
 
 ---
 
