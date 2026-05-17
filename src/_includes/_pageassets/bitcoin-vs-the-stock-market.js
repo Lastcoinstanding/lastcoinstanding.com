@@ -1580,6 +1580,22 @@
         });
         btn.classList.add('is-active');
         renderHeatmap();
+
+        // Sync the §2 calc's mode toggle to match. On /heatmap the §2
+        // mode toggle is hidden via CSS, so this is the only way the
+        // wealth-over-time chart's mode stays in sync with the heatmap.
+        // On BvSM the §2 mode toggle is visible and this keeps the two
+        // views consistent (the prior independent behavior was a small
+        // inconsistency — switching the heatmap to DCA but leaving §2 in
+        // lump-sum mode meant the calc above and the heatmap below could
+        // present different scenarios for the same conceptual question).
+        // The s2Btn.click() recursively fires §2's mode handler which
+        // does NOT call back into the heatmap, so no feedback loop.
+        var mode = btn.getAttribute('data-hm-mode');
+        var s2Btn = document.querySelector('.bvsm-mode[data-mode="' + mode + '"]');
+        if (s2Btn && !s2Btn.classList.contains('is-active')) {
+          s2Btn.click();
+        }
       });
     });
   }

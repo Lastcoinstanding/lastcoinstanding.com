@@ -1,18 +1,37 @@
 /* ============================================================
-   /heatmap — standalone-page-specific styles (v2).
+   /heatmap — standalone-page-specific styles (v3).
 
-   v2 rebuild: full-canvas heatmap (no horizontal scroll on
-   desktop), sidebar reflows from right-rail to horizontal stat
-   strip below the heatmap, §2 calculator rendered inline below.
-   Wrapper max-width expanded from 1180 → 1400 to give the
-   heatmap a more expansive canvas.
+   Three corrections to v2 in this iteration:
 
-   The heatmap component itself (.bvsm-heatmap-*) is styled in
-   bitcoin-vs-the-stock-market.css; rules here OVERRIDE that
-   file where standalone layout needs to differ. Source order:
-   bvsm.css loads first, heatmap.css second (per heatmap.njk
-   eleventyComputed page_styles), so these rules win by source
-   order without needing higher specificity.
+   (A) WIDTH BUG. The v2 minmax(0, 1fr) override on the grid
+       template wasn't actually distributing columns across the
+       container width — at JM's actual viewport the heatmap was
+       only ~25% wide (showing 2010-2014). Root cause: bvsm.css
+       sets `.bvsm-heatmap-gridwrap { flex: 0 0 auto }` so the
+       gridwrap never grew to fill its flex parent, AND
+       `.bvsm-heatmap-cell { width: 7px }` so each cell fought
+       the minmax(0, 1fr) track with an explicit pixel width.
+       The grid was effectively rendering at fixed-7px-per-column
+       inside a non-flexing gridwrap, with everything beyond what
+       fit clipped by overflow-x: hidden. Fixed both with explicit
+       overrides below.
+
+   (B) VERTICAL SPACING. v2 placed THE PATTERN strip BELOW the
+       heatmap and the §2 calc controls between the heatmap and
+       the chart. Combined with the section-eyebrow + h2 + lede
+       for the deep-dive, ~700px sat between heatmap and chart —
+       breaking the click-cell-see-chart-update loop because
+       both couldn't be visible simultaneously above the fold.
+       v3 moves pattern ABOVE heatmap, hides §2 controls, drops
+       the deep-dive section title — chart sits directly under
+       the heatmap legend.
+
+   (C) CHART LABEL POSITION. v2 placed the chart label
+       'WEALTH-OVER-TIME — LUMP SUM…' ABOVE the canvas. JM noted
+       this was 'calculator guidance' that should be below the
+       chart so it doesn't interrupt heatmap-chart adjacency.
+       v3 uses flex order to move it below the canvas, between
+       canvas and caption.
    ============================================================ */
 
 body {
@@ -26,9 +45,9 @@ body {
   padding: 0 1.5rem 5rem;
 }
 
-/* ─── Hero — narrower than the heatmap canvas ───────────────── */
+/* ─── Hero ─────────────────────────────────────────────────── */
 .heatmap-hero {
-  padding: 4.5rem 0 2.6rem;
+  padding: 3.6rem 0 2rem;
   text-align: center;
   max-width: 880px;
   margin: 0 auto;
@@ -53,7 +72,7 @@ body {
   font-size: clamp(1.05rem, 2vw, 1.3rem);
   color: #c8c0b4;
   line-height: 1.55;
-  margin: 0 auto 1.6rem;
+  margin: 0 auto 1.4rem;
   max-width: 720px;
 }
 .heatmap-hero .heatmap-howto {
@@ -71,9 +90,6 @@ body {
 }
 
 /* ─── .bvsm-page wrapper neutralization ─────────────────────── */
-/* On BvSM, .bvsm-page has its own padding/background/max-width.
-   On standalone we want it as a transparent grouping wrapper so
-   our outer .heatmap-standalone controls the page width. */
 .heatmap-standalone .bvsm-page {
   background: transparent;
   padding: 0;
@@ -82,90 +98,79 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   HEATMAP COMPONENT — full-canvas overrides
+   FIX (A) — actually fit ~197 columns into the container width
 ═══════════════════════════════════════════════════════════════ */
 
-.heatmap-component {
-  margin: 0 0 2.4rem;
+/* The gridwrap is `flex: 0 0 auto` in bvsm.css — it stays at
+   content width, so even with `width: 100%` on the grid the
+   grid was sized by the gridwrap's content (fixed 7px cells ×
+   197) rather than the scroll container. Letting gridwrap grow
+   to fill its flex parent. */
+.heatmap-standalone .bvsm-heatmap-gridwrap {
+  flex: 1 1 auto;
+  min-width: 0;
 }
-
-/* Layout: switch from 2-column grid (heatmap | sidebar) to a
-   simple vertical stack — heatmap first, sidebar as a stat strip
-   below. */
-.heatmap-standalone .bvsm-heatmap-layout {
-  display: block;
+/* And the cells themselves had a hard-coded `width: 7px` in
+   bvsm.css that fought the `minmax(0, 1fr)` grid tracks. Letting
+   the grid determine width. Height stays 28px from bvsm.css. */
+.heatmap-standalone .bvsm-heatmap-cell {
+  width: auto;
 }
-.heatmap-standalone .bvsm-heatmap-main {
-  width: 100%;
-  /* The right-edge gradient affordance (bvsm.css ::after on .bvsm-
-     heatmap-main) is a scroll-cue that's not needed when the grid
-     fits the container without overflow. Hide on desktop; restore
-     on mobile where horizontal scrolling returns. */
-}
-.heatmap-standalone .bvsm-heatmap-main::after {
-  display: none;
-}
-
-/* Grid columns: from a fixed 7px width to minmax(0, 1fr) fill on
-   desktop, so all ~197 monthly columns distribute evenly across
-   the available container width. Yields ~6-7px per column on
-   wide screens with no horizontal scroll. */
 .heatmap-standalone .bvsm-heatmap-grid,
 .heatmap-standalone .bvsm-heatmap-xaxis {
   grid-template-columns: repeat(var(--hm-cols, 197), minmax(0, 1fr));
   width: 100%;
+  min-width: 0;
 }
 .heatmap-standalone .bvsm-heatmap-scroll-container {
   overflow-x: hidden;
-  /* Also reset the scrollbar-color since no scrollbar will appear */
+}
+/* Right-edge scroll-cue from earlier mobile-fix work isn't needed
+   when nothing scrolls. Hide on desktop; restore on mobile below. */
+.heatmap-standalone .bvsm-heatmap-main::after {
+  display: none;
 }
 
-/* ─── Sidebar as horizontal stat strip ──────────────────────── */
-/* Sidebar's internal markup (built by bvsm.js renderSidebar):
-     <div class="bvsm-heatmap-sidebar-title">…</div>
-     <ul class="bvsm-heatmap-sidebar-list">
-       <li>…</li> × 3
-     </ul>
-     <div class="bvsm-heatmap-sidebar-foot">…</div>
-   We restyle the container as a horizontal stat-card strip with
-   the title as a small left rail, the 3 bullets as a 3-column
-   grid, and the foot as a small caption underneath. */
+/* ═══════════════════════════════════════════════════════════════
+   PATTERN STAT STRIP — compact, ABOVE the heatmap
+═══════════════════════════════════════════════════════════════ */
+
+/* The sidebar element now sits directly inside .bvsm-page, BEFORE
+   the heatmap-component. Restyle as a compact horizontal stat
+   strip rather than the right-rail vertical block. */
 .heatmap-standalone .bvsm-heatmap-sidebar {
-  position: static;        /* override the sticky positioning from bvsm.css */
+  position: static;
   width: 100%;
   max-width: none;
-  margin: 1.6rem 0 0;
-  padding: 1.4rem 1.6rem 1.2rem;
+  margin: 0 0 1.2rem;
+  padding: 0.95rem 1.4rem 0.85rem;
   background: rgba(247, 147, 26, 0.04);
   border: 1px solid rgba(247, 147, 26, 0.18);
   border-radius: 8px;
   display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas:
-    "title  list"
-    "foot   foot";
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "title list foot";
   column-gap: 1.5rem;
-  row-gap: 0.8rem;
-  align-items: start;
+  align-items: center;
 }
 .heatmap-standalone .bvsm-heatmap-sidebar-title {
   grid-area: title;
   font-family: 'Inter', -apple-system, sans-serif;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #e09422;
   white-space: nowrap;
-  padding-top: 0.45rem;
   border: none;
   margin: 0;
+  padding: 0;
 }
 .heatmap-standalone .bvsm-heatmap-sidebar-list {
   grid-area: list;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.6rem;
+  gap: 1.2rem;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -174,15 +179,13 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Inter', -apple-system, sans-serif;
-  font-size: 0.92rem;
-  line-height: 1.55;
+  font-size: 0.82rem;
+  line-height: 1.45;
   color: rgba(255, 255, 255, 0.78);
-  /* Remove the bullet marker entirely — visual separation comes
-     from the grid columns. */
   list-style: none;
 }
 .heatmap-standalone .bvsm-heatmap-sidebar-list li::before {
-  content: none;  /* if bvsm.css adds a ::before bullet, hide it */
+  content: none;
 }
 .heatmap-standalone .bvsm-heatmap-sidebar-list li strong {
   color: #f2eee8;
@@ -195,34 +198,76 @@ body {
 .heatmap-standalone .bvsm-heatmap-sidebar-foot {
   grid-area: foot;
   font-family: 'Inter', -apple-system, sans-serif;
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.36);
-  padding-top: 0.7rem;
-  margin-top: 0.2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  text-align: right;
+  white-space: nowrap;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* The heatmap-layout no longer holds the sidebar (moved above),
+   so the heatmap-main occupies it alone. */
+.heatmap-standalone .bvsm-heatmap-layout {
+  display: block;
+}
+.heatmap-standalone .bvsm-heatmap-main {
+  width: 100%;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   §2 CALC INLINE — deep-dive section
+   §2 CALC — hide controls, keep chart + results + verdict
 ═══════════════════════════════════════════════════════════════ */
 
-.heatmap-deepdive {
-  margin: 4rem 0 0;
-  padding-top: 3rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+/* The §2 calc markup is in DOM (for bvsm.js bindings) but most
+   of its CONTROLS are hidden. The chart canvas + result cards +
+   verdict text remain visible. The heatmap's own mode toggle
+   doubles as the calc's mode toggle via bvsm.js's wireHeatmap-
+   Toggles sync added in this iteration. Cell click on the
+   heatmap drives the scenario; the user doesn't need (and
+   wouldn't expect, on a 'heatmap' page) the full preset/slider
+   surface. */
+.heatmap-standalone #bvsmCalcHeading,
+.heatmap-standalone .bvsm-mode-toggle,
+.heatmap-standalone .slider-cluster {
+  display: none;
 }
-.heatmap-deepdive-intro {
-  max-width: 880px;
-  margin: 0 auto 2rem;
+
+/* Tighten the .bvsm-calc container — no top border/padding, sit
+   directly below the heatmap. */
+.heatmap-standalone .bvsm-calc {
+  margin: 1.5rem 0 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+/* FIX (C) — chart label moves BELOW the canvas (was above).
+   .bvsm-chart-wrap becomes a flex column with explicit order;
+   canvas first (closest to heatmap), label second, caption third. */
+.heatmap-standalone .bvsm-chart-wrap {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+.heatmap-standalone .bvsm-chart-canvas { order: 1; }
+.heatmap-standalone .bvsm-chart-label  {
+  order: 2;
+  margin: 0.8rem 0 0.2rem;
   text-align: center;
 }
-.heatmap-deepdive-intro .section-eyebrow {
-  display: inline-block;
-  margin-bottom: 0.8rem;
+.heatmap-standalone .bvsm-chart-caption {
+  order: 3;
+  text-align: center;
+}
+
+/* Result cards keep their styling from bvsm.css — they sit below
+   the chart and act as the numeric punch line. */
+.heatmap-standalone .bvsm-results-grid {
+  margin-top: 1.4rem;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -230,7 +275,7 @@ body {
 ═══════════════════════════════════════════════════════════════ */
 
 .heatmap-cta {
-  margin: 4.5rem auto 0;
+  margin: 4rem auto 0;
   max-width: 880px;
   padding: 0 0.5rem;
 }
@@ -286,7 +331,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   MOBILE — restore horizontal scroll, stack sidebar bullets
+   MOBILE
 ═══════════════════════════════════════════════════════════════ */
 
 @media (max-width: 768px) {
@@ -294,7 +339,7 @@ body {
     padding: 0 1rem 3rem;
   }
   .heatmap-hero {
-    padding: 2.6rem 0 1.8rem;
+    padding: 2.2rem 0 1.5rem;
   }
 
   /* Restore fixed-pixel column width and horizontal scrolling.
@@ -303,36 +348,39 @@ body {
   .heatmap-standalone .bvsm-heatmap-grid,
   .heatmap-standalone .bvsm-heatmap-xaxis {
     grid-template-columns: repeat(var(--hm-cols, 197), 5px);
+    width: auto;
+  }
+  .heatmap-standalone .bvsm-heatmap-cell {
+    width: 5px;
+  }
+  .heatmap-standalone .bvsm-heatmap-gridwrap {
+    flex: 0 0 auto;  /* back to content-sized on mobile */
   }
   .heatmap-standalone .bvsm-heatmap-scroll-container {
     overflow-x: auto;
   }
-  /* Right-edge gradient scroll-cue is useful again on mobile */
   .heatmap-standalone .bvsm-heatmap-main::after {
     display: block;
   }
 
-  /* Stat strip stacks vertically on narrow screens */
+  /* Pattern strip stacks vertically on narrow screens */
   .heatmap-standalone .bvsm-heatmap-sidebar {
     grid-template-columns: 1fr;
     grid-template-areas:
       "title"
       "list"
       "foot";
-    padding: 1.2rem 1.2rem 1rem;
+    row-gap: 0.7rem;
+    padding: 1rem 1.2rem 0.9rem;
   }
   .heatmap-standalone .bvsm-heatmap-sidebar-list {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 0.9rem;
   }
   .heatmap-standalone .bvsm-heatmap-sidebar-foot {
     text-align: left;
   }
 
-  .heatmap-deepdive {
-    margin-top: 2.5rem;
-    padding-top: 2rem;
-  }
   .heatmap-cta {
     margin-top: 3rem;
   }
@@ -342,7 +390,7 @@ body {
 }
 @media (max-width: 480px) {
   .heatmap-hero {
-    padding: 2rem 0 1.4rem;
+    padding: 1.8rem 0 1.2rem;
   }
   .heatmap-hero .heatmap-howto {
     font-size: 0.86rem;
