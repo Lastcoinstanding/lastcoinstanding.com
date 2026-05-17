@@ -1065,11 +1065,6 @@
   var Y_MAX_ALLTIME     = 250;   // clip; early peaks exceed
   var Y_MAX_RECENT      = 70;    // tight zoom for the modern compression
   var RECENT_WINDOW_DAYS = 730;   // ~2 years
-  var GENESIS_TS_LOCAL  = (typeof GENESIS_TS !== 'undefined') ? GENESIS_TS : 1230940800;
-  var PL_A_LOCAL        = (typeof PL_A        !== 'undefined') ? PL_A        : 1.6e-17;
-  var PL_B_LOCAL        = (typeof PL_B        !== 'undefined') ? PL_B        : 5.77;
-
-  function trendPrice(days) { return PL_A_LOCAL * Math.pow(days, PL_B_LOCAL); }
 
   // ── Compute realized 4-year rolling CAGR series from PL_DATA samples
   function computeRealizedCAGR() {
@@ -1101,7 +1096,7 @@
       var dNow = PL_DATA[i][0];
       var dPast = dNow - WINDOW_DAYS;
       if (dPast < 365) continue; // trend formula not meaningful for tiny day values
-      var ratio = trendPrice(dNow) / trendPrice(dPast);
+      var ratio = plPrice(dNow) / plPrice(dPast);
       var cagr  = Math.pow(ratio, 0.25) - 1;
       out.push({ x: dNow, y: cagr * 100 });
     }
@@ -1114,12 +1109,12 @@
 
   // ── Render the dated as-of callout from the most recent samples
   var lastSample        = realized[realized.length - 1];
-  var lastSampleDate    = new Date(GENESIS_TS_LOCAL * 1000 + lastSample.x * 86400 * 1000);
+  var lastSampleDate    = new Date(GENESIS_TS * 1000 + lastSample.x * 86400 * 1000);
   var dateStr           = lastSampleDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' }).toUpperCase();
   var realizedNow       = lastSample.y;
   var trendNow          = trend[trend.length - 1].y;
   var lastSamplePrice   = PL_DATA[PL_DATA.length - 1][1];
-  var lastSampleTrendP  = trendPrice(lastSample.x);
+  var lastSampleTrendP  = plPrice(lastSample.x);
   var trendMultiple     = lastSamplePrice / lastSampleTrendP;  // e.g. 0.59
   var fmt = function(n, p) { return n.toFixed(p == null ? 1 : p) + '%'; };
 
@@ -1209,7 +1204,7 @@
           callbacks: {
             title: function(items) {
               if (!items.length) return '';
-              var d = new Date(GENESIS_TS_LOCAL * 1000 + items[0].parsed.x * 86400 * 1000);
+              var d = new Date(GENESIS_TS * 1000 + items[0].parsed.x * 86400 * 1000);
               return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
             },
             label: function(item) {
@@ -1234,7 +1229,7 @@
             color: 'rgba(255,255,255,0.5)',
             font: { size: 10 },
             callback: function(v) {
-              var d = new Date(GENESIS_TS_LOCAL * 1000 + v * 86400 * 1000);
+              var d = new Date(GENESIS_TS * 1000 + v * 86400 * 1000);
               return d.getFullYear();
             },
             maxRotation: 0,
@@ -1278,12 +1273,12 @@
     chart.options.scales.y.max = currentYMax;
     if (mode === '2y') {
       chart.options.scales.x.ticks.callback = function(v) {
-        var d = new Date(GENESIS_TS_LOCAL * 1000 + v * 86400 * 1000);
+        var d = new Date(GENESIS_TS * 1000 + v * 86400 * 1000);
         return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
       };
     } else {
       chart.options.scales.x.ticks.callback = function(v) {
-        var d = new Date(GENESIS_TS_LOCAL * 1000 + v * 86400 * 1000);
+        var d = new Date(GENESIS_TS * 1000 + v * 86400 * 1000);
         return d.getFullYear();
       };
     }
