@@ -130,9 +130,10 @@
   padding: 1.5rem 1.5rem 1.3rem;
 }
 
-/* Tools tile preview — shorter */
+/* Tools tile preview — shorter than featured but taller than v1
+   to fit chart-style live renders (~120-tall viewBox) plus padding */
 .calc-tile:not(.calc-tile-featured) .calc-tile-preview {
-  min-height: 130px;
+  min-height: 150px;
 }
 
 .calc-tile-preview svg {
@@ -149,60 +150,41 @@
    breathing room. Featured tiles keep the default full-width
    behavior — their viewBoxes (e.g. 400×110 for the BvSM chart and
    the live mini-heatmap) are wide, so full-width scaling lands at
-   a sensible height naturally. */
+   a sensible height naturally.
+
+   Updated for v2 live renderers: bumped max-width to 175 and
+   max-height to 120 so chart-style mini-renders (200×120 viewBox)
+   render at ~175×105 with readable axis labels at font-size ~7
+   in SVG units. The 5 remaining icon-style SVGs (BvRE, BAYB,
+   Mortgages, Fixed Share, Melting Ice Cube) still look proportional
+   at the larger constraint — height-constrained at 120, width
+   ~160 for the 80×60 viewBox. */
 .calc-tile:not(.calc-tile-featured) .calc-tile-preview svg {
-  max-height: 105px;
-  max-width: 150px;
+  max-height: 120px;
+  max-width: 175px;
   width: auto;
 }
 
-/* Live preview area — give SVG more breathing room horizontally */
-.calc-tile-preview-live {
-  padding: 1rem 1.2rem 1rem !important;
-}
-
-#mini-heatmap {
+/* Live-preview target divs — filled by calculators-minis.js on
+   page load. The grouped selector below covers all seven; new
+   live renderers added later should add their target id here.
+   The min-height on the parent .calc-tile-preview ensures the
+   space is reserved during the brief moment before the renderer
+   runs, so the page doesn't reflow when SVGs appear. */
+#mini-heatmap,
+#mini-bvsm-chart,
+#mini-power-law,
+#mini-retirement,
+#mini-rebalancing,
+#mini-horizon,
+#mini-half-life {
   width: 100%;
 }
 
-#mini-heatmap svg {
+#mini-heatmap svg,
+#mini-bvsm-chart svg {
   width: 100%;
   height: auto;
-}
-
-/* "Live" badge — pulsing amber indicator */
-.calc-tile-live-badge {
-  position: absolute;
-  top: 0.7rem;
-  right: 0.7rem;
-  background: rgba(247, 147, 26, 0.13);
-  color: #F7931A;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.2rem 0.55rem 0.2rem 0.5rem;
-  border-radius: 3px;
-  border: 1px solid rgba(247, 147, 26, 0.32);
-  z-index: 2;
-}
-
-.calc-tile-live-badge::before {
-  content: '';
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #F7931A;
-  margin-right: 5px;
-  vertical-align: 1px;
-  animation: live-pulse 2s ease-in-out infinite;
-}
-
-@keyframes live-pulse {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.35; }
 }
 
 /* ─── Tile body ─── */

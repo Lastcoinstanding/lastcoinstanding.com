@@ -66,10 +66,9 @@ eleventyComputed:
     <div class="calc-tile-grid calc-tile-grid-featured">
 
       {# Tile 1 — The Bitcoin Heatmap (LIVE preview) #}
-      <a href="/heatmap.html" class="calc-tile calc-tile-featured calc-tile-live" aria-label="Open The Bitcoin Heatmap">
-        <div class="calc-tile-preview calc-tile-preview-live">
+      <a href="/heatmap.html" class="calc-tile calc-tile-featured" aria-label="Open The Bitcoin Heatmap">
+        <div class="calc-tile-preview">
           <div id="mini-heatmap"></div>
-          <span class="calc-tile-live-badge">Live</span>
         </div>
         <div class="calc-tile-body">
           <h3 class="calc-tile-name">The Bitcoin Heatmap</h3>
@@ -81,31 +80,7 @@ eleventyComputed:
       {# Tile 2 — Bitcoin vs. The Stock Market #}
       <a href="/bitcoin-vs-the-stock-market.html#bvsmCalc" class="calc-tile calc-tile-featured" aria-label="Open Bitcoin vs. The Stock Market calculator">
         <div class="calc-tile-preview">
-          <svg viewBox="0 0 400 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block" preserveAspectRatio="xMidYMid meet">
-            {# log-scale gridlines #}
-            <line x1="20" y1="20"  x2="392" y2="20"  stroke="#2a2a2a" stroke-width="0.5" stroke-dasharray="2 3"/>
-            <line x1="20" y1="50"  x2="392" y2="50"  stroke="#2a2a2a" stroke-width="0.5" stroke-dasharray="2 3"/>
-            <line x1="20" y1="80"  x2="392" y2="80"  stroke="#2a2a2a" stroke-width="0.5" stroke-dasharray="2 3"/>
-            <line x1="20" y1="20"  x2="20"  y2="100" stroke="#2a2a2a" stroke-width="0.5"/>
-            <line x1="20" y1="100" x2="392" y2="100" stroke="#2a2a2a" stroke-width="0.5"/>
-            {# S&P 500 — gentle linear ascent #}
-            <path d="M 20 85 Q 100 80 200 72 T 392 60" stroke="#5fc6d4" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-            {# NASDAQ-100 — slightly steeper #}
-            <path d="M 20 85 Q 100 76 200 65 T 392 45" stroke="#7fd4b8" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-            {# BTC — dramatic, with cycle wobbles on the way up #}
-            <path d="M 20 95 C 60 80 80 30 110 50 C 130 65 145 25 180 35 C 200 42 215 18 250 40 C 270 55 285 28 320 32 C 345 35 360 20 392 22" stroke="#F7931A" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            {# Legend dots #}
-            <circle cx="30" cy="14" r="2" fill="#F7931A"/>
-            <text x="36" y="17" font-size="7" font-family="Inter, sans-serif" fill="#aaa">Bitcoin</text>
-            <circle cx="100" cy="14" r="2" fill="#7fd4b8"/>
-            <text x="106" y="17" font-size="7" font-family="Inter, sans-serif" fill="#aaa">NASDAQ-100</text>
-            <circle cx="190" cy="14" r="2" fill="#5fc6d4"/>
-            <text x="196" y="17" font-size="7" font-family="Inter, sans-serif" fill="#aaa">S&amp;P 500</text>
-            {# Year tick labels #}
-            <text x="22"  y="108" font-size="6" font-family="Inter, sans-serif" fill="#666">2010</text>
-            <text x="200" y="108" font-size="6" font-family="Inter, sans-serif" fill="#666" text-anchor="middle">2018</text>
-            <text x="388" y="108" font-size="6" font-family="Inter, sans-serif" fill="#666" text-anchor="end">2026</text>
-          </svg>
+          <div id="mini-bvsm-chart"></div>
         </div>
         <div class="calc-tile-body">
           <h3 class="calc-tile-name">Bitcoin vs. The Stock Market</h3>
@@ -132,16 +107,7 @@ eleventyComputed:
       {# Retirement — clock-face icon, the planning question #}
       <a href="/the-bitcoin-retirement.html#calculator" class="calc-tile">
         <div class="calc-tile-preview">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
-            <circle cx="40" cy="30" r="22" stroke="#e09422" stroke-width="1.4" fill="rgba(247,147,26,0.04)" opacity="0.85"/>
-            <line x1="40" y1="13" x2="40" y2="17" stroke="#e09422" stroke-width="1" opacity="0.6"/>
-            <line x1="40" y1="43" x2="40" y2="47" stroke="#e09422" stroke-width="1" opacity="0.6"/>
-            <line x1="23" y1="30" x2="27" y2="30" stroke="#e09422" stroke-width="1" opacity="0.6"/>
-            <line x1="53" y1="30" x2="57" y2="30" stroke="#e09422" stroke-width="1" opacity="0.6"/>
-            <line x1="40" y1="30" x2="40" y2="20" stroke="#F7931A" stroke-width="1.6" stroke-linecap="round"/>
-            <line x1="40" y1="30" x2="48" y2="34" stroke="#F7931A" stroke-width="1.3" stroke-linecap="round"/>
-            <circle cx="40" cy="30" r="1.4" fill="#F7931A"/>
-          </svg>
+          <div id="mini-retirement"></div>
         </div>
         <div class="calc-tile-body">
           <h3 class="calc-tile-name">The Bitcoin Retirement</h3>
@@ -153,14 +119,7 @@ eleventyComputed:
       {# Disciplined Rebalancing — oscillating wave + thresholds #}
       <a href="/disciplined-rebalancing.html#calculator" class="calc-tile">
         <div class="calc-tile-preview">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
-            <line x1="8" y1="18" x2="72" y2="18" stroke="#e09422" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.6"/>
-            <line x1="8" y1="30" x2="72" y2="30" stroke="#e09422" stroke-width="0.8" opacity="0.35"/>
-            <line x1="8" y1="42" x2="72" y2="42" stroke="#e09422" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.6"/>
-            <path d="M 8 30 Q 18 14 26 18 Q 34 22 42 40 Q 50 48 58 42 Q 66 36 72 30" stroke="#F7931A" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M 26 12 L 30 12 L 28 16 Z" fill="#F7931A"/>
-            <path d="M 56 48 L 60 48 L 58 44 Z" fill="#F7931A"/>
-          </svg>
+          <div id="mini-rebalancing"></div>
         </div>
         <div class="calc-tile-body">
           <h3 class="calc-tile-name">Disciplined Rebalancing</h3>
@@ -172,19 +131,7 @@ eleventyComputed:
       {# The Power Law — log-log scatter + trend line #}
       <a href="/the-power-law.html#channel" class="calc-tile">
         <div class="calc-tile-preview">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
-            <line x1="8" y1="52" x2="72" y2="52" stroke="#2a2a2a" stroke-width="0.6"/>
-            <line x1="8" y1="8"  x2="8"  y2="52" stroke="#2a2a2a" stroke-width="0.6"/>
-            <line x1="10" y1="50" x2="72" y2="10" stroke="#F7931A" stroke-width="1.6" stroke-linecap="round"/>
-            <circle cx="14" cy="48" r="0.9" fill="#e09422"/>
-            <circle cx="20" cy="44" r="0.9" fill="#e09422"/>
-            <circle cx="26" cy="40" r="0.9" fill="#e09422"/>
-            <circle cx="34" cy="36" r="0.9" fill="#e09422"/>
-            <circle cx="42" cy="28" r="0.9" fill="#e09422"/>
-            <circle cx="50" cy="22" r="0.9" fill="#e09422"/>
-            <circle cx="58" cy="18" r="0.9" fill="#e09422"/>
-            <circle cx="66" cy="14" r="0.9" fill="#e09422"/>
-          </svg>
+          <div id="mini-power-law"></div>
         </div>
         <div class="calc-tile-body">
           <h3 class="calc-tile-name">Bitcoin &amp; The Power Law</h3>
@@ -255,18 +202,7 @@ eleventyComputed:
       {# The Bitcoin Horizon — long-range projection curve #}
       <a href="/the-bitcoin-horizon.html#explorer" class="calc-tile">
         <div class="calc-tile-preview">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
-            <line x1="8" y1="50" x2="72" y2="50" stroke="#2a2a2a" stroke-width="0.6"/>
-            <line x1="8" y1="8"  x2="8"  y2="50" stroke="#2a2a2a" stroke-width="0.6"/>
-            {# Upper band, trend, lower band #}
-            <path d="M 8 38 Q 30 26 50 14 T 72 6"  stroke="#e09422" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.5" fill="none"/>
-            <path d="M 8 44 Q 30 36 50 26 T 72 18" stroke="#F7931A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-            <path d="M 8 48 Q 30 44 50 38 T 72 30" stroke="#e09422" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.5" fill="none"/>
-            <circle cx="22" cy="42" r="0.9" fill="#e09422"/>
-            <circle cx="34" cy="36" r="0.9" fill="#e09422"/>
-            <circle cx="44" cy="30" r="0.9" fill="#e09422"/>
-            <circle cx="54" cy="24" r="0.9" fill="#e09422"/>
-          </svg>
+          <div id="mini-horizon"></div>
         </div>
         <div class="calc-tile-body">
           <h3 class="calc-tile-name">The Bitcoin Horizon</h3>
@@ -298,17 +234,7 @@ eleventyComputed:
       {# The Half-Life — decay curve with quarters marked #}
       <a href="/the-half-life.html" class="calc-tile">
         <div class="calc-tile-preview">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
-            <line x1="8" y1="50" x2="72" y2="50" stroke="#2a2a2a" stroke-width="0.6"/>
-            <line x1="8" y1="8"  x2="8"  y2="50" stroke="#2a2a2a" stroke-width="0.6"/>
-            <line x1="8" y1="29" x2="72" y2="29" stroke="#3a3a3a" stroke-width="0.5" stroke-dasharray="2 2"/>
-            <line x1="8" y1="40" x2="72" y2="40" stroke="#3a3a3a" stroke-width="0.5" stroke-dasharray="2 2"/>
-            <line x1="8" y1="45" x2="72" y2="45" stroke="#3a3a3a" stroke-width="0.5" stroke-dasharray="2 2"/>
-            <path d="M 8 10 C 20 12 30 22 40 30 C 50 38 60 44 72 48" stroke="#F7931A" stroke-width="1.7" fill="none" stroke-linecap="round"/>
-            <text x="4" y="13" font-size="6" font-family="Inter, sans-serif" fill="#e09422" text-anchor="end">$1</text>
-            <text x="4" y="31" font-size="5.5" font-family="Inter, sans-serif" fill="#888" text-anchor="end">½</text>
-            <text x="4" y="42" font-size="5.5" font-family="Inter, sans-serif" fill="#888" text-anchor="end">¼</text>
-          </svg>
+          <div id="mini-half-life"></div>
         </div>
         <div class="calc-tile-body">
           <h3 class="calc-tile-name">The Half-Life</h3>
