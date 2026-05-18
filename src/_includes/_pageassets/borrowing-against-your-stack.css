@@ -1991,6 +1991,7 @@
   .bas-calc-providers,              /* provider cards — tactical guidance, not summary */
   .bas-calc-profile,                /* profile checks — tactical guidance, not summary */
   .bas-future-considerations,       /* "Future considerations" prose block */
+  .bas-calc-roadmap,                /* "Coming in subsequent commits" roadmap block */
   .section-intro { display: none !important; }
 
   /* ─── Layout tightening ─── */
