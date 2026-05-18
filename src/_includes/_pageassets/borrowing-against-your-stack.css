@@ -1920,3 +1920,186 @@
     color: var(--text-bright);
     font-weight: 600;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   PRINT STYLESHEET — single-page PDF output for Loan Health tab
+   ═══════════════════════════════════════════════════════════════════
+
+   Pattern documented in STYLE_GUIDE §6.16. Second use of the print-
+   stylesheet pattern after /the-bitcoin-retirement. DOM scaffolding
+   lives in the .njk: two .print-only blocks bracket the on-screen
+   calculator content. Print order: pre-block (header + inputs table)
+   → chart (kept visible) → post-block (outputs summary + disclaimer).
+   On-screen calculator inputs and computed displays are hidden in
+   print; the chart and the print-only blocks together form the
+   printed page.
+
+   Scope note: scaffolding currently lives only on the Loan Health
+   (II) tab. Borrow vs. Sell (III) and The Math (IV) tabs, if
+   printed by a user, will print their on-screen content with global
+   chrome hidden — functional but not pretty. Multi-tab print
+   coverage tracked in TECH_DEBT. */
+
+.print-only { display: none; }
+
+@media print {
+  /* ─── Reset to black-on-white for ink-friendliness ─── */
+  :root {
+    --bg-page: white;
+    --bg-card: white;
+    --bg-deep: white;
+    --ink: #1a1a1a;
+    --ink-bright: black;
+    --ink-dim: #333;
+    --ink-faint: #666;
+    --border: #999;
+    --border-strong: #555;
+    --border-faint: #ccc;
+    --amber: #b06a18;
+    --amber-bright: #8a4f10;
+    --amber-soft: rgba(176,106,24,0.08);
+  }
+  body { background: white !important; color: black !important; }
+
+  /* ─── Hide global page chrome ─── */
+  nav, header.site-header, .site-nav, .site-header,
+  .tool-framing, .tool-framing-strip, .tool-framing-expanded,
+  footer, .site-footer,
+  .footer-cta,
+  .related-block, .related-grid,
+  .related-set, .related-section, .related-cards,
+  .companion-content, .companion-section { display: none !important; }
+
+  /* ─── Hide BAS-page chrome (audit selectors against rendered HTML) ─── */
+  .page-header,
+  .tab-nav,
+  .tab-content:not(.active),
+  .bas-exploration-banner,          /* persistent FOR-EXPLORATION-ONLY banner */
+  .bas-tool-framing,
+  .help-tip,                        /* ? icons and inline tooltips */
+  .bas-calc-presets-row,            /* "Conservative / Moderate / Aggressive" preset row */
+  .bas-calc-cost-basis-presets,
+  .bas-calc-bvs-cb-presets,
+  .bas-calc-inputs,                 /* live input controls — already in print-inputs-table */
+  .bas-calc-outputs-detail,         /* on-screen output cards — already in print-outputs-table */
+  .bas-calc-providers,              /* provider cards — tactical guidance, not summary */
+  .bas-calc-profile,                /* profile checks — tactical guidance, not summary */
+  .bas-future-considerations,       /* "Future considerations" prose block */
+  .section-intro { display: none !important; }
+
+  /* ─── Layout tightening ─── */
+  .page { max-width: 100%; margin: 0; padding: 0; }
+  .tab-content.active { display: block; }
+
+  /* ─── Keep the chart visible ─── */
+  .bas-calc-chart, .bas-calc-chart-canvas { display: block !important; }
+  .bas-calc-chart {
+    margin: 8pt 0 !important;
+    padding: 4pt !important;
+    page-break-inside: avoid;
+    border: 1px solid #ccc;
+    background: white !important;
+  }
+  .bas-calc-chart-canvas { height: 260pt !important; }
+
+  /* ─── Show print-only blocks ─── */
+  .print-only { display: block; }
+
+  /* ─── Print page head ─── */
+  .print-page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid #999;
+    padding-bottom: 6pt;
+    margin-bottom: 10pt;
+  }
+  .print-brand {
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 9pt;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+  }
+  .print-meta {
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 8.5pt;
+    color: #666;
+  }
+  .print-meta-sep { margin: 0 0.4em; color: #999; }
+  .print-url { font-weight: 500; color: #1a1a1a; }
+
+  /* ─── Print title ─── */
+  .print-title {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 22pt;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin: 0 0 10pt 0;
+    line-height: 1.15;
+  }
+
+  /* ─── Inputs table ─── */
+  .print-inputs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 9pt;
+    margin-bottom: 10pt;
+    page-break-inside: avoid;
+  }
+  .print-inputs-table th {
+    text-align: left;
+    border-bottom: 1px solid #555;
+    padding: 4pt 6pt;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+  .print-inputs-table td {
+    border-bottom: 1px solid #ddd;
+    padding: 3pt 6pt;
+    color: #333;
+  }
+  .print-inputs-table td:first-child { color: #666; }
+  .print-inputs-table td:last-child  { text-align: right; font-weight: 500; }
+
+  /* ─── Post-chart: outputs summary table ─── */
+  .print-section-title {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 14pt;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin: 8pt 0 6pt 0;
+  }
+  .print-outputs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 9pt;
+    margin-bottom: 10pt;
+    page-break-inside: avoid;
+  }
+  .print-outputs-table td {
+    border-bottom: 1px solid #ddd;
+    padding: 3pt 6pt;
+    color: #1a1a1a;
+  }
+  .print-outputs-table td:first-child { color: #666; width: 50%; }
+  .print-outputs-table td:last-child  { text-align: right; font-weight: 600; }
+
+  /* ─── Disclaimer footer ─── */
+  .print-disclaimer {
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 7.5pt;
+    color: #666;
+    border-top: 1px solid #ccc;
+    padding-top: 4pt;
+    margin-top: 8pt;
+    line-height: 1.35;
+  }
+
+  /* ─── Page rules ─── */
+  @page { margin: 14mm 12mm 12mm 12mm; size: letter; }
+}

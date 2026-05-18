@@ -269,6 +269,30 @@ eleventyComputed:
     <!-- TAB II: LOAN HEALTH — will this loan survive?  -->
     <!-- ═══════════════════════════════════════════ -->
     <div class="tab-content" id="tab-loan-health">
+        <!-- PRINT-ONLY: header + inputs (appears before chart in print).
+             Hidden on screen via .print-only { display: none; } and shown
+             in print via @media print. Populated by JS on `beforeprint`.
+             Per STYLE_GUIDE §6.16 (single-page PDF pattern). -->
+        <div class="print-only print-block print-block-pre" aria-hidden="true">
+            <div class="print-page-head">
+                <div class="print-brand">LAST COIN STANDING</div>
+                <div class="print-meta">
+                    <span class="print-url">lastcoinstanding.com/borrowing-against-your-stack</span>
+                    <span class="print-meta-sep">&middot;</span>
+                    <span id="printDate">&mdash;</span>
+                </div>
+            </div>
+            <h2 class="print-title">Borrowing Against Your Stack &mdash; Loan Health</h2>
+            <table class="print-inputs-table">
+                <thead>
+                    <tr><th colspan="2">Inputs</th></tr>
+                </thead>
+                <tbody id="printInputsBody">
+                    <!-- rows populated by JS on beforeprint -->
+                </tbody>
+            </table>
+        </div>
+
         <div class="section-intro">
             <h2>Loan Health</h2>
             <p>Test whether the loan you're considering would survive bitcoin's drawdowns. Set your stack, current price, and the loan you'd need; the chart places your liquidation price on the Power Law channel &mdash; the vertical space between today's price and your liquidation marker is your structural buffer. If that marker sits below the channel floor, bitcoin would need to break its long-term structural support before liquidation. The Borrow vs. Sell tab next door uses the same loan figures to compare borrowing against an outright sale.</p>
@@ -475,6 +499,19 @@ eleventyComputed:
                 </ul>
             </div>
 
+        </div>
+
+        <!-- PRINT-ONLY: outputs + footer (appears after chart in print).
+             DOM order produces print sequence: pre-block → [screen-hidden
+             inputs] → chart → [screen-hidden outputs] → post-block. -->
+        <div class="print-only print-block print-block-post" aria-hidden="true">
+            <h3 class="print-section-title">Loan health summary</h3>
+            <table class="print-outputs-table">
+                <tbody id="printOutputsBody">
+                    <!-- rows populated by JS on beforeprint -->
+                </tbody>
+            </table>
+            <p class="print-disclaimer">For exploration and education only. Not financial advice. The Power Law channel is the central-tendency model only; market behavior may diverge from any single window. See lastcoinstanding.com/borrowing-against-your-stack for the live calculator and full disclaimer.</p>
         </div>
     </div>
 

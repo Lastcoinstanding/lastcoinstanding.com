@@ -995,6 +995,8 @@ Without this, Cloudflare serves the page's HTML at the OG image URL — a phanto
 
 Pattern for adding print stylesheets to calculator pages. Reusable for any future calculator that needs a printable scenario summary.
 
+**Used by.** `/the-bitcoin-retirement` (canonical first use, shipped May 2026), `/borrowing-against-your-stack` (Loan Health tab, May 2026 — note: BAS print scaffolding lives only on Tab II; other BAS tabs degrade to printing on-screen content with global chrome hidden, per the BAS print CSS scope comment).
+
 **Architecture.** Two `display: none` print-only blocks interleaved in the calculator DOM:
 
 ```html

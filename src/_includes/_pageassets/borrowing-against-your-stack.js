@@ -1071,6 +1071,83 @@
       (bvsTab && bvsTab.classList.contains('active'))) {
     recompute();
   }
+
+  // ─── Print population — copy live screen state into print-only blocks ──
+  // Triggered on beforeprint so the printed PDF reflects current sliders.
+  // Pattern documented in STYLE_GUIDE §6.16. Scope: Loan Health tab only;
+  // Borrow vs. Sell and The Math tabs degrade to printing on-screen UI
+  // with chrome hidden (acceptable — see TECH_DEBT for full coverage).
+  function bindPrintPopulation() {
+    function txtById(id) {
+      var el = document.getElementById(id);
+      return el ? el.textContent.trim().replace(/\s+/g, ' ') : '—';
+    }
+    function fmtUSD(n) {
+      var v = parseFloat(n);
+      if (isNaN(v)) return '—';
+      return '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    }
+    function rowHtml(label, value) {
+      return '<tr><td>' + label + '</td><td>' + value + '</td></tr>';
+    }
+
+    function populate() {
+      // Date in header
+      var dateEl = document.getElementById('printDate');
+      if (dateEl) {
+        dateEl.textContent = new Date().toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+      }
+
+      // Inputs table (5 rows — read live input values)
+      var stack    = stackInput ? stackInput.value : '—';
+      var price    = priceInput ? fmtUSD(priceInput.value) : '—';
+      var loan     = loanInput  ? fmtUSD(loanInput.value)  : '—';
+      var liqThr   = liqThresholdSlider ? (liqThresholdSlider.value + '%') : '—';
+      var rate     = rateSlider ? (rateSlider.value + '%')                 : '—';
+      var inputsBody = document.getElementById('printInputsBody');
+      if (inputsBody) {
+        inputsBody.innerHTML =
+          rowHtml('Bitcoin stack',                  stack + ' BTC') +
+          rowHtml('Current BTC price',              price) +
+          rowHtml('Loan amount',                    loan) +
+          rowHtml('Liquidation threshold (LTV)',    liqThr) +
+          rowHtml('Interest rate (APR)',            rate);
+      }
+
+      // Outputs table (live state from computed-output spans)
+      var ltv          = txtById('basLtvOut');
+      var ltvZone      = txtById('basLtvZone');
+      var liqPrice     = txtById('basLiqPrice');
+      var liqDrawdown  = txtById('basLiqDrawdown');
+      var channelPos   = txtById('basChannelPos');
+      var channelHint  = txtById('basChannelHint');
+      var monthly      = txtById('basMonthlyInterest');
+      var annual       = txtById('basAnnualInterest');
+      var pctStack     = txtById('basAnnualPctStack');
+
+      var outputsBody = document.getElementById('printOutputsBody');
+      if (outputsBody) {
+        outputsBody.innerHTML =
+          rowHtml('Current LTV',           ltv + (ltvZone && ltvZone !== '—' ? ' (' + ltvZone + ')' : '')) +
+          rowHtml('Liquidation price',     liqPrice + (liqDrawdown && liqDrawdown !== '—' ? ' — ' + liqDrawdown : '')) +
+          rowHtml('Channel position',      channelPos + (channelHint && channelHint !== '—' ? ' — ' + channelHint : '')) +
+          rowHtml('Monthly interest',      monthly) +
+          rowHtml('Annual interest',       annual + (pctStack && pctStack !== '—' ? ' (' + pctStack + ' of stack)' : ''));
+      }
+    }
+
+    // Run on any print intent — covers Cmd/Ctrl-P, browser menu, system print.
+    window.addEventListener('beforeprint', populate);
+    // Some browsers (Safari mobile) don't fire beforeprint reliably; pre-
+    // populate once at load so data is in place even if the event never
+    // fires. Inputs that change after load won't update without beforeprint
+    // — acceptable trade-off for cross-browser robustness.
+    populate();
+  }
+
+  bindPrintPopulation();
 })();
 
 // ═════════════════════════════════════════════════════════════════════

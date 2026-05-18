@@ -896,9 +896,13 @@ The `RETIREMENT_CALCULATOR_DESIGN §4.2` spec proposed `"25% LTV slider (slidera
 - `og-borrowing-against-your-stack.jpg` is the dedicated OG card — brand-forward family aesthetic per `STYLE_GUIDE §6.15.1` (Cormorant title with italic-amber *"Borrowing"*, atmospheric ₿ glyph, italic subtitle, brand mark)
 - Featured tile on `/calculators` (Tools index)
 
-### Open enhancements
+### Print output
 
-- **Print stylesheet.** Zero `@media print` rules in `borrowing-against-your-stack.css`. Pattern is documented in `STYLE_GUIDE §6.16` (third use after Bitcoin Retirement and Disciplined Rebalancing). Lower priority than the primary calc's print pattern since BAS is supplemental.
+Added 2026-05-18. `Cmd/Ctrl+P` produces a single-page PDF of the Loan Health tab: header strip (brand + URL + date) → page title → inputs table (5 rows: Bitcoin stack, current BTC price, loan amount, liquidation threshold, interest rate) → `basChannelChart` (Power Law channel with current-price marker and liquidation horizontal line) → outputs summary table (current LTV with zone, liquidation price + drawdown, channel position, monthly + annual interest with annual-%-of-stack) → disclaimer footer.
+
+Pattern is the canonical `STYLE_GUIDE §6.16` (second use after `/the-bitcoin-retirement`). Two `print-only` blocks bracket the on-screen calculator inside `#tab-loan-health`; the chart stays visible in print, the screen input controls and output panels are hidden. JS `bindPrintPopulation()` runs on `beforeprint` *and* once at load (Safari-mobile fallback). The on-screen state is the source of truth — current slider values and computed output spans are read directly.
+
+**Scope note.** Print scaffolding lives only on the Loan Health tab. Borrow vs. Sell (III) and The Math (IV) tabs degrade to printing their on-screen content with global chrome hidden — functional but lacks the dedicated header + summary-table treatment. Multi-tab print coverage is tracked as a follow-up in TECH_DEBT; trigger is a user wanting to print a Borrow-vs-Sell scenario specifically.
 
 ### Scenario carry-over from /the-bitcoin-retirement
 
