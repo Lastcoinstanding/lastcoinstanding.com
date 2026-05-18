@@ -2007,7 +2007,7 @@
     border: 1px solid #ccc;
     background: white !important;
   }
-  .bas-calc-chart-canvas { height: 260pt !important; }
+  .bas-calc-chart-canvas { height: 210pt !important; }
 
   /* ─── Show print-only blocks ─── */
   .print-only { display: block; }
@@ -2071,7 +2071,8 @@
   .print-inputs-table td:first-child { color: #666; }
   .print-inputs-table td:last-child  { text-align: right; font-weight: 500; }
 
-  /* ─── Post-chart: outputs summary table ─── */
+  /* ─── Post-chart: outputs summary block stays together ─── */
+  .print-block-post { page-break-inside: avoid; }
   .print-section-title {
     font-family: "Cormorant Garamond", Georgia, serif;
     font-size: 14pt;
