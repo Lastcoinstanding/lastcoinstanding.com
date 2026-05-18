@@ -1972,6 +1972,7 @@
   .companion-content, .companion-section { display: none !important; }
 
   /* ─── Hide BAS-page chrome (audit selectors against rendered HTML) ─── */
+  .hero,                            /* page-level title + subtitle + lede paragraph */
   .page-header,
   .tab-nav,
   .tab-content:not(.active),
