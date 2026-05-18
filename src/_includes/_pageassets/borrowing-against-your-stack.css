@@ -2072,8 +2072,7 @@
   .print-inputs-table td:first-child { color: #666; }
   .print-inputs-table td:last-child  { text-align: right; font-weight: 500; }
 
-  /* ─── Post-chart: outputs summary block stays together ─── */
-  .print-block-post { page-break-inside: avoid; }
+  /* ─── Post-chart: outputs summary table avoids splitting mid-row ─── */
   .print-section-title {
     font-family: "Cormorant Garamond", Georgia, serif;
     font-size: 14pt;
