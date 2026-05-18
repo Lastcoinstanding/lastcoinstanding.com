@@ -1983,6 +1983,8 @@
   .bas-calc-cost-basis-presets,
   .bas-calc-bvs-cb-presets,
   .bas-calc-inputs,                 /* live input controls — already in print-inputs-table */
+  .bas-calc-inputs-risk,            /* (stack, price, loan, threshold cluster) */
+  .bas-calc-inputs-cost,            /* (interest rate slider + presets) */
   .bas-calc-outputs-detail,         /* on-screen output cards — already in print-outputs-table */
   .bas-calc-providers,              /* provider cards — tactical guidance, not summary */
   .bas-calc-profile,                /* profile checks — tactical guidance, not summary */
