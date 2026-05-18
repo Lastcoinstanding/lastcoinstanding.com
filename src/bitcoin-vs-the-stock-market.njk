@@ -223,6 +223,11 @@ eleventyComputed:
                         <button class="bvsm-heatmap-mode-btn is-active" data-hm-mode="lump" type="button">Lump-sum</button>
                         <button class="bvsm-heatmap-mode-btn"           data-hm-mode="dca"  type="button">Weekly DCA</button>
                     </div>
+                    <div class="bvsm-heatmap-control-group">
+                        <span class="bvsm-heatmap-control-label">View:</span>
+                        <button class="bvsm-heatmap-view-btn is-active" data-hm-view="window" type="button">Period return</button>
+                        <button class="bvsm-heatmap-view-btn"           data-hm-view="hold"   type="button">Held to today</button>
+                    </div>
                 </div>
 
                 <div class="bvsm-heatmap-layout">
@@ -247,7 +252,7 @@ eleventyComputed:
                                 <span class="bvsm-heatmap-legend-cell" data-tier="win-mid">2&times; to 5&times;</span>
                                 <span class="bvsm-heatmap-legend-cell" data-tier="win-deep">&gt;5&times;</span>
                             </div>
-                            <div class="bvsm-heatmap-legend-note">Color = bitcoin&rsquo;s outperformance multiple over the comparator. Click any cell to load that start date in the calculator above.</div>
+                            <div class="bvsm-heatmap-legend-note">Color = bitcoin&rsquo;s outperformance multiple over the comparator. Click any cell to load that start date in the calculator above. <strong>View toggle above:</strong> <em>Period return</em> reads each cell as the return over the cell&rsquo;s specific window. <em>Held to today</em> reads each cell as the return from that entry date to today, for someone who held through.</div>
                         </div>
                     </div>
 

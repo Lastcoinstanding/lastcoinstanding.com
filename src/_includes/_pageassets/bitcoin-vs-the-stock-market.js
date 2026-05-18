@@ -1155,13 +1155,25 @@
   // Compute the outperformance multiple + avg BTC price for one cell.
   // O(1) per call after precomputeWeekly() has run.
   // Returns null if the window extends past today (future).
-  function hmCellValue(startDate, horizonMonths, cmpKey, mode) {
+  //
+  // holdToToday (optional): when true, the cell-validity check still uses
+  // the nominal `horizonMonths` end (so the grid's set of valid cells is
+  // identical to window mode), but the computed value uses entry → today
+  // instead of entry → entry+horizon. The cell's row label becomes
+  // "intended commitment" rather than "actual exit"; all cells in the
+  // same entry-month column resolve to the same value. The "View: Held
+  // to today" toggle on the heatmap controls drives this.
+  function hmCellValue(startDate, horizonMonths, cmpKey, mode, holdToToday) {
     if (!hmReady) return null;
     var endDate = addMonths(startDate, horizonMonths);
     var startW = dateToWeekIdx(startDate);
     var endW   = dateToWeekIdx(endDate);
-    if (endW > maxWeekIdx) return null;
+    if (endW > maxWeekIdx) return null;            // nominal horizon end is in the future → cell excluded in both views
     if (startW < 0 || endW <= startW) return null;
+
+    // Hold-to-today overrides the actual end week. The grid structure
+    // is unaffected; only the value differs from window mode.
+    if (holdToToday) endW = maxWeekIdx;
 
     var weeklyCmp = (cmpKey === 'ndq') ? weeklyNdq : weeklySp;
     var cumInvCmp = (cmpKey === 'ndq') ? cumInvNdq : cumInvSp;
@@ -1281,8 +1293,11 @@
 
     var cmpKey  = document.querySelector('.bvsm-heatmap-cmp-btn.is-active');
     var modeBtn = document.querySelector('.bvsm-heatmap-mode-btn.is-active');
+    var viewBtn = document.querySelector('.bvsm-heatmap-view-btn.is-active');
     var cmp     = cmpKey ? cmpKey.getAttribute('data-hm-cmp') : 'sp500';
     var mode    = modeBtn ? modeBtn.getAttribute('data-hm-mode') : 'lump';
+    var view    = viewBtn ? viewBtn.getAttribute('data-hm-view') : 'window';
+    var holdToToday = (view === 'hold');
     var cmpName = cmp === 'ndq' ? 'NASDAQ-100 TR' : 'S&P 500 TR';
 
     var startDates = buildStartDates();
@@ -1311,7 +1326,7 @@
       var rowWins = 0, rowTotal = 0, rowSumOutperf = 0;
       for (var c = 0; c < nCols; c++) {
         var sd = startDates[c];
-        var val = hmCellValue(sd, h, cmp, mode);
+        var val = hmCellValue(sd, h, cmp, mode, holdToToday);
         if (val === null) {
           cellHtml.push('<div class="bvsm-heatmap-cell is-future"></div>');
         } else {
@@ -1329,6 +1344,7 @@
             'data-avg-btc="'   + val.avgBtc.toFixed(2)   + '" ' +
             'data-entry-btc="' + val.entryBtc.toFixed(2) + '" ' +
             'data-mode="'      + mode + '" ' +
+            'data-view="'      + view + '" ' +
             'data-tier="'      + tier + '" ' +
             'style="background:' + hmColor(tier) + '"></div>'
           );
@@ -1358,59 +1374,82 @@
     xaxis.innerHTML = xaxisHtml.join('');
 
     // Sidebar: three punchline bullets pulled from the computed stats
-    renderSidebar(sidebar, perHorizonStats, cmpName, mode);
+    renderSidebar(sidebar, perHorizonStats, cmpName, mode, holdToToday);
   }
 
   // Pull out the three sharpest summary bullets from the per-horizon stats.
   // Bullet 1: longest horizon where win rate hit 100%.
   // Bullet 2: the 7y row (or whichever long horizon best illustrates).
   // Bullet 3: the short horizon where losses still exist, named honestly.
-  function renderSidebar(el, stats, cmpName, mode) {
+  function renderSidebar(el, stats, cmpName, mode, holdToToday) {
     var modeLabel = mode === 'dca' ? 'Weekly DCA' : 'Lump-sum';
+    var viewLabel = holdToToday ? 'Held to today' : 'Period return';
     var bullets = [];
 
-    // Find longest horizon where win rate is 100%
-    var perfectHorizons = HM_HORIZONS.filter(function(h) {
-      return stats[h] && stats[h].total > 0 && stats[h].wins === stats[h].total;
-    });
-    if (perfectHorizons.length) {
-      var minPerfect = perfectHorizons[0];  // smallest = earliest threshold
-      var label7y = HM_HORIZON_LABELS[HM_HORIZONS.indexOf(minPerfect)];
-      bullets.push(
-        '<strong>' + label7y + '+ horizons:</strong> bitcoin outperformed ' + cmpName +
-        ' in <strong>100% of cases</strong> &mdash; ' +
-        '<span class="bvsm-heatmap-sidebar-num">' + stats[minPerfect].wins + ' of ' +
-        stats[minPerfect].total + '</span> windows.'
-      );
-    }
+    if (holdToToday) {
+      // Hold-to-today: all rows show the same value per entry-month. Use the
+      // 6mo row (longest history of valid entries — anyone who entered 6+
+      // months ago has a "to today" return to display) for the headline
+      // takeaways.
+      var sHold = stats[6];
+      if (sHold && sHold.total > 0) {
+        var winPct = (sHold.winPct * 100).toFixed(0);
+        bullets.push(
+          '<strong>Held to today,</strong> bitcoin outperformed ' + cmpName + ' in ' +
+          '<span class="bvsm-heatmap-sidebar-num">' + winPct + '%</span> of monthly entries since 2010 &mdash; ' +
+          '<span class="bvsm-heatmap-sidebar-num">' + sHold.wins + ' of ' + sHold.total + '</span> windows.'
+        );
+        bullets.push(
+          '<strong>Average outperformance</strong> from entry to today is ' +
+          '<span class="bvsm-heatmap-sidebar-num">' + fmtMult(sHold.avgOutperf) + '</span> ' +
+          'over the comparator. Long-term entry timing has rewarded patience across nearly every starting point.'
+        );
+      }
+    } else {
+      // Window-mode bullets (the original three takeaways).
+      // Bullet 1: longest horizon where win rate hit 100%.
+      // Bullet 2: the 7y row (or whichever long horizon best illustrates).
+      // Bullet 3: the short horizon where losses still exist, named honestly.
+      var perfectHorizons = HM_HORIZONS.filter(function(h) {
+        return stats[h] && stats[h].total > 0 && stats[h].wins === stats[h].total;
+      });
+      if (perfectHorizons.length) {
+        var minPerfect = perfectHorizons[0];  // smallest = earliest threshold
+        var label7y = HM_HORIZON_LABELS[HM_HORIZONS.indexOf(minPerfect)];
+        bullets.push(
+          '<strong>' + label7y + '+ horizons:</strong> bitcoin outperformed ' + cmpName +
+          ' in <strong>100% of cases</strong> &mdash; ' +
+          '<span class="bvsm-heatmap-sidebar-num">' + stats[minPerfect].wins + ' of ' +
+          stats[minPerfect].total + '</span> windows.'
+        );
+      }
 
-    // The 7y or longest horizon — magnitude of median outperformance
-    var bigH = 84;  // 7y
-    if (stats[bigH] && stats[bigH].total > 0) {
-      var avg = stats[bigH].avgOutperf;
-      bullets.push(
-        '<strong>At 7-year horizons,</strong> average outperformance is ' +
-        '<span class="bvsm-heatmap-sidebar-num">' + fmtMult(avg) + '</span> ' +
-        'over the comparator.'
-      );
-    }
+      var bigH = 84;  // 7y
+      if (stats[bigH] && stats[bigH].total > 0) {
+        var avg = stats[bigH].avgOutperf;
+        bullets.push(
+          '<strong>At 7-year horizons,</strong> average outperformance is ' +
+          '<span class="bvsm-heatmap-sidebar-num">' + fmtMult(avg) + '</span> ' +
+          'over the comparator.'
+        );
+      }
 
-    // Short-horizon honest disclosure
-    var shortH = 12;
-    if (stats[shortH] && stats[shortH].total > 0) {
-      var winPct = (stats[shortH].winPct * 100).toFixed(0);
-      var lossWindows = stats[shortH].total - stats[shortH].wins;
-      bullets.push(
-        '<strong>At 1-year horizons,</strong> bitcoin won in ' + winPct + '% of cases &mdash; ' +
-        'leaving <span class="bvsm-heatmap-sidebar-num">' + lossWindows + ' window' +
-        (lossWindows === 1 ? '' : 's') + '</span> where it didn&rsquo;t. Short-horizon entry timing matters; long-horizon entry timing doesn&rsquo;t.'
-      );
+      var shortH = 12;
+      if (stats[shortH] && stats[shortH].total > 0) {
+        var sWinPct = (stats[shortH].winPct * 100).toFixed(0);
+        var lossWindows = stats[shortH].total - stats[shortH].wins;
+        bullets.push(
+          '<strong>At 1-year horizons,</strong> bitcoin won in ' + sWinPct + '% of cases &mdash; ' +
+          'leaving <span class="bvsm-heatmap-sidebar-num">' + lossWindows + ' window' +
+          (lossWindows === 1 ? '' : 's') + '</span> where it didn&rsquo;t. Short-horizon entry timing matters; long-horizon entry timing doesn&rsquo;t.'
+        );
+      }
     }
 
     el.innerHTML =
       '<div class="bvsm-heatmap-sidebar-label">' +
         '<div class="bvsm-heatmap-sidebar-title">The pattern</div>' +
-        '<div class="bvsm-heatmap-sidebar-foot">' + modeLabel + ' &middot; vs ' + cmpName + '</div>' +
+        '<div class="bvsm-heatmap-sidebar-foot">' + viewLabel + ' &middot; ' + modeLabel + ' &middot; vs ' + cmpName + '</div>' +
       '</div>' +
       '<ul class="bvsm-heatmap-sidebar-list">' +
       bullets.map(function(b) { return '<li>' + b + '</li>'; }).join('') +
@@ -1432,11 +1471,15 @@
       var avgBtc    = parseFloat(cell.getAttribute('data-avg-btc'));
       var entryBtc  = parseFloat(cell.getAttribute('data-entry-btc'));
       var cellMode  = cell.getAttribute('data-mode') || 'lump';
+      var cellView  = cell.getAttribute('data-view') || 'window';
+      var cellHold  = (cellView === 'hold');
       if (!startStr) { tip.style.opacity = 0; return; }
 
       var hLabel = HM_HORIZON_LABELS[HM_HORIZONS.indexOf(horizon)];
       var startD = new Date(startStr);
-      var endD   = addMonths(startD, horizon);
+      // In hold-to-today mode, the displayed end date is today; in window
+      // mode it's entry + horizon (which is what the cell's value is over).
+      var endD   = cellHold ? new Date() : addMonths(startD, horizon);
       var cmpKey = document.querySelector('.bvsm-heatmap-cmp-btn.is-active');
       var cmpName = cmpKey && cmpKey.getAttribute('data-hm-cmp') === 'ndq' ? 'NDQ' : 'S&P';
 
@@ -1470,9 +1513,15 @@
       //   4. Entry price (always) + Avg buy price (DCA only)
       //   5. Outperformance multiple (highlighted)
       //   6. Click-to-load CTA
+      // Tooltip head — window mode shows "start → end · horizon"; hold-to-today
+      // shows "start → today · held through" (the "horizon" row label is the
+      // commitment-period axis in this view, not an exit date).
+      var tipHead = cellHold
+        ? fmtDateShort(startD) + ' &rarr; today &middot; held through'
+        : fmtDateShort(startD) + ' &rarr; ' + fmtDateShort(endD) + ' &middot; ' + hLabel;
+
       tip.innerHTML =
-        '<div class="bvsm-heatmap-tooltip-head">' + fmtDateShort(startD) +
-        ' &rarr; ' + fmtDateShort(endD) + ' &middot; ' + hLabel + '</div>' +
+        '<div class="bvsm-heatmap-tooltip-head">' + tipHead + '</div>' +
         '<div class="bvsm-heatmap-tooltip-row"><span>Bitcoin</span><strong>' + fmtRet(btcRet) + '</strong></div>' +
         '<div class="bvsm-heatmap-tooltip-row"><span>' + cmpName + '</span><strong>' + fmtRet(cmpRet) + '</strong></div>' +
         priceRows +
@@ -1642,6 +1691,18 @@
         if (s2Btn && !s2Btn.classList.contains('is-active')) {
           s2Btn.click();
         }
+      });
+    });
+    // View toggle: "Period return" (cell window) vs "Held to today"
+    // (entry → today). Cell-validity check is the same in both views,
+    // so the grid structure doesn't change — only cell values + tooltip.
+    document.querySelectorAll('.bvsm-heatmap-view-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.bvsm-heatmap-view-btn').forEach(function(b) {
+          b.classList.remove('is-active');
+        });
+        btn.classList.add('is-active');
+        renderHeatmap();
       });
     });
   }
