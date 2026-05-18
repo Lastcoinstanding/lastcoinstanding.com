@@ -737,7 +737,7 @@ Dual BTC line treatment — *trend-basis projection* (solid, starting from the P
 
 ## 20. The Bitcoin Heatmap (`/heatmap.html`)
 
-**Added:** May 2026 (commits `7f87e8` initial → `448c30` v2 full-canvas → `852c7b` v3 width+pattern-above → `5b6d7b` v4 no-scroll-on-click; subsequent refinement series `61361b` axis labels + mode-aware tooltip → `652471` palette + legend → `5a005a` polish). Standalone marquee page presenting the heatmap as the page-level argument — every monthly entry since 2010, every common holding horizon, in a single colored grid. Companion to the BvSM page's §2 visualization but with no calculator chart below; the heatmap IS the page.
+**Added:** May 2026 (commits `7f87e8` initial → `448c30` v2 full-canvas → `852c7b` v3 width+pattern-above → `5b6d7b` v4 no-scroll-on-click; subsequent refinement series `61361b` axis labels + mode-aware tooltip → `652471` palette + legend → `5a005a` polish → `5a3976c` view toggle / Period return vs Held to today). Standalone marquee page presenting the heatmap as the page-level argument — every monthly entry since 2010, every common holding horizon, in a single colored grid. Companion to the BvSM page's §2 visualization; the v3 redesign brought the wealth-over-time chart onto the standalone page below the heatmap so cell-click updates a chart in place rather than navigating away — the heatmap + chart pair together IS the page.
 
 ### What the page argues
 
@@ -754,10 +754,23 @@ The standalone page reuses the BvSM heatmap component — same JS (`bvsm.js` IIF
 
 ### Interaction model
 
-- **Click any cell** → loads the (entry, horizon) scenario into the BvSM calculator (on BvSM only; on `/heatmap` standalone the click is a no-op since the calc chart doesn't exist on this page — see `TECH_DEBT` for whether to add a "open in BvSM" deep-link)
+- **Click any cell** → loads the (entry, horizon) scenario into the wealth-over-time chart on the same page (v3 redesign, May 2026). On `/heatmap` the chart sits directly below the heatmap and updates in place; on BvSM the same JS targets the §2 calculator chart with the same effect. No page navigation in either context — the click is a chart-state update, not a route.
+- **View toggle** (Period return / Held to today) — switches the cells between two outperformance interpretations. *Period return*: cell value = BTC outperformance over the cell's nominal window (entry → entry+horizon). *Held to today*: cell value = BTC outperformance from entry to today, for a continuous holder; all cells in the same entry-month column resolve to the same value. The wealth-over-time chart below the heatmap is always entry-to-today regardless of view (this is deliberate — see "View toggle" subsection below)
 - **Mode toggle** (Lump-sum / Weekly DCA) — switches the entire grid between two outperformance interpretations
 - **Comparator toggle** (S&P 500 TR / NASDAQ-100 TR) — switches the comparator series
-- **Hover cell** → tooltip with: window start → end · horizon · BTC return · comparator return · price row(s) · outperformance multiple · "click to load" CTA
+- **Hover cell** → tooltip with: window header (view-aware) · BTC return · comparator return · price row(s) · outperformance multiple · "click to load" CTA
+
+### View toggle (Period return / Held to today)
+
+Added 2026-05-17 (commit `5a3976cce5`). The toggle exists because the default *Period return* view, while honestly measuring window-by-window outperformance, can mislead a reader whose actual alternative is *not holding any bitcoin at all*. A 6mo cell starting Oct 2019 shows red (BTC -24% vs S&P over those six months) — true within the window, but a user who actually entered Oct 2019 and is reading this page in May 2026 is up several-hundred percent on that entry. The *Held to today* view surfaces that long-term-thinking-wins framing without erasing the Period return view, which still tells the volatility-risk story honestly.
+
+Mechanics: the cell-validity check uses the nominal horizon end in both views (so the grid structure is identical between modes — only colors change, not the shape of the grid). The Period view uses entry+horizon as the value endpoint; the Held view uses today (`maxWeekIdx`) as the value endpoint. In Held view, the row label becomes "intended commitment" rather than "actual exit" — all cells in the same entry-month column resolve to the same value, producing a 1D-ribbon-shaped reading inside the 2D grid. JM accepted this flatness as the message: long-term entry timing has rewarded patience across nearly every starting point.
+
+Sidebar text branches on view: Period mode keeps the three original bullets (100%-wins horizon, 7y average outperformance, 1y honest-disclosure). Held mode shows two bullets — *"Held to today, bitcoin outperformed [cmp] in X% of monthly entries since 2010"* and *"Average outperformance from entry to today is M×."* The 6mo row's stats drive both bullets (longest history of valid entries).
+
+Tooltip head text branches on the cell's `data-view` attribute: window mode keeps the original `start → end · horizon` head; held mode shows `start → today · held through`. All other tooltip rows (BTC return, comparator return, entry price, outperformance, CTA) use the cell's currently-computed values, so they update automatically.
+
+Editorial design call: the wealth-over-time chart below the heatmap stays entry-to-today regardless of view. When the heatmap is in *Period return* mode, the cell measures one window while the chart shows what happened next — that tension is itself part of the lesson (windowed risk vs long-run reward). When the heatmap is in *Held to today* mode, the chart matches the cell's framing — both are entry-to-today.
 
 ### Mode-aware tooltip price row
 
@@ -780,13 +793,12 @@ Six-tier solid-color palette mapped from outperformance multiple. Documented can
 
 ### Cross-linking
 
-- The BvSM page's §2 heatmap section visually references this page; clicking a cell on either heatmap loads the scenario into the BvSM calculator (on BvSM) or has no effect (on /heatmap standalone — see open enhancement below)
+- The BvSM page's §2 heatmap section uses the same component; clicking a cell on either heatmap updates the wealth-over-time chart on the same page (no navigation in either context — that was a pre-v3 design that v3 replaced with in-place chart updating)
 - Listed as a featured tile on `/calculators` (Tools index) with a live mini-heatmap preview
 - `og-heatmap.jpg` is the dedicated OG card — product-forward (§6.15.2), regenerated via `npm run build-ogs` (`scripts/build-og-images.py`)
 
 ### Open enhancements
 
-- **Cell-click on /heatmap standalone.** Currently a no-op on the standalone page (gated by `.heatmap-standalone` class check). Could add a deep-link to BvSM with scenario params (`/bitcoin-vs-the-stock-market#start=YYYY-MM&horizon=Xy`) so the click navigates with intent preserved. Trigger criteria: user demand for this flow.
 - **OG image regeneration cadence.** The heatmap OG embeds a screenshot of the live grid; when new monthly data lands (per `MONTHLY_REFRESH_CHECKLIST` §6), the OG goes slightly stale. Refresh with `npm run build-ogs` after each monthly data refresh — covered in the checklist.
 
 ---
