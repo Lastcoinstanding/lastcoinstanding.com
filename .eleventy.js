@@ -21,7 +21,6 @@ module.exports = function (eleventyConfig) {
     'data.json',
     // OG cards
     'og-image.jpg',
-    'og-preview.jpg',
     'og-about.jpg',
     'og-money-trees.jpg',
     'og-not-a-bubble.jpg',
