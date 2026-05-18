@@ -352,7 +352,7 @@ Full credits section lists: Giovanni Santostasi (theory creator), Matthew Mežin
 
 ### What's no longer here (was Tab 4 before Phase 4)
 
-The previous Tab 4 was **"Calculator"** (`data-tab="calculator"`) — a forward-looking real-estate calculator. That calculator was migrated to BvRE's Calculator tab as the projection mode (commit `0b2d203`); Tab 4 was rewritten as The Channel (commit `36c13a0`). Inbound `/the-power-law.html#calculator` deep-links **redirect** client-side via `location.replace()` to `/bitcoin-vs-real-estate.html#calc-mode-projection` (top of TABS IIFE; runs before any tab logic). Cross-link role: BvRE hosts both retrospective and projection real-estate calculators; Power Law is the *model* they apply, not a competing decision frame.
+The previous Tab 4 was **"Calculator"** (`data-tab="calculator"`) — a forward-looking real-estate calculator. That calculator was migrated to BvRE's Calculator tab as the projection mode (commit `0b2d203`); Tab 4 was rewritten as The Channel (commit `36c13a0`). Inbound `/the-power-law.html#calculator` deep-links **redirect** client-side via `location.replace()` to `/bitcoin-vs-real-estate.html#projection` (top of TABS IIFE; runs before any tab logic). Cross-link role: BvRE hosts both retrospective and projection real-estate calculators; Power Law is the *model* they apply, not a competing decision frame.
 
 ### Tool A vs The Channel
 
@@ -494,8 +494,8 @@ Three hashes resolve cleanly:
 | Hash | Behavior |
 |---|---|
 | `#calculator` | Calculator tab (default), retrospective mode |
-| `#calc-mode-projection` | Calculator tab AND projection mode auto-activated |
-| `#projection` | Same as `#calc-mode-projection` (alias) |
+| `#projection` | Calculator tab AND projection mode auto-activated. Canonical short alias. |
+| `#calc-mode-projection` | Same as `#projection` (legacy long form, matches the DOM id; routes correctly and rewrites the URL to `#projection` on landing via `history.replaceState`) |
 
 `applyHashToMode()` inside the BvRE js handles both initial page load and subsequent `hashchange` events. The pattern is reusable for any future page with sub-mode states reachable via hash.
 

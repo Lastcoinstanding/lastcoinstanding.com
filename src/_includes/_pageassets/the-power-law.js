@@ -177,11 +177,12 @@
 (function(){
   // Hash-based redirect: the projection real-estate calculator that
   // previously lived at /the-power-law.html#calculator now lives at
-  // /bitcoin-vs-real-estate.html#calc-mode-projection (Phase 4 restructure
-  // commits 0b2d203 + 36c13a0). Carry inbound deep-links over so users
-  // arriving from old bookmarks or external links still land on the tool.
+  // /bitcoin-vs-real-estate.html#projection (Phase 4 restructure commits
+  // 0b2d203 + 36c13a0; canonicalized to the short hash in commit TBD).
+  // Carry inbound deep-links over so users arriving from old bookmarks
+  // or external links still land on the tool.
   if(location.hash === '#calculator'){
-    location.replace('/bitcoin-vs-real-estate.html#calc-mode-projection');
+    location.replace('/bitcoin-vs-real-estate.html#projection');
     return;
   }
 
@@ -606,8 +607,8 @@
 // recent PL_DATA sample if the fetch fails.
 //
 // Replaces the previous Tool B: Forward Calculator (now lives at
-// /bitcoin-vs-real-estate.html#calc-mode-projection — see commit 0b2d203
-// and the Phase 4 restructure).
+// /bitcoin-vs-real-estate.html#projection — see commit 0b2d203 and the
+// Phase 4 restructure).
 (function(){
   var canvas = document.getElementById('channelChart');
   if(!canvas) return;

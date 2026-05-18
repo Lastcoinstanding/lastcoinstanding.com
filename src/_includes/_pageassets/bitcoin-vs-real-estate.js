@@ -868,14 +868,24 @@
 
     // Auto-activate projection mode when arriving with a deep-link.
     // Recognized hashes:
-    //   #calc-mode-projection     — direct deep-link to projection mode
-    //   #projection                — short alias used in some cross-links
+    //   #projection                — canonical short form (public-facing alias)
+    //   #calc-mode-projection      — legacy long form; matches the DOM id
+    //                                of the projection panel. Still routes
+    //                                correctly for any external links that
+    //                                use it, but the URL is rewritten to the
+    //                                short form on landing so the browser
+    //                                bar shows the cleaner alias.
     // The base tab routing handles #calculator (default tab). When the
     // page lands with one of the projection hashes, we ensure the tab
     // is also calculator (where the toggle lives) and then flip the mode.
     function applyHashToMode(){
         var h = location.hash.replace('#','');
-        if(h === 'calc-mode-projection' || h === 'projection'){
+        if(h === 'projection' || h === 'calc-mode-projection'){
+            // Canonicalize the URL to the short form. replaceState avoids
+            // polluting browser history and avoids firing hashchange again.
+            if(h === 'calc-mode-projection'){
+                history.replaceState(null, '', '#projection');
+            }
             // Make sure the calculator tab is active first
             var calcTabBtn = document.querySelector('.tab-btn[data-tab="calculator"]');
             if(calcTabBtn && !calcTabBtn.classList.contains('active')){
