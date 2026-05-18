@@ -1,22 +1,28 @@
 // ═══════════════════════════════════════════════════════════════════
 // BORROWING AGAINST YOUR STACK — page logic
 //
-// Three-tab page: Question / Calculator / Math. This file handles
-// tab routing + the Calculator's interactive math and Power Law
-// channel chart.
+// Four-tab page: Question / Loan Health / Borrow-vs-Sell-vs-HODL /
+// Math. This file handles tab routing + the interactive math and
+// charts for the two tool-led tabs (Loan Health, Borrow-vs-Sell-vs-
+// HODL) and the Math tab's CAGR-vs-rates chart.
 //
-// Current scope:
-//   • LTV / liquidation-price / channel-position math (risk surface)
-//   • Interest rate input + monthly/annual repayment burden (cost surface)
-//   • Interpretation paragraph that incorporates mean-reversion opportunity
-//     cost at low PL positions and the borrow-low/repay-high (Disciplined-
-//     Rebalancing-mirror) framing
-//   • Power Law channel chart with current-price marker and liquidation-
-//     price horizontal line projected forward
+// Loan Health (Tab II) — risk surface:
+//   • LTV / liquidation-price / channel-position math
+//   • Interest-rate input + monthly/annual repayment burden
+//   • Interpretation paragraph that incorporates mean-reversion
+//     opportunity cost at low PL positions and the borrow-low/repay-
+//     high (Disciplined-Rebalancing-mirror) framing
+//   • Power Law channel chart (basChannelChart) with current-price
+//     marker and liquidation-price horizontal line projected forward
 //
-// Subsequent commits will add: borrow-vs-sell comparison, structured
-// early-repayment surface, historical-drawdown backtest, counterparty
-// default scenario, DeFi infrastructure scenario, 0% baseline anchor.
+// Borrow vs. Sell vs. HODL (Tab III) — cross-strategy comparison:
+//   • Three-path comparison over chosen horizon (1–15y)
+//   • HODL baseline + Borrow path + Sell-with-cap-gains-tax path
+//   • Exceeds §4.2 spec by adding the do-nothing baseline that makes
+//     both active paths' wealth costs legible
+//
+// The Math (Tab IV) — cagrVsRatesChart, defined in its own IIFE
+// below the calculator code (separator block around line 1039).
 //
 // PL_DATA + PL_A/B/FLOOR/CEIL + GENESIS_TS + plPrice() come from
 // shared/power-law-data.js (loaded before this file via njk page_scripts).

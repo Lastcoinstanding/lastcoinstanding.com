@@ -801,6 +801,83 @@ Six-tier solid-color palette mapped from outperformance multiple. Documented can
 
 - **OG image regeneration cadence.** The heatmap OG embeds a screenshot of the live grid; when new monthly data lands (per `MONTHLY_REFRESH_CHECKLIST` §6), the OG goes slightly stale. Refresh with `npm run build-ogs` after each monthly data refresh — covered in the checklist.
 
+## 21. Borrowing Against Your Stack (`/borrowing-against-your-stack.html`)
+
+**Added:** May 2026 (initial build → ongoing refinements; closed as feature-complete in commit `01d8f35` 2026-05-17). A four-tab supplemental page exploring the borrow-against-bitcoin path as an *honestly-framed alternative to selling*, with HODL as the legitimate baseline and the structural risks made fully visible. Sister page to The Bitcoin Retirement (`/the-bitcoin-retirement.html` §17) — Retirement is the primary decision frame; BAS is one of three strategies the Strategies tab points at, here given its own dedicated surface with proper editorial weight.
+
+### The page's editorial frame
+
+The hero subtitle anchors the whole page: *"Bitcoin as collateral instead of selling it — with HODL as the legitimate baseline and the structural risks made fully visible."* The premise the page argues against is the reflexive *"borrowing against bitcoin is anti-ethos"* dismissal — the page's first H2 (*"Compared to what?"*) reframes the comparison: when the alternative is *selling part of your stack to fund a genuine life-event need*, the borrow-and-retain path deserves careful evaluation against its actual risks, not against a strawman of irresponsibility. The framing essay is honest about the failure cases (Celsius, BlockFi) and the lender-counterparty taxonomy that determines what kind of risk you're actually taking.
+
+### Tab structure
+
+| Tab | Character | Content |
+|---|---|---|
+| I. The Question | Editorial prose | 9 H2 sections: "Compared to what?", what this page actually is, what we recommend / don't, tactical vs strategic uses, the four lender categories, rehypothecation as the single biggest variable, the cautionary record (Celsius / BlockFi / Genesis / Voyager), when borrowing makes sense, what HODL actually wins |
+| II. Loan Health | Tool-led | Liquidation-on-Power-Law-channel viz + LTV / liquidation-price / channel-position / interest-burden outputs |
+| III. Borrow vs. Sell vs. HODL | Tool-led | Three-path comparison surface over a chosen horizon, including capital-gains tax math on the Sell path |
+| IV. The Math | Specification-led | Bitcoin 4-year rolling CAGR vs lending-rate bands chart, with Power Law trend CAGR overlaid |
+
+A persistent *"FOR EXPLORATION ONLY"* disclaimer banner sits between the hero and the tabs — financial-advice disclosure given the page's interactive surfaces deal in real loan figures.
+
+### Loan Health tab — the risk surface
+
+Inputs (5):
+
+| Input | Type | Default | Range |
+|---|---|---|---|
+| BTC stack | number | 1.0 | 0–100000 |
+| Current BTC price (USD) | number | live (PL_DATA fallback) | 0–100000000 |
+| Loan amount (USD) | number | 10000 | 0–1000000000 |
+| Liquidation threshold (LTV) | range slider | 80% | 70–95% (step 1) |
+| Interest rate (APR) | range slider | 10.0% | 2–20% (step 0.5) |
+
+Outputs: current LTV with zone-tier badge (good / caution / warning), liquidation price + drawdown distance from current price, channel position (where current price sits inside the Power Law channel: trough / floor-adjacent / mid-channel / trend-adjacent / peak), monthly + annual interest burden.
+
+The signature visual is `basChannelChart` — a log-scale Power Law channel with the current-price marker plotted at `(TODAY_DAYS, current_btc_price)` and a horizontal red dashed line projected forward at the liquidation price. The vertical distance between current-price and liquidation marker IS the structural buffer; if the liquidation marker sits BELOW the Power Law channel floor, bitcoin would need to break its long-term structural support before liquidation triggers — the visual makes that buffer instantly readable.
+
+### Borrow vs. Sell vs. HODL tab — cross-strategy comparison
+
+Three-path comparison over a user-chosen horizon (1–15 years). Inputs: stack, current BTC price, loan amount (the dollar need being funded, identical in both Borrow and Sell paths), interest rate, horizon, cost basis, capital-gains rate (0–40% slider). Outputs: end-of-horizon wealth for each path, expressed in BTC terms at trend price plus USD.
+
+The HODL path is the baseline — it doesn't fund the dollar need but preserves the most wealth by definition. The Borrow path takes a loan and repays at horizon. The Sell path crystallizes BTC at today's price to fund the need (with capital-gains tax applied). The HODL path quantifies the *wealth cost of any active decision*; the borrow-vs-sell comparison answers *which of the two active paths is cheaper if the dollar need is real*.
+
+Future BTC price is the Power Law trend at end-of-horizon — central-tendency expectation, not a forecast. The page is explicit about this in tooltip prose. Exceeds the §4.2 design-spec requirement for *"an honest comparison surface against sell-as-needed at the same inputs"* — the three-path comparison adds the do-nothing baseline that makes both active paths' costs legible.
+
+### The Math tab — CAGR-vs-rates chart
+
+`cagrVsRatesChart` displays two stories simultaneously:
+
+1. **Power Law trend CAGR** (dashed amber) — what the model predicts the growth rate to be from the channel position, independent of where current price sits inside the channel.
+2. **Realized 4-year rolling CAGR** (solid amber) — what bitcoin actually did over each trailing 4-year window.
+
+The gap between them = how far below (or above) trend bitcoin's price sat at each historical point. Lending-rate bands (typical 8–14% range) are overlaid as horizontal reference lines. The chart's pedagogical move: even at bitcoin's worst realized 4-year CAGR over the past 8 years, the rate sat above the upper edge of the lending-rate band — which is the structural argument for why a loan at trend-implied growth is *not absurd*, even granting realized-vs-trend gaps.
+
+All-time / Recent 2y axis toggle (`STYLE_GUIDE §6.22` pattern). Computed from `PL_DATA` at page-load time so the trailing edge stays fresh with each monthly data refresh.
+
+### UX design choice: dollar inputs over percentage sliders
+
+The `RETIREMENT_CALCULATOR_DESIGN §4.2` spec proposed `"25% LTV slider (sliderable to 50%) + % of stack borrowed slider (default 100%, sliderable to 0%)"`. The actual UX took a different shape — **dollar-denominated loan amount + liquidation-LTV slider** — for two reasons. First, *users thinking about borrowing have a dollar number in mind*, not a percentage; *"I need $50K for a remodel"* is a more concrete entry point than *"I want to borrow X% of my stack at Y% LTV"*. Second, the **liquidation LTV** (default 80%, 70–95% range) is the lender-determined variable that actually controls risk — the origination LTV is the *output*, derived from `loanAmount / (stack × price)`. Putting the lender's liquidation threshold on the slider and origination LTV in the output zone matches the actual mental model. Math is equivalent to the spec; the framing is more user-honest.
+
+### Editorial moves
+
+- **The four-lender-category taxonomy.** Tactical insight: lenders aren't fungible. The categories (rehypothecating CeFi, non-rehypothecating CeFi, DeFi over-collateralized protocols, self-custodied collateralized loans) carry different risks, and *rehypothecation is the single biggest variable* — the next H2 spells out why. Editorial gold that other content doesn't articulate clearly; preserved here as the structural argument for choosing carefully.
+- **"The cautionary record."** Names Celsius / BlockFi / Genesis / Voyager explicitly. Refuses to soft-pedal: borrowers in those failures didn't lose only their collateral; they lost their *over-collateral* (the BTC that was supposed to be safely securing the loan). Rehypothecation explains the mechanism.
+- **HODL as the legitimate baseline.** Most strategy-comparison content treats sell-as-needed as the default and asks *"is borrow better?"* — this page treats HODL as the default and asks *"is borrow better than selling, given the dollar need is real?"* That re-baselining is the page's central editorial move.
+- **"FOR EXPLORATION ONLY" disclaimer banner.** Dismissible (✕ button) but persistent across reloads via sessionStorage. Surfaces the financial-advice non-claim without being preachy.
+
+### Cross-linking
+
+- `/the-bitcoin-retirement.html` §17 references borrowing-against-the-stack in its Strategies tab; the deep-link from Retirement points here as the dedicated treatment
+- `/disciplined-rebalancing.html` is a *mirror* surface — DR is *sell-to-rebalance at high channel positions*, BAS is *borrow-to-avoid-selling*; together they cover the two active-management strategies inside the Power Law frame, with HODL as the third-and-default no-action baseline
+- `og-borrowing-against-your-stack.jpg` is the dedicated OG card — brand-forward family aesthetic per `STYLE_GUIDE §6.15.1` (Cormorant title with italic-amber *"Borrowing"*, atmospheric ₿ glyph, italic subtitle, brand mark)
+- Featured tile on `/calculators` (Tools index)
+
+### Open enhancements
+
+- **URL-param scenario carry-over from `/the-bitcoin-retirement` and `/disciplined-rebalancing`.** BAS shipped without this — testing `/borrowing-against-your-stack?stack=5&loan=200000` initializes with default values, ignoring the params. The schema is documented in `RETIREMENT_CALCULATOR_DESIGN §11.1` commit 6. Trigger: meaningful traffic from the primary retirement calc to BAS where users would benefit from not re-entering inputs.
+- **Print stylesheet.** Zero `@media print` rules in `borrowing-against-your-stack.css`. Pattern is documented in `STYLE_GUIDE §6.16` (third use after Bitcoin Retirement and Disciplined Rebalancing). Lower priority than the primary calc's print pattern since BAS is supplemental.
+
 ---
 
 _Last updated: May 2026. Update this document as editorial decisions crystallize into principles worth preserving._
