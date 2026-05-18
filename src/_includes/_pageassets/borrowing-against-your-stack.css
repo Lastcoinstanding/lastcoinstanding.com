@@ -1986,6 +1986,8 @@
   .bas-calc-inputs-risk,            /* (stack, price, loan, threshold cluster) */
   .bas-calc-inputs-cost,            /* (interest rate slider + presets) */
   .bas-calc-outputs-detail,         /* on-screen output cards — already in print-outputs-table */
+  .bas-calc-output-section,         /* (actual class — wraps Risk surface + Cost surface sections) */
+  .bas-calc-provider-section,       /* "Interest cost by provider category" section */
   .bas-calc-providers,              /* provider cards — tactical guidance, not summary */
   .bas-calc-profile,                /* profile checks — tactical guidance, not summary */
   .bas-future-considerations,       /* "Future considerations" prose block */
