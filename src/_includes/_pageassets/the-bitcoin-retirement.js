@@ -1351,3 +1351,89 @@
     btn.addEventListener('click', render);
   });
 })();
+
+
+// ═══════ SCENARIO CARRY-OVER ═══════
+// Sender side of the URL-param scenario carry-over (receiver lives on
+// /borrowing-against-your-stack; future DR-page implementation will
+// read the same schema). Updates the two teaser links at the bottom
+// of the Strategies tab so each carries the current Retirement
+// scenario as URL query params — when the user clicks through, the
+// sibling page can pre-populate its inputs from the URL instead of
+// re-asking.
+//
+// Schema (canonical — see SITE_GUIDE §17.5):
+//   stack     BTC stack (decimal)
+//   retire    retirement year (4-digit)
+//   income    target annual income USD
+//   years     years in retirement (integer)
+//   dca       monthly DCA USD
+//   withdraw  withdrawal rate %
+//
+// Baseline assumptions (inflation preset, growth model, real-returns
+// preset) live in localStorage via ModelingAssumptions and carry
+// across pages automatically — no URL-param help needed.
+//
+// Implementation notes:
+//   - Reads slider values directly from the DOM (not from any closure-
+//     scoped SCENARIO state) so this IIFE is self-contained and doesn't
+//     need to be wired into the chart IIFE above.
+//   - On every input event on any of the six sliders, all matching
+//     teaser links update their href in place.
+//   - Any href base path is preserved; only the query string is
+//     rewritten. Existing hash fragments are dropped (none in current
+//     usage; explicit comment so future me knows it was intentional).
+(function(){
+  var SLIDER_TO_PARAM = {
+    'slider-btcStack':           'stack',
+    'slider-retirementYear':     'retire',
+    'slider-targetIncomeUSD':    'income',
+    'slider-yearsInRetirement':  'years',
+    'slider-monthlyDcaUSD':      'dca',
+    'slider-withdrawalRatePct':  'withdraw'
+  };
+
+  // Selectors for the teaser links — match by href prefix so we don't
+  // need to add class hooks to the HTML. Both teasers live in the
+  // Strategies tab's strategy-C and strategy-D sections.
+  var TEASER_SELECTORS = [
+    'a[href^="/borrowing-against-your-stack"]',
+    'a[href^="/disciplined-rebalancing"]'
+  ];
+
+  function buildQueryString() {
+    var params = new URLSearchParams();
+    Object.keys(SLIDER_TO_PARAM).forEach(function(id){
+      var el = document.getElementById(id);
+      if (el && el.value !== '') {
+        params.set(SLIDER_TO_PARAM[id], el.value);
+      }
+    });
+    return params.toString();
+  }
+
+  function updateLinks() {
+    var qs = buildQueryString();
+    TEASER_SELECTORS.forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(link){
+        var href = link.getAttribute('href') || '';
+        var base = href.split('?')[0].split('#')[0];
+        link.setAttribute('href', qs ? (base + '?' + qs) : base);
+      });
+    });
+  }
+
+  function wireSliders() {
+    Object.keys(SLIDER_TO_PARAM).forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('input', updateLinks);
+    });
+    updateLinks();  // initial run so links are populated immediately
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wireSliders);
+  } else {
+    wireSliders();
+  }
+})();

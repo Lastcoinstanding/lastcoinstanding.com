@@ -644,6 +644,29 @@ The illustrative tax line in the income slider tooltip — *"a 20% effective tax
 
 `Cmd/Ctrl+P` produces a single-page PDF with: header strip (brand + URL + date) → page title → 9-row inputs table (6 sliders + 3 baseline picker selections) → projection chart → sustainability summary → disclaimer footer. Pattern is reusable for sibling pages — documented in `STYLE_GUIDE` print stylesheet section.
 
+### Scenario carry-over to sibling pages
+
+The Retirement page is the entry point for two sibling-page strategies — Borrowing Against Your Stack (§21) and Disciplined Rebalancing — and serializes its current scenario state into the URL when the user clicks through to either sibling. The sibling page reads the params on load and pre-populates its inputs, so the user doesn't re-enter what they just configured.
+
+**The canonical schema** (all params optional; missing or invalid params fall back to the sibling page's HTML defaults):
+
+| Param | Type | Source slider | Notes |
+|---|---|---|---|
+| `stack` | decimal | `slider-btcStack` | BTC stack |
+| `retire` | integer | `slider-retirementYear` | 4-digit year |
+| `income` | integer | `slider-targetIncomeUSD` | Target annual income USD |
+| `years` | integer | `slider-yearsInRetirement` | Years in retirement |
+| `dca` | integer | `slider-monthlyDcaUSD` | Monthly DCA USD |
+| `withdraw` | decimal | `slider-withdrawalRatePct` | Withdrawal rate % |
+
+**Out of scope for the URL contract:** baseline assumptions (inflation preset, growth model, real-returns preset). These live in `localStorage` via the shared `ModelingAssumptions` module, so they carry across pages automatically without URL-param help. The URL schema deliberately covers *only* page-local Retirement state.
+
+**Sender mechanics:** a self-contained IIFE at the end of `the-bitcoin-retirement.js` wires an `input` listener on each of the six sliders. On any change, the IIFE rebuilds the query string and rewrites the `href` of every link matching `a[href^="/borrowing-against-your-stack"]` or `a[href^="/disciplined-rebalancing"]`. The match-by-prefix selector means new teaser links added to the page later (with the same base path) are picked up automatically without HTML hooks.
+
+**Receiver mechanics:** the sibling page parses `URLSearchParams` inside its calculator's init code, *before* the first compute. Each param is validated (numeric range, sane bounds) before being applied to the matching input. Unknown or invalid params are silently ignored, and unknown params remain on the URL so any subsequent navigation sees the full state.
+
+**Forward compatibility:** the BAS receiver currently uses only `stack` because BAS's other inputs (loan amount, liquidation threshold, interest rate) are BAS-specific and don't map to any Retirement state. The receiver explicitly preserves unknown params so any later additions (BAS Tab III's horizon slider eventually reading `years`, for instance) can layer on without breaking the link contract.
+
 ### Voice / editorial register
 
 Editorial-tier per `STYLE_GUIDE §1` (it has prose tabs); typography matches §2.1 canonical with Inter body and Cormorant display. Voice calibrated against the user's *Bitcoin Migration* essay: long structured sentences with semicolons; italicized conceptual emphasis on terms like *structurally*, *contextual not computational*, *delays*; concession-and-pivot moves; sober, intelligent register; no jargon-as-drama.
@@ -875,8 +898,13 @@ The `RETIREMENT_CALCULATOR_DESIGN §4.2` spec proposed `"25% LTV slider (slidera
 
 ### Open enhancements
 
-- **URL-param scenario carry-over from `/the-bitcoin-retirement` and `/disciplined-rebalancing`.** BAS shipped without this — testing `/borrowing-against-your-stack?stack=5&loan=200000` initializes with default values, ignoring the params. The schema is documented in `RETIREMENT_CALCULATOR_DESIGN §11.1` commit 6. Trigger: meaningful traffic from the primary retirement calc to BAS where users would benefit from not re-entering inputs.
 - **Print stylesheet.** Zero `@media print` rules in `borrowing-against-your-stack.css`. Pattern is documented in `STYLE_GUIDE §6.16` (third use after Bitcoin Retirement and Disciplined Rebalancing). Lower priority than the primary calc's print pattern since BAS is supplemental.
+
+### Scenario carry-over from /the-bitcoin-retirement
+
+Added 2026-05-18. BAS reads the canonical scenario-carry-over schema documented in §17.5 above. In v1, only the `stack` param is *used* — BAS's other inputs (loan amount, liquidation threshold, interest rate) are BAS-specific and don't map to any Retirement state. Unknown params are preserved on the URL so navigating back to `/the-bitcoin-retirement` (or any other sibling) sees the full scenario state.
+
+The receiver lives inside the BAS calculator IIFE, between the element-reference declarations and the cost-basis-preset block. It runs *before* the first `recompute()` so the override value is used in the initial render — no event-dispatch race with the input wiring.
 
 ---
 

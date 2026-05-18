@@ -112,6 +112,37 @@
   var bvsHodlRows       = document.getElementById('basBvsHodlRows');
   var bvsVerdict        = document.getElementById('basBvsVerdict');
 
+  // ─── Scenario carry-over from sibling pages ──────────────────────────
+  // /the-bitcoin-retirement (the primary calculator) builds links to
+  // BAS with the user's scenario serialized as URL query parameters.
+  // Read the relevant subset here so the user doesn't re-enter inputs.
+  //
+  // Schema (full spec in SITE_GUIDE §17.5):
+  //   stack     BTC stack (decimal)    ← only param BAS reads in v1
+  //   retire    retirement year         ← unused on BAS
+  //   income    target income USD       ← unused on BAS
+  //   years     years in retirement     ← unused on BAS (BAS's Tab-III
+  //                                       horizon slider is independent)
+  //   dca       monthly DCA USD         ← unused on BAS
+  //   withdraw  withdrawal rate %       ← unused on BAS
+  //
+  // Baseline assumptions (inflation preset, growth model, real-returns
+  // preset) carry across pages via the ModelingAssumptions localStorage
+  // module, so they don't need URL-param help.
+  //
+  // Unknown params are preserved on the URL so any subsequent navigation
+  // (e.g., back-link to /the-bitcoin-retirement) sees the full state.
+  if (typeof URLSearchParams !== 'undefined') {
+    var params = new URLSearchParams(window.location.search);
+    var stackParam = params.get('stack');
+    if (stackParam !== null) {
+      var parsed = parseFloat(stackParam);
+      if (!isNaN(parsed) && parsed >= 0 && parsed <= 100000) {
+        stackInput.value = parsed;
+      }
+    }
+  }
+
   // ─── Cost-basis presets (typical bitcoiner entry points) ───
   // Editorially-anchored to recognizable cycle moments. The "today"
   // preset is the conservative default (no embedded gain). The others
