@@ -318,8 +318,8 @@ body { background: var(--bg-page); color: var(--ink); }
 
 /* ─── 6. SLIDER CLUSTERS (STYLE_GUIDE §6.16) ─── */
 .slider-cluster {
-    margin-bottom: 1.25rem;
-    padding: 1.1rem 1.25rem 1.25rem;
+    margin-bottom: 0.9rem;
+    padding: 0.85rem 1rem 0.95rem;
     border-radius: 6px;
     background: rgba(0,0,0,0.18);
     border: 1px solid var(--border-strong);
@@ -328,47 +328,47 @@ body { background: var(--bg-page); color: var(--ink); }
     display: flex;
     align-items: baseline;
     flex-wrap: wrap;
-    gap: 0.4rem 0.7rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.6rem;
+    gap: 0.35rem 0.7rem;
+    margin-bottom: 0.7rem;
+    padding-bottom: 0.45rem;
     border-bottom: 1px dashed var(--border-faint);
 }
 .cluster-label-main {
     font-family: var(--font-display);
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-weight: 500;
     color: var(--ink-bright);
 }
 .cluster-label-help {
     font-family: var(--font-body);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--ink-faint);
     font-style: italic;
     flex: 1;
     min-width: 14em;
-    line-height: 1.5;
+    line-height: 1.45;
 }
 .slider-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.1rem 2rem;
+    gap: 0.75rem 1.5rem;
 }
 .slider-control {
-    padding: 0.5rem 0;
+    padding: 0.25rem 0;
     display: flex;
     flex-direction: column;
-    gap: 0.55rem;
+    gap: 0.4rem;
 }
 .slider-row {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 0.4rem 0.6rem;
+    gap: 0.35rem 0.5rem;
 }
 .slider-name {
     font-family: var(--font-body);
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     font-weight: 500;
     color: var(--ink-bright);
     display: inline-flex;
@@ -377,7 +377,7 @@ body { background: var(--bg-page); color: var(--ink); }
 }
 .slider-val {
     font-family: var(--font-body);
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 500;
     color: var(--ink-bright);
     letter-spacing: -0.005em;
@@ -608,11 +608,13 @@ body { background: var(--bg-page); color: var(--ink); }
 
 /* ─── 12. POWER LAW PROJECTION DISPLAY ─── */
 /* Sits in the .friction cluster's slider-grid. Replaces the former
-   user-controlled BTC growth slider with a derived projection. */
+   user-controlled BTC growth slider with a derived projection.
+   Includes the growth-scenario radios (current vs trendline) which
+   pick the projection's starting price. */
 .projection-display {
     grid-column: 1 / -1;
-    margin-top: 0.4rem;
-    padding: 0.85rem 1rem;
+    margin-top: 0.3rem;
+    padding: 0.7rem 0.9rem 0.75rem;
     background: var(--amber-soft);
     border-left: 3px solid var(--amber);
     border-radius: 4px;
@@ -622,12 +624,12 @@ body { background: var(--bg-page); color: var(--ink); }
     justify-content: space-between;
     align-items: baseline;
     gap: 1rem;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.3rem;
     flex-wrap: wrap;
 }
 .projection-name {
     font-family: var(--font-body);
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     color: var(--ink-bright);
     font-weight: 500;
     display: inline-flex;
@@ -636,7 +638,7 @@ body { background: var(--bg-page); color: var(--ink); }
 }
 .projection-val {
     font-family: var(--font-display);
-    font-size: 1.55rem;
+    font-size: 1.45rem;
     font-weight: 600;
     color: var(--amber);
     line-height: 1;
@@ -644,19 +646,83 @@ body { background: var(--bg-page); color: var(--ink); }
 }
 .projection-detail {
     font-family: var(--font-body);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     color: var(--ink-dim);
     line-height: 1.5;
+    margin-bottom: 0.55rem;
 }
 .projection-detail strong {
     color: var(--ink-bright);
     font-weight: 600;
 }
 .projection-detail .projection-source {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-style: italic;
     color: var(--ink-faint);
     letter-spacing: 0.02em;
+}
+
+/* Scenario radios — inline segmented-control look. Two options:
+   "Current trajectory" (bullish, mean-reversion bonus) and
+   "Power Law trendline" (conservative, pure trend growth). */
+.projection-scenarios {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+    padding-top: 0.55rem;
+    border-top: 1px dashed var(--border-faint);
+}
+.projection-scenario-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.6rem 0.3rem 0.5rem;
+    background: rgba(0,0,0,0.18);
+    border: 1px solid var(--border-faint);
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    color: var(--ink-dim);
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.projection-scenario-option:hover {
+    border-color: var(--border-strong);
+    color: var(--ink);
+}
+.projection-scenario-option input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid var(--ink-faint);
+    border-radius: 50%;
+    margin: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+}
+.projection-scenario-option input[type="radio"]:checked {
+    border-color: var(--amber);
+    background: radial-gradient(circle, var(--amber) 0%, var(--amber) 40%, transparent 45%);
+}
+.projection-scenario-option:has(input:checked) {
+    background: rgba(224,148,34,0.10);
+    border-color: var(--amber);
+    color: var(--ink-bright);
+}
+.projection-scenario-label {
+    font-weight: 500;
+}
+.projection-scenario-help {
+    font-size: 0.74rem;
+    color: var(--ink-faint);
+    font-style: italic;
+}
+.projection-scenario-option:has(input:checked) .projection-scenario-help {
+    color: var(--ink-dim);
 }
 
 
@@ -696,6 +762,51 @@ body { background: var(--bg-page); color: var(--ink); }
     line-height: 1.5;
 }
 .lob-headline-sub strong { color: var(--ink-bright); font-weight: 600; }
+
+/* Bottom result-summary block — sits after the live-explore sliders,
+   provides closure on the user's exploration. Same number as the top
+   hero but smaller and with more narrative context. The top is the
+   anchor; this is the natural endpoint. */
+.lob-result-summary {
+    margin: 2.5rem 0 1.5rem;
+    padding: 1.5rem 2rem;
+    background: rgba(224,148,34,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-align: center;
+}
+.lob-result-summary-label {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.6rem;
+}
+.lob-result-summary-value {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4.5vw, 2.8rem);
+    font-weight: 600;
+    color: var(--amber);
+    line-height: 1;
+    margin-bottom: 0.7rem;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+.lob-result-summary-value.lob-result-summary-negative { color: #e87f6f; }
+.lob-result-summary-sub {
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    color: var(--ink-dim);
+    max-width: 60ch;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+.lob-result-summary-sub strong, .lob-result-summary-sub span {
+    color: var(--ink-bright);
+    font-weight: 500;
+}
 
 .lob-breakdown {
     margin: 2.5rem 0 1.5rem;

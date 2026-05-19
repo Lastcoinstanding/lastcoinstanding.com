@@ -95,6 +95,21 @@
   var elDrawdownEndValue    = document.getElementById('lobDrawdownEndValue');
   var elDrawdownDelta       = document.getElementById('lobDrawdownDelta');
 
+  // New (Commit 4) — bottom result-summary elements (mirror of top hero)
+  var elSummaryHorizon      = document.getElementById('lobSummaryHorizon');
+  var elSummaryDifferential = document.getElementById('lobSummaryDifferential');
+  var elSummaryGross        = document.getElementById('lobSummaryGross');
+  var elSummaryFees         = document.getElementById('lobSummaryFees');
+  var elSummaryTaxes        = document.getElementById('lobSummaryTaxes');
+
+  // New (Commit 4) — drawdown shock callout (trendline-recovery copy)
+  var elDrawdownShockValue     = document.getElementById('lobDrawdownShockValue');
+  var elDrawdownShockMagnitude = document.getElementById('lobDrawdownShockMagnitude');
+  var elDrawdownHorizonYear    = document.getElementById('lobDrawdownHorizonYear');
+
+  // New (Commit 4) — growth-scenario radios (current vs trendline)
+  var scenarioRadios = document.querySelectorAll('input[name="growthScenario"]');
+
   // Chart context
   var chartCanvas = document.getElementById('lobChart');
   var chart = null;
@@ -115,6 +130,13 @@
   // semantics. 'powerlaw-floor' returns trend × PL_FLOOR; the others
   // return trend.
   var growthModel = 'powerlaw-trend';
+  // Growth scenario — LOCAL to this calculator. Picks the START price for
+  // the projection; the END is always projectedTrendPrice(horizon).
+  //   'current'  — start at today's actual price (mean-reversion bonus)
+  //   'trendline' — start at today's trend value (no mean-reversion)
+  // Wired to two radio buttons inside .projection-display. Default
+  // 'current' preserves Commit 1 behavior.
+  var growthScenario = 'current';
 
   function daysSince(date) {
     return (date.getTime() - GENESIS.getTime()) / 86400000;
@@ -125,13 +147,24 @@
     if (growthModel === 'powerlaw-floor') return trend * PL_FLOOR;
     return trend; // 'powerlaw-trend', 'linear-cagr-decay', or fallback
   }
-  // Implied annual CAGR from today's price to projected trend price h years out.
+  // Starting price for the projection — depends on growthScenario.
+  //   'current'  — today's actual spot price (from CoinGecko or fallback).
+  //                Mean-reversion to trend = higher CAGR, higher end value.
+  //   'trendline' — today's trend value. No mean-reversion bonus = lower
+  //                CAGR, lower end value (more conservative for the user).
+  function scenarioStartPrice() {
+    if (growthScenario === 'trendline') return plPriceAtDate(new Date());
+    return liveBtcPrice;
+  }
+  // Implied annual CAGR from scenario-start to projected trend price h years out.
   function computeProjectedCAGR(h) {
-    if (h <= 0 || liveBtcPrice <= 0) return 0;
+    if (h <= 0) return 0;
+    var startPrice = scenarioStartPrice();
+    if (startPrice <= 0) return 0;
     var today = new Date();
     var future = new Date(today.getTime() + h * 365.25 * 86400000);
     var futurePrice = projectedTrendPrice(future);
-    return Math.pow(futurePrice / liveBtcPrice, 1 / h) - 1;
+    return Math.pow(futurePrice / startPrice, 1 / h) - 1;
   }
 
   // ─── Pull initial growth model from ModelingAssumptions, if available ───
@@ -217,32 +250,45 @@
     }
 
     // ─── Drawdown stress series ───
-    // Follows LoB net until ddYear; at end of ddYear, drop 50%; then resume
-    // compounding at r from the new level; continue subtracting friction.
+    // §6.3 modeling: drawdowns are temporary deviations from Power Law,
+    // not permanent damage. Pre-drawdown: matches LoB net trajectory.
+    // At ddYear: 50% shock on gross value (then friction applied). After
+    // ddYear: linearly recovers from the shocked value back to LoB net
+    // by horizon end. By year h the drawdown line meets the LoB line —
+    // the cost of the shock is borne in the near-term (paying bills at
+    // the bottom during the recovery period), not in the end state.
     var drawdownSeries = [];
-    var ddBalance = B; // starts same as gross
+    var shockedAtDdYear = 0; // value at ddYear after the shock + friction
     for (var i = 0; i <= h; i++) {
-      // Match LoB gross trajectory up to ddYear
-      if (i <= ddYear) {
-        ddBalance = B * Math.pow(1 + r, i);
+      if (i < ddYear) {
+        // Pre-drawdown: track LoB net exactly
+        drawdownSeries.push(lobNetSeries[i]);
+      } else if (i === ddYear) {
+        // 50% shock on gross; apply current cumulative friction
+        var shocked = lobGrossSeries[i] * 0.5;
+        shockedAtDdYear = shocked - cumulativeFeesByYear[i] - cumulativeTaxesByYear[i];
+        drawdownSeries.push(shockedAtDdYear);
       } else {
-        // After drawdown, compound from the post-drawdown base
-        var postDrawdownBase = B * Math.pow(1 + r, ddYear) * 0.5;
-        ddBalance = postDrawdownBase * Math.pow(1 + r, i - ddYear);
+        // Post-drawdown: linear recovery from shocked-at-ddYear to lobNet-at-horizon.
+        // If ddYear === h (drawdown at horizon), recoveryPeriod is 0 and
+        // this branch never executes — value stays at shockedAtDdYear.
+        var recoveryPeriod = h - ddYear;
+        var t = (i - ddYear) / recoveryPeriod;
+        var endTarget = lobNetSeries[h];
+        drawdownSeries.push(shockedAtDdYear + (endTarget - shockedAtDdYear) * t);
       }
-      // Apply 50% shock at exact end of ddYear
-      var shocked = ddBalance;
-      if (i === ddYear) shocked = ddBalance * 0.5;
-
-      drawdownSeries.push(
-        shocked - cumulativeFeesByYear[i] - cumulativeTaxesByYear[i]
-      );
     }
 
     var grossAppreciation = lobGrossSeries[h] - B;
     var differential = lobNetSeries[h] - B; // vs cash baseline (also B)
     var drawdownEndValue = drawdownSeries[h];
     var drawdownDelta = drawdownEndValue - B;
+    // Magnitude of the shock at ddYear — used by the callout to surface
+    // the near-term cost (which is where the drawdown story actually lives
+    // under the trendline-recovery assumption).
+    var lobValueAtDdYear = lobNetSeries[ddYear];
+    var shockValueAtDdYear = drawdownSeries[ddYear];
+    var shockMagnitude = lobValueAtDdYear - shockValueAtDdYear;
 
     return {
       B: B,
@@ -260,6 +306,9 @@
       differential: differential,
       drawdownEndValue: drawdownEndValue,
       drawdownDelta: drawdownDelta,
+      lobValueAtDdYear: lobValueAtDdYear,
+      shockValueAtDdYear: shockValueAtDdYear,
+      shockMagnitude: shockMagnitude,
       deMinimisActive: deMinimisOn && perTxAmount < 200,
     };
   }
@@ -281,19 +330,23 @@
     var future = new Date(today.getTime() + h * 365.25 * 86400000);
     var futurePrice = projectedTrendPrice(future);
     var trendToday = plPriceAtDate(today);
+    var startPrice = scenarioStartPrice();
     var pctOffTrend = (liveBtcPrice / trendToday - 1) * 100;
     var offTrendLabel = pctOffTrend < 0
       ? Math.abs(pctOffTrend).toFixed(0) + '% below trend'
       : pctOffTrend.toFixed(0) + '% above trend';
     var modelLabel = growthModel === 'powerlaw-floor' ? 'Power Law floor band' : 'Power Law trend';
+    var startLabel = growthScenario === 'trendline'
+      ? 'trend value today'
+      : 'today (' + offTrendLabel + ')';
 
     if (projectionCAGR) {
       projectionCAGR.textContent = (r * 100).toFixed(1) + '%';
     }
     if (projectionDetail) {
       projectionDetail.innerHTML =
-        'From <strong>$' + Math.round(liveBtcPrice).toLocaleString() + '</strong> today ' +
-        '(' + offTrendLabel + ') ' +
+        'From <strong>$' + Math.round(startPrice).toLocaleString() + '</strong> ' +
+        startLabel + ' ' +
         'to <strong>$' + Math.round(futurePrice).toLocaleString() + '</strong> ' +
         'at ' + modelLabel + ' in year ' + h +
         ' &middot; <span class="projection-source">' + liveBtcSource + '</span>';
@@ -307,11 +360,24 @@
     elDrawdownYearDisplay.textContent = result.ddYear;
     elDrawdownYearText.textContent = result.ddYear;
 
-    // Headline
+    // Top headline
     elDifferential.textContent = fmtSignedCurrency(result.differential);
     elDifferential.classList.toggle('lob-headline-negative', result.differential < 0);
     elFeesInline.textContent = fmtCurrencyFull(result.cumulativeFees);
     elTaxesInline.textContent = fmtCurrencyFull(result.cumulativeTaxes);
+
+    // Bottom result block (mirror of top, anchored after the sliders).
+    // Same number, slightly different framing — gives the calculator a
+    // natural conclusion after the exploration. Optional elements so the
+    // page renders correctly even if the bottom block isn't in the DOM.
+    if (elSummaryHorizon)     elSummaryHorizon.textContent = result.h;
+    if (elSummaryDifferential) {
+      elSummaryDifferential.textContent = fmtSignedCurrency(result.differential);
+      elSummaryDifferential.classList.toggle('lob-result-summary-negative', result.differential < 0);
+    }
+    if (elSummaryGross) elSummaryGross.textContent = fmtSignedCurrency(result.grossAppreciation);
+    if (elSummaryFees)  elSummaryFees.textContent  = fmtCurrencyFull(result.cumulativeFees);
+    if (elSummaryTaxes) elSummaryTaxes.textContent = fmtCurrencyFull(result.cumulativeTaxes);
 
     // Friction breakdown grid
     elFeesTotal.textContent = fmtCurrencyFull(result.cumulativeFees);
@@ -320,9 +386,17 @@
     elNetDifferential.textContent = fmtSignedCurrency(result.differential);
     elNetDifferential.classList.toggle('lob-breakdown-negative', result.differential < 0);
 
-    // Drawdown callout
-    elDrawdownEndValue.textContent = fmtCurrencyFull(result.drawdownEndValue);
-    elDrawdownDelta.textContent = fmtSignedCurrency(result.drawdownDelta);
+    // Drawdown callout — under the trendline-recovery model, the
+    // end-state delta is ~0 (drawdown recovers to LoB net by horizon).
+    // The story is the near-term shock at ddYear: how deep the bitcoin
+    // float dips and what that means for paying bills during recovery.
+    if (elDrawdownShockValue) elDrawdownShockValue.textContent = fmtCurrencyFull(result.shockValueAtDdYear);
+    if (elDrawdownShockMagnitude) elDrawdownShockMagnitude.textContent = fmtCurrencyFull(result.shockMagnitude);
+    if (elDrawdownHorizonYear) elDrawdownHorizonYear.textContent = result.h;
+    // Legacy fields kept for compatibility — populate but they may not
+    // be displayed under the new copy.
+    if (elDrawdownEndValue) elDrawdownEndValue.textContent = fmtCurrencyFull(result.drawdownEndValue);
+    if (elDrawdownDelta) elDrawdownDelta.textContent = fmtSignedCurrency(result.drawdownDelta);
   }
 
   // ─── Chart rendering ───
@@ -459,6 +533,18 @@
     s.addEventListener('input', render);
   });
   deMinimisToggle.addEventListener('change', render);
+
+  // ─── Growth scenario radios — switch between 'current' and 'trendline' ───
+  if (scenarioRadios && scenarioRadios.length) {
+    Array.prototype.forEach.call(scenarioRadios, function(radio){
+      radio.addEventListener('change', function(){
+        if (radio.checked) {
+          growthScenario = radio.value;
+          render();
+        }
+      });
+    });
+  }
 
   // ─── Subscribe to ModelingAssumptions changes (optional) ───
   // If the user changes the btcGrowthModel preset on another page (via the

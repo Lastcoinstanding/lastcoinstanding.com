@@ -305,11 +305,23 @@ eleventyComputed:
                 <div class="projection-display">
                     <div class="projection-row">
                         <span class="projection-name">Bitcoin growth (Power Law projection)
-                            <span class="help-tip" tabindex="0">?<span class="tip-content">Rather than ask you to guess a growth rate, the Calculator projects forward along the Power Law trend from today&rsquo;s bitcoin price to the trend value at the end of your horizon. Today&rsquo;s price is below trend, so the implied CAGR includes both mean-reversion to trend and trend growth &mdash; the more conservative of two framings. This matches the approach used in the Retirement and Borrowing-Against-Your-Stack calculators. You can override the underlying growth model via the sitewide modeling-assumptions picker.</span></span>
+                            <span class="help-tip" tabindex="0">?<span class="tip-content">Rather than ask you to guess a growth rate, the Calculator projects forward along the Power Law trend. Two scenarios are offered: <strong>Current trajectory</strong> starts from today&rsquo;s actual bitcoin price (which is below trend), so the implied CAGR includes both mean-reversion to trend and trend growth &mdash; the bullish reading. <strong>Power Law trendline</strong> starts from today&rsquo;s trend value (higher than the actual price), so the implied CAGR is pure trend growth without the mean-reversion bonus &mdash; the conservative reading. You can override the underlying growth model via the sitewide modeling-assumptions picker.</span></span>
                         </span>
                         <span class="projection-val" id="projection-cagr">&mdash;</span>
                     </div>
                     <div class="projection-detail" id="projection-detail">Loading current bitcoin price&hellip;</div>
+                    <div class="projection-scenarios">
+                        <label class="projection-scenario-option">
+                            <input type="radio" name="growthScenario" value="current" checked>
+                            <span class="projection-scenario-label">Current trajectory</span>
+                            <span class="projection-scenario-help">starts at today&rsquo;s price</span>
+                        </label>
+                        <label class="projection-scenario-option">
+                            <input type="radio" name="growthScenario" value="trendline">
+                            <span class="projection-scenario-label">Power Law trendline</span>
+                            <span class="projection-scenario-help">starts at today&rsquo;s trend value</span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -336,7 +348,7 @@ eleventyComputed:
                     <div class="slider-control" data-key="drawdownYear">
                         <div class="slider-row">
                             <span class="slider-name">Drawdown stress &mdash; year of &minus;50% BTC shock
-                                <span class="help-tip" tabindex="0">?<span class="tip-content">Models a single 50% drawdown at the end of the chosen year. The dashed line on the chart shows the LoB scenario&rsquo;s end-state under this stress test. Useful for sanity-checking whether your buffer survives a worst-case sequence.</span></span>
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">Models a single 50% drawdown at the end of the chosen year. Under the Power Law modeling assumption, the trajectory recovers to trendline by horizon end &mdash; drawdowns are temporary deviations, not permanent damage. The dashed line on the chart shows the V-shaped recovery. The real cost lives in the near-term: selling bitcoin at the bottom to pay bills during the recovery period.</span></span>
                             </span>
                             <span class="slider-val" id="val-drawdownYear">Year 3</span>
                         </div>
@@ -345,6 +357,15 @@ eleventyComputed:
 
                 </div>
             </div>
+        </div>
+
+        <!-- BOTTOM RESULT SUMMARY — same number as the top hero, framed
+             as the conclusion of the user's exploration. The top is the
+             anchor; this is the natural endpoint after adjusting sliders. -->
+        <div class="lob-result-summary">
+            <div class="lob-result-summary-label">Your result for these inputs</div>
+            <div class="lob-result-summary-value" id="lobSummaryDifferential">+$0</div>
+            <div class="lob-result-summary-sub">Over <span id="lobSummaryHorizon">5</span> years: <span id="lobSummaryGross">+$0</span> in gross bitcoin appreciation, minus <span id="lobSummaryFees">$0</span> in conversion fees and <span id="lobSummaryTaxes">$0</span> in taxes on conversion gains.</div>
         </div>
 
         <!-- FRICTION BREAKDOWN -->
@@ -374,7 +395,7 @@ eleventyComputed:
             </div>
 
             <div class="lob-drawdown-callout" id="lobDrawdownCallout">
-                <strong>If bitcoin drops 50% at end of year <span id="lobDrawdownYearText">3</span>:</strong> your LoB end-state would be <span id="lobDrawdownEndValue">$0</span> &mdash; a differential of <span id="lobDrawdownDelta">$0</span> vs. the cash baseline. The practice survives drawdowns mathematically, but the year you actually need to pay bills determines whether you survive them operationally.
+                <strong>If bitcoin drops 50% at end of year <span id="lobDrawdownYearText">3</span>:</strong> your bitcoin float drops to <span id="lobDrawdownShockValue">$0</span> at the bottom &mdash; about <span id="lobDrawdownShockMagnitude">$0</span> below where the trajectory was just before the shock. Under Power Law assumptions the path recovers to trendline by year <span id="lobDrawdownHorizonYear">10</span>, so the end-state delta is small. The real cost lives in the recovery period: selling bitcoin at depressed prices to pay monthly bills while the trajectory rebuilds.
             </div>
         </div>
 
