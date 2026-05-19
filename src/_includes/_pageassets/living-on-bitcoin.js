@@ -337,8 +337,8 @@
       {
         label: 'Cash baseline',
         data: result.cashSeries,
-        borderColor: 'rgba(150, 150, 150, 0.9)',
-        backgroundColor: 'rgba(150, 150, 150, 0.05)',
+        borderColor: '#9a9080', // matches var(--text-dim) + .swatch-baseline
+        backgroundColor: 'rgba(154,144,128,0.04)',
         borderWidth: 2,
         borderDash: [4, 4],
         tension: 0.0,
@@ -348,8 +348,8 @@
       {
         label: 'Living on Bitcoin (net of friction)',
         data: result.lobNetSeries,
-        borderColor: 'rgba(247, 147, 26, 1)', // bitcoin orange
-        backgroundColor: 'rgba(247, 147, 26, 0.08)',
+        borderColor: '#e09422', // matches var(--amber) + .swatch-lob
+        backgroundColor: 'rgba(224,148,34,0.10)',
         borderWidth: 3,
         tension: 0.2,
         pointRadius: 0,
@@ -359,7 +359,7 @@
       {
         label: 'LoB with −50% drawdown at year ' + result.ddYear,
         data: result.drawdownSeries,
-        borderColor: 'rgba(180, 80, 60, 0.85)',
+        borderColor: '#c0392b', // matches var(--red) + .swatch-drawdown
         backgroundColor: 'transparent',
         borderWidth: 2,
         borderDash: [8, 4],
@@ -389,6 +389,14 @@
         plugins: {
           legend: { display: false }, // legend in HTML
           tooltip: {
+            backgroundColor: 'rgba(20,18,16,0.95)',
+            borderColor: 'rgba(224,148,34,0.30)',
+            borderWidth: 1,
+            titleColor: '#e8e0d4',
+            bodyColor: '#e8e0d4',
+            padding: 10,
+            cornerRadius: 4,
+            displayColors: true,
             callbacks: {
               label: function(ctx){
                 return ctx.dataset.label + ': $' + Math.round(ctx.parsed.y).toLocaleString();
@@ -398,14 +406,17 @@
         },
         scales: {
           x: {
-            grid: { color: 'rgba(0,0,0,0.05)' },
-            ticks: { color: 'var(--text)' },
+            grid: { color: 'rgba(224,148,34,0.06)' },
+            ticks: { color: '#9a9080', font: { size: 11 } },
+            border: { color: 'rgba(224,148,34,0.15)' },
           },
           y: {
             beginAtZero: false,
-            grid: { color: 'rgba(0,0,0,0.05)' },
+            grid: { color: 'rgba(224,148,34,0.06)' },
+            border: { color: 'rgba(224,148,34,0.15)' },
             ticks: {
-              color: 'var(--text)',
+              color: '#9a9080',
+              font: { size: 11 },
               callback: function(v){
                 if (v >= 1e6) return '$' + (v/1e6).toFixed(1) + 'M';
                 if (v >= 1e3) return '$' + (v/1e3).toFixed(0) + 'k';
