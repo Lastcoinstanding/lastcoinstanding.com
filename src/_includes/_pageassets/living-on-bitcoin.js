@@ -253,10 +253,21 @@
     // §6.3 modeling: drawdowns are temporary deviations from Power Law,
     // not permanent damage. Pre-drawdown: matches LoB net trajectory.
     // At ddYear: 50% shock on gross value (then friction applied). After
-    // ddYear: linearly recovers from the shocked value back to LoB net
-    // by horizon end. By year h the drawdown line meets the LoB line —
-    // the cost of the shock is borne in the near-term (paying bills at
-    // the bottom during the recovery period), not in the end state.
+    // ddYear: GEOMETRIC recovery (constant catch-up CAGR) from the shocked
+    // value back to lobNet at horizon end. By year h the drawdown line
+    // meets the LoB line — the cost of the shock is borne in the near-
+    // term (paying bills at the bottom during the recovery period), not
+    // in the end state.
+    //
+    // Why geometric, not linear: lobNet grows ~ exponentially (B·(1+r)^i
+    // minus a linear friction term). Linear interpolation from a low shock
+    // value to a high terminal value crosses ABOVE the exponential curve
+    // almost immediately — the drawdown line ends up implying HIGHER
+    // wealth than no-drawdown in the middle years, which is incoherent.
+    // Geometric interp (compounding from shock at a constant rate to
+    // terminal) stays below the lobNet curve throughout the recovery and
+    // meets it only at horizon. A min() cap guards against any numerical
+    // edge case where geometric might still overshoot.
     var drawdownSeries = [];
     var shockedAtDdYear = 0; // value at ddYear after the shock + friction
     for (var i = 0; i <= h; i++) {
@@ -269,13 +280,25 @@
         shockedAtDdYear = shocked - cumulativeFeesByYear[i] - cumulativeTaxesByYear[i];
         drawdownSeries.push(shockedAtDdYear);
       } else {
-        // Post-drawdown: linear recovery from shocked-at-ddYear to lobNet-at-horizon.
-        // If ddYear === h (drawdown at horizon), recoveryPeriod is 0 and
-        // this branch never executes — value stays at shockedAtDdYear.
+        // Post-drawdown: geometric recovery from shockedAtDdYear to lobNet[h].
+        // If ddYear === h (drawdown at horizon), this branch never executes.
         var recoveryPeriod = h - ddYear;
-        var t = (i - ddYear) / recoveryPeriod;
         var endTarget = lobNetSeries[h];
-        drawdownSeries.push(shockedAtDdYear + (endTarget - shockedAtDdYear) * t);
+        var interpolated;
+        if (shockedAtDdYear > 0 && endTarget > 0) {
+          // Geometric: constant catch-up CAGR from shock to terminal.
+          // catchup = (terminal / shock)^(1/period) - 1
+          var catchup = Math.pow(endTarget / shockedAtDdYear, 1 / recoveryPeriod) - 1;
+          interpolated = shockedAtDdYear * Math.pow(1 + catchup, i - ddYear);
+        } else {
+          // Edge case: negative shock or non-positive terminal. Fall back
+          // to linear; the min() cap below ensures no overshoot.
+          var t = (i - ddYear) / recoveryPeriod;
+          interpolated = shockedAtDdYear + (endTarget - shockedAtDdYear) * t;
+        }
+        // Safety cap: never let the drawdown line exceed the no-drawdown
+        // trajectory. Mathematically geometric shouldn't, but cheap insurance.
+        drawdownSeries.push(Math.min(interpolated, lobNetSeries[i]));
       }
     }
 
@@ -355,16 +378,20 @@
 
   // ─── Output rendering ───
   function renderOutputs(result) {
-    elHorizonYears.textContent = result.h;
+    if (elHorizonYears)        elHorizonYears.textContent = result.h;
     elBreakdownHorizon.textContent = result.h;
     elDrawdownYearDisplay.textContent = result.ddYear;
     elDrawdownYearText.textContent = result.ddYear;
 
-    // Top headline
-    elDifferential.textContent = fmtSignedCurrency(result.differential);
-    elDifferential.classList.toggle('lob-headline-negative', result.differential < 0);
-    elFeesInline.textContent = fmtCurrencyFull(result.cumulativeFees);
-    elTaxesInline.textContent = fmtCurrencyFull(result.cumulativeTaxes);
+    // Top headline (markup removed in Commit 5 per JM — null-guarded so
+    // the page renders correctly. Kept the assignments in case the
+    // markup is restored later.)
+    if (elDifferential) {
+      elDifferential.textContent = fmtSignedCurrency(result.differential);
+      elDifferential.classList.toggle('lob-headline-negative', result.differential < 0);
+    }
+    if (elFeesInline) elFeesInline.textContent = fmtCurrencyFull(result.cumulativeFees);
+    if (elTaxesInline) elTaxesInline.textContent = fmtCurrencyFull(result.cumulativeTaxes);
 
     // Bottom result block (mirror of top, anchored after the sliders).
     // Same number, slightly different framing — gives the calculator a

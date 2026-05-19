@@ -204,13 +204,6 @@ eleventyComputed:
             <p>Drag the sliders to your situation. The Calculator compares two strategies over your chosen horizon: <strong>holding your operating cash float in dollars</strong> (the baseline) versus <strong>holding it in bitcoin and converting to dollars as bills come due</strong> (the Living-on-Bitcoin path). The chart shows wealth over time. The friction breakdown shows what the practice actually costs you in fees and tax events. The drawdown stress test shows what happens if bitcoin takes a 50% hit during your horizon.</p>
         </div>
 
-        <!-- HEADLINE OUTPUT -->
-        <div class="lob-headline">
-            <div class="lob-headline-label">Over <span id="lobHorizonYears">5</span> years, Living on Bitcoin nets you</div>
-            <div class="lob-headline-value" id="lobDifferential">+$&mdash;</div>
-            <div class="lob-headline-sub">vs. holding the same float in dollars &mdash; after <span id="lobFeesInline">$0</span> in conversion fees and <span id="lobTaxesInline">$0</span> in taxes on conversion gains.</div>
-        </div>
-
         <!-- CHART -->
         <div class="projection">
             <div class="projection-header">
@@ -359,13 +352,14 @@ eleventyComputed:
             </div>
         </div>
 
-        <!-- BOTTOM RESULT SUMMARY — same number as the top hero, framed
-             as the conclusion of the user's exploration. The top is the
-             anchor; this is the natural endpoint after adjusting sliders. -->
+        <!-- RESULT SUMMARY — the page's primary result surface. Sits
+             after the live-explore sliders so the user sees the result
+             as the natural conclusion of their exploration (rather than
+             a pre-slider preview that can mislead). -->
         <div class="lob-result-summary">
-            <div class="lob-result-summary-label">Your result for these inputs</div>
+            <div class="lob-result-summary-label">Over <span id="lobSummaryHorizon">5</span> years, Living on Bitcoin nets you</div>
             <div class="lob-result-summary-value" id="lobSummaryDifferential">+$0</div>
-            <div class="lob-result-summary-sub">Over <span id="lobSummaryHorizon">5</span> years: <span id="lobSummaryGross">+$0</span> in gross bitcoin appreciation, minus <span id="lobSummaryFees">$0</span> in conversion fees and <span id="lobSummaryTaxes">$0</span> in taxes on conversion gains.</div>
+            <div class="lob-result-summary-sub">vs. holding the same float in dollars &mdash; <span id="lobSummaryGross">+$0</span> in gross bitcoin appreciation, minus <span id="lobSummaryFees">$0</span> in conversion fees and <span id="lobSummaryTaxes">$0</span> in taxes on conversion gains.</div>
         </div>
 
         <!-- FRICTION BREAKDOWN -->

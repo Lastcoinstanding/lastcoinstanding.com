@@ -727,77 +727,53 @@ body { background: var(--bg-page); color: var(--ink); }
 
 
 /* ─── 13. CALCULATOR OUTPUTS ─── */
-.lob-headline {
+/* The top hero (.lob-headline) block was removed in Commit 5 per JM —
+   pre-slider results can mislead because values shift significantly
+   as the user interacts. The result now lives in .lob-result-summary
+   below, after the sliders, framed as the conclusion of exploration. */
+
+/* Result-summary block — the page's primary result surface after the
+   top hero was removed in Commit 5 (JM noted that pre-slider results
+   can mislead since the values change significantly as the user
+   interacts). Sits after the live-explore sliders so the user sees
+   the result as the natural conclusion of their exploration. Styled
+   with the gradient amber background previously used by the top hero. */
+.lob-result-summary {
+    margin: 2.5rem 0 1.5rem;
+    padding: 2rem 2.5rem;
     background: linear-gradient(135deg,
         rgba(224,148,34,0.04) 0%,
         rgba(224,148,34,0.10) 100%);
     border: 1px solid rgba(224,148,34,0.25);
     border-radius: 12px;
-    padding: 2rem 2.5rem;
-    margin: 2rem 0 2.5rem;
     text-align: center;
 }
-.lob-headline-label {
+.lob-result-summary-label {
     font-family: var(--font-display);
-    font-size: 1.25rem;
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    font-weight: 400;
     color: var(--ink-dim);
     margin-bottom: 0.5rem;
+    line-height: 1.4;
 }
-.lob-headline-value {
+.lob-result-summary-label span {
+    color: var(--ink-bright);
+    font-weight: 500;
+}
+.lob-result-summary-value {
     font-family: var(--font-display);
     font-size: clamp(2.5rem, 6vw, 3.75rem);
     font-weight: 600;
     color: var(--amber);
     line-height: 1;
-    margin-bottom: 0.75rem;
-    letter-spacing: -0.02em;
-}
-.lob-headline-value.lob-headline-negative { color: #e87f6f; }
-.lob-headline-sub {
-    font-family: var(--font-body);
-    font-size: 0.95rem;
-    color: var(--ink-dim);
-    max-width: 56ch;
-    margin: 0 auto;
-    line-height: 1.5;
-}
-.lob-headline-sub strong { color: var(--ink-bright); font-weight: 600; }
-
-/* Bottom result-summary block — sits after the live-explore sliders,
-   provides closure on the user's exploration. Same number as the top
-   hero but smaller and with more narrative context. The top is the
-   anchor; this is the natural endpoint. */
-.lob-result-summary {
-    margin: 2.5rem 0 1.5rem;
-    padding: 1.5rem 2rem;
-    background: rgba(224,148,34,0.04);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    text-align: center;
-}
-.lob-result-summary-label {
-    font-family: var(--font-body);
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--amber);
-    margin-bottom: 0.6rem;
-}
-.lob-result-summary-value {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 4.5vw, 2.8rem);
-    font-weight: 600;
-    color: var(--amber);
-    line-height: 1;
-    margin-bottom: 0.7rem;
+    margin-bottom: 0.85rem;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
 }
 .lob-result-summary-value.lob-result-summary-negative { color: #e87f6f; }
 .lob-result-summary-sub {
     font-family: var(--font-body);
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     color: var(--ink-dim);
     max-width: 60ch;
     margin: 0 auto;
@@ -982,8 +958,8 @@ body { background: var(--bg-page); color: var(--ink); }
     }
     .chart-wrapper { height: 320px; }
     .live-explore-help { width: 100%; }
-    .lob-headline { padding: 1.5rem 1.25rem; }
     .lob-breakdown { padding: 1.25rem 1rem; }
+    .lob-result-summary { padding: 1.5rem 1.25rem; }
     .lob-breakdown-grid { grid-template-columns: 1fr 1fr; }
     .lob-tool-card { padding: 1rem 1.1rem; }
     .lob-math-eq { font-size: 0.85rem; padding: 0.8rem 0.95rem; }
