@@ -1,0 +1,274 @@
+/* ============================================================
+   Living on Bitcoin — page-specific styles
+   ============================================================
+   Mirrors BAS/Retirement patterns where possible. Adds the
+   prefixed-class components specific to this page:
+     .lob-*         page-scoped styles
+   ============================================================ */
+
+/* ─── Headline output (top of Calculator tab) ─── */
+.lob-headline {
+    background: linear-gradient(135deg,
+        rgba(247, 147, 26, 0.04) 0%,
+        rgba(247, 147, 26, 0.10) 100%);
+    border: 1px solid rgba(247, 147, 26, 0.25);
+    border-radius: 12px;
+    padding: 2rem 2.5rem;
+    margin: 2rem 0 2.5rem;
+    text-align: center;
+}
+.lob-headline-label {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.25rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+.lob-headline-value {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(2.5rem, 6vw, 3.75rem);
+    font-weight: 600;
+    color: rgb(247, 147, 26);
+    line-height: 1;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+}
+.lob-headline-value.lob-headline-negative {
+    color: rgb(180, 80, 60);
+}
+.lob-headline-sub {
+    font-size: 0.95rem;
+    color: var(--text-secondary, #666);
+    max-width: 56ch;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+/* ─── Friction breakdown ─── */
+.lob-breakdown {
+    margin: 2.5rem 0 1.5rem;
+    padding: 1.75rem 2rem;
+    background: var(--card-bg, rgba(0, 0, 0, 0.02));
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+.lob-breakdown-title {
+    margin: 0 0 1.25rem;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+}
+.lob-breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+.lob-breakdown-item {
+    padding: 0.75rem 0;
+}
+.lob-breakdown-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary, #666);
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+}
+.lob-breakdown-value {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 0.25rem;
+}
+.lob-breakdown-value.lob-breakdown-negative {
+    color: rgb(180, 80, 60);
+}
+.lob-breakdown-sub {
+    font-size: 0.75rem;
+    color: var(--text-secondary, #999);
+    font-style: italic;
+}
+
+/* ─── Drawdown callout (inside breakdown) ─── */
+.lob-drawdown-callout {
+    margin-top: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: rgba(180, 80, 60, 0.05);
+    border-left: 3px solid rgba(180, 80, 60, 0.5);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--text);
+}
+.lob-drawdown-callout strong {
+    color: rgb(180, 80, 60);
+}
+
+/* ─── Tool cards (Tab II) ─── */
+.lob-tool-card {
+    margin: 1.25rem 0;
+    padding: 1.25rem 1.5rem;
+    background: var(--card-bg, rgba(0, 0, 0, 0.015));
+    border-left: 3px solid rgba(247, 147, 26, 0.4);
+    border-radius: 4px;
+}
+.lob-tool-name {
+    margin: 0 0 0.6rem;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+}
+.lob-tool-card .prose {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+.lob-tool-aside {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #777);
+    line-height: 1.5;
+}
+
+/* ─── Lists (Tab I) ─── */
+.lob-friction-list,
+.lob-fit-list,
+.lob-math-list {
+    margin: 0.75rem 0 1rem 1.5rem;
+    padding: 0;
+    list-style: disc;
+}
+.lob-friction-list li,
+.lob-fit-list li,
+.lob-math-list li {
+    margin-bottom: 0.75rem;
+    line-height: 1.65;
+    color: var(--text);
+}
+
+/* ─── Friction subheads (Tab I, §4) ─── */
+.friction-subhead {
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text);
+    font-style: italic;
+}
+
+/* ─── Math tab sections ─── */
+.lob-math-section {
+    margin-bottom: 2rem;
+}
+.lob-math-subhead {
+    margin-top: 1.25rem;
+    margin-bottom: 0.6rem;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+}
+.lob-math-eq {
+    margin: 0.75rem 0;
+    padding: 0.85rem 1.25rem;
+    background: rgba(0, 0, 0, 0.03);
+    border-left: 2px solid rgba(247, 147, 26, 0.5);
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    color: var(--text);
+    overflow-x: auto;
+}
+.lob-math-eq sub {
+    font-size: 0.75em;
+    vertical-align: sub;
+}
+.lob-math-eq sup {
+    font-size: 0.75em;
+    vertical-align: super;
+}
+
+/* ─── Toggle switch (de minimis) ─── */
+.lob-toggle {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 26px;
+    margin-top: 0.4rem;
+}
+.lob-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.lob-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 26px;
+    transition: background-color 0.2s;
+}
+.lob-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+.lob-toggle input:checked + .lob-toggle-slider {
+    background-color: rgba(247, 147, 26, 0.7);
+}
+.lob-toggle input:checked + .lob-toggle-slider:before {
+    transform: translateX(26px);
+}
+
+/* ─── Chart legend swatches ─── */
+.swatch-baseline {
+    background: rgba(150, 150, 150, 0.9);
+}
+.swatch-lob {
+    background: rgba(247, 147, 26, 1);
+}
+.swatch-drawdown {
+    background: repeating-linear-gradient(
+        90deg,
+        rgba(180, 80, 60, 0.85) 0,
+        rgba(180, 80, 60, 0.85) 6px,
+        transparent 6px,
+        transparent 10px
+    );
+}
+
+/* ─── Responsive adjustments ─── */
+@media (max-width: 768px) {
+    .lob-headline {
+        padding: 1.5rem 1.25rem;
+    }
+    .lob-breakdown {
+        padding: 1.25rem 1rem;
+    }
+    .lob-breakdown-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .lob-tool-card {
+        padding: 1rem 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .lob-breakdown-grid {
+        grid-template-columns: 1fr;
+    }
+}

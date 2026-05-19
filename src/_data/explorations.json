@@ -119,6 +119,13 @@
         "is_calculator": true
     },
     {
+        "slug": "living-on-bitcoin",
+        "title": "Living on Bitcoin",
+        "category": "numbers",
+        "interactive": true,
+        "is_calculator": true
+    },
+    {
         "slug": "bitcoin-backed-mortgages",
         "title": "Bitcoin-Backed Mortgages",
         "category": "numbers",

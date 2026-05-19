@@ -1,0 +1,460 @@
+---
+layout: base.njk
+permalink: /living-on-bitcoin.html
+slug: living-on-bitcoin
+related:
+  - slug: the-bitcoin-retirement
+    desc: "The primary wealth-building page. Living on Bitcoin is icing; the cake lives here — long-horizon stack accumulation as the actual economic engine."
+  - slug: borrowing-against-your-stack
+    desc: "The other practice that compounds wealth without selling. Living on Bitcoin handles the day-to-day cash layer; borrowing handles the big-event cash layer."
+  - slug: disciplined-rebalancing
+    desc: "The sibling page on the inverse side — when to take wealth off the table. Different mechanism, same channel underneath."
+  - slug: the-power-law
+    desc: "The growth model the Calculator on this page relies on for the BTC appreciation assumption. Sets the baseline for what 'compounding bitcoin' means quantitatively."
+companion: []
+eleventyComputed:
+  page_styles: "{% include '_pageassets/living-on-bitcoin.css' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/living-on-bitcoin.js' %}"
+---
+<section class="hero">
+    <h1><em>Living</em> on Bitcoin</h1>
+    <div class="hero-subtitle">Holding operating cash in bitcoin and paying fiat bills as they come due &mdash; a values-aligned practice with modest economics and real friction.</div>
+    <p class="subtitle">For most bitcoiners, the case for bitcoin lives on the retirement page and the borrow-against-your-stack page &mdash; the surfaces where the asset's compounding actually does meaningful financial work. <em>Living on bitcoin</em> is something else: a day-to-day practice closer to identity than to yield, where the appreciation differential is real but small, the friction is real and recurring, and the psychological payoff is what most practitioners actually come for.</p>
+</section>
+
+<main class="content-area">
+    {% include 'components/tool-framing.njk' %}
+
+    <div class="tab-nav">
+        <button class="tab-btn active" data-tab="question">
+            <span class="tab-num">I</span>
+            <span class="tab-title">The Question</span>
+        </button>
+        <button class="tab-btn" data-tab="tools">
+            <span class="tab-num">II</span>
+            <span class="tab-title">The Tools</span>
+        </button>
+        <button class="tab-btn" data-tab="calculator">
+            <span class="tab-num">III</span>
+            <span class="tab-title">The Calculator</span>
+        </button>
+        <button class="tab-btn" data-tab="math">
+            <span class="tab-num">IV</span>
+            <span class="tab-title">The Math</span>
+        </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB I: THE QUESTION — editorial framing       -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="tab-content active" id="tab-question">
+
+        <div class="section-intro">
+            <h2>A practice, not a strategy</h2>
+            <p>Living on bitcoin is a practice before it&rsquo;s a strategy. The shorthand is simple: convert your paycheck to bitcoin on receipt, hold less cash, pay fiat bills as they come due by converting back. Optionally, route everyday spending through bitcoin-back cards (Gemini, Coinbase, Fold) and collect the rewards in satoshis. Strike&rsquo;s marketing tagline for the bundled product is literally &ldquo;Live life on Bitcoin.&rdquo;</p>
+            <p>This page is built around that practice. But it is honest about something the product marketing won&rsquo;t say: as a wealth-building move, it&rsquo;s modest. <a href="/the-bitcoin-retirement.html">The retirement page</a> moves the needle on long-term net worth. <a href="/borrowing-against-your-stack.html">The borrow-against-stack page</a> moves the needle on accessing wealth without selling. <em>Living on bitcoin</em> is something different &mdash; closer to a habit than a strategy, closer to identity than yield.</p>
+        </div>
+
+        <div class="section">
+            <h3>The economic case &mdash; small, real, eaten by friction</h3>
+            <p class="prose">The argument is straightforward. A dollar held in checking earns nothing or close to it. A dollar held in bitcoin appreciates with the asset. Over a multi-year window in which bitcoin compounds, even a modest operating-cash balance held in bitcoin can produce real absolute dollars.</p>
+            <p class="prose">The math thins quickly:</p>
+            <ul class="lob-friction-list">
+                <li><strong>Most people don&rsquo;t keep large balances on hand.</strong> Typical US household checking balances run in the low thousands. A strong bitcoin year on a few thousand dollars of held-as-bitcoin cash is real money &mdash; but only if the cash is actually held, not constantly converted back to pay bills.</li>
+                <li><strong>Round-trip conversion costs roughly 2%.</strong> Strike&rsquo;s confirmed tier structure puts the consumer at 0.99% per side; Cash App is wider; bitcoin-back cards reduce the cost on the spending leg but don&rsquo;t eliminate it.</li>
+                <li><strong>Every conversion is a tax event under current law.</strong> More on this below.</li>
+                <li><strong>Bitcoin&rsquo;s drawdowns hit operating cash the hardest.</strong> A 30% drop in the week your rent is due is the scenario the whole approach has to survive.</li>
+            </ul>
+            <p class="prose">The honest summary is that this is a marginal economic play, not a primary one. <a href="#calculator" class="tab-jump" data-tab-target="calculator">The Calculator</a> turns this into specific numbers for your specific buffer and bill load. For most readers the answer will be a modest positive expected return, partially offset by drawdown risk, with the size of the win depending heavily on horizon and on how disciplined the conversion cadence stays.</p>
+        </div>
+
+        <div class="section">
+            <h3>The reason this practice exists anyway</h3>
+            <p class="prose">Most bitcoiners who live this way don&rsquo;t do it for the small economic edge. They do it because of what the practice changes.</p>
+            <p class="prose">The Strike app shows balances in satoshis. Fold&rsquo;s spin wheel makes everyday spending into incremental bitcoin accumulation. Recurring purchases and direct-deposit splits push the user toward thinking of bitcoin as the default holding and dollars as the conversion. After a while, the unit-of-account shift becomes the point: prices stop reading in dollars first and start reading in satoshis instead.</p>
+            <p class="prose">Call it normalization. Call it the Bitcoin Standard if you read that book. Either way, it&rsquo;s a values-aligned practice &mdash; opting out of holding the fiat that gets debased, opting into holding the asset whose supply is fixed. The economic upside is real but small. The identity payoff is large for the people who care about it. This page does not pretend otherwise.</p>
+        </div>
+
+        <div class="section">
+            <h3>The friction &mdash; three honest costs</h3>
+            <p class="prose">If the practice is for you, three frictions are worth seeing clearly.</p>
+
+            <h4 class="friction-subhead">Conversion drag</h4>
+            <p class="prose">A round trip costs roughly 2% on Strike at typical consumer volumes, more elsewhere. Bitcoin-back cards offset some of this on the spending leg &mdash; the rewards effectively rebate part of the cycle cost &mdash; but they don&rsquo;t eliminate it. The Calculator quantifies this against your monthly bill load.</p>
+
+            <h4 class="friction-subhead">Tax-event load</h4>
+            <p class="prose">Under current US law, every conversion is a disposal &mdash; a taxable event. For someone paying a dozen or two fiat bills a month from a bitcoin balance, that&rsquo;s a dozen or two taxable events per month. Hand-tracking this is not realistic. What is realistic is using services that facilitate the recordkeeping: Strike, Swan, River, and Fold all issue Form 1099-DA with HIFO-defaulted cost basis at year-end, and the major tax software (CoinTracker, Koinly, TurboTax integrations) reads these documents directly. The recordkeeping burden is real, but it&rsquo;s not your pencil-and-paper problem.</p>
+            <p class="prose">A note on what may change. Two bills propose to fix this at the federal level: the <strong>PARITY Act</strong> would create a $200-per-transaction de-minimis exemption modeled on the existing foreign-currency carve-out, and the <strong>Lummis bill</strong> would set a $300 threshold with a $5,000 annual cap. Neither has passed. Separately, the <strong>Digital Asset Market Clarity (CLARITY) Act</strong> &mdash; which doesn&rsquo;t directly contain a de-minimis exemption but signals the broader regulatory direction &mdash; advanced through the Senate Banking Committee on May 14, 2026, and is expected to receive a full Senate vote in the coming months. If a de-minimis exemption is enacted in either form, much of the tax-event friction on small everyday bitcoin spending evaporates. This page is written to today&rsquo;s law; it watches the horizon.</p>
+
+            <h4 class="friction-subhead">Drawdown sequence</h4>
+            <p class="prose">Bitcoin&rsquo;s volatility means the worst time to need cash is sometimes exactly when you have to spend it. A bitcoin-default Bill Pay setup during a 40% drawdown pays your rent at a 40% discount to your stack. This is the prerequisite question the rest of the page rests on: <em>is your buffer thick enough that drawdown timing doesn&rsquo;t damage you?</em> If yes, the practice is workable. If not, this is not the page that helps you.</p>
+        </div>
+
+        <div class="section">
+            <h3>Who this is for</h3>
+            <ul class="lob-fit-list">
+                <li>Bitcoiners with enough buffer above their next-ninety-days bills that drawdown sequence risk is bounded.</li>
+                <li>People for whom the practice carries values weight &mdash; the unit-of-account shift is the actual reason, the economic edge is the side benefit.</li>
+                <li>People willing to use tools that handle the tax recordkeeping rather than handle it themselves.</li>
+                <li>US users, mostly &mdash; the tool ecosystem is US-heavy and varies state by state.</li>
+            </ul>
+            <p class="prose">Who this isn&rsquo;t for: anyone whose paycheck-to-rent gap is narrow, anyone for whom the friction outweighs the values payoff, and anyone whose bitcoin exposure isn&rsquo;t already established through <a href="/the-bitcoin-retirement.html">retirement</a> and long-horizon savings where the compounding actually matters. <em>Living on bitcoin is icing. The cake lives on the other pages of this site.</em></p>
+        </div>
+
+        <div class="section">
+            <h3>Where to go from here</h3>
+            <p class="prose"><a href="#tools" class="tab-jump" data-tab-target="tools">Tab II</a> surveys the tools &mdash; categorically, with named examples and brief honest tradeoffs &mdash; so you can see what the practice looks like in 2026. <a href="#calculator" class="tab-jump" data-tab-target="calculator">Tab III</a> is the Calculator, which turns the question into numbers for your specific buffer, bill load, and horizon. <a href="#math" class="tab-jump" data-tab-target="math">Tab IV</a> is the math behind the Calculator for anyone who wants to verify the assumptions before trusting the output.</p>
+            <p class="prose">If the practice fits, the tools have never been better. If it doesn&rsquo;t, the other pages on this site are where the real economic case for bitcoin lives.</p>
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB II: THE TOOLS — categorical survey         -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="tab-content" id="tab-tools">
+
+        <div class="section-intro">
+            <h2>The shape of the toolkit</h2>
+            <p>Living on bitcoin in 2026 is built on three layers of product, plus the network rail that connects them. The <strong>conversion service</strong> is the foundation &mdash; where the paycheck arrives, where bills get paid from, where trading happens, where year-end tax docs come from. The <strong>bitcoin-back card</strong> is the everyday-spending layer that adds a rewards stream on top. A <strong>dedicated paycheck router</strong> is a specialized alternative for cross-border or global payroll. The <strong>Lightning Network</strong> underneath makes the small, fast transactions possible.</p>
+            <p>Most practitioners pick one tool from each of the first two categories and ignore the third unless they have a specific cross-border need. This survey is a snapshot &mdash; the landscape changes, the rates change, and what&rsquo;s true today may not be true in six months. Use it as a starting point for your own research.</p>
+        </div>
+
+        <div class="section">
+            <h3>The conversion service &mdash; the foundation</h3>
+            <p class="prose">The conversion service is where the practice lives. Account and routing numbers for paycheck deposit. Bill pay from either cash or bitcoin balance. Trading. Withdrawal to self-custody. Year-end tax documents. Most of the practitioners running this play meaningfully are doing it through one of three or four services.</p>
+
+            <div class="lob-tool-card">
+                <h4 class="lob-tool-name">Strike</h4>
+                <p class="prose">The most directly aligned with the Living-on-Bitcoin concept &mdash; the product is marketed for it explicitly. Distinctive features: Bill Pay with a default-balance choice between cash and bitcoin, &ldquo;Get Paid in Bitcoin&rdquo; with the first $20,000/month of paycheck-to-BTC conversion fee-free, tiered trading fees from 0.99% down to 0.39%, free withdrawal to cold storage on the Flexible delivery tier, Lightning Address for incoming payments, and a Bitrefill integration for spending bitcoin or cash at participating merchants. Custodial. Year-end tax documents use HIFO cost basis by default.</p>
+                <p class="lob-tool-aside"><em>If the three-way merger with Twenty One Capital and Elektron Energy announced April 29, 2026 closes, Strike would sit inside a larger vertically integrated entity; product implications are unclear.</em></p>
+            </div>
+
+            <div class="lob-tool-card">
+                <h4 class="lob-tool-name">River Financial</h4>
+                <p class="prose">Bitcoin-only with a savings emphasis. Recurring buys are fee-free after the first week. Cash balances pay interest in bitcoin (currently around 3.8% APY), with USD deposits FDIC-insured to $250K via partner Lead Bank. No Lightning for outbound spending. Cleaner if your use case is paycheck-in-stack-out, less suited if you want to spend bitcoin actively.</p>
+            </div>
+
+            <div class="lob-tool-card">
+                <h4 class="lob-tool-name">Swan Bitcoin</h4>
+                <p class="prose">The DCA-focused option. Flat 0.99% fee on all buys and sells with no spread on top. Free withdrawals (Swan actively encourages self-custody). Bitcoin-only, no Lightning send. Notably strong IRA product if retirement bitcoin exposure is part of the same financial picture.</p>
+            </div>
+
+            <div class="lob-tool-card">
+                <h4 class="lob-tool-name">Cash App</h4>
+                <p class="prose">The mass-market entry. Direct-deposit-to-BTC conversion is fee-free; on-demand BTC purchases are wider, 0.75% to 3% depending on size. Lightning supported for incoming. Less Bitcoin-focused product polish than Strike or Swan, but the path of least resistance for users already on the platform.</p>
+            </div>
+
+            <p class="prose">Coinbase and Kraken are also options &mdash; Coinbase Advanced and Kraken Pro both have competitive maker/taker fees for active traders &mdash; but neither is built around the Living-on-Bitcoin pattern specifically. They&rsquo;re general crypto platforms that happen to support bitcoin.</p>
+        </div>
+
+        <div class="section">
+            <h3>The bitcoin-back card &mdash; the everyday-spending layer</h3>
+            <p class="prose">A card adds a rewards stream on top of fiat spending that&rsquo;s happening anyway. The premise is that you&rsquo;re going to spend dollars on groceries and gas regardless &mdash; the card converts a slice of that spending into accumulated satoshis without changing the spending behavior. The economics are modest; the practice is psychological.</p>
+
+            <div class="lob-tool-card">
+                <h4 class="lob-tool-name">Gemini Credit Card</h4>
+                <p class="prose">A true credit card (Mastercard via WebBank) with category-tiered rewards: 4% on gas and transit (capped at $300 of monthly spend, 1% above), 3% on dining, 2% on groceries, 1% on everything else. No annual fee. No foreign transaction fees. Rewards deposit instantly to a Gemini account in 50+ supported assets. US only, requires credit underwriting.</p>
+            </div>
+
+            <div class="lob-tool-card">
+                <h4 class="lob-tool-name">Coinbase One Card</h4>
+                <p class="prose">An American Express card with rewards tied to your Coinbase asset balance &mdash; 2% under $10K, scaling to 4% at $200K+, but the elevated rates only apply to the first $10K of monthly spend. Requires a Coinbase One subscription ($4.99/month minimum) to access at all. The economics depend heavily on how much you already keep on Coinbase.</p>
+            </div>
+
+            <div class="lob-tool-card">
+                <h4 class="lob-tool-name">Fold</h4>
+                <p class="prose">Runs a live debit card (Visa, prepaid) with gamified Spin Wheel rewards plus a 0.5% guaranteed base for Fold+ subscribers ($10/month or $100/year). A Fold credit card is announced for release. Stronger gamification dimension than the others &mdash; the rewards are inherently variable.</p>
+            </div>
+
+            <p class="prose"><strong>A note on tax treatment of card rewards:</strong> as of mid-2026, card rewards paid in bitcoin are generally treated as a rebate at issuance (not ordinary income), but become taxable on disposal at the gain or loss between the bitcoin&rsquo;s value at issuance and at sale. The card issuers handle this basis reporting on the year-end 1099-DA.</p>
+        </div>
+
+        <div class="section">
+            <h3>The dedicated paycheck router</h3>
+            <div class="lob-tool-card">
+                <h4 class="lob-tool-name">Bitwage</h4>
+                <p class="prose">Occupies a specialized niche &mdash; a payroll routing service that generates a virtual receiving account in the user&rsquo;s chosen currency, accepts the deposit from the employer, and disburses according to the user&rsquo;s preferred mix of fiat, stablecoins, BTC, and ETH. Fees are 1% on local-currency deposits, 2% on stablecoins. Bitwage&rsquo;s value-add is strongest for cross-border or global payroll where currency conversion is the main pain point &mdash; 4,500+ companies and 90,000+ workers use it, mostly freelance or international.</p>
+            </div>
+            <p class="prose">For US-domestic salaried users, Strike&rsquo;s &ldquo;Get Paid in Bitcoin&rdquo; typically does what Bitwage does without the extra layer.</p>
+        </div>
+
+        <div class="section">
+            <h3>The Lightning Network underneath</h3>
+            <p class="prose">Most of the consumer-facing Living-on-Bitcoin tooling runs on Lightning underneath, even when the user doesn&rsquo;t see it. Strike&rsquo;s instant transfers, Cash App&rsquo;s bitcoin sends, Fold&rsquo;s gift-card purchases &mdash; many are Lightning-routed at the rail level. The Lightning Network reached $1.17 billion in monthly volume in November 2025 with an average transaction size of $223, signaling its transition from micropayment experiment into a real settlement layer.</p>
+            <p class="prose">Self-custodial Lightning for everyday spending (Phoenix, Breez, Mutiny, Aqua) remains smaller than the custodial alternatives. The UX has improved with splicing and routing advances, but for most practitioners the right Lightning is the one that runs invisibly inside their custodial service &mdash; Strike or Fold acting as a Lightning user on the customer&rsquo;s behalf, with no channel management, no node operation, no routing-fee accounting required from the user.</p>
+        </div>
+
+        <div class="section">
+            <h3>Where to go from here</h3>
+            <p class="prose"><a href="#calculator" class="tab-jump" data-tab-target="calculator">The Calculator</a> turns the choice of tools into numbers &mdash; what the conversion fees actually cost over a year given your bill load, what the card rewards realistically add up to, how the friction stacks against expected appreciation. <a href="#math" class="tab-jump" data-tab-target="math">The Math tab</a> documents the assumptions for verification.</p>
+            <p class="prose">The landscape will change. The CLARITY Act moving through the Senate, the proposed Strike merger, and new entrants in the cards category could all reshape this picture within a year. This survey is a snapshot, not an evergreen reference.</p>
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB III: THE CALCULATOR — central deliverable  -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="tab-content" id="tab-calculator">
+
+        <div class="section-intro">
+            <h2>Does the practice actually pay off?</h2>
+            <p>Drag the sliders to your situation. The Calculator compares two strategies over your chosen horizon: <strong>holding your operating cash float in dollars</strong> (the baseline) versus <strong>holding it in bitcoin and converting to dollars as bills come due</strong> (the Living-on-Bitcoin path). The chart shows wealth over time. The friction breakdown shows what the practice actually costs you in fees and tax events. The drawdown stress test shows what happens if bitcoin takes a 50% hit during your horizon.</p>
+        </div>
+
+        <!-- HEADLINE OUTPUT -->
+        <div class="lob-headline">
+            <div class="lob-headline-label">Over <span id="lobHorizonYears">5</span> years, Living on Bitcoin nets you</div>
+            <div class="lob-headline-value" id="lobDifferential">+$&mdash;</div>
+            <div class="lob-headline-sub">vs. holding the same float in dollars &mdash; after <span id="lobFeesInline">$0</span> in conversion fees and <span id="lobTaxesInline">$0</span> in taxes on conversion gains.</div>
+        </div>
+
+        <!-- CHART -->
+        <div class="projection">
+            <div class="projection-header">
+                <span class="projection-title">Float value over time</span>
+                <div class="projection-legend">
+                    <div class="legend-item"><span class="swatch swatch-baseline"></span>Cash baseline (dollars)</div>
+                    <div class="legend-item"><span class="swatch swatch-lob"></span>Living on Bitcoin (net of friction)</div>
+                    <div class="legend-item"><span class="swatch swatch-drawdown"></span>Drawdown stress &mdash; &minus;50% BTC at year <span id="lobDrawdownYearDisplay">3</span></div>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="lobChart"></canvas>
+            </div>
+        </div>
+
+        <!-- LIVE EXPLORATION — sliders -->
+        <div class="live-explore">
+            <div class="live-explore-header">
+                <span class="live-explore-label">Live exploration &mdash; drag any slider</span>
+                <span class="live-explore-help">Watch the differential and chart move as you adjust your scenario.</span>
+            </div>
+
+            <div class="slider-cluster">
+                <div class="cluster-label">
+                    <span class="cluster-label-main">Your situation</span>
+                    <span class="cluster-label-help">&mdash; the size of the cash float you&rsquo;d hold as bitcoin, your monthly fiat outflow, and your horizon.</span>
+                </div>
+                <div class="slider-grid">
+
+                    <div class="slider-control" data-key="floatHeldUSD">
+                        <div class="slider-row">
+                            <span class="slider-name">Cash float held as bitcoin
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">The dollar amount of operating cash you&rsquo;d keep in bitcoin instead of in checking. Most US households keep checking balances in the low thousands. The Calculator assumes this float is replenished each month from your paycheck.</span></span>
+                            </span>
+                            <span class="slider-val" id="val-floatHeldUSD">$5,000</span>
+                        </div>
+                        <input type="range" id="slider-floatHeldUSD" min="1000" max="50000" step="500" value="5000" aria-label="Cash float held as bitcoin">
+                    </div>
+
+                    <div class="slider-control" data-key="monthlyBillsUSD">
+                        <div class="slider-row">
+                            <span class="slider-name">Monthly bills paid from bitcoin
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">The dollar amount of fiat bills you&rsquo;d pay each month by converting bitcoin to cash. Higher values mean more frequent conversions, which increases both the fee load and the number of tax events.</span></span>
+                            </span>
+                            <span class="slider-val" id="val-monthlyBillsUSD">$2,000</span>
+                        </div>
+                        <input type="range" id="slider-monthlyBillsUSD" min="0" max="10000" step="100" value="2000" aria-label="Monthly bills paid from bitcoin">
+                    </div>
+
+                    <div class="slider-control" data-key="horizonYears">
+                        <div class="slider-row">
+                            <span class="slider-name">Horizon
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">How long the Calculator models the practice forward. Longer horizons compound both the appreciation and the friction.</span></span>
+                            </span>
+                            <span class="slider-val" id="val-horizonYears">5 years</span>
+                        </div>
+                        <input type="range" id="slider-horizonYears" min="1" max="10" step="1" value="5" aria-label="Horizon in years">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="slider-cluster">
+                <div class="cluster-label">
+                    <span class="cluster-label-main">The friction</span>
+                    <span class="cluster-label-help">&mdash; conversion fees per side, your capital gains tax rate, and assumed bitcoin growth.</span>
+                </div>
+                <div class="slider-grid">
+
+                    <div class="slider-control" data-key="feePctPerSide">
+                        <div class="slider-row">
+                            <span class="slider-name">Conversion fee per side
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">The percentage fee charged per conversion. Strike consumer tier is ~0.99%; Cash App is 0.75&ndash;3% depending on size; Coinbase main app is wider. The Calculator applies this fee on both the buy leg and the sell leg.</span></span>
+                            </span>
+                            <span class="slider-val" id="val-feePctPerSide">1.0%</span>
+                        </div>
+                        <input type="range" id="slider-feePctPerSide" min="0.4" max="3.0" step="0.1" value="1.0" aria-label="Conversion fee per side">
+                    </div>
+
+                    <div class="slider-control" data-key="capGainsPct">
+                        <div class="slider-row">
+                            <span class="slider-name">Capital gains tax rate
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">Short-term capital gains (holding period under one year) are taxed as ordinary income; 22% is a common bracket for middle-income earners. Under HIFO cost basis with monthly conversions, most lots will be short-term. Long-term rates (held over a year) are typically 0&ndash;20%.</span></span>
+                            </span>
+                            <span class="slider-val" id="val-capGainsPct">22%</span>
+                        </div>
+                        <input type="range" id="slider-capGainsPct" min="0" max="37" step="1" value="22" aria-label="Capital gains tax rate">
+                    </div>
+
+                    <div class="slider-control" data-key="btcGrowthPct">
+                        <div class="slider-row">
+                            <span class="slider-name">Bitcoin annual growth
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">Assumed annual bitcoin appreciation rate, averaged over your horizon. Power Law trend suggests roughly 25&ndash;35% over a 5-year window; recent realized CAGR has been closer to 15&ndash;20%. The further out you go, the more the rate compresses. This slider lets you test the practice against a range of growth assumptions; you can set the sitewide default via the modeling-assumptions picker on other pages.</span></span>
+                            </span>
+                            <span class="slider-val" id="val-btcGrowthPct">25%</span>
+                        </div>
+                        <input type="range" id="slider-btcGrowthPct" min="0" max="50" step="1" value="25" aria-label="Bitcoin annual growth">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="slider-cluster">
+                <div class="cluster-label">
+                    <span class="cluster-label-main">Scenarios</span>
+                    <span class="cluster-label-help">&mdash; what changes if a de-minimis exemption passes, and how a drawdown affects the outcome.</span>
+                </div>
+                <div class="slider-grid">
+
+                    <div class="slider-control" data-key="deMinimisOn">
+                        <div class="slider-row">
+                            <span class="slider-name">Assume de-minimis exemption passes
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">If the PARITY Act ($200/transaction) or Lummis bill ($300/transaction with $5K annual cap) is enacted, much of the tax-event load on small everyday bitcoin spending evaporates. Toggle this on to see the LoB scenario without the tax friction.</span></span>
+                            </span>
+                            <span class="slider-val" id="val-deMinimisOn">Off</span>
+                        </div>
+                        <label class="lob-toggle">
+                            <input type="checkbox" id="slider-deMinimisOn" aria-label="Assume de minimis exemption passes">
+                            <span class="lob-toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="slider-control" data-key="drawdownYear">
+                        <div class="slider-row">
+                            <span class="slider-name">Drawdown stress &mdash; year of &minus;50% BTC shock
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">Models a single 50% drawdown at the end of the chosen year. The dashed line on the chart shows the LoB scenario&rsquo;s end-state under this stress test. Useful for sanity-checking whether your buffer survives a worst-case sequence.</span></span>
+                            </span>
+                            <span class="slider-val" id="val-drawdownYear">Year 3</span>
+                        </div>
+                        <input type="range" id="slider-drawdownYear" min="1" max="10" step="1" value="3" aria-label="Drawdown stress year">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- FRICTION BREAKDOWN -->
+        <div class="lob-breakdown">
+            <h4 class="lob-breakdown-title">Friction breakdown over <span id="lobBreakdownHorizon">5</span> years</h4>
+            <div class="lob-breakdown-grid">
+                <div class="lob-breakdown-item">
+                    <div class="lob-breakdown-label">Cumulative conversion fees</div>
+                    <div class="lob-breakdown-value" id="lobFeesTotal">$0</div>
+                    <div class="lob-breakdown-sub">two sides &times; 12 months &times; horizon</div>
+                </div>
+                <div class="lob-breakdown-item">
+                    <div class="lob-breakdown-label">Cumulative tax events</div>
+                    <div class="lob-breakdown-value" id="lobTaxesTotal">$0</div>
+                    <div class="lob-breakdown-sub">on conversion gains, HIFO assumed</div>
+                </div>
+                <div class="lob-breakdown-item">
+                    <div class="lob-breakdown-label">Gross appreciation</div>
+                    <div class="lob-breakdown-value" id="lobGrossAppreciation">$0</div>
+                    <div class="lob-breakdown-sub">before fees and taxes</div>
+                </div>
+                <div class="lob-breakdown-item">
+                    <div class="lob-breakdown-label">Net of friction</div>
+                    <div class="lob-breakdown-value" id="lobNetDifferential">$0</div>
+                    <div class="lob-breakdown-sub">what the practice actually delivers</div>
+                </div>
+            </div>
+
+            <div class="lob-drawdown-callout" id="lobDrawdownCallout">
+                <strong>If bitcoin drops 50% at end of year <span id="lobDrawdownYearText">3</span>:</strong> your LoB end-state would be <span id="lobDrawdownEndValue">$0</span> &mdash; a differential of <span id="lobDrawdownDelta">$0</span> vs. the cash baseline. The practice survives drawdowns mathematically, but the year you actually need to pay bills determines whether you survive them operationally.
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB IV: THE MATH — calculator specification    -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="tab-content" id="tab-math">
+
+        <div class="section-intro">
+            <h2>What the Calculator computes</h2>
+            <p>This page spells out the assumptions and formulas behind <a href="#calculator" class="tab-jump" data-tab-target="calculator">Tab III</a>, in the same register as the Math tabs on Retirement and BAS. The Calculator is intentionally simpler than those tools &mdash; Living on Bitcoin is a marginal economic play, and a higher-fidelity model would be precision theater. The aim is directional honesty, not financial-plan accuracy.</p>
+        </div>
+
+        <div class="section lob-math-section">
+            <h3>The two strategies</h3>
+
+            <h4 class="lob-math-subhead">Strategy A &mdash; Cash baseline</h4>
+            <p class="prose">The user holds an operating-cash float of <em>B</em> dollars in checking. Bills are paid from cash; paycheck refills cash. No interest is assumed (typical US checking accounts pay near zero). Over horizon <em>h</em>, the float remains nominally at <em>B</em>:</p>
+            <div class="lob-math-eq">value<sub>cash</sub>(t) = B &nbsp; for all t &isin; [0, h]</div>
+
+            <h4 class="lob-math-subhead">Strategy B &mdash; Living on Bitcoin</h4>
+            <p class="prose">At time 0, the user converts <em>B</em> dollars into bitcoin at price <em>P&#8320;</em>, yielding <em>B/P&#8320;</em> coins. Each month thereafter, <em>M</em> dollars of bitcoin is sold to pay bills, and <em>M</em> dollars of paycheck is bought back into bitcoin. Under steady-state refilling, the BTC quantity held stays constant at <em>B/P&#8320;</em>. The dollar value tracks bitcoin&rsquo;s price:</p>
+            <div class="lob-math-eq">value<sub>LoB,gross</sub>(t) = (B/P&#8320;) &times; P<sub>t</sub> = B &times; (1 + r)<sup>t</sup></div>
+            <p class="prose">where <em>r</em> is the assumed annual bitcoin growth rate.</p>
+        </div>
+
+        <div class="section lob-math-section">
+            <h3>The friction</h3>
+
+            <h4 class="lob-math-subhead">Conversion fees</h4>
+            <p class="prose">Each month the user converts <em>2M</em> dollars of round-trip volume (one buy, one sell). At a per-side fee rate of <em>f</em>%, the annual fee load is:</p>
+            <div class="lob-math-eq">fees<sub>annual</sub> = 2 &times; 12 &times; M &times; (f/100) = 0.24 &times; M &times; f</div>
+            <p class="prose">Over horizon <em>h</em>, cumulative fees are <em>h &times; 0.24 &times; M &times; f</em>. Fees are assumed paid externally (from the user&rsquo;s remaining cash income), not from the float itself.</p>
+
+            <h4 class="lob-math-subhead">Tax events &mdash; HIFO cost basis</h4>
+            <p class="prose">Under <em>highest-in, first-out</em> cost basis (the default on Strike, Swan, River, and Fold), each monthly sale pulls from the highest-priced lot in inventory. With steady monthly refilling, the inventory is dominated by recently-purchased lots, so the average holding period of sold BTC is short &mdash; approximately one month.</p>
+            <p class="prose">Per-dollar gain on a sale equals the bitcoin&rsquo;s appreciation between the matched buy and the sale. Annualizing across twelve monthly conversions:</p>
+            <div class="lob-math-eq">taxable_gain<sub>annual</sub> &asymp; M &times; r</div>
+            <p class="prose">at growth rate <em>r</em> (decimal). At a capital gains rate <em>g</em>%, the annual tax load is:</p>
+            <div class="lob-math-eq">tax<sub>annual</sub> = M &times; r &times; (g/100)</div>
+            <p class="prose">Cumulative over <em>h</em> years: <em>h &times; M &times; r &times; (g/100)</em>.</p>
+            <p class="prose">This is the &ldquo;straight-line&rdquo; approximation. A more rigorous model would compound gains as the price rises across the horizon, but for the modest scale of the typical operating-cash float, the straight-line approximation tracks the more rigorous result within ~15&ndash;20%. It is also more interpretable.</p>
+
+            <h4 class="lob-math-subhead">De-minimis exemption (toggle scenario)</h4>
+            <p class="prose">When the de-minimis toggle is on, the Calculator zeros out the tax load on bills below the threshold. The toggle approximates the PARITY Act&rsquo;s $200-per-transaction structure: for monthly bills <em>M</em>/12 per individual transaction (assumed 12 bills/month), if the per-transaction amount falls below $200, no tax is owed on that conversion. The toggle is a simplifying approximation; the actual Lummis variant with a $5,000 annual cap would produce slightly different numbers.</p>
+        </div>
+
+        <div class="section lob-math-section">
+            <h3>The net differential</h3>
+            <p class="prose">The Calculator&rsquo;s headline number is the wealth differential at horizon end, net of all friction:</p>
+            <div class="lob-math-eq">differential = value<sub>LoB,gross</sub>(h) &minus; cumulative_fees &minus; cumulative_taxes &minus; B</div>
+            <p class="prose">Expanded:</p>
+            <div class="lob-math-eq">differential = B &times; [(1 + r)<sup>h</sup> &minus; 1] &minus; h &times; 0.24 &times; M &times; f &minus; h &times; M &times; r &times; (g/100)</div>
+            <p class="prose">The first term is the gross appreciation on the float. The second is conversion fee friction. The third is tax-event friction. The differential is the result <em>after</em> subtracting both.</p>
+        </div>
+
+        <div class="section lob-math-section">
+            <h3>The drawdown stress test</h3>
+            <p class="prose">The drawdown scenario applies a single 50% bitcoin price shock at the end of the chosen year <em>Y</em>. The LoB end-state under this stress is:</p>
+            <div class="lob-math-eq">value<sub>LoB,drawdown</sub>(h) = B &times; (1 + r)<sup>Y</sup> &times; 0.5 &times; (1 + r)<sup>h&minus;Y</sup></div>
+            <p class="prose">The float recovers and continues compounding after the drawdown; the test does not assume bitcoin stays at the drawdown level. The visualization shows the chart line dipping at year <em>Y</em> and resuming its trajectory thereafter, with the friction continuing to accumulate. The point of the stress test isn&rsquo;t to model bitcoin&rsquo;s actual volatility &mdash; it&rsquo;s to give the user a single visual answer to &ldquo;what happens if I&rsquo;m unlucky?&rdquo;</p>
+        </div>
+
+        <div class="section lob-math-section">
+            <h3>What&rsquo;s not modelled</h3>
+            <ul class="lob-math-list">
+                <li><strong>Card rewards.</strong> The Calculator omits the bitcoin-back card layer entirely. For most card-using practitioners, rewards add somewhere between 0.5% and 2% of card-charged spend in accumulated bitcoin per year &mdash; modest enough that it doesn&rsquo;t change the overall picture, but real. Treat the Calculator&rsquo;s output as the floor.</li>
+                <li><strong>Interest on cash baseline.</strong> The cash baseline assumes 0% interest. A 4&ndash;5% FDIC-insured high-yield savings account would reduce the differential by roughly the same amount on the cash side &mdash; close the gap by maybe a third at typical horizons.</li>
+                <li><strong>Inflation.</strong> All numbers are nominal. Real (inflation-adjusted) terms would compress both strategies proportionally; the differential survives.</li>
+                <li><strong>State and local taxes.</strong> Only federal capital gains are modelled. State and city income taxes are real and additive &mdash; California, New York, and similar high-tax states would meaningfully reduce the LoB advantage.</li>
+                <li><strong>Long-term capital gains rate transitions.</strong> Under HIFO with monthly cadence, most sold lots are short-term. The Calculator does not model the small fraction of sales that may straddle into long-term territory.</li>
+                <li><strong>Counterparty risk on the conversion service.</strong> A Strike outage, a River insolvency, a Cash App freeze all change the practical outcome in ways the math doesn&rsquo;t capture.</li>
+                <li><strong>Behavioral drift.</strong> The Calculator assumes the user actually refills the float each month with discipline. Real users skip months, adjust ratios, panic-sell during drawdowns. The numbers are an upper bound on a well-disciplined practice.</li>
+            </ul>
+        </div>
+
+    </div>
+
+    {% include 'components/related.njk' %}
+    {% include 'components/companion-content.njk' %}
+
+</main>

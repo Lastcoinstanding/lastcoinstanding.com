@@ -910,6 +910,76 @@ Added 2026-05-18. BAS reads the canonical scenario-carry-over schema documented 
 
 The receiver lives inside the BAS calculator IIFE, between the element-reference declarations and the cost-basis-preset block. It runs *before* the first `recompute()` so the override value is used in the initial render — no event-dispatch race with the input wiring.
 
+## 22. Living on Bitcoin (`/living-on-bitcoin.html`)
+
+**Added:** May 2026. A four-tab supplemental page on the *practice* of holding operating cash in bitcoin and paying fiat bills as they come due. Positioned editorially as "icing not the cake" — explicitly secondary to the Retirement and BAS pages where the real economic case for bitcoin lives. The page is honest that the practice is values-aligned and modestly economic rather than wealth-building.
+
+### The page's editorial frame
+
+The hero subtitle anchors the position: *"Holding operating cash in bitcoin and paying fiat bills as they come due — a values-aligned practice with modest economics and real friction."* The Question tab leads with "a practice, not a strategy" — distinguishing this page from Retirement (the wealth-building surface) and BAS (the access-without-selling surface). The editorial position is *skeptical-but-values-respectful*: the economic case is real but small, eaten by friction; the psychological case (unit-of-account shift, bitcoin-as-money normalization) is what most practitioners actually come for, and the page does not pretend otherwise.
+
+### Tab structure
+
+| Tab | Character | Content |
+|---|---|---|
+| I. The Question | Editorial prose | 6 H2/H3 sections: practice vs strategy, economic case eaten by friction, the psychological reason, three honest costs (conversion drag, tax-event load, drawdown sequence), who this is for / isn't for, where-to-go bridge |
+| II. The Tools | Categorical survey | 4 categories (conversion service, bitcoin-back card, dedicated paycheck router, Lightning rail) with brief named examples (Strike, River, Swan, Cash App, Gemini, Coinbase One, Fold, Bitwage) and honest tradeoffs; not a comparison matrix |
+| III. The Calculator | Tool-led | Float-vs-friction wealth comparison over user-chosen horizon, with drawdown stress test |
+| IV. The Math | Specification-led | Formulas, HIFO holding-period assumption, de-minimis approximation, what's not modelled |
+
+### The Calculator — wealth comparison surface
+
+Inputs (7):
+
+| Input | Type | Default | Range |
+|---|---|---|---|
+| Cash float held as bitcoin (USD) | range slider | $5,000 | $1,000–$50,000 (step $500) |
+| Monthly bills paid from bitcoin (USD) | range slider | $2,000 | $0–$10,000 (step $100) |
+| Horizon (years) | range slider | 5 | 1–10 (step 1) |
+| Conversion fee per side (%) | range slider | 1.0% | 0.4–3.0% (step 0.1) |
+| Capital gains tax rate (%) | range slider | 22% | 0–37% (step 1) |
+| Bitcoin annual growth (%) | range slider | 25% | 0–50% (step 1) |
+| De-minimis exemption | toggle | Off | on/off |
+| Drawdown stress year | range slider | 3 | 1–10 (step 1) |
+
+Outputs: net differential (LoB wealth minus cash baseline, after fees and taxes) as the headline number, cumulative conversion fees, cumulative tax events, gross appreciation (pre-friction), net of friction, drawdown stress end-state with delta vs cash baseline.
+
+The signature visual is `lobChart` — a three-line chart over the horizon showing the flat cash baseline (dashed gray), the LoB net-of-friction trajectory (solid orange), and the drawdown stress overlay (dashed red, dropping 50% at the chosen year and resuming compounding from the new floor).
+
+### The math model
+
+Under steady-state refilling, the BTC quantity held stays constant at *B/P₀* — each month the user sells $M of BTC for bills and buys $M of BTC from paycheck. The dollar value of the float compounds at growth rate *r*. Friction comes in two channels: conversion fees (`2 × 12 × M × f/100` per year) and tax events on conversion gains.
+
+Under HIFO with monthly cadence, sold lots are very recently bought, so per-dollar gain is small (≈ *r*/12) and annual taxable gain ≈ *M × r*. This makes the tax friction *modest at typical bills*. The de-minimis toggle zeros this out for monthly bills under $200 per transaction (PARITY-style approximation). The drawdown stress test applies a single 50% shock at end of chosen year, with recovery and continued compounding thereafter — the point isn't realistic vol modelling, it's a single visual answer to "what if I'm unlucky?"
+
+The model is intentionally simpler than the Retirement Power Law projection or the BAS borrow-vs-sell comparison. Living on Bitcoin is a marginal economic play, and higher-fidelity math would be precision theater. The Math tab spells out the simplifications and what's not modelled.
+
+### Editorial moves
+
+- **"Icing not the cake."** The page's central editorial frame. Most "live on bitcoin" content treats the practice as a wealth-building strategy; this page explicitly says it isn't, and points the reader to the Retirement and BAS pages for where the real economic case lives. Honesty earns trust on a topic where most content is promotional.
+- **Psychological dimension foregrounded.** §3 of Tab I ("The reason this practice exists anyway") names the unit-of-account shift and identity payoff as the *actual* reason most practitioners do this. The page assumes the reader is sympathetic enough to bitcoin to value the practice for its own sake, not just its economics.
+- **Tax recordkeeping reframed.** §4 of Tab I refuses to pretend the user can do hand-tracking — instead names the services (Strike, Swan, River, Fold) that handle it via 1099-DA at year-end. Honest about the friction without making it the reader's pencil-and-paper problem.
+- **De-minimis horizon noted but not load-bearing.** The PARITY/Lummis legislation is mentioned in both Tab I and the Calculator's de-minimis toggle, but the page is written to today's law. Avoids the trap of "if this passes, then..." reasoning that ages badly.
+- **Strike/XXI/Elektron merger as italicized aside.** Tab II mentions the proposed April 29, 2026 merger inside the Strike tool card as an italicized note, deliberately marking it as a moving piece that may need refresh. Doesn't lean on the merger as load-bearing context.
+
+### Modeling assumptions integration
+
+The BTC growth slider reads its initial value from `ModelingAssumptions.get('btcGrowthModel')` via a simple preset-to-approx-rate translation (`powerlaw-trend → 30%`, `powerlaw-floor → 20%`, `linear-cagr-decay → 15%`). The slider becomes the source of truth once the user touches it; subscribes to `*` changes so any sitewide preset change re-syncs the slider value. This is a simplified treatment compared to the Retirement page's full Power Law trajectory — appropriate for this page's "directional honesty not financial-plan accuracy" register.
+
+### Cross-linking
+
+- `/the-bitcoin-retirement.html` §17 and `/borrowing-against-your-stack.html` §21 are the primary wealth-building surfaces; this page links them in the hero subtitle and in Tab I §1 and §5 as "where the real economic case lives"
+- `/disciplined-rebalancing.html` is referenced in the `related` block as the inverse-side sibling
+- `/the-power-law.html` is referenced as the growth-model basis for the Calculator's BTC appreciation assumption
+- Featured tile on `/calculators` (Tools index) — added via `_data/explorations.json` entry in the `numbers` category, after BAS and before bitcoin-backed-mortgages
+
+### Future work
+
+- **OG image.** Skipped for v1 to keep the build focused. Pattern is `STYLE_GUIDE §6.15.1` brand-forward family aesthetic; tracked in TECH_DEBT.
+- **Print stylesheet.** Not in v1. Pattern would mirror `STYLE_GUIDE §6.16` from Retirement / BAS — Cmd+P produces a single-page PDF of the Calculator scenario with inputs table and chart. Lower priority than the Retirement / BAS prints because Living on Bitcoin is less likely to be shared as a printout.
+- **Card-rewards modeling.** The Calculator omits the bitcoin-back-card layer. For most card-using practitioners, rewards add 0.5–2% of card-charged spend per year — modest but real. A future enhancement could add a card-rewards slider and roll the accumulated rewards into the LoB total.
+- **Long-term capital gains transitions.** Under HIFO with monthly cadence, most lots are short-term, but a small fraction may straddle into long-term territory. Not modeled in v1.
+
 ---
 
 _Last updated: May 2026. Update this document as editorial decisions crystallize into principles worth preserving._
