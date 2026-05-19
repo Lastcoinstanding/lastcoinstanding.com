@@ -326,8 +326,24 @@
   }
 
   // ─── Chart rendering ───
+  // §6.14 deferred-layout pattern: the chart canvas lives inside the
+  // Calculator tab (.tab-content), which has display:none on initial page
+  // load (Question tab is default-active). Creating Chart.js against a 0×0
+  // canvas corrupts every element's pixel position to 0, and subsequent
+  // chart.update('none') calls don't recover from this. We use a flag +
+  // ResizeObserver: if the canvas has zero width when renderChart() runs,
+  // we stash the pending result; when the canvas first gains real
+  // dimensions (user switches to Calculator tab), ResizeObserver fires
+  // and we run the deferred render once.
+  var pendingChartResult = null;
   function renderChart(result) {
     if (!chartCanvas) return;
+    if (!chartCanvas.clientWidth || chartCanvas.clientWidth === 0) {
+      // Canvas hidden (tab not active). Stash the result; ResizeObserver
+      // below picks it up when the tab becomes visible.
+      pendingChartResult = result;
+      return;
+    }
     var labels = [];
     for (var i = 0; i <= result.h; i++) {
       labels.push('Year ' + i);
@@ -483,6 +499,23 @@
       .catch(function(){ /* keep fallback; render already ran with it */ });
   }
   fetchLiveBtc();
+
+  // ─── §6.14 deferred chart render — ResizeObserver picks up the canvas
+  // becoming visible (user switches to Calculator tab) and runs the
+  // stashed chart render exactly once. ResizeObserver is supported in
+  // every evergreen browser (Chrome 64+, Safari 13.4+, Firefox 69+);
+  // without it the fallback is a slightly stale chart on first view,
+  // which is no worse than the original bug. ───
+  if (chartCanvas && typeof ResizeObserver !== 'undefined') {
+    var chartObserver = new ResizeObserver(function() {
+      if (pendingChartResult && chartCanvas.clientWidth > 0) {
+        var deferred = pendingChartResult;
+        pendingChartResult = null;
+        renderChart(deferred);
+      }
+    });
+    chartObserver.observe(chartCanvas);
+  }
 
   // ─── Initial render ───
   render();

@@ -1,65 +1,63 @@
 /* ============================================================
    Living on Bitcoin — page-level styles
    ============================================================
-   Mirrors BAS / Retirement canonical patterns per STYLE_GUIDE.md
-   §2.1 (typography), §3.5 (modeling-assumptions), §6.16 (slider
-   clusters), §6.15 (chart containers).
+   Per STYLE_GUIDE.md §1 this is an editorial-tier page (contains
+   essay tabs alongside the calculator), so canonical scale §2.1 +
+   Inter body applies. Variable names follow §3 canonical
+   (--ink-*, --bg-page, --font-display, --font-body, --font-flourish).
 
-   Sections in this file:
-     1. CSS variables (dark amber palette)
-     2. Body + page wrapper
-     3. Hero (h1, subtitle, hero-subtitle)
-     4. Tab nav (tab-btn, tab-num, tab-title, tab-content)
-     5. Sections + prose + friction-subhead
-     6. Tab-question / Tab-tools / Tab-math typography
-     7. Slider clusters (cluster-label, slider-grid)
-     8. Individual slider controls (slider-row, slider-name,
-        slider-val, help-tip, tip-content, range input)
-     9. Toggle switch (lob-toggle for de-minimis)
-    10. Projection container (chart-wrapper, projection-header,
-        projection-legend, legend-item, swatch)
-    11. Live-explore (header, label, help)
-    12. Power Law projection display (replaces former slider)
-    13. Calculator outputs (headline, breakdown grid, drawdown
-        callout)
+   Sections:
+     1. CSS variables (canonical --ink-* / --bg-* / --font-* tokens)
+     2. Page chrome (html, body, content-area)
+     3. Hero (Pattern 1 editorial: §2.1 h1, §2.4 Source Serif subtitle)
+     4. Tab nav (§6.2 canonical: Inter 0.95rem, weight 500/600,
+        2px amber border, tab-num + tab-title pattern)
+     5. Sections + prose (#tab-question / #tab-tools / #tab-math
+        scoping so unclassified <p> still gets canonical styling)
+     6. Slider clusters + controls (§6.16 pattern)
+     7. Help-tip tooltips (§6.13 pattern)
+     8. Range input thumb/track
+     9. Toggle switch (de-minimis)
+    10. Projection container (chart-wrapper, header, legend, swatch)
+    11. Live-explore caps-label (§6.1)
+    12. Power Law projection display (replaces former growth slider)
+    13. Calculator outputs (headline, breakdown, drawdown callout)
     14. Tool cards (Tab II)
     15. Math tab (lob-math-section, lob-math-eq, lob-math-list)
-    16. Lists (friction-list, fit-list)
-    17. Responsive breakpoints (720px, 480px)
+    16. Lists
+    17. Responsive (720px, 480px)
 ============================================================ */
 
 
-/* ─── 1. CSS VARIABLES ─── */
+/* ─── 1. CSS VARIABLES (per STYLE_GUIDE §3) ─── */
 :root {
-    --bg: #0a0908;
-    --bg-card: #141210;
+    --bg-page: #0a0908;
+    --bg-card: #14110d;
     --amber: #e09422;
     --amber-bright: #F7931A;
-    --amber-dim: #b8791c;
     --amber-soft: rgba(224,148,34,0.06);
     --amber-glow: rgba(224,148,34,0.15);
-    --text: #e8e0d4;
-    --text-dim: #9a9080;
-    --text-muted: #6a6256;
+    --ink-bright: #ece4d6;
+    --ink: #ccc6b8;
+    --ink-dim: #968b7a;
+    --ink-faint: #5a5247;
     --red: #c0392b;
     --red-dim: rgba(192,57,43,0.6);
-    --green: #27ae60;
-    --border: rgba(224,148,34,0.12);
+    --border: rgba(224,148,34,0.15);
     --border-strong: rgba(224,148,34,0.30);
     --border-faint: rgba(224,148,34,0.08);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-flourish: 'Source Serif 4', Georgia, serif;
 }
 
 
-/* ─── 2. BODY + PAGE WRAPPER ─── */
-html { background: var(--bg); color-scheme: dark; }
-body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 1.05rem;
-    line-height: 1.7;
-    -webkit-font-smoothing: antialiased;
-}
+/* ─── 2. PAGE CHROME ─── */
+/* base.njk already sets body font-family, font-size, line-height
+   (Inter / 1.05rem / 1.7). Only add page-specific bg + color here. */
+html { background: var(--bg-page); color-scheme: dark; }
+body { background: var(--bg-page); color: var(--ink); }
+
 .content-area {
     position: relative;
     max-width: 1100px;
@@ -68,7 +66,7 @@ body {
 }
 
 
-/* ─── 3. HERO ─── */
+/* ─── 3. HERO (STYLE_GUIDE §2.1 standard h1 + §2.4 italic subtitle) ─── */
 .hero {
     position: relative;
     text-align: center;
@@ -76,54 +74,65 @@ body {
     margin: 0 auto;
     padding: 5rem 2rem 3rem;
 }
+/* Canonical standard-page h1: clamp(2rem, 4vw, 3.4rem), weight 500. */
 .hero h1 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: clamp(2.8rem, 5.5vw, 4.5rem);
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.4rem);
     font-weight: 500;
-    color: var(--text);
-    line-height: 1.05;
-    letter-spacing: -0.015em;
-    margin: 0 0 0.6rem;
+    color: var(--ink-bright);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.7rem;
 }
 .hero h1 em {
     font-style: italic;
     color: var(--amber);
     font-weight: 500;
 }
+/* Hero subtitle in Source Serif 4 italic (§2.4 italic flourish). */
 .hero-subtitle {
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: clamp(1.1rem, 2vw, 1.35rem);
-    font-style: normal;
-    color: var(--text-dim);
+    font-family: var(--font-flourish);
+    font-style: italic;
+    font-size: clamp(1.05rem, 2vw, 1.3rem);
+    font-weight: 400;
+    color: var(--ink-dim);
     margin: 0 auto 1.8rem;
-    max-width: 720px;
-    line-height: 1.5;
-    letter-spacing: 0.005em;
+    max-width: 680px;
+    line-height: 1.6;
 }
+/* Lede paragraph below subtitle — Inter body register. */
 .hero .subtitle {
-    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 1.6vw, 1.1rem);
     line-height: 1.7;
-    color: var(--text-dim);
+    color: var(--ink-dim);
     max-width: 680px;
     margin: 0 auto;
     font-weight: 400;
 }
-.hero .subtitle em { color: var(--text); font-style: italic; }
+.hero .subtitle em {
+    color: var(--ink-bright);
+    font-style: italic;
+    font-weight: 500;
+}
 
 
-/* ─── 4. TAB NAV ─── */
+/* ─── 4. TAB NAV (STYLE_GUIDE §6.2 canonical) ─── */
 .tab-nav {
     display: flex;
     gap: 0;
     border-bottom: 1px solid var(--border);
     margin: 1.8rem 0 2.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
 }
+.tab-nav::-webkit-scrollbar { display: none; }
 .tab-btn {
     flex: 1;
-    padding: 1.1rem 1rem;
+    padding: 16px;
     background: none;
     border: none;
-    border-bottom: 3px solid transparent;
+    border-bottom: 2px solid transparent;
     cursor: pointer;
     text-align: center;
     transition: all 0.25s;
@@ -133,27 +142,30 @@ body {
 .tab-btn:hover { background: rgba(255,255,255,0.02); }
 .tab-btn .tab-num {
     display: block;
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: var(--font-body);
     font-size: 0.65rem;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 5px;
+    color: var(--ink-faint);
+    margin-bottom: 4px;
     transition: color 0.25s;
 }
+/* Tab title is Inter, NOT Cormorant — STYLE_GUIDE §6.2 explicit. */
 .tab-btn .tab-title {
     display: block;
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: clamp(1rem, 2vw, 1.3rem);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
     font-weight: 500;
-    color: var(--text-dim);
-    transition: color 0.25s;
-    letter-spacing: 0.005em;
+    color: var(--ink-dim);
+    transition: color 0.25s, font-weight 0.25s;
 }
 .tab-btn.active { border-bottom-color: var(--amber); }
 .tab-btn.active .tab-num { color: var(--amber); }
-.tab-btn.active .tab-title { color: var(--text); }
+.tab-btn.active .tab-title {
+    color: var(--ink-bright);
+    font-weight: 600;
+}
 
 .tab-content { display: none; }
 .tab-content.active { display: block; animation: tabIn 0.35s ease; }
@@ -162,8 +174,11 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* In-prose link that jumps to a different tab. */
-.tab-jump {
+/* In-prose tab-jump link — explicit :link/:visited so it stays
+   amber for visited links (default browser visited-color is purple). */
+.tab-jump,
+.tab-jump:link,
+.tab-jump:visited {
     color: var(--amber);
     text-decoration: none;
     border-bottom: 1px solid rgba(224,148,34,0.3);
@@ -179,76 +194,49 @@ body {
     max-width: 880px;
 }
 .section-intro h2 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-display);
     font-size: clamp(1.8rem, 3.4vw, 2.6rem);
     font-weight: 500;
-    color: var(--text);
+    color: var(--ink-bright);
     line-height: 1.15;
     margin: 0 0 1rem;
     letter-spacing: -0.005em;
 }
 .section-intro h2 em { font-style: italic; color: var(--amber); }
 .section-intro p {
+    font-family: var(--font-body);
     font-size: 1.05rem;
     line-height: 1.7;
-    color: var(--text-dim);
+    color: var(--ink-dim);
     margin: 0 0 1rem;
 }
-.section-intro p em { color: var(--text); font-style: italic; }
-.section-intro p strong { color: var(--text); font-weight: 600; }
+.section-intro p em { color: var(--ink-bright); font-style: italic; }
+.section-intro p strong { color: var(--ink-bright); font-weight: 600; }
 
 .section h2 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-display);
     font-size: clamp(1.8rem, 3.4vw, 2.6rem);
     font-weight: 500;
-    color: var(--text);
+    color: var(--ink-bright);
     line-height: 1.2;
     margin: 2.8rem 0 1rem;
     letter-spacing: -0.005em;
 }
 .section h2 em { font-style: italic; color: var(--amber); }
 .section h3 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-display);
     font-size: clamp(1.4rem, 2.4vw, 1.8rem);
     font-weight: 500;
-    color: var(--text);
+    color: var(--ink-bright);
     line-height: 1.25;
     margin: 2rem 0 0.75rem;
     letter-spacing: -0.005em;
 }
 .section h3 em { font-style: italic; color: var(--amber); }
 
-/* Generic prose paragraph — used across all four tabs */
-.prose {
-    font-size: 1.05rem;
-    line-height: 1.7;
-    color: var(--text);
-    margin: 0 0 1.2rem;
-}
-.prose em { font-style: italic; color: var(--amber-dim); }
-.prose strong { color: var(--text); font-weight: 600; }
-.prose a {
-    color: var(--amber);
-    text-decoration: none;
-    border-bottom: 1px solid rgba(224,148,34,0.3);
-    transition: border-color 0.2s;
-}
-.prose a:hover { border-color: var(--amber); }
-.prose a em { color: var(--amber); }
-
-/* Italic friction-subhead inside Tab-question */
-.friction-subhead {
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 1.25rem;
-    font-weight: 500;
-    color: var(--text);
-    font-style: italic;
-    margin: 1.8rem 0 0.7rem;
-    letter-spacing: -0.003em;
-}
-
-
-/* ─── 6. TAB-SPECIFIC TYPOGRAPHY ─── */
+/* Tab-scoped prose styling — covers BOTH classed `.prose p` and
+   unclassed `<p>` inside tab content (the latter was rendering
+   with default browser link colors, hence the purple visited links). */
 #tab-question .section,
 #tab-tools .section,
 #tab-math .section,
@@ -257,17 +245,78 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
+#tab-question p,
+#tab-tools p,
+#tab-math p,
+.prose {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--ink);
+    margin: 0 0 1.2rem;
+}
+#tab-question p em,
+#tab-tools p em,
+#tab-math p em,
+.prose em { font-style: italic; color: var(--amber); }
+#tab-question p strong,
+#tab-tools p strong,
+#tab-math p strong,
+.prose strong { color: var(--ink-bright); font-weight: 600; }
+
+/* Link rules — explicit :link, :visited so visited links keep amber
+   (browser default is purple). This was the visible bug on Tab I. */
+#tab-question p a,
+#tab-question p a:link,
+#tab-question p a:visited,
+#tab-tools p a,
+#tab-tools p a:link,
+#tab-tools p a:visited,
+#tab-math p a,
+#tab-math p a:link,
+#tab-math p a:visited,
+.prose a,
+.prose a:link,
+.prose a:visited {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(224,148,34,0.3);
+    transition: border-color 0.2s, color 0.2s;
+}
+#tab-question p a:hover,
+#tab-tools p a:hover,
+#tab-math p a:hover,
+.prose a:hover {
+    color: var(--amber-bright);
+    border-color: var(--amber);
+}
+#tab-question p a em,
+#tab-tools p a em,
+#tab-math p a em,
+.prose a em { color: var(--amber); }
+
 #tab-question h3 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-display);
     font-size: 1.7rem;
     font-weight: 500;
-    color: var(--text);
+    color: var(--ink-bright);
     margin: 2.5rem 0 1rem;
     letter-spacing: -0.005em;
 }
 
+/* Italic friction-subhead (Tab-question subsection labels) */
+.friction-subhead {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--ink-bright);
+    font-style: italic;
+    margin: 1.8rem 0 0.7rem;
+    letter-spacing: -0.003em;
+}
 
-/* ─── 7. SLIDER CLUSTERS ─── */
+
+/* ─── 6. SLIDER CLUSTERS (STYLE_GUIDE §6.16) ─── */
 .slider-cluster {
     margin-bottom: 1.25rem;
     padding: 1.1rem 1.25rem 1.25rem;
@@ -285,14 +334,15 @@ body {
     border-bottom: 1px dashed var(--border-faint);
 }
 .cluster-label-main {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-display);
     font-size: 1.15rem;
     font-weight: 500;
-    color: var(--text);
+    color: var(--ink-bright);
 }
 .cluster-label-help {
+    font-family: var(--font-body);
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: var(--ink-faint);
     font-style: italic;
     flex: 1;
     min-width: 14em;
@@ -303,9 +353,6 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 1.1rem 2rem;
 }
-
-
-/* ─── 8. INDIVIDUAL SLIDER CONTROL ─── */
 .slider-control {
     padding: 0.5rem 0;
     display: flex;
@@ -320,23 +367,25 @@ body {
     gap: 0.4rem 0.6rem;
 }
 .slider-name {
+    font-family: var(--font-body);
     font-size: 0.95rem;
     font-weight: 500;
-    color: var(--text);
+    color: var(--ink-bright);
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
 }
 .slider-val {
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: var(--font-body);
     font-size: 1.1rem;
     font-weight: 500;
-    color: var(--text);
+    color: var(--ink-bright);
     letter-spacing: -0.005em;
     font-variant-numeric: tabular-nums;
 }
 
-/* Help-tip tooltip — appears on hover/focus of the ? icon */
+
+/* ─── 7. HELP-TIP TOOLTIPS (STYLE_GUIDE §6.13) ─── */
 .help-tip {
     display: inline-flex;
     align-items: center;
@@ -344,24 +393,23 @@ body {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    border: 1px solid var(--text-muted);
-    color: var(--text-muted);
+    border: 1px solid var(--ink-faint);
+    color: var(--ink-faint);
     font-size: 0.65rem;
     font-style: normal;
     cursor: help;
     position: relative;
     font-weight: 400;
 }
-.help-tip:hover,
-.help-tip:focus {
+.help-tip:hover, .help-tip:focus {
     border-color: var(--amber);
     color: var(--amber);
     outline: none;
 }
 .help-tip .tip-content {
-    /* display:none rather than opacity:0 so the 240px tooltip is fully
+    /* display:none rather than opacity:0 so the 240px popover is fully
        out of layout when hidden — prevents horizontal overflow on mobile
-       when a ? sits near the viewport edge. Pattern from Retirement page. */
+       when a ? icon sits near the right edge. Pattern from Retirement. */
     display: none;
     position: absolute;
     bottom: calc(100% + 8px);
@@ -372,9 +420,10 @@ body {
     background: var(--bg-card);
     border: 1px solid var(--border-strong);
     border-radius: 4px;
+    font-family: var(--font-body);
     font-size: 0.8rem;
     font-weight: 400;
-    color: var(--text);
+    color: var(--ink);
     line-height: 1.45;
     text-align: left;
     letter-spacing: 0;
@@ -383,8 +432,8 @@ body {
     box-shadow: 0 6px 18px rgba(0,0,0,0.5);
     font-style: normal;
 }
-.help-tip .tip-content strong { color: var(--text); font-weight: 600; }
-.help-tip .tip-content em { color: var(--amber-dim); font-style: italic; }
+.help-tip .tip-content strong { color: var(--ink-bright); font-weight: 600; }
+.help-tip .tip-content em { color: var(--amber); font-style: italic; }
 .help-tip:hover .tip-content,
 .help-tip:focus .tip-content,
 .help-tip:focus-within .tip-content {
@@ -392,7 +441,8 @@ body {
     pointer-events: auto;
 }
 
-/* Range input — site-consistent amber-on-dark slider */
+
+/* ─── 8. RANGE INPUT — amber-on-dark slider ─── */
 .slider-control input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
@@ -411,7 +461,7 @@ body {
     height: 18px;
     border-radius: 50%;
     background: var(--amber);
-    border: 2px solid var(--bg);
+    border: 2px solid var(--bg-page);
     box-shadow: 0 0 0 1px rgba(224,148,34,0.4);
     cursor: grab;
     transition: transform 0.1s, box-shadow 0.15s;
@@ -421,7 +471,7 @@ body {
     height: 18px;
     border-radius: 50%;
     background: var(--amber);
-    border: 2px solid var(--bg);
+    border: 2px solid var(--bg-page);
     box-shadow: 0 0 0 1px rgba(224,148,34,0.4);
     cursor: grab;
 }
@@ -429,9 +479,7 @@ body {
     transform: scale(1.1);
     box-shadow: 0 0 0 2px rgba(224,148,34,0.5);
 }
-.slider-control input[type="range"]:active::-webkit-slider-thumb {
-    cursor: grabbing;
-}
+.slider-control input[type="range"]:active::-webkit-slider-thumb { cursor: grabbing; }
 
 
 /* ─── 9. TOGGLE SWITCH (de-minimis) ─── */
@@ -442,11 +490,7 @@ body {
     height: 26px;
     margin-top: 0.4rem;
 }
-.lob-toggle input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
+.lob-toggle input { opacity: 0; width: 0; height: 0; }
 .lob-toggle-slider {
     position: absolute;
     cursor: pointer;
@@ -463,7 +507,7 @@ body {
     width: 20px;
     left: 2px;
     bottom: 2px;
-    background-color: var(--text-dim);
+    background-color: var(--ink-dim);
     border-radius: 50%;
     transition: transform 0.2s, background-color 0.2s;
 }
@@ -473,7 +517,7 @@ body {
 }
 .lob-toggle input:checked + .lob-toggle-slider:before {
     transform: translateX(26px);
-    background-color: var(--text);
+    background-color: var(--ink-bright);
 }
 
 
@@ -494,18 +538,19 @@ body {
     margin-bottom: 1rem;
 }
 .projection-title {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-display);
     font-size: 1.3rem;
     font-weight: 600;
-    color: var(--text);
+    color: var(--ink-bright);
     line-height: 1.25;
 }
 .projection-legend {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 0.5rem 1rem;
+    font-family: var(--font-body);
     font-size: 0.85rem;
-    color: var(--text-dim);
+    color: var(--ink-dim);
 }
 .legend-item { display: inline-flex; align-items: center; gap: 0.45rem; }
 .swatch {
@@ -515,7 +560,7 @@ body {
     border-radius: 1px;
     flex-shrink: 0;
 }
-.swatch-baseline { background: #9a9080; }
+.swatch-baseline { background: var(--ink-dim); }
 .swatch-lob { background: var(--amber); }
 .swatch-drawdown {
     background: repeating-linear-gradient(
@@ -533,7 +578,7 @@ body {
 }
 
 
-/* ─── 11. LIVE EXPLORE ─── */
+/* ─── 11. LIVE EXPLORE (§6.1 caps-label) ─── */
 .live-explore {
     margin-top: 1.5rem;
     padding: 0;
@@ -546,6 +591,7 @@ body {
     margin-bottom: 1rem;
 }
 .live-explore-label {
+    font-family: var(--font-body);
     font-size: 0.7rem;
     font-weight: 500;
     letter-spacing: 0.22em;
@@ -553,17 +599,16 @@ body {
     color: var(--amber);
 }
 .live-explore-help {
+    font-family: var(--font-body);
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: var(--ink-faint);
     font-style: italic;
 }
 
 
 /* ─── 12. POWER LAW PROJECTION DISPLAY ─── */
-/* Replaces the former BTC growth slider in the .friction cluster.
-   Renders a single value (implied CAGR) and a one-line detail showing
-   the price endpoints. Live BTC source updates from "fallback" to
-   "live price" once the CoinGecko fetch resolves. */
+/* Sits in the .friction cluster's slider-grid. Replaces the former
+   user-controlled BTC growth slider with a derived projection. */
 .projection-display {
     grid-column: 1 / -1;
     margin-top: 0.4rem;
@@ -581,16 +626,16 @@ body {
     flex-wrap: wrap;
 }
 .projection-name {
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: var(--font-body);
     font-size: 0.95rem;
-    color: var(--text);
+    color: var(--ink-bright);
     font-weight: 500;
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
 }
 .projection-val {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-display);
     font-size: 1.55rem;
     font-weight: 600;
     color: var(--amber);
@@ -598,26 +643,24 @@ body {
     font-variant-numeric: tabular-nums;
 }
 .projection-detail {
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: var(--font-body);
     font-size: 0.85rem;
-    color: var(--text-dim);
+    color: var(--ink-dim);
     line-height: 1.5;
 }
 .projection-detail strong {
-    color: var(--text);
+    color: var(--ink-bright);
     font-weight: 600;
 }
 .projection-detail .projection-source {
     font-size: 0.75rem;
     font-style: italic;
-    color: var(--text-muted);
+    color: var(--ink-faint);
     letter-spacing: 0.02em;
 }
 
 
 /* ─── 13. CALCULATOR OUTPUTS ─── */
-/* Headline summary at top of Calculator tab — supports the chart,
-   doesn't replace it. The spectrum chart is the primary visual answer. */
 .lob-headline {
     background: linear-gradient(135deg,
         rgba(224,148,34,0.04) 0%,
@@ -629,13 +672,13 @@ body {
     text-align: center;
 }
 .lob-headline-label {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-display);
     font-size: 1.25rem;
-    color: var(--text-dim);
+    color: var(--ink-dim);
     margin-bottom: 0.5rem;
 }
 .lob-headline-value {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-display);
     font-size: clamp(2.5rem, 6vw, 3.75rem);
     font-weight: 600;
     color: var(--amber);
@@ -645,15 +688,15 @@ body {
 }
 .lob-headline-value.lob-headline-negative { color: #e87f6f; }
 .lob-headline-sub {
+    font-family: var(--font-body);
     font-size: 0.95rem;
-    color: var(--text-dim);
+    color: var(--ink-dim);
     max-width: 56ch;
     margin: 0 auto;
     line-height: 1.5;
 }
-.lob-headline-sub strong { color: var(--text); font-weight: 600; }
+.lob-headline-sub strong { color: var(--ink-bright); font-weight: 600; }
 
-/* Friction breakdown grid */
 .lob-breakdown {
     margin: 2.5rem 0 1.5rem;
     padding: 1.75rem 2rem;
@@ -663,10 +706,10 @@ body {
 }
 .lob-breakdown-title {
     margin: 0 0 1.25rem;
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-display);
     font-size: 1.25rem;
     font-weight: 600;
-    color: var(--text);
+    color: var(--ink-bright);
 }
 .lob-breakdown-grid {
     display: grid;
@@ -676,41 +719,42 @@ body {
 }
 .lob-breakdown-item { padding: 0.75rem 0; }
 .lob-breakdown-label {
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: var(--font-body);
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.16em;
-    color: var(--text-muted);
+    color: var(--ink-faint);
     margin-bottom: 0.5rem;
     font-weight: 500;
 }
 .lob-breakdown-value {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-display);
     font-size: 1.75rem;
     font-weight: 600;
-    color: var(--text);
+    color: var(--ink-bright);
     line-height: 1.1;
     margin-bottom: 0.3rem;
     font-variant-numeric: tabular-nums;
 }
 .lob-breakdown-value.lob-breakdown-negative { color: #e87f6f; }
 .lob-breakdown-sub {
+    font-family: var(--font-body);
     font-size: 0.78rem;
-    color: var(--text-muted);
+    color: var(--ink-faint);
     font-style: italic;
     line-height: 1.4;
 }
 
-/* Drawdown callout (inside breakdown) */
 .lob-drawdown-callout {
     margin-top: 0.75rem;
     padding: 1rem 1.25rem;
     background: rgba(192,57,43,0.08);
     border-left: 3px solid var(--red-dim);
     border-radius: 4px;
+    font-family: var(--font-body);
     font-size: 0.9rem;
     line-height: 1.6;
-    color: var(--text);
+    color: var(--ink);
 }
 .lob-drawdown-callout strong { color: #e87f6f; font-weight: 600; }
 
@@ -720,53 +764,48 @@ body {
     margin: 1.25rem 0;
     padding: 1.25rem 1.5rem;
     background: rgba(0,0,0,0.22);
-    border-left: 3px solid var(--amber-dim);
+    border-left: 3px solid var(--amber);
     border-radius: 4px;
 }
 .lob-tool-name {
     margin: 0 0 0.6rem;
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-display);
     font-size: 1.3rem;
     font-weight: 500;
-    color: var(--text);
+    color: var(--ink-bright);
 }
-.lob-tool-card .prose {
-    margin: 0;
-    font-size: 0.97rem;
-    line-height: 1.65;
-}
+.lob-tool-card .prose { margin: 0; font-size: 0.97rem; line-height: 1.65; }
 .lob-tool-aside {
     margin-top: 0.6rem;
+    font-family: var(--font-body);
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: var(--ink-faint);
     line-height: 1.5;
     font-style: italic;
 }
 
 
 /* ─── 15. MATH TAB ─── */
-.lob-math-section {
-    margin-bottom: 2.25rem;
-}
+.lob-math-section { margin-bottom: 2.25rem; }
 .lob-math-subhead {
     margin-top: 1.5rem;
     margin-bottom: 0.7rem;
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-display);
     font-size: 1.2rem;
     font-weight: 500;
-    color: var(--text);
+    color: var(--ink-bright);
     font-style: italic;
 }
 .lob-math-eq {
     margin: 0.85rem 0 1.1rem;
     padding: 0.95rem 1.25rem;
     background: rgba(0,0,0,0.3);
-    border-left: 2px solid var(--amber-dim);
+    border-left: 2px solid var(--amber);
     border-radius: 3px;
-    font-family: 'Courier New', monospace;
+    font-family: 'Courier New', ui-monospace, monospace;
     font-size: 0.94rem;
     line-height: 1.55;
-    color: var(--text);
+    color: var(--ink-bright);
     overflow-x: auto;
 }
 .lob-math-eq sub { font-size: 0.75em; vertical-align: sub; }
@@ -774,7 +813,7 @@ body {
 .lob-math-eq em { color: var(--amber); font-style: italic; }
 
 
-/* ─── 16. LISTS (Tab I + Math) ─── */
+/* ─── 16. LISTS ─── */
 .lob-friction-list,
 .lob-fit-list,
 .lob-math-list {
@@ -785,31 +824,41 @@ body {
 .lob-friction-list li,
 .lob-fit-list li,
 .lob-math-list li {
+    font-family: var(--font-body);
     margin-bottom: 0.75rem;
     line-height: 1.65;
-    color: var(--text);
+    color: var(--ink);
     font-size: 1.02rem;
 }
 .lob-friction-list li::marker,
 .lob-fit-list li::marker,
-.lob-math-list li::marker {
-    color: var(--amber-dim);
-}
+.lob-math-list li::marker { color: var(--amber); }
 .lob-friction-list strong,
 .lob-fit-list strong,
-.lob-math-list strong { color: var(--text); font-weight: 600; }
+.lob-math-list strong { color: var(--ink-bright); font-weight: 600; }
 .lob-friction-list em,
 .lob-fit-list em,
-.lob-math-list em { color: var(--amber-dim); font-style: italic; }
+.lob-math-list em { color: var(--amber); font-style: italic; }
+/* Links inside lists — :link / :visited explicit to override default purple. */
+.lob-friction-list a, .lob-friction-list a:link, .lob-friction-list a:visited,
+.lob-fit-list a,      .lob-fit-list a:link,      .lob-fit-list a:visited,
+.lob-math-list a,     .lob-math-list a:link,     .lob-math-list a:visited {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(224,148,34,0.3);
+}
+.lob-friction-list a:hover,
+.lob-fit-list a:hover,
+.lob-math-list a:hover { color: var(--amber-bright); border-color: var(--amber); }
 
 
 /* ─── 17. RESPONSIVE ─── */
 @media (max-width: 720px) {
     .content-area { padding: 0 1.25rem 3rem; }
     .hero { padding: 3.5rem 1.25rem 2rem; }
-    .tab-btn { padding: 0.85rem 0.5rem; }
-    .tab-btn .tab-num { font-size: 0.6rem; letter-spacing: 0.15em; }
-    .tab-btn .tab-title { font-size: 0.95rem; }
+    .tab-btn { padding: 0.85rem 0.7rem; }
+    .tab-btn .tab-num { font-size: 0.6rem; letter-spacing: 0.18em; }
+    .tab-btn .tab-title { font-size: 0.88rem; }
     .slider-cluster { padding: 0.95rem 1rem 1.05rem; }
     .slider-grid { grid-template-columns: 1fr; gap: 0.9rem; }
     .projection { padding: 0.95rem 0.9rem 1.1rem; }
@@ -829,6 +878,8 @@ body {
     .lob-math-eq { font-size: 0.85rem; padding: 0.8rem 0.95rem; }
 }
 @media (max-width: 480px) {
+    .tab-btn { padding: 0.75rem 0.4rem; }
+    .tab-btn .tab-title { font-size: 0.82rem; }
     .help-tip .tip-content { width: min(240px, calc(100vw - 32px)); }
     .lob-breakdown-grid { grid-template-columns: 1fr; }
     .projection-row { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
