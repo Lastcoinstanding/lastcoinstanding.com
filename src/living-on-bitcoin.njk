@@ -275,7 +275,7 @@ eleventyComputed:
             <div class="slider-cluster">
                 <div class="cluster-label">
                     <span class="cluster-label-main">The friction</span>
-                    <span class="cluster-label-help">&mdash; conversion fees per side, your capital gains tax rate, and assumed bitcoin growth.</span>
+                    <span class="cluster-label-help">&mdash; conversion fees per side and your capital gains tax rate. Bitcoin growth comes from the Power Law projection below.</span>
                 </div>
                 <div class="slider-grid">
 
@@ -299,16 +299,16 @@ eleventyComputed:
                         <input type="range" id="slider-capGainsPct" min="0" max="37" step="1" value="22" aria-label="Capital gains tax rate">
                     </div>
 
-                    <div class="slider-control" data-key="btcGrowthPct">
-                        <div class="slider-row">
-                            <span class="slider-name">Bitcoin annual growth
-                                <span class="help-tip" tabindex="0">?<span class="tip-content">Assumed annual bitcoin appreciation rate, averaged over your horizon. Power Law trend suggests roughly 25&ndash;35% over a 5-year window; recent realized CAGR has been closer to 15&ndash;20%. The further out you go, the more the rate compresses. This slider lets you test the practice against a range of growth assumptions; you can set the sitewide default via the modeling-assumptions picker on other pages.</span></span>
-                            </span>
-                            <span class="slider-val" id="val-btcGrowthPct">25%</span>
-                        </div>
-                        <input type="range" id="slider-btcGrowthPct" min="0" max="50" step="1" value="25" aria-label="Bitcoin annual growth">
-                    </div>
+                </div>
 
+                <div class="projection-display">
+                    <div class="projection-row">
+                        <span class="projection-name">Bitcoin growth (Power Law projection)
+                            <span class="help-tip" tabindex="0">?<span class="tip-content">Rather than ask you to guess a growth rate, the Calculator projects forward along the Power Law trend from today&rsquo;s bitcoin price to the trend value at the end of your horizon. Today&rsquo;s price is below trend, so the implied CAGR includes both mean-reversion to trend and trend growth &mdash; the more conservative of two framings. This matches the approach used in the Retirement and Borrowing-Against-Your-Stack calculators. You can override the underlying growth model via the sitewide modeling-assumptions picker.</span></span>
+                        </span>
+                        <span class="projection-val" id="projection-cagr">&mdash;</span>
+                    </div>
+                    <div class="projection-detail" id="projection-detail">Loading current bitcoin price&hellip;</div>
                 </div>
             </div>
 
@@ -399,7 +399,9 @@ eleventyComputed:
             <h4 class="lob-math-subhead">Strategy B &mdash; Living on Bitcoin</h4>
             <p class="prose">At time 0, the user converts <em>B</em> dollars into bitcoin at price <em>P&#8320;</em>, yielding <em>B/P&#8320;</em> coins. Each month thereafter, <em>M</em> dollars of bitcoin is sold to pay bills, and <em>M</em> dollars of paycheck is bought back into bitcoin. Under steady-state refilling, the BTC quantity held stays constant at <em>B/P&#8320;</em>. The dollar value tracks bitcoin&rsquo;s price:</p>
             <div class="lob-math-eq">value<sub>LoB,gross</sub>(t) = (B/P&#8320;) &times; P<sub>t</sub> = B &times; (1 + r)<sup>t</sup></div>
-            <p class="prose">where <em>r</em> is the assumed annual bitcoin growth rate.</p>
+            <p class="prose">where <em>r</em> is the implied annual growth rate from the Power Law projection. Rather than ask the user to pick a number, the Calculator anchors to two real values: today&rsquo;s spot bitcoin price <em>P&#8320;</em> (fetched live from CoinGecko, with a fallback) and the Power Law trend value <em>P<sub>h</sub></em> at the end of the chosen horizon. The implied annual rate is:</p>
+            <div class="lob-math-eq">r = (P<sub>h</sub> / P&#8320;)<sup>1/h</sup> &minus; 1</div>
+            <p class="prose">This is the &ldquo;current value with Power Law projected out&rdquo; framing &mdash; the same framing used by the Retirement and Borrowing-Against-Your-Stack calculators. Because today&rsquo;s price is below the Power Law trend, <em>r</em> includes both trend growth and mean-reversion to trend over the horizon. The reversion is a one-time tailwind, not a sustained rate, but the Calculator amortizes it evenly across the horizon for tractability.</p>
         </div>
 
         <div class="section lob-math-section">

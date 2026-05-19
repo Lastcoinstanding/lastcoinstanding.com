@@ -64,7 +64,6 @@
   var horizonSlider   = document.getElementById('slider-horizonYears');
   var feeSlider       = document.getElementById('slider-feePctPerSide');
   var capGainsSlider  = document.getElementById('slider-capGainsPct');
-  var btcGrowthSlider = document.getElementById('slider-btcGrowthPct');
   var deMinimisToggle = document.getElementById('slider-deMinimisOn');
   var drawdownSlider  = document.getElementById('slider-drawdownYear');
 
@@ -74,9 +73,12 @@
   var valHorizon   = document.getElementById('val-horizonYears');
   var valFee       = document.getElementById('val-feePctPerSide');
   var valCapGains  = document.getElementById('val-capGainsPct');
-  var valBtcGrowth = document.getElementById('val-btcGrowthPct');
   var valDeMinimis = document.getElementById('val-deMinimisOn');
   var valDrawdown  = document.getElementById('val-drawdownYear');
+
+  // Projection display elements (replaces former btcGrowthSlider)
+  var projectionCAGR   = document.getElementById('projection-cagr');
+  var projectionDetail = document.getElementById('projection-detail');
 
   // Output elements
   var elHorizonYears        = document.getElementById('lobHorizonYears');
@@ -97,31 +99,52 @@
   var chartCanvas = document.getElementById('lobChart');
   var chart = null;
 
-  // ─── Pull initial BTC growth from ModelingAssumptions, if available ───
-  // The shared module exposes presets keyed by btcGrowthModel. We translate
-  // the preset to a single-rate approximation suitable for this calculator.
-  // Users can override via the slider; the slider value wins.
+  // ─── Power Law projection — replaces user-controlled growth slider ───
+  // PL_A, PL_B, PL_FLOOR, plPrice() come from shared/power-law-data.js
+  // (loaded before this file via njk page_scripts).
+  // Pattern matches the-bitcoin-retirement.js: GENESIS as Date object,
+  // local daysSince() helper, plPriceAtDate() composition. Live BTC price
+  // is fetched from CoinGecko on load; falls back to LIVE_BTC_FALLBACK
+  // if the fetch fails (offline, rate-limited, etc.).
+  var GENESIS = new Date(Date.UTC(2009, 0, 3)); // Jan 3, 2009 UTC
+  var LIVE_BTC_FALLBACK = 108000; // periodically updated; matches Retirement
+  var liveBtcPrice = LIVE_BTC_FALLBACK;
+  var liveBtcSource = 'fallback';
+  // Growth-model preset from sitewide modeling-assumptions (default: trend).
+  // Honored by projectedTrendPrice() — same as Retirement's growth-model
+  // semantics. 'powerlaw-floor' returns trend × PL_FLOOR; the others
+  // return trend.
+  var growthModel = 'powerlaw-trend';
+
+  function daysSince(date) {
+    return (date.getTime() - GENESIS.getTime()) / 86400000;
+  }
+  function plPriceAtDate(date) { return plPrice(daysSince(date)); }
+  function projectedTrendPrice(date) {
+    var trend = plPriceAtDate(date);
+    if (growthModel === 'powerlaw-floor') return trend * PL_FLOOR;
+    return trend; // 'powerlaw-trend', 'linear-cagr-decay', or fallback
+  }
+  // Implied annual CAGR from today's price to projected trend price h years out.
+  function computeProjectedCAGR(h) {
+    if (h <= 0 || liveBtcPrice <= 0) return 0;
+    var today = new Date();
+    var future = new Date(today.getTime() + h * 365.25 * 86400000);
+    var futurePrice = projectedTrendPrice(future);
+    return Math.pow(futurePrice / liveBtcPrice, 1 / h) - 1;
+  }
+
+  // ─── Pull initial growth model from ModelingAssumptions, if available ───
+  // The shared module exposes presets keyed by btcGrowthModel. Used here
+  // to drive projectedTrendPrice() — the model determines whether we
+  // project to trend or floor band.
   if (window.ModelingAssumptions && window.ModelingAssumptions.get) {
     try {
       var growthPreset = window.ModelingAssumptions.get('btcGrowthModel');
       if (growthPreset && growthPreset.preset) {
-        var approxRate = presetToApproxRate(growthPreset.preset);
-        if (approxRate != null) {
-          btcGrowthSlider.value = approxRate;
-        }
+        growthModel = growthPreset.preset;
       }
-    } catch(_e) { /* fall back to default slider value */ }
-  }
-
-  function presetToApproxRate(preset) {
-    // Rough single-rate approximations for the three presets, for use here.
-    // Real models on Retirement / Power Law pages use the full PL trajectory.
-    switch (preset) {
-      case 'powerlaw-trend':       return 30; // ~30% CAGR over 5y trend
-      case 'powerlaw-floor':       return 20; // floor-band conservative
-      case 'linear-cagr-decay':    return 15; // realized recent CAGR
-      default:                     return null;
-    }
+    } catch(_e) { /* keep default */ }
   }
 
   // ─── Formatters ───
@@ -151,7 +174,7 @@
     var h = parseInt(horizonSlider.value, 10);
     var f = parseFloat(feeSlider.value);
     var g = parseFloat(capGainsSlider.value);
-    var r = parseFloat(btcGrowthSlider.value) / 100;
+    var r = computeProjectedCAGR(h); // Power Law projection from today
     var deMinimisOn = deMinimisToggle.checked;
     var ddYear = Math.min(parseInt(drawdownSlider.value, 10), h);
 
@@ -248,9 +271,33 @@
     valHorizon.textContent   = horizonSlider.value + (horizonSlider.value === '1' ? ' year' : ' years');
     valFee.textContent       = parseFloat(feeSlider.value).toFixed(1) + '%';
     valCapGains.textContent  = capGainsSlider.value + '%';
-    valBtcGrowth.textContent = btcGrowthSlider.value + '%';
     valDeMinimis.textContent = deMinimisToggle.checked ? 'On' : 'Off';
     valDrawdown.textContent  = 'Year ' + drawdownSlider.value;
+
+    // Power Law projection display
+    var h = parseInt(horizonSlider.value, 10);
+    var r = computeProjectedCAGR(h);
+    var today = new Date();
+    var future = new Date(today.getTime() + h * 365.25 * 86400000);
+    var futurePrice = projectedTrendPrice(future);
+    var trendToday = plPriceAtDate(today);
+    var pctOffTrend = (liveBtcPrice / trendToday - 1) * 100;
+    var offTrendLabel = pctOffTrend < 0
+      ? Math.abs(pctOffTrend).toFixed(0) + '% below trend'
+      : pctOffTrend.toFixed(0) + '% above trend';
+    var modelLabel = growthModel === 'powerlaw-floor' ? 'Power Law floor band' : 'Power Law trend';
+
+    if (projectionCAGR) {
+      projectionCAGR.textContent = (r * 100).toFixed(1) + '%';
+    }
+    if (projectionDetail) {
+      projectionDetail.innerHTML =
+        'From <strong>$' + Math.round(liveBtcPrice).toLocaleString() + '</strong> today ' +
+        '(' + offTrendLabel + ') ' +
+        'to <strong>$' + Math.round(futurePrice).toLocaleString() + '</strong> ' +
+        'at ' + modelLabel + ' in year ' + h +
+        ' &middot; <span class="projection-source">' + liveBtcSource + '</span>';
+    }
   }
 
   // ─── Output rendering ───
@@ -381,31 +428,50 @@
 
   // ─── Wire all sliders ───
   [floatSlider, monthlyBills, horizonSlider, feeSlider, capGainsSlider,
-   btcGrowthSlider, drawdownSlider].forEach(function(s){
+   drawdownSlider].forEach(function(s){
     s.addEventListener('input', render);
   });
   deMinimisToggle.addEventListener('change', render);
 
   // ─── Subscribe to ModelingAssumptions changes (optional) ───
-  // If the user changes the btcGrowthModel preset on another page, we update
-  // our slider to match. The slider remains the source of truth — the user
-  // can still override on this page.
+  // If the user changes the btcGrowthModel preset on another page (via the
+  // sitewide modeling-assumptions picker), we update our projection accordingly.
+  // No on-page slider to keep in sync any more — the projection display
+  // re-computes naturally on render().
   if (window.ModelingAssumptions && window.ModelingAssumptions.subscribe) {
     window.ModelingAssumptions.subscribe(function(dim){
       if (dim === 'btcGrowthModel' || dim === '*') {
         try {
           var growthPreset = window.ModelingAssumptions.get('btcGrowthModel');
           if (growthPreset && growthPreset.preset) {
-            var approxRate = presetToApproxRate(growthPreset.preset);
-            if (approxRate != null) {
-              btcGrowthSlider.value = approxRate;
-              render();
-            }
+            growthModel = growthPreset.preset;
+            render();
           }
         } catch(_e) { /* ignore */ }
       }
     });
   }
+
+  // ─── Live BTC price fetch (CoinGecko, with fallback) ───
+  // Match the pattern from the-bitcoin-retirement.js: fire-and-forget,
+  // re-render on success, silent fallback on failure. Network/CORS/rate-limit
+  // issues all degrade gracefully to LIVE_BTC_FALLBACK.
+  function fetchLiveBtc() {
+    if (typeof fetch !== 'function') return;
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', {
+      mode: 'cors', cache: 'no-store'
+    })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        if (d && d.bitcoin && typeof d.bitcoin.usd === 'number' && d.bitcoin.usd > 0) {
+          liveBtcPrice = d.bitcoin.usd;
+          liveBtcSource = 'live price';
+          render();
+        }
+      })
+      .catch(function(){ /* keep fallback; render already ran with it */ });
+  }
+  fetchLiveBtc();
 
   // ─── Initial render ───
   render();

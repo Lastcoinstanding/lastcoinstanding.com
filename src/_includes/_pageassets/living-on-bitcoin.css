@@ -6,6 +6,58 @@
      .lob-*         page-scoped styles
    ============================================================ */
 
+/* ─── Power Law projection display (replaces former BTC growth slider) ───
+   Sits inside the .slider-cluster.friction block. Renders a single value
+   (implied CAGR) and a one-line detail showing the price endpoints.
+   Live BTC price source is shown inline; updates from "fallback" to
+   "live price" once the CoinGecko fetch resolves.
+   The container styling (.slider-cluster) gets the full STYLE_GUIDE §6.16
+   treatment in the design pass. */
+.projection-display {
+    grid-column: 1 / -1;
+    margin-top: 0.6rem;
+    padding: 0.85rem 1rem;
+    background: rgba(247, 147, 26, 0.06);
+    border-left: 3px solid rgba(247, 147, 26, 0.55);
+    border-radius: 4px;
+}
+.projection-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.35rem;
+}
+.projection-name {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.95rem;
+    color: var(--text, #1a1a1a);
+    font-weight: 500;
+}
+.projection-val {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.55rem;
+    font-weight: 600;
+    color: rgb(247, 147, 26);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+.projection-detail {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #666);
+    line-height: 1.5;
+}
+.projection-detail strong {
+    color: var(--text, #1a1a1a);
+    font-weight: 600;
+}
+.projection-detail .projection-source {
+    font-size: 0.78rem;
+    font-style: italic;
+    color: var(--text-tertiary, #999);
+}
+
 /* ─── Headline output (top of Calculator tab) ─── */
 .lob-headline {
     background: linear-gradient(135deg,
