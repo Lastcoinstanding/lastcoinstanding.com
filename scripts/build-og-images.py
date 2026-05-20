@@ -325,7 +325,7 @@ CARDS = [
         "wait_after_navigate_ms": 1500,
         "wait_after_scroll_ms": 3500,
         "chrome": {
-            "title": "The ",
+            "title": "Bitcoin & The ",
             "titleAccent": "Power",
             "titleAfter": " Law",
             "subtitle": "Bitcoin's price has tracked a single growth equation across nine orders of magnitude since 2010 — the structural model behind the long-duration thesis.",
