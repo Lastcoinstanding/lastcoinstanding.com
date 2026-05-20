@@ -318,6 +318,88 @@ CARDS = [
         },
         "output_filename": "og-calculators.jpg",
     },
+    {
+        "name": "power-law",
+        "url": "https://lastcoinstanding.com/the-power-law",
+        "hero_selector": "#powerLawChart",
+        "wait_after_navigate_ms": 1500,
+        "wait_after_scroll_ms": 3500,
+        "chrome": {
+            "title": "The ",
+            "titleAccent": "Power",
+            "titleAfter": " Law",
+            "subtitle": "Bitcoin's price has tracked a single growth equation across nine orders of magnitude since 2010 — the structural model behind the long-duration thesis.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">Trend doubles every 13% increase in bitcoin&rsquo;s age</strong>'
+                '  ·  floor 0.42&times;  ·  ceiling 3&times;'
+            ),
+            "urlText": "lastcoinstanding.com/the-power-law",
+        },
+        "output_filename": "og-the-power-law.jpg",
+    },
+    {
+        "name": "bvre",
+        "url": "https://lastcoinstanding.com/bitcoin-vs-real-estate",
+        "hero_selector": "#eraBarChart",
+        # eraBarChart sits inside the "Affordability Crisis" tab (Tab IV), not
+        # the default. Click that tab first to make the panel visible.
+        "click_before_capture": "button.tab-btn[data-tab='crisis']",
+        "wait_after_navigate_ms": 1500,
+        "wait_after_scroll_ms": 3500,
+        "chrome": {
+            "title": "",
+            "titleAccent": "Bitcoin",
+            "titleAfter": " vs. Real Estate",
+            "subtitle": "135 years of US housing affordability — and what changed when the dollar&rsquo;s monetary regime did. Homes priced in real money tell a different story.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">1890–2025</strong>'
+                '  ·  home-price-to-income across five monetary eras'
+            ),
+            "urlText": "lastcoinstanding.com/bitcoin-vs-real-estate",
+        },
+        "output_filename": "og-bitcoin-vs-real-estate.jpg",
+    },
+    {
+        "name": "lob",
+        "url": "https://lastcoinstanding.com/living-on-bitcoin",
+        "hero_selector": "#lobChart",
+        # lobChart sits inside the "Calculator" tab (Tab III), not the default.
+        # Click that tab first to make the panel visible.
+        "click_before_capture": "button.tab-btn[data-tab='calculator']",
+        "wait_after_navigate_ms": 1500,
+        "wait_after_scroll_ms": 3500,
+        "chrome": {
+            "title": "Living on ",
+            "titleAccent": "Bitcoin",
+            "titleAfter": "",
+            "subtitle": "Holding operating cash in bitcoin and paying fiat bills as they come due — modest economics, real friction, and the psychological payoff.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">Power Law projection</strong>'
+                '  ·  BTC float vs. USD float  ·  drawdown stress test'
+            ),
+            "urlText": "lastcoinstanding.com/living-on-bitcoin",
+        },
+        "output_filename": "og-living-on-bitcoin.jpg",
+    },
+    {
+        "name": "bbm",
+        "url": "https://lastcoinstanding.com/bitcoin-backed-mortgages",
+        "hero_selector": "#bbmWealthChart",
+        "wait_after_navigate_ms": 1500,
+        "wait_after_scroll_ms": 3500,
+        "chrome": {
+            "title": "Bitcoin-Backed ",
+            "titleAccent": "Mortgages",
+            "titleAfter": "",
+            "subtitle": "Pledge bitcoin instead of selling it to fund a home down-payment — Fannie-Mae-conforming, no margin call, and when it may make sense.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">Pledge vs. Sell</strong>'
+                '  ·  cumulative cost over time  ·  crossover marked'
+            ),
+            "urlText": "lastcoinstanding.com/bitcoin-backed-mortgages",
+        },
+        "output_filename": "og-bitcoin-backed-mortgages.jpg",
+    },
 ]
 
 
@@ -349,6 +431,15 @@ def build_card(page, card_config: dict, output_path: Path) -> None:
         raise RuntimeError(
             f"hero selector not found on page: {card_config['hero_selector']}")
     page.wait_for_timeout(card_config["wait_after_navigate_ms"])
+
+    # Optional: click an element before capture (e.g. a tab button to reveal
+    # the hero chart on a tabbed page). The chart panel must become visible
+    # before scroll_into_view_if_needed will succeed.
+    click_selector = card_config.get("click_before_capture")
+    if click_selector:
+        print(f"  click {click_selector}")
+        page.click(click_selector)
+        page.wait_for_timeout(900)  # tab transition + chart render
 
     # 1. Capture hero element as a PNG
     hero_png = capture_hero_png(
