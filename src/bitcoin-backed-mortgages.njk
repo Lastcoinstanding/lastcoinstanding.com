@@ -200,7 +200,7 @@ eleventyComputed:
         <div class="section">
             <h3>Model it: Pledge vs. Sell over time</h3>
 
-            <p class="prose">The decision lives in the trade-off between two costs that move in opposite directions over the horizon: the <strong>cumulative interest cost</strong> of the pledge path (a known, dollar-denominated cost that grows linearly with time and stops at any early-repayment year), and the <strong>opportunity cost</strong> of the BTC you&rsquo;d have sold (an unknown, bitcoin-denominated benefit that grows with whatever trajectory bitcoin produces). The calculator below sets future bitcoin price to the Power Law trend at end of horizon<span class="help-tip help-tip-reg" tabindex="0">&sect;<span class="tip-content"><span class="reg-note-label">Modelling note &middot; Power Law as central tendency</span>The Power Law trend is a <em>central-tendency expectation</em>, not a forecast. Bitcoin spends roughly half its time above the trend and half below, with deviations large in either direction during cycles. Use the trend as the conceptual midpoint; remember that an actual outcome inside any specific horizon could be meaningfully higher or lower. The <a href="/the-power-law.html">Power Law page</a> covers the model and its uncertainty bands.</span></span> &mdash; <em>a central-tendency expectation, not a forecast</em> &mdash; and shows three lines: Pledge, Sell, and a 0% Hold baseline (no purchase) for reference, using a <strong>simple-interest cost model</strong><span class="help-tip help-tip-reg" tabindex="0">&sect;<span class="tip-content"><span class="reg-note-label">Modelling note &middot; Simple-interest approximation</span>The cumulative cost differential between paths is modelled as <code>(downPayment &times; rate + homePrice &times; premium) &times; min(years, repayYear)</code> &mdash; a straight-line approximation that <em>slightly overstates</em> the true cost, because in amortizing loans the outstanding balance (and therefore interest charged) declines over time. The two terms reflect (a) the base-rate interest on the down-payment portion that the sell path doesn&rsquo;t borrow at all, and (b) the combined-product premium applied to the full mortgage per Coinbase&rsquo;s product structure. Matches the convention used on the parent Borrowing Against Your Stack calculator. For exact figures, run a full amortization schedule with your lender.</span></span>. The interest on both loans may be tax-deductible depending on loan-tracing<span class="help-tip help-tip-reg" tabindex="0">&sect;<span class="tip-content"><span class="reg-note-label">Regulatory note &middot; Interest deductibility</span>Mortgage interest on the primary loan is deductible under home-acquisition rules. The second-lien also generally qualifies as acquisition debt <em>if</em> the proceeds are documented as funding the down payment specifically &mdash; the IRS loan-tracing rules place the documentation burden on the borrower. Calculator outputs do not net out the value of the deduction; model it separately against your bracket and the standard-deduction comparison.</span></span> &mdash; the calculator shows pre-deduction wealth.</p>
+            <p class="prose">The decision lives in the trade-off between two costs that move in opposite directions over the horizon: the <strong>cumulative interest cost</strong> of the pledge path (a known, dollar-denominated cost that grows linearly with time and stops at any early-repayment year), and the <strong>opportunity cost</strong> of the BTC you&rsquo;d have sold (an unknown, bitcoin-denominated cost that grows with whatever trajectory bitcoin produces). The calculator below sets future bitcoin price to the Power Law trend at end of horizon<span class="help-tip help-tip-reg" tabindex="0">&sect;<span class="tip-content"><span class="reg-note-label">Modelling note &middot; Power Law as central tendency</span>The Power Law trend is a <em>central-tendency expectation</em>, not a forecast. Bitcoin spends roughly half its time above the trend and half below, with deviations large in either direction during cycles. Use the trend as the conceptual midpoint; remember that an actual outcome inside any specific horizon could be meaningfully higher or lower. The <a href="/the-power-law.html">Power Law page</a> covers the model and its uncertainty bands.</span></span> &mdash; <em>a central-tendency expectation, not a forecast</em> &mdash; and shows the cumulative cost of each path using a <strong>simple-interest model</strong><span class="help-tip help-tip-reg" tabindex="0">&sect;<span class="tip-content"><span class="reg-note-label">Modelling note &middot; Simple-interest approximation</span>The cumulative pledge-path cost is modelled as <code>(downPayment &times; rate + homePrice &times; premium) &times; min(years, repayYear)</code> &mdash; a straight-line approximation that <em>slightly overstates</em> the true cost, because in amortizing loans the outstanding balance (and therefore interest charged) declines over time. The two terms reflect (a) the base-rate interest on the down-payment portion that the sell path doesn&rsquo;t borrow at all, and (b) the BBM rate premium applied to the full mortgage per Coinbase&rsquo;s product structure. Matches the convention used on the parent Borrowing Against Your Stack calculator. For exact figures, run a full amortization schedule with your lender.</span></span>. The interest on both loans may be tax-deductible depending on loan-tracing<span class="help-tip help-tip-reg" tabindex="0">&sect;<span class="tip-content"><span class="reg-note-label">Regulatory note &middot; Interest deductibility</span>Mortgage interest on the primary loan is deductible under home-acquisition rules. The second-lien also generally qualifies as acquisition debt <em>if</em> the proceeds are documented as funding the down payment specifically &mdash; the IRS loan-tracing rules place the documentation burden on the borrower. Calculator outputs do not net out the value of the deduction; model it separately against your bracket and the standard-deduction comparison.</span></span> &mdash; the calculator shows pre-deduction figures.</p>
 
             <div class="bbm-calc">
 
@@ -210,9 +210,9 @@ eleventyComputed:
                 <div class="slider-cluster cluster-target">
                     <div class="cluster-label">
                         <span class="cluster-label-main">The scenario</span>
-                        <span class="cluster-label-help">&mdash; the home, the stack, and the horizon you&rsquo;re evaluating</span>
+                        <span class="cluster-label-help">&mdash; the home, the horizon, and any early-repayment plan</span>
                     </div>
-                    <div class="slider-grid grid-5">
+                    <div class="slider-grid grid-4">
 
                         <div class="slider-control">
                             <div class="slider-row">
@@ -228,14 +228,6 @@ eleventyComputed:
                                 <span class="slider-val" id="bbmDownPctVal">20%</span>
                             </div>
                             <input type="range" id="bbmDownPct" min="5" max="50" value="20" step="1" aria-label="Down payment percent">
-                        </div>
-
-                        <div class="slider-control">
-                            <div class="slider-row">
-                                <span class="slider-name">BTC <span class="slider-name-nobreak">stack<span class="help-tip" tabindex="0">?<span class="tip-content">Your bitcoin stack. Mirrors the BTC stack input on the Borrowing Against Your Stack page &mdash; change either, both update.</span></span></span></span>
-                                <span class="slider-val" id="bbmBtcStackVal">3 BTC</span>
-                            </div>
-                            <input type="range" id="bbmBtcStack" min="0.1" max="20" value="3" step="0.1" aria-label="BTC stack">
                         </div>
 
                         <div class="slider-control">
@@ -262,73 +254,80 @@ eleventyComputed:
                     </div>
                 </div>
 
-                <!-- Cluster 2 (standard register): financing & tax parameters -->
-                <div class="slider-cluster cluster-means">
-                    <div class="cluster-label">
-                        <span class="cluster-label-main">Financing &amp; tax assumptions</span>
-                        <span class="cluster-label-help">&mdash; the rate environment, the stack&rsquo;s embedded gain, and your bracket</span>
-                    </div>
-                    <div class="slider-grid grid-5">
-
-                        <div class="slider-control">
-                            <div class="slider-row">
-                                <span class="slider-name">Current BTC <span class="slider-name-nobreak">price<span class="help-tip" tabindex="0">?<span class="tip-content">Mirrors the Current BTC price input on the Borrowing Against Your Stack page. Auto-filled from the most recent monthly Power Law sample on first load.</span></span></span></span>
-                                <span class="slider-val" id="bbmBtcPriceVal">$72,000</span>
-                            </div>
-                            <input type="range" id="bbmBtcPrice" min="30000" max="300000" value="72000" step="1000" aria-label="Current BTC price">
-                        </div>
-
-                        <div class="slider-control">
-                            <div class="slider-row">
-                                <span class="slider-name">Cost basis per <span class="slider-name-nobreak">BTC<span class="help-tip" tabindex="0">?<span class="tip-content">Your average price per BTC when you acquired the stack. Used to compute capital gains tax owed in the Sell path. Defaults to today&rsquo;s price (no embedded gain &mdash; the most conservative input for the sell path).</span></span></span></span>
-                                <span class="slider-val" id="bbmCostBasisVal">$72,000</span>
-                            </div>
-                            <input type="range" id="bbmCostBasis" min="0" max="200000" value="72000" step="1000" aria-label="Cost basis per BTC">
-                        </div>
-
-                        <div class="slider-control">
-                            <div class="slider-row">
-                                <span class="slider-name">Standard mortgage <span class="slider-name-nobreak">rate<span class="help-tip" tabindex="0">?<span class="tip-content">The rate on a conventional 30-year primary mortgage. Same primary mortgage applies under both paths; it&rsquo;s the base rate that the bitcoin-backed second-lien premium gets added to.</span></span></span></span>
-                                <span class="slider-val" id="bbmMortRateVal">7.0%</span>
-                            </div>
-                            <input type="range" id="bbmMortRate" min="3" max="10" value="7" step="0.25" aria-label="Standard mortgage rate">
-                        </div>
-
-                        <div class="slider-control">
-                            <div class="slider-row">
-                                <span class="slider-name">Combined-product <span class="slider-name-nobreak">premium<span class="help-tip" tabindex="0">?<span class="tip-content">How many percentage points above a standard 30-year the combined Better/Coinbase product carries. Source reports give a range of 0.5&ndash;1.5pp; 1.0pp is the middle of that range. Per Coinbase&rsquo;s product blog, both loans (primary + second-lien) share the same rate, so this premium applies to the entire borrowed amount, not only to the second-lien portion.</span></span></span></span>
-                                <span class="slider-val" id="bbmPremiumVal">+1.00pp</span>
-                            </div>
-                            <input type="range" id="bbmPremium" min="0.25" max="2.5" value="1.0" step="0.25" aria-label="Second-lien premium">
-                        </div>
-
-                        <div class="slider-control">
-                            <div class="slider-row">
-                                <span class="slider-name">Capital gains <span class="slider-name-nobreak">tax<span class="help-tip" tabindex="0">?<span class="tip-content">Your effective long-term capital gains tax rate. Only relevant to the Sell path &mdash; tax owed when BTC is sold for the down payment. US federal LTCG is 0%, 15%, or 20% depending on bracket; state tax may add more.</span></span></span></span></span>
-                                <span class="slider-val" id="bbmCapGainsVal">20%</span>
-                            </div>
-                            <input type="range" id="bbmCapGains" min="0" max="40" value="20" step="1" aria-label="Capital gains tax rate">
-                        </div>
-
-                    </div>
+                <!-- Derived: required pledged collateral (a result, not an input) -->
+                <div class="bbm-collateral-card" id="bbmCollateralCard">
+                    <div class="bbm-collateral-label">Required pledged collateral <span class="help-tip help-tip-reg" tabindex="0">&sect;<span class="tip-content"><span class="reg-note-label">Product requirement</span>The Coinbase/Better/Fannie Mae product requires $2.50 of pledged bitcoin per $1.00 of down-payment credit (a 40% LTV on the pledged stack). The figure shown is derived from your home price, down-payment percentage, and the current BTC price assumption below &mdash; <em>not</em> an input. Compare it against your own bitcoin stack to gauge whether the product is reachable for your situation.</span></span></div>
+                    <div class="bbm-collateral-value" id="bbmCollateralValue">&mdash;</div>
+                    <div class="bbm-collateral-sub" id="bbmCollateralSub">&mdash;</div>
                 </div>
+
+                <!-- Cluster 2 (advanced, collapsed by default): financing & tax parameters -->
+                <details class="bbm-advanced">
+                    <summary class="bbm-advanced-summary">Advanced assumptions <span class="bbm-advanced-hint">&mdash; current BTC price, mortgage rate, BBM rate premium, cost basis, capital gains tax</span></summary>
+                    <div class="slider-cluster cluster-means">
+                        <div class="cluster-label-help" style="margin-bottom:1rem">Defaults are tuned for a typical Bitcoiner without an embedded gain: current BTC price from the Power Law trend today, conventional 30-year rate at 7%, BBM rate premium at the midpoint of the 0.5&ndash;1.5pp band, cost basis equal to current price (no embedded capital gain — the most conservative input for the Sell path), and the top federal LTCG bracket.</div>
+                        <div class="slider-grid grid-5">
+
+                            <div class="slider-control">
+                                <div class="slider-row">
+                                    <span class="slider-name">Current BTC <span class="slider-name-nobreak">price<span class="help-tip" tabindex="0">?<span class="tip-content">Auto-filled from the most recent monthly Power Law sample on first load. Override if you want to model the comparison against a different spot price.</span></span></span></span>
+                                    <span class="slider-val" id="bbmBtcPriceVal">$72,000</span>
+                                </div>
+                                <input type="range" id="bbmBtcPrice" min="30000" max="300000" value="72000" step="1000" aria-label="Current BTC price">
+                            </div>
+
+                            <div class="slider-control">
+                                <div class="slider-row">
+                                    <span class="slider-name">Cost basis per <span class="slider-name-nobreak">BTC<span class="help-tip" tabindex="0">?<span class="tip-content">Your average price per BTC when you acquired the stack. Used to compute capital gains tax owed in the Sell path. Defaults to today&rsquo;s price (no embedded gain &mdash; the most conservative input for the Sell path). Lower it to reflect a real embedded gain — e.g. if your cost basis is meaningfully below the current price, the Sell path becomes materially more expensive.</span></span></span></span>
+                                    <span class="slider-val" id="bbmCostBasisVal">$72,000</span>
+                                </div>
+                                <input type="range" id="bbmCostBasis" min="0" max="200000" value="72000" step="1000" aria-label="Cost basis per BTC">
+                            </div>
+
+                            <div class="slider-control">
+                                <div class="slider-row">
+                                    <span class="slider-name">Standard mortgage <span class="slider-name-nobreak">rate<span class="help-tip" tabindex="0">?<span class="tip-content">The rate on a conventional 30-year primary mortgage. Same primary mortgage applies under both paths; it&rsquo;s the base rate that the BBM rate premium gets added to.</span></span></span></span>
+                                    <span class="slider-val" id="bbmMortRateVal">7.0%</span>
+                                </div>
+                                <input type="range" id="bbmMortRate" min="3" max="10" value="7" step="0.25" aria-label="Standard mortgage rate">
+                            </div>
+
+                            <div class="slider-control">
+                                <div class="slider-row">
+                                    <span class="slider-name">BBM rate <span class="slider-name-nobreak">premium<span class="help-tip" tabindex="0">?<span class="tip-content">How many percentage points above a standard 30-year the combined Better/Coinbase product carries. Source reports give a range of 0.5&ndash;1.5pp; 1.0pp is the middle of that range. Per Coinbase&rsquo;s product blog, both loans (primary + second-lien) share the same rate, so this premium applies to the entire borrowed amount, not only to the second-lien portion.</span></span></span></span>
+                                    <span class="slider-val" id="bbmPremiumVal">+1.00pp</span>
+                                </div>
+                                <input type="range" id="bbmPremium" min="0.25" max="2.5" value="1.0" step="0.25" aria-label="BBM rate premium">
+                            </div>
+
+                            <div class="slider-control">
+                                <div class="slider-row">
+                                    <span class="slider-name">Capital gains <span class="slider-name-nobreak">tax<span class="help-tip" tabindex="0">?<span class="tip-content">Your effective long-term capital gains tax rate. Only relevant to the Sell path &mdash; tax owed when BTC is sold for the down payment. US federal LTCG is 0%, 15%, or 20% depending on bracket; state tax may add more.</span></span></span></span></span>
+                                    <span class="slider-val" id="bbmCapGainsVal">20%</span>
+                                </div>
+                                <input type="range" id="bbmCapGains" min="0" max="40" value="20" step="1" aria-label="Capital gains tax rate">
+                            </div>
+
+                        </div>
+                    </div>
+                </details>
 
                 <!-- ═══════════════ OUTCOMES — calc-result-card pattern (STYLE_GUIDE §6.17) ═══════════════ -->
 
                 <div class="calc-results">
                     <div class="calc-result-card pledge">
                         <h4>Pledge path</h4>
-                        <p class="result-tagline">Second-lien at premium &middot; full stack stays in custody &middot; no taxable event</p>
-                        <div class="result-sublabel">Retained at end of horizon</div>
-                        <div class="result-value" id="bbmPledgeHeadline">&mdash; BTC</div>
+                        <p class="result-tagline">Borrow at premium &middot; full stack stays in custody &middot; no taxable event</p>
+                        <div class="result-sublabel">Cumulative cost at horizon</div>
+                        <div class="result-value" id="bbmPledgeHeadline">&mdash;</div>
                         <div class="period-divider"></div>
                         <div class="result-detail" id="bbmPledgeRows"></div>
                     </div>
                     <div class="calc-result-card sell">
                         <h4>Sell path</h4>
-                        <p class="result-tagline">Sell BTC for down payment &middot; pay cap gains now &middot; no premium interest</p>
-                        <div class="result-sublabel">Retained at end of horizon</div>
-                        <div class="result-value" id="bbmSellHeadline">&mdash; BTC</div>
+                        <p class="result-tagline">Sell BTC for down-payment &middot; pay cap gains now &middot; no premium interest</p>
+                        <div class="result-sublabel">Forgone BTC value at horizon</div>
+                        <div class="result-value" id="bbmSellHeadline">&mdash;</div>
                         <div class="period-divider"></div>
                         <div class="result-detail" id="bbmSellRows"></div>
                     </div>
@@ -339,14 +338,14 @@ eleventyComputed:
                     <p>Adjust the inputs above to model the comparison.</p>
                 </div>
 
-                <!-- ─── Wealth-over-time line chart ─── -->
+                <!-- ─── Cost-over-time line chart ─── -->
                 <div class="bbm-calc-chart-wrap">
-                    <div class="bbm-calc-chart-label">Net wealth over time &mdash; both paths, with crossover marked</div>
+                    <div class="bbm-calc-chart-label">Cost of each path over time &mdash; with crossover marked</div>
                     <div class="bbm-calc-chart-host">
                         <canvas id="bbmWealthChart"></canvas>
                     </div>
                     <div class="bbm-calc-chart-caption" id="bbmChartCaption">
-                        <em>The dashed Hold line is the 0% baseline &mdash; what your stack does if you don&rsquo;t buy the house at all. The Pledge line sits below Hold by the cumulative cost of the combined premium and the second-lien base interest. The Sell line sits below Hold by the value of the BTC you sold. The crossover between Pledge and Sell &mdash; if it falls inside your horizon &mdash; is where the math turns on the purchase decision; the gap from either purchase line to Hold is the cost of buying at all.</em>
+                        <em>Both paths buy the same home for the same price, so the home itself cancels out of the comparison &mdash; only the cost differential between the two financing structures matters. The <strong>Pledge</strong> line is cumulative extra interest paid (down-payment-portion base rate + BBM premium on the full mortgage); it grows linearly and stops at the pay-off year. The <strong>Sell</strong> line is the forgone value of the BTC you&rsquo;d have sold (priced at the Power Law trend); it grows exponentially with bitcoin&rsquo;s trajectory. Whichever line is lower at your horizon is the cheaper path; the crossover marks where one overtakes the other.</em>
                     </div>
                 </div>
 
@@ -374,15 +373,14 @@ eleventyComputed:
             <details class="bbm-math-collapsible">
                 <summary class="bbm-math-summary">Math &amp; methodology &mdash; click to expand the full derivations behind the calculator</summary>
                 <div class="bbm-math">
-                <p><strong>Inputs.</strong> Home price, down payment percent, BTC stack, current BTC price, cost basis per BTC, conventional 30-year mortgage rate, combined-product premium above conventional, horizon in years, early-repayment year, capital gains tax rate. Stack and current price persist via <code>localStorage</code> across the Borrowing Against Your Stack page so a configured scenario carries between the two pages.</p>
-                <p><strong>Pledge path feasibility.</strong> The product requires $2.50 of pledged bitcoin per $1.00 of down-payment credit (a 40% LTV on the pledged stack). When the current stack value at the input price is below the required collateral, the pledge path is flagged not feasible and the calculator surfaces the shortfall instead of producing comparison numbers.</p>
-                <p><strong>Pledge path cost differential.</strong> <code>cost(t) = (downPayment &times; rate + homePrice &times; premium) &times; min(t, repayYear)</code>. The two terms decompose as: (a) <em>base-rate interest on the down-payment portion</em> &mdash; the sell path doesn&rsquo;t borrow this amount at all, so doesn&rsquo;t pay any interest on it; (b) <em>the premium applied to the full mortgage</em> &mdash; per Coinbase&rsquo;s product blog, both loans share the combined rate, so the premium applies to the entire borrowed amount, not only the second-lien. Simple-interest approximation; matches the parent BvS calculator&rsquo;s convention and slightly overstates the true cost in an amortizing loan. Early-repayment caps the accrual at <code>repayYear</code>; cost contributions stop after that year (released collateral funds the rest from the borrower&rsquo;s cash flow or via primary refinance to a standard-rate mortgage).</p>
-                <p><strong>Pledge path wealth at year t.</strong> <code>stack &times; P<sub>powerLaw</sub>(t) &minus; cost(t)</code>.</p>
-                <p><strong>Sell path wealth at year t.</strong> <code>(stack &minus; btcSold) &times; P<sub>powerLaw</sub>(t)</code>, where <code>btcSold = downPayment / (price &minus; taxRate &times; max(0, price &minus; costBasis))</code>. Capital gains tax is treated as an upfront one-time cost embedded in the BTC-sold figure. If the calculation requires selling more BTC than the stack holds, the sell path is flagged not feasible rather than producing a negative quantity.</p>
-                <p><strong>Hold (0%) baseline.</strong> <code>stack &times; P<sub>powerLaw</sub>(t)</code> &mdash; no home purchase, no loan, no tax event. Plotted as a dashed reference line on the chart. Both Pledge and Sell are decisions to commit BTC to a home purchase; the gap between either purchase line and the Hold baseline is the <em>all-in cost of acquiring the home at all</em>, against which the Pledge vs Sell comparison is the second-order decision.</p>
+                <p><strong>Inputs.</strong> Always-visible: home price, down-payment percent, time horizon, pay-off year. Behind the &ldquo;Advanced assumptions&rdquo; expander: current BTC price (auto-filled from the latest Power Law sample), cost basis per BTC (defaults to current price &mdash; no embedded gain), conventional 30-year mortgage rate (7%), BBM rate premium (1.0pp midpoint of the 0.5&ndash;1.5pp band), capital gains tax rate (20%). Current price persists via <code>localStorage</code> across the Borrowing Against Your Stack page so a configured scenario carries between the two calculators.</p>
+                <p><strong>Required pledged collateral.</strong> <code>requiredBtc = (homePrice &times; downPct &times; 2.5) / currentPrice</code>. The product requires $2.50 of pledged bitcoin per $1.00 of down-payment credit (40% LTV on pledged assets). The figure is shown as a <em>derived output</em> above the result cards, not a feasibility check &mdash; compare against your own bitcoin holdings to gauge reachability.</p>
+                <p><strong>Stack-independent comparison.</strong> The Pledge-vs-Sell differential at year <code>t</code> is <code>btcSold &times; P(t) &minus; pledgeExtraInterest(t)</code>, which doesn&rsquo;t actually depend on stack size &mdash; the stack-dependent terms cancel out of the comparison. Both the cost of the pledge path (cumulative extra interest) and the cost of the sell path (forgone BTC value) are fully determined by <code>(downPayment, currentPrice, costBasis, taxRate, mortgageRate, premium, horizon, repayYear)</code>. This is why the calculator can give you a comparison without asking for your stack.</p>
+                <p><strong>Pledge path cumulative cost.</strong> <code>pledgeCost(t) = (downPayment &times; rate + homePrice &times; premium) &times; min(t, repayYear)</code>. The two terms decompose as: (a) <em>base-rate interest on the down-payment portion</em> &mdash; the sell path doesn&rsquo;t borrow this amount at all, so doesn&rsquo;t pay any interest on it; (b) <em>the premium applied to the full mortgage</em> &mdash; per Coinbase&rsquo;s product blog, both loans share the combined rate, so the premium applies to the entire borrowed amount, not only the second-lien. Simple-interest approximation; matches the parent BvS calculator&rsquo;s convention and slightly overstates the true cost in an amortizing loan. Early-repayment caps the accrual at <code>repayYear</code>; cost contributions stop after that year (released collateral funds the rest from the borrower&rsquo;s cash flow or via primary refinance to a standard-rate mortgage).</p>
+                <p><strong>Sell path opportunity cost.</strong> <code>sellCost(t) = btcSold &times; P<sub>powerLaw</sub>(t)</code>, where <code>btcSold = downPayment / (price &minus; taxRate &times; max(0, price &minus; costBasis))</code>. The <code>btcSold</code> figure includes both the BTC needed to net the down-payment and the BTC consumed by capital gains tax leakage &mdash; so <code>btcSold &times; P(t)</code> is the full future value of all BTC lost to the sell path.</p>
                 <p><strong>Future BTC price.</strong> Drawn from the Power Law trend <code>P(d) = 1.6 &times; 10<sup>&minus;17</sup> &times; d<sup>5.77</sup></code>, with <code>d</code> measured in days since the bitcoin genesis block (January 3, 2009). These are the canonical coefficients used across the site &mdash; the trajectory matches what the <a href="/the-power-law.html"><em>The Power Law</em></a> page describes and what every other calculator on the site projects against.</p>
-                <p><strong>What cancels out (and what doesn&rsquo;t).</strong> The home itself cancels &mdash; both purchase paths buy the same home for the same price, capture the same home appreciation, and accumulate the same home equity. What <em>doesn&rsquo;t</em> cancel: (a) total interest paid on the mortgage (different rates and different principal amounts under the two paths); (b) BTC retained vs sold; (c) the one-time capital gains event under the Sell path. The cost-differential formula above captures (a) at the simple-interest tier. Pre-tax of the mortgage-interest deduction.</p>
-                <p><strong>Crossover detection.</strong> The chart marks the year (if any) at which the wealthier purchase path flips from one to the other inside the chosen horizon, computed by linear interpolation between yearly samples. Pledge starts ahead at <code>t=0</code> by the value of unsold BTC; the cumulative cost differential can pull it below the Sell path over time if bitcoin&rsquo;s realized trajectory underperforms the Power Law trend or if the combined premium is large. Early-repayment caps the cost accrual and is a structural lever for keeping Pledge ahead under shorter horizons.</p>
+                <p><strong>What cancels out (and what doesn&rsquo;t).</strong> The home itself cancels &mdash; both purchase paths buy the same home for the same price, capture the same home appreciation, and accumulate the same home equity. The portion of the mortgage borrowed under both paths at the standard rate also cancels. What <em>doesn&rsquo;t</em> cancel: (a) the extra interest paid under the pledge path (premium on the full mortgage + base rate on the additional down-payment loan); (b) the BTC consumed by the sell path; (c) the one-time capital gains event under the Sell path (embedded in the BTC-sold figure). The differential the calculator displays captures exactly these residuals. Pre-tax of the mortgage-interest deduction.</p>
+                <p><strong>Crossover detection.</strong> The chart marks the year (if any) at which the cheaper path flips from one to the other inside the chosen horizon, computed by linear interpolation between yearly samples. Pledge cost grows linearly with time and plateaus at <code>repayYear</code>; Sell cost grows with whatever trajectory bitcoin produces. The crossover is the point at which their cumulative-cost lines meet &mdash; before it, one path is cheaper; after it, the other.</p>
                 <p><strong>Historical safety.</strong> Bitcoin has experienced multiple peak-to-trough drawdowns exceeding 70% over the last decade, and many 60-day windows in which price has fallen below 40% of a prior collateral peak. Under the prior decade&rsquo;s CeFi BTC-backed loans, those drawdowns would have triggered immediate force-liquidation by LTV threshold. Under the Fannie-Mae-conforming structure, none of them would have &mdash; the only liquidation trigger is 60-day payment delinquency, not price. The calculator doesn&rsquo;t need a separate &ldquo;was I safe historically&rdquo; surface because under this product structure the answer is the same regardless of historical path: yes, as long as the monthly payment was made.</p>
                 </div>
             </details>

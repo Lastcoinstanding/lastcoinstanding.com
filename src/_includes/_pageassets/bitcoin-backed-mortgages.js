@@ -100,7 +100,6 @@
   // formatted current value (populated by updateSliderVals() below).
   var homePriceInput   = document.getElementById('bbmHomePrice');
   var downPctSlider    = document.getElementById('bbmDownPct');
-  var stackInput       = document.getElementById('bbmBtcStack');
   var priceInput       = document.getElementById('bbmBtcPrice');
   var costBasisInput   = document.getElementById('bbmCostBasis');
   var mortRateSlider   = document.getElementById('bbmMortRate');
@@ -112,7 +111,6 @@
   // Slider-val displays — formatted current-value spans next to each slider
   var homePriceVal     = document.getElementById('bbmHomePriceVal');
   var downPctVal       = document.getElementById('bbmDownPctVal');
-  var stackVal         = document.getElementById('bbmBtcStackVal');
   var priceVal         = document.getElementById('bbmBtcPriceVal');
   var costBasisVal     = document.getElementById('bbmCostBasisVal');
   var mortRateVal      = document.getElementById('bbmMortRateVal');
@@ -120,6 +118,14 @@
   var horizonVal       = document.getElementById('bbmHorizonVal');
   var capGainsVal      = document.getElementById('bbmCapGainsVal');
   var earlyRepayVal    = document.getElementById('bbmEarlyRepayVal');
+
+  // Derived required-collateral display (Commit 2 calc simplification — JM12).
+  // The required pledged BTC is a *derived output* of (home_price, down_pct,
+  // current_price), not a user input. Prominent placement so the user can
+  // gauge whether the product is reachable for their situation without
+  // scrolling past a 'not feasible' failure message hidden below the chart.
+  var collateralValue  = document.getElementById('bbmCollateralValue');
+  var collateralSub    = document.getElementById('bbmCollateralSub');
 
   // Tactical/strategic preset buttons (set horizon when clicked)
   var presetButtons    = document.querySelectorAll('.bbm-horizon-preset');
@@ -140,9 +146,10 @@
   priceInput.value = latestPrice;
   costBasisInput.value = latestPrice;
 
-  // ─── Hydrate shared state from localStorage (set by the BAY page) ───
+  // ─── Hydrate shared current-price from localStorage (set by the BAY page) ───
+  // Stack is no longer an input on this page (Commit 2 simplification — JM12),
+  // so only the current-price field shares state with BAY.
   var SHARED = [
-    { key: 'bas_stack',  el: stackInput },
     { key: 'bas_price',  el: priceInput }
   ];
   SHARED.forEach(function(p){
@@ -157,20 +164,27 @@
   // ─── Chart.js instance (initialised on first compute) ───
   var chart = null;
 
-  // ─── The math ───
+  // ─── The math (Commit 2 simplification — JM12) ───
+  // Calculator is now stack-independent. The Pledge-vs-Sell differential
+  // doesn't actually depend on stack size — it's:
+  //   differential = btcSold × P(t) − pledgeExtraInterest(t)
+  // where btcSold is the BTC the user would have to sell to net the down-
+  // payment after tax. Both costs are computed from (downPayment, current
+  // price, cost basis, tax rate, rates) — none of which depend on stack.
+  //
+  // The chart shows the two cost trajectories. The user can read the
+  // required pledged collateral as a derived display above and compare
+  // it against their own holdings mentally — feasibility-failure surface
+  // is no longer needed.
   function compute(){
     var homePrice    = parseFloat(homePriceInput.value)   || 0;
     var downPct      = parseFloat(downPctSlider.value)    / 100;
-    var stack        = parseFloat(stackInput.value)       || 0;
     var price        = parseFloat(priceInput.value)       || 0;
     var costBasis    = parseFloat(costBasisInput.value)   || 0;
     var mortRate     = parseFloat(mortRateSlider.value)   / 100;
     var premium      = parseFloat(premiumSlider.value)    / 100;
     var horizon      = parseInt(horizonSlider.value, 10)  || 1;
     var taxRate      = parseFloat(capGainsSlider.value)   / 100;
-    // Early-repayment year: 0..horizon means 'pay off the second-lien at
-    // year R'. Default value of horizon (slider max) means 'never repay
-    // early' — interest accrues for the full horizon. Clamped to horizon.
     var repayYear    = earlyRepaySlider ? parseInt(earlyRepaySlider.value, 10) : horizon;
     if(repayYear > horizon) repayYear = horizon;
     if(repayYear < 0) repayYear = 0;
@@ -178,7 +192,6 @@
     // ─── Update slider-val displays (formatted current values) ───
     homePriceVal.textContent = fmtUsd(homePrice);
     downPctVal.textContent   = downPctSlider.value + '%';
-    stackVal.textContent     = (stack === Math.floor(stack) ? stack.toFixed(0) : stack.toFixed(1)) + ' BTC';
     priceVal.textContent     = fmtUsd(price);
     costBasisVal.textContent = fmtUsd(costBasis);
     mortRateVal.textContent  = parseFloat(mortRateSlider.value).toFixed(2) + '%';
@@ -186,22 +199,19 @@
     horizonVal.textContent   = horizon + ' years';
     capGainsVal.textContent  = capGainsSlider.value + '%';
     if(earlyRepayVal){
-      earlyRepayVal.textContent = (repayYear >= horizon)
-        ? 'never'
-        : 'year ' + repayYear;
+      earlyRepayVal.textContent = (repayYear >= horizon) ? 'never' : 'year ' + repayYear;
     }
 
-    // Persist shared inputs to localStorage so BAY picks them up too
-    try {
-      localStorage.setItem('bas_stack', stack);
-      localStorage.setItem('bas_price', price);
-    } catch(e){}
+    // Persist current-price for cross-page state with BAY
+    try { localStorage.setItem('bas_price', price); } catch(e){}
 
     var downPayment = homePrice * downPct;
 
-    if(stack <= 0 || price <= 0 || homePrice <= 0 || downPayment <= 0){
-      pledgeHeadline.textContent = '— BTC';
-      sellHeadline.textContent   = '— BTC';
+    if(price <= 0 || homePrice <= 0 || downPayment <= 0){
+      if(collateralValue) collateralValue.textContent = '—';
+      if(collateralSub) collateralSub.textContent = 'Set the home price and down-payment percentage to see the required pledged collateral.';
+      pledgeHeadline.textContent = '—';
+      sellHeadline.textContent   = '—';
       pledgeRows.innerHTML       = '';
       sellRows.innerHTML         = '';
       verdict.className = 'bbm-calc-verdict';
@@ -209,93 +219,69 @@
       return;
     }
 
-    // ─── 250% collateralization requirement ───
-    // The product requires $2.50 of pledged BTC per $1.00 of down-payment credit
-    // (40% LTV on pledged assets). The full stack value must cover this.
-    var requiredCollateral = downPayment * 2.5;
-    var stackValueNow = stack * price;
-    var pledgeFeasible = stackValueNow >= requiredCollateral;
+    // ─── Required pledged collateral (derived output) ───
+    // The product requires 2.5× over-collateralization on the down-payment
+    // credit. Shown as a prominent derived value above the result cards so
+    // the user can gauge whether the product is reachable for their own
+    // stack without scrolling past a hidden 'not feasible' message.
+    var requiredCollateralUsd = downPayment * 2.5;
+    var requiredCollateralBtc = requiredCollateralUsd / price;
+    if(collateralValue){
+      collateralValue.innerHTML = '<strong>' + fmtBtc(requiredCollateralBtc) + '</strong> &middot; ' + fmtUsd(requiredCollateralUsd);
+    }
+    if(collateralSub){
+      collateralSub.innerHTML = '2.5&times; the ' + fmtUsd(downPayment) + ' down-payment, valued at the ' + fmtUsd(price) + '/BTC assumption below. Compare against your own bitcoin holdings to gauge reachability.';
+    }
 
-    // ─── Sell-path mechanics ───
+    // ─── Sell-path mechanics (BTC sold to net the down-payment after tax) ───
     var gainPerBtc    = Math.max(0, price - costBasis);
     var taxPerBtc     = gainPerBtc * taxRate;
     var netPerBtc     = price - taxPerBtc;
-    var btcSold       = netPerBtc > 0 ? (downPayment / netPerBtc) : Infinity;
+    var btcSold       = netPerBtc > 0 ? (downPayment / netPerBtc) : 0;
     var sellTaxPaid   = btcSold * taxPerBtc;
-    var sellStack     = Math.max(0, stack - btcSold);
-    var sellFeasible  = btcSold <= stack;
 
     // ─── Future price (at horizon) per Power Law trend ───
-    var futurePrice    = plPriceAtYear(horizon);
+    var futurePrice   = plPriceAtYear(horizon);
 
-    // ─── Pledge-path cost differential (corrected math, v9) ───
-    // Coinbase's product blog confirms BOTH loans (primary + second-lien)
-    // share the combined rate of (standard rate + premium); the premium
-    // applies to the entire borrowed amount, not only to the second-lien.
-    //
-    // Under sell path: borrow (homePrice − downPayment) at standard rate.
-    // Under pledge path: borrow homePrice at (rate + premium).
-    //
-    // Interest-cost differential over t years (simple-interest approximation):
+    // ─── Pledge-path extra interest cost over t years ───
+    // Same model as v9. The differential between pledge and sell paths in
+    // mortgage interest, decomposed into two structural components:
     //   pledge − sell
     //   = homePrice × (rate + premium) × t − (homePrice − downPayment) × rate × t
     //   = downPayment × rate × t + homePrice × premium × t
-    //
-    // The earlier model (downPayment × premium × t only) undercounted by
-    // a ~12× factor at typical inputs; v9 corrects this and breaks the
-    // cost out into the two structural components for transparency in
-    // the result-card detail rows.
-    //
-    // Early-repayment caps both terms at min(t, repayYear). The
-    // released collateral funds primary refinance or the pledge cost
-    // simply ends — the calc treats post-repayment years as zero-cost
-    // for both terms.
+    // Simple-interest approximation; matches BvS calculator convention.
+    // Stops accruing at repayYear (early-repayment of the lien).
     function pledgeCostAtYear(t){
       var capped = Math.min(t, repayYear);
       return downPayment * mortRate * capped + homePrice * premium * capped;
     }
 
-    // ─── Pledge path: full stack retained; pay corrected interest delta ───
-    var cumulativePremiumInterest = pledgeCostAtYear(horizon);
-    var pledgeStack    = stack;
-    var pledgeTerminalWealth = pledgeStack * futurePrice - cumulativePremiumInterest;
+    // ─── Sell-path opportunity cost over t years ───
+    // The future value of the BTC consumed by the sell path. btcSold
+    // INCLUDES the BTC needed to net the down-payment after cap-gains tax,
+    // so btcSold × P(t) captures both the down-payment-equivalent value
+    // and the tax-leakage value at future prices.
+    function sellCostAtYear(t){
+      return btcSold * plPriceAtYear(t);
+    }
 
-    // ─── Sell path: reduced stack, no premium interest, tax already paid ───
-    var sellTerminalWealth = sellFeasible ? (sellStack * futurePrice) : 0;
-
-    // ─── HOLD (0% borrowing baseline): no home purchase at all ───
-    // The 'genuinely conservative baseline' — the user keeps their full
-    // stack, buys no house, takes no loan. Plotted as a reference line
-    // on the chart so both Pledge and Sell can be seen as decisions
-    // relative to it. Always feasible (no eligibility math).
-    var holdTerminalWealth = stack * futurePrice;
-
-    // ─── Year-by-year wealth trajectory (for chart) ───
+    // ─── Year-by-year cost trajectories (for chart + crossover detection) ───
     var years = [];
     var pledgeSeries = [];
     var sellSeries = [];
-    var holdSeries = [];
     var crossoverYear = null;
-    var prevDelta = pledgeTerminalWealth - sellTerminalWealth; // sentinel
+    var prevDelta = pledgeCostAtYear(0) - sellCostAtYear(0);
     for(var t = 0; t <= horizon; t++){
-      var pAtT = plPriceAtYear(t);
-      var pledgeAtT = pledgeStack * pAtT - pledgeCostAtYear(t);
-      var sellAtT   = sellFeasible ? (sellStack * pAtT) : 0;
-      var holdAtT   = stack * pAtT;
+      var pCost = pledgeCostAtYear(t);
+      var sCost = sellCostAtYear(t);
       years.push(t);
-      pledgeSeries.push(pledgeAtT);
-      sellSeries.push(sellAtT);
-      holdSeries.push(holdAtT);
-      // Crossover: when pledge wealth first exceeds sell wealth (or vice versa).
-      // Pledge starts ahead (at t=0, full stack vs reduced stack at current price),
-      // BUT cumulative interest cost can pull it below sell over time.
-      // Look for sign change in (pledge − sell).
-      var delta = pledgeAtT - sellAtT;
+      pledgeSeries.push(pCost);
+      sellSeries.push(sCost);
+      var delta = pCost - sCost;
       if(t > 0 && Math.sign(delta) !== Math.sign(prevDelta) && Math.sign(prevDelta) !== 0){
-        // Linear interpolate between t-1 and t
-        var prevPledge = pledgeSeries[t-1];
-        var prevSell   = sellSeries[t-1];
-        var prevDeltaR = prevPledge - prevSell;
+        var prevP = pledgeSeries[t-1];
+        var prevS = sellSeries[t-1];
+        var prevDeltaR = prevP - prevS;
         var dDelta = delta - prevDeltaR;
         if(dDelta !== 0){
           crossoverYear = (t - 1) + Math.abs(prevDeltaR / dDelta);
@@ -304,90 +290,62 @@
       prevDelta = delta;
     }
 
-    // ─── Render Pledge card ───
-    if(pledgeFeasible){
-      pledgeHeadline.textContent = fmtBtc(pledgeStack);
-      var interestRows;
-      if(repayYear >= horizon){
-        interestRows =
-          row('Premium portion (full mortgage)',                                fmtUsd(homePrice * premium * horizon)) +
-          row('Base-rate portion (down-payment loan)',                          fmtUsd(downPayment * mortRate * horizon));
-      } else {
-        interestRows =
-          row('Premium portion (full mortgage, years 0&ndash;' + repayYear + ')', fmtUsd(homePrice * premium * repayYear)) +
-          row('Base-rate portion (down-payment loan, years 0&ndash;' + repayYear + ')', fmtUsd(downPayment * mortRate * repayYear));
-      }
-      pledgeRows.innerHTML =
-        row('Down payment funded',                                              fmtUsd(downPayment)) +
-        row('Required collateral (250%)',                                       fmtUsd(requiredCollateral) + ' &middot; ' + fmtBtc(requiredCollateral / price)) +
-        row('BTC sold to fund',                                                  '0 (pledged instead)') +
-        row('Cap gains tax paid now',                                            '$0') +
-        interestRows +
-        row('Total cost of pledge path @ year ' + horizon,                       fmtUsd(cumulativePremiumInterest)) +
-        row('BTC value at year ' + horizon + ' (PL trend)',                      fmtUsd(pledgeStack * futurePrice)) +
-        row('Net wealth at year ' + horizon,                                     fmtUsd(pledgeTerminalWealth), true);
-    } else {
-      pledgeHeadline.textContent = 'N/A';
-      var shortfall = requiredCollateral - stackValueNow;
-      pledgeRows.innerHTML =
-        row('Required collateral (250%)',                                       fmtUsd(requiredCollateral)) +
-        row('Your stack value now',                                              fmtUsd(stackValueNow)) +
-        row('Shortfall',                                                         fmtUsd(shortfall));
-    }
+    var pledgeTerminalCost = pledgeCostAtYear(horizon);
+    var sellTerminalCost   = sellCostAtYear(horizon);
 
-    // ─── Render Sell card ───
-    if(sellFeasible){
-      sellHeadline.textContent = fmtBtc(sellStack);
-      sellRows.innerHTML =
-        row('Down payment funded',                                            fmtUsd(downPayment)) +
-        row('BTC sold to fund',                                                fmtBtc(btcSold)) +
-        row('Cap gains tax paid now',                                          fmtUsd(sellTaxPaid)) +
-        row('Cumulative interest premium @ year ' + horizon,                   '$0') +
-        row('BTC value at year ' + horizon + ' (PL trend)',                    fmtUsd(sellStack * futurePrice)) +
-        row('Net wealth at year ' + horizon,                                   fmtUsd(sellTerminalWealth), true);
+    // ─── Render Pledge card (cost-of-path framing) ───
+    pledgeHeadline.textContent = fmtUsd(pledgeTerminalCost);
+    var interestRows;
+    if(repayYear >= horizon){
+      interestRows =
+        row('Premium portion (full mortgage, years 0&ndash;' + horizon + ')',          fmtUsd(homePrice * premium * horizon)) +
+        row('Base-rate portion (down-payment loan, years 0&ndash;' + horizon + ')',    fmtUsd(downPayment * mortRate * horizon));
     } else {
-      sellHeadline.textContent = 'N/A';
-      sellRows.innerHTML = row('Sell path not feasible — would need to sell ' + fmtBtc(btcSold) + ', but you only have ' + fmtBtc(stack), '');
+      interestRows =
+        row('Premium portion (full mortgage, years 0&ndash;' + repayYear + ')',        fmtUsd(homePrice * premium * repayYear)) +
+        row('Base-rate portion (down-payment loan, years 0&ndash;' + repayYear + ')',  fmtUsd(downPayment * mortRate * repayYear));
     }
+    pledgeRows.innerHTML =
+      row('Down-payment funded',                                                fmtUsd(downPayment)) +
+      row('BTC pledged (stays in custody)',                                     fmtBtc(requiredCollateralBtc)) +
+      row('Cap-gains tax paid now',                                              '$0 (loan, not a disposition)') +
+      interestRows +
+      row('Cumulative cost @ year ' + horizon,                                  fmtUsd(pledgeTerminalCost), true);
 
-    // ─── Verdict ───
-    var verdictCls = 'bbm-calc-verdict';
-    var verdictHtml;
-    if(!pledgeFeasible && !sellFeasible){
-      verdictHtml = '<p><strong>Neither path is feasible with this configuration.</strong> The pledge path requires ' + fmtUsd(requiredCollateral) + ' in collateral (250% of the down payment) but your stack is worth only ' + fmtUsd(stackValueNow) + ' at the current price. The sell path requires ' + fmtBtc(btcSold) + ' to net the down payment after tax but you have only ' + fmtBtc(stack) + '. Consider a smaller home, a larger down-payment percentage that brings the figure within reach, or growing the stack first.</p>';
-    } else if(!pledgeFeasible){
-      verdictHtml = '<p><strong>The pledge path isn\u2019t feasible.</strong> The product requires <strong>' + fmtUsd(requiredCollateral) + '</strong> in pledged bitcoin (250% of the down payment) but your stack is worth <strong>' + fmtUsd(stackValueNow) + '</strong> at the current price &mdash; a shortfall of ' + fmtUsd(requiredCollateral - stackValueNow) + '. The sell path remains available, or you could revisit when bitcoin&rsquo;s price brings the collateral within reach.</p>';
-    } else if(!sellFeasible){
-      verdictHtml = '<p><strong>The sell path isn\u2019t feasible.</strong> At your current price and cost basis, netting the ' + fmtUsd(downPayment) + ' down payment after tax would require selling ' + fmtBtc(btcSold) + ' &mdash; more than your stack. The pledge path remains the only option (or buy a less expensive home).</p>';
+    // ─── Render Sell card (forgone-value framing) ───
+    sellHeadline.textContent = fmtUsd(sellTerminalCost);
+    sellRows.innerHTML =
+      row('Down-payment funded',                                                fmtUsd(downPayment)) +
+      row('BTC sold to fund (incl. tax leakage)',                                fmtBtc(btcSold)) +
+      row('Cap-gains tax paid now',                                              fmtUsd(sellTaxPaid)) +
+      row('Cumulative interest premium',                                          '$0') +
+      row('BTC trend price @ year ' + horizon,                                    fmtUsd(futurePrice) + '/BTC') +
+      row('Forgone BTC value @ year ' + horizon,                                  fmtUsd(sellTerminalCost), true);
+
+    // ─── Verdict (which path is cheaper at horizon) ───
+    var verdictCls;
+    var pledgeWins = pledgeTerminalCost < sellTerminalCost;
+    var winnerLabel = pledgeWins ? 'Pledge' : 'Sell';
+    var loserLabel  = pledgeWins ? 'Sell' : 'Pledge';
+    var winnerCls   = pledgeWins ? 'verdict-pledge' : 'verdict-sell';
+    var costDelta   = Math.abs(pledgeTerminalCost - sellTerminalCost);
+    verdictCls = pledgeWins ? 'bbm-calc-verdict bbm-calc-verdict-pledge-wins' : 'bbm-calc-verdict bbm-calc-verdict-sell-wins';
+    var crossoverStr;
+    if(crossoverYear !== null && crossoverYear > 0 && crossoverYear <= horizon){
+      crossoverStr = ' Crossover lands at <strong>year ' + crossoverYear.toFixed(1) + '</strong>, beyond which the ' + (pledgeWins ? 'pledge path' : 'sell path') + ' becomes the cheaper finish.';
+    } else if(pledgeWins){
+      crossoverStr = ' The pledge path is cheaper at every point in your horizon \u2014 cumulative interest never outpaces the value of the BTC the sell path would have given up.';
     } else {
-      var pledgeWins = pledgeTerminalWealth > sellTerminalWealth;
-      var winnerLabel = pledgeWins ? 'Pledge' : 'Sell';
-      var winnerCls   = pledgeWins ? 'verdict-pledge' : 'verdict-sell';
-      var loserLabel  = pledgeWins ? 'Sell' : 'Pledge';
-      var loserCls    = pledgeWins ? 'verdict-sell' : 'verdict-pledge';
-      var delta       = Math.abs(pledgeTerminalWealth - sellTerminalWealth);
-      verdictCls = pledgeWins ? 'bbm-calc-verdict bbm-calc-verdict-pledge-wins' : 'bbm-calc-verdict bbm-calc-verdict-sell-wins';
-      var crossoverStr;
-      if(crossoverYear !== null && crossoverYear > 0 && crossoverYear <= horizon){
-        crossoverStr = ' Crossover lands at <strong>year ' + crossoverYear.toFixed(1) + '</strong>, beyond which the ' + (pledgeWins ? 'pledge path' : 'sell path') + ' is the wealthier finish.';
-      } else if(pledgeWins){
-        crossoverStr = ' The pledge path is wealthier at every point in your horizon \u2014 cumulative interest cost never outpaces the appreciation captured by retaining the BTC.';
-      } else {
-        crossoverStr = ' The sell path is wealthier at every point in your horizon \u2014 the cumulative interest cost dominates the value of BTC retained.';
-      }
-      // Reference the HOLD baseline so users see the cost of buying-at-all
-      var holdDelta = holdTerminalWealth - Math.max(pledgeTerminalWealth, sellTerminalWealth);
-      var holdStr = ' For reference, simply <strong>holding the stack and not buying the home at all</strong> finishes at <strong>' + fmtUsd(holdTerminalWealth) + '</strong> &mdash; ' + fmtUsd(holdDelta) + ' more than the better of the two purchase paths. That gap is the all-in cost of acquiring the home, against which the Pledge vs Sell comparison is the second-order decision.';
-      verdictHtml =
-        '<p>At year <strong>' + horizon + '</strong>, the <strong class="' + winnerCls + '">' + winnerLabel + '</strong> path retains ' +
-        '<strong class="' + winnerCls + '">' + fmtUsd(delta) + ' more wealth</strong> than the ' + loserLabel + ' path. ' +
-        'BTC trend price at year ' + horizon + ': <strong>' + fmtUsd(futurePrice) + '/BTC</strong>.' + crossoverStr + holdStr + '</p>';
+      crossoverStr = ' The sell path is cheaper at every point in your horizon \u2014 the value of forgone BTC stays below the cumulative interest cost of the pledge.';
     }
     verdict.className = verdictCls;
-    verdict.innerHTML = verdictHtml;
+    verdict.innerHTML =
+      '<p>At year <strong>' + horizon + '</strong>, the <strong class="' + winnerCls + '">' + winnerLabel + '</strong> path is cheaper by ' +
+      '<strong class="' + winnerCls + '">' + fmtUsd(costDelta) + '</strong> than the ' + loserLabel + ' path. ' +
+      'BTC trend price at year ' + horizon + ': <strong>' + fmtUsd(futurePrice) + '/BTC</strong>.' + crossoverStr + '</p>';
 
-    // ─── Render the chart ───
-    renderChart(years, pledgeSeries, sellSeries, holdSeries, crossoverYear, sellFeasible, pledgeFeasible);
+    // ─── Render the chart (two cost lines + crossover marker) ───
+    renderChart(years, pledgeSeries, sellSeries, crossoverYear);
   }
 
   function row(label, value, terminal){
@@ -396,19 +354,18 @@
       '<span class="row-val">' + value + '</span></div>';
   }
 
-  function renderChart(years, pledgeSeries, sellSeries, holdSeries, crossoverYear, sellFeasible, pledgeFeasible){
+  function renderChart(years, pledgeSeries, sellSeries, crossoverYear){
     if(!chartCanvas || typeof Chart === 'undefined') return;
 
-    var datasets = [];
-
-    // PLEDGE and SELL paths are drawn first so HOLD (added last, drawn on top)
-    // shows its dashes through any overlap regions. Without this, scenarios
-    // where Pledge tracks Hold closely (small premium / large stack / no
-    // early repay) produce a chart where the Hold line is invisible because
-    // the solid Pledge stroke fully covers it.
-    if(pledgeFeasible){
-      datasets.push({
-        label: 'Pledge path',
+    // Commit 2 simplification: chart now shows two cost lines instead of
+    // wealth trajectories. Pledge cost is cumulative extra interest
+    // (linear, plateaus at repayYear); Sell cost is forgone BTC value
+    // priced at the Power Law trend (exponential). The Hold baseline
+    // (previously a dashed reference) no longer applies — there's no
+    // "no purchase" alternative being modelled in cost terms.
+    var datasets = [
+      {
+        label: 'Pledge: cumulative extra interest cost',
         data: pledgeSeries,
         borderColor: '#e09422',
         backgroundColor: 'rgba(224,148,34,0.10)',
@@ -417,11 +374,9 @@
         pointHoverRadius: 4,
         tension: 0.1,
         fill: false,
-      });
-    }
-    if(sellFeasible){
-      datasets.push({
-        label: 'Sell path',
+      },
+      {
+        label: 'Sell: forgone BTC value (PL trend)',
         data: sellSeries,
         borderColor: '#8aa3b5',
         backgroundColor: 'rgba(122,149,168,0.10)',
@@ -430,26 +385,8 @@
         pointHoverRadius: 4,
         tension: 0.1,
         fill: false,
-      });
-    }
-    // HOLD baseline drawn LAST so its dashes are visible through the Pledge/
-    // Sell strokes in overlap regions. Always shown — it's the 0% borrowing
-    // reference. Muted tan, dashed weight 1.75px with longer dash segments
-    // for visibility. Reads as 'reference overlay' rather than 'primary path'.
-    if(holdSeries && holdSeries.length){
-      datasets.push({
-        label: 'Hold (no purchase)',
-        data: holdSeries,
-        borderColor: '#bfae97',
-        backgroundColor: 'rgba(191,174,151,0.06)',
-        borderWidth: 1.75,
-        borderDash: [7, 4],
-        pointRadius: 0,
-        pointHoverRadius: 4,
-        tension: 0.1,
-        fill: false,
-      });
-    }
+      }
+    ];
 
     // Custom plugin: draw vertical dashed crossover line + label.
     // (Chart.js 4 doesn't ship annotations by default; this avoids the
@@ -499,7 +436,7 @@
           grid: { color: 'rgba(255,255,255,0.05)' }
         },
         y: {
-          title: { display: true, text: 'Net wealth (USD)', color: 'rgba(255,255,255,0.5)', font: { family: 'Inter, sans-serif', size: 11 } },
+          title: { display: true, text: 'Cumulative cost (USD)', color: 'rgba(255,255,255,0.5)', font: { family: 'Inter, sans-serif', size: 11 } },
           ticks: {
             color: 'rgba(255,255,255,0.5)',
             font: { family: 'Inter, sans-serif', size: 10 },
@@ -564,7 +501,7 @@
   }
 
   // ─── Wire all inputs to recompute ───
-  var inputs = [homePriceInput, downPctSlider, stackInput, priceInput, costBasisInput,
+  var inputs = [homePriceInput, downPctSlider, priceInput, costBasisInput,
                 mortRateSlider, premiumSlider, horizonSlider, capGainsSlider,
                 earlyRepaySlider];
   ['input','change'].forEach(function(evt){
