@@ -277,39 +277,46 @@ eleventyComputed:
     <div class="explore-subsection-label">Latest</div>
     <div class="card-grid">
 
-        <!-- Disciplined Rebalancing -->
-        <a href="/disciplined-rebalancing.html" class="concept-card">
+        <!-- Living on Bitcoin -->
+        <a href="/living-on-bitcoin.html" class="concept-card">
             <div class="card-icon">
                 <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Bounded oscillation: floor + ceiling band with sine inside -->
-                    <line x1="6" y1="14" x2="42" y2="14" stroke="#e09422" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.5"/>
-                    <line x1="6" y1="34" x2="42" y2="34" stroke="#e09422" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.5"/>
-                    <path d="M 6 24 Q 12 14 18 24 T 30 24 T 42 24" stroke="#F7931A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-                    <circle cx="12" cy="17.5" r="2" fill="#F7931A"/>
-                    <circle cx="24" cy="30.5" r="2" fill="#F7931A"/>
-                    <circle cx="36" cy="17.5" r="2" fill="#F7931A"/>
+                    <!-- Upper inflow droplet (the source) -->
+                    <line x1="24" y1="4" x2="24" y2="10" stroke="#e09422" stroke-width="1.3" stroke-linecap="round" opacity="0.75"/>
+                    <circle cx="24" cy="11.5" r="0.9" fill="#F7931A"/>
+                    <!-- Basin (the BTC reserve) -->
+                    <path d="M 11 14 L 37 14 L 33 28 L 15 28 Z" stroke="#F7931A" stroke-width="1.6" fill="rgba(247,147,26,0.10)" stroke-linejoin="round"/>
+                    <!-- Reserve level line inside basin -->
+                    <line x1="14" y1="19" x2="34" y2="19" stroke="#F7931A" stroke-width="1.1" opacity="0.55"/>
+                    <!-- Outflow droplet -->
+                    <line x1="24" y1="30" x2="24" y2="36" stroke="#e09422" stroke-width="1.3" stroke-linecap="round" opacity="0.75"/>
+                    <circle cx="24" cy="37.5" r="0.9" fill="#F7931A"/>
+                    <!-- Cup (the daily provision) -->
+                    <path d="M 17 38 L 19 45 L 29 45 L 31 38 Z" stroke="#F7931A" stroke-width="1.3" fill="rgba(247,147,26,0.06)" stroke-linejoin="round"/>
                 </svg>
             </div>
-            <div class="card-title">Disciplined Rebalancing</div>
-            <div class="card-desc">If bitcoin's price oscillates inside a bounded channel, then percentile triggers — sell when historical-frequency says you're high, rebuy when you're low — turn the channel from a model into a discipline. Walk fifteen years of actual price data through the rules; see what would have happened.</div>
+            <div class="card-title">Living on Bitcoin</div>
+            <div class="card-desc">Holding everyday operating cash in bitcoin while paying fiat bills as they come due &mdash; a values-aligned practice with modest economics, real friction, and a psychological payoff. Project the float, stress-test it against a drawdown, and decide if the operational overhead is worth it.</div>
             <div class="card-cta">Read more &rarr;</div>
         </a>
 
-        <!-- The Bitcoin Retirement -->
-        <a href="/the-bitcoin-retirement.html" class="concept-card">
+        <!-- Bitcoin-Backed Mortgages -->
+        <a href="/bitcoin-backed-mortgages.html" class="concept-card">
             <div class="card-icon">
                 <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Time-horizon arrow: short stick now → long projection -->
-                    <line x1="8" y1="38" x2="40" y2="10" stroke="#F7931A" stroke-width="1.6" stroke-linecap="round"/>
-                    <line x1="40" y1="10" x2="34" y2="10" stroke="#F7931A" stroke-width="1.6" stroke-linecap="round"/>
-                    <line x1="40" y1="10" x2="40" y2="16" stroke="#F7931A" stroke-width="1.6" stroke-linecap="round"/>
-                    <circle cx="14" cy="34" r="2.5" fill="rgba(247,147,26,0.15)" stroke="#F7931A" stroke-width="1.4"/>
-                    <circle cx="24" cy="24" r="2" fill="rgba(247,147,26,0.15)" stroke="#F7931A" stroke-width="1.2"/>
-                    <circle cx="34" cy="14" r="2.5" fill="rgba(247,147,26,0.15)" stroke="#F7931A" stroke-width="1.4"/>
+                    <!-- BTC vault/stack on left (the pledge, retained) -->
+                    <rect x="6" y="16" width="14" height="20" rx="1.5" stroke="#F7931A" stroke-width="1.6" fill="rgba(247,147,26,0.10)"/>
+                    <text x="13" y="29" text-anchor="middle" fill="#F7931A" font-size="10" font-weight="700" font-family="sans-serif">&#8383;</text>
+                    <!-- Pledge connection (dashed link, not consumed) -->
+                    <line x1="20" y1="26" x2="28" y2="26" stroke="#e09422" stroke-width="1.4" stroke-dasharray="2 2" opacity="0.75"/>
+                    <!-- House outline on right (the home unlocked) -->
+                    <path d="M 28 36 L 28 24 L 36 16 L 44 24 L 44 36 Z" stroke="#F7931A" stroke-width="1.6" fill="rgba(247,147,26,0.06)" stroke-linejoin="round"/>
+                    <!-- Door inside house -->
+                    <rect x="34" y="28" width="4" height="8" stroke="#F7931A" stroke-width="1" fill="rgba(247,147,26,0.10)" opacity="0.7"/>
                 </svg>
             </div>
-            <div class="card-title">The Bitcoin Retirement</div>
-            <div class="card-desc">A retirement account inside a bitcoin-denominated framework: see what your stack needs to be at withdrawal age to fund the lifestyle you want, given long-run trend growth. Adjustable assumptions, transparent math, no advice.</div>
+            <div class="card-title">Bitcoin-Backed Mortgages</div>
+            <div class="card-desc">Pledge bitcoin instead of selling it to fund a home purchase &mdash; a Fannie Mae-conforming product that preserves your stack while you live in the house. Model the pledge math against selling outright, weigh the counterparty risk, and see when the structural tradeoffs actually make sense.</div>
             <div class="card-cta">Read more &rarr;</div>
         </a>
 
@@ -463,6 +470,29 @@ eleventyComputed:
             <div class="card-cta">Read more &rarr;</div>
         </a>
 
+        <!-- Living on Bitcoin -->
+        <a href="/living-on-bitcoin.html" class="concept-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Upper inflow droplet (the source) -->
+                    <line x1="24" y1="4" x2="24" y2="10" stroke="#e09422" stroke-width="1.3" stroke-linecap="round" opacity="0.75"/>
+                    <circle cx="24" cy="11.5" r="0.9" fill="#F7931A"/>
+                    <!-- Basin (the BTC reserve) -->
+                    <path d="M 11 14 L 37 14 L 33 28 L 15 28 Z" stroke="#F7931A" stroke-width="1.6" fill="rgba(247,147,26,0.10)" stroke-linejoin="round"/>
+                    <!-- Reserve level line inside basin -->
+                    <line x1="14" y1="19" x2="34" y2="19" stroke="#F7931A" stroke-width="1.1" opacity="0.55"/>
+                    <!-- Outflow droplet -->
+                    <line x1="24" y1="30" x2="24" y2="36" stroke="#e09422" stroke-width="1.3" stroke-linecap="round" opacity="0.75"/>
+                    <circle cx="24" cy="37.5" r="0.9" fill="#F7931A"/>
+                    <!-- Cup (the daily provision) -->
+                    <path d="M 17 38 L 19 45 L 29 45 L 31 38 Z" stroke="#F7931A" stroke-width="1.3" fill="rgba(247,147,26,0.06)" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="card-title">Living on Bitcoin</div>
+            <div class="card-desc">Holding everyday operating cash in bitcoin while paying fiat bills as they come due &mdash; a values-aligned practice with modest economics, real friction, and a psychological payoff. Project the float, stress-test it against a drawdown, and decide if the operational overhead is worth it.</div>
+            <div class="card-cta">Read more &rarr;</div>
+        </a>
+
         <a href="/not-a-bubble.html" class="concept-card">
             <div class="card-icon">
                 <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -599,6 +629,26 @@ eleventyComputed:
             </div>
             <div class="card-title">Borrowing Against Your Stack</div>
             <div class="card-desc">Every coin sold today is a coin that compounds for someone else. Borrowing against bitcoin preserves the upside — but the strategy carries real tail risks. Model your scenario against rehypothecation tiers, see liquidation distance under stress, weigh interest cost vs. retained-coin appreciation.</div>
+            <div class="card-cta">Read more &rarr;</div>
+        </a>
+
+        <!-- Bitcoin-Backed Mortgages -->
+        <a href="/bitcoin-backed-mortgages.html" class="concept-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- BTC vault/stack on left (the pledge, retained) -->
+                    <rect x="6" y="16" width="14" height="20" rx="1.5" stroke="#F7931A" stroke-width="1.6" fill="rgba(247,147,26,0.10)"/>
+                    <text x="13" y="29" text-anchor="middle" fill="#F7931A" font-size="10" font-weight="700" font-family="sans-serif">&#8383;</text>
+                    <!-- Pledge connection (dashed link, not consumed) -->
+                    <line x1="20" y1="26" x2="28" y2="26" stroke="#e09422" stroke-width="1.4" stroke-dasharray="2 2" opacity="0.75"/>
+                    <!-- House outline on right (the home unlocked) -->
+                    <path d="M 28 36 L 28 24 L 36 16 L 44 24 L 44 36 Z" stroke="#F7931A" stroke-width="1.6" fill="rgba(247,147,26,0.06)" stroke-linejoin="round"/>
+                    <!-- Door inside house -->
+                    <rect x="34" y="28" width="4" height="8" stroke="#F7931A" stroke-width="1" fill="rgba(247,147,26,0.10)" opacity="0.7"/>
+                </svg>
+            </div>
+            <div class="card-title">Bitcoin-Backed Mortgages</div>
+            <div class="card-desc">Pledge bitcoin instead of selling it to fund a home purchase &mdash; a Fannie Mae-conforming product that preserves your stack while you live in the house. Model the pledge math against selling outright, weigh the counterparty risk, and see when the structural tradeoffs actually make sense.</div>
             <div class="card-cta">Read more &rarr;</div>
         </a>
 
