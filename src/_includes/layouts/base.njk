@@ -99,6 +99,13 @@ h1, h2, h3 {
 @media (max-width: 768px) {
   .site-footer .footer-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); text-align: left; }
 }
+/* ─── Footer tip block (Lightning Address) — restrained presence, click-to-copy ─── */
+.site-footer .footer-tip { max-width: 540px; margin: 0 auto 2.4rem; text-align: center; padding: 0 1rem; }
+.site-footer .footer-tip-copy { font-family: 'Inter', sans-serif; font-size: 0.78rem; color: rgba(255,255,255,0.45); line-height: 1.6; margin: 0 0 0.9rem; letter-spacing: 0.01em; font-style: italic; }
+.site-footer .footer-tip-address { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1.1rem; background: rgba(247,147,26,0.06); border: 1px solid rgba(247,147,26,0.20); border-radius: 999px; font-family: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace; font-size: 0.78rem; color: #e09422; text-decoration: none; transition: background 0.3s, border-color 0.3s, color 0.3s; cursor: pointer; user-select: none; }
+.site-footer .footer-tip-address:hover { background: rgba(247,147,26,0.12); border-color: rgba(247,147,26,0.35); color: #F7931A; }
+.site-footer .footer-tip-bolt { font-size: 0.92rem; line-height: 1; }
+.site-footer .footer-tip-address.copied { background: rgba(247,147,26,0.16); border-color: rgba(247,147,26,0.45); color: #F7931A; }
 .site-footer .footer-line { width: 40px; height: 1px; background: rgba(224,148,34,0.3); margin: 0 auto 1.4rem; }
 .site-footer .footer-copy { font-family: 'Inter', sans-serif; font-size: 0.7rem; color: rgba(255,255,255,0.22); letter-spacing: 0.04em; }
 
@@ -249,6 +256,13 @@ h1, h2, h3 {
             <a href="/about.html">About</a>
         </div>
     </nav>
+    <div class="footer-tip">
+        <p class="footer-tip-copy">If you've found these explorations useful, consider buying me a coffee.</p>
+        <span class="footer-tip-address" data-tip-address="tips@lastcoinstanding.com" role="button" tabindex="0" aria-label="Copy Lightning Address to clipboard">
+            <span class="footer-tip-bolt">&#9889;</span>
+            <span class="footer-tip-text">tips@lastcoinstanding.com</span>
+        </span>
+    </div>
     <div class="footer-line"></div>
     <div class="footer-copy">&copy; 2026 Last Coin Standing &mdash; Bitcoin education through contrast and clarity</div>
 </footer>
@@ -314,6 +328,43 @@ h1, h2, h3 {
   });
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') { closeMobile(); closeAllDropdowns(); }
+  });
+})();
+
+/* Footer tip address: click-to-copy with brief "copied" feedback */
+(function() {
+  var tipEls = document.querySelectorAll('.footer-tip-address');
+  if (!tipEls.length) return;
+  function copyTip(el) {
+    var addr = el.getAttribute('data-tip-address');
+    if (!addr) return;
+    var done = function() {
+      var textEl = el.querySelector('.footer-tip-text');
+      if (!textEl) return;
+      var orig = textEl.textContent;
+      el.classList.add('copied');
+      textEl.textContent = 'Copied — thank you';
+      setTimeout(function() {
+        textEl.textContent = orig;
+        el.classList.remove('copied');
+      }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(addr).then(done).catch(function() {});
+    } else {
+      // Fallback for older browsers
+      var ta = document.createElement('textarea');
+      ta.value = addr; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+  }
+  tipEls.forEach(function(el) {
+    el.addEventListener('click', function() { copyTip(el); });
+    el.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyTip(el); }
+    });
   });
 })();
 </script>

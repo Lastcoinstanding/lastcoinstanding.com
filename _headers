@@ -1,0 +1,5 @@
+# Lightning Address JSON endpoint — set Content-Type and allow CORS
+/.well-known/lnurlp/tips
+  Content-Type: application/json; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=300

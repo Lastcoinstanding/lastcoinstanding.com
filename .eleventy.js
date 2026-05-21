@@ -56,6 +56,9 @@ module.exports = function (eleventyConfig) {
 
   // Videos folder — only enable when present locally (production has it; local test may not)
   eleventyConfig.addPassthroughCopy({ 'videos': 'videos' });
+  // Lightning Address endpoint — Cloudflare Pages serves .well-known files; _headers sets Content-Type
+  eleventyConfig.addPassthroughCopy({ '.well-known': '.well-known' });
+  eleventyConfig.addPassthroughCopy({ '_headers': '_headers' });
 
   return {
     dir: {

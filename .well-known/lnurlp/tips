@@ -1,0 +1,10 @@
+{
+    "allowsNostr": true,
+    "minSendable": 1000,
+    "maxSendable": 100000000000,
+    "metadata": "[[\"text/plain\",\"Tips for Last Coin Standing\"],[\"text/identifier\",\"tips@lastcoinstanding.com\"]]",
+    "nostrPubkey": "72bdbc57bdd6dfc4e62685051de8041d148c3c68fe42bf301f71aa6cf53e52fb",
+    "commentAllowed": 512,
+    "callback": "https://coinos.io/api/lnurl/7ef69ccf-557c-48a2-a97d-3dec6194ca90",
+    "tag": "payRequest"
+}
