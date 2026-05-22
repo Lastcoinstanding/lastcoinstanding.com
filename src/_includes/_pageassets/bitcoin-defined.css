@@ -452,6 +452,30 @@
     margin: 0;
 }
 
+/* Citation — full attribution disclosure at the bottom of the final reveal */
+.bd-citation {
+    max-width: 640px;
+    margin: 2.6rem auto 0;
+    padding-top: 1.9rem;
+    border-top: 1px solid rgba(247,147,26,0.13);
+    position: relative;
+}
+.bd-citation-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(0.92rem, 1.55vw, 1.04rem);
+    line-height: 1.65;
+    color: rgba(232,224,213,0.46);
+    text-align: center;
+    margin: 0;
+    letter-spacing: 0.005em;
+}
+.bd-citation-text em {
+    color: rgba(247,147,26,0.72);
+    font-style: italic;
+    font-weight: 500;
+}
+
 /* ─── Mobile ─── */
 @media (max-width: 720px) {
     .bd-page .bd-header { padding: 3rem 1.2rem 1rem; }
