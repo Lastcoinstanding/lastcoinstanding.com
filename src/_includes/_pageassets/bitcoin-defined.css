@@ -52,6 +52,31 @@
     font-style: italic;
     margin-bottom: 0.25rem;
 }
+.bd-page .bd-header .bd-attribution {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    color: rgba(232,224,213,0.5);
+    margin: 1.4rem 0 0;
+    letter-spacing: 0.015em;
+}
+.bd-page .bd-header .bd-attribution::before,
+.bd-page .bd-header .bd-attribution::after {
+    content: '';
+    display: inline-block;
+    width: 22px;
+    height: 1px;
+    background: rgba(247,147,26,0.35);
+    vertical-align: middle;
+    margin: 0 0.9rem;
+    transform: translateY(-2px);
+}
+.bd-page .bd-header .bd-attribution .bd-attribution-name {
+    color: var(--bd-amber-soft);
+    font-weight: 500;
+    font-style: italic;
+    margin-left: 0.15em;
+}
 
 /* ─── Sticky sentence ─── */
 .bd-sticky-wrap {
@@ -361,11 +386,54 @@
     letter-spacing: 0.005em;
     position: relative;
 }
+/* Soft amber halo backdrop centered on the sentence — only when final-active */
+.bd-final-active .bd-final-sentence::before {
+    content: '';
+    position: absolute;
+    inset: -2.5rem -3rem;
+    background: radial-gradient(ellipse at center, rgba(247,147,26,0.10) 0%, rgba(247,147,26,0.04) 40%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+    animation: bd-halo-bloom 2.6s ease-out forwards;
+}
 .bd-final-sentence em {
     font-style: italic;
     color: var(--bd-amber);
-    text-shadow: 0 0 22px var(--bd-amber-glow);
     font-weight: 500;
+    /* Resting glow — moderate, three concentric halos for natural light radiation */
+    text-shadow:
+        0 0 14px rgba(247,147,26,0.50),
+        0 0 32px rgba(247,147,26,0.25),
+        0 0 60px rgba(247,147,26,0.10);
+}
+/* Bloom: when final state activates, each word warms up briefly then settles */
+.bd-final-active .bd-final-sentence em {
+    animation: bd-word-resonate 2.4s ease-out forwards;
+}
+@keyframes bd-word-resonate {
+    0% {
+        text-shadow:
+            0 0 6px rgba(247,147,26,0.20),
+            0 0 14px rgba(247,147,26,0.10),
+            0 0 28px rgba(247,147,26,0.04);
+    }
+    55% {
+        text-shadow:
+            0 0 22px rgba(247,147,26,0.75),
+            0 0 50px rgba(247,147,26,0.40),
+            0 0 90px rgba(247,147,26,0.18);
+    }
+    100% {
+        text-shadow:
+            0 0 14px rgba(247,147,26,0.50),
+            0 0 32px rgba(247,147,26,0.25),
+            0 0 60px rgba(247,147,26,0.10);
+    }
+}
+@keyframes bd-halo-bloom {
+    0% { opacity: 0; transform: scale(0.85); }
+    55% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 0.7; transform: scale(1); }
 }
 .bd-final-reflection {
     font-family: 'Cormorant Garamond', serif;
@@ -410,5 +478,9 @@
     .bd-sticky-sentence .bd-word.bd-active::after {
         animation: none;
         opacity: 0.6;
+    }
+    .bd-final-active .bd-final-sentence em,
+    .bd-final-active .bd-final-sentence::before {
+        animation: none !important;
     }
 }
