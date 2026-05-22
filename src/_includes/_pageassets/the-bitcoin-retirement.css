@@ -868,6 +868,82 @@ a.powerlaw-link:hover {
   font-style: italic;
 }
 
+/* ─── Share section — discoverable affordance for the shareable URL.
+   ─── Pattern intended for reuse across calculator pages, so selectors
+   ─── are page-agnostic. Matches the .live-explore eyebrow register. */
+.share-section {
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-faint);
+}
+.share-section-header {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+.share-section-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+.share-section-help {
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  font-style: italic;
+}
+.share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.9rem;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--ink-dim);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.share-btn:hover,
+.share-btn:focus-visible {
+  background: rgba(224, 148, 34, 0.08);
+  border-color: rgba(224, 148, 34, 0.4);
+  color: var(--ink-bright);
+  outline: none;
+}
+.share-btn:active {
+  transform: translateY(1px);
+}
+.share-btn .share-icon {
+  flex-shrink: 0;
+}
+.share-btn-copied {
+  background: rgba(224, 148, 34, 0.14);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+.share-btn-copied:hover {
+  background: rgba(224, 148, 34, 0.14);
+  color: var(--amber);
+}
+/* Hide the native-share button by default; JS un-hides it on browsers
+   that support navigator.share (mostly mobile + Safari desktop). */
+.share-btn-native[hidden] {
+  display: none;
+}
+
 /* ─── Cluster wrappers ─── */
 .slider-cluster {
   margin-bottom: 1.25rem;
@@ -1331,6 +1407,7 @@ a.powerlaw-link:hover {
   .live-explore,                    /* slider clusters */
   .sustainability,                  /* on-screen readout (print has its own) */
   .baseline-cluster,                /* picker grid (selected values listed in inputs table) */
+  .share-section,                   /* social share / copy-link UI */
   .help-tip,                        /* ? icons and tooltips */
   .construction-note,
   .powerlaw-link {

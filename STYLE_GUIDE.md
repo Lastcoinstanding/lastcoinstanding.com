@@ -1496,6 +1496,60 @@ A small parenthetical annotation inside a preset button text, showing a *value-a
 
 **Vocabulary discipline.** The annotation should be a *comparable number on the same axis* across all presets — not a mix of magnitudes and absolute prices. The BvSM annotation is multiple-of-trend for all four (12.1× / 6.4× / 2.8× / 1.12×), which lets the reader compare the entries at a glance. Mixing units inside the annotation (e.g., `(12.1×) / ($1,150) / (high) / (recent)`) defeats the purpose.
 
+### 6.26 Share-this-scenario section (`share-section`)
+
+**Use case:** Any page with a shareable scenario URL (the URL captures the user's current state via query params — see `SITE_GUIDE §17.5`). The section makes the otherwise-invisible shareability discoverable and provides one-click options for copy-link plus the major social platforms. Introduced on the Retirement page at the same time as the page-URL sync; designed for reuse on every calculator page where the URL becomes meaningful as the user dials in inputs.
+
+**Core principle:** The section is calm, not pushy. The eyebrow + tagline surfaces *that* the URL is shareable; the buttons offer specific destinations. No exhortations to "go viral" or "tell your friends" — the editorial register is the same as the rest of the page.
+
+**Markup:**
+
+```html
+<section class="share-section" id="shareSection">
+  <div class="share-section-header">
+    <span class="share-section-label">Share this scenario</span>
+    <span class="share-section-help">The link in your address bar captures your current sliders &mdash; anyone who opens it sees the same projection.</span>
+  </div>
+  <div class="share-actions">
+    <button type="button" class="share-btn" id="shareCopy" aria-label="Copy link to clipboard">
+      <svg class="share-icon">...</svg><span class="share-btn-label">Copy link</span>
+    </button>
+    <a class="share-btn" id="shareTwitter" href="#" target="_blank" rel="noopener" aria-label="Share on X">
+      <svg class="share-icon">...</svg><span class="share-btn-label">X</span>
+    </a>
+    <a class="share-btn" id="shareLinkedIn" href="#" target="_blank" rel="noopener" aria-label="Share on LinkedIn">
+      <svg class="share-icon">...</svg><span class="share-btn-label">LinkedIn</span>
+    </a>
+    <a class="share-btn" id="shareFacebook" href="#" target="_blank" rel="noopener" aria-label="Share on Facebook">
+      <svg class="share-icon">...</svg><span class="share-btn-label">Facebook</span>
+    </a>
+    <button type="button" class="share-btn share-btn-native" id="shareNative" aria-label="Share via system" hidden>
+      <svg class="share-icon">...</svg><span class="share-btn-label">Share&hellip;</span>
+    </button>
+  </div>
+</section>
+```
+
+**Visual design.** Eyebrow uses the canonical `.live-explore-label` register (0.7rem, uppercase, 0.22em letter-spacing, amber). Tagline is muted italic at 0.85rem. Buttons are inline-flex with a subtle dark-tint background, 1px border, 4px radius; on hover they pick up an amber tint and brighter text. Copy-link feedback applies a `.share-btn-copied` class that switches to amber-tinted background + amber text for ~1.8 seconds. Native-share button stays hidden by default; the IIFE un-hides it only when `navigator.share` is available (mobile + Safari).
+
+**Behavior pattern.** All buttons read `window.location.href` at click time, not at page-load — the URL is already kept current by the page's URL-sync logic, so the share target reflects whatever the user has just configured. Social buttons open in a popup-sized new tab using the standard share-intent endpoints:
+- X/Twitter: `https://twitter.com/intent/tweet?url=...&text=...`
+- LinkedIn: `https://www.linkedin.com/sharing/share-offsite/?url=...`
+- Facebook: `https://www.facebook.com/sharer/sharer.php?u=...`
+
+Copy uses `navigator.clipboard.writeText` with an `execCommand` fallback for legacy browsers. Native share uses `navigator.share`.
+
+**Placement.** Insert after the page's "aha moment" UI (Sustainability readout on Retirement, equivalent on other pages) and before the next interactive section (Baseline Assumptions on Retirement). The top border separates it visually from the result above; the section sits at the natural "I've configured this, now what?" pause point.
+
+**Print:** Hidden via `display: none !important` in the page's `@media print` block — it's pure on-screen interaction.
+
+**When to add it to a new page.** Any page that:
+- Has a shareable URL (per `SITE_GUIDE §17.5` or equivalent), or could trivially be given one;
+- Has a result the user might want to spread (a chart, a number, a verdict);
+- Has a calm pause point between the result and any continued exploration.
+
+Pages where it probably doesn't earn space: pure-prose pages with no interactive state to share, or pages whose primary CTA is something else (e.g. a checkout or a sign-up). For those, a generic page-level share button at the top or in the footer might be more appropriate; the `share-section` is for *scenario sharing*, not generic page promotion.
+
 ### Naming convention reminder
 
 Several patterns above follow the convention `{purpose}-{role}`: `calc-mode-*`, `porkopolis-credit*`, `channel-*`, `start-input-*`. When introducing future patterns, prefer this convention over generic names like `.toggle` or `.controls` to avoid collisions across pages. Recipes §6.20–6.25 above were introduced on BvSM in May 2026 and are currently page-scoped (`.bvsm-section-eyebrow`, `.bvsm-as-of-callout`, etc. in the live page CSS); the recipe names above use the unprefixed canonical form. When a second consumer of any of these patterns arrives, promote the CSS into the shared layer and drop the prefix.

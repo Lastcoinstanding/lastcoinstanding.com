@@ -1663,3 +1663,125 @@
     wireSliders();
   }
 })();
+
+
+// ═══════ SHARE THIS SCENARIO ═══════
+// Discoverable share affordance for the URL's scenario state. Reads
+// window.location.href at click time so it always reflects whatever the
+// user has dialed in (the page-URL sync handles keeping that current).
+//
+// Surfaces are:
+//   - Copy link  → navigator.clipboard.writeText with on-button feedback
+//   - X / LinkedIn / Facebook → standard share-intent URLs in a new tab
+//   - Native share (mobile + Safari) → navigator.share, if supported
+//
+// The IIFE is self-contained; no closure dependencies on the chart IIFE.
+// Pattern intended for reuse on other calculator pages: lift this block
+// plus the matching markup + CSS and it works as-is (the markup IDs are
+// the only contract).
+(function(){
+  // Default copy/text for social-intent links. Kept short — the OG card
+  // (set at build time per the page's head fragment) carries the rich
+  // preview on platforms that fetch it. Twitter/X uses the text param
+  // for the tweet body alongside the URL; LinkedIn and Facebook largely
+  // ignore text and lean on the OG metadata.
+  var SHARE_TITLE = 'What does a bitcoin retirement look like?';
+
+  function currentUrl() {
+    return window.location.href;
+  }
+
+  function showCopiedFeedback(btn) {
+    var labelEl = btn.querySelector('.share-btn-label');
+    if (!labelEl) return;
+    var original = labelEl.textContent;
+    labelEl.textContent = 'Copied';
+    btn.classList.add('share-btn-copied');
+    setTimeout(function(){
+      labelEl.textContent = original;
+      btn.classList.remove('share-btn-copied');
+    }, 1800);
+  }
+
+  // Fallback for browsers without async-clipboard support (older Safari,
+  // some legacy contexts, or when the page is loaded over insecure http).
+  // Uses the deprecated execCommand path through a temporary textarea.
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'absolute';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function bindCopy() {
+    var btn = document.getElementById('shareCopy');
+    if (!btn) return;
+    btn.addEventListener('click', function(){
+      var url = currentUrl();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(
+          function(){ showCopiedFeedback(btn); },
+          function(){ if (fallbackCopy(url)) showCopiedFeedback(btn); }
+        );
+      } else if (fallbackCopy(url)) {
+        showCopiedFeedback(btn);
+      }
+    });
+  }
+
+  function bindIntentButton(id, urlBuilder) {
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var shareUrl = urlBuilder(currentUrl());
+      // Popup-sized window for the social composer — falls back to a new
+      // tab if the browser doesn't honor the size hints (common on mobile).
+      window.open(shareUrl, '_blank', 'noopener,noreferrer,width=620,height=540');
+    });
+  }
+
+  function bindNativeShare() {
+    var btn = document.getElementById('shareNative');
+    if (!btn || !navigator.share) return;
+    btn.hidden = false;
+    btn.addEventListener('click', function(){
+      navigator.share({
+        title: 'Bitcoin retirement projection',
+        text: SHARE_TITLE,
+        url: currentUrl()
+      }).catch(function(){
+        // User cancelled or share failed — no-op (intentional silent).
+      });
+    });
+  }
+
+  function wireShareSection() {
+    if (!document.getElementById('shareSection')) return;
+    bindCopy();
+    bindIntentButton('shareTwitter', function(url){
+      return 'https://twitter.com/intent/tweet?url=' +
+        encodeURIComponent(url) + '&text=' + encodeURIComponent(SHARE_TITLE);
+    });
+    bindIntentButton('shareLinkedIn', function(url){
+      return 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(url);
+    });
+    bindIntentButton('shareFacebook', function(url){
+      return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+    });
+    bindNativeShare();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wireShareSection);
+  } else {
+    wireShareSection();
+  }
+})();
