@@ -725,6 +725,34 @@ a.powerlaw-link:hover {
 .swatch-current { background: #a89c8a; height: 8px; }
 .swatch-benchmark { background: #5e7a92; height: 8px; }
 
+/* Interactive legend — click a swatch/label to toggle the corresponding
+   line on the chart. The .off state dims the row's color and fades the
+   swatch; the chart hides the dataset via Chart.js setDatasetVisibility().
+   Help-tips inside legend items remain interactive in their own right
+   (the click handler ignores clicks that land inside .help-tip). */
+.legend-item {
+  cursor: pointer;
+  user-select: none;
+  border-radius: 2px;
+  transition: color 0.15s ease;
+}
+.legend-item:hover {
+  color: var(--ink-bright);
+}
+.legend-item:focus-visible {
+  outline: 1px solid rgba(224, 148, 34, 0.55);
+  outline-offset: 3px;
+}
+.legend-item.off {
+  color: var(--ink-faint);
+}
+.legend-item.off .swatch {
+  opacity: 0.22;
+}
+.legend-item .help-tip {
+  cursor: help;
+}
+
 .chart-wrapper {
   position: relative;
   width: 100%;

@@ -303,6 +303,13 @@
   // renders sensibly before the fetch completes.
   var liveBtcPrice = LIVE_BTC_FALLBACK;
 
+  // Interactive-legend state — which datasets are user-visible. Indices
+  // match the chart.data.datasets order: 0=floor, 1=trend, 2=upper,
+  // 3=drawdown, 4=current-trajectory, 5=benchmark. Persisted across
+  // renderChart() re-runs (every slider change rebuilds datasets, but
+  // visibility is a user-intent layer that outlives the redraw).
+  var legendVisibility = { 0: true, 1: true, 2: true, 3: true, 4: true, 5: true };
+
   function daysSince(date) {
     return (date.getTime() - GENESIS.getTime()) / (1000 * 60 * 60 * 24);
   }
@@ -756,6 +763,15 @@
       }
     ];
 
+    // Apply user-selected legend visibility to the freshly rebuilt datasets.
+    // Slider changes call renderChart() which rebuilds this array from scratch,
+    // so the user's toggle state would reset on every interaction without this
+    // step. Hidden datasets remain in the array (so the y-axis bounds below
+    // stay stable across toggles) — they just won't draw.
+    for (var vIdx = 0; vIdx < datasets.length; vIdx++) {
+      if (legendVisibility[vIdx] === false) datasets[vIdx].hidden = true;
+    }
+
     var verticalLines = [
       { x: startYear, label: 'Today', color: 'rgba(224,148,34,0.45)', labelColor: '#e09422' },
       { x: SCENARIO.retirementYear, label: 'Retirement (' + SCENARIO.retirementYear + ')', color: 'rgba(236,228,214,0.35)', labelColor: '#ece4d6' }
@@ -1146,12 +1162,49 @@
     });
   }
 
+  // ─── Interactive legend wiring
+  // Each .legend-item has a data-dataset-idx mapping to its position in the
+  // chart.data.datasets array. Click or Enter/Space toggles visibility on
+  // both sides — the chart hides the dataset via setDatasetVisibility(),
+  // and the row gets a .off class for the dimmed visual treatment.
+  // Help-tip clicks inside a legend item are excluded (they have their own
+  // hover/focus behavior — the ? should never toggle the line).
+  function wireLegendToggles() {
+    var items = document.querySelectorAll('.projection-legend .legend-item[data-dataset-idx]');
+    items.forEach(function(item){
+      function toggle() {
+        var idx = parseInt(item.getAttribute('data-dataset-idx'), 10);
+        if (isNaN(idx)) return;
+        var nowVisible = !legendVisibility[idx];
+        legendVisibility[idx] = nowVisible;
+        item.classList.toggle('off', !nowVisible);
+        item.setAttribute('aria-pressed', nowVisible ? 'true' : 'false');
+        if (chart) {
+          chart.setDatasetVisibility(idx, nowVisible);
+          chart.update('none');
+        }
+      }
+      item.addEventListener('click', function(e){
+        if (e.target.closest('.help-tip')) return;
+        toggle();
+      });
+      item.addEventListener('keydown', function(e){
+        if (e.target.closest('.help-tip')) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle();
+        }
+      });
+    });
+  }
+
   // ─── Initial run
   wireSliders();
   // Reconcile defaults: income held; derive withdrawal rate from current
   // stack-at-retirement so the visible values are internally consistent.
   recomputeCoupledFromIncomeOrMeans();
   renderChart();
+  wireLegendToggles();
   updateSustainability();
   fetchLiveBtcPrice();
 })();
