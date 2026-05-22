@@ -1508,6 +1508,43 @@
   // The channel viz's forward-projection datasets stay empty by
   // initial config.)
 
+  // ─── Interactive-legend wiring
+  // Each .dr-legend-item has a data-dataset-idx attribute mapping to its
+  // position in chart.data.datasets (matches the DS index map above).
+  // Click or Enter/Space toggles visibility on both sides — the chart
+  // hides the dataset via setDatasetVisibility(), and the row gets a
+  // .off class for the dimmed visual treatment. Chart.js stores the
+  // hidden state on each dataset's meta object, which persists through
+  // chart.data.datasets[X].data mutations + chart.update('none') (the
+  // page's update path for slider drags), so no separate state object
+  // is needed here. Help-tip clicks inside legend items are excluded so
+  // the ? affordance remains its own interaction.
+  (function wireDrLegendToggles(){
+    var items = document.querySelectorAll('.dr-channel-legend .dr-legend-item[data-dataset-idx]');
+    items.forEach(function(item){
+      function toggle(){
+        var idx = parseInt(item.getAttribute('data-dataset-idx'), 10);
+        if (isNaN(idx) || !chart) return;
+        var nowVisible = !chart.isDatasetVisible(idx);
+        chart.setDatasetVisibility(idx, nowVisible);
+        chart.update('none');
+        item.classList.toggle('off', !nowVisible);
+        item.setAttribute('aria-pressed', nowVisible ? 'true' : 'false');
+      }
+      item.addEventListener('click', function(e){
+        if (e.target.closest('.dr-tt')) return;
+        toggle();
+      });
+      item.addEventListener('keydown', function(e){
+        if (e.target.closest('.dr-tt')) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle();
+        }
+      });
+    });
+  })();
+
 })();
 
 // ═══════ CALCULATOR ═══════
@@ -1757,4 +1794,244 @@
   loadStickyValues();
   updateReadouts();
   // Don't auto-run until user enters a stack value (privacy: no implicit re-runs with default stack)
+})();
+
+
+// ═══════ SCENARIO URL SYNC ═══════
+// URL ⇄ input state for DR's scenario. Same pattern as the Retirement
+// page (see SITE_GUIDE §17.5 + the addendum): a shared link reproduces
+// the sender's slider configuration when opened, and the URL stays in
+// sync as the user drags.
+//
+// DR's params extend the canonical schema with its own slider keys:
+//   sell    sell percentile (integer 60–95)
+//   rebuy   rebuy percentile (integer 5–55)
+//   tax     tax rate (integer 0–40)
+//   account 'retirement' or 'regular'
+// Unknown params (e.g. Retirement's `stack=`, `income=`) are preserved
+// on the URL untouched per the §17.5 forward-compat convention.
+//
+// Self-contained IIFE; no closure access to the calculator IIFE above.
+// Drives state changes by setting input.value + dispatching 'input',
+// which the existing calculator listeners (thresholds, backtest,
+// channel chart) pick up via their established event paths.
+(function(){
+  var URL_MAP = {
+    sell:  { elId: 'drSellPct',  defaultVal: 80 },
+    rebuy: { elId: 'drRebuyPct', defaultVal: 50 },
+    tax:   { elId: 'drTaxRate',  defaultVal: 15 }
+  };
+  var ACCOUNT_DEFAULT = 'retirement';
+
+  // Suppression flag: when applying URL params we dispatch synthetic
+  // 'input' events to refresh dependent UI; we don't want those events
+  // to bounce back into the writer and re-stringify what we just read.
+  var _suppressWriter = false;
+
+  function clampInt(val, min, max) {
+    return Math.max(min, Math.min(max, Math.round(val)));
+  }
+
+  function readUrlIntoInputs() {
+    if (!window.URLSearchParams) return;
+    var params = new URLSearchParams(window.location.search);
+    _suppressWriter = true;
+    try {
+      Object.keys(URL_MAP).forEach(function(p){
+        if (!params.has(p)) return;
+        var raw = params.get(p);
+        var num = parseFloat(raw);
+        if (!isFinite(num)) return;
+        var entry = URL_MAP[p];
+        var el = document.getElementById(entry.elId);
+        if (!el) return;
+        var clamped = clampInt(num, parseFloat(el.min), parseFloat(el.max));
+        el.value = String(clamped);
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      if (params.has('account')) {
+        var acct = params.get('account');
+        if (acct === 'retirement' || acct === 'regular') {
+          // Click the matching account button so the calculator IIFE's
+          // existing handler (setAccountType) runs — which updates UI,
+          // saves localStorage, and re-runs the backtest.
+          var btn = document.querySelector('[data-account="' + acct + '"]');
+          if (btn && !btn.classList.contains('active')) btn.click();
+        }
+      }
+    } finally {
+      _suppressWriter = false;
+    }
+  }
+
+  function getActiveAccount() {
+    var active = document.querySelector('[data-account].active');
+    return active ? active.getAttribute('data-account') : ACCOUNT_DEFAULT;
+  }
+
+  function syncUrl() {
+    if (!window.URLSearchParams || !window.history || !window.history.replaceState) return;
+    var params = new URLSearchParams(window.location.search);
+
+    Object.keys(URL_MAP).forEach(function(p){
+      var entry = URL_MAP[p];
+      var el = document.getElementById(entry.elId);
+      if (!el) return;
+      var val = parseInt(el.value, 10);
+      if (!isFinite(val) || val === entry.defaultVal) {
+        params.delete(p);
+      } else {
+        params.set(p, String(val));
+      }
+    });
+
+    var acct = getActiveAccount();
+    if (acct === ACCOUNT_DEFAULT) {
+      params.delete('account');
+    } else {
+      params.set('account', acct);
+    }
+
+    var qs = params.toString();
+    var newUrl = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
+    window.history.replaceState(null, '', newUrl);
+  }
+
+  var _t = null;
+  function scheduleSyncUrl() {
+    if (_suppressWriter) return;
+    if (_t) clearTimeout(_t);
+    _t = setTimeout(syncUrl, 220);
+  }
+
+  function wireWriters() {
+    Object.keys(URL_MAP).forEach(function(p){
+      var entry = URL_MAP[p];
+      var el = document.getElementById(entry.elId);
+      if (el) el.addEventListener('input', scheduleSyncUrl);
+    });
+    document.querySelectorAll('[data-account]').forEach(function(btn){
+      btn.addEventListener('click', scheduleSyncUrl);
+    });
+    // Presets change sell/rebuy programmatically and dispatch 'input',
+    // so the slider listeners above pick those up. No separate hook.
+  }
+
+  function init() {
+    if (!document.getElementById('drSellPct')) return;
+    readUrlIntoInputs();
+    wireWriters();
+    syncUrl(); // normalize URL once on init — drops invalid params,
+               // promotes any non-default localStorage values into the URL
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+
+// ═══════ SHARE THIS SCENARIO ═══════
+// Discoverable share affordance with two functionally-distinct groups
+// (same pattern as the Retirement page; see STYLE_GUIDE §6.26):
+//   1. SHARE THIS SCENARIO  → scenario URL (currentUrl)  → Copy, Native
+//   2. SHARE THE PAGE       → generic URL (genericPageUrl) → X, LI, FB
+// Splitting these prevents accidental publication of personal scenario
+// numbers when a user clicks a social button meaning to promote the page.
+(function(){
+  var SHARE_TITLE = 'Disciplined rebalancing of bitcoin — within the Power Law channel.';
+
+  function currentUrl() { return window.location.href; }
+  function genericPageUrl() {
+    return window.location.origin + window.location.pathname + window.location.hash;
+  }
+
+  function showCopiedFeedback(btn) {
+    var labelEl = btn.querySelector('.share-btn-label');
+    if (!labelEl) return;
+    var original = labelEl.textContent;
+    labelEl.textContent = 'Copied';
+    btn.classList.add('share-btn-copied');
+    setTimeout(function(){
+      labelEl.textContent = original;
+      btn.classList.remove('share-btn-copied');
+    }, 1800);
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'absolute';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function bindCopy() {
+    var btn = document.getElementById('shareCopy');
+    if (!btn) return;
+    btn.addEventListener('click', function(){
+      var url = currentUrl();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(
+          function(){ showCopiedFeedback(btn); },
+          function(){ if (fallbackCopy(url)) showCopiedFeedback(btn); }
+        );
+      } else if (fallbackCopy(url)) {
+        showCopiedFeedback(btn);
+      }
+    });
+  }
+
+  function bindIntentButton(id, urlGetter, urlBuilder) {
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var shareUrl = urlBuilder(urlGetter());
+      window.open(shareUrl, '_blank', 'noopener,noreferrer,width=620,height=540');
+    });
+  }
+
+  function bindNativeShare() {
+    var btn = document.getElementById('shareNative');
+    if (!btn || !navigator.share) return;
+    btn.hidden = false;
+    btn.addEventListener('click', function(){
+      navigator.share({
+        title: 'Disciplined rebalancing',
+        text: SHARE_TITLE,
+        url: currentUrl()
+      }).catch(function(){ /* user cancelled — silent */ });
+    });
+  }
+
+  function wireShareSection() {
+    if (!document.getElementById('shareSection')) return;
+    bindCopy();
+    bindNativeShare();
+    bindIntentButton('shareTwitter', genericPageUrl, function(url){
+      return 'https://twitter.com/intent/tweet?url=' +
+        encodeURIComponent(url) + '&text=' + encodeURIComponent(SHARE_TITLE);
+    });
+    bindIntentButton('shareLinkedIn', genericPageUrl, function(url){
+      return 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(url);
+    });
+    bindIntentButton('shareFacebook', genericPageUrl, function(url){
+      return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wireShareSection);
+  } else {
+    wireShareSection();
+  }
 })();

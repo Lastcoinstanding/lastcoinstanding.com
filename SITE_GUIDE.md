@@ -669,6 +669,19 @@ The Retirement page is the entry point for two sibling-page strategies — Borro
 
 **Shareable scenario URL on Retirement itself.** Added 2026-05-22. The same schema now also drives the Retirement page's own URL: on init the reader applies any URL params to `SCENARIO` before the first render; on every slider change a debounced (`~220ms`) `history.replaceState` rewrites the address bar to reflect current state. Defaults are omitted from the URL — a clean `/the-bitcoin-retirement.html` represents the default scenario, only the user's deviations show as query params. `withdraw` is intentionally skipped in the *writer* (though still accepted in the reader for forward-compat) because the rate is a derived value that gets reconciled locally from income+stack+baselines; including it would produce URL cruft like `?withdraw=6.7` on a fresh load. Baseline assumptions remain out of scope per the original §17.5 contract — they carry across pages via `localStorage`, not the URL.
 
+**Shareable scenario URL on Disciplined Rebalancing.** Added 2026-05-22. DR adopts the same pattern with its own page-local schema (DR has no `stack`/`income`/etc. surface):
+
+| Param | Type | Source input | Notes |
+|---|---|---|---|
+| `sell` | integer | `slider-drSellPct` | Sell percentile (60–95, default 80) |
+| `rebuy` | integer | `slider-drRebuyPct` | Rebuy percentile (5–55, default 50) |
+| `tax` | integer | `slider-drTaxRate` | Effective cap-gains rate (0–40, default 15) |
+| `account` | enum | `[data-account].active` | `retirement` (default) or `regular` |
+
+Reader runs on `DOMContentLoaded`, AFTER the calculator IIFE's `loadStickyValues()` (so URL params override localStorage rather than being overwritten by it); writer is debounced ~220ms on slider `input` and account-button `click`. Account button changes go through the existing `setAccountType()` handler (the reader programmatically `.click()`s the matching button rather than re-implementing the toggle's side effects).
+
+Unknown params (including Retirement's `stack`/`income`/etc. when a user navigates between sibling pages) are preserved on the URL untouched — `URLSearchParams.set/delete` only touches keys explicitly in DR's schema, leaving everything else as-is. This keeps the cross-page carry-over working in both directions even when each page only writes its own schema.
+
 ### Voice / editorial register
 
 Editorial-tier per `STYLE_GUIDE §1` (it has prose tabs); typography matches §2.1 canonical with Inter body and Cormorant display. Voice calibrated against the user's *Bitcoin Migration* essay: long structured sentences with semicolons; italicized conceptual emphasis on terms like *structurally*, *contextual not computational*, *delays*; concession-and-pivot moves; sober, intelligent register; no jargon-as-drama.

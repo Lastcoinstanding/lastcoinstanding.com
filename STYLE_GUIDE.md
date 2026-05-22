@@ -1571,6 +1571,8 @@ Copy uses `navigator.clipboard.writeText` with an `execCommand` fallback for leg
 
 Pages where it probably doesn't earn space: pure-prose pages with no interactive state to share, or pages whose primary CTA is something else (e.g. a checkout or a sign-up). For those, a generic page-level share button at the top or in the footer might be more appropriate; the `share-section` is for *scenario sharing*, not generic page promotion.
 
+**Where it's used.** Retirement (canonical home) and Disciplined Rebalancing (2026-05-22) — both place the section between the page's primary result surface and a denouement editorial block (Baseline Assumptions on Retirement; Failure Modes on DR). The right-hand group's eyebrow varies slightly per page register — *"Share the calculator"* on Retirement reads as natural; on DR the surface is more analytic than calculator-like so *"Share the page"* fits better. The pattern accommodates that copy flex without changing the markup or CSS structure.
+
 ### Naming convention reminder
 
 Several patterns above follow the convention `{purpose}-{role}`: `calc-mode-*`, `porkopolis-credit*`, `channel-*`, `start-input-*`. When introducing future patterns, prefer this convention over generic names like `.toggle` or `.controls` to avoid collisions across pages. Recipes §6.20–6.25 above were introduced on BvSM in May 2026 and are currently page-scoped (`.bvsm-section-eyebrow`, `.bvsm-as-of-callout`, etc. in the live page CSS); the recipe names above use the unprefixed canonical form. When a second consumer of any of these patterns arrives, promote the CSS into the shared layer and drop the prefix.

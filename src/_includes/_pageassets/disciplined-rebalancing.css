@@ -867,6 +867,95 @@ input[type="range"]::-moz-range-track {
 }
 .dr-methodology-note strong { color: var(--text-dim); font-weight: 500; }
 
+/* ═══════ SHARE SECTION ═══════
+ * Discoverable affordance for the scenario-laden URL (DR's URL sync
+ * is in the calculator IIFE). Two functionally-distinct groups:
+ *   - Share this scenario  → scenario URL → Copy link, Native share
+ *   - Share the page       → generic URL  → X, LinkedIn, Facebook
+ * Pattern documented in STYLE_GUIDE §6.26. Class names are page-
+ * agnostic so the markup + IIFE lift cleanly from the Retirement page. */
+.share-section {
+    margin-top: 1.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+.share-groups {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 2.5rem;
+}
+@media (max-width: 720px) {
+    .share-groups {
+        grid-template-columns: 1fr;
+        gap: 1.75rem;
+    }
+}
+.share-group-header {
+    margin-bottom: 0.85rem;
+}
+.share-group-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.4rem;
+}
+.share-group-help {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+    line-height: 1.5;
+}
+.share-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.9rem;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    line-height: 1;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.share-btn:hover,
+.share-btn:focus-visible {
+    background: rgba(224, 148, 34, 0.08);
+    border-color: rgba(224, 148, 34, 0.4);
+    color: var(--text);
+    outline: none;
+}
+.share-btn:active {
+    transform: translateY(1px);
+}
+.share-btn .share-icon {
+    flex-shrink: 0;
+}
+.share-btn-copied {
+    background: rgba(224, 148, 34, 0.14);
+    border-color: var(--amber);
+    color: var(--amber);
+}
+.share-btn-copied:hover {
+    background: rgba(224, 148, 34, 0.14);
+    color: var(--amber);
+}
+.share-btn-native[hidden] {
+    display: none;
+}
+
 /* ═══════ FAILURE MODES SECTION ═══════
  * Honest disclosure of how the strategy can underperform. Visually
  * distinct from .dr-methodology-note (which is a methodology note,
@@ -1225,6 +1314,37 @@ input[type="range"]::-moz-range-track {
     border-top: 1px solid var(--border);
     font-size: 0.78rem;
     color: var(--text-muted);
+}
+/* Interactive legend — click any item to toggle the corresponding dataset
+   on the channel chart. Pattern matches the Retirement page (STYLE_GUIDE
+   §6.something pending; behavior contract is the .off class). The hint
+   spans the full flex row so it sits above the items rather than inline. */
+.dr-legend-hint {
+    flex-basis: 100%;
+    font-size: 0.72rem;
+    font-style: italic;
+    color: var(--text-muted);
+    margin-bottom: -0.4rem;
+}
+.dr-legend-item {
+    cursor: pointer;
+    user-select: none;
+    border-radius: 2px;
+    transition: color 0.15s ease;
+}
+.dr-legend-item:hover {
+    color: var(--text);
+}
+.dr-legend-item:focus-visible {
+    outline: 1px solid rgba(224, 148, 34, 0.55);
+    outline-offset: 3px;
+}
+.dr-legend-item.off {
+    color: var(--text-muted);
+}
+.dr-legend-item.off .dr-legend-swatch,
+.dr-legend-item.off .dr-legend-glyph {
+    opacity: 0.22;
 }
 .dr-swatch-floor    { background: var(--red);    width: 14px; height: 0; border-top: 1.5px dashed var(--red); }
 .dr-swatch-trend    { background: var(--amber);  width: 14px; height: 2.5px; border-radius: 1px; }
