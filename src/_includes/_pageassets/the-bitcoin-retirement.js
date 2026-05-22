@@ -1083,6 +1083,93 @@
     valEl.textContent = cfg.fmt(SCENARIO[key]);
   }
 
+  // ─── URL ⇄ SCENARIO sync — shareable scenario state
+  // Same schema as the sibling-page carry-over (see SITE_GUIDE §17.5).
+  // The page URL becomes the canonical address of any configuration the
+  // user has dialed in: copying the address bar gives a link that, when
+  // opened, reproduces the exact slider state.
+  //
+  // Reader runs once at init (before sliders are wired) so SCENARIO is
+  // populated from the URL before any DOM sync. Writer fires after every
+  // slider change, debounced ~220ms so drags don't spam history. Defaults
+  // are omitted from the URL — a clean `/the-bitcoin-retirement` represents
+  // the default scenario, and only the user's deviations show up as params.
+  //
+  // Baseline assumptions (inflation, growth model, real returns) live in
+  // localStorage via ModelingAssumptions and are deliberately out of scope
+  // — per §17.5, the URL covers only page-local Retirement state.
+  var SCENARIO_URL_MAP = {
+    stack:    { key: 'btcStack',          isInt: false, decimals: 1 },
+    retire:   { key: 'retirementYear',    isInt: true },
+    income:   { key: 'targetIncomeUSD',   isInt: true },
+    years:    { key: 'yearsInRetirement', isInt: true },
+    dca:      { key: 'monthlyDcaUSD',     isInt: true },
+    withdraw: { key: 'withdrawalRatePct', isInt: false, decimals: 1 }
+  };
+  // Snapshot the as-built defaults so the writer can omit unchanged values.
+  // Deep clone via JSON round-trip — SCENARIO holds only primitives so this
+  // is safe and concise.
+  var SCENARIO_DEFAULTS_SNAPSHOT = JSON.parse(JSON.stringify(SCENARIO));
+
+  // Reader: parses URL search params, validates against slider min/max,
+  // applies clamped values to SCENARIO. Called once at init, before the
+  // sliders are wired so the DOM sync inside wireSliders() picks up the
+  // URL-provided values.
+  function readUrlParamsIntoScenario() {
+    if (!window.URLSearchParams) return;
+    var params = new URLSearchParams(window.location.search);
+    Object.keys(SCENARIO_URL_MAP).forEach(function(p){
+      if (!params.has(p)) return;
+      var raw = params.get(p);
+      var num = parseFloat(raw);
+      if (!isFinite(num)) return;
+      var entry = SCENARIO_URL_MAP[p];
+      var cfg = SLIDER_BY_KEY[entry.key];
+      if (!cfg) return;
+      var clamped = clamp(num, cfg.min, cfg.max);
+      if (entry.isInt) clamped = Math.round(clamped);
+      else clamped = Math.round(clamped * 10) / 10; // 1-decimal step precision
+      SCENARIO[entry.key] = clamped;
+    });
+  }
+
+  // Writer: serializes SCENARIO into URL query string via replaceState
+  // (no history pollution, no scroll, no re-load). Debounced through
+  // scheduleUrlSync below.
+  //
+  // `withdraw` is intentionally skipped in the writer even though the reader
+  // accepts it: the rate is a *derived* value (income / stack-at-retirement,
+  // post-reconcile) and including it would produce URL cruft like
+  // `?withdraw=6.7` on a fresh page load. The receiver reproduces the rate
+  // from income+stack+baselines locally, which is the more honest behavior
+  // anyway when baselines may differ between sender and receiver.
+  function syncUrlFromScenario() {
+    if (!window.URLSearchParams || !window.history || !window.history.replaceState) return;
+    var params = new URLSearchParams(window.location.search);
+    Object.keys(SCENARIO_URL_MAP).forEach(function(p){
+      if (p === 'withdraw') { params.delete(p); return; }
+      var entry = SCENARIO_URL_MAP[p];
+      var val = SCENARIO[entry.key];
+      var defVal = SCENARIO_DEFAULTS_SNAPSHOT[entry.key];
+      // Round to slider step precision before comparing to default — coupling
+      // math can produce non-step floats that would otherwise never match.
+      var rounded = entry.isInt ? Math.round(val) : Math.round(val * 10) / 10;
+      if (rounded === defVal) {
+        params.delete(p);
+      } else {
+        params.set(p, entry.isInt ? String(rounded) : rounded.toFixed(entry.decimals || 1));
+      }
+    });
+    var qs = params.toString();
+    var newUrl = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
+    window.history.replaceState(null, '', newUrl);
+  }
+  var _urlSyncTimer = null;
+  function scheduleUrlSync() {
+    if (_urlSyncTimer) clearTimeout(_urlSyncTimer);
+    _urlSyncTimer = setTimeout(syncUrlFromScenario, 220);
+  }
+
   function recomputeCoupledFromIncomeOrMeans() {
     // Income held; rate derived from current stack value
     var growthModel = window.ModelingAssumptions.get('btcGrowthModel');
@@ -1222,6 +1309,7 @@
         if (cfg.updates === 'rate') recomputeCoupledFromIncomeOrMeans();
         else if (cfg.updates === 'income') recomputeCoupledFromRate();
         scheduleRender();
+        scheduleUrlSync();
       });
     });
   }
@@ -1272,14 +1360,26 @@
   }
 
   // ─── Initial run
+  // 1. Apply URL params to SCENARIO (if any) — must happen BEFORE wireSliders
+  //    so input.value gets the URL-provided values when the DOM syncs from
+  //    SCENARIO inside wireSliders().
+  readUrlParamsIntoScenario();
   wireSliders();
-  // Reconcile defaults: income held; derive withdrawal rate from current
-  // stack-at-retirement so the visible values are internally consistent.
+  // 2. Reconcile defaults: income held; derive withdrawal rate from current
+  //    stack-at-retirement so the visible values are internally consistent.
+  //    Runs unconditionally — the URL transmits user-set inputs (stack,
+  //    income, years, dca); the rate is derived locally so a receiver with
+  //    different baseline assumptions sees a self-consistent rate display.
   recomputeCoupledFromIncomeOrMeans();
   renderChart();
   wireLegendToggles();
   updateSustainability();
   fetchLiveBtcPrice();
+  // 3. Normalize the URL — drops any out-of-range or unrecognized params,
+  //    ensures the address bar reflects the actual rendered state. Runs
+  //    immediately (not via scheduleUrlSync) so the URL is correct from
+  //    the first frame.
+  syncUrlFromScenario();
 })();
 
 /* ════════════════════════════════════════════════════════════════
