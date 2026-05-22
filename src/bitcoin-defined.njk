@@ -1,0 +1,56 @@
+---
+layout: base.njk
+permalink: /bitcoin-defined.html
+slug: bitcoin-defined
+related:
+  - slug: synthesis
+    desc: "The mechanistic counterpart to this page. Synthesis asks what Bitcoin is made of and what breaks if any component is removed; this page asks what each word in the definition does."
+  - slug: what-money-has-to-be
+    desc: "The requirements side of the definition. Why these properties matter at all — because money has to do three things at once, and only this configuration can."
+  - slug: what-bitcoin-is
+    desc: "A complementary view from the dimensional angle: Bitcoin as asset, network, technology, and money simultaneously rather than reduced to any single one."
+  - slug: the-bitcoin-migration
+    desc: "Once the definition lands, the practical question follows. The Migration is the case for what to do about it."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/bitcoin-defined-head.html' %}"
+  page_styles: "{% include '_pageassets/bitcoin-defined.css' %}"
+  page_scripts: "{% include '_pageassets/bitcoin-defined.js' %}"
+---
+<div class="page bd-page">
+    <header class="bd-header">
+        <h1>Bitcoin Defined</h1>
+        <p class="subtitle">
+            <span class="line1">A single sentence. Eight load-bearing words.</span>
+            One claim about what Bitcoin actually is.
+        </p>
+    </header>
+
+    {# Sticky sentence — visible during the entire scroll, words light up as cards are revealed #}
+    <div class="bd-sticky-wrap">
+        <div class="bd-sticky-sentence" id="bdStickySentence" aria-label="Bitcoin definition, building as you progress">
+            <span class="bd-fixed">The Bitcoin&nbsp;</span><span class="bd-word" data-word="network" id="word-network">network</span><span class="bd-fixed">&nbsp;is the&nbsp;</span><span class="bd-word" data-word="open" id="word-open">open</span><span class="bd-fixed">,&nbsp;</span><span class="bd-word" data-word="permissionless" id="word-permissionless">permissionless</span><span class="bd-fixed">,&nbsp;</span><span class="bd-word" data-word="decentralized" id="word-decentralized">decentralized</span><span class="bd-fixed">,&nbsp;</span><span class="bd-word" data-word="secure" id="word-secure">secure</span><span class="bd-fixed">&nbsp;</span><span class="bd-word" data-word="protocol" id="word-protocol">protocol</span><span class="bd-fixed">&nbsp;&mdash;&nbsp;</span><span class="bd-word" data-word="bounded-by-energy" id="word-bounded-by-energy">bounded by energy</span><span class="bd-fixed">,&nbsp;</span><span class="bd-word" data-word="absolutely-scarce" id="word-absolutely-scarce">absolutely scarce</span><span class="bd-fixed">.</span>
+        </div>
+        <div class="bd-progress" id="bdProgress" aria-hidden="true">
+            <span id="bdProgressCount">0</span> of 8 revealed
+        </div>
+    </div>
+
+    <main class="bd-cards" id="bdCards">
+        {# Cards rendered by JS from data in bitcoin-defined.js — keeps content and structure in one place #}
+    </main>
+
+    {# Final-state section — only revealed after all 8 cards have been clicked through #}
+    <section class="bd-final" id="bdFinal" aria-hidden="true">
+        <div class="bd-final-inner">
+            <p class="bd-final-eyebrow">The full definition</p>
+            <p class="bd-final-sentence">The Bitcoin <em>network</em> is the <em>open</em>, <em>permissionless</em>, <em>decentralized</em>, <em>secure</em> <em>protocol</em> &mdash; <em>bounded by energy</em>, <em>absolutely scarce</em>.</p>
+            <div class="bd-final-reflection">
+                <p>Eight words. Each one load-bearing. None of them ornamental.</p>
+                <p>Remove any one and you no longer have Bitcoin &mdash; you have something else, weaker in a specific, instructive way. The configuration is what produces the money. There has never been one quite like it.</p>
+            </div>
+        </div>
+    </section>
+
+    {% include 'components/related.njk' %}
+    {% include 'components/companion-content.njk' %}
+</div>

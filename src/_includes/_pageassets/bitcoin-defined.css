@@ -1,0 +1,414 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Bitcoin Defined — page-scoped styles
+   Sticky sentence at top, scrolling cards below, glowing final reveal.
+   Tokens align with the site's existing dark + amber palette.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.bd-page {
+    --bd-bg: #080808;
+    --bd-card-bg: #0d0d0d;
+    --bd-card-border: rgba(247,147,26,0.08);
+    --bd-amber: #F7931A;
+    --bd-amber-soft: #e09422;
+    --bd-amber-glow: rgba(247,147,26,0.32);
+    --bd-text: #e8e0d5;
+    --bd-text-dim: rgba(232,224,213,0.55);
+    --bd-word-grey: rgba(255,255,255,0.16);
+    --bd-word-pending: rgba(232,224,213,0.55);
+    color: var(--bd-text);
+    background: var(--bd-bg);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Header ─── */
+.bd-page .bd-header {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 4.5rem 1.5rem 1.5rem;
+    text-align: center;
+}
+.bd-page .bd-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--bd-text);
+    margin: 0 0 1.1rem;
+}
+.bd-page .bd-header .subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(1.05rem, 2vw, 1.3rem);
+    color: var(--bd-text-dim);
+    line-height: 1.5;
+    max-width: 640px;
+    margin: 0 auto;
+}
+.bd-page .bd-header .subtitle .line1 {
+    display: block;
+    color: var(--bd-amber-soft);
+    font-style: italic;
+    margin-bottom: 0.25rem;
+}
+
+/* ─── Sticky sentence ─── */
+.bd-sticky-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: linear-gradient(180deg, var(--bd-bg) 0%, var(--bd-bg) 85%, rgba(8,8,8,0.92) 100%);
+    border-bottom: 1px solid rgba(247,147,26,0.06);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 1.5rem 1.2rem 1.1rem;
+    margin-top: 2.5rem;
+    transition: padding 0.4s ease;
+}
+.bd-sticky-sentence {
+    max-width: 1100px;
+    margin: 0 auto;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+    line-height: 1.55;
+    text-align: center;
+    letter-spacing: 0.005em;
+    color: var(--bd-text);
+}
+.bd-sticky-sentence .bd-fixed {
+    color: var(--bd-word-grey);
+    transition: color 0.6s ease;
+}
+.bd-sticky-sentence .bd-word {
+    color: var(--bd-word-grey);
+    transition: color 0.6s ease, text-shadow 0.6s ease;
+    font-weight: 500;
+    position: relative;
+}
+/* The active (next-to-be-revealed) word pulses subtly to signal it's the target */
+.bd-sticky-sentence .bd-word.bd-active {
+    color: var(--bd-word-pending);
+}
+.bd-sticky-sentence .bd-word.bd-active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--bd-amber-soft) 50%, transparent 100%);
+    opacity: 0.6;
+    animation: bd-pulse 2.4s ease-in-out infinite;
+}
+@keyframes bd-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.85; }
+}
+/* Revealed words: full amber, soft glow when sentence completes */
+.bd-sticky-sentence .bd-word.bd-revealed {
+    color: var(--bd-amber-soft);
+}
+.bd-sticky-sentence.bd-complete .bd-word.bd-revealed {
+    color: var(--bd-amber);
+    text-shadow: 0 0 18px var(--bd-amber-glow);
+}
+.bd-sticky-sentence.bd-complete .bd-fixed {
+    color: var(--bd-text);
+}
+
+/* Progress counter under sticky sentence */
+.bd-progress {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.66rem;
+    color: rgba(232,224,213,0.32);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-align: center;
+    margin-top: 0.7rem;
+}
+.bd-progress.bd-progress-complete {
+    color: var(--bd-amber-soft);
+}
+
+/* ─── Cards section ─── */
+.bd-cards {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 3rem 1.2rem 2rem;
+}
+.bd-card {
+    background: var(--bd-card-bg);
+    border: 1px solid var(--bd-card-border);
+    border-radius: 14px;
+    padding: 2.5rem 2rem;
+    margin-bottom: 2.5rem;
+    opacity: 0.34;
+    filter: saturate(0.6);
+    transition: opacity 0.7s ease, filter 0.7s ease, border-color 0.7s ease, box-shadow 0.7s ease;
+    pointer-events: none;
+}
+.bd-card.bd-card-active {
+    opacity: 1;
+    filter: saturate(1);
+    border-color: rgba(247,147,26,0.18);
+    box-shadow: 0 12px 40px -20px var(--bd-amber-glow);
+    pointer-events: auto;
+}
+.bd-card.bd-card-revealed {
+    opacity: 1;
+    filter: saturate(1);
+    border-color: rgba(247,147,26,0.10);
+    pointer-events: auto;
+}
+
+/* Card image slot — placeholder uses gradient + concept SVG. Real Grok Imagine
+   stills will swap in via the .bd-card-image background-image once available. */
+.bd-card-image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1a0f08 0%, #2a1810 35%, #3d2210 70%, #1a0d05 100%);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.bd-card-image::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 40%, rgba(247,147,26,0.14) 0%, transparent 60%);
+    pointer-events: none;
+}
+.bd-card-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 70% 70%, rgba(247,147,26,0.08) 0%, transparent 55%);
+    pointer-events: none;
+}
+.bd-card-image svg {
+    position: relative;
+    z-index: 2;
+    width: clamp(180px, 38%, 280px);
+    height: auto;
+    opacity: 0.85;
+    filter: drop-shadow(0 4px 24px rgba(247,147,26,0.18));
+}
+/* Note: When a real image is loaded, the parent gets .bd-card-image-loaded,
+   and the inline SVG fades out via this rule. */
+.bd-card-image-loaded { background-size: cover; background-position: center; }
+.bd-card-image-loaded::before, .bd-card-image-loaded::after { display: none; }
+.bd-card-image-loaded svg { display: none; }
+
+/* Card content */
+.bd-card-eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    color: var(--bd-amber-soft);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin: 0 0 0.7rem;
+    font-weight: 500;
+}
+.bd-card-word {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(2.8rem, 6vw, 4.5rem);
+    line-height: 1;
+    color: var(--bd-amber);
+    margin: 0 0 1.5rem;
+    letter-spacing: -0.01em;
+}
+.bd-card-definition {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    line-height: 1.5;
+    color: var(--bd-text);
+    margin: 0 0 1.4rem;
+    letter-spacing: 0.005em;
+}
+.bd-card-elaboration {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.98rem, 1.5vw, 1.05rem);
+    line-height: 1.72;
+    color: rgba(232,224,213,0.78);
+    margin: 0 0 2rem;
+}
+.bd-card-elaboration p {
+    margin: 0 0 1rem;
+}
+.bd-card-elaboration p:last-child {
+    margin: 0;
+}
+
+/* Continue button */
+.bd-card-cta-wrap {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+}
+.bd-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(247,147,26,0.08);
+    border: 1px solid rgba(247,147,26,0.32);
+    border-radius: 999px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.84rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--bd-amber);
+    cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+    user-select: none;
+}
+.bd-card-cta:hover {
+    background: rgba(247,147,26,0.14);
+    border-color: rgba(247,147,26,0.5);
+    transform: translateY(-1px);
+}
+.bd-card-cta:active {
+    transform: translateY(0);
+}
+.bd-card-cta-arrow {
+    font-size: 0.92rem;
+    line-height: 1;
+}
+/* Only the currently-active card shows its CTA. Once revealed, the CTA is replaced
+   with a quiet "revealed" marker. */
+.bd-card .bd-card-cta { display: none; }
+.bd-card.bd-card-active .bd-card-cta { display: inline-flex; }
+.bd-card .bd-card-revealed-marker { display: none; }
+.bd-card.bd-card-revealed .bd-card-revealed-marker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    color: rgba(247,147,26,0.55);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+.bd-card .bd-card-revealed-marker::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--bd-amber-soft);
+}
+
+/* ─── Final state ─── */
+.bd-final {
+    max-width: 980px;
+    margin: 3rem auto 5rem;
+    padding: 4rem 1.5rem;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1.2s ease, transform 1.2s ease;
+    pointer-events: none;
+}
+.bd-final.bd-final-active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+.bd-final-inner {
+    background: linear-gradient(180deg, rgba(247,147,26,0.04) 0%, rgba(247,147,26,0.01) 100%);
+    border: 1px solid rgba(247,147,26,0.18);
+    border-radius: 16px;
+    padding: 3.5rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+.bd-final-inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(247,147,26,0.10) 0%, transparent 60%);
+    pointer-events: none;
+}
+.bd-final-eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    color: var(--bd-amber-soft);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    margin: 0 0 1.6rem;
+    font-weight: 500;
+    position: relative;
+}
+.bd-final-sentence {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(1.4rem, 3vw, 2.1rem);
+    line-height: 1.45;
+    color: var(--bd-text);
+    margin: 0 auto 2.2rem;
+    max-width: 820px;
+    letter-spacing: 0.005em;
+    position: relative;
+}
+.bd-final-sentence em {
+    font-style: italic;
+    color: var(--bd-amber);
+    text-shadow: 0 0 22px var(--bd-amber-glow);
+    font-weight: 500;
+}
+.bd-final-reflection {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(1.05rem, 1.8vw, 1.22rem);
+    line-height: 1.6;
+    color: var(--bd-text-dim);
+    max-width: 620px;
+    margin: 0 auto;
+    position: relative;
+}
+.bd-final-reflection p {
+    margin: 0 0 1rem;
+}
+.bd-final-reflection p:last-child {
+    margin: 0;
+}
+
+/* ─── Mobile ─── */
+@media (max-width: 720px) {
+    .bd-page .bd-header { padding: 3rem 1.2rem 1rem; }
+    .bd-sticky-wrap { padding: 1rem 0.8rem 0.8rem; margin-top: 1.5rem; }
+    .bd-sticky-sentence { font-size: 1rem; line-height: 1.55; }
+    .bd-cards { padding: 2rem 0.9rem 1rem; }
+    .bd-card { padding: 1.7rem 1.3rem; margin-bottom: 1.8rem; border-radius: 12px; }
+    .bd-card-image { margin-bottom: 1.4rem; aspect-ratio: 4 / 3; }
+    .bd-card-image svg { width: 45%; }
+    .bd-card-word { font-size: 2.4rem; margin-bottom: 1.1rem; }
+    .bd-card-definition { font-size: 1.1rem; margin-bottom: 1.1rem; }
+    .bd-card-elaboration { font-size: 0.95rem; line-height: 1.65; margin-bottom: 1.4rem; }
+    .bd-final { margin: 2rem auto 3.5rem; padding: 2.5rem 1rem; }
+    .bd-final-inner { padding: 2.2rem 1.4rem; border-radius: 14px; }
+    .bd-card-cta-wrap { justify-content: flex-start; flex-wrap: wrap; }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .bd-card, .bd-final, .bd-sticky-sentence .bd-word,
+    .bd-sticky-sentence .bd-fixed, .bd-card-cta {
+        transition: none !important;
+    }
+    .bd-sticky-sentence .bd-word.bd-active::after {
+        animation: none;
+        opacity: 0.6;
+    }
+}

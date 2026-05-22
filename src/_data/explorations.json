@@ -21,6 +21,13 @@
         "is_calculator": false
     },
     {
+        "slug": "bitcoin-defined",
+        "title": "Bitcoin Defined",
+        "category": "foundations",
+        "interactive": true,
+        "is_calculator": false
+    },
+    {
         "slug": "trilemma",
         "title": "The Bitcoin Trilemma",
         "category": "foundations",

@@ -25,6 +25,7 @@ module.exports = function (eleventyConfig) {
     'og-money-trees.jpg',
     'og-not-a-bubble.jpg',
     'og-synthesis.jpg',
+    'og-bitcoin-defined.jpg',
     'og-the-bitcoin-horizon.jpg',
     'og-the-bitcoin-migration.jpg',
     'og-the-fixed-pie.jpg',
