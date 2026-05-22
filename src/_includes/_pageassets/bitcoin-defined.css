@@ -56,7 +56,7 @@
 /* ─── Sticky sentence ─── */
 .bd-sticky-wrap {
     position: sticky;
-    top: 0;
+    top: 65px;  /* sit just below the site-nav which is sticky at top:0, height ~65px */
     z-index: 50;
     background: linear-gradient(180deg, var(--bd-bg) 0%, var(--bd-bg) 85%, rgba(8,8,8,0.92) 100%);
     border-bottom: 1px solid rgba(247,147,26,0.06);

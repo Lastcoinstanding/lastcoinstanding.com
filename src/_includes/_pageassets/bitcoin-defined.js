@@ -158,12 +158,13 @@ function bdApplyState() {
 }
 
 /* Smooth-scroll the next card into a comfortable viewport position. Aim for the
-   card's top to land just below the sticky sentence, with some breathing room. */
+   card's top to land just below the sticky sentence (which itself is offset
+   below the site nav). Total clearance = nav (65px) + sticky-wrap height + breathing room. */
 function bdScrollToCard(index) {
     var card = document.getElementById('bd-card-' + bdWords[index].id);
     if (!card) return;
     var stickyEl = document.querySelector('.bd-sticky-wrap');
-    var offset = stickyEl ? stickyEl.offsetHeight + 24 : 100;
+    var offset = (stickyEl ? stickyEl.offsetHeight : 80) + 65 + 24;
     var rect = card.getBoundingClientRect();
     var targetY = window.scrollY + rect.top - offset;
     window.scrollTo({ top: targetY, behavior: 'smooth' });
@@ -183,7 +184,7 @@ function bdAdvance() {
             if (fin) {
                 var rect = fin.getBoundingClientRect();
                 var stickyEl = document.querySelector('.bd-sticky-wrap');
-                var offset = stickyEl ? stickyEl.offsetHeight + 24 : 100;
+                var offset = (stickyEl ? stickyEl.offsetHeight : 80) + 65 + 24;
                 window.scrollTo({ top: window.scrollY + rect.top - offset, behavior: 'smooth' });
             }
         }, 320);
