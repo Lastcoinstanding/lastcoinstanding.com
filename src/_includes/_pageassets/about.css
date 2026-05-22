@@ -52,6 +52,10 @@
     /* ── SECTIONS ── */
     .about-section {
       margin-bottom: 52px;
+      /* For deep-link anchors (e.g. /about.html#why-usd from calculator
+         page footnotes) so the section header lands clearly below the
+         fixed site nav rather than tucked under it. */
+      scroll-margin-top: 96px;
     }
     .about-section:last-child {
       margin-bottom: 0;

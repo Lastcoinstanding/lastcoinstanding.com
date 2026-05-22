@@ -150,6 +150,37 @@ h1, h2, h3 {
 @media print {
   .page-share { display: none; }
 }
+
+/* ─── USD methodology footnote — see /about.html#why-usd ─── */
+/* Small inline reference link used on calculator pages where dollar
+   amounts are prominent. Editorial-tier callout, not a banner. The
+   message addresses non-US readers directly without disrupting the
+   primary interaction; placement is just above the in-page share
+   section so it sits at the calculator's natural pause point. The
+   arrow link follows the site's "→ Read more" convention. */
+.usd-footnote {
+  text-align: center;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: rgba(255,255,255,0.42);
+  margin: 1.75rem 0 0;
+  line-height: 1.6;
+}
+.usd-footnote a {
+  color: #e09422;
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(224,148,34,0.35);
+  padding-bottom: 1px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.usd-footnote a:hover, .usd-footnote a:focus-visible {
+  color: #F7931A;
+  border-bottom-color: rgba(224,148,34,0.8);
+  outline: none;
+}
+@media print {
+  .usd-footnote { display: none; }
+}
 .related-kind-marker { font-family: 'Inter', sans-serif; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(224,148,34,0.7); margin-bottom: 0.1rem; }
 .related-card.external .related-kind-marker { color: rgba(224,148,34,0.85); }
 .related-interactive-marker { color: #e09422; font-size: 0.85em; opacity: 0.85; margin-left: 1px; vertical-align: 0.05em; }

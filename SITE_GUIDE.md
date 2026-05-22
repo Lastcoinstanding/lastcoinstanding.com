@@ -16,6 +16,16 @@ The voice is **restrained, declarative, and serious**, with quiet purpose and in
 
 Tone the site reaches for: elegiac seriousness. Tone the site avoids: maximalist marketing.
 
+### Denomination: USD is canonical
+
+All dollar figures throughout the site are in USD, intentionally. The full editorial reasoning lives on the About page at `/about.html#why-usd`; the short version for engineering and editorial decisions:
+
+1. **Bitcoin trades primarily against USD.** Order books, historical record, and the Power Law fit are all USD-anchored. Projecting bitcoin's path in any other currency means *also* projecting that currency against USD for the same horizon — adding uncertainty without adding precision.
+2. **USD is the conservative presentation for non-US readers.** For audiences in countries with currencies devaluing faster than USD (which is most of the world), their bitcoin's local purchasing power will grow *faster* than what these numbers show. Converting at today's spot rate would understate, not overstate, bitcoin's case.
+3. **Editorial register matters.** A currency selector on a calculator subtly reframes the site from "essays with interactive support" to "financial product." That trade isn't worth making for a marginal-utility feature.
+
+This decision was made 2026-05-22 after reconsidering a planned multi-currency feature. Calculator pages include a small italic footnote (`.usd-footnote`, defined in `base.njk`) just above each in-page share section, linking to `/about.html#why-usd`. The link is editorial-tier — addresses non-US readers without disrupting US-reader flow. Future calculator pages with prominent dollar figures should adopt the same footnote.
+
 ## 2. Core arguments the site makes
 
 - **Bitcoin is a discovery more than an invention.** The design space is narrow; any change to the synthesis degrades it. This is why no "better Bitcoin" has ever emerged.
