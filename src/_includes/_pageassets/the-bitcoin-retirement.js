@@ -441,6 +441,12 @@
   }
 
   // ─── Vertical-line plugin: draws a dashed marker at a given x-axis value
+  // with a top-anchored text label. Two-pass implementation so labels can be
+  // combined (same x) and stacked vertically (near x) when the user picks a
+  // configuration that puts markers close together — e.g. retirement year set
+  // to the current year ("Today" + "Retirement (2026)" collide), or a
+  // short-horizon scenario where stack depletion is only a year or two after
+  // retirement.
   var verticalLinePlugin = {
     id: 'verticalMarkers',
     afterDraw: function(chart) {
@@ -449,24 +455,91 @@
       var ctx = chart.ctx;
       var xScale = chart.scales.x, yScale = chart.scales.y;
       ctx.save();
+
+      // ─── Pass 1: draw the vertical dashed lines for every marker
+      ctx.lineWidth = 0.5;
+      ctx.setLineDash([3, 3]);
       markers.forEach(function(m) {
         var xPx = xScale.getPixelForValue(m.x);
         ctx.strokeStyle = m.color || 'rgba(236,228,214,0.35)';
-        ctx.lineWidth = 0.5;
-        ctx.setLineDash([3, 3]);
         ctx.beginPath();
         ctx.moveTo(xPx, yScale.top);
         ctx.lineTo(xPx, yScale.bottom);
         ctx.stroke();
-        // Label at top of plot area
-        if (m.label) {
-          ctx.setLineDash([]);
-          ctx.fillStyle = m.labelColor || '#ece4d6';
-          ctx.font = '500 12px Inter, sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(m.label, xPx, yScale.top - 8);
+      });
+      ctx.setLineDash([]);
+
+      // ─── Pass 2: lay out labels with same-x combining + near-x stacking
+      ctx.font = '500 12px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      var SAME_X_PX = 5;     // labels within 5px of each other → combine
+      var H_GAP_PX = 6;       // horizontal breathing room between siblings
+      var LINE_HEIGHT = 14;   // vertical step when stacking upward
+      var BASELINE_Y = yScale.top - 8;
+
+      // Build label entries (skip markers with no label)
+      var entries = [];
+      markers.forEach(function(m){
+        if (!m.label) return;
+        entries.push({
+          xPx: xScale.getPixelForValue(m.x),
+          text: m.label,
+          color: m.labelColor || '#ece4d6'
+        });
+      });
+
+      // Combine same-x labels into one entry. First label's color wins (it
+      // doesn't actually matter much — the combined label reads as a single
+      // unit and the colors of the source markers are visible on the chart
+      // lines themselves). Separator " · " is a middle dot with thin spaces.
+      var combined = [];
+      entries.forEach(function(e){
+        var match = null;
+        for (var i = 0; i < combined.length; i++) {
+          if (Math.abs(combined[i].xPx - e.xPx) <= SAME_X_PX) { match = combined[i]; break; }
+        }
+        if (match) {
+          match.text = match.text + ' \u00b7 ' + e.text;
+        } else {
+          combined.push({ xPx: e.xPx, text: e.text, color: e.color });
         }
       });
+
+      // Sort left-to-right so stacking is deterministic
+      combined.sort(function(a, b){ return a.xPx - b.xPx; });
+
+      // For each label, find the lowest stack-row (smallest upward offset)
+      // where its horizontal span doesn't overlap any already-placed label.
+      // Stacking is upward (yOffset positive means rendered higher up on the
+      // canvas); the chart's layout.padding.top has been sized to give room
+      // for two stack rows.
+      var placed = [];
+      combined.forEach(function(e){
+        var width = ctx.measureText(e.text).width;
+        var left = e.xPx - width / 2;
+        var right = e.xPx + width / 2;
+        var row = 0;
+        while (true) {
+          var collides = false;
+          for (var i = 0; i < placed.length; i++) {
+            var p = placed[i];
+            if (p.row !== row) continue;
+            if (right + H_GAP_PX < p.left || left - H_GAP_PX > p.right) continue;
+            collides = true; break;
+          }
+          if (!collides) break;
+          row++;
+          if (row > 3) break; // safety cap; never seen in practice
+        }
+        placed.push({ xPx: e.xPx, text: e.text, color: e.color, row: row, left: left, right: right });
+      });
+
+      // Render
+      placed.forEach(function(p){
+        ctx.fillStyle = p.color;
+        ctx.fillText(p.text, p.xPx, BASELINE_Y - p.row * LINE_HEIGHT);
+      });
+
       ctx.restore();
     }
   };
@@ -842,7 +915,7 @@
         parsing: false,
         animation: { duration: 0 },
         interaction: { intersect: false, mode: 'index' },
-        layout: { padding: { top: 36, right: 8 } },
+        layout: { padding: { top: 52, right: 8 } },
         scales: {
           x: {
             type: 'linear',
@@ -986,9 +1059,9 @@
   //       'income' → rate held;   income recomputed
   //       null     → no coupling (yearsInRetirement only affects depletion)
   var SLIDER_CONFIG = [
-    { key: 'targetIncomeUSD',   parse: parseInt,   fmt: function(v){ return '$' + Math.round(v).toLocaleString(); }, updates: 'rate',   min: 20000, max: 500000 },
+    { key: 'targetIncomeUSD',   parse: parseInt,   fmt: function(v){ return '$' + Math.round(v).toLocaleString(); }, updates: 'rate',   min: 20000, max: 1000000 },
     { key: 'retirementYear',    parse: parseInt,   fmt: function(v){ return String(v); },                            updates: 'rate',   min: 2026,  max: 2070 },
-    { key: 'btcStack',          parse: parseFloat, fmt: function(v){ return v.toFixed(1) + ' BTC'; },                updates: 'rate',   min: 0,     max: 50 },
+    { key: 'btcStack',          parse: parseFloat, fmt: function(v){ return v.toFixed(1) + ' BTC'; },                updates: 'rate',   min: 0,     max: 100 },
     { key: 'withdrawalRatePct', parse: parseFloat, fmt: function(v){ return v.toFixed(1) + '%'; },                   updates: 'income', min: 2,     max: 15 },
     { key: 'monthlyDcaUSD',     parse: parseInt,   fmt: function(v){ return '$' + Math.round(v).toLocaleString() + '/mo'; }, updates: 'rate', min: 0, max: 5000 },
     { key: 'yearsInRetirement', parse: parseInt,   fmt: function(v){ return v + ' yrs'; },                           updates: null,     min: 10,    max: 50 }

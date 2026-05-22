@@ -127,7 +127,7 @@ eleventyComputed:
 
     <!-- CHART STATUS LINE — current price + Power Law context -->
     <div class="chart-status-line" id="chartStatusLine">
-      <span class="status-prose"><strong>Today:</strong> <span id="statusPrice">$&mdash;</span> / BTC &mdash; sits at <strong><span id="statusRatio">&mdash;</span></strong> the Power Law trend; historically, BTC has been below this price <strong><span id="statusPercentile">&mdash;</span></strong> of the time.</span>
+      <span class="status-prose"><strong>Today:</strong> <span id="statusPrice">$&mdash;</span> / BTC &mdash; sits at <strong><span id="statusRatio">&mdash;</span></strong> the Power Law trend; historically, BTC has traded below this <a href="/the-power-law.html" class="status-trend-link">trend level</a> <strong><span id="statusPercentile">&mdash;</span></strong> of its history.</span>
       <a href="/the-power-law.html#summary" class="powerlaw-link">What is the Power Law? &rarr;</a>
     </div>
 
@@ -136,6 +136,7 @@ eleventyComputed:
       <div class="projection-header">
         <span class="projection-title" id="projectionTitle">Projected stack value</span>
         <div class="projection-legend" role="group" aria-label="Click any line to toggle on or off">
+          <div class="legend-hint">Click any line below to hide or show it on the chart</div>
           <div class="legend-group-label">Power Law bands &mdash; per bitcoin</div>
           <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="1"><span class="swatch swatch-trend"></span>Trend (central case)</div>
           <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="0"><span class="swatch swatch-floor"></span>Floor band (conservative anchor)</div>
@@ -173,7 +174,7 @@ eleventyComputed:
               </span>
               <span class="slider-val" id="val-targetIncomeUSD">$100,000</span>
             </div>
-            <input type="range" id="slider-targetIncomeUSD" min="20000" max="500000" step="5000" value="100000" aria-label="Target annual retirement income">
+            <input type="range" id="slider-targetIncomeUSD" min="20000" max="1000000" step="5000" value="100000" aria-label="Target annual retirement income">
           </div>
 
           <div class="slider-control" data-key="retirementYear">
@@ -204,7 +205,7 @@ eleventyComputed:
               </span>
               <span class="slider-val" id="val-btcStack">1.0 BTC</span>
             </div>
-            <input type="range" id="slider-btcStack" min="0" max="50" step="0.1" value="1" aria-label="Bitcoin stack">
+            <input type="range" id="slider-btcStack" min="0" max="100" step="0.1" value="1" aria-label="Bitcoin stack">
           </div>
 
           <div class="slider-control" data-key="withdrawalRatePct">

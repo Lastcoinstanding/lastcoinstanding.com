@@ -656,6 +656,19 @@ a.powerlaw-link:hover {
 }
 .chart-status-line .status-prose { display: block; }
 .chart-status-line strong { color: var(--ink-bright); font-weight: 500; }
+.chart-status-line .status-trend-link,
+.chart-status-line .status-trend-link:link,
+.chart-status-line .status-trend-link:visited {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(224, 148, 34, 0.4);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: text-decoration-color 0.15s ease;
+}
+.chart-status-line .status-trend-link:hover {
+  text-decoration-color: var(--amber);
+}
 .chart-status-line a.powerlaw-link {
   align-self: flex-end;
   margin-top: 0;
@@ -751,6 +764,16 @@ a.powerlaw-link:hover {
 }
 .legend-item .help-tip {
   cursor: help;
+}
+/* Small italic discoverability hint above the legend rows — spans the full
+   grid so it sits cleanly above the first group label. Subdued visual
+   weight; the cursor:pointer on the rows below carries the actual signal. */
+.legend-hint {
+  grid-column: 1 / -1;
+  font-size: 0.72rem;
+  font-style: italic;
+  color: var(--ink-dim);
+  margin-bottom: 0.1rem;
 }
 
 .chart-wrapper {
