@@ -1498,41 +1498,62 @@ A small parenthetical annotation inside a preset button text, showing a *value-a
 
 ### 6.26 Share-this-scenario section (`share-section`)
 
-**Use case:** Any page with a shareable scenario URL (the URL captures the user's current state via query params — see `SITE_GUIDE §17.5`). The section makes the otherwise-invisible shareability discoverable and provides one-click options for copy-link plus the major social platforms. Introduced on the Retirement page at the same time as the page-URL sync; designed for reuse on every calculator page where the URL becomes meaningful as the user dials in inputs.
+**Use case:** Any page with a shareable scenario URL (the URL captures the user's current state via query params — see `SITE_GUIDE §17.5`). The section makes the otherwise-invisible shareability discoverable and provides one-click options for the two functionally-distinct intents users actually have. Introduced on the Retirement page at the same time as the page-URL sync; designed for reuse on every calculator page where the URL becomes meaningful as the user dials in inputs.
 
-**Core principle:** The section is calm, not pushy. The eyebrow + tagline surfaces *that* the URL is shareable; the buttons offer specific destinations. No exhortations to "go viral" or "tell your friends" — the editorial register is the same as the rest of the page.
+**Core principle: two intents, two URL flavors.** Users sharing a calculator scenario have two genuinely different goals: *send my specific projection to a friend, spouse, or advisor* (direct messaging, often private), and *tell people about this calculator* (public posts, often promotional). These map to different URL flavors:
+
+- **Scenario URL** (`?stack=…&income=…&…`) → Copy link, native share. The receiver sees what the sender configured.
+- **Generic page URL** (no query params) → X, LinkedIn, Facebook. The receiver lands on a clean page and explores their own scenario.
+
+Mixing the two in one button row is a real privacy footgun: a user clicking "X" with their actual retirement target and BTC stack baked into the URL doesn't realize they're broadcasting personal numbers to their followers. Splitting the two groups visually *and* functionally — with each button class fixed to the right URL flavor — makes the choice explicit. A user who wants to publish their scenario publicly can still copy the link and paste into a tweet; that one extra step is worth the protection it gives to everyone else.
 
 **Markup:**
 
 ```html
 <section class="share-section" id="shareSection">
-  <div class="share-section-header">
-    <span class="share-section-label">Share this scenario</span>
-    <span class="share-section-help">The link in your address bar captures your current sliders &mdash; anyone who opens it sees the same projection.</span>
-  </div>
-  <div class="share-actions">
-    <button type="button" class="share-btn" id="shareCopy" aria-label="Copy link to clipboard">
-      <svg class="share-icon">...</svg><span class="share-btn-label">Copy link</span>
-    </button>
-    <a class="share-btn" id="shareTwitter" href="#" target="_blank" rel="noopener" aria-label="Share on X">
-      <svg class="share-icon">...</svg><span class="share-btn-label">X</span>
-    </a>
-    <a class="share-btn" id="shareLinkedIn" href="#" target="_blank" rel="noopener" aria-label="Share on LinkedIn">
-      <svg class="share-icon">...</svg><span class="share-btn-label">LinkedIn</span>
-    </a>
-    <a class="share-btn" id="shareFacebook" href="#" target="_blank" rel="noopener" aria-label="Share on Facebook">
-      <svg class="share-icon">...</svg><span class="share-btn-label">Facebook</span>
-    </a>
-    <button type="button" class="share-btn share-btn-native" id="shareNative" aria-label="Share via system" hidden>
-      <svg class="share-icon">...</svg><span class="share-btn-label">Share&hellip;</span>
-    </button>
+  <div class="share-groups">
+    <div class="share-group">
+      <div class="share-group-header">
+        <span class="share-group-label">Share this scenario</span>
+        <span class="share-group-help">A link that carries your current sliders &mdash; for sending a specific projection to a friend, your spouse, or your advisor.</span>
+      </div>
+      <div class="share-actions">
+        <button type="button" class="share-btn" id="shareCopy" aria-label="Copy link to clipboard">
+          <svg class="share-icon">...</svg><span class="share-btn-label">Copy link</span>
+        </button>
+        <button type="button" class="share-btn share-btn-native" id="shareNative" aria-label="Share via system" hidden>
+          <svg class="share-icon">...</svg><span class="share-btn-label">Share&hellip;</span>
+        </button>
+      </div>
+    </div>
+    <div class="share-group">
+      <div class="share-group-header">
+        <span class="share-group-label">Share the calculator</span>
+        <span class="share-group-help">A clean link to the page &mdash; without your specific settings &mdash; for public posts and broader sharing.</span>
+      </div>
+      <div class="share-actions">
+        <a class="share-btn" id="shareTwitter" href="#" target="_blank" rel="noopener">
+          <svg class="share-icon">...</svg><span class="share-btn-label">X</span>
+        </a>
+        <a class="share-btn" id="shareLinkedIn" href="#" target="_blank" rel="noopener">
+          <svg class="share-icon">...</svg><span class="share-btn-label">LinkedIn</span>
+        </a>
+        <a class="share-btn" id="shareFacebook" href="#" target="_blank" rel="noopener">
+          <svg class="share-icon">...</svg><span class="share-btn-label">Facebook</span>
+        </a>
+      </div>
+    </div>
   </div>
 </section>
 ```
 
-**Visual design.** Eyebrow uses the canonical `.live-explore-label` register (0.7rem, uppercase, 0.22em letter-spacing, amber). Tagline is muted italic at 0.85rem. Buttons are inline-flex with a subtle dark-tint background, 1px border, 4px radius; on hover they pick up an amber tint and brighter text. Copy-link feedback applies a `.share-btn-copied` class that switches to amber-tinted background + amber text for ~1.8 seconds. Native-share button stays hidden by default; the IIFE un-hides it only when `navigator.share` is available (mobile + Safari).
+**Visual design.** Outer section: top border + 1.5rem padding-top to separate from the result above. Two share-groups in a `1fr 1fr` grid with a 2.5rem column gap, stacking to 1 column at 720px. Each group header uses the canonical eyebrow register (0.7rem, uppercase, 0.22em letter-spacing, amber) with a muted italic help line below. Buttons are inline-flex with a subtle dark-tint background, 1px border, 4px radius; on hover they pick up an amber tint and brighter text. Copy-link feedback applies a `.share-btn-copied` class that switches to amber-tinted background + amber text for ~1.8 seconds. Native-share button stays hidden by default; the IIFE un-hides it only when `navigator.share` is available (mobile + Safari).
 
-**Behavior pattern.** All buttons read `window.location.href` at click time, not at page-load — the URL is already kept current by the page's URL-sync logic, so the share target reflects whatever the user has just configured. Social buttons open in a popup-sized new tab using the standard share-intent endpoints:
+**Behavior pattern.** The IIFE binds two URL getters:
+- `currentUrl()` → `window.location.href` (scenario-laden) — used by Copy link and Native share.
+- `genericPageUrl()` → `window.location.origin + window.location.pathname + window.location.hash` (strips `?query`, preserves `#tab`) — used by all social-intent buttons.
+
+Buttons read their URL at *click time*, not page-load, so the share target always reflects whatever the user has just configured. Social buttons open in a popup-sized new tab using standard share-intent endpoints:
 - X/Twitter: `https://twitter.com/intent/tweet?url=...&text=...`
 - LinkedIn: `https://www.linkedin.com/sharing/share-offsite/?url=...`
 - Facebook: `https://www.facebook.com/sharer/sharer.php?u=...`

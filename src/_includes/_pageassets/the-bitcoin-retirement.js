@@ -1666,14 +1666,22 @@
 
 
 // ═══════ SHARE THIS SCENARIO ═══════
-// Discoverable share affordance for the URL's scenario state. Reads
-// window.location.href at click time so it always reflects whatever the
-// user has dialed in (the page-URL sync handles keeping that current).
+// Discoverable share affordance with two functionally-distinct groups:
 //
-// Surfaces are:
-//   - Copy link  → navigator.clipboard.writeText with on-button feedback
-//   - X / LinkedIn / Facebook → standard share-intent URLs in a new tab
-//   - Native share (mobile + Safari) → navigator.share, if supported
+//   1. SHARE THIS SCENARIO (scenario URL — includes ?stack=&income=&…):
+//      Copy link, Native share. These are the surfaces typically used
+//      for direct messaging where you want the receiver to see exactly
+//      what you configured.
+//
+//   2. SHARE THE CALCULATOR (generic page URL — no query params):
+//      X, LinkedIn, Facebook. Default to public posts where the user
+//      probably doesn't want their personal numbers broadcast — and
+//      where a clean URL invites the receiver to explore their own.
+//
+// A user who DOES want to publish their scenario to social can still
+// copy the link and paste into a tweet manually. Keeping that one extra
+// step is worth it to protect users from accidentally publishing their
+// retirement target income or BTC stack to their followers.
 //
 // The IIFE is self-contained; no closure dependencies on the chart IIFE.
 // Pattern intended for reuse on other calculator pages: lift this block
@@ -1687,8 +1695,18 @@
   // ignore text and lean on the OG metadata.
   var SHARE_TITLE = 'What does a bitcoin retirement look like?';
 
+  // The current URL — includes any ?stack=&income=&... scenario state.
+  // Used by Copy link and Native share (typically private-channel sharing
+  // where the receiver should see the sender's exact configuration).
   function currentUrl() {
     return window.location.href;
+  }
+
+  // The generic page URL — strips query params, preserves hash (#tab).
+  // Used by the social-platform buttons (X / LinkedIn / Facebook) so
+  // public posts don't broadcast the user's personal slider values.
+  function genericPageUrl() {
+    return window.location.origin + window.location.pathname + window.location.hash;
   }
 
   function showCopiedFeedback(btn) {
@@ -1724,7 +1742,7 @@
     var btn = document.getElementById('shareCopy');
     if (!btn) return;
     btn.addEventListener('click', function(){
-      var url = currentUrl();
+      var url = currentUrl(); // scenario-laden — this is the personal-share path
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(url).then(
           function(){ showCopiedFeedback(btn); },
@@ -1736,12 +1754,16 @@
     });
   }
 
-  function bindIntentButton(id, urlBuilder) {
+  // Binds a social-intent button. urlGetter is one of currentUrl /
+  // genericPageUrl — the caller decides which URL flavor the platform
+  // should receive. urlBuilder wraps that URL in the platform's share
+  // intent endpoint.
+  function bindIntentButton(id, urlGetter, urlBuilder) {
     var btn = document.getElementById(id);
     if (!btn) return;
     btn.addEventListener('click', function(e){
       e.preventDefault();
-      var shareUrl = urlBuilder(currentUrl());
+      var shareUrl = urlBuilder(urlGetter());
       // Popup-sized window for the social composer — falls back to a new
       // tab if the browser doesn't honor the size hints (common on mobile).
       window.open(shareUrl, '_blank', 'noopener,noreferrer,width=620,height=540');
@@ -1756,7 +1778,7 @@
       navigator.share({
         title: 'Bitcoin retirement projection',
         text: SHARE_TITLE,
-        url: currentUrl()
+        url: currentUrl() // scenario-laden — same intent as Copy link
       }).catch(function(){
         // User cancelled or share failed — no-op (intentional silent).
       });
@@ -1766,17 +1788,18 @@
   function wireShareSection() {
     if (!document.getElementById('shareSection')) return;
     bindCopy();
-    bindIntentButton('shareTwitter', function(url){
+    bindNativeShare();
+    // Social buttons share the GENERIC page URL — see top-of-IIFE comment.
+    bindIntentButton('shareTwitter', genericPageUrl, function(url){
       return 'https://twitter.com/intent/tweet?url=' +
         encodeURIComponent(url) + '&text=' + encodeURIComponent(SHARE_TITLE);
     });
-    bindIntentButton('shareLinkedIn', function(url){
+    bindIntentButton('shareLinkedIn', genericPageUrl, function(url){
       return 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(url);
     });
-    bindIntentButton('shareFacebook', function(url){
+    bindIntentButton('shareFacebook', genericPageUrl, function(url){
       return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
     });
-    bindNativeShare();
   }
 
   if (document.readyState === 'loading') {

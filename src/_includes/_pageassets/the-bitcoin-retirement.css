@@ -870,30 +870,44 @@ a.powerlaw-link:hover {
 
 /* ─── Share section — discoverable affordance for the shareable URL.
    ─── Pattern intended for reuse across calculator pages, so selectors
-   ─── are page-agnostic. Matches the .live-explore eyebrow register. */
+   ─── are page-agnostic. Two-group layout separates scenario-laden share
+   ─── (Copy link / Share via system) from generic-page share (X, LinkedIn,
+   ─── Facebook) so users don't accidentally publish personal numbers when
+   ─── they meant to promote the page. */
 .share-section {
   margin-top: 1.75rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border-faint);
 }
-.share-section-header {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
-  margin-bottom: 1rem;
+.share-groups {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 2.5rem;
 }
-.share-section-label {
+@media (max-width: 720px) {
+  .share-groups {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+}
+.share-group-header {
+  margin-bottom: 0.85rem;
+}
+.share-group-label {
+  display: block;
   font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--amber);
+  margin-bottom: 0.4rem;
 }
-.share-section-help {
+.share-group-help {
+  display: block;
   font-size: 0.85rem;
   color: var(--ink-faint);
   font-style: italic;
+  line-height: 1.5;
 }
 .share-actions {
   display: flex;
