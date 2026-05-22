@@ -115,33 +115,17 @@
   // ─── Scenario carry-over from sibling pages ──────────────────────────
   // /the-bitcoin-retirement (the primary calculator) builds links to
   // BAS with the user's scenario serialized as URL query parameters.
-  // Read the relevant subset here so the user doesn't re-enter inputs.
   //
-  // Schema (full spec in SITE_GUIDE §17.5):
-  //   stack     BTC stack (decimal)    ← only param BAS reads in v1
-  //   retire    retirement year         ← unused on BAS
-  //   income    target income USD       ← unused on BAS
-  //   years     years in retirement     ← unused on BAS (BAS's Tab-III
-  //                                       horizon slider is independent)
-  //   dca       monthly DCA USD         ← unused on BAS
-  //   withdraw  withdrawal rate %       ← unused on BAS
+  // The full URL ⇄ state sync now lives in a dedicated IIFE at the end
+  // of this file (see "═══════ SCENARIO URL SYNC & SHARE — BAS ═══════"),
+  // which handles all 7 BAS schema keys (stack/loan/rate/liq/horizon/
+  // cb/cg) AND runs AFTER the SHARED_PAIRS localStorage hydration
+  // below, so URL params correctly override stored values.
   //
-  // Baseline assumptions (inflation preset, growth model, real-returns
-  // preset) carry across pages via the ModelingAssumptions localStorage
-  // module, so they don't need URL-param help.
-  //
-  // Unknown params are preserved on the URL so any subsequent navigation
-  // (e.g., back-link to /the-bitcoin-retirement) sees the full state.
-  if (typeof URLSearchParams !== 'undefined') {
-    var params = new URLSearchParams(window.location.search);
-    var stackParam = params.get('stack');
-    if (stackParam !== null) {
-      var parsed = parseFloat(stackParam);
-      if (!isNaN(parsed) && parsed >= 0 && parsed <= 100000) {
-        stackInput.value = parsed;
-      }
-    }
-  }
+  // Unknown params (e.g. Retirement's retire/income/years/dca/withdraw)
+  // are preserved on the URL untouched per the §17.5 forward-compat
+  // convention, so any back-link to /the-bitcoin-retirement still sees
+  // the original sender's full state.
 
   // ─── Cost-basis presets (typical bitcoiner entry points) ───
   // Editorially-anchored to recognizable cycle moments. The "today"
@@ -1410,5 +1394,239 @@
       btn.setAttribute('aria-selected', 'true');
       setMode(btn.getAttribute('data-range'));
     });
+  });
+})();
+
+
+// ═══════ SCENARIO URL SYNC & SHARE — BAS ═══════
+// URL ⇄ input state for BAS scenario. Pattern follows SITE_GUIDE §17.5
+// with BAS-specific schema. Runs at end of file so it executes AFTER
+// the calculator IIFE's SHARED_PAIRS localStorage hydration — URL
+// params correctly override stored values.
+//
+// Schema:
+//   stack    BTC stack (decimal)        default 1.0
+//   loan     loan amount USD (integer)  default 10000
+//   rate     interest rate %            default 10
+//   liq      liquidation LTV % (int)    default 80   (Loan Health tab)
+//   horizon  BvS horizon yrs (integer)  default 5    (BvS tab)
+//   cb       cost basis USD (integer)   default = current price (BvS)
+//   cg       cap gains tax % (integer)  default 20   (BvS tab)
+//
+// `price` (basBtcPrice / bvsBtcPrice) is intentionally NOT in the URL:
+// it's live-fetched and goes stale within hours, so a shared link
+// lets the receiver's calculator pull fresh price rather than pin a
+// past value (same reasoning as BvRE excludes fwdBtcNow).
+//
+// Shared inputs (stack, price, loan, rate) are mirrored across tabs
+// via the SHARED_PAIRS state-sync layer. Setting either bas* or bvs*
+// input + dispatching 'input' triggers the mirror — so the URL sync
+// only writes to ONE of each pair (the bas* prefix) and the sync
+// layer propagates to bvs*.
+//
+// Unknown params preserved on URL per §17.5 forward-compat.
+(function(){
+  if (typeof URLSearchParams === 'undefined') return;
+  if (!document.getElementById('basBtcStack')) return;
+
+  // Schema entries — `elId` is the canonical input to write/read; for
+  // shared pairs we use the bas* member and let the sync layer mirror.
+  var SCHEMA = {
+    stack:   { elId: 'basBtcStack',     type: 'float', def: 1.0 },
+    loan:    { elId: 'basLoanAmount',   type: 'int',   def: 10000 },
+    rate:    { elId: 'basInterestRate', type: 'float', def: 10 },
+    liq:     { elId: 'basLiqThreshold', type: 'int',   def: 80 },
+    horizon: { elId: 'bvsHorizon',      type: 'int',   def: 5 },
+    cb:      { elId: 'bvsCostBasis',    type: 'int',   def: null  /* default = current price; treated specially in syncUrl */ },
+    cg:      { elId: 'bvsCapGains',     type: 'int',   def: 20 }
+  };
+
+  var _suppressWriter = false;
+
+  function readNumber(el, type) {
+    if (!el || el.value === '' || el.value === null) return NaN;
+    var n = type === 'int' ? parseInt(el.value, 10) : parseFloat(el.value);
+    return n;
+  }
+
+  function readUrlIntoInputs() {
+    var params = new URLSearchParams(window.location.search);
+    _suppressWriter = true;
+    try {
+      Object.keys(SCHEMA).forEach(function(key){
+        if (!params.has(key)) return;
+        var spec = SCHEMA[key];
+        var el = document.getElementById(spec.elId);
+        if (!el) return;
+        var raw = params.get(key);
+        var n = spec.type === 'int' ? parseInt(raw, 10) : parseFloat(raw);
+        if (!isFinite(n)) return;
+        el.value = String(n);
+        // Dispatch both 'input' and 'change' so existing handlers
+        // (state-sync mirror, persist, recompute) all fire.
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    } finally {
+      _suppressWriter = false;
+    }
+  }
+
+  function syncUrl() {
+    if (!window.history || !window.history.replaceState) return;
+    var params = new URLSearchParams(window.location.search);
+    Object.keys(SCHEMA).forEach(function(key){
+      var spec = SCHEMA[key];
+      var el = document.getElementById(spec.elId);
+      if (!el) return;
+      var val = readNumber(el, spec.type);
+      // Cost basis (`cb`) defaults to current price, which varies; we
+      // omit it from URL when it equals the current price input,
+      // signaling "use receiver's current price" rather than pinning.
+      if (key === 'cb') {
+        var priceEl = document.getElementById('bvsBtcPrice') || document.getElementById('basBtcPrice');
+        var priceVal = priceEl ? parseFloat(priceEl.value) : NaN;
+        if (!isFinite(val) || (isFinite(priceVal) && Math.abs(val - priceVal) < 1)) {
+          params.delete(key);
+        } else {
+          params.set(key, String(Math.round(val)));
+        }
+        return;
+      }
+      if (!isFinite(val) || (spec.def !== null && val === spec.def)) {
+        params.delete(key);
+      } else {
+        params.set(key, String(val));
+      }
+    });
+    var qs = params.toString();
+    var newUrl = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
+    window.history.replaceState(null, '', newUrl);
+  }
+
+  var _t = null;
+  function scheduleSyncUrl() {
+    if (_suppressWriter) return;
+    if (_t) clearTimeout(_t);
+    _t = setTimeout(syncUrl, 220);
+  }
+
+  function wireWriters() {
+    // Bind to the same inputs we read. For shared pairs (stack/loan/
+    // rate) the sync layer already mirrors bas* ⇄ bvs*, so binding
+    // just to bas* is enough — but a user might drag the bvs* version,
+    // so also bind to those for direct events.
+    var PAIRS = [
+      ['basBtcStack',     'bvsBtcStack'],
+      ['basLoanAmount',   'bvsLoanAmount'],
+      ['basInterestRate', 'bvsInterestRate']
+    ];
+    PAIRS.forEach(function(p){
+      p.forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) ['input','change'].forEach(function(e){ el.addEventListener(e, scheduleSyncUrl); });
+      });
+    });
+    ['basLiqThreshold','bvsHorizon','bvsCostBasis','bvsCapGains'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) ['input','change'].forEach(function(e){ el.addEventListener(e, scheduleSyncUrl); });
+    });
+    // Preset and cost-basis preset buttons set values programmatically
+    // and call recompute(); they don't always dispatch 'input', so bind
+    // click directly.
+    document.querySelectorAll('.bas-calc-preset, .bas-calc-bvs-cb-preset').forEach(function(btn){
+      btn.addEventListener('click', scheduleSyncUrl);
+    });
+  }
+
+  function init() {
+    readUrlIntoInputs();
+    wireWriters();
+    syncUrl();
+  }
+
+  // Run AFTER the calculator IIFE's SHARED_PAIRS hydration. The
+  // calculator IIFE is synchronous and finishes before any async event
+  // (incl. DOMContentLoaded if script is at end of body). For safety
+  // we wait for DOMContentLoaded if loading; otherwise run on next tick.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    setTimeout(init, 0);
+  }
+})();
+
+
+// ═══════ IN-PAGE SHARE SECTION — BAS ═══════
+(function(){
+  if (!document.getElementById('shareSection')) return;
+  var SHARE_TITLE = 'Borrowing against your bitcoin stack — when it adds up.';
+
+  function currentUrl() { return window.location.href; }
+  function genericPageUrl() {
+    return window.location.origin + window.location.pathname + window.location.hash;
+  }
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', '');
+    ta.style.position = 'absolute'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch(e){ ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+  function showCopiedFeedback(btn) {
+    var labelEl = btn.querySelector('.share-btn-label');
+    if (!labelEl) return;
+    var original = labelEl.textContent;
+    labelEl.textContent = 'Copied';
+    btn.classList.add('share-btn-copied');
+    setTimeout(function(){
+      labelEl.textContent = original;
+      btn.classList.remove('share-btn-copied');
+    }, 1800);
+  }
+
+  var copyBtn = document.getElementById('shareCopy');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', function(){
+      var url = currentUrl();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(
+          function(){ showCopiedFeedback(copyBtn); },
+          function(){ if (fallbackCopy(url)) showCopiedFeedback(copyBtn); }
+        );
+      } else if (fallbackCopy(url)) {
+        showCopiedFeedback(copyBtn);
+      }
+    });
+  }
+  var nativeBtn = document.getElementById('shareNative');
+  if (nativeBtn && navigator.share) {
+    nativeBtn.hidden = false;
+    nativeBtn.addEventListener('click', function(){
+      navigator.share({ title: 'Borrowing against your stack', text: SHARE_TITLE, url: currentUrl() })
+        .catch(function(){ /* user cancelled — silent */ });
+    });
+  }
+
+  function bindIntent(id, urlBuilder) {
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      window.open(urlBuilder(genericPageUrl()), '_blank', 'noopener,noreferrer,width=620,height=540');
+    });
+  }
+  bindIntent('shareTwitter', function(url){
+    return 'https://twitter.com/intent/tweet?url=' + encodeURIComponent(url) +
+           '&text=' + encodeURIComponent(SHARE_TITLE);
+  });
+  bindIntent('shareLinkedIn', function(url){
+    return 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(url);
+  });
+  bindIntent('shareFacebook', function(url){
+    return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
   });
 })();

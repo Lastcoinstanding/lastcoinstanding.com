@@ -897,3 +897,276 @@
     applyHashToMode();
     window.addEventListener('hashchange', applyHashToMode);
 })();
+
+
+// ═══════ SCENARIO URL SYNC & SHARE — BvRE ═══════
+// URL ⇄ input state for both calculator modes (retrospective and
+// projection). The mode itself is captured by the existing #projection
+// hash convention (see applyHashToMode); this IIFE handles only the
+// query-param surface for slider/select/checkbox state. Pattern
+// follows SITE_GUIDE §17.5 with BvRE-specific schema:
+//
+//   Retrospective:
+//     year       integer 2014–2021       default 2017
+//     dca        '1' if checked          omit otherwise
+//   Projection:
+//     home       integer (USD)            default 420000
+//     horizon    integer 5|10|15|20       default 10
+//     appr       decimal (home appr %)    default 3.5
+//     mortgage   decimal (mortgage %)     default 6.8
+//     method     'cash' | 'mortgage'      default 'mortgage'
+//     pscenario  'floor'|'trend'|'upper'  default 'floor'
+//     advanced   '1' if checked           omit otherwise
+//     advrate    decimal (investment %)   default 7
+//
+// fwdBtcNow is intentionally NOT in the URL — it's a live-fetched
+// value that goes stale within hours, so a shared link should let the
+// receiver's calculator fetch the current price rather than pin a
+// past value. Same reasoning as BAS's exclusion of `price`.
+//
+// Unknown params preserved on the URL per §17.5 forward-compat. The
+// retrospective/projection IIFEs above wire 'input'/'change' to their
+// own runCalculator/runFwdCalc paths; this IIFE adds writer hooks on
+// the same events and reader logic that programmatically sets values
+// + dispatches 'input' so existing pipelines pick up shared scenarios.
+(function(){
+  if (typeof URLSearchParams === 'undefined') return;
+  if (!document.getElementById('calcYear') && !document.getElementById('fwdHomePrice')) return;
+
+  // ── Schema ──────────────────────────────────────────────────────
+  // type tags: int, float, thousands (comma-formatted), bool, enum
+  var SCHEMA = {
+    year:      { elId: 'calcYear',             type: 'int',       def: 2017,    evt: 'change' },
+    dca:       { elId: 'calcDCA',              type: 'bool',                    evt: 'change' },
+    home:      { elId: 'fwdHomePrice',         type: 'thousands', def: 420000,  evt: 'input'  },
+    horizon:   { elId: 'fwdHorizon',           type: 'int',       def: 10,      evt: 'change' },
+    appr:      { elId: 'fwdHomeAppreciation',  type: 'float',     def: 3.5,     evt: 'input'  },
+    mortgage:  { elId: 'fwdMortgageRate',      type: 'float',     def: 6.8,     evt: 'input'  },
+    advanced:  { elId: 'fwdAdvancedCheck',     type: 'bool',                    evt: 'change' },
+    advrate:   { elId: 'fwdAdvancedRate',      type: 'float',     def: 7,       evt: 'input'  },
+    method:    { type: 'btn-method',    sel: '.purchase-btn',   attr: 'method',   def: 'mortgage' },
+    pscenario: { type: 'btn-pscenario', sel: '.scenario-btn',   attr: 'scenario', def: 'floor'    }
+  };
+
+  function parseThousands(str) {
+    if (str === null || str === undefined || str === '') return NaN;
+    return parseFloat(String(str).replace(/,/g, ''));
+  }
+  function formatThousands(num) {
+    if (!isFinite(num)) return '';
+    return Math.round(num).toLocaleString('en-US');
+  }
+
+  var _suppressWriter = false;
+
+  function readValue(key) {
+    var spec = SCHEMA[key];
+    if (spec.type === 'btn-method' || spec.type === 'btn-pscenario') {
+      var active = document.querySelector(spec.sel + '.active');
+      return active ? active.getAttribute('data-' + spec.attr) : spec.def;
+    }
+    var el = document.getElementById(spec.elId);
+    if (!el) return undefined;
+    if (spec.type === 'bool') return el.checked ? 1 : 0;
+    if (spec.type === 'thousands') return parseThousands(el.value);
+    if (spec.type === 'int')   return parseInt(el.value, 10);
+    if (spec.type === 'float') return parseFloat(el.value);
+    return el.value;
+  }
+
+  function applyValue(key, raw) {
+    var spec = SCHEMA[key];
+    if (spec.type === 'btn-method' || spec.type === 'btn-pscenario') {
+      var btn = document.querySelector(spec.sel + '[data-' + spec.attr + '="' + raw + '"]');
+      if (btn && !btn.classList.contains('active')) btn.click();
+      return;
+    }
+    var el = document.getElementById(spec.elId);
+    if (!el) return;
+    if (spec.type === 'bool') {
+      var want = raw === '1' || raw === 'true';
+      if (el.checked !== want) {
+        el.checked = want;
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      return;
+    }
+    if (spec.type === 'thousands') {
+      var n = parseFloat(raw);
+      if (!isFinite(n)) return;
+      el.value = formatThousands(n);
+    } else if (spec.type === 'int') {
+      var i = parseInt(raw, 10);
+      if (!isFinite(i)) return;
+      el.value = String(i);
+    } else if (spec.type === 'float') {
+      var f = parseFloat(raw);
+      if (!isFinite(f)) return;
+      el.value = String(f);
+    } else {
+      el.value = String(raw);
+    }
+    el.dispatchEvent(new Event('input',  { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  function readUrlIntoInputs() {
+    var params = new URLSearchParams(window.location.search);
+    _suppressWriter = true;
+    try {
+      Object.keys(SCHEMA).forEach(function(key){
+        if (!params.has(key)) return;
+        applyValue(key, params.get(key));
+      });
+    } finally {
+      _suppressWriter = false;
+    }
+  }
+
+  function syncUrl() {
+    if (!window.history || !window.history.replaceState) return;
+    var params = new URLSearchParams(window.location.search);
+    Object.keys(SCHEMA).forEach(function(key){
+      var spec = SCHEMA[key];
+      var val = readValue(key);
+      // 'undefined' means the input doesn't exist in DOM (shouldn't happen
+      // post-init, but be defensive); leave the param as-is in that case.
+      if (val === undefined) return;
+      // Booleans: omit when false; serialize as '1' when true
+      if (spec.type === 'bool') {
+        if (val === 1) params.set(key, '1');
+        else params.delete(key);
+        return;
+      }
+      // Number types: omit when equal to default or NaN
+      if (spec.type === 'int' || spec.type === 'thousands' || spec.type === 'float') {
+        if (!isFinite(val) || val === spec.def) params.delete(key);
+        else params.set(key, String(val));
+        return;
+      }
+      // Enums (button groups): omit when equal to default
+      if (val === spec.def) params.delete(key);
+      else params.set(key, val);
+    });
+    var qs = params.toString();
+    var newUrl = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
+    window.history.replaceState(null, '', newUrl);
+  }
+
+  var _t = null;
+  function scheduleSyncUrl() {
+    if (_suppressWriter) return;
+    if (_t) clearTimeout(_t);
+    _t = setTimeout(syncUrl, 220);
+  }
+
+  function wireWriters() {
+    Object.keys(SCHEMA).forEach(function(key){
+      var spec = SCHEMA[key];
+      if (spec.type === 'btn-method' || spec.type === 'btn-pscenario') {
+        document.querySelectorAll(spec.sel).forEach(function(b){
+          b.addEventListener('click', scheduleSyncUrl);
+        });
+        return;
+      }
+      var el = document.getElementById(spec.elId);
+      if (!el) return;
+      el.addEventListener(spec.evt || 'input', scheduleSyncUrl);
+      // For text/number inputs, also listen to 'change' so blur-paste flows
+      // through the writer even when 'input' didn't fire.
+      if ((spec.evt || 'input') === 'input' && spec.type !== 'bool') {
+        el.addEventListener('change', scheduleSyncUrl);
+      }
+    });
+  }
+
+  function init() {
+    readUrlIntoInputs();
+    wireWriters();
+    syncUrl();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+
+// ═══════ IN-PAGE SHARE SECTION — BvRE ═══════
+// Two-group share affordance (STYLE_GUIDE §6.26). Mirrors Retirement
+// and DR's IIFE. Lives inside panel-calculator so it's only visible on
+// the calculator tab.
+(function(){
+  if (!document.getElementById('shareSection')) return;
+  var SHARE_TITLE = 'Bitcoin vs. Real Estate — what the trend really shows.';
+
+  function currentUrl() { return window.location.href; }
+  function genericPageUrl() {
+    return window.location.origin + window.location.pathname + window.location.hash;
+  }
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', '');
+    ta.style.position = 'absolute'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch(e){ ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+  function showCopiedFeedback(btn) {
+    var labelEl = btn.querySelector('.share-btn-label');
+    if (!labelEl) return;
+    var original = labelEl.textContent;
+    labelEl.textContent = 'Copied';
+    btn.classList.add('share-btn-copied');
+    setTimeout(function(){
+      labelEl.textContent = original;
+      btn.classList.remove('share-btn-copied');
+    }, 1800);
+  }
+
+  var copyBtn = document.getElementById('shareCopy');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', function(){
+      var url = currentUrl();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(
+          function(){ showCopiedFeedback(copyBtn); },
+          function(){ if (fallbackCopy(url)) showCopiedFeedback(copyBtn); }
+        );
+      } else if (fallbackCopy(url)) {
+        showCopiedFeedback(copyBtn);
+      }
+    });
+  }
+  var nativeBtn = document.getElementById('shareNative');
+  if (nativeBtn && navigator.share) {
+    nativeBtn.hidden = false;
+    nativeBtn.addEventListener('click', function(){
+      navigator.share({ title: 'Bitcoin vs. Real Estate', text: SHARE_TITLE, url: currentUrl() })
+        .catch(function(){ /* user cancelled — silent */ });
+    });
+  }
+
+  function bindIntent(id, urlBuilder) {
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      window.open(urlBuilder(genericPageUrl()), '_blank', 'noopener,noreferrer,width=620,height=540');
+    });
+  }
+  bindIntent('shareTwitter', function(url){
+    return 'https://twitter.com/intent/tweet?url=' + encodeURIComponent(url) +
+           '&text=' + encodeURIComponent(SHARE_TITLE);
+  });
+  bindIntent('shareLinkedIn', function(url){
+    return 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(url);
+  });
+  bindIntent('shareFacebook', function(url){
+    return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+  });
+})();

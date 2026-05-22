@@ -682,6 +682,57 @@ Reader runs on `DOMContentLoaded`, AFTER the calculator IIFE's `loadStickyValues
 
 Unknown params (including Retirement's `stack`/`income`/etc. when a user navigates between sibling pages) are preserved on the URL untouched — `URLSearchParams.set/delete` only touches keys explicitly in DR's schema, leaving everything else as-is. This keeps the cross-page carry-over working in both directions even when each page only writes its own schema.
 
+**Shareable scenario URL on Bitcoin vs. Real Estate.** Added 2026-05-22. BvRE has two calculator modes (retrospective + projection) with disjoint input sets; the URL schema covers both, with the mode itself captured by the existing `#projection` hash convention (handled by `applyHashToMode`):
+
+| Param | Type | Mode | Source input | Notes |
+|---|---|---|---|---|
+| `year` | integer | retro | `#calcYear` | 2014–2021, default 2017 |
+| `dca` | bool | retro | `#calcDCA` | `'1'` if checked, omitted otherwise |
+| `home` | integer | proj | `#fwdHomePrice` | comma-formatted in DOM; URL strips commas; default 420000 |
+| `horizon` | integer | proj | `#fwdHorizon` | one of `5`/`10`/`15`/`20`, default 10 |
+| `appr` | decimal | proj | `#fwdHomeAppreciation` | real %/yr, default 3.5 |
+| `mortgage` | decimal | proj | `#fwdMortgageRate` | nominal %, default 6.8 |
+| `method` | enum | proj | `.purchase-btn.active` | `'cash'` or `'mortgage'` (default) |
+| `pscenario` | enum | proj | `.scenario-btn.active` | `'floor'` (default), `'trend'`, or `'upper'` |
+| `advanced` | bool | proj | `#fwdAdvancedCheck` | `'1'` if checked, omitted otherwise |
+| `advrate` | decimal | proj | `#fwdAdvancedRate` | real %/yr, default 7 |
+
+`fwdBtcNow` (current BTC price) is intentionally NOT in the URL — it's a live-fetched value that goes stale within hours, so a shared link lets the receiver's calculator pull fresh price rather than pin a past value.
+
+For purchase-method and Power Law scenario (which are button groups, not form inputs), the reader programmatically `.click()`s the matching button so the existing handlers (which trigger `runFwdCalc`) run. Button-group changes also fire the URL writer via direct `click` listeners.
+
+**Shareable scenario URL on Borrowing Against Your Stack.** Added 2026-05-22. Extends BAS's prior single-param (`stack`) receiver to a full 7-key schema:
+
+| Param | Type | Source input | Notes |
+|---|---|---|---|
+| `stack` | decimal | `#basBtcStack` | default 1.0; mirrored to `#bvsBtcStack` via SHARED_PAIRS |
+| `loan` | integer | `#basLoanAmount` | default 10000; mirrored |
+| `rate` | decimal | `#basInterestRate` | default 10; mirrored |
+| `liq` | integer | `#basLiqThreshold` | Loan Health tab; 70–95, default 80 |
+| `horizon` | integer | `#bvsHorizon` | BvS tab; 1–15, default 5 |
+| `cb` | integer | `#bvsCostBasis` | BvS tab; defaults to current price — omitted from URL when equal to current price (within $1) so a shared link lets the receiver's calculator default to their current price rather than pin the sender's |
+| `cg` | integer | `#bvsCapGains` | BvS tab; 0–40, default 20 |
+
+`price` (basBtcPrice / bvsBtcPrice) is excluded for the same staleness reason as BvRE's `fwdBtcNow`.
+
+The new URL sync IIFE runs at the end of `borrowing-against-your-stack.js`, AFTER the calculator IIFE's `SHARED_PAIRS` localStorage hydration — so URL params correctly override stored values. The previous inline single-param receiver inside the calculator IIFE was removed; a comment block now points future readers to the new full sync IIFE at the end of the file.
+
+For shared inputs (stack/loan/rate), the writer binds to BOTH the bas* and bvs* members of each pair (so direct events from either tab feed the writer); the state-sync layer mirrors values across pairs and the writer reads from the bas* member as canonical.
+
+**Universal layout-level "Share this page".** Added 2026-05-22. A second share surface, auto-injected by `base.njk` between `{{ content | safe }}` and the canonical footer on every page. Single-group, generic-URL only (`window.location.origin + pathname + hash` — query params stripped). Frontmatter `share_in_layout: false` opts a specific page out.
+
+This surface is for *page promotion* — the eyebrow reads "Share this page" — and intentionally does not carry scenario state. Calculator pages with their own in-page two-group share section (Retirement, DR, BvRE, BAS) keep that surface for "Share this scenario" (which still uses `currentUrl()` with query params). The two surfaces serve different intents at different points in the reading flow.
+
+URL strategy summary across the site:
+
+| Share surface | URL used | Strip query params? | Where it lives |
+|---|---|---|---|
+| In-page "Share this scenario" (Copy / Native) | `currentUrl()` | No — full scenario URL | Per-page IIFE, near the result |
+| In-page "Share the page" (X / LinkedIn / Facebook) | `genericPageUrl()` | Yes | Same per-page IIFE |
+| Layout-level "Share this page" (all buttons) | `genericPageUrl()` | Yes | `base.njk` inline IIFE, every page |
+
+Tab-aware sharing works for free on every page: `genericPageUrl()` preserves the URL hash (which captures the active tab on pages with tab navigation), so a user on `/the-power-law.html#theory` shares a link that lands the receiver on the Theory tab.
+
 ### Voice / editorial register
 
 Editorial-tier per `STYLE_GUIDE §1` (it has prose tabs); typography matches §2.1 canonical with Inter body and Cormorant display. Voice calibrated against the user's *Bitcoin Migration* essay: long structured sentences with semicolons; italicized conceptual emphasis on terms like *structurally*, *contextual not computational*, *delays*; concession-and-pivot moves; sober, intelligent register; no jargon-as-drama.

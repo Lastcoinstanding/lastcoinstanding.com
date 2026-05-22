@@ -798,6 +798,53 @@ eleventyComputed:
         </div>
     </div>
 
+    <!-- SHARE THIS SCENARIO — STYLE_GUIDE §6.26. Sits OUTSIDE the
+         tab structure (after all tab-content divs, before related /
+         companion) so it's always visible regardless of which tab
+         the user is on. Scenario state is shared across tabs via the
+         SHARED_PAIRS state-sync layer, so the captured URL is
+         tab-independent. URL params per SITE_GUIDE §17.5 (BAS schema). -->
+    <section class="share-section" id="shareSection">
+      <div class="share-groups">
+        <div class="share-group" id="shareGroupScenario">
+          <div class="share-group-header">
+            <span class="share-group-label">Share this scenario</span>
+            <span class="share-group-help">A link that carries your current stack, loan, rate, and threshold settings &mdash; for sending a specific configuration to a friend, your spouse, or your advisor.</span>
+          </div>
+          <div class="share-actions">
+            <button type="button" class="share-btn" id="shareCopy" aria-label="Copy link to clipboard">
+              <svg class="share-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span class="share-btn-label">Copy link</span>
+            </button>
+            <button type="button" class="share-btn share-btn-native" id="shareNative" aria-label="Share via system" hidden>
+              <svg class="share-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              <span class="share-btn-label">Share&hellip;</span>
+            </button>
+          </div>
+        </div>
+        <div class="share-group" id="shareGroupGeneric">
+          <div class="share-group-header">
+            <span class="share-group-label">Share the page</span>
+            <span class="share-group-help">A clean link to the page &mdash; without your specific settings &mdash; for public posts and broader sharing.</span>
+          </div>
+          <div class="share-actions">
+            <a class="share-btn" id="shareTwitter" href="#" target="_blank" rel="noopener" aria-label="Share on X (Twitter)">
+              <svg class="share-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="share-btn-label">X</span>
+            </a>
+            <a class="share-btn" id="shareLinkedIn" href="#" target="_blank" rel="noopener" aria-label="Share on LinkedIn">
+              <svg class="share-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.063 2.063 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
+              <span class="share-btn-label">LinkedIn</span>
+            </a>
+            <a class="share-btn" id="shareFacebook" href="#" target="_blank" rel="noopener" aria-label="Share on Facebook">
+              <svg class="share-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg>
+              <span class="share-btn-label">Facebook</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
     {% include 'components/related.njk' %}
     {% include 'components/companion-content.njk' %}
 

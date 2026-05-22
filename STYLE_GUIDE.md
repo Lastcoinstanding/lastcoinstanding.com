@@ -1571,7 +1571,25 @@ Copy uses `navigator.clipboard.writeText` with an `execCommand` fallback for leg
 
 Pages where it probably doesn't earn space: pure-prose pages with no interactive state to share, or pages whose primary CTA is something else (e.g. a checkout or a sign-up). For those, a generic page-level share button at the top or in the footer might be more appropriate; the `share-section` is for *scenario sharing*, not generic page promotion.
 
-**Where it's used.** Retirement (canonical home) and Disciplined Rebalancing (2026-05-22) — both place the section between the page's primary result surface and a denouement editorial block (Baseline Assumptions on Retirement; Failure Modes on DR). The right-hand group's eyebrow varies slightly per page register — *"Share the calculator"* on Retirement reads as natural; on DR the surface is more analytic than calculator-like so *"Share the page"* fits better. The pattern accommodates that copy flex without changing the markup or CSS structure.
+**Where it's used.** Two distinct surfaces, applied independently:
+
+*In-page two-group share section* — placed near the result, scenario-laden. Consumers:
+- Retirement (canonical home, 2026-05-22)
+- Disciplined Rebalancing (2026-05-22)
+- Bitcoin vs. Real Estate (2026-05-22) — inside `panel-calculator` so it only appears on the calculator tab
+- Borrowing Against Your Stack (2026-05-22) — outside the tab structure (after all tab-content divs, before related/companion) so it's visible regardless of active tab; scenario state is shared across BAS tabs via the SHARED_PAIRS state-sync layer, so a tab-independent share section captures the same scenario from any tab
+
+The right-hand group's eyebrow varies slightly per page register — *"Share the calculator"* on Retirement reads as natural; on DR / BvRE / BAS the surface is more analytic than calculator-like so *"Share the page"* fits better. The pattern accommodates that copy flex without changing markup or CSS structure.
+
+*Layout-level "Share this page"* — auto-injected by `base.njk` between page content and the canonical footer on **every** page (added 2026-05-22). Single-group, generic-URL only (no query params). Frontmatter `share_in_layout: false` opts a specific page out.
+
+CSS, markup, and JS for the layout-level surface all live inline in `base.njk` (same pattern as the canonical-body, canonical-nav, canonical-footer, and Related component blocks). Class names are `.page-share*` to namespace-separate from the in-page section's `.share-section / .share-group / .share-btn`, so the two surfaces coexist without CSS or JS collisions on calculator pages.
+
+JS targeting strategy:
+- **Layout-level** uses data attributes (`[data-page-share]`, `[data-share-action="copy|native|twitter|linkedin|facebook"]`) so multiple instances could theoretically coexist (though only one is auto-injected today)
+- **In-page** uses IDs (`#shareSection`, `#shareCopy`, etc.) per the existing calculator-page convention
+
+Each calculator page wires its own in-page IIFE; the layout-level IIFE in `base.njk` handles the auto-injected surface for every page.
 
 ### Naming convention reminder
 

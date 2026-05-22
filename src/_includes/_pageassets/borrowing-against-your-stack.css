@@ -1943,6 +1943,92 @@
 
 .print-only { display: none; }
 
+/* ═══════ SHARE SECTION ═══════
+ * STYLE_GUIDE §6.26. Sits outside the BAS tab structure (after all
+ * tab-content divs, before related/companion) so it's always visible.
+ * Class names are page-agnostic to match Retirement / DR / BvRE. */
+.share-section {
+    margin-top: 1.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+.share-groups {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 2.5rem;
+}
+@media (max-width: 720px) {
+    .share-groups {
+        grid-template-columns: 1fr;
+        gap: 1.75rem;
+    }
+}
+.share-group-header { margin-bottom: 0.85rem; }
+.share-group-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.4rem;
+}
+.share-group-help {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+    line-height: 1.5;
+}
+.share-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.9rem;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    line-height: 1;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.share-btn:hover, .share-btn:focus-visible {
+    background: rgba(224, 148, 34, 0.08);
+    border-color: rgba(224, 148, 34, 0.4);
+    color: var(--text);
+    outline: none;
+}
+.share-btn:active { transform: translateY(1px); }
+.share-btn .share-icon { flex-shrink: 0; }
+.share-btn-copied {
+    background: rgba(224, 148, 34, 0.14);
+    border-color: var(--amber);
+    color: var(--amber);
+}
+.share-btn-copied:hover {
+    background: rgba(224, 148, 34, 0.14);
+    color: var(--amber);
+}
+.share-btn-native[hidden] { display: none; }
+
+@media print {
+  .share-section { display: none; }
+}
+
 @media print {
   /* ─── Reset to black-on-white for ink-friendliness ─── */
   :root {
