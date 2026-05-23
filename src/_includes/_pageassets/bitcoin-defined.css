@@ -274,6 +274,194 @@
     margin: 0;
 }
 
+/* ─── Sentence-as-nav: words are clickable. Hover/focus reveal interactivity. ─── */
+.bd-sticky-sentence .bd-word {
+    cursor: pointer;
+    border-radius: 2px;
+    transition: color 0.6s ease, text-shadow 0.6s ease, background 0.2s ease;
+}
+.bd-sticky-sentence .bd-word:hover {
+    color: var(--bd-amber);
+}
+.bd-sticky-sentence .bd-word:focus-visible {
+    outline: 1px solid rgba(247,147,26,0.5);
+    outline-offset: 3px;
+}
+.bd-progress-hint {
+    color: rgba(232,224,213,0.32);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0.04em;
+}
+
+/* ─── Explorer container (replaces the old vertical .bd-cards stack) ─── */
+.bd-explorer {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 1.2rem 1.5rem;
+}
+
+/* The single explorer card is always "active" — there's only one card, and
+   its content is swapped in place by JS rather than being one of eight
+   stacked cards. We keep the .bd-card class for visual continuity with the
+   prior design (background, border, padding, shadow) but override the old
+   reveal/dim states. */
+.bd-card {
+    background: var(--bd-card-bg);
+    border: 1px solid rgba(247,147,26,0.18);
+    border-radius: 14px;
+    padding: 2.5rem 2.2rem;
+    margin-bottom: 0;
+    opacity: 1;
+    filter: saturate(1);
+    box-shadow: 0 12px 40px -20px var(--bd-amber-glow);
+    pointer-events: auto;
+    transition: opacity 0.18s ease;
+}
+
+/* Swap state: brief opacity dip during content swap. JS adds .bd-swapping
+   for ~180ms while it changes inner content, then removes it. */
+.bd-card.bd-swapping {
+    opacity: 0.15;
+}
+
+/* Layout: image full-width on top (height-capped so it doesn't dominate
+   shorter viewports), text below. The image gets the dramatic-establishing
+   role the curated photography deserves; the text builds on it. The whole
+   word may not fit in viewport on smaller desktops, but the critical fix
+   is that scroll happens within ONE word, never between words — clicking
+   Continue swaps content in place. */
+.bd-card-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+}
+.bd-card-text-col {
+    max-width: 780px;
+    margin: 0 auto;
+}
+
+@media (max-width: 880px) {
+    .bd-card {
+        padding: 1.6rem 1.3rem;
+    }
+}
+
+/* Image slot. For words with a real photo we render an <img> that covers
+   the slot (height-capped on desktop to ~360px so the whole word can
+   reasonably fit in a typical desktop viewport). For words without yet
+   (currently just absolutely-scarce), the inline SVG sits center with
+   the warm gradient backdrop. */
+.bd-card-image {
+    margin-bottom: 0;
+    max-height: 380px;
+}
+.bd-card-image img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+/* When a real photo is rendered, suppress the warm gradient backdrop +
+   the inline-SVG sizing (those were for the pre-photo placeholder state). */
+.bd-card-image.bd-card-image-with-photo {
+    background: #0a0908;
+    aspect-ratio: auto;     /* let max-height drive sizing */
+    height: 380px;
+}
+.bd-card-image.bd-card-image-with-photo::before,
+.bd-card-image.bd-card-image-with-photo::after {
+    display: none;
+}
+@media (max-width: 880px) {
+    .bd-card-image,
+    .bd-card-image.bd-card-image-with-photo {
+        height: auto;
+        max-height: 260px;
+        aspect-ratio: 16 / 9;
+    }
+}
+
+/* ─── Explorer nav: Prev / counter / Next ─── */
+.bd-explorer-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 1.5rem 0 0;
+    padding: 0 0.5rem;
+}
+.bd-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.7rem 1.4rem;
+    background: rgba(247,147,26,0.08);
+    border: 1px solid rgba(247,147,26,0.28);
+    border-radius: 999px;
+    color: var(--bd-amber);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.86rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.25s ease, border-color 0.25s ease, transform 0.15s ease, opacity 0.2s ease;
+    user-select: none;
+}
+.bd-nav-btn:hover:not([disabled]) {
+    background: rgba(247,147,26,0.16);
+    border-color: rgba(247,147,26,0.5);
+    transform: translateY(-1px);
+}
+.bd-nav-btn:active:not([disabled]) {
+    transform: translateY(0);
+}
+.bd-nav-btn[disabled] {
+    opacity: 0.28;
+    cursor: not-allowed;
+    transform: none;
+}
+.bd-nav-btn-arrow {
+    font-size: 0.96rem;
+    line-height: 1;
+}
+.bd-nav-counter {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(232,224,213,0.45);
+    flex-shrink: 0;
+}
+@media (max-width: 600px) {
+    .bd-explorer-nav { flex-wrap: wrap; gap: 0.7rem; justify-content: center; }
+    .bd-nav-counter { order: -1; width: 100%; text-align: center; }
+}
+
+/* Reset link — quiet, only appears after the user has visited 2+ words. */
+.bd-explorer-reset {
+    text-align: center;
+    margin-top: 1.2rem;
+}
+.bd-reset-btn {
+    background: transparent;
+    border: none;
+    color: rgba(232,224,213,0.4);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 0.4rem 0.8rem;
+    border-bottom: 1px dotted rgba(232,224,213,0.22);
+    transition: color 0.2s, border-color 0.2s;
+}
+.bd-reset-btn:hover {
+    color: var(--bd-amber);
+    border-color: rgba(247,147,26,0.45);
+}
+
 /* Continue button */
 .bd-card-cta-wrap {
     display: flex;

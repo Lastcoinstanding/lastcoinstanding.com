@@ -26,18 +26,51 @@ eleventyComputed:
         <p class="bd-attribution">Inspired by <span class="bd-attribution-name">Jeff Booth</span></p>
     </header>
 
-    {# Sticky sentence — visible during the entire scroll, words light up as cards are revealed #}
+    {# Sticky sentence — each word is clickable, the active one indicates current,
+       visited ones are amber, unvisited muted. Acts as both progress indicator
+       and direct-jump nav. #}
     <div class="bd-sticky-wrap">
-        <div class="bd-sticky-sentence" id="bdStickySentence" aria-label="Bitcoin definition, building as you progress">
-            <span class="bd-fixed">The Bitcoin&nbsp;</span><span class="bd-word" data-word="network" id="word-network">network</span><span class="bd-fixed">&nbsp;is the&nbsp;</span><span class="bd-word" data-word="open" id="word-open">open</span><span class="bd-fixed">,&nbsp;</span><span class="bd-word" data-word="permissionless" id="word-permissionless">permissionless</span><span class="bd-fixed">,&nbsp;</span><span class="bd-word" data-word="decentralized" id="word-decentralized">decentralized</span><span class="bd-fixed">,&nbsp;</span><span class="bd-word" data-word="secure" id="word-secure">secure</span><span class="bd-fixed">&nbsp;</span><span class="bd-word" data-word="protocol" id="word-protocol">protocol</span><span class="bd-fixed">&nbsp;&mdash;&nbsp;</span><span class="bd-word" data-word="bounded-by-energy" id="word-bounded-by-energy">bounded by energy</span><span class="bd-fixed">,&nbsp;</span><span class="bd-word" data-word="absolutely-scarce" id="word-absolutely-scarce">absolutely scarce</span><span class="bd-fixed">.</span>
+        <div class="bd-sticky-sentence" id="bdStickySentence" aria-label="Bitcoin definition. Each word is a navigable section.">
+            <span class="bd-fixed">The Bitcoin&nbsp;</span><span class="bd-word" data-word="network" id="word-network" role="button" tabindex="0">network</span><span class="bd-fixed">&nbsp;is the&nbsp;</span><span class="bd-word" data-word="open" id="word-open" role="button" tabindex="0">open</span><span class="bd-fixed">,&nbsp;</span><span class="bd-word" data-word="permissionless" id="word-permissionless" role="button" tabindex="0">permissionless</span><span class="bd-fixed">,&nbsp;</span><span class="bd-word" data-word="decentralized" id="word-decentralized" role="button" tabindex="0">decentralized</span><span class="bd-fixed">,&nbsp;</span><span class="bd-word" data-word="secure" id="word-secure" role="button" tabindex="0">secure</span><span class="bd-fixed">&nbsp;</span><span class="bd-word" data-word="protocol" id="word-protocol" role="button" tabindex="0">protocol</span><span class="bd-fixed">&nbsp;&mdash;&nbsp;</span><span class="bd-word" data-word="bounded-by-energy" id="word-bounded-by-energy" role="button" tabindex="0">bounded by energy</span><span class="bd-fixed">,&nbsp;</span><span class="bd-word" data-word="absolutely-scarce" id="word-absolutely-scarce" role="button" tabindex="0">absolutely scarce</span><span class="bd-fixed">.</span>
         </div>
-        <div class="bd-progress" id="bdProgress" aria-hidden="true">
-            <span id="bdProgressCount">0</span> of 8 revealed
+        <div class="bd-progress" id="bdProgress" aria-live="polite">
+            <span id="bdProgressCount">0</span> of 8 revealed &middot; <span class="bd-progress-hint">click any word to jump</span>
         </div>
     </div>
 
-    <main class="bd-cards" id="bdCards">
-        {# Cards rendered by JS from data in bitcoin-defined.js — keeps content and structure in one place #}
+    {# Single explorer card — content swapped in place by JS. Side-by-side
+       layout on desktop (image left, content right); stacks on mobile. #}
+    <main class="bd-explorer">
+        <article class="bd-card" id="bdCard">
+            <div class="bd-card-inner">
+                <div class="bd-card-image" id="bdCardImage"></div>
+                <div class="bd-card-text-col">
+                    <p class="bd-card-eyebrow" id="bdCardEyebrow"></p>
+                    <h2 class="bd-card-word" id="bdCardWord"></h2>
+                    <p class="bd-card-definition" id="bdCardDefinition"></p>
+                    <div class="bd-card-elaboration" id="bdCardElaboration"></div>
+                </div>
+            </div>
+        </article>
+
+        {# Nav controls under the card — Prev / counter / Next. Same position
+           every interaction so user knows where to look. #}
+        <div class="bd-explorer-nav">
+            <button type="button" class="bd-nav-btn bd-nav-prev" id="bdPrev" aria-label="Previous word">
+                <span class="bd-nav-btn-arrow">&larr;</span>
+                <span class="bd-nav-btn-label">Previous</span>
+            </button>
+            <div class="bd-nav-counter" id="bdCounter" aria-live="polite">Word 1 of 8</div>
+            <button type="button" class="bd-nav-btn bd-nav-next" id="bdNext" aria-label="Next word">
+                <span class="bd-nav-btn-label">Continue</span>
+                <span class="bd-nav-btn-arrow">&rarr;</span>
+            </button>
+        </div>
+
+        {# Reset link — hidden until at least 2 words have been visited. #}
+        <div class="bd-explorer-reset" id="bdResetWrap" style="display:none">
+            <button type="button" class="bd-reset-btn" id="bdReset">Reset progress</button>
+        </div>
     </main>
 
     {# Final-state section — only revealed after all 8 cards have been clicked through #}
