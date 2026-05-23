@@ -207,7 +207,7 @@ meta tag block. Follow the BvSM head HTML as the reference. Required tags:
 ```html
 <meta name="description" content="...">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://lastcoinstanding.com/<slug>.html">
+<meta property="og:url" content="https://lastcoinstanding.com/<slug>">
 <meta property="og:title" content="<Page Title> — Last Coin Standing">
 <meta property="og:description" content="...">
 <meta property="og:image" content="https://lastcoinstanding.com/og-<slug>.jpg">
@@ -221,6 +221,8 @@ meta tag block. Follow the BvSM head HTML as the reference. Required tags:
 <meta name="twitter:image" content="https://lastcoinstanding.com/og-<slug>.jpg">
 <meta name="twitter:image:alt" content="...">
 ```
+
+**IMPORTANT — clean URLs only in og:url, canonical, and JSON-LD url/@id.** Cloudflare Pages serves this site with clean URLs and 308-redirects every `.html` URL to its bare-slug form. If a page's self-claimed canonical URL contains `.html` while the URL scrapers actually fetch does NOT, Twitter (and some other social scrapers) treat the mismatch as a red flag and refuse to cache the OG card — the link unfurls as a plain text URL instead of a card. The slug-only form (e.g. `/bitcoin-defined`, not `/bitcoin-defined.html`) is what Cloudflare serves and what the sitemap and `llms.txt` use; `og:url`, `canonical`, JSON-LD `url`, and JSON-LD `@id` must all match. The `permalink` in page front-matter still uses `/<slug>.html` since that's what Eleventy needs to emit the file; only the public-facing URL references should drop the extension. Bug encountered May 2026 — see TECH_DEBT §1 closure.
 
 ### `.eleventy.js` static asset registration
 
@@ -340,9 +342,13 @@ the following. Copy from a complete reference (e.g.
 - **Meta description** — single declarative sentence, 140-155
   characters, no marketing language. Should read as a useful summary
   even out of context.
-- **Canonical link** — `<link rel="canonical" href="https://lastcoinstanding.com/<slug>.html">`.
+- **Canonical link** — `<link rel="canonical" href="https://lastcoinstanding.com/<slug>">`.
   Self-referential. Required for every page even if there are no
   duplicates today; protects against future URL parameter drift.
+  **No `.html` extension** — Cloudflare Pages 308-redirects `.html` URLs
+  to clean form; mismatch between canonical-claimed URL and actually-
+  served URL breaks Twitter OG cards. See the IMPORTANT callout under
+  §7 above for the full failure mode.
 - **Open Graph tags** — `og:type`, `og:url`, `og:title`,
   `og:description`, `og:image`, `og:image:width`, `og:image:height`,
   `og:image:type`, `og:image:alt`. The image must be 1280×720 JPEG;
