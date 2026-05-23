@@ -1085,7 +1085,7 @@ URL hash mirrors the current idea (`/bitcoin-defined#decentralized` deep-links i
 
 ### Visual treatment
 
-Each idea has a Grok-generated 1280×720 atmospheric photograph at repo root (`bd-network.jpg` through `bd-bounded-by-energy.jpg`). The eighth (`bd-absolutely-scarce.jpg`, moon over dark sea) is pending generation — the data file has `image: null` for it and falls back to the inline SVG gracefully.
+Each idea has a Grok-generated 1280×720 atmospheric photograph at repo root (`bd-network.jpg` through `bd-absolutely-scarce.jpg`). All eight cards ship with real photography as of May 2026.
 
 Image curation reading:
 - **Network** — sandhill cranes in shallow water (collective behavior; only living-being image, acceptable outlier)
@@ -1095,7 +1095,7 @@ Image curation reading:
 - **Secure** — stratified rock cliff (immutable geological layers)
 - **Protocol** — Roman aqueduct (repeating arches read as blocks; civilizational endurance)
 - **Bounded by energy** — embers with small live flame (past work crystallized into structure + present work still expending — represents ongoing PoW, not "completion")
-- **Absolutely scarce** (pending) — moon over dark sea (singular, eternal, impossible to mint another)
+- **Absolutely scarce** — full moon over calm dark sea (singular, eternal, impossible to mint another; the only cool-tone-anchored image in the set, with a warm amber-rose horizon band bridging back to the seven warm cards so it doesn't feel tonally orphaned)
 
 ### Cross-linking
 
@@ -1108,7 +1108,6 @@ All four companions have reciprocal `related:` entries pointing back to Bitcoin 
 
 ### Future work
 
-- **Image 8 of 8 (Absolutely Scarce).** Pending Grok generation — moon over dark sea. Drop-in spec: save as `/bd-absolutely-scarce.jpg` at repo root (1280×720), register in `.eleventy.js` `staticAssets`, change `image: null → image: '/bd-absolutely-scarce.jpg'` in the 8th entry of `bdWords` (in `bitcoin-defined.js`). Three small edits, no other changes.
 - **Dead CSS cleanup.** The carousel rebuild left harmless dead CSS rules from the prior stacked-cards design (`.bd-card-cta-wrap`, `.bd-card-cta`, `.bd-card-revealed-marker`). Tracked in TECH_DEBT §6 for a follow-up sweep.
 - **Carousel-slide on homepage.** Page is not yet in the homepage carousel rotation. Pending Grok Imagine video — direction TBD; conceptual direction is one of the atmospheric idea images animated subtly (embers glowing, cranes lifting, light shifting across the olive grove).
 

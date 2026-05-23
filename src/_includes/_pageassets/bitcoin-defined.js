@@ -12,10 +12,10 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ─── DATA ───
-   Each word has a real Grok-generated image (Network through Bounded by
-   Energy), plus an inline SVG used as fallback for Absolutely Scarce until
-   the matching image is generated. When the moon image is dropped in,
-   change image: null to image: '/bd-absolutely-scarce.jpg'. */
+   Each idea has a real Grok-generated 1280x720 image at repo root. The
+   inline SVG strings on each entry are kept as a fallback that fires only
+   if a future entry sets `image: null` (e.g. while a replacement image is
+   being regenerated); the live deck renders the photos for all 8. */
 var bdWords = [
     {
         id: 'network',
@@ -91,7 +91,7 @@ var bdWords = [
         id: 'absolutely-scarce',
         label: 'Absolutely scarce',
         eyebrow: 'Idea 8 of 8',
-        image: null,  // pending Grok generation — moon over dark sea
+        image: '/bd-absolutely-scarce.jpg',
         alt: 'A single luminous moon over a calm dark sea — singular, eternal, impossible to mint another.',
         definition: 'Most things called scarce are actually rate-limited. Gold is scarce because new gold is hard to extract \u2014 but the total stock grows. Bitcoin\u2019s scarcity is different in kind: 21 million units, and not one more, ever.',
         elaboration: '<p>The cap is enforced not by promise but by code that every node independently verifies. This is the first asset in human history with a mathematically provable, absolutely fixed supply. Once issued, no committee can vote to issue more; no emergency can authorize an exception.</p><p>Demand can rise without limit. Supply cannot. This asymmetry, sustained over decades, is what makes the math of Bitcoin\u2019s monetary properties unlike anything the human species has ever held.</p>',

@@ -44,8 +44,8 @@ module.exports = function (eleventyConfig) {
     'og-living-on-bitcoin.jpg',
     'og-heatmap.jpg',
     'og-calculators.jpg',
-    // Bitcoin Defined illustrations (1280x720). bd-absolutely-scarce.jpg
-    // pending — Grok generation in progress.
+    // Bitcoin Defined illustrations (1280x720). Eight Grok-generated
+    // atmospheric still images, one per load-bearing idea.
     'bd-network.jpg',
     'bd-open.jpg',
     'bd-permissionless.jpg',
@@ -53,6 +53,7 @@ module.exports = function (eleventyConfig) {
     'bd-secure.jpg',
     'bd-protocol.jpg',
     'bd-bounded-by-energy.jpg',
+    'bd-absolutely-scarce.jpg',
     // Admin tool stays as standalone HTML
     'admin.html',
     // Misc legacy
