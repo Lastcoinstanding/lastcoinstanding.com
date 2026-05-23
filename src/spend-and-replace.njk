@@ -84,7 +84,7 @@ eleventyComputed:
             <text x="0" y="92" class="sd-label">At the time of the spend, your wallet</text>
             <text x="0" y="110" class="sd-label">holds your legacy lots &mdash; nothing else.</text>
             <rect x="0" y="130" width="390" height="170" rx="4" class="sd-wallet"/>
-            <text x="380" y="148" class="sd-caps" text-anchor="end">YOUR WALLET</text>
+            
             <line x1="15" y1="280" x2="375" y2="280" class="sd-axis"/>
             <rect x="30"  y="252" width="40" height="28"  class="sd-bar-sold"   rx="2"/>
             <text x="50"  y="294" class="sd-axis-label" text-anchor="middle">2017</text>
@@ -98,12 +98,9 @@ eleventyComputed:
             <text x="290" y="294" class="sd-axis-label" text-anchor="middle">2024</text>
             <rect x="330" y="140" width="40" height="140" class="sd-bar-future" rx="2"/>
             <text x="350" y="294" class="sd-axis-label" text-anchor="middle">(later)</text>
-            <path d="M 50 248 C 50 200, 20 195, 0 200" stroke="#e09422" stroke-width="2" fill="none" marker-end="url(#seqArrowAmber)"/>
-            <text x="-20" y="180" class="sd-label-it">FIFO pulls</text>
-            <text x="-20" y="197" class="sd-label-it">the oldest lot</text>
-            <text x="-2" y="155" class="sd-axis-label" transform="rotate(-90 -2 155)" text-anchor="middle">basis ($)</text>
-            <text x="350" y="248" class="sd-axis-label" text-anchor="end">replacement</text>
-            <text x="350" y="262" class="sd-axis-label" text-anchor="end">happens after</text>
+            <text x="15" y="178" class="sd-label-it">FIFO pulls</text>
+            <text x="15" y="195" class="sd-label-it">the oldest lot</text>
+            <path d="M 50 205 Q 55 225, 50 248" stroke="#e09422" stroke-width="2" fill="none" marker-end="url(#seqArrowAmber)"/>
             <line x1="0" y1="335" x2="390" y2="335" class="sd-rule"/>
             <text x="0" y="360" class="sd-caps">RESULT ON A $200 SPEND</text>
             <text x="0" y="395" class="sd-outcome">&asymp; $30 capital gains tax</text>
@@ -119,7 +116,7 @@ eleventyComputed:
             <text x="0" y="92" class="sd-label">At the time of the spend, your wallet</text>
             <text x="0" y="110" class="sd-label">already holds the fresh, high-basis lot.</text>
             <rect x="0" y="130" width="390" height="170" rx="4" class="sd-wallet"/>
-            <text x="380" y="148" class="sd-caps" text-anchor="end">YOUR WALLET</text>
+            
             <line x1="15" y1="280" x2="375" y2="280" class="sd-axis"/>
             <rect x="30"  y="252" width="40" height="28"  class="sd-bar-legacy" rx="2"/>
             <text x="50"  y="294" class="sd-axis-label" text-anchor="middle">2017</text>
@@ -134,10 +131,9 @@ eleventyComputed:
             <rect x="330" y="140" width="40" height="140" class="sd-bar-sold" rx="2"/>
             <text x="350" y="294" class="sd-axis-label" text-anchor="middle">just</text>
             <text x="350" y="306" class="sd-axis-label" text-anchor="middle">bought</text>
-            <path d="M 350 136 C 350 100, 380 95, 395 105" stroke="#e09422" stroke-width="2" fill="none" marker-end="url(#seqArrowAmber)"/>
-            <text x="395" y="95" class="sd-label-it">HIFO pulls</text>
-            <text x="395" y="112" class="sd-label-it">the new lot</text>
-            <text x="-2" y="155" class="sd-axis-label" transform="rotate(-90 -2 155)" text-anchor="middle">basis ($)</text>
+            <text x="200" y="178" class="sd-label-it">HIFO pulls</text>
+            <text x="200" y="195" class="sd-label-it">the new lot</text>
+            <path d="M 290 192 Q 330 175, 350 142" stroke="#e09422" stroke-width="2" fill="none" marker-end="url(#seqArrowAmber)"/>
             <text x="170" y="332" class="sd-axis-label" text-anchor="middle">&#8593; legacy lots untouched</text>
             <line x1="0" y1="345" x2="390" y2="345" class="sd-rule"/>
             <text x="0" y="370" class="sd-caps">RESULT ON A $200 SPEND</text>
@@ -146,10 +142,8 @@ eleventyComputed:
             <text x="0" y="454" class="sd-outcome-sub">Legacy stack preserved.</text>
           </g>
           <line x1="50" y1="510" x2="910" y2="510" class="sd-rule-dim"/>
-          <text x="480" y="535" class="sd-label" text-anchor="middle">
-            <tspan fill="#ccc6b8">Same wallet, same $200 spend.</tspan>
-            <tspan dx="6" fill="#968b7a">Reversing the order changes which lot the IRS deems sold, and changes the tax by an order of magnitude.</tspan>
-          </text>
+          <text x="480" y="528" class="sd-label" text-anchor="middle" fill="#ccc6b8">Same wallet, same $200 spend.</text>
+          <text x="480" y="548" class="sd-label" text-anchor="middle" fill="#968b7a" style="font-size:12px">Reversing the order changes which lot the IRS deems sold, and changes the tax by an order of magnitude.</text>
         </svg>
         <figcaption class="diagram-caption">Same wallet, same spend &mdash; reversing the order changes the tax outcome by an order of magnitude.</figcaption>
       </figure>
