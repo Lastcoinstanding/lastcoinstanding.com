@@ -20,7 +20,7 @@ var bdWords = [
     {
         id: 'network',
         label: 'Network',
-        eyebrow: 'Word 1 of 8',
+        eyebrow: 'Idea 1 of 8',
         image: '/bd-network.jpg',
         alt: 'A flock of sandhill cranes standing in shallow reflective water at sunset, some flying overhead — many distinct individuals forming a single coordinated whole.',
         definition: 'A network is not a thing; it is a relationship between things. Bitcoin is the persistent agreement among tens of thousands of nodes, millions of wallets, and the global community of people who hold, run, and transact on the same shared ledger.',
@@ -30,7 +30,7 @@ var bdWords = [
     {
         id: 'open',
         label: 'Open',
-        eyebrow: 'Word 2 of 8',
+        eyebrow: 'Idea 2 of 8',
         image: '/bd-open.jpg',
         alt: 'A natural sea arch at sunset over the ocean — sunlight passing through an opening formed by elemental forces, not gatekept.',
         definition: 'The source code is open. The protocol\u2019s rules are visible. The full transaction history is auditable &mdash; by anyone, indefinitely. No proprietary layers, no closed components, no privileged participants who own the system or sit above its rules.',
@@ -40,7 +40,7 @@ var bdWords = [
     {
         id: 'permissionless',
         label: 'Permissionless',
-        eyebrow: 'Word 3 of 8',
+        eyebrow: 'Idea 3 of 8',
         image: '/bd-permissionless.jpg',
         alt: 'A dirt path winding through tall grasslands at sunset — open access in any direction, no gatekeeper, no toll, worn by use rather than centrally planned.',
         definition: 'Open lets you read the system. Permissionless lets you join it &mdash; anywhere, anytime, no application, no approval, no identity check. Anyone, at their own discretion alone, can run a node, mine, hold, send, or build. Bitcoin is, in this sense, both global and borderless.',
@@ -50,7 +50,7 @@ var bdWords = [
     {
         id: 'decentralized',
         label: 'Decentralized',
-        eyebrow: 'Word 4 of 8',
+        eyebrow: 'Idea 4 of 8',
         image: '/bd-decentralized.jpg',
         alt: 'An olive grove at golden hour — ancient gnarled trees, each with its own individual character, distributed across the landscape, none dominant.',
         definition: 'No single party &mdash; no founder, no company, no government, no consortium &mdash; can change the rules, freeze the ledger, or shut the network down. Authority is dispersed across the participants, none of whom hold special power.',
@@ -60,7 +60,7 @@ var bdWords = [
     {
         id: 'secure',
         label: 'Secure',
-        eyebrow: 'Word 5 of 8',
+        eyebrow: 'Idea 5 of 8',
         image: '/bd-secure.jpg',
         alt: 'A massive stratified rock cliff at sunset — layer upon layer of accumulated geological time, immutable by individual action.',
         definition: 'Bitcoin\u2019s security is not a wall but an economic gradient &mdash; the cost of attacking the network must always exceed the cost of participating honestly. The longer the chain grows, the more expensive every past block becomes to attack.',
@@ -70,7 +70,7 @@ var bdWords = [
     {
         id: 'protocol',
         label: 'Protocol',
-        eyebrow: 'Word 6 of 8',
+        eyebrow: 'Idea 6 of 8',
         image: '/bd-protocol.jpg',
         alt: 'A Roman aqueduct at sunset, identical arches repeating into the distance — engineering that persists across centuries, carrying something reliably.',
         definition: 'Bitcoin is a protocol, not a product, not a company, not a technology in the conventional sense. A protocol is a set of agreed-upon rules &mdash; TCP/IP is a protocol; HTTP is a protocol; SMTP is a protocol. None has a CEO. None has a headquarters.',
@@ -80,7 +80,7 @@ var bdWords = [
     {
         id: 'bounded-by-energy',
         label: 'Bounded by energy',
-        eyebrow: 'Word 7 of 8',
+        eyebrow: 'Idea 7 of 8',
         image: '/bd-bounded-by-energy.jpg',
         alt: 'A bed of glowing embers on wooden planks with a small live flame at center — past work crystallized into structure, present work still expending.',
         definition: 'To create new bitcoin, you must expend real-world energy. Not metaphorical effort, not promised work &mdash; measured, verifiable joules. The protocol calibrates difficulty so this expenditure stays high, regardless of how efficient the hardware becomes.',
@@ -90,7 +90,7 @@ var bdWords = [
     {
         id: 'absolutely-scarce',
         label: 'Absolutely scarce',
-        eyebrow: 'Word 8 of 8',
+        eyebrow: 'Idea 8 of 8',
         image: null,  // pending Grok generation — moon over dark sea
         alt: 'A single luminous moon over a calm dark sea — singular, eternal, impossible to mint another.',
         definition: 'Most things called scarce are actually rate-limited. Gold is scarce because new gold is hard to extract \u2014 but the total stock grows. Bitcoin\u2019s scarcity is different in kind: 21 million units, and not one more, ever.',
@@ -174,9 +174,9 @@ function bdRenderCurrent() {
         }
     }
 
-    /* Counter mid-nav reads "Word X of 8" */
+    /* Counter mid-nav reads "Idea X of 8" */
     var counter = document.getElementById('bdCounter');
-    if (counter) counter.textContent = 'Word ' + (bdState.currentIndex + 1) + ' of ' + bdWords.length;
+    if (counter) counter.textContent = 'Idea ' + (bdState.currentIndex + 1) + ' of ' + bdWords.length;
 }
 
 /* ─── RENDER: sticky-sentence word states + progress + final reveal ─── */
