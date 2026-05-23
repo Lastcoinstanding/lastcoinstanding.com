@@ -87,8 +87,8 @@
     border-bottom: 1px solid rgba(247,147,26,0.06);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    padding: 1.5rem 1.2rem 1.1rem;
-    margin-top: 2.5rem;
+    padding: 1rem 1.2rem 0.75rem;
+    margin-top: 1.5rem;
     transition: padding 0.4s ease;
 }
 .bd-sticky-sentence {
@@ -152,7 +152,7 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     text-align: center;
-    margin-top: 0.7rem;
+    margin-top: 0.45rem;
 }
 .bd-progress.bd-progress-complete {
     color: var(--bd-amber-soft);
@@ -234,41 +234,41 @@
 /* Card content */
 .bd-card-eyebrow {
     font-family: 'Inter', sans-serif;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     color: var(--bd-amber-soft);
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    margin: 0 0 0.7rem;
+    margin: 0 0 0.55rem;
     font-weight: 500;
 }
 .bd-card-word {
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
     font-weight: 500;
-    font-size: clamp(2.8rem, 6vw, 4.5rem);
-    line-height: 1;
+    font-size: clamp(2rem, 3.5vw, 2.8rem);
+    line-height: 1.05;
     color: var(--bd-amber);
-    margin: 0 0 1.5rem;
+    margin: 0 0 1rem;
     letter-spacing: -0.01em;
 }
 .bd-card-definition {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 500;
-    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    font-size: clamp(1.05rem, 1.5vw, 1.2rem);
     line-height: 1.5;
     color: var(--bd-text);
-    margin: 0 0 1.4rem;
+    margin: 0 0 0.95rem;
     letter-spacing: 0.005em;
 }
 .bd-card-elaboration {
     font-family: 'Inter', sans-serif;
-    font-size: clamp(0.98rem, 1.5vw, 1.05rem);
-    line-height: 1.72;
+    font-size: clamp(0.88rem, 1.2vw, 0.96rem);
+    line-height: 1.65;
     color: rgba(232,224,213,0.78);
-    margin: 0 0 2rem;
+    margin: 0;
 }
 .bd-card-elaboration p {
-    margin: 0 0 1rem;
+    margin: 0 0 0.75rem;
 }
 .bd-card-elaboration p:last-child {
     margin: 0;
@@ -298,7 +298,7 @@
 .bd-explorer {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 2.5rem 1.2rem 1.5rem;
+    padding: 1.5rem 1.2rem 1rem;
 }
 
 /* The single explorer card is always "active" — there's only one card, and
@@ -310,7 +310,7 @@
     background: var(--bd-card-bg);
     border: 1px solid rgba(247,147,26,0.18);
     border-radius: 14px;
-    padding: 2.5rem 2.2rem;
+    padding: 1.75rem 1.75rem;
     margin-bottom: 0;
     opacity: 1;
     filter: saturate(1);
@@ -325,36 +325,39 @@
     opacity: 0.15;
 }
 
-/* Layout: image full-width on top (height-capped so it doesn't dominate
-   shorter viewports), text below. The image gets the dramatic-establishing
-   role the curated photography deserves; the text builds on it. The whole
-   word may not fit in viewport on smaller desktops, but the critical fix
-   is that scroll happens within ONE word, never between words — clicking
-   Continue swaps content in place. */
+/* Layout: side-by-side on desktop (image left, text right) so the image
+   and the text aren't competing for vertical space — each gets its own
+   column. This keeps the whole word experience in a single viewport on
+   common desktop sizes (~768px+ tall) without the user needing to
+   scroll-then-reorient as they did with the prior stacked design. On
+   mobile, the columns stack image-then-text in the natural reading order. */
 .bd-card-inner {
-    display: flex;
-    flex-direction: column;
-    gap: 1.6rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;  /* image and text both anchor at top of card */
 }
 .bd-card-text-col {
-    max-width: 780px;
-    margin: 0 auto;
+    max-width: none;
 }
 
 @media (max-width: 880px) {
     .bd-card {
-        padding: 1.6rem 1.3rem;
+        padding: 1.4rem 1.2rem;
+    }
+    .bd-card-inner {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
     }
 }
 
-/* Image slot. For words with a real photo we render an <img> that covers
-   the slot (height-capped on desktop to ~360px so the whole word can
-   reasonably fit in a typical desktop viewport). For words without yet
-   (currently just absolutely-scarce), the inline SVG sits center with
-   the warm gradient backdrop. */
+/* Image slot. Side-by-side layout means the image gets ~50% of the card
+   width — at 1100px container that's ~520px wide, ~293px tall at native
+   16:9. Significant visual presence without being viewport-dominating. */
 .bd-card-image {
     margin-bottom: 0;
-    max-height: 380px;
+    aspect-ratio: 16 / 9;
+    max-height: none;
 }
 .bd-card-image img {
     position: absolute;
@@ -364,24 +367,12 @@
     object-fit: cover;
     display: block;
 }
-/* When a real photo is rendered, suppress the warm gradient backdrop +
-   the inline-SVG sizing (those were for the pre-photo placeholder state). */
 .bd-card-image.bd-card-image-with-photo {
     background: #0a0908;
-    aspect-ratio: auto;     /* let max-height drive sizing */
-    height: 380px;
 }
 .bd-card-image.bd-card-image-with-photo::before,
 .bd-card-image.bd-card-image-with-photo::after {
     display: none;
-}
-@media (max-width: 880px) {
-    .bd-card-image,
-    .bd-card-image.bd-card-image-with-photo {
-        height: auto;
-        max-height: 260px;
-        aspect-ratio: 16 / 9;
-    }
 }
 
 /* ─── Explorer nav: Prev / counter / Next ─── */
@@ -390,7 +381,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    margin: 1.5rem 0 0;
+    margin: 1.1rem 0 0;
     padding: 0 0.5rem;
 }
 .bd-nav-btn {
