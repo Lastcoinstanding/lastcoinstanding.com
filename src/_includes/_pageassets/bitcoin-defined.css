@@ -159,35 +159,12 @@
 }
 
 /* ─── Cards section ─── */
-.bd-cards {
-    max-width: 880px;
-    margin: 0 auto;
-    padding: 3rem 1.2rem 2rem;
-}
-.bd-card {
-    background: var(--bd-card-bg);
-    border: 1px solid var(--bd-card-border);
-    border-radius: 14px;
-    padding: 2.5rem 2rem;
-    margin-bottom: 2.5rem;
-    opacity: 0.34;
-    filter: saturate(0.6);
-    transition: opacity 0.7s ease, filter 0.7s ease, border-color 0.7s ease, box-shadow 0.7s ease;
-    pointer-events: none;
-}
-.bd-card.bd-card-active {
-    opacity: 1;
-    filter: saturate(1);
-    border-color: rgba(247,147,26,0.18);
-    box-shadow: 0 12px 40px -20px var(--bd-amber-glow);
-    pointer-events: auto;
-}
-.bd-card.bd-card-revealed {
-    opacity: 1;
-    filter: saturate(1);
-    border-color: rgba(247,147,26,0.10);
-    pointer-events: auto;
-}
+/* (`.bd-cards` container and the `.bd-card.bd-card-active` /
+   `.bd-card.bd-card-revealed` reveal-state rules were removed in May 2026
+   when the page was rebuilt from an 8-stacked-cards interaction into a
+   single carousel slot. The new `.bd-card` rule lives further down with
+   the explorer-layout section. See SITE_GUIDE §23 for the rebuild
+   rationale, STYLE_GUIDE §6.27 for the carousel pattern.) */
 
 /* Card image slot — placeholder uses gradient + concept SVG. Real Grok Imagine
    stills will swap in via the .bd-card-image background-image once available. */
@@ -453,65 +430,11 @@
     border-color: rgba(247,147,26,0.45);
 }
 
-/* Continue button */
-.bd-card-cta-wrap {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 1rem;
-}
-.bd-card-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: rgba(247,147,26,0.08);
-    border: 1px solid rgba(247,147,26,0.32);
-    border-radius: 999px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.84rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    color: var(--bd-amber);
-    cursor: pointer;
-    transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
-    user-select: none;
-}
-.bd-card-cta:hover {
-    background: rgba(247,147,26,0.14);
-    border-color: rgba(247,147,26,0.5);
-    transform: translateY(-1px);
-}
-.bd-card-cta:active {
-    transform: translateY(0);
-}
-.bd-card-cta-arrow {
-    font-size: 0.92rem;
-    line-height: 1;
-}
-/* Only the currently-active card shows its CTA. Once revealed, the CTA is replaced
-   with a quiet "revealed" marker. */
-.bd-card .bd-card-cta { display: none; }
-.bd-card.bd-card-active .bd-card-cta { display: inline-flex; }
-.bd-card .bd-card-revealed-marker { display: none; }
-.bd-card.bd-card-revealed .bd-card-revealed-marker {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.7rem;
-    color: rgba(247,147,26,0.55);
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-}
-.bd-card .bd-card-revealed-marker::before {
-    content: '';
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--bd-amber-soft);
-}
+/* (`.bd-card-cta*` and `.bd-card-revealed-marker` rules were removed in
+   May 2026 alongside the carousel rebuild. The Continue button lives in
+   the explorer-nav section above as `.bd-nav-btn` / `.bd-nav-next`; the
+   "revealed" marker UI was dropped entirely since the sentence-as-nav
+   highlights the visited-word state directly.) */
 
 /* ─── Final state ─── */
 .bd-final {
@@ -669,13 +592,12 @@
     .bd-card-elaboration { font-size: 0.95rem; line-height: 1.65; margin-bottom: 1.4rem; }
     .bd-final { margin: 2rem auto 3.5rem; padding: 2.5rem 1rem; }
     .bd-final-inner { padding: 2.2rem 1.4rem; border-radius: 14px; }
-    .bd-card-cta-wrap { justify-content: flex-start; flex-wrap: wrap; }
 }
 
 /* Respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {
     .bd-card, .bd-final, .bd-sticky-sentence .bd-word,
-    .bd-sticky-sentence .bd-fixed, .bd-card-cta {
+    .bd-sticky-sentence .bd-fixed {
         transition: none !important;
     }
     .bd-sticky-sentence .bd-word.bd-active::after {

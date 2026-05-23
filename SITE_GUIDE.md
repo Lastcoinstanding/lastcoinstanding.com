@@ -416,9 +416,11 @@ The site's most foundational concept page. Thesis: a good money must simultaneou
 
 All four principles in Section 9 originated here. See that section for the general patterns; this section documents the page-specific application.
 
-## 13. Homepage carousel — completed set (17 slides)
+## 13. Homepage carousel — completed set (21 slides)
 
-All 15 slides deployed with 16:9 widescreen silent videos, minimalist copy pattern (label + headline + CTA, no `.insight-desc`).
+All slides deployed with 16:9 widescreen silent videos, minimalist copy pattern (label + headline + CTA, no `.insight-desc`).
+
+**Documentation drift note:** the markup in `src/index.njk` currently contains 21 slides in production, but the inventory table below documents 17 rows (slides 1–17) plus the new slide 21 added in May 2026. Three slides shipped between slide 17 and the May 2026 BD slide (`vid-heatmap`, `vid-bbm`, `vid-lob`) without their inventory rows being added at the time. Tracked in TECH_DEBT for a follow-up sweep that scrapes the markup and fills the gap rows.
 
 ### Typography tune
 
@@ -448,6 +450,8 @@ All 15 slides deployed with 16:9 widescreen silent videos, minimalist copy patte
 | 15 | The Fixed Pie | Your share remains undiluted — for eternity | Unmarked gold coin; surrounding coins dissolve |
 | 16 | Bitcoin vs. The Stock Market | Three growth curves. One decisive horizon | Three trees in a meadow at golden hour; the middle tree grows dramatically taller and fuller-canopied over 10 seconds while the flanking trees mature modestly; latent-state opening, divergent outcomes from identical conditions |
 | 17 | Borrowing Against Your Stack | Every coin sold today is a coin that compounds for someone else | Solitary ancient standing stone — weathered, lichen-marked, ~six feet tall — in a golden-hour meadow; tall grasses bend in gentle wind, long shadow extends from the stone across the foreground; the stone itself does not move; quiet persistence as the visual argument |
+| 18–20 | *(see markup — inventory rows pending)* | — | — |
+| 21 | Bitcoin Defined | Define it. *Then debate it.* | Bed of glowing embers in deep darkness — same composition as Card 7 (Bounded by Energy) on the page. Camera fixed throughout. Four-layer subtle motion: heat shimmer above the bed, asymmetric ember pulse (no two embers in sync), a small natural wood-fire flame at center-left with irregular asymmetric tongues whose base merges with the surrounding embers, wisps of pale smoke rising and dissipating. Seamlessly looping 10-second silent video. |
 
 ### Iteration record — slide 16 (May 2026)
 
@@ -458,6 +462,16 @@ The first brief proposed *three glass vessels filling at different rates under c
 The trees brief — *three young trees in a meadow at golden hour, middle one growing dramatically more* — produced a substantially stronger take on first try. Living-element comparisons read more naturally than industrial-element ones in the site's tonal grammar; *single-element-with-different-states* (one tree grows more than another) is also more reliable than *multi-element-with-different-behaviors* (one vessel fills at a different rhythm than another) because the former matches a familiar time-lapse nature pattern while the latter requires Grok to invent visual logic.
 
 The trees direction has light visual overlap with two other tree-themed slides (slide 12 Money Trees / two trees, slide 13 Bitcoin Retirement / one tree). Adjacency is broken by slide 14 (wheat field) and slide 15 (gold coin) between slides 13 and 16; framings differ enough (centered single vs wide three) that the shared visual vocabulary reinforces site identity rather than producing monotony — the carousel's overall grammar is part of what makes the set feel like one artifact.
+
+### Iteration record — slide 21 (May 2026)
+
+The Bitcoin Defined slide took two video briefs to land. Captured here because the lesson generalizes to any future video prompt that needs to describe a *stable, small* flame.
+
+The first brief described the flame as flickering softly *"like a candle in still air"* — the simile was meant to convey **stability** (small, contained, not leaping). Grok took it literally and rendered the canonical candle-on-wick: a single symmetric teardrop sitting on top of one ember, base clearly separated from the surrounding bed. Everything else in the video (ember texture, color gradient, the warm glow holding through the bed, the seamless loop) landed beautifully on v1 — only the flame failed.
+
+The revision dropped the candle simile entirely, anchored the flame as **part of** the ember bed rather than a separate object on top of it ("emerges from a hot pocket within the ember bed itself — its base merges visually with the surrounding embers"), specified wood-fire flame anatomy ("irregular and asymmetric, with two or three small uneven tongues that flicker, split, and merge back together — never a single symmetric teardrop"), and added explicit anti-pattern language to the exclude block ("no candle flame; no symmetric teardrop-shaped flame; no single-wick flame appearance; no flame sitting on top of a discrete object; the flame must be part of the burning ember bed itself, not separate from it"). v2 landed cleanly with two organic tongues emerging from within the bed.
+
+The prompt-craft principle: **never use a candle as a stability simile when the rendered subject is fire of any kind**. The simile is too strong a visual prior — the model will render the candle, not the stability. The same caution likely applies to any other subject-as-stability simile where the source object has a distinctive visual archetype (a sundial as a stillness simile would invoke the sundial itself, a glacier as a slowness simile would invoke ice, etc.). Describe the property you want (small, asymmetric, stable in envelope) using neutral physical language; reserve similes for properties that don't have a strong visual archetype in the model's training data.
 
 ## 14. Bitcoin vs. Real Estate (`/bitcoin-vs-real-estate.html`)
 
@@ -1109,7 +1123,11 @@ All four companions have reciprocal `related:` entries pointing back to Bitcoin 
 ### Future work
 
 - **Dead CSS cleanup.** The carousel rebuild left harmless dead CSS rules from the prior stacked-cards design (`.bd-card-cta-wrap`, `.bd-card-cta`, `.bd-card-revealed-marker`). Tracked in TECH_DEBT §6 for a follow-up sweep.
-- **Carousel-slide on homepage.** Page is not yet in the homepage carousel rotation. Pending Grok Imagine video — direction TBD; conceptual direction is one of the atmospheric idea images animated subtly (embers glowing, cranes lifting, light shifting across the olive grove).
+
+### Recently closed
+
+- **Card 8 image (Absolutely Scarce)** shipped May 2026 (commit `7ea1725`). Moon-over-calm-sea Grok-generated photo wired in; the eight-card set is complete on the photography axis.
+- **Homepage carousel slide** shipped May 2026. 10-second silent embers video animated from Card 7's still composition; caption "Define it. Then debate it." Slide is row 21 in the carousel inventory. Iteration record (candle-simile failure → wood-fire revision) in `SITE_GUIDE §13`.
 
 ---
 
