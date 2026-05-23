@@ -10,6 +10,7 @@ Conceptual underpinnings of money and Bitcoin.
 
 - [What Money Has To Be](https://lastcoinstanding.com/what-money-has-to-be.html): The three structurally-coupled functions of money — hold value across time, move across space, serve as a shared unit of measurement. Interactive comparison of bitcoin, gold, the US dollar, and a hyperinflating fiat.
 - [What Bitcoin Is](https://lastcoinstanding.com/what-bitcoin-is.html): Bitcoin's core monetary properties — scarcity, decentralization, immutability, censorship-resistance — visualized as interlocking petals.
+- [Bitcoin Defined](https://lastcoinstanding.com/bitcoin-defined.html): The single-sentence definition. Bitcoin is the open, permissionless, decentralized, secure protocol — bounded by energy, absolutely scarce. Eight load-bearing ideas, unpacked one at a time. The shortest accurate description of Bitcoin available.
 - [The Bitcoin Synthesis](https://lastcoinstanding.com/synthesis.html): Six existing ideas combined into one irreducible monetary discovery. Explore each component, then remove one to see what collapses.
 - [The Bitcoin Trilemma](https://lastcoinstanding.com/trilemma.html): The decentralization / security / scalability tradeoff. Why Bitcoin deliberately sacrifices base-layer speed for the other two.
 

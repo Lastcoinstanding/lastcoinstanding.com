@@ -160,18 +160,21 @@ function bdRenderCurrent() {
     if (defEl)     defEl.innerHTML       = w.definition;
     if (elabEl)    elabEl.innerHTML      = w.elaboration;
 
-    /* Nav button enabled/disabled state */
+    /* Prev button: disabled on the first card */
     var prev = document.getElementById('bdPrev');
-    var next = document.getElementById('bdNext');
     if (prev) prev.disabled = bdState.currentIndex === 0;
+
+    /* Continue button stays labeled "Continue →" on every card, including
+       the last. On the last card, clicking Continue scrolls to the final
+       reveal rather than advancing — but the affordance is identical so
+       readers don't bail at the finish line thinking they're done.
+       (Renaming the label to "Complete" risked exactly that: a reader
+       seeing "Complete" decides they've finished and never sees the
+       full lit-up sentence below.) */
+    var next = document.getElementById('bdNext');
     if (next) {
-        if (bdState.currentIndex === bdWords.length - 1) {
-            next.querySelector('.bd-nav-btn-label').textContent = 'Complete';
-            next.querySelector('.bd-nav-btn-arrow').innerHTML   = '&#10003;';
-        } else {
-            next.querySelector('.bd-nav-btn-label').textContent = 'Continue';
-            next.querySelector('.bd-nav-btn-arrow').innerHTML   = '&rarr;';
-        }
+        next.querySelector('.bd-nav-btn-label').textContent = 'Continue';
+        next.querySelector('.bd-nav-btn-arrow').innerHTML   = '&rarr;';
     }
 
     /* Counter mid-nav reads "Idea X of 8" */

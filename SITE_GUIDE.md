@@ -1058,4 +1058,60 @@ The BTC growth slider reads its initial value from `ModelingAssumptions.get('btc
 
 ---
 
+## 23. Bitcoin Defined (`/bitcoin-defined.html`)
+
+**Added:** earlier (pre-May 2026, as essay format). **Rebuilt as carousel:** May 2026. A Foundations page that defines Bitcoin in a single sentence and unpacks each of its eight load-bearing ideas one at a time. Sits in the Foundations bucket per `_data/explorations.json` (`category: "foundations"`, `interactive: true`, `is_calculator: false`).
+
+### Editorial framing — definition, not argument
+
+This page's job is narrower than its siblings: fix what is meant when someone says *Bitcoin*. It does not argue for Bitcoin's value, predict adoption, or claim the components are individually necessary (that last argument is the **Synthesis** page's whole thesis, made over six different components — repeating it here would blur the distinction). The closing reflection makes the role-differentiation explicit: *"This is a definition, not yet an argument. What follows from the definition lives elsewhere on this site."*
+
+### The sentence
+
+> The Bitcoin *network* is the *open*, *permissionless*, *decentralized*, *secure* *protocol* — *bounded by energy*, *absolutely scarce*.
+
+Six single words plus two phrases ("bounded by energy", "absolutely scarce") = **eight load-bearing ideas**. UI throughout the page calls these "ideas" — earlier copy used "words" but that undersold the framing and was technically inaccurate for the two phrases. Extends Jeff Booth's original phrasing of Bitcoin as *"an open, permissionless, decentralized, secure protocol bounded by energy that couldn't be changed by governments,"* with two additions: *network* prepended (topological frame) and *absolutely scarce* appended (supply property). Booth credit is preserved in the citation block below the final reveal.
+
+### Carousel interaction (STYLE_GUIDE §6.27)
+
+The page uses the **sentence-as-navigation carousel** pattern (`STYLE_GUIDE §6.27`). The sticky sentence at the top doubles as navigation — each of the eight terms is a clickable span. A single explorer card sits below the sentence; content swaps in place via a brief opacity fade when the reader navigates. Prev / counter / Continue controls in a fixed position below the card. Keyboard arrows also work.
+
+Three navigation paths:
+- **Sentence-word click** — direct random access to any of the 8 ideas
+- **Continue / Previous** — linear traversal. Continue label stays "Continue →" on the last card (not "Complete") — relabeling to "Complete" risked readers deciding they were done and not clicking through to see the final lit-up sentence reveal
+- **Keyboard** — Arrow Left / Right; Enter / Space on a focused sentence-word
+
+URL hash mirrors the current idea (`/bitcoin-defined#decentralized` deep-links into that card). Back/forward buttons navigate between visited ideas.
+
+### Visual treatment
+
+Each idea has a Grok-generated 1280×720 atmospheric photograph at repo root (`bd-network.jpg` through `bd-bounded-by-energy.jpg`). The eighth (`bd-absolutely-scarce.jpg`, moon over dark sea) is pending generation — the data file has `image: null` for it and falls back to the inline SVG gracefully.
+
+Image curation reading:
+- **Network** — sandhill cranes in shallow water (collective behavior; only living-being image, acceptable outlier)
+- **Open** — natural sea arch (an opening formed by elemental forces, not gatekept)
+- **Permissionless** — winding path through tall grass (organic emergence, no toll)
+- **Decentralized** — ancient olive grove (gnarled trees, distributed, none dominant)
+- **Secure** — stratified rock cliff (immutable geological layers)
+- **Protocol** — Roman aqueduct (repeating arches read as blocks; civilizational endurance)
+- **Bounded by energy** — embers with small live flame (past work crystallized into structure + present work still expending — represents ongoing PoW, not "completion")
+- **Absolutely scarce** (pending) — moon over dark sea (singular, eternal, impossible to mint another)
+
+### Cross-linking
+
+- `/synthesis.html` is the bidirectional companion — Synthesis names the six components; Bitcoin Defined names the eight ideas; same system, two angles of approach
+- `/what-money-has-to-be.html` — the requirements side of the definition (why these properties matter)
+- `/what-bitcoin-is.html` — the dimensional companion (asset / network / technology / money)
+- `/the-bitcoin-migration.html` — the practical question that follows once the definition lands
+
+All four companions have reciprocal `related:` entries pointing back to Bitcoin Defined.
+
+### Future work
+
+- **Image 8 of 8 (Absolutely Scarce).** Pending Grok generation — moon over dark sea. Drop-in spec: save as `/bd-absolutely-scarce.jpg` at repo root (1280×720), register in `.eleventy.js` `staticAssets`, change `image: null → image: '/bd-absolutely-scarce.jpg'` in the 8th entry of `bdWords` (in `bitcoin-defined.js`). Three small edits, no other changes.
+- **Dead CSS cleanup.** The carousel rebuild left harmless dead CSS rules from the prior stacked-cards design (`.bd-card-cta-wrap`, `.bd-card-cta`, `.bd-card-revealed-marker`). Tracked in TECH_DEBT §6 for a follow-up sweep.
+- **Carousel-slide on homepage.** Page is not yet in the homepage carousel rotation. Pending Grok Imagine video — direction TBD; conceptual direction is one of the atmospheric idea images animated subtly (embers glowing, cranes lifting, light shifting across the olive grove).
+
+---
+
 _Last updated: May 2026. Update this document as editorial decisions crystallize into principles worth preserving._

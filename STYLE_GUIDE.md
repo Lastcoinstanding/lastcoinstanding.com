@@ -1591,6 +1591,80 @@ JS targeting strategy:
 
 Each calculator page wires its own in-page IIFE; the layout-level IIFE in `base.njk` handles the auto-injected surface for every page.
 
+### 6.27 Sentence-as-navigation carousel (`bd-explorer`)
+
+For sequential editorial content with N short, named components that compose a single sentence or thesis — when the goal is to let the reader explore each component in place without scroll-and-reorient friction between them.
+
+Introduced on the Bitcoin Defined page (May 2026 rebuild). Replaced an earlier stacked-cards design where the user had to scroll between sections after clicking Continue; users reported that each click required additional manual scrolling to find the next image, text, and button. The fix is to swap content in place within a single fixed card slot, and to make the sentence itself the navigation.
+
+**Markup.** Two persistent containers above the carousel: a sticky sentence (rendered with each load-bearing term as a clickable span) and a progress counter. Below: a single card slot whose innards are swapped by JS; below the card, a Prev / counter / Next nav strip; below that, an optional reset link that appears only after 2+ components have been visited.
+
+```html
+<div class="bd-sticky-wrap">
+  <div class="bd-sticky-sentence" id="bdStickySentence" aria-label="...Each idea is a navigable section.">
+    <span class="bd-fixed">The Bitcoin&nbsp;</span>
+    <span class="bd-word" data-word="network" role="button" tabindex="0">network</span>
+    <span class="bd-fixed">&nbsp;is the&nbsp;</span>
+    <span class="bd-word" data-word="open" role="button" tabindex="0">open</span>
+    <!-- ...each load-bearing term gets a .bd-word span -->
+  </div>
+  <div class="bd-progress" id="bdProgress" aria-live="polite">
+    <span id="bdProgressCount">0</span> of N revealed &middot;
+    <span class="bd-progress-hint">click any idea to jump</span>
+  </div>
+</div>
+
+<main class="bd-explorer">
+  <article class="bd-card" id="bdCard">
+    <div class="bd-card-inner">
+      <div class="bd-card-image" id="bdCardImage"></div>
+      <div class="bd-card-text-col">
+        <p class="bd-card-eyebrow" id="bdCardEyebrow"></p>
+        <h2 class="bd-card-word" id="bdCardWord"></h2>
+        <p class="bd-card-definition" id="bdCardDefinition"></p>
+        <div class="bd-card-elaboration" id="bdCardElaboration"></div>
+      </div>
+    </div>
+  </article>
+  <div class="bd-explorer-nav">
+    <button class="bd-nav-btn bd-nav-prev" id="bdPrev">← Previous</button>
+    <div class="bd-nav-counter" id="bdCounter" aria-live="polite">Idea 1 of N</div>
+    <button class="bd-nav-btn bd-nav-next" id="bdNext">Continue →</button>
+  </div>
+  <div class="bd-explorer-reset" id="bdResetWrap" style="display:none">
+    <button class="bd-reset-btn" id="bdReset">Reset progress</button>
+  </div>
+</main>
+```
+
+**Layout.** Side-by-side on desktop (image left ~50%, text right ~50%) so image and text don't compete for vertical viewport budget; stacks on mobile (<880px). Card padding ~1.75rem; sticky-sentence padding tightened to ~1rem top/bot (~110px total sticky-header height including progress line). On a 768px-tall viewport: site nav 65 + sticky 110 + card ~370 + nav controls ~68 = ~613px, fits with ~155px headroom. Image is rendered as `<img>` with `object-fit: cover` inside an aspect-ratio: 16/9 container; a fallback inline SVG is used for any component without a generated photo yet (graceful degradation while photography is in-flight).
+
+**JS state model.** Two pieces of state: `{ currentIndex, visited }`. `currentIndex` is the integer of the currently-displayed component (0..N-1). `visited` is an object-as-set tracking which indices the reader has touched — drives the sentence-word highlighting (`.bd-revealed` for visited, `.bd-active` for current) and the progress counter. URL hash mirrors the current word's slug (`/page#component-id`) via `history.replaceState` so bookmarking and back/forward both work without polluting history. On page load, `parseHash()` resolves the initial component; on hash change (back/forward), the carousel updates with `{ skipAnimation: true }`.
+
+**Content swap.** ~180ms opacity fade — JS adds `.bd-swapping` to the card, sets a `setTimeout` for the actual content swap, then removes the class. Editorial register, not flashy; matches the site's calm voice. No slide animations.
+
+**Navigation surfaces.** Three ways to navigate:
+1. **Sentence-word click** — any of the N spans in the sticky sentence is clickable. Click jumps directly. Visited words light up amber, current pulses. Sentence is the navigation.
+2. **Continue / Previous buttons** — standard linear traversal. Continue stays labeled `Continue →` on every card including the last (don't relabel to "Complete" — readers may decide they're done and not click, missing the final reveal). On the last card, Continue scrolls smoothly to the final reveal section.
+3. **Keyboard** — Arrow Right / Left for next/prev; Enter / Space on a focused sentence-word activates it.
+
+**Final-reveal pattern.** When `visited.size === N`, a final section reveals (fade-in) showing the full completed sentence with all components lit, plus a closing reflection. The reflection should affirm what the page does (definition / accumulation / synthesis) and explicitly hand off the "what follows from this" arguments to other pages — to prevent overlap with sibling pages that make the consequence-of-each-component argument.
+
+**When to use it.**
+
+- Editorial content with N short, named components (3–10 range; below 3 a stack is fine, above 10 it's an exploration not a sequence)
+- The components compose a coherent whole (the sentence, the framework, the system) — not a checklist
+- Sequential reading order is the default but random-access matters too (readers may want to revisit a specific component)
+- Each component has roughly comparable content depth — variation is fine but order-of-magnitude differences make the fixed-height slot fight you
+
+**When to skip it.**
+
+- The components aren't sequenced (no natural reading order → use a 2D map or grid)
+- A reader needs to compare two components side-by-side (carousel makes that impossible by design)
+- Components are too long to swap meaningfully (>1 screen of text per component → stack or paginate)
+
+Currently consumed by `/bitcoin-defined` (May 2026). When a second consumer arrives, promote the `.bd-` prefix to a generic `.carousel-` or `.explorer-` namespace.
+
 ### Naming convention reminder
 
 Several patterns above follow the convention `{purpose}-{role}`: `calc-mode-*`, `porkopolis-credit*`, `channel-*`, `start-input-*`. When introducing future patterns, prefer this convention over generic names like `.toggle` or `.controls` to avoid collisions across pages. Recipes §6.20–6.25 above were introduced on BvSM in May 2026 and are currently page-scoped (`.bvsm-section-eyebrow`, `.bvsm-as-of-callout`, etc. in the live page CSS); the recipe names above use the unprefixed canonical form. When a second consumer of any of these patterns arrives, promote the CSS into the shared layer and drop the prefix.
