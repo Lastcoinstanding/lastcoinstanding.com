@@ -1,0 +1,314 @@
+---
+layout: base.njk
+permalink: /spend-and-replace.html
+slug: spend-and-replace
+related:
+  - slug: living-on-bitcoin
+    desc: "The companion practice — holding operating cash in bitcoin and paying fiat bills as they come due. Same circular-economy mindset, the cash-layer view rather than the spending-event view."
+  - slug: the-bitcoin-retirement
+    desc: "Where bitcoin's compounding actually does meaningful financial work. Spend-and-Replace handles the day-to-day tax cleanly; the retirement page handles the wealth engine underneath."
+  - slug: what-money-has-to-be
+    desc: "The structural argument for why bitcoin functions as a medium of exchange in the first place — the precondition for any spending at all to be worth the friction."
+companion: []
+eleventyComputed:
+  head_extras: "{% include '_pageassets/spend-and-replace-head.html' %}"
+  page_styles: "{% include '_pageassets/spend-and-replace.css' %}"
+  page_scripts: "{% include '_pageassets/spend-and-replace.js' %}"
+---
+<div class="page">
+
+  <!-- ─── HERO ─── -->
+  <header class="page-header">
+    <div class="eyebrow">The Arguments</div>
+    <h1>Bitcoin <span class="amber">Spend and Replace</span></h1>
+    <p class="subtitle"><em>The most common assumption about taxes when spending bitcoin in the US is wrong. Here&rsquo;s what &ldquo;replace and spend&rdquo; actually buys you, and how to do it cleanly.</em></p>
+  </header>
+
+  <!-- ─── BODY ─── -->
+  <article class="essay">
+
+    <section class="section">
+      <h2>The comforting myth</h2>
+      <p class="prose">A persistent piece of Bitcoiner folklore holds that if you spend bitcoin and immediately buy back the same amount with fresh dollars, the spending event &ldquo;doesn&rsquo;t count&rdquo; for tax purposes &mdash; your bitcoin balance is unchanged, so there&rsquo;s nothing for the IRS to tax. This is wrong. It&rsquo;s a comfortable wrong, and it stays wrong even if everyone you know believes it.</p>
+      <p class="prose">It also obscures something more useful. The right version of this practice &mdash; <em>Replace and Spend</em>, in that order, executed with a small amount of discipline &mdash; can reduce the tax on a given transaction to something close to zero. It can&rsquo;t eliminate the taxable event itself (only one move can, and we&rsquo;ll get to it near the end). But &ldquo;close to zero on this spend, with my legacy stack undisturbed&rdquo; is a meaningfully different proposition from &ldquo;no tax at all on anything.&rdquo; It&rsquo;s also the proposition that&rsquo;s actually available.</p>
+      <p class="prose">This page is for US Bitcoiners who want to spend bitcoin in the circular economy without surrendering more to the tax man than they have to. It&rsquo;s written to current US federal law as of mid-2026, which is always a moving target &mdash; sometimes in helpful directions. The closing section covers what&rsquo;s pending and what might simplify all of this.</p>
+    </section>
+
+    <section class="section">
+      <h2>The reality in one paragraph</h2>
+      <p class="prose">Under IRS Notice 2014-21, the foundational guidance from a decade ago, bitcoin is property for federal tax purposes &mdash; not currency.<sup class="fn-mark"><a href="#fn-1" id="fnref-1">1</a></sup> Every time you spend bitcoin on something, you&rsquo;re disposing of property, and you owe capital gains tax on the difference between what those specific units of bitcoin originally cost you (your <em>cost basis</em>) and what they&rsquo;re worth at the moment you spend them. Buying more bitcoin afterward does not retroactively cancel the disposition. The IRS does not recognize what tax professionals call &ldquo;balance-sheet offsets&rdquo; between non-simultaneous transactions. The spend is a completed sale; the repurchase is a new acquisition with new basis. They are two separate events that happen to involve the same asset.</p>
+      <p class="prose">This is the <em>net-zero balance illusion</em>. It is the central misconception this page exists to put to bed.</p>
+    </section>
+
+    <section class="section">
+      <h2>Sequence is everything</h2>
+      <p class="prose">The sequence of the two transactions decides which lot of bitcoin gets sold &mdash; and therefore what the gain is.</p>
+      <p class="prose"><strong>Spend then Replace.</strong> You spend bitcoin first, then go buy more, immediately after. Under the default IRS accounting method &mdash; First-In, First-Out, or FIFO &mdash; the bitcoin that gets sold is the oldest bitcoin in your account. For most long-term holders, the oldest bitcoin is also the cheapest, bought years ago at a fraction of today&rsquo;s price. Spending those low-basis units triggers the largest possible gain. The replacement purchase just gives you new bitcoin sitting at today&rsquo;s price, which has no effect on the tax you already owe on the spend.</p>
+      <p class="prose"><strong>Replace then Spend.</strong> You buy the bitcoin first, then spend it. The newly-acquired bitcoin has a cost basis equal to roughly today&rsquo;s price. If you can identify <em>those specific units</em> as the ones being spent, the gain on the spending transaction is approximately zero &mdash; basis &asymp; sale price, by construction. Your low-basis legacy holdings stay where they are, untouched.</p>
+      <p class="prose">The difference between these two sequences, on say a $200 electronics-store spend by someone holding bitcoin at a 10&times; embedded gain, is roughly $30 of capital gains tax versus roughly nothing. Across a year of routine spending, the difference compounds into real money.</p>
+
+      <!-- ─── DIAGRAM ─── -->
+      <figure class="diagram-frame" role="figure" aria-label="Spend then Replace versus Replace then Spend">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" preserveAspectRatio="xMidYMid meet" class="sequence-diagram" aria-labelledby="seqDiagTitle seqDiagDesc">
+          <title id="seqDiagTitle">Spend then Replace versus Replace then Spend: a comparison of tax outcomes</title>
+          <desc id="seqDiagDesc">Side-by-side comparison of two sequences for spending bitcoin. In Spend then Replace, the FIFO default pulls the oldest, lowest-basis lot from your transactional wallet, producing the largest possible capital gain. In Replace then Spend, a fresh high-basis lot enters the wallet first; HIFO then pulls that lot when you spend, producing approximately zero gain and leaving the legacy stack untouched.</desc>
+          <defs>
+            <marker id="seqArrowAmber" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+              <polygon points="0 0, 10 5, 0 10" fill="#e09422"/>
+            </marker>
+            <pattern id="seqDimHatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(150,139,122,0.18)" stroke-width="2"/>
+            </pattern>
+          </defs>
+          <style>
+            .sd-caps        { font: 500 11px Inter, system-ui, sans-serif; fill: #968b7a; letter-spacing: 0.22em; }
+            .sd-panel-title { font: 600 22px Inter, system-ui, sans-serif; fill: #ece4d6; }
+            .sd-label       { font: 500 13px Inter, system-ui, sans-serif; fill: #ccc6b8; }
+            .sd-label-it    { font: 500 italic 13px Inter, system-ui, sans-serif; fill: #e09422; }
+            .sd-axis-label  { font: 400 10px Inter, system-ui, sans-serif; fill: #5a5247; letter-spacing: 0.05em; }
+            .sd-outcome     { font: 600 17px Inter, system-ui, sans-serif; fill: #e09422; }
+            .sd-outcome-sub { font: 400 13px Inter, system-ui, sans-serif; fill: #ccc6b8; }
+            .sd-rule        { stroke: rgba(224,148,34,0.30); stroke-width: 1; }
+            .sd-rule-dim    { stroke: rgba(224,148,34,0.15); stroke-width: 1; }
+            .sd-wallet      { fill: none; stroke: rgba(224,148,34,0.30); stroke-width: 1.5; }
+            .sd-bar-legacy  { fill: rgba(224,148,34,0.42); }
+            .sd-bar-sold    { fill: #e09422; stroke: #F7931A; stroke-width: 2.5; }
+            .sd-bar-future  { fill: url(#seqDimHatch); stroke: rgba(150,139,122,0.30); stroke-width: 1; stroke-dasharray: 3 3; }
+            .sd-axis        { stroke: rgba(150,139,122,0.30); stroke-width: 1; }
+          </style>
+          <!-- LEFT PANEL -->
+          <g transform="translate(50,30)">
+            <text x="0" y="18" class="sd-caps">THE DEFAULT OUTCOME</text>
+            <text x="0" y="52" class="sd-panel-title">Spend then Replace</text>
+            <line x1="0" y1="68" x2="390" y2="68" class="sd-rule"/>
+            <text x="0" y="92" class="sd-label">At the time of the spend, your wallet</text>
+            <text x="0" y="110" class="sd-label">holds your legacy lots &mdash; nothing else.</text>
+            <rect x="0" y="130" width="390" height="170" rx="4" class="sd-wallet"/>
+            <text x="380" y="148" class="sd-caps" text-anchor="end">YOUR WALLET</text>
+            <line x1="15" y1="280" x2="375" y2="280" class="sd-axis"/>
+            <rect x="30"  y="252" width="40" height="28"  class="sd-bar-sold"   rx="2"/>
+            <text x="50"  y="294" class="sd-axis-label" text-anchor="middle">2017</text>
+            <rect x="90"  y="232" width="40" height="48"  class="sd-bar-legacy" rx="2"/>
+            <text x="110" y="294" class="sd-axis-label" text-anchor="middle">2018</text>
+            <rect x="150" y="208" width="40" height="72"  class="sd-bar-legacy" rx="2"/>
+            <text x="170" y="294" class="sd-axis-label" text-anchor="middle">2020</text>
+            <rect x="210" y="184" width="40" height="96"  class="sd-bar-legacy" rx="2"/>
+            <text x="230" y="294" class="sd-axis-label" text-anchor="middle">2022</text>
+            <rect x="270" y="162" width="40" height="118" class="sd-bar-legacy" rx="2"/>
+            <text x="290" y="294" class="sd-axis-label" text-anchor="middle">2024</text>
+            <rect x="330" y="140" width="40" height="140" class="sd-bar-future" rx="2"/>
+            <text x="350" y="294" class="sd-axis-label" text-anchor="middle">(later)</text>
+            <path d="M 50 248 C 50 200, 20 195, 0 200" stroke="#e09422" stroke-width="2" fill="none" marker-end="url(#seqArrowAmber)"/>
+            <text x="-20" y="180" class="sd-label-it">FIFO pulls</text>
+            <text x="-20" y="197" class="sd-label-it">the oldest lot</text>
+            <text x="-2" y="155" class="sd-axis-label" transform="rotate(-90 -2 155)" text-anchor="middle">basis ($)</text>
+            <text x="350" y="248" class="sd-axis-label" text-anchor="end">replacement</text>
+            <text x="350" y="262" class="sd-axis-label" text-anchor="end">happens after</text>
+            <line x1="0" y1="335" x2="390" y2="335" class="sd-rule"/>
+            <text x="0" y="360" class="sd-caps">RESULT ON A $200 SPEND</text>
+            <text x="0" y="395" class="sd-outcome">&asymp; $30 capital gains tax</text>
+            <text x="0" y="424" class="sd-outcome-sub">Largest possible gain. The cheapest legacy</text>
+            <text x="0" y="444" class="sd-outcome-sub">lot is gone; your stack is disturbed.</text>
+          </g>
+          <line x1="490" y1="60" x2="490" y2="480" class="sd-rule-dim"/>
+          <!-- RIGHT PANEL -->
+          <g transform="translate(540,30)">
+            <text x="0" y="18" class="sd-caps">THE INTENTIONAL OUTCOME</text>
+            <text x="0" y="52" class="sd-panel-title">Replace then Spend</text>
+            <line x1="0" y1="68" x2="390" y2="68" class="sd-rule"/>
+            <text x="0" y="92" class="sd-label">At the time of the spend, your wallet</text>
+            <text x="0" y="110" class="sd-label">already holds the fresh, high-basis lot.</text>
+            <rect x="0" y="130" width="390" height="170" rx="4" class="sd-wallet"/>
+            <text x="380" y="148" class="sd-caps" text-anchor="end">YOUR WALLET</text>
+            <line x1="15" y1="280" x2="375" y2="280" class="sd-axis"/>
+            <rect x="30"  y="252" width="40" height="28"  class="sd-bar-legacy" rx="2"/>
+            <text x="50"  y="294" class="sd-axis-label" text-anchor="middle">2017</text>
+            <rect x="90"  y="232" width="40" height="48"  class="sd-bar-legacy" rx="2"/>
+            <text x="110" y="294" class="sd-axis-label" text-anchor="middle">2018</text>
+            <rect x="150" y="208" width="40" height="72"  class="sd-bar-legacy" rx="2"/>
+            <text x="170" y="294" class="sd-axis-label" text-anchor="middle">2020</text>
+            <rect x="210" y="184" width="40" height="96"  class="sd-bar-legacy" rx="2"/>
+            <text x="230" y="294" class="sd-axis-label" text-anchor="middle">2022</text>
+            <rect x="270" y="162" width="40" height="118" class="sd-bar-legacy" rx="2"/>
+            <text x="290" y="294" class="sd-axis-label" text-anchor="middle">2024</text>
+            <rect x="330" y="140" width="40" height="140" class="sd-bar-sold" rx="2"/>
+            <text x="350" y="294" class="sd-axis-label" text-anchor="middle">just</text>
+            <text x="350" y="306" class="sd-axis-label" text-anchor="middle">bought</text>
+            <path d="M 350 136 C 350 100, 380 95, 395 105" stroke="#e09422" stroke-width="2" fill="none" marker-end="url(#seqArrowAmber)"/>
+            <text x="395" y="95" class="sd-label-it">HIFO pulls</text>
+            <text x="395" y="112" class="sd-label-it">the new lot</text>
+            <text x="-2" y="155" class="sd-axis-label" transform="rotate(-90 -2 155)" text-anchor="middle">basis ($)</text>
+            <text x="170" y="332" class="sd-axis-label" text-anchor="middle">&#8593; legacy lots untouched</text>
+            <line x1="0" y1="345" x2="390" y2="345" class="sd-rule"/>
+            <text x="0" y="370" class="sd-caps">RESULT ON A $200 SPEND</text>
+            <text x="0" y="405" class="sd-outcome">&asymp; $0 capital gains tax</text>
+            <text x="0" y="434" class="sd-outcome-sub">Basis &asymp; sale price by construction.</text>
+            <text x="0" y="454" class="sd-outcome-sub">Legacy stack preserved.</text>
+          </g>
+          <line x1="50" y1="510" x2="910" y2="510" class="sd-rule-dim"/>
+          <text x="480" y="535" class="sd-label" text-anchor="middle">
+            <tspan fill="#ccc6b8">Same wallet, same $200 spend.</tspan>
+            <tspan dx="6" fill="#968b7a">Reversing the order changes which lot the IRS deems sold, and changes the tax by an order of magnitude.</tspan>
+          </text>
+        </svg>
+        <figcaption class="diagram-caption">Same wallet, same spend &mdash; reversing the order changes the tax outcome by an order of magnitude.</figcaption>
+      </figure>
+
+      <p class="prose">The catch: <em>&ldquo;if you can identify those specific units&rdquo;</em> is doing serious work in that sentence. Without identification, you default back to FIFO and end up with the Spend-then-Replace tax outcome no matter what order you actually did the transactions in. Identification is the mechanism that makes Replace-and-Spend actually work.</p>
+    </section>
+
+    <section class="section">
+      <h2>Getting the identification right</h2>
+      <p class="prose">The IRS allows several methods for identifying which lot you&rsquo;re selling. The two that matter for Replace-and-Spend are:</p>
+      <ul class="prose-list">
+        <li><strong>Specific Identification &mdash; &ldquo;Spec ID&rdquo;:</strong> You designate the exact units being sold, with reference to their acquisition date and price, no later than the moment of the transaction.<sup class="fn-mark"><a href="#fn-2" id="fnref-2">2</a></sup></li>
+        <li><strong>Highest-In, First-Out &mdash; &ldquo;HIFO&rdquo;:</strong> A programmatic version of Spec ID that automatically picks the highest-basis units first. Since the bitcoin you just bought is, by construction, the highest-basis bitcoin in the wallet, a standing HIFO instruction will pair your spend with your replacement lot automatically.</li>
+      </ul>
+      <p class="prose">HIFO as a standing order is the practical answer for most people. You set it up once; it runs forever. You don&rsquo;t have to manually identify every electronics-store spend.</p>
+      <p class="prose">Three things have to be true for Spec ID or HIFO to work:</p>
+
+      <p class="prose"><strong>The replacement bitcoin must sit <em>in the same wallet</em> as the bitcoin you spend from.</strong> As of January 1, 2025, the IRS requires cost basis tracking on a wallet-by-wallet (or account-by-account) basis under Revenue Procedure 2024-28.<sup class="fn-mark"><a href="#fn-3" id="fnref-3">3</a></sup> You can no longer mix bases across wallets. If you &ldquo;replace&rdquo; on Coinbase and &ldquo;spend&rdquo; from a mobile wallet, the high-basis Coinbase lot is trapped on Coinbase &mdash; your spend pulls from whatever basis the mobile wallet holds. Replace and spend have to happen in the same container.</p>
+
+      <p class="prose"><strong>The <em>identification</em> must be contemporaneous &mdash; but the buy doesn&rsquo;t have to be simultaneous with the spend.</strong> This is a point worth slowing down on, because the wording trips people up. The IRS rule is that your documentation of <em>which lot you&rsquo;re selling</em> has to be recorded no later than the moment of the sale. It does not say the buy and the spend have to happen at the same instant. The practical workflow looks like this:</p>
+
+      <blockquote class="workflow">
+        <p><strong>Tuesday morning:</strong> You set up (once, in advance) a standing HIFO instruction in your exchange&rsquo;s tax settings and record the same instruction in your own books. That&rsquo;s your contemporaneous identification &mdash; it&rsquo;s already on file, applying to all future sales.</p>
+        <p><strong>Friday morning:</strong> You know you&rsquo;ll be making a $200 purchase later. You buy ~$200 of bitcoin on your exchange. That bitcoin now sits in the same account at roughly today&rsquo;s price.</p>
+        <p><strong>Friday afternoon:</strong> You spend the bitcoin. Because HIFO is your standing instruction, the lot the system identifies as sold is the highest-basis lot &mdash; which is the bitcoin you bought a few hours earlier. Gain &asymp; zero.</p>
+      </blockquote>
+
+      <p class="prose">A standing HIFO order is the elegant solution because it does the identification work in advance, once, and then disappears into the background. You don&rsquo;t have to make a manual identification before every coffee-shop purchase.</p>
+      <p class="prose">A practical note on the gap between buy and spend: you generally want some separation &mdash; hours to a day or so &mdash; rather than executing them within seconds of each other. Same-second buy-and-spend invites the step-transaction concern we&rsquo;ll get to in the Traps section. A few hours&rsquo; separation is enough to have real economic substance (the price could move; you&rsquo;re bearing genuine market risk), close enough that your basis is still approximately the spend value.</p>
+
+      <p class="prose"><strong>For broker-custodied bitcoin in 2025 and 2026, you have the option of documenting in your own books and records.</strong> This is the latest IRS relief: Notice 2025-7, extended through December 31, 2026 by Notice 2026-20, lets you make adequate identification in your own books rather than having to communicate it to your broker.<sup class="fn-mark"><a href="#fn-4" id="fnref-4">4</a></sup> The relief exists because most centralized exchanges haven&rsquo;t built the technology to accept per-transaction lot instructions; the IRS gave taxpayers a workaround. After the end of 2026, brokers are expected to handle this natively.</p>
+    </section>
+
+    <section class="section">
+      <h2>Tactics by tool type</h2>
+      <p class="prose"><strong>Centralized exchanges (Coinbase, Kraken, Gemini, and similar).</strong> Most major US exchanges support account-level HIFO or LIFO standing orders. Go to your tax settings and set HIFO. For 2025 and 2026, also keep a written record of the standing order in your own books &mdash; that&rsquo;s your fallback documentation under the Notice 2026-20 relief.<sup class="fn-mark"><a href="#fn-5" id="fnref-5">5</a></sup></p>
+
+      <p class="prose"><strong>Self-custody on Bitcoin (Trezor, Ledger, Sparrow, Wasabi).</strong> Bitcoin&rsquo;s UTXO architecture is unusually friendly to Specific Identification: every UTXO is, by design, a discrete lot with a known acquisition history. <em>Coin Control</em> &mdash; the feature that lets you manually pick which UTXOs to spend &mdash; is native to most serious Bitcoin wallets.<sup class="fn-mark"><a href="#fn-6" id="fnref-6">6</a></sup> Use it. When you replace, the new UTXO arrives with its high basis intact; when you spend, select that specific UTXO. The blockchain itself is your documentation.</p>
+
+      <p class="prose">One important caveat: <strong>the Notice 2025-7 / 2026-20 books-and-records relief is broker-only.</strong> It does not cover self-custody wallets. For self-custody, you have to do the per-transaction identification at the moment of the spend, contemporaneously. UTXO Coin Control is what gets you there.</p>
+
+      <p class="prose"><strong>The hybrid case &mdash; buying on an exchange, sending to self-custody, spending from there.</strong> This is the trickiest setup, and the one most likely to fail. Once you move bitcoin out of a broker&rsquo;s custody, the broker loses your basis information. If you later move it back to a broker to sell or spend, the broker treats it as a <em>noncovered security</em> &mdash; Form 1099-DA will report the gross proceeds with the basis box blank or zeroed.<sup class="fn-mark"><a href="#fn-7" id="fnref-7">7</a></sup> The IRS&rsquo;s automated systems then assume 100% of the proceeds is gain. You&rsquo;ll likely get a CP2000 notice. You can defend the actual basis with your own records, but the burden of proof is on you. If you&rsquo;re going this route, your reconciliation file &mdash; wallet-to-wallet transfer logs, contemporaneous lot ledgers, your standing-order documentation &mdash; needs to be airtight.</p>
+
+      <p class="prose">For most Bitcoiners spending modest amounts in the circular economy, the cleanest setup is the simplest one: keep a dedicated transactional wallet (broker or self-custody), execute Replace-and-Spend cleanly within that container, and leave the cold storage stack entirely alone.</p>
+    </section>
+
+    <section class="section">
+      <h2>Traps worth knowing</h2>
+      <p class="prose">A few risks worth flagging before you operate at scale.</p>
+      <p class="prose"><strong>The Step Transaction and Economic Substance doctrines.</strong> Federal courts have long allowed the IRS to disregard a series of formally separate transactions if their substance is a single tax-motivated maneuver with no real economic consequence. The Tenth Circuit&rsquo;s April 2026 ruling in <em>Liberty Global, Inc. v. United States</em> took an expansive view of when the codified Economic Substance Doctrine applies &mdash; including transactions that mechanically comply with the letter of the tax code but produce results Congress didn&rsquo;t intend.<sup class="fn-mark"><a href="#fn-8" id="fnref-8">8</a></sup> Replace-and-Spend executed as a one-off, with normal timing and ordinary economic intent, is not the kind of transaction these doctrines were built for. Replace-and-Spend executed as a hundred-times-per-day API-driven loop specifically to harvest losses, with no real change in your bitcoin exposure, is exactly the kind of thing that does attract attention. The practical defense, where doctrinal challenge is even plausible, is <em>temporal separation</em> &mdash; letting genuine market price movement happen between the replacement and the spend &mdash; and keeping your purpose ordinary (paying for things you&rsquo;d pay for anyway).</p>
+
+      <p class="prose"><strong>The pseudonymity false hope.</strong> Some Bitcoiners assume self-custody puts them outside the IRS&rsquo;s view. It does not. The IRS has been using blockchain analytics tools (Chainalysis being the most prominent) and &ldquo;John Doe&rdquo; summonses against exchanges since 2016, and the resulting wallet-cluster data is durable. The right framing isn&rsquo;t <em>they can&rsquo;t see it</em> &mdash; it&rsquo;s <em>make sure what they can see is fully reported, because what they audit you on later is the gap.</em> During an audit, the IRS uses an Information Document Request form covering digital asset platforms, wallets, and services, with an essentially unlimited look-back. Checking &ldquo;no&rdquo; for an exchange the IRS already has data linking to you can expose you to felony charges under 26 U.S.C. &sect; 7206(1) &mdash; false statements under penalty of perjury &mdash; even without any underpayment of tax.<sup class="fn-mark"><a href="#fn-9" id="fnref-9">9</a></sup></p>
+
+      <p class="prose"><strong>A note on losses.</strong> You may have heard that bitcoin doesn&rsquo;t currently fall under the &ldquo;wash sale&rdquo; rule that prevents stock investors from claiming a loss and immediately repurchasing the same stock. That&rsquo;s true today: IRC &sect; 1091 applies only to &ldquo;stocks and securities,&rdquo; and bitcoin is property. So tax-loss harvesting via Spend-and-Replace at a loss is currently legal.<sup class="fn-mark"><a href="#fn-10" id="fnref-10">10</a></sup> But: the PARITY Act (more on it below) would close this loophole by expanding &sect; 1091 to cover digital assets, and other proposed bills contain similar provisions. The wash sale loophole has a visible expiration date. Use it if it suits you while it&rsquo;s open; don&rsquo;t build a multi-year plan around its continued existence.</p>
+    </section>
+
+    <!-- ─── SIDEBAR: DONATE AND REPLACE ─── -->
+    <aside class="sidebar">
+      <div class="sidebar-eyebrow">Sidebar</div>
+      <h3>Donate and Replace &mdash; the one move that actually eliminates the tax</h3>
+      <p class="prose">If you&rsquo;re the giving kind, there&rsquo;s a related move that uniquely <em>eliminates</em> tax on the disposition rather than merely minimizing it.</p>
+      <p class="prose">When you donate appreciated property held for more than a year to a qualified US charity, you can deduct the full fair-market value of the donation on your taxes <em>and</em> you don&rsquo;t recognize the capital gain on the appreciation. Both effects happen because the IRS treats charitable donations of long-term appreciated property differently from sales. If you then replace the donated bitcoin with a cash purchase at current price, you&rsquo;ve moved the appreciation off your books entirely, refreshed the basis on your stack, and supported a cause you believe in.</p>
+      <p class="prose">This is the only &ldquo;spend and replace&rdquo; variant that genuinely makes the tax disappear, and it&rsquo;s a particularly clean fit with the Bitcoiner ethos of putting bitcoin into circulation for things that matter. A growing number of charities accept bitcoin directly &mdash; including Bitcoin-aligned organizations like the Human Rights Foundation, Coin Center, and the Bitcoin Policy Institute, alongside many traditional 501(c)(3)s.</p>
+      <p class="prose">The mechanics still require care: the donation must go to a 501(c)(3) qualified organization, you&rsquo;ll need a contemporaneous written acknowledgment from the charity for any donation over $250, and donations of bitcoin over $5,000 require a qualified appraisal. But if you were planning charitable giving anyway, doing it in bitcoin and then buying the bitcoin back with the cash you would have donated is the most tax-efficient way to do both.</p>
+    </aside>
+
+    <section class="section">
+      <h2>What to do tomorrow</h2>
+      <p class="subhead-note"><em>(If you want to participate in spending in the Bitcoin circular economy without taxable-event anxiety.)</em></p>
+      <p class="prose">If you take one thing from this page, take this: spending bitcoin in the circular economy is taxable, and the cleanest way to keep that tax small is to <em>buy first, spend second, in the same wallet, with HIFO documented as a standing instruction.</em></p>
+      <p class="prose">Concretely:</p>
+      <ol class="prose-list numbered">
+        <li>Pick one wallet (or one exchange account) as your transactional wallet. Keep your cold storage out of it entirely.</li>
+        <li>Set a standing HIFO instruction. On a centralized exchange, configure it in your tax settings. In self-custody, plan to use Coin Control on every spend. Record the standing instruction in your own books and records for 2025 and 2026 either way.</li>
+        <li>Before any spend, buy the bitcoin you&rsquo;re about to spend (or close to it, in dollar terms). Same wallet. Leave a few hours of separation if you can.</li>
+        <li>Spend.</li>
+        <li>Keep records: date, time, lots, USD value at the moment of each transaction. Most tax software (Koinly, CoinTracker, and similar) handles this if you connect your wallet &mdash; but verify the lots they&rsquo;re matching, because the default may not be HIFO.</li>
+        <li>At tax time, your accountant files Form 8949 with your specifically identified lots. The gain per transaction should be small.</li>
+      </ol>
+    </section>
+
+    <section class="section">
+      <h2>What&rsquo;s coming (maybe)</h2>
+      <p class="prose">There&rsquo;s a non-trivial chance much of this gets simpler in the next two or three years.</p>
+      <p class="prose">For nearly a decade, various US lawmakers have proposed a <em>de minimis</em> exemption &mdash; a rule that would simply exempt small personal bitcoin transactions from capital gains reporting, much the way the tax code has long exempted small foreign currency transactions ($200 or under). The Lummis-Gillibrand proposal of recent congressional sessions floated $300 per transaction with a $5,000 annual cap. The Digital Asset PARITY Act, first introduced as a discussion draft in December 2025, originally proposed a $200 per-transaction exemption <em>only</em> for regulated stablecoins, with native bitcoin explicitly excluded &mdash; drawing public criticism from the Bitcoin Policy Institute and others as a &ldquo;two-tier tax regime&rdquo; disadvantaging decentralized assets.<sup class="fn-mark"><a href="#fn-11" id="fnref-11">11</a></sup></p>
+      <p class="prose">The latest revision of the PARITY Act, released in late May 2026, walked the bitcoin exclusion back partially. It now <em>directs the IRS to study and report on how a de minimis exemption might work</em> for non-stablecoin digital assets &mdash; a softer move than blanket relief but a meaningful change in posture. The result is that the bitcoin-coffee question is, for the first time in a decade, formally on the legislative agenda rather than perpetually deferred.</p>
+      <p class="prose">The honest summary: a de minimis exemption for bitcoin specifically is plausible within the next few years, but no version of it has yet passed, and the bill currently moving the fastest only directs a study rather than granting relief. If it does pass &mdash; for bitcoin, not just stablecoins &mdash; much of this page becomes obsolete for small everyday spending, which would be excellent news. We&rsquo;ll update the page when something is signed into law. Until then, this is the world we have.</p>
+    </section>
+
+    <section class="section">
+      <h2>A note on intent</h2>
+      <p class="prose">We didn&rsquo;t write this page to dissuade anyone from spending bitcoin in the circular economy. The opposite, really. As with all our pages, the point isn&rsquo;t to recommend or discourage &mdash; it&rsquo;s to put accurate facts in front of people who care.</p>
+      <p class="prose">A few of those facts deserve calling out plainly. First, many Bitcoiners already spend bitcoin routinely on small things &mdash; coffee, lunches, online subscriptions, merchant transactions &mdash; and that behavior is genuinely good for the network, for merchant adoption, and for the long-term case that bitcoin is money. It deserves more of, not less. Second, there&rsquo;s no public evidence the IRS has ever pursued an audit of a $4 latte purchase, or anything close to it. Public enforcement case histories cluster around large-scale concealment, not micro-transactions. The agency itself has signaled, including through its expressed openness to de minimis frameworks in foreign currency contexts, that it doesn&rsquo;t actually want to be in the business of taxing coffee. Third, the friction in the current regime is paper, not pursuit: the new 1099-DA reporting mechanically creates reportable events for every transaction, regardless of size, which produces document-mismatch problems and audit risk even when the IRS would prefer not to litigate small spends. That asymmetry &mdash; the IRS doesn&rsquo;t want to chase these, but the paperwork insists they exist &mdash; is exactly why bipartisan support for a value-based de minimis exemption keeps growing.</p>
+      <p class="prose">The practical upshot: keep using bitcoin. The more it gets used at the cup-of-coffee level, the harder the current regime is to defend on its own terms, and the more pressure builds for the kind of de minimis fix that would let everyone &mdash; taxpayers, accountants, the IRS itself &mdash; stop worrying about $4 lattes. In the meantime, this page exists to help you do it cleanly.</p>
+    </section>
+
+    <section class="section disclaimer">
+      <h2>Not tax advice</h2>
+      <p class="prose">This page describes US federal tax rules as we understand them as of mid-2026 and tactics that practitioners commonly use to comply with them. It is not tax advice and we are not your tax advisor. Your specific situation, your state tax exposure, your audit history, and the precise mechanics of your wallets and exchanges all matter, and we can&rsquo;t see any of them. The audit-form perjury exposure under 26 U.S.C. &sect; 7206(1) for incomplete disclosure is real; treat it seriously. For anything more consequential than a coffee-shop spend, talk to a CPA who routinely handles digital assets.</p>
+    </section>
+
+    <!-- ─── NOTES & REFERENCES ─── -->
+    <section class="notes-section" aria-labelledby="notes-heading">
+      <h2 id="notes-heading">Notes &amp; References</h2>
+      <p class="notes-intro"><em>The notes below are supplemental &mdash; for readers who want the legal background, primary-source links, and a bit more doctrinal context behind the claims in the body. The body of the page stands on its own; nothing here is required reading.</em></p>
+
+      <ol class="notes-list">
+        <li id="fn-1">
+          <strong>IRS Notice 2014-21 and the property classification.</strong>
+          The IRS first ruled that &ldquo;convertible virtual currency&rdquo; is treated as property for federal tax purposes in <a href="https://www.irs.gov/pub/irs-drop/n-14-21.pdf" target="_blank" rel="noopener">Notice 2014-21</a>, issued in March 2014. The classification means every sale or exchange of bitcoin &mdash; including a purchase of goods or services &mdash; triggers a capital gain or loss under IRC &sect; 1001, calculated as the difference between the fair market value of what you received and your adjusted cost basis in the bitcoin you disposed of. The classification has been controversial for over a decade. It&rsquo;s why there is currently no <em>de minimis</em> exemption for small spending (cash and foreign currency have one; property doesn&rsquo;t), and it&rsquo;s the structural reason Replace-and-Spend exists as a tactic at all. <em>Holding period matters here:</em> gains on bitcoin held one year or less are taxed at ordinary income rates (10&ndash;37% in 2026); gains on bitcoin held more than a year are taxed at long-term capital gains rates (0%, 15%, or 20%), plus a 3.8% Net Investment Income Tax for higher-income filers. <a href="#fnref-1" class="fn-back" aria-label="Back to text">&#8617;</a>
+        </li>
+        <li id="fn-2">
+          <strong>Specific Identification requirements.</strong>
+          The contemporaneous identification rule lives at Treas. Reg. &sect; 1.1012-1(j)(3)(ii). The taxpayer must identify the specific units being sold &mdash; by acquisition date and price &mdash; no later than the date and time of the sale. Without an adequate identification, the units are deemed sold under FIFO. Notice 2025-7 and Notice 2026-20 (see note 4) added a temporary allowance for taxpayers to record identifications in their own books and records rather than communicating them to their broker, but only for broker-custodied assets. For self-custody, the contemporaneity rule is unchanged: identify the lot at the moment of spending. Note that the contemporaneity requirement attaches to the <em>identification</em> (the documentation), not to the timing of the replacement purchase itself &mdash; a point that confuses many readers. <a href="#fnref-2" class="fn-back" aria-label="Back to text">&#8617;</a>
+        </li>
+        <li id="fn-3">
+          <strong>Revenue Procedure 2024-28 &mdash; the end of universal pooling.</strong>
+          <a href="https://www.irs.gov/pub/irs-drop/rp-24-28.pdf" target="_blank" rel="noopener">Rev. Proc. 2024-28</a>, effective January 1, 2025, eliminated the so-called &ldquo;universal&rdquo; method of digital asset basis tracking, under which taxpayers could pool basis across all their wallets and exchanges. Basis must now be tracked on a wallet-by-wallet (or account-by-account) basis, and a sale from a given wallet draws only from the basis lots within that wallet. The procedure included a one-time safe harbor allowing taxpayers to allocate their pre-2025 &ldquo;unused basis&rdquo; to specific wallets as of January 1, 2025; that allocation, once made, is irrevocable. The practical implication for Replace-and-Spend: replace and spend must occur within the same wallet or account. Moving the replacement bitcoin to a different wallet before spending defeats the strategy. <a href="#fnref-3" class="fn-back" aria-label="Back to text">&#8617;</a>
+        </li>
+        <li id="fn-4">
+          <strong>Notices 2025-7 and 2026-20 &mdash; temporary books-and-records relief.</strong>
+          <a href="https://www.irs.gov/pub/irs-drop/n-25-07.pdf" target="_blank" rel="noopener">Notice 2025-7</a>, issued December 31, 2024, recognized that most custodial brokers did not yet have the technology to accept per-transaction lot identification instructions from customers. It allowed taxpayers, for the 2025 calendar year, to make adequate identification of broker-custodied digital assets in their own books and records &mdash; including via a &ldquo;standing order&rdquo; applying to every disposition. <a href="https://www.irs.gov/irb/2026-15_IRB" target="_blank" rel="noopener">Notice 2026-20</a> extended this relief through December 31, 2026, and added a useful new provision acknowledging that 1099-DA basis reported by a broker may not match the taxpayer&rsquo;s books &mdash; explicitly contemplating the documentation mismatch that an active Replace-and-Spend practitioner will likely create. After the end of 2026, brokers are expected to receive and process lot instructions natively. <a href="#fnref-4" class="fn-back" aria-label="Back to text">&#8617;</a>
+        </li>
+        <li id="fn-5">
+          <strong>Standing orders on centralized exchanges.</strong>
+          Coinbase, Kraken, Gemini, and most other major US-regulated exchanges support account-level standing instructions for HIFO, LIFO, or specific lot selection in their tax-reporting settings. The setup is one-time. Because exchanges occasionally update their systems or lose configurations during platform migrations, keeping a parallel written record of your standing instruction in your own books &mdash; dated and pre-transaction &mdash; is prudent during the 2025&ndash;2026 transition relief window. <a href="#fnref-5" class="fn-back" aria-label="Back to text">&#8617;</a>
+        </li>
+        <li id="fn-6">
+          <strong>Coin Control and Bitcoin UTXOs.</strong>
+          Bitcoin&rsquo;s Unspent Transaction Output (UTXO) model means every coin you receive arrives as a discrete output with its own acquisition history. Wallets with Coin Control features &mdash; Trezor Suite, Ledger Live, Sparrow Wallet, Wasabi Wallet, and others &mdash; let you select which specific UTXOs to spend in any given transaction. This is structurally what Specific Identification looks like for a self-custody Bitcoiner. Account-based blockchains like Ethereum lack protocol-level coin control, which is one reason Specific Identification is harder on those networks. <a href="#fnref-6" class="fn-back" aria-label="Back to text">&#8617;</a>
+        </li>
+        <li id="fn-7">
+          <strong>Form 1099-DA and the zero-basis trap.</strong>
+          Beginning with the 2025 tax year (forms filed in 2026), custodial brokers must report digital asset gross proceeds on Form 1099-DA. Beginning with the 2026 tax year (forms filed in 2027), they must also report adjusted basis for &ldquo;covered&rdquo; assets &mdash; broadly, assets acquired within the broker&rsquo;s platform on or after January 1, 2026. Assets that arrive at a broker from an external source (a self-custody wallet, another exchange) are classified as <em>noncovered</em>. The broker reports the gross proceeds with Box 9 checked (noncovered) and the basis box blank or set to zero. The IRS&rsquo;s automated matching systems then assume the entire proceeds is taxable gain. Defending the actual basis against the resulting CP2000 notice requires the taxpayer&rsquo;s own contemporaneous records &mdash; purchase dates, prices, transfer logs from wallet to wallet. The compliance overhead is real, especially for self-custody users who later spend on a centralized rail. <a href="#fnref-7" class="fn-back" aria-label="Back to text">&#8617;</a>
+        </li>
+        <li id="fn-8">
+          <strong><em>Liberty Global v. United States</em> and <em>Patel v. Commissioner</em> &mdash; the Economic Substance Doctrine.</strong>
+          The codified Economic Substance Doctrine (IRC &sect; 7701(o)) allows the IRS to disregard, for tax purposes, a transaction (or series of transactions) that lacks a substantial non-tax business purpose or that does not meaningfully change the taxpayer&rsquo;s economic position. In <em>Liberty Global, Inc. v. United States</em>, the Tenth Circuit on April 21, 2026 affirmed a district court ruling that applied the doctrine expansively, holding that mechanical compliance with the literal text of the Internal Revenue Code does not shield a transaction from &sect; 7701(o) review when the result is one Congress did not intend. The Tax Court in <em>Patel v. Commissioner</em> (decided earlier) took a narrower view, treating the &ldquo;relevance&rdquo; inquiry as an antecedent threshold step. Tax practitioners view the unresolved tension between these approaches as enlarging the IRS&rsquo;s room to challenge structured tax-motivated transactions. For a casual Replace-and-Spend practitioner doing ordinary spending, the risk is minimal. For a high-frequency, automated, loss-harvesting variant, the risk is meaningful &mdash; and the standard mitigation is <em>temporal separation</em> (letting genuine market price movement happen between the replace and the spend) plus documented non-tax purpose. <a href="#fnref-8" class="fn-back" aria-label="Back to text">&#8617;</a>
+        </li>
+        <li id="fn-9">
+          <strong>The audit form and &sect; 7206(1) exposure.</strong>
+          During digital asset audits, the IRS uses an Information Document Request (Form 4564) with a digital-asset-specific attachment requiring the taxpayer to disclose, under penalty of perjury, every exchange and wallet they have ever used &mdash; including defunct exchanges like Mt. Gox and FTX. Because the IRS has data from &ldquo;John Doe&rdquo; summonses (Coinbase, Kraken, and others) and from blockchain analytics providers, checking &ldquo;no&rdquo; for a platform the IRS has independently linked to the taxpayer creates exposure under 26 U.S.C. &sect; 7206(1) (false statements under penalty of perjury) &mdash; a felony punishable independently of any underpayment of tax. The practical implication: comprehensive disclosure is the only viable defense. This is part of why Replace-and-Spend practitioners need clean, complete recordkeeping rather than partial coverage. <a href="#fnref-9" class="fn-back" aria-label="Back to text">&#8617;</a>
+        </li>
+        <li id="fn-10">
+          <strong>Wash sale rules and digital assets.</strong>
+          IRC &sect; 1091, the &ldquo;wash sale&rdquo; rule, currently applies only to &ldquo;stocks and securities.&rdquo; Because the IRS treats bitcoin as property, the wash sale rule does not currently apply to bitcoin. A taxpayer can sell bitcoin at a loss, claim the loss, and immediately repurchase the same quantity without the 30-day disallowance that applies to stocks. The Digital Asset PARITY Act (see note 11) would close this loophole by amending &sect; 1091 to apply to &ldquo;specified assets&rdquo; &mdash; defined to include digital assets. Other proposed bills contain similar provisions. The administration has signaled support for extending the rule. Practitioners should treat the current treatment as time-limited rather than durable. <a href="#fnref-10" class="fn-back" aria-label="Back to text">&#8617;</a>
+        </li>
+        <li id="fn-11">
+          <strong>The Lummis-Gillibrand proposal, the Digital Asset PARITY Act, and the de minimis question.</strong>
+          Multiple legislative proposals over the last several Congresses have sought to introduce a <em>de minimis</em> exemption for small personal digital asset transactions. The <a href="https://www.congress.gov/bill/118th-congress/senate-bill/2281" target="_blank" rel="noopener">Lummis-Gillibrand Responsible Financial Innovation Act</a> (re-introduced across several sessions) proposed exempting personal-use transactions of up to $300, with a $5,000 annual cap. The <a href="https://www.taxnotes.com/research/federal/legislative-documents/legislative-text/digital-asset-protection-accountability-regulation-innovation-taxation-and-yields-digital-asset/7vjnn" target="_blank" rel="noopener">Digital Asset PARITY Act</a>, introduced by Reps. Max Miller and Steven Horsford in December 2025 and revised in March and again in late May 2026 with additional cosponsors (DelBene and Carey), takes a different approach: it proposes a $200 per-transaction de minimis exemption <em>only</em> for regulated, dollar-pegged stablecoins, while extending wash sale and constructive-sale rules to all digital assets. The Bitcoin Policy Institute publicly criticized the December draft&rsquo;s exclusion of native bitcoin from the de minimis relief, arguing it created a &ldquo;two-tier tax regime.&rdquo; The late-May 2026 revision walked the position back partially, directing the IRS to study and report on how a de minimis exemption might work for non-stablecoin digital assets &mdash; a posture shift rather than substantive relief, but one that moves the bitcoin-coffee question onto the legislative agenda for the first time in years. None of these proposals has yet been enacted. <a href="#fnref-11" class="fn-back" aria-label="Back to text">&#8617;</a>
+        </li>
+      </ol>
+
+      <p class="last-updated"><em>Last updated: May 2026. Tax law moves; this page may not reflect the latest changes. Always verify against current IRS guidance and a qualified CPA before acting.</em></p>
+    </section>
+
+  </article>
+
+  {% include 'components/related.njk' %}
+  {% include 'components/companion-content.njk' %}
+
+</div>

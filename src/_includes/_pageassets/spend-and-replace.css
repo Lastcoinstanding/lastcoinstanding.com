@@ -1,0 +1,403 @@
+/* ─── Spend and Replace ─── editorial-tier page (STYLE_GUIDE §4.2, §2.3)
+   Pattern: prose-led essay with one inline SVG diagram, sidebar callout,
+   numbered footnote markers, and Notes & References block.
+   Companion: Living on Bitcoin (the cash-layer view) and the Bitcoin
+   Retirement (the long-horizon wealth engine).                       */
+
+:root {
+  --bg: #0a0908;
+  --bg-card: #14110d;
+  --border: rgba(224,148,34,0.15);
+  --border-strong: rgba(224,148,34,0.30);
+  --ink-bright: #ece4d6;
+  --ink: #ccc6b8;
+  --ink-dim: #968b7a;
+  --ink-faint: #5a5247;
+  --amber: #e09422;
+  --amber-bright: #F7931A;
+  --amber-soft: rgba(224,148,34,0.08);
+  --amber-glow: rgba(224,148,34,0.12);
+  --font-d: 'Cormorant Garamond', Georgia, serif;
+  --font-b: 'Inter', -apple-system, sans-serif;
+  --font-flourish: 'Source Serif 4', Georgia, serif;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* NAV palette accents (structure inherited from canonical-nav-css in base.njk) */
+.site-nav .brand:hover { color: var(--amber); }
+.site-nav .nav-links a.active { color: var(--amber); background: var(--amber-soft); font-weight: 600; }
+.mobile-overlay a.active { color: var(--amber); background: var(--amber-soft); font-weight: 600; }
+
+/* ─── PAGE FRAME ─── editorial tier 960px (STYLE_GUIDE §4.2) ─── */
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px 60px;
+}
+
+/* ─── HERO ─── */
+.page-header {
+  text-align: center;
+  margin: 32px auto 56px;
+  max-width: 760px;
+}
+.page-header .eyebrow {
+  font-family: var(--font-b);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 1.2rem;
+}
+.page-header h1 {
+  font-family: var(--font-d);
+  font-size: clamp(2.2rem, 5.2vw, 3.6rem);
+  font-weight: 500;
+  color: var(--ink-bright);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin-bottom: 1.4rem;
+}
+.page-header h1 .amber { color: var(--amber); }
+.page-header .subtitle {
+  font-family: var(--font-d);
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ink-dim);
+  line-height: 1.5;
+  max-width: 680px;
+  margin: 0 auto;
+}
+.page-header .subtitle em { font-style: italic; }
+
+/* ─── ESSAY BODY ─── */
+.essay {
+  /* prose fills the 960px page naturally — no inner max-width per
+     STYLE_GUIDE §4.2 editorial-tier rules */
+}
+
+.section {
+  margin-bottom: 3rem;
+  scroll-margin-top: 96px;
+}
+.section:first-child { margin-top: 0; }
+
+.section h2 {
+  font-family: var(--font-d);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 500;
+  color: var(--ink-bright);
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  margin-bottom: 1.1rem;
+}
+
+.section .subhead-note {
+  font-family: var(--font-b);
+  font-size: 0.95rem;
+  color: var(--ink-dim);
+  margin: -0.6rem 0 1.2rem;
+}
+.section .subhead-note em { font-style: italic; }
+
+/* prose paragraphs */
+.prose {
+  font-family: var(--font-b);
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--ink);
+  margin-bottom: 1.1rem;
+}
+.prose:last-child { margin-bottom: 0; }
+.prose strong { color: var(--ink-bright); font-weight: 600; }
+.prose em { color: var(--ink-bright); font-style: italic; font-weight: 400; }
+.prose a {
+  color: var(--amber);
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s, color 0.2s;
+}
+.prose a:hover {
+  color: var(--amber-bright);
+  text-decoration-color: var(--amber);
+}
+
+/* lists in prose */
+.prose-list {
+  margin: 0 0 1.4rem 0;
+  padding-left: 1.6rem;
+  font-family: var(--font-b);
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--ink);
+}
+.prose-list li { margin-bottom: 0.7rem; }
+.prose-list li:last-child { margin-bottom: 0; }
+.prose-list strong { color: var(--ink-bright); font-weight: 600; }
+.prose-list em { color: var(--ink-bright); font-style: italic; }
+.prose-list.numbered { padding-left: 1.4rem; }
+.prose-list.numbered li::marker {
+  font-weight: 600;
+  color: var(--amber);
+}
+
+/* ─── WORKFLOW BLOCKQUOTE ─── (Tuesday/Friday morning/afternoon example) */
+.workflow {
+  margin: 1.6rem 0;
+  padding: 1.5rem 1.8rem;
+  background: var(--bg-card);
+  border-left: 3px solid var(--amber);
+  border-radius: 0 6px 6px 0;
+}
+.workflow p {
+  font-family: var(--font-b);
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--ink);
+  margin-bottom: 0.8rem;
+}
+.workflow p:last-child { margin-bottom: 0; }
+.workflow strong { color: var(--amber); font-weight: 600; }
+
+/* ─── DIAGRAM ─── */
+.diagram-frame {
+  margin: 2rem 0;
+  padding: 1.5rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.diagram-frame .sequence-diagram {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.diagram-frame .diagram-caption {
+  text-align: center;
+  color: var(--ink-dim);
+  font-family: var(--font-b);
+  font-style: italic;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  padding: 0 1rem;
+}
+
+/* ─── SIDEBAR (Donate and Replace) ─── */
+.sidebar {
+  margin: 3rem 0;
+  padding: 1.8rem 2rem;
+  background: var(--amber-soft);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  position: relative;
+}
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--amber);
+  border-radius: 6px 6px 0 0;
+}
+.sidebar .sidebar-eyebrow {
+  font-family: var(--font-b);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.6rem;
+}
+.sidebar h3 {
+  font-family: var(--font-d);
+  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+  font-weight: 500;
+  color: var(--ink-bright);
+  line-height: 1.25;
+  margin-bottom: 1rem;
+}
+.sidebar .prose {
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+/* ─── DISCLAIMER SECTION ─── */
+.section.disclaimer {
+  margin-top: 3rem;
+  padding: 1.6rem 1.8rem;
+  background: rgba(255,255,255,0.018);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 6px;
+}
+.section.disclaimer h2 {
+  font-size: 1.15rem;
+  color: var(--ink-dim);
+  font-style: italic;
+  font-weight: 500;
+  margin-bottom: 0.7rem;
+}
+.section.disclaimer .prose {
+  font-size: 0.92rem;
+  color: var(--ink-dim);
+  line-height: 1.65;
+}
+
+/* ─── FOOTNOTE MARKERS (in-body) ─── */
+sup.fn-mark {
+  font-size: 0.7em;
+  line-height: 0;
+  vertical-align: super;
+  margin-left: 1px;
+}
+sup.fn-mark a {
+  color: var(--amber);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0 2px;
+  border-radius: 2px;
+  transition: background 0.2s, color 0.2s;
+}
+sup.fn-mark a:hover, sup.fn-mark a:focus-visible {
+  background: var(--amber-soft);
+  color: var(--amber-bright);
+  outline: none;
+}
+
+/* ─── NOTES & REFERENCES SECTION ─── */
+.notes-section {
+  margin-top: 4rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--border);
+}
+.notes-section h2 {
+  font-family: var(--font-d);
+  font-size: clamp(1.5rem, 2.6vw, 1.9rem);
+  font-weight: 500;
+  color: var(--ink-bright);
+  margin-bottom: 1rem;
+}
+.notes-section .notes-intro {
+  font-family: var(--font-b);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--ink-dim);
+  margin-bottom: 2rem;
+  max-width: 680px;
+}
+.notes-list {
+  list-style: none;
+  counter-reset: notes;
+  padding-left: 0;
+}
+.notes-list li {
+  counter-increment: notes;
+  position: relative;
+  padding-left: 2.6rem;
+  margin-bottom: 1.6rem;
+  font-family: var(--font-b);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--ink);
+  scroll-margin-top: 96px;
+}
+.notes-list li::before {
+  content: counter(notes);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2rem;
+  font-family: var(--font-b);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--amber);
+  text-align: right;
+  padding-top: 0.05em;
+}
+.notes-list li strong { color: var(--ink-bright); font-weight: 600; }
+.notes-list li em { color: var(--ink-bright); font-style: italic; }
+.notes-list li a {
+  color: var(--amber);
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 2px;
+}
+.notes-list li a:hover { color: var(--amber-bright); text-decoration-color: var(--amber); }
+
+/* highlight-on-anchor — when reader clicks a footnote marker, the
+   target note pulses subtly so they can find it */
+.notes-list li:target {
+  animation: noteHighlight 1.2s ease;
+}
+@keyframes noteHighlight {
+  0% { background: var(--amber-soft); }
+  100% { background: transparent; }
+}
+
+/* back-arrow to body */
+.fn-back {
+  display: inline-block;
+  font-size: 0.95em;
+  color: var(--amber) !important;
+  text-decoration: none !important;
+  margin-left: 0.4em;
+  padding: 0 2px;
+  border-radius: 2px;
+  transition: background 0.2s;
+}
+.fn-back:hover {
+  background: var(--amber-soft);
+  color: var(--amber-bright) !important;
+}
+
+/* last-updated note */
+.last-updated {
+  margin-top: 2.5rem;
+  font-family: var(--font-b);
+  font-size: 0.82rem;
+  color: var(--ink-faint);
+  text-align: center;
+}
+.last-updated em { font-style: italic; }
+
+/* ─── MOBILE BREAKPOINTS ─── */
+@media (max-width: 720px) {
+  .page { padding: 24px 16px 40px; }
+  .page-header { margin: 16px auto 36px; }
+  .page-header h1 { line-height: 1.15; }
+  .section { margin-bottom: 2.4rem; }
+  .workflow { padding: 1.2rem 1.3rem; margin: 1.3rem 0; }
+  .workflow p { font-size: 0.95rem; }
+  .sidebar { padding: 1.4rem 1.4rem; margin: 2.2rem 0; }
+  .diagram-frame { padding: 1rem 0.6rem; margin: 1.6rem 0; }
+  .diagram-frame .diagram-caption { font-size: 0.78rem; padding: 0 0.4rem; }
+  .notes-list li { padding-left: 2.2rem; font-size: 0.9rem; }
+  .notes-list li::before { font-size: 0.72rem; width: 1.7rem; }
+}
+
+@media (max-width: 480px) {
+  .site-nav { padding: 10px 14px; }
+  .site-nav .brand { font-size: 0.72rem; letter-spacing: 0.14em; }
+  .page-header .eyebrow { font-size: 0.65rem; }
+  .page-header .subtitle { font-size: 1rem; }
+  .prose, .prose-list { font-size: 1rem; }
+  .section.disclaimer .prose { font-size: 0.88rem; }
+  /* on very narrow viewports, the side-by-side SVG diagram's in-SVG
+     text shrinks below the readability floor — the surrounding prose
+     re-explains the comparison, so the diagram becomes scene-setter
+     rather than primary signal-carrier. The body explicitly carries
+     the argument in text. */
+}

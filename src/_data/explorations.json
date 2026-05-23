@@ -70,6 +70,13 @@
         "is_calculator": false
     },
     {
+        "slug": "spend-and-replace",
+        "title": "Bitcoin Spend and Replace",
+        "category": "arguments",
+        "interactive": false,
+        "is_calculator": false
+    },
+    {
         "slug": "the-fixed-pie",
         "title": "The Bitcoin Fixed Share",
         "category": "numbers",

@@ -42,6 +42,7 @@ module.exports = function (eleventyConfig) {
     'og-borrowing-against-your-stack.jpg',
     'og-bitcoin-backed-mortgages.jpg',
     'og-living-on-bitcoin.jpg',
+    'og-spend-and-replace.jpg',
     'og-heatmap.jpg',
     'og-calculators.jpg',
     // Bitcoin Defined illustrations (1280x720). Eight Grok-generated
