@@ -1,0 +1,221 @@
+---
+layout: base.njk
+permalink: /what-money-is-for.html
+slug: what-money-is-for
+related:
+  - slug: what-money-has-to-be
+    desc: "Sister page. Where this page is about what money is for, that one is about what money has to be — properties rather than purposes. The two argue the same point from opposite faces."
+  - slug: the-bitcoin-migration
+    desc: "The full essay this page distils. The argument that fiat structurally destroys savings and conscripts everyone into the markets is developed at length there."
+  - slug: the-melting-ice-cube
+    desc: "The empirical case on the savings side. What happens to held cash in a fiat regime, and why holding it is not a passive choice but an active loss."
+companion: []
+eleventyComputed:
+  head_extras: "{% include '_pageassets/what-money-is-for-head.html' %}"
+  page_styles: "{% include '_pageassets/what-money-is-for.css' %}"
+  page_scripts: "{% include '_pageassets/what-money-is-for.js' %}"
+---
+
+<div class="container">
+
+  <!-- Hero -->
+  <header class="hero">
+    <h1>What Money Is For</h1>
+    <p class="subtitle">Saving is the default. Investing and consuming are choices.<br>
+    A money is judged by how cleanly it lets each of the three happen.</p>
+  </header>
+
+  <!-- Preset control panel -->
+  <div class="preset-panel">
+    <div class="preset-panel-label">Select a money to compare</div>
+    <div class="presets" role="tablist" aria-label="Select a money">
+      <button class="preset-btn active" data-money="bitcoin">Bitcoin</button>
+      <button class="preset-btn" data-money="gold">Gold</button>
+      <button class="preset-btn" data-money="usd">USD</button>
+      <button class="preset-btn" data-money="hyperinflating">Hyperinflating fiat</button>
+    </div>
+  </div>
+
+  <!-- Purposes layout: Save (foundation) at top; Invest + Consume (choices) below -->
+  <div class="purposes-layout">
+
+    <!-- TOP TIER: Save — the default state -->
+    <section class="purpose-block" data-purpose="save">
+      <header class="purpose-header">
+        <div class="purpose-eyebrow">The default</div>
+        <div class="purpose-title">Save</div>
+        <div class="purpose-subtitle">wealth at rest — the position you fall back to when neither investing nor consuming</div>
+      </header>
+      <div class="purpose-grid purpose-grid-4">
+
+        <div class="property" data-prop="purchasing-power">
+          <div class="property-name">Purchasing power over time</div>
+          <div class="property-states">
+            <button class="state-btn" data-state="preserved">Preserved</button>
+            <button class="state-btn" data-state="slow-leak">Slow leak</button>
+            <button class="state-btn" data-state="eroded">Eroded</button>
+            <button class="state-btn" data-state="destroyed">Destroyed</button>
+          </div>
+          <div class="property-desc"></div>
+        </div>
+
+        <div class="property" data-prop="independence">
+          <div class="property-name">Independent of counterparty</div>
+          <div class="property-states">
+            <button class="state-btn" data-state="bearer">Bearer</button>
+            <button class="state-btn" data-state="constrained">Constrained</button>
+            <button class="state-btn" data-state="intermediated">Intermediated</button>
+            <button class="state-btn" data-state="captured">Captured</button>
+          </div>
+          <div class="property-desc"></div>
+        </div>
+
+        <div class="property" data-prop="no-management">
+          <div class="property-name">No active management required</div>
+          <div class="property-states">
+            <button class="state-btn" data-state="passive">Passive</button>
+            <button class="state-btn" data-state="manageable">Manageable</button>
+            <button class="state-btn" data-state="compulsory">Compulsory</button>
+            <button class="state-btn" data-state="impossible">Impossible</button>
+          </div>
+          <div class="property-desc"></div>
+        </div>
+
+        <div class="property" data-prop="default-state">
+          <div class="property-name">The default state of wealth</div>
+          <div class="property-states">
+            <button class="state-btn" data-state="restored">Restored</button>
+            <button class="state-btn" data-state="partial">Partial</button>
+            <button class="state-btn" data-state="eliminated">Eliminated</button>
+            <button class="state-btn" data-state="inverted">Inverted</button>
+          </div>
+          <div class="property-desc"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Visual bracket showing hierarchy: Save branches into two choices -->
+    <div class="purposes-bracket" aria-hidden="true">
+      <svg viewBox="0 0 400 36" preserveAspectRatio="none">
+        <line x1="200" y1="0"   x2="200" y2="13"  class="bracket-stem"/>
+        <line x1="80"  y1="13"  x2="320" y2="13"  class="bracket-rule"/>
+        <line x1="80"  y1="13"  x2="80"  y2="34"  class="bracket-stem"/>
+        <line x1="320" y1="13"  x2="320" y2="34"  class="bracket-stem"/>
+      </svg>
+      <div class="purposes-bracket-label">from saving, two choices</div>
+    </div>
+
+    <!-- BOTTOM TIER: Invest + Consume -->
+    <div class="purposes-row-secondary">
+
+      <section class="purpose-block" data-purpose="invest">
+        <header class="purpose-header">
+          <div class="purpose-eyebrow">A choice</div>
+          <div class="purpose-title">Invest</div>
+          <div class="purpose-subtitle">deploying wealth toward future production</div>
+        </header>
+        <div class="purpose-grid purpose-grid-stack">
+
+          <div class="property" data-prop="measuring-stick">
+            <div class="property-name">Stable measuring stick</div>
+            <div class="property-states">
+              <button class="state-btn" data-state="fixed">Fixed</button>
+              <button class="state-btn" data-state="drifting">Drifting</button>
+              <button class="state-btn" data-state="unstable">Unstable</button>
+              <button class="state-btn" data-state="unmoored">Unmoored</button>
+            </div>
+            <div class="property-desc"></div>
+          </div>
+
+          <div class="property" data-prop="long-horizon">
+            <div class="property-name">Long-horizon planning</div>
+            <div class="property-states">
+              <button class="state-btn" data-state="decades">Decades</button>
+              <button class="state-btn" data-state="years">Years</button>
+              <button class="state-btn" data-state="months">Months</button>
+            </div>
+            <div class="property-desc"></div>
+          </div>
+
+          <div class="property" data-prop="required-exposure">
+            <div class="property-name">Required exposure</div>
+            <div class="property-states">
+              <button class="state-btn" data-state="optional">Optional</button>
+              <button class="state-btn" data-state="light">Light pressure</button>
+              <button class="state-btn" data-state="mandatory">Mandatory</button>
+              <button class="state-btn" data-state="forced">Forced</button>
+            </div>
+            <div class="property-desc"></div>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="purpose-block" data-purpose="consume">
+        <header class="purpose-header">
+          <div class="purpose-eyebrow">A choice</div>
+          <div class="purpose-title">Consume</div>
+          <div class="purpose-subtitle">spending wealth on present needs and wants</div>
+        </header>
+        <div class="purpose-grid purpose-grid-stack">
+
+          <div class="property" data-prop="daily-transaction">
+            <div class="property-name">Daily transaction practicality</div>
+            <div class="property-states">
+              <button class="state-btn" data-state="capable">Capable</button>
+              <button class="state-btn" data-state="practical">Practical</button>
+              <button class="state-btn" data-state="impractical">Impractical</button>
+              <button class="state-btn" data-state="fraught">Fraught</button>
+            </div>
+            <div class="property-desc"></div>
+          </div>
+
+          <div class="property" data-prop="pressure-to-spend">
+            <div class="property-name">Pressure to spend now</div>
+            <div class="property-states">
+              <button class="state-btn" data-state="none">None</button>
+              <button class="state-btn" data-state="high">High</button>
+              <button class="state-btn" data-state="extreme">Extreme</button>
+            </div>
+            <div class="property-desc"></div>
+          </div>
+
+          <div class="property" data-prop="cross-border">
+            <div class="property-name">Cross-border use</div>
+            <div class="property-states">
+              <button class="state-btn" data-state="universal">Universal</button>
+              <button class="state-btn" data-state="privileged">Privileged</button>
+              <button class="state-btn" data-state="gated">Gated</button>
+              <button class="state-btn" data-state="blocked">Blocked</button>
+            </div>
+            <div class="property-desc"></div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+  <!-- /purposes-layout -->
+
+  <!-- Downstream prose sections -->
+  <section class="section">
+    <h2>Where did savings go?</h2>
+    <p>Saving is not a behaviour fiat removed by accident; it is a behaviour fiat had to remove in order to function. A credit-based monetary system requires the steady expansion of credit to service the debt that anchored it in the previous period. That expansion requires that the units already in circulation lose value over time, because otherwise no one would take on new debt to chase appreciating money. The system runs only if the units melt. And if the units melt, savers &mdash; the people holding units without yield &mdash; are by structural necessity the people the system has to penalise first. The destruction of savings is not a side effect; it is a load-bearing wall.</p>
+    <p>What happened to the economic energy that would once have sat in savings is harder to see than the inflation tax, and arguably more damaging. That energy did not vanish; it was conscripted. Some of it was forced into equity markets and other risk assets, which is why those assets have inflated faster than any productive metric attached to them. Some of it was absorbed by the state itself, which under a fiat standard can issue debt that the central bank will service through monetary expansion if the bond market refuses. And some of it kept alive the companies and projects that would not have survived in any monetary regime where capital had a real cost. The textbook term is <em>malinvestment</em>; the phenomenon worth naming, however, is the suppression of creative destruction &mdash; the immune system of capitalism, which clears out firms that have stopped producing value so that firms still producing value can compete for the capital they release. A money that won&rsquo;t sit still cannot afford that immune response. The zombies stay.</p>
+    <p>The cost of fiat is therefore layered: the inflation tax that can be measured, plus the misallocation tax that cannot, plus all the productive activity displaced by the misallocation that the inflation tax made possible.</p>
+  </section>
+
+  <section class="section">
+    <h2>The forced bet</h2>
+    <p>The case for sound money is often framed in terms of personal financial outcomes &mdash; whether bitcoin will outperform some basket of stocks, whether holding cash is &ldquo;worse&rdquo; than holding equities, which portfolio is best held over twenty years. That framing concedes more than it should. Even if the optimal portfolio were fully knowable, even if a person could costlessly replicate the best investment decisions in history, the fiat system has done something to them that no investment outcome can undo: it has removed the option of holding wealth without taking risk. There is no version of being on the fiat standard in which the no-risk position remains available at any price. The state has converted the absence of an investment decision into its own kind of investment decision, and not in the holder&rsquo;s favour.</p>
+    <p>This is what the loss of the savings function actually means. It is not that a person has to think harder about money, or learn to be a better investor, or delegate the decision more carefully. The structural change is that abstention has been removed from the menu &mdash; the no-exposure position is no longer purchasable. Whatever portfolio is chosen, even the best portfolio anyone has ever chosen, it is chosen under duress, and would likely have been a different and quieter portfolio if a quieter one had been on offer.</p>
+    <p>What sound money returns is not freedom from financial thinking. It is the option of not being forced into the market in the first place. Investment remains available. Consumption remains available. But so does neither, and neither carries no penalty. The reintroduction of a true default state is the part of the change that is hardest to feel before you have it, and the hardest to give up once you do.</p>
+  </section>
+
+  {% include 'components/related.njk' %}
+  {% include 'components/companion-content.njk' %}
+
+</div>

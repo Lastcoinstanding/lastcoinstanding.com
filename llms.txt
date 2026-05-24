@@ -9,6 +9,7 @@ Each page is a self-contained exploration. The site does not provide financial a
 Conceptual underpinnings of money and Bitcoin.
 
 - [What Money Has To Be](https://lastcoinstanding.com/what-money-has-to-be): The three structurally-coupled functions of money — hold value across time, move across space, serve as a shared unit of measurement. Interactive comparison of bitcoin, gold, the US dollar, and a hyperinflating fiat.
+- [What Money Is For](https://lastcoinstanding.com/what-money-is-for): The three purposes of money — save, invest, consume — and how each money holds or fails to hold them. Saving is the default state; investing and consuming are the two choices that flow from it. Sister page to What Money Has To Be (properties vs. purposes). Interactive comparison of bitcoin, gold, the US dollar, and a hyperinflating fiat.
 - [What Bitcoin Is](https://lastcoinstanding.com/what-bitcoin-is): Bitcoin's core monetary properties — scarcity, decentralization, immutability, censorship-resistance — visualized as interlocking petals.
 - [Bitcoin Defined](https://lastcoinstanding.com/bitcoin-defined): The single-sentence definition. Bitcoin is the open, permissionless, decentralized, secure protocol — bounded by energy, absolutely scarce. Eight load-bearing ideas, unpacked one at a time. The shortest accurate description of Bitcoin available.
 - [The Bitcoin Synthesis](https://lastcoinstanding.com/synthesis): Six existing ideas combined into one irreducible monetary discovery. Explore each component, then remove one to see what collapses.

@@ -7,6 +7,13 @@
         "is_calculator": false
     },
     {
+        "slug": "what-money-is-for",
+        "title": "What Money Is For",
+        "category": "foundations",
+        "interactive": true,
+        "is_calculator": false
+    },
+    {
         "slug": "what-bitcoin-is",
         "title": "What Bitcoin Is",
         "category": "foundations",
