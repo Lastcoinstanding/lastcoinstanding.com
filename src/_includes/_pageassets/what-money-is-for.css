@@ -300,6 +300,20 @@
     min-height: 3.2em;
     transition: color 0.4s ease;
   }
+  /* Inline links inside a descriptor cell (e.g. EO 6102 → Wikipedia).
+     Sit on dim-text body; amber, dotted-underline, solid on hover. */
+  .property-desc a,
+  .property-desc a.desc-link {
+    color: var(--orange);
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(247, 147, 26, 0.5);
+    transition: color 0.2s ease, border-bottom-style 0.2s ease, border-bottom-color 0.2s ease;
+  }
+  .property-desc a:hover {
+    color: var(--orange-bright);
+    border-bottom-style: solid;
+    border-bottom-color: var(--orange);
+  }
 
   /* ═══ Downstream prose sections ═══ */
   .section {
