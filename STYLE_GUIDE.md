@@ -1669,6 +1669,104 @@ Currently consumed by `/bitcoin-defined` (May 2026). When a second consumer arri
 
 Several patterns above follow the convention `{purpose}-{role}`: `calc-mode-*`, `porkopolis-credit*`, `channel-*`, `start-input-*`. When introducing future patterns, prefer this convention over generic names like `.toggle` or `.controls` to avoid collisions across pages. Recipes §6.20–6.25 above were introduced on BvSM in May 2026 and are currently page-scoped (`.bvsm-section-eyebrow`, `.bvsm-as-of-callout`, etc. in the live page CSS); the recipe names above use the unprefixed canonical form. When a second consumer of any of these patterns arrives, promote the CSS into the shared layer and drop the prefix.
 
+### 6.28 Two-level purposes hierarchy (`purposes-layout`)
+
+A two-tier layout pattern for arguments where one concept is foundational and two others are derived from it. Used on `/what-money-is-for` (`SITE_GUIDE §12.1`) where Save sits as a full-width foundation row above Invest and Consume in a two-column row below. Sister to the WMHTB triangle (which depicts three symmetrically-coupled functions) — use this pattern when the relationship is hierarchical / asymmetric, not when it's symmetric / coupled.
+
+**Markup.**
+
+```html
+<div class="purposes-layout">
+  <!-- TOP TIER: foundational concept -->
+  <section class="purpose-block" data-purpose="save">
+    <header class="purpose-header">
+      <div class="purpose-eyebrow">The default</div>
+      <div class="purpose-title">Save</div>
+      <div class="purpose-subtitle">...</div>
+    </header>
+    <div class="purpose-grid purpose-grid-4">
+      <!-- 4 property cards in a 2x2 grid -->
+    </div>
+  </section>
+
+  <!-- Visual bracket showing the branching -->
+  <div class="purposes-bracket" aria-hidden="true">
+    <svg viewBox="0 0 400 36" preserveAspectRatio="none">
+      <line x1="200" y1="0"   x2="200" y2="13"  class="bracket-stem"/>
+      <line x1="80"  y1="13"  x2="320" y2="13"  class="bracket-rule"/>
+      <line x1="80"  y1="13"  x2="80"  y2="34"  class="bracket-stem"/>
+      <line x1="320" y1="13"  x2="320" y2="34"  class="bracket-stem"/>
+    </svg>
+    <div class="purposes-bracket-label">from saving, two choices</div>
+  </div>
+
+  <!-- BOTTOM TIER: two derived choices, side-by-side -->
+  <div class="purposes-row-secondary">
+    <section class="purpose-block" data-purpose="invest"> ... </section>
+    <section class="purpose-block" data-purpose="consume"> ... </section>
+  </div>
+</div>
+```
+
+**CSS skeleton.**
+
+- `.purposes-layout` — `display: flex; flex-direction: column; gap: 0;` (sections own their margins / spacing via `.purpose-block`)
+- `.purpose-block` — standard editorial card border + padding; `.purpose-block[data-purpose="save"]` overrides border + background to amber-tint (`rgba(247, 147, 26, 0.22)` border, `rgba(247, 147, 26, 0.02)` background) to telegraph foundational primacy
+- `.purpose-grid-4` — `grid-template-columns: repeat(2, 1fr)` at desktop, collapses to `1fr` at ≤900px (4 cards stack vertically on mobile)
+- `.purpose-grid-stack` — `grid-template-columns: 1fr` always (3 cards stack vertically inside their column)
+- `.purposes-row-secondary` — `grid-template-columns: 1fr 1fr` at desktop, collapses to `1fr` + gap at ≤900px
+- `.purposes-bracket` — 320×36 SVG with two horizontal stems and a connecting rule, amber stroke at 35% alpha; `display: none` at ≤900px (the hierarchy is implicit when stacked)
+
+**Header treatment.** The `.purpose-header` is center-aligned (different from WMHTB's `.column-header` which is left-aligned). The `.purpose-eyebrow` is `--orange` for Save and `--text-dim` for Invest / Consume — the eyebrow color reinforces the foundation/derived distinction in addition to the border tint. Eyebrow letter-spacing is `0.22em`, slightly wider than the WMHTB column-eyebrow (`0.16em`), to fit "THE DEFAULT" comfortably as a small all-caps label.
+
+**Inheritance from WMHTB.** The `.purpose-block` cards use the same four-state decoration vocabulary as WMHTB (resonant / depleted / decaying / dying) on the `.state-btn` pills inside each `.property` card. The CSS lives at the page level for now (not promoted to a shared layer), but the conventions are sitewide per the WMHTB precedent. Pills, palette, and transition timings should match WMHTB exactly so the two pages read as a family.
+
+**When to use.** Concept where one element is structurally primary and two others derive from it. Examples: saving as the default with investing / consuming as choices (the canonical case); a foundation principle with two applications; one cause with two effects. Don't use when the three elements are symmetric or coupled — those want the WMHTB triangle pattern. Don't use when there are four or more derived elements — the bracket SVG and two-column row don't generalise cleanly past two.
+
+### 6.29 Inline link inside descriptor cell (`.property-desc a`)
+
+When a categorical-matrix cell (WMHTB / WMIF descriptor) wants an inline link to an off-site canonical learn-more source. First instance: the WMIF Gold / Independent-of-counterparty cell ending with `(rule 6102)` linked to the Executive Order 6102 Wikipedia article.
+
+**JS rendering shift.** The descriptor render must use `.innerHTML` rather than `.textContent` so HTML markup in the data renders. WMHTB uses `.textContent` for its cells; WMIF uses `.innerHTML`. Both are valid for their own page; a page adopting links must use innerHTML.
+
+```javascript
+const desc = prop.querySelector('.property-desc');
+if (desc) desc.innerHTML = entry.desc;  // not textContent
+```
+
+**Data form.**
+
+```javascript
+'independence': {
+  value: 'constrained',
+  decoration: 'depleted',
+  desc: 'A bearer asset in principle, often centralized in practice. Seizable by decree, as the 1933 confiscation demonstrated (<a href="https://en.wikipedia.org/wiki/Executive_Order_6102" target="_blank" rel="noopener" class="desc-link">rule 6102</a>).'
+}
+```
+
+**CSS.**
+
+```css
+.property-desc a,
+.property-desc a.desc-link {
+  color: var(--orange);
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(247, 147, 26, 0.5);
+  transition: color 0.2s ease, border-bottom-style 0.2s ease, border-bottom-color 0.2s ease;
+}
+.property-desc a:hover {
+  color: var(--orange-bright);
+  border-bottom-style: solid;
+  border-bottom-color: var(--orange);
+}
+```
+
+**Color rationale.** The orange dotted-underline reads as an affordance against the `--text-dim` body color of the cell — bright enough to signal "clickable" without competing with the active state pill's amber. Hover state goes solid + brighter to confirm interactivity. Selecting the `.desc-link` class explicitly (in addition to the bare `a` selector) lets future authors opt cells into a styled inline link without inheriting the base behaviour on links that might appear elsewhere in the markup.
+
+**XSS note.** Data is hardcoded in the page's JS module; there's no user-supplied content path. innerHTML is safe in this context. If WMIF or a future sister page ever takes external input into a descriptor cell, sanitisation must be added or rendering must revert to `.textContent` for that field.
+
+**When to use.** Inline footnote-style references where the term in the cell has a canonical learn-more source (Wikipedia, regulatory filing, primary text). Don't use for cross-links to other pages on this site — those belong in the page's `related:` front-matter and render via `§6.10` Related component. Inline links inside cells are reserved for off-site references that meaningfully enrich the term.
+
 ---
 
 ## 7. Mobile considerations

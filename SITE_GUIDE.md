@@ -416,6 +416,47 @@ The site's most foundational concept page. Thesis: a good money must simultaneou
 
 All four principles in Section 9 originated here. See that section for the general patterns; this section documents the page-specific application.
 
+## 12.1 What Money Is For (`/what-money-is-for.html`)
+
+Sister page to *What Money Has To Be* (§12), launched May 2026 (commit `93a39982d2`, editorial pass `270f84ef93`, OG iteration `[follow-up]`). Thesis: money serves three purposes — saving, investing, consuming — and these are not equal-status alternatives. Saving is the structural default; investing and consuming are choices that flow from a saver deciding to do something with what they have set aside. A money that cannot serve saving forces a person into the other two. WMHTB asks what money has to **be**; WMIF asks what those properties are **for**.
+
+### Structural elements
+
+- **Two-level hierarchy layout.** Save sits in a full-width row at the top with an amber-tinted border that signals foundational primacy; Invest and Consume sit below in a two-column row of stacked property cards (`STYLE_GUIDE §6.28`). The two tiers are joined by a small `purposes-bracket` SVG that draws a branching connector with the italic label *"from saving, two choices"*. Mobile (≤900px) collapses everything to a single column and hides the bracket.
+- **Same four-preset state system as WMHTB.** Bitcoin / Gold / USD / Hyperinflating fiat. Categorical, not continuous. Inherits the four-state decoration vocabulary (resonant / depleted / decaying / dying) wholesale from WMHTB; pills, color palette, transition timings all identical so the two pages read as a family.
+- **10 property cards × 4 monies = 40 descriptor cells.** Save has 4 cards (Purchasing power over time, Independent of counterparty, No active management required, The default state of wealth); Invest has 3 (Stable measuring stick, Long-horizon planning, Required exposure); Consume has 3 (Daily transaction practicality, Pressure to spend now, Cross-border use).
+- **Closing sections.** *"Where did savings go?"* (the structural argument: credit-based money requires units to melt, so savers must be penalised first; what happens to that displaced economic energy is malinvestment, state debt absorption, and zombie-firm preservation — the suppression of Joseph Schumpeter's *creative destruction*). *"The forced bet"* (even the optimal portfolio chosen under fiat is chosen under duress; sound money returns the no-exposure default to the menu).
+
+### Copy patterns established here
+
+- **Descriptor cell length varies by argumentative weight, not by uniform target.** WMHTB enforces ≤15 words per cell. WMIF was drafted under a ≤25-word target but JM's editorial pass intentionally pushed several cells to 30–43 words where the argument needed the room. USD/Required-exposure at 43 words is the densest cell, carrying the state-malinvestment / zombie-firm argument that builds across all three USD Invest cells. The longer cells deliberately telegraph argumentative weight via card height — when toggling between presets, USD/Required-exposure visibly grows relative to its Bitcoin counterpart (10 words), and that asymmetry is a feature, not a defect.
+- **The "or should be" qualifier in the hero subtitle.** *"Saving is the default. Investing and consuming are — or should be — choices."* The em-dashed qualifier surfaces the page's central tension (under fiat, the "are choices" framing is false — investing and consuming are forced) immediately, before the reader scrolls. The same qualifier is mirrored in the `og:description` meta tag, so the social-card preview surfaces it too.
+- **Reframed Bitcoin/daily-transaction friction as policy, not technology.** Lightning and on-chain final settlement make bitcoin technically capable for daily transactions. The brake is fiat-era US tax law treating every spend as a taxable disposition — an artificial construct expected to fade. The cell language ("an artificial construct that should eventually free up bitcoin's usage") makes the impermanence explicit. Spend-and-Replace exists as the practical workaround in the current regime.
+- **State-malinvestment / zombification argument woven across three USD Invest cells.** Stable-measuring-stick names "state debt and money-printing inflates prices system-wide"; Long-horizon names "state capital allocation crowds out the signals private investment depends on"; Required-exposure names "Zombie companies get created that the state feels compelled to keep alive". The closing prose then picks the argument up by name (Schumpeter's creative destruction → "The zombies stay.")
+- **Inline link inside a descriptor cell — first WMIF cell to use one.** Gold/Independent-of-counterparty cell ends with `(rule 6102)` linking to the Executive Order 6102 Wikipedia article. Required switching the JS rendering from `.textContent` to `.innerHTML`. CSS recipe at `STYLE_GUIDE §6.29`. WMHTB cells remain plain text — the two pages have diverged on rendering model, but each is internally consistent.
+- **"Unconfiscatable" admitted as bitcoin-community vernacular.** Bitcoin/Independent-of-counterparty uses the single word where my draft had a three-clause expansion. The term is bitcoin-native and load-bearing; the editorial pass elevated it.
+
+### Cross-links
+
+- From *What Money Has To Be* (sister page; the two argue the same point from opposite faces — properties vs. purposes)
+- From *The Bitcoin Migration* (the source essay this page distils)
+- From *The Melting Ice Cube* (the empirical case on the savings-destruction side)
+
+### OG card iteration (v1 → v2)
+
+The brand-forward OG image went through one iteration during launch review:
+
+- **v1** placed Save at the bottom-center as a large bright bitcoin-orange circle, with Invest and Consume as smaller amber circles above (foundation reading — Save anchors, choices grow up from it).
+- **v2** flips the vertical layout: Save at the top-center, Invest and Consume below (source/family-tree reading — Save originates, choices flow down from it).
+
+v2 aligns with the homepage concept-card icon (which had Save at top from the start). The family-tree direction was the preferred reading; recorded here so future pages in this family don't relearn the decision. Generator script at `/home/claude/lcs-build/og_what_money_is_for_v2.py` in build history.
+
+### Page-specific design lessons
+
+- **Two-level hierarchy reads cleanly without a coupled-network diagram.** Where WMHTB's three functions are structurally coupled (removing one breaks all three) and the triangle visualization carries that coupling argument, WMIF's three purposes are NOT coupled in the same way — saving is foundational; investing and consuming are derived. The two-level visual hierarchy (foundation row + branching connector + two columns) telegraphs the asymmetric relationship at a glance. The `purposes-bracket` SVG between the tiers does the visual work of showing the branching without needing dynamic coupling-line animations.
+- **JS rendering switched from textContent to innerHTML to support inline links.** Data is hardcoded in `what-money-is-for.js`; no XSS risk. The architectural shift is small but worth knowing — if a third page in the WMHTB/WMIF family wants the same affordance, it should also use `.innerHTML` for the descriptor cell.
+- **Sister-page launches should pull from the senior page's references, not duplicate them.** This build pulled `what-money-has-to-be.njk / .css / .js / head.html` fresh from main as scaffolding before authoring WMIF, rather than re-deriving the patterns. Saved roughly 60% of the work and ensured the visual family stays tight. Worth doing on any future sister-page launch.
+
 ## 13. Homepage carousel — completed set (21 slides)
 
 All slides deployed with 16:9 widescreen silent videos, minimalist copy pattern (label + headline + CTA, no `.insight-desc`).
