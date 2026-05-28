@@ -286,12 +286,12 @@
                 '<div class="invested-line">Invested <strong>$'+dp.toLocaleString()+'</strong>'+(mode==='leverage'?' <span class="note">(20% down)</span>':' <span class="note">(cash equivalent)</span>')+'</div>'+
                 '<div class="period-divider"></div>'+
                 '<div class="period-label">'+asOf+' \u00B7 Current</div>'+
-                '<div class="result-value">$'+Math.round(lumpValue).toLocaleString()+' <span style="font-size:0.85rem;color:var(--text-muted)">gross</span></div>'+
+                '<div class="result-value">$'+Math.round(lumpNet).toLocaleString()+' <span style="font-size:0.85rem;color:var(--text-muted)">net</span></div>'+
                 '<div class="result-detail">'+(function(){var lh=lumpHouses;var fH=Math.floor(lh);var pt=lh-fH;var ic='';var fI='<svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" style=\"margin:1px\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/></svg>';var pI='<svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" style=\"margin:1px;opacity:0.45\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.2\" stroke-dasharray=\"2 2\" stroke-linejoin=\"round\"/></svg>';for(var i=0;i<Math.min(fH,15);i++)ic+=fI;if(pt>0.05)ic+=pI;var ov=fH>15?'<span style=\"font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center\">+'+(fH-15)+' more</span>':'';return '<div style=\"display:flex;flex-wrap:wrap;align-items:center;gap:0;margin-bottom:0.8rem\">'+ic+ov+'</div>';})()+
                     'BTC purchased: '+bb.toFixed(2)+' @ $'+bs.toLocaleString()+'<br>'+
+                    'Gross BTC value: $'+Math.round(lumpValue).toLocaleString()+' <span style="font-size:0.78rem;color:var(--text-muted)">(before rent)</span><br>'+
                     'Est. monthly rent: $'+estRent.toLocaleString()+'/mo'+(mode==='leverage'?(' <span style="font-size:0.78rem;color:var(--text-muted)">(vs. mortgage $'+Math.round(mortgageMonthly).toLocaleString()+')</span>'):'')+'<br>'+
                     'Total rent paid: $'+totalRentPaid.toLocaleString()+'<br>'+
-                    '<span style="color:var(--amber);font-weight:500">Net position: $'+Math.round(lumpNet).toLocaleString()+'</span><br>'+
                     '<span style="color:var(--amber);font-weight:500">You could now buy '+lumpHouses.toFixed(1)+' houses <strong>outright</strong></span> <span style="font-size:0.78rem;color:var(--text-muted)">('+medianRef+')</span><br>'+
                     '<span style="font-size:0.78rem;color:var(--text-muted);display:block;margin-top:0.4rem">No leverage. No interest. No property taxes. No maintenance.</span>'+
                 '</div>'+
@@ -1223,6 +1223,49 @@
     }
   }
 
+  // ── localStorage persistence layer ─────────────────────────────────
+  // Lets calculator settings survive across sessions and fresh visits
+  // (i.e. URLs without query params). URL params still take precedence
+  // when present, so shared scenario links override stored prefs as
+  // expected. Storage gets written alongside the URL on every input
+  // change. No PII captured — only the same scalar/enum/bool inputs
+  // that the URL schema already exposes (year, home price, scenario,
+  // horizon, etc.). Live BTC price is intentionally not stored (same
+  // staleness reasoning as its exclusion from the URL schema). Wrapped
+  // in try/catch for environments with disabled storage (Safari private
+  // mode, browser settings, quota errors); failure is silent.
+  var STORAGE_KEY = 'lcs.bvre.calc.v1';
+
+  function readStorageIntoInputs() {
+    if (typeof localStorage === 'undefined') return;
+    var raw;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch(e) { return; }
+    if (!raw) return;
+    var data;
+    try { data = JSON.parse(raw); } catch(e) { return; }
+    if (!data || typeof data !== 'object') return;
+    _suppressWriter = true;
+    try {
+      Object.keys(SCHEMA).forEach(function(key){
+        if (!Object.prototype.hasOwnProperty.call(data, key)) return;
+        applyValue(key, data[key]);
+      });
+    } finally {
+      _suppressWriter = false;
+    }
+  }
+
+  function syncStorage() {
+    if (typeof localStorage === 'undefined') return;
+    var data = {};
+    Object.keys(SCHEMA).forEach(function(key){
+      var val = readValue(key);
+      if (val === undefined) return;
+      data[key] = val;
+    });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) { /* quota or disabled */ }
+  }
+
   function syncUrl() {
     if (!window.history || !window.history.replaceState) return;
     var params = new URLSearchParams(window.location.search);
@@ -1257,7 +1300,10 @@
   function scheduleSyncUrl() {
     if (_suppressWriter) return;
     if (_t) clearTimeout(_t);
-    _t = setTimeout(syncUrl, 220);
+    _t = setTimeout(function(){
+      syncUrl();
+      syncStorage();
+    }, 220);
   }
 
   function wireWriters() {
@@ -1281,9 +1327,15 @@
   }
 
   function init() {
+    // Read order matters: storage is the base layer, URL overrides
+    // per-key when present. So a shared link with ?home=420000 wins
+    // for that param but leaves storage-restored year/horizon/etc.
+    // intact for any param the URL didn't specify.
+    readStorageIntoInputs();
     readUrlIntoInputs();
     wireWriters();
     syncUrl();
+    syncStorage();
   }
 
   if (document.readyState === 'loading') {
