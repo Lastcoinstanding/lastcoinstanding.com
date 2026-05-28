@@ -64,7 +64,7 @@
     // TAB 2: OPPORTUNITY COST CHART (indexed, log scale, fixed tooltips)
     const ssHomeIdx=btcYears.map(y=>+((homeData[y]/homeData[2013])*100).toFixed(1));
     const ssBtcIdx=btcYears.map(y=>+((btcData[y]/btcData[2013])*100).toFixed(1));
-    new Chart(document.getElementById('seesawChart'),{type:'line',data:{labels:btcYears.map(String),datasets:[{label:'Bitcoin',data:ssBtcIdx,borderColor:amber,backgroundColor:'rgba(224,148,34,0.08)',borderWidth:2.5,pointRadius:3,tension:0.3,fill:true},{label:'Housing',data:ssHomeIdx,borderColor:red,backgroundColor:'transparent',borderWidth:2.5,pointRadius:3,tension:0.3,borderDash:[6,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:24,color:tickColor,font:{size:10}}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,callbacks:{label:c=>{const pct=(c.parsed.y-100).toFixed(0);const sign=pct>=0?'+':'';return c.dataset.label+': '+sign+Number(pct).toLocaleString()+'% since 2013'}}}},scales:{x:{...cso()},y:{...cso('Growth of $1 Invested'),type:'logarithmic',min:30,ticks:{color:tickColor,font:{size:10},callback:v=>{const a=[50,100,200,500,1000,2000,5000,10000,12000];if(!a.includes(v))return'';if(v===100)return'$1 (start)';return'$'+(v/100).toFixed(0)}}}}}});
+    new Chart(document.getElementById('seesawChart'),{type:'line',data:{labels:btcYears.map(String),datasets:[{label:'Bitcoin',data:ssBtcIdx,borderColor:amber,backgroundColor:'rgba(224,148,34,0.08)',borderWidth:2.5,pointRadius:3,tension:0.3,fill:true},{label:'Housing',data:ssHomeIdx,borderColor:red,backgroundColor:'transparent',borderWidth:2.5,pointRadius:3,tension:0.3,borderDash:[6,3]}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:24,color:tickColor,font:{size:10}}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,callbacks:{label:c=>{const pct=(c.parsed.y-100).toFixed(0);const sign=pct>=0?'+':'';return c.dataset.label+': '+sign+Number(pct).toLocaleString()+'% since 2013'}}}},scales:{x:{...cso()},y:{...cso('Growth of $1 Invested'),type:'logarithmic',min:30,ticks:{color:tickColor,font:{size:10},callback:v=>{const a=[50,100,200,500,1000,2000,5000,10000,12000];if(!a.includes(v))return'';if(v===100)return'$1 (start)';return'$'+(v/100).toFixed(0)}}}}}});
 
     // TAB 2: HOUSES VISUAL with mortgage comparison
     (function(){
@@ -128,8 +128,19 @@
         startYears.forEach(y=>{
             const btcR=((btcData[endY]-btcData[y])/btcData[y]*100).toFixed(0);
             const homeR=((homeData[endY]-homeData[y])/homeData[y]*100).toFixed(0);
-            const ratio=Math.round(btcR/Math.max(homeR,1));
-            rows+='<tr style="border-bottom:1px solid rgba(224,148,34,0.06)"><td style="padding:0.6rem 0.8rem;color:var(--text);font-weight:500">'+y+' → '+endY+'</td><td style="padding:0.6rem 0.8rem;color:var(--amber);font-weight:500">+'+Number(btcR).toLocaleString()+'%</td><td style="padding:0.6rem 0.8rem;color:var(--text-dim)">+'+(homeR<0?'':'')+homeR+'%</td><td style="padding:0.6rem 0.8rem;color:var(--amber);font-size:0.75rem">BTC returned '+ratio+' to 1</td></tr>';
+            // Wealth ratio: $1 in BTC vs $1 in housing at start year. Ratio of
+            // the multipliers (1 + return) — meaningful regardless of sign.
+            // Previous version divided the two return percentages directly,
+            // which is mathematically nonsense and produced a non-monotonic
+            // series (2016 showed a larger 'ratio' than 2014 even with less
+            // holding time). It also broke entirely when housing's return was
+            // negative — Math.max(homeR, 1) collapsed the divisor to 1 and
+            // displayed the BTC return itself as the 'ratio'.
+            const btcMult=btcData[endY]/btcData[y];
+            const homeMult=homeData[endY]/homeData[y];
+            const ratio=Math.round(btcMult/homeMult);
+            const homeSign=homeR<0?'':'+';
+            rows+='<tr style="border-bottom:1px solid rgba(224,148,34,0.06)"><td style="padding:0.6rem 0.8rem;color:var(--text);font-weight:500">'+y+' → '+endY+'</td><td style="padding:0.6rem 0.8rem;color:var(--amber);font-weight:500">+'+Number(btcR).toLocaleString()+'%</td><td style="padding:0.6rem 0.8rem;color:var(--text-dim)">'+homeSign+homeR+'%</td><td style="padding:0.6rem 0.8rem;color:var(--amber);font-size:0.75rem">BTC outperformed '+ratio+'\u00d7</td></tr>';
         });
         document.getElementById('returnTable').innerHTML=rows;
     })();
