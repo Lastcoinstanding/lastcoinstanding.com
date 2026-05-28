@@ -171,6 +171,16 @@
             rows+='<tr style="border-bottom:1px solid rgba(224,148,34,0.06)"><td style="padding:0.6rem 0.8rem;color:var(--text);font-weight:500">'+y+' → '+endY+'</td><td style="padding:0.6rem 0.8rem;color:var(--text-dim)">$'+btcData[y].toLocaleString()+'</td><td style="padding:0.6rem 0.8rem;color:var(--amber);font-weight:500">+'+Number(btcR).toLocaleString()+'%</td><td style="padding:0.6rem 0.8rem;color:var(--text-dim)">'+homeSign+homeR+'%</td><td style="padding:0.6rem 0.8rem;color:var(--amber);font-size:0.75rem">BTC outperformed '+ratio+'\u00d7</td></tr>';
         });
         document.getElementById('returnTable').innerHTML=rows;
+        // End-price reference line above the table — surfaces the 2025 BTC
+        // and median-home values that every row's return % is computed
+        // against. Without this, readers could see the start price (new
+        // 'BTC at start' column) and the % return, but couldn't reconstruct
+        // the end price without hovering the chart. Sourced from the same
+        // data constants so future MONTHLY_REFRESH updates flow through.
+        const endRef=document.getElementById('returnTableEndPrices');
+        if(endRef){
+            endRef.innerHTML='All rows end at <strong>'+endY+'</strong> prices: <strong style="color:var(--amber)">BTC $'+btcData[endY].toLocaleString()+'</strong> &middot; <strong>Median US home $'+homeData[endY].toLocaleString()+'</strong>';
+        }
     })();
 
     // TAB 4: BURDEN - line chart with threshold lines
