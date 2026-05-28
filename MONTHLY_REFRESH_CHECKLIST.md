@@ -207,3 +207,58 @@ Bitcoin Retirement, and Borrowing Against Your Stack (Loan Health input
 auto-fill). Disciplined Rebalancing continues to use the latest `PL_DATA`
 sample for its "today" (matches the chart's historical line by design);
 a future pass may add the live anchor there too.
+
+## Annual: Demographia global affordability dataset — May each year
+
+Bitcoin vs. Real Estate's Affordability Crisis tab includes a 5-market
+price-to-income time series (HK, Sydney, Vancouver, Greater London,
+US national — see DATA_AUDIT BvRE-4 for full provenance). The series
+extends by one data point per year and the source — Demographia
+International Housing Affordability — releases each May, reporting Q3
+data for the prior calendar year.
+
+**Annual procedure (do this once per year, within ~4 weeks of the
+Demographia release):**
+
+1. **Find the new edition.** Check `http://www.demographia.com/db-dhi-index.htm`
+   for the latest annual edition, and `https://www.chapman.edu/communication/`
+   (search "Demographia") for the Chapman-co-published PDF if newer than
+   what demographia.com lists.
+
+2. **Extract the five values** from the new PDF's "Executive Summary" /
+   "Housing Affordability Ratings by Nation" table and the "Least
+   affordable markets" paragraph in Section 3:
+   - **Hong Kong** — appears as a national row in the by-nation table
+     ("China: Hong Kong … 14.4" style)
+   - **Sydney** — named in the least-affordable paragraph ("Sydney at
+     13.8") and in the per-market ranking table near the front of
+     Section 3
+   - **Vancouver** — same: least-affordable paragraph + ranking table
+   - **Greater London** — same: least-affordable paragraph + ranking
+     table
+   - **United States (national)** — by-nation table ("United States … 4.8")
+
+3. **Append the new data_year** to the arrays in
+   `src/_includes/_pageassets/bitcoin-vs-real-estate.js`:
+   - Add the new year (integer) to `globalYears`
+   - Append the five new values, in order, to `ratHK`, `ratSydney`,
+     `ratVancouver`, `ratLondon`, `ratUS`
+   - `affordThresh` is derived from `globalYears` length, so it
+     auto-extends with no edit
+
+4. **Update DATA_AUDIT** BvRE-4 row: `Last audited` → today, `Next due`
+   → today + 1 year.
+
+5. **Verify visually** on the built page: the chart should show one
+   additional data point on the right edge for each line; the US line
+   should remain the lowest of the five; the legend, tooltip, and
+   y-axis range should not require any code changes (the y-axis is
+   bounded at min:2 / max:25 which comfortably covers HK's all-time
+   peak of 23.2 in 2021).
+
+**Annual-cadence rationale, not monthly.** Demographia is the only
+multi-market price-to-income dataset with consistent methodology across
+this set of markets and the depth we need. It is published once a year.
+Sub-annual updates from other sources (national stats agencies, BIS,
+OECD) would introduce methodology mixing and aren't worth the editorial
+inconsistency.
