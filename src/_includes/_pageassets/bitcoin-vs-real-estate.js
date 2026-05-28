@@ -513,6 +513,32 @@
     }
   }
 
+  // Compute DCA accumulation for the projection. Returns null when DCA
+  // doesn't apply (cash method, or no positive monthly savings, or invalid
+  // BTC price inputs). Used by runFwdCalc to drive the Total Comparison
+  // visibility + augmented totals, and by renderAdvanced to populate the
+  // DCA card in the "go deeper" panel. Single source of truth so the two
+  // surfaces can't drift apart.
+  function computeProjectionDca(method, btcNow, futurePrice, monthlyMort, impliedRent, horizonYrs){
+    if(method !== 'mortgage') return null;
+    var monthlySavings = Math.max(0, monthlyMort - impliedRent);
+    if(monthlySavings <= 0 || btcNow <= 0 || futurePrice <= 0) return null;
+    var dcaBtc = 0;
+    var totalMonths = horizonYrs * 12;
+    for(var m = 0; m < totalMonths; m++){
+      // Geometric interpolation of BTC price across the horizon — same
+      // assumption used in the renderAdvanced display logic.
+      var frac = m / totalMonths;
+      var monthPrice = btcNow * Math.pow(futurePrice/btcNow, frac);
+      dcaBtc += monthlySavings / monthPrice;
+    }
+    return {
+      dcaBtc: dcaBtc,
+      dcaInvested: monthlySavings * totalMonths,
+      monthlySavings: monthlySavings
+    };
+  }
+
   function runFwdCalc(){
     var horizonYrs = parseInt(horizonSel.value);
     var btcNow = parseNum('fwdBtcNow');
@@ -738,94 +764,107 @@
       '<div class="calc-results-grid">' + btcHtml + houseHtml + '</div>';
 
     // ── TOTAL COMPARISON (parity with retrospective) ───────────────────
-    // Renders two cards summarizing total positions at end-of-horizon,
-    // mirroring the retrospective Total Comparison layout: amber-bordered
-    // Bitcoin card with home-icons visual (count derived from housesCanBuy),
-    // red-bordered House card with equity-fill icon (scaled to equityPct).
-    // Main position values use real-primary (today's purchasing power) with
-    // nominal-secondary line; accumulated payment streams remain in nominal
-    // dollars per the canonical real-display convention documented in the
-    // 'How this works' annotation immediately below this block.
+    // Mirrors retrospective behavior: only renders when the user toggles
+    // "go deeper" (DCA the rent-vs-mortgage savings into bitcoin). Without
+    // DCA, the headline cards above already surface the lump-sum position
+    // and the Total Comparison would just restate them — same logic that
+    // gates the retrospective's wrapper on its dca flag. When DCA is
+    // active, the BTC card here aggregates the lump-sum BTC position with
+    // the BTC accumulated by DCA'ing monthly savings (single source of
+    // truth: computeProjectionDca helper, also used by renderAdvanced).
+    // The augmented figures are meaningfully different from the headline
+    // cards — that delta IS the point of showing this section.
     var fwdTotalWrapper = document.getElementById('fwdTotalSummaryWrapper');
     var fwdTotalSummary = document.getElementById('fwdTotalSummary');
     if(fwdTotalWrapper && fwdTotalSummary){
-      var mortgageEndYear = startYear + 30;
-      var debtFreeYear = (method === 'mortgage') ? mortgageEndYear : startYear;
-      var debtFreeLabel = (method === 'mortgage')
-        ? (endYear >= mortgageEndYear ? 'before horizon' : (debtFreeYear + ' (' + (mortgageEndYear - endYear) + ' yrs past horizon)'))
-        : 'never financed';
-      var btcOutflowNominal = amount + totalRentPaid;
-      // House total outflow (already computed earlier in the function as
-      // totalHouseCost = amount + totalMortPaid + propTax + insurance + maintenance)
-      var ls = 'font-size:0.88rem;line-height:2.2;';
-      var lm = 'color:var(--text-muted)';
-      var lr = 'color:var(--red)';
-      var la = 'color:var(--amber)';
-      // Home-icons visual for the BTC card: solid amber icons for each whole
-      // house housesCanBuy supports, plus a dashed/faded icon for any partial.
-      var bhVisual = (function(){
-        var hf = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.5" stroke-linejoin="round"/></svg>';
-        var hp = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px;opacity:0.3"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.5" stroke-dasharray="2 2" stroke-linejoin="round"/></svg>';
-        var lh = Math.max(0, housesCanBuy);
-        var fH = Math.floor(lh);
-        var pt = lh - fH;
-        var ic = '';
-        for(var i = 0; i < Math.min(fH, 15); i++) ic += hf;
-        if(pt > 0.05) ic += hp;
-        if(fH === 0 && pt <= 0.05) ic += hp;
-        var ov = fH > 15 ? ('<span style="font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center">+' + (fH - 15) + ' more</span>') : '';
-        return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:0.4rem 0 0.6rem">' + ic + ov + '</div>';
-      })();
-      // Equity-fill visual for the house card
-      var equityVisual = (function(){
-        var fh = Math.max(0, Math.min(20, equityPct * 0.20));
-        var st = equityPct >= 100 ? '#e09422' : '#c0392b';
-        var clipId = 'fwdTlc';
-        return '<div style="display:flex;align-items:center;gap:0.6rem;margin:0.4rem 0 0.6rem"><svg viewBox="0 0 24 24" width="32" height="32"><defs><clipPath id="' + clipId + '"><rect x="0" y="' + (24 - fh) + '" width="24" height="' + fh + '"/></clipPath></defs>'
-          + '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="' + st + '" stroke-width="1.5" stroke-linejoin="round"/>'
-          + '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.7" stroke-linejoin="round" clip-path="url(#' + clipId + ')"/></svg>'
-          + '<span style="font-size:0.85rem;color:var(--text-muted)">' + (equityPct >= 100 ? 'fully owned' : equityPct + '% owned') + '</span></div>';
-      })();
-      var housesWhole = Math.floor(Math.max(0, housesCanBuy));
-      var extraHouses = Math.max(0, housesCanBuy - 1);
-      var canBuyOutright = housesCanBuy >= 1;
-      fwdTotalWrapper.style.display = 'block';
-      fwdTotalSummary.innerHTML =
-        '<div style="background:var(--bg-card);border:1px solid var(--amber-dim);border-radius:8px;padding:1.5rem 2rem">'
-        + '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);margin-bottom:0.5rem">\u20BF Bitcoin \u2014 Total Position</div>'
-        + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.15rem;line-height:1.1">' + fmt(btcNetReal) + ' <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400">net</span></div>'
-        + '<div style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:0.85rem;color:var(--text-dim);margin-bottom:0.5rem;font-weight:400">' + fmt(btcNet) + ' <span style="color:var(--text-muted)">nominal</span></div>'
-        + bhVisual
-        + '<div style="font-size:0.78rem;color:var(--amber-dim);margin-bottom:0.6rem">projected to ' + asOf + ' \u2014 ' + scenarioLabel + '</div>'
-        + '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'
-          + (canBuyOutright
-              ? '<div style="' + ls + la + '">You could buy <strong>the house, outright</strong></div>'
-              : '<div style="' + ls + la + '">You could buy <strong>' + (housesCanBuy * 100).toFixed(0) + '%</strong> of the house outright</div>')
-          + '<div style="' + ls + la + '">Debt outstanding: $0</div>'
-          + (method === 'mortgage' ? '<div style="' + ls + la + '">Interest paid: $0</div>' : '')
-          + '<div style="' + ls + la + '">Debt-free: <strong>always</strong></div>'
-          + (canBuyOutright && extraHouses > 0.05
-              ? '<div style="' + ls + la + ';font-weight:600">You could buy ' + extraHouses.toFixed(1) + ' additional house' + (extraHouses >= 1.05 ? 's' : '') + ', also outright <span style="color:var(--text-muted);font-weight:400;font-size:0.82rem">(' + housesCanBuy.toFixed(1) + ' total)</span></div>'
-              : '')
-          + '<div style="' + ls + 'color:var(--text-dim)">Rent paid: ' + fmt(totalRentPaid) + '</div>'
-          + '<div style="' + ls + 'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: ' + fmt(btcOutflowNominal) + '</div>'
+      var advancedCheck = document.getElementById('fwdAdvancedCheck');
+      var dcaResult = computeProjectionDca(method, btcNow, futurePrice, monthlyMort, impliedRent, horizonYrs);
+      var dcaActive = !!(advancedCheck && advancedCheck.checked && dcaResult);
+      if(!dcaActive){
+        fwdTotalWrapper.style.display = 'none';
+        fwdTotalSummary.innerHTML = '';
+      } else {
+        // ── DCA-augmented BTC position ────────────────────────────────
+        // Lump-sum BTC + DCA-accumulated BTC, valued at the projected
+        // future BTC price. Outflow = down payment + DCA cash + rent paid.
+        // dcaActive guarantees method === 'mortgage' (computeProjectionDca
+        // returns null for cash), so debt-related lines can assume mortgage.
+        var totalBtcBought = btcBought + dcaResult.dcaBtc;
+        var totalBtcValueNominal = totalBtcBought * futurePrice;
+        var totalBtcValueReal = toReal(totalBtcValueNominal);
+        var totalBtcNetReal = totalBtcValueReal - totalRentPaid;
+        var totalBtcNetNominal = totalBtcValueNominal - totalRentPaid;
+        var totalInvestedCash = amount + dcaResult.dcaInvested;
+        var btcOutflowAugmented = totalInvestedCash + totalRentPaid;
+        var housesCanBuyAugmented = Math.max(0, totalBtcNetReal / futureHomeValueReal);
+        var mortgageEndYear = startYear + 30;
+        var debtFreeLabel = (endYear >= mortgageEndYear ? 'before horizon' : (mortgageEndYear + ' (' + (mortgageEndYear - endYear) + ' yrs past horizon)'));
+        var ls = 'font-size:0.88rem;line-height:2.2;';
+        var lm = 'color:var(--text-muted)';
+        var lr = 'color:var(--red)';
+        var la = 'color:var(--amber)';
+        var bhVisual = (function(){
+          var hf = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+          var hp = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px;opacity:0.3"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.5" stroke-dasharray="2 2" stroke-linejoin="round"/></svg>';
+          var lh = Math.max(0, housesCanBuyAugmented);
+          var fH = Math.floor(lh);
+          var pt = lh - fH;
+          var ic = '';
+          for(var i = 0; i < Math.min(fH, 15); i++) ic += hf;
+          if(pt > 0.05) ic += hp;
+          if(fH === 0 && pt <= 0.05) ic += hp;
+          var ov = fH > 15 ? ('<span style="font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center">+' + (fH - 15) + ' more</span>') : '';
+          return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:0.4rem 0 0.6rem">' + ic + ov + '</div>';
+        })();
+        var equityVisual = (function(){
+          var fh = Math.max(0, Math.min(20, equityPct * 0.20));
+          var st = equityPct >= 100 ? '#e09422' : '#c0392b';
+          var clipId = 'fwdTlc';
+          return '<div style="display:flex;align-items:center;gap:0.6rem;margin:0.4rem 0 0.6rem"><svg viewBox="0 0 24 24" width="32" height="32"><defs><clipPath id="' + clipId + '"><rect x="0" y="' + (24 - fh) + '" width="24" height="' + fh + '"/></clipPath></defs>'
+            + '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="' + st + '" stroke-width="1.5" stroke-linejoin="round"/>'
+            + '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.7" stroke-linejoin="round" clip-path="url(#' + clipId + ')"/></svg>'
+            + '<span style="font-size:0.85rem;color:var(--text-muted)">' + (equityPct >= 100 ? 'fully owned' : equityPct + '% owned') + '</span></div>';
+        })();
+        var extraHouses = Math.max(0, housesCanBuyAugmented - 1);
+        var canBuyOutright = housesCanBuyAugmented >= 1;
+        fwdTotalWrapper.style.display = 'block';
+        fwdTotalSummary.innerHTML =
+          '<div style="background:var(--bg-card);border:1px solid var(--amber-dim);border-radius:8px;padding:1.5rem 2rem">'
+          + '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);margin-bottom:0.5rem">\u20BF Bitcoin \u2014 Total Position</div>'
+          + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.15rem;line-height:1.1">' + fmt(totalBtcNetReal) + ' <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400">net</span></div>'
+          + '<div style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:0.85rem;color:var(--text-dim);margin-bottom:0.5rem;font-weight:400">' + fmt(totalBtcNetNominal) + ' <span style="color:var(--text-muted)">nominal</span></div>'
+          + bhVisual
+          + '<div style="font-size:0.78rem;color:var(--amber-dim);margin-bottom:0.6rem">projected to ' + asOf + ' \u2014 ' + scenarioLabel + ' \u00b7 lump sum + DCA</div>'
+          + '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'
+            + (canBuyOutright
+                ? '<div style="' + ls + la + '">You could buy <strong>the house, outright</strong></div>'
+                : '<div style="' + ls + la + '">You could buy <strong>' + (housesCanBuyAugmented * 100).toFixed(0) + '%</strong> of the house outright</div>')
+            + '<div style="' + ls + la + '">Debt outstanding: $0</div>'
+            + '<div style="' + ls + la + '">Interest paid: $0</div>'
+            + '<div style="' + ls + la + '">Debt-free: <strong>always</strong></div>'
+            + (canBuyOutright && extraHouses > 0.05
+                ? '<div style="' + ls + la + ';font-weight:600">You could buy ' + extraHouses.toFixed(1) + ' additional house' + (extraHouses >= 1.05 ? 's' : '') + ', also outright <span style="color:var(--text-muted);font-weight:400;font-size:0.82rem">(' + housesCanBuyAugmented.toFixed(1) + ' total)</span></div>'
+                : '')
+            + '<div style="' + ls + 'color:var(--text-dim)">Rent paid: ' + fmt(totalRentPaid) + '</div>'
+            + '<div style="' + ls + 'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: ' + fmt(btcOutflowAugmented) + '</div>'
+          + '</div>'
         + '</div>'
-      + '</div>'
-      + '<div style="background:var(--bg-card);border:1px solid var(--red-dim);border-radius:8px;padding:1.5rem 2rem">'
-        + '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--red);margin-bottom:0.5rem">\uD83C\uDFE0 House \u2014 Total Position</div>'
-        + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--text-dim);margin-bottom:0.15rem;line-height:1.1">' + fmt(equityReal) + '</div>'
-        + '<div style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:0.85rem;color:var(--text-dim);margin-bottom:0.5rem;font-weight:400">' + fmt(equity) + ' <span style="color:var(--text-muted)">nominal</span></div>'
-        + equityVisual
-        + '<div style="font-size:0.78rem;' + lm + ';margin-bottom:0.6rem">projected to ' + asOf + '</div>'
-        + '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'
-          + '<div style="' + ls + lm + '">Ownership: <span style="color:var(--text)">' + equityPct + '% of 1 home</span></div>'
-          + (method === 'mortgage' ? '<div style="' + ls + lr + '">Debt outstanding: ' + fmt(Math.round(bal)) + '</div>' : '')
-          + (method === 'mortgage' ? '<div style="' + ls + lr + '">Interest paid: ' + fmt(Math.round(interestPaid)) + ' <span style="' + lm + ';font-size:0.78rem">(dead money)</span></div>' : '')
-          + (method === 'mortgage' ? '<div style="' + ls + lr + '">Debt-free: ' + debtFreeLabel + '</div>' : '')
-          + '<div style="' + ls + lm + '">Rent paid: $0 <span style="font-size:0.78rem">(you live in it)</span></div>'
-          + '<div style="' + ls + 'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: ' + fmt(Math.round(totalHouseCost)) + '</div>'
-        + '</div>'
-      + '</div>';
+        + '<div style="background:var(--bg-card);border:1px solid var(--red-dim);border-radius:8px;padding:1.5rem 2rem">'
+          + '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--red);margin-bottom:0.5rem">\uD83C\uDFE0 House \u2014 Total Position</div>'
+          + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--text-dim);margin-bottom:0.15rem;line-height:1.1">' + fmt(equityReal) + '</div>'
+          + '<div style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:0.85rem;color:var(--text-dim);margin-bottom:0.5rem;font-weight:400">' + fmt(equity) + ' <span style="color:var(--text-muted)">nominal</span></div>'
+          + equityVisual
+          + '<div style="font-size:0.78rem;' + lm + ';margin-bottom:0.6rem">projected to ' + asOf + '</div>'
+          + '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'
+            + '<div style="' + ls + lm + '">Ownership: <span style="color:var(--text)">' + equityPct + '% of 1 home</span></div>'
+            + '<div style="' + ls + lr + '">Debt outstanding: ' + fmt(Math.round(bal)) + '</div>'
+            + '<div style="' + ls + lr + '">Interest paid: ' + fmt(Math.round(interestPaid)) + ' <span style="' + lm + ';font-size:0.78rem">(dead money)</span></div>'
+            + '<div style="' + ls + lr + '">Debt-free: ' + debtFreeLabel + '</div>'
+            + '<div style="' + ls + lm + '">Rent paid: $0 <span style="font-size:0.78rem">(you live in it)</span></div>'
+            + '<div style="' + ls + 'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: ' + fmt(Math.round(totalHouseCost)) + '</div>'
+          + '</div>'
+        + '</div>';
+      }
     }
 
     // ── ADVANCED SECTION ──
@@ -856,21 +895,16 @@
     }
 
     if(s.method === 'mortgage'){
-      // DCA the rent-vs-mortgage savings into BTC, using geometric interpolation of price over horizon
-      var monthlySavings = Math.max(0, s.monthlyMort - s.impliedRent);
-      var dcaBtc = 0;
+      // DCA the rent-vs-mortgage savings into BTC. Math lives in
+      // computeProjectionDca (single source of truth, also used by the
+      // Total Comparison block in runFwdCalc).
+      var dcaR = computeProjectionDca(s.method, s.btcNow, s.futurePrice, s.monthlyMort, s.impliedRent, s.horizonYrs);
+      var monthlySavings = dcaR ? dcaR.monthlySavings : Math.max(0, s.monthlyMort - s.impliedRent);
+      var dcaBtc = dcaR ? dcaR.dcaBtc : 0;
       var totalMonths = s.horizonYrs * 12;
-      if(monthlySavings > 0 && s.btcNow > 0 && s.futurePrice > 0){
-        for(var m = 0; m < totalMonths; m++){
-          // Geometric interpolation from btcNow to futurePrice
-          var frac = m / totalMonths;
-          var monthPrice = s.btcNow * Math.pow(s.futurePrice/s.btcNow, frac);
-          dcaBtc += monthlySavings / monthPrice;
-        }
-      }
       var dcaValue = dcaBtc * s.futurePrice;
       var dcaValueReal = toReal(dcaValue);
-      var dcaTotalInvested = monthlySavings * totalMonths;
+      var dcaTotalInvested = dcaR ? dcaR.dcaInvested : monthlySavings * totalMonths;
       note.innerHTML = 'If you rent instead of buying, your monthly housing cost is ~75% of a mortgage payment. The difference \u2014 <strong>'+fmt(monthlySavings)+'/mo</strong> \u2014 invested in bitcoin each month compounds the opportunity cost over the horizon.';
       leftEl.innerHTML =
         '<div class="calc-card bitcoin" style="border-style:dashed">' +
