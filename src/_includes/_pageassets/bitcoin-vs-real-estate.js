@@ -793,7 +793,8 @@
       fwdTotalSummary.innerHTML =
         '<div style="background:var(--bg-card);border:1px solid var(--amber-dim);border-radius:8px;padding:1.5rem 2rem">'
         + '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);margin-bottom:0.5rem">\u20BF Bitcoin \u2014 Total Position</div>'
-        + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.3rem">' + fmtDual(btcNet, btcNetReal) + ' <span style="font-size:0.8rem;color:var(--text-muted)">net</span></div>'
+        + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.15rem;line-height:1.1">' + fmt(btcNetReal) + ' <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400">net</span></div>'
+        + '<div style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:0.85rem;color:var(--text-dim);margin-bottom:0.5rem;font-weight:400">' + fmt(btcNet) + ' <span style="color:var(--text-muted)">nominal</span></div>'
         + bhVisual
         + '<div style="font-size:0.78rem;color:var(--amber-dim);margin-bottom:0.6rem">projected to ' + asOf + ' \u2014 ' + scenarioLabel + '</div>'
         + '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'
@@ -812,7 +813,8 @@
       + '</div>'
       + '<div style="background:var(--bg-card);border:1px solid var(--red-dim);border-radius:8px;padding:1.5rem 2rem">'
         + '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--red);margin-bottom:0.5rem">\uD83C\uDFE0 House \u2014 Total Position</div>'
-        + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--text-dim);margin-bottom:0.3rem">' + fmtDual(equity, equityReal) + '</div>'
+        + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--text-dim);margin-bottom:0.15rem;line-height:1.1">' + fmt(equityReal) + '</div>'
+        + '<div style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:0.85rem;color:var(--text-dim);margin-bottom:0.5rem;font-weight:400">' + fmt(equity) + ' <span style="color:var(--text-muted)">nominal</span></div>'
         + equityVisual
         + '<div style="font-size:0.78rem;' + lm + ';margin-bottom:0.6rem">projected to ' + asOf + '</div>'
         + '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'
