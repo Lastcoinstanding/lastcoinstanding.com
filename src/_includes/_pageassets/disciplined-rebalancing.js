@@ -385,9 +385,20 @@
           ticks: {
             color: muted,
             callback: function(v){
-              if(v >= 1e6) return '$' + (v/1e6) + 'M';
-              if(v >= 1000) return '$' + (v/1000) + 'K';
-              if(v >= 1) return '$' + v;
+              // Defensive: round at every magnitude so any value — including
+              // an explicit min/max set by the zoom code — renders as a clean
+              // label rather than a raw decimal (e.g. '$854.39…K').
+              if(v >= 1e6){
+                var m = v / 1e6;
+                if(m >= 10 || m === Math.floor(m)) return '$' + Math.round(m) + 'M';
+                return '$' + (Math.round(m * 10) / 10) + 'M';
+              }
+              if(v >= 1000){
+                var k = v / 1000;
+                if(k >= 100 || k === Math.floor(k)) return '$' + Math.round(k) + 'K';
+                return '$' + (Math.round(k * 10) / 10) + 'K';
+              }
+              if(v >= 1) return '$' + Math.round(v);
               return '$' + v.toFixed(2);
             }
           }
@@ -1040,9 +1051,20 @@
           ticks: {
             color: muted,
             callback: function(v){
-              if(v >= 1e6) return '$' + (v/1e6) + 'M';
-              if(v >= 1000) return '$' + (v/1000) + 'K';
-              if(v >= 1) return '$' + v;
+              // Defensive: round at every magnitude so any value — including
+              // an explicit min/max set by the zoom code — renders as a clean
+              // label rather than a raw decimal (e.g. '$854.39…K').
+              if(v >= 1e6){
+                var m = v / 1e6;
+                if(m >= 10 || m === Math.floor(m)) return '$' + Math.round(m) + 'M';
+                return '$' + (Math.round(m * 10) / 10) + 'M';
+              }
+              if(v >= 1000){
+                var k = v / 1000;
+                if(k >= 100 || k === Math.floor(k)) return '$' + Math.round(k) + 'K';
+                return '$' + (Math.round(k * 10) / 10) + 'K';
+              }
+              if(v >= 1) return '$' + Math.round(v);
               return '$' + v.toFixed(2);
             }
           }
@@ -1644,8 +1666,34 @@
         if (t * PL_FLOOR < lo) lo = t * PL_FLOOR;
         if (t * PL_CEIL  > hi) hi = t * PL_CEIL;
       }
-      // Pad ~10% on each side for breathing room (log scale; multiplicative).
-      return { min: lo / 1.10, max: hi * 1.10 };
+      // Pad ~10% on each side for breathing room (log scale; multiplicative),
+      // then snap each bound to a nice log-friendly value (1, 1.5, 2, 3, 5, 7
+      // × 10^n) so the edge ticks render as clean labels rather than the raw
+      // padded envelope value. Without this snap, the y-tick callback was
+      // dividing the explicit min/max directly and producing labels like
+      // '$854.39…K' / '$26.53…K' at the chart edges. Picking a relatively
+      // dense candidate set keeps the visual padding tight: worst-case extra
+      // padding from the snap is ~50%, typical case much less.
+      return {
+        min: niceLogBound(lo / 1.10, 'down'),
+        max: niceLogBound(hi * 1.10, 'up')
+      };
+    }
+    function niceLogBound(v, direction) {
+      if (v <= 0) return v;
+      var pow = Math.pow(10, Math.floor(Math.log10(v)));
+      var leading = v / pow;  // in [1, 10)
+      var candidates = [1, 1.5, 2, 3, 5, 7, 10];
+      if (direction === 'down') {
+        for (var i = candidates.length - 1; i >= 0; i--) {
+          if (candidates[i] <= leading) return candidates[i] * pow;
+        }
+        return candidates[0] * pow;
+      }
+      for (var j = 0; j < candidates.length; j++) {
+        if (candidates[j] >= leading) return candidates[j] * pow;
+      }
+      return candidates[candidates.length - 1] * pow;
     }
     btns.forEach(function(btn) {
       btn.addEventListener('click', function() {
