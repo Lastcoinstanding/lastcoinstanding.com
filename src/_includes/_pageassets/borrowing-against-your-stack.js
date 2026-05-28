@@ -914,7 +914,7 @@
             borderColor: '#c0392b', borderWidth: 2,
             borderDash: [6,4], pointRadius: 0, fill: false, order: 1 },
           { label: 'Current price',       data: currentDot,
-            borderColor: '#27ae60', backgroundColor: '#27ae60',
+            borderColor: '#e09422', backgroundColor: '#e09422',
             pointRadius: 0, pointHoverRadius: 0, showLine: false, order: 0 }
         ]
       },

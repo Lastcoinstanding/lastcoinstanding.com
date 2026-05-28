@@ -1987,6 +1987,11 @@ input[type="range"]::-moz-range-track {
   border-radius: 50%;
   pointer-events: none;
   transform: translate(-50%, -50%);
+  /* Solid amber core dot at the pulse center — matches BvSM's on-canvas
+     "you are here" core circle, makes the marker read as the expected
+     "data point with surrounding pulse" rather than a hollow ring set. */
+  background-color: var(--amber, #e09422);
+  box-shadow: 0 0 6px rgba(224, 148, 34, 0.5);
   opacity: 0;
   transition: opacity 0.35s ease;
   z-index: 2;

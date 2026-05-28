@@ -1594,11 +1594,33 @@
     fetchTodayPrice(function(price) {
       liveBtcPrice = price;
       updateDrTodayCaption(price);
-      // Re-render so the pulse plugin repositions to the new (TODAY_DAYS, price).
-      // 'resize' update mode is the safe choice on this chart — it triggers the
-      // afterRender hook without disturbing the historical price line's data or
-      // the cached scale state that the documented scale-cache bug was sensitive
-      // to (see TECH_DEBT closed entry on the channel-viz fix).
+      // Extend the historical-price line to the live "today" anchor so it
+      // visibly meets the Today vertical (previously stopped at the last
+      // PL_DATA sample, leaving a small but visually awkward gap to Today).
+      // Safe to mutate DS.history here: nothing else in the file writes to
+      // this dataset after construction (grep confirms no DS.history writes
+      // beyond initial setup), so threshold-slider / band / horizon updates
+      // won't overwrite the trailing point. The xPerDataset interaction
+      // mode handles the mixed-cadence picking, so the original scale-cache
+      // bug class is not re-triggered by adding one trailing sample.
+      var histData = chart.data.datasets[DS.history].data;
+      if (histData && histData.length) {
+        var last = histData[histData.length - 1];
+        // Idempotent: if we've already appended a "today" point on a prior
+        // resolve (e.g. a hypothetical hot-reload), update its y rather
+        // than appending again. The "today" point is the one whose x is
+        // greater than the last canonical PL_DATA sample's x.
+        var lastCanonicalDay = PL_DATA[PL_DATA.length - 1][0];
+        if (last && last.x > lastCanonicalDay) {
+          last.y = price;
+        } else {
+          histData.push({ x: TODAY_DAYS, y: price });
+        }
+      }
+      // Re-render so the pulse plugin repositions and the price line
+      // redraws to today. 'resize' update mode triggers afterRender and
+      // safely revisits the scales without the tooltip-index pathology
+      // the documented scale-cache fix addressed.
       chart.update('resize');
     });
   }

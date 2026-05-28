@@ -845,7 +845,7 @@
 .bas-calc-swatch.bas-calc-swatch-upper   { background: rgba(224,148,34,0.5); }
 .bas-calc-swatch.bas-calc-swatch-history { background: rgba(232,224,212,0.8); height: 2.5px; }
 .bas-calc-swatch.bas-calc-swatch-liq     { background: var(--red); }
-.bas-calc-swatch.bas-calc-swatch-current { width: 10px; height: 10px; border-radius: 50%; background: var(--green); }
+.bas-calc-swatch.bas-calc-swatch-current { width: 10px; height: 10px; border-radius: 50%; background: var(--amber); }
 
 /* Interpretation paragraph below the chart */
 .bas-calc-interp {
@@ -2212,6 +2212,11 @@
   border-radius: 50%;
   pointer-events: none;
   transform: translate(-50%, -50%);
+  /* Solid amber core dot at the pulse center — matches BvSM's on-canvas
+     "you are here" core circle, makes the marker read as the expected
+     "data point with surrounding pulse" rather than a hollow ring set. */
+  background-color: var(--amber, #e09422);
+  box-shadow: 0 0 6px rgba(224, 148, 34, 0.5);
   opacity: 0;
   transition: opacity 0.35s ease;
   z-index: 2;
