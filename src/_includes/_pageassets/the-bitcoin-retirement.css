@@ -1611,3 +1611,45 @@ a.powerlaw-link:hover {
     size: letter;
   }
 }
+
+/* ──────────────────────────────────────────────────────────────────
+   Canonical "you are here" pulse halo (STYLE_GUIDE §6.23).
+   Animated amber radial marker positioned over the live "today" data
+   point. Class name lcs-pulse-halo is the canonical, shared spelling
+   used across tactical chart pages (Retirement, DR, BAS). Visual
+   parity with BvSM's older bvsm-you-are-here-pulse — kept in sync.
+   ────────────────────────────────────────────────────────────────── */
+.lcs-pulse-halo {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 2;
+}
+.lcs-pulse-halo.is-visible { opacity: 1; }
+.lcs-pulse-halo::before,
+.lcs-pulse-halo::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(224, 148, 34, 0.7);
+  transform: translate(-50%, -50%) scale(1);
+  animation: lcsPulseRing 2.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+.lcs-pulse-halo::after { animation-delay: 1.3s; }
+@keyframes lcsPulseRing {
+  0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.85; }
+  100% { transform: translate(-50%, -50%) scale(4); opacity: 0;    }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lcs-pulse-halo::before,
+  .lcs-pulse-halo::after { animation: none; }
+}

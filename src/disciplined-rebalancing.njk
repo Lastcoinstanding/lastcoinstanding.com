@@ -140,7 +140,18 @@ eleventyComputed:
             <!-- coefficients credit Mežinskis / Porkopolis (see /the-power-law). -->
             <div class="dr-channel-viz">
                 <div class="dr-channel-viz-title">The channel — your thresholds against fifteen years of history</div>
-                <div class="dr-channel-chart-wrapper"><canvas id="drChannelChart"></canvas></div>
+                <div class="dr-channel-range-toggle" role="tablist" aria-label="Chart time range">
+                    <button class="dr-range-btn is-active" data-range="all"      role="tab" aria-selected="true">All-time</button>
+                    <button class="dr-range-btn"            data-range="near-1y" role="tab" aria-selected="false">Near (&plusmn;1y)</button>
+                    <button class="dr-range-btn"            data-range="plan-2y" role="tab" aria-selected="false">Planning (&plusmn;2y)</button>
+                </div>
+                <div class="dr-channel-chart-wrapper">
+                    <canvas id="drChannelChart"></canvas>
+                    <!-- Canonical lcs-pulse-halo (STYLE_GUIDE §6.23). Positioned
+                         at (TODAY_DAYS, liveBtcPrice) by lcsPulsePlugin in
+                         disciplined-rebalancing.js after every chart render. -->
+                    <div class="lcs-pulse-halo" id="drPulse" aria-hidden="true"></div>
+                </div>
                 <div class="dr-channel-legend" role="group" aria-label="Click any line to toggle on or off">
                     <div class="dr-legend-hint">Click any item below to hide or show it on the chart</div>
                     <span class="dr-legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="0"><span class="dr-legend-swatch dr-swatch-floor"></span>Floor (0.42&times; trend)</span>
@@ -152,6 +163,7 @@ eleventyComputed:
                     <span class="dr-legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="9"><span class="dr-legend-glyph dr-legend-glyph-histsell">&#9660;</span>Historical sell signal</span>
                     <span class="dr-legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="10"><span class="dr-legend-glyph dr-legend-glyph-histrebuy">&#9650;</span>Historical rebuy signal</span>
                 </div>
+                <div class="dr-channel-today" aria-live="polite">Today (live): <strong id="drTodaySpot">&mdash;</strong> &middot; <span id="drTodayMult">&mdash;&times;</span> trend</div>
 
                 <!-- HISTORICAL BACKTEST SUMMARY -->
                 <!-- Shows what the strategy would have done if applied -->

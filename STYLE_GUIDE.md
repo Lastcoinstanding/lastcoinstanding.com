@@ -1398,7 +1398,11 @@ const pulsePlugin = {
 };
 ```
 
-**Per-page CSS scoping note.** Animation `pulse-halo` should be page-scoped (`bvsm-pulse-halo` or similar) if multiple chart pages adopt this pattern, to keep keyframe collisions unambiguous. If promoted to shared, rename to `lcs-pulse-halo` once.
+**Canonical class name: `lcs-pulse-halo` (promoted 2026-05-28).** The pulse rolled out across multiple tactical chart pages (Retirement, DR, BAS — Retirement and DR add a new pulse; BAS promotes its previously-static green "Current price" dot into the pulse so there's no second marker). The shared class name is `lcs-pulse-halo` and the keyframe animation is `lcsPulseRing`, matching across all consumers. The original BvSM `bvsm-you-are-here-pulse` rules stay in place on that page for now (they work; visual parity is preserved by matching keyframes); future BvSM CSS work can swap to the canonical name at no behavioral cost.
+
+**CSS is duplicated per-page CSS file rather than living in a shared module** — this site doesn't yet have a base.css, and adding one purely for this is out of scope. The duplication is mechanical (the rule body is identical across the three new pages) and the canonical class name carries the "shared" identity. If a base.css is added later, this is the obvious first inhabitant.
+
+**Conceptual / educational pages should NOT adopt the pulse** — e.g., the Power Law Channel tab is foundational/explanatory rather than tactical, so the pulse would over-signal "live performance" on a chart whose argument is the multi-decade arc. The rule of thumb: pulse on tactical decision tools, plain on conceptual explainers.
 
 ### 6.24 Combined presets + slider input group (`start-input-group`)
 

@@ -149,6 +149,10 @@ eleventyComputed:
       </div>
       <div class="chart-wrapper">
         <canvas id="projectionChart"></canvas>
+        <!-- Canonical lcs-pulse-halo (STYLE_GUIDE §6.23). Positioned over
+             the "Today" anchor by lcsPulsePlugin in the-bitcoin-retirement.js
+             after every chart render; CSS handles the ring animation. -->
+        <div class="lcs-pulse-halo" id="retirePulse" aria-hidden="true"></div>
       </div>
     </div>
 

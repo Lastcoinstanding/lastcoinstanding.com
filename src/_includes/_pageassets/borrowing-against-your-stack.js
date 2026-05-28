@@ -143,22 +143,42 @@
   // seeds to the latest PL_DATA sample (used immediately so the page renders
   // with a sensible value) and fetchTodayPrice() then overwrites with the
   // CoinGecko spot. We only overwrite the input if the user hasn't already
-  // typed a value — this is an editable modeling input by design.
+  // typed a value — this is an editable modeling input by design. The fixed
+  // "Today (live)" caption below the chart legend always reflects the live
+  // spot regardless of user edits, so the reader has a stable factual anchor.
+  function updateTodayCaption(price) {
+    var spotEl = document.getElementById('basTodaySpot');
+    var multEl = document.getElementById('basTodayMult');
+    if (!spotEl || !multEl) return;
+    var fmt = (price >= 1000) ? '$' + (price / 1000).toFixed(1) + 'K'
+                              : '$' + Math.round(price).toLocaleString();
+    spotEl.textContent = fmt;
+    var trendNow = (typeof plPrice === 'function' && typeof TODAY_DAYS !== 'undefined')
+                   ? plPrice(TODAY_DAYS) : null;
+    multEl.textContent = (trendNow && trendNow > 0)
+                         ? (price / trendNow).toFixed(2) + '\u00d7'
+                         : '\u2014\u00d7';
+  }
   if (typeof PL_DATA !== 'undefined' && PL_DATA.length) {
     var userHadValue = !!(priceInput.value && priceInput.value !== '0');
     if (!userHadValue) {
       priceInput.value = Math.round(TODAY_PRICE / 100) * 100;
     }
-    if (typeof fetchTodayPrice === 'function' && !userHadValue) {
+    // Seed the fixed caption right away so the reader sees a sensible
+    // value before the fetch resolves.
+    updateTodayCaption(TODAY_PRICE);
+    if (typeof fetchTodayPrice === 'function') {
+      priceInput.addEventListener('input', function(){ priceInput.dataset.userEdited = '1'; });
       fetchTodayPrice(function(price) {
-        // Only fill if the user hasn't edited the field since first paint.
-        if (!priceInput.dataset.userEdited) {
+        // The fixed caption always reflects the live spot — even if the
+        // user has edited the modeling input to a hypothetical.
+        updateTodayCaption(price);
+        // Only fill the editable input if the user hasn't touched it.
+        if (!priceInput.dataset.userEdited && !userHadValue) {
           priceInput.value = Math.round(price / 100) * 100;
-          // Trigger any input listeners (chart re-render, computed outputs)
           priceInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
       });
-      priceInput.addEventListener('input', function(){ priceInput.dataset.userEdited = '1'; });
     }
   }
 
@@ -172,6 +192,37 @@
   }
 
   var chart = null;
+
+  // ─── Canonical "you are here" pulse halo plugin (STYLE_GUIDE §6.23).
+  // Promotes the static green "Current price" dot into the canonical
+  // animated pulse — no second marker added; the dot's pointRadius is 0
+  // and the pulse div is the visual. Anchored to the "Current price"
+  // dataset's single data point so it tracks user edits to the price
+  // input naturally (renderChart() rebuilds currentDot from the input).
+  var lcsPulsePlugin = {
+    id: 'lcsPulse',
+    afterRender: function(c) {
+      var pulse = document.getElementById('basPulse');
+      if (!pulse || !c.scales || !c.scales.x || !c.scales.y) return;
+      // Current price dataset is the last one (label === 'Current price').
+      var ds = null;
+      for (var i = c.data.datasets.length - 1; i >= 0; i--) {
+        if (c.data.datasets[i].label === 'Current price') { ds = c.data.datasets[i]; break; }
+      }
+      if (!ds || !ds.data || !ds.data.length) { pulse.classList.remove('is-visible'); return; }
+      var pt = ds.data[0];
+      var x = c.scales.x.getPixelForValue(pt.x);
+      var y = c.scales.y.getPixelForValue(pt.y);
+      if (x < c.chartArea.left  - 4 || x > c.chartArea.right  + 4 ||
+          y < c.chartArea.top   - 4 || y > c.chartArea.bottom + 4) {
+        pulse.classList.remove('is-visible');
+        return;
+      }
+      pulse.style.left = x + 'px';
+      pulse.style.top  = y + 'px';
+      pulse.classList.add('is-visible');
+    }
+  };
 
   // ─── Formatters ───
   function fmtUsd(n) {
@@ -864,9 +915,10 @@
             borderDash: [6,4], pointRadius: 0, fill: false, order: 1 },
           { label: 'Current price',       data: currentDot,
             borderColor: '#27ae60', backgroundColor: '#27ae60',
-            pointRadius: 6, pointHoverRadius: 8, showLine: false, order: 0 }
+            pointRadius: 0, pointHoverRadius: 0, showLine: false, order: 0 }
         ]
       },
+      plugins: [lcsPulsePlugin],
       options: {
         responsive: true,
         maintainAspectRatio: false,

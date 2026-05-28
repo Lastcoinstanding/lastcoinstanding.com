@@ -795,6 +795,36 @@
     };
   }
 
+  // ─── Live BTC anchor (added with the 2026-05-28 live-fetch rollout).
+  // DR's chart historical line continues to end at the latest PL_DATA
+  // sample (matches the dataset the chart is built from); the pulse +
+  // today-caption below provide a separate, live "you are here" anchor
+  // that does NOT mutate the chart's historical-price dataset, avoiding
+  // any interaction with the documented scale-cache fragility.
+  var liveBtcPrice = TODAY_PRICE;
+
+  // ─── Canonical "you are here" pulse halo (STYLE_GUIDE §6.23).
+  // Positions #drPulse at (TODAY_DAYS, liveBtcPrice) after every chart
+  // render. liveBtcPrice is closure-captured and updated by the
+  // fetchTodayPrice callback below.
+  var lcsPulsePlugin = {
+    id: 'lcsPulse',
+    afterRender: function(c) {
+      var pulse = document.getElementById('drPulse');
+      if (!pulse || !c.scales || !c.scales.x || !c.scales.y) return;
+      var x = c.scales.x.getPixelForValue(TODAY_DAYS);
+      var y = c.scales.y.getPixelForValue(liveBtcPrice);
+      if (x < c.chartArea.left  - 4 || x > c.chartArea.right  + 4 ||
+          y < c.chartArea.top   - 4 || y > c.chartArea.bottom + 4) {
+        pulse.classList.remove('is-visible');
+        return;
+      }
+      pulse.style.left = x + 'px';
+      pulse.style.top  = y + 'px';
+      pulse.classList.add('is-visible');
+    }
+  };
+
   var chart = new Chart(canvas, {
     type: 'scatter',
     data: {
@@ -935,7 +965,7 @@
         }
       ]
     },
-    plugins: [todayLinePlugin],
+    plugins: [todayLinePlugin, lcsPulsePlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -1541,6 +1571,87 @@
           e.preventDefault();
           toggle();
         }
+      });
+    });
+  })();
+
+  // ─── Today (live) caption + range toggle (added with 2026-05-28 rollout)
+  function updateDrTodayCaption(price) {
+    var spotEl = document.getElementById('drTodaySpot');
+    var multEl = document.getElementById('drTodayMult');
+    if (!spotEl || !multEl) return;
+    var fmt = (price >= 1000) ? '$' + (price / 1000).toFixed(1) + 'K'
+                              : '$' + Math.round(price).toLocaleString();
+    spotEl.textContent = fmt;
+    var trendNow = plPrice(TODAY_DAYS);
+    multEl.textContent = (trendNow && trendNow > 0)
+                         ? (price / trendNow).toFixed(2) + '\u00d7'
+                         : '\u2014\u00d7';
+  }
+  // Seed immediately with the latest-sample value, then update on fetch resolve.
+  updateDrTodayCaption(TODAY_PRICE);
+  if (typeof fetchTodayPrice === 'function') {
+    fetchTodayPrice(function(price) {
+      liveBtcPrice = price;
+      updateDrTodayCaption(price);
+      // Re-render so the pulse plugin repositions to the new (TODAY_DAYS, price).
+      // 'resize' update mode is the safe choice on this chart — it triggers the
+      // afterRender hook without disturbing the historical price line's data or
+      // the cached scale state that the documented scale-cache bug was sensitive
+      // to (see TECH_DEBT closed entry on the channel-viz fix).
+      chart.update('resize');
+    });
+  }
+
+  // Today-centered range toggle: All-time / Near (±1y) / Planning (±2y).
+  // Unlike a trailing window, this centers on TODAY_DAYS so the visible
+  // x-range includes both recent history and near-future projection —
+  // matches the buy/sell decision context this page is built for. The
+  // y-axis is recomputed for the local band envelope on zoom so a log
+  // y-axis doesn't collapse to a flat sliver.
+  (function(){
+    var btns = document.querySelectorAll('.dr-range-btn');
+    if (!btns || !btns.length) return;
+    function bandsBoundsForWindow(loD, hiD) {
+      // Sample the floor/upper bands across the window to get a sensible
+      // y-domain. Floor = trend × 0.42 (low), Upper = trend × 3.0 (high).
+      var step = 30;
+      var lo = Infinity, hi = -Infinity;
+      for (var d = loD; d <= hiD; d += step) {
+        var t = plPrice(d);
+        if (t * PL_FLOOR < lo) lo = t * PL_FLOOR;
+        if (t * PL_CEIL  > hi) hi = t * PL_CEIL;
+      }
+      // Pad ~10% on each side for breathing room (log scale; multiplicative).
+      return { min: lo / 1.10, max: hi * 1.10 };
+    }
+    btns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        btns.forEach(function(b){
+          b.classList.remove('is-active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-selected', 'true');
+        var range = btn.getAttribute('data-range');
+        var xScale = chart.options.scales.x;
+        var yScale = chart.options.scales.y;
+        if (range === 'all') {
+          xScale.min = undefined;
+          xScale.max = undefined;
+          yScale.min = undefined;
+          yScale.max = undefined;
+        } else {
+          var window_yrs = (range === 'near-1y') ? 1 : 2;
+          var loD = TODAY_DAYS - 365 * window_yrs;
+          var hiD = TODAY_DAYS + 365 * window_yrs;
+          xScale.min = loD;
+          xScale.max = hiD;
+          var b = bandsBoundsForWindow(loD, hiD);
+          yScale.min = b.min;
+          yScale.max = b.max;
+        }
+        chart.update('resize');
       });
     });
   })();

@@ -305,7 +305,14 @@ eleventyComputed:
             <!-- Updates live as the user adjusts stack / price / loan / threshold. -->
             <div class="bas-calc-chart-wrapper">
                 <div class="bas-calc-chart-title">Your liquidation price on the Power Law channel</div>
-                <div class="bas-calc-chart-canvas"><canvas id="basChannelChart"></canvas></div>
+                <div class="bas-calc-chart-canvas">
+                    <canvas id="basChannelChart"></canvas>
+                    <!-- Canonical lcs-pulse-halo (STYLE_GUIDE §6.23). Replaces
+                         the static green "Current price" dot — the same data
+                         point, animated. Positioned by lcsPulsePlugin in
+                         borrowing-against-your-stack.js. -->
+                    <div class="lcs-pulse-halo" id="basPulse" aria-hidden="true"></div>
+                </div>
                 <div class="bas-calc-chart-legend">
                     <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-floor"></span>Floor (0.42&times; trend)</span>
                     <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-trend"></span>Trend</span>
@@ -314,6 +321,7 @@ eleventyComputed:
                     <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-current"></span>Current price</span>
                     <span class="bas-calc-legend-item"><span class="bas-calc-swatch bas-calc-swatch-liq"></span>Your liquidation price</span>
                 </div>
+                <div class="bas-calc-chart-today" aria-live="polite">Today (live): <strong id="basTodaySpot">&mdash;</strong> &middot; <span id="basTodayMult">&mdash;&times;</span> trend</div>
             </div>
 
             <!-- ─── INPUT GRID (RISK / POSITION) ─── -->

@@ -546,7 +546,31 @@
     }
   };
 
-  // ─── BTC-count annotation plugin: dots + "X.XX BTC" labels at anchor years
+  // ─── Canonical "you are here" pulse halo plugin (STYLE_GUIDE §6.23).
+  // Positions the #retirePulse DOM element over the live "today" anchor
+  // after every chart render. X = current year (matches the existing
+  // "Today" vertical line); Y = liveBtcPrice (closure-captured, mutated
+  // by updateStatusLine() once fetchTodayPrice resolves). CSS handles
+  // the ring animation; this plugin only keeps the element pinned.
+  var lcsPulsePlugin = {
+    id: 'lcsPulse',
+    afterRender: function(chart) {
+      var pulse = document.getElementById('retirePulse');
+      if (!pulse || !chart.scales || !chart.scales.x || !chart.scales.y) return;
+      var todayYear = (new Date()).getFullYear();
+      var x = chart.scales.x.getPixelForValue(todayYear);
+      var y = chart.scales.y.getPixelForValue(liveBtcPrice);
+      if (x < chart.chartArea.left  - 4 || x > chart.chartArea.right  + 4 ||
+          y < chart.chartArea.top   - 4 || y > chart.chartArea.bottom + 4) {
+        pulse.classList.remove('is-visible');
+        return;
+      }
+      pulse.style.left = x + 'px';
+      pulse.style.top  = y + 'px';
+      pulse.classList.add('is-visible');
+    }
+  };
+
   // along the user's drawdown line. Bitcoin-native readers care not just about
   // the dollar value of remaining stack but the BTC count itself; this gives
   // them that dimension at a glance without a second Y-axis.
@@ -1010,7 +1034,7 @@
           btcCountAnnotations: { anchors: btcAnchors }
         }
       },
-      plugins: [bandFillPlugin, verticalLinePlugin, btcCountPlugin]
+      plugins: [bandFillPlugin, verticalLinePlugin, btcCountPlugin, lcsPulsePlugin]
     });
     chart._btcDataByDataset = btcDataByDataset;
   }
