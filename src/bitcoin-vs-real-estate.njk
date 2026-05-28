@@ -30,7 +30,7 @@ eleventyComputed:
         <div class="tab-nav">
             <button class="tab-btn active" data-tab="calculator">
                 <span class="tab-num">I</span>
-                <span class="tab-title">The Postponed Purchase</span>
+                <span class="tab-title">Postponed Purchase Calculator</span>
             </button>
             <button class="tab-btn" data-tab="btc-house">
                 <span class="tab-num">II</span>
@@ -291,6 +291,12 @@ eleventyComputed:
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Total Comparison — mirrors retrospective layout. Populated by runFwdCalc. -->
+                <div class="calculator" id="fwdTotalSummaryWrapper" style="display:none;margin-top:0;border-top:none;border-radius:0 0 8px 8px;padding:1.5rem 2rem">
+                    <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:1rem;text-align:center">Total Comparison</div>
+                    <div id="fwdTotalSummary" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem"></div>
                 </div>
 
                 <div class="annotation" style="margin-top:1rem;font-size:.85rem;color:var(--text-muted);line-height:1.7">
