@@ -139,11 +139,26 @@
     'genesis': 5000     // pre-2020 average accumulation
   };
 
-  // Auto-fill current BTC price from most recent PL_DATA sample
+  // Auto-fill current BTC price from the shared live anchor. TODAY_PRICE
+  // seeds to the latest PL_DATA sample (used immediately so the page renders
+  // with a sensible value) and fetchTodayPrice() then overwrites with the
+  // CoinGecko spot. We only overwrite the input if the user hasn't already
+  // typed a value — this is an editable modeling input by design.
   if (typeof PL_DATA !== 'undefined' && PL_DATA.length) {
-    var latest = PL_DATA[PL_DATA.length - 1];
-    if (!priceInput.value || priceInput.value === '0') {
-      priceInput.value = Math.round(latest[1] / 100) * 100;
+    var userHadValue = !!(priceInput.value && priceInput.value !== '0');
+    if (!userHadValue) {
+      priceInput.value = Math.round(TODAY_PRICE / 100) * 100;
+    }
+    if (typeof fetchTodayPrice === 'function' && !userHadValue) {
+      fetchTodayPrice(function(price) {
+        // Only fill if the user hasn't edited the field since first paint.
+        if (!priceInput.dataset.userEdited) {
+          priceInput.value = Math.round(price / 100) * 100;
+          // Trigger any input listeners (chart re-render, computed outputs)
+          priceInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      });
+      priceInput.addEventListener('input', function(){ priceInput.dataset.userEdited = '1'; });
     }
   }
 

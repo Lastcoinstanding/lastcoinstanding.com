@@ -18,18 +18,19 @@ as-of date string, add it here in the same commit.
 The shared module is the single source of truth for the Power Law model
 constants and the historical price series. Update both on each refresh.
 
-### TODAY_DAYS and TODAY_PRICE
+### TODAY_DAYS and TODAY_PRICE — no longer monthly-refreshed
 
-The two constants representing the present moment. Both feed into every
-page's "you are here" markers, as-of callouts, and forward-projection
-chart anchors.
+Both anchors now live in `shared/power-law-data.js` and self-update at page
+load. **You do not need to touch them on the monthly refresh.**
 
-| Constant | What it is | How to compute |
+| Constant | What it is | How it's set now |
 |---|---|---|
-| `TODAY_DAYS` | Days since the Bitcoin Genesis Block (3 Jan 2009) | `Math.floor((Date.now() / 1000 - 1230940800) / 86400)` |
-| `TODAY_PRICE` | Most recent USD BTC price | Pull from a price API or take the previous day's close |
+| `TODAY_DAYS` | Days since the Bitcoin Genesis Block (3 Jan 2009) | Computed at load: `Math.floor((Date.now() / 1000 - GENESIS_TS) / 86400)` |
+| `TODAY_PRICE` | Most recent USD BTC price | Seeded to the latest `PL_DATA` sample, then overwritten by `fetchTodayPrice()` (CoinGecko spot, with the latest sample as fallback) |
 
-Round `TODAY_DAYS` to the nearest integer; `TODAY_PRICE` to the nearest dollar.
+The only thing the monthly refresh now does for "today" is keep the
+fallback fresh — and that happens automatically when you append a new
+`PL_DATA` sample (below), since the fallback IS the latest sample.
 
 ### PL_DATA — the historical price series
 
@@ -40,31 +41,24 @@ right cadence; daily samples produce a heavier file with no editorial gain.
 When you add the sample for the current month, also verify the as-of
 caption on the BvSM Power Law chart still reads accurately (see §3).
 
-## 2. Page-level TODAY constants
+## 2. Page-level TODAY constants — none remaining
 
-Some pages keep their own copy of `TODAY_DAYS` and `TODAY_PRICE` because
-they were authored before the shared module existed, or because they were
-deliberately scoped per-page. These need updating in lockstep with the
-shared module.
+Historically a few pages kept their own `TODAY_DAYS`/`TODAY_PRICE` copies
+that needed lockstep updates. As of 2026-05-28 those copies have been
+removed; every page that anchors to "today" now reads the shared globals
+from `power-law-data.js`, so cross-page disagreement is no longer possible
+by construction.
 
-Grep across the repo to find every page that holds its own copy:
+If a future page introduces a local copy, surface it here and prefer
+deletion in favor of the shared globals — the cross-page consistency
+guarantee depends on a single source.
+
+Sanity-grep to confirm no copies have crept back in:
 
 ```bash
-grep -rn "TODAY_DAYS\|TODAY_PRICE" src/_includes/_pageassets/
+grep -rn "^[^/]*\bvar (TODAY_DAYS|TODAY_PRICE)" src/_includes/_pageassets/
+# Expected: only the declarations in shared/power-law-data.js
 ```
-
-Current known copies (verify with grep each refresh, since the list grows):
-
-| Page | File path | Constants present |
-|---|---|---|
-| BvSM | `src/_includes/_pageassets/bitcoin-vs-the-stock-market.js` | TODAY_DAYS, TODAY_PRICE |
-
-When a page has its own copy, update it to match the shared module exactly.
-Diverging values produce silent inconsistency (e.g., the "you are here" pulse
-sits at a different point on the BvSM chart than on the Power Law chart).
-
-A separate Tech Debt item tracks consolidating per-page copies down to the
-shared module. Until that lands, the lockstep update is the discipline.
 
 ## 3. As-of date strings in callouts and chart captions
 
@@ -187,21 +181,29 @@ will cache the previous version; first new share triggers re-scrape, or
 use [Facebook's debugger](https://developers.facebook.com/tools/debug/)
 to force a fresh fetch.
 
-## Why not live fetch?
+## Live BTC price fetch — shipped 2026-05-28
 
-Live BTC price fetch via CoinGecko (or similar) is a Phase 2 enhancement
-on the Tech Debt list. The reasons it's deferred:
+The "Why not live fetch?" reasoning that previously sat here is preserved
+in git history (last revision before this commit). The decision was
+reversed because (a) the credibility cost of cross-page disagreement on
+spot price was clearly visible — three different pages were showing three
+different "current" prices on the same day — and (b) the two coherence
+concerns we originally raised are addressed by computing `TODAY_DAYS` at
+load and centralizing the fetch + fallback in one shared helper:
 
-- A runtime dependency on a third-party API for every page load is a
-  reliability surface that monthly hardcoded refresh doesn't need.
-- `TODAY_DAYS` is also a hardcoded constant; without also computing
-  `TODAY_DAYS` at render time, a live `TODAY_PRICE` paired with a stale
-  `TODAY_DAYS` produces partial coherence — the price floats while the
-  trend anchor doesn't.
-- The discipline of a monthly refresh forces a periodic editorial review
-  of the as-of strings and chart captions, which a live fetch would mask
-  rather than resolve. Those strings are part of the page's editorial
-  voice and benefit from the eyeball.
+- **Reliability:** `fetchTodayPrice()` in `shared/power-law-data.js` is the
+  single network surface. On any failure it falls back to the latest
+  `PL_DATA` sample, which is itself refreshed monthly — so the worst-case
+  is the same staleness the old hardcoded path had, never worse.
+- **Coherence:** `TODAY_DAYS` is now computed from `GENESIS_TS` at load,
+  so the trend anchor advances in lockstep with whatever `TODAY_PRICE`
+  resolves to. No partial-coherence drift.
+- **Editorial review:** the as-of strings and chart captions in §3 still
+  benefit from the monthly eyeball; that discipline is preserved
+  independently of the live-fetch change.
 
-When the page set grows past the point where monthly refresh is tractable,
-revisit. Until then, the checklist is the protocol.
+Pages consuming the shared helper: BvSM, the Power Law Channel tab, the
+Bitcoin Retirement, and Borrowing Against Your Stack (Loan Health input
+auto-fill). Disciplined Rebalancing continues to use the latest `PL_DATA`
+sample for its "today" (matches the chart's historical line by design);
+a future pass may add the live anchor there too.

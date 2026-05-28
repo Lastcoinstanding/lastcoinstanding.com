@@ -330,10 +330,10 @@ eleventyComputed:
                 <div class="bas-calc-field">
                     <label class="bas-calc-field-label" for="basBtcPrice">
                         Current BTC price (USD)
-                        <span class="help-tip" tabindex="0">?<span class="tip-content">Auto-filled from the most recent monthly sample in the page's Power Law dataset. Override to model a different starting price &mdash; e.g. to see what your loan would look like if originated at a higher or lower point in the cycle.</span></span>
+                        <span class="help-tip" tabindex="0">?<span class="tip-content">Auto-filled from the live BTC spot price on page load (with the most recent monthly sample as a fallback if the live fetch is unavailable). Override to model a different starting price &mdash; e.g. to see what your loan would look like if originated at a higher or lower point in the cycle.</span></span>
                     </label>
                     <input type="number" id="basBtcPrice" value="" step="100" min="0" max="100000000">
-                    <div class="bas-calc-field-hint">Auto-populated from the most recent monthly sample. Edit to model a different starting price.</div>
+                    <div class="bas-calc-field-hint">Auto-populated from the live BTC price (monthly sample as fallback). Edit to model a different starting price.</div>
                 </div>
 
                 <div class="bas-calc-field">

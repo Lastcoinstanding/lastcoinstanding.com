@@ -847,18 +847,9 @@
       ' <span style="opacity:0.55;margin-left:0.5rem">(Power Law trend = ' + fmtUSD(todayPrice) + ')</span>';
   }
 
-  // Try to fetch live BTC; fall back to last PL_DATA sample
-  fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
-    .then(function(r){ return r.ok ? r.json() : Promise.reject(); })
-    .then(function(j){
-      if(j && j.bitcoin && j.bitcoin.usd){
-        updateStatus(j.bitcoin.usd, true);
-      } else {
-        updateStatus(PL_DATA[PL_DATA.length-1][1], false);
-      }
-    })
-    .catch(function(){
-      updateStatus(PL_DATA[PL_DATA.length-1][1], false);
-    });
+  // Live BTC via the shared helper (one fetch + one consistent fallback
+  // across every Power Law page, so the "Today" value can't disagree page
+  // to page). Status-line rendering is unchanged.
+  fetchTodayPrice(function(price, source){ updateStatus(price, source === 'live'); });
 })();
 

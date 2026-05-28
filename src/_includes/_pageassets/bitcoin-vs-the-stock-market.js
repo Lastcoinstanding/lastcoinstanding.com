@@ -41,9 +41,9 @@
 (function() {
   if (typeof PL_DATA === 'undefined' || typeof Chart === 'undefined') return;
 
-  // May 14, 2026 reference (matches the site-wide today price)
-  var TODAY_DAYS = 6340;
-  var TODAY_PRICE = 81741;
+  // TODAY_DAYS / TODAY_PRICE now come from shared/power-law-data.js:
+  // TODAY_DAYS is computed at load, TODAY_PRICE seeds to the latest sample
+  // and is overwritten by the live spot via fetchTodayPrice() (wired below).
 
   // Build BTC price series: PL_DATA samples + an appended today point so
   // the historical line extends to the present and the today marker sits
@@ -140,9 +140,15 @@
       FLOORS.forEach(function(m) { drawMarker(m, floorColor, false); });
       TOPS.forEach(function(m)   { drawMarker(m, topColor,   true);  });
 
-      // Today marker — larger, with concentric rings and a distinct label
-      var tx = xs.getPixelForValue(TODAY_MARKER.d);
-      var ty = ys.getPixelForValue(TODAY_MARKER.p);
+      // Today marker — larger, with concentric rings and a distinct label.
+      // Reads the live globals (TODAY_DAYS/TODAY_PRICE) so it tracks the spot
+      // price once fetchTodayPrice() resolves.
+      var todayMult = TODAY_PRICE / plPrice(TODAY_DAYS);
+      var todayLabel = (TODAY_PRICE >= 1000 ? '$' + (TODAY_PRICE / 1000).toFixed(1) + 'K'
+                                            : '$' + Math.round(TODAY_PRICE))
+                       + ' \u00b7 ' + todayMult.toFixed(2) + '\u00d7 trend';
+      var tx = xs.getPixelForValue(TODAY_DAYS);
+      var ty = ys.getPixelForValue(TODAY_PRICE);
       // Outer halo
       ctx.beginPath();
       ctx.arc(tx, ty, 11, 0, 2 * Math.PI);
@@ -168,7 +174,7 @@
       ctx.fillText('You are here', tx - 16, ty - 2);
       ctx.font = '500 10px Inter, sans-serif';
       ctx.fillStyle = muted;
-      ctx.fillText('0.59\u00d7 trend', tx - 16, ty + 12);
+      ctx.fillText(todayLabel, tx - 16, ty + 12);
     }
   };
 
@@ -358,6 +364,17 @@
         }
         plChart.update();
       });
+    });
+
+    // ─── Live price: seed is the latest sample; overwrite with spot on load ───
+    // fetchTodayPrice() updates the shared TODAY_PRICE global (read by both the
+    // markers plugin and the pulse plugin); here we also move the trailing point
+    // of the price line and the today marker, then re-render.
+    fetchTodayPrice(function(price) {
+      if (historicalLine.length) historicalLine[historicalLine.length - 1].y = price;
+      TODAY_MARKER.p = price;
+      TODAY_MARKER.m = price / plPrice(TODAY_DAYS);
+      plChart.update();
     });
   }
 

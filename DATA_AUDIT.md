@@ -91,7 +91,7 @@ Citations already present on the site as of Stage 1 (commit context: pending).
 | BR-4 | Trinity Study (4% rule, 7% real return target) | Cooley, Hubbard, Walz 1998; Bengen 1994 | Bogleheads explainer (also primary papers) | https://www.bogleheads.org/wiki/Trinity_study | 2026-05-07 | 2026-11-07 |
 | BR-5 | Live BTC price feed | live | CoinGecko public API | https://www.coingecko.com/ | 2026-05-07 | 2026-11-07 |
 | BR-6 | Inflation presets (3.5% / 6.5% / 8% / Custom) | (canonical, sitewide) | (same as I-1, I-2, I-4 in canonical inflation rows) | n/a — canonical | 2026-05-07 | 2026-11-07 |
-| BR-7 | Live BTC fallback price | $108,000 | Manually set fallback when CoinGecko fetch fails; updated periodically | n/a — fallback only | 2026-05-07 | 2026-11-07 |
+| BR-7 | Live BTC fallback price | Latest `PL_DATA` sample | Auto-fresh after each monthly refresh — no separately-maintained constant. Routed through the shared `fetchTodayPrice()` helper in `/_pageassets/shared/power-law-data.js`. | n/a — derived from BR-5 fallback path | 2026-05-28 | 2026-11-28 |
 
 The Power Law constants (BR-1 through BR-3) duplicate the canonical PL-1 row; documented separately for cross-page traceability. Inflation presets (BR-6) are the canonical sitewide values from `STYLE_GUIDE.md §3.5`; no separate sourcing.
 

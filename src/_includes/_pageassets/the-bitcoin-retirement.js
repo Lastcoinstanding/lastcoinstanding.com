@@ -294,14 +294,16 @@
   // module's GENESIS_TS (Unix-timestamp seconds).
   var GENESIS = new Date(Date.UTC(2009, 0, 3)); // Jan 3, 2009 UTC
 
-  // CoinGecko fallback if live fetch fails (updated periodically)
-  var LIVE_BTC_FALLBACK = 108000;
+  // Fallback when the live fetch fails: the latest PL_DATA monthly sample
+  // (always fresh after the monthly refresh) rather than a hand-maintained
+  // constant that drifts on its own. See shared/power-law-data.js.
+  var LIVE_BTC_FALLBACK = PL_DATA[PL_DATA.length - 1][1];
 
-  // Live BTC price — updated by updateStatusLine() once the CoinGecko fetch
-  // resolves. Used by renderChart() to anchor the "current trajectory" line
-  // (5th dataset on the chart). Initialised to the fallback so the line
-  // renders sensibly before the fetch completes.
-  var liveBtcPrice = LIVE_BTC_FALLBACK;
+  // Live BTC price — updated once fetchTodayPrice() resolves. Used by
+  // renderChart() to anchor the "current trajectory" line (5th dataset).
+  // Seeded to the shared TODAY_PRICE (latest sample) so the line renders
+  // sensibly before the fetch completes.
+  var liveBtcPrice = TODAY_PRICE;
 
   // Interactive-legend state — which datasets are user-visible. Indices
   // match the chart.data.datasets order: 0=floor, 1=trend, 2=upper,
@@ -1042,10 +1044,11 @@
     }
   }
   function fetchLiveBtcPrice() {
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', { cache: 'no-store' })
-      .then(function(r){ return r.ok ? r.json() : Promise.reject(); })
-      .then(function(d){ updateStatusLine(d.bitcoin.usd, 'live'); scheduleRender(); })
-      .catch(function(){ updateStatusLine(LIVE_BTC_FALLBACK, 'fallback'); scheduleRender(); });
+    // Shared helper: one CoinGecko call + consistent fallback site-wide.
+    fetchTodayPrice(function(price, source){
+      updateStatusLine(price, source);
+      scheduleRender();
+    });
   }
 
   // ─── Slider wiring + coupling

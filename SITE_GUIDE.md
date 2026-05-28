@@ -902,7 +902,7 @@ Dual BTC line treatment — *trend-basis projection* (solid, starting from the P
 
 - **Carousel slide (slide 16) — shipped May 2026.** Trees-in-meadow video landed in carousel position 16; see `§13` inventory and iteration record.
 - **Heatmap visualization — shipped May 2026.** Initially deferred; now shipped both as an in-page §2 visualization on BvSM AND as a standalone `/heatmap` marquee page. See §20 below.
-- **Live BTC price fetch (Phase 2).** Currently using hardcoded `TODAY_DAYS` and `TODAY_PRICE` constants refreshed monthly per `MONTHLY_REFRESH_CHECKLIST.md`. Live fetch is on the Tech Debt list but deferred — see the checklist's *"Why not live fetch"* section.
+- **Live BTC price fetch (shipped 2026-05-28).** `TODAY_DAYS` and `TODAY_PRICE` now live in `shared/power-law-data.js`. `TODAY_DAYS` is computed at load, `TODAY_PRICE` seeds to the latest `PL_DATA` sample and is overwritten by the live CoinGecko spot via `fetchTodayPrice()` — one shared call across BvSM, the Power Law Channel, the Bitcoin Retirement, and Borrowing Against Your Stack so the four pages can no longer disagree on "today." Fallback is the latest `PL_DATA` sample (always self-fresh after the monthly refresh) rather than a separately-maintained constant. See `MONTHLY_REFRESH_CHECKLIST.md` (the "Why not live fetch" section is preserved in git history as the reasoning that was reversed).
 
 ---
 
