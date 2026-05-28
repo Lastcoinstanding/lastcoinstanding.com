@@ -62,9 +62,32 @@
     new Chart(document.getElementById('btcHouseChart'),{type:'line',data:{labels:allLabels,datasets:[{label:'Actual',data:historicalFull,borderColor:amber,backgroundColor:amberLight,borderWidth:2.5,pointBackgroundColor:amber,pointRadius:4,pointHoverRadius:7,fill:true,tension:0.3},{label:'Trend',data:trendLineFull,borderColor:'rgba(224,148,34,0.4)',backgroundColor:'transparent',borderWidth:2,borderDash:[8,4],pointRadius:0,tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:20,color:tickColor,font:{size:10},filter:item=>item.text!=='Projection'}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,callbacks:{title:c=>c[0].label,label:c=>{const y=parseInt(c.label);const isProj=y>2025;if(c.datasetIndex===1)return'Trend: ~'+c.parsed.y.toFixed(1)+' BTC';if(isProj)return null;return[c.parsed.y.toFixed(1)+' BTC','House: $'+(homeData[y]||0).toLocaleString(),'BTC price: $'+(btcData[y]||0).toLocaleString()]}}}},scales:{x:{...cso(),ticks:{color:function(c){return c.index>12?'rgba(106,98,86,0.5)':tickColor},font:{size:9}}},y:{...cso('Bitcoin Required'),type:'logarithmic',min:1,ticks:{color:tickColor,font:{size:10},callback:v=>{const a=[1,2,5,10,20,50,100,200,500];return a.includes(v)?v.toLocaleString():''}}}}}});
 
     // TAB 2: OPPORTUNITY COST CHART (indexed, log scale, fixed tooltips)
-    const ssHomeIdx=btcYears.map(y=>+((homeData[y]/homeData[2013])*100).toFixed(1));
-    const ssBtcIdx=btcYears.map(y=>+((btcData[y]/btcData[2013])*100).toFixed(1));
-    new Chart(document.getElementById('seesawChart'),{type:'line',data:{labels:btcYears.map(String),datasets:[{label:'Bitcoin',data:ssBtcIdx,borderColor:amber,backgroundColor:'rgba(224,148,34,0.08)',borderWidth:2.5,pointRadius:3,tension:0.3,fill:true},{label:'Housing',data:ssHomeIdx,borderColor:red,backgroundColor:'transparent',borderWidth:2.5,pointRadius:3,tension:0.3,borderDash:[6,3]}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:24,color:tickColor,font:{size:10}}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,callbacks:{label:c=>{const pct=(c.parsed.y-100).toFixed(0);const sign=pct>=0?'+':'';return c.dataset.label+': '+sign+Number(pct).toLocaleString()+'% since 2013'}}}},scales:{x:{...cso()},y:{...cso('Growth of $1 Invested'),type:'logarithmic',min:30,ticks:{color:tickColor,font:{size:10},callback:v=>{const a=[50,100,200,500,1000,2000,5000,10000,12000];if(!a.includes(v))return'';if(v===100)return'$1 (start)';return'$'+(v/100).toFixed(0)}}}}}});
+    // TAB 2: SEESAW — Real Opportunity Cost (growth of $1 invested, log scale).
+    // Switchable start year: 2014, 2016, 2018, 2020, 2022 — matching the
+    // 'It's Not Just Since 2013' table below the chart so readers can pivot
+    // both views to the same anchor. Default is 2018 (recent enough to feel
+    // realistic, with enough holding time to still show a ~9× outperformance
+    // on log scale). The original 2013 anchor was editorially flattering but
+    // dismissable as cherry-picked; the toggle replaces a fixed-default
+    // chart with a reader-controlled comparison.
+    let seesawInstance=null;
+    function renderSeesaw(startYear){
+      const visYrs=btcYears.filter(y=>y>=startYear);
+      const idxBtc=visYrs.map(y=>+((btcData[y]/btcData[startYear])*100).toFixed(1));
+      const idxHome=visYrs.map(y=>+((homeData[y]/homeData[startYear])*100).toFixed(1));
+      const sub=document.getElementById('seesawSubtitle');
+      if(sub) sub.textContent='Growth of $1 invested in '+startYear+' \u2014 bitcoin vs. housing (log scale)';
+      if(seesawInstance) seesawInstance.destroy();
+      seesawInstance=new Chart(document.getElementById('seesawChart'),{type:'line',data:{labels:visYrs.map(String),datasets:[{label:'Bitcoin',data:idxBtc,borderColor:amber,backgroundColor:'rgba(224,148,34,0.08)',borderWidth:2.5,pointRadius:3,tension:0.3,fill:true},{label:'Housing',data:idxHome,borderColor:red,backgroundColor:'transparent',borderWidth:2.5,pointRadius:3,tension:0.3,borderDash:[6,3]}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:24,color:tickColor,font:{size:10}}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,callbacks:{label:c=>{const pct=(c.parsed.y-100).toFixed(0);const sign=pct>=0?'+':'';return c.dataset.label+': '+sign+Number(pct).toLocaleString()+'% since '+startYear}}}},scales:{x:{...cso()},y:{...cso('Growth of $1 Invested'),type:'logarithmic',min:30,ticks:{color:tickColor,font:{size:10},callback:v=>{const a=[50,100,200,500,1000,2000,5000,10000,12000];if(!a.includes(v))return'';if(v===100)return'$1 (start)';return'$'+(v/100).toFixed(0)}}}}}});
+    }
+    document.querySelectorAll('.seesaw-start-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.seesaw-start-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        renderSeesaw(parseInt(btn.dataset.startyear,10));
+      });
+    });
+    renderSeesaw(2018);
 
     // TAB 2: HOUSES VISUAL with mortgage comparison
     (function(){
