@@ -159,6 +159,8 @@ A page omitting its own body rule entirely (as Disciplined Rebalancing did pre-f
 
 **Per-tab body prose must match canonical `1.05rem / 1.7`.** On multi-tab pages where each tab's prose has its own selector, the temptation is to tune type per tab (Question tab at 1rem / 1.8 felt different from Math tab at 1.05rem / 1.7 on Disciplined Rebalancing for several months — the divergence wasn't intentional, just inconsistent application). All editorial prose on dark backgrounds is `1.05rem` with `1.7` line-height, regardless of which tab or section it lives in.
 
+**Site-wide horizontal anchor (set in `base.njk`, not per-page).** The base layout's `<style id="canonical-body-css">` block also locks horizontal scroll at the document level via `html, body { overflow-x: clip; }`. Without this rule, any element that accidentally exceeds viewport width — a wide chart container, a long word, a misconfigured grid, a heatmap that didn't fit on a small device — lets the entire page slide left/right under finger gestures on mobile, which reads as a layout bug rather than a feature. Observed and fixed on `/heatmap` and `/bitcoin-vs-the-stock-market` on 2026-05-28. `clip` is preferred over `hidden` here: it doesn't create a new scroll context and doesn't break `position: sticky` descendants, which the site uses in several places (heatmap y-axis label column, table headers, etc.). Per-page CSS may still create nested horizontal scroll containers where that's the right affordance (e.g. wide data tables wrapped in `overflow-x: auto`); the document-level anchor only prevents the whole page from drifting.
+
 ### 2.4 Italic flourish (Source Serif italic)
 
 | Slot | Size | Notes |

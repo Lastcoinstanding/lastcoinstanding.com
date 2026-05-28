@@ -1483,7 +1483,7 @@
         var sWinPct = (stats[shortH].winPct * 100).toFixed(0);
         var lossWindows = stats[shortH].total - stats[shortH].wins;
         bullets.push(
-          '<strong>At 1-year horizons,</strong> bitcoin won in ' + sWinPct + '% of cases &mdash; ' +
+          '<strong>At 1-year horizons,</strong> bitcoin outperformed in ' + sWinPct + '% of cases &mdash; ' +
           'leaving <span class="bvsm-heatmap-sidebar-num">' + lossWindows + ' window' +
           (lossWindows === 1 ? '' : 's') + '</span> where it didn&rsquo;t. Short-horizon entry timing matters; long-horizon entry timing doesn&rsquo;t.'
         );

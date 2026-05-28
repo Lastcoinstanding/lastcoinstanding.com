@@ -5,6 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 {{ head_extras | safe }}
 <style id="canonical-body-css">
+/* ─── Site-wide horizontal anchor ─── */
+/* Locks the document horizontally so no page can be panned sideways on
+   mobile. Without this, any element that accidentally exceeds viewport
+   width (a wide chart container, a long word, a misconfigured grid,
+   etc.) lets the entire page slide left/right under finger gestures,
+   which reads as a layout bug. Observed on /heatmap and
+   /bitcoin-vs-the-stock-market before this rule was added.
+   `clip` is preferred over `hidden` because it doesn't create a new
+   scroll context and doesn't break `position: sticky` descendants;
+   widely supported in modern browsers. Applied to both html and body
+   for belt-and-suspenders coverage across user-agent quirks. */
+html, body {
+    overflow-x: clip;
+}
+
 /* ─── Site-wide body invariants ─── */
 /* Source of truth for body font-family, size, and line-height.
    Every page inherits these unless it deliberately overrides
