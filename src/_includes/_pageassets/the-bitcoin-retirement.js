@@ -546,31 +546,7 @@
     }
   };
 
-  // ─── Canonical "you are here" pulse halo plugin (STYLE_GUIDE §6.23).
-  // Positions the #retirePulse DOM element over the live "today" anchor
-  // after every chart render. X = current year (matches the existing
-  // "Today" vertical line); Y = liveBtcPrice (closure-captured, mutated
-  // by updateStatusLine() once fetchTodayPrice resolves). CSS handles
-  // the ring animation; this plugin only keeps the element pinned.
-  var lcsPulsePlugin = {
-    id: 'lcsPulse',
-    afterRender: function(chart) {
-      var pulse = document.getElementById('retirePulse');
-      if (!pulse || !chart.scales || !chart.scales.x || !chart.scales.y) return;
-      var todayYear = (new Date()).getFullYear();
-      var x = chart.scales.x.getPixelForValue(todayYear);
-      var y = chart.scales.y.getPixelForValue(liveBtcPrice);
-      if (x < chart.chartArea.left  - 4 || x > chart.chartArea.right  + 4 ||
-          y < chart.chartArea.top   - 4 || y > chart.chartArea.bottom + 4) {
-        pulse.classList.remove('is-visible');
-        return;
-      }
-      pulse.style.left = x + 'px';
-      pulse.style.top  = y + 'px';
-      pulse.classList.add('is-visible');
-    }
-  };
-
+  // ─── BTC-count annotation plugin: dots + "X.XX BTC" labels at anchor years
   // along the user's drawdown line. Bitcoin-native readers care not just about
   // the dollar value of remaining stack but the BTC count itself; this gives
   // them that dimension at a glance without a second Y-axis.
@@ -1034,7 +1010,7 @@
           btcCountAnnotations: { anchors: btcAnchors }
         }
       },
-      plugins: [bandFillPlugin, verticalLinePlugin, btcCountPlugin, lcsPulsePlugin]
+      plugins: [bandFillPlugin, verticalLinePlugin, btcCountPlugin]
     });
     chart._btcDataByDataset = btcDataByDataset;
   }
@@ -1047,12 +1023,41 @@
     // current-trajectory line, etc.). Even if the page elements below are
     // missing, downstream callers should still see the fresh value.
     liveBtcPrice = currentPrice;
+
+    // ─── Today's-price caption beneath the projection chart (matches the
+    // Channel's "Today's bitcoin price: …" treatment so the two pages read
+    // as siblings). Updates whenever fetchTodayPrice resolves, even if the
+    // existing status-badge elements below this block aren't present.
+    var todayTrend = plPriceAtDate(new Date());
+    var ratio = (todayTrend > 0) ? currentPrice / todayTrend : 0;
+    (function updateChartTodayCaption() {
+      var spotEl  = document.getElementById('retireTodaySpot');
+      var multEl  = document.getElementById('retireTodayMult');
+      var zoneEl  = document.getElementById('retireTodayZone');
+      var trendEl = document.getElementById('retireTodayTrend');
+      if (!spotEl || !multEl) return;
+      function fmtUsdShort(v) {
+        if (v >= 1e6)  return '$' + (v / 1e6).toFixed(2) + 'M';
+        if (v >= 1000) return '$' + (v / 1000).toFixed(1) + 'K';
+        return '$' + Math.round(v).toLocaleString();
+      }
+      spotEl.textContent = fmtUsdShort(currentPrice);
+      multEl.textContent = ratio.toFixed(2) + '\u00d7';
+      if (zoneEl) {
+        var zone;
+        if (ratio < 0.42)     zone = '\u00b7 below floor';
+        else if (ratio < 1.0) zone = '\u00b7 within Floor \u2192 Trend zone';
+        else if (ratio < 3.0) zone = '\u00b7 within Trend \u2192 Upper zone';
+        else                  zone = '\u00b7 above upper band';
+        zoneEl.textContent = zone;
+      }
+      if (trendEl) trendEl.textContent = fmtUsdShort(todayTrend);
+    })();
+
     var priceEl = document.getElementById('statusPrice');
     var ratioEl = document.getElementById('statusRatio');
     var pctEl = document.getElementById('statusPercentile');
     if (!priceEl || !ratioEl) return;
-    var todayTrend = plPriceAtDate(new Date());
-    var ratio = currentPrice / todayTrend;
     priceEl.textContent = '$' + Math.round(currentPrice).toLocaleString();
     ratioEl.textContent = ratio.toFixed(2) + '\u00d7';
     if (pctEl && window.CalcHelpers && window.CalcHelpers.percentileBelowRatio) {

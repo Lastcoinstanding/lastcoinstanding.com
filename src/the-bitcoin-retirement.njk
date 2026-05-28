@@ -149,11 +149,8 @@ eleventyComputed:
       </div>
       <div class="chart-wrapper">
         <canvas id="projectionChart"></canvas>
-        <!-- Canonical lcs-pulse-halo (STYLE_GUIDE §6.23). Positioned over
-             the "Today" anchor by lcsPulsePlugin in the-bitcoin-retirement.js
-             after every chart render; CSS handles the ring animation. -->
-        <div class="lcs-pulse-halo" id="retirePulse" aria-hidden="true"></div>
       </div>
+      <div class="retire-chart-today" id="retireChartToday" aria-live="polite"><strong>Today&rsquo;s bitcoin price:</strong> <span class="retire-today-spot" id="retireTodaySpot">&mdash;</span> &middot; <span class="retire-today-mult" id="retireTodayMult">&mdash;&times;</span> trend <span class="retire-today-zone" id="retireTodayZone"></span> <span class="retire-today-trendline">(Power Law trend = <span id="retireTodayTrend">&mdash;</span>)</span></div>
     </div>
 
     <!-- LIVE EXPLORATION — slider clusters per §9.2.5 -->

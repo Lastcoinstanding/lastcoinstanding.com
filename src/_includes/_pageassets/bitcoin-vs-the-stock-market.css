@@ -1329,3 +1329,31 @@ body {
   .bvsm-heatmap-controls { gap: 0.8rem 1.2rem; }
   .bvsm-heatmap-tooltip { min-width: 200px; font-size: 0.76rem; }
 }
+
+/* ─── Today's bitcoin price caption (matches the Channel's status-line
+   treatment on /the-power-law). Sits between the chart and the descriptive
+   chart-caption below it. Amber accents on spot + multiplier mirror the
+   Channel's coloring so the two pages read as siblings. */
+.bvsm-chart-today {
+    margin-top: 0.7rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text);
+    letter-spacing: 0.01em;
+}
+.bvsm-chart-today strong {
+    color: var(--text-bright);
+    font-weight: 600;
+}
+.bvsm-today-spot,
+.bvsm-today-mult {
+    color: var(--amber);
+    font-weight: 500;
+}
+.bvsm-today-zone {
+    color: var(--text-dim);
+}
+.bvsm-today-trendline {
+    opacity: 0.55;
+    margin-left: 0.5rem;
+}

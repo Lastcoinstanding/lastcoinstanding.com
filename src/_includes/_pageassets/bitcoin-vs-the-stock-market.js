@@ -141,12 +141,10 @@
       TOPS.forEach(function(m)   { drawMarker(m, topColor,   true);  });
 
       // Today marker — larger, with concentric rings and a distinct label.
-      // Reads the live globals (TODAY_DAYS/TODAY_PRICE) so it tracks the spot
-      // price once fetchTodayPrice() resolves.
-      var todayMult = TODAY_PRICE / plPrice(TODAY_DAYS);
-      var todayLabel = (TODAY_PRICE >= 1000 ? '$' + (TODAY_PRICE / 1000).toFixed(1) + 'K'
-                                            : '$' + Math.round(TODAY_PRICE))
-                       + ' \u00b7 ' + todayMult.toFixed(2) + '\u00d7 trend';
+      // Anchors to the live (TODAY_DAYS, TODAY_PRICE) so it tracks the spot
+      // once fetchTodayPrice() resolves. The price + trend-multiple readout
+      // lives in the caption directly below the chart (#bvsmChartToday) so
+      // it's never obscured by the price line crossing the marker.
       var tx = xs.getPixelForValue(TODAY_DAYS);
       var ty = ys.getPixelForValue(TODAY_PRICE);
       // Outer halo
@@ -166,15 +164,12 @@
       ctx.arc(tx, ty, 4, 0, 2 * Math.PI);
       ctx.fillStyle = todayColor;
       ctx.fill();
-      // Label — anchored to the left of the dot since today is near the
-      // right edge of the chart area; offset by 16px to clear the rings
+      // Single short label — anchored left of the dot since today sits near
+      // the right edge of the chart area; offset 16px to clear the rings.
       ctx.font = '700 11px Inter, sans-serif';
       ctx.fillStyle = todayColor;
       ctx.textAlign = 'right';
       ctx.fillText('You are here', tx - 16, ty - 2);
-      ctx.font = '500 10px Inter, sans-serif';
-      ctx.fillStyle = muted;
-      ctx.fillText(todayLabel, tx - 16, ty + 12);
     }
   };
 
@@ -366,14 +361,46 @@
       });
     });
 
+    // ─── Today's-price caption beneath the chart (matches the Channel's
+    // "Today's bitcoin price: …" treatment). Seeded immediately from the
+    // shared TODAY_PRICE so it renders something sensible before the fetch
+    // resolves; updated to the live spot in the fetch callback below.
+    function fmtUsdShort(v) {
+      if (v >= 1e6) return '$' + (v / 1e6).toFixed(2) + 'M';
+      if (v >= 1000) return '$' + (v / 1000).toFixed(1) + 'K';
+      return '$' + Math.round(v).toLocaleString();
+    }
+    function updateBvsmTodayCaption(price) {
+      var spotEl  = document.getElementById('bvsmTodaySpot');
+      var multEl  = document.getElementById('bvsmTodayMult');
+      var zoneEl  = document.getElementById('bvsmTodayZone');
+      var trendEl = document.getElementById('bvsmTodayTrend');
+      if (!spotEl || !multEl) return;
+      var trendNow = plPrice(TODAY_DAYS);
+      var mult = (trendNow > 0) ? price / trendNow : 0;
+      spotEl.textContent = fmtUsdShort(price);
+      multEl.textContent = mult.toFixed(2) + '\u00d7';
+      if (zoneEl) {
+        var zone;
+        if (mult < 0.42)      zone = '\u00b7 below floor';
+        else if (mult < 1.0)  zone = '\u00b7 within Floor \u2192 Trend zone';
+        else if (mult < 3.0)  zone = '\u00b7 within Trend \u2192 Upper zone';
+        else                  zone = '\u00b7 above upper band';
+        zoneEl.textContent = zone;
+      }
+      if (trendEl) trendEl.textContent = fmtUsdShort(trendNow);
+    }
+    updateBvsmTodayCaption(TODAY_PRICE);
+
     // ─── Live price: seed is the latest sample; overwrite with spot on load ───
     // fetchTodayPrice() updates the shared TODAY_PRICE global (read by both the
     // markers plugin and the pulse plugin); here we also move the trailing point
-    // of the price line and the today marker, then re-render.
+    // of the price line and the today marker, refresh the caption, then re-render.
     fetchTodayPrice(function(price) {
       if (historicalLine.length) historicalLine[historicalLine.length - 1].y = price;
       TODAY_MARKER.p = price;
       TODAY_MARKER.m = price / plPrice(TODAY_DAYS);
+      updateBvsmTodayCaption(price);
       plChart.update();
     });
   }
