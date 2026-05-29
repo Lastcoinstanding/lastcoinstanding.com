@@ -382,3 +382,68 @@
     color: var(--amber);
 }
 .share-btn-native[hidden] { display: none; }
+
+/* ── Help-tip / inline tooltip (canonical pattern, per STYLE_GUIDE §6.13) ──
+   ?-in-circle trigger; dark card on hover/focus/tap. Use display:none/block
+   (not opacity) to keep the card out of layout when hidden — otherwise the
+   absolutely-positioned card causes horizontal overflow on mobile when the
+   trigger sits within the card's width of the right edge. Identical
+   geometry/colors to bitcoin-backed-mortgages.css to keep visual parity
+   across the calculator suite. */
+.help-tip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid var(--text-muted);
+    border-radius: 50%;
+    cursor: help;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+    position: relative;
+    transition: color 0.2s, border-color 0.2s;
+    user-select: none;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+.help-tip:hover,
+.help-tip:focus {
+    color: var(--amber);
+    border-color: var(--amber);
+    outline: none;
+}
+.help-tip .tip-content {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: min(260px, calc(100vw - 32px));
+    padding: 0.85rem 1rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text);
+    background: var(--bg-card);
+    border: 1px solid rgba(224,148,34,0.25);
+    border-radius: 5px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.55);
+    z-index: 50;
+    text-align: left;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: normal;
+}
+.help-tip .tip-content strong { color: var(--text); font-weight: 600; }
+.help-tip .tip-content em { color: var(--amber-dim); font-style: italic; }
+.help-tip:hover .tip-content,
+.help-tip:focus .tip-content,
+.help-tip:focus-within .tip-content { display: block; }
+
+/* Right-anchored variant — when the trigger sits close to the right edge */
+.help-tip.help-tip-right .tip-content { left: auto; right: 0; }

@@ -227,11 +227,11 @@ eleventyComputed:
                 <div class="calc-section">
                     <!-- Power Law Scenario Selection -->
                     <div style="margin-bottom:1rem">
-                        <label style="font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:.5rem">Power Law Scenario <a href="/the-power-law.html" style="color:var(--amber);text-transform:none;font-size:0.72rem;letter-spacing:0;margin-left:0.4rem;text-decoration:none;border-bottom:1px dotted var(--amber-dim)">learn more &rarr;</a></label>
+                        <label style="font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:.5rem">Power Law Scenario<span class="help-tip" tabindex="0">?<span class="tip-content">Which line of the Power Law band to use for projecting BTC&rsquo;s future price. <strong>Floor</strong> is the conservative lower bound (R&sup2; &gt; 0.99); BTC has historically respected this floor since 2010 &mdash; every meaningful dip recovered above it. <strong>Trend</strong> is the fair-value center line (R&sup2; &asymp; 0.95) &mdash; closest to a &ldquo;middle estimate.&rdquo; <strong>Upper</strong> is the historical bull-case ceiling; BTC has touched this line at every major cycle peak.</span></span> <a href="/the-power-law.html" style="color:var(--amber);text-transform:none;font-size:0.72rem;letter-spacing:0;margin-left:0.4rem;text-decoration:none;border-bottom:1px dotted var(--amber-dim)">learn more &rarr;</a></label>
                         <div class="scenario-btns">
-                            <button class="scenario-btn" data-scenario="floor" title="The conservative lower bound of the Power Law band (R² > 0.99). BTC has historically respected this floor since 2010 — every meaningful dip recovered above it.">Floor (Conservative)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &gt; 0.99</span></button>
-                            <button class="scenario-btn active" data-scenario="trend" title="The fair-value center line of the Power Law model (R² ≈ 0.95). Closest to a 'middle estimate' for BTC's long-term trajectory.">Trend (Fair Value)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &asymp; 0.95</span></button>
-                            <button class="scenario-btn" data-scenario="upper" title="The historical bull-case ceiling of the Power Law band. BTC has touched this line at every major cycle peak.">Upper (Bull Case)<br><span style="font-size:.7rem;opacity:.7">Historical peaks</span></button>
+                            <button class="scenario-btn" data-scenario="floor">Floor (Conservative)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &gt; 0.99</span></button>
+                            <button class="scenario-btn active" data-scenario="trend">Trend (Fair Value)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &asymp; 0.95</span></button>
+                            <button class="scenario-btn" data-scenario="upper">Upper (Bull Case)<br><span style="font-size:.7rem;opacity:.7">Historical peaks</span></button>
                         </div>
                     </div>
 
@@ -247,11 +247,11 @@ eleventyComputed:
                     <!-- Primary Inputs -->
                     <div class="calc-grid">
                         <div class="calc-field">
-                            <label title="The price of the home you'd be considering buying today.">Home Price Today</label>
+                            <label>Home Price Today</label>
                             <input type="text" id="fwdHomePrice" value="$420,000" inputmode="numeric">
                         </div>
                         <div class="calc-field">
-                            <label title="How far into the future to project. Longer horizons give the Power Law model more compounding to work with — and more uncertainty.">Time Horizon</label>
+                            <label>Time Horizon<span class="help-tip" tabindex="0">?<span class="tip-content">How far into the future to project. Longer horizons give the Power Law model more compounding to work with &mdash; and more uncertainty. Both paths (bitcoin and house) are evaluated at the same future date so the comparison is apples-to-apples.</span></span></label>
                             <select id="fwdHorizon"></select>
                         </div>
                         <div class="calc-field">
@@ -261,15 +261,15 @@ eleventyComputed:
                     </div>
                     <div class="calc-grid">
                         <div class="calc-field">
-                            <label title="Annual home price growth in real terms (after inflation). Long-run US median has been roughly 0–1% real; default 3.5% is generous.">Expected Home Appreciation <span class="opt">(real / yr)</span></label>
+                            <label>Expected Home Appreciation <span class="opt">(real / yr)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Annual home price growth in <strong>real</strong> terms (after inflation). Long-run US median has been roughly 0&ndash;1% real &mdash; the default 3.5% is generous. Sitewide inflation (~6.5% M2 growth) is layered on top internally to drive the nominal home value path.</span></span></label>
                             <input type="text" id="fwdHomeAppreciation" value="3.5%" inputmode="decimal">
                         </div>
                         <div class="calc-field" id="fwdMortgageRateField">
-                            <label title="Annual interest rate on a 30-year fixed mortgage, in nominal terms (as quoted by lenders).">Mortgage Rate <span class="opt">(nominal)</span></label>
+                            <label>Mortgage Rate <span class="opt">(nominal)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Annual interest rate on a 30-year fixed mortgage, in <strong>nominal</strong> terms (as quoted by lenders). The calculator assumes a 30-year fixed-rate amortization. The default 6.8% tracks recent US averages; check current quotes for your situation.</span></span></label>
                             <input type="text" id="fwdMortgageRate" value="6.8%" inputmode="decimal">
                         </div>
                         <div class="calc-field" id="fwdMonthlyRentField">
-                            <label title="Override the default rent assumption (75% of an equivalent mortgage). Leave blank to use the default.">Your Monthly Rent <span class="opt">(optional)</span></label>
+                            <label>Your Monthly Rent <span class="opt">(optional)</span><span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content">Override the default rent assumption (75% of an equivalent mortgage payment). Leave blank to use the default &mdash; the default updates live as you change home price and mortgage rate. Used to compute &ldquo;total rent paid&rdquo; over the projection horizon for the bitcoin + rent path.</span></span></label>
                             <input type="text" id="fwdMonthlyRent" value="" inputmode="numeric" placeholder="$3,150 (75% of mortgage)">
                         </div>
                     </div>
@@ -280,9 +280,9 @@ eleventyComputed:
                          Default is Real — matches the editorial convention used in 'How this works' and
                          in retrospective. Persisted via URL/storage SCHEMA. -->
                     <div class="display-mode-row" style="display:flex;align-items:center;gap:0.6rem;margin:0.4rem 0 1rem;justify-content:flex-end">
-                        <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)" title="Real shows projected values deflated to today's purchasing power, using the sitewide inflation assumption (currently 6.5% M2 growth; same canonical used across all calculators — see Half-Life or Melting Ice Cube). Nominal shows the actual future dollar amounts as they'd appear on a future statement — these include both real growth and inflation, so they look larger but buy the same things.">Display values in:</span>
-                        <button class="display-mode-btn toggle-btn active" data-mode="real" title="Show projected values in today's purchasing power. Future amounts are deflated using the sitewide inflation assumption (currently 6.5% M2 growth) so they're directly comparable to dollars you spend today." style="flex:0 0 auto;min-width:120px;padding:0.4rem 0.8rem;font-size:0.78rem">Real (today's $)</button>
-                        <button class="display-mode-btn toggle-btn" data-mode="nominal" title="Show projected values in future dollar amounts (not adjusted for inflation) — what you'd actually see quoted at the projection date. Includes both real appreciation and ~6.5%/yr cumulative inflation (sitewide M2-growth assumption)." style="flex:0 0 auto;min-width:120px;padding:0.4rem 0.8rem;font-size:0.78rem">Nominal (future $)</button>
+                        <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)">Display values in:<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Real</strong> shows projected values deflated to today&rsquo;s purchasing power, using the sitewide inflation assumption (currently 6.5% M2 growth; same canonical used across all calculators &mdash; see Half-Life or Melting Ice Cube). <strong>Nominal</strong> shows the actual future dollar amounts as they&rsquo;d appear on a future statement &mdash; these include both real growth and inflation, so they look larger but buy the same things.</span></span></span>
+                        <button class="display-mode-btn toggle-btn active" data-mode="real" style="flex:0 0 auto;min-width:120px;padding:0.4rem 0.8rem;font-size:0.78rem">Real (today's $)</button>
+                        <button class="display-mode-btn toggle-btn" data-mode="nominal" style="flex:0 0 auto;min-width:120px;padding:0.4rem 0.8rem;font-size:0.78rem">Nominal (future $)</button>
                     </div>
 
                     <!-- Results -->
