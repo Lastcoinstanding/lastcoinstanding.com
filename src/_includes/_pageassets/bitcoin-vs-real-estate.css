@@ -447,3 +447,31 @@
 
 /* Right-anchored variant — when the trigger sits close to the right edge */
 .help-tip.help-tip-right .tip-content { left: auto; right: 0; }
+
+/* ── Retrospective purchase-method toggle: visual parity with projection ──
+   The .toggle-group / .toggle-btn classes were defined with a single outer
+   border and no internal divider, while the projection's .purchase-btn uses
+   per-button borders and a subtle amber-tint active state. These overrides
+   only apply when .toggle-btn sits inside .toggle-group (i.e. the
+   retrospective method toggle); the seesaw start-year row and Real/Nominal
+   toggle keep their original .toggle-btn styling because they're not
+   wrapped in .toggle-group. */
+.toggle-group {
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+}
+.toggle-group .toggle-btn {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+}
+.toggle-group .toggle-btn:first-child { border-radius: 4px 0 0 4px; }
+.toggle-group .toggle-btn:last-child  { border-radius: 0 4px 4px 0; }
+.toggle-group .toggle-btn:not(:first-child) { border-left: none; }
+.toggle-group .toggle-btn.active {
+    background: rgba(224,148,34,0.1);
+    color: var(--amber);
+    border-color: rgba(247,147,26,0.3);
+    font-weight: 600;
+}

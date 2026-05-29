@@ -222,7 +222,13 @@
     // TAB 3: CALCULATOR
     function runCalculator(){
         const sy=parseInt(document.getElementById('calcYear').value);
-        const mode=document.querySelector('.toggle-btn.active').dataset.mode;
+        // Scope to .toggle-group so we pick the retrospective method
+        // toggle's active button, never the Real/Nominal display-mode
+        // toggle (which also has .toggle-btn class and a .active state).
+        // Defensive fallback to 'leverage' (markup default) if no active
+        // button is found.
+        const _retroBtn = document.querySelector('.toggle-group .toggle-btn.active');
+        const mode = _retroBtn ? _retroBtn.dataset.mode : 'leverage';
         const dca=document.getElementById('calcDCA').checked;
         const ey=2025;
         const medianHs=homeData[sy],medianHe=homeData[ey],bs=btcData[sy],be=btcData[ey];const _customRaw=(document.getElementById('customHomePrice')||{}).value||'';const _customNum=parseFloat(_customRaw.replace(/[$,\s]/g,''));const _customValid=!isNaN(_customNum)&&_customNum>=50000&&_customNum<=10000000;const hs=_customValid?_customNum:medianHs;const he=_customValid?Math.round(_customNum*(medianHe/medianHs)):medianHe;const _isCustom=_customValid;
@@ -417,7 +423,13 @@
     })});
     window.addEventListener('hashchange',initTabFromHash);
     initTabFromHash();
-    document.querySelectorAll('.toggle-btn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.toggle-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');runCalculator()})});
+    // Scope to .toggle-group: this handler manages ONLY the retrospective
+    // method toggle (Cash / 20% Down + Mortgage). Without the scope, this
+    // would match every .toggle-btn on the page — including the Real/Nominal
+    // display-mode toggle and the seesaw start-year buttons — and a click
+    // anywhere would strip .active from retrospective method buttons. Each
+    // other group has its own scoped click handler defined elsewhere.
+    document.querySelectorAll('.toggle-group .toggle-btn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.toggle-group .toggle-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');runCalculator()})});
     document.getElementById('calcYear').addEventListener('change',function(){var cp=document.getElementById('customHomePrice');if(cp){cp.value='';var y=parseInt(this.value);var m=homeData[y];if(m)cp.placeholder='$'+m.toLocaleString()+' ('+y+' median)';}var cr=document.getElementById('customRent');if(cr){cr.value='';}var crt=document.getElementById('customRate');if(crt){crt.value='';var yr=parseInt(this.value);var mr=mortgageRates&&mortgageRates[yr];if(mr)crt.placeholder=mr+'% ('+yr+' avg)';}runCalculator();});var _cpEl=document.getElementById('customHomePrice');if(_cpEl){_cpEl.addEventListener('input',runCalculator);var _yVal=parseInt(document.getElementById('calcYear').value);if(homeData[_yVal])_cpEl.placeholder='$'+homeData[_yVal].toLocaleString()+' ('+_yVal+' median)';}var _crEl=document.getElementById('customRent');if(_crEl){_crEl.addEventListener('input',runCalculator);}var _crtEl=document.getElementById('customRate');if(_crtEl){_crtEl.addEventListener('input',runCalculator);var _yrInit=parseInt(document.getElementById('calcYear').value);if(mortgageRates[_yrInit])_crtEl.placeholder=mortgageRates[_yrInit]+'% ('+_yrInit+' avg)';}
     document.getElementById('calcDCA').addEventListener('change',function(){
         document.getElementById('dcaSection').style.display=this.checked?'block':'none';
