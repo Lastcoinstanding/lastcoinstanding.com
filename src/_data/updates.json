@@ -2,6 +2,12 @@
   {
     "date": "2026-05-29",
     "display": "5/29/26",
+    "page": "/the-bitcoin-retirement.html",
+    "summary": "Bitcoin Retirement calculator: withdrawal rate now a derived readout under target income, making the mathematical linkage between the two visible"
+  },
+  {
+    "date": "2026-05-29",
+    "display": "5/29/26",
     "page": "/bitcoin-vs-real-estate.html",
     "summary": "Bitcoin vs. Real Estate calculator: Power Law scenarios clarified (Upper = cycle peak, ~3× trend) and canonical ? tooltips throughout"
   },

@@ -1105,13 +1105,17 @@
 
   // Update both the slider input (thumb position) and the value-display
   // for a given key. Used when coupling adjusts a slider programmatically.
+  // Also used for keys that have a value display but no slider input —
+  // i.e. derived-readouts like withdrawalRatePct after the 2026-05-29
+  // rate-as-derived migration. In that case the input lookup misses
+  // gracefully and only the valEl is updated.
   function syncSliderUI(key) {
     var cfg = SLIDER_BY_KEY[key];
     if (!cfg) return;
-    var input = document.getElementById('slider-' + key);
     var valEl = document.getElementById('val-' + key);
-    if (!input || !valEl) return;
-    input.value = SCENARIO[key];
+    if (!valEl) return;
+    var input = document.getElementById('slider-' + key);
+    if (input) input.value = SCENARIO[key];
     valEl.textContent = cfg.fmt(SCENARIO[key]);
   }
 
@@ -1647,8 +1651,11 @@
     'slider-retirementYear':     'retire',
     'slider-targetIncomeUSD':    'income',
     'slider-yearsInRetirement':  'years',
-    'slider-monthlyDcaUSD':      'dca',
-    'slider-withdrawalRatePct':  'withdraw'
+    'slider-monthlyDcaUSD':      'dca'
+    // slider-withdrawalRatePct removed 2026-05-29 — rate is now a
+    // derived readout, not a draggable input. The 'withdraw' URL param
+    // remains accepted by readUrlParamsIntoScenario for back-compat
+    // (silently overwritten by the income-driven recompute on init).
   };
 
   // Selectors for the teaser links — match by href prefix so we don't

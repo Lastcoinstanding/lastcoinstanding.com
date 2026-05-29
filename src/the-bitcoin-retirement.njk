@@ -176,6 +176,11 @@ eleventyComputed:
               <span class="slider-val" id="val-targetIncomeUSD">$100,000</span>
             </div>
             <input type="range" id="slider-targetIncomeUSD" min="20000" max="1000000" step="5000" value="100000" aria-label="Target annual retirement income">
+            <div class="derived-readout">
+              <span class="derived-label">&equiv;&nbsp;withdrawal rate:</span>
+              <span class="derived-val" id="val-withdrawalRatePct">6.0%</span>
+              <span class="help-tip" tabindex="0">?<span class="tip-content">Effective annual withdrawal as a percentage of your projected stack at retirement (in today&rsquo;s dollars). This is a <em>derived</em> readout, not a separate input &mdash; it&rsquo;s computed live as <strong>income &divide; projected stack value</strong>. Traditional &ldquo;safe withdrawal rate&rdquo; guidance (e.g., the <strong>4% rule</strong>) was calibrated against a 60/40 stock-bond portfolio expected to deliver ~7% real returns. Under the <a href="/the-power-law.html" style="color:var(--amber)">Power Law</a>, bitcoin&rsquo;s projected real growth remains meaningfully above that for the foreseeable retirement window, so higher withdrawal rates can be sustained &mdash; the <em>years stack lasts</em> readout below simulates this year-by-year. To explore a specific rate, nudge the income slider until this readout lands on your target.</span></span>
+            </div>
           </div>
 
           <div class="slider-control" data-key="retirementYear">
@@ -207,16 +212,6 @@ eleventyComputed:
               <span class="slider-val" id="val-btcStack">1.0 BTC</span>
             </div>
             <input type="range" id="slider-btcStack" min="0" max="100" step="0.1" value="1" aria-label="Bitcoin stack">
-          </div>
-
-          <div class="slider-control" data-key="withdrawalRatePct">
-            <div class="slider-row">
-              <span class="slider-name">Withdrawal rate
-                <span class="help-tip" tabindex="0">?<span class="tip-content">Effective annual withdrawal as a percentage of your stack at retirement (in today&rsquo;s dollars). Coupled with target income: drag this and target income adjusts; drag target income and this adjusts.</span></span>
-              </span>
-              <span class="slider-val" id="val-withdrawalRatePct">6.0%</span>
-            </div>
-            <input type="range" id="slider-withdrawalRatePct" min="2" max="15" step="0.1" value="6" aria-label="Withdrawal rate">
           </div>
 
           <div class="slider-control" data-key="monthlyDcaUSD">
@@ -555,7 +550,7 @@ eleventyComputed:
         <div class="math-eq">stack<sub>y+1</sub> = stack<sub>y</sub> &minus; btc sold<sub>y</sub></div>
       </div>
 
-      <p class="prose">When the user is dragging the income slider, the implied withdrawal rate at retirement (income &divide; stack value at retirement) is computed as a derived value. When the user is thinking in percentage-rate terms, the same calculation runs in reverse to produce the implied dollar income.</p>
+      <p class="prose">When the user is dragging the income slider, the implied withdrawal rate at retirement (income &divide; stack value at retirement) is computed and surfaced as a <em>derived</em> readout beneath the slider. Users who prefer to think in percentage-rate terms can read the implied rate live and nudge income until that readout lands on their target. Showing the rate as derived (rather than as a second slider coupled to income) makes the dependency between the two visible &mdash; they were never independent inputs, even when both looked draggable.</p>
 
       <h2 class="section-title">Sustainability and escape velocity</h2>
 
