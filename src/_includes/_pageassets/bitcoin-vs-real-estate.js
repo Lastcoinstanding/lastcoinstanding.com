@@ -673,7 +673,7 @@
     var futurePrice, scenarioLabel;
     if(scenario === 'floor'){ futurePrice = futureFloor; scenarioLabel = 'Floor (conservative)'; }
     else if(scenario === 'trend'){ futurePrice = futureTrend; scenarioLabel = 'Trend (fair value)'; }
-    else { futurePrice = futureCeil; scenarioLabel = 'Upper (bull case)'; }
+    else { futurePrice = futureCeil; scenarioLabel = 'Upper (cycle peak)'; }
 
     var btcValue = btcBought * futurePrice;
     var btcNet = btcValue - totalRentPaid;
