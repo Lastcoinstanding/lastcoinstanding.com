@@ -280,9 +280,9 @@ eleventyComputed:
                          Default is Real — matches the editorial convention used in 'How this works' and
                          in retrospective. Persisted via URL/storage SCHEMA. -->
                     <div class="display-mode-row" style="display:flex;align-items:center;gap:0.6rem;margin:0.4rem 0 1rem;justify-content:flex-end">
-                        <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)" title="Real = projected values deflated to today's purchasing power. Nominal = the actual future dollar amounts (not adjusted for inflation).">Display values in:</span>
-                        <button class="display-mode-btn toggle-btn active" data-mode="real" style="flex:0 0 auto;min-width:120px;padding:0.4rem 0.8rem;font-size:0.78rem">Real (today's $)</button>
-                        <button class="display-mode-btn toggle-btn" data-mode="nominal" style="flex:0 0 auto;min-width:120px;padding:0.4rem 0.8rem;font-size:0.78rem">Nominal (future $)</button>
+                        <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)" title="Real shows projected values deflated to today's purchasing power, using the sitewide inflation assumption (currently 6.5% M2 growth; same canonical used across all calculators — see Half-Life or Melting Ice Cube). Nominal shows the actual future dollar amounts as they'd appear on a future statement — these include both real growth and inflation, so they look larger but buy the same things.">Display values in:</span>
+                        <button class="display-mode-btn toggle-btn active" data-mode="real" title="Show projected values in today's purchasing power. Future amounts are deflated using the sitewide inflation assumption (currently 6.5% M2 growth) so they're directly comparable to dollars you spend today." style="flex:0 0 auto;min-width:120px;padding:0.4rem 0.8rem;font-size:0.78rem">Real (today's $)</button>
+                        <button class="display-mode-btn toggle-btn" data-mode="nominal" title="Show projected values in future dollar amounts (not adjusted for inflation) — what you'd actually see quoted at the projection date. Includes both real appreciation and ~6.5%/yr cumulative inflation (sitewide M2-growth assumption)." style="flex:0 0 auto;min-width:120px;padding:0.4rem 0.8rem;font-size:0.78rem">Nominal (future $)</button>
                     </div>
 
                     <!-- Results -->
