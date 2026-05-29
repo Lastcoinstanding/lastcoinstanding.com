@@ -451,7 +451,13 @@
   var resultsEl = document.getElementById('fwdResults');
   if(!resultsEl) return;
 
-  var scenario = 'floor';
+  // JS state mirrors the active scenario / purchase-method buttons. The
+  // initial values here MUST match the .active class set in the markup
+  // and the SCHEMA def: keys (single source of truth: the markup).
+  // Belt-and-suspenders DOM-sync at end of init() force-syncs these
+  // regardless, so a future drift in any of the three defaults gets
+  // corrected before the first calc render.
+  var scenario = 'trend';
   var method = 'mortgage';
   var LIVE_BTC_FALLBACK = 84000;
 
@@ -1441,6 +1447,22 @@
     // intact for any param the URL didn't specify.
     readStorageIntoInputs();
     readUrlIntoInputs();
+
+    // ── DOM-sync of JS state from active buttons ─────────────────────
+    // applyValue() skips btn.click() when the target button is already
+    // active (line ~1285), which means JS variables `scenario` and
+    // `method` can desync from the visual state when the rehydrated
+    // value happens to match the markup default. E.g.: markup has
+    // Trend active, user lands on the page with no URL/storage params,
+    // the SCHEMA default is also 'trend' so applyValue is never even
+    // called for that key — but the module-init JS variable could be
+    // stale. Force-syncing from the DOM here guarantees the calc uses
+    // whatever the user actually sees highlighted.
+    var _activeScenarioBtn = document.querySelector('.scenario-btn.active');
+    if (_activeScenarioBtn) scenario = _activeScenarioBtn.dataset.scenario;
+    var _activeMethodBtn = document.querySelector('.purchase-btn.active');
+    if (_activeMethodBtn) method = _activeMethodBtn.dataset.method;
+
     wireWriters();
     syncUrl();
     syncStorage();
