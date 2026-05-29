@@ -1006,7 +1006,13 @@ a.powerlaw-link:hover {
   gap: 1.1rem 2rem;
 }
 .grid-target { grid-template-columns: 1fr 1fr; }
-.grid-means  { grid-template-columns: repeat(4, 1fr); }
+/* grid-means held 4 columns before the rate-as-derived migration
+   (2026-05-29). With WR slider retired and 3 controls remaining,
+   each slider now gets ~33% width instead of ~25% — more horizontal
+   room for fine-grained dragging. Tablet (≤720px) still wraps to
+   2 columns (orphaned last item left-aligned, acceptable); phone
+   (≤480px) stacks fully. */
+.grid-means  { grid-template-columns: repeat(3, 1fr); }
 
 /* ─── Individual slider control ─── */
 .slider-control {

@@ -3,6 +3,12 @@
     "date": "2026-05-29",
     "display": "5/29/26",
     "page": "/the-bitcoin-retirement.html",
+    "summary": "Bitcoin Retirement calculator: wider input sliders (3-column grid) now that withdrawal rate is a derived readout, allowing finer-grained dragging"
+  },
+  {
+    "date": "2026-05-29",
+    "display": "5/29/26",
+    "page": "/the-bitcoin-retirement.html",
     "summary": "Bitcoin Retirement calculator: withdrawal rate now a derived readout under target income, making the mathematical linkage between the two visible"
   },
   {
