@@ -21,6 +21,22 @@ eleventyComputed:
 </section>
 
 
+<!-- RECENT UPDATES STRIP — see _data/updates.json -->
+<section class="updates-strip" aria-label="Recent site updates">
+    <div class="updates-inner">
+        <div class="updates-label">Recent updates</div>
+        <div class="updates-scroller" tabindex="0">
+            {% for u in updates %}
+            <a class="update-row" href="{{ u.page }}">
+                <span class="update-date">{{ u.display }}</span>
+                <span class="update-text">{{ u.summary }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+
 <!-- FEATURED INSIGHTS CAROUSEL -->
 <div class="insight-carousel">
     <div class="insight-slides" id="insightSlides">

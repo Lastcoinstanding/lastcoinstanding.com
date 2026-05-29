@@ -469,3 +469,93 @@ footer a:hover { text-decoration: underline; }
     }
 }
 
+
+/* ── Recent Updates strip (between hero and insight carousel) ─────────────
+   A small visual signal that the site is actively maintained. Latest 3
+   rows visible; container scrolls vertically for the rest. Each row is a
+   link to the relevant page. Data source: src/_data/updates.json. */
+.updates-strip {
+    width: 100%;
+    background: linear-gradient(180deg, var(--bg) 0%, rgba(224,148,34,0.025) 100%);
+    border-top: 1px solid rgba(224,148,34,0.10);
+    border-bottom: 1px solid rgba(224,148,34,0.10);
+    padding: 1.25rem 0;
+}
+.updates-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+.updates-label {
+    flex: 0 0 auto;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    color: var(--text-muted);
+    padding-top: 0.4rem;
+    white-space: nowrap;
+}
+.updates-scroller {
+    flex: 1 1 auto;
+    max-height: 5.4rem;           /* approx 3 rows; remainder scrolls */
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(224,148,34,0.35) transparent;
+}
+.updates-scroller::-webkit-scrollbar { width: 6px; }
+.updates-scroller::-webkit-scrollbar-track { background: transparent; }
+.updates-scroller::-webkit-scrollbar-thumb { background: rgba(224,148,34,0.35); border-radius: 3px; }
+.updates-scroller:focus { outline: 1px solid rgba(224,148,34,0.30); outline-offset: 4px; border-radius: 2px; }
+
+.update-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    padding: 0.35rem 0;
+    text-decoration: none;
+    color: var(--text-dim);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    transition: color 0.18s;
+}
+.update-row + .update-row {
+    border-top: 1px dashed rgba(255,255,255,0.05);
+}
+.update-row:hover,
+.update-row:focus {
+    color: var(--text);
+    outline: none;
+}
+.update-row:hover .update-text,
+.update-row:focus .update-text {
+    color: var(--amber);
+}
+.update-date {
+    flex: 0 0 auto;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.78rem;
+    color: var(--amber-dim);
+    font-weight: 500;
+    min-width: 4.2rem;
+}
+.update-text {
+    flex: 1 1 auto;
+    transition: color 0.18s;
+}
+
+@media (max-width: 768px) {
+    .updates-inner {
+        flex-direction: column;
+        gap: 0.6rem;
+        padding: 0 1.25rem;
+    }
+    .updates-label { padding-top: 0; }
+    .updates-scroller { max-height: 7.5rem; }
+    .update-row { font-size: 0.82rem; }
+}

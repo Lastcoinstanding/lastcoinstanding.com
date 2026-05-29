@@ -1,0 +1,50 @@
+[
+  {
+    "date": "2026-05-29",
+    "display": "5/29/26",
+    "page": "/bitcoin-vs-real-estate.html",
+    "summary": "Bitcoin vs. Real Estate calculator: Power Law scenarios clarified (Upper = cycle peak, ~3× trend) and canonical ? tooltips throughout"
+  },
+  {
+    "date": "2026-05-29",
+    "display": "5/29/26",
+    "page": "/bitcoin-vs-real-estate.html",
+    "summary": "Bitcoin vs. Real Estate calculator: Real / Nominal display toggle for projected values, with inflation-aware tooltips"
+  },
+  {
+    "date": "2026-05-29",
+    "display": "5/29/26",
+    "page": "/bitcoin-vs-real-estate.html",
+    "summary": "Bitcoin vs. Real Estate calculator: input formatting polish ($/comma/%) and clearer projected-value phrasing with future-date context"
+  },
+  {
+    "date": "2026-05-28",
+    "display": "5/28/26",
+    "page": "/bitcoin-vs-real-estate.html",
+    "summary": "Bitcoin vs. Real Estate calculator: cross-session persistence for user inputs + reformed NET headline on retrospective"
+  },
+  {
+    "date": "2026-05-28",
+    "display": "5/28/26",
+    "page": "/bitcoin-vs-real-estate.html",
+    "summary": "Bitcoin vs. Real Estate: seesaw chart start-year selector + start-price transparency in comparison table"
+  },
+  {
+    "date": "2026-05-28",
+    "display": "5/28/26",
+    "page": "/bitcoin-vs-real-estate.html",
+    "summary": "Bitcoin vs. Real Estate: new Global Affordability Crisis chart (5-market Demographia data, Tokyo case study)"
+  },
+  {
+    "date": "2026-05-28",
+    "display": "5/28/26",
+    "page": "/the-power-law.html",
+    "summary": "Power Law pages: live BTC price + consistent today-anchor across Disciplined Rebalancing, Bitcoin Retirement, and Borrowing Against Your Stack"
+  },
+  {
+    "date": "2026-05-24",
+    "display": "5/24/26",
+    "page": "/what-money-is-for.html",
+    "summary": "Homepage: new What Money Is For exploration added to carousel with silent video intro"
+  }
+]
