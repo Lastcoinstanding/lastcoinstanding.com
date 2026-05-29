@@ -474,12 +474,12 @@
       .then(function(r){ return r.ok ? r.json() : Promise.reject(); })
       .then(function(d){
         var p = Math.round(d.bitcoin.usd);
-        input.value = p.toLocaleString();
+        input.value = '$' + p.toLocaleString();
         if(status) status.textContent = '(live)';
         runFwdCalc();
       })
       .catch(function(){
-        input.value = LIVE_BTC_FALLBACK.toLocaleString();
+        input.value = '$' + LIVE_BTC_FALLBACK.toLocaleString();
         if(status) status.textContent = '(fallback)';
         runFwdCalc();
       });
@@ -1016,19 +1016,42 @@
     var el = document.getElementById(id);
     if(el) el.addEventListener('input', runFwdCalc);
   });
-  // Format-on-blur for the optional rent override — same pattern as
-  // the retrospective custom inputs (strips non-numeric, reformats with
-  // $ and commas; empty leaves placeholder visible).
+  // Format-on-blur for projection inputs — parity with retrospective
+  // calculator (commit 7fd3284). Money fields get $X,XXX; percent fields
+  // get X.X%. Empty leaves placeholder visible. Values are parsed back
+  // via parseNum() inside runFwdCalc, which strips $/,/%/whitespace, so
+  // the formatting is purely cosmetic and doesn't affect math.
   (function(){
-    var rent = document.getElementById('fwdMonthlyRent');
-    if(!rent) return;
-    rent.addEventListener('blur', function(){
-      var raw = (rent.value || '').replace(/[^0-9.]/g, '');
-      if(!raw){ rent.value = ''; return; }
-      var n = parseFloat(raw);
-      if(!isFinite(n)){ rent.value = ''; return; }
-      rent.value = '$' + Math.round(n).toLocaleString();
-    });
+    function bindMoney(id){
+      var el = document.getElementById(id);
+      if(!el) return;
+      el.addEventListener('blur', function(){
+        var raw = (el.value || '').replace(/[^0-9.]/g, '');
+        if(!raw){ el.value = ''; return; }
+        var n = parseFloat(raw);
+        if(!isFinite(n)){ el.value = ''; return; }
+        el.value = '$' + Math.round(n).toLocaleString();
+      });
+    }
+    function bindPercent(id){
+      var el = document.getElementById(id);
+      if(!el) return;
+      el.addEventListener('blur', function(){
+        var raw = (el.value || '').replace(/[^0-9.\-]/g, '');
+        if(!raw){ el.value = ''; return; }
+        var n = parseFloat(raw);
+        if(!isFinite(n)){ el.value = ''; return; }
+        // One decimal place — matches the rate-style convention used
+        // for retrospective's custom-rate input and the canonical inputs.
+        el.value = (Math.round(n * 10) / 10) + '%';
+      });
+    }
+    bindMoney('fwdHomePrice');
+    bindMoney('fwdBtcNow');
+    bindMoney('fwdMonthlyRent');
+    bindPercent('fwdHomeAppreciation');
+    bindPercent('fwdMortgageRate');
+    bindPercent('fwdAdvancedRate');
   })();
   horizonSel.addEventListener('change', runFwdCalc);
   document.getElementById('fwdAdvancedCheck').addEventListener('change', runFwdCalc);
@@ -1043,14 +1066,16 @@
     var current = window.ModelingAssumptions.get('realEstate');
     var input = document.getElementById('fwdHomeAppreciation');
     if(input && parseFloat(input.value) !== current.value) {
-      input.value = current.value;
+      // Apply % format to match the blur formatter (consistent appearance
+      // whether the value comes from canonical, URL/storage, or user edit).
+      input.value = (Math.round(current.value * 10) / 10) + '%';
     }
   }
   function syncFwdAdvancedRateFromCanonical(){
     var current = window.ModelingAssumptions.get('realReturns');
     var input = document.getElementById('fwdAdvancedRate');
     if(input && parseFloat(input.value) !== current.value) {
-      input.value = current.value;
+      input.value = (Math.round(current.value * 10) / 10) + '%';
     }
   }
 
@@ -1227,7 +1252,9 @@
 
   function parseThousands(str) {
     if (str === null || str === undefined || str === '') return NaN;
-    return parseFloat(String(str).replace(/,/g, ''));
+    // Strip $, commas, and whitespace so format-on-blur values
+    // ("$1,200,000") parse correctly when rehydrated from URL/storage.
+    return parseFloat(String(str).replace(/[$,\s]/g, ''));
   }
   function formatThousands(num) {
     if (!isFinite(num)) return '';
@@ -1271,7 +1298,9 @@
     if (spec.type === 'thousands') {
       var n = parseFloat(raw);
       if (!isFinite(n)) return;
-      el.value = formatThousands(n);
+      // Format with $ prefix to match the blur formatter — so values
+      // rehydrated from URL/storage look identical to user-blurred values.
+      el.value = '$' + formatThousands(n);
     } else if (spec.type === 'int') {
       var i = parseInt(raw, 10);
       if (!isFinite(i)) return;
@@ -1279,7 +1308,9 @@
     } else if (spec.type === 'float') {
       var f = parseFloat(raw);
       if (!isFinite(f)) return;
-      el.value = String(f);
+      // Apply % suffix on rehydration — matches the blur formatter, so
+      // first-load appearance is consistent with edited appearance.
+      el.value = (Math.round(f * 10) / 10) + '%';
     } else {
       el.value = String(raw);
     }

@@ -247,26 +247,26 @@ eleventyComputed:
                     <!-- Primary Inputs -->
                     <div class="calc-grid">
                         <div class="calc-field">
-                            <label title="The price of the home you'd be considering buying today.">Home Price Today ($)</label>
-                            <input type="text" id="fwdHomePrice" value="420,000" inputmode="numeric">
+                            <label title="The price of the home you'd be considering buying today.">Home Price Today</label>
+                            <input type="text" id="fwdHomePrice" value="$420,000" inputmode="numeric">
                         </div>
                         <div class="calc-field">
                             <label title="How far into the future to project. Longer horizons give the Power Law model more compounding to work with — and more uncertainty.">Time Horizon</label>
                             <select id="fwdHorizon"></select>
                         </div>
                         <div class="calc-field">
-                            <label>Current BTC Price ($) <span class="opt" id="fwdBtcPriceStatus">loading&hellip;</span></label>
+                            <label>Current BTC Price <span class="opt" id="fwdBtcPriceStatus">loading&hellip;</span></label>
                             <input type="text" id="fwdBtcNow" value="" inputmode="numeric" placeholder="fetching live price&hellip;">
                         </div>
                     </div>
                     <div class="calc-grid">
                         <div class="calc-field">
-                            <label title="Annual home price growth in real terms (after inflation). Long-run US median has been roughly 0–1% real; default 3.5% is generous.">Expected Home Appreciation <span class="opt">(% real / yr)</span></label>
-                            <input type="text" id="fwdHomeAppreciation" value="3.5" inputmode="decimal">
+                            <label title="Annual home price growth in real terms (after inflation). Long-run US median has been roughly 0–1% real; default 3.5% is generous.">Expected Home Appreciation <span class="opt">(real / yr)</span></label>
+                            <input type="text" id="fwdHomeAppreciation" value="3.5%" inputmode="decimal">
                         </div>
                         <div class="calc-field" id="fwdMortgageRateField">
-                            <label title="Annual interest rate on a 30-year fixed mortgage, in nominal terms (as quoted by lenders).">Mortgage Rate <span class="opt">(% nominal)</span></label>
-                            <input type="text" id="fwdMortgageRate" value="6.8" inputmode="decimal">
+                            <label title="Annual interest rate on a 30-year fixed mortgage, in nominal terms (as quoted by lenders).">Mortgage Rate <span class="opt">(nominal)</span></label>
+                            <input type="text" id="fwdMortgageRate" value="6.8%" inputmode="decimal">
                         </div>
                         <div class="calc-field" id="fwdMonthlyRentField">
                             <label title="Override the default rent assumption (75% of an equivalent mortgage). Leave blank to use the default.">Your Monthly Rent <span class="opt">(optional)</span></label>
@@ -293,7 +293,7 @@ eleventyComputed:
                         <label class="advanced-toggle-label">
                             <input type="checkbox" id="fwdAdvancedCheck">
                             <span id="fwdAdvancedText"></span>
-                            <span id="fwdAdvancedRateWrap" style="display:none">at <input type="text" id="fwdAdvancedRate" value="7" inputmode="decimal">% real / yr</span>
+                            <span id="fwdAdvancedRateWrap" style="display:none">at <input type="text" id="fwdAdvancedRate" value="7%" inputmode="decimal"> real / yr</span>
                         </label>
                         <div id="fwdAdvancedContent" style="display:none">
                             <div class="advanced-note" id="fwdAdvancedNote"></div>
