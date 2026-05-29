@@ -227,11 +227,11 @@ eleventyComputed:
                 <div class="calc-section">
                     <!-- Power Law Scenario Selection -->
                     <div style="margin-bottom:1rem">
-                        <label style="font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:.5rem">Power Law Scenario</label>
+                        <label style="font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:.5rem">Power Law Scenario <a href="/the-power-law.html" style="color:var(--amber);text-transform:none;font-size:0.72rem;letter-spacing:0;margin-left:0.4rem;text-decoration:none;border-bottom:1px dotted var(--amber-dim)">learn more &rarr;</a></label>
                         <div class="scenario-btns">
-                            <button class="scenario-btn" data-scenario="floor">Floor (Conservative)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &gt; 0.99</span></button>
-                            <button class="scenario-btn active" data-scenario="trend">Trend (Fair Value)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &asymp; 0.95</span></button>
-                            <button class="scenario-btn" data-scenario="upper">Upper (Bull Case)<br><span style="font-size:.7rem;opacity:.7">Historical peaks</span></button>
+                            <button class="scenario-btn" data-scenario="floor" title="The conservative lower bound of the Power Law band (R² > 0.99). BTC has historically respected this floor since 2010 — every meaningful dip recovered above it.">Floor (Conservative)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &gt; 0.99</span></button>
+                            <button class="scenario-btn active" data-scenario="trend" title="The fair-value center line of the Power Law model (R² ≈ 0.95). Closest to a 'middle estimate' for BTC's long-term trajectory.">Trend (Fair Value)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &asymp; 0.95</span></button>
+                            <button class="scenario-btn" data-scenario="upper" title="The historical bull-case ceiling of the Power Law band. BTC has touched this line at every major cycle peak.">Upper (Bull Case)<br><span style="font-size:.7rem;opacity:.7">Historical peaks</span></button>
                         </div>
                     </div>
 
@@ -247,11 +247,11 @@ eleventyComputed:
                     <!-- Primary Inputs -->
                     <div class="calc-grid">
                         <div class="calc-field">
-                            <label>Home Price Today ($)</label>
+                            <label title="The price of the home you'd be considering buying today.">Home Price Today ($)</label>
                             <input type="text" id="fwdHomePrice" value="420,000" inputmode="numeric">
                         </div>
                         <div class="calc-field">
-                            <label>Time Horizon</label>
+                            <label title="How far into the future to project. Longer horizons give the Power Law model more compounding to work with — and more uncertainty.">Time Horizon</label>
                             <select id="fwdHorizon"></select>
                         </div>
                         <div class="calc-field">
@@ -261,14 +261,17 @@ eleventyComputed:
                     </div>
                     <div class="calc-grid">
                         <div class="calc-field">
-                            <label>Expected Home Appreciation <span class="opt">(% real / yr)</span></label>
+                            <label title="Annual home price growth in real terms (after inflation). Long-run US median has been roughly 0–1% real; default 3.5% is generous.">Expected Home Appreciation <span class="opt">(% real / yr)</span></label>
                             <input type="text" id="fwdHomeAppreciation" value="3.5" inputmode="decimal">
                         </div>
                         <div class="calc-field" id="fwdMortgageRateField">
-                            <label>Mortgage Rate <span class="opt">(% nominal)</span></label>
+                            <label title="Annual interest rate on a 30-year fixed mortgage, in nominal terms (as quoted by lenders).">Mortgage Rate <span class="opt">(% nominal)</span></label>
                             <input type="text" id="fwdMortgageRate" value="6.8" inputmode="decimal">
                         </div>
-                        <div class="calc-field" style="visibility:hidden"><label>&nbsp;</label><input type="text" disabled></div>
+                        <div class="calc-field" id="fwdMonthlyRentField">
+                            <label title="Override the default rent assumption (75% of an equivalent mortgage). Leave blank to use the default.">Your Monthly Rent <span class="opt">(optional)</span></label>
+                            <input type="text" id="fwdMonthlyRent" value="" inputmode="numeric" placeholder="$3,150 (75% of mortgage)">
+                        </div>
                     </div>
 
                     <div class="footnote-date" id="fwdInvestmentFootnote">Home appreciation is in real (inflation-adjusted) terms; mortgage rate is nominal as written. Sitewide inflation rate (currently 6.5% M2-growth default; see Half-Life or Melting Ice Cube) is used internally to reconcile the two. Your up-front investment is derived from the home price and purchase method. Projections anchored to January 1 of the selected year.</div>
@@ -300,7 +303,7 @@ eleventyComputed:
                 </div>
 
                 <div class="annotation" style="margin-top:1rem;font-size:.85rem;color:var(--text-muted);line-height:1.7">
-                    <strong style="color:var(--text-dim)">How this works:</strong> The bitcoin projection uses the Power Law model (Porkopolis coefficients). Home appreciation is in real (inflation-adjusted) terms; the calculator combines it internally with the sitewide inflation rate to drive the nominal home value path. Mortgage assumes 20% down, 30-year fixed; mortgage rate is nominal as written. Property taxes at 1.2% annually, insurance ~$150/mo, maintenance at 1% of home value annually. Rent in the bitcoin + rent path is estimated at 75% of an equivalent mortgage payment. <em>Projected dollar amounts are shown in today's purchasing power (real terms) as the primary value, with nominal future dollars shown alongside. Returns and CAGRs are computed on the real values. Accumulated payment streams (rent, interest, total cost of ownership) are shown as their nominal sum.</em>
+                    <strong style="color:var(--text-dim)">How this works:</strong> The bitcoin projection uses the <a href="/the-power-law.html" style="color:var(--amber)">Power Law model</a> (Porkopolis coefficients). Home appreciation is in real (inflation-adjusted) terms; the calculator combines it internally with the sitewide inflation rate to drive the nominal home value path. Mortgage assumes 20% down, 30-year fixed; mortgage rate is nominal as written. Property taxes at 1.2% annually, insurance ~$150/mo, maintenance at 1% of home value annually. Rent in the bitcoin + rent path is estimated at 75% of an equivalent mortgage payment. <em>Projected dollar amounts are shown in today's purchasing power (real terms) as the primary value, with nominal future dollars shown alongside. Returns and CAGRs are computed on the real values. Accumulated payment streams (rent, interest, total cost of ownership) are shown as their nominal sum.</em>
                 </div>
 
             </div><!-- /calc-mode-projection -->

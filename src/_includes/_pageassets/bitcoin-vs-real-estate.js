@@ -290,7 +290,7 @@
                 '<div style="font-size:0.78rem;color:var(--text-muted);margin-top:-0.3rem;margin-bottom:0.7rem;font-style:italic">after $'+totalRentPaid.toLocaleString()+' rent paid over '+yrs+' years</div>'+
                 '<div class="result-detail">'+(function(){var lh=lumpHouses;var fH=Math.floor(lh);var pt=lh-fH;var ic='';var fI='<svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" style=\"margin:1px\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/></svg>';var pI='<svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" style=\"margin:1px;opacity:0.45\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.2\" stroke-dasharray=\"2 2\" stroke-linejoin=\"round\"/></svg>';for(var i=0;i<Math.min(fH,15);i++)ic+=fI;if(pt>0.05)ic+=pI;var ov=fH>15?'<span style=\"font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center\">+'+(fH-15)+' more</span>':'';return '<div style=\"display:flex;flex-wrap:wrap;align-items:center;gap:0;margin-bottom:0.8rem\">'+ic+ov+'</div>';})()+
                     'BTC purchased: '+bb.toFixed(2)+' @ $'+bs.toLocaleString()+'<br>'+
-                    'Gross BTC value: $'+Math.round(lumpValue).toLocaleString()+' <span style="font-size:0.78rem;color:var(--text-muted)">(before rent)</span><br>'+
+                    '<span title="Value of your BTC holdings at today\u2019s market price, before subtracting rent paid during the holding period.">Gross BTC value:</span> $'+Math.round(lumpValue).toLocaleString()+' <span style="font-size:0.78rem;color:var(--text-muted)">(before rent)</span><br>'+
                     'Est. monthly rent: $'+estRent.toLocaleString()+'/mo'+(mode==='leverage'?(' <span style="font-size:0.78rem;color:var(--text-muted)">(vs. mortgage $'+Math.round(mortgageMonthly).toLocaleString()+')</span>'):'')+'<br>'+
                     'Total rent paid: $'+totalRentPaid.toLocaleString()+'<br>'+
                     '<span style="color:var(--amber);font-weight:500">You could now buy '+lumpHouses.toFixed(1)+' houses <strong>outright</strong></span> <span style="font-size:0.78rem;color:var(--text-muted)">('+medianRef+')</span><br>'+
@@ -356,7 +356,8 @@
             totalSummary.innerHTML=
                 '<div style="background:var(--bg-card);border:1px solid var(--amber-dim);border-radius:8px;padding:1.5rem 2rem">'+
                     '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);margin-bottom:0.5rem">\u20BF Bitcoin — Total Position</div>'+
-                    '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.3rem">$'+Math.round(totalBtcNet).toLocaleString()+' <span style="font-size:0.8rem;color:var(--text-muted)">net</span></div>'+_bh+
+                    '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.15rem;line-height:1.1">$'+Math.round(totalBtcNet).toLocaleString()+' <span style="font-size:0.8rem;color:var(--text-muted)">net</span></div>'+
+                    '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.7rem;font-style:italic">= $'+Math.round(lumpValue).toLocaleString()+' gross BTC + $'+Math.round(dcaValue).toLocaleString()+' DCA \u2212 $'+totalRentPaid.toLocaleString()+' rent</div>'+_bh+
                     '<div style="font-size:0.78rem;color:var(--amber-dim);margin-bottom:0.6rem">values as of '+asOf+'</div>'+
                     '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'+
                         '<div style="'+ls+la+'">You could now buy <strong>the house, outright</strong></div>'+
@@ -602,7 +603,18 @@
     var mr = mortRate / 100 / 12;
     var nPayments = 360;
     var monthlyMort = mr > 0 ? loanAmt * (mr * Math.pow(1+mr, nPayments)) / (Math.pow(1+mr, nPayments) - 1) : loanAmt / nPayments;
-    var impliedRent = monthlyMort * 0.75;
+    // Optional user-override for monthly rent. Default = 75% of equivalent
+    // mortgage (the established assumption used elsewhere in the page).
+    // Mirrors the customRent override pattern from retrospective.
+    var _fwdRentEl = document.getElementById('fwdMonthlyRent');
+    var _fwdRentRaw = _fwdRentEl ? (_fwdRentEl.value || '').replace(/[$,\s]/g, '') : '';
+    var _fwdRentNum = parseFloat(_fwdRentRaw);
+    var _fwdRentValid = isFinite(_fwdRentNum) && _fwdRentNum >= 100 && _fwdRentNum <= 50000;
+    var impliedRent = _fwdRentValid ? _fwdRentNum : (monthlyMort * 0.75);
+    // Update placeholder to reflect the live default
+    if (_fwdRentEl && !_fwdRentValid) {
+      _fwdRentEl.placeholder = '$' + Math.round(monthlyMort * 0.75).toLocaleString() + ' (75% of mortgage)';
+    }
     var totalRentPaid = impliedRent * 12 * horizonYrs;
 
     // ── BITCOIN SIDE ──
@@ -723,7 +735,7 @@
         houseIconsHtml +
         '<div class="detail-line">BTC purchased: '+btcBought.toFixed(4)+' @ '+fmt(btcNow)+'/BTC</div>' +
         '<div class="detail-line">Projected BTC price: <strong>'+fmt(futurePriceReal)+'</strong> <span style="font-size:.78rem;color:var(--text-muted)">today\u2019s $ (~'+fmt(futurePrice)+' nominal)</span></div>' +
-        '<div class="detail-line">Gross BTC value: '+fmt(btcValueReal)+' <span style="font-size:.78rem;color:var(--text-muted)">(~'+fmt(btcValue)+' nominal)</span></div>' +
+        '<div class="detail-line"><span title="Value of your BTC holdings at the projected future market price, before subtracting rent paid during the holding period.">Gross BTC value:</span> '+fmt(btcValueReal)+' <span style="font-size:.78rem;color:var(--text-muted)">(~'+fmt(btcValue)+' nominal)</span></div>' +
         '<div class="detail-line">Est. monthly rent: '+fmt(impliedRent)+'/mo <span style="font-size:.78rem;color:var(--text-muted)">(75% of equivalent mortgage)</span></div>' +
         '<div class="detail-line">Total rent paid: <span class="negative">'+fmt(totalRentPaid)+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
         '<div class="detail-line">Total real return: <span class="highlight">'+btcReturn+'%</span> <span style="font-size:.72rem;color:var(--text-muted)">in purchasing-power terms</span></div>' +
@@ -806,6 +818,12 @@
         var totalBtcBought = btcBought + dcaResult.dcaBtc;
         var totalBtcValueNominal = totalBtcBought * futurePrice;
         var totalBtcValueReal = toReal(totalBtcValueNominal);
+        // Component breakdown for the inline math sub-line. The headline
+        // totalBtcNetReal equals btcLumpReal + dcaValueReal − totalRentPaid
+        // (totalRentPaid stays nominal per the established convention for
+        // accumulated payment streams; same mixing used in retrospective).
+        var btcLumpReal = toReal(btcBought * futurePrice);
+        var dcaValueReal = toReal(dcaResult.dcaBtc * futurePrice);
         var totalBtcNetReal = totalBtcValueReal - totalRentPaid;
         var totalBtcNetNominal = totalBtcValueNominal - totalRentPaid;
         var totalInvestedCash = amount + dcaResult.dcaInvested;
@@ -846,7 +864,8 @@
           '<div style="background:var(--bg-card);border:1px solid var(--amber-dim);border-radius:8px;padding:1.5rem 2rem">'
           + '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);margin-bottom:0.5rem">\u20BF Bitcoin \u2014 Total Position</div>'
           + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.15rem;line-height:1.1">' + fmt(totalBtcNetReal) + ' <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400">net</span></div>'
-          + '<div style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:0.85rem;color:var(--text-dim);margin-bottom:0.5rem;font-weight:400">' + fmt(totalBtcNetNominal) + ' <span style="color:var(--text-muted)">nominal</span></div>'
+          + '<div style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:0.85rem;color:var(--text-dim);margin-bottom:0.15rem;font-weight:400">' + fmt(totalBtcNetNominal) + ' <span style="color:var(--text-muted)">nominal</span></div>'
+          + '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.6rem;font-style:italic">= ' + fmt(btcLumpReal) + ' gross BTC + ' + fmt(dcaValueReal) + ' DCA \u2212 ' + fmt(totalRentPaid) + ' rent <span style="font-size:0.72rem">(real)</span></div>'
           + bhVisual
           + '<div style="font-size:0.78rem;color:var(--amber-dim);margin-bottom:0.6rem">projected to ' + asOf + ' \u2014 ' + scenarioLabel + ' \u00b7 lump sum + DCA</div>'
           + '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'
@@ -931,7 +950,7 @@
           '<div class="detail-line">Monthly DCA into BTC: <span class="highlight">'+fmt(monthlySavings)+'/mo</span></div>' +
           '<div class="detail-line">BTC accumulated: '+dcaBtc.toFixed(4)+' BTC</div>' +
           '<div class="detail-line">Total invested via DCA: '+fmt(dcaTotalInvested)+' <span style="font-size:.72rem;color:var(--text-muted)">accumulated (\u2248'+fmt(monthlySavings)+'/mo \u00d7 '+totalMonths+' months)</span></div>' +
-          '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">DCA assumes BTC price follows a smooth geometric path from today\u2019s price to the projected endpoint.</div>' +
+          '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">DCA assumes BTC price follows a smooth geometric path from today\u2019s price to the projected endpoint (itself derived from the <a href="/the-power-law.html" style="color:var(--amber)">Power Law</a> scenario above).</div>' +
         '</div>';
       rightEl.innerHTML = '';
     } else {
@@ -964,10 +983,24 @@
   }
 
   // ── Event listeners ──
-  ['fwdBtcNow','fwdHomePrice','fwdHomeAppreciation','fwdMortgageRate','fwdAdvancedRate'].forEach(function(id){
+  ['fwdBtcNow','fwdHomePrice','fwdHomeAppreciation','fwdMortgageRate','fwdAdvancedRate','fwdMonthlyRent'].forEach(function(id){
     var el = document.getElementById(id);
     if(el) el.addEventListener('input', runFwdCalc);
   });
+  // Format-on-blur for the optional rent override — same pattern as
+  // the retrospective custom inputs (strips non-numeric, reformats with
+  // $ and commas; empty leaves placeholder visible).
+  (function(){
+    var rent = document.getElementById('fwdMonthlyRent');
+    if(!rent) return;
+    rent.addEventListener('blur', function(){
+      var raw = (rent.value || '').replace(/[^0-9.]/g, '');
+      if(!raw){ rent.value = ''; return; }
+      var n = parseFloat(raw);
+      if(!isFinite(n)){ rent.value = ''; return; }
+      rent.value = '$' + Math.round(n).toLocaleString();
+    });
+  })();
   horizonSel.addEventListener('change', runFwdCalc);
   document.getElementById('fwdAdvancedCheck').addEventListener('change', runFwdCalc);
 
