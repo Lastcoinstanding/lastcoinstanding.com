@@ -7,9 +7,97 @@ hardcoded constants and date strings across the codebase. Running this
 checklist once a month keeps pages internally consistent with the actual
 market state and the as-of dates the page presents to the reader.
 
+Most items are monthly. A few are **per-commit** (Recent Updates strip
+on the homepage) or **annual** (Demographia dataset) — the relevant cadence
+is flagged in each section header.
+
 This list will grow over time as the site adds pages with time-sensitive
 content. When you add a new page that bakes in a TODAY constant or an
 as-of date string, add it here in the same commit.
+
+---
+
+## Per-commit: Recent Updates strip on the homepage
+
+The most frequent maintenance task on this list — not monthly. Every
+user-facing commit should add a new entry to the top of
+`src/_data/updates.json`. The homepage's Recent Updates strip
+(between the hero and the insight carousel) reads from this file and
+is the visible signal that the site is actively maintained. Keeping
+it current is part of the editorial discipline, not a periodic task.
+
+### What counts as user-facing
+
+A change a reader could plausibly notice on a page they visit:
+new chart or calculator field, relabeled scenario, new tooltip, new
+section or page, new exploration, materially improved phrasing on a
+visible element, fixed visible bug (e.g. wrong number shown).
+
+### What does NOT count
+
+Refactors, bug fixes for issues that weren't visibly broken to
+readers, internal renames, build-system / config / dependency
+changes, doc updates (DATA_AUDIT, SITE_GUIDE, TECH_DEBT,
+STYLE_GUIDE, this file), JS scoping fixes that don't change
+observable behavior, type-only fixes, monthly PL_DATA refreshes
+(implicit — already covered by §1 below). When in doubt, ask:
+*would a returning reader notice this on the page?* If no, skip
+the entry; the journal in git history is enough.
+
+### Entry format
+
+Add to the **top** of the array (newest first):
+
+```json
+{
+  "date": "2026-05-30",
+  "display": "5/30/26",
+  "page": "/some-page.html",
+  "summary": "One-line description of what changed (≤140 chars)"
+}
+```
+
+- `date` — ISO `YYYY-MM-DD`. Reserved for machine sort if we ever
+  add it; not currently used for rendering.
+- `display` — `m/d/yy` US format as shown in the strip. Keep
+  consistent across all entries (single source: this format).
+- `page` — deep link to the page the entry relates to. Pick the
+  most relevant single page when a commit touches several. Use the
+  full path with leading slash (e.g. `/bitcoin-vs-real-estate.html`),
+  not the bare slug.
+- `summary` — one declarative sentence in past or active tense
+  ("Added X", "Clarified Y", "Fixed Z"). No leading dash or bullet.
+  Cap at ~140 chars so the row fits two lines on desktop without
+  truncation. Lead with the page name when it's not obvious from
+  context, e.g. "Bitcoin vs. Real Estate calculator: …".
+
+### Batching
+
+One PR, one entry typically. If a single PR spans several unrelated
+user-facing changes, add a single entry that batches them ("Bitcoin
+vs. Real Estate: scenario clarifications, Real/Nominal toggle, and
+? tooltips") rather than three near-identical lines. Reader-time,
+not commit-history, is the audience.
+
+### Retention
+
+No expiration. The scroller in the strip handles arbitrary length;
+older entries scroll out of the default 3-row view but remain
+accessible. We do not prune. If the file ever crosses ~50 entries,
+reconsider truncation — but not before.
+
+### Sanity-check after committing
+
+Build, then confirm the strip picks up the new row at the top:
+
+```bash
+npm run build && \
+  grep -A2 'class="update-row"' _site/index.html | head -6
+```
+
+The first match should be the new entry. The strip itself is in
+`src/index.njk` (search "updates-strip"); the CSS in
+`src/_includes/_pageassets/index.css`.
 
 ---
 
