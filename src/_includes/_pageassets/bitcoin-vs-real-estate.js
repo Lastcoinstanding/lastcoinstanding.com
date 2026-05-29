@@ -1242,6 +1242,12 @@
 
   // ── Schema ──────────────────────────────────────────────────────
   // type tags: int, float, thousands (comma-formatted), bool, enum
+  // SCHEMA entries with persist:false are excluded from localStorage —
+  // i.e. they don't survive across sessions. URL params still work
+  // (shareable links), and per-session clicks still update the URL.
+  // Used for editorial framing choices (Power Law scenario, display
+  // mode) where the editorial default should always render on fresh
+  // page loads, not the visitor's last selection.
   var SCHEMA = {
     year:      { elId: 'calcYear',             type: 'int',       def: 2017,    evt: 'change' },
     dca:       { elId: 'calcDCA',              type: 'bool',                    evt: 'change' },
@@ -1252,8 +1258,8 @@
     advanced:  { elId: 'fwdAdvancedCheck',     type: 'bool',                    evt: 'change' },
     advrate:   { elId: 'fwdAdvancedRate',      type: 'float',     def: 7,       evt: 'input'  },
     method:    { type: 'btn-method',    sel: '.purchase-btn',   attr: 'method',   def: 'mortgage' },
-    pscenario: { type: 'btn-pscenario', sel: '.scenario-btn',   attr: 'scenario', def: 'trend'    },
-    displaymode: { type: 'btn-displaymode', sel: '.display-mode-btn', attr: 'mode', def: 'real' }
+    pscenario: { type: 'btn-pscenario', sel: '.scenario-btn',   attr: 'scenario', def: 'trend',    persist: false },
+    displaymode: { type: 'btn-displaymode', sel: '.display-mode-btn', attr: 'mode', def: 'real',  persist: false }
   };
 
   function parseThousands(str) {
@@ -1361,6 +1367,10 @@
     _suppressWriter = true;
     try {
       Object.keys(SCHEMA).forEach(function(key){
+        // Skip keys that opt out of storage persistence (editorial framing
+        // choices — Power Law scenario, display mode — always render with
+        // the markup default on fresh loads regardless of stored value).
+        if (SCHEMA[key].persist === false) return;
         if (!Object.prototype.hasOwnProperty.call(data, key)) return;
         applyValue(key, data[key]);
       });
@@ -1373,6 +1383,11 @@
     if (typeof localStorage === 'undefined') return;
     var data = {};
     Object.keys(SCHEMA).forEach(function(key){
+      // Match readStorageIntoInputs — never write keys flagged
+      // persist:false. Belt-and-suspenders: the read side would skip
+      // them anyway, but excluding from the write keeps the storage
+      // blob clean and migrates existing users on their next save.
+      if (SCHEMA[key].persist === false) return;
       var val = readValue(key);
       if (val === undefined) return;
       data[key] = val;
