@@ -229,7 +229,7 @@
         const _prevailingRate=mortgageRates[sy];const _rateRaw=(document.getElementById('customRate')||{}).value||'';const _rateNum=parseFloat(_rateRaw.replace(/[%\s]/g,''));const _rateValid=!isNaN(_rateNum)&&_rateNum>=0.5&&_rateNum<=15;const rate=_rateValid?_rateNum:_prevailingRate;const _isCustomRate=_rateValid;const yrs=ey-sy;
         const dp=mode==='cash'?hs:Math.round(hs*0.2);
         const asOf='April 2025';
-        const medianRef=_isCustom?('vs. your $'+Math.round(hs).toLocaleString()+' home'):('median home: $'+he.toLocaleString());
+        const medianRef=_isCustom?('at $'+Math.round(hs).toLocaleString()+' each'):('at $'+he.toLocaleString()+' each (median)');
 
         // Assumptions display
         const assumeEl=document.getElementById('calcAssumptions');
@@ -285,8 +285,9 @@
                 '<div class="period-label">'+sy+' \u00B7 Purchased</div>'+
                 '<div class="invested-line">Invested <strong>$'+dp.toLocaleString()+'</strong>'+(mode==='leverage'?' <span class="note">(20% down)</span>':' <span class="note">(cash equivalent)</span>')+'</div>'+
                 '<div class="period-divider"></div>'+
-                '<div class="period-label">'+asOf+' \u00B7 Current</div>'+
+                '<div class="period-label">'+asOf+' \u00B7 Current Value</div>'+
                 '<div class="result-value">$'+Math.round(lumpNet).toLocaleString()+' <span style="font-size:0.85rem;color:var(--text-muted)">net</span></div>'+
+                '<div style="font-size:0.78rem;color:var(--text-muted);margin-top:-0.3rem;margin-bottom:0.7rem;font-style:italic">after $'+totalRentPaid.toLocaleString()+' rent paid over '+yrs+' years</div>'+
                 '<div class="result-detail">'+(function(){var lh=lumpHouses;var fH=Math.floor(lh);var pt=lh-fH;var ic='';var fI='<svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" style=\"margin:1px\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/></svg>';var pI='<svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" style=\"margin:1px;opacity:0.45\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.2\" stroke-dasharray=\"2 2\" stroke-linejoin=\"round\"/></svg>';for(var i=0;i<Math.min(fH,15);i++)ic+=fI;if(pt>0.05)ic+=pI;var ov=fH>15?'<span style=\"font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center\">+'+(fH-15)+' more</span>':'';return '<div style=\"display:flex;flex-wrap:wrap;align-items:center;gap:0;margin-bottom:0.8rem\">'+ic+ov+'</div>';})()+
                     'BTC purchased: '+bb.toFixed(2)+' @ $'+bs.toLocaleString()+'<br>'+
                     'Gross BTC value: $'+Math.round(lumpValue).toLocaleString()+' <span style="font-size:0.78rem;color:var(--text-muted)">(before rent)</span><br>'+
@@ -301,7 +302,7 @@
                 '<div class="period-label">'+sy+' \u00B7 Purchased</div>'+
                 '<div class="invested-line">Invested <strong>$'+dp.toLocaleString()+'</strong>'+(mode==='leverage'?' <span class="note">(20% down of $'+hs.toLocaleString()+')</span>':' <span class="note">(cash, paid in full)</span>')+'</div>'+
                 '<div class="period-divider"></div>'+
-                '<div class="period-label">'+asOf+' \u00B7 Current</div>'+
+                '<div class="period-label">'+asOf+' \u00B7 Current Value</div>'+
                 '<div class="result-value">'+hL+'</div>'+
                 '<div class="result-detail">'+hD+'</div>'+
             '</div>';
@@ -342,6 +343,7 @@
                         'Monthly DCA into BTC: <span style="color:var(--amber)">$'+monthlySavings.toLocaleString()+'/mo</span><br>'+
                         'BTC accumulated: '+dcaBtc.toFixed(2)+' BTC<br>'+
                         '<span>Total invested via DCA: $'+dcaTotalInvested.toLocaleString()+'</span>'+
+                        ' <span style="font-size:0.78rem;color:var(--text-muted)">($'+monthlySavings.toLocaleString()+'/mo \u00d7 '+(yrs*12)+' months)</span>'+
                     '</div>'+
                 '</div>';
 
@@ -420,6 +422,18 @@
         document.getElementById('dcaSection').style.display=this.checked?'block':'none';
         runCalculator();
     });
+    // Format-on-blur for the three custom optional inputs. Strips
+    // non-numeric chars and reformats with $ and commas (money) or %
+    // suffix (rate). Empty values stay empty so the placeholder remains
+    // visible. Parsers in runCalculator already strip $ , % whitespace
+    // so internal math is unaffected.
+    (function(){
+        function fmtMoney(el){if(!el) return;var raw=(el.value||'').replace(/[^0-9.]/g,'');if(!raw){el.value='';return;}var n=parseFloat(raw);if(!isFinite(n)){el.value='';return;}el.value='$'+Math.round(n).toLocaleString();}
+        function fmtPercent(el){if(!el) return;var raw=(el.value||'').replace(/[^0-9.]/g,'');if(!raw){el.value='';return;}var n=parseFloat(raw);if(!isFinite(n)){el.value='';return;}el.value=parseFloat(n.toFixed(2))+'%';}
+        var hp=document.getElementById('customHomePrice');if(hp) hp.addEventListener('blur',function(){fmtMoney(hp);});
+        var rt=document.getElementById('customRent');if(rt) rt.addEventListener('blur',function(){fmtMoney(rt);});
+        var rate=document.getElementById('customRate');if(rate) rate.addEventListener('blur',function(){fmtPercent(rate);});
+    })();
     runCalculator();
     
 
@@ -916,7 +930,7 @@
           '<div class="detail-line">Est. rent: '+fmt(s.impliedRent)+'/mo</div>' +
           '<div class="detail-line">Monthly DCA into BTC: <span class="highlight">'+fmt(monthlySavings)+'/mo</span></div>' +
           '<div class="detail-line">BTC accumulated: '+dcaBtc.toFixed(4)+' BTC</div>' +
-          '<div class="detail-line">Total invested via DCA: '+fmt(dcaTotalInvested)+' <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
+          '<div class="detail-line">Total invested via DCA: '+fmt(dcaTotalInvested)+' <span style="font-size:.72rem;color:var(--text-muted)">accumulated (\u2248'+fmt(monthlySavings)+'/mo \u00d7 '+totalMonths+' months)</span></div>' +
           '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">DCA assumes BTC price follows a smooth geometric path from today\u2019s price to the projected endpoint.</div>' +
         '</div>';
       rightEl.innerHTML = '';
@@ -1115,7 +1129,7 @@
 //     appr       decimal (home appr %)    default 3.5
 //     mortgage   decimal (mortgage %)     default 6.8
 //     method     'cash' | 'mortgage'      default 'mortgage'
-//     pscenario  'floor'|'trend'|'upper'  default 'floor'
+//     pscenario  'floor'|'trend'|'upper'  default 'trend'
 //     advanced   '1' if checked           omit otherwise
 //     advrate    decimal (investment %)   default 7
 //
@@ -1145,7 +1159,7 @@
     advanced:  { elId: 'fwdAdvancedCheck',     type: 'bool',                    evt: 'change' },
     advrate:   { elId: 'fwdAdvancedRate',      type: 'float',     def: 7,       evt: 'input'  },
     method:    { type: 'btn-method',    sel: '.purchase-btn',   attr: 'method',   def: 'mortgage' },
-    pscenario: { type: 'btn-pscenario', sel: '.scenario-btn',   attr: 'scenario', def: 'floor'    }
+    pscenario: { type: 'btn-pscenario', sel: '.scenario-btn',   attr: 'scenario', def: 'trend'    }
   };
 
   function parseThousands(str) {
