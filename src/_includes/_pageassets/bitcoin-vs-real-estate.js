@@ -586,7 +586,7 @@
     // accompanies the value.
     var _mode = _displayMode();
     function modeVal(realV, nomV){ return _mode === 'real' ? realV : nomV; }
-    function modeUnit(){ return _mode === 'real' ? "today\u2019s $" : "nominal"; }
+    function modeUnit(){ return _mode === 'real' ? "in today\u2019s $" : "nominal"; }
     function modePeriodLabel(){ return _mode === 'real' ? 'real, today\u2019s $' : 'nominal, future $'; }
     function modeBigLabel(metric){ return _mode === 'real' ? ('projected ' + metric + ' in today\u2019s purchasing power') : ('projected ' + metric + ' in future dollars'); }
     var horizonYrs = parseInt(horizonSel.value);
@@ -773,7 +773,7 @@
         '<div class="detail-line">Total rent paid: <span class="negative">'+fmt(totalRentPaid)+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
         '<div class="detail-line">Total real return: <span class="highlight">'+btcReturn+'%</span> <span style="font-size:.72rem;color:var(--text-muted)">in purchasing-power terms</span></div>' +
         (btcCAGR !== '—' ? '<div class="detail-line">Implied real CAGR: <span class="highlight">'+btcCAGR+'%</span></div>' : '') +
-        '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">(projected home value: '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' each '+modeUnit()+')</span></div>' +
+        '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> in '+endYear+' <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">\u2014 projected home value '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' each '+modeUnit()+', vs. '+fmt(homePrice)+' today</span></div>' +
         '<div class="detail-line" style="margin-top:.6rem;font-size:.78rem;color:var(--text-muted)">No leverage. No interest. No property taxes. No maintenance.</div>' +
       '</div>';
 
@@ -961,7 +961,7 @@
     // result cards).
     var _mode = _displayMode();
     function modeVal(realV, nomV){ return _mode === 'real' ? realV : nomV; }
-    function modeUnit(){ return _mode === 'real' ? "today\u2019s $" : "nominal"; }
+    function modeUnit(){ return _mode === 'real' ? "in today\u2019s $" : "nominal"; }
     function modeBigLabel(metric){ return _mode === 'real' ? ('projected ' + metric + ' in today\u2019s purchasing power') : ('projected ' + metric + ' in future dollars'); }
 
     if(s.method === 'mortgage'){
