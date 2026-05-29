@@ -495,6 +495,24 @@
     });
   });
 
+  // ── Display mode toggle (Real vs Nominal) ──────────────────────────
+  // Controls whether projected values render in today's purchasing
+  // power (real) or future dollars (nominal). Default 'real'. Mode
+  // state is read live from the DOM via _displayMode() inside the
+  // render function, so this handler only needs to update the active
+  // class and trigger a re-render.
+  document.querySelectorAll('.display-mode-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.display-mode-btn').forEach(function(b){b.classList.remove('active')});
+      btn.classList.add('active');
+      runFwdCalc();
+    });
+  });
+  function _displayMode(){
+    var b = document.querySelector('.display-mode-btn.active');
+    return b ? b.getAttribute('data-mode') : 'real';
+  }
+
   // ── Purchase method buttons ──
   document.querySelectorAll('.purchase-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
@@ -555,6 +573,16 @@
   }
 
   function runFwdCalc(){
+    // Display-mode helpers (Real vs Nominal toggle). Read once per render
+    // and use throughout to pick which value/label to emit. modeVal picks
+    // between two pre-computed values; modeUnit / modePeriodLabel /
+    // modeBigNumberLabel return the human-readable annotation that
+    // accompanies the value.
+    var _mode = _displayMode();
+    function modeVal(realV, nomV){ return _mode === 'real' ? realV : nomV; }
+    function modeUnit(){ return _mode === 'real' ? "today\u2019s $" : "nominal"; }
+    function modePeriodLabel(){ return _mode === 'real' ? 'real, today\u2019s $' : 'nominal, future $'; }
+    function modeBigLabel(metric){ return _mode === 'real' ? ('projected ' + metric + ' in today\u2019s purchasing power') : ('projected ' + metric + ' in future dollars'); }
     var horizonYrs = parseInt(horizonSel.value);
     var btcNow = parseNum('fwdBtcNow');
     var homePrice = parseNum('fwdHomePrice');
@@ -728,19 +756,18 @@
         '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
         '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong></div>' +
         '<div class="period-divider"></div>' +
-        '<div class="period-label">'+endYear+' \u00b7 Projected (real, today\u2019s $)</div>' +
-        '<div class="big-number">'+fmt(btcNetReal)+' <span style="font-size:.8rem;color:var(--text-muted)">net</span></div>' +
-        '<div class="big-number-label">projected net position in today\u2019s purchasing power</div>' +
-        '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(btcNet)+' nominal</div>' +
+        '<div class="period-label">'+endYear+' \u00b7 Projected ('+modePeriodLabel()+')</div>' +
+        '<div class="big-number">'+fmt(modeVal(btcNetReal, btcNet))+' <span style="font-size:.8rem;color:var(--text-muted)">net</span></div>' +
+        '<div class="big-number-label">'+modeBigLabel('net position')+'</div>' +
         houseIconsHtml +
         '<div class="detail-line">BTC purchased: '+btcBought.toFixed(4)+' @ '+fmt(btcNow)+'/BTC</div>' +
-        '<div class="detail-line">Projected BTC price: <strong>'+fmt(futurePriceReal)+'</strong> <span style="font-size:.78rem;color:var(--text-muted)">today\u2019s $ (~'+fmt(futurePrice)+' nominal)</span></div>' +
-        '<div class="detail-line"><span title="Value of your BTC holdings at the projected future market price, before subtracting rent paid during the holding period.">Gross BTC value:</span> '+fmt(btcValueReal)+' <span style="font-size:.78rem;color:var(--text-muted)">(~'+fmt(btcValue)+' nominal)</span></div>' +
+        '<div class="detail-line">Projected BTC price: <strong>'+fmt(modeVal(futurePriceReal, futurePrice))+'</strong> <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'</span></div>' +
+        '<div class="detail-line"><span title="Value of your BTC holdings at the projected future market price, before subtracting rent paid during the holding period.">Gross BTC value:</span> '+fmt(modeVal(btcValueReal, btcValue))+' <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'</span></div>' +
         '<div class="detail-line">Est. monthly rent: '+fmt(impliedRent)+'/mo <span style="font-size:.78rem;color:var(--text-muted)">(75% of equivalent mortgage)</span></div>' +
         '<div class="detail-line">Total rent paid: <span class="negative">'+fmt(totalRentPaid)+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
         '<div class="detail-line">Total real return: <span class="highlight">'+btcReturn+'%</span> <span style="font-size:.72rem;color:var(--text-muted)">in purchasing-power terms</span></div>' +
         (btcCAGR !== '—' ? '<div class="detail-line">Implied real CAGR: <span class="highlight">'+btcCAGR+'%</span></div>' : '') +
-        '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">(projected home value: '+fmt(futureHomeValueReal)+' each in today\u2019s $)</span></div>' +
+        '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">(projected home value: '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' each '+modeUnit()+')</span></div>' +
         '<div class="detail-line" style="margin-top:.6rem;font-size:.78rem;color:var(--text-muted)">No leverage. No interest. No property taxes. No maintenance.</div>' +
       '</div>';
 
@@ -753,12 +780,11 @@
           '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
           '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(20% down of '+fmt(homePrice)+')</span></div>' +
           '<div class="period-divider"></div>' +
-          '<div class="period-label">'+endYear+' \u00b7 Projected (real, today\u2019s $)</div>' +
-          '<div class="big-number">'+fmt(equityReal)+'</div>' +
-          '<div class="big-number-label">projected equity in today\u2019s purchasing power</div>' +
-          '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(equity)+' nominal</div>' +
+          '<div class="period-label">'+endYear+' \u00b7 Projected ('+modePeriodLabel()+')</div>' +
+          '<div class="big-number">'+fmt(modeVal(equityReal, equity))+'</div>' +
+          '<div class="big-number-label">'+modeBigLabel('equity')+'</div>' +
           ownershipVisual +
-          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(futureHomeValueReal)+' <span style="font-size:.78rem;color:var(--text-muted)">today\u2019s $ (~'+fmt(futureHomeValue)+' nominal); '+houseCAGR+'%/yr real</span></div>' +
+          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'; '+houseCAGR+'%/yr real</span></div>' +
           '<div class="detail-line">Monthly mortgage: '+fmt(monthlyMort)+'/mo at '+mortRate+'%</div>' +
           '<div class="detail-line">Interest paid: <span class="negative">'+fmt(interestPaid)+'</span> <span style="font-size:.78rem;color:var(--text-muted)">(dead money, accumulated)</span></div>' +
           '<div class="detail-line">Remaining loan: '+(bal > 0 ? '<span class="negative">'+fmt(bal)+'</span>' : 'Paid off')+'</div>' +
@@ -772,12 +798,11 @@
           '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
           '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(cash, paid in full)</span></div>' +
           '<div class="period-divider"></div>' +
-          '<div class="period-label">'+endYear+' \u00b7 Projected (real, today\u2019s $)</div>' +
-          '<div class="big-number">'+fmt(futureHomeValueReal)+'</div>' +
-          '<div class="big-number-label">projected home value in today\u2019s purchasing power</div>' +
-          '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(futureHomeValue)+' nominal</div>' +
+          '<div class="period-label">'+endYear+' \u00b7 Projected ('+modePeriodLabel()+')</div>' +
+          '<div class="big-number">'+fmt(modeVal(futureHomeValueReal, futureHomeValue))+'</div>' +
+          '<div class="big-number-label">'+modeBigLabel('home value')+'</div>' +
           ownershipVisual +
-          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(futureHomeValueReal)+' <span style="font-size:.78rem;color:var(--text-muted)">today\u2019s $ (~'+fmt(futureHomeValue)+' nominal); '+houseCAGR+'%/yr real</span></div>' +
+          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'; '+houseCAGR+'%/yr real</span></div>' +
           '<div class="detail-line">Mortgage: $0 <span style="font-size:.78rem;color:var(--text-muted)">(no debt)</span></div>' +
           '<div class="detail-line">Interest paid: $0</div>' +
           '<div class="detail-line">Rent paid: $0 <span style="font-size:.78rem;color:var(--text-muted)">(you live in it)</span></div>' +
@@ -863,9 +888,8 @@
         fwdTotalSummary.innerHTML =
           '<div style="background:var(--bg-card);border:1px solid var(--amber-dim);border-radius:8px;padding:1.5rem 2rem">'
           + '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);margin-bottom:0.5rem">\u20BF Bitcoin \u2014 Total Position</div>'
-          + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.15rem;line-height:1.1">' + fmt(totalBtcNetReal) + ' <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400">net</span></div>'
-          + '<div style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:0.85rem;color:var(--text-dim);margin-bottom:0.15rem;font-weight:400">' + fmt(totalBtcNetNominal) + ' <span style="color:var(--text-muted)">nominal</span></div>'
-          + '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.6rem;font-style:italic">= ' + fmt(btcLumpReal) + ' gross BTC + ' + fmt(dcaValueReal) + ' DCA \u2212 ' + fmt(totalRentPaid) + ' rent <span style="font-size:0.72rem">(real)</span></div>'
+          + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.15rem;line-height:1.1">' + fmt(modeVal(totalBtcNetReal, totalBtcNetNominal)) + ' <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400">net</span></div>'
+          + '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.6rem;font-style:italic">= ' + fmt(modeVal(btcLumpReal, btcBought*futurePrice)) + ' gross BTC + ' + fmt(modeVal(dcaValueReal, dcaResult.dcaBtc*futurePrice)) + ' DCA \u2212 ' + fmt(totalRentPaid) + ' rent <span style="font-size:0.72rem">(' + modeUnit() + ')</span></div>'
           + bhVisual
           + '<div style="font-size:0.78rem;color:var(--amber-dim);margin-bottom:0.6rem">projected to ' + asOf + ' \u2014 ' + scenarioLabel + ' \u00b7 lump sum + DCA</div>'
           + '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'
@@ -884,8 +908,7 @@
         + '</div>'
         + '<div style="background:var(--bg-card);border:1px solid var(--red-dim);border-radius:8px;padding:1.5rem 2rem">'
           + '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--red);margin-bottom:0.5rem">\uD83C\uDFE0 House \u2014 Total Position</div>'
-          + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--text-dim);margin-bottom:0.15rem;line-height:1.1">' + fmt(equityReal) + '</div>'
-          + '<div style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:0.85rem;color:var(--text-dim);margin-bottom:0.5rem;font-weight:400">' + fmt(equity) + ' <span style="color:var(--text-muted)">nominal</span></div>'
+          + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--text-dim);margin-bottom:0.5rem;line-height:1.1">' + fmt(modeVal(equityReal, equity)) + '</div>'
           + equityVisual
           + '<div style="font-size:0.78rem;' + lm + ';margin-bottom:0.6rem">projected to ' + asOf + '</div>'
           + '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'
@@ -927,6 +950,14 @@
       return window.CalcHelpers.deflateToToday(nominalFutureValue, s.inflRate, s.horizonYrs);
     }
 
+    // Display mode helpers (mirror runFwdCalc — read live from DOM so the
+    // advanced section honors the same Real/Nominal toggle as the main
+    // result cards).
+    var _mode = _displayMode();
+    function modeVal(realV, nomV){ return _mode === 'real' ? realV : nomV; }
+    function modeUnit(){ return _mode === 'real' ? "today\u2019s $" : "nominal"; }
+    function modeBigLabel(metric){ return _mode === 'real' ? ('projected ' + metric + ' in today\u2019s purchasing power') : ('projected ' + metric + ' in future dollars'); }
+
     if(s.method === 'mortgage'){
       // DCA the rent-vs-mortgage savings into BTC. Math lives in
       // computeProjectionDca (single source of truth, also used by the
@@ -942,9 +973,8 @@
       leftEl.innerHTML =
         '<div class="calc-card bitcoin" style="border-style:dashed">' +
           '<h4>&#8383; Monthly DCA \u2014 Rent vs. Mortgage Savings</h4>' +
-          '<div class="big-number">'+fmt(dcaValueReal)+'</div>' +
-          '<div class="big-number-label">projected DCA value in today\u2019s purchasing power ('+s.endYear+')</div>' +
-          '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(dcaValue)+' nominal</div>' +
+          '<div class="big-number">'+fmt(modeVal(dcaValueReal, dcaValue))+'</div>' +
+          '<div class="big-number-label">'+modeBigLabel('DCA value')+' ('+s.endYear+')</div>' +
           '<div class="detail-line">Est. mortgage: '+fmt(s.monthlyMort)+'/mo</div>' +
           '<div class="detail-line">Est. rent: '+fmt(s.impliedRent)+'/mo</div>' +
           '<div class="detail-line">Monthly DCA into BTC: <span class="highlight">'+fmt(monthlySavings)+'/mo</span></div>' +
@@ -970,9 +1000,8 @@
       rightEl.innerHTML =
         '<div class="calc-card house" style="border-style:dashed">' +
           '<h4>&#128200; Imputed Rent &rarr; S&amp;P 500</h4>' +
-          '<div class="big-number">'+fmt(spFVReal)+'</div>' +
-          '<div class="big-number-label">projected portfolio in today\u2019s purchasing power ('+s.endYear+')</div>' +
-          '<div style="font-size:.72rem;color:var(--text-muted);margin-top:-.3rem;margin-bottom:.6rem">~'+fmt(spFV)+' nominal</div>' +
+          '<div class="big-number">'+fmt(modeVal(spFVReal, spFV))+'</div>' +
+          '<div class="big-number-label">'+modeBigLabel('portfolio')+' ('+s.endYear+')</div>' +
           '<div class="detail-line">Rent avoided: '+fmt(s.impliedRent)+'/mo</div>' +
           '<div class="detail-line">Invested monthly at: <span class="highlight">'+spReal.toFixed(1)+'%/yr real</span></div>' +
           '<div class="detail-line">Total invested: '+fmt(spInvested)+' <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
@@ -1192,7 +1221,8 @@
     advanced:  { elId: 'fwdAdvancedCheck',     type: 'bool',                    evt: 'change' },
     advrate:   { elId: 'fwdAdvancedRate',      type: 'float',     def: 7,       evt: 'input'  },
     method:    { type: 'btn-method',    sel: '.purchase-btn',   attr: 'method',   def: 'mortgage' },
-    pscenario: { type: 'btn-pscenario', sel: '.scenario-btn',   attr: 'scenario', def: 'trend'    }
+    pscenario: { type: 'btn-pscenario', sel: '.scenario-btn',   attr: 'scenario', def: 'trend'    },
+    displaymode: { type: 'btn-displaymode', sel: '.display-mode-btn', attr: 'mode', def: 'real' }
   };
 
   function parseThousands(str) {
@@ -1208,7 +1238,7 @@
 
   function readValue(key) {
     var spec = SCHEMA[key];
-    if (spec.type === 'btn-method' || spec.type === 'btn-pscenario') {
+    if (spec.type === 'btn-method' || spec.type === 'btn-pscenario' || spec.type === 'btn-displaymode') {
       var active = document.querySelector(spec.sel + '.active');
       return active ? active.getAttribute('data-' + spec.attr) : spec.def;
     }
@@ -1223,7 +1253,7 @@
 
   function applyValue(key, raw) {
     var spec = SCHEMA[key];
-    if (spec.type === 'btn-method' || spec.type === 'btn-pscenario') {
+    if (spec.type === 'btn-method' || spec.type === 'btn-pscenario' || spec.type === 'btn-displaymode') {
       var btn = document.querySelector(spec.sel + '[data-' + spec.attr + '="' + raw + '"]');
       if (btn && !btn.classList.contains('active')) btn.click();
       return;
@@ -1356,7 +1386,7 @@
   function wireWriters() {
     Object.keys(SCHEMA).forEach(function(key){
       var spec = SCHEMA[key];
-      if (spec.type === 'btn-method' || spec.type === 'btn-pscenario') {
+      if (spec.type === 'btn-method' || spec.type === 'btn-pscenario' || spec.type === 'btn-displaymode') {
         document.querySelectorAll(spec.sel).forEach(function(b){
           b.addEventListener('click', scheduleSyncUrl);
         });

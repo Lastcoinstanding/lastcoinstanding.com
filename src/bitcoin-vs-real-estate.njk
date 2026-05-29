@@ -276,6 +276,15 @@ eleventyComputed:
 
                     <div class="footnote-date" id="fwdInvestmentFootnote">Home appreciation is in real (inflation-adjusted) terms; mortgage rate is nominal as written. Sitewide inflation rate (currently 6.5% M2-growth default; see Half-Life or Melting Ice Cube) is used internally to reconcile the two. Your up-front investment is derived from the home price and purchase method. Projections anchored to January 1 of the selected year.</div>
 
+                    <!-- Display mode toggle: Real (today's purchasing power) vs Nominal (future dollars).
+                         Default is Real — matches the editorial convention used in 'How this works' and
+                         in retrospective. Persisted via URL/storage SCHEMA. -->
+                    <div class="display-mode-row" style="display:flex;align-items:center;gap:0.6rem;margin:0.4rem 0 1rem;justify-content:flex-end">
+                        <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)" title="Real = projected values deflated to today's purchasing power. Nominal = the actual future dollar amounts (not adjusted for inflation).">Display values in:</span>
+                        <button class="display-mode-btn toggle-btn active" data-mode="real" style="flex:0 0 auto;min-width:120px;padding:0.4rem 0.8rem;font-size:0.78rem">Real (today's $)</button>
+                        <button class="display-mode-btn toggle-btn" data-mode="nominal" style="flex:0 0 auto;min-width:120px;padding:0.4rem 0.8rem;font-size:0.78rem">Nominal (future $)</button>
+                    </div>
+
                     <!-- Results -->
                     <div id="fwdResults"></div>
 
@@ -303,7 +312,7 @@ eleventyComputed:
                 </div>
 
                 <div class="annotation" style="margin-top:1rem;font-size:.85rem;color:var(--text-muted);line-height:1.7">
-                    <strong style="color:var(--text-dim)">How this works:</strong> The bitcoin projection uses the <a href="/the-power-law.html" style="color:var(--amber)">Power Law model</a> (Porkopolis coefficients). Home appreciation is in real (inflation-adjusted) terms; the calculator combines it internally with the sitewide inflation rate to drive the nominal home value path. Mortgage assumes 20% down, 30-year fixed; mortgage rate is nominal as written. Property taxes at 1.2% annually, insurance ~$150/mo, maintenance at 1% of home value annually. Rent in the bitcoin + rent path is estimated at 75% of an equivalent mortgage payment. <em>Projected dollar amounts are shown in today's purchasing power (real terms) as the primary value, with nominal future dollars shown alongside. Returns and CAGRs are computed on the real values. Accumulated payment streams (rent, interest, total cost of ownership) are shown as their nominal sum.</em>
+                    <strong style="color:var(--text-dim)">How this works:</strong> The bitcoin projection uses the <a href="/the-power-law.html" style="color:var(--amber)">Power Law model</a> (Porkopolis coefficients). Home appreciation is in real (inflation-adjusted) terms; the calculator combines it internally with the sitewide inflation rate to drive the nominal home value path. Mortgage assumes 20% down, 30-year fixed; mortgage rate is nominal as written. Property taxes at 1.2% annually, insurance ~$150/mo, maintenance at 1% of home value annually. Rent in the bitcoin + rent path is estimated at 75% of an equivalent mortgage payment. <em>Projected dollar amounts render in your chosen frame &mdash; Real (today&rsquo;s purchasing power) or Nominal (future dollars) &mdash; via the toggle above the results. Real is the default. Returns and CAGRs are computed on the real values regardless of toggle. Accumulated payment streams (rent, interest, total cost of ownership) are shown as their nominal sum.</em>
                 </div>
 
             </div><!-- /calc-mode-projection -->
