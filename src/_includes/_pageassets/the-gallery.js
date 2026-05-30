@@ -1149,15 +1149,27 @@
 })();
 
 
-// ─── Chart 7: $10K invested in 2010 — BTC vs S&P 500 vs NASDAQ-100 ──
+// ─── Chart 7: Rolling 4-Year CAGR — Bitcoin vs S&P 500 TR vs NDQ TR ──
 //
-// Three log-Y lines showing wealth trajectory of $10K invested in
-// mid-2010 (first reliable BTC price), held to today. Total-return
-// indexes for SP500 and NDQ (dividends reinvested). BTC uses PL_DATA
-// directly. Data: SP500_TR_DATA and NDQ_TR_DATA are inlined below,
-// mirroring the same arrays in calculators-minis.js — accepted
-// duplication per Commit A's strategy. Both arrays refresh monthly
-// per MONTHLY_REFRESH_CHECKLIST; updates need to land in both files.
+// Line chart of compound annual growth rate over rolling four-year
+// windows, ending each year from 2017 through 2026. Three series:
+// bitcoin (using annual averages from btcData + today's live price
+// for the 2026 endpoint), S&P 500 total return, and NASDAQ-100 total
+// return. Replaces an earlier "$10K invested in 2010" lump-sum wealth
+// chart (Commit C) that was structurally vulnerable to the same
+// cherry-pick objection the rest of the site works to refute — picking
+// the earliest possible start year inflates returns and implies they
+// will repeat, contradicting the Power Law deceleration story this
+// site spends Chart 2 establishing. Rolling-window CAGR dodges that:
+// every reader-relevant 4-year period is shown, no single year is
+// privileged, and the pattern that emerges (declining-but-still-
+// materially-above-equity-comparators) is exactly what the Power Law
+// model in Chart 2 projects on the prospective side.
+//
+// SP500_TR_DATA and NDQ_TR_DATA arrays inlined below, mirroring the
+// same arrays in calculators-minis.js — accepted duplication per
+// Commit A's strategy. Both arrays refresh monthly per MONTHLY_REFRESH_
+// CHECKLIST; updates need to land in both files.
 (function(){
   var canvas = document.getElementById('galleryBvsmChart');
   if (!canvas) return;
@@ -1274,66 +1286,87 @@
     ["2026-05-28", 33772.46]
   ];
 
-  // ── Helpers: lookup price at a date for SP/NDQ; lookup BTC price at
-  //   days-since-genesis. Same pattern as calculators-minis.js.
-  function seriesPriceAt(arr, date){
-    var target = new Date(date).getTime();
-    var bestIdx = 0, bestDiff = Infinity;
-    for (var i = 0; i < arr.length; i++) {
-      var diff = Math.abs(new Date(arr[i][0]).getTime() - target);
-      if (diff < bestDiff) { bestDiff = diff; bestIdx = i; }
+  // ── Bitcoin annual averages (mirrors bitcoin-vs-real-estate.js
+  //   homeData/btcData duplication pattern). Used as the per-year
+  //   bitcoin price for CAGR calculations 2013-2025. The 2026 value
+  //   is live (TODAY_PRICE, updated by fetchTodayPrice when it lands).
+  var BTC_ANNUAL = {
+    2013: 732, 2014: 530, 2015: 272, 2016: 567, 2017: 4348, 2018: 7565,
+    2019: 7362, 2020: 11072, 2021: 47458, 2022: 19657, 2023: 28233,
+    2024: 62682, 2025: 88000
+  };
+
+  // ── Helpers
+  function spYearEnd(year, isCurrent) {
+    if (isCurrent) return SP500_TR_DATA[SP500_TR_DATA.length - 1][1];
+    var key = year + '-12-28';
+    for (var i = SP500_TR_DATA.length - 1; i >= 0; i--) {
+      if (SP500_TR_DATA[i][0] === key) return SP500_TR_DATA[i][1];
     }
-    return arr[bestIdx][1];
+    return null;
   }
-  function btcPriceAtDays(days){
-    // Find PL_DATA point with nearest x
-    var best = PL_DATA[0], bestDiff = Math.abs(PL_DATA[0][0] - days);
-    for (var i = 1; i < PL_DATA.length; i++) {
-      var d = Math.abs(PL_DATA[i][0] - days);
-      if (d < bestDiff) { bestDiff = d; best = PL_DATA[i]; }
+  function ndqYearEnd(year, isCurrent) {
+    if (isCurrent) return NDQ_TR_DATA[NDQ_TR_DATA.length - 1][1];
+    var key = year + '-12-28';
+    for (var i = NDQ_TR_DATA.length - 1; i >= 0; i--) {
+      if (NDQ_TR_DATA[i][0] === key) return NDQ_TR_DATA[i][1];
     }
-    return best[1];
+    return null;
   }
-  function daysFromDate(date){
-    return (new Date(date).getTime() / 1000 - GENESIS_TS) / 86400;
+  function btcYearEnd(year, isCurrent) {
+    if (isCurrent) {
+      return (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0)
+        ? TODAY_PRICE : PL_DATA[PL_DATA.length - 1][1];
+    }
+    return BTC_ANNUAL[year];
+  }
+
+  function cagr(endVal, startVal, years) {
+    if (!endVal || !startVal || years <= 0) return null;
+    return (Math.pow(endVal / startVal, 1 / years) - 1) * 100;
+  }
+
+  function buildSeries() {
+    // Rolling 4-year CAGR ending each year 2017-2026
+    var thisYear = new Date().getFullYear();
+    var endYears = [], btcSeries = [], spSeries = [], ndqSeries = [];
+    for (var y = 2017; y <= 2026; y++) {
+      var startY = y - 4;
+      var isCurrentEnd = (y === thisYear);
+      var bEnd = btcYearEnd(y, isCurrentEnd);
+      var bStart = btcYearEnd(startY, false);
+      var sEnd = spYearEnd(y, isCurrentEnd);
+      var sStart = spYearEnd(startY, false);
+      var nEnd = ndqYearEnd(y, isCurrentEnd);
+      var nStart = ndqYearEnd(startY, false);
+      endYears.push(y.toString());
+      btcSeries.push(cagr(bEnd, bStart, 4));
+      spSeries.push (cagr(sEnd, sStart, 4));
+      ndqSeries.push(cagr(nEnd, nStart, 4));
+    }
+    return { endYears: endYears, btc: btcSeries, sp: spSeries, ndq: ndqSeries };
   }
 
   function buildChart() {
-    // Build monthly time series — start at SP500_TR_DATA[0] date, end today
-    var startDate = new Date(SP500_TR_DATA[0][0]);
-    var endDate = new Date();
-    var startBtc = btcPriceAtDays(daysFromDate(startDate));
-    var startSp  = SP500_TR_DATA[0][1];
-    var startNdq = NDQ_TR_DATA[0][1];
-    var amount = 10000;
-
-    var labels = [], btcWealth = [], spWealth = [], ndqWealth = [];
-    var cur = new Date(startDate);
-    while (cur < endDate) {
-      var bp = btcPriceAtDays(daysFromDate(cur));
-      var sp = seriesPriceAt(SP500_TR_DATA, cur);
-      var np = seriesPriceAt(NDQ_TR_DATA, cur);
-      labels.push(cur.toISOString().slice(0, 7));   // YYYY-MM
-      btcWealth.push(amount * (bp / startBtc));
-      spWealth.push(amount * (sp / startSp));
-      ndqWealth.push(amount * (np / startNdq));
-      cur.setMonth(cur.getMonth() + 1);
-    }
+    var s = buildSeries();
 
     chartInstance = new Chart(canvas.getContext('2d'), {
       type: 'line',
       data: {
-        labels: labels,
+        labels: s.endYears,
         datasets: [
-          { label: 'S&P 500 (total return)', data: spWealth,
-            borderColor: 'rgba(180,170,140,0.85)', backgroundColor: 'transparent',
-            borderWidth: 2, pointRadius: 0, tension: 0.2, order: 3 },
-          { label: 'NASDAQ-100 (total return)', data: ndqWealth,
+          { label: 'Bitcoin', data: s.btc,
+            borderColor: 'rgba(247,147,26,0.95)', backgroundColor: 'rgba(247,147,26,0.10)',
+            borderWidth: 2.8, pointBackgroundColor: 'rgba(247,147,26,1)',
+            pointRadius: 4, pointHoverRadius: 6, tension: 0.25, fill: true, order: 1 },
+          { label: 'NASDAQ-100 (total return)', data: s.ndq,
             borderColor: 'rgba(120,160,200,0.85)', backgroundColor: 'transparent',
-            borderWidth: 2, pointRadius: 0, tension: 0.2, order: 2 },
-          { label: 'Bitcoin', data: btcWealth,
-            borderColor: 'rgba(247,147,26,0.95)', backgroundColor: 'rgba(247,147,26,0.06)',
-            borderWidth: 2.5, pointRadius: 0, tension: 0.15, fill: true, order: 1 }
+            borderWidth: 2, pointBackgroundColor: 'rgba(120,160,200,1)',
+            pointRadius: 3, pointHoverRadius: 5, tension: 0.25, order: 2 },
+          { label: 'S&P 500 (total return)', data: s.sp,
+            borderColor: 'rgba(180,170,140,0.85)', backgroundColor: 'transparent',
+            borderWidth: 2, pointBackgroundColor: 'rgba(180,170,140,1)',
+            pointRadius: 3, pointHoverRadius: 5, tension: 0.25, order: 3 }
         ]
       },
       options: {
@@ -1351,14 +1384,14 @@
             titleFont: { size: 11, family: 'Inter, sans-serif' },
             bodyFont:  { size: 11, family: 'Inter, sans-serif' },
             callbacks: {
+              title: function(items){
+                if (!items.length) return '';
+                var y = parseInt(items[0].label, 10);
+                return (y - 4) + ' → ' + y + ' (4-year window)';
+              },
               label: function(c){
-                var v = c.parsed.y;
-                var formatted;
-                if (v >= 1e9)      formatted = '$' + (v/1e9).toFixed(1) + 'B';
-                else if (v >= 1e6) formatted = '$' + (v/1e6).toFixed(1) + 'M';
-                else if (v >= 1e3) formatted = '$' + (v/1e3).toFixed(0) + 'K';
-                else               formatted = '$' + Math.round(v).toLocaleString();
-                return c.dataset.label + ': ' + formatted;
+                if (c.parsed.y == null) return c.dataset.label + ': —';
+                return c.dataset.label + ': ' + c.parsed.y.toFixed(1) + '%';
               }
             }
           }
@@ -1366,36 +1399,19 @@
         scales: {
           x: {
             grid: { color: 'rgba(220,200,170,0.04)' },
-            ticks: {
-              color: 'rgba(220,200,170,0.45)',
-              font: { size: 11, family: 'Inter, sans-serif' },
-              maxRotation: 0,
-              autoSkip: true, maxTicksLimit: 9,
-              callback: function(v, idx){
-                var label = this.getLabelForValue(idx);
-                if (!label) return '';
-                // Show year only — drop the -MM suffix
-                return label.split('-')[0];
-              }
-            },
+            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' }, maxRotation: 0 },
+            title: { display: true, text: 'End year of 4-year window',
+                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
             border: { display: false }
           },
           y: {
-            type: 'logarithmic', min: 5000,
             grid: { color: 'rgba(220,200,170,0.04)' },
-            ticks: {
-              color: 'rgba(220,200,170,0.45)',
-              font: { size: 11, family: 'Inter, sans-serif' },
-              callback: function(v){
-                var marks = [10000, 100000, 1000000, 10000000];
-                if (marks.indexOf(v) === -1) return '';
-                if (v >= 1e6) return '$' + (v/1e6) + 'M';
-                return '$' + (v/1000) + 'K';
-              }
-            },
-            title: { display: true, text: '$10K invested in 2010 grows to ...',
+            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' },
+                     callback: function(v){ return v + '%'; } },
+            title: { display: true, text: 'Annualized return over the window',
                      color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
-            border: { display: false }
+            border: { display: false },
+            beginAtZero: true
           }
         },
         layout: { padding: { top: 4, right: 12, bottom: 0, left: 0 } }
@@ -1403,11 +1419,29 @@
     });
   }
 
+  // Live-fetch hook — when fetchTodayPrice resolves, recompute the
+  // 2026 bitcoin endpoint and update that single point on the chart.
+  // SP500/NDQ don't need updating since they use the latest data
+  // point (which is static between monthly data refreshes).
+  function wireLiveUpdate() {
+    if (typeof fetchTodayPrice !== 'function') return;
+    fetchTodayPrice(function(/* price, source */){
+      if (!chartInstance || !chartInstance.data) return;
+      var s = buildSeries();   // recompute (BTC_ANNUAL is unchanged; only
+                               // the current-year endpoint reads TODAY_PRICE)
+      chartInstance.data.datasets[0].data = s.btc;
+      chartInstance.update('none');
+    });
+  }
+
   function init() {
     if (hasInited) return;
     hasInited = true;
     requestAnimationFrame(function(){
-      try { buildChart(); }
+      try {
+        buildChart();
+        wireLiveUpdate();
+      }
       catch (err) {
         var fb = document.querySelector('#section-bvsm .gallery-chart-fallback');
         if (fb) {

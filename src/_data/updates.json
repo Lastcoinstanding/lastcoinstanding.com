@@ -3,6 +3,12 @@
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
+    "summary": "Gallery Chart 7 rebuilt: replaced the $10K-invested-in-2010 lump-sum wealth chart (structurally a cherry-pick of the earliest possible start year, implying returns that won't repeat) with a rolling 4-year CAGR comparison — bitcoin vs. S&P 500 TR vs. NASDAQ-100 TR across every 4-year window from 2017 to 2026. The new chart shows bitcoin's returns declining over time (as the Power Law projects) but still exceeding both equity comparators in every window — even the cycle-top-to-cycle-low 2021-2025 window where bitcoin's 16.7% beat the S&P's 11.1%"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
     "summary": "Gallery polish pass: stronger section dividers between charts so the eye gets a clear break between arguments (was near-invisible at 4% opacity, now 10%); Chart 2 title now reads 'Bitcoin's Power Law Implied CAGR vs. the S&P 500' (was missing 'Bitcoin's' so the comparison wasn't explicit); Chart 2 convergence footnote rewritten with concrete claims ('more than 2× the S&P 500's 10% benchmark', 'even out to 2150 still sits above 10%') replacing vaguer earlier wording"
   },
   {
