@@ -1,5 +1,11 @@
 [
   {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "New section: The Gallery — a visual index of charts across the site (placeholder for now; first chart cards land shortly). Nav: Tools renamed to Calculators"
+  },
+  {
     "date": "2026-05-29",
     "display": "5/29/26",
     "page": "/the-bitcoin-retirement.html",

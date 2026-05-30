@@ -280,7 +280,8 @@ h1, h2, h3 {
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
             </div>
         </div>
-        <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Tools</a>
+        <a href="/the-gallery.html"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
+        <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
     </div>
         <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
@@ -298,7 +299,8 @@ h1, h2, h3 {
 {%- for e in explorations %}{% if e.category == 'numbers' %}
         <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}</a>
 {%- endif %}{%- endfor %}
-        <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Tools</a>
+        <a href="/the-gallery.html"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
+        <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
         <div class="mobile-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
     </div>
@@ -369,7 +371,8 @@ h1, h2, h3 {
         </div>
         <div class="footer-nav-section">
             <div class="footer-nav-label">Site</div>
-            <a href="/calculators.html">Tools</a>
+            <a href="/the-gallery.html">The Gallery</a>
+            <a href="/calculators.html">Calculators</a>
             <a href="/about.html">About</a>
         </div>
     </nav>

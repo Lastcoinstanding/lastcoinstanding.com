@@ -1,0 +1,32 @@
+---
+layout: base.njk
+permalink: /the-gallery.html
+slug: the-gallery
+title: The Gallery
+description: A visual index of charts and patterns across Last Coin Standing — a scroll-through view of the most interesting visuals from every exploration, each linking back to its source argument.
+eleventyComputed:
+  page_styles: "{% include '_pageassets/the-gallery.css' %}"
+---
+
+{# ═══════════════════════════════════════════════════════════════════
+   /the-gallery — visual index of charts across the site
+
+   v1 (this commit): polished placeholder so the nav link resolves
+   cleanly. The full gallery (chart cards reusing concept-card grammar,
+   live Power Law channel hero, static thumbnails for the rest) lands
+   in a follow-up commit.
+
+   The placeholder is intentionally minimal — a single intro section
+   matching the page chrome of other "constellation" pages on the site,
+   without inventing visual patterns that the full version will then
+   need to replace.
+   ═══════════════════════════════════════════════════════════════════ #}
+
+<div class="gallery-hero">
+    <div class="gallery-hero-inner">
+        <p class="gallery-eyebrow">Visual index</p>
+        <h1 class="gallery-title">The Gallery</h1>
+        <p class="gallery-tagline">A scroll-through view of the most interesting charts and visuals across the site &mdash; the shapes of the arguments, distilled.</p>
+        <p class="gallery-coming-soon">In active curation. The first cards land shortly &mdash; the Power Law channel anchors the set. In the meantime, jump straight to <a href="/the-power-law.html">Bitcoin &amp; the Power Law</a>.</p>
+    </div>
+</div>

@@ -1,0 +1,72 @@
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   /the-gallery — page styles (v1: placeholder hero only)
+
+   Reuses canonical tokens from base styles (--amber, --amber-dim,
+   --text, --text-dim, --text-muted, --bg-card). Cormorant for title;
+   Inter for prose. Geometry matches other "constellation" landing
+   pages so the visual cadence is consistent across the site.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.gallery-hero {
+    width: 100%;
+    padding: 5rem 0 4rem;
+    background: linear-gradient(180deg,
+        var(--bg) 0%,
+        rgba(224,148,34,0.025) 60%,
+        var(--bg) 100%);
+}
+.gallery-hero-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    text-align: center;
+}
+.gallery-eyebrow {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--amber-dim);
+    margin: 0 0 1rem;
+}
+.gallery-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.4rem, 5vw, 3.4rem);
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 1.2rem;
+    letter-spacing: -0.5px;
+}
+.gallery-tagline {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    margin: 0 auto 2rem;
+    max-width: 580px;
+}
+.gallery-coming-soon {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+    margin: 0 auto;
+    max-width: 540px;
+    font-style: italic;
+}
+.gallery-coming-soon a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--amber-dim);
+}
+.gallery-coming-soon a:hover {
+    color: var(--amber);
+    border-bottom-style: solid;
+}
+
+@media (max-width: 768px) {
+    .gallery-hero { padding: 3.5rem 0 3rem; }
+    .gallery-hero-inner { padding: 0 1.25rem; }
+}
+</style>
