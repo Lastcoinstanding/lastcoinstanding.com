@@ -5,7 +5,7 @@ slug: index
 eleventyComputed:
   head_extras: "{% include '_pageassets/index-head.html' %}"
   page_styles: "{% include '_pageassets/index.css' %}"
-  page_scripts: "{% include '_pageassets/index.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/index.js' %}"
 ---
 <!-- HERO WITH BACKGROUND IMAGE -->
 <section class="hero">
@@ -18,6 +18,20 @@ eleventyComputed:
         <p class="tagline">Bitcoin education through contrast and clarity</p>
         <p class="intro">Understanding money requires seeing what makes it work - and what makes it break. Each interactive exploration below examines a different dimension of Bitcoin through the lens of fundamental tradeoffs, irreducible design, and philosophical contrast.</p>
     </div>
+</section>
+
+
+<!-- BITCOIN TICKER STRIP — price + ×trend + state, fed by shared/power-law-data.js -->
+<section class="bitcoin-ticker" aria-label="Bitcoin price relative to the Power Law channel">
+    <a class="ticker-inner" href="/the-power-law.html#channel">
+        <span class="ticker-glyph" aria-hidden="true">&#8383;</span>
+        <span class="ticker-price" id="tickerPrice">&mdash;</span>
+        <span class="ticker-sep" aria-hidden="true">&middot;</span>
+        <span class="ticker-multiple" id="tickerMultiple">&mdash;</span>
+        <span class="ticker-sep" aria-hidden="true">&middot;</span>
+        <span class="ticker-state" id="tickerState">&mdash;</span>
+        <span class="ticker-cta">see the channel &rarr;</span>
+    </a>
 </section>
 
 

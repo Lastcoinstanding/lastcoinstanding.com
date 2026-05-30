@@ -117,3 +117,84 @@
         });
     });
 })();
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  BITCOIN TICKER STRIP
+//
+//  Slim live data point sitting between the hero and the Recent
+//  Updates strip. Single line: ₿ price · ×trend · state → CTA.
+//
+//  Reads from the shared/power-law-data.js module (TODAY_PRICE,
+//  TODAY_DAYS, plPrice, fetchTodayPrice) so the homepage and the four
+//  Power Law chart pages all agree on "today" — one source of truth.
+//
+//  First paint uses the seeded TODAY_PRICE (last PL_DATA monthly
+//  sample) so the ticker is NEVER empty, even before the live fetch
+//  resolves or if the fetch fails outright. The live fetch then
+//  replaces the seed if it succeeds.
+//
+//  State classifier is the multi-state band model from PL_FLOOR=0.42
+//  through trend=1.0 to PL_CEIL=3.0, with band boundaries chosen in
+//  log space (midpoints in log between adjacent anchors) so the
+//  classification is symmetric around the log-scale channel. Two
+//  defensive extreme states ('below floor', 'above ceiling') cover
+//  the rare cases where the spot price exceeds the channel — these
+//  basically never display in normal market conditions but are
+//  preferable to silently showing 'near floor' / 'near ceiling' when
+//  the multiplier has actually exited the band.
+// ═══════════════════════════════════════════════════════════════════
+(function(){
+    var priceEl = document.getElementById('tickerPrice');
+    var multEl  = document.getElementById('tickerMultiple');
+    var stateEl = document.getElementById('tickerState');
+    if (!priceEl || !multEl || !stateEl) return;
+
+    function formatPrice(p) {
+        if (!isFinite(p) || p <= 0) return '$\u2014';
+        if (p >= 1000) return '$' + (p / 1000).toFixed(1) + 'K';
+        return '$' + Math.round(p).toLocaleString();
+    }
+
+    // Boundaries in log space: midpoints between PL_FLOOR (0.42),
+    // trend (1.0), and PL_CEIL (3.0).
+    //   log-midpoint(floor, trend)  ≈ 0.648  →  rounded to 0.65
+    //   log-midpoint(trend, ceil)   ≈ 1.732  →  rounded to 1.80
+    // The 'near-X' bands are the ±15% windows around each anchor.
+    function classifyState(m) {
+        if (!isFinite(m) || m <= 0) return '\u2014';
+        if (m < 0.42) return 'below floor';
+        if (m < 0.65) return 'near floor';
+        if (m < 0.85) return 'below trend';
+        if (m < 1.15) return 'near trend';
+        if (m < 1.80) return 'above trend';
+        if (m <= 3.0) return 'near ceiling';
+        return 'above ceiling';
+    }
+
+    function render(price) {
+        var trend = (typeof plPrice === 'function' && typeof TODAY_DAYS === 'number')
+            ? plPrice(TODAY_DAYS) : null;
+        if (!trend || !isFinite(trend) || trend <= 0) {
+            priceEl.textContent = formatPrice(price);
+            multEl.textContent  = '\u2014';
+            stateEl.textContent = '\u2014';
+            return;
+        }
+        var mult = price / trend;
+        priceEl.textContent = formatPrice(price);
+        multEl.textContent  = mult.toFixed(2) + '\u00d7 trend';
+        stateEl.textContent = classifyState(mult);
+    }
+
+    // First paint: seeded value from PL_DATA (always present, never
+    // empty). The shared module exposes TODAY_PRICE at this point.
+    if (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0) render(TODAY_PRICE);
+
+    // Live fetch: replaces the seed if the call succeeds; falls back
+    // silently to the seed if it doesn't. fetchTodayPrice handles
+    // both branches via the (price, source) callback.
+    if (typeof fetchTodayPrice === 'function') {
+        fetchTodayPrice(function(p /*, source */) { render(p); });
+    }
+})();

@@ -559,3 +559,78 @@ footer a:hover { text-decoration: underline; }
     .updates-scroller { max-height: 7.5rem; }
     .update-row { font-size: 0.82rem; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   BITCOIN TICKER STRIP — fed by shared/power-law-data.js
+
+   Sits between the hero and the Recent Updates strip. Visually quieter
+   than the updates strip (lighter divider, no background gradient) so
+   the two thin strips don't compete or stack-look as one heavy band.
+   Single line on desktop; wraps to two lines on narrow phones with the
+   CTA on its own row. Whole strip is one big <a> so the tap target is
+   generous on mobile.
+   ═══════════════════════════════════════════════════════════════════ */
+.bitcoin-ticker {
+    width: 100%;
+    background: rgba(247,147,26,0.02);
+    border-top: 1px solid rgba(224,148,34,0.08);
+    border-bottom: 1px solid rgba(224,148,34,0.08);
+    padding: 0.7rem 0;
+}
+.ticker-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.55rem;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    text-decoration: none;
+    color: #888;
+    flex-wrap: wrap;
+}
+.ticker-inner:hover { color: #aaa; }
+.ticker-inner:hover .ticker-cta { color: var(--amber); }
+.ticker-glyph {
+    color: var(--amber);
+    font-weight: 600;
+    font-size: 1.05rem;
+    line-height: 1;
+    margin-right: 0.05rem;
+}
+.ticker-price {
+    color: #ccc;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.2px;
+}
+.ticker-multiple {
+    color: #bbb;
+    font-variant-numeric: tabular-nums;
+}
+.ticker-state {
+    color: #888;
+    font-style: italic;
+}
+.ticker-sep {
+    color: #555;
+}
+.ticker-cta {
+    color: var(--amber-dim);
+    font-weight: 500;
+    letter-spacing: 0.15px;
+    transition: color 0.18s;
+    margin-left: 0.15rem;
+}
+
+@media (max-width: 560px) {
+    .ticker-inner {
+        font-size: 0.85rem;
+        gap: 0.45rem;
+        padding: 0 1rem;
+    }
+}
