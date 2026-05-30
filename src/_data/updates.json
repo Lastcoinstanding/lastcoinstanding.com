@@ -3,6 +3,12 @@
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
+    "summary": "The Gallery rebuilt as a vertical scroll-through of full charts (was a teaser card grid). Chart 1 of 10 live: the Power Law channel in ±2y default view with All-time / Near / Planning toggle. Nine more charts arriving in three follow-up commits"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
     "summary": "Gallery palette finally rendering correctly (real fix: nested <style> tags in page CSS were breaking the :root variable block). Calculators featured tiles now have matched heights"
   },
   {
