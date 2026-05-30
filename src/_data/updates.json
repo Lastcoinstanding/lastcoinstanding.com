@@ -2,6 +2,12 @@
   {
     "date": "2026-05-30",
     "display": "5/30/26",
+    "page": "/calculators.html",
+    "summary": "Calculators page: featured row now leads with The Bitcoin Retirement (with its live mini-preview) — Heatmap moved out, since it's not strictly a calculator and already lives in The Gallery"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
     "page": "/the-gallery.html",
     "summary": "Gallery polish: page now renders against the proper dark palette (body background + CSS variables were missing on first ship). Calculators page H1 updated to match the nav label"
   },

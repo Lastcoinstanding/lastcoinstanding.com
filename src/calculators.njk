@@ -8,30 +8,33 @@ eleventyComputed:
   page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/calculators-minis.js' %}"
 ---
 {# ═══════════════════════════════════════════════════════════════════
-   /calculators — Pathway A v1: tools gallery
+   /calculators — Pathway A v2: calculators gallery
 
    Restructured from a 5-tile text-list into a polished gallery that
-   functions as the canonical entry point for every interactive tool
-   on the site. JM's framing: 'each tile shows an actual live
-   thumbnail of the tool's heart (mini heatmap, mini chart, mini
-   retirement curve…) with an Open button.' This v1 ships the
-   gallery structure plus ONE live preview (the heatmap, as the
-   showcase proof-of-concept). Other tiles use polished SVG
-   illustrations; subsequent iterations can promote them to live
-   renders one at a time.
+   functions as the canonical entry point for every interactive
+   calculator on the site. JM's framing: 'each tile shows an actual
+   live thumbnail of the tool's heart (mini heatmap, mini chart, mini
+   retirement curve…) with an Open button.' v1 shipped one live
+   preview (Heatmap) as proof-of-concept. v2 expanded to 7 live
+   renderers in calculators-minis.js. The page nav label was also
+   renamed Tools → Calculators in commit 132f79a / 0148ba3.
 
    Hierarchy:
-   - Featured row (2 tiles, large): Heatmap (live) + BvSM (chart-SVG)
-   - Tools grid (10 tiles, 3-col on desktop): all other Numbers-tier
-     interactive tools + the two Arguments-tier interactive ones
-     (Half-Life, Melting Ice Cube). The Calculators page becomes the
-     comprehensive tools surface; the previous footer 'nav-hint'
-     directing readers to The Numbers / The Arguments for the rest
-     becomes obsolete since everything's right here.
+   - Featured row (2 tiles, large): The Bitcoin Retirement (live mini
+     retirement curve) + Bitcoin vs. The Stock Market (live mini
+     3-line wealth chart). These are the two highest-leverage
+     personal-decision tools.
+   - Tools grid (9 tiles, 3-col on desktop): the remaining
+     Numbers-tier calculators plus the two Arguments-tier interactive
+     ones (Half-Life, Melting Ice Cube).
 
-   Includes previously-missing tools: /heatmap and
-   /bitcoin-vs-the-stock-market (calculator section). Both were
-   linked elsewhere on the site but didn't appear on this hub.
+   History note: through commit 0148ba3 the featured row paired the
+   Heatmap with BvSM. The Heatmap is not strictly a calculator (no
+   inputs that drive outputs — it's a static visualization grid),
+   and with The Gallery now serving as the visual-showcase surface,
+   it's better-suited there. The Bitcoin Retirement took its
+   featured slot in commit (this one) — the live mini renderer
+   already existed in calculators-minis.js for it.
 
    Notes for future iterations:
    - Live preview pattern is established by #mini-heatmap →
@@ -54,25 +57,35 @@ eleventyComputed:
   </header>
 
   {# ═══ FEATURED ROW ════════════════════════════════════════════════
-     Two tiles, side-by-side on desktop. The Heatmap tile carries a
-     live mini-render targeting #mini-heatmap (calculators-minis.js).
-     The BvSM tile uses a static-but-evocative SVG showing three
-     ascending curves on a log-grid — visually says 'wealth
-     comparison over time' without needing live data on this page.
+     Two tiles, side-by-side on desktop. Both tiles carry live mini-
+     renders fed by calculators-minis.js — #mini-retirement and
+     #mini-bvsm-chart respectively. These are the two highest-leverage
+     personal-decision tools on the site, hence the featured placement:
+     'when can I retire?' and 'BTC vs the stock market.'
+
+     History: through commit 0148ba3 the featured row paired the
+     Heatmap with BvSM. Heatmap was promoted to featured as a
+     proof-of-concept for live mini-renders (it shipped first). With
+     The Gallery now serving as the visual-showcase surface for
+     interesting charts, Heatmap is better-suited there (where it
+     remains as a card) than here on /calculators — strictly
+     speaking, it isn't a calculator. The Bitcoin Retirement takes
+     its featured slot; it already had a live mini renderer wired
+     in calculators-minis.js, just sitting in the regular grid.
      ═════════════════════════════════════════════════════════════ #}
   <section class="calc-row calc-row-featured" aria-labelledby="featured-heading">
     <h2 id="featured-heading" class="calc-row-heading">Featured</h2>
 
     <div class="calc-tile-grid calc-tile-grid-featured">
 
-      {# Tile 1 — The Bitcoin Heatmap (LIVE preview) #}
-      <a href="/heatmap.html" class="calc-tile calc-tile-featured" aria-label="Open The Bitcoin Heatmap">
+      {# Tile 1 — The Bitcoin Retirement (LIVE preview) #}
+      <a href="/the-bitcoin-retirement.html#calculator" class="calc-tile calc-tile-featured" aria-label="Open The Bitcoin Retirement calculator">
         <div class="calc-tile-preview">
-          <div id="mini-heatmap"></div>
+          <div id="mini-retirement"></div>
         </div>
         <div class="calc-tile-body">
-          <h3 class="calc-tile-name">The Bitcoin Heatmap</h3>
-          <p class="calc-tile-tagline">Every monthly entry, every common horizon &mdash; bitcoin&rsquo;s outperformance against the S&amp;P 500 and NASDAQ-100 in one grid.</p>
+          <h3 class="calc-tile-name">The Bitcoin Retirement</h3>
+          <p class="calc-tile-tagline">When can I retire on bitcoin? Drag the sliders &mdash; see how much you need, when, and on what income.</p>
           <span class="calc-tile-cta">Open &rarr;</span>
         </div>
       </a>
@@ -103,18 +116,6 @@ eleventyComputed:
     <h2 id="tools-heading" class="calc-row-heading">All calculators</h2>
 
     <div class="calc-tile-grid">
-
-      {# Retirement — clock-face icon, the planning question #}
-      <a href="/the-bitcoin-retirement.html#calculator" class="calc-tile">
-        <div class="calc-tile-preview">
-          <div id="mini-retirement"></div>
-        </div>
-        <div class="calc-tile-body">
-          <h3 class="calc-tile-name">The Bitcoin Retirement</h3>
-          <p class="calc-tile-tagline">When can I retire on bitcoin? Drag the sliders &mdash; see how much you need, when, and on what income.</p>
-          <span class="calc-tile-cta">Open &rarr;</span>
-        </div>
-      </a>
 
       {# Disciplined Rebalancing — oscillating wave + thresholds #}
       <a href="/disciplined-rebalancing.html#calculator" class="calc-tile">
