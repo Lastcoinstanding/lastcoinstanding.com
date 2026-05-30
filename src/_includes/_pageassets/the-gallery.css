@@ -8,6 +8,38 @@
    cards reflow into a 1-3 col auto-fit grid below.
    ═══════════════════════════════════════════════════════════════════ */
 
+/* ─── CSS variables ──────────────────────────────────────────────────
+   Each page on this site is responsible for declaring its own token
+   set — there's no global :root block in base.njk by design (cream-bg
+   essay pages can override). These mirror the canonical values from
+   src/_includes/_pageassets/index.css. */
+:root {
+    --bg:          #0a0908;
+    --bg-card:     #111010;
+    --border:      #1e1c1a;
+    --orange:      #F7931A;
+    --orange-dim:  rgba(247,147,26,0.08);
+    --amber:       #e09422;
+    --amber-dim:   #c97f1a;
+    --text:        #d8d2ca;
+    --text-dim:    #908880;
+    --text-muted:  rgba(220,200,170,0.42);
+    --text-bright: #f2eee8;
+}
+
+/* ─── Body invariants ────────────────────────────────────────────────
+   Site-wide convention: each page sets its own body { background, color }
+   to match its palette. Without this rule the page renders against the
+   user-agent default (white in light mode, dark grey in dark mode) and
+   any translucent overlay — including the .gallery-card rgba background
+   and the auto-injected .page-share buttons — shows through wrong. */
+body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
 /* ─── Hero ─── */
 .gallery-hero {
     width: 100%;
