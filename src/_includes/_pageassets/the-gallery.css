@@ -83,7 +83,11 @@ body {
 .gallery-section {
     width: 100%;
     padding: 4.5rem 0;
-    border-top: 1px solid rgba(255,255,255,0.04);
+    /* Section divider — bumped from 0.04 to 0.10 per reader feedback.
+       The earlier near-invisible line let charts bleed into each other
+       visually; a slightly stronger separator gives each chart room
+       to land as its own argument before the next one starts. */
+    border-top: 1px solid rgba(232,224,210,0.10);
 }
 .gallery-section:first-of-type {
     border-top: none;

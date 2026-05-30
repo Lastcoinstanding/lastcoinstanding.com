@@ -3,6 +3,12 @@
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
+    "summary": "Gallery polish pass: stronger section dividers between charts so the eye gets a clear break between arguments (was near-invisible at 4% opacity, now 10%); Chart 2 title now reads 'Bitcoin's Power Law Implied CAGR vs. the S&P 500' (was missing 'Bitcoin's' so the comparison wasn't explicit); Chart 2 convergence footnote rewritten with concrete claims ('more than 2× the S&P 500's 10% benchmark', 'even out to 2150 still sits above 10%') replacing vaguer earlier wording"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
     "summary": "Gallery Commit C: three more charts live. Global housing affordability across HK / Sydney / Vancouver / London / US (Demographia ratios), BTC needed for retirement decay curve (4% rule, anchors at year 0/+10/+20/+30), and $10K invested in 2010 — bitcoin vs S&P 500 TR vs NASDAQ-100 TR. Seven charts done; three to go in the final commit"
   },
   {
