@@ -124,10 +124,30 @@
   padding: 1.2rem;
 }
 
-/* Featured tile preview — taller */
+/* Featured tile preview — fixed height (was min-height pre-2026-05-30).
+   The two featured mini-renders ship with very different viewBox
+   aspect ratios (renderMiniRetirement is 200×120 ≈ 1.67:1; the BvSM
+   chart is 400×110 ≈ 3.64:1), so at the same width the Retirement
+   render is roughly twice as tall. Pinning height instead of min-
+   height lets both previews occupy the same vertical box; the SVGs
+   sit centered within via object-fit:contain (declared on the SVG
+   rule below), the wider BvSM chart gets vertical breathing room
+   rather than stretching to fill. */
 .calc-tile-featured .calc-tile-preview {
-  min-height: 200px;
+  height: 240px;
   padding: 1.5rem 1.5rem 1.3rem;
+}
+.calc-tile-featured .calc-tile-preview > div {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.calc-tile-featured .calc-tile-preview svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* Tools tile preview — shorter than featured but taller than v1
