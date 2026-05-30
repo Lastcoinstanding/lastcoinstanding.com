@@ -3,23 +3,33 @@ layout: base.njk
 permalink: /the-gallery.html
 slug: the-gallery
 title: The Gallery
-description: A visual index of charts and patterns across Last Coin Standing — a scroll-through view of the most interesting visuals from every exploration, each linking back to its source argument.
+description: A visual index of the most interesting charts and patterns from across Last Coin Standing. The shapes of the arguments, distilled.
 eleventyComputed:
+  head_extras: "{% include '_pageassets/the-gallery-head.html' %}"
   page_styles: "{% include '_pageassets/the-gallery.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/the-gallery.js' %}"
 ---
 
 {# ═══════════════════════════════════════════════════════════════════
    /the-gallery — visual index of charts across the site
 
-   v1 (this commit): polished placeholder so the nav link resolves
-   cleanly. The full gallery (chart cards reusing concept-card grammar,
-   live Power Law channel hero, static thumbnails for the rest) lands
-   in a follow-up commit.
+   v1 layout:
+   - Hero (intro + tagline)
+   - Live hero card: Power Law channel (real Chart.js render, lazy-init
+     via IntersectionObserver per TECH_DEBT §6.14 hidden-canvas rules)
+   - Grid of 7 static "preview coming" cards with thematic SVG art
 
-   The placeholder is intentionally minimal — a single intro section
-   matching the page chrome of other "constellation" pages on the site,
-   without inventing visual patterns that the full version will then
-   need to replace.
+   Static-card thumbnails are SVG placeholders rather than rendered PNGs
+   for v1 — visually polished, brand-aligned, but honest about being
+   v1 art. Follow-up: extend scripts/build-og-images.py to also export
+   real chart PNGs into src/img/gallery/, then swap each card's SVG for
+   an <img> pointing at the rendered PNG (TECH_DEBT item, deferred from
+   this commit).
+
+   Card grammar: <a class="gallery-card"> wrapping a top thumbnail and
+   a bottom .card-meta block (category eyebrow + Cormorant title +
+   Inter description). Whole card is the link target — visual cue is
+   amber border + hover-lift, same as the homepage concept-card pattern.
    ═══════════════════════════════════════════════════════════════════ #}
 
 <div class="gallery-hero">
@@ -27,6 +37,227 @@ eleventyComputed:
         <p class="gallery-eyebrow">Visual index</p>
         <h1 class="gallery-title">The Gallery</h1>
         <p class="gallery-tagline">A scroll-through view of the most interesting charts and visuals across the site &mdash; the shapes of the arguments, distilled.</p>
-        <p class="gallery-coming-soon">In active curation. The first cards land shortly &mdash; the Power Law channel anchors the set. In the meantime, jump straight to <a href="/the-power-law.html">Bitcoin &amp; the Power Law</a>.</p>
     </div>
 </div>
+
+<section class="gallery-grid-wrap" aria-label="Chart cards">
+    <div class="gallery-grid-inner">
+
+        {# ─── Live hero card: Power Law channel ─── #}
+        <a href="/the-power-law.html#channel" class="gallery-card gallery-card-hero" data-card="power-law">
+            <div class="card-thumb card-thumb-live">
+                <div class="live-chart-wrap">
+                    <canvas id="galleryChannelChart" aria-label="Power Law channel chart (live)"></canvas>
+                </div>
+                <div class="live-chart-fallback" aria-hidden="true">
+                    <p class="chart-loading">Loading the channel&hellip;</p>
+                </div>
+                <span class="card-live-badge">LIVE</span>
+            </div>
+            <div class="card-meta">
+                <p class="card-category">The Numbers</p>
+                <h3 class="card-title">Bitcoin &amp; the Power Law</h3>
+                <p class="card-desc">Bitcoin&rsquo;s price plotted on a log-log channel anchored to the trend curve and bounded by a floor and a ceiling. The structural insight that underpins most of the site&rsquo;s quantitative arguments.</p>
+                <span class="card-cta">Open exploration &rarr;</span>
+            </div>
+        </a>
+
+        {# ─── Static card: Disciplined Rebalancing tax-rate band ─── #}
+        <a href="/disciplined-rebalancing.html" class="gallery-card" data-card="rebalancing">
+            <div class="card-thumb card-thumb-static">
+                <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="280" height="160" fill="rgba(15,12,8,0.6)"/>
+                    {# Five stacked tax-rate bands, low to high #}
+                    <rect x="20" y="28"  width="240" height="20" fill="rgba(247,147,26,0.10)" rx="2"/>
+                    <rect x="20" y="52"  width="240" height="20" fill="rgba(247,147,26,0.22)" rx="2"/>
+                    <rect x="20" y="76"  width="240" height="20" fill="rgba(247,147,26,0.36)" rx="2"/>
+                    <rect x="20" y="100" width="240" height="20" fill="rgba(247,147,26,0.55)" rx="2"/>
+                    <rect x="20" y="124" width="240" height="20" fill="rgba(247,147,26,0.78)" rx="2"/>
+                    <text x="140" y="18" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(220,200,170,0.55)" letter-spacing="1.5">TAX-RATE CHANNEL</text>
+                </svg>
+            </div>
+            <div class="card-meta">
+                <p class="card-category">The Numbers</p>
+                <h3 class="card-title">Disciplined Rebalancing</h3>
+                <p class="card-desc">A tax-rate band chart that maps personal effective tax rate against the Power Law multiplier, showing when a rebalance pays for its own friction.</p>
+                <span class="card-cta">Open exploration &rarr;</span>
+            </div>
+        </a>
+
+        {# ─── Static card: The Bitcoin Heatmap ─── #}
+        <a href="/heatmap.html" class="gallery-card" data-card="heatmap">
+            <div class="card-thumb card-thumb-static">
+                <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="280" height="160" fill="rgba(15,12,8,0.6)"/>
+                    {# Heatmap-style grid: 12 cols × 6 rows of cells with varying intensities #}
+                    <g>
+                        {%- set intensities = [0.10, 0.15, 0.22, 0.35, 0.50, 0.65, 0.78, 0.65, 0.50, 0.35, 0.22, 0.12] -%}
+                        {%- for r in range(0, 6) -%}
+                            {%- for c in range(0, 12) -%}
+                                {%- set base = intensities[c] -%}
+                                {%- set rOff = r * 0.08 -%}
+                                {%- set v = base - rOff -%}
+                                {%- if v < 0.05 -%}{%- set v = 0.05 -%}{%- endif -%}
+                                <rect x="{{ 20 + c * 20 }}" y="{{ 24 + r * 20 }}" width="18" height="18" fill="rgba(247,147,26,{{ v }})" rx="1"/>
+                            {%- endfor -%}
+                        {%- endfor -%}
+                    </g>
+                    <text x="140" y="16" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(220,200,170,0.55)" letter-spacing="1.5">CYCLE HEATMAP</text>
+                </svg>
+            </div>
+            <div class="card-meta">
+                <p class="card-category">The Numbers</p>
+                <h3 class="card-title">The Bitcoin Heatmap</h3>
+                <p class="card-desc">A monthly heatmap of bitcoin&rsquo;s monthly returns across every year since 2010 &mdash; a visual phase-portrait of cycle behavior.</p>
+                <span class="card-cta">Open exploration &rarr;</span>
+            </div>
+        </a>
+
+        {# ─── Static card: BvRE seesaw ─── #}
+        <a href="/bitcoin-vs-real-estate.html" class="gallery-card" data-card="bvre-seesaw">
+            <div class="card-thumb card-thumb-static">
+                <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="280" height="160" fill="rgba(15,12,8,0.6)"/>
+                    {# Seesaw: tilted bar with BTC weight high-left and house weight low-right #}
+                    <line x1="50" y1="60" x2="230" y2="110" stroke="rgba(247,147,26,0.55)" stroke-width="2.2" stroke-linecap="round"/>
+                    {# Fulcrum #}
+                    <polygon points="140,120 130,140 150,140" fill="rgba(120,100,80,0.5)"/>
+                    {# BTC weight (left/up) #}
+                    <circle cx="58" cy="52" r="13" fill="rgba(247,147,26,0.8)"/>
+                    <text x="58" y="56" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0a0908">&#8383;</text>
+                    {# House weight (right/down) #}
+                    <g transform="translate(208, 88)">
+                        <path d="M -14 8 L 0 -6 L 14 8 L 14 18 L -14 18 Z" fill="rgba(220,200,170,0.45)" stroke="rgba(220,200,170,0.65)" stroke-width="1"/>
+                        <rect x="-3" y="6" width="6" height="12" fill="rgba(15,12,8,0.6)"/>
+                    </g>
+                    <text x="140" y="22" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(220,200,170,0.55)" letter-spacing="1.5">HOME PRICED IN BTC</text>
+                </svg>
+            </div>
+            <div class="card-meta">
+                <p class="card-category">The Numbers</p>
+                <h3 class="card-title">BTC vs. Real Estate</h3>
+                <p class="card-desc">Bitcoin priced as a denominator: how many BTC the average home costs over time, and what that ratio implies about which asset is doing the work.</p>
+                <span class="card-cta">Open exploration &rarr;</span>
+            </div>
+        </a>
+
+        {# ─── Static card: BvRE Global Affordability ─── #}
+        <a href="/bitcoin-vs-real-estate.html#affordability" class="gallery-card" data-card="bvre-affordability">
+            <div class="card-thumb card-thumb-static">
+                <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="280" height="160" fill="rgba(15,12,8,0.6)"/>
+                    {# Five houses in descending size, mimicking the affordability map #}
+                    {%- set sizes = [38, 30, 24, 18, 14] -%}
+                    {%- set xs = [44, 92, 138, 180, 218] -%}
+                    {%- set opacities = [0.85, 0.65, 0.50, 0.38, 0.28] -%}
+                    {%- for i in range(0, 5) -%}
+                        {%- set s = sizes[i] -%}
+                        {%- set x = xs[i] -%}
+                        {%- set op = opacities[i] -%}
+                        <g transform="translate({{ x }}, {{ 110 - (s / 2) }})">
+                            <path d="M {{ -s/2 }} {{ s/3 }} L 0 {{ -s/2 }} L {{ s/2 }} {{ s/3 }} L {{ s/2 }} {{ s/2 + 4 }} L {{ -s/2 }} {{ s/2 + 4 }} Z" fill="rgba(247,147,26,{{ op }})" stroke="rgba(247,147,26,{{ op + 0.15 }})" stroke-width="1"/>
+                        </g>
+                    {%- endfor -%}
+                    {# Baseline #}
+                    <line x1="20" y1="135" x2="260" y2="135" stroke="rgba(220,200,170,0.18)" stroke-width="1"/>
+                    <text x="140" y="22" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(220,200,170,0.55)" letter-spacing="1.5">GLOBAL AFFORDABILITY</text>
+                </svg>
+            </div>
+            <div class="card-meta">
+                <p class="card-category">The Numbers</p>
+                <h3 class="card-title">Global Affordability</h3>
+                <p class="card-desc">The same home, priced in BTC, across years &mdash; visualizing how a bitcoin-denominated balance sheet rewrites what feels &ldquo;expensive.&rdquo;</p>
+                <span class="card-cta">Open exploration &rarr;</span>
+            </div>
+        </a>
+
+        {# ─── Static card: BvSM ─── #}
+        <a href="/bitcoin-vs-the-stock-market.html" class="gallery-card" data-card="bvsm">
+            <div class="card-thumb card-thumb-static">
+                <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="280" height="160" fill="rgba(15,12,8,0.6)"/>
+                    {# Two diverging curves: BTC rising sharply, SP500 rising mildly #}
+                    <path d="M 30 130 Q 90 120 140 92 T 250 22" stroke="rgba(247,147,26,0.85)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                    <path d="M 30 130 Q 90 122 140 110 T 250 78"  stroke="rgba(180,200,210,0.55)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                    {# End-point dots #}
+                    <circle cx="250" cy="22" r="3.5" fill="rgba(247,147,26,1)"/>
+                    <circle cx="250" cy="78" r="3.5" fill="rgba(180,200,210,0.8)"/>
+                    {# Axes hint #}
+                    <line x1="30" y1="135" x2="260" y2="135" stroke="rgba(220,200,170,0.18)" stroke-width="1"/>
+                    <line x1="30" y1="135" x2="30"  y2="20"  stroke="rgba(220,200,170,0.18)" stroke-width="1"/>
+                    <text x="140" y="16" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(220,200,170,0.55)" letter-spacing="1.5">BTC vs. S&amp;P 500</text>
+                </svg>
+            </div>
+            <div class="card-meta">
+                <p class="card-category">The Numbers</p>
+                <h3 class="card-title">Bitcoin vs. the Stock Market</h3>
+                <p class="card-desc">The Power Law channel applied as an entry-quality signal against the S&amp;P 500 and NASDAQ-100, stress-tested against historical cyclical-top entries.</p>
+                <span class="card-cta">Open exploration &rarr;</span>
+            </div>
+        </a>
+
+        {# ─── Static card: The Half-Life ─── #}
+        <a href="/the-half-life.html" class="gallery-card" data-card="half-life">
+            <div class="card-thumb card-thumb-static">
+                <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="280" height="160" fill="rgba(15,12,8,0.6)"/>
+                    {# Exponential decay curve #}
+                    <path d="M 30 30 Q 70 50 110 85 Q 150 115 200 128 T 260 134" stroke="rgba(247,147,26,0.85)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                    {# Half-life vertical markers #}
+                    <line x1="80"  y1="55" x2="80"  y2="135" stroke="rgba(247,147,26,0.25)" stroke-dasharray="2,3" stroke-width="1"/>
+                    <line x1="130" y1="100" x2="130" y2="135" stroke="rgba(247,147,26,0.25)" stroke-dasharray="2,3" stroke-width="1"/>
+                    <line x1="195" y1="127" x2="195" y2="135" stroke="rgba(247,147,26,0.25)" stroke-dasharray="2,3" stroke-width="1"/>
+                    {# Axes hint #}
+                    <line x1="30" y1="135" x2="260" y2="135" stroke="rgba(220,200,170,0.18)" stroke-width="1"/>
+                    <line x1="30" y1="135" x2="30"  y2="20"  stroke="rgba(220,200,170,0.18)" stroke-width="1"/>
+                    <text x="140" y="16" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(220,200,170,0.55)" letter-spacing="1.5">VOLATILITY DECAY</text>
+                </svg>
+            </div>
+            <div class="card-meta">
+                <p class="card-category">The Arguments</p>
+                <h3 class="card-title">The Half-Life</h3>
+                <p class="card-desc">Bitcoin&rsquo;s volatility declining over time on a half-life schedule &mdash; the institutional case that pairs with the Power Law projection.</p>
+                <span class="card-cta">Open exploration &rarr;</span>
+            </div>
+        </a>
+
+        {# ─── Static card: The Melting Ice Cube ─── #}
+        <a href="/the-melting-ice-cube.html" class="gallery-card" data-card="melting-ice">
+            <div class="card-thumb card-thumb-static">
+                <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="280" height="160" fill="rgba(15,12,8,0.6)"/>
+                    {# Ice cube (perspective) gradually shrinking — three layered cubes from large/opaque to small/faint #}
+                    <g transform="translate(80, 90)">
+                        <polygon points="-30,-20 0,-32 30,-20 30,16 0,28 -30,16" fill="rgba(180,210,230,0.45)" stroke="rgba(180,210,230,0.65)" stroke-width="1.2"/>
+                        <line x1="-30" y1="-20" x2="0"  y2="-8" stroke="rgba(180,210,230,0.55)" stroke-width="0.8"/>
+                        <line x1="30"  y1="-20" x2="0"  y2="-8" stroke="rgba(180,210,230,0.55)" stroke-width="0.8"/>
+                        <line x1="0"   y1="-8" x2="0"  y2="28" stroke="rgba(180,210,230,0.55)" stroke-width="0.8"/>
+                    </g>
+                    <g transform="translate(160, 100)">
+                        <polygon points="-22,-15 0,-24 22,-15 22,11 0,20 -22,11" fill="rgba(180,210,230,0.30)" stroke="rgba(180,210,230,0.45)" stroke-width="1"/>
+                    </g>
+                    <g transform="translate(220, 110)">
+                        <polygon points="-14,-9 0,-16 14,-9 14,7 0,13 -14,7" fill="rgba(180,210,230,0.18)" stroke="rgba(180,210,230,0.30)" stroke-width="0.8"/>
+                    </g>
+                    {# Drops below #}
+                    <circle cx="86" cy="132" r="2" fill="rgba(180,210,230,0.40)"/>
+                    <circle cx="98" cy="138" r="1.5" fill="rgba(180,210,230,0.30)"/>
+                    <circle cx="166" cy="133" r="1.8" fill="rgba(180,210,230,0.35)"/>
+                    <circle cx="225" cy="135" r="1.4" fill="rgba(180,210,230,0.25)"/>
+                    {# Baseline #}
+                    <line x1="20" y1="140" x2="260" y2="140" stroke="rgba(220,200,170,0.15)" stroke-width="1"/>
+                    <text x="140" y="22" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(220,200,170,0.55)" letter-spacing="1.5">FIAT PURCHASING POWER</text>
+                </svg>
+            </div>
+            <div class="card-meta">
+                <p class="card-category">The Arguments</p>
+                <h3 class="card-title">The Melting Ice Cube</h3>
+                <p class="card-desc">Fiat&rsquo;s purchasing power decaying steadily over time &mdash; the visual metaphor for inflation as continuous, irreversible loss.</p>
+                <span class="card-cta">Open exploration &rarr;</span>
+            </div>
+        </a>
+
+    </div>
+
+    <p class="gallery-footnote"><em>This is v1.</em> Card art is hand-drawn for first ship &mdash; rendered chart PNGs replace these in a follow-up. The Power Law channel above is the live chart used on its source page.</p>
+</section>

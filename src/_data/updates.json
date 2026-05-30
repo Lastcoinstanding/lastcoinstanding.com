@@ -2,8 +2,14 @@
   {
     "date": "2026-05-30",
     "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "The Gallery is open: 8 chart cards, with the Power Law channel as a live hero and the rest as v1 hand-drawn previews — a visual table-of-contents for the site"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
     "page": "/the-power-law.html#channel",
-    "summary": "Homepage: bitcoin live ticker — price, multiple vs trend, and where it sits in the Power Law channel (near floor / below trend / near trend / above trend / near ceiling)"
+    "summary": "Homepage ticker polish: ₿ + price in Bitcoin orange with a slow heartbeat glow"
   },
   {
     "date": "2026-05-30",
