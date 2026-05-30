@@ -221,10 +221,13 @@ body {
     color: var(--text-faint);
 }
 
-/* ── Editorial framing prose */
+/* ── Editorial framing prose — full section-inner width (matches chart
+    width) per the spec conversation: short orienting paragraphs read
+    fine at a wider measure, and matching the chart's width tightens
+    the visual rhythm so each chart-and-prose pair feels like one unit
+    rather than a chart with a narrower commentary block beneath it. */
 .gallery-section-prose {
     margin: 2rem 0 1.5rem;
-    max-width: 780px;
 }
 .gallery-section-prose p {
     font-family: 'Inter', sans-serif;

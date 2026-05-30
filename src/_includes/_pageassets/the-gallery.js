@@ -120,6 +120,14 @@
     var todayPrice = (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0)
       ? TODAY_PRICE : PL_DATA[PL_DATA.length - 1][1];
 
+    // Extend the historical line to today's live price so the white line
+    // reaches the today marker rather than terminating at PL_DATA's last
+    // seeded sample (which may be days/weeks/months stale). This is
+    // mutated in place by fetchTodayPrice when the live spot lands.
+    if (today >= bounds.xMin - pad && today <= bounds.xMax + pad) {
+      historicalLine.push({x: today, y: todayPrice});
+    }
+
     return {
       trend: trendLine,
       floor: floorLine,
@@ -168,6 +176,34 @@
       }
     };
 
+    // "Today" marker glow plugin — soft radial-gradient halo behind the
+    // today dot so it visually resonates rather than sitting flat on the
+    // canvas. Matches the Disciplined Rebalancing source page's treatment.
+    // Hooks beforeDatasetDraw with index check so the glow draws BEFORE
+    // the dot itself (which is dataset index 4), making the dot appear
+    // on top of the halo.
+    var todayGlowPlugin = {
+      id: 'todayGlow',
+      beforeDatasetDraw: function(chart, args){
+        if (args.index !== 4) return;
+        var meta = chart.getDatasetMeta(4);
+        if (!meta || !meta.data || !meta.data[0]) return;
+        var p = meta.data[0];
+        if (typeof p.x !== 'number' || typeof p.y !== 'number') return;
+        var gctx = chart.ctx;
+        gctx.save();
+        var grad = gctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 16);
+        grad.addColorStop(0,    'rgba(247,147,26,0.55)');
+        grad.addColorStop(0.45, 'rgba(247,147,26,0.22)');
+        grad.addColorStop(1,    'rgba(247,147,26,0)');
+        gctx.fillStyle = grad;
+        gctx.beginPath();
+        gctx.arc(p.x, p.y, 16, 0, Math.PI * 2);
+        gctx.fill();
+        gctx.restore();
+      }
+    };
+
     var ctx = canvas.getContext('2d');
     chartInstance = new Chart(ctx, {
       type: 'line',
@@ -188,7 +224,7 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        interaction: { mode: 'nearest', intersect: false },
+        interaction: { mode: 'index', intersect: false },
         plugins: {
           legend: {
             display: true, position: 'top',
@@ -239,7 +275,7 @@
         },
         layout: { padding: { top: 4, right: 12, bottom: 0, left: 0 } }
       },
-      plugins: [todayLinePlugin]
+      plugins: [todayLinePlugin, todayGlowPlugin]
     });
   }
 
@@ -278,8 +314,12 @@
           updateStatus(TODAY_PRICE, 'seed');
         }
 
-        // Live price replaces the seed when the fetch lands; also pokes
-        // the Today marker on the chart (dataset index 4) to the new value.
+        // Live price replaces the seed when the fetch lands; pokes the
+        // Today marker on the chart (dataset index 4) AND the trailing
+        // point of the historical line (dataset index 3, last point —
+        // see buildDatasets which appends a today point to the history
+        // so the white line reaches the marker rather than terminating
+        // at PL_DATA's last seeded sample).
         if (typeof fetchTodayPrice === 'function') {
           fetchTodayPrice(function(price /*, source */){
             updateStatus(price, 'live');
@@ -287,8 +327,13 @@
             var todayDs = chartInstance.data.datasets[4];
             if (todayDs && todayDs.data && todayDs.data[0]) {
               todayDs.data[0].y = price;
-              chartInstance.update('none');
             }
+            var historyDs = chartInstance.data.datasets[3];
+            if (historyDs && historyDs.data && historyDs.data.length) {
+              var lastIdx = historyDs.data.length - 1;
+              historyDs.data[lastIdx].y = price;
+            }
+            chartInstance.update('none');
           });
         }
       } catch (err) {
