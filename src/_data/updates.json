@@ -3,6 +3,12 @@
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
+    "summary": "Gallery Commit B: three more charts live. Power Law implied CAGR vs. S&P 500 (with convergence footnote), BTC required to buy the median US house (2013→2025 actual, projected trend to 2032), and the real opportunity cost of buying a house (start-year toggle 2014/2016/2018/2020/2022). Four charts done; six to go"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
     "summary": "Gallery Chart 1 polish: white historical line now extends to today's live price; hover tooltip shows trend + floor + upper at the hover X (not just nearest); today marker has the radial-gradient halo from the Disciplined Rebalancing chart; editorial prose spans the full chart width for a tighter scroll rhythm between charts"
   },
   {

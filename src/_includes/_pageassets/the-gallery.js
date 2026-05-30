@@ -396,3 +396,465 @@
     ro.observe(canvas.parentElement);
   }
 })();
+
+
+// ─── Chart 2: Power Law Implied CAGR vs. S&P 500 ──────────────────
+//
+// Bar chart of the model's implied CAGR-to-2035 for each starting year
+// 2015-2030, with a horizontal dashed line at 10% (the S&P 500's
+// historical annualized average). Mirrors the chart on /the-power-law
+// but rendered standalone for the Gallery (no shared module yet —
+// accepted minor drift risk, per the spec conversation).
+//
+// Convergence note lives in the prose paragraph beside the chart
+// rather than on the chart axis: per the math worked out before
+// shipping, the bars don't cross 10% until ~2150 with starting year
+// 2025, so extending the axis would just show more bars above the
+// dashed line, not a crossing.
+(function(){
+  var canvas = document.getElementById('galleryCagrChart');
+  if (!canvas) return;
+  if (typeof Chart === 'undefined' || typeof plPrice === 'undefined') return;
+
+  var chartInstance = null;
+  var hasInited = false;
+
+  function buildChart() {
+    var targetYear = 2035;
+    var targetDays = (targetYear - 2009) * 365.25;
+    var targetPrice = plPrice(targetDays);
+
+    var years = [], cagrValues = [], sp500Line = [];
+    for (var y = 2015; y <= 2030; y++) {
+      var yrsHeld = targetYear - y;
+      if (yrsHeld <= 0) continue;
+      var startPrice = plPrice((y - 2009) * 365.25);
+      var cagr = (Math.pow(targetPrice / startPrice, 1 / yrsHeld) - 1) * 100;
+      years.push(y.toString());
+      cagrValues.push(+cagr.toFixed(1));
+      sp500Line.push(10);
+    }
+
+    chartInstance = new Chart(canvas.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: years,
+        datasets: [
+          { label: 'Bitcoin Power Law CAGR to 2035', data: cagrValues, order: 2,
+            backgroundColor: 'rgba(247,147,26,0.45)', borderColor: 'rgba(247,147,26,0.85)',
+            borderWidth: 1, borderRadius: 3 },
+          { label: 'S\u0026P 500 Historical Avg (~10%)', data: sp500Line, type: 'line', order: 1,
+            borderColor: 'rgba(200,190,170,0.55)', borderWidth: 2, borderDash: [6, 3],
+            pointRadius: 0, fill: false }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            display: true, position: 'top',
+            labels: { color: 'rgba(220,200,170,0.55)', font: { size: 11, family: 'Inter, sans-serif' },
+                      boxWidth: 14, padding: 14 }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15,12,8,0.95)', borderColor: 'rgba(247,147,26,0.30)',
+            borderWidth: 1, titleColor: 'rgba(232,224,210,0.95)', bodyColor: 'rgba(220,200,170,0.85)',
+            titleFont: { size: 11, family: 'Inter, sans-serif' },
+            bodyFont:  { size: 11, family: 'Inter, sans-serif' },
+            callbacks: {
+              label: function(item){
+                if (item.datasetIndex === 0) return 'Bitcoin CAGR: ' + item.raw + '%';
+                return 'S&P 500 avg: ~10%';
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(220,200,170,0.04)' },
+            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+            title: { display: true, text: 'Year of Bitcoin purchase',
+                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+            border: { display: false }
+          },
+          y: {
+            grid: { color: 'rgba(220,200,170,0.04)' },
+            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' },
+                     callback: function(v){ return v + '%'; } },
+            title: { display: true, text: 'Implied CAGR to 2035',
+                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+            beginAtZero: true, border: { display: false }
+          }
+        },
+        layout: { padding: { top: 4, right: 12, bottom: 0, left: 0 } }
+      }
+    });
+  }
+
+  function init() {
+    if (hasInited) return;
+    hasInited = true;
+    requestAnimationFrame(function(){
+      try { buildChart(); }
+      catch (err) {
+        var fb = document.querySelector('#section-cagr .gallery-chart-fallback');
+        if (fb) {
+          fb.classList.add('show');
+          var p = fb.querySelector('.chart-loading');
+          if (p) p.textContent = 'Chart unavailable \u2014 open the full version \u2192';
+        }
+      }
+    });
+  }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting && entry.intersectionRatio > 0) {
+          init(); io.disconnect();
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '50px' });
+    io.observe(canvas);
+  } else { init(); }
+
+  if ('ResizeObserver' in window) {
+    var ro = new ResizeObserver(function(){
+      if (chartInstance) { try { chartInstance.resize(); } catch (e) {} }
+    });
+    ro.observe(canvas.parentElement);
+  }
+})();
+
+
+// ─── Chart 3: BTC Required to Buy the Median US House ─────────────
+//
+// Semi-log line chart, x = years 2013-2032 (2013-2025 actual, 2026-2032
+// projected trend), y = log-scale BTC count. Data mirrors the source
+// chart on /bitcoin-vs-real-estate#priced-in-bitcoin — accepted as
+// duplicated since it's just 13 home prices and 13 BTC prices; trivial
+// to keep in sync at the annual cadence the data updates.
+(function(){
+  var canvas = document.getElementById('galleryBtcHouseChart');
+  if (!canvas) return;
+  if (typeof Chart === 'undefined') return;
+
+  // Annual data — mirrors bitcoin-vs-real-estate.js homeData/btcData
+  // for the years where both exist (2013 onward). Refresh annually.
+  var homeData = {
+    2013: 268900, 2014: 282800, 2015: 294000, 2016: 306200, 2017: 323500,
+    2018: 326400, 2019: 321500, 2020: 336900, 2021: 401700, 2022: 454900,
+    2023: 426100, 2024: 420300, 2025: 416900
+  };
+  var btcData = {
+    2013: 732, 2014: 530, 2015: 272, 2016: 567, 2017: 4348, 2018: 7565,
+    2019: 7362, 2020: 11072, 2021: 47458, 2022: 19657, 2023: 28233,
+    2024: 62682, 2025: 88000
+  };
+
+  var chartInstance = null;
+  var hasInited = false;
+
+  function buildChart() {
+    var btcYears = Object.keys(btcData).map(Number);
+    var projYears = [2026, 2027, 2028, 2029, 2030, 2031, 2032];
+    var allLabels = btcYears.map(String).concat(projYears.map(String));
+
+    var btcHouseValues = btcYears.map(function(y){
+      return +(homeData[y] / btcData[y]).toFixed(1);
+    });
+
+    // Smooth trend line — log-linear from 367 BTC (2013) to ~1.5 BTC (2032),
+    // matching the source chart. Continues seamlessly across actual + projected.
+    var trendFull = btcYears.concat(projYears).map(function(y){
+      var t = (y - 2013) / (2032 - 2013);
+      return +(367 * Math.pow(1.5 / 367, t)).toFixed(2);
+    });
+    // Historical actual: data for 2013-2025, nulls for projection years
+    var historicalFull = btcHouseValues.concat(projYears.map(function(){ return null; }));
+
+    chartInstance = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: allLabels,
+        datasets: [
+          { label: 'Actual', data: historicalFull,
+            borderColor: 'rgba(247,147,26,0.95)',
+            backgroundColor: 'rgba(247,147,26,0.15)',
+            borderWidth: 2.5, pointBackgroundColor: 'rgba(247,147,26,1)',
+            pointRadius: 4, pointHoverRadius: 7, fill: true, tension: 0.3 },
+          { label: 'Trend', data: trendFull,
+            borderColor: 'rgba(224,148,34,0.45)', backgroundColor: 'transparent',
+            borderWidth: 2, borderDash: [8, 4], pointRadius: 0, tension: 0.4 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            display: true, position: 'top',
+            labels: { color: 'rgba(220,200,170,0.55)', font: { size: 11, family: 'Inter, sans-serif' },
+                      boxWidth: 14, padding: 14, usePointStyle: true, pointStyle: 'circle' }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15,12,8,0.95)', borderColor: 'rgba(247,147,26,0.30)',
+            borderWidth: 1, titleColor: 'rgba(232,224,210,0.95)', bodyColor: 'rgba(220,200,170,0.85)',
+            titleFont: { size: 11, family: 'Inter, sans-serif' },
+            bodyFont:  { size: 11, family: 'Inter, sans-serif' },
+            callbacks: {
+              title: function(c){ return c[0].label; },
+              label: function(c){
+                var y = parseInt(c.label);
+                var isProj = y > 2025;
+                if (c.datasetIndex === 1) return 'Trend: ~' + c.parsed.y.toFixed(1) + ' BTC';
+                if (isProj) return null;
+                return [
+                  c.parsed.y.toFixed(1) + ' BTC',
+                  'House: $' + (homeData[y] || 0).toLocaleString(),
+                  'BTC price: $' + (btcData[y] || 0).toLocaleString()
+                ];
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(220,200,170,0.04)' },
+            ticks: {
+              color: function(c){ return c.index > 12 ? 'rgba(220,200,170,0.25)' : 'rgba(220,200,170,0.45)'; },
+              font: { size: 11, family: 'Inter, sans-serif' }, maxRotation: 0
+            },
+            border: { display: false }
+          },
+          y: {
+            type: 'logarithmic', min: 1,
+            grid: { color: 'rgba(220,200,170,0.04)' },
+            ticks: {
+              color: 'rgba(220,200,170,0.45)',
+              font: { size: 11, family: 'Inter, sans-serif' },
+              callback: function(v){
+                var marks = [1, 2, 5, 10, 20, 50, 100, 200, 500];
+                return marks.indexOf(v) !== -1 ? v.toLocaleString() : '';
+              }
+            },
+            title: { display: true, text: 'Bitcoin Required',
+                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+            border: { display: false }
+          }
+        },
+        layout: { padding: { top: 4, right: 12, bottom: 0, left: 0 } }
+      }
+    });
+  }
+
+  function init() {
+    if (hasInited) return;
+    hasInited = true;
+    requestAnimationFrame(function(){
+      try { buildChart(); }
+      catch (err) {
+        var fb = document.querySelector('#section-btc-house .gallery-chart-fallback');
+        if (fb) {
+          fb.classList.add('show');
+          var p = fb.querySelector('.chart-loading');
+          if (p) p.textContent = 'Chart unavailable \u2014 open the full version \u2192';
+        }
+      }
+    });
+  }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting && entry.intersectionRatio > 0) {
+          init(); io.disconnect();
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '50px' });
+    io.observe(canvas);
+  } else { init(); }
+
+  if ('ResizeObserver' in window) {
+    var ro = new ResizeObserver(function(){
+      if (chartInstance) { try { chartInstance.resize(); } catch (e) {} }
+    });
+    ro.observe(canvas.parentElement);
+  }
+})();
+
+
+// ─── Chart 4: The Real Opportunity Cost of Buying a House ─────────
+//
+// Two-line log chart, growth of $1 invested from a reader-selected
+// start year (2014/2016/2018/2020/2022, default 2018) to 2025. Bitcoin
+// line filled amber, housing line dashed red. Source-page parity for
+// the data (annual averages mirror bitcoin-vs-real-estate.js); the
+// editorial framing is the seesaw-style "pick any year" argument.
+(function(){
+  var canvas = document.getElementById('galleryOppCostChart');
+  if (!canvas) return;
+  if (typeof Chart === 'undefined') return;
+
+  // Same annual data as Chart 3 — duplicated rather than shared via
+  // module, since the two charts ship together and a shared module
+  // would be premature factorization. Refresh annually in both places.
+  var homeData = {
+    2013: 268900, 2014: 282800, 2015: 294000, 2016: 306200, 2017: 323500,
+    2018: 326400, 2019: 321500, 2020: 336900, 2021: 401700, 2022: 454900,
+    2023: 426100, 2024: 420300, 2025: 416900
+  };
+  var btcData = {
+    2013: 732, 2014: 530, 2015: 272, 2016: 567, 2017: 4348, 2018: 7565,
+    2019: 7362, 2020: 11072, 2021: 47458, 2022: 19657, 2023: 28233,
+    2024: 62682, 2025: 88000
+  };
+
+  var chartInstance = null;
+  var currentStartYear = 2018;
+  var hasInited = false;
+
+  function buildChart() {
+    var btcYears = Object.keys(btcData).map(Number);
+    var visYrs = btcYears.filter(function(y){ return y >= currentStartYear; });
+
+    var idxBtc  = visYrs.map(function(y){
+      return +((btcData[y]  / btcData[currentStartYear])  * 100).toFixed(1);
+    });
+    var idxHome = visYrs.map(function(y){
+      return +((homeData[y] / homeData[currentStartYear]) * 100).toFixed(1);
+    });
+
+    chartInstance = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: visYrs.map(String),
+        datasets: [
+          { label: 'Bitcoin', data: idxBtc,
+            borderColor: 'rgba(247,147,26,0.95)',
+            backgroundColor: 'rgba(247,147,26,0.10)',
+            borderWidth: 2.5, pointRadius: 3, tension: 0.3, fill: true },
+          { label: 'Housing', data: idxHome,
+            borderColor: 'rgba(192,57,43,0.85)', backgroundColor: 'transparent',
+            borderWidth: 2.5, pointRadius: 3, tension: 0.3, borderDash: [6, 3] }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            display: true, position: 'top',
+            labels: { color: 'rgba(220,200,170,0.55)', font: { size: 11, family: 'Inter, sans-serif' },
+                      boxWidth: 14, padding: 14, usePointStyle: true, pointStyle: 'circle' }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15,12,8,0.95)', borderColor: 'rgba(247,147,26,0.30)',
+            borderWidth: 1, titleColor: 'rgba(232,224,210,0.95)', bodyColor: 'rgba(220,200,170,0.85)',
+            titleFont: { size: 11, family: 'Inter, sans-serif' },
+            bodyFont:  { size: 11, family: 'Inter, sans-serif' },
+            callbacks: {
+              label: function(c){
+                var pct = (c.parsed.y - 100).toFixed(0);
+                var sign = pct >= 0 ? '+' : '';
+                var yr = visYrs[c.dataIndex];
+                var actual = c.dataset.label === 'Bitcoin' ? btcData[yr] : homeData[yr];
+                var priceFmt = '$' + actual.toLocaleString();
+                return c.dataset.label + ': ' + sign + Number(pct).toLocaleString() + '% since ' + currentStartYear + ' (' + priceFmt + ')';
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(220,200,170,0.04)' },
+            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' }, maxRotation: 0 },
+            border: { display: false }
+          },
+          y: {
+            type: 'logarithmic', min: 30,
+            grid: { color: 'rgba(220,200,170,0.04)' },
+            ticks: {
+              color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' },
+              callback: function(v){
+                var marks = [50, 100, 200, 500, 1000, 2000, 5000, 10000, 12000];
+                if (marks.indexOf(v) === -1) return '';
+                if (v === 100) return '$1 (start)';
+                return '$' + (v / 100).toFixed(0);
+              }
+            },
+            title: { display: true, text: 'Growth of $1 Invested',
+                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+            border: { display: false }
+          }
+        },
+        layout: { padding: { top: 4, right: 12, bottom: 0, left: 0 } }
+      }
+    });
+  }
+
+  function rebuild() {
+    if (chartInstance) {
+      try { chartInstance.destroy(); } catch (e) {}
+      chartInstance = null;
+    }
+    buildChart();
+    // Update the chart's subtitle to reflect the new start year — small
+    // touch that makes the toggle feel grounded ("Growth of $1 invested
+    // in 2020 — bitcoin vs. housing").
+    var sub = document.getElementById('oppCostSubtitle');
+    if (sub) sub.textContent = 'Growth of $1 invested in ' + currentStartYear + ' \u2014 bitcoin vs. housing, log scale.';
+  }
+
+  function init() {
+    if (hasInited) return;
+    hasInited = true;
+    requestAnimationFrame(function(){
+      try { buildChart(); }
+      catch (err) {
+        var fb = document.querySelector('#section-opp-cost .gallery-chart-fallback');
+        if (fb) {
+          fb.classList.add('show');
+          var p = fb.querySelector('.chart-loading');
+          if (p) p.textContent = 'Chart unavailable \u2014 open the full version \u2192';
+        }
+      }
+    });
+  }
+
+  // Start-year toggle — same UI pattern as Chart 1's range toggle,
+  // different semantics. data-start-year on each button.
+  document.querySelectorAll('#section-opp-cost .range-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var y = parseInt(btn.dataset.startYear, 10);
+      if (!y || y === currentStartYear) return;
+      currentStartYear = y;
+      document.querySelectorAll('#section-opp-cost .range-btn').forEach(function(b){
+        var on = parseInt(b.dataset.startYear, 10) === currentStartYear;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      if (!hasInited) init();
+      else rebuild();
+    });
+  });
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting && entry.intersectionRatio > 0) {
+          init(); io.disconnect();
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '50px' });
+    io.observe(canvas);
+  } else { init(); }
+
+  if ('ResizeObserver' in window) {
+    var ro = new ResizeObserver(function(){
+      if (chartInstance) { try { chartInstance.resize(); } catch (e) {} }
+    });
+    ro.observe(canvas.parentElement);
+  }
+})();

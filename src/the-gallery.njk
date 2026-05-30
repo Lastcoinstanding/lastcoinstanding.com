@@ -84,13 +84,103 @@ eleventyComputed:
 </section>
 
 
-{# ─── Charts 2-10 land in subsequent commits ─────────────────────── #}
+{# ─── Chart 2 · Power Law Implied CAGR vs. S&P 500 ────────────────── #}
+<section class="gallery-section" id="section-cagr" aria-labelledby="title-cagr">
+    <div class="gallery-section-inner">
+        <header class="gallery-section-header">
+            <p class="gallery-section-eyebrow">&sect;I &middot; The Model &middot; Chart 2 of 10</p>
+            <h2 id="title-cagr" class="gallery-section-title">Power Law Implied CAGR vs. S&amp;P 500</h2>
+            <p class="gallery-section-subtitle">What the model projects, year by starting year, against the equity benchmark.</p>
+        </header>
+
+        <div class="gallery-chart-frame">
+            <canvas id="galleryCagrChart" aria-label="Power Law implied CAGR vs S&P 500 bar chart"></canvas>
+            <div class="gallery-chart-fallback" aria-hidden="true">
+                <p class="chart-loading">Loading the comparison&hellip;</p>
+            </div>
+        </div>
+
+        <div class="gallery-section-prose">
+            <p>The Power Law implies a specific annualized return from each starting year. Each bar is the model's projected CAGR through 2035 for a bitcoin purchase made in that year; the dashed line is the S&amp;P 500's historical ~10% annual average. Even at the conservative end &mdash; buying in 2030 &mdash; the model's implied CAGR through 2035 is roughly <em>three times</em> the equity benchmark.</p>
+            <p class="prose-footnote"><em>On convergence:</em> Bitcoin's CAGR declines as the model decelerates, but never crosses the S&amp;P 500's historical 10% within any reasonable forecast horizon. Even projecting from 2025 to 2150, the implied annualized return remains around 10%. The chart's window shows the strongest period of relative outperformance &mdash; but the gap, while shrinking, persists for decades beyond it.</p>
+        </div>
+
+        <p class="gallery-section-source">More in this exploration &rarr; <a href="/the-power-law.html">Bitcoin &amp; the Power Law</a></p>
+    </div>
+</section>
+
+
+{# ═══ §II · REAL-WORLD DENOMINATIONS ═══════════════════════════════ #}
+
+{# ─── Chart 3 · BTC Required to Buy the Median US House ──────────── #}
+<section class="gallery-section" id="section-btc-house" aria-labelledby="title-btc-house">
+    <div class="gallery-section-inner">
+        <header class="gallery-section-header">
+            <p class="gallery-section-eyebrow">&sect;II &middot; Real-World Denominations &middot; Chart 3 of 10</p>
+            <h2 id="title-btc-house" class="gallery-section-title">BTC Required to Buy the Median US House</h2>
+            <p class="gallery-section-subtitle">Annual averages, 2013&ndash;2025 actual, with projected trend to 2032 &mdash; log scale.</p>
+        </header>
+
+        <div class="gallery-chart-frame">
+            <canvas id="galleryBtcHouseChart" aria-label="BTC required to buy the median US house"></canvas>
+            <div class="gallery-chart-fallback" aria-hidden="true">
+                <p class="chart-loading">Loading the trajectory&hellip;</p>
+            </div>
+        </div>
+
+        <div class="gallery-section-prose">
+            <p>In 2013, you needed <em>367 bitcoin</em> to buy the median US house. By 2025, you needed roughly <em>5</em>. That's a 98.6% decline in the bitcoin-denominated cost of housing across twelve years. Yes, the line is volatile &mdash; bitcoin is volatile &mdash; but look at the direction. No amount of fiat appreciation in home values can disguise what is happening on this chart.</p>
+            <p>The house is demonetizing &mdash; shedding its store-of-value premium &mdash; as bitcoin absorbs the monetary energy that was artificially trapped in real estate. The dashed line is where the historical trend points to next, not a price prediction.</p>
+        </div>
+
+        <p class="gallery-section-source">More in this exploration &rarr; <a href="/bitcoin-vs-real-estate.html#priced-in-bitcoin">Bitcoin vs. Real Estate</a></p>
+    </div>
+</section>
+
+
+{# ─── Chart 4 · The Real Opportunity Cost of Buying a House ──────── #}
+<section class="gallery-section" id="section-opp-cost" aria-labelledby="title-opp-cost">
+    <div class="gallery-section-inner">
+        <header class="gallery-section-header">
+            <p class="gallery-section-eyebrow">&sect;II &middot; Real-World Denominations &middot; Chart 4 of 10</p>
+            <h2 id="title-opp-cost" class="gallery-section-title">The Real Opportunity Cost of Buying a House</h2>
+            <p class="gallery-section-subtitle" id="oppCostSubtitle">Growth of $1 invested in 2018 &mdash; bitcoin vs. housing, log scale.</p>
+        </header>
+
+        <div class="gallery-controls-row">
+            <span class="control-label">Start year:</span>
+            <div class="range-toggle" role="tablist" aria-label="Start year for opportunity cost comparison">
+                <button type="button" class="range-btn" data-start-year="2014" role="tab" aria-selected="false">2014</button>
+                <button type="button" class="range-btn" data-start-year="2016" role="tab" aria-selected="false">2016</button>
+                <button type="button" class="range-btn active" data-start-year="2018" role="tab" aria-selected="true">2018</button>
+                <button type="button" class="range-btn" data-start-year="2020" role="tab" aria-selected="false">2020</button>
+                <button type="button" class="range-btn" data-start-year="2022" role="tab" aria-selected="false">2022</button>
+            </div>
+        </div>
+
+        <div class="gallery-chart-frame">
+            <canvas id="galleryOppCostChart" aria-label="Growth of $1 invested - bitcoin vs housing"></canvas>
+            <div class="gallery-chart-fallback" aria-hidden="true">
+                <p class="chart-loading">Loading the comparison&hellip;</p>
+            </div>
+        </div>
+
+        <div class="gallery-section-prose">
+            <p>Cherry-picking 2013 as a starting year for bitcoin's outperformance is the standard skeptic's objection. So pick any other year. From every starting year since 2014 &mdash; through every bear market, every drawdown, every 'cycle is over' moment &mdash; <em>$1 invested in bitcoin outperformed $1 invested in housing by orders of magnitude.</em> The toggle lets you choose your own starting point and see for yourself.</p>
+        </div>
+
+        <p class="gallery-section-source">More in this exploration &rarr; <a href="/bitcoin-vs-real-estate.html#priced-in-bitcoin">Bitcoin vs. Real Estate</a></p>
+    </div>
+</section>
+
+
+{# ─── Charts 5-10 land in subsequent commits ─────────────────────── #}
 
 <section class="gallery-coming-next">
     <div class="gallery-section-inner">
         <p class="gallery-coming-next-copy">
-            <em>Nine more charts arriving in three follow-up commits.</em>
-            Power Law CAGR vs. S&amp;P 500 &middot; BTC required to buy a house &middot; the real opportunity cost of buying a house &middot; global affordability &middot; BTC needed for retirement &middot; BTC vs. the stock market &middot; the cycle heatmap &middot; the half-life &middot; the long-range horizon. In the meantime, the <a href="/calculators.html">Calculators</a> page is the working surface and the source pages linked above each chart are the deep dives.
+            <em>Six more charts arriving in two follow-up commits.</em>
+            Global affordability &middot; BTC needed for retirement &middot; BTC vs. the stock market &middot; the cycle heatmap &middot; the half-life &middot; the long-range horizon. In the meantime, the <a href="/calculators.html">Calculators</a> page is the working surface and the source pages linked above each chart are the deep dives.
         </p>
     </div>
 </section>

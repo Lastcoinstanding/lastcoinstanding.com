@@ -157,6 +157,27 @@ body {
     color: var(--orange);
 }
 
+/* ── Controls row — label + toggle for charts where the toggle's
+    meaning isn't obvious from button labels alone (e.g., Chart 4's
+    "2014 / 2016 / 2018 / 2020 / 2022" needs a "Start year:" prefix). */
+.gallery-controls-row {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin: 0 0 1.2rem;
+    flex-wrap: wrap;
+}
+.gallery-controls-row .range-toggle {
+    margin: 0;
+}
+.control-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--text-faint);
+}
+
 /* ── Chart frame */
 .gallery-chart-frame {
     position: relative;
@@ -242,6 +263,15 @@ body {
 .gallery-section-prose em {
     color: var(--amber);
     font-style: italic;
+}
+/* Footnote-style paragraph — slightly smaller, dimmed; used for the
+   CAGR-convergence note that contextualizes the chart without leading
+   the eye. */
+.gallery-section-prose .prose-footnote {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    border-left: 2px solid var(--border-dim);
+    padding-left: 1rem;
 }
 
 /* ── Source link */
