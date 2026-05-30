@@ -595,18 +595,55 @@ footer a:hover { text-decoration: underline; }
 }
 .ticker-inner:hover { color: #aaa; }
 .ticker-inner:hover .ticker-cta { color: var(--amber); }
-.ticker-glyph {
-    color: var(--amber);
+.ticker-glyph,
+.ticker-price {
+    color: var(--orange);
     font-weight: 600;
+    text-shadow: 0 0 6px rgba(247,147,26,0.32),
+                 0 0 14px rgba(247,147,26,0.12);
+    animation: ticker-pulse 2.8s ease-in-out infinite;
+    will-change: text-shadow;
+}
+.ticker-glyph {
     font-size: 1.05rem;
     line-height: 1;
     margin-right: 0.05rem;
 }
 .ticker-price {
-    color: #ccc;
-    font-weight: 600;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.2px;
+}
+.ticker-inner:hover .ticker-glyph,
+.ticker-inner:hover .ticker-price {
+    text-shadow: 0 0 10px rgba(247,147,26,0.55),
+                 0 0 22px rgba(247,147,26,0.22);
+}
+
+/* Slow heartbeat pulse on the price + glyph — ~2.8s cycle so the
+   motion reads as "alive" rather than "blinking." Glow intensity
+   oscillates ±25%; the color and weight stay constant so the digit
+   readability never drops. */
+@keyframes ticker-pulse {
+    0%, 100% {
+        text-shadow: 0 0 5px rgba(247,147,26,0.22),
+                     0 0 12px rgba(247,147,26,0.08);
+    }
+    50% {
+        text-shadow: 0 0 9px rgba(247,147,26,0.48),
+                     0 0 20px rgba(247,147,26,0.18);
+    }
+}
+
+/* Accessibility: kill the pulse for users who've opted out of
+   motion. Keep the static glow so the orange-with-aura look is
+   still present, just not breathing. */
+@media (prefers-reduced-motion: reduce) {
+    .ticker-glyph,
+    .ticker-price {
+        animation: none;
+        text-shadow: 0 0 7px rgba(247,147,26,0.30),
+                     0 0 16px rgba(247,147,26,0.10);
+    }
 }
 .ticker-multiple {
     color: #bbb;
