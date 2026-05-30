@@ -3,6 +3,12 @@
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
+    "summary": "Gallery Commit C: three more charts live. Global housing affordability across HK / Sydney / Vancouver / London / US (Demographia ratios), BTC needed for retirement decay curve (4% rule, anchors at year 0/+10/+20/+30), and $10K invested in 2010 — bitcoin vs S&P 500 TR vs NASDAQ-100 TR. Seven charts done; three to go in the final commit"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
     "summary": "Gallery Commit B: three more charts live. Power Law implied CAGR vs. S&P 500 (with convergence footnote), BTC required to buy the median US house (2013→2025 actual, projected trend to 2032), and the real opportunity cost of buying a house (start-year toggle 2014/2016/2018/2020/2022). Four charts done; six to go"
   },
   {

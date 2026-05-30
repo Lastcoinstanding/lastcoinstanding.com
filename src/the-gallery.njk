@@ -174,13 +174,92 @@ eleventyComputed:
 </section>
 
 
-{# ─── Charts 5-10 land in subsequent commits ─────────────────────── #}
+{# ─── Chart 5 · Global Affordability ──────────────────────────────── #}
+<section class="gallery-section" id="section-global-aff" aria-labelledby="title-global-aff">
+    <div class="gallery-section-inner">
+        <header class="gallery-section-header">
+            <p class="gallery-section-eyebrow">&sect;II &middot; Real-World Denominations &middot; Chart 5 of 10</p>
+            <h2 id="title-global-aff" class="gallery-section-title">Global Housing Affordability</h2>
+            <p class="gallery-section-subtitle">Price-to-income ratio across major English-speaking markets, 2005&ndash;2024 &mdash; Demographia annual median surveys.</p>
+        </header>
+
+        <div class="gallery-chart-frame">
+            <canvas id="galleryGlobalAffChart" aria-label="Global housing price-to-income ratios across major markets"></canvas>
+            <div class="gallery-chart-fallback" aria-hidden="true">
+                <p class="chart-loading">Loading the survey&hellip;</p>
+            </div>
+        </div>
+
+        <div class="gallery-section-prose">
+            <p>Demographia tracks median home price as a multiple of median household income, every year, across major English-speaking markets. The dashed green line is the <em>3.0&times;</em> threshold they label &lsquo;affordable.&rsquo; Hong Kong has sat above 11&times; for fifteen years. Vancouver, Sydney, and Greater London cluster near or above 10&times;. The United States is closest to the threshold &mdash; and even it is comfortably above, with a clearly upward trajectory through 2021.</p>
+            <p>What's remarkable about the chart isn't any one city's number &mdash; it's that <em>every market</em> shown has been judged unaffordable for the entire data window. The denominator is income, and incomes have not kept pace with housing globally for two decades.</p>
+        </div>
+
+        <p class="gallery-section-source">More in this exploration &rarr; <a href="/bitcoin-vs-real-estate.html#affordability">Bitcoin vs. Real Estate</a></p>
+    </div>
+</section>
+
+
+{# ─── Chart 6 · BTC Needed for Retirement (decay curve) ───────────── #}
+<section class="gallery-section" id="section-retirement" aria-labelledby="title-retirement">
+    <div class="gallery-section-inner">
+        <header class="gallery-section-header">
+            <p class="gallery-section-eyebrow">&sect;II &middot; Real-World Denominations &middot; Chart 6 of 10</p>
+            <h2 id="title-retirement" class="gallery-section-title">BTC Needed for Retirement, by Year</h2>
+            <p class="gallery-section-subtitle">BTC required at each retirement year's Power Law trend price to fund $100K/year &mdash; 4% rule, $2.5M principal.</p>
+        </header>
+
+        <div class="gallery-chart-frame">
+            <canvas id="galleryRetirementChart" aria-label="BTC needed for retirement decay curve"></canvas>
+            <div class="gallery-chart-fallback" aria-hidden="true">
+                <p class="chart-loading">Loading the curve&hellip;</p>
+            </div>
+        </div>
+
+        <div class="gallery-section-prose">
+            <p>At today's Power Law trend price, you'd need roughly <em>20 BTC</em> to fund a $100K/year retirement under the 4% rule (a $2.5M nest egg). Push the retirement year out ten years, and the requirement falls to ~1.4 BTC. Twenty years, ~0.23 BTC. Thirty years, ~0.06 BTC.</p>
+            <p class="prose-footnote"><em>Each anchor is its own scenario</em> &mdash; this isn't a single stack drawing down. The chart shows that as bitcoin's trend price compounds, the BTC count required to support the same lifestyle falls sharply. The math privileges patience.</p>
+        </div>
+
+        <p class="gallery-section-source">More in this exploration &rarr; <a href="/the-bitcoin-retirement.html">The Bitcoin Retirement</a></p>
+    </div>
+</section>
+
+
+{# ═══ §III · HISTORICAL EVIDENCE ═══════════════════════════════════ #}
+
+{# ─── Chart 7 · BTC vs. the Stock Market ─────────────────────────── #}
+<section class="gallery-section" id="section-bvsm" aria-labelledby="title-bvsm">
+    <div class="gallery-section-inner">
+        <header class="gallery-section-header">
+            <p class="gallery-section-eyebrow">&sect;III &middot; Historical Evidence &middot; Chart 7 of 10</p>
+            <h2 id="title-bvsm" class="gallery-section-title">$10,000 Invested in 2010 &mdash; BTC vs. the Stock Market</h2>
+            <p class="gallery-section-subtitle">Three paths from a common starting point: bitcoin, the S&amp;P 500 (total return), and the NASDAQ-100 (total return) &mdash; log scale.</p>
+        </header>
+
+        <div class="gallery-chart-frame">
+            <canvas id="galleryBvsmChart" aria-label="Wealth comparison: bitcoin vs S&P 500 vs NASDAQ-100"></canvas>
+            <div class="gallery-chart-fallback" aria-hidden="true">
+                <p class="chart-loading">Loading the comparison&hellip;</p>
+            </div>
+        </div>
+
+        <div class="gallery-section-prose">
+            <p>$10,000 invested in 2010, side by side, in three places: <em>bitcoin</em>, the <em>S&amp;P 500</em> (total return, dividends reinvested), and the <em>NASDAQ-100</em> (also total return). The Y-axis is logarithmic, so equal vertical distances represent equal multiples of growth. The S&amp;P 500 multiplied roughly seven-fold over fifteen years. The NASDAQ-100 outperformed it by another doubling. Bitcoin's path is on the same chart, on the same scale, with the same starting amount &mdash; there's not much else to say.</p>
+        </div>
+
+        <p class="gallery-section-source">More in this exploration &rarr; <a href="/bitcoin-vs-the-stock-market.html">Bitcoin vs. the Stock Market</a></p>
+    </div>
+</section>
+
+
+{# ─── Charts 8-10 land in Commit D ────────────────────────────────── #}
 
 <section class="gallery-coming-next">
     <div class="gallery-section-inner">
         <p class="gallery-coming-next-copy">
-            <em>Six more charts arriving in two follow-up commits.</em>
-            Global affordability &middot; BTC needed for retirement &middot; BTC vs. the stock market &middot; the cycle heatmap &middot; the half-life &middot; the long-range horizon. In the meantime, the <a href="/calculators.html">Calculators</a> page is the working surface and the source pages linked above each chart are the deep dives.
+            <em>Three more charts arriving in the final commit.</em>
+            The cycle heatmap &middot; the half-life &middot; the long-range horizon. In the meantime, the <a href="/calculators.html">Calculators</a> page is the working surface and the source pages linked above each chart are the deep dives.
         </p>
     </div>
 </section>
