@@ -2,6 +2,12 @@
   {
     "date": "2026-05-30",
     "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "Gallery palette finally rendering correctly (real fix: nested <style> tags in page CSS were breaking the :root variable block). Calculators featured tiles now have matched heights"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
     "page": "/calculators.html",
     "summary": "Calculators page: featured row now leads with The Bitcoin Retirement (with its live mini-preview) — Heatmap moved out, since it's not strictly a calculator and already lives in The Gallery"
   },
