@@ -3,6 +3,12 @@
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
+    "summary": "The Gallery is now featured on the homepage's Latest section — a curated vertical scroll-through of the ten most striking charts across the site, each chart full-size with editorial framing. Designed as the highest-level entry point for any skeptical reader who wants the structural argument at a glance"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
     "summary": "The Gallery now ships with the full SEO + social-card baseline that other pages on the site have — Google Analytics, canonical URL, full Open Graph and Twitter card meta tags, JSON-LD WebPage schema, custom OG image (the Power Law channel as hero with editorial chrome), sitemap and llms.txt registration, and reciprocal Related cross-link cards with The Power Law, Bitcoin vs. The Stock Market, and The Bitcoin Horizon. Brings the page into compliance with the site's NEW_PAGE_CHECKLIST"
   },
   {
