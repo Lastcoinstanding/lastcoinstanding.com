@@ -263,6 +263,11 @@ eleventyComputed:
             <p class="gallery-section-subtitle">Outperformance vs. the S&amp;P 500 for every (entry month &times; holding horizon) pair since 2011 &mdash; the long-horizon rows are amber to the right edge.</p>
         </header>
 
+        <div class="range-toggle" role="tablist" aria-label="Heatmap view mode">
+            <button type="button" class="range-btn active" data-view="period" role="tab" aria-selected="true">Period return</button>
+            <button type="button" class="range-btn" data-view="hold-to-today" role="tab" aria-selected="false">Held to today</button>
+        </div>
+
         <div class="gallery-chart-frame heatmap-frame">
             <div id="galleryHeatmap" class="heatmap-svg-host" aria-label="Bitcoin outperformance heatmap across entry months and horizons"></div>
             <div class="gallery-chart-fallback" aria-hidden="true">
@@ -282,7 +287,7 @@ eleventyComputed:
 
         <div class="gallery-section-prose">
             <p>Every cell is a single bitcoin investment: enter on the column's month, hold for the row's horizon (1, 2, 3, 5, 7, or 10 years), compare the outcome against the same dollars invested in the S&amp;P 500. Amber means bitcoin outperformed; red means it underperformed; the brighter the cell, the wider the margin.</p>
-            <p>At <em>short horizons</em> there are visible red pockets &mdash; pre-bear-market entries that hadn't fully recovered yet. At <em>long horizons</em>, the pattern is almost entirely amber: <em>there is no historical 5-year window in which a bitcoin holder failed to outperform the S&amp;P 500</em>. The horizons that matter still produced wealth, even from the worst-timed entries.</p>
+            <p>At <em>short horizons</em> there are visible red pockets &mdash; pre-bear-market entries that hadn't fully recovered yet within the cell's window. At <em>long horizons</em>, the pattern is almost entirely amber: <em>there is no historical 5-year window in which a bitcoin holder failed to outperform the S&amp;P 500</em>. Toggle to <em>Held to today</em> to see how most of those red cells turn amber once the holder simply kept holding past the cell's nominal exit &mdash; the underperformance was timing-of-exit, not timing-of-entry.</p>
         </div>
 
         <p class="gallery-section-source">More in this exploration &rarr; <a href="/heatmap.html">The Bitcoin Heatmap</a></p>

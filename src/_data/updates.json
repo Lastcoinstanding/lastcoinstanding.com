@@ -3,6 +3,12 @@
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
+    "summary": "Gallery polish: Chart 8 (Heatmap) gains a Period return / Held to today toggle matching the source-page /heatmap behavior — defaults to discrete-window (more informative) but lets readers flip to held-to-today to verify most red cells turn amber when the holder simply kept holding. Chart 10 (Volatility Is Not Risk) legend restored to all four entries — the orange and white median dots now have legend labels"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
     "summary": "Gallery v2 complete. Final three charts live: the Bitcoin Heatmap (BTC vs S&P 500 outperformance grid, every entry month × every horizon since 2011 — long-horizon rows are amber to the edge), the Half-Life of a Dollar (fiat purchasing power decay; $100 → $50 in 11 years at M2 inflation), and CAGR Ranges by Horizon (Volatility Is Not Risk — how 1y bitcoin variance compresses to a narrow positive band at 5y+). All 10 charts shipped; the Gallery is a full scroll-through of the site's strongest visual arguments"
   },
   {

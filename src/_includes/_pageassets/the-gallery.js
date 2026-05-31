@@ -1588,12 +1588,19 @@
     return best[1];
   }
 
-  var rendered = false;
+  // currentView: 'period' (default, exit at startDate + horizon) or
+  // 'hold-to-today' (exit at today for valid cells). The cell-VALIDITY
+  // check is identical in both views — a cell is valid iff its NOMINAL
+  // horizon end is <= today. So future cells stay the same gray
+  // regardless of view. Only the outperformance numerator/denominator
+  // change between modes. This matches the source-page /heatmap behavior
+  // (bitcoin-vs-the-stock-market.js, viewBtn / holdToToday flag).
+  var currentView = 'period';
+  var hasRendered = false;
 
   function renderHeatmap() {
-    if (rendered) return;
-    if (!host.clientWidth) return;   // wait for layout
-    rendered = true;
+    if (!host.clientWidth) return;     // wait for layout
+    hasRendered = true;
 
     // Layout — viewBox dimensions chosen for aspect ratio; renders
     // responsive via CSS width/height on the svg.
@@ -1617,6 +1624,10 @@
 
     var parts = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + vbW + ' ' + vbH + '" preserveAspectRatio="xMidYMid meet">'];
 
+    // Precompute today's prices once (only used in hold-to-today mode)
+    var todayBtc = btcPriceAt(today);
+    var todaySp  = spPriceAt(today);
+
     // Cells
     for (var r = 0; r < nRows; r++) {
       var hMo = horizons[r];                    // row 0 = 1y (shortest at top)
@@ -1627,10 +1638,15 @@
         var w = Math.max(cellW - gap, 0.5), h = Math.max(cellH - gap, 1);
         var color;
         if (ed > today) {
-          color = '#1a1a1a';                     // future — exit date hasn't happened
+          color = '#1a1a1a';                     // future — nominal horizon end is in the future (same in both views)
         } else {
-          var bs = btcPriceAt(sd), be = btcPriceAt(ed);
-          var ss = spPriceAt(sd),  se = spPriceAt(ed);
+          var bs = btcPriceAt(sd), ss = spPriceAt(sd);
+          var be, se;
+          if (currentView === 'hold-to-today') {
+            be = todayBtc; se = todaySp;        // hold beyond the cell's horizon, exit at today
+          } else {
+            be = btcPriceAt(ed); se = spPriceAt(ed);   // exit at start + horizon
+          }
           var outperf = (be / bs) / (se / ss);
           color = tierFor(outperf);
         }
@@ -1658,6 +1674,29 @@
 
     parts.push('</svg>');
     host.innerHTML = parts.join('');
+  }
+
+  // Toggle buttons: scoped to the section so we don't collide with other
+  // .range-toggle blocks on the page (Chart 1, Chart 4 also use them).
+  var toggleScope = document.querySelector('#section-heatmap .range-toggle');
+  if (toggleScope) {
+    toggleScope.addEventListener('click', function(ev){
+      var btn = ev.target.closest('.range-btn');
+      if (!btn) return;
+      var v = btn.getAttribute('data-view');
+      if (!v || v === currentView) return;
+      currentView = v;
+      // Update active class + aria-selected on the two buttons
+      toggleScope.querySelectorAll('.range-btn').forEach(function(b){
+        var sel = b === btn;
+        b.classList.toggle('active', sel);
+        b.setAttribute('aria-selected', sel ? 'true' : 'false');
+      });
+      // Re-render with the new view (only if the heatmap has been
+      // built once — otherwise the IntersectionObserver path will pick
+      // up the latest currentView when it fires for the first time)
+      if (hasRendered) renderHeatmap();
+    });
   }
 
   // Lazy init via IntersectionObserver
@@ -1990,9 +2029,7 @@
           legend: {
             display: true, position: 'top',
             labels: { color: 'rgba(220,200,170,0.55)', font: { size: 11, family: 'Inter, sans-serif' },
-                      boxWidth: 14, padding: 14, usePointStyle: true, pointStyle: 'circle',
-                      // Hide the duplicate '(median)' entries — the range bars already convey the asset's identity
-                      filter: function(item){ return !/\(median\)$/.test(item.text); } }
+                      boxWidth: 14, padding: 14, usePointStyle: true, pointStyle: 'circle' }
           },
           tooltip: {
             backgroundColor: 'rgba(15,12,8,0.95)', borderColor: 'rgba(247,147,26,0.30)',
