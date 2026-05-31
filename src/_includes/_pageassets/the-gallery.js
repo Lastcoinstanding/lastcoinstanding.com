@@ -204,6 +204,38 @@
       }
     };
 
+    // "You are here" pulse halo — canonical lcs-pulse-halo from
+    // STYLE_GUIDE §6.23. Positions #galleryChannelPulse at the today
+    // point on each render so the CSS animation runs at the data
+    // location. The pulse element is inside .gallery-chart-frame
+    // (position: relative); we set left/top in canvas-relative pixel
+    // coords from the chart's x/y scales.
+    var lcsPulsePlugin = {
+      id: 'lcsPulse',
+      afterRender: function(c){
+        var pulse = document.getElementById('galleryChannelPulse');
+        if (!pulse || !c.scales || !c.scales.x || !c.scales.y) return;
+        // Use the canvas's bounding-box position relative to the frame,
+        // since the canvas may have padding around it inside the frame.
+        var todayDays = (Date.now() / 1000 - GENESIS_TS) / 86400;
+        var livePrice = (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0)
+          ? TODAY_PRICE : PL_DATA[PL_DATA.length - 1][1];
+        // Pixel coordinates are relative to the canvas; offset by the
+        // canvas's offsetLeft/offsetTop within the frame to align.
+        var x = c.scales.x.getPixelForValue(todayDays);
+        var y = c.scales.y.getPixelForValue(livePrice);
+        // Hide if today's point would render outside the visible chart area
+        if (x < c.chartArea.left  - 4 || x > c.chartArea.right  + 4 ||
+            y < c.chartArea.top   - 4 || y > c.chartArea.bottom + 4) {
+          pulse.classList.remove('is-visible');
+          return;
+        }
+        pulse.style.left = (c.canvas.offsetLeft + x) + 'px';
+        pulse.style.top  = (c.canvas.offsetTop  + y) + 'px';
+        pulse.classList.add('is-visible');
+      }
+    };
+
     var ctx = canvas.getContext('2d');
     chartInstance = new Chart(ctx, {
       type: 'line',
@@ -275,7 +307,7 @@
         },
         layout: { padding: { top: 4, right: 12, bottom: 0, left: 0 } }
       },
-      plugins: [todayLinePlugin, todayGlowPlugin]
+      plugins: [todayLinePlugin, todayGlowPlugin, lcsPulsePlugin]
     });
   }
 
@@ -1928,28 +1960,95 @@
     ["2026-01",96100.00],["2026-02",88500.00],["2026-03",86400.00],["2026-04",84300.00],["2026-05",73800.00]
   ];
 
-  // S&P 500 reference stats — Schiller/NYU Stern long-run analyses.
-  // Same as the-bitcoin-horizon.js source values.
-  var SP500_STATS = {
-    12:  { min: -0.43,  median: 0.10,  max: 0.54 },
-    24:  { min: -0.226, median: 0.095, max: 0.41 },
-    36:  { min: -0.161, median: 0.092, max: 0.32 },
-    48:  { min: -0.104, median: 0.090, max: 0.28 },
-    60:  { min: -0.066, median: 0.089, max: 0.24 },
-    120: { min: -0.014, median: 0.088, max: 0.20 }
-  };
+  // ────────────────────────────────────────────────────────────────
+  // CONSERVATIVE-DATA WINDOW
+  // ────────────────────────────────────────────────────────────────
+  // The CAGR stats below are deliberately computed from 2015-01
+  // onwards — explicitly leaving out the parabolic 2013 run (which
+  // generated 1y bitcoin returns above 4000% annualized) and the
+  // 2014 drawdown (-75% 1y). Those years are historically real but
+  // unrepresentative of any plausible forward outcome; including
+  // them in a "what range of returns could a holder see" chart
+  // inflates the visual story in bitcoin's favor in a way the rest
+  // of the site refuses to. The same 2015+ window is applied to the
+  // S&P 500 comparison so the two sides are apples-to-apples on
+  // time period (rather than 11-year BTC vs. multi-decade SP500).
+  var STATS_START_KEY = '2015-01';
 
-  function btcCAGRStats(months) {
+  // S&P 500 total-return monthly data — 3rd inline copy in this file
+  // (also in Chart 7 IIFE and Chart 8 IIFE). Refactor to shared/tr-
+  // comparator-data.js is overdue (now 5-6 copies site-wide); see
+  // TECH_DEBT_26.md. Refresh monthly per MONTHLY_REFRESH_CHECKLIST.
+  var SP500_TR_DATA = [
+    ["2010-01-28", 1721.34],["2010-02-28", 1742.67],["2010-03-28", 1764.01],["2010-04-28", 1785.34],
+    ["2010-05-28", 1806.68],["2010-06-28", 1828.01],["2010-07-28", 1849.35],["2010-08-28", 1870.68],
+    ["2010-09-28", 1892.02],["2010-10-28", 1913.35],["2010-11-28", 1934.69],["2010-12-28", 1956.02],
+    ["2011-01-28", 1959.46],["2011-02-28", 1962.9],["2011-03-28", 1966.34],["2011-04-28", 1969.78],
+    ["2011-05-28", 1973.22],["2011-06-28", 1976.66],["2011-07-28", 1980.1],["2011-08-28", 1983.53],
+    ["2011-09-28", 1986.97],["2011-10-28", 1990.41],["2011-11-28", 1993.85],["2011-12-28", 1997.29],
+    ["2012-01-28", 2023.92],["2012-02-28", 2050.55],["2012-03-28", 2077.18],["2012-04-28", 2103.81],
+    ["2012-05-28", 2130.44],["2012-06-28", 2157.08],["2012-07-28", 2183.71],["2012-08-28", 2210.34],
+    ["2012-09-28", 2236.97],["2012-10-28", 2263.6],["2012-11-28", 2290.23],["2012-12-28", 2316.86],
+    ["2013-01-28", 2379.39],["2013-02-28", 2441.93],["2013-03-28", 2504.47],["2013-04-28", 2567.0],
+    ["2013-05-28", 2629.54],["2013-06-28", 2692.07],["2013-07-28", 2754.61],["2013-08-28", 2817.15],
+    ["2013-09-28", 2879.68],["2013-10-28", 2942.22],["2013-11-28", 3004.75],["2013-12-28", 3067.29],
+    ["2014-01-28", 3102.28],["2014-02-28", 3137.27],["2014-03-28", 3172.27],["2014-04-28", 3207.26],
+    ["2014-05-28", 3242.25],["2014-06-28", 3277.25],["2014-07-28", 3312.24],["2014-08-28", 3347.23],
+    ["2014-09-28", 3382.22],["2014-10-28", 3417.22],["2014-11-28", 3452.21],["2014-12-28", 3487.2],
+    ["2015-01-28", 3491.21],["2015-02-28", 3495.22],["2015-03-28", 3499.23],["2015-04-28", 3503.24],
+    ["2015-05-28", 3507.25],["2015-06-28", 3511.26],["2015-07-28", 3515.27],["2015-08-28", 3519.28],
+    ["2015-09-28", 3523.29],["2015-10-28", 3527.3],["2015-11-28", 3531.31],["2015-12-28", 3535.32],
+    ["2016-01-28", 3570.56],["2016-02-28", 3605.8],["2016-03-28", 3641.03],["2016-04-28", 3676.27],
+    ["2016-05-28", 3711.5],["2016-06-28", 3746.74],["2016-07-28", 3781.97],["2016-08-28", 3817.21],
+    ["2016-09-28", 3852.44],["2016-10-28", 3887.68],["2016-11-28", 3922.91],["2016-12-28", 3958.15],
+    ["2017-01-28", 4030.15],["2017-02-28", 4102.16],["2017-03-28", 4174.17],["2017-04-28", 4246.17],
+    ["2017-05-28", 4318.18],["2017-06-28", 4390.18],["2017-07-28", 4462.19],["2017-08-28", 4534.19],
+    ["2017-09-28", 4606.2],["2017-10-28", 4678.2],["2017-11-28", 4750.21],["2017-12-28", 4822.21],
+    ["2018-01-28", 4804.61],["2018-02-28", 4787.01],["2018-03-28", 4769.41],["2018-04-28", 4751.81],
+    ["2018-05-28", 4734.21],["2018-06-28", 4716.61],["2018-07-28", 4699.01],["2018-08-28", 4681.4],
+    ["2018-09-28", 4663.8],["2018-10-28", 4646.2],["2018-11-28", 4628.6],["2018-12-28", 4611.0],
+    ["2019-01-28", 4732.0],["2019-02-28", 4853.0],["2019-03-28", 4974.0],["2019-04-28", 5095.0],
+    ["2019-05-28", 5216.0],["2019-06-28", 5337.0],["2019-07-28", 5458.0],["2019-08-28", 5579.0],
+    ["2019-09-28", 5700.0],["2019-10-28", 5821.0],["2019-11-28", 5942.0],["2019-12-28", 6063.0],
+    ["2020-01-28", 6155.97],["2020-02-28", 6248.94],["2020-03-28", 6341.9],["2020-04-28", 6434.87],
+    ["2020-05-28", 6527.83],["2020-06-28", 6620.8],["2020-07-28", 6713.77],["2020-08-28", 6806.73],
+    ["2020-09-28", 6899.7],["2020-10-28", 6992.67],["2020-11-28", 7085.63],["2020-12-28", 7178.6],
+    ["2021-01-28", 7350.35],["2021-02-28", 7522.09],["2021-03-28", 7693.84],["2021-04-28", 7865.59],
+    ["2021-05-28", 8037.34],["2021-06-28", 8209.08],["2021-07-28", 8380.83],["2021-08-28", 8552.58],
+    ["2021-09-28", 8724.33],["2021-10-28", 8896.08],["2021-11-28", 9067.82],["2021-12-28", 9239.57],
+    ["2022-01-28", 9100.13],["2022-02-28", 8960.69],["2022-03-28", 8821.25],["2022-04-28", 8681.81],
+    ["2022-05-28", 8542.37],["2022-06-28", 8402.93],["2022-07-28", 8263.49],["2022-08-28", 8124.05],
+    ["2022-09-28", 7984.61],["2022-10-28", 7845.17],["2022-11-28", 7705.73],["2022-12-28", 7566.29],
+    ["2023-01-28", 7732.05],["2023-02-28", 7897.82],["2023-03-28", 8063.58],["2023-04-28", 8229.34],
+    ["2023-05-28", 8395.11],["2023-06-28", 8560.87],["2023-07-28", 8726.64],["2023-08-28", 8892.4],
+    ["2023-09-28", 9058.17],["2023-10-28", 9223.93],["2023-11-28", 9389.7],["2023-12-28", 9555.46],
+    ["2024-01-28", 9754.69],["2024-02-28", 9953.93],["2024-03-28", 10153.16],["2024-04-28", 10352.39],
+    ["2024-05-28", 10551.62],["2024-06-28", 10750.85],["2024-07-28", 10950.08],["2024-08-28", 11149.31],
+    ["2024-09-28", 11348.55],["2024-10-28", 11547.78],["2024-11-28", 11747.01],["2024-12-28", 11946.24],
+    ["2025-01-28", 12125.43],["2025-02-28", 12304.63],["2025-03-28", 12483.82],["2025-04-28", 12663.01],
+    ["2025-05-28", 12842.21],["2025-06-28", 13021.4],["2025-07-28", 13200.59],["2025-08-28", 13379.79],
+    ["2025-09-28", 13558.98],["2025-10-28", 13738.18],["2025-11-28", 13917.37],["2025-12-28", 14096.56],
+    ["2026-01-28", 14128.98],["2026-02-28", 14161.41],["2026-03-28", 14193.83],["2026-04-28", 14226.25],
+    ["2026-05-28", 14258.67]
+  ];
+
+  // Generic rolling-CAGR stats. Walks a [['YYYY-MM', price], …] series
+  // from the conservative-window start key, building every rolling
+  // `months`-month window, then returns {min, median, max}.
+  function rollingCAGRStats(series, months, startKey) {
     var startIdx = 0;
-    for (var i = 0; i < BTC_MONTHLY.length; i++) {
-      if (BTC_MONTHLY[i][0] === '2013-01') { startIdx = i; break; }
+    for (var i = 0; i < series.length; i++) {
+      if (series[i][0] === startKey || series[i][0].slice(0, 7) === startKey) {
+        startIdx = i; break;
+      }
     }
     var cagrs = [];
-    for (var i = startIdx; i + months < BTC_MONTHLY.length; i++) {
-      var p0 = BTC_MONTHLY[i][1];
-      var p1 = BTC_MONTHLY[i + months][1];
+    for (var i = startIdx; i + months < series.length; i++) {
+      var p0 = series[i][1];
+      var p1 = series[i + months][1];
       cagrs.push(Math.pow(p1 / p0, 12 / months) - 1);
     }
+    if (!cagrs.length) return { min: null, median: null, max: null };
     cagrs.sort(function(a, b){ return a - b; });
     var n = cagrs.length;
     var median = (n % 2)
@@ -1958,6 +2057,9 @@
     return { min: cagrs[0], median: median, max: cagrs[n - 1] };
   }
 
+  function btcCAGRStats(months) { return rollingCAGRStats(BTC_MONTHLY, months, STATS_START_KEY); }
+  function spCAGRStats (months) { return rollingCAGRStats(SP500_TR_DATA, months, STATS_START_KEY); }
+
   var chartInstance = null;
   var hasInited = false;
 
@@ -1965,7 +2067,7 @@
     var periods = [12, 24, 36, 48, 60, 120];
     var labels  = ['1 yr', '2 yr', '3 yr', '4 yr', '5 yr', '10 yr'];
     var btcStats = periods.map(btcCAGRStats);
-    var spStats  = periods.map(function(m){ return SP500_STATS[m]; });
+    var spStats  = periods.map(spCAGRStats);
 
     // Pct-format helpers (% on chart)
     function toPct(v) { return v == null ? null : v * 100; }

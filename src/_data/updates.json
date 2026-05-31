@@ -3,6 +3,12 @@
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
+    "summary": "Gallery polish: Chart 10 (Volatility Is Not Risk) and the matching chart on The Bitcoin Horizon now compute stats from January 2015 onwards — deliberately setting aside the parabolic 2013 run and 2014 drawdown as unrepresentative of plausible forward outcomes. The same 2015+ window is applied to the S&P 500 for an apples-to-apples comparison. The conservative framing strengthens the case: bitcoin's worst-case at 3 years and beyond stays positive, and the 10-year band collapses to a tight 64-85% range, still well above the S&P 500's 13-15%. Chart 1 (Power Law Channel) also gets a 'you are here' pulse halo on the today point — the canonical animated amber marker from STYLE_GUIDE §6.23"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
     "summary": "Gallery polish: Chart 8 (Heatmap) gains a Period return / Held to today toggle matching the source-page /heatmap behavior — defaults to discrete-window (more informative) but lets readers flip to held-to-today to verify most red cells turn amber when the holder simply kept holding. Chart 10 (Volatility Is Not Risk) legend restored to all four entries — the orange and white median dots now have legend labels"
   },
   {

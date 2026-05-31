@@ -62,6 +62,7 @@ eleventyComputed:
 
         <div class="gallery-chart-frame">
             <canvas id="galleryChannelChart" aria-label="Power Law channel chart"></canvas>
+            <div id="galleryChannelPulse" class="lcs-pulse-halo" aria-hidden="true"></div>
             <div class="gallery-chart-fallback" aria-hidden="true">
                 <p class="chart-loading">Loading the channel&hellip;</p>
             </div>
@@ -329,7 +330,7 @@ eleventyComputed:
         <header class="gallery-section-header">
             <p class="gallery-section-eyebrow">&sect;IV &middot; Horizon &middot; Chart 10 of 10</p>
             <h2 id="title-horizon" class="gallery-section-title">Volatility Is Not Risk &mdash; CAGR Ranges by Horizon</h2>
-            <p class="gallery-section-subtitle">Historical range of rolling annualized returns (min, median, max) for bitcoin and the S&amp;P 500 across holding periods from 1 to 10 years.</p>
+            <p class="gallery-section-subtitle">Rolling annualized returns (min, median, max) for bitcoin and the S&amp;P 500 across holding periods of 1&ndash;10 years &mdash; deliberately computed from 2015 onwards, setting aside pre-2015 bitcoin returns as unrepresentative of plausible forward outcomes.</p>
         </header>
 
         <div class="gallery-chart-frame">
@@ -340,8 +341,9 @@ eleventyComputed:
         </div>
 
         <div class="gallery-section-prose">
-            <p>At a one-year holding horizon, bitcoin's worst rolling return was deeply negative &mdash; the 'too volatile' objection in one bar. But <em>look what happens as the horizon lengthens.</em> Each bar collapses inward: the worst-case return rises, the best-case return falls, and the distribution narrows around a positive median. By a ten-year horizon, bitcoin's worst historical rolling CAGR is still meaningfully positive, while the S&amp;P 500's stays bounded near its long-run 10% mean.</p>
+            <p>At a one-year holding horizon, bitcoin's worst rolling return was deeply negative &mdash; the 'too volatile' objection in one bar. But <em>look what happens as the horizon lengthens.</em> Each bar collapses inward: the worst-case return rises, the best-case return falls, and the distribution narrows around a positive median. By a three-year horizon, bitcoin's worst historical rolling CAGR is already positive. By ten years, the bitcoin range collapses into a tight band entirely above the S&amp;P 500's.</p>
             <p><em>Volatility is not risk.</em> Volatility is the width of the short-term distribution. Risk is the probability of permanent loss of purchasing power. At horizons of five years or more, bitcoin's historical record shows the former but not the latter &mdash; the wide one-year bars compress into something the S&amp;P 500's never does: a wide median, narrow range, no negative tail. That's the entire argument for time as bitcoin's strongest ally.</p>
+            <p class="prose-footnote"><em>On the data:</em> these stats are deliberately computed from January 2015 onwards, setting aside the parabolic 2013 run and the 2014 drawdown. Those years generated 1-year bitcoin returns above 4000% and below -75% that, while historically real, aren't representative of any plausible forward outcome. The 11 years that remain still cover three complete bitcoin cycles, and the same window is applied to the S&amp;P 500 for an apples-to-apples comparison &mdash; which means the chart's SP500 numbers reflect the unusually strong 2015&ndash;2026 stretch, not the long-run ~10% historical mean.</p>
         </div>
 
         <p class="gallery-section-source">More in this exploration &rarr; <a href="/the-bitcoin-horizon.html">The Bitcoin Horizon</a></p>

@@ -297,6 +297,54 @@ body {
     border-bottom-color: var(--orange);
 }
 
+/* ═══ Canonical "you are here" pulse halo (STYLE_GUIDE §6.23) ════
+   Animated amber radial marker positioned over the live "today" data
+   point. Class name lcs-pulse-halo is the canonical, shared spelling
+   used across the site (Disciplined Rebalancing, Retirement, BAS).
+   On the Gallery, only Chart 1 uses it — positioned by the lcsPulse
+   plugin in the Chart 1 IIFE at (TODAY_DAYS, livePrice). The element
+   sits over the canvas inside .gallery-chart-frame (which is already
+   position: relative). Animation cycles ~2.6s; second ring delayed
+   1.3s for a "chasing" effect. Respects prefers-reduced-motion.    */
+.lcs-pulse-halo {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    /* Solid amber core dot at the pulse center — sits on top of the
+       Chart.js "Today" dot in the dataset, so the two coincide. */
+    background-color: var(--amber, #e09422);
+    box-shadow: 0 0 6px rgba(224, 148, 34, 0.5);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    z-index: 2;
+}
+.lcs-pulse-halo.is-visible { opacity: 1; }
+.lcs-pulse-halo::before,
+.lcs-pulse-halo::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid rgba(224, 148, 34, 0.7);
+    transform: translate(-50%, -50%) scale(1);
+    animation: lcsPulseRing 2.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+.lcs-pulse-halo::after { animation-delay: 1.3s; }
+@keyframes lcsPulseRing {
+    0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.85; }
+    100% { transform: translate(-50%, -50%) scale(4); opacity: 0;    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .lcs-pulse-halo::before,
+    .lcs-pulse-halo::after { animation: none; }
+}
+
 /* ═══ Heatmap — Chart 8's custom SVG host ══════════════════════════ */
 /* The heatmap is rendered as an inline SVG inside .heatmap-svg-host
    (filled by the-gallery.js's Chart 8 IIFE at lazy-init time). Frame
