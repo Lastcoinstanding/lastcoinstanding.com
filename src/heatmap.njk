@@ -3,7 +3,13 @@ layout: base.njk
 permalink: /heatmap.html
 slug: heatmap
 companion: []
-related: []
+related:
+  - slug: bitcoin-vs-the-stock-market
+    desc: "The full deep-dive that this heatmap visualizes — click any cell to navigate to the BvSM page with that cell's start-date and horizon pre-loaded. The wealth-over-time comparison, the four-section progressive argument, and the methodology all live there."
+  - slug: the-power-law
+    desc: "The structural growth model underlying the bitcoin-vs-equities comparison. The heatmap visualizes the historical record; the Power Law is the model that makes the long-horizon claim — that bitcoin outperforms the index over multi-year windows — generalizable."
+  - slug: the-gallery
+    desc: "The curated visual index. The heatmap is Chart 8 there; the Gallery places it in the broader structural argument alongside nine other charts that build the case from model → consequence → evidence → horizon."
 eleventyComputed:
   head_extras: "{% include '_pageassets/heatmap-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-vs-the-stock-market.css' %}\n{% include '_pageassets/heatmap.css' %}"
@@ -227,3 +233,5 @@ eleventyComputed:
     </section>
 
 </main>
+
+{% include 'components/related.njk' %}
