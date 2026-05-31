@@ -486,7 +486,7 @@ def build_card(page, card_config: dict, output_path: Path) -> None:
         img = img.resize((1280, 720), Image.LANCZOS)
     img = img.convert("RGB")
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    img.save(output_path, "JPEG", quality=82, optimize=True, progressive=True)
+    img.save(output_path, "JPEG", quality=82, optimize=True, progressive=False)
     elapsed = time.time() - started
     print(f"  wrote {output_path} ({output_path.stat().st_size:,} bytes, "
           f"{elapsed:.1f}s)")
