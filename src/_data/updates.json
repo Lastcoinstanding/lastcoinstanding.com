@@ -2,6 +2,12 @@
   {
     "date": "2026-05-30",
     "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "The Gallery now ships with the full SEO + social-card baseline that other pages on the site have — Google Analytics, canonical URL, full Open Graph and Twitter card meta tags, JSON-LD WebPage schema, custom OG image (the Power Law channel as hero with editorial chrome), sitemap and llms.txt registration, and reciprocal Related cross-link cards with The Power Law, Bitcoin vs. The Stock Market, and The Bitcoin Horizon. Brings the page into compliance with the site's NEW_PAGE_CHECKLIST"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
     "page": "/the-bitcoin-horizon.html",
     "summary": "Small fix on The Bitcoin Horizon: the §2 chart caption (under the rolling-CAGR chart) was constrained to 72 characters wide and stopped well short of the chart's right edge. Removed the max-width — caption now flows to the full chart-panel width, matching the chart canvas above it"
   },

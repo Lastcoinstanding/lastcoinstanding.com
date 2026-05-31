@@ -159,5 +159,13 @@
         "category": "numbers",
         "interactive": true,
         "is_calculator": false
+    },
+    {
+        "_comment": "Hub-level page. The 'hub' category is intentionally outside the foundations/arguments/numbers nav buckets — base.njk only iterates those three. This entry exists so the related component can render Gallery back-link cards (its slug lookup against explorations.json otherwise silently fails). If a future nav iterator needs to include hub pages, add an explicit check for 'hub' there.",
+        "slug": "the-gallery",
+        "title": "The Gallery",
+        "category": "hub",
+        "interactive": true,
+        "is_calculator": false
     }
 ]

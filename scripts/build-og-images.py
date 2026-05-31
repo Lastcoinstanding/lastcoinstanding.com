@@ -400,6 +400,26 @@ CARDS = [
         },
         "output_filename": "og-bitcoin-backed-mortgages.jpg",
     },
+    {
+        "name": "the-gallery",
+        "url": "https://lastcoinstanding.com/the-gallery",
+        "hero_selector": "#galleryChannelChart",
+        "wait_after_navigate_ms": 1800,
+        "wait_after_scroll_ms": 3500,
+        "chrome": {
+            "title": "The ",
+            "titleAccent": "Gallery",
+            "titleAfter": "",
+            "subtitle": "A vertical scroll-through of the ten most striking charts across Last Coin Standing — each chart full-size, with editorial framing.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">10 charts</strong>'
+                '  ·  Power Law, housing, retirement, heatmap, horizons'
+                '  ·  the case in one scroll'
+            ),
+            "urlText": "lastcoinstanding.com/the-gallery",
+        },
+        "output_filename": "og-the-gallery.jpg",
+    },
 ]
 
 

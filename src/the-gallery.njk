@@ -4,6 +4,13 @@ permalink: /the-gallery.html
 slug: the-gallery
 title: The Gallery
 description: A vertical scroll-through of the most striking charts and patterns across Last Coin Standing — each chart full-size, with editorial framing, delivering its insight on the spot.
+related:
+  - slug: the-power-law
+    desc: "The structural model anchoring most of the site's quantitative arguments — and the source of the Gallery's opening two charts. Read this for the math behind the channel."
+  - slug: bitcoin-vs-the-stock-market
+    desc: "The full deep-dive on bitcoin's historical outperformance vs. equities — the source page for the Gallery's rolling-CAGR comparison and the outperformance heatmap."
+  - slug: the-bitcoin-horizon
+    desc: "The volatility-is-not-risk argument unpacked at length — the source page for the Gallery's closing chart on CAGR ranges by holding horizon."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-gallery-head.html' %}"
   page_styles: "{% include '_pageassets/the-gallery.css' %}"
@@ -349,3 +356,5 @@ eleventyComputed:
         <p class="gallery-section-source">More in this exploration &rarr; <a href="/the-bitcoin-horizon.html">The Bitcoin Horizon</a></p>
     </div>
 </section>
+
+{% include 'components/related.njk' %}

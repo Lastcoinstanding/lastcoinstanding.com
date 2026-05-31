@@ -42,6 +42,7 @@ Data-driven analyses with interactive calculators. Backed by historical price da
 
 ## Tools
 
+- [The Gallery](https://lastcoinstanding.com/the-gallery): A curated vertical scroll-through of the ten most striking charts across the site — Power Law channel, BTC required to buy a US house, real opportunity cost of buying a house, global housing affordability, BTC needed for retirement, 4-year rolling CAGR vs. the S&P 500, the BTC outperformance heatmap, the half-life of a dollar, and CAGR ranges by holding horizon. Each chart full-size with editorial framing; designed as a one-stop entry point that shows the structural argument from model → consequence → evidence → horizon.
 - [The Bitcoin Heatmap](https://lastcoinstanding.com/heatmap): Standalone interactive — bitcoin's outperformance against the S&P 500 and NASDAQ-100 across every monthly entry from 2010 and every common holding horizon, in one grid. Click-to-explore navigates to the full Bitcoin vs. Stock Market article with the cell's parameters pre-loaded.
 - [Calculators](https://lastcoinstanding.com/calculators): Central hub linking to every interactive calculator across the site.
 
