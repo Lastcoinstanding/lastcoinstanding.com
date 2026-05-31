@@ -1,0 +1,549 @@
+/* ═══════════════════════════════════════════════════════════════════
+   /start-here — orientation pathway page styles
+   
+   Design: vertical numbered cards with a subtle visual rail connecting
+   the step numbers. Each step has a framing-label eyebrow, icon,
+   editorial title, description, payoff line, and CTA. Paired step 6
+   uses a wider card with two side-by-side mini-cards.
+   
+   Palette follows the bitcoin-defined pattern: page-scoped variables,
+   self-contained background, dark + amber tokens consistent with the
+   site's editorial identity.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.start-here-page {
+  --sh-bg: #080808;
+  --sh-card-bg: #0d0d0d;
+  --sh-card-border: rgba(247,147,26,0.10);
+  --sh-card-border-hover: rgba(247,147,26,0.32);
+  --sh-amber: #F7931A;
+  --sh-amber-soft: #e09422;
+  --sh-amber-glow: rgba(247,147,26,0.06);
+  --sh-text: #e8e0d5;
+  --sh-text-bright: #f2eee8;
+  --sh-text-dim: rgba(232,224,213,0.55);
+  --sh-text-mid: rgba(232,224,213,0.78);
+  background: var(--sh-bg);
+  color: var(--sh-text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+body { background: #080808; }
+
+.start-here-page {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 6rem;
+}
+
+/* ─── Hero ─── */
+.sh-hero {
+  text-align: center;
+  margin-bottom: 5rem;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid rgba(247,147,26,0.10);
+}
+
+.sh-eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sh-amber);
+  margin: 0 0 1rem;
+  font-weight: 500;
+}
+
+.sh-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.6rem, 7vw, 4.6rem);
+  font-weight: 500;
+  line-height: 1;
+  margin: 0 0 1.2rem;
+  color: var(--sh-text-bright);
+  letter-spacing: -0.01em;
+}
+
+.sh-title em {
+  color: var(--sh-amber);
+  font-style: italic;
+}
+
+.sh-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+  color: var(--sh-text-mid);
+  margin: 0 auto 2.2rem;
+  max-width: 580px;
+  line-height: 1.4;
+}
+
+.sh-intro {
+  max-width: 660px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.sh-intro p {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--sh-text-mid);
+  margin: 0 0 1rem;
+}
+
+.sh-intro p:last-child {
+  margin-bottom: 0;
+}
+
+.sh-intro-sequence {
+  text-align: center;
+  font-size: 0.95rem !important;
+  padding: 1rem 0;
+}
+
+.sh-intro-sequence em {
+  color: var(--sh-amber);
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* ─── Pathway list ─── */
+.sh-pathway {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+/* The vertical rail connecting all step numbers */
+.sh-pathway::before {
+  content: '';
+  position: absolute;
+  left: 31px;
+  top: 31px;
+  bottom: 31px;
+  width: 1px;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    var(--sh-amber) 8%,
+    var(--sh-amber) 92%,
+    transparent 100%);
+  opacity: 0.25;
+  z-index: 0;
+}
+
+/* ─── Individual step ─── */
+.sh-step {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 1;
+}
+
+.sh-step:last-child {
+  margin-bottom: 0;
+}
+
+.sh-step-rail {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 0.5rem;
+}
+
+.sh-step-num {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: var(--sh-bg);
+  border: 1.5px solid var(--sh-amber);
+  color: var(--sh-amber);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 500;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 0 0 6px var(--sh-bg);
+}
+
+.sh-step-card {
+  background: var(--sh-card-bg);
+  border: 1px solid var(--sh-card-border);
+  border-radius: 6px;
+  padding: 1.8rem 2rem;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.sh-step-card:hover {
+  border-color: var(--sh-card-border-hover);
+}
+
+.sh-step-eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sh-amber);
+  margin: 0 0 0.9rem;
+  font-weight: 500;
+}
+
+.sh-step-link {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 1.1rem;
+  text-decoration: none;
+}
+
+.sh-step-icon {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sh-amber-glow);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.sh-step-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.sh-step-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.5rem, 2.8vw, 1.85rem);
+  font-weight: 500;
+  color: var(--sh-text-bright);
+  margin: 0;
+  line-height: 1.2;
+  transition: color 0.18s ease;
+  text-decoration: none;
+}
+
+.sh-step-link:hover .sh-step-title {
+  color: var(--sh-amber);
+}
+
+.sh-step-desc {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--sh-text-mid);
+  margin: 0 0 1.1rem;
+}
+
+.sh-step-desc em {
+  color: var(--sh-text-bright);
+  font-style: italic;
+}
+
+.sh-step-payoff {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--sh-text-mid);
+  margin: 0 0 1.2rem;
+  padding: 0.8rem 1rem;
+  background: var(--sh-amber-glow);
+  border-left: 2px solid var(--sh-amber);
+  border-radius: 0 4px 4px 0;
+}
+
+.sh-payoff-label {
+  color: var(--sh-amber);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+}
+
+.sh-step-cta {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: var(--sh-amber);
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: gap 0.18s ease;
+}
+
+.sh-step-cta:hover {
+  gap: 0.65rem;
+}
+
+/* ─── Step 6 — paired card ─── */
+.sh-step-card-paired {
+  padding-bottom: 1.5rem;
+}
+
+.sh-step-title-paired {
+  font-size: clamp(1.3rem, 2.4vw, 1.55rem) !important;
+  font-style: italic;
+  margin-bottom: 0.9rem !important;
+  color: var(--sh-text-bright);
+}
+
+.sh-step-pair-intro {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--sh-text-mid);
+  margin: 0 0 1.4rem;
+}
+
+.sh-pair-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+
+.sh-pair-card {
+  background: rgba(247, 147, 26, 0.04);
+  border: 1px solid rgba(247, 147, 26, 0.15);
+  border-radius: 5px;
+  padding: 1.2rem 1.2rem 1rem;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.sh-pair-card:hover {
+  border-color: var(--sh-card-border-hover);
+  transform: translateY(-1px);
+}
+
+.sh-pair-icon {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 0.7rem;
+}
+
+.sh-pair-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.sh-pair-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--sh-text-bright);
+  margin: 0 0 0.4rem;
+  line-height: 1.2;
+}
+
+.sh-pair-desc {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--sh-text-mid);
+  margin: 0 0 0.8rem;
+  flex: 1;
+}
+
+.sh-pair-cta {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  color: var(--sh-amber);
+  font-weight: 500;
+}
+
+/* ─── Now What? closing block ─── */
+.sh-now-what {
+  margin-top: 5rem;
+  padding-top: 3rem;
+  border-top: 1px solid rgba(247,147,26,0.10);
+  text-align: center;
+}
+
+.sh-now-eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sh-amber);
+  margin: 0 0 1rem;
+  font-weight: 500;
+}
+
+.sh-now-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 500;
+  color: var(--sh-text-bright);
+  margin: 0 0 1.2rem;
+  line-height: 1.2;
+}
+
+.sh-now-title em {
+  color: var(--sh-amber);
+  font-style: italic;
+}
+
+.sh-now-intro {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--sh-text-mid);
+  margin: 0 auto 2rem;
+  max-width: 640px;
+}
+
+.sh-now-intro em {
+  color: var(--sh-text-bright);
+  font-style: italic;
+}
+
+.sh-now-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.sh-now-card {
+  background: var(--sh-card-bg);
+  border: 1px solid var(--sh-card-border);
+  border-radius: 6px;
+  padding: 1.5rem 1.6rem 1.4rem;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.sh-now-card:hover {
+  border-color: var(--sh-card-border-hover);
+  transform: translateY(-2px);
+}
+
+.sh-now-card-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 0.9rem;
+}
+
+.sh-now-card-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.sh-now-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: var(--sh-text-bright);
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.sh-now-card-desc {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--sh-text-mid);
+  margin: 0 0 1rem;
+  flex: 1;
+}
+
+.sh-now-card-cta {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: var(--sh-amber);
+  font-weight: 500;
+}
+
+.sh-now-rest {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--sh-text-mid);
+  margin: 0 auto;
+  max-width: 640px;
+}
+
+.sh-now-rest a {
+  color: var(--sh-amber);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.sh-now-rest a:hover {
+  text-decoration: underline;
+}
+
+/* ─── Mobile ─── */
+@media (max-width: 720px) {
+  .start-here-page {
+    padding: 2.5rem 1rem 4rem;
+  }
+  
+  .sh-hero {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+  }
+  
+  .sh-pathway::before {
+    left: 23px;
+  }
+  
+  .sh-step {
+    grid-template-columns: 48px 1fr;
+    gap: 1rem;
+    margin-bottom: 2.2rem;
+  }
+  
+  .sh-step-num {
+    width: 46px;
+    height: 46px;
+    font-size: 1.55rem;
+    box-shadow: 0 0 0 4px var(--sh-bg);
+  }
+  
+  .sh-step-card {
+    padding: 1.3rem 1.3rem;
+  }
+  
+  .sh-step-link {
+    gap: 0.9rem;
+    margin-bottom: 0.9rem;
+  }
+  
+  .sh-step-icon {
+    flex: 0 0 50px;
+    width: 50px;
+    height: 50px;
+    padding: 6px;
+  }
+  
+  .sh-pair-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .sh-now-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .sh-now-what {
+    margin-top: 3rem;
+    padding-top: 2rem;
+  }
+}

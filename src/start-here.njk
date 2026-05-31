@@ -1,0 +1,355 @@
+---
+layout: base.njk
+permalink: /start-here.html
+slug: start-here
+title: Start Here
+description: A curated path for people relatively new to Bitcoin. Seven explorations sequenced so each one earns the next — framework, emotion, quantification, introduction, mechanism, evidence, commitment. By the end you'll understand the structural case for Bitcoin more clearly than most people who hold it.
+companion: []
+related:
+  - slug: the-gallery
+    desc: "Once you've walked the pathway, the Gallery is the curated chart wall — the structural case rendered in one visual sweep. Pairs naturally with this orientation page as a hub-level companion."
+  - slug: the-bitcoin-retirement
+    desc: "When you're ready for applied scenarios, the retirement calculator is one of the most engaging surfaces on the site — model a Power-Law-anchored Bitcoin scenario across multiple sustainability lenses."
+  - slug: bitcoin-vs-real-estate
+    desc: "The canonical asset comparison — 30-year projection calculator, global affordability data, real and nominal returns. The companion piece for after the structural case lands."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/start-here-head.html' %}"
+  page_styles: "{% include '_pageassets/start-here.css' %}"
+---
+
+{# ═══════════════════════════════════════════════════════════════════
+   /start-here — the orientation pathway for newcomers.
+
+   Editorial: this page is the answer to "where do I start?" — a problem
+   the site otherwise leaves to the visitor. Seven curated explorations
+   sequenced as Framework → Emotion → Quantification → Introduction →
+   Mechanism → Evidence (paired) → Commitment. Each step exposes its
+   "framing label" so the reader sees the deliberate sequencing.
+
+   Audience: pre-conviction Normies. Welcoming intro, explicit payoff
+   per step. Applied surfaces (calculators, BvSM, etc.) deliberately
+   excluded from the pathway and surfaced only in the closing
+   "Now what?" block as natural next layers.
+
+   Structure:
+     - Hero (welcome + curation philosophy)
+     - .sh-pathway ol with 7 steps; step 6 is paired (PL + Gallery)
+     - .sh-now-what closing block (Retirement + BvRE highlighted)
+     - Related cards (Gallery, Retirement, BvRE again — reciprocal)
+   ═══════════════════════════════════════════════════════════════════ #}
+
+<main>
+  <article class="start-here-page">
+
+    {# ─── Hero / welcome ─── #}
+    <section class="sh-hero">
+      <p class="sh-eyebrow">A curated path</p>
+      <h1 class="sh-title">Start <em>Here</em></h1>
+      <p class="sh-subtitle">For people relatively new to Bitcoin &mdash; and ready to actually understand it.</p>
+      <div class="sh-intro">
+        <p>There's a lot on this site, and most of it doesn't make sense in isolation. The seven explorations below are sequenced so that each one earns the next:</p>
+        <p class="sh-intro-sequence"><em>framework</em> before <em>emotion</em>, <em>emotion</em> before <em>quantification</em>, <em>quantification</em> before <em>introduction</em>, then <em>mechanism</em>, <em>evidence</em>, and finally <em>commitment</em>.</p>
+        <p>By the time you reach the seventh, you'll understand the structural case for Bitcoin more clearly than most people who hold it &mdash; and more clearly than nearly everyone in your peer group. No prior knowledge required. Each step is short.</p>
+      </div>
+    </section>
+
+    {# ─── The pathway: 7 steps ─── #}
+    <ol class="sh-pathway">
+
+      {# Step 1 — Framework #}
+      <li class="sh-step" data-step="1">
+        <div class="sh-step-rail">
+          <div class="sh-step-num">1</div>
+        </div>
+        <div class="sh-step-card">
+          <p class="sh-step-eyebrow">Framework</p>
+          <a href="/what-money-has-to-be.html" class="sh-step-link" aria-label="Begin step 1: What Money Has To Be">
+            <div class="sh-step-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="14" r="6" stroke="#F7931A" stroke-width="1.4" fill="rgba(247,147,26,0.08)"/>
+                <circle cx="14" cy="32" r="6" stroke="#F7931A" stroke-width="1.4" fill="rgba(247,147,26,0.08)"/>
+                <circle cx="34" cy="32" r="6" stroke="#F7931A" stroke-width="1.4" fill="rgba(247,147,26,0.08)"/>
+                <path d="M 24 20 L 14 32 M 24 20 L 34 32 M 14 32 L 34 32" stroke="#e09422" stroke-width="0.9" opacity="0.6" stroke-dasharray="2 2"/>
+                <text x="24" y="11" text-anchor="middle" fill="#F7931A" font-size="3.5" font-family="sans-serif" letter-spacing="0.5">STORE</text>
+                <text x="14" y="42" text-anchor="middle" fill="#F7931A" font-size="3.5" font-family="sans-serif" letter-spacing="0.5">MOVE</text>
+                <text x="34" y="42" text-anchor="middle" fill="#F7931A" font-size="3.5" font-family="sans-serif" letter-spacing="0.5">UNIT</text>
+              </svg>
+            </div>
+            <h2 class="sh-step-title">What Money Has To Be</h2>
+          </a>
+          <p class="sh-step-desc">The irreducible trilemma. One money must <em>store value</em> across time, <em>move value</em> across space, and serve as a <em>unit of account</em> across people &mdash; or it fails at all three. This is the philosophical bedrock. No interactivity yet, just cold logic that makes every later page land harder.</p>
+          <p class="sh-step-payoff"><span class="sh-payoff-label">After this you'll know</span> &mdash; the three jobs every money must do, and why most things called "money" fail at one or more.</p>
+          <a href="/what-money-has-to-be.html" class="sh-step-cta">Begin step 1 &rarr;</a>
+        </div>
+      </li>
+
+      {# Step 2 — Emotion #}
+      <li class="sh-step" data-step="2">
+        <div class="sh-step-rail">
+          <div class="sh-step-num">2</div>
+        </div>
+        <div class="sh-step-card">
+          <p class="sh-step-eyebrow">Emotion</p>
+          <a href="/the-melting-ice-cube.html" class="sh-step-link" aria-label="Begin step 2: The Melting Ice Cube">
+            <div class="sh-step-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {# Ice cube melting — solid block at top, droplets falling, puddle below #}
+                <rect x="14" y="8" width="20" height="14" rx="1.5" stroke="#F7931A" stroke-width="1.4" fill="rgba(247,147,26,0.12)"/>
+                <line x1="18" y1="11" x2="22" y2="11" stroke="#F7931A" stroke-width="0.8" opacity="0.5"/>
+                <line x1="26" y1="14" x2="30" y2="14" stroke="#F7931A" stroke-width="0.8" opacity="0.5"/>
+                <line x1="20" y1="17" x2="24" y2="17" stroke="#F7931A" stroke-width="0.8" opacity="0.5"/>
+                {# Drips falling #}
+                <circle cx="18" cy="26" r="1" fill="#e09422" opacity="0.7"/>
+                <circle cx="24" cy="29" r="1.2" fill="#e09422" opacity="0.8"/>
+                <circle cx="30" cy="27" r="1" fill="#e09422" opacity="0.7"/>
+                <circle cx="21" cy="34" r="0.8" fill="#e09422" opacity="0.5"/>
+                <circle cx="28" cy="35" r="0.9" fill="#e09422" opacity="0.5"/>
+                {# Puddle / spreading pool #}
+                <ellipse cx="24" cy="40" rx="14" ry="2" fill="#F7931A" opacity="0.25"/>
+                <ellipse cx="24" cy="40" rx="11" ry="1.5" fill="#F7931A" opacity="0.18"/>
+              </svg>
+            </div>
+            <h2 class="sh-step-title">The Melting Ice Cube</h2>
+          </a>
+          <p class="sh-step-desc">Immediate visceral punch. Watch $100,000 of cash visibly thaw in real time. This is the emotional hook that makes fiat feel personal. Keep it early; the decay curve is unforgettable.</p>
+          <p class="sh-step-payoff"><span class="sh-payoff-label">After this you'll feel</span> &mdash; what holding dollars actually costs, in a way you'll never unsee.</p>
+          <a href="/the-melting-ice-cube.html" class="sh-step-cta">Begin step 2 &rarr;</a>
+        </div>
+      </li>
+
+      {# Step 3 — Quantification #}
+      <li class="sh-step" data-step="3">
+        <div class="sh-step-rail">
+          <div class="sh-step-num">3</div>
+        </div>
+        <div class="sh-step-card">
+          <p class="sh-step-eyebrow">Quantification</p>
+          <a href="/the-half-life.html" class="sh-step-link" aria-label="Begin step 3: The Half-Life">
+            <div class="sh-step-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {# Exponential decay curve with axes — quantifies the melting #}
+                <line x1="6" y1="42" x2="44" y2="42" stroke="#e09422" stroke-width="0.8" opacity="0.5"/>
+                <line x1="6" y1="42" x2="6" y2="6" stroke="#e09422" stroke-width="0.8" opacity="0.5"/>
+                {# Decay curve #}
+                <path d="M 8 8 Q 14 10 20 18 Q 26 28 34 36 Q 38 39 44 41" stroke="#F7931A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                {# Half-line marker — the moment value halves #}
+                <line x1="6" y1="25" x2="22" y2="25" stroke="#e09422" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.7"/>
+                <line x1="22" y1="25" x2="22" y2="42" stroke="#e09422" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.7"/>
+                <text x="3" y="27" fill="#F7931A" font-size="3.5" font-family="sans-serif" font-weight="700">½</text>
+                {# Today marker at the start #}
+                <circle cx="8" cy="8" r="1.4" fill="#F7931A"/>
+                {# Tick at the half-life point on x-axis #}
+                <circle cx="22" cy="25" r="1.2" fill="#F7931A"/>
+              </svg>
+            </div>
+            <h2 class="sh-step-title">The Half-Life</h2>
+          </a>
+          <p class="sh-step-desc">Quantify the crime. How many years until your money is worth half? Sliders, projections, historical data. The numbers now have teeth.</p>
+          <p class="sh-step-payoff"><span class="sh-payoff-label">After this you'll be able to name</span> &mdash; the half-life of a dollar at any inflation rate, and where the historical record actually lands.</p>
+          <a href="/the-half-life.html" class="sh-step-cta">Begin step 3 &rarr;</a>
+        </div>
+      </li>
+
+      {# Step 4 — Introduction #}
+      <li class="sh-step" data-step="4">
+        <div class="sh-step-rail">
+          <div class="sh-step-num">4</div>
+        </div>
+        <div class="sh-step-card">
+          <p class="sh-step-eyebrow">Introduction</p>
+          <a href="/bitcoin-defined.html" class="sh-step-link" aria-label="Begin step 4: Bitcoin Defined">
+            <div class="sh-step-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {# Eight dots — the eight load-bearing ideas — with one revealed (filled), others outlined #}
+                <circle cx="9" cy="16" r="2.8" fill="#F7931A"/>
+                <circle cx="19" cy="16" r="2.8" fill="#F7931A"/>
+                <circle cx="29" cy="16" r="2.8" fill="#F7931A" opacity="0.5"/>
+                <circle cx="39" cy="16" r="2.8" fill="#F7931A" opacity="0.25"/>
+                <circle cx="9" cy="32" r="2.8" fill="#F7931A" opacity="0.5"/>
+                <circle cx="19" cy="32" r="2.8" fill="#F7931A" opacity="0.25"/>
+                <circle cx="29" cy="32" r="2.8" fill="#F7931A" opacity="0.25"/>
+                <circle cx="39" cy="32" r="2.8" fill="#F7931A" opacity="0.25"/>
+                {# Highlight line under first two — the "revealed so far" indicator #}
+                <line x1="6" y1="22" x2="22" y2="22" stroke="#F7931A" stroke-width="1" opacity="0.7"/>
+              </svg>
+            </div>
+            <h2 class="sh-step-title">Bitcoin Defined</h2>
+          </a>
+          <p class="sh-step-desc">The interactive reveal. One sentence that only Bitcoin satisfies. Light, clickable, rewarding curiosity without overwhelming.</p>
+          <p class="sh-step-payoff"><span class="sh-payoff-label">After this you'll have</span> &mdash; the shortest accurate definition of Bitcoin, and the eight ideas inside it that are each doing essential work.</p>
+          <a href="/bitcoin-defined.html" class="sh-step-cta">Begin step 4 &rarr;</a>
+        </div>
+      </li>
+
+      {# Step 5 — Mechanism #}
+      <li class="sh-step" data-step="5">
+        <div class="sh-step-rail">
+          <div class="sh-step-num">5</div>
+        </div>
+        <div class="sh-step-card">
+          <p class="sh-step-eyebrow">Mechanism</p>
+          <a href="/synthesis.html" class="sh-step-link" aria-label="Begin step 5: The Bitcoin Synthesis">
+            <div class="sh-step-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {# Six interlocking components forming a hexagonal whole #}
+                <polygon points="24,8 36,15 36,29 24,36 12,29 12,15" stroke="#F7931A" stroke-width="1.5" fill="rgba(247,147,26,0.08)" stroke-linejoin="round"/>
+                {# Internal triangulation showing the six pieces #}
+                <line x1="24" y1="8" x2="24" y2="36" stroke="#F7931A" stroke-width="0.8" opacity="0.5"/>
+                <line x1="12" y1="15" x2="36" y2="29" stroke="#F7931A" stroke-width="0.8" opacity="0.5"/>
+                <line x1="36" y1="15" x2="12" y2="29" stroke="#F7931A" stroke-width="0.8" opacity="0.5"/>
+                {# Six vertex dots — the components #}
+                <circle cx="24" cy="8" r="1.6" fill="#F7931A"/>
+                <circle cx="36" cy="15" r="1.6" fill="#F7931A"/>
+                <circle cx="36" cy="29" r="1.6" fill="#F7931A"/>
+                <circle cx="24" cy="36" r="1.6" fill="#F7931A"/>
+                <circle cx="12" cy="29" r="1.6" fill="#F7931A"/>
+                <circle cx="12" cy="15" r="1.6" fill="#F7931A"/>
+                {# Center — the synthesis itself #}
+                <circle cx="24" cy="22" r="2.2" fill="#F7931A"/>
+              </svg>
+            </div>
+            <h2 class="sh-step-title">The Bitcoin Synthesis</h2>
+          </a>
+          <p class="sh-step-desc">Six components. One unbreakable whole. This is the &ldquo;aha&rdquo; where the first-principles lock into place.</p>
+          <p class="sh-step-payoff"><span class="sh-payoff-label">After this you'll see</span> &mdash; why no single Bitcoin property carries the case alone, and how the six together change what money can be.</p>
+          <a href="/synthesis.html" class="sh-step-cta">Begin step 5 &rarr;</a>
+        </div>
+      </li>
+
+      {# Step 6 — Evidence (PAIRED: Power Law + Gallery) #}
+      <li class="sh-step sh-step-paired" data-step="6">
+        <div class="sh-step-rail">
+          <div class="sh-step-num">6</div>
+        </div>
+        <div class="sh-step-card sh-step-card-paired">
+          <p class="sh-step-eyebrow">Evidence &mdash; a visual double-tap</p>
+          <h2 class="sh-step-title sh-step-title-paired">The mathematical case and the visual one, side by side</h2>
+          <p class="sh-step-pair-intro">Two complementary surfaces. The first gives you the structural pattern; the second gives you the war-room evidence for what that pattern means in practice.</p>
+
+          <div class="sh-pair-grid">
+            <a href="/the-power-law.html" class="sh-pair-card">
+              <div class="sh-pair-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <line x1="8" y1="40" x2="42" y2="40" stroke="#e09422" stroke-width="1" opacity="0.35"/>
+                  <line x1="8" y1="6" x2="8" y2="40" stroke="#e09422" stroke-width="1" opacity="0.35"/>
+                  <line x1="10" y1="38" x2="42" y2="8" stroke="#F7931A" stroke-width="1.8" stroke-linecap="round"/>
+                  <circle cx="14" cy="35" r="1.2" fill="#e09422"/>
+                  <circle cx="22" cy="28" r="1.2" fill="#e09422"/>
+                  <circle cx="30" cy="19" r="1.2" fill="#e09422"/>
+                  <circle cx="38" cy="11" r="1.2" fill="#e09422"/>
+                </svg>
+              </div>
+              <h3 class="sh-pair-title">Bitcoin &amp; The Power Law</h3>
+              <p class="sh-pair-desc">The structural growth pattern fiat can never touch.</p>
+              <span class="sh-pair-cta">Open &rarr;</span>
+            </a>
+
+            <a href="/the-gallery.html" class="sh-pair-card">
+              <div class="sh-pair-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="4" y="4" width="18" height="18" rx="1.5" stroke="#F7931A" stroke-width="1" fill="rgba(247,147,26,0.06)"/>
+                  <polyline points="7,19 10,15 13,16 16,11 19,7" stroke="#F7931A" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="19" cy="7" r="1.3" fill="#F7931A"/>
+                  <rect x="26" y="4" width="18" height="18" rx="1.5" stroke="#F7931A" stroke-width="1" fill="rgba(247,147,26,0.06)"/>
+                  <rect x="29" y="14" width="2.4" height="5" fill="#F7931A"/>
+                  <rect x="33" y="11" width="2.4" height="8" fill="#F7931A" opacity="0.78"/>
+                  <rect x="37" y="8" width="2.4" height="11" fill="#F7931A" opacity="0.55"/>
+                  <rect x="41" y="6" width="2.4" height="13" fill="#F7931A" opacity="0.35"/>
+                  <rect x="4" y="26" width="18" height="18" rx="1.5" stroke="#F7931A" stroke-width="1" fill="rgba(247,147,26,0.06)"/>
+                  <rect x="7" y="29" width="3.6" height="3.6" fill="#F7931A" opacity="0.25"/>
+                  <rect x="11.4" y="29" width="3.6" height="3.6" fill="#F7931A" opacity="0.55"/>
+                  <rect x="15.8" y="29" width="3.6" height="3.6" fill="#F7931A" opacity="0.85"/>
+                  <rect x="7" y="33.4" width="3.6" height="3.6" fill="#F7931A" opacity="0.55"/>
+                  <rect x="11.4" y="33.4" width="3.6" height="3.6" fill="#F7931A" opacity="0.85"/>
+                  <rect x="15.8" y="33.4" width="3.6" height="3.6" fill="#F7931A"/>
+                  <rect x="7" y="37.8" width="3.6" height="3.6" fill="#F7931A" opacity="0.85"/>
+                  <rect x="11.4" y="37.8" width="3.6" height="3.6" fill="#F7931A"/>
+                  <rect x="15.8" y="37.8" width="3.6" height="3.6" fill="#F7931A"/>
+                  <rect x="26" y="26" width="18" height="18" rx="1.5" stroke="#F7931A" stroke-width="1" fill="rgba(247,147,26,0.06)"/>
+                  <path d="M 29 42 L 29 33 C 32 30 35 29 38 28.5 C 40.5 28.2 42 28 42 28 L 42 42 Z" fill="#F7931A" opacity="0.30"/>
+                  <path d="M 29 33 C 32 30 35 29 38 28.5 C 40.5 28.2 42 28 42 28" stroke="#F7931A" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h3 class="sh-pair-title">The Gallery</h3>
+              <p class="sh-pair-desc">Ten of the site's strongest charts in one scroll.</p>
+              <span class="sh-pair-cta">Open &rarr;</span>
+            </a>
+          </div>
+
+          <p class="sh-step-payoff"><span class="sh-payoff-label">After this you'll have</span> &mdash; the 15-year structural pattern Bitcoin has held against the dollar, and the visual evidence for what it means for ordinary savers.</p>
+        </div>
+      </li>
+
+      {# Step 7 — Commitment #}
+      <li class="sh-step" data-step="7">
+        <div class="sh-step-rail">
+          <div class="sh-step-num">7</div>
+        </div>
+        <div class="sh-step-card">
+          <p class="sh-step-eyebrow">Commitment</p>
+          <a href="/the-bitcoin-migration.html" class="sh-step-link" aria-label="Begin step 7: The Bitcoin Migration">
+            <div class="sh-step-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {# Migrating arrows — bodies flowing from left to right #}
+                <path d="M 6 16 L 18 16 L 18 12 L 24 18 L 18 24 L 18 20 L 6 20 Z" fill="#F7931A" opacity="0.35"/>
+                <path d="M 12 26 L 26 26 L 26 22 L 32 28 L 26 34 L 26 30 L 12 30 Z" fill="#F7931A" opacity="0.65"/>
+                <path d="M 18 36 L 34 36 L 34 32 L 42 38 L 34 44 L 34 40 L 18 40 Z" fill="#F7931A"/>
+              </svg>
+            </div>
+            <h2 class="sh-step-title">The Bitcoin Migration</h2>
+          </a>
+          <p class="sh-step-desc">Only now, after you've felt the breakage and seen the alternative, do you get the full exodus narrative. It becomes a commitment you choose, not one forced upon arrival.</p>
+          <p class="sh-step-payoff"><span class="sh-payoff-label">After this you'll understand</span> &mdash; why individuals, companies, and sovereigns are migrating, what stage we're in, and where it goes from here.</p>
+          <a href="/the-bitcoin-migration.html" class="sh-step-cta">Begin step 7 &rarr;</a>
+        </div>
+      </li>
+
+    </ol>
+
+    {# ─── End block: Now What? ─── #}
+    <section class="sh-now-what">
+      <p class="sh-now-eyebrow">Now what?</p>
+      <h2 class="sh-now-title">You're not done &mdash; you're <em>calibrated</em>.</h2>
+      <p class="sh-now-intro">Most of the site is for what comes <em>after</em> the structural case lands. Two of the most engaging applied surfaces &mdash; either of these can hold you across many sessions of scenario exploration:</p>
+
+      <div class="sh-now-grid">
+        <a href="/the-bitcoin-retirement.html" class="sh-now-card">
+          <div class="sh-now-card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {# Retirement: a portfolio curve climbing, with a target marker #}
+              <line x1="6" y1="40" x2="42" y2="40" stroke="#e09422" stroke-width="0.8" opacity="0.5"/>
+              <line x1="6" y1="40" x2="6" y2="6" stroke="#e09422" stroke-width="0.8" opacity="0.5"/>
+              <path d="M 6 36 Q 14 32 22 24 Q 30 14 38 8" stroke="#F7931A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              <circle cx="38" cy="8" r="2.2" fill="#F7931A"/>
+              <circle cx="38" cy="8" r="4" stroke="#F7931A" stroke-width="0.7" fill="none" opacity="0.5"/>
+              <line x1="22" y1="40" x2="22" y2="24" stroke="#e09422" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5"/>
+            </svg>
+          </div>
+          <h3 class="sh-now-card-title">The Bitcoin Retirement</h3>
+          <p class="sh-now-card-desc">Model your retirement against a Power-Law-anchored Bitcoin scenario. Adjust contribution, horizon, and withdrawal rate; see your portfolio's sustainability across multiple lenses.</p>
+          <span class="sh-now-card-cta">Open the calculator &rarr;</span>
+        </a>
+
+        <a href="/bitcoin-vs-real-estate.html" class="sh-now-card">
+          <div class="sh-now-card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {# House outline vs. Bitcoin symbol comparison #}
+              <path d="M 6 30 L 6 22 L 14 14 L 22 22 L 22 30 Z" stroke="#F7931A" stroke-width="1.4" fill="rgba(247,147,26,0.10)" stroke-linejoin="round"/>
+              <rect x="11" y="24" width="3" height="6" stroke="#F7931A" stroke-width="0.8" fill="rgba(247,147,26,0.15)" opacity="0.7"/>
+              <text x="36" y="26" text-anchor="middle" fill="#F7931A" font-size="14" font-weight="700" font-family="sans-serif">&#8383;</text>
+              <line x1="24" y1="22" x2="28" y2="22" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2" opacity="0.7"/>
+            </svg>
+          </div>
+          <h3 class="sh-now-card-title">Bitcoin vs. Real Estate</h3>
+          <p class="sh-now-card-desc">The canonical asset comparison. 30-year projection calculator, global affordability data across 5 markets, real and nominal returns. The companion piece once the structural case lands.</p>
+          <span class="sh-now-card-cta">Run the comparison &rarr;</span>
+        </a>
+      </div>
+
+      <p class="sh-now-rest">And the rest of the site is open. The <a href="/calculators.html">Calculators</a>, <a href="/bitcoin-vs-the-stock-market.html">Bitcoin vs. The Stock Market</a>, <a href="/the-bitcoin-horizon.html">The Bitcoin Horizon</a>, and every other exploration &mdash; pick whatever pulls you next. You're calibrated now; you don't need a pathway anymore.</p>
+    </section>
+
+  </article>
+</main>
+
+{% include 'components/related.njk' %}

@@ -3,6 +3,9 @@
   <!-- Homepage -->
   <url><loc>https://lastcoinstanding.com/</loc><priority>1.0</priority><changefreq>weekly</changefreq></url>
 
+  <!-- Start Here — orientation pathway for newcomers (hub-level) -->
+  <url><loc>https://lastcoinstanding.com/start-here</loc><priority>0.95</priority><changefreq>monthly</changefreq></url>
+
   <!-- The Numbers — interactive data pages (highest crawl priority after home) -->
   <url><loc>https://lastcoinstanding.com/bitcoin-vs-the-stock-market</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://lastcoinstanding.com/heatmap</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>

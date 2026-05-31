@@ -4,6 +4,12 @@
 
 Each page is a self-contained exploration. The site does not provide financial advice; it provides frameworks, data, and tools so readers can think through Bitcoin decisions themselves.
 
+## Start Here
+
+The orientation pathway for newcomers — a curated entry point into the site.
+
+- [Start Here](https://lastcoinstanding.com/start-here): A curated path for people relatively new to Bitcoin. Seven explorations sequenced so each one earns the next: framework (What Money Has To Be) → emotion (Melting Ice Cube) → quantification (Half-Life) → introduction (Bitcoin Defined) → mechanism (Synthesis) → evidence (Power Law + Gallery as paired step) → commitment (Bitcoin Migration). By the seventh, the reader understands the structural case for Bitcoin more clearly than most people who hold it. Closes with an applied-next-steps block highlighting The Bitcoin Retirement and Bitcoin vs. Real Estate.
+
 ## Foundations
 
 Conceptual underpinnings of money and Bitcoin.

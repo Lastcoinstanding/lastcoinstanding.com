@@ -17,6 +17,7 @@ eleventyComputed:
         <h1>Last Coin Standing</h1>
         <p class="tagline">Bitcoin education through contrast and clarity</p>
         <p class="intro">Understanding money requires seeing what makes it work - and what makes it break. Each interactive exploration below examines a different dimension of Bitcoin through the lens of fundamental tradeoffs, irreducible design, and philosophical contrast.</p>
+        <p class="hero-cta"><em>New to Bitcoin?</em> <a href="/start-here.html">Start here &rarr;</a></p>
     </div>
 </section>
 
@@ -32,22 +33,6 @@ eleventyComputed:
         <span class="ticker-state" id="tickerState">&mdash;</span>
         <span class="ticker-cta">see the channel &rarr;</span>
     </a>
-</section>
-
-
-<!-- RECENT UPDATES STRIP — see _data/updates.json -->
-<section class="updates-strip" aria-label="Recent site updates">
-    <div class="updates-inner">
-        <div class="updates-label">Recent updates</div>
-        <div class="updates-scroller" tabindex="0">
-            {% for u in updates %}
-            <a class="update-row" href="{{ u.page }}">
-                <span class="update-date">{{ u.display }}</span>
-                <span class="update-text">{{ u.summary }}</span>
-            </a>
-            {% endfor %}
-        </div>
-    </div>
 </section>
 
 
@@ -368,6 +353,23 @@ eleventyComputed:
     </div>
     <div class="insight-dots" id="insightDots"></div>
 </div>
+
+
+<!-- RECENT UPDATES STRIP — moved below carousel 2026-05-31 (kept as live-signal but no longer competes for attention) -->
+<section class="updates-strip" aria-label="Recent site updates">
+    <div class="updates-inner">
+        <div class="updates-label">Recent updates</div>
+        <div class="updates-scroller" tabindex="0">
+            {% for u in updates %}
+            <a class="update-row" href="{{ u.page }}">
+                <span class="update-date">{{ u.display }}</span>
+                <span class="update-text">{{ u.summary }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
 
 <!-- CONCEPT CARDS -->
 <div class="explore-section">
