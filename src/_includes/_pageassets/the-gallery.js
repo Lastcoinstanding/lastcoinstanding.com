@@ -1471,3 +1471,602 @@
     ro.observe(canvas.parentElement);
   }
 })();
+
+
+// ─── Chart 8: The Bitcoin Heatmap ──────────────────────────────────
+//
+// SVG-rendered grid of monthly entry × holding horizon, colored by
+// BTC outperformance vs S&P 500 total return. Mirrors the visual
+// pattern of /heatmap (the canonical deep-dive page) but simplified
+// for the Gallery: static (no interactive cell-click → calculator),
+// just the pattern itself.
+//
+// Color tiers and outperformance buckets match calculators-minis.js's
+// renderMiniHeatmap exactly so the Gallery and the Calculators page
+// produce visually-equivalent heatmaps for the same data.
+//
+// Not Chart.js — Chart.js's heatmap support is awkward and the cell
+// grid here is pure rectangles, so a direct SVG render is cleaner
+// and faster. Generates ~1400 <rect> elements (196 months × 7
+// horizons) at init; static after that. Performance is fine; the SVG
+// renders in <50ms.
+//
+// SP500_TR_DATA needed — duplicated inline (third copy in the file
+// after Chart 7's and the source-of-truth elsewhere). Accepted as
+// drift-risk per spec; refactor candidate for TECH_DEBT.
+(function(){
+  var host = document.getElementById('galleryHeatmap');
+  if (!host) return;
+  if (typeof PL_DATA === 'undefined') return;
+
+  // Inlined SP500 TR data — same as Chart 7. Refresh monthly per
+  // MONTHLY_REFRESH_CHECKLIST in both places.
+  var SP500_TR = [
+    ["2010-01-28", 1721.34],["2010-02-28", 1742.67],["2010-03-28", 1764.01],["2010-04-28", 1785.34],
+    ["2010-05-28", 1806.68],["2010-06-28", 1828.01],["2010-07-28", 1849.35],["2010-08-28", 1870.68],
+    ["2010-09-28", 1892.02],["2010-10-28", 1913.35],["2010-11-28", 1934.69],["2010-12-28", 1956.02],
+    ["2011-01-28", 1959.46],["2011-02-28", 1962.9],["2011-03-28", 1966.34],["2011-04-28", 1969.78],
+    ["2011-05-28", 1973.22],["2011-06-28", 1976.66],["2011-07-28", 1980.1],["2011-08-28", 1983.53],
+    ["2011-09-28", 1986.97],["2011-10-28", 1990.41],["2011-11-28", 1993.85],["2011-12-28", 1997.29],
+    ["2012-01-28", 2023.92],["2012-02-28", 2050.55],["2012-03-28", 2077.18],["2012-04-28", 2103.81],
+    ["2012-05-28", 2130.44],["2012-06-28", 2157.08],["2012-07-28", 2183.71],["2012-08-28", 2210.34],
+    ["2012-09-28", 2236.97],["2012-10-28", 2263.6],["2012-11-28", 2290.23],["2012-12-28", 2316.86],
+    ["2013-01-28", 2379.39],["2013-02-28", 2441.93],["2013-03-28", 2504.47],["2013-04-28", 2567.0],
+    ["2013-05-28", 2629.54],["2013-06-28", 2692.07],["2013-07-28", 2754.61],["2013-08-28", 2817.15],
+    ["2013-09-28", 2879.68],["2013-10-28", 2942.22],["2013-11-28", 3004.75],["2013-12-28", 3067.29],
+    ["2014-01-28", 3102.28],["2014-02-28", 3137.27],["2014-03-28", 3172.27],["2014-04-28", 3207.26],
+    ["2014-05-28", 3242.25],["2014-06-28", 3277.25],["2014-07-28", 3312.24],["2014-08-28", 3347.23],
+    ["2014-09-28", 3382.22],["2014-10-28", 3417.22],["2014-11-28", 3452.21],["2014-12-28", 3487.2],
+    ["2015-01-28", 3491.21],["2015-02-28", 3495.22],["2015-03-28", 3499.23],["2015-04-28", 3503.24],
+    ["2015-05-28", 3507.25],["2015-06-28", 3511.26],["2015-07-28", 3515.27],["2015-08-28", 3519.28],
+    ["2015-09-28", 3523.29],["2015-10-28", 3527.3],["2015-11-28", 3531.31],["2015-12-28", 3535.32],
+    ["2016-01-28", 3570.56],["2016-02-28", 3605.8],["2016-03-28", 3641.03],["2016-04-28", 3676.27],
+    ["2016-05-28", 3711.5],["2016-06-28", 3746.74],["2016-07-28", 3781.97],["2016-08-28", 3817.21],
+    ["2016-09-28", 3852.44],["2016-10-28", 3887.68],["2016-11-28", 3922.91],["2016-12-28", 3958.15],
+    ["2017-01-28", 4030.15],["2017-02-28", 4102.16],["2017-03-28", 4174.17],["2017-04-28", 4246.17],
+    ["2017-05-28", 4318.18],["2017-06-28", 4390.18],["2017-07-28", 4462.19],["2017-08-28", 4534.19],
+    ["2017-09-28", 4606.2],["2017-10-28", 4678.2],["2017-11-28", 4750.21],["2017-12-28", 4822.21],
+    ["2018-01-28", 4804.61],["2018-02-28", 4787.01],["2018-03-28", 4769.41],["2018-04-28", 4751.81],
+    ["2018-05-28", 4734.21],["2018-06-28", 4716.61],["2018-07-28", 4699.01],["2018-08-28", 4681.4],
+    ["2018-09-28", 4663.8],["2018-10-28", 4646.2],["2018-11-28", 4628.6],["2018-12-28", 4611.0],
+    ["2019-01-28", 4732.0],["2019-02-28", 4853.0],["2019-03-28", 4974.0],["2019-04-28", 5095.0],
+    ["2019-05-28", 5216.0],["2019-06-28", 5337.0],["2019-07-28", 5458.0],["2019-08-28", 5579.0],
+    ["2019-09-28", 5700.0],["2019-10-28", 5821.0],["2019-11-28", 5942.0],["2019-12-28", 6063.0],
+    ["2020-01-28", 6155.97],["2020-02-28", 6248.94],["2020-03-28", 6341.9],["2020-04-28", 6434.87],
+    ["2020-05-28", 6527.83],["2020-06-28", 6620.8],["2020-07-28", 6713.77],["2020-08-28", 6806.73],
+    ["2020-09-28", 6899.7],["2020-10-28", 6992.67],["2020-11-28", 7085.63],["2020-12-28", 7178.6],
+    ["2021-01-28", 7350.35],["2021-02-28", 7522.09],["2021-03-28", 7693.84],["2021-04-28", 7865.59],
+    ["2021-05-28", 8037.34],["2021-06-28", 8209.08],["2021-07-28", 8380.83],["2021-08-28", 8552.58],
+    ["2021-09-28", 8724.33],["2021-10-28", 8896.08],["2021-11-28", 9067.82],["2021-12-28", 9239.57],
+    ["2022-01-28", 9100.13],["2022-02-28", 8960.69],["2022-03-28", 8821.25],["2022-04-28", 8681.81],
+    ["2022-05-28", 8542.37],["2022-06-28", 8402.93],["2022-07-28", 8263.49],["2022-08-28", 8124.05],
+    ["2022-09-28", 7984.61],["2022-10-28", 7845.17],["2022-11-28", 7705.73],["2022-12-28", 7566.29],
+    ["2023-01-28", 7732.05],["2023-02-28", 7897.82],["2023-03-28", 8063.58],["2023-04-28", 8229.34],
+    ["2023-05-28", 8395.11],["2023-06-28", 8560.87],["2023-07-28", 8726.64],["2023-08-28", 8892.4],
+    ["2023-09-28", 9058.17],["2023-10-28", 9223.93],["2023-11-28", 9389.7],["2023-12-28", 9555.46],
+    ["2024-01-28", 9754.69],["2024-02-28", 9953.93],["2024-03-28", 10153.16],["2024-04-28", 10352.39],
+    ["2024-05-28", 10551.62],["2024-06-28", 10750.85],["2024-07-28", 10950.08],["2024-08-28", 11149.31],
+    ["2024-09-28", 11348.55],["2024-10-28", 11547.78],["2024-11-28", 11747.01],["2024-12-28", 11946.24],
+    ["2025-01-28", 12125.43],["2025-02-28", 12304.63],["2025-03-28", 12483.82],["2025-04-28", 12663.01],
+    ["2025-05-28", 12842.21],["2025-06-28", 13021.4],["2025-07-28", 13200.59],["2025-08-28", 13379.79],
+    ["2025-09-28", 13558.98],["2025-10-28", 13738.18],["2025-11-28", 13917.37],["2025-12-28", 14096.56],
+    ["2026-01-28", 14128.98],["2026-02-28", 14161.41],["2026-03-28", 14193.83],["2026-04-28", 14226.25],
+    ["2026-05-28", 14258.67]
+  ];
+
+  // Color tiers per outperformance multiple — same as renderMiniHeatmap
+  function tierFor(outperf) {
+    if (outperf <= 0.5) return '#BE3A30';
+    if (outperf <= 0.9) return '#6B2A23';
+    if (outperf <= 1.1) return '#1F1F1F';
+    if (outperf <= 2.0) return '#E0BC50';
+    if (outperf <= 5.0) return '#F5C240';
+    return '#F7931A';
+  }
+
+  // Log-linear interp BTC price at a given Date (via PL_DATA)
+  function daysFromDate(d) { return (d.getTime() / 1000 - GENESIS_TS) / 86400; }
+  function btcPriceAt(date) {
+    var days = daysFromDate(date);
+    if (days <= PL_DATA[0][0]) return PL_DATA[0][1];
+    if (days >= PL_DATA[PL_DATA.length - 1][0]) return PL_DATA[PL_DATA.length - 1][1];
+    for (var i = 0; i < PL_DATA.length - 1; i++) {
+      if (PL_DATA[i][0] <= days && days <= PL_DATA[i+1][0]) {
+        var t = (days - PL_DATA[i][0]) / (PL_DATA[i+1][0] - PL_DATA[i][0]);
+        return PL_DATA[i][1] * Math.pow(PL_DATA[i+1][1] / PL_DATA[i][1], t);
+      }
+    }
+    return PL_DATA[PL_DATA.length - 1][1];
+  }
+  function spPriceAt(date) {
+    var target = date.getTime();
+    var best = SP500_TR[0], bestDiff = Math.abs(new Date(SP500_TR[0][0]).getTime() - target);
+    for (var i = 1; i < SP500_TR.length; i++) {
+      var d = Math.abs(new Date(SP500_TR[i][0]).getTime() - target);
+      if (d < bestDiff) { bestDiff = d; best = SP500_TR[i]; }
+    }
+    return best[1];
+  }
+
+  var rendered = false;
+
+  function renderHeatmap() {
+    if (rendered) return;
+    if (!host.clientWidth) return;   // wait for layout
+    rendered = true;
+
+    // Layout — viewBox dimensions chosen for aspect ratio; renders
+    // responsive via CSS width/height on the svg.
+    var horizons = [12, 24, 36, 60, 84, 120];   // months
+    var hLabels  = ['1y', '2y', '3y', '5y', '7y', '10y'];
+    var startDates = [];
+    var today = new Date();
+    var d = new Date(Date.UTC(2011, 0, 15));
+    while (d < today) { startDates.push(new Date(d)); d.setUTCMonth(d.getUTCMonth() + 1); }
+
+    var nCols = startDates.length, nRows = horizons.length;
+
+    // viewBox sized so cells render at ~5px × 36px
+    var ml = 40, mt = 6, mr = 8, mb = 22;
+    var vbW = ml + nCols * 5.6 + mr;
+    var vbH = mt + nRows * 38 + mb;
+
+    var cellW = (vbW - ml - mr) / nCols;
+    var cellH = (vbH - mt - mb) / nRows;
+    var gap = 0.5;
+
+    var parts = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + vbW + ' ' + vbH + '" preserveAspectRatio="xMidYMid meet">'];
+
+    // Cells
+    for (var r = 0; r < nRows; r++) {
+      var hMo = horizons[r];                    // row 0 = 1y (shortest at top)
+      for (var c = 0; c < nCols; c++) {
+        var sd = startDates[c];
+        var ed = new Date(sd); ed.setUTCMonth(ed.getUTCMonth() + hMo);
+        var x = ml + c * cellW, y = mt + r * cellH;
+        var w = Math.max(cellW - gap, 0.5), h = Math.max(cellH - gap, 1);
+        var color;
+        if (ed > today) {
+          color = '#1a1a1a';                     // future — exit date hasn't happened
+        } else {
+          var bs = btcPriceAt(sd), be = btcPriceAt(ed);
+          var ss = spPriceAt(sd),  se = spPriceAt(ed);
+          var outperf = (be / bs) / (se / ss);
+          color = tierFor(outperf);
+        }
+        parts.push('<rect x="' + x.toFixed(2) + '" y="' + y.toFixed(2) + '" width="' + w.toFixed(2) + '" height="' + h.toFixed(2) + '" fill="' + color + '"/>');
+      }
+    }
+
+    // Y-axis horizon labels (left of grid)
+    for (var i = 0; i < nRows; i++) {
+      var ly = mt + i * cellH + cellH / 2 + 4;
+      parts.push('<text x="' + (ml - 8) + '" y="' + ly.toFixed(2) + '" font-size="11" font-family="Inter, sans-serif" fill="rgba(220,200,170,0.55)" text-anchor="end">' + hLabels[i] + '</text>');
+    }
+
+    // X-axis year labels (decadal-ish anchors)
+    var anchorYears = { 2011: 1, 2014: 1, 2017: 1, 2020: 1, 2023: 1, 2026: 1 };
+    var lastYr = null;
+    for (var col = 0; col < nCols; col++) {
+      var yr = startDates[col].getUTCFullYear();
+      if (yr !== lastYr && anchorYears[yr]) {
+        var xx = ml + col * cellW + cellW / 2;
+        parts.push('<text x="' + xx.toFixed(2) + '" y="' + (vbH - 6) + '" font-size="11" font-family="Inter, sans-serif" fill="rgba(220,200,170,0.55)" text-anchor="middle">' + yr + '</text>');
+        lastYr = yr;
+      }
+    }
+
+    parts.push('</svg>');
+    host.innerHTML = parts.join('');
+  }
+
+  // Lazy init via IntersectionObserver
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting && entry.intersectionRatio > 0) {
+          renderHeatmap();
+          io.disconnect();
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '50px' });
+    io.observe(host);
+  } else {
+    renderHeatmap();
+  }
+
+  // SVG is responsive via viewBox + 100% width — no resize handler needed
+})();
+
+
+// ─── Chart 9: The Half-Life of a Dollar ───────────────────────────
+//
+// Exponential decay of $100 in purchasing power at 6.5%/yr (M2 monetary-
+// base growth — the default inflation preset on /the-half-life). Custom
+// fill area + curve via Chart.js with a 'fill: origin' style so the
+// loss area below the curve shades to make the magnitude of decay
+// visually heavy. Half-life year is dashed-line annotated.
+(function(){
+  var canvas = document.getElementById('galleryHalfLifeChart');
+  if (!canvas) return;
+  if (typeof Chart === 'undefined') return;
+
+  var chartInstance = null;
+  var hasInited = false;
+
+  var INFLATION_RATE = 6.5;     // M2-growth default per modeling-assumptions.js
+  var MAX_YEARS = 30;
+  var halfLifeYr = Math.log(2) / Math.log(1 + INFLATION_RATE / 100);
+
+  function buildChart() {
+    // Build curve at 0.5-year resolution for smoothness
+    var data = [];
+    for (var yr = 0; yr <= MAX_YEARS; yr += 0.5) {
+      var val = 100 / Math.pow(1 + INFLATION_RATE / 100, yr);
+      data.push({ x: yr, y: val });
+    }
+
+    // Custom plugin: dashed lines at the half-life intersection point
+    // ($50 horizontal + half-life year vertical), with labels.
+    var halfLifePlugin = {
+      id: 'halfLifeMarker',
+      afterDatasetsDraw: function(chart){
+        var xScale = chart.scales.x, yScale = chart.scales.y;
+        var area = chart.chartArea;
+        if (!xScale || !yScale || !area) return;
+        var ctx = chart.ctx;
+        var hlX = xScale.getPixelForValue(halfLifeYr);
+        var fifty = yScale.getPixelForValue(50);
+
+        ctx.save();
+        // Horizontal $50 line (from y-axis to half-life x)
+        ctx.strokeStyle = 'rgba(192,57,43,0.45)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath();
+        ctx.moveTo(area.left, fifty);
+        ctx.lineTo(hlX, fifty);
+        ctx.stroke();
+        // Vertical half-life line (from x-axis up to $50)
+        ctx.beginPath();
+        ctx.moveTo(hlX, fifty);
+        ctx.lineTo(hlX, area.bottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // "Half-life: ~Xy" label near the intersection
+        ctx.fillStyle = 'rgba(192,57,43,0.85)';
+        ctx.font = '600 11px Inter, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('Half-life: ' + halfLifeYr.toFixed(1) + ' years', hlX + 6, fifty - 6);
+        ctx.restore();
+      }
+    };
+
+    chartInstance = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        datasets: [{
+          label: 'Purchasing power of $100',
+          data: data,
+          parsing: false,
+          borderColor: 'rgba(192,57,43,0.95)',
+          backgroundColor: 'rgba(192,57,43,0.10)',
+          borderWidth: 2.5,
+          fill: 'origin',
+          tension: 0.2,
+          pointRadius: 0,
+          pointHoverRadius: 4
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        parsing: false,
+        interaction: { mode: 'nearest', axis: 'x', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(15,12,8,0.95)', borderColor: 'rgba(192,57,43,0.30)',
+            borderWidth: 1, titleColor: 'rgba(232,224,210,0.95)', bodyColor: 'rgba(220,200,170,0.85)',
+            titleFont: { size: 11, family: 'Inter, sans-serif' },
+            bodyFont:  { size: 11, family: 'Inter, sans-serif' },
+            callbacks: {
+              title: function(items){
+                if (!items.length) return '';
+                return 'Year ' + items[0].parsed.x.toFixed(1);
+              },
+              label: function(c){
+                return '$' + c.parsed.y.toFixed(2) + ' of original $100';
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            type: 'linear', min: 0, max: MAX_YEARS,
+            grid: { color: 'rgba(220,200,170,0.04)' },
+            ticks: {
+              color: 'rgba(220,200,170,0.45)',
+              font: { size: 11, family: 'Inter, sans-serif' },
+              stepSize: 5,
+              callback: function(v){ return v + 'y'; }
+            },
+            title: { display: true, text: 'Years from today',
+                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+            border: { display: false }
+          },
+          y: {
+            min: 0, max: 100,
+            grid: { color: 'rgba(220,200,170,0.04)' },
+            ticks: {
+              color: 'rgba(220,200,170,0.45)',
+              font: { size: 11, family: 'Inter, sans-serif' },
+              stepSize: 25,
+              callback: function(v){ return '$' + v; }
+            },
+            title: { display: true, text: 'Purchasing power of $100',
+                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+            border: { display: false }
+          }
+        },
+        layout: { padding: { top: 12, right: 12, bottom: 0, left: 0 } }
+      },
+      plugins: [halfLifePlugin]
+    });
+  }
+
+  function init() {
+    if (hasInited) return;
+    hasInited = true;
+    requestAnimationFrame(function(){
+      try { buildChart(); }
+      catch (err) {
+        var fb = document.querySelector('#section-half-life .gallery-chart-fallback');
+        if (fb) {
+          fb.classList.add('show');
+          var p = fb.querySelector('.chart-loading');
+          if (p) p.textContent = 'Chart unavailable \u2014 open the full version \u2192';
+        }
+      }
+    });
+  }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting && entry.intersectionRatio > 0) {
+          init(); io.disconnect();
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '50px' });
+    io.observe(canvas);
+  } else { init(); }
+
+  if ('ResizeObserver' in window) {
+    var ro = new ResizeObserver(function(){
+      if (chartInstance) { try { chartInstance.resize(); } catch (e) {} }
+    });
+    ro.observe(canvas.parentElement);
+  }
+})();
+
+
+// ─── Chart 10: CAGR Ranges by Horizon — Volatility Is Not Risk ────
+//
+// Floating-bar chart of rolling CAGR statistics (min, median, max)
+// for bitcoin and the S&P 500 across holding horizons 1/2/3/4/5/10y.
+// Bitcoin stats computed from inlined btcMonthly data (mirrors the
+// /the-bitcoin-horizon page exactly). S&P 500 stats are reference
+// values from long-run historical CAGR analyses (Schiller / NYU
+// Stern data), same as the source page.
+//
+// Each asset renders as a translucent floating bar (representing the
+// min→max range) plus a solid scatter point at the median. Range
+// bars use Chart.js's data-as-pair feature ([min, max]).
+(function(){
+  var canvas = document.getElementById('galleryHorizonChart');
+  if (!canvas) return;
+  if (typeof Chart === 'undefined') return;
+
+  // Bitcoin monthly close data — mirrors the-bitcoin-horizon.js's btcMonthly
+  // array. Refresh monthly per MONTHLY_REFRESH_CHECKLIST in both places.
+  var BTC_MONTHLY = [
+    ["2011-01",0.30],["2011-02",0.95],["2011-03",0.70],["2011-04",1.75],["2011-05",8.40],["2011-06",15.50],["2011-07",13.20],["2011-08",8.20],["2011-09",5.10],["2011-10",3.20],["2011-11",2.55],["2011-12",4.25],
+    ["2012-01",5.30],["2012-02",4.90],["2012-03",4.85],["2012-04",5.00],["2012-05",5.20],["2012-06",6.60],["2012-07",8.80],["2012-08",10.40],["2012-09",12.40],["2012-10",11.05],["2012-11",12.40],["2012-12",13.40],
+    ["2013-01",20.35],["2013-02",33.50],["2013-03",93.50],["2013-04",138.00],["2013-05",128.50],["2013-06",98.80],["2013-07",104.50],["2013-08",129.00],["2013-09",127.50],["2013-10",196.00],["2013-11",1075.00],["2013-12",754.00],
+    ["2014-01",842.00],["2014-02",567.00],["2014-03",475.00],["2014-04",446.00],["2014-05",627.00],["2014-06",639.00],["2014-07",587.00],["2014-08",478.00],["2014-09",387.00],["2014-10",338.00],["2014-11",378.00],["2014-12",320.00],
+    ["2015-01",217.00],["2015-02",254.00],["2015-03",244.00],["2015-04",236.00],["2015-05",230.00],["2015-06",263.00],["2015-07",285.00],["2015-08",230.00],["2015-09",236.00],["2015-10",314.00],["2015-11",377.00],["2015-12",430.00],
+    ["2016-01",378.00],["2016-02",437.00],["2016-03",416.00],["2016-04",448.00],["2016-05",531.00],["2016-06",673.00],["2016-07",624.00],["2016-08",575.00],["2016-09",610.00],["2016-10",700.00],["2016-11",742.00],["2016-12",964.00],
+    ["2017-01",970.00],["2017-02",1190.00],["2017-03",1071.00],["2017-04",1348.00],["2017-05",2286.00],["2017-06",2480.00],["2017-07",2875.00],["2017-08",4700.00],["2017-09",4338.00],["2017-10",6460.00],["2017-11",10200.00],["2017-12",13800.00],
+    ["2018-01",10220.00],["2018-02",10340.00],["2018-03",6928.00],["2018-04",9244.00],["2018-05",7490.00],["2018-06",6385.00],["2018-07",7735.00],["2018-08",7035.00],["2018-09",6626.00],["2018-10",6324.00],["2018-11",4017.00],["2018-12",3742.00],
+    ["2019-01",3440.00],["2019-02",3817.00],["2019-03",4105.00],["2019-04",5325.00],["2019-05",8545.00],["2019-06",10817.00],["2019-07",10080.00],["2019-08",9630.00],["2019-09",8305.00],["2019-10",9202.00],["2019-11",7550.00],["2019-12",7195.00],
+    ["2020-01",9349.00],["2020-02",8523.00],["2020-03",6421.00],["2020-04",8660.00],["2020-05",9453.00],["2020-06",9137.00],["2020-07",11350.00],["2020-08",11660.00],["2020-09",10777.00],["2020-10",13800.00],["2020-11",19700.00],["2020-12",28990.00],
+    ["2021-01",33100.00],["2021-02",45140.00],["2021-03",58800.00],["2021-04",57760.00],["2021-05",37330.00],["2021-06",35040.00],["2021-07",41660.00],["2021-08",47150.00],["2021-09",43790.00],["2021-10",61300.00],["2021-11",57000.00],["2021-12",46300.00],
+    ["2022-01",38470.00],["2022-02",43160.00],["2022-03",45540.00],["2022-04",37610.00],["2022-05",31780.00],["2022-06",19940.00],["2022-07",23290.00],["2022-08",20050.00],["2022-09",19430.00],["2022-10",20490.00],["2022-11",17160.00],["2022-12",16540.00],
+    ["2023-01",23130.00],["2023-02",23140.00],["2023-03",28470.00],["2023-04",29230.00],["2023-05",27220.00],["2023-06",30470.00],["2023-07",29230.00],["2023-08",25930.00],["2023-09",26970.00],["2023-10",34630.00],["2023-11",37720.00],["2023-12",42265.00],
+    ["2024-01",42580.00],["2024-02",61170.00],["2024-03",71330.00],["2024-04",60630.00],["2024-05",67490.00],["2024-06",62680.00],["2024-07",64620.00],["2024-08",58970.00],["2024-09",63330.00],["2024-10",70300.00],["2024-11",96450.00],["2024-12",93420.00],
+    ["2025-01",102500.00],["2025-02",84320.00],["2025-03",82540.00],["2025-04",94700.00],["2025-05",104200.00],["2025-06",107800.00],["2025-07",115600.00],["2025-08",109400.00],["2025-09",113200.00],["2025-10",126080.00],["2025-11",91500.00],["2025-12",88200.00],
+    ["2026-01",96100.00],["2026-02",88500.00],["2026-03",86400.00],["2026-04",84300.00],["2026-05",73800.00]
+  ];
+
+  // S&P 500 reference stats — Schiller/NYU Stern long-run analyses.
+  // Same as the-bitcoin-horizon.js source values.
+  var SP500_STATS = {
+    12:  { min: -0.43,  median: 0.10,  max: 0.54 },
+    24:  { min: -0.226, median: 0.095, max: 0.41 },
+    36:  { min: -0.161, median: 0.092, max: 0.32 },
+    48:  { min: -0.104, median: 0.090, max: 0.28 },
+    60:  { min: -0.066, median: 0.089, max: 0.24 },
+    120: { min: -0.014, median: 0.088, max: 0.20 }
+  };
+
+  function btcCAGRStats(months) {
+    var startIdx = 0;
+    for (var i = 0; i < BTC_MONTHLY.length; i++) {
+      if (BTC_MONTHLY[i][0] === '2013-01') { startIdx = i; break; }
+    }
+    var cagrs = [];
+    for (var i = startIdx; i + months < BTC_MONTHLY.length; i++) {
+      var p0 = BTC_MONTHLY[i][1];
+      var p1 = BTC_MONTHLY[i + months][1];
+      cagrs.push(Math.pow(p1 / p0, 12 / months) - 1);
+    }
+    cagrs.sort(function(a, b){ return a - b; });
+    var n = cagrs.length;
+    var median = (n % 2)
+      ? cagrs[(n - 1) / 2]
+      : (cagrs[n / 2 - 1] + cagrs[n / 2]) / 2;
+    return { min: cagrs[0], median: median, max: cagrs[n - 1] };
+  }
+
+  var chartInstance = null;
+  var hasInited = false;
+
+  function buildChart() {
+    var periods = [12, 24, 36, 48, 60, 120];
+    var labels  = ['1 yr', '2 yr', '3 yr', '4 yr', '5 yr', '10 yr'];
+    var btcStats = periods.map(btcCAGRStats);
+    var spStats  = periods.map(function(m){ return SP500_STATS[m]; });
+
+    // Pct-format helpers (% on chart)
+    function toPct(v) { return v == null ? null : v * 100; }
+
+    // Custom plugin: dashed break-even line at y=0
+    var zeroLinePlugin = {
+      id: 'zeroLine',
+      afterDatasetsDraw: function(chart){
+        var yScale = chart.scales.y;
+        var area = chart.chartArea;
+        if (!yScale || !area) return;
+        var y0 = yScale.getPixelForValue(0);
+        if (y0 < area.top || y0 > area.bottom) return;
+        var ctx = chart.ctx;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(232,224,210,0.40)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(area.left, y0);
+        ctx.lineTo(area.right, y0);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = 'rgba(232,224,210,0.55)';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText('break-even', area.right - 4, y0 - 4);
+        ctx.restore();
+      }
+    };
+
+    chartInstance = new Chart(canvas.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          { label: 'Bitcoin (range)', data: btcStats.map(function(s){ return [toPct(s.min), toPct(s.max)]; }),
+            backgroundColor: 'rgba(224,148,34,0.30)',
+            borderColor: 'rgba(224,148,34,0.75)',
+            borderWidth: 1,
+            barPercentage: 0.4, categoryPercentage: 0.85, order: 2 },
+          { label: 'Bitcoin (median)', type: 'scatter',
+            data: btcStats.map(function(s, i){ return { x: labels[i], y: toPct(s.median) }; }),
+            backgroundColor: '#e09422', borderColor: '#e09422',
+            pointRadius: 6, pointHoverRadius: 7, pointStyle: 'circle', showLine: false, order: 0 },
+          { label: 'S&P 500 (range)', data: spStats.map(function(s){ return [toPct(s.min), toPct(s.max)]; }),
+            backgroundColor: 'rgba(180,170,140,0.18)',
+            borderColor: 'rgba(180,170,140,0.55)',
+            borderWidth: 1,
+            barPercentage: 0.4, categoryPercentage: 0.85, order: 3 },
+          { label: 'S&P 500 (median)', type: 'scatter',
+            data: spStats.map(function(s, i){ return { x: labels[i], y: toPct(s.median) }; }),
+            backgroundColor: 'rgba(200,190,170,0.95)', borderColor: 'rgba(200,190,170,0.95)',
+            pointRadius: 5, pointHoverRadius: 6, pointStyle: 'circle', showLine: false, order: 1 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            display: true, position: 'top',
+            labels: { color: 'rgba(220,200,170,0.55)', font: { size: 11, family: 'Inter, sans-serif' },
+                      boxWidth: 14, padding: 14, usePointStyle: true, pointStyle: 'circle',
+                      // Hide the duplicate '(median)' entries — the range bars already convey the asset's identity
+                      filter: function(item){ return !/\(median\)$/.test(item.text); } }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15,12,8,0.95)', borderColor: 'rgba(247,147,26,0.30)',
+            borderWidth: 1, titleColor: 'rgba(232,224,210,0.95)', bodyColor: 'rgba(220,200,170,0.85)',
+            titleFont: { size: 11, family: 'Inter, sans-serif' },
+            bodyFont:  { size: 11, family: 'Inter, sans-serif' },
+            callbacks: {
+              label: function(c){
+                if (Array.isArray(c.raw)) {
+                  return c.dataset.label + ': ' + c.raw[0].toFixed(1) + '% to ' + c.raw[1].toFixed(1) + '%';
+                }
+                var y = c.parsed.y;
+                if (y == null) return c.dataset.label;
+                return c.dataset.label + ': ' + y.toFixed(1) + '%';
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(220,200,170,0.04)' },
+            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+            title: { display: true, text: 'Holding horizon',
+                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+            border: { display: false }
+          },
+          y: {
+            min: -60, max: 250,           // cap so the 1y/2y BTC bars clip
+            grid: { color: 'rgba(220,200,170,0.04)' },
+            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' },
+                     stepSize: 50,
+                     callback: function(v){ return v + '%'; } },
+            title: { display: true, text: 'Annualized rolling return',
+                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+            border: { display: false }
+          }
+        },
+        layout: { padding: { top: 4, right: 12, bottom: 0, left: 0 } }
+      },
+      plugins: [zeroLinePlugin]
+    });
+  }
+
+  function init() {
+    if (hasInited) return;
+    hasInited = true;
+    requestAnimationFrame(function(){
+      try { buildChart(); }
+      catch (err) {
+        var fb = document.querySelector('#section-horizon .gallery-chart-fallback');
+        if (fb) {
+          fb.classList.add('show');
+          var p = fb.querySelector('.chart-loading');
+          if (p) p.textContent = 'Chart unavailable \u2014 open the full version \u2192';
+        }
+      }
+    });
+  }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting && entry.intersectionRatio > 0) {
+          init(); io.disconnect();
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '50px' });
+    io.observe(canvas);
+  } else { init(); }
+
+  if ('ResizeObserver' in window) {
+    var ro = new ResizeObserver(function(){
+      if (chartInstance) { try { chartInstance.resize(); } catch (e) {} }
+    });
+    ro.observe(canvas.parentElement);
+  }
+})();

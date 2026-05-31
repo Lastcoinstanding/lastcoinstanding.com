@@ -254,13 +254,91 @@ eleventyComputed:
 </section>
 
 
-{# ─── Charts 8-10 land in Commit D ────────────────────────────────── #}
-
-<section class="gallery-coming-next">
+{# ─── Chart 8 · The Bitcoin Heatmap ──────────────────────────────── #}
+<section class="gallery-section" id="section-heatmap" aria-labelledby="title-heatmap">
     <div class="gallery-section-inner">
-        <p class="gallery-coming-next-copy">
-            <em>Three more charts arriving in the final commit.</em>
-            The cycle heatmap &middot; the half-life &middot; the long-range horizon. In the meantime, the <a href="/calculators.html">Calculators</a> page is the working surface and the source pages linked above each chart are the deep dives.
-        </p>
+        <header class="gallery-section-header">
+            <p class="gallery-section-eyebrow">&sect;III &middot; Historical Evidence &middot; Chart 8 of 10</p>
+            <h2 id="title-heatmap" class="gallery-section-title">The Bitcoin Heatmap</h2>
+            <p class="gallery-section-subtitle">Outperformance vs. the S&amp;P 500 for every (entry month &times; holding horizon) pair since 2011 &mdash; the long-horizon rows are amber to the right edge.</p>
+        </header>
+
+        <div class="gallery-chart-frame heatmap-frame">
+            <div id="galleryHeatmap" class="heatmap-svg-host" aria-label="Bitcoin outperformance heatmap across entry months and horizons"></div>
+            <div class="gallery-chart-fallback" aria-hidden="true">
+                <p class="chart-loading">Loading the heatmap&hellip;</p>
+            </div>
+        </div>
+
+        <div class="heatmap-legend">
+            <span class="heatmap-legend-label">BTC vs S&amp;P 500:</span>
+            <span class="heatmap-legend-tier" data-tier="loss-deep">deep loss</span>
+            <span class="heatmap-legend-tier" data-tier="loss">loss</span>
+            <span class="heatmap-legend-tier" data-tier="flat">flat</span>
+            <span class="heatmap-legend-tier" data-tier="win-mild">mild win</span>
+            <span class="heatmap-legend-tier" data-tier="win-mid">mid win</span>
+            <span class="heatmap-legend-tier" data-tier="win-deep">deep win</span>
+        </div>
+
+        <div class="gallery-section-prose">
+            <p>Every cell is a single bitcoin investment: enter on the column's month, hold for the row's horizon (1, 2, 3, 5, 7, or 10 years), compare the outcome against the same dollars invested in the S&amp;P 500. Amber means bitcoin outperformed; red means it underperformed; the brighter the cell, the wider the margin.</p>
+            <p>At <em>short horizons</em> there are visible red pockets &mdash; pre-bear-market entries that hadn't fully recovered yet. At <em>long horizons</em>, the pattern is almost entirely amber: <em>there is no historical 5-year window in which a bitcoin holder failed to outperform the S&amp;P 500</em>. The horizons that matter still produced wealth, even from the worst-timed entries.</p>
+        </div>
+
+        <p class="gallery-section-source">More in this exploration &rarr; <a href="/heatmap.html">The Bitcoin Heatmap</a></p>
+    </div>
+</section>
+
+
+{# ─── Chart 9 · The Half-Life (fiat purchasing power) ─────────────── #}
+<section class="gallery-section" id="section-half-life" aria-labelledby="title-half-life">
+    <div class="gallery-section-inner">
+        <header class="gallery-section-header">
+            <p class="gallery-section-eyebrow">&sect;III &middot; Historical Evidence &middot; Chart 9 of 10</p>
+            <h2 id="title-half-life" class="gallery-section-title">The Half-Life of a Dollar</h2>
+            <p class="gallery-section-subtitle">Purchasing power decay of $100 held in cash over 30 years &mdash; using the M2 monetary-base growth rate (~6.5%/yr) as the inflation proxy.</p>
+        </header>
+
+        <div class="gallery-chart-frame">
+            <canvas id="galleryHalfLifeChart" aria-label="Fiat purchasing power decay over 30 years"></canvas>
+            <div class="gallery-chart-fallback" aria-hidden="true">
+                <p class="chart-loading">Loading the decay&hellip;</p>
+            </div>
+        </div>
+
+        <div class="gallery-section-prose">
+            <p>The official CPI rate (~3.5%) understates the actual debasement of fiat. A more honest proxy is <em>M2 monetary-base growth</em> &mdash; how fast new dollars are created &mdash; which has averaged closer to <em>6.5% per year</em> across recent decades. At that rate, $100 held in cash today is worth $50 in purchasing power in roughly <em>eleven years</em>, and a quarter of its value in twenty-two.</p>
+            <p>The chart is a clean exponential decay because the mechanism is. <em>Cash is not a stable store of value</em>; it is a slowly evaporating one. Every argument for holding bitcoin against equities applies more forcefully against cash &mdash; equities at least share in monetary expansion; cash <em>is</em> what's being expanded.</p>
+        </div>
+
+        <p class="gallery-section-source">More in this exploration &rarr; <a href="/the-half-life.html">The Half-Life of a Dollar</a></p>
+    </div>
+</section>
+
+
+{# ═══ §IV · HORIZON ════════════════════════════════════════════════ #}
+
+{# ─── Chart 10 · CAGR Ranges Across Holding Horizons ─────────────── #}
+<section class="gallery-section" id="section-horizon" aria-labelledby="title-horizon">
+    <div class="gallery-section-inner">
+        <header class="gallery-section-header">
+            <p class="gallery-section-eyebrow">&sect;IV &middot; Horizon &middot; Chart 10 of 10</p>
+            <h2 id="title-horizon" class="gallery-section-title">Volatility Is Not Risk &mdash; CAGR Ranges by Horizon</h2>
+            <p class="gallery-section-subtitle">Historical range of rolling annualized returns (min, median, max) for bitcoin and the S&amp;P 500 across holding periods from 1 to 10 years.</p>
+        </header>
+
+        <div class="gallery-chart-frame">
+            <canvas id="galleryHorizonChart" aria-label="CAGR ranges by holding horizon - bitcoin vs S&P 500"></canvas>
+            <div class="gallery-chart-fallback" aria-hidden="true">
+                <p class="chart-loading">Loading the distribution&hellip;</p>
+            </div>
+        </div>
+
+        <div class="gallery-section-prose">
+            <p>At a one-year holding horizon, bitcoin's worst rolling return was deeply negative &mdash; the 'too volatile' objection in one bar. But <em>look what happens as the horizon lengthens.</em> Each bar collapses inward: the worst-case return rises, the best-case return falls, and the distribution narrows around a positive median. By a ten-year horizon, bitcoin's worst historical rolling CAGR is still meaningfully positive, while the S&amp;P 500's stays bounded near its long-run 10% mean.</p>
+            <p><em>Volatility is not risk.</em> Volatility is the width of the short-term distribution. Risk is the probability of permanent loss of purchasing power. At horizons of five years or more, bitcoin's historical record shows the former but not the latter &mdash; the wide one-year bars compress into something the S&amp;P 500's never does: a wide median, narrow range, no negative tail. That's the entire argument for time as bitcoin's strongest ally.</p>
+        </div>
+
+        <p class="gallery-section-source">More in this exploration &rarr; <a href="/the-bitcoin-horizon.html">The Bitcoin Horizon</a></p>
     </div>
 </section>

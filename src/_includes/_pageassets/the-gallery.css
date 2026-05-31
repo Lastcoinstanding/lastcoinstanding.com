@@ -297,37 +297,70 @@ body {
     border-bottom-color: var(--orange);
 }
 
-/* ═══ "Coming next" placeholder block (removed once all 10 ship) ══ */
-.gallery-coming-next {
+/* ═══ Heatmap — Chart 8's custom SVG host ══════════════════════════ */
+/* The heatmap is rendered as an inline SVG inside .heatmap-svg-host
+   (filled by the-gallery.js's Chart 8 IIFE at lazy-init time). Frame
+   keeps the same border/background as Chart.js frames so the visual
+   grammar stays consistent across chart types. */
+.heatmap-frame {
+    height: 360px;             /* slightly shorter than Chart.js frames —
+                                  ~6 horizon rows don't need 540px tall */
+    padding: 1.2rem 1.25rem 0.9rem;
+}
+.heatmap-svg-host {
     width: 100%;
-    padding: 4rem 0 5rem;
-    border-top: 1px dashed rgba(247,147,26,0.10);
-    background: rgba(247,147,26,0.012);
-}
-.gallery-coming-next .gallery-section-inner {
-    max-width: 760px;
-    text-align: center;
-}
-.gallery-coming-next-copy {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.92rem;
-    line-height: 1.7;
-    color: var(--text-muted);
-    margin: 0;
-}
-.gallery-coming-next-copy em {
-    color: var(--amber);
-    font-style: italic;
+    height: 100%;
     display: block;
-    margin-bottom: 0.8rem;
 }
-.gallery-coming-next-copy a {
-    color: var(--amber);
-    text-decoration: none;
-    border-bottom: 1px dotted var(--amber-dim);
+.heatmap-svg-host svg {
+    width: 100%;
+    height: 100%;
+    display: block;
 }
-.gallery-coming-next-copy a:hover {
-    color: var(--orange);
+
+/* Color-tier legend below the heatmap. The data-tier attribute drives
+   the swatch color via attribute selector so the JS doesn't need to
+   know the legend exists — it just renders cells, and the legend keys
+   itself off the same tier names from CSS. */
+.heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin: 0.9rem 0 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    color: var(--text-faint);
+    flex-wrap: wrap;
+}
+.heatmap-legend-label {
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-right: 0.3rem;
+}
+.heatmap-legend-tier {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text);
+}
+.heatmap-legend-tier::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: #1F1F1F;
+}
+.heatmap-legend-tier[data-tier="loss-deep"]::before { background: #BE3A30; }
+.heatmap-legend-tier[data-tier="loss"]::before      { background: #6B2A23; }
+.heatmap-legend-tier[data-tier="flat"]::before      { background: #1F1F1F; border: 1px solid rgba(255,255,255,0.15); }
+.heatmap-legend-tier[data-tier="win-mild"]::before  { background: #E0BC50; }
+.heatmap-legend-tier[data-tier="win-mid"]::before   { background: #F5C240; }
+.heatmap-legend-tier[data-tier="win-deep"]::before  { background: #F7931A; }
+
+@media (max-width: 768px) {
+    .heatmap-frame { height: 280px; padding: 0.8rem 0.6rem 0.5rem; }
+    .heatmap-legend { font-size: 0.72rem; gap: 0.5rem; }
 }
 
 /* ═══ Responsive ═══════════════════════════════════════════════════ */

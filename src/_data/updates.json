@@ -3,6 +3,12 @@
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
+    "summary": "Gallery v2 complete. Final three charts live: the Bitcoin Heatmap (BTC vs S&P 500 outperformance grid, every entry month × every horizon since 2011 — long-horizon rows are amber to the edge), the Half-Life of a Dollar (fiat purchasing power decay; $100 → $50 in 11 years at M2 inflation), and CAGR Ranges by Horizon (Volatility Is Not Risk — how 1y bitcoin variance compresses to a narrow positive band at 5y+). All 10 charts shipped; the Gallery is a full scroll-through of the site's strongest visual arguments"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
     "summary": "Gallery Chart 7 rebuilt: replaced the $10K-invested-in-2010 lump-sum wealth chart (structurally a cherry-pick of the earliest possible start year, implying returns that won't repeat) with a rolling 4-year CAGR comparison — bitcoin vs. S&P 500 TR vs. NASDAQ-100 TR across every 4-year window from 2017 to 2026. The new chart shows bitcoin's returns declining over time (as the Power Law projects) but still exceeding both equity comparators in every window — even the cycle-top-to-cycle-low 2021-2025 window where bitcoin's 16.7% beat the S&P's 11.1%"
   },
   {
