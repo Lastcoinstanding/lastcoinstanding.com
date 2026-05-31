@@ -486,7 +486,6 @@ section:first-of-type { border-top: none; }
   line-height: 1.55;
   color: var(--ink-dim);
   margin-top: 0.9rem;
-  max-width: 72ch;
 }
 
 /* Calculator */
