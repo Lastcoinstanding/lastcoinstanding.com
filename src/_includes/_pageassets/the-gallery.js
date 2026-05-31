@@ -574,18 +574,9 @@
 
   // Annual data — mirrors bitcoin-vs-real-estate.js homeData/btcData
   // for the years where both exist (2013 onward). Refresh annually.
-  var homeData = {
-    2013: 268900, 2014: 282800, 2015: 294000, 2016: 306200, 2017: 323500,
-    2018: 326400, 2019: 321500, 2020: 336900, 2021: 401700, 2022: 454900,
-    2023: 426100, 2024: 420300, 2025: 416900
-  };
-  var btcData = {
-    2013: 732, 2014: 530, 2015: 272, 2016: 567, 2017: 4348, 2018: 7565,
-    2019: 7362, 2020: 11072, 2021: 47458, 2022: 19657, 2023: 28233,
-    2024: 62682, 2025: 88000
-  };
-
-  var chartInstance = null;
+  /* homeData: see shared/bvre-annual-data.js (loaded before this script). */
+/* btcData: see shared/bvre-annual-data.js (loaded before this script). */
+var chartInstance = null;
   var hasInited = false;
 
   function buildChart() {
@@ -732,18 +723,9 @@
   // Same annual data as Chart 3 — duplicated rather than shared via
   // module, since the two charts ship together and a shared module
   // would be premature factorization. Refresh annually in both places.
-  var homeData = {
-    2013: 268900, 2014: 282800, 2015: 294000, 2016: 306200, 2017: 323500,
-    2018: 326400, 2019: 321500, 2020: 336900, 2021: 401700, 2022: 454900,
-    2023: 426100, 2024: 420300, 2025: 416900
-  };
-  var btcData = {
-    2013: 732, 2014: 530, 2015: 272, 2016: 567, 2017: 4348, 2018: 7565,
-    2019: 7362, 2020: 11072, 2021: 47458, 2022: 19657, 2023: 28233,
-    2024: 62682, 2025: 88000
-  };
-
-  var chartInstance = null;
+  /* homeData: see shared/bvre-annual-data.js (loaded before this script). */
+/* btcData: see shared/bvre-annual-data.js (loaded before this script). */
+var chartInstance = null;
   var currentStartYear = 2018;
   var hasInited = false;
 
@@ -1218,13 +1200,8 @@
   //   homeData/btcData duplication pattern). Used as the per-year
   //   bitcoin price for CAGR calculations 2013-2025. The 2026 value
   //   is live (TODAY_PRICE, updated by fetchTodayPrice when it lands).
-  var BTC_ANNUAL = {
-    2013: 732, 2014: 530, 2015: 272, 2016: 567, 2017: 4348, 2018: 7565,
-    2019: 7362, 2020: 11072, 2021: 47458, 2022: 19657, 2023: 28233,
-    2024: 62682, 2025: 88000
-  };
-
-  // ── Helpers
+  /* btcData alias removed — Chart 7 now uses canonical btcData from shared/bvre-annual-data.js. */
+// ── Helpers
   function spYearEnd(year, isCurrent) {
     if (isCurrent) return SP500_TR_DATA[SP500_TR_DATA.length - 1][1];
     var key = year + '-12-28';
@@ -1246,7 +1223,7 @@
       return (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0)
         ? TODAY_PRICE : PL_DATA[PL_DATA.length - 1][1];
     }
-    return BTC_ANNUAL[year];
+    return btcData[year];
   }
 
   function cagr(endVal, startVal, years) {
@@ -1355,7 +1332,7 @@
     if (typeof fetchTodayPrice !== 'function') return;
     fetchTodayPrice(function(/* price, source */){
       if (!chartInstance || !chartInstance.data) return;
-      var s = buildSeries();   // recompute (BTC_ANNUAL is unchanged; only
+      var s = buildSeries();   // recompute (btcData is unchanged; only
                                // the current-year endpoint reads TODAY_PRICE)
       chartInstance.data.datasets[0].data = s.btc;
       chartInstance.update('none');
