@@ -365,7 +365,14 @@
               var lastIdx = historyDs.data.length - 1;
               historyDs.data[lastIdx].y = price;
             }
-            chartInstance.update('none');
+            // update('resize') not 'none' — the historical line's last
+            // point is mutated in place (data array ref unchanged), so
+            // update('none') leaves its element pixel cached at the
+            // seeded TODAY_PRICE while the Today dot (single-point
+            // dataset) does relayout — producing the documented
+            // "two visually distinct dots near the today marker"
+            // symptom. STYLE_GUIDE §6.14 / TECH_DEBT (DR channel viz).
+            chartInstance.update('resize');
           });
         }
       } catch (err) {
