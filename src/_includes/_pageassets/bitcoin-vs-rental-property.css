@@ -1,0 +1,515 @@
+/* ─── Bitcoin vs. Rental Property — page styles
+       Under-construction draft. Editorial-led page (Phase 1) with
+       entry-timing indicator. Calculator deferred to Phase 2.
+       Follows STYLE_GUIDE typography scale + LCS palette. ─── */
+
+:root {
+  --bg-page: #0a0908;
+  --amber: #e09422;
+  --amber-bright: #F7931A;
+  --amber-soft: rgba(224,148,34,0.08);
+  --ink-bright: #ece4d6;
+  --ink: #ccc6b8;
+  --ink-dim: #968b7a;
+  --ink-faint: #5a5247;
+  --border-faint: rgba(255,255,255,0.06);
+  --border-amber: rgba(224,148,34,0.20);
+  --red: #c0392b;
+  --green: #5a8a3a;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color-scheme: dark;
+}
+
+html, body {
+  background: #0a0908 !important;
+  color: var(--ink);
+  font-family: var(--font-body);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Under-construction banner ───
+   Prominent, persistent notice at the top of the page indicating
+   draft status. Sticks to top of viewport on scroll so it remains
+   visible during feedback review. Dismissible only by closing tab. */
+.uc-banner {
+  background: linear-gradient(180deg, rgba(224,148,34,0.18) 0%, rgba(224,148,34,0.10) 100%);
+  border-bottom: 1px solid var(--border-amber);
+  padding: 0.85rem 1.5rem;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--amber-bright);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.uc-banner strong {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-right: 0.5rem;
+  color: var(--amber-bright);
+}
+.uc-banner .uc-meta {
+  color: rgba(224,148,34,0.65);
+  margin-left: 0.5rem;
+  font-size: 0.74rem;
+  font-style: italic;
+}
+
+/* ─── Hero ─── */
+.bvrp-hero {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 4rem 2rem 2.4rem;
+  text-align: center;
+}
+.bvrp-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5.5vw, 3.8rem);
+  font-weight: 500;
+  color: var(--ink-bright);
+  letter-spacing: -0.01em;
+  line-height: 1.08;
+  margin: 0 0 1rem;
+}
+.bvrp-hero h1 em {
+  font-style: italic;
+  color: var(--amber);
+}
+.bvrp-hero .subhead {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: 400;
+  color: var(--ink-dim);
+  max-width: 700px;
+  margin: 0 auto 1.6rem;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+}
+.bvrp-hero .tldr {
+  max-width: 720px;
+  margin: 1.6rem auto 0;
+  padding: 1.4rem 1.6rem;
+  background: rgba(224,148,34,0.04);
+  border: 1px solid var(--border-amber);
+  border-radius: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--ink);
+  text-align: left;
+}
+.bvrp-hero .tldr-label {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.6rem;
+  display: block;
+}
+
+/* ─── Reading column ─── */
+.bvrp-body {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 2rem 2rem 4rem;
+}
+
+.bvrp-section {
+  margin: 3.6rem 0 0;
+  scroll-margin-top: 4rem;
+}
+.bvrp-section:first-child {
+  margin-top: 2rem;
+}
+.bvrp-section-num {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+.bvrp-section h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.6vw, 2.4rem);
+  font-weight: 500;
+  color: var(--ink-bright);
+  letter-spacing: -0.01em;
+  line-height: 1.18;
+  margin: 0 0 1.2rem;
+}
+.bvrp-section h2 em {
+  font-style: italic;
+  color: var(--amber);
+}
+.bvrp-section h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--ink-bright);
+  margin: 2.2rem 0 0.9rem;
+  letter-spacing: -0.005em;
+}
+.bvrp-section p {
+  font-family: var(--font-body);
+  font-size: 1.02rem;
+  line-height: 1.72;
+  color: var(--ink);
+  margin: 0 0 1.1rem;
+}
+.bvrp-section p strong {
+  color: var(--ink-bright);
+  font-weight: 600;
+}
+.bvrp-section p em {
+  font-style: italic;
+  color: var(--ink-bright);
+}
+.bvrp-section a {
+  color: var(--amber);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(224,148,34,0.3);
+  transition: border-color 0.2s, color 0.2s;
+}
+.bvrp-section a:hover {
+  color: var(--amber-bright);
+  border-bottom-color: var(--amber-bright);
+}
+
+/* ─── Pull quotes & callouts ─── */
+.bvrp-pull {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.4rem;
+  line-height: 1.4;
+  color: var(--ink-bright);
+  border-left: 2px solid var(--amber);
+  padding: 0.4rem 0 0.4rem 1.4rem;
+  margin: 2rem 0;
+}
+
+.bvrp-callout {
+  background: rgba(224,148,34,0.04);
+  border: 1px solid var(--border-amber);
+  border-radius: 0.5rem;
+  padding: 1.3rem 1.5rem;
+  margin: 1.8rem 0;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+.bvrp-callout .bvrp-callout-label {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.bvrp-warning {
+  background: rgba(192,57,43,0.06);
+  border: 1px solid rgba(192,57,43,0.25);
+  border-radius: 0.5rem;
+  padding: 1.3rem 1.5rem;
+  margin: 1.8rem 0;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+.bvrp-warning .bvrp-warning-label {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #e07a6d;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* ─── Stat row (for numbers like 50–63%, 19–33%, etc) ─── */
+.bvrp-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.9rem;
+  margin: 1.6rem 0;
+}
+.bvrp-stat {
+  background: #111110;
+  border: 1px solid #1e1c1a;
+  border-radius: 0.4rem;
+  padding: 1rem 1.1rem;
+  text-align: center;
+}
+.bvrp-stat-value {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 500;
+  color: var(--amber);
+  line-height: 1.1;
+  margin-bottom: 0.3rem;
+}
+.bvrp-stat-value.negative { color: #e07a6d; }
+.bvrp-stat-value.positive { color: var(--green); }
+.bvrp-stat-label {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+  line-height: 1.35;
+}
+
+/* ─── Comparison table for the head-to-head ─── */
+.bvrp-table-wrap {
+  margin: 1.8rem 0;
+  overflow-x: auto;
+}
+.bvrp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+}
+.bvrp-table th, .bvrp-table td {
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-faint);
+  vertical-align: top;
+}
+.bvrp-table th {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--amber);
+}
+.bvrp-table td.numeric {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-bright);
+}
+
+/* ─── Entry-Timing Indicator (Section 3.5) ───
+       Compact live readout of BTC's current multiple-of-trend with
+       categorical label (Favorable / Neutral / Elevated). Data
+       sourced from canonical PL_DATA + TODAY_PRICE via the page JS. */
+.eti-card {
+  background: #0f0e0d;
+  border: 1px solid var(--border-amber);
+  border-radius: 0.6rem;
+  padding: 1.6rem 1.8rem;
+  margin: 1.6rem 0 2rem;
+}
+.eti-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.8rem;
+}
+.eti-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.eti-multiple {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 500;
+  color: var(--ink-bright);
+  line-height: 1;
+}
+.eti-multiple .eti-unit {
+  font-size: 1.2rem;
+  color: var(--ink-dim);
+  margin-left: 0.2rem;
+}
+.eti-label {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid;
+}
+.eti-label.favorable {
+  color: var(--green);
+  border-color: rgba(90,138,58,0.4);
+  background: rgba(90,138,58,0.08);
+}
+.eti-label.neutral {
+  color: var(--amber);
+  border-color: rgba(224,148,34,0.4);
+  background: rgba(224,148,34,0.08);
+}
+.eti-label.elevated {
+  color: #e07a6d;
+  border-color: rgba(192,57,43,0.4);
+  background: rgba(192,57,43,0.08);
+}
+.eti-bar {
+  position: relative;
+  height: 12px;
+  background: linear-gradient(90deg,
+    rgba(90,138,58,0.20) 0%,
+    rgba(90,138,58,0.20) 33%,
+    rgba(224,148,34,0.20) 33%,
+    rgba(224,148,34,0.20) 66%,
+    rgba(192,57,43,0.20) 66%,
+    rgba(192,57,43,0.20) 100%);
+  border-radius: 6px;
+  border: 1px solid var(--border-faint);
+  margin: 0.6rem 0 0.4rem;
+}
+.eti-marker {
+  position: absolute;
+  top: -4px;
+  width: 4px;
+  height: 20px;
+  background: var(--ink-bright);
+  border-radius: 2px;
+  transform: translateX(-2px);
+  box-shadow: 0 0 8px rgba(236,228,214,0.4);
+  transition: left 0.6s ease-out;
+}
+.eti-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-body);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+  margin-top: 0.3rem;
+}
+.eti-caveat {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+  font-style: italic;
+  margin-top: 0.9rem;
+  line-height: 1.5;
+}
+
+/* ─── Path cards (Section 5) ─── */
+.bvrp-path {
+  background: #111110;
+  border: 1px solid #1e1c1a;
+  border-radius: 0.5rem;
+  padding: 1.5rem 1.6rem;
+  margin: 1.2rem 0;
+}
+.bvrp-path h3 {
+  margin-top: 0;
+  margin-bottom: 0.3rem;
+  font-size: 1.3rem;
+}
+.bvrp-path-sub {
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.9rem;
+}
+.bvrp-path p {
+  margin-bottom: 0.7rem;
+}
+
+/* ─── Phase-2 placeholder ─── */
+.bvrp-placeholder {
+  background: rgba(255,255,255,0.02);
+  border: 1px dashed var(--border-amber);
+  border-radius: 0.5rem;
+  padding: 2rem 1.8rem;
+  margin: 1.6rem 0;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--ink-dim);
+  font-style: italic;
+  line-height: 1.6;
+}
+.bvrp-placeholder strong {
+  display: block;
+  color: var(--amber);
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  margin-bottom: 0.6rem;
+}
+
+/* ─── Methodology / sources appendix ─── */
+.bvrp-methodology {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-faint);
+}
+.bvrp-methodology details {
+  margin: 0.8rem 0;
+}
+.bvrp-methodology summary {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--ink-bright);
+  cursor: pointer;
+  padding: 0.5rem 0;
+  letter-spacing: 0.02em;
+}
+.bvrp-methodology summary::-webkit-details-marker { color: var(--amber); }
+.bvrp-methodology details[open] summary {
+  color: var(--amber);
+}
+.bvrp-methodology .source-list {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--ink-dim);
+  line-height: 1.6;
+  padding: 0.4rem 0 0.8rem 0.5rem;
+}
+.bvrp-methodology .source-list li {
+  margin-bottom: 0.4rem;
+}
+
+/* ─── Section-2.5 STR sub-section visual differentiation ─── */
+.bvrp-subsection {
+  background: rgba(255,255,255,0.015);
+  border-left: 2px solid var(--amber);
+  padding: 1.4rem 1.6rem;
+  margin: 2rem 0;
+  border-radius: 0 0.4rem 0.4rem 0;
+}
+
+@media (max-width: 768px) {
+  .bvrp-hero { padding: 3rem 1.2rem 1.6rem; }
+  .bvrp-body { padding: 1.4rem 1.2rem 3rem; }
+  .bvrp-hero .tldr, .bvrp-callout, .bvrp-warning, .eti-card, .bvrp-path { padding: 1.1rem 1.2rem; }
+  .eti-multiple { font-size: 2rem; }
+}

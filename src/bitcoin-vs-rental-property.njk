@@ -1,0 +1,470 @@
+---
+layout: base.njk
+permalink: /bitcoin-vs-rental-property.html
+slug: bitcoin-vs-rental-property
+related:
+  - slug: bitcoin-vs-real-estate
+    desc: "The sister page: should you buy a home to live in, or own bitcoin and rent? This page asks the parallel investment question — should you own bitcoin (or bitcoin-yield instruments) instead of rental property as a yield-producing asset."
+  - slug: the-power-law
+    desc: "The growth model that anchors the bitcoin side of every comparison on this page, including the entry-timing indicator in Section 3."
+  - slug: the-gallery
+    desc: "The canonical view of where bitcoin sits in the Power Law channel today — the same data the entry-timing indicator pulls from."
+  - slug: the-bitcoin-retirement
+    desc: "The forward-projection sibling: same Power Law backbone, same calculator philosophy. The two-tier input model used here was first established there."
+companion: []
+eleventyComputed:
+  head_extras: "{% include '_pageassets/bitcoin-vs-rental-property-head.html' %}"
+  page_styles: "{% include '_pageassets/bitcoin-vs-rental-property.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/bitcoin-vs-rental-property.js' %}"
+---
+<!-- ─── Under-construction banner ─── -->
+<div class="uc-banner">
+  <strong>Draft · Under Construction</strong>
+  This page is in active development.
+  <span class="uc-meta">Editorial v0.1 · Calculator deferred to Phase 2 · Feedback welcome</span>
+</div>
+
+<!-- ─── Hero ─── -->
+<section class="bvrp-hero">
+  <h1>Bitcoin vs. <em>Rental Property</em></h1>
+  <p class="subhead">2× the after-tax yield, no tenants, no maintenance, no policy risk. The honest comparison.</p>
+  <div class="tldr">
+    <span class="tldr-label">TL;DR</span>
+    Once the hidden costs of being a landlord are surfaced honestly &mdash; the dollars, the time, and the ongoing background anxiety &mdash; conventional rental property yields close to half of what listings suggest. Bitcoin-treasury yield instruments like <strong>STRC</strong> and <strong>SATA</strong> pay 10&ndash;13% gross with the same tax-deferral mechanics as real estate&rsquo;s depreciation shield, while spot bitcoin provides structural appreciation. Below: the honest comparison, the four operational paths to switch, and the constraints to know before you act.
+  </div>
+</section>
+
+<main class="bvrp-body">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 1: THE CONVENTIONAL PITCH           -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="bvrp-section" id="conventional-pitch">
+  <span class="bvrp-section-num">Section 1</span>
+  <h2>The Conventional Pitch</h2>
+
+  <p>Rental property has been a genuinely good investment for genuine reasons. Before this page argues anything against it, it needs to acknowledge what landlords already know &mdash; and what they&rsquo;re right about.</p>
+
+  <p>Gross rental yields range from roughly <strong>3&ndash;6%</strong> in expensive coastal Tier 1 markets, <strong>6&ndash;12%</strong> in mid-tier metros, and historically <strong>12&ndash;20%</strong> in lower-cost secondary markets &mdash; though that top end has compressed sharply over the past three years as institutional capital rotated into those markets. With standard 4&times;&ndash;5&times; leverage (a 20&ndash;25% down payment paired with non-callable 30-year fixed-rate debt), the most-cited industry figure for total annualized return on US single-family rental over the past two decades is <strong>11.7%</strong>. We will return to that number in detail; for now, take it at face value.</p>
+
+  <p>On top of that, the US tax code radically shields rental returns. Straight-line depreciation over 27.5 years operates as a non-cash deduction against rental income, compressing effective tax rates as low as <strong>5.8%</strong> for middle-bracket landlords during the holding period. <a href="https://www.irs.gov/businesses/small-businesses-self-employed/like-kind-exchanges-real-estate-tax-tips" target="_blank" rel="noopener">Section 1031 exchanges</a> let investors defer 100% of capital gains and depreciation recapture indefinitely by rolling proceeds into like-kind property. Tenants pay down principal each month, growing the landlord&rsquo;s equity even in flat markets.</p>
+
+  <p>Real estate also delivers these returns with <em>half the volatility</em> of public equities. Across the long historical record (1870&ndash;2015, <a href="https://www.frbsf.org/wp-content/uploads/wp2017-25.pdf" target="_blank" rel="noopener">Jord&agrave;-Schularick-Taylor</a>), US housing posted a real total return of 6.03% with a standard deviation of 9.86% &mdash; against the S&amp;P 500&rsquo;s 8.39% real with 21.43% standard deviation. Over the 28-year window from 1986 to 2014, <a href="https://anderson-review.ucla.edu/single-family-rentals/" target="_blank" rel="noopener">Demers &amp; Eisfeldt</a> calculated an unleveraged SFR Sharpe ratio of <strong>1.14</strong>, compared to the S&amp;P 500&rsquo;s <strong>0.52</strong> over the same period. The worst rolling 10-year SFR real return stayed <em>positive</em>: a floor of roughly +2.5&ndash;3%. Equities, by contrast, posted -7.5% to -8% real annualized in their worst 10-year windows.</p>
+
+  <p>And there is one more thing the steelman has to acknowledge before we move on, because pretending it isn&rsquo;t there would weaken the rest of the page. <strong>Real estate confers status.</strong> Owning property is a recognizable social signal &mdash; an identity, a permanence, a &ldquo;bricks and mortar&rdquo; reassurance to family and peers that bitcoin (still) doesn&rsquo;t carry. This is real, even if it&rsquo;s not strictly economic, and it&rsquo;s part of why real estate is over-indexed as a desired asset class beyond what the spreadsheet justifies. That may change as bitcoin matures, but it&rsquo;s an honest current dimension of the case <em>for</em> owning real estate.</p>
+
+  <p>So: yields exist, leverage is available, tax shielding is substantial, volatility is half of equities, the worst 10-year window still made money, and the asset confers status. This is a real case. The next section is about what this case leaves out.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 2: THE AFTER-FRICTION REALITY       -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="bvrp-section" id="after-friction-reality">
+  <span class="bvrp-section-num">Section 2</span>
+  <h2>The After-Friction <em>Reality</em></h2>
+
+  <p>Conventional rental property math is computed against a sanitized model. Once the documented hidden costs go back in &mdash; including the ones that don&rsquo;t appear on a P&amp;L &mdash; after-friction returns are materially lower than the proponent narrative claims, and the asset&rsquo;s structural disadvantages become visible.</p>
+
+  <h3>The 50&ndash;63% Haircut</h3>
+
+  <p>The first thing the conventional pitch leaves out is what actually survives from gross rent to net cash flow. Walking the waterfall line by line for a typical small landlord:</p>
+
+  <div class="bvrp-stats">
+    <div class="bvrp-stat"><div class="bvrp-stat-value negative">3.5&ndash;12%</div><div class="bvrp-stat-label">Vacancy &amp; Collection Losses</div></div>
+    <div class="bvrp-stat"><div class="bvrp-stat-value negative">9&ndash;15%</div><div class="bvrp-stat-label">Property Taxes</div></div>
+    <div class="bvrp-stat"><div class="bvrp-stat-value negative">6&ndash;15%+</div><div class="bvrp-stat-label">Landlord Insurance</div></div>
+    <div class="bvrp-stat"><div class="bvrp-stat-value negative">11&ndash;14%</div><div class="bvrp-stat-label">Property Management</div></div>
+    <div class="bvrp-stat"><div class="bvrp-stat-value negative">9&ndash;13%</div><div class="bvrp-stat-label">Maintenance &amp; Repairs</div></div>
+    <div class="bvrp-stat"><div class="bvrp-stat-value negative">6&ndash;10%</div><div class="bvrp-stat-label">CapEx Reserves</div></div>
+  </div>
+
+  <p>Combined, operating expenses and reserves consume between <strong>50.0% and 63.0%</strong> of gross rental income. Only <strong>36.8% to 50.4%</strong> of the headline yield actually survives to become net cash flow. This is the &ldquo;50% Rule&rdquo; that industry underwriters quietly use; the listing-yield numbers most landlord proponents quote are gross.</p>
+
+  <p>There is a paradox inside this waterfall. Counterintuitively, <strong>high-yield markets retain less of their gross</strong>. A property in a low-cost Midwest market might post a stellar 15.6% gross yield, but because physical costs like a $10,000 roof replacement don&rsquo;t drop just because the house is cheap, only about 36.8% of that gross survives to net. A premium coastal property with a 5.4% gross yield benefits from &ldquo;expense compression&rdquo; &mdash; high rents dwarf the fixed costs &mdash; and over 50% of its gross survives. The conventional &ldquo;cheap markets are cash-flow markets&rdquo; intuition is structurally inverted: cheap markets are <em>fixed-cost-dominated</em> markets.</p>
+
+  <h3>About That 11.7% ROI Number</h3>
+
+  <p>The headline 11.7% leveraged ROI is technically real, but it was computed against a sanitized model. Specifically: it&rsquo;s the average across the best rolling 20-year windows for leveraged private US housing portfolios, computed at 4&times;&ndash;5&times; leverage, aggregating net rental cash flow, appreciation, and principal amortization &mdash; while <em>zeroing out</em> sweat equity, real turnover frictions, eviction risk, and exit liquidity discounts. The conventional calculator assumes a flat 5&ndash;8% vacancy, nominal bad-debt write-offs, frictionless exit at full market value, and a landlord whose time has no opportunity cost.</p>
+
+  <p>Once those costs go back in, an honest after-friction equivalent lands in the <strong>7&ndash;9% range</strong>. Still positive. Still meaningful. But materially below the headline that gets cited in books and bro podcasts about &ldquo;real estate as the ultimate wealth builder.&rdquo;</p>
+
+  <h3>Costs That Don&rsquo;t Appear on a P&amp;L</h3>
+
+  <p>This is the section that conventional landlord-economics writeups systematically miss. The frictions that don&rsquo;t show up on a spreadsheet absolutely show up in a landlord&rsquo;s life. Three components, in increasing order of how much they are under-counted:</p>
+
+  <p><strong>Time cost.</strong> The average independent landlord spends roughly <strong>31 hours per month</strong> on property management, with single-property owners closer to 8 hours per month plus 40&ndash;48 hours per year on leasing and turnover &mdash; about 96 hours annually per property. Valued at a modest $50/hour, that&rsquo;s an unbudgeted <strong>$4,800 per year per property</strong>. A landlord with three properties is &ldquo;earning&rdquo; $14,400 per year in unpaid labor before any cash flow shows up. Most underwriting models put this cost at zero.</p>
+
+  <p><strong>Background mental load.</strong> Beyond the hours, there is the ongoing anxiety of staying on top of a moving target. Tax code shifts. Local ordinance changes. Tenant situations that could turn at any time. The constant low-grade risk of vacancy, contested eviction, or worse &mdash; squatting. This cost doesn&rsquo;t appear on any spreadsheet, but it&rsquo;s real and it never goes away &mdash; it can only be mitigated. The 2 a.m. plumber call is the canonical sensory image: even when nothing is going wrong, you&rsquo;re carrying the possibility that it might. Bitcoin&rsquo;s anxiety profile is genuinely different. Market volatility and custody are real anxieties, but they are <em>structurally inert</em> once accepted &mdash; bounded, known, and not requiring active monitoring of a moving regulatory and operational target.</p>
+
+  <p><strong>The &ldquo;this won&rsquo;t happen to me&rdquo; dismissal.</strong> Landlords systematically under-budget for tail risks &mdash; contested evictions ($3,500&ndash;$10,000+ in direct costs, plus 7&ndash;16 weeks of lost rent), multi-month vacancies, sudden regulatory shifts &mdash; precisely because the worst cases haven&rsquo;t happened to them yet. The conventional model assumes nominal bad-debt write-offs and flat 5&ndash;8% vacancy. Real-world data show the tail is fatter than the model assumes, and when it hits, it hits a P&amp;L that was never sized to absorb it.</p>
+
+  <h3>Exit Attrition</h3>
+
+  <p>And then there is the cost of getting out. Standard yield calculators assume properties can be liquidated at 100% of theoretical market value. They cannot.</p>
+
+  <div class="bvrp-stats">
+    <div class="bvrp-stat"><div class="bvrp-stat-value negative">7&ndash;11%</div><div class="bvrp-stat-label">Orderly Sale Costs</div></div>
+    <div class="bvrp-stat"><div class="bvrp-stat-value negative">19&ndash;33%</div><div class="bvrp-stat-label">Forced Sale Attrition</div></div>
+    <div class="bvrp-stat"><div class="bvrp-stat-value negative">50%+</div><div class="bvrp-stat-label">Distressed Sale</div></div>
+    <div class="bvrp-stat"><div class="bvrp-stat-value negative">+25%</div><div class="bvrp-stat-label">Depreciation Recapture</div></div>
+  </div>
+
+  <p>An orderly sale consumes 7&ndash;11% in commissions, closing costs, and transfer taxes. A forced sale (cash crunch, sudden event, slow market) compounds price concessions on top of those frictions, producing total attrition of 19&ndash;33%. A distressed sale &mdash; near-foreclosure or fire-sale conditions &mdash; can exceed 50%. And depreciation recapture (capped at 25%) must be paid out of those discounted proceeds. Bitcoin&rsquo;s comparable cost: sell 1% in seconds at near-zero spread. We will come back to that comparison in Section 3.</p>
+
+  <h3>The Regulatory Risk Surface</h3>
+
+  <p>The final hidden cost is the most asymmetric: a single policy change can permanently degrade your asset&rsquo;s economics. The 2024&ndash;2026 cycle saw 29 states and 51 localities pass new tenant-protection or rent-control measures. Specific named exhibits where landlord economics moved materially:</p>
+
+  <ul>
+    <li><strong>Portland, ME:</strong> 2020 rent control ordinance produced an average <strong>$500/month per unit</strong> in lost collected revenue &mdash; a 40% drop in landlord cash flow versus unregulated market pricing.</li>
+    <li><strong>St. Paul, MN:</strong> A 2021 3% annual rent cap with no inflation adjustment and no vacancy decontrol caused multi-unit rental property values to fall 12&ndash;13%, contributing to a citywide valuation loss of <a href="https://www.nber.org/system/files/working_papers/w30083/w30083.pdf" target="_blank" rel="noopener">$1.57 billion</a>.</li>
+    <li><strong>Tacoma, WA:</strong> Initiative 1 (Nov 2023) capped late fees at $10, imposed eviction bans, and mandated up to 3 months of relocation assistance. Delinquency rates climbed from 33% in 2024 to <strong>54%</strong> in 2025. Institutional capital exited; 32% of sold rentals were permanently removed from the rental supply.</li>
+    <li><strong>Seattle, WA:</strong> Cumulative rent-cap and relocation-assistance burdens drove a <a href="https://www.seattle.gov/documents/departments/cityauditor/auditreports/rrioaudit.pdf" target="_blank" rel="noopener">21% decline</a> in registered rental properties as small landlords sold off.</li>
+  </ul>
+
+  <p>Bitcoin doesn&rsquo;t have a policy-can-cap-your-yield surface in this form. That doesn&rsquo;t mean bitcoin has no political risk &mdash; it does &mdash; but the failure mode is qualitatively different and bounded in different ways. A city council vote can cap your rental yield next quarter. A city council vote cannot cap bitcoin&rsquo;s price.</p>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SECTION 2.5: THE STR / AIRBNB CLIFF         -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="bvrp-subsection" id="str-cliff">
+    <span class="bvrp-section-num">Section 2.5</span>
+    <h2 style="font-size:1.6rem;margin-bottom:0.8rem">The STR / AirBnB <em>Cliff</em></h2>
+
+    <p>One last sub-argument before we move on, because the AirBnB economics are dramatically different from long-term rental and deserve a focused look.</p>
+
+    <p>Short-term rental operators look at gross booking revenue and conclude they are outperforming long-term landlords. The operational waterfall says otherwise. STRs are not real estate investments &mdash; they are active commercial hospitality businesses, with cost structures and labor requirements to match.</p>
+
+    <p>For a fully delegated STR property, the net cash flow that survives the waterfall is typically only <strong>15&ndash;30% of Gross Booking Revenue</strong> &mdash; versus the long-term rental&rsquo;s 36.8&ndash;50.4%. The drag comes from platform fees plus lodging taxes (20&ndash;30%), STR-specific property management (25&ndash;40% versus LTR&rsquo;s 8&ndash;12%), accelerated maintenance from continuous guest turnover, and dedicated STR insurance ($1,500&ndash;$5,000+ annually versus LTR&rsquo;s $800&ndash;$3,000).</p>
+
+    <p>And the regulatory cliff is binary. New York City&rsquo;s Local Law 18, effective late 2023, mandated host presence and unlocked-bedroom requirements that effectively banned dedicated investment STRs. Active listings plunged <strong>70&ndash;92%</strong>, from roughly 38,000 down to fewer than 3,000. For dedicated operators, this was a near-100% revenue collapse triggered by a single ordinance. California&rsquo;s AB 1154 (effective January 2026) extends similar restrictions, prohibiting Junior ADUs from STR use entirely.</p>
+
+    <p>If your model depends on AirBnB economics, your asset is exposed to <em>discretionary local political decisions</em> that can zero out your revenue line overnight. That risk doesn&rsquo;t appear in the cap-rate spreadsheet but it&rsquo;s real, and it&rsquo;s asymmetric.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 3: THE BITCOIN COMPARISON           -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="bvrp-section" id="bitcoin-comparison">
+  <span class="bvrp-section-num">Section 3</span>
+  <h2>The Bitcoin <em>Comparison</em></h2>
+
+  <p>Now the other side. This section is direct, honest about bitcoin&rsquo;s weaknesses, and leans on the <a href="/the-power-law.html">Power Law</a> as the projection backbone &mdash; the same model that anchors the rest of this site.</p>
+
+  <p>Under conservative Power Law assumptions, bitcoin&rsquo;s long-term CAGR has held in the <strong>25&ndash;30% range</strong>, trending lower across the decade as market capitalization grows. Even at the conservative end, this dramatically exceeds the after-friction real-estate equivalent of 7&ndash;9%. Bitcoin&rsquo;s liquidity profile is the inverse of real estate&rsquo;s: you can sell 1% of your position in seconds at near-zero spread, on any day, from any device, anywhere in the world. Against rental property&rsquo;s 19&ndash;33% forced-sale attrition, this is not a marginal advantage &mdash; it is a structural one.</p>
+
+  <p>The structural advantages compound. No tenants. No maintenance. No regulatory cliff. No policy risk in the form a city council can produce. No time or attention cost. No 2 a.m. calls. The asset is fungible, portable, divisible, censorship-resistant, and operates the same in Texas as in California as in Maine.</p>
+
+  <p><strong>But this page has to be honest about what bitcoin gives up to deliver this.</strong> Bitcoin&rsquo;s volatility is materially higher than real estate&rsquo;s. The 9.86% standard deviation that makes housing look stable next to public equities is roughly a quarter of bitcoin&rsquo;s standard deviation over comparable windows. Bitcoin&rsquo;s worst rolling 10-year drawdown windows are far deeper than SFR&rsquo;s &mdash; well into the negative real returns &mdash; and bitcoin&rsquo;s Sharpe ratio over any period that includes a full cycle is lower than the SFR Sharpe of 1.14 cited above. <em>Bitcoin trades volatility for absolute return.</em> Over sufficiently long holding periods, the CAGR differential overwhelms the volatility penalty; over shorter windows, or for an investor who cannot tolerate seeing 50&ndash;80% drawdowns without capitulating, this trade does not work.</p>
+
+  <p>What the right hassle-adjusted comparison looks like, then: if rental property&rsquo;s real after-friction return is 7&ndash;9% leveraged, but requires 96 hours per year per property of attention plus the ongoing background mental load, what is bitcoin&rsquo;s equivalent at <em>zero hours</em> and bounded, structurally-inert risk? Even at the most conservative bitcoin assumptions, the math is not close.</p>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SECTION 3.5: WHEN THIS DECISION IS BEST MADE -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="when-decision-best" style="margin-top:2.4rem">
+    <span class="bvrp-section-num">Section 3.5</span>
+    <h2 style="font-size:1.8rem">When This Decision Is Best <em>Made</em></h2>
+
+    <p>Entry timing matters. This page&rsquo;s thesis is structurally more compelling when bitcoin sits at or below long-term trend than when it sits in the upper band. Not a guarantee &mdash; the Power Law is a model, not a forecast &mdash; but the right honest guidance to surface before you choose a path.</p>
+
+    <p>The Power Law channel describes bitcoin&rsquo;s long-term trajectory bounded by a trend line and a 0.42&times;&ndash;3&times; envelope. Bitcoin spends most of its time inside that channel, oscillating between phases of expensive (upper band) and cheap (around the floor). Entering near the floor means your forward CAGR is structurally larger; entering near the ceiling means it&rsquo;s structurally compressed. The math works in the long run from any reasonable entry, but how quickly it works depends on where in the channel you bought.</p>
+
+    <!-- Entry-Timing Indicator (live, JS-driven) -->
+    <div class="eti-card" id="eti-card">
+      <div class="eti-eyebrow">Current Entry Conditions · Live</div>
+      <div class="eti-row">
+        <div class="eti-multiple">
+          <span class="eti-multiple-value">&mdash;</span><span class="eti-unit">&times; trend</span>
+        </div>
+        <span class="eti-label neutral">&mdash;</span>
+      </div>
+      <div class="eti-bar">
+        <div class="eti-marker" style="left:50%"></div>
+      </div>
+      <div class="eti-bar-labels">
+        <span>0&times; Floor</span>
+        <span>1&times; Trend</span>
+        <span>3&times; Ceiling</span>
+      </div>
+      <p class="eti-copy" style="margin:0.9rem 0 0;font-size:0.95rem;color:var(--ink);line-height:1.6">Loading current channel position&hellip;</p>
+      <p class="eti-caveat">Power Law channel position is a probabilistic guide, not market-timing advice. For full context see <a href="/the-gallery.html">The Gallery</a>.</p>
+    </div>
+
+    <p>Read the indicator above honestly. Favorable conditions don&rsquo;t mean &ldquo;buy right now;&rdquo; elevated conditions don&rsquo;t mean &ldquo;wait forever.&rdquo; But if you&rsquo;re sitting on a decision and the channel is favorable, that&rsquo;s additional information. If it&rsquo;s elevated, averaging in over months rather than committing all at once is the conservative move.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 4: THE YIELD-INSTRUMENT SUBSTITUTION -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="bvrp-section" id="yield-substitution">
+  <span class="bvrp-section-num">Section 4 · Central Argument</span>
+  <h2>You Don&rsquo;t Have to Give Up Cash Flow to <em>Switch</em></h2>
+
+  <p class="bvrp-pull">What you&rsquo;re really buying is your weekends back.</p>
+
+  <p>This is the section that matters most for the cash-flow-dependent landlord audience &mdash; the reader who can see the structural argument against rental property but doesn&rsquo;t want to lose their monthly income stream. The honest answer is: you don&rsquo;t have to.</p>
+
+  <p>A small but rapidly maturing category of bitcoin-treasury yield instruments now pays 10&ndash;13% gross with tax treatment that mirrors real estate&rsquo;s depreciation shield. The two flagship instruments:</p>
+
+  <h3>STRC and SATA: The Core Instruments</h3>
+
+  <p><strong>STRC (Strategy Variable Rate Series A Perpetual Stretch Preferred Stock)</strong> pays a variable annualized rate currently around <strong>11.5%</strong>, with monthly distributions transitioning to semi-monthly. Strategy adjusts the rate at its discretion to keep STRC&rsquo;s trading price near its $100 par value. STRC is Strategy&rsquo;s largest preferred instrument and currently the largest pure-yield vehicle in the broader bitcoin-treasury category.</p>
+
+  <p><strong>SATA (Strive&rsquo;s Variable Rate Series A Perpetual Preferred Stock)</strong> currently pays a <strong>13.00%</strong> variable annualized rate, transitioning to <em>daily</em> distributions effective June 16, 2026 &mdash; roughly 250 payments per year, which effectively converts the preferred stock into a daily-compounding cash-management instrument. SATA is backed by Strive&rsquo;s 15,009 BTC corporate treasury plus an 18-month dedicated dividend reserve, and is purchasable on standard US brokerage platforms (Robinhood, Fidelity, Schwab).</p>
+
+  <p>Both are <em>unsecured preferred equity</em>, not directly bitcoin-collateralized. They are backed by the issuer&rsquo;s general corporate credit, their cash reserves, equity-issuance capacity, and ultimately their bitcoin treasury via liquidation as a last resort. We will surface the structural risks in detail below; what they share is a yield level that materially exceeds the after-friction net rental yield landlords actually realize.</p>
+
+  <h3>The Tax Treatment: Depreciation for Bitcoin Yield</h3>
+
+  <p>Here is the part landlords intuitively understand the fastest. Because Strategy and Strive both lack accumulated earnings &amp; profits (E&amp;P) for US tax purposes &mdash; and do not expect to generate any in the foreseeable future &mdash; distributions from STRC, SATA, and the other Strategy preferreds (STRF, STRK, STRD) are classified as <strong>Return of Capital (ROC)</strong>. For US taxable accounts, this means distributions are <em>tax-deferred</em>, reducing the investor&rsquo;s cost basis rather than triggering immediate ordinary income tax. Once cost basis is reduced to zero, further distributions are taxed at long-term capital gains rates.</p>
+
+  <p>The structural parallel is exact: <em>ROC is depreciation for bitcoin yield</em>. Real estate&rsquo;s depreciation shield works by allowing landlords to deduct a paper-loss against rental income, deferring tax until eventual sale. STRC&rsquo;s ROC works by reducing cost basis as distributions are paid, deferring tax until eventual sale. The mechanism is different; the after-tax effect on the holder is comparable. Landlords already understand this intuitively from one direction; meeting them on the same axis from the other direction is what makes this argument land.</p>
+
+  <h3>The Numbers, $500K Side-by-Side</h3>
+
+  <p>Consider the same starting capital, deployed two different ways.</p>
+
+  <div class="bvrp-table-wrap">
+    <table class="bvrp-table">
+      <thead>
+        <tr><th>Metric</th><th>$500K Rental Property</th><th>$500K Bitcoin Yield Portfolio</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Composition</td>
+          <td class="numeric">One property, leveraged or not</td>
+          <td class="numeric">45% STRC + 30% SATA + 10% Ledn + 15% spot BTC</td>
+        </tr>
+        <tr>
+          <td>Year 1 cash flow</td>
+          <td class="numeric">$20,000&ndash;$24,000 (net of operating costs)</td>
+          <td class="numeric">~$49,000 (with ~$42,500 ROC-treated)</td>
+        </tr>
+        <tr>
+          <td>Effective gross yield</td>
+          <td class="numeric">4.0&ndash;4.8% net</td>
+          <td class="numeric">9.8% blended</td>
+        </tr>
+        <tr>
+          <td>10-year cash flow (yields flat)</td>
+          <td class="numeric">$200K&ndash;$240K + property appreciation</td>
+          <td class="numeric">~$490K + ~$415K BTC appreciation on the spot slice</td>
+        </tr>
+        <tr>
+          <td>Hassle</td>
+          <td class="numeric">96 hrs/yr/property + ongoing mental load</td>
+          <td class="numeric">Effectively zero</td>
+        </tr>
+        <tr>
+          <td>Liquidity</td>
+          <td class="numeric">Months; 7&ndash;33% exit attrition</td>
+          <td class="numeric">Instant; near-zero spread</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Two-and-a-half times the Year 1 cash flow. Roughly comparable tax treatment via ROC. Zero hassle. And on the appreciation side, the 15% allocated to spot bitcoin at a conservative 25% CAGR grows from $50K to roughly $465K over the decade &mdash; meaningfully more than the property appreciation a $500K rental would typically deliver after exit frictions.</p>
+
+  <h3>The Bear Case, Honestly</h3>
+
+  <p>Now the part the page would lose credibility without. These instruments are real, and so are the risks. The headline question is: <em>what happens if bitcoin crashes?</em></p>
+
+  <p>Strategy currently holds <strong>843,706 BTC</strong> as of mid-2026 &mdash; one of the largest concentrated bitcoin treasuries in existence. Against the company&rsquo;s roughly $1.7B annual preferred-suite dividend obligation, the math of treasury coverage is favorable:</p>
+
+  <div class="bvrp-stats">
+    <div class="bvrp-stat"><div class="bvrp-stat-value positive">49.6 yrs</div><div class="bvrp-stat-label">Coverage at $100K BTC</div></div>
+    <div class="bvrp-stat"><div class="bvrp-stat-value positive">24.8 yrs</div><div class="bvrp-stat-label">Coverage at $50K BTC</div></div>
+    <div class="bvrp-stat"><div class="bvrp-stat-value positive">14.8 yrs</div><div class="bvrp-stat-label">Coverage at $30K BTC</div></div>
+  </div>
+
+  <p>But the structural risk isn&rsquo;t treasury depletion &mdash; it&rsquo;s that <em>Strategy doesn&rsquo;t want to sell bitcoin</em>. Selling treasury bitcoin destroys the per-share bitcoin-accretion metric (&ldquo;BPS&rdquo;) that gives MSTR common equity its premium, which is itself the engine that fuels at-the-market equity issuance. If bitcoin drops materially, STRC trades below its $100 par, the ATM issuance channel shuts down, and Strategy must service dividends from cash reserves that are roughly 6 months in scale against the $1.7B annual obligation. After that, the board faces a binary choice: sell bitcoin into a down market, or <em>suspend</em> the dividend. Suspension is non-fatal &mdash; STRC dividends are cumulative, arrears accumulate &mdash; but it would be catastrophic for the &ldquo;Digital Credit&rdquo; brand and would trigger collateral damage in the broader Strategy capital stack.</p>
+
+  <p>Michael Saylor&rsquo;s public framing is that bitcoin would have to plunge to roughly <strong>$8,000 and stay there for five years</strong> before Strategy would face any genuine threat to its convertible-debt obligations. Take that as the calibration anchor: what kind of catastrophic, sustained collapse would actually have to unfold for STRC&rsquo;s dividend to break? It is a much deeper and longer bear scenario than a typical 50% drawdown.</p>
+
+  <div class="bvrp-callout">
+    <span class="bvrp-callout-label">Honest Risk Surfaces</span>
+    Three things to surface explicitly for any reader considering these instruments:
+    <ul style="margin:0.6rem 0 0;padding-left:1.4rem">
+      <li><strong>STRC is unsecured corporate credit</strong>, not directly bitcoin-collateralized. Preferred shareholders sit junior to Strategy&rsquo;s $8.2B in convertible notes in any formal bankruptcy.</li>
+      <li><strong>SATA&ndash;STRC contagion.</strong> Strive&rsquo;s 18-month dividend reserve includes $50M of STRC. STRC distress propagates to SATA.</li>
+      <li><strong>Both companies have short histories.</strong> Neither has yet weathered a full bitcoin cycle in their current preferred-stock configuration. The structural math is sound; the empirical track record is short.</li>
+    </ul>
+  </div>
+
+  <h3>What Not to Confuse These With</h3>
+
+  <p>Two categories of bitcoin-yield instruments warrant explicit warnings, because their structures look superficially similar to STRC and SATA but their risk profiles are dramatically worse.</p>
+
+  <div class="bvrp-warning">
+    <span class="bvrp-warning-label">Caution: Synthetic Options ETFs (YBIT, YBTC)</span>
+    Funds like YieldMax&rsquo;s YBIT and Roundhill&rsquo;s YBTC advertise extraordinary distribution rates &mdash; YBTC has projected annualized rates around 74.7% &mdash; by writing synthetic covered calls against bitcoin ETPs. The structure caps your upside and leaves you fully exposed to the downside. A 50% bitcoin drop produces a roughly 45&ndash;48% NAV decline, AND permanently impairs the fund&rsquo;s future yield capacity. The tax character of the distributions also swings wildly week to week (anywhere from 0% to 96% ROC), making after-tax forecasting nearly impossible. These are an income illusion, not a substitute for STRC or SATA. Don&rsquo;t confuse them.
+  </div>
+
+  <p>The other category to handle carefully is CeFi lending (Ledn, Unchained, Arch, APX, Strike). These platforms offer 6.5&ndash;13.9% interest on overcollateralized loan books, with custody structures dramatically improved over the BlockFi era &mdash; segregated accounts, 2-of-3 multisig, non-rehypothecation. The structural risk is materially lower than 2022-era CeFi. But the tax treatment is <em>ordinary income</em>, not ROC. For a high-bracket (37% federal) investor, a 10% gross CeFi yield compresses to roughly 6.3% after-tax &mdash; meaningfully worse than the same gross yield on STRC or SATA, where ROC treatment lets the full distribution sit untaxed at the federal level until cost basis is exhausted. CeFi has a place in a portfolio for retail-bracket investors and for risk diversification; it shouldn&rsquo;t dominate for high earners.</p>
+
+  <h3>What&rsquo;s Familiar, What&rsquo;s Genuinely New</h3>
+
+  <p>If you&rsquo;ve been a landlord for years, several elements of the bitcoin-yield landscape will feel structurally familiar:</p>
+
+  <ul>
+    <li>STRC and SATA function like the <strong>preferred equity stack</strong> of a real estate holding company &mdash; senior to common, junior to debt, paying steady distributions stripped of the underlying asset&rsquo;s extreme volatility.</li>
+    <li>Native bitcoin staking and liquid staking tokens behave like a <strong>triple-net lease on digital land</strong> &mdash; you keep the underlying asset, you collect cash flow from securing a network.</li>
+    <li>CeFi lending platforms are structurally a <strong>cash-out refinance against bitcoin collateral</strong> &mdash; the borrower pledges bitcoin, you fund their loan and collect interest.</li>
+    <li>Stablecoin growth accounts (Ledn, Onramp) function like <strong>high-yield CDs</strong> &mdash; without FDIC, but with overcollateralization as the structural backstop.</li>
+  </ul>
+
+  <p>What is genuinely new and needs explaining before any landlord acts: enforcement is <em>programmatic</em>, not judicial &mdash; if you breach an LTV threshold, a smart contract liquidates instantly, no foreclosure court, no months-long process. The term &ldquo;BTC Yield&rdquo; that Strategy promotes is a per-share-of-treasury KPI, <em>not</em> a financial yield to investors &mdash; investors get cash dividends only by buying the preferred stock (STRC, etc.). And bridging bitcoin to another blockchain to earn DeFi yield can trigger a <em>taxable disposal event</em> in the US before a single dollar of yield is generated. These are real differences from how real estate yield works, and they need to be on the page.</p>
+
+  <p class="bvrp-pull">The yield portfolio doesn&rsquo;t just match rental cash flow at a higher yield. It removes the operational anxiety entirely. No tenants. No moving regulatory target. No 2 a.m. calls. The risks are real but bounded.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 5: THE FOUR OPERATIONAL PATHS       -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="bvrp-section" id="four-paths">
+  <span class="bvrp-section-num">Section 5</span>
+  <h2>Four Paths to <em>Switch</em></h2>
+
+  <p>The reader sits somewhere on a conviction curve. This page doesn&rsquo;t recommend one path &mdash; it lays out four, with honest tradeoffs, so the reader can self-select based on where they are.</p>
+
+  <div class="bvrp-path">
+    <h3>Path 1 &mdash; Outright Sell (Full Pivot)</h3>
+    <div class="bvrp-path-sub">High conviction · No leverage · Highest tax friction</div>
+    <p>Sell the rental property outright, pay the tax bill, redeploy net proceeds into bitcoin or a bitcoin-yield portfolio. The cleanest path, but the most expensive on day one.</p>
+    <p>Tax math, worked example. A $500K property with a $200K adjusted basis (originally purchased for $300K, $100K depreciation taken) sells for $500K. After roughly 8% in transaction costs, net proceeds are $460K. The taxable gain is $260K: $100K is taxed at the 25% depreciation-recapture rate ($25K), the remaining $160K at 15% long-term capital gains ($24K). Total federal tax: $49K. Net cash to seller: <strong>$411K</strong> &mdash; an 18% all-in haircut at the federal level, before state tax and the 3.8% NIIT (which for a California high-bracket investor brings total leakage to roughly 27%).</p>
+    <p>Critically: <strong>1031 exchanges don&rsquo;t apply</strong>. Bitcoin is not &ldquo;like-kind&rdquo; property for 1031 purposes, and opportunity zones don&rsquo;t qualify. The tax-deferral pathways landlords normally rely on are closed for this destination.</p>
+    <p><strong>Best for:</strong> high conviction; long holding horizon (5&ndash;10+ years to amortize the upfront tax); investors who are also tired of being landlords for non-financial reasons.</p>
+  </div>
+
+  <div class="bvrp-path">
+    <h3>Path 2 &mdash; HELOC / Cash-Out Refi (Partial Levered)</h3>
+    <div class="bvrp-path-sub">Lower conviction · Adds leverage · No tax event upfront</div>
+    <p>Tap your home&rsquo;s equity via a HELOC (or cash-out refi) to buy bitcoin without selling the rental. No immediate tax event &mdash; loan proceeds are not income.</p>
+    <p>Cash-out refinance is largely impractical in 2026. With 62% of US mortgage holders sitting on sub-4% rates, replacing the entire balance at today&rsquo;s 7%+ levels for partial bitcoin exposure rarely pencils. <strong>HELOC is the realistic tool.</strong> Typical maximum combined LTV is 85&ndash;90%, with variable rates currently in the 8.5&ndash;10.5% range tied to the Prime Rate.</p>
+    <p><strong>Tax treatment caveat:</strong> Under the Tax Cuts and Jobs Act, HELOC interest is only deductible as mortgage interest if the proceeds are used to &ldquo;buy, build, or improve&rdquo; the home itself. Proceeds used to buy bitcoin are not deductible. They <em>could</em> be deducted as investment-interest expense if you have offsetting investment income &mdash; but spot bitcoin generates no investment income (no dividends or interest unless staked), making this deduction largely unavailable. Plan accordingly.</p>
+    <p><strong>The reframe.</strong> A HELOC-funded bitcoin position is structurally a <em>leveraged bitcoin position collateralized by your home</em>. At 80% combined LTV, your home&rsquo;s untouched 20% equity is more than your $100K bitcoin position, so a 100% bitcoin wipeout cannot cause negative equity from bitcoin alone. The real risk is <strong>debt-service insolvency</strong> through a multi-year drawdown &mdash; paying $791/month in HELOC interest out of personal income while your bitcoin position sits down 70&ndash;80%. The 2022 cycle is the canonical exhibit: bitcoin dropped 77% precisely as variable HELOC rates were climbing in response to Fed tightening. A double shock, and the worst-case scenario for this strategy.</p>
+    <p><strong>Best for:</strong> investors who want partial exposure, can&rsquo;t or won&rsquo;t sell the property, have stable non-rental income sufficient to service the debt through a multi-year drawdown, and understand they are taking a leveraged position.</p>
+  </div>
+
+  <div class="bvrp-path">
+    <h3>Path 3 &mdash; Partial Portfolio Sale</h3>
+    <div class="bvrp-path-sub">For multi-property landlords · Path 1 economics on one property</div>
+    <p>Sell one rental property, take the tax hit on that one only, redeploy into bitcoin. Keep the rest of the portfolio.</p>
+    <p>Per-property tax math is identical to Path 1. The advantage is avoiding the all-or-nothing decision: you preserve some rental cash flow on the remaining properties while gaining bitcoin exposure on the proceeds of the sold one. This is probably the most palatable path for landlords with 2&ndash;5 properties, especially if one of those properties is the most operationally annoying (worst tenants, oldest building, worst regulatory jurisdiction).</p>
+    <p><strong>Best for:</strong> moderate conviction; multi-property portfolio; investors who don&rsquo;t want to lose all rental cash flow but want meaningful bitcoin exposure. Mental load is partially retained because you still manage the remaining properties.</p>
+  </div>
+
+  <div class="bvrp-path">
+    <h3>Path 4 &mdash; Sell Rental, Buy Bitcoin Yield Portfolio</h3>
+    <div class="bvrp-path-sub">Full pivot, cash flow preserved · The headline option for income-dependent investors</div>
+    <p>Combine Path 1&rsquo;s outright sale with Section 4&rsquo;s yield-instrument substitution. Take the tax hit; redeploy net proceeds into a portfolio of STRC, SATA, optional CeFi, and a small spot bitcoin allocation. The yield this portfolio generates is materially higher than the net rental cash flow you gave up &mdash; even after eating the upfront tax leakage.</p>
+    <p>For an income-dependent investor who can&rsquo;t go without monthly cash flow, this is probably the most compelling path the page can offer. You give up local-tenant-and-property risk and take on issuer-credit risk &mdash; a different risk concentration, but at higher yield, with comparable tax treatment, and with zero ongoing operational load.</p>
+    <p><strong>Best for:</strong> income-dependent investors; those who want to fully exit landlording without giving up the cash flow stream that made rental property attractive in the first place.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 6: CONSTRAINTS, RISKS, SPECIFICS    -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="bvrp-section" id="constraints">
+  <span class="bvrp-section-num">Section 6</span>
+  <h2>Where This Gets Specific to <em>You</em></h2>
+
+  <p>This page shows you the <em>shape and direction</em> of the decision &mdash; the structural argument, the rough numbers, the four paths. Your actual numbers depend on your state, your bracket, your specific property, and your situation. When you&rsquo;re ready to act, that&rsquo;s a CPA, a financial advisor, and a lender conversation. Not this page.</p>
+
+  <p><strong>State and bracket variation.</strong> The tax math on a sale swings hard. A middle-bracket investor in Texas (no state income tax) sees an all-in haircut of roughly 18% federal on a typical sale. A high-bracket investor in California with the 3.8% NIIT applied sees roughly 27%. The ROC tax treatment of STRC/SATA distributions also has state-by-state nuances. Get specific advice for your jurisdiction before acting.</p>
+
+  <p><strong>HELOC qualification.</strong> Path 2&rsquo;s viability for any specific reader depends on their existing mortgage rate, combined loan-to-value ratio, debt-to-income ratio, credit score, and the lender&rsquo;s appetite for the use case. Investment-property HELOCs typically allow lower CLTVs and carry higher rates than primary-residence HELOCs. Talk to your lender; the page&rsquo;s economics are based on representative terms, not a quote.</p>
+
+  <p><strong>STRC and SATA risk picture.</strong> Both instruments have short empirical track records in their current configurations. The structural math is sound, the issuers are sophisticated, but neither has yet weathered a full bitcoin cycle as a preferred-stock vehicle. Treat the bear case in Section 4 seriously; size positions accordingly; consider diversifying across both issuers (and across instruments) rather than concentrating in a single name.</p>
+
+  <p><strong>Entry timing matters.</strong> Re-read Section 3.5 and check the indicator&rsquo;s current reading. The same path executed at the floor of the Power Law channel and at the ceiling has materially different forward economics.</p>
+
+  <p><strong>Social and identity considerations.</strong> If owning physical real estate carries meaning for you beyond the cash flow it produces &mdash; if status, identity, or the simple satisfaction of pointing at a building and saying &ldquo;that&rsquo;s mine&rdquo; matters &mdash; that is a legitimate consideration that doesn&rsquo;t appear in any of the math above. Bitcoin doesn&rsquo;t (yet) confer the same social recognition. This page is optimizing for return per unit of hassle, anxiety, and capital tied up. If you also weight identity and status, the calculation looks different, and we&rsquo;re not going to talk you out of that.</p>
+
+  <p><strong>This is not personalized financial, tax, or legal advice.</strong> This is decision framing &mdash; the structural argument and the rough shape of the numbers. Personalized advice for your specific situation requires professionals who know your situation.</p>
+
+  <h3>Pointers to Next Steps</h3>
+
+  <ul>
+    <li><strong>Bitcoin custody.</strong> For self-custody: <a href="https://unchained.com/" target="_blank" rel="noopener">Unchained Capital</a> and <a href="https://casa.io/" target="_blank" rel="noopener">Casa</a> offer collaborative-multisig solutions designed for serious holders. For ease of access: spot bitcoin ETFs (IBIT, FBTC, etc.) at major brokers.</li>
+    <li><strong>STRC and SATA purchase.</strong> Both are retail-accessible on standard US brokerage platforms (Robinhood, Fidelity, Schwab, Interactive Brokers). Trade like any other preferred stock; settle T+2.</li>
+    <li><strong>CeFi onboarding caveats.</strong> Ledn, Unchained Capital, and similar platforms require KYC and have state-by-state availability restrictions. Verify your state is supported before relying on any specific platform.</li>
+    <li><strong>Professional advisors.</strong> A CPA familiar with crypto tax treatment; a real estate attorney for the sale; a lender for HELOC qualification on Path 2.</li>
+  </ul>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 7: THE CALCULATOR (PHASE 2)         -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="bvrp-section" id="calculator">
+  <span class="bvrp-section-num">Section 7</span>
+  <h2>The <em>Calculator</em></h2>
+
+  <p>An interactive calculator will let you plug in your property&rsquo;s actual numbers and your state and bracket, choose a path, and see the head-to-head against a customized bitcoin yield portfolio. Sensitivity sliders for the high-leverage variables (vacancy %, maintenance %, holding period, bitcoin CAGR assumption, leverage ratio) will let you stress-test your specific case.</p>
+
+  <div class="bvrp-placeholder">
+    <strong>Phase 2 · Coming Soon</strong>
+    Interactive calculator with persona-based defaults and two-tier inputs (Base Level Assumptions + active sliders), modeled on the pattern established by <a href="/the-bitcoin-retirement.html">The Bitcoin Retirement</a>. Currently in design.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 8: METHODOLOGY & SOURCES            -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="bvrp-section bvrp-methodology" id="methodology">
+  <span class="bvrp-section-num">Section 8</span>
+  <h2>Methodology &amp; <em>Sources</em></h2>
+
+  <p>Every headline number on this page traces back to a specific source. Where the underlying number is a synthesis of multiple sources (rather than a single direct citation), it&rsquo;s flagged as such. The breakdown:</p>
+
+  <details>
+    <summary>Rental property economics &mdash; gross yields, waterfall, hidden costs, returns</summary>
+    <ul class="source-list">
+      <li><strong>Historical real returns (housing vs. equities, 1870&ndash;2015):</strong> <a href="https://www.frbsf.org/wp-content/uploads/wp2017-25.pdf" target="_blank" rel="noopener">&ldquo;The Rate of Return on Everything&rdquo;</a> (Federal Reserve Bank of San Francisco / Jord&agrave;-Schularick-Taylor Macrohistory Database).</li>
+      <li><strong>SFR Sharpe ratio of 1.14 (1986&ndash;2014):</strong> Demers &amp; Eisfeldt, <a href="https://anderson-review.ucla.edu/single-family-rentals/" target="_blank" rel="noopener">&ldquo;Total Returns to Single-Family Rentals&rdquo;</a> (UCLA Anderson Review / Real Estate Economics).</li>
+      <li><strong>St. Paul, MN $1.57B value loss:</strong> <a href="https://www.nber.org/system/files/working_papers/w30083/w30083.pdf" target="_blank" rel="noopener">&ldquo;Robbing Peter to Pay Paul?&rdquo;</a> (NBER Working Paper w30083).</li>
+      <li><strong>Seattle 21% rental supply decline:</strong> <a href="https://www.seattle.gov/documents/departments/cityauditor/auditreports/rrioaudit.pdf" target="_blank" rel="noopener">Seattle City Auditor RRIO Program Audit</a>.</li>
+      <li><strong>Forced-sale liquidity discounts (6.6%&ndash;12.5%):</strong> Nielsen, &ldquo;Fire Sales and House Prices&rdquo; (Management Science).</li>
+      <li><strong>Gross-to-net waterfall and the 50% Rule:</strong> CoreVest Finance maintenance-budgeting reference, plus NotebookLM synthesis combining property tax, insurance, management, and CapEx components.</li>
+      <li><strong>Sweat equity (31 hours/month, $4,800/yr at $50/hr):</strong> Property118 landlord survey + valuation synthesis (modeled estimate).</li>
+      <li><strong>19&ndash;33% total exit attrition:</strong> Compiled by combining academic fire-sale discounts (Nielsen) with industry-standard agent commissions and closing costs (modeled estimate).</li>
+      <li><strong>11.7% leveraged ROI methodology critique:</strong> Property Scout 360 (industry-standard calculation methodology), NotebookLM synthesis of model inputs.</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary>Bitcoin yield instruments &mdash; STRC, SATA, CeFi, ETFs</summary>
+    <ul class="source-list">
+      <li><strong>Strategy preferred stock terms (STRF, STRC, STRK, STRD):</strong> SEC filings &mdash; Form 424B5 prospectuses and 8-K material event disclosures (corporate-issued, primary).</li>
+      <li><strong>Strategy bitcoin treasury (843,706 BTC) and USD Reserve ($871M&ndash;$900M):</strong> Strategy 8-K filings as of late May 2026.</li>
+      <li><strong>STRC&rsquo;s $1.7B annual obligation total:</strong> Derived from outstanding shares &times; dividend rate; verification pending against most recent Strategy 10-Q (modeled, primary source verification in progress).</li>
+      <li><strong>Strive SATA structural details (13% rate, daily payments effective June 16 2026, 18-month reserve, 15,009 BTC, $50M STRC cross-holding):</strong> Strive Form 8-K / EX-99.1 SEC disclosure (corporate-issued, primary).</li>
+      <li><strong>Return-of-Capital tax treatment:</strong> Tax counsel opinions filed in SEC prospectuses; the &ldquo;lack of accumulated earnings &amp; profits&rdquo; doctrine documented in Strategy&rsquo;s tax disclosures (corporate-issued).</li>
+      <li><strong>Ledn S&amp;P-rated Issuer Trust 2026-1 Notes:</strong> S&amp;P Global Ratings Presale Report (third-party verified).</li>
+      <li><strong>BlockFi and BlockFills bankruptcies:</strong> Kroll restructuring administration dockets and Sidley Austin legal analysis (third-party verified).</li>
+      <li><strong>Trading volumes (STRC ~$350M daily, SATA ~$45.9M daily):</strong> BitcoinQuant exchange data dashboard (third-party verified).</li>
+      <li><strong>Saylor &ldquo;$8,000 for 5 years&rdquo; doomsday threshold:</strong> Public statements from Strategy executive team; primary attribution verification in progress.</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary>Tax mechanics, HELOC, regulatory framings</summary>
+    <ul class="source-list">
+      <li><strong>Section 1031 like-kind treatment:</strong> <a href="https://www.irs.gov/businesses/small-businesses-self-employed/like-kind-exchanges-real-estate-tax-tips" target="_blank" rel="noopener">IRS guidance</a>.</li>
+      <li><strong>HELOC interest deductibility under TCJA:</strong> IRS Publication 936 and related TCJA provisions.</li>
+      <li><strong>Investment interest expense deduction (Schedule A):</strong> IRS Form 4952 instructions.</li>
+      <li><strong>State-level capital gains and rent-control surfaces:</strong> Compiled from state revenue department publications and the NBER/legal-research summaries cited above.</li>
+    </ul>
+  </details>
+
+  <p style="font-size:0.85rem;color:var(--ink-dim);font-style:italic;margin-top:1.6rem">
+    Several headline numbers on this page are flagged as &ldquo;modeled estimate&rdquo; or &ldquo;verification pending&rdquo; &mdash; primarily figures synthesized from multiple sources rather than carried directly from a single primary citation. As this draft moves toward publication, those will be either re-sourced to primary references or qualified explicitly. The methodology section will be updated accordingly.
+  </p>
+</section>
+
+</main>
