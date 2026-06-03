@@ -681,3 +681,71 @@
     initCalc();
   }
 })();
+
+// ─── Tab navigation ───────────────────────────────────────────────────
+// Four-tab structure (Reality / Bitcoin Case / Four Paths / Calculator)
+// adopted to break the page's sustained argument into cognitively-grouped
+// chunks. Mirrors the BvRE convention: data-tab on buttons, panel-{id}
+// on the panels, hash-based deep linking.
+//
+// Calculator state and entry-timing indicator state persist across tab
+// switches (their state lives in their respective IIFEs above; the tab
+// JS only toggles visibility classes).
+
+(function bvrpTabs(){
+  'use strict';
+
+  var TAB_IDS = ['reality', 'bitcoin', 'paths', 'calculator'];
+
+  function activateTab(tabId){
+    if (TAB_IDS.indexOf(tabId) === -1) tabId = 'reality';
+    document.querySelectorAll('.tab-btn').forEach(function(b){
+      b.classList.toggle('active', b.dataset.tab === tabId);
+    });
+    document.querySelectorAll('.tab-panel').forEach(function(p){
+      var match = p.id === 'panel-' + tabId;
+      p.classList.toggle('active', match);
+      p.classList.toggle('js-hidden', !match);
+    });
+    // Scroll the tab nav into view if user clicked something deep on the page
+    // to make the tab change feel grounded. Skip on initial load.
+    if (document.readyState === 'complete') {
+      var nav = document.querySelector('.tab-nav');
+      if (nav) {
+        var rect = nav.getBoundingClientRect();
+        if (rect.top < 0 || rect.top > window.innerHeight) {
+          nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }
+  }
+
+  function initTabFromHash(){
+    var hash = (window.location.hash || '').replace(/^#/, '');
+    if (TAB_IDS.indexOf(hash) !== -1) {
+      activateTab(hash);
+    }
+    // else: default to Reality (already active in initial HTML)
+  }
+
+  function init(){
+    document.querySelectorAll('.tab-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var tabId = btn.dataset.tab;
+        activateTab(tabId);
+        // Update URL hash without scrolling
+        if (history.replaceState) {
+          history.replaceState(null, '', '#' + tabId);
+        }
+      });
+    });
+    window.addEventListener('hashchange', initTabFromHash);
+    initTabFromHash();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();

@@ -6,7 +6,7 @@ related:
   - slug: bitcoin-vs-real-estate
     desc: "The sister page: should you buy a home to live in, or own bitcoin and rent? This page asks the parallel investment question — should you own bitcoin (or bitcoin-yield instruments) instead of rental property as a yield-producing asset."
   - slug: the-power-law
-    desc: "The growth model that anchors the bitcoin side of every comparison on this page, including the entry-timing indicator in Section 3."
+    desc: "The growth model that anchors the bitcoin side of every comparison on this page, including the entry-timing indicator in the Bitcoin Case tab."
   - slug: the-gallery
     desc: "The canonical view of where bitcoin sits in the Power Law channel today — the same data the entry-timing indicator pulls from."
   - slug: the-bitcoin-retirement
@@ -37,10 +37,39 @@ eleventyComputed:
 <main class="bvrp-body">
 
 <!-- ═══════════════════════════════════════════ -->
+<!-- TAB NAVIGATION                              -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="reality">
+    <span class="tab-num">I</span>
+    <span class="tab-title">The Reality</span>
+  </button>
+  <button class="tab-btn" data-tab="bitcoin">
+    <span class="tab-num">II</span>
+    <span class="tab-title">The Bitcoin Case</span>
+  </button>
+  <button class="tab-btn" data-tab="paths">
+    <span class="tab-num">III</span>
+    <span class="tab-title">The Four Paths</span>
+  </button>
+  <button class="tab-btn" data-tab="calculator">
+    <span class="tab-num">IV</span>
+    <span class="tab-title">The Calculator</span>
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- TAB I — THE REALITY                          -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="tab-panel active" id="panel-reality">
+  <div class="tab-thesis">
+    What the conventional rental-property pitch leaves out &mdash; the dollars, the time, the regulatory exposure, and the operational anxiety that don&rsquo;t show up in a cap-rate spreadsheet.
+  </div>
+
+<!-- ═══════════════════════════════════════════ -->
 <!-- SECTION 1: THE CONVENTIONAL PITCH           -->
 <!-- ═══════════════════════════════════════════ -->
 <section class="bvrp-section" id="conventional-pitch">
-  <span class="bvrp-section-num">Section 1</span>
   <h2>The Conventional Pitch</h2>
 
   <p>Rental property has been a genuinely good investment for genuine reasons. Before this page argues anything against it, it needs to acknowledge what landlords already know &mdash; and what they&rsquo;re right about.</p>
@@ -60,7 +89,6 @@ eleventyComputed:
 <!-- SECTION 2: THE AFTER-FRICTION REALITY       -->
 <!-- ═══════════════════════════════════════════ -->
 <section class="bvrp-section" id="after-friction-reality">
-  <span class="bvrp-section-num">Section 2</span>
   <h2>The After-Friction <em>Reality</em></h2>
 
   <p>Conventional rental property math is computed against a sanitized model. Once the documented hidden costs go back in &mdash; including the ones that don&rsquo;t appear on a P&amp;L &mdash; after-friction returns are materially lower than the proponent narrative claims, and the asset&rsquo;s structural disadvantages become visible.</p>
@@ -109,7 +137,7 @@ eleventyComputed:
     <div class="bvrp-stat"><div class="bvrp-stat-value negative">+25%</div><div class="bvrp-stat-label">Depreciation Recapture</div></div>
   </div>
 
-  <p>An orderly sale consumes 7&ndash;11% in commissions, closing costs, and transfer taxes. A forced sale (cash crunch, sudden event, slow market) compounds price concessions on top of those frictions, producing total attrition of 19&ndash;33%. A distressed sale &mdash; near-foreclosure or fire-sale conditions &mdash; can exceed 50%. And depreciation recapture (capped at 25%) must be paid out of those discounted proceeds. Bitcoin&rsquo;s comparable cost: sell 1% in seconds at near-zero spread. We will come back to that comparison in Section 3.</p>
+  <p>An orderly sale consumes 7&ndash;11% in commissions, closing costs, and transfer taxes. A forced sale (cash crunch, sudden event, slow market) compounds price concessions on top of those frictions, producing total attrition of 19&ndash;33%. A distressed sale &mdash; near-foreclosure or fire-sale conditions &mdash; can exceed 50%. And depreciation recapture (capped at 25%) must be paid out of those discounted proceeds. Bitcoin&rsquo;s comparable cost: sell 1% in seconds at near-zero spread. We will come back to that comparison in the next tab.</p>
 
   <h3>The Regulatory Risk Surface</h3>
 
@@ -128,7 +156,6 @@ eleventyComputed:
   <!-- SECTION 2.5: THE STR / AIRBNB CLIFF         -->
   <!-- ═══════════════════════════════════════════ -->
   <div class="bvrp-subsection" id="str-cliff">
-    <span class="bvrp-section-num">Section 2.5</span>
     <h2 style="font-size:1.6rem;margin-bottom:0.8rem">The STR / AirBnB <em>Cliff</em></h2>
 
     <p>One last sub-argument before we move on, because the AirBnB economics are dramatically different from long-term rental and deserve a focused look.</p>
@@ -143,11 +170,20 @@ eleventyComputed:
   </div>
 </section>
 
+</div><!-- /panel-reality -->
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- TAB II — THE BITCOIN CASE                    -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="tab-panel js-hidden" id="panel-bitcoin">
+  <div class="tab-thesis">
+    The structural comparison &mdash; bitcoin&rsquo;s growth profile against rental&rsquo;s after-friction reality &mdash; and the central argument: cash-flow-dependent landlords can switch <em>without giving up income</em>, via bitcoin-treasury yield instruments that pay 10&ndash;13% with depreciation-equivalent tax mechanics.
+  </div>
+
 <!-- ═══════════════════════════════════════════ -->
 <!-- SECTION 3: THE BITCOIN COMPARISON           -->
 <!-- ═══════════════════════════════════════════ -->
 <section class="bvrp-section" id="bitcoin-comparison">
-  <span class="bvrp-section-num">Section 3</span>
   <h2>The Bitcoin <em>Comparison</em></h2>
 
   <p>Now the other side. This section is direct, honest about bitcoin&rsquo;s weaknesses, and leans on the <a href="/the-power-law.html">Power Law</a> as the projection backbone &mdash; the same model that anchors the rest of this site.</p>
@@ -164,7 +200,6 @@ eleventyComputed:
   <!-- SECTION 3.5: WHEN THIS DECISION IS BEST MADE -->
   <!-- ═══════════════════════════════════════════ -->
   <div id="when-decision-best" style="margin-top:2.4rem">
-    <span class="bvrp-section-num">Section 3.5</span>
     <h2 style="font-size:1.8rem">When This Decision Is Best <em>Made</em></h2>
 
     <p>Entry timing matters. This page&rsquo;s thesis is structurally more compelling when bitcoin sits at or below long-term trend than when it sits in the upper band. Not a guarantee &mdash; the Power Law is a model, not a forecast &mdash; but the right honest guidance to surface before you choose a path.</p>
@@ -200,7 +235,7 @@ eleventyComputed:
 <!-- SECTION 4: THE YIELD-INSTRUMENT SUBSTITUTION -->
 <!-- ═══════════════════════════════════════════ -->
 <section class="bvrp-section" id="yield-substitution">
-  <span class="bvrp-section-num">Section 4 · Central Argument</span>
+  <span class="bvrp-section-num">Central Argument</span>
   <h2>You Don&rsquo;t Have to Give Up Cash Flow to <em>Switch</em></h2>
 
   <p class="bvrp-pull">What you&rsquo;re really buying is your weekends back.</p>
@@ -322,11 +357,20 @@ eleventyComputed:
   <p class="bvrp-pull">The yield portfolio doesn&rsquo;t just match rental cash flow at a higher yield. It removes the operational anxiety entirely. No tenants. No moving regulatory target. No 2 a.m. calls. The risks are real but bounded.</p>
 </section>
 
+</div><!-- /panel-bitcoin -->
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- TAB III — THE FOUR PATHS                     -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="tab-panel js-hidden" id="panel-paths">
+  <div class="tab-thesis">
+    Four operational ways to make the switch &mdash; from full pivot to partial exposure &mdash; and the situation-specific constraints that determine which path actually fits.
+  </div>
+
 <!-- ═══════════════════════════════════════════ -->
 <!-- SECTION 5: THE FOUR OPERATIONAL PATHS       -->
 <!-- ═══════════════════════════════════════════ -->
 <section class="bvrp-section" id="four-paths">
-  <span class="bvrp-section-num">Section 5</span>
   <h2>Four Paths to <em>Switch</em></h2>
 
   <p>The reader sits somewhere on a conviction curve. This page doesn&rsquo;t recommend one path &mdash; it lays out four, with honest tradeoffs, so the reader can self-select based on where they are.</p>
@@ -361,7 +405,7 @@ eleventyComputed:
   <div class="bvrp-path">
     <h3>Path 4 &mdash; Sell Rental, Buy Bitcoin Yield Portfolio</h3>
     <div class="bvrp-path-sub">Full pivot, cash flow preserved · The headline option for income-dependent investors</div>
-    <p>Combine Path 1&rsquo;s outright sale with Section 4&rsquo;s yield-instrument substitution. Take the tax hit; redeploy net proceeds into a portfolio of STRC, SATA, optional CeFi, and a small spot bitcoin allocation. The yield this portfolio generates is materially higher than the net rental cash flow you gave up &mdash; even after eating the upfront tax leakage.</p>
+    <p>Combine Path 1&rsquo;s outright sale with the yield-instrument substitution from the Bitcoin Case tab. Take the tax hit; redeploy net proceeds into a portfolio of STRC, SATA, optional CeFi, and a small spot bitcoin allocation. The yield this portfolio generates is materially higher than the net rental cash flow you gave up &mdash; even after eating the upfront tax leakage.</p>
     <p>For an income-dependent investor who can&rsquo;t go without monthly cash flow, this is probably the most compelling path the page can offer. You give up local-tenant-and-property risk and take on issuer-credit risk &mdash; a different risk concentration, but at higher yield, with comparable tax treatment, and with zero ongoing operational load.</p>
     <p><strong>Best for:</strong> income-dependent investors; those who want to fully exit landlording without giving up the cash flow stream that made rental property attractive in the first place.</p>
   </div>
@@ -371,7 +415,6 @@ eleventyComputed:
 <!-- SECTION 6: CONSTRAINTS, RISKS, SPECIFICS    -->
 <!-- ═══════════════════════════════════════════ -->
 <section class="bvrp-section" id="constraints">
-  <span class="bvrp-section-num">Section 6</span>
   <h2>Where This Gets Specific to <em>You</em></h2>
 
   <p>This page shows you the <em>shape and direction</em> of the decision &mdash; the structural argument, the rough numbers, the four paths. Your actual numbers depend on your state, your bracket, your specific property, and your situation. When you&rsquo;re ready to act, that&rsquo;s a CPA, a financial advisor, and a lender conversation. Not this page.</p>
@@ -380,9 +423,9 @@ eleventyComputed:
 
   <p><strong>HELOC qualification.</strong> Path 2&rsquo;s viability for any specific reader depends on their existing mortgage rate, combined loan-to-value ratio, debt-to-income ratio, credit score, and the lender&rsquo;s appetite for the use case. Investment-property HELOCs typically allow lower CLTVs and carry higher rates than primary-residence HELOCs. Talk to your lender; the page&rsquo;s economics are based on representative terms, not a quote.</p>
 
-  <p><strong>STRC and SATA risk picture.</strong> Both instruments have short empirical track records in their current configurations. The structural math is sound, the issuers are sophisticated, but neither has yet weathered a full bitcoin cycle as a preferred-stock vehicle. Treat the bear case in Section 4 seriously; size positions accordingly; consider diversifying across both issuers (and across instruments) rather than concentrating in a single name.</p>
+  <p><strong>STRC and SATA risk picture.</strong> Both instruments have short empirical track records in their current configurations. The structural math is sound, the issuers are sophisticated, but neither has yet weathered a full bitcoin cycle as a preferred-stock vehicle. Treat the bear case (in the Bitcoin Case tab) seriously; size positions accordingly; consider diversifying across both issuers (and across instruments) rather than concentrating in a single name.</p>
 
-  <p><strong>Entry timing matters.</strong> Re-read Section 3.5 and check the indicator&rsquo;s current reading. The same path executed at the floor of the Power Law channel and at the ceiling has materially different forward economics.</p>
+  <p><strong>Entry timing matters.</strong> Re-read the entry-timing piece in the Bitcoin Case tab and check the indicator&rsquo;s current reading. The same path executed at the floor of the Power Law channel and at the ceiling has materially different forward economics.</p>
 
   <p><strong>Social and identity considerations.</strong> If owning physical real estate carries meaning for you beyond the cash flow it produces &mdash; if status, identity, or the simple satisfaction of pointing at a building and saying &ldquo;that&rsquo;s mine&rdquo; matters &mdash; that is a legitimate consideration that doesn&rsquo;t appear in any of the math above. Bitcoin doesn&rsquo;t (yet) confer the same social recognition. This page is optimizing for return per unit of hassle, anxiety, and capital tied up. If you also weight identity and status, the calculation looks different, and we&rsquo;re not going to talk you out of that.</p>
 
@@ -398,11 +441,20 @@ eleventyComputed:
   </ul>
 </section>
 
+</div><!-- /panel-paths -->
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- TAB IV — THE CALCULATOR                      -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="tab-panel js-hidden" id="panel-calculator">
+  <div class="tab-thesis">
+    Plug in your property, state, bracket, and path. The math runs as you drag. Methodology &amp; sources tucked at the bottom of this tab.
+  </div>
+
 <!-- ═══════════════════════════════════════════ -->
 <!-- SECTION 7: THE CALCULATOR (v0.1)            -->
 <!-- ═══════════════════════════════════════════ -->
 <section class="bvrp-section" id="calculator">
-  <span class="bvrp-section-num">Section 7</span>
   <h2>The <em>Calculator</em></h2>
 
   <p>Drag the sliders, switch paths, see how the head-to-head shifts under your specific inputs. <strong>This is decision framing, not personalized advice</strong> — your actual numbers depend on your state, bracket, property, and situation. When you&rsquo;re ready to act, that&rsquo;s a CPA and a lender conversation.</p>
@@ -431,7 +483,7 @@ eleventyComputed:
         <input type="range" id="calc-property-value" min="100000" max="3000000" step="25000" value="500000">
 
         <div class="calc-slider-row">
-          <span class="calc-slider-name">Net rental yield <span class="calc-slider-hint">(post-waterfall, ~Section 2)</span></span>
+          <span class="calc-slider-name">Net rental yield <span class="calc-slider-hint">(post-waterfall, see The Reality tab)</span></span>
           <span class="calc-slider-val" id="val-net-yield">4.4%</span>
         </div>
         <input type="range" id="calc-net-yield" min="1" max="10" step="0.1" value="4.4">
@@ -597,7 +649,6 @@ eleventyComputed:
 <!-- SECTION 8: METHODOLOGY & SOURCES            -->
 <!-- ═══════════════════════════════════════════ -->
 <section class="bvrp-section bvrp-methodology" id="methodology">
-  <span class="bvrp-section-num">Section 8</span>
   <h2>Methodology &amp; <em>Sources</em></h2>
 
   <p>Every headline number on this page traces back to a specific source. Where the underlying number is a synthesis of multiple sources (rather than a single direct citation), it&rsquo;s flagged as such. The breakdown:</p>
@@ -646,5 +697,7 @@ eleventyComputed:
     Several headline numbers on this page are flagged as &ldquo;modeled estimate&rdquo; or &ldquo;verification pending&rdquo; &mdash; primarily figures synthesized from multiple sources rather than carried directly from a single primary citation. As this draft moves toward publication, those will be either re-sourced to primary references or qualified explicitly. The methodology section will be updated accordingly.
   </p>
 </section>
+
+</div><!-- /panel-calculator -->
 
 </main>

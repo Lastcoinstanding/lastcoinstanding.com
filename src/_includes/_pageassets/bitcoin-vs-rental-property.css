@@ -906,3 +906,104 @@ html, body {
   .calc-comparison-table { font-size: 0.8rem; }
   .calc-comparison-table th, .calc-comparison-table td { padding: 0.5rem 0.55rem; }
 }
+
+/* ─── Tab navigation (page-level act breaks) ─────────────────────────
+   Four tabs separating Reality, Bitcoin Case, Four Paths, Calculator.
+   Convention adapted from BvRE / The Bitcoin Retirement — same .tab-nav
+   / .tab-btn / .tab-panel API, restyled to match this page's palette. */
+
+.tab-nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border-faint);
+  margin: 2rem auto 2.4rem;
+  max-width: 760px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.95rem 0.85rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.25s;
+  min-height: 60px;
+  flex-shrink: 0;
+}
+.tab-btn:hover {
+  background: rgba(224,148,34,0.03);
+}
+.tab-btn .tab-num {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 4px;
+  transition: color 0.25s;
+}
+.tab-btn .tab-title {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--ink-dim);
+  transition: color 0.25s;
+}
+.tab-btn.active {
+  border-bottom-color: var(--amber);
+}
+.tab-btn.active .tab-num { color: var(--amber); }
+.tab-btn.active .tab-title { color: var(--ink-bright); font-weight: 600; }
+
+.tab-panel { animation: bvrpFadeIn 0.4s ease; }
+.tab-panel.js-hidden { display: none; }
+.tab-panel.active { display: block; }
+
+@keyframes bvrpFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Tab thesis — one-sentence framer below each tab's content begins */
+.tab-thesis {
+  max-width: 720px;
+  margin: 0 auto 2rem;
+  padding: 1.1rem 1.4rem;
+  background: rgba(224,148,34,0.04);
+  border-left: 2px solid var(--amber);
+  border-radius: 0 0.3rem 0.3rem 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: var(--ink-bright);
+}
+.tab-thesis em {
+  font-style: italic;
+  color: var(--amber);
+}
+
+@media (max-width: 768px) {
+  .tab-nav {
+    margin: 1.4rem 0 1.8rem;
+    mask-image: linear-gradient(90deg, #000 88%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent);
+  }
+  .tab-btn {
+    flex: 0 0 auto;
+    padding: 0.75rem 0.9rem;
+    min-height: 54px;
+  }
+  .tab-btn .tab-title { font-size: 0.82rem; white-space: nowrap; }
+  .tab-thesis { font-size: 1rem; padding: 0.95rem 1.1rem; margin-bottom: 1.4rem; }
+}
