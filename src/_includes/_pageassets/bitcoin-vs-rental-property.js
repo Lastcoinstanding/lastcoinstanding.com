@@ -378,6 +378,209 @@
   }
 
   // ─── Renderers ───
+  // ─── Year-by-year wealth trajectories (for the chart) ───
+  function calcYieldPortfolioAtYearT(amount, s, t, scenarioOverride){
+    var p = s.portfolio;
+    var allocs = {
+      strc: amount * p.strc/100,
+      sata: amount * p.sata/100,
+      ledn: amount * p.ledn/100,
+      spot: amount * p.spot/100
+    };
+    var strcDist = allocs.strc * 0.115;
+    var sataDist = allocs.sata * 0.13;
+    var lednDist = allocs.ledn * 0.08;
+    var pretax = strcDist + sataDist + lednDist;
+    var ordTax = lednDist * (s.federalBracketPct/100);
+    var year1AfterTax = pretax - ordTax;
+    var cumCash = year1AfterTax * t;
+    var cagr = btcCAGR(scenarioOverride || s.btcScenario);
+    var spotFV = allocs.spot * Math.pow(1 + cagr, t);
+    var preserved = allocs.strc + allocs.sata + allocs.ledn;
+    return preserved + spotFV + cumCash;
+  }
+
+  function calcWealthTrajectory(s, scenarioOverride){
+    var sUse = scenarioOverride ? Object.assign({}, s, { btcScenario: scenarioOverride }) : s;
+    var rentalAnnual = calcRentalAnnualCF(sUse);
+    var cagr = btcCAGR(sUse.btcScenario);
+    var trajectory = [];
+
+    for (var t = 0; t <= sUse.holdingYears; t++) {
+      // Keep rental: cumulative after-tax CF up to year t + net cash if sold at year t
+      var cumCash = rentalAnnual.afterTax * t;
+      var exitAtT = calcRentalExit(sUse, t);
+      var wealthKeep = cumCash + exitAtT.netCash;
+
+      var wealthPath;
+      if (sUse.path === 1) {
+        var exitNow = calcRentalExit(sUse, 0);
+        wealthPath = exitNow.netCash * Math.pow(1 + cagr, t);
+      } else if (sUse.path === 2) {
+        var maxCltv = sUse.propertyValue * (sUse.helocLtv/100);
+        var heloc = Math.max(0, maxCltv - sUse.existingMortgage);
+        var btcVal = heloc * Math.pow(1 + cagr, t);
+        var carry = heloc * (sUse.helocRatePct/100) * t;
+        wealthPath = wealthKeep + btcVal - heloc - carry;
+      } else if (sUse.path === 3) {
+        var soldVal = sUse.propertyValue * sUse.propertiesToSell;
+        var sellS = Object.assign({}, sUse, { propertyValue: soldVal });
+        var exitSell = calcRentalExit(sellS, 0);
+        var ypVal = calcYieldPortfolioAtYearT(exitSell.netCash, sUse, t);
+        var retainedS = Object.assign({}, sUse, {
+          propertyValue: sUse.propertyValue * (sUse.numProperties - sUse.propertiesToSell)
+        });
+        var retainedAnnual = calcRentalAnnualCF(retainedS);
+        var retainedExit = calcRentalExit(retainedS, t);
+        wealthPath = ypVal + retainedAnnual.afterTax * t + retainedExit.netCash;
+      } else {
+        var exitNow4 = calcRentalExit(sUse, 0);
+        wealthPath = calcYieldPortfolioAtYearT(exitNow4.netCash, sUse, t);
+      }
+      trajectory.push({ year: t, wealthKeep: wealthKeep, wealthPath: wealthPath });
+    }
+    return trajectory;
+  }
+
+  // ─── Chart.js rendering ───
+  var chartInstance = null;
+
+  function renderChart(s){
+    var canvas = document.getElementById('calc-chart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    var trajCons = calcWealthTrajectory(s, 'conservative');
+    var trajMed  = calcWealthTrajectory(s, 'median');
+    var trajOpt  = calcWealthTrajectory(s, 'optimistic');
+
+    var labels = trajMed.map(function(r){ return 'Y' + r.year; });
+    var keepData = trajMed.map(function(r){ return r.wealthKeep; });
+    var pathCons = trajCons.map(function(r){ return r.wealthPath; });
+    var pathMed  = trajMed.map(function(r){ return r.wealthPath; });
+    var pathOpt  = trajOpt.map(function(r){ return r.wealthPath; });
+
+    var selectedPath = (s.btcScenario === 'conservative') ? pathCons
+                     : (s.btcScenario === 'optimistic')   ? pathOpt
+                     : pathMed;
+
+    var lastIdx = selectedPath.length - 1;
+    var pathWins = selectedPath[lastIdx] > keepData[lastIdx];
+    var pathColor = pathWins ? '#5a8a3a' : '#c0392b';
+    var pathColorBg = pathWins ? 'rgba(90,138,58,0.12)' : 'rgba(192,57,43,0.12)';
+
+    var datasets = [
+      // Upper envelope (fills down to lower envelope)
+      {
+        label: '__bandHigh__',
+        data: pathOpt,
+        borderColor: 'transparent',
+        backgroundColor: pathColorBg,
+        pointRadius: 0,
+        fill: '+1',
+        order: 5
+      },
+      // Lower envelope
+      {
+        label: '__bandLow__',
+        data: pathCons,
+        borderColor: 'transparent',
+        backgroundColor: 'transparent',
+        pointRadius: 0,
+        fill: false,
+        order: 5
+      },
+      // Selected bitcoin path
+      {
+        label: 'Bitcoin path',
+        data: selectedPath,
+        borderColor: pathColor,
+        backgroundColor: pathColor,
+        borderWidth: 2.5,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        fill: false,
+        tension: 0.18,
+        order: 1
+      },
+      // Keep rental (amber dashed)
+      {
+        label: 'Keep rental',
+        data: keepData,
+        borderColor: '#e09422',
+        backgroundColor: '#e09422',
+        borderWidth: 2,
+        borderDash: [4, 3],
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        fill: false,
+        tension: 0.1,
+        order: 2
+      }
+    ];
+
+    if (chartInstance) {
+      chartInstance.data.labels = labels;
+      chartInstance.data.datasets = datasets;
+      chartInstance.update('none');
+      return;
+    }
+
+    chartInstance = new Chart(canvas, {
+      type: 'line',
+      data: { labels: labels, datasets: datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(15,14,13,0.95)',
+            borderColor: 'rgba(224,148,34,0.3)',
+            borderWidth: 1,
+            titleColor: '#ece4d6',
+            bodyColor: '#ccc6b8',
+            padding: 10,
+            cornerRadius: 4,
+            callbacks: {
+              label: function(ctx){
+                if (ctx.dataset.label && ctx.dataset.label.indexOf('__') === 0) return null;
+                return ctx.dataset.label + ': ' + fmtMoney(ctx.parsed.y);
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(255,255,255,0.04)' },
+            ticks: { color: 'rgba(204,198,184,0.6)', font: { size: 11 } }
+          },
+          y: {
+            grid: { color: 'rgba(255,255,255,0.04)' },
+            ticks: {
+              color: 'rgba(204,198,184,0.6)',
+              font: { size: 11 },
+              callback: function(v){ return fmtMoney(v); }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function renderChartLegend(s){
+    var el = document.getElementById('calc-chart-legend');
+    if (!el) return;
+    var trajMed = calcWealthTrajectory(s, s.btcScenario);
+    var last = trajMed[trajMed.length - 1];
+    var pathWins = last.wealthPath > last.wealthKeep;
+    var pathColor = pathWins ? 'var(--green)' : '#e07a6d';
+    el.innerHTML =
+      '<span class="calc-legend-item"><span class="calc-legend-line keep"></span>Keep rental</span>' +
+      '<span class="calc-legend-item"><span class="calc-legend-line path" style="background:' + pathColor + '"></span>Bitcoin path · ' + s.btcScenario + ' CAGR</span>' +
+      '<span class="calc-legend-item"><span class="calc-legend-band"></span>Conservative&ndash;Optimistic envelope</span>';
+  }
+
   function renderHeadline(results, s){
     var el = document.getElementById('calc-headline');
     if (!el) return;
@@ -508,31 +711,30 @@
     el.innerHTML = html;
   }
 
-  function renderCAGRBands(s){
-    var el = document.getElementById('calc-cagr-bands');
-    if (!el) return;
+  function renderCAGRChips(s){
     var scenarios = ['conservative', 'median', 'optimistic'];
-    var html = '<div class="calc-cagr-title">Same path under three bitcoin CAGR scenarios</div><div class="calc-cagr-bars">';
     scenarios.forEach(function(sc){
+      var chip = document.querySelector('.calc-cagr-chip[data-scenario="' + sc + '"]');
+      if (!chip) return;
       var sCopy = Object.assign({}, s, { btcScenario: sc });
       var r = computeAll(sCopy);
       var delta = r.path.totalWealth - r.keep.totalWealth;
-      var rate = btcCAGR(sc) * 100;
-      var winClass = delta > 0 ? 'positive' : 'neutral';
-      html += '<div class="calc-cagr-band ' + winClass + ' ' + (sc === s.btcScenario ? 'active' : '') + '" data-scenario="' + sc + '">' +
-              '<div class="calc-cagr-label">' + sc.charAt(0).toUpperCase() + sc.slice(1) + ' · ' + rate + '%</div>' +
-              '<div class="calc-cagr-delta">' + (delta > 0 ? '+' : '') + fmtMoney(delta) + '</div>' +
-              '<div class="calc-cagr-sub">' + (delta > 0 ? 'Bitcoin wins' : 'Rental wins') + ' by this amount</div>' +
-              '</div>';
+      var deltaEl = chip.querySelector('.calc-cagr-chip-delta');
+      if (!deltaEl) {
+        deltaEl = document.createElement('span');
+        deltaEl.className = 'calc-cagr-chip-delta';
+        chip.appendChild(deltaEl);
+      }
+      deltaEl.textContent = (delta > 0 ? '+' : '') + fmtMoney(delta);
+      deltaEl.style.color = delta > 0 ? 'var(--green)' : '#e07a6d';
+      chip.classList.toggle('active', sc === s.btcScenario);
     });
-    html += '</div>';
-    el.innerHTML = html;
-    // Click handlers to switch scenario
-    el.querySelectorAll('.calc-cagr-band').forEach(function(band){
-      band.addEventListener('click', function(){
-        state.btcScenario = band.dataset.scenario;
-        var cagrSlider = document.getElementById('calc-btc-scenario');
-        if (cagrSlider) cagrSlider.value = ['conservative','median','optimistic'].indexOf(state.btcScenario);
+  }
+
+  function bindCAGRChips(){
+    document.querySelectorAll('.calc-cagr-chip').forEach(function(chip){
+      chip.addEventListener('click', function(){
+        state.btcScenario = chip.dataset.scenario;
         rerender();
       });
     });
@@ -560,7 +762,9 @@
     renderHeadline(results, state);
     renderComparison(results, state);
     renderPathDetail(results, state);
-    renderCAGRBands(state);
+    renderCAGRChips(state);
+    renderChart(state);
+    renderChartLegend(state);
     renderSpecificCallout(state);
   }
 
@@ -645,11 +849,6 @@
     bindSelect('calc-state', 'stateCode');
     bindSelect('calc-bracket', 'federalBracketPct');
 
-    // BTC scenario as 3-position selector
-    bindSlider('calc-btc-scenario', 'btcScenario',
-      function(v){ return v.charAt(0).toUpperCase() + v.slice(1) + ' (' + Math.round(btcCAGR(v)*100) + '% CAGR)'; },
-      function(v){ return ['conservative','median','optimistic'][Number(v)]; });
-
     // Path 2 sliders
     bindSlider('calc-heloc-ltv', 'helocLtv',
       function(v){ return v + '%'; });
@@ -666,6 +865,7 @@
 
     bindPortfolioSliders();
     bindPathToggle();
+    bindCAGRChips();
 
     // Initial: show path-4 group, hide others
     document.querySelectorAll('.calc-path-specific').forEach(function(grp){

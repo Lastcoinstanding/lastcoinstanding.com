@@ -470,12 +470,12 @@ eleventyComputed:
       <button class="calc-path-btn active" data-path="4">4 · Sell + Yield Portfolio</button>
     </div>
 
-    <!-- Active Sliders -->
+    <!-- Active sliders — the things you play with for sensitivity -->
     <div class="calc-sliders">
 
-      <!-- Universal sliders -->
       <div class="calc-slider-group">
-        <div class="calc-slider-group-label">Your situation</div>
+        <div class="calc-slider-group-label">Your scenario</div>
+
         <div class="calc-slider-row">
           <span class="calc-slider-name">Property value</span>
           <span class="calc-slider-val" id="val-property-value">$500,000</span>
@@ -493,91 +493,21 @@ eleventyComputed:
           <span class="calc-slider-val" id="val-holding-years">10 yrs</span>
         </div>
         <input type="range" id="calc-holding-years" min="1" max="30" step="1" value="10">
-
-        <div class="calc-slider-row">
-          <span class="calc-slider-name">State</span>
-          <select id="calc-state" class="calc-select">
-            <option value="CA" selected>California (13.3%)</option>
-            <option value="NY">New York (10.9%)</option>
-            <option value="NJ">New Jersey (10.75%)</option>
-            <option value="OR">Oregon (9.9%)</option>
-            <option value="MN">Minnesota (9.85%)</option>
-            <option value="MA">Massachusetts (5.0%)</option>
-            <option value="IL">Illinois (4.95%)</option>
-            <option value="GA">Georgia (5.39%)</option>
-            <option value="NC">North Carolina (4.5%)</option>
-            <option value="AZ">Arizona (2.5%)</option>
-            <option value="TX">Texas (0%)</option>
-            <option value="FL">Florida (0%)</option>
-            <option value="NV">Nevada (0%)</option>
-            <option value="WA">Washington (0%)</option>
-            <option value="TN">Tennessee (0%)</option>
-            <option value="OTHER">Other (~5%)</option>
-          </select>
-        </div>
-
-        <div class="calc-slider-row">
-          <span class="calc-slider-name">Federal bracket</span>
-          <select id="calc-bracket" class="calc-select">
-            <option value="12">12% (lower)</option>
-            <option value="22">22%</option>
-            <option value="24" selected>24% (middle)</option>
-            <option value="32">32%</option>
-            <option value="35">35%</option>
-            <option value="37">37% (top)</option>
-          </select>
-        </div>
-
-        <div class="calc-slider-row">
-          <span class="calc-slider-name">Bitcoin CAGR scenario</span>
-          <span class="calc-slider-val" id="val-btc-scenario">Median (25% CAGR)</span>
-        </div>
-        <input type="range" id="calc-btc-scenario" min="0" max="2" step="1" value="1">
-
-        <div class="calc-slider-row">
-          <span class="calc-slider-name">Adjusted basis <span class="calc-slider-hint">(% of current value)</span></span>
-          <span class="calc-slider-val" id="val-adjusted-basis">60%</span>
-        </div>
-        <input type="range" id="calc-adjusted-basis" min="10" max="100" step="5" value="60">
-
-        <div class="calc-slider-row">
-          <span class="calc-slider-name">Years already held</span>
-          <span class="calc-slider-val" id="val-years-held">10 yrs</span>
-        </div>
-        <input type="range" id="calc-years-held" min="0" max="27" step="1" value="10">
       </div>
 
-      <!-- Path 2-specific -->
+      <!-- Path 2-specific active -->
       <div class="calc-slider-group calc-path-specific" data-for-path="2">
-        <div class="calc-slider-group-label">HELOC parameters</div>
+        <div class="calc-slider-group-label">HELOC draw</div>
         <div class="calc-slider-row">
-          <span class="calc-slider-name">Max combined LTV</span>
+          <span class="calc-slider-name">Max combined LTV <span class="calc-slider-hint">(how much equity to tap)</span></span>
           <span class="calc-slider-val" id="val-heloc-ltv">80%</span>
         </div>
         <input type="range" id="calc-heloc-ltv" min="50" max="90" step="5" value="80">
-
-        <div class="calc-slider-row">
-          <span class="calc-slider-name">HELOC rate</span>
-          <span class="calc-slider-val" id="val-heloc-rate">9.5%</span>
-        </div>
-        <input type="range" id="calc-heloc-rate" min="5" max="15" step="0.25" value="9.5">
-
-        <div class="calc-slider-row">
-          <span class="calc-slider-name">Existing mortgage balance</span>
-          <span class="calc-slider-val" id="val-existing-mortgage">$200,000</span>
-        </div>
-        <input type="range" id="calc-existing-mortgage" min="0" max="2000000" step="10000" value="200000">
       </div>
 
-      <!-- Path 3-specific -->
+      <!-- Path 3-specific active -->
       <div class="calc-slider-group calc-path-specific" data-for-path="3">
-        <div class="calc-slider-group-label">Portfolio composition</div>
-        <div class="calc-slider-row">
-          <span class="calc-slider-name">Properties owned <span class="calc-slider-hint">(each at property value above)</span></span>
-          <span class="calc-slider-val" id="val-num-properties">3 properties</span>
-        </div>
-        <input type="range" id="calc-num-properties" min="2" max="10" step="1" value="3">
-
+        <div class="calc-slider-group-label">How much to sell</div>
         <div class="calc-slider-row">
           <span class="calc-slider-name">Properties to sell</span>
           <span class="calc-slider-val" id="val-properties-to-sell">1 to sell</span>
@@ -585,9 +515,9 @@ eleventyComputed:
         <input type="range" id="calc-properties-to-sell" min="1" max="9" step="1" value="1">
       </div>
 
-      <!-- Path 4-specific (and Path 3 uses same portfolio) -->
+      <!-- Path 3+4 portfolio composition (active) -->
       <div class="calc-slider-group calc-path-specific" data-for-path="3,4">
-        <div class="calc-slider-group-label">Bitcoin yield portfolio composition</div>
+        <div class="calc-slider-group-label">Bitcoin yield portfolio</div>
 
         <div class="calc-slider-row">
           <span class="calc-slider-name">STRC (Strategy, 11.5%, ROC)</span>
@@ -621,23 +551,143 @@ eleventyComputed:
 
     </div>
 
-    <!-- Output area -->
-    <div class="calc-output">
-      <div id="calc-headline" class="calc-headline">&hellip;</div>
-
-      <div class="calc-comparison">
-        <table class="bvrp-table calc-comparison-table">
-          <thead id="calc-comparison-headers"></thead>
-          <tbody id="calc-comparison-body"></tbody>
-        </table>
+    <!-- Bitcoin CAGR scenario picker (chips above chart) -->
+    <div class="calc-cagr-picker">
+      <div class="calc-cagr-picker-label">Bitcoin CAGR scenario</div>
+      <div class="calc-cagr-chips" id="calc-cagr-chips">
+        <button class="calc-cagr-chip" data-scenario="conservative">
+          <span class="calc-cagr-chip-name">Conservative</span>
+          <span class="calc-cagr-chip-rate">15% CAGR</span>
+        </button>
+        <button class="calc-cagr-chip active" data-scenario="median">
+          <span class="calc-cagr-chip-name">Median</span>
+          <span class="calc-cagr-chip-rate">25% CAGR</span>
+        </button>
+        <button class="calc-cagr-chip" data-scenario="optimistic">
+          <span class="calc-cagr-chip-name">Optimistic</span>
+          <span class="calc-cagr-chip-rate">35% CAGR</span>
+        </button>
       </div>
-
-      <div id="calc-path-detail" class="calc-path-detail"></div>
-
-      <div id="calc-cagr-bands" class="calc-cagr-bands"></div>
-
-      <div id="calc-specific-callout" class="calc-specific-callout"></div>
     </div>
+
+    <!-- Chart — the centerpiece. Wealth over time, two lines + CAGR band -->
+    <div class="calc-chart-container">
+      <div class="calc-chart-title" id="calc-chart-title">Wealth over time, your scenario</div>
+      <div class="calc-chart-wrap">
+        <canvas id="calc-chart"></canvas>
+      </div>
+      <div class="calc-chart-legend" id="calc-chart-legend"></div>
+    </div>
+
+    <!-- Headline verdict -->
+    <div id="calc-headline" class="calc-headline">&hellip;</div>
+
+    <!-- Comparison table -->
+    <div class="calc-comparison">
+      <table class="bvrp-table calc-comparison-table">
+        <thead id="calc-comparison-headers"></thead>
+        <tbody id="calc-comparison-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Path-specific detail card -->
+    <div id="calc-path-detail" class="calc-path-detail"></div>
+
+    <!-- Baseline assumptions (collapsible — set once, ignore) -->
+    <details class="calc-baseline">
+      <summary>
+        <span class="calc-baseline-summary-label">Baseline assumptions</span>
+        <span class="calc-baseline-summary-hint">— set these once for your situation, then ignore</span>
+      </summary>
+
+      <div class="calc-baseline-grid">
+
+        <div class="calc-slider-group">
+          <div class="calc-slider-group-label">Tax profile</div>
+
+          <div class="calc-slider-row">
+            <span class="calc-slider-name">State</span>
+            <select id="calc-state" class="calc-select">
+              <option value="CA" selected>California (13.3%)</option>
+              <option value="NY">New York (10.9%)</option>
+              <option value="NJ">New Jersey (10.75%)</option>
+              <option value="OR">Oregon (9.9%)</option>
+              <option value="MN">Minnesota (9.85%)</option>
+              <option value="MA">Massachusetts (5.0%)</option>
+              <option value="IL">Illinois (4.95%)</option>
+              <option value="GA">Georgia (5.39%)</option>
+              <option value="NC">North Carolina (4.5%)</option>
+              <option value="AZ">Arizona (2.5%)</option>
+              <option value="TX">Texas (0%)</option>
+              <option value="FL">Florida (0%)</option>
+              <option value="NV">Nevada (0%)</option>
+              <option value="WA">Washington (0%)</option>
+              <option value="TN">Tennessee (0%)</option>
+              <option value="OTHER">Other (~5%)</option>
+            </select>
+          </div>
+
+          <div class="calc-slider-row">
+            <span class="calc-slider-name">Federal bracket</span>
+            <select id="calc-bracket" class="calc-select">
+              <option value="12">12% (lower)</option>
+              <option value="22">22%</option>
+              <option value="24" selected>24% (middle)</option>
+              <option value="32">32%</option>
+              <option value="35">35%</option>
+              <option value="37">37% (top)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="calc-slider-group">
+          <div class="calc-slider-group-label">Property facts</div>
+
+          <div class="calc-slider-row">
+            <span class="calc-slider-name">Adjusted basis <span class="calc-slider-hint">(% of current value)</span></span>
+            <span class="calc-slider-val" id="val-adjusted-basis">60%</span>
+          </div>
+          <input type="range" id="calc-adjusted-basis" min="10" max="100" step="5" value="60">
+
+          <div class="calc-slider-row">
+            <span class="calc-slider-name">Years already held</span>
+            <span class="calc-slider-val" id="val-years-held">10 yrs</span>
+          </div>
+          <input type="range" id="calc-years-held" min="0" max="27" step="1" value="10">
+        </div>
+
+        <div class="calc-slider-group calc-path-specific" data-for-path="2">
+          <div class="calc-slider-group-label">Path 2 — HELOC terms</div>
+
+          <div class="calc-slider-row">
+            <span class="calc-slider-name">HELOC rate <span class="calc-slider-hint">(lender quote)</span></span>
+            <span class="calc-slider-val" id="val-heloc-rate">9.5%</span>
+          </div>
+          <input type="range" id="calc-heloc-rate" min="5" max="15" step="0.25" value="9.5">
+
+          <div class="calc-slider-row">
+            <span class="calc-slider-name">Existing mortgage balance</span>
+            <span class="calc-slider-val" id="val-existing-mortgage">$200,000</span>
+          </div>
+          <input type="range" id="calc-existing-mortgage" min="0" max="2000000" step="10000" value="200000">
+        </div>
+
+        <div class="calc-slider-group calc-path-specific" data-for-path="3">
+          <div class="calc-slider-group-label">Path 3 — Portfolio facts</div>
+
+          <div class="calc-slider-row">
+            <span class="calc-slider-name">Properties owned <span class="calc-slider-hint">(each at property value above)</span></span>
+            <span class="calc-slider-val" id="val-num-properties">3 properties</span>
+          </div>
+          <input type="range" id="calc-num-properties" min="2" max="10" step="1" value="3">
+        </div>
+
+      </div>
+    </details>
+
+    <!-- Specific-to-you callout -->
+    <div id="calc-specific-callout" class="calc-specific-callout"></div>
+
   </div>
 
   <p style="margin-top:1.6rem;font-size:0.85rem;color:var(--ink-dim);font-style:italic">
