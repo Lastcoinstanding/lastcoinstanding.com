@@ -76,6 +76,19 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ '.well-known': '.well-known' });
   eleventyConfig.addPassthroughCopy({ '_headers': '_headers' });
 
+  // Sort helper for the /calculators page (src/calculators.njk).
+  // Sorts an explorations.json array by calculator_tile.position ascending.
+  // Entries without a calculator_tile block sort to the end (effectively
+  // filtered out — the template guards with `{% if ex.calculator_tile %}`).
+  eleventyConfig.addFilter('sortByCalculatorTilePosition', (arr) => {
+    if (!Array.isArray(arr)) return arr;
+    return [...arr].sort((a, b) => {
+      const ap = (a.calculator_tile && a.calculator_tile.position) || 9999;
+      const bp = (b.calculator_tile && b.calculator_tile.position) || 9999;
+      return ap - bp;
+    });
+  });
+
   return {
     dir: {
       input: "src",

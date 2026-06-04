@@ -8,43 +8,79 @@ eleventyComputed:
   page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/tr-comparator-data.js' %}\n{% include '_pageassets/calculators-minis.js' %}"
 ---
 {# ═══════════════════════════════════════════════════════════════════
-   /calculators — Pathway A v2: calculators gallery
+   /calculators — data-driven gallery of every interactive calculator
+   on the site.
 
-   Restructured from a 5-tile text-list into a polished gallery that
-   functions as the canonical entry point for every interactive
-   calculator on the site. JM's framing: 'each tile shows an actual
-   live thumbnail of the tool's heart (mini heatmap, mini chart, mini
-   retirement curve…) with an Open button.' v1 shipped one live
-   preview (Heatmap) as proof-of-concept. v2 expanded to 7 live
-   renderers in calculators-minis.js. The page nav label was also
-   renamed Tools → Calculators in commit 132f79a / 0148ba3.
+   ─── Architecture ──────────────────────────────────────────────────
+   This page is rendered from `src/_data/explorations.json`. Any entry
+   in the registry that carries a `calculator_tile` block gets a tile
+   here automatically; entries without that block do not. Adding a new
+   calculator to /calculators is therefore a single edit to
+   explorations.json — no template changes required.
 
-   Hierarchy:
-   - Featured row (2 tiles, large): The Bitcoin Retirement (live mini
-     retirement curve) + Bitcoin vs. The Stock Market (live mini
-     3-line wealth chart). These are the two highest-leverage
-     personal-decision tools.
-   - Tools grid (10 tiles, 3-col on desktop): the remaining
-     Numbers-tier calculators plus the two Arguments-tier interactive
-     ones (Half-Life, Melting Ice Cube).
+   The `calculator_tile` schema:
 
-   History note: through commit 0148ba3 the featured row paired the
-   Heatmap with BvSM. The Heatmap is not strictly a calculator (no
-   inputs that drive outputs — it's a static visualization grid),
-   and with The Gallery now serving as the visual-showcase surface,
-   it's better-suited there. The Bitcoin Retirement took its
-   featured slot in commit (this one) — the live mini renderer
-   already existed in calculators-minis.js for it.
+     calculator_tile: {
+       tagline:      string  (required)  — 1-line copy, may include
+                                            HTML entities (&mdash;,
+                                            &rsquo;, etc.)
+       preview_kind: "svg" | "live-chart"  (required)
+       preview_id:   string              — required if preview_kind ===
+                                            "live-chart"; the DOM id
+                                            picked up by
+                                            calculators-minis.js
+                                            (e.g. "mini-retirement")
+       anchor:       string  (optional)  — appended to the tile href
+                                            after /<slug>.html;
+                                            defaults to "#calculator".
+                                            Set to "" for pages with no
+                                            tab anchor (the-fixed-pie,
+                                            the-half-life,
+                                            the-melting-ice-cube).
+       featured:     boolean (optional)  — true puts the tile in the
+                                            top Featured row (large
+                                            card, special styling).
+                                            Defaults to false.
+       position:     integer (required)  — sort key within the page;
+                                            featured row is sorted by
+                                            position too, so featured
+                                            entries should have the
+                                            lowest positions
+     }
 
-   Notes for future iterations:
-   - Live preview pattern is established by #mini-heatmap →
-     calculators-minis.js → renderMiniHeatmap. Adding more live
-     previews (mini-bvsm-chart, mini-retirement-curve, mini-power-
-     law-channel, etc.) follows the same shape: add a target div
-     in the tile markup, write a renderer in calculators-minis.js.
+   For svg previews: the icon markup lives at
+     src/_includes/components/calc-tile-icons/<slug>.njk
+   and is auto-resolved by slug. To add a new svg-preview tile, create
+   that file and add the calculator_tile block in explorations.json.
+
+   For live-chart previews: the renderer must already exist in
+   src/_includes/_pageassets/calculators-minis.js, wired to the
+   `preview_id` via the {id → render-function} map near the bottom of
+   that file. Adding a new live-chart preview = add a renderer there
+   AND the tile block here.
+
+   ─── History ───────────────────────────────────────────────────────
+   v1 (May 2026): 5-tile text-list.
+   v2 (May 2026): polished gallery with 1 live preview (Heatmap) as
+                  proof-of-concept.
+   v2.5: expanded to 7 live renderers in calculators-minis.js.
+   v3 (June 2026): renamed Tools → Calculators (commits 132f79a /
+                   0148ba3); Heatmap moved to /the-gallery; Bitcoin
+                   Retirement promoted to Featured slot.
+   v4 (June 2026, this commit): data-driven from explorations.json's
+                   calculator_tile schema. Removed the unused
+                   `is_calculator` boolean from the registry — its
+                   semantic ("personal-decision tool only") had drifted
+                   from the page's actual contents (which include
+                   interactive demonstrations like Horizon, Fixed
+                   Share, Half-Life, MIC). The `calculator_tile` block
+                   replaces it as the single source of truth: presence
+                   of the block = tile rendered here.
+
+   ─── Tech debt ─────────────────────────────────────────────────────
    - SP500_TR_DATA is duplicated between calculators-minis.js and
-     bitcoin-vs-the-stock-market.js. Marked 'TR-SYNC' in both
-     files. Future cleanup: extract to shared/comparator-data.js.
+     bitcoin-vs-the-stock-market.js. Marked 'TR-SYNC' in both files.
+     Future cleanup: extract to shared/comparator-data.js.
 ═══════════════════════════════════════════════════════════════════ #}
 
 <main class="calculators-page">
@@ -57,239 +93,64 @@ eleventyComputed:
   </header>
 
   {# ═══ FEATURED ROW ════════════════════════════════════════════════
-     Two tiles, side-by-side on desktop. Both tiles carry live mini-
-     renders fed by calculators-minis.js — #mini-retirement and
-     #mini-bvsm-chart respectively. These are the two highest-leverage
-     personal-decision tools on the site, hence the featured placement:
-     'when can I retire?' and 'BTC vs the stock market.'
-
-     History: through commit 0148ba3 the featured row paired the
-     Heatmap with BvSM. Heatmap was promoted to featured as a
-     proof-of-concept for live mini-renders (it shipped first). With
-     The Gallery now serving as the visual-showcase surface for
-     interesting charts, Heatmap is better-suited there (where it
-     remains as a card) than here on /calculators — strictly
-     speaking, it isn't a calculator. The Bitcoin Retirement takes
-     its featured slot; it already had a live mini renderer wired
-     in calculators-minis.js, just sitting in the regular grid.
+     Tiles with calculator_tile.featured === true, sorted by position.
      ═════════════════════════════════════════════════════════════ #}
   <section class="calc-row calc-row-featured" aria-labelledby="featured-heading">
     <h2 id="featured-heading" class="calc-row-heading">Featured</h2>
 
     <div class="calc-tile-grid calc-tile-grid-featured">
-
-      {# Tile 1 — The Bitcoin Retirement (LIVE preview) #}
-      <a href="/the-bitcoin-retirement.html#calculator" class="calc-tile calc-tile-featured" aria-label="Open The Bitcoin Retirement calculator">
-        <div class="calc-tile-preview">
-          <div id="mini-retirement"></div>
-        </div>
-        <div class="calc-tile-body">
-          <h3 class="calc-tile-name">The Bitcoin Retirement</h3>
-          <p class="calc-tile-tagline">When can I retire on bitcoin? Drag the sliders &mdash; see how much you need, when, and on what income.</p>
-          <span class="calc-tile-cta">Open &rarr;</span>
-        </div>
-      </a>
-
-      {# Tile 2 — Bitcoin vs. The Stock Market #}
-      <a href="/bitcoin-vs-the-stock-market.html#bvsmCalc" class="calc-tile calc-tile-featured" aria-label="Open Bitcoin vs. The Stock Market calculator">
-        <div class="calc-tile-preview">
-          <div id="mini-bvsm-chart"></div>
-        </div>
-        <div class="calc-tile-body">
-          <h3 class="calc-tile-name">Bitcoin vs. The Stock Market</h3>
-          <p class="calc-tile-tagline">The wealth-over-time stress test &mdash; bitcoin against the S&amp;P 500 and NASDAQ-100 across any holding window since 2010.</p>
-          <span class="calc-tile-cta">Open &rarr;</span>
-        </div>
-      </a>
-
+      {% for ex in explorations | sortByCalculatorTilePosition %}
+        {% if ex.calculator_tile and ex.calculator_tile.featured %}
+          {% set ct = ex.calculator_tile %}
+          {% set anchor = ct.anchor if ct.anchor is defined else "#calculator" %}
+          <a href="/{{ ex.slug }}.html{{ anchor }}" class="calc-tile calc-tile-featured" aria-label="Open {{ ex.title | safe }} calculator">
+            <div class="calc-tile-preview">
+              {% if ct.preview_kind == "live-chart" %}
+                <div id="{{ ct.preview_id }}"></div>
+              {% else %}
+                {% include 'components/calc-tile-icons/' + ex.slug + '.njk' %}
+              {% endif %}
+            </div>
+            <div class="calc-tile-body">
+              <h3 class="calc-tile-name">{{ ex.title | safe }}</h3>
+              <p class="calc-tile-tagline">{{ ct.tagline | safe }}</p>
+              <span class="calc-tile-cta">Open &rarr;</span>
+            </div>
+          </a>
+        {% endif %}
+      {% endfor %}
     </div>
   </section>
 
   {# ═══ TOOLS GRID ══════════════════════════════════════════════════
-     10 tiles, 3-col responsive grid. Each tile has a preview area
-     with a tool-signature SVG illustration, then name + 1-line
-     tagline + 'Open →' CTA. Order is roughly by user value /
-     decision impact (retirement & rebalancing front, foundational
-     viz toward the back).
+     All tiles where calculator_tile.featured is not true, sorted by
+     position. Order is roughly by user value / decision impact
+     (live-chart calculators front, foundational viz toward the back).
      ═════════════════════════════════════════════════════════════ #}
   <section class="calc-row" aria-labelledby="tools-heading">
     <h2 id="tools-heading" class="calc-row-heading">All calculators</h2>
 
     <div class="calc-tile-grid">
-
-      {# Disciplined Rebalancing — oscillating wave + thresholds #}
-      <a href="/disciplined-rebalancing.html#calculator" class="calc-tile">
-        <div class="calc-tile-preview">
-          <div id="mini-rebalancing"></div>
-        </div>
-        <div class="calc-tile-body">
-          <h3 class="calc-tile-name">Disciplined Rebalancing</h3>
-          <p class="calc-tile-tagline">Turn the Power Law channel into a protocol &mdash; sell at upper-band triggers, rebuy at lower.</p>
-          <span class="calc-tile-cta">Open &rarr;</span>
-        </div>
-      </a>
-
-      {# The Power Law — log-log scatter + trend line #}
-      <a href="/the-power-law.html#channel" class="calc-tile">
-        <div class="calc-tile-preview">
-          <div id="mini-power-law"></div>
-        </div>
-        <div class="calc-tile-body">
-          <h3 class="calc-tile-name">Bitcoin &amp; The Power Law</h3>
-          <p class="calc-tile-tagline">Where does bitcoin sit inside the channel &mdash; floor, trend, upper band &mdash; that anchors every projection on this site?</p>
-          <span class="calc-tile-cta">Open &rarr;</span>
-        </div>
-      </a>
-
-      {# BTC vs. Real Estate — house + bitcoin #}
-      <a href="/bitcoin-vs-real-estate.html#calculator" class="calc-tile">
-        <div class="calc-tile-preview">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
-            <path d="M16 34L40 16L64 34" stroke="#e09422" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <path d="M22 32V50H58V32" stroke="#e09422" stroke-width="1.4" stroke-linejoin="round" fill="rgba(224,148,34,0.05)"/>
-            <text x="40" y="46" text-anchor="middle" fill="#F7931A" font-size="14" font-weight="700" font-family="sans-serif">&#8383;</text>
-          </svg>
-        </div>
-        <div class="calc-tile-body">
-          <h3 class="calc-tile-name">BTC vs. Real Estate</h3>
-          <p class="calc-tile-tagline">Bitcoin or a house &mdash; looking back, or projecting forward? Full mortgage and ownership costs included.</p>
-          <span class="calc-tile-cta">Open &rarr;</span>
-        </div>
-      </a>
-
-      {# BTC vs. Rental Property — small rental house + bitcoin "For Sale" sign — landlord-exit framing #}
-      <a href="/bitcoin-vs-rental-property.html#calculator" class="calc-tile">
-        <div class="calc-tile-preview">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
-            <!-- Small rental house on left -->
-            <path d="M10 30L24 18L38 30" stroke="#e09422" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <path d="M14 28V50H34V28" stroke="#e09422" stroke-width="1.4" stroke-linejoin="round" fill="rgba(224,148,34,0.05)"/>
-            <!-- Small window in house -->
-            <rect x="19" y="34" width="10" height="8" stroke="#e09422" stroke-width="1" fill="none" opacity="0.6"/>
-            <!-- For Sale sign post -->
-            <line x1="56" y1="50" x2="56" y2="26" stroke="#e09422" stroke-width="1.2" opacity="0.7"/>
-            <!-- Sign with bitcoin glyph -->
-            <rect x="44" y="18" width="22" height="12" stroke="#F7931A" stroke-width="1.4" fill="rgba(247,147,26,0.10)"/>
-            <text x="55" y="28" text-anchor="middle" fill="#F7931A" font-size="10" font-weight="700" font-family="sans-serif">&#8383;</text>
-            <!-- Subtle arrow from house to bitcoin sign -->
-            <line x1="38" y1="34" x2="46" y2="28" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2" opacity="0.45"/>
-          </svg>
-        </div>
-        <div class="calc-tile-body">
-          <h3 class="calc-tile-name">BTC vs. Rental Property</h3>
-          <p class="calc-tile-tagline">Bitcoin or rental property &mdash; the honest yield comparison once landlord costs and tax leakage are surfaced.</p>
-          <span class="calc-tile-cta">Open &rarr;</span>
-        </div>
-      </a>
-
-      {# Borrowing Against Your Stack — coin + outflow dashes #}
-      <a href="/borrowing-against-your-stack.html#calculator" class="calc-tile">
-        <div class="calc-tile-preview">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
-            <circle cx="40" cy="30" r="13" stroke="#F7931A" stroke-width="1.8" fill="rgba(247,147,26,0.10)"/>
-            <text x="40" y="35" text-anchor="middle" fill="#F7931A" font-size="14" font-weight="700" font-family="sans-serif">&#8383;</text>
-            <line x1="40" y1="13" x2="40" y2="6"   stroke="#e09422" stroke-width="1.1" stroke-dasharray="2 2" opacity="0.55"/>
-            <line x1="57" y1="30" x2="64" y2="30"  stroke="#e09422" stroke-width="1.1" stroke-dasharray="2 2" opacity="0.55"/>
-            <line x1="40" y1="47" x2="40" y2="54"  stroke="#e09422" stroke-width="1.1" stroke-dasharray="2 2" opacity="0.55"/>
-            <line x1="23" y1="30" x2="16" y2="30"  stroke="#e09422" stroke-width="1.1" stroke-dasharray="2 2" opacity="0.55"/>
-            <line x1="50" y1="20" x2="56" y2="14"  stroke="#e09422" stroke-width="0.9" stroke-dasharray="2 2" opacity="0.4"/>
-            <line x1="50" y1="40" x2="56" y2="46"  stroke="#e09422" stroke-width="0.9" stroke-dasharray="2 2" opacity="0.4"/>
-            <line x1="30" y1="40" x2="24" y2="46"  stroke="#e09422" stroke-width="0.9" stroke-dasharray="2 2" opacity="0.4"/>
-            <line x1="30" y1="20" x2="24" y2="14"  stroke="#e09422" stroke-width="0.9" stroke-dasharray="2 2" opacity="0.4"/>
-          </svg>
-        </div>
-        <div class="calc-tile-body">
-          <h3 class="calc-tile-name">Borrowing Against Your Stack</h3>
-          <p class="calc-tile-tagline">When does borrowing make more sense than selling? Model liquidation distance vs. retained-coin upside.</p>
-          <span class="calc-tile-cta">Open &rarr;</span>
-        </div>
-      </a>
-
-      {# Bitcoin-Backed Mortgages — house with bitcoin lock #}
-      <a href="/bitcoin-backed-mortgages.html#calculator" class="calc-tile">
-        <div class="calc-tile-preview">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
-            <path d="M22 30L40 14L58 30" stroke="#e09422" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <path d="M26 28V46H54V28" stroke="#e09422" stroke-width="1.4" stroke-linejoin="round" fill="rgba(224,148,34,0.05)"/>
-            <line x1="40" y1="34" x2="40" y2="46" stroke="#e09422" stroke-width="0.8" opacity="0.45"/>
-            <line x1="32" y1="40" x2="48" y2="40" stroke="#e09422" stroke-width="0.8" opacity="0.45"/>
-            <circle cx="18" cy="48" r="6" stroke="#F7931A" stroke-width="1.6" fill="rgba(247,147,26,0.10)"/>
-            <text x="18" y="51" text-anchor="middle" fill="#F7931A" font-size="7" font-weight="700" font-family="sans-serif">&#8383;</text>
-            <line x1="23" y1="46" x2="28" y2="42" stroke="#F7931A" stroke-width="1" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="calc-tile-body">
-          <h3 class="calc-tile-name">Bitcoin-Backed Mortgages</h3>
-          <p class="calc-tile-tagline">Buy the house with bitcoin as collateral &mdash; the structural mortgage trade-off across counterparty tiers.</p>
-          <span class="calc-tile-cta">Open &rarr;</span>
-        </div>
-      </a>
-
-      {# The Bitcoin Horizon — long-range projection curve #}
-      <a href="/the-bitcoin-horizon.html#explorer" class="calc-tile">
-        <div class="calc-tile-preview">
-          <div id="mini-horizon"></div>
-        </div>
-        <div class="calc-tile-body">
-          <h3 class="calc-tile-name">The Bitcoin Horizon</h3>
-          <p class="calc-tile-tagline">Long-range Power Law projection across an investor&rsquo;s lifetime &mdash; floor, trend, upper band.</p>
-          <span class="calc-tile-cta">Open &rarr;</span>
-        </div>
-      </a>
-
-      {# The Bitcoin Fixed Share — pie with one slice highlighted #}
-      <a href="/the-fixed-pie.html" class="calc-tile">
-        <div class="calc-tile-preview">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
-            <circle cx="40" cy="30" r="20" stroke="#2a2a2a" stroke-width="1" fill="#1a1a1a"/>
-            <path d="M 40 30 L 40 10 A 20 20 0 0 1 56 20 Z" fill="#F7931A"/>
-            <path d="M 40 30 L 56 20 A 20 20 0 0 1 60 30 Z" fill="#e09422" opacity="0.7"/>
-            <path d="M 40 30 L 60 30 A 20 20 0 0 1 40 50 Z" fill="#5c4a1f" opacity="0.6"/>
-            <path d="M 40 30 L 40 50 A 20 20 0 0 1 20 30 Z" fill="#3a3025" opacity="0.6"/>
-            <path d="M 40 30 L 20 30 A 20 20 0 0 1 40 10 Z" fill="#2a2218" opacity="0.6"/>
-            <text x="40" y="34" text-anchor="middle" fill="#0a0908" font-size="9" font-weight="700" font-family="sans-serif">&#8383;</text>
-          </svg>
-        </div>
-        <div class="calc-tile-body">
-          <h3 class="calc-tile-name">The Bitcoin Fixed Share</h3>
-          <p class="calc-tile-tagline">What does owning a piece of 21 million actually mean as a share of all the bitcoin there will ever be?</p>
-          <span class="calc-tile-cta">Open &rarr;</span>
-        </div>
-      </a>
-
-      {# The Half-Life — decay curve with quarters marked #}
-      <a href="/the-half-life.html" class="calc-tile">
-        <div class="calc-tile-preview">
-          <div id="mini-half-life"></div>
-        </div>
-        <div class="calc-tile-body">
-          <h3 class="calc-tile-name">The Half-Life</h3>
-          <p class="calc-tile-tagline">Watch the dollar&rsquo;s purchasing power decay &mdash; half by half, generation by generation.</p>
-          <span class="calc-tile-cta">Open &rarr;</span>
-        </div>
-      </a>
-
-      {# The Melting Ice Cube — ice cube + bitcoin alternative #}
-      <a href="/the-melting-ice-cube.html" class="calc-tile">
-        <div class="calc-tile-preview">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
-            <path d="M 22 16 L 38 12 L 50 18 L 48 36 L 28 38 Z" stroke="#5fc6d4" stroke-width="1.2" fill="rgba(95,198,212,0.08)" stroke-linejoin="round"/>
-            <line x1="22" y1="16" x2="28" y2="22" stroke="#5fc6d4" stroke-width="0.7" opacity="0.6"/>
-            <line x1="38" y1="12" x2="40" y2="20" stroke="#5fc6d4" stroke-width="0.7" opacity="0.6"/>
-            <line x1="50" y1="18" x2="44" y2="22" stroke="#5fc6d4" stroke-width="0.7" opacity="0.6"/>
-            <path d="M 32 38 Q 30 42 28 46" stroke="#5fc6d4" stroke-width="0.8" fill="none" opacity="0.5" stroke-dasharray="1.5 2"/>
-            <path d="M 40 38 Q 40 43 41 48" stroke="#5fc6d4" stroke-width="0.8" fill="none" opacity="0.5" stroke-dasharray="1.5 2"/>
-            <circle cx="60" cy="40" r="8" stroke="#F7931A" stroke-width="1.4" fill="rgba(247,147,26,0.10)"/>
-            <text x="60" y="44" text-anchor="middle" fill="#F7931A" font-size="9" font-weight="700" font-family="sans-serif">&#8383;</text>
-          </svg>
-        </div>
-        <div class="calc-tile-body">
-          <h3 class="calc-tile-name">The Melting Ice Cube</h3>
-          <p class="calc-tile-tagline">Corporate treasuries against monetary debasement &mdash; bitcoin as the dollar-melt antidote.</p>
-          <span class="calc-tile-cta">Open &rarr;</span>
-        </div>
-      </a>
-
+      {% for ex in explorations | sortByCalculatorTilePosition %}
+        {% if ex.calculator_tile and not ex.calculator_tile.featured %}
+          {% set ct = ex.calculator_tile %}
+          {% set anchor = ct.anchor if ct.anchor is defined else "#calculator" %}
+          <a href="/{{ ex.slug }}.html{{ anchor }}" class="calc-tile">
+            <div class="calc-tile-preview">
+              {% if ct.preview_kind == "live-chart" %}
+                <div id="{{ ct.preview_id }}"></div>
+              {% else %}
+                {% include 'components/calc-tile-icons/' + ex.slug + '.njk' %}
+              {% endif %}
+            </div>
+            <div class="calc-tile-body">
+              <h3 class="calc-tile-name">{{ ex.title | safe }}</h3>
+              <p class="calc-tile-tagline">{{ ct.tagline | safe }}</p>
+              <span class="calc-tile-cta">Open &rarr;</span>
+            </div>
+          </a>
+        {% endif %}
+      {% endfor %}
     </div>
   </section>
 
