@@ -483,7 +483,11 @@ eleventyComputed:
         <input type="range" id="calc-property-value" min="100000" max="3000000" step="25000" value="500000">
 
         <div class="calc-slider-row">
-          <span class="calc-slider-name">Net rental yield <span class="calc-slider-hint">(post-waterfall, see The Reality tab)</span></span>
+          <span class="calc-slider-name">Net rental yield
+            <span class="help-tip" tabindex="0">?<span class="tip-content">
+              The cash flow that survives the gross-to-net waterfall &mdash; net of vacancy, maintenance, management, property tax, insurance, and CapEx reserves. Typically 36&ndash;50% of gross yield. See The Reality tab for the full waterfall.
+            </span></span>
+          </span>
           <span class="calc-slider-val" id="val-net-yield">4.4%</span>
         </div>
         <input type="range" id="calc-net-yield" min="1" max="10" step="0.1" value="4.4">
@@ -499,7 +503,11 @@ eleventyComputed:
       <div class="calc-slider-group calc-path-specific" data-for-path="2">
         <div class="calc-slider-group-label">HELOC draw</div>
         <div class="calc-slider-row">
-          <span class="calc-slider-name">Max combined LTV <span class="calc-slider-hint">(how much equity to tap)</span></span>
+          <span class="calc-slider-name">Max combined LTV
+            <span class="help-tip" tabindex="0">?<span class="tip-content">
+              Combined Loan-to-Value: how much of your home&rsquo;s appraised value can be borrowed across all liens (mortgage + HELOC). The HELOC draw is this LTV cap minus your existing mortgage balance. Typical lender ceilings: 80&ndash;90% for primary residences.
+            </span></span>
+          </span>
           <span class="calc-slider-val" id="val-heloc-ltv">80%</span>
         </div>
         <input type="range" id="calc-heloc-ltv" min="50" max="90" step="5" value="80">
@@ -520,25 +528,41 @@ eleventyComputed:
         <div class="calc-slider-group-label">Bitcoin yield portfolio</div>
 
         <div class="calc-slider-row">
-          <span class="calc-slider-name">STRC (Strategy, 11.5%, ROC)</span>
+          <span class="calc-slider-name">STRC <span class="calc-slider-hint">(Strategy, 11.5%, ROC)</span>
+            <span class="help-tip" tabindex="0">?<span class="tip-content">
+              Strategy&rsquo;s variable-rate Series&nbsp;A perpetual preferred stock. Currently paying ~11.5% annualized with monthly distributions classified as Return of Capital &mdash; distributions reduce your cost basis instead of triggering immediate ordinary income tax (depreciation-equivalent shield for bitcoin yield).
+            </span></span>
+          </span>
           <span class="calc-slider-val" id="val-port-strc">45%</span>
         </div>
         <input type="range" id="calc-port-strc" min="0" max="100" step="5" value="45">
 
         <div class="calc-slider-row">
-          <span class="calc-slider-name">SATA (Strive, 13%, ROC)</span>
+          <span class="calc-slider-name">SATA <span class="calc-slider-hint">(Strive, 13%, ROC)</span>
+            <span class="help-tip" tabindex="0">?<span class="tip-content">
+              Strive&rsquo;s variable-rate Series&nbsp;A perpetual preferred stock. Pays ~13% annualized, transitioning to daily distributions (June 2026), backed by Strive&rsquo;s 15,009 BTC treasury + an 18-month dividend reserve. Same ROC tax treatment as STRC.
+            </span></span>
+          </span>
           <span class="calc-slider-val" id="val-port-sata">30%</span>
         </div>
         <input type="range" id="calc-port-sata" min="0" max="100" step="5" value="30">
 
         <div class="calc-slider-row">
-          <span class="calc-slider-name">Ledn (CeFi, 8%, ordinary)</span>
+          <span class="calc-slider-name">Ledn <span class="calc-slider-hint">(CeFi, 8%, ordinary)</span>
+            <span class="help-tip" tabindex="0">?<span class="tip-content">
+              Centralized lending platform with bitcoin-backed loan books. Yields are taxed as ordinary income (no ROC shield), so the after-tax yield compresses materially at higher federal brackets. Lower yield but different risk concentration than the issuer-credit risk of STRC/SATA.
+            </span></span>
+          </span>
           <span class="calc-slider-val" id="val-port-ledn">10%</span>
         </div>
         <input type="range" id="calc-port-ledn" min="0" max="100" step="5" value="10">
 
         <div class="calc-slider-row">
-          <span class="calc-slider-name">Spot BTC (no distributions)</span>
+          <span class="calc-slider-name">Spot BTC <span class="calc-slider-hint">(no distributions)</span>
+            <span class="help-tip" tabindex="0">?<span class="tip-content">
+              Bitcoin held outright (self-custody or via spot ETF). No cash distributions; pure asset appreciation. The portfolio&rsquo;s growth engine &mdash; the slice that captures bitcoin&rsquo;s structural CAGR while the yield instruments provide income.
+            </span></span>
+          </span>
           <span class="calc-slider-val" id="val-port-spot">15%</span>
         </div>
         <input type="range" id="calc-port-spot" min="0" max="100" step="5" value="15">
@@ -551,21 +575,34 @@ eleventyComputed:
 
     </div>
 
-    <!-- Bitcoin CAGR scenario picker (chips above chart) -->
+    <!-- Bitcoin CAGR scenario picker (chips above chart) — Power Law-anchored -->
     <div class="calc-cagr-picker">
-      <div class="calc-cagr-picker-label">Bitcoin CAGR scenario</div>
+      <div class="calc-cagr-picker-row">
+        <div class="calc-cagr-picker-label">
+          Bitcoin scenario
+          <span class="help-tip" tabindex="0">?<span class="tip-content">
+            All three scenarios are anchored to the Power Law model and auto-recalibrate as bitcoin&rsquo;s current multiple-of-trend shifts. The selected chip drives the headline number and the comparison table; all three lines remain visible on the chart unless you toggle them off via the legend.
+          </span></span>
+        </div>
+        <div class="calc-cagr-picker-current">
+          BTC today: <strong id="calc-current-multiple">&mdash;</strong>
+        </div>
+      </div>
       <div class="calc-cagr-chips" id="calc-cagr-chips">
-        <button class="calc-cagr-chip" data-scenario="conservative">
-          <span class="calc-cagr-chip-name">Conservative</span>
-          <span class="calc-cagr-chip-rate">15% CAGR</span>
+        <button class="calc-cagr-chip" data-scenario="stay">
+          <span class="calc-cagr-chip-name">Stay at current</span>
+          <span class="calc-cagr-chip-rate">&mdash;</span>
+          <span class="calc-cagr-chip-sub">no reversion</span>
         </button>
-        <button class="calc-cagr-chip active" data-scenario="median">
-          <span class="calc-cagr-chip-name">Median</span>
-          <span class="calc-cagr-chip-rate">25% CAGR</span>
+        <button class="calc-cagr-chip active" data-scenario="trend">
+          <span class="calc-cagr-chip-name">Revert to trend</span>
+          <span class="calc-cagr-chip-rate">&mdash;</span>
+          <span class="calc-cagr-chip-sub">Power Law central</span>
         </button>
-        <button class="calc-cagr-chip" data-scenario="optimistic">
-          <span class="calc-cagr-chip-name">Optimistic</span>
-          <span class="calc-cagr-chip-rate">35% CAGR</span>
+        <button class="calc-cagr-chip" data-scenario="upper">
+          <span class="calc-cagr-chip-name">Reach upper channel</span>
+          <span class="calc-cagr-chip-rate">&mdash;</span>
+          <span class="calc-cagr-chip-sub">cycle peak</span>
         </button>
       </div>
     </div>
@@ -593,7 +630,10 @@ eleventyComputed:
     <!-- Path-specific detail card -->
     <div id="calc-path-detail" class="calc-path-detail"></div>
 
-    <!-- Baseline assumptions (collapsible — set once, ignore) -->
+    <!-- Specific-to-you callout -->
+    <div id="calc-specific-callout" class="calc-specific-callout"></div>
+
+    <!-- Baseline assumptions (collapsible — set once, ignore) — moved to the very bottom per TBR pattern -->
     <details class="calc-baseline">
       <summary>
         <span class="calc-baseline-summary-label">Baseline assumptions</span>
@@ -644,20 +684,28 @@ eleventyComputed:
           <div class="calc-slider-group-label">Property facts</div>
 
           <div class="calc-slider-row">
-            <span class="calc-slider-name">Adjusted basis <span class="calc-slider-hint">(% of current value)</span></span>
+            <span class="calc-slider-name">Adjusted basis
+              <span class="help-tip" tabindex="0">?<span class="tip-content">
+                Your property&rsquo;s tax basis: original purchase price plus capital improvements, minus depreciation already taken. Drives the taxable gain on sale. Default 60% of current value approximates 10 years of holding with steady appreciation.
+              </span></span>
+            </span>
             <span class="calc-slider-val" id="val-adjusted-basis">60%</span>
           </div>
           <input type="range" id="calc-adjusted-basis" min="10" max="100" step="5" value="60">
 
           <div class="calc-slider-row">
-            <span class="calc-slider-name">Years already held</span>
+            <span class="calc-slider-name">Years already held
+              <span class="help-tip" tabindex="0">?<span class="tip-content">
+                How long you&rsquo;ve owned the property. Determines accumulated straight-line depreciation (building basis &divide; 27.5 yrs &times; years held), which becomes the depreciation-recapture tax bill at sale.
+              </span></span>
+            </span>
             <span class="calc-slider-val" id="val-years-held">10 yrs</span>
           </div>
           <input type="range" id="calc-years-held" min="0" max="27" step="1" value="10">
         </div>
 
         <div class="calc-slider-group calc-path-specific" data-for-path="2">
-          <div class="calc-slider-group-label">Path 2 — HELOC terms</div>
+          <div class="calc-slider-group-label">Path 2 &mdash; HELOC terms</div>
 
           <div class="calc-slider-row">
             <span class="calc-slider-name">HELOC rate <span class="calc-slider-hint">(lender quote)</span></span>
@@ -673,7 +721,7 @@ eleventyComputed:
         </div>
 
         <div class="calc-slider-group calc-path-specific" data-for-path="3">
-          <div class="calc-slider-group-label">Path 3 — Portfolio facts</div>
+          <div class="calc-slider-group-label">Path 3 &mdash; Portfolio facts</div>
 
           <div class="calc-slider-row">
             <span class="calc-slider-name">Properties owned <span class="calc-slider-hint">(each at property value above)</span></span>
@@ -685,13 +733,10 @@ eleventyComputed:
       </div>
     </details>
 
-    <!-- Specific-to-you callout -->
-    <div id="calc-specific-callout" class="calc-specific-callout"></div>
-
   </div>
 
   <p style="margin-top:1.6rem;font-size:0.85rem;color:var(--ink-dim);font-style:italic">
-    <strong>v0.1 caveats:</strong> bitcoin CAGR is flat over the holding period (declining-CAGR projection coming in v0.2). ROC distributions assumed tax-free for the full holding period (a fair approximation for ~10-year windows). State taxes simplified to a single rate per state. HELOC modeled as interest-only with balloon repayment. Calculator design doc: <code>BITCOIN_VS_RENTAL_PROPERTY_CALCULATOR_DESIGN_1.md</code>.
+    <strong>v0.3 caveats:</strong> Bitcoin scenarios are anchored to the site&rsquo;s Power Law model and dynamically recalibrate to bitcoin&rsquo;s current multiple-of-trend. Reversion paths use linear interpolation from today&rsquo;s multiple to the target multiple over the holding period (a simplification; real reversion is non-linear). ROC distributions assumed tax-free for the full holding period (a fair approximation for ~10-year windows at current STRC/SATA rates). State taxes simplified to a single rate per state. HELOC modeled as interest-only with balloon repayment.
   </p>
 </section>
 

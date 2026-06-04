@@ -116,7 +116,7 @@
     federalBracketPct: 24,     // 12, 22, 24, 32, 35, 37
     adjustedBasisPct: 60,      // % of current value
     yearsAlreadyHeld: 10,
-    btcScenario: 'median',     // 'conservative', 'median', 'optimistic'
+    btcScenario: 'trend',      // 'stay' | 'trend' | 'upper' — Power Law-anchored
     helocLtv: 80,
     helocRatePct: 9.5,
     existingMortgage: 200000,
@@ -149,10 +149,73 @@
   }
   function niitApplies(brkt){ return brkt >= 32; }
 
-  function btcCAGR(scenario){
-    if (scenario === 'conservative') return 0.15;
-    if (scenario === 'optimistic') return 0.35;
-    return 0.25;  // median
+  // ─── Power Law-anchored bitcoin growth scenarios ───────────────────
+  // Three named scenarios, all derived from shared/power-law-data.js so
+  // they auto-recalibrate as bitcoin's current multiple-of-trend shifts.
+  //
+  //   stay   — Bitcoin maintains today's multiple-of-trend forever.
+  //            Growth rate ≈ trend CAGR from today's price (no reversion
+  //            benefit / penalty from current entry conditions).
+  //
+  //   trend  — Bitcoin reverts from today's multiple back to 1.0× trend
+  //            linearly over the holding period. When entering below
+  //            trend (current case at ~0.45×), this is the "entry-timing
+  //            advantage" case that produces above-trend CAGR.
+  //
+  //   upper  — Bitcoin drifts from today's multiple toward 2.5× trend
+  //            (historical above-cycle peak, conservative vs the 3.0×
+  //            channel ceiling) over the holding period.
+  //
+  // currentBTCMultiple() reads today's multiple at call time so the
+  // chips and chart reflect the live Power Law state.
+
+  function currentBTCMultiple(){
+    if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function' ||
+        typeof GENESIS_TS !== 'number') return 1.0;
+    var todayDays = (Date.now() / 1000 - GENESIS_TS) / 86400;
+    var todayTrend = plPrice(todayDays);
+    var todaySpot = (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0)
+      ? TODAY_PRICE : PL_DATA[PL_DATA.length - 1][1];
+    return todaySpot / todayTrend;
+  }
+
+  function scenarioGrowthFactor(scenario, t, holdingYears){
+    if (t === 0) return 1.0;
+    if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function' ||
+        typeof GENESIS_TS !== 'number') {
+      // Fallback to flat CAGR if Power Law data not loaded yet
+      var fallbackCAGR = scenario === 'stay' ? 0.20
+                       : scenario === 'upper' ? 0.45
+                       : 0.30;
+      return Math.pow(1 + fallbackCAGR, t);
+    }
+    var todayDays = (Date.now() / 1000 - GENESIS_TS) / 86400;
+    var todayTrend = plPrice(todayDays);
+    var todaySpot = (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0)
+      ? TODAY_PRICE : PL_DATA[PL_DATA.length - 1][1];
+    var currentMult = todaySpot / todayTrend;
+
+    var futureTrend = plPrice(todayDays + t * 365);
+    var progress = Math.min(t / Math.max(1, holdingYears), 1.0);
+
+    var targetMult;
+    if (scenario === 'stay') {
+      targetMult = currentMult;
+    } else if (scenario === 'upper') {
+      targetMult = currentMult + progress * (2.5 - currentMult);
+    } else {
+      // 'trend' (default): linear interp to 1.0× trend
+      targetMult = currentMult + progress * (1.0 - currentMult);
+    }
+
+    var futurePrice = targetMult * futureTrend;
+    return futurePrice / todaySpot;
+  }
+
+  function effectiveCAGR(scenario, holdingYears){
+    if (holdingYears <= 0) return 0;
+    var totalGrowth = scenarioGrowthFactor(scenario, holdingYears, holdingYears);
+    return Math.pow(totalGrowth, 1 / holdingYears) - 1;
   }
 
   // ─── Math: rental side ───
@@ -204,8 +267,11 @@
   }
 
   // ─── Math: bitcoin paths ───
-  function calcSpotBTCFV(amount, years, scenario){
-    return amount * Math.pow(1 + btcCAGR(scenario), years);
+  // Spot BTC future value uses scenarioGrowthFactor — the growth path is
+  // Power Law-anchored rather than a flat CAGR. The `holdingYears` arg
+  // matters because it sets the reversion horizon for 'trend' and 'upper'.
+  function calcSpotBTCFV(amount, years, scenario, holdingYears){
+    return amount * scenarioGrowthFactor(scenario, years, holdingYears || years);
   }
 
   function calcYieldPortfolio(amount, s){
@@ -394,8 +460,8 @@
     var ordTax = lednDist * (s.federalBracketPct/100);
     var year1AfterTax = pretax - ordTax;
     var cumCash = year1AfterTax * t;
-    var cagr = btcCAGR(scenarioOverride || s.btcScenario);
-    var spotFV = allocs.spot * Math.pow(1 + cagr, t);
+    var scenario = scenarioOverride || s.btcScenario;
+    var spotFV = allocs.spot * scenarioGrowthFactor(scenario, t, s.holdingYears);
     var preserved = allocs.strc + allocs.sata + allocs.ledn;
     return preserved + spotFV + cumCash;
   }
@@ -403,10 +469,11 @@
   function calcWealthTrajectory(s, scenarioOverride){
     var sUse = scenarioOverride ? Object.assign({}, s, { btcScenario: scenarioOverride }) : s;
     var rentalAnnual = calcRentalAnnualCF(sUse);
-    var cagr = btcCAGR(sUse.btcScenario);
     var trajectory = [];
 
     for (var t = 0; t <= sUse.holdingYears; t++) {
+      var growth = scenarioGrowthFactor(sUse.btcScenario, t, sUse.holdingYears);
+
       // Keep rental: cumulative after-tax CF up to year t + net cash if sold at year t
       var cumCash = rentalAnnual.afterTax * t;
       var exitAtT = calcRentalExit(sUse, t);
@@ -415,11 +482,11 @@
       var wealthPath;
       if (sUse.path === 1) {
         var exitNow = calcRentalExit(sUse, 0);
-        wealthPath = exitNow.netCash * Math.pow(1 + cagr, t);
+        wealthPath = exitNow.netCash * growth;
       } else if (sUse.path === 2) {
         var maxCltv = sUse.propertyValue * (sUse.helocLtv/100);
         var heloc = Math.max(0, maxCltv - sUse.existingMortgage);
-        var btcVal = heloc * Math.pow(1 + cagr, t);
+        var btcVal = heloc * growth;
         var carry = heloc * (sUse.helocRatePct/100) * t;
         wealthPath = wealthKeep + btcVal - heloc - carry;
       } else if (sUse.path === 3) {
@@ -443,85 +510,106 @@
   }
 
   // ─── Chart.js rendering ───
+  // Four datasets, dataset indices stable (legendVisibility maps to these):
+  //   0 = Keep rental (amber dashed)
+  //   1 = Bitcoin: Stay at current multiple
+  //   2 = Bitcoin: Revert to trend
+  //   3 = Bitcoin: Reach upper channel
+  // The chip selection (state.btcScenario) determines which line is the
+  // "primary" (bold) and which scenario drives the headline / table /
+  // path-detail numbers. All four lines are simultaneously visible by
+  // default; user can toggle individual lines via the custom legend.
   var chartInstance = null;
+  var legendVisibility = { 0: true, 1: true, 2: true, 3: true };
+
+  // Colors for the four datasets — distinguishable on dark, semantically
+  // ordered (rental amber → bear brown → trend green → upper bright green).
+  var CHART_COLORS = {
+    rental:    '#e09422',  // amber, dashed
+    stay:      '#a87a4a',  // muted brown — bear/no-reversion
+    trend:     '#5a8a3a',  // canonical site green — central/default
+    upper:     '#7cc24a'   // brighter green — upper channel
+  };
 
   function renderChart(s){
     var canvas = document.getElementById('calc-chart');
     if (!canvas || typeof Chart === 'undefined') return;
 
-    var trajCons = calcWealthTrajectory(s, 'conservative');
-    var trajMed  = calcWealthTrajectory(s, 'median');
-    var trajOpt  = calcWealthTrajectory(s, 'optimistic');
+    var trajStay  = calcWealthTrajectory(s, 'stay');
+    var trajTrend = calcWealthTrajectory(s, 'trend');
+    var trajUpper = calcWealthTrajectory(s, 'upper');
 
-    var labels = trajMed.map(function(r){ return 'Y' + r.year; });
-    var keepData = trajMed.map(function(r){ return r.wealthKeep; });
-    var pathCons = trajCons.map(function(r){ return r.wealthPath; });
-    var pathMed  = trajMed.map(function(r){ return r.wealthPath; });
-    var pathOpt  = trajOpt.map(function(r){ return r.wealthPath; });
+    var labels = trajTrend.map(function(r){ return 'Y' + r.year; });
+    var keepData  = trajTrend.map(function(r){ return r.wealthKeep; });
+    var pathStay  = trajStay.map(function(r){ return r.wealthPath; });
+    var pathTrend = trajTrend.map(function(r){ return r.wealthPath; });
+    var pathUpper = trajUpper.map(function(r){ return r.wealthPath; });
 
-    var selectedPath = (s.btcScenario === 'conservative') ? pathCons
-                     : (s.btcScenario === 'optimistic')   ? pathOpt
-                     : pathMed;
-
-    var lastIdx = selectedPath.length - 1;
-    var pathWins = selectedPath[lastIdx] > keepData[lastIdx];
-    var pathColor = pathWins ? '#5a8a3a' : '#c0392b';
-    var pathColorBg = pathWins ? 'rgba(90,138,58,0.12)' : 'rgba(192,57,43,0.12)';
+    function primary(scenario){ return scenario === s.btcScenario; }
 
     var datasets = [
-      // Upper envelope (fills down to lower envelope)
-      {
-        label: '__bandHigh__',
-        data: pathOpt,
-        borderColor: 'transparent',
-        backgroundColor: pathColorBg,
-        pointRadius: 0,
-        fill: '+1',
-        order: 5
-      },
-      // Lower envelope
-      {
-        label: '__bandLow__',
-        data: pathCons,
-        borderColor: 'transparent',
-        backgroundColor: 'transparent',
-        pointRadius: 0,
-        fill: false,
-        order: 5
-      },
-      // Selected bitcoin path
-      {
-        label: 'Bitcoin path',
-        data: selectedPath,
-        borderColor: pathColor,
-        backgroundColor: pathColor,
-        borderWidth: 2.5,
-        pointRadius: 0,
-        pointHoverRadius: 5,
-        fill: false,
-        tension: 0.18,
-        order: 1
-      },
-      // Keep rental (amber dashed)
       {
         label: 'Keep rental',
         data: keepData,
-        borderColor: '#e09422',
-        backgroundColor: '#e09422',
+        borderColor: CHART_COLORS.rental,
+        backgroundColor: CHART_COLORS.rental,
         borderWidth: 2,
         borderDash: [4, 3],
         pointRadius: 0,
         pointHoverRadius: 5,
         fill: false,
         tension: 0.1,
-        order: 2
+        order: 2,
+        hidden: !legendVisibility[0]
+      },
+      {
+        label: 'Bitcoin · Stay at current multiple',
+        data: pathStay,
+        borderColor: CHART_COLORS.stay,
+        backgroundColor: CHART_COLORS.stay,
+        borderWidth: primary('stay') ? 2.75 : 1.5,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        fill: false,
+        tension: 0.18,
+        order: primary('stay') ? 1 : 4,
+        hidden: !legendVisibility[1]
+      },
+      {
+        label: 'Bitcoin · Revert to trend',
+        data: pathTrend,
+        borderColor: CHART_COLORS.trend,
+        backgroundColor: CHART_COLORS.trend,
+        borderWidth: primary('trend') ? 2.75 : 1.5,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        fill: false,
+        tension: 0.18,
+        order: primary('trend') ? 1 : 4,
+        hidden: !legendVisibility[2]
+      },
+      {
+        label: 'Bitcoin · Reach upper channel',
+        data: pathUpper,
+        borderColor: CHART_COLORS.upper,
+        backgroundColor: CHART_COLORS.upper,
+        borderWidth: primary('upper') ? 2.75 : 1.5,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        fill: false,
+        tension: 0.18,
+        order: primary('upper') ? 1 : 4,
+        hidden: !legendVisibility[3]
       }
     ];
 
     if (chartInstance) {
       chartInstance.data.labels = labels;
       chartInstance.data.datasets = datasets;
-      chartInstance.update('none');
+      // 'resize' invalidates the layout cache (per STYLE_GUIDE §6.14);
+      // safer than 'none' when the chart may have initialized in a
+      // display:none container.
+      chartInstance.update('resize');
       return;
     }
 
@@ -533,7 +621,7 @@
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
         plugins: {
-          legend: { display: false },
+          legend: { display: false },  // custom legend rendered below the chart
           tooltip: {
             backgroundColor: 'rgba(15,14,13,0.95)',
             borderColor: 'rgba(224,148,34,0.3)',
@@ -544,7 +632,6 @@
             cornerRadius: 4,
             callbacks: {
               label: function(ctx){
-                if (ctx.dataset.label && ctx.dataset.label.indexOf('__') === 0) return null;
                 return ctx.dataset.label + ': ' + fmtMoney(ctx.parsed.y);
               }
             }
@@ -568,17 +655,71 @@
     });
   }
 
-  function renderChartLegend(s){
+  // Custom legend: clickable items toggle dataset visibility. Pattern
+  // adapted from the-bitcoin-retirement.js wireLegendToggles().
+  // Help-tip clicks inside legend items are excluded so the ? glyph
+  // never toggles the line — it has its own hover/focus behavior.
+  function renderChartLegend(){
     var el = document.getElementById('calc-chart-legend');
     if (!el) return;
-    var trajMed = calcWealthTrajectory(s, s.btcScenario);
-    var last = trajMed[trajMed.length - 1];
-    var pathWins = last.wealthPath > last.wealthKeep;
-    var pathColor = pathWins ? 'var(--green)' : '#e07a6d';
-    el.innerHTML =
-      '<span class="calc-legend-item"><span class="calc-legend-line keep"></span>Keep rental</span>' +
-      '<span class="calc-legend-item"><span class="calc-legend-line path" style="background:' + pathColor + '"></span>Bitcoin path · ' + s.btcScenario + ' CAGR</span>' +
-      '<span class="calc-legend-item"><span class="calc-legend-band"></span>Conservative&ndash;Optimistic envelope</span>';
+    var rows = [
+      { idx: 0, label: 'Keep rental', color: CHART_COLORS.rental, dashed: true,
+        tip: 'Net wealth if you keep the rental, collect after-tax cash flow each year, and sell at the end of the holding period.' },
+      { idx: 1, label: 'Bitcoin · Stay at current multiple', color: CHART_COLORS.stay,
+        tip: 'Bitcoin grows at the Power Law trend rate from today\u2019s price, never reverting to trend. The bear / no-reversion case.' },
+      { idx: 2, label: 'Bitcoin · Revert to trend', color: CHART_COLORS.trend,
+        tip: 'Bitcoin moves from today\u2019s multiple back to 1.0\u00d7 trend linearly over the holding period. The Power Law central case.' },
+      { idx: 3, label: 'Bitcoin · Reach upper channel', color: CHART_COLORS.upper,
+        tip: 'Bitcoin drifts toward 2.5\u00d7 trend (the historical above-cycle peak) over the holding period. The optimistic case.' }
+    ];
+    var html = rows.map(function(r){
+      var off = legendVisibility[r.idx] ? '' : ' off';
+      var swatchStyle = 'background:' + r.color + (r.dashed ?
+        ';background-image:repeating-linear-gradient(90deg,' + r.color + ' 0,' + r.color + ' 4px,transparent 4px,transparent 7px);background-color:transparent' : '');
+      return '<span class="legend-item' + off + '" data-dataset-idx="' + r.idx +
+             '" tabindex="0" role="button" aria-pressed="' + (legendVisibility[r.idx] ? 'true' : 'false') + '">' +
+             '<span class="swatch" style="' + swatchStyle + '"></span>' +
+             '<span class="legend-label">' + r.label + '</span>' +
+             '<span class="help-tip" tabindex="0">?<span class="tip-content">' + r.tip + '</span></span>' +
+             '</span>';
+    }).join('');
+    el.innerHTML = '<div class="legend-hint">click any item to hide / show that line</div>' + html;
+    wireLegendToggles();
+  }
+
+  function wireLegendToggles(){
+    var items = document.querySelectorAll('#calc-chart-legend .legend-item[data-dataset-idx]');
+    items.forEach(function(item){
+      function toggle(){
+        var idx = parseInt(item.getAttribute('data-dataset-idx'), 10);
+        if (isNaN(idx)) return;
+        var nowVisible = !legendVisibility[idx];
+        legendVisibility[idx] = nowVisible;
+        item.classList.toggle('off', !nowVisible);
+        item.setAttribute('aria-pressed', nowVisible ? 'true' : 'false');
+        if (chartInstance) {
+          chartInstance.setDatasetVisibility(idx, nowVisible);
+          chartInstance.update('none');
+        }
+      }
+      item.addEventListener('click', function(e){
+        if (e.target.closest('.help-tip')) return;
+        toggle();
+      });
+      item.addEventListener('keydown', function(e){
+        if (e.target.closest('.help-tip')) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle();
+        }
+      });
+    });
+  }
+
+  function scenarioLabel(scenario){
+    if (scenario === 'stay')  return 'Stay at current multiple';
+    if (scenario === 'upper') return 'Reach upper channel';
+    return 'Revert to trend';
   }
 
   function renderHeadline(results, s){
@@ -606,7 +747,7 @@
                 ' more</strong> than ' + pathName + ' under your inputs. The decision is close — try adjusting bitcoin CAGR, holding period, or path.';
       color = 'neutral';
     }
-    var hedge = '<span class="calc-headline-hedge">Under a <strong>' + s.btcScenario +
+    var hedge = '<span class="calc-headline-hedge">Under the <strong>' + scenarioLabel(s.btcScenario) +
                 '</strong> bitcoin CAGR scenario and your specific inputs.</span>';
     el.innerHTML = '<div class="calc-headline-verdict ' + color + '">' + verdict + '</div>' + hedge;
   }
@@ -673,7 +814,7 @@
         '<div><span>HELOC draw available</span><strong>' + fmtMoneyFull(r2.helocDraw) + '</strong></div>' +
         '<div><span>Annual interest carry</span><strong>' + fmtMoneyFull(r2.annualCarry) + '/yr</strong></div>' +
         '<div><span>Cumulative carry (' + s.holdingYears + ' yrs)</span><strong>' + fmtMoneyFull(r2.cumulativeCarry) + '</strong></div>' +
-        '<div><span>Bitcoin position FV (' + s.btcScenario + ' CAGR)</span><strong>' + fmtMoneyFull(r2.btcFV) + '</strong></div>' +
+        '<div><span>Bitcoin position FV (' + scenarioLabel(s.btcScenario) + ')</span><strong>' + fmtMoneyFull(r2.btcFV) + '</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Net gain from leveraged bitcoin</span><strong>' + fmtMoneyFull(r2.netGainFromLeverage) + '</strong></div>' +
         '<div><span>+ Retained rental wealth at exit</span><strong>' + fmtMoneyFull(r2.retainedRental.totalWealth) + '</strong></div>' +
         '</div>' +
@@ -705,20 +846,29 @@
         '<div><span>Ledn (' + p.ledn + '%, ' + fmtMoneyFull(yp.allocations.ledn) + ' @ 8.0% ord.)</span><strong>' + fmtMoneyFull(yp.year1Distributions.ledn) + '</strong></div>' +
         '<div><span>Spot BTC (' + p.spot + '%, ' + fmtMoneyFull(yp.allocations.spot) + ', no dist.)</span><strong>—</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Year 1 after-tax total</span><strong>' + fmtMoneyFull(yp.year1AfterTax) + '</strong></div>' +
-        '<div><span>Spot BTC value at year ' + s.holdingYears + ' (' + s.btcScenario + ' CAGR)</span><strong>' + fmtMoneyFull(yp.spotFV) + '</strong></div>' +
+        '<div><span>Spot BTC value at year ' + s.holdingYears + ' (' + scenarioLabel(s.btcScenario) + ')</span><strong>' + fmtMoneyFull(yp.spotFV) + '</strong></div>' +
         '</div></div>';
     }
     el.innerHTML = html;
   }
 
   function renderCAGRChips(s){
-    var scenarios = ['conservative', 'median', 'optimistic'];
+    var scenarios = ['stay', 'trend', 'upper'];
     scenarios.forEach(function(sc){
       var chip = document.querySelector('.calc-cagr-chip[data-scenario="' + sc + '"]');
       if (!chip) return;
       var sCopy = Object.assign({}, s, { btcScenario: sc });
       var r = computeAll(sCopy);
       var delta = r.path.totalWealth - r.keep.totalWealth;
+
+      // Effective CAGR display — derived dynamically from Power Law data
+      // and the current holding period, so the number recalibrates as
+      // the user drags the holding-period slider or as TODAY_PRICE
+      // updates from the live fetch.
+      var effCAGRPct = effectiveCAGR(sc, s.holdingYears) * 100;
+      var rateEl = chip.querySelector('.calc-cagr-chip-rate');
+      if (rateEl) rateEl.textContent = '~' + effCAGRPct.toFixed(0) + '% CAGR';
+
       var deltaEl = chip.querySelector('.calc-cagr-chip-delta');
       if (!deltaEl) {
         deltaEl = document.createElement('span');
@@ -729,6 +879,13 @@
       deltaEl.style.color = delta > 0 ? 'var(--green)' : '#e07a6d';
       chip.classList.toggle('active', sc === s.btcScenario);
     });
+
+    // Update the current-multiple readout above the chips if present
+    var mEl = document.getElementById('calc-current-multiple');
+    if (mEl) {
+      var mult = currentBTCMultiple();
+      mEl.textContent = mult.toFixed(2) + '\u00d7 trend';
+    }
   }
 
   function bindCAGRChips(){
@@ -764,7 +921,6 @@
     renderPathDetail(results, state);
     renderCAGRChips(state);
     renderChart(state);
-    renderChartLegend(state);
     renderSpecificCallout(state);
   }
 
@@ -872,7 +1028,36 @@
       grp.style.display = grp.dataset.forPath.split(',').indexOf(String(state.path)) >= 0 ? '' : 'none';
     });
 
-    rerender();
+    // Render everything EXCEPT the chart. The chart waits for the
+    // calculator tab to activate (STYLE_GUIDE §6.14 — Chart.js charts
+    // initialized inside a display:none container suffer stale layout
+    // cache). The headline / table / chips / detail / callout all
+    // render fine in the hidden tab.
+    var results = computeAll(state);
+    renderHeadline(results, state);
+    renderComparison(results, state);
+    renderPathDetail(results, state);
+    renderCAGRChips(state);
+    renderSpecificCallout(state);
+    renderChartLegend();  // static legend markup; toggle handlers persist
+
+    // Hook into tab activation: build / refresh the chart only when the
+    // calculator tab becomes visible.
+    window.addEventListener('bvrp:tab-activated', function(e){
+      if (e.detail && e.detail.tabId === 'calculator') {
+        // Defer one frame so the panel's display:block has taken effect
+        // and the canvas has real dimensions before Chart.js measures it.
+        setTimeout(function(){ renderChart(state); }, 16);
+      }
+    });
+
+    // Edge case: page loaded with #calculator in URL — calculator tab
+    // is already active on initial render. Detect that and build the
+    // chart immediately (one tick out, after layout settles).
+    var calcPanel = document.getElementById('panel-calculator');
+    if (calcPanel && calcPanel.classList.contains('active')) {
+      setTimeout(function(){ renderChart(state); }, 16);
+    }
   }
 
   if (document.readyState === 'loading') {
@@ -918,6 +1103,12 @@
         }
       }
     }
+    // Notify any per-panel initializers that this tab is now visible.
+    // Consumed by the calculator IIFE to lazy-init Chart.js (avoids the
+    // hidden-tab layout-cache bug — STYLE_GUIDE §6.14).
+    window.dispatchEvent(new CustomEvent('bvrp:tab-activated', {
+      detail: { tabId: tabId }
+    }));
   }
 
   function initTabFromHash(){
