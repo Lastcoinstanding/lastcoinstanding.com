@@ -24,7 +24,7 @@ eleventyComputed:
      retirement curve) + Bitcoin vs. The Stock Market (live mini
      3-line wealth chart). These are the two highest-leverage
      personal-decision tools.
-   - Tools grid (9 tiles, 3-col on desktop): the remaining
+   - Tools grid (10 tiles, 3-col on desktop): the remaining
      Numbers-tier calculators plus the two Arguments-tier interactive
      ones (Half-Life, Melting Ice Cube).
 
@@ -153,6 +153,31 @@ eleventyComputed:
         <div class="calc-tile-body">
           <h3 class="calc-tile-name">BTC vs. Real Estate</h3>
           <p class="calc-tile-tagline">Bitcoin or a house &mdash; looking back, or projecting forward? Full mortgage and ownership costs included.</p>
+          <span class="calc-tile-cta">Open &rarr;</span>
+        </div>
+      </a>
+
+      {# BTC vs. Rental Property — small rental house + bitcoin "For Sale" sign — landlord-exit framing #}
+      <a href="/bitcoin-vs-rental-property.html#calculator" class="calc-tile">
+        <div class="calc-tile-preview">
+          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+            <!-- Small rental house on left -->
+            <path d="M10 30L24 18L38 30" stroke="#e09422" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M14 28V50H34V28" stroke="#e09422" stroke-width="1.4" stroke-linejoin="round" fill="rgba(224,148,34,0.05)"/>
+            <!-- Small window in house -->
+            <rect x="19" y="34" width="10" height="8" stroke="#e09422" stroke-width="1" fill="none" opacity="0.6"/>
+            <!-- For Sale sign post -->
+            <line x1="56" y1="50" x2="56" y2="26" stroke="#e09422" stroke-width="1.2" opacity="0.7"/>
+            <!-- Sign with bitcoin glyph -->
+            <rect x="44" y="18" width="22" height="12" stroke="#F7931A" stroke-width="1.4" fill="rgba(247,147,26,0.10)"/>
+            <text x="55" y="28" text-anchor="middle" fill="#F7931A" font-size="10" font-weight="700" font-family="sans-serif">&#8383;</text>
+            <!-- Subtle arrow from house to bitcoin sign -->
+            <line x1="38" y1="34" x2="46" y2="28" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2" opacity="0.45"/>
+          </svg>
+        </div>
+        <div class="calc-tile-body">
+          <h3 class="calc-tile-name">BTC vs. Rental Property</h3>
+          <p class="calc-tile-tagline">Bitcoin or rental property &mdash; the honest yield comparison once landlord costs and tax leakage are surfaced.</p>
           <span class="calc-tile-cta">Open &rarr;</span>
         </div>
       </a>
