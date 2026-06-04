@@ -686,24 +686,37 @@ eleventyComputed:
           <div class="calc-slider-group-label">Tax profile</div>
 
           <div class="calc-slider-row">
-            <span class="calc-slider-name">State</span>
+            <span class="calc-slider-name">State
+              <span class="help-tip" tabindex="0">?<span class="tip-content">
+                State capital gains tax rate applied to the rental sale. Default is a typical ~5% rate &mdash; select your actual state for an accurate calculation. Rates vary widely (0% in TX/FL/NV/WA/TN to 13.3% in CA).
+              </span></span>
+            </span>
             <select id="calc-state" class="calc-select">
-              <option value="CA" selected>California (13.3%)</option>
-              <option value="NY">New York (10.9%)</option>
-              <option value="NJ">New Jersey (10.75%)</option>
-              <option value="OR">Oregon (9.9%)</option>
-              <option value="MN">Minnesota (9.85%)</option>
-              <option value="MA">Massachusetts (5.0%)</option>
-              <option value="IL">Illinois (4.95%)</option>
-              <option value="GA">Georgia (5.39%)</option>
-              <option value="NC">North Carolina (4.5%)</option>
-              <option value="AZ">Arizona (2.5%)</option>
+              <option value="OTHER" selected>Typical / average (~5%)</option>
               <option value="TX">Texas (0%)</option>
               <option value="FL">Florida (0%)</option>
               <option value="NV">Nevada (0%)</option>
               <option value="WA">Washington (0%)</option>
               <option value="TN">Tennessee (0%)</option>
-              <option value="OTHER">Other (~5%)</option>
+              <option value="AZ">Arizona (2.5%)</option>
+              <option value="IN">Indiana (3.0%)</option>
+              <option value="PA">Pennsylvania (3.07%)</option>
+              <option value="CO">Colorado (4.4%)</option>
+              <option value="MI">Michigan (4.25%)</option>
+              <option value="NC">North Carolina (4.5%)</option>
+              <option value="IL">Illinois (4.95%)</option>
+              <option value="MA">Massachusetts (5.0%)</option>
+              <option value="GA">Georgia (5.39%)</option>
+              <option value="WI">Wisconsin (7.65%)</option>
+              <option value="IA">Iowa (8.53%)</option>
+              <option value="VT">Vermont (8.75%)</option>
+              <option value="MN">Minnesota (9.85%)</option>
+              <option value="OR">Oregon (9.9%)</option>
+              <option value="DC">DC (10.75%)</option>
+              <option value="NJ">New Jersey (10.75%)</option>
+              <option value="NY">New York (10.9%)</option>
+              <option value="HI">Hawaii (11.0%)</option>
+              <option value="CA">California (13.3%)</option>
             </select>
           </div>
 

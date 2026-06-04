@@ -112,7 +112,7 @@
     propertyValue: 500000,
     netRentalYield: 4.4,       // % net (post-waterfall)
     holdingYears: 10,
-    stateCode: 'CA',
+    stateCode: 'OTHER',          // typical ~5% — user selects their actual state for accuracy
     federalBracketPct: 24,     // 12, 22, 24, 32, 35, 37
     adjustedBasisPct: 60,      // % of current value
     yearsAlreadyHeld: 10,
@@ -909,7 +909,7 @@
         '<div><span>Net proceeds</span><strong>' + fmtMoneyFull(r.netProceeds) + '</strong></div>' +
         '<div><span>Depreciation recapture (25%)</span><strong>-' + fmtMoneyFull(r.recaptureTax) + '</strong></div>' +
         '<div><span>Federal LTCG</span><strong>-' + fmtMoneyFull(r.ltcgTax) + '</strong></div>' +
-        '<div><span>State tax (' + s.stateCode + ')</span><strong>-' + fmtMoneyFull(r.stateTax) + '</strong></div>' +
+        '<div><span>State tax (' + (s.stateCode === 'OTHER' ? 'typical ~5%' : s.stateCode) + ')</span><strong>-' + fmtMoneyFull(r.stateTax) + '</strong></div>' +
         '<div><span>NIIT</span><strong>-' + fmtMoneyFull(r.niit) + '</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Net cash deployed to bitcoin</span><strong>' + fmtMoneyFull(r.netCash) + '</strong></div>' +
         '<div><span>All-in leakage from gross sale</span><strong>' + fmtPct(r.effectiveLeakagePct) + '</strong></div>' +
@@ -1070,16 +1070,21 @@
   function renderSpecificCallout(s){
     var el = document.getElementById('calc-specific-callout');
     if (!el) return;
-    var stateName = s.stateCode === 'OTHER' ? 'your state' : s.stateCode;
+    var isTypical = s.stateCode === 'OTHER';
+    var stateName = isTypical ? 'a typical state' : s.stateCode;
     var stateRate = STATE_CAPGAIN[s.stateCode] !== undefined ? STATE_CAPGAIN[s.stateCode] : STATE_CAPGAIN.OTHER;
     var brktLabel = s.federalBracketPct + '% federal bracket';
+    var statePrompt = isTypical
+      ? ' <strong>Pick your actual state above for an accurate calculation</strong> &mdash; state cap-gains rates vary from 0% (TX, FL, NV, WA, TN) to 13.3% (CA), and the rental sale\u2019s tax leakage moves materially with this input.'
+      : '';
     var pathSpecific = '';
-    if (s.path === 2) pathSpecific = ' Your HELOC rate, CLTV, and qualification depend on your specific lender — the ' + s.helocRatePct + '% rate above is representative, not a quote.';
+    if (s.path === 2) pathSpecific = ' Your HELOC rate, CLTV, and qualification depend on your specific lender &mdash; the ' + s.helocRatePct + '% rate above is representative, not a quote.';
     if (s.path === 1 || s.path === 4) pathSpecific = ' The depreciation recapture and capital gains math above assumes a single transaction; consult a CPA before acting.';
 
     el.innerHTML =
       '<strong>Where this gets specific to you:</strong> Tax math is based on ' + stateName +
       ' (' + stateRate.toFixed(1) + '% state capital-gains rate) and ' + brktLabel + '.' +
+      statePrompt +
       pathSpecific +
       ' This calculator is decision framing, not personalized financial, tax, or legal advice.';
   }
