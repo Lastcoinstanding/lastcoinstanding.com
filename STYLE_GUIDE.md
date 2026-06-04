@@ -694,21 +694,21 @@ Phase 1B reorganized the site's flat exploration list into three content-charact
 
 A fourth top-level link (Calculators) leads to the standalone calculator constellation page (Commit 2 of Phase 1B). About remains its own top-level link.
 
-**Schema:** every entry in `_data/explorations.json` has these fields:
+**Schema:** every entry in `_data/explorations.json` has these required base fields:
 
 ```json
 {
   "slug": "the-half-life",
   "title": "The Half-Life",
   "category": "arguments",
-  "interactive": true,
-  "is_calculator": false
+  "interactive": true
 }
 ```
 
-- `category` (string, required): one of `foundations`, `arguments`, `numbers`. Determines which dropdown the entry appears under.
+- `category` (string, required): one of `foundations`, `arguments`, `numbers`. Determines which dropdown the entry appears under. Two additional category values (`hub`) exist for non-dropdown pages — base.njk only iterates the three nav buckets above.
 - `interactive` (boolean, required): `true` if the page has interactive UI elements (input fields, sliders, button-driven calculations, scrubbable charts). Items with `interactive: true` get a small amber dot marker (•) next to their nav link, marketing the site's character as an interactive tool collection rather than flat essays. Marker class is `.nav-interactive-marker`. Each dropdown menu shows a small italic legend at its bottom (`.nav-dropdown-legend`) reading *"• indicates pages with interactive tools"* so the meaning is discoverable in context. The mobile overlay shows a single legend at the bottom (`.mobile-legend`).
-- `is_calculator` (boolean, required): `true` ONLY for personal-decision tools — calculators that take inputs about the user's life (their home price, their bitcoin holdings, their retirement age, etc.) and help them make or evaluate a real-life decision. By this stricter definition: BvRE, Power Law (forward tab), and the future retirement calculator are calculators. Half-Life, MIC, Fixed Share, Horizon are interactive demonstrations or projections without a personal decision-support frame; they get `is_calculator: false`. The Calculators constellation page reads from this flag to populate its content.
+
+**Optional `calculator_tile` block** — entries that should also appear as a tile on the `/calculators` constellation page carry an additional object. The presence of this block (not a separate boolean) is the single source of truth for /calculators inclusion. See §6.9.1 for the full schema and the rationale behind the data-driven refactor that removed the previous `is_calculator` boolean.
 
 **Active-state behavior:** when the user is on a page in bucket X, the bucket-X dropdown button gets the active styling (amber color, amber-tint background, font-weight 600). Other dropdowns stay default. The link to the current page within its dropdown also gets the active styling. About is its own top-level link with separate active handling. This is implemented via a single `currentCat` lookup at the top of the nav block in `base.njk` that finds the current page's category from the explorations data.
 
@@ -718,23 +718,52 @@ A fourth top-level link (Calculators) leads to the standalone calculator constel
 
 **Multi-dropdown JS:** the canonical nav JS in `base.njk` was updated to handle multiple dropdowns. Each dropdown's button toggles its own dropdown (closing the others first); click-outside closes all. The previous single-dropdown `querySelector` was replaced with iteration over `querySelectorAll('.nav-dropdown')`. Hover-open still works on desktop via CSS; click-toggle is for mobile/touch.
 
-**Adding a new page:** set `category`, `interactive`, and `is_calculator` in the explorations data. The page automatically appears in the right dropdown, with the right marker, and is automatically picked up by the constellation page if applicable. No nav-rendering changes required.
+**Adding a new page:** set `category` and `interactive` in the explorations data. The page automatically appears in the right dropdown with the right marker. If the page is also a calculator that should appear on /calculators, add a `calculator_tile` block per §6.9.1. No template changes required for either nav or /calculators.
 
 ### 6.9.1 Calculators constellation page (`/calculators.html`)
 
-A standalone destination at `/calculators.html` that introduces every personal-decision calculator with a card description, separate from the bucket dropdowns. Accessible via the top-level "Calculators" nav slot (between The Numbers and About). Reached two ways: directly via the standalone link, and indirectly via The Numbers dropdown for users navigating by content character.
+A standalone destination at `/calculators.html` that introduces every interactive calculator and decision-support tool on the site. Accessible via the top-level "Calculators" nav slot (between The Numbers and About). Reached two ways: directly via the standalone link, and indirectly via The Numbers dropdown for users navigating by content character.
 
-**Why a separate page rather than just a dropdown:** dropdowns can only show names. The constellation page introduces each calculator with a one-or-two-sentence description framing the question it answers (*"What if you'd bought bitcoin instead of a house?"* / *"What should I do with my buying decision today?"*). This is decision-support orientation, not just a list — it helps users pick the right tool for *their* question.
+**Why a separate page rather than just a dropdown:** dropdowns can only show names. The constellation page introduces each calculator with a one-line tagline framing the question it answers (*"When can I retire on bitcoin?"* / *"Bitcoin or a house — looking back, or projecting forward?"*). This is decision-support orientation, not just a list — it helps users pick the right tool for *their* question. Six tiles also carry a *live* mini-chart preview (rendered by `calculators-minis.js`) so the reader sees the actual shape of the tool's output before clicking in.
 
-**Content character:** the constellation page features only `is_calculator: true` items, per the strict definition codified in §6.9 (personal-decision tools that take inputs about the user's life and help them make or evaluate a real decision). Currently: BvRE, Power Law (forward tab), and the future retirement calculator. Interactive demonstrations like Half-Life, MIC, Fixed Share, and Horizon are surfaced via The Numbers / The Arguments dropdowns and via a closing "nav-hint" paragraph on the constellation page itself, but they don't get a tile.
+**Content character:** the page currently shows 12 tiles — 2 in a Featured row up top (The Bitcoin Retirement + BvSM) and 10 in the "All calculators" grid. The set spans personal-decision calculators (BvRE, BvRP, Disciplined Rebalancing, Borrowing, BBM, BvSM, Retirement) and interactive demonstrations (Power Law channel, Horizon, Fixed Share, Half-Life, MIC). The previous "strict" definition (`is_calculator: true` only for personal-decision tools with user-life inputs) has been retired — the page is broader than that in practice, and a `calculator_tile` block on any sufficiently interactive entry is the new threshold for inclusion.
 
-**Card structure:** each tile (`.calc-tile`) has a name (Cormorant title), question line (italic amber, the user's-life framing), description prose, and CTA. Live tiles are anchor elements with hover-lift; coming-soon tiles are divs with the `.coming-soon` modifier (dimmed, no hover-lift, no functioning link). Cards link to the calculator's tab via URL fragment (e.g. `/the-power-law.html#calculator`) so the user lands directly on the working tab — relies on per-page tab handling to honor URL fragments (verified separately, per Phase 1B Commit 4).
+**Data-driven architecture (June 2026 refactor).** The page renders from `src/_data/explorations.json`. Every entry with a `calculator_tile` object becomes a tile; entries without that block don't. Tile order, copy, preview type, and href anchor all come from the registry. The `calculators.njk` template iterates the explorations data, splits by featured/non-featured, sorts by `position`, and renders.
 
-**Coming-soon pattern:** any tile that represents a planned-but-unbuilt page uses `.calc-tile.coming-soon` with a `.coming-soon-badge` in the corner reading "COMING SOON" (small caps, amber on amber-soft background, amber-dim border). The tile body shows the same name/question/description as a live tile so users see the conceptual shape, but the CTA reads "In development" instead of "Open" and the card is dimmed to ~65% opacity. **This pattern is reusable site-wide** — any forthcoming page (future explorations, Substack articles, YouTube videos) can adopt the same `.coming-soon` modifier on similar card structures. When the page ships, switch the tile from `<div class="calc-tile coming-soon">` to `<a href="..." class="calc-tile live">` and remove the badge.
+**`calculator_tile` schema:**
 
-**Hero copy:** the page lede reads *"Tools to help you think through Bitcoin decisions in your own life — past, present, and future."* This frames the constellation as decision-support, not feature-showcase. Subordinate caveat line acknowledges the exploration/risk framing that Phase 1C will later codify into a tool-framing strip across all calculator pages.
+```json
+"calculator_tile": {
+  "tagline": "...",
+  "preview_kind": "svg" | "live-chart",
+  "preview_id": "mini-bvsm-chart",
+  "anchor": "#calculator",
+  "featured": false,
+  "position": 5
+}
+```
 
-**Adding a new calculator to the constellation:** edit `src/calculators.njk` directly to add a new `<a class="calc-tile live">` (or coming-soon `<div>`). The constellation page is intentionally NOT data-driven from `_data/explorations.json` — it's a curated destination with deliberate ordering, descriptions, and question framings that don't fit a flat schema. Update the `is_calculator: true` flag on the corresponding explorations entry too, for consistency. Both updates happen in the same commit when a new calculator ships.
+- `tagline` (required) — one-line copy in the editorial register. HTML entities allowed (rendered with `| safe`).
+- `preview_kind` (required) — `"svg"` for a static custom SVG icon; `"live-chart"` for a JS-rendered mini-chart preview.
+- `preview_id` (required if `preview_kind === "live-chart"`) — DOM id that `calculators-minis.js` looks up in its renderer map. Adding a new live-chart tile means wiring a new renderer in that file too.
+- `anchor` (optional, defaults to `"#calculator"`) — appended to the tile href. Set `""` for single-pane pages (Half-Life, MIC, Fixed Pie). Set custom value (`#bvsmCalc`, `#channel`, `#explorer`) where the calculator lives at a different anchor.
+- `featured` (optional, defaults `false`) — top row vs. grid placement.
+- `position` (required) — integer sort key. Featured and grid both sort by this; lower numbers come first.
+
+**SVG icons.** For `preview_kind: "svg"` tiles, the SVG markup lives at `src/_includes/components/calc-tile-icons/<slug>.njk` and is auto-resolved by slug. Each file is just the inner `<svg viewBox="0 0 80 60">…</svg>`. The 80×60 viewBox is the family convention; use amber `#e09422` for outline strokes, bitcoin orange `#F7931A` for the bitcoin glyph and primary accent, and 5–10% opacity fills.
+
+**Custom Nunjucks filter.** A small `sortByCalculatorTilePosition` filter is registered in `.eleventy.js` for the position-based sort (Nunjucks doesn't have a clean one-liner for sorting by a nested object property). The filter is local to the `/calculators` page; everywhere else the explorations registry is used in its source order (which dictates nav dropdown order).
+
+**Why no per-tile JSON for SVG markup.** Inline SVG in JSON requires aggressive escaping (every quote, every `<` and `>`) and is unreadable. Per-slug `.njk` files keep the markup editable and version-controlled in a sensible form. The cost is one extra file per svg-preview tile; the alternative is one massive escaped string.
+
+**Adding a new calculator tile.** Two steps:
+
+1. Add the `calculator_tile` block to the page's entry in `src/_data/explorations.json` per the schema above.
+2. If `preview_kind: "svg"`, create the SVG markup at `src/_includes/components/calc-tile-icons/<slug>.njk`. If `preview_kind: "live-chart"`, add a renderer in `src/_includes/_pageassets/calculators-minis.js` and register it in the `{ id → render-function }` map at the bottom of that file.
+
+No edits to `calculators.njk` required for either case.
+
+**Removing a tile.** Delete the `calculator_tile` block (the entry stays in the registry for the nav dropdown).
 
 ### 6.10 Related component (cross-reference cards)
 

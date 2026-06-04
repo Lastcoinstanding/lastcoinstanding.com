@@ -56,8 +56,7 @@ Add a new entry to the array:
   "slug": "<slug>",
   "title": "<Display Title>",
   "category": "<foundations | arguments | numbers>",
-  "interactive": true | false,
-  "is_calculator": true | false
+  "interactive": true | false
 }
 ```
 
@@ -66,12 +65,51 @@ Add a new entry to the array:
 - **`interactive`** — `true` if the page has buttons, sliders, scrubbable
   charts, or any user-driven UI. Adds the amber • marker next to the
   nav link.
-- **`is_calculator`** — `true` *only* for personal-decision tools that
-  take inputs about the user's life (home price, retirement age, target
-  income, etc.). Decision-implying pages without personal inputs (e.g.
-  BvSM's hypothetical-amount calculator) get `false`. See `STYLE_GUIDE
-  §6.9` for the strict definition; this flag controls inclusion on the
-  Calculators constellation page.
+
+If the page should appear on the `/calculators` constellation page, add a
+`calculator_tile` object to the same entry. The presence of this block is
+the single source of truth for /calculators inclusion (the page is
+data-driven from this registry; see `STYLE_GUIDE §6.9.1`):
+
+```json
+"calculator_tile": {
+  "tagline": "One-line copy describing what the calculator answers, in the editorial register. HTML entities ok (&mdash;, &rsquo;, etc.).",
+  "preview_kind": "svg",
+  "anchor": "#calculator",
+  "featured": false,
+  "position": 5
+}
+```
+
+- **`tagline`** (required) — one-line copy for the tile body. Short
+  declarative em-dash structure matches the family voice (e.g. *"Bitcoin
+  or a house — looking back, or projecting forward?"*).
+- **`preview_kind`** (required) — `"svg"` or `"live-chart"`.
+  - For `"svg"`: create a markup file at
+    `src/_includes/components/calc-tile-icons/<slug>.njk` containing the
+    inline `<svg viewBox="0 0 80 60">…</svg>`. The template
+    auto-resolves it by slug.
+  - For `"live-chart"`: add a `"preview_id": "mini-<something>"` to the
+    block and wire a renderer in `src/_includes/_pageassets/calculators-minis.js`
+    via the `{ id → render-function }` map near the bottom of that file.
+- **`anchor`** (optional, defaults to `"#calculator"`) — appended to the
+  tile href. Set to `""` for single-pane pages that have no tab anchor
+  (Half-Life, MIC, Fixed Pie). Set to a custom value (`#bvsmCalc`,
+  `#channel`, `#explorer`) for pages whose calculator lives at a
+  different anchor.
+- **`featured`** (optional, defaults to `false`) — `true` places the
+  tile in the top Featured row with the large-card styling. Reserved
+  for the two highest-leverage personal-decision tools (currently
+  Bitcoin Retirement and BvSM).
+- **`position`** (required) — integer sort key. Featured and grid
+  sections are sorted by position independently, so featured entries
+  should have the lowest positions overall and grid entries should
+  number sequentially from there.
+
+Note: the previous boolean `is_calculator` flag was retired in the June 2026
+data-driven refactor. The flag was dead code (no template read it) and its
+documented semantic ("personal-decision tools with user inputs only") had
+drifted from the page's actual contents.
 
 Validate the JSON after editing — HTML quotes inside JSON strings must be
 single-quoted or unicode-escaped:
@@ -428,7 +466,7 @@ Before announcing the page or sharing the URL externally:
 
 For reference, the BvSM launch ran through this checklist as follows:
 
-- **§3 explorations.json** — added `{slug: "bitcoin-vs-the-stock-market", category: "numbers", interactive: true, is_calculator: false}`
+- **§3 explorations.json** — added `{slug: "bitcoin-vs-the-stock-market", category: "numbers", interactive: true, calculator_tile: {tagline: "…", preview_kind: "live-chart", preview_id: "mini-bvsm-chart", anchor: "#bvsmCalc", featured: true, position: 2}}` (the `calculator_tile.featured: true` puts it in the top Featured row alongside The Bitcoin Retirement)
 - **§3 sitemap.xml** — added `<url><loc>...bitcoin-vs-the-stock-market</loc><priority>0.9</priority></url>`
 - **§4 related** — linked from BvSM to Power Law, Bitcoin Retirement, BvRE, Disciplined Rebalancing; bidirectional links added on those pages too
 - **§5 homepage** — concept card in The Numbers subsection with custom three-curves SVG icon (one rising amber line plus two flatter sage/blue-grey lines)

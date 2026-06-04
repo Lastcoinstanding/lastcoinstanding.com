@@ -850,7 +850,7 @@ Phase 4 strengthens this reading order by separating *application* (BvSM, BvRE, 
 
 ## 19. Bitcoin vs. The Stock Market (`/bitcoin-vs-the-stock-market.html`)
 
-**Added:** May 2026. A decision-frame page for the bitcoin-vs-equities question, structured as a four-section progressive argument that uses the Power Law as the structural reference and the historical record as the stress test. Sits in The Numbers bucket per `_data/explorations.json` (`category: "numbers"`, `interactive: true`, `is_calculator: false` — the calculator takes a hypothetical dollar amount but does not take inputs about the user's life, so it doesn't earn a tile on the Calculators constellation page).
+**Added:** May 2026. A decision-frame page for the bitcoin-vs-equities question, structured as a four-section progressive argument that uses the Power Law as the structural reference and the historical record as the stress test. Sits in The Numbers bucket per `_data/explorations.json` (`category: "numbers"`, `interactive: true`) and earns a Featured tile on `/calculators` via its `calculator_tile` block (the live-chart `mini-bvsm-chart` preview, anchor `#bvsmCalc`, position 2 alongside The Bitcoin Retirement at position 1). The previous "strict" inclusion criterion for /calculators (personal-decision tools only, requiring user-life inputs) was retired in the June 2026 data-driven refactor — BvSM's hypothetical-amount calculator now qualifies on the broader threshold of "interactive calculator worth surfacing on /calculators."
 
 ### Four-section progressive arc
 
@@ -1135,7 +1135,7 @@ The BTC growth slider reads its initial value from `ModelingAssumptions.get('btc
 
 ## 23. Bitcoin Defined (`/bitcoin-defined.html`)
 
-**Added:** earlier (pre-May 2026, as essay format). **Rebuilt as carousel:** May 2026. A Foundations page that defines Bitcoin in a single sentence and unpacks each of its eight load-bearing ideas one at a time. Sits in the Foundations bucket per `_data/explorations.json` (`category: "foundations"`, `interactive: true`, `is_calculator: false`).
+**Added:** earlier (pre-May 2026, as essay format). **Rebuilt as carousel:** May 2026. A Foundations page that defines Bitcoin in a single sentence and unpacks each of its eight load-bearing ideas one at a time. Sits in the Foundations bucket per `_data/explorations.json` (`category: "foundations"`, `interactive: true`; no `calculator_tile` block — it's not a calculator).
 
 ### Editorial framing — definition, not argument
 
