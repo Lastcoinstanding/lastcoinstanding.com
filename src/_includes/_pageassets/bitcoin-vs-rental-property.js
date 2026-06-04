@@ -555,7 +555,12 @@
   // path-detail numbers. All four lines are simultaneously visible by
   // default; user can toggle individual lines via the custom legend.
   var chartInstance = null;
-  var legendVisibility = { 0: true, 1: true, 2: true, 3: true };
+  // Legend visibility defaults: keep-rental + the default-primary
+  // scenario (trend) visible; other two scenarios hidden but
+  // toggleable. User clicking a different chip auto-hides the old
+  // primary and shows the new one; manual toggles on the other two
+  // persist across chip switches.
+  var legendVisibility = { 0: true, 1: false, 2: true, 3: false };
   var chartZoom = 'full';  // 'full' | 'first3' — toggleable via UI above the chart
 
   // Colors for the four datasets — distinguishable on dark, semantically
@@ -701,42 +706,48 @@
     });
   }
 
+  // Per-scenario tooltip content — DRY across chip help-tips and legend
+  // help-tips. Caller may pass scenario codes 'stay' | 'trend' | 'upper'.
+  // 'stay' is conditional on current multiple: below trend → bear /
+  // no-reversion case; above trend → bull / no-correction case;
+  // within ±5% of 1.0× → neutral.
+  function scenarioTipHTML(scenario){
+    if (scenario === 'stay') {
+      var mult = currentBTCMultiple();
+      if (mult < 0.95) {
+        return 'Bitcoin grows at the Power Law trend rate from today\u2019s price, never reverting up to trend. The bear / no-reversion case &mdash; you get just trend growth and miss the catch-up upside an under-trend entry would normally deliver.';
+      }
+      if (mult > 1.05) {
+        return 'Bitcoin grows at the Power Law trend rate from today\u2019s price, never correcting down to trend. The bull / no-correction case &mdash; you keep the premium permanently and avoid the downside risk of mean reversion.';
+      }
+      return 'Bitcoin grows at the Power Law trend rate from today\u2019s price (which is currently at trend). At ~1\u00d7 trend, this case is roughly equivalent to Revert to trend.';
+    }
+    if (scenario === 'trend') {
+      return 'Bitcoin moves from today\u2019s multiple back to 1.0\u00d7 the Power Law trend linearly over the holding period. The central case &mdash; assumes today\u2019s discount-or-premium-to-trend closes over time.';
+    }
+    if (scenario === 'upper') {
+      return 'Bitcoin drifts toward 2.5\u00d7 trend (the historical above-cycle peak) over the holding period. <strong>Not a trendline expectation</strong> &mdash; rather a recognition that bitcoin has historically <em>spiked</em> to ~2.5\u00d7 trend in cycle peaks, and that such spikes have <em>never been sustained</em>. Worth modeling as a potential window for disciplined rebalancing or partial divestment &mdash; see <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>.';
+    }
+    return '';
+  }
+
   // Custom legend: clickable items toggle dataset visibility. Pattern
   // adapted from the-bitcoin-retirement.js wireLegendToggles().
   // Help-tip clicks inside legend items are excluded so the ? glyph
   // never toggles the line — it has its own hover/focus behavior.
-  //
-  // 'Stay at current multiple' tooltip is conditional: if today's
-  // bitcoin sits BELOW trend (multiple < 1.0), it's the bear / no-
-  // reversion case (you get just trend growth, missing the catch-up
-  // upside). If today's bitcoin sits ABOVE trend (multiple > 1.0),
-  // it's the bull / no-correction case (you keep the premium and
-  // miss the downside risk of mean reversion).
   function renderChartLegend(){
     var el = document.getElementById('calc-chart-legend');
     if (!el) return;
-    var mult = currentBTCMultiple();
-    var stayTip;
-    if (mult < 0.95) {
-      stayTip = 'Bitcoin grows at the Power Law trend rate from today\u2019s price, never reverting up to trend. The bear / no-reversion case &mdash; you get just trend growth and miss the catch-up upside an under-trend entry would normally deliver.';
-    } else if (mult > 1.05) {
-      stayTip = 'Bitcoin grows at the Power Law trend rate from today\u2019s price, never correcting down to trend. The bull / no-correction case &mdash; you keep the premium permanently and avoid the downside risk of mean reversion.';
-    } else {
-      stayTip = 'Bitcoin grows at the Power Law trend rate from today\u2019s price (which is at trend). With today at ~1\u00d7 trend, this case is roughly equivalent to Revert to trend.';
-    }
-
-    var upperTip = 'Bitcoin drifts toward 2.5\u00d7 trend (the historical above-cycle peak) over the holding period. <strong>Not a trendline expectation</strong> &mdash; rather a recognition that bitcoin has historically <em>spiked</em> to ~2.5\u00d7 trend in cycle peaks, and that such spikes have <em>never been sustained</em>. Worth modeling as a potential window for disciplined rebalancing or partial divestment &mdash; see <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>.';
-
     var rows = [
       { idx: 0, label: 'Keep rental', color: CHART_COLORS.rental, dashed: true,
         tip: 'Net wealth if you keep the rental, collecting after-tax cash flow each year. Mark-to-market &mdash; the property\u2019s market value is included without applying the exit tax that would arise on sale.' },
       { idx: 1, label: 'Bitcoin \u00b7 Stay at current trend multiple', color: CHART_COLORS.stay,
-        tip: stayTip },
+        tip: scenarioTipHTML('stay') },
       { idx: 2, label: 'Bitcoin \u00b7 Revert to Power Law trend', color: CHART_COLORS.trend,
-        tip: 'Bitcoin moves from today\u2019s multiple back to 1.0\u00d7 the Power Law trend linearly over the holding period. The central case &mdash; assumes today\u2019s discount-or-premium-to-trend closes over time.' },
+        tip: scenarioTipHTML('trend') },
       { idx: 3, label: 'Bitcoin \u00b7 Reach Power Law upper channel', color: CHART_COLORS.upper,
         dashed: true,  // visually less confident — matches dashed chart line
-        tip: upperTip }
+        tip: scenarioTipHTML('upper') }
     ];
     var html = rows.map(function(r){
       var off = legendVisibility[r.idx] ? '' : ' off';
@@ -976,6 +987,12 @@
       deltaEl.textContent = (delta > 0 ? '+' : '') + fmtMoney(delta);
       deltaEl.style.color = delta > 0 ? 'var(--green)' : '#e07a6d';
       chip.classList.toggle('active', sc === s.btcScenario);
+
+      // Chip tooltip — populates the .tip-content span inside the chip's
+      // own .help-tip. Re-runs every rerender so 'stay' picks up the
+      // current multiple's bull/bear/neutral framing.
+      var chipTipEl = chip.querySelector('.calc-chip-help .tip-content');
+      if (chipTipEl) chipTipEl.innerHTML = scenarioTipHTML(sc);
     });
 
     // Update the current-multiple readout above the chips if present
@@ -987,10 +1004,35 @@
   }
 
   function bindCAGRChips(){
+    // Scenario code → dataset index in the chart (and in legendVisibility)
+    var SCENARIO_IDX = { stay: 1, trend: 2, upper: 3 };
+
     document.querySelectorAll('.calc-cagr-chip').forEach(function(chip){
       chip.addEventListener('click', function(){
-        state.btcScenario = chip.dataset.scenario;
+        var newScenario = chip.dataset.scenario;
+        var oldScenario = state.btcScenario;
+        if (newScenario === oldScenario) return;
+
+        // Auto-swap visibility: hide the previously-primary scenario,
+        // show the newly-selected. Other scenarios retain their manual
+        // toggle state — so a user who turned 'Stay' on for comparison
+        // keeps it on when switching primary from Trend to Upper.
+        if (SCENARIO_IDX[oldScenario] !== undefined) {
+          legendVisibility[SCENARIO_IDX[oldScenario]] = false;
+        }
+        legendVisibility[SCENARIO_IDX[newScenario]] = true;
+
+        state.btcScenario = newScenario;
         rerender();
+      });
+    });
+
+    // Stop chip help-tip clicks from bubbling to the chip button.
+    // Without this, clicking the ? glyph would toggle the chip selection.
+    document.querySelectorAll('.calc-cagr-chip .calc-chip-help').forEach(function(help){
+      help.addEventListener('click', function(e){ e.stopPropagation(); });
+      help.addEventListener('keydown', function(e){
+        if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
       });
     });
   }

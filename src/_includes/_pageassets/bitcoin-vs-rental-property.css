@@ -1239,7 +1239,9 @@ html, body {
   color: var(--ink);
   line-height: 1.5;
   text-align: left;
-  letter-spacing: 0;
+  letter-spacing: normal !important;       /* override eyebrow letter-spacing inheritance */
+  text-transform: none !important;         /* override eyebrow uppercase inheritance */
+  font-style: normal;
   pointer-events: none;
   z-index: 20;
   box-shadow: 0 6px 18px rgba(0,0,0,0.5);
@@ -1545,4 +1547,21 @@ html, body {
   color: var(--ink);
   font-style: normal;
   font-weight: 600;
+}
+
+/* Chip help-tip positioning. The chip is a flex button with the help-tip
+   inline in the .calc-cagr-chip-name span. Anchor the tip-content to the
+   help-tip itself (already its parent context) and nudge upward so it
+   doesn't overlap the chip's text. */
+.calc-cagr-chip .calc-chip-help {
+  vertical-align: 1px;  /* align ? glyph with the chip name baseline */
+}
+.calc-cagr-chip .calc-chip-help .tip-content {
+  /* Override the default centered .tip-content positioning so it doesn't
+     get clipped by the chip's narrow width on desktop. Left-anchor at 0
+     and let the 240px card extend rightward. */
+  left: 0;
+  transform: none;
+  /* Slightly less width so it doesn't visually dominate the chip column */
+  width: 220px;
 }
