@@ -252,6 +252,7 @@
     var netCash = netProceeds - totalTax;
     return {
       grossSale: appreciatedValue,
+      marketValue: appreciatedValue,    // mark-to-market property value (no taxes/costs applied)
       transactionCosts: transactionCosts,
       netProceeds: netProceeds,
       accumulatedDep: accumulatedDep,
@@ -318,11 +319,23 @@
   }
 
   // ─── Counterfactual: keep rental ───
+  // Asset-value (mark-to-market) framing: keep-rental wealth is cumulative
+  // after-tax cash flow + the property's market value at year N. The exit
+  // tax that would arise on sale is NOT applied — we're showing the asset
+  // trajectory of someone who intends to keep holding. The path-detail
+  // card shows the tax waterfall explicitly for users who want to see
+  // the realizable-at-year-N number.
+  //
+  // This matches the visual framing of the chart: bitcoin paths pay their
+  // exit tax up front (year 0) so they start lower; keep-rental defers
+  // the exit tax indefinitely so it starts higher. The chart honestly
+  // shows the "selling has an immediate cost" reality the prior version
+  // silently hid by applying exit tax to both sides at year N.
   function calcKeepRental(s){
     var annual = calcRentalAnnualCF(s);
     var cumulativeCash = annual.afterTax * s.holdingYears;
     var exit = calcRentalExit(s, s.holdingYears);
-    var totalWealth = cumulativeCash + exit.netCash;
+    var totalWealth = cumulativeCash + exit.marketValue;  // unrealized
     return {
       annual: annual,
       cumulativeCash: cumulativeCash,
@@ -474,10 +487,12 @@
     for (var t = 0; t <= sUse.holdingYears; t++) {
       var growth = scenarioGrowthFactor(sUse.btcScenario, t, sUse.holdingYears);
 
-      // Keep rental: cumulative after-tax CF up to year t + net cash if sold at year t
+      // Keep rental at year t: cumulative after-tax cash + property market
+      // value at year t (mark-to-market, no exit tax applied). See
+      // calcKeepRental docblock for the framing rationale.
       var cumCash = rentalAnnual.afterTax * t;
       var exitAtT = calcRentalExit(sUse, t);
-      var wealthKeep = cumCash + exitAtT.netCash;
+      var wealthKeep = cumCash + exitAtT.marketValue;
 
       var wealthPath;
       if (sUse.path === 1) {
@@ -499,7 +514,7 @@
         });
         var retainedAnnual = calcRentalAnnualCF(retainedS);
         var retainedExit = calcRentalExit(retainedS, t);
-        wealthPath = ypVal + retainedAnnual.afterTax * t + retainedExit.netCash;
+        wealthPath = ypVal + retainedAnnual.afterTax * t + retainedExit.marketValue;
       } else {
         var exitNow4 = calcRentalExit(sUse, 0);
         wealthPath = calcYieldPortfolioAtYearT(exitNow4.netCash, sUse, t);
@@ -521,14 +536,17 @@
   // default; user can toggle individual lines via the custom legend.
   var chartInstance = null;
   var legendVisibility = { 0: true, 1: true, 2: true, 3: true };
+  var chartZoom = 'full';  // 'full' | 'first3' — toggleable via UI above the chart
 
   // Colors for the four datasets — distinguishable on dark, semantically
-  // ordered (rental amber → bear brown → trend green → upper bright green).
+  // ordered (rental amber → bear brown → trend green → upper cyan).
+  // Upper channel uses a distinct hue (not another green) and is dashed
+  // to reinforce its "less certain / less sustained" character.
   var CHART_COLORS = {
     rental:    '#e09422',  // amber, dashed
-    stay:      '#a87a4a',  // muted brown — bear/no-reversion
+    stay:      '#b87a4a',  // warm brown — bear/no-reversion
     trend:     '#5a8a3a',  // canonical site green — central/default
-    upper:     '#7cc24a'   // brighter green — upper channel
+    upper:     '#5fa8d8'   // cool blue — upper channel, also dashed
   };
 
   function renderChart(s){
@@ -539,11 +557,18 @@
     var trajTrend = calcWealthTrajectory(s, 'trend');
     var trajUpper = calcWealthTrajectory(s, 'upper');
 
-    var labels = trajTrend.map(function(r){ return 'Y' + r.year; });
-    var keepData  = trajTrend.map(function(r){ return r.wealthKeep; });
-    var pathStay  = trajStay.map(function(r){ return r.wealthPath; });
-    var pathTrend = trajTrend.map(function(r){ return r.wealthPath; });
-    var pathUpper = trajUpper.map(function(r){ return r.wealthPath; });
+    // Zoom: if 'first3', slice to the first 4 years (Y0..Y3) so the
+    // short-term tax-leakage dip is visible. Auto-scaling y-axis will
+    // tighten the value range around the smaller numbers, making the
+    // early dynamics legible.
+    var endIdx = chartZoom === 'first3' ? Math.min(3, s.holdingYears) : s.holdingYears;
+    function slice(arr){ return arr.slice(0, endIdx + 1); }
+
+    var labels = slice(trajTrend).map(function(r){ return 'Y' + r.year; });
+    var keepData  = slice(trajTrend).map(function(r){ return r.wealthKeep; });
+    var pathStay  = slice(trajStay).map(function(r){ return r.wealthPath; });
+    var pathTrend = slice(trajTrend).map(function(r){ return r.wealthPath; });
+    var pathUpper = slice(trajUpper).map(function(r){ return r.wealthPath; });
 
     function primary(scenario){ return scenario === s.btcScenario; }
 
@@ -594,6 +619,7 @@
         borderColor: CHART_COLORS.upper,
         backgroundColor: CHART_COLORS.upper,
         borderWidth: primary('upper') ? 2.75 : 1.5,
+        borderDash: [5, 4],  // dashed — historical spikes, never sustained
         pointRadius: 0,
         pointHoverRadius: 5,
         fill: false,
@@ -659,18 +685,38 @@
   // adapted from the-bitcoin-retirement.js wireLegendToggles().
   // Help-tip clicks inside legend items are excluded so the ? glyph
   // never toggles the line — it has its own hover/focus behavior.
+  //
+  // 'Stay at current multiple' tooltip is conditional: if today's
+  // bitcoin sits BELOW trend (multiple < 1.0), it's the bear / no-
+  // reversion case (you get just trend growth, missing the catch-up
+  // upside). If today's bitcoin sits ABOVE trend (multiple > 1.0),
+  // it's the bull / no-correction case (you keep the premium and
+  // miss the downside risk of mean reversion).
   function renderChartLegend(){
     var el = document.getElementById('calc-chart-legend');
     if (!el) return;
+    var mult = currentBTCMultiple();
+    var stayTip;
+    if (mult < 0.95) {
+      stayTip = 'Bitcoin grows at the Power Law trend rate from today\u2019s price, never reverting up to trend. The bear / no-reversion case &mdash; you get just trend growth and miss the catch-up upside an under-trend entry would normally deliver.';
+    } else if (mult > 1.05) {
+      stayTip = 'Bitcoin grows at the Power Law trend rate from today\u2019s price, never correcting down to trend. The bull / no-correction case &mdash; you keep the premium permanently and avoid the downside risk of mean reversion.';
+    } else {
+      stayTip = 'Bitcoin grows at the Power Law trend rate from today\u2019s price (which is at trend). With today at ~1\u00d7 trend, this case is roughly equivalent to Revert to trend.';
+    }
+
+    var upperTip = 'Bitcoin drifts toward 2.5\u00d7 trend (the historical above-cycle peak) over the holding period. <strong>Not a trendline expectation</strong> &mdash; rather a recognition that bitcoin has historically <em>spiked</em> to ~2.5\u00d7 trend in cycle peaks, and that such spikes have <em>never been sustained</em>. Worth modeling as a potential window for disciplined rebalancing or partial divestment &mdash; see <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>.';
+
     var rows = [
       { idx: 0, label: 'Keep rental', color: CHART_COLORS.rental, dashed: true,
-        tip: 'Net wealth if you keep the rental, collect after-tax cash flow each year, and sell at the end of the holding period.' },
+        tip: 'Net wealth if you keep the rental, collecting after-tax cash flow each year. Mark-to-market &mdash; the property\u2019s market value is included without applying the exit tax that would arise on sale.' },
       { idx: 1, label: 'Bitcoin · Stay at current multiple', color: CHART_COLORS.stay,
-        tip: 'Bitcoin grows at the Power Law trend rate from today\u2019s price, never reverting to trend. The bear / no-reversion case.' },
+        tip: stayTip },
       { idx: 2, label: 'Bitcoin · Revert to trend', color: CHART_COLORS.trend,
-        tip: 'Bitcoin moves from today\u2019s multiple back to 1.0\u00d7 trend linearly over the holding period. The Power Law central case.' },
+        tip: 'Bitcoin moves from today\u2019s multiple back to 1.0\u00d7 trend linearly over the holding period. The Power Law central case &mdash; assumes today\u2019s discount-or-premium-to-trend closes over time.' },
       { idx: 3, label: 'Bitcoin · Reach upper channel', color: CHART_COLORS.upper,
-        tip: 'Bitcoin drifts toward 2.5\u00d7 trend (the historical above-cycle peak) over the holding period. The optimistic case.' }
+        dashed: true,  // visually less confident — matches dashed chart line
+        tip: upperTip }
     ];
     var html = rows.map(function(r){
       var off = legendVisibility[r.idx] ? '' : ' off';
@@ -722,6 +768,24 @@
     return 'Revert to trend';
   }
 
+  // Path-specific plain-English description rendered below the path
+  // toggle. Helps users who land on the calculator directly (deep link
+  // from email, share, etc.) without first reading The Four Paths tab.
+  // HELOC path includes a contextual link to the editorial section
+  // since "HELOC" is jargon that needs unpacking for a non-finance
+  // audience.
+  function renderPathDescription(){
+    var el = document.getElementById('calc-path-description');
+    if (!el) return;
+    var descByPath = {
+      1: '<strong>Outright Sell.</strong> Sell the rental outright, pay the tax bill up front, redeploy net proceeds into spot bitcoin. The cleanest exit &mdash; cash flow stops, capital concentrates in a single asset, full bitcoin upside on what survives the tax leakage.',
+      2: '<strong>HELOC + Bitcoin.</strong> Tap your home&rsquo;s equity via a Home Equity Line of Credit and buy bitcoin without selling the rental. No immediate tax event; ongoing interest carry to service from personal income. Layered leverage &mdash; structurally a leveraged bitcoin position with the rental as collateral. <a href="#paths">More on HELOC mechanics &rarr;</a>',
+      3: '<strong>Partial Sale.</strong> If you have multiple rental properties, sell some but not all of them. The sold properties&rsquo; proceeds redeploy into the bitcoin yield portfolio; the retained ones keep producing rental cash flow. The middle path &mdash; partial conviction, partial diversification.',
+      4: '<strong>Sell + Yield Portfolio.</strong> Sell the rental, take the tax hit, redeploy net proceeds into a portfolio of bitcoin-treasury yield instruments (STRC, SATA) plus a spot bitcoin slice. Preserves monthly income at a higher yield than the rental produced; swaps tenant-and-property risk for issuer-credit risk.'
+    };
+    el.innerHTML = descByPath[state.path] || '';
+  }
+
   function renderHeadline(results, s){
     var el = document.getElementById('calc-headline');
     if (!el) return;
@@ -733,23 +797,35 @@
     var pathName = ['', 'Outright Sell + Spot Bitcoin',
                     'HELOC + Bitcoin', 'Partial Portfolio Sale + Yield', 'Sell + Yield Portfolio'][s.path];
 
+    // Path-specific tradeoff reminder. The user has just made a decision;
+    // this line surfaces what that decision *gives up* in exchange for
+    // what the headline number promises. Honest framing — these are
+    // tradeoffs, not free lunches.
+    var explainerByPath = {
+      1: 'You\u2019re foregoing operational cash flow and the property\u2019s tax-deferred appreciation in exchange for a higher terminal asset value &mdash; if bitcoin grows as the scenario suggests.',
+      2: 'You\u2019re retaining the rental and layering on a leveraged bitcoin position. The HELOC carry must be serviced from personal income through any bitcoin drawdown &mdash; a real and asymmetric risk in the early years.',
+      3: 'You\u2019re partially exiting &mdash; keeping some rental cash flow while gaining bitcoin exposure on the sold portion. Mental load and operational risk on the retained properties remain.',
+      4: 'You\u2019re foregoing operational landlord cash flow in exchange for higher yield-instrument cash flow plus bitcoin appreciation. The trade preserves monthly income but swaps tenant-and-property risk for issuer-credit risk.'
+    };
+
     var verdict, color;
     if (delta > 0) {
-      verdict = '<strong>' + pathName + ' outperforms keeping the rental by ' +
-                fmtMoney(delta) + '</strong> over ' + s.holdingYears + ' years';
+      verdict = '<strong>' + pathName + ' results in ' + fmtMoney(delta) +
+                ' more asset value</strong> than keeping the rental over ' + s.holdingYears + ' years';
       if (ratio >= 1.3 && bitcoinAnn > 0) {
-        verdict += ', with about <strong>' + ratio.toFixed(1) + '&times;</strong> the annual cash flow';
+        verdict += ', with about <strong>' + ratio.toFixed(1) + '&times;</strong> the Year 1 cash flow';
       }
       verdict += '.';
       color = 'positive';
     } else {
       verdict = '<strong>Keeping the rental produces ' + fmtMoney(-delta) +
-                ' more</strong> than ' + pathName + ' under your inputs. The decision is close — try adjusting bitcoin CAGR, holding period, or path.';
+                ' more asset value</strong> than ' + pathName + ' under your inputs. The decision is close &mdash; try adjusting the bitcoin scenario, holding period, or path.';
       color = 'neutral';
     }
+    var explainer = '<span class="calc-headline-explainer">' + explainerByPath[s.path] + '</span>';
     var hedge = '<span class="calc-headline-hedge">Under the <strong>' + scenarioLabel(s.btcScenario) +
-                '</strong> bitcoin CAGR scenario and your specific inputs.</span>';
-    el.innerHTML = '<div class="calc-headline-verdict ' + color + '">' + verdict + '</div>' + hedge;
+                '</strong> bitcoin scenario and your specific inputs.</span>';
+    el.innerHTML = '<div class="calc-headline-verdict ' + color + '">' + verdict + '</div>' + explainer + hedge;
   }
 
   function renderComparison(results, s){
@@ -779,7 +855,7 @@
       '<tr><td>Tax treatment</td>' +
         '<td>Depreciation-shielded</td>' +
         '<td>' + (s.path === 1 ? 'LTCG on appreciation only' : 'ROC-shielded') + '</td></tr>' +
-      '<tr class="' + winnerClass + '"><td><strong>' + s.holdingYears + '-year total wealth</strong></td>' +
+      '<tr class="' + winnerClass + '"><td><strong>' + s.holdingYears + '-year total asset value</strong></td>' +
         '<td class="numeric"><strong>' + fmtMoneyFull(rentalTotal) + '</strong></td>' +
         '<td class="numeric"><strong>' + fmtMoneyFull(bitcoinTotal) + '</strong></td></tr>';
 
@@ -897,6 +973,38 @@
     });
   }
 
+  function bindZoomToggle(){
+    document.querySelectorAll('.calc-chart-zoom-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        chartZoom = btn.dataset.zoom;
+        document.querySelectorAll('.calc-chart-zoom-btn').forEach(function(b){
+          b.classList.toggle('active', b.dataset.zoom === chartZoom);
+          b.setAttribute('aria-selected', b.dataset.zoom === chartZoom ? 'true' : 'false');
+        });
+        // Force chart rebuild so Chart.js recomputes axis scales for
+        // the new data range. update('resize') alone keeps the prior
+        // y-axis max baked in, which defeats the purpose of zoom.
+        if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+        renderChart(state);
+      });
+    });
+  }
+
+  // Path 3 breakdown — total / retained / sold derived display.
+  // Called every rerender so it stays in sync as the user drags the
+  // properties-to-sell slider or changes the total-properties baseline.
+  function renderPath3Breakdown(s){
+    var totalEl = document.getElementById('calc-path3-total');
+    var retainedEl = document.getElementById('calc-path3-retained');
+    var soldEl = document.getElementById('calc-path3-sold');
+    if (!totalEl) return;
+    var sold = Math.min(s.propertiesToSell, s.numProperties);
+    var retained = Math.max(0, s.numProperties - sold);
+    totalEl.textContent = s.numProperties;
+    retainedEl.textContent = retained;
+    soldEl.textContent = sold;
+  }
+
   function renderSpecificCallout(s){
     var el = document.getElementById('calc-specific-callout');
     if (!el) return;
@@ -916,11 +1024,14 @@
 
   function rerender(){
     var results = computeAll(state);
+    renderPathDescription();
     renderHeadline(results, state);
     renderComparison(results, state);
     renderPathDetail(results, state);
+    renderPath3Breakdown(state);
     renderCAGRChips(state);
     renderChart(state);
+    renderChartLegend();  // re-render so Stay tooltip stays accurate as multiple/inputs shift
     renderSpecificCallout(state);
   }
 
@@ -1022,6 +1133,7 @@
     bindPortfolioSliders();
     bindPathToggle();
     bindCAGRChips();
+    bindZoomToggle();
 
     // Initial: show path-4 group, hide others
     document.querySelectorAll('.calc-path-specific').forEach(function(grp){
@@ -1034,6 +1146,7 @@
     // cache). The headline / table / chips / detail / callout all
     // render fine in the hidden tab.
     var results = computeAll(state);
+    renderPathDescription();
     renderHeadline(results, state);
     renderComparison(results, state);
     renderPathDetail(results, state);

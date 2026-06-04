@@ -1059,11 +1059,11 @@ html, body {
   border-color: var(--amber);
 }
 .calc-cagr-chip-name {
-  font-size: 0.74rem;
+  font-size: 0.86rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-dim);
+  letter-spacing: 0.005em;
+  color: var(--ink-bright);
+  line-height: 1.2;
 }
 .calc-cagr-chip.active .calc-cagr-chip-name { color: var(--amber-bright); }
 .calc-cagr-chip-rate {
@@ -1346,4 +1346,168 @@ html, body {
     grid-template-columns: 1fr;
     font-size: 0.78rem;
   }
+}
+
+/* ─── Calculator v0.4 additions: path description, zoom toggle, PL link,
+       Path 3 breakdown, headline explainer, chart caveat ─── */
+
+/* Plain-English path description below the path toggle. Helps deep-link
+   visitors who never read the Four Paths tab. */
+.calc-path-description {
+  background: rgba(255,255,255,0.02);
+  border-left: 2px solid var(--amber);
+  border-radius: 0 0.3rem 0.3rem 0;
+  padding: 0.85rem 1.1rem;
+  margin: 0 0 1.4rem;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+.calc-path-description strong {
+  color: var(--ink-bright);
+  font-weight: 600;
+  margin-right: 0.2rem;
+}
+.calc-path-description a {
+  color: var(--amber);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(224,148,34,0.3);
+  font-size: 0.84rem;
+  margin-left: 0.4rem;
+  white-space: nowrap;
+}
+.calc-path-description a:hover {
+  color: var(--amber-bright);
+  border-bottom-color: var(--amber-bright);
+}
+
+/* Path 3 breakdown — owned / retained / selling, derived display */
+.calc-path3-breakdown {
+  margin-top: 0.9rem;
+  padding: 0.7rem 0.9rem;
+  background: rgba(255,255,255,0.02);
+  border-radius: 0.3rem;
+  border: 1px solid var(--border-faint);
+}
+.calc-path3-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--ink-dim);
+  border-bottom: 1px dotted var(--border-faint);
+}
+.calc-path3-row:last-child { border-bottom: none; }
+.calc-path3-row strong {
+  color: var(--ink-bright);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.calc-path3-row-emphasis span { color: var(--amber); }
+.calc-path3-row-emphasis strong { color: var(--amber); }
+.calc-path3-note {
+  margin-top: 0.6rem;
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  font-style: italic;
+  color: var(--ink-dim);
+  line-height: 1.5;
+}
+.calc-path3-note em { color: var(--ink); font-style: italic; }
+
+/* "What is the Power Law?" link below the chip cluster */
+.calc-cagr-pl-link {
+  display: inline-block;
+  margin-top: 0.7rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--amber);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(224,148,34,0.3);
+  transition: color 0.2s, border-color 0.2s;
+}
+.calc-cagr-pl-link:hover {
+  color: var(--amber-bright);
+  border-bottom-color: var(--amber-bright);
+}
+
+/* Chart header with zoom toggle to the right of the title */
+.calc-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-bottom: 0.7rem;
+}
+.calc-chart-header .calc-chart-title {
+  margin-bottom: 0;  /* overrides the v0.2 .calc-chart-title's margin */
+}
+.calc-chart-zoom {
+  display: inline-flex;
+  gap: 0.3rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border-faint);
+  border-radius: 0.4rem;
+  padding: 0.15rem;
+}
+.calc-chart-zoom-btn {
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  font-weight: 500;
+  padding: 0.35rem 0.7rem;
+  background: transparent;
+  border: none;
+  border-radius: 0.3rem;
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  letter-spacing: 0.02em;
+}
+.calc-chart-zoom-btn:hover { color: var(--ink); }
+.calc-chart-zoom-btn.active {
+  background: rgba(224,148,34,0.14);
+  color: var(--amber-bright);
+  font-weight: 600;
+}
+
+/* Mark-to-market caveat below the chart, above the legend */
+.calc-chart-caveat {
+  margin-top: 0.7rem;
+  padding-top: 0.65rem;
+  border-top: 1px dotted var(--border-faint);
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  font-style: italic;
+  color: var(--ink-dim);
+  line-height: 1.55;
+}
+.calc-chart-caveat em {
+  font-style: italic;
+  color: var(--ink);
+}
+
+/* Headline explainer — the path-specific tradeoff reminder below the
+   verdict and above the scenario-hedge text */
+.calc-headline-explainer {
+  display: block;
+  margin-top: 0.7rem;
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  font-style: normal;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+/* Slightly compact the CAGR chips so the picker doesn't compete with
+   the chart for attention (visual-subordination middle-ground per the
+   prior exchange about Power Law input placement). */
+.calc-cagr-chip {
+  padding: 0.6rem 0.85rem;
+}
+.calc-cagr-chip-delta {
+  font-size: 1.15rem;  /* was 1.25rem */
 }

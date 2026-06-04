@@ -464,11 +464,17 @@ eleventyComputed:
     <!-- Path Toggle -->
     <div class="calc-path-toggle">
       <div class="calc-toggle-label">Path:</div>
-      <button class="calc-path-btn" data-path="1">1 · Outright Sell</button>
-      <button class="calc-path-btn" data-path="2">2 · HELOC</button>
-      <button class="calc-path-btn" data-path="3">3 · Partial Sale</button>
-      <button class="calc-path-btn active" data-path="4">4 · Sell + Yield Portfolio</button>
+      <button class="calc-path-btn" data-path="1">1 &middot; Outright Sell</button>
+      <button class="calc-path-btn" data-path="2">2 &middot; HELOC</button>
+      <button class="calc-path-btn" data-path="3">3 &middot; Partial Sale</button>
+      <button class="calc-path-btn active" data-path="4">4 &middot; Sell + Yield Portfolio</button>
     </div>
+
+    <!-- Path description — plain-English explanation of the selected path,
+         injected by renderPathDescription(). Editorially load-bearing for
+         users who skip the Four Paths tab and arrive at the calculator
+         directly via a deep link. -->
+    <div id="calc-path-description" class="calc-path-description"></div>
 
     <!-- Active sliders — the things you play with for sensitivity -->
     <div class="calc-sliders">
@@ -477,7 +483,7 @@ eleventyComputed:
         <div class="calc-slider-group-label">Your scenario</div>
 
         <div class="calc-slider-row">
-          <span class="calc-slider-name">Property value</span>
+          <span class="calc-slider-name">Property value <span class="calc-slider-hint">(per property)</span></span>
           <span class="calc-slider-val" id="val-property-value">$500,000</span>
         </div>
         <input type="range" id="calc-property-value" min="100000" max="3000000" step="25000" value="500000">
@@ -521,6 +527,18 @@ eleventyComputed:
           <span class="calc-slider-val" id="val-properties-to-sell">1 to sell</span>
         </div>
         <input type="range" id="calc-properties-to-sell" min="1" max="9" step="1" value="1">
+
+        <!-- Property breakdown — derived display, no slider. Surfaces the
+             total / retained / selling split so the partial-sale framing
+             is unambiguous. -->
+        <div class="calc-path3-breakdown" id="calc-path3-breakdown">
+          <div class="calc-path3-row"><span>Properties owned (total)</span><strong id="calc-path3-total">3</strong></div>
+          <div class="calc-path3-row"><span>Properties retained</span><strong id="calc-path3-retained">2</strong></div>
+          <div class="calc-path3-row calc-path3-row-emphasis"><span>Properties sold (proceeds to bitcoin)</span><strong id="calc-path3-sold">1</strong></div>
+        </div>
+        <div class="calc-path3-note">
+          Each property assumed to be worth the &ldquo;Property value&rdquo; slider amount above. Adjust the <em>Properties owned</em> total in baseline assumptions.
+        </div>
       </div>
 
       <!-- Path 3+4 portfolio composition (active) -->
@@ -605,13 +623,23 @@ eleventyComputed:
           <span class="calc-cagr-chip-sub">cycle peak</span>
         </button>
       </div>
+      <a class="calc-cagr-pl-link" href="/the-power-law">What is the Power Law? &rarr;</a>
     </div>
 
-    <!-- Chart — the centerpiece. Wealth over time, two lines + CAGR band -->
+    <!-- Chart — the centerpiece. Wealth over time, three bitcoin lines + rental. -->
     <div class="calc-chart-container">
-      <div class="calc-chart-title" id="calc-chart-title">Wealth over time, your scenario</div>
+      <div class="calc-chart-header">
+        <div class="calc-chart-title">Wealth over time, your scenario</div>
+        <div class="calc-chart-zoom" role="tablist" aria-label="Chart zoom range">
+          <button class="calc-chart-zoom-btn active" data-zoom="full" role="tab" aria-selected="true">Full window</button>
+          <button class="calc-chart-zoom-btn" data-zoom="first3" role="tab" aria-selected="false">First 3 years</button>
+        </div>
+      </div>
       <div class="calc-chart-wrap">
         <canvas id="calc-chart"></canvas>
+      </div>
+      <div class="calc-chart-caveat">
+        Keep-rental values are <em>mark-to-market</em> &mdash; cumulative after-tax cash + the property&rsquo;s market value, with the exit tax that would arise on sale <em>not</em> applied. Bitcoin paths show their upfront tax already paid at Y0. Toggle the <em>First 3 years</em> view to see the near-term tax-leakage dip honestly.
       </div>
       <div class="calc-chart-legend" id="calc-chart-legend"></div>
     </div>
