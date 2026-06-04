@@ -457,9 +457,11 @@ v2 aligns with the homepage concept-card icon (which had Save at top from the st
 - **JS rendering switched from textContent to innerHTML to support inline links.** Data is hardcoded in `what-money-is-for.js`; no XSS risk. The architectural shift is small but worth knowing — if a third page in the WMHTB/WMIF family wants the same affordance, it should also use `.innerHTML` for the descriptor cell.
 - **Sister-page launches should pull from the senior page's references, not duplicate them.** This build pulled `what-money-has-to-be.njk / .css / .js / head.html` fresh from main as scaffolding before authoring WMIF, rather than re-deriving the patterns. Saved roughly 60% of the work and ensured the visual family stays tight. Worth doing on any future sister-page launch.
 
-## 13. Homepage carousel — completed set (22 slides)
+## 13. Homepage carousel — completed set (23 slides)
 
 All slides deployed with 16:9 widescreen silent videos, minimalist copy pattern (label + headline + CTA, no `.insight-desc`).
+
+**Renumber, June 2026:** the BvRP slide landed at position 3 to sit adjacent to its sister page BvRE (slide 2). Slides previously numbered 3–22 are now numbered 4–23. Iteration-record section headers updated to track the slides they describe (slide 16 → 17, slide 21 → 22, slide 22 → 23); internal cross-references in the BvSM iteration record likewise updated to the post-renumber values.
 
 **Documentation drift resolved (May 2026):** the previously-flagged drift between markup and this inventory was closed when slide 22 (What Money Is For) landed. The three previously-undocumented slides (`vid-heatmap`, `vid-bbm`, `vid-lob`) have had their inventory rows scraped from `src/index.njk` and added to the table below; the prior slide-17 entry (Borrowing Against Your Stack) has been renumbered to 18 to match the live markup. The table below now matches `src/index.njk` slide-for-slide.
 
@@ -476,28 +478,29 @@ All slides deployed with 16:9 widescreen silent videos, minimalist copy pattern 
 |---|-------|----------|---------------|
 | 1 | What Money Has To Be | One money must do three things at once — or it cannot do any of them | Three ornate brass lenses on oak workbench, candle behind; each shows same flame |
 | 2 | Bitcoin vs. Real Estate | Housing became the default store of value by elimination, not merit | Golden hour → twilight → dark silhouette |
-| 3 | Bitcoin and The Power Law | For every 13% increase in Bitcoin's age, the trend price doubles | Town at dusk, lawful illumination pattern |
-| 4 | The Bitcoin Horizon | What looks like turbulence over the course of a day is trajectory over the course of a decade | Small ship at golden hour, crossing toward the horizon; near-shore chop, steady distant line; persistence-through-turbulence |
-| 5 | Is Bitcoin a Bubble? | A thing isn't a bubble simply because it has been called one | ~10 bubbles burst; one amber object remains impervious |
-| 6 | The Half-Life | How long until your money loses half its value? | Candle burning down asymptotically |
-| 7 | The Melting Ice Cube | Holding cash is not safety. It's an active decision with an ongoing cost | Ice cube melts to fragment on weathered wood |
-| 8 | The Bitcoin Synthesis | Six components. One irreducible synthesis | Six antique keys assemble into clockwork mechanism |
-| 9 | What Bitcoin Is | Most people consider just a few dimensions. Bitcoin is all of them, simultaneously | Raw mineral crystal, traveling amber light |
-| 10 | The Bitcoin Migration | From what can't be fixed, to what can't be broken | Heavy wooden door opens ~2/3, amber light |
-| 11 | The Trilemma | Some problems are navigated, not solved | Three geometric counterweights in coupled sway |
-| 12 | The Money Trees | Two systems. Different roots. One outcome | Two trees; left withers, right unchanged |
-| 13 | The Bitcoin Retirement | A stack that lasts a lifetime — or runs out before you do | Solitary mature tree in golden-hour meadow; sun moves from behind canopy to streaming rays through it; latent-state opening, persistence across the arc |
-| 14 | Disciplined Rebalancing | A model you believe in is a protocol you can run | Wheat field at golden hour, ears swaying in coupled bounded oscillation; fixed camera, stable disequilibrium |
-| 15 | The Fixed Pie | Your share remains undiluted — for eternity | Unmarked gold coin; surrounding coins dissolve |
-| 16 | Bitcoin vs. The Stock Market | Three growth curves. One decisive horizon | Three trees in a meadow at golden hour; the middle tree grows dramatically taller and fuller-canopied over 10 seconds while the flanking trees mature modestly; latent-state opening, divergent outcomes from identical conditions |
-| 17 | The Bitcoin Heatmap | The pattern reveals itself *only when you zoom out.* | (concept retrospectively documented — see live markup `src/index.njk` for the as-shipped video) |
-| 18 | Borrowing Against Your Stack | Every coin sold today is a coin that compounds for someone else | Solitary ancient standing stone — weathered, lichen-marked, ~six feet tall — in a golden-hour meadow; tall grasses bend in gentle wind, long shadow extends from the stone across the foreground; the stone itself does not move; quiet persistence as the visual argument |
-| 19 | Bitcoin-Backed Mortgages | The home opens. *The stack stays.* | (concept retrospectively documented — see live markup `src/index.njk` for the as-shipped video) |
-| 20 | Living on Bitcoin | Save in bitcoin. Spend in fiat. *The float holds.* | (concept retrospectively documented — see live markup `src/index.njk` for the as-shipped video) |
-| 21 | Bitcoin Defined | Define it. *Then debate it.* | Bed of glowing embers in deep darkness — same composition as Card 7 (Bounded by Energy) on the page. Camera fixed throughout. Four-layer subtle motion: heat shimmer above the bed, asymmetric ember pulse (no two embers in sync), a small natural wood-fire flame at center-left with irregular asymmetric tongues whose base merges with the surrounding embers, wisps of pale smoke rising and dissipating. Seamlessly looping 10-second silent video. |
-| 22 | What Money Is For | Saving is the default. The rest is choice — *or should be.* | Small ancient weathered stone basin set into a leaf-carpeted forest clearing in late autumn; the basin is full to the brim with water held still, gentle source-welling at center; two narrow channels carved into the basin's lip on either side remain dry throughout (paths the water could take but does not); birches with golden foliage and a sun-lit clearing opening behind; warm low-angle late-afternoon sun, bronze/amber/ochre palette; fixed camera; the basin's persistence is the visual argument |
+| 3 | Bitcoin vs. Rental Property | What if the yield were higher — and the weather quieter. | Wide cinematic shot of a sweeping field of tall grass at the moment a storm passes. First ~4 seconds: heavy rain falls diagonally, wind bends the grass in waves, slate-gray storm clouds churn low overhead, distant lightning hinted. The clouds then break in the upper third of the frame — golden god-rays pierce through, illuminating the wet field in patches, mist rising off the warm ground. Rain tapers; camera slowly pushes in. By the end, the storm has moved off to the right edge, warm dawn light bathes the field, droplets on grass catch the gold. Same field, different sky — storm reads as the landlord burden (operational load, gross-to-net leakage, policy risk), sun reads as bitcoin's quieter yield. v2 landed warmer/more natural than v1 on the close. |
+| 4 | Bitcoin and The Power Law | For every 13% increase in Bitcoin's age, the trend price doubles | Town at dusk, lawful illumination pattern |
+| 5 | The Bitcoin Horizon | What looks like turbulence over the course of a day is trajectory over the course of a decade | Small ship at golden hour, crossing toward the horizon; near-shore chop, steady distant line; persistence-through-turbulence |
+| 6 | Is Bitcoin a Bubble? | A thing isn't a bubble simply because it has been called one | ~10 bubbles burst; one amber object remains impervious |
+| 7 | The Half-Life | How long until your money loses half its value? | Candle burning down asymptotically |
+| 8 | The Melting Ice Cube | Holding cash is not safety. It's an active decision with an ongoing cost | Ice cube melts to fragment on weathered wood |
+| 9 | The Bitcoin Synthesis | Six components. One irreducible synthesis | Six antique keys assemble into clockwork mechanism |
+| 10 | What Bitcoin Is | Most people consider just a few dimensions. Bitcoin is all of them, simultaneously | Raw mineral crystal, traveling amber light |
+| 11 | The Bitcoin Migration | From what can't be fixed, to what can't be broken | Heavy wooden door opens ~2/3, amber light |
+| 12 | The Trilemma | Some problems are navigated, not solved | Three geometric counterweights in coupled sway |
+| 13 | The Money Trees | Two systems. Different roots. One outcome | Two trees; left withers, right unchanged |
+| 14 | The Bitcoin Retirement | A stack that lasts a lifetime — or runs out before you do | Solitary mature tree in golden-hour meadow; sun moves from behind canopy to streaming rays through it; latent-state opening, persistence across the arc |
+| 15 | Disciplined Rebalancing | A model you believe in is a protocol you can run | Wheat field at golden hour, ears swaying in coupled bounded oscillation; fixed camera, stable disequilibrium |
+| 16 | The Fixed Pie | Your share remains undiluted — for eternity | Unmarked gold coin; surrounding coins dissolve |
+| 17 | Bitcoin vs. The Stock Market | Three growth curves. One decisive horizon | Three trees in a meadow at golden hour; the middle tree grows dramatically taller and fuller-canopied over 10 seconds while the flanking trees mature modestly; latent-state opening, divergent outcomes from identical conditions |
+| 18 | The Bitcoin Heatmap | The pattern reveals itself *only when you zoom out.* | (concept retrospectively documented — see live markup `src/index.njk` for the as-shipped video) |
+| 19 | Borrowing Against Your Stack | Every coin sold today is a coin that compounds for someone else | Solitary ancient standing stone — weathered, lichen-marked, ~six feet tall — in a golden-hour meadow; tall grasses bend in gentle wind, long shadow extends from the stone across the foreground; the stone itself does not move; quiet persistence as the visual argument |
+| 20 | Bitcoin-Backed Mortgages | The home opens. *The stack stays.* | (concept retrospectively documented — see live markup `src/index.njk` for the as-shipped video) |
+| 21 | Living on Bitcoin | Save in bitcoin. Spend in fiat. *The float holds.* | (concept retrospectively documented — see live markup `src/index.njk` for the as-shipped video) |
+| 22 | Bitcoin Defined | Define it. *Then debate it.* | Bed of glowing embers in deep darkness — same composition as Card 7 (Bounded by Energy) on the page. Camera fixed throughout. Four-layer subtle motion: heat shimmer above the bed, asymmetric ember pulse (no two embers in sync), a small natural wood-fire flame at center-left with irregular asymmetric tongues whose base merges with the surrounding embers, wisps of pale smoke rising and dissipating. Seamlessly looping 10-second silent video. |
+| 23 | What Money Is For | Saving is the default. The rest is choice — *or should be.* | Small ancient weathered stone basin set into a leaf-carpeted forest clearing in late autumn; the basin is full to the brim with water held still, gentle source-welling at center; two narrow channels carved into the basin's lip on either side remain dry throughout (paths the water could take but does not); birches with golden foliage and a sun-lit clearing opening behind; warm low-angle late-afternoon sun, bronze/amber/ochre palette; fixed camera; the basin's persistence is the visual argument |
 
-### Iteration record — slide 16 (May 2026)
+### Iteration record — slide 17 (May 2026)
 
 The BvSM slide took two video briefs to land. Captured here because the lesson generalizes to any future *bitcoin vs X* comparison slide; the prompt-craft principle now lives in §6 ("Comparison metaphors: prefer living elements over industrial ones").
 
@@ -505,9 +508,9 @@ The first brief proposed *three glass vessels filling at different rates under c
 
 The trees brief — *three young trees in a meadow at golden hour, middle one growing dramatically more* — produced a substantially stronger take on first try. Living-element comparisons read more naturally than industrial-element ones in the site's tonal grammar; *single-element-with-different-states* (one tree grows more than another) is also more reliable than *multi-element-with-different-behaviors* (one vessel fills at a different rhythm than another) because the former matches a familiar time-lapse nature pattern while the latter requires Grok to invent visual logic.
 
-The trees direction has light visual overlap with two other tree-themed slides (slide 12 Money Trees / two trees, slide 13 Bitcoin Retirement / one tree). Adjacency is broken by slide 14 (wheat field) and slide 15 (gold coin) between slides 13 and 16; framings differ enough (centered single vs wide three) that the shared visual vocabulary reinforces site identity rather than producing monotony — the carousel's overall grammar is part of what makes the set feel like one artifact.
+The trees direction has light visual overlap with two other tree-themed slides (slide 13 Money Trees / two trees, slide 14 Bitcoin Retirement / one tree). Adjacency is broken by slide 15 (wheat field) and slide 16 (gold coin) between slides 14 and 17; framings differ enough (centered single vs wide three) that the shared visual vocabulary reinforces site identity rather than producing monotony — the carousel's overall grammar is part of what makes the set feel like one artifact.
 
-### Iteration record — slide 21 (May 2026)
+### Iteration record — slide 22 (May 2026)
 
 The Bitcoin Defined slide took two video briefs to land. Captured here because the lesson generalizes to any future video prompt that needs to describe a *stable, small* flame.
 
@@ -517,7 +520,7 @@ The revision dropped the candle simile entirely, anchored the flame as **part of
 
 The prompt-craft principle: **never use a candle as a stability simile when the rendered subject is fire of any kind**. The simile is too strong a visual prior — the model will render the candle, not the stability. The same caution likely applies to any other subject-as-stability simile where the source object has a distinctive visual archetype (a sundial as a stillness simile would invoke the sundial itself, a glacier as a slowness simile would invoke ice, etc.). Describe the property you want (small, asymmetric, stable in envelope) using neutral physical language; reserve similes for properties that don't have a strong visual archetype in the model's training data.
 
-### Iteration record — slide 22 (May 2026)
+### Iteration record — slide 23 (May 2026)
 
 The What Money Is For slide took two video briefs to land. Captured here because the lesson generalizes to any future *forest-set golden-hour* slide.
 
@@ -857,8 +860,8 @@ The page reads as a single argument unfolding across four registers, each marked
 |---|---|---|---|
 | 1 | `FRAMEWORK` | The Power Law as cautionary tale | Visual + prose introduction to the model |
 | 2 | `LOOKING BACK` | What the historical record says | Unified calculator (Lump sum / Weekly DCA toggle) |
-| 3 | `LOOKING FORWARD` | The forward projection | Dual BTC trend-basis + current-price line vs S&P / NDQ |
-| 4 | `TAKEAWAY` | The long-horizon argument | Synthesis, convergence sentence, methodology link |
+| 4 | `LOOKING FORWARD` | The forward projection | Dual BTC trend-basis + current-price line vs S&P / NDQ |
+| 5 | `TAKEAWAY` | The long-horizon argument | Synthesis, convergence sentence, methodology link |
 
 The eyebrow pattern was introduced on this page; the four-step structure is reusable on any page with a present-tense argument that benefits from a past → future → synthesis arc.
 
