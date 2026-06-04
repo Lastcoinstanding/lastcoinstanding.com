@@ -1,5 +1,11 @@
 [
   {
+    "date": "2026-06-04",
+    "display": "6/4/26",
+    "page": "/bitcoin-vs-rental-property.html",
+    "summary": "New: Bitcoin vs. Rental Property — the honest yield comparison once landlord costs are surfaced. Walks through the gross-to-net waterfall on a typical rental (vacancy, maintenance, property tax, insurance, management, CapEx erode roughly half the listed yield) and the tax asymmetry on exit (depreciation recapture and transaction costs on top of LTCG, versus bitcoin's LTCG-only sale), then contrasts with bitcoin-treasury yield instruments (STRC, SATA) paying 10–13% under the same ROC tax shield real estate uses for depreciation. Four operational paths from rental property to bitcoin, plus an interactive calculator anchored to the Power Law channel that models your specific situation across three bitcoin scenarios (stay at current multiple, revert to trend, reach upper channel) and four exit paths (full sell and reinvest, partial sell, keep some + sell some with a coupled property-count slider, full keep with bitcoin in addition). Now featured on the homepage as a concept card under The Numbers and as carousel slide #3 (storm-to-sun field — storm reads as the landlord burden, sun as bitcoin's quieter yield)"
+  },
+  {
     "date": "2026-05-31",
     "display": "5/31/26",
     "page": "/start-here.html",
