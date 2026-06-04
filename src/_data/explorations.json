@@ -105,6 +105,13 @@
     "is_calculator": true
   },
   {
+    "slug": "bitcoin-vs-rental-property",
+    "title": "BTC vs. Rental Property",
+    "category": "numbers",
+    "interactive": true,
+    "is_calculator": true
+  },
+  {
     "slug": "the-power-law",
     "title": "Bitcoin &amp; The Power Law",
     "category": "numbers",

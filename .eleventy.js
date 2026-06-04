@@ -37,6 +37,7 @@ module.exports = function (eleventyConfig) {
     'og-what-money-has-to-be.jpg',
     'og-what-money-is-for.jpg',
     'og-bitcoin-vs-real-estate.jpg',
+    'og-bitcoin-vs-rental-property.jpg',
     'og-bitcoin-vs-the-stock-market.jpg',
     'og-the-bitcoin-retirement.jpg',
     'og-disciplined-rebalancing.jpg',

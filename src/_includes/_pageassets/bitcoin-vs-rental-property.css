@@ -30,39 +30,6 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ─── Under-construction banner ───
-   Prominent, persistent notice at the top of the page indicating
-   draft status. Sticks to top of viewport on scroll so it remains
-   visible during feedback review. Dismissible only by closing tab. */
-.uc-banner {
-  background: linear-gradient(180deg, rgba(224,148,34,0.18) 0%, rgba(224,148,34,0.10) 100%);
-  border-bottom: 1px solid var(--border-amber);
-  padding: 0.85rem 1.5rem;
-  text-align: center;
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  letter-spacing: 0.04em;
-  color: var(--amber-bright);
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-.uc-banner strong {
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  margin-right: 0.5rem;
-  color: var(--amber-bright);
-}
-.uc-banner .uc-meta {
-  color: rgba(224,148,34,0.65);
-  margin-left: 0.5rem;
-  font-size: 0.74rem;
-  font-style: italic;
-}
-
 /* ─── Hero ─── */
 .bvrp-hero {
   max-width: 920px;

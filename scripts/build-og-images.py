@@ -298,6 +298,31 @@ CARDS = [
         "output_filename": "og-the-bitcoin-retirement.jpg",
     },
     {
+        "name": "bvrp",
+        "url": "https://lastcoinstanding.com/bitcoin-vs-rental-property#calculator",
+        "hero_selector": "#calc-chart",
+        "wait_after_navigate_ms": 2000,
+        # Calculator tab needs to activate + chart needs to init lazily
+        # (per STYLE_GUIDE §6.14 — chart defers to bvrp:tab-activated event).
+        # The #calculator hash deep-link auto-activates the tab on load, but
+        # give the Chart.js animation 4s to settle before screenshot.
+        "wait_after_scroll_ms": 4000,
+        "chrome": {
+            "title": "Bitcoin vs. ",
+            "titleAccent": "Rental Property",
+            "titleAfter": "",
+            "subtitle": "2\u00d7 the after-tax yield, no tenants, no maintenance, no policy risk \u2014 once landlord costs are surfaced honestly.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">10\u201313% yield</strong>'
+                '  \u00b7  ROC tax shield'
+                '  \u00b7  Four operational paths'
+                '  \u00b7  Power Law-anchored projection'
+            ),
+            "urlText": "lastcoinstanding.com/bitcoin-vs-rental-property",
+        },
+        "output_filename": "og-bitcoin-vs-rental-property.jpg",
+    },
+    {
         "name": "tools",
         "url": "https://lastcoinstanding.com/calculators",
         "hero_selector": ".calc-row-featured",
