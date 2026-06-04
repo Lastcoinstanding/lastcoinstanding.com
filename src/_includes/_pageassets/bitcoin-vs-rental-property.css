@@ -1511,3 +1511,38 @@ html, body {
 .calc-cagr-chip-delta {
   font-size: 1.15rem;  /* was 1.25rem */
 }
+
+/* ─── Calculator v0.5 additions: Path 3 derived display + tax-asymmetry caveat ─── */
+
+/* Path 3 single derived line — the sold count below the two sliders */
+.calc-path3-derived {
+  margin-top: 0.7rem;
+  padding: 0.55rem 0.85rem;
+  background: rgba(224,148,34,0.06);
+  border-left: 2px solid var(--amber);
+  border-radius: 0 0.3rem 0.3rem 0;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--ink);
+  line-height: 1.5;
+}
+.calc-path3-derived strong {
+  color: var(--amber-bright);
+  font-weight: 600;
+}
+
+/* Two-paragraph chart caveat (mark-to-market framing + tax asymmetry) */
+.calc-chart-caveat p {
+  margin: 0 0 0.55rem;
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  font-style: italic;
+  color: var(--ink-dim);
+  line-height: 1.55;
+}
+.calc-chart-caveat p:last-child { margin-bottom: 0; }
+.calc-chart-caveat p strong {
+  color: var(--ink);
+  font-style: normal;
+  font-weight: 600;
+}

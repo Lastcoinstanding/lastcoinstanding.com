@@ -121,7 +121,7 @@
     helocRatePct: 9.5,
     existingMortgage: 200000,
     numProperties: 3,
-    propertiesToSell: 1,
+    propertiesRetained: 2,     // derived sold = numProperties - propertiesRetained
     portfolio: { strc: 45, sata: 30, ledn: 10, spot: 15 },
     includeSweatEquity: false,
     appreciationPct: 3.0       // RE annual appreciation
@@ -385,29 +385,31 @@
   }
 
   function calcPath3(s){
-    // Sell propertiesToSell out of numProperties; retain the rest
-    var soldFraction = s.propertiesToSell / s.numProperties;
-    var retainedFraction = 1 - soldFraction;
+    // Derive sold count from numProperties - propertiesRetained.
+    // propertiesRetained is the active control; sold is implicit.
+    var sold = Math.max(0, s.numProperties - s.propertiesRetained);
+    var retained = s.propertiesRetained;
 
     // Per-property economics (assume identical)
-    var perPropertyValue = s.propertyValue;  // user enters per-property value
-    var soldPropertiesValue = perPropertyValue * s.propertiesToSell;
+    var perPropertyValue = s.propertyValue;
+    var soldPropertiesValue = perPropertyValue * sold;
 
     // Sale on the sold portion, deploy to yield portfolio
     var sellS = Object.assign({}, s, { propertyValue: soldPropertiesValue });
     var exitNow = calcRentalExit(sellS, 0);
     var netCashFromSale = exitNow.netCash;
 
-    // Deploy to yield portfolio
     var yieldPort = calcYieldPortfolio(netCashFromSale, s);
 
     // Retained properties keep earning
-    var retainedS = Object.assign({}, s, { propertyValue: perPropertyValue * (s.numProperties - s.propertiesToSell) });
+    var retainedS = Object.assign({}, s, { propertyValue: perPropertyValue * retained });
     var keep = calcKeepRental(retainedS);
 
     var totalWealth = yieldPort.totalWealth + keep.totalWealth;
     var year1CF = yieldPort.year1AfterTax + keep.annual.afterTax;
     return {
+      sold: sold,
+      retained: retained,
       soldPropertiesValue: soldPropertiesValue,
       saleResult: exitNow,
       netCashFromSale: netCashFromSale,
@@ -433,7 +435,15 @@
   }
 
   function computeAll(s){
-    var keep = calcKeepRental(s);
+    // Keep-rental scales with numProperties for Path 3 — the
+    // counterfactual is keeping ALL properties (the partial-sale
+    // comparison would be misleading otherwise, treating an N-property
+    // path as if its keep-baseline were just one property).
+    var keepMultiplier = (s.path === 3) ? s.numProperties : 1;
+    var keepS = (keepMultiplier !== 1)
+      ? Object.assign({}, s, { propertyValue: s.propertyValue * keepMultiplier })
+      : s;
+    var keep = calcKeepRental(keepS);
     var pathResult;
     if (s.path === 1) pathResult = calcPath1(s);
     else if (s.path === 2) pathResult = calcPath2(s);
@@ -481,17 +491,25 @@
 
   function calcWealthTrajectory(s, scenarioOverride){
     var sUse = scenarioOverride ? Object.assign({}, s, { btcScenario: scenarioOverride }) : s;
-    var rentalAnnual = calcRentalAnnualCF(sUse);
+
+    // Keep-rental counterfactual scales with numProperties for Path 3
+    // (compares against keeping ALL properties, not just one). For
+    // paths 1, 2, 4 the keep-rental counterfactual is the single
+    // subject property of the path, so multiplier = 1.
+    var keepMultiplier = (sUse.path === 3) ? sUse.numProperties : 1;
+    var keepS = (keepMultiplier !== 1)
+      ? Object.assign({}, sUse, { propertyValue: sUse.propertyValue * keepMultiplier })
+      : sUse;
+    var rentalAnnual = calcRentalAnnualCF(keepS);
     var trajectory = [];
 
     for (var t = 0; t <= sUse.holdingYears; t++) {
       var growth = scenarioGrowthFactor(sUse.btcScenario, t, sUse.holdingYears);
 
       // Keep rental at year t: cumulative after-tax cash + property market
-      // value at year t (mark-to-market, no exit tax applied). See
-      // calcKeepRental docblock for the framing rationale.
+      // value at year t (mark-to-market, no exit tax applied).
       var cumCash = rentalAnnual.afterTax * t;
-      var exitAtT = calcRentalExit(sUse, t);
+      var exitAtT = calcRentalExit(keepS, t);
       var wealthKeep = cumCash + exitAtT.marketValue;
 
       var wealthPath;
@@ -505,12 +523,14 @@
         var carry = heloc * (sUse.helocRatePct/100) * t;
         wealthPath = wealthKeep + btcVal - heloc - carry;
       } else if (sUse.path === 3) {
-        var soldVal = sUse.propertyValue * sUse.propertiesToSell;
+        // Derive sold/retained from numProperties - propertiesRetained.
+        var sold = Math.max(0, sUse.numProperties - sUse.propertiesRetained);
+        var soldVal = sUse.propertyValue * sold;
         var sellS = Object.assign({}, sUse, { propertyValue: soldVal });
         var exitSell = calcRentalExit(sellS, 0);
         var ypVal = calcYieldPortfolioAtYearT(exitSell.netCash, sUse, t);
         var retainedS = Object.assign({}, sUse, {
-          propertyValue: sUse.propertyValue * (sUse.numProperties - sUse.propertiesToSell)
+          propertyValue: sUse.propertyValue * sUse.propertiesRetained
         });
         var retainedAnnual = calcRentalAnnualCF(retainedS);
         var retainedExit = calcRentalExit(retainedS, t);
@@ -588,7 +608,7 @@
         hidden: !legendVisibility[0]
       },
       {
-        label: 'Bitcoin · Stay at current multiple',
+        label: 'Bitcoin · Stay at current trend multiple',
         data: pathStay,
         borderColor: CHART_COLORS.stay,
         backgroundColor: CHART_COLORS.stay,
@@ -601,7 +621,7 @@
         hidden: !legendVisibility[1]
       },
       {
-        label: 'Bitcoin · Revert to trend',
+        label: 'Bitcoin · Revert to Power Law trend',
         data: pathTrend,
         borderColor: CHART_COLORS.trend,
         backgroundColor: CHART_COLORS.trend,
@@ -614,7 +634,7 @@
         hidden: !legendVisibility[2]
       },
       {
-        label: 'Bitcoin · Reach upper channel',
+        label: 'Bitcoin · Reach Power Law upper channel',
         data: pathUpper,
         borderColor: CHART_COLORS.upper,
         backgroundColor: CHART_COLORS.upper,
@@ -710,11 +730,11 @@
     var rows = [
       { idx: 0, label: 'Keep rental', color: CHART_COLORS.rental, dashed: true,
         tip: 'Net wealth if you keep the rental, collecting after-tax cash flow each year. Mark-to-market &mdash; the property\u2019s market value is included without applying the exit tax that would arise on sale.' },
-      { idx: 1, label: 'Bitcoin · Stay at current multiple', color: CHART_COLORS.stay,
+      { idx: 1, label: 'Bitcoin \u00b7 Stay at current trend multiple', color: CHART_COLORS.stay,
         tip: stayTip },
-      { idx: 2, label: 'Bitcoin · Revert to trend', color: CHART_COLORS.trend,
-        tip: 'Bitcoin moves from today\u2019s multiple back to 1.0\u00d7 trend linearly over the holding period. The Power Law central case &mdash; assumes today\u2019s discount-or-premium-to-trend closes over time.' },
-      { idx: 3, label: 'Bitcoin · Reach upper channel', color: CHART_COLORS.upper,
+      { idx: 2, label: 'Bitcoin \u00b7 Revert to Power Law trend', color: CHART_COLORS.trend,
+        tip: 'Bitcoin moves from today\u2019s multiple back to 1.0\u00d7 the Power Law trend linearly over the holding period. The central case &mdash; assumes today\u2019s discount-or-premium-to-trend closes over time.' },
+      { idx: 3, label: 'Bitcoin \u00b7 Reach Power Law upper channel', color: CHART_COLORS.upper,
         dashed: true,  // visually less confident — matches dashed chart line
         tip: upperTip }
     ];
@@ -763,9 +783,9 @@
   }
 
   function scenarioLabel(scenario){
-    if (scenario === 'stay')  return 'Stay at current multiple';
-    if (scenario === 'upper') return 'Reach upper channel';
-    return 'Revert to trend';
+    if (scenario === 'stay')  return 'Stay at current trend multiple';
+    if (scenario === 'upper') return 'Reach Power Law upper channel';
+    return 'Revert to Power Law trend';
   }
 
   // Path-specific plain-English description rendered below the path
@@ -897,12 +917,14 @@
         '<div class="calc-detail-warn">Caveat: HELOC interest used for bitcoin is not tax-deductible (TCJA). Carry must be serviced from personal income through any bitcoin drawdown.</div>';
     } else if (s.path === 3) {
       var r3 = results.path;
-      html = '<div class="calc-detail-title">Path 3 mechanics — sell ' + s.propertiesToSell + ' of ' + s.numProperties + ' properties, redeploy</div>' +
+      var soldCount = r3.sold;
+      var retainedCount = r3.retained;
+      html = '<div class="calc-detail-title">Path 3 mechanics &mdash; sell ' + soldCount + ' of ' + s.numProperties + ' properties, redeploy</div>' +
         '<div class="calc-detail-rows">' +
-        '<div><span>Sold property value</span><strong>' + fmtMoneyFull(r3.soldPropertiesValue) + '</strong></div>' +
-        '<div><span>Net cash after taxes (' + s.propertiesToSell + ' property)</span><strong>' + fmtMoneyFull(r3.netCashFromSale) + '</strong></div>' +
+        '<div><span>Sold property value (' + soldCount + ' \u00d7 ' + fmtMoneyFull(s.propertyValue) + ')</span><strong>' + fmtMoneyFull(r3.soldPropertiesValue) + '</strong></div>' +
+        '<div><span>Net cash after sale taxes</span><strong>' + fmtMoneyFull(r3.netCashFromSale) + '</strong></div>' +
         '<div><span>Year 1 cash from yield portfolio</span><strong>' + fmtMoneyFull(r3.yieldPortfolio.year1AfterTax) + '</strong></div>' +
-        '<div><span>Year 1 cash from retained ' + (s.numProperties - s.propertiesToSell) + ' rentals</span><strong>' + fmtMoneyFull(r3.retainedRental.annual.afterTax) + '</strong></div>' +
+        '<div><span>Year 1 cash from ' + retainedCount + ' retained rental' + (retainedCount === 1 ? '' : 's') + '</span><strong>' + fmtMoneyFull(r3.retainedRental.annual.afterTax) + '</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Combined Year 1 cash flow</span><strong>' + fmtMoneyFull(r3.year1CashFlow) + '</strong></div>' +
         '</div>';
     } else {
@@ -990,19 +1012,17 @@
     });
   }
 
-  // Path 3 breakdown — total / retained / sold derived display.
-  // Called every rerender so it stays in sync as the user drags the
-  // properties-to-sell slider or changes the total-properties baseline.
-  function renderPath3Breakdown(s){
-    var totalEl = document.getElementById('calc-path3-total');
-    var retainedEl = document.getElementById('calc-path3-retained');
-    var soldEl = document.getElementById('calc-path3-sold');
-    if (!totalEl) return;
-    var sold = Math.min(s.propertiesToSell, s.numProperties);
-    var retained = Math.max(0, s.numProperties - sold);
-    totalEl.textContent = s.numProperties;
-    retainedEl.textContent = retained;
-    soldEl.textContent = sold;
+  // Path 3 derived display — the sold count + property-value reminder.
+  // Called every rerender so it stays in sync with the two sliders
+  // (numProperties and propertiesRetained) controlling the partial-sale
+  // composition. The total and retained values are already visible
+  // on the sliders themselves; this surfaces the implicit "sold" count
+  // so the user sees the full breakdown at a glance.
+  function renderPath3Derived(s){
+    var soldEl = document.getElementById('calc-path3-sold-count');
+    if (!soldEl) return;
+    var sold = Math.max(0, s.numProperties - s.propertiesRetained);
+    soldEl.textContent = sold + ' propert' + (sold === 1 ? 'y' : 'ies');
   }
 
   function renderSpecificCallout(s){
@@ -1028,7 +1048,7 @@
     renderHeadline(results, state);
     renderComparison(results, state);
     renderPathDetail(results, state);
-    renderPath3Breakdown(state);
+    renderPath3Derived(state);
     renderCAGRChips(state);
     renderChart(state);
     renderChartLegend();  // re-render so Stay tooltip stays accurate as multiple/inputs shift
@@ -1061,6 +1081,11 @@
     });
   }
 
+  function updatePerPropertyHint(){
+    var hint = document.querySelector('.calc-perprop-hint');
+    if (hint) hint.style.display = state.path === 3 ? 'inline' : 'none';
+  }
+
   function bindPathToggle(){
     document.querySelectorAll('.calc-path-btn').forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -1072,6 +1097,7 @@
         document.querySelectorAll('.calc-path-specific').forEach(function(grp){
           grp.style.display = grp.dataset.forPath.split(',').indexOf(String(state.path)) >= 0 ? '' : 'none';
         });
+        updatePerPropertyHint();  // "(per property)" only when Path 3 is active
         rerender();
       });
     });
@@ -1124,11 +1150,25 @@
     bindSlider('calc-existing-mortgage', 'existingMortgage',
       function(v){ return fmtMoneyFull(v); });
 
-    // Path 3 sliders
+    // Path 3 sliders — coupled: numProperties drives propertiesRetained's max,
+    // and we clamp propertiesRetained if numProperties is dragged below it.
     bindSlider('calc-num-properties', 'numProperties',
-      function(v){ return v + ' properties'; });
-    bindSlider('calc-properties-to-sell', 'propertiesToSell',
-      function(v){ return v + ' to sell'; });
+      function(v){ return v + ' propert' + (v === 1 ? 'y' : 'ies'); },
+      null,
+      function(){
+        var retainedSlider = document.getElementById('calc-properties-retained');
+        if (!retainedSlider) return;
+        var newMax = state.numProperties - 1;
+        retainedSlider.max = String(newMax);
+        if (state.propertiesRetained > newMax) {
+          state.propertiesRetained = newMax;
+          retainedSlider.value = String(newMax);
+          var lbl = document.getElementById('val-properties-retained');
+          if (lbl) lbl.textContent = newMax + ' retained';
+        }
+      });
+    bindSlider('calc-properties-retained', 'propertiesRetained',
+      function(v){ return v + ' retained'; });
 
     bindPortfolioSliders();
     bindPathToggle();
@@ -1150,9 +1190,11 @@
     renderHeadline(results, state);
     renderComparison(results, state);
     renderPathDetail(results, state);
+    renderPath3Derived(state);
     renderCAGRChips(state);
     renderSpecificCallout(state);
     renderChartLegend();  // static legend markup; toggle handlers persist
+    updatePerPropertyHint();  // initial visibility (default path is 4, so hidden)
 
     // Hook into tab activation: build / refresh the chart only when the
     // calculator tab becomes visible.

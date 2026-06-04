@@ -483,7 +483,7 @@ eleventyComputed:
         <div class="calc-slider-group-label">Your scenario</div>
 
         <div class="calc-slider-row">
-          <span class="calc-slider-name">Property value <span class="calc-slider-hint">(per property)</span></span>
+          <span class="calc-slider-name">Property value <span class="calc-slider-hint calc-perprop-hint" style="display:none">(per property)</span></span>
           <span class="calc-slider-val" id="val-property-value">$500,000</span>
         </div>
         <input type="range" id="calc-property-value" min="100000" max="3000000" step="25000" value="500000">
@@ -519,25 +519,30 @@ eleventyComputed:
         <input type="range" id="calc-heloc-ltv" min="50" max="90" step="5" value="80">
       </div>
 
-      <!-- Path 3-specific active -->
+      <!-- Path 3-specific active. Two sliders (Total + Retained) with the
+           sold count derived. Cleaner mental model than the prior "how many
+           to sell" formulation, which the prior version of this section
+           allowed to exceed the actual total. -->
       <div class="calc-slider-group calc-path-specific" data-for-path="3">
-        <div class="calc-slider-group-label">How much to sell</div>
-        <div class="calc-slider-row">
-          <span class="calc-slider-name">Properties to sell</span>
-          <span class="calc-slider-val" id="val-properties-to-sell">1 to sell</span>
-        </div>
-        <input type="range" id="calc-properties-to-sell" min="1" max="9" step="1" value="1">
+        <div class="calc-slider-group-label">Partial sale composition</div>
 
-        <!-- Property breakdown — derived display, no slider. Surfaces the
-             total / retained / selling split so the partial-sale framing
-             is unambiguous. -->
-        <div class="calc-path3-breakdown" id="calc-path3-breakdown">
-          <div class="calc-path3-row"><span>Properties owned (total)</span><strong id="calc-path3-total">3</strong></div>
-          <div class="calc-path3-row"><span>Properties retained</span><strong id="calc-path3-retained">2</strong></div>
-          <div class="calc-path3-row calc-path3-row-emphasis"><span>Properties sold (proceeds to bitcoin)</span><strong id="calc-path3-sold">1</strong></div>
+        <div class="calc-slider-row">
+          <span class="calc-slider-name">Total # of properties</span>
+          <span class="calc-slider-val" id="val-num-properties">3 properties</span>
+        </div>
+        <input type="range" id="calc-num-properties" min="2" max="10" step="1" value="3">
+
+        <div class="calc-slider-row">
+          <span class="calc-slider-name">Properties retained as rentals</span>
+          <span class="calc-slider-val" id="val-properties-retained">2 retained</span>
+        </div>
+        <input type="range" id="calc-properties-retained" min="1" max="2" step="1" value="2">
+
+        <div class="calc-path3-derived" id="calc-path3-derived">
+          &rarr; <strong id="calc-path3-sold-count">1 property</strong> sold &mdash; proceeds redeploy into the bitcoin yield portfolio.
         </div>
         <div class="calc-path3-note">
-          Each property assumed to be worth the &ldquo;Property value&rdquo; slider amount above. Adjust the <em>Properties owned</em> total in baseline assumptions.
+          Each property assumed to be worth the &ldquo;Property value&rdquo; slider amount above. &ldquo;Keep rental&rdquo; in this path means keeping <em>all</em> properties (apples-to-apples vs. selling some).
         </div>
       </div>
 
@@ -597,7 +602,7 @@ eleventyComputed:
     <div class="calc-cagr-picker">
       <div class="calc-cagr-picker-row">
         <div class="calc-cagr-picker-label">
-          Bitcoin scenario
+          Bitcoin scenario &mdash; based on the Power Law
           <span class="help-tip" tabindex="0">?<span class="tip-content">
             All three scenarios are anchored to the Power Law model and auto-recalibrate as bitcoin&rsquo;s current multiple-of-trend shifts. The selected chip drives the headline number and the comparison table; all three lines remain visible on the chart unless you toggle them off via the legend.
           </span></span>
@@ -608,17 +613,17 @@ eleventyComputed:
       </div>
       <div class="calc-cagr-chips" id="calc-cagr-chips">
         <button class="calc-cagr-chip" data-scenario="stay">
-          <span class="calc-cagr-chip-name">Stay at current</span>
+          <span class="calc-cagr-chip-name">Stay at current trend multiple</span>
           <span class="calc-cagr-chip-rate">&mdash;</span>
           <span class="calc-cagr-chip-sub">no reversion</span>
         </button>
         <button class="calc-cagr-chip active" data-scenario="trend">
-          <span class="calc-cagr-chip-name">Revert to trend</span>
+          <span class="calc-cagr-chip-name">Revert to Power Law trend</span>
           <span class="calc-cagr-chip-rate">&mdash;</span>
-          <span class="calc-cagr-chip-sub">Power Law central</span>
+          <span class="calc-cagr-chip-sub">central case</span>
         </button>
         <button class="calc-cagr-chip" data-scenario="upper">
-          <span class="calc-cagr-chip-name">Reach upper channel</span>
+          <span class="calc-cagr-chip-name">Reach Power Law upper channel</span>
           <span class="calc-cagr-chip-rate">&mdash;</span>
           <span class="calc-cagr-chip-sub">cycle peak</span>
         </button>
@@ -639,7 +644,8 @@ eleventyComputed:
         <canvas id="calc-chart"></canvas>
       </div>
       <div class="calc-chart-caveat">
-        Keep-rental values are <em>mark-to-market</em> &mdash; cumulative after-tax cash + the property&rsquo;s market value, with the exit tax that would arise on sale <em>not</em> applied. Bitcoin paths show their upfront tax already paid at Y0. Toggle the <em>First 3 years</em> view to see the near-term tax-leakage dip honestly.
+        <p><strong>Mark-to-market framing.</strong> Keep-rental values are cumulative after-tax cash + the property&rsquo;s market value, with the exit tax that would arise on sale <em>not</em> applied. Bitcoin paths show their upfront tax already paid at Y0. Toggle the <em>First 3 years</em> view to see the near-term tax-leakage dip honestly &mdash; this recognizes the near-term adverse consequence of divesting property for the bitcoin path.</p>
+        <p><strong>Tax asymmetry on realization.</strong> If both positions are eventually liquidated at year N, the exit-tax profiles differ: a rental sale incurs depreciation recapture (25% on accumulated depreciation) and ~7% transaction costs <em>in addition</em> to LTCG + state cap gains. A bitcoin sale faces only LTCG + state cap gains &mdash; a structurally lighter exit-tax profile that this chart&rsquo;s mark-to-market framing doesn&rsquo;t visualize.</p>
       </div>
       <div class="calc-chart-legend" id="calc-chart-legend"></div>
     </div>
@@ -746,16 +752,6 @@ eleventyComputed:
             <span class="calc-slider-val" id="val-existing-mortgage">$200,000</span>
           </div>
           <input type="range" id="calc-existing-mortgage" min="0" max="2000000" step="10000" value="200000">
-        </div>
-
-        <div class="calc-slider-group calc-path-specific" data-for-path="3">
-          <div class="calc-slider-group-label">Path 3 &mdash; Portfolio facts</div>
-
-          <div class="calc-slider-row">
-            <span class="calc-slider-name">Properties owned <span class="calc-slider-hint">(each at property value above)</span></span>
-            <span class="calc-slider-val" id="val-num-properties">3 properties</span>
-          </div>
-          <input type="range" id="calc-num-properties" min="2" max="10" step="1" value="3">
         </div>
 
       </div>
