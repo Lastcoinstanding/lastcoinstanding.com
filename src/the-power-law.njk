@@ -461,6 +461,24 @@ eleventyComputed:
           <label class="channel-band-toggle"><input type="checkbox" data-band="history" checked><span>Price history</span></label>
         </div>
       </div>
+      <div class="channel-range-controls" role="group" aria-label="Date range">
+        <span class="channel-range-label">Range:</span>
+        <button type="button" class="channel-range-btn active" data-range="all">All-time</button>
+        <button type="button" class="channel-range-btn" data-range="recent-5y">Last 5y</button>
+        <button type="button" class="channel-range-btn" data-range="recent-2y">Last 2y</button>
+        <button type="button" class="channel-range-btn" data-range="recent-1y">Last 1y</button>
+        <span class="channel-range-divider" aria-hidden="true"></span>
+        <button type="button" class="channel-range-btn" data-range="year-2017">2017</button>
+        <button type="button" class="channel-range-btn" data-range="year-2018">2018</button>
+        <button type="button" class="channel-range-btn" data-range="year-2019">2019</button>
+        <button type="button" class="channel-range-btn" data-range="year-2020">2020</button>
+        <button type="button" class="channel-range-btn" data-range="year-2021">2021</button>
+        <button type="button" class="channel-range-btn" data-range="year-2022">2022</button>
+        <button type="button" class="channel-range-btn" data-range="year-2023">2023</button>
+        <button type="button" class="channel-range-btn" data-range="year-2024">2024</button>
+        <button type="button" class="channel-range-btn" data-range="year-2025">2025</button>
+        <button type="button" class="channel-range-btn" data-range="year-2026">2026</button>
+      </div>
       <div class="channel-chart-wrapper"><canvas id="channelChart"></canvas></div>
       <div class="channel-status" id="channelStatus">Loading current price&hellip;</div>
     </div>

@@ -767,10 +767,37 @@
           ticks: {
             color: muted,
             maxTicksLimit: 10,
+            // Year-aligned tick override — prevents duplicate-year labels
+            // on zoomed (small-span) views. Chart.js's autoSkip otherwise
+            // picks evenly-spaced ticks that don't land on Jan 1, causing
+            // adjacent ticks to fall in the same calendar year. With this
+            // override, every visible year appears exactly once. For wide
+            // ranges the stride spaces ticks (every 2y on >10y windows,
+            // every 5y on >20y).
             callback: function(v){
               var date = new Date(GENESIS_TS*1000 + v*86400*1000);
               return date.getFullYear();
             }
+          },
+          afterBuildTicks: function(axis){
+            if(axis.type !== 'linear') return;
+            var startMs = (GENESIS_TS + axis.min * 86400) * 1000;
+            var endMs   = (GENESIS_TS + axis.max * 86400) * 1000;
+            var startYear = new Date(startMs).getUTCFullYear();
+            var endYear   = new Date(endMs).getUTCFullYear();
+            var span = endYear - startYear + 1;
+            var stride = 1;
+            if (span > 20) stride = 5;
+            else if (span > 10) stride = 2;
+            var firstYear = Math.ceil(startYear / stride) * stride;
+            var ticks = [];
+            for (var y = firstYear; y <= endYear; y += stride) {
+              var jan1Days = (Date.UTC(y, 0, 1) / 1000 - GENESIS_TS) / 86400;
+              if (jan1Days >= axis.min && jan1Days <= axis.max) {
+                ticks.push({ value: jan1Days });
+              }
+            }
+            axis.ticks = ticks;
           }
         },
         y: {
@@ -815,6 +842,63 @@
       var idx = bandIndex[input.dataset.band];
       if(idx === undefined) return;
       chart.setDatasetVisibility(idx, input.checked);
+      chart.update('none');
+    });
+  });
+
+  // Range / zoom controls — relative presets (All-time, last 5y/2y/1y)
+  // plus absolute year-jump buttons (2017…2026). Each button sets the
+  // x-axis min/max bounds and rebuilds. The y-axis stays logarithmic so
+  // the bands stay visually meaningful at any zoom level.
+  //
+  // Bounds for the year-N case run from Jan 1 of year N to Dec 31 of
+  // year N. For relative presets, the upper bound stays at the chart's
+  // futureD (today + 5y) so the forward projection cone stays visible.
+  function rangeBoundsFor(rangeKey){
+    if(rangeKey === 'all'){
+      return { min: minD, max: futureD };
+    }
+    if(rangeKey === 'recent-5y'){
+      return { min: todayD - 365.25 * 5, max: futureD };
+    }
+    if(rangeKey === 'recent-2y'){
+      return { min: todayD - 365.25 * 2, max: futureD };
+    }
+    if(rangeKey === 'recent-1y'){
+      return { min: todayD - 365.25 * 1, max: futureD };
+    }
+    if(rangeKey.indexOf('year-') === 0){
+      var y = parseInt(rangeKey.slice(5), 10);
+      var start = (Date.UTC(y,     0, 1) / 1000 - GENESIS_TS) / 86400;
+      var end   = (Date.UTC(y + 1, 0, 1) / 1000 - GENESIS_TS) / 86400;
+      return { min: start, max: end };
+    }
+    return { min: minD, max: futureD };
+  }
+
+  document.querySelectorAll('.channel-range-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.channel-range-btn').forEach(function(b){
+        b.classList.remove('active');
+      });
+      btn.classList.add('active');
+      var bounds = rangeBoundsFor(btn.dataset.range);
+      chart.options.scales.x.min = bounds.min;
+      chart.options.scales.x.max = bounds.max;
+      // When zoomed to a year-N window, the log-time axis can't represent
+      // a window that doesn't include the full lifetime origin sensibly —
+      // force linear axis for year-specific zooms so the user always sees
+      // a meaningful x-axis. Don't touch the axis toggle for relative
+      // presets; the user's choice between linear/log stays respected.
+      if(btn.dataset.range.indexOf('year-') === 0 &&
+         chart.options.scales.x.type === 'logarithmic'){
+        chart.options.scales.x.type = 'linear';
+        document.querySelectorAll('.channel-axis-btn').forEach(function(x){
+          var on = x.dataset.axis === 'linear';
+          x.classList.toggle('active', on);
+          x.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+      }
       chart.update('none');
     });
   });

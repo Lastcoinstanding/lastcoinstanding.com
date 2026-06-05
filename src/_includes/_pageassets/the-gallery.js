@@ -85,6 +85,34 @@
     return String(year);
   }
 
+  // Build explicit year-aligned ticks (Jan 1 of each year) for the linear
+  // x-axis. Without this, Chart.js's autoSkip picks evenly-spaced ticks
+  // that don't land on year boundaries, producing duplicate year labels
+  // when adjacent ticks fall in the same calendar year (e.g. on a ±2y
+  // window: "2024 2025 2025 2027 2027 2028"). With explicit Jan-1 ticks
+  // every year appears exactly once. For wider ranges, stride spaces the
+  // ticks (every 2 years on >10y windows, every 5y on >20y).
+  function buildYearTicks(xMin, xMax) {
+    var startMs = (GENESIS_TS + xMin * 86400) * 1000;
+    var endMs   = (GENESIS_TS + xMax * 86400) * 1000;
+    var startYear = new Date(startMs).getUTCFullYear();
+    var endYear   = new Date(endMs).getUTCFullYear();
+    var span = endYear - startYear + 1;
+    var stride = 1;
+    if (span > 20) stride = 5;
+    else if (span > 10) stride = 2;
+    // Snap start to a multiple of stride so 2010/2015/2020/... pattern holds
+    var firstYear = Math.ceil(startYear / stride) * stride;
+    var ticks = [];
+    for (var y = firstYear; y <= endYear; y += stride) {
+      var jan1Days = (Date.UTC(y, 0, 1) / 1000 - GENESIS_TS) / 86400;
+      if (jan1Days >= xMin && jan1Days <= xMax) {
+        ticks.push({ value: jan1Days });
+      }
+    }
+    return ticks;
+  }
+
   // Y-axis tick formatter — $K / $M abbreviations, sparse on the
   // zoomed views (every band line), denser on the all-time view.
   function formatYTick(v) {
@@ -286,6 +314,13 @@
           x: {
             type: bounds.xType, min: bounds.xMin, max: bounds.xMax,
             grid: { color: 'rgba(220,200,170,0.04)' },
+            // Year-aligned tick override for linear views — see
+            // buildYearTicks comment above for why this is needed.
+            // No-op on the logarithmic all-time view, where the sparse
+            // milestone filter in formatXTick handles label density.
+            afterBuildTicks: bounds.xType === 'linear'
+              ? function(axis){ axis.ticks = buildYearTicks(axis.min, axis.max); }
+              : undefined,
             ticks: {
               color: 'rgba(220,200,170,0.45)',
               font: { size: 11, family: 'Inter, sans-serif' },

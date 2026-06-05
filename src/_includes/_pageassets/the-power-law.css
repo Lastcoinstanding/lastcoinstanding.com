@@ -284,6 +284,56 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   cursor: pointer;
 }
 
+/* Date-range selector — second row below the axis/band controls.
+   Mix of relative presets (All / 5y / 2y / 1y) and absolute year jumps
+   (2017 … 2026). Free-wrapping flex row so it gracefully reflows on
+   smaller widths. */
+.channel-range-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.channel-range-label {
+  font-family: var(--font-b);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-right: 0.3rem;
+}
+.channel-range-btn {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-family: var(--font-b);
+  font-size: 0.74rem;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+  white-space: nowrap;
+}
+.channel-range-btn:hover {
+  color: var(--text-dim);
+  border-color: rgba(224,148,34,0.3);
+}
+.channel-range-btn.active {
+  background: rgba(224,148,34,0.1);
+  color: var(--amber);
+  border-color: rgba(224,148,34,0.5);
+}
+.channel-range-divider {
+  display: inline-block;
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  margin: 0 0.3rem;
+}
+
 /* Chart canvas wrapper */
 .channel-chart-wrapper {
   height: 460px;
