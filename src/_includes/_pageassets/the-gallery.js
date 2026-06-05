@@ -28,6 +28,50 @@
   if (typeof Chart === 'undefined') return;
   if (typeof PL_DATA === 'undefined') return;
 
+  // Custom Chart.js interaction mode: 'xNearest'.
+  // Same definition as in the-power-law.js — keyed on
+  // !Chart.Interaction.modes.xNearest so a second registration on the
+  // same page is a no-op. See the Power Law page version for the full
+  // rationale; the short version: 'index' matches by ARRAY INDEX which
+  // breaks for {x, y} datasets of different lengths (bands ~200,
+  // historical 5500+); this matches by x-VALUE instead, returning one
+  // item per dataset at its own nearest-by-x point.
+  if (Chart.Interaction && Chart.Interaction.modes && !Chart.Interaction.modes.xNearest) {
+    Chart.Interaction.modes.xNearest = function(chart, e, options, useFinalPosition){
+      var position = (Chart.helpers && Chart.helpers.getRelativePosition)
+        ? Chart.helpers.getRelativePosition(e, chart)
+        : { x: e.x, y: e.y };
+      var xScale = chart.scales.x;
+      if(!xScale) return [];
+      var cursorX = xScale.getValueForPixel(position.x);
+      var items = [];
+      chart.data.datasets.forEach(function(dataset, datasetIndex){
+        if(!chart.isDatasetVisible(datasetIndex)) return;
+        var data = dataset.data;
+        if(!data || !data.length) return;
+        var nearestIdx = 0;
+        var nearestDist = Math.abs((data[0].x !== undefined ? data[0].x : 0) - cursorX);
+        for(var i = 1; i < data.length; i++){
+          var x = data[i].x !== undefined ? data[i].x : i;
+          var dist = Math.abs(x - cursorX);
+          if(dist < nearestDist){
+            nearestDist = dist;
+            nearestIdx = i;
+          }
+        }
+        var meta = chart.getDatasetMeta(datasetIndex);
+        if(meta && meta.data && meta.data[nearestIdx]){
+          items.push({
+            element: meta.data[nearestIdx],
+            datasetIndex: datasetIndex,
+            index: nearestIdx
+          });
+        }
+      });
+      return items;
+    };
+  }
+
   var chartInstance = null;
   var currentRange = 'planning';   // ±2y default
   var hasInited = false;
@@ -304,7 +348,7 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
+        interaction: { mode: 'xNearest', intersect: false },
         plugins: {
           legend: {
             display: true, position: 'top',
@@ -319,7 +363,17 @@
             callbacks: {
               title: function(items){
                 if (!items.length) return '';
-                var d = items[0].parsed.x;
+                // Prefer Historical's date (daily resolution) over the
+                // band items (sampled at the range's coarser step). Same
+                // pattern as the-power-law.js channel chart.
+                var pick = items[0];
+                for (var i = 0; i < items.length; i++) {
+                  if (items[i].dataset && items[i].dataset.label === 'Historical price') {
+                    pick = items[i];
+                    break;
+                  }
+                }
+                var d = pick.parsed.x;
                 var ms = (GENESIS_TS + d * 86400) * 1000;
                 var date = new Date(ms);
                 return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });

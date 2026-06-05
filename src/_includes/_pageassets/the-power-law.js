@@ -618,6 +618,61 @@
   var minD = PL_DATA[0][0];
   var futureD = todayD + 365.25 * 5; // project 5 years past today
 
+  // Custom Chart.js interaction mode: 'xNearest'.
+  //
+  // Why this exists: Chart.js's built-in 'index' mode matches by array
+  // INDEX across datasets, not by x value. On this chart, the band
+  // lines have ~190 sampled points (every 30 days) while the
+  // historical line has 5500+ daily points — so array index N
+  // corresponds to wildly different x values in different datasets.
+  // Hovering on a historical point at index 4900 (some date in 2026)
+  // either omits the bands (only 190 entries exist there) or, in
+  // mirrored cases, returns band[N] at one date and historical[N] at
+  // some other date so the tooltip displays inconsistent x values.
+  //
+  // Native 'nearest' with axis 'x' returns only ONE item across all
+  // datasets — also wrong; we want one item per dataset.
+  //
+  // This mode: pick up the cursor's x value via the x-scale, then for
+  // each visible dataset find the point with the smallest |point.x -
+  // cursorX| and return one item per dataset. Result: every series
+  // appears in the tooltip at its own nearest-by-date point.
+  if (typeof Chart !== 'undefined' && Chart.Interaction && Chart.Interaction.modes && !Chart.Interaction.modes.xNearest) {
+    Chart.Interaction.modes.xNearest = function(chart, e, options, useFinalPosition){
+      var position = (Chart.helpers && Chart.helpers.getRelativePosition)
+        ? Chart.helpers.getRelativePosition(e, chart)
+        : { x: e.x, y: e.y };
+      var xScale = chart.scales.x;
+      if(!xScale) return [];
+      var cursorX = xScale.getValueForPixel(position.x);
+      var items = [];
+      chart.data.datasets.forEach(function(dataset, datasetIndex){
+        if(!chart.isDatasetVisible(datasetIndex)) return;
+        var data = dataset.data;
+        if(!data || !data.length) return;
+        var nearestIdx = 0;
+        var nearestDist = Math.abs((data[0].x !== undefined ? data[0].x : 0) - cursorX);
+        for(var i = 1; i < data.length; i++){
+          var x = data[i].x !== undefined ? data[i].x : i;
+          var dist = Math.abs(x - cursorX);
+          if(dist < nearestDist){
+            nearestDist = dist;
+            nearestIdx = i;
+          }
+        }
+        var meta = chart.getDatasetMeta(datasetIndex);
+        if(meta && meta.data && meta.data[nearestIdx]){
+          items.push({
+            element: meta.data[nearestIdx],
+            datasetIndex: datasetIndex,
+            index: nearestIdx
+          });
+        }
+      });
+      return items;
+    };
+  }
+
   // Generate band lines: trend / floor / upper, sampled every 30 days
   var trendLine = [], floorLine = [], upperLine = [];
   for(var d = minD; d <= futureD; d += 30){
@@ -757,7 +812,7 @@
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
+      interaction: { mode: 'xNearest', intersect: false },
       plugins: {
         legend: {
           display: true,
@@ -780,7 +835,20 @@
           callbacks: {
             title: function(items){
               if(!items.length) return '';
-              var d = items[0].parsed.x;
+              // Prefer the Historical item's date (daily resolution) over
+              // the band items (sampled every 30 days). When hovering in
+              // the past, historical is present and its x is within ±0.5
+              // days of the cursor — matches the user's mental model.
+              // When hovering in the future, only the bands are returned;
+              // fall back to items[0] (within ±15 days of cursor).
+              var pick = items[0];
+              for(var i = 0; i < items.length; i++){
+                if(items[i].dataset && items[i].dataset.label === 'Historical price'){
+                  pick = items[i];
+                  break;
+                }
+              }
+              var d = pick.parsed.x;
               var date = new Date(GENESIS_TS*1000 + d*86400*1000);
               return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
             },
