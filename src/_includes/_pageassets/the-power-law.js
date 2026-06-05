@@ -693,8 +693,18 @@
     }
   };
 
+  // Chart type 'line' (not 'scatter') even though the data points are
+  // {x, y} objects with a linear x-axis. The reason is tooltip
+  // behavior: with type 'scatter', interaction.mode 'index' matches by
+  // array index across datasets — which fails here because the band
+  // lines have ~200 sampled points while the historical line has
+  // 5000+ daily points, so the array indices don't align to the same
+  // x values. With type 'line', the same 'index' mode matches by
+  // x-value, so a hover at any x position shows Floor / Trend / Upper
+  // / Historical simultaneously. The {x, y} data format works for
+  // 'line' too when the x-axis is type 'linear' (which it is).
   var chart = new Chart(canvas, {
-    type: 'scatter',
+    type: 'line',
     data: {
       datasets: [
         {
