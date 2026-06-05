@@ -627,8 +627,35 @@
     upperLine.push({x: d, y: t * PL_CEIL});
   }
 
-  // Historical price as dataset
+  // Historical price as dataset. We append a today-point at the end so
+  // the white line reaches the today marker rather than terminating at
+  // PL_DATA's last seeded sample (which may be weeks/months stale). To
+  // make the tooltip work continuously across the gap (Chart.js's 'index'
+  // mode shows only existing data points, not interpolated values), we
+  // also fill the gap with weekly linearly-interpolated points. Without
+  // this, hovering between PL_DATA's last point and today shows the band
+  // lines but omits Historical from the tooltip even though the visual
+  // line passes through. Both the gap points and the today point are
+  // mutated in place by fetchTodayPrice when the live spot lands.
   var historicalLine = PL_DATA.map(function(p){ return {x: p[0], y: p[1]}; });
+  var lastPlX = PL_DATA[PL_DATA.length - 1][0];
+  var lastPlY = PL_DATA[PL_DATA.length - 1][1];
+
+  // Live-price seed (mutated by fetchTodayPrice when CoinGecko resolves)
+  var liveTodayPrice = (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0)
+    ? TODAY_PRICE
+    : lastPlY;
+
+  // Weekly gap-fill (only when gap > 1 week — otherwise interpolation is
+  // visually identical to the single-segment connection)
+  if (todayD > lastPlX + 7) {
+    var gap = todayD - lastPlX;
+    for (var gx = lastPlX + 7; gx < todayD; gx += 7) {
+      var ft = (gx - lastPlX) / gap;
+      historicalLine.push({ x: gx, y: lastPlY * (1 - ft) + liveTodayPrice * ft });
+    }
+  }
+  historicalLine.push({ x: todayD, y: liveTodayPrice });
 
   // Today marker (single point)
   var todayPrice = plPrice(todayD);
@@ -720,7 +747,7 @@
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: 'nearest', axis: 'x', intersect: false },
+      interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: {
           display: true,
@@ -933,7 +960,30 @@
 
   // Live BTC via the shared helper (one fetch + one consistent fallback
   // across every Power Law page, so the "Today" value can't disagree page
-  // to page). Status-line rendering is unchanged.
-  fetchTodayPrice(function(price, source){ updateStatus(price, source === 'live'); });
+  // to page). Status-line rendering is unchanged. When the live price
+  // arrives we also re-interpolate the historical-line gap-fill points
+  // (and the trailing today point) so the white line and its tooltip
+  // values converge on the live spot rather than the seeded TODAY_PRICE.
+  fetchTodayPrice(function(price, source){
+    updateStatus(price, source === 'live');
+    if(source === 'live'){
+      liveTodayPrice = price;
+      var histDs = chart.data.datasets[3];
+      if(histDs && histDs.data && histDs.data.length){
+        var gap = todayD - lastPlX;
+        for(var i = 0; i < histDs.data.length; i++){
+          var pt = histDs.data[i];
+          if(pt.x > lastPlX && pt.x <= todayD){
+            var t = (pt.x - lastPlX) / gap;
+            pt.y = lastPlY * (1 - t) + price * t;
+          }
+        }
+        // update('resize') not 'none' — last-point mutation otherwise
+        // leaves the element pixel cached at the seeded value
+        // (STYLE_GUIDE §6.14).
+        chart.update('resize');
+      }
+    }
+  });
 })();
 

@@ -148,6 +148,26 @@
     var todayPrice = (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0)
       ? TODAY_PRICE : PL_DATA[PL_DATA.length - 1][1];
 
+    // Densify the gap between PL_DATA's last point and today with weekly
+    // linear interpolation. Without this, Chart.js's 'index' tooltip mode
+    // finds no historical data point at hover positions in the gap (only
+    // the bands have points there) and silently omits Historical from
+    // the tooltip — even though the line visually passes through. Both
+    // the gap points and the today point at the end are mutated in
+    // place by fetchTodayPrice when the live spot lands; see init().
+    var lastPlX = PL_DATA[PL_DATA.length - 1][0];
+    var lastPlY = PL_DATA[PL_DATA.length - 1][1];
+    if (today > lastPlX + 7) {
+      var gap = today - lastPlX;
+      for (var gx = lastPlX + 7; gx < today; gx += 7) {
+        var gt = (gx - lastPlX) / gap;
+        var gy = lastPlY * (1 - gt) + todayPrice * gt;
+        if (gx >= bounds.xMin - pad && gx <= bounds.xMax + pad) {
+          historicalLine.push({x: gx, y: gy});
+        }
+      }
+    }
+
     // Extend the historical line to today's live price so the white line
     // reaches the today marker rather than terminating at PL_DATA's last
     // seeded sample (which may be days/weeks/months stale). This is
@@ -382,11 +402,11 @@
         }
 
         // Live price replaces the seed when the fetch lands; pokes the
-        // Today marker on the chart (dataset index 4) AND the trailing
-        // point of the historical line (dataset index 3, last point —
-        // see buildDatasets which appends a today point to the history
-        // so the white line reaches the marker rather than terminating
-        // at PL_DATA's last seeded sample).
+        // Today marker on the chart (dataset index 4) AND every point in
+        // the historical-line gap-fill (dataset index 3, points between
+        // PL_DATA's last sample and today — see buildDatasets which
+        // weekly-interpolates the gap so 'index' tooltip mode has a
+        // historical value to show at every hover x).
         if (typeof fetchTodayPrice === 'function') {
           fetchTodayPrice(function(price /*, source */){
             updateStatus(price, 'live');
@@ -397,8 +417,20 @@
             }
             var historyDs = chartInstance.data.datasets[3];
             if (historyDs && historyDs.data && historyDs.data.length) {
-              var lastIdx = historyDs.data.length - 1;
-              historyDs.data[lastIdx].y = price;
+              // Re-interpolate every point that lies in the gap between
+              // PL_DATA's last sample and today, plus the trailing today
+              // point itself.
+              var lastPlX = PL_DATA[PL_DATA.length - 1][0];
+              var lastPlY = PL_DATA[PL_DATA.length - 1][1];
+              var todayX  = (Date.now() / 1000 - GENESIS_TS) / 86400;
+              var gap = todayX - lastPlX;
+              for (var i = 0; i < historyDs.data.length; i++) {
+                var pt = historyDs.data[i];
+                if (pt.x > lastPlX && pt.x <= todayX && gap > 0) {
+                  var t = (pt.x - lastPlX) / gap;
+                  pt.y = lastPlY * (1 - t) + price * t;
+                }
+              }
             }
             // update('resize') not 'none' — the historical line's last
             // point is mutated in place (data array ref unchanged), so
