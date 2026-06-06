@@ -645,6 +645,22 @@
       var xScale = chart.scales.x;
       if(!xScale) return [];
       var cursorX = xScale.getValueForPixel(position.x);
+      // Stash cursorX on the chart so the tooltip title callback can read
+      // it. The title needs the cursor's actual data-space x to render
+      // the right date — picking it from any returned item is wrong when
+      // the historical-line dataset ends at "today" (its nearest point
+      // for any cursor past today is the today-extension point, so the
+      // title would freeze at today's date as the user hovers further).
+      chart._lastCursorX = cursorX;
+      // Threshold: 5% of the visible x range. If a dataset's nearest
+      // point is farther than this from the cursor, treat the dataset
+      // as "not present here" and skip it. This drops the historical
+      // line from the tooltip when the user hovers far past today —
+      // otherwise we'd show today's price with a future cursor's date
+      // (the "Historical price: $61K" appearing alongside bands at
+      // their 2027 values). The bands themselves stay included since
+      // their 30-day-step sampling extends through futureD.
+      var threshold = (xScale.max - xScale.min) * 0.05;
       var items = [];
       chart.data.datasets.forEach(function(dataset, datasetIndex){
         if(!chart.isDatasetVisible(datasetIndex)) return;
@@ -660,6 +676,7 @@
             nearestIdx = i;
           }
         }
+        if(nearestDist > threshold) return;
         var meta = chart.getDatasetMeta(datasetIndex);
         if(meta && meta.data && meta.data[nearestIdx]){
           items.push({
@@ -835,20 +852,16 @@
           callbacks: {
             title: function(items){
               if(!items.length) return '';
-              // Prefer the Historical item's date (daily resolution) over
-              // the band items (sampled every 30 days). When hovering in
-              // the past, historical is present and its x is within ±0.5
-              // days of the cursor — matches the user's mental model.
-              // When hovering in the future, only the bands are returned;
-              // fall back to items[0] (within ±15 days of cursor).
-              var pick = items[0];
-              for(var i = 0; i < items.length; i++){
-                if(items[i].dataset && items[i].dataset.label === 'Historical price'){
-                  pick = items[i];
-                  break;
-                }
-              }
-              var d = pick.parsed.x;
+              // Date comes from the cursor's data-space x (stashed by the
+              // xNearest interaction mode at the start of each event), not
+              // from any item's parsed.x — items can be off by ±15 days
+              // from the cursor due to the bands' 30-day sampling, and the
+              // historical-line item's x freezes at today for any cursor
+              // past today.
+              var chart = items[0].chart;
+              var d = (chart && chart._lastCursorX !== undefined)
+                ? chart._lastCursorX
+                : items[0].parsed.x;
               var date = new Date(GENESIS_TS*1000 + d*86400*1000);
               return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
             },

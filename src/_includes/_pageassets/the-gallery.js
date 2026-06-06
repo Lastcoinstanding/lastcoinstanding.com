@@ -44,6 +44,14 @@
       var xScale = chart.scales.x;
       if(!xScale) return [];
       var cursorX = xScale.getValueForPixel(position.x);
+      // Stash cursorX on the chart so the tooltip title callback can read
+      // it. See the-power-law.js for the rationale.
+      chart._lastCursorX = cursorX;
+      // Threshold-filter datasets whose nearest point is far from cursor.
+      // Drops historical from the tooltip when hovering far past today,
+      // so we don't show today's price labeled with a future cursor's
+      // date. 5% of visible range is the tolerance.
+      var threshold = (xScale.max - xScale.min) * 0.05;
       var items = [];
       chart.data.datasets.forEach(function(dataset, datasetIndex){
         if(!chart.isDatasetVisible(datasetIndex)) return;
@@ -59,6 +67,7 @@
             nearestIdx = i;
           }
         }
+        if(nearestDist > threshold) return;
         var meta = chart.getDatasetMeta(datasetIndex);
         if(meta && meta.data && meta.data[nearestIdx]){
           items.push({
@@ -363,17 +372,14 @@
             callbacks: {
               title: function(items){
                 if (!items.length) return '';
-                // Prefer Historical's date (daily resolution) over the
-                // band items (sampled at the range's coarser step). Same
-                // pattern as the-power-law.js channel chart.
-                var pick = items[0];
-                for (var i = 0; i < items.length; i++) {
-                  if (items[i].dataset && items[i].dataset.label === 'Historical price') {
-                    pick = items[i];
-                    break;
-                  }
-                }
-                var d = pick.parsed.x;
+                // Use cursor's data-space x (stashed by xNearest mode) so
+                // the date tracks the cursor everywhere — including past
+                // today where historical-line items freeze at today's x.
+                // See the-power-law.js for the rationale.
+                var chart = items[0].chart;
+                var d = (chart && chart._lastCursorX !== undefined)
+                  ? chart._lastCursorX
+                  : items[0].parsed.x;
                 var ms = (GENESIS_TS + d * 86400) * 1000;
                 var date = new Date(ms);
                 return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
