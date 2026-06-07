@@ -478,19 +478,19 @@ related:
           <label>Bitcoin growth scenario<span class="help-tip" tabindex="0">?<span class="tip-content">Annualized bitcoin growth (CAGR) over the chosen horizon. Three scenarios mapped to Power Law channel positions — same framing used in Bitcoin vs Rental Property. Implied CAGR is computed dynamically from today's price-vs-trend position and your horizon, so the chip rates shift as bitcoin moves.</span></span></label>
           <div class="calc-cagr-chips">
             <button class="calc-cagr-chip" data-scenario="stay">
-              <span class="calc-cagr-chip-name">Stay at current trend multiple<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin grows at the Power Law trend rate from today's price, never reverting up to trend. The bear / no-reversion case — you get just trend growth and nothing else.</span></span></span>
+              <span class="calc-cagr-chip-name">Stay at current trend multiple<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin grows at the Power Law trend rate from today's price, never reverting up to trend. The bear / no-reversion case — you get just trend growth and miss the catch-up upside an under-trend entry would normally deliver.</span></span></span>
               <span class="calc-cagr-chip-rate" data-chip-rate>—</span>
-              <span class="calc-cagr-chip-sub">bear / no-reversion</span>
+              <span class="calc-cagr-chip-sub">no reversion</span>
             </button>
             <button class="calc-cagr-chip active" data-scenario="trend">
-              <span class="calc-cagr-chip-name">Revert to Power Law trend<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin moves from today's multiple back to 1.0× the Power Law trend linearly over the holding period. The central case — assumes today's discount-or-premium fades back to trend.</span></span></span>
+              <span class="calc-cagr-chip-name">Revert to Power Law trend<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin moves from today's multiple back to 1.0× the Power Law trend linearly over the holding period. The central case — assumes today's discount-or-premium-to-trend closes over time.</span></span></span>
               <span class="calc-cagr-chip-rate" data-chip-rate>—</span>
               <span class="calc-cagr-chip-sub">central case</span>
             </button>
             <button class="calc-cagr-chip" data-scenario="upper">
-              <span class="calc-cagr-chip-name">Reach Power Law upper channel<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin drifts toward 2.5× trend (the historical above-cycle peak) over the holding period. Not a trendline expectation — rather a recognition that bitcoin spends meaningful time well above its long-run line.</span></span></span>
+              <span class="calc-cagr-chip-name">Reach Power Law upper channel<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin drifts toward 2.5× trend (the historical above-cycle peak) over the holding period. Not a trendline expectation — rather a recognition that bitcoin has historically spiked to ~2.5× trend in cycle peaks, and that such spikes have never been sustained. Worth modeling as a potential window for disciplined rebalancing or partial divestment — see Disciplined Rebalancing.</span></span></span>
               <span class="calc-cagr-chip-rate" data-chip-rate>—</span>
-              <span class="calc-cagr-chip-sub">upper channel</span>
+              <span class="calc-cagr-chip-sub">cycle peak</span>
             </button>
           </div>
         </div>
