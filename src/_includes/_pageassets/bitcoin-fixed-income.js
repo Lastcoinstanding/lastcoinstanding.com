@@ -80,36 +80,60 @@
 
   var CURRENT_BTC_PRICE = 63800;
 
-  // ===== Input sync — slider <-> number =====
-  function syncPair(sliderId, numId, stateKey, parser){
-    parser = parser || Number;
-    var slider = document.getElementById(sliderId);
-    var num = document.getElementById(numId);
-    if (!slider || !num) return;
-
-    function pushFromSlider(){
-      num.value = slider.value;
-      state[stateKey] = parser(slider.value);
-      recalc();
-    }
-    function pushFromNum(){
-      var v = parser(num.value);
-      if (isNaN(v)) return;
-      slider.value = v;
-      state[stateKey] = v;
-      recalc();
-    }
-    slider.addEventListener('input', pushFromSlider);
-    num.addEventListener('input', pushFromNum);
-    num.addEventListener('change', pushFromNum);
+  // ===== Sliders with formatted-value display (BvRP pattern) =====
+  // Each slider has an associated <span class="calc-slider-val" id="val-X">
+  // that displays the value formatted per its formatter (currency, integer, percent).
+  function fmtCurrency(v){
+    return '$' + Math.round(Number(v)).toLocaleString('en-US');
+  }
+  function fmtYears(v){
+    var n = Math.round(Number(v));
+    return n + ' year' + (n === 1 ? '' : 's');
+  }
+  function fmtPercent(v){
+    return Number(v).toLocaleString('en-US', { maximumFractionDigits: 1 }) + '%';
+  }
+  function fmtInt(v){
+    return Math.round(Number(v)).toLocaleString('en-US');
   }
 
-  syncPair('incomeNeedSlider', 'incomeNeed', 'incomeNeed');
-  syncPair('positionSlider', 'position', 'position');
-  syncPair('horizonSlider', 'horizon', 'horizon');
-  syncPair('taxBracketSlider', 'taxBracket', 'taxBracket');
-  syncPair('ltcgRateSlider', 'ltcgRate', 'ltcgRate');
-  syncPair('inflationSlider', 'inflation', 'inflation', parseFloat);
+  function bindSlider(sliderId, valSpanId, stateKey, parser, formatter){
+    parser = parser || Number;
+    formatter = formatter || String;
+    var slider = document.getElementById(sliderId);
+    var valSpan = valSpanId ? document.getElementById(valSpanId) : null;
+    var num = document.getElementById(sliderId.replace('Slider', ''));
+    if (!slider) return;
+
+    function update(){
+      var v = parser(slider.value);
+      state[stateKey] = v;
+      if (valSpan) valSpan.textContent = formatter(slider.value);
+      if (num && num !== slider) num.value = slider.value;
+      recalc();
+    }
+    slider.addEventListener('input', update);
+    if (num && num !== slider) {
+      num.addEventListener('input', function(){
+        var v = parser(num.value);
+        if (isNaN(v)) return;
+        slider.value = v;
+        update();
+      });
+    }
+    // Initial render of formatted value
+    if (valSpan) valSpan.textContent = formatter(slider.value);
+  }
+
+  // Main inputs (BvRP slider pattern — formatted value display, no number-input)
+  bindSlider('incomeNeedSlider', 'val-incomeNeed', 'incomeNeed', Number, fmtCurrency);
+  bindSlider('positionSlider',   'val-position',   'position',   Number, fmtCurrency);
+  bindSlider('horizonSlider',    'val-horizon',    'horizon',    Number, fmtYears);
+
+  // Advanced inputs (legacy slider + number-input pattern for percent values)
+  bindSlider('taxBracketSlider', null, 'taxBracket', Number,     null);
+  bindSlider('ltcgRateSlider',   null, 'ltcgRate',   Number,     null);
+  bindSlider('inflationSlider',  null, 'inflation',  parseFloat, null);
 
   // ===== Button groups =====
   function wireButtonGroup(selector, stateKey, attrKey, parser){
@@ -124,7 +148,7 @@
       });
     });
   }
-  wireButtonGroup('.growth-btn', 'btcCagr', 'data-cagr', parseFloat);
+  wireButtonGroup('.calc-cagr-chip', 'btcCagr', 'data-cagr', parseFloat);
   wireButtonGroup('.path-btn', 'incomePath', 'data-path');
   wireButtonGroup('.tax-btn', 'preferredTaxTreatment', 'data-tax');
 
@@ -369,9 +393,10 @@
           {
             label: 'Income path (real USD)',
             data: [],
-            borderColor: '#e09422',
-            backgroundColor: 'rgba(224, 148, 34, 0.08)',
-            borderWidth: 2,
+            borderColor: '#6db3d4',
+            backgroundColor: 'rgba(109, 179, 212, 0.08)',
+            borderWidth: 2.5,
+            borderDash: [6, 4],
             tension: 0.2,
             pointRadius: 0,
             pointHoverRadius: 4,
@@ -382,7 +407,7 @@
             data: [],
             borderColor: '#F7931A',
             backgroundColor: 'rgba(247, 147, 26, 0.06)',
-            borderWidth: 2,
+            borderWidth: 2.5,
             borderDash: [],
             tension: 0.2,
             pointRadius: 0,

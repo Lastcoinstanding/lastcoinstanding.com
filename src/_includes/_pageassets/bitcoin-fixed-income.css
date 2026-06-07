@@ -609,7 +609,7 @@ html, body {
 .calc-inputs {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.1rem;
 }
 .input-group label {
   display: block;
@@ -621,6 +621,150 @@ html, body {
   color: var(--amber, #e09422);
   margin-bottom: 0.5rem;
 }
+
+/* --- BvRP-style slider group (label + formatted value above, slider below) ---
+   Matches the pattern in bitcoin-vs-rental-property for visual consistency
+   across calculators. Eliminates the number-input crowding issue by
+   showing the formatted value as a span ($60,000 / $1,000,000 / 15 years)
+   instead of an editable text box. */
+.calc-slider-group {
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid var(--border-faint, rgba(255, 255, 255, 0.06));
+  border-radius: 0.5rem;
+  padding: 0.95rem 1.15rem;
+}
+.calc-slider-group-label {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber, #e09422);
+  margin-bottom: 0.4rem;
+}
+.calc-slider-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0.55rem 0 0.3rem;
+  gap: 0.8rem;
+}
+.calc-slider-row:first-child {
+  margin-top: 0;
+}
+.calc-slider-name {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 0.88rem;
+  color: var(--ink, #ccc6b8);
+  line-height: 1.35;
+}
+.calc-slider-val {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--amber, #e09422);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.calc-slider-group input[type="range"] {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  margin: 0.25rem 0 0;
+  cursor: pointer;
+}
+.calc-slider-group input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  background: rgba(224, 148, 34, 0.18);
+  border-radius: 2px;
+}
+.calc-slider-group input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: rgba(224, 148, 34, 0.18);
+  border-radius: 2px;
+}
+.calc-slider-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--amber, #e09422);
+  border-radius: 50%;
+  margin-top: -6px;
+  cursor: pointer;
+}
+.calc-slider-group input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--amber, #e09422);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+/* --- BvRP-style scenario chips (replaces the simple Floor/Trend/Upper buttons).
+   Each chip carries a name + implied rate + sub-caption, with a help-tip
+   for the underlying narrative. Matches the .calc-cagr-chip pattern. */
+.calc-cagr-chips {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+}
+@media (max-width: 720px) {
+  .calc-cagr-chips { grid-template-columns: 1fr; }
+}
+.calc-cagr-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 0.75rem 0.9rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-faint, rgba(255, 255, 255, 0.06));
+  border-radius: 0.4rem;
+  font-family: var(--font-body, "Inter", sans-serif);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  text-align: left;
+  color: var(--ink, #ccc6b8);
+}
+.calc-cagr-chip:hover {
+  background: rgba(224, 148, 34, 0.05);
+  border-color: rgba(224, 148, 34, 0.35);
+  transform: translateY(-1px);
+}
+.calc-cagr-chip.active {
+  background: rgba(224, 148, 34, 0.10);
+  border-color: var(--amber, #e09422);
+}
+.calc-cagr-chip-name {
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  color: var(--ink-bright, #ece4d6);
+  line-height: 1.25;
+}
+.calc-cagr-chip.active .calc-cagr-chip-name {
+  color: var(--amber-bright, #F7931A);
+}
+.calc-cagr-chip-rate {
+  font-size: 0.78rem;
+  color: var(--ink-faint, #5a5247);
+  font-variant-numeric: tabular-nums;
+}
+.calc-cagr-chip.active .calc-cagr-chip-rate {
+  color: var(--amber, #e09422);
+}
+.calc-cagr-chip-sub {
+  font-size: 0.7rem;
+  color: var(--ink-faint, #5a5247);
+  font-style: italic;
+}
+
+/* --- Legacy input-row (retained for the advanced section's percent inputs:
+   tax bracket, LTCG rate, inflation). The dollar inputs above have moved
+   to the .calc-slider-group pattern. --- */
 .input-row {
   display: grid;
   grid-template-columns: 1fr 110px auto;
@@ -677,13 +821,11 @@ html, body {
   white-space: nowrap;
 }
 
-.growth-buttons,
 .path-buttons {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
 }
-.growth-btn,
 .path-btn,
 .tax-btn {
   flex: 1;
@@ -699,13 +841,11 @@ html, body {
   cursor: pointer;
   transition: all 0.2s;
 }
-.growth-btn:hover,
 .path-btn:hover,
 .tax-btn:hover {
   border-color: rgba(247, 147, 26, 0.4);
   color: var(--ink-bright, #f2eee8);
 }
-.growth-btn.active,
 .path-btn.active,
 .tax-btn.active {
   background: rgba(247, 147, 26, 0.08);
