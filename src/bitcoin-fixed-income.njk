@@ -458,7 +458,7 @@ related:
         </div>
 
         <div class="input-group">
-          <label for="position">Initial position</label>
+          <label for="position">Initial position<span class="help-tip" tabindex="0">?<span class="tip-content">Your starting capital available to deploy. The income path puts this in the chosen instrument (STRC, SATA, Treasury, or IG Corp); the bitcoin path holds it as bitcoin and sells as needed to fund annual income.</span></span></label>
           <div class="input-row">
             <input type="range" id="positionSlider" min="100000" max="10000000" step="50000" value="1000000" />
             <input type="number" id="position" min="100000" max="10000000" step="50000" value="1000000" />
@@ -476,7 +476,7 @@ related:
         </div>
 
         <div class="input-group">
-          <label>Bitcoin growth scenario</label>
+          <label>Bitcoin growth scenario<span class="help-tip" tabindex="0">?<span class="tip-content">Annualized bitcoin growth (CAGR) over the chosen horizon. Floor / Trend / Upper anchor to the Power Law fair-value channel: Trend (~28%) is the long-run regression line; Floor (~18%) is the channel floor; Upper (~40%) is the cycle-peak ceiling.</span></span></label>
           <div class="growth-buttons">
             <button class="growth-btn" data-cagr="0.18">Floor (18%)</button>
             <button class="growth-btn active" data-cagr="0.28">Trend (28%)</button>
@@ -485,7 +485,7 @@ related:
         </div>
 
         <div class="input-group">
-          <label>Income path</label>
+          <label>Income path<span class="help-tip" tabindex="0">?<span class="tip-content">The instrument the income path holds. STRC and SATA are Strategy's bitcoin-backed preferreds (par-anchored, ROC-deferred tax). Treasury and IG Corp are the conventional baselines for after-tax comparison.</span></span></label>
           <div class="path-buttons">
             <button class="path-btn active" data-path="strc">STRC (11.5% ROC)</button>
             <button class="path-btn" data-path="sata">SATA (13% ROC)</button>
@@ -507,7 +507,7 @@ related:
           </div>
 
           <div class="input-group">
-            <label for="ltcgRate">Long-term capital gains rate</label>
+            <label for="ltcgRate">Long-term capital gains rate<span class="help-tip" tabindex="0">?<span class="tip-content">Combined federal + state rate on long-term capital gains. Applies when bitcoin is sold (bitcoin path) and when ROC basis is exhausted on the preferred (income path, after ~10 years).</span></span></label>
             <div class="input-row">
               <input type="range" id="ltcgRateSlider" min="0" max="40" step="1" value="30" />
               <input type="number" id="ltcgRate" min="0" max="40" step="1" value="30" />
@@ -525,7 +525,7 @@ related:
           </div>
 
           <div class="input-group">
-            <label>Preferred tax treatment</label>
+            <label>Preferred tax treatment<span class="help-tip" tabindex="0">?<span class="tip-content">ROC: distributions treated as return-of-capital (tax-deferred until basis depleted, then LTCG) — Strategy's structural design. Ordinary income: stress scenario where the IRS reclassifies distributions as fully taxable when received.</span></span></label>
             <div class="path-buttons">
               <button class="tax-btn active" data-tax="roc">ROC (deferred)</button>
               <button class="tax-btn" data-tax="ordinary">Ordinary income (stress)</button>
@@ -539,22 +539,22 @@ related:
 
         <div class="headline-output">
           <div class="output-item">
-            <div class="output-label">Crossover horizon</div>
+            <div class="output-label">Crossover horizon<span class="help-tip tip-right" tabindex="0">?<span class="tip-content">The year at which the all-bitcoin path (hold + sell-as-needed) overtakes the chosen income path in real-terms wealth, given your assumptions. Earlier crossover means the income path's window of advantage is shorter.</span></span></div>
             <div class="output-value" id="crossoverYear">—</div>
             <div class="output-unit">years</div>
           </div>
           <div class="output-item">
-            <div class="output-label">Real after-tax IRR (income path)</div>
+            <div class="output-label">Real after-tax IRR (income path)<span class="help-tip tip-right" tabindex="0">?<span class="tip-content">Internal rate of return on the income path, net of tax and inflation. Computes the cash-flow stream end-to-end through eventual sale or redemption of the instrument.</span></span></div>
             <div class="output-value" id="incomeIRR">—</div>
             <div class="output-unit">% per year</div>
           </div>
           <div class="output-item">
-            <div class="output-label">End-of-horizon wealth (income path)</div>
+            <div class="output-label">End-of-horizon wealth (income path)<span class="help-tip tip-right" tabindex="0">?<span class="tip-content">Real-terms wealth at end of horizon if you stay in the income instrument throughout: dividends received plus the redemption / sale value of principal, deflated to today's purchasing power.</span></span></div>
             <div class="output-value" id="incomeWealth">—</div>
             <div class="output-unit">today's USD</div>
           </div>
           <div class="output-item">
-            <div class="output-label">End-of-horizon wealth (bitcoin path)</div>
+            <div class="output-label">End-of-horizon wealth (bitcoin path)<span class="help-tip tip-right" tabindex="0">?<span class="tip-content">Real-terms wealth at end of horizon if you hold bitcoin and sell as needed each year to fund the income need, deflated to today's purchasing power.</span></span></div>
             <div class="output-value" id="btcWealth">—</div>
             <div class="output-unit">today's USD</div>
           </div>
