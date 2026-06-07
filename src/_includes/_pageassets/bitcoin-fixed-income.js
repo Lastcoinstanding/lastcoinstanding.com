@@ -1,4 +1,3 @@
-<script>
 /* =============================================================
    The Income Question / Bitcoin Fixed Income — page script
    Tab switching with URL hash deep-linking, calculator math,
@@ -476,4 +475,3 @@
   setTimeout(tryEnsureChart, 200);
 
 })();
-</script>
