@@ -119,22 +119,37 @@
     });
   }
 
-  // BTC-today indicator + entry-conditions verdict
+  // BTC-today indicator (static — depends only on TODAY_PRICE and trend)
   function refreshEntryConditions(){
     var mult = currentMultiple();
     var multEl = document.getElementById('entryMultiple');
+    if (multEl) multEl.textContent = mult.toFixed(2);
+  }
+
+  // Income-path verdict (dynamic — driven by actual computed result so it
+  // reflects scenario + stress + horizon, not just today's static multiple).
+  // Thresholds based on income/bitcoin wealth ratio at end of horizon:
+  //   >= 1.0  → 'stronger'  (income path actually wins)
+  //   >= 0.7  → 'fair'      (close — within 30%)
+  //   <  0.7  → 'weaker'    (bitcoin path clearly ahead)
+  function updateVerdict(result){
     var verdictEl = document.getElementById('entryVerdictValue');
     var verdictWrap = document.getElementById('entryVerdict');
-    if (multEl) multEl.textContent = mult.toFixed(2);
-    if (verdictEl && verdictWrap){
-      var verdict, cls;
-      if (mult < 0.8)      { verdict = 'weaker';   cls = 'verdict-weaker'; }
-      else if (mult > 1.2) { verdict = 'stronger'; cls = 'verdict-stronger'; }
-      else                 { verdict = 'fair';     cls = 'verdict-fair'; }
-      verdictEl.textContent = verdict;
-      verdictWrap.classList.remove('verdict-weaker', 'verdict-fair', 'verdict-stronger');
-      verdictWrap.classList.add(cls);
+    if (!verdictEl || !verdictWrap) return;
+    var incomeW = result && result.finalRealIncomeWealth;
+    var btcW = result && result.finalRealBtcWealth;
+    if (!isFinite(incomeW) || !isFinite(btcW) || btcW <= 0){
+      verdictEl.textContent = '—';
+      return;
     }
+    var ratio = incomeW / btcW;
+    var verdict, cls;
+    if (ratio >= 1.0)      { verdict = 'stronger'; cls = 'verdict-stronger'; }
+    else if (ratio >= 0.7) { verdict = 'fair';     cls = 'verdict-fair'; }
+    else                   { verdict = 'weaker';   cls = 'verdict-weaker'; }
+    verdictEl.textContent = verdict;
+    verdictWrap.classList.remove('verdict-weaker', 'verdict-fair', 'verdict-stronger');
+    verdictWrap.classList.add(cls);
   }
 
   // ===== Sliders with formatted-value display (BvRP pattern) =====
@@ -591,6 +606,7 @@
     updateChart(result);
     updateCashflowTable(result);
     refreshEntryConditions();
+    updateVerdict(result);
   }
 
   // Initial render — defer until DOM and Chart.js settle

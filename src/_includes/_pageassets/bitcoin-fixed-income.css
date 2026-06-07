@@ -1315,6 +1315,12 @@ html, body {
   text-align: left;
   letter-spacing: 0;
   text-transform: none;
+  /* Explicit normal whitespace prevents nowrap from cascading in when the
+     trigger sits inside a flex/inline row with white-space: nowrap (e.g.
+     the entry-conditions bar). Without this, the tip card collapses to a
+     single line and extends off the viewport. */
+  white-space: normal;
+  word-wrap: break-word;
   pointer-events: none;
   z-index: 10;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
@@ -1396,4 +1402,20 @@ html, body {
 .entry-conditions-verdict.verdict-stronger .entry-conditions-verdict-value { color: #6db3d4; }
 @media (max-width: 720px) {
   .entry-conditions-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+}
+
+/* --- "What is the Power Law?" link below growth chips ---
+   Same pattern as Bitcoin vs Rental Property's calc-cagr-pl-link. */
+.calc-cagr-pl-link {
+  display: inline-block;
+  margin-top: 0.65rem;
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 0.85rem;
+  color: var(--amber, #e09422);
+  text-decoration: none;
+  letter-spacing: 0.005em;
+  transition: color 0.2s;
+}
+.calc-cagr-pl-link:hover {
+  color: var(--amber-bright, #F7931A);
 }
