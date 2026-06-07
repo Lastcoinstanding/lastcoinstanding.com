@@ -600,10 +600,19 @@
     document.addEventListener('DOMContentLoaded', function(){ setTimeout(recalc, 60); });
   }
 
-  // The shared power-law-data module triggers fetchTodayPrice() on load and
-  // updates window.TODAY_PRICE async (CoinGecko spot; PL_DATA fallback). Re-render
-  // once the fetch has had time to resolve so chips + indicator reflect live price.
-  setTimeout(function(){ refreshScenarioCagrs(); recalc(); }, 1500);
+  // The shared power-law-data module seeds window.TODAY_PRICE to the latest
+  // PL_DATA sample but does NOT auto-call fetchTodayPrice. We call it ourselves
+  // to swap in the live CoinGecko spot, then re-render. If CoinGecko fails,
+  // the shared fetch helper falls back to the seeded value automatically.
+  if (typeof window.fetchTodayPrice === 'function'){
+    window.fetchTodayPrice(function(price /*, source: 'live' | 'fallback' */){
+      if (price && isFinite(price) && price > 0){
+        window.TODAY_PRICE = price;
+      }
+      refreshScenarioCagrs();
+      recalc();
+    });
+  }
 
   // If Chart.js loads after our script (defer pattern), retry once
   var chartRetryAttempts = 0;
