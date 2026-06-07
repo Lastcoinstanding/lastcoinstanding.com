@@ -59,13 +59,15 @@
     incomeNeed: 60000,
     position: 1000000,
     horizon: 15,
-    btcCagr: 0.28,
+    btcScenario: 'trend',      // 'stay' | 'trend' | 'upper' — drives btcCagr via Power Law math
+    btcCagr: 0.28,             // derived from btcScenario + horizon; recomputed in resolveScenarioCagr()
     incomePath: 'strc',
     taxBracket: 42,
     ltcgRate: 30,
     inflation: 6.5,
     preferredTaxTreatment: 'roc',
     // Stress overlay
+    stressPreset: 'base',
     stressDrawdown: 0,         // 0..1 — peak fraction of decline
     stressDurationMonths: 0    // 0..n
   };
@@ -78,7 +80,46 @@
     igcorp:   { label: 'IG Corporate Bond', yield: 0.055, treatment: 'ordinary' }
   };
 
+  // ===== Power Law trend anchors =====
+  // These need monthly refresh — same cadence as the STRC/SATA live snapshot.
+  // The "trend price today" is the Power Law model's central estimate of where
+  // bitcoin "should" trade given days-since-genesis. The bare trend CAGR is
+  // the rate at which that trend line is currently climbing (declines slowly
+  // over time as bitcoin matures). See STYLE_GUIDE refresh checklist.
   var CURRENT_BTC_PRICE = 63800;
+  var BTC_TREND_PRICE_TODAY = 75000;   // Power Law trend estimate, refresh monthly
+  var BTC_TREND_CAGR_BARE  = 0.22;     // current bare trend growth rate, declining
+  // Target multiple at end-of-horizon for each scenario:
+  //   stay  → same multiple as today (no reversion uplift, just trend growth)
+  //   trend → 1.0× trend at end of horizon (linear reversion to trend)
+  //   upper → 2.5× trend at end of horizon (drift toward historical above-cycle peak)
+  var SCENARIO_TARGET_MULT = { stay: null, trend: 1.0, upper: 2.5 };
+
+  // Compute implied CAGR for a scenario over the chosen horizon.
+  // For 'stay': just the bare trend rate (no reversion to trend, no drift up).
+  // For 'trend' / 'upper': solve for CAGR that gets price from current to
+  // (target_mult × terminal_trend_price) over horizon years.
+  function resolveScenarioCagr(scenario, horizon){
+    if (scenario === 'stay') return BTC_TREND_CAGR_BARE;
+    var targetMult = SCENARIO_TARGET_MULT[scenario];
+    if (targetMult == null) return BTC_TREND_CAGR_BARE;
+    var terminalTrend = BTC_TREND_PRICE_TODAY * Math.pow(1 + BTC_TREND_CAGR_BARE, horizon);
+    var terminalPrice = targetMult * terminalTrend;
+    return Math.pow(terminalPrice / CURRENT_BTC_PRICE, 1 / horizon) - 1;
+  }
+
+  // Re-derive btcCagr from current state.btcScenario + state.horizon, and update
+  // each chip's rate display. Called whenever scenario or horizon changes.
+  function refreshScenarioCagrs(){
+    var chips = document.querySelectorAll('.calc-cagr-chip');
+    chips.forEach(function(chip){
+      var scenario = chip.getAttribute('data-scenario');
+      var cagr = resolveScenarioCagr(scenario, state.horizon);
+      var rateEl = chip.querySelector('[data-chip-rate]');
+      if (rateEl) rateEl.textContent = '~' + Math.round(cagr * 100) + '% CAGR';
+      if (scenario === state.btcScenario) state.btcCagr = cagr;
+    });
+  }
 
   // ===== Sliders with formatted-value display (BvRP pattern) =====
   // Each slider has an associated <span class="calc-slider-val" id="val-X">
@@ -130,6 +171,12 @@
   bindSlider('positionSlider',   'val-position',   'position',   Number, fmtCurrency);
   bindSlider('horizonSlider',    'val-horizon',    'horizon',    Number, fmtYears);
 
+  // Horizon change must also re-derive the scenario CAGRs (their implied rates
+  // depend on horizon: longer horizons give reversion more time to play out,
+  // shifting the "Revert to trend" and "Reach upper" rates).
+  var horizonSliderEl = document.getElementById('horizonSlider');
+  if (horizonSliderEl) horizonSliderEl.addEventListener('input', refreshScenarioCagrs);
+
   // Advanced inputs (legacy slider + number-input pattern for percent values)
   bindSlider('taxBracketSlider', null, 'taxBracket', Number,     null);
   bindSlider('ltcgRateSlider',   null, 'ltcgRate',   Number,     null);
@@ -148,7 +195,22 @@
       });
     });
   }
-  wireButtonGroup('.calc-cagr-chip', 'btcCagr', 'data-cagr', parseFloat);
+
+  // Bitcoin growth scenario chips — set scenario string, then derive CAGR
+  // via the Power Law-multiple math (resolveScenarioCagr). The chip's CAGR
+  // is dynamic, so we can't just store data-cagr — we store data-scenario.
+  document.querySelectorAll('.calc-cagr-chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      document.querySelectorAll('.calc-cagr-chip').forEach(function(b){ b.classList.remove('active'); });
+      chip.classList.add('active');
+      state.btcScenario = chip.getAttribute('data-scenario');
+      state.btcCagr = resolveScenarioCagr(state.btcScenario, state.horizon);
+      recalc();
+    });
+  });
+  // Initial CAGR render
+  refreshScenarioCagrs();
+
   wireButtonGroup('.path-btn', 'incomePath', 'data-path');
   wireButtonGroup('.tax-btn', 'preferredTaxTreatment', 'data-tax');
 
@@ -159,12 +221,14 @@
     winter: { drawdown: 0.70, durationMonths: 48 },
     base:   { drawdown: 0.00, durationMonths: 0  }
   };
-  var presetBtns = document.querySelectorAll('.preset-btn');
-  presetBtns.forEach(function(btn){
+  var stressChips = document.querySelectorAll('.stress-chip');
+  stressChips.forEach(function(btn){
     btn.addEventListener('click', function(){
-      presetBtns.forEach(function(b){ b.classList.remove('active'); });
+      stressChips.forEach(function(b){ b.classList.remove('active'); });
       btn.classList.add('active');
-      var preset = PRESETS[btn.getAttribute('data-preset')] || PRESETS.base;
+      var presetKey = btn.getAttribute('data-preset');
+      var preset = PRESETS[presetKey] || PRESETS.base;
+      state.stressPreset = presetKey;
       state.stressDrawdown = preset.drawdown;
       state.stressDurationMonths = preset.durationMonths;
       recalc();
@@ -199,6 +263,7 @@
     var positionValue = state.position; // nominal $
     var nominalIncomePath = [state.position];
     var realIncomePath = [state.position];
+    var dividendsPerYear = [];     // net (after-tax) nominal dividend received each year
     var afterTaxCashflow = 0;
     var totalNominalReceived = 0;
     var basisDepleteYear = 1 / path.yield; // years until ROC basis depletes at gross yield
@@ -228,6 +293,7 @@
 
       var netDividend = grossDividend - tax;
       totalNominalReceived += netDividend;
+      dividendsPerYear.push(netDividend);
 
       // User withdraws need; surplus reinvested into position
       var surplus = netDividend - needThisYear;
@@ -258,6 +324,7 @@
     var btcCostBasis = state.position;
     var nominalBtcPath = [state.position];
     var realBtcPath = [state.position];
+    var btcSoldPerYear = [];   // nominal USD value of BTC sold to fund need + tax each year
 
     // Apply stress: drawdown happens in months 1..duration, recovery linear after that to trend
     var stressDuration = state.stressDurationMonths / 12;
@@ -293,6 +360,7 @@
       var extraSale = btcSaleTax / btcPrice;
       btcToSell += extraSale;
 
+      btcSoldPerYear.push(btcToSell * btcPrice);
       btcUnits = Math.max(0, btcUnits - btcToSell);
       btcCostBasis = Math.max(0, btcCostBasis - (avgBasisPerBtc * btcToSell));
 
@@ -336,6 +404,8 @@
       realBtcPath: realBtcPath,
       nominalIncomePath: nominalIncomePath,
       nominalBtcPath: nominalBtcPath,
+      dividendsPerYear: dividendsPerYear,
+      btcSoldPerYear: btcSoldPerYear,
       crossoverYear: crossoverYear,
       finalRealIncomeWealth: finalRealIncomeWealth,
       finalRealBtcWealth: realBtcPath[realBtcPath.length - 1],
@@ -476,10 +546,33 @@
     chart.update('none');
   }
 
+  function updateCashflowTable(result){
+    var tbody = document.getElementById('cashflowTbody');
+    if (!tbody) return;
+    var rows = [];
+    for (var y = 1; y <= state.horizon; y++){
+      var incomeWealth = result.realIncomePath[y];
+      var btcWealth    = result.realBtcPath[y];
+      var dividend     = result.dividendsPerYear[y - 1] || 0;
+      var btcSold      = result.btcSoldPerYear[y - 1] || 0;
+      rows.push(
+        '<tr>' +
+          '<td>' + y + '</td>' +
+          '<td class="td-income">' + fmtUSD(incomeWealth) + '</td>' +
+          '<td class="td-income">' + fmtUSD(dividend) + '</td>' +
+          '<td class="td-btc">' + fmtUSD(btcWealth) + '</td>' +
+          '<td class="td-btc">' + fmtUSD(btcSold) + '</td>' +
+        '</tr>'
+      );
+    }
+    tbody.innerHTML = rows.join('');
+  }
+
   function recalc(){
     var result = computePaths();
     updateOutputs(result);
     updateChart(result);
+    updateCashflowTable(result);
   }
 
   // Initial render — defer until DOM and Chart.js settle

@@ -853,34 +853,79 @@ html, body {
   color: var(--ink-bright, #f2eee8);
 }
 
+/* --- Advanced assumptions disclosure (tax & inflation) ---
+   Visual affordance: bordered panel, prominent chevron that rotates on
+   open, hover state. The previous styling read as a near-invisible
+   collapsed line; this makes the "click to expand" affordance obvious. */
 .advanced-inputs {
-  margin-top: 0.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  margin-top: 0.75rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.10));
+  border-radius: 0.4rem;
+  background: rgba(255, 255, 255, 0.015);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.advanced-inputs:hover {
+  border-color: rgba(224, 148, 34, 0.35);
+}
+.advanced-inputs[open] {
+  border-color: rgba(224, 148, 34, 0.25);
 }
 .advanced-inputs summary {
   font-family: var(--font-body, "Inter", sans-serif);
   font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--ink-dim, #c8c2b8);
+  font-weight: 600;
+  color: var(--ink-bright, #ece4d6);
   cursor: pointer;
-  padding: 0.4rem 0;
+  padding: 0.8rem 1.1rem;
   list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  user-select: none;
+  transition: background 0.15s;
+}
+.advanced-inputs summary:hover {
+  background: rgba(224, 148, 34, 0.05);
+}
+.advanced-inputs summary::-webkit-details-marker {
+  display: none;
 }
 .advanced-inputs summary::before {
-  content: "▸ ";
+  content: "›";
+  display: inline-block;
   color: var(--amber, #e09422);
-  font-size: 0.7rem;
-  margin-right: 0.3rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  width: 0.8rem;
+  text-align: center;
+  transition: transform 0.2s;
+  transform: rotate(0deg);
+  line-height: 1;
 }
 .advanced-inputs[open] summary::before {
-  content: "▾ ";
+  transform: rotate(90deg);
+}
+.advanced-inputs summary::after {
+  content: "click to expand";
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--ink-faint, #5a5247);
+  font-style: italic;
+  margin-left: auto;
+}
+.advanced-inputs[open] summary::after {
+  content: "click to collapse";
 }
 .advanced-inputs[open] {
-  padding-bottom: 0.5rem;
+  padding-bottom: 1rem;
 }
 .advanced-inputs .input-group {
-  margin-top: 1.25rem;
+  margin: 1rem 1.1rem 0;
+}
+.advanced-inputs .input-group:first-of-type {
+  margin-top: 0.5rem;
 }
 
 /* --- Calc output --- */
@@ -942,37 +987,174 @@ html, body {
   margin: 0;
 }
 
-/* --- Preset buttons --- */
-.preset-buttons {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0.75rem;
-  margin: 1.5rem 0 2rem;
+/* --- Stress chips (relocated above the chart in the output column).
+   Each chip carries a name + sub-caption + an in-name help-tip. Sits as a
+   row of 4 above the headline-output so its visual effect on the chart is
+   immediately visible (no scrolling needed). */
+.stress-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid var(--border-faint, rgba(255, 255, 255, 0.06));
+  border-radius: 0.4rem;
 }
-.preset-btn {
-  padding: 1rem 0.75rem;
+.stress-chips-label {
   font-family: var(--font-body, "Inter", sans-serif);
-  font-size: 0.92rem;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
-  border-radius: 4px;
-  color: var(--ink-bright, #f2eee8);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber, #e09422);
+}
+.stress-chips-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.55rem;
+}
+@media (max-width: 720px) {
+  .stress-chips-row { grid-template-columns: repeat(2, 1fr); }
+}
+.stress-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.18rem;
+  padding: 0.55rem 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-faint, rgba(255, 255, 255, 0.08));
+  border-radius: 0.35rem;
+  font-family: var(--font-body, "Inter", sans-serif);
   cursor: pointer;
-  transition: all 0.2s;
-  line-height: 1.4;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  text-align: left;
+  color: var(--ink, #ccc6b8);
 }
-.preset-btn small {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--ink-faint, #9a9286);
-  font-weight: 400;
-  margin-top: 0.25rem;
+.stress-chip:hover {
+  background: rgba(224, 148, 34, 0.05);
+  border-color: rgba(224, 148, 34, 0.35);
+  transform: translateY(-1px);
 }
-.preset-btn:hover {
+.stress-chip.active {
+  background: rgba(224, 148, 34, 0.10);
   border-color: var(--amber, #e09422);
-  background: rgba(247, 147, 26, 0.05);
 }
+.stress-chip-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-bright, #ece4d6);
+  line-height: 1.2;
+}
+.stress-chip.active .stress-chip-name {
+  color: var(--amber-bright, #F7931A);
+}
+.stress-chip-sub {
+  font-size: 0.68rem;
+  color: var(--ink-faint, #5a5247);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Year-by-year cashflow table (collapsible details below chart) --- */
+.cashflow-table {
+  margin-top: 0.5rem;
+  border: 1px solid var(--border-faint, rgba(255, 255, 255, 0.08));
+  border-radius: 0.4rem;
+  overflow: hidden;
+}
+.cashflow-table summary {
+  cursor: pointer;
+  padding: 0.7rem 1rem;
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-bright, #ece4d6);
+  background: rgba(255, 255, 255, 0.02);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+}
+.cashflow-table summary:hover {
+  background: rgba(224, 148, 34, 0.04);
+}
+.cashflow-table summary::-webkit-details-marker { display: none; }
+.cashflow-table summary::before {
+  content: "›";
+  display: inline-block;
+  color: var(--amber, #e09422);
+  font-size: 1.1rem;
+  font-weight: 700;
+  width: 0.8rem;
+  text-align: center;
+  transition: transform 0.2s;
+  line-height: 1;
+}
+.cashflow-table[open] summary::before { transform: rotate(90deg); }
+.cashflow-table-hint {
+  font-size: 0.72rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink-faint, #5a5247);
+  margin-left: auto;
+}
+.cashflow-table[open] .cashflow-table-hint { display: none; }
+.cashflow-table-wrap {
+  overflow-x: auto;
+  border-top: 1px solid var(--border-faint, rgba(255, 255, 255, 0.06));
+}
+.cashflow-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+.cashflow-table th,
+.cashflow-table td {
+  padding: 0.5rem 0.7rem;
+  text-align: right;
+  border-bottom: 1px solid var(--border-faint, rgba(255, 255, 255, 0.04));
+  white-space: nowrap;
+}
+.cashflow-table th:first-child,
+.cashflow-table td:first-child {
+  text-align: left;
+  color: var(--ink-faint, #5a5247);
+  width: 3rem;
+}
+.cashflow-table thead th {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint, #5a5247);
+  background: rgba(255, 255, 255, 0.01);
+}
+.cashflow-table th.th-income,
+.cashflow-table td.td-income {
+  color: #6db3d4;
+}
+.cashflow-table th.th-btc,
+.cashflow-table td.td-btc {
+  color: var(--amber-bright, #F7931A);
+}
+.cashflow-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+.cashflow-note {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 0.72rem;
+  font-style: italic;
+  color: var(--ink-faint, #5a5247);
+  padding: 0.6rem 1rem;
+  margin: 0;
+}
+
+/* --- Color-coded result values (match chart line colors) --- */
+.output-value-income { color: #6db3d4; }
+.output-value-btc    { color: var(--amber-bright, #F7931A); }
 
 /* --- Tab system (canonical per §6.2) --- */
 .tab-nav {
@@ -1069,16 +1251,6 @@ html, body {
   .chart-wrapper {
     height: 280px;
   }
-}
-
-/* --- Stress-preset button active state --- */
-.preset-btn.active {
-  background: rgba(247, 147, 26, 0.08);
-  border-color: var(--amber, #e09422);
-  color: var(--ink-bright, #f2eee8);
-}
-.preset-btn.active small {
-  color: var(--ink-bright, #f2eee8);
 }
 
 /* --- Help-tip / inline tooltip (canonical per STYLE_GUIDE §6.13) ---
