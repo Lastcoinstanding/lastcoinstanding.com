@@ -1,9 +1,36 @@
 <style id="bitcoin-fixed-income-css">
 /* =============================================================
    The Income Question / Bitcoin Fixed Income — page styles
-   Inherits site-wide tokens from base.njk. Page-scoped overrides
-   and component recipes live here.
+   Page-scoped design tokens (dark theme), matching the convention
+   used by Bitcoin vs Rental Property and other Numbers pages.
    ============================================================= */
+
+:root {
+  --bg-page: #0a0908;
+  --amber: #e09422;
+  --amber-bright: #F7931A;
+  --amber-soft: rgba(224,148,34,0.08);
+  --ink-bright: #ece4d6;
+  --ink: #ccc6b8;
+  --ink-dim: #968b7a;
+  --ink-faint: #5a5247;
+  --border-faint: rgba(255,255,255,0.06);
+  --border-amber: rgba(224,148,34,0.20);
+  --red: #c0392b;
+  --green: #5a8a3a;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color-scheme: dark;
+}
+
+html, body {
+  background: #0a0908 !important;
+  color: var(--ink);
+  font-family: var(--font-body);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
 
 /* --- Page wrap (mixed-content tier: 1100px page, 880px essay block) --- */
 .page-wrap {
