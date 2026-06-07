@@ -438,10 +438,12 @@ related:
 
     <div class="essay-prose">
       <div class="tab-thesis">
-        <h2>The crossover horizon — <em>at what point does just-hold-bitcoin overtake?</em></h2>
+        <h2>Where the income path actually wins — <em>bitcoin-backed preferreds as bear-case insurance</em></h2>
       </div>
 
-      <p class="prose">The calculator computes the year at which an all-bitcoin path overtakes a chosen income path, under your assumed growth scenario. For any holder, there is a horizon at which the income instruments make sense and a horizon at which they don't. The calculator computes that horizon for your specific situation, end-to-end through eventual sale or redemption of the instruments.</p>
+      <p class="prose">Under base-case bitcoin growth, just holding bitcoin wins on terminal wealth — comfortably, at any reasonable Power Law assumption. The case for these instruments is not wealth maximization. It is <strong>bear-case insurance, volatility elimination, and tax-efficient cashflow today</strong>: a defined dividend stream while bitcoin maybe disappoints, no need to sell coins into a 60%-drawdown market to eat, and a way to hold bitcoin-adjacent yield in a household where direct exposure isn't an option.</p>
+
+      <p class="prose">The calculator shows you where the crossover sits under your assumptions and current Power Law positioning. The stress scenarios — directly above the chart — show what happens when bitcoin actually disappoints. The case for the income path lives in the area between them.</p>
     </div>
 
     <div class="calc-wrapper">
@@ -473,21 +475,21 @@ related:
         </div>
 
         <div class="input-group">
-          <label>Bitcoin growth scenario<span class="help-tip" tabindex="0">?<span class="tip-content">Annualized bitcoin growth (CAGR) over the chosen horizon. Three scenarios mapped to Power Law channel positions — same framing used in Bitcoin vs Rental Property.</span></span></label>
+          <label>Bitcoin growth scenario<span class="help-tip" tabindex="0">?<span class="tip-content">Annualized bitcoin growth (CAGR) over the chosen horizon. Three scenarios mapped to Power Law channel positions — same framing used in Bitcoin vs Rental Property. Implied CAGR is computed dynamically from today's price-vs-trend position and your horizon, so the chip rates shift as bitcoin moves.</span></span></label>
           <div class="calc-cagr-chips">
-            <button class="calc-cagr-chip" data-cagr="0.22">
+            <button class="calc-cagr-chip" data-scenario="stay">
               <span class="calc-cagr-chip-name">Stay at current trend multiple<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin grows at the Power Law trend rate from today's price, never reverting up to trend. The bear / no-reversion case — you get just trend growth and nothing else.</span></span></span>
-              <span class="calc-cagr-chip-rate">~22% CAGR</span>
+              <span class="calc-cagr-chip-rate" data-chip-rate>—</span>
               <span class="calc-cagr-chip-sub">bear / no-reversion</span>
             </button>
-            <button class="calc-cagr-chip active" data-cagr="0.28">
+            <button class="calc-cagr-chip active" data-scenario="trend">
               <span class="calc-cagr-chip-name">Revert to Power Law trend<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin moves from today's multiple back to 1.0× the Power Law trend linearly over the holding period. The central case — assumes today's discount-or-premium fades back to trend.</span></span></span>
-              <span class="calc-cagr-chip-rate">~28% CAGR</span>
+              <span class="calc-cagr-chip-rate" data-chip-rate>—</span>
               <span class="calc-cagr-chip-sub">central case</span>
             </button>
-            <button class="calc-cagr-chip" data-cagr="0.40">
+            <button class="calc-cagr-chip" data-scenario="upper">
               <span class="calc-cagr-chip-name">Reach Power Law upper channel<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin drifts toward 2.5× trend (the historical above-cycle peak) over the holding period. Not a trendline expectation — rather a recognition that bitcoin spends meaningful time well above its long-run line.</span></span></span>
-              <span class="calc-cagr-chip-rate">~40% CAGR</span>
+              <span class="calc-cagr-chip-rate" data-chip-rate>—</span>
               <span class="calc-cagr-chip-sub">upper channel</span>
             </button>
           </div>
@@ -503,8 +505,8 @@ related:
           </div>
         </div>
 
-        <details class="advanced-inputs">
-          <summary>Advanced assumptions</summary>
+        <details class="advanced-inputs" open>
+          <summary>Tax &amp; inflation</summary>
 
           <div class="input-group">
             <label for="taxBracket">Combined ordinary income tax bracket</label>
@@ -546,6 +548,28 @@ related:
 
       <div class="calc-output">
 
+        <div class="stress-chips" role="group" aria-label="Stress test scenarios">
+          <div class="stress-chips-label">Stress overlay</div>
+          <div class="stress-chips-row">
+            <button class="stress-chip active" data-preset="base">
+              <span class="stress-chip-name">Base<span class="help-tip" tabindex="0">?<span class="tip-content">No additional stress applied. Bitcoin follows the growth scenario you selected; the preferred path runs at its par-anchored yield with ROC tax treatment.</span></span></span>
+              <span class="stress-chip-sub">no stress</span>
+            </button>
+            <button class="stress-chip" data-preset="mild">
+              <span class="stress-chip-name">Mild stress<span class="help-tip" tabindex="0">?<span class="tip-content">A 30% bitcoin drawdown lasting 12 months overlaid on the chosen growth scenario. Realistic mid-cycle correction — the kind that has happened roughly every 2–3 years in bitcoin's history.</span></span></span>
+              <span class="stress-chip-sub">30% / 12 months</span>
+            </button>
+            <button class="stress-chip" data-preset="mreit">
+              <span class="stress-chip-name">2008 mREIT-style<span class="help-tip" tabindex="0">?<span class="tip-content">A 50% drawdown lasting 24 months — the kind of stress that broke mortgage REITs in 2008 when funding markets froze. Tests whether the preferred mechanism holds when the structural stress lasts longer than typical recoveries.</span></span></span>
+              <span class="stress-chip-sub">50% / 24 months</span>
+            </button>
+            <button class="stress-chip" data-preset="winter">
+              <span class="stress-chip-name">Crypto winter<span class="help-tip" tabindex="0">?<span class="tip-content">A 70% drawdown lasting 48 months — the deepest stress scenario, matching the 2014–2015 and 2018 crypto winters. Pushes the preferred mechanism toward the structural failure conditions documented in The Risks.</span></span></span>
+              <span class="stress-chip-sub">70% / 48 months</span>
+            </button>
+          </div>
+        </div>
+
         <div class="headline-output">
           <div class="output-item">
             <div class="output-label">Crossover horizon<span class="help-tip tip-right" tabindex="0">?<span class="tip-content">The year at which the all-bitcoin path (hold + sell-as-needed) overtakes the chosen income path in real-terms wealth, given your assumptions. Earlier crossover means the income path's window of advantage is shorter.</span></span></div>
@@ -554,17 +578,17 @@ related:
           </div>
           <div class="output-item">
             <div class="output-label">Real after-tax IRR (income path)<span class="help-tip tip-right" tabindex="0">?<span class="tip-content">Internal rate of return on the income path, net of tax and inflation. Computes the cash-flow stream end-to-end through eventual sale or redemption of the instrument.</span></span></div>
-            <div class="output-value" id="incomeIRR">—</div>
+            <div class="output-value output-value-income" id="incomeIRR">—</div>
             <div class="output-unit">% per year</div>
           </div>
           <div class="output-item">
             <div class="output-label">End-of-horizon wealth (income path)<span class="help-tip tip-right" tabindex="0">?<span class="tip-content">Real-terms wealth at end of horizon if you stay in the income instrument throughout: dividends received plus the redemption / sale value of principal, deflated to today's purchasing power.</span></span></div>
-            <div class="output-value" id="incomeWealth">—</div>
+            <div class="output-value output-value-income" id="incomeWealth">—</div>
             <div class="output-unit">today's USD</div>
           </div>
           <div class="output-item">
             <div class="output-label">End-of-horizon wealth (bitcoin path)<span class="help-tip tip-right" tabindex="0">?<span class="tip-content">Real-terms wealth at end of horizon if you hold bitcoin and sell as needed each year to fund the income need, deflated to today's purchasing power.</span></span></div>
-            <div class="output-value" id="btcWealth">—</div>
+            <div class="output-value output-value-btc" id="btcWealth">—</div>
             <div class="output-unit">today's USD</div>
           </div>
         </div>
@@ -575,21 +599,30 @@ related:
 
         <p class="chart-caption" id="chartCaption">Wealth trajectory comparison in real terms (today's purchasing power). Income path receives dividends, redeems at par at end of horizon. Bitcoin path holds and sells lump-sum at end of horizon.</p>
 
+        <details class="cashflow-table">
+          <summary>Year-by-year cashflows <span class="cashflow-table-hint">(click to expand)</span></summary>
+          <div class="cashflow-table-wrap">
+            <table id="cashflowTable">
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th class="th-income">Income path wealth (real)</th>
+                  <th class="th-income">Dividend received (nominal)</th>
+                  <th class="th-btc">Bitcoin path wealth (real)</th>
+                  <th class="th-btc">Bitcoin sold (USD nominal)</th>
+                </tr>
+              </thead>
+              <tbody id="cashflowTbody"></tbody>
+            </table>
+          </div>
+          <p class="cashflow-note">Wealth columns deflated to today's purchasing power. Dividend / sale columns are nominal year-of-occurrence USD.</p>
+        </details>
+
       </div>
 
     </div>
 
     <div class="essay-prose">
-      <h2 class="section-title">Stress test scenarios</h2>
-      <p class="prose">Three named scenarios apply additional structural stress to the preferred path. These are teaching tools, not predictions.</p>
-
-      <div class="preset-buttons">
-        <button class="preset-btn" data-preset="mild">Mild stress<br><small>30% BTC drawdown, 12 months</small></button>
-        <button class="preset-btn" data-preset="mreit">2008 mREIT-style<br><small>50% drawdown, 24 months</small></button>
-        <button class="preset-btn" data-preset="winter">Crypto winter<br><small>70% drawdown, 48 months</small></button>
-        <button class="preset-btn" data-preset="base">Reset to base</button>
-      </div>
-
       <h2 class="section-title">What the calculator does not do</h2>
 
       <p class="prose">It does not predict bitcoin's price. It does not predict whether STRC will re-anchor to par or whether SATA's daily-dividend mechanism will hold its band. It does not predict whether issuer management will maintain par-anchoring under sustained stress. It does not predict tax-code changes that could compromise the ROC treatment.</p>
