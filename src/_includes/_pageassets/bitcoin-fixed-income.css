@@ -1330,3 +1330,70 @@ html, body {
   right: 0;
   transform: none;
 }
+
+/* --- Entry-conditions indicator (canonical Power Law multiple, top of calculator) ---
+   Sits at the top of .calc-wrapper, above both columns. Shows two readings:
+   the live current multiple of trend (sourced from the shared power-law-data
+   module — same number used by all other Power-Law-aware pages on the site),
+   and a directional verdict on whether today's positioning makes the income
+   path's case stronger / fair / weaker. Color of the verdict tracks the
+   classification (blue when stronger, amber when fair, red when weaker —
+   though red here means "buying income now means giving up bitcoin upside",
+   not "danger"). */
+.entry-conditions {
+  grid-column: 1 / -1;     /* span both columns of the calc-wrapper grid */
+  margin-bottom: 1.1rem;
+  padding: 0.85rem 1.15rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-faint, rgba(255, 255, 255, 0.08));
+  border-radius: 0.5rem;
+  font-family: var(--font-body, "Inter", sans-serif);
+}
+.entry-conditions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.entry-conditions-readout,
+.entry-conditions-verdict {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+.entry-conditions-label,
+.entry-conditions-verdict-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber, #e09422);
+}
+.entry-conditions-value {
+  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--ink-bright, #ece4d6);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.entry-conditions-trend {
+  font-size: 0.85rem;
+  color: var(--ink-dim, #968b7a);
+  letter-spacing: 0.02em;
+}
+.entry-conditions-verdict-value {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+}
+.entry-conditions-verdict.verdict-weaker .entry-conditions-verdict-value   { color: #c66; }
+.entry-conditions-verdict.verdict-fair .entry-conditions-verdict-value     { color: var(--amber, #e09422); }
+.entry-conditions-verdict.verdict-stronger .entry-conditions-verdict-value { color: #6db3d4; }
+@media (max-width: 720px) {
+  .entry-conditions-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+}

@@ -80,36 +80,34 @@
     igcorp:   { label: 'IG Corporate Bond', yield: 0.055, treatment: 'ordinary' }
   };
 
-  // ===== Power Law trend anchors =====
-  // These need monthly refresh — same cadence as the STRC/SATA live snapshot.
-  // The "trend price today" is the Power Law model's central estimate of where
-  // bitcoin "should" trade given days-since-genesis. The bare trend CAGR is
-  // the rate at which that trend line is currently climbing (declines slowly
-  // over time as bitcoin matures). See STYLE_GUIDE refresh checklist.
-  var CURRENT_BTC_PRICE = 63800;
-  var BTC_TREND_PRICE_TODAY = 75000;   // Power Law trend estimate, refresh monthly
-  var BTC_TREND_CAGR_BARE  = 0.22;     // current bare trend growth rate, declining
-  // Target multiple at end-of-horizon for each scenario:
-  //   stay  → same multiple as today (no reversion uplift, just trend growth)
-  //   trend → 1.0× trend at end of horizon (linear reversion to trend)
-  //   upper → 2.5× trend at end of horizon (drift toward historical above-cycle peak)
-  var SCENARIO_TARGET_MULT = { stay: null, trend: 1.0, upper: 2.5 };
+  // ===== Power Law anchors (sourced from shared /_pageassets/shared/power-law-data.js) =====
+  // The shared module exposes globals: PL_A, PL_B, TODAY_DAYS, TODAY_PRICE,
+  // plPrice(days), PL_FLOOR, PL_CEIL. Single-source-of-truth across pages —
+  // do not redefine constants here. Monthly refresh of TODAY_PRICE happens
+  // automatically (CoinGecko spot, with latest PL_DATA sample as fallback).
+  //
+  // currentTrendPrice = plPrice(TODAY_DAYS)              — Power Law trend at today's days-since-genesis
+  // currentMultiple   = TODAY_PRICE / currentTrendPrice  — where bitcoin sits relative to trend
+  //
+  // resolveScenarioCagr() projects a terminal price under each scenario and
+  // solves for the CAGR that connects today's price to it over the horizon.
+  // Scenario target multiples at end-of-horizon:
+  //   stay  → currentMultiple   (no reversion — same multiple)
+  //   trend → 1.0×              (full reversion to trend)
+  //   upper → 2.5×              (drift to historical above-cycle peak)
+  function currentTrendPrice(){ return window.plPrice(window.TODAY_DAYS); }
+  function currentMultiple(){ return window.TODAY_PRICE / currentTrendPrice(); }
+  var SCENARIO_TARGET_MULT = { stay: null /* uses current multiple */, trend: 1.0, upper: 2.5 };
 
-  // Compute implied CAGR for a scenario over the chosen horizon.
-  // For 'stay': just the bare trend rate (no reversion to trend, no drift up).
-  // For 'trend' / 'upper': solve for CAGR that gets price from current to
-  // (target_mult × terminal_trend_price) over horizon years.
   function resolveScenarioCagr(scenario, horizon){
-    if (scenario === 'stay') return BTC_TREND_CAGR_BARE;
-    var targetMult = SCENARIO_TARGET_MULT[scenario];
-    if (targetMult == null) return BTC_TREND_CAGR_BARE;
-    var terminalTrend = BTC_TREND_PRICE_TODAY * Math.pow(1 + BTC_TREND_CAGR_BARE, horizon);
-    var terminalPrice = targetMult * terminalTrend;
-    return Math.pow(terminalPrice / CURRENT_BTC_PRICE, 1 / horizon) - 1;
+    var endDays = window.TODAY_DAYS + horizon * 365;
+    var endTrend = window.plPrice(endDays);
+    var targetMult = (scenario === 'stay') ? currentMultiple() : SCENARIO_TARGET_MULT[scenario];
+    if (targetMult == null || !isFinite(targetMult)) return 0;
+    var terminalPrice = targetMult * endTrend;
+    return Math.pow(terminalPrice / window.TODAY_PRICE, 1 / horizon) - 1;
   }
 
-  // Re-derive btcCagr from current state.btcScenario + state.horizon, and update
-  // each chip's rate display. Called whenever scenario or horizon changes.
   function refreshScenarioCagrs(){
     var chips = document.querySelectorAll('.calc-cagr-chip');
     chips.forEach(function(chip){
@@ -119,6 +117,24 @@
       if (rateEl) rateEl.textContent = '~' + Math.round(cagr * 100) + '% CAGR';
       if (scenario === state.btcScenario) state.btcCagr = cagr;
     });
+  }
+
+  // BTC-today indicator + entry-conditions verdict
+  function refreshEntryConditions(){
+    var mult = currentMultiple();
+    var multEl = document.getElementById('entryMultiple');
+    var verdictEl = document.getElementById('entryVerdictValue');
+    var verdictWrap = document.getElementById('entryVerdict');
+    if (multEl) multEl.textContent = mult.toFixed(2);
+    if (verdictEl && verdictWrap){
+      var verdict, cls;
+      if (mult < 0.8)      { verdict = 'weaker';   cls = 'verdict-weaker'; }
+      else if (mult > 1.2) { verdict = 'stronger'; cls = 'verdict-stronger'; }
+      else                 { verdict = 'fair';     cls = 'verdict-fair'; }
+      verdictEl.textContent = verdict;
+      verdictWrap.classList.remove('verdict-weaker', 'verdict-fair', 'verdict-stronger');
+      verdictWrap.classList.add(cls);
+    }
   }
 
   // ===== Sliders with formatted-value display (BvRP pattern) =====
@@ -318,9 +334,10 @@
     // === Bitcoin sell-as-needed path ===
     // Convert position to BTC at today's price. Apply CAGR with optional stress overlay.
     // Sell BTC each year to fund income need (nominal-inflated). Pay LTCG on gain.
-    var btcUnits = state.position / CURRENT_BTC_PRICE;
-    var btcPriceTrajectory = [CURRENT_BTC_PRICE];
-    var btcPrice = CURRENT_BTC_PRICE;
+    var spotPrice = window.TODAY_PRICE;
+    var btcUnits = state.position / spotPrice;
+    var btcPriceTrajectory = [spotPrice];
+    var btcPrice = spotPrice;
     var btcCostBasis = state.position;
     var nominalBtcPath = [state.position];
     var realBtcPath = [state.position];
@@ -331,8 +348,8 @@
     var stressMax = state.stressDrawdown;
 
     for (var y2 = 1; y2 <= years; y2++){
-      // Trend price
-      var trendPrice = CURRENT_BTC_PRICE * Math.pow(1 + btcCagr, y2);
+      // Trend price (this is the scenario CAGR projection, not the Power Law trend)
+      var trendPrice = spotPrice * Math.pow(1 + btcCagr, y2);
       // Apply stress overlay
       var stressFactor = 1;
       if (stressMax > 0 && y2 <= stressDuration * 2){
@@ -573,6 +590,7 @@
     updateOutputs(result);
     updateChart(result);
     updateCashflowTable(result);
+    refreshEntryConditions();
   }
 
   // Initial render — defer until DOM and Chart.js settle
@@ -581,6 +599,11 @@
   } else {
     document.addEventListener('DOMContentLoaded', function(){ setTimeout(recalc, 60); });
   }
+
+  // The shared power-law-data module triggers fetchTodayPrice() on load and
+  // updates window.TODAY_PRICE async (CoinGecko spot; PL_DATA fallback). Re-render
+  // once the fetch has had time to resolve so chips + indicator reflect live price.
+  setTimeout(function(){ refreshScenarioCagrs(); recalc(); }, 1500);
 
   // If Chart.js loads after our script (defer pattern), retry once
   var chartRetryAttempts = 0;
