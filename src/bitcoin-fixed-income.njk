@@ -448,39 +448,48 @@ related:
 
       <div class="calc-inputs">
 
-        <div class="input-group">
-          <label for="incomeNeed">Annual income need</label>
-          <div class="input-row">
-            <input type="range" id="incomeNeedSlider" min="10000" max="500000" step="5000" value="60000" />
-            <input type="number" id="incomeNeed" min="10000" max="500000" step="5000" value="60000" />
-            <span class="input-unit">USD/yr</span>
+        <div class="calc-slider-group">
+          <div class="calc-slider-row">
+            <span class="calc-slider-name">Annual income need<span class="help-tip" tabindex="0">?<span class="tip-content">The pre-tax cash you need to draw each year. The income path tries to fund this via dividends; the bitcoin path sells coins as needed to deliver the same after-tax dollars.</span></span></span>
+            <span class="calc-slider-val" id="val-incomeNeed">$60,000</span>
           </div>
+          <input type="range" id="incomeNeedSlider" min="10000" max="500000" step="5000" value="60000" />
+        </div>
+
+        <div class="calc-slider-group">
+          <div class="calc-slider-row">
+            <span class="calc-slider-name">Initial position<span class="help-tip" tabindex="0">?<span class="tip-content">Your starting capital available to deploy. The income path puts this in the chosen instrument (STRC, SATA, Treasury, or IG Corp); the bitcoin path holds it as bitcoin and sells as needed to fund annual income.</span></span></span>
+            <span class="calc-slider-val" id="val-position">$1,000,000</span>
+          </div>
+          <input type="range" id="positionSlider" min="100000" max="10000000" step="50000" value="1000000" />
+        </div>
+
+        <div class="calc-slider-group">
+          <div class="calc-slider-row">
+            <span class="calc-slider-name">Horizon</span>
+            <span class="calc-slider-val" id="val-horizon">15 years</span>
+          </div>
+          <input type="range" id="horizonSlider" min="1" max="30" step="1" value="15" />
         </div>
 
         <div class="input-group">
-          <label for="position">Initial position<span class="help-tip" tabindex="0">?<span class="tip-content">Your starting capital available to deploy. The income path puts this in the chosen instrument (STRC, SATA, Treasury, or IG Corp); the bitcoin path holds it as bitcoin and sells as needed to fund annual income.</span></span></label>
-          <div class="input-row">
-            <input type="range" id="positionSlider" min="100000" max="10000000" step="50000" value="1000000" />
-            <input type="number" id="position" min="100000" max="10000000" step="50000" value="1000000" />
-            <span class="input-unit">USD</span>
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label for="horizon">Horizon</label>
-          <div class="input-row">
-            <input type="range" id="horizonSlider" min="1" max="30" step="1" value="15" />
-            <input type="number" id="horizon" min="1" max="30" step="1" value="15" />
-            <span class="input-unit">years</span>
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label>Bitcoin growth scenario<span class="help-tip" tabindex="0">?<span class="tip-content">Annualized bitcoin growth (CAGR) over the chosen horizon. Floor / Trend / Upper anchor to the Power Law fair-value channel: Trend (~28%) is the long-run regression line; Floor (~18%) is the channel floor; Upper (~40%) is the cycle-peak ceiling.</span></span></label>
-          <div class="growth-buttons">
-            <button class="growth-btn" data-cagr="0.18">Floor (18%)</button>
-            <button class="growth-btn active" data-cagr="0.28">Trend (28%)</button>
-            <button class="growth-btn" data-cagr="0.40">Upper (40%)</button>
+          <label>Bitcoin growth scenario<span class="help-tip" tabindex="0">?<span class="tip-content">Annualized bitcoin growth (CAGR) over the chosen horizon. Three scenarios mapped to Power Law channel positions — same framing used in Bitcoin vs Rental Property.</span></span></label>
+          <div class="calc-cagr-chips">
+            <button class="calc-cagr-chip" data-cagr="0.22">
+              <span class="calc-cagr-chip-name">Stay at current trend multiple<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin grows at the Power Law trend rate from today's price, never reverting up to trend. The bear / no-reversion case — you get just trend growth and nothing else.</span></span></span>
+              <span class="calc-cagr-chip-rate">~22% CAGR</span>
+              <span class="calc-cagr-chip-sub">bear / no-reversion</span>
+            </button>
+            <button class="calc-cagr-chip active" data-cagr="0.28">
+              <span class="calc-cagr-chip-name">Revert to Power Law trend<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin moves from today's multiple back to 1.0× the Power Law trend linearly over the holding period. The central case — assumes today's discount-or-premium fades back to trend.</span></span></span>
+              <span class="calc-cagr-chip-rate">~28% CAGR</span>
+              <span class="calc-cagr-chip-sub">central case</span>
+            </button>
+            <button class="calc-cagr-chip" data-cagr="0.40">
+              <span class="calc-cagr-chip-name">Reach Power Law upper channel<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin drifts toward 2.5× trend (the historical above-cycle peak) over the holding period. Not a trendline expectation — rather a recognition that bitcoin spends meaningful time well above its long-run line.</span></span></span>
+              <span class="calc-cagr-chip-rate">~40% CAGR</span>
+              <span class="calc-cagr-chip-sub">upper channel</span>
+            </button>
           </div>
         </div>
 
