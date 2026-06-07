@@ -138,6 +138,8 @@
   var presetBtns = document.querySelectorAll('.preset-btn');
   presetBtns.forEach(function(btn){
     btn.addEventListener('click', function(){
+      presetBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
       var preset = PRESETS[btn.getAttribute('data-preset')] || PRESETS.base;
       state.stressDrawdown = preset.drawdown;
       state.stressDurationMonths = preset.durationMonths;
