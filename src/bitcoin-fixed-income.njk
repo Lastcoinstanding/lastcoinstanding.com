@@ -6,7 +6,7 @@ title: The Income Question
 eleventyComputed:
   head_extras:  "{% include '_pageassets/bitcoin-fixed-income-head.html' %}"
   page_styles:  "{% include '_pageassets/bitcoin-fixed-income.css' %}"
-  page_scripts: "{% include '_pageassets/bitcoin-fixed-income.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}{% include '_pageassets/bitcoin-fixed-income.js' %}"
 related:
   - slug: the-bitcoin-migration
     desc: "The structural argument for why conventional fixed income destroys purchasing power — the foundation this page rests on."
@@ -447,6 +447,22 @@ related:
     </div>
 
     <div class="calc-wrapper">
+
+      <div class="entry-conditions" id="entryConditions">
+        <div class="entry-conditions-row">
+          <div class="entry-conditions-readout">
+            <span class="entry-conditions-label">BTC today</span>
+            <span class="entry-conditions-value" id="entryMultiple">—</span>
+            <span class="entry-conditions-trend">×&nbsp;trend</span>
+            <span class="help-tip" tabindex="0">?<span class="tip-content">Today's bitcoin price as a multiple of the Power Law trend value for today's days-since-genesis. A multiple below 1.0× means bitcoin is trading under trend (reversion implies extra upside); above 1.0× means trading over trend (reversion implies downside). Updated from the live CoinGecko spot, falling back to the latest <code>PL_DATA</code> sample. Same canonical formula used by the Power Law, Bitcoin Retirement, Bitcoin vs Real Estate, and Bitcoin vs Rental Property pages.</span></span>
+          </div>
+          <div class="entry-conditions-verdict" id="entryVerdict">
+            <span class="entry-conditions-verdict-label">Income path's case is</span>
+            <span class="entry-conditions-verdict-value" id="entryVerdictValue">—</span>
+            <span class="help-tip" tabindex="0">?<span class="tip-content">A directional read on whether <em>today</em> is a favorable moment to enter the income trade. When bitcoin is well under trend (≲0.8×), reversion-to-trend gives bitcoin meaningful catch-up upside, weakening the income path's relative case. When bitcoin is well over trend (≳1.2×), reversion implies forward downside, strengthening the income path's case for cashflow certainty. Around trend (0.8–1.2×) the cases are roughly balanced. This is a framing aid, not advice — the calculator below shows the full math.</span></span>
+          </div>
+        </div>
+      </div>
 
       <div class="calc-inputs">
 
