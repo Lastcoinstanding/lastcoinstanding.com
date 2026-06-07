@@ -57,7 +57,7 @@
       "preview_kind": "live-chart",
       "preview_id": "mini-half-life",
       "anchor": "",
-      "position": 11
+      "position": 12
     }
   },
   {
@@ -75,7 +75,7 @@
       "tagline": "Corporate treasuries against monetary debasement &mdash; bitcoin as the dollar-melt antidote.",
       "preview_kind": "svg",
       "anchor": "",
-      "position": 12
+      "position": 13
     }
   },
   {
@@ -91,7 +91,7 @@
     "interactive": false
   },
   {
-    "_comment": "Tile name 'The Bitcoin Fixed Share' differs from registry title 'The Bitcoin Fixed Share' (matches); page slug is the-fixed-pie. The tile uses no anchor — the page is single-pane.",
+    "_comment": "Tile name 'The Bitcoin Fixed Share' differs from registry title 'The Bitcoin Fixed Share' (matches); page slug is the-fixed-pie. The tile uses no anchor \u2014 the page is single-pane.",
     "slug": "the-fixed-pie",
     "title": "The Bitcoin Fixed Share",
     "category": "numbers",
@@ -100,7 +100,7 @@
       "tagline": "What does owning a piece of 21 million actually mean as a share of all the bitcoin there will ever be?",
       "preview_kind": "svg",
       "anchor": "",
-      "position": 10
+      "position": 11
     }
   },
   {
@@ -123,6 +123,18 @@
       "tagline": "Bitcoin or rental property &mdash; the honest yield comparison once landlord costs and tax leakage are surfaced.",
       "preview_kind": "svg",
       "position": 6
+    }
+  },
+  {
+    "slug": "bitcoin-fixed-income",
+    "title": "Bitcoin Fixed Income",
+    "category": "numbers",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Bitcoin-backed preferreds vs holding bitcoin &mdash; the bear-case insurance trade, with the actual crossover horizon and stress behavior shown honestly.",
+      "preview_kind": "svg",
+      "anchor": "#calculator",
+      "position": 7
     }
   },
   {
@@ -193,7 +205,7 @@
     "calculator_tile": {
       "tagline": "When does borrowing make more sense than selling? Model liquidation distance vs. retained-coin upside.",
       "preview_kind": "svg",
-      "position": 7
+      "position": 8
     }
   },
   {
@@ -211,7 +223,7 @@
     "calculator_tile": {
       "tagline": "Buy the house with bitcoin as collateral &mdash; the structural mortgage trade-off across counterparty tiers.",
       "preview_kind": "svg",
-      "position": 8
+      "position": 9
     }
   },
   {
@@ -224,7 +236,7 @@
       "anchor": "#explorer",
       "preview_kind": "live-chart",
       "preview_id": "mini-horizon",
-      "position": 9
+      "position": 10
     }
   },
   {
