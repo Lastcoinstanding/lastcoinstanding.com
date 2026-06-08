@@ -190,6 +190,44 @@ new page lands, evaluate whether it should bump an older entry. Default
 behavior: insert the new card at the top of Latest; if Latest is already
 at 3 cards, evaluate which to remove (typically the oldest of the three).
 
+### `src/_data/updates.json` — Recent Updates strip
+
+The homepage's "Recent updates" strip (below the carousel, above the
+Explore section) is a live signal of what's new on the site. Every new
+page **and every meaningful page update** should add an entry to the top
+of `src/_data/updates.json`:
+
+```json
+{
+  "display": "M/D/YY",
+  "page": "/your-page.html",
+  "summary": "One or two lines, user-readable, ~20–40 words. What the page does, not how it was built."
+}
+```
+
+**Copy register: write for readers, not for builders.** This is the
+single most-violated rule of the strip historically. Updates are read by
+returning visitors trying to figure out whether anything they care about
+has changed — not by people who want a technical changelog. Aim for:
+
+- **What it does, not how it was implemented.** "Includes an interactive
+  calculator that runs your scenario across growth and exit paths" ✓,
+  not "Refactored from a hash-based prototype to query-param scenario
+  encoding per SITE_GUIDE §17.5" ✗.
+- **Pithy framing over completeness.** A reader who wants the full story
+  clicks through. A reader who doesn't, doesn't.
+- **No file paths, no commit SHAs, no section numbers.** Those belong in
+  TECH_DEBT, not on the homepage.
+- **20–40 words is the working range.** Hard cap at ~60 unless the page
+  itself genuinely needs that much context (rare).
+
+Good examples (existing entries):
+- *"Homepage ticker polish: ₿ + price in Bitcoin orange with a slow heartbeat glow"* (14 words)
+- *"Bitcoin vs. Real Estate: seesaw chart start-year selector + start-price transparency in copy"* (14 words)
+- *"New: Start Here — a curated orientation pathway for newcomers. Seven explorations sequenced so each one earns the next, with explicit payoff per step."* (24 words)
+
+When in doubt, write it long, then cut by half.
+
 ## 6. Tool-framing strip
 
 If the page is decision-implying — meaning a reader could reasonably read
