@@ -1,9 +1,14 @@
 [
   {
+    "display": "6/7/26",
+    "page": "/bitcoin-fixed-income.html",
+    "summary": "New: Bitcoin Fixed Income — when bitcoin-backed preferreds (STRC, SATA) actually beat just holding bitcoin. Five tabs from the structural question through a calculator that runs your scenario across growth, stress, and horizon, plus the bear case in detail."
+  },
+  {
     "date": "2026-06-04",
     "display": "6/4/26",
     "page": "/bitcoin-vs-rental-property.html",
-    "summary": "New: Bitcoin vs. Rental Property — the honest yield comparison once landlord costs are surfaced. Walks through the gross-to-net waterfall on a typical rental (vacancy, maintenance, property tax, insurance, management, CapEx erode roughly half the listed yield) and the tax asymmetry on exit (depreciation recapture and transaction costs on top of LTCG, versus bitcoin's LTCG-only sale), then contrasts with bitcoin-treasury yield instruments (STRC, SATA) paying 10–13% under the same ROC tax shield real estate uses for depreciation. Four operational paths from rental property to bitcoin, plus an interactive calculator anchored to the Power Law channel that models your specific situation across three bitcoin scenarios (stay at current multiple, revert to trend, reach upper channel) and four exit paths (full sell and reinvest, partial sell, keep some + sell some with a coupled property-count slider, full keep with bitcoin in addition). Now featured on the homepage as a concept card under The Numbers and as carousel slide #3 (storm-to-sun field — storm reads as the landlord burden, sun as bitcoin's quieter yield)"
+    "summary": "New: Bitcoin vs. Rental Property — the honest yield comparison after landlord costs and exit taxes. Includes an interactive calculator that runs your scenario across bitcoin growth and four exit paths. Now on the homepage and as carousel slide #3."
   },
   {
     "date": "2026-05-31",
@@ -21,7 +26,7 @@
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
-    "summary": "The Gallery now ships with the full SEO + social-card baseline that other pages on the site have — Google Analytics, canonical URL, full Open Graph and Twitter card meta tags, JSON-LD WebPage schema, custom OG image (the Power Law channel as hero with editorial chrome), sitemap and llms.txt registration, and reciprocal Related cross-link cards with The Power Law, Bitcoin vs. The Stock Market, and The Bitcoin Horizon. Brings the page into compliance with the site's NEW_PAGE_CHECKLIST"
+    "summary": "The Gallery now has its own social card and search-engine baseline — links unfurl cleanly when shared, and it shows up in search alongside the other pages."
   },
   {
     "date": "2026-05-30",
@@ -33,31 +38,31 @@
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
-    "summary": "Gallery polish: Chart 10 (Volatility Is Not Risk) and the matching chart on The Bitcoin Horizon now compute stats from January 2015 onwards — deliberately setting aside the parabolic 2013 run and 2014 drawdown as unrepresentative of plausible forward outcomes. The same 2015+ window is applied to the S&P 500 for an apples-to-apples comparison. The conservative framing strengthens the case: bitcoin's worst-case at 3 years and beyond stays positive, and the 10-year band collapses to a tight 64-85% range, still well above the S&P 500's 13-15%. Chart 1 (Power Law Channel) also gets a 'you are here' pulse halo on the today point — the canonical animated amber marker from STYLE_GUIDE §6.23"
+    "summary": "Gallery: the Volatility Is Not Risk chart now starts from 2015 — a more conservative window that still shows bitcoin's worst 10-year CAGR sitting comfortably above the S&P 500's. Plus a subtle 'you are here' marker on the Power Law chart."
   },
   {
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
-    "summary": "Gallery polish: Chart 8 (Heatmap) gains a Period return / Held to today toggle matching the source-page /heatmap behavior — defaults to discrete-window (more informative) but lets readers flip to held-to-today to verify most red cells turn amber when the holder simply kept holding. Chart 10 (Volatility Is Not Risk) legend restored to all four entries — the orange and white median dots now have legend labels"
+    "summary": "Gallery: the Heatmap chart gains a 'Held to today' toggle — most of the red losses turn amber once you keep holding."
   },
   {
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
-    "summary": "Gallery v2 complete. Final three charts live: the Bitcoin Heatmap (BTC vs S&P 500 outperformance grid, every entry month × every horizon since 2011 — long-horizon rows are amber to the edge), the Half-Life of a Dollar (fiat purchasing power decay; $100 → $50 in 11 years at M2 inflation), and CAGR Ranges by Horizon (Volatility Is Not Risk — how 1y bitcoin variance compresses to a narrow positive band at 5y+). All 10 charts shipped; the Gallery is a full scroll-through of the site's strongest visual arguments"
+    "summary": "Gallery v2 complete. Final three charts live: the BTC vs S&P 500 outperformance grid, the half-life of a dollar's purchasing power, and how bitcoin's CAGR variance compresses over longer horizons."
   },
   {
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
-    "summary": "Gallery Chart 7 rebuilt: replaced the $10K-invested-in-2010 lump-sum wealth chart (structurally a cherry-pick of the earliest possible start year, implying returns that won't repeat) with a rolling 4-year CAGR comparison — bitcoin vs. S&P 500 TR vs. NASDAQ-100 TR across every 4-year window from 2017 to 2026. The new chart shows bitcoin's returns declining over time (as the Power Law projects) but still exceeding both equity comparators in every window — even the cycle-top-to-cycle-low 2021-2025 window where bitcoin's 16.7% beat the S&P's 11.1%"
+    "summary": "Gallery Chart 7 rebuilt: replaced the $10K-invested-in-2010 wealth chart (a cherry-pick of the best possible start year) with a rolling 4-year CAGR comparison. Bitcoin's returns decline over time but still beat the S&P 500 and NASDAQ-100 in every window."
   },
   {
     "date": "2026-05-30",
     "display": "5/30/26",
     "page": "/the-gallery.html",
-    "summary": "Gallery polish pass: stronger section dividers between charts so the eye gets a clear break between arguments (was near-invisible at 4% opacity, now 10%); Chart 2 title now reads 'Bitcoin's Power Law Implied CAGR vs. the S&P 500' (was missing 'Bitcoin's' so the comparison wasn't explicit); Chart 2 convergence footnote rewritten with concrete claims ('more than 2× the S&P 500's 10% benchmark', 'even out to 2150 still sits above 10%') replacing vaguer earlier wording"
+    "summary": "Gallery polish: clearer section dividers between charts, a sharper Chart 2 title, and more concrete claims in the Power Law vs S&P 500 convergence footnote."
   },
   {
     "date": "2026-05-30",
