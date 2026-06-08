@@ -1260,6 +1260,21 @@
     if (calcPanel && calcPanel.classList.contains('active')) {
       setTimeout(function(){ renderChart(state); }, 16);
     }
+
+    // The shared power-law-data module updates window.TODAY_PRICE in place
+    // once fetchTodayPrice resolves (CoinGecko spot, with PL_DATA fallback).
+    // The ETI module above already calls fetchTodayPrice for its own render,
+    // but the chip-picker's #calc-current-multiple readout is not subscribed
+    // to that callback — so it stays on the first-paint seeded value (the
+    // last PL_DATA sample) while the ETI updates to live. This causes the
+    // page to show two different "current multiple" values for the same
+    // fact (e.g. 0.51× vs 0.44×). Subscribe here so both indicators agree
+    // once the live fetch returns.
+    if (typeof fetchTodayPrice === 'function') {
+      fetchTodayPrice(function(){
+        renderCAGRChips(state);
+      });
+    }
   }
 
   if (document.readyState === 'loading') {
