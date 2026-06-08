@@ -534,6 +534,12 @@ The prompt-craft principles, generalizable beyond this slide:
 2. **Repeated terms over-weight their priors.** "Moss-covered" appearing twice in v1 pulled the whole composition toward bright green even though the prompt also said "golden hour" and "late autumn". When a setting-element appears multiple times with the same descriptor, the model treats that descriptor as the dominant visual direction. Vary the language ("dormant lichen", "rust-tinged moss", "weathered stone") to keep any one prior from over-dominating.
 3. **Labelled prompt blocks weight more heavily than embedded paragraph copy.** Leading with an `OVERALL TONAL DIRECTION (most important):` block in v2 gave the color call disproportionate weight relative to the setting/composition/motion paragraphs that followed. Worth doing whenever a single dimension (color, mood, motion-quality) is the load-bearing element that the slide depends on.
 
+### Pending additions
+
+| Slide | Headline (proposed) | Video direction (proposed) |
+|---|---|---|
+| Bitcoin Fixed Income | *Coupons today, without selling tomorrow's stack.* | Slow-tilt close-up of crystallized amber/rosin droplet on dark stone — each drop catches a single warm highlight as it forms (the steady coupon stream), but the stone underneath stays unchanged (the bitcoin collateral). Bronze/amber register matching the family. Silent. |
+
 ## 14. Bitcoin vs. Real Estate (`/bitcoin-vs-real-estate.html`)
 
 **Added:** April 18, 2026. **Refreshed:** May 7, 2026 (Phase 4 restructure). Decision-frame page for the bitcoin-vs-housing question. After Phase 4 hosts both retrospective and projection calculators on the same canvas, paired via a temporal toggle.
@@ -842,7 +848,8 @@ For a reader new to the site landing on the calculators:
 4. **BvRE — Projection mode** — the same question forward; introduces the channel framing without going deep
 5. **The Power Law — The Channel tab** — the foundational visualization; readers arrive ready to grok the framework
 6. **The Power Law — other tabs** — the deeper conceptual case (Theory, In Nature)
-7. **Disciplined Rebalancing** — applies the channel as a sell-and-rebuy protocol; deepest specialization
+7. **Disciplined Rebalancing** — applies the channel as a sell-and-rebuy protocol; deepest specialization on the *selling* side
+8. **Bitcoin Fixed Income** — the income-instrument decision frame for readers who want cashflow today without selling the stack; sits at the same depth tier as Disciplined Rebalancing but addresses a different mechanism (preferred dividends vs. percentile selling)
 
 Phase 4 strengthens this reading order by separating *application* (BvSM, BvRE, retirement, disciplined rebalancing) from *foundation* (Power Law). BvSM was added at the top of the reading order in May 2026 because it requires the least personal context from the reader and proves the framework with the broadest comparator most readers already trust.
 
@@ -1189,6 +1196,54 @@ All four companions have reciprocal `related:` entries pointing back to Bitcoin 
 
 - **Card 8 image (Absolutely Scarce)** shipped May 2026 (commit `7ea1725`). Moon-over-calm-sea Grok-generated photo wired in; the eight-card set is complete on the photography axis.
 - **Homepage carousel slide** shipped May 2026. 10-second silent embers video animated from Card 7's still composition; caption "Define it. Then debate it." Slide is row 21 in the carousel inventory. Iteration record (candle-simile failure → wood-fire revision) in `SITE_GUIDE §13`.
+
+---
+
+## 24. Bitcoin Fixed Income (`/bitcoin-fixed-income.html`)
+
+**Added:** June 2026. The income-instrument decision page. Asks the structurally honest question about bitcoin-backed preferreds (STRC, SATA) and conventional fixed income: when do these actually beat just holding bitcoin? Editorial register is essayistic — five tabs of structured argument with a calculator as one tab among five, not the hero.
+
+### Tab structure (5 tabs)
+
+| Tab | `data-tab` | Notes |
+|---|---|---|
+| The Income Question | `question` | The framing tab. Opens with the structural argument for *why* a bitcoin-anchored portfolio might want cashflow today. Default tab. |
+| The Instruments | `instruments` | Concrete instrument inventory: STRC (Strategy 11.5% ROC), SATA (Strive 13% ROC), 10yr Treasury, IG Corp. Capital stack diagram placeholder. |
+| The Mechanism | `mechanism` | How the mNAV+ATM machinery works — corporate side. Acknowledges this is the engine, not magic. |
+| The Calculator | `calculator` | Interactive head-to-head. Income path vs sell-as-needed bitcoin, with stress overlays (Base / Mild / 2008 mREIT-style / Bitcoin winter) and three Power-Law-anchored growth scenarios (Stay / Revert to trend / Reach upper channel). |
+| The Risks | `risks` | The bear case for the bear case. Where the mechanism can fail — bitcoin winter, ATM channel closure, structural arrears, dividend-rate spiral. |
+
+### Editorial moves worth preserving
+
+- **The Tab IV reframing.** Title is *"Where the income path actually wins — bitcoin-backed preferreds as bear-case insurance"* — not "wealth maximization." This was the single most consequential editorial decision. Under base-case bitcoin growth, just holding bitcoin wins on terminal wealth, comfortably, at any reasonable Power Law assumption. The honest case for the instruments isn't beating bitcoin; it's: bear-case insurance, volatility elimination, and tax-efficient cashflow *today*. The intro prose, the chip framing, and the dynamic verdict logic all align to this thesis.
+- **Bitcoin winter not crypto winter.** Site-wide convention avoids the word "crypto" because it tends to legitimize the broader crypto space. Stress preset display name + Tab V prose both use "Bitcoin winter"; internal `data-preset="winter"` key unchanged for forward-compat.
+- **Verbatim BvRP growth-scenario language.** The three growth chips (Stay at current trend multiple / Revert to Power Law trend / Reach Power Law upper channel) carry the exact tooltip text used by Bitcoin vs Rental Property. Same Power Law model + same canonical phrasing = cross-page consistency.
+
+### Calculator architecture
+
+- **Power Law shared module.** Reads from `/_pageassets/shared/power-law-data.js` for `TODAY_PRICE`, `TODAY_DAYS`, `PL_A`, `PL_B`, `plPrice(days)`. Single source of truth — same as BvRP, BvRE, Bitcoin Retirement, Disciplined Rebalancing, the-power-law itself. Monthly PL_DATA refresh automatically updates this page; nothing here needs touching.
+- **Entry-conditions indicator.** Top of calculator surfaces `BTC TODAY 0.XX× trend` (static — fact about today's price) and `INCOME PATH'S CASE IS [weaker / fair / stronger]` (dynamic — comparison of income vs bitcoin end-of-horizon real wealth). The verdict responds to scenario + stress + horizon, not just the static multiple. At default settings (15yr, no stress) it reads *weaker*; at Bitcoin winter + 4yr horizon it flips to *stronger*.
+- **BvRP-pattern slider rows.** Label + formatted-value above, slider below — eliminates the input crowding that the older two-column input pattern caused.
+- **CSS subgrid for spectrum cards.** Cross-column row alignment via `display: contents` on the inner UL. Canonical pattern for any 3-column spectrum where corresponding rows across columns should align baselines.
+
+### Cross-linking
+
+The page has five reciprocal `related:` companions (each pointing in both directions):
+
+- `/the-bitcoin-migration` — the structural argument for why conventional fixed income destroys purchasing power; foundation BFI rests on
+- `/the-bitcoin-retirement` — the sell-as-needed path; the long-horizon comparison the BFI calculator references
+- `/borrowing-against-your-stack` — the individual-lending alternative; same broad objective, opposite side of the same balance sheet
+- `/bitcoin-vs-rental-property` — where the yield-instrument question first surfaced on the site
+- `/the-power-law` — the growth model the calculator uses
+
+### Open enhancements
+
+- **Homepage carousel slide pending.** Needs a Grok Imagine video with editorial framing (suggested caption direction: *"Coupons today, without selling tomorrow's stack."*). Track under §13 Pending additions.
+- **Saylor quote verification.** Tab I includes an attributed quote that needs sourcing — see TECH_DEBT.
+- **mNAV/ATM-status live indicator.** Tab II currently describes the mechanism in prose; a live mNAV readout would make it actionable.
+- **Capital stack SVG diagram.** Tab II has a placeholder for the capital-stack visualization (preferred above common, below debt).
+- **BvRP `#calc-current-multiple` fix.** Same fix pattern BFI uses — `fetchTodayPrice(callback)` for live CoinGecko spot — needs to be wired into BvRP's chip-picker readout (currently uses PL_DATA fallback, showing 0.51× while the ETI card correctly shows 0.44×).
+- **Print stylesheet** for the entire calculator output.
 
 ---
 
