@@ -177,12 +177,9 @@ related:
 
     <p class="prose">For the income-dependent reader, this is arguably the most consequential development in fixed income in a generation. Conventional fixed income destroys purchasing power in real terms. The new instruments offer something that exists nowhere else in conventional income markets: a double-digit nominal yield, with a tax treatment that effectively defers the tax for roughly a decade, on a balance sheet whose underlying asset is structurally accretive rather than structurally inflationary.</p>
 
-    <p class="prose">For the bitcoiner with a long horizon, the same arithmetic looks different. Saylor himself, when asked about STRC's appropriate audience, has said it candidly:</p>
+    <p class="prose">For the bitcoiner with a long horizon, the same arithmetic looks different. Saylor himself has been candid about STRC's intended audience: it isn't for the long-horizon bitcoiner. He has argued, in substance, that anyone with a multi-year holding window is better served by holding bitcoin directly — and that STRC exists for holders who can't tolerate the volatility, who need predictable income, who need to live on their portfolio.</p>
 
-    <blockquote class="saylor-quote">
-      <p>"If you're a long-term investor — five years, ten years, twenty years — you're better off just buying bitcoin. STRC is for people who can't afford that volatility, who need predictable income, who need to live on their portfolio."</p>
-      <footer>— Michael Saylor, on STRC's intended holder <span class="quote-note">(quote framing approximate; see methodology)</span></footer>
-    </blockquote>
+    <p class="prose"><em>(That framing is reconstructed from a recurring theme across Saylor's interviews and X posts in 2025–2026, including a Natalie Brunell interview where he discussed Strategy's seven-year horizon and the per-share-bitcoin objective, and his June 2026 statement that Strategy's "goal is to make STRC the best credit instrument in the world." We've reframed it as editorial paraphrase rather than direct quotation because the literal sentence isn't sourceable to a single transcript.)</em></p>
 
     <p class="prose">That long-horizon caveat is honest and worth carrying through the page. For a bitcoiner with the patience to wait through bitcoin's volatility, holding bitcoin directly will likely outperform any leveraged structure built on top of bitcoin. The instruments exist for holders who can't tolerate the volatility — retirees, families with fixed expenses, those who can't be forced sellers in a 60% drawdown — and for income-dependent normies for whom the alternative is conventional fixed income that's silently destroying their purchasing power.</p>
 
@@ -251,8 +248,60 @@ related:
 
     <p class="prose">Strategy's full capital structure, as of Q1 2026, against a $54 billion asset pool (843,738 BTC and $900M cash):</p>
 
-    <div class="capital-stack-diagram-placeholder">
-      <p class="placeholder-note"><em>Diagram: vertical stack visualization with debt at top, five preferred series in priority order with proportional notional widths, common equity at the bottom. Bitcoin treasury pool drawn alongside for scale. To be illustrated.</em></p>
+    <div class="capital-stack-diagram">
+      <svg viewBox="0 0 820 420" xmlns="http://www.w3.org/2000/svg" class="capital-stack-svg" role="img" aria-labelledby="cap-stack-title cap-stack-desc">
+        <title id="cap-stack-title">Strategy capital structure, Q1 2026</title>
+        <desc id="cap-stack-desc">Vertical stack of six capital tranches against a $54 billion asset base. From top: senior convertible notes ($6.7B), STRF preferred ($1.28B), STRC preferred ($10.49B, highlighted), STRK preferred convertible ($1.40B), STRD preferred non-cumulative ($1.40B), and MSTR common equity ($32.73B residual). Bar widths are proportional to notional claim; coverage ratios annotated on the right.</desc>
+
+        <!-- Eyebrow -->
+        <text x="60" y="34" fill="#e09422" font-family="Inter, sans-serif" font-size="10" font-weight="600" letter-spacing="3.5">CAPITAL STRUCTURE</text>
+        <line x1="60" y1="44" x2="240" y2="44" stroke="#e09422" stroke-width="1.5" opacity="0.85"/>
+
+        <!-- Subtitle line -->
+        <text x="60" y="74" fill="#968b7a" font-family="Inter, sans-serif" font-size="13" font-style="italic">$54B asset base · 843,738 BTC + $900M cash · scale: bar width &#x221d; notional claim</text>
+
+        <!-- Column headers -->
+        <text x="60"  y="106" fill="#5a5247" font-family="Inter, sans-serif" font-size="10" font-weight="600" letter-spacing="2">PRIORITY · TRANCHE</text>
+        <text x="760" y="106" fill="#5a5247" font-family="Inter, sans-serif" font-size="10" font-weight="600" letter-spacing="2" text-anchor="end">NOTIONAL · COVERAGE</text>
+
+        <!-- Bars (each row 38px high with 8px gap; bar height 22px centered) -->
+        <!-- Width scale: 400px = $32.73B (the common equity floor) → 12.22px per $B -->
+
+        <!-- Row 1: Senior convertible notes — $6.7B → 82px -->
+        <text x="60" y="140" fill="#ccc6b8" font-family="Inter, sans-serif" font-size="12" font-weight="600">1 · Senior convertible notes</text>
+        <rect x="280" y="128" width="82" height="22" fill="rgba(109,179,212,0.15)" stroke="#6db3d4" stroke-width="1.1" rx="2"/>
+        <text x="760" y="143" fill="#ece4d6" font-family="Inter, sans-serif" font-size="12" font-weight="500" text-anchor="end" font-variant-numeric="tabular-nums">$6.70B · 8.07&#xd7;</text>
+
+        <!-- Row 2: STRF preferred — $1.28B → 16px -->
+        <text x="60" y="178" fill="#ccc6b8" font-family="Inter, sans-serif" font-size="12" font-weight="600">2 · STRF (preferred)</text>
+        <rect x="280" y="166" width="16" height="22" fill="rgba(109,179,212,0.15)" stroke="#6db3d4" stroke-width="1.1" rx="2"/>
+        <text x="760" y="181" fill="#ece4d6" font-family="Inter, sans-serif" font-size="12" font-weight="500" text-anchor="end" font-variant-numeric="tabular-nums">$1.28B · 6.77&#xd7;</text>
+
+        <!-- Row 3: STRC — $10.49B → 128px — HIGHLIGHTED -->
+        <text x="60" y="216" fill="#F7931A" font-family="Inter, sans-serif" font-size="12" font-weight="700">3 · STRC (preferred)</text>
+        <rect x="280" y="204" width="128" height="22" fill="rgba(247,147,26,0.22)" stroke="#F7931A" stroke-width="1.6" rx="2"/>
+        <text x="760" y="219" fill="#F7931A" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="end" font-variant-numeric="tabular-nums">$10.49B · 2.93&#xd7;</text>
+
+        <!-- Row 4: STRK — $1.40B → 17px -->
+        <text x="60" y="254" fill="#ccc6b8" font-family="Inter, sans-serif" font-size="12" font-weight="600">4 · STRK (preferred, convertible)</text>
+        <rect x="280" y="242" width="17" height="22" fill="rgba(109,179,212,0.15)" stroke="#6db3d4" stroke-width="1.1" rx="2"/>
+        <text x="760" y="257" fill="#ece4d6" font-family="Inter, sans-serif" font-size="12" font-weight="500" text-anchor="end" font-variant-numeric="tabular-nums">$1.40B · 2.72&#xd7;</text>
+
+        <!-- Row 5: STRD — $1.40B → 17px -->
+        <text x="60" y="292" fill="#ccc6b8" font-family="Inter, sans-serif" font-size="12" font-weight="600">5 · STRD (preferred, non-cumulative)</text>
+        <rect x="280" y="280" width="17" height="22" fill="rgba(109,179,212,0.15)" stroke="#6db3d4" stroke-width="1.1" rx="2"/>
+        <text x="760" y="295" fill="#ece4d6" font-family="Inter, sans-serif" font-size="12" font-weight="500" text-anchor="end" font-variant-numeric="tabular-nums">$1.40B · 2.54&#xd7;</text>
+
+        <!-- Row 6: MSTR common — $32.73B → 400px (residual, the cushion below STRC) -->
+        <text x="60" y="330" fill="#ccc6b8" font-family="Inter, sans-serif" font-size="12" font-weight="600">6 · MSTR common (residual)</text>
+        <rect x="280" y="318" width="400" height="22" fill="rgba(150,139,122,0.12)" stroke="#968b7a" stroke-width="1.1" rx="2" stroke-dasharray="3 2"/>
+        <text x="760" y="333" fill="#ece4d6" font-family="Inter, sans-serif" font-size="12" font-weight="500" text-anchor="end" font-variant-numeric="tabular-nums">~$32.73B · 1.00&#xd7;</text>
+
+        <!-- STRC's "cushion below" annotation: the subordinate capital that absorbs first losses before STRC takes impairment -->
+        <line x1="408" y1="232" x2="408" y2="362" stroke="#F7931A" stroke-width="1" stroke-dasharray="2 2" opacity="0.55"/>
+        <line x1="408" y1="362" x2="680" y2="362" stroke="#F7931A" stroke-width="1" stroke-dasharray="2 2" opacity="0.55"/>
+        <text x="544" y="384" fill="#e09422" font-family="Inter, sans-serif" font-size="11" font-style="italic" text-anchor="middle">~$35.6B subordinate cushion below STRC (STRK + STRD + common)</text>
+      </svg>
     </div>
 
     <div class="comparison-table-wrap">
