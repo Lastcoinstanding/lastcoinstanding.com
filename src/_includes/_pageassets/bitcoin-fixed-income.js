@@ -607,13 +607,157 @@
     updateCashflowTable(result);
     refreshEntryConditions();
     updateVerdict(result);
+    pushHash();  // keep URL hash in sync with calculator state for shareable scenarios
+  }
+
+  // ===== URL-fragment scenario sharing =====
+  // Round-trippable encoding of calculator state to the URL hash so users
+  // can share a specific scenario. Six dimensions: income need, initial
+  // position, horizon, growth scenario, income path, stress preset.
+  // Pattern mirrors the spirit of BvSM's #b=... share URLs. Other state
+  // fields (tax bracket, ltcg rate, inflation, preferredTaxTreatment) are
+  // intentionally left out — they're "advanced" knobs that don't belong
+  // in a shareable scenario link.
+  var SHARE_KEYS = {
+    in: 'incomeNeed',     po: 'position',     hz: 'horizon',
+    sc: 'btcScenario',    pa: 'incomePath',   st: 'stressPreset'
+  };
+  var SHARE_NUMERIC = { incomeNeed: true, position: true, horizon: true };
+  var SHARE_VALID = {
+    btcScenario:  ['stay', 'trend', 'upper'],
+    incomePath:   ['strc', 'sata', 'treasury', 'igcorp'],
+    stressPreset: ['base', 'mild', 'mreit', 'winter']
+  };
+
+  // Suppress pushHash during programmatic apply so we don't flicker the URL
+  // through partial states while clicking chips/buttons one by one.
+  var applyingHash = false;
+
+  function encodeStateToHash(){
+    var params = new URLSearchParams();
+    for (var k in SHARE_KEYS){
+      var v = state[SHARE_KEYS[k]];
+      if (v !== undefined && v !== null) params.set(k, String(v));
+    }
+    return params.toString();
+  }
+
+  function decodeHashToState(){
+    var hash = (window.location.hash || '').replace(/^#/, '');
+    if (!hash || !/=/.test(hash)) return null;  // ignore plain anchors like #calculator
+    var params = new URLSearchParams(hash);
+    var overrides = {};
+    for (var k in SHARE_KEYS){
+      var longKey = SHARE_KEYS[k];
+      var v = params.get(k);
+      if (v === null) continue;
+      if (SHARE_NUMERIC[longKey]){
+        var n = parseFloat(v);
+        if (isFinite(n)) overrides[longKey] = n;
+      } else if (SHARE_VALID[longKey]){
+        if (SHARE_VALID[longKey].indexOf(v) !== -1) overrides[longKey] = v;
+      }
+    }
+    return Object.keys(overrides).length ? overrides : null;
+  }
+
+  function applyOverridesToUI(overrides){
+    applyingHash = true;
+    // Sliders: set value + dispatch input event so existing handlers
+    // update both state and the visible readouts.
+    var sliderMap = {
+      incomeNeed: 'incomeNeedSlider',
+      position:   'positionSlider',
+      horizon:    'horizonSlider'
+    };
+    for (var key in sliderMap){
+      if (overrides[key] === undefined) continue;
+      var el = document.getElementById(sliderMap[key]);
+      if (el){
+        el.value = String(overrides[key]);
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }
+    // Chip / button groups: click the matching control so existing handlers
+    // run all the side effects (active class, stress preset table, etc.).
+    if (overrides.btcScenario){
+      var sc = document.querySelector('.calc-cagr-chip[data-scenario="' + overrides.btcScenario + '"]');
+      if (sc) sc.click();
+    }
+    if (overrides.incomePath){
+      var pa = document.querySelector('.path-btn[data-path="' + overrides.incomePath + '"]');
+      if (pa) pa.click();
+    }
+    if (overrides.stressPreset){
+      var st = document.querySelector('.stress-chip[data-preset="' + overrides.stressPreset + '"]');
+      if (st) st.click();
+    }
+    applyingHash = false;
+  }
+
+  var hashUpdateTimer = null;
+  function pushHash(){
+    if (applyingHash) return;
+    clearTimeout(hashUpdateTimer);
+    hashUpdateTimer = setTimeout(function(){
+      var encoded = encodeStateToHash();
+      if (!encoded) return;
+      var newHash = '#' + encoded;
+      if (window.location.hash !== newHash){
+        try { history.replaceState(null, '', newHash); } catch(e){ /* ignore — non-https file:// */ }
+      }
+    }, 250);
+  }
+
+  // "Copy share link" button — wire up after DOM is ready
+  function wireShareButton(){
+    var btn = document.getElementById('btn-share-scenario');
+    if (!btn) return;
+    btn.addEventListener('click', function(){
+      // Make sure the hash is current before reading the URL
+      var encoded = encodeStateToHash();
+      var url = window.location.origin + window.location.pathname + (encoded ? '#' + encoded : '');
+      var status = document.getElementById('shareStatus');
+      var showStatus = function(msg){
+        if (!status) return;
+        status.textContent = msg;
+        status.classList.remove('fade');
+        setTimeout(function(){ status.classList.add('fade'); }, 2500);
+        setTimeout(function(){ status.textContent = ''; status.classList.remove('fade'); }, 3000);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(url).then(
+          function(){ showStatus('Link copied — share away.'); },
+          function(){ showStatus('Copy failed — please select the URL manually.'); }
+        );
+      } else {
+        // Fallback: temp textarea + execCommand
+        var ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showStatus('Link copied — share away.'); }
+        catch(e){ showStatus('Copy failed — please select the URL manually.'); }
+        document.body.removeChild(ta);
+      }
+    });
+  }
+
+  // Apply any URL-hash overrides BEFORE first recalc, then wire the share button.
+  function initShareLayer(){
+    var overrides = decodeHashToState();
+    if (overrides) applyOverridesToUI(overrides);
+    wireShareButton();
   }
 
   // Initial render — defer until DOM and Chart.js settle
   if (document.readyState === 'complete' || document.readyState === 'interactive'){
-    setTimeout(recalc, 60);
+    setTimeout(function(){ initShareLayer(); recalc(); }, 60);
   } else {
-    document.addEventListener('DOMContentLoaded', function(){ setTimeout(recalc, 60); });
+    document.addEventListener('DOMContentLoaded', function(){
+      setTimeout(function(){ initShareLayer(); recalc(); }, 60);
+    });
   }
 
   // The shared power-law-data module seeds window.TODAY_PRICE to the latest

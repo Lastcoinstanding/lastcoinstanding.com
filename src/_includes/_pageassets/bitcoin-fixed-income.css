@@ -1396,3 +1396,281 @@ html, body {
 .calc-cagr-pl-link:hover {
   color: var(--amber-bright, #F7931A);
 }
+
+/* ─── Calculator action buttons (print, share) ─── */
+.calc-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.25rem 0 0.5rem;
+  flex-wrap: wrap;
+}
+.calc-action-btn {
+  background: rgba(247, 147, 26, 0.08);
+  border: 1px solid rgba(247, 147, 26, 0.45);
+  color: var(--amber, #e09422);
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 0.45rem 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.calc-action-btn:hover {
+  background: rgba(247, 147, 26, 0.15);
+  border-color: var(--amber-bright, #F7931A);
+  color: var(--amber-bright, #F7931A);
+}
+.calc-action-btn:focus-visible {
+  outline: 2px solid var(--amber-bright, #F7931A);
+  outline-offset: 2px;
+}
+.calc-share-status {
+  font-size: 0.78rem;
+  color: var(--ink-faint, #968b7a);
+  font-style: italic;
+  transition: opacity 0.2s;
+}
+.calc-share-status.fade {
+  opacity: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Print stylesheet (the calculator)
+   ─────────────────────────────────────────────────────────────────────
+   Goal: produce a single-shot printable scenario summary suitable for
+   a client meeting or PDF export. Hide the site chrome and the
+   non-calculator tabs; render the active calculator state — selected
+   inputs, entry conditions, headline outputs, the chart, and the
+   year-by-year cashflow table — on a white background with dark text.
+
+   Hiding strategy: collapse interactive controls (range inputs, inactive
+   chips, inactive path buttons) so only the *chosen* settings appear.
+   The slider value readouts (`.calc-slider-val`, `#val-incomeNeed` etc.)
+   remain visible and act as the printout's input summary.
+
+   Pairing: there's a small "Print scenario" button in the calculator
+   output area whose `onclick` calls `window.print()`. The browser's
+   print dialog also picks up these rules via Ctrl/Cmd+P, so manual
+   print also works.
+*/
+@media print {
+  /* ─── Reset to light theme ─── */
+  body, html {
+    background: #fff !important;
+    color: #111 !important;
+    font-family: Georgia, 'Source Serif 4', serif;
+    font-size: 10.5pt;
+    line-height: 1.4;
+  }
+  body * {
+    color: #111 !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  body {
+    background: #fff !important;
+  }
+
+  /* ─── Hide site chrome ─── */
+  header, footer, nav,
+  .site-header, .site-footer, .site-nav, .global-nav, .top-nav,
+  .exploration-banner, .for-exploration-only, .disclaimer-banner,
+  .related-pages, .related-links, .footer-links,
+  .help-tip, .tip-content,
+  .editorial-hero .subtitle, /* shorten the hero for print */
+  .calc-cagr-pl-link,
+  [data-no-print] {
+    display: none !important;
+  }
+
+  /* ─── Hide all non-calculator tabs and the tab nav ─── */
+  .tab-nav, .tab-buttons, [role="tablist"] {
+    display: none !important;
+  }
+  .tab-content {
+    display: none !important;
+  }
+  #tab-calculator {
+    display: block !important;
+  }
+  /* If the editorial hero has page H1, keep it as a brief print heading */
+  h1, .page-title {
+    page-break-after: avoid;
+    font-size: 18pt;
+    margin: 0 0 0.4cm;
+    color: #111 !important;
+  }
+
+  /* ─── Calculator: collapse two-column to single column ─── */
+  .calc-wrapper {
+    display: block !important;
+    max-width: 100% !important;
+  }
+  .calc-inputs, .calc-output {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* ─── Entry conditions card ─── */
+  .entry-conditions, .entry-conditions-verdict {
+    border: 1px solid #444 !important;
+    padding: 0.3cm 0.4cm !important;
+    margin: 0.3cm 0 !important;
+    page-break-inside: avoid;
+    background: #f6f3ee !important;
+  }
+  .entry-conditions-verdict-value {
+    font-weight: 700;
+  }
+
+  /* ─── Slider rows: show name + value, hide the actual range input ─── */
+  input[type="range"] {
+    display: none !important;
+  }
+  .calc-slider-group {
+    display: flex !important;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+    padding: 0.12cm 0;
+    margin: 0;
+  }
+  .calc-slider-row {
+    display: flex !important;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .calc-slider-name { font-weight: 600; }
+  .calc-slider-val { font-variant-numeric: tabular-nums; }
+
+  /* ─── Chip/button groups: only show the active selection ─── */
+  .calc-cagr-chip:not(.active),
+  .stress-chip:not(.active),
+  .path-btn:not(.active) {
+    display: none !important;
+  }
+  .calc-cagr-chip.active,
+  .stress-chip.active,
+  .path-btn.active {
+    display: inline-block !important;
+    border: 1px solid #444 !important;
+    background: #f6f3ee !important;
+    padding: 0.15cm 0.3cm !important;
+    margin: 0.1cm 0 !important;
+    color: #111 !important;
+  }
+  .calc-cagr-chips, .stress-chips-row, .path-buttons {
+    display: block !important;
+  }
+  .input-group label, .stress-chips-label {
+    font-weight: 600;
+    display: block;
+    margin-top: 0.25cm;
+  }
+
+  /* ─── Headline output cards: 2x2 grid for print, full color ─── */
+  .headline-output {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3cm;
+    margin: 0.4cm 0;
+    page-break-inside: avoid;
+  }
+  .output-item {
+    border: 1px solid #444 !important;
+    padding: 0.25cm 0.3cm !important;
+    background: #fff !important;
+  }
+  .output-label {
+    font-size: 9pt;
+    color: #444 !important;
+    margin-bottom: 0.1cm;
+  }
+  .output-value {
+    font-size: 16pt;
+    font-weight: 700;
+    color: #111 !important;
+    font-variant-numeric: tabular-nums;
+  }
+  .output-unit {
+    font-size: 8.5pt;
+    color: #666 !important;
+  }
+
+  /* ─── Chart: keep it but force a sensible size ─── */
+  .chart-wrapper {
+    page-break-inside: avoid;
+    margin: 0.4cm 0;
+    max-width: 100%;
+  }
+  .chart-wrapper canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 9cm;
+  }
+  .chart-caption {
+    font-size: 8.5pt;
+    color: #444 !important;
+    font-style: italic;
+    margin-top: 0.1cm;
+  }
+
+  /* ─── Cashflow table: force open (override <details>), full width, light borders ─── */
+  details.cashflow-table {
+    display: block !important;
+  }
+  details.cashflow-table > summary {
+    display: none !important;
+  }
+  .cashflow-table .cashflow-table-wrap {
+    overflow: visible !important;
+  }
+  .cashflow-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+    page-break-inside: auto;
+  }
+  .cashflow-table th, .cashflow-table td {
+    border: 1px solid #999 !important;
+    padding: 0.08cm 0.18cm;
+    text-align: right;
+    color: #111 !important;
+    background: #fff !important;
+  }
+  .cashflow-table thead {
+    display: table-header-group; /* repeat header on every printed page */
+  }
+  .cashflow-table th {
+    background: #f0ede6 !important;
+    font-weight: 700;
+  }
+  .cashflow-table tr {
+    page-break-inside: avoid;
+  }
+
+  /* ─── Disclaimer footer for the printout ─── */
+  .calc-output::after {
+    content: "Educational and informational purposes only. Nothing here is financial advice. Bitcoin involves significant risk including potential total loss. Consult a qualified financial advisor before making decisions based on what you see here. — lastcoinstanding.com/bitcoin-fixed-income";
+    display: block;
+    margin-top: 0.5cm;
+    padding-top: 0.3cm;
+    border-top: 1px solid #888;
+    font-size: 8pt;
+    color: #555 !important;
+    font-style: italic;
+  }
+
+  /* ─── Page setup ─── */
+  @page {
+    size: A4 portrait;
+    margin: 1.5cm;
+  }
+  p, h2, h3 {
+    orphans: 3;
+    widows: 3;
+  }
+}
