@@ -610,14 +610,30 @@
     pushHash();  // keep URL hash in sync with calculator state for shareable scenarios
   }
 
-  // ===== URL-fragment scenario sharing =====
-  // Round-trippable encoding of calculator state to the URL hash so users
+  // ===== URL scenario sharing (query params per SITE_GUIDE §17.5 convention) =====
+  // Round-trippable encoding of calculator state to URL query params so users
   // can share a specific scenario. Six dimensions: income need, initial
   // position, horizon, growth scenario, income path, stress preset.
-  // Pattern mirrors the spirit of BvSM's #b=... share URLs. Other state
-  // fields (tax bracket, ltcg rate, inflation, preferredTaxTreatment) are
-  // intentionally left out — they're "advanced" knobs that don't belong
-  // in a shareable scenario link.
+  //
+  // Convention (matches /the-bitcoin-retirement, /disciplined-rebalancing,
+  // /bitcoin-vs-real-estate, /borrowing-against-your-stack):
+  //   - Query params, not hash. Hash is preserved for tab anchors (#calculator).
+  //   - Defaults are omitted — a clean URL represents the default scenario.
+  //   - Debounced (~250ms) history.replaceState on state changes.
+  //   - Decoder runs once on page load, BEFORE the first recalc, via the
+  //     existing slider/chip click handlers so all side effects fire.
+  //
+  // Other state fields (tax bracket, ltcg rate, inflation, preferredTaxTreatment)
+  // are intentionally left out — they're "advanced" knobs that don't belong
+  // in a shareable scenario URL.
+  var SHARE_DEFAULTS = {
+    incomeNeed:   60000,
+    position:     1000000,
+    horizon:      15,
+    btcScenario:  'trend',
+    incomePath:   'strc',
+    stressPreset: 'base'
+  };
   var SHARE_KEYS = {
     in: 'incomeNeed',     po: 'position',     hz: 'horizon',
     sc: 'btcScenario',    pa: 'incomePath',   st: 'stressPreset'
@@ -629,23 +645,13 @@
     stressPreset: ['base', 'mild', 'mreit', 'winter']
   };
 
-  // Suppress pushHash during programmatic apply so we don't flicker the URL
-  // through partial states while clicking chips/buttons one by one.
+  // Suppress URL sync during programmatic apply so we don't flicker the
+  // address bar through partial states while clicking chips/buttons one by one.
   var applyingHash = false;
 
-  function encodeStateToHash(){
-    var params = new URLSearchParams();
-    for (var k in SHARE_KEYS){
-      var v = state[SHARE_KEYS[k]];
-      if (v !== undefined && v !== null) params.set(k, String(v));
-    }
-    return params.toString();
-  }
-
-  function decodeHashToState(){
-    var hash = (window.location.hash || '').replace(/^#/, '');
-    if (!hash || !/=/.test(hash)) return null;  // ignore plain anchors like #calculator
-    var params = new URLSearchParams(hash);
+  function readStateFromUrl(){
+    if (!window.URLSearchParams) return null;
+    var params = new URLSearchParams(window.location.search);
     var overrides = {};
     for (var k in SHARE_KEYS){
       var longKey = SHARE_KEYS[k];
@@ -695,28 +701,38 @@
     applyingHash = false;
   }
 
-  var hashUpdateTimer = null;
-  function pushHash(){
+  var urlSyncTimer = null;
+  function pushHash(){  // name retained for call-site stability; writes ?query now
     if (applyingHash) return;
-    clearTimeout(hashUpdateTimer);
-    hashUpdateTimer = setTimeout(function(){
-      var encoded = encodeStateToHash();
-      if (!encoded) return;
-      var newHash = '#' + encoded;
-      if (window.location.hash !== newHash){
-        try { history.replaceState(null, '', newHash); } catch(e){ /* ignore — non-https file:// */ }
+    if (!window.URLSearchParams || !window.history || !window.history.replaceState) return;
+    clearTimeout(urlSyncTimer);
+    urlSyncTimer = setTimeout(function(){
+      var params = new URLSearchParams(window.location.search);
+      for (var shortKey in SHARE_KEYS){
+        var longKey = SHARE_KEYS[shortKey];
+        var v = state[longKey];
+        var def = SHARE_DEFAULTS[longKey];
+        if (v === undefined || v === null || v === def){
+          params.delete(shortKey);  // clean URL for defaults — Retirement convention
+        } else {
+          params.set(shortKey, String(v));
+        }
+      }
+      var qs = params.toString();
+      var newUrl = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
+      if (newUrl !== window.location.pathname + window.location.search + window.location.hash){
+        try { window.history.replaceState(null, '', newUrl); } catch(e){ /* ignore */ }
       }
     }, 250);
   }
 
-  // "Copy share link" button — wire up after DOM is ready
+  // "Copy share link" button — wire up after DOM is ready. Reads
+  // window.location.href at click time so the URL always reflects current state.
   function wireShareButton(){
     var btn = document.getElementById('btn-share-scenario');
     if (!btn) return;
     btn.addEventListener('click', function(){
-      // Make sure the hash is current before reading the URL
-      var encoded = encodeStateToHash();
-      var url = window.location.origin + window.location.pathname + (encoded ? '#' + encoded : '');
+      var url = window.location.href;
       var status = document.getElementById('shareStatus');
       var showStatus = function(msg){
         if (!status) return;
@@ -744,9 +760,9 @@
     });
   }
 
-  // Apply any URL-hash overrides BEFORE first recalc, then wire the share button.
+  // Apply any URL-query overrides BEFORE first recalc, then wire the share button.
   function initShareLayer(){
-    var overrides = decodeHashToState();
+    var overrides = readStateFromUrl();
     if (overrides) applyOverridesToUI(overrides);
     wireShareButton();
   }
