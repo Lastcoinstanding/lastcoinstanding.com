@@ -1239,11 +1239,35 @@ The page has five reciprocal `related:` companions (each pointing in both direct
 ### Open enhancements
 
 - **Homepage carousel slide pending.** Needs a Grok Imagine video with editorial framing (suggested caption direction: *"Coupons today, without selling tomorrow's stack."*). Track under §13 Pending additions.
-- **Saylor quote verification.** Tab I includes an attributed quote that needs sourcing — see TECH_DEBT.
-- **mNAV/ATM-status live indicator.** Tab II currently describes the mechanism in prose; a live mNAV readout would make it actionable.
-- **Capital stack SVG diagram.** Tab II has a placeholder for the capital-stack visualization (preferred above common, below debt).
-- **BvRP `#calc-current-multiple` fix.** Same fix pattern BFI uses — `fetchTodayPrice(callback)` for live CoinGecko spot — needs to be wired into BvRP's chip-picker readout (currently uses PL_DATA fallback, showing 0.51× while the ETI card correctly shows 0.44×).
-- **Print stylesheet** for the entire calculator output.
+- **mNAV/ATM-status live indicator.** Tab II currently describes the mechanism in prose; a live mNAV readout (market value of bitcoin treasury / market cap of issuer) would make it actionable. Requires a live data source for Strategy's treasury value and ATM issuance status; deferred until an API source is identified.
+- **Drawdown threshold sourcing.** Tab II's $33K (-47%) and $21K (-67%) drawdown thresholds were verified arithmetically (the $21K = 1× coverage threshold, the $33K = 2× coverage threshold, both against the ~$54B asset pool and the $7.98B + $10.49B claim stack above + including STRC). A short methodology footnote linking to the calculation would be a nice-to-have.
+- **§6.26 full-component alignment.** Current share UI is a simplified single-action variant ("Copy share link" only). Aligning to the full two-group `share-section` component used by Retirement / DR / BvRE / BAS would add X/LinkedIn/Facebook social-promotion buttons. Not urgent; the layout-level "Share this page" surface from `base.njk` already covers public promotion.
+- **Multi-tab print scaffolding.** Print stylesheet currently uses the lighter CSS-only variant (STYLE_GUIDE §6.16) scoped to the Calculator tab. Other tabs print on-screen content with site chrome hidden — functional but lacks curated print layouts. Right answer if needed: per-tab print-only blocks per the §6.16 two-block pattern. Trigger is a user wanting to print the Risks tab specifically.
+
+### URL schema (scenario sharing)
+
+Six dimensions of calculator state are carried in the URL query string per the canonical convention (SITE_GUIDE §17.5):
+
+| Param | State key | Type | Default | Domain |
+|---|---|---|---|---|
+| `in` | `incomeNeed` | number | 60000 | 10000–500000, step 5000 |
+| `po` | `position` | number | 1000000 | 100000–10000000, step 50000 |
+| `hz` | `horizon` | number | 15 | 1–30 |
+| `sc` | `btcScenario` | enum | `trend` | `stay` \| `trend` \| `upper` |
+| `pa` | `incomePath` | enum | `strc` | `strc` \| `sata` \| `treasury` \| `igcorp` |
+| `st` | `stressPreset` | enum | `base` | `base` \| `mild` \| `mreit` \| `winter` |
+
+Defaults are omitted from the URL — a clean `/bitcoin-fixed-income` represents the default scenario. The decoder applies overrides via the existing slider/chip click handlers before the first render so all side effects (active class, stress-preset table values, etc.) fire correctly. `recalc()` debounces a `history.replaceState` write at ~250ms so dragging a slider doesn't hammer the browser's history API. Advanced state fields (`taxBracket`, `ltcgRate`, `inflation`, `preferredTaxTreatment`) are intentionally NOT in the URL — they're modeling assumptions, not scenario inputs.
+
+Example: `/bitcoin-fixed-income?in=120000&po=3000000&hz=20&sc=upper&pa=sata&st=mreit` decodes to $120k annual income on a $3M position over a 20-year horizon, Upper-channel growth, SATA path, with 2008-mREIT-style stress overlay.
+
+### Recently closed
+
+- **Iter B — BvRP `#calc-current-multiple` desync** (June 2026). BvRP's ETI card subscribed to `fetchTodayPrice` and showed the live CoinGecko spot (e.g. 0.45×); the chip-picker's readout did not subscribe and stayed on the seeded fallback (e.g. 0.51×). Five-line patch: chip-picker `renderCAGRChips(state)` now also subscribes to the live-fetch callback. Both indicators now read the same `TODAY_PRICE` global. Pattern banked: when adding live-price-dependent readouts on a page, each must subscribe to the fetch callback explicitly.
+- **Saylor quote reframed as editorial paraphrase** (June 2026). Earlier draft's blockquote wasn't sourceable to a single transcript. Reframed as paraphrase with sourcing methodology (Natalie Brunell interview themes, "best credit instrument in the world" X post). Preserves the argument, removes the false-attribution problem.
+- **Capital stack SVG diagram** (June 2026, Tab II). Replaced the placeholder block with an inline 820×420 SVG showing all six tranches of Strategy's Q1 2026 capital structure, bar widths proportional to notional, STRC amber-highlighted, subordinate cushion annotated.
+- **Print stylesheet** (June 2026, lighter CSS-only variant of §6.16). `@media print` rules hide site chrome and interactive controls, let the existing `.calc-slider-val` readouts show through, force the cashflow `<details>` open, attach a disclaimer footer via `::after`. No JS, no duplicated DOM. Works because BFI's on-screen readouts are already print-friendly.
+- **URL scenario sharing** (June 2026). Query-param-based per SITE_GUIDE §17.5 convention. Six dimensions encoded as `?in=…&po=…&hz=…&sc=…&pa=…&st=…`. See URL schema subsection above for details. Refactored from an initial hash-based prototype after discovering the site-wide query-param convention.
 
 ---
 
