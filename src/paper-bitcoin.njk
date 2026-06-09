@@ -1,0 +1,228 @@
+---
+layout: base.njk
+permalink: /paper-bitcoin.html
+slug: paper-bitcoin
+related:
+  - slug: the-bitcoin-migration
+    desc: "The historical argument this page applies to your own holdings — why gold's paper era ended in 1933, and why an ideal money must be a practical bearer instrument."
+  - slug: what-money-has-to-be
+    desc: "The property framework. This page tests which of money's required properties survive each way of holding bitcoin."
+  - slug: borrowing-against-your-stack
+    desc: "Collaborative-custody vaults in practice — what 'no rehypothecation by design' means when bitcoin is pledged as loan collateral."
+  - slug: bitcoin-fixed-income
+    desc: "The other page about holding a claim shaped like bitcoin — and the honest cases where that trade makes sense."
+companion: []
+eleventyComputed:
+  head_extras: "{% include '_pageassets/paper-bitcoin-head.html' %}"
+  page_styles: "{% include '_pageassets/paper-bitcoin.css' %}"
+  page_scripts: "{% include '_pageassets/paper-bitcoin.js' %}"
+---
+<div class="container">
+
+  <!-- Hero -->
+  <header class="hero">
+    <h1>Paper Bitcoin</h1>
+    <p class="subtitle">Every way of holding bitcoin is a different asset.<br>
+    Only one of them is the real bitcoin &mdash; the <em>physical</em> bitcoin &mdash; the rest of this site describes.</p>
+  </header>
+
+  <!-- §A — The asset and its shadow -->
+  <section class="section section-opening">
+    <h2>The asset and its shadow</h2>
+    <p>In 1933, Executive Order 6102 caught gold in both of its forms. Paper gold &mdash; the certificates and bank claims that most "gold ownership" had quietly become &mdash; was cancelled by memo: banks converted certificates to fiat on instruction, and the state seized the ledger without touching the metal. And physical gold was surrendered too &mdash; not because the state could find it, but because hidden gold was useless gold. It couldn't be spent, transported, or resurfaced without exposure. Defiance was possible; it just bought you an asset you could never use again. <a href="/the-bitcoin-migration.html">The Bitcoin Migration</a> tells this history in full. This page is about how it applies to you.</p>
+    <p>Because the same migration &mdash; from bearer asset to paper claim &mdash; is happening to bitcoin. In fast-forward, and by choice. A retail holder of a spot bitcoin ETF stands <strong>five claims away</strong> from any actual bitcoin: a claim on their <em>broker</em> (a book-entry "security entitlement," not a certificate); who holds a claim through <em>DTC</em>, whose nominee Cede &amp; Co. is the legal owner of record of the shares; which represent fractional interests in a <em>trust</em>; which holds a contractual claim on a <em>custodian</em> &mdash; one firm, Coinbase Custody, secures more than 80% of all US spot-ETF bitcoin, under agreements with limited insurance and contractual liability caps detailed in the funds' own filings; with creation and redemption flows pooled through a <em>prime execution agent</em> alongside other clients' assets.</p>
+    <p>And the bottom of that chain is, by the seller's own admission, an open legal question. BlackRock's <a href="https://www.sec.gov/Archives/edgar/data/0001980994/000143774925024228/bit20250731_424b3.htm" target="_blank" rel="noopener">IBIT prospectus</a> states that customer protections in a custodian insolvency are "relatively untested," that courts "have not yet considered this type of treatment for custodied digital assets," and that the Trust may be at risk of being treated as a general unsecured creditor &mdash; subject, in its words, to the risk of total loss. Coinbase's filings express a <em>belief</em> that courts would protect custodied assets. The issuer's own document says nobody knows.</p>
+  </section>
+
+  <!-- §A2 — The four quadrants -->
+  <section class="section quadrant-section">
+    <h2>The four quadrants</h2>
+    <p class="quadrant-lede">Gold fell to 6102 in both its forms. Bitcoin can fall in only one &mdash; and that form is a choice.</p>
+
+    <div class="quadrant-wrap" role="img" aria-label="A two-by-two grid: paper and physical forms of gold and bitcoin. Paper gold, physical gold, and paper bitcoin are captured; physical bitcoin escapes.">
+      <div class="q-col-labels">
+        <div class="q-axis-spacer"></div>
+        <div class="q-col-label">Gold</div>
+        <div class="q-col-label">Bitcoin</div>
+      </div>
+      <div class="q-body">
+        <div class="q-row-label">Paper</div>
+        <div class="q-cell q-captured">
+          <div class="q-cell-title">Paper gold</div>
+          <div class="q-cell-desc">Cancelled by memo. Banks converted certificates to fiat on instruction &mdash; 1933.</div>
+          <div class="q-cell-verdict">captured</div>
+        </div>
+        <div class="q-cell q-captured">
+          <div class="q-cell-title">Paper bitcoin</div>
+          <div class="q-cell-desc">One directive to a handful of custodians now holding most ETF coin.</div>
+          <div class="q-cell-verdict">capturable</div>
+        </div>
+        <div class="q-row-label">Physical</div>
+        <div class="q-cell q-captured">
+          <div class="q-cell-title">Physical gold</div>
+          <div class="q-cell-desc">Surrendered. Hidden gold was useless gold &mdash; it couldn't move, spend, or surface.</div>
+          <div class="q-cell-verdict">captured</div>
+        </div>
+        <div class="q-cell q-alight">
+          <div class="q-cell-title">Physical bitcoin</div>
+          <div class="q-cell-desc">Crosses any border in a memorized phrase. Spends peer-to-peer. Never needs to surface.</div>
+          <div class="q-cell-verdict">escapes</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §B — The interactive -->
+  <section class="section grid-section">
+    <h2>One bitcoin, five assets</h2>
+    <p>The price chart is identical for all five. Everything else differs. Select a way of holding bitcoin and watch what survives &mdash; and what it asks of you.</p>
+
+    <div class="preset-panel">
+      <div class="preset-panel-label">Select a way of holding bitcoin</div>
+      <div class="presets" role="tablist" aria-label="Select a custody model">
+        <div class="preset-group">
+          <div class="preset-group-label">Paper forms</div>
+          <button class="preset-btn" data-model="etf">ETF</button>
+          <button class="preset-btn" data-model="exchange">Exchange</button>
+        </div>
+        <div class="preset-group">
+          <div class="preset-group-label">Physical forms</div>
+          <button class="preset-btn" data-model="collab">Collaborative multisig</button>
+          <button class="preset-btn active" data-model="singlesig">Single-sig</button>
+          <button class="preset-btn" data-model="diy">DIY multisig</button>
+        </div>
+      </div>
+      <div class="you-hold" id="youHold"></div>
+    </div>
+
+    <div class="camps">
+      <!-- Warm camp -->
+      <div class="camp camp-warm">
+        <div class="camp-header">
+          <div class="camp-title">What survives of bitcoin's nature</div>
+          <div class="camp-subtitle">the properties the Foundations pages describe</div>
+        </div>
+
+        <div class="dimension" data-dim="bearer">
+          <div class="dimension-name">Bearer status &amp; counterparty chain<span class="help-tip" tabindex="0">?<span class="tip-content">Nearly all US securities are held in "street name": the legal owner of record is Cede &amp; Co., the nominee of the Depository Trust Company. What you hold at a broker is a <em>security entitlement</em> &mdash; a claim on a chain of intermediaries &mdash; not the asset itself. Bitcoin held with your own keys has no chain: possession of the key <strong>is</strong> ownership.</span></span></div>
+          <div class="dimension-scale" data-camp="warm"></div>
+          <div class="dimension-desc"></div>
+        </div>
+
+        <div class="dimension" data-dim="confiscation">
+          <div class="dimension-name">Confiscation reach &mdash; the 6102 test<span class="help-tip" tabindex="0">?<span class="tip-content">Executive Order 6102 (1933) required delivery of gold coin, bullion, and certificates to the Federal Reserve at $20.67/oz, under criminal penalty. It succeeded largely through banks and paper claims &mdash; the state seized ledgers, not living rooms. The test for any asset: does confiscating it take a memo, or a door?</span></span></div>
+          <div class="dimension-scale" data-camp="warm"></div>
+          <div class="dimension-desc"></div>
+        </div>
+
+        <div class="dimension" data-dim="freezes">
+          <div class="dimension-name">Freezes &amp; capital controls<span class="help-tip" tabindex="0">?<span class="tip-content">A freeze order works by instructing an <em>intermediary</em> &mdash; a bank, broker, or exchange &mdash; to stop honoring your claims. Capital controls (Greece 2015, Argentina's cepo, Cyprus 2013) work the same way. An asset with no intermediary has no one to receive the order.</span></span></div>
+          <div class="dimension-scale" data-camp="warm"></div>
+          <div class="dimension-desc"></div>
+        </div>
+
+        <div class="dimension" data-dim="rehypo">
+          <div class="dimension-name">Rehypothecation &amp; encumbrance<span class="help-tip" tabindex="0">?<span class="tip-content">Rehypothecation: a custodian lending or pledging "your" asset to someone else, so multiple claims point at the same coin. Proof-of-reserves attests to a snapshot of holdings; it cannot prove the absence of competing claims. On-chain coins under your keys are verifiably unencumbered &mdash; nothing moves without your signature.</span></span></div>
+          <div class="dimension-scale" data-camp="warm"></div>
+          <div class="dimension-desc"></div>
+        </div>
+
+        <div class="dimension" data-dim="privacy">
+          <div class="dimension-name">Privacy of ownership records<span class="help-tip" tabindex="0">?<span class="tip-content">KYC ("know your customer") rules pair your legal identity, address, and holdings in databases held by every regulated intermediary you touch. The record outlives the account &mdash; and as the France kidnapping wave showed, leaked records are how criminals choose doors.</span></span></div>
+          <div class="dimension-scale" data-camp="warm"></div>
+          <div class="dimension-desc"></div>
+        </div>
+      </div>
+
+      <!-- Cool camp -->
+      <div class="camp camp-cool">
+        <div class="camp-header">
+          <div class="camp-title">What life requires of you</div>
+          <div class="camp-subtitle">the burdens and risks you carry in exchange</div>
+        </div>
+
+        <div class="dimension" data-dim="keyloss">
+          <div class="dimension-name">Key loss &amp; recourse<span class="help-tip" tabindex="0">?<span class="tip-content">A seed phrase is the human-readable backup of a private key. There is no password reset on the Bitcoin network &mdash; no company, court, or miner can restore a lost key. An estimated 2.3&ndash;4 million coins are already permanently inaccessible, mostly through ordinary human error.</span></span></div>
+          <div class="dimension-scale" data-camp="cool"></div>
+          <div class="dimension-desc"></div>
+        </div>
+
+        <div class="dimension" data-dim="coercion">
+          <div class="dimension-name">Physical coercion &mdash; the wrench<span class="help-tip" tabindex="0">?<span class="tip-content">The "$5 wrench attack": skipping the cryptography and attacking the person. France recorded dozens of crypto-linked abductions in a single recent year &mdash; roughly a quarter of the world's documented cases. The targeting came from leaked customer records, not from the blockchain.</span></span></div>
+          <div class="dimension-scale" data-camp="cool"></div>
+          <div class="dimension-desc"></div>
+        </div>
+
+        <div class="dimension" data-dim="inheritance">
+          <div class="dimension-name">Inheritance<span class="help-tip" tabindex="0">?<span class="tip-content">In traditional finance, a beneficiary designation and a death certificate transfer an account &mdash; heirs never touch the machinery. Self-custodied bitcoin inverts this: the secrecy that protects you in life can lock out your family at death, unless the handoff is engineered in advance.</span></span></div>
+          <div class="dimension-scale" data-camp="cool"></div>
+          <div class="dimension-desc"></div>
+        </div>
+
+        <div class="dimension" data-dim="burden">
+          <div class="dimension-name">Operational burden<span class="help-tip" tabindex="0">?<span class="tip-content">"Being your own bank" means being your own security, compliance, and disaster-recovery team: devices, backups, firmware, operational secrecy &mdash; sustained for decades, without a serious mistake. The burden is real, which is why every layer of help exists &mdash; and why each one costs a property.</span></span></div>
+          <div class="dimension-scale" data-camp="cool"></div>
+          <div class="dimension-desc"></div>
+        </div>
+
+        <div class="dimension" data-dim="exit">
+          <div class="dimension-name">Exit &amp; optionality<span class="help-tip" tabindex="0">?<span class="tip-content">Selling an ETF in a taxable account is a taxable event; withdrawing your own coins from an exchange to your own wallet is not &mdash; you're moving property you already own. Only Authorized Participants (large broker-dealers) can redeem ETF shares for actual bitcoin; retail holders can only sell.</span></span></div>
+          <div class="dimension-scale" data-camp="cool"></div>
+          <div class="dimension-desc"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-legend">
+      <span class="legend-warm">Warm rows: how intact the property remains.</span>
+      <span class="legend-cool">Cool rows: how heavy the burden you carry.</span>
+      <span class="legend-note">No column wins. The question is which column's costs you can live with.</span>
+    </div>
+  </section>
+
+  <!-- §D — Optionality -->
+  <section class="section">
+    <h2>The cul-de-sac and the open door</h2>
+    <p>The exchange holder and the ETF holder look similar &mdash; both trusted a third party with the keys. But one bought a position with an exit, and one bought a position with a toll booth on the exit. A holder of coins at an exchange who decides, next year or next decade, to take real custody makes one withdrawal: a network fee, no taxable event, done &mdash; they are moving property they already own. The ETF holder in a taxable account must sell (and recognize every dollar of gain), transfer the cash, rebuy the coins across a second spread, and then withdraw. Retail in-kind redemption does not exist: since mid-2025, redeeming shares for actual bitcoin is permitted &mdash; but only for Authorized Participants, in baskets of tens of thousands of shares. For everyone else, the only door out of the ETF is the sale.</p>
+    <p>There is one honest exception, and it deserves plain statement: inside an IRA or 401(k), the ETF is not a cul-de-sac but the only road. It is the sole practical way to hold bitcoin exposure in the accounts where many people keep most of their wealth, with tax-deferred or tax-free compounding that nothing on this page can match. The price is the wrapper's own rules &mdash; required minimum distributions, and the permanent impossibility of ever taking coins in kind. For some readers that trade is right. It should simply be made knowingly.</p>
+    <p>Optionality, in other words, is itself a property. The exchange account &mdash; the baby step &mdash; preserves your future self's ability to choose. The ETF quietly spends it.</p>
+  </section>
+
+  <!-- §E — The records -->
+  <section class="section">
+    <h2>The risk that follows the records</h2>
+    <p>Here is the honest complication, and it cuts against this page's own grain. France has become the world's center of "wrench attacks" &mdash; physical coercion against bitcoin holders &mdash; with dozens of abductions in a single recent year, roughly a quarter of the world's documented cases: a hardware-wallet founder's finger severed for ransom, a CEO's daughter nearly taken in daylight, families targeted at home. And the leak vectors were not blockchains. They were <em>databases</em>: a hardware-wallet vendor's 2020 breach exposing 270,000 names and home addresses; a French crypto-tax platform's 2026 breach exposing 50,000 users' balances; a tax official reportedly selling state-held data to the gangs; ordinary bragging on social media.</p>
+    <p><strong>Physical risk follows the records of ownership, not the location of the coins.</strong> Your keys can be mathematically unbreakable while your shipping address is not. This has implications the grid states plainly: the ETF genuinely mitigates the wrench &mdash; there is no bearer asset to hand over at gunpoint, and no presence in crypto-vendor databases. A single hardware wallet genuinely concentrates it &mdash; the key's holder <em>is</em> the vault's door. And multisig structurally dissolves it: with keys split across locations &mdash; or with a service holding one &mdash; no single person, including the owner under duress, can move the coins, and time-delays and duress protocols exist for precisely this attack.</p>
+    <p>The dimension where paper is strongest and the dimension where it is weakest are different dimensions. That is the grid's whole point.</p>
+  </section>
+
+  <!-- §F — The steelman -->
+  <section class="section">
+    <h2>The steelman</h2>
+    <p>The strongest case against self-custody deserves full volume: cryptographic sovereignty is incompatible with human fallibility. An estimated 2.3 to 4 million coins &mdash; somewhere between a tenth and a fifth of all the bitcoin that will ever exist &mdash; are already permanently lost. Not confiscated. Not stolen from exchanges. Lost: failed backups, forgotten phrases, estates that died with their owners. For a holder who cannot guarantee flawless operational security across decades &mdash; or whose family cannot navigate a hardware wallet under grief &mdash; the statistical risk of self-inflicted loss can genuinely exceed the risk of institutional failure. Anyone who tells you otherwise is selling certainty they don't have.</p>
+    <p>But notice what this argument actually proves. Every coin in that graveyard was lost to a <em>single point of failure</em> &mdash; one phrase, one device, one person's memory. The argument is not for paper; it is for engineering the single point of failure away, which is exactly what multisig is. A two-of-three quorum survives a lost key, a house fire, a death &mdash; with a service holding one key, it survives them with guidance; built yourself, it survives them with discipline. The choice was never sovereignty <em>or</em> safety. That framing was an artifact of the single-key era, and the era is over.</p>
+  </section>
+
+  <!-- §G — Closing -->
+  <section class="section">
+    <h2>One event, two outcomes</h2>
+    <p>Canada, February 2022. One government order under the Emergencies Act. Within days, exchanges froze accounts linked to the protests &mdash; no court order required &mdash; while self-custodied coins kept moving through the same blockade, because there was no one to receive the instruction. Same week, same country, same asset, opposite outcomes. It is the cleanest natural experiment custody has ever produced.</p>
+    <p>And it sits on a century of precedent. 1933: paper claims and centralized custody made gold seizable by memo. Cyprus, 2013: uninsured bank deposits were legally converted into shares of the failing banks that held them &mdash; the bail-in moved from theory to template, and is now codified resolution policy on both sides of the Atlantic. Celsius, 2023: a bankruptcy court found that the platform's terms of service had legally transferred $4.2 billion of customers' coins to the platform &mdash; what they owned was an IOU, and they learned it in court. The pattern across a hundred years is consistent: <em>claims on assets are raw material for crisis resolution; bearer assets are not.</em></p>
+    <p>Which makes the game theory worth stating &mdash; as inference, clearly labeled, but tight inference. A modern 6102 could capture only the paper quadrants. Announcing it would catalyze migration into the one quadrant it cannot reach, and jurisdictional flight by holders whose asset boards the plane with them. The order would strengthen the very thing it targets &mdash; which is precisely what 1933's order did not do, because gold had nowhere to go. An attack that advertises its own escape route is an attack a rational state hesitates to launch. And the quiet corollary: the more bitcoin sits in paper form, the cheaper and more rational that order becomes. Every self-custodied coin raises its price. Custody is not only a personal risk decision; it is a vote on whether the attack is worth attempting at all.</p>
+    <p>Walk the warm rows of the grid one last time. Only self-custodied bitcoin retains the full set of properties the Foundations pages describe &mdash; bearer status, freeze immunity, border portability, unconfiscatability in practice. Gold held those properties in theory and lost them in practice, because self-custody of gold never scaled. Bitcoin is the first money whose physical form is <em>practical</em> &mdash; which means that, for the first time in monetary history, the properties are optional rather than theoretical. Every custody layer is a decision to decline them.</p>
+    <p class="closing-line">6102 caught gold in the vault and gold in the hand.<br>It can catch bitcoin only on paper.</p>
+  </section>
+
+  <!-- §H — Referral callout -->
+  <aside class="closing-callout">
+    <div class="closing-callout-inner">
+      <p class="callout-lede">This page is about <em>whether</em> and <em>what</em> &mdash; not <em>how</em>.</p>
+      <p class="callout-body">The mechanics of self-custody &mdash; choosing hardware, securing seed phrases, building a multisig quorum &mdash; are a craft with dedicated guides, and they deserve better than a summary here. For collaborative custody, Unchained and Casa both publish thorough documentation of their models. For doing it yourself, the community-maintained guides at Bitcoiner.guide and the 10x Security Bitcoin Guide are the standard references.</p>
+      <a class="callout-link" href="https://bitcoiner.guide/" target="_blank" rel="noopener">Start with the guides &rarr;</a>
+    </div>
+  </aside>
+
+  {% include 'components/related.njk' %}
+  {% include 'components/companion-content.njk' %}
+
+</div>

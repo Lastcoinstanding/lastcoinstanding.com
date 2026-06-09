@@ -91,7 +91,13 @@
     "interactive": false
   },
   {
-    "_comment": "Tile name 'The Bitcoin Fixed Share' differs from registry title 'The Bitcoin Fixed Share' (matches); page slug is the-fixed-pie. The tile uses no anchor \u2014 the page is single-pane.",
+    "slug": "paper-bitcoin",
+    "title": "Paper Bitcoin",
+    "category": "arguments",
+    "interactive": true
+  },
+  {
+    "_comment": "Tile name 'The Bitcoin Fixed Share' differs from registry title 'The Bitcoin Fixed Share' (matches); page slug is the-fixed-pie. The tile uses no anchor — the page is single-pane.",
     "slug": "the-fixed-pie",
     "title": "The Bitcoin Fixed Share",
     "category": "numbers",
@@ -240,7 +246,7 @@
     }
   },
   {
-    "_comment": "Hub-level page. The 'hub' category is intentionally outside the foundations/arguments/numbers nav buckets \u2014 base.njk only iterates those three. This entry exists so the related component can render Gallery back-link cards (its slug lookup against explorations.json otherwise silently fails). If a future nav iterator needs to include hub pages, add an explicit check for 'hub' there.",
+    "_comment": "Hub-level page. The 'hub' category is intentionally outside the foundations/arguments/numbers nav buckets — base.njk only iterates those three. This entry exists so the related component can render Gallery back-link cards (its slug lookup against explorations.json otherwise silently fails). If a future nav iterator needs to include hub pages, add an explicit check for 'hub' there.",
     "slug": "the-gallery",
     "title": "The Gallery",
     "category": "hub",

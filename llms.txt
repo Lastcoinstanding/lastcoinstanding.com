@@ -31,6 +31,7 @@ Editorial essays on Bitcoin's role as the monetary endgame.
 - [The Melting Ice Cube](https://lastcoinstanding.com/the-melting-ice-cube): Holding cash isn't conservatism — it's an active decision with a quantifiable ongoing cost. Interactive treasury model.
 - [Is Bitcoin a Bubble?](https://lastcoinstanding.com/not-a-bubble): Every historical bubble followed a pattern of collapse to permanent zero. Bitcoin has crashed 80%+ three times and reached new all-time highs each time. The bubble checklist, applied honestly.
 - [Bitcoin Spend and Replace](https://lastcoinstanding.com/spend-and-replace): What spending bitcoin and immediately repurchasing it actually buys you under US federal tax law in 2026. Debunks the "net-zero balance" illusion, distinguishes "Spend then Replace" from "Replace then Spend," and lays out the practical tactics — HIFO standing orders, wallet-by-wallet basis tracking, Notice 2026-20 books-and-records relief, the 1099-DA zero-basis trap — for executing the sequence cleanly. Covers the legislative horizon including the Lummis-Gillibrand proposal and the Digital Asset PARITY Act.
+- [Paper Bitcoin](https://lastcoinstanding.com/paper-bitcoin): Every way of holding bitcoin is a different asset — spot ETF, exchange account, collaborative multisig, single-sig, DIY multisig. An interactive ten-dimension property grid plus the four-quadrant confiscation analysis: gold fell to Executive Order 6102 in both its forms; bitcoin can fall only on paper.
 
 ## The Numbers
 
