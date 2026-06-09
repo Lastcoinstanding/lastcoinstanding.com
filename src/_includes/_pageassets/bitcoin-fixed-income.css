@@ -1674,3 +1674,113 @@ html, body {
     widows: 3;
   }
 }
+
+
+/* --- Strategy at a glance (Tab II) ---
+   Snapshot indicator providing factual ground-truth for the capital-structure
+   analysis below. BTC treasury USD value is the one truly live field
+   (computed from shared TODAY_PRICE x 845,256). Other fields are snapshots
+   refreshed monthly per MONTHLY_REFRESH_CHECKLIST. */
+.strategy-glance {
+  margin: 2rem 0 2.5rem;
+  padding: 1.4rem 1.5rem 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+}
+.sg-eyebrow {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--amber, #e09422);
+  margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(224, 148, 34, 0.25);
+}
+.sg-ticker {
+  color: var(--ink-faint, #968b7a);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+}
+.sg-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem 1.5rem;
+}
+.sg-cell {
+  padding: 0.25rem 0;
+}
+.sg-cell-wide {
+  grid-column: 1 / -1;
+  padding-top: 0.9rem;
+  margin-top: 0.4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.sg-label {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim, #968b7a);
+  margin-bottom: 0.35rem;
+}
+.sg-value {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--ink-bright, #ece4d6);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.sg-value-prose {
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+.sg-unit {
+  font-size: 0.78em;
+  font-weight: 400;
+  color: var(--ink-dim, #968b7a);
+}
+.sg-sub {
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--ink-faint, #968b7a);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.45;
+}
+.sg-live-tag {
+  display: inline-block;
+  padding: 0.05rem 0.4rem;
+  margin-right: 0.4rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6dc66d;
+  background: rgba(109, 198, 109, 0.10);
+  border: 1px solid rgba(109, 198, 109, 0.30);
+  border-radius: 2px;
+  vertical-align: 1px;
+}
+.sg-treasury-usd-value {
+  color: var(--ink-bright, #ece4d6);
+  font-weight: 500;
+}
+.sg-footer {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.76rem;
+  color: var(--ink-faint, #968b7a);
+  font-style: italic;
+  line-height: 1.45;
+}
+@media (max-width: 720px) {
+  .sg-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .sg-grid { grid-template-columns: 1fr; }
+  .sg-cell-wide { grid-column: 1 / -1; }
+}

@@ -803,3 +803,51 @@
   setTimeout(tryEnsureChart, 200);
 
 })();
+
+
+// ============================================================
+// Strategy at a glance — live treasury USD value (Tab II)
+// ============================================================
+// Computes the live USD value of Strategy's bitcoin treasury by
+// multiplying the snapshot BTC count by the shared module's TODAY_PRICE
+// (which updates from CoinGecko spot once fetchTodayPrice resolves). Other
+// fields in the "Strategy at a glance" indicator are snapshot values updated
+// monthly per MONTHLY_REFRESH_CHECKLIST.
+(function(){
+  // BTC count: snapshot. Verified June 2026 against CoinGecko's
+  // /companies/public_treasury/bitcoin endpoint. Update here when Strategy buys more.
+  var BTC_HELD = 845256;
+
+  function formatBigUSD(n){
+    if (n >= 1e9) return '$' + (n / 1e9).toFixed(1) + 'B';
+    if (n >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
+    return '$' + Math.round(n).toLocaleString();
+  }
+
+  function renderTreasuryUsd(){
+    var valueEl = document.querySelector('.sg-treasury-usd-value');
+    if (!valueEl) return;
+    var price;
+    if (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0) {
+      price = TODAY_PRICE;
+    } else if (typeof PL_DATA !== 'undefined' && PL_DATA && PL_DATA.length) {
+      price = PL_DATA[PL_DATA.length - 1][1];
+    } else {
+      return;
+    }
+    valueEl.textContent = formatBigUSD(BTC_HELD * price);
+  }
+
+  function initStrategyGlance(){
+    renderTreasuryUsd();
+    if (typeof fetchTodayPrice === 'function') {
+      fetchTodayPrice(renderTreasuryUsd);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStrategyGlance);
+  } else {
+    initStrategyGlance();
+  }
+})();
