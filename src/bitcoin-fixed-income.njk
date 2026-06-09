@@ -244,6 +244,34 @@ related:
 
     <p class="prose"><em>(One small detail worth knowing: SATA's 18-month reserve composition includes 6 months in STRC preferred — meaning a stress event affecting STRC will also mark down a portion of SATA's backstop. The correlation is structural and worth knowing if you're considering both.)</em></p>
 
+    <!-- Strategy at a glance: snapshot ground-truth framing the capital-structure analysis below. BTC count verified live from CoinGecko (June 2026 snapshot). Treasury USD value is computed live from TODAY_PRICE x BTC_HELD via the JS subscribed to fetchTodayPrice. mNAV, shares outstanding, and ATM status are snapshots refreshed monthly per MONTHLY_REFRESH_CHECKLIST. -->
+    <aside class="strategy-glance" aria-labelledby="sg-title">
+      <div class="sg-eyebrow" id="sg-title">STRATEGY <span class="sg-ticker">(MSTR)</span> AT A GLANCE</div>
+      <div class="sg-grid">
+        <div class="sg-cell">
+          <div class="sg-label">Bitcoin treasury</div>
+          <div class="sg-value">845,256<span class="sg-unit"> BTC</span></div>
+          <div class="sg-sub"><span class="sg-live-tag">live</span><span class="sg-treasury-usd-value">$&hellip;</span></div>
+        </div>
+        <div class="sg-cell">
+          <div class="sg-label">mNAV</div>
+          <div class="sg-value">~1.7<span class="sg-unit">&times;</span></div>
+          <div class="sg-sub">Market cap &divide; BTC NAV</div>
+        </div>
+        <div class="sg-cell">
+          <div class="sg-label">Shares outstanding</div>
+          <div class="sg-value">~282<span class="sg-unit">M</span></div>
+          <div class="sg-sub">Basic, all classes</div>
+        </div>
+        <div class="sg-cell sg-cell-wide">
+          <div class="sg-label">ATM issuance</div>
+          <div class="sg-value sg-value-prose">Active</div>
+          <div class="sg-sub">Common equity ATM plus dedicated preferred-share programs (STRF, STRK, STRD, STRC).</div>
+        </div>
+      </div>
+      <div class="sg-footer">Snapshot as of June 2026. Bitcoin treasury USD value updates live via CoinGecko spot price; other values refresh monthly.</div>
+    </aside>
+
     <h2 class="section-title">The capital structure picture</h2>
 
     <p class="prose">Strategy's full capital structure, as of Q1 2026, against a $54 billion asset pool (843,738 BTC and $900M cash):</p>
