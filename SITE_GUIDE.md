@@ -534,12 +534,6 @@ The prompt-craft principles, generalizable beyond this slide:
 2. **Repeated terms over-weight their priors.** "Moss-covered" appearing twice in v1 pulled the whole composition toward bright green even though the prompt also said "golden hour" and "late autumn". When a setting-element appears multiple times with the same descriptor, the model treats that descriptor as the dominant visual direction. Vary the language ("dormant lichen", "rust-tinged moss", "weathered stone") to keep any one prior from over-dominating.
 3. **Labelled prompt blocks weight more heavily than embedded paragraph copy.** Leading with an `OVERALL TONAL DIRECTION (most important):` block in v2 gave the color call disproportionate weight relative to the setting/composition/motion paragraphs that followed. Worth doing whenever a single dimension (color, mood, motion-quality) is the load-bearing element that the slide depends on.
 
-### Pending additions
-
-| Slide | Headline (proposed) | Video direction (proposed) |
-|---|---|---|
-| Bitcoin Fixed Income | *Coupons today, without selling tomorrow's stack.* | Slow-tilt close-up of crystallized amber/rosin droplet on dark stone — each drop catches a single warm highlight as it forms (the steady coupon stream), but the stone underneath stays unchanged (the bitcoin collateral). Bronze/amber register matching the family. Silent. |
-
 ## 14. Bitcoin vs. Real Estate (`/bitcoin-vs-real-estate.html`)
 
 **Added:** April 18, 2026. **Refreshed:** May 7, 2026 (Phase 4 restructure). Decision-frame page for the bitcoin-vs-housing question. After Phase 4 hosts both retrospective and projection calculators on the same canvas, paired via a temporal toggle.
@@ -1238,7 +1232,6 @@ The page has five reciprocal `related:` companions (each pointing in both direct
 
 ### Open enhancements
 
-- **Homepage carousel slide pending.** Needs a Grok Imagine video with editorial framing (suggested caption direction: *"Coupons today, without selling tomorrow's stack."*). Track under §13 Pending additions.
 - **mNAV/ATM-status live indicator.** Tab II currently describes the mechanism in prose; a live mNAV readout (market value of bitcoin treasury / market cap of issuer) would make it actionable. Requires a live data source for Strategy's treasury value and ATM issuance status; deferred until an API source is identified.
 - **Drawdown threshold sourcing.** Tab II's $33K (-47%) and $21K (-67%) drawdown thresholds were verified arithmetically (the $21K = 1× coverage threshold, the $33K = 2× coverage threshold, both against the ~$54B asset pool and the $7.98B + $10.49B claim stack above + including STRC). A short methodology footnote linking to the calculation would be a nice-to-have.
 - **§6.26 full-component alignment.** Current share UI is a simplified single-action variant ("Copy share link" only). Aligning to the full two-group `share-section` component used by Retirement / DR / BvRE / BAS would add X/LinkedIn/Facebook social-promotion buttons. Not urgent; the layout-level "Share this page" surface from `base.njk` already covers public promotion.
@@ -1263,6 +1256,7 @@ Example: `/bitcoin-fixed-income?in=120000&po=3000000&hz=20&sc=upper&pa=sata&st=m
 
 ### Recently closed
 
+- **Homepage carousel slide** (June 2026). Autumn-forest stream cascade — a moss-edged natural stone weir across a forest stream, water flowing gently over the top in a thin continuous sheet, calm pool gathering behind, leaves drifting at the edges. Caption: *"Coupons today &mdash; without selling tomorrow's stack."* Placed in the carousel between Bitcoin vs. Rental Property and Bitcoin and The Power Law so the two income-comparison pages sit together before the main argument flow resumes.
 - **Iter B — BvRP `#calc-current-multiple` desync** (June 2026). BvRP's ETI card subscribed to `fetchTodayPrice` and showed the live CoinGecko spot (e.g. 0.45×); the chip-picker's readout did not subscribe and stayed on the seeded fallback (e.g. 0.51×). Five-line patch: chip-picker `renderCAGRChips(state)` now also subscribes to the live-fetch callback. Both indicators now read the same `TODAY_PRICE` global. Pattern banked: when adding live-price-dependent readouts on a page, each must subscribe to the fetch callback explicitly.
 - **Saylor quote reframed as editorial paraphrase** (June 2026). Earlier draft's blockquote wasn't sourceable to a single transcript. Reframed as paraphrase with sourcing methodology (Natalie Brunell interview themes, "best credit instrument in the world" X post). Preserves the argument, removes the false-attribution problem.
 - **Capital stack SVG diagram** (June 2026, Tab II). Replaced the placeholder block with an inline 820×420 SVG showing all six tranches of Strategy's Q1 2026 capital structure, bar widths proportional to notional, STRC amber-highlighted, subordinate cushion annotated.
