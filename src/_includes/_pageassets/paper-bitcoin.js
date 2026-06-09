@@ -63,7 +63,7 @@
       hold: 'You hold: bitcoin. One key, yours alone \u2014 and so is everything that can happen to it.',
       dims: {
         bearer:       { state: 'intact',      desc: 'Ownership is the key itself \u2014 no counterparty exists.' },
-        confiscation: { state: 'intact',      desc: 'Hidden gold was useless gold; hidden bitcoin still works \u2014 defiance costs nothing but the hiding.' },
+        confiscation: { state: 'intact',      desc: 'Where hidden gold could not be used, hidden bitcoin still works \u2014 seizure requires finding the holder, not sending a memo.' },
         freezes:      { state: 'intact',      desc: 'No intermediary exists to receive the freeze order.' },
         rehypo:       { state: 'intact',      desc: 'Your coins verifiably exist and verifiably cannot be lent \u2014 the chain is the audit.' },
         privacy:      { state: 'mostly',      desc: 'If acquired with KYC, the purchase record exists somewhere; the holdings themselves answer to no registry.' },
