@@ -1786,54 +1786,11 @@ html, body {
 }
 
 
-/* --- Strategy at a glance: tooltip pattern + insight callout (Tab II enhancement) ---
-   Tooltips: applied to the mNAV and ATM issuance labels where the jargon is
-   opaque without context. CSS-only with focus-visible support for keyboard a11y.
-   Insight: a subtle left-bordered callout that translates the snapshot values
-   into a current-state interpretation. Refresh prose alongside the snapshot
-   values per MONTHLY_REFRESH_CHECKLIST. */
-.sg-term {
-  position: relative;
-  cursor: help;
-  border-bottom: 1px dotted rgba(224, 148, 34, 0.4);
-  outline: none;
-}
-.sg-term:focus {
-  border-bottom-color: rgba(224, 148, 34, 0.8);
-}
-.sg-tooltip {
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 300px;
-  padding: 0.75rem 0.9rem;
-  background: rgba(20, 20, 18, 0.98);
-  border: 1px solid rgba(224, 148, 34, 0.35);
-  border-radius: 4px;
-  font-family: var(--font-body, "Inter", sans-serif);
-  font-size: 0.78rem;
-  font-weight: 400;
-  color: var(--ink-bright, #ece4d6);
-  line-height: 1.5;
-  text-transform: none;
-  letter-spacing: normal;
-  text-align: left;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.15s, visibility 0.15s;
-  z-index: 50;
-  pointer-events: none;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-}
-.sg-term:hover .sg-tooltip,
-.sg-term:focus .sg-tooltip {
-  opacity: 1;
-  visibility: visible;
-}
-@media (max-width: 480px) {
-  .sg-tooltip { width: 240px; left: 0; transform: none; }
-}
+/* --- Strategy at a glance: insight callout (Tab II enhancement) ---
+   Subtle left-bordered callout that translates the snapshot values into a
+   current-state interpretation. Refresh prose alongside the snapshot values
+   per MONTHLY_REFRESH_CHECKLIST. Tooltips on mNAV and ATM use the site-wide
+   .help-tip / .tip-content pattern (no overrides needed here). */
 .sg-insight {
   margin-top: 1.1rem;
   padding: 0.85rem 1rem;
