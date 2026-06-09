@@ -269,6 +269,25 @@ will cache the previous version; first new share triggers re-scrape, or
 use [Facebook's debugger](https://developers.facebook.com/tools/debug/)
 to force a fresh fetch.
 
+## 7. Strategy (MSTR) snapshot values — Bitcoin Fixed Income, Tab II
+
+The "Strategy at a glance" card on Tab II shows four snapshot fields plus one truly-live field. The treasury USD value updates live (BTC count &times; shared `TODAY_PRICE`) and doesn't need a manual refresh, but the four underlying snapshots and the "Reading right now" insight prose do.
+
+For each value, verify against the source listed and update in the BFI files as needed.
+
+| Field | Where it lives | Source to verify against |
+|---|---|---|
+| **BTC held** | `src/bitcoin-fixed-income.njk` (the `845,256` figure) AND `src/_includes/_pageassets/bitcoin-fixed-income.js` (`var BTC_HELD = 845256`) | CoinGecko `/api/v3/companies/public_treasury/bitcoin` (find Strategy entry by `symbol: "MSTR.US"`). Cross-check against Saylor's latest tweet or Strategy IR page. |
+| **mNAV** | `.njk` (`~1.7&amp;times;`) | SaylorTracker.com headline mNAV figure. Or compute: (MSTR price &times; shares outstanding) &divide; (BTC count &times; BTC price). |
+| **Shares outstanding** | `.njk` (`~282M`) | Latest 10-Q "Diluted shares outstanding" or Yahoo Finance MSTR Statistics page. Basic, all classes. |
+| **ATM issuance** | `.njk` (`Active` value cell + sub-text) | Latest 10-Q ATM disclosures + 8-K announcements for new facilities. Phrase as `Active` or `Paused` with a brief structural note. |
+| **Reading right now insight prose** | `.njk` `.sg-insight-text` paragraph | Rewrite when mNAV crosses ~1.0&times; (issuance accretive vs dilutive boundary) or ATM status changes (Active &harr; Paused). Stable otherwise. |
+| **As-of date** | `.njk` footer (`Snapshot as of June 2026`) | Update to the current month/year whenever any other field is refreshed. |
+
+**Critical**: the two BTC count locations (the visible cell text in `.njk` AND the `BTC_HELD` constant in `.js`) MUST stay in sync. Otherwise the displayed BTC count and the live USD value will drift apart.
+
+If the values haven't materially changed (BTC count moved &lt;1%, mNAV moved &lt;0.1&times;, ATM status unchanged, insight prose still accurate), the only required update is the as-of date.
+
 ## Live BTC price fetch — shipped 2026-05-28
 
 The "Why not live fetch?" reasoning that previously sat here is preserved
