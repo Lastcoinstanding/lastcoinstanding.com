@@ -48,8 +48,22 @@ eleventyComputed:
         <button class="insight-arrow prev" id="insightPrev" aria-label="Previous">&#8249;</button>
         <button class="insight-arrow next" id="insightNext" aria-label="Next">&#8250;</button>
 
+        <!-- Slide: How Much Bitcoin? (Featured lead, June 2026) -->
+        <div class="insight-slide active" data-cat="numbers" data-feat="1">
+            <div class="insight-visual video-visual">
+                <video class="carousel-video" id="vid-howmuch" muted playsinline preload="none">
+                    <source src="/videos/how-much-bitcoin.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="insight-text">
+                <div class="insight-label">How Much Bitcoin?</div>
+                <div class="insight-headline">The peak is <em>not the target.</em></div>
+                <a href="/how-much-bitcoin.html" class="insight-cta">How much is the question &rarr;</a>
+            </div>
+        </div>
+
         <!-- Slide 1: Paper Bitcoin -->
-        <div class="insight-slide active" data-cat="arguments" data-feat="1">
+        <div class="insight-slide" data-cat="arguments" data-feat="1">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-paperbtc" muted playsinline preload="none">
                     <source src="/videos/paper-bitcoin.mp4" type="video/mp4">
@@ -175,7 +189,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 7: The Melting Ice Cube -->
-        <div class="insight-slide" data-cat="arguments" data-feat="1">
+        <div class="insight-slide" data-cat="arguments">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-3" muted playsinline preload="none">
                     <source src="/videos/melting-ice-cube.mp4" type="video/mp4">
