@@ -1,0 +1,165 @@
+---
+layout: base.njk
+permalink: /how-much-bitcoin.html
+slug: how-much-bitcoin
+related:
+  - slug: disciplined-rebalancing
+    desc: "Kelly answers how much; rebalancing answers how to stay there — the maintenance protocol that keeps a target a target, and quietly harvests the volatility."
+  - slug: the-power-law
+    desc: "The return model behind this page's default assumptions — and the honest limits of extrapolating it."
+  - slug: the-bitcoin-retirement
+    desc: "What an allocation is ultimately for: the long-horizon arithmetic of holding through cycles."
+  - slug: paper-bitcoin
+    desc: "Whatever amount you arrive at, the next question is how to hold it — and every way of holding bitcoin is a different asset."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/how-much-bitcoin-head.html' %}"
+  page_styles: "{% include '_pageassets/how-much-bitcoin.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/how-much-bitcoin.js' %}"
+---
+<div class="container">
+
+  <header class="hero">
+    <div class="category-eyebrow">The Numbers</div>
+    <h1>How Much <span class="h1-amber">Bitcoin</span>?</h1>
+    <p class="subtitle">In 1956, a Bell Labs physicist derived the formula for how much to stake on a favorable bet.<br>
+    Applied to bitcoin, its answer is startling &mdash; and the honest lesson is not the number,<br>
+    but the shape of the curve around it.</p>
+  </header>
+
+  <!-- §A — The formula from Bell Labs -->
+  <section class="section section-opening">
+    <h2>The formula from Bell Labs</h2>
+    <p>Every page on this site about bitcoin's properties eventually meets the same practical question, and it is the one question the literature spends the least honest effort on: not <em>whether</em> bitcoin belongs in a portfolio, but <em>how much</em>. There is, as it happens, a famous mathematical answer to exactly this question &mdash; and it did not come from finance.</p>
+    <p>In 1956, John Kelly, a physicist at Bell Labs, was studying how fast information could travel down a noisy telephone line. He noticed that his problem had the same structure as a gambler's: given a genuine edge and uncertain outcomes, what fraction of your capital should you stake to grow it as fast as possible without ever going broke? The answer &mdash; bet in proportion to your edge, discounted by your uncertainty &mdash; became known as the <span class="tip-anchor">Kelly criterion<span class="help-tip" tabindex="0">?<span class="tip-content">A rule for position sizing that maximizes the long-run compound growth rate of wealth. For an asset held against a safe alternative, the optimal fraction is the asset's expected excess return divided by the square of its volatility.</span></span></span>. Claude Shannon, the father of information theory and Kelly's colleague, took it seriously enough to use it. So did Edward Thorp, who applied it first to blackjack, in the card-counting system that made casinos change their rules, and then to markets, at Princeton Newport Partners &mdash; one of the first quantitative hedge funds, which compounded at roughly 20% a year for nineteen years. Bill Gross, who ran the world's largest bond fund, learned position sizing from Thorp's blackjack book. The formula's pedigree is not in question.</p>
+    <p>What the formula maximizes is the long-run <em>growth rate</em> of wealth &mdash; not the expected value of any single bet. The distinction matters because wealth compounds: a 50% loss requires a 100% gain to repair, so a strategy that looks attractive on average can still grind a single investor to nothing over time. Kelly sizing is the mathematical answer to <span class="tip-anchor">living in one timeline<span class="help-tip" tabindex="0">?<span class="tip-content">The ergodicity point: an "expected value" averages across many imagined parallel outcomes, but a person experiences one sequence of outcomes in order. For compounding wealth, the time-average growth of a single path is what matters &mdash; and maximizing it is exactly what the Kelly criterion does.</span></span></span> rather than averaging across many.</p>
+    <p>This page applies that formula to bitcoin, honestly. The raw answer will be startling. The reasons to discount it are just as instructive. Neither is a recommendation; both are worth seeing plainly.</p>
+  </section>
+
+  <!-- §B — What the formula says -->
+  <section class="section">
+    <h2>What the formula says about bitcoin</h2>
+    <p>For an asset held against a safe alternative, the Kelly fraction has a clean closed form: the asset's <span class="tip-anchor">expected excess return<span class="help-tip" tabindex="0">?<span class="tip-content">The asset's expected annual return (its "drift," in arithmetic terms) minus the <em>risk-free rate</em> &mdash; what a safe alternative such as a Treasury bill pays. The formula sizes the bet on the edge over doing nothing, not on the raw return.</span></span></span> divided by the square of its <span class="tip-anchor">volatility<span class="help-tip" tabindex="0">?<span class="tip-content">The standard deviation of the asset's annual returns &mdash; how widely outcomes swing around their average. Squaring it gives the <em>variance</em>, the penalty term in the formula. Bitcoin's annualized volatility has historically run between roughly 50% and 80%, several times that of stocks.</span></span></span>. One technical care this page takes that most published attempts do not: historical growth is usually quoted as a compound rate, but the formula wants the arithmetic drift, and <span class="tip-anchor">the two differ by the volatility drag<span class="help-tip" tabindex="0">?<span class="tip-content">Volatility makes compound growth lag the simple average of returns: g &asymp; &mu; &minus; &frac12;&sigma;&sup2;. Plugging a compound growth rate (CAGR) straight into the Kelly formula quietly understates the answer &mdash; the most common error in published bitcoin&ndash;Kelly calculations. This page converts properly, and shows the conversion in the readout below.</span></span></span> &mdash; a distinction that quietly decides whether the answer is merely large or calls for leverage.</p>
+    <p>Run it on bitcoin under three honest input scenarios &mdash; computed live on this page, from the same data series as <a href="/the-power-law.html">The Power Law</a>:</p>
+
+    <div class="scenario-list">
+      <div class="scenario-row">
+        <div class="scenario-name">The trailing decade as it happened <span class="scenario-asof" id="asofTrailing"></span></div>
+        <div class="scenario-text">Computed from the site's price series: the formula's answer is roughly <strong><span id="sFTrail">190%</span> of your wealth</strong> &mdash; it asks for leverage, nearly twice your net worth.</div>
+      </div>
+      <div class="scenario-row">
+        <div class="scenario-name">A maturation scenario</div>
+        <div class="scenario-text">Growth decaying to ~30% a year, volatility moderating to 60% &mdash; the trajectory the power-law literature describes: the answer is still <strong><span id="sFMatur">122%</span></strong>. Still leverage.</div>
+      </div>
+      <div class="scenario-row">
+        <div class="scenario-name">A deliberately hostile scenario</div>
+        <div class="scenario-text">A 10% expected return against stubborn 60% volatility &mdash; assumptions so bearish that <em>holding only bitcoin would lose about 8% a year in compound terms</em>: the formula still allocates <strong><span id="sFCons">17%</span></strong>. It refuses to say zero, because a small, rebalanced slice of a volatile asset can add growth that the asset alone cannot &mdash; a result this page returns to.</div>
+      </div>
+    </div>
+
+    <p>Institutional research lands in the same startling territory when it asks the same question. Fidelity Digital Assets' March 2026 study ran a discrete Kelly calculation on bitcoin's last ten calendar years &mdash; seven positive years averaging +288%, three negative averaging &minus;50% &mdash; and published the result: <a href="https://www.fidelitydigitalassets.com/research-and-insights/getting-zero-evaluating-bitcoin-2026" target="_blank" rel="noopener">a 65% position</a>. Their own footnote concedes they chose the <em>conservative</em> variant of the formula; the generalized version "results in an even higher recommended position size" &mdash; it implies leverage. Under their deliberately conservative forward inputs, the same machinery still says 10% &mdash; five times the institutional consensus. And note what the first two scenarios above mean for the most maligned figure in this debate: when the formula's answer exceeds 100%, the unleveraged holder who is "all in" is not being reckless by Kelly's lights &mdash; they are <em>under</em>-allocated. The formula is more bullish than the maximalist.</p>
+    <p>So the startling number is established. Now for the honest part.</p>
+  </section>
+
+  <!-- §C — THE INTERACTIVE -->
+  <section class="section curve-section">
+    <h2>The curve</h2>
+    <p class="curve-intro">The formula's answer is a single point. The argument of this page is the <em>shape of the curve around it</em>. Below is the relationship between how much you allocate and how fast your wealth compounds &mdash; with bitcoin's numbers, under assumptions you control. Watch three things: how unevenly the curve falls away on either side of the peak; how violently the peak itself moves when you nudge the assumptions; and how little growth the half- and quarter-Kelly marks give up for how much calamity they avoid.</p>
+
+    <div class="curve-tool">
+      <div class="curve-controls">
+        <div class="preset-group">
+          <span class="preset-item"><button class="kpreset-btn active" data-preset="trailing">Trailing decade</button><span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin's compound growth rate and volatility over the most recent ten years of the site's price series, computed live on this page, converted properly to arithmetic drift. The as-of date is shown beside the result.</span></span></span>
+          <span class="preset-item"><button class="kpreset-btn" data-preset="maturation">Maturation</button><span class="help-tip" tabindex="0">?<span class="tip-content">A forward view consistent with power-law maturation: compound growth decaying to 30% a year, volatility moderating to 60%. Deliberately far below the historical record.</span></span></span>
+          <span class="preset-item"><button class="kpreset-btn" data-preset="conservative">Conservative</button><span class="help-tip" tabindex="0">?<span class="tip-content">A deliberately hostile case: a 10% expected (arithmetic) return against 60% volatility. Under these assumptions bitcoin held alone would <em>lose</em> about 8% a year in compound terms &mdash; and the formula still allocates to it.</span></span></span>
+        </div>
+        <div class="slider-group">
+          <label class="slider-row"><span class="slider-name">Compound growth <span class="slider-val" id="valG"></span></span>
+            <input type="range" id="sliderG" min="-10" max="100" step="1" value="30"></label>
+          <label class="slider-row"><span class="slider-name">Volatility <span class="slider-val" id="valS"></span></span>
+            <input type="range" id="sliderS" min="20" max="120" step="1" value="60"></label>
+          <div class="r-note">Risk-free rate held at <strong>4.0%</strong> <span class="r-asof">(short Treasury yield, June 2026)</span></div>
+        </div>
+      </div>
+
+      <div class="curve-chart-wrap">
+        <svg id="curveChart" viewBox="0 0 980 480" preserveAspectRatio="xMidYMid meet" aria-label="Growth rate versus allocation, with the Kelly peak and fractional-Kelly marks"></svg>
+      </div>
+
+      <div class="curve-readout">
+        <div class="readout-main">
+          <div class="readout-fstar">
+            <div class="readout-label">The formula's answer</div>
+            <div class="readout-big" id="roFstar">&mdash;</div>
+            <div class="readout-sub" id="roConv"></div>
+          </div>
+          <div class="readout-flags" id="roFlags"></div>
+        </div>
+        <div class="readout-tables">
+          <div class="readout-block">
+            <div class="readout-block-title">Growth kept at each fraction</div>
+            <table class="readout-table" id="roGrowth"></table>
+          </div>
+          <div class="readout-block">
+            <div class="readout-block-title">Drawdown odds at each fraction <span class="help-tip" tabindex="0">?<span class="tip-content">Two distinct quantities, often conflated in the literature. <em>Ever halved</em>: the chance, over a long horizon, that wealth at some point falls to half its starting value. <em>Halved before doubled</em>: the chance the halving arrives before the first doubling. Both are model results for the continuous Kelly framework (MacLean, Thorp &amp; Ziemba).</span></span></div>
+            <table class="readout-table" id="roDraw"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §D — Why nobody bets the formula -->
+  <section class="section">
+    <h2>Why nobody bets the formula</h2>
+    <p>Three honest reasons, in ascending order of force.</p>
+    <p><strong>The inputs are unknowable.</strong> The formula's answer is exquisitely sensitive to the expected return &mdash; the one input nobody has. Chopra and Ziemba's classic study put numbers on it: errors in the return estimate damage outcomes roughly eleven times more than errors in the volatility estimate, and the penalty <em>grows</em> with risk tolerance &mdash; the more aggressively you size, the more your mistake costs. And bitcoin's expected return is genuinely contested: a 2026 analysis of the power-law model found that the fitted exponent &mdash; the engine of every long-horizon extrapolation &mdash; varies by nearly a factor of three depending on a methodological choice as small as where you place the curve's time origin. The fit is real; the precision is not.</p>
+    <p><strong>The curve is asymmetric.</strong> Allocate half the optimal fraction and you keep 75% of the achievable growth. Allocate double and your growth falls all the way back to the risk-free rate &mdash; you carry twice the volatility of the optimal portfolio and are paid <em>nothing</em> for it &mdash; and beyond double, growth turns negative: more risk, less wealth, forever. Under-betting costs a little; over-betting costs everything. Since the inputs can only be estimated, and since estimation error in one direction is survivable and in the other direction is not, deliberately sitting below the formula is not timidity. It is the rational response to not knowing.</p>
+    <p><strong>The drawdowns are unsurvivable.</strong> At the full Kelly allocation, the mathematics is explicit: a coin-flip's chance &mdash; 50% &mdash; that your wealth is cut in half at some point along the way, and one chance in three that the halving comes <em>before</em> the first doubling. These are not tail risks; they are the design. The model assumes you hold through them, withdraw nothing, retire never, and feel nothing. Every way in which a person differs from that assumption &mdash; a finite horizon, a retirement date, living expenses, a family, loss aversion, the 3 a.m. urge to sell &mdash; corrects the allocation in the same direction: <em>downward</em>. For a single investor, a deep enough drawdown is not a statistical outlier to be averaged away. It is an <span class="tip-anchor">absorbing barrier<span class="help-tip" tabindex="0">?<span class="tip-content">A point of no return in a random process. In investing: the loss deep enough that the investor &mdash; for financial or psychological reasons &mdash; exits and never recovers the position. Once absorbed, the long-run mathematics no longer applies to you.</span></span></span> &mdash; the point where the game ends, whether or not the math says it should have continued.</p>
+  </section>
+
+  <!-- §E — Fractional Kelly -->
+  <section class="section">
+    <h2>Fractional Kelly: the honest resolution</h2>
+    <p>The practitioners' answer to all three problems is the same, and it has been standard since Thorp: bet a <span class="tip-anchor">fraction of the formula<span class="help-tip" tabindex="0">?<span class="tip-content">"Half-Kelly" means allocating half of what the formula says; "quarter-Kelly," a quarter. Because the growth curve is flat near its peak and the risk falls fast as you step left, fractional sizing gives up a little growth for a large reduction in drawdown risk.</span></span></span>. The arithmetic of the trade is remarkably kind.</p>
+    <p>At <strong>half-Kelly</strong>, you retain 75% of the achievable excess growth &mdash; while the chance of ever seeing your wealth halved collapses from 50% to 12.5%, and the chance of halving before doubling falls from one-in-three to one-in-nine. At <strong>quarter-Kelly</strong> you still retain about 44% of the maximum growth, and the halving risk that defines full Kelly's brutality essentially vanishes &mdash; well under 1%. The exchange rate, in plain terms: give up a quarter of the growth, shed three-quarters of the catastrophe.</p>
+    <p>And there is a deeper justification than prudence. The full formula is optimal only for an investor with a mathematically specific &mdash; and humanly rare &mdash; indifference to swings in wealth. For an investor with ordinary, stronger risk aversion, the <em>formally optimal</em> policy is exactly a fixed fraction of Kelly: the same mathematics, run with an honest utility function, produces the discount directly. Fractional Kelly is not the formula watered down. It is the formula told the truth about its owner.</p>
+    <p>One more property worth naming: a Kelly weight is a <em>target</em>, not a transaction. Holding an allocation steady through bitcoin's swings means periodically trimming what has run and adding to what has fallen &mdash; which is its own discipline, with its own page: <a href="/disciplined-rebalancing.html">Disciplined Rebalancing</a>. Kelly answers <em>how much</em>; rebalancing answers <em>how to stay there</em> &mdash; and the act of staying there is itself a small, real engine of return, harvesting the volatility that the sizing math treats only as drag.</p>
+  </section>
+
+  <!-- §F — The gap -->
+  <section class="section">
+    <h2>The gap</h2>
+    <p>Hold the fractional discount in one hand and conventional guidance in the other, and the page's finding appears. The same asset, the same arithmetic, descending a ladder of answers:</p>
+
+    <div class="ladder-wrap">
+      <table class="ladder">
+        <thead><tr><th>The question asked</th><th>The answer</th></tr></thead>
+        <tbody>
+          <tr><td>Full Kelly, trailing decade (computed live above)</td><td class="ladder-num" id="ladderTrail">~190%</td></tr>
+          <tr><td>Full Kelly, maturation inputs</td><td class="ladder-num">~122%</td></tr>
+          <tr><td>Fidelity's discrete Kelly, last ten calendar years (Mar 2026)</td><td class="ladder-num">65%</td></tr>
+          <tr><td>Half-Kelly, maturation inputs</td><td class="ladder-num">~61%</td></tr>
+          <tr><td>Quarter-Kelly, maturation inputs</td><td class="ladder-num">~31%</td></tr>
+          <tr><td>Fidelity's discrete Kelly, conservative forward inputs</td><td class="ladder-num">10%</td></tr>
+          <tr><td>Maximum-Sharpe optimization, Fidelity's conservative assumptions</td><td class="ladder-num">9.4%<span class="ladder-note"> (and 0% bonds)</span></td></tr>
+          <tr><td>BlackRock's risk budget &mdash; and its model portfolios since 2025</td><td class="ladder-num">1&ndash;2%</td></tr>
+          <tr><td>Typical advisor guidance</td><td class="ladder-num">1&ndash;5%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The gap between the top and bottom of this ladder is not a disagreement about bitcoin. Every rung can accept the <em>same</em> inputs. It is a disagreement about the question. The bottom rungs ask: <em>how much bitcoin can a portfolio hold before its volatility dominates the risk budget?</em> &mdash; a question about smoothness, careers, and committees, with 1&ndash;2% as a defensible answer. The top rungs ask: <em>what allocation maximizes how fast wealth compounds?</em> &mdash; a question about growth, with answers that start at 10% under hostile assumptions and run past 100% under historical ones. A single institution's single document carries both ends: Fidelity's March 2026 study answers the Sharpe question with 9.4% and the growth question with 65%, eleven pages apart.</p>
+    <p>The reader does not have to pick a rung. But it is worth knowing which question each number is answering &mdash; because the most commonly cited figures answer the question almost nobody who owns bitcoin is actually asking.</p>
+  </section>
+
+  <!-- §G — Closing -->
+  <section class="section">
+    <h2>What this page does not say</h2>
+    <p>This page has not told you how much bitcoin to own. It has shown you what one well-credentialed body of mathematics says when asked &mdash; and why the people who trust that mathematics most are precisely the ones who discount it before acting. Three closing observations, stated descriptively.</p>
+    <p>First: every honest correction runs in one direction. Unknowable inputs, finite lifespans, real expenses, human nerves &mdash; each argues for sizing <em>below</em> the formula. None argues for zero. The same arithmetic that refuses to endorse leverage also refuses, under any input this page can defend, to endorse nothing.</p>
+    <p>Second: the formula's answer is not shrinking. Because the allocation rises as variance falls, bitcoin's maturation cuts the formula's denominator faster than fading returns cut its numerator across a wide range of assumptions &mdash; the math's answer can <em>grow</em> as the asset calms. The institutional ladder has begun to reflect this: the world's largest asset manager moved from publishing 1&ndash;2% to allocating it.</p>
+    <p>Third: whatever fraction a person arrives at, it is a number they must be able to <em>hold</em> &mdash; through the drawdowns the curve promises, with the maintenance discipline that keeps a target a target. How much is a question about mathematics. Whether you can keep it is a question about you.</p>
+    <p class="closing-line">The formula does not say what to do.<br>It shows the limits of what can be survived.</p>
+  </section>
+
+</div>
