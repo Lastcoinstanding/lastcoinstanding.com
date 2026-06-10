@@ -277,6 +277,36 @@ footer a:hover { text-decoration: underline; }
 
 
 /* Featured Insights Carousel */
+/* ── Carousel category tabs (June 2026 homepage pass) ── */
+.insight-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 0 auto 1.1rem;
+}
+.insight-tab {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.95rem;
+    background: transparent;
+    color: #908880;
+    border: 1px solid #2a2724;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+.insight-tab:hover { color: #d8d2ca; border-color: #908880; }
+.insight-tab.active {
+    color: #e09422;
+    border-color: rgba(224, 148, 34, 0.55);
+    background: rgba(224, 148, 34, 0.07);
+}
+.updates-all-link .update-text { color: #e09422; font-weight: 500; }
+
 .insight-carousel {
     max-width: 1080px;
     margin: 0 auto 0;

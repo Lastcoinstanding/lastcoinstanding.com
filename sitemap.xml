@@ -36,6 +36,7 @@
   <url><loc>https://lastcoinstanding.com/not-a-bubble</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://lastcoinstanding.com/spend-and-replace</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://lastcoinstanding.com/paper-bitcoin</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://lastcoinstanding.com/updates</loc><priority>0.4</priority><changefreq>weekly</changefreq></url>
 
   <!-- Hubs and meta -->
   <url><loc>https://lastcoinstanding.com/the-gallery</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>

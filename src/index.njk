@@ -38,12 +38,18 @@ eleventyComputed:
 
 <!-- FEATURED INSIGHTS CAROUSEL -->
 <div class="insight-carousel">
+    <div class="insight-tabs" id="insightTabs" role="tablist" aria-label="Carousel categories">
+        <button class="insight-tab active" data-tab="featured">Featured</button>
+        <button class="insight-tab" data-tab="foundations">Foundations</button>
+        <button class="insight-tab" data-tab="arguments">Arguments</button>
+        <button class="insight-tab" data-tab="numbers">Numbers</button>
+    </div>
     <div class="insight-slides" id="insightSlides">
         <button class="insight-arrow prev" id="insightPrev" aria-label="Previous">&#8249;</button>
         <button class="insight-arrow next" id="insightNext" aria-label="Next">&#8250;</button>
 
         <!-- Slide 1: Paper Bitcoin -->
-        <div class="insight-slide active">
+        <div class="insight-slide active" data-cat="arguments" data-feat="1">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-paperbtc" muted playsinline preload="none">
                     <source src="/videos/paper-bitcoin.mp4" type="video/mp4">
@@ -57,7 +63,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 2: What Money Has To Be -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="foundations" data-feat="1">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-wmhtb" muted playsinline preload="none">
                     <source src="/videos/what-money-has-to-be.mp4" type="video/mp4">
@@ -71,7 +77,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 2: BTC vs Real Estate -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="numbers">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-0" muted playsinline preload="none">
                     <source src="/videos/real-estate.mp4" type="video/mp4">
@@ -85,7 +91,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide: BTC vs Rental Property — storm-to-sun field, the honest comparison once landlord costs are surfaced -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="numbers">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-bvrp" muted playsinline preload="none">
                     <source src="/videos/rental-property.mp4" type="video/mp4">
@@ -99,7 +105,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide: Bitcoin Fixed Income — autumn-forest stream cascade, regular yield against an unchanging structure -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="numbers" data-feat="1">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-bfi" muted playsinline preload="none">
                     <source src="/videos/bitcoin-fixed-income.mp4" type="video/mp4">
@@ -113,7 +119,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 3: Bitcoin and The Power Law -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="numbers" data-feat="1">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-10" muted playsinline preload="none">
                     <source src="/videos/power-law.mp4" type="video/mp4">
@@ -127,7 +133,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 4: The Bitcoin Horizon -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="numbers">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-11" muted playsinline preload="none">
                     <source src="/videos/horizon.mp4" type="video/mp4">
@@ -141,7 +147,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 5: Is Bitcoin a Bubble? -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="arguments" data-feat="1">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-1" muted playsinline preload="none">
                     <source src="/videos/bubble.mp4" type="video/mp4">
@@ -155,7 +161,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 6: The Half-Life -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="arguments">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-2" muted playsinline preload="none">
                     <source src="/videos/candle-burn-out.mp4" type="video/mp4">
@@ -169,7 +175,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 7: The Melting Ice Cube -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="arguments" data-feat="1">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-3" muted playsinline preload="none">
                     <source src="/videos/melting-ice-cube.mp4" type="video/mp4">
@@ -183,7 +189,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 8: The Synthesis -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="foundations">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-4" muted playsinline preload="none">
                     <source src="/videos/synthesis.mp4" type="video/mp4">
@@ -198,7 +204,7 @@ eleventyComputed:
 
 
         <!-- Slide 9: What Bitcoin Is -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="foundations">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-5" muted playsinline preload="none">
                     <source src="/videos/what-bitcoin-is.mp4" type="video/mp4">
@@ -212,7 +218,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 10: The Bitcoin Migration -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="arguments" data-feat="1">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-6" muted playsinline preload="none">
                     <source src="/videos/migration.mp4" type="video/mp4">
@@ -226,7 +232,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 11: The Trilemma -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="foundations">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-7" muted playsinline preload="none">
                     <source src="/videos/trilemma.mp4" type="video/mp4">
@@ -240,7 +246,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 12: Money Trees -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="arguments">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-8" muted playsinline preload="none">
                     <source src="/videos/money-trees.mp4" type="video/mp4">
@@ -254,7 +260,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 13: The Bitcoin Retirement -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="numbers" data-feat="1">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-12" muted playsinline preload="none">
                     <source src="/videos/retirement.mp4" type="video/mp4">
@@ -268,7 +274,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 14: Disciplined Rebalancing -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="numbers">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-13" muted playsinline preload="none">
                     <source src="/videos/disciplined-rebalancing.mp4" type="video/mp4">
@@ -282,7 +288,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 15: The Fixed Pie -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="numbers" data-feat="1">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-9" muted playsinline preload="none">
                     <source src="/videos/fixed-pie.mp4" type="video/mp4">
@@ -296,7 +302,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 16: Bitcoin vs. The Stock Market -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="numbers" data-feat="1">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-bvsm" muted playsinline preload="none">
                     <source src="/videos/stock-market.mp4" type="video/mp4">
@@ -310,7 +316,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 17: The Bitcoin Heatmap -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="numbers">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-heatmap" muted playsinline preload="none">
                     <source src="/videos/heatmap.mp4" type="video/mp4">
@@ -324,7 +330,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 18: Borrowing Against Your Stack -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="numbers">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-bayb" muted playsinline preload="none">
                     <source src="/videos/borrowing.mp4" type="video/mp4">
@@ -338,7 +344,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 19: Bitcoin-Backed Mortgages -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="numbers">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-bbm" muted playsinline preload="none">
                     <source src="/videos/bitcoin-backed-mortgages.mp4" type="video/mp4">
@@ -352,7 +358,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 20: Living on Bitcoin -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="numbers">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-lob" muted playsinline preload="none">
                     <source src="/videos/living-on-bitcoin.mp4" type="video/mp4">
@@ -366,7 +372,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 21: Bitcoin Defined -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="foundations">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-bd" muted playsinline preload="none">
                     <source src="/videos/bitcoin-defined.mp4" type="video/mp4">
@@ -380,7 +386,7 @@ eleventyComputed:
         </div>
 
         <!-- Slide 22: What Money Is For -->
-        <div class="insight-slide">
+        <div class="insight-slide" data-cat="foundations">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-wmif" muted playsinline preload="none">
                     <source src="/videos/what-money-is-for.mp4" type="video/mp4">
@@ -402,12 +408,16 @@ eleventyComputed:
     <div class="updates-inner">
         <div class="updates-label">Recent updates</div>
         <div class="updates-scroller" tabindex="0">
-            {% for u in updates %}
+            {% for u in updates %}{% if loop.index <= 8 %}
             <a class="update-row" href="{{ u.page }}">
                 <span class="update-date">{{ u.display }}</span>
                 <span class="update-text">{{ u.summary }}</span>
             </a>
-            {% endfor %}
+            {% endif %}{% endfor %}
+            <a class="update-row updates-all-link" href="/updates.html">
+                <span class="update-date">&nbsp;</span>
+                <span class="update-text">All updates &rarr;</span>
+            </a>
         </div>
     </div>
 </section>

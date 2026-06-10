@@ -1,0 +1,24 @@
+---
+layout: base.njk
+permalink: /updates.html
+eleventyComputed:
+  head_extras: "{% include '_pageassets/updates-head.html' %}"
+  page_styles: "{% include '_pageassets/updates.css' %}"
+---
+<div class="container">
+
+  <header class="hero">
+    <h1>All Updates</h1>
+    <p class="subtitle">Every change shipped to Last Coin Standing &mdash; new explorations, refreshed data, and notable revisions, newest first. The homepage strip shows the latest eight; this page keeps the full record.</p>
+  </header>
+
+  <div class="updates-list">
+    {% for u in updates %}
+    <a class="update-item" href="{{ u.page }}">
+      <span class="update-item-date">{{ u.display }}</span>
+      <span class="update-item-text">{{ u.summary }}</span>
+    </a>
+    {% endfor %}
+  </div>
+
+</div>
