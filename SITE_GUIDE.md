@@ -478,7 +478,7 @@ All slides deployed with 16:9 widescreen silent videos, minimalist copy pattern 
 
 | # | Slide | Headline | Video concept |
 |---|-------|----------|---------------|
-| 1 | Paper Bitcoin | Same light — different asset. | Dark wooden table at dusk: a vintage glass bulb with a visible fabric cord trailing out of frame, and a freestanding candle, giving identical warm light. ~5s in, the bulb fades to dark — power withdrawn through the wire — while the flame continues unchanged; held final state. Extends the "impervious" signature. First-take accept: prompt asked for an instant cut; Grok delivered a lawful gradual fade, judged semantically better (fits the §6 "nothing random" grammar; a hard cut risks reading as an edit artifact). The cord is the argument: same light, different dependency. |
+| 1 | Paper Bitcoin vs. Real Bitcoin | Same light — different asset. | Dark wooden table at dusk: a vintage glass bulb with a visible fabric cord trailing out of frame, and a freestanding candle, giving identical warm light. ~5s in, the bulb fades to dark — power withdrawn through the wire — while the flame continues unchanged; held final state. Extends the "impervious" signature. First-take accept: prompt asked for an instant cut; Grok delivered a lawful gradual fade, judged semantically better (fits the §6 "nothing random" grammar; a hard cut risks reading as an edit artifact). The cord is the argument: same light, different dependency. |
 | 2* | What Money Has To Be | One money must do three things at once — or it cannot do any of them | Three ornate brass lenses on oak workbench, candle behind; each shows same flame |
 | 2 | Bitcoin vs. Real Estate | Housing became the default store of value by elimination, not merit | Golden hour → twilight → dark silhouette |
 | 3 | Bitcoin vs. Rental Property | What if the yield were higher — and the weather quieter. | Wide cinematic shot of a sweeping field of tall grass at the moment a storm passes. First ~4 seconds: heavy rain falls diagonally, wind bends the grass in waves, slate-gray storm clouds churn low overhead, distant lightning hinted. The clouds then break in the upper third of the frame — golden god-rays pierce through, illuminating the wet field in patches, mist rising off the warm ground. Rain tapers; camera slowly pushes in. By the end, the storm has moved off to the right edge, warm dawn light bathes the field, droplets on grass catch the gold. Same field, different sky — storm reads as the landlord burden (operational load, gross-to-net leakage, policy risk), sun reads as bitcoin's quieter yield. v2 landed warmer/more natural than v1 on the close. |
@@ -1268,7 +1268,9 @@ Example: `/bitcoin-fixed-income?in=120000&po=3000000&hz=20&sc=upper&pa=sata&st=m
 
 ---
 
-## 25. Paper Bitcoin (`/paper-bitcoin.html`)
+## 25. Paper Bitcoin vs. Real Bitcoin (`/paper-bitcoin.html`)
+
+**Retitled June 2026** from "Paper Bitcoin" — the comparison-instrument nature of the page (five custody models × ten dimensions) was undersold by the single-term title, which read as an editorial about one flavor. "Real" chosen over "Physical" for the title because "physical bitcoin" collides in search with Casascius-style collectible coins; in-page prose keeps both terms ("the real bitcoin — the physical bitcoin"). Slug unchanged at `/paper-bitcoin` (live, indexed, shared). First Arguments page with a "vs." title — a deliberate exception to the vs.-signals-Numbers convention, justified by the page genuinely being a comparison instrument.
 
 **Added:** June 2026. The custody exploration: every way of holding bitcoin is essentially a different asset, and only self-custody retains the full property set the Foundations pages describe. Sits in The Arguments (`category: "arguments"`, `interactive: true`). Prose-led page with one interactive (WMHTB interaction grammar) plus a static 2×2 diagram. Mixed-content width tier (1100/880 per STYLE_GUIDE §4.2). Research basis: a dedicated NotebookLM corpus (custody models, ETF prospectuses, the Lopp physical-attacks dataset, 6102/capital-controls history, Celsius/Cyprus precedent), with independently verified key claims.
 
@@ -1305,7 +1307,7 @@ Coinbase Custody secures >80% of US spot-ETF bitcoin (84% by AUM, Apr 2026 — r
 
 ### Open items / deferred
 
-- Title variant "Paper Bitcoin vs. Physical Bitcoin" — parked after live review; revisit only if the current title underperforms.
+- ~~Title variant~~ — resolved June 2026: retitled to "Paper Bitcoin vs. Real Bitcoin" (see section header note).
 - ~~Carousel slide~~ — shipped June 2026 at carousel position 1 (bulb-and-candle video, "Same light — different asset."; see §13). The earlier three-doors concept was superseded by the two-lights metaphor.
 - The 2×2 quadrant as a Gallery entry.
 - Build-time citation niceties: SIPC scope language, Casa/Unchained duress-protocol product-doc cites (page phrasing already conservative: "exist," not "guarantee").

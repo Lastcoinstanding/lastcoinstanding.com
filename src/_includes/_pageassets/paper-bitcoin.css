@@ -73,6 +73,7 @@
     margin: 0 auto;
   }
   .hero .subtitle em { font-style: italic; color: var(--text); }
+  .hero h1 .h1-real { color: var(--orange); }
 
   /* ═══ Prose sections ═══ */
   .section {
