@@ -465,6 +465,8 @@ All slides deployed with 16:9 widescreen silent videos, minimalist copy pattern 
 
 **Paper Bitcoin slide added at position 1 (June 2026).** The newest page leads the Featured set; live markup slides previously 1–24 are now 2–25 (the prior "23 slides" count was itself one short of live markup — markup is truth). Table rows below still read at +1; a full renumber is now LOW priority because the June 2026 tab restructure makes absolute carousel position secondary to tab membership. Video: bulb-with-cord and freestanding candle, first-take accept (see iteration record below).
 
+**Pending additions — How Much Bitcoin? (June 2026).** Slide ships with its Grok Imagine video in a follow-up commit. Proposed copy: label `THE NUMBERS`, headline *"The peak is not the target."*, CTA *"How much is the question →"*. Primary video direction: macro slow pour of amber liquid into a clear glass on a dark table, the pour easing and stopping deliberately short of the brim, surface settling with warm light — fill-toward-capacity-but-stop-short is the page's whole argument (fractional Kelly). Alternate: a climber's lantern halting below a dark ridgeline at dusk. On landing, apply the §13 curation rule: promote into Featured, retire one (~10 cap).
+
 **Category tabs + curated Featured set (June 2026 homepage pass).** The carousel now has four tabs — **Featured (deterministic default every session) | Foundations | Arguments | Numbers** — rendered as pill buttons above the slides. Each slide carries `data-cat` (derived from `explorations.json` categories) and the Featured ten carry `data-feat="1"`. The controller (`index.js`) cycles, auto-advances, and builds dots within the active tab's subset only; random-start now applies *within* the chosen tab (deterministic tab, varied entry point — replaces the old random-start-across-all-25). Current Featured set: Paper Bitcoin vs. Real Bitcoin, What Money Has To Be, The Bitcoin Migration, Bitcoin vs. The Stock Market, The Bitcoin Retirement, The Power Law, The Fixed Pie, Is Bitcoin a Bubble?, Bitcoin Fixed Income, The Melting Ice Cube. **Curation rule:** when a new page ships its carousel slide, promote it into Featured and retire one — Featured stays at ~10. In the same pass, the Recent Updates strip was capped at the latest 8 entries with an "All updates →" row linking to the new `/updates` archive page (full history, editorial-tier layout, sitemap 0.4).
 
 **Documentation drift resolved (May 2026):** the previously-flagged drift between markup and this inventory was closed when slide 22 (What Money Is For) landed. The three previously-undocumented slides (`vid-heatmap`, `vid-bbm`, `vid-lob`) have had their inventory rows scraped from `src/index.njk` and added to the table below; the prior slide-17 entry (Borrowing Against Your Stack) has been renumbered to 18 to match the live markup. The table below now matches `src/index.njk` slide-for-slide.
@@ -847,8 +849,9 @@ For a reader new to the site landing on the calculators:
 4. **BvRE — Projection mode** — the same question forward; introduces the channel framing without going deep
 5. **The Power Law — The Channel tab** — the foundational visualization; readers arrive ready to grok the framework
 6. **The Power Law — other tabs** — the deeper conceptual case (Theory, In Nature)
-7. **Disciplined Rebalancing** — applies the channel as a sell-and-rebuy protocol; deepest specialization on the *selling* side
-8. **Bitcoin Fixed Income** — the income-instrument decision frame for readers who want cashflow today without selling the stack; sits at the same depth tier as Disciplined Rebalancing but addresses a different mechanism (preferred dividends vs. percentile selling)
+7. **How Much Bitcoin?** — the sizing question every applied page eventually meets, answered descriptively through the Kelly criterion; reads naturally after the Power Law (which supplies its scenario inputs) and immediately before Disciplined Rebalancing, its sister page (sizing → maintenance)
+8. **Disciplined Rebalancing** — applies the channel as a sell-and-rebuy protocol; deepest specialization on the *selling* side
+9. **Bitcoin Fixed Income** — the income-instrument decision frame for readers who want cashflow today without selling the stack; sits at the same depth tier as Disciplined Rebalancing but addresses a different mechanism (preferred dividends vs. percentile selling)
 
 Phase 4 strengthens this reading order by separating *application* (BvSM, BvRE, retirement, disciplined rebalancing) from *foundation* (Power Law). BvSM was added at the top of the reading order in May 2026 because it requires the least personal context from the reader and proves the framework with the broadest comparator most readers already trust.
 
@@ -1314,6 +1317,47 @@ Coinbase Custody secures >80% of US spot-ETF bitcoin (84% by AUM, Apr 2026 — r
 - The 2×2 quadrant as a Gallery entry.
 - Build-time citation niceties: SIPC scope language, Casa/Unchained duress-protocol product-doc cites (page phrasing already conservative: "exist," not "guarantee").
 - Parked future pages seeded here: the CDS framing (bitcoin as a credit default swap on the fiat/banking system — Greg Foss's thesis, credited; pairs with the Kelly exploration) and an estate-planning companion (Fiduciary Integration Framework report).
+
+---
+
+## 26. How Much Bitcoin? (`/how-much-bitcoin.html`)
+
+**Added:** June 2026. The Numbers; `interactive: true`; mixed-content width tier (1100/880, taken from the §4.2 table, not scaffolded). The position-sizing page: applies the Kelly criterion to bitcoin descriptively — the formula's startling raw answer, the asymmetric growth curve around the peak, and the honest case for fractional sizing. Calculator tile on `/calculators` (svg preview, anchor `#curve`, position 4, beside its sister page Disciplined Rebalancing at 3). Tool-framing strip on (decision-implying).
+
+### Structure
+
+Hero (two-tone H1; subtitle names the Kelly criterion up front — review lesson: the page's central concept must not wait for §A) → §A Bell Labs pedigree (Kelly 1956, Shannon, Thorp/Princeton Newport ~20%/yr for 19 years, Gross) → §B three worked scenarios + Fidelity/BlackRock institutional anchors → §C the interactive curve → §D three discounts in ascending force (estimation error / asymmetry / drawdowns + absorbing barrier) → §E fractional Kelly as formally optimal, position-on-trend reconciliation, sister-page operation → §F the nine-rung gap ladder → §G descriptive close + two-line epigraph.
+
+### The interactive (§C, `#curve`)
+
+g(f) growth-vs-allocation curve, all math computed in-page. Presets are the two canonical Power Law scenarios (**Revert to Power Law trend** / **Stay at current trend multiple**, both computed live from `PL_DATA`/`plPrice` with the current trend multiple displayed Gallery-style) plus a hostile **Conservative** case (μ=10%, σ=60% → standalone g=−8%, f*≈17% — the volatility-harvesting nugget). Two-line preset chips (name + computed assumptions); cluster titles "Default scenarios" / "Custom assumptions"; sliders deselect presets. Readout: f*, explicit CAGR→drift conversion (½σ² shown), expected-growth table, drawdown 2×2, contextual honesty flags (leverage; negative-standalone). "What the chart is saying" spoon-fed takeaways recompute live. Hover point-legend with "expected … under your assumptions — not a forecast" third line. The same JS engine fills §B prose numbers and the ladder's live rungs, so copy and chart cannot disagree.
+
+### Verified-claims register (do not re-derive from the research corpus)
+
+- Curve math locked: f* = (μ−r)/σ²; g(2f*) = r; half-Kelly keeps 75% of excess growth, quarter 43.75%. Cite MacLean/Thorp/Ziemba.
+- Drawdown 2×2 locked (the corpus repeatedly conflates the two quantities): P(ever halve) at fraction c = 0.5^(2/c−1) → 50% / 12.5% / ~0.78%; P(halve before double) via θ=2/c−1 → ⅓ / ⅑ / ~0.78%. These depend **only on the fraction of Kelly** — the fact behind §E's position-on-trend paragraph.
+- Fidelity "Getting Off Zero: Evaluating Bitcoin in 2026" (Kuiper, Mar 25 2026) verified at primary: 9.4% max-Sharpe (0% bonds; stocks 14.5/15.5, bonds 2/5, BTC 25/50), 65% discrete Kelly (70% win, +288%/−50%), 10% conservative-forward, and the footnote conceding the generalized formula gives a higher position (~130%, leverage).
+- **RETRACTED:** "Fidelity published an 84% continuous Kelly" is a corpus hallucination — never reintroduce. Our labeled computation on their inputs gives 92%.
+- BlackRock 1–2% risk budget (Dec 2024; Cohen/Henderson/Mitchnick/Paul; ≈ single Mag-7 risk share) — current as of 2026 AND implemented in BlackRock Target Allocation model portfolios since early 2025.
+- Chopra & Ziemba 1993: mean errors ≈ 11× variance errors at RT50, growing with risk tolerance.
+- Power-law exponent specification-sensitivity (~3× across time-origin shifts): **Baquero & Menezes**, arXiv:2605.21316 (May 2026) — author attribution verified at launch; linked from §D. Two-sided finding (weak structure, yet bitcoin uniquely beats single growth curves) is precisely calibrated for this page.
+- Upside-skew wrinkle (volatility slider tooltip): sourced from Fidelity's 7-up/+288% vs 3-down/−50% tally; symmetric model therefore *understates* f* — the conservative direction.
+
+### Editorial lessons
+
+- **Expectations, not forecasts** (JM review): every output the reader can mistake for a prediction carries conditional language — hover legend third line, "Expected growth" block title, slider tooltips.
+- **Label the axis with numbers, not just a word.** The unquantified Y axis was the root cause of round-2 confusion; the misread "2×" label ("2× the risk-free rate") proved chart labels must name their referent ("2× Kelly — growth falls back to cash").
+- **Tooltips must force `text-transform: none`** — they inherit uppercase from table headers and block titles (fixed in page CSS; consider canonicalizing).
+- **The related component is included per-page, not by the layout** — this page shipped three review rounds with no related strip before the missing include was caught. See TECH_DEBT.
+- Sister-series framing with Disciplined Rebalancing: operating a Kelly weight IS the rebalancing protocol (trim after surges, add after falls). Bidirectional related links carry "sister page" language; DR's array leads with this page.
+- "More bullish than the maximalist" (§B) survived review explicitly — JM approved the phrasing.
+- Human-capital aside: **omitted by decision** (closest research item to advice-shaped); revisit only on reader demand.
+
+### Open enhancements
+
+- Carousel slide pending video (see §13 Pending additions).
+- Candidate STYLE_GUIDE recipes from this page, to add at next docs pass: two-line preset chip (`kp-name`/`kp-sub`), chart takeaways block, SVG hover point-legend, `tip-end` right-anchored tooltip variant.
+- Parked sister-content: Foss CDS framing pairs with this page (see §25 parked list).
 
 ---
 

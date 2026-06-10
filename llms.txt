@@ -45,6 +45,7 @@ Data-driven analyses with interactive calculators. Backed by historical price da
 - [The Bitcoin Fixed Share](https://lastcoinstanding.com/the-fixed-pie): The 21-million supply ceiling and what mathematically-fixed share of a monetary network actually means.
 - [The Bitcoin Retirement](https://lastcoinstanding.com/the-bitcoin-retirement): Required stack size at withdrawal age against long-run trend growth. Adjustable assumptions, transparent math, no advice.
 - [Disciplined Rebalancing](https://lastcoinstanding.com/disciplined-rebalancing): Percentile-trigger rebalancing applied to fifteen years of price data. Turning the Power Law channel from a model into a protocol.
+- [How Much Bitcoin?](https://lastcoinstanding.com/how-much-bitcoin): The Kelly criterion applied to bitcoin position sizing. The Bell Labs formula's startling raw answer, the asymmetric growth curve around the peak, and the honest case for fractional Kelly. Interactive curve explorer with Power Law scenario defaults.
 - [Borrowing Against Your Stack](https://lastcoinstanding.com/borrowing-against-your-stack): The cautionary version of using Bitcoin as collateral — rehypothecation tiers, liquidation distance under stress, interest cost versus retained-coin appreciation. Strong emphasis on the failure modes.
 - [Bitcoin-Backed Mortgages](https://lastcoinstanding.com/bitcoin-backed-mortgages): Mortgage scenarios with Bitcoin collateral. Same caution profile as the broader borrowing page.
 

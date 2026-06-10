@@ -31,6 +31,22 @@ A running list of known issues, inconsistencies, and architectural improvements 
 
 - [x] **`og-preview.jpg` orphaned — cleanup.** Closed 2026-05-18. Removed `'og-preview.jpg'` from the `staticAssets` list in `.eleventy.js` and deleted the file from the repo. Was the shared fallback OG for both `/` (homepage) and `/calculators` (Tools) before the 2026-05-17 OG rollout migrated each to a dedicated card (`og-image.jpg` and `og-calculators.jpg`). With only ~24 hours since the migration the external-embed risk was small (almost nobody embeds an OG image as a standalone image URL); proceeding rather than carrying the orphan indefinitely. If an external embed surfaces a 404, the fix is a one-line `_redirects` entry.
 
+**related.njk is included per-page, not by the layout (added 2026-06-10).**
+Every page must remember `{% include 'components/related.njk' %}` near its
+container close; How Much Bitcoin shipped three review rounds with a
+populated `related:` front-matter array and **no rendered strip** before the
+missing include was caught. Either move the include into `base.njk` (gated
+on `related`), or add a build-time check that any page with `related:` front
+matter emits `related-card` markup. Low risk, recurring footgun.
+
+**STYLE_GUIDE recipes deferred from the How Much Bitcoin build (2026-06-10).**
+Four reusable patterns shipped page-scoped and should be canonicalized as
+§6.N recipes at the next docs pass: two-line preset chip (`kp-name`/`kp-sub`),
+"What the chart is saying" takeaways block, SVG hover point-legend
+(crosshair + dot + flip-aware readout box), and the `tip-end` right-anchored
+tooltip variant (plus the global `.tip-content { text-transform: none }`
+inheritance guard).
+
 ## 2. Type system compliance
 
 - [x] **Coordinated §5.2 sweep across calculator/explorer-tier pages.** Multiple selectors per page violate STYLE_GUIDE §5.2 ("Cormorant at <1.3rem with weight ≥600"). The prescribed fix is mechanical — drop weight from 600 → 500 — but the surface area is large enough that it warrants a single coordinated pass with screenshot review. Status by page:

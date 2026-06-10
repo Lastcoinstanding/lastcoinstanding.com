@@ -26,6 +26,8 @@ eleventyComputed:
     and the honest lesson is not the number, but the shape of the curve around it.</p>
   </header>
 
+  {% include 'components/tool-framing.njk' %}
+
   <!-- §A — The formula from Bell Labs -->
   <section class="section section-opening">
     <h2>The formula from Bell Labs</h2>
@@ -61,7 +63,7 @@ eleventyComputed:
   </section>
 
   <!-- §C — THE INTERACTIVE -->
-  <section class="section curve-section">
+  <section class="section curve-section" id="curve">
     <h2>The curve</h2>
     <p class="curve-intro">The formula's answer is a single point. The argument of this page is the <em>shape of the curve around it</em>. Below is the relationship between how much you allocate and how fast your wealth compounds &mdash; with bitcoin's numbers, under assumptions you control. Watch three things: how unevenly the curve falls away on either side of the peak; how violently the peak itself moves when you nudge the assumptions; and how little growth the half- and quarter-Kelly marks give up for how much calamity they avoid.</p>
 
@@ -122,7 +124,7 @@ eleventyComputed:
   <section class="section">
     <h2>Why nobody bets the formula</h2>
     <p>Three honest reasons, in ascending order of force.</p>
-    <p><strong>The inputs are unknowable.</strong> The formula's answer is exquisitely sensitive to the expected return &mdash; the one input nobody has. Chopra and Ziemba's classic study put numbers on it: errors in the return estimate damage outcomes roughly eleven times more than errors in the volatility estimate, and the penalty <em>grows</em> with risk tolerance &mdash; the more aggressively you size, the more your mistake costs. And bitcoin's expected return is genuinely contested: a 2026 analysis of the power-law model found that the fitted exponent &mdash; the engine of every long-horizon extrapolation &mdash; varies by nearly a factor of three depending on a methodological choice as small as where you place the curve's time origin. The fit is real; the precision is not.</p>
+    <p><strong>The inputs are unknowable.</strong> The formula's answer is exquisitely sensitive to the expected return &mdash; the one input nobody has. Chopra and Ziemba's classic study put numbers on it: errors in the return estimate damage outcomes roughly eleven times more than errors in the volatility estimate, and the penalty <em>grows</em> with risk tolerance &mdash; the more aggressively you size, the more your mistake costs. And bitcoin's expected return is genuinely contested: <a href="https://arxiv.org/abs/2605.21316" target="_blank" rel="noopener">a 2026 analysis of the power-law model</a> found that the fitted exponent &mdash; the engine of every long-horizon extrapolation &mdash; varies by nearly a factor of three depending on a methodological choice as small as where you place the curve's time origin. The fit is real; the precision is not.</p>
     <p><strong>The curve is asymmetric.</strong> Allocate half the optimal fraction and you keep 75% of the achievable growth. Allocate double and your growth falls all the way back to the risk-free rate &mdash; you carry twice the volatility of the optimal portfolio and are paid <em>nothing</em> for it &mdash; and beyond double, growth turns negative: more risk, less wealth, forever. Under-betting costs a little; over-betting costs everything. Since the inputs can only be estimated, and since estimation error in one direction is survivable and in the other direction is not, deliberately sitting below the formula is not timidity. It is the rational response to not knowing.</p>
     <p><strong>The drawdowns are unsurvivable.</strong> At the full Kelly allocation, the mathematics is explicit: a coin-flip's chance &mdash; 50% &mdash; that your wealth is cut in half at some point along the way, and one chance in three that the halving comes <em>before</em> the first doubling. These are not tail risks; they are the design. The model assumes you hold through them, withdraw nothing, retire never, and feel nothing. Every way in which a person differs from that assumption &mdash; a finite horizon, a retirement date, living expenses, a family, loss aversion, the 3 a.m. urge to sell &mdash; corrects the allocation in the same direction: <em>downward</em>. For a single investor, a deep enough drawdown is not a statistical outlier to be averaged away. It is an <span class="tip-anchor">absorbing barrier<span class="help-tip" tabindex="0">?<span class="tip-content">A point of no return in a random process. In investing: the loss deep enough that the investor &mdash; for financial or psychological reasons &mdash; exits and never recovers the position. Once absorbed, the long-run mathematics no longer applies to you.</span></span></span> &mdash; the point where the game ends, whether or not the math says it should have continued.</p>
   </section>

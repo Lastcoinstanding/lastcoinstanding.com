@@ -176,6 +176,13 @@ Update every instance to the current month-year. Bump even the in-prose
 references if they would otherwise read as historical when they describe
 the present.
 
+**How Much Bitcoin? — risk-free rate as-of.** `src/how-much-bitcoin.njk` carries
+"Risk-free rate held at **4.0%** (short Treasury yield, June 2026)" and
+`src/_includes/_pageassets/how-much-bitcoin.js` carries the matching
+`var R = 0.04`. Update BOTH together when short rates move materially
+(±50bp); the month string updates whenever the rate does. The Power Law
+preset inputs need no refresh — they compute live from the shared globals.
+
 ## 4. Conditional disclosures and percentile markers
 
 Pages that compute and display a *current* state value — e.g., *"bitcoin
@@ -287,6 +294,19 @@ For each value, verify against the source listed and update in the BFI files as 
 **Critical**: the two BTC count locations (the visible cell text in `.njk` AND the `BTC_HELD` constant in `.js`) MUST stay in sync. Otherwise the displayed BTC count and the live USD value will drift apart.
 
 If the values haven't materially changed (BTC count moved &lt;1%, mNAV moved &lt;0.1&times;, ATM status unchanged, insight prose still accurate), the only required update is the as-of date.
+
+## 8. Institutional guidance citations — How Much Bitcoin? (quarterly is fine)
+
+The gap ladder and §B cite live institutional positions. Quarterly, verify:
+
+- BlackRock's 1–2% guidance and its Target Allocation model-portfolio
+  implementation are still current; update the ladder rung and §G if the
+  range moves.
+- Fidelity's "Getting Off Zero" (Mar 2026) remains the latest edition; if a
+  successor publishes, re-verify the 9.4% / 65% / 10% trio at the primary
+  before swapping numbers.
+- GUARD: never reintroduce the retracted "Fidelity 84% continuous Kelly"
+  figure (corpus hallucination — see SITE_GUIDE §26 register).
 
 ## Live BTC price fetch — shipped 2026-05-28
 
