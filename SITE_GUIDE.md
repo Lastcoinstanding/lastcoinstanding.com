@@ -1265,4 +1265,49 @@ Example: `/bitcoin-fixed-income?in=120000&po=3000000&hz=20&sc=upper&pa=sata&st=m
 
 ---
 
-_Last updated: May 2026. Update this document as editorial decisions crystallize into principles worth preserving._
+## 25. Paper Bitcoin (`/paper-bitcoin.html`)
+
+**Added:** June 2026. The custody exploration: every way of holding bitcoin is essentially a different asset, and only self-custody retains the full property set the Foundations pages describe. Sits in The Arguments (`category: "arguments"`, `interactive: true`). Prose-led page with one interactive (WMHTB interaction grammar) plus a static 2×2 diagram. Mixed-content width tier (1100/880 per STYLE_GUIDE §4.2). Research basis: a dedicated NotebookLM corpus (custody models, ETF prospectuses, the Lopp physical-attacks dataset, 6102/capital-controls history, Celsius/Cyprus precedent), with independently verified key claims.
+
+### Page structure
+
+1. **What happened to gold** — 6102 caught gold in both forms: paper cancelled by memo; physical surrendered because use was compromised and possession criminal. Cross-links the Migration.
+2. **The four quadrants** — static 2×2 (Gold|Bitcoin × Paper|Physical); three quadrants captured, one alight. The page's shareable unit and the bridge from gold to bitcoin. Caption: gold fell in both its forms; bitcoin can fall in only one — and that form is a choice.
+3. **What paper bitcoin is** — the five-claim chain (broker → DTC/Cede & Co. → trust → custodian → prime execution agent) and the IBIT prospectus "relatively untested" admission, with sponsor (BlackRock) and custodian (Coinbase) named precisely.
+4. **One bitcoin, five ways to hold it** — the interactive. Five presets in two groups (Paper forms: ETF, Exchange | Physical forms: Collaborative multisig, Single-sig, DIY multisig), each preset with a plain-language `?` tooltip and a "You hold:" descriptor. Ten dimensions in two camps: warm (what survives of bitcoin's nature — states Intact/Mostly intact/Compromised/Severed) and cool (what life requires of you — Light/Moderate/Heavy/Structural). 50 cells; severity drives chip + descriptor styling. Single-sig is the landing preset. Design thesis: no column wins; legend says so.
+5. **Prose arguments** — the cul-de-sac and the open door (exchange withdrawal = non-taxable exit vs. ETF sale = taxed exit; honest IRA exception); the risk that follows the records (France wrench-attack wave, Ledger/Waltio breaches, insider data sale — physical risk follows records of ownership, not location of private keys; ETF honestly mitigates, single-sig concentrates, multisig structurally mitigates); the steelman (2.3–4M coins permanently lost; sovereignty vs. fallibility resolved via multisig — "it can be both"; links to Unchained/Casa/Bitcoiner.guide/10x Security).
+6. **One event, two outcomes** — Canada 2022 (exchange accounts froze; self-custody moved); precedent stack (1933, Cyprus 2013 bail-in, Celsius 2023 $4.2B ToS ruling); the 6102 game theory, labeled inference (an order that strengthens what it targets; every self-custodied coin raises its price); the closing properties walk. Styled closing line: "6102 caught gold in the vault and gold in the hand. It can catch bitcoin only on paper."
+7. **Referral callout** — whether/what, not how; mechanics referred out to Unchained, Casa, Bitcoiner.guide, 10x Security.
+
+### Editorial register — lessons from the June 2026 review passes (apply to all future pages)
+
+- **Migration register is the site's prose standard.** Full, measured sentences; no staccato fragments ("Not confiscated. Not stolen.") and no marketing-flash taglines. The styled two-line closing epigraph is the sanctioned exception.
+- **Topical subtitles.** Sections complete one topic before the next begins (gold finished before ETFs began); headings name the topic plainly.
+- **Define-before-use for Normie readers.** Any term a newcomer may not know (ETF, multisig, hardware wallet, seed phrase) gets a canonical `?` tooltip at first interactive use — the preset buttons carry tooltips, not just the dimension rows.
+- **Name roles precisely.** Sponsor vs. custodian vs. issuer; "seller" was ambiguous and got flagged. Precision survives review; compression doesn't.
+- **Neutral comparative framing in updates-strip copy.** "How X compares against Y and Z," never "when X actually beats Y" — strip summaries read as recommendations faster than page prose does.
+- **Vocabulary parity:** "essentially an IOU for bitcoin" is the page's plain-language descriptor for exchange balances; "physical bitcoin" is the coined term for self-custody, used in hero, presets, and closing.
+
+### Interactive architecture
+
+`paper-bitcoin.js` holds the full data model (`models` object: 5 models × 10 dims, each `{state, desc}` plus a `hold` line). `applyModel()` re-renders chips, descriptors, and row decoration classes (`warm-intact`…`cool-structural`). Scale chips are non-interactive spans (one-control rule); presets are the only control. 15 canonical tooltips total (5 preset + 10 dimension), STYLE_GUIDE §6.13 recipe with a centered-tip variant for the preset panel.
+
+### Cross-linking
+
+`related:` — Migration (foundational history), WMHTB (property-grid sister), Borrowing Against Your Stack (collaborative-custody vaults in practice), Bitcoin Fixed Income (the other claim-shaped-like-bitcoin page). All four carry reciprocal links. Suggested reading position: immediately after the Migration (its personal-application sequel).
+
+### Verified claims worth preserving (June 2026)
+
+Coinbase Custody secures >80% of US spot-ETF bitcoin (84% by AUM, Apr 2026 — refresh on monthly passes); IBIT 424B3 (Jul 2025) carries the "relatively untested" / "general unsecured creditor" / "risk of total loss" language; France ≈25% of global wrench attacks and ≈80% of European (the corpus's "70% of global" was wrong and is retired); the second breach is Waltio Jan 2026 (the corpus's "Global-e" claim failed verification and was dropped); Celsius figure is $4.2B and is Earn-ToS-scoped.
+
+### Open items / deferred
+
+- Title variant "Paper Bitcoin vs. Physical Bitcoin" — parked after live review; revisit only if the current title underperforms.
+- Carousel slide + Grok Imagine video (concept: three doors close — vault, brokerage screen, exchange app; a lit landscape remains. Caption: "It can catch bitcoin only on paper.").
+- The 2×2 quadrant as a Gallery entry.
+- Build-time citation niceties: SIPC scope language, Casa/Unchained duress-protocol product-doc cites (page phrasing already conservative: "exist," not "guarantee").
+- Parked future pages seeded here: the CDS framing (bitcoin as a credit default swap on the fiat/banking system — Greg Foss's thesis, credited; pairs with the Kelly exploration) and an estate-planning companion (Fiduciary Integration Framework report).
+
+---
+
+_Last updated: June 2026. Update this document as editorial decisions crystallize into principles worth preserving._

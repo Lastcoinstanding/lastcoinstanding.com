@@ -403,9 +403,13 @@ The site uses three canonical width tiers. **Every page must adopt one of these 
 
 | Tier | Page width | Essay block | Used by |
 |---|---|---|---|
-| Editorial | **960px** | none (prose fills) | Power Law, Half-Life, Fixed Pie, Melting Ice Cube, Horizon, Migration, Money Trees, About, Index, What Money Has To Be |
-| Mixed-content | **1100px** | **880px centered** | Disciplined Rebalancing, Bitcoin vs Real Estate, Not-a-Bubble |
+| Editorial | **960px** | none (prose fills) | Power Law, Half-Life, Fixed Pie, Melting Ice Cube, Horizon, Migration, Money Trees, About, Index, What Money Has To Be† |
+| Mixed-content | **1100px** | **880px centered** | Disciplined Rebalancing, Bitcoin vs Real Estate, Not-a-Bubble, Paper Bitcoin |
 | System-diagrammatic | **1140px** | none | Synthesis, What Bitcoin Is, Trilemma |
+
+† **WMHTB currently ships off-canon** — a 1240px container with 720px paragraph-level constraints (anti-pattern #11), pending migration (see TECH_DEBT). 
+
+**Scaffolding warning (added June 2026).** When building a new page from a sister-page scaffold, take the structure, interaction grammar, and component recipes — but always re-derive container and prose widths from the table above, never from the donor page's CSS. Observed failure mode: Paper Bitcoin initially inherited WMHTB's 1240px/720px values and shipped with visibly compressed prose relative to canonical pages; corrected to the mixed-content tier (1100/880) in the June 2026 pass. The donor page may itself be carrying pre-canonical debt.
 
 **Editorial tier — 960px (canonical).** The reading-prose width that produces comfortable line-lengths for sustained text. This is the default for any new page that's primarily Inter body prose; deviating wider degrades narrative readability. Prose fills the container naturally; do not apply inner max-widths.
 

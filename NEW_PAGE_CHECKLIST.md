@@ -24,6 +24,15 @@ Assumed complete by the time you reach this checklist. The page is a
 `src/<slug>.njk` template with a `base.njk` layout, page-scoped assets in
 `src/_includes/_pageassets/<slug>/`, and a clean dev build. Skip ahead.
 
+One check is NOT assumed and must be made explicitly before shipping:
+
+- [ ] **Container width adopts a canonical STYLE_GUIDE §4.2 tier** (editorial
+  960 / mixed-content 1100+880 / system-diagrammatic 1140). Never inherit
+  widths from the scaffolding donor page — donors can carry pre-canonical
+  debt (WMHTB's 1240px container bit Paper Bitcoin in June 2026). Prose
+  blocks on mixed-content pages are 880px with `margin: 0 auto`; no
+  paragraph-level max-widths anywhere.
+
 ## 2. Eleventy/build wiring
 
 Verify the page's front-matter has the four expected fields:
