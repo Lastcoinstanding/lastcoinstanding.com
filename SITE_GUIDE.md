@@ -457,11 +457,13 @@ v2 aligns with the homepage concept-card icon (which had Save at top from the st
 - **JS rendering switched from textContent to innerHTML to support inline links.** Data is hardcoded in `what-money-is-for.js`; no XSS risk. The architectural shift is small but worth knowing — if a third page in the WMHTB/WMIF family wants the same affordance, it should also use `.innerHTML` for the descriptor cell.
 - **Sister-page launches should pull from the senior page's references, not duplicate them.** This build pulled `what-money-has-to-be.njk / .css / .js / head.html` fresh from main as scaffolding before authoring WMIF, rather than re-deriving the patterns. Saved roughly 60% of the work and ensured the visual family stays tight. Worth doing on any future sister-page launch.
 
-## 13. Homepage carousel — completed set (23 slides)
+## 13. Homepage carousel — completed set (24 slides)
 
 All slides deployed with 16:9 widescreen silent videos, minimalist copy pattern (label + headline + CTA, no `.insight-desc`).
 
 **Renumber, June 2026:** the BvRP slide landed at position 3 to sit adjacent to its sister page BvRE (slide 2). Slides previously numbered 3–22 are now numbered 4–23. Iteration-record section headers updated to track the slides they describe (slide 16 → 17, slide 21 → 22, slide 22 → 23); internal cross-references in the BvSM iteration record likewise updated to the post-renumber values.
+
+**Paper Bitcoin slide added at position 1 (June 2026).** The newest page leads the carousel; live markup slides previously 1–23 are now 2–24. The table rows below are deliberately NOT renumbered this time — the imminent homepage restructure (category tabs + curated Featured set, see §25 open items and TECH_DEBT) will rework this inventory wholesale, so rows 1–23 below should be read at +1 until that pass lands. Video: bulb-with-cord and freestanding candle, first-take accept (see iteration record below).
 
 **Documentation drift resolved (May 2026):** the previously-flagged drift between markup and this inventory was closed when slide 22 (What Money Is For) landed. The three previously-undocumented slides (`vid-heatmap`, `vid-bbm`, `vid-lob`) have had their inventory rows scraped from `src/index.njk` and added to the table below; the prior slide-17 entry (Borrowing Against Your Stack) has been renumbered to 18 to match the live markup. The table below now matches `src/index.njk` slide-for-slide.
 
@@ -476,7 +478,8 @@ All slides deployed with 16:9 widescreen silent videos, minimalist copy pattern 
 
 | # | Slide | Headline | Video concept |
 |---|-------|----------|---------------|
-| 1 | What Money Has To Be | One money must do three things at once — or it cannot do any of them | Three ornate brass lenses on oak workbench, candle behind; each shows same flame |
+| 1 | Paper Bitcoin | Same light — different asset. | Dark wooden table at dusk: a vintage glass bulb with a visible fabric cord trailing out of frame, and a freestanding candle, giving identical warm light. ~5s in, the bulb fades to dark — power withdrawn through the wire — while the flame continues unchanged; held final state. Extends the "impervious" signature. First-take accept: prompt asked for an instant cut; Grok delivered a lawful gradual fade, judged semantically better (fits the §6 "nothing random" grammar; a hard cut risks reading as an edit artifact). The cord is the argument: same light, different dependency. |
+| 2* | What Money Has To Be | One money must do three things at once — or it cannot do any of them | Three ornate brass lenses on oak workbench, candle behind; each shows same flame |
 | 2 | Bitcoin vs. Real Estate | Housing became the default store of value by elimination, not merit | Golden hour → twilight → dark silhouette |
 | 3 | Bitcoin vs. Rental Property | What if the yield were higher — and the weather quieter. | Wide cinematic shot of a sweeping field of tall grass at the moment a storm passes. First ~4 seconds: heavy rain falls diagonally, wind bends the grass in waves, slate-gray storm clouds churn low overhead, distant lightning hinted. The clouds then break in the upper third of the frame — golden god-rays pierce through, illuminating the wet field in patches, mist rising off the warm ground. Rain tapers; camera slowly pushes in. By the end, the storm has moved off to the right edge, warm dawn light bathes the field, droplets on grass catch the gold. Same field, different sky — storm reads as the landlord burden (operational load, gross-to-net leakage, policy risk), sun reads as bitcoin's quieter yield. v2 landed warmer/more natural than v1 on the close. |
 | 4 | Bitcoin and The Power Law | For every 13% increase in Bitcoin's age, the trend price doubles | Town at dusk, lawful illumination pattern |
@@ -1303,7 +1306,7 @@ Coinbase Custody secures >80% of US spot-ETF bitcoin (84% by AUM, Apr 2026 — r
 ### Open items / deferred
 
 - Title variant "Paper Bitcoin vs. Physical Bitcoin" — parked after live review; revisit only if the current title underperforms.
-- Carousel slide + Grok Imagine video (concept: three doors close — vault, brokerage screen, exchange app; a lit landscape remains. Caption: "It can catch bitcoin only on paper.").
+- ~~Carousel slide~~ — shipped June 2026 at carousel position 1 (bulb-and-candle video, "Same light — different asset."; see §13). The earlier three-doors concept was superseded by the two-lights metaphor.
 - The 2×2 quadrant as a Gallery entry.
 - Build-time citation niceties: SIPC scope language, Casa/Unchained duress-protocol product-doc cites (page phrasing already conservative: "exist," not "guarantee").
 - Parked future pages seeded here: the CDS framing (bitcoin as a credit default swap on the fiat/banking system — Greg Foss's thesis, credited; pairs with the Kelly exploration) and an estate-planning companion (Fiduciary Integration Framework report).
