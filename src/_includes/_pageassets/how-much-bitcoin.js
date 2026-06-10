@@ -121,7 +121,7 @@
             svg.appendChild(el('line', { x1: PAD.l, y1: yS(ty), x2: W - PAD.r, y2: yS(ty), class: 'grid-line' }));
             svg.appendChild(el('text', { x: PAD.l - 8, y: yS(ty) + 4, 'text-anchor': 'end', class: 'axis-label' }, (ty > 1e-9 ? '+' : '') + Math.round(ty * 100) + '%'));
         }
-        svg.appendChild(el('text', { x: PAD.l - 8, y: PAD.t + 4, 'text-anchor': 'end', class: 'axis-label' }, 'wealth growth, % / yr'));
+        svg.appendChild(el('text', { x: PAD.l + 10, y: PAD.t + 8, 'text-anchor': 'start', class: 'axis-label' }, 'wealth growth, % / yr'));
         svg.appendChild(el('text', { x: W - PAD.r, y: H - PAD.b + 30, 'text-anchor': 'end', class: 'axis-label' }, 'allocation (fraction of wealth)'));
         var step = xMax > 2.6 ? 1.0 : 0.5;
         for (var tx = 0; tx <= xMax + 0.001; tx += step) {
@@ -178,12 +178,13 @@
         var g = el('g', { visibility: 'hidden' });
         var line = el('line', { y1: PAD.t, y2: H - PAD.b, class: 'hv-line' });
         var dot = el('circle', { r: 4.5, class: 'hv-dot' });
-        var box = el('rect', { width: 252, height: 58, rx: 6, y: PAD.t + 6, class: 'hv-box' });
-        var t1 = el('text', { y: PAD.t + 30, class: 'hv-text hv-strong' });
-        var t2 = el('text', { y: PAD.t + 50, class: 'hv-text' });
-        g.appendChild(line); g.appendChild(dot); g.appendChild(box); g.appendChild(t1); g.appendChild(t2);
+        var box = el('rect', { width: 268, height: 76, rx: 6, y: PAD.t + 6, class: 'hv-box' });
+        var t1 = el('text', { y: PAD.t + 28, class: 'hv-text hv-strong' });
+        var t2 = el('text', { y: PAD.t + 48, class: 'hv-text' });
+        var t3 = el('text', { y: PAD.t + 68, class: 'hv-text hv-note' });
+        g.appendChild(line); g.appendChild(dot); g.appendChild(box); g.appendChild(t1); g.appendChild(t2); g.appendChild(t3);
         svg.appendChild(g);
-        hov = { g: g, line: line, dot: dot, box: box, t1: t1, t2: t2 };
+        hov = { g: g, line: line, dot: dot, box: box, t1: t1, t2: t2, t3: t3 };
     }
     svg.addEventListener('pointermove', function (e) {
         if (!CUR || !hov) return;
@@ -193,14 +194,15 @@
         if (f < 0 || f > CUR.xMax) { hov.g.setAttribute('visibility', 'hidden'); return; }
         var gv = growth(f);
         var x = CUR.xS(f), y = CUR.yS(gv);
-        var bx = (x > W - 280) ? x - 264 : x + 12;
+        var bx = (x > W - 296) ? x - 280 : x + 12;
         hov.g.setAttribute('visibility', 'visible');
         hov.line.setAttribute('x1', x); hov.line.setAttribute('x2', x);
         hov.dot.setAttribute('cx', x); hov.dot.setAttribute('cy', y);
         hov.box.setAttribute('x', bx);
-        hov.t1.setAttribute('x', bx + 12); hov.t2.setAttribute('x', bx + 12);
+        hov.t1.setAttribute('x', bx + 12); hov.t2.setAttribute('x', bx + 12); hov.t3.setAttribute('x', bx + 12);
         hov.t1.textContent = 'at ' + Math.round(f * 100) + '% allocation';
-        hov.t2.textContent = 'wealth compounds \u2248 ' + (gv >= 0 ? '+' : '') + (gv * 100).toFixed(1) + '% / yr';
+        hov.t2.textContent = 'expected growth \u2248 ' + (gv >= 0 ? '+' : '') + (gv * 100).toFixed(1) + '% / yr';
+        hov.t3.textContent = 'under your assumptions \u2014 not a forecast';
     });
     svg.addEventListener('pointerleave', function () { if (hov) hov.g.setAttribute('visibility', 'hidden'); });
 

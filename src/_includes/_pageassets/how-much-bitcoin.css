@@ -70,6 +70,9 @@
     line-height: 1.55;
     color: var(--text);
     white-space: normal;
+    text-transform: none;      /* tooltips must not inherit th/title uppercase */
+    letter-spacing: normal;
+    text-align: left;
     z-index: 30;
     box-shadow: 0 8px 28px rgba(0,0,0,0.55);
   }
@@ -130,6 +133,7 @@
   .hv-box { fill: var(--panel); stroke: var(--border-mid); opacity: 0.96; }
   .hv-text { fill: var(--text); font-family: var(--font-body); font-size: 13px; font-weight: 400; }
   .hv-text.hv-strong { fill: var(--text-bright); font-weight: 600; }
+  .hv-text.hv-note { fill: var(--text-dim); font-size: 11.5px; font-weight: 300; }
 
   .readout-table th .help-tip { margin-left: 0.3rem; vertical-align: 0; }
   .tip-content.tip-end { left: auto; right: -6px; transform: none; }
