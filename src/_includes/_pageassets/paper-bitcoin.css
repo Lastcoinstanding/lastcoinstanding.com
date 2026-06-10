@@ -280,6 +280,19 @@
     background: var(--orange-soft);
     box-shadow: 0 0 0 1px var(--orange) inset, 0 2px 12px rgba(247, 147, 26, 0.12);
   }
+  .preset-item {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .preset-item .help-tip { margin-left: 0; flex-shrink: 0; }
+  .preset-item .tip-content {
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(300px, calc(100vw - 32px));
+  }
+
   .you-hold {
     margin-top: 1.2rem;
     text-align: center;
