@@ -1,35 +1,34 @@
 /* ============================================================
-   How Much Bitcoin? — Kelly curve explorer
+   How Much Bitcoin? — Kelly curve explorer (v2: Power Law presets)
    All formula outputs computed here; nothing quoted from
    research-corpus arithmetic (SITE_GUIDE verification rule).
 
+   Growth scenarios mirror the canonical BvRP/BFI chips:
+     revert — price closes its gap to the Power Law trend over 10y
+     stay   — price holds today's trend multiple (trend-rate growth)
+   Both embed the trend's DECLINING growth rate, averaged over the
+   next ten years; Kelly needs a single (mu, sigma) and the 10-year
+   trend-implied CAGR is the honest mapping.
+
    Model (continuous-time, two assets):
      mu  = arithmetic drift; g = compound growth; g ≈ mu − ½σ²
-     f*  = (mu − r) / σ²
-     g(f) = r + f(mu − r) − ½ f² σ²
-     Drawdown odds at fraction c of Kelly (relative-wealth model):
-       P(ever fall to x)        = x^(2/c − 1)
-       P(halve before double)   = 1 − (2^θ − 1)/(2^θ − 2^−θ), θ = 2/c − 1
+     f*  = (mu − r) / σ²;  g(f) = r + f(mu − r) − ½ f² σ²
+     P(ever fall to x) at fraction c = x^(2/c − 1)
+     P(halve before double): θ = 2/c − 1 → 1 − (2^θ−1)/(2^θ−2^−θ)
    ============================================================ */
 (function () {
     var R = 0.04; // risk-free rate, as-of June 2026 (MONTHLY_REFRESH item)
-    var GENESIS = new Date(2009, 0, 3);
+    var H_YEARS = 10, H_DAYS = 3652.5;
 
     var svg = document.getElementById('curveChart');
-    if (!svg || typeof PL_DATA === 'undefined') return;
+    if (!svg || typeof PL_DATA === 'undefined' || typeof plPrice === 'undefined') return;
 
-    /* ── Trailing-decade inputs computed from the canonical series ── */
-    function trailingDecade() {
-        var n = PL_DATA.length;
-        var endDay = PL_DATA[n - 1][0], endP = PL_DATA[n - 1][1];
-        var startIdx = 0;
+    /* ── Realized volatility over the most recent ten years of the canonical series ── */
+    function trailingVol() {
+        var n = PL_DATA.length, endDay = PL_DATA[n - 1][0], startIdx = 0;
         for (var i = n - 1; i >= 0; i--) {
-            if (endDay - PL_DATA[i][0] >= 3652.5) { startIdx = i; break; }
+            if (endDay - PL_DATA[i][0] >= H_DAYS) { startIdx = i; break; }
         }
-        var startDay = PL_DATA[startIdx][0], startP = PL_DATA[startIdx][1];
-        var years = (endDay - startDay) / 365.25;
-        var g = Math.pow(endP / startP, 1 / years) - 1;
-        // Annualized volatility from interval log returns, normalized per √day
         var zs = [];
         for (var j = startIdx + 1; j < n; j++) {
             var dd = PL_DATA[j][0] - PL_DATA[j - 1][0];
@@ -37,22 +36,32 @@
             zs.push(Math.log(PL_DATA[j][1] / PL_DATA[j - 1][1]) / Math.sqrt(dd));
         }
         var mean = zs.reduce(function (a, b) { return a + b; }, 0) / zs.length;
-        var varr = zs.reduce(function (a, b) { return a + (b - mean) * (b - mean); }, 0) / (zs.length - 1);
-        var sigma = Math.sqrt(varr) * Math.sqrt(365.25);
-        var asof = new Date(GENESIS.getTime() + endDay * 86400000);
-        return { g: g, sigma: sigma, asof: asof };
+        var v = zs.reduce(function (a, b) { return a + (b - mean) * (b - mean); }, 0) / (zs.length - 1);
+        return Math.sqrt(v) * Math.sqrt(365.25);
+    }
+    var VOL = trailingVol();
+
+    /* ── Power Law scenario growth rates (10y forward CAGR) ── */
+    var SC;
+    function scenarioRates() {
+        var trendNow = plPrice(TODAY_DAYS), trendThen = plPrice(TODAY_DAYS + H_DAYS);
+        return {
+            multiple: TODAY_PRICE / trendNow,
+            gStay: Math.pow(trendThen / trendNow, 1 / H_YEARS) - 1,
+            gRevert: Math.pow(trendThen / TODAY_PRICE, 1 / H_YEARS) - 1
+        };
+    }
+    SC = scenarioRates();
+    function PRESETS() {
+        return {
+            revert: { g: SC.gRevert, sigma: VOL },
+            stay: { g: SC.gStay, sigma: VOL },
+            conservative: { g: 0.10 - 0.5 * 0.36, sigma: 0.60 } // mu = 10% → g = −8%
+        };
     }
 
-    var TRAIL = trailingDecade();
-    var PRESETS = {
-        trailing: { g: TRAIL.g, sigma: TRAIL.sigma },
-        maturation: { g: 0.30, sigma: 0.60 },
-        conservative: { g: 0.10 - 0.5 * 0.36, sigma: 0.60 } // defined by mu=10%: g = mu − ½σ² = −8%
-    };
-
-    /* ── State ── */
-    var state = { g: PRESETS.trailing.g, sigma: PRESETS.trailing.sigma, preset: 'trailing' };
-
+    /* ── State + helpers ── */
+    var state = { g: 0, sigma: VOL, preset: 'revert' };
     var sliderG = document.getElementById('sliderG');
     var sliderS = document.getElementById('sliderS');
     var valG = document.getElementById('valG');
@@ -66,11 +75,11 @@
         var th = 2 / c - 1, up = Math.pow(2, th);
         return 1 - (up - 1) / (up - 1 / up);
     }
-
     var fmtP = function (x, d) { return (x * 100).toFixed(d === undefined ? 1 : d) + '%'; };
+    var fmtP0 = function (x) { return Math.round(x * 100) + '%'; };
 
     /* ── Chart ── */
-    var W = 980, H = 480, PAD = { l: 64, r: 24, t: 26, b: 46 };
+    var W = 980, H = 480, PAD = { l: 64, r: 24, t: 30, b: 46 };
     var NS = 'http://www.w3.org/2000/svg';
     function el(tag, attrs, text) {
         var e = document.createElementNS(NS, tag);
@@ -91,11 +100,9 @@
 
         svg.innerHTML = '';
 
-        // Danger zone beyond 2×Kelly
         if (2 * fs < xMax) {
             svg.appendChild(el('rect', { x: xS(2 * fs), y: PAD.t, width: xS(xMax) - xS(2 * fs), height: H - PAD.t - PAD.b, class: 'danger-zone' }));
         }
-        // Fill above risk-free between 0 and 2×Kelly
         var fillD = 'M' + xS(0) + ',' + yS(R);
         var f2 = Math.min(2 * fs, xMax);
         for (var i = 0; i <= 120; i++) {
@@ -105,22 +112,20 @@
         fillD += ' L' + xS(f2) + ',' + yS(R) + ' Z';
         svg.appendChild(el('path', { d: fillD, class: 'curve-fill' }));
 
-        // Axes
         svg.appendChild(el('line', { x1: PAD.l, y1: PAD.t, x2: PAD.l, y2: H - PAD.b, class: 'axis-line' }));
         svg.appendChild(el('line', { x1: PAD.l, y1: H - PAD.b, x2: W - PAD.r, y2: H - PAD.b, class: 'axis-line' }));
         svg.appendChild(el('text', { x: PAD.l - 8, y: PAD.t + 4, 'text-anchor': 'end', class: 'axis-label' }, 'growth'));
         svg.appendChild(el('text', { x: W - PAD.r, y: H - PAD.b + 30, 'text-anchor': 'end', class: 'axis-label' }, 'allocation (fraction of wealth)'));
-        // X ticks at 0, 50%, 100%, … up to xMax
         var step = xMax > 2.6 ? 1.0 : 0.5;
         for (var tx = 0; tx <= xMax + 0.001; tx += step) {
             svg.appendChild(el('text', { x: xS(tx), y: H - PAD.b + 18, 'text-anchor': 'middle', class: 'axis-label' }, Math.round(tx * 100) + '%'));
         }
 
-        // Risk-free reference line
+        // Risk-free reference line — label LEFT and BELOW the line so it can
+        // never collide with the 2× mark label on the right (review fix Jun 2026)
         svg.appendChild(el('line', { x1: PAD.l, y1: yS(R), x2: W - PAD.r, y2: yS(R), class: 'rf-line' }));
-        svg.appendChild(el('text', { x: W - PAD.r - 4, y: yS(R) - 7, 'text-anchor': 'end', class: 'mark-text dim' }, 'the risk-free rate \u2014 what doing nothing earns'));
+        svg.appendChild(el('text', { x: PAD.l + 8, y: yS(R) + 17, 'text-anchor': 'start', class: 'mark-text dim' }, 'the risk-free rate \u2014 what doing nothing earns'));
 
-        // The curve
         var d = '';
         for (var k = 0; k <= 240; k++) {
             var fx = (k / 240) * xMax;
@@ -128,34 +133,56 @@
         }
         svg.appendChild(el('path', { d: d, class: 'curve-path' }));
 
-        // Marks: ¼, ½, full, 2× Kelly
+        // Marks with collision-aware label placement (review fix Jun 2026)
+        var qx = xS(0.25 * fs), hx = xS(0.5 * fs);
+        var crowded = (hx - qx) < 90;
         var marks = [
-            { f: 0.25 * fs, label: '\u00BC Kelly', cls: '' },
-            { f: 0.5 * fs, label: '\u00BD Kelly', cls: '' },
-            { f: fs, label: 'full Kelly \u2014 the peak', cls: 'peak' },
-            { f: 2 * fs, label: '2\u00D7 \u2014 back to the risk-free rate', cls: 'double' }
+            { f: 0.25 * fs, label: '\u00BC Kelly', cls: '', dy: crowded ? -28 : -10 },
+            { f: 0.5 * fs, label: '\u00BD Kelly', cls: '', dy: -10 },
+            { f: fs, label: 'full Kelly \u2014 the peak', cls: 'peak', dy: -12 },
+            { f: 2 * fs, label: '2\u00D7 \u2014 back to the risk-free rate', cls: 'double', dy: -12 }
         ];
         marks.forEach(function (m) {
             if (m.f > xMax) return;
             var gx = growth(m.f);
             svg.appendChild(el('line', { x1: xS(m.f), y1: yS(gx), x2: xS(m.f), y2: H - PAD.b, class: 'mark-line ' + m.cls }));
             svg.appendChild(el('circle', { cx: xS(m.f), cy: yS(gx), r: m.cls === 'peak' ? 5 : 3.5, class: 'mark-dot' }));
-            var anchor = (xS(m.f) > W - 220) ? 'end' : 'start';
+            var anchor = (xS(m.f) > W - 250) ? 'end' : 'start';
             var dx = anchor === 'end' ? -8 : 8;
             svg.appendChild(el('text', {
-                x: xS(m.f) + dx, y: yS(gx) - 10, 'text-anchor': anchor,
+                x: xS(m.f) + dx, y: yS(gx) + m.dy, 'text-anchor': anchor,
                 class: 'mark-text' + (m.cls === 'double' ? ' danger' : '')
             }, m.label));
         });
+        // Danger-zone caption: right-aligned inside the zone, shortened (review fix)
         if (2 * fs < xMax) {
-            svg.appendChild(el('text', { x: xS(2 * fs) + 10, y: PAD.t + 18, class: 'mark-text danger' }, 'beyond: less growth than cash, more risk than full Kelly'));
+            svg.appendChild(el('text', { x: W - PAD.r - 8, y: PAD.t + 18, 'text-anchor': 'end', class: 'mark-text danger' }, 'beyond 2\u00D7: less growth than cash, more risk'));
         }
 
+        renderTakeaways(fs);
         renderReadout(fs);
-        renderProse(fs);
     }
 
-    /* ── Readout panel ── */
+    /* ── Spoon-fed takeaways (review request, Jun 2026) ── */
+    function renderTakeaways(fs) {
+        var list = document.getElementById('takeawaysList');
+        if (!list) return;
+        var items = [];
+        if (state.g < 0 && mu() > R) {
+            items.push('Even under assumptions where bitcoin held <em>alone</em> would lose ' + fmtP(Math.abs(state.g), 0) + ' a year in compound terms, the formula still allocates <strong>' + fmtP(fs, 1) + '</strong> \u2014 a small, rebalanced slice harvests volatility the standalone holding cannot.');
+        } else if (mu() <= R) {
+            items.push('With no expected edge over the risk-free rate, the formula allocates <strong>nothing</strong> \u2014 there is no excess return to size.');
+        } else {
+            items.push('Under these assumptions the formula\u2019s answer \u2014 the peak of the curve \u2014 is <strong>' + fmtP0(fs) + ' of your wealth</strong>' + (fs > 1 ? ', past the 100% boundary: the math is asking for <em>leverage</em>, more than everything you have.' : '.'));
+        }
+        if (mu() > R) {
+            items.push('<strong>Half-Kelly</strong> (' + fmtP0(fs / 2) + ') keeps 75% of the achievable growth while cutting the odds of ever seeing your wealth halved from 50% to 12.5%; <strong>quarter-Kelly</strong> (' + fmtP0(fs / 4) + ') keeps about 44% with that risk near zero.');
+            items.push('Right of the peak, <em>more bitcoin buys less growth</em> \u2014 and past ' + fmtP0(2 * fs) + ' (twice the peak), wealth compounds slower than cash while carrying far more risk. Over-betting is the only true mistake on this chart.');
+        }
+        list.innerHTML = items.map(function (t) { return '<li>' + t + '</li>'; }).join('');
+    }
+
+    /* ── Readout ── */
     function renderReadout(fs) {
         document.getElementById('roFstar').textContent = fmtP(fs, fs >= 1 ? 0 : 1) + ' of wealth';
         document.getElementById('roConv').textContent =
@@ -181,9 +208,8 @@
         if (fs > 1) {
             flags.push('The formula is asking for <em>leverage</em>. For an unleveraged holder, the binding answer under these assumptions is simply \u201Call of it\u201D \u2014 see The Gap below.');
         }
-        var gStandalone = mu() - 0.5 * state.sigma * state.sigma; // = state.g
-        if (gStandalone < 0 && fs > 0) {
-            flags.push('Under these assumptions bitcoin held <em>alone</em> compounds at ' + fmtP(gStandalone, 1) + ' a year \u2014 it loses money \u2014 yet the formula still allocates ' + fmtP(fs, 1) + '. A small, rebalanced slice harvests the volatility that destroys the standalone holding.');
+        if (state.g < 0 && fs > 0 && mu() > R) {
+            flags.push('Bitcoin held <em>alone</em> compounds at ' + fmtP(state.g, 1) + ' a year under these assumptions \u2014 yet the formula still allocates ' + fmtP(fs, 1) + '. The rebalanced slice harvests the volatility.');
         }
         if (mu() <= R) {
             flags.push('With no excess return over the risk-free rate, the formula allocates nothing \u2014 there is no edge to size.');
@@ -191,23 +217,27 @@
         document.getElementById('roFlags').innerHTML = flags.map(function (f) { return '<div class="ro-flag">' + f + '</div>'; }).join('');
     }
 
-    /* ── Prose numbers (§B + ladder) stay in lockstep with the engine ── */
-    function renderProse() {
-        var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-        var pm = { g: PRESETS.trailing.g, sigma: PRESETS.trailing.sigma };
-        var muT = pm.g + 0.5 * pm.sigma * pm.sigma;
-        var fT = (muT - R) / (pm.sigma * pm.sigma);
-        var sFTrail = document.getElementById('sFTrail');
-        if (sFTrail) sFTrail.textContent = Math.round(fT * 100) + '%';
-        var ladderTrail = document.getElementById('ladderTrail');
-        if (ladderTrail) ladderTrail.textContent = '~' + Math.round(fT * 100) + '%';
-        var asof = document.getElementById('asofTrailing');
-        if (asof) asof.textContent = '(data through ' + months[TRAIL.asof.getMonth()] + ' ' + TRAIL.asof.getFullYear() +
-            ': growth ' + fmtP(pm.g, 0) + '/yr, volatility ' + fmtP(pm.sigma, 0) + ')';
-        var mMat = 0.30 + 0.5 * 0.36, fMat = (mMat - R) / 0.36;
-        var sM = document.getElementById('sFMatur'); if (sM) sM.textContent = Math.round(fMat * 100) + '%';
-        var fCons = (0.10 - R) / 0.36;
-        var sC = document.getElementById('sFCons'); if (sC) sC.textContent = (fCons * 100).toFixed(0) + '%';
+    /* ── Prose (§B), ladder (§F), and chip sub-labels — same engine ── */
+    function fillStatics() {
+        var P = PRESETS();
+        var fOf = function (p) { var m = p.g + 0.5 * p.sigma * p.sigma; return (m - R) / (p.sigma * p.sigma); };
+        var fRevert = fOf(P.revert), fStay = fOf(P.stay), fCons = fOf(P.conservative);
+
+        var set = function (id, txt) { var e = document.getElementById(id); if (e) e.textContent = txt; };
+        set('gRevertTxt', fmtP0(P.revert.g));
+        set('gStayTxt', fmtP0(P.stay.g));
+        set('volTxt', fmtP0(VOL));
+        set('multTxt', SC.multiple.toFixed(2));
+        set('sFRevert', fmtP0(fRevert));
+        set('sFStay', fmtP0(fStay));
+        set('sFCons', fmtP0(fCons));
+        set('ladderRevert', '~' + fmtP0(fRevert));
+        set('ladderStay', '~' + fmtP0(fStay));
+        set('ladderHalf', '~' + fmtP0(fStay / 2));
+        set('ladderQuart', '~' + fmtP0(fStay / 4));
+        set('subRevert', '\u2248' + fmtP0(P.revert.g) + '/yr \u00B7 vol ' + fmtP0(VOL));
+        set('subStay', '\u2248' + fmtP0(P.stay.g) + '/yr \u00B7 vol ' + fmtP0(VOL));
+        set('subCons', '\u22128%/yr \u00B7 vol 60%');
     }
 
     /* ── Controls ── */
@@ -218,9 +248,10 @@
         valS.textContent = Math.round(state.sigma * 100) + '%';
     }
     function setPreset(name) {
+        var P = PRESETS();
         state.preset = name;
-        state.g = PRESETS[name].g;
-        state.sigma = PRESETS[name].sigma;
+        state.g = P[name].g;
+        state.sigma = P[name].sigma;
         document.querySelectorAll('.kpreset-btn').forEach(function (b) {
             b.classList.toggle('active', b.dataset.preset === name);
         });
@@ -242,5 +273,14 @@
     sliderG.addEventListener('input', onSlide);
     sliderS.addEventListener('input', onSlide);
 
-    setPreset('trailing');
+    /* ── Boot: series price first, then refine via the shared live fetch ── */
+    fillStatics();
+    setPreset('revert');
+    if (typeof fetchTodayPrice === 'function') {
+        fetchTodayPrice(function () {
+            SC = scenarioRates();
+            fillStatics();
+            if (state.preset) { setPreset(state.preset); } else { render(); }
+        });
+    }
 })();

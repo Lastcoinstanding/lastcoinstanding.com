@@ -183,3 +183,18 @@
     .ladder td { font-size: 0.88rem; }
     .hero .subtitle br { display: none; }
   }
+
+  /* ── v2 review revisions: scenario chips, cluster titles, takeaways ── */
+  .preset-cluster { flex: 1 1 460px; }
+  .cluster-title { font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.7rem; }
+  .kpreset-btn { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; text-align: left; padding: 0.5rem 1.0rem; border-radius: 10px; text-transform: none; letter-spacing: 0; }
+  .kp-name { font-size: 0.82rem; font-weight: 600; letter-spacing: 0.02em; }
+  .kp-sub { font-size: 0.7rem; font-weight: 400; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .kpreset-btn.active .kp-sub { color: var(--orange-dim); color: rgba(224,148,34,0.8); }
+  .takeaways { border-top: 1px solid var(--border); padding: 1.2rem 0.2rem 0.4rem; margin-bottom: 1.0rem; }
+  .takeaways-title { font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--orange); margin-bottom: 0.7rem; }
+  .takeaways ul { list-style: none; margin: 0; padding: 0; }
+  .takeaways li { position: relative; padding-left: 1.3rem; margin-bottom: 0.55rem; font-size: 0.93rem; font-weight: 300; line-height: 1.55; }
+  .takeaways li::before { content: "\2192"; position: absolute; left: 0; color: var(--orange); }
+  .takeaways li strong { color: var(--text-bright); font-weight: 600; }
+  .takeaways li em { color: var(--orange); font-style: normal; }
