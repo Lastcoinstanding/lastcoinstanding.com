@@ -200,7 +200,7 @@ eleventyComputed:
   <section class="section">
     <h2>The risk that follows the records</h2>
     <p>There is an honest complication here, and it cuts against this page's own argument. France has become the world's center of "wrench attacks" &mdash; physical coercion against bitcoin holders &mdash; with dozens of abductions in a single recent year, roughly a quarter of the world's documented cases: a hardware-wallet founder's finger severed for ransom, a CEO's daughter nearly taken in daylight, families targeted at home. The attack vectors were <em>databases</em>: a hardware-wallet vendor's 2020 breach exposing 270,000 names and home addresses; a French crypto-tax platform's 2026 breach exposing 50,000 users' balances; a tax official reportedly selling state-held data to the gangs; ordinary bragging on social media.</p>
-    <p>In every case, <strong>physical risk followed the records of ownership, not the location of the private keys.</strong> Your keys can be mathematically unbreakable while your shipping address is not. The implications cut in different directions, and the grid states them plainly. The ETF genuinely mitigates the wrench-attack risk: there is no bearer asset to hand over at gunpoint, and no presence in crypto-vendor databases. A single hardware wallet genuinely concentrates the risk, because the key's holder <em>is</em> the vault's door. And a multisig self-custody approach structurally mitigates it: with keys split across locations &mdash; or with a service holding one &mdash; no single person, including the owner under duress, can move the coins, and time-delays and duress protocols exist to mitigate or eliminate precisely this risk of attack.</p>
+    <p>In every case, <strong>physical risk followed the records of ownership, not the location of the private keys.</strong> Your keys can be mathematically unbreakable while your shipping address is not. The implications cut in different directions, and the grid states them plainly. The ETF genuinely mitigates the wrench-attack risk: there is no bearer asset to hand over at gunpoint, and no presence in crypto-vendor databases. A single hardware wallet genuinely concentrates the risk, because the key's holder <em>is</em> the vault's door. And a multisig self-custody approach structurally mitigates it: with keys split across locations &mdash; or with a service holding one &mdash; no single person, including the owner under duress, can move the coins, and time-delays and <a href="https://www.unchained.com/blog/bitcoin-singlesig-passphrase-vs-multisig" target="_blank" rel="noopener">duress protocols exist</a> to mitigate or eliminate precisely this risk of attack.</p>
     <p>The dimension where paper is strongest and the dimension where it is weakest are different dimensions. That is the grid's whole point.</p>
   </section>
 
@@ -229,6 +229,17 @@ eleventyComputed:
       <a class="callout-link" href="https://bitcoiner.guide/" target="_blank" rel="noopener">Start with the guides &rarr;</a>
     </div>
   </aside>
+
+
+  <!-- Sources -->
+  <section class="section sources-block">
+    <h2 class="sources-title">Sources &amp; further reading</h2>
+    <ul class="sources-list">
+      <li>SIPC, <a href="https://www.sipc.org/for-investors/what-sipc-protects" target="_blank" rel="noopener">"What SIPC Protects"</a> &mdash; the official scope of brokerage-account protection: custody failure of the broker, not market loss, and not all assets.</li>
+      <li>Unchained, <a href="https://www.unchained.com/blog/bitcoin-singlesig-passphrase-vs-multisig" target="_blank" rel="noopener">"Bitcoin passphrase vs. multisig"</a> &mdash; documents duress features: decoy wallets via secondary passphrase or decoy quorum keys.</li>
+      <li>Casa, <a href="https://casa.io/learn-more/multisig-wallets" target="_blank" rel="noopener">"Multisig Wallets"</a> &mdash; collaborative-custody key distribution and time-delay design.</li>
+    </ul>
+  </section>
 
   {% include 'components/related.njk' %}
   {% include 'components/companion-content.njk' %}

@@ -528,3 +528,11 @@
     .state-chip { font-size: 0.64rem; padding: 0.24rem 0.5rem; }
     .dimension-desc { font-size: 0.82rem; }
   }
+
+  /* ── Sources block (June 2026) ── */
+  .sources-block { border-top: 1px solid #1e1c1a; padding-top: 2.2rem; margin-top: 5rem; }
+  .sources-title { font-family: var(--font-body, Inter) !important; font-size: 0.72rem !important; letter-spacing: 0.18em; text-transform: uppercase; color: #908880 !important; font-weight: 600; margin-bottom: 1.1rem; }
+  .sources-list { list-style: none; padding: 0; }
+  .sources-list li { font-size: 0.82rem; font-weight: 300; color: #908880; line-height: 1.6; margin-bottom: 0.55rem; }
+  .sources-list a { color: #d8d2ca; border-bottom: 1px solid #2a2724; text-decoration: none; }
+  .sources-list a:hover { color: #e09422; }

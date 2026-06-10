@@ -39,13 +39,15 @@ missing include was caught. Either move the include into `base.njk` (gated
 on `related`), or add a build-time check that any page with `related:` front
 matter emits `related-card` markup. Low risk, recurring footgun.
 
-**STYLE_GUIDE recipes deferred from the How Much Bitcoin build (2026-06-10).**
-Four reusable patterns shipped page-scoped and should be canonicalized as
-§6.N recipes at the next docs pass: two-line preset chip (`kp-name`/`kp-sub`),
-"What the chart is saying" takeaways block, SVG hover point-legend
-(crosshair + dot + flip-aware readout box), and the `tip-end` right-anchored
-tooltip variant (plus the global `.tip-content { text-transform: none }`
-inheritance guard).
+**[CLOSED 2026-06-10] STYLE_GUIDE recipes from the How Much Bitcoin build.**
+Canonicalized same-day as §6.30 (two-line preset chip), §6.31 (chart
+takeaways block), §6.32 (SVG hover point-legend), §6.33 (tooltip case-guard
++ `tip-end` variant). Also closed in the same pass: the Paper Bitcoin
+citation niceties from SITE_GUIDE §25 (SIPC scope + Casa/Unchained duress
+docs — now a Sources block on the page with an inline cite on the duress
+sentence), and a Sources & credits block on How Much Bitcoin (all seven
+primary citations from the §26 verified-claims register, plus the Fred
+Krueger / *Bitcoin One Million* popularizer credit in §A).
 
 ## 2. Type system compliance
 

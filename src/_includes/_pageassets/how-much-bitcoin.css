@@ -193,6 +193,15 @@
     margin-top: 3rem;
   }
 
+
+  /* ── Sources block ── */
+  .sources-block { border-top: 1px solid var(--border); padding-top: 2.2rem; margin-top: 5rem; }
+  .sources-title { font-family: var(--font-body) !important; font-size: 0.72rem !important; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim) !important; font-weight: 600; margin-bottom: 1.1rem; }
+  .sources-list { list-style: none; padding: 0; }
+  .sources-list li { font-size: 0.82rem; font-weight: 300; color: var(--text-dim); line-height: 1.6; margin-bottom: 0.55rem; }
+  .sources-list a { color: var(--text); border-bottom: 1px solid var(--border-mid); text-decoration: none; }
+  .sources-list a:hover { color: var(--orange); border-bottom-color: var(--orange-dim); }
+
   /* ── Responsive ── */
   @media (max-width: 720px) {
     .container { padding: 2rem 1rem 4rem; }

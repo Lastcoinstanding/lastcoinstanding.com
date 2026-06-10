@@ -1813,6 +1813,23 @@ if (desc) desc.innerHTML = entry.desc;  // not textContent
 
 ---
 
+
+### 6.30 Two-line preset chip (`kp-name` / `kp-sub`)
+
+A preset pill that carries its assumptions on its face: scenario name on the top line, computed inputs on the second (e.g. *"≈30%/yr · vol 67%"*), filled by JS so the chip can never go stale. Markup: `<button class="kpreset-btn"><span class="kp-name">…</span><span class="kp-sub" id="…"></span></button>`. Pair the cluster with a `cluster-title` ("Default scenarios") opposite a slider cluster titled "Custom assumptions" so the preset/slider relationship is explicit. **When to use:** any control where a named scenario encodes ≥2 numeric assumptions a Normie would otherwise have to guess. **When to skip:** binary toggles or presets whose meaning is self-evident. Canonical instance: How Much Bitcoin? §C (page-scoped `kp-` prefix).
+
+### 6.31 Chart takeaways block ("What the chart is saying")
+
+A 2–3 bullet plain-language block directly beneath an interactive chart, recomputed live with the active inputs — spoon-fed interpretation, with branch variants for qualitatively different regimes (e.g. a leverage variant when f* > 100%). Markup: `.takeaways` > `.takeaways-title` + `<ul id="…">`; JS rebuilds `innerHTML` on every input event. **Rule:** bullets state what the *current* configuration means, never generic chart-reading advice. **When to use:** any chart whose correct reading requires holding ≥2 ideas at once. Canonical instance: How Much Bitcoin? §C; review-driven (June 2026).
+
+### 6.32 SVG hover point-legend (crosshair + readout box)
+
+Pointer-tracking readout for hand-rolled SVG charts: dashed vertical crosshair, dot riding the curve, floating two/three-line box ("at 73% allocation / expected growth ≈ +18.4%/yr / under your assumptions — not a forecast") that flips sides near the right edge. Listeners attach once to the `<svg>`; scale closures are stashed module-level on each render; the hover group is rebuilt per render (innerHTML wipe) and toggled via `visibility`. Touch works via pointer events. **Conditional-language rule:** if the chart shows model outputs, the readout must carry the "under your assumptions" qualifier (third line, `hv-note` class). Canonical instance: How Much Bitcoin? §C.
+
+### 6.33 Tooltip case-guard and right-anchored variant (`tip-end`)
+
+Two hard-won rules for the §6.13 `?`-tooltips. (1) **Case-guard:** `.tip-content` must declare `text-transform: none; letter-spacing: normal; text-align: left;` — tooltips placed inside uppercase contexts (table `th`, block titles) inherit the transform and render ALLCAPS otherwise (caught in How Much Bitcoin review, June 2026). (2) **`tip-end`:** for tooltips in right-aligned table headers near a panel edge, add `tip-content tip-end` (`left: auto; right: -6px; transform: none;`) so the bubble doesn't clip outside the container. Generate via a JS `tipHtml(txt, end)` helper when tables are built client-side.
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.

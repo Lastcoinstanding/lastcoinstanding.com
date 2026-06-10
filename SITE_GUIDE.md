@@ -1315,7 +1315,7 @@ Coinbase Custody secures >80% of US spot-ETF bitcoin (84% by AUM, Apr 2026 — r
 - ~~Title variant~~ — resolved June 2026: retitled to "Paper Bitcoin vs. Real Bitcoin" (see section header note).
 - ~~Carousel slide~~ — shipped June 2026 at carousel position 1 (bulb-and-candle video, "Same light — different asset."; see §13). The earlier three-doors concept was superseded by the two-lights metaphor.
 - The 2×2 quadrant as a Gallery entry.
-- Build-time citation niceties: SIPC scope language, Casa/Unchained duress-protocol product-doc cites (page phrasing already conservative: "exist," not "guarantee").
+- ~~Build-time citation niceties~~ CLOSED June 2026: Sources block added (SIPC "What SIPC Protects", Unchained passphrase-vs-multisig duress doc, Casa multisig page) with an inline cite on the §"keys" duress sentence. Pattern: `.sources-block` endnote list, small type, verified links only.
 - Parked future pages seeded here: the CDS framing (bitcoin as a credit default swap on the fiat/banking system — Greg Foss's thesis, credited; pairs with the Kelly exploration) and an estate-planning companion (Fiduciary Integration Framework report).
 
 ---
@@ -1356,7 +1356,8 @@ g(f) growth-vs-allocation curve, all math computed in-page. Presets are the two 
 ### Open enhancements
 
 - Carousel slide SHIPPED June 2026 as Featured lead (see §13).
-- Candidate STYLE_GUIDE recipes from this page, to add at next docs pass: two-line preset chip (`kp-name`/`kp-sub`), chart takeaways block, SVG hover point-legend, `tip-end` right-anchored tooltip variant.
+- ~~Candidate STYLE_GUIDE recipes~~ CLOSED June 2026: canonicalized as §6.30–6.33.
+- Sources & credits block added (June 2026): all seven register primaries linked (Kelly 1956 PDF, MacLean/Thorp/Ziemba PDF, Chopra-Ziemba, Fidelity, BlackRock, Baquero-Menezes, Krueger-Sigman). §A carries the popularizer credit: Fred Krueger (@dotkrueger), *Bitcoin One Million* (with Ben Sigman) — JM-requested, verified June 2026. The Power Law page hero gained the shift-parameter caveat sentence with the arXiv link (same pass).
 - Parked sister-content: Foss CDS framing pairs with this page (see §25 parked list).
 
 ---
