@@ -118,6 +118,22 @@
   .r-note strong { color: var(--text); }
   .r-asof { font-size: 0.72rem; }
 
+  .cluster-context { margin-top: 0.75rem; font-size: 0.78rem; color: var(--text-dim); font-weight: 300; }
+  .cluster-context strong { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .cluster-context a { color: var(--orange); text-decoration: none; border-bottom: 1px solid var(--orange-dim); }
+  .cluster-context a:hover { color: var(--text-bright); border-bottom-color: var(--text-bright); }
+
+  .grid-line { stroke: var(--border); stroke-width: 1; }
+  #curveChart { cursor: crosshair; }
+  .hv-line { stroke: var(--text-dim); stroke-width: 1; stroke-dasharray: 3 4; opacity: 0.85; }
+  .hv-dot { fill: var(--text-bright); stroke: var(--orange); stroke-width: 2; }
+  .hv-box { fill: var(--panel); stroke: var(--border-mid); opacity: 0.96; }
+  .hv-text { fill: var(--text); font-family: var(--font-body); font-size: 13px; font-weight: 400; }
+  .hv-text.hv-strong { fill: var(--text-bright); font-weight: 600; }
+
+  .readout-table th .help-tip { margin-left: 0.3rem; vertical-align: 0; }
+  .tip-content.tip-end { left: auto; right: -6px; transform: none; }
+
   .curve-chart-wrap { margin: 0.4rem 0 1.4rem; }
   #curveChart { width: 100%; height: auto; display: block; }
   .axis-line { stroke: var(--border-mid); stroke-width: 1; }

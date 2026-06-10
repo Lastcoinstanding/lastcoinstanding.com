@@ -21,9 +21,9 @@ eleventyComputed:
   <header class="hero">
     <div class="category-eyebrow">The Numbers</div>
     <h1>How Much <span class="h1-amber">Bitcoin</span>?</h1>
-    <p class="subtitle">In 1956, a Bell Labs physicist derived the formula for how much to stake on a favorable bet.<br>
-    Applied to bitcoin, its answer is startling &mdash; and the honest lesson is not the number,<br>
-    but the shape of the curve around it.</p>
+    <p class="subtitle">In 1956, a Bell Labs physicist derived the Kelly criterion &mdash; the formula<br>
+    for how much to stake on a favorable bet. Applied to bitcoin, its answer is startling &mdash;<br>
+    and the honest lesson is not the number, but the shape of the curve around it.</p>
   </header>
 
   <!-- §A — The formula from Bell Labs -->
@@ -74,6 +74,7 @@ eleventyComputed:
           <span class="preset-item"><button class="kpreset-btn" data-preset="stay"><span class="kp-name">Stay at current trend multiple</span><span class="kp-sub" id="subStay"></span></button><span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin grows at the Power Law trend rate from today's price, never reverting up to trend. The bear / no-reversion case &mdash; you get just trend growth and miss the catch-up upside an under-trend entry would normally deliver. Expressed as the trend's own growth rate averaged over the next ten years (it declines with time), against realized trailing volatility.</span></span></span>
           <span class="preset-item"><button class="kpreset-btn" data-preset="conservative"><span class="kp-name">Conservative</span><span class="kp-sub" id="subCons"></span></button><span class="help-tip" tabindex="0">?<span class="tip-content">A deliberately hostile case, unrelated to the Power Law: a 10% expected (arithmetic) return against 60% volatility. Under these assumptions bitcoin held alone would <em>lose</em> about 8% a year in compound terms &mdash; and the formula still allocates to it.</span></span></span>
         </div>
+        <div class="cluster-context">Bitcoin today: <strong id="ctxPrice">&mdash;</strong> &mdash; <strong id="ctxMult">&mdash;</strong> the Power Law trend&ensp;&middot;&ensp;<a href="/the-power-law.html">Learn more: The Power Law &rarr;</a></div>
         </div>
         <div class="slider-group">
           <div class="cluster-title">Custom assumptions</div>
@@ -97,7 +98,7 @@ eleventyComputed:
       <div class="curve-readout">
         <div class="readout-main">
           <div class="readout-fstar">
-            <div class="readout-label">The formula's answer</div>
+            <div class="readout-label">The formula's answer <span class="help-tip" tabindex="0">?<span class="tip-content">Full Kelly: the single allocation that maximizes the long-run compound growth of total wealth under the chosen assumptions &mdash; the peak of the curve above.</span></span></div>
             <div class="readout-big" id="roFstar">&mdash;</div>
             <div class="readout-sub" id="roConv"></div>
           </div>
