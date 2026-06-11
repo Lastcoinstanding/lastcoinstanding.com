@@ -1,0 +1,82 @@
+<!-- ─── Page feedback widget (private reader-to-author channel; nothing published) ───
+     Layout-level component (base.njk), gated on front matter. Trial: opt-in via `feedback: true`.
+     At wide rollout flip the base.njk gate to default-on for slug pages. -->
+<style>
+.pf-wrap { max-width: 880px; margin: 4rem auto 0; padding: 0 2rem; font-family: 'Inter', -apple-system, sans-serif; }
+.pf-inner { border-top: 1px solid #1e1c1a; padding-top: 2.2rem; }
+.pf-eyebrow { font-size: 0.72rem; letter-spacing: 0.28em; text-transform: uppercase; color: #e09422; margin-bottom: 0.9rem; }
+.pf-lede { font-size: 0.95rem; font-weight: 300; color: #d8d2ca; line-height: 1.65; margin-bottom: 1.3rem; max-width: 640px; }
+.pf-form { display: flex; flex-direction: column; gap: 0.8rem; max-width: 640px; }
+.pf-form textarea, .pf-form input[type=email] {
+  background: #100e0c; border: 1px solid #2a2724; border-radius: 6px;
+  color: #d8d2ca; font-family: inherit; font-weight: 300; font-size: 0.92rem;
+  padding: 0.75rem 0.9rem; line-height: 1.55; width: 100%; box-sizing: border-box;
+}
+.pf-form textarea { min-height: 110px; resize: vertical; }
+.pf-form textarea:focus, .pf-form input[type=email]:focus { outline: none; border-color: rgba(224,148,34,0.55); }
+.pf-form ::placeholder { color: #908880; opacity: 0.8; }
+.pf-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.pf-row { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; }
+.pf-row input[type=email] { flex: 1 1 260px; }
+.pf-send {
+  font-family: inherit; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: #e09422; background: rgba(224,148,34,0.07); border: 1px solid rgba(224,148,34,0.55); border-radius: 999px;
+  padding: 0.6rem 1.6rem; cursor: pointer; transition: color .2s ease, background .2s ease;
+}
+.pf-send:hover:not(:disabled) { color: #f2eee8; background: rgba(224,148,34,0.16); }
+.pf-send:disabled { opacity: 0.5; cursor: default; }
+.pf-fine { font-size: 0.74rem; font-weight: 300; color: #908880; margin-top: 0.2rem; }
+.pf-done { font-size: 0.95rem; font-weight: 300; color: #d8d2ca; border-left: 2px solid rgba(224,148,34,0.55); background: rgba(224,148,34,0.05); padding: 0.9rem 1.1rem; max-width: 640px; line-height: 1.6; }
+.pf-fail a { color: #e09422; text-decoration: none; border-bottom: 1px solid rgba(224,148,34,0.55); }
+@media (max-width: 720px) { .pf-wrap { padding: 0 1rem; margin-top: 3rem; } }
+</style>
+<div class="pf-wrap" id="pfWrap" data-page="{{ slug or page.fileSlug }}">
+  <div class="pf-inner">
+    <div class="pf-eyebrow">Feedback or questions?</div>
+    <p class="pf-lede">Every page on this site has been improved by someone pushing on it. Ask a question, flag an error, or suggest what&rsquo;s missing &mdash; it goes straight to the author, never published.</p>
+    <form class="pf-form" id="pfForm" novalidate>
+      <textarea id="pfMsg" name="message" maxlength="2000" required placeholder="Your question, correction, or suggestion&hellip;"></textarea>
+      <input class="pf-hp" type="text" name="website" id="pfHp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="pf-row">
+        <input type="email" id="pfEmail" name="email" maxlength="200" placeholder="Email (optional &mdash; only if you&rsquo;d like a reply)">
+        <button class="pf-send" id="pfSend" type="submit">Send &rarr;</button>
+      </div>
+      <div class="pf-fine">Nothing you write here is posted publicly.</div>
+    </form>
+  </div>
+</div>
+<script>
+(function () {
+  var form = document.getElementById('pfForm');
+  if (!form) return;
+  var wrap = document.getElementById('pfWrap');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var msg = document.getElementById('pfMsg').value.trim();
+    if (!msg) { document.getElementById('pfMsg').focus(); return; }
+    var btn = document.getElementById('pfSend');
+    btn.disabled = true; btn.textContent = 'Sending\u2026';
+    fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        page: wrap.getAttribute('data-page') || location.pathname,
+        message: msg.slice(0, 2000),
+        email: document.getElementById('pfEmail').value.trim().slice(0, 200),
+        website: document.getElementById('pfHp').value
+      })
+    }).then(function (r) {
+      if (!r.ok) throw new Error('status ' + r.status);
+      form.parentNode.querySelector('.pf-lede').remove();
+      form.outerHTML = '<div class="pf-done">Received &mdash; thank you. If you left an email, replies usually land within a few days.</div>';
+    }).catch(function () {
+      btn.disabled = false; btn.textContent = 'Send \u2192';
+      var fine = form.querySelector('.pf-fine');
+      var page = wrap.getAttribute('data-page') || location.pathname;
+      fine.className = 'pf-fine pf-fail';
+      fine.innerHTML = 'Something hiccuped. You can email directly instead: <a href="mailto:johnmc190@gmail.com?subject=' +
+        encodeURIComponent('[LCS] ' + page) + '">johnmc190@gmail.com</a> &mdash; mention the page you were reading.';
+    });
+  });
+})();
+</script>

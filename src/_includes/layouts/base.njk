@@ -307,6 +307,10 @@ h1, h2, h3 {
 
 {{ content | safe }}
 
+{# Page feedback widget — TRIAL: opt-in via `feedback: true` front matter.
+   At wide rollout change the gate to: {% if slug and feedback != false %} #}
+{% if feedback %}{% include 'components/page-feedback.njk' %}{% endif %}
+
 {#- ═══ Layout-level "Share this page" — auto-injected on every page ═══
     Sits between page content (which may include the Related component
     at its end) and the canonical footer. To opt out on a specific page,
