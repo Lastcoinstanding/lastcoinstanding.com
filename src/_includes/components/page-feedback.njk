@@ -15,6 +15,14 @@
 .pf-form textarea { min-height: 110px; resize: vertical; }
 .pf-form textarea:focus, .pf-form input[type=email]:focus { outline: none; border-color: rgba(224,148,34,0.55); }
 .pf-form ::placeholder { color: #908880; opacity: 0.8; }
+.pf-form input:-webkit-autofill, .pf-form input:-webkit-autofill:hover,
+.pf-form input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #100e0c inset;
+  -webkit-text-fill-color: #d8d2ca;
+  caret-color: #d8d2ca;
+  border: 1px solid #2a2724;
+  transition: background-color 600000s 0s;
+}
 .pf-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 .pf-row { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; }
 .pf-row input[type=email] { flex: 1 1 260px; }
