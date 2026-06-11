@@ -307,6 +307,11 @@ h1, h2, h3 {
 
 {{ content | safe }}
 
+{# Related strip — layout-level (centralized 2026-06-12; was per-page, footgun fired
+   twice: how-much-bitcoin pre-launch, bitcoin-vs-rental-property in production).
+   Component self-guards: renders nothing unless `related:` front matter exists. #}
+{% include 'components/related.njk' %}
+
 {# Page feedback widget — default-on for every page with a slug (all explorations,
    current and future). Hub/utility pages opt out with `feedback: false` front matter.
    Layout-level by design: see SITE_GUIDE §27. #}

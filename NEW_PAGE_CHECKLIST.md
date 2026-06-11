@@ -148,6 +148,10 @@ pattern), add fragment URLs at priority `0.8`:
 Use the `STYLE_GUIDE §6.10` related-component pattern. The new page should
 *both* link to companion pages AND have companion pages link back to it.
 
+**The strip itself is automatic** — `base.njk` renders it for any page with
+`related:` front matter. Do NOT add a per-page include (that pattern is
+retired; it was forgotten twice). Front matter is the only step here.
+
 ### On the new page
 
 ```yaml

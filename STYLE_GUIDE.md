@@ -803,7 +803,7 @@ related:
 
 **Visual character.** Mirrors the homepage's `concept-card` pattern at smaller scale — same hover-lift, amber border on hover, orange top-bar appearing on hover, Cormorant title, dim caps marker. Cards are `auto-fit minmax(280px, 1fr)` so 3 fit comfortably on desktop, stack on mobile.
 
-**Placement.** Insert `{% include 'components/related.njk' %}` near the bottom of the page's main content, before the closing wrapper div. Component handles its own top-border and spacing. Page-level placement (not inside a tab) so users see the related links regardless of which tab they were in last.
+**Placement.** Automatic — `base.njk` includes the component once for every page, after the content block and above the feedback widget (centralized 2026-06-12 after the per-page include was forgotten twice: how-much-bitcoin pre-launch, bitcoin-vs-rental-property in production). **Never add `{% include 'components/related.njk' %}` to a page template** — declaring `related:` front matter is the entire per-page step; the component renders nothing when the front matter is absent. It handles its own top-border, spacing, and width.
 
 **When to use a related-card vs. inline link.** Use an inline `<a>` for inline references in body prose ("see the half-life of the dollar"). Use the related component for the deliberate end-of-page "now go here" moment with two-or-three thematically chosen next steps. Don't use both for the same destination on the same page — pick the placement that does more work.
 
