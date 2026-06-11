@@ -1341,6 +1341,8 @@ g(f) growth-vs-allocation curve, all math computed in-page. Presets are the two 
 - BlackRock 1–2% risk budget (Dec 2024; Cohen/Henderson/Mitchnick/Paul; ≈ single Mag-7 risk share) — current as of 2026 AND implemented in BlackRock Target Allocation model portfolios since early 2025.
 - Chopra & Ziemba 1993: mean errors ≈ 11× variance errors at RT50, growing with risk tolerance.
 - Power-law exponent specification-sensitivity (~3× across time-origin shifts): **Baquero & Menezes**, arXiv:2605.21316 (May 2026) — author attribution verified at launch; linked from §D. Two-sided finding (weak structure, yet bitcoin uniquely beats single growth curves) is precisely calibrated for this page.
+- Credit (JM request, June 2026): Fred Krueger (@dotkrueger) credited in §A as the popularizer of Kelly-for-bitcoin specifically, with a link to *Bitcoin One Million: The Final Chapter of Fiat* (Krueger & Sigman, 2025 — its description confirms a Kelly chapter). Credit is for popularization only; the page does not endorse the book's price thesis.
+- Linked citations (June 2026): Kelly 1956 (Princeton-hosted PDF, verified 200), MacLean/Thorp/Ziemba (Berkeley PDF, verified 200), BlackRock "Sizing bitcoin in portfolios" (institutions/en-zz URL, ladder rung), Fidelity and arXiv already linked inline. Chopra & Ziemba cited by name only (no stable public PDF).
 - Upside-skew wrinkle (volatility slider tooltip): sourced from Fidelity's 7-up/+288% vs 3-down/−50% tally; symmetric model therefore *understates* f* — the conservative direction.
 
 ### Editorial lessons

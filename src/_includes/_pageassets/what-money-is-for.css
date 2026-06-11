@@ -47,7 +47,7 @@
   }
 
   .container {
-    max-width: 1240px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 2.5rem 2rem 6rem;
   }
@@ -75,7 +75,7 @@
 
   /* ═══ Preset control panel — direct match to WMHTB ═══ */
   .preset-panel {
-    max-width: 720px;
+    max-width: 880px;
     margin: 1.5rem auto 2.5rem;
     padding: 1.4rem 1.6rem 1.5rem;
     border: 1px solid rgba(247, 147, 26, 0.22);
@@ -318,7 +318,7 @@
   /* ═══ Downstream prose sections ═══ */
   .section {
     margin-top: 5rem;
-    max-width: 720px;
+    max-width: 880px;
     margin-left: auto;
     margin-right: auto;
   }

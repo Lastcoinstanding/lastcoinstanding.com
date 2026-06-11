@@ -45,7 +45,7 @@
   }
 
   .container {
-    max-width: 1240px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 2.5rem 2rem 6rem;
   }
@@ -73,7 +73,7 @@
 
   /* ═══ Preset control panel ═══ */
   .preset-panel {
-    max-width: 720px;
+    max-width: 880px;
     margin: 1.5rem auto 2.5rem;
     padding: 1.4rem 1.6rem 1.5rem;
     border: 1px solid rgba(247, 147, 26, 0.22);
@@ -437,7 +437,7 @@
   /* ═══ Downstream section stubs ═══ */
   .section {
     margin-top: 7rem;
-    max-width: 720px;
+    max-width: 880px;
     margin-left: auto;
     margin-right: auto;
   }
@@ -464,7 +464,7 @@
 
   /* ═══ Closing callout — Adam Back video link ═══ */
   .closing-callout {
-    max-width: 720px;
+    max-width: 880px;
     margin: 3rem auto 0;
     padding: 2rem 2rem;
     border: 1px solid rgba(247, 147, 26, 0.18);
@@ -518,10 +518,10 @@
     .center-stack { display: contents; }
 
     .triangle-wrap                        { order: 1; margin: 0 auto; }
-    .property-column[data-column="sov"]   { order: 2; max-width: 720px; width: 100%; margin: 0 auto; }
-    .property-column[data-column="moe"]   { order: 3; max-width: 720px; width: 100%; margin: 0 auto; }
-    .uoa-row                              { order: 4; max-width: 720px; width: 100%; margin: 0 auto; }
-    .cross-cutting                        { order: 5; max-width: 720px; width: 100%; margin: 0 auto; }
+    .property-column[data-column="sov"]   { order: 2; max-width: 880px; width: 100%; margin: 0 auto; }
+    .property-column[data-column="moe"]   { order: 3; max-width: 880px; width: 100%; margin: 0 auto; }
+    .uoa-row                              { order: 4; max-width: 880px; width: 100%; margin: 0 auto; }
+    .cross-cutting                        { order: 5; max-width: 880px; width: 100%; margin: 0 auto; }
 
     /* Triangle is fluid between desktop (540px) and mobile rules: scales
        proportionally with the viewport up to a hard max. Aspect ratio
