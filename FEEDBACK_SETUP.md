@@ -1,5 +1,7 @@
 # FEEDBACK WIDGET — ONE-TIME SETUP (JM, ~10 minutes)
 
+> Status: KV namespace created and bound (2026-06-11, via dashboard). Email path pending — step 2 below.
+
 The widget is live on the trial page but submissions will show the friendly
 failure state until step 1 is done. Steps 1–2 make it fully work; step 3 is
 optional hardening.
