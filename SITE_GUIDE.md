@@ -1365,3 +1365,28 @@ g(f) growth-vs-allocation curve, all math computed in-page. Presets are the two 
 ---
 
 _Last updated: June 2026. Update this document as editorial decisions crystallize into principles worth preserving._
+
+
+## 27. Page feedback widget (site-wide component)
+
+**What it is.** A private reader-to-author channel at the bottom of every exploration page: message box (2,000 chars), optional reply email, async POST. **Nothing is ever published** — this is the component's defining principle and must survive any future redesign. It is not comments and must never become comments; the public face is silence, the private value is a pipeline of real reader questions (tooltip ideas, FAQ material, future-page topics, warm contacts).
+
+**Where it lives.** `src/_includes/components/page-feedback.njk` (markup + self-contained `.pf-*` styles + vanilla JS), included once from `base.njk` after `{{ content | safe }}`, gated `{% if slug and feedback != false %}`. Every slugged page — all 29 explorations and any future page — inherits it automatically; `index`, `about`, and `calculators` opt out via `feedback: false` front matter. Layout-level by design so the related-strip per-page-include footgun cannot recur here (TECH_DEBT, 2026-06-11). Renders below the related cards, above the footer.
+
+**Register copy (canon — reuse verbatim if rebuilt):**
+- Eyebrow: "Feedback or questions?" (JM decision: direct, not cute; rejected "A question or a quibble?")
+- Lede: "Every page on this site has been improved by someone pushing on it. Ask a question, flag an error, or suggest what's missing — it goes straight to the author, never published."
+- Fine print: "Nothing you write here is posted publicly." (JM trimmed the auto-attach sentence.)
+- Success: "Received — thank you. If you left an email, replies usually land within a few days."
+- Failure: "Something hiccuped. You can email directly instead: [mailto johnmc190@gmail.com] — mention the page you were reading."
+
+**Backend.** Cloudflare Pages Function `functions/api/feedback.js`, POST `/api/feedback`: honeypot (silent accept) → validation (length caps, email syntax) → rate limit 5/hour/IP via KV (`rl:` keys, TTL 1h; IP sha256-hashed transiently, never stored with submissions) → optional Turnstile (enforced only when `TURNSTILE_SECRET` env exists; OFF as of rollout) → KV archive (`fb:<ISO-ts>:<id>` → `{page, message, email|null, ts}`; source of truth) → best-effort email. Email path: `NOTIFY` send_email binding if present, else Resend via `RESEND_KEY` env (ACTIVE; account = johnmc190@gmail.com, free tier delivers only to account owner — correct here), else KV-only. `FEEDBACK_TO` env overrides destination. Subject format `[LCS feedback] /<slug>`; reader email becomes Reply-To.
+
+**Account config (live since 2026-06-11):** KV namespace `FEEDBACK` bound as `FEEDBACK` (Production); `RESEND_KEY` secret set. Submissions browsable at dashboard → Storage & databases → Workers KV → FEEDBACK. Setup click-paths and the Turnstile enable procedure: `FEEDBACK_SETUP.md` (repo root).
+
+**Ops.** Expected volume: low. No moderation duty exists (nothing public). Replies are one click (Reply-To). If volume ever outgrows the inbox, a private KV-reading digest page is a half-day add.
+
+**Editorial pipeline (future).** The best questions may seed "What readers asked" blocks on pages — author-written content, never raw comments. Track candidates as they arrive.
+
+**History.** Designed via FEEDBACK_WIDGET_DESIGN doc (chat deliverable, JM-reviewed with Word comments); trial on /how-much-bitcoin 2026-06-11 (commit `ecf1a13`); Chrome-autofill dark-theme fix (`974224b`, see STYLE_GUIDE §6.34); rollout site-wide same day.
+

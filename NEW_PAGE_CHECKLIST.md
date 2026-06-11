@@ -506,6 +506,7 @@ Before announcing the page or sharing the URL externally:
   and image.
 - **Console clean** — open DevTools, verify no JS errors or 404s on page
   load.
+- **Feedback widget check** — automatic for any page with `slug` (layout-level, base.njk); verify it renders on the deployed page below the related strip (eyebrow "Feedback or questions?"). Hub/utility pages opt out with `feedback: false`. Do NOT add a per-page include. (SITE_GUIDE §27)
 
 ---
 

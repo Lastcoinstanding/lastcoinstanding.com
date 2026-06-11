@@ -307,9 +307,10 @@ h1, h2, h3 {
 
 {{ content | safe }}
 
-{# Page feedback widget — TRIAL: opt-in via `feedback: true` front matter.
-   At wide rollout change the gate to: {% if slug and feedback != false %} #}
-{% if feedback %}{% include 'components/page-feedback.njk' %}{% endif %}
+{# Page feedback widget — default-on for every page with a slug (all explorations,
+   current and future). Hub/utility pages opt out with `feedback: false` front matter.
+   Layout-level by design: see SITE_GUIDE §27. #}
+{% if slug and feedback != false %}{% include 'components/page-feedback.njk' %}{% endif %}
 
 {#- ═══ Layout-level "Share this page" — auto-injected on every page ═══
     Sits between page content (which may include the Related component

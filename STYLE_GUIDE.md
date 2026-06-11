@@ -1830,6 +1830,28 @@ Pointer-tracking readout for hand-rolled SVG charts: dashed vertical crosshair, 
 
 Two hard-won rules for the §6.13 `?`-tooltips. (1) **Case-guard:** `.tip-content` must declare `text-transform: none; letter-spacing: normal; text-align: left;` — tooltips placed inside uppercase contexts (table `th`, block titles) inherit the transform and render ALLCAPS otherwise (caught in How Much Bitcoin review, June 2026). (2) **`tip-end`:** for tooltips in right-aligned table headers near a panel edge, add `tip-content tip-end` (`left: auto; right: -6px; transform: none;`) so the bubble doesn't clip outside the container. Generate via a JS `tipHtml(txt, end)` helper when tables are built client-side.
 
+
+### 6.34 Page feedback widget (layout-level component)
+
+**When:** automatic — any page with `slug` front matter gets it from `base.njk`; nothing to add per page. Hub/utility pages opt out with `feedback: false`. Never duplicate the include in a page template.
+
+**Files:** `components/page-feedback.njk` (markup + styles + JS, fully self-contained, `.pf-*` class prefix); backend `functions/api/feedback.js`. Copy is canon — see SITE_GUIDE §27 before changing a word; the never-public principle is non-negotiable.
+
+**Behavior:** async POST to `/api/feedback`; success replaces the form with `.pf-done`; failure rewires `.pf-fine` into a mailto fallback. Honeypot input `#pfHp` (absolute-positioned off-screen; do not display:none — some bots skip those). 2,000-char textarea cap enforced client and server side.
+
+**Reusable pattern — Chrome autofill on dark themes:** autofilled inputs get Chrome's pale background unless countered. The working counter (from commit `974224b`):
+
+```css
+input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px <field-bg> inset;
+  -webkit-text-fill-color: <field-text>;
+  caret-color: <field-text>;
+  transition: background-color 600000s 0s;
+}
+```
+
+Use on any future dark-theme form (the inset shadow repaints over the autofill color; the absurd transition delay defers Chrome's repaint indefinitely).
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.
