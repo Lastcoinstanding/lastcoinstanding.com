@@ -1,0 +1,117 @@
+{# risks-to-bitcoin.css — scoped to this page; inherits site palette via :root below #}
+<style>
+  :root {
+    --bg: #0a0908; --bg-card: #111010; --border: #1e1c1a; --border-lt: #2a2724;
+    --text: #d8d2ca; --text-body: #d0c8c0; --text-bright: #f2eee8; --text-dim: #908880;
+    --amber: #e09422; --amber-bright: #ffa940; --amber-soft: rgba(224,148,34,0.07);
+    --orange: #F7931A; --orange-bright: #ffa940;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem 6rem; }
+
+  /* ═══ Hero ═══ */
+  .hero { text-align: center; margin-bottom: 1.25rem; }
+  .hero h1 {
+    font-family: var(--font-display); font-weight: 500; font-size: clamp(2.4rem, 6vw, 3.6rem);
+    line-height: 1.05; color: var(--text-bright); letter-spacing: -0.01em; margin-bottom: 1rem;
+  }
+  .hero h1 .h1-real { color: var(--orange); }
+  .hero .subtitle {
+    font-family: var(--font-body); font-weight: 300; font-size: clamp(0.98rem, 2vw, 1.12rem);
+    line-height: 1.6; color: var(--text-dim); max-width: 640px; margin: 0 auto;
+  }
+
+  /* ═══ Sections ═══ */
+  .section { max-width: 760px; margin: 0 auto; }
+  .section-opening { margin-top: 3.5rem; }
+  .section h2 {
+    font-family: var(--font-display); font-weight: 500; font-size: clamp(1.7rem, 4vw, 2.2rem);
+    color: var(--text-bright); margin-bottom: 1.1rem; letter-spacing: -0.01em;
+  }
+  .section p { font-size: 1.02rem; line-height: 1.72; color: var(--text-body); margin-bottom: 1.15rem; }
+  .section em { font-style: italic; color: var(--text-bright); }
+  .section strong { color: var(--text-bright); font-weight: 600; }
+  .section a { color: var(--orange); text-decoration: none; border-bottom: 1px solid rgba(247,147,26,0.35); transition: color .2s, border-color .2s; }
+  .section a:hover { color: var(--orange-bright); border-bottom-color: var(--orange); }
+
+  .opening-turn {
+    margin-top: 1.6rem; padding: 1.1rem 1.3rem; border-left: 2px solid var(--amber);
+    background: var(--amber-soft); font-size: 1.04rem; color: var(--text);
+  }
+
+  /* ═══ Part dividers ═══ */
+  .part-divider { max-width: 760px; margin: 4.5rem auto 2.5rem; text-align: center; border-top: 1px solid var(--border); padding-top: 2.5rem; }
+  .part-kicker {
+    display: inline-block; font-family: var(--font-body); font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.28em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.6rem;
+  }
+  .part-title { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.9rem, 5vw, 2.6rem); color: var(--text-bright); margin-bottom: 0.5rem; }
+  .part-sub { font-family: var(--font-body); font-weight: 300; font-size: 0.98rem; color: var(--text-dim); max-width: 520px; margin: 0 auto; }
+
+  /* ═══ Risk sections ═══ */
+  .risk { margin-top: 3rem; }
+  .risk-title {
+    font-family: var(--font-display); font-weight: 600; font-size: clamp(1.45rem, 3.5vw, 1.85rem);
+    color: var(--text-bright); margin-bottom: 0.9rem; display: flex; align-items: baseline; gap: 0.7rem;
+  }
+  .risk-num {
+    font-family: var(--font-body); font-size: 0.85rem; font-weight: 700; color: var(--amber);
+    border: 1px solid var(--amber-dim, rgba(224,148,34,0.5)); border-radius: 50%;
+    width: 1.9rem; height: 1.9rem; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .risk-flag {
+    font-size: 0.88rem !important; font-style: italic; color: var(--amber) !important;
+    margin-top: -0.4rem; margin-bottom: 1.1rem !important;
+  }
+  .beat-label { font-weight: 600; color: var(--text-bright); }
+  .steel .beat-label { color: var(--amber); }
+  .steel { color: var(--text-body); }
+
+  /* ═══ Tripwire block ═══ */
+  .tripwire {
+    margin: 1.5rem 0 0.5rem; padding: 1.1rem 1.3rem 1.1rem 1.4rem;
+    border-left: 3px solid var(--amber); background: var(--amber-soft); border-radius: 0 6px 6px 0;
+  }
+  .tripwire-eyebrow {
+    font-family: var(--font-body); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--amber); margin-bottom: 0.7rem;
+  }
+  .tripwire ul { list-style: none; margin: 0; padding: 0; }
+  .tripwire li { position: relative; padding-left: 1.1rem; margin-bottom: 0.6rem; font-size: 0.96rem; line-height: 1.6; color: var(--text); }
+  .tripwire li:last-child { margin-bottom: 0; }
+  .tripwire li::before { content: "→"; position: absolute; left: 0; color: var(--amber); }
+  .tripwire em { font-style: italic; color: var(--text-bright); }
+
+  /* ═══ Scoreboard ═══ */
+  .scoreboard-section { margin-top: 4.5rem; border-top: 1px solid var(--border); padding-top: 3rem; }
+  .scoreboard { margin: 1.8rem 0; display: flex; flex-direction: column; gap: 1rem; }
+  .score-tier { padding: 1.2rem 1.4rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; }
+  .score-label {
+    font-family: var(--font-body); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; margin-bottom: 0.6rem; display: inline-block;
+  }
+  .score-survived { color: #6bbf8a; }
+  .score-watched { color: var(--amber); }
+  .score-shared { color: var(--text-dim); }
+  .score-tier p { font-size: 0.98rem; margin: 0; color: var(--text-body); }
+  .scoreboard-close { margin-top: 1.6rem; }
+  .scoreboard-bridge {
+    margin-top: 1.2rem; padding: 1.1rem 1.3rem; border-left: 2px solid var(--orange);
+    background: rgba(247,147,26,0.06); font-size: 1.04rem; color: var(--text);
+  }
+
+  /* ═══ Sources ═══ */
+  .sources-block { margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 2rem; }
+  .sources-title { font-size: 1.4rem !important; }
+  .sources-list { list-style: none; padding: 0; margin: 0; }
+  .sources-list li { font-size: 0.9rem; line-height: 1.6; color: var(--text-dim); margin-bottom: 0.8rem; padding-left: 1rem; border-left: 1px solid var(--border-lt); }
+  .sources-list a { color: var(--orange); text-decoration: none; border-bottom: 1px solid rgba(247,147,26,0.3); }
+
+  @media (max-width: 720px) {
+    .container { padding: 2rem 1.1rem 4rem; }
+    .section, .part-divider, .scoreboard-section { padding-left: 0; padding-right: 0; }
+    .risk-title { gap: 0.5rem; }
+  }
+</style>

@@ -1,0 +1,293 @@
+---
+layout: base.njk
+permalink: /risks-to-bitcoin.html
+slug: risks-to-bitcoin
+noindex: true
+related:
+  - slug: how-much-bitcoin
+    desc: "The sister page. Every risk here is why position sizing exists — the Kelly criterion's answer to holding a volatile, attackable asset without being ruined by it."
+  - slug: paper-bitcoin
+    desc: "The custody risk in full. This page summarizes the re-intermediation threat; that one maps every way of holding bitcoin against a 6102-style seizure."
+  - slug: the-power-law
+    desc: "The model is not destiny. The growth trajectory this site charts is an observed regularity, not a law — and the security budget depends on it continuing."
+  - slug: trilemma
+    desc: "Why bitcoin's design choices are the correct tradeoff, not an accident — the foundation under the 'a better coin could replace it' question."
+companion: []
+eleventyComputed:
+  head_extras: "{% include '_pageassets/risks-to-bitcoin-head.html' %}"
+  page_styles: "{% include '_pageassets/risks-to-bitcoin.css' %}"
+---
+<div class="container">
+
+  <!-- Hero -->
+  <header class="hero">
+    <h1>Risks to <span class="h1-real">Bitcoin</span></h1>
+    <p class="subtitle">Bitcoin has been declared dead, banned, and out-competed more times than anyone has counted.<br>
+    This page takes every serious risk seriously &mdash; and asks what would have to be true for each one to win.</p>
+  </header>
+
+  <!-- §A — The opening: seventeen years -->
+  <section class="section section-opening">
+    <h2>Seventeen years of obituaries</h2>
+    <p>Bitcoin is seventeen years old. In that time it has been declared dead several hundred times, banned outright by China in six escalating rounds, and challenged by thousands of cryptocurrencies promising to do what it does, only better. It is still here. As of 2026 it accounts for the overwhelming majority of all the computing power devoted to proof-of-work networks combined &mdash; more security than every rival chain put together, by a wide margin.</p>
+    <p>That is not an accident, and it is not momentum. A fragile thing subjected to seventeen years of attacks, bans, crashes, forks, and well-funded competition does not merely survive by luck; it either has properties that make it hard to kill, or it doesn't. The argument of this page is that bitcoin's resilience is a <em>property</em>, not a streak &mdash; and the way to test that claim honestly is not to wave the risks away but to state each one in its strongest form and ask what it would actually take to win.</p>
+    <p>So that is what follows: ten risks, grouped into four kinds, each given the strongest version a thoughtful critic would make, then an honest assessment &mdash; including, where it applies, the admission that the question is not yet settled. Every section ends the same way: <strong>the observable markers that would tell us the risk is winning.</strong> Not reassurance. Specifics you can watch for yourself.</p>
+    <p class="opening-turn">One pattern recurs often enough to name up front. Bitcoin has tended to survive its threats not by adapting to them &mdash; not by twisting and re-engineering itself each time it is challenged &mdash; but by refusing to change at all. Its inertia is not a weakness it has failed to fix. It is, as the sections below keep finding, the immune system itself.</p>
+  </section>
+
+  <!-- ===================== PART I ===================== -->
+  <div class="part-divider">
+    <span class="part-kicker">Part I</span>
+    <h2 class="part-title">Death by decree</h2>
+    <p class="part-sub">The attacks from outside &mdash; the state, and the physical world.</p>
+  </div>
+
+  <!-- §1 — State attack -->
+  <section class="section risk">
+    <h3 class="risk-title"><span class="risk-num">1</span> The coordinated state attack</h3>
+
+    <p class="steel"><span class="beat-label">The strongest case.</span> States have the means and the precedent. In 1933, Executive Order 6102 confiscated American gold by decree. A government that wanted bitcoin gone could criminalize mining, ban custody, cut exchanges off from the banking system, and prosecute holders &mdash; and a coordinated bloc of major economies acting together could, in principle, choke the on-ramps that connect bitcoin to the rest of the economy. This is the risk every other risk borrows fear from: not that bitcoin breaks, but that the people who run the financial system simply decide it is not allowed.</p>
+
+    <p><span class="beat-label">The honest answer.</span> We are not speculating about this one. China has run the experiment &mdash; six separate times over seventeen years, escalating from a 2009 ban on virtual-currency payments to <a href="https://www.nortonrosefulbright.com/en/knowledge/publications/4ea238ef/china-rolls-out-updated-crypto-framework-establishing-the-legal-regime-for-rwa-tokenization" target="_blank" rel="noopener">Circular 42 in February 2026</a>, which reaffirmed a total ban on mining and trading. The most aggressive round, in mid-2021, ordered every mining operation in the country to shut down at once. Global hashrate fell about 71% in weeks. It was the closest thing to a kill-shot any state has landed.</p>
+    <p>Within roughly six months, hashrate had fully recovered, redistributed across the United States, Kazakhstan, Russia, and beyond. And by most estimates a substantial share of mining &mdash; on the order of 15&ndash;20% of the global total &mdash; quietly returned <em>inside China itself</em>, operating through stranded energy and distributed sites despite the ban. The most determined ban by the most capable administrative state on earth did not end bitcoin mining; it relocated it, temporarily, and then watched a fraction of it grow back in the dark.</p>
+    <p>The reason is structural. Gold could be confiscated because confiscation was practical: it is heavy, it sits in vaults, and the state could seize the ledger and the metal alike. Bitcoin inverts every one of those properties. A ban does not destroy the coins; it relocates the capital &mdash; and capital relocates to whichever jurisdiction declines to participate in the ban. That is the asymmetry that makes a coordinated global prohibition unstable: the first major economy to defer, or simply to look the other way, becomes the beneficiary of all the activity the others expelled. A ban cartel is a game in which every member has a standing incentive to defect, and the defector is rewarded. This is why a 6102-for-bitcoin is not merely difficult to enforce but counterproductive to attempt: it exports the very thing it was meant to capture.</p>
+    <p>And there is a quieter point underneath the loud one, which belongs here only after the threat has been taken seriously: a state does not move to ban what does not threaten it. The energy a government spends trying to prohibit bitcoin is itself a measure of bitcoin's relevance to monetary control. The ban is a tell.</p>
+
+    <div class="tripwire" role="note">
+      <div class="tripwire-eyebrow">We will know it's winning when</div>
+      <ul>
+        <li>The world's major economies criminalize <em>self-custody</em> simultaneously &mdash; not exchanges, not mining, but individual possession &mdash; and sustain it in concert.</li>
+        <li>A post-crackdown hashrate recovery <em>fails</em> to materialize. The 2021 episode set the baseline: a 71% drop fully repaired in months. A future ban that hashrate does not route around would be the new and worse signal.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- §2 — Infrastructure catastrophe -->
+  <section class="section risk">
+    <h3 class="risk-title"><span class="risk-num">2</span> Infrastructure catastrophe</h3>
+
+    <p class="steel"><span class="beat-label">The strongest case.</span> Bitcoin needs electricity and the internet. A sufficiently large catastrophe &mdash; a Carrington-class solar storm of the kind that struck in 1859 and narrowly missed in 2012, a high-altitude electromagnetic pulse, or a sustained partition of the global internet &mdash; could knock out power and connectivity across whole continents for months. Mining would stop. Transactions would stop. Nodes would go dark. The most apocalyptic version of the bitcoin obituary is the one where the lights simply go out.</p>
+
+    <p><span class="beat-label">The honest answer.</span> This risk turns on a distinction the rest of the page uses too: the difference between bitcoin's <em>operation</em> and bitcoin's <em>record</em>. A geomagnetic storm threatens the network's ability to process new transactions while the power is out. It does not threaten the ledger of who owns what.</p>
+    <p>Three facts carry the point. First, solar storms damage long conductors &mdash; transmission lines and grid transformers &mdash; not the small electronics in a drawer, and certainly not unpowered storage; a seed phrase stamped in steel is indifferent to space weather. (This is often confused with nuclear EMP, a different and more localized phenomenon &mdash; and even that does not reliably erase unpowered storage.) Second, the worst effects are regional and hemispheric, not uniform and global. Third, and decisively, the blockchain is not stored anywhere in particular: it is replicated in full across tens of thousands of nodes on every inhabited continent, with offline archives and satellite broadcast besides. The network needs exactly <em>one</em> surviving copy to restore the complete record, and ownership is proven by keys that exist independently of any copy. Bitcoin does not die in such an event. It pauses, and resumes wherever the power resumes, with every balance intact.</p>
+    <p>Then the comparison that the catastrophe framing invites: a disaster physically capable of destroying every copy of bitcoin's ledger on every continent at once would have destroyed the banking system's records long before it got to bitcoin. Bank ledgers live in a relative handful of concentrated data centers; there is no seed phrase in a drawer for your checking account. By the standard of monetary records, a distributed ledger replicated across the planet is among the most catastrophe-resistant ever built. The honest residual is real and worth stating plainly: in a true years-long collapse of electrical civilization, bitcoin is unusable in the interim &mdash; and so is every form of money more sophisticated than the goods in your hands. That is not a risk to bitcoin. It is a risk to everything.</p>
+
+    <div class="tripwire" role="note">
+      <div class="tripwire-eyebrow">We will know it's winning when</div>
+      <ul>
+        <li>Every full node, every offline archive, every satellite copy, and every backup is destroyed simultaneously, everywhere on earth &mdash; the conjunction states its own implausibility.</li>
+        <li>Short of that: a global connectivity partition lasting long enough that no region can re-converge the chain &mdash; a scenario in which the failure of money is the least of the day's problems.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================== PART II ===================== -->
+  <div class="part-divider">
+    <span class="part-kicker">Part II</span>
+    <h2 class="part-title">Death by economics</h2>
+    <p class="part-sub">The attacks from inside &mdash; the incentives that secure the network.</p>
+  </div>
+
+  <!-- §3 — Security budget -->
+  <section class="section risk">
+    <h3 class="risk-title"><span class="risk-num">3</span> The security budget</h3>
+    <p class="risk-flag">The strongest critique on this page &mdash; and the one most honestly unresolved.</p>
+
+    <p class="steel"><span class="beat-label">The strongest case.</span> This is the serious one, and it comes from economists, not cynics. Eric Budish's <a href="https://www.nber.org/papers/w24717" target="_blank" rel="noopener">"The Economic Limits of Bitcoin and the Blockchain"</a> formalizes it. Bitcoin's security is "memoryless": the chain is only as safe at any moment as the computing power actively defending it right then. To make a 51% attack irrational, the recurring payments to honest miners must continually exceed the one-off prize an attacker could seize &mdash; which means security spending scales with the value secured. Meanwhile the block subsidy, bitcoin's main payment to miners, halves every four years toward zero. The network is meant to replace it with transaction fees. Princeton researchers (<a href="https://www.cs.princeton.edu/~arvindn/publications/mining_CCS.pdf" target="_blank" rel="noopener">Carlsten et al.</a>) showed that a fee-only regime can become unstable on its own: when fees dominate, miners face incentives to "undercut" &mdash; to fork a fee-rich block rather than build on it &mdash; degrading the finality the whole system depends on. The pointed version: bitcoin is either too expensive to use or too cheap to defend, and the day the subsidy runs out is the day we find out which.</p>
+
+    <p><span class="beat-label">The honest answer.</span> Begin by conceding the part that is true. In the notes that became this site, the plainest line on the subject is ours: <em>the lack of an ultimate subsidy does bring uncertainty.</em> This is a real open problem, it resolves over decades rather than in an argument, and anyone who tells you it is simply solved is selling something. With that said, the picture is far from hopeless, and several mechanisms already point toward resolution.</p>
+    <p>First, the empirical floor: blocks have <em>already</em> been mined in which fees exceeded the subsidy. The fee-dominant world is not a theoretical regime the network has never glimpsed; it has happened, during periods of heavy demand, and the chain kept producing blocks. Second, structure. As base-layer block space grows scarce relative to demand, most everyday transactions move to second layers like Lightning, while the base layer increasingly settles large, batched transactions among major institutions. A single settlement transaction can carry an enormous fee while costing each of the many users batched within it very little &mdash; high aggregate security revenue, low individual burden. Third, and most easily missed: a fee that is even a modest <em>percentage</em> of the value transacted throws off ever-larger <em>absolute</em> revenue as bitcoin's price rises. Fees do not need to grow as a share of each transaction; if bitcoin's value compounds, a flat percentage produces a rising security budget in dollar terms automatically. The proposed protocol-level responses &mdash; tail emission, fee-routing sidechain designs, demand engineered onto the base layer &mdash; are real and actively debated, but the honest point is that the network may not need a redesign so much as it needs the thing it was already built to produce: a deep fee market at high valuation.</p>
+    <p>So the section ends where the critique deserves: this is bitcoin's hardest open question, and it will be answered in public, one halving at a time, over the coming decades. The mechanisms above are reasons the answer is plausibly favorable. They are not a guarantee, and the page does not pretend otherwise.</p>
+
+    <div class="tripwire" role="note">
+      <div class="tripwire-eyebrow">We will know it's winning when</div>
+      <ul>
+        <li>Fees as a share of miner revenue fail to trend upward across consecutive halvings &mdash; the multi-decade signal that the fee market is not maturing as the subsidy fades.</li>
+        <li>Hashrate declines persistently while price is flat or rising &mdash; the sign that mining economics are breaking independent of a bear market.</li>
+        <li>A reorganization of economically meaningful depth succeeds &mdash; the theoretical attack arriving in practice.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- §4 — Mining centralization -->
+  <section class="section risk">
+    <h3 class="risk-title"><span class="risk-num">4</span> Mining centralization</h3>
+
+    <p class="steel"><span class="beat-label">The strongest case.</span> Bitcoin's defense is distributed by design, but its production has concentrated. A handful of mining pools coordinate most of the network's hashrate &mdash; the top three command roughly 60% between them &mdash; and because pools build the block templates, they decide which transactions are included. That is a censorship surface: a concentrated set of pools could be pressured to filter transactions, and a single pool approaching half the network reintroduces the 51% spectre from the inside. Layer on a newer pressure: the AI and high-performance-computing boom is bidding away exactly the cheap, stranded energy that bitcoin miners depend on, potentially raising the operational floor and squeezing the small operators that keep mining diffuse.</p>
+
+    <p><span class="beat-label">The honest answer.</span> The deepest point is that bitcoin mining has remarkably few <em>structural</em> economies of scale. What a profitable mine actually needs is cheap, otherwise-wasted energy; a cool climate; and a jurisdiction that permits it &mdash; and no company, and no country, holds a monopoly on those conditions. They are scattered across the planet by geography and accident, which is precisely why, when China expelled its entire mining industry, the hashrate did not collapse into a cartel; it dispersed across continents and grew back. Mining can be economic even at small scale where the conditions are right. Access to better hardware pricing or rack space confers a marginal edge, not a moat. The thing that would have to be true for centralization to win &mdash; a durable, monopolizable advantage of scale &mdash; is the thing the activity structurally lacks.</p>
+    <p>The secondary point still matters, and it is the answer to the censorship surface specifically: pools are <em>coordination, not ownership.</em> The individual miners pointing hashrate at a pool can leave in hours, and have, whenever a pool has misbehaved &mdash; the hashrate is rented to the pool, not owned by it. And the industry is actively closing even the template-control gap: Stratum V2 moves transaction selection back to the individual miner rather than the pool operator, and has been adopted across a large share of the network. Concentration at the pool layer is real; ownership of the hashrate is not, and the censorship lever is being engineered away.</p>
+
+    <div class="tripwire" role="note">
+      <div class="tripwire-eyebrow">We will know it's winning when</div>
+      <ul>
+        <li>A single pool sustains more than half the network's hashrate &mdash; not for a transient spike, but held.</li>
+        <li>Valid transactions are routinely censored at the template layer, and miners do <em>not</em> migrate away from the pools doing it.</li>
+        <li>Stratum-V2-style miner-side template selection stalls or reverses instead of spreading.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- §5 — Custody concentration -->
+  <section class="section risk">
+    <h3 class="risk-title"><span class="risk-num">5</span> Custody concentration</h3>
+
+    <p class="steel"><span class="beat-label">The strongest case.</span> The 6102 of the modern era does not need to knock on doors. The spot-ETF era has re-intermediated a large and growing share of bitcoin into a tiny number of custodians &mdash; one firm alone safeguards the overwhelming majority of US spot-ETF coin, amounting to a meaningful fraction of all bitcoin in existence. A state that wanted to seize or freeze that bitcoin would not need a house-to-house search; it would need one subpoena. The thing that made gold confiscable &mdash; concentration in custodial hands &mdash; is being recreated voluntarily, for convenience.</p>
+
+    <p><span class="beat-label">The honest answer.</span> The concentration is real, and this page will not paper over it &mdash; <a href="/paper-bitcoin.html">Paper Bitcoin</a> maps it in full. But the decisive fact is that, for nearly everyone, custody is a <em>choice made anew every time</em>, not a structural trap. Nothing prevents an individual from holding their own keys; the people locked into custodians are mostly locked there by artificial constructs &mdash; pension structures that cannot buy bitcoin directly and so must hold an ETF for price exposure alone, for instance &mdash; rather than by anything intrinsic to bitcoin. For the ordinary holder, the paper-bitcoin risk is opt-in, and opt-out, at will.</p>
+    <p>And there is a property here that no other monetary asset of comparable value possesses: bitcoin can be self-custodied <em>at scale.</em> No one can practically take personal physical custody of a billion dollars in gold &mdash; let alone move it across a border at will &mdash; without security details, logistics, and exposure to capital controls. A billion dollars in bitcoin is held in a memorized phrase and moves anywhere on earth at the speed of the network. The concentration risk exists because custody is convenient, not because self-custody is unavailable; the reader of this page can personally change which side of that line they are on. The structural mitigation &mdash; diversified, multi-custodian models &mdash; is beginning to emerge at the institutional layer, but the individual mitigation has been available since the first block.</p>
+
+    <div class="tripwire" role="note">
+      <div class="tripwire-eyebrow">We will know it's winning when</div>
+      <ul>
+        <li>The ETF-and-custodian share of total supply keeps climbing <em>while</em> self-custody tooling gets harder to use rather than easier &mdash; the two trends that would turn a choice into a trap.</li>
+        <li>A redemption-gating or freeze event hits custodial bitcoin and the holders affected have no self-custody recourse.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================== PART III ===================== -->
+  <div class="part-divider">
+    <span class="part-kicker">Part III</span>
+    <h2 class="part-title">Death by failure</h2>
+    <p class="part-sub">The thing itself breaks &mdash; the code, the governance, the cryptography.</p>
+  </div>
+
+  <!-- §6 — Protocol catastrophe -->
+  <section class="section risk">
+    <h3 class="risk-title"><span class="risk-num">6</span> Protocol catastrophe</h3>
+
+    <p class="steel"><span class="beat-label">The strongest case.</span> It has already happened &mdash; twice. In August 2010, an integer-overflow bug let an attacker create 184 billion bitcoin in a single transaction, out of nothing. In 2018, a vulnerability (CVE-2018-17144) sat latent in Bitcoin Core that, if exploited, would have let a miner inflate the supply by spending the same input twice. Bitcoin's defining promise &mdash; 21 million, no more &mdash; was broken once and nearly broken again. And nearly all the network runs a single software implementation, Bitcoin Core: a monoculture in which one consensus bug threatens everything at once.</p>
+
+    <p><span class="beat-label">The honest answer.</span> Read correctly, these two incidents are among the strongest evidence on the page &mdash; because of how they ended. The 2010 overflow was caught and patched within about five hours; developers coordinated a corrected chain that overtook the exploited one, and the 184 billion phantom coins were erased from history by a reorganization the network agreed to honor. The 2018 bug was never exploited at all: developers executed a quiet, staged disclosure &mdash; shipping the fix described only as a minor denial-of-service patch until enough of the network had upgraded, then revealing the true severity. Both times, the 21-million cap held.</p>
+    <p>The honest reframing is to be clear about <em>what</em> held it. It was not the immutability of the code &mdash; the code had the bug. It was the social layer: developers, node operators, miners, and exchanges coordinating, fast and competently, under live fire, to reject an invalid history and enforce the monetary rule. This is the part critics miss when they call the cap "just software." The cap is enforced by tens of thousands of independent parties who each validate every block and will reject any chain that violates the rule, however much work backs it. The monoculture is a genuine fragility and the network knows it; the defense is the same one that worked twice already &mdash; the rule lives in the social consensus, not only in the binary, and that consensus has been tested in combat and held.</p>
+
+    <div class="tripwire" role="note">
+      <div class="tripwire-eyebrow">We will know it's winning when</div>
+      <ul>
+        <li>An inflation or theft bug is exploited at scale <em>before</em> a patch coordinates &mdash; the failure caught in time twice, not caught in time once.</li>
+        <li>A response fractures: the network cannot agree on which chain is valid, and the social layer that saved it before splits instead.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- §7 — Governance / ossification -->
+  <section class="section risk">
+    <h3 class="risk-title"><span class="risk-num">7</span> Governance failure and ossification</h3>
+
+    <p class="steel"><span class="beat-label">The strongest case.</span> This risk cuts both ways, and both edges are sharp. If bitcoin cannot change, it cannot fix itself &mdash; a fatal flaw the day a change becomes genuinely necessary (a quantum migration, say; see the next section). If bitcoin <em>can</em> change, it can be captured &mdash; whoever controls the upgrade process controls the money. A system has to thread between paralysis and capture, and a sufficiently determined, well-funded faction &mdash; a coalition of the largest miners and companies &mdash; might force a change the users never wanted, or block one they needed.</p>
+
+    <p><span class="beat-label">The honest answer.</span> Bitcoin has already survived its constitutional crisis, and the outcome defined the network's governance for good. During the Blocksize War of 2015&ndash;2017, a coalition representing more than 80% of hashpower and many of the largest companies in the industry tried to force a block-size increase through the New York Agreement. They lost. They lost to a user-activated soft fork &mdash; node operators, the economic majority, announcing they would reject the miners' blocks &mdash; and to a market that priced the small-block chain far above the big-block alternative in live trading before the split. The lesson was permanent: miners propose, but users running their own nodes dispose. No cartel of hashpower can impose a rule the economic majority refuses to run.</p>
+    <p>What that episode proved is that bitcoin's default state is extreme inertia, and that this inertia is a feature wearing the costume of a bug. A money whose rules can be changed easily by whoever holds the most resources is a money that can be captured; bitcoin's resistance to change is exactly what makes its 21-million cap and its censorship-resistance credible. The risk does not vanish &mdash; it relocates to the genuinely hard case, the one the next section raises: what happens if a change is not merely contentious but <em>security-necessary</em>, and the same inertia that repels capture also repels the fix. That is the real test of bitcoin governance, and it has not yet come.</p>
+
+    <div class="tripwire" role="note">
+      <div class="tripwire-eyebrow">We will know it's winning when</div>
+      <ul>
+        <li>A security-necessary change cannot activate &mdash; the network needs to move, and ossification prevents it. (Our own earlier note put it most simply: we will know ossification has won when the first genuinely needed soft fork fails to activate.)</li>
+        <li>Its mirror: a contentious change <em>is</em> imposed over the sustained objection of a significant economic minority &mdash; capture beating consensus.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- §8 — Quantum -->
+  <section class="section risk">
+    <h3 class="risk-title"><span class="risk-num">8</span> Quantum computing</h3>
+    <p class="risk-flag">The one risk with a clock on it.</p>
+
+    <p class="steel"><span class="beat-label">The strongest case.</span> Bitcoin's ownership is protected by elliptic-curve cryptography, and elliptic-curve cryptography is exactly what a large quantum computer running Shor's algorithm is built to break. The threat stopped being abstract in March 2026, when <a href="https://research.google/blog/safeguarding-cryptocurrency-by-disclosing-quantum-vulnerabilities-responsibly/" target="_blank" rel="noopener">Google Quantum AI published</a> resource estimates roughly an order of magnitude below prior work: breaking bitcoin's curve might need fewer than 1,200 logical qubits and under 500,000 physical qubits &mdash; and could derive a private key from an exposed public key in minutes. Because a block takes about ten, that raises an "on-spend" attack: watch the mempool, crack the key of a transaction in flight, and front-run the owner with a forged spend. A large share of all bitcoin &mdash; the early coins stored as raw public keys, including Satoshi's, plus every address ever reused &mdash; sits in the exposed category. The paper's own line is the one to sit with: it is conceivable that the first cryptographically relevant quantum computer is detected not by announcement but on the blockchain.</p>
+
+    <p><span class="beat-label">The honest answer.</span> Take the threat at full strength and then locate it precisely. The exposure is to <em>signatures</em>, not to mining: bitcoin's mining algorithm, SHA-256, is only mildly weakened by quantum methods, and the difficulty adjustment absorbs the rest. The danger is to keys, and it is real &mdash; but it is also the most telegraphed risk on this page, with a defense whose pieces already exist. Post-quantum signature standards were finalized in 2024; quantum-resistant address designs are specified and waiting; and the qubit hardware, while advancing fast, remains far enough from the required scale that the migration window is open. The clock is real, but it is not yet midnight, and everyone can read the face.</p>
+    <p>The genuine difficulty is not cryptographic but exactly the governance problem of the previous section. Migrating the network means a coordinated upgrade &mdash; costly in block space, since post-quantum signatures are far larger &mdash; and, hardest of all, it forces a decision about the millions of bitcoin in old exposed addresses whose owners are gone or silent, Satoshi's among them. Leave them as they are, and a future quantum attacker inherits them. Freeze them to prevent that, and the network has violated the property-rights absolutism that is its whole point. There is no comfortable answer, and this is where ossification gets its real examination: the one change bitcoin may someday truly need is also the most contentious it could attempt. The page's honest position is that the defense is feasible and the timeline is watchable &mdash; and that the hard part was always going to be the politics, not the math.</p>
+
+    <div class="tripwire" role="note">
+      <div class="tripwire-eyebrow">We will know it's winning when</div>
+      <ul>
+        <li>A quantum computer publicly solves even a small-curve version of the problem &mdash; on the researchers' own logic, a demonstration at 32 bits would mean migration has already failed to keep pace.</li>
+        <li>Logical-qubit counts climb toward the four-figure threshold while post-quantum migration proposals remain unactivated and the standards deadlines pass.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- §9 — Privacy trap -->
+  <section class="section risk">
+    <h3 class="risk-title"><span class="risk-num">9</span> The privacy trap</h3>
+
+    <p class="steel"><span class="beat-label">The strongest case.</span> Bitcoin's ledger is fully public, which makes it arguably the most surveillable money ever built. Every transaction is permanent and visible; analytics firms cluster addresses into identities using well-understood heuristics; and the moment coins touch a KYC exchange, the pseudonym attaches to a name. A transparent monetary network is a panopticon waiting for the surveillance state to finish wiring it &mdash; and the tools that try to restore privacy get their developers arrested.</p>
+
+    <p><span class="beat-label">The honest answer.</span> The transparency is real and the surveillance concern is legitimate &mdash; but the page has to name what the transparency <em>buys</em>, because it is the thing bitcoiners will not trade away: <em>anyone can audit the 21-million supply.</em> Every node verifies, from plain arithmetic, that not one coin was created out of turn. That is exactly the check that caught the 2010 overflow and would catch the next one. The strongest base-layer privacy upgrades &mdash; confidential transactions that hide amounts &mdash; trade this away: once amounts are encrypted, proof that no inflation occurred shifts from public arithmetic to complex cryptography, and a single soundness bug becomes <em>invisible counterfeiting</em>, undetectable by construction, as has happened on other chains. The network's choice is deliberate: keep the base layer transparent and auditable, and build privacy at higher layers where a cryptographic failure cannot silently break the supply. That is a real cost, honestly incurred, for a reason &mdash; the auditability of the cap is load-bearing, and trading it for base-layer privacy would remove the very property that let bitcoin survive its worst bugs.</p>
+
+    <div class="tripwire" role="note">
+      <div class="tripwire-eyebrow">We will know it's winning when</div>
+      <ul>
+        <li>A base-layer change that breaks public supply auditability gains real consensus traction &mdash; privacy purchased at the price of the cap's verifiability.</li>
+        <li>Or the inverse: chain surveillance and KYC chokepoints measurably suppress self-custody, driving ordinary users into custodians for fear of holding traceable coins.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================== PART IV ===================== -->
+  <div class="part-divider">
+    <span class="part-kicker">Part IV</span>
+    <h2 class="part-title">Death by irrelevance</h2>
+    <p class="part-sub">Nobody attacks &mdash; people simply leave.</p>
+  </div>
+
+  <!-- §10 — Bitcoin 2.0, stagnation, containment -->
+  <section class="section risk">
+    <h3 class="risk-title"><span class="risk-num">10</span> A better coin, a slow fade, a quiet squeeze</h3>
+
+    <p class="steel"><span class="beat-label">The strongest case.</span> No attack is required for bitcoin to fail; indifference would do. Two versions. The first: a technically superior successor &mdash; quantum-resistant from genesis, fairer in its mining, faster by design &mdash; out-innovates an ossified incumbent the way every technology eventually yields to a better one. The second needs no rival at all: demand simply decays. Bitcoin's price has leaned on a few committed institutional buyers; if they reach their limits or change their minds, the marginal buyer evaporates. Governments need not ban it &mdash; they can contain it, with punitive bank-capital rules, with a tax code that treats every coffee bought in bitcoin as a taxable disposal, with state-blessed stablecoins and digital currencies offering the convenience without the property. Bitcoin could end not with a prohibition but with a shrug.</p>
+
+    <p><span class="beat-label">The honest answer.</span> Take the successor argument first, because it sounds the most modern and is the most mistaken about what bitcoin is. Monetary goods do not compete on features. The Blocksize War already ran this experiment at full scale: a better-specified, higher-throughput fork, backed by most of the industry, lost to the original because monetary credibility, not throughput, is the product &mdash; and the market priced it that way in live trading. The deeper reasons compound. As Adam Back puts it, bitcoin was <em>discovered</em> more than invented: it sits in a design space so narrow that improving any one property &mdash; more speed, more privacy, more flexibility &mdash; degrades another and breaks the whole. It solved the double-spend problem and the Byzantine generals problem, and you do not earn credibility by solving foundational problems that are already solved; you earn it by being the chain that solved them first and has run untouched since. (Our <a href="/trilemma.html">Trilemma</a> page makes the structural version of this case: bitcoin's tradeoffs are the correct ones, not an accident waiting to be improved upon.) It is, today, the longest chain with the most accumulated proof-of-work in existence &mdash; the literal foundation any successor would have to out-build from zero. And every would-be successor arrives with a tell: a founding team and a pre-mine, a concentration of coins and control at genesis that destroys the very credibility it would need to displace a money with no owner. Bitcoin is a protocol that has taken hold the way SMTP took hold for email or TCP/IP for the internet &mdash; technically superior replacements have existed for years and go unused, because the value was never in the features; it was in the universal, entrenched, trusted standard.</p>
+    <p>The decay argument is more serious, because it requires no villain. But containment is policy, policy is set jurisdiction by jurisdiction, and jurisdictions compete &mdash; the same one-way-street logic that destabilizes a ban cartel erodes a containment regime: the economy that taxes bitcoin into uselessness exports its activity to the one that does not. The friction is real today &mdash; the absence of a small-transaction tax exemption genuinely suppresses everyday use &mdash; but it is contingent, legislative, and reversible, not structural. And the demand case rests on a claim about human preference that the last seventeen years have steadily undercut: each cycle of supposed disinterest has been followed by a wider base of holders, not a narrower one. Indifference is a real way for bitcoin to fade. It is just not the way to bet, on the evidence so far.</p>
+
+    <div class="tripwire" role="note">
+      <div class="tripwire-eyebrow">We will know it's winning when</div>
+      <ul>
+        <li>A monetary challenger sustains a meaningful fraction of bitcoin's market value across a full cycle &mdash; not a bull-market spike, but a held position through a drawdown.</li>
+        <li>On-chain settlement value and the count of self-custodying users decline across a full cycle, independent of price &mdash; the signature of genuine disinterest rather than a bear market.</li>
+        <li>Containment friction &mdash; transaction taxation, bank-capital penalties &mdash; <em>increases</em> across the major economies over a decade rather than competing itself away.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- §B — The honest scoreboard -->
+  <section class="section scoreboard-section">
+    <h2>The honest scoreboard</h2>
+    <p>The obituaries and the maximalists make the same mistake from opposite directions: one insists bitcoin is already dead, the other that it cannot die. Neither grades the risks. Here is the grade.</p>
+
+    <div class="scoreboard">
+      <div class="score-tier">
+        <div class="score-label score-survived">Tested and survived</div>
+        <p>The state ban &mdash; China ran it six times, and hardest in 2021; the hashrate recovered in months. The protocol bug &mdash; twice, in 2010 and 2018, and the 21-million cap held both times. Governance capture &mdash; attempted in 2017 by 80% of hashpower, and defeated by the users. These are not hypotheticals the page is reassuring you about. They are attacks that happened and failed.</p>
+      </div>
+      <div class="score-tier">
+        <div class="score-label score-watched">Live and watched</div>
+        <p>The security budget &mdash; structurally unresolved, resolving over decades, with real mechanisms pointing toward a deep fee market but no guarantee. Quantum &mdash; the one with a clock, defensible on a watchable timeline, hard in its politics rather than its math. Custody concentration &mdash; trending the wrong way at the institutional layer, fully optional at the individual one. These are the risks worth actually watching, by the markers each section named.</p>
+      </div>
+      <div class="score-tier">
+        <div class="score-label score-shared">Catastrophic but shared</div>
+        <p>Infrastructure collapse on a civilization-ending scale would take bitcoin down with everything else &mdash; which makes it a risk to money as a category, not to bitcoin in particular.</p>
+      </div>
+    </div>
+
+    <p class="scoreboard-close">Notice the shape of the list. The risks that have been <em>tested</em> are the ones bitcoin survived &mdash; and it survived them, repeatedly, not by adapting but by refusing to. The risks that remain genuinely open are open precisely because they have not yet been tested in full. That is what it looks like when resilience is a property rather than a streak: the thing keeps being attacked, in new ways, and keeps being here. Seventeen years of obituaries have a common author's error &mdash; each one mistook a risk it could see for a verdict it could not.</p>
+    <p class="scoreboard-bridge">This is also exactly why position sizing exists. Bitcoin can be hurt; the ways are specific, and some are unresolved. An honest holder does not respond to that by betting everything or nothing, but by sizing a position to survive the risks that are real &mdash; which is the entire subject of <a href="/how-much-bitcoin.html">How Much Bitcoin?</a>, the sister page to this one. The risks on this page are the reason that the answer there is a fraction, and never all of it.</p>
+  </section>
+
+  <!-- Sources -->
+  <section class="section sources-block">
+    <h2 class="sources-title">Sources &amp; further reading</h2>
+    <ul class="sources-list">
+      <li>Eric Budish, <a href="https://www.nber.org/papers/w24717" target="_blank" rel="noopener">"The Economic Limits of Bitcoin and the Blockchain"</a> (NBER) &mdash; the formal flow-vs-stock argument on security cost.</li>
+      <li>Carlsten, Kalodner, Weinberg, Narayanan, <a href="https://www.cs.princeton.edu/~arvindn/publications/mining_CCS.pdf" target="_blank" rel="noopener">"On the Instability of Bitcoin Without the Block Reward"</a> (Princeton) &mdash; fee-only mining instability and undercutting.</li>
+      <li>Google Quantum AI, <a href="https://research.google/blog/safeguarding-cryptocurrency-by-disclosing-quantum-vulnerabilities-responsibly/" target="_blank" rel="noopener">"Safeguarding cryptocurrency by disclosing quantum vulnerabilities responsibly"</a> (March 2026) &mdash; the revised qubit resource estimates for breaking secp256k1.</li>
+      <li>Norton Rose Fulbright, <a href="https://www.nortonrosefulbright.com/en/knowledge/publications/4ea238ef/china-rolls-out-updated-crypto-framework-establishing-the-legal-regime-for-rwa-tokenization" target="_blank" rel="noopener">analysis of China's 2026 Circular 42</a> &mdash; the latest of six escalating prohibition rounds since 2009.</li>
+      <li>Jonathan Bier, <em>The Blocksize War</em> (2021) &mdash; the definitive account of the 2015&ndash;2017 governance crisis and its resolution by user-activated soft fork.</li>
+      <li>Bitcoin Core, <a href="https://bitcoincore.org/en/2018/09/20/notice/" target="_blank" rel="noopener">CVE-2018-17144 disclosure</a> &mdash; the 2018 inflation vulnerability and its staged, coordinated patch.</li>
+    </ul>
+  </section>
+
+  {% include 'components/companion-content.njk' %}
+
+</div>
