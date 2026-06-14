@@ -18,8 +18,8 @@ eleventyComputed:
   <!-- HEADER -->
   <header class="dl-header">
     <span class="dl-draft-flag">Draft &middot; noindex</span>
-    <h1>The <em>Doubling</em> Ladder</h1>
-    <p class="dl-subtitle">Bitcoin's price doublings come at a strangely regular cadence &mdash; about 12.8% more days of life per rung. That regularity is real. What it means is more interesting, and more honest, than &ldquo;Bitcoin doubles on a clock.&rdquo;</p>
+    <h1>The Bitcoin <em>Doubling</em> Ladder</h1>
+    <p class="dl-subtitle">Bitcoin's price has doubled, on the trend, roughly every 12.8% of the way through its life so far &mdash; a steady cadence it has kept since the genesis block in 2009. That regularity is real. What it means is more interesting, and more honest, than &ldquo;Bitcoin doubles on a clock.&rdquo;</p>
   </header>
 
   <!-- ATTRIBUTION (prominent, near the top) -->
@@ -31,7 +31,7 @@ eleventyComputed:
   <!-- THESIS -->
   <section class="dl-hero">
     <div class="dl-hero-stat">Each price doubling takes a fixed <em>percentage</em> longer in days &mdash; not a fixed number of years.</div>
-    <p class="dl-hero-body">In Mezinskis's table, every doubling of the trend takes roughly <strong>12.8% more</strong> days-of-life than the one before. It looks like a hidden metronome. It is not. It is the <em>arithmetic fingerprint of a power law</em> &mdash; and once you see why, the regularity stops being mystical and becomes something you can check.</p>
+    <p class="dl-hero-body">In Mezinskis's table, every doubling of the trend takes roughly <strong>12.8% more</strong> days-of-life than the one before. It looks like a hidden metronome. It is not. It is the <em>arithmetic fingerprint of a power law</em> &mdash; and once you see why, the regularity stops being mystical and becomes something you can check against the actual record.</p>
   </section>
 
   <!-- WHAT IT IS (and isn't) -->
@@ -42,7 +42,7 @@ eleventyComputed:
     <div class="dl-insight">
       <p>The ~12.8%-per-doubling cadence isn't bitcoin keeping time. It is what <em>any</em> power law of exponent 5.76 must do, by algebra alone. The regularity is in the math, not in the market.</p>
     </div>
-    <p>This matters because it kills a tempting misreading. The ladder does <strong>not</strong> say &ldquo;bitcoin doubles every N years.&rdquo; A fixed 12.8% of a growing age means each doubling takes <em>longer in calendar time</em> than the last: 128 days when the network is 1,000 days old, but 766 days when it is 6,000. The cadence is constant in proportion and stretching in years. Saying otherwise &mdash; treating the rungs as a schedule &mdash; is the single most common way the Power Law gets misused. So we say it plainly: <strong>the ladder is a consequence of the exponent, not a promise about the calendar.</strong></p>
+    <p>This matters because it kills a tempting misreading. The ladder does <strong>not</strong> say &ldquo;bitcoin doubles every N years.&rdquo; A fixed 12.8% of a growing age means each doubling takes <em>longer in calendar time</em> than the last: 128 days when the network was 1,000 days old, but 766 days when it was 6,000 days old. The cadence is constant in proportion and stretching in years. Saying otherwise &mdash; treating the rungs as a schedule &mdash; is the single most common way the Power Law gets misused. So we say it plainly: <strong>the ladder is a consequence of the exponent, not a promise about the calendar.</strong></p>
   </section>
 
   <!-- VISUAL A — THE DOUBLING LADDER -->
@@ -51,15 +51,15 @@ eleventyComputed:
     <div class="dl-chart-title">The Doubling Ladder</div>
     <div class="dl-chart-subtitle">The trend's price doublings as a log-log staircase, from $0.06 to a projected ~$2M. Diamonds mark where the market <em>actually</em> first reached each rung &mdash; left of a rung means it got there early, in a mania; right means it lagged. Hover any rung for the lead or lag in days.</div>
     <div class="dl-chart-wrapper"><canvas id="ladderChart"></canvas></div>
-    <div class="dl-chart-source"><strong>Read it like a stylus on a record:</strong> the amber staircase is where the trend says each level &ldquo;should&rdquo; arrive. The green diamonds &mdash; clustered far to the left in 2011 and 2013 and 2017 &mdash; are the manias overshooting years ahead of schedule. The 2017 run reached $15,729 roughly <strong>1,089 days</strong> before the trend did. Source: trend levels from <em>price = 1.69&times;10<sup>&minus;17</sup> &middot; day<sup>5.763</sup></em>; first-crossing dates from daily history (Blockchain.info, all-time).</div>
+    <div class="dl-chart-source"><strong>Read it like a stylus on a record:</strong> the amber staircase is where the trend says each level &ldquo;should&rdquo; arrive. The green diamonds &mdash; clustered far to the left in 2011 and 2013 and 2017 &mdash; are the manias overshooting years ahead of schedule. The 2017 run reached $15,729 roughly <strong>1,089 days</strong> before the trend did. The blue line is bitcoin's monthly high &mdash; watch it rocket through several rungs at once in each mania, then sag below the staircase in the bears. Source: trend levels from <em>price = 1.69&times;10<sup>&minus;17</sup> &middot; day<sup>5.763</sup></em>; first-crossing dates and monthly highs from daily history (Blockchain.info, all-time).</div>
   </div>
 
   <!-- THE TURN — gravity not clockwork -->
   <section class="dl-section">
     <h2>Gravity, not clockwork</h2>
-    <p>If the ladder is &ldquo;just algebra,&rdquo; where is the genuinely remarkable part? Here: across more than fifteen years, the <em>actual</em> price has spent the whole time misbehaving &mdash; overshooting wildly in every mania, crashing far below in every bear &mdash; and yet, averaged over its entire life, it sits almost exactly <strong>on</strong> the trendline.</p>
-    <p class="dl-pull">The trend doesn't tick like a clock. It pulls like <em>gravity</em>. Price is always somewhere it shouldn't be, and always being dragged back.</p>
-    <p>Measure the distance from trend month by month &mdash; <em>ln(actual&nbsp;&divide;&nbsp;trend)</em> &mdash; and the record is not centred on order. It is a series of enormous excursions: up to <strong>+2.5</strong> in the 2011 and 2013 frenzies (roughly twelve times the trend), down past <strong>&minus;0.9</strong> in the deepest bear troughs. But sum all 191 months and the mean log-deviation is <strong>+0.014</strong> &mdash; a whisker above the line. The median month sits <em>below</em> trend; only about <strong>41%</strong> of months close above it. The average is held near zero not by calm, but by a few violent overshoots balancing many quiet undershoots.</p>
+    <p>If the ladder is &ldquo;just algebra,&rdquo; where is the genuinely remarkable part? Here: across more than fifteen years, the <em>actual</em> price has spent the whole time misbehaving &mdash; overshooting wildly in every mania, crashing far below in every bear market &mdash; and yet, averaged over its entire life, it sits almost exactly <strong>on</strong> the trendline.</p>
+    <p class="dl-pull">The trend doesn't tick like a clock. It pulls like <em>gravity</em>. Price is always somewhere it shouldn't be, and always being dragged back &mdash; reversion to the mean.</p>
+    <p>Measure the distance from trend month by month &mdash; <em>ln(actual&nbsp;&divide;&nbsp;trend)</em> &mdash; and the record is anything but orderly. It is a series of enormous excursions: up to <strong>+2.5</strong> in the 2011 and 2013 frenzies (roughly twelve times the trend), down past <strong>&minus;0.9</strong> in the deepest bear troughs. But sum all 191 months and the mean log-deviation is <strong>+0.014</strong> &mdash; a whisker above the line. The median month sits <em>below</em> trend; only about <strong>41%</strong> of months close above it. The average is held near zero not by calm, but by a few violent overshoots balancing many quiet undershoots.</p>
   </section>
 
   <!-- VISUAL B — THE DEVIATION WAVE (centerpiece) -->
@@ -99,7 +99,7 @@ eleventyComputed:
   <!-- CAVEATS -->
   <div class="dl-caveats">
     <h3>What this is &mdash; and isn&rsquo;t</h3>
-    <p>The doubling cadence is arithmetic; the adherence to trend is the empirical claim. Only the second can fail, and it is the one worth watching. The trend is an observed regularity across fifteen years, not a law of nature, and not a guarantee about the next fifteen.</p>
+    <p>The doubling cadence is arithmetic; the adherence to trend is the empirical claim. Only the second can fail, and it is the one worth watching. The trend is an observed regularity across fifteen years, not a law of nature, and not a guarantee about the next fifteen. That said, the fit is strong &mdash; the trend has held a ~95% R&sup2; across fifteen years, and the channel floor tighter still &mdash; and the model's value is in expectations, not promises. Being far below the trend, as bitcoin periodically is, has historically preceded a more favorable forward setup; being far above it, the reverse. The discipline is to read the ladder as a center of gravity to reason from, not a schedule to count on.</p>
     <p>The exponent is sensitive to how you fit it &mdash; the honest core of this page. Using the canonical Porkopolis / Santostasi coefficients (<em>a&nbsp;=&nbsp;1.69&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.763</em>), an ordinary least-squares fit through end-2023 reproduces <em>b&nbsp;&asymp;&nbsp;5.77</em>. A naive fit over the <em>entire</em> series through 2026 instead yields <em>b&nbsp;&asymp;&nbsp;5.63</em>, because recent prices have run slightly under the steep early-fitted trend. The cadence shifts with the exponent: 12.8% per doubling at <em>b&nbsp;=&nbsp;5.76</em>, about 13.1% at <em>b&nbsp;=&nbsp;5.63</em>. We use the canonical value and flag the spread rather than hide it.</p>
     <p>Future rungs &mdash; everything above today's price &mdash; are projections of the trend, not predictions of when the market will arrive. Past rungs show the market reaching levels years early or, occasionally, late; there is no reason the future will be tidier. Treat the upper ladder as a scenario to reason from, never a timetable.</p>
   </div>

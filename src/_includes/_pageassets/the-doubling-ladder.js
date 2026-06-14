@@ -96,6 +96,40 @@ var DEVIATION = [
   [6296,-0.6857],[6326,-0.5854],[6357,-0.6407],[6371,-0.7886]
 ];
 
+// ── MONTHLY_HIGH: [daySinceGenesis (of the month's high), highest daily
+//    price that month]. Same daily Blockchain.info series as LADDER /
+//    DEVIATION; the highest close in each calendar month. Drawn as a
+//    continuous line on Visual A so the mania spikes are legible — one
+//    run sweeps near-vertically through several rungs at once. ──
+var MONTHLY_HIGH = [
+  [592,0.07],[621,0.15],[662,0.19],[674,0.47],[726,0.3],[758,0.48],[771,1],[788,0.97],[847,3],
+  [874,9],[889,34],[909,17],[940,15],[971,9],[1001,5],[1034,3],[1092,4],[1101,7],[1126,6],
+  [1167,5],[1205,5],[1238,5],[1266,7],[1296,10],[1323,15],[1357,13],[1371,13],[1424,13],
+  [1442,14],[1489,20],[1517,31],[1548,92],[1558,231],[1579,139],[1611,129],[1670,108],
+  [1701,125],[1719,139],[1761,216],[1792,1134],[1797,1137],[1830,916],[1856,817],[1886,682],
+  [1930,526],[1974,621],[1978,670],[2007,650],[2037,596],[2071,489],[2111,402],[2140,420],
+  [2160,380],[2189,321],[2234,258],[2259,297],[2284,261],[2317,243],[2369,256],[2382,311],
+  [2405,285],[2440,244],[2492,328],[2497,408],[2538,464],[2561,459],[2606,438],[2614,437],
+  [2671,468],[2703,527],[2722,765],[2738,701],[2767,624],[2806,625],[2857,712],[2878,751],
+  [2917,976],[2924,1109],[2978,1194],[2982,1287],[3039,1333],[3064,2421],[3082,2955],
+  [3121,2840],[3161,4595],[3164,4908],[3222,6136],[3252,9919],[3270,19280],[3291,17156],
+  [3336,11246],[3348,11517],[3399,9658],[3410,9838],[3439,7714],[3490,8418],[3497,7735],
+  [3532,7359],[3566,6641],[3596,6537],[3620,4188],[3656,4072],[3704,4140],[3738,4116],
+  [3763,5518],[3797,8770],[3827,12933],[3840,12587],[3870,11996],[3896,10621],[3950,9552],
+  [3958,9418],[3984,7558],[4045,9502],[4060,10369],[4081,9156],[4135,8778],[4143,10002],
+  [4168,10204],[4227,11115],[4245,12294],[4260,11923],[4316,13651],[4344,19173],[4380,28857],
+  [4389,40670],[4433,57488],[4453,61259],[4484,63554],[4509,58929],[4546,40526],[4592,42214],
+  [4616,49524],[4630,52677],[4674,66064],[4693,67562],[4716,57230],[4747,47763],[4792,44536],
+  [4834,47448],[4840,46611],[4870,39675],[4897,31776],[4955,23856],[4971,24447],[5001,22393],
+  [5048,20816],[5055,21293],[5094,17802],[5140,23756],[5162,24835],[5199,28356],[5215,30486],
+  [5236,29535],[5289,30699],[5305,31485],[5331,29768],[5373,27222],[5413,34532],[5430,37891],
+  [5453,44184],[5484,46972],[5535,62499],[5549,73094],[5575,71646],[5617,71443],[5633,71084],
+  [5686,68257],[5690,65298],[5748,65888],[5779,72706],[5803,99012],[5828,106156],[5863,106158],
+  [5873,102406],[5903,94256],[5960,94998],[5984,111722],[6002,110300],[6045,120001],
+  [6067,123359],[6103,117129],[6121,124777],[6148,110602],[6179,93468],[6221,96932],
+  [6240,78680],[6282,74860],[6323,78649],[6337,82146],[6358,73571]
+];
+
 // ── helpers ──────────────────────────────────────────────────────────
 function dlDateFromDay(d){
   var dt = new Date(GENESIS_TS*1000 + d*86400*1000);
@@ -138,6 +172,9 @@ function dlYearTicks(axis){
     var pt = {x:r.aDay, y:r.lvl, rung:r};
     (r.lead >= 0 ? earlyDots : lateDots).push(pt);
   });
+  // Actual monthly-high price, connected — the line that sweeps through
+  // several rungs in a mania and sags below the staircase in a bear.
+  var monthlyHigh = MONTHLY_HIGH.map(function(m){ return {x:m[0], y:m[1]}; });
 
   function rungTooltip(item){
     var r = item.raw.rung; if(!r) return '';
@@ -154,7 +191,9 @@ function dlYearTicks(axis){
     type: 'scatter',
     data: { datasets: [
       { label:'Trend staircase', data:staircase, type:'line', showLine:true, stepped:true,
-        borderColor:'rgba(224,148,34,0.55)', borderWidth:1.6, pointRadius:0, fill:false, order:4 },
+        borderColor:'rgba(224,148,34,0.55)', borderWidth:1.6, pointRadius:0, fill:false, order:6 },
+      { label:'Monthly high (actual)', data:monthlyHigh, type:'line', showLine:true,
+        borderColor:'rgba(92,158,173,0.75)', borderWidth:1.2, pointRadius:0, fill:false, tension:0.1, order:5 },
       { label:'Trend doubling level', data:trendDots, pointRadius:4, pointHoverRadius:6,
         pointBackgroundColor:'#e09422', pointBorderColor:'#e09422', order:3 },
       { label:'First reached early (mania)', data:earlyDots, pointRadius:4.5, pointHoverRadius:6.5,
@@ -197,8 +236,8 @@ function dlYearTicks(axis){
         tooltip:{ backgroundColor:'rgba(10,9,8,0.95)', titleColor:'#f2eee8', bodyColor:'#d0c8c0',
           borderColor:'rgba(247,147,26,0.3)', borderWidth:1, padding:12, displayColors:false,
           callbacks:{
-            title:function(items){ var r=items[0].raw.rung; return r ? 'Doubling to ' + dlFmtUSD(r.lvl) : ''; },
-            label:function(item){ return rungTooltip(item); },
+            title:function(items){ var raw=items[0].raw; return raw.rung ? 'Doubling to ' + dlFmtUSD(raw.rung.lvl) : dlDateFromDay(raw.x); },
+            label:function(item){ return item.raw.rung ? rungTooltip(item) : 'Monthly high: ' + dlFmtUSD(item.raw.y); },
             beforeBody:function(){ return ''; }
           }
         }
