@@ -1,0 +1,128 @@
+---
+layout: base.njk
+permalink: /the-doubling-ladder.html
+slug: the-doubling-ladder
+related:
+  - slug: the-power-law
+    desc: "The parent framework. This page is its arithmetic companion — where the Power Law shows the channel, the Doubling Ladder shows what the per-doubling regularity actually is, and is not."
+  - slug: the-fixed-pie
+    desc: "The supply-side basis the trend leans on. A fixed share of a growing network is the structural underpinning beneath the ladder's rungs."
+companion: []
+eleventyComputed:
+  head_extras: "{% include '_pageassets/the-doubling-ladder-head.html' %}"
+  page_styles: "{% include '_pageassets/the-doubling-ladder.css' %}"
+  page_scripts: "{% include '_pageassets/the-doubling-ladder.js' %}"
+---
+<div class="dl-page">
+
+  <!-- HEADER -->
+  <header class="dl-header">
+    <span class="dl-draft-flag">Draft &middot; noindex</span>
+    <h1>The <em>Doubling</em> Ladder</h1>
+    <p class="dl-subtitle">Bitcoin's price doublings come at a strangely regular cadence &mdash; about 12.8% more days of life per rung. That regularity is real. What it means is more interesting, and more honest, than &ldquo;Bitcoin doubles on a clock.&rdquo;</p>
+  </header>
+
+  <!-- ATTRIBUTION (prominent, near the top) -->
+  <div class="dl-attribution">
+    <div class="dl-attribution-label">Lineage &amp; attribution</div>
+    <p>This page builds directly on the doubling-cadence framing of <strong>Matthew Mezinskis</strong> (<a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">Porkopolis Economics &middot; porkopolis.io/thechart</a>), whose published table first laid the per-doubling progression out as a ladder. The underlying power-law theory it rests on originates with <strong>Dr.&nbsp;Giovanni Santostasi</strong>, and the earliest logarithmic-regression sketch of Bitcoin's price came from the pseudonymous <strong>Trolololo</strong> (<a href="https://bitcointalk.org/index.php?topic=831547.0" target="_blank" rel="noopener">BitcoinTalk, 2014</a>). The reframing, the deviation analysis, and any errors here are this site's own.</p>
+  </div>
+
+  <!-- THESIS -->
+  <section class="dl-hero">
+    <div class="dl-hero-stat">Each price doubling takes a fixed <em>percentage</em> longer in days &mdash; not a fixed number of years.</div>
+    <p class="dl-hero-body">In Mezinskis's table, every doubling of the trend takes roughly <strong>12.8% more</strong> days-of-life than the one before. It looks like a hidden metronome. It is not. It is the <em>arithmetic fingerprint of a power law</em> &mdash; and once you see why, the regularity stops being mystical and becomes something you can check.</p>
+  </section>
+
+  <!-- WHAT IT IS (and isn't) -->
+  <section class="dl-section">
+    <h2>The fingerprint, not the clock</h2>
+    <p>Start from the model this site documents in <a href="/the-power-law.html">The Power Law</a>: the trend price is <em>price = a &middot; day<sup>b</sup></em>, where <em>day</em> is Bitcoin's age in days since the Genesis block (3&nbsp;January&nbsp;2009) and the exponent <em>b</em> is about 5.76.</p>
+    <p>Ask how long it takes the trend to double. If <em>a&nbsp;&middot;&nbsp;day<sub>2</sub><sup>b</sup>&nbsp;=&nbsp;2&nbsp;&middot;&nbsp;a&nbsp;&middot;&nbsp;day<sub>1</sub><sup>b</sup></em>, then <em>day<sub>2</sub>&nbsp;&divide;&nbsp;day<sub>1</sub>&nbsp;=&nbsp;2<sup>1/b</sup></em>. With <em>b&nbsp;&asymp;&nbsp;5.76</em>, that ratio is <strong>2<sup>1/5.76</sup>&nbsp;&asymp;&nbsp;1.128</strong>. Every doubling requires the network to get about <strong>12.8% older</strong> &mdash; always the same percentage, forever.</p>
+    <div class="dl-insight">
+      <p>The ~12.8%-per-doubling cadence isn't bitcoin keeping time. It is what <em>any</em> power law of exponent 5.76 must do, by algebra alone. The regularity is in the math, not in the market.</p>
+    </div>
+    <p>This matters because it kills a tempting misreading. The ladder does <strong>not</strong> say &ldquo;bitcoin doubles every N years.&rdquo; A fixed 12.8% of a growing age means each doubling takes <em>longer in calendar time</em> than the last: 128 days when the network is 1,000 days old, but 766 days when it is 6,000. The cadence is constant in proportion and stretching in years. Saying otherwise &mdash; treating the rungs as a schedule &mdash; is the single most common way the Power Law gets misused. So we say it plainly: <strong>the ladder is a consequence of the exponent, not a promise about the calendar.</strong></p>
+  </section>
+
+  <!-- VISUAL A — THE DOUBLING LADDER -->
+  <div class="dl-chart-container">
+    <div class="dl-chart-kicker">Visual A</div>
+    <div class="dl-chart-title">The Doubling Ladder</div>
+    <div class="dl-chart-subtitle">The trend's price doublings as a log-log staircase, from $0.06 to a projected ~$2M. Diamonds mark where the market <em>actually</em> first reached each rung &mdash; left of a rung means it got there early, in a mania; right means it lagged. Hover any rung for the lead or lag in days.</div>
+    <div class="dl-chart-wrapper"><canvas id="ladderChart"></canvas></div>
+    <div class="dl-chart-source"><strong>Read it like a stylus on a record:</strong> the amber staircase is where the trend says each level &ldquo;should&rdquo; arrive. The green diamonds &mdash; clustered far to the left in 2011 and 2013 and 2017 &mdash; are the manias overshooting years ahead of schedule. The 2017 run reached $15,729 roughly <strong>1,089 days</strong> before the trend did. Source: trend levels from <em>price = 1.69&times;10<sup>&minus;17</sup> &middot; day<sup>5.763</sup></em>; first-crossing dates from daily history (Blockchain.info, all-time).</div>
+  </div>
+
+  <!-- THE TURN — gravity not clockwork -->
+  <section class="dl-section">
+    <h2>Gravity, not clockwork</h2>
+    <p>If the ladder is &ldquo;just algebra,&rdquo; where is the genuinely remarkable part? Here: across more than fifteen years, the <em>actual</em> price has spent the whole time misbehaving &mdash; overshooting wildly in every mania, crashing far below in every bear &mdash; and yet, averaged over its entire life, it sits almost exactly <strong>on</strong> the trendline.</p>
+    <p class="dl-pull">The trend doesn't tick like a clock. It pulls like <em>gravity</em>. Price is always somewhere it shouldn't be, and always being dragged back.</p>
+    <p>Measure the distance from trend month by month &mdash; <em>ln(actual&nbsp;&divide;&nbsp;trend)</em> &mdash; and the record is not centred on order. It is a series of enormous excursions: up to <strong>+2.5</strong> in the 2011 and 2013 frenzies (roughly twelve times the trend), down past <strong>&minus;0.9</strong> in the deepest bear troughs. But sum all 191 months and the mean log-deviation is <strong>+0.014</strong> &mdash; a whisker above the line. The median month sits <em>below</em> trend; only about <strong>41%</strong> of months close above it. The average is held near zero not by calm, but by a few violent overshoots balancing many quiet undershoots.</p>
+  </section>
+
+  <!-- VISUAL B — THE DEVIATION WAVE (centerpiece) -->
+  <div class="dl-chart-container">
+    <div class="dl-chart-kicker">Visual B &middot; centerpiece</div>
+    <div class="dl-chart-title">The Deviation Wave</div>
+    <div class="dl-chart-subtitle">Not price in a band &mdash; the <em>gap</em> itself. Each month's distance above or below the trendline, as a wave straddling a zero centerline. Green is the market above trend; red is below. The dashed line is the 15-year average.</div>
+    <div class="dl-chart-wrapper"><canvas id="waveChart"></canvas></div>
+    <div class="dl-wave-stats">
+      <span class="dl-wave-stat"><span class="dl-wave-swatch above"></span> Above trend: <strong>41.9%</strong> of months (80)</span>
+      <span class="dl-wave-stat"><span class="dl-wave-swatch below"></span> Below trend: <strong>58.1%</strong> of months (111)</span>
+      <span class="dl-wave-stat">Mean: <strong>+0.014</strong> ln &middot; essentially zero</span>
+    </div>
+    <div class="dl-chart-source"><strong>This is the centerpiece, and it is deliberately not the channel chart.</strong> The Power Law's channel shows price riding inside a corridor. This shows the corridor subtracted away &mdash; only the deviation remains. The shape is the argument: tall green spikes that don't last, broad red shallows that do, and a long-run average pinned to the line. Month-end closes vs. the trendline; 191 months, mid-2010 to mid-2026.</div>
+  </div>
+
+  <!-- VERIFICATION REGISTER -->
+  <div class="dl-register">
+    <h3>Verification register</h3>
+    <p class="dl-register-note">The audit trail. Every figure on this page is reproducible from the daily Blockchain.info series and the stated coefficients. The deviation statistics below are recomputed in-browser from the embedded month-end series, so what you read is provably what the wave is drawn from.</p>
+    <div class="dl-register-stats">
+      <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-exp">5.76</div><div class="dl-stat-label">Fitted exponent <em>b</em><br>(canonical window)</div></div>
+      <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-mean">+0.014</div><div class="dl-stat-label">Mean log-deviation<br>(ln, 191 months)</div></div>
+      <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-above">80 / 111</div><div class="dl-stat-label">Months above / below<br>trendline</div></div>
+      <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-split">41% / 59%</div><div class="dl-stat-label">Above / below<br>split</div></div>
+    </div>
+    <div class="dl-table-wrap">
+      <table class="dl-ladder-table">
+        <thead>
+          <tr><th>Doubling level</th><th>Trend reaches</th><th>Market first reached</th><th>Lead / lag</th></tr>
+        </thead>
+        <tbody id="dl-ladder-body"><!-- populated from LADDER --></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CAVEATS -->
+  <div class="dl-caveats">
+    <h3>What this is &mdash; and isn&rsquo;t</h3>
+    <p>The doubling cadence is arithmetic; the adherence to trend is the empirical claim. Only the second can fail, and it is the one worth watching. The trend is an observed regularity across fifteen years, not a law of nature, and not a guarantee about the next fifteen.</p>
+    <p>The exponent is sensitive to how you fit it &mdash; the honest core of this page. Using the canonical Porkopolis / Santostasi coefficients (<em>a&nbsp;=&nbsp;1.69&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.763</em>), an ordinary least-squares fit through end-2023 reproduces <em>b&nbsp;&asymp;&nbsp;5.77</em>. A naive fit over the <em>entire</em> series through 2026 instead yields <em>b&nbsp;&asymp;&nbsp;5.63</em>, because recent prices have run slightly under the steep early-fitted trend. The cadence shifts with the exponent: 12.8% per doubling at <em>b&nbsp;=&nbsp;5.76</em>, about 13.1% at <em>b&nbsp;=&nbsp;5.63</em>. We use the canonical value and flag the spread rather than hide it.</p>
+    <p>Future rungs &mdash; everything above today's price &mdash; are projections of the trend, not predictions of when the market will arrive. Past rungs show the market reaching levels years early or, occasionally, late; there is no reason the future will be tidier. Treat the upper ladder as a scenario to reason from, never a timetable.</p>
+  </div>
+
+  <!-- CREDITS -->
+  <div class="dl-credits">
+    <h3>Sources &amp; method</h3>
+    <div class="dl-credit-entry">
+      <strong>Matthew Mezinskis</strong> &mdash; <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">Porkopolis Economics</a>
+      <p>The doubling-cadence framing and the per-doubling progression table this page is built around. The canonical coefficients used here are from his work.</p>
+    </div>
+    <div class="dl-credit-entry">
+      <strong>Dr. Giovanni Santostasi</strong>
+      <p>Originator of the Bitcoin Power Law theory &mdash; the structural explanation for why <em>price = a &middot; day<sup>b</sup></em> holds at all.</p>
+    </div>
+    <div class="dl-credit-entry">
+      <strong>Trolololo</strong> &mdash; BitcoinTalk, 2014
+      <p>The earliest logarithmic-regression chart of Bitcoin's price, the seed of the later power-law work.</p>
+    </div>
+    <div class="dl-credit-entry">
+      <strong>Data</strong> &mdash; <a href="https://api.blockchain.info/charts/market-price?timespan=all&amp;format=json&amp;sampled=false" target="_blank" rel="noopener">Blockchain.info Market Price (USD)</a>
+      <p>Full daily history since 2009. The ladder's first-crossing dates and the month-end deviation series are computed directly from it.</p>
+    </div>
+  </div>
+
+</div>

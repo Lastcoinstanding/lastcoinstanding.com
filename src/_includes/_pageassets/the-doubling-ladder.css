@@ -1,0 +1,131 @@
+/* ─── The Doubling Ladder — page styles ───────────────────────────────
+   Standalone companion to The Power Law. Editorial-led, single-pane,
+   §4.2 mixed-content width tier: 1100px page, 880px prose. Reuses the
+   Power Law palette tokens so the two pages read as a family.
+   DRAFT — noindex. Not in nav / sitemap / explorations / llms yet. ─── */
+
+:root{
+  --bg:#0a0908;--bg-card:#111110;--border:#1e1c1a;--border-lt:#2a2826;
+  --orange:#F7931A;--orange-dim:rgba(247,147,26,.45);--orange-soft:rgba(247,147,26,.08);
+  --gold:#d4a843;--green:#5a8a3a;--green-soft:rgba(90,138,58,.10);
+  --red:#c0392b;--red-soft:rgba(192,57,43,.10);--amber:#e09422;
+  --text:#d8d2ca;--text-dim:#908880;--text-bright:#f2eee8;--text-body:#d0c8c0;--text-muted:#706860;
+  --font-d:'Cormorant Garamond',Georgia,serif;--font-b:'Inter',-apple-system,sans-serif;
+  color-scheme:dark;
+}
+
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:1.05rem;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+/* NAV palette accents (structural rules come from canonical-nav-css) */
+.site-nav .brand:hover{color:var(--orange)}
+.site-nav .nav-links a.active{color:var(--orange);background:var(--orange-soft);font-weight:600}
+.mobile-overlay a.active{color:var(--orange);background:var(--orange-soft);font-weight:600}
+.nav-dropdown-menu a.active{color:var(--orange);background:rgba(247,147,26,.08);font-weight:600}
+
+/* ─── §4.2 mixed-content width: 1100px page, 880px prose ─── */
+.dl-page{max-width:1100px;margin:0 auto;padding:40px 24px 60px}
+.dl-prose{max-width:880px;margin:0 auto}              /* essay block, centered */
+
+/* HEADER */
+.dl-header{text-align:center;margin-bottom:2.4rem}
+.dl-draft-flag{display:inline-block;font-family:var(--font-b);font-size:.6rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);border:1px solid var(--border-amber,rgba(224,148,34,.3));border-radius:999px;padding:.3rem .8rem;margin-bottom:1.2rem;opacity:.8}
+.dl-header h1{font-family:var(--font-d);font-size:clamp(2.2rem,4.4vw,3.6rem);font-weight:500;color:var(--text-bright);margin-bottom:.7rem;letter-spacing:-.01em;line-height:1.08}
+.dl-header h1 em{font-style:italic;color:var(--amber)}
+.dl-subtitle{font-family:'Source Serif 4',Georgia,serif;font-size:clamp(1.05rem,2vw,1.3rem);color:var(--text-dim);line-height:1.6;max-width:720px;margin:0 auto;font-style:italic;font-weight:400}
+
+/* ATTRIBUTION (prominent, near top) — same register as Power Law's
+   .porkopolis-credit so lineage reads identically across the family */
+.dl-attribution{background:rgba(224,148,34,.04);border:1px solid rgba(224,148,34,.18);border-radius:8px;padding:1.4rem 1.7rem;margin:0 auto 2.6rem;max-width:880px}
+.dl-attribution-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;color:var(--amber);font-weight:600;margin-bottom:.6rem}
+.dl-attribution p{margin:0;font-size:.95rem;line-height:1.7;color:var(--text-dim)}
+.dl-attribution a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(224,148,34,.3);transition:border-color .2s,color .2s}
+.dl-attribution a:hover{color:var(--orange);border-bottom-color:var(--orange)}
+.dl-attribution strong{color:var(--text-bright)}
+
+/* HERO / THESIS */
+.dl-hero{max-width:880px;margin:0 auto 3rem;text-align:center}
+.dl-hero-stat{font-family:var(--font-d);font-size:clamp(1.7rem,3.6vw,2.6rem);font-weight:500;color:var(--text-bright);line-height:1.25;margin-bottom:1.2rem}
+.dl-hero-stat em{color:var(--amber);font-style:italic}
+.dl-hero-body{font-size:1.05rem;color:var(--text-body);line-height:1.72;margin-bottom:1rem}
+.dl-hero-body strong{color:var(--text-bright);font-weight:600}
+
+/* SECTIONS (constrained to prose width) */
+.dl-section{max-width:880px;margin:0 auto 3rem}
+.dl-section h2{font-family:var(--font-d);font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:500;color:var(--text-bright);margin-bottom:1rem;line-height:1.18}
+.dl-section h2 em{font-style:italic;color:var(--amber)}
+.dl-section h3{font-family:var(--font-d);font-size:clamp(1.4rem,2.4vw,1.8rem);font-weight:500;color:var(--text-bright);margin:2rem 0 .8rem}
+.dl-section p{font-size:1.05rem;color:var(--text-body);line-height:1.72;margin-bottom:1.2rem}
+.dl-section p em{color:var(--amber);font-style:italic}
+.dl-section p strong{color:var(--text-bright);font-weight:600}
+.dl-section a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(224,148,34,.3);transition:border-color .2s,color .2s}
+.dl-section a:hover{color:var(--orange);border-bottom-color:var(--orange)}
+
+/* INSIGHT / PULL */
+.dl-insight{background:rgba(224,148,34,.04);padding:1.2rem 1.5rem;margin:2rem 0;border-radius:6px}
+.dl-insight p{font-family:'Source Serif 4',Georgia,serif;font-size:clamp(1.05rem,2vw,1.28rem);font-style:italic;color:var(--text-body);line-height:1.6;margin:0;font-weight:400}
+.dl-insight p em{color:var(--amber)}
+.dl-pull{font-family:var(--font-d);font-style:italic;font-size:1.5rem;line-height:1.35;color:var(--text-bright);border-left:2px solid var(--amber);padding:.3rem 0 .3rem 1.4rem;margin:2rem 0}
+.dl-pull em{color:var(--amber)}
+
+/* CHARTS — allowed full page width (the sanctioned exception to 880) */
+.dl-chart-container{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1.5rem 1.8rem;margin:2rem auto 2.6rem;max-width:1100px}
+.dl-chart-kicker{font-family:var(--font-b);font-size:.62rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:.5rem}
+.dl-chart-title{font-family:var(--font-d);font-size:1.45rem;font-weight:600;color:var(--text-bright);margin-bottom:4px;line-height:1.2}
+.dl-chart-subtitle{font-size:.82rem;color:var(--text-muted);margin-bottom:1.1rem;line-height:1.5}
+.dl-chart-wrapper{position:relative;height:440px}
+.dl-chart-source{font-size:.78rem;color:var(--text-muted);margin-top:1rem;line-height:1.55}
+.dl-chart-source strong{color:var(--text-dim);font-weight:600}
+
+/* Deviation-wave legend chips + stat readout */
+.dl-wave-stats{display:flex;flex-wrap:wrap;gap:.6rem 1.4rem;margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--border);font-size:.82rem;color:var(--text-dim)}
+.dl-wave-stat{display:inline-flex;align-items:center;gap:.45rem}
+.dl-wave-swatch{display:inline-block;width:14px;height:10px;border-radius:2px;flex-shrink:0}
+.dl-wave-swatch.above{background:rgba(90,138,58,.35);border:1px solid rgba(90,138,58,.5)}
+.dl-wave-swatch.below{background:rgba(192,57,43,.30);border:1px solid rgba(192,57,43,.5)}
+.dl-wave-stat strong{color:var(--text-bright);font-variant-numeric:tabular-nums;font-weight:600}
+
+/* VERIFICATION REGISTER */
+.dl-register{background:rgba(255,255,255,.015);border:1px solid var(--border);border-radius:8px;padding:1.6rem 1.8rem;margin:2.4rem auto;max-width:1100px}
+.dl-register h3{font-family:var(--font-d);font-size:1.3rem;color:var(--text-bright);margin-bottom:.3rem}
+.dl-register-note{font-size:.82rem;color:var(--text-muted);line-height:1.6;margin-bottom:1.2rem}
+.dl-register-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.9rem;margin-bottom:1.6rem}
+.dl-stat-card{background:#111110;border:1px solid var(--border);border-radius:.4rem;padding:1rem 1.1rem;text-align:center}
+.dl-stat-value{font-family:var(--font-d);font-size:1.7rem;font-weight:600;color:var(--amber);line-height:1.1;margin-bottom:.3rem;font-variant-numeric:tabular-nums}
+.dl-stat-label{font-size:.7rem;letter-spacing:.04em;color:var(--text-dim);line-height:1.35}
+.dl-table-wrap{overflow-x:auto}
+.dl-ladder-table{width:100%;border-collapse:collapse;font-family:var(--font-b);font-size:.84rem}
+.dl-ladder-table th{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);padding:.7rem .8rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.dl-ladder-table td{padding:.6rem .8rem;border-bottom:1px solid rgba(30,28,26,.55);color:var(--text);vertical-align:top}
+.dl-ladder-table td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.dl-ladder-table td.lvl{font-weight:600;color:var(--amber)}
+.dl-ladder-table tr:hover td{background:rgba(247,147,26,.03)}
+.dl-lead-early{color:#7fae5e;font-variant-numeric:tabular-nums}
+.dl-lead-late{color:#e07a6d;font-variant-numeric:tabular-nums}
+.dl-lead-pending{color:var(--text-muted);font-style:italic}
+
+/* CAVEATS / CREDITS */
+.dl-caveats{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:1.5rem 1.8rem;margin:2.4rem auto;max-width:880px}
+.dl-caveats h3{font-family:var(--font-d);font-size:1.15rem;color:var(--text-dim);margin-bottom:1rem}
+.dl-caveats p{font-size:.88rem;color:var(--text-dim);line-height:1.8;margin-bottom:1rem}
+.dl-caveats p:last-child{margin-bottom:0}
+.dl-caveats a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(224,148,34,.3)}
+.dl-caveats a:hover{border-bottom-color:var(--amber)}
+
+.dl-credits{border-top:1px solid var(--border);padding-top:2rem;margin:3rem auto 0;max-width:880px}
+.dl-credits h3{font-family:var(--font-d);font-size:1.15rem;color:var(--text-bright);margin-bottom:1.2rem}
+.dl-credit-entry{margin-bottom:1rem}
+.dl-credit-entry strong{color:var(--amber);font-size:.9rem}
+.dl-credit-entry a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(224,148,34,.3)}
+.dl-credit-entry a:hover{border-bottom-color:var(--amber)}
+.dl-credit-entry p{font-size:.85rem;color:var(--text-dim);line-height:1.6;margin-top:.2rem}
+
+@media(max-width:768px){
+  .dl-page{padding:32px 16px 48px}
+  .dl-chart-wrapper{height:340px}
+  .dl-chart-container,.dl-register,.dl-caveats{padding:1.2rem 1.2rem}
+  .dl-ladder-table{font-size:.78rem}
+  .dl-ladder-table td,.dl-ladder-table th{padding:.5rem .5rem}
+}
+@media(max-width:480px){
+  .dl-chart-wrapper{height:300px}
+}
