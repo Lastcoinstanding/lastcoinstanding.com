@@ -1,198 +1,203 @@
 [
   {
+    "display": "6/14/26",
+    "page": "/risks-to-bitcoin.html",
+    "summary": "New: Risks to Bitcoin — ten risks to the network, each stated in its strongest form and answered, from state attack and the security budget to quantum computing and a rival coin. Each closes with the markers that would tell us the risk is becoming real."
+  },
+  {
     "display": "6/10/26",
     "page": "/how-much-bitcoin.html",
     "summary": "New: How Much Bitcoin? — the Kelly criterion's startling answer to position sizing, an interactive growth curve under Power Law scenarios, and the honest case for taking a fraction of the formula."
   },
- {
-  "date": "2026-06-09",
-  "display": "6/9/26",
-  "page": "/paper-bitcoin.html",
-  "summary": "New: Paper Bitcoin vs. Real Bitcoin — an ETF, an exchange balance, a multisig vault, a hardware wallet: each is a different asset wearing bitcoin's price. An interactive property grid compares five ways of holding bitcoin across ten dimensions, from confiscation reach to inheritance."
- },
- {
-  "display": "6/7/26",
-  "page": "/bitcoin-fixed-income.html",
-  "summary": "New: Bitcoin Fixed Income — how bitcoin-backed preferreds (STRC, SATA) compare against conventional fixed income and against simply holding bitcoin, across growth scenarios, stress overlays, and horizons. Five tabs from the structural question to the bear case in detail."
- },
- {
-  "date": "2026-06-04",
-  "display": "6/4/26",
-  "page": "/bitcoin-vs-rental-property.html",
-  "summary": "New: Bitcoin vs. Rental Property — the honest yield comparison after landlord costs and exit taxes. Includes an interactive calculator that runs your scenario across bitcoin growth and four exit paths. Now on the homepage and as carousel slide #3."
- },
- {
-  "date": "2026-05-31",
-  "display": "5/31/26",
-  "page": "/start-here.html",
-  "summary": "New: Start Here — a curated orientation pathway for newcomers. Seven explorations sequenced so each one earns the next (framework → emotion → quantification → introduction → mechanism → evidence → commitment), with explicit payoff per step and an applied-next-steps block at the end. Linked prominently from the homepage hero for 'New to Bitcoin?' visitors"
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "The Gallery is now featured on the homepage's Latest section — a curated vertical scroll-through of the ten most striking charts across the site, each chart full-size with editorial framing. Designed as the highest-level entry point for any skeptical reader who wants the structural argument at a glance"
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "The Gallery now has its own social card and search-engine baseline — links unfurl cleanly when shared, and it shows up in search alongside the other pages."
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-bitcoin-horizon.html",
-  "summary": "Small fix on The Bitcoin Horizon: the §2 chart caption (under the rolling-CAGR chart) was constrained to 72 characters wide and stopped well short of the chart's right edge. Removed the max-width — caption now flows to the full chart-panel width, matching the chart canvas above it"
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "Gallery: the Volatility Is Not Risk chart now starts from 2015 — a more conservative window that still shows bitcoin's worst 10-year CAGR sitting comfortably above the S&P 500's. Plus a subtle 'you are here' marker on the Power Law chart."
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "Gallery: the Heatmap chart gains a 'Held to today' toggle — most of the red losses turn amber once you keep holding."
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "Gallery v2 complete. Final three charts live: the BTC vs S&P 500 outperformance grid, the half-life of a dollar's purchasing power, and how bitcoin's CAGR variance compresses over longer horizons."
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "Gallery Chart 7 rebuilt: replaced the $10K-invested-in-2010 wealth chart (a cherry-pick of the best possible start year) with a rolling 4-year CAGR comparison. Bitcoin's returns decline over time but still beat the S&P 500 and NASDAQ-100 in every window."
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "Gallery polish: clearer section dividers between charts, a sharper Chart 2 title, and more concrete claims in the Power Law vs S&P 500 convergence footnote."
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "Gallery Commit C: three more charts live. Global housing affordability across HK / Sydney / Vancouver / London / US (Demographia ratios), BTC needed for retirement decay curve (4% rule, anchors at year 0/+10/+20/+30), and $10K invested in 2010 — bitcoin vs S&P 500 TR vs NASDAQ-100 TR. Seven charts done; three to go in the final commit"
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "Gallery Commit B: three more charts live. Power Law implied CAGR vs. S&P 500 (with convergence footnote), BTC required to buy the median US house (2013→2025 actual, projected trend to 2032), and the real opportunity cost of buying a house (start-year toggle 2014/2016/2018/2020/2022). Four charts done; six to go"
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "Gallery Chart 1 polish: white historical line now extends to today's live price; hover tooltip shows trend + floor + upper at the hover X (not just nearest); today marker has the radial-gradient halo from the Disciplined Rebalancing chart; editorial prose spans the full chart width for a tighter scroll rhythm between charts"
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "The Gallery rebuilt as a vertical scroll-through of full charts (was a teaser card grid). Chart 1 of 10 live: the Power Law channel in ±2y default view with All-time / Near / Planning toggle. Nine more charts arriving in three follow-up commits"
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "Gallery palette finally rendering correctly (real fix: nested <style> tags in page CSS were breaking the :root variable block). Calculators featured tiles now have matched heights"
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/calculators.html",
-  "summary": "Calculators page: featured row now leads with The Bitcoin Retirement (with its live mini-preview) — Heatmap moved out, since it's not strictly a calculator and already lives in The Gallery"
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "Gallery polish: page now renders against the proper dark palette (body background + CSS variables were missing on first ship). Calculators page H1 updated to match the nav label"
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "The Gallery is open: 8 chart cards, with the Power Law channel as a live hero and the rest as v1 hand-drawn previews — a visual table-of-contents for the site"
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-power-law.html#channel",
-  "summary": "Homepage ticker polish: ₿ + price in Bitcoin orange with a slow heartbeat glow"
- },
- {
-  "date": "2026-05-30",
-  "display": "5/30/26",
-  "page": "/the-gallery.html",
-  "summary": "New section: The Gallery — a visual index of charts across the site (placeholder for now; first chart cards land shortly). Nav: Tools renamed to Calculators"
- },
- {
-  "date": "2026-05-29",
-  "display": "5/29/26",
-  "page": "/the-bitcoin-retirement.html",
-  "summary": "Bitcoin Retirement calculator: wider input sliders (3-column grid) now that withdrawal rate is a derived readout, allowing finer-grained dragging"
- },
- {
-  "date": "2026-05-29",
-  "display": "5/29/26",
-  "page": "/the-bitcoin-retirement.html",
-  "summary": "Bitcoin Retirement calculator: withdrawal rate now a derived readout under target income, making the mathematical linkage between the two visible"
- },
- {
-  "date": "2026-05-29",
-  "display": "5/29/26",
-  "page": "/bitcoin-vs-real-estate.html",
-  "summary": "Bitcoin vs. Real Estate calculator: Power Law scenarios clarified (Upper = cycle peak, ~3× trend) and canonical ? tooltips throughout"
- },
- {
-  "date": "2026-05-29",
-  "display": "5/29/26",
-  "page": "/bitcoin-vs-real-estate.html",
-  "summary": "Bitcoin vs. Real Estate calculator: Real / Nominal display toggle for projected values, with inflation-aware tooltips"
- },
- {
-  "date": "2026-05-29",
-  "display": "5/29/26",
-  "page": "/bitcoin-vs-real-estate.html",
-  "summary": "Bitcoin vs. Real Estate calculator: input formatting polish ($/comma/%) and clearer projected-value phrasing with future-date context"
- },
- {
-  "date": "2026-05-28",
-  "display": "5/28/26",
-  "page": "/bitcoin-vs-real-estate.html",
-  "summary": "Bitcoin vs. Real Estate calculator: cross-session persistence for user inputs + reformed NET headline on retrospective"
- },
- {
-  "date": "2026-05-28",
-  "display": "5/28/26",
-  "page": "/bitcoin-vs-real-estate.html",
-  "summary": "Bitcoin vs. Real Estate: seesaw chart start-year selector + start-price transparency in comparison table"
- },
- {
-  "date": "2026-05-28",
-  "display": "5/28/26",
-  "page": "/bitcoin-vs-real-estate.html",
-  "summary": "Bitcoin vs. Real Estate: new Global Affordability Crisis chart (5-market Demographia data, Tokyo case study)"
- },
- {
-  "date": "2026-05-28",
-  "display": "5/28/26",
-  "page": "/the-power-law.html",
-  "summary": "Power Law pages: live BTC price + consistent today-anchor across Disciplined Rebalancing, Bitcoin Retirement, and Borrowing Against Your Stack"
- },
- {
-  "date": "2026-05-24",
-  "display": "5/24/26",
-  "page": "/what-money-is-for.html",
-  "summary": "Homepage: new What Money Is For exploration added to carousel with silent video intro"
- }
+  {
+    "date": "2026-06-09",
+    "display": "6/9/26",
+    "page": "/paper-bitcoin.html",
+    "summary": "New: Paper Bitcoin vs. Real Bitcoin — an ETF, an exchange balance, a multisig vault, a hardware wallet: each is a different asset wearing bitcoin's price. An interactive property grid compares five ways of holding bitcoin across ten dimensions, from confiscation reach to inheritance."
+  },
+  {
+    "display": "6/7/26",
+    "page": "/bitcoin-fixed-income.html",
+    "summary": "New: Bitcoin Fixed Income — how bitcoin-backed preferreds (STRC, SATA) compare against conventional fixed income and against simply holding bitcoin, across growth scenarios, stress overlays, and horizons. Five tabs from the structural question to the bear case in detail."
+  },
+  {
+    "date": "2026-06-04",
+    "display": "6/4/26",
+    "page": "/bitcoin-vs-rental-property.html",
+    "summary": "New: Bitcoin vs. Rental Property — the honest yield comparison after landlord costs and exit taxes. Includes an interactive calculator that runs your scenario across bitcoin growth and four exit paths. Now on the homepage and as carousel slide #3."
+  },
+  {
+    "date": "2026-05-31",
+    "display": "5/31/26",
+    "page": "/start-here.html",
+    "summary": "New: Start Here — a curated orientation pathway for newcomers. Seven explorations sequenced so each one earns the next (framework → emotion → quantification → introduction → mechanism → evidence → commitment), with explicit payoff per step and an applied-next-steps block at the end. Linked prominently from the homepage hero for 'New to Bitcoin?' visitors"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "The Gallery is now featured on the homepage's Latest section — a curated vertical scroll-through of the ten most striking charts across the site, each chart full-size with editorial framing. Designed as the highest-level entry point for any skeptical reader who wants the structural argument at a glance"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "The Gallery now has its own social card and search-engine baseline — links unfurl cleanly when shared, and it shows up in search alongside the other pages."
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-bitcoin-horizon.html",
+    "summary": "Small fix on The Bitcoin Horizon: the §2 chart caption (under the rolling-CAGR chart) was constrained to 72 characters wide and stopped well short of the chart's right edge. Removed the max-width — caption now flows to the full chart-panel width, matching the chart canvas above it"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "Gallery: the Volatility Is Not Risk chart now starts from 2015 — a more conservative window that still shows bitcoin's worst 10-year CAGR sitting comfortably above the S&P 500's. Plus a subtle 'you are here' marker on the Power Law chart."
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "Gallery: the Heatmap chart gains a 'Held to today' toggle — most of the red losses turn amber once you keep holding."
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "Gallery v2 complete. Final three charts live: the BTC vs S&P 500 outperformance grid, the half-life of a dollar's purchasing power, and how bitcoin's CAGR variance compresses over longer horizons."
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "Gallery Chart 7 rebuilt: replaced the $10K-invested-in-2010 wealth chart (a cherry-pick of the best possible start year) with a rolling 4-year CAGR comparison. Bitcoin's returns decline over time but still beat the S&P 500 and NASDAQ-100 in every window."
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "Gallery polish: clearer section dividers between charts, a sharper Chart 2 title, and more concrete claims in the Power Law vs S&P 500 convergence footnote."
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "Gallery Commit C: three more charts live. Global housing affordability across HK / Sydney / Vancouver / London / US (Demographia ratios), BTC needed for retirement decay curve (4% rule, anchors at year 0/+10/+20/+30), and $10K invested in 2010 — bitcoin vs S&P 500 TR vs NASDAQ-100 TR. Seven charts done; three to go in the final commit"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "Gallery Commit B: three more charts live. Power Law implied CAGR vs. S&P 500 (with convergence footnote), BTC required to buy the median US house (2013→2025 actual, projected trend to 2032), and the real opportunity cost of buying a house (start-year toggle 2014/2016/2018/2020/2022). Four charts done; six to go"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "Gallery Chart 1 polish: white historical line now extends to today's live price; hover tooltip shows trend + floor + upper at the hover X (not just nearest); today marker has the radial-gradient halo from the Disciplined Rebalancing chart; editorial prose spans the full chart width for a tighter scroll rhythm between charts"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "The Gallery rebuilt as a vertical scroll-through of full charts (was a teaser card grid). Chart 1 of 10 live: the Power Law channel in ±2y default view with All-time / Near / Planning toggle. Nine more charts arriving in three follow-up commits"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "Gallery palette finally rendering correctly (real fix: nested <style> tags in page CSS were breaking the :root variable block). Calculators featured tiles now have matched heights"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/calculators.html",
+    "summary": "Calculators page: featured row now leads with The Bitcoin Retirement (with its live mini-preview) — Heatmap moved out, since it's not strictly a calculator and already lives in The Gallery"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "Gallery polish: page now renders against the proper dark palette (body background + CSS variables were missing on first ship). Calculators page H1 updated to match the nav label"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "The Gallery is open: 8 chart cards, with the Power Law channel as a live hero and the rest as v1 hand-drawn previews — a visual table-of-contents for the site"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-power-law.html#channel",
+    "summary": "Homepage ticker polish: ₿ + price in Bitcoin orange with a slow heartbeat glow"
+  },
+  {
+    "date": "2026-05-30",
+    "display": "5/30/26",
+    "page": "/the-gallery.html",
+    "summary": "New section: The Gallery — a visual index of charts across the site (placeholder for now; first chart cards land shortly). Nav: Tools renamed to Calculators"
+  },
+  {
+    "date": "2026-05-29",
+    "display": "5/29/26",
+    "page": "/the-bitcoin-retirement.html",
+    "summary": "Bitcoin Retirement calculator: wider input sliders (3-column grid) now that withdrawal rate is a derived readout, allowing finer-grained dragging"
+  },
+  {
+    "date": "2026-05-29",
+    "display": "5/29/26",
+    "page": "/the-bitcoin-retirement.html",
+    "summary": "Bitcoin Retirement calculator: withdrawal rate now a derived readout under target income, making the mathematical linkage between the two visible"
+  },
+  {
+    "date": "2026-05-29",
+    "display": "5/29/26",
+    "page": "/bitcoin-vs-real-estate.html",
+    "summary": "Bitcoin vs. Real Estate calculator: Power Law scenarios clarified (Upper = cycle peak, ~3× trend) and canonical ? tooltips throughout"
+  },
+  {
+    "date": "2026-05-29",
+    "display": "5/29/26",
+    "page": "/bitcoin-vs-real-estate.html",
+    "summary": "Bitcoin vs. Real Estate calculator: Real / Nominal display toggle for projected values, with inflation-aware tooltips"
+  },
+  {
+    "date": "2026-05-29",
+    "display": "5/29/26",
+    "page": "/bitcoin-vs-real-estate.html",
+    "summary": "Bitcoin vs. Real Estate calculator: input formatting polish ($/comma/%) and clearer projected-value phrasing with future-date context"
+  },
+  {
+    "date": "2026-05-28",
+    "display": "5/28/26",
+    "page": "/bitcoin-vs-real-estate.html",
+    "summary": "Bitcoin vs. Real Estate calculator: cross-session persistence for user inputs + reformed NET headline on retrospective"
+  },
+  {
+    "date": "2026-05-28",
+    "display": "5/28/26",
+    "page": "/bitcoin-vs-real-estate.html",
+    "summary": "Bitcoin vs. Real Estate: seesaw chart start-year selector + start-price transparency in comparison table"
+  },
+  {
+    "date": "2026-05-28",
+    "display": "5/28/26",
+    "page": "/bitcoin-vs-real-estate.html",
+    "summary": "Bitcoin vs. Real Estate: new Global Affordability Crisis chart (5-market Demographia data, Tokyo case study)"
+  },
+  {
+    "date": "2026-05-28",
+    "display": "5/28/26",
+    "page": "/the-power-law.html",
+    "summary": "Power Law pages: live BTC price + consistent today-anchor across Disciplined Rebalancing, Bitcoin Retirement, and Borrowing Against Your Stack"
+  },
+  {
+    "date": "2026-05-24",
+    "display": "5/24/26",
+    "page": "/what-money-is-for.html",
+    "summary": "Homepage: new What Money Is For exploration added to carousel with silent video intro"
+  }
 ]

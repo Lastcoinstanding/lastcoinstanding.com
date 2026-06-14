@@ -853,6 +853,8 @@ For a reader new to the site landing on the calculators:
 8. **Disciplined Rebalancing** — applies the channel as a sell-and-rebuy protocol; deepest specialization on the *selling* side
 9. **Bitcoin Fixed Income** — the income-instrument decision frame for readers who want cashflow today without selling the stack; sits at the same depth tier as Disciplined Rebalancing but addresses a different mechanism (preferred dividends vs. percentile selling)
 
+Risks to Bitcoin (shipped June 2026) sits late in the reading order — it is a steelman-and-rebuttal page that lands best once a reader already grasps the bull case, since it argues against bitcoin in order to test that case. Place it after the core Arguments and before the deepest Numbers specializations.
+
 Phase 4 strengthens this reading order by separating *application* (BvSM, BvRE, retirement, disciplined rebalancing) from *foundation* (Power Law). BvSM was added at the top of the reading order in May 2026 because it requires the least personal context from the reader and proves the framework with the broadest comparator most readers already trust.
 
 ---
@@ -1390,3 +1392,29 @@ _Last updated: June 2026. Update this document as editorial decisions crystalliz
 
 **History.** Designed via FEEDBACK_WIDGET_DESIGN doc (chat deliverable, JM-reviewed with Word comments); trial on /how-much-bitcoin 2026-06-11 (commit `ecf1a13`); Chrome-autofill dark-theme fix (`974224b`, see STYLE_GUIDE §6.34); rollout site-wide same day.
 
+
+
+## 28. Risks to Bitcoin (`/risks-to-bitcoin.html`)
+
+**Category:** The Arguments. **Interactive:** no (restraint by design — a risk page with a toy would undercut its seriousness). **Shipped:** 2026-06-14.
+
+**Thesis.** The site's other pages argue *for* bitcoin; this one argues *against* it, better than the critics do, and earns the rest of the site its credibility in the process. The frame is antifragility: bitcoin has survived seventeen years of attacks, bans, crashes, and competition not by adapting but by refusing to change, and the page tests that claim by stating each risk in its strongest form and asking what would have to be true for it to become real.
+
+**Structure.** Ten risks in four named parts — Death by decree (state attack, infrastructure catastrophe), Death by economics (security budget, mining centralization, custody concentration), Death by failure (protocol catastrophe, ossification, quantum, privacy), Death by irrelevance (a better coin / stagnation / containment as one section). Every risk runs the same three beats: **The case** (steelman, granted fully) → **The reply** (the answer, including where unresolved) → a **tripwire block** ("The risk becomes credible when…", 2–3 observable markers). Closes with **The scoreboard** (tested-and-survived / live-and-watched / catastrophic-but-shared) and a temperament link to How Much Bitcoin.
+
+**Key editorial decisions (from JM review rounds).**
+- Title is "Risks to Bitcoin," not "What Could Kill Bitcoin?" — deliberate register, and avoids the bait-and-switch of a kill-titled page concluding most risks are survivable.
+- The "win" framing was removed throughout (not a competition) → "becomes credible / a real threat." Beat labels are "The case." / "The reply." — NOT "honest answer" (an AI-tell; see the de-tell note below).
+- **Bitcoin** (capital B) = the network/protocol; **bitcoin** (lowercase) = the monetary asset. Applied consistently; maintain it in any edits.
+- "Governance" avoided — bitcoin has consensus rules and social consensus, not governance in the altcoin sense. §7 is "Ossification, and the limits of changing the rules."
+- **De-tell discipline:** the words "honest/honestly" and "load-bearing," and self-congratulatory candor lines ("we're being honest with you"), are AI-tells JM flagged. Kept near-zero; let the arguments stand on their own terms. Preserve this in future edits.
+- Depth follows substance: security budget and quantum run full-length (the genuinely contested/clocked ones); others are compact.
+- Two JM substantive corrections worth preserving: (a) the AI/HPC-bids-away-mining-energy claim was CUT — AI needs firm always-on baseload and can pay for it; mining monetizes intermittent stranded power; not the same customers. (b) Quantum: weaker cryptography elsewhere breaks first and in public = a warning, not a surprise; Satoshi's coins are many scattered 50-BTC coinbase addresses, not one honeypot; old key formats are the warning shots.
+
+**Verified-claims register.** Data-audit at launch (2026-06-14): the 2021 China-ban hashrate drop is **~50%** (175→85 EH/s; multiple sources) — an earlier draft's "71%" was WRONG and corrected to "roughly half." Covert-China-resident mining hedged to "by various estimates 15–20%" (sources span 14–21%). Blocks where fees exceeded subsidy: VERIFIED (April 2024 halving block, 37+ BTC fees vs 3.125 subsidy; Ordinals/Runes 2023–24). Budish, Carlsten et al., Blocksize War, 2010/2018 protocol bugs, Circular 42 (Feb 2026), Google quantum paper (March 2026) — all sourced in the page's Sources block.
+
+**Cross-linking.** Related (bidirectional): How Much Bitcoin (temperament companion — NOT a "size around failure probability" framing; JM removed that), Paper Bitcoin (custody deferral), The Power Law (model ≠ destiny), Trilemma (the design-is-correct foundation under the Bitcoin-2.0 rebuttal).
+
+**Annual refresh (JM flag).** The opening's time-anchored facts — "seventeen years old," "as of 2026," the proof-of-work-dominance claim — need a yearly update. Logged in MONTHLY_REFRESH §2.
+
+**Open enhancements.** Carousel slide pending (needs a video). All statistics were rounded/hedged at launch pending firmer dated primaries; the data-audit register above is the canonical record.

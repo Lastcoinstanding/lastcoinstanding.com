@@ -97,6 +97,12 @@
     "interactive": true
   },
   {
+    "slug": "risks-to-bitcoin",
+    "title": "Risks to Bitcoin",
+    "category": "arguments",
+    "interactive": false
+  },
+  {
     "_comment": "Tile name 'The Bitcoin Fixed Share' differs from registry title 'The Bitcoin Fixed Share' (matches); page slug is the-fixed-pie. The tile uses no anchor — the page is single-pane.",
     "slug": "the-fixed-pie",
     "title": "The Bitcoin Fixed Share",

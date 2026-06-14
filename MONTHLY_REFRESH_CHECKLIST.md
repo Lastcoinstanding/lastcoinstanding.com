@@ -131,6 +131,9 @@ caption on the BvSM Power Law chart still reads accurately (see §3).
 
 ## 2. Page-level TODAY constants — none remaining
 
+**Annual (not monthly) — Risks to Bitcoin time-anchored facts.** `src/risks-to-bitcoin.njk` opens with "Bitcoin is seventeen years old," "As of 2026," and a claim that bitcoin holds the overwhelming majority of proof-of-work hash power. Update the age and year each January, and re-confirm the PoW-dominance claim against current data (it has been true and widening, but verify). This is a yearly task, flagged at launch (SITE_GUIDE §28).
+
+
 Historically a few pages kept their own `TODAY_DAYS`/`TODAY_PRICE` copies
 that needed lockstep updates. As of 2026-05-28 those copies have been
 removed; every page that anchors to "today" now reads the shared globals
