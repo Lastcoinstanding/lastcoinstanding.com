@@ -86,13 +86,14 @@ html, body {
 
 /* ─── Reading column ─── */
 .bvrp-body {
-  max-width: 760px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 2rem 2rem 4rem;
 }
 
 .bvrp-section {
-  margin: 3.6rem 0 0;
+  max-width: 880px;
+  margin: 3.6rem auto 0;
   scroll-margin-top: 4rem;
 }
 .bvrp-section:first-child {
