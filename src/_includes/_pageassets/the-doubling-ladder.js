@@ -262,6 +262,24 @@ function dlYearTicks(axis){
   // centerline annotation can never drift from the data).
   var meanLn = DEVIATION.reduce(function(s,d){ return s+d[1]; }, 0) / DEVIATION.length;
 
+  // ── Cycle ceiling & floor: linear fits (x = days since genesis) through
+  //    the four cycle peaks and the four cycle troughs in the month-end
+  //    log-deviation series. The ceiling slopes down (each mania overshoots
+  //    less than the last, R²≈0.83); the floor is essentially flat (every
+  //    bear bottoms near the same depth, R²≈0). Recomputed here from the
+  //    embedded peak/trough points so the lines can't drift from the data.
+  var CYCLE_PEAKS   = [[908,2.22],[1792,2.48],[3284,1.40],[4470,1.16]];   // 2011,2013,2017,2021
+  var CYCLE_TROUGHS = [[1244,-0.80],[2461,-0.91],[3680,-0.55],[5110,-0.87]]; // 2012,2015,2019,2022
+  function olsLine(pts){
+    var n=pts.length, sx=0, sy=0, sxy=0, sxx=0;
+    pts.forEach(function(p){ sx+=p[0]; sy+=p[1]; sxy+=p[0]*p[1]; sxx+=p[0]*p[0]; });
+    var m=(n*sxy-sx*sy)/(n*sxx-sx*sx); return {m:m, c:(sy-m*sx)/n};
+  }
+  var xMin = DEVIATION[0][0], xMax = DEVIATION[DEVIATION.length-1][0];
+  var fitCeil = olsLine(CYCLE_PEAKS), fitFloor = olsLine(CYCLE_TROUGHS);
+  var ceilLine  = [{x:xMin, y:fitCeil.m*xMin+fitCeil.c},  {x:xMax, y:fitCeil.m*xMax+fitCeil.c}];
+  var floorLine = [{x:xMin, y:fitFloor.m*xMin+fitFloor.c}, {x:xMax, y:fitFloor.m*xMax+fitFloor.c}];
+
   var meanLinePlugin = {
     id:'meanLine',
     afterDatasetsDraw:function(chart){
@@ -282,9 +300,13 @@ function dlYearTicks(axis){
     type:'line',
     data:{ datasets:[
       { label:'Above trend', data:pos, borderColor:'rgba(90,138,58,0.85)', borderWidth:1.2,
-        backgroundColor:'rgba(90,138,58,0.22)', pointRadius:0, fill:'origin', tension:0.25, order:2 },
+        backgroundColor:'rgba(90,138,58,0.22)', pointRadius:0, fill:'origin', tension:0.25, order:3 },
       { label:'Below trend', data:neg, borderColor:'rgba(192,57,43,0.8)', borderWidth:1.2,
-        backgroundColor:'rgba(192,57,43,0.18)', pointRadius:0, fill:'origin', tension:0.25, order:3 }
+        backgroundColor:'rgba(192,57,43,0.18)', pointRadius:0, fill:'origin', tension:0.25, order:4 },
+      { label:'Cycle-peak ceiling (falling)', data:ceilLine, borderColor:'rgba(90,138,58,0.75)',
+        borderWidth:1.4, borderDash:[6,4], pointRadius:0, fill:false, tension:0, order:1 },
+      { label:'Cycle floor (flat)', data:floorLine, borderColor:'rgba(192,57,43,0.75)',
+        borderWidth:1.4, borderDash:[6,4], pointRadius:0, fill:false, tension:0, order:1 }
     ]},
     plugins:[meanLinePlugin],
     options:{
@@ -309,10 +331,11 @@ function dlYearTicks(axis){
           labels:{color:'#908880', font:{size:11, family:'Inter'}, boxWidth:12, padding:14, usePointStyle:true} },
         tooltip:{ backgroundColor:'rgba(10,9,8,0.95)', titleColor:'#f2eee8', bodyColor:'#d0c8c0',
           borderColor:'rgba(247,147,26,0.3)', borderWidth:1, padding:12, displayColors:false,
-          // Both clamped datasets report at every month (one holds the value,
-          // the other is pinned to 0). Keep only the dataset carrying the real
-          // value so the tooltip shows each month once.
-          filter:function(item){ var ln=item.raw.raw; return item.datasetIndex===0 ? ln>=0 : ln<0; },
+          // Datasets 0/1 are the two clamped halves of the wave (one holds the
+          // value, the other is pinned to 0); 2/3 are the straight ceiling/floor
+          // fit lines. Keep only the wave half carrying the real value, and drop
+          // the fit lines, so each month shows once.
+          filter:function(item){ if(item.datasetIndex>1) return false; var ln=item.raw.raw; return item.datasetIndex===0 ? ln>=0 : ln<0; },
           callbacks:{
             title:function(items){ return dlDateFromDay(items[0].parsed.x); },
             label:function(item){
@@ -361,4 +384,58 @@ function dlYearTicks(axis){
       tbody.appendChild(tr);
     });
   }
+})();
+
+// ════════════ SCENARIO SLIDER — future rungs, early/late ════════════════
+// The five trend levels still above today's price, with their trend-projected
+// arrival dates. The slider shifts every arrival by the same offset (−730 to
+// +730 days) so the reader can re-date the whole upper ladder on their own
+// assumption — a scenario to reason from, not a schedule.
+(function(){
+  var slider  = document.getElementById('dl-scenario-slider');
+  var readout = document.getElementById('dl-scenario-readout');
+  var body    = document.getElementById('dl-scenario-body');
+  if(!slider || !body) return;
+
+  var FUTURE_RUNGS = [
+    {price:135367,   date:'2026-04-27'},
+    {price:270734,   date:'2028-07-14'},
+    {price:541467,   date:'2031-01-13'},
+    {price:1082934,  date:'2033-11-07'},
+    {price:2165869,  date:'2037-01-11'}
+  ];
+
+  function shiftDate(iso, offsetDays){
+    var p = iso.split('-');
+    var d = new Date(Date.UTC(+p[0], +p[1]-1, +p[2]));
+    d.setUTCDate(d.getUTCDate() + offsetDays);
+    return d.getUTCFullYear() + '-' + String(d.getUTCMonth()+1).padStart(2,'0') + '-' + String(d.getUTCDate()).padStart(2,'0');
+  }
+
+  // Build the rows once; the scenario cell is updated live by id.
+  FUTURE_RUNGS.forEach(function(r, i){
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="lvl num">' + dlFmtUSD(r.price) + '</td>' +
+      '<td class="num">' + r.date + '</td>' +
+      '<td class="num" id="dl-scn-' + i + '">' + r.date + '</td>';
+    body.appendChild(tr);
+  });
+
+  function update(){
+    var off = parseInt(slider.value, 10);
+    FUTURE_RUNGS.forEach(function(r, i){
+      document.getElementById('dl-scn-' + i).textContent = shiftDate(r.date, off);
+    });
+    if(off === 0){
+      readout.textContent = 'on the line';
+      readout.className = 'dl-scenario-readout';
+    } else {
+      var yrs = Math.abs(off) / 365.25;
+      readout.textContent = Math.abs(off).toLocaleString() + ' days (' + yrs.toFixed(1) + ' yr) ' + (off < 0 ? 'early' : 'late');
+      readout.className = 'dl-scenario-readout ' + (off < 0 ? 'early' : 'late');
+    }
+  }
+  slider.addEventListener('input', update);
+  update();
 })();

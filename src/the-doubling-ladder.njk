@@ -74,6 +74,10 @@ eleventyComputed:
       <span class="dl-wave-stat">Mean: <strong>+0.014</strong> ln &middot; essentially zero</span>
     </div>
     <div class="dl-chart-source"><strong>This is the centerpiece, and it is deliberately not the channel chart.</strong> The Power Law's channel shows price riding inside a corridor. This shows the corridor subtracted away &mdash; only the deviation remains. The shape is the argument: tall green spikes that don't last, broad red shallows that do, and a long-run average pinned to the line. Month-end closes vs. the trendline; 191 months, mid-2010 to mid-2026.</div>
+    <div class="dl-trendnote">
+      <p><strong>The ceiling is falling; the floor holds.</strong> Each mania has overshot the trend less than the last &mdash; about 9&times; in 2011, 4&times; in 2017, 3&times; in 2021 &mdash; while every bear has bottomed near 0.4&times; of trend. The wave is compressing from the top: bitcoin's overshoots are shrinking as the asset matures, even as its floor stays remarkably constant. The dashed green line fits the four cycle <em>peaks</em>; the dashed red line fits the four cycle <em>troughs</em>.</p>
+      <p class="dl-trendnote-caveat">Four cycles is a small sample, and 2013 overshot more than 2011; read this as a tendency across recent cycles, not a guarantee the ceiling keeps falling.</p>
+    </div>
   </div>
 
   <!-- VERIFICATION REGISTER -->
@@ -93,6 +97,25 @@ eleventyComputed:
         </thead>
         <tbody id="dl-ladder-body"><!-- populated from LADDER --></tbody>
       </table>
+    </div>
+
+    <!-- Scenario slider — re-date the not-yet-reached rungs early/late -->
+    <div class="dl-scenario">
+      <h4 class="dl-scenario-title">Run the upper ladder on your own assumption</h4>
+      <p class="dl-scenario-intro">The trend says when each level arrives <em>on the line</em>. The market never has &mdash; it runs years early in manias, late in bears. Move the slider to see the remaining doublings on your own assumption. <strong>This is a scenario to reason from, not a schedule.</strong></p>
+      <div class="dl-scenario-control">
+        <label for="dl-scenario-slider">If the market runs early or late&hellip;</label>
+        <input type="range" id="dl-scenario-slider" min="-730" max="730" step="10" value="0" aria-describedby="dl-scenario-readout">
+        <div class="dl-scenario-readout" id="dl-scenario-readout">on the line</div>
+      </div>
+      <div class="dl-table-wrap">
+        <table class="dl-ladder-table dl-scenario-table">
+          <thead>
+            <tr><th>Doubling level</th><th>Trend date</th><th>Your-scenario date</th></tr>
+          </thead>
+          <tbody id="dl-scenario-body"><!-- populated from FUTURE_RUNGS --></tbody>
+        </table>
+      </div>
     </div>
   </div>
 

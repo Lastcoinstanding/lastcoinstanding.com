@@ -103,6 +103,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .dl-lead-late{color:#e07a6d;font-variant-numeric:tabular-nums}
 .dl-lead-pending{color:var(--text-muted);font-style:italic}
 
+/* Trend-line note beneath Visual B (ceiling falling / floor holds) */
+.dl-trendnote{margin-top:1rem;padding:0.9rem 1.1rem;background:rgba(255,255,255,.02);border-left:2px solid var(--border-lt);border-radius:0 .3rem .3rem 0}
+.dl-trendnote p{font-size:.82rem;line-height:1.6;color:var(--text-dim);margin:0}
+.dl-trendnote p strong{color:var(--text-bright)}
+.dl-trendnote p em{color:var(--text);font-style:italic}
+.dl-trendnote-caveat{margin-top:.6rem !important;font-size:.78rem !important;font-style:italic;color:var(--text-muted) !important}
+
+/* Scenario slider — re-date the not-yet-reached rungs */
+.dl-scenario{margin-top:1.8rem;padding-top:1.4rem;border-top:1px solid var(--border)}
+.dl-scenario-title{font-family:var(--font-d);font-size:1.2rem;font-weight:500;color:var(--text-bright);margin-bottom:.5rem}
+.dl-scenario-intro{font-size:.86rem;line-height:1.65;color:var(--text-dim);margin-bottom:1.2rem}
+.dl-scenario-intro em{color:var(--amber);font-style:italic}
+.dl-scenario-intro strong{color:var(--text-bright)}
+.dl-scenario-control{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.2rem;padding:1rem 1.1rem;background:#111110;border:1px solid var(--border);border-radius:.4rem}
+.dl-scenario-control label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);flex:0 0 auto}
+.dl-scenario-control input[type=range]{flex:1 1 200px;min-width:160px;accent-color:var(--amber);cursor:pointer}
+.dl-scenario-readout{flex:0 0 auto;font-family:var(--font-b);font-size:.92rem;font-weight:600;color:var(--amber);font-variant-numeric:tabular-nums;min-width:9.5rem;text-align:right}
+.dl-scenario-readout.early{color:#7fae5e}
+.dl-scenario-readout.late{color:#e07a6d}
+.dl-scenario-table{margin-top:.2rem}
+
 /* CAVEATS / CREDITS */
 .dl-caveats{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:1.5rem 1.8rem;margin:2.4rem auto;max-width:880px}
 .dl-caveats h3{font-family:var(--font-d);font-size:1.15rem;color:var(--text-dim);margin-bottom:1rem}
@@ -125,6 +146,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
   .dl-chart-container,.dl-register,.dl-caveats{padding:1.2rem 1.2rem}
   .dl-ladder-table{font-size:.78rem}
   .dl-ladder-table td,.dl-ladder-table th{padding:.5rem .5rem}
+  .dl-scenario-readout{flex-basis:100%;text-align:left;min-width:0}
 }
 @media(max-width:480px){
   .dl-chart-wrapper{height:300px}
