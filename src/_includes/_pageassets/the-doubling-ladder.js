@@ -53,9 +53,9 @@ var LADDER = [
   {lvl:15729, tDay:4350.3, tDate:"2020-12-01", aDay:3261.0, aDate:"2017-12-08", lead:1089},
   {lvl:31457, tDay:4906.3, tDate:"2022-06-10", aDay:4383.0, aDate:"2021-01-03", lead:523},
   {lvl:62915, tDay:5533.4, tDate:"2024-02-27", aDay:4484.0, aDate:"2021-04-14", lead:1049},
-  {lvl:125829, tDay:6240.6, tDate:"2026-02-03", aDay:null, aDate:null, lead:null},
+  {lvl:125829, tDay:6240.6, tDate:"2026-02-04", aDay:null, aDate:null, lead:null},
   {lvl:251658, tDay:7038.2, tDate:"2028-04-11", aDay:null, aDate:null, lead:null},
-  {lvl:503316, tDay:7937.7, tDate:"2030-09-27", aDay:null, aDate:null, lead:null},
+  {lvl:503316, tDay:7937.7, tDate:"2030-09-28", aDay:null, aDate:null, lead:null},
   {lvl:1006633, tDay:8952.2, tDate:"2033-07-08", aDay:null, aDate:null, lead:null},
   {lvl:2013266, tDay:10096.4, tDate:"2036-08-25", aDay:null, aDate:null, lead:null}
 ];
@@ -397,13 +397,12 @@ function dlYearTicks(axis){
   var body    = document.getElementById('dl-scenario-body');
   if(!slider || !body) return;
 
-  var FUTURE_RUNGS = [
-    {price:135367,   date:'2026-04-27'},
-    {price:270734,   date:'2028-07-14'},
-    {price:541467,   date:'2031-01-13'},
-    {price:1082934,  date:'2033-11-07'},
-    {price:2165869,  date:'2037-01-11'}
-  ];
+  // Derive the future rungs from the SAME LADDER the verification table is
+  // built from — the not-yet-reached rungs (no actual crossing yet). Both the
+  // table and this slider read r.lvl / r.tDate from this one source, so their
+  // prices and trend dates are identical by construction and can never drift.
+  var FUTURE_RUNGS = LADDER.filter(function(r){ return r.aDay == null; })
+                           .map(function(r){ return {price:r.lvl, date:r.tDate}; });
 
   function shiftDate(iso, offsetDays){
     var p = iso.split('-');
