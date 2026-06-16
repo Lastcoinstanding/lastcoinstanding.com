@@ -67,6 +67,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .dl-pull{font-family:var(--font-d);font-style:italic;font-size:1.5rem;line-height:1.35;color:var(--text-bright);border-left:2px solid var(--amber);padding:.3rem 0 .3rem 1.4rem;margin:2rem 0}
 .dl-pull em{color:var(--amber)}
 
+/* OPT-IN MATH CALLOUT (skippable aside) */
+.dl-mathbox{margin:1.6rem 0;padding:1.1rem 1.3rem;background:rgba(255,255,255,.02);border:1px dashed rgba(224,148,34,.32);border-radius:6px}
+.dl-mathbox-title{font-family:var(--font-b);font-size:.62rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-bottom:.55rem}
+.dl-mathbox p{font-size:.95rem;line-height:1.7;color:var(--text-dim);margin:0}
+.dl-mathbox p em{font-style:normal;color:var(--text-bright);font-family:'Source Serif 4',Georgia,serif}
+
 /* CHARTS — allowed full page width (the sanctioned exception to 880) */
 .dl-chart-container{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1.5rem 1.8rem;margin:2rem auto 2.6rem;max-width:1100px}
 .dl-chart-kicker{font-family:var(--font-b);font-size:.62rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:.5rem}

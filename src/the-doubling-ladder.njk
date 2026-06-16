@@ -19,7 +19,7 @@ eleventyComputed:
   <header class="dl-header">
     <span class="dl-draft-flag">Draft &middot; noindex</span>
     <h1>The Bitcoin <em>Doubling</em> Ladder</h1>
-    <p class="dl-subtitle">Bitcoin's price has doubled, on the trend, roughly every 12.8% of the way through its life so far &mdash; a steady cadence it has kept since the genesis block in 2009. That regularity is real. What it means is more interesting, and more honest, than &ldquo;Bitcoin doubles on a clock.&rdquo;</p>
+    <p class="dl-subtitle">You've met <a href="/the-power-law.html">the Power Law</a>. This page looks at it through a single lens &mdash; price doublings &mdash; with three visuals that make its behavior tangible: where each doubling has landed, how far the market strays from the trend, and what the pattern is (and isn't) telling you.</p>
   </header>
 
   <!-- ATTRIBUTION (prominent, near the top) -->
@@ -31,18 +31,21 @@ eleventyComputed:
   <!-- THESIS -->
   <section class="dl-hero">
     <div class="dl-hero-stat">Each price doubling takes a fixed <em>percentage</em> longer in days &mdash; not a fixed number of years.</div>
-    <p class="dl-hero-body">In Mezinskis's table, every doubling of the trend takes roughly <strong>12.8% more</strong> days-of-life than the one before. It looks like a hidden metronome. It is not. It is the <em>arithmetic fingerprint of a power law</em> &mdash; and once you see why, the regularity stops being mystical and becomes something you can check against the actual record.</p>
+    <p class="dl-hero-body">Mezinskis spotted it first: laid out as a ladder, bitcoin's price doublings come at a steady cadence &mdash; each one takes about <strong>12.8% more</strong> of bitcoin's life than the last. Not magic &mdash; arithmetic, as we'll show. What this page adds is a way to <em>see</em> it: where each doubling has actually landed, and how far the market strays from the line along the way.</p>
   </section>
 
   <!-- WHAT IT IS (and isn't) -->
   <section class="dl-section">
-    <h2>The fingerprint, not the clock</h2>
-    <p>Start from the model this site documents in <a href="/the-power-law.html">The Power Law</a>: the trend price is <em>price = a &middot; day<sup>b</sup></em>, where <em>day</em> is Bitcoin's age in days since the Genesis block (3&nbsp;January&nbsp;2009) and the exponent <em>b</em> is about 5.76.</p>
-    <p>Ask how long it takes the trend to double. If <em>a&nbsp;&middot;&nbsp;day<sub>2</sub><sup>b</sup>&nbsp;=&nbsp;2&nbsp;&middot;&nbsp;a&nbsp;&middot;&nbsp;day<sub>1</sub><sup>b</sup></em>, then <em>day<sub>2</sub>&nbsp;&divide;&nbsp;day<sub>1</sub>&nbsp;=&nbsp;2<sup>1/b</sup></em>. With <em>b&nbsp;&asymp;&nbsp;5.76</em>, that ratio is <strong>2<sup>1/5.76</sup>&nbsp;&asymp;&nbsp;1.128</strong>. Every doubling requires the network to get about <strong>12.8% older</strong> &mdash; always the same percentage, forever.</p>
+    <h2>A fingerprint, not a clock</h2>
+    <p>Each 12.8% of additional age has doubled the price. That's the whole pattern &mdash; and it's a fact about the math, not a habit of the market.</p>
+    <aside class="dl-mathbox">
+      <div class="dl-mathbox-title">The one line of math, if you want it</div>
+      <p>The trend is <em>price = a &middot; day<sup>b</sup></em> (<em>day</em> = age since the Genesis block, 3&nbsp;Jan&nbsp;2009; <em>b</em>&nbsp;&asymp;&nbsp;5.76). Doubling the price means <em>day</em> must grow by <em>2<sup>1/b</sup> = 2<sup>1/5.76</sup> &asymp; 1.128</em> &mdash; about 12.8% &mdash; every time.</p>
+    </aside>
     <div class="dl-insight">
-      <p>The ~12.8%-per-doubling cadence isn't bitcoin keeping time. It is what <em>any</em> power law of exponent 5.76 must do, by algebra alone. The regularity is in the math, not in the market.</p>
+      <p>The ~12.8%-per-doubling cadence isn't bitcoin keeping time. It is what <em>any</em> power law of exponent 5.76 must do, by algebra alone.</p>
     </div>
-    <p>This matters because it kills a tempting misreading. The ladder does <strong>not</strong> say &ldquo;bitcoin doubles every N years.&rdquo; A fixed 12.8% of a growing age means each doubling takes <em>longer in calendar time</em> than the last: 128 days when the network was 1,000 days old, but 766 days when it was 6,000 days old. The cadence is constant in proportion and stretching in years. Saying otherwise &mdash; treating the rungs as a schedule &mdash; is the single most common way the Power Law gets misused. So we say it plainly: <strong>the ladder is a consequence of the exponent, not a promise about the calendar.</strong></p>
+    <p>A fixed 12.8% of a growing age means each doubling takes <em>longer in calendar time</em> than the last: 128 days when the network was 1,000 days old, but 766 days when it was 6,000 days old. The cadence is constant in <em>proportion</em> and stretching in years. The ladder is the Power Law trend line, marked with a step at each price doubling &mdash; a record of past doublings, with the steps extrapolated forward. Not a schedule; a consequence of the curve.</p>
   </section>
 
   <!-- VISUAL A — THE DOUBLING LADDER -->
@@ -59,14 +62,14 @@ eleventyComputed:
     <h2>Gravity, not clockwork</h2>
     <p>If the ladder is &ldquo;just algebra,&rdquo; where is the genuinely remarkable part? Here: across more than fifteen years, the <em>actual</em> price has spent the whole time misbehaving &mdash; overshooting wildly in every mania, crashing far below in every bear market &mdash; and yet, averaged over its entire life, it sits almost exactly <strong>on</strong> the trendline.</p>
     <p class="dl-pull">The trend doesn't tick like a clock. It pulls like <em>gravity</em>. Price is always somewhere it shouldn't be, and always being dragged back &mdash; reversion to the mean.</p>
-    <p>Measure the distance from trend month by month &mdash; <em>ln(actual&nbsp;&divide;&nbsp;trend)</em> &mdash; and the record is anything but orderly. It is a series of enormous excursions: up to <strong>+2.5</strong> in the 2011 and 2013 frenzies (roughly twelve times the trend), down past <strong>&minus;0.9</strong> in the deepest bear troughs. But sum all 191 months and the mean log-deviation is <strong>+0.014</strong> &mdash; a whisker above the line. The median month sits <em>below</em> trend; only about <strong>41%</strong> of months close above it. The average is held near zero not by calm, but by a few violent overshoots balancing many quiet undershoots.</p>
+    <p>Measure the distance from trend month by month &mdash; <em>ln(actual&nbsp;&divide;&nbsp;trend)</em> &mdash; and the record is anything but orderly. It is a series of enormous excursions: up to <strong>+2.5</strong> in the 2011 and 2013 frenzies (roughly twelve times the trend), down past <strong>&minus;0.9</strong> in the deepest bear troughs <em>(the wave plots ln(actual&nbsp;&divide;&nbsp;trend), so +2.5 means about 12&times; above the line; &minus;0.9 means roughly 0.4&times;)</em>. But sum all 191 months and the mean log-deviation is <strong>+0.014</strong> &mdash; just a whisker above the line. The median month sits <em>slightly below</em> trend; only about <strong>41%</strong> of months close above it. The average is held near zero not by calm, but by a few violent overshoots balancing many quiet undershoots.</p>
   </section>
 
   <!-- VISUAL B — THE DEVIATION WAVE (centerpiece) -->
   <div class="dl-chart-container">
     <div class="dl-chart-kicker">Visual B &middot; centerpiece</div>
     <div class="dl-chart-title">The Deviation Wave</div>
-    <div class="dl-chart-subtitle">Not price in a band &mdash; the <em>gap</em> itself. Each month's distance above or below the trendline, as a wave straddling a zero centerline. Green is the market above trend; red is below. The dashed line is the 15-year average.</div>
+    <div class="dl-chart-subtitle">Not price in a band &mdash; the <em>gap</em> itself. Each month's distance above or below the trendline, as a wave straddling a zero centerline. Green is the market above trend; red is below. The dashed line is the 15-year average. The vertical axis is <em>ln(actual&nbsp;&divide;&nbsp;trend)</em> &mdash; above 0 means the market sits above the trend &mdash; and the ticks read as a multiple of trend (&times;2, &times;4), with the log value in parentheses.</div>
     <div class="dl-chart-wrapper"><canvas id="waveChart"></canvas></div>
     <div class="dl-wave-stats">
       <span class="dl-wave-stat"><span class="dl-wave-swatch above"></span> Above trend: <strong>41.9%</strong> of months (80)</span>
@@ -88,7 +91,7 @@ eleventyComputed:
       <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-exp">5.76</div><div class="dl-stat-label">Fitted exponent <em>b</em><br>(canonical window)</div></div>
       <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-mean">+0.014</div><div class="dl-stat-label">Mean log-deviation<br>(ln, 191 months)</div></div>
       <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-above">80 / 111</div><div class="dl-stat-label">Months above / below<br>trendline</div></div>
-      <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-split">41% / 59%</div><div class="dl-stat-label">Above / below<br>split</div></div>
+      <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-split">41% / 59%</div><div class="dl-stat-label">Months above / below<br>split</div></div>
     </div>
     <div class="dl-table-wrap">
       <table class="dl-ladder-table">
@@ -102,10 +105,10 @@ eleventyComputed:
     <!-- Scenario slider — re-date the not-yet-reached rungs early/late -->
     <div class="dl-scenario">
       <h4 class="dl-scenario-title">Run the upper ladder on your own assumption</h4>
-      <p class="dl-scenario-intro">The trend says when each level arrives <em>on the line</em>. The market never has &mdash; it runs years early in manias, late in bears. Move the slider to see the remaining doublings on your own assumption. <strong>This is a scenario to reason from, not a schedule.</strong></p>
+      <p class="dl-scenario-intro">The trend says when each level arrives <em>on the line</em>. Market history has always under- or over-shot it. Move the slider to see when the remaining doublings would occur on your own assumption. <strong>These are scenarios to explore &mdash; not a prediction of the schedule.</strong></p>
       <div class="dl-scenario-control">
         <label for="dl-scenario-slider">If the market runs early or late&hellip;</label>
-        <input type="range" id="dl-scenario-slider" min="-730" max="730" step="10" value="0" aria-describedby="dl-scenario-readout">
+        <input type="range" id="dl-scenario-slider" min="-1200" max="1200" step="10" value="0" aria-describedby="dl-scenario-readout">
         <div class="dl-scenario-readout" id="dl-scenario-readout">on the line</div>
       </div>
       <div class="dl-table-wrap">
@@ -122,8 +125,8 @@ eleventyComputed:
   <!-- CAVEATS -->
   <div class="dl-caveats">
     <h3>What this is &mdash; and isn&rsquo;t</h3>
-    <p>The doubling cadence is arithmetic; the adherence to trend is the empirical claim. Only the second can fail, and it is the one worth watching. The trend is an observed regularity across fifteen years, not a law of nature, and not a guarantee about the next fifteen. That said, the fit is strong &mdash; the trend has held a ~95% R&sup2; across fifteen years, and the channel floor tighter still &mdash; and the model's value is in expectations, not promises. Being far below the trend, as bitcoin periodically is, has historically preceded a more favorable forward setup; being far above it, the reverse. The discipline is to read the ladder as a center of gravity to reason from, not a schedule to count on.</p>
-    <p>The exponent is sensitive to how you fit it &mdash; the honest core of this page. Using the canonical Porkopolis / Santostasi coefficients (<em>a&nbsp;=&nbsp;1.69&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.763</em>), an ordinary least-squares fit through end-2023 reproduces <em>b&nbsp;&asymp;&nbsp;5.77</em>. A naive fit over the <em>entire</em> series through 2026 instead yields <em>b&nbsp;&asymp;&nbsp;5.63</em>, because recent prices have run slightly under the steep early-fitted trend. The cadence shifts with the exponent: 12.8% per doubling at <em>b&nbsp;=&nbsp;5.76</em>, about 13.1% at <em>b&nbsp;=&nbsp;5.63</em>. We use the canonical value and flag the spread rather than hide it.</p>
+    <p>The doubling cadence is arithmetic; the adherence to trend is the empirical claim. Only the second can fail, and it is the one worth exploring. The trend is an observed regularity across fifteen years, not a law of nature, and not any guarantee about the next fifteen. That said, the fit is strong &mdash; the trend has held a ~95% R&sup2; across fifteen years, and the channel floor tighter still &mdash; and the model's value is in projections, not promises. Being far below the trend, as bitcoin periodically is, has historically preceded a more favorable forward setup; being far above it, the reverse. The discipline is to read the ladder as a center of gravity to reason from, not a schedule to count on.</p>
+    <p>The exponent is sensitive to how you fit it. Using the canonical Porkopolis / Santostasi coefficients (<em>a&nbsp;=&nbsp;1.69&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.763</em>), an ordinary least-squares fit through end-2023 reproduces <em>b&nbsp;&asymp;&nbsp;5.77</em>. A naive fit over the <em>entire</em> series through 2026 instead yields <em>b&nbsp;&asymp;&nbsp;5.63</em>, because recent prices have run slightly under the steep early-fitted trend. The cadence shifts with the exponent: 12.8% per doubling at <em>b&nbsp;=&nbsp;5.76</em>, about 13.1% at <em>b&nbsp;=&nbsp;5.63</em>.</p>
     <p>Future rungs &mdash; everything above today's price &mdash; are projections of the trend, not predictions of when the market will arrive. Past rungs show the market reaching levels years early or, occasionally, late; there is no reason the future will be tidier. Treat the upper ladder as a scenario to reason from, never a timetable.</p>
   </div>
 

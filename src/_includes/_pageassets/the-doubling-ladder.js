@@ -320,10 +320,11 @@ function dlYearTicks(axis){
             afterBuildTicks:dlYearTicks
         },
         y:{ type:'linear', min:-1.8, max:2.7,
-            title:{display:true, text:'Distance from trend — ln(actual ÷ trend)', color:'#706860', font:{size:11}},
+            title:{display:true, text:'Market ÷ trend  (multiple; ln in parentheses)', color:'#706860', font:{size:11}},
             grid:{ color:function(c){ return c.tick.value===0 ? 'rgba(236,228,214,0.25)' : 'rgba(255,255,255,0.04)'; } },
             ticks:{ color:'#706860', font:{size:10},
-              callback:function(v){ var r=Math.exp(v); return v.toFixed(1)+'  ('+r.toFixed(r<1?2:1)+'×)'; } }
+              // Multiple of trend primary, raw ln value secondary.
+              callback:function(v){ var r=Math.exp(v); return '×'+(r<1?r.toFixed(2):r.toFixed(1))+'  ('+(v>=0?'+':'')+v.toFixed(1)+')'; } }
         }
       },
       plugins:{
@@ -423,8 +424,14 @@ function dlYearTicks(axis){
 
   function update(){
     var off = parseInt(slider.value, 10);
+    // Earlier than the trend date → green (dl-lead-early); later → red
+    // (dl-lead-late); on the line → neutral. The whole column shifts by the
+    // same offset, so it reads uniformly early or late.
+    var cellClass = 'num' + (off < 0 ? ' dl-lead-early' : off > 0 ? ' dl-lead-late' : '');
     FUTURE_RUNGS.forEach(function(r, i){
-      document.getElementById('dl-scn-' + i).textContent = shiftDate(r.date, off);
+      var cell = document.getElementById('dl-scn-' + i);
+      cell.textContent = shiftDate(r.date, off);
+      cell.className = cellClass;
     });
     if(off === 0){
       readout.textContent = 'on the line';
