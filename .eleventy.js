@@ -32,6 +32,7 @@ module.exports = function (eleventyConfig) {
     'og-the-half-life.jpg',
     'og-the-melting-ice-cube.jpg',
     'og-the-power-law.jpg',
+    'og-the-doubling-ladder.jpg',
     'og-trilemma.jpg',
     'og-what-bitcoin-is.jpg',
     'og-what-money-has-to-be.jpg',

@@ -39,6 +39,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .dl-attribution-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;color:var(--amber);font-weight:600;margin-bottom:.6rem}
 .dl-attribution p{margin:0;font-size:.95rem;line-height:1.7;color:var(--text-dim)}
 .dl-attribution a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(224,148,34,.3);transition:border-color .2s,color .2s}
+.dl-attribution a:visited{color:var(--amber)}
 .dl-attribution a:hover{color:var(--orange);border-bottom-color:var(--orange)}
 .dl-attribution strong{color:var(--text-bright)}
 
@@ -58,6 +59,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .dl-section p em{color:var(--amber);font-style:italic}
 .dl-section p strong{color:var(--text-bright);font-weight:600}
 .dl-section a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(224,148,34,.3);transition:border-color .2s,color .2s}
+.dl-section a:visited{color:var(--amber)}
 .dl-section a:hover{color:var(--orange);border-bottom-color:var(--orange)}
 
 /* INSIGHT / PULL */
@@ -136,6 +138,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .dl-caveats p{font-size:.88rem;color:var(--text-dim);line-height:1.8;margin-bottom:1rem}
 .dl-caveats p:last-child{margin-bottom:0}
 .dl-caveats a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(224,148,34,.3)}
+.dl-caveats a:visited{color:var(--amber)}
 .dl-caveats a:hover{border-bottom-color:var(--amber)}
 
 .dl-credits{border-top:1px solid var(--border);padding-top:2rem;margin:3rem auto 0;max-width:880px}
@@ -143,6 +146,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .dl-credit-entry{margin-bottom:1rem}
 .dl-credit-entry strong{color:var(--amber);font-size:.9rem}
 .dl-credit-entry a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(224,148,34,.3)}
+.dl-credit-entry a:visited{color:var(--amber)}
 .dl-credit-entry a:hover{border-bottom-color:var(--amber)}
 .dl-credit-entry p{font-size:.85rem;color:var(--text-dim);line-height:1.6;margin-top:.2rem}
 

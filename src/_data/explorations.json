@@ -164,6 +164,12 @@
     }
   },
   {
+    "slug": "the-doubling-ladder",
+    "title": "The Bitcoin Doubling Ladder",
+    "category": "numbers",
+    "interactive": true
+  },
+  {
     "slug": "bitcoin-vs-the-stock-market",
     "title": "Bitcoin vs. The Stock Market",
     "category": "numbers",
