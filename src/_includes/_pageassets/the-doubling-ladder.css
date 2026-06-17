@@ -61,6 +61,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .dl-section a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(224,148,34,.3);transition:border-color .2s,color .2s}
 .dl-section a:visited{color:var(--amber)}
 .dl-section a:hover{color:var(--orange);border-bottom-color:var(--orange)}
+.dl-subtitle a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(224,148,34,.3);transition:border-color .2s,color .2s}
+.dl-subtitle a:visited{color:var(--amber)}
+.dl-subtitle a:hover{color:var(--orange);border-bottom-color:var(--orange)}
 
 /* INSIGHT / PULL */
 .dl-insight{background:rgba(224,148,34,.04);padding:1.2rem 1.5rem;margin:2rem 0;border-radius:6px}
