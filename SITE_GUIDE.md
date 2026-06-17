@@ -457,7 +457,7 @@ v2 aligns with the homepage concept-card icon (which had Save at top from the st
 - **JS rendering switched from textContent to innerHTML to support inline links.** Data is hardcoded in `what-money-is-for.js`; no XSS risk. The architectural shift is small but worth knowing — if a third page in the WMHTB/WMIF family wants the same affordance, it should also use `.innerHTML` for the descriptor cell.
 - **Sister-page launches should pull from the senior page's references, not duplicate them.** This build pulled `what-money-has-to-be.njk / .css / .js / head.html` fresh from main as scaffolding before authoring WMIF, rather than re-deriving the patterns. Saved roughly 60% of the work and ensured the visual family stays tight. Worth doing on any future sister-page launch.
 
-## 13. Homepage carousel — completed set (24 slides)
+## 13. Homepage carousel — completed set (28 slides)
 
 All slides deployed with 16:9 widescreen silent videos, minimalist copy pattern (label + headline + CTA, no `.insight-desc`).
 
@@ -510,6 +510,8 @@ All slides deployed with 16:9 widescreen silent videos, minimalist copy pattern 
 | 21 | Living on Bitcoin | Save in bitcoin. Spend in fiat. *The float holds.* | (concept retrospectively documented — see live markup `src/index.njk` for the as-shipped video) |
 | 22 | Bitcoin Defined | Define it. *Then debate it.* | Bed of glowing embers in deep darkness — same composition as Card 7 (Bounded by Energy) on the page. Camera fixed throughout. Four-layer subtle motion: heat shimmer above the bed, asymmetric ember pulse (no two embers in sync), a small natural wood-fire flame at center-left with irregular asymmetric tongues whose base merges with the surrounding embers, wisps of pale smoke rising and dissipating. Seamlessly looping 10-second silent video. |
 | 23 | What Money Is For | Saving is the default. The rest is choice — *or should be.* | Small ancient weathered stone basin set into a leaf-carpeted forest clearing in late autumn; the basin is full to the brim with water held still, gentle source-welling at center; two narrow channels carved into the basin's lip on either side remain dry throughout (paths the water could take but does not); birches with golden foliage and a sun-lit clearing opening behind; warm low-angle late-afternoon sun, bronze/amber/ochre palette; fixed camera; the basin's persistence is the visual argument |
+
+**Added since this table was last renumbered (positions tracked in the bolded paragraphs above; rows pending a full renumber):** The Bitcoin Doubling Ladder (numbers, video — first-person staircase ascent; headline *"Each step takes longer than the last."*; CTA *"Climb the ladder →"*). Bitcoin and The Power Law demoted from featured (data-feat=0) to hold featured count at 10 — June 2026.
 
 ### Iteration record — slide 17 (May 2026)
 
@@ -1422,3 +1424,43 @@ _Last updated: June 2026. Update this document as editorial decisions crystalliz
 **Annual refresh (JM flag).** The opening's time-anchored facts — "seventeen years old," "as of 2026," the proof-of-work-dominance claim — need a yearly update. Logged in MONTHLY_REFRESH §2.
 
 **Open enhancements.** Carousel slide shipped June 2026 (resilience video, antifragility carried by headline + page; see §13 iteration record). All statistics were rounded/hedged at launch pending firmer dated primaries; the data-audit register above is the canonical record.
+
+## 29. The Bitcoin Doubling Ladder (`/the-doubling-ladder.html`)
+
+First page of the "Power Law cluster" — takes the Power Law and views it through the single lens of price doublings. Launched June 2026. Category: The Numbers; interactive (scenario slider + hover charts).
+
+### Editorial frame
+The page adds new *visuals*, not a new argument — and says so up front. Credits Matthew Mezinskis (Porkopolis) for the doubling-cadence insight (each doubling takes ~12.8% more days-of-life than the last); the page's contribution is making it visible. Core honest thesis: the 12.8% cadence is an *arithmetic* property of any power law (2^(1/b)), not a market behavior — "a fingerprint, not a clock." The genuinely remarkable empirical fact is "gravity, not clockwork": price overshoots/undershoots wildly but averages almost exactly on trend.
+
+### Model parameters (canonical, verified against blockchain.info daily history)
+- Trend: price = 1.69×10⁻¹⁷ · day^5.763 (day = age since Genesis, 2009-01-03). Display exponent: 5.76.
+- Time-origin sensitivity (documented on-page, not hidden): canonical fit through ~2023 reproduces b≈5.76; naive OLS through 2026 gives b≈5.63. Cadence: 12.8% per doubling at b=5.76, ~13.1% at b=5.63.
+
+### Verified claims register (DO NOT re-derive — computed from blockchain.info full daily series, 5,780 priced days)
+- Mean log-deviation (month-end, 191 months): +0.014 — statistically the trendline is the center of gravity.
+- Months above/below trend: 80/111 = 41%/59% (essentially balanced, slightly more below).
+- Deviation extremes: up to +2.5 ln (~12× trend, 2011/2013 manias); down to ~−0.9 ln (~0.4× trend, deep bears).
+- Cycle peaks DECLINING: ~9× (2011), ~12× (2013), ~4× (2017), ~3× (2021); downward best-fit R²≈0.82.
+- Cycle troughs roughly FLAT: ~0.40–0.45× trend every cycle; slope≈0, R²≈0.01.
+- Spread (stdev of log-deviation) compresses each 3-yr window: 0.90→0.86→0.56→0.58→0.27 = volatility decreasing as asset matures.
+- Forward-return finding (verified, deliberately KEPT OUT of prose as it reads as prediction): median forward 2yr return started-below-trend ≈ +2.27 ln (~9.7×); near-trend ≈ +1.35 (~3.9×); above-trend ≈ +0.14 (~1.15×).
+- First-crossing example: market hit $15,729 ~1,089 days *before* the trendline (2017 mania).
+
+### Three visuals
+- **Visual A — The Doubling Ladder:** log-log staircase of trend doublings ($0.06→~$2M), diamonds at actual first-crossings (green=early/mania, red=late), plus a teal monthly-high actual-price line that sweeps through the mania clusters (makes the "one spike crosses many rungs" legible).
+- **Visual B — The Deviation Wave (centerpiece):** month-end ln(actual/trend) as green-above/red-below wave around zero centerline; dashed ceiling (falling) + floor (flat) best-fit lines; "ceiling is falling, the floor holds" caption with small-sample caveat (4 cycles; 2013 overshot more than 2011).
+- **Verification register:** 4 stat cards + per-rung crossing table; scenario slider (±1,200 days, default 0) re-dating the 5 future rungs ($126K→2026-02 … $2.01M→2036-08, anchored to the $0.06 doubling sequence), scenario dates colored green-early/red-late.
+
+### Closing section "What the gap is good for"
+Observational, not advisory. Two points: swings are shrinking (maturing asset), and below-trend has historically preceded stronger forward returns. Guardrail line: "None of this is a signal to act on, and past patterns can break." Cross-links to The Bitcoin Horizon (the why) and Disciplined Rebalancing (the what-to-do).
+
+### Attribution
+Mezinskis/Porkopolis (doubling cadence + canonical coefficients), Santostasi (power-law theory), Trolololo (2014 log-regression sketch). Credited in both the lead-in prose and a formal Lineage & Attribution block.
+
+### Files
+src/the-doubling-ladder.njk; _pageassets/the-doubling-ladder-head.html, .css, .js. OG card: og-the-doubling-ladder.jpg. Carousel video: videos/the-doubling-ladder.mp4 (first-person mossy-staircase ascent into mist).
+
+### Page-specific lessons banked
+- Internal links need an explicit `a:visited{color:var(--amber)}` rule per link-bearing class, or visited links render browser-default purple. Classes covered: .dl-section, .dl-attribution, .dl-caveats, .dl-credit-entry, .dl-subtitle.
+- Mania clustering on the ladder is real data (one spike crosses 4-5 rungs in days), not a plotting bug — the monthly-high line makes it legible.
+- Future-rung values must be computed from the same $0.06-anchored doubling sequence the register table uses, or the slider and table drift apart.
