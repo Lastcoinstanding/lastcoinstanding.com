@@ -311,6 +311,44 @@ The gap ladder and §B cite live institutional positions. Quarterly, verify:
 - GUARD: never reintroduce the retracted "Fidelity 84% continuous Kelly"
   figure (corpus hallucination — see SITE_GUIDE §26 register).
 
+## 9. Bitcoin & Metcalfe's Law — ETF-era time-sensitive figures (`/bitcoin-and-metcalfes-law.html`)
+
+These figures are date-stamped on the page and drift over time; stale numbers
+would undercut the page's "verified, not asserted" standard. Refresh monthly
+(a structural argument tolerates a monthly cadence — see the cadence note).
+Source files: prose + credits in `src/bitcoin-and-metcalfes-law.njk`; the fit
+table in `src/_includes/_pageassets/bitcoin-and-metcalfes-law.js`.
+
+| Figure on page | Current value (as of) | Source to re-pull | Notes |
+|---|---|---|---|
+| US spot ETF holdings | 1,283,551 BTC (2026-06-17) | walletpilot.com/bitcoin-tracker/etfs (cross-check Farside, Glassnode, The Block, Bitbo) | Credit [8] + §VI prose ("roughly 1.28 million BTC"). Update both the BTC figure AND the "% of circulating supply." |
+| ETF holdings as % of supply | ≈6.5% | = ETF BTC ÷ circulating supply | Appears in §VI prose, the inline holder-growth/ETF visual ("6.5%"), and the visual caption. Recompute when either input moves. |
+| ETF AUM (owner-count basis) | ~$82.5B | same ETF trackers | Credit [9] order-of-magnitude basis for the "millions of owners" claim. |
+| ETF-era on-chain holder growth | ~3.7%/yr | recompute: Coin Metrics `AdrBalCnt` CAGR over 2024–present | §VI prose + the inline visual ("3.7%/yr"). Will drift as the ETF era extends. |
+| Long-term-held supply share | ~67% ("two-thirds today") | Bitcoin Magazine Pro HODL Waves (sum of ≥1yr bands) | §V callout ("roughly two-thirds today"). |
+
+**Re-pull recipes** (so future-you doesn't reconstruct the method):
+
+- **On-chain fits (β, R² by era — the `FITS` object).** Coin Metrics Community
+  API — `community-api.coinmetrics.io/v4/timeseries/asset-metrics`, metrics
+  `PriceUSD` + `AdrBalCnt` (holders) and Blockchain.com Charts
+  `n-unique-addresses` + `market-price` (active), daily, full history; OLS on
+  log-log per era. Era boundaries: retail 2011→2016-12-31; institutional
+  2017-01-01→2020-03-31; ETF 2024-01-01→present; full 2011→present (calibrated
+  so the holders fit reproduces the exact `bal` cells — see SITE_GUIDE §29).
+  Re-running monthly mainly moves the ETF-era and full-history rows. The `bal`
+  cells are exact OLS; the `act` cells were recomputed at launch.
+- **HODL / long-term-held share.** Bitcoin Magazine Pro Dash app `hodl_waves`,
+  POST to `_dash-update-component` with `display.children="lg 1082px"`. Free,
+  full history.
+- **ETF holdings.** No clean free API; read the current figure off Wallet Pilot
+  / Farside and cross-check one other tracker before updating.
+
+**Cadence note.** ETF figures move daily but a monthly refresh is sufficient
+for a page making a structural (not real-time) argument. If the page ever
+quotes a "today" figure prominently, consider a quarterly re-fit of the era
+exponents too, since the ETF-era window lengthens.
+
 ## Live BTC price fetch — shipped 2026-05-28
 
 The "Why not live fetch?" reasoning that previously sat here is preserved

@@ -1,0 +1,221 @@
+---
+layout: base.njk
+permalink: /bitcoin-and-metcalfes-law.html
+slug: bitcoin-and-metcalfes-law
+related:
+  - slug: the-power-law
+    desc: "The price model this builds on. The Power Law models price versus time; this page measures price versus adoption — the network-effect engine running underneath that trend."
+  - slug: the-fixed-pie
+    desc: "The supply-side companion. Metcalfe counts the network's participants; the Fixed Share counts your claim on its fixed supply — two halves of the same network-value question."
+  - slug: paper-bitcoin
+    desc: "Where the intermediation problem bites hardest. As ETFs and custodians hold more coins on behalf of more owners, the gap between an on-chain address and a real owner is exactly what this page measures going blind."
+companion: []
+eleventyComputed:
+  head_extras: "{% include '_pageassets/bitcoin-and-metcalfes-law-head.html' %}"
+  page_styles: "{% include '_pageassets/bitcoin-and-metcalfes-law.css' %}"
+  page_scripts: "{% include '_pageassets/bitcoin-and-metcalfes-law.js' %}"
+---
+<div class="page">
+
+  <header class="hero">
+    <h1>Bitcoin &amp; <em>Metcalfe's Law</em></h1>
+    <div class="hero-subtitle">Adoption is real — but the data is going blind</div>
+    <p class="subtitle">Metcalfe's Law says a network's value grows with the square of the number of its users. Bitcoin tracked that link for a decade. Then a growing share of all Bitcoin came to sit behind intermediaries — ETFs, custodians, corporate treasuries — and the on-chain data we use to measure adoption began losing sight of who actually owns it.</p>
+    <div class="signature" id="signature">
+      <div class="sig-rail" id="sigRail"></div>
+      <div class="sig-labels"><span>2011</span><span>2017</span><span>2020</span><span>2024</span><span>2026</span></div>
+      <div class="sig-caption">How well on-chain holders explain price, era by era. Brightness is the strength of the fit. It fades.</div>
+    </div>
+  </header>
+
+  <!-- I -->
+  <section class="block essay">
+    <div class="section-num">I · The Claim</div>
+    <h2>As adoption doubles, price quadruples</h2>
+    <p class="lede">There is a common belief about Bitcoin: that as adoption rises, price rises with the <em>square</em> of it. Double the number of holders, and price should roughly quadruple.</p>
+    <p>The idea traces to Metcalfe's Law — the principle that a network's value grows with the square of the number of its users — and the causal story runs in one direction: more adoption drives higher price, not the reverse. The cleanest recent statement of it comes from Fred Krueger, who put it plainly in September 2025:</p>
+    <blockquote>
+      "Bitcoin Price is quadratic with the number of active users… Quadratic is what Metcalfe's law would project. It's roughly in line with the statistical data."
+      <cite>— Fred Krueger (@dotkrueger), September 28, 2025<sup><a href="#c1">1</a></sup>. His chart fixes the exponent at exactly two: Price = 4.4×10⁻¹¹ · Users².</cite>
+    </blockquote>
+    <p>Krueger is in good company. Timothy Peterson<sup><a href="#c2">2</a></sup> built the standard Metcalfe model of Bitcoin in 2018; Santostasi and Perrenod<sup><a href="#c3">3</a></sup> derive a version of it from first principles. But all three do the same thing: they <em>assume</em> the exponent is two and show the fit looks good. None of them lets the data decide what the exponent actually is.</p>
+    <p>That distinction is where this gets interesting — because when you measure the exponent instead of assuming it, two things turn out to be true that the popular version misses. The first is a smaller number than you'd expect. The second changes how you should read every Bitcoin adoption chart from here on.</p>
+  </section>
+
+  <!-- II -->
+  <section class="block essay">
+    <div class="section-num">II · The Measurement</div>
+    <h2>Measured, the exponent is <em>below</em> two</h2>
+    <p>When you fit the relationship to data rather than assume it — when you let the data choose the exponent — it lands consistently below the quadratic ideal. We measured it ourselves against the number of addresses holding a non-zero balance, and checked it against the peer-reviewed record.</p>
+    <div class="exps">
+      <div class="exp-row"><div class="who">Krueger — asserted heuristic <small>active users</small></div><div class="beta">2.00</div><div class="tag asserted">Assumed</div></div>
+      <div class="exp-row"><div class="who">Peterson (2018) — imposes n² <small>active addresses · R²&gt;0.80</small></div><div class="beta">2.00</div><div class="tag asserted">Assumed</div></div>
+      <div class="exp-row"><div class="who">Santostasi/Perrenod (2026) <small>generalised Metcalfe component</small></div><div class="beta">≈2.0</div><div class="tag asserted">Assumed</div></div>
+      <div class="exp-row"><div class="who">Wheatley, Sornette et al. (2018) <small>active addresses · R²=0.95 · peer-reviewed</small></div><div class="beta">1.69</div><div class="tag fitted">Measured</div></div>
+      <div class="exp-row"><div class="who">This page — our fit <small>non-zero-balance addresses · 2011–2026 · R²=0.95</small></div><div class="beta">1.84</div><div class="tag fitted">Measured</div></div>
+    </div>
+    <p>Every <em>measured</em> exponent falls below two. A doubling of adoption has historically come with something closer to a 3.5× price increase than a clean 4×. The popular "4x per 2x" is directionally right, and a little generous.</p>
+  </section>
+
+  <!-- III -->
+  <section class="block essay">
+    <div class="section-num">III · The Theory</div>
+    <h2>Below two is what the theory predicts</h2>
+    <p>The shortfall is not measurement error. In 2006, Briscoe, Odlyzko and Tilly published a well-known rebuttal titled simply <em>"Metcalfe's Law is Wrong."</em><sup><a href="#c4">4</a></sup> Their argument: a network's value grows not as n², but as <strong>n·log(n)</strong> — gentler than quadratic — because of <em>diminishing returns</em>. The most valuable connections form first, so each new member adds a little less than the last.</p>
+    <p>A measured Bitcoin exponent sitting between Metcalfe's 2.0 and Odlyzko's gentler curve is exactly what that theory predicts. The data and the twenty-year-old critique point the same way, arrived at independently — the skeptical correction and the empirical measurement landing on the same number.</p>
+  </section>
+
+  <!-- IV -->
+  <section class="block">
+    <div class="essay">
+      <div class="section-num">IV · See For Yourself</div>
+      <h2>The exponent depends on two choices</h2>
+      <p>There is no single Metcalfe exponent for Bitcoin. The number you get depends on what you use to measure "adoption" and which era you look at — and, more importantly, so does <em>how well it fits at all</em>. Choose a proxy and an era below, and watch both the exponent and the fit. The better the fit, the more the relationship actually means.</p>
+    </div>
+
+    <div class="tool essay" id="tool">
+      <div class="tool-title">Metcalfe, on your assumptions</div>
+      <div class="tool-sub">All figures measured from on-chain data, 2011–2026. The defaults are the most defensible reading.</div>
+
+      <div class="ctrl">
+        <div class="ctrl-label">Adoption proxy</div>
+        <div class="proxy-seg" id="proxySeg">
+          <button data-v="bal" aria-pressed="true">Holders (non-zero balance)
+            <span class="tip">?<span class="tip-body">Every address holding any Bitcoin. A closer proxy for ownership than activity — an idle long-term holder still counts. This is our preferred measure.</span></span>
+          </button>
+          <button data-v="act">Active addresses
+            <span class="tip">?<span class="tip-body">Addresses transacting on a given day. A measure of activity, not ownership — it misses dormant holders and is distorted when activity moves off-chain.</span></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-label">Era <span style="color:var(--ink-faint);text-transform:none;letter-spacing:0;font-size:.74rem">— Bitcoin's structural epochs, left to right</span></div>
+        <div class="era-rail" id="eraSeg">
+          <button data-v="all" aria-pressed="true">Full history<span class="yr">2011–26</span></button>
+          <button data-v="retail">Retail<span class="yr">pre-2017</span></button>
+          <button data-v="inst">Institutional<span class="yr">2017–20</span></button>
+          <button data-v="etf">ETF era<span class="yr">2024–26</span></button>
+        </div>
+      </div>
+
+      <div class="readout">
+        <div class="stat" id="statBeta">
+          <div class="k">Measured exponent β</div>
+          <div class="v" id="betaVal">1.84</div>
+          <div class="fit-quality" id="fitQ"><span class="dot"></span><span id="fitTxt"></span></div>
+        </div>
+        <div class="stat flag" id="statPerDouble">
+          <div class="k">Price per doubling of adoption</div>
+          <div class="v" id="perDoubleVal">3.6<small>×</small></div>
+          <div class="fit-quality" style="color:var(--ink-faint)">Metcalfe predicts 4×; Odlyzko, less</div>
+        </div>
+      </div>
+
+      <div class="insight" id="insight"></div>
+      <div class="chart-box"><canvas id="fitChart"></canvas></div>
+      <div class="tool-foot">
+        Sources: price and non-zero-balance addresses from Coin Metrics Community API<sup><a href="#c5">5</a></sup>; active addresses from Blockchain.com. Fits are ordinary least squares on log-transformed series. Why we prefer holders over active addresses: an owner who buys once and holds for years is real adoption, but never appears as an "active" address — so active-address counts undercount committed holders and, as the ETF era shows, can even move opposite to price. Method and data are reproducible; see credits.
+      </div>
+    </div>
+  </section>
+
+  <!-- V -->
+  <section class="block essay">
+    <div class="section-num">V · A Missing Variable <span class="novel-inline">· New perspective</span></div>
+    <h2>Headcount is not the measure of adoption</h2>
+    <p class="dek">One holder's deep conviction can matter more than another's passing curiosity — and a head-count cannot tell them apart.</p>
+    <p>There is a flaw buried in every proxy above, and naming it opens a question the published literature has barely touched. Counting holders treats adoption as a simple head-count. But adoption is rarely a single, binary event. A hodler progresses. The first purchase of Bitcoin, for most people, is modest — a little sent by a friend, an initial nervous buy. What often follows, much later and after far more conviction, is something far larger: the retirement account moved over, the rental property sold and the proceeds converted, steady accumulation in between.</p>
+    <p>So the demand that moves price most is frequently the <span class="amber-em">second act</span> — the large, late, conviction-driven commitment — and it is exactly what a head-count cannot see. Someone who deepens their stack from a hundred dollars to their life savings is still a single holder in the count; if they consolidate that larger stack into one cold-storage wallet, their on-chain footprint can even <em>shrink</em>. The right measure of adoption isn't how many wallets exist — it's <em>value-weighted</em>: coins counted by the conviction behind them. The truest version would weight by each holder's share of personal wealth committed, but no on-chain data can see anyone's net worth. The closest measurable shadow is realized capitalization, which weights each coin by the price at which it last moved.</p>
+    <p>We tested whether this conviction signal <em>leads</em> price. Using sixteen years of holding-age data, the answer is partial and honest. The relationship is a feedback loop, and price leads it: when price rises, holders reliably move into longer-term conviction — the well-known pattern of higher prices pulling in committed buyers. The reverse, conviction pushing price up, is present in the data but weak, and it shows up only over a week or two.<sup><a href="#c6">6</a></sup> So the idea isn't wrong; it's just the quieter half of the loop.</p>
+    <div class="callout">
+      <div class="ct">The finding that survives every caveat</div>
+      <p>One result holds up regardless of how the causality shakes out. The share of Bitcoin that has not moved in over a year has trended structurally <strong>upward across Bitcoin's history</strong> — from roughly 30% in its early years to roughly two-thirds today.<sup><a href="#c6">6</a></sup></p>
+      <p>Whatever drives price in the short run, Bitcoin is steadily becoming an asset that is <em>held</em> rather than traded. That long maturation is the firmer ground — and it sets up the larger problem with measuring adoption at all.</p>
+    </div>
+  </section>
+
+  <!-- VI -->
+  <section class="block essay">
+    <div class="section-num">VI · The Headline <span class="novel-inline">· New perspective</span></div>
+    <h2>On-chain data is no longer the whole story</h2>
+    <p>Here is the observation that builds on everything above. The mechanisms of Bitcoin demand have changed structurally, and recently. Bitcoin retirement accounts, corporate treasuries holding Bitcoin on the balance sheet, spot ETFs since 2024, borrowing fiat against your Bitcoin instead of selling it — none of these existed in the early years. Consequently there is no reason to expect one stable price-to-adoption relationship across eras that are this fundamentally different.</p>
+    <p>And when you examine the price-to-adoption relationship era by era, it doesn't hold still — but the revealing number isn't the exponent. It is the fit. In the early retail era, on-chain holders explained roughly 80% of the variation in price. In the ETF era, that has collapsed to under 10%. The signal doesn't just weaken; it falls apart.</p>
+    <p>The reason is structural. It is the missing variable from the section above — the gap between an on-chain address and an actual owner — now grown wide enough to break the measurement. A single on-chain address has never been the same thing as a single owner; exchanges have aggregated thousands of customers behind a handful of addresses for over a decade. What is new is the scale and the type of intermediary. ETFs, corporate treasuries, and custodians now hold large amounts of Bitcoin on behalf of millions of people, behind a small number of addresses — and they do it at a size that overwhelms the on-chain signal. The people entering Bitcoin in this era, and especially the large, conviction-driven buyers who move price, increasingly don't appear as individual on-chain addresses at all.</p>
+
+      <div style="margin:30px 0;background:var(--bg-raise);border:1px solid var(--line);border-radius:12px;padding:24px 26px">
+        <div style="font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-bottom:20px">The adoption didn't stop — it moved behind intermediaries</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+          <div>
+            <div style="font-size:.82rem;color:var(--ink-dim);margin-bottom:16px">On-chain holder growth is collapsing</div>
+            <div style="display:flex;gap:8px;height:170px">
+              <div style="display:flex;flex-direction:column;justify-content:space-between;font-size:.6rem;color:var(--ink-faint);text-align:right;padding-bottom:34px">
+                <span>60%</span><span>40%</span><span>20%</span><span>0</span>
+              </div>
+              <div style="flex:1;position:relative">
+                <div style="position:absolute;inset:0;bottom:34px;display:flex;flex-direction:column;justify-content:space-between">
+                  <div style="border-top:1px solid var(--line);opacity:.5"></div><div style="border-top:1px solid var(--line);opacity:.5"></div><div style="border-top:1px solid var(--line);opacity:.5"></div><div style="border-top:1px solid var(--line)"></div>
+                </div>
+                <div style="position:absolute;inset:0;bottom:34px;display:flex;align-items:flex-end;gap:18px;padding:0 6px">
+                  <div style="flex:1;text-align:center"><div style="background:var(--good);height:124px;border-radius:3px 3px 0 0"></div></div>
+                  <div style="flex:1;text-align:center"><div style="background:var(--amber);height:41px;border-radius:3px 3px 0 0"></div></div>
+                  <div style="flex:1;text-align:center"><div style="background:var(--bad);height:8px;border-radius:3px 3px 0 0"></div></div>
+                </div>
+                <div style="position:absolute;left:6px;right:6px;bottom:0;display:flex;gap:18px">
+                  <div style="flex:1;text-align:center"><div style="font-size:.72rem;color:var(--ink-bright);font-weight:600">54%/yr</div><div style="font-size:.6rem;color:var(--ink-faint)">2015–19</div></div>
+                  <div style="flex:1;text-align:center"><div style="font-size:.72rem;color:var(--ink-bright);font-weight:600">18%/yr</div><div style="font-size:.6rem;color:var(--ink-faint)">2019–23</div></div>
+                  <div style="flex:1;text-align:center"><div style="font-size:.72rem;color:var(--ink-bright);font-weight:600">3.7%/yr</div><div style="font-size:.6rem;color:var(--ink-faint)">ETF era</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:.82rem;color:var(--ink-dim);margin-bottom:16px">…while ETFs absorbed 6.5% of all BTC</div>
+            <div style="display:flex;gap:8px;height:170px">
+              <div style="display:flex;flex-direction:column;justify-content:space-between;font-size:.6rem;color:var(--ink-faint);text-align:right;padding-bottom:20px">
+                <span>8%</span><span>6%</span><span>4%</span><span>2%</span><span>0</span>
+              </div>
+              <div style="flex:1;position:relative">
+                <div style="position:relative;height:136px;border-bottom:1px solid var(--line)">
+                  <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between">
+                    <div style="border-top:1px solid var(--line);opacity:.4"></div><div style="border-top:1px solid var(--line);opacity:.4"></div><div style="border-top:1px solid var(--line);opacity:.4"></div><div style="border-top:1px solid var(--line);opacity:.4"></div><div></div>
+                  </div>
+                  <svg viewBox="0 0 200 136" preserveAspectRatio="none" style="width:100%;height:136px;position:relative">
+                    <defs><linearGradient id="metcalfeEtfGrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d99a2b" stop-opacity=".4"/><stop offset="1" stop-color="#d99a2b" stop-opacity="0"/></linearGradient></defs>
+                    <path d="M0,136 L40,95 L90,69 L140,50 L200,25 L200,136 Z" fill="url(#metcalfeEtfGrad)"/>
+                    <path d="M0,136 L40,95 L90,69 L140,50 L200,25" fill="none" stroke="#e7b75e" stroke-width="2.5"/>
+                  </svg>
+                  <div style="position:absolute;top:14px;right:8px;font-size:.8rem;color:var(--amber-soft);font-weight:600">6.5%</div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--ink-faint);margin-top:4px"><span>2024</span><span>2026</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:.72rem;color:var(--ink-faint);margin-top:18px;line-height:1.5">On-chain holder growth fell to 3.7%/yr in the ETF era — but US spot ETFs alone came to hold 1.28M BTC (6.5% of supply) on behalf of millions of owners who never appear as individual on-chain addresses. ETF ramp illustrative toward the verified 6.5% endpoint; holder-growth rates measured.</div>
+      </div>
+
+    <p>The numbers make the gap concrete. Over the ETF era (2024 to present), on-chain holder growth slowed to about 3.7% per year, down from over 50% per year a decade earlier — which, read from on-chain data alone, looks like adoption stalling. But over that same period, US spot ETFs alone came to hold roughly 1.28 million BTC — about 6.5% of all the Bitcoin in existence — on behalf of millions of owners who never appear as individual on-chain addresses. The slowdown isn't an adoption slowdown. It's the mechanical consequence of millions of new owners entering through ETFs and custodians instead of through self-custody. (Some balances have also genuinely moved off-chain, onto the Lightning Network; its capacity is small enough today not to move these numbers much, though that could change in the future.)</p>
+    <p class="lede">Metcalfe's Law hasn't failed. The network effect is likely intact. What has failed is our ability to measure the full network dynamics on-chain. On-chain data is no longer the whole story — and any accurate modelling of Bitcoin's adoption will, from here, have to account for ownership it can no longer easily count.</p>
+    <div class="callout"><div class="ct">What this is and isn't</div><p>This is not a claim that network effects stopped working, nor a refutation of the power-law models explored elsewhere on this site — those concern price versus time, a different relationship. It is a narrower, sturdier claim: a growing share of Bitcoin sits in addresses that represent many beneficial owners rather than one, so on-chain holder counts increasingly understate real ownership — and the era-by-era collapse in fit is the evidence. This intermediation isn't entirely new (exchanges did it for years); what's new is its scale, via ETFs and treasuries. The era boundaries are analyst-chosen and the individual era exponents are sensitive to where you draw them, so we don't quote them as constants. The pattern — a strong fit early in Bitcoin's history versus an increasingly broken one as time goes by — is the finding.</p></div>
+  </section>
+
+  <!-- credits -->
+  <section class="credits essay">
+    <h3>Sources &amp; credits</h3>
+    <p style="font-size:.84rem; color:var(--ink-dim); margin-bottom:24px; line-height:1.55">Every figure on this page is traceable to a primary source. Figures marked "our fit" were measured from public on-chain data (Coin Metrics; Bitcoin Magazine Pro HODL Waves); literature figures were verified against the original papers.</p>
+    <ol>
+      <li id="c1"><strong>Fred Krueger</strong> (@dotkrueger), X, Sep 28 2025. Credited as the clearest recent popularizer of the quadratic-adoption heuristic. As elsewhere on this site, the credit is for popularization; this page does not endorse his price forecasts. <a href="https://x.com/dotkrueger/status/1972338023783452748">post</a></li>
+      <li id="c2"><strong>Timothy Peterson</strong>, "Metcalfe's Law as a Model for Bitcoin's Value," <em>Alternative Investment Analyst Review</em>, 2018. <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3078248">SSRN 3078248</a></li>
+      <li id="c3"><strong>Giovanni Santostasi &amp; Stephen Perrenod</strong>, "A Mechanistic Derivation of the Bitcoin Price Power Law," Zenodo, 2026. Generalised-Metcalfe component cited as ≈ N²; precise value not independently confirmed. <a href="https://zenodo.org/records/19387099">Zenodo</a></li>
+      <li id="c4"><strong>Bob Briscoe, Andrew Odlyzko &amp; Benjamin Tilly</strong>, "Metcalfe's Law is Wrong," <em>IEEE Spectrum</em> 43(7):34–39, 2006. The n·log(n) / diminishing-returns argument. <a href="https://spectrum.ieee.org/metcalfes-law-is-wrong">IEEE Spectrum</a></li>
+      <li id="c5"><strong>Price &amp; address data.</strong> Price and non-zero-balance address counts from <a href="https://coinmetrics.io">Coin Metrics</a> Community API (metrics PriceUSD, AdrBalCnt); active addresses from Blockchain.com Charts. Fits are OLS on log-transformed daily series, 2011–2026.</li>
+      <li id="c6"><strong>Conviction &amp; long-term-holder analysis (this page).</strong> Granger causality, weekly differences, 2010–2026, on the share of supply last active ≥1 year, built from Bitcoin Magazine Pro HODL Waves data<sup>(upstream on-chain methodology: Glassnode-style age-band analysis)</sup>. Price→conviction significant at all lags (p≈0.0002); conviction→price weak and short-horizon (p≈0.02, lags 1–2 weeks); series not cointegrated (p=0.13). The long-term-held share rose from ~30% to ~67% over Bitcoin's history (not strictly monotonic year-to-year). The one prior instrumental-variable study (Shanaev et al., 2019, <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3432431">SSRN 3432431</a>) tested transaction count — a head-count proxy — leaving conviction untested. Conviction-progression framing: John McCabe (@LastCoinStandng).</li>
+      <li id="c7"><strong>Era analysis (this page).</strong> Price vs. non-zero-balance addresses (Coin Metrics), OLS on log-log, by era. Fit (R²): retail/pre-2017 ≈ 0.82; ETF era 2024–26 ≈ 0.09. Boundaries (2017 CME futures; 2020 corporate treasuries; 2024 spot ETFs) are analyst-chosen; the robust claim is the collapse in fit, not the individual exponents. The specification-sensitivity of pooled power-law fits is consistent with Baquero &amp; Menezes, <a href="https://arxiv.org/abs/2605.21316">arXiv:2605.21316</a> (2026). Off-chain-decoupling framing: John McCabe (@LastCoinStandng).</li>
+      <li id="c8"><strong>US spot Bitcoin ETF holdings: 1,283,551 BTC (≈6.5% of circulating supply), as of June 17 2026.</strong> Compiled from public ETF reporting via <a href="https://www.walletpilot.com/bitcoin-tracker/etfs">Wallet Pilot</a>; cross-checked against Glassnode, The Block, Bitbo and Farside. <em>Time-sensitive — refreshed monthly (see data checklist).</em></li>
+      <li id="c9"><strong>"Millions of owners" — why not a precise figure.</strong> ETFs and custodians report Bitcoin held and assets under management, but not the number of beneficial owners behind those holdings, so an exact owner count isn't publicly available. As an order-of-magnitude check, ~$82.5B in spot-ETF assets at an assumed average position of $10k–25k implies very roughly 3–8 million owner-accounts — none of which appear as on-chain addresses. We cite "millions" rather than a false-precise number; the verified, precise figure is the 1.28M BTC / 6.5%-of-supply holding.</li>
+    </ol>
+    <p class="usd-footnote">All dollar figures are in USD, intentionally. <a href="/about.html#why-usd">Why USD →</a></p>
+  </section>
+
+</div>

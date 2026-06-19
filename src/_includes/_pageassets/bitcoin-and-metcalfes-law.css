@@ -1,0 +1,119 @@
+:root{
+  --bg:#0f1012; --bg-raise:#16181b; --panel:#1a1d21; --line:#2a2e34;
+  --ink:#e7e3da; --ink-bright:#f4f1ea; --ink-dim:#a8a39a; --ink-faint:#6f6b63;
+  --amber:#d99a2b; --amber-soft:#e7b75e; --red:#c1502e; --teal:#3a8a82;
+  --good:#5a8f6b; --warn:#b07d2e; --bad:#b3523a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,sans-serif;font-size:1.05rem;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+/* NAV — palette overrides on canonical-nav-css (base.njk). Mirrors the
+   per-page accent pattern used by the-power-law.css so the active states
+   pick up this page's amber rather than the site default. */
+.site-nav .nav-links a.active{color:var(--amber);background:rgba(217,154,43,.10);font-weight:600}
+.site-nav .brand:hover{color:var(--amber)}
+.mobile-overlay a.active{color:var(--amber);background:rgba(217,154,43,.10);font-weight:600}
+.nav-dropdown-menu a.active{color:var(--amber);background:rgba(217,154,43,.10);font-weight:600}
+.nav-interactive-marker{color:var(--amber)}
+
+/* CONTAINER — mixed-content tier (STYLE_GUIDE §4.2): 1100 outer, 880 prose. */
+.page{max-width:1100px; margin:0 auto; padding:0 24px}
+.essay{max-width:880px; margin:0 auto}
+
+/* HERO — conformed to the canonical page-header convention (H1 + subtitle),
+   matching The Power Law / BvRE. No eyebrow-over-H1. The thesis line rides
+   as the hero-subtitle, the way BvRE carries "The Opportunity Cost". */
+.hero{text-align:center; max-width:880px; margin:0 auto; padding:56px 0 40px}
+.hero h1{font-family:'Cormorant Garamond',serif; font-weight:500; font-size:clamp(2rem,4.6vw,3.4rem); line-height:1.08; color:var(--ink-bright); letter-spacing:-.01em; margin-bottom:14px}
+.hero h1 em{font-style:italic; color:var(--amber)}
+.hero .hero-subtitle{font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(1.3rem,2.6vw,1.7rem); color:var(--amber-soft); line-height:1.2; margin-bottom:20px}
+.hero .subtitle{max-width:660px; margin:0 auto; color:var(--ink-dim); font-family:'Source Serif 4',Georgia,serif; font-style:italic; font-size:clamp(1rem,2vw,1.18rem); line-height:1.6}
+
+/* SIGNATURE RAIL — era-by-era fit brightness strip under the hero */
+.signature{margin:46px auto 0; max-width:760px}
+.sig-rail{display:flex; gap:2px; height:8px; border-radius:4px; overflow:hidden; background:var(--line)}
+.sig-seg{flex:1}
+.sig-labels{display:flex; justify-content:space-between; margin-top:12px; font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint)}
+.sig-caption{text-align:center; margin-top:18px; font-size:.8rem; color:var(--ink-faint); font-style:italic}
+
+/* SECTIONS */
+section.block{padding:54px 0; border-top:1px solid var(--line)}
+.section-num{font-size:.7rem; letter-spacing:.22em; text-transform:uppercase; color:var(--amber); margin-bottom:14px}
+.section-num .novel-inline{color:var(--teal); margin-left:8px}
+h2{font-family:'Cormorant Garamond',serif; font-weight:500; font-size:clamp(1.7rem,3.4vw,2.4rem); line-height:1.12; color:var(--ink-bright); margin-bottom:8px}
+h2 em{font-style:italic; color:var(--amber)}
+.dek{font-size:1.02rem; color:var(--ink-dim); margin-bottom:24px; font-style:italic}
+.essay p{margin-bottom:20px; color:var(--ink)}
+.essay p strong{color:var(--ink-bright); font-weight:600}
+.essay p em{font-style:italic; color:var(--ink-bright)}
+.amber-em{color:var(--amber-soft); font-style:normal; font-weight:500}
+.lede{font-size:1.18rem; line-height:1.62; color:var(--ink-bright)}
+
+blockquote{border-left:2px solid var(--amber); padding:6px 0 6px 24px; margin:30px 0; font-style:italic; color:var(--ink-bright); font-size:1.08rem}
+blockquote cite{display:block; font-style:normal; font-size:.82rem; color:var(--ink-dim); margin-top:10px; letter-spacing:.02em}
+
+/* EXPONENT TABLE */
+.exps{margin:30px 0; display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden}
+.exp-row{display:grid; grid-template-columns:1fr auto auto; gap:16px; align-items:center; background:var(--panel); padding:14px 18px}
+.exp-row .who{color:var(--ink); font-size:.96rem}
+.exp-row .who small{display:block; color:var(--ink-faint); font-size:.74rem; margin-top:2px}
+.exp-row .beta{font-family:'Cormorant Garamond',serif; font-size:1.5rem; color:var(--amber-soft); font-weight:500; min-width:60px; text-align:right}
+.exp-row .tag{font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; padding:3px 9px; border-radius:20px; white-space:nowrap}
+.tag.asserted{background:rgba(176,125,46,.16); color:var(--warn)}
+.tag.fitted{background:rgba(90,143,107,.16); color:var(--good)}
+
+/* INTERACTIVE TOOL */
+.tool{background:var(--bg-raise); border:1px solid var(--line); border-radius:14px; padding:28px; margin:8px auto 0}
+.tool-title{font-family:'Cormorant Garamond',serif; font-size:1.5rem; color:var(--ink-bright); margin-bottom:6px}
+.tool-sub{font-size:.86rem; color:var(--ink-dim); margin-bottom:24px}
+.ctrl{margin-bottom:22px}
+.ctrl-label{display:flex; align-items:center; gap:8px; font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); margin-bottom:12px}
+.proxy-seg{display:flex; gap:8px}
+.proxy-seg button{flex:1; background:var(--panel); border:1px solid var(--line); color:var(--ink-dim); padding:11px 14px; border-radius:8px; font-family:inherit; font-size:.86rem; cursor:pointer; transition:all .15s; position:relative}
+.proxy-seg button:hover{border-color:var(--amber-soft); color:var(--ink)}
+.proxy-seg button[aria-pressed="true"]{background:rgba(217,154,43,.14); border-color:var(--amber); color:var(--amber-soft)}
+.tip{display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border-radius:50%; border:1px solid var(--ink-faint); color:var(--ink-faint); font-size:.6rem; cursor:help; position:relative; font-style:normal}
+.tip:hover .tip-body{opacity:1; visibility:visible; transform:translateX(-50%) translateY(0)}
+.tip-body{position:absolute; bottom:140%; left:50%; transform:translateX(-50%) translateY(4px); width:240px; background:#23272d; border:1px solid var(--line); border-radius:8px; padding:11px 13px; font-size:.76rem; line-height:1.5; color:var(--ink); letter-spacing:0; text-transform:none; font-weight:400; opacity:0; visibility:hidden; transition:all .18s; z-index:10; box-shadow:0 8px 24px rgba(0,0,0,.4)}
+/* era rail — continuous epochs, like hero */
+.era-rail{display:flex; gap:3px; border-radius:8px; overflow:hidden}
+.era-rail button{flex:1; background:var(--panel); border:none; border-top:3px solid var(--line); color:var(--ink-dim); padding:12px 8px 11px; font-family:inherit; font-size:.74rem; cursor:pointer; transition:all .15s; text-align:left}
+.era-rail button:hover{background:#1f2329; color:var(--ink)}
+.era-rail button[aria-pressed="true"]{background:#1f2329; color:var(--amber-soft)}
+.era-rail button .yr{display:block; font-size:.64rem; color:var(--ink-faint); margin-top:2px}
+.era-rail button[aria-pressed="true"] .yr{color:var(--amber)}
+.readout{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:22px}
+@media(max-width:620px){.readout{grid-template-columns:1fr}}
+.stat{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px 20px}
+.stat .k{font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px}
+.stat .v{font-family:'Cormorant Garamond',serif; font-size:2rem; color:var(--ink-bright); line-height:1}
+.stat .v small{font-size:1rem; color:var(--ink-dim)}
+.stat.flag .v{color:var(--amber-soft)}
+.fit-quality{margin-top:8px; font-size:.78rem}
+.fit-quality .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:7px; vertical-align:middle}
+.insight{margin-top:20px; padding:14px 18px; background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--amber); border-radius:8px; font-size:.88rem; color:var(--ink); line-height:1.6}
+.insight strong{color:var(--ink-bright)}
+.chart-box{margin-top:24px; height:300px; position:relative}
+.tool-foot{margin-top:18px; font-size:.72rem; color:var(--ink-faint); line-height:1.5}
+.tool-foot a{color:var(--ink-dim)}
+
+/* CALLOUTS */
+.callout{background:rgba(217,154,43,.07); border:1px solid rgba(217,154,43,.22); border-radius:12px; padding:22px 26px; margin:30px 0}
+.callout .ct{font-size:.7rem; letter-spacing:.16em; text-transform:uppercase; color:var(--amber); margin-bottom:12px}
+.callout p{margin-bottom:14px}
+.callout p:last-child{margin-bottom:0}
+.novel{display:inline-block; font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:var(--teal); border:1px solid rgba(58,138,130,.4); border-radius:20px; padding:3px 11px; margin-bottom:16px}
+
+/* CREDITS */
+.credits{padding:48px 0 90px; border-top:1px solid var(--line)}
+.credits h3{font-family:'Cormorant Garamond',serif; font-weight:500; font-size:1.4rem; color:var(--ink-bright); margin-bottom:20px}
+.credits ol{list-style:none; counter-reset:c}
+.credits li{counter-increment:c; position:relative; padding-left:34px; margin-bottom:14px; font-size:.82rem; color:var(--ink-dim); line-height:1.5}
+.credits li::before{content:counter(c); position:absolute; left:0; top:0; font-size:.7rem; color:var(--amber); font-weight:600}
+.credits a{color:var(--amber-soft); text-decoration:none; border-bottom:1px solid rgba(231,183,94,.3)}
+.credits a:hover{border-bottom-color:var(--amber-soft)}
+.credits a:visited{color:var(--amber-soft)}
+.fn{font-size:.78rem; color:var(--ink-faint); line-height:1.5; margin-top:8px; padding-left:34px}
+sup a{color:var(--amber); text-decoration:none; font-size:.7em; padding:0 1px}
+.usd-footnote{font-size:.76rem; font-style:italic; color:var(--ink-faint); text-align:center; margin:34px auto 0; max-width:560px}
+.usd-footnote a{color:var(--ink-dim)}
