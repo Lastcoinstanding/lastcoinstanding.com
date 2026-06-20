@@ -164,6 +164,13 @@
     }
   },
   {
+    "_comment": "Title uses &amp; entity for nav HTML safety (rendered via | safe), matching the-power-law. Sibling to /the-power-law (price-vs-adoption to its price-vs-time). Interactive data explorer (proxy/era selector + fit chart); no calculator_tile — not a personal-decision tool, like the-doubling-ladder and heatmap.",
+    "slug": "bitcoin-and-metcalfes-law",
+    "title": "Bitcoin &amp; Metcalfe's Law",
+    "category": "numbers",
+    "interactive": true
+  },
+  {
     "slug": "the-doubling-ladder",
     "title": "The Bitcoin Doubling Ladder",
     "category": "numbers",

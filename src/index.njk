@@ -473,6 +473,32 @@ eleventyComputed:
     <div class="explore-subsection-label">Latest</div>
     <div class="card-grid">
 
+        <!-- Bitcoin & Metcalfe's Law -->
+        <a href="/bitcoin-and-metcalfes-law.html" class="concept-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- A network whose connections brighten on the left and fade on the
+                         right: Metcalfe's network effect, with the on-chain signal going blind. -->
+                    <line x1="11" y1="14" x2="9" y2="31" stroke="#F7931A" stroke-width="1.3"/>
+                    <line x1="11" y1="14" x2="22" y2="23" stroke="#F7931A" stroke-width="1.3"/>
+                    <line x1="9" y1="31" x2="22" y2="23" stroke="#F7931A" stroke-width="1.3"/>
+                    <line x1="22" y1="23" x2="31" y2="12" stroke="#e09422" stroke-width="1.1" opacity="0.6"/>
+                    <line x1="22" y1="23" x2="34" y2="32" stroke="#e09422" stroke-width="1.1" opacity="0.6"/>
+                    <line x1="31" y1="12" x2="42" y2="21" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2.5" opacity="0.35"/>
+                    <line x1="34" y1="32" x2="42" y2="21" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2.5" opacity="0.35"/>
+                    <circle cx="11" cy="14" r="2.2" fill="#F7931A"/>
+                    <circle cx="9" cy="31" r="2.2" fill="#F7931A"/>
+                    <circle cx="22" cy="23" r="2.4" fill="#F7931A"/>
+                    <circle cx="31" cy="12" r="1.9" fill="#e09422" opacity="0.7"/>
+                    <circle cx="34" cy="32" r="1.9" fill="#e09422" opacity="0.55"/>
+                    <circle cx="42" cy="21" r="1.7" fill="#e09422" opacity="0.3"/>
+                </svg>
+            </div>
+            <div class="card-title">Bitcoin &amp; Metcalfe's Law</div>
+            <div class="card-desc">Does price really grow with the square of adoption? Measured from on-chain data, the exponent lands below the quadratic ideal &mdash; and the deeper finding is that the signal itself is fading, as ownership moves into ETFs and custody the data can no longer see.</div>
+            <div class="card-cta">Measure it yourself &rarr;</div>
+        </a>
+
         <!-- The Bitcoin Doubling Ladder -->
         <a href="/the-doubling-ladder.html" class="concept-card">
             <div class="card-icon">
@@ -495,31 +521,6 @@ eleventyComputed:
             <div class="card-desc">Mezinskis showed bitcoin's price doublings come at a steady cadence. This page makes it visible &mdash; where each doubling landed, the market's wild swings around the trend, and what the widening-then-compressing gap reveals.</div>
             <div class="card-cta">Read more &rarr;</div>
         </a>
-
-        <!-- How Much Bitcoin? -->
-        <a href="/how-much-bitcoin.html" class="concept-card">
-            <div class="card-icon">
-                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Axes -->
-                    <line x1="6" y1="40" x2="42" y2="40" stroke="#e09422" stroke-width="1" opacity="0.35"/>
-                    <line x1="6" y1="6" x2="6" y2="40" stroke="#e09422" stroke-width="1" opacity="0.35"/>
-                    <!-- Kelly growth curve: steep rise, gentle peak, brutal far side -->
-                    <path d="M 6 40 C 10 24, 14 15, 22 14 C 30 13, 35 22, 40 38" stroke="#F7931A" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-                    <!-- over-betting tail, red -->
-                    <path d="M 36 26 C 38 30, 39.5 34, 40 38" stroke="#c0392b" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.85"/>
-                    <!-- fractional-Kelly marks -->
-                    <circle cx="12" cy="22.5" r="1.3" fill="#e09422"/>
-                    <circle cx="16" cy="16.5" r="1.3" fill="#e09422"/>
-                    <!-- the peak -->
-                    <line x1="22" y1="14" x2="22" y2="40" stroke="#e09422" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.5"/>
-                    <circle cx="22" cy="14" r="2" fill="#F7931A"/>
-                </svg>
-            </div>
-            <div class="card-title">How Much Bitcoin?</div>
-            <div class="card-desc">The question every other page eventually meets, answered by the Bell Labs formula built for it. The Kelly criterion's raw answer is startling &mdash; and the honest lesson is the shape of the curve around the peak: under-betting costs a little, over-betting costs everything.</div>
-            <div class="card-cta">See the formula's answer &rarr;</div>
-        </a>
-
 
         <!-- The Gallery -->
         <a href="/the-gallery.html" class="concept-card">
@@ -880,6 +881,36 @@ eleventyComputed:
             <div class="card-title">Bitcoin and The Power Law</div>
             <div class="card-desc">Bitcoin grows proportionally, not exponentially. For every ~13% increase in Bitcoin's age, the trend price doubles. Explore the empirical law governing Bitcoin's scaling &mdash; then project it forward against a house purchase, 5 to 20 years out.</div>
             <div class="card-cta">Read more &rarr;</div>
+        </a>
+
+        <!-- Bitcoin & Metcalfe's Law -->
+        <a href="/bitcoin-and-metcalfes-law.html" class="concept-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- A network whose connections brighten on the left and fade on the
+                         right: Metcalfe's network effect, with the on-chain signal going blind. -->
+                    <!-- Bright edges (left) -->
+                    <line x1="11" y1="14" x2="9" y2="31" stroke="#F7931A" stroke-width="1.3"/>
+                    <line x1="11" y1="14" x2="22" y2="23" stroke="#F7931A" stroke-width="1.3"/>
+                    <line x1="9" y1="31" x2="22" y2="23" stroke="#F7931A" stroke-width="1.3"/>
+                    <!-- Transition edges -->
+                    <line x1="22" y1="23" x2="31" y2="12" stroke="#e09422" stroke-width="1.1" opacity="0.6"/>
+                    <line x1="22" y1="23" x2="34" y2="32" stroke="#e09422" stroke-width="1.1" opacity="0.6"/>
+                    <!-- Faded edges (right) -->
+                    <line x1="31" y1="12" x2="42" y2="21" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2.5" opacity="0.35"/>
+                    <line x1="34" y1="32" x2="42" y2="21" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2.5" opacity="0.35"/>
+                    <!-- Nodes: bright left, fading right -->
+                    <circle cx="11" cy="14" r="2.2" fill="#F7931A"/>
+                    <circle cx="9" cy="31" r="2.2" fill="#F7931A"/>
+                    <circle cx="22" cy="23" r="2.4" fill="#F7931A"/>
+                    <circle cx="31" cy="12" r="1.9" fill="#e09422" opacity="0.7"/>
+                    <circle cx="34" cy="32" r="1.9" fill="#e09422" opacity="0.55"/>
+                    <circle cx="42" cy="21" r="1.7" fill="#e09422" opacity="0.3"/>
+                </svg>
+            </div>
+            <div class="card-title">Bitcoin &amp; Metcalfe's Law</div>
+            <div class="card-desc">Does price really grow with the square of adoption? Measured from on-chain data, the exponent lands below the quadratic ideal &mdash; and the deeper finding is that the signal itself is fading, as ownership moves into ETFs and custody the data can no longer see.</div>
+            <div class="card-cta">Measure it yourself &rarr;</div>
         </a>
 
         <!-- The Bitcoin Doubling Ladder -->
