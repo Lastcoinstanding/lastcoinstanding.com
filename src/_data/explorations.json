@@ -41,16 +41,13 @@
     "category": "foundations",
     "interactive": false
   },
+
   {
-    "slug": "the-bitcoin-migration",
-    "title": "The Bitcoin Migration",
-    "category": "arguments",
-    "interactive": false
-  },
-  {
+    "_comment": "── The Arguments — grouped via the `group` field; see SITE_GUIDE §30 (nav grouping). Group display order is controlled by base.njk's argumentsGroups array; item order within a group follows array order here. ──",
     "slug": "the-half-life",
     "title": "The Half-Life",
     "category": "arguments",
+    "group": "Why Fiat Fails",
     "interactive": true,
     "calculator_tile": {
       "tagline": "Watch the dollar&rsquo;s purchasing power decay &mdash; half by half, generation by generation.",
@@ -64,12 +61,14 @@
     "slug": "money-trees",
     "title": "Money Trees",
     "category": "arguments",
+    "group": "Why Fiat Fails",
     "interactive": false
   },
   {
     "slug": "the-melting-ice-cube",
     "title": "The Melting Ice Cube",
     "category": "arguments",
+    "group": "Why Fiat Fails",
     "interactive": true,
     "calculator_tile": {
       "tagline": "Corporate treasuries against monetary debasement &mdash; bitcoin as the dollar-melt antidote.",
@@ -79,34 +78,11 @@
     }
   },
   {
-    "slug": "not-a-bubble",
-    "title": "Is Bitcoin a Bubble?",
-    "category": "arguments",
-    "interactive": false
-  },
-  {
-    "slug": "spend-and-replace",
-    "title": "Bitcoin Spend and Replace",
-    "category": "arguments",
-    "interactive": false
-  },
-  {
-    "slug": "paper-bitcoin",
-    "title": "Paper Bitcoin vs. Real Bitcoin",
-    "category": "arguments",
-    "interactive": true
-  },
-  {
-    "slug": "risks-to-bitcoin",
-    "title": "Risks to Bitcoin",
-    "category": "arguments",
-    "interactive": false
-  },
-  {
-    "_comment": "Tile name 'The Bitcoin Fixed Share' differs from registry title 'The Bitcoin Fixed Share' (matches); page slug is the-fixed-pie. The tile uses no anchor — the page is single-pane.",
+    "_comment": "Moved from The Numbers to The Arguments (2026-06): a conceptual/philosophical page, not a data/tool page. Placed in 'Why Fiat Fails' next to The Melting Ice Cube as its direct mirror — fiat's share melts, your bitcoin share stays fixed. Page slug stays the-fixed-pie; slug, content, and OG card are unchanged — only the nav home moved. Tile name 'The Bitcoin Fixed Share' matches registry title; the tile uses no anchor (single-pane page).",
     "slug": "the-fixed-pie",
     "title": "The Bitcoin Fixed Share",
-    "category": "numbers",
+    "category": "arguments",
+    "group": "Why Fiat Fails",
     "interactive": true,
     "calculator_tile": {
       "tagline": "What does owning a piece of 21 million actually mean as a share of all the bitcoin there will ever be?",
@@ -116,44 +92,48 @@
     }
   },
   {
-    "slug": "bitcoin-vs-real-estate",
-    "title": "BTC vs. Real Estate",
-    "category": "numbers",
-    "interactive": true,
-    "calculator_tile": {
-      "tagline": "Bitcoin or a house &mdash; looking back, or projecting forward? Full mortgage and ownership costs included.",
-      "preview_kind": "svg",
-      "position": 6
-    }
+    "slug": "the-bitcoin-migration",
+    "title": "The Bitcoin Migration",
+    "category": "arguments",
+    "group": "Why Bitcoin Endures",
+    "interactive": false
   },
   {
-    "slug": "bitcoin-vs-rental-property",
-    "title": "BTC vs. Rental Property",
-    "category": "numbers",
-    "interactive": true,
-    "calculator_tile": {
-      "tagline": "Bitcoin or rental property &mdash; the honest yield comparison once landlord costs and tax leakage are surfaced.",
-      "preview_kind": "svg",
-      "position": 7
-    }
+    "slug": "not-a-bubble",
+    "title": "Is Bitcoin a Bubble?",
+    "category": "arguments",
+    "group": "Objections, Answered",
+    "interactive": false
   },
   {
-    "slug": "bitcoin-fixed-income",
-    "title": "Bitcoin Fixed Income",
-    "category": "numbers",
-    "interactive": true,
-    "calculator_tile": {
-      "tagline": "Bitcoin-backed preferreds vs holding bitcoin &mdash; the bear-case insurance trade, with the actual crossover horizon and stress behavior shown honestly.",
-      "preview_kind": "svg",
-      "anchor": "#calculator",
-      "position": 8
-    }
+    "slug": "risks-to-bitcoin",
+    "title": "Risks to Bitcoin",
+    "category": "arguments",
+    "group": "Objections, Answered",
+    "interactive": false
   },
   {
-    "_comment": "Title in registry uses &amp; entity (for HTML safety in nav); tile_title here overrides to 'Bitcoin & The Power Law' for the tile body (which we let Nunjucks render through autoescape-off via |safe).",
+    "slug": "paper-bitcoin",
+    "title": "Paper Bitcoin vs. Real Bitcoin",
+    "category": "arguments",
+    "group": "Holding & Spending",
+    "interactive": true
+  },
+  {
+    "slug": "spend-and-replace",
+    "title": "Bitcoin Spend and Replace",
+    "category": "arguments",
+    "group": "Holding & Spending",
+    "interactive": false
+  },
+
+  {
+    "_comment": "── The Numbers — grouped via the `group` field; see SITE_GUIDE §30 (nav grouping). Group display order is controlled by base.njk's numbersGroups array; item order within a group follows array order here. ──",
+    "_comment2": "Title in registry uses &amp; entity (for HTML safety in nav); tile_title here overrides to 'Bitcoin & The Power Law' for the tile body (which we let Nunjucks render through autoescape-off via |safe).",
     "slug": "the-power-law",
     "title": "Bitcoin &amp; The Power Law",
     "category": "numbers",
+    "group": "Models & Trends",
     "interactive": true,
     "calculator_tile": {
       "tagline": "Where does bitcoin sit inside the channel &mdash; floor, trend, upper band &mdash; that anchors every projection on this site?",
@@ -168,18 +148,29 @@
     "slug": "bitcoin-and-metcalfes-law",
     "title": "Bitcoin &amp; Metcalfe's Law",
     "category": "numbers",
+    "group": "Models & Trends",
     "interactive": true
   },
   {
     "slug": "the-doubling-ladder",
     "title": "The Bitcoin Doubling Ladder",
     "category": "numbers",
+    "group": "Models & Trends",
+    "interactive": true
+  },
+  {
+    "_comment": "The Heatmap was previously on /calculators as proof-of-concept for live mini-renders, then moved to /the-gallery as a visual surface. Intentionally NOT on /calculators now (no calculator_tile block).",
+    "slug": "heatmap",
+    "title": "The Bitcoin Heatmap",
+    "category": "numbers",
+    "group": "Models & Trends",
     "interactive": true
   },
   {
     "slug": "bitcoin-vs-the-stock-market",
     "title": "Bitcoin vs. The Stock Market",
     "category": "numbers",
+    "group": "Bitcoin vs. Other Assets",
     "interactive": true,
     "calculator_tile": {
       "tagline": "The wealth-over-time stress test &mdash; bitcoin against the S&amp;P 500 and NASDAQ-100 across any holding window since 2010.",
@@ -191,16 +182,34 @@
     }
   },
   {
-    "_comment": "The Heatmap was previously on /calculators as proof-of-concept for live mini-renders, then moved to /the-gallery as a visual surface. Intentionally NOT on /calculators now (no calculator_tile block).",
-    "slug": "heatmap",
-    "title": "The Bitcoin Heatmap",
+    "slug": "bitcoin-vs-real-estate",
+    "title": "BTC vs. Real Estate",
     "category": "numbers",
-    "interactive": true
+    "group": "Bitcoin vs. Other Assets",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Bitcoin or a house &mdash; looking back, or projecting forward? Full mortgage and ownership costs included.",
+      "preview_kind": "svg",
+      "position": 6
+    }
+  },
+  {
+    "slug": "bitcoin-vs-rental-property",
+    "title": "BTC vs. Rental Property",
+    "category": "numbers",
+    "group": "Bitcoin vs. Other Assets",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Bitcoin or rental property &mdash; the honest yield comparison once landlord costs and tax leakage are surfaced.",
+      "preview_kind": "svg",
+      "position": 7
+    }
   },
   {
     "slug": "the-bitcoin-retirement",
     "title": "The Bitcoin Retirement",
     "category": "numbers",
+    "group": "Positioning & Strategy",
     "interactive": true,
     "calculator_tile": {
       "tagline": "When can I retire on bitcoin? Drag the sliders &mdash; see how much you need, when, and on what income.",
@@ -214,6 +223,7 @@
     "slug": "disciplined-rebalancing",
     "title": "Disciplined Rebalancing",
     "category": "numbers",
+    "group": "Positioning & Strategy",
     "interactive": true,
     "calculator_tile": {
       "tagline": "Turn the Power Law channel into a protocol &mdash; sell at upper-band triggers, rebuy at lower.",
@@ -226,6 +236,7 @@
     "slug": "how-much-bitcoin",
     "title": "How Much Bitcoin?",
     "category": "numbers",
+    "group": "Positioning & Strategy",
     "interactive": true,
     "calculator_tile": {
       "tagline": "How much is the question &mdash; the Bell Labs sizing formula's startling answer, and the honest fraction of it.",
@@ -236,9 +247,24 @@
     }
   },
   {
+    "slug": "the-bitcoin-horizon",
+    "title": "The Bitcoin Horizon",
+    "category": "numbers",
+    "group": "Positioning & Strategy",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Long-range Power Law projection across an investor&rsquo;s lifetime &mdash; floor, trend, upper band.",
+      "anchor": "#explorer",
+      "preview_kind": "live-chart",
+      "preview_id": "mini-horizon",
+      "position": 11
+    }
+  },
+  {
     "slug": "borrowing-against-your-stack",
     "title": "Borrowing Against Your Stack",
     "category": "numbers",
+    "group": "Living on Bitcoin",
     "interactive": true,
     "calculator_tile": {
       "tagline": "When does borrowing make more sense than selling? Model liquidation distance vs. retained-coin upside.",
@@ -247,16 +273,10 @@
     }
   },
   {
-    "_comment": "Living on Bitcoin is a personal-decision tool but currently does not have a /calculators tile. Add a calculator_tile block when wiring it in.",
-    "slug": "living-on-bitcoin",
-    "title": "Living on Bitcoin",
-    "category": "numbers",
-    "interactive": true
-  },
-  {
     "slug": "bitcoin-backed-mortgages",
     "title": "Bitcoin-Backed Mortgages",
     "category": "numbers",
+    "group": "Living on Bitcoin",
     "interactive": true,
     "calculator_tile": {
       "tagline": "Buy the house with bitcoin as collateral &mdash; the structural mortgage trade-off across counterparty tiers.",
@@ -265,16 +285,25 @@
     }
   },
   {
-    "slug": "the-bitcoin-horizon",
-    "title": "The Bitcoin Horizon",
+    "_comment": "Living on Bitcoin is a personal-decision tool but currently does not have a /calculators tile. Add a calculator_tile block when wiring it in.",
+    "slug": "living-on-bitcoin",
+    "title": "Living on Bitcoin",
     "category": "numbers",
+    "group": "Living on Bitcoin",
+    "interactive": true
+  },
+  {
+    "_comment": "Display title is 'Bitcoin and Fixed Income' (renamed 2026-06 from 'Bitcoin Fixed Income' — the old name implied an inherent yield/fixed-income component bitcoin doesn't have). Slug stays /bitcoin-fixed-income (slug≠title is fine; renaming a live slug would need a 301). Editorial page H1 remains 'The Income Question'.",
+    "slug": "bitcoin-fixed-income",
+    "title": "Bitcoin and Fixed Income",
+    "category": "numbers",
+    "group": "Living on Bitcoin",
     "interactive": true,
     "calculator_tile": {
-      "tagline": "Long-range Power Law projection across an investor&rsquo;s lifetime &mdash; floor, trend, upper band.",
-      "anchor": "#explorer",
-      "preview_kind": "live-chart",
-      "preview_id": "mini-horizon",
-      "position": 11
+      "tagline": "Bitcoin-backed preferreds vs holding bitcoin &mdash; the bear-case insurance trade, with the actual crossover horizon and stress behavior shown honestly.",
+      "preview_kind": "svg",
+      "anchor": "#calculator",
+      "position": 8
     }
   },
   {

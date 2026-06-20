@@ -75,8 +75,14 @@ body {
 .nav-dropdown-legend { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.7rem; font-style: italic; color: rgba(255,255,255,0.4); padding: 8px 24px 4px; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.06); white-space: nowrap; }
 .mobile-legend { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.78rem; font-style: italic; color: rgba(255,255,255,0.42); padding: 1.6rem 32px 0; margin-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.06); }
 .nav-interactive-marker { color: #e09422; font-size: 0.7em; opacity: 0.7; margin-left: 2px; line-height: 1; vertical-align: 0.05em; }
+/* ─── Dropdown sub-headers (non-clickable group labels) — see SITE_GUIDE §30 ─── */
+/* Visually quiet: small letterspaced muted caps in the footer-nav-label / mobile-
+   section-label register. pointer-events:none guarantees they never read as links. */
+.nav-dropdown-group-label { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.16em; color: rgba(255,255,255,0.34); padding: 12px 24px 4px; white-space: nowrap; user-select: none; pointer-events: none; }
+.nav-dropdown-group-label:first-child { padding-top: 6px; }
 .mobile-section-label { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.65rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.18em; margin: 0.9rem 0 0.2rem; padding: 0 32px; }
 .mobile-section-label:first-child { margin-top: 0; }
+.mobile-section-sublabel { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.56rem; font-weight: 600; color: rgba(255,255,255,0.38); text-transform: uppercase; letter-spacing: 0.16em; margin: 0.65rem 0 0.05rem; }
 @media (max-width: 768px) {
   .site-nav .nav-links { display: none; }
   .hamburger { display: block; }
@@ -248,6 +254,12 @@ h1, h2, h3 {
 <body>
 {{ body_chrome | safe }}
     <!-- Navigation -->
+    {#- Nav dropdown sub-header grouping (see SITE_GUIDE §30). These arrays control the
+        DISPLAY ORDER of the group sub-headers within each dropdown; the item order WITHIN
+        a group follows src/_data/explorations.json array order. A page's `group` field must
+        match one of these strings exactly, or that page silently drops out of the dropdown. -#}
+    {%- set numbersGroups = ["Models & Trends", "Bitcoin vs. Other Assets", "Positioning & Strategy", "Living on Bitcoin"] -%}
+    {%- set argumentsGroups = ["Why Fiat Fails", "Why Bitcoin Endures", "Objections, Answered", "Holding & Spending"] -%}
     <nav class="site-nav">
         <a href="/" class="brand">Last Coin Standing</a>
             <div class="nav-links">
@@ -265,18 +277,24 @@ h1, h2, h3 {
         <div class="nav-dropdown{% if currentCat == 'arguments' %} active-bucket{% endif %}">
             <a class="nav-dropdown-btn{% if currentCat == 'arguments' %} active{% endif %}" href="#">The Arguments &#9662;</a>
             <div class="nav-dropdown-menu">
-{%- for e in explorations %}{% if e.category == 'arguments' %}
+{%- for g in argumentsGroups %}
+                <div class="nav-dropdown-group-label">{{ g }}</div>
+{%- for e in explorations %}{% if e.category == 'arguments' and e.group == g %}
         <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}</a>
 {%- endif %}{%- endfor %}
+{%- endfor %}
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
             </div>
         </div>
         <div class="nav-dropdown{% if currentCat == 'numbers' %} active-bucket{% endif %}">
             <a class="nav-dropdown-btn{% if currentCat == 'numbers' %} active{% endif %}" href="#">The Numbers &#9662;</a>
             <div class="nav-dropdown-menu">
-{%- for e in explorations %}{% if e.category == 'numbers' %}
+{%- for g in numbersGroups %}
+                <div class="nav-dropdown-group-label">{{ g }}</div>
+{%- for e in explorations %}{% if e.category == 'numbers' and e.group == g %}
         <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}</a>
 {%- endif %}{%- endfor %}
+{%- endfor %}
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
             </div>
         </div>
@@ -292,13 +310,19 @@ h1, h2, h3 {
         <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}</a>
 {%- endif %}{%- endfor %}
         <div class="mobile-section-label">The Arguments</div>
-{%- for e in explorations %}{% if e.category == 'arguments' %}
+{%- for g in argumentsGroups %}
+        <div class="mobile-section-sublabel">{{ g }}</div>
+{%- for e in explorations %}{% if e.category == 'arguments' and e.group == g %}
         <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}</a>
 {%- endif %}{%- endfor %}
+{%- endfor %}
         <div class="mobile-section-label">The Numbers</div>
-{%- for e in explorations %}{% if e.category == 'numbers' %}
+{%- for g in numbersGroups %}
+        <div class="mobile-section-sublabel">{{ g }}</div>
+{%- for e in explorations %}{% if e.category == 'numbers' and e.group == g %}
         <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}</a>
 {%- endif %}{%- endfor %}
+{%- endfor %}
         <a href="/the-gallery.html"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
         <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>

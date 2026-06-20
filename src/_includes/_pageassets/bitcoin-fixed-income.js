@@ -1,5 +1,5 @@
 /* =============================================================
-   The Income Question / Bitcoin Fixed Income — page script
+   The Income Question / Bitcoin and Fixed Income — page script
    Tab switching with URL hash deep-linking, calculator math,
    Chart.js wealth-trajectory rendering, stress-test presets.
    ============================================================= */
