@@ -1076,5 +1076,17 @@
       }
     }
   });
+
+  // "Copy chart as image" — quiet top-right affordance (PROTOTYPE: this
+  // one chart only). Self-contained PNG with the site's dark card bg and a
+  // muted "lastcoinstanding.com" caption; copies to clipboard, falls back
+  // to download where clipboard-image write is blocked. See chart-copy.js.
+  if (window.attachChartCopy) {
+    window.attachChartCopy(chart, {
+      title: 'Bitcoin & The Power Law — the channel',
+      filename: 'bitcoin-power-law-channel.png',
+      background: '#111110'
+    });
+  }
 })();
 
