@@ -8,6 +8,109 @@ _For runnable procedures, two checklists at repo root: **`NEW_PAGE_CHECKLIST.md`
 
 ---
 
+## 0. How work moves to production (standing workflow — do not re-negotiate)
+
+This site is built across two kinds of Claude session. They have fixed,
+non-overlapping roles. Every page follows the same path; there is nothing to
+decide fresh each time. (Mechanical build steps live in `NEW_PAGE_CHECKLIST`;
+this section governs WHO does WHAT and HOW handoff happens.)
+
+### The two roles
+
+**1. The research/drafting chat (claude.ai, with project knowledge + web + tools).**
+Does everything that does NOT touch the repo: research, data pulls, fact-checking
+and primary-source verification, drafting page content, building the design/
+interactive as a standalone HTML mockup, writing the verified-claims register and
+source ledger, and producing the **Code-tab build prompt** (below). It CANNOT push
+to the repo, click inside GitHub/Cloudflare, or place binary files — and does not
+try to. It hands off via a prompt + draft files.
+
+**2. The Claude Code tab (local clone, authenticated to GitHub).**
+Does everything that DOES touch the repo: porting the mockup into the `.njk` +
+`_pageassets` template structure, running `NEW_PAGE_CHECKLIST`, committing on a
+branch, opening the PR, merging to main. JM is authenticated here; this is the
+only path that can push. Cloudflare auto-deploys on merge to main.
+
+### The handoff artifact
+
+The drafting chat produces a **Code-tab build prompt** — a single pasteable block
+instructing Claude Code to build and ship the page per `NEW_PAGE_CHECKLIST` and the
+relevant sibling-page conventions. JM pastes it into the Code tab; Claude Code
+executes; JM reviews the PR and merges. This prompt-handoff is the standard
+mechanism for EVERY page. (Do not invent per-conversation alternatives like
+browser automation, GitHub-API-from-chat, or asking JM to hand-edit — those are
+the legacy/hot-fix exceptions documented in `NEW_PAGE_CHECKLIST`, not the default.)
+
+### JM's role at the boundary
+
+JM is the bridge: pastes the prompt into the Code tab, screenshots Code-tab output
+back to the drafting chat if verification is needed there, performs the authenticated
+push/merge, and does the ~2-minute live verification (OG card curl, page load,
+social-card validator) after deploy. The drafting chat verifies results by reading
+the public repo (`raw.githubusercontent.com`) and the live URL — it does not need
+to see inside the Code tab except via JM's screenshots.
+
+### One-line summary
+
+**Drafting chat researches, verifies, drafts, and writes the build prompt → JM
+pastes it into Claude Code → Claude Code builds, PRs, and (on merge) deploys → JM
+verifies live.** Every page. No renegotiation.
+
+### Legacy/exception mechanisms (NOT the default)
+
+Direct GitHub-API commits from a chat (PAT-based) remain documented for hot-fixes
+when no local checkout is at hand — see the "Direct GitHub-API commits" note in
+`NEW_PAGE_CHECKLIST`. Use only for small urgent fixes, never as the page-build path.
+
+## 0.1 Direct-to-production by default (standing policy)
+
+The site currently gets low traffic, so the cost of a bad deploy is small and
+quickly correctable. Accordingly, the **default** is to push merged PRs straight
+to `main` (production) and verify on the live page — NOT to gate on a Cloudflare
+preview or local build first. Seeing the change in production and noting any issue
+there is the preferred, faster path. Do not ask JM to eyeball a preview before
+merging unless one of the exceptions below applies.
+
+### Always required, even on the fast path
+
+Pushing direct does NOT mean skipping verification. After every production deploy,
+run the post-deploy checks and report results:
+- The relevant `curl -I` on any new/changed static asset (OG image, video, data
+  file) — confirm `Content-Type` is correct, NOT `text/html`. (The phantom-200
+  silent-failure mode — Cloudflare serving an HTML fallback at 200 for a missing
+  asset — is the single most recurrent launch bug on this site; see `TECH_DEBT`.
+  It is invisible on the page and only a curl catches it.)
+- For a page change: load the live URL and confirm the specific changed behavior
+  renders.
+- For SEO/schema changes: the four `curl … | grep` checks (gtag, canonical,
+  og:image, ld+json) from `NEW_PAGE_CHECKLIST` §10.
+
+### Preview-first exceptions (the only times to gate before merge)
+
+Push direct EXCEPT when the change can fail invisibly or affect pages beyond the
+one being edited. Preview first (or at minimum verify with extra care) when the
+change:
+1. **Touches a shared template / layout / global include** (`base.njk`,
+   `related.njk`, nav, anything under `_includes` used by multiple pages) — a
+   regression here breaks pages you won't think to check.
+2. **Affects SEO/structured-data/social metadata** — failures are invisible on the
+   rendered page and surface only in crawlers/validators.
+3. **Introduces a new static asset referenced in head/meta** (OG image, etc.) —
+   the phantom-200 risk; verify the asset serves before relying on it.
+4. **Is a large structural refactor** where a build error would take the page down
+   entirely rather than degrade gracefully.
+
+For everything else — copy edits, single-page content, a self-contained interactive
+tweak, a new page that doesn't touch shared chrome — push direct and verify live.
+
+### One-line summary
+
+**Default: merge to production, then verify live (always run the asset curls).
+Preview first only for shared-template, SEO/meta, new-head-asset, or
+take-the-site-down-if-it-breaks changes.**
+
+---
+
 ## 1. Editorial posture
 
 Last Coin Standing is a **statement piece, not a monetization funnel**. Its purpose is to explain Bitcoin structurally — through contrast and clarity — so that a thoughtful reader can understand what Bitcoin is by seeing what everything else isn't.
@@ -1465,7 +1568,10 @@ _Last updated: June 2026. Update this document as editorial decisions crystalliz
 
 **Cross-linking (bidirectional).** Related set on the page: **The Power Law** ("the price model this builds on" — price-vs-time vs. this page's price-vs-adoption), **The Fixed Share** (supply-side companion: participants vs. your claim on fixed supply), **Paper Bitcoin** (where the intermediation/custody gap this page measures bites hardest). Back-links added on all three. Homepage: concept card in The Numbers (custom network-graph SVG icon whose edges/nodes brighten left and fade right — Metcalfe's network effect plus the signal going blind), inserted at the top of Latest (How Much Bitcoin retired from Latest to hold it at three; it keeps its permanent Numbers card). `updates.json`, `sitemap.xml` (0.9), `llms.txt` (The Numbers) all updated.
 
-**Open items.**
-- ~~Carousel slide pending~~ **Shipped June 2026** (`vid-bitcoin-and-metcalfes-law`, `/videos/bitcoin-and-metcalfes-law.mp4`; Featured, placed between the Power Law and Doubling Ladder slides; the Doubling Ladder was demoted to hold Featured at 10). See §13 for the slide note and iteration record. **Audio-strip still pending** — the supplied master carries an audio track and no `ffmpeg` was available to strip it; harmless in-carousel (`muted playsinline`) but a same-filename silent re-drop is owed.
-- **OG image is still the placeholder, intentionally.** `og-bitcoin-and-metcalfes-law.jpg` currently duplicates the generic site card (`og-image.jpg`); the `.eleventy.js` passthrough registration is in place and points at this filename, so the real branded card will deploy automatically once it is dropped in at the same path (owner producing it separately — no head-tag or registration change needed).
-- **No local Eleventy build was run** for these PRs (no Node on the authoring machine); templates were validated statically (JSON parse, include-path existence) and rely on the Cloudflare Pages preview build + the §10 post-deploy SEO curl checks.
+**Shipped (June 2026), all live on production.**
+- **Carousel slide** — `vid-bitcoin-and-metcalfes-law`, `/videos/bitcoin-and-metcalfes-law.mp4`; Featured, placed between the Power Law and Doubling Ladder slides; the Doubling Ladder was demoted to hold Featured at 10. See §13 for the slide note and iteration record.
+- **Real OG card** — `og-bitcoin-and-metcalfes-law.jpg` is the real brand-forward card (STYLE_GUIDE §6.15.1, ~84 KB, composited from `og-synthesis.jpg`), replacing the launch placeholder. Verified live (`Content-Type: image/jpeg`). `.eleventy.js` registration unchanged.
+- **Real-data fit chart** — the §IV scatter now plots the real price-vs-adoption series on real logarithmic axes ($ and holder-count ticks), driven by the pinned weekly dataset `bitcoin-and-metcalfes-law-data.js` (808 points), with per-era filtering and the canonical-β fit line. Replaced the original synthetic 0–1 schematic. Refresh cadence: MONTHLY_REFRESH §9.
+
+**Open item (one remaining).**
+- **Carousel video audio strip.** The supplied video master still carries an audio track (no `ffmpeg` was available to strip it at ship time). Harmless in-carousel — the `<video>` is `muted playsinline` — but the silent-video convention isn't satisfied; a same-filename silent re-drop (`ffmpeg -i in.mp4 -c:v copy -an …`) is owed.
