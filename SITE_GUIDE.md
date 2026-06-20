@@ -366,7 +366,7 @@ When a page has a natural visual hierarchy (e.g., triangle → UoA properties �
 ## 10. Open tasks and future rename considerations
 
 - **`/synthesis.html` → `/the-bitcoin-synthesis.html`** URL alignment to match label convention.
-- **"The Fixed Pie" concept rename pass.** "Fixed" reads as limitation in ordinary language; the concept's actual thesis is permanence/imperviousness to dilution. Candidates: "The Share That Holds," "Your Permanent Share," "What Cannot Be Diluted." A rename touches: homepage carousel label, nav dropdown, tool page, sitemap, internal links, meta tags.
+- **"The Fixed Pie" concept rename pass.** "Fixed" reads as limitation in ordinary language; the concept's actual thesis is permanence/imperviousness to dilution. Candidates: "The Share That Holds," "Your Permanent Share," "What Cannot Be Diluted." A rename touches: homepage carousel label, nav dropdown, tool page, sitemap, internal links, meta tags. (Note: as of June 2026 this page lives in **The Arguments → Why Fiat Fails**, not The Numbers — see §30.)
 - ~~**Mobile responsive tweak** on Bitcoin vs. Real Estate page~~ — completed (now 3-col input row with responsive stacking).
 - **Audit of `.insight-desc` blocks** on older carousel slides — the minimalist pattern drops these; ensure consistency across the set.
 - ~~**OG/Twitter card meta tags on WMHTB and Power Law pages**~~ — completed (both pages retrofitted with full social meta tag block).
@@ -1328,7 +1328,9 @@ All four companions have reciprocal `related:` entries pointing back to Bitcoin 
 
 ---
 
-## 24. Bitcoin Fixed Income (`/bitcoin-fixed-income.html`)
+## 24. Bitcoin and Fixed Income (`/bitcoin-fixed-income.html`)
+
+**Display title renamed June 2026** from "Bitcoin Fixed Income" → **"Bitcoin and Fixed Income"** (honesty fix: the old name implied bitcoin has an inherent fixed-income/yield component; it doesn't — the page is about bitcoin *and* the fixed-income question). The change is display-only: nav label (registry `title` in `explorations.json`), `<title>`/OG/Twitter titles + alts + JSON-LD `name`, homepage carousel label, homepage concept card, and the `updates.json` entry. **The slug stays `/bitcoin-fixed-income`** — renaming a live slug would need a 301 and break inbound links/SEO; `slug ≠ title` is fine. The editorial **page H1 remains "The Income Question"** (it never carried the misleading phrasing). Nav home: The Numbers → *Living on Bitcoin* group (see §30). OG card `og-bitcoin-fixed-income.jpg` regenerated with the new title at the same filename (registration unchanged).
 
 **Added:** June 2026. The income-instrument decision page. Asks the structurally honest question about bitcoin-backed preferreds (STRC, SATA) and conventional fixed income: when do these actually beat just holding bitcoin? Editorial register is essayistic — five tabs of structured argument with a calculator as one tab among five, not the hero.
 
@@ -1575,3 +1577,43 @@ _Last updated: June 2026. Update this document as editorial decisions crystalliz
 - **Carousel video audio strip** — done (PR #27, June 2026). The master shipped with an AAC track; stripped via stream copy (`-map 0:v:0 -c:v copy -an`, no re-encode → identical video quality), also dropping the mjpeg cover-art per the §6 convention. Now video-only, 0 audio streams (1280×720, 10.04 s, ~2.95 MB). Verified on the deployed file via ffprobe.
 
 **Open items.** None — the page and all its assets are shipped and verified live.
+
+## 30. Nav dropdown grouping (sub-headers)
+
+**Added June 2026.** The Numbers and The Arguments dropdowns are organized into named **sub-groups** under non-clickable sub-header labels, rather than one flat list each. Foundations stays flat (six items). The grouping renders in both the desktop dropdowns and the mobile overlay, and the footer continues to list each bucket flat (in `explorations.json` array order, which now follows the grouped order so the footer reads sensibly too).
+
+### How it works
+
+- **Data.** Each `numbers`/`arguments` entry in `src/_data/explorations.json` carries a **`group`** field (a string). Foundations and hub entries have no `group`. The `group` value must match — character-for-character, raw `&` not `&amp;` — one of the group names listed in `base.njk` (below), or that page silently drops out of its dropdown.
+- **Order.** Two Nunjucks arrays at the top of the nav in `src/_includes/layouts/base.njk` control the **display order of the sub-headers**: `numbersGroups` and `argumentsGroups`. The **item order within a group** follows `explorations.json` array order. So: to reorder groups, edit the arrays; to reorder items inside a group, reorder the JSON entries.
+- **Render.** For each group name, the template emits a `<div class="nav-dropdown-group-label">` (desktop) / `<div class="mobile-section-sublabel">` (mobile) then loops `explorations` filtered by `category == cat and group == g`. The labels are `<div>`s with `pointer-events: none` — **non-clickable by construction** (labels, not links). The per-item `·interactive` dot convention is unchanged. Styling lives in the `canonical-nav-css` block: small letterspaced muted caps, matching the `footer-nav-label` / `mobile-section-label` register.
+
+### The groups (as of June 2026)
+
+**The Numbers** (15 items):
+
+| Group | Pages |
+|---|---|
+| Models & Trends | Bitcoin & The Power Law · Bitcoin & Metcalfe's Law · The Bitcoin Doubling Ladder · The Bitcoin Heatmap |
+| Bitcoin vs. Other Assets | Bitcoin vs. The Stock Market · BTC vs. Real Estate · BTC vs. Rental Property |
+| Positioning & Strategy | The Bitcoin Retirement · Disciplined Rebalancing · How Much Bitcoin? · The Bitcoin Horizon |
+| Living on Bitcoin | Borrowing Against Your Stack · Bitcoin-Backed Mortgages · Living on Bitcoin · Bitcoin and Fixed Income |
+
+**The Arguments** (9 items):
+
+| Group | Pages |
+|---|---|
+| Why Fiat Fails | The Half-Life · Money Trees · The Melting Ice Cube · **The Bitcoin Fixed Share** |
+| Why Bitcoin Endures | The Bitcoin Migration |
+| Objections, Answered | Is Bitcoin a Bubble? · Risks to Bitcoin |
+| Holding & Spending | Paper Bitcoin vs. Real Bitcoin · Bitcoin Spend and Replace |
+
+*Note: "Why Bitcoin Endures" currently holds a single page (The Bitcoin Migration, the flagship essay). It stands alone deliberately; if a second positive-thesis page lands, it joins here.*
+
+### The Bitcoin Fixed Share moved to The Arguments (June 2026)
+
+`the-fixed-pie` (display title "The Bitcoin Fixed Share") **moved from The Numbers to The Arguments**, into the *Why Fiat Fails* group, placed directly after **The Melting Ice Cube** as its conceptual mirror — fiat's share melts; your bitcoin share stays fixed. It is a philosophical/conceptual page, not a data/tool page, so it belongs with the arguments. The move touched: `explorations.json` (`category` numbers→arguments + `group`), `sitemap.xml` and `llms.txt` (relocated to the Arguments section). **Its slug (`/the-fixed-pie`), page content, and OG card are unchanged — only its nav home moved.** Cross-links to it are slug-based (`related:` entries) and resolve regardless of category.
+
+### Adding a new page
+
+Set its `category` (`numbers`/`arguments`) **and** a `group` matching one of the arrays in `base.njk`. To introduce a *new* group, add the name to the relevant array in `base.njk` (in the position you want the sub-header to appear) and tag the page(s) with it. Place the JSON entry among its group-mates so item order reads correctly.
