@@ -13,7 +13,7 @@ companion: []
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-and-metcalfes-law-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-and-metcalfes-law.css' %}"
-  page_scripts: "{% include '_pageassets/bitcoin-and-metcalfes-law.js' %}"
+  page_scripts: "{% include '_pageassets/bitcoin-and-metcalfes-law-data.js' %}\n{% include '_pageassets/bitcoin-and-metcalfes-law.js' %}"
 ---
 <div class="page">
 
@@ -81,7 +81,7 @@ eleventyComputed:
         <div class="ctrl-label">Adoption proxy</div>
         <div class="proxy-seg" id="proxySeg">
           <button data-v="bal" aria-pressed="true">Holders (non-zero balance)
-            <span class="tip">?<span class="tip-body">Every address holding any Bitcoin. A closer proxy for ownership than activity — an idle long-term holder still counts. This is our preferred measure.</span></span>
+            <span class="tip">?<span class="tip-body">An address holding any non-zero Bitcoin balance. A closer proxy for ownership than activity — an idle long-term holder still counts. This is our preferred measure.</span></span>
           </button>
           <button data-v="act">Active addresses
             <span class="tip">?<span class="tip-body">Addresses transacting on a given day. A measure of activity, not ownership — it misses dormant holders and is distorted when activity moves off-chain.</span></span>
@@ -140,14 +140,14 @@ eleventyComputed:
     <div class="section-num">VI · The Headline <span class="novel-inline">· New perspective</span></div>
     <h2>On-chain data is no longer the whole story</h2>
     <p>Here is the observation that builds on everything above. The mechanisms of Bitcoin demand have changed structurally, and recently. Bitcoin retirement accounts, corporate treasuries holding Bitcoin on the balance sheet, spot ETFs since 2024, borrowing fiat against your Bitcoin instead of selling it — none of these existed in the early years. Consequently there is no reason to expect one stable price-to-adoption relationship across eras that are this fundamentally different.</p>
-    <p>And when you examine the price-to-adoption relationship era by era, it doesn't hold still — but the revealing number isn't the exponent. It is the fit. In the early retail era, on-chain holders explained roughly 80% of the variation in price. In the ETF era, that has collapsed to under 10%. The signal doesn't just weaken; it falls apart.</p>
-    <p>The reason is structural. It is the missing variable from the section above — the gap between an on-chain address and an actual owner — now grown wide enough to break the measurement. A single on-chain address has never been the same thing as a single owner; exchanges have aggregated thousands of customers behind a handful of addresses for over a decade. What is new is the scale and the type of intermediary. ETFs, corporate treasuries, and custodians now hold large amounts of Bitcoin on behalf of millions of people, behind a small number of addresses — and they do it at a size that overwhelms the on-chain signal. The people entering Bitcoin in this era, and especially the large, conviction-driven buyers who move price, increasingly don't appear as individual on-chain addresses at all.</p>
+    <p>And when you examine the price-to-adoption relationship era by era, it doesn't hold still — but the revealing number isn't the exponent. It is the fit. In the early retail era, on-chain holders (by which we mean addresses holding a non-zero Bitcoin balance — the closest on-chain proxy for an owner, though an imperfect one) explained roughly 80% of the variation in price. In the ETF era, that has collapsed to under 10%. The signal doesn't just weaken; it falls apart.</p>
+    <p>The reason is structural. It is the missing variable from the section above — the gap between an on-chain address and an actual owner — now grown wide enough to break the measurement. A single on-chain address has never been the same thing as a single owner; exchanges have aggregated thousands of customers behind a handful of addresses for over a decade. The reverse is also true: one person can hold many addresses, and the count makes no attempt to resolve addresses into distinct real people — it cannot. That irreducible gap between addresses and owners is precisely why the on-chain proxy is going blind. What is new is the scale and the type of intermediary. ETFs, corporate treasuries, and custodians now hold large amounts of Bitcoin on behalf of millions of people, behind a small number of addresses — and they do it at a size that overwhelms the on-chain signal. The people entering Bitcoin in this era, and especially the large, conviction-driven buyers who move price, increasingly don't appear as individual on-chain addresses at all.</p>
 
       <div style="margin:30px 0;background:var(--bg-raise);border:1px solid var(--line);border-radius:12px;padding:24px 26px">
-        <div style="font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-bottom:20px">The adoption didn't stop — it moved behind intermediaries</div>
+        <div style="font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-bottom:20px">The adoption didn't stop — an increasing share moved behind intermediaries</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
           <div>
-            <div style="font-size:.82rem;color:var(--ink-dim);margin-bottom:16px">On-chain holder growth is collapsing</div>
+            <div style="font-size:.82rem;color:var(--ink-dim);margin-bottom:16px">On-chain holder growth is slowing sharply</div>
             <div style="display:flex;gap:8px;height:170px">
               <div style="display:flex;flex-direction:column;justify-content:space-between;font-size:.6rem;color:var(--ink-faint);text-align:right;padding-bottom:34px">
                 <span>60%</span><span>40%</span><span>20%</span><span>0</span>
@@ -188,6 +188,7 @@ eleventyComputed:
                   <div style="position:absolute;top:14px;right:8px;font-size:.8rem;color:var(--amber-soft);font-weight:600">6.5%</div>
                 </div>
                 <div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--ink-faint);margin-top:4px"><span>2024</span><span>2026</span></div>
+                <div style="text-align:center;font-size:.6rem;letter-spacing:.04em;color:var(--ink-faint);margin-top:3px">Year</div>
               </div>
             </div>
           </div>
@@ -209,7 +210,7 @@ eleventyComputed:
       <li id="c2"><strong>Timothy Peterson</strong>, "Metcalfe's Law as a Model for Bitcoin's Value," <em>Alternative Investment Analyst Review</em>, 2018. <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3078248">SSRN 3078248</a></li>
       <li id="c3"><strong>Giovanni Santostasi &amp; Stephen Perrenod</strong>, "A Mechanistic Derivation of the Bitcoin Price Power Law," Zenodo, 2026. Generalised-Metcalfe component cited as ≈ N²; precise value not independently confirmed. <a href="https://zenodo.org/records/19387099">Zenodo</a></li>
       <li id="c4"><strong>Bob Briscoe, Andrew Odlyzko &amp; Benjamin Tilly</strong>, "Metcalfe's Law is Wrong," <em>IEEE Spectrum</em> 43(7):34–39, 2006. The n·log(n) / diminishing-returns argument. <a href="https://spectrum.ieee.org/metcalfes-law-is-wrong">IEEE Spectrum</a></li>
-      <li id="c5"><strong>Price &amp; address data.</strong> Price and non-zero-balance address counts from <a href="https://coinmetrics.io">Coin Metrics</a> Community API (metrics PriceUSD, AdrBalCnt); active addresses from Blockchain.com Charts. Fits are OLS on log-transformed daily series, 2011–2026.</li>
+      <li id="c5"><strong>Price &amp; address data.</strong> Price and non-zero-balance address counts from <a href="https://coinmetrics.io">Coin Metrics</a> Community API (metrics PriceUSD, AdrBalCnt); active addresses from Blockchain.com Charts. Fits are OLS on log-transformed daily series, 2011–2026. Address counts are a proxy for ownership, not a unique-user count: one owner may hold multiple addresses and one custodial address may hold many owners' coins. No on-chain metric resolves this; the page's §VI argument is built on exactly this limitation. The scatter chart plots a pinned weekly downsample of this series (see page data file).</li>
       <li id="c6"><strong>Conviction &amp; long-term-holder analysis (this page).</strong> Granger causality, weekly differences, 2010–2026, on the share of supply last active ≥1 year, built from Bitcoin Magazine Pro HODL Waves data<sup>(upstream on-chain methodology: Glassnode-style age-band analysis)</sup>. Price→conviction significant at all lags (p≈0.0002); conviction→price weak and short-horizon (p≈0.02, lags 1–2 weeks); series not cointegrated (p=0.13). The long-term-held share rose from ~30% to ~67% over Bitcoin's history (not strictly monotonic year-to-year). The one prior instrumental-variable study (Shanaev et al., 2019, <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3432431">SSRN 3432431</a>) tested transaction count — a head-count proxy — leaving conviction untested. Conviction-progression framing: John McCabe (@LastCoinStandng).</li>
       <li id="c7"><strong>Era analysis (this page).</strong> Price vs. non-zero-balance addresses (Coin Metrics), OLS on log-log, by era. Fit (R²): retail/pre-2017 ≈ 0.82; ETF era 2024–26 ≈ 0.09. Boundaries (2017 CME futures; 2020 corporate treasuries; 2024 spot ETFs) are analyst-chosen; the robust claim is the collapse in fit, not the individual exponents. The specification-sensitivity of pooled power-law fits is consistent with Baquero &amp; Menezes, <a href="https://arxiv.org/abs/2605.21316">arXiv:2605.21316</a> (2026). Off-chain-decoupling framing: John McCabe (@LastCoinStandng).</li>
       <li id="c8"><strong>US spot Bitcoin ETF holdings: 1,283,551 BTC (≈6.5% of circulating supply), as of June 17 2026.</strong> Compiled from public ETF reporting via <a href="https://www.walletpilot.com/bitcoin-tracker/etfs">Wallet Pilot</a>; cross-checked against Glassnode, The Block, Bitbo and Farside. <em>Time-sensitive — refreshed monthly (see data checklist).</em></li>
