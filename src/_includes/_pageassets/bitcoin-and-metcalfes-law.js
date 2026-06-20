@@ -17,7 +17,7 @@ const FITS = {
   bal: {
     all:    {beta:1.84, r2:0.95, label:'Full history · holders'},
     retail: {beta:1.48, r2:0.82, label:'Retail era · holders'},
-    inst:   {beta:3.07, r2:0.77, label:'Institutional onset · holders'},
+    inst:   {beta:3.14, r2:0.78, label:'Institutional onset · holders'},
     etf:    {beta:2.86, r2:0.09, label:'ETF era · holders'},
   },
   act: {
