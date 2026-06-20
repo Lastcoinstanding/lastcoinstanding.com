@@ -343,6 +343,20 @@ table in `src/_includes/_pageassets/bitcoin-and-metcalfes-law.js`.
   full history.
 - **ETF holdings.** No clean free API; read the current figure off Wallet Pilot
   / Farside and cross-check one other tracker before updating.
+- **Pinned chart dataset (`src/_includes/_pageassets/bitcoin-and-metcalfes-law-data.js`).**
+  The §IV fit chart reads a committed static weekly series — 808 points, one per
+  ISO week: Coin Metrics `PriceUSD` + `AdrBalCnt` (holders) and Blockchain.com
+  `n-unique-addresses` (active) — **pulled 2026-06-20** (source + pull date are in
+  the file header). Re-pull **quarterly** (not monthly — it's a structural scatter,
+  not a date-stamped headline figure): regenerate the weekly series, and **before
+  committing, confirm the refreshed full-history holders fit still reproduces
+  β ≈ 1.84 / R² ≈ 0.95** (and the era pattern: retail strong → ETF-era broken). If
+  it drifts materially, reconcile against the `FITS` object before shipping.
+
+**OG card — no regeneration needed.** `og-bitcoin-and-metcalfes-law.jpg` is a
+**brand-forward** card (STYLE_GUIDE §6.15.1) — static atmospheric ₿, no embedded
+chart data — so it does **NOT** go stale on data refresh and is **excluded** from
+the §6 product-forward OG-regen list above.
 
 **Cadence note.** ETF figures move daily but a monthly refresh is sufficient
 for a page making a structural (not real-time) argument. If the page ever
