@@ -54,7 +54,7 @@ eleventyComputed:
     <div class="dl-chart-kicker">Visual A</div>
     <div class="dl-chart-title">The Doubling Ladder</div>
     <div class="dl-chart-subtitle">The trend's price doublings as a log-log staircase, from $0.06 to a projected ~$2M. Diamonds mark where the market <em>actually</em> first reached each rung &mdash; left of a rung means it got there early, in a mania; right means it lagged. Hover any rung for the lead or lag in days.</div>
-    <div class="dl-chart-wrapper"><canvas id="ladderChart"></canvas></div>
+    <div class="dl-chart-wrapper" data-chart-copy data-chart-title="The Bitcoin doubling ladder"><canvas id="ladderChart"></canvas></div>
     <div class="dl-chart-source"><strong>Read it like a stylus on a record:</strong> the amber staircase is where the trend says each level &ldquo;should&rdquo; arrive. The green diamonds &mdash; clustered far to the left in 2011 and 2013 and 2017 &mdash; are the manias overshooting years ahead of schedule. The 2017 run reached $15,729 roughly <strong>1,089 days</strong> before the trend did. The blue line is bitcoin's monthly high &mdash; watch it rocket through several rungs at once in each mania, then sag below the staircase in the bears. Source: trend levels from <em>price = 1.69&times;10<sup>&minus;17</sup> &middot; day<sup>5.763</sup></em>; first-crossing dates and monthly highs from daily history (Blockchain.info, all-time).</div>
   </div>
 
@@ -71,7 +71,7 @@ eleventyComputed:
     <div class="dl-chart-kicker">Visual B &middot; centerpiece</div>
     <div class="dl-chart-title">The Deviation Wave</div>
     <div class="dl-chart-subtitle">Not price in a band &mdash; the <em>gap</em> itself. Each month's distance above or below the trendline, as a wave straddling a zero centerline. Green is the market above trend; red is below. The dashed line is the 15-year average. The vertical axis is <em>ln(actual&nbsp;&divide;&nbsp;trend)</em> &mdash; above 0 means the market sits above the trend &mdash; and the ticks read as a multiple of trend (&times;2, &times;4), with the log value in parentheses.</div>
-    <div class="dl-chart-wrapper"><canvas id="waveChart"></canvas></div>
+    <div class="dl-chart-wrapper" data-chart-copy data-chart-title="The deviation wave"><canvas id="waveChart"></canvas></div>
     <div class="dl-wave-stats">
       <span class="dl-wave-stat"><span class="dl-wave-swatch above"></span> Above trend: <strong>41.9%</strong> of months (80)</span>
       <span class="dl-wave-stat"><span class="dl-wave-swatch below"></span> Below trend: <strong>58.1%</strong> of months (111)</span>

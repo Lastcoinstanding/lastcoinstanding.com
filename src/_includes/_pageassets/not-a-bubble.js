@@ -539,16 +539,14 @@ async function fetchLivePrice() {
 }
 
 // ─── DOWNLOAD ─────────────────────────────────────────────────────────────────
-async function generateDownload() {
-  const btn = document.getElementById('downloadBtn');
-  btn.disabled = true;
-  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.22-8.56"/></svg> Generating…`;
-
+// Builds the shareable 1600×900 PNG with today's date and the live BTC price
+// baked in — the chart's whole point is "today bitcoin is at $X vs every
+// historical bubble," so date+price are intrinsic content, not chrome. Returns
+// the canvas; the shared chart-copy helper handles copy-to-clipboard / download.
+// Wired as the chart-wrap's custom capture (see boot, and chart-copy.js).
+async function buildBubbleExportCanvas() {
   // Ensure latest price
   await fetchLivePrice();
-
-  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-                || (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
 
   // ── Export dimensions ──────────────────────────────────────────────────────
   const exportW   = 1600, exportH = 900;
@@ -734,33 +732,11 @@ async function generateDownload() {
       32, footerY
     );
 
-    // ── Deliver the image ──
-    const dataUrl = EC.toDataURL('image/png');
-
-    if (isMobile) {
-      const overlay = document.getElementById('saveOverlay');
-      const img     = document.getElementById('saveOverlayImg');
-      img.src       = dataUrl;
-      overlay.classList.add('show');
-      document.body.style.overflow = 'hidden';
-      showToast('Image ready — long-press to save to Photos');
-    } else {
-      const today    = new Date().toISOString().slice(0,10);
-      const filename = `bitcoin-not-a-bubble-${today}.png`;
-      const link     = document.createElement('a');
-      link.download  = filename;
-      link.href      = dataUrl;
-      link.click();
-      showToast(`Downloaded: ${filename}`);
-    }
-  } catch(e) {
+    return EC;
+  } catch (e) {
     console.error(e);
-    showToast('Download failed — please try again');
+    return null;
   }
-
-  btn.disabled = false;
-  const resetLabel = isMobile ? 'Generate &amp; Save as Image' : 'Generate &amp; Download Chart';
-  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> ${resetLabel}`;
 }
 
 // ─── MOBILE LABEL ───────────────────────────────────────────────────────────
@@ -803,6 +779,10 @@ window.addEventListener('DOMContentLoaded', () => {
   fetchLivePrice();
   // Refresh price every 2 minutes
   setInterval(fetchLivePrice, 120000);
+  // Wire the quiet "copy chart" button to this page's richer export (today's
+  // date + live BTC price baked in). chart-copy.js calls this on click.
+  const cw = document.querySelector('.chart-wrap[data-chart-copy]');
+  if (cw) cw._chartCopyCapture = buildBubbleExportCanvas;
 });
 
 // Spin keyframe for loading indicator

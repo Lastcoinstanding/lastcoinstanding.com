@@ -31,7 +31,7 @@ companion: []
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-power-law-head.html' %}"
   page_styles: "{% include '_pageassets/the-power-law.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/chart-copy.js' %}\n{% include '_pageassets/the-power-law.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/the-power-law.js' %}"
 ---
 <div class="page">
   <div class="page-header">
@@ -64,7 +64,7 @@ eleventyComputed:
     <div class="chart-container">
       <div class="chart-title">Bitcoin Price vs. Power Law Trend</div>
       <div class="chart-subtitle">Log-log scale &middot; Daily prices since 2010 with trend, floor, and ceiling corridors</div>
-      <div class="chart-wrapper"><canvas id="powerLawChart"></canvas></div>
+      <div class="chart-wrapper" data-chart-copy data-chart-title="Bitcoin price vs. the Power Law trend"><canvas id="powerLawChart"></canvas></div>
       <div class="chart-source">Model uses Porkopolis coefficients (a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.77). Floor &asymp; 0.42&times; trend. Ceiling &asymp; 3&times; trend. Genesis block: January 3, 2009. Price data: Blockchain.info.</div>
     </div>
 
@@ -88,7 +88,7 @@ eleventyComputed:
       <div class="chart-container">
         <div class="chart-title">Power Law Implied CAGR vs. S&amp;P 500</div>
         <div class="chart-subtitle">Projected annualized return from each year to 2035, using trend (fair value) line</div>
-        <div class="chart-wrapper" style="height:320px"><canvas id="cagrChart"></canvas></div>
+        <div class="chart-wrapper" style="height:320px" data-chart-copy data-chart-title="Power Law implied CAGR vs. the S&amp;P 500"><canvas id="cagrChart"></canvas></div>
         <div class="chart-source">CAGR calculated from Power Law trend values. S&amp;P 500 historical average ~10% annualized (nominal). Bitcoin's CAGR declines because the Power Law describes proportional, not exponential, growth &mdash; but remains above equity-market averages for decades.</div>
       </div>
       <p class="prose">The key insight: even the <em>decelerating</em> version of Bitcoin's growth outperforms the historical average of the world's most successful equity index. This isn't a prediction &mdash; it's what the model's trajectory implies if the 15-year pattern continues. The growth slows, but the slowed growth is still extraordinary by any traditional benchmark.</p>
@@ -138,7 +138,7 @@ eleventyComputed:
       <div class="chart-container">
         <div class="chart-title">Early Data Predicts the Future</div>
         <div class="chart-subtitle">Power Law fitted to 2010&ndash;2017 data only, projected forward vs. actual prices</div>
-        <div class="chart-wrapper" style="height:380px"><canvas id="oosChart"></canvas></div>
+        <div class="chart-wrapper" style="height:380px" data-chart-copy data-chart-title="The Power Law holds out-of-sample"><canvas id="oosChart"></canvas></div>
         <div class="chart-source">Green line: regression fitted using only data from 2010&ndash;2017 &mdash; the year before formal publication. Orange dots: actual prices 2018&ndash;present. The early-fitted model tracks Bitcoin's subsequent seven-year trajectory without access to any post-2017 data.</div>
       </div>
     </div>
@@ -215,7 +215,7 @@ eleventyComputed:
       <div class="chart-container">
         <div class="chart-title">Kleiber's Law: Metabolic Rate vs. Body Mass</div>
         <div class="chart-subtitle">Log-log scale &middot; Representative mammalian species &middot; Exponent &asymp; 0.75</div>
-        <div class="chart-wrapper" style="height:280px"><canvas id="kleiberChart"></canvas></div>
+        <div class="chart-wrapper" style="height:280px" data-chart-copy data-chart-title="Kleiber&rsquo;s law — metabolic rate vs. body mass"><canvas id="kleiberChart"></canvas></div>
         <div class="chart-source">Data representative of Kleiber's observations. On a log-log scale, every species falls on the same straight line &mdash; the visual signature of a power law. The same straight line appears in Bitcoin's price history.</div>
       </div>
       <p class="prose">The key insight isn't just that the relationship exists &mdash; it's that it's <em>proportional and sustainable</em>. Larger mammals don't need exponentially more energy; they achieve greater efficiency through structural scaling. The growth is governed by physics, not by intention. Bitcoin's hash rate scales with price following an analogous relationship &mdash; security increasing predictably with value, governed by the same mathematics that governs how elephants breathe.</p>
@@ -335,7 +335,7 @@ eleventyComputed:
         <div class="chart-container" style="margin:0">
           <div class="chart-title" style="font-size:1.05rem">The Mathematical Relationship</div>
           <div class="chart-subtitle">GDP vs. Population &middot; Log-log scale &middot; Exponent ~1.15</div>
-          <div class="chart-wrapper" style="height:240px"><canvas id="cityChart"></canvas></div>
+          <div class="chart-wrapper" style="height:240px" data-chart-copy data-chart-title="City scaling — GDP vs. population"><canvas id="cityChart"></canvas></div>
         </div>
       </div>
       <div class="chart-source" style="margin-top:0.5rem">Left: cities grow outward in phases, each phase producing disproportionately more economic output per person. Right: the mathematical relationship, plotted log-log, forms the characteristic straight line. Source framework: Bettencourt &amp; West (<em>Nature</em>, 2010).</div>
@@ -487,7 +487,7 @@ eleventyComputed:
         <button type="button" class="channel-range-btn" data-range="year-2025">2025</button>
         <button type="button" class="channel-range-btn" data-range="year-2026">2026</button>
       </div>
-      <div class="channel-chart-wrapper"><canvas id="channelChart"></canvas></div>
+      <div class="channel-chart-wrapper" data-chart-copy data-chart-title="Bitcoin &amp; The Power Law — the channel" data-chart-filename="bitcoin-power-law-channel.png"><canvas id="channelChart"></canvas></div>
       <div class="channel-status" id="channelStatus">Loading current price&hellip;</div>
     </div>
 
