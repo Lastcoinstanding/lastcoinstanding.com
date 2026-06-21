@@ -183,7 +183,11 @@
     var box = el.getBoundingClientRect();
     var cssW = box.width, cssH = box.height;
     return ensureHtml2Canvas().then(function(h2c){
-      return h2c(el, { backgroundColor: bg || '#111110', scale: exportScale(), logging: false, useCORS: true });
+      return h2c(el, {
+        backgroundColor: bg || '#111110', scale: exportScale(), logging: false, useCORS: true,
+        // The copy button lives inside the captured host — keep it out of the image.
+        ignoreElements: function(node){ return node.classList && node.classList.contains('chart-copy-btn'); }
+      });
     }).then(function(raster){
       return { cssW: cssW, cssH: cssH,
         draw: function(ctx, x, y, w, h){ ctx.drawImage(raster, 0, 0, raster.width, raster.height, x, y, w, h); } };
