@@ -71,7 +71,7 @@ eleventyComputed:
             <button type="button" class="range-btn active" data-range="planning" role="tab" aria-selected="true">Planning (&plusmn;2y)</button>
         </div>
 
-        <div class="gallery-chart-frame">
+        <div class="gallery-chart-frame" data-chart-copy data-chart-title="The Power Law channel">
             <canvas id="galleryChannelChart" aria-label="Power Law channel chart"></canvas>
             <div id="galleryChannelPulse" class="lcs-pulse-halo" aria-hidden="true"></div>
             <div class="gallery-chart-fallback" aria-hidden="true">
@@ -105,7 +105,7 @@ eleventyComputed:
             <p class="gallery-section-subtitle">What the model projects, year by starting year, against the equity benchmark.</p>
         </header>
 
-        <div class="gallery-chart-frame">
+        <div class="gallery-chart-frame" data-chart-copy data-chart-title="Bitcoin&rsquo;s CAGR vs. the S&amp;P 500">
             <canvas id="galleryCagrChart" aria-label="Power Law implied CAGR vs S&P 500 bar chart"></canvas>
             <div class="gallery-chart-fallback" aria-hidden="true">
                 <p class="chart-loading">Loading the comparison&hellip;</p>
@@ -133,7 +133,7 @@ eleventyComputed:
             <p class="gallery-section-subtitle">Annual averages, 2013&ndash;2025 actual, with projected trend to 2032 &mdash; log scale.</p>
         </header>
 
-        <div class="gallery-chart-frame">
+        <div class="gallery-chart-frame" data-chart-copy data-chart-title="BTC required to buy the median US house">
             <canvas id="galleryBtcHouseChart" aria-label="BTC required to buy the median US house"></canvas>
             <div class="gallery-chart-fallback" aria-hidden="true">
                 <p class="chart-loading">Loading the trajectory&hellip;</p>
@@ -170,7 +170,7 @@ eleventyComputed:
             </div>
         </div>
 
-        <div class="gallery-chart-frame">
+        <div class="gallery-chart-frame" data-chart-copy data-chart-title="The real opportunity cost of buying a house">
             <canvas id="galleryOppCostChart" aria-label="Growth of $1 invested - bitcoin vs housing"></canvas>
             <div class="gallery-chart-fallback" aria-hidden="true">
                 <p class="chart-loading">Loading the comparison&hellip;</p>
@@ -195,7 +195,7 @@ eleventyComputed:
             <p class="gallery-section-subtitle">Price-to-income ratio across major English-speaking markets, 2005&ndash;2024 &mdash; Demographia annual median surveys.</p>
         </header>
 
-        <div class="gallery-chart-frame">
+        <div class="gallery-chart-frame" data-chart-copy data-chart-title="Global housing affordability">
             <canvas id="galleryGlobalAffChart" aria-label="Global housing price-to-income ratios across major markets"></canvas>
             <div class="gallery-chart-fallback" aria-hidden="true">
                 <p class="chart-loading">Loading the survey&hellip;</p>
@@ -221,7 +221,7 @@ eleventyComputed:
             <p class="gallery-section-subtitle">BTC required at each retirement year's Power Law trend price to fund $100K/year &mdash; 4% rule, $2.5M principal.</p>
         </header>
 
-        <div class="gallery-chart-frame">
+        <div class="gallery-chart-frame" data-chart-copy data-chart-title="BTC needed for retirement">
             <canvas id="galleryRetirementChart" aria-label="BTC needed for retirement decay curve"></canvas>
             <div class="gallery-chart-fallback" aria-hidden="true">
                 <p class="chart-loading">Loading the curve&hellip;</p>
@@ -249,7 +249,7 @@ eleventyComputed:
             <p class="gallery-section-subtitle">Compound annual growth rate over rolling four-year windows, ending each year from 2017 to 2026 &mdash; total return for the S&amp;P 500 and NASDAQ-100.</p>
         </header>
 
-        <div class="gallery-chart-frame">
+        <div class="gallery-chart-frame" data-chart-copy data-chart-title="Rolling 4-year CAGR — bitcoin vs. the stock market">
             <canvas id="galleryBvsmChart" aria-label="Rolling 4-year CAGR: bitcoin vs S&P 500 TR vs NASDAQ-100 TR"></canvas>
             <div class="gallery-chart-fallback" aria-hidden="true">
                 <p class="chart-loading">Loading the comparison&hellip;</p>
@@ -280,7 +280,7 @@ eleventyComputed:
             <button type="button" class="range-btn" data-view="hold-to-today" role="tab" aria-selected="false">Held to today</button>
         </div>
 
-        <div class="gallery-chart-frame heatmap-frame">
+        <div class="gallery-chart-frame heatmap-frame" data-chart-copy data-chart-capture="dom" data-chart-title="The Bitcoin heatmap — outperformance vs. the S&amp;P 500">
             <div id="galleryHeatmap" class="heatmap-svg-host" aria-label="Bitcoin outperformance heatmap across entry months and horizons"></div>
             <div class="gallery-chart-fallback" aria-hidden="true">
                 <p class="chart-loading">Loading the heatmap&hellip;</p>
@@ -316,7 +316,7 @@ eleventyComputed:
             <p class="gallery-section-subtitle">Purchasing power decay of $100 held in cash over 30 years &mdash; using the M2 monetary-base growth rate (~6.5%/yr) as the inflation proxy.</p>
         </header>
 
-        <div class="gallery-chart-frame">
+        <div class="gallery-chart-frame" data-chart-copy data-chart-title="The half-life of a dollar">
             <canvas id="galleryHalfLifeChart" aria-label="Fiat purchasing power decay over 30 years"></canvas>
             <div class="gallery-chart-fallback" aria-hidden="true">
                 <p class="chart-loading">Loading the decay&hellip;</p>
@@ -344,7 +344,7 @@ eleventyComputed:
             <p class="gallery-section-subtitle">Rolling annualized returns (min, median, max) for bitcoin and the S&amp;P 500 across holding periods of 1&ndash;10 years &mdash; deliberately computed from 2015 onwards, setting aside pre-2015 bitcoin returns as unrepresentative of plausible forward outcomes.</p>
         </header>
 
-        <div class="gallery-chart-frame">
+        <div class="gallery-chart-frame" data-chart-copy data-chart-title="CAGR ranges by holding horizon">
             <canvas id="galleryHorizonChart" aria-label="CAGR ranges by holding horizon - bitcoin vs S&P 500"></canvas>
             <div class="gallery-chart-fallback" aria-hidden="true">
                 <p class="chart-loading">Loading the distribution&hellip;</p>

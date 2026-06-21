@@ -1076,5 +1076,7 @@
       }
     }
   });
+  // "Copy chart as image" button is attached declaratively via the
+  // data-chart-copy attribute on .channel-chart-wrapper (see chart-copy.js).
 })();
 

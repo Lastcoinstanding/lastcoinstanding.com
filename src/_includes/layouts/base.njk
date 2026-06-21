@@ -431,6 +431,13 @@ h1, h2, h3 {
     </script>
 {%- endif %}
 
+{# Layout-level "copy chart as image" utility — scans every page for
+   [data-chart-copy] wrappers and attaches a quiet camera button. No-op on
+   pages without charts. See SITE_GUIDE §31 and _pageassets/shared/chart-copy.js. #}
+<script>
+{% include '_pageassets/shared/chart-copy.js' %}
+</script>
+
 <script>
 /* Canonical nav UX — hamburger open/close, dropdown click-toggle, click-outside, Escape, link-click close */
 (function() {

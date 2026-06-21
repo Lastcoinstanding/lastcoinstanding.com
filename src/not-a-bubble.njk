@@ -54,30 +54,15 @@ eleventyComputed:
     </div>
   </div>
 
-  <!-- Chart -->
-  <div class="chart-wrap">
+  <!-- Chart — the quiet "copy chart" button (chart-copy.js) reuses this page's
+       richer export (today's date + live BTC price baked in) via a custom
+       capture wired in not-a-bubble.js. -->
+  <div class="chart-wrap" data-chart-copy data-chart-title="Bitcoin vs. every historical bubble" data-chart-filename="bitcoin-not-a-bubble.png">
     <canvas id="bubbleChart" role="img" aria-label="Interactive chart comparing Bitcoin price history to famous asset bubbles"></canvas>
   </div>
 
   <!-- Legend -->
   <div class="legend-wrap" id="legendWrap"></div>
-
-  <!-- Download -->
-  <div class="download-section">
-    <p>
-      Generate a shareable image with today&rsquo;s date and current price —
-      ready to post to X, LinkedIn, or anywhere else.
-      <span id="downloadHint" style="display:none"> Opens as an image — long-press to save to Photos.</span>
-    </p>
-    <button class="btn-download" id="downloadBtn" onclick="generateDownload()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-        <polyline points="7 10 12 15 17 10"/>
-        <line x1="12" y1="15" x2="12" y2="3"/>
-      </svg>
-      <span id="downloadBtnLabel">Generate &amp; Download Chart</span>
-    </button>
-  </div>
 
   <!-- Insight cards -->
   <div class="insight-section">

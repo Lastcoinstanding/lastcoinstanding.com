@@ -63,7 +63,7 @@ eleventyComputed:
         <!-- concrete before the essay's structural argument unfolds below.   -->
         <div class="dr-q-channel-viz">
             <div class="dr-q-channel-title">The Power Law channel &mdash; fifteen years of bitcoin price against floor, trend, and upper bound, projected forward</div>
-            <div class="dr-q-channel-chart-wrapper"><canvas id="drQuestionChannelChart"></canvas></div>
+            <div class="dr-q-channel-chart-wrapper" data-chart-copy data-chart-title="The Power Law channel"><canvas id="drQuestionChannelChart"></canvas></div>
             <div class="dr-q-channel-legend">
                 <span class="dr-q-channel-legend-item"><span class="dr-q-swatch dr-q-swatch-floor"></span>Floor (0.42&times; trend)</span>
                 <span class="dr-q-channel-legend-item"><span class="dr-q-swatch dr-q-swatch-trend"></span>Trend</span>
@@ -147,7 +147,7 @@ eleventyComputed:
                     <button class="dr-range-btn"            data-range="near-1y" role="tab" aria-selected="false">Near (&plusmn;1y)</button>
                     <button class="dr-range-btn"            data-range="plan-2y" role="tab" aria-selected="false">Planning (&plusmn;2y)</button>
                 </div>
-                <div class="dr-channel-chart-wrapper">
+                <div class="dr-channel-chart-wrapper" data-chart-copy data-chart-title="Your rebalancing thresholds on the channel">
                     <canvas id="drChannelChart"></canvas>
                     <!-- Canonical lcs-pulse-halo (STYLE_GUIDE §6.23). Positioned
                          at (TODAY_DAYS, liveBtcPrice) by lcsPulsePlugin in
@@ -472,7 +472,7 @@ eleventyComputed:
             <h3>6. Historical channel positions</h3>
             <p>The chart below shows bitcoin's price/trend ratio across all of <code>PL_DATA</code>. Horizontal reference lines mark the canonical percentile thresholds. You can see where each excursion sat, how long it lasted, and how often each percentile boundary was crossed.</p>
 
-            <div class="dr-math-chart-container">
+            <div class="dr-math-chart-container" data-chart-copy data-chart-title="Price-to-trend ratio with percentile triggers">
                 <canvas id="drMathChart"></canvas>
             </div>
 

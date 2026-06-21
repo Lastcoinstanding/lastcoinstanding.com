@@ -1617,3 +1617,48 @@ _Last updated: June 2026. Update this document as editorial decisions crystalliz
 ### Adding a new page
 
 Set its `category` (`numbers`/`arguments`) **and** a `group` matching one of the arrays in `base.njk`. To introduce a *new* group, add the name to the relevant array in `base.njk` (in the position you want the sub-header to appear) and tag the page(s) with it. Place the JSON entry among its group-mates so item order reads correctly.
+
+## 31. "Copy chart as image" button (site-wide)
+
+**Added June 2026.** Every data chart has a small, quiet **camera button** in its top-right corner that exports just the chart (not the page) as a self-contained PNG — **copied to the clipboard**, or **downloaded** if clipboard-image write is blocked (Safari/Firefox). It is a deliberately understated affordance (low-opacity ghost, ~0.55, brightening to full opacity on hover/focus with a "Copy image" label) — *not* a promotional CTA. It replaced the heavy "Generate & Download Chart" button that used to live on /not-a-bubble.
+
+### How it works — declarative
+
+The helper `src/_includes/_pageassets/shared/chart-copy.js` is loaded **once, site-wide, from `base.njk`** (after `page_scripts`). On load it scans for **`[data-chart-copy]`** wrappers and attaches a button to each. It's a no-op on pages without charts. To give a chart the button, mark the element that **tightly wraps** it (so the corner button sits on the plot):
+
+```html
+<div class="chart-wrapper" data-chart-copy
+     data-chart-title="Bitcoin price vs. the Power Law trend">
+  <canvas id="..."></canvas>
+</div>
+```
+
+The exported PNG is rendered at **≥2× CSS resolution**, on an **opaque dark background** (`#111110`, never transparent — it must read on white surfaces like X/LinkedIn), with a muted **caption** baked in: *chart title* (left) · `lastcoinstanding.com` (right).
+
+Optional attributes: `data-chart-filename` (default = slug of the title), `data-chart-bg` (default `#111110`), `data-chart-label` (default `Copy image`), and `data-chart-capture` (force a capture path — see below).
+
+### Three capture paths (auto-detected from the wrapper's contents)
+
+| Chart kind | Detection | Capture |
+|---|---|---|
+| **Chart.js or hand-drawn `<canvas>`** | wrapper contains a `<canvas>` | the canvas pixels are blitted directly (works for both — capture doesn't care how the canvas was painted) |
+| **inline `<svg>`** (e.g. how-much-bitcoin's Kelly `curveChart`) | wrapper contains an `<svg>` | the SVG is cloned, its **computed styles inlined** (so it isn't unstyled), serialized, and rasterized at 2×. Force with `data-chart-capture="svg"`. |
+| **composite DOM / CSS-grid** (the outperformance heatmap — a grid of `<div>` cells) | no canvas/svg | **html-to-canvas** via lazily-loaded `html2canvas` (CDN, loaded only on first click of such a chart). Force with `data-chart-capture="dom"`. |
+
+### Custom capture (a page owns the full image)
+
+A page can supply its own finished image instead of the standard framed export — set, at load:
+
+```js
+wrapperEl._chartCopyCapture = function(){ return Promise<canvas|Blob>; };
+```
+
+**/not-a-bubble** uses this: its export bakes in **today's date and the live BTC price** (the chart's whole point is "today, bitcoin is at \$X vs every historical bubble"), so that richer 1600×900 image — built by `buildBubbleExportCanvas()` in `not-a-bubble.js` — is what the quiet button copies. Every other chart uses the plain framed capture.
+
+### Coverage & exclusions
+
+~51 data charts across 20 pages carry the button. **Excluded** (conceptual/decorative, not data charts): the trilemma triangle, what-bitcoin-is flower, synthesis orbs, money-trees, the melting-ice-cube ice-cube + battery animations, the bitcoin-fixed-income capital-stack diagram, the paper-bitcoin quadrant, the Foundations property matrices, the spend-and-replace sequence diagram, the power-law branching-trees SVG, and the metcalfe ETF-absorption illustration. Also skipped: bitcoin-vs-real-estate's `housesVisual` and `returnTable` (illustrative, not plotted).
+
+### Adding the button to a future chart
+
+Just add `data-chart-copy` + `data-chart-title="…"` to the chart's wrapper. The capture path is auto-detected. For a DOM-grid or an SVG that should be captured whole (including non-SVG labels in the frame), add `data-chart-capture="dom"`.
