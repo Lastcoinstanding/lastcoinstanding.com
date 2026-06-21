@@ -4,9 +4,11 @@
    A small, quiet affordance that lets a reader grab a single
    Chart.js chart as a self-contained PNG — copied to the
    clipboard, or downloaded if clipboard-image write is blocked
-   (Safari/Firefox). Deliberately understated: a ghost icon
-   button in the chart's top-right corner, fading in on hover
-   (desktop) and always visible on touch. NOT a promotional CTA.
+   (Safari/Firefox). Deliberately understated: a low-opacity
+   ghost camera button always present in the chart's top-right
+   corner, brightening to full opacity on hover/focus and
+   revealing a "Copy image" label. Quiet, not hidden — so the
+   affordance is discoverable. NOT a promotional CTA.
 
    Rollout is one call:
      attachChartCopy(chartInstance, {
@@ -40,23 +42,29 @@
     if (document.getElementById(STYLE_ID)) return;
     var css =
       '.chart-copy-host{position:relative;}' +
+      // Always present, but quiet: a low-opacity ghost in the corner. Brightens
+      // to full opacity on hover/focus (and while showing feedback). Understated,
+      // not hidden — so the affordance is discoverable.
       '.chart-copy-btn{position:absolute;top:8px;right:8px;z-index:6;width:30px;height:30px;' +
         'display:inline-flex;align-items:center;justify-content:center;padding:0;' +
-        'background:rgba(17,17,16,0.55);border:1px solid rgba(255,255,255,0.12);border-radius:6px;' +
-        'color:rgba(216,210,202,0.55);cursor:pointer;opacity:0;' +
-        'transition:opacity .25s ease,color .2s,border-color .2s,background .2s;' +
+        'background:rgba(17,17,16,0.5);border:1px solid rgba(255,255,255,0.14);border-radius:6px;' +
+        'color:rgba(220,214,206,0.9);cursor:pointer;opacity:0.55;' +
+        'transition:opacity .2s ease,color .2s,border-color .2s,background .2s;' +
         '-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}' +
-      '.chart-copy-host:hover .chart-copy-btn,.chart-copy-btn:focus-visible{opacity:1;}' +
-      '.chart-copy-btn:hover{color:#e09422;border-color:rgba(224,148,34,0.4);background:rgba(17,17,16,0.85);}' +
-      '.chart-copy-btn:focus-visible{outline:2px solid rgba(224,148,34,0.5);outline-offset:2px;}' +
+      '.chart-copy-host:hover .chart-copy-btn{opacity:0.82;}' +
+      '.chart-copy-btn:hover,.chart-copy-btn:focus-visible,.chart-copy-btn.is-done{opacity:1;}' +
+      '.chart-copy-btn:hover{color:#e09422;border-color:rgba(224,148,34,0.4);background:rgba(17,17,16,0.9);}' +
+      '.chart-copy-btn:focus-visible{outline:2px solid rgba(224,148,34,0.5);outline-offset:2px;color:#e09422;}' +
       '.chart-copy-btn.is-done{color:#e09422;border-color:rgba(224,148,34,0.45);}' +
       '.chart-copy-glyph{display:inline-flex;line-height:0;}' +
-      '.chart-copy-tip{position:absolute;right:calc(100% + 8px);top:50%;transform:translateY(-50%);' +
+      // Hover label: quiet by default, text-clarity on hover. Reused for the
+      // post-action "Copied"/"Downloaded" confirmation (shown via .is-done).
+      '.chart-copy-tip{position:absolute;right:calc(100% + 8px);top:50%;transform:translateY(-50%) translateX(4px);' +
         'white-space:nowrap;font:600 11px/1 "Inter",-apple-system,sans-serif;letter-spacing:0.02em;' +
         'color:#e09422;background:rgba(17,17,16,0.96);border:1px solid rgba(224,148,34,0.3);' +
-        'border-radius:4px;padding:4px 8px;opacity:0;pointer-events:none;transition:opacity .2s;}' +
-      '.chart-copy-btn.is-done .chart-copy-tip{opacity:1;}' +
-      '@media (hover:none){.chart-copy-btn{opacity:1;}}' +
+        'border-radius:4px;padding:4px 8px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;}' +
+      '.chart-copy-btn:hover .chart-copy-tip,.chart-copy-btn:focus-visible .chart-copy-tip,' +
+        '.chart-copy-btn.is-done .chart-copy-tip{opacity:1;transform:translateY(-50%) translateX(0);}' +
       '@media print{.chart-copy-btn{display:none;}}';
     var el = document.createElement('style');
     el.id = STYLE_ID;
@@ -163,7 +171,7 @@
   /**
    * Attach a copy-as-image button to a Chart.js chart.
    * @param {Chart} chart  - a live Chart.js instance
-   * @param {Object} opts  - { title, filename, background, host }
+   * @param {Object} opts  - { title, filename, background, host, label }
    */
   function attachChartCopy(chart, opts){
     opts = opts || {};
@@ -179,29 +187,32 @@
     var title    = opts.title || '';
     var bg       = opts.background || '#111110';
     var filename = opts.filename || 'lastcoinstanding-chart.png';
+    var label    = opts.label || 'Copy image';   // hover label (and accessible name)
 
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'chart-copy-btn';
-    btn.setAttribute('aria-label', 'Copy chart as image');
-    btn.setAttribute('title', 'Copy chart as image');
+    btn.setAttribute('aria-label', label);
+    // No native `title` — the custom .chart-copy-tip is the visible label, and a
+    // title attr would double it with the browser's own tooltip.
     btn.innerHTML = '<span class="chart-copy-glyph">' + CAMERA_SVG + '</span>' +
                     '<span class="chart-copy-tip" role="status" aria-live="polite"></span>';
     host.appendChild(btn);
 
     var glyph = btn.querySelector('.chart-copy-glyph');
     var tip   = btn.querySelector('.chart-copy-tip');
+    tip.textContent = label;          // resting label, revealed on hover/focus
     var resetTimer = null;
 
-    function flash(label){
+    function flash(text){
       btn.classList.add('is-done');
       glyph.innerHTML = CHECK_SVG;
-      tip.textContent = label;
+      tip.textContent = text;
       clearTimeout(resetTimer);
       resetTimer = setTimeout(function(){
         btn.classList.remove('is-done');
         glyph.innerHTML = CAMERA_SVG;
-        tip.textContent = '';
+        tip.textContent = label;      // restore the hover label
       }, 1500);
     }
 
