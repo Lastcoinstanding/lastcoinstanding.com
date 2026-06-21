@@ -1645,6 +1645,8 @@ Optional attributes: `data-chart-filename` (default = slug of the title), `data-
 | **inline `<svg>`** (e.g. how-much-bitcoin's Kelly `curveChart`) | wrapper contains an `<svg>` | the SVG is cloned, its **computed styles inlined** (so it isn't unstyled), serialized, and rasterized at 2×. Force with `data-chart-capture="svg"`. |
 | **composite DOM / CSS-grid** (the outperformance heatmap — a grid of `<div>` cells) | no canvas/svg | **html-to-canvas** via lazily-loaded `html2canvas` (CDN, loaded only on first click of such a chart). Force with `data-chart-capture="dom"`. |
 
+The DOM-grid heatmap capture is **verified working in-browser** (June 2026): the export renders the full grid, legend, and attribution via `html2canvas`, with the copy button itself excluded (`ignoreElements`) — a supported path, not a known-risky one.
+
 ### Custom capture (a page owns the full image)
 
 A page can supply its own finished image instead of the standard framed export — set, at load:
