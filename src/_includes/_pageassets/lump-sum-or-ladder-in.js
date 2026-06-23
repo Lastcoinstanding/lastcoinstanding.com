@@ -51,11 +51,14 @@
     // live value — today's position renders only in the live component (rule #1).
     pos: 0.15,
     decision: 'all-now',     // 'all-now' | 'ladder-in'
-    era: 'post-2020',        // default recent (design §7)
+    era: 'post-2020',        // default recent (design §7); also drives channel x-range (Amendment 2)
+    lens: 'retrospective',   // 'retrospective' | 'projective' (Stage 2B)
     sum: 12000,
     ladderN: 30,             // ~1yr of ~12-day samples
-    horizon: 4               // years (drives the backstop takeaway)
+    horizon: 4,              // years (drives the backstop takeaway AND the forward channel extent)
+    blend: 0                 // advanced: % laddered (0 = all-now); 0 disables the blend overlay
   };
+  var MAX_H = 8;             // forward channel is drawn out to today + MAX_H years (clipped by horizon)
   var WIN = 0.075;           // channel-position window for binning entries
   var liveTodayPos = null, liveTodayPrice = null;
 
@@ -158,6 +161,41 @@
     return 'above the upper band';
   }
 
+  // ════════ FORWARD PROJECTION (Stage 2B, design §5.2 + Amendment 1) ════════
+  // Recent-era amplitude caps every forward excursion (design §4.5) so the
+  // projection can never import early-era, un-repeatable swings.
+  var RECENT_MAX = (function () { var mx = -Infinity; for (var i = 0; i < N; i++) if (S[i].yr >= 2023) mx = Math.max(mx, S[i].pos); return mx > -Infinity ? mx : 0.53; })();
+  var TREND_POS = (0 - LF) / SPAN;   // channel position of the trend line (ratio = 1.0)
+
+  var PATHS = [
+    { key: 'revert', label: 'Revert to trend', color: AMBER },
+    { key: 'floor', label: 'Ride the floor', color: RUST },
+    { key: 'stretch', label: 'Stretch, then revert', color: BLUE }
+  ];
+  // channel position along a forward path, u in [0,1] across the ladder window
+  function pathPos(key, startPos, u) {
+    if (key === 'revert') return startPos + (TREND_POS - startPos) * u;
+    if (key === 'floor') return startPos + (0 - startPos) * u;
+    var peak = Math.min(RECENT_MAX, Math.max(startPos, startPos + 0.28)); // recent-amplitude-capped
+    return (u <= 0.4) ? startPos + (peak - startPos) * (u / 0.4) : peak + (TREND_POS - peak) * ((u - 0.4) / 0.6);
+  }
+  var FWD_STEP_D = 12.16;            // ~ PL_DATA cadence
+  // ladder-in advantage if you enter TODAY at channel position startPos and price
+  // follows `key` over the ladder window. Amount-invariant. Anchored at todayD.
+  function simFwdAdv(startPos, key, ladderN) {
+    var steps = Math.max(2, ladderN), p0 = plPrice(todayD) * ratioOf(startPos), sumInv = 0;
+    for (var k = 0; k < steps; k++) {
+      var u = k / (steps - 1);
+      sumInv += 1 / (plPrice(todayD + k * FWD_STEP_D) * ratioOf(pathPos(key, startPos, u)));
+    }
+    return ((sumInv / steps) / (1 / p0) - 1) * 100;
+  }
+  function projectiveCurve(key, ladderN) {
+    var pts = [];
+    for (var g = 0; g <= 1.0001; g += 0.02) pts.push({ x: +g.toFixed(4), y: simFwdAdv(g, key, ladderN) });
+    return pts;
+  }
+
   // ════════ CHARTS ════════
   var advChart = null, channelChart = null;
 
@@ -185,25 +223,40 @@
     }
   };
 
+  function markerY() {
+    if (state.lens === 'projective') return simFwdAdv(state.pos, 'revert', state.ladderN);
+    var b = bucketAt(state.era, state.ladderN, state.pos);
+    return b.n ? b.mean : 0;
+  }
+  function markerDataset() {
+    return {
+      label: 'Your position', data: [{ x: state.pos, y: markerY() }], showLine: false,
+      pointRadius: 7, pointHoverRadius: 7, pointBackgroundColor: '#f2eee8', pointBorderColor: AMBER, pointBorderWidth: 2.5, order: 0
+    };
+  }
+  function advDatasets() {
+    if (state.lens === 'projective') {
+      var ds = PATHS.map(function (pth) {
+        return { label: pth.label, data: projectiveCurve(pth.key, state.ladderN), borderColor: pth.color, borderWidth: 2, pointRadius: 0, tension: 0.25, order: 3 };
+      });
+      ds.push({ label: 'Historical (reference)', data: advantageCurve(state.era, state.ladderN), borderColor: 'rgba(232,224,210,0.28)', borderWidth: 1.4, borderDash: [4, 4], pointRadius: 0, tension: 0.25, order: 4 });
+      ds.push(markerDataset());
+      return ds;
+    }
+    return [
+      {
+        label: 'Ladder-in advantage', data: advantageCurve(state.era, state.ladderN), borderColor: AMBER, borderWidth: 2.4,
+        pointRadius: 0, tension: 0.25, order: 2,
+        segment: { borderColor: function (ctx) { return (ctx.p0.parsed.y + ctx.p1.parsed.y) / 2 < 0 ? AMBER : BLUE; } }
+      },
+      markerDataset()
+    ];
+  }
   function buildAdvChart() {
     var el = document.getElementById('lslAdvChart'); if (!el) return;
-    var pts = advantageCurve(state.era, state.ladderN);
     advChart = new Chart(el, {
       type: 'line',
-      data: {
-        datasets: [
-          {
-            label: 'Ladder-in advantage', data: pts, borderColor: AMBER, borderWidth: 2.4,
-            pointRadius: 0, tension: 0.25, order: 2,
-            segment: { borderColor: function (ctx) { return (ctx.p0.parsed.y + ctx.p1.parsed.y) / 2 < 0 ? AMBER : BLUE; } }
-          },
-          { // scrubbed-position marker
-            label: 'Your position', data: [{ x: state.pos, y: 0 }], showLine: false,
-            pointRadius: 7, pointHoverRadius: 7, pointBackgroundColor: '#f2eee8',
-            pointBorderColor: AMBER, pointBorderWidth: 2.5, order: 1
-          }
-        ]
-      },
+      data: { datasets: advDatasets() },
       options: {
         responsive: true, maintainAspectRatio: false, animation: false,
         interaction: { mode: 'nearest', intersect: false },
@@ -212,10 +265,7 @@
             type: 'linear', min: -0.1, max: 1.15,
             title: { display: true, text: 'Entry channel position  (0 = floor · 1 = upper band)', color: MUTED, font: { size: 10 } },
             grid: { color: 'rgba(255,255,255,0.04)' },
-            ticks: {
-              color: MUTED, stepSize: 0.25,
-              callback: function (v) { return v === 0 ? 'Floor' : (Math.abs(v - 1) < 1e-9 ? 'Upper' : v.toFixed(2)); }
-            }
+            ticks: { color: MUTED, stepSize: 0.25, callback: function (v) { return v === 0 ? 'Floor' : (Math.abs(v - 1) < 1e-9 ? 'Upper' : v.toFixed(2)); } }
           },
           y: {
             title: { display: true, text: 'Ladder-in advantage  (% more BTC vs. all-now)', color: MUTED, font: { size: 10 } },
@@ -224,17 +274,17 @@
           }
         },
         plugins: {
-          legend: { display: false },
+          legend: { display: false, position: 'top', labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 22, padding: 10, filter: function (l) { return l.text !== 'Your position'; } } },
           tooltip: {
             backgroundColor: 'rgba(10,9,8,0.95)', borderColor: 'rgba(224,148,34,0.5)', borderWidth: 1,
             titleColor: AMBER, bodyColor: '#ddd', displayColors: false,
-            filter: function (it) { return it.datasetIndex === 0; },
+            filter: function (it) { return it.dataset.label !== 'Your position'; },
             callbacks: {
               title: function (it) { return 'Channel position ' + (+it[0].parsed.x).toFixed(2); },
               label: function (it) {
-                var y = it.parsed.y;
-                return (y < 0 ? 'All-now won by ' + Math.abs(y).toFixed(0) + '% more BTC'
-                  : 'Laddering won by ' + y.toFixed(0) + '% more BTC');
+                var y = it.parsed.y, lab = it.dataset.label;
+                var who = y < 0 ? 'all-now +' + Math.abs(y).toFixed(0) + '%' : 'ladder +' + y.toFixed(0) + '%';
+                return (state.lens === 'projective' ? lab + ': ' : '') + who + ' BTC';
               }
             }
           }
@@ -244,19 +294,16 @@
     });
   }
 
-  function updateAdvChart() {
+  function updateAdvChart() {     // full refresh (lens / era / ladder)
     if (!advChart) return;
-    advChart.data.datasets[0].data = advantageCurve(state.era, state.ladderN);
-    advChart.data.datasets[1].data = [{ x: state.pos, y: markerY() }];
+    advChart.data.datasets = advDatasets();
+    advChart.options.plugins.legend.display = (state.lens === 'projective');
     advChart.update('none');
-  }
-  function markerY() {
-    var b = bucketAt(state.era, state.ladderN, state.pos);
-    return b.n ? b.mean : 0;
   }
   function updateMarkerOnly() {
     if (!advChart) return;
-    advChart.data.datasets[1].data = [{ x: state.pos, y: markerY() }];
+    var ds = advChart.data.datasets;
+    ds[ds.length - 1].data = [{ x: state.pos, y: markerY() }];
     advChart.update('none');
   }
 
@@ -273,14 +320,22 @@
     }
   };
   function bands() {
-    var trend = [], floor = [], upper = [], hi = todayD + 1.2 * 365.25;
+    var trend = [], floor = [], upper = [], hi = todayD + MAX_H * 365.25;
     for (var d = MIN_D; d <= hi; d += 30) { var t = plPrice(d); trend.push({ x: d, y: t }); floor.push({ x: d, y: t * PL_FLOOR }); upper.push({ x: d, y: t * PL_CEIL }); }
     return { trend: trend, floor: floor, upper: upper };
   }
   function entryLine(pos) {
-    var r = ratioOf(pos), line = [], hi = todayD + 1.2 * 365.25;
+    var r = ratioOf(pos), line = [], hi = todayD + MAX_H * 365.25;
     for (var d = MIN_D; d <= hi; d += 30) line.push({ x: d, y: plPrice(d) * r });
     return line;
+  }
+  // Forward (x ≥ today) portion of a band renders faded + finely dashed so the
+  // user sees where fitted history ends and extrapolation begins (Amendment 1).
+  function fwdSeg(faded) {
+    return {
+      borderColor: function (ctx) { return ctx.p0.parsed.x >= todayD ? faded : undefined; },
+      borderDash: function (ctx) { return ctx.p0.parsed.x >= todayD ? [2, 4] : undefined; }
+    };
   }
   function buildChannelChart() {
     var el = document.getElementById('lslChannelChart'); if (!el) return;
@@ -289,10 +344,10 @@
       type: 'line',
       data: {
         datasets: [
-          { label: 'Floor (0.42×)', data: b.floor, borderColor: RUST, borderWidth: 1.3, borderDash: [6, 3], pointRadius: 0, tension: 0.2, order: 5 },
-          { label: 'Trend', data: b.trend, borderColor: TREND, borderWidth: 1.8, pointRadius: 0, tension: 0.2, order: 4 },
-          { label: 'Upper (3×)', data: b.upper, borderColor: '#d4a843', borderWidth: 1.1, borderDash: [1, 5], pointRadius: 0, tension: 0.2, order: 6 },
-          { label: 'Your entry valuation', data: entryLine(state.pos), borderColor: '#f2eee8', borderWidth: 1.8, borderDash: [7, 4], pointRadius: 0, tension: 0.2, order: 2 },
+          { label: 'Floor (0.42×)', data: b.floor, borderColor: RUST, borderWidth: 1.3, borderDash: [6, 3], pointRadius: 0, tension: 0.2, order: 5, segment: fwdSeg('rgba(192,57,43,0.35)') },
+          { label: 'Trend', data: b.trend, borderColor: TREND, borderWidth: 1.8, pointRadius: 0, tension: 0.2, order: 4, segment: fwdSeg('rgba(224,148,34,0.4)') },
+          { label: 'Upper (3×)', data: b.upper, borderColor: '#d4a843', borderWidth: 1.1, borderDash: [1, 5], pointRadius: 0, tension: 0.2, order: 6, segment: fwdSeg('rgba(212,168,67,0.35)') },
+          { label: 'Your entry valuation', data: entryLine(state.pos), borderColor: '#f2eee8', borderWidth: 1.8, borderDash: [7, 4], pointRadius: 0, tension: 0.2, order: 2, segment: fwdSeg('rgba(242,238,232,0.45)') },
           { label: 'Historical price', data: PL_DATA.map(function (p) { return { x: p[0], y: p[1] }; }), borderColor: HISTORY, borderWidth: 1.2, pointRadius: 0, tension: 0.15, order: 1 }
         ]
       },
@@ -301,7 +356,7 @@
         interaction: { mode: 'index', intersect: false },
         scales: {
           x: {
-            type: 'linear', min: MIN_D, grid: { color: 'rgba(255,255,255,0.04)' },
+            type: 'linear', grid: { color: 'rgba(255,255,255,0.04)' },
             title: { display: true, text: 'Year', color: MUTED, font: { size: 10 } },
             ticks: { color: MUTED, maxTicksLimit: 9, callback: function (v) { return new Date(GENESIS_TS * 1000 + v * 86400 * 1000).getUTCFullYear(); } }
           },
@@ -328,6 +383,24 @@
     channelChart.data.datasets[3].data = entryLine(state.pos);
     channelChart.update('none');
   }
+  // Amendment 2: the era control sets the visible x-range; refit the log-Y to the
+  // window so the bands open up. Projective lens extends x to the horizon year so
+  // the forward extension stays on-canvas; the "today" line is always inside.
+  function applyChannelWindow() {
+    if (!channelChart) return;
+    var xmin = (state.era === 'full') ? MIN_D : Math.max(MIN_D, eraStartDay(state.era));
+    var xmax = (state.lens === 'projective') ? (todayD + state.horizon * 365.25) : (todayD + 0.3 * 365.25);
+    var lo = Infinity, hi = 0, d, t;
+    for (d = xmin; d <= xmax; d += 30) { t = plPrice(d); if (t * PL_FLOOR < lo) lo = t * PL_FLOOR; if (t * PL_CEIL > hi) hi = t * PL_CEIL; }
+    for (var i = 0; i < N; i++) { if (S[i].d >= xmin && S[i].d <= xmax) { if (S[i].p < lo) lo = S[i].p; if (S[i].p > hi) hi = S[i].p; } }
+    var x = channelChart.options.scales.x, y = channelChart.options.scales.y;
+    x.min = xmin; x.max = xmax; y.min = lo * 0.6; y.max = hi * 1.7;
+    channelChart.update('none');
+  }
+  function setForwardCaveat() {
+    var el = document.getElementById('lslFwdCaveat');
+    if (el) el.style.display = (state.lens === 'projective') ? '' : 'none';
+  }
 
   // ════════ VERDICT ════════
   function ladderDurationLabel() {
@@ -339,6 +412,23 @@
     var main = document.getElementById('lslVerdictMain');
     var detail = document.getElementById('lslVerdictDetail');
     if (!main) return;
+
+    if (state.lens === 'projective') {
+      if (lead) lead.textContent = 'Starting ' + posLabel(state.pos) + ' (position ' + state.pos.toFixed(2) + ') · forward scenarios over ' + ladderDurationLabel();
+      var a = PATHS.map(function (p) { return { k: p.label, v: simFwdAdv(state.pos, p.key, state.ladderN) }; });
+      var ladderWins = a.filter(function (x) { return x.v > 0; }).length;
+      var html;
+      if (ladderWins === 0) html = 'Starting <em>' + posLabel(state.pos) + '</em>, deploying <strong>all at once</strong> comes out ahead under <strong>every</strong> permitted forward path — the channel-aware call is robust, not a bet on one path.';
+      else if (ladderWins === 3) html = 'Starting <em>' + posLabel(state.pos) + '</em>, <span class="lsl-dca">laddering</span> comes out ahead under <span class="lsl-dca">every</span> permitted path — up here, spreading is the model-rational hedge against the reversion the channel predicts.';
+      else html = 'Starting <em>' + posLabel(state.pos) + '</em>, the paths disagree &mdash; laddering wins under ' + ladderWins + ' of three and loses under the rest. A genuine toss-up the channel doesn&rsquo;t resolve; commitment matters more than the tactic.';
+      main.innerHTML = html;
+      if (detail) {
+        detail.innerHTML = a.map(function (x) { return x.k + ' <strong>' + (x.v < 0 ? 'all-now +' + Math.abs(x.v).toFixed(0) : 'ladder +' + x.v.toFixed(0)) + '%</strong>'; }).join(' &nbsp;·&nbsp; ')
+          + '<br><span class="lsl-sparse">Robustness across the paths the channel permits &mdash; never a single forecast. The same call beat naive deployment retrospectively too; the agreement across both lenses is the credibility.</span>';
+      }
+      return;
+    }
+
     var b = bucketAt(state.era, state.ladderN, state.pos);
     if (lead) lead.textContent = 'At channel position ' + state.pos.toFixed(2) + ' (' + posLabel(state.pos) + ') · ladder over ' + ladderDurationLabel();
     if (b.n < 4) {
@@ -452,7 +542,17 @@
       btn.addEventListener('click', function () {
         state.era = btn.getAttribute('data-era');
         era.forEach(function (b) { b.classList.toggle('active', b === btn); });
-        updateAdvChart(); updateVerdict();
+        updateAdvChart(); applyChannelWindow(); updateVerdict();   // era also drives channel x-range (Amendment 2)
+      });
+    });
+
+    var lens = document.querySelectorAll('.lsl-lens button');
+    lens.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.lens = btn.getAttribute('data-lens');
+        lens.forEach(function (b) { b.classList.toggle('active', b === btn); });
+        document.body.setAttribute('data-lsl-lens', state.lens);  // CSS hook (axis caption swap, etc.)
+        updateAdvChart(); applyChannelWindow(); setForwardCaveat(); updateVerdict();
       });
     });
 
@@ -471,6 +571,7 @@
       state.horizon = parseInt(this.value, 10);
       if (horizonVal) horizonVal.textContent = state.horizon + ' yrs';
       renderBackstop();
+      applyChannelWindow();   // projective forward extent is the horizon year (Amendment 1)
     });
 
     var sum = document.getElementById('lslSum');
@@ -481,11 +582,60 @@
     });
   }
 
+  // ════════ ADVANCED / OPTIONAL DISCLOSURE (design §6.1) ════════
+  // Layered on top of the core decision; kept deliberately quiet so it never
+  // competes with the scrubber for "the thing you manipulate."
+  function primaryAdvAt(pos) {
+    if (state.lens === 'projective') return simFwdAdv(pos, 'revert', state.ladderN);
+    var b = bucketAt(state.era, state.ladderN, pos);
+    return b.n ? b.mean : 0;
+  }
+  function wireAdvanced() {
+    // (i) Manual %-now / %-laddered blend — the executed middle ground.
+    var blend = document.getElementById('lslBlend'), blendVal = document.getElementById('lslBlendVal'), blendOut = document.getElementById('lslBlendOut');
+    function renderBlend() {
+      if (!blendOut) return;
+      var f = state.blend / 100, base = primaryAdvAt(state.pos), blended = f * base;
+      var sign = function (v) { return (v < 0 ? '' : '+') + v.toFixed(0) + '%'; };
+      if (state.blend === 0) blendOut.innerHTML = 'All at once &mdash; the binary&rsquo;s &ldquo;deploy&rdquo; state. Slide right to spread part of it.';
+      else if (state.blend === 100) blendOut.innerHTML = 'Fully laddered &mdash; the binary&rsquo;s &ldquo;ladder&rdquo; state (' + sign(base) + ' vs all-now).';
+      else blendOut.innerHTML = 'Deploy <strong>' + (100 - state.blend) + '% now</strong>, ladder <strong>' + state.blend + '%</strong> &mdash; lands at <strong>' + sign(blended) + '</strong> vs all-now, between the two endpoints.';
+    }
+    if (blend) blend.addEventListener('input', function () { state.blend = parseInt(this.value, 10); if (blendVal) blendVal.textContent = state.blend + '% laddered'; renderBlend(); });
+    renderBlend();
+
+    // (ii) Recurring-windfall planner — ongoing DCA + a periodic lump, projected
+    // forward along the central trend (a planning surface, not a forecast).
+    var rw = document.getElementById('lslRwWeekly'), ra = document.getElementById('lslRwAnnual'), rh = document.getElementById('lslRwYears');
+    function setText(id, t) { var e = document.getElementById(id); if (e) e.textContent = t; }
+    function renderRw() {
+      if (!rw) return;
+      var weekly = parseFloat(rw.value) || 0, annual = parseFloat(ra && ra.value) || 0, yrs = parseInt(rh && rh.value, 10) || 1;
+      var btc = 0, deployed = 0, weeks = Math.round(yrs * 52);
+      for (var w = 0; w < weeks; w++) {
+        var price = plPrice(todayD + w * 7);
+        if (weekly > 0) { btc += weekly / price; deployed += weekly; }
+        if (w > 0 && w % 52 === 0 && annual > 0) { btc += annual / price; deployed += annual; }
+      }
+      var value = btc * plPrice(todayD + yrs * 365.25);
+      setText('lslRwDeployed', fmtUSD(deployed));
+      setText('lslRwBtc', btc.toFixed(4) + ' BTC');
+      setText('lslRwValue', fmtUSD(value));
+      setText('lslRwMult', deployed > 0 ? (value / deployed).toFixed(1) + '×' : '—');
+    }
+    [rw, ra, rh].forEach(function (el) { if (el) el.addEventListener('input', function () { if (el === rh) setText('lslRwYearsVal', el.value + ' yrs'); renderRw(); }); });
+    renderRw();
+  }
+
   // ════════ INIT ════════
   function init() {
     buildAdvChart();
     buildChannelChart();
+    applyChannelWindow();          // initial x-range / y-refit
+    setForwardCaveat();            // hidden in retrospective
+    document.body.setAttribute('data-lsl-lens', state.lens);
     wire();
+    wireAdvanced();
     updateVerdict();
     renderBackstop();
     renderCompression();

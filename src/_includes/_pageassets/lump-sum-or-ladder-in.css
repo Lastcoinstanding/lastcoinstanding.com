@@ -160,6 +160,43 @@ body { background: var(--bg); color: var(--text); }
 .lsl-method li:last-child { border-bottom: none; }
 .lsl-method code { font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace; color: var(--amber); font-size: 0.78rem; }
 
+/* ── Lens toggle (Retrospective ↔ Projective) ── */
+.lsl-lens-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 0.9rem; margin: 0 0 1.2rem; }
+.lsl-lens-label { font-family: 'Inter', sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); }
+.lsl-lens { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.lsl-lens button { background: rgba(255,255,255,0.02); border: none; border-right: 1px solid var(--border); color: var(--text-dim); font-family: 'Inter', sans-serif; font-size: 0.78rem; padding: 0.5rem 1rem; cursor: pointer; transition: background 0.15s, color 0.15s; }
+.lsl-lens button:last-child { border-right: none; }
+.lsl-lens button.active { background: rgba(224,148,34,0.12); color: var(--amber); font-weight: 600; }
+.lsl-lens-hint { font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted); font-style: italic; }
+
+/* Dual captions — show retro/proj per the body lens hook */
+.lsl-cap-proj { display: none; }
+body[data-lsl-lens="projective"] .lsl-cap-retro { display: none; }
+body[data-lsl-lens="projective"] .lsl-cap-proj { display: block; }
+
+/* Forward-extrapolation caveat (Amendment 1, non-negotiable) */
+.lsl-fwd-caveat { font-family: 'Inter', sans-serif; font-size: 0.82rem; line-height: 1.6; color: var(--text-dim); margin: 0.7rem 0 0; padding: 0.8rem 1rem; background: rgba(192,57,43,0.05); border: 1px solid rgba(192,57,43,0.25); border-radius: 6px; }
+.lsl-fwd-caveat strong { color: var(--text); font-weight: 600; }
+
+/* ── Advanced / optional disclosure ── */
+.lsl-advanced { margin: 1.4rem 0 0; border-top: 1px solid rgba(255,255,255,0.06); }
+.lsl-advanced > summary { cursor: pointer; list-style: none; padding: 0.9rem 0 0.2rem; font-family: 'Inter', sans-serif; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); transition: color 0.2s; }
+.lsl-advanced > summary::-webkit-details-marker { display: none; }
+.lsl-advanced > summary::before { content: '+ '; color: var(--amber); }
+.lsl-advanced[open] > summary::before { content: '– '; }
+.lsl-advanced > summary:hover { color: var(--text-dim); }
+.lsl-advanced-body { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.4rem 2rem; padding: 1rem 0 0.4rem; }
+.lsl-adv-block h4 { font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 600; color: var(--text); margin: 0 0 0.7rem; }
+.lsl-adv-out { font-family: 'Inter', sans-serif; font-size: 0.86rem; line-height: 1.55; color: var(--text-dim); margin: 0.6rem 0 0.5rem; min-height: 2.4em; }
+.lsl-adv-out strong { color: var(--amber); }
+.lsl-adv-note { font-family: 'Inter', sans-serif; font-size: 0.74rem; line-height: 1.5; color: var(--text-muted); margin: 0; }
+.lsl-adv-block .lsl-config { border-top: none; padding-top: 0; margin-top: 0; grid-template-columns: 1fr; gap: 0.7rem; }
+.lsl-adv-block input[type="number"] { width: 100%; height: 36px; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.9rem; padding: 0 0.7rem; border-radius: 4px; }
+.lsl-rw-out { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1rem; margin: 0.9rem 0; }
+.lsl-rw-cell { display: flex; flex-direction: column; gap: 0.1rem; }
+.lsl-rw-k { font-family: 'Inter', sans-serif; font-size: 0.64rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+.lsl-rw-v { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+
 /* ── Responsive ── */
 @media (max-width: 760px) {
   .content-area { padding: 0 1.2rem 4rem; }

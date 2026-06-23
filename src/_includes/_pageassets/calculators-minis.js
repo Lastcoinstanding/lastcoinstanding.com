@@ -612,6 +612,49 @@
   }
 
   /* ═══════════════════════════════════════════════════════════
+     LUMP SUM OR LADDER IN — the advantage curve "flip"
+     ═══════════════════════════════════════════════════════════ */
+
+  function renderMiniLumpVsDca(target) {
+    var W = 400, H = 110, ml = 24, mt = 10, mb = 16, mr = 10;
+    var LF = Math.log(PL_FLOOR), LC = Math.log(PL_CEIL), SPAN = LC - LF;
+    var N = PL_DATA.length, ladderN = 30;
+    function posOf(p, d) { return (Math.log(p / plTrend(d)) - LF) / SPAN; }
+    var pos = []; for (var i = 0; i < N; i++) pos.push(posOf(PL_DATA[i][1], PL_DATA[i][0]));
+    function adv(idx) {
+      if (idx + ladderN - 1 > N - 1) return null;
+      var lump = 1 / PL_DATA[idx][1], dca = 0;
+      for (var k = 0; k < ladderN; k++) dca += (1 / ladderN) / PL_DATA[idx + k][1];
+      return (dca / lump - 1) * 100;
+    }
+    var pts = [];
+    for (var g = 0; g <= 1.0001; g += 0.05) {
+      var vals = [];
+      for (var j = 0; j < N; j++) { if (Math.abs(pos[j] - g) > 0.08) continue; var a = adv(j); if (a !== null) vals.push(a); }
+      if (vals.length >= 4) { var m = 0; for (var v = 0; v < vals.length; v++) m += vals[v]; pts.push({ g: g, y: m / vals.length }); }
+    }
+    if (pts.length < 2) { target.innerHTML = ''; return; }
+    var ymin = Infinity, ymax = -Infinity;
+    pts.forEach(function (p) { if (p.y < ymin) ymin = p.y; if (p.y > ymax) ymax = p.y; });
+    ymin = Math.min(ymin, -5); ymax = Math.max(ymax, 5);
+    var pd = (ymax - ymin) * 0.12; ymin -= pd; ymax += pd;
+    function X(g) { return ml + g * (W - ml - mr); }
+    function Y(y) { return mt + (1 - (y - ymin) / (ymax - ymin)) * (H - mt - mb); }
+    var parts = [];
+    var y0 = Y(0);
+    parts.push('<line x1="' + ml + '" y1="' + y0.toFixed(1) + '" x2="' + (W - mr) + '" y2="' + y0.toFixed(1) + '" stroke="' + C.gridLt + '" stroke-width="0.6" stroke-dasharray="2 2"/>');
+    for (var p2 = 0; p2 < pts.length - 1; p2++) {
+      var a0 = pts[p2], b0 = pts[p2 + 1], col = ((a0.y + b0.y) / 2 < 0) ? '#e09422' : '#6db3d4';
+      parts.push('<line x1="' + X(a0.g).toFixed(1) + '" y1="' + Y(a0.y).toFixed(1) + '" x2="' + X(b0.g).toFixed(1) + '" y2="' + Y(b0.y).toFixed(1) + '" stroke="' + col + '" stroke-width="1.9"/>');
+    }
+    parts.push('<text x="' + ml + '" y="' + (H - 3) + '" font-size="6.5" font-family="' + FONT + '" fill="' + C.label + '">Floor</text>');
+    parts.push('<text x="' + (W - mr) + '" y="' + (H - 3) + '" font-size="6.5" font-family="' + FONT + '" fill="' + C.label + '" text-anchor="end">Upper</text>');
+    parts.push('<text x="3" y="' + Math.max(mt + 6, Y(ymax * 0.6)).toFixed(1) + '" font-size="6" font-family="' + FONT + '" fill="#6db3d4">ladder</text>');
+    parts.push('<text x="3" y="' + Math.min(H - mb, Y(ymin * 0.6)).toFixed(1) + '" font-size="6" font-family="' + FONT + '" fill="#e09422">lump</text>');
+    setSvg(target, W, H, parts.join(''));
+  }
+
+  /* ═══════════════════════════════════════════════════════════
      INIT — find each target div and run its renderer
      ═══════════════════════════════════════════════════════════ */
 
@@ -622,7 +665,8 @@
     'mini-retirement':   renderMiniRetirement,
     'mini-rebalancing':  renderMiniRebalancing,
     'mini-horizon':      renderMiniHorizon,
-    'mini-half-life':    renderMiniHalfLife
+    'mini-half-life':    renderMiniHalfLife,
+    'mini-lump-vs-dca':  renderMiniLumpVsDca
   };
 
   function init() {

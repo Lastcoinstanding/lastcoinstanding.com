@@ -46,6 +46,7 @@ module.exports = function (eleventyConfig) {
     'og-borrowing-against-your-stack.jpg',
     'og-bitcoin-backed-mortgages.jpg',
     'og-bitcoin-fixed-income.jpg',
+    'og-lump-sum-or-ladder-in.jpg',
     'og-living-on-bitcoin.jpg',
     'og-paper-bitcoin.jpg',
     'og-risks-to-bitcoin.jpg',

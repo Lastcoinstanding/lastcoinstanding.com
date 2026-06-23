@@ -1664,3 +1664,33 @@ wrapperEl._chartCopyCapture = function(){ return Promise<canvas|Blob>; };
 ### Adding the button to a future chart
 
 Just add `data-chart-copy` + `data-chart-title="…"` to the chart's wrapper. The capture path is auto-detected. For a DOM-grid or an SVG that should be captured whole (including non-SVG labels in the frame), add `data-chart-capture="dom"`.
+## 32. Lump Sum or Ladder In? (`/lump-sum-or-ladder-in.html`)
+
+**Added June 2026.** A channel-applying decision tool in **The Numbers** (group *Positioning & Strategy*). Sibling to `/disciplined-rebalancing` (DR) and `/bitcoin-vs-real-estate` projection mode; reuses DR's channel-viz / Chart.js patterns, the shared `power-law-data.js` globals, and the mixed-content width tier (1100 page / 880 prose). Built in two stages (2A core, 2B projective + integration).
+
+**Thesis.** Lump sum vs. DCA isn't about timing or temperament — it's about **valuation relative to the Power Law channel**. Low in the channel → deploy decisively; stretched into the upper channel → spreading is the model-rational hedge; mid-channel → a coin-flip. Underneath it all, the commitment backstop: over a long horizon *every* entry recovers, so the tactic is a margin and commitment is the foundation.
+
+**Everything is computed live from the current `PL_DATA` at load** — the advantage curve, the commitment-backstop table, the volatility-compression table, the worst-entry recovery, and today's channel position. **Nothing is hard-coded** (the build-time re-run discipline becomes a load-time one). Step 1 of the build re-ran the four analyses against canonical data and reproduced the design figures to rounding; the figures that ship are the freshly-computed ones.
+
+### Structure (single-scroll, not tabbed)
+The page is one decision on one continuum, so it deliberately avoids DR's tab split. Controls: a **channel-position scrubber** (the single star lever), a **binary all-now ↔ ladder-in toggle** (the core decision; *not* a blend slider), a **lens toggle** (Retrospective ↔ Projective, 2B), and an **era segmented control** (Full / Post-2017 / Post-2020, default recent) that does double duty — it buckets the backtest *and* sets the channel chart's x-range. Quiet config: sum (cosmetic — the advantage is amount-invariant), ladder duration, hold horizon. Then: live readout, commitment-backstop table, volatility-compression (secondary), honesty layer, methodology footer. Advanced/optional disclosure (collapsed `<details>`): a manual %-now/%-laddered blend and a recurring-windfall planner.
+
+### Two lenses (the credibility argument)
+- **Retrospective** — the lump-vs-ladder advantage as a function of entry channel position, the "settled debate flips on its axis" curve (amber = all-now territory below zero, blue = laddering above), with a scrubbed marker and a live "today" line.
+- **Projective** — anchored at today, three forward channel-scenario paths (revert-to-trend / ride-floor / stretch-then-revert), **excursions sized to recent-era (compressed) amplitude, never early-era** (design §4.5). Shows all-now-vs-ladder *robust across permitted paths*, never a point forecast; the faint retrospective curve overlays for the two-lens agreement.
+
+### Stage-2B amendments (build decisions worth preserving)
+- **Forward channel extension folded into the projective lens (Amendment 1).** The orientation chart extends the floor/trend/upper bands forward to the hold-horizon year **only in the projective lens** (retrospective stays strictly historical — flagged choice). The forward (extrapolated) portion renders **faded + finely dashed** via Chart.js `segment` styling so fitted history is visually distinct from extrapolation, and it carries a **non-negotiable right-hand-edge caveat** (`#lslFwdCaveat`): the bands are a mathematical extrapolation of an empirical regularity, not a forecast.
+- **Era control drives the channel x-range with a y-refit (Amendment 2).** Selecting an era clips x to `[era-start … (retrospective: ~today | projective: horizon-year)]` **and** refits the log-Y envelope to that window so the bands open up. The "today" line and the forward bands always stay on-canvas.
+
+### Cross-cutting discipline
+- **No live value in static copy (rule #1).** The scrubber opens at a fixed low-channel *teaching* default (0.15), not today's value; today's position renders only in the live component via `fetchTodayPrice`.
+- **Live readout + caveats are one eyeful (rule #2).** The right-hand-edge and panic-threshold caveats sit in the same card as the live "deploy" reading.
+- **Locked precision conventions** (methodology footer): 8-year backstop exit = nearest sample to (entry + 8×365.25 days); worst-entry recovery quoted as the live range. Porkopolis attribution links to The Channel rather than restating it. No URL carry-over.
+
+### Integration
+`explorations.json` (group *Positioning & Strategy*, `calculator_tile` `mini-lump-vs-dca` at position 15); `calculators-minis.js` renderer (the advantage-curve flip); `sitemap.xml` @0.9; `llms.txt`; homepage concept card (deploy-vs-ladder bar SVG) in The Numbers + Latest; `updates.json`; bidirectional `related:` with The Power Law, The Bitcoin Horizon, BvSM, Disciplined Rebalancing; OG card `og-lump-sum-or-ladder-in.jpg` (§6.15.1 brand-forward).
+
+### Open items
+- **Deferred polish (post-2B pass):** the opening copy will be rewritten in a less salesy register against the final structure; tooltips for load-bearing terms (channel position, trend, floor, upper band) will reuse the existing Style-Guide tooltip component verbatim. Neither is built yet.
+- **Carousel slide** pending (needs a Grok Imagine video) per the usual NEW_PAGE_CHECKLIST §8 cadence.
