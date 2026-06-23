@@ -1,0 +1,211 @@
+---
+layout: base.njk
+permalink: /lump-sum-or-ladder-in.html
+slug: lump-sum-or-ladder-in
+related:
+  - slug: the-power-law
+    desc: "The foundational model and its attribution. This page applies the Power Law channel as a deployment-timing frame; The Channel lays out the bands and the evidence."
+  - slug: the-bitcoin-horizon
+    desc: "The worst-entry-recovery sibling. Where this page shows every entry recovers over a long horizon, Horizon makes the convergence its whole subject."
+  - slug: bitcoin-vs-the-stock-market
+    desc: "The entry-at-the-tops stress test. Buying the literal worst moments and still coming out ahead at long horizons — the same commitment backstop, against the index."
+  - slug: disciplined-rebalancing
+    desc: "The other channel-tactics page. Where this one is about getting in, Disciplined Rebalancing is the multi-cycle sell-and-rebuy protocol for bitcoin already held."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/lump-sum-or-ladder-in-head.html' %}"
+  page_styles: "{% include '_pageassets/lump-sum-or-ladder-in.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/lump-sum-or-ladder-in.js' %}"
+---
+
+<section class="hero">
+  <h1>Lump Sum or <em>Ladder In?</em></h1>
+  <div class="hero-subtitle">Lump sum or DCA &mdash; and does where you sit in the channel change the answer?</div>
+  <p class="subtitle">Not about timing, not about temperament &mdash; about valuation relative to the Power Law channel. Decisive when cheap, patient when stretched, committed always.</p>
+</section>
+
+<main class="content-area">
+
+  {% include 'components/tool-framing.njk' %}
+
+  <div class="section-intro lsl-prose">
+    <p>Every exchange has a dollar-cost-averaging calculator. Run honestly against a rising asset, they all reach the same flat conclusion &mdash; <em>you should have lump-summed</em> &mdash; which is true, unsatisfying, and undifferentiated.</p>
+    <p>This page asks the better question. The lump-sum-versus-ladder decision isn&rsquo;t really about <em>timing</em> and isn&rsquo;t really about <em>temperament</em> &mdash; it&rsquo;s about <strong>valuation relative to the Power Law trajectory</strong>. Low in the channel, spreading purchases just means paying more as price reverts up toward trend, so deploy decisively. Stretched into the upper channel, spreading is the model-rational hedge against the mean-reversion the channel itself predicts. Mid-channel is a genuine coin-flip. And underneath all of it: over a long enough horizon, <em>every</em> entry &mdash; even the literal worst tops in Bitcoin&rsquo;s history &mdash; recovers to a large multiple. The tactic is a margin; commitment is the foundation.</p>
+  </div>
+
+  <!-- ════════ THE DECISION SURFACE ════════ -->
+  <div class="lsl-calc" id="calculator">
+    <div class="lsl-calc-head">
+      <h2>At this valuation, which wins?</h2>
+      <div>
+        <span class="lsl-era-label">Historical window</span>
+        <div class="lsl-era" role="group" aria-label="Historical window">
+          <button type="button" data-era="full">Full</button>
+          <button type="button" data-era="post-2017">Post-2017</button>
+          <button type="button" data-era="post-2020" class="active">Post-2020</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- The star control -->
+    <div class="lsl-scrubber">
+      <div class="lsl-scrubber-top">
+        <span class="lsl-scrubber-title">Where in the channel are you buying?</span>
+        <span class="lsl-scrubber-readout" id="lslScrubReadout">&mdash;</span>
+      </div>
+      <input type="range" min="0" max="100" step="1" value="15" class="lsl-scrub-input" id="lslScrub"
+             aria-label="Entry channel position from floor to upper band">
+      <div class="lsl-scrub-scale"><span>Floor &middot; cheap</span><span>Trend</span><span>Upper band &middot; stretched</span></div>
+    </div>
+
+    <!-- Binary core decision control (NOT a blend slider) -->
+    <div class="lsl-decision" role="group" aria-label="How will you deploy?">
+      <button type="button" data-decision="all-now" class="active">
+        <span class="lsl-decision-name">Deploy all now</span>
+        <span class="lsl-decision-sub">Lump sum</span>
+      </button>
+      <button type="button" data-decision="ladder-in">
+        <span class="lsl-decision-name">Ladder in</span>
+        <span class="lsl-decision-sub">Spread over time</span>
+      </button>
+    </div>
+
+    <!-- Verdict -->
+    <div class="lsl-verdict">
+      <div class="lsl-verdict-lead" id="lslVerdictLead">&mdash;</div>
+      <div class="lsl-verdict-main" id="lslVerdictMain">&mdash;</div>
+      <div class="lsl-verdict-detail" id="lslVerdictDetail"></div>
+    </div>
+
+    <!-- Primary chart: the flip -->
+    <div class="lsl-chart-block">
+      <p class="lsl-chart-caption">How the all-now-vs-ladder edge changes across the channel. Below the line, deploying all at once accumulated more BTC (amber); above it, laddering did (blue). The settled &ldquo;lump-sum usually wins&rdquo; debate flips on its axis once you condition on valuation.</p>
+      <div class="lsl-chart-wrapper" data-chart-copy data-chart-title="Lump-sum vs. ladder-in advantage by channel position">
+        <canvas id="lslAdvChart" aria-label="Ladder-in advantage in percent more BTC, plotted across entry channel position from floor to upper band"></canvas>
+      </div>
+    </div>
+
+    <!-- Orientation chart: the channel itself -->
+    <div class="lsl-chart-block">
+      <p class="lsl-chart-caption">Where that valuation sits in the actual channel. The dashed white line is your scrubbed entry valuation against the floor, trend, and upper band, with real price overlaid.</p>
+      <div class="lsl-chart-wrapper lsl-channel" data-chart-copy data-chart-title="The Power Law channel — your entry valuation">
+        <canvas id="lslChannelChart" aria-label="Bitcoin price across its history against the Power Law floor, trend, and upper band, with the scrubbed entry valuation drawn parallel to trend"></canvas>
+      </div>
+    </div>
+
+    <!-- Quiet config (not the lever) -->
+    <div class="lsl-config">
+      <div class="lsl-field">
+        <label for="lslSum">Sum to deploy <span class="lsl-field-val" id="lslSumVal">$12.0K</span></label>
+        <input type="range" id="lslSum" min="1000" max="500000" step="1000" value="12000">
+      </div>
+      <div class="lsl-field">
+        <label for="lslLadder">Ladder over <span class="lsl-field-val" id="lslLadderVal">1 yr</span></label>
+        <input type="range" id="lslLadder" min="3" max="24" step="1" value="12">
+      </div>
+      <div class="lsl-field">
+        <label for="lslHorizon">Hold horizon <span class="lsl-field-val" id="lslHorizonVal">4 yrs</span></label>
+        <input type="range" id="lslHorizon" min="2" max="8" step="2" value="4">
+      </div>
+      <p class="lsl-config-note">Defaults are set so the lesson reads without touching anything &mdash; drag the scrubber, flip the toggle, done. The advantage is a <em>ratio of BTC accumulated</em>, so it&rsquo;s independent of the sum; the sum just scales what the amounts would have been. Ladder duration sets how long the spread-in takes; hold horizon drives the commitment backstop below.</p>
+    </div>
+  </div>
+
+  <!-- ════════ LIVE READOUT + its inseparable caveats (rule #2) ════════ -->
+  <section class="lsl-live" aria-label="Today's reading">
+    <div class="lsl-live-grid">
+      <div>
+        <div class="lsl-live-label">Where the channel sits right now</div>
+        <div class="lsl-live-pos" id="lslLivePos" aria-live="polite">&mdash;</div>
+        <p class="lsl-live-rec" id="lslLiveRec">&mdash;</p>
+        <p class="lsl-live-meta" id="lslLiveMeta"></p>
+      </div>
+      <div class="lsl-live-caveats">
+        <div class="lsl-caveat-label">Read this in the same glance</div>
+        <p><strong>The forward read carries more humility than the backtest.</strong> Today&rsquo;s floor is knowable; today&rsquo;s position relative to a <em>future</em> trend is less so.</p>
+        <p><strong>The math models a holder who never capitulates.</strong> If deploying a lump and watching it fall would push you to sell and leave entirely, laddering is staying-power insurance &mdash; a small tactical cost for a steadiness the backtest can&rsquo;t see. It&rsquo;s the one honest reason to ladder even when the channel says deploy.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ THE COMMITMENT BACKSTOP ════════ -->
+  <section class="lsl-section lsl-wide">
+    <p class="lsl-eyebrow">The commitment backstop</p>
+    <h2>Every entry recovers</h2>
+    <div class="lsl-prose" style="max-width:none;">
+      <p>Before any tactic, the floor the whole page rests on: over a long horizon, <em>where</em> you bought barely matters. Mean value-multiple of a lump, by entry valuation and how long it was held &mdash; computed live from the current record:</p>
+    </div>
+    <div class="lsl-table-wrap">
+      <table class="lsl-table">
+        <thead><tr><th>Entry valuation</th><th>2&nbsp;yr</th><th>4&nbsp;yr</th><th>6&nbsp;yr</th><th>8&nbsp;yr</th></tr></thead>
+        <tbody id="lslBackstopBody"></tbody>
+      </table>
+    </div>
+    <div class="lsl-takeaway" id="lslBackstopTakeaway"></div>
+  </section>
+
+  <!-- ════════ SUPPORTING: volatility compression ════════ -->
+  <section class="lsl-section">
+    <p class="lsl-secondary-label">Supporting &middot; why the tactic matters less over time</p>
+    <h2>The upper channel is vanishing</h2>
+    <div class="lsl-prose">
+      <p>The tactical edge <em>per opportunity</em> stays large &mdash; up high, laddering still wins big. But the opportunities to be up high are collapsing cycle over cycle. Maximum channel position reached, by four-year window:</p>
+    </div>
+    <div class="lsl-table-wrap">
+      <table class="lsl-table">
+        <thead><tr><th>Window</th><th>Max channel position</th></tr></thead>
+        <tbody id="lslCompressionBody"></tbody>
+      </table>
+    </div>
+    <div class="lsl-prose">
+      <p>As Bitcoin matures it increasingly lives low-to-mid channel, where decisiveness wins &mdash; consistent with the volatility compression on <a href="/the-doubling-ladder">The Doubling Ladder</a> and the Power Law&rsquo;s shrinking cycle peaks. The clever &ldquo;wait-and-ladder-down-from-the-top&rdquo; move is one you rarely get to use anymore. The channel mostly just says <em>commit</em>.</p>
+    </div>
+  </section>
+
+  <!-- ════════ HONESTY LAYER ════════ -->
+  <section class="lsl-section">
+    <div class="belief-context">
+      <div class="belief-context-label">A note on prerequisite reading</div>
+      <p><strong>This tool uses the Power Law channel to frame the decision.</strong> If that model isn&rsquo;t useful to you, neither is this page. <a href="/the-power-law#channel">The Channel</a> lays out the bands, the evidence, and the attribution &mdash; read it first if the frame is new.</p>
+    </div>
+
+    <h3>Where the clean backtest doesn&rsquo;t describe you</h3>
+    <div class="lsl-caveats">
+      <div class="lsl-caveat">
+        <h4>The Power Law is empirical, not guaranteed.</h4>
+        <p>It&rsquo;s an observation that has held across fifteen years and nine orders of magnitude &mdash; not a promise. Future cycles aren&rsquo;t assured, and every projection assumes the channel&rsquo;s mathematical shape keeps holding.</p>
+      </div>
+      <div class="lsl-caveat">
+        <h4>Hindsight flatters the fit.</h4>
+        <p>The bands were drawn through the data, which makes &ldquo;buy low in the channel&rdquo; look prescient. The backtest is what <em>would have</em> happened; past cycles aren&rsquo;t promised to the next buyer.</p>
+      </div>
+      <div class="lsl-caveat lsl-caveat-blindspot">
+        <h4>The math ignores the panic threshold.</h4>
+        <p>The backtest says deploying usually wins &mdash; but it models a holder who never sells in fear. A real person who lump-sums and watches a 30% drawdown may capitulate and leave entirely. That&rsquo;s the model&rsquo;s blind spot, not an edge, and it&rsquo;s the honest case for laddering even when the channel says deploy. It sits with the live reading above for a reason.</p>
+      </div>
+    </div>
+
+    <ul class="negative-space-list">
+      <li><strong>Not a price target.</strong> The page never tells you where price is going &mdash; only how to weigh deployment given where price <em>is</em> in the channel.</li>
+      <li><strong>Not a trading strategy.</strong> The only endorsed tactic is adjusting deployment decisiveness by valuation. Getting in, not trading in and out.</li>
+      <li><strong>Not a timing signal.</strong> &ldquo;Decisive&rdquo; and &ldquo;hedge&rdquo; are about valuation, not a prediction that a move is imminent.</li>
+    </ul>
+  </section>
+
+  <!-- ════════ METHODOLOGY ════════ -->
+  <div class="lsl-attribution">
+    <span class="lsl-attribution-label">Channel framework &amp; coefficients</span>
+    The Power Law channel &mdash; floor at 0.42&times; trend, upper band at 3&times; trend &mdash; was developed by <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener"><strong>Matthew Me&zcaron;inskis</strong></a> at Porkopolis Economics. Coefficients used: <code>a = 1.6&times;10<sup>&minus;17</sup></code>, <code>b = 5.77</code>. See <a href="/the-power-law#channel">The Channel</a> for the full case and attribution.
+  </div>
+
+  <div class="lsl-method">
+    <div class="lsl-method-label">Methodology</div>
+    <ul>
+      <li>Channel position is the log-space location between floor and ceiling: <code>(ln(price/trend) &minus; ln 0.42) / (ln 3.0 &minus; ln 0.42)</code> &mdash; 0 at the floor, 1 at the upper band.</li>
+      <li>Backtest: a fixed sum deployed all-at-once vs. laddered equally across the chosen window, comparing BTC accumulated, bucketed by entry channel position. The advantage is amount-invariant.</li>
+      <li>Commitment backstop: mean value-multiple by hold length. <strong>8-year exit convention</strong> &mdash; the nearest sample to (entry&nbsp;+&nbsp;8&nbsp;&times;&nbsp;365.25&nbsp;days); carries ~1&ndash;3% sensitivity (disclosure, not precision). Worst-entry recovery is the range for entries above 1.5&times; channel position (roughly the 2011/2013 blow-off tops), recovered to the latest sample.</li>
+      <li id="lslMethodWindow"></li>
+      <li>Today&rsquo;s channel position is computed at load from the latest sample and the live spot (CoinGecko, via the shared fetch) &mdash; never baked in. Forward scenarios calibrated to recent-era amplitude are a Stage 2B addition.</li>
+    </ul>
+  </div>
+
+</main>
