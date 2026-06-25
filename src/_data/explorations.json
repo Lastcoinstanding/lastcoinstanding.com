@@ -276,6 +276,21 @@
     }
   },
   {
+    "slug": "your-deployment-plan",
+    "title": "Your Deployment Plan",
+    "category": "numbers",
+    "group": "Positioning & Strategy",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Lump, ladder, or hybrid &mdash; model your own deployment, looking back and looking forward.",
+      "preview_kind": "live-chart",
+      "preview_id": "mini-deployment-plan",
+      "anchor": "#calculator",
+      "featured": false,
+      "position": 16
+    }
+  },
+  {
     "slug": "borrowing-against-your-stack",
     "title": "Borrowing Against Your Stack",
     "category": "numbers",

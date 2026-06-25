@@ -658,6 +658,53 @@
      INIT — find each target div and run its renderer
      ═══════════════════════════════════════════════════════════ */
 
+  /* ═══════════════════════════════════════════════════════════
+     9. MINI DEPLOYMENT PLAN  (value-over-time forward range)
+     A stack's value rising to today, then a forward cone between
+     reversion-to-trend (amber) and stay-on-trajectory (blue), over
+     a faint floor/trend backdrop. Telegraphs Your Deployment Plan's
+     value-over-time chart, floor at the bottom.
+     ═══════════════════════════════════════════════════════════ */
+  function renderMiniDeploymentPlan(target) {
+    var W = 400, H = 110, ml = 8, mt = 12, mb = 16, mr = 46;
+    var LF = Math.log(PL_FLOOR), LC = Math.log(PL_CEIL), SPAN = LC - LF;
+    var today = (Date.now() / 1000 - GENESIS_TS) / 86400;
+    var lastP = PL_DATA[PL_DATA.length - 1][1];
+    var pos = (Math.log(lastP / plTrend(today)) - LF) / SPAN;
+    if (!isFinite(pos)) pos = 0.4;
+    pos = Math.max(0.08, Math.min(0.92, pos));
+    var TREND_POS = (0 - LF) / SPAN, hz = 4 * 365.25, steps = 40;
+    function ratioOf(p) { return Math.exp(p * SPAN + LF); }
+    var traj = [], rev = [], trend = [], floor = [];
+    for (var k = 0; k <= steps; k++) {
+      var u = k / steps, d = today + u * hz, t = plTrend(d);
+      traj.push(t * ratioOf(pos));
+      rev.push(t * ratioOf(pos + (TREND_POS - pos) * u));
+      trend.push(t); floor.push(t * PL_FLOOR);
+    }
+    var base = traj[0];
+    var ymin = Infinity, ymax = -Infinity;
+    [traj, rev, trend, floor].forEach(function (arr) { arr.forEach(function (v) { var n = v / base; if (n < ymin) ymin = n; if (n > ymax) ymax = n; }); });
+    function X(u) { return ml + u * (W - ml - mr); }
+    function Y(v) { var ly = Math.log(v), lo = Math.log(ymin), hi = Math.log(ymax); return mt + (1 - (ly - lo) / (hi - lo)) * (H - mt - mb); }
+    function path(arr) { var s = ''; for (var k = 0; k <= steps; k++) { s += (k === 0 ? 'M' : 'L') + X(k / steps).toFixed(1) + ' ' + Y(arr[k] / base).toFixed(1); } return s; }
+    var parts = [];
+    parts.push('<path d="' + path(floor) + '" fill="none" stroke="#b04525" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.5"/>');
+    parts.push('<path d="' + path(trend) + '" fill="none" stroke="#e09422" stroke-width="0.9" opacity="0.4"/>');
+    var area = ''; for (var k3 = 0; k3 <= steps; k3++) area += (k3 === 0 ? 'M' : 'L') + X(k3 / steps).toFixed(1) + ' ' + Y(rev[k3] / base).toFixed(1);
+    for (var k4 = steps; k4 >= 0; k4--) area += 'L' + X(k4 / steps).toFixed(1) + ' ' + Y(traj[k4] / base).toFixed(1);
+    area += 'Z';
+    parts.push('<path d="' + area + '" fill="#e09422" opacity="0.12"/>');
+    parts.push('<path d="' + path(rev) + '" fill="none" stroke="#e09422" stroke-width="1.9"/>');
+    parts.push('<path d="' + path(traj) + '" fill="none" stroke="#6db3d4" stroke-width="1.7" stroke-dasharray="4 2"/>');
+    parts.push('<circle cx="' + X(0).toFixed(1) + '" cy="' + Y(traj[0] / base).toFixed(1) + '" r="2" fill="#e09422"/>');
+    parts.push('<text x="' + X(0).toFixed(1) + '" y="' + (H - 3) + '" font-size="6.5" font-family="' + FONT + '" fill="' + C.label + '">today</text>');
+    parts.push('<text x="' + (W - mr) + '" y="' + (H - 3) + '" font-size="6.5" font-family="' + FONT + '" fill="' + C.label + '" text-anchor="end">+4y</text>');
+    parts.push('<text x="' + (W - mr + 3) + '" y="' + (Y(rev[steps] / base) + 2).toFixed(1) + '" font-size="6.5" font-family="' + FONT + '" fill="#e09422">reversion</text>');
+    parts.push('<text x="' + (W - mr + 3) + '" y="' + (Y(traj[steps] / base) + 2).toFixed(1) + '" font-size="6.5" font-family="' + FONT + '" fill="#6db3d4">trajectory</text>');
+    setSvg(target, W, H, parts.join(''));
+  }
+
   var RENDERERS = {
     'mini-heatmap':      renderMiniHeatmap,
     'mini-bvsm-chart':   renderMiniBvsmChart,
@@ -666,7 +713,8 @@
     'mini-rebalancing':  renderMiniRebalancing,
     'mini-horizon':      renderMiniHorizon,
     'mini-half-life':    renderMiniHalfLife,
-    'mini-lump-vs-dca':  renderMiniLumpVsDca
+    'mini-lump-vs-dca':  renderMiniLumpVsDca,
+    'mini-deployment-plan': renderMiniDeploymentPlan
   };
 
   function init() {

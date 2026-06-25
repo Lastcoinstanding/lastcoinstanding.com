@@ -1708,4 +1708,32 @@ Per reviewer direction (`STAGE_2C_REBUILD_SPEC.md` + `Lump_Sum_or_Ladder_In_-_Co
 - **Reframed copy** to the plained-down "this is a demonstration, not advice for your situation" voice throughout; added the **DCA footnote** at first use; honesty layer is now the doc's three items (empirical-not-guaranteed / hindsight-flatters / demonstration-not-advice), the negative-space "what this is not" list retained.
 - **Added the hand-off card** to `/your-deployment-plan` (`.lsl-handoff`). **This is a dead link until Stage 2C-② ships** — wired deliberately per spec.
 
-**Stage 2C-② (not built):** new page `/your-deployment-plan` — borrows The Bitcoin Retirement's value-over-time chart chassis, houses the hybrid (lump/ladder/blend), carries both retrospective + projective views (consuming `DeploymentProjection`), the four prominent rising-channel cautions, and full NEW_PAGE_CHECKLIST integration incl. bidirectional `related:` back to this page. Page 1's hand-off link resolves then.
+**Stage 2C-② (built — same PR #34, reviewed together):** new page `/your-deployment-plan` — see §33. Page 1's hand-off card now resolves to it.
+
+---
+
+## 33. Your Deployment Plan (`/your-deployment-plan.html`)
+
+**Added June 2026 (Stage 2C-②).** The personal model in **The Numbers** (group *Positioning & Strategy*), companion to §32 *Lump Sum or Ladder In?*. Where Page 1 is the retrospective teaching demonstration, this page is about *your* situation: your sum, your cadence, your horizon — modelled both back across real history and forward under the Power Law. New slug `/your-deployment-plan`; no URL carry-over from Page 1 (DR §8.1).
+
+**Thesis.** You have a sum to deploy. Lump it, ladder it, or do some of each? The **hybrid** (deploy X% now, ladder the rest over N months) is the differentiator — the option many people actually choose: a decisive core with some hedged comfort. The page lets you compare all three for your own case, on an intuitive value-over-time axis.
+
+### Structure
+- **Primary control: deployment style** (Lump / Ladder / Hybrid) — the thing you manipulate (rule #3). Then quiet plan inputs: sum, ladder/blend duration, hybrid front-load %, hold horizon. A **view toggle** (Retrospective / Projective).
+- **Chart chassis borrowed from The Bitcoin Retirement — SHAPE ONLY** (value-over-time, time on the x-axis, the Power Law channel as a floor-at-the-bottom backdrop). Imports **none** of Retirement's age/withdrawal/lifespan inputs; keeps this page's own controls and voice. The channel bands are expressed in *value* terms (your stack's worth under floor / trend / upper) so they share magnitude with the value line — fixing the inverted-floor confusion of the old Page-1 projective advantage chart at its root.
+- **Two views.** **Retrospective** replays the chosen plan from the most recent historical entry whose channel position is closest to today's (with enough forward data to hold the full horizon), at real prices. **Projective** deploys today and extends two Power Law paths — **reversion-to-trend** and **stay-on-current-trajectory** — drawn as a shaded *range*, never a single forecast. The projective path model is the **lifted `DeploymentProjection`** module from Stage ① (reused, not reinvented).
+- **Live readout** carries the softened recommendation (deploy / coin-flip / hedge) **with its caveats in the same eyeful** (rule #2) and links into the Cautions.
+- **Cautions** — the required four (rule #4), loud and headed (`#cautions`): rising-channel-means-you-may-never-enter / sideways-for-years / Bitcoin-could-break-the-Power-Law / never-capitulates. This is where the upper-channel hedge is softened from Page 1's historical fact to a *recommendation*.
+- **Commitment backstop + volatility-compression** tables, computed live (the doc places them here too). Prerequisite + methodology + attribution as sitewide.
+
+### Cross-cutting discipline
+- **Rule #1:** no live value in static copy; today's position renders only via `fetchTodayPrice` (live readout + the chart anchor). The retrospective analog is chosen *from* the live position at load — described in logic, never a baked value.
+- **Reuse:** Power Law constants + channel math copied locally per rule #5; `DeploymentProjection` consumed for the reversion path; Mežinskis/Porkopolis attribution links to The Channel.
+
+### Integration
+`explorations.json` (group *Positioning & Strategy*, `calculator_tile` `mini-deployment-plan` at position 16); `calculators-minis.js` renderer (forward value-range cone); `sitemap.xml` @0.9; `llms.txt`; homepage concept card (value-fork-into-range SVG) in The Numbers + Latest (rolled The Gallery out of Latest); `updates.json`; **bidirectional `related:`** with Lump Sum or Ladder In?, The Bitcoin Retirement, The Power Law, The Bitcoin Horizon, Disciplined Rebalancing, **and The Bitcoin Heatmap** (the holding-period companion — empirical backstop for this page's commitment-first claim); OG card `og-your-deployment-plan.jpg` (§6.15.1 brand-forward).
+
+### Open items
+- **Carousel slide** pending (needs a Grok Imagine video) per NEW_PAGE_CHECKLIST §8.
+- **Deferred polish** shared with §32: tooltips for load-bearing terms; final voice pass against the live designed pages.
+- **BvSM cross-link** considered (the entry-at-the-tops stress-test sibling) but left out of the related set to keep it focused on the deployment-decision family; easy to add if wanted.

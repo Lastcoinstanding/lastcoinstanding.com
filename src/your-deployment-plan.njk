@@ -1,0 +1,195 @@
+---
+layout: base.njk
+permalink: /your-deployment-plan.html
+slug: your-deployment-plan
+related:
+  - slug: lump-sum-or-ladder-in
+    desc: "The teaching demonstration this page applies. Start there for the general lesson on how valuation shifts the lump-vs-ladder choice; come here to model your own sum, cadence, and horizon."
+  - slug: the-bitcoin-retirement
+    desc: "The sibling whose value-over-time projection chassis this page borrows. Deploying toward retirement is the same decision in another frame — when to commit, and how fast."
+  - slug: the-power-law
+    desc: "The foundational model and its attribution. This page frames deployment as a function of where price sits in the channel; The Channel lays out the bands and the evidence."
+  - slug: the-bitcoin-horizon
+    desc: "The worst-entry-recovery sibling. Every entry recovers over a long horizon — the empirical floor under this page's commitment-first claim."
+  - slug: heatmap
+    desc: "The holding-period companion to this page. Where this models how to deploy, the Heatmap shows how cohort profitability recovers over time — so almost any entry comes good given a long enough hold."
+  - slug: disciplined-rebalancing
+    desc: "The other channel-tactics page. Where this one is about getting in, Disciplined Rebalancing is the multi-cycle sell-and-rebuy protocol for bitcoin already held."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/your-deployment-plan-head.html' %}"
+  page_styles: "{% include '_pageassets/your-deployment-plan.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/deployment-projection.js' %}\n{% include '_pageassets/your-deployment-plan.js' %}"
+---
+
+<section class="hero">
+  <h1>Your <em>Deployment Plan</em></h1>
+  <div class="hero-subtitle">You have money to put into Bitcoin. Deploy it all now, spread it out, or do some of each?</div>
+  <p class="subtitle">Model your own plan &mdash; your sum, your cadence, your horizon &mdash; and see how it would have fared across real history, and how it might fare ahead.</p>
+</section>
+
+<main class="content-area">
+
+  {% include 'components/tool-framing.njk' %}
+
+  <div class="section-intro dp-prose">
+    <p>This is the companion to <a href="/lump-sum-or-ladder-in">Lump Sum or Ladder In?</a> &mdash; where that page shows the general lesson, this one is about your situation. Set a sum to deploy, pick a style, and compare deploying it all at once, laddering it in, or a <strong>hybrid</strong> of the two.</p>
+    <p class="dp-footnote"><strong>DCA</strong> &mdash; dollar-cost averaging: deploying a fixed amount on a regular cadence (e.g. every paycheck) as a savings discipline, rather than all at once.</p>
+  </div>
+
+  <!-- ════════ INTERACTIVE 2 — YOUR PLAN ════════ -->
+  <div class="dp-calc" id="calculator">
+    <div class="dp-calc-head">
+      <h2>Model your deployment</h2>
+      <div class="dp-view" role="group" aria-label="Retrospective or projective view">
+        <button type="button" data-view="retrospective" class="active">Retrospective</button>
+        <button type="button" data-view="projective">Projective</button>
+      </div>
+    </div>
+
+    <!-- Primary control: deployment style -->
+    <div class="dp-style" role="group" aria-label="Deployment style">
+      <button type="button" data-style="lump" class="active">
+        <span class="dp-style-name">Lump sum</span><span class="dp-style-sub">Deploy it all now</span>
+      </button>
+      <button type="button" data-style="ladder">
+        <span class="dp-style-name">Ladder in</span><span class="dp-style-sub">Spread it over time</span>
+      </button>
+      <button type="button" data-style="hybrid">
+        <span class="dp-style-name">Hybrid</span><span class="dp-style-sub">Some now, ladder the rest</span>
+      </button>
+    </div>
+
+    <!-- Plan inputs -->
+    <div class="dp-config">
+      <div class="dp-field">
+        <label for="dpSum">Sum to deploy <span class="dp-field-val" id="dpSumVal">$25.0K</span></label>
+        <input type="range" id="dpSum" min="1000" max="500000" step="1000" value="25000">
+      </div>
+      <div class="dp-field" id="dpDurRow">
+        <label for="dpDur"><span id="dpDurLabelText">Ladder over</span> <span class="dp-field-val" id="dpDurVal">1 yr</span></label>
+        <input type="range" id="dpDur" min="3" max="36" step="1" value="12">
+      </div>
+      <div class="dp-field" id="dpFrontRow" style="display:none">
+        <label for="dpFront">Deploy now <span class="dp-field-val" id="dpFrontVal">50% now</span></label>
+        <input type="range" id="dpFront" min="0" max="100" step="5" value="50">
+      </div>
+      <div class="dp-field">
+        <label for="dpHorizon">Hold horizon <span class="dp-field-val" id="dpHorizonVal">4 yrs</span></label>
+        <input type="range" id="dpHorizon" min="2" max="8" step="1" value="4">
+      </div>
+    </div>
+
+    <!-- Verdict -->
+    <div class="dp-verdict">
+      <div class="dp-verdict-lead" id="dpVerdictLead">&mdash;</div>
+      <div class="dp-verdict-main" id="dpVerdictMain">&mdash;</div>
+      <div class="dp-verdict-detail" id="dpVerdictDetail"></div>
+    </div>
+
+    <!-- The value-over-time chart (Retirement chassis: floor at the bottom) -->
+    <div class="dp-chart-block">
+      <p class="dp-chart-caption dp-cap-retro">Your stack&rsquo;s value over your hold horizon, replayed from the last time Bitcoin sat near today&rsquo;s channel position, against the floor / trend / upper band drawn in <em>value</em> terms. Time runs left to right, floor at the bottom &mdash; the orientation you already have from the Power Law graph.</p>
+      <p class="dp-chart-caption dp-cap-proj">Your stack&rsquo;s value projected forward under two Power Law paths &mdash; <strong>reversion to trend</strong> and <strong>staying on the current trajectory</strong> &mdash; shown as a range, not a single line. The shaded band is the spread between them. Both are extrapolations of an empirical regularity, never forecasts.</p>
+      <div class="dp-chart-wrapper" data-chart-copy data-chart-title="Your deployment plan — value over time">
+        <canvas id="dpChart" aria-label="Portfolio value over time for the chosen deployment plan, against the Power Law floor, trend, and upper band expressed in value terms"></canvas>
+      </div>
+      <p class="dp-fwd-caveat dp-cap-proj"><strong>The forward bands are a mathematical extrapolation of the Power Law &mdash; not a forecast.</strong> Reversion-to-trend and stay-on-trajectory bracket a plausible range; reality can leave it in either direction. Where fitted history ends, extrapolation begins.</p>
+    </div>
+  </div>
+
+  <!-- ════════ LIVE READOUT + its inseparable caveats (rule #2) ════════ -->
+  <section class="dp-live" aria-label="Today's reading">
+    <div class="dp-live-grid">
+      <div>
+        <div class="dp-live-label">Where the channel sits right now</div>
+        <div class="dp-live-pos" id="dpLivePos" aria-live="polite">&mdash;</div>
+        <p class="dp-live-rec" id="dpLiveRec">&mdash;</p>
+        <p class="dp-live-meta" id="dpLiveMeta"></p>
+      </div>
+      <div class="dp-live-caveats">
+        <div class="dp-caveat-label">Read this in the same glance</div>
+        <p><strong>A forward personal projection is exactly where complacency is most dangerous.</strong> The recommendation above is the channel&rsquo;s tendency, not a promise &mdash; the <a href="#cautions">cautions below</a> are the load-bearing part of this page, not the footnotes.</p>
+        <p><strong>The math models a holder who never capitulates.</strong> If deploying a lump and watching it fall would push you to sell and leave, laddering or a hybrid is staying-power insurance &mdash; a small expected cost for steadiness the numbers can&rsquo;t see.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ CAUTIONS — required content (rule #4), loud not buried ════════ -->
+  <section class="dp-section dp-cautions" id="cautions">
+    <p class="dp-eyebrow">Cautions</p>
+    <h2>Read these before you lean on any of this</h2>
+    <div class="dp-prose" style="max-width:none;">
+      <p>A forward-looking personal projection is exactly where complacency is most dangerous. These are loud on purpose.</p>
+    </div>
+    <div class="dp-caution-grid">
+      <div class="dp-caution">
+        <h3>The channel is a rising trend &mdash; waiting for the perfect entry can mean never entering.</h3>
+        <p>Because the whole channel rises over time, holding out for an ideal low can backfire: price may simply keep climbing without giving you the entry you waited for. The cost of waiting is real, and it&rsquo;s why, on a long horizon, getting in tends to beat timing it.</p>
+      </div>
+      <div class="dp-caution">
+        <h3>Price can move sideways for a long time.</h3>
+        <p>&ldquo;High in the channel&rdquo; doesn&rsquo;t mean a drop is coming. Price can drift sideways for an extended stretch and then rise again. The upper-channel hedge looks smart in a backtest precisely because reversion eventually happened &mdash; there&rsquo;s no promise it happens on your timeline.</p>
+      </div>
+      <div class="dp-caution">
+        <h3>Bitcoin could break from the Power Law entirely.</h3>
+        <p>To the upside or the downside. If it does, the tactics on this page are moot and you&rsquo;re on your own. The Power Law is a strong thesis worth taking seriously &mdash; but it&rsquo;s a thesis, not a law to lean on like dogma.</p>
+      </div>
+      <div class="dp-caution dp-caution-blindspot">
+        <h3>The math models a holder who never capitulates.</h3>
+        <p>The backtest assumes you never sell in fear. A real person who deploys a lump and watches a 30% drawdown may sell and leave entirely. If that&rsquo;s a risk for you, laddering or a hybrid is staying-power insurance &mdash; a small expected cost for steadiness the numbers can&rsquo;t see. It&rsquo;s the honest reason to spread even when the channel says deploy.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ COMMITMENT BACKSTOP ════════ -->
+  <section class="dp-section dp-wide">
+    <p class="dp-eyebrow">The commitment backstop</p>
+    <h2>Before any tactic: every entry recovers</h2>
+    <div class="dp-prose" style="max-width:none;">
+      <p>Over a long horizon, <em>where</em> you bought has mattered far less than <em>that</em> you bought and held. Mean value-multiple of a deployment, by entry valuation and how long it was held &mdash; computed live from the current record:</p>
+    </div>
+    <div class="dp-table-wrap">
+      <table class="dp-table">
+        <thead><tr><th>Entry valuation</th><th>2&nbsp;yr</th><th>4&nbsp;yr</th><th>6&nbsp;yr</th><th>8&nbsp;yr</th></tr></thead>
+        <tbody id="dpBackstopBody"></tbody>
+      </table>
+    </div>
+    <div class="dp-takeaway" id="dpBackstopTakeaway"></div>
+
+    <div class="dp-prose" style="max-width:none; margin-top:2rem;">
+      <p>And the edge from timing has been shrinking anyway: Bitcoin&rsquo;s swings have compressed cycle over cycle, so it increasingly lives low-to-mid channel where decisiveness wins. The clever &ldquo;wait for the top to pass, then ladder down&rdquo; move is one you rarely get to use anymore. Maximum channel position reached, by four-year window:</p>
+    </div>
+    <div class="dp-table-wrap">
+      <table class="dp-table">
+        <thead><tr><th>Window</th><th>Max channel position</th></tr></thead>
+        <tbody id="dpCompressionBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ════════ PREREQUISITE + METHODOLOGY + ATTRIBUTION ════════ -->
+  <section class="dp-section">
+    <div class="belief-context">
+      <div class="belief-context-label">A note on prerequisite reading</div>
+      <p><strong>This tool uses the Power Law channel to frame the decision.</strong> If that model isn&rsquo;t useful to you, neither is this page. <a href="/the-power-law#channel">The Channel</a> lays out the bands, the evidence, and the attribution &mdash; read it first if the frame is new.</p>
+    </div>
+  </section>
+
+  <div class="dp-attribution">
+    <span class="dp-attribution-label">Channel framework &amp; coefficients</span>
+    The Power Law channel &mdash; floor at 0.42&times; trend, upper band at 3&times; trend &mdash; was developed by <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener"><strong>Matthew Me&zcaron;inskis</strong></a> at Porkopolis Economics. Coefficients used: <code>a = 1.6&times;10<sup>&minus;17</sup></code>, <code>b = 5.77</code>. See <a href="/the-power-law#channel">The Channel</a> for the full case and attribution.
+  </div>
+
+  <div class="dp-method">
+    <div class="dp-method-label">Methodology</div>
+    <ul>
+      <li>Channel position is the log-space location between floor and ceiling: <code>(ln(price/trend) &minus; ln 0.42) / (ln 3.0 &minus; ln 0.42)</code> &mdash; 0 at the floor, 1 at the upper band.</li>
+      <li><strong>Retrospective</strong> replays your plan from the most recent historical entry whose channel position is closest to today&rsquo;s (with enough forward data to hold the full horizon), using real prices. <strong>Projective</strong> deploys today and extends two Power Law paths &mdash; reversion-to-trend and stay-on-trajectory &mdash; as a range. Both are extrapolations of an empirical regularity, <em>not forecasts</em>.</li>
+      <li>Lump deploys the full sum at once; ladder spreads it equally over the chosen duration; hybrid deploys a chosen share now and ladders the rest. Value is BTC accumulated &times; price along the path; multiples are amount-invariant, the dollar figures just scale with the sum.</li>
+      <li>Commitment backstop: mean value-multiple by hold length, <strong>8-year exit convention</strong> (nearest sample to entry&nbsp;+&nbsp;8&nbsp;&times;&nbsp;365.25&nbsp;days); ~1&ndash;3% sensitivity. Worst-entry recovery is the range for entries above 1.5&times; channel position, recovered to the latest sample.</li>
+      <li id="dpMethodWindow"></li>
+      <li>Today&rsquo;s channel position is computed at load from the latest sample and the live spot (CoinGecko, via the shared fetch) &mdash; never baked in.</li>
+    </ul>
+  </div>
+
+</main>
