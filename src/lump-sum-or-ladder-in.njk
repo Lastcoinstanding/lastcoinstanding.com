@@ -19,8 +19,8 @@ eleventyComputed:
 
 <section class="hero">
   <h1>Lump Sum or <em>Ladder In?</em></h1>
-  <div class="hero-subtitle">Lump sum or DCA &mdash; and does where you sit in the channel change the answer?</div>
-  <p class="subtitle">Not about timing, not about temperament &mdash; about valuation relative to the Power Law channel. Decisive when cheap, patient when stretched, committed always.</p>
+  <div class="hero-subtitle">Two ways to put money into Bitcoin &mdash; and which one served you better depended on where price sat in the channel.</div>
+  <p class="subtitle">A look back at how lump-summing and laddering in compared across Bitcoin&rsquo;s history &mdash; and how the comparison shifts with where price sits in its Power Law channel. A demonstration, not advice for your situation.</p>
 </section>
 
 <main class="content-area">
@@ -28,14 +28,35 @@ eleventyComputed:
   {% include 'components/tool-framing.njk' %}
 
   <div class="section-intro lsl-prose">
-    <p>Every exchange has a dollar-cost-averaging calculator. Run honestly against a rising asset, they all reach the same flat conclusion &mdash; <em>you should have lump-summed</em> &mdash; which is true, unsatisfying, and undifferentiated.</p>
-    <p>This page asks the better question. The lump-sum-versus-ladder decision isn&rsquo;t really about <em>timing</em> and isn&rsquo;t really about <em>temperament</em> &mdash; it&rsquo;s about <strong>valuation relative to the Power Law trajectory</strong>. Low in the channel, spreading purchases just means paying more as price reverts up toward trend, so deploy decisively. Stretched into the upper channel, spreading is the model-rational hedge against the mean-reversion the channel itself predicts. Mid-channel is a genuine coin-flip. And underneath all of it: over a long enough horizon, <em>every</em> entry &mdash; even the literal worst tops in Bitcoin&rsquo;s history &mdash; recovers to a large multiple. The tactic is a margin; commitment is the foundation.</p>
+    <p>Accumulating Bitcoin can involve both a lump sum and DCA. This page looks at how the two compared historically, and how that comparison shifts with where price sits in its Power Law channel.</p>
+    <p class="lsl-footnote"><strong>DCA</strong> &mdash; dollar-cost averaging: deploying a fixed amount on a regular cadence (e.g. every paycheck) as a savings discipline, rather than all at once.</p>
+    <p>Looking back at Bitcoin&rsquo;s price history, the rule of thumb is that a lump-sum buy has, on average, outperformed spreading the same money out over time. Markets trend up, and time in the market beats waiting on the sidelines.</p>
+    <p>But that average hides something useful. The lump-sum-versus-ladder choice isn&rsquo;t really about <em>timing</em>, and not really about <em>market sentiment</em> &mdash; it tracks valuation relative to the Power Law trend. Low in the channel, you&rsquo;re effectively buying at a discount to trend: if you hold the Power Law thesis, price tends to revert upward over time, so deploying decisively captured more Bitcoin. Higher in the channel, the gap between lump-sum and laddering narrowed, and laddering more often came out ahead. <span class="lsl-aside">(Why that is &mdash; and why it&rsquo;s a weaker reed to lean on than it looks &mdash; is the subject of the next page.)</span></p>
+    <p>And underneath all of it: historically, over a long enough horizon, <em>every</em> entry &mdash; even the literal worst tops in Bitcoin&rsquo;s history &mdash; has recovered to a large multiple. What this page explores is tactics, but commitment is the foundation.</p>
   </div>
 
-  <!-- ════════ THE DECISION SURFACE ════════ -->
+  <!-- ════════ WHERE ARE WE RIGHT NOW? — channel context above the scrubber ════════ -->
+  <section class="lsl-section lsl-wide lsl-context" aria-label="Where are we right now?">
+    <p class="lsl-eyebrow">Where are we right now?</p>
+    <h2>Here is the channel &mdash; and where Bitcoin sits in it today</h2>
+    <div class="lsl-prose" style="max-width:none;">
+      <p>Before the demonstration: here is the Power Law channel, and where Bitcoin sits in it today. The floor sits at <strong>0.42&times;</strong> the trend, the upper band at <strong>3&times;</strong>. Most of the time, price lives somewhere between. This orients you before the scrubber below asks <em>where in the channel are you buying?</em></p>
+    </div>
+    <div class="lsl-ctx-chart" data-chart-copy data-chart-title="The Power Law channel — where Bitcoin sits today">
+      <canvas id="lslChannelChart" aria-label="Bitcoin price across its history against the Power Law floor, trend, and upper band, with a glowing marker at today's live position and a dashed line for the entry valuation being tested by the scrubber"></canvas>
+      <div id="lslChannelPulse" class="lcs-pulse-halo" aria-hidden="true"></div>
+    </div>
+    <div class="lsl-ctx-readout">
+      <div class="lsl-ctx-pos" id="lslCtxPos" aria-live="polite">&mdash;</div>
+      <p class="lsl-ctx-meta" id="lslCtxMeta"></p>
+    </div>
+    <p class="lsl-chart-caption">The glowing marker is where Bitcoin sits <strong>today</strong> (live). The dashed white line is the entry valuation you&rsquo;re testing with the scrubber below &mdash; drag it and watch the line slide through the channel.</p>
+  </section>
+
+  <!-- ════════ THE DEMONSTRATION ════════ -->
   <div class="lsl-calc" id="calculator">
     <div class="lsl-calc-head">
-      <h2>At this valuation, which wins?</h2>
+      <h2>At this valuation, which served you better?</h2>
       <div>
         <span class="lsl-era-label">Historical window</span>
         <div class="lsl-era" role="group" aria-label="Historical window">
@@ -45,6 +66,8 @@ eleventyComputed:
         </div>
       </div>
     </div>
+
+    <p class="lsl-calc-framing">This is a retrospective demonstration of how lump sum and laddering compared across history &mdash; <strong>not a calculator for your own situation</strong>. Drag the scrubber to a valuation and read what history did there. (Modelling your own sum, cadence, and horizon &mdash; looking forward as well as back &mdash; is the next page.)</p>
 
     <!-- The star control -->
     <div class="lsl-scrubber">
@@ -57,8 +80,8 @@ eleventyComputed:
       <div class="lsl-scrub-scale"><span>Floor &middot; cheap</span><span>Trend</span><span>Upper band &middot; stretched</span></div>
     </div>
 
-    <!-- Binary core decision control (NOT a blend slider) -->
-    <div class="lsl-decision" role="group" aria-label="How will you deploy?">
+    <!-- Binary core decision control (a two-way teaching comparison, not a blend) -->
+    <div class="lsl-decision" role="group" aria-label="Which way to deploy?">
       <button type="button" data-decision="all-now" class="active">
         <span class="lsl-decision-name">Deploy all now</span>
         <span class="lsl-decision-sub">Lump sum</span>
@@ -76,42 +99,16 @@ eleventyComputed:
       <div class="lsl-verdict-detail" id="lslVerdictDetail"></div>
     </div>
 
-    <!-- Lens toggle (Stage 2B) — governs the primary chart + the forward channel extension -->
-    <div class="lsl-lens-row">
-      <span class="lsl-lens-label">Lens</span>
-      <div class="lsl-lens" role="group" aria-label="Retrospective or projective lens">
-        <button type="button" data-lens="retrospective" class="active">Retrospective</button>
-        <button type="button" data-lens="projective">Projective</button>
-      </div>
-      <span class="lsl-lens-hint">What history did &mdash; or what the channel&rsquo;s forward scenarios imply.</span>
-    </div>
-
-    <!-- Primary chart: the flip -->
+    <!-- Primary chart: the advantage-by-channel-position flip (the novel one) -->
     <div class="lsl-chart-block">
-      <p class="lsl-chart-caption lsl-cap-retro">How the all-now-vs-ladder edge changes across the channel. Below the line, deploying all at once accumulated more BTC (amber); above it, laddering did (blue). The settled &ldquo;lump-sum usually wins&rdquo; debate flips on its axis once you condition on valuation.</p>
-      <p class="lsl-chart-caption lsl-cap-proj">Anchored at today, under the three forward paths the channel permits &mdash; revert to trend, ride the floor, stretch then revert (excursions sized to <em>recent</em> amplitude, never 2013&rsquo;s). The lesson holds prospectively too: starting low, deploying wins under essentially every path; high up, laddering wins under the revert paths. It&rsquo;s robustness across permitted paths &mdash; never a single forecast. The faint dashed line is the retrospective curve, for the two-lens agreement.</p>
+      <p class="lsl-chart-caption">How the lump-sum-vs-ladder edge changed across the channel. Below the line, deploying all at once accumulated more BTC (amber); above it, laddering did (blue). The familiar &ldquo;lump-sum usually wins&rdquo; result holds on average &mdash; but it flips, region by region, once you sort entries by where price sat in the channel.</p>
       <div class="lsl-chart-wrapper" data-chart-copy data-chart-title="Lump-sum vs. ladder-in advantage by channel position">
         <canvas id="lslAdvChart" aria-label="Ladder-in advantage in percent more BTC, plotted across entry channel position from floor to upper band"></canvas>
       </div>
     </div>
 
-    <!-- Orientation chart: the channel itself (forward extension in projective — Amendment 1) -->
-    <div class="lsl-chart-block">
-      <p class="lsl-chart-caption">Where that valuation sits in the actual channel. The dashed white line is your scrubbed entry valuation against the floor, trend, and upper band, with real price overlaid. In the <strong>projective</strong> lens the bands extend forward to your hold-horizon year.</p>
-      <div class="lsl-chart-wrapper lsl-channel" data-chart-copy data-chart-title="The Power Law channel — your entry valuation">
-        <canvas id="lslChannelChart" aria-label="Bitcoin price across its history against the Power Law floor, trend, and upper band, with the scrubbed entry valuation drawn parallel to trend"></canvas>
-      </div>
-      <p class="lsl-fwd-caveat" id="lslFwdCaveat" style="display:none">
-        <strong>The forward bands are a mathematical extrapolation of the Power Law &mdash; not a forecast.</strong> Past today they&rsquo;re drawn dashed and faded: the channel&rsquo;s shape projected outward, carrying the same right-hand-edge humility as the live reading. Where fitted history ends, extrapolation begins.
-      </p>
-    </div>
-
     <!-- Quiet config (not the lever) -->
     <div class="lsl-config">
-      <div class="lsl-field">
-        <label for="lslSum">Sum to deploy <span class="lsl-field-val" id="lslSumVal">$12.0K</span></label>
-        <input type="range" id="lslSum" min="1000" max="500000" step="1000" value="12000">
-      </div>
       <div class="lsl-field">
         <label for="lslLadder">Ladder over <span class="lsl-field-val" id="lslLadderVal">1 yr</span></label>
         <input type="range" id="lslLadder" min="3" max="24" step="1" value="12">
@@ -120,64 +117,16 @@ eleventyComputed:
         <label for="lslHorizon">Hold horizon <span class="lsl-field-val" id="lslHorizonVal">4 yrs</span></label>
         <input type="range" id="lslHorizon" min="2" max="8" step="2" value="4">
       </div>
-      <p class="lsl-config-note">Defaults are set so the lesson reads without touching anything &mdash; drag the scrubber, flip the toggle, done. The advantage is a <em>ratio of BTC accumulated</em>, so it&rsquo;s independent of the sum; the sum just scales what the amounts would have been. Ladder duration sets how long the spread-in takes; hold horizon drives the commitment backstop below and the forward channel extent in the projective lens.</p>
+      <p class="lsl-config-note">Drag the scrubber and flip the toggle &mdash; that&rsquo;s the lesson; the defaults read on their own. The advantage is a <em>ratio of BTC accumulated</em>, so it&rsquo;s independent of how much you deploy. Ladder duration sets how long the spread-in takes; hold horizon drives the commitment backstop below.</p>
     </div>
-
-    <!-- Advanced / optional disclosure (design §6.1) — collapsed so it never competes with the scrubber -->
-    <details class="lsl-advanced">
-      <summary>Advanced &mdash; manual blend &amp; recurring-windfall planner</summary>
-      <div class="lsl-advanced-body">
-        <div class="lsl-adv-block">
-          <h4>Manual blend &mdash; the executed middle ground</h4>
-          <div class="lsl-field">
-            <label for="lslBlend">Blend <span class="lsl-field-val" id="lslBlendVal">0% laddered</span></label>
-            <input type="range" id="lslBlend" min="0" max="100" step="5" value="0">
-          </div>
-          <p class="lsl-adv-out" id="lslBlendOut">&mdash;</p>
-          <p class="lsl-adv-note">The binary above teaches the clean principle; this is the execution detail for power users who want a specific split. Pure-lump and pure-ladder are its endpoints.</p>
-        </div>
-        <div class="lsl-adv-block">
-          <h4>Recurring-windfall planner &mdash; weekly buys plus a yearly bonus</h4>
-          <div class="lsl-config">
-            <div class="lsl-field"><label for="lslRwWeekly">Weekly buy ($)</label><input type="number" id="lslRwWeekly" min="0" step="25" value="100"></div>
-            <div class="lsl-field"><label for="lslRwAnnual">Yearly bonus lump ($)</label><input type="number" id="lslRwAnnual" min="0" step="500" value="5000"></div>
-            <div class="lsl-field"><label for="lslRwYears">Over <span class="lsl-field-val" id="lslRwYearsVal">8 yrs</span></label><input type="range" id="lslRwYears" min="1" max="15" step="1" value="8"></div>
-          </div>
-          <div class="lsl-rw-out">
-            <div class="lsl-rw-cell"><span class="lsl-rw-k">Deployed</span><span class="lsl-rw-v" id="lslRwDeployed">&mdash;</span></div>
-            <div class="lsl-rw-cell"><span class="lsl-rw-k">BTC accumulated</span><span class="lsl-rw-v" id="lslRwBtc">&mdash;</span></div>
-            <div class="lsl-rw-cell"><span class="lsl-rw-k">Projected value</span><span class="lsl-rw-v" id="lslRwValue">&mdash;</span></div>
-            <div class="lsl-rw-cell"><span class="lsl-rw-k">Multiple</span><span class="lsl-rw-v" id="lslRwMult">&mdash;</span></div>
-          </div>
-          <p class="lsl-adv-note">Projected along the central Power Law trend &mdash; a planning sketch, not a forecast. Forward prices are an extrapolation of an empirical regularity; treat the number as a shape, not a promise.</p>
-        </div>
-      </div>
-    </details>
   </div>
-
-  <!-- ════════ LIVE READOUT + its inseparable caveats (rule #2) ════════ -->
-  <section class="lsl-live" aria-label="Today's reading">
-    <div class="lsl-live-grid">
-      <div>
-        <div class="lsl-live-label">Where the channel sits right now</div>
-        <div class="lsl-live-pos" id="lslLivePos" aria-live="polite">&mdash;</div>
-        <p class="lsl-live-rec" id="lslLiveRec">&mdash;</p>
-        <p class="lsl-live-meta" id="lslLiveMeta"></p>
-      </div>
-      <div class="lsl-live-caveats">
-        <div class="lsl-caveat-label">Read this in the same glance</div>
-        <p><strong>The forward read carries more humility than the backtest.</strong> Today&rsquo;s floor is knowable; today&rsquo;s position relative to a <em>future</em> trend is less so.</p>
-        <p><strong>The math models a holder who never capitulates.</strong> If deploying a lump and watching it fall would push you to sell and leave entirely, laddering is staying-power insurance &mdash; a small tactical cost for a steadiness the backtest can&rsquo;t see. It&rsquo;s the one honest reason to ladder even when the channel says deploy.</p>
-      </div>
-    </div>
-  </section>
 
   <!-- ════════ THE COMMITMENT BACKSTOP ════════ -->
   <section class="lsl-section lsl-wide">
     <p class="lsl-eyebrow">The commitment backstop</p>
     <h2>Every entry recovers</h2>
     <div class="lsl-prose" style="max-width:none;">
-      <p>Before any tactic, the floor the whole page rests on: over a long horizon, <em>where</em> you bought barely matters. Mean value-multiple of a lump, by entry valuation and how long it was held &mdash; computed live from the current record:</p>
+      <p>Before any tactic, the floor the whole page rests on: over a long horizon, <em>where</em> you bought has mattered far less than <em>that</em> you bought and held. Mean value-multiple of a deployment, by entry valuation and how long it was held &mdash; computed live from the current record:</p>
     </div>
     <div class="lsl-table-wrap">
       <table class="lsl-table">
@@ -193,7 +142,7 @@ eleventyComputed:
     <p class="lsl-secondary-label">Supporting &middot; why the tactic matters less over time</p>
     <h2>The upper channel is vanishing</h2>
     <div class="lsl-prose">
-      <p>The tactical edge <em>per opportunity</em> stays large &mdash; up high, laddering still wins big. But the opportunities to be up high are collapsing cycle over cycle. Maximum channel position reached, by four-year window:</p>
+      <p>The tactical edge <em>per opportunity</em> stays large &mdash; up high, laddering still won big. But the opportunities to be up high are collapsing cycle over cycle. Maximum channel position reached, by four-year window:</p>
     </div>
     <div class="lsl-table-wrap">
       <table class="lsl-table">
@@ -202,37 +151,49 @@ eleventyComputed:
       </table>
     </div>
     <div class="lsl-prose">
-      <p>As Bitcoin matures it increasingly lives low-to-mid channel, where decisiveness wins &mdash; consistent with the volatility compression on <a href="/the-doubling-ladder">The Doubling Ladder</a> and the Power Law&rsquo;s shrinking cycle peaks. The clever &ldquo;wait-and-ladder-down-from-the-top&rdquo; move is one you rarely get to use anymore. The channel mostly just says <em>commit</em>.</p>
+      <p>As Bitcoin matures it increasingly lives low-to-mid channel, where decisiveness won &mdash; consistent with the volatility compression on <a href="/the-doubling-ladder">The Doubling Ladder</a> and the Power Law&rsquo;s shrinking cycle peaks. The clever &ldquo;wait for the top to pass, then ladder down&rdquo; move is one you rarely get to use anymore. The channel mostly just says <em>commit</em>.</p>
     </div>
+  </section>
+
+  <!-- ════════ HAND-OFF TO PAGE 2 (dead link until Stage 2C-②) ════════ -->
+  <section class="lsl-section lsl-wide">
+    <a class="lsl-handoff" href="/your-deployment-plan">
+      <span class="lsl-handoff-body">
+        <span class="lsl-handoff-eyebrow">Next &middot; your situation</span>
+        <span class="lsl-handoff-title">Now model your own deployment plan</span>
+        <span class="lsl-handoff-desc">That&rsquo;s the general lesson. Your own case is a different question &mdash; you may have a lump to deploy, a regular buy, or both, and you&rsquo;ll want to see how lump, ladder, and a hybrid compare for you, looking forward as well as back. That&rsquo;s the next page: <strong>Your Deployment Plan</strong>.</span>
+      </span>
+      <span class="lsl-handoff-arrow" aria-hidden="true">&rarr;</span>
+    </a>
   </section>
 
   <!-- ════════ HONESTY LAYER ════════ -->
   <section class="lsl-section">
     <div class="belief-context">
       <div class="belief-context-label">A note on prerequisite reading</div>
-      <p><strong>This tool uses the Power Law channel to frame the decision.</strong> If that model isn&rsquo;t useful to you, neither is this page. <a href="/the-power-law#channel">The Channel</a> lays out the bands, the evidence, and the attribution &mdash; read it first if the frame is new.</p>
+      <p><strong>This page uses the Power Law channel to frame the decision.</strong> If that model isn&rsquo;t useful to you, neither is this page. <a href="/the-power-law#channel">The Channel</a> lays out the bands, the evidence, and the attribution &mdash; read it first if the frame is new.</p>
     </div>
 
-    <h3>Where the clean backtest doesn&rsquo;t describe you</h3>
+    <h3>Where this demonstration doesn&rsquo;t describe you</h3>
     <div class="lsl-caveats">
       <div class="lsl-caveat">
         <h4>The Power Law is empirical, not guaranteed.</h4>
-        <p>It&rsquo;s an observation that has held across fifteen years and nine orders of magnitude &mdash; not a promise. Future cycles aren&rsquo;t assured, and every projection assumes the channel&rsquo;s mathematical shape keeps holding.</p>
+        <p>It&rsquo;s an observation that has held across roughly fifteen years &mdash; not a promise. Future cycles aren&rsquo;t assured, and every reading here assumes the channel&rsquo;s shape keeps holding.</p>
       </div>
       <div class="lsl-caveat">
         <h4>Hindsight flatters the fit.</h4>
-        <p>The bands were drawn through the data, which makes &ldquo;buy low in the channel&rdquo; look prescient. The backtest is what <em>would have</em> happened; past cycles aren&rsquo;t promised to the next buyer.</p>
+        <p>The bands were drawn through the data, which makes &ldquo;buy low in the channel&rdquo; look prescient. This is what <em>would have</em> happened; the past isn&rsquo;t promised to the next buyer.</p>
       </div>
-      <div class="lsl-caveat lsl-caveat-blindspot">
-        <h4>The math ignores the panic threshold.</h4>
-        <p>The backtest says deploying usually wins &mdash; but it models a holder who never sells in fear. A real person who lump-sums and watches a 30% drawdown may capitulate and leave entirely. That&rsquo;s the model&rsquo;s blind spot, not an edge, and it&rsquo;s the honest case for laddering even when the channel says deploy. It sits with the live reading above for a reason.</p>
+      <div class="lsl-caveat">
+        <h4>This is a demonstration, not advice for your situation.</h4>
+        <p>It compares two tactics across history to make a point. What to actually do with your own money &mdash; and looking forward, not just back &mdash; is the <a href="/your-deployment-plan">next page</a>&rsquo;s job, with its own cautions.</p>
       </div>
     </div>
 
     <ul class="negative-space-list">
-      <li><strong>Not a price target.</strong> The page never tells you where price is going &mdash; only how to weigh deployment given where price <em>is</em> in the channel.</li>
-      <li><strong>Not a trading strategy.</strong> The only endorsed tactic is adjusting deployment decisiveness by valuation. Getting in, not trading in and out.</li>
-      <li><strong>Not a timing signal.</strong> &ldquo;Decisive&rdquo; and &ldquo;hedge&rdquo; are about valuation, not a prediction that a move is imminent.</li>
+      <li><strong>Not a price target.</strong> The page never tells you where price is going &mdash; only how the deployment comparison shifted with where price <em>was</em> in the channel.</li>
+      <li><strong>Not a trading strategy.</strong> The only thing being compared is deployment decisiveness by valuation. Getting in, not trading in and out.</li>
+      <li><strong>Not a timing signal.</strong> &ldquo;Decisive&rdquo; and &ldquo;spread&rdquo; are about valuation, not a prediction that a move is imminent.</li>
     </ul>
   </section>
 
@@ -249,7 +210,7 @@ eleventyComputed:
       <li>Backtest: a fixed sum deployed all-at-once vs. laddered equally across the chosen window, comparing BTC accumulated, bucketed by entry channel position. The advantage is amount-invariant.</li>
       <li>Commitment backstop: mean value-multiple by hold length. <strong>8-year exit convention</strong> &mdash; the nearest sample to (entry&nbsp;+&nbsp;8&nbsp;&times;&nbsp;365.25&nbsp;days); carries ~1&ndash;3% sensitivity (disclosure, not precision). Worst-entry recovery is the range for entries above 1.5&times; channel position (roughly the 2011/2013 blow-off tops), recovered to the latest sample.</li>
       <li id="lslMethodWindow"></li>
-      <li>Today&rsquo;s channel position is computed at load from the latest sample and the live spot (CoinGecko, via the shared fetch) &mdash; never baked in. Forward scenarios calibrated to recent-era amplitude are a Stage 2B addition.</li>
+      <li>Today&rsquo;s channel position is computed at load from the latest sample and the live spot (CoinGecko, via the shared fetch) &mdash; never baked in.</li>
     </ul>
   </div>
 
