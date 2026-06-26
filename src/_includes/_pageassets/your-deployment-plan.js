@@ -43,6 +43,14 @@
   var MATCH_BAND = 0.07;   // channel-anchored match band (item 10)
   var UPPER_RISK = 0.75;   // three-zone threshold (item 12)
   var SUFFICIENT_YEARS = 6; // channel-anchored sufficiency (item 12b)
+  // ── Early-era cut (STAGE_2C_early_era_fix). Bitcoin's first four years (2009–2012)
+  //    traded as a sub-$15 curiosity whose genuine 2-yr forward returns ran 100–200×
+  //    (and 8-yr backstop figures into the thousands) — real, but not a return any
+  //    buyer today could replicate. Headline figures (channel distribution + backstop)
+  //    are computed from this cut forward; the early era is KEPT BUT MARKED in the
+  //    copy, never silently dropped and never part of a headline number.
+  var EARLY_ERA_D = (Date.UTC(2013, 0, 1) / 1000 - GENESIS_TS) / 86400;
+  function isEarly(day) { return day < EARLY_ERA_D; }
 
   function revertPos(startPos, u) {
     if (DeploymentProjection && typeof DeploymentProjection.pathPos === 'function') return DeploymentProjection.pathPos('revert', startPos, u);
@@ -135,11 +143,24 @@
     return idx;
   }
   function distinctYears(idx) { var y = {}, c = 0; for (var k = 0; k < idx.length; k++) if (!y[S[idx[k]].yr]) { y[S[idx[k]].yr] = 1; c++; } return c; }
-  function channelDist(style, pos, span) {
-    var idx = channelMatches(pos, span);
+  function distStats(style, idx, span) {
     var m = idx.map(function (i) { return planMultiple(style, S[i].d, span); }).sort(function (a, b) { return a - b; });
     function q(p) { return m.length ? m[Math.min(m.length - 1, Math.floor(m.length * p))] : null; }
-    return { idx: idx, n: idx.length, years: distinctYears(idx), median: q(0.5), lo: q(0.1), hi: q(0.9), repIdx: idx.length ? idx[idx.length - 1] : -1 };
+    return { idx: idx, n: idx.length, years: distinctYears(idx), median: q(0.5), lo: q(0.1), hi: q(0.9) };
+  }
+  // Headline = post-cut (modern) matches; the early era is split out as marked
+  // context (`early`), and `full` carries the with-early-era figures the marked
+  // note quotes ("counted in, the median would read …"). repIdx is the most recent
+  // MODERN match, so the chart never replays a curiosity-era entry.
+  function channelDist(style, pos, span) {
+    var all = channelMatches(pos, span), modern = [], early = [];
+    for (var k = 0; k < all.length; k++) (isEarly(S[all[k]].d) ? early : modern).push(all[k]);
+    var H = distStats(style, modern, span), F = distStats(style, all, span);
+    return {
+      idx: modern, n: H.n, years: H.years, median: H.median, lo: H.lo, hi: H.hi,
+      repIdx: modern.length ? modern[modern.length - 1] : (all.length ? all[all.length - 1] : -1),
+      early: { n: early.length, years: distinctYears(early), fullMedian: F.median, fullHi: F.hi }
+    };
   }
   function timeAnchor(style, span) {
     var entryDay = Math.max(FIRST_D, todayD - span), hold = todayD - entryDay;
@@ -220,7 +241,10 @@
     ds = bandTriple(repDay, span);
     ds.push({ label: 'BTC price (actual history)', data: pricePath(rPrice, span, repDay), borderColor: REAL_C, borderWidth: 2.4, pointRadius: 0, tension: 0.2, fill: false, order: 1 });
     buyMarks = buyMarksFor(state.style, rPrice, repDay);
-    markLabel = 'You deployed here · ' + monthYear(repDay);
+    // Name this one replay's own multiple on the marker, so a ~6× chart next to a
+    // higher distribution median reads as "one entry vs. the set", not a contradiction.
+    markLabel = 'You deployed here · ' + monthYear(repDay)
+      + (dist.repIdx >= 0 ? ' (this path: ' + fmtMult(planMultiple(state.style, repDay, span)) + ')' : '');
     return ds;
   }
 
@@ -315,7 +339,9 @@
     var dist = channelDist(sel, pos, span);
     lead.textContent = 'Replayed from history · deploying near today&rsquo;s valuation (' + posDisplay(pos) + ') · ' + state.horizon + '-year hold';
     if (dist.n < 4) {
-      main.innerHTML = 'Bitcoin has rarely sat near today&rsquo;s valuation with ' + state.horizon + ' years of history to follow — too few analogues to read. Switch to the <em>time-anchored</em> view.';
+      main.innerHTML = 'Bitcoin has rarely sat near today&rsquo;s valuation with ' + state.horizon + ' years of modern history (2013 onward) to follow — too few analogues to read.'
+        + (dist.early.n ? ' The closest earlier matches sit in the pre-2013 sub-$15 curiosity era, set aside as unreplicable.' : '')
+        + ' Switch to the <em>time-anchored</em> view.';
       detail.innerHTML = '';
       return;
     }
@@ -323,9 +349,11 @@
     var styles3 = ['lump', 'ladder', 'hybrid'], dl = {};
     styles3.forEach(function (s) { dl[s] = channelDist(s, pos, span); });
     var thin = dist.years < SUFFICIENT_YEARS;
+    var repMY = monthYear(S[dist.repIdx].d), repMult = planMultiple(sel, S[dist.repIdx].d, span), early = dist.early;
     detail.innerHTML = styles3.map(function (s) { return '<span' + (s === sel ? ' class="dp-row-sel"' : '') + '>' + STYLE_NAME[s] + ' <strong>' + fmtMult(dl[s].median) + '</strong></span>'; }).join(' &nbsp;·&nbsp; ')
-      + '<br><span class="dp-sparse">Across <strong>' + dist.n + '</strong> historical entries in <strong>' + dist.years + '</strong> distinct years where price sat near today&rsquo;s valuation, deploying ' + STYLE_NAME[sel].toLowerCase() + ' and holding ' + state.horizon + ' years returned a <strong>median ' + fmtMult(dist.median) + '</strong> (typical range ' + fmtMult(dist.lo) + '–' + fmtMult(dist.hi) + '). The chart marks the most recent match; the numbers speak to the whole set.'
-      + (thin ? ' <em>Small sample — these come from only ' + dist.years + ' distinct years; treat as illustrative, not statistical.</em>' : '') + '</span>';
+      + '<br><span class="dp-sparse">Across <strong>' + dist.n + '</strong> historical entries in <strong>' + dist.years + '</strong> distinct years (2013 onward) where price sat near today&rsquo;s valuation, deploying ' + STYLE_NAME[sel].toLowerCase() + ' and holding ' + state.horizon + ' years returned a <strong>median ' + fmtMult(dist.median) + '</strong> (typical range ' + fmtMult(dist.lo) + '–' + fmtMult(dist.hi) + '). The chart replays just one of those — the most recent, <strong>' + repMY + ' → ' + fmtMult(repMult) + '</strong> — so a single path can land well below the median of all ' + dist.n + '.'
+      + (thin ? ' <em>Small sample — these come from only ' + dist.years + ' distinct years; treat as illustrative, not statistical.</em>' : '') + '</span>'
+      + (early.n ? '<br><span class="dp-earlyera">Set aside: Bitcoin&rsquo;s sub-$15 curiosity era (2009–2012), when prices were too small to represent a return any buyer today could replicate. Counting its ' + early.n + ' earlier ' + (early.n === 1 ? 'match' : 'matches') + ' back in would lift the headline median to <strong>' + fmtMult(early.fullMedian) + '</strong> and stretch the range past <strong>' + fmtMult(early.fullHi) + '</strong>. Shown and marked here, never in the headline.</span>' : '');
   }
 
   // shared position-keyed recommendation, three-zone (item 12), tense-aware
@@ -379,18 +407,22 @@
   var HOLDS = [2, 4, 6, 8];
   function bucketName(pos) { return pos < 0.33 ? 'lower' : (pos < 0.66 ? 'mid' : 'upper'); }
   function nearestIdx(t) { var b = 0, bd = Infinity; for (var j = 0; j < N; j++) { var dd = Math.abs(S[j].d - t); if (dd < bd) { bd = dd; b = j; } } return b; }
-  function backstop() {
+  // cut=true → headline (2013 onward); cut=false → full set, used only to quote what
+  // the early era would add in the marked caveat (item: keep but mark).
+  function backstop(cut) {
     var agg = { lower: {}, mid: {}, upper: {} }, b, h;
     for (b in agg) for (h = 0; h < HOLDS.length; h++) agg[b][HOLDS[h]] = [];
-    for (var i = 0; i < N; i++) { var bk = bucketName(S[i].pos); for (h = 0; h < HOLDS.length; h++) { var t = S[i].d + HOLDS[h] * YEAR_D; if (t > S[N - 1].d) continue; agg[bk][HOLDS[h]].push(S[nearestIdx(t)].p / S[i].p); } }
+    for (var i = 0; i < N; i++) { if (cut && isEarly(S[i].d)) continue; var bk = bucketName(S[i].pos); for (h = 0; h < HOLDS.length; h++) { var t = S[i].d + HOLDS[h] * YEAR_D; if (t > S[N - 1].d) continue; agg[bk][HOLDS[h]].push(S[nearestIdx(t)].p / S[i].p); } }
     var out = {}; for (b in agg) { out[b] = {}; for (h = 0; h < HOLDS.length; h++) { var arr = agg[b][HOLDS[h]], m = 0; for (var k = 0; k < arr.length; k++) m += arr[k]; out[b][HOLDS[h]] = arr.length ? m / arr.length : null; } } return out;
   }
-  function worstRecovery() { var mn = Infinity, mx = 0; for (var i = 0; i < N; i++) if (S[i].pos > 1.5) { var m = S[N - 1].p / S[i].p; if (m < mn) mn = m; if (m > mx) mx = m; } return { min: mn, max: mx }; }
+  function worstRecovery(cut) { var mn = Infinity, mx = 0; for (var i = 0; i < N; i++) if ((!cut || !isEarly(S[i].d)) && S[i].pos > 1.5) { var m = S[N - 1].p / S[i].p; if (m < mn) mn = m; if (m > mx) mx = m; } return { min: mn, max: mx }; }
   function compression() { var W = [[2011, 2014], [2015, 2018], [2019, 2022], [2023, 2026]], out = []; for (var w = 0; w < W.length; w++) { var mx = -Infinity; for (var i = 0; i < N; i++) if (S[i].yr >= W[w][0] && S[i].yr <= W[w][1]) mx = Math.max(mx, S[i].pos); if (mx > -Infinity) out.push({ label: W[w][0] + '–' + W[w][1], max: mx }); } return out; }
   function renderTables() {
-    var bs = backstop(), tb = document.getElementById('dpBackstopBody');
+    var bs = backstop(true), bsFull = backstop(false), tb = document.getElementById('dpBackstopBody');
     if (tb) { var rows = [['lower', 'Lower channel'], ['mid', 'Mid-channel'], ['upper', 'Upper channel']], html = ''; for (var r = 0; r < rows.length; r++) { html += '<tr class="dp-row-' + rows[r][0] + '"><th>' + rows[r][1] + '</th>'; for (var h = 0; h < HOLDS.length; h++) { var v = bs[rows[r][0]][HOLDS[h]]; html += '<td' + (h === HOLDS.length - 1 ? ' class="dp-strong"' : '') + '>' + fmtMult(v) + '</td>'; } html += '</tr>'; } tb.innerHTML = html; }
-    var wr = worstRecovery(), tk = document.getElementById('dpBackstopTakeaway');
+    var ee = document.getElementById('dpBackstopEarlyEra');
+    if (ee) ee.innerHTML = 'These exclude Bitcoin&rsquo;s sub-$15 curiosity era (2009&ndash;2012), when prices were too small to represent a return any buyer today could replicate. Counted in, the long-hold lower-channel cells balloon on those tiny prices &mdash; lower-channel 8-year reads about <strong>' + fmtMult(bsFull.lower[8]) + '</strong> with that era in, versus <strong>' + fmtMult(bs.lower[8]) + '</strong> without. Marked here, never the headline.';
+    var wr = worstRecovery(true), tk = document.getElementById('dpBackstopTakeaway');
     if (tk) { var H = state.horizon, up = bs.upper[H]; tk.innerHTML = 'Over a <strong>' + H + '-year</strong> hold, even <strong>upper-channel</strong> entries — the worst-timed buys — returned about <strong>' + fmtMult(up) + '</strong> on average; the literal worst entries in history still returned <strong>' + fmtMult(wr.min) + ' to ' + fmtMult(wr.max) + '</strong> by the latest sample. That is a multi-year tendency, <em>not</em> a guarantee: over short horizons entries have frequently sat underwater — including now, with price below half its prior high. Recovery has historically come with time held, not on demand.'; }
     var cp = compression(), cb = document.getElementById('dpCompressionBody');
     if (cb) { var ch = ''; for (var i = 0; i < cp.length; i++) ch += '<tr><th>' + cp[i].label + '</th><td class="dp-strong">' + cp[i].max.toFixed(2) + '</td></tr>'; cb.innerHTML = ch; }
