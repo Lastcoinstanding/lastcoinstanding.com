@@ -93,6 +93,13 @@ body { background: var(--bg); color: var(--text); }
 .lsl-verdict-detail { font-family: 'Inter', sans-serif; font-size: 0.84rem; color: var(--text-dim); margin-top: 0.6rem; line-height: 1.6; }
 .lsl-verdict-detail .lsl-sparse { color: var(--text-muted); font-style: italic; }
 
+/* ── Upper-channel risk flag (item 12) ── */
+.lsl-risk { margin: 0 0 1.6rem; padding: 0.95rem 1.2rem; background: rgba(192,57,43,0.07); border: 1px solid rgba(192,57,43,0.4); border-left-width: 3px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.86rem; line-height: 1.6; color: var(--text-dim); }
+.lsl-risk[hidden] { display: none; }
+.lsl-risk strong { color: var(--text); font-weight: 600; }
+.lsl-risk .lsl-risk-tag { display: inline-block; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); margin-right: 0.4rem; }
+.lsl-risk .lsl-risk-thin { display: block; margin-top: 0.5rem; color: var(--text-muted); font-style: italic; }
+
 /* ── Charts ── */
 .lsl-chart-block { margin: 0 0 0.6rem; }
 .lsl-chart-caption { font-family: 'Inter', sans-serif; font-size: 0.8rem; color: var(--text-dim); margin: 0 0 0.7rem; line-height: 1.55; }

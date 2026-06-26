@@ -18,7 +18,7 @@ TEXT_BRIGHT = (242, 238, 232); TEXT_DIM = (190, 178, 160)
 SEED = 2606; random.seed(SEED)
 TEMPLATE = "og-synthesis.jpg"
 
-TITLE_LINES = ["Your", "Deployment Plan"]
+TITLE_LINES = ["Your Bitcoin", "Deployment Plan"]
 SUBTITLE = "Lump, ladder, or hybrid — model your own deployment, looking back and looking forward."
 URL_FOOTER = "LASTCOINSTANDING.COM/YOUR-DEPLOYMENT-PLAN"
 TMP = tempfile.gettempdir()

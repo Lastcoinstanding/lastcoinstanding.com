@@ -162,6 +162,11 @@
     if (pos < 1.0) return 'high in the channel';
     return 'above the upper band';
   }
+  // Sitewide channel-position display (item 3): the ×-trend multiple + a plain
+  // location label — the Gallery's treatment. The raw position stays internal
+  // (logic only); it is never shown as the primary number.
+  function posDisplay(pos) { return ratioOf(pos).toFixed(2) + '× trend · ' + posLabel(pos); }
+  var UPPER_RISK = 0.75;   // three-zone threshold (item 12): sparse upper channel
 
   // ════════ ADVANTAGE CHART (the novel, retrospective curve) ════════
   var advChart = null, channelChart = null;
@@ -408,7 +413,8 @@
     if (!main) return;
 
     var b = bucketAt(state.era, state.ladderN, state.pos);
-    if (lead) lead.textContent = 'At channel position ' + state.pos.toFixed(2) + ' (' + posLabel(state.pos) + ') · laddered over ' + ladderDurationLabel();
+    if (lead) lead.textContent = 'At ' + posDisplay(state.pos) + ' · laddered over ' + ladderDurationLabel();
+    updateRiskFlag();
     if (b.n < 4) {
       main.innerHTML = 'Bitcoin has rarely sat <em>' + posLabel(state.pos) + '</em> in this window — too few historical entries here to read.';
       if (detail) detail.innerHTML = '<span class="lsl-sparse">Widen the window or move the scrubber toward where price has actually spent time.</span>';
@@ -432,6 +438,25 @@
     }
   }
 
+  // ════════ THREE-ZONE UPPER-CHANNEL RISK FLAG (item 12, fires on scrubbed pos) ════════
+  // Counts distinct historical years with entries near the scrubbed position to
+  // judge how thin the sample is (the upper channel clusters into a few brief
+  // blow-off tops). Position-keyed, identical framing to Page 2's live flag.
+  function distinctYearsNear(pos) {
+    var yrs = {}, c = 0;
+    for (var i = 0; i < N; i++) if (Math.abs(S[i].pos - pos) <= 0.07) { if (!yrs[S[i].yr]) { yrs[S[i].yr] = 1; c++; } }
+    return c;
+  }
+  function updateRiskFlag() {
+    var el = document.getElementById('lslRisk'); if (!el) return;
+    if (state.pos < UPPER_RISK) { el.hidden = true; return; }
+    var dy = distinctYearsNear(state.pos), thin = dy < 6;
+    el.hidden = false;
+    el.innerHTML = '<span class="lsl-risk-tag">High-risk zone for lump deployment</span> '
+      + 'Up here a lump buys into the mean-reversion the channel predicts &mdash; this is where laddering&rsquo;s hedge earns its keep. Frame it honestly as a <strong>drawdown hedge, not a reliable edge</strong>: the rising channel means even the hedge isn&rsquo;t guaranteed to pay.'
+      + (thin ? ' <span class="lsl-risk-thin">Small sample &mdash; only ~' + dy + ' distinct years sat this high, clustered into a handful of brief blow-off tops. Treat the demonstration here as illustrative, not statistical.</span>' : '');
+  }
+
   // ════════ LIVE CHANNEL CONTEXT (factual position callout — no recommendation) ════════
   // Page 1 states where price sits today as fact; the "deploy / hedge"
   // recommendation lives on Page 2 (the personal model). Computed live,
@@ -442,7 +467,7 @@
     var ratio = price / plPrice(TODAY_DAYS);
     var posEl = document.getElementById('lslCtxPos');
     var metaEl = document.getElementById('lslCtxMeta');
-    if (posEl) posEl.innerHTML = 'Today: channel position <strong>' + liveTodayPos.toFixed(2) + '</strong> · ' + ratio.toFixed(2) + '× trend · <em>' + posLabel(liveTodayPos) + '</em>';
+    if (posEl) posEl.innerHTML = 'Today: <strong>' + ratio.toFixed(2) + '×</strong> trend · <em>' + posLabel(liveTodayPos) + '</em>';
     if (metaEl) metaEl.textContent = 'Live: ' + fmtUSD(price) + (source === 'live' ? '' : ' (latest sample)') + ' · floor 0.42× trend, upper band 3× · recomputed every load.';
     // poke the live today marker on the context chart so the dot + pulse track the live spot
     if (channelChart && channelChart.data && channelChart.data.datasets[TODAY_DS]) {
@@ -471,9 +496,8 @@
     var wr = worstRecovery(), tk = document.getElementById('lslBackstopTakeaway');
     if (tk) {
       var H = state.horizon, up = bs.upper[H];
-      tk.innerHTML = 'Even <strong>upper-channel</strong> entries — the worst-timed buys — returned about <strong>' + fmtMult(up) + '</strong> on average after ' + H + ' years. '
-        + 'The literal worst entries in history (buying blow-off tops above the upper band) still returned <strong>' + fmtMult(wr.min) + ' to ' + fmtMult(wr.max) + '</strong> by the latest sample. '
-        + 'Over a long horizon, commitment dominates the tactic entirely — the tactic is a margin; commitment is the foundation.';
+      tk.innerHTML = 'Over a <strong>' + H + '-year</strong> hold, even <strong>upper-channel</strong> entries — the worst-timed buys — returned about <strong>' + fmtMult(up) + '</strong> on average; the literal worst entries in history (blow-off tops above the upper band) still returned <strong>' + fmtMult(wr.min) + ' to ' + fmtMult(wr.max) + '</strong> by the latest sample. '
+        + 'That is a multi-year tendency, <em>not</em> a guarantee: over short horizons entries have frequently sat underwater — including now, with price below half its prior high. Recovery has historically come with time held, not on demand.';
     }
   }
   function renderCompression() {
@@ -496,7 +520,7 @@
     var scrub = document.getElementById('lslScrub');
     var scrubRead = document.getElementById('lslScrubReadout');
     function syncScrubReadout() {
-      if (scrubRead) scrubRead.innerHTML = 'position <strong>' + state.pos.toFixed(2) + '</strong> · ' + ratioOf(state.pos).toFixed(2) + '× trend · <em>' + posLabel(state.pos) + '</em>';
+      if (scrubRead) scrubRead.innerHTML = '<strong>' + ratioOf(state.pos).toFixed(2) + '×</strong> trend · <em>' + posLabel(state.pos) + '</em>';
     }
     if (scrub) {
       scrub.value = Math.round(state.pos * 100);

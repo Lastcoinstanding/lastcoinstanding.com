@@ -22,9 +22,9 @@ eleventyComputed:
 ---
 
 <section class="hero">
-  <h1>Your <em>Deployment Plan</em></h1>
+  <h1>Your <em>Bitcoin Deployment Plan</em></h1>
   <div class="hero-subtitle">You have money to put into Bitcoin. Deploy it all now, spread it out, or do some of each?</div>
-  <p class="subtitle">Model your own plan &mdash; your sum, your cadence, your horizon &mdash; and see how it would have fared across real history, and how it might fare ahead.</p>
+  <p class="subtitle">Model your own plan &mdash; your sum, your cadence, your horizon &mdash; see how it would have fared across real history, and how it might fare ahead.</p>
 </section>
 
 <main class="content-area">
@@ -59,24 +59,34 @@ eleventyComputed:
       </button>
     </div>
 
-    <!-- Plan inputs -->
+    <!-- Plan inputs — hybrid front-load grouped right after the style toggle (item 5) -->
     <div class="dp-config">
-      <div class="dp-field">
-        <label for="dpSum">Sum to deploy <span class="dp-field-val" id="dpSumVal">$25.0K</span></label>
-        <input type="range" id="dpSum" min="1000" max="500000" step="1000" value="25000">
-      </div>
-      <div class="dp-field" id="dpDurRow">
-        <label for="dpDur"><span id="dpDurLabelText">Ladder over</span> <span class="dp-field-val" id="dpDurVal">1 yr</span></label>
-        <input type="range" id="dpDur" min="3" max="36" step="1" value="12">
-      </div>
       <div class="dp-field" id="dpFrontRow" style="display:none">
         <label for="dpFront">Deploy now <span class="dp-field-val" id="dpFrontVal">50% now</span></label>
         <input type="range" id="dpFront" min="0" max="100" step="5" value="50">
       </div>
       <div class="dp-field">
-        <label for="dpHorizon">Hold horizon <span class="dp-field-val" id="dpHorizonVal">4 yrs</span></label>
-        <input type="range" id="dpHorizon" min="2" max="8" step="1" value="4">
+        <label for="dpSum">Sum to deploy <span class="dp-field-val" id="dpSumVal">$25.0K</span></label>
+        <input type="range" id="dpSum" min="1000" max="1000000" step="1000" value="25000">
       </div>
+      <div class="dp-field" id="dpDurRow">
+        <label for="dpDur"><span id="dpDurLabelText">Ladder over</span> <span class="dp-field-val" id="dpDurVal">1 yr</span></label>
+        <input type="range" id="dpDur" min="3" max="36" step="1" value="12">
+      </div>
+      <div class="dp-field">
+        <label for="dpHorizon">Hold horizon <span class="dp-field-val" id="dpHorizonVal">4 yrs</span></label>
+        <input type="range" id="dpHorizon" min="2" max="10" step="1" value="4">
+      </div>
+    </div>
+
+    <!-- Retrospective anchor toggle (item 10) — secondary, available not disabled -->
+    <div class="dp-anchor-row" aria-label="Retrospective anchor">
+      <span class="dp-anchor-label">Replay anchored by</span>
+      <div class="dp-anchor" role="group">
+        <button type="button" data-anchor="channel" class="active">Today&rsquo;s valuation</button>
+        <button type="button" data-anchor="time">A point in time</button>
+      </div>
+      <span class="dp-anchor-hint" id="dpAnchorHint">Channel-anchored: what tends to happen deploying from a valuation like today&rsquo;s. Time-anchored: what if you&rsquo;d simply started N years ago.</span>
     </div>
 
     <!-- Verdict -->
@@ -86,9 +96,12 @@ eleventyComputed:
       <div class="dp-verdict-detail" id="dpVerdictDetail"></div>
     </div>
 
+    <!-- Upper-channel risk flag (item 12) — fires on the live position -->
+    <div class="dp-risk" id="dpRisk" role="note" hidden></div>
+
     <!-- The value-over-time chart (Retirement chassis: floor at the bottom) -->
     <div class="dp-chart-block">
-      <p class="dp-chart-caption dp-cap-retro">Your stack&rsquo;s value over your hold horizon, replayed from the last time Bitcoin sat near today&rsquo;s channel position, against the floor / trend / upper band drawn in <em>value</em> terms. Time runs left to right, floor at the bottom &mdash; the orientation you already have from the Power Law graph.</p>
+      <p class="dp-chart-caption dp-cap-retro">Your stack&rsquo;s value over your hold horizon, against the floor / trend / upper band drawn in <em>value</em> terms &mdash; floor at the bottom, the orientation you already have from the Power Law graph. The amber marker is where you deployed; the verdict above speaks to the <em>whole set</em> of historical matches, not just this one replay.</p>
       <p class="dp-chart-caption dp-cap-proj">Your stack&rsquo;s value projected forward under two Power Law paths &mdash; <strong>reversion to trend</strong> and <strong>staying on the current trajectory</strong> &mdash; shown as a range, not a single line. The shaded band is the spread between them. Both are extrapolations of an empirical regularity, never forecasts.</p>
       <div class="dp-chart-wrapper" data-chart-copy data-chart-title="Your deployment plan — value over time">
         <canvas id="dpChart" aria-label="Portfolio value over time for the chosen deployment plan, against the Power Law floor, trend, and upper band expressed in value terms"></canvas>
@@ -144,9 +157,9 @@ eleventyComputed:
   <!-- ════════ COMMITMENT BACKSTOP ════════ -->
   <section class="dp-section dp-wide">
     <p class="dp-eyebrow">The commitment backstop</p>
-    <h2>Before any tactic: every entry recovers</h2>
+    <h2>Given long enough, entries have historically recovered</h2>
     <div class="dp-prose" style="max-width:none;">
-      <p>Over a long horizon, <em>where</em> you bought has mattered far less than <em>that</em> you bought and held. Mean value-multiple of a deployment, by entry valuation and how long it was held &mdash; computed live from the current record:</p>
+      <p>Over a <em>long</em> horizon, <em>where</em> you bought has mattered far less than <em>that</em> you bought and held. That&rsquo;s a multi-year tendency, not a promise &mdash; over short horizons entries have frequently sat underwater (including now, with price below half its prior high). Mean value-multiple of a deployment, by entry valuation and how long it was held &mdash; computed live from the current record:</p>
     </div>
     <div class="dp-table-wrap">
       <table class="dp-table">
@@ -184,10 +197,11 @@ eleventyComputed:
     <div class="dp-method-label">Methodology</div>
     <ul>
       <li>Channel position is the log-space location between floor and ceiling: <code>(ln(price/trend) &minus; ln 0.42) / (ln 3.0 &minus; ln 0.42)</code> &mdash; 0 at the floor, 1 at the upper band.</li>
-      <li><strong>Retrospective</strong> replays your plan from the most recent historical entry whose channel position is closest to today&rsquo;s (with enough forward data to hold the full horizon), using real prices. <strong>Projective</strong> deploys today and extends two Power Law paths &mdash; reversion-to-trend and stay-on-trajectory &mdash; as a range. Both are extrapolations of an empirical regularity, <em>not forecasts</em>.</li>
+      <li><strong>Retrospective &mdash; channel-anchored (default):</strong> finds every historical entry whose channel position is within &plusmn;0.07 of today&rsquo;s live position, deploys your plan from each at real prices, and holds for the chosen horizon &mdash; reported as a <em>distribution</em> (median + typical range across the matches), with the chart replaying the most recent match. The horizon slider sets <em>how long you hold</em>, not which entry. <strong>Time-anchored (secondary):</strong> deploys the horizon&rsquo;s-worth of years ago from today and replays to now &mdash; a single historical path.</li>
+      <li><strong>Projective</strong> deploys today and extends two Power Law paths &mdash; reversion-to-trend and stay-on-trajectory &mdash; as a range. Both are extrapolations of an empirical regularity, <em>not forecasts</em>.</li>
       <li>Lump deploys the full sum at once; ladder spreads it equally over the chosen duration; hybrid deploys a chosen share now and ladders the rest. Value is BTC accumulated &times; price along the path; multiples are amount-invariant, the dollar figures just scale with the sum.</li>
       <li>Commitment backstop: mean value-multiple by hold length, <strong>8-year exit convention</strong> (nearest sample to entry&nbsp;+&nbsp;8&nbsp;&times;&nbsp;365.25&nbsp;days); ~1&ndash;3% sensitivity. Worst-entry recovery is the range for entries above 1.5&times; channel position, recovered to the latest sample.</li>
-      <li id="dpMethodWindow"></li>
+      <li id="dpMethodWindow">Computed live from the current <code>PL_DATA</code> window.</li>
       <li>Today&rsquo;s channel position is computed at load from the latest sample and the live spot (CoinGecko, via the shared fetch) &mdash; never baked in.</li>
     </ul>
   </div>

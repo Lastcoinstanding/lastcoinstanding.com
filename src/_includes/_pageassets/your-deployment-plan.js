@@ -1,31 +1,33 @@
 /* =============================================================
-   Your Deployment Plan — page script (Stage 2C-②)
+   Your Bitcoin Deployment Plan — page script (Stage 2C-②, review round)
 
-   The personal model that companions /lump-sum-or-ladder-in. Where
-   that page is the retrospective teaching demonstration, this one is
-   about your situation: your sum, your cadence, your horizon — modelled
-   both back across real history and forward under the Power Law.
+   The personal model that companions /lump-sum-or-ladder-in. Borrows The
+   Bitcoin Retirement's chart SHAPE only (value-over-time, time on the x-axis,
+   the Power Law channel as a floor-at-the-bottom backdrop in value terms).
+   Keeps this page's own controls and voice; imports none of Retirement's
+   age/withdrawal/lifespan inputs.
 
-   Borrows The Bitcoin Retirement's chart SHAPE only — value-over-time,
-   time on the x-axis, the Power Law channel as a floor-at-the-bottom
-   backdrop (the intuitive orientation that fixes the old inverted-floor
-   advantage chart). Keeps this page's own controls and voice; imports
-   none of Retirement's age/withdrawal/lifespan inputs.
+   Reads PL_DATA + PL_* + GENESIS_TS + plPrice + TODAY_DAYS/TODAY_PRICE +
+   fetchTodayPrice from shared/power-law-data.js, and the lifted forward path
+   model from shared/deployment-projection.js (DeploymentProjection). Constants
+   are NOT redeclared. Everything is computed live; no live position/price is
+   ever baked into static copy (cross-cutting rule #1).
 
-   Reads PL_DATA + PL_A/PL_B/PL_FLOOR/PL_CEIL + GENESIS_TS + plPrice +
-   TODAY_DAYS/TODAY_PRICE + fetchTodayPrice from shared/power-law-data.js,
-   and the lifted forward path model from shared/deployment-projection.js
-   (global DeploymentProjection — reused for the reversion-to-trend path).
-   Constants are NOT redeclared. Everything is computed live; nothing is
-   hard-coded (cross-cutting rule #1).
+   Review-round changes (STAGE_2C_REVIEW_FIXES): channel-position shown as
+   "×trend · plain label", never raw coordinates (item 3); retrospective
+   rebuilt into a channel-anchored distribution (default) + a secondary
+   time-anchored mode, killing the 2015-pin (item 10); past-tense verdict
+   (item 11); "you deployed here" entry marker (item 7); Retirement-distinct
+   chart colours (item 8); three-zone upper-channel risk flag on live position
+   (item 12); softened backstop (item 9).
    ============================================================= */
 (function () {
   if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function') return;
 
-  // ── Palette (matches the Retirement chassis band colours) ──
+  // ── Palette — distinct colours borrowed from The Bitcoin Retirement (item 8) ──
   var FLOOR_C = '#b04525', TREND_C = '#e09422', UPPER_C = '#e8c820';
-  var REVERT_C = '#e09422', TRAJ_C = '#6db3d4', REAL_C = '#ece4d6';
-  var MUTED = '#7a7367', DIM = '#9a9080', AMBER = '#e09422', BLUE = '#6db3d4';
+  var REVERT_C = '#ece4d6', TRAJ_C = '#5e7a92', REAL_C = '#ece4d6';
+  var MUTED = '#7a7367', DIM = '#9a9080', AMBER = '#e09422';
 
   // ── Channel-position math (log-space, copied locally per rule #5) ──
   var LF = Math.log(PL_FLOOR), LC = Math.log(PL_CEIL), SPAN = LC - LF;
@@ -35,177 +37,187 @@
     ? DeploymentProjection.TREND_POS : (0 - LF) / SPAN;
 
   var N = PL_DATA.length;
-  var FIRST_D = PL_DATA[0][0], LAST_D = PL_DATA[N - 1][1] !== undefined ? PL_DATA[N - 1][0] : PL_DATA[N - 1][0];
+  var FIRST_D = PL_DATA[0][0], LAST_D = PL_DATA[N - 1][0];
   var todayD = (Date.now() / 1000 - GENESIS_TS) / 86400;
   var YEAR_D = 365.25, MONTH_D = 30.44;
+  var MATCH_BAND = 0.07;   // channel-anchored match band (item 10)
+  var UPPER_RISK = 0.75;   // three-zone threshold (item 12)
+  var SUFFICIENT_YEARS = 6; // channel-anchored sufficiency (item 12b)
 
-  // Reversion-to-trend channel position along the forward window — reuse the
-  // lifted path model where available (identical linear revert), else inline.
   function revertPos(startPos, u) {
-    if (DeploymentProjection && typeof DeploymentProjection.pathPos === 'function') {
-      return DeploymentProjection.pathPos('revert', startPos, u);
-    }
+    if (DeploymentProjection && typeof DeploymentProjection.pathPos === 'function') return DeploymentProjection.pathPos('revert', startPos, u);
     return startPos + (TREND_POS - startPos) * u;
   }
-
-  // Real historical price at an absolute day, linearly interpolated.
   function realPriceAt(absDay) {
     if (absDay <= PL_DATA[0][0]) return PL_DATA[0][1];
     if (absDay >= PL_DATA[N - 1][0]) return PL_DATA[N - 1][1];
     for (var i = 1; i < N; i++) {
-      if (PL_DATA[i][0] >= absDay) {
-        var a = PL_DATA[i - 1], b = PL_DATA[i], t = (absDay - a[0]) / (b[0] - a[0]);
-        return a[1] * (1 - t) + b[1] * t;
-      }
+      if (PL_DATA[i][0] >= absDay) { var a = PL_DATA[i - 1], b = PL_DATA[i], t = (absDay - a[0]) / (b[0] - a[0]); return a[1] * (1 - t) + b[1] * t; }
     }
     return PL_DATA[N - 1][1];
   }
-
   function yearOf(day) { return new Date(GENESIS_TS * 1000 + day * 86400 * 1000).getUTCFullYear(); }
   function monthYear(day) { return new Date(GENESIS_TS * 1000 + day * 86400 * 1000).toLocaleString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
+
+  // ── Precomputed samples ──
+  var S = (function () { var a = new Array(N); for (var i = 0; i < N; i++) a[i] = { d: PL_DATA[i][0], p: PL_DATA[i][1], pos: posOf(PL_DATA[i][1], PL_DATA[i][0]), yr: yearOf(PL_DATA[i][0]) }; return a; })();
 
   // ── State ──
   var state = {
     sum: 25000,
-    style: 'lump',        // 'lump' | 'ladder' | 'hybrid'
-    durMonths: 12,        // ladder / blend duration
-    front: 50,            // hybrid: % deployed now (rest laddered)
-    horizon: 4,           // years
-    view: 'retrospective' // 'retrospective' | 'projective'
+    style: 'lump',          // 'lump' | 'ladder' | 'hybrid'
+    durMonths: 12,
+    front: 50,
+    horizon: 4,
+    view: 'retrospective',  // 'retrospective' | 'projective'
+    anchor: 'channel'       // retrospective sub-mode: 'channel' | 'time'
   };
+  var anchorUserSet = false;   // once the reader picks an anchor, stop auto-preferring
   var liveTodayPrice = null, liveTodayPos = null;
+  var entryMark = null;        // {x, y, label} for the "you deployed here" marker
 
-  // ── Buy schedule: events with day-offset + weight (weights sum to 1) ──
-  function buyEvents() {
+  // ── Channel-position display (item 3): ×trend + plain label. Raw pos stays
+  //    internal (logic only); never shown as the primary number. ──
+  function posLabel(pos) {
+    if (pos < 0.12) return 'near the floor';
+    if (pos < 0.33) return 'low in the channel';
+    if (pos < 0.66) return 'mid-channel';
+    if (pos < 1.0) return 'high in the channel';
+    return 'above the upper band';
+  }
+  function posDisplay(pos) { return ratioOf(pos).toFixed(2) + '× trend · ' + posLabel(pos); }
+
+  // ── Buy schedule for a style ──
+  function buyEvents(style) {
     var n = Math.max(1, Math.round(state.durMonths)), a, k, w;
-    if (state.style === 'lump') return [{ d: 0, w: 1 }];
-    if (state.style === 'ladder') {
-      a = []; w = 1 / n;
-      for (k = 0; k < n; k++) a.push({ d: k * MONTH_D, w: w });
-      return a;
-    }
-    // hybrid: front now, ladder the rest over the duration (months 1..n)
+    if (style === 'lump') return [{ d: 0, w: 1 }];
+    if (style === 'ladder') { a = []; w = 1 / n; for (k = 0; k < n; k++) a.push({ d: k * MONTH_D, w: w }); return a; }
     var f = Math.max(0, Math.min(1, state.front / 100));
     a = [{ d: 0, w: f }]; w = (1 - f) / n;
     for (k = 1; k <= n; k++) a.push({ d: k * MONTH_D, w: w });
     return a;
   }
-
-  // BTC held at offset t given a price-at-offset function
-  function btcHeldAt(events, priceAt, t) {
-    var btc = 0;
-    for (var i = 0; i < events.length; i++) if (events[i].d <= t + 1e-9) btc += (events[i].w * state.sum) / priceAt(events[i].d);
-    return btc;
-  }
-  function btcFinal(events, priceAt, horizonDays) { return btcHeldAt(events, priceAt, horizonDays); }
-
-  // Value-over-time series for a price-at-offset function, anchored at baseDay
-  function valueSeries(events, priceAt, horizonDays, baseDay) {
-    var pts = [], step = Math.max(12, horizonDays / 80), d;
-    for (d = 0; d <= horizonDays + 1e-6; d += step) pts.push({ x: baseDay + d, y: btcHeldAt(events, priceAt, d) * priceAt(d) });
-    if (pts.length && Math.abs(pts[pts.length - 1].x - (baseDay + horizonDays)) > 1)
-      pts.push({ x: baseDay + horizonDays, y: btcHeldAt(events, priceAt, horizonDays) * priceAt(horizonDays) });
+  function btcHeldAt(events, priceAt, t) { var btc = 0; for (var i = 0; i < events.length; i++) if (events[i].d <= t + 1e-9) btc += (events[i].w * state.sum) / priceAt(events[i].d); return btc; }
+  function valueSeries(events, priceAt, span, baseDay) {
+    var pts = [], step = Math.max(12, span / 80), d;
+    for (d = 0; d <= span + 1e-6; d += step) pts.push({ x: baseDay + d, y: btcHeldAt(events, priceAt, d) * priceAt(d) });
+    pts.push({ x: baseDay + span, y: btcHeldAt(events, priceAt, span) * priceAt(span) });
     return pts;
   }
-  function bandSeries(btcRef, baseDay, horizonDays, mult) {
-    var pts = [], step = Math.max(12, horizonDays / 80), d;
-    for (d = 0; d <= horizonDays + 1e-6; d += step) pts.push({ x: baseDay + d, y: btcRef * plPrice(baseDay + d) * mult });
-    pts.push({ x: baseDay + horizonDays, y: btcRef * plPrice(baseDay + horizonDays) * mult });
+  function bandSeries(btcRef, baseDay, span, mult) {
+    var pts = [], step = Math.max(12, span / 80), d;
+    for (d = 0; d <= span + 1e-6; d += step) pts.push({ x: baseDay + d, y: btcRef * plPrice(baseDay + d) * mult });
+    pts.push({ x: baseDay + span, y: btcRef * plPrice(baseDay + span) * mult });
     return pts;
   }
-
-  // ── Retrospective analog: the most recent historical entry whose channel
-  //    position is closest to today's AND has ≥ horizon years of forward data. ──
-  function analogIndex(todayPos, horizonDays) {
-    var best = -1, bestScore = Infinity;
-    for (var i = 0; i < N; i++) {
-      if (PL_DATA[i][0] > LAST_D - horizonDays) break;        // need room to hold
-      var pos = posOf(PL_DATA[i][1], PL_DATA[i][0]);
-      var recency = (LAST_D - PL_DATA[i][0]) / (LAST_D - FIRST_D); // 0 = recent, 1 = old
-      var score = Math.abs(pos - todayPos) + recency * 0.15;       // prefer close position, mildly prefer recent
-      if (score < bestScore) { bestScore = score; best = i; }
-    }
-    return best;
+  // multiple (value/sum) for a plan deployed at entryDay over the real record
+  function planMultiple(style, entryDay, span) {
+    var ev = buyEvents(style), price = function (d) { return realPriceAt(entryDay + d); };
+    return btcHeldAt(ev, price, span) * price(span) / state.sum;
   }
 
-  // ── Outcome for one style under the active view ──
-  function outcome(style) {
-    var saved = state.style; state.style = style;
-    var events = buyEvents(); state.style = saved;
-    var horizonDays = state.horizon * YEAR_D;
-    var pos = (liveTodayPos != null) ? liveTodayPos : posOf(TODAY_PRICE, TODAY_DAYS);
-
-    if (state.view === 'projective') {
-      var trajPrice = function (d) { return plPrice(todayD + d) * ratioOf(pos); };
-      var revertPrice = function (d) { return plPrice(todayD + d) * ratioOf(revertPos(pos, Math.min(1, d / horizonDays))); };
-      var mTraj = btcFinal(events, trajPrice, horizonDays) * trajPrice(horizonDays) / state.sum;
-      var mRevert = btcFinal(events, revertPrice, horizonDays) * revertPrice(horizonDays) / state.sum;
-      return { traj: mTraj, revert: mRevert, lo: Math.min(mTraj, mRevert), hi: Math.max(mTraj, mRevert), events: events };
-    }
-    var ai = analogIndex(pos, horizonDays), baseDay = PL_DATA[ai][0];
-    var realPrice = function (d) { return realPriceAt(baseDay + d); };
-    var m = btcFinal(events, realPrice, horizonDays) * realPrice(horizonDays) / state.sum;
-    return { real: m, lo: m, hi: m, analogDay: baseDay, events: events };
+  // ── Channel-anchored matches: historical entries near `pos` with room to
+  //    hold `span`. Returned as a distribution, not a single date (item 10). ──
+  function channelMatches(pos, span) {
+    var idx = [];
+    for (var i = 0; i < N; i++) { if (S[i].d > LAST_D - span) break; if (Math.abs(S[i].pos - pos) <= MATCH_BAND) idx.push(i); }
+    return idx;
+  }
+  function distinctYears(idx) { var y = {}, c = 0; for (var k = 0; k < idx.length; k++) if (!y[S[idx[k]].yr]) { y[S[idx[k]].yr] = 1; c++; } return c; }
+  function channelDist(style, pos, span) {
+    var idx = channelMatches(pos, span);
+    var m = idx.map(function (i) { return planMultiple(style, S[i].d, span); }).sort(function (a, b) { return a - b; });
+    function q(p) { return m.length ? m[Math.min(m.length - 1, Math.floor(m.length * p))] : null; }
+    return { idx: idx, n: idx.length, years: distinctYears(idx), median: q(0.5), lo: q(0.1), hi: q(0.9), repIdx: idx.length ? idx[idx.length - 1] : -1 };
+  }
+  function timeAnchor(style, span) {
+    var entryDay = Math.max(FIRST_D, todayD - span), hold = todayD - entryDay;
+    return { entryDay: entryDay, hold: hold, mult: planMultiple(style, entryDay, hold) };
   }
 
-  // ════════ CHART (Retirement chassis grammar) ════════
+  // Retrospective anchor = state.anchor. The graceful fallback to time-anchored
+  // when the upper-channel band is too thin (item 12b) is decided once in
+  // renderLive (which also syncs the toggle UI), so chart + verdict + toggle
+  // never disagree.
+  function effectiveAnchor() { return state.view === 'retrospective' ? state.anchor : null; }
+  function livePos() { return (liveTodayPos != null) ? liveTodayPos : posOf(TODAY_PRICE, TODAY_DAYS); }
+
+  // ════════ CHART ════════
   var chart = null;
-  var todayMarker = {
-    id: 'dpToday',
+  var markerPlugin = {
+    id: 'dpEntryMark',
     afterDatasetsDraw: function (c) {
-      if (state.view !== 'projective') return;
-      var xS = c.scales.x, ctx = c.ctx, area = c.chartArea, x = xS.getPixelForValue(todayD);
-      if (x < area.left || x > area.right) return;
-      ctx.save(); ctx.strokeStyle = 'rgba(224,148,34,0.45)'; ctx.lineWidth = 1.2; ctx.setLineDash([3, 4]);
-      ctx.beginPath(); ctx.moveTo(x, area.top); ctx.lineTo(x, area.bottom); ctx.stroke();
-      ctx.setLineDash([]); ctx.fillStyle = AMBER; ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('Today', x, area.top - 4); ctx.restore();
+      if (!entryMark) return;
+      var xS = c.scales.x, yS = c.scales.y, ctx = c.ctx, area = c.chartArea;
+      var x = xS.getPixelForValue(entryMark.x), y = yS.getPixelForValue(entryMark.y);
+      if (x < area.left - 2 || x > area.right + 2) return;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(224,148,34,0.5)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(x, area.top); ctx.lineTo(x, area.bottom); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = AMBER; ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#0a0908'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.fillStyle = AMBER; ctx.font = '600 10px Inter, sans-serif';
+      var tx = Math.min(x + 7, area.right - 90); ctx.textAlign = 'left';
+      ctx.fillText(entryMark.label, tx, area.top + 11);
+      ctx.restore();
     }
   };
 
+  function band(label, data, color, dash, w) { return { label: label, data: data, borderColor: color, backgroundColor: color, borderWidth: w, borderDash: dash || undefined, pointRadius: 0, tension: 0.2, fill: false, order: 4 }; }
+
   function chartDatasets() {
-    var horizonDays = state.horizon * YEAR_D;
-    var pos = (liveTodayPos != null) ? liveTodayPos : posOf(TODAY_PRICE, TODAY_DAYS);
-    var events = buyEvents();
-    var ds = [];
+    var span = state.horizon * YEAR_D, pos = livePos(), ds = [];
+    entryMark = null;
 
     if (state.view === 'projective') {
       var baseDay = todayD;
       var trajPrice = function (d) { return plPrice(todayD + d) * ratioOf(pos); };
-      var revertPrice = function (d) { return plPrice(todayD + d) * ratioOf(revertPos(pos, Math.min(1, d / horizonDays))); };
+      var revertPrice = function (d) { return plPrice(todayD + d) * ratioOf(revertPos(pos, Math.min(1, d / span))); };
       var btcRef = state.sum / trajPrice(0);
-      ds.push(band('Floor (0.42× trend)', bandSeries(btcRef, baseDay, horizonDays, PL_FLOOR), FLOOR_C, [6, 3], 1.4));
-      ds.push(band('Trend', bandSeries(btcRef, baseDay, horizonDays, 1), TREND_C, null, 2));
-      ds.push(band('Upper (3× trend)', bandSeries(btcRef, baseDay, horizonDays, PL_CEIL), UPPER_C, [1, 6], 1.1));
-      // the two forward paths, with the range shaded between them
-      var revSeries = valueSeries(events, revertPrice, horizonDays, baseDay);
-      var trajSeries = valueSeries(events, trajPrice, horizonDays, baseDay);
-      ds.push({ label: 'Reversion to trend', data: revSeries, borderColor: REVERT_C, backgroundColor: 'rgba(224,148,34,0.10)', borderWidth: 2.2, pointRadius: 0, tension: 0.2, fill: '+1', order: 1 });
-      ds.push({ label: 'Stay on current trajectory', data: trajSeries, borderColor: TRAJ_C, backgroundColor: 'transparent', borderWidth: 2, borderDash: [5, 3], pointRadius: 0, tension: 0.2, fill: false, order: 1 });
-    } else {
-      var ai = analogIndex(pos, horizonDays), aDay = PL_DATA[ai][0];
-      var realPrice = function (d) { return realPriceAt(aDay + d); };
-      var btcRefR = state.sum / realPrice(0);
-      ds.push(band('Floor (0.42× trend)', bandSeries(btcRefR, aDay, horizonDays, PL_FLOOR), FLOOR_C, [6, 3], 1.4));
-      ds.push(band('Trend', bandSeries(btcRefR, aDay, horizonDays, 1), TREND_C, null, 2));
-      ds.push(band('Upper (3× trend)', bandSeries(btcRefR, aDay, horizonDays, PL_CEIL), UPPER_C, [1, 6], 1.1));
-      ds.push({ label: 'Your stack (actual history)', data: valueSeries(events, realPrice, horizonDays, aDay), borderColor: REAL_C, backgroundColor: 'transparent', borderWidth: 2.4, pointRadius: 0, tension: 0.2, fill: false, order: 1 });
+      var ev = buyEvents(state.style);
+      ds.push(band('Floor (0.42× trend)', bandSeries(btcRef, baseDay, span, PL_FLOOR), FLOOR_C, [6, 3], 1.4));
+      ds.push(band('Trend', bandSeries(btcRef, baseDay, span, 1), TREND_C, null, 2));
+      ds.push(band('Upper (3× trend)', bandSeries(btcRef, baseDay, span, PL_CEIL), UPPER_C, [1, 6], 1.1));
+      ds.push({ label: 'Reversion to trend', data: valueSeries(ev, revertPrice, span, baseDay), borderColor: REVERT_C, backgroundColor: 'rgba(224,148,34,0.10)', borderWidth: 2.4, pointRadius: 0, tension: 0.2, fill: '+1', order: 1 });
+      ds.push({ label: 'Stay on current trajectory', data: valueSeries(ev, trajPrice, span, baseDay), borderColor: TRAJ_C, backgroundColor: 'transparent', borderWidth: 2, borderDash: [5, 3], pointRadius: 0, tension: 0.2, fill: false, order: 1 });
+      entryMark = { x: todayD, y: state.sum / trajPrice(0) * trajPrice(0), label: 'You deploy here · today' };
+      // entryMark.y = stack value at t0 (≈ the first laddered tranche for ladder; full sum for lump)
+      entryMark.y = btcHeldAt(ev, trajPrice, 0) * trajPrice(0) || state.sum;
+      return ds;
     }
+
+    // ── retrospective ──
+    var anchor = effectiveAnchor();
+    if (anchor === 'time') {
+      var ta = timeAnchor(state.style, span), aDay = ta.entryDay, hold = ta.hold;
+      var realPrice = function (d) { return realPriceAt(aDay + d); };
+      var btcRefT = state.sum / realPrice(0);
+      ds.push(band('Floor (0.42× trend)', bandSeries(btcRefT, aDay, hold, PL_FLOOR), FLOOR_C, [6, 3], 1.4));
+      ds.push(band('Trend', bandSeries(btcRefT, aDay, hold, 1), TREND_C, null, 2));
+      ds.push(band('Upper (3× trend)', bandSeries(btcRefT, aDay, hold, PL_CEIL), UPPER_C, [1, 6], 1.1));
+      ds.push({ label: 'Your stack (actual history)', data: valueSeries(buyEvents(state.style), realPrice, hold, aDay), borderColor: REAL_C, borderWidth: 2.4, pointRadius: 0, tension: 0.2, fill: false, order: 1 });
+      entryMark = { x: aDay, y: btcHeldAt(buyEvents(state.style), realPrice, 0) * realPrice(0) || state.sum, label: 'You deployed here · ' + monthYear(aDay) };
+      return ds;
+    }
+    // channel-anchored: replay the representative (most recent) match; verdict carries the distribution
+    var dist = channelDist(state.style, pos, span);
+    var repDay = dist.repIdx >= 0 ? S[dist.repIdx].d : Math.max(FIRST_D, LAST_D - span);
+    var rPrice = function (d) { return realPriceAt(repDay + d); };
+    var btcRefC = state.sum / rPrice(0);
+    ds.push(band('Floor (0.42× trend)', bandSeries(btcRefC, repDay, span, PL_FLOOR), FLOOR_C, [6, 3], 1.4));
+    ds.push(band('Trend', bandSeries(btcRefC, repDay, span, 1), TREND_C, null, 2));
+    ds.push(band('Upper (3× trend)', bandSeries(btcRefC, repDay, span, PL_CEIL), UPPER_C, [1, 6], 1.1));
+    ds.push({ label: 'Representative match (actual history)', data: valueSeries(buyEvents(state.style), rPrice, span, repDay), borderColor: REAL_C, borderWidth: 2.4, pointRadius: 0, tension: 0.2, fill: false, order: 1 });
+    entryMark = { x: repDay, y: btcHeldAt(buyEvents(state.style), rPrice, 0) * rPrice(0) || state.sum, label: 'You deployed here · ' + monthYear(repDay) };
     return ds;
-  }
-  function band(label, data, color, dash, w) {
-    return { label: label, data: data, borderColor: color, backgroundColor: color, borderWidth: w, borderDash: dash || undefined, pointRadius: 0, tension: 0.2, fill: false, order: 4 };
   }
 
   function yBounds(ds) {
     var lo = Infinity, hi = -Infinity;
-    for (var i = 0; i < ds.length; i++) for (var j = 0; j < ds[i].data.length; j++) {
-      var y = ds[i].data[j].y; if (isFinite(y) && y > 0) { if (y < lo) lo = y; if (y > hi) hi = y; }
-    }
+    for (var i = 0; i < ds.length; i++) for (var j = 0; j < ds[i].data.length; j++) { var y = ds[i].data[j].y; if (isFinite(y) && y > 0) { if (y < lo) lo = y; if (y > hi) hi = y; } }
     if (!isFinite(lo)) { lo = 1000; hi = 1e7; }
     return { min: lo * 0.55, max: hi * 1.9 };
   }
-
   function buildChart() {
     var el = document.getElementById('dpChart'); if (!el || typeof Chart === 'undefined') return;
     var ds = chartDatasets(), yb = yBounds(ds);
@@ -217,41 +229,28 @@
         interaction: { intersect: false, mode: 'index' },
         layout: { padding: { top: 24, right: 10 } },
         scales: {
-          x: {
-            type: 'linear', grid: { color: 'rgba(224,148,34,0.05)' },
-            ticks: { color: MUTED, font: { family: 'Inter, sans-serif', size: 11 }, maxTicksLimit: 8, callback: function (v) { return yearOf(v); } }
-          },
+          x: { type: 'linear', grid: { color: 'rgba(224,148,34,0.05)' }, ticks: { color: MUTED, font: { family: 'Inter, sans-serif', size: 11 }, maxTicksLimit: 8, callback: function (v) { return yearOf(v); } } },
           y: {
             type: 'logarithmic', min: yb.min, max: yb.max, grid: { color: 'rgba(224,148,34,0.06)' },
-            ticks: {
-              color: MUTED, font: { family: 'Inter, sans-serif', size: 11 }, callback: function (v) {
-                if (v >= 1e9) return '$' + (v / 1e9).toFixed(0) + 'B'; if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M';
-                if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K'; return '$' + v.toFixed(0);
-              }
-            }
+            ticks: { color: MUTED, font: { family: 'Inter, sans-serif', size: 11 }, callback: function (v) { if (v >= 1e9) return '$' + (v / 1e9).toFixed(0) + 'B'; if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M'; if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K'; return '$' + v.toFixed(0); } }
           }
         },
         plugins: {
           legend: { display: true, position: 'top', labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 22, padding: 9 } },
           tooltip: {
-            backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.30)', borderWidth: 1,
-            titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10,
+            backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.30)', borderWidth: 1, titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10,
             filter: function (it) { var v = it.parsed && it.parsed.y; return v != null && isFinite(v) && v > 0; },
-            callbacks: {
-              title: function (it) { return it.length ? yearOf(it[0].parsed.x) : ''; },
-              label: function (it) { return it.dataset.label + ': ' + fmtUSD(it.parsed.y); }
-            }
+            callbacks: { title: function (it) { return it.length ? yearOf(it[0].parsed.x) : ''; }, label: function (it) { return it.dataset.label + ': ' + fmtUSD(it.parsed.y); } }
           }
         }
       },
-      plugins: [todayMarker]
+      plugins: [markerPlugin]
     });
   }
   function updateChart() {
     if (!chart) { buildChart(); return; }
     var ds = chartDatasets(), yb = yBounds(ds);
-    chart.data.datasets = ds;
-    chart.options.scales.y.min = yb.min; chart.options.scales.y.max = yb.max;
+    chart.data.datasets = ds; chart.options.scales.y.min = yb.min; chart.options.scales.y.max = yb.max;
     chart.update('none');
   }
 
@@ -263,113 +262,128 @@
     return '$' + Math.round(v).toLocaleString();
   }
   function fmtMult(m) { return m == null ? '—' : (m >= 100 ? Math.round(m).toLocaleString() : m.toFixed(1)) + '×'; }
-  function posLabel(pos) {
-    if (pos < 0.12) return 'near the floor';
-    if (pos < 0.33) return 'low in the channel';
-    if (pos < 0.66) return 'mid-channel';
-    if (pos < 1.0) return 'high in the channel';
-    return 'above the upper band';
-  }
   var STYLE_NAME = { lump: 'Lump sum', ladder: 'Ladder in', hybrid: 'Hybrid' };
 
-  // ════════ VERDICT (compares lump / ladder / hybrid for the active view) ════════
+  // ════════ VERDICT ════════
   function updateVerdict() {
-    var lead = document.getElementById('dpVerdictLead');
-    var main = document.getElementById('dpVerdictMain');
-    var detail = document.getElementById('dpVerdictDetail');
+    var lead = document.getElementById('dpVerdictLead'), main = document.getElementById('dpVerdictMain'), detail = document.getElementById('dpVerdictDetail');
     if (!main) return;
-    var pos = (liveTodayPos != null) ? liveTodayPos : posOf(TODAY_PRICE, TODAY_DAYS);
-    var styles = ['lump', 'ladder', 'hybrid'];
-    var res = {}; styles.forEach(function (s) { res[s] = outcome(s); });
+    var pos = livePos(), span = state.horizon * YEAR_D, sel = state.style;
 
-    if (lead) lead.textContent = (state.view === 'projective' ? 'Projected' : 'Replayed from history') +
-      ' · starting ' + posLabel(pos) + ' (channel position ' + pos.toFixed(2) + ') · ' + state.horizon + '-year hold';
-
-    var sel = state.style, r = res[sel];
-    var lumpMid = state.view === 'projective' ? (res.lump.lo + res.lump.hi) / 2 : res.lump.real;
-    var selMid = state.view === 'projective' ? (r.lo + r.hi) / 2 : r.real;
-    var html;
-    if (pos < 0.33) {
-      html = 'With price <em>' + posLabel(pos) + '</em>, deploying decisively tends to come out ahead — you&rsquo;re buying below trend. '
-        + (sel === 'lump' ? 'Your <strong>lump</strong> captures that edge in full.'
-          : 'Your <strong>' + STYLE_NAME[sel].toLowerCase() + '</strong> gives up a little of that edge for the comfort of not deploying all at once.');
-    } else if (pos < 0.66) {
-      html = 'Mid-channel is close to a coin-flip — <strong>commitment matters more than the tactic</strong> here. A '
-        + (sel === 'hybrid' ? 'hybrid' : sel) + ' is a reasonable call; the spread between styles is small.';
-    } else {
-      html = 'Higher in the channel, the lump-sum advantage shrinks and a <span class="dp-hedge">hybrid or ladder</span> looks more attractive as a hedge — '
-        + 'though <a href="#cautions">see the cautions</a>, that&rsquo;s softer than it sounds.';
+    if (state.view === 'projective') {
+      lead.textContent = 'Projected · starting ' + posDisplay(pos) + ' · ' + state.horizon + '-year hold';
+      var styles = ['lump', 'ladder', 'hybrid'], res = {};
+      styles.forEach(function (s) {
+        var ev = buyEvents(s);
+        var tj = function (d) { return plPrice(todayD + d) * ratioOf(pos); };
+        var rv = function (d) { return plPrice(todayD + d) * ratioOf(revertPos(pos, Math.min(1, d / span))); };
+        var a = btcHeldAt(ev, tj, span) * tj(span) / state.sum, b = btcHeldAt(ev, rv, span) * rv(span) / state.sum;
+        res[s] = { lo: Math.min(a, b), hi: Math.max(a, b) };
+      });
+      main.innerHTML = posRec(pos, sel, false);
+      var r = res[sel];
+      detail.innerHTML = styles.map(function (s) { return '<span' + (s === sel ? ' class="dp-row-sel"' : '') + '>' + STYLE_NAME[s] + ' <strong>' + fmtMult(res[s].lo) + '–' + fmtMult(res[s].hi) + '</strong></span>'; }).join(' &nbsp;·&nbsp; ')
+        + '<br><span class="dp-sparse">' + fmtUSD(state.sum) + ' deployed → <strong>' + fmtUSD(r.lo * state.sum) + '–' + fmtUSD(r.hi * state.sum) + '</strong> after ' + state.horizon + ' years — the range spans reversion-to-trend and stay-on-trajectory. Extrapolations, not forecasts.</span>';
+      return;
     }
-    main.innerHTML = html;
 
-    if (detail) {
-      var rows = styles.map(function (s) {
-        var x = res[s];
-        var val = state.view === 'projective'
-          ? fmtMult(x.lo) + '–' + fmtMult(x.hi)
-          : fmtMult(x.real);
-        var on = s === sel ? ' class="dp-row-sel"' : '';
-        return '<span' + on + '>' + STYLE_NAME[s] + ' <strong>' + val + '</strong></span>';
-      }).join(' &nbsp;·&nbsp; ');
-      var endVal = state.view === 'projective'
-        ? fmtUSD(selMid * state.sum) + ' (range ' + fmtUSD(r.lo * state.sum) + '–' + fmtUSD(r.hi * state.sum) + ')'
-        : fmtUSD(r.real * state.sum);
-      detail.innerHTML = rows
-        + '<br><span class="dp-sparse">' + fmtUSD(state.sum) + ' deployed → <strong>' + endVal + '</strong> after ' + state.horizon + ' years'
-        + (state.view === 'projective'
-          ? ' — the range spans reversion-to-trend and stay-on-trajectory. Extrapolations, not forecasts.'
-          : ' — replaying from ' + monthYear(r.analogDay) + ', when Bitcoin last sat near where it does today.') + '</span>';
+    var anchor = effectiveAnchor();
+    if (anchor === 'time') {
+      var ta = {}, styles2 = ['lump', 'ladder', 'hybrid'];
+      styles2.forEach(function (s) { ta[s] = timeAnchor(s, span); });
+      var yrs = (ta[sel].hold / YEAR_D);
+      lead.textContent = 'Time-anchored · deployed ' + yrs.toFixed(0) + ' years ago, from ' + monthYear(ta[sel].entryDay) + ' · held to today';
+      main.innerHTML = 'If you&rsquo;d deployed your <strong>' + STYLE_NAME[sel].toLowerCase() + '</strong> ' + yrs.toFixed(0) + ' years ago and held to today, you&rsquo;d be at <strong>' + fmtMult(ta[sel].mult) + '</strong>. This is the &ldquo;what if I&rsquo;d simply started N years ago&rdquo; view — switch to <em>channel-anchored</em> for &ldquo;what tends to happen deploying from a valuation like today&rsquo;s.&rdquo;';
+      detail.innerHTML = styles2.map(function (s) { return '<span' + (s === sel ? ' class="dp-row-sel"' : '') + '>' + STYLE_NAME[s] + ' <strong>' + fmtMult(ta[s].mult) + '</strong></span>'; }).join(' &nbsp;·&nbsp; ')
+        + '<br><span class="dp-sparse">' + fmtUSD(state.sum) + ' → <strong>' + fmtUSD(ta[sel].mult * state.sum) + '</strong>. A single historical path, not a distribution.</span>';
+      return;
     }
+
+    // channel-anchored distribution
+    var dist = channelDist(sel, pos, span);
+    lead.textContent = 'Replayed from history · deploying near today&rsquo;s valuation (' + posDisplay(pos) + ') · ' + state.horizon + '-year hold';
+    if (dist.n < 4) {
+      main.innerHTML = 'Bitcoin has rarely sat near today&rsquo;s valuation with ' + state.horizon + ' years of history to follow — too few analogues to read. Switch to the <em>time-anchored</em> view.';
+      detail.innerHTML = '';
+      return;
+    }
+    main.innerHTML = posRec(pos, sel, true) + ' <span class="dp-pasttense">You bought at ' + ratioOf(pos).toFixed(2) + '× trend.</span>';
+    var styles3 = ['lump', 'ladder', 'hybrid'], dl = {};
+    styles3.forEach(function (s) { dl[s] = channelDist(s, pos, span); });
+    var thin = dist.years < SUFFICIENT_YEARS;
+    detail.innerHTML = styles3.map(function (s) { return '<span' + (s === sel ? ' class="dp-row-sel"' : '') + '>' + STYLE_NAME[s] + ' <strong>' + fmtMult(dl[s].median) + '</strong></span>'; }).join(' &nbsp;·&nbsp; ')
+      + '<br><span class="dp-sparse">Across <strong>' + dist.n + '</strong> historical entries in <strong>' + dist.years + '</strong> distinct years where price sat near today&rsquo;s valuation, deploying ' + STYLE_NAME[sel].toLowerCase() + ' and holding ' + state.horizon + ' years returned a <strong>median ' + fmtMult(dist.median) + '</strong> (typical range ' + fmtMult(dist.lo) + '–' + fmtMult(dist.hi) + '). The chart marks the most recent match; the numbers speak to the whole set.'
+      + (thin ? ' <em>Small sample — these come from only ' + dist.years + ' distinct years; treat as illustrative, not statistical.</em>' : '') + '</span>';
   }
 
-  // ════════ LIVE READOUT (recommendation + its caveats in one eyeful — rule #2) ════════
+  // shared position-keyed recommendation, three-zone (item 12), tense-aware
+  // (past for the retrospective replay — item 11; present/future for projective)
+  function posRec(pos, sel, past) {
+    var was = past ? 'was' : 'is', tend = past ? 'tended to come out ahead' : 'tends to come out ahead';
+    var sn = STYLE_NAME[sel].toLowerCase();
+    if (pos < 0.33) return 'With price <em>' + posLabel(pos) + '</em>, deploying decisively ' + tend + ' — ' + (past ? 'you bought below trend' : 'you&rsquo;re buying below trend') + '. '
+      + (sel === 'lump' ? 'A <strong>lump</strong> ' + (past ? 'captured' : 'captures') + ' that edge in full.' : 'A <strong>' + sn + '</strong> ' + (past ? 'gave up' : 'gives up') + ' a little of that edge for the comfort of not deploying all at once.');
+    if (pos < 0.66) return 'Mid-channel ' + was + ' close to a coin-flip — <strong>commitment ' + (past ? 'mattered' : 'matters') + ' more than the tactic</strong>. A ' + (sel === 'hybrid' ? 'hybrid' : sel) + ' is a reasonable call; the spread between styles is small.';
+    if (pos < UPPER_RISK) return 'Getting toward the upper channel, the lump-sum edge thins and a <span class="dp-hedge">hybrid or ladder</span> ' + (past ? 'looked' : 'looks') + ' more attractive as a hedge.';
+    return '<span class="dp-hedge">High in the channel</span>, a lump buys into the mean-reversion the channel predicts — <strong>this is where laddering&rsquo;s hedge earns its keep</strong>. Treat it as a <a href="#cautions">drawdown hedge, not a reliable edge</a>: the rising channel means even the hedge isn&rsquo;t guaranteed to pay.';
+  }
+
+  // ════════ LIVE READOUT + three-zone risk flag (rule #2; items 3 + 12) ════════
   function renderLive(price, source) {
-    liveTodayPrice = price;
-    liveTodayPos = posOf(price, TODAY_DAYS);
+    liveTodayPrice = price; liveTodayPos = posOf(price, TODAY_DAYS);
     var ratio = price / plPrice(TODAY_DAYS);
-    var posEl = document.getElementById('dpLivePos');
-    var recEl = document.getElementById('dpLiveRec');
-    var metaEl = document.getElementById('dpLiveMeta');
-    if (posEl) posEl.innerHTML = 'Channel position <strong>' + liveTodayPos.toFixed(2) + '</strong> · ' + posLabel(liveTodayPos);
+    // auto-prefer time-anchored on first load if the channel band is too thin here
+    if (!anchorUserSet) {
+      var d0 = channelDist(state.style, liveTodayPos, state.horizon * YEAR_D);
+      state.anchor = (liveTodayPos >= UPPER_RISK && d0.years < SUFFICIENT_YEARS) ? 'time' : 'channel';
+      syncAnchorUI();
+    }
+    var posEl = document.getElementById('dpLivePos'), recEl = document.getElementById('dpLiveRec'), metaEl = document.getElementById('dpLiveMeta');
+    if (posEl) posEl.innerHTML = '<strong>' + ratio.toFixed(2) + '×</strong> trend · ' + posLabel(liveTodayPos);
     if (recEl) {
       var rec;
       if (liveTodayPos < 0.33) rec = 'the model leans <b>deploy decisively</b> — spreading mostly means paying more as price reverts up toward trend.';
       else if (liveTodayPos < 0.66) rec = 'this is close to a <b>coin-flip</b> — pick the style you can hold through; commitment matters more than the tactic.';
-      else rec = 'a <b>hybrid or ladder</b> is the more defensible call as a hedge against the reversion the channel predicts — but read the cautions; it&rsquo;s softer than it sounds.';
+      else if (liveTodayPos < UPPER_RISK) rec = 'the lump-sum edge is thinning; a <b>hybrid or ladder</b> starts to look more attractive as a hedge.';
+      else rec = 'a <b>hybrid or ladder</b> is the more defensible call as a drawdown hedge against the reversion the channel predicts — read the cautions, it&rsquo;s softer than it sounds.';
       recEl.innerHTML = 'With price ' + posLabel(liveTodayPos) + ', ' + rec;
     }
     if (metaEl) metaEl.textContent = 'Live: ' + fmtUSD(price) + ' · ' + ratio.toFixed(2) + '× trend' + (source === 'live' ? '' : ' (latest sample)') + ' · recomputed every load.';
-    updateChart();
-    updateVerdict();
+    updateRiskFlag();
+    updateChart(); updateVerdict();
+  }
+  function updateRiskFlag() {
+    var el = document.getElementById('dpRisk'); if (!el) return;
+    var pos = livePos();
+    if (pos < UPPER_RISK) { el.hidden = true; return; }
+    var dist = channelDist(state.style, pos, state.horizon * YEAR_D), thin = dist.years < SUFFICIENT_YEARS;
+    el.hidden = false;
+    el.innerHTML = '<span class="dp-risk-tag">High-risk zone for lump deployment</span> '
+      + 'At today&rsquo;s valuation a lump buys into the mean-reversion the channel predicts — this is where laddering&rsquo;s hedge earns its keep. Frame it honestly as a <strong>drawdown hedge, not a reliable edge</strong>: the rising channel means even the hedge isn&rsquo;t guaranteed to pay.'
+      + (thin ? ' <span class="dp-risk-thin">Channel-anchored history is thin up here — only ~' + dist.years + ' distinct years, clustered into a handful of brief blow-off tops. The replay below leads with the time-anchored view; treat the channel analogues as illustrative.</span>' : '');
   }
 
-  // ════════ COMMITMENT BACKSTOP + COMPRESSION (computed live; same as Page 1) ════════
-  var S = (function () { var a = new Array(N); for (var i = 0; i < N; i++) a[i] = { d: PL_DATA[i][0], p: PL_DATA[i][1], pos: posOf(PL_DATA[i][1], PL_DATA[i][0]), yr: yearOf(PL_DATA[i][0]) }; return a; })();
+  // ════════ COMMITMENT BACKSTOP + COMPRESSION (live; softened per item 9) ════════
   var HOLDS = [2, 4, 6, 8];
   function bucketName(pos) { return pos < 0.33 ? 'lower' : (pos < 0.66 ? 'mid' : 'upper'); }
-  function nearestIdx(targetD) { var best = 0, bd = Infinity; for (var j = 0; j < N; j++) { var dd = Math.abs(S[j].d - targetD); if (dd < bd) { bd = dd; best = j; } } return best; }
+  function nearestIdx(t) { var b = 0, bd = Infinity; for (var j = 0; j < N; j++) { var dd = Math.abs(S[j].d - t); if (dd < bd) { bd = dd; b = j; } } return b; }
   function backstop() {
     var agg = { lower: {}, mid: {}, upper: {} }, b, h;
     for (b in agg) for (h = 0; h < HOLDS.length; h++) agg[b][HOLDS[h]] = [];
     for (var i = 0; i < N; i++) { var bk = bucketName(S[i].pos); for (h = 0; h < HOLDS.length; h++) { var t = S[i].d + HOLDS[h] * YEAR_D; if (t > S[N - 1].d) continue; agg[bk][HOLDS[h]].push(S[nearestIdx(t)].p / S[i].p); } }
-    var out = {}; for (b in agg) { out[b] = {}; for (h = 0; h < HOLDS.length; h++) { var arr = agg[b][HOLDS[h]], m = 0; for (var k = 0; k < arr.length; k++) m += arr[k]; out[b][HOLDS[h]] = arr.length ? m / arr.length : null; } }
-    return out;
+    var out = {}; for (b in agg) { out[b] = {}; for (h = 0; h < HOLDS.length; h++) { var arr = agg[b][HOLDS[h]], m = 0; for (var k = 0; k < arr.length; k++) m += arr[k]; out[b][HOLDS[h]] = arr.length ? m / arr.length : null; } } return out;
   }
-  function worstRecovery() { var mn = Infinity, mx = 0, cnt = 0; for (var i = 0; i < N; i++) if (S[i].pos > 1.5) { cnt++; var m = S[N - 1].p / S[i].p; if (m < mn) mn = m; if (m > mx) mx = m; } return { cnt: cnt, min: mn, max: mx }; }
+  function worstRecovery() { var mn = Infinity, mx = 0; for (var i = 0; i < N; i++) if (S[i].pos > 1.5) { var m = S[N - 1].p / S[i].p; if (m < mn) mn = m; if (m > mx) mx = m; } return { min: mn, max: mx }; }
   function compression() { var W = [[2011, 2014], [2015, 2018], [2019, 2022], [2023, 2026]], out = []; for (var w = 0; w < W.length; w++) { var mx = -Infinity; for (var i = 0; i < N; i++) if (S[i].yr >= W[w][0] && S[i].yr <= W[w][1]) mx = Math.max(mx, S[i].pos); if (mx > -Infinity) out.push({ label: W[w][0] + '–' + W[w][1], max: mx }); } return out; }
   function renderTables() {
     var bs = backstop(), tb = document.getElementById('dpBackstopBody');
-    if (tb) {
-      var rows = [['lower', 'Lower channel'], ['mid', 'Mid-channel'], ['upper', 'Upper channel']], html = '';
-      for (var r = 0; r < rows.length; r++) { html += '<tr class="dp-row-' + rows[r][0] + '"><th>' + rows[r][1] + '</th>'; for (var h = 0; h < HOLDS.length; h++) { var v = bs[rows[r][0]][HOLDS[h]]; html += '<td' + (h === HOLDS.length - 1 ? ' class="dp-strong"' : '') + '>' + fmtMult(v) + '</td>'; } html += '</tr>'; }
-      tb.innerHTML = html;
-    }
+    if (tb) { var rows = [['lower', 'Lower channel'], ['mid', 'Mid-channel'], ['upper', 'Upper channel']], html = ''; for (var r = 0; r < rows.length; r++) { html += '<tr class="dp-row-' + rows[r][0] + '"><th>' + rows[r][1] + '</th>'; for (var h = 0; h < HOLDS.length; h++) { var v = bs[rows[r][0]][HOLDS[h]]; html += '<td' + (h === HOLDS.length - 1 ? ' class="dp-strong"' : '') + '>' + fmtMult(v) + '</td>'; } html += '</tr>'; } tb.innerHTML = html; }
     var wr = worstRecovery(), tk = document.getElementById('dpBackstopTakeaway');
-    if (tk) { var H = state.horizon, up = bs.upper[H]; tk.innerHTML = 'Even <strong>upper-channel</strong> entries — the worst-timed buys — returned about <strong>' + fmtMult(up) + '</strong> on average after ' + H + ' years. The literal worst entries in history still returned <strong>' + fmtMult(wr.min) + ' to ' + fmtMult(wr.max) + '</strong> by the latest sample. Where you bought has mattered far less than that you bought and held.'; }
+    if (tk) { var H = state.horizon, up = bs.upper[H]; tk.innerHTML = 'Over a <strong>' + H + '-year</strong> hold, even <strong>upper-channel</strong> entries — the worst-timed buys — returned about <strong>' + fmtMult(up) + '</strong> on average; the literal worst entries in history still returned <strong>' + fmtMult(wr.min) + ' to ' + fmtMult(wr.max) + '</strong> by the latest sample. That is a multi-year tendency, <em>not</em> a guarantee: over short horizons entries have frequently sat underwater — including now, with price below half its prior high. Recovery has historically come with time held, not on demand.'; }
     var cp = compression(), cb = document.getElementById('dpCompressionBody');
     if (cb) { var ch = ''; for (var i = 0; i < cp.length; i++) ch += '<tr><th>' + cp[i].label + '</th><td class="dp-strong">' + cp[i].max.toFixed(2) + '</td></tr>'; cb.innerHTML = ch; }
     var mw = document.getElementById('dpMethodWindow');
-    if (mw) mw.innerHTML = '<code>PL_DATA</code> window: ' + monthYear(S[0].d) + ' – ' + monthYear(S[N - 1].d) + ' (' + N + ' samples, ~12-day spacing)';
+    if (mw) mw.innerHTML = '<code>PL_DATA</code> window: ' + monthYear(S[0].d) + ' – ' + monthYear(S[N - 1].d) + ' (' + N + ' samples, ~12-day spacing).';
   }
 
   // ════════ CONTROLS ════════
@@ -381,16 +395,15 @@
     var durLabel = document.getElementById('dpDurLabelText');
     if (durLabel) durLabel.textContent = (state.style === 'hybrid') ? 'Blend the rest over' : 'Ladder over';
   }
+  function syncAnchorUI() {
+    document.querySelectorAll('.dp-anchor button').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-anchor') === state.anchor); });
+  }
   function wire() {
     var sum = document.getElementById('dpSum'), sumVal = document.getElementById('dpSumVal');
     if (sum) sum.addEventListener('input', function () { state.sum = parseInt(this.value, 10); if (sumVal) sumVal.textContent = fmtUSD(state.sum); updateChart(); updateVerdict(); });
 
     document.querySelectorAll('.dp-style button').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        state.style = btn.getAttribute('data-style');
-        document.querySelectorAll('.dp-style button').forEach(function (b) { b.classList.toggle('active', b === btn); });
-        syncStyleUI(); updateChart(); updateVerdict();
-      });
+      btn.addEventListener('click', function () { state.style = btn.getAttribute('data-style'); document.querySelectorAll('.dp-style button').forEach(function (b) { b.classList.toggle('active', b === btn); }); syncStyleUI(); updateRiskFlag(); updateChart(); updateVerdict(); });
     });
 
     var dur = document.getElementById('dpDur'), durVal = document.getElementById('dpDurVal');
@@ -400,25 +413,21 @@
     if (front) front.addEventListener('input', function () { state.front = parseInt(this.value, 10); if (frontVal) frontVal.textContent = state.front + '% now'; updateChart(); updateVerdict(); });
 
     var hz = document.getElementById('dpHorizon'), hzVal = document.getElementById('dpHorizonVal');
-    if (hz) hz.addEventListener('input', function () { state.horizon = parseInt(this.value, 10); if (hzVal) hzVal.textContent = state.horizon + ' yrs'; updateChart(); updateVerdict(); renderTables(); });
+    if (hz) hz.addEventListener('input', function () { state.horizon = parseInt(this.value, 10); if (hzVal) hzVal.textContent = state.horizon + ' yrs'; updateRiskFlag(); updateChart(); updateVerdict(); renderTables(); });
 
     document.querySelectorAll('.dp-view button').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        state.view = btn.getAttribute('data-view');
-        document.querySelectorAll('.dp-view button').forEach(function (b) { b.classList.toggle('active', b === btn); });
-        document.body.setAttribute('data-dp-view', state.view);
-        updateChart(); updateVerdict();
-      });
+      btn.addEventListener('click', function () { state.view = btn.getAttribute('data-view'); document.querySelectorAll('.dp-view button').forEach(function (b) { b.classList.toggle('active', b === btn); }); document.body.setAttribute('data-dp-view', state.view); updateChart(); updateVerdict(); });
+    });
+    document.querySelectorAll('.dp-anchor button').forEach(function (btn) {
+      btn.addEventListener('click', function () { anchorUserSet = true; state.anchor = btn.getAttribute('data-anchor'); syncAnchorUI(); updateChart(); updateVerdict(); });
     });
   }
 
   // ════════ INIT ════════
   function init() {
     document.body.setAttribute('data-dp-view', state.view);
-    syncStyleUI();
-    buildChart();
-    wire();
-    renderTables();
+    syncStyleUI(); syncAnchorUI();
+    buildChart(); wire(); renderTables();
     renderLive(TODAY_PRICE, 'seed');
     if (typeof fetchTodayPrice === 'function') fetchTodayPrice(function (price, source) { renderLive(price, source); });
   }

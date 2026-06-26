@@ -1,5 +1,5 @@
 /* =============================================================
-   Your Deployment Plan — page styles (Stage 2C-②)
+   Your Bitcoin Deployment Plan — page styles (Stage 2C-②)
    Sibling to /lump-sum-or-ladder-in; reuses its :root tokens, the
    mixed-content width tier (1100 page / 880 prose), and the
    segmented-control / channel-viz conventions. Page-scoped classes
@@ -74,8 +74,27 @@ body { background: var(--bg); color: var(--text); }
 .dp-field input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--amber); border: 2px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.4); cursor: pointer; }
 .dp-field input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--amber); border: 2px solid var(--bg); cursor: pointer; }
 
+/* Retrospective anchor toggle (item 10) — secondary, lower weight than the style/view controls */
+.dp-anchor-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.45rem 0.8rem; margin: 0 0 1.4rem; }
+body[data-dp-view="projective"] .dp-anchor-row { display: none; }
+.dp-anchor-label { font-family: 'Inter', sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+.dp-anchor { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.dp-anchor button { background: rgba(255,255,255,0.015); border: none; border-right: 1px solid var(--border); color: var(--text-dim); font-family: 'Inter', sans-serif; font-size: 0.74rem; padding: 0.4rem 0.85rem; cursor: pointer; transition: background 0.15s, color 0.15s; }
+.dp-anchor button:last-child { border-right: none; }
+.dp-anchor button.active { background: rgba(224,148,34,0.1); color: var(--amber); font-weight: 600; }
+.dp-anchor-hint { font-family: 'Inter', sans-serif; font-size: 0.74rem; color: var(--text-muted); font-style: italic; flex-basis: 100%; }
+
+/* Upper-channel risk flag (item 12) */
+.dp-risk { margin: 0 0 1.6rem; padding: 0.95rem 1.2rem; background: rgba(192,57,43,0.07); border: 1px solid rgba(192,57,43,0.4); border-left-width: 3px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.86rem; line-height: 1.6; color: var(--text-dim); }
+.dp-risk[hidden] { display: none; }
+.dp-risk strong { color: var(--text); font-weight: 600; }
+.dp-risk a { color: var(--blue); text-decoration: none; border-bottom: 1px dotted rgba(109,179,212,0.5); }
+.dp-risk .dp-risk-tag { display: inline-block; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); margin-right: 0.4rem; }
+.dp-risk .dp-risk-thin { display: block; margin-top: 0.5rem; color: var(--text-muted); font-style: italic; }
+
 /* Verdict */
 .dp-verdict { text-align: center; padding: 1.3rem 1.2rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; margin: 0 0 1.6rem; }
+.dp-verdict-main .dp-pasttense { color: var(--text-dim); font-style: italic; }
 .dp-verdict-lead { font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
 .dp-verdict-main { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.3rem, 3.2vw, 1.75rem); line-height: 1.3; color: #f2eee8; }
 .dp-verdict-main strong { color: var(--amber); font-weight: 600; }
