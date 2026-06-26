@@ -74,7 +74,7 @@
   };
   var anchorUserSet = false;   // once the reader picks an anchor, stop auto-preferring
   var liveTodayPrice = null, liveTodayPos = null;
-  var entryMark = null;        // {x, y, label} for the "you deployed here" marker
+  var buyMarks = [], markLabel = '';   // "you deployed here" buy-point markers (one per tranche)
 
   // ── Channel-position display (item 3): ×trend + plain label. Raw pos stays
   //    internal (logic only); never shown as the primary number. ──
@@ -98,17 +98,28 @@
     return a;
   }
   function btcHeldAt(events, priceAt, t) { var btc = 0; for (var i = 0; i < events.length; i++) if (events[i].d <= t + 1e-9) btc += (events[i].w * state.sum) / priceAt(events[i].d); return btc; }
-  function valueSeries(events, priceAt, span, baseDay) {
+  // ── Chart series are PRICE-per-BTC, anchored at the live spot / matched entry
+  //    price (not the deployed sum) — the Power Law channel orientation. Dollar
+  //    value + multiples live in the verdict. Fixes the value-space anchor that
+  //    pinned t=0 to the sum (BUG_projective_anchor). ──
+  function bandLine(mult, baseDay, span) {
     var pts = [], step = Math.max(12, span / 80), d;
-    for (d = 0; d <= span + 1e-6; d += step) pts.push({ x: baseDay + d, y: btcHeldAt(events, priceAt, d) * priceAt(d) });
-    pts.push({ x: baseDay + span, y: btcHeldAt(events, priceAt, span) * priceAt(span) });
+    for (d = 0; d <= span + 1e-6; d += step) pts.push({ x: baseDay + d, y: plPrice(baseDay + d) * mult });
+    pts.push({ x: baseDay + span, y: plPrice(baseDay + span) * mult });
     return pts;
   }
-  function bandSeries(btcRef, baseDay, span, mult) {
+  function pricePath(priceFn, span, baseDay) {
     var pts = [], step = Math.max(12, span / 80), d;
-    for (d = 0; d <= span + 1e-6; d += step) pts.push({ x: baseDay + d, y: btcRef * plPrice(baseDay + d) * mult });
-    pts.push({ x: baseDay + span, y: btcRef * plPrice(baseDay + span) * mult });
+    for (d = 0; d <= span + 1e-6; d += step) pts.push({ x: baseDay + d, y: priceFn(d) });
+    pts.push({ x: baseDay + span, y: priceFn(span) });
     return pts;
+  }
+  // buy points: one per tranche, at the price along `priceFn` when it was bought —
+  // a lump is one dot, a ladder/hybrid several, so the chart reflects the style.
+  function buyMarksFor(style, priceFn, baseDay) {
+    var ev = buyEvents(style), maxw = 0, tagged = false;
+    ev.forEach(function (e) { if (e.w > maxw) maxw = e.w; });
+    return ev.map(function (e) { var p = !tagged && e.w >= maxw - 1e-9; if (p) tagged = true; return { x: baseDay + e.d, y: priceFn(e.d), primary: p }; });
   }
   // multiple (value/sum) for a plan deployed at entryDay over the real record
   function planMultiple(style, entryDay, span) {
@@ -142,73 +153,74 @@
   function effectiveAnchor() { return state.view === 'retrospective' ? state.anchor : null; }
   function livePos() { return (liveTodayPos != null) ? liveTodayPos : posOf(TODAY_PRICE, TODAY_DAYS); }
 
-  // ════════ CHART ════════
+  // ════════ CHART (price-per-BTC + Power Law channel; anchored at spot/entry) ════════
   var chart = null;
   var markerPlugin = {
     id: 'dpEntryMark',
     afterDatasetsDraw: function (c) {
-      if (!entryMark) return;
+      if (!buyMarks.length) return;
       var xS = c.scales.x, yS = c.scales.y, ctx = c.ctx, area = c.chartArea;
-      var x = xS.getPixelForValue(entryMark.x), y = yS.getPixelForValue(entryMark.y);
-      if (x < area.left - 2 || x > area.right + 2) return;
       ctx.save();
-      ctx.strokeStyle = 'rgba(224,148,34,0.5)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
-      ctx.beginPath(); ctx.moveTo(x, area.top); ctx.lineTo(x, area.bottom); ctx.stroke(); ctx.setLineDash([]);
-      ctx.fillStyle = AMBER; ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#0a0908'; ctx.lineWidth = 1.5; ctx.stroke();
-      ctx.fillStyle = AMBER; ctx.font = '600 10px Inter, sans-serif';
-      var tx = Math.min(x + 7, area.right - 90); ctx.textAlign = 'left';
-      ctx.fillText(entryMark.label, tx, area.top + 11);
+      var pm = null;
+      for (var i = 0; i < buyMarks.length; i++) {
+        var m = buyMarks[i], x = xS.getPixelForValue(m.x), y = yS.getPixelForValue(m.y);
+        if (x < area.left - 2 || x > area.right + 2) continue;
+        ctx.fillStyle = AMBER; ctx.globalAlpha = m.primary ? 1 : 0.55;
+        ctx.beginPath(); ctx.arc(x, y, m.primary ? 4.5 : 3, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 1; ctx.strokeStyle = '#0a0908'; ctx.lineWidth = 1.3; ctx.stroke();
+        if (m.primary) pm = { x: x, y: y };
+      }
+      if (pm) {
+        ctx.strokeStyle = 'rgba(224,148,34,0.4)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+        ctx.beginPath(); ctx.moveTo(pm.x, area.top); ctx.lineTo(pm.x, area.bottom); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = AMBER; ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText(markLabel, Math.min(pm.x + 7, area.right - 120), area.top + 11);
+      }
       ctx.restore();
     }
   };
 
   function band(label, data, color, dash, w) { return { label: label, data: data, borderColor: color, backgroundColor: color, borderWidth: w, borderDash: dash || undefined, pointRadius: 0, tension: 0.2, fill: false, order: 4 }; }
+  function bandTriple(baseDay, span) {
+    return [band('Floor (0.42× trend)', bandLine(PL_FLOOR, baseDay, span), FLOOR_C, [6, 3], 1.4),
+            band('Trend', bandLine(1, baseDay, span), TREND_C, null, 2),
+            band('Upper (3× trend)', bandLine(PL_CEIL, baseDay, span), UPPER_C, [1, 6], 1.1)];
+  }
 
   function chartDatasets() {
     var span = state.horizon * YEAR_D, pos = livePos(), ds = [];
-    entryMark = null;
+    buyMarks = []; markLabel = '';
 
     if (state.view === 'projective') {
       var baseDay = todayD;
       var trajPrice = function (d) { return plPrice(todayD + d) * ratioOf(pos); };
       var revertPrice = function (d) { return plPrice(todayD + d) * ratioOf(revertPos(pos, Math.min(1, d / span))); };
-      var btcRef = state.sum / trajPrice(0);
-      var ev = buyEvents(state.style);
-      ds.push(band('Floor (0.42× trend)', bandSeries(btcRef, baseDay, span, PL_FLOOR), FLOOR_C, [6, 3], 1.4));
-      ds.push(band('Trend', bandSeries(btcRef, baseDay, span, 1), TREND_C, null, 2));
-      ds.push(band('Upper (3× trend)', bandSeries(btcRef, baseDay, span, PL_CEIL), UPPER_C, [1, 6], 1.1));
-      ds.push({ label: 'Reversion to trend', data: valueSeries(ev, revertPrice, span, baseDay), borderColor: REVERT_C, backgroundColor: 'rgba(224,148,34,0.10)', borderWidth: 2.4, pointRadius: 0, tension: 0.2, fill: '+1', order: 1 });
-      ds.push({ label: 'Stay on current trajectory', data: valueSeries(ev, trajPrice, span, baseDay), borderColor: TRAJ_C, backgroundColor: 'transparent', borderWidth: 2, borderDash: [5, 3], pointRadius: 0, tension: 0.2, fill: false, order: 1 });
-      entryMark = { x: todayD, y: state.sum / trajPrice(0) * trajPrice(0), label: 'You deploy here · today' };
-      // entryMark.y = stack value at t0 (≈ the first laddered tranche for ladder; full sum for lump)
-      entryMark.y = btcHeldAt(ev, trajPrice, 0) * trajPrice(0) || state.sum;
+      ds = bandTriple(baseDay, span);
+      ds.push({ label: 'Reversion to trend', data: pricePath(revertPrice, span, baseDay), borderColor: REVERT_C, backgroundColor: 'rgba(224,148,34,0.10)', borderWidth: 2.4, pointRadius: 0, tension: 0.2, fill: '+1', order: 1 });
+      ds.push({ label: 'Stay on current trajectory', data: pricePath(trajPrice, span, baseDay), borderColor: TRAJ_C, backgroundColor: 'transparent', borderWidth: 2, borderDash: [5, 3], pointRadius: 0, tension: 0.2, fill: false, order: 1 });
+      buyMarks = buyMarksFor(state.style, trajPrice, baseDay);   // where each tranche buys along the "stay" path
+      markLabel = 'You deploy here · today';
       return ds;
     }
 
     // ── retrospective ──
-    var anchor = effectiveAnchor();
-    if (anchor === 'time') {
+    if (effectiveAnchor() === 'time') {
       var ta = timeAnchor(state.style, span), aDay = ta.entryDay, hold = ta.hold;
-      var realPrice = function (d) { return realPriceAt(aDay + d); };
-      var btcRefT = state.sum / realPrice(0);
-      ds.push(band('Floor (0.42× trend)', bandSeries(btcRefT, aDay, hold, PL_FLOOR), FLOOR_C, [6, 3], 1.4));
-      ds.push(band('Trend', bandSeries(btcRefT, aDay, hold, 1), TREND_C, null, 2));
-      ds.push(band('Upper (3× trend)', bandSeries(btcRefT, aDay, hold, PL_CEIL), UPPER_C, [1, 6], 1.1));
-      ds.push({ label: 'Your stack (actual history)', data: valueSeries(buyEvents(state.style), realPrice, hold, aDay), borderColor: REAL_C, borderWidth: 2.4, pointRadius: 0, tension: 0.2, fill: false, order: 1 });
-      entryMark = { x: aDay, y: btcHeldAt(buyEvents(state.style), realPrice, 0) * realPrice(0) || state.sum, label: 'You deployed here · ' + monthYear(aDay) };
+      var realPriceT = function (d) { return realPriceAt(aDay + d); };
+      ds = bandTriple(aDay, hold);
+      ds.push({ label: 'BTC price (actual history)', data: pricePath(realPriceT, hold, aDay), borderColor: REAL_C, borderWidth: 2.4, pointRadius: 0, tension: 0.2, fill: false, order: 1 });
+      buyMarks = buyMarksFor(state.style, realPriceT, aDay);
+      markLabel = 'You deployed here · ' + monthYear(aDay);
       return ds;
     }
     // channel-anchored: replay the representative (most recent) match; verdict carries the distribution
     var dist = channelDist(state.style, pos, span);
     var repDay = dist.repIdx >= 0 ? S[dist.repIdx].d : Math.max(FIRST_D, LAST_D - span);
     var rPrice = function (d) { return realPriceAt(repDay + d); };
-    var btcRefC = state.sum / rPrice(0);
-    ds.push(band('Floor (0.42× trend)', bandSeries(btcRefC, repDay, span, PL_FLOOR), FLOOR_C, [6, 3], 1.4));
-    ds.push(band('Trend', bandSeries(btcRefC, repDay, span, 1), TREND_C, null, 2));
-    ds.push(band('Upper (3× trend)', bandSeries(btcRefC, repDay, span, PL_CEIL), UPPER_C, [1, 6], 1.1));
-    ds.push({ label: 'Representative match (actual history)', data: valueSeries(buyEvents(state.style), rPrice, span, repDay), borderColor: REAL_C, borderWidth: 2.4, pointRadius: 0, tension: 0.2, fill: false, order: 1 });
-    entryMark = { x: repDay, y: btcHeldAt(buyEvents(state.style), rPrice, 0) * rPrice(0) || state.sum, label: 'You deployed here · ' + monthYear(repDay) };
+    ds = bandTriple(repDay, span);
+    ds.push({ label: 'BTC price (actual history)', data: pricePath(rPrice, span, repDay), borderColor: REAL_C, borderWidth: 2.4, pointRadius: 0, tension: 0.2, fill: false, order: 1 });
+    buyMarks = buyMarksFor(state.style, rPrice, repDay);
+    markLabel = 'You deployed here · ' + monthYear(repDay);
     return ds;
   }
 
