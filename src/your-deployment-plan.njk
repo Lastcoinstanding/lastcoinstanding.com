@@ -159,7 +159,7 @@ eleventyComputed:
     <p class="dp-eyebrow">The commitment backstop</p>
     <h2>Given long enough, entries have historically recovered</h2>
     <div class="dp-prose" style="max-width:none;">
-      <p>Three things compound into your eventual stack: <em>where</em> in the channel you bought, the <em>lump-vs-ladder-vs-hybrid</em> choice, and <em>patience</em> over a long horizon. They add up together &mdash; a long hold doesn&rsquo;t erase the edge from buying low in the channel, it builds on it. That said, the horizon does the heaviest lifting: over a <em>long</em> enough hold even a poorly-positioned entry has recovered. A multi-year tendency, not a promise &mdash; over short horizons entries have frequently sat underwater (including now &mdash; price has been below the Power Law trend about 58% of the time, above it about 42%). Mean value-multiple of a deployment, by entry position and how long it was held &mdash; computed live from the current record:</p>
+      <p>Three things compound into your eventual stack: <em>where</em> in the channel you bought, the <em>lump-vs-ladder-vs-hybrid</em> choice, and <em>patience</em> over a long horizon. They add up together &mdash; a long hold doesn&rsquo;t erase the edge from buying low in the channel, it builds on it. That said, the horizon does the heaviest lifting: over a <em>long</em> enough hold even a poorly-positioned entry has recovered. A multi-year tendency, not a promise &mdash; over short horizons entries have frequently sat underwater (including now &mdash; price has been below the Power Law trend about 58% of the time, above it about 42%). Mean value-multiple if you&rsquo;d deployed at each entry position the given number of years ago and <strong>held to today</strong> &mdash; computed live from the current price:</p>
     </div>
     <div class="dp-table-wrap">
       <table class="dp-table">
@@ -168,7 +168,6 @@ eleventyComputed:
       </table>
     </div>
     <div class="dp-takeaway" id="dpBackstopTakeaway"></div>
-    <p class="dp-earlyera" id="dpBackstopEarlyEra"></p>
 
     <div class="dp-prose" style="max-width:none; margin-top:2rem;">
       <p>And the edge from timing has been shrinking anyway: Bitcoin&rsquo;s swings have compressed cycle over cycle, so it increasingly lives low-to-mid channel where decisiveness wins. The clever &ldquo;wait for the top to pass, then ladder down&rdquo; move is one you rarely get to use anymore. Maximum channel position reached, by four-year window:</p>
@@ -202,7 +201,7 @@ eleventyComputed:
       <li><strong>Early-era cut:</strong> headline figures &mdash; the channel-anchored distribution and the commitment-backstop table &mdash; are computed from <strong>2013 onward</strong>. Bitcoin&rsquo;s first four years (2009&ndash;2012) traded as a sub-$15 curiosity whose real two-year returns ran 100&ndash;200&times; (and eight-year backstop figures into the thousands) &mdash; numbers no buyer today could replicate. Those entries are excluded from every headline number and shown only as marked context, never silently dropped. The time-anchored and projective views deploy from today and so are unaffected.</li>
       <li><strong>Projective</strong> deploys today and extends two Power Law paths &mdash; reversion-to-trend and stay-on-trajectory &mdash; as a range. Both are extrapolations of an empirical regularity, <em>not forecasts</em>.</li>
       <li>Lump deploys the full sum at once; ladder spreads it equally over the chosen duration; hybrid deploys a chosen share now and ladders the rest. Value is BTC accumulated &times; price along the path; multiples are amount-invariant, the dollar figures just scale with the sum.</li>
-      <li>Commitment backstop: mean value-multiple by hold length, <strong>8-year exit convention</strong> (nearest sample to entry&nbsp;+&nbsp;8&nbsp;&times;&nbsp;365.25&nbsp;days); ~1&ndash;3% sensitivity. Worst-entry recovery is the range for entries above 1.5&times; channel position, recovered to the latest sample.</li>
+      <li>Commitment backstop: <strong>today-anchored</strong>. For each hold length N, entries deployed ~N years ago (a ~1.8-year window centred N years before today) are bucketed by channel position and valued at <strong>today&rsquo;s live price &divide; entry price</strong> &mdash; what each would be worth now, not its value at a historical cycle peak. Recomputes live as the price moves. (The 2013 early-era cut still governs the channel-anchored distribution above, a separate computation.)</li>
       <li id="dpMethodWindow">Computed live from the current <code>PL_DATA</code> window.</li>
       <li>Today&rsquo;s channel position is computed at load from the latest sample and the live spot (CoinGecko, via the shared fetch) &mdash; never baked in.</li>
     </ul>

@@ -391,6 +391,7 @@
     if (metaEl) metaEl.textContent = 'Live: ' + fmtUSD(price) + ' · ' + ratio.toFixed(2) + '× trend' + (source === 'live' ? '' : ' (latest sample)') + ' · recomputed every load.';
     updateRiskFlag();
     updateChart(); updateVerdict();
+    renderTables();   // today-anchored backstop recomputes with the live exit price (2E-A1)
   }
   function updateRiskFlag() {
     var el = document.getElementById('dpRisk'); if (!el) return;
@@ -407,23 +408,34 @@
   var HOLDS = [2, 4, 6, 8];
   function bucketName(pos) { return pos < 0.33 ? 'lower' : (pos < 0.66 ? 'mid' : 'upper'); }
   function nearestIdx(t) { var b = 0, bd = Infinity; for (var j = 0; j < N; j++) { var dd = Math.abs(S[j].d - t); if (dd < bd) { bd = dd; b = j; } } return b; }
-  // cut=true → headline (2013 onward); cut=false → full set, used only to quote what
-  // the early era would add in the marked caveat (item: keep but mark).
-  function backstop(cut) {
-    var agg = { lower: {}, mid: {}, upper: {} }, b, h;
+  // Today-anchored commitment backstop (Stage 2E-A1): for each hold length N, entries
+  // deployed ~N years ago (a ~1.8yr window centred N years before today), bucketed by
+  // channel position, valued at TODAY's live price ÷ entry price — what each would be
+  // worth now. Recomputes live. The 2013 early-era cut is intentionally NOT applied here
+  // (the today-anchor already excludes the ancient cycle-peak exits the cut suppressed);
+  // the cut still applies to the channel-anchored distribution / verdict (channelDist).
+  function exitPrice() { return liveTodayPrice != null ? liveTodayPrice : TODAY_PRICE; }
+  function backstop() {
+    var exit = exitPrice(), HALF = 0.9 * YEAR_D, agg = { lower: {}, mid: {}, upper: {} }, b, h;
     for (b in agg) for (h = 0; h < HOLDS.length; h++) agg[b][HOLDS[h]] = [];
-    for (var i = 0; i < N; i++) { if (cut && isEarly(S[i].d)) continue; var bk = bucketName(S[i].pos); for (h = 0; h < HOLDS.length; h++) { var t = S[i].d + HOLDS[h] * YEAR_D; if (t > S[N - 1].d) continue; agg[bk][HOLDS[h]].push(S[nearestIdx(t)].p / S[i].p); } }
+    for (h = 0; h < HOLDS.length; h++) {
+      var center = todayD - HOLDS[h] * YEAR_D;
+      for (var i = 0; i < N; i++) { if (Math.abs(S[i].d - center) > HALF) continue; agg[bucketName(S[i].pos)][HOLDS[h]].push(exit / S[i].p); }
+    }
     var out = {}; for (b in agg) { out[b] = {}; for (h = 0; h < HOLDS.length; h++) { var arr = agg[b][HOLDS[h]], m = 0; for (var k = 0; k < arr.length; k++) m += arr[k]; out[b][HOLDS[h]] = arr.length ? m / arr.length : null; } } return out;
   }
-  function worstRecovery(cut) { var mn = Infinity, mx = 0; for (var i = 0; i < N; i++) if ((!cut || !isEarly(S[i].d)) && S[i].pos > 1.5) { var m = S[N - 1].p / S[i].p; if (m < mn) mn = m; if (m > mx) mx = m; } return { min: mn, max: mx }; }
   function compression() { var W = [[2011, 2014], [2015, 2018], [2019, 2022], [2023, 2026]], out = []; for (var w = 0; w < W.length; w++) { var mx = -Infinity; for (var i = 0; i < N; i++) if (S[i].yr >= W[w][0] && S[i].yr <= W[w][1]) mx = Math.max(mx, S[i].pos); if (mx > -Infinity) out.push({ label: W[w][0] + '–' + W[w][1], max: mx }); } return out; }
   function renderTables() {
-    var bs = backstop(true), bsFull = backstop(false), tb = document.getElementById('dpBackstopBody');
+    var bs = backstop(), tb = document.getElementById('dpBackstopBody');
     if (tb) { var rows = [['lower', 'Lower channel'], ['mid', 'Mid-channel'], ['upper', 'Upper channel']], html = ''; for (var r = 0; r < rows.length; r++) { html += '<tr class="dp-row-' + rows[r][0] + '"><th>' + rows[r][1] + '</th>'; for (var h = 0; h < HOLDS.length; h++) { var v = bs[rows[r][0]][HOLDS[h]]; html += '<td' + (h === HOLDS.length - 1 ? ' class="dp-strong"' : '') + '>' + fmtMult(v) + '</td>'; } html += '</tr>'; } tb.innerHTML = html; }
-    var ee = document.getElementById('dpBackstopEarlyEra');
-    if (ee) ee.innerHTML = 'These exclude Bitcoin&rsquo;s sub-$15 curiosity era (2009&ndash;2012), when prices were too small to represent a return any buyer today could replicate. Counted in, the long-hold lower-channel cells balloon on those tiny prices &mdash; lower-channel 8-year reads about <strong>' + fmtMult(bsFull.lower[8]) + '</strong> with that era in, versus <strong>' + fmtMult(bs.lower[8]) + '</strong> without. Marked here, never the headline.';
-    var wr = worstRecovery(true), tk = document.getElementById('dpBackstopTakeaway');
-    if (tk) { var H = state.horizon, up = bs.upper[H]; tk.innerHTML = 'Over a <strong>' + H + '-year</strong> hold, even <strong>upper-channel</strong> entries — the worst-timed buys — returned about <strong>' + fmtMult(up) + '</strong> on average; the literal worst entries in history still returned <strong>' + fmtMult(wr.min) + ' to ' + fmtMult(wr.max) + '</strong> by the latest sample. That is a multi-year tendency, <em>not</em> a guarantee: over short horizons entries have frequently sat underwater — including now (price has been below the Power Law trend about 58% of the time, above it about 42%). Recovery has historically come with time held, not on demand.'; }
+    var tk = document.getElementById('dpBackstopTakeaway');
+    if (tk) {
+      var H = state.horizon, up = bs.upper[H];
+      var lead = (up != null)
+        ? 'Even <strong>upper-channel</strong> entries — the worst-timed buys — deployed <strong>' + H + ' years ago</strong> and held to today still returned about <strong>' + fmtMult(up) + '</strong> on average. '
+        : 'Bitcoin hasn&rsquo;t sat high in the channel within the last <strong>' + H + ' years</strong>, so there are no upper-channel entries that recent to show — but over longer holds even the worst-timed buys have recovered to today. ';
+      tk.innerHTML = lead + 'That is a multi-year tendency, <em>not</em> a guarantee: over short horizons entries have frequently sat underwater — including now (price has been below the Power Law trend about 58% of the time, above it about 42%). Recovery has historically come with time held, not on demand.';
+    }
     var cp = compression(), cb = document.getElementById('dpCompressionBody');
     if (cb) { var ch = ''; for (var i = 0; i < cp.length; i++) ch += '<tr><th>' + cp[i].label + '</th><td class="dp-strong">' + cp[i].max.toFixed(2) + '</td></tr>'; cb.innerHTML = ch; }
     var mw = document.getElementById('dpMethodWindow');

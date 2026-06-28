@@ -108,15 +108,21 @@
     return best;
   }
   var HOLDS = [2, 4, 6, 8];
+  // Today-anchored commitment backstop (Stage 2E-A1): for each hold length N, take
+  // entries deployed ~N years ago (a ~1.8yr window centred N years before today),
+  // bucket by channel position, and value each at TODAY's live price ÷ entry price —
+  // what each entry would actually be worth now. Recomputes live as the price moves;
+  // supersedes the old historical-exit convention (which measured cycle-peak exits and
+  // produced implausible thousands-× cells).
+  function exitPrice() { return liveTodayPrice != null ? liveTodayPrice : TODAY_PRICE; }
   function backstop() {
-    var agg = { lower: {}, mid: {}, upper: {} }, b, h;
+    var exit = exitPrice(), HALF = 0.9 * 365.25, agg = { lower: {}, mid: {}, upper: {} }, b, h;
     for (b in agg) for (h = 0; h < HOLDS.length; h++) agg[b][HOLDS[h]] = [];
-    for (var i = 0; i < N; i++) {
-      var bk = bucketName(S[i].pos);
-      for (h = 0; h < HOLDS.length; h++) {
-        var t = S[i].d + HOLDS[h] * 365.25;
-        if (t > LAST_D) continue;            // exit must exist (locked convention: nearest sample to entry+H×365.25)
-        agg[bk][HOLDS[h]].push(S[nearestIdx(t)].p / S[i].p);
+    for (h = 0; h < HOLDS.length; h++) {
+      var center = todayD - HOLDS[h] * 365.25;
+      for (var i = 0; i < N; i++) {
+        if (Math.abs(S[i].d - center) > HALF) continue;
+        agg[bucketName(S[i].pos)][HOLDS[h]].push(exit / S[i].p);
       }
     }
     var out = {};
@@ -129,13 +135,6 @@
       }
     }
     return out;
-  }
-  function worstRecovery() {
-    var mn = Infinity, mx = 0, cnt = 0;
-    for (var i = 0; i < N; i++) {
-      if (S[i].pos > 1.5) { cnt++; var m = S[N - 1].p / S[i].p; if (m < mn) mn = m; if (m > mx) mx = m; }
-    }
-    return { cnt: cnt, min: mn, max: mx };
   }
 
   // ── §4.5 volatility compression: max channel position by 4-year window ──
@@ -192,6 +191,16 @@
           ctx.setLineDash([]); ctx.fillStyle = AMBER; ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'center';
           ctx.fillText('TODAY', xt, area.top + 11); ctx.restore();
         }
+      }
+      // slider position (moving, solid cream) — couples the slider to the curve;
+      // distinct from the fixed amber-dashed TODAY line (Stage 2E-B). The full
+      // −0.1→1.15 x-range is preserved so the lump→ladder crossover stays visible.
+      var xsl = xS.getPixelForValue(state.pos);
+      if (xsl >= area.left && xsl <= area.right) {
+        ctx.save(); ctx.strokeStyle = 'rgba(242,238,232,0.6)'; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.moveTo(xsl, area.top); ctx.lineTo(xsl, area.bottom); ctx.stroke();
+        ctx.fillStyle = '#f2eee8'; ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('SLIDER', xsl, area.bottom - 4); ctx.restore();
       }
     }
   };
@@ -352,7 +361,8 @@
           { label: 'Trend', data: b.trend, borderColor: TREND, borderWidth: 1.8, pointRadius: 0, tension: 0.2, order: 4 },
           { label: 'Upper (3×)', data: b.upper, borderColor: '#d4a843', borderWidth: 1.1, borderDash: [1, 5], pointRadius: 0, tension: 0.2, order: 6 },
           { label: "Entry you're testing", data: entryLine(state.pos), borderColor: '#f2eee8', borderWidth: 1.6, borderDash: [7, 4], pointRadius: 0, tension: 0.2, order: 3 },
-          { label: 'Historical price', data: PL_DATA.map(function (p) { return { x: p[0], y: p[1] }; }), borderColor: HISTORY, borderWidth: 1.2, pointRadius: 0, tension: 0.15, order: 1 },
+          // trailing point at todayD so the white line reaches the live Today marker (2E-C1); its y is updated live in renderChannelContext
+          { label: 'Historical price', data: PL_DATA.map(function (p) { return { x: p[0], y: p[1] }; }).concat([{ x: todayD, y: TODAY_PRICE }]), borderColor: HISTORY, borderWidth: 1.2, pointRadius: 0, tension: 0.15, order: 1 },
           { label: 'Today', data: [{ x: todayD, y: TODAY_PRICE }], borderColor: AMBER, backgroundColor: AMBER, pointRadius: 5, pointHoverRadius: 6, showLine: false, order: 0 }
         ]
       },
@@ -491,12 +501,15 @@
     // poke the live today marker on the context chart so the dot + pulse track the live spot
     if (channelChart && channelChart.data && channelChart.data.datasets[TODAY_DS]) {
       channelChart.data.datasets[TODAY_DS].data[0].y = price;
+      var hist = channelChart.data.datasets[4].data;       // extend the white line to the live Today marker (2E-C1)
+      hist[hist.length - 1].y = price;
       channelChart.update('resize');   // 'resize' so the in-place mutation relayouts and the pulse repositions
     }
     if (advChart) advChart.update('none');
     // The slider tracks today's live position until the reader drags it (B1).
     positionTodayMarker();
     if (!userMoved) setSliderPos(liveTodayPos, false);
+    renderBackstop();   // today-anchored table recomputes with the live exit price (2E-A1)
   }
 
   // ════════ TABLES ════════
@@ -514,11 +527,14 @@
       html += '</tr>';
     }
     tb.innerHTML = html;
-    // horizon-keyed takeaway
-    var wr = worstRecovery(), tk = document.getElementById('lslBackstopTakeaway');
+    // horizon-keyed takeaway (today-anchored: deployed N years ago, held to today)
+    var tk = document.getElementById('lslBackstopTakeaway');
     if (tk) {
       var H = state.horizon, up = bs.upper[H];
-      tk.innerHTML = 'Over a <strong>' + H + '-year</strong> hold, even <strong>upper-channel</strong> entries — the worst-timed buys — returned about <strong>' + fmtMult(up) + '</strong> on average; the literal worst entries in history (blow-off tops above the upper band) still returned <strong>' + fmtMult(wr.min) + ' to ' + fmtMult(wr.max) + '</strong> by the latest sample. '
+      var lead = (up != null)
+        ? 'Even <strong>upper-channel</strong> entries — the worst-timed buys — deployed <strong>' + H + ' years ago</strong> and held to today still returned about <strong>' + fmtMult(up) + '</strong> on average. '
+        : 'Bitcoin hasn&rsquo;t sat high in the channel within the last <strong>' + H + ' years</strong>, so there are no upper-channel entries that recent to show — but over longer holds even the worst-timed buys have recovered to today. ';
+      tk.innerHTML = lead
         + 'That is a multi-year tendency, <em>not</em> a guarantee: over short horizons entries have frequently sat underwater — including now (price has been below the Power Law trend about 58% of the time, above it about 42%). Recovery has historically come with time held, not on demand.';
     }
   }

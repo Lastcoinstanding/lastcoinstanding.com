@@ -32,7 +32,7 @@ eleventyComputed:
     <p>Accumulating Bitcoin can involve both a lump sum and DCA. This page examines how the two compared historically, and how that comparison shifts with where price sits in its Power Law channel. The next, sister page &mdash; Your Bitcoin Deployment Plan &mdash; then provides a calculator to help you get comfortable with your own decision.</p>
     <p class="lsl-footnote"><strong>DCA</strong> &mdash; dollar-cost averaging: deploying a fixed amount on a regular cadence (e.g. every paycheck) as a savings discipline, rather than all at once.</p>
     <p>Looking back at Bitcoin&rsquo;s price history, the rule of thumb is that a lump-sum buy has, on average, outperformed spreading smaller buys out over time. Generally, Bitcoin price trends up over time, and time in the market beats waiting on the sidelines.</p>
-    <p>But that average hides something useful. The lump-sum-versus-ladder choice isn&rsquo;t really about <em>timing</em>, and not really about <em>market sentiment</em> &mdash; it tracks position relative to the Power Law trend. Low in the channel, you&rsquo;re effectively buying at a <em>discount</em> to trend: if you hold the Power Law thesis, price tends to revert upward over time, so deploying decisively captured more Bitcoin. Higher in the channel, the gap between lump-sum and laddering narrowed, and laddering more often came out ahead. <span class="lsl-aside">(Why that edge is weaker than it looks &mdash; and what it means for your own deployment &mdash; is the subject of Your Bitcoin Deployment Plan.)</span></p>
+    <p>But that average hides something useful. The lump-sum vs. ladder choice is not so much about timing, price or market sentiment but really about <em>where bitcoin&rsquo;s price is in the Power Law channel</em>. Low in the channel, you&rsquo;re effectively buying at a <em>discount</em> to trend: if you hold the Power Law thesis, price tends to revert upward over time, so deploying decisively captured more Bitcoin. Higher in the channel, the gap between lump-sum and laddering narrowed, and laddering more often came out ahead. <span class="lsl-aside">(Why that edge is weaker than it looks &mdash; and what it means for your own deployment &mdash; is the subject of Your Bitcoin Deployment Plan.)</span></p>
     <p>And underneath all of it: historically, <em>over a long enough horizon</em>, every entry &mdash; even the literal worst tops in Bitcoin&rsquo;s history &mdash; has recovered to a large multiple. What this page explores is tactics, but commitment is the foundation.</p>
   </div>
 
@@ -50,7 +50,7 @@ eleventyComputed:
     <div class="lsl-ctx-readout">
       <div class="lsl-ctx-pos" id="lslCtxPos" aria-live="polite">&mdash;</div>
     </div>
-    <p class="lsl-chart-caption">The glowing marker is where Bitcoin sits today; the dashed white line is the entry you&rsquo;re testing &mdash; drag the slider to move it.</p>
+    <p class="lsl-chart-caption">The glowing marker is where Bitcoin sits today; the dashed white line is the entry you&rsquo;re testing &mdash; drag the slider below to move it.</p>
   </section>
 
   <!-- ════════ THE DEMONSTRATION ════════ -->
@@ -136,7 +136,7 @@ eleventyComputed:
     <p class="lsl-eyebrow">The commitment backstop</p>
     <h2>Given long enough, entries have historically recovered</h2>
     <div class="lsl-prose" style="max-width:none;">
-      <p>Three things compound into your eventual stack: <em>where</em> in the channel you bought, the <em>lump-vs-ladder</em> choice, and <em>patience</em> over a long horizon. They add up together &mdash; a long hold doesn&rsquo;t erase the edge from buying low in the channel, it builds on it. That said, the horizon does the heaviest lifting: over a <em>long</em> enough hold even a poorly-positioned entry has recovered. A multi-year tendency, not a promise &mdash; over short horizons entries have frequently sat underwater (including now &mdash; price has been below the Power Law trend about 58% of the time, above it about 42%). Mean value-multiple of a deployment, by entry position and how long it was held &mdash; computed live from the current record:</p>
+      <p>Three things compound into your eventual stack: <em>where</em> in the channel you bought, the <em>lump-vs-ladder</em> choice, and <em>patience</em> over a long horizon. They add up together &mdash; a long hold doesn&rsquo;t erase the edge from buying low in the channel, it builds on it. That said, the horizon does the heaviest lifting: over a <em>long</em> enough hold even a poorly-positioned entry has recovered. A multi-year tendency, not a promise &mdash; over short horizons entries have frequently sat underwater (including now &mdash; price has been below the Power Law trend about 58% of the time, above it about 42%). Mean value-multiple if you&rsquo;d deployed at each entry position the given number of years ago and <strong>held to today</strong> &mdash; computed live from the current price:</p>
     </div>
     <div class="lsl-table-wrap">
       <table class="lsl-table">
@@ -218,7 +218,7 @@ eleventyComputed:
     <ul>
       <li>Channel position is the log-space location between floor and ceiling: <code>(ln(price/trend) &minus; ln 0.42) / (ln 3.0 &minus; ln 0.42)</code> &mdash; 0 at the floor, 1 at the upper band.</li>
       <li>Backtest: a fixed sum deployed all-at-once vs. laddered equally across the chosen window, comparing BTC accumulated, bucketed by entry channel position. The advantage is amount-invariant.</li>
-      <li>Commitment backstop: mean value-multiple by hold length. <strong>8-year exit convention</strong> &mdash; the nearest sample to (entry&nbsp;+&nbsp;8&nbsp;&times;&nbsp;365.25&nbsp;days); carries ~1&ndash;3% sensitivity (disclosure, not precision). Worst-entry recovery is the range for entries above 1.5&times; channel position (roughly the 2011/2013 blow-off tops), recovered to the latest sample.</li>
+      <li>Commitment backstop: <strong>today-anchored</strong>. For each hold length N, entries deployed ~N years ago (a ~1.8-year window centred N years before today) are bucketed by channel position and valued at <strong>today&rsquo;s live price &divide; entry price</strong> &mdash; what each entry would be worth now, not its value at some historical cycle peak. Recomputes live as the price moves.</li>
       <li id="lslMethodWindow"></li>
       <li>Today&rsquo;s channel position is computed at load from the latest sample and the live spot (CoinGecko, via the shared fetch) &mdash; never baked in.</li>
     </ul>
