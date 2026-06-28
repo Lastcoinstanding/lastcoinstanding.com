@@ -195,6 +195,27 @@ body { background: var(--bg); color: var(--text); }
 .lsl-takeaway { background: rgba(224,148,34,0.04); border: 1px solid rgba(224,148,34,0.18); border-radius: 8px; padding: 1rem 1.2rem; margin: 1.2rem 0; font-size: 0.92rem; line-height: 1.65; color: var(--text); }
 .lsl-takeaway strong { color: var(--amber); }
 
+/* ── "Deploying high in the channel" position-aware caution (Stage 2F) ── */
+.lsl-highrisk-body { margin: 1.4rem auto 0; max-width: 880px; }
+.lsl-hr-quiet { font-family: 'Inter', sans-serif; font-size: 0.9rem; line-height: 1.65; color: var(--text-muted); margin: 0; }
+.lsl-hr-quiet strong { color: var(--text-dim); font-weight: 600; }
+.lsl-hr-flag { border: 1px solid; border-left-width: 3px; border-radius: 8px; padding: 1.1rem 1.3rem; }
+.lsl-hr-tier-soft .lsl-hr-flag { background: rgba(224,148,34,0.06); border-color: rgba(224,148,34,0.4); }
+.lsl-hr-tier-sharp .lsl-hr-flag { background: rgba(192,57,43,0.08); border-color: rgba(192,57,43,0.45); }
+.lsl-hr-tag { display: inline-block; font-family: 'Inter', sans-serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.55rem; }
+.lsl-hr-tier-soft .lsl-hr-tag { color: var(--amber); }
+.lsl-hr-tier-sharp .lsl-hr-tag { color: var(--red); }
+.lsl-hr-flag p { font-family: 'Inter', sans-serif; font-size: 0.9rem; line-height: 1.65; color: var(--text-dim); margin: 0 0 0.75rem; }
+.lsl-hr-flag p:last-child { margin-bottom: 0; }
+.lsl-hr-flag strong { color: var(--text); font-weight: 600; }
+.lsl-hr-num { font-weight: 600; }
+.lsl-hr-tier-soft .lsl-hr-num { color: var(--amber); }
+.lsl-hr-tier-sharp .lsl-hr-num { color: var(--red); }
+/* waiting = mechanism prose, deliberately quieter than the cost number — never a stat */
+.lsl-hr-wait { font-style: italic; color: var(--text-muted); }
+.lsl-hr-wait em { color: var(--text-dim); font-style: italic; }
+.lsl-hr-tie { color: var(--text-muted); }
+
 /* ── Honesty callouts ── */
 .belief-context { background: rgba(224,148,34,0.04); border: 1px solid rgba(224,148,34,0.18); border-radius: 8px; padding: 1.1rem 1.3rem; margin: 1.6rem auto; max-width: 880px; }
 .belief-context-label { font-family: 'Inter', sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.5rem; }

@@ -148,6 +148,27 @@
     return out;
   }
 
+  // ── Stage 2F: the COST of deploying high — median max-drawdown-within-2yr for
+  //    high-channel entries (2017+). The drawdown below your deploy price within two
+  //    years, before any recovery. Computed once from the canonical series, never baked
+  //    in. This is the only number the "deploying high" caution shows; waiting is
+  //    mechanism-prose (a high reading reverting is channel geometry, not a tradeable
+  //    edge — showing a win-rate would make it a timing tool). ──
+  function channelDrawdown(minPos) {
+    var cut = (Date.UTC(2017, 0, 1) / 1000 - GENESIS_TS) / 86400, dds = [];
+    for (var i = 0; i < N; i++) {
+      if (S[i].d < cut || S[i].pos < minPos) continue;
+      if (S[i].d + 2 * 365.25 > LAST_D) continue;       // need the full 2yr window
+      var lo = S[i].p, end = S[i].d + 2 * 365.25;
+      for (var j = i; j < N && S[j].d <= end; j++) if (S[j].p < lo) lo = S[j].p;
+      dds.push((S[i].p - lo) / S[i].p);
+    }
+    dds.sort(function (a, b) { return a - b; });
+    return { n: dds.length, median: dds.length ? dds[Math.floor(dds.length * 0.5)] : null, worst: dds.length ? dds[dds.length - 1] : null };
+  }
+  var DD_UPPER = channelDrawdown(0.667);   // upper third (pos ≥ 0.667)
+  var DD_VERY = channelDrawdown(0.85);     // very high / near-or-above the upper band
+
   // ── Formatting helpers ──
   function fmtMult(m) { return m == null ? '—' : (m >= 100 ? Math.round(m).toLocaleString() : m.toFixed(1)) + '×'; }
   function fmtUSD(v) {
@@ -435,6 +456,7 @@
     if (!lede || !boxes) return;
     syncScrubReadout();
     updateRiskFlag();
+    updateHighRisk();   // position-aware "deploying high" caution (2F) tracks the slider
     var b = bucketAt(state.era, state.ladderN, state.pos);
     if (b.n < 4) {
       lede.innerHTML = 'Bitcoin has rarely sat <em>' + posLabel(state.pos) + '</em> in this window &mdash; too few historical entries here to read.';
@@ -484,6 +506,35 @@
     el.innerHTML = '<span class="lsl-risk-tag">High-risk zone for lump deployment</span> '
       + 'Up here a lump buys into the mean-reversion the channel predicts &mdash; this is where laddering&rsquo;s hedge earns its keep. Frame it honestly as a <strong>drawdown hedge, not a reliable edge</strong>: the rising channel means even the hedge isn&rsquo;t guaranteed to pay.'
       + (thin ? ' <span class="lsl-risk-thin">Small sample &mdash; only ~' + dy + ' distinct years sat this high, clustered into a handful of brief blow-off tops. Treat the demonstration here as illustrative, not statistical.</span>' : '');
+  }
+
+  // ════════ Stage 2F: position-aware "deploying high in the channel" caution ════════
+  // The COST is the only number (DD_UPPER / DD_VERY). Waiting is MECHANISM-PROSE — no
+  // win-rate, no "X% cheaper" figure (those are channel geometry, not a tradeable edge;
+  // showing them would make this a timing tool, against the site's anti-timing stance).
+  var HR_WAIT = 'That&rsquo;s the cost side. The other side is <strong>waiting</strong> &mdash; and here the channel&rsquo;s own shape matters: a high reading has historically been followed, eventually, by a lower one, because a cyclical asset oscillates within bands drawn relative to trend. But <em>that&rsquo;s geometry, not a forecast</em> &mdash; <em>when</em> a lower position arrives, and at <em>what absolute price</em>, is never promised. The trend rises underneath you, so &ldquo;lower in the channel&rdquo; can someday mean a <em>higher price after waiting</em>. And the volatility that made waiting pay in past cycles is compressing. Waiting is a real consideration up here &mdash; not a strategy with a guaranteed payoff.';
+  var HR_TIE = 'High in the channel is also where laddering&rsquo;s drawdown hedge earns its keep &mdash; so waiting and laddering are the two responses to upper-channel risk, with a lump the most exposed.';
+  function updateHighRisk() {
+    var el = document.getElementById('lslHighRiskBody'); if (!el) return;
+    var pos = state.pos, ratio = ratioOf(pos).toFixed(2);
+    if (pos < 0.667) {   // quiet — low/mid channel, not alarming
+      el.className = 'lsl-highrisk-body lsl-hr-tier-quiet';
+      el.innerHTML = '<p class="lsl-hr-quiet">This matters more the higher in the channel you are. At <strong>' + ratio + '× trend</strong> (' + posLabel(pos) + ') you&rsquo;re clear of upper-channel risk &mdash; drag the slider above toward the upper band to see what deploying high has historically cost.</p>';
+      return;
+    }
+    var sharp = pos >= 0.85;   // very high → sharper flag leads with the higher figure
+    var ddPct = Math.round((sharp ? DD_VERY.median : DD_UPPER.median) * 100);
+    var worstPct = Math.round(DD_UPPER.worst * 100);
+    var cost = sharp
+      ? 'You&rsquo;re buying <strong>' + ratio + '× trend</strong> &mdash; at or above the upper band. Historically (2017 on, ' + DD_VERY.n + ' entries), the highest entries went on to a <span class="lsl-hr-num">median ' + ddPct + '% drawdown within two years</span> before any recovery (worst ~' + worstPct + '%). This is the riskiest place to deploy a lump.'
+      : 'You&rsquo;re buying <strong>' + ratio + '× trend</strong> &mdash; high in the channel. Historically (2017 on, ' + DD_UPPER.n + ' entries), deploying into the upper channel went on to a <span class="lsl-hr-num">median ' + ddPct + '% drawdown within two years</span> before any recovery (worst ~' + worstPct + '%). That&rsquo;s the cost side of deploying high.';
+    el.className = 'lsl-highrisk-body lsl-hr-tier-' + (sharp ? 'sharp' : 'soft');
+    el.innerHTML = '<div class="lsl-hr-flag">'
+      + '<span class="lsl-hr-tag">' + (sharp ? 'Sharp caution &middot; near or above the upper band' : 'Caution &middot; upper channel') + '</span>'
+      + '<p class="lsl-hr-cost">' + cost + '</p>'
+      + '<p class="lsl-hr-wait">' + HR_WAIT + '</p>'
+      + '<p class="lsl-hr-tie">' + HR_TIE + '</p>'
+      + '</div>';
   }
 
   // ════════ LIVE CHANNEL CONTEXT (factual position callout — no recommendation) ════════
