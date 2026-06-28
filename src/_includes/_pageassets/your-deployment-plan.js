@@ -86,13 +86,9 @@
 
   // ── Channel-position display (item 3): ×trend + plain label. Raw pos stays
   //    internal (logic only); never shown as the primary number. ──
-  function posLabel(pos) {
-    if (pos < 0.12) return 'near the floor';
-    if (pos < 0.33) return 'low in the channel';
-    if (pos < 0.66) return 'mid-channel';
-    if (pos < 1.0) return 'high in the channel';
-    return 'above the upper band';
-  }
+  // Delegates to the shared graduated vocabulary (Stage 2H) so this page's live readout,
+  // verdict, and captions use the one canonical label set — no drifted local thresholds.
+  function posLabel(pos) { return positionLabel(pos); }
   function posDisplay(pos) { return ratioOf(pos).toFixed(2) + '× trend · ' + posLabel(pos); }
 
   // ── Buy schedule for a style ──
@@ -363,9 +359,9 @@
     var sn = STYLE_NAME[sel].toLowerCase();
     if (pos < 0.33) return 'With price <em>' + posLabel(pos) + '</em>, deploying decisively ' + tend + ' — ' + (past ? 'you bought below trend' : 'you&rsquo;re buying below trend') + '. '
       + (sel === 'lump' ? 'A <strong>lump</strong> ' + (past ? 'captured' : 'captures') + ' that edge in full.' : 'A <strong>' + sn + '</strong> ' + (past ? 'gave up' : 'gives up') + ' a little of that edge for the comfort of not deploying all at once.');
-    if (pos < 0.66) return 'Mid-channel ' + was + ' close to a coin-flip — <strong>commitment ' + (past ? 'mattered' : 'matters') + ' more than the tactic</strong>. A ' + (sel === 'hybrid' ? 'hybrid' : sel) + ' is a reasonable call; the spread between styles is small.';
-    if (pos < UPPER_RISK) return 'Getting toward the upper channel, the lump-sum edge thins and a <span class="dp-hedge">hybrid or ladder</span> ' + (past ? 'looked' : 'looks') + ' more attractive as a hedge.';
-    return '<span class="dp-hedge">High in the channel</span>, a lump buys into the mean-reversion the channel predicts — <strong>this is where laddering&rsquo;s hedge earns its keep</strong>. Treat it as a <a href="#cautions">drawdown hedge, not a reliable edge</a>: the rising channel means even the hedge isn&rsquo;t guaranteed to pay.';
+    if (pos < 0.66) return 'With price <em>' + posLabel(pos) + '</em>, it ' + was + ' close to a coin-flip — <strong>commitment ' + (past ? 'mattered' : 'matters') + ' more than the tactic</strong>. A ' + (sel === 'hybrid' ? 'hybrid' : sel) + ' is a reasonable call; the spread between styles is small.';
+    if (pos < UPPER_RISK) return 'With price <em>' + posLabel(pos) + '</em>, the lump-sum edge thins and a <span class="dp-hedge">hybrid or ladder</span> ' + (past ? 'looked' : 'looks') + ' more attractive as a hedge.';
+    return 'With price <span class="dp-hedge">' + posLabel(pos) + '</span>, a lump buys into the mean-reversion the channel predicts — <strong>this is where laddering&rsquo;s hedge earns its keep</strong>. Treat it as a <a href="#cautions">drawdown hedge, not a reliable edge</a>: the rising channel means even the hedge isn&rsquo;t guaranteed to pay.';
   }
 
   // ════════ LIVE READOUT + three-zone risk flag (rule #2; items 3 + 12) ════════

@@ -180,13 +180,9 @@
     if (v >= 1000) return '$' + (v / 1000).toFixed(1) + 'K';
     return '$' + Math.round(v).toLocaleString();
   }
-  function posLabel(pos) {
-    if (pos < 0.12) return 'near the floor';
-    if (pos < 0.33) return 'low in the channel';
-    if (pos < 0.66) return 'mid-channel';
-    if (pos < 1.0) return 'high in the channel';
-    return 'above the upper band';
-  }
+  // Delegates to the shared graduated vocabulary (Stage 2H) so this page's readouts and
+  // prose use the one canonical label set — no drifted local thresholds.
+  function posLabel(pos) { return positionLabel(pos); }
   // Sitewide channel-position display (item 3): the ×-trend multiple + a plain
   // location label — the Gallery's treatment. The raw position stays internal
   // (logic only); it is never shown as the primary number.
@@ -542,18 +538,22 @@
   // Leads with decisiveness when low; states risk factually when high — never "wait for lower".
   function updateHighRisk() {
     var el = document.getElementById('lslHighRiskBody'); if (!el) return;
-    var pos = hrPos, ratio = ratioOf(pos).toFixed(2);
+    // Tier boundaries align to the shared label bands (2H): reassure below "above trend"
+    // (pos<0.53), moderate through "above trend" (0.53–0.79), sharper at "high in the
+    // channel" and beyond (>=0.79). The tag states the SAME label as the slider readout,
+    // so the two can never disagree.
+    var pos = hrPos, ratio = ratioOf(pos).toFixed(2), label = posLabel(pos);
     var upPct = Math.round(DD_UPPER.median * 100), vPct = Math.round(DD_VERY.median * 100), worstPct = Math.round(DD_UPPER.worst * 100);
     var tier, tag, lead;
-    if (pos < 0.667) {   // quiet / reassuring — but the cost is still stated (as contrast)
-      tier = 'quiet'; tag = 'You&rsquo;re low in the channel today';
-      lead = 'At <strong>' + ratio + '× trend</strong> (' + posLabel(pos) + '), deploying decisively carries little of this drawdown risk &mdash; which is exactly why being <strong>decisive while you&rsquo;re low</strong> is valuable. For contrast: historically (2017 on, ' + DD_UPPER.n + ' entries), deploying into the <em>upper</em> channel meant a <span class="lsl-hr-num">median ' + upPct + '% drawdown within two years</span> before recovery (the highest entries, ~' + vPct + '%; worst ~' + worstPct + '%).';
-    } else if (pos < 0.85) {   // softer amber caution
-      tier = 'soft'; tag = 'Caution &middot; upper channel';
-      lead = 'Deploying at <strong>' + ratio + '× trend</strong> &mdash; high in the channel &mdash; has historically (2017 on, ' + DD_UPPER.n + ' entries) meant a <span class="lsl-hr-num">median ' + upPct + '% drawdown within two years</span> before recovery (worst ~' + worstPct + '%). That&rsquo;s the cost of deploying high.';
-    } else {   // sharper red flag — swaps in the higher figure
-      tier = 'sharp'; tag = 'Sharp caution &middot; near or above the upper band';
-      lead = 'Deploying at <strong>' + ratio + '× trend</strong> &mdash; at or above the upper band &mdash; has historically (2017 on, ' + DD_VERY.n + ' entries) meant a <span class="lsl-hr-num">median ' + vPct + '% drawdown within two years</span> before recovery (worst ~' + worstPct + '%). This is the riskiest place to deploy a lump.';
+    if (pos < 0.53) {   // near floor / below trend / at trend — reassuring, but cost still stated
+      tier = 'quiet'; tag = 'Limited drawdown risk &middot; ' + label;
+      lead = 'At <strong>' + ratio + '× trend</strong> (<em>' + label + '</em>), deploying decisively carries little of this drawdown risk &mdash; which is exactly why being <strong>decisive while you&rsquo;re low in the channel</strong> is valuable. For contrast: historically (2017 on, ' + DD_UPPER.n + ' entries), deploying into the <em>upper</em> channel meant a <span class="lsl-hr-num">median ' + upPct + '% drawdown within two years</span> before recovery (the highest entries, ~' + vPct + '%; worst ~' + worstPct + '%).';
+    } else if (pos < 0.79) {   // above trend — moderate amber caution
+      tier = 'soft'; tag = 'Caution &middot; ' + label;
+      lead = 'Deploying at <strong>' + ratio + '× trend</strong> (<em>' + label + '</em>) carries real drawdown risk: historically (2017 on, ' + DD_UPPER.n + ' entries), deploying into the upper channel meant a <span class="lsl-hr-num">median ' + upPct + '% drawdown within two years</span> before recovery (worst ~' + worstPct + '%). The higher you go, the steeper it gets.';
+    } else {   // high in the channel / near-or-above the upper band — sharper, leads with the higher figure
+      tier = 'sharp'; tag = 'Sharp caution &middot; ' + label;
+      lead = 'Deploying at <strong>' + ratio + '× trend</strong> (<em>' + label + '</em>) is the riskiest place to put a lump. Historically (2017 on, ' + DD_VERY.n + ' entries), the highest entries went on to a <span class="lsl-hr-num">median ' + vPct + '% drawdown within two years</span> before recovery (worst ~' + worstPct + '%).';
     }
     el.className = 'lsl-highrisk-body lsl-hr-tier-' + tier;
     el.innerHTML = '<div class="lsl-hr-flag">'
