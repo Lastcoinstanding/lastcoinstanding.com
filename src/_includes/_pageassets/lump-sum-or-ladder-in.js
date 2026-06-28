@@ -61,6 +61,10 @@
     horizon: 4               // years (drives the commitment-backstop takeaway; its slider was removed in 2D-B2)
   };
   var userMoved = false;     // true once the reader drags the slider — stops the live-position auto-sync
+  // Stage 2G: the "deploying high" risk section has its OWN position, decoupled from the
+  // top demonstration slider. Defaults to today's live position; the reader's explore
+  // slider drives it. Until they drag, it tracks live.
+  var hrPos = 0.40, hrUserMoved = false;
   var CTX_PAD_Y = 0.4;       // years of channel drawn past today so the "today" marker isn't at the edge
   var WIN = 0.075;           // channel-position window for binning entries
   var liveTodayPos = null, liveTodayPrice = null;
@@ -456,7 +460,6 @@
     if (!lede || !boxes) return;
     syncScrubReadout();
     updateRiskFlag();
-    updateHighRisk();   // position-aware "deploying high" caution (2F) tracks the slider
     var b = bucketAt(state.era, state.ladderN, state.pos);
     if (b.n < 4) {
       lede.innerHTML = 'Bitcoin has rarely sat <em>' + posLabel(state.pos) + '</em> in this window &mdash; too few historical entries here to read.';
@@ -514,24 +517,48 @@
   // showing them would make this a timing tool, against the site's anti-timing stance).
   var HR_WAIT = 'That&rsquo;s the cost side. The other side is <strong>waiting</strong> &mdash; and here the channel&rsquo;s own shape matters: a high reading has historically been followed, eventually, by a lower one, because a cyclical asset oscillates within bands drawn relative to trend. But <em>that&rsquo;s geometry, not a forecast</em> &mdash; <em>when</em> a lower position arrives, and at <em>what absolute price</em>, is never promised. The trend rises underneath you, so &ldquo;lower in the channel&rdquo; can someday mean a <em>higher price after waiting</em>. And the volatility that made waiting pay in past cycles is compressing. Waiting is a real consideration up here &mdash; not a strategy with a guaranteed payoff.';
   var HR_TIE = 'High in the channel is also where laddering&rsquo;s drawdown hedge earns its keep &mdash; so waiting and laddering are the two responses to upper-channel risk, with a lump the most exposed.';
+  // Gallery-style readout for the section's own explore slider.
+  function syncHrReadout() {
+    var el = document.getElementById('lslHrReadout');
+    if (el) el.innerHTML = '<strong>' + ratioOf(hrPos).toFixed(2) + '×</strong> trend · <em>' + posLabel(hrPos) + '</em>';
+  }
+  // Persistent "today" tick on the explore slider track at the live position.
+  function positionHrTodayMarker() {
+    var m = document.getElementById('lslHrTodayMarker');
+    if (!m) return;
+    if (liveTodayPos == null) { m.classList.remove('is-visible'); return; }
+    m.style.left = (Math.max(0, Math.min(1, liveTodayPos)) * 100) + '%';
+    m.classList.add('is-visible');
+  }
+  function setHrPos(pos, fromUser) {
+    hrPos = Math.max(0, Math.min(1, pos));
+    if (fromUser) hrUserMoved = true;
+    var s = document.getElementById('lslHrSlider');
+    if (s && !fromUser) s.value = Math.round(hrPos * 100);
+    syncHrReadout(); updateHighRisk();
+  }
+  // Position-aware caution driven by the section's OWN position (hrPos), live by default.
+  // The drawdown COST is ALWAYS stated; only the alarm prominence escalates with position.
+  // Leads with decisiveness when low; states risk factually when high — never "wait for lower".
   function updateHighRisk() {
     var el = document.getElementById('lslHighRiskBody'); if (!el) return;
-    var pos = state.pos, ratio = ratioOf(pos).toFixed(2);
-    if (pos < 0.667) {   // quiet — low/mid channel, not alarming
-      el.className = 'lsl-highrisk-body lsl-hr-tier-quiet';
-      el.innerHTML = '<p class="lsl-hr-quiet">This matters more the higher in the channel you are. At <strong>' + ratio + '× trend</strong> (' + posLabel(pos) + ') you&rsquo;re clear of upper-channel risk &mdash; drag the slider above toward the upper band to see what deploying high has historically cost.</p>';
-      return;
+    var pos = hrPos, ratio = ratioOf(pos).toFixed(2);
+    var upPct = Math.round(DD_UPPER.median * 100), vPct = Math.round(DD_VERY.median * 100), worstPct = Math.round(DD_UPPER.worst * 100);
+    var tier, tag, lead;
+    if (pos < 0.667) {   // quiet / reassuring — but the cost is still stated (as contrast)
+      tier = 'quiet'; tag = 'You&rsquo;re low in the channel today';
+      lead = 'At <strong>' + ratio + '× trend</strong> (' + posLabel(pos) + '), deploying decisively carries little of this drawdown risk &mdash; which is exactly why being <strong>decisive while you&rsquo;re low</strong> is valuable. For contrast: historically (2017 on, ' + DD_UPPER.n + ' entries), deploying into the <em>upper</em> channel meant a <span class="lsl-hr-num">median ' + upPct + '% drawdown within two years</span> before recovery (the highest entries, ~' + vPct + '%; worst ~' + worstPct + '%).';
+    } else if (pos < 0.85) {   // softer amber caution
+      tier = 'soft'; tag = 'Caution &middot; upper channel';
+      lead = 'Deploying at <strong>' + ratio + '× trend</strong> &mdash; high in the channel &mdash; has historically (2017 on, ' + DD_UPPER.n + ' entries) meant a <span class="lsl-hr-num">median ' + upPct + '% drawdown within two years</span> before recovery (worst ~' + worstPct + '%). That&rsquo;s the cost of deploying high.';
+    } else {   // sharper red flag — swaps in the higher figure
+      tier = 'sharp'; tag = 'Sharp caution &middot; near or above the upper band';
+      lead = 'Deploying at <strong>' + ratio + '× trend</strong> &mdash; at or above the upper band &mdash; has historically (2017 on, ' + DD_VERY.n + ' entries) meant a <span class="lsl-hr-num">median ' + vPct + '% drawdown within two years</span> before recovery (worst ~' + worstPct + '%). This is the riskiest place to deploy a lump.';
     }
-    var sharp = pos >= 0.85;   // very high → sharper flag leads with the higher figure
-    var ddPct = Math.round((sharp ? DD_VERY.median : DD_UPPER.median) * 100);
-    var worstPct = Math.round(DD_UPPER.worst * 100);
-    var cost = sharp
-      ? 'You&rsquo;re buying <strong>' + ratio + '× trend</strong> &mdash; at or above the upper band. Historically (2017 on, ' + DD_VERY.n + ' entries), the highest entries went on to a <span class="lsl-hr-num">median ' + ddPct + '% drawdown within two years</span> before any recovery (worst ~' + worstPct + '%). This is the riskiest place to deploy a lump.'
-      : 'You&rsquo;re buying <strong>' + ratio + '× trend</strong> &mdash; high in the channel. Historically (2017 on, ' + DD_UPPER.n + ' entries), deploying into the upper channel went on to a <span class="lsl-hr-num">median ' + ddPct + '% drawdown within two years</span> before any recovery (worst ~' + worstPct + '%). That&rsquo;s the cost side of deploying high.';
-    el.className = 'lsl-highrisk-body lsl-hr-tier-' + (sharp ? 'sharp' : 'soft');
+    el.className = 'lsl-highrisk-body lsl-hr-tier-' + tier;
     el.innerHTML = '<div class="lsl-hr-flag">'
-      + '<span class="lsl-hr-tag">' + (sharp ? 'Sharp caution &middot; near or above the upper band' : 'Caution &middot; upper channel') + '</span>'
-      + '<p class="lsl-hr-cost">' + cost + '</p>'
+      + '<span class="lsl-hr-tag">' + tag + '</span>'
+      + '<p class="lsl-hr-cost">' + lead + '</p>'
       + '<p class="lsl-hr-wait">' + HR_WAIT + '</p>'
       + '<p class="lsl-hr-tie">' + HR_TIE + '</p>'
       + '</div>';
@@ -560,6 +587,10 @@
     // The slider tracks today's live position until the reader drags it (B1).
     positionTodayMarker();
     if (!userMoved) setSliderPos(liveTodayPos, false);
+    // The risk section's own explore slider + caution also default to today's live
+    // position, with a persistent today tick (2G); independent of the top slider.
+    positionHrTodayMarker();
+    if (!hrUserMoved) setHrPos(liveTodayPos, false);
     renderBackstop();   // today-anchored table recomputes with the live exit price (2E-A1)
   }
 
@@ -630,6 +661,14 @@
       if (ladderVal) ladderVal.textContent = months >= 12 && months % 12 === 0 ? (months / 12) + (months === 12 ? ' yr' : ' yrs') : months + ' mo';
       updateAdvChart(); updateBoxes();
     });
+
+    // The risk section's own explore slider (2G) — independent of the top slider above.
+    var hr = document.getElementById('lslHrSlider');
+    if (hr) {
+      hr.value = Math.round(hrPos * 100);
+      hr.addEventListener('input', function () { setHrPos(this.value / 100, true); });
+    }
+    syncHrReadout();
   }
 
   // ════════ INIT ════════
@@ -639,6 +678,7 @@
     applyChannelWindow();          // initial x-range / y-refit
     wire();
     updateBoxes();
+    updateHighRisk();              // 2G risk section renders at its own (live-default) position
     renderBackstop();
     renderCompression();
     renderMethod();

@@ -172,10 +172,29 @@ eleventyComputed:
     <p class="lsl-secondary-label">The third dimension &middot; deploying high in the channel</p>
     <h2>What deploying high in the channel has cost</h2>
     <div class="lsl-prose" style="max-width:none;">
-      <p>The lump-vs-ladder comparison above sorts <em>how</em> to deploy. It leaves out a third question the binary hides: high in the channel, <em>whether</em> to deploy a lump at all. This is the most timing-adjacent idea on the site, so it&rsquo;s framed as a historical <em>cost</em>, never a signal &mdash; it changes with the slider position above.</p>
+      <p>The lump-vs-ladder comparison above sorts <em>how</em> to deploy. It leaves out a third question the binary hides: high in the channel, <em>whether</em> to deploy a lump at all. This is the most timing-adjacent idea on the site, so it&rsquo;s framed as a historical <em>cost</em>, never a signal &mdash; and it leads with why being <em>decisive while you&rsquo;re low</em> is valuable. It starts where Bitcoin sits <strong>today</strong>; use the slider below to preview the drawdown risk at other points in the channel.</p>
     </div>
+
+    <!-- This section's OWN explore slider — decoupled from the top demonstration slider
+         (Stage 2G). Defaults to today's live position; the persistent tick marks today so
+         the reader always sees their real position vs. the hypothetical they're exploring.
+         It answers "how much drawdown risk at each position", never "which tactic won". -->
+    <div class="lsl-hr-explore">
+      <div class="lsl-hr-explore-top">
+        <span class="lsl-hr-explore-title">Preview the risk at other channel positions</span>
+        <span class="lsl-hr-explore-readout" id="lslHrReadout">&mdash;</span>
+      </div>
+      <div class="lsl-slider-wrap">
+        <input type="range" min="0" max="100" step="1" value="41" class="lsl-hr-slider" id="lslHrSlider"
+               aria-label="Preview drawdown risk at a channel position (does not affect the demonstration above)">
+        <span class="lsl-today-marker" id="lslHrTodayMarker" aria-hidden="true"></span>
+      </div>
+      <div class="lsl-scrub-scale"><span>Floor &middot; cheap</span><span>Trend</span><span>Upper band &middot; expensive</span></div>
+      <p class="lsl-hr-explore-caption">The tick marks where Bitcoin sits <strong>today</strong> &mdash; drag to preview the risk at other positions. This shows risk at a position; it is not a signal to wait for a lower price.</p>
+    </div>
+
     <div class="lsl-highrisk-body lsl-hr-tier-quiet" id="lslHighRiskBody">
-      <p class="lsl-hr-quiet">This matters more the higher in the channel you are. Drag the slider above toward the upper band to see what deploying high has historically cost.</p>
+      <p class="lsl-hr-quiet">Loading today&rsquo;s position&hellip; deploying decisively while low in the channel has historically carried the least of this drawdown risk.</p>
     </div>
   </section>
 
