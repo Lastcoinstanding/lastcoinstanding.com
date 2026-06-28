@@ -4,7 +4,7 @@ permalink: /your-deployment-plan.html
 slug: your-deployment-plan
 related:
   - slug: lump-sum-or-ladder-in
-    desc: "The teaching demonstration this page applies. Start there for the general lesson on how valuation shifts the lump-vs-ladder choice; come here to model your own sum, cadence, and horizon."
+    desc: "The teaching demonstration this page applies. Start there for the general lesson on how channel position shifts the lump-vs-ladder choice; come here to model your own sum, cadence, and horizon."
   - slug: the-bitcoin-retirement
     desc: "The sibling whose value-over-time projection chassis this page borrows. Deploying toward retirement is the same decision in another frame — when to commit, and how fast."
   - slug: the-power-law
@@ -83,10 +83,10 @@ eleventyComputed:
     <div class="dp-anchor-row" aria-label="Retrospective anchor">
       <span class="dp-anchor-label">Replay anchored by</span>
       <div class="dp-anchor" role="group">
-        <button type="button" data-anchor="channel" class="active">Today&rsquo;s valuation</button>
+        <button type="button" data-anchor="channel" class="active">Today&rsquo;s position</button>
         <button type="button" data-anchor="time">A point in time</button>
       </div>
-      <span class="dp-anchor-hint" id="dpAnchorHint">Channel-anchored: what tends to happen deploying from a valuation like today&rsquo;s. Time-anchored: what if you&rsquo;d simply started N years ago.</span>
+      <span class="dp-anchor-hint" id="dpAnchorHint">Channel-anchored: what tends to happen deploying from a position like today&rsquo;s. Time-anchored: what if you&rsquo;d simply started N years ago.</span>
     </div>
 
     <!-- Verdict -->
@@ -159,11 +159,11 @@ eleventyComputed:
     <p class="dp-eyebrow">The commitment backstop</p>
     <h2>Given long enough, entries have historically recovered</h2>
     <div class="dp-prose" style="max-width:none;">
-      <p>Over a <em>long</em> horizon, <em>where</em> you bought has mattered far less than <em>that</em> you bought and held. That&rsquo;s a multi-year tendency, not a promise &mdash; over short horizons entries have frequently sat underwater (including now, with price below half its prior high). Mean value-multiple of a deployment, by entry valuation and how long it was held &mdash; computed live from the current record:</p>
+      <p>Three things compound into your eventual stack: <em>where</em> in the channel you bought, the <em>lump-vs-ladder-vs-hybrid</em> choice, and <em>patience</em> over a long horizon. They add up together &mdash; a long hold doesn&rsquo;t erase the edge from buying low in the channel, it builds on it. That said, the horizon does the heaviest lifting: over a <em>long</em> enough hold even a poorly-positioned entry has recovered. A multi-year tendency, not a promise &mdash; over short horizons entries have frequently sat underwater (including now &mdash; price has been below the Power Law trend about 58% of the time, above it about 42%). Mean value-multiple of a deployment, by entry position and how long it was held &mdash; computed live from the current record:</p>
     </div>
     <div class="dp-table-wrap">
       <table class="dp-table">
-        <thead><tr><th>Entry valuation</th><th>2&nbsp;yr</th><th>4&nbsp;yr</th><th>6&nbsp;yr</th><th>8&nbsp;yr</th></tr></thead>
+        <thead><tr><th>Entry position</th><th>2&nbsp;yr</th><th>4&nbsp;yr</th><th>6&nbsp;yr</th><th>8&nbsp;yr</th></tr></thead>
         <tbody id="dpBackstopBody"></tbody>
       </table>
     </div>

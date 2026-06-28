@@ -329,7 +329,7 @@
       styles2.forEach(function (s) { ta[s] = timeAnchor(s, span); });
       var yrs = (ta[sel].hold / YEAR_D);
       lead.textContent = 'Time-anchored · deployed ' + yrs.toFixed(0) + ' years ago, from ' + monthYear(ta[sel].entryDay) + ' · held to today';
-      main.innerHTML = 'If you&rsquo;d deployed your <strong>' + STYLE_NAME[sel].toLowerCase() + '</strong> ' + yrs.toFixed(0) + ' years ago and held to today, you&rsquo;d be at <strong>' + fmtMult(ta[sel].mult) + '</strong>. This is the &ldquo;what if I&rsquo;d simply started N years ago&rdquo; view — switch to <em>channel-anchored</em> for &ldquo;what tends to happen deploying from a valuation like today&rsquo;s.&rdquo;';
+      main.innerHTML = 'If you&rsquo;d deployed your <strong>' + STYLE_NAME[sel].toLowerCase() + '</strong> ' + yrs.toFixed(0) + ' years ago and held to today, you&rsquo;d be at <strong>' + fmtMult(ta[sel].mult) + '</strong>. This is the &ldquo;what if I&rsquo;d simply started N years ago&rdquo; view — switch to <em>channel-anchored</em> for &ldquo;what tends to happen deploying from a position like today&rsquo;s.&rdquo;';
       detail.innerHTML = styles2.map(function (s) { return '<span' + (s === sel ? ' class="dp-row-sel"' : '') + '>' + STYLE_NAME[s] + ' <strong>' + fmtMult(ta[s].mult) + '</strong></span>'; }).join(' &nbsp;·&nbsp; ')
         + '<br><span class="dp-sparse">' + fmtUSD(state.sum) + ' → <strong>' + fmtUSD(ta[sel].mult * state.sum) + '</strong>. A single historical path, not a distribution.</span>';
       return;
@@ -337,9 +337,9 @@
 
     // channel-anchored distribution
     var dist = channelDist(sel, pos, span);
-    lead.textContent = 'Replayed from history · deploying near today&rsquo;s valuation (' + posDisplay(pos) + ') · ' + state.horizon + '-year hold';
+    lead.textContent = 'Replayed from history · deploying near today&rsquo;s position (' + posDisplay(pos) + ') · ' + state.horizon + '-year hold';
     if (dist.n < 4) {
-      main.innerHTML = 'Bitcoin has rarely sat near today&rsquo;s valuation with ' + state.horizon + ' years of modern history (2013 onward) to follow — too few analogues to read.'
+      main.innerHTML = 'Bitcoin has rarely sat near today&rsquo;s position with ' + state.horizon + ' years of modern history (2013 onward) to follow — too few analogues to read.'
         + (dist.early.n ? ' The closest earlier matches sit in the pre-2013 sub-$15 curiosity era, set aside as unreplicable.' : '')
         + ' Switch to the <em>time-anchored</em> view.';
       detail.innerHTML = '';
@@ -351,7 +351,7 @@
     var thin = dist.years < SUFFICIENT_YEARS;
     var repMY = monthYear(S[dist.repIdx].d), repMult = planMultiple(sel, S[dist.repIdx].d, span), early = dist.early;
     detail.innerHTML = styles3.map(function (s) { return '<span' + (s === sel ? ' class="dp-row-sel"' : '') + '>' + STYLE_NAME[s] + ' <strong>' + fmtMult(dl[s].median) + '</strong></span>'; }).join(' &nbsp;·&nbsp; ')
-      + '<br><span class="dp-sparse">Across <strong>' + dist.n + '</strong> historical entries in <strong>' + dist.years + '</strong> distinct years (2013 onward) where price sat near today&rsquo;s valuation, deploying ' + STYLE_NAME[sel].toLowerCase() + ' and holding ' + state.horizon + ' years returned a <strong>median ' + fmtMult(dist.median) + '</strong> (typical range ' + fmtMult(dist.lo) + '–' + fmtMult(dist.hi) + '). The chart replays just one of those — the most recent, <strong>' + repMY + ' → ' + fmtMult(repMult) + '</strong> — so a single path can land well below the median of all ' + dist.n + '.'
+      + '<br><span class="dp-sparse">Across <strong>' + dist.n + '</strong> historical entries in <strong>' + dist.years + '</strong> distinct years (2013 onward) where price sat near today&rsquo;s position, deploying ' + STYLE_NAME[sel].toLowerCase() + ' and holding ' + state.horizon + ' years returned a <strong>median ' + fmtMult(dist.median) + '</strong> (typical range ' + fmtMult(dist.lo) + '–' + fmtMult(dist.hi) + '). The chart replays just one of those — the most recent, <strong>' + repMY + ' → ' + fmtMult(repMult) + '</strong> — so a single path can land well below the median of all ' + dist.n + '.'
       + (thin ? ' <em>Small sample — these come from only ' + dist.years + ' distinct years; treat as illustrative, not statistical.</em>' : '') + '</span>'
       + (early.n ? '<br><span class="dp-earlyera">Set aside: Bitcoin&rsquo;s sub-$15 curiosity era (2009–2012), when prices were too small to represent a return any buyer today could replicate. Counting its ' + early.n + ' earlier ' + (early.n === 1 ? 'match' : 'matches') + ' back in would lift the headline median to <strong>' + fmtMult(early.fullMedian) + '</strong> and stretch the range past <strong>' + fmtMult(early.fullHi) + '</strong>. Shown and marked here, never in the headline.</span>' : '');
   }
@@ -399,7 +399,7 @@
     var dist = channelDist(state.style, pos, state.horizon * YEAR_D), thin = dist.years < SUFFICIENT_YEARS;
     el.hidden = false;
     el.innerHTML = '<span class="dp-risk-tag">High-risk zone for lump deployment</span> '
-      + 'At today&rsquo;s valuation a lump buys into the mean-reversion the channel predicts — this is where laddering&rsquo;s hedge earns its keep. Frame it honestly as a <strong>drawdown hedge, not a reliable edge</strong>: the rising channel means even the hedge isn&rsquo;t guaranteed to pay.'
+      + 'At today&rsquo;s position a lump buys into the mean-reversion the channel predicts — this is where laddering&rsquo;s hedge earns its keep. Frame it honestly as a <strong>drawdown hedge, not a reliable edge</strong>: the rising channel means even the hedge isn&rsquo;t guaranteed to pay.'
       + (thin ? ' <span class="dp-risk-thin">Channel-anchored history is thin up here — only ~' + dist.years + ' distinct years, clustered into a handful of brief blow-off tops. The replay below leads with the time-anchored view; treat the channel analogues as illustrative.</span>' : '');
   }
 
@@ -423,7 +423,7 @@
     var ee = document.getElementById('dpBackstopEarlyEra');
     if (ee) ee.innerHTML = 'These exclude Bitcoin&rsquo;s sub-$15 curiosity era (2009&ndash;2012), when prices were too small to represent a return any buyer today could replicate. Counted in, the long-hold lower-channel cells balloon on those tiny prices &mdash; lower-channel 8-year reads about <strong>' + fmtMult(bsFull.lower[8]) + '</strong> with that era in, versus <strong>' + fmtMult(bs.lower[8]) + '</strong> without. Marked here, never the headline.';
     var wr = worstRecovery(true), tk = document.getElementById('dpBackstopTakeaway');
-    if (tk) { var H = state.horizon, up = bs.upper[H]; tk.innerHTML = 'Over a <strong>' + H + '-year</strong> hold, even <strong>upper-channel</strong> entries — the worst-timed buys — returned about <strong>' + fmtMult(up) + '</strong> on average; the literal worst entries in history still returned <strong>' + fmtMult(wr.min) + ' to ' + fmtMult(wr.max) + '</strong> by the latest sample. That is a multi-year tendency, <em>not</em> a guarantee: over short horizons entries have frequently sat underwater — including now, with price below half its prior high. Recovery has historically come with time held, not on demand.'; }
+    if (tk) { var H = state.horizon, up = bs.upper[H]; tk.innerHTML = 'Over a <strong>' + H + '-year</strong> hold, even <strong>upper-channel</strong> entries — the worst-timed buys — returned about <strong>' + fmtMult(up) + '</strong> on average; the literal worst entries in history still returned <strong>' + fmtMult(wr.min) + ' to ' + fmtMult(wr.max) + '</strong> by the latest sample. That is a multi-year tendency, <em>not</em> a guarantee: over short horizons entries have frequently sat underwater — including now (price has been below the Power Law trend about 58% of the time, above it about 42%). Recovery has historically come with time held, not on demand.'; }
     var cp = compression(), cb = document.getElementById('dpCompressionBody');
     if (cb) { var ch = ''; for (var i = 0; i < cp.length; i++) ch += '<tr><th>' + cp[i].label + '</th><td class="dp-strong">' + cp[i].max.toFixed(2) + '</td></tr>'; cb.innerHTML = ch; }
     var mw = document.getElementById('dpMethodWindow');

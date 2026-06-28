@@ -17,7 +17,7 @@
    Stage 2C-①; the forward path model was LIFTED to
    shared/deployment-projection.js for reuse by Page 2
    (/your-deployment-plan), not deleted. The channel-orientation chart
-   was promoted ABOVE the scrubber into the "Where are we right now?"
+   was promoted ABOVE the slider into the "Where are we right now?"
    context section, gaining the canonical glowing "you are here" pulse
    (STYLE_GUIDE §6.23) and a live factual position callout.
    ============================================================= */
@@ -52,14 +52,15 @@
 
   // ── State ──
   var state = {
-    // Fixed low-channel TEACHING default (the page's headline lesson). NOT today's
-    // live value — today's position renders only in the live component (rule #1).
-    pos: 0.15,
-    decision: 'all-now',     // 'all-now' | 'ladder-in'
+    // Defaults to today's LIVE channel position on load (Stage 2D-B1). Set once the
+    // live price resolves (renderChannelContext); until the reader drags the slider it
+    // tracks live. This is a computed value, never baked into static copy (rule #1).
+    pos: 0.40,
     era: 'post-2020',        // default recent (design §7); also drives the context chart x-range
     ladderN: 30,             // ~1yr of ~12-day samples
-    horizon: 4               // years (drives the commitment-backstop takeaway)
+    horizon: 4               // years (drives the commitment-backstop takeaway; its slider was removed in 2D-B2)
   };
+  var userMoved = false;     // true once the reader drags the slider — stops the live-position auto-sync
   var CTX_PAD_Y = 0.4;       // years of channel drawn past today so the "today" marker isn't at the edge
   var WIN = 0.075;           // channel-position window for binning entries
   var liveTodayPos = null, liveTodayPrice = null;
@@ -268,7 +269,7 @@
     advChart.update('none');
   }
 
-  // ════════ CHANNEL CONTEXT CHART (promoted above the scrubber) ════════
+  // ════════ CHANNEL CONTEXT CHART (promoted above the slider) ════════
   // Price vs time + bands + scrubbed entry line + a live, glowing "you are
   // here" today marker. Retrospective only — the bands stop just past today
   // (no forward extension; that moved to Page 2 with the projection).
@@ -350,7 +351,7 @@
           { label: 'Floor (0.42×)', data: b.floor, borderColor: RUST, borderWidth: 1.3, borderDash: [6, 3], pointRadius: 0, tension: 0.2, order: 5 },
           { label: 'Trend', data: b.trend, borderColor: TREND, borderWidth: 1.8, pointRadius: 0, tension: 0.2, order: 4 },
           { label: 'Upper (3×)', data: b.upper, borderColor: '#d4a843', borderWidth: 1.1, borderDash: [1, 5], pointRadius: 0, tension: 0.2, order: 6 },
-          { label: 'Tested entry valuation', data: entryLine(state.pos), borderColor: '#f2eee8', borderWidth: 1.6, borderDash: [7, 4], pointRadius: 0, tension: 0.2, order: 3 },
+          { label: "Entry you're testing", data: entryLine(state.pos), borderColor: '#f2eee8', borderWidth: 1.6, borderDash: [7, 4], pointRadius: 0, tension: 0.2, order: 3 },
           { label: 'Historical price', data: PL_DATA.map(function (p) { return { x: p[0], y: p[1] }; }), borderColor: HISTORY, borderWidth: 1.2, pointRadius: 0, tension: 0.15, order: 1 },
           { label: 'Today', data: [{ x: todayD, y: TODAY_PRICE }], borderColor: AMBER, backgroundColor: AMBER, pointRadius: 5, pointHoverRadius: 6, showLine: false, order: 0 }
         ]
@@ -401,41 +402,59 @@
     channelChart.update('none');
   }
 
-  // ════════ VERDICT (retrospective) ════════
-  function ladderDurationLabel() {
-    var months = Math.round(state.ladderN / 2.53);
-    return months >= 12 ? (months % 12 === 0 ? (months / 12) + (months === 12 ? ' year' : ' years') : (months + ' months')) : months + ' months';
+  // ════════ READOUT: aligned single-strategy cluster (Stage 2D-B1) ════════
+  // The slider's Gallery-style position readout (×trend + plain label).
+  function syncScrubReadout() {
+    var el = document.getElementById('lslScrubReadout');
+    if (el) el.innerHTML = '<strong>' + ratioOf(state.pos).toFixed(2) + '×</strong> trend · <em>' + posLabel(state.pos) + '</em>';
   }
-  function updateVerdict() {
-    var lead = document.getElementById('lslVerdictLead');
-    var main = document.getElementById('lslVerdictMain');
+  // Place the "today" tick on the slider track at the live channel position.
+  function positionTodayMarker() {
+    var m = document.getElementById('lslTodayMarker');
+    if (!m) return;
+    if (liveTodayPos == null) { m.classList.remove('is-visible'); return; }
+    m.style.left = (Math.max(0, Math.min(1, liveTodayPos)) * 100) + '%';
+    m.classList.add('is-visible');
+  }
+  // One lede + two boxes, BOTH describing the winning tactic, flipping together as one unit.
+  function updateBoxes() {
+    var lede = document.getElementById('lslLede'), boxes = document.getElementById('lslBoxes');
+    var magEl = document.getElementById('lslBoxMag'), magSub = document.getElementById('lslBoxMagSub');
+    var freqEl = document.getElementById('lslBoxFreq'), freqSub = document.getElementById('lslBoxFreqSub');
     var detail = document.getElementById('lslVerdictDetail');
-    if (!main) return;
-
-    var b = bucketAt(state.era, state.ladderN, state.pos);
-    if (lead) lead.textContent = 'At ' + posDisplay(state.pos) + ' · laddered over ' + ladderDurationLabel();
+    if (!lede || !boxes) return;
+    syncScrubReadout();
     updateRiskFlag();
+    var b = bucketAt(state.era, state.ladderN, state.pos);
     if (b.n < 4) {
-      main.innerHTML = 'Bitcoin has rarely sat <em>' + posLabel(state.pos) + '</em> in this window — too few historical entries here to read.';
-      if (detail) detail.innerHTML = '<span class="lsl-sparse">Widen the window or move the scrubber toward where price has actually spent time.</span>';
+      lede.innerHTML = 'Bitcoin has rarely sat <em>' + posLabel(state.pos) + '</em> in this window &mdash; too few historical entries here to read.';
+      boxes.style.display = 'none';
+      if (detail) detail.innerHTML = '<span class="lsl-sparse">Widen the window or move the slider toward where price has actually spent time.</span>';
       return;
     }
-    var adv = b.mean, lumpWins = adv < 0, mag = Math.abs(adv).toFixed(0);
-    var html, dec = state.decision;
-    if (lumpWins) {
-      html = dec === 'all-now'
-        ? 'At this valuation, deploying <strong>all at once</strong> historically accumulated <strong>' + mag + '% more BTC</strong> than laddering in — the channel favoured decisiveness here.'
-        : 'At this valuation, laddering in historically gave up <strong>' + mag + '% of the BTC</strong> that deploying all at once would have captured — the channel favoured decisiveness here.';
-    } else {
-      html = dec === 'ladder-in'
-        ? 'At this valuation, laddering in historically accumulated <span class="lsl-dca">' + mag + '% more BTC</span> than deploying all at once — higher in the channel, spreading more often came out ahead.'
-        : 'At this valuation, deploying all at once historically gave up <span class="lsl-dca">' + mag + '% of the BTC</span> laddering in would have captured — higher in the channel, spreading more often came out ahead.';
-    }
-    main.innerHTML = html;
-    if (detail) {
-      detail.innerHTML = 'Across <strong>' + b.n + '</strong> historical entries at this valuation, laddering beat deploying-all-at-once in <strong>' + Math.round(b.win) + '%</strong> of them. '
-        + '<span class="lsl-sparse">A demonstration across history — not a call for your own situation. That’s the next page.</span>';
-    }
+    boxes.style.display = '';
+    // Always the literal winner — no special mid-channel "wash" state (B1 #6); the
+    // small magnitude / near-50% frequency near trend is the honest message.
+    var adv = b.mean, ladderWon = adv > 0;
+    var winName = ladderWon ? 'laddering in' : 'deploying all at once';
+    var winRate = ladderWon ? b.win : (100 - b.win);   // how often the WINNER beat the other
+    lede.innerHTML = 'At this position, the tactic that served you better was <span class="'
+      + (ladderWon ? 'lsl-win-ladder' : 'lsl-win-lump') + '">' + winName + '</span>:';
+    boxes.classList.toggle('is-ladder', ladderWon);
+    boxes.classList.toggle('is-lump', !ladderWon);
+    if (magEl) magEl.textContent = '+' + Math.abs(adv).toFixed(0) + '%';
+    if (magSub) magSub.textContent = 'more BTC accumulated';
+    if (freqEl) freqEl.textContent = Math.round(winRate) + '%';
+    if (freqSub) freqSub.textContent = 'of ' + b.n + ' historical entries here';
+    if (detail) detail.innerHTML = '<span class="lsl-sparse">A demonstration across history &mdash; not a call for your own situation. That&rsquo;s the next page.</span>';
+  }
+  // Apply a new slider position — from a drag (fromUser) or from the live default.
+  function setSliderPos(pos, fromUser) {
+    state.pos = Math.max(0, Math.min(1, pos));
+    if (fromUser) userMoved = true;
+    var scrub = document.getElementById('lslScrub');
+    if (scrub && !fromUser) scrub.value = Math.round(state.pos * 100);
+    updateMarkerOnly(); updateEntryLine(); updateBoxes();
   }
 
   // ════════ THREE-ZONE UPPER-CHANNEL RISK FLAG (item 12, fires on scrubbed pos) ════════
@@ -466,15 +485,18 @@
     liveTodayPos = posOf(price, TODAY_DAYS);
     var ratio = price / plPrice(TODAY_DAYS);
     var posEl = document.getElementById('lslCtxPos');
-    var metaEl = document.getElementById('lslCtxMeta');
-    if (posEl) posEl.innerHTML = 'Today: <strong>' + ratio.toFixed(2) + '×</strong> trend · <em>' + posLabel(liveTodayPos) + '</em>';
-    if (metaEl) metaEl.textContent = 'Live: ' + fmtUSD(price) + (source === 'live' ? '' : ' (latest sample)') + ' · floor 0.42× trend, upper band 3× · recomputed every load.';
+    // One declarative live line (B3): "Today (live): $X · 0.XX× trend · <plain label>"
+    if (posEl) posEl.innerHTML = (source === 'live' ? 'Today (live)' : 'Today (latest sample)')
+      + ': <strong>' + fmtUSD(price) + '</strong> &middot; ' + ratio.toFixed(2) + '× trend &middot; <em>' + posLabel(liveTodayPos) + '</em>';
     // poke the live today marker on the context chart so the dot + pulse track the live spot
     if (channelChart && channelChart.data && channelChart.data.datasets[TODAY_DS]) {
       channelChart.data.datasets[TODAY_DS].data[0].y = price;
       channelChart.update('resize');   // 'resize' so the in-place mutation relayouts and the pulse repositions
     }
     if (advChart) advChart.update('none');
+    // The slider tracks today's live position until the reader drags it (B1).
+    positionTodayMarker();
+    if (!userMoved) setSliderPos(liveTodayPos, false);
   }
 
   // ════════ TABLES ════════
@@ -497,7 +519,7 @@
     if (tk) {
       var H = state.horizon, up = bs.upper[H];
       tk.innerHTML = 'Over a <strong>' + H + '-year</strong> hold, even <strong>upper-channel</strong> entries — the worst-timed buys — returned about <strong>' + fmtMult(up) + '</strong> on average; the literal worst entries in history (blow-off tops above the upper band) still returned <strong>' + fmtMult(wr.min) + ' to ' + fmtMult(wr.max) + '</strong> by the latest sample. '
-        + 'That is a multi-year tendency, <em>not</em> a guarantee: over short horizons entries have frequently sat underwater — including now, with price below half its prior high. Recovery has historically come with time held, not on demand.';
+        + 'That is a multi-year tendency, <em>not</em> a guarantee: over short horizons entries have frequently sat underwater — including now (price has been below the Power Law trend about 58% of the time, above it about 42%). Recovery has historically come with time held, not on demand.';
     }
   }
   function renderCompression() {
@@ -518,34 +540,18 @@
   // ════════ CONTROLS ════════
   function wire() {
     var scrub = document.getElementById('lslScrub');
-    var scrubRead = document.getElementById('lslScrubReadout');
-    function syncScrubReadout() {
-      if (scrubRead) scrubRead.innerHTML = '<strong>' + ratioOf(state.pos).toFixed(2) + '×</strong> trend · <em>' + posLabel(state.pos) + '</em>';
-    }
     if (scrub) {
       scrub.value = Math.round(state.pos * 100);
-      scrub.addEventListener('input', function () {
-        state.pos = Math.max(0, Math.min(1, this.value / 100));
-        syncScrubReadout(); updateMarkerOnly(); updateEntryLine(); updateVerdict();
-      });
+      scrub.addEventListener('input', function () { setSliderPos(this.value / 100, true); });
     }
     syncScrubReadout();
-
-    var dec = document.querySelectorAll('.lsl-decision button');
-    dec.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        state.decision = btn.getAttribute('data-decision');
-        dec.forEach(function (b) { b.classList.toggle('active', b === btn); });
-        updateVerdict();
-      });
-    });
 
     var era = document.querySelectorAll('.lsl-era button');
     era.forEach(function (btn) {
       btn.addEventListener('click', function () {
         state.era = btn.getAttribute('data-era');
         era.forEach(function (b) { b.classList.toggle('active', b === btn); });
-        updateAdvChart(); applyChannelWindow(); updateVerdict();   // era buckets the backtest AND sets the context chart x-range
+        updateAdvChart(); applyChannelWindow(); updateBoxes();   // era buckets the backtest AND sets the context chart x-range
       });
     });
 
@@ -555,15 +561,7 @@
       var months = parseInt(this.value, 10);
       state.ladderN = Math.max(2, Math.round(months * 2.53));
       if (ladderVal) ladderVal.textContent = months >= 12 && months % 12 === 0 ? (months / 12) + (months === 12 ? ' yr' : ' yrs') : months + ' mo';
-      updateAdvChart(); updateVerdict();
-    });
-
-    var horizon = document.getElementById('lslHorizon');
-    var horizonVal = document.getElementById('lslHorizonVal');
-    if (horizon) horizon.addEventListener('input', function () {
-      state.horizon = parseInt(this.value, 10);
-      if (horizonVal) horizonVal.textContent = state.horizon + ' yrs';
-      renderBackstop();
+      updateAdvChart(); updateBoxes();
     });
   }
 
@@ -573,11 +571,11 @@
     buildChannelChart();
     applyChannelWindow();          // initial x-range / y-refit
     wire();
-    updateVerdict();
+    updateBoxes();
     renderBackstop();
     renderCompression();
     renderMethod();
-    renderChannelContext(TODAY_PRICE, 'seed');   // seed immediately
+    renderChannelContext(TODAY_PRICE, 'seed');   // seeds the slider to today's live position
     if (typeof fetchTodayPrice === 'function') fetchTodayPrice(function (price, source) { renderChannelContext(price, source); });
   }
 
