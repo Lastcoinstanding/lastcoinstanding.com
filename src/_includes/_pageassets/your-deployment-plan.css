@@ -49,8 +49,13 @@ body { background: var(--bg); color: var(--text); }
 
 /* ── The calculator surface ── */
 .dp-calc { max-width: 1100px; margin: 2.5rem auto 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.8rem 1.8rem 2rem; }
-.dp-calc-head { display: flex; flex-wrap: wrap; gap: 0.8rem 1.4rem; align-items: center; justify-content: space-between; margin-bottom: 1.4rem; }
-.dp-calc-head h2 { font-family: var(--font-d); font-size: 1.5rem; font-weight: 500; letter-spacing: -.01em; color: #f2eee8; margin: 0; }
+/* Title + view toggle share a row; the 3B dynamic title differs in length per view, so the
+   toggle is pinned upper-right (flex-shrink:0 + margin-left:auto) and the title wraps within
+   its own column — the toggle does NOT move when switching Retrospective ↔ Projection. */
+.dp-calc-head { display: flex; flex-wrap: nowrap; gap: 0.8rem 1.4rem; align-items: flex-start; justify-content: space-between; margin-bottom: 1.4rem; }
+.dp-calc-head h2 { font-family: var(--font-d); font-size: 1.5rem; font-weight: 500; letter-spacing: -.01em; color: #f2eee8; margin: 0; flex: 1 1 auto; min-width: 0; }
+.dp-calc-head .dp-view { flex-shrink: 0; margin-left: auto; }
+@media (max-width: 520px) { .dp-calc-head { flex-wrap: wrap; } .dp-calc-head .dp-view { margin-left: 0; } }
 
 /* View toggle (Retrospective ↔ Projective) */
 .dp-view { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
@@ -141,6 +146,9 @@ body[data-dp-view="projective"] .dp-proj-only { display: block; }
 .dp-table-caveat { font-family: 'Inter', sans-serif; font-size: 0.78rem; line-height: 1.6; color: var(--text-muted); margin: 0.8rem 0 0; }
 .dp-table-caveat strong { color: var(--text-dim); font-weight: 600; }
 .dp-table-caveat em { font-style: italic; }
+.dp-decay-note { color: var(--text-dim); margin-top: 0.5rem; }
+.dp-decay-note em { color: var(--text-dim); }
+.dp-decay-note a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 
 /* 3×4 strategy × hold grid */
 .dp-grid { table-layout: fixed; width: 100%; }

@@ -276,7 +276,7 @@
     var cap = document.getElementById('dpRetroCaveat');
     if (cap) {
       cap.innerHTML = idx.length
-        ? 'Across <strong>' + idx.length + '</strong> historical entries near today&rsquo;s position (' + posDisplay(matchPos()) + ') &mdash; <strong>' + mature8 + '</strong> with a full eight-year history &mdash; each held the listed number of years. <em>Each column uses the entries old enough for that hold, so the long-hold medians rest on fewer, older entries. Treat as illustrative, not statistical; the pre-2014 curiosity era is excluded.</em>'
+        ? 'Across <strong>' + idx.length + '</strong> historical entries near today&rsquo;s position (' + posDisplay(matchPos()) + ') &mdash; <strong>' + mature8 + '</strong> with a full eight-year history &mdash; each held the listed number of years. <em>Each column uses the entries old enough for that hold, so the long-hold columns rest on the older near-floor entries, which cluster in 2015&ndash;2016 (the last time Bitcoin sat this low with room for a full eight-year record). 2014 traded well above the floor, working down from the 2013 peak &mdash; an absence, not a cut; earlier near-floor entries in 2010&ndash;2013 are set aside as the pre-$15 curiosity era, prices too small to represent returns a buyer today could replicate. Illustrative, not statistical.</em>'
         : 'Bitcoin has too few historical entries near today&rsquo;s position to follow &mdash; switch to <strong>Projection</strong> for the forward view.';
     }
     var dct = document.getElementById('dpDotCountTotal'); if (dct) dct.textContent = idx.length;
@@ -338,6 +338,24 @@
     renderTitle();
     updateTimingLink();
     updateChart(); renderRetro(); renderProj(); renderBackstop();
+    renderCaveats();
+  }
+  // Position-relative caveat (no spatial pointer — the readout reordered, so "above"/"left"
+  // are wrong/fragile) + decaying-returns honesty caveat. Both pull the SAME live numbers the
+  // tables render, so the magnitude gap (historical ~X× vs projected ~lo–hi×) can never drift.
+  // Qualitative fallback when a value is missing — a broken {} placeholder never renders.
+  function renderCaveats() {
+    var rel = document.getElementById('dpCaveatRel');
+    if (rel) rel.innerHTML = 'Everything here is relative to <strong>today&rsquo;s position &mdash; ' + posDisplay(livePos()) + '</strong>; the recommendation is the channel&rsquo;s tendency, not a <strong>certainty or prediction</strong> &mdash; the <a href="#cautions">cautions at the bottom of the page</a> are important to understand and reflect on.';
+    var dec = document.getElementById('dpDecayCaveat'); if (!dec) return;
+    var idx = entrySet();
+    var retro = idx.length ? retroGrid(idx).lump[HOLDS.length - 1] : null;
+    var pj = projGrid().lump[HOLDS.length - 1];
+    if (retro != null && pj && isFinite(pj.lo) && isFinite(pj.hi)) {
+      dec.innerHTML = '<strong>These historical multiples won&rsquo;t repeat at the same scale.</strong> The Power Law&rsquo;s growth rate decays as Bitcoin matures &mdash; near-floor entries returned about <strong>' + fmtMult(retro) + '</strong> over eight years historically, but the same model projects roughly <strong>' + fmtMult(pj.lo) + '&ndash;' + fmtMult(pj.hi) + '</strong> forward. The table below teaches that <em>patience helped</em> &mdash; it does not promise the <em>magnitude</em>. For forward-looking ranges, use the <strong>Projection</strong> view.';
+    } else {
+      dec.innerHTML = '<strong>These historical multiples won&rsquo;t repeat at the same scale.</strong> The Power Law&rsquo;s growth rate decays as Bitcoin matures, so forward returns are expected to be materially lower. For forward-looking ranges, use the <strong>Projection</strong> view.';
+    }
   }
   // Calculator H2 — dynamic by view, with the live ×-trend inline (same value as the readout).
   function renderTitle() {
@@ -427,6 +445,10 @@
 
     document.querySelectorAll('.dp-view button').forEach(function (btn) {
       btn.addEventListener('click', function () { state.view = btn.getAttribute('data-view'); document.querySelectorAll('.dp-view button').forEach(function (b) { b.classList.toggle('active', b === btn); }); document.body.setAttribute('data-dp-view', state.view); renderTitle(); updateChart(); });
+    });
+
+    document.querySelectorAll('.dp-proj-jump').forEach(function (a) {
+      a.addEventListener('click', function (e) { e.preventDefault(); var b = document.querySelector('.dp-view button[data-view="projective"]'); if (b) b.click(); });
     });
 
     var dtog = document.getElementById('dpDetailToggle'), dbody = document.getElementById('dpDetailBody');
