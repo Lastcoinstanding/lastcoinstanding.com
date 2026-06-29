@@ -122,6 +122,50 @@ body[data-dp-view="projective"] .dp-cap-proj { display: block; }
 .dp-fwd-caveat { font-family: 'Inter', sans-serif; font-size: 0.82rem; line-height: 1.6; color: var(--text-dim); margin: 0.7rem 0 0; padding: 0.8rem 1rem; background: rgba(192,57,43,0.05); border: 1px solid rgba(192,57,43,0.25); border-radius: 6px; }
 .dp-fwd-caveat strong { color: var(--text); font-weight: 600; }
 
+/* ════════ Stage 3A redesign ════════ */
+/* Retrospective / Projection switch — pill toggle (BvRE-style) */
+.dp-switch { display: inline-flex; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 999px; padding: 3px; gap: 2px; }
+.dp-switch button { border: none; background: transparent; color: var(--text-dim); font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; padding: 0.42rem 1.1rem; border-radius: 999px; cursor: pointer; transition: background 0.18s, color 0.18s; }
+.dp-switch button.active { background: var(--amber); color: #0a0908; }
+
+/* View-driven show/hide of the two tables */
+.dp-proj-only { display: none; }
+body[data-dp-view="projective"] .dp-retro-only { display: none; }
+body[data-dp-view="projective"] .dp-proj-only { display: block; }
+
+/* Table captions + caveats */
+.dp-tablewrap { margin: 1.6rem 0 0; }
+.dp-table-caption { font-family: 'Inter', sans-serif; font-size: 0.84rem; line-height: 1.6; color: var(--text-dim); margin: 0 0 0.8rem; }
+.dp-table-caption strong { color: var(--text); font-weight: 600; }
+.dp-table-caption em { color: var(--amber); font-style: italic; }
+.dp-table-caveat { font-family: 'Inter', sans-serif; font-size: 0.78rem; line-height: 1.6; color: var(--text-muted); margin: 0.8rem 0 0; }
+.dp-table-caveat strong { color: var(--text-dim); font-weight: 600; }
+.dp-table-caveat em { font-style: italic; }
+
+/* 3×4 strategy × hold grid */
+.dp-grid { table-layout: fixed; width: 100%; }
+.dp-grid th:first-child, .dp-grid td:first-child { width: 26%; text-align: left; }
+.dp-grid .dp-strat-row { transition: background 0.15s; }
+.dp-grid .dp-strat-row:hover { background: rgba(224,148,34,0.06); cursor: default; }
+.dp-grid .dp-strat-row.dp-row-sel { background: rgba(224,148,34,0.10); }
+.dp-grid .dp-strat-row.dp-row-sel th { color: var(--amber); }
+
+/* Position-aware cross-link to the timing page */
+.dp-timing-link { max-width: 1100px; margin: 2.4rem auto 0; font-family: 'Inter', sans-serif; font-size: 0.9rem; line-height: 1.65; border-radius: 10px; padding: 1rem 1.3rem; }
+.dp-timing-link strong { color: var(--text); font-weight: 600; }
+.dp-timing-muted { color: var(--text-muted); background: rgba(255,255,255,0.015); border: 1px solid var(--border); }
+.dp-timing-muted .dp-timing-note { display: block; margin-top: 0.4rem; font-style: italic; opacity: 0.85; }
+.dp-timing-surfaced { color: var(--text-dim); background: rgba(224,148,34,0.06); border: 1px solid rgba(224,148,34,0.35); border-left-width: 3px; }
+.dp-timing-surfaced a { color: var(--amber); }
+.dp-timing-tag { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); margin-right: 0.4rem; }
+
+/* Canonical Style-Guide tooltip (.help-tip / .tip-content) — for the "Today's position" ⓘ */
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; margin-left: 0.35rem; }
+.help-tip:hover, .help-tip:focus { border-color: var(--amber); color: var(--amber); outline: none; }
+.help-tip .tip-content { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 240px; padding: 0.6rem 0.75rem; background: var(--bg-card); border: 1px solid rgba(224,148,34,0.3); border-radius: 4px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 400; color: var(--text); line-height: 1.45; text-align: left; letter-spacing: 0; text-transform: none; pointer-events: none; z-index: 10; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
+.help-tip:hover .tip-content, .help-tip:focus .tip-content { display: block; pointer-events: auto; }
+@media (max-width: 480px) { .help-tip .tip-content { width: min(240px, calc(100vw - 32px)); } }
+
 /* ── Live readout + caveats (rule #2) ── */
 .dp-live { margin: 2.6rem auto 0; max-width: 1100px; background: linear-gradient(135deg, rgba(224,148,34,0.06), rgba(20,18,16,0.4)); border: 1px solid rgba(224,148,34,0.22); border-radius: 12px; padding: 1.5rem 1.6rem; }
 .dp-live-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 1.4rem 1.8rem; align-items: start; }
