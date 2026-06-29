@@ -116,19 +116,24 @@
   //    (Version B). Reuses the ±0.07 band matcher. ──
   function channelMatches(pos, span) {
     var idx = [];
-    for (var i = 0; i < N; i++) { if (S[i].d > LAST_D - span) break; if (Math.abs(S[i].pos - pos) <= MATCH_BAND) idx.push(i); }
+    for (var i = 0; i < N; i++) { if (span != null && S[i].d > LAST_D - span) break; if (Math.abs(S[i].pos - pos) <= MATCH_BAND) idx.push(i); }
     return idx;
   }
+  // The full in-band, post-2014 entry set at EVERY maturity. Per-column maturity is applied
+  // inside retroGrid (so a column's median isn't dragged by entries too recent to have that
+  // record), and the expandable detail table shows the rest with honest blank long-hold cells.
   function entrySet() {
-    var maxHold = HOLDS[HOLDS.length - 1] * YEAR_D;
-    return channelMatches(matchPos(), maxHold).filter(function (i) { return S[i].d >= TABLE_CUT; });
+    return channelMatches(matchPos(), null).filter(function (i) { return S[i].d >= TABLE_CUT; });
   }
-  // 3×4 median grid under the "held N years" convention (each entry valued N years AFTER
-  // its own entry date — captures the cycle peak within the holding window → columns climb).
+  function matureFor(idx, h) { return idx.filter(function (i) { return S[i].d <= LAST_D - h * YEAR_D; }); }
+  // 3×4 median grid under the "held N years" convention (each entry valued N years AFTER its
+  // own entry date — captures the cycle peak within the window). Each column draws only on the
+  // entries old enough for that hold, so the long-hold medians rest on fewer, older entries and
+  // the row climbs because time does the work, not because of an inconsistent denominator.
   function retroGrid(idx) {
     var grid = {};
     STYLES.forEach(function (s) {
-      grid[s] = HOLDS.map(function (h) { return median(idx.map(function (i) { return planMultiple(s, S[i].d, h * YEAR_D); })); });
+      grid[s] = HOLDS.map(function (h) { return median(matureFor(idx, h).map(function (i) { return planMultiple(s, S[i].d, h * YEAR_D); })); });
     });
     return grid;
   }
@@ -267,12 +272,42 @@
     var idx = entrySet(), grid = retroGrid(idx), cells = {};
     STYLES.forEach(function (s) { cells[s] = grid[s].map(function (m) { return fmtMult(m); }); });
     strategyRows('dpRetroBody', cells);
+    var mature8 = matureFor(idx, HOLDS[HOLDS.length - 1]).length;
     var cap = document.getElementById('dpRetroCaveat');
     if (cap) {
       cap.innerHTML = idx.length
-        ? 'Across <strong>' + idx.length + '</strong> historical entries near today&rsquo;s position (' + posDisplay(matchPos()) + '), each held the listed number of years. <em>These qualifying near-floor entries cluster in ~2015&ndash;2016 — recent near-floor entries are too young for the long holds, so the longest columns necessarily rest on older entries. Treat as illustrative, not statistical; the pre-2014 curiosity era is excluded.</em>'
-        : 'Bitcoin has too few historical entries near today&rsquo;s position with eight years of history to follow — switch to <strong>Projection</strong> for the forward view.';
+        ? 'Across <strong>' + idx.length + '</strong> historical entries near today&rsquo;s position (' + posDisplay(matchPos()) + ') &mdash; <strong>' + mature8 + '</strong> with a full eight-year history &mdash; each held the listed number of years. <em>Each column uses the entries old enough for that hold, so the long-hold medians rest on fewer, older entries. Treat as illustrative, not statistical; the pre-2014 curiosity era is excluded.</em>'
+        : 'Bitcoin has too few historical entries near today&rsquo;s position to follow &mdash; switch to <strong>Projection</strong> for the forward view.';
     }
+    var dct = document.getElementById('dpDotCountTotal'); if (dct) dct.textContent = idx.length;
+    var dcm = document.getElementById('dpDotCountMature'); if (dcm) dcm.textContent = mature8;
+    var dco = document.getElementById('dpDetailCount'); if (dco) dco.textContent = idx.length;
+    renderDetail(idx, grid);
+  }
+  // Expandable evidence table (the answer to "how do the entries become the median"): every
+  // in-band entry, not just the 8yr-mature ones, with blank long-hold cells where an entry is
+  // too recent for that record. A pinned median row anchors the reference; individual rows
+  // zigzag (some six-year holds caught a cycle peak), the median across all of them is what climbs.
+  function renderDetail(idx, grid) {
+    var tb = document.getElementById('dpDetailTableBody'); if (!tb) return;
+    grid = grid || retroGrid(idx);
+    var s = state.style, html = '';
+    html += '<tr class="dp-detail-median"><th>Median</th><td class="dp-detail-xt">&mdash;</td>';
+    grid[s].forEach(function (m, j) { html += '<td' + (j === HOLDS.length - 1 ? ' class="dp-strong"' : '') + '>' + fmtMult(m) + '</td>'; });
+    html += '</tr>';
+    idx.forEach(function (i) {
+      var xt = S[i].p / plPrice(S[i].d);
+      html += '<tr><th>' + monthYear(S[i].d) + '</th><td class="dp-detail-xt">' + xt.toFixed(2) + '&times;</td>';
+      for (var h = 0; h < HOLDS.length; h++) {
+        var mature = S[i].d <= LAST_D - HOLDS[h] * YEAR_D, cls = [];
+        if (h === HOLDS.length - 1) cls.push('dp-strong');
+        if (!mature) cls.push('dp-detail-blank');
+        var v = mature ? fmtMult(planMultiple(s, S[i].d, HOLDS[h] * YEAR_D)) : '&mdash;';
+        html += '<td' + (cls.length ? ' class="' + cls.join(' ') + '"' : '') + '>' + v + '</td>';
+      }
+      html += '</tr>';
+    });
+    tb.innerHTML = html;
   }
   function renderProj() {
     var grid = projGrid(), cells = {};
@@ -293,15 +328,25 @@
     if (posEl) posEl.innerHTML = '<strong>' + ratio.toFixed(2) + '×</strong> trend · ' + posLabel(pos);
     if (recEl) {
       var rec;   // bands aligned to the 2H vocabulary boundaries
-      if (pos < 0.36) rec = 'the model leans <b>deploy decisively</b> — spreading mostly means paying more as price reverts up toward trend.';
+      if (pos < 0.36) rec = 'the model leans <b>deploy decisively</b> — laddering-in mostly means paying more as price reverts up.';
       else if (pos < 0.53) rec = 'this is close to a <b>coin-flip</b> — pick the style you can hold through; commitment matters more than the tactic.';
-      else if (pos < 0.79) rec = 'the lump-sum edge is thinning; a <b>hybrid or ladder</b> starts to look more attractive as a hedge.';
-      else rec = 'a <b>hybrid or ladder</b> is the more defensible call as a drawdown hedge against the reversion the channel predicts — read the cautions, it&rsquo;s softer than it sounds.';
+      else if (pos < 0.79) rec = 'lump sum can be riskier here; a <b>hybrid or ladder</b> looks more attractive as a hedge.';
+      else rec = 'a <b>hybrid or ladder</b> is the more defensible call as a drawdown hedge — read the cautions, it&rsquo;s softer than it sounds.';
       recEl.innerHTML = 'With price ' + posLabel(pos) + ', ' + rec;
     }
-    if (metaEl) metaEl.textContent = 'Live: ' + fmtUSD(price) + ' · ' + ratio.toFixed(2) + '× trend' + (source === 'live' ? '' : ' (latest sample)') + ' · recomputed every load.';
+    if (metaEl) metaEl.textContent = 'Live: ' + fmtUSD(price) + ' · ' + ratio.toFixed(2) + '× trend' + (source === 'live' ? '' : ' (latest sample)') + ' · recomputed every page load.';
+    renderTitle();
     updateTimingLink();
     updateChart(); renderRetro(); renderProj(); renderBackstop();
+  }
+  // Calculator H2 — dynamic by view, with the live ×-trend inline (same value as the readout).
+  function renderTitle() {
+    var el = document.getElementById('dpCalcTitle'); if (!el) return;
+    var ratio = (liveTodayPrice != null ? liveTodayPrice : TODAY_PRICE) / plPrice(TODAY_DAYS);
+    var pre = 'At today&rsquo;s position (' + ratio.toFixed(2) + '&times; trend), ';
+    el.innerHTML = (state.view === 'retrospective')
+      ? pre + 'how have the strategies performed?'
+      : pre + 'how might the strategies perform over the years ahead?';
   }
   // Position-aware cross-link to the (future) timing page: muted/absent when low in the
   // channel (deploying decisively is the honest call — we don't manufacture hesitation);
@@ -358,25 +403,37 @@
     var durRow = document.getElementById('dpDurRow'), frontRow = document.getElementById('dpFrontRow');
     if (durRow) durRow.style.display = (state.style === 'lump') ? 'none' : '';
     if (frontRow) frontRow.style.display = (state.style === 'hybrid') ? '' : 'none';
-    var durLabel = document.getElementById('dpDurLabelText');
-    if (durLabel) durLabel.textContent = (state.style === 'hybrid') ? 'Blend the rest over' : 'Ladder over';
+    updateDurLabel();
+  }
+  // Hybrid names the laddered remainder explicitly so the split is unambiguous (e.g. 75% now
+  // → "Blend the remaining 25% over"); plain ladder just says "Ladder over".
+  function updateDurLabel() {
+    var durLabel = document.getElementById('dpDurLabelText'); if (!durLabel) return;
+    durLabel.textContent = (state.style === 'hybrid') ? 'Blend the remaining ' + (100 - state.front) + '% over' : 'Ladder over';
   }
   function wire() {
     var sum = document.getElementById('dpSum'), sumVal = document.getElementById('dpSumVal');
     if (sum) sum.addEventListener('input', function () { state.sum = parseInt(this.value, 10); if (sumVal) sumVal.textContent = fmtUSD(state.sum); renderRetro(); renderProj(); });
 
     document.querySelectorAll('.dp-style button').forEach(function (btn) {
-      btn.addEventListener('click', function () { state.style = btn.getAttribute('data-style'); document.querySelectorAll('.dp-style button').forEach(function (b) { b.classList.toggle('active', b === btn); }); syncStyleUI(); renderActiveRows(); renderProj(); });
+      btn.addEventListener('click', function () { state.style = btn.getAttribute('data-style'); document.querySelectorAll('.dp-style button').forEach(function (b) { b.classList.toggle('active', b === btn); }); syncStyleUI(); renderRetro(); renderActiveRows(); renderProj(); });
     });
 
     var dur = document.getElementById('dpDur'), durVal = document.getElementById('dpDurVal');
     if (dur) dur.addEventListener('input', function () { state.durMonths = parseInt(this.value, 10); if (durVal) durVal.textContent = state.durMonths >= 12 && state.durMonths % 12 === 0 ? (state.durMonths / 12) + (state.durMonths === 12 ? ' yr' : ' yrs') : state.durMonths + ' mo'; renderRetro(); renderProj(); });
 
     var front = document.getElementById('dpFront'), frontVal = document.getElementById('dpFrontVal');
-    if (front) front.addEventListener('input', function () { state.front = parseInt(this.value, 10); if (frontVal) frontVal.textContent = state.front + '% now'; renderRetro(); renderProj(); });
+    if (front) front.addEventListener('input', function () { state.front = parseInt(this.value, 10); if (frontVal) frontVal.textContent = state.front + '% now'; updateDurLabel(); renderRetro(); renderProj(); });
 
     document.querySelectorAll('.dp-view button').forEach(function (btn) {
-      btn.addEventListener('click', function () { state.view = btn.getAttribute('data-view'); document.querySelectorAll('.dp-view button').forEach(function (b) { b.classList.toggle('active', b === btn); }); document.body.setAttribute('data-dp-view', state.view); updateChart(); });
+      btn.addEventListener('click', function () { state.view = btn.getAttribute('data-view'); document.querySelectorAll('.dp-view button').forEach(function (b) { b.classList.toggle('active', b === btn); }); document.body.setAttribute('data-dp-view', state.view); renderTitle(); updateChart(); });
+    });
+
+    var dtog = document.getElementById('dpDetailToggle'), dbody = document.getElementById('dpDetailBody');
+    if (dtog && dbody) dtog.addEventListener('click', function () {
+      var open = dbody.hasAttribute('hidden');
+      if (open) dbody.removeAttribute('hidden'); else dbody.setAttribute('hidden', '');
+      dtog.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
   }
 
