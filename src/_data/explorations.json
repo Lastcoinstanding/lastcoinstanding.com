@@ -291,6 +291,21 @@
     }
   },
   {
+    "slug": "wait-or-deploy-now",
+    "title": "Wait, or Deploy Now?",
+    "category": "numbers",
+    "group": "Positioning & Strategy",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Did waiting for a lower Bitcoin entry pay off? A position-aware, historical read &mdash; quiet when low, live when high.",
+      "preview_kind": "live-chart",
+      "preview_id": "mini-wait-or-deploy",
+      "anchor": "#comparator",
+      "featured": false,
+      "position": 17
+    }
+  },
+  {
     "slug": "borrowing-against-your-stack",
     "title": "Borrowing Against Your Stack",
     "category": "numbers",

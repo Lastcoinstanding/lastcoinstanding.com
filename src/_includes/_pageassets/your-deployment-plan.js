@@ -369,16 +369,16 @@
   // Position-aware cross-link to the (future) timing page: muted/absent when low in the
   // channel (deploying decisively is the honest call — we don't manufacture hesitation);
   // surfaced when high (waiting is a real consideration worth digesting first). The
-  // page-3 URL is a placeholder until that page ships.
+  // page-3 is /wait-or-deploy-now (the "whether/when" page, retrospective-only).
   function updateTimingLink() {
     var el = document.getElementById('dpTimingLink'); if (!el) return;
     var pos = livePos();
     if (pos < 0.53) {   // near floor / below trend / at trend → muted
       el.className = 'dp-timing-link dp-timing-muted';
-      el.innerHTML = 'Today, price is <strong>' + posDisplay(pos) + '</strong> — low enough that deploying decisively is the honest call, so there&rsquo;s little to deliberate. <span class="dp-timing-note">(If price were high in the channel, this is where we&rsquo;d point you to the timing page — weighing whether to wait. It isn&rsquo;t, so we don&rsquo;t.)</span>';
+      el.innerHTML = 'Today, price is <strong>' + posDisplay(pos) + '</strong> — low enough that deploying decisively is the honest call, so there&rsquo;s little to deliberate. <span class="dp-timing-note">(If price were high in the channel, this is where we&rsquo;d point you to <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a> — weighing whether to wait. It isn&rsquo;t, so we don&rsquo;t.)</span>';
     } else {            // above trend / high / upper band → surfaced
       el.className = 'dp-timing-link dp-timing-surfaced';
-      el.innerHTML = '<span class="dp-timing-tag">Weighing whether to wait?</span> Price is <strong>' + posDisplay(pos) + '</strong> — high enough that <em>when</em> to deploy is a real question, not just <em>how</em>. Digest the drawdown-cost and waiting tradeoffs on <a href="/timing-and-waiting">the timing page</a> before committing capital.';
+      el.innerHTML = '<span class="dp-timing-tag">Weighing whether to wait?</span> Price is <strong>' + posDisplay(pos) + '</strong> — high enough that <em>when</em> to deploy is a real question, not just <em>how</em>. Digest the drawdown-cost and waiting tradeoffs on <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a> before committing capital.';
     }
   }
 

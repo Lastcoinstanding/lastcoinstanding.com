@@ -705,6 +705,49 @@
     setSvg(target, W, H, parts.join(''));
   }
 
+  /* ═══════════════════════════════════════════════════════════
+     10. MINI WAIT-OR-DEPLOY  (drawdown cost rises with position)
+     A cost curve deepening left→right across the channel (floor →
+     upper band): shallow where price is low, steep where it's high.
+     A live "today" marker sits at Bitcoin's current channel position
+     — near the floor, in the quiet zone. Telegraphs page 3's spine:
+     deploying high has carried escalating drawdowns; deploying low
+     barely does. amber → red.
+     ═══════════════════════════════════════════════════════════ */
+  function renderMiniWaitOrDeploy(target) {
+    var W = 400, H = 110, ml = 10, mt = 14, mb = 18, mr = 50, steps = 48;
+    var LF = Math.log(PL_FLOOR), LC = Math.log(PL_CEIL), SPAN = LC - LF;
+    var today = (Date.now() / 1000 - GENESIS_TS) / 86400;
+    var lastP = PL_DATA[PL_DATA.length - 1][1];
+    var pos = (Math.log(lastP / plTrend(today)) - LF) / SPAN;
+    if (!isFinite(pos)) pos = 0.1;
+    pos = Math.max(0.02, Math.min(0.98, pos));
+    function X(u) { return ml + u * (W - ml - mr); }
+    // illustrative monotonic drawdown-by-position cost curve (deepens with position)
+    function depth(u) { return 0.02 + 0.72 * Math.pow(u, 1.35); }
+    function Y(u) { return mt + Math.min(1, depth(u) / 0.78) * (H - mt - mb); }
+    var line = '', area = '', k;
+    for (k = 0; k <= steps; k++) { var u = k / steps; line += (k === 0 ? 'M' : 'L') + X(u).toFixed(1) + ' ' + Y(u).toFixed(1); }
+    area = line + 'L' + X(1).toFixed(1) + ' ' + mt + 'L' + X(0).toFixed(1) + ' ' + mt + 'Z';
+    var parts = [];
+    parts.push('<defs><linearGradient id="wdGrad" x1="0" y1="0" x2="1" y2="0">' +
+      '<stop offset="0" stop-color="#e09422" stop-opacity="0.18"/>' +
+      '<stop offset="0.6" stop-color="#c0392b" stop-opacity="0.22"/>' +
+      '<stop offset="1" stop-color="#c0392b" stop-opacity="0.4"/></linearGradient></defs>');
+    parts.push('<line x1="' + ml + '" y1="' + mt + '" x2="' + (W - mr) + '" y2="' + mt + '" stroke="#3a3a3a" stroke-width="0.8" stroke-dasharray="3 3"/>');
+    parts.push('<path d="' + area + '" fill="url(#wdGrad)"/>');
+    parts.push('<path d="' + line + '" fill="none" stroke="#c0392b" stroke-width="1.8" stroke-linecap="round"/>');
+    // live today marker on the curve at the current channel position
+    var tx = X(pos), ty = Y(pos);
+    parts.push('<line x1="' + tx.toFixed(1) + '" y1="' + mt + '" x2="' + tx.toFixed(1) + '" y2="' + (H - mb) + '" stroke="#f2eee8" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5"/>');
+    parts.push('<circle cx="' + tx.toFixed(1) + '" cy="' + ty.toFixed(1) + '" r="3" fill="#f2eee8" stroke="#0a0908" stroke-width="1"/>');
+    parts.push('<text x="' + tx.toFixed(1) + '" y="' + (H - 4) + '" font-size="6.5" font-family="' + FONT + '" fill="' + C.label + '" text-anchor="middle">today</text>');
+    parts.push('<text x="' + ml + '" y="' + (mt - 4) + '" font-size="6.5" font-family="' + FONT + '" fill="' + C.label + '">floor · deploy</text>');
+    parts.push('<text x="' + (W - mr) + '" y="' + (mt - 4) + '" font-size="6.5" font-family="' + FONT + '" fill="#c0392b" text-anchor="end">upper · wait?</text>');
+    parts.push('<text x="' + (W - mr + 3) + '" y="' + (Y(1) + 2).toFixed(1) + '" font-size="6.5" font-family="' + FONT + '" fill="#c0392b">drawdown</text>');
+    setSvg(target, W, H, parts.join(''));
+  }
+
   var RENDERERS = {
     'mini-heatmap':      renderMiniHeatmap,
     'mini-bvsm-chart':   renderMiniBvsmChart,
@@ -714,7 +757,8 @@
     'mini-horizon':      renderMiniHorizon,
     'mini-half-life':    renderMiniHalfLife,
     'mini-lump-vs-dca':  renderMiniLumpVsDca,
-    'mini-deployment-plan': renderMiniDeploymentPlan
+    'mini-deployment-plan': renderMiniDeploymentPlan,
+    'mini-wait-or-deploy': renderMiniWaitOrDeploy
   };
 
   function init() {
