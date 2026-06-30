@@ -85,10 +85,25 @@ body { background: var(--bg); color: var(--text); }
 .wd-slider-caption strong { color: var(--text-dim); font-weight: 600; }
 .wd-slider-caption a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 
-/* Hero — the waiting-paid rate */
-.wd-hero { text-align: center; padding: 1.6rem 1.2rem 1.4rem; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 10px; margin: 0 0 1.4rem; }
-.wd-hero-num { font-family: var(--font-d); font-size: clamp(3.2rem, 12vw, 5rem); font-weight: 600; line-height: 1; letter-spacing: -.02em; color: #f2eee8; font-variant-numeric: tabular-nums; }
-.wd-hero-label { font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.6; color: var(--text-dim); max-width: 30rem; margin: 0.8rem auto 0; }
+/* Up-front cue tying the slider to the chart */
+.wd-cue { font-family: 'Inter', sans-serif; font-size: 0.86rem; line-height: 1.6; color: var(--text-dim); margin: 0 0 0.9rem; }
+.wd-cue strong { color: var(--text); font-weight: 600; }
+
+/* Explicit, unmistakable "today" marker on the slider track */
+.wd-today-flag { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: 'Inter', sans-serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #f2eee8; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+.wd-today-tick.is-visible .wd-today-flag { opacity: 0.95; }
+
+/* IN-VIEWPORT ROW — hero answer (left) + channel chart with moving dots (right), so cause
+   (slider) and effect (dots + number) are seen together without scrolling. */
+.wd-viewport-row { display: grid; grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr); gap: 1.2rem 1.6rem; align-items: stretch; margin: 0 0 1.6rem; }
+.wd-viewport-row .wd-chart-block { margin: 0; display: flex; flex-direction: column; }
+.wd-viewport-row .wd-chart-wrapper { flex: 1; min-height: 300px; }
+.wd-why { border-top: 1px solid var(--border); padding-top: 1.6rem; }
+
+/* Hero — the waiting-paid rate (compact: smaller number to keep the chart in-viewport) */
+.wd-hero { text-align: center; padding: 1.4rem 1.2rem; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 10px; margin: 0; display: flex; flex-direction: column; justify-content: center; }
+.wd-hero-num { font-family: var(--font-d); font-size: clamp(2.8rem, 7vw, 4rem); font-weight: 600; line-height: 1; letter-spacing: -.02em; color: #f2eee8; font-variant-numeric: tabular-nums; }
+.wd-hero-label { font-family: 'Inter', sans-serif; font-size: 0.9rem; line-height: 1.55; color: var(--text-dim); max-width: 26rem; margin: 0.7rem auto 0; }
 .wd-hero-label strong { color: var(--text); font-weight: 600; }
 .wd-verdict { font-family: var(--font-d); font-size: clamp(1.2rem, 3vw, 1.6rem); letter-spacing: -.01em; line-height: 1.35; margin: 1rem auto 0; max-width: 32rem; }
 .wd-verdict strong { font-weight: 600; }
@@ -122,9 +137,9 @@ body { background: var(--bg); color: var(--text); }
 
 /* Chart */
 .wd-chart-block { margin: 0.6rem 0 0; }
-.wd-chart-caption { font-family: 'Inter', sans-serif; font-size: 0.8rem; color: var(--text-dim); margin: 0 0 0.7rem; line-height: 1.55; }
+.wd-chart-caption { font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-dim); margin: 0.55rem 0 0; line-height: 1.5; }
 .wd-chart-caption strong { color: var(--text); font-weight: 600; }
-.wd-chart-wrapper { position: relative; height: 400px; }
+.wd-chart-wrapper { position: relative; height: 360px; }
 .wd-sample-note { font-family: 'Inter', sans-serif; font-size: 0.76rem; line-height: 1.55; color: var(--text-muted); margin: 1rem 0 0; }
 .wd-sample-note strong { color: var(--text-dim); font-weight: 600; }
 
@@ -169,7 +184,9 @@ body { background: var(--bg); color: var(--text); }
 @media (max-width: 760px) {
   .content-area { padding: 0 1.2rem 4rem; }
   .wd-calc { padding: 1.3rem 1.1rem 1.5rem; }
-  .wd-chart-wrapper { height: 320px; }
+  .wd-viewport-row { grid-template-columns: 1fr; }
+  .wd-chart-wrapper { height: 300px; }
+  .wd-viewport-row .wd-chart-wrapper { min-height: 280px; }
   .wd-dd-pair { grid-template-columns: 1fr; }
   .wd-dd-divider { width: auto; height: 1px; margin: 0 1.4rem; }
   .wd-caution-grid, .wd-link-grid { grid-template-columns: 1fr; }

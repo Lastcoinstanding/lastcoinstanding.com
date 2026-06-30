@@ -37,9 +37,17 @@ function plPrice(days){ return PL_A * Math.pow(days, PL_B); }
 // log-space channel position (0 = floor at 0.42×trend, 1 = upper band at 3×trend).
 // Boundaries verified against the ×-trend ranges: ≤0.60× near floor, 0.60–0.85× below
 // trend, 0.85–1.20× at trend, 1.20–2.00× above trend, 2.00–2.70× high, ≥2.70× upper band.
-// Sub-floor positions (pos < 0, e.g. today's ~0.41× ≈ −0.01) fold into "near the floor"
-// — never a negative/below-floor artifact.
+// Sub-floor positions (pos < 0) are graded honestly by ×-trend rather than clamped to
+// "near the floor": price has historically sat below the 0.42× floor (low ~0.196× in 2010),
+// and today's ~0.40× is "just below the floor". The at/above-floor bands are unchanged, so
+// the other trilogy pages inherit only the additive sub-floor grading.
 function positionLabel(pos){
+  if (pos < 0) {
+    var r = PL_FLOOR * Math.exp(pos * (Math.log(PL_CEIL) - Math.log(PL_FLOOR)));
+    if (r < 0.30) return 'far below the floor';
+    if (r < 0.40) return 'below the floor';
+    return 'just below the floor';
+  }
   if (pos < 0.18) return 'near the floor';
   if (pos < 0.36) return 'below trend';
   if (pos < 0.53) return 'at trend';

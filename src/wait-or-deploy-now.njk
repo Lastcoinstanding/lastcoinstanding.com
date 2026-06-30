@@ -22,7 +22,7 @@ eleventyComputed:
 <section class="hero">
   <h1>Wait, or <em>Deploy Now?</em></h1>
   <div class="hero-subtitle">Sometimes waiting for a better Bitcoin entry pays off &mdash; and the channel tells you when.</div>
-  <p class="subtitle">The third of the trilogy: where the others ask <em>how</em> to deploy, this one asks <em>whether</em> &mdash; is this a position where waiting earned its keep, or one where deploying decisively was the honest call?</p>
+  <p class="subtitle">The third of the trilogy: where the others ask <em>how</em> to deploy, this one asks <em>whether</em> &mdash; is today&rsquo;s position one where waiting <em>or</em> deploying decisively becomes the prudent call?</p>
 </section>
 
 <main class="content-area">
@@ -30,8 +30,8 @@ eleventyComputed:
   {% include 'components/tool-framing.njk' %}
 
   <div class="section-intro wd-prose">
-    <p>This is the trilogy&rsquo;s <em>whether/when</em> page. <a href="/lump-sum-or-ladder-in">Lump Sum or Ladder In?</a> teaches the general lesson; <a href="/your-deployment-plan">Your Deployment Plan</a> models deploying today. This page owns the question the others deliberately leave alone: from a given position in the channel, did <strong>waiting for a lower entry</strong> historically leave you with more Bitcoin &mdash; or did the dip you were waiting for usually never come?</p>
-    <p class="wd-footnote"><strong>Waiting, here, is position-based &mdash; not a calendar.</strong> &ldquo;Wait&rdquo; means hold out for a <em>lower channel position</em> (price drifting toward the floor), capped at two years. It is never a signal that price <em>will</em> drop; it is a read on what history did at this position.</p>
+    <p>This is the trilogy&rsquo;s <em>whether/when</em> page. <a href="/lump-sum-or-ladder-in">Lump Sum or Ladder In?</a> teaches the general lesson; <a href="/your-deployment-plan">Your Bitcoin Deployment Plan</a> models deploying today. This page owns the question the others deliberately leave alone: from a given position in the channel, did <strong>waiting for a lower entry</strong> historically leave you with more Bitcoin &mdash; or did the dip you were waiting for usually never come?</p>
+    <p class="wd-footnote"><strong>Waiting, here, is position-based &mdash; not about timing.</strong> &ldquo;Wait&rdquo; means hold out for a <em>lower channel position</em>, capped at two years. It is never a signal or guarantee that price <em>will</em> drop; it is a read on what history did at this position.</p>
   </div>
 
   <!-- ════════ POSITION-AWARE STATE — quiet when low (as now), live when high ════════ -->
@@ -51,53 +51,58 @@ eleventyComputed:
       <span class="wd-readout" id="wdPosReadout">&mdash;</span>
     </div>
 
+    <!-- Cue the slider → chart link UP FRONT, before the slider -->
+    <p class="wd-cue">Drag the slider to explore any channel position &mdash; the <strong>dashed line and blue dots on the chart move with it</strong>, and the answer below updates together. The <strong>&#9650; today</strong> marker is where Bitcoin sits right now.</p>
+
     <div class="wd-slider-block">
       <div class="wd-slider-wrap">
-        <input type="range" min="0" max="1000" step="1" value="86" class="wd-slider" id="wdSlider"
-               aria-label="Explore a channel position from floor to upper band">
-        <span class="wd-today-tick" id="wdTodayTick" aria-hidden="true"></span>
+        <input type="range" min="0" max="1000" step="1" value="51" class="wd-slider" id="wdSlider"
+               aria-label="Explore a channel position from below the floor to the upper band">
+        <span class="wd-today-tick" id="wdTodayTick" aria-hidden="true"><span class="wd-today-flag">&#9650; today</span></span>
       </div>
-      <div class="wd-slider-scale"><span>Floor &middot; cheap</span><span>Trend</span><span>Upper band &middot; expensive</span></div>
-      <p class="wd-slider-caption">The tick marks where Bitcoin sits <strong>today</strong> &mdash; drag to explore other positions, or <a href="#" id="wdResetToday">snap back to today</a>. Every figure below is <strong>historical, at this position</strong> &mdash; not a prediction.</p>
+      <div class="wd-slider-scale"><span>Below floor &middot; cheapest</span><span>Trend</span><span>Upper band &middot; expensive</span></div>
+      <p class="wd-slider-caption">Drag to explore other positions, or <a href="#" id="wdResetToday">snap back to today</a>. Every figure is <strong>historical, at this position</strong> &mdash; not a prediction.</p>
     </div>
 
-    <!-- Hero — the waiting-paid rate -->
-    <div class="wd-hero">
-      <div class="wd-hero-num"><span id="wdHeroNum">&mdash;</span></div>
-      <p class="wd-hero-label">Historically, from this position, waiting for a lower entry left you with <strong>more Bitcoin</strong> this often.</p>
-      <p class="wd-verdict wd-verdict-danger" id="wdVerdict">&mdash;</p>
-    </div>
-
-    <!-- "Never arrived" counterweight -->
-    <p class="wd-counter wd-counter-strong" id="wdCounter">&mdash;</p>
-
-    <!-- Dual-impact drawdown pair — the WHY -->
-    <div class="wd-dd">
-      <div class="wd-dd-pair">
-        <div class="wd-dd-half">
-          <div class="wd-dd-cap">How likely</div>
-          <div class="wd-dd-num" id="wdDdProb">&mdash;</div>
-          <p class="wd-dd-sub">of entries at this position fell at least 20% within two years.</p>
-        </div>
-        <div class="wd-dd-divider" aria-hidden="true"></div>
-        <div class="wd-dd-half">
-          <div class="wd-dd-cap">How deep, if it comes</div>
-          <div class="wd-dd-num wd-dd-num-red" id="wdDdDepth">&mdash;</div>
-          <p class="wd-dd-sub">median worst drawdown &mdash; <span id="wdDdCoins">&mdash;</span>.</p>
-        </div>
+    <!-- IN-VIEWPORT ROW: hero answer (left) + channel chart with moving dots (right) -->
+    <div class="wd-viewport-row">
+      <div class="wd-hero">
+        <div class="wd-hero-num"><span id="wdHeroNum">&mdash;</span></div>
+        <p class="wd-hero-label">Historically, from this position, waiting for a lower entry left you with <strong>more Bitcoin</strong> this often.</p>
+        <p class="wd-verdict wd-verdict-danger" id="wdVerdict">&mdash;</p>
       </div>
-      <p class="wd-dd-caveat">Likelihood and depth together &mdash; both drawn from history at this position, <strong>not a forecast</strong>. Past patterns can&rsquo;t predict future prices.</p>
+      <div class="wd-chart-block">
+        <div class="wd-chart-wrapper"><canvas id="wdChart"></canvas></div>
+        <p class="wd-chart-caption">The Power Law channel across history. The <strong>dashed blue line</strong> is the position you&rsquo;re exploring; the <strong>blue dots</strong> are the historical entries near it the answer is built from.</p>
+      </div>
     </div>
 
-    <p class="wd-wait-detail" id="wdWaitDetail">&mdash;</p>
+    <!-- ── Below the interaction: the "why" ── -->
+    <div class="wd-why">
+      <!-- "Never arrived" counterweight -->
+      <p class="wd-counter wd-counter-strong" id="wdCounter">&mdash;</p>
 
-    <!-- Channel chart — the selected position highlighted -->
-    <div class="wd-chart-block">
-      <p class="wd-chart-caption">The Power Law channel across history. The <strong>dashed blue line</strong> is the position you&rsquo;re exploring; the <strong>blue dots</strong> are the historical entries near it that the figures above are built from. Drag the slider to move both.</p>
-      <div class="wd-chart-wrapper"><canvas id="wdChart"></canvas></div>
+      <!-- Dual-impact drawdown pair — the WHY -->
+      <div class="wd-dd">
+        <div class="wd-dd-pair">
+          <div class="wd-dd-half">
+            <div class="wd-dd-cap">How likely</div>
+            <div class="wd-dd-num" id="wdDdProb">&mdash;</div>
+            <p class="wd-dd-sub">of entries at this position fell at least 20% within two years.</p>
+          </div>
+          <div class="wd-dd-divider" aria-hidden="true"></div>
+          <div class="wd-dd-half">
+            <div class="wd-dd-cap">How deep, if it comes</div>
+            <div class="wd-dd-num wd-dd-num-red" id="wdDdDepth">&mdash;</div>
+            <p class="wd-dd-sub">median worst drawdown &mdash; <span id="wdDdCoins">&mdash;</span>.</p>
+          </div>
+        </div>
+        <p class="wd-dd-caveat">Likelihood and depth together &mdash; both drawn from history at this position, <strong>not a forecast</strong>. Past patterns can&rsquo;t predict future prices.</p>
+      </div>
+
+      <p class="wd-wait-detail" id="wdWaitDetail">&mdash;</p>
+      <p class="wd-sample-note" id="wdSampleNote">&mdash;</p>
     </div>
-
-    <p class="wd-sample-note" id="wdSampleNote">&mdash;</p>
   </section>
 
   <!-- ════════ CROSS-LINKS — the trilogy connective tissue ════════ -->
@@ -128,7 +133,7 @@ eleventyComputed:
       </div>
       <div class="wd-caution">
         <h3>&ldquo;Waiting&rdquo; is a position read, not a market call</h3>
-        <p>Waiting here means holding out for a <em>lower channel position</em>, capped at two years &mdash; and the whole point is that the dip often never came. Nothing on this page tells you price will drop. When the waiting-paid rate is low, the honest reading is to <strong>deploy decisively</strong>.</p>
+        <p>Waiting here means holding out for a <em>lower channel position</em>, capped at two years &mdash; and the whole point is that the dip often never came. Nothing on this page tells you price will drop. When the waiting-paid rate is low, the clear reading is to <strong>deploy decisively</strong>.</p>
       </div>
       <div class="wd-caution wd-caution-blindspot">
         <h3>Laddering is the response to risk, not a timing bet</h3>

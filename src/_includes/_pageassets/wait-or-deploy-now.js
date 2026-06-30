@@ -11,7 +11,7 @@
 
    POSITION-AWARE: the page reads its relevance off today's LIVE position.
    Near the floor (as now) it is QUIET — "deploying decisively is the
-   honest call". High in the channel it goes LIVE. This is the anti-timing
+   clear call". High in the channel it goes LIVE. This is the anti-timing
    stance at the page level: it declines to manufacture a waiting
    deliberation when there is nothing to deliberate. Everything is
    retrospective; the forward view lives on page 2's Projection.
@@ -99,6 +99,15 @@
 
   // ── State (continuous position; default to today's live position) ──
   var state = { pos: 0.1 };
+  // The slider spans slightly BELOW the floor (so today's sub-floor ~0.40× is reachable and the
+  // "today" marker sits at the true position) up to the upper band. The reader-facing label
+  // always shows the TRUE position; entry-matching clamps sub-floor to the floor INTERNALLY only
+  // (stability), so the clamp never leaks into what the reader sees.
+  var POS_MIN = -0.08, POS_MAX = 1.0, POS_RANGE = POS_MAX - POS_MIN;
+  function clampPos(p) { return Math.max(POS_MIN, Math.min(POS_MAX, p)); }
+  function sliderToPos(v) { return POS_MIN + (v / 1000) * POS_RANGE; }
+  function posToSlider(p) { return Math.round((clampPos(p) - POS_MIN) / POS_RANGE * 1000); }
+  function matchPos(p) { return Math.max(0, p); }   // internal entry-matching clamp (display untouched)
 
   // ── Format helpers ──
   function pct0(v) { return Math.round(v) + '%'; }
@@ -113,7 +122,7 @@
 
   // ════════ COMPARATOR RENDER ════════
   function renderComparator() {
-    var P = state.pos, m = bandMetrics(P);
+    var P = state.pos, m = bandMetrics(matchPos(P));
     var posReadout = document.getElementById('wdPosReadout');
     if (posReadout) posReadout.innerHTML = '<strong>' + ratioOf(P).toFixed(2) + '×</strong> trend · <em>' + posLabel(P) + '</em>';
     if (!m) return;
@@ -197,8 +206,8 @@
     ds.push({ label: 'BTC price (history)', data: price, borderColor: HIST_C, borderWidth: 1.3, pointRadius: 0, tension: 0.15, order: 1 });
     // selected position — a line parallel to trend at the chosen ×-trend multiple
     ds.push(band('Selected position', bandLine(ratioOf(state.pos), startD, span), SEL_C, [4, 4], 2));
-    // the historical entries the current band is built from
-    var m = bandMetrics(state.pos);
+    // the historical entries the current band is built from (same internal match-clamp)
+    var m = bandMetrics(matchPos(state.pos));
     selDots = (m && m.entries) ? m.entries.map(function (i) { return { x: S[i].d, y: S[i].p }; }) : [];
     return ds;
   }
@@ -244,37 +253,37 @@
     if (posEl) posEl.innerHTML = '<strong>' + ratio.toFixed(2) + '×</strong> trend · ' + posLabel(pos);
     if (metaEl) metaEl.textContent = 'Live: $' + Math.round(price).toLocaleString() + ' · ' + ratio.toFixed(2) + '× trend' + (source === 'live' ? '' : ' (latest sample)') + ' · recomputed every page load.';
     if (introEl) {
-      if (pos < 0.53) {   // near floor / below trend / at trend → QUIET
+      if (pos < 0.53) {   // sub-floor / near floor / below trend / at trend → QUIET
         introEl.className = 'wd-intro-state wd-intro-quiet';
-        introEl.innerHTML = '<span class="wd-intro-tag">This page is quiet right now</span> Bitcoin is <strong>' + posDisplay(pos) + '</strong> — low enough that this page’s question barely applies: <strong>deploying decisively is the honest call</strong>, and there is little to deliberate. What follows is what this page is <em>for</em> — explore higher positions to see why, for when price climbs into the channel and <em>whether</em> to deploy becomes a real question.';
+        introEl.innerHTML = '<span class="wd-intro-tag">This page is quiet right now</span> Bitcoin is <strong>' + posDisplay(pos) + '</strong> — low enough that there is essentially no advantage to waiting, based on historical data: <strong>deploying decisively is the clear call</strong>, and there is little to deliberate. This page is more applicable when price is higher in the channel, where <em>whether to deploy</em> becomes a real question.';
       } else {            // above trend / high / upper band → LIVE
         introEl.className = 'wd-intro-state wd-intro-live';
         introEl.innerHTML = '<span class="wd-intro-tag wd-intro-tag-live">This page is live right now</span> Price is <strong>' + posDisplay(pos) + '</strong> — high enough that <em>whether</em> to deploy, not just how, is a real question. Below is the historical cost of deploying at this position, and how often waiting for a lower entry paid off.';
       }
     }
-    // default the explorer to today's live position the first time we learn it
-    if (!state.userMoved) { state.pos = Math.max(0, Math.min(1, pos)); syncSliderToState(); }
+    // default the explorer to today's TRUE live position the first time we learn it (no floor clamp)
+    if (!state.userMoved) { state.pos = clampPos(pos); syncSliderToState(); }
     placeTodayTick();
     renderComparator();
   }
 
   // ════════ SLIDER + PERSISTENT "TODAY" TICK ════════
-  function syncSliderToState() { var sl = document.getElementById('wdSlider'); if (sl) sl.value = Math.round(state.pos * 1000); }
+  function syncSliderToState() { var sl = document.getElementById('wdSlider'); if (sl) sl.value = posToSlider(state.pos); }
   function placeTodayTick() {
     var m = document.getElementById('wdTodayTick'); if (!m) return;
-    m.style.left = (Math.max(0, Math.min(1, livePos())) * 100) + '%';
+    m.style.left = ((clampPos(livePos()) - POS_MIN) / POS_RANGE * 100) + '%';
     m.classList.add('is-visible');
   }
   function wire() {
     var sl = document.getElementById('wdSlider');
-    if (sl) sl.addEventListener('input', function () { state.userMoved = true; state.pos = parseInt(this.value, 10) / 1000; renderComparator(); });
+    if (sl) sl.addEventListener('input', function () { state.userMoved = true; state.pos = sliderToPos(parseInt(this.value, 10)); renderComparator(); });
     var reset = document.getElementById('wdResetToday');
-    if (reset) reset.addEventListener('click', function (e) { e.preventDefault(); state.userMoved = false; state.pos = Math.max(0, Math.min(1, livePos())); syncSliderToState(); renderComparator(); });
+    if (reset) reset.addEventListener('click', function (e) { e.preventDefault(); state.userMoved = false; state.pos = clampPos(livePos()); syncSliderToState(); renderComparator(); });
   }
 
   // ════════ INIT ════════
   function init() {
-    state.pos = Math.max(0, Math.min(1, livePos()));
+    state.pos = clampPos(livePos());
     syncSliderToState();
     buildChart(); wire();
     renderLive(TODAY_PRICE, 'seed');
