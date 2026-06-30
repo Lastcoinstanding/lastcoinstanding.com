@@ -580,7 +580,13 @@ All slides deployed with 16:9 widescreen silent videos, minimalist copy pattern 
 
 ### Pending additions
 
-_None currently — the Bitcoin & Metcalfe's Law slide shipped June 2026 (see the slide-added note above and the iteration record below)._
+The **deployment trilogy** slides are pending — each needs a Grok Imagine video (the three pages shipped in PR #34, June 2026, per the usual NEW_PAGE_CHECKLIST §8 cadence). Proposed copy + video direction:
+
+- **Lump Sum or Ladder In?** — slide copy: *"Deploy it all, or ladder in? History sorts it out."* Video direction: a single stack of coins deployed at once beside a staircase of smaller deployments, the lump-sum path pulling ahead over a rising channel.
+- **Your Bitcoin Deployment Plan** — slide copy: *"Your capital, your timeline — modeled against the channel."* Video direction: a personal deployment sum flowing into the channel at today's position, fanning into lump/ladder/hybrid paths.
+- **Wait, or Deploy Now?** — slide copy: *"Wait for a lower entry, or deploy now? The channel tells you when."* Video direction: a marker on the rising channel at today's position, a dotted "wait" path dipping down then rejoining as the channel rises away — echoing the page's icon.
+
+_(The Bitcoin & Metcalfe's Law slide shipped June 2026 — see the slide-added note above and the iteration record below.)_
 
 **Documentation drift resolved (May 2026):** the previously-flagged drift between markup and this inventory was closed when slide 22 (What Money Is For) landed. The three previously-undocumented slides (`vid-heatmap`, `vid-bbm`, `vid-lob`) have had their inventory rows scraped from `src/index.njk` and added to the table below; the prior slide-17 entry (Borrowing Against Your Stack) has been renumbered to 18 to match the live markup. The table below now matches `src/index.njk` slide-for-slide.
 
@@ -981,6 +987,8 @@ For a reader new to the site landing on the calculators:
 Risks to Bitcoin (shipped June 2026) sits late in the reading order — it is a steelman-and-rebuttal page that lands best once a reader already grasps the bull case, since it argues against bitcoin in order to test that case. Place it after the core Arguments and before the deepest Numbers specializations.
 
 Phase 4 strengthens this reading order by separating *application* (BvSM, BvRE, retirement, disciplined rebalancing) from *foundation* (Power Law). BvSM was added at the top of the reading order in May 2026 because it requires the least personal context from the reader and proves the framework with the broadest comparator most readers already trust.
+
+The deployment trilogy sits in the applied-Numbers tier, after the foundational Power Law and the broad comparators, since it assumes the reader already grasps the channel. Read in order — **Lump Sum or Ladder In?** (the general lump-vs-ladder lesson) → **Your Bitcoin Deployment Plan** (model your own deployment today) → **Wait, or Deploy Now?** (the position-aware whether/when question). The three escalate from general principle to personal plan to the timing-adjacent edge case, so they earn each other in that sequence; placing "Wait, or Deploy Now?" last is deliberate — it's the most timing-adjacent and lands best once the reader already holds the decisive-deployment default.
 
 ---
 
@@ -1737,3 +1745,35 @@ Per reviewer direction (`STAGE_2C_REBUILD_SPEC.md` + `Lump_Sum_or_Ladder_In_-_Co
 - **Carousel slide** pending (needs a Grok Imagine video) per NEW_PAGE_CHECKLIST §8.
 - **Deferred polish** shared with §32: tooltips for load-bearing terms; final voice pass against the live designed pages.
 - **BvSM cross-link** considered (the entry-at-the-tops stress-test sibling) but left out of the related set to keep it focused on the deployment-decision family; easy to add if wanted.
+
+---
+
+## 34. Wait, or Deploy Now? (`/wait-or-deploy-now.html`)
+
+**Added June 2026 (Stages 4–6, same PR #34).** The third page of the deployment trilogy in **The Numbers** (group *Positioning & Strategy*), after §32 *Lump Sum or Ladder In?* and §33 *Your Bitcoin Deployment Plan*. Where Page 1 teaches the general lesson and Page 2 models deploying *today*, this page owns the question the other two deliberately leave alone: from a given position in the channel, **did waiting for a lower entry historically leave you with more Bitcoin — or did the dip you were waiting for usually never come?** Page-scoped classes use the `wd-` prefix; reads the shared `power-law-data.js` globals (incl. `positionLabel`) and the mixed-content width tier (1100 page / 880 prose).
+
+**Thesis.** This is the trilogy's *whether/when* page, and the most timing-adjacent surface on the site — so it is framed as a **retrospective, position-aware read, never a signal**. "Waiting" is **position-based, not calendar-based**: hold out for a *lower channel position* (capped at two years), never a claim that price *will* drop. The outcome is measured in **Bitcoin acquired** (1 / price), waiter vs. deploy-now. The honest payload: low in the channel there is essentially no advantage to waiting (deploying decisively is the clear call); high in the channel, *whether* to deploy becomes a real question worth digesting.
+
+**Everything is computed live from the current `PL_DATA` at load** — the waiting-paid rate, the drawdown likelihood/depth, the never-arrived share, and today's channel position. **Nothing is hard-coded** (rule #1).
+
+### Structure (single comparator surface)
+A continuous **position explorer**, top to bottom: a **position-aware live state** band (quiet when low — "deploying decisively is the clear call" — flipping LIVE high in the channel, the `pos < 0.53` threshold shared with Page 2's timing link); then the comparator — a **sub-floor-capable slider** (`#wdSlider`) with a persistent **▲ today** marker and a "snap back to today" link; a **full-width Power Law channel chart** (`#wdChart`) directly under the slider whose dashed line + blue dots move as you drag; and a **compact result band**: the **waiting-paid hero %** on the left (how often waiting left you with more Bitcoin) beside the **bonded dual-impact drawdown pair** (likelihood × depth as one grouped unit with a shared "not a forecast" caveat). Below: the **never-arrived counterweight** (the share where no lower entry came within two years), then secondary wait-length/sample lines. Cautions + methodology close the page.
+
+### Key editorial moves
+- **Anti-timing integrity** — the page is quiet at the floor and only goes "live" high in the channel; it never tells you price will fall, and when the waiting-paid rate is low the clear reading is *deploy decisively*. The waiting mechanism is prose-only (channel geometry, "not a forecast"), never a win-rate or "cheaper" stat that would make it a timing tool.
+- **Position-based waiting** (not a market call) — "wait" means a lower *channel position*, capped at two years; if no lower entry arrives, the waiter deploys at the two-year price (waiting failed). The rising trend means "lower in the channel" can still mean a *higher absolute price* after waiting — stated explicitly.
+- **Sub-floor vocabulary originates here** — the graduated "far below / below / just below the floor" grading was added to the shared `positionLabel` (Stage 5) so today's ~0.40× reads as "just below the floor" rather than clamping to "near the floor"; the `pos≥0` bands are byte-for-byte unchanged and only the trilogy (the sole callers) inherits the grading. See TECH_DEBT §1 (zone-vocabulary divergence) for the sitewide consistency note.
+
+### Design lessons (the 5A→5C density arc)
+The result surface went through three compaction passes worth preserving: **5A** (three tall stat slabs) → **5B** (full-width chart moved *above* a compact result band; the three slabs collapse to hero % | bonded drawdown pair) → **5C** (CSS-only one-viewport fit: chart height became a responsive `clamp(260px, 38vh, 340px)` — generous on tall displays, compressing toward the floor on a ~1366×768 laptop — plus tightened result-band padding and inter-section gaps). The goal across the arc: slider → chart → headline answer visible together without scrolling, legible across the clamp range, mobile still stacking cleanly. **Page 1's risk section was later shed (Stage 6)** down to a concise static figure + a teaser link here, delegating the full waiting/drawdown depth to this page so the two don't duplicate.
+
+### Cross-cutting discipline
+- **Rule #1:** no live value in static copy; today's position renders only via `fetchTodayPrice` (the live-state band, the slider's today marker, the live readout).
+- **Reuse:** shared Power Law globals + `positionLabel`; the canonical `.help-tip` tooltip; the slider/today-tick conventions from the trilogy siblings.
+
+### Integration
+`explorations.json` (group *Positioning & Strategy*, `calculator_tile` at position 17, `interactive: true`); `sitemap.xml` @0.9; `llms.txt` (The Numbers); homepage concept card (rising-channel-with-wait-dip marker SVG) in The Numbers + Latest (rolled Bitcoin & Metcalfe's Law and The Doubling Ladder out of Latest, leaving the trilogy as the three newest); `updates.json` (6/30/26); **bidirectional `related:`** with Lump Sum or Ladder In?, Your Bitcoin Deployment Plan, The Power Law, The Bitcoin Horizon, and the Heatmap (Page 1 and Page 2 both link back per the Stage 7 audit fix); OG card `og-wait-or-deploy-now.jpg` (§6.15.1 brand-forward).
+
+### Open items
+- **Carousel slide** pending (needs a Grok Imagine video) per NEW_PAGE_CHECKLIST §8 — see §13 "Pending additions" for the proposed copy + video direction.
+- **Zone-vocabulary divergence** (TECH_DEBT §1): the non-trilogy "zone" pages (`the-power-law`, BvSM, retirement) and the homepage `classifyState` still use their own position-label vocabulary; migrate-vs-document is deferred to the future bull/bear-cycles page (PAGE_IDEAS_BACKLOG).

@@ -487,6 +487,23 @@ eleventyComputed:
     <div class="explore-subsection-label">Latest</div>
     <div class="card-grid">
 
+        <!-- Wait, or Deploy Now? -->
+        <a href="/wait-or-deploy-now.html" class="concept-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- A rising channel with a marker at today's position and a dotted "wait for a lower entry" dip that rejoins as the channel climbs away -->
+                    <path d="M4 38 C 16 30, 30 18, 44 11" stroke="#7a6f5d" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.55"/>
+                    <path d="M4 44 C 16 36, 30 24, 44 17" stroke="#7a6f5d" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.55"/>
+                    <path d="M4 41 C 16 33, 30 21, 44 14" stroke="#e09422" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.9"/>
+                    <path d="M24 27 C 25 33, 29 34, 33 30" stroke="#9a8f7d" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="1.5 2.2" fill="none"/>
+                    <circle cx="24" cy="27" r="3.4" fill="#e09422"/>
+                </svg>
+            </div>
+            <div class="card-title">Wait, or Deploy Now?</div>
+            <div class="card-desc">High in the channel, is it worth waiting for a lower entry &mdash; or is deploying now the honest call? A position-aware look at when patience paid, and when the dip never came.</div>
+            <div class="card-cta">Explore the question &rarr;</div>
+        </a>
+
         <!-- Your Deployment Plan -->
         <a href="/your-deployment-plan.html" class="concept-card">
             <div class="card-icon">
@@ -521,55 +538,6 @@ eleventyComputed:
             <div class="card-title">Lump Sum or Ladder In?</div>
             <div class="card-desc">You have a windfall &mdash; deploy it all now, or spread it out? The honest answer isn&rsquo;t &ldquo;always one.&rdquo; It depends where Bitcoin sits in the Power Law channel: decisive when cheap, patient when stretched, committed always. Drag the scrubber and watch the settled debate flip on its axis.</div>
             <div class="card-cta">Find your call &rarr;</div>
-        </a>
-
-        <!-- Bitcoin & Metcalfe's Law -->
-        <a href="/bitcoin-and-metcalfes-law.html" class="concept-card">
-            <div class="card-icon">
-                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- A network whose connections brighten on the left and fade on the
-                         right: Metcalfe's network effect, with the on-chain signal going blind. -->
-                    <line x1="11" y1="14" x2="9" y2="31" stroke="#F7931A" stroke-width="1.3"/>
-                    <line x1="11" y1="14" x2="22" y2="23" stroke="#F7931A" stroke-width="1.3"/>
-                    <line x1="9" y1="31" x2="22" y2="23" stroke="#F7931A" stroke-width="1.3"/>
-                    <line x1="22" y1="23" x2="31" y2="12" stroke="#e09422" stroke-width="1.1" opacity="0.6"/>
-                    <line x1="22" y1="23" x2="34" y2="32" stroke="#e09422" stroke-width="1.1" opacity="0.6"/>
-                    <line x1="31" y1="12" x2="42" y2="21" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2.5" opacity="0.35"/>
-                    <line x1="34" y1="32" x2="42" y2="21" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2.5" opacity="0.35"/>
-                    <circle cx="11" cy="14" r="2.2" fill="#F7931A"/>
-                    <circle cx="9" cy="31" r="2.2" fill="#F7931A"/>
-                    <circle cx="22" cy="23" r="2.4" fill="#F7931A"/>
-                    <circle cx="31" cy="12" r="1.9" fill="#e09422" opacity="0.7"/>
-                    <circle cx="34" cy="32" r="1.9" fill="#e09422" opacity="0.55"/>
-                    <circle cx="42" cy="21" r="1.7" fill="#e09422" opacity="0.3"/>
-                </svg>
-            </div>
-            <div class="card-title">Bitcoin &amp; Metcalfe's Law</div>
-            <div class="card-desc">Does price really grow with the square of adoption? Measured from on-chain data, the exponent lands below the quadratic ideal &mdash; and the deeper finding is that the signal itself is fading, as ownership moves into ETFs and custody the data can no longer see.</div>
-            <div class="card-cta">Measure it yourself &rarr;</div>
-        </a>
-
-        <!-- The Bitcoin Doubling Ladder -->
-        <a href="/the-doubling-ladder.html" class="concept-card">
-            <div class="card-icon">
-                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Log-log axes -->
-                    <line x1="6" y1="42" x2="44" y2="42" stroke="#e09422" stroke-width="1" opacity="0.35"/>
-                    <line x1="6" y1="6" x2="6" y2="42" stroke="#e09422" stroke-width="1" opacity="0.35"/>
-                    <!-- Underlying trend line (straight on log-log) -->
-                    <line x1="6" y1="40" x2="43" y2="8" stroke="#e09422" stroke-width="1" stroke-dasharray="2 2.5" opacity="0.5"/>
-                    <!-- Doubling staircase: treads widen and risers grow as it climbs -->
-                    <polyline points="6,40 6,35 12,35 12,29 20,29 20,22 31,22 31,13 43,13 43,8" stroke="#F7931A" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                    <!-- Diamonds where the doublings land -->
-                    <circle cx="12" cy="35" r="1.3" fill="#e09422"/>
-                    <circle cx="20" cy="29" r="1.3" fill="#e09422"/>
-                    <circle cx="31" cy="22" r="1.4" fill="#F7931A"/>
-                    <circle cx="43" cy="13" r="1.5" fill="#F7931A"/>
-                </svg>
-            </div>
-            <div class="card-title">The Bitcoin Doubling Ladder</div>
-            <div class="card-desc">Mezinskis showed bitcoin's price doublings come at a steady cadence. This page makes it visible &mdash; where each doubling landed, the market's wild swings around the trend, and what the widening-then-compressing gap reveals.</div>
-            <div class="card-cta">Read more &rarr;</div>
         </a>
 
     </div>
@@ -1236,6 +1204,23 @@ eleventyComputed:
             <div class="card-title">Your Bitcoin Deployment Plan</div>
             <div class="card-desc">You have a sum to put into Bitcoin &mdash; all at once, laddered in, or a hybrid of the two? Model your own plan against the Power Law channel, both back across real history and forward as a range. The personal companion to Lump Sum or Ladder In?, built for your situation.</div>
             <div class="card-cta">Model your plan &rarr;</div>
+        </a>
+
+        <!-- Wait, or Deploy Now? -->
+        <a href="/wait-or-deploy-now.html" class="concept-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- A rising channel with a marker at today's position and a dotted "wait for a lower entry" dip that rejoins as the channel climbs away -->
+                    <path d="M4 38 C 16 30, 30 18, 44 11" stroke="#7a6f5d" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.55"/>
+                    <path d="M4 44 C 16 36, 30 24, 44 17" stroke="#7a6f5d" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.55"/>
+                    <path d="M4 41 C 16 33, 30 21, 44 14" stroke="#e09422" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.9"/>
+                    <path d="M24 27 C 25 33, 29 34, 33 30" stroke="#9a8f7d" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="1.5 2.2" fill="none"/>
+                    <circle cx="24" cy="27" r="3.4" fill="#e09422"/>
+                </svg>
+            </div>
+            <div class="card-title">Wait, or Deploy Now?</div>
+            <div class="card-desc">High in the channel, is it worth waiting for a lower entry &mdash; or is deploying now the honest call? A position-aware look at when patience paid, and when the dip never came.</div>
+            <div class="card-cta">Explore the question &rarr;</div>
         </a>
 
         <!-- The Bitcoin Retirement -->
