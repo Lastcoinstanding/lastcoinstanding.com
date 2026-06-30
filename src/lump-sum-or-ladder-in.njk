@@ -5,6 +5,8 @@ slug: lump-sum-or-ladder-in
 related:
   - slug: your-deployment-plan
     desc: "The personal companion. Where this page is the general lesson, Your Bitcoin Deployment Plan models your own situation — your sum, lump vs ladder vs hybrid, looking forward as well as back."
+  - slug: wait-or-deploy-now
+    desc: "The whether/when sibling. This page names the upper-channel drawdown cost; Wait, or Deploy Now? owns the full waiting exploration — did holding out for a lower entry historically leave you with more Bitcoin, or did the dip never come?"
   - slug: the-power-law
     desc: "The foundational model and its attribution. This page applies the Power Law channel as a deployment-timing frame; The Channel lays out the bands and the evidence."
   - slug: the-bitcoin-horizon
@@ -165,36 +167,19 @@ eleventyComputed:
     </div>
   </section>
 
-  <!-- ════════ THE THIRD DIMENSION — deploying high in the channel (position-aware caution) ════════ -->
-  <!-- Anti-timing guardrail (Stage 2F): the drawdown COST is a live number; "waiting" is
-       mechanism-prose only — never a win-rate or "cheaper" stat. Caution, not a timing tool. -->
+  <!-- ════════ THE THIRD DIMENSION — deploying high in the channel (concise risk note) ════════ -->
+  <!-- Stage 6 shed: the full upper-channel waiting/drawdown exploration now lives on page 3
+       (/wait-or-deploy-now). Page 1 keeps the key point as concise static prose — a
+       live-computed headline figure (#lslHrMedian/#lslHrWorst), the decisiveness-while-low
+       framing with a live today readout (#lslHrToday), and the "historical cost, never a
+       signal" guardrail — then hands the depth off to page 3. No slider, no tiers. -->
   <section class="lsl-section lsl-highrisk" aria-label="Deploying high in the channel">
     <p class="lsl-secondary-label">The third dimension &middot; deploying high in the channel</p>
     <h2>What deploying high in the channel has cost</h2>
     <div class="lsl-prose" style="max-width:none;">
-      <p>The lump-vs-ladder comparison above sorts <em>how</em> to deploy. It leaves out a third question the binary hides: high in the channel, <em>whether</em> to deploy a lump at all. This is the most timing-adjacent idea on the site, so it&rsquo;s framed as a historical <em>cost</em>, never a signal &mdash; and it leads with why being <em>decisive while you&rsquo;re low</em> is valuable. It starts where Bitcoin sits <strong>today</strong>; use the slider below to preview the drawdown risk at other points in the channel.</p>
-    </div>
-
-    <!-- This section's OWN explore slider — decoupled from the top demonstration slider
-         (Stage 2G). Defaults to today's live position; the persistent tick marks today so
-         the reader always sees their real position vs. the hypothetical they're exploring.
-         It answers "how much drawdown risk at each position", never "which tactic won". -->
-    <div class="lsl-hr-explore">
-      <div class="lsl-hr-explore-top">
-        <span class="lsl-hr-explore-title">Preview the risk at other channel positions</span>
-        <span class="lsl-hr-explore-readout" id="lslHrReadout">&mdash;</span>
-      </div>
-      <div class="lsl-slider-wrap">
-        <input type="range" min="0" max="100" step="1" value="41" class="lsl-hr-slider" id="lslHrSlider"
-               aria-label="Preview drawdown risk at a channel position (does not affect the demonstration above)">
-        <span class="lsl-today-marker" id="lslHrTodayMarker" aria-hidden="true"></span>
-      </div>
-      <div class="lsl-scrub-scale"><span>Floor &middot; cheap</span><span>Trend</span><span>Upper band &middot; expensive</span></div>
-      <p class="lsl-hr-explore-caption">The tick marks where Bitcoin sits <strong>today</strong> &mdash; drag to preview the risk at other positions. This shows risk at a position; it is not a signal to wait for a lower price.</p>
-    </div>
-
-    <div class="lsl-highrisk-body lsl-hr-tier-quiet" id="lslHighRiskBody">
-      <p class="lsl-hr-quiet">Loading today&rsquo;s position&hellip; deploying decisively while low in the channel has historically carried the least of this drawdown risk.</p>
+      <p>The lump-vs-ladder comparison above sorts <em>how</em> to deploy. It leaves out a third question the binary hides: high in the channel, <em>whether</em> to deploy a lump at all. Framed honestly as a historical <em>cost</em>, never a signal: deploying into the upper channel has carried a steep, multi-year drawdown &mdash; a <span class="lsl-hr-num">median ~<span id="lslHrMedian">&mdash;</span>% drawdown within two years</span> before recovery (worst ~<span id="lslHrWorst">&mdash;</span>%), for upper-channel entries since 2017.</p>
+      <p>That risk is concentrated up high &mdash; which is exactly why being <strong>decisive while you&rsquo;re low in the channel</strong> is valuable, when that drawdown risk is least. <span class="lsl-hr-today-line">Today: <span id="lslHrToday">&mdash;</span>.</span></p>
+      <p class="lsl-hr-teaser">Whether to <em>wait</em> when you&rsquo;re high in the channel &mdash; and whether the same capital could buy more later &mdash; is its own question, explored fully in <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a></p>
     </div>
   </section>
 
