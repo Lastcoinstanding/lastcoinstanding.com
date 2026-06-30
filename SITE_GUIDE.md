@@ -1664,3 +1664,76 @@ wrapperEl._chartCopyCapture = function(){ return Promise<canvas|Blob>; };
 ### Adding the button to a future chart
 
 Just add `data-chart-copy` + `data-chart-title="…"` to the chart's wrapper. The capture path is auto-detected. For a DOM-grid or an SVG that should be captured whole (including non-SVG labels in the frame), add `data-chart-capture="dom"`.
+## 32. Lump Sum or Ladder In? (`/lump-sum-or-ladder-in.html`)
+
+**Added June 2026.** A channel-applying decision tool in **The Numbers** (group *Positioning & Strategy*). Sibling to `/disciplined-rebalancing` (DR) and `/bitcoin-vs-real-estate` projection mode; reuses DR's channel-viz / Chart.js patterns, the shared `power-law-data.js` globals, and the mixed-content width tier (1100 page / 880 prose). Built in two stages (2A core, 2B projective + integration), then **refocused in Stage 2C-①** (see the amendment at the end of this section).
+
+> **⚠️ Stage 2C-① refocus (see the amendment below before trusting this section).** The single page was split into two by reviewer direction. **This page (slug unchanged) is now the retrospective *teaching demonstration* only** — the projective lens, manual-blend, and recurring-windfall planner are gone; the live "deploy / hedge" recommendation moved off this page. The descriptions of "Two lenses" and the Stage-2B amendments below are **historical**, retained for provenance. The forward (projective) view and the hybrid model move to **Page 2, `/your-deployment-plan`** (Stage 2C-②, not yet built).
+
+**Thesis.** Lump sum vs. DCA isn't about timing or temperament — it's about **valuation relative to the Power Law channel**. Low in the channel → deploy decisively; stretched into the upper channel → spreading is the model-rational hedge; mid-channel → a coin-flip. Underneath it all, the commitment backstop: over a long horizon *every* entry recovers, so the tactic is a margin and commitment is the foundation.
+
+**Everything is computed live from the current `PL_DATA` at load** — the advantage curve, the commitment-backstop table, the volatility-compression table, the worst-entry recovery, and today's channel position. **Nothing is hard-coded** (the build-time re-run discipline becomes a load-time one). Step 1 of the build re-ran the four analyses against canonical data and reproduced the design figures to rounding; the figures that ship are the freshly-computed ones.
+
+### Structure (single-scroll, not tabbed)
+The page is one decision on one continuum, so it deliberately avoids DR's tab split. Controls: a **channel-position scrubber** (the single star lever), a **binary all-now ↔ ladder-in toggle** (the core decision; *not* a blend slider), a **lens toggle** (Retrospective ↔ Projective, 2B), and an **era segmented control** (Full / Post-2017 / Post-2020, default recent) that does double duty — it buckets the backtest *and* sets the channel chart's x-range. Quiet config: sum (cosmetic — the advantage is amount-invariant), ladder duration, hold horizon. Then: live readout, commitment-backstop table, volatility-compression (secondary), honesty layer, methodology footer. Advanced/optional disclosure (collapsed `<details>`): a manual %-now/%-laddered blend and a recurring-windfall planner.
+
+### Two lenses (the credibility argument)
+- **Retrospective** — the lump-vs-ladder advantage as a function of entry channel position, the "settled debate flips on its axis" curve (amber = all-now territory below zero, blue = laddering above), with a scrubbed marker and a live "today" line.
+- **Projective** — anchored at today, three forward channel-scenario paths (revert-to-trend / ride-floor / stretch-then-revert), **excursions sized to recent-era (compressed) amplitude, never early-era** (design §4.5). Shows all-now-vs-ladder *robust across permitted paths*, never a point forecast; the faint retrospective curve overlays for the two-lens agreement.
+
+### Stage-2B amendments (build decisions worth preserving)
+- **Forward channel extension folded into the projective lens (Amendment 1).** The orientation chart extends the floor/trend/upper bands forward to the hold-horizon year **only in the projective lens** (retrospective stays strictly historical — flagged choice). The forward (extrapolated) portion renders **faded + finely dashed** via Chart.js `segment` styling so fitted history is visually distinct from extrapolation, and it carries a **non-negotiable right-hand-edge caveat** (`#lslFwdCaveat`): the bands are a mathematical extrapolation of an empirical regularity, not a forecast.
+- **Era control drives the channel x-range with a y-refit (Amendment 2).** Selecting an era clips x to `[era-start … (retrospective: ~today | projective: horizon-year)]` **and** refits the log-Y envelope to that window so the bands open up. The "today" line and the forward bands always stay on-canvas.
+
+### Cross-cutting discipline
+- **No live value in static copy (rule #1).** The scrubber opens at a fixed low-channel *teaching* default (0.15), not today's value; today's position renders only in the live component via `fetchTodayPrice`.
+- **Live readout + caveats are one eyeful (rule #2).** The right-hand-edge and panic-threshold caveats sit in the same card as the live "deploy" reading.
+- **Locked precision conventions** (methodology footer): 8-year backstop exit = nearest sample to (entry + 8×365.25 days); worst-entry recovery quoted as the live range. Porkopolis attribution links to The Channel rather than restating it. No URL carry-over.
+
+### Integration
+`explorations.json` (group *Positioning & Strategy*, `calculator_tile` `mini-lump-vs-dca` at position 15); `calculators-minis.js` renderer (the advantage-curve flip); `sitemap.xml` @0.9; `llms.txt`; homepage concept card (deploy-vs-ladder bar SVG) in The Numbers + Latest; `updates.json`; bidirectional `related:` with The Power Law, The Bitcoin Horizon, BvSM, Disciplined Rebalancing; OG card `og-lump-sum-or-ladder-in.jpg` (§6.15.1 brand-forward).
+
+### Open items
+- **Deferred polish (post-split pass):** tooltips for load-bearing terms (channel position, trend, floor, upper band) will reuse the existing Style-Guide tooltip component verbatim; DCA-footnote wording confirmed against house style; a possible "sit in fiat and wait" third option (evaluate vs. confusion). None built yet.
+- **Carousel slide** pending (needs a Grok Imagine video) per the usual NEW_PAGE_CHECKLIST §8 cadence.
+
+### Stage 2C-① amendment — refocused to the teaching demonstration (current state)
+Per reviewer direction (`STAGE_2C_REBUILD_SPEC.md` + `Lump_Sum_or_Ladder_In_-_Content_v2_two_pages.docx`), the single page that tried to be both a teaching demonstration *and* a personal calculator was split. **Stage ① (this PR) refocuses Page 1 down to the retrospective demonstration; the slug, nav slot, OG image, and inbound links are preserved.** What changed:
+
+- **Removed the projective lens entirely** — the lens toggle, the three forward-scenario paths on the advantage chart, and the forward channel extension on the orientation chart. Page 1 is retrospective only. The forward path model (`PATHS` / `pathPos` / `simFwdAdv` / `projectiveCurve`, recent-era amplitude cap, `TREND_POS`) was **lifted, not deleted**, into `_pageassets/shared/deployment-projection.js` (global `DeploymentProjection`), self-contained on the shared Power Law globals, ready for Page 2.
+- **Removed the advanced disclosure** (manual %-now/%-laddered blend + recurring-windfall planner) and the cosmetic **Sum-to-deploy** control (it had no effect once those were gone — the advantage is amount-invariant). Both planners move to Page 2.
+- **Removed the live "deploy / hedge" recommendation block.** The upper-channel hedge is shown as *historical fact* here and softened to a *recommendation* only on Page 2. Page 1's sole live element is now a **factual position callout** ("Today: channel position X · Y× trend · near the floor"), computed live (rule #1 intact — no value baked into static copy).
+- **Promoted the channel-orientation chart ABOVE the scrubber** into a new **"Where are we right now?"** context section, and gave it the canonical **"you are here" glowing-rings pulse** (`lcs-pulse-halo`, STYLE_GUIDE §6.23 — reused verbatim from The Gallery's Chart 1: `todayGlow` radial halo + `lcsPulse` element positioner). It still draws the scrubbed entry-valuation line, so the reader sees today's glow *and* watches the tested valuation slide through the channel as they scrub below. Bands stop just past today (no forward extension).
+- **Kept** the novel advantage-by-channel-position chart; the era control (Full / Post-2017 / Post-2020) still buckets the backtest *and* sets the context chart's x-range with a y-refit. **Kept** the commitment-backstop and volatility-compression tables ("shared idea, shown here too" — they also appear on Page 2).
+- **Reframed copy** to the plained-down "this is a demonstration, not advice for your situation" voice throughout; added the **DCA footnote** at first use; honesty layer is now the doc's three items (empirical-not-guaranteed / hindsight-flatters / demonstration-not-advice), the negative-space "what this is not" list retained.
+- **Added the hand-off card** to `/your-deployment-plan` (`.lsl-handoff`). **This is a dead link until Stage 2C-② ships** — wired deliberately per spec.
+
+**Stage 2C-② (built — same PR #34, reviewed together):** new page `/your-deployment-plan` — see §33. Page 1's hand-off card now resolves to it.
+
+---
+
+## 33. Your Bitcoin Deployment Plan (`/your-deployment-plan.html`)
+
+**Added June 2026 (Stage 2C-②).** The personal model in **The Numbers** (group *Positioning & Strategy*), companion to §32 *Lump Sum or Ladder In?*. Where Page 1 is the retrospective teaching demonstration, this page is about *your* situation: your sum, your cadence, your horizon — modelled both back across real history and forward under the Power Law. New slug `/your-deployment-plan`; no URL carry-over from Page 1 (DR §8.1).
+
+**Thesis.** You have a sum to deploy. Lump it, ladder it, or do some of each? The **hybrid** (deploy X% now, ladder the rest over N months) is the differentiator — the option many people actually choose: a decisive core with some hedged comfort. The page lets you compare all three for your own case, on an intuitive value-over-time axis.
+
+### Structure
+- **Primary control: deployment style** (Lump / Ladder / Hybrid) — the thing you manipulate (rule #3). Then quiet plan inputs: sum, ladder/blend duration, hybrid front-load %, hold horizon. A **view toggle** (Retrospective / Projective).
+- **Chart chassis borrowed from The Bitcoin Retirement — SHAPE ONLY** (time on the x-axis, the Power Law channel floor-at-the-bottom). Imports **none** of Retirement's age/withdrawal/lifespan inputs; keeps this page's own controls and voice. The chart plots **price-per-BTC** with the floor/trend/upper channel and the forward/real price path, **anchored at the live spot (projective) or the matched historical entry price (retrospective)** — not the deployed sum. Amber **buy-point markers** show where the plan's purchases land (one dot for a lump, several along the path for a ladder/hybrid), so the chart reflects the style. The **dollar value + multiples live in the verdict**, not the chart axis. (Earlier builds plotted value-space bands scaled by `sum/spot`, which pinned t=0 to the deployed sum and read as mis-anchored — see `BUG_projective_anchor`; fixed by moving to the price channel.) Floor at the bottom still fixes the inverted-floor confusion of the old Page-1 projective advantage chart.
+- **Two views.** **Retrospective** has two anchors (review-round rebuild, fixes the 2015-pin): **channel-anchored** (default) finds every historical entry within ±0.07 of today's live channel position, deploys the plan from each at real prices, holds for the chosen horizon, and reports a **distribution** (median + typical range across matches) — the horizon slider sets *hold length*, not the entry; the chart replays the most recent match with a "you deployed here" marker while the verdict speaks to the whole set. **Time-anchored** (secondary, lower-weight toggle, never disabled) deploys the horizon's-worth of years ago and replays to today. **Projective** deploys today and extends two Power Law paths — **reversion-to-trend** and **stay-on-current-trajectory** — as a shaded *range*, never a forecast (the **lifted `DeploymentProjection`** module). Channel-position is shown sitewide as "×trend · plain label", never raw coordinates (review item 3); a **three-zone upper-channel risk flag** fires on the live position here (and the scrubbed position on Page 1), flipping the lean from "deploy decisively" to "drawdown hedge" and degrading the channel-anchored sample gracefully when it thins (review item 12).
+- **Live readout** carries the softened recommendation (deploy / coin-flip / hedge) **with its caveats in the same eyeful** (rule #2) and links into the Cautions.
+- **Cautions** — the required four (rule #4), loud and headed (`#cautions`): rising-channel-means-you-may-never-enter / sideways-for-years / Bitcoin-could-break-the-Power-Law / never-capitulates. This is where the upper-channel hedge is softened from Page 1's historical fact to a *recommendation*.
+- **Commitment backstop + volatility-compression** tables, computed live (the doc places them here too). Prerequisite + methodology + attribution as sitewide.
+
+### Cross-cutting discipline
+- **Rule #1:** no live value in static copy; today's position renders only via `fetchTodayPrice` (live readout + the chart anchor). The retrospective analog is chosen *from* the live position at load — described in logic, never a baked value.
+- **Reuse:** Power Law constants + channel math copied locally per rule #5; `DeploymentProjection` consumed for the reversion path; Mežinskis/Porkopolis attribution links to The Channel.
+
+### Integration
+`explorations.json` (group *Positioning & Strategy*, `calculator_tile` `mini-deployment-plan` at position 16); `calculators-minis.js` renderer (forward value-range cone); `sitemap.xml` @0.9; `llms.txt`; homepage concept card (value-fork-into-range SVG) in The Numbers + Latest (rolled The Gallery out of Latest); `updates.json`; **bidirectional `related:`** with Lump Sum or Ladder In?, The Bitcoin Retirement, The Power Law, The Bitcoin Horizon, Disciplined Rebalancing, **and The Bitcoin Heatmap** (the holding-period companion — empirical backstop for this page's commitment-first claim); OG card `og-your-deployment-plan.jpg` (§6.15.1 brand-forward).
+
+### Open items
+- **Carousel slide** pending (needs a Grok Imagine video) per NEW_PAGE_CHECKLIST §8.
+- **Deferred polish** shared with §32: tooltips for load-bearing terms; final voice pass against the live designed pages.
+- **BvSM cross-link** considered (the entry-at-the-tops stress-test sibling) but left out of the related set to keep it focused on the deployment-decision family; easy to add if wanted.

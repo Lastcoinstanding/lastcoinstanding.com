@@ -1,0 +1,246 @@
+/* =============================================================
+   Lump Sum or Ladder In? — page styles
+   Sibling to /disciplined-rebalancing; reuses its :root tokens,
+   mixed-content width tier (1100 page / 880 prose), channel-viz
+   and segmented-control conventions. Page-scoped classes use the
+   `lsl-` prefix; shared site classes (.hero, .content-area,
+   .section-intro, .belief-context, .negative-space-list) are reused.
+   ============================================================= */
+
+:root {
+  --bg: #0a0908;
+  --bg-card: #141210;
+  --amber: #e09422;
+  --amber-dim: #b8791c;
+  --amber-glow: rgba(224,148,34,0.15);
+  --text: #e8e0d4;
+  --text-dim: #9a9080;
+  --text-muted: #6a6256;
+  --red: #c0392b;
+  --red-dim: rgba(192,57,43,0.6);
+  --green: #27ae60;
+  --blue: #6db3d4;
+  --border: rgba(224,148,34,0.12);
+  --font-d: 'Cormorant Garamond', Georgia, serif;
+  --font-b: 'Inter', -apple-system, sans-serif;
+}
+
+body { background: var(--bg); color: var(--text); }
+
+/* ── Hero ── */
+.hero { position: relative; text-align: center; max-width: 880px; margin: 0 auto; padding: 4.5rem 2rem 2.5rem; }
+.hero h1 { font-family: var(--font-d); font-size: clamp(2.4rem, 6vw, 3.6rem); font-weight: 500; letter-spacing: -.01em; line-height: 1.08; color: #f2eee8; margin: 0 0 1rem; }
+.hero h1 em { font-style: italic; color: var(--amber); }
+.hero .hero-subtitle { font-family: var(--font-d); font-style: italic; font-size: clamp(1.1rem, 2.6vw, 1.45rem); color: var(--text-dim); margin: 0 0 0.6rem; }
+.hero .subtitle { font-family: 'Inter', sans-serif; font-size: 0.98rem; line-height: 1.7; color: var(--text-dim); margin: 0.6rem auto 0; }
+
+/* ── Container (mixed-content §4.2: page 1100, prose 880) ── */
+.content-area { position: relative; max-width: 1100px; margin: 0 auto; padding: 0 2rem 5rem; }
+.section-intro { max-width: 880px; margin: 0 auto 2.4rem; }
+.lsl-prose { max-width: 880px; margin: 0 auto; font-size: 1.02rem; line-height: 1.75; color: var(--text); }
+.lsl-prose p { margin: 0 0 1.1rem; }
+.lsl-prose em { color: var(--amber); font-style: italic; }
+.lsl-footnote { font-size: 0.84rem; color: var(--text-muted); line-height: 1.6; padding-left: 0.9rem; border-left: 2px solid var(--border); }
+.lsl-footnote strong { color: var(--text-dim); font-weight: 600; }
+.lsl-aside { color: var(--text-muted); }
+.lsl-section { max-width: 880px; margin: 3.5rem auto 0; }
+.lsl-section.lsl-wide { max-width: 1100px; }
+.lsl-section h2 { font-family: var(--font-d); font-size: 1.75rem; font-weight: 500; letter-spacing: -.01em; color: #f2eee8; margin: 0 0 0.4rem; }
+.lsl-section h3 { font-family: var(--font-d); font-size: clamp(1.35rem, 2.4vw, 1.65rem); font-weight: 500; letter-spacing: -.01em; color: #f2eee8; margin: 2rem 0 0.6rem; }
+.lsl-eyebrow { font-family: 'Inter', sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin: 0 0 0.6rem; }
+.lsl-secondary-label { font-family: 'Inter', sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); }
+
+/* ── The decision surface ── */
+.lsl-calc { max-width: 1100px; margin: 2.5rem auto 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.8rem 1.8rem 2rem; }
+.lsl-calc-head { display: flex; flex-wrap: wrap; gap: 0.8rem 1.4rem; align-items: flex-start; justify-content: space-between; margin-bottom: 1.4rem; }
+.lsl-calc-head h2 { font-family: var(--font-d); font-size: 1.5rem; font-weight: 500; letter-spacing: -.01em; color: #f2eee8; margin: 0; }
+.lsl-calc-framing { font-family: 'Inter', sans-serif; font-size: 0.84rem; line-height: 1.6; color: var(--text-dim); margin: 0 0 1.3rem; padding: 0.8rem 1rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; }
+.lsl-calc-framing strong { color: var(--text); font-weight: 600; }
+
+/* Era segmented control */
+.lsl-era { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.lsl-era button { background: rgba(255,255,255,0.02); border: none; border-right: 1px solid var(--border); color: var(--text-dim); font-family: 'Inter', sans-serif; font-size: 0.74rem; padding: 0.5rem 0.95rem; cursor: pointer; transition: background 0.15s, color 0.15s; white-space: nowrap; }
+.lsl-era button:last-child { border-right: none; }
+.lsl-era button.active { background: rgba(224,148,34,0.12); color: var(--amber); font-weight: 600; }
+.lsl-era-label { display: block; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* ── The scrubber — THE star control ── */
+.lsl-scrubber { background: rgba(224,148,34,0.04); border: 1px solid rgba(224,148,34,0.18); border-radius: 10px; padding: 1.3rem 1.5rem 1.5rem; margin: 0 0 1.4rem; }
+.lsl-scrubber-top { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.4rem 1rem; margin-bottom: 0.9rem; }
+.lsl-scrubber-title { font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber); }
+.lsl-scrubber-readout { font-family: 'Inter', sans-serif; font-size: 0.85rem; color: var(--text-dim); }
+.lsl-scrubber-readout strong { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.lsl-scrub-input { -webkit-appearance: none; appearance: none; width: 100%; height: 10px; border-radius: 6px; outline: none;
+  background: linear-gradient(90deg, rgba(224,148,34,0.55) 0%, rgba(224,148,34,0.18) 33%, rgba(109,179,212,0.18) 66%, rgba(109,179,212,0.5) 100%); }
+.lsl-scrub-input::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 26px; height: 26px; border-radius: 50%; background: var(--amber); border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.5), 0 2px 8px rgba(0,0,0,0.5); cursor: grab; }
+.lsl-scrub-input::-webkit-slider-thumb:active { cursor: grabbing; }
+.lsl-scrub-input::-moz-range-thumb { width: 26px; height: 26px; border-radius: 50%; background: var(--amber); border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.5); cursor: grab; }
+.lsl-scrub-scale { display: flex; justify-content: space-between; font-family: 'Inter', sans-serif; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-top: 0.5rem; }
+
+/* ── Result readout (the verdict at the slider position) ── */
+.lsl-verdict { text-align: center; padding: 1.3rem 1.2rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; margin: 0 0 1.6rem; }
+.lsl-verdict-lead { font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
+.lsl-verdict-main { font-family: var(--font-d); font-size: clamp(1.3rem, 3.4vw, 1.85rem); letter-spacing: -.01em; line-height: 1.25; color: #f2eee8; }
+.lsl-verdict-main strong { color: var(--amber); font-weight: 600; }
+.lsl-verdict-main .lsl-dca { color: var(--blue); }
+.lsl-verdict-detail { font-family: 'Inter', sans-serif; font-size: 0.84rem; color: var(--text-dim); margin-top: 0.6rem; line-height: 1.6; }
+.lsl-verdict-detail .lsl-sparse { color: var(--text-muted); font-style: italic; }
+
+/* ── Today marker on the position slider (B1) ── */
+.lsl-slider-wrap { position: relative; }
+.lsl-today-marker { position: absolute; top: 5px; width: 2px; height: 0; transform: translateX(-50%); background: #f2eee8; box-shadow: 0 0 4px rgba(242,238,232,0.6); pointer-events: none; opacity: 0; transition: opacity 0.3s ease; }
+.lsl-today-marker.is-visible { opacity: 0.9; height: 16px; }
+.lsl-today-caption { font-family: 'Inter', sans-serif; font-size: 0.74rem; color: var(--text-muted); line-height: 1.5; margin: 0.6rem 0 0; }
+
+/* ── Aligned single-strategy data-readout cluster (B1) ── */
+.lsl-cluster { margin: 0 0 1.6rem; }
+.lsl-lede { font-family: var(--font-d); font-size: clamp(1.25rem, 3vw, 1.6rem); letter-spacing: -.01em; line-height: 1.3; color: #f2eee8; text-align: center; margin: 0 0 1.1rem; }
+.lsl-lede .lsl-win-lump { color: var(--amber); font-weight: 600; }
+.lsl-lede .lsl-win-ladder { color: var(--blue); font-weight: 600; }
+.lsl-boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.lsl-box { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.2rem 1.2rem; text-align: center; }
+.lsl-box-head { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.55rem; }
+.lsl-box-label { font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600; color: var(--text); }
+.lsl-box-tag { font-family: 'Inter', sans-serif; font-size: 0.56rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); border: 1px solid var(--border); border-radius: 999px; padding: 0.15rem 0.45rem; }
+.lsl-box-value { font-family: var(--font-d); font-size: clamp(2rem, 6vw, 2.8rem); font-weight: 500; letter-spacing: -.01em; line-height: 1; color: #f2eee8; font-variant-numeric: tabular-nums; margin: 0.1rem 0 0.35rem; }
+.lsl-box-sub { font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-dim); line-height: 1.45; }
+.lsl-boxes.is-lump .lsl-box-value { color: var(--amber); }
+.lsl-boxes.is-ladder .lsl-box-value { color: var(--blue); }
+
+/* ── Canonical Style-Guide tooltip (.help-tip / .tip-content), reused verbatim ── */
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; }
+.help-tip:hover, .help-tip:focus { border-color: var(--amber); color: var(--amber); outline: none; }
+.help-tip .tip-content { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 240px; padding: 0.6rem 0.75rem; background: var(--bg-card); border: 1px solid rgba(224,148,34,0.3); border-radius: 4px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 400; color: var(--text); line-height: 1.45; text-align: left; letter-spacing: 0; pointer-events: none; z-index: 10; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
+.help-tip:hover .tip-content, .help-tip:focus .tip-content { display: block; pointer-events: auto; }
+@media (max-width: 480px) { .help-tip .tip-content { width: min(240px, calc(100vw - 32px)); } }
+
+/* ── Upper-channel risk flag (item 12) ── */
+.lsl-risk { margin: 0 0 1.6rem; padding: 0.95rem 1.2rem; background: rgba(192,57,43,0.07); border: 1px solid rgba(192,57,43,0.4); border-left-width: 3px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.86rem; line-height: 1.6; color: var(--text-dim); }
+.lsl-risk[hidden] { display: none; }
+.lsl-risk strong { color: var(--text); font-weight: 600; }
+.lsl-risk .lsl-risk-tag { display: inline-block; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); margin-right: 0.4rem; }
+.lsl-risk .lsl-risk-thin { display: block; margin-top: 0.5rem; color: var(--text-muted); font-style: italic; }
+
+/* ── Charts ── */
+.lsl-chart-block { margin: 0 0 0.6rem; }
+.lsl-chart-caption { font-family: 'Inter', sans-serif; font-size: 0.8rem; color: var(--text-dim); margin: 0 0 0.7rem; line-height: 1.55; }
+.lsl-chart-caption strong { color: var(--text); font-weight: 600; }
+.lsl-chart-wrapper { position: relative; height: 360px; }
+
+/* ── "Where are we right now?" channel-context section ── */
+.lsl-context h2 { margin-bottom: 0.6rem; }
+.lsl-ctx-chart { position: relative; height: 360px; margin: 1.4rem 0 0; }
+.lsl-ctx-readout { margin: 1.1rem 0 0.5rem; }
+.lsl-ctx-pos { font-family: var(--font-d); font-size: 1.55rem; letter-spacing: -.01em; line-height: 1.25; color: #f2eee8; }
+.lsl-ctx-pos strong { color: var(--amber); font-weight: 600; font-variant-numeric: tabular-nums; }
+.lsl-ctx-pos em { color: var(--text-dim); font-style: italic; }
+.lsl-ctx-meta { font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted); margin: 0.4rem 0 0; }
+
+/* Canonical "you are here" pulse halo (STYLE_GUIDE §6.23) — reused verbatim
+   from The Gallery's first chart / Disciplined Rebalancing. Positioned over
+   the live "today" data point by the lcsPulse plugin in the page script. */
+.lcs-pulse-halo {
+  position: absolute; width: 12px; height: 12px; border-radius: 50%;
+  pointer-events: none; transform: translate(-50%, -50%);
+  background-color: var(--amber, #e09422); box-shadow: 0 0 6px rgba(224,148,34,0.5);
+  opacity: 0; transition: opacity 0.35s ease; z-index: 2;
+}
+.lcs-pulse-halo.is-visible { opacity: 1; }
+.lcs-pulse-halo::before, .lcs-pulse-halo::after {
+  content: ''; position: absolute; top: 50%; left: 50%; width: 12px; height: 12px;
+  border-radius: 50%; border: 2px solid rgba(224,148,34,0.7);
+  transform: translate(-50%, -50%) scale(1);
+  animation: lcsPulseRing 2.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+.lcs-pulse-halo::after { animation-delay: 1.3s; }
+@keyframes lcsPulseRing {
+  0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.85; }
+  100% { transform: translate(-50%, -50%) scale(4); opacity: 0;    }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lcs-pulse-halo::before, .lcs-pulse-halo::after { animation: none; }
+}
+
+/* ── Quiet config (collapsible-ish; not the lever) ── */
+.lsl-config { margin: 1.6rem 0 0; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.1rem 1.6rem; }
+.lsl-field { display: flex; flex-direction: column; }
+.lsl-field > label { font-family: 'Inter', sans-serif; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 0.45rem; display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+.lsl-field-val { text-transform: none; letter-spacing: 0; color: var(--text); font-variant-numeric: tabular-nums; font-weight: 600; }
+.lsl-field input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.12); outline: none; }
+.lsl-field input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--amber); border: 2px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.4); cursor: pointer; }
+.lsl-field input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--amber); border: 2px solid var(--bg); cursor: pointer; }
+.lsl-config-note { grid-column: 1 / -1; font-family: 'Inter', sans-serif; font-size: 0.76rem; color: var(--text-muted); line-height: 1.55; margin: 0; }
+
+/* ── Hand-off card to Page 2 (Your Deployment Plan) ── */
+.lsl-handoff { display: flex; align-items: center; gap: 1.2rem; text-decoration: none; background: linear-gradient(135deg, rgba(224,148,34,0.07), rgba(20,18,16,0.4)); border: 1px solid rgba(224,148,34,0.25); border-radius: 12px; padding: 1.4rem 1.6rem; transition: border-color 0.18s, background 0.18s, transform 0.18s; }
+.lsl-handoff:hover { border-color: rgba(224,148,34,0.5); background: linear-gradient(135deg, rgba(224,148,34,0.1), rgba(20,18,16,0.4)); transform: translateY(-1px); }
+.lsl-handoff-body { display: flex; flex-direction: column; gap: 0.3rem; }
+.lsl-handoff-eyebrow { font-family: 'Inter', sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); }
+.lsl-handoff-title { font-family: var(--font-d); font-size: 1.5rem; font-weight: 500; letter-spacing: -.01em; color: #f2eee8; line-height: 1.2; }
+.lsl-handoff-desc { font-family: 'Inter', sans-serif; font-size: 0.88rem; line-height: 1.6; color: var(--text-dim); }
+.lsl-handoff-desc strong { color: var(--amber); font-weight: 600; }
+.lsl-handoff-arrow { font-size: 1.8rem; color: var(--amber); flex-shrink: 0; transition: transform 0.18s; }
+.lsl-handoff:hover .lsl-handoff-arrow { transform: translateX(4px); }
+
+/* ── Data tables (backstop, compression) ── */
+.lsl-table-wrap { overflow-x: auto; margin: 1rem 0; }
+.lsl-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 0.86rem; }
+.lsl-table th, .lsl-table td { padding: 0.6rem 0.8rem; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.06); font-variant-numeric: tabular-nums; }
+.lsl-table th:first-child, .lsl-table td:first-child { text-align: left; }
+.lsl-table thead th { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+.lsl-table tbody td { color: var(--text-dim); }
+.lsl-table tbody td.lsl-strong { color: var(--text); font-weight: 600; }
+.lsl-table .lsl-row-lower th { color: var(--amber); }
+.lsl-table .lsl-row-upper th { color: var(--blue); }
+.lsl-takeaway { background: rgba(224,148,34,0.04); border: 1px solid rgba(224,148,34,0.18); border-radius: 8px; padding: 1rem 1.2rem; margin: 1.2rem 0; font-size: 0.92rem; line-height: 1.65; color: var(--text); }
+.lsl-takeaway strong { color: var(--amber); }
+
+/* ── "Deploying high in the channel" risk note (Stage 6 shed) ──
+   The full position-by-position waiting/drawdown explorer now lives on page 3
+   (/wait-or-deploy-now). Page 1 keeps a concise static statement: a live-computed
+   headline drawdown figure, the decisiveness-while-low framing with a live today
+   readout, and a teaser link. No slider, no tiers — depth is delegated to page 3. */
+.lsl-hr-num { font-weight: 600; color: var(--amber); }
+.lsl-hr-today-line { color: var(--text-muted); }
+.lsl-hr-today-line #lslHrToday { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.lsl-hr-today-line em { color: var(--text-dim); font-style: italic; }
+.lsl-hr-teaser a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+
+/* ── Honesty callouts ── */
+.belief-context { background: rgba(224,148,34,0.04); border: 1px solid rgba(224,148,34,0.18); border-radius: 8px; padding: 1.1rem 1.3rem; margin: 1.6rem auto; max-width: 880px; }
+.belief-context-label { font-family: 'Inter', sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.5rem; }
+.belief-context p { font-size: 0.92rem; line-height: 1.7; color: var(--text-dim); margin: 0; }
+.belief-context a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+
+.lsl-caveats { max-width: 880px; margin: 0 auto; }
+.lsl-caveat { border-left: 2px solid var(--border); padding: 0.2rem 0 0.2rem 1.2rem; margin-bottom: 1.4rem; }
+.lsl-caveat.lsl-caveat-blindspot { border-left-color: rgba(192,57,43,0.45); }
+.lsl-caveat h4 { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); margin: 0 0 0.35rem; }
+.lsl-caveat p { font-family: 'Inter', sans-serif; font-size: 0.9rem; line-height: 1.7; color: var(--text-dim); margin: 0; }
+
+.negative-space-list { list-style: none; padding: 0; margin: 1rem auto 1.5rem; max-width: 880px; }
+.negative-space-list li { border-left: 2px solid var(--border); padding: 0.5rem 0 0.5rem 1.2rem; margin-bottom: 0.8rem; font-size: 0.9rem; line-height: 1.65; color: var(--text-dim); }
+.negative-space-list li strong { color: var(--text); font-weight: 500; }
+
+/* ── Methodology footer + attribution ── */
+.lsl-attribution { max-width: 880px; margin: 2.4rem auto 0; font-family: 'Inter', sans-serif; font-size: 0.82rem; line-height: 1.6; color: var(--text-muted); padding: 1rem 1.2rem; background: rgba(255,255,255,0.015); border-radius: 6px; }
+.lsl-attribution-label { display: block; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.4rem; }
+.lsl-attribution a { color: var(--amber); text-decoration: none; }
+.lsl-attribution code { font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace; color: var(--amber); }
+.lsl-method { max-width: 880px; margin: 2.4rem auto 0; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 6px; padding: 1.3rem 1.5rem; }
+.lsl-method-label { font-family: 'Inter', sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.7rem; }
+.lsl-method ul { list-style: none; padding: 0; margin: 0; }
+.lsl-method li { font-family: 'Inter', sans-serif; font-size: 0.8rem; line-height: 1.5; color: var(--text-muted); padding: 0.4rem 0; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+.lsl-method li:last-child { border-bottom: none; }
+.lsl-method code { font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace; color: var(--amber); font-size: 0.78rem; }
+
+/* ── Responsive ── */
+@media (max-width: 760px) {
+  .content-area { padding: 0 1.2rem 4rem; }
+  .lsl-calc { padding: 1.3rem 1.1rem 1.5rem; }
+  .lsl-chart-wrapper { height: 300px; }
+  .lsl-ctx-chart { height: 300px; }
+  .lsl-handoff { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
+  .lsl-handoff-arrow { align-self: flex-end; }
+  .lsl-boxes { grid-template-columns: 1fr; }
+}

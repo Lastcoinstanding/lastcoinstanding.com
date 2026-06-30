@@ -261,6 +261,51 @@
     }
   },
   {
+    "slug": "lump-sum-or-ladder-in",
+    "title": "Lump Sum or Ladder In?",
+    "category": "numbers",
+    "group": "Positioning & Strategy",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Deploy a windfall now or ladder in &mdash; and how channel position changes the answer.",
+      "preview_kind": "live-chart",
+      "preview_id": "mini-lump-vs-dca",
+      "anchor": "#calculator",
+      "featured": false,
+      "position": 15
+    }
+  },
+  {
+    "slug": "your-deployment-plan",
+    "title": "Your Bitcoin Deployment Plan",
+    "category": "numbers",
+    "group": "Positioning & Strategy",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Lump, ladder, or hybrid &mdash; model your own deployment, looking back and looking forward.",
+      "preview_kind": "live-chart",
+      "preview_id": "mini-deployment-plan",
+      "anchor": "#calculator",
+      "featured": false,
+      "position": 16
+    }
+  },
+  {
+    "slug": "wait-or-deploy-now",
+    "title": "Wait, or Deploy Now?",
+    "category": "numbers",
+    "group": "Positioning & Strategy",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Did waiting for a lower Bitcoin entry pay off? A position-aware, historical read &mdash; quiet when low, live when high.",
+      "preview_kind": "live-chart",
+      "preview_id": "mini-wait-or-deploy",
+      "anchor": "#comparator",
+      "featured": false,
+      "position": 17
+    }
+  },
+  {
     "slug": "borrowing-against-your-stack",
     "title": "Borrowing Against Your Stack",
     "category": "numbers",

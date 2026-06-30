@@ -612,8 +612,141 @@
   }
 
   /* ═══════════════════════════════════════════════════════════
+     LUMP SUM OR LADDER IN — the advantage curve "flip"
+     ═══════════════════════════════════════════════════════════ */
+
+  function renderMiniLumpVsDca(target) {
+    var W = 400, H = 110, ml = 24, mt = 10, mb = 16, mr = 10;
+    var LF = Math.log(PL_FLOOR), LC = Math.log(PL_CEIL), SPAN = LC - LF;
+    var N = PL_DATA.length, ladderN = 30;
+    function posOf(p, d) { return (Math.log(p / plTrend(d)) - LF) / SPAN; }
+    var pos = []; for (var i = 0; i < N; i++) pos.push(posOf(PL_DATA[i][1], PL_DATA[i][0]));
+    function adv(idx) {
+      if (idx + ladderN - 1 > N - 1) return null;
+      var lump = 1 / PL_DATA[idx][1], dca = 0;
+      for (var k = 0; k < ladderN; k++) dca += (1 / ladderN) / PL_DATA[idx + k][1];
+      return (dca / lump - 1) * 100;
+    }
+    var pts = [];
+    for (var g = 0; g <= 1.0001; g += 0.05) {
+      var vals = [];
+      for (var j = 0; j < N; j++) { if (Math.abs(pos[j] - g) > 0.08) continue; var a = adv(j); if (a !== null) vals.push(a); }
+      if (vals.length >= 4) { var m = 0; for (var v = 0; v < vals.length; v++) m += vals[v]; pts.push({ g: g, y: m / vals.length }); }
+    }
+    if (pts.length < 2) { target.innerHTML = ''; return; }
+    var ymin = Infinity, ymax = -Infinity;
+    pts.forEach(function (p) { if (p.y < ymin) ymin = p.y; if (p.y > ymax) ymax = p.y; });
+    ymin = Math.min(ymin, -5); ymax = Math.max(ymax, 5);
+    var pd = (ymax - ymin) * 0.12; ymin -= pd; ymax += pd;
+    function X(g) { return ml + g * (W - ml - mr); }
+    function Y(y) { return mt + (1 - (y - ymin) / (ymax - ymin)) * (H - mt - mb); }
+    var parts = [];
+    var y0 = Y(0);
+    parts.push('<line x1="' + ml + '" y1="' + y0.toFixed(1) + '" x2="' + (W - mr) + '" y2="' + y0.toFixed(1) + '" stroke="' + C.gridLt + '" stroke-width="0.6" stroke-dasharray="2 2"/>');
+    for (var p2 = 0; p2 < pts.length - 1; p2++) {
+      var a0 = pts[p2], b0 = pts[p2 + 1], col = ((a0.y + b0.y) / 2 < 0) ? '#e09422' : '#6db3d4';
+      parts.push('<line x1="' + X(a0.g).toFixed(1) + '" y1="' + Y(a0.y).toFixed(1) + '" x2="' + X(b0.g).toFixed(1) + '" y2="' + Y(b0.y).toFixed(1) + '" stroke="' + col + '" stroke-width="1.9"/>');
+    }
+    parts.push('<text x="' + ml + '" y="' + (H - 3) + '" font-size="6.5" font-family="' + FONT + '" fill="' + C.label + '">Floor</text>');
+    parts.push('<text x="' + (W - mr) + '" y="' + (H - 3) + '" font-size="6.5" font-family="' + FONT + '" fill="' + C.label + '" text-anchor="end">Upper</text>');
+    parts.push('<text x="3" y="' + Math.max(mt + 6, Y(ymax * 0.6)).toFixed(1) + '" font-size="6" font-family="' + FONT + '" fill="#6db3d4">ladder</text>');
+    parts.push('<text x="3" y="' + Math.min(H - mb, Y(ymin * 0.6)).toFixed(1) + '" font-size="6" font-family="' + FONT + '" fill="#e09422">lump</text>');
+    setSvg(target, W, H, parts.join(''));
+  }
+
+  /* ═══════════════════════════════════════════════════════════
      INIT — find each target div and run its renderer
      ═══════════════════════════════════════════════════════════ */
+
+  /* ═══════════════════════════════════════════════════════════
+     9. MINI DEPLOYMENT PLAN  (value-over-time forward range)
+     A stack's value rising to today, then a forward cone between
+     reversion-to-trend (amber) and stay-on-trajectory (blue), over
+     a faint floor/trend backdrop. Telegraphs Your Deployment Plan's
+     value-over-time chart, floor at the bottom.
+     ═══════════════════════════════════════════════════════════ */
+  function renderMiniDeploymentPlan(target) {
+    var W = 400, H = 110, ml = 8, mt = 12, mb = 16, mr = 46;
+    var LF = Math.log(PL_FLOOR), LC = Math.log(PL_CEIL), SPAN = LC - LF;
+    var today = (Date.now() / 1000 - GENESIS_TS) / 86400;
+    var lastP = PL_DATA[PL_DATA.length - 1][1];
+    var pos = (Math.log(lastP / plTrend(today)) - LF) / SPAN;
+    if (!isFinite(pos)) pos = 0.4;
+    pos = Math.max(0.08, Math.min(0.92, pos));
+    var TREND_POS = (0 - LF) / SPAN, hz = 4 * 365.25, steps = 40;
+    function ratioOf(p) { return Math.exp(p * SPAN + LF); }
+    var traj = [], rev = [], trend = [], floor = [];
+    for (var k = 0; k <= steps; k++) {
+      var u = k / steps, d = today + u * hz, t = plTrend(d);
+      traj.push(t * ratioOf(pos));
+      rev.push(t * ratioOf(pos + (TREND_POS - pos) * u));
+      trend.push(t); floor.push(t * PL_FLOOR);
+    }
+    var base = traj[0];
+    var ymin = Infinity, ymax = -Infinity;
+    [traj, rev, trend, floor].forEach(function (arr) { arr.forEach(function (v) { var n = v / base; if (n < ymin) ymin = n; if (n > ymax) ymax = n; }); });
+    function X(u) { return ml + u * (W - ml - mr); }
+    function Y(v) { var ly = Math.log(v), lo = Math.log(ymin), hi = Math.log(ymax); return mt + (1 - (ly - lo) / (hi - lo)) * (H - mt - mb); }
+    function path(arr) { var s = ''; for (var k = 0; k <= steps; k++) { s += (k === 0 ? 'M' : 'L') + X(k / steps).toFixed(1) + ' ' + Y(arr[k] / base).toFixed(1); } return s; }
+    var parts = [];
+    parts.push('<path d="' + path(floor) + '" fill="none" stroke="#b04525" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.5"/>');
+    parts.push('<path d="' + path(trend) + '" fill="none" stroke="#e09422" stroke-width="0.9" opacity="0.4"/>');
+    var area = ''; for (var k3 = 0; k3 <= steps; k3++) area += (k3 === 0 ? 'M' : 'L') + X(k3 / steps).toFixed(1) + ' ' + Y(rev[k3] / base).toFixed(1);
+    for (var k4 = steps; k4 >= 0; k4--) area += 'L' + X(k4 / steps).toFixed(1) + ' ' + Y(traj[k4] / base).toFixed(1);
+    area += 'Z';
+    parts.push('<path d="' + area + '" fill="#e09422" opacity="0.12"/>');
+    parts.push('<path d="' + path(rev) + '" fill="none" stroke="#e09422" stroke-width="1.9"/>');
+    parts.push('<path d="' + path(traj) + '" fill="none" stroke="#6db3d4" stroke-width="1.7" stroke-dasharray="4 2"/>');
+    parts.push('<circle cx="' + X(0).toFixed(1) + '" cy="' + Y(traj[0] / base).toFixed(1) + '" r="2" fill="#e09422"/>');
+    parts.push('<text x="' + X(0).toFixed(1) + '" y="' + (H - 3) + '" font-size="6.5" font-family="' + FONT + '" fill="' + C.label + '">today</text>');
+    parts.push('<text x="' + (W - mr) + '" y="' + (H - 3) + '" font-size="6.5" font-family="' + FONT + '" fill="' + C.label + '" text-anchor="end">+4y</text>');
+    parts.push('<text x="' + (W - mr + 3) + '" y="' + (Y(rev[steps] / base) + 2).toFixed(1) + '" font-size="6.5" font-family="' + FONT + '" fill="#e09422">reversion</text>');
+    parts.push('<text x="' + (W - mr + 3) + '" y="' + (Y(traj[steps] / base) + 2).toFixed(1) + '" font-size="6.5" font-family="' + FONT + '" fill="#6db3d4">trajectory</text>');
+    setSvg(target, W, H, parts.join(''));
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     10. MINI WAIT-OR-DEPLOY  (drawdown cost rises with position)
+     A cost curve deepening left→right across the channel (floor →
+     upper band): shallow where price is low, steep where it's high.
+     A live "today" marker sits at Bitcoin's current channel position
+     — near the floor, in the quiet zone. Telegraphs page 3's spine:
+     deploying high has carried escalating drawdowns; deploying low
+     barely does. amber → red.
+     ═══════════════════════════════════════════════════════════ */
+  function renderMiniWaitOrDeploy(target) {
+    var W = 400, H = 110, ml = 10, mt = 14, mb = 18, mr = 50, steps = 48;
+    var LF = Math.log(PL_FLOOR), LC = Math.log(PL_CEIL), SPAN = LC - LF;
+    var today = (Date.now() / 1000 - GENESIS_TS) / 86400;
+    var lastP = PL_DATA[PL_DATA.length - 1][1];
+    var pos = (Math.log(lastP / plTrend(today)) - LF) / SPAN;
+    if (!isFinite(pos)) pos = 0.1;
+    pos = Math.max(0.02, Math.min(0.98, pos));
+    function X(u) { return ml + u * (W - ml - mr); }
+    // illustrative monotonic drawdown-by-position cost curve (deepens with position)
+    function depth(u) { return 0.02 + 0.72 * Math.pow(u, 1.35); }
+    function Y(u) { return mt + Math.min(1, depth(u) / 0.78) * (H - mt - mb); }
+    var line = '', area = '', k;
+    for (k = 0; k <= steps; k++) { var u = k / steps; line += (k === 0 ? 'M' : 'L') + X(u).toFixed(1) + ' ' + Y(u).toFixed(1); }
+    area = line + 'L' + X(1).toFixed(1) + ' ' + mt + 'L' + X(0).toFixed(1) + ' ' + mt + 'Z';
+    var parts = [];
+    parts.push('<defs><linearGradient id="wdGrad" x1="0" y1="0" x2="1" y2="0">' +
+      '<stop offset="0" stop-color="#e09422" stop-opacity="0.18"/>' +
+      '<stop offset="0.6" stop-color="#c0392b" stop-opacity="0.22"/>' +
+      '<stop offset="1" stop-color="#c0392b" stop-opacity="0.4"/></linearGradient></defs>');
+    parts.push('<line x1="' + ml + '" y1="' + mt + '" x2="' + (W - mr) + '" y2="' + mt + '" stroke="#3a3a3a" stroke-width="0.8" stroke-dasharray="3 3"/>');
+    parts.push('<path d="' + area + '" fill="url(#wdGrad)"/>');
+    parts.push('<path d="' + line + '" fill="none" stroke="#c0392b" stroke-width="1.8" stroke-linecap="round"/>');
+    // live today marker on the curve at the current channel position
+    var tx = X(pos), ty = Y(pos);
+    parts.push('<line x1="' + tx.toFixed(1) + '" y1="' + mt + '" x2="' + tx.toFixed(1) + '" y2="' + (H - mb) + '" stroke="#f2eee8" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5"/>');
+    parts.push('<circle cx="' + tx.toFixed(1) + '" cy="' + ty.toFixed(1) + '" r="3" fill="#f2eee8" stroke="#0a0908" stroke-width="1"/>');
+    parts.push('<text x="' + tx.toFixed(1) + '" y="' + (H - 4) + '" font-size="6.5" font-family="' + FONT + '" fill="' + C.label + '" text-anchor="middle">today</text>');
+    parts.push('<text x="' + ml + '" y="' + (mt - 4) + '" font-size="6.5" font-family="' + FONT + '" fill="' + C.label + '">floor · deploy</text>');
+    parts.push('<text x="' + (W - mr) + '" y="' + (mt - 4) + '" font-size="6.5" font-family="' + FONT + '" fill="#c0392b" text-anchor="end">upper · wait?</text>');
+    parts.push('<text x="' + (W - mr + 3) + '" y="' + (Y(1) + 2).toFixed(1) + '" font-size="6.5" font-family="' + FONT + '" fill="#c0392b">drawdown</text>');
+    setSvg(target, W, H, parts.join(''));
+  }
 
   var RENDERERS = {
     'mini-heatmap':      renderMiniHeatmap,
@@ -622,7 +755,10 @@
     'mini-retirement':   renderMiniRetirement,
     'mini-rebalancing':  renderMiniRebalancing,
     'mini-horizon':      renderMiniHorizon,
-    'mini-half-life':    renderMiniHalfLife
+    'mini-half-life':    renderMiniHalfLife,
+    'mini-lump-vs-dca':  renderMiniLumpVsDca,
+    'mini-deployment-plan': renderMiniDeploymentPlan,
+    'mini-wait-or-deploy': renderMiniWaitOrDeploy
   };
 
   function init() {
