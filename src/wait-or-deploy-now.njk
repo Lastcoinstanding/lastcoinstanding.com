@@ -64,31 +64,27 @@ eleventyComputed:
       <p class="wd-slider-caption">Drag to explore other positions, or <a href="#" id="wdResetToday">snap back to today</a>. Every figure is <strong>historical, at this position</strong> &mdash; not a prediction.</p>
     </div>
 
-    <!-- IN-VIEWPORT ROW: hero answer (left) + channel chart with moving dots (right) -->
-    <div class="wd-viewport-row">
-      <div class="wd-hero">
-        <div class="wd-hero-num"><span id="wdHeroNum">&mdash;</span></div>
-        <p class="wd-hero-label">Historically, from this position, waiting for a lower entry left you with <strong>more Bitcoin</strong> this often.</p>
-        <p class="wd-verdict wd-verdict-danger" id="wdVerdict">&mdash;</p>
-      </div>
-      <div class="wd-chart-block">
-        <div class="wd-chart-wrapper"><canvas id="wdChart"></canvas></div>
-        <p class="wd-chart-caption">The Power Law channel across history. The <strong>dashed blue line</strong> is the position you&rsquo;re exploring; the <strong>blue dots</strong> are the historical entries near it the answer is built from.</p>
-      </div>
+    <!-- FULL-WIDTH channel chart, directly under the slider — dots move as you drag -->
+    <div class="wd-chart-block">
+      <div class="wd-chart-wrapper"><canvas id="wdChart"></canvas></div>
+      <p class="wd-chart-caption">The Power Law channel across history. The <strong>dashed blue line</strong> is the position you&rsquo;re exploring; the <strong>blue dots</strong> are the historical entries near it the answer is built from.</p>
     </div>
 
-    <!-- ── Below the interaction: the "why" ── -->
-    <div class="wd-why">
-      <!-- "Never arrived" counterweight -->
-      <p class="wd-counter wd-counter-strong" id="wdCounter">&mdash;</p>
+    <!-- COMPACT RESULT BAND: hero % (left, prominent) | drawdown likelihood+depth (grouped, bonded) -->
+    <div class="wd-resultband">
+      <div class="wd-rb-hero">
+        <div class="wd-hero-num"><span id="wdHeroNum">&mdash;</span></div>
+        <p class="wd-hero-label">Historically, waiting for a lower entry left you with <strong>more Bitcoin</strong> this often.</p>
+        <p class="wd-verdict wd-verdict-danger" id="wdVerdict">&mdash;</p>
+      </div>
 
-      <!-- Dual-impact drawdown pair — the WHY -->
+      <!-- dual-impact drawdown pair — ONE bonded unit (likelihood × depth) + its caveat -->
       <div class="wd-dd">
         <div class="wd-dd-pair">
           <div class="wd-dd-half">
             <div class="wd-dd-cap">How likely</div>
             <div class="wd-dd-num" id="wdDdProb">&mdash;</div>
-            <p class="wd-dd-sub">of entries at this position fell at least 20% within two years.</p>
+            <p class="wd-dd-sub">of entries here fell at least 20% within two years.</p>
           </div>
           <div class="wd-dd-divider" aria-hidden="true"></div>
           <div class="wd-dd-half">
@@ -99,10 +95,14 @@ eleventyComputed:
         </div>
         <p class="wd-dd-caveat">Likelihood and depth together &mdash; both drawn from history at this position, <strong>not a forecast</strong>. Past patterns can&rsquo;t predict future prices.</p>
       </div>
-
-      <p class="wd-wait-detail" id="wdWaitDetail">&mdash;</p>
-      <p class="wd-sample-note" id="wdSampleNote">&mdash;</p>
     </div>
+
+    <!-- never-arrived counterweight → compact stat + inline prose line -->
+    <p class="wd-counter wd-counter-strong" id="wdCounter">&mdash;</p>
+
+    <!-- small secondary lines -->
+    <p class="wd-wait-detail" id="wdWaitDetail">&mdash;</p>
+    <p class="wd-sample-note" id="wdSampleNote">&mdash;</p>
   </section>
 
   <!-- ════════ CROSS-LINKS — the trilogy connective tissue ════════ -->

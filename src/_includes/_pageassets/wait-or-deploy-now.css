@@ -93,17 +93,14 @@ body { background: var(--bg); color: var(--text); }
 .wd-today-flag { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: 'Inter', sans-serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #f2eee8; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
 .wd-today-tick.is-visible .wd-today-flag { opacity: 0.95; }
 
-/* IN-VIEWPORT ROW — hero answer (left) + channel chart with moving dots (right), so cause
-   (slider) and effect (dots + number) are seen together without scrolling. */
-.wd-viewport-row { display: grid; grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr); gap: 1.2rem 1.6rem; align-items: stretch; margin: 0 0 1.6rem; }
-.wd-viewport-row .wd-chart-block { margin: 0; display: flex; flex-direction: column; }
-.wd-viewport-row .wd-chart-wrapper { flex: 1; min-height: 300px; }
-.wd-why { border-top: 1px solid var(--border); padding-top: 1.6rem; }
-
-/* Hero — the waiting-paid rate (compact: smaller number to keep the chart in-viewport) */
-.wd-hero { text-align: center; padding: 1.4rem 1.2rem; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 10px; margin: 0; display: flex; flex-direction: column; justify-content: center; }
-.wd-hero-num { font-family: var(--font-d); font-size: clamp(2.8rem, 7vw, 4rem); font-weight: 600; line-height: 1; letter-spacing: -.02em; color: #f2eee8; font-variant-numeric: tabular-nums; }
-.wd-hero-label { font-family: 'Inter', sans-serif; font-size: 0.9rem; line-height: 1.55; color: var(--text-dim); max-width: 26rem; margin: 0.7rem auto 0; }
+/* COMPACT RESULT BAND (5B) — the three tall 5A slabs collapse to one tight row: hero %
+   prominent on the left, the bonded drawdown likelihood+depth pair grouped beside it. The
+   full-width chart now sits ABOVE this band, directly under the slider. Stacks on mobile. */
+.wd-resultband { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr); gap: 1rem 1.4rem; align-items: stretch; margin: 0 0 1rem; }
+.wd-rb-hero { text-align: center; padding: 1rem 1.1rem; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 10px; display: flex; flex-direction: column; justify-content: center; }
+.wd-hero-num { font-family: var(--font-d); font-size: clamp(2.4rem, 5.5vw, 3.4rem); font-weight: 600; line-height: 1; letter-spacing: -.02em; color: #f2eee8; font-variant-numeric: tabular-nums; }
+.wd-hero-label { font-family: 'Inter', sans-serif; font-size: 0.82rem; line-height: 1.5; color: var(--text-dim); margin: 0.55rem auto 0; }
+.wd-rb-hero .wd-verdict { font-size: clamp(1.05rem, 2.4vw, 1.3rem); margin: 0.7rem auto 0; }
 .wd-hero-label strong { color: var(--text); font-weight: 600; }
 .wd-verdict { font-family: var(--font-d); font-size: clamp(1.2rem, 3vw, 1.6rem); letter-spacing: -.01em; line-height: 1.35; margin: 1rem auto 0; max-width: 32rem; }
 .wd-verdict strong { font-weight: 600; }
@@ -113,33 +110,33 @@ body { background: var(--bg); color: var(--text); }
 .wd-verdict-success { color: #cfe0cf; }
 .wd-verdict-success strong { color: var(--green); }
 
-/* "Never arrived" counterweight */
-.wd-counter { font-family: 'Inter', sans-serif; font-size: 0.92rem; line-height: 1.7; color: var(--text-dim); margin: 0 0 1.4rem; padding: 1rem 1.25rem; border-radius: 8px; background: rgba(255,255,255,0.015); border: 1px solid var(--border); }
+/* "Never arrived" counterweight — compact stat-tag + inline prose on one slim line */
+.wd-counter { font-family: 'Inter', sans-serif; font-size: 0.8rem; line-height: 1.5; color: var(--text-dim); margin: 0 0 0.5rem; padding: 0.55rem 0.9rem; border-radius: 6px; background: rgba(255,255,255,0.015); border: 1px solid var(--border); }
 .wd-counter strong { color: var(--text); font-weight: 600; }
 .wd-counter-strong { background: rgba(224,148,34,0.06); border-color: rgba(224,148,34,0.3); border-left: 3px solid var(--amber); }
-.wd-counter-tag { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); margin-right: 0.4rem; }
+.wd-counter-tag { display: inline-block; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); margin-right: 0.4rem; }
 
 /* Dual-impact drawdown pair — ONE bonded panel, two halves + a bonded caveat */
-.wd-dd { margin: 0 0 1.4rem; border: 1px solid rgba(192,57,43,0.3); border-radius: 10px; overflow: hidden; background: rgba(192,57,43,0.04); }
-.wd-dd-pair { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; }
-.wd-dd-half { padding: 1.3rem 1.4rem; text-align: center; }
-.wd-dd-divider { width: 1px; background: rgba(192,57,43,0.3); margin: 1rem 0; }
-.wd-dd-cap { font-family: 'Inter', sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
-.wd-dd-num { font-family: var(--font-d); font-size: clamp(2.2rem, 7vw, 3rem); font-weight: 600; line-height: 1; letter-spacing: -.01em; color: #f2eee8; font-variant-numeric: tabular-nums; }
+.wd-dd { margin: 0; border: 1px solid rgba(192,57,43,0.3); border-radius: 10px; overflow: hidden; background: rgba(192,57,43,0.04); display: flex; flex-direction: column; }
+.wd-dd-pair { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; flex: 1; }
+.wd-dd-half { padding: 0.85rem 1rem; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+.wd-dd-divider { width: 1px; background: rgba(192,57,43,0.3); margin: 0.85rem 0; }
+.wd-dd-cap { font-family: 'Inter', sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.35rem; }
+.wd-dd-num { font-family: var(--font-d); font-size: clamp(1.7rem, 4.5vw, 2.4rem); font-weight: 600; line-height: 1; letter-spacing: -.01em; color: #f2eee8; font-variant-numeric: tabular-nums; }
 .wd-dd-num-red { color: #e08a7a; }
-.wd-dd-sub { font-family: 'Inter', sans-serif; font-size: 0.8rem; line-height: 1.55; color: var(--text-dim); margin: 0.6rem auto 0; max-width: 16rem; }
+.wd-dd-sub { font-family: 'Inter', sans-serif; font-size: 0.74rem; line-height: 1.45; color: var(--text-dim); margin: 0.4rem auto 0; max-width: 15rem; }
 .wd-dd-sub strong { color: var(--text); font-weight: 600; }
-.wd-dd-caveat { font-family: 'Inter', sans-serif; font-size: 0.8rem; line-height: 1.6; color: var(--text-muted); margin: 0; padding: 0.85rem 1.4rem; border-top: 1px solid rgba(192,57,43,0.3); background: rgba(192,57,43,0.06); }
+.wd-dd-caveat { font-family: 'Inter', sans-serif; font-size: 0.74rem; line-height: 1.5; color: var(--text-muted); margin: 0; padding: 0.6rem 1rem; border-top: 1px solid rgba(192,57,43,0.3); background: rgba(192,57,43,0.06); }
 .wd-dd-caveat strong { color: var(--text-dim); font-weight: 600; }
 
-.wd-wait-detail { font-family: 'Inter', sans-serif; font-size: 0.85rem; line-height: 1.6; color: var(--text-muted); margin: 0 0 1.4rem; text-align: center; }
+.wd-wait-detail { font-family: 'Inter', sans-serif; font-size: 0.8rem; line-height: 1.55; color: var(--text-muted); margin: 0 0 0.35rem; }
 .wd-wait-detail strong { color: var(--text-dim); font-weight: 600; }
 
-/* Chart */
-.wd-chart-block { margin: 0.6rem 0 0; }
+/* Chart (full-width, directly under the slider) */
+.wd-chart-block { margin: 0 0 1.4rem; }
 .wd-chart-caption { font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-dim); margin: 0.55rem 0 0; line-height: 1.5; }
 .wd-chart-caption strong { color: var(--text); font-weight: 600; }
-.wd-chart-wrapper { position: relative; height: 360px; }
+.wd-chart-wrapper { position: relative; height: 340px; }
 .wd-sample-note { font-family: 'Inter', sans-serif; font-size: 0.76rem; line-height: 1.55; color: var(--text-muted); margin: 1rem 0 0; }
 .wd-sample-note strong { color: var(--text-dim); font-weight: 600; }
 
@@ -184,9 +181,8 @@ body { background: var(--bg); color: var(--text); }
 @media (max-width: 760px) {
   .content-area { padding: 0 1.2rem 4rem; }
   .wd-calc { padding: 1.3rem 1.1rem 1.5rem; }
-  .wd-viewport-row { grid-template-columns: 1fr; }
+  .wd-resultband { grid-template-columns: 1fr; }
   .wd-chart-wrapper { height: 300px; }
-  .wd-viewport-row .wd-chart-wrapper { min-height: 280px; }
   .wd-dd-pair { grid-template-columns: 1fr; }
   .wd-dd-divider { width: auto; height: 1px; margin: 0 1.4rem; }
   .wd-caution-grid, .wd-link-grid { grid-template-columns: 1fr; }
