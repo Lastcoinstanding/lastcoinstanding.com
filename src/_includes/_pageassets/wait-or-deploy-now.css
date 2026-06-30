@@ -64,14 +64,14 @@ body { background: var(--bg); color: var(--text); }
 
 /* ── The comparator surface ── */
 .wd-calc { max-width: 1100px; margin: 2.5rem auto 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.8rem 1.8rem 2rem; }
-.wd-calc-head { display: flex; flex-wrap: wrap; gap: 0.5rem 1.2rem; align-items: baseline; justify-content: space-between; margin-bottom: 1.4rem; }
+.wd-calc-head { display: flex; flex-wrap: wrap; gap: 0.5rem 1.2rem; align-items: baseline; justify-content: space-between; margin-bottom: 1.1rem; }
 .wd-calc-head h2 { font-family: var(--font-d); font-size: 1.6rem; font-weight: 500; letter-spacing: -.01em; color: #f2eee8; margin: 0; }
 .wd-readout { font-family: 'Inter', sans-serif; font-size: 0.9rem; color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .wd-readout strong { color: var(--text); font-weight: 600; }
 .wd-readout em { color: var(--amber); font-style: italic; }
 
 /* Slider with persistent today tick (2G pattern) */
-.wd-slider-block { margin: 0 0 1.8rem; }
+.wd-slider-block { margin: 0 0 1.1rem; }
 .wd-slider-wrap { position: relative; }
 .wd-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 5px; outline: none;
   background: linear-gradient(90deg, rgba(122,115,103,0.45) 0%, rgba(224,148,34,0.5) 55%, rgba(192,57,43,0.6) 100%); }
@@ -86,7 +86,7 @@ body { background: var(--bg); color: var(--text); }
 .wd-slider-caption a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 
 /* Up-front cue tying the slider to the chart */
-.wd-cue { font-family: 'Inter', sans-serif; font-size: 0.86rem; line-height: 1.6; color: var(--text-dim); margin: 0 0 0.9rem; }
+.wd-cue { font-family: 'Inter', sans-serif; font-size: 0.86rem; line-height: 1.5; color: var(--text-dim); margin: 0 0 0.7rem; }
 .wd-cue strong { color: var(--text); font-weight: 600; }
 
 /* Explicit, unmistakable "today" marker on the slider track */
@@ -97,10 +97,10 @@ body { background: var(--bg); color: var(--text); }
    prominent on the left, the bonded drawdown likelihood+depth pair grouped beside it. The
    full-width chart now sits ABOVE this band, directly under the slider. Stacks on mobile. */
 .wd-resultband { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr); gap: 1rem 1.4rem; align-items: stretch; margin: 0 0 1rem; }
-.wd-rb-hero { text-align: center; padding: 1rem 1.1rem; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 10px; display: flex; flex-direction: column; justify-content: center; }
+.wd-rb-hero { text-align: center; padding: 0.75rem 1.1rem; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 10px; display: flex; flex-direction: column; justify-content: center; }
 .wd-hero-num { font-family: var(--font-d); font-size: clamp(2.4rem, 5.5vw, 3.4rem); font-weight: 600; line-height: 1; letter-spacing: -.02em; color: #f2eee8; font-variant-numeric: tabular-nums; }
-.wd-hero-label { font-family: 'Inter', sans-serif; font-size: 0.82rem; line-height: 1.5; color: var(--text-dim); margin: 0.55rem auto 0; }
-.wd-rb-hero .wd-verdict { font-size: clamp(1.05rem, 2.4vw, 1.3rem); margin: 0.7rem auto 0; }
+.wd-hero-label { font-family: 'Inter', sans-serif; font-size: 0.82rem; line-height: 1.5; color: var(--text-dim); margin: 0.4rem auto 0; }
+.wd-rb-hero .wd-verdict { font-size: clamp(1.05rem, 2.4vw, 1.3rem); margin: 0.5rem auto 0; }
 .wd-hero-label strong { color: var(--text); font-weight: 600; }
 .wd-verdict { font-family: var(--font-d); font-size: clamp(1.2rem, 3vw, 1.6rem); letter-spacing: -.01em; line-height: 1.35; margin: 1rem auto 0; max-width: 32rem; }
 .wd-verdict strong { font-weight: 600; }
@@ -119,24 +119,26 @@ body { background: var(--bg); color: var(--text); }
 /* Dual-impact drawdown pair — ONE bonded panel, two halves + a bonded caveat */
 .wd-dd { margin: 0; border: 1px solid rgba(192,57,43,0.3); border-radius: 10px; overflow: hidden; background: rgba(192,57,43,0.04); display: flex; flex-direction: column; }
 .wd-dd-pair { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; flex: 1; }
-.wd-dd-half { padding: 0.85rem 1rem; text-align: center; display: flex; flex-direction: column; justify-content: center; }
-.wd-dd-divider { width: 1px; background: rgba(192,57,43,0.3); margin: 0.85rem 0; }
+.wd-dd-half { padding: 0.7rem 1rem; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+.wd-dd-divider { width: 1px; background: rgba(192,57,43,0.3); margin: 0.7rem 0; }
 .wd-dd-cap { font-family: 'Inter', sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.35rem; }
 .wd-dd-num { font-family: var(--font-d); font-size: clamp(1.7rem, 4.5vw, 2.4rem); font-weight: 600; line-height: 1; letter-spacing: -.01em; color: #f2eee8; font-variant-numeric: tabular-nums; }
 .wd-dd-num-red { color: #e08a7a; }
 .wd-dd-sub { font-family: 'Inter', sans-serif; font-size: 0.74rem; line-height: 1.45; color: var(--text-dim); margin: 0.4rem auto 0; max-width: 15rem; }
 .wd-dd-sub strong { color: var(--text); font-weight: 600; }
-.wd-dd-caveat { font-family: 'Inter', sans-serif; font-size: 0.74rem; line-height: 1.5; color: var(--text-muted); margin: 0; padding: 0.6rem 1rem; border-top: 1px solid rgba(192,57,43,0.3); background: rgba(192,57,43,0.06); }
+.wd-dd-caveat { font-family: 'Inter', sans-serif; font-size: 0.74rem; line-height: 1.5; color: var(--text-muted); margin: 0; padding: 0.5rem 1rem; border-top: 1px solid rgba(192,57,43,0.3); background: rgba(192,57,43,0.06); }
 .wd-dd-caveat strong { color: var(--text-dim); font-weight: 600; }
 
 .wd-wait-detail { font-family: 'Inter', sans-serif; font-size: 0.8rem; line-height: 1.55; color: var(--text-muted); margin: 0 0 0.35rem; }
 .wd-wait-detail strong { color: var(--text-dim); font-weight: 600; }
 
 /* Chart (full-width, directly under the slider) */
-.wd-chart-block { margin: 0 0 1.4rem; }
+.wd-chart-block { margin: 0 0 1rem; }
 .wd-chart-caption { font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-dim); margin: 0.55rem 0 0; line-height: 1.5; }
 .wd-chart-caption strong { color: var(--text); font-weight: 600; }
-.wd-chart-wrapper { position: relative; height: 340px; }
+/* Viewport-aware height (5C): generous on tall screens, compresses toward the
+   floor on a ~1366×768 laptop so the whole interaction fits one viewport. */
+.wd-chart-wrapper { position: relative; height: clamp(260px, 38vh, 340px); }
 .wd-sample-note { font-family: 'Inter', sans-serif; font-size: 0.76rem; line-height: 1.55; color: var(--text-muted); margin: 1rem 0 0; }
 .wd-sample-note strong { color: var(--text-dim); font-weight: 600; }
 
