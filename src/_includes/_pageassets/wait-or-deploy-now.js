@@ -89,6 +89,11 @@
       n: n, half: half,
       paid: M.filter(function (m) { return m.paid; }).length / n * 100,
       ratio: median(M.map(function (m) { return m.ratio; })),
+      condRatio: (function () {
+        var arr = M.filter(function (m) { return m.arrived; }).map(function (m) { return m.ratio; });
+        return arr.length ? median(arr) : null;
+      })(),
+      nArrived: M.filter(function (m) { return m.arrived; }).length,
       ddProb: M.filter(function (m) { return m.hadDD; }).length / n * 100,
       ddDepth: median(M.map(function (m) { return m.depth; })) * 100,
       never: M.filter(function (m) { return !m.arrived; }).length / n * 100,
@@ -142,15 +147,27 @@
     // "Never arrived" counterweight — prominent when low (the dip usually never came)
     var counter = document.getElementById('wdCounter');
     if (counter) {
+      var dip = (m.condRatio != null)
+        ? 'when a lower entry did arrive, waiting bought about <strong>' + fmtRatio(m.condRatio) +
+          '</strong> the coins (from ' + m.nArrived + ' historical dip' + (m.nArrived === 1 ? '' : 's') + ')'
+        : 'no lower entry arrived here within two years at all';
       if (m.never >= 50) {
         counter.className = 'wd-counter wd-counter-strong';
-        counter.innerHTML = '<span class="wd-counter-tag">The dip usually never came</span> <strong>' + pct0(m.never) + '</strong> of the time, no lower entry arrived within two years — you were already near the bottom, and the rising channel carried price up and away. That is why the same dollars bought just <strong>' + fmtRatio(m.ratio) + '</strong> the coins waiting as deploying now.';
+        counter.innerHTML = '<span class="wd-counter-tag">The dip usually never came</span> <strong>' +
+          pct0(m.never) + '</strong> of the time, no lower entry arrived within two years — you were already near the bottom. ' +
+          (m.condRatio != null
+            ? 'On the rare occasions one did, waiting bought about <strong>' + fmtRatio(m.condRatio) +
+              '</strong> the coins (from ' + m.nArrived + ' historical dip' + (m.nArrived === 1 ? '' : 's') + ').'
+            : 'A lower entry never arrived here within two years.');
       } else if (m.never >= 15) {
         counter.className = 'wd-counter';
-        counter.innerHTML = 'A lower entry arrived most of the time, but not always — <strong>' + pct0(m.never) + '</strong> of the time none came within two years and the waiter deployed later anyway. Across all entries here, waiting bought <strong>' + fmtRatio(m.ratio) + '</strong> the coins.';
+        counter.innerHTML = 'A lower entry arrived most of the time, but <strong>' + pct0(m.never) +
+          '</strong> of the time none came within two years — ' + dip + '.';
       } else {
         counter.className = 'wd-counter';
-        counter.innerHTML = 'From here a lower entry <strong>almost always arrived</strong>' + (m.waitLen != null ? ' — typically within about <strong>' + fmtWait(m.waitLen) + '</strong>' : '') + ', so waiting had room to work: <strong>' + fmtRatio(m.ratio) + '</strong> the coins, historically.';
+        counter.innerHTML = 'From here a lower entry <strong>almost always arrived</strong>' +
+          (m.waitLen != null ? ', typically within about <strong>' + fmtWait(m.waitLen) + '</strong>' : '') +
+          ', so waiting had room to work — ' + dip + '.';
       }
     }
 
