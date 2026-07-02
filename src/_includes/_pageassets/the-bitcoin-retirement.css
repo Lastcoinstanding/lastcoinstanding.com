@@ -1064,13 +1064,17 @@ a.powerlaw-link:hover {
 /* ─── Editable Bitcoin-stack value (input-btcStack) ─── */
 .slider-val-editable { display: inline-flex; align-items: baseline; gap: 4px; }
 .stack-input {
-  width: 4.5ch; text-align: right; background: transparent; border: none;
-  border-bottom: 1px solid rgba(247,147,26,0.35);
-  color: var(--amber); font: inherit; font-weight: 600; padding: 0 2px;
+  width: 6ch; text-align: right; padding: 2px 6px;
+  background: rgba(247,147,26,0.04);
+  border: 1px solid rgba(247,147,26,0.30);
+  border-radius: 4px;
+  color: var(--amber); font: inherit; font-weight: 600;
   -moz-appearance: textfield;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
-.stack-input:focus { outline: none; border-bottom-color: var(--amber); }
-.stack-input.invalid { border-bottom-color: #c0392b; }
+.stack-input:hover  { border-color: rgba(247,147,26,0.45); }
+.stack-input:focus  { outline: none; border-color: var(--amber); background: rgba(247,147,26,0.07); }
+.stack-input.invalid { border-color: #c0392b; }
 .stack-input-suffix { color: var(--amber); font-weight: 600; opacity: 0.85; }
 
 /* ─── "Worth $X today → $Y at retirement" secondary line ─── */
