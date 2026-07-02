@@ -199,7 +199,7 @@
       var rows = [
         ['Target annual retirement income', txtById('val-targetIncomeUSD')],
         ['Retirement year',                 txtById('val-retirementYear')],
-        ['Bitcoin stack',                   txtById('val-btcStack')],
+        ['Bitcoin stack',                   (function(){ var f = document.getElementById('input-btcStack'); return f && f.value !== '' ? f.value + ' BTC' : '—'; })()],
         ['Withdrawal rate',                 txtById('val-withdrawalRatePct')],
         ['Monthly DCA',                     txtById('val-monthlyDcaUSD')],
         ['Years in retirement',             txtById('val-yearsInRetirement')],
@@ -1093,7 +1093,7 @@
   var SLIDER_CONFIG = [
     { key: 'targetIncomeUSD',   parse: parseInt,   fmt: function(v){ return '$' + Math.round(v).toLocaleString(); }, updates: 'rate',   min: 20000, max: 1000000 },
     { key: 'retirementYear',    parse: parseInt,   fmt: function(v){ return String(v); },                            updates: 'rate',   min: 2026,  max: 2070 },
-    { key: 'btcStack',          parse: parseFloat, fmt: function(v){ return v.toFixed(1) + ' BTC'; },                updates: 'rate',   min: 0,     max: 100 },
+    { key: 'btcStack',          parse: parseFloat, fmt: function(v){ return v.toFixed(2); },                         updates: 'rate',   min: 0,     max: 99.99 },
     { key: 'withdrawalRatePct', parse: parseFloat, fmt: function(v){ return v.toFixed(1) + '%'; },                   updates: 'income', min: 2,     max: 15 },
     { key: 'monthlyDcaUSD',     parse: parseInt,   fmt: function(v){ return '$' + Math.round(v).toLocaleString() + '/mo'; }, updates: 'rate', min: 0, max: 5000 },
     { key: 'yearsInRetirement', parse: parseInt,   fmt: function(v){ return v + ' yrs'; },                           updates: null,     min: 10,    max: 50 }
@@ -1112,11 +1112,17 @@
   function syncSliderUI(key) {
     var cfg = SLIDER_BY_KEY[key];
     if (!cfg) return;
-    var valEl = document.getElementById('val-' + key);
-    if (!valEl) return;
     var input = document.getElementById('slider-' + key);
     if (input) input.value = SCENARIO[key];
-    valEl.textContent = cfg.fmt(SCENARIO[key]);
+    // Editable numeric display (btcStack) — write to the text input unless
+    // it's focused (guard prevents reformatting/jumping the caret mid-type).
+    var editable = document.getElementById('input-' + key);
+    if (editable) {
+      if (document.activeElement !== editable) editable.value = cfg.fmt(SCENARIO[key]);
+      return;
+    }
+    var valEl = document.getElementById('val-' + key);
+    if (valEl) valEl.textContent = cfg.fmt(SCENARIO[key]);
   }
 
   // ─── URL ⇄ SCENARIO sync — shareable scenario state
@@ -1135,7 +1141,7 @@
   // localStorage via ModelingAssumptions and are deliberately out of scope
   // — per §17.5, the URL covers only page-local Retirement state.
   var SCENARIO_URL_MAP = {
-    stack:    { key: 'btcStack',          isInt: false, decimals: 1 },
+    stack:    { key: 'btcStack',          isInt: false, decimals: 2 },
     retire:   { key: 'retirementYear',    isInt: true },
     income:   { key: 'targetIncomeUSD',   isInt: true },
     years:    { key: 'yearsInRetirement', isInt: true },
@@ -1316,6 +1322,15 @@
     var stackEl = document.getElementById('sustStackValue');
     if (stackEl) stackEl.textContent = formatCurrencyShort(stackReal);
 
+    // Stack value line under the input — today → at retirement (reuses
+    // existing values: liveBtcPrice for today, stackReal for at-retirement,
+    // the same figure feeding the Sustainability readout above).
+    var todayVal = SCENARIO.btcStack * liveBtcPrice;
+    var elToday  = document.getElementById('stackValToday');
+    var elAtRet  = document.getElementById('stackValAtRet');
+    if (elToday) elToday.textContent = formatCurrencyShort(todayVal);
+    if (elAtRet) elAtRet.textContent = formatCurrencyShort(stackReal);
+
     updateSpectrum(proj, SCENARIO, inflation.value);
   }
 
@@ -1332,15 +1347,17 @@
   function wireSliders() {
     SLIDER_CONFIG.forEach(function(cfg){
       var input = document.getElementById('slider-' + cfg.key);
-      var valEl = document.getElementById('val-' + cfg.key);
-      if (!input || !valEl) return;
-      // Sync initial display from SCENARIO state
+      if (!input) return;
+      // Sync initial display from SCENARIO state. syncSliderUI handles both
+      // the static val-<key> spans and btcStack's editable input-<key>, so
+      // we no longer require a val-<key> element to exist (btcStack dropped
+      // its span in favour of the editable field).
       input.value = SCENARIO[cfg.key];
-      valEl.textContent = cfg.fmt(SCENARIO[cfg.key]);
+      syncSliderUI(cfg.key);
       input.addEventListener('input', function(){
         var v = cfg.parse(input.value);
         SCENARIO[cfg.key] = v;
-        valEl.textContent = cfg.fmt(v);
+        syncSliderUI(cfg.key);
         // Coupling: update the partner slider (income↔rate)
         if (cfg.updates === 'rate') recomputeCoupledFromIncomeOrMeans();
         else if (cfg.updates === 'income') recomputeCoupledFromRate();
@@ -1348,6 +1365,55 @@
         scheduleUrlSync();
       });
     });
+    wireStackInput();
+  }
+
+  // Editable Bitcoin-stack field (input-btcStack) — precision entry that
+  // mirrors the btcStack slider's exact update path so the field and slider
+  // stay behaviorally identical. Typing snaps the slider thumb; blur/Enter
+  // reformat to two decimals. The slider's own 'input' handler updates this
+  // field live via syncSliderUI (skipped while the field is focused).
+  function wireStackInput() {
+    var field = document.getElementById('input-btcStack');
+    if (!field) return;
+    var cfg = SLIDER_BY_KEY['btcStack'];
+
+    function commit(reformat) {
+      var raw = field.value.replace(/[^0-9.]/g, '');
+      var parsed = parseFloat(raw);
+      var valid = isFinite(parsed);
+      field.classList.toggle('invalid', !valid && raw !== '');
+      if (!valid) {
+        // Non-numeric mid-type → keep the last valid scenario value. On
+        // blur/Enter, coerce an empty-or-garbage field to 0.00.
+        if (reformat) {
+          SCENARIO.btcStack = 0;
+          var slider0 = document.getElementById('slider-btcStack');
+          if (slider0) slider0.value = 0;
+          if (cfg.updates === 'rate') recomputeCoupledFromIncomeOrMeans();
+          else if (cfg.updates === 'income') recomputeCoupledFromRate();
+          scheduleRender();
+          scheduleUrlSync();
+          field.classList.remove('invalid');
+          field.value = cfg.fmt(0);
+        }
+        return;
+      }
+      var v = Math.round(clamp(parsed, cfg.min, cfg.max) * 100) / 100;  // 0…99.99, 2dp snap
+      SCENARIO.btcStack = v;
+      var slider = document.getElementById('slider-btcStack');
+      if (slider) slider.value = v;
+      // Same update path a slider change runs (coupling + render + URL write).
+      if (cfg.updates === 'rate') recomputeCoupledFromIncomeOrMeans();
+      else if (cfg.updates === 'income') recomputeCoupledFromRate();
+      scheduleRender();
+      scheduleUrlSync();
+      if (reformat) field.value = cfg.fmt(v);
+    }
+
+    field.addEventListener('input',   function(){ commit(false); });
+    field.addEventListener('blur',    function(){ commit(true);  });
+    field.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ commit(true); field.blur(); } });
   }
 
   // ─── Re-render chart when inflation or growth model changes
