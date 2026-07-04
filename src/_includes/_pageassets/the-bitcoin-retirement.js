@@ -329,7 +329,8 @@
     retirementYear: 2045,
     yearsInRetirement: 30,
     monthlyDcaUSD: 0,
-    withdrawalRatePct: 6.0
+    withdrawalRatePct: 6.0,
+    incomeBasis: 'today'   // 'today' = target is in today's dollars (real target, default) | 'fixed' = fixed future nominal amount
   };
 
   // ─── Growth-model price helper — shared by stack-projection + sustainability math
@@ -419,7 +420,9 @@
       } else {
         // Post-retirement: sell BTC to cover nominal target income
         var yearsFromToday = y - startYear;
-        var nominalIncome = scenario.targetIncomeUSD * Math.pow(1 + infl, yearsFromToday);
+        var nominalIncome = (scenario.incomeBasis === 'fixed')
+          ? scenario.targetIncomeUSD                                        // fixed future amount: same raw dollars every year
+          : scenario.targetIncomeUSD * Math.pow(1 + infl, yearsFromToday);  // today's-dollars target: inflate forward (default)
         var btcNeeded = nominalIncome / price;
         stackBtc = Math.max(0, stackBtc - btcNeeded);
         if (stackBtc <= 0 && depletionYear === null) {
@@ -656,7 +659,9 @@
       } else {
         // Post-retirement: compound, then withdraw target nominal income
         var yearsFromToday = y - startYear;
-        var nominalIncome = scenario.targetIncomeUSD * Math.pow(1 + infl, yearsFromToday);
+        var nominalIncome = (scenario.incomeBasis === 'fixed')
+          ? scenario.targetIncomeUSD                                        // fixed future amount: same raw dollars every year
+          : scenario.targetIncomeUSD * Math.pow(1 + infl, yearsFromToday);  // today's-dollars target: inflate forward (default)
         balance = balance * (1 + nominalRate) - nominalIncome;
         if (balance <= 0) {
           balance = 0;
@@ -752,7 +757,8 @@
       (s.monthlyDcaUSD > 0 ? ' · adding ' + formatCurrencyShort(s.monthlyDcaUSD) + '/mo until then' : '') +
       ' · ' + s.yearsInRetirement + ' yrs in retirement.' +
       ' Price basis: ' + (RT_BASIS === 'current' ? 'today’s ' + todaysBasisPhrase(rtCurrentRatio()) + ' persists' : 'reverts to trend') + '.' +
-      ' Dollars: ' + (RT_DOLLARS === 'real' ? "real (today's, " + window.ModelingAssumptions.get('inflation').value + '% infl)' : 'nominal (future)') + '.';
+      ' Dollars: ' + (RT_DOLLARS === 'real' ? "real (today's, " + window.ModelingAssumptions.get('inflation').value + '% infl)' : 'nominal (future)') + '.' +
+      ' Income target: ' + (SCENARIO.incomeBasis === 'fixed' ? 'fixed future $' : "today's dollars") + '.';
   }
 
   function renderRtTables(stack) {
@@ -765,6 +771,14 @@
     var vs = document.getElementById('rtVerifySummary');
     if (gs) gs.innerHTML = summary;
     if (vs) vs.innerHTML = summary;
+    // Income-drawn column note — phrased for the active income basis so the
+    // rising-nominal / flat-real shape is never an unexplained surprise.
+    var incEl = document.getElementById('rtIncomeNote');
+    if (incEl) {
+      incEl.textContent = (SCENARIO.incomeBasis === 'fixed')
+        ? 'Income drawn is flat in nominal mode (a fixed future amount); in real mode it shrinks as inflation erodes its purchasing power.'
+        : 'Income drawn rises in nominal mode because your today’s-dollars target needs more future dollars each year to buy the same goods; in real mode it’s flat at your target.';
+    }
     updateRtBasisLabels();
   }
 
@@ -777,6 +791,10 @@
     var curTxt = 'Today’s ' + todaysBasisPhrase(ratio) + ' persists (' + ratio.toFixed(2) + '×)';
     document.querySelectorAll('.rt-basis-btn[data-basis="trend"] .rt-basis-text').forEach(function (el) { el.textContent = trendTxt; });
     document.querySelectorAll('.rt-basis-btn[data-basis="current"] .rt-basis-text').forEach(function (el) { el.textContent = curTxt; });
+    // Real dollar button shows the live Baseline inflation rate (Part C) — only
+    // the .seg-btn-sub number is rewritten so the button's help-tip stays intact.
+    var infl = window.ModelingAssumptions.get('inflation').value;
+    document.querySelectorAll('.rt-dollars-btn[data-dollars="real"] .seg-btn-sub').forEach(function (el) { el.textContent = infl + '%'; });
   }
 
   function rtPhaseLabel(phase) {
@@ -903,6 +921,7 @@
     lines.push('# Inflation,' + inflation.value + '%');
     lines.push('# Price assumption,' + (RT_BASIS === 'current' ? "today's " + todaysBasisPhrase(rtCurrentRatio()) + ' persists' : 'reverts to trend'));
     lines.push('# Dollar basis,' + (RT_DOLLARS === 'real' ? "real (today's dollars, " + inflation.value + '% inflation)' : 'nominal (future dollars)'));
+    lines.push('# Income target basis,' + (s.incomeBasis === 'fixed' ? 'fixed future $' : "today's dollars"));
     lines.push('# Live scenario URL,' + window.location.href);
     lines.push('');
     // BTC price is always nominal; portfolio/income dollars follow the active basis.
@@ -987,6 +1006,28 @@
         updateBaselineDollarsNote();
         scheduleRender();
       });
+    });
+  }
+
+  // Income-basis toggle — declares whether the target income is in today's
+  // dollars (real target, default) or a fixed future amount. Changes the
+  // projection's income term, so it runs the full shared recompute + URL sync.
+  function wireRtIncomeBasis() {
+    var btns = document.querySelectorAll('[data-incbasis]');
+    btns.forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        if (e.target.closest('.help-tip')) return;
+        SCENARIO.incomeBasis = b.getAttribute('data-incbasis');
+        document.querySelectorAll('[data-incbasis]').forEach(function (x) {
+          x.classList.toggle('is-active', x.getAttribute('data-incbasis') === SCENARIO.incomeBasis);
+        });
+        scheduleRender();
+        scheduleUrlSync();
+      });
+    });
+    // Initial active state from SCENARIO (may have been set to 'fixed' via ?incbasis=).
+    document.querySelectorAll('[data-incbasis]').forEach(function (x) {
+      x.classList.toggle('is-active', x.getAttribute('data-incbasis') === SCENARIO.incomeBasis);
     });
   }
 
@@ -1498,6 +1539,11 @@
       else clamped = Math.round(clamped * 10) / 10; // 1-decimal step precision
       SCENARIO[entry.key] = clamped;
     });
+    // Non-numeric string param — handled outside the numeric map machinery.
+    if (params.has('incbasis')) {
+      var ib = params.get('incbasis');
+      if (ib === 'today' || ib === 'fixed') SCENARIO.incomeBasis = ib;
+    }
   }
 
   // Writer: serializes SCENARIO into URL query string via replaceState
@@ -1527,6 +1573,12 @@
         params.set(p, entry.isInt ? String(rounded) : rounded.toFixed(entry.decimals || 1));
       }
     });
+    // incomeBasis is a string, so it lives outside the numeric map — omit when default.
+    if (SCENARIO.incomeBasis && SCENARIO.incomeBasis !== SCENARIO_DEFAULTS_SNAPSHOT.incomeBasis) {
+      params.set('incbasis', SCENARIO.incomeBasis);
+    } else {
+      params.delete('incbasis');
+    }
     var qs = params.toString();
     var newUrl = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
     window.history.replaceState(null, '', newUrl);
@@ -1822,6 +1874,7 @@
   wireRtAccordion();
   wireRtBasis();
   wireRtDollars();
+  wireRtIncomeBasis();
   updateBaselineDollarsNote();
   wireRtCsv();
   updateSustainability();

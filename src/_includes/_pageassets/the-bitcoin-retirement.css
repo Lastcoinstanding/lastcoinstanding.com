@@ -1744,13 +1744,18 @@ a.powerlaw-link:hover {
 /* Scenario summary line (orientation) */
 .rt-scenario-summary { font-family: 'Inter', sans-serif; font-size: 0.8rem; line-height: 1.55; color: var(--ink); margin: 0 0 0.7rem; padding: 0.5rem 0.7rem; background: rgba(224,148,34,0.05); border-left: 2px solid var(--amber); border-radius: 0 4px 4px 0; }
 .rt-scenario-summary strong { color: var(--ink-bright); font-weight: 600; }
-/* Price-assumption (trajectory) + nominal/real dollar toggles — shared styling */
-.rt-basis-toggle { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 0.8rem; font-family: 'Inter', sans-serif; }
-.rt-basis-label { font-size: 0.75rem; color: var(--ink-dim); margin-right: 0.2rem; }
-.rt-basis-btn, .rt-dollars-btn { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; font-weight: 600; color: var(--ink-dim); background: rgba(224,148,34,0.05); border: 1px solid var(--border); border-radius: 5px; padding: 0.3rem 0.7rem; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
-.rt-basis-btn:hover, .rt-dollars-btn:hover { background: rgba(224,148,34,0.1); color: var(--ink); }
-.rt-basis-btn.is-active, .rt-dollars-btn.is-active { background: rgba(224,148,34,0.14); border-color: var(--amber); color: var(--ink-bright); }
-.rt-basis-btn .help-tip { margin-left: 0.1rem; }
+/* Segmented controls — income-basis, price-assumption, nominal/real dollars.
+   Each pair shares one border and sits flush so it reads as one binary switch. */
+.rt-toggle-row { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 0.5rem; flex-wrap: wrap; }
+.rt-toggle-row .rt-basis-label, .income-basis-label { font-size: 0.75rem; color: var(--ink-dim); min-width: 7.5rem; }
+.income-basis { display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0 0; flex-wrap: wrap; }
+.seg-control { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.seg-btn { font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 600; color: var(--ink-dim); background: rgba(224,148,34,0.04); border: none; border-right: 1px solid var(--border); padding: 0.35rem 0.75rem; cursor: pointer; transition: background 0.15s, color 0.15s; display: inline-flex; align-items: center; gap: 0.3rem; }
+.seg-btn:last-child { border-right: none; }
+.seg-btn:hover { background: rgba(224,148,34,0.1); color: var(--ink); }
+.seg-btn.is-active { background: rgba(224,148,34,0.16); color: var(--ink-bright); }
+.seg-btn .help-tip { margin-left: 0.05rem; }
+.rt-income-note { margin-top: 0.5rem; }
 /* Second at-retirement sub-line (both price bases) under the input value line */
 .stack-value-line2 { font-family: 'Inter', sans-serif; font-size: 0.68rem; color: var(--ink-faint); line-height: 1.35; margin-top: 2px; }
 .stack-value-line2 strong { color: var(--ink-dim); font-weight: 600; }
