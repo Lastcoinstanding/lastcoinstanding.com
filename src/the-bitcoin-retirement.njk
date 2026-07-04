@@ -172,8 +172,13 @@ eleventyComputed:
             <p class="rt-note">Did your stack outgrow your spending? Green means it grew that year; red means it shrank. Same yearly numbers as the audit view.</p>
             <div class="rt-basis-toggle" role="group" aria-label="Price assumption">
               <span class="rt-basis-label">Price assumption:</span>
-              <button type="button" class="rt-basis-btn is-active" data-basis="trend">Reverts to trend</button>
-              <button type="button" class="rt-basis-btn" data-basis="current">Today&rsquo;s discount persists</button>
+              <button type="button" class="rt-basis-btn is-active" data-basis="trend"><span class="rt-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Drawdowns are taken against this trend-priced stack to fund retirement income. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
+              <button type="button" class="rt-basis-btn" data-basis="current"><span class="rt-basis-text">Today&rsquo;s discount persists</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
+            </div>
+            <div class="rt-basis-toggle" role="group" aria-label="Dollar basis">
+              <span class="rt-basis-label">Dollars:</span>
+              <button type="button" class="rt-dollars-btn is-active" data-dollars="nominal">Nominal (future $)</button>
+              <button type="button" class="rt-dollars-btn" data-dollars="real">Real (today&rsquo;s $)</button>
             </div>
             <div class="rt-scroll">
               <table class="rt-table rt-grow-table">
@@ -195,18 +200,23 @@ eleventyComputed:
           <div class="rt-body" id="rtVerifyBody" hidden>
             <p class="rt-scenario-summary" id="rtVerifySummary"></p>
             <div class="rt-verify-head">
-              <p class="rt-note">Reproduce any row: <strong>price &times; BTC held = stack value</strong>; <strong>income &divide; price = BTC sold</strong>. Income grows with inflation each year. Same projection that draws the chart. <span class="rt-note-caveat">Pre-retirement DCA is approximated once per year at that year&rsquo;s trend price, so accumulation rows may not reconcile to the exact month.</span></p>
+              <p class="rt-note">Reproduce any row: <strong>Starting BTC &minus; BTC sold + any DCA added = BTC left</strong>; <strong>price &times; BTC left = stack value</strong>; <strong>income &divide; price = BTC sold</strong>. Income grows with inflation each year. Portfolio dollars follow the nominal/real toggle; <strong>BTC price is always nominal</strong>. Same projection that draws the chart. <span class="rt-note-caveat">Pre-retirement DCA is approximated once per year at that year&rsquo;s trend price, so accumulation rows may not reconcile to the exact month.</span></p>
               <button type="button" class="rt-csv-btn" id="rtCsvBtn"><span aria-hidden="true">&#8595;</span> Copy as CSV</button>
             </div>
             <div class="rt-basis-toggle" role="group" aria-label="Price assumption">
               <span class="rt-basis-label">Price assumption:</span>
-              <button type="button" class="rt-basis-btn is-active" data-basis="trend">Reverts to trend</button>
-              <button type="button" class="rt-basis-btn" data-basis="current">Today&rsquo;s discount persists</button>
+              <button type="button" class="rt-basis-btn is-active" data-basis="trend"><span class="rt-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Drawdowns are taken against this trend-priced stack to fund retirement income. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
+              <button type="button" class="rt-basis-btn" data-basis="current"><span class="rt-basis-text">Today&rsquo;s discount persists</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
+            </div>
+            <div class="rt-basis-toggle" role="group" aria-label="Dollar basis">
+              <span class="rt-basis-label">Dollars:</span>
+              <button type="button" class="rt-dollars-btn is-active" data-dollars="nominal">Nominal (future $)</button>
+              <button type="button" class="rt-dollars-btn" data-dollars="real">Real (today&rsquo;s $)</button>
             </div>
             <div class="rt-scroll">
               <table class="rt-table rt-verify-table">
                 <thead>
-                  <tr><th>Year</th><th>Phase</th><th class="rt-num">BTC price</th><th class="rt-num">BTC held</th><th class="rt-num">Stack value</th><th class="rt-num">Income drawn</th><th class="rt-num">BTC sold</th><th class="rt-num">BTC left</th></tr>
+                  <tr><th>Year</th><th>Phase</th><th class="rt-num">BTC price</th><th class="rt-num">Starting BTC</th><th class="rt-num">Stack value</th><th class="rt-num">Income drawn</th><th class="rt-num">BTC sold</th><th class="rt-num">BTC left</th></tr>
                 </thead>
                 <tbody id="rtVerifyRows"><!-- JS-populated --></tbody>
               </table>
@@ -283,7 +293,11 @@ eleventyComputed:
             <div class="stack-value-line" id="stackValueLine" aria-live="polite">
               <span class="stack-value-hint">Worth <strong id="stackValToday">&mdash;</strong> today
               <span class="stack-value-arrow">&rarr;</span>
-              <strong id="stackValAtRet">&mdash;</strong> at retirement</span>
+              <strong id="stackValAtRet">&mdash;</strong> at the start of your retirement</span>
+            </div>
+            <div class="stack-value-line2" id="stackValueLine2" aria-live="polite">
+              If price reverts to trend: <strong id="stackValTrend">&mdash;</strong>
+              &middot; if today&rsquo;s <span id="stackValBasisWord">discount</span> persists: <strong id="stackValCurrent">&mdash;</strong>
             </div>
           </div>
 
@@ -457,6 +471,11 @@ eleventyComputed:
             <label for="inflationCustom">Custom rate (%)</label>
             <input type="number" id="inflationCustom" min="-50" max="500" step="0.1" inputmode="decimal">
           </div>
+          <p class="baseline-dollars-note">
+            Figures show in <strong id="baselineDollarsState">nominal (future dollars)</strong>.
+            Toggle nominal/real in the year-by-year tables above. Real dollars use the inflation
+            rate selected here, applied across every figure on the page.
+          </p>
         </div>
 
         <div class="picker-group">

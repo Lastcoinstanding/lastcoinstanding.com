@@ -720,6 +720,27 @@
   var LAST_STACK = null;
   var LAST_STACK_PAIR = null;                 // { trend: <stack>, current: <stack> } — both bases from the last chart render
   var RT_BASIS = 'trend';                     // 'trend' (mean-reversion, central case) | 'current' (today's discount persists)
+  var RT_DOLLARS = 'nominal';                 // 'nominal' (default, future $) | 'real' (today's $, uses chosen inflation)
+
+  // Real-dollar deflator for a calendar year, using the user's chosen inflation.
+  function rtDeflator(year, inflationPct) {
+    var startYear = (new Date()).getFullYear();
+    return Math.pow(1 + inflationPct / 100, Math.max(0, year - startYear));
+  }
+  // Convert a nominal USD figure for `year` to the active dollar basis. Applied at
+  // RENDER time only — the projection stays nominal, so switching basis is a
+  // re-render, not a recompute. BTC *price* is never deflated (reconciliation note).
+  function rtDollars(nominalUSD, year, inflationPct) {
+    if (nominalUSD == null) return null;
+    return (RT_DOLLARS === 'real') ? nominalUSD / rtDeflator(year, inflationPct) : nominalUSD;
+  }
+  // Live price ÷ today's trend price — how far below (<1) or above (>=1) trend BTC is now.
+  function rtCurrentRatio() {
+    var t = projPriceForGrowth(dateForYear((new Date()).getFullYear()), 'powerlaw-trend');
+    return (t > 0) ? (liveBtcPrice / t) : 1;
+  }
+  // Shared discount/premium wording so button, summary, and CSV always agree.
+  function todaysBasisPhrase(ratio) { return ratio < 1 ? 'discount' : 'premium'; }
 
   // One-line reminder of the scenario the tables reflect, plus the active
   // price basis — so a reader who's been dragging sliders stays oriented.
@@ -730,7 +751,8 @@
       ', drawing <strong>' + formatCurrencyShort(s.targetIncomeUSD) + '/yr</strong>' +
       (s.monthlyDcaUSD > 0 ? ' · adding ' + formatCurrencyShort(s.monthlyDcaUSD) + '/mo until then' : '') +
       ' · ' + s.yearsInRetirement + ' yrs in retirement.' +
-      ' Price basis: ' + (RT_BASIS === 'current' ? 'today’s discount persists' : 'reverts to trend') + '.';
+      ' Price basis: ' + (RT_BASIS === 'current' ? 'today’s ' + todaysBasisPhrase(rtCurrentRatio()) + ' persists' : 'reverts to trend') + '.' +
+      ' Dollars: ' + (RT_DOLLARS === 'real' ? "real (today's, " + window.ModelingAssumptions.get('inflation').value + '% infl)' : 'nominal (future)') + '.';
   }
 
   function renderRtTables(stack) {
@@ -743,6 +765,18 @@
     var vs = document.getElementById('rtVerifySummary');
     if (gs) gs.innerHTML = summary;
     if (vs) vs.innerHTML = summary;
+    updateRtBasisLabels();
+  }
+
+  // Live labels on the price-basis buttons: "Reverts to trend (1.0×)" and
+  // "Today's <discount|premium> persists (N.NN×)". Only the .rt-basis-text node
+  // is rewritten so each button's help-tip stays intact.
+  function updateRtBasisLabels() {
+    var ratio = rtCurrentRatio();
+    var trendTxt = 'Reverts to trend (1.0×)';
+    var curTxt = 'Today’s ' + todaysBasisPhrase(ratio) + ' persists (' + ratio.toFixed(2) + '×)';
+    document.querySelectorAll('.rt-basis-btn[data-basis="trend"] .rt-basis-text').forEach(function (el) { el.textContent = trendTxt; });
+    document.querySelectorAll('.rt-basis-btn[data-basis="current"] .rt-basis-text').forEach(function (el) { el.textContent = curTxt; });
   }
 
   function rtPhaseLabel(phase) {
@@ -756,6 +790,7 @@
   function renderVerifyTable(rows, depletionYear) {
     var tbody = document.getElementById('rtVerifyRows');
     if (!tbody) return;
+    var inflationPct = window.ModelingAssumptions.get('inflation').value;
     var html = '';
     for (var i = 0; i < rows.length; i++) {
       var r = rows[i];
@@ -773,8 +808,8 @@
         + '<td class="' + phaseCls + '">' + rtPhaseLabel(r.phase) + '</td>'
         + '<td class="rt-num">' + (r.price  != null ? formatCurrencyShort(r.price)  : '—') + '</td>'
         + '<td class="rt-num">' + (held     != null ? held.toFixed(2)               : '—') + '</td>'
-        + '<td class="rt-num">' + (r.usd    != null ? formatCurrencyShort(r.usd)    : '—') + '</td>'
-        + '<td class="rt-num">' + (r.income != null ? formatCurrencyShort(r.income) : '—') + '</td>'
+        + '<td class="rt-num">' + (r.usd    != null ? formatCurrencyShort(rtDollars(r.usd, r.x, inflationPct))    : '—') + '</td>'
+        + '<td class="rt-num">' + (r.income != null ? formatCurrencyShort(rtDollars(r.income, r.x, inflationPct)) : '—') + '</td>'
         + '<td class="rt-num">' + (r.btcSold != null ? r.btcSold.toFixed(3)         : '—') + '</td>'
         + '<td class="rt-num">' + (r.btc    != null ? r.btc.toFixed(2)              : '—') + '</td>'
         + '</tr>';
@@ -789,18 +824,24 @@
     var tbody = document.getElementById('rtGrowRows');
     var tfoot = document.getElementById('rtGrowResult');
     if (!tbody) return;
+    var inflationPct = window.ModelingAssumptions.get('inflation').value;
     var valued = [];
     for (var i = 0; i < rows.length; i++) {
       if (rows[i].usd != null) valued.push(rows[i]);
     }
+    // Convert each year's portfolio value to the active dollar basis up front,
+    // so the displayed value, the year-over-year delta, and the bar scale are
+    // all on the same basis.
+    var vals = valued.map(function (r) { return rtDollars(r.usd, r.x, inflationPct); });
     var maxUsd = 0;
-    for (var j = 0; j < valued.length; j++) {
-      if (valued[j].usd > maxUsd) maxUsd = valued[j].usd;
+    for (var j = 0; j < vals.length; j++) {
+      if (vals[j] > maxUsd) maxUsd = vals[j];
     }
     var html = '';
     var anyShrank = false;
     for (var k = 0; k < valued.length; k++) {
       var r = valued[k];
+      var v = vals[k];
       var isDeplete = depletionYear != null && r.x >= depletionYear;
       var rowCls = r.phase === 'retire' ? ' class="rt-row-retire"'
                  : (isDeplete ? ' class="rt-row-deplete"' : '');
@@ -809,7 +850,7 @@
         changeCell = '<span class="rt-change-flat">start</span>';
         grew = true;
       } else {
-        var delta = r.usd - valued[k - 1].usd;
+        var delta = v - vals[k - 1];
         if (delta > 0) {
           changeCell = '<span class="rt-change-up">▲ ' + formatCurrencyShort(delta) + '</span>';
           grew = true;
@@ -822,10 +863,10 @@
           grew = true;
         }
       }
-      var pct = maxUsd > 0 ? (r.usd / maxUsd * 100) : 0;
+      var pct = maxUsd > 0 ? (v / maxUsd * 100) : 0;
       html += '<tr' + rowCls + '>'
         + '<td>' + r.x + '</td>'
-        + '<td class="rt-num">' + formatCurrencyShort(r.usd) + '</td>'
+        + '<td class="rt-num">' + formatCurrencyShort(v) + '</td>'
         + '<td class="rt-num">' + changeCell + '</td>'
         + '<td class="rt-bar-col"><span class="rt-bar-track">'
         +   '<span class="rt-bar-fill ' + (grew ? 'grew' : 'shrank') + '" style="width:' + pct.toFixed(1) + '%"></span>'
@@ -860,17 +901,21 @@
     lines.push('# Monthly DCA,' + s.monthlyDcaUSD);
     lines.push('# Growth model,' + growth.preset);
     lines.push('# Inflation,' + inflation.value + '%');
-    lines.push('# Price assumption,' + (RT_BASIS === 'current' ? "today's discount persists" : 'reverts to trend'));
+    lines.push('# Price assumption,' + (RT_BASIS === 'current' ? "today's " + todaysBasisPhrase(rtCurrentRatio()) + ' persists' : 'reverts to trend'));
+    lines.push('# Dollar basis,' + (RT_DOLLARS === 'real' ? "real (today's dollars, " + inflation.value + '% inflation)' : 'nominal (future dollars)'));
     lines.push('# Live scenario URL,' + window.location.href);
     lines.push('');
-    lines.push('Year,Phase,BTC price,BTC held (start),Stack value USD,Income drawn USD,BTC sold,BTC left');
+    // BTC price is always nominal; portfolio/income dollars follow the active basis.
+    lines.push('Year,Phase,BTC price (nominal),Starting BTC,Stack value USD,Income drawn USD,BTC sold,BTC left');
     (stack.btcPoints || []).forEach(function (r) {
       var heldStart = r.btc != null ? (r.btc + (r.btcSold || 0) - (r.dcaAdded || 0)) : null;
+      var usdShown = rtDollars(r.usd, r.x, inflation.value);
+      var incomeShown = rtDollars(r.income, r.x, inflation.value);
       lines.push([r.x, r.phase,
         r.price != null ? Math.round(r.price) : '',
         heldStart != null ? heldStart.toFixed(4) : '',
-        r.usd != null ? Math.round(r.usd) : '',
-        r.income != null ? Math.round(r.income) : '',
+        usdShown != null ? Math.round(usdShown) : '',
+        incomeShown != null ? Math.round(incomeShown) : '',
         r.btcSold != null ? r.btcSold.toFixed(6) : '',
         r.btc != null ? r.btc.toFixed(4) : ''
       ].join(','));
@@ -917,7 +962,8 @@
   function wireRtBasis() {
     var btns = document.querySelectorAll('.rt-basis-btn');
     btns.forEach(function (b) {
-      b.addEventListener('click', function () {
+      b.addEventListener('click', function (e) {
+        if (e.target.closest('.help-tip')) return;   // let the tooltip handle its own clicks
         RT_BASIS = b.getAttribute('data-basis');
         document.querySelectorAll('.rt-basis-btn').forEach(function (x) {
           x.classList.toggle('is-active', x.getAttribute('data-basis') === RT_BASIS);
@@ -925,6 +971,36 @@
         if (LAST_STACK_PAIR) renderRtTables(LAST_STACK_PAIR[RT_BASIS]);
       });
     });
+  }
+
+  // Nominal/real dollar toggle — global display basis for EVERY dollar figure.
+  // Re-runs the shared render (scheduleRender = chart + tables + Sustainability +
+  // input line) so no two figures can end up on different bases.
+  function wireRtDollars() {
+    var btns = document.querySelectorAll('.rt-dollars-btn');
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        RT_DOLLARS = b.getAttribute('data-dollars');
+        document.querySelectorAll('.rt-dollars-btn').forEach(function (x) {
+          x.classList.toggle('is-active', x.getAttribute('data-dollars') === RT_DOLLARS);
+        });
+        updateBaselineDollarsNote();
+        scheduleRender();
+      });
+    });
+  }
+
+  // Read-only mirror in Baseline assumptions — states the active dollar basis
+  // (and, in real mode, the inflation rate it uses). The control lives at the
+  // tables; this only reflects it.
+  function updateBaselineDollarsNote() {
+    var el = document.getElementById('baselineDollarsState');
+    if (!el) return;
+    if (RT_DOLLARS === 'real') {
+      el.textContent = 'real (today’s dollars, at ' + window.ModelingAssumptions.get('inflation').value + '% inflation)';
+    } else {
+      el.textContent = 'nominal (future dollars)';
+    }
   }
 
   function wireRtCsv() {
@@ -1554,7 +1630,7 @@
   function updateSustainability() {
     var growthModel = window.ModelingAssumptions.get('btcGrowthModel');
     var inflation = window.ModelingAssumptions.get('inflation');
-    var stackReal = realStackAtRetirement(SCENARIO, growthModel.preset, inflation.value);
+    var inflationPct = inflation.value;
     var proj = projectStackOverTime(SCENARIO, growthModel.preset, inflation.value);
 
     var yearsEl = document.getElementById('sustYearsLast');
@@ -1568,18 +1644,37 @@
         yearsEl.classList.add('escape-velocity');
       }
     }
+    // Projected stack value at retirement — routes through rtDollars so it
+    // follows the nominal/real toggle and can never disagree with the tables'
+    // start row (the original $12.20M-vs-$9.49M contradiction). Trend price
+    // basis, matching computeStackAtRetirement's growth model.
+    var atRetInfo  = computeStackAtRetirement(SCENARIO, growthModel.preset);
+    var ratio      = rtCurrentRatio();
+    var atRetShown = rtDollars(atRetInfo.nominal, SCENARIO.retirementYear, inflationPct);
     var stackEl = document.getElementById('sustStackValue');
-    if (stackEl) stackEl.textContent = formatCurrencyShort(stackReal);
+    if (stackEl) stackEl.textContent = formatCurrencyShort(atRetShown);
 
-    // Stack value line under the input — today → at retirement (reuses
-    // existing values: liveBtcPrice for today, stackReal for at-retirement,
-    // the same figure feeding the Sustainability readout above).
+    // Input line: worth $X today → $Y at the start of retirement. Today's value
+    // is basis-invariant (deflator = 1 at year 0); at-retirement follows the toggle.
     var todayVal = SCENARIO.btcStack * liveBtcPrice;
     var elToday  = document.getElementById('stackValToday');
     var elAtRet  = document.getElementById('stackValAtRet');
     if (elToday) elToday.textContent = formatCurrencyShort(todayVal);
-    if (elAtRet) elAtRet.textContent = formatCurrencyShort(stackReal);
+    if (elAtRet) elAtRet.textContent = formatCurrencyShort(atRetShown);
 
+    // Second sub-line: at-retirement value under BOTH price bases — trend
+    // (mean-reversion) and today's-discount-persists (nominal × currentRatio) —
+    // each respecting the active dollar basis.
+    var trendAtRet   = rtDollars(atRetInfo.nominal, SCENARIO.retirementYear, inflationPct);
+    var currentAtRet = rtDollars(atRetInfo.nominal * ratio, SCENARIO.retirementYear, inflationPct);
+    var elTrend = document.getElementById('stackValTrend');
+    var elCur   = document.getElementById('stackValCurrent');
+    var elWord  = document.getElementById('stackValBasisWord');
+    if (elTrend) elTrend.textContent = formatCurrencyShort(trendAtRet);
+    if (elCur)   elCur.textContent = formatCurrencyShort(currentAtRet);
+    if (elWord)  elWord.textContent = todaysBasisPhrase(ratio);
+
+    updateBaselineDollarsNote();
     updateSpectrum(proj, SCENARIO, inflation.value);
   }
 
@@ -1726,6 +1821,8 @@
   wireLegendToggles();
   wireRtAccordion();
   wireRtBasis();
+  wireRtDollars();
+  updateBaselineDollarsNote();
   wireRtCsv();
   updateSustainability();
   fetchLiveBtcPrice();

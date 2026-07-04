@@ -1744,12 +1744,19 @@ a.powerlaw-link:hover {
 /* Scenario summary line (orientation) */
 .rt-scenario-summary { font-family: 'Inter', sans-serif; font-size: 0.8rem; line-height: 1.55; color: var(--ink); margin: 0 0 0.7rem; padding: 0.5rem 0.7rem; background: rgba(224,148,34,0.05); border-left: 2px solid var(--amber); border-radius: 0 4px 4px 0; }
 .rt-scenario-summary strong { color: var(--ink-bright); font-weight: 600; }
-/* Price-assumption (trajectory) toggle */
+/* Price-assumption (trajectory) + nominal/real dollar toggles — shared styling */
 .rt-basis-toggle { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 0.8rem; font-family: 'Inter', sans-serif; }
 .rt-basis-label { font-size: 0.75rem; color: var(--ink-dim); margin-right: 0.2rem; }
-.rt-basis-btn { font-size: 0.75rem; font-weight: 600; color: var(--ink-dim); background: rgba(224,148,34,0.05); border: 1px solid var(--border); border-radius: 5px; padding: 0.3rem 0.7rem; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
-.rt-basis-btn:hover { background: rgba(224,148,34,0.1); color: var(--ink); }
-.rt-basis-btn.is-active { background: rgba(224,148,34,0.14); border-color: var(--amber); color: var(--ink-bright); }
+.rt-basis-btn, .rt-dollars-btn { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; font-weight: 600; color: var(--ink-dim); background: rgba(224,148,34,0.05); border: 1px solid var(--border); border-radius: 5px; padding: 0.3rem 0.7rem; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+.rt-basis-btn:hover, .rt-dollars-btn:hover { background: rgba(224,148,34,0.1); color: var(--ink); }
+.rt-basis-btn.is-active, .rt-dollars-btn.is-active { background: rgba(224,148,34,0.14); border-color: var(--amber); color: var(--ink-bright); }
+.rt-basis-btn .help-tip { margin-left: 0.1rem; }
+/* Second at-retirement sub-line (both price bases) under the input value line */
+.stack-value-line2 { font-family: 'Inter', sans-serif; font-size: 0.68rem; color: var(--ink-faint); line-height: 1.35; margin-top: 2px; }
+.stack-value-line2 strong { color: var(--ink-dim); font-weight: 600; }
+/* Dollar-basis mirror note in Baseline assumptions */
+.baseline-dollars-note { font-family: 'Inter', sans-serif; font-size: 0.75rem; color: var(--ink-dim); line-height: 1.5; margin: 0.7rem 0 0; }
+.baseline-dollars-note strong { color: var(--ink-bright); font-weight: 600; }
 .rt-note { font-family: 'Inter', sans-serif; font-size: 0.78rem; line-height: 1.6; color: var(--ink-dim); margin: 0 0 0.6rem; }
 .rt-note strong { color: var(--ink); font-weight: 600; }
 .rt-note-caveat { display: block; margin-top: 0.35rem; opacity: 0.85; }
