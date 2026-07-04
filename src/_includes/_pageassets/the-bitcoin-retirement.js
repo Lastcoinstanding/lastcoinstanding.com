@@ -745,11 +745,15 @@
                  : (isDeplete ? ' class="rt-row-deplete"' : '');
       var phaseCls = r.phase === 'accum' ? 'rt-phase-accum'
                    : (r.phase === 'draw' ? 'rt-phase-draw' : '');
+      // Start-of-year BTC held, backed out of the end-of-year count: undo the
+      // year's sale (draw phase) and DCA add (accum phase). General identity,
+      // true on every row/phase: held − btcSold + dcaAdded = left (= r.btc).
+      var held = r.btc != null ? (r.btc + (r.btcSold || 0) - (r.dcaAdded || 0)) : null;
       html += '<tr' + rowCls + '>'
         + '<td>' + r.x + '</td>'
         + '<td class="' + phaseCls + '">' + rtPhaseLabel(r.phase) + '</td>'
         + '<td class="rt-num">' + (r.price  != null ? formatCurrencyShort(r.price)  : '—') + '</td>'
-        + '<td class="rt-num">' + (r.btc    != null ? r.btc.toFixed(2)              : '—') + '</td>'
+        + '<td class="rt-num">' + (held     != null ? held.toFixed(2)               : '—') + '</td>'
         + '<td class="rt-num">' + (r.usd    != null ? formatCurrencyShort(r.usd)    : '—') + '</td>'
         + '<td class="rt-num">' + (r.income != null ? formatCurrencyShort(r.income) : '—') + '</td>'
         + '<td class="rt-num">' + (r.btcSold != null ? r.btcSold.toFixed(3)         : '—') + '</td>'
@@ -839,11 +843,12 @@
     lines.push('# Inflation,' + inflation.value + '%');
     lines.push('# Live scenario URL,' + window.location.href);
     lines.push('');
-    lines.push('Year,Phase,BTC price,BTC held,Stack value USD,Income drawn USD,BTC sold,BTC left');
+    lines.push('Year,Phase,BTC price,BTC held (start),Stack value USD,Income drawn USD,BTC sold,BTC left');
     (stack.btcPoints || []).forEach(function (r) {
+      var heldStart = r.btc != null ? (r.btc + (r.btcSold || 0) - (r.dcaAdded || 0)) : null;
       lines.push([r.x, r.phase,
         r.price != null ? Math.round(r.price) : '',
-        r.btc != null ? r.btc.toFixed(4) : '',
+        heldStart != null ? heldStart.toFixed(4) : '',
         r.usd != null ? Math.round(r.usd) : '',
         r.income != null ? Math.round(r.income) : '',
         r.btcSold != null ? r.btcSold.toFixed(6) : '',
