@@ -732,11 +732,29 @@ a.powerlaw-link:hover {
   border-radius: 1px;
 }
 .swatch-trend { background: #e09422; height: 8px; }
-.swatch-floor { background: #b04525; height: 8px; }
-.swatch-upper { background: #e8c820; height: 8px; }
 .swatch-stack { background: #ece4d6; height: 8px; }
-.swatch-current { background: #a89c8a; height: 8px; }
-.swatch-benchmark { background: #5e7a92; height: 8px; }
+
+/* Dashed lines — swatch mirrors the chart's borderDash pattern */
+.swatch-floor {
+  height: 8px;
+  background: repeating-linear-gradient(90deg,
+    #b04525 0, #b04525 6px, transparent 6px, transparent 9px);
+}
+.swatch-upper {
+  height: 8px;
+  background: repeating-linear-gradient(90deg,
+    #e8c820 0, #e8c820 2px, transparent 2px, transparent 8px);
+}
+.swatch-current {
+  height: 8px;
+  background: repeating-linear-gradient(90deg,
+    #a89c8a 0, #a89c8a 4px, transparent 4px, transparent 7px);
+}
+.swatch-benchmark {
+  height: 8px;
+  background: repeating-linear-gradient(90deg,
+    #5e7a92 0, #5e7a92 5px, transparent 5px, transparent 9px);
+}
 
 /* Interactive legend — click a swatch/label to toggle the corresponding
    line on the chart. The .off state dims the row's color and fades the
