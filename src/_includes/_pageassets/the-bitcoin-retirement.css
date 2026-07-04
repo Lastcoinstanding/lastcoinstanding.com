@@ -1720,13 +1720,36 @@ a.powerlaw-link:hover {
    Token mapping to this page's palette: spec --text → --ink-bright,
    --text-dim → --ink, --text-muted → --ink-dim, --surface → --bg-card. */
 .rt-tables { margin: 1.5rem 0 0; }
-.rt-trigger-pair { display: flex; flex-wrap: wrap; gap: 0.6rem; }
-.rt-toggle { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(224,148,34,0.05); border: 1px solid var(--border); border-radius: 6px; color: var(--ink); font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; padding: 0.5rem 0.95rem; cursor: pointer; transition: background 0.15s, color 0.15s; }
+.rt-accordion-item { margin: 0.6rem 0 0; }
+/* Trigger — full-width so each stacks directly above its own panel (accordion) */
+.rt-toggle { display: inline-flex; width: 100%; justify-content: flex-start; align-items: center; gap: 0.5rem; background: rgba(224,148,34,0.05); border: 1px solid var(--border); border-radius: 6px; color: var(--ink); font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; padding: 0.5rem 0.95rem; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
 .rt-toggle:hover { background: rgba(224,148,34,0.1); color: var(--ink-bright); }
 .rt-caret { display: inline-block; font-size: 0.7rem; color: var(--amber); transition: transform 0.18s; }
 .rt-toggle[aria-expanded="true"] .rt-caret { transform: rotate(90deg); }
-.rt-body { margin: 0.9rem 0 0; }
+/* Expanded state — open trigger reads as the head of its attached panel */
+.rt-toggle[aria-expanded="true"] {
+  background: rgba(224,148,34,0.1);
+  border-color: var(--amber);
+  border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+  color: var(--ink-bright);
+}
+.rt-body {
+  border: 1px solid var(--amber);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  padding: 0.9rem;
+  margin: 0;
+}
 .rt-body[hidden] { display: none; }
+/* Scenario summary line (orientation) */
+.rt-scenario-summary { font-family: 'Inter', sans-serif; font-size: 0.8rem; line-height: 1.55; color: var(--ink); margin: 0 0 0.7rem; padding: 0.5rem 0.7rem; background: rgba(224,148,34,0.05); border-left: 2px solid var(--amber); border-radius: 0 4px 4px 0; }
+.rt-scenario-summary strong { color: var(--ink-bright); font-weight: 600; }
+/* Price-assumption (trajectory) toggle */
+.rt-basis-toggle { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 0.8rem; font-family: 'Inter', sans-serif; }
+.rt-basis-label { font-size: 0.75rem; color: var(--ink-dim); margin-right: 0.2rem; }
+.rt-basis-btn { font-size: 0.75rem; font-weight: 600; color: var(--ink-dim); background: rgba(224,148,34,0.05); border: 1px solid var(--border); border-radius: 5px; padding: 0.3rem 0.7rem; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+.rt-basis-btn:hover { background: rgba(224,148,34,0.1); color: var(--ink); }
+.rt-basis-btn.is-active { background: rgba(224,148,34,0.14); border-color: var(--amber); color: var(--ink-bright); }
 .rt-note { font-family: 'Inter', sans-serif; font-size: 0.78rem; line-height: 1.6; color: var(--ink-dim); margin: 0 0 0.6rem; }
 .rt-note strong { color: var(--ink); font-weight: 600; }
 .rt-note-caveat { display: block; margin-top: 0.35rem; opacity: 0.85; }

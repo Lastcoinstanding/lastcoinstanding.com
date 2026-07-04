@@ -718,12 +718,31 @@
   // intermediates it already computed — no formula is touched. See
   // retirement-tabular-views-design-doc.md.
   var LAST_STACK = null;
+  var LAST_STACK_PAIR = null;                 // { trend: <stack>, current: <stack> } — both bases from the last chart render
+  var RT_BASIS = 'trend';                     // 'trend' (mean-reversion, central case) | 'current' (today's discount persists)
+
+  // One-line reminder of the scenario the tables reflect, plus the active
+  // price basis — so a reader who's been dragging sliders stays oriented.
+  function rtScenarioSummary() {
+    var s = SCENARIO;
+    return 'Your scenario: <strong>' + s.btcStack.toFixed(2) + ' BTC</strong>' +
+      ', retiring in <strong>' + s.retirementYear + '</strong>' +
+      ', drawing <strong>' + formatCurrencyShort(s.targetIncomeUSD) + '/yr</strong>' +
+      (s.monthlyDcaUSD > 0 ? ' · adding ' + formatCurrencyShort(s.monthlyDcaUSD) + '/mo until then' : '') +
+      ' · ' + s.yearsInRetirement + ' yrs in retirement.' +
+      ' Price basis: ' + (RT_BASIS === 'current' ? 'today’s discount persists' : 'reverts to trend') + '.';
+  }
 
   function renderRtTables(stack) {
     LAST_STACK = stack;                 // module ref so the CSV button always exports the current scenario
     var rows = stack.btcPoints || [];
     renderVerifyTable(rows, stack.depletionYear);
     renderGrowTable(rows, stack.depletionYear);
+    var summary = rtScenarioSummary();
+    var gs = document.getElementById('rtGrowSummary');
+    var vs = document.getElementById('rtVerifySummary');
+    if (gs) gs.innerHTML = summary;
+    if (vs) vs.innerHTML = summary;
   }
 
   function rtPhaseLabel(phase) {
@@ -841,6 +860,7 @@
     lines.push('# Monthly DCA,' + s.monthlyDcaUSD);
     lines.push('# Growth model,' + growth.preset);
     lines.push('# Inflation,' + inflation.value + '%');
+    lines.push('# Price assumption,' + (RT_BASIS === 'current' ? "today's discount persists" : 'reverts to trend'));
     lines.push('# Live scenario URL,' + window.location.href);
     lines.push('');
     lines.push('Year,Phase,BTC price,BTC held (start),Stack value USD,Income drawn USD,BTC sold,BTC left');
@@ -870,13 +890,40 @@
     document.body.removeChild(ta);
   }
 
-  function wireRtToggle(btnId, bodyId) {
-    var btn = document.getElementById(btnId), body = document.getElementById(bodyId);
-    if (!btn || !body) return;
-    btn.addEventListener('click', function () {
-      var open = btn.getAttribute('aria-expanded') === 'true';
-      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
-      body.hidden = open;
+  // Accordion — one table open at a time. Clicking an open trigger collapses
+  // it (all closed); clicking a closed one closes the other and opens it.
+  function wireRtAccordion() {
+    var items = [
+      { btn: 'rtGrowToggle',   body: 'rtGrowBody'   },
+      { btn: 'rtVerifyToggle', body: 'rtVerifyBody' }
+    ];
+    items.forEach(function (it) {
+      var btn = document.getElementById(it.btn), body = document.getElementById(it.body);
+      if (!btn || !body) return;
+      btn.addEventListener('click', function () {
+        var willOpen = btn.getAttribute('aria-expanded') !== 'true';
+        items.forEach(function (other) {
+          var ob = document.getElementById(other.btn), obody = document.getElementById(other.body);
+          if (ob && obody) { ob.setAttribute('aria-expanded', 'false'); obody.hidden = true; }
+        });
+        if (willOpen) { btn.setAttribute('aria-expanded', 'true'); body.hidden = false; }
+      });
+    });
+  }
+
+  // Price-assumption toggle — selects which already-computed projection the
+  // tables render (trend vs. today's-discount-persists). No new math; just
+  // re-renders from LAST_STACK_PAIR. Buttons in both panels stay in sync.
+  function wireRtBasis() {
+    var btns = document.querySelectorAll('.rt-basis-btn');
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        RT_BASIS = b.getAttribute('data-basis');
+        document.querySelectorAll('.rt-basis-btn').forEach(function (x) {
+          x.classList.toggle('is-active', x.getAttribute('data-basis') === RT_BASIS);
+        });
+        if (LAST_STACK_PAIR) renderRtTables(LAST_STACK_PAIR[RT_BASIS]);
+      });
     });
   }
 
@@ -1087,8 +1134,11 @@
 
     // Year-by-year tables read the SAME stack object — placed before the
     // chart-update branch so they render on both the update and initial-
-    // create paths (the update path returns early below).
-    renderRtTables(stack);
+    // create paths (the update path returns early below). Store BOTH
+    // already-computed bases so the price-assumption toggle can switch the
+    // tables without a chart recompute; render whichever is active.
+    LAST_STACK_PAIR = { trend: stack, current: currentTrajectory };
+    renderRtTables(LAST_STACK_PAIR[RT_BASIS]);
 
     if (chart) {
       chart.data.datasets = datasets;
@@ -1674,8 +1724,8 @@
   recomputeCoupledFromIncomeOrMeans();
   renderChart();
   wireLegendToggles();
-  wireRtToggle('rtGrowToggle', 'rtGrowBody');
-  wireRtToggle('rtVerifyToggle', 'rtVerifyBody');
+  wireRtAccordion();
+  wireRtBasis();
   wireRtCsv();
   updateSustainability();
   fetchLiveBtcPrice();
