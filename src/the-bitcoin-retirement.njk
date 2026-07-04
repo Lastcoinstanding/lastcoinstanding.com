@@ -170,15 +170,19 @@ eleventyComputed:
           <div class="rt-body" id="rtGrowBody" hidden>
             <p class="rt-scenario-summary" id="rtGrowSummary"></p>
             <p class="rt-note">Did your stack outgrow your spending? Green means it grew that year; red means it shrank. Same yearly numbers as the audit view.</p>
-            <div class="rt-basis-toggle" role="group" aria-label="Price assumption">
+            <div class="rt-toggle-row">
               <span class="rt-basis-label">Price assumption:</span>
-              <button type="button" class="rt-basis-btn is-active" data-basis="trend"><span class="rt-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Drawdowns are taken against this trend-priced stack to fund retirement income. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
-              <button type="button" class="rt-basis-btn" data-basis="current"><span class="rt-basis-text">Today&rsquo;s discount persists</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
+              <div class="seg-control seg-2" role="group" aria-label="Price assumption">
+                <button type="button" class="rt-basis-btn seg-btn is-active" data-basis="trend"><span class="rt-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Drawdowns are taken against this trend-priced stack to fund retirement income. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
+                <button type="button" class="rt-basis-btn seg-btn" data-basis="current"><span class="rt-basis-text">Today&rsquo;s discount persists</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
+              </div>
             </div>
-            <div class="rt-basis-toggle" role="group" aria-label="Dollar basis">
+            <div class="rt-toggle-row">
               <span class="rt-basis-label">Dollars:</span>
-              <button type="button" class="rt-dollars-btn is-active" data-dollars="nominal">Nominal (future $)</button>
-              <button type="button" class="rt-dollars-btn" data-dollars="real">Real (today&rsquo;s $)</button>
+              <div class="seg-control seg-2" role="group" aria-label="Dollar basis">
+                <button type="button" class="rt-dollars-btn seg-btn is-active" data-dollars="nominal">Nominal (future $)<span class="help-tip" tabindex="0">?<span class="tip-content">Raw future dollars &mdash; the actual dollar amounts in each year, inflation included. price &times; BTC = value reconciles exactly in this mode.</span></span></button>
+                <button type="button" class="rt-dollars-btn seg-btn" data-dollars="real">Real (today&rsquo;s $ &middot; <span class="seg-btn-sub">&mdash;</span>)<span class="help-tip" tabindex="0">?<span class="tip-content">Today&rsquo;s purchasing power &mdash; every figure divided back by your chosen inflation rate (set in Baseline assumptions), so amounts are comparable to money now.</span></span></button>
+              </div>
             </div>
             <div class="rt-scroll">
               <table class="rt-table rt-grow-table">
@@ -203,15 +207,20 @@ eleventyComputed:
               <p class="rt-note">Reproduce any row: <strong>Starting BTC &minus; BTC sold + any DCA added = BTC left</strong>; <strong>price &times; BTC left = stack value</strong>; <strong>income &divide; price = BTC sold</strong>. Income grows with inflation each year. Portfolio dollars follow the nominal/real toggle; <strong>BTC price is always nominal</strong>. Same projection that draws the chart. <span class="rt-note-caveat">Pre-retirement DCA is approximated once per year at that year&rsquo;s trend price, so accumulation rows may not reconcile to the exact month.</span></p>
               <button type="button" class="rt-csv-btn" id="rtCsvBtn"><span aria-hidden="true">&#8595;</span> Copy as CSV</button>
             </div>
-            <div class="rt-basis-toggle" role="group" aria-label="Price assumption">
+            <p class="rt-note rt-income-note" id="rtIncomeNote"></p>
+            <div class="rt-toggle-row">
               <span class="rt-basis-label">Price assumption:</span>
-              <button type="button" class="rt-basis-btn is-active" data-basis="trend"><span class="rt-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Drawdowns are taken against this trend-priced stack to fund retirement income. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
-              <button type="button" class="rt-basis-btn" data-basis="current"><span class="rt-basis-text">Today&rsquo;s discount persists</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
+              <div class="seg-control seg-2" role="group" aria-label="Price assumption">
+                <button type="button" class="rt-basis-btn seg-btn is-active" data-basis="trend"><span class="rt-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Drawdowns are taken against this trend-priced stack to fund retirement income. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
+                <button type="button" class="rt-basis-btn seg-btn" data-basis="current"><span class="rt-basis-text">Today&rsquo;s discount persists</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
+              </div>
             </div>
-            <div class="rt-basis-toggle" role="group" aria-label="Dollar basis">
+            <div class="rt-toggle-row">
               <span class="rt-basis-label">Dollars:</span>
-              <button type="button" class="rt-dollars-btn is-active" data-dollars="nominal">Nominal (future $)</button>
-              <button type="button" class="rt-dollars-btn" data-dollars="real">Real (today&rsquo;s $)</button>
+              <div class="seg-control seg-2" role="group" aria-label="Dollar basis">
+                <button type="button" class="rt-dollars-btn seg-btn is-active" data-dollars="nominal">Nominal (future $)<span class="help-tip" tabindex="0">?<span class="tip-content">Raw future dollars &mdash; the actual dollar amounts in each year, inflation included. price &times; BTC = value reconciles exactly in this mode.</span></span></button>
+                <button type="button" class="rt-dollars-btn seg-btn" data-dollars="real">Real (today&rsquo;s $ &middot; <span class="seg-btn-sub">&mdash;</span>)<span class="help-tip" tabindex="0">?<span class="tip-content">Today&rsquo;s purchasing power &mdash; every figure divided back by your chosen inflation rate (set in Baseline assumptions), so amounts are comparable to money now.</span></span></button>
+              </div>
             </div>
             <div class="rt-scroll">
               <table class="rt-table rt-verify-table">
@@ -253,6 +262,13 @@ eleventyComputed:
               <span class="derived-label">&equiv;&nbsp;withdrawal rate:</span>
               <span class="derived-val" id="val-withdrawalRatePct">6.0%</span>
               <span class="help-tip" tabindex="0">?<span class="tip-content">Effective annual withdrawal as a percentage of your projected stack at retirement (in today&rsquo;s dollars). This is a <em>derived</em> readout, not a separate input &mdash; it&rsquo;s computed live as <strong>income &divide; projected stack value</strong>. Traditional &ldquo;safe withdrawal rate&rdquo; guidance (e.g., the <strong>4% rule</strong>) was calibrated against a 60/40 stock-bond portfolio expected to deliver ~7% real returns. Under the <a href="/the-power-law.html" style="color:var(--amber)">Power Law</a>, bitcoin&rsquo;s projected real growth remains meaningfully above that for the foreseeable retirement window, so higher withdrawal rates can be sustained &mdash; the <em>years stack lasts</em> readout below simulates this year-by-year. To explore a specific rate, nudge the income slider until this readout lands on your target.</span></span>
+            </div>
+            <div class="income-basis" role="group" aria-label="Income basis">
+              <span class="income-basis-label">Your $ target is in:</span>
+              <div class="seg-control seg-2">
+                <button type="button" class="seg-btn is-active" data-incbasis="today">Today&rsquo;s dollars<span class="help-tip" tabindex="0">?<span class="tip-content">Your target is in <strong>today&rsquo;s purchasing power</strong>. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
+                <button type="button" class="seg-btn" data-incbasis="fixed">Fixed future $<span class="help-tip" tabindex="0">?<span class="tip-content">Your target is a <strong>fixed nominal amount</strong> &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
+              </div>
             </div>
           </div>
 
