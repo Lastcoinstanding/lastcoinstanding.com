@@ -407,12 +407,15 @@
         // interaction aligned across all four series. Chart.js renders null as a
         // gap (no visible line pre-retirement, same as before).
         points.push({ x: y, y: null });
-        btcPoints.push({ x: y, btc: stackBtc, usd: null });
+        btcPoints.push({ x: y, btc: stackBtc, usd: null, phase: 'accum',
+          price: price, income: null, btcSold: null,
+          dcaAdded: (scenario.monthlyDcaUSD > 0 && price > 0) ? (12 * scenario.monthlyDcaUSD) / price : 0 });
       } else if (y === scenario.retirementYear) {
         // Drawdown line begins here, at the user's stack value at retirement
         // (after any accumulated DCA contributions).
         points.push({ x: y, y: stackBtc * price });
-        btcPoints.push({ x: y, btc: stackBtc, usd: stackBtc * price });
+        btcPoints.push({ x: y, btc: stackBtc, usd: stackBtc * price, phase: 'retire',
+          price: price, income: null, btcSold: null, dcaAdded: 0 });
       } else {
         // Post-retirement: sell BTC to cover nominal target income
         var yearsFromToday = y - startYear;
@@ -423,7 +426,8 @@
           depletionYear = y;
         }
         points.push({ x: y, y: stackBtc * price });
-        btcPoints.push({ x: y, btc: stackBtc, usd: stackBtc * price });
+        btcPoints.push({ x: y, btc: stackBtc, usd: stackBtc * price, phase: 'draw',
+          price: price, income: nominalIncome, btcSold: btcNeeded, dcaAdded: 0 });
       }
     }
     return { points: points, btcPoints: btcPoints, depletionYear: depletionYear, startYear: startYear, endYear: endYear };
@@ -706,6 +710,196 @@
 
   // ─── Chart instance + render/update
   var chart = null;
+  // ─── Year-by-year tabular views (below the chart) ──────────────────
+  // Two collapsible tables fed by the SAME projectStackOverTime result the
+  // chart consumes, so they reconcile to the chart by construction. View B
+  // ("watch it grow": value + YoY change + growth bar) and View A ("verify
+  // the math": full per-year audit + CSV export). The engine only captures
+  // intermediates it already computed — no formula is touched. See
+  // retirement-tabular-views-design-doc.md.
+  var LAST_STACK = null;
+
+  function renderRtTables(stack) {
+    LAST_STACK = stack;                 // module ref so the CSV button always exports the current scenario
+    var rows = stack.btcPoints || [];
+    renderVerifyTable(rows, stack.depletionYear);
+    renderGrowTable(rows, stack.depletionYear);
+  }
+
+  function rtPhaseLabel(phase) {
+    return phase === 'accum' ? 'Accumulate'
+         : phase === 'retire' ? 'Retire'
+         : phase === 'draw'   ? 'Draw down'
+         : '—';
+  }
+
+  // View A — one row per year, every intermediate the projection uses.
+  function renderVerifyTable(rows, depletionYear) {
+    var tbody = document.getElementById('rtVerifyRows');
+    if (!tbody) return;
+    var html = '';
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var isDeplete = depletionYear != null && r.x >= depletionYear;
+      var rowCls = r.phase === 'retire' ? ' class="rt-row-retire"'
+                 : (isDeplete ? ' class="rt-row-deplete"' : '');
+      var phaseCls = r.phase === 'accum' ? 'rt-phase-accum'
+                   : (r.phase === 'draw' ? 'rt-phase-draw' : '');
+      // Start-of-year BTC held, backed out of the end-of-year count: undo the
+      // year's sale (draw phase) and DCA add (accum phase). General identity,
+      // true on every row/phase: held − btcSold + dcaAdded = left (= r.btc).
+      var held = r.btc != null ? (r.btc + (r.btcSold || 0) - (r.dcaAdded || 0)) : null;
+      html += '<tr' + rowCls + '>'
+        + '<td>' + r.x + '</td>'
+        + '<td class="' + phaseCls + '">' + rtPhaseLabel(r.phase) + '</td>'
+        + '<td class="rt-num">' + (r.price  != null ? formatCurrencyShort(r.price)  : '—') + '</td>'
+        + '<td class="rt-num">' + (held     != null ? held.toFixed(2)               : '—') + '</td>'
+        + '<td class="rt-num">' + (r.usd    != null ? formatCurrencyShort(r.usd)    : '—') + '</td>'
+        + '<td class="rt-num">' + (r.income != null ? formatCurrencyShort(r.income) : '—') + '</td>'
+        + '<td class="rt-num">' + (r.btcSold != null ? r.btcSold.toFixed(3)         : '—') + '</td>'
+        + '<td class="rt-num">' + (r.btc    != null ? r.btc.toFixed(2)              : '—') + '</td>'
+        + '</tr>';
+    }
+    tbody.innerHTML = html;
+  }
+
+  // View B — dollar value + year-over-year change + proportional growth bar.
+  // Starts at the retirement year (pre-retirement rows have usd===null) so the
+  // year-over-year "change" is meaningful.
+  function renderGrowTable(rows, depletionYear) {
+    var tbody = document.getElementById('rtGrowRows');
+    var tfoot = document.getElementById('rtGrowResult');
+    if (!tbody) return;
+    var valued = [];
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i].usd != null) valued.push(rows[i]);
+    }
+    var maxUsd = 0;
+    for (var j = 0; j < valued.length; j++) {
+      if (valued[j].usd > maxUsd) maxUsd = valued[j].usd;
+    }
+    var html = '';
+    var anyShrank = false;
+    for (var k = 0; k < valued.length; k++) {
+      var r = valued[k];
+      var isDeplete = depletionYear != null && r.x >= depletionYear;
+      var rowCls = r.phase === 'retire' ? ' class="rt-row-retire"'
+                 : (isDeplete ? ' class="rt-row-deplete"' : '');
+      var changeCell, grew;
+      if (k === 0) {
+        changeCell = '<span class="rt-change-flat">start</span>';
+        grew = true;
+      } else {
+        var delta = r.usd - valued[k - 1].usd;
+        if (delta > 0) {
+          changeCell = '<span class="rt-change-up">▲ ' + formatCurrencyShort(delta) + '</span>';
+          grew = true;
+        } else if (delta < 0) {
+          changeCell = '<span class="rt-change-down">▼ ' + formatCurrencyShort(-delta) + '</span>';
+          grew = false;
+          anyShrank = true;
+        } else {
+          changeCell = '<span class="rt-change-flat">—</span>';
+          grew = true;
+        }
+      }
+      var pct = maxUsd > 0 ? (r.usd / maxUsd * 100) : 0;
+      html += '<tr' + rowCls + '>'
+        + '<td>' + r.x + '</td>'
+        + '<td class="rt-num">' + formatCurrencyShort(r.usd) + '</td>'
+        + '<td class="rt-num">' + changeCell + '</td>'
+        + '<td class="rt-bar-col"><span class="rt-bar-track">'
+        +   '<span class="rt-bar-fill ' + (grew ? 'grew' : 'shrank') + '" style="width:' + pct.toFixed(1) + '%"></span>'
+        + '</span></td>'
+        + '</tr>';
+    }
+    tbody.innerHTML = html;
+    if (tfoot) {
+      if (depletionYear != null) {
+        tfoot.innerHTML = '<tr><td colspan="4" class="rt-result-deplete">Depletes in ' + depletionYear + '</td></tr>';
+      } else {
+        var msg = anyShrank ? 'Ended above where it started — escape velocity'
+                            : 'Escape velocity — grew every year';
+        tfoot.innerHTML = '<tr><td colspan="4" class="rt-result-escape">' + msg + '</td></tr>';
+      }
+    }
+  }
+
+  // CSV export — provenance header (the assumptions that produced the table)
+  // then one line per year. Reuses SCENARIO + the same ModelingAssumptions the
+  // render path reads, so the export matches exactly what's on screen.
+  function buildRtCsv(stack) {
+    var s = SCENARIO;
+    var growth = window.ModelingAssumptions.get('btcGrowthModel');
+    var inflation = window.ModelingAssumptions.get('inflation');
+    var lines = [];
+    lines.push('# Last Coin Standing — Retirement projection');
+    lines.push('# Bitcoin stack,' + s.btcStack + ' BTC');
+    lines.push('# Retirement year,' + s.retirementYear);
+    lines.push('# Target annual income,' + s.targetIncomeUSD);
+    lines.push('# Years in retirement,' + s.yearsInRetirement);
+    lines.push('# Monthly DCA,' + s.monthlyDcaUSD);
+    lines.push('# Growth model,' + growth.preset);
+    lines.push('# Inflation,' + inflation.value + '%');
+    lines.push('# Live scenario URL,' + window.location.href);
+    lines.push('');
+    lines.push('Year,Phase,BTC price,BTC held (start),Stack value USD,Income drawn USD,BTC sold,BTC left');
+    (stack.btcPoints || []).forEach(function (r) {
+      var heldStart = r.btc != null ? (r.btc + (r.btcSold || 0) - (r.dcaAdded || 0)) : null;
+      lines.push([r.x, r.phase,
+        r.price != null ? Math.round(r.price) : '',
+        heldStart != null ? heldStart.toFixed(4) : '',
+        r.usd != null ? Math.round(r.usd) : '',
+        r.income != null ? Math.round(r.income) : '',
+        r.btcSold != null ? r.btcSold.toFixed(6) : '',
+        r.btc != null ? r.btc.toFixed(4) : ''
+      ].join(','));
+    });
+    return lines.join('\n');
+  }
+
+  function rtFallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'absolute';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  function wireRtToggle(btnId, bodyId) {
+    var btn = document.getElementById(btnId), body = document.getElementById(bodyId);
+    if (!btn || !body) return;
+    btn.addEventListener('click', function () {
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      body.hidden = open;
+    });
+  }
+
+  function wireRtCsv() {
+    var btn = document.getElementById('rtCsvBtn');
+    if (!btn) return;
+    var originalHtml = btn.innerHTML;
+    btn.addEventListener('click', function () {
+      if (!LAST_STACK) return;
+      var csv = buildRtCsv(LAST_STACK);
+      var restore = function () {
+        btn.classList.add('copied');
+        btn.textContent = 'Copied ✓';
+        setTimeout(function () { btn.classList.remove('copied'); btn.innerHTML = originalHtml; }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(csv).then(restore).catch(function () { rtFallbackCopy(csv); restore(); });
+      } else {
+        rtFallbackCopy(csv); restore();
+      }
+    });
+  }
+
   function renderChart() {
     var canvas = document.getElementById('projectionChart');
     if (!canvas) return;
@@ -890,6 +1084,11 @@
     // Half-decade padding above and below so lines aren't pinned to the edge
     var yMin = yMinObs * 0.5;
     var yMax = yMaxObs * 2;
+
+    // Year-by-year tables read the SAME stack object — placed before the
+    // chart-update branch so they render on both the update and initial-
+    // create paths (the update path returns early below).
+    renderRtTables(stack);
 
     if (chart) {
       chart.data.datasets = datasets;
@@ -1475,6 +1674,9 @@
   recomputeCoupledFromIncomeOrMeans();
   renderChart();
   wireLegendToggles();
+  wireRtToggle('rtGrowToggle', 'rtGrowBody');
+  wireRtToggle('rtVerifyToggle', 'rtVerifyBody');
+  wireRtCsv();
   updateSustainability();
   fetchLiveBtcPrice();
   // 3. Normalize the URL — drops any out-of-range or unrecognized params,

@@ -1715,3 +1715,53 @@ a.powerlaw-link:hover {
   opacity: 0.55;
   margin-left: 0.5rem;
 }
+
+/* ─── Year-by-year tabular views (below the chart) ───
+   Token mapping to this page's palette: spec --text → --ink-bright,
+   --text-dim → --ink, --text-muted → --ink-dim, --surface → --bg-card. */
+.rt-tables { margin: 1.5rem 0 0; }
+.rt-trigger-pair { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.rt-toggle { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(224,148,34,0.05); border: 1px solid var(--border); border-radius: 6px; color: var(--ink); font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; padding: 0.5rem 0.95rem; cursor: pointer; transition: background 0.15s, color 0.15s; }
+.rt-toggle:hover { background: rgba(224,148,34,0.1); color: var(--ink-bright); }
+.rt-caret { display: inline-block; font-size: 0.7rem; color: var(--amber); transition: transform 0.18s; }
+.rt-toggle[aria-expanded="true"] .rt-caret { transform: rotate(90deg); }
+.rt-body { margin: 0.9rem 0 0; }
+.rt-body[hidden] { display: none; }
+.rt-note { font-family: 'Inter', sans-serif; font-size: 0.78rem; line-height: 1.6; color: var(--ink-dim); margin: 0 0 0.6rem; }
+.rt-note strong { color: var(--ink); font-weight: 600; }
+.rt-note-caveat { display: block; margin-top: 0.35rem; opacity: 0.85; }
+.rt-verify-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+.rt-csv-btn { flex: none; background: rgba(224,148,34,0.05); border: 1px solid var(--border); border-radius: 6px; color: var(--ink); font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 600; padding: 0.4rem 0.8rem; cursor: pointer; transition: background 0.15s, color 0.15s; }
+.rt-csv-btn:hover { background: rgba(224,148,34,0.1); color: var(--ink-bright); }
+.rt-csv-btn.copied { color: var(--amber); }
+
+/* Horizontal scroll wrapper — for View A's 8 columns on narrow screens */
+.rt-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.rt-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+.rt-table thead th { text-align: left; font-weight: 600; color: var(--amber); background: rgba(224,148,34,0.06); padding: 0.5rem 0.6rem; white-space: nowrap; }
+.rt-table th.rt-num, .rt-table td.rt-num { text-align: right; }
+.rt-table tbody td { padding: 0.45rem 0.6rem; border-top: 1px solid var(--border); color: var(--ink-bright); white-space: nowrap; }
+.rt-table tbody tr.rt-row-retire td { background: rgba(224,148,34,0.06); color: var(--ink-bright); }
+.rt-table tbody tr.rt-row-retire td:first-child { color: var(--amber); font-weight: 600; }
+.rt-table tbody tr.rt-row-deplete td { color: var(--ink-dim); }
+.rt-phase-accum { color: #7fa87f; }
+.rt-phase-draw { color: var(--ink-dim); }
+
+/* Sticky Year column on mobile so the anchor stays put while scrolling */
+@media (max-width: 640px) {
+  .rt-table thead th:first-child,
+  .rt-table tbody td:first-child { position: sticky; left: 0; background: var(--bg-card); z-index: 1; }
+}
+
+/* View B growth bar */
+.rt-bar-col { width: 34%; }
+.rt-bar-track { display: inline-block; width: 100%; max-width: 220px; height: 9px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; vertical-align: middle; }
+.rt-bar-fill { display: block; height: 9px; border-radius: 3px; }
+.rt-bar-fill.grew { background: #7fc47f; }
+.rt-bar-fill.shrank { background: #c0603a; }
+.rt-change-up { color: #7fc47f; font-weight: 600; }
+.rt-change-down { color: #c0603a; font-weight: 600; }
+.rt-change-flat { color: var(--ink-dim); }
+.rt-grow-table tfoot td { border-top: 2px solid rgba(127,196,127,0.4); padding: 0.55rem 0.6rem; font-weight: 600; }
+.rt-grow-table tfoot td.rt-result-escape { color: #7fc47f; }
+.rt-grow-table tfoot td.rt-result-deplete { color: #c0603a; }

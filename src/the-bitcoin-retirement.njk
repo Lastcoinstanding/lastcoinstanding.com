@@ -159,6 +159,47 @@ eleventyComputed:
         <canvas id="projectionChart"></canvas>
       </div>
       <div class="retire-chart-today" id="retireChartToday" aria-live="polite"><strong>Today&rsquo;s bitcoin price:</strong> <span class="retire-today-spot" id="retireTodaySpot">&mdash;</span> &middot; <span class="retire-today-mult" id="retireTodayMult">&mdash;&times;</span> trend <span class="retire-today-zone" id="retireTodayZone"></span> <span class="retire-today-trendline">(Power Law trend = <span id="retireTodayTrend">&mdash;</span>)</span></div>
+
+      <section class="rt-tables" aria-label="Year-by-year detail">
+        <div class="rt-trigger-pair">
+          <button type="button" class="rt-toggle" id="rtGrowToggle" aria-expanded="false" aria-controls="rtGrowBody">
+            <span class="rt-caret" aria-hidden="true">&#9656;</span> Watch it grow &mdash; year by year
+          </button>
+          <button type="button" class="rt-toggle" id="rtVerifyToggle" aria-expanded="false" aria-controls="rtVerifyBody">
+            <span class="rt-caret" aria-hidden="true">&#9656;</span> Verify the math &mdash; year by year
+          </button>
+        </div>
+
+        <!-- View B: Watch it grow (rendered first) -->
+        <div class="rt-body" id="rtGrowBody" hidden>
+          <p class="rt-note">Did your stack outgrow your spending? Green means it grew that year; red means it shrank. Same yearly numbers as the audit view below.</p>
+          <div class="rt-scroll">
+            <table class="rt-table rt-grow-table">
+              <thead>
+                <tr><th>Year</th><th class="rt-num">Portfolio value</th><th class="rt-num">Change</th><th class="rt-bar-col">Growing vs. spending</th></tr>
+              </thead>
+              <tbody id="rtGrowRows"><!-- JS-populated --></tbody>
+              <tfoot id="rtGrowResult"><!-- JS-populated result row --></tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- View A: Verify the math -->
+        <div class="rt-body" id="rtVerifyBody" hidden>
+          <div class="rt-verify-head">
+            <p class="rt-note">Reproduce any row: <strong>price &times; BTC held = stack value</strong>; <strong>income &divide; price = BTC sold</strong>. Income grows with inflation each year. Same projection that draws the chart. <span class="rt-note-caveat">Pre-retirement DCA is approximated once per year at that year&rsquo;s trend price, so accumulation rows may not reconcile to the exact month.</span></p>
+            <button type="button" class="rt-csv-btn" id="rtCsvBtn"><span aria-hidden="true">&#8595;</span> Copy as CSV</button>
+          </div>
+          <div class="rt-scroll">
+            <table class="rt-table rt-verify-table">
+              <thead>
+                <tr><th>Year</th><th>Phase</th><th class="rt-num">BTC price</th><th class="rt-num">BTC held</th><th class="rt-num">Stack value</th><th class="rt-num">Income drawn</th><th class="rt-num">BTC sold</th><th class="rt-num">BTC left</th></tr>
+              </thead>
+              <tbody id="rtVerifyRows"><!-- JS-populated --></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </div>
 
     <!-- LIVE EXPLORATION — slider clusters per §9.2.5 -->
