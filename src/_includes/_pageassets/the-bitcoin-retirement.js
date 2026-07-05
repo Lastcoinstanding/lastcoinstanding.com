@@ -776,8 +776,8 @@
     var incEl = document.getElementById('rtIncomeNote');
     if (incEl) {
       incEl.textContent = (SCENARIO.incomeBasis === 'fixed')
-        ? 'Income drawn is flat in nominal mode (a fixed future amount); in real mode it shrinks as inflation erodes its purchasing power.'
-        : 'Income drawn rises in nominal mode because your today’s-dollars target needs more future dollars each year to buy the same goods; in real mode it’s flat at your target.';
+        ? 'Income drawn is flat here because your $ target is treated as a fixed future amount — the same raw dollars every year; in real (today’s $) mode it shrinks as inflation erodes it. To treat your target as today’s purchasing power instead (nominal grows, real stays flat), switch “Income target” to “Today’s dollars”.'
+        : 'Income drawn rises in nominal mode because your $ target is treated as today’s dollars — it takes more future dollars each year to buy the same goods; in real mode it stays flat at your target. To treat your target as a fixed future amount instead (nominal flat, real lower), switch “Income target” to “Fixed future $”.';
     }
     updateRtBasisLabels();
   }

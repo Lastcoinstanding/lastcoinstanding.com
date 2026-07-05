@@ -184,6 +184,13 @@ eleventyComputed:
                 <button type="button" class="rt-dollars-btn seg-btn" data-dollars="real">Real (today&rsquo;s $ &middot; <span class="seg-btn-sub">&mdash;</span>)<span class="help-tip" tabindex="0">?<span class="tip-content">Today&rsquo;s purchasing power &mdash; every figure divided back by your chosen inflation rate (set in Baseline assumptions), so amounts are comparable to money now.</span></span></button>
               </div>
             </div>
+            <div class="rt-toggle-row">
+              <span class="rt-basis-label">Income target:</span>
+              <div class="seg-control seg-2" role="group" aria-label="Income basis">
+                <button type="button" class="seg-btn is-active" data-incbasis="today">Today&rsquo;s dollars<span class="help-tip" tabindex="0">?<span class="tip-content">Your target is in <strong>today&rsquo;s purchasing power</strong>. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
+                <button type="button" class="seg-btn" data-incbasis="fixed">Fixed future $<span class="help-tip" tabindex="0">?<span class="tip-content">Your target is a <strong>fixed nominal amount</strong> &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
+              </div>
+            </div>
             <div class="rt-scroll">
               <table class="rt-table rt-grow-table">
                 <thead>
@@ -220,6 +227,13 @@ eleventyComputed:
               <div class="seg-control seg-2" role="group" aria-label="Dollar basis">
                 <button type="button" class="rt-dollars-btn seg-btn is-active" data-dollars="nominal">Nominal (future $)<span class="help-tip" tabindex="0">?<span class="tip-content">Raw future dollars &mdash; the actual dollar amounts in each year, inflation included. price &times; BTC = value reconciles exactly in this mode.</span></span></button>
                 <button type="button" class="rt-dollars-btn seg-btn" data-dollars="real">Real (today&rsquo;s $ &middot; <span class="seg-btn-sub">&mdash;</span>)<span class="help-tip" tabindex="0">?<span class="tip-content">Today&rsquo;s purchasing power &mdash; every figure divided back by your chosen inflation rate (set in Baseline assumptions), so amounts are comparable to money now.</span></span></button>
+              </div>
+            </div>
+            <div class="rt-toggle-row">
+              <span class="rt-basis-label">Income target:</span>
+              <div class="seg-control seg-2" role="group" aria-label="Income basis">
+                <button type="button" class="seg-btn is-active" data-incbasis="today">Today&rsquo;s dollars<span class="help-tip" tabindex="0">?<span class="tip-content">Your target is in <strong>today&rsquo;s purchasing power</strong>. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
+                <button type="button" class="seg-btn" data-incbasis="fixed">Fixed future $<span class="help-tip" tabindex="0">?<span class="tip-content">Your target is a <strong>fixed nominal amount</strong> &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
               </div>
             </div>
             <div class="rt-scroll">
