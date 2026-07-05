@@ -113,11 +113,13 @@ take-the-site-down-if-it-breaks changes.**
 
 ## 1. Editorial posture
 
-Last Coin Standing is a **statement piece, not a monetization funnel**. Its purpose is to explain Bitcoin structurally — through contrast and clarity — so that a thoughtful reader can understand what Bitcoin is by seeing what everything else isn't.
+Last Coin Standing is a **statement piece and an investment-education resource — never a monetization funnel**. Its purpose is to explain Bitcoin structurally — through contrast and clarity — so that a thoughtful reader can understand what Bitcoin is by seeing what everything else isn't, and (for some readers) can satisfy themselves that a considered Bitcoin allocation is sound. It earns understanding and allocation decisions through rigor a skeptic can check, never through hype or urgency. See **`POSITIONING_STRATEGY_GUIDE.md`** for the full framing — including the authoritative statement of intent (§1.5) and the no-embellishment principle that governs every tool and page.
 
 The voice is **restrained, declarative, and serious**, with quiet purpose and intent. The site earns the right to make structural claims ("for eternity," "impervious," "irreducible") through the seriousness of everything else on the page. It never overclaims, but it also doesn't hedge on what it actually believes.
 
 Tone the site reaches for: elegiac seriousness. Tone the site avoids: maximalist marketing.
+
+**Who the site is for, and values as positioning:** the site serves two audiences — Bitcoiners (who want live-computed proof and no hand-waving) and newcomers ("normies," who need an intuitive on-ramp before rigor) — plus a third reader, the prospective asset-management partner evaluating the site's credibility. The honesty guardrails (show the work, disclose limitations, never let the optimistic lens overstate, no funnel mechanics) are not just ethics but the site's competitive positioning. Full detail in `POSITIONING_STRATEGY_GUIDE.md` §2 (audiences) and §3 (values as positioning).
 
 ### Denomination: USD is canonical
 
