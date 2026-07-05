@@ -1,5 +1,10 @@
 [
   {
+    "display": "7/5/26",
+    "page": "/the-bitcoin-retirement.html",
+    "summary": "Updated: The Bitcoin Retirement — major enhancements. A year-by-year view of your retirement (portfolio value, annual change, and growth), a \"Verify the math\" audit table where every number reconciles by hand and exports to CSV, and controls to explore the assumptions honestly: reverts-to-trend vs. today's gap-to-trend, nominal vs. real (today's) dollars, and whether your income target is in today's dollars or a fixed future amount. Escape-velocity and depletion now track whichever assumptions you pick."
+  },
+  {
     "display": "6/30/26",
     "page": "/wait-or-deploy-now.html",
     "summary": "New: Wait, or Deploy Now? — from any position in the channel, see whether waiting for a lower Bitcoin entry historically got you more coins, or whether the dip you'd be waiting for usually never came. The position-aware close to the deployment trilogy."
