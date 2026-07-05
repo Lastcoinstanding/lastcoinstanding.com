@@ -1163,6 +1163,15 @@ a.powerlaw-link:hover {
   bottom: auto;
   top: calc(100% + 8px);
 }
+/* Right-edge header tooltips: anchor the tooltip's right edge to the icon so
+   its 240px width opens leftward into the visible table, instead of centered
+   (which overflows .rt-scroll's right boundary and gets clipped). Pairs with
+   .tip-below for the downward position. */
+.help-tip .tip-content.tip-align-right {
+  left: auto;
+  right: 0;
+  transform: none;
+}
 /* Narrow viewports: cap tooltip width so it can't exceed viewport when
    shown — even if its parent ? icon is near the right edge. */
 @media (max-width: 480px) {
