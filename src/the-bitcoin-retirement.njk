@@ -169,7 +169,7 @@ eleventyComputed:
           </button>
           <div class="rt-body" id="rtGrowBody" hidden>
             <p class="rt-scenario-summary" id="rtGrowSummary"></p>
-            <p class="rt-note">Did your stack outgrow your spending? Green means it grew that year; red means it shrank. Same yearly numbers as the audit view.</p>
+            <p class="rt-note">Did your stack outgrow your spending? Green means it grew that year; red means it shrank. Same yearly numbers as the audit view. <span class="rt-note-caveat"><strong>Growth %</strong> is the year-over-year change in portfolio value under your current assumptions (price basis, dollar basis, and income basis) &mdash; driven by the Power Law growth of your stack minus that year&rsquo;s withdrawal, not a fixed bitcoin-price CAGR.</span></p>
             <div class="rt-toggle-row">
               <span class="rt-basis-label">Price assumption:</span>
               <div class="seg-control seg-2" role="group" aria-label="Price assumption">
@@ -194,7 +194,7 @@ eleventyComputed:
             <div class="rt-scroll">
               <table class="rt-table rt-grow-table">
                 <thead>
-                  <tr><th>Year</th><th class="rt-num">Portfolio value</th><th class="rt-num">Change</th><th class="rt-num">Growth %<span class="help-tip" tabindex="0">?<span class="tip-content tip-below tip-align-right">Year-over-year change in portfolio value <strong>under the current assumptions</strong> (price basis, dollar basis, and income basis you&rsquo;ve selected). Driven by the Power Law growth of your stack minus that year&rsquo;s withdrawal &mdash; not a fixed bitcoin-price CAGR.</span></span></th><th class="rt-bar-col">Growing vs. spending</th></tr>
+                  <tr><th>Year</th><th class="rt-num">Portfolio value</th><th class="rt-num">Change</th><th class="rt-num">Growth %</th><th class="rt-bar-col">Growing vs. spending</th></tr>
                 </thead>
                 <tbody id="rtGrowRows"><!-- JS-populated --></tbody>
                 <tfoot id="rtGrowResult"><!-- JS-populated result row --></tfoot>
