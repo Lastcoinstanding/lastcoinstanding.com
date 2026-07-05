@@ -162,10 +162,10 @@ eleventyComputed:
 
       <section class="rt-tables" aria-label="Year-by-year detail">
 
-        <!-- View B: Watch it grow -->
+        <!-- View B: Your retirement, year by year -->
         <div class="rt-accordion-item">
           <button type="button" class="rt-toggle" id="rtGrowToggle" aria-expanded="false" aria-controls="rtGrowBody">
-            <span class="rt-caret" aria-hidden="true">&#9656;</span> Watch it grow &mdash; year by year
+            <span class="rt-caret" aria-hidden="true">&#9656;</span> Your retirement, year by year
           </button>
           <div class="rt-body" id="rtGrowBody" hidden>
             <p class="rt-scenario-summary" id="rtGrowSummary"></p>
@@ -185,16 +185,16 @@ eleventyComputed:
               </div>
             </div>
             <div class="rt-toggle-row">
-              <span class="rt-basis-label">Interpret my target as:</span>
+              <span class="rt-basis-label">Interpret my retirement income as:</span>
               <div class="seg-control seg-2" role="group" aria-label="Income basis">
-                <button type="button" class="seg-btn is-active" data-incbasis="today">Today&rsquo;s dollars<span class="help-tip" tabindex="0">?<span class="tip-content">Your target is in <strong>today&rsquo;s purchasing power</strong>. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
-                <button type="button" class="seg-btn" data-incbasis="fixed">Fixed future $<span class="help-tip" tabindex="0">?<span class="tip-content">Your target is a <strong>fixed nominal amount</strong> &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
+                <button type="button" class="seg-btn is-active" data-incbasis="today">Today&rsquo;s dollars<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>retirement income</strong> target is in today&rsquo;s purchasing power. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
+                <button type="button" class="seg-btn" data-incbasis="fixed">Fixed future $<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>retirement income</strong> target is a fixed nominal amount &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
               </div>
             </div>
             <div class="rt-scroll">
               <table class="rt-table rt-grow-table">
                 <thead>
-                  <tr><th>Year</th><th class="rt-num">Portfolio value</th><th class="rt-num">Change</th><th class="rt-bar-col">Growing vs. spending</th></tr>
+                  <tr><th>Year</th><th class="rt-num">Portfolio value</th><th class="rt-num">Change</th><th class="rt-num">Growth %<span class="help-tip" tabindex="0">?<span class="tip-content">Year-over-year change in portfolio value <strong>under the current assumptions</strong> (price basis, dollar basis, and income basis you&rsquo;ve selected). Driven by the Power Law growth of your stack minus that year&rsquo;s withdrawal &mdash; not a fixed bitcoin-price CAGR.</span></span></th><th class="rt-bar-col">Growing vs. spending</th></tr>
                 </thead>
                 <tbody id="rtGrowRows"><!-- JS-populated --></tbody>
                 <tfoot id="rtGrowResult"><!-- JS-populated result row --></tfoot>
@@ -230,10 +230,10 @@ eleventyComputed:
               </div>
             </div>
             <div class="rt-toggle-row">
-              <span class="rt-basis-label">Interpret my target as:</span>
+              <span class="rt-basis-label">Interpret my retirement income as:</span>
               <div class="seg-control seg-2" role="group" aria-label="Income basis">
-                <button type="button" class="seg-btn is-active" data-incbasis="today">Today&rsquo;s dollars<span class="help-tip" tabindex="0">?<span class="tip-content">Your target is in <strong>today&rsquo;s purchasing power</strong>. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
-                <button type="button" class="seg-btn" data-incbasis="fixed">Fixed future $<span class="help-tip" tabindex="0">?<span class="tip-content">Your target is a <strong>fixed nominal amount</strong> &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
+                <button type="button" class="seg-btn is-active" data-incbasis="today">Today&rsquo;s dollars<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>retirement income</strong> target is in today&rsquo;s purchasing power. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
+                <button type="button" class="seg-btn" data-incbasis="fixed">Fixed future $<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>retirement income</strong> target is a fixed nominal amount &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
               </div>
             </div>
             <div class="rt-scroll">
@@ -278,10 +278,10 @@ eleventyComputed:
               <span class="help-tip" tabindex="0">?<span class="tip-content">Effective annual withdrawal as a percentage of your projected stack at retirement (in today&rsquo;s dollars). This is a <em>derived</em> readout, not a separate input &mdash; it&rsquo;s computed live as <strong>income &divide; projected stack value</strong>. Traditional &ldquo;safe withdrawal rate&rdquo; guidance (e.g., the <strong>4% rule</strong>) was calibrated against a 60/40 stock-bond portfolio expected to deliver ~7% real returns. Under the <a href="/the-power-law.html" style="color:var(--amber)">Power Law</a>, bitcoin&rsquo;s projected real growth remains meaningfully above that for the foreseeable retirement window, so higher withdrawal rates can be sustained &mdash; the <em>years stack lasts</em> readout below simulates this year-by-year. To explore a specific rate, nudge the income slider until this readout lands on your target.</span></span>
             </div>
             <div class="income-basis" role="group" aria-label="Income basis">
-              <span class="income-basis-label">Interpret my target as:</span>
+              <span class="income-basis-label">Interpret my retirement income as:</span>
               <div class="seg-control seg-2">
-                <button type="button" class="seg-btn is-active" data-incbasis="today">Today&rsquo;s dollars<span class="help-tip" tabindex="0">?<span class="tip-content">Your target is in <strong>today&rsquo;s purchasing power</strong>. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
-                <button type="button" class="seg-btn" data-incbasis="fixed">Fixed future $<span class="help-tip" tabindex="0">?<span class="tip-content">Your target is a <strong>fixed nominal amount</strong> &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
+                <button type="button" class="seg-btn is-active" data-incbasis="today">Today&rsquo;s dollars<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>retirement income</strong> target is in today&rsquo;s purchasing power. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
+                <button type="button" class="seg-btn" data-incbasis="fixed">Fixed future $<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>retirement income</strong> target is a fixed nominal amount &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
               </div>
             </div>
           </div>
@@ -393,6 +393,8 @@ eleventyComputed:
           <div class="value-display" id="sustStackValue">&mdash;</div>
         </div>
       </div>
+
+      <p class="sust-basis-note">Under: <strong id="sustBasisWord">reverts to trend</strong>.</p>
 
       <!-- ESCAPE VELOCITY SPECTRUM BAR — §9.2.6 -->
       <div class="sustainability-spectrum">

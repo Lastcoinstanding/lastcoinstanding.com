@@ -881,11 +881,24 @@
           grew = true;
         }
       }
+      // Year-over-year % change in the active dollar basis (same source as the
+      // Change column). Not a fixed CAGR — it varies with every assumption.
+      var pctChange;
+      if (k === 0) {
+        pctChange = '<span class="rt-change-flat">—</span>';
+      } else {
+        var base = vals[k - 1];
+        var pc = base > 0 ? ((v - base) / base * 100) : 0;
+        var pcCls = pc > 0 ? 'rt-change-up' : (pc < 0 ? 'rt-change-down' : 'rt-change-flat');
+        var pcSign = pc > 0 ? '+' : '';
+        pctChange = '<span class="' + pcCls + '">' + pcSign + pc.toFixed(1) + '%</span>';
+      }
       var pct = maxUsd > 0 ? (v / maxUsd * 100) : 0;
       html += '<tr' + rowCls + '>'
         + '<td>' + r.x + '</td>'
         + '<td class="rt-num">' + formatCurrencyShort(v) + '</td>'
         + '<td class="rt-num">' + changeCell + '</td>'
+        + '<td class="rt-num">' + pctChange + '</td>'
         + '<td class="rt-bar-col"><span class="rt-bar-track">'
         +   '<span class="rt-bar-fill ' + (grew ? 'grew' : 'shrank') + '" style="width:' + pct.toFixed(1) + '%"></span>'
         + '</span></td>'
@@ -894,11 +907,11 @@
     tbody.innerHTML = html;
     if (tfoot) {
       if (depletionYear != null) {
-        tfoot.innerHTML = '<tr><td colspan="4" class="rt-result-deplete">Depletes in ' + depletionYear + '</td></tr>';
+        tfoot.innerHTML = '<tr><td colspan="5" class="rt-result-deplete">Depletes in ' + depletionYear + '</td></tr>';
       } else {
         var msg = anyShrank ? 'Ended above where it started — escape velocity'
                             : 'Escape velocity — grew every year';
-        tfoot.innerHTML = '<tr><td colspan="4" class="rt-result-escape">' + msg + '</td></tr>';
+        tfoot.innerHTML = '<tr><td colspan="5" class="rt-result-escape">' + msg + '</td></tr>';
       }
     }
   }
@@ -1683,7 +1696,14 @@
     var growthModel = window.ModelingAssumptions.get('btcGrowthModel');
     var inflation = window.ModelingAssumptions.get('inflation');
     var inflationPct = inflation.value;
-    var proj = projectStackOverTime(SCENARIO, growthModel.preset, inflation.value);
+    // Escape-velocity / depletion / spectrum must follow the SAME price basis
+    // the tables use (RT_BASIS), or the visual can contradict them \u2014 e.g. claim
+    // escape velocity while the tables show depletion under "today's discount".
+    // Current basis = trend prices scaled by today's ratio (matches the tables'
+    // currentTrajectory); trend basis is the default.
+    var proj = (RT_BASIS === 'current')
+      ? projectStackOverTime(SCENARIO, 'powerlaw-trend', inflation.value, rtCurrentRatio())
+      : projectStackOverTime(SCENARIO, growthModel.preset, inflation.value);
 
     var yearsEl = document.getElementById('sustYearsLast');
     if (yearsEl) {
@@ -1696,6 +1716,11 @@
         yearsEl.classList.add('escape-velocity');
       }
     }
+    // Disclose which price assumption the Sustainability visual is describing.
+    var bw = document.getElementById('sustBasisWord');
+    if (bw) bw.textContent = (RT_BASIS === 'current')
+      ? 'today\u2019s ' + todaysBasisPhrase(rtCurrentRatio()) + ' persists (' + rtCurrentRatio().toFixed(2) + '\u00D7)'
+      : 'reverts to trend';
     // Projected stack value at retirement — routes through rtDollars so it
     // follows the nominal/real toggle and can never disagree with the tables'
     // start row (the original $12.20M-vs-$9.49M contradiction). Trend price
