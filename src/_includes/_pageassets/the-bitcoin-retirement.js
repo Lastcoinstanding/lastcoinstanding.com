@@ -724,7 +724,7 @@
   // retirement-tabular-views-design-doc.md.
   var LAST_STACK = null;
   var LAST_STACK_PAIR = null;                 // { trend: <stack>, current: <stack> } — both bases from the last chart render
-  var RT_BASIS = 'trend';                     // 'trend' (mean-reversion, central case) | 'current' (today's discount persists)
+  var RT_BASIS = 'trend';                     // 'trend' (mean-reversion, central case) | 'current' (today's gap to trend holds)
   var RT_DOLLARS = 'nominal';                 // 'nominal' (default, future $) | 'real' (today's $, uses chosen inflation)
 
   // Real-dollar deflator for a calendar year, using the user's chosen inflation.
@@ -744,8 +744,8 @@
     var t = projPriceForGrowth(dateForYear((new Date()).getFullYear()), 'powerlaw-trend');
     return (t > 0) ? (liveBtcPrice / t) : 1;
   }
-  // Shared discount/premium wording so button, summary, and CSV always agree.
-  function todaysBasisPhrase(ratio) { return ratio < 1 ? 'discount' : 'premium'; }
+  // Shared gap/premium wording so button, summary, and CSV always agree.
+  function todaysBasisPhrase(ratio) { return ratio < 1 ? 'gap' : 'premium'; }
 
   // One-line reminder of the scenario the tables reflect, plus the active
   // price basis — so a reader who's been dragging sliders stays oriented.
@@ -756,7 +756,7 @@
       ', drawing <strong>' + formatCurrencyShort(s.targetIncomeUSD) + '/yr</strong>' +
       (s.monthlyDcaUSD > 0 ? ' · adding ' + formatCurrencyShort(s.monthlyDcaUSD) + '/mo until then' : '') +
       ' · ' + s.yearsInRetirement + ' yrs in retirement.' +
-      ' Price basis: ' + (RT_BASIS === 'current' ? 'today’s ' + todaysBasisPhrase(rtCurrentRatio()) + ' persists' : 'reverts to trend') + '.' +
+      ' Price basis: ' + (RT_BASIS === 'current' ? 'today’s ' + todaysBasisPhrase(rtCurrentRatio()) + ' to trend holds' : 'reverts to trend') + '.' +
       ' Dollars: ' + (RT_DOLLARS === 'real' ? "real (today's, " + window.ModelingAssumptions.get('inflation').value + '% infl)' : 'nominal (future)') + '.' +
       ' Income target: ' + (SCENARIO.incomeBasis === 'fixed' ? 'fixed future $' : "today's dollars") + '.';
   }
@@ -783,12 +783,12 @@
   }
 
   // Live labels on the price-basis buttons: "Reverts to trend (1.0×)" and
-  // "Today's <discount|premium> persists (N.NN×)". Only the .rt-basis-text node
+  // "Today's <gap|premium> to trend holds (N.NN×)". Only the .rt-basis-text node
   // is rewritten so each button's help-tip stays intact.
   function updateRtBasisLabels() {
     var ratio = rtCurrentRatio();
     var trendTxt = 'Reverts to trend (1.0×)';
-    var curTxt = 'Today’s ' + todaysBasisPhrase(ratio) + ' persists (' + ratio.toFixed(2) + '×)';
+    var curTxt = 'Today’s ' + todaysBasisPhrase(ratio) + ' to trend holds (' + ratio.toFixed(2) + '×)';
     document.querySelectorAll('.rt-basis-btn[data-basis="trend"] .rt-basis-text').forEach(function (el) { el.textContent = trendTxt; });
     document.querySelectorAll('.rt-basis-btn[data-basis="current"] .rt-basis-text').forEach(function (el) { el.textContent = curTxt; });
     // Real dollar button shows the live Baseline inflation rate (Part C) — only
@@ -932,7 +932,7 @@
     lines.push('# Monthly DCA,' + s.monthlyDcaUSD);
     lines.push('# Growth model,' + growth.preset);
     lines.push('# Inflation,' + inflation.value + '%');
-    lines.push('# Price assumption,' + (RT_BASIS === 'current' ? "today's " + todaysBasisPhrase(rtCurrentRatio()) + ' persists' : 'reverts to trend'));
+    lines.push('# Price assumption,' + (RT_BASIS === 'current' ? "today's " + todaysBasisPhrase(rtCurrentRatio()) + ' to trend holds' : 'reverts to trend'));
     lines.push('# Dollar basis,' + (RT_DOLLARS === 'real' ? "real (today's dollars, " + inflation.value + '% inflation)' : 'nominal (future dollars)'));
     lines.push('# Income target basis,' + (s.incomeBasis === 'fixed' ? 'fixed future $' : "today's dollars"));
     lines.push('# Live scenario URL,' + window.location.href);
@@ -989,7 +989,7 @@
   }
 
   // Price-assumption toggle — selects which already-computed projection the
-  // tables render (trend vs. today's-discount-persists). No new math; just
+  // tables render (trend vs. today's-gap-to-trend-holds). No new math; just
   // re-renders from LAST_STACK_PAIR. Buttons in both panels stay in sync.
   function wireRtBasis() {
     var btns = document.querySelectorAll('.rt-basis-btn');
@@ -1001,6 +1001,7 @@
           x.classList.toggle('is-active', x.getAttribute('data-basis') === RT_BASIS);
         });
         if (LAST_STACK_PAIR) renderRtTables(LAST_STACK_PAIR[RT_BASIS]);
+        updateSustainability();   // basis-aware escape-velocity/depletion + "Under:" note must track the toggle too
       });
     });
   }
@@ -1698,7 +1699,7 @@
     var inflationPct = inflation.value;
     // Escape-velocity / depletion / spectrum must follow the SAME price basis
     // the tables use (RT_BASIS), or the visual can contradict them \u2014 e.g. claim
-    // escape velocity while the tables show depletion under "today's discount".
+    // escape velocity while the tables show depletion under "today's gap to trend".
     // Current basis = trend prices scaled by today's ratio (matches the tables'
     // currentTrajectory); trend basis is the default.
     var proj = (RT_BASIS === 'current')
@@ -1719,7 +1720,7 @@
     // Disclose which price assumption the Sustainability visual is describing.
     var bw = document.getElementById('sustBasisWord');
     if (bw) bw.textContent = (RT_BASIS === 'current')
-      ? 'today\u2019s ' + todaysBasisPhrase(rtCurrentRatio()) + ' persists (' + rtCurrentRatio().toFixed(2) + '\u00D7)'
+      ? 'today\u2019s ' + todaysBasisPhrase(rtCurrentRatio()) + ' to trend holds (' + rtCurrentRatio().toFixed(2) + '\u00D7)'
       : 'reverts to trend';
     // Projected stack value at retirement — routes through rtDollars so it
     // follows the nominal/real toggle and can never disagree with the tables'
@@ -1740,7 +1741,7 @@
     if (elAtRet) elAtRet.textContent = formatCurrencyShort(atRetShown);
 
     // Second sub-line: at-retirement value under BOTH price bases — trend
-    // (mean-reversion) and today's-discount-persists (nominal × currentRatio) —
+    // (mean-reversion) and today's-gap-to-trend-holds (nominal × currentRatio) —
     // each respecting the active dollar basis.
     var trendAtRet   = rtDollars(atRetInfo.nominal, SCENARIO.retirementYear, inflationPct);
     var currentAtRet = rtDollars(atRetInfo.nominal * ratio, SCENARIO.retirementYear, inflationPct);
