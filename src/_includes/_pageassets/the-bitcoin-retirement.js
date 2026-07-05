@@ -1722,13 +1722,14 @@
     if (bw) bw.textContent = (RT_BASIS === 'current')
       ? 'today\u2019s ' + todaysBasisPhrase(rtCurrentRatio()) + ' to trend holds (' + rtCurrentRatio().toFixed(2) + '\u00D7)'
       : 'reverts to trend';
-    // Projected stack value at retirement — routes through rtDollars so it
-    // follows the nominal/real toggle and can never disagree with the tables'
-    // start row (the original $12.20M-vs-$9.49M contradiction). Trend price
-    // basis, matching computeStackAtRetirement's growth model.
-    var atRetInfo  = computeStackAtRetirement(SCENARIO, growthModel.preset);
-    var ratio      = rtCurrentRatio();
-    var atRetShown = rtDollars(atRetInfo.nominal, SCENARIO.retirementYear, inflationPct);
+    // Projected stack value at retirement — follows BOTH toggles so it can never
+    // disagree with the tables' start row: the price-basis toggle (× currentRatio
+    // under 'current', matching the tables' currentTrajectory) and the nominal/real
+    // toggle (via rtDollars). Under 'trend' it's the plain trend-basis value.
+    var atRetInfo    = computeStackAtRetirement(SCENARIO, growthModel.preset);
+    var ratio        = rtCurrentRatio();
+    var atRetNominal = (RT_BASIS === 'current') ? atRetInfo.nominal * ratio : atRetInfo.nominal;
+    var atRetShown   = rtDollars(atRetNominal, SCENARIO.retirementYear, inflationPct);
     var stackEl = document.getElementById('sustStackValue');
     if (stackEl) stackEl.textContent = formatCurrencyShort(atRetShown);
 
