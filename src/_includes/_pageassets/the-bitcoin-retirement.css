@@ -1749,7 +1749,9 @@ a.powerlaw-link:hover {
 .rt-toggle-row { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 0.5rem; flex-wrap: wrap; }
 .rt-toggle-row .rt-basis-label, .income-basis-label { font-size: 0.75rem; color: var(--ink-dim); min-width: 7.5rem; }
 .income-basis { display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0 0; flex-wrap: wrap; }
-.seg-control { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.seg-control { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; }
+.seg-control .seg-btn:first-child { border-top-left-radius: 5px; border-bottom-left-radius: 5px; }
+.seg-control .seg-btn:last-child  { border-top-right-radius: 5px; border-bottom-right-radius: 5px; }
 .seg-btn { font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 600; color: var(--ink-dim); background: rgba(224,148,34,0.04); border: none; border-right: 1px solid var(--border); padding: 0.35rem 0.75rem; cursor: pointer; transition: background 0.15s, color 0.15s; display: inline-flex; align-items: center; gap: 0.3rem; }
 .seg-btn:last-child { border-right: none; }
 .seg-btn:hover { background: rgba(224,148,34,0.1); color: var(--ink); }
