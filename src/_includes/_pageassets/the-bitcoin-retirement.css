@@ -1155,6 +1155,14 @@ a.powerlaw-link:hover {
   display: block;
   pointer-events: auto;
 }
+/* Header-cell tooltips inside a horizontal-scroll table must open downward:
+   the header sits at the top edge of .rt-scroll (overflow-x:auto), so an
+   upward tooltip is clipped by the container. Opening downward drops it into
+   the scroll region where it's visible. */
+.help-tip .tip-content.tip-below {
+  bottom: auto;
+  top: calc(100% + 8px);
+}
 /* Narrow viewports: cap tooltip width so it can't exceed viewport when
    shown — even if its parent ? icon is near the right edge. */
 @media (max-width: 480px) {
