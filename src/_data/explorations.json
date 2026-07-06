@@ -169,7 +169,7 @@
   {
     "_comment": "Bull & Bear Cycles — cyclical drawdowns + CAGR/volatility spine. Interactive (live cycle status, day-zero overlay toggles, computed vol chart) but not a personal-decision calculator, so no calculator_tile — same posture as the-doubling-ladder / heatmap. Placed in Models & Trends as a cyclical-model page; cross-links heavily into Positioning & Strategy.",
     "slug": "bull-and-bear-cycles",
-    "title": "Bull &amp; Bear Cycles",
+    "title": "Bitcoin Bull &amp; Bear Cycles",
     "category": "numbers",
     "group": "Models & Trends",
     "interactive": true

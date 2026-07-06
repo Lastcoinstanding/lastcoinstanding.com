@@ -977,7 +977,7 @@ A reusable Python + Pillow generator for site OG cards (1280×720 JPG) lives in 
 
 **Font sourcing.** Cormorant Garamond pulled at generation time via the Google Fonts CSS API (`https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap`) — parse the latin font-face blocks for woff2 URLs, download, convert to TTF via `fontTools`. Inter via the `fonts-inter` apt package (system-installed). No font assets committed to the repo.
 
-**Save as JPEG quality 88 with `optimize=True`** to land at ~75–95 KB per card, matching the size of existing OG images. Cormorant Garamond doesn't include U+20BF (`₿`); use Inter for that single character if it appears in a title.
+**Save as JPEG quality 80 with `optimize=True`** to land at ~75–95 KB per card, matching the size of existing OG images. (All shipped per-page `build-og-*.py` scripts use `quality=80`; the doc previously said 88 — corrected 2026-07 to match the scripts.) Cormorant Garamond doesn't include U+20BF (`₿`); use Inter for that single character if it appears in a title.
 
 **When you generate a card,** use the page's headline (carousel slide headline, if defined) as the italic subtitle text. Keep the subtitle under three wrapped lines at the 480px max-width — longer subtitles compete visually with the right-half atmosphere.
 
