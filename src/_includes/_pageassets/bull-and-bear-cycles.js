@@ -111,59 +111,109 @@
     tb.innerHTML = rows;
   }
 
-  // ════════ 2. LIVE "WHERE ARE WE NOW" ════════
+  // ════════ 2. LIVE "WHERE ARE WE NOW" — Power-Law-anchored state machine ════════
+  // The panel must read accurately in EVERY price regime, not just a bear market.
+  // Power Law position is the consistent descriptive spine across all states; every
+  // state is descriptive, never a recommendation and never a forecast. Thresholds are
+  // explicit and documented here so they can be reviewed when the cycle changes regime.
   var _live = null;
   function livePrice() { return _live != null ? _live : TODAY_PRICE; }
 
-  // Drawdown of a past cycle at `age` days after its own peak (for the rank).
+  var ST_EXTENDED = 1.8;   // ratio (price/trend) at/above which price is "extended above trend"
+  var ST_DEEP = -0.35;     // fromPeak at/below which it is a deep bear
+  var ST_RECOVERY = -0.10; // fromPeak between ST_DEEP and here = recovery; above here = near/at high
+  var ST_NEWHIGH = 0.02;   // fromPeak at/above which it is a new all-time high
+
+  function sgnPct(v) { return (v > 0 ? '+' : (v < 0 ? '−' : '')) + Math.abs(Math.round(v)) + '%'; }
+
+  // % of history at or below the current price/trend ratio (descriptive, both directions).
+  function pctAtOrBelow(ratio) {
+    var n = 0;
+    for (var i = 0; i < N; i++) { if (S[i].p / plPrice(S[i].d) <= ratio) n++; }
+    return Math.round(100 * n / N);
+  }
+  // Drawdown of a past cycle at `age` days after its own peak (for the deep-bear rank).
   function pastDDatAge(c, age) {
     var pd = daysFrom(c.peakDate), td = daysFrom(c.troughDate);
-    var at = pd + age;
-    if (at > td) at = td;                 // don't read past that cycle's own bottom
-    var basis = priceAt(pd);
-    return (priceAt(at) / basis - 1) * 100;
+    var at = Math.min(pd + age, td);      // don't read past that cycle's own bottom
+    return (priceAt(at) / priceAt(pd) - 1) * 100;
   }
 
   function renderLive(price, source) {
     _live = price;
     var peak = CYCLES[4].peak, peakDay = daysFrom(CYCLES[4].peakDate);
-    var dd = (price / peak - 1) * 100;
+    var trend = plPrice(TODAY_DAYS);
+    var ratio = price / trend;
+    var fromPeak = (price - peak) / peak;         // negative = drawdown, positive = new high
+    var fromPeakPct = fromPeak * 100;
     var daysIn = todayD - peakDay;
+    var pctBelow = pctAtOrBelow(ratio), pctAbove = 100 - pctBelow;
 
+    // Pick ONE state.
+    var state;
+    if (ratio >= ST_EXTENDED) state = 'extended';
+    else if (fromPeak <= ST_DEEP) state = 'deepbear';
+    else if (fromPeak <= ST_RECOVERY) state = 'recovery';
+    else if (fromPeak < ST_NEWHIGH) state = 'nearhigh';
+    else state = 'newhigh';
+
+    // ── Tiles (Power Law position is the spine) ──
+    var posEl = document.getElementById('bbLivePos');
+    if (posEl) posEl.textContent = ratio.toFixed(2) + '×';
+    var posSubEl = document.getElementById('bbLivePosSub');
+    if (posSubEl) posSubEl.innerHTML = (state === 'extended' || state === 'newhigh')
+      ? 'of trend · above here only <strong>' + pctAbove + '%</strong> of history'
+      : 'of trend · below here <strong>' + pctBelow + '%</strong> of history';
+
+    var ddCapEl = document.getElementById('bbLiveDDCap');
+    if (ddCapEl) ddCapEl.textContent = fromPeak >= 0 ? 'Above the 2025 peak' : 'From the 2025 peak';
     var ddEl = document.getElementById('bbLiveDD');
-    if (ddEl) ddEl.textContent = pct0(dd);
+    if (ddEl) ddEl.textContent = sgnPct(fromPeakPct);
     var priceEl = document.getElementById('bbLivePrice');
     if (priceEl) priceEl.innerHTML = 'now ' + usd(price) + ' vs ' + usdK(peak) + ' peak' + (source === 'live' ? '' : ' <span style="opacity:.7">(latest sample)</span>');
+
     var daysEl = document.getElementById('bbLiveDays');
     if (daysEl) daysEl.textContent = Math.round(daysIn);
-    var durEl = document.getElementById('bbLiveDuration');
-    if (durEl) durEl.innerHTML = daysIn >= 100
-      ? 'past the <strong style="color:#e09422">100-day</strong> structural-bear threshold'
-      : Math.round(100 - daysIn) + ' days short of the 100-day threshold';
+    var daysSubEl = document.getElementById('bbLiveDaysSub');
+    if (daysSubEl) daysSubEl.innerHTML = (state === 'deepbear' || state === 'recovery')
+      ? (daysIn >= 100 ? 'past the <strong style="color:#e09422">100-day</strong> structural-bear mark' : Math.round(100 - daysIn) + ' short of the 100-day mark')
+      : 'since the Oct 2025 peak';
 
-    // Rank vs the completed bears at the same age
-    var completed = CYCLES.filter(function (c) { return !c.ongoing; });
-    var deeper = 0, comps = [];
-    completed.forEach(function (c) { var d = pastDDatAge(c, daysIn); comps.push({ id: c.id, dd: d }); if (d < dd) deeper++; });
-    var rankEl = document.getElementById('bbLiveRank');
-    if (rankEl) rankEl.innerHTML = 'shallower than <strong>' + deeper + ' of ' + completed.length + '</strong>';
+    // ── Regime label + one merged, state-appropriate message ──
+    var pos = 'Price sits at about <strong>' + ratio.toFixed(2) + '×</strong> the Power Law trend, where it has historically spent roughly <strong>' + pctBelow + '%</strong> of its time below this level.';
+    var regime, read;
+    if (state === 'deepbear') {
+      var completed = CYCLES.filter(function (c) { return !c.ongoing; });
+      var deeper = 0;
+      completed.forEach(function (c) { if (pastDDatAge(c, daysIn) < fromPeakPct) deeper++; });
+      var shallowMost = deeper >= Math.ceil(completed.length / 2);
+      if (daysIn >= 100) {
+        regime = 'Right now: a structural bear market';
+        read = 'By the assumption-free measure, duration, this already qualifies as a structural bear market (100+ days to bottom). At <strong>' + Math.round(daysIn) + ' days</strong> past the peak, the drawdown of <strong>' + sgnPct(fromPeakPct) + '</strong> is ' + (shallowMost ? 'shallower than most' : 'in line with or deeper than most') + ' prior bear markets at the same age. ' + pos + ' Volatility has compressed cycle over cycle, though every past bear market has still been deep.';
+      } else {
+        regime = 'Right now: a deep drawdown';
+        read = 'By duration, the assumption-free measure, this is not yet a confirmed structural bear market (that takes 100+ days to bottom), though the drawdown is already deep at <strong>' + sgnPct(fromPeakPct) + '</strong>, ' + (shallowMost ? 'shallower than most' : 'in line with or deeper than most') + ' prior bear markets at this age. ' + pos + ' Volatility has compressed cycle over cycle, though every past bear market has still been deep.';
+      }
+    } else if (state === 'recovery') {
+      regime = 'Right now: recovering off the low';
+      read = 'Bitcoin is off its low but still <strong>' + sgnPct(fromPeakPct) + '</strong> from the 2025 peak. ' + pos + ' In past cycles, reclaiming a prior high from a low took time: the trough-to-next-peak span has run near 1,050 days.';
+    } else if (state === 'nearhigh') {
+      regime = 'Right now: near the prior high';
+      read = 'Bitcoin is within <strong>' + Math.abs(Math.round(fromPeakPct)) + '%</strong> of the 2025 peak. ' + pos;
+    } else if (state === 'newhigh') {
+      regime = 'Right now: a new all-time high';
+      read = 'Bitcoin is at a new all-time high, <strong>' + sgnPct(fromPeakPct) + '</strong> above the 2025 peak. Price sits at about <strong>' + ratio.toFixed(2) + '×</strong> the Power Law trend, where it has historically spent roughly <strong>' + pctBelow + '%</strong> of its time below this level.';
+    } else { // extended
+      regime = 'Right now: extended above trend';
+      read = 'Price sits at about <strong>' + ratio.toFixed(2) + '×</strong> the Power Law trend, well above it; historically price has been above this level only about <strong>' + pctAbove + '%</strong> of the time. In past cycles, extension this far above trend has preceded drawdowns. That is a description of history, not a forecast.';
+    }
 
+    var regimeEl = document.getElementById('bbLiveRegime');
+    if (regimeEl) regimeEl.textContent = regime;
     var readEl = document.getElementById('bbLiveRead');
-    if (readEl) {
-      var dur = daysIn >= 100
-        ? 'By the assumption-free measure &mdash; <strong>duration</strong> &mdash; this already qualifies as a structural bear (100+ days to bottom). '
-        : 'By duration &mdash; the assumption-free measure &mdash; this is <strong>not yet</strong> a confirmed structural bear (that takes 100+ days). ';
-      readEl.innerHTML = dur + 'At <strong>' + Math.round(daysIn) + ' days</strong> past the peak, the drawdown of <strong>' + pct0(dd) +
-        '</strong> is ' + (deeper >= Math.ceil(completed.length / 2) ? 'shallower than most' : 'in line with or deeper than most') +
-        ' prior bears at the same age. Whether it has bottomed is <em>unknown</em>, and this page does not guess.';
-    }
-
-    var revEl = document.getElementById('bbLiveReversion');
-    if (revEl) {
-      var lo = peak * (1 - 0.77), hi = peak * (1 - 0.74);
-      revEl.innerHTML = 'If it reverted to the ~74&ndash;77% deep end of the historical range, that would imply roughly <strong>' +
-        usdK(lo) + '&ndash;' + usdK(hi) + '</strong> &mdash; from here, further downside is entirely live.';
-    }
+    if (readEl) readEl.innerHTML = read;
+    var asOfEl = document.getElementById('bbLiveAsOf');
+    if (asOfEl) asOfEl.textContent = 'Computed live from the current spot price on each page load; figures are as of today.';
 
     renderTable(); // keep the ongoing row's live figures in sync
   }

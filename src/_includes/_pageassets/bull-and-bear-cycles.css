@@ -71,6 +71,7 @@ body { background: var(--bg); color: var(--text); }
 .bb-live-caveat p { font-family: var(--font-b); font-size: 0.86rem; line-height: 1.6; color: var(--text-dim); margin: 0; }
 .bb-live-caveat strong { color: #f0c8a0; font-weight: 600; }
 .bb-live-caveat em { color: var(--amber); font-style: italic; }
+.bb-live-asof { font-family: var(--font-b); font-size: 0.72rem; font-style: italic; color: var(--text-muted); margin: 0.7rem 0 0; }
 
 /* ── Cycle table ── */
 .bb-table-wrap { overflow-x: auto; margin: 0 0 0.9rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-card); }
@@ -107,6 +108,20 @@ body { background: var(--bg); color: var(--text); }
 .bb-vol-chart { height: clamp(260px, 38vh, 340px); }
 .bb-chart-caption { font-family: var(--font-b); font-size: 0.78rem; line-height: 1.55; color: var(--text-muted); margin: 0.6rem 0 0; }
 .bb-chart-caption strong { color: var(--text-dim); font-weight: 600; }
+
+/* ── Two-sided bull/bear definition callout ── */
+.bb-define { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin: 0 0 1.1rem; }
+.bb-define-side { border-radius: 10px; padding: 1.2rem 1.35rem; border: 1px solid var(--border); }
+.bb-define-tag { font-family: var(--font-b); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.6rem; }
+.bb-define-side p { font-family: var(--font-b); font-size: 0.9rem; line-height: 1.65; color: var(--text-dim); margin: 0; }
+.bb-define-side strong { color: var(--text); font-weight: 600; }
+.bb-define-side em { color: var(--amber); font-style: italic; }
+.bb-define-bear { border-color: rgba(192,57,43,0.35); background: rgba(192,57,43,0.05); border-left: 3px solid var(--red); }
+.bb-define-bear .bb-define-tag { color: var(--red-soft); }
+.bb-define-bull { border-color: rgba(111,174,111,0.35); background: rgba(111,174,111,0.05); border-left: 3px solid var(--green); }
+.bb-define-bull .bb-define-tag { color: var(--green); }
+.bb-define-close { font-family: var(--font-d); font-size: clamp(1.15rem, 2.6vw, 1.45rem); line-height: 1.4; color: var(--text); text-align: center; margin: 0.4rem auto 0; max-width: 40rem; }
+.bb-define-close strong { color: var(--amber); font-weight: 600; }
 
 /* ── Graded mechanisms ── */
 .bb-grades { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.1rem; margin: 0 0 1.2rem; }
@@ -201,6 +216,7 @@ body { background: var(--bg); color: var(--text); }
   .bb-live { padding: 1.3rem 1.2rem; }
   .bb-live-grid { grid-template-columns: 1fr; }
   .bb-vol-anchors { grid-template-columns: 1fr; }
+  .bb-define { grid-template-columns: 1fr; }
   .bb-overlay { padding: 1.2rem 1.1rem 1.4rem; }
   .bb-chart-wrap { height: 320px; }
   .bb-section { margin-top: 3rem; }

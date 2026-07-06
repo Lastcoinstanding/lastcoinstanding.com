@@ -4,7 +4,7 @@ permalink: /bull-and-bear-cycles.html
 slug: bull-and-bear-cycles
 related:
   - slug: the-bitcoin-horizon
-    desc: "The recovery half of the story. This page measures the pain of the drawdowns; the Horizon shows that no long-enough hold has ever ended in loss &mdash; the empirical answer to &lsquo;will it come back?&rsquo;"
+    desc: "The recovery half of the story. This page measures the pain of the drawdowns; the Horizon shows that no long-enough hold has ever ended in loss, the empirical answer to &lsquo;will it come back?&rsquo;"
   - slug: the-doubling-ladder
     desc: "The trend the volatility swings around. Where this page reads the cycles as deviations from the Power Law, the Doubling Ladder maps the trend itself and the deviation wave around it."
   - slug: how-much-bitcoin
@@ -12,7 +12,7 @@ related:
   - slug: wait-or-deploy-now
     desc: "The position-aware sibling. This page frames the whole cycle; Wait-or-Deploy reads today&rsquo;s spot in the channel and asks whether, from here, waiting has historically paid."
   - slug: disciplined-rebalancing
-    desc: "The protocol that turns cycle awareness into action &mdash; trimming at upper-band triggers, rebuying at lower ones, instead of trying to call the top or bottom."
+    desc: "The protocol that turns cycle awareness into action: trimming at upper-band triggers, rebuying at lower ones, instead of trying to call the top or bottom."
 eleventyComputed:
   head_extras: "{% include '_pageassets/bull-and-bear-cycles-head.html' %}"
   page_styles: "{% include '_pageassets/bull-and-bear-cycles.css' %}"
@@ -21,8 +21,8 @@ eleventyComputed:
 
 <section class="hero">
   <h1>Bull &amp; Bear <em>Cycles</em></h1>
-  <div class="hero-subtitle">The volatility is the price of the returns &mdash; you cannot buy one without paying the other.</div>
-  <p class="subtitle">Bitcoin has delivered the best returns of any major asset and the deepest drawdowns of any major asset. These are not two facts. They are <em>one</em> fact, seen from two sides. This page holds both at once &mdash; and refuses to tell you where the bottom is.</p>
+  <div class="hero-subtitle">The volatility is the price of the returns, you cannot buy one without paying the other.</div>
+  <p class="subtitle">Bitcoin has delivered the best returns of any major asset and the deepest drawdowns of any major asset. These are not two facts. They are <em>one</em> fact, seen from two sides. This page explores both sides of that same coin.</p>
 </section>
 
 <main class="content-area">
@@ -31,41 +31,39 @@ eleventyComputed:
 
   <!-- ════════ HOOK — return and volatility are one fact ════════ -->
   <div class="section-intro bb-prose">
-    <p>Over 2014&ndash;2024, Bitcoin was the <strong>best-performing major asset in eight of eleven years</strong> &mdash; and the <strong>worst-performing in the other three</strong> (BlackRock). That single line is the whole thesis. The engine that produced roughly <strong>136% compound annual growth since inception</strong> is the same engine that produced four drawdowns of 77% or more. You do not get the ascent without the falls; they are the up-swing and the down-swing of one oscillation.</p>
-    <p>So this page does not try to sell you the returns while hiding the pain, or scare you with the pain while hiding the returns. It puts them side by side, grades its own evidence, and &mdash; on the one question everyone actually wants answered, <em>where is the bottom?</em> &mdash; it deliberately declines to guess. The honesty is the point. <strong>If a claim here has a caveat, the caveat is printed next to it, at the same size.</strong></p>
+    <p>Over 2014&ndash;2024, Bitcoin was the <strong>best-performing major asset in eight of eleven years</strong>, and the <strong>worst-performing in the other three</strong> (BlackRock). That single line is the whole thesis. The engine that produced roughly <strong>136% compound annual growth since inception</strong> is the same engine that produced four drawdowns of 77% or more. You do not get the ascent without the falls; they are the up-swing and the down-swing of one oscillation.</p>
+    <p>This page examines the dynamics of both the bull and bear sides of Bitcoin&rsquo;s value growth over the years. It puts them side by side and weighs the evidence. We can&rsquo;t identify the bottom, but we can describe the dynamics at play.</p>
   </div>
 
-  <!-- ════════ WHERE ARE WE NOW — live status ════════ -->
+  <!-- ════════ WHERE ARE WE NOW — live status (Power-Law-anchored state machine) ════════ -->
   <section class="bb-live" id="now" aria-label="Where the cycle sits right now">
-    <div class="bb-live-eyebrow">Where we are right now</div>
+    <div class="bb-live-eyebrow"><span id="bbLiveRegime">Where we are right now</span></div>
     <div class="bb-live-grid">
       <div class="bb-live-stat">
-        <div class="bb-live-cap">Drawdown from the 2025 peak</div>
+        <div class="bb-live-cap">Power Law position</div>
+        <div class="bb-live-num" id="bbLivePos">&mdash;</div>
+        <div class="bb-live-sub" id="bbLivePosSub">&mdash;</div>
+      </div>
+      <div class="bb-live-stat">
+        <div class="bb-live-cap" id="bbLiveDDCap">From the 2025 peak</div>
         <div class="bb-live-num" id="bbLiveDD">&mdash;</div>
         <div class="bb-live-sub" id="bbLivePrice">&mdash;</div>
       </div>
       <div class="bb-live-stat">
         <div class="bb-live-cap">Days since the peak</div>
         <div class="bb-live-num" id="bbLiveDays">&mdash;</div>
-        <div class="bb-live-sub" id="bbLiveDuration">&mdash;</div>
-      </div>
-      <div class="bb-live-stat">
-        <div class="bb-live-cap">Against prior bears, at this age</div>
-        <div class="bb-live-num bb-live-num-sm" id="bbLiveRank">&mdash;</div>
-        <div class="bb-live-sub">where this drawdown sits versus past cycles the same number of days past their peak.</div>
+        <div class="bb-live-sub" id="bbLiveDaysSub">&mdash;</div>
       </div>
     </div>
     <p class="bb-live-read" id="bbLiveRead">&mdash;</p>
-    <div class="bb-live-caveat">
-      <p><strong>The final depth is unknown, and nothing here forecasts it.</strong> A structural Bitcoin bear has historically taken <strong>100+ days</strong> to bottom and reached <strong>77% or deeper</strong> &mdash; but that is a <em>description of past cycles, not a bar this one must hit</em>. <span id="bbLiveReversion">&mdash;</span> That is a conditional reference, not a prediction. As Galaxy Research noted in mid-2026, <strong>only 4 of 13 historical bottoming signals had fired</strong> &mdash; and the softer ones at that. Bitcoin does not tend to bottom quietly.</p>
-    </div>
+    <p class="bb-live-asof" id="bbLiveAsOf">&mdash;</p>
   </section>
 
   <!-- ════════ HISTORY OF THE PAIN — table + overlay ════════ -->
   <section class="bb-section" id="history">
     <div class="bb-eyebrow">The history of the pain</div>
     <h2 class="bb-h2">Four completed cycles, four brutal drawdowns</h2>
-    <p class="bb-lead">Every completed Bitcoin cycle has ended in a fall of at least three-quarters from its peak. Every one of those falls was also, in hindsight, followed by a new all-time high. Both halves are in the table.</p>
+    <p class="bb-lead">Bitcoin has had five bear markets: four are complete, and the current one is the fifth, still unresolved. Every completed cycle has ended in a fall of at least three-quarters from its peak, and every one of those falls was, in hindsight, followed by a new all-time high. Both halves are in the table.</p>
 
     <div class="bb-table-wrap" data-chart-copy data-chart-title="Bitcoin bull &amp; bear cycles — drawdowns and recoveries" data-chart-filename="bitcoin-bull-bear-cycles.png">
       <table class="bb-table">
@@ -83,7 +81,7 @@ eleventyComputed:
       </table>
     </div>
     <p class="bb-table-note">
-      <span class="bb-ast">*</span> The 2011 &minus;93% is shown for the record but <strong>excluded from every trend line on this page</strong>: it partly reflects non-market artifacts (the June 2011 Mt.&nbsp;Gox breach printed a $0.01 tick), on an exchange that was then &gt;70% of all volume, with no real market infrastructure. Voluntarily down-weighting our own most dramatic number is the opposite of embellishment. Recovery magnitudes shrink each cycle &mdash; <strong>621&times; &rarr; 130&times; &rarr; 22&times; &rarr; 8&times;</strong> &mdash; even as the trough-to-next-peak time held remarkably steady near <strong>1,050 days</strong>. The shrinking recovery is as real as the shrinking drawdown; see <a href="#counter">the counterweight</a>.
+      <span class="bb-ast">*</span> The 2011 &minus;93% is shown for the record but <strong>excluded from every trend line on this page</strong>: it partly reflects non-market artifacts (the June 2011 Mt.&nbsp;Gox breach printed a $0.01 tick), on an exchange that was then &gt;70% of all volume, with no real market infrastructure. Recovery magnitudes shrink each cycle, <strong>621&times; &rarr; 130&times; &rarr; 22&times; &rarr; 8&times;</strong>, even as the trough-to-next-peak time held remarkably steady near <strong>1,050 days</strong>. The shrinking recovery is as real as the shrinking drawdown; see <a href="#counter">the counterweight</a>.
     </p>
 
     <div class="bb-overlay" id="overlay">
@@ -94,51 +92,68 @@ eleventyComputed:
       <div class="bb-overlay-toggles" id="bbOverlayToggles"><!-- populated live --></div>
       <div class="bb-chart-wrap" data-chart-copy data-chart-title="Every Bitcoin bear, aligned at day zero" data-chart-filename="bitcoin-bear-overlay.png"><canvas id="bbOverlayChart"></canvas></div>
       <p class="bb-chart-caption">
-        The plotted lines are drawn from the site&rsquo;s shared <strong>~12-day Power-Law price series</strong>, so a peak or trough falling between samples reads slightly shallow. The <strong>annotated depth on each line is the documented daily-close extreme</strong> from the table &mdash; that is the seam where the smooth chart and the headline number are reconciled. See <a href="#measure">how we measure a drawdown</a>.
+        The plotted lines are drawn from the site&rsquo;s shared <strong>~12-day Power-Law price series</strong>, so a peak or trough falling between samples reads slightly shallow. The <strong>annotated depth on each line is the documented daily-close extreme</strong> from the table, the seam where the smooth chart and the headline number are reconciled. See <a href="#measure">how we measure a drawdown</a>.
       </p>
     </div>
+  </section>
+
+  <!-- ════════ WHAT BULL & BEAR MEAN HERE — two-sided definition ════════ -->
+  <section class="bb-section" id="define">
+    <div class="bb-eyebrow">What bull &amp; bear mean here</div>
+    <h2 class="bb-h2">Defining the terms, in Bitcoin&rsquo;s context</h2>
+    <p class="bb-lead">The words carry over from equities, but the thresholds do not. Bitcoin routinely falls 30% inside a healthy advance, so the conventional rules mislabel it. Here is how this page draws the line.</p>
+    <div class="bb-define">
+      <div class="bb-define-side bb-define-bear">
+        <div class="bb-define-tag">Bear market</div>
+        <p>The conventional &ldquo;down 20% from the high&rdquo; rule is useless for Bitcoin: 20&ndash;30% pullbacks happen routinely <em>inside</em> bull runs. This page uses a stricter, two-part definition. A structural bear takes <strong>100+ days to bottom</strong>, which is measurable and assumption-free, and has historically run <strong>77% deep or more</strong>. That depth describes past bears; it is not a floor the next one must reach. And unlike a conventional equity bear, a Bitcoin bear tends to grind for months, clearing out leverage before it ends.</p>
+      </div>
+      <div class="bb-define-side bb-define-bull">
+        <div class="bb-define-tag">Bull market</div>
+        <p>The sustained advance between two structural bears. Historically the trough-to-next-peak span has held remarkably steady near <strong>1,050 days</strong> (about 35 months). A Bitcoin bull routinely contains equity-sized &ldquo;bear&rdquo; corrections, drops of 20&ndash;30% that resolve upward rather than ending the advance, which is exactly why the conventional 20% rule misreads them.</p>
+      </div>
+    </div>
+    <p class="bb-define-close">Bull and bear name the <strong>regime you are in</strong>, not what happens next.</p>
   </section>
 
   <!-- ════════ THE PATTERN — graded maturation mechanisms ════════ -->
   <section class="bb-section" id="pattern">
     <div class="bb-eyebrow">The pattern, stated plainly</div>
-    <h2 class="bb-h2">The drawdowns have been getting shallower &mdash; and here is exactly how much to trust that</h2>
-    <p class="bb-lead">Discount 2011, and the completed drawdowns run <strong>&minus;85%, &minus;84%, &minus;77%</strong>. Volatility has roughly halved over five years. There is a real, mechanical story for <em>why</em> a larger, more liquid asset should swing less. But &ldquo;shallower each time&rdquo; is exactly the kind of pattern that seduces you into timing the bottom &mdash; so we grade the evidence for each mechanism, out loud, and never extrapolate the next low.</p>
+    <h2 class="bb-h2">The drawdowns have been getting shallower, and here is exactly how much to trust that</h2>
+    <p class="bb-lead">Two different measures point the same way. Discount 2011, and the completed <strong>drawdowns</strong> (peak-to-trough depth) run <strong>&minus;85%, &minus;84%, &minus;77%</strong>. Separately, <strong>volatility</strong> (the day-to-day swing) has roughly halved over five years. They are different measures, not the same number series. There is a real, mechanical story for <em>why</em> a larger, more liquid asset should swing less. But &ldquo;shallower each time&rdquo; is the kind of pattern that can seduce us into timing the bottom, so the evidence for each mechanism is graded below.</p>
 
     <div class="bb-grades">
       <div class="bb-grade bb-grade-strong">
         <div class="bb-grade-tag">Evidence-backed</div>
         <ul>
-          <li><strong>Capital scaling / law of large numbers.</strong> A ~$2&nbsp;trillion asset needs vastly more capital to move a given percentage than a $10&nbsp;million one did. This is arithmetic, not narrative.</li>
-          <li><strong>Raised cost-basis floors.</strong> Aggregate holder cost basis sat near <strong>43.7% of the prior peak</strong> this cycle, versus a third or less historically (Galaxy) &mdash; a higher floor for mean-reversion to fall toward.</li>
-          <li><strong>Volatility decay</strong> and <strong>supply absorption</strong> &mdash; large long-term-holder distribution met by comparable ETF and treasury inflows through 2026.</li>
+          <li><strong>Capital scaling / law of large numbers.</strong> A ~$2&nbsp;trillion asset needs vastly more capital to move a given percentage than a $10&nbsp;million one did.</li>
+          <li><strong>Raised cost-basis floors.</strong> Aggregate holder cost basis sat near <strong>43.7% of the prior peak</strong> this cycle, versus a third or less historically (Galaxy), a higher floor for mean-reversion to fall toward.</li>
+          <li><strong>Volatility decay</strong> and <strong>supply absorption:</strong> large long-term-holder distribution met by comparable ETF and treasury inflows through 2026.</li>
         </ul>
       </div>
       <div class="bb-grade bb-grade-mid">
-        <div class="bb-grade-tag">Contested &mdash; the data partly disagrees</div>
+        <div class="bb-grade-tag">Contested - the data partly disagrees</div>
         <ul>
-          <li><strong>&ldquo;Institutions dampen the swings.&rdquo;</strong> The clean version of this theory <em>broke down</em> in the February 2026 sell-off: ETF redemptions <em>transmitted</em> selling straight to spot, and institutions treated Bitcoin as a high-beta tech proxy and sold it in macro stress. The stabiliser can become an accelerant. This corroborates the rising-correlation caveat below.</li>
+          <li><strong>&ldquo;Institutions dampen the swings.&rdquo;</strong> The clean version of this theory <em>broke down</em> in the February 2026 sell-off: ETF redemptions <em>transmitted</em> selling straight to spot, and institutions treated Bitcoin as a high-beta tech proxy and sold it in macro stress. What was a supposed stabiliser can become an accelerant. This corroborates the rising-correlation caveat below.</li>
         </ul>
       </div>
       <div class="bb-grade bb-grade-weak">
-        <div class="bb-grade-tag">Unproven &mdash; narrative, not evidence</div>
+        <div class="bb-grade-tag">Unproven - narrative, not evidence</div>
         <ul>
-          <li><strong>Speculation migrating to altcoins</strong> leaving Bitcoin steadier.</li>
-          <li><strong>Regulatory clarity</strong> structurally reducing panic. Plausible stories; the data does not yet support them.</li>
+          <li><strong>Regulatory clarity reducing panic.</strong> Bitcoin already sits in the cleanest regulatory category: in March 2026 the SEC and CFTC jointly classified it a digital commodity (administrative guidance). The <strong>CLARITY Act</strong> (the Digital Asset Market Clarity Act) would codify that; it passed the U.S. House in July 2025 and cleared the Senate Banking Committee in May 2026, but as of mid-2026 it is <em>not yet law</em>, still needing a Senate floor vote, reconciliation, and the President&rsquo;s signature. Clearer rules could plausibly reduce forced-seller panic, but that is a reasonable expectation, not an established effect.</li>
         </ul>
       </div>
     </div>
-    <p class="bb-smallcaps-note">Three completed cycles cannot prove a trend &mdash; a skeptic would call &ldquo;shallower each time&rdquo; an <strong>extreme case of small-sample bias</strong>, indistinguishable from three correlated random walks. We use &ldquo;has behaved,&rdquo; never &ldquo;behaves.&rdquo; History here is evidence, not destiny.</p>
+    <p class="bb-smallcaps-note">Three completed cycles cannot prove a trend. A skeptic would call &ldquo;shallower each time&rdquo; an <strong>extreme case of small-sample bias</strong>, indistinguishable from three correlated random walks. The right verb is &ldquo;has behaved,&rdquo; not &ldquo;behaves&rdquo;: this is historical evidence, not a projection.</p>
   </section>
 
   <!-- ════════ VOLATILITY OVER TIME — computed series ════════ -->
   <section class="bb-section" id="volatility">
     <div class="bb-eyebrow">The volatility, measured</div>
-    <h2 class="bb-h2">Half of what it was &mdash; still multiples of everything else</h2>
-    <p class="bb-lead">Rolling annualised volatility, computed live from this site&rsquo;s price series, traces the arc: from <strong id="bbVolEarly">~150%</strong> in the early years toward <strong id="bbVolNow">~40%</strong> now &mdash; roughly half of five years ago, and today below Tesla and around Nvidia. It has fallen. It has not become small.</p>
+    <h2 class="bb-h2">Half of what it was, still multiples of everything else</h2>
+    <p class="bb-lead">Volatility here means how much price swings around its path over a window, measured as annualised realised volatility of returns. It is <em>not</em> the same as a drawdown (a peak-to-trough fall), and not the same as risk (the next section). Measured that way and computed live from this site&rsquo;s price series, it traces an arc: from <strong id="bbVolEarly">~150%</strong> in the early years toward <strong id="bbVolNow">~40%</strong> now, roughly half of five years ago, and today below Tesla and around Nvidia. It has fallen, but it is still high.</p>
 
     <div class="bb-chart-wrap bb-vol-chart" data-chart-copy data-chart-title="Bitcoin rolling annualised volatility" data-chart-filename="bitcoin-volatility-trend.png"><canvas id="bbVolChart"></canvas></div>
-    <p class="bb-chart-caption">Rolling annualised realised volatility of log returns, computed from the shared ~12-day series (annualised at ~30.4 periods/yr). Because the series is sampled, treat this as a <strong>trend line, not a point estimate</strong>; a daily series would read somewhat higher. It is disclosed as computed-from-sampled-data on purpose.</p>
+    <p class="bb-chart-caption">Rolling annualised realised volatility of log returns, computed from the shared ~12-day series (annualised at ~30.4 periods/yr). Because the series is sampled, treat this as a <strong>trend line, not a point estimate</strong>; a daily series would read somewhat higher.</p>
 
     <div class="bb-vol-anchors">
       <div class="bb-vol-anchor"><span class="bb-vol-x">~2.4&times;</span><span class="bb-vol-l">vs the S&amp;P 500 today (was 4&ndash;5&times;)</span></div>
@@ -148,9 +163,9 @@ eleventyComputed:
 
     <div class="bb-callouts">
       <div class="bb-callout">
-        <h4>Two honest caveats on the decline</h4>
-        <p><strong>It was not a smooth 15-year glide.</strong> An econometric read finds the 2014&ndash;2020 downtrend was statistically weak; the real compression is <em>post-2020</em> &mdash; ETFs, a trillion-dollar cap. Say &ldquo;fell sharply, chiefly since 2020,&rdquo; not &ldquo;steadily for fifteen years.&rdquo;</p>
-        <p><strong>Daily-close volatility fell; intraday did not.</strong> Range-based intraday volatility stays high &mdash; near the 79th percentile of the S&amp;P&nbsp;1500 &mdash; driven by leveraged perpetual-futures liquidation cascades. That churn is largely a <em>derivatives artifact</em>, not a change in Bitcoin&rsquo;s underlying value &mdash; which is exactly why the next section matters.</p>
+        <h4>Two caveats on the decline</h4>
+        <p><strong>It was not a smooth 15-year glide.</strong> An econometric read finds the 2014&ndash;2020 downtrend was statistically weak; the real compression is <em>post-2020</em>: ETFs, a trillion-dollar cap. It would be more accurate to say Bitcoin&rsquo;s volatility &ldquo;fell sharply, chiefly since 2020,&rdquo; than &ldquo;steadily for fifteen years.&rdquo;</p>
+        <p><strong>Daily-close volatility fell; intraday did not.</strong> Range-based intraday volatility stays high, near the 79th percentile of the S&amp;P&nbsp;1500, driven by leveraged perpetual-futures liquidation cascades. That churn is largely a <em>derivatives artifact</em>, not a change in Bitcoin&rsquo;s underlying value, which is why the next section matters.</p>
       </div>
     </div>
   </section>
@@ -160,9 +175,8 @@ eleventyComputed:
     <div class="bb-eyebrow">Volatility is not risk</div>
     <h2 class="bb-h2">Dispersion is not the same thing as losing your money</h2>
     <div class="bb-prose bb-prose-wide">
-      <p><strong>Volatility</strong> measures dispersion &mdash; how far price ranges around its path. It is symmetric: a +40% month is penalised by the maths exactly as much as a &minus;40% month. <strong>Risk</strong>, for a long-term holder, is something else entirely: the <em>permanent</em> loss of capital. They are different quantities, and Bitcoin&rsquo;s makes the gap unusually wide.</p>
-      <p>Bitcoin&rsquo;s returns are <strong>positively skewed and fat-tailed</strong> &mdash; a large share of its &ldquo;volatility&rdquo; is <em>upside</em>, especially rebounding off the Power-Law lows. A single volatility number therefore <em>overstates</em> the downside danger to someone with a long horizon. The clean way to see this: over 2020&ndash;2024 Bitcoin&rsquo;s <strong>Sortino ratio of 1.86</strong> was roughly double its Sharpe ratio &mdash; and Sortino only penalises <em>downside</em> movement. Most of the swing it ignores was the good kind.</p>
-      <p class="bb-quote">As one digital-asset treasury firm puts it: <em>&ldquo;Volatility is not risk. Volatility is movement. Risk is the potential for permanent capital destruction.&rdquo;</em> &mdash; a useful framing, and worth flagging that its source has a commercial interest in you believing it.</p>
+      <p><strong>Volatility</strong> measures dispersion, how far price ranges around its path. It is symmetric: a +40% month is penalised by the maths exactly as much as a &minus;40% month. <strong>Risk</strong>, for a long-term holder, is something else entirely: the <em>permanent</em> loss of capital. They are different quantities, and Bitcoin&rsquo;s makes the gap unusually wide.</p>
+      <p>Bitcoin&rsquo;s returns are <strong>positively skewed and fat-tailed</strong>: a large share of its &ldquo;volatility&rdquo; is <em>upside</em>, especially rebounding off the Power-Law lows. A single volatility number therefore <em>overstates</em> the downside danger to someone with a long horizon. Over 2020&ndash;2024 Bitcoin&rsquo;s <strong>Sortino ratio of 1.86</strong> was roughly double its Sharpe ratio, and Sortino only penalises <em>downside</em> movement, so most of the swing it ignores was the good kind. It would be more accurate to say Bitcoin&rsquo;s volatility is largely to the upside, but it is still high.</p>
       <p class="bb-guard"><strong>The guardrail.</strong> &ldquo;Risk isn&rsquo;t volatility&rdquo; must never slide into &ldquo;Bitcoin isn&rsquo;t risky.&rdquo; There is no valuation floor; wrong sizing, a broken thesis, or being <em>forced</em> to sell at a low are all real, permanent-loss risks. The upside skew is a historical characteristic, not a guarantee that the next dip resolves upward.</p>
     </div>
   </section>
@@ -172,32 +186,32 @@ eleventyComputed:
     <div class="bb-eyebrow">Why the fear is bigger than the danger</div>
     <h2 class="bb-h2">The drawdown does its damage through you, not to you</h2>
     <div class="bb-prose bb-prose-wide">
-      <p>A 50% fall only becomes a 50% loss if you sell into it. Whether you do is mostly psychology, and the psychology is well-measured. <strong>Kahneman and Tversky (1979)</strong> established that losses are felt roughly <strong>twice as intensely as equivalent gains</strong> &mdash; a result replicated across some 90% of studied populations. That asymmetry is the machinery a bear market runs on.</p>
-      <p>It strikes twice. It keeps newcomers from ever entering (an opportunity cost), and &mdash; the more destructive strike &mdash; it shakes existing holders out at the lows, converting a paper swing into a realised loss. And it does its worst work not in the crash but in the <strong>grind</strong>: the first sharp drop clears out leverage, a relief rally sucks people back, and then months of slow bleed, every bounce sold, break the spirit. People capitulate in the grind, not the crash.</p>
-      <p><strong>Conviction has to be earned, not sold.</strong> The verified Saylor line is <em>&ldquo;Everyone gets Bitcoin at the price they deserve.&rdquo;</em> Its real-time case study arrived in 2026: a &ldquo;Saylor is selling&rdquo; headline (his firm sold 32 BTC to meet a dividend) triggered retail to panic-sell at the lows &mdash; right before the same firm rebought 1,550 BTC lower. The people the headline frightened out did precisely the thing the drawdown needed them to do.</p>
-      <p class="bb-empirical">The empirical answer to the fear: the worst annualised return over <em>any</em> five-year hold has been <strong id="bbWorstHold">about +3.6%</strong> (NYDIG) &mdash; no five-year holder has lost money &mdash; and every four-year hold since 2013 has averaged 60&ndash;120% annualised (CoinMarketCap). <span class="bb-empirical-src">Cross-check the recovery maths on <a href="/the-bitcoin-horizon">The Bitcoin Horizon</a>.</span></p>
-      <p class="bb-guard"><strong>The guardrail.</strong> &ldquo;Don&rsquo;t panic-sell&rdquo; is not &ldquo;diamond-hands, never sell, ever.&rdquo; Even Saylor&rsquo;s firm sold when it had to. The honest version: earned conviction, a long horizon, and <em>correct sizing so you are never forced to sell</em> let you avoid <em>panic</em> selling &mdash; contingent, always, on the thesis holding. This argues against emotional selling, not against rational portfolio decisions.</p>
+      <p>A 50% fall only becomes a 50% loss if you sell into it. Whether you do is mostly psychology, and the psychology is well-measured. <strong>Kahneman and Tversky (1979)</strong> established that losses are felt roughly <strong>twice as intensely as equivalent gains</strong>, a result replicated across some 90% of studied populations. That asymmetry is the machinery a bear market runs on.</p>
+      <p>It strikes twice. It keeps newcomers from ever entering (an opportunity cost), and, more destructively, it shakes existing holders out at the lows, converting a paper swing into a realised loss. And it does its worst work not in the crash but in the <strong>grind</strong>: the first sharp drop clears out leverage, a relief rally sucks people back, and then months of slow bleed, every bounce sold, break the spirit. People capitulate in the grind, not the crash.</p>
+      <p><strong>Conviction has to be earned, not sold.</strong> As Saylor has said, <em>&ldquo;Everyone gets Bitcoin at the price they deserve.&rdquo;</em> A real-time case study arrived in 2026: a &ldquo;Saylor is selling&rdquo; headline (his firm sold 32 BTC to meet a dividend) triggered retail to panic-sell at the lows, right before the same firm rebought 1,550 BTC lower.</p>
+      <p class="bb-empirical">The empirical answer to the fear: the worst annualised return over <em>any</em> five-year hold has been <strong id="bbWorstHold">about +3.6%</strong> (NYDIG), no five-year holder has lost money, and every four-year hold since 2013 has averaged 60&ndash;120% annualised (CoinMarketCap). <span class="bb-empirical-src">Cross-check the recovery maths on <a href="/the-bitcoin-horizon">The Bitcoin Horizon</a>.</span></p>
+      <p class="bb-guard"><strong>The guardrail.</strong> &ldquo;Don&rsquo;t panic-sell&rdquo; is not &ldquo;diamond-hands, never sell, ever.&rdquo; Even Saylor&rsquo;s firm sold when it had to. Put precisely: earned conviction, a long horizon, and <em>correct sizing so you are never forced to sell</em> let you avoid <em>panic</em> selling, contingent always on the thesis holding. This argues against emotional selling, not against rational portfolio decisions.</p>
     </div>
   </section>
 
   <!-- ════════ THE COUNTERWEIGHT ════════ -->
   <section class="bb-section bb-counter" id="counter">
-    <div class="bb-eyebrow">The honest counterweight</div>
+    <div class="bb-eyebrow">The counterweight</div>
     <h2 class="bb-h2">Everything above, argued against</h2>
-    <p class="bb-lead">A page that only made the bull case would not be honest, and the counter-case is cited as prominently as the thesis. Here is the strongest version of the other side.</p>
+    <p class="bb-lead">Everything above has a serious opposing case. Here is the strongest version of the other side.</p>
 
     <div class="bb-counter-grid">
       <div class="bb-counter-card">
         <h4>Maturation compresses the upside too</h4>
-        <p>The very forces that shrink the drawdowns &mdash; scale, liquidity, institutional depth &mdash; <em>mechanically</em> cap future returns. Even Bitcoin-favourable analysts model it: <strong>VanEck&rsquo;s base case is ~15% CAGR for 2026&ndash;2050</strong>, revised <em>down</em> from 25% a year earlier; Fidelity warns high returns &ldquo;may not persist as the asset matures.&rdquo; You cannot sell the shallower drawdowns without also selling the mid-teens returns. They are the same coin.</p>
+        <p>The very forces that shrink the drawdowns (scale, liquidity, institutional depth) <em>mechanically</em> cap future returns. Even Bitcoin-favourable analysts model it: <strong>VanEck&rsquo;s base case is ~15% CAGR for 2026&ndash;2050</strong>, revised <em>down</em> from 25% a year earlier; Fidelity warns high returns &ldquo;may not persist as the asset matures.&rdquo; You cannot sell the shallower drawdowns without also selling the mid-teens returns. They are the same coin.</p>
       </div>
       <div class="bb-counter-card">
         <h4>The &ldquo;uncorrelated diversifier&rdquo; claim no longer holds</h4>
-        <p>Post-ETF, Bitcoin&rsquo;s correlation with equities rose to <strong>0.5&ndash;0.88</strong> (near 0.9 with the Nasdaq at points), versus roughly zero in 2018&ndash;2020. And it is not a safe haven: across S&amp;P drawdowns worse than 12%, Bitcoin lost ~35% on average while <em>gold gained ~4.7%</em> (State Street). It has behaved risk-off, then uncorrelated, then correlated, as adoption shifted &mdash; so pick no single label.</p>
+        <p>Post-ETF, Bitcoin&rsquo;s correlation with equities rose to <strong>0.5&ndash;0.88</strong> (near 0.9 with the Nasdaq at points), versus roughly zero in 2018&ndash;2020. And it is not a safe haven: across S&amp;P drawdowns worse than 12%, Bitcoin lost ~35% on average while <em>gold gained ~4.7%</em> (State Street). It has behaved risk-off, then uncorrelated, then correlated, as adoption shifted, so pick no single label.</p>
       </div>
       <div class="bb-counter-card">
         <h4>The reflexive floor can be clawed back</h4>
-        <p>The raised cost-basis floor is real but not fixed. In a genuine panic, Galaxy notes, a 10&ndash;30% cost-basis decline can pull the implied floor from ~$40K back toward <strong>~$28K</strong>. The floor moves under stress &mdash; which is the moment you were counting on it.</p>
+        <p>The raised cost-basis floor is real but not fixed. In a genuine panic, Galaxy notes, a 10&ndash;30% cost-basis decline can pull the implied floor from ~$40K back toward <strong>~$28K</strong>. The floor moves under stress, which is the moment you were counting on it.</p>
       </div>
       <div class="bb-counter-card">
         <h4>The model is a tool, not an oracle</h4>
@@ -206,9 +220,9 @@ eleventyComputed:
     </div>
 
     <div class="bb-trap" id="trap">
-      <div class="bb-trap-tag">The prediction trap &mdash; documented, and refused</div>
-      <p>Twenty-plus analysts have published a &ldquo;next bottom&rdquo; spanning roughly <strong>$25K to $68K</strong>: a deep camp near $25&ndash;37K, a consensus near $40&ndash;55K, a shallow camp near $54&ndash;68K. <strong>The width of that spread <em>is</em> the finding.</strong> When the professionals disagree by nearly 3&times;, the honest conclusion is that the bottom is unknowable &mdash; not that we should supply a twenty-first number. Today&rsquo;s price sits near the shallow end, which means further downside is entirely live if the consensus or deep camps are right. Nobody knows which. <strong>This page catalogues the guesses without joining them.</strong></p>
-      <p class="bb-trap-land">Read cycles as a <strong>risk-management framework, never a timing tool</strong>. They tell you drawdowns of this magnitude happen and must be survivable in your plan. They do not tell you when.</p>
+      <div class="bb-trap-tag">The prediction trap</div>
+      <p>Twenty-plus analysts have published a &ldquo;next bottom&rdquo; spanning roughly <strong>$25K to $68K</strong>: a deep camp near $25&ndash;37K, a consensus near $40&ndash;55K, a shallow camp near $54&ndash;68K. <strong>The width of that spread <em>is</em> the finding.</strong> When the professionals disagree by nearly 3&times;, the conclusion is that the bottom is unknowable, not that a twenty-first number would help. Today&rsquo;s price sits near the shallow end, so further downside is entirely live if the consensus or deep camps are right, and nobody knows which.</p>
+      <p class="bb-trap-land">Read cycles as a <strong>risk-management framework, not a timing tool</strong>. They tell you drawdowns of this magnitude happen and must be survivable in your plan. They do not tell you when.</p>
     </div>
   </section>
 
@@ -217,10 +231,10 @@ eleventyComputed:
     <div class="bb-eyebrow">Tolerating the volatility</div>
     <h2 class="bb-h2">Position sizing is the survival mechanism</h2>
     <div class="bb-prose bb-prose-wide">
-      <p>Everything above resolves into one practical lever. The reason to size a Bitcoin position carefully is not timidity &mdash; it is that <strong>risk contribution is wildly non-linear</strong>. On institutional risk-budgeting maths, a 2% allocation contributes roughly 5% of a portfolio&rsquo;s risk, but a <strong>4% allocation contributes about 14%</strong> (BlackRock); JPMorgan puts a 3.5% Bitcoin sleeve at roughly the <em>risk</em> of a 40% bond allocation. Read that as a warning about the curve, <em>not</em> a recommendation to hold 4%.</p>
+      <p>Everything above resolves into one practical lever. The reason to size a Bitcoin position carefully is not timidity; it is that <strong>risk contribution is wildly non-linear</strong>. On institutional risk-budgeting maths, a 2% allocation contributes roughly 5% of a portfolio&rsquo;s risk, but a <strong>4% allocation contributes about 14%</strong> (BlackRock); JPMorgan puts a 3.5% Bitcoin sleeve at roughly the <em>risk</em> of a 40% bond allocation. Read that as a warning about the curve, <em>not</em> a recommendation to hold 4%.</p>
       <p>Which is why the recommended caps cluster low: <strong>BlackRock 1&ndash;2%</strong>, <strong>VanEck 1&ndash;3%</strong> as the &ldquo;sweet spot,&rdquo; and Galaxy&rsquo;s finding that the biggest marginal Sharpe/Sortino gain comes just from <strong>0% &rarr; 1%</strong>. The figure and its cap belong together.</p>
-      <p class="bb-synthesis">Here is the synthesis that fuses the two middle sections: <strong>oversizing guarantees the loss-aversion shakeout.</strong> Hold more than you can watch fall 77%, and the psychology does the rest &mdash; you sell at the low, converting volatility into permanent loss. Correct sizing is precisely what lets conviction survive the drawdown, which is the only way you are still holding to capture the returns. Sizing is not a tax on the thesis; it is what makes the thesis survivable.</p>
-      <p class="bb-handoff">The <em>how much</em> &mdash; the Kelly criterion, why its raw answer (~65%) is absurd, and why fractional Kelly lands nearer ~10% &mdash; belongs to its own page. <a href="/how-much-bitcoin">How Much Bitcoin?</a> owns that calculation; this page owns only the reason it matters.</p>
+      <p class="bb-synthesis">This fuses the two middle sections: <strong>oversizing guarantees the loss-aversion shakeout.</strong> Hold more than you can watch fall 77%, and the psychology does the rest; you sell at the low, converting volatility into permanent loss. Correct sizing is precisely what lets conviction survive the drawdown, which is the only way you are still holding to capture the returns. Sizing is not a tax on the thesis; it is what makes the thesis survivable.</p>
+      <p class="bb-handoff">The <em>how much</em> belongs to its own page: the Kelly criterion, why its raw answer of ~65% is absurd, and why fractional Kelly lands nearer ~10%. <a href="/how-much-bitcoin">How Much Bitcoin?</a> owns that calculation; this page owns only the reason it matters.</p>
     </div>
   </section>
 
@@ -230,7 +244,7 @@ eleventyComputed:
     <div class="bb-connect-grid">
       <a class="bb-connect-card" href="/the-bitcoin-horizon">
         <div class="bb-connect-title">The Bitcoin Horizon</div>
-        <p>The recovery half &mdash; no long-enough hold has ended in loss.</p>
+        <p>The recovery half: no long-enough hold has ended in loss.</p>
       </a>
       <a class="bb-connect-card" href="/how-much-bitcoin">
         <div class="bb-connect-title">How Much Bitcoin?</div>
@@ -254,8 +268,8 @@ eleventyComputed:
 
       <h4 id="how-measured">How we measure a drawdown</h4>
       <ul>
-        <li><strong>Headline drawdown %s are documented daily-close cycle extremes</strong> &mdash; the researched, cleansed figures (peak-to-trough on daily closes), not numbers computed from the sampled series. Daily-close is the rigorous standard; it is deliberately <em>shallower</em> than intraday. For the widest cycle, 2013&ndash;15, the definitional range runs <strong>&minus;81.6% to &minus;87.7%</strong> depending on method &mdash; choosing the shallower daily-close read is rigour, not cherry-picking.</li>
-        <li><strong>The charts use the shared ~12-day Power-Law price series</strong> (<code>PL_DATA</code>), the same series every other channel page on this site reads &mdash; so the live &ldquo;where are we now&rdquo; number ties exactly to what those pages show. A peak or trough between samples reads slightly shallow on the line; each cycle line is <strong>annotated with its true documented depth</strong> to reconcile the two.</li>
+        <li><strong>Headline drawdown %s are documented daily-close cycle extremes:</strong> the researched, cleansed figures (peak-to-trough on daily closes), not numbers computed from the sampled series. Daily-close is the rigorous standard, deliberately <em>shallower</em> than intraday. For the widest cycle, 2013&ndash;15, the definitional range runs <strong>&minus;81.6% to &minus;87.7%</strong> depending on method; the shallower daily-close read is the one used here.</li>
+        <li><strong>The charts use the shared ~12-day Power-Law price series</strong> (<code>PL_DATA</code>), the same series every other channel page on this site reads, so the live &ldquo;where are we now&rdquo; number ties exactly to what those pages show. A peak or trough between samples reads slightly shallow on the line; each cycle line is <strong>annotated with its true documented depth</strong> to reconcile the two.</li>
         <li><strong>Volatility</strong> is rolling annualised realised volatility of log returns, computed from that sampled series (~30.4 periods/yr). Disclosed as a sampled-data trend, not a point estimate; a daily series reads somewhat higher.</li>
         <li><strong>The live status</strong> computes drawdown-from-peak against the 2025 peak of <strong>$126,198 (Oct&nbsp;6&nbsp;2025)</strong> and days-since-peak, both recomputed every page load from the live spot price. The 2025 trough is <strong>unresolved</strong>; its final depth is left blank on purpose.</li>
         <li><strong>2011 is asterisked and excluded from every trend line</strong> (Mt.&nbsp;Gox artifacts, &gt;70%-of-volume single point of failure).</li>
@@ -264,17 +278,16 @@ eleventyComputed:
       <h4>Computed here vs. cited</h4>
       <p><strong>Computed live on this page:</strong> the drawdown-from-peak and day-count, the cycle-table drawdown geometry, the day-zero overlay, and the rolling-volatility series. <strong>Cited (not computed):</strong> the worst-five-year-hold figure (NYDIG), the cross-asset volatility multiples, CAGR and Sortino figures, allocation caps, recovery magnitudes, and every named institutional claim below.</p>
 
-      <h4>Sources &mdash; deliberately balanced, bulls and skeptics</h4>
+      <h4>Sources</h4>
+      <p>Commercial-interest sources (asset managers with a Bitcoin product) are tagged as such and paired with skeptic-leaning research.</p>
       <ul class="bb-refs">
-        <li><strong>Kahneman &amp; Tversky</strong>, &ldquo;Prospect Theory,&rdquo; <em>Econometrica</em> (1979) &mdash; loss aversion, losses ~2&times; gains.</li>
-        <li><strong>Baquero &amp; Menezes</strong>, &ldquo;Bitcoin&rsquo;s Power Law: Weak Structure, Strong Forecasts,&rdquo; arXiv:2605.21316 (2026) &mdash; the model-is-not-a-law counterweight.</li>
-        <li><strong>BlackRock / iShares</strong> (commercial interest) &mdash; best asset 8 of 11 years 2014&ndash;24; ~54% vol vs 15.1% gold / 10.5% equities (Jan&nbsp;31&nbsp;2025), easing to 43% by Dec&nbsp;31&nbsp;2025; 1&ndash;2% allocation and the non-linear risk-contribution figures. Its &ldquo;uncorrelated diversifier&rdquo; framing is <em>not</em> inherited here.</li>
-        <li><strong>VanEck</strong> (commercial interest) &mdash; 15% base-case CAGR 2026&ndash;2050, revised down from 25%; 1&ndash;3% allocation; on-record on pro-cyclical reflexivity.</li>
-        <li><strong>Galaxy Digital</strong> (skeptic-leaning research) &mdash; 4 of 13 bottoming signals fired; cost basis 43.7% of ATH; the reflexive-floor claw-back toward ~$28K; the analyst bottom-estimate clusters.</li>
-        <li><strong>XBTO</strong> (commercial interest) &mdash; the &ldquo;volatility is not risk&rdquo; framing, attributed as such.</li>
+        <li><strong>Kahneman &amp; Tversky</strong>, &ldquo;Prospect Theory,&rdquo; <em>Econometrica</em> (1979): loss aversion, losses ~2&times; gains.</li>
+        <li><strong>Baquero &amp; Menezes</strong>, &ldquo;Bitcoin&rsquo;s Power Law: Weak Structure, Strong Forecasts,&rdquo; arXiv:2605.21316 (2026): the model-is-not-a-law counterweight.</li>
+        <li><strong>BlackRock / iShares</strong> (commercial interest): best asset 8 of 11 years 2014&ndash;24; ~54% vol vs 15.1% gold / 10.5% equities (Jan&nbsp;31&nbsp;2025), easing to 43% by Dec&nbsp;31&nbsp;2025; 1&ndash;2% allocation and the non-linear risk-contribution figures. Its &ldquo;uncorrelated diversifier&rdquo; framing is <em>not</em> inherited here.</li>
+        <li><strong>VanEck</strong> (commercial interest): 15% base-case CAGR 2026&ndash;2050, revised down from 25%; 1&ndash;3% allocation; on-record on pro-cyclical reflexivity.</li>
+        <li><strong>Galaxy Digital</strong> (skeptic-leaning research): 4 of 13 bottoming signals fired; cost basis 43.7% of ATH; the reflexive-floor claw-back toward ~$28K; the analyst bottom-estimate clusters.</li>
         <li>Also drawn on: <strong>NYDIG</strong> (drawdown methodology; worst 5-yr hold +3.6%), <strong>Fidelity Digital Assets</strong> (maturation, return-persistence caution), <strong>State Street</strong> (safe-haven comparison), <strong>CoinMarketCap</strong> (4-year hold returns), <strong>Paybis</strong> (capitulation grind), and standard composite-index methodology (NYDIG / Coin Metrics / Glassnode) for the cleansed daily-close extremes.</li>
       </ul>
-      <p class="bb-refs-note">Every optimistic claim on this page carries its stated caveat &mdash; compression, rising correlation, non-stationarity, small sample &mdash; at equal weight. There is no next-bottom prediction anywhere on this page, by design.</p>
     </div>
   </details>
 
