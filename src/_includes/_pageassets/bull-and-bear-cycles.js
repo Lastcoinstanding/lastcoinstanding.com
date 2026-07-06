@@ -161,7 +161,9 @@
     var posEl = document.getElementById('bbLivePos');
     if (posEl) posEl.textContent = ratio.toFixed(2) + '×';
     var posSubEl = document.getElementById('bbLivePosSub');
-    if (posSubEl) posSubEl.innerHTML = (state === 'extended' || state === 'newhigh')
+    // Frame by whether price is actually above/below trend (ratio), not by state:
+    // a new dollar ATH can still sit below a risen trend line, where "above only X%" misreads.
+    if (posSubEl) posSubEl.innerHTML = (ratio >= 1)
       ? 'of trend · above here only <strong>' + pctAbove + '%</strong> of history'
       : 'of trend · below here <strong>' + pctBelow + '%</strong> of history';
 
