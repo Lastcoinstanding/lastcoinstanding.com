@@ -131,6 +131,8 @@ caption on the BvSM Power Law chart still reads accurately (see §3).
 
 ## 2. Page-level TODAY constants — none remaining
 
+**Per-cycle (event-driven, not monthly) — Bull & Bear Cycles status framing.** `src/_includes/_pageassets/bull-and-bear-cycles.js` hard-codes the `CYCLES` table of *documented daily-close* peak/trough extremes (register figures, not live-computed) and treats **2025 (peak $126,198, Oct 6 2025) as the ongoing bear**. The live status, table, and overlay all compute off that peak. Two triggers change the framing and need a manual edit: (a) **a new all-time high above $126,198** — the 2025 entry is no longer a bear; add the resolved 2025 trough and open a new ongoing cycle; (b) **the 2025 trough resolving** (a confirmed bottom) — fill `troughDate`/`trough`/`ddPct`/`recovery` for the 2025 row and flip `ongoing` off. Everything else (drawdown-from-peak, days-since-peak, rank, volatility) is computed live from the shared series and needs no edit.
+
 **Annual (not monthly) — Risks to Bitcoin time-anchored facts.** `src/risks-to-bitcoin.njk` opens with "Bitcoin is seventeen years old," "As of 2026," and a claim that bitcoin holds the overwhelming majority of proof-of-work hash power. Update the age and year each January, and re-confirm the PoW-dominance claim against current data (it has been true and widening, but verify). This is a yearly task, flagged at launch (SITE_GUIDE §28).
 
 

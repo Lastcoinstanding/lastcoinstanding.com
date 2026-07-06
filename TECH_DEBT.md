@@ -85,6 +85,8 @@ Krueger / *Bitcoin One Million* popularizer credit in §A).
   
   Verified during audit: all 16 OG image files present at correct 1280×720 dimensions, all properly registered in `.eleventy.js` staticAssets list, all visually consistent with site brand template (dark background, Cormorant title, italic tagline, glowing Bitcoin glyph, brand header + URL footer).
 
+- [ ] **Bull & Bear Cycles OG card not yet generated.** Opened 2026-07-06. `/bull-and-bear-cycles` shipped with head `og:image` / `twitter:image` meta + JSON-LD wired to `og-bull-and-bear-cycles.jpg`, but the image file itself and its `.eleventy.js` `addPassthroughCopy('og-bull-and-bear-cycles.jpg')` are not yet done — so the page currently unfurls as a plain text link, not a card. Natural pattern is §6.15.1 brand-forward (essayistic page, no single interactive hero). Follow-up: generate the 1280×720 JPEG via the Pillow two-tier procedure, place at repo root, add the passthrough line, and force a re-scrape (cards-dev.twitter.com/validator). The `curl -I .../og-bull-and-bear-cycles.jpg` check in NEW_PAGE_CHECKLIST §7 must return `image/jpeg` before the card works. **Carousel slide** (Grok Imagine video) is a separate pending follow-up per NEW_PAGE_CHECKLIST §8.
+
 ## 4. Width treatments
 
 _(no open items)_

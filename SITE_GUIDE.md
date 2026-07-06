@@ -989,6 +989,8 @@ Phase 4 strengthens this reading order by separating *application* (BvSM, BvRE, 
 
 The deployment trilogy sits in the applied-Numbers tier, after the foundational Power Law and the broad comparators, since it assumes the reader already grasps the channel. Read in order — **Lump Sum or Ladder In?** (the general lump-vs-ladder lesson) → **Your Bitcoin Deployment Plan** (model your own deployment today) → **Wait, or Deploy Now?** (the position-aware whether/when question). The three escalate from general principle to personal plan to the timing-adjacent edge case, so they earn each other in that sequence; placing "Wait, or Deploy Now?" last is deliberate — it's the most timing-adjacent and lands best once the reader already holds the decisive-deployment default.
 
+**Bull & Bear Cycles** (§35, shipped July 2026) sits alongside the applied-Numbers tier as the *temperament* page: it assumes the reader grasps the channel and the long-horizon recovery case, then frames the emotional/structural cost of holding through the swings (volatility ≠ risk, loss aversion, sizing as survival). It reads well **after The Bitcoin Horizon** (which supplies the "every hold recovered" reassurance this page depends on) and **before or beside How Much Bitcoin** (to which it hands the sizing calculation). Because it refuses to time the bottom, it is safe to place late without a reader mistaking it for a signal.
+
 ---
 
 ## 19. Bitcoin vs. The Stock Market (`/bitcoin-vs-the-stock-market.html`)
@@ -1776,3 +1778,30 @@ The result surface went through three compaction passes worth preserving: **5A**
 ### Open items
 - **Carousel slide** pending (needs a Grok Imagine video) per NEW_PAGE_CHECKLIST §8 — see §13 "Pending additions" for the proposed copy + video direction.
 - **Zone-vocabulary divergence** (TECH_DEBT §1): the non-trilogy "zone" pages (`the-power-law`, BvSM, retirement) and the homepage `classifyState` still use their own position-label vocabulary; migrate-vs-document is deferred to the future bull/bear-cycles page (PAGE_IDEAS_BACKLOG).
+
+## 35. Bull & Bear Cycles (`/bull-and-bear-cycles.html`)
+
+**Added July 2026.** A cyclical-model page in **The Numbers** (group *Models & Trends*, next to the Doubling Ladder / Metcalfe / Heatmap), `interactive: true`, **no `calculator_tile`** (it is an analytical page, not a personal-decision calculator — same posture as the Doubling Ladder and Heatmap). Page-scoped classes use the `bb-` prefix; reads the shared `power-law-data.js` globals and the mixed-content width tier (1100 page / 880 prose).
+
+**Governing principle — this is the honesty page; its credibility IS the product.** The spine is **CAGR + volatility ("the volatility is the price of the returns")**, *not* "drawdowns are shrinking" (which would invite the timing trap). Every optimistic claim carries its caveat at **equal visual weight** (small-sample, compression, rising correlation, non-stationarity). Uses "has behaved," not "behaves." Evidence is **graded visibly**. **There is no next-bottom prediction anywhere on the page, by design** — the prediction trap is catalogued and explicitly refused.
+
+**The hybrid data seam (the key methodological move).** Headline cycle drawdowns are **documented daily-close extremes** hard-coded in the `CYCLES` constant (−93%\*/−85/−84/−77/ongoing), *not* computed from the sampled series — the shared ~12-day `PL_DATA` runs shallow because a peak/trough between samples is smoothed. The **visuals** (day-zero overlay, volatility) *are* computed from `PL_DATA` (so the live "where are we now" number ties exactly to the other channel pages), and each cycle line is **annotated with its true documented depth** to reconcile the smooth line against the stated %. A "How we measure a drawdown" note in the collapsible Sources section discloses this, plus the intraday-is-deeper alternative (2013–15: −81.6% to −87.7%) and the **2011 asterisk** (Mt. Gox artifacts; included in the narrative, excluded from every trend line).
+
+### Structure (top to bottom)
+Hero → tool-framing → hook (return *and* volatility are one fact; BlackRock "best 8 / worst 3 of 11 years") → **live "where are we now"** (drawdown-from-peak, days-since-peak vs the 100-day structural-bear threshold, rank vs prior bears at the same age, and the *conditional* ~$29–33K reversion reference framed as conditional) → **history of the pain** (cycle summary table + day-zero bear overlay with toggles) → **the pattern, graded** (evidence-backed / contested / unproven maturation mechanisms) → **the measured volatility** (computed rolling-vol chart + cross-asset anchors + the daily-close-vs-intraday and post-2020-break caveats) → **volatility ≠ risk** (dispersion vs permanent loss; Sortino 1.86 vs Sharpe; the XBTO quote attributed as commercial-interest) → **loss aversion** (Kahneman & Tversky; the grind; the verified Saylor "price they deserve" quote + the 32-BTC episode; worst-5yr-hold cited from NYDIG) → **the counterweight** (compression, rising correlation/not-a-safe-haven, reflexive floor claw-back, model-is-not-an-oracle) + **the prediction trap** (the $25K–$68K analyst spread, refused) → **position sizing as the survival mechanism** (non-linear risk contribution *with* the 1–2% caps; Kelly handed to How Much Bitcoin) → where-this-connects cards → collapsible **Sources & methodology**.
+
+### Key editorial moves
+- **Caveat-at-equal-weight as a visual rule** — optimistic blocks (evidence-backed grade, empirical holding-period line) are paired with a caveat block (`.bb-guard`, `.bb-callout`, `.bb-live-caveat`, the counterweight grid) rendered at the same size, never a footnote.
+- **Graded-evidence three-card pattern** (`.bb-grade-strong` / `-mid` / `-weak`, green/amber/red) — reusable recipe for "here is exactly how much to trust this," used for the maturation mechanisms.
+- **Computed-vs-cited is explicit** in the Sources section: live drawdown/day-count, cycle geometry, overlay, and volatility are computed; the worst-5yr hold, cross-asset multiples, CAGR/Sortino, caps, recovery magnitudes, and every named institutional claim are cited. Sources are **deliberately balanced** — commercial-interest bulls (BlackRock, VanEck, XBTO) tagged as such and paired with skeptic-leaning research (Galaxy, Baquero & Menezes).
+
+### Cross-cutting discipline
+- **The 2025 peak/trough are the only hard-coded live-framing constants** (`CYCLES`), documented for event-driven refresh in MONTHLY_REFRESH_CHECKLIST §2. Everything else is computed from the shared globals.
+- **Reuse:** shared Power Law data module; `data-chart-copy` on the table + charts; the layout-level related strip, share section, and feedback widget.
+
+### Integration
+`explorations.json` (group *Models & Trends*, `interactive: true`, no tile); `sitemap.xml` @0.9; `llms.txt` (The Numbers); homepage concept card (rising-trend-with-shrinking-drawdowns SVG, amber up-swings / red down-swings) in The Numbers + Latest (rolled *Lump Sum or Ladder In?* out of Latest); `updates.json` (7/6/26); **bidirectional `related:`** with The Bitcoin Horizon, The Doubling Ladder, How Much Bitcoin, Wait-or-Deploy, and Disciplined Rebalancing.
+
+### Open items
+- **OG card** `og-bull-and-bear-cycles.jpg` not yet generated — head meta tags + JSON-LD are wired and point at the expected filename, but the image and its `.eleventy.js` passthrough are a follow-up (§6.15.1 brand-forward is the natural pattern — essayistic page). Until it ships the link unfurls as plain text, not a card.
+- **Carousel slide** pending (needs a Grok Imagine video) per NEW_PAGE_CHECKLIST §8.

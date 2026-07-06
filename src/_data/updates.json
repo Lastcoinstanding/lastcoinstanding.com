@@ -1,5 +1,10 @@
 [
   {
+    "display": "7/6/26",
+    "page": "/bull-and-bear-cycles.html",
+    "summary": "New: Bull & Bear Cycles — Bitcoin's best returns and deepest drawdowns are one fact, not two. A live read on where the current cycle sits, the four historical bears with a day-zero overlay, a computed volatility trend, why volatility isn't the same as losing your money, and why sizing is what lets you survive the fall. It refuses, on purpose, to guess where the bottom is."
+  },
+  {
     "display": "7/5/26",
     "page": "/the-bitcoin-retirement.html",
     "summary": "Updated: The Bitcoin Retirement — major enhancements. A year-by-year view of your retirement (portfolio value, annual change, and growth), a \"Verify the math\" audit table where every number reconciles by hand and exports to CSV, and controls to explore the assumptions honestly: reverts-to-trend vs. today's gap-to-trend, nominal vs. real (today's) dollars, and whether your income target is in today's dollars or a fixed future amount. Escape-velocity and depletion now track whichever assumptions you pick."
