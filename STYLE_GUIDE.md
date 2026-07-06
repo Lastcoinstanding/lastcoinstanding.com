@@ -1865,7 +1865,7 @@ Use on any future dark-theme form (the inset shadow repaints over the autofill c
 
 ## 8. What this guide intentionally doesn't cover
 
-- **Voice and content** — see `SITE_GUIDE.md` (the editorial register, "elegiac seriousness", argument structure, etc.)
+- **Voice and content** — see `SITE_GUIDE.md` (the editorial register, "elegiac seriousness", argument structure, etc.). Exception: two cross-cutting *house-style* conventions (don't announce your own honesty; prefer commas/hyphens over em-dashes) are codified in **§10** below, because they govern phrasing and punctuation on every page and every Claude Code build.
 - **Page-level information architecture** — what sections each exploration page must have, how charts are framed, etc. Belongs in a future `PAGE_PATTERNS.md` if it becomes worth codifying.
 - **Animation and motion design** — site is largely static. If we add motion later, this guide gets a §9.
 - **Specific chart styling** — chart-specific decisions (colors of BTC vs S&P series, axis treatments, etc.) are page-specific. Codify if patterns emerge.
@@ -1887,6 +1887,41 @@ Use on any future dark-theme form (the inset shadow repaints over the autofill c
 **When proposing a change to this guide:**
 - Note the date and reason at the top.
 - The bar for adding a fifth typeface, a new color token, or a new pattern recipe is high. The bar for tightening a rule (e.g., "Cormorant italic floor is now 1.7rem instead of 1.5rem") is lower.
+
+---
+
+## 10. Voice & punctuation conventions (house style)
+
+_Added 2026-07, from the Bull & Bear Cycles review. These are durable house style for all pages and all Claude Code builds. Voice more broadly lives in `SITE_GUIDE.md`; these two live here because they are mechanical, cross-cutting, and easy to check._
+
+### 10.1 Describe, don't announce your honesty
+
+The site's credibility comes from *being* honest, not from *saying* it is honest. Do not write sentences whose job is to reassure the reader that the content is candid, balanced, or non-promotional. Show the caveat; never narrate that you are showing it. Self-referential honesty language is both tiresome and self-undermining — a page that keeps insisting on its own integrity reads as less trustworthy, not more, and it is a tell of AI-generated copy.
+
+**Avoid (self-referential / defensive):**
+- "The honesty is the point."
+- "If a claim here has a caveat, the caveat is printed next to it, at the same size."
+- "This page does not try to sell you… or scare you…"
+- "grades its own evidence, out loud"
+- "documented, and refused" / "the counter-case is cited as prominently as the thesis"
+- "This is arithmetic, not narrative." / "a plausible story, but…"
+- Any framing where we tell the reader how trustworthy or balanced we are being.
+
+**Prefer:** state the fact and its caveat plainly, and stop. Let the balance be visible in the content itself.
+- Instead of *"The honesty is the point; we refuse to guess the bottom"* → *"We can't identify the bottom, but we can describe the dynamics at play."*
+- Instead of *"Even Bitcoin-favourable analysts model it, and we cite them honestly"* → *"Even Bitcoin-favourable analysts model it: VanEck's base case is about 15%…"*
+
+The target voice is **frank, direct, and dispassionately descriptive** — the same plain register used in working conversation, not a defensive or reassuring one. Describe Bitcoin's phenomena as they are; the reader draws their own conclusions. Words that flag AI/defensive authorship and should be cut or replaced unless genuinely needed: "honest/honestly," "to be clear," "the truth is," "let's be honest," and similar throat-clearing.
+
+### 10.2 Prefer commas and simple hyphens over em-dashes
+
+The long em-dash ("—"), especially in pairs bracketing a clause, is a tell of AI-generated text and does not match JM's own writing. Default to a **comma** or a **simple hyphen ("-")** where either works. Reserve the em-dash for the rare case where a comma genuinely would not carry the break.
+
+- Avoid: *"the falls — they are the up-swing and the down-swing — of one oscillation"*
+- Prefer: *"the falls, the up-swing and the down-swing of one oscillation"*
+- Avoid stacking multiple em-dash asides in a single paragraph; if a paragraph has more than one, rewrite at least one with a comma or a full stop.
+
+This is a house-style preference, not a grammar rule; apply it in new copy and when editing existing pages, without contorting a sentence to avoid a dash that is genuinely the clearest choice.
 
 ---
 
