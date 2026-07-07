@@ -87,6 +87,8 @@ Krueger / *Bitcoin One Million* popularizer credit in §A).
 
 - [x] **Bull & Bear Cycles OG card.** Closed 2026-07. Generated `og-bull-and-bear-cycles.jpg` via `build-og-bull-and-bear-cycles.py` (brand-forward §6.15.1, cloned from the wait-or-deploy sibling: two-tier composite over `og-synthesis.jpg`, Cormorant/Inter fonts fetched at gen time), added the `.eleventy.js` staticAssets passthrough, and the head `og:image`/`twitter:image` already agreed on the slug-based filename. Also renamed the display title to "Bitcoin Bull & Bear Cycles" across metadata/H1/nav/cards (slug unchanged) and corrected STYLE_GUIDE §6.15.1's stale `quality 88` → `80` to match the shipped scripts. **Carousel slide** (Grok Imagine video) remains a separate pending follow-up per NEW_PAGE_CHECKLIST §8.
 
+- [ ] **Retirement Stress Test: remove the "coming v2" reduce-withdrawals mention.** Opened 2026-07. The "what this means" section of `/the-bitcoin-retirement-stress-test` (`src/the-bitcoin-retirement-stress-test.njk`, the `.st-v2` paragraph) carries a forward mention: "a future version will let you model reducing withdrawals during the crash." **Remove that placeholder when the v2 withdrawal-flexibility lever ships** so it does not become stale. v2 scope (per the build spec) also includes a worst-case-timing auto-finder; both were deferred from v1 by JM. Related: SITE_GUIDE §36.
+
 ## 4. Width treatments
 
 _(no open items)_

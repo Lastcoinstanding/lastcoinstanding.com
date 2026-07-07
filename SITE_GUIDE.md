@@ -1814,3 +1814,24 @@ A revision pass after JM's content review, in two parts:
 
 ### Open items
 - **Carousel slide** pending (needs a Grok Imagine video) per NEW_PAGE_CHECKLIST §8.
+
+## 36. The Bitcoin Retirement Stress Test (`/the-bitcoin-retirement-stress-test.html`)
+
+**Added July 2026.** A calculator in **The Numbers** (group *Positioning & Strategy*), sibling and sober counterpart to §17 The Bitcoin Retirement. `interactive: true`, has a `calculator_tile` (SVG icon at `components/calc-tile-icons/`). Page-scoped classes use the `st-` prefix.
+
+**Thesis.** Models **sequence-of-returns risk**: the retirement calculator projects the plan on the upside path; this page injects a *timed* bear market and shows what a crash does when you are selling Bitcoin to fund income. The honesty trap here is the *opposite* of Bull & Bear's, it risks being falsely *reassuring* ("Bitcoin's growth saves you anyway"), so it is built to show failure plainly (depletion in red), defaults recovery to Historical not Fast with a prominent **Weak** (never-fully-recovers) option, carries the non-stationarity caveat, and makes **no probability claims** (a what-if, never a forecast).
+
+**Engine reuse (the core design).** Copies the retirement engine's projection math verbatim for baseline parity, `daysSince` / `plPriceAtDate` / `dateForYear` / `projPriceForGrowth`, the `SCENARIO` shape, and the year-by-year sell-to-cover-income loop, and reads the shared `ModelingAssumptions` (inflation 6.5% m2-growth, Power Law trend) so the no-crash path matches the Retirement page exactly. The one new piece is `crashMultiplier(year, crash)`: a timed price-path perturbation that multiplies onto the trend **price only**. The withdrawal math is untouched, so the same nominal income is funded by selling more BTC at the depressed price. The lasting stack damage is emergent sequence risk, not a special case. The loop runs twice (baseline `mult=1` and crashed) to produce the two paths.
+
+**The three inputs.** Crash depth (−40 / −60 / **−77% historical characteristic** / custom, default −60, not the worst); crash timing (year of retirement it begins, the decisive variable, made prominent); recovery shape (Fast / **Historical default** / Slow / **Weak**, where Weak asymptotes to a ceiling below trend). All URL-encoded (reuses the retirement param names `stack`/`retire`/`income`/`years`/`dca`/`incbasis` plus `cdepth`/`ctime`/`crecov`) so scenarios are shareable and carry between the two pages.
+
+**Outputs.** (a) Two-path overlay chart, baseline vs crashed, with crash-year and depletion markers; (b) a plain survive/deplete headline that swaps green→red and states failure without softening ("your plan does not survive this scenario, the stack drains to zero in [year]"); (c) the **timing-sensitivity view**, the core lesson, the same crash at years 1/3/5/10/15 as a bar chart + table against the no-crash baseline, framing early-crash-brutal and late-crash-harmless with equal weight; (d) two-view audit table (crashed path, crash years flagged, BTC-sold column visibly rising) + CSV carrying the scenario and crash params.
+
+**Deferred to v2** (both flagged by JM at scope): a worst-case-timing auto-finder, and a **reduce-withdrawals mitigation lever**. The "what this means" section carries a brief forward mention of the withdrawal-flexibility lever; **TECH_DEBT tracks removing that placeholder when v2 ships** (do not let it go stale).
+
+### Integration
+`explorations.json` (group *Positioning & Strategy*, `interactive: true`, `calculator_tile` SVG at position 18); `sitemap.xml` @0.9; `llms.txt` (The Numbers); homepage concept card in The Numbers + Latest (rolled *Your Bitcoin Deployment Plan* out of Latest); `updates.json` (7/6/26); **bidirectional `related:`** with The Bitcoin Retirement, Bull & Bear Cycles, How Much Bitcoin, and Disciplined Rebalancing; OG card `og-the-bitcoin-retirement-stress-test.jpg` via `build-og-the-bitcoin-retirement-stress-test.py` (brand-forward §6.15.1, three-line title).
+
+### Open items (stress test)
+- **Carousel slide** pending (needs a Grok Imagine video) per NEW_PAGE_CHECKLIST §8.
+- **v2 features** (worst-case auto-finder, reduce-withdrawals lever) per the build spec, tracked in TECH_DEBT.

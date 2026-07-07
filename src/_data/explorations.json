@@ -273,6 +273,20 @@
     }
   },
   {
+    "_comment": "Sequence-of-returns stress test — reuses the retirement engine and injects a timed crash. Sibling to the-bitcoin-retirement (its sober counterpart). No live-chart mini (SVG tile); the icon lives at components/calc-tile-icons/the-bitcoin-retirement-stress-test.njk.",
+    "slug": "the-bitcoin-retirement-stress-test",
+    "title": "The Bitcoin Retirement Stress Test",
+    "category": "numbers",
+    "group": "Positioning & Strategy",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Drop a bear market into a retirement plan at any year &mdash; and see whether it survives the timing.",
+      "preview_kind": "svg",
+      "anchor": "#stress",
+      "position": 18
+    }
+  },
+  {
     "slug": "disciplined-rebalancing",
     "title": "Disciplined Rebalancing",
     "category": "numbers",
