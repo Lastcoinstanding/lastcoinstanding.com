@@ -19,8 +19,8 @@ eleventyComputed:
 
 <section class="hero">
   <h1>The Bitcoin Retirement <em>Stress Test</em></h1>
-  <div class="hero-subtitle">The retirement calculator shows the upside path. This one drops a bear market into it, at the worst possible moment.</div>
-  <p class="subtitle">Two retirees with the identical average return can end up in completely different places. The one who hit a deep crash in the <em>first</em> years of retirement was selling into the low to fund income, permanently shrinking the base that later had to recover. The one who hit the same crash <em>late</em> was barely touched. When you are withdrawing, the order of returns matters.</p>
+  <div class="hero-subtitle">The retirement calculator shows the upside path. This one drops a bear market into it, and lets you change the one thing that decides the outcome: <em>when</em> you retire.</div>
+  <p class="subtitle">A lot of Bitcoiners who once assumed a normal retirement age are now weighing an early exit. But the same stack and the same spending can pass or fail on the retirement year alone. Retire early and a deep crash in the <em>first</em> years means selling into the low to fund income, permanently shrinking the base that later has to recover. Retire later, with more years of compounding behind you, and the identical crash is nearly a non-event. When you are withdrawing, the order of returns matters, and the year you start is the lever.</p>
 </section>
 
 <main class="content-area">
@@ -30,7 +30,7 @@ eleventyComputed:
   <!-- ════════ 1. INTRO ════════ -->
   <div class="section-intro st-prose">
     <p>This is <strong>sequence-of-returns risk</strong>, and it is specifically a withdrawal problem. While you are still buying, a crash is a discount. Once you are selling Bitcoin to live, a crash means selling <em>more</em> sats to cover the same bill, and that is stack you never get back even if price fully recovers. For Bitcoin the effect is sharper than for most assets, because its drawdowns are deep (the 77% historical characteristic from <a href="/bull-and-bear-cycles">Bull &amp; Bear Cycles</a>) and its recoveries, while historically reliable, are not guaranteed.</p>
-    <p>So pick a crash, drop it anywhere in the retirement, and watch what it does. This is a what-if, not a forecast. It assigns no odds, and it is built to show the cases where the plan fails as plainly as the cases where it survives.</p>
+    <p>The page works for any retirement year, but it leads with the early exit, because that is where sequence risk bites. Set a plan, pick a crash, and change the year you retire. This is a what-if, not a forecast. It assigns no odds, and it is built to show the cases where the plan fails as plainly as the cases where it survives.</p>
   </div>
 
   <!-- ════════ 2. YOUR PLAN ════════ -->
@@ -38,11 +38,19 @@ eleventyComputed:
     <div class="st-eyebrow">Your plan</div>
     <h2 class="st-h2">Start from a retirement plan</h2>
     <p class="st-lead">The baseline, before any crash. These are the same inputs as the Retirement calculator, so the no-crash path here matches that page.</p>
+
+    <div class="st-primary">
+      <div class="st-primary-label">Retirement year <span class="st-key-tag">the dominant variable</span></div>
+      <div class="st-primary-row">
+        <input type="number" id="stRetire" step="1" min="2026" max="2100">
+        <p class="st-primary-note">The single biggest lever in this tool. Retire earlier and the stack has had fewer years to compound before you start selling into a bear market; retire later and that compounding is your cushion. Change it and watch the comparison further down: the same plan can survive one year and deplete another.</p>
+      </div>
+    </div>
+
     <div class="st-inputs">
       <label class="st-field"><span>Bitcoin stack (BTC)</span><input type="number" id="stStack" step="0.01" min="0.01"></label>
-      <label class="st-field"><span>Retirement year</span><input type="number" id="stRetire" step="1" min="2026" max="2100"></label>
-      <label class="st-field"><span>Years in retirement</span><input type="number" id="stYears" step="1" min="1" max="60"></label>
       <label class="st-field"><span>Target annual income (USD)</span><input type="number" id="stIncome" step="1000" min="0"></label>
+      <label class="st-field"><span>Years in retirement</span><input type="number" id="stYears" step="1" min="1" max="60"></label>
       <label class="st-field"><span>Monthly DCA until retirement (USD)</span><input type="number" id="stDca" step="100" min="0"></label>
       <div class="st-field">
         <span>Income target is in</span>
@@ -74,7 +82,7 @@ eleventyComputed:
       </div>
 
       <div class="st-control st-control-key">
-        <div class="st-control-label">Crash timing <span class="st-key-tag">the decisive variable</span></div>
+        <div class="st-control-label">Crash timing <span class="st-key-tag">matters too</span></div>
         <div class="st-seg" id="stTiming">
           <button type="button" data-val="1">Year 1</button>
           <button type="button" data-val="3">Year 3</button>
@@ -83,7 +91,7 @@ eleventyComputed:
           <button type="button" data-val="custom">Custom</button>
         </div>
         <div class="st-custom" id="stTimingCustomWrap" hidden><input type="number" id="stTimingCustom" min="1" max="60" step="1" placeholder="7"> <span>year of retirement</span></div>
-        <p class="st-control-note">Which year of retirement the bear market begins. Early is brutal, late is nearly harmless. The timing sensitivity below is the core lesson.</p>
+        <p class="st-control-note">Which year of retirement the bear market begins. Early is brutal, late is nearly harmless. Alongside the retirement year, this is what the comparison below sweeps.</p>
       </div>
 
       <div class="st-control">
@@ -109,21 +117,32 @@ eleventyComputed:
     <p class="st-chart-caption">Stack value over retirement, log scale, nominal dollars. The <strong style="color:#6db3d4">baseline</strong> is the plan with no crash; the <strong style="color:#e08a7a">crashed path</strong> is the same plan with your bear market. The gap between them is the sequence-of-returns cost. Faint lines are the Power Law trend and floor.</p>
   </section>
 
-  <!-- ════════ 5. TIMING SENSITIVITY ════════ -->
+  <!-- ════════ 5. COMPARISON (early-vs-late / crash-timing sweep) ════════ -->
   <section class="st-section" id="timing">
-    <div class="st-eyebrow">Timing sensitivity</div>
-    <h2 class="st-h2">The same crash, at different years</h2>
-    <p class="st-lead">This is the whole point. Hold the depth and recovery fixed, move only <em>when</em> the crash lands, and the outcomes diverge wildly. A crash early in retirement can break a plan that the identical crash, late, barely dents. Timing is decisive, and it is unknowable in advance.</p>
+    <div class="st-compare-head">
+      <div>
+        <div class="st-eyebrow">The comparison</div>
+        <h2 class="st-h2" id="stTimingTitle">The same plan, retiring in different years</h2>
+      </div>
+      <div class="st-compare-toggle">
+        <span class="st-compare-toggle-label">Vary</span>
+        <div class="st-seg" id="stCompareMode">
+          <button type="button" data-val="retire">Retirement year</button>
+          <button type="button" data-val="timing">Crash timing</button>
+        </div>
+      </div>
+    </div>
+    <p class="st-lead" id="stTimingLead">This is the whole point. Hold the stack, the withdrawal, and the crash fixed, and move only <em>when</em> you retire. Retire early and you are selling into the crash before the stack has had years to compound, so the same plan that survives a later start can fail an earlier one. Retire later and the compounding does the cushioning.</p>
     <div class="st-timing-grid">
-      <div class="st-chart-wrap st-timing-chart" data-chart-copy data-chart-title="Sequence risk: same crash at different retirement years" data-chart-filename="sequence-risk-timing.png"><canvas id="stTimingChart"></canvas></div>
+      <div class="st-chart-wrap st-timing-chart" data-chart-copy data-chart-title="Sequence risk: same plan, survive or deplete on the retirement year" data-chart-filename="sequence-risk-comparison.png"><canvas id="stTimingChart"></canvas></div>
       <div class="st-timing-tablewrap">
         <table class="st-table">
-          <thead><tr><th>Crash in</th><th>Calendar</th><th>Outcome</th><th class="st-num">Final stack</th><th class="st-num">Income lost</th></tr></thead>
+          <thead id="stTimingHead"><tr><th>Retire in</th><th>Crash lands</th><th>Outcome</th><th class="st-num">Final stack</th><th class="st-num">Cost vs no crash</th></tr></thead>
           <tbody id="stTimingTableBody"></tbody>
         </table>
       </div>
     </div>
-    <p class="st-chart-caption">Final stack in today&rsquo;s dollars for the same crash landing in different years of retirement. Bars below the dashed <strong>no-crash baseline</strong> are the cost of that timing; <span class="st-fail">red</span> bars ran the stack to zero. &ldquo;Income lost&rdquo; is the shortfall versus baseline, in years of your target income.</p>
+    <p class="st-chart-caption" id="stTimingCaption">Final stack in today&rsquo;s dollars for each retirement year, same crash throughout. The faint bar is that year&rsquo;s plan with <strong>no crash</strong>; the solid bar is <strong>with the crash</strong>. A <span class="st-fail">✕ depletes</span> tag marks the years the stack runs to zero. The gap between the two bars is the crash&rsquo;s cost; it shrinks the later you retire.</p>
   </section>
 
   <!-- ════════ 6. AUDIT VIEW ════════ -->
@@ -151,8 +170,8 @@ eleventyComputed:
     <div class="st-eyebrow">What this means</div>
     <h2 class="st-h2">Reading the result</h2>
     <div class="st-prose st-prose-wide">
-      <p>A plan that survives a mid-severity crash in year 10 tells you little about the same plan meeting a deep crash in year 1. The tool exists to show that spread, including the outcomes where the stack does not make it. If your plan only survives on the assumption of a fast recovery, that is worth knowing now, while you can still change the stack, the income, or the horizon.</p>
-      <p>Two honest framings sit side by side here. A badly-timed crash can do real, lasting damage to a Bitcoin retirement. And the same crash, met late or with room to spare, is nearly a non-event. Both are true; which one you get is a matter of timing you cannot control.</p>
+      <p>A plan that survives a mid-severity crash in year 10 tells you little about the same plan meeting a deep crash in year 1. The tool exists to show that spread, including the outcomes where the stack does not make it. If your plan only survives on the assumption of a fast recovery, that is worth knowing now, while you can still change the stack, the income, or the year you retire.</p>
+      <p>Two framings sit side by side here. A badly-timed crash can do real, lasting damage to a Bitcoin retirement. And the same crash, met late or with room to spare, is nearly a non-event. Which one you get turns mostly on two things: <strong>when you retire</strong> and <strong>how much you withdraw relative to your stack</strong>. A larger stack helps, but it is not the deciding lever; retire early and draw hard and even a big stack can run out, while a modest withdrawal a few years later rides the same crash through. Stack size sets the sizing question, and that is where <a href="/how-much-bitcoin">How Much Bitcoin?</a> and the upside baseline on <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a> pick up.</p>
       <p class="st-v2">There is a lever this version does not yet model: <strong>reducing withdrawals during the crash</strong> rather than selling a fixed amount into the low. A future version will add it, the actionable counterpart to the &ldquo;don&rsquo;t sell into the bottom&rdquo; lesson from Bull &amp; Bear. For now, treat the fixed-withdrawal result as the cautious case.</p>
     </div>
     <div class="st-connect-grid">

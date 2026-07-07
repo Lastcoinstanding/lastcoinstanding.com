@@ -42,28 +42,37 @@
   }
 
   // ── Baseline scenario (mirror of the retirement SCENARIO shape) ──
-  // Defaults deliberately differ from the Retirement page's (1.0 BTC / 2045): at a
-  // 2045 retirement the Power Law trend prices 1 BTC in the millions, so NOTHING ever
-  // depletes and the tool would always read "survives" — the falsely-reassuring trap.
-  // 0.75 BTC retiring 2040 is an honest default: the baseline survives, a mid crash
-  // survives at a real cost, and a deep + early + weak crash genuinely breaks the plan.
+  // v1.1 default: an EARLY-retirement scenario, because retirement year is the dominant
+  // variable (the same plan passes or fails on when you retire) and the early retiree is
+  // the audience. 5 BTC retiring 2030 on 175k/yr (today's $) is the tuned sweet spot,
+  // verified against the live Power Law trend prices:
+  //   - baseline (no crash) survives with a wide margin;
+  //   - the default crash (-77% in year 1, HISTORICAL recovery) survives but takes a real
+  //     bite out of the terminal stack;
+  //   - flipping recovery to Weak (one tap) makes the SAME crash deplete the stack by 2034.
+  // The lesson is not "a big stack is safe" (this one depletes if you retire early and the
+  // recovery fails) and not "early retirement is dangerous" (the base case is comfortable).
+  // The decisive levers are retirement year and withdrawal rate relative to stack.
   // Baseline PARITY is preserved for identical inputs (same math + shared assumptions);
   // only the cold-start defaults differ, which is the point of a stress test.
   var SCENARIO = {
-    btcStack: 0.75,
-    targetIncomeUSD: 100000,
-    retirementYear: 2040,
+    btcStack: 5,
+    targetIncomeUSD: 175000,
+    retirementYear: 2030,
     yearsInRetirement: 30,
     monthlyDcaUSD: 0,
     incomeBasis: 'today'   // 'today' = real target (inflate forward) | 'fixed' = fixed future nominal
   };
 
   // ── Crash defaults ──
+  // Default to the historical -77% depth landing in YEAR 1 of retirement, with a
+  // HISTORICAL (reliable-past) recovery: at the default plan this survives at a cost, and
+  // switching recovery to Weak is the single tap that tips it into depletion.
   var CRASH = {
-    depthPct: 0.60,          // default a mid severity, NOT the worst
-    depthPreset: '60',
-    timingYear: 3,           // year OF retirement the crash begins (1 = first year)
-    timingPreset: '3',
+    depthPct: 0.77,          // Bitcoin's historical bear-market characteristic
+    depthPreset: '77',
+    timingYear: 1,           // year OF retirement the crash begins (1 = first year)
+    timingPreset: '1',
     recoveryPreset: 'historical',
     troughLagYears: 1        // ~1 year peak->trough (Bull & Bear: 100+ days to bottom)
   };
@@ -112,11 +121,11 @@
     return trough + r * (1 - trough);
   }
 
-  // Build a crash object from CRASH + the baseline retirement year.
-  function makeCrash(timingYear) {
+  // Build a crash object from CRASH + a scenario's retirement year.
+  function makeCrashFor(scn, timingYear) {
     var rec = RECOVERY[CRASH.recoveryPreset] || RECOVERY.historical;
     return {
-      crashYear: SCENARIO.retirementYear + (timingYear - 1), // year 1 of retirement = retirementYear
+      crashYear: scn.retirementYear + (timingYear - 1), // year 1 of retirement = retirementYear
       depthPct: CRASH.depthPct,
       troughLagYears: CRASH.troughLagYears,
       recoveryYears: rec.years,
@@ -124,6 +133,7 @@
       recoveryCeiling: rec.ceiling
     };
   }
+  function makeCrash(timingYear) { return makeCrashFor(SCENARIO, timingYear); }
 
   // ════════ PROJECTION ENGINE (parity with retirement projectStackOverTime) ════════
   // multFn(year) returns the price multiplier for that year (baseline = ()=>1).
@@ -166,14 +176,13 @@
     var last = proj.rows[proj.rows.length - 1];
     return toReal(last.usd, last.x, infl);
   }
-  // Real (today's $) annual income, for the "years of income lost" metric.
-  function realAnnualIncome(infl) {
-    if (SCENARIO.incomeBasis === 'fixed') {
-      // fixed future dollars: deflate the mid-retirement year to today for a representative figure
-      var midY = SCENARIO.retirementYear + Math.round(SCENARIO.yearsInRetirement / 2);
-      return toReal(SCENARIO.targetIncomeUSD, midY, infl);
-    }
-    return SCENARIO.targetIncomeUSD; // today's-dollars target is already real
+  // Cost of the crash as a share of the no-crash terminal stack. Scale-free, so it stays
+  // meaningful whether the Power Law leaves you with thousands or tens of millions: a
+  // "years of income lost" figure balloons into the hundreds once the trend compounds a
+  // stack into the millions, which reads as alarm rather than information.
+  function pctSmaller(baseReal, crashReal) {
+    if (!(baseReal > 0)) return 0;
+    return Math.max(0, Math.round(100 * (1 - crashReal / baseReal)));
   }
 
   // ════════ FORMATTERS ════════
@@ -264,64 +273,151 @@
     mainChart.$markers = markers;
   }
 
-  // ════════ TIMING-SENSITIVITY CHART (the core lesson) ════════
-  var timingChart = null;
+  // ════════ COMPARISON SWEEP (the core lesson) ════════
+  // Two sweeps behind one toggle. 'retire' varies the retirement YEAR (the same plan,
+  // same crash, retiring earlier or later) and is the default view: it is the direct
+  // picture of "the same plan passes or fails on retirement year alone". 'timing' varies
+  // WHICH year of retirement the crash lands in, the original sensitivity view. Every row
+  // is measured against ITS OWN no-crash baseline, so the cost is honest in both sweeps.
+  var COMPARE_MODE = 'retire';           // 'retire' | 'timing'
   var TIMING_YEARS = [1, 3, 5, 10, 15];
-  function timingOutcomes() {
+  var RETIRE_YEARS = [2028, 2030, 2032, 2035, 2040, 2045];
+  var sweepChart = null;
+  var _sweepRows = [];                    // current rows, read by the plugin + tooltip (survives chart re-use)
+
+  function sweepRows() {
     var infl = inflationPct(), g = growthKey();
-    return TIMING_YEARS.filter(function (t) { return t <= SCENARIO.yearsInRetirement; }).map(function (t) {
-      var crash = makeCrash(t);
-      var proj = projectStack(SCENARIO, g, infl, function (y) { return crashMultiplier(y, crash); });
-      return { timing: t, crashYear: crash.crashYear, depletion: proj.depletionYear, finalReal: finalRealStack(proj, infl) };
+    if (COMPARE_MODE === 'timing') {
+      var baseProj = projectStack(SCENARIO, g, infl, null);
+      var baseReal = finalRealStack(baseProj, infl);
+      return TIMING_YEARS.filter(function (t) { return t <= SCENARIO.yearsInRetirement; }).map(function (t) {
+        var crash = makeCrash(t);
+        var proj = projectStack(SCENARIO, g, infl, function (y) { return crashMultiplier(y, crash); });
+        var real = finalRealStack(proj, infl);
+        return { key: t, label: 'Year ' + t, sub: 'crash in ' + crash.crashYear,
+                 depletion: proj.depletionYear, crashReal: real, baseReal: baseReal,
+                 pct: pctSmaller(baseReal, real), current: t === CRASH.timingYear };
+      });
+    }
+    // 'retire' mode: same stack, same withdrawal, same crash, varying the retirement YEAR.
+    // Always fold in the user's own retirement year so their scenario appears (highlighted).
+    var curYear = (new Date()).getFullYear();
+    var years = RETIRE_YEARS.slice();
+    if (SCENARIO.retirementYear >= curYear && years.indexOf(SCENARIO.retirementYear) < 0) years.push(SCENARIO.retirementYear);
+    years = years.filter(function (ry) { return ry >= curYear; }).sort(function (a, b) { return a - b; });
+    return years.map(function (ry) {
+      var scn = Object.assign({}, SCENARIO, { retirementYear: ry });
+      var crash = makeCrashFor(scn, CRASH.timingYear);
+      var baseProj = projectStack(scn, g, infl, null);
+      var proj = projectStack(scn, g, infl, function (y) { return crashMultiplier(y, crash); });
+      var baseReal = finalRealStack(baseProj, infl), real = finalRealStack(proj, infl);
+      return { key: ry, label: String(ry), sub: 'crash in ' + crash.crashYear,
+               depletion: proj.depletionYear, crashReal: real, baseReal: baseReal,
+               pct: pctSmaller(baseReal, real), current: ry === SCENARIO.retirementYear };
     });
   }
-  function renderTimingChart(outcomes, baseFinalReal) {
+
+  // Draw "✕ depletes YYYY" tags where the crashed bar collapses to zero, so the flip is
+  // visible on the chart and not only in the table.
+  var depletionTagPlugin = {
+    id: 'stDepletionTags',
+    afterDatasetsDraw: function (c) {
+      var rows = _sweepRows; if (!rows.length) return;
+      var meta = c.getDatasetMeta(1); if (!meta || !meta.data) return;
+      var ctx = c.ctx, yS = c.scales.y;
+      ctx.save(); ctx.textAlign = 'center';
+      rows.forEach(function (r, i) {
+        if (!r.depletion) return;
+        var bar = meta.data[i]; if (!bar) return;
+        var x = bar.x, y = yS.bottom - 6;
+        ctx.fillStyle = '#e08a7a'; ctx.font = '700 11px Inter, sans-serif';
+        ctx.fillText('✕', x, y - 12);
+        ctx.fillStyle = 'rgba(224,138,122,0.9)'; ctx.font = '600 9px Inter, sans-serif';
+        ctx.fillText('depletes', x, y);
+        ctx.fillText(String(r.depletion), x, y + 10);
+      });
+      ctx.restore();
+    }
+  };
+
+  function renderSweepChart(rows) {
     var el = document.getElementById('stTimingChart');
     if (!el || typeof Chart === 'undefined') return;
-    var labels = outcomes.map(function (o) { return 'Year ' + o.timing; });
-    var data = outcomes.map(function (o) { return Math.max(0, o.finalReal); });
-    var colors = outcomes.map(function (o) { return o.depletion ? '#c0392b' : C_BASE; });
-    if (timingChart) {
-      timingChart.data.labels = labels; timingChart.data.datasets[0].data = data;
-      timingChart.data.datasets[0].backgroundColor = colors; timingChart.$base = baseFinalReal; timingChart.update('none'); return;
+    _sweepRows = rows;
+    var labels = rows.map(function (r) { return r.label; });
+    var baseData = rows.map(function (r) { return Math.max(0, r.baseReal); });
+    var crashData = rows.map(function (r) { return Math.max(0, r.crashReal); });
+    var colors = rows.map(function (r) { return r.depletion ? '#c0392b' : C_CRASH; });
+    var ds = [
+      { label: 'No crash', data: baseData, backgroundColor: 'rgba(122,115,103,0.28)', borderWidth: 0, borderRadius: 3, order: 2 },
+      { label: 'With the crash', data: crashData, backgroundColor: colors, borderWidth: 0, borderRadius: 3, order: 1 }
+    ];
+    if (sweepChart) {
+      sweepChart.data.labels = labels; sweepChart.data.datasets[0].data = baseData;
+      sweepChart.data.datasets[1].data = crashData; sweepChart.data.datasets[1].backgroundColor = colors;
+      sweepChart.update('none'); return;
     }
-    timingChart = new Chart(el.getContext('2d'), {
+    sweepChart = new Chart(el.getContext('2d'), {
       type: 'bar',
-      data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 0, borderRadius: 3 }] },
+      data: { labels: labels, datasets: ds },
       options: {
         responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
+        layout: { padding: { top: 8 } },
         scales: {
           x: { grid: { display: false }, ticks: { color: DIM, font: { size: 11 } } },
           y: { grid: { color: 'rgba(224,148,34,0.06)' }, ticks: { color: MUTED, font: { size: 11 }, callback: function (v) { return usd(v); } }, title: { display: true, text: "Final stack, today's $", color: MUTED, font: { size: 10 } } }
         },
         plugins: {
-          legend: { display: false },
-          tooltip: { backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.3)', borderWidth: 1, titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10, callbacks: { label: function (it) { var o = outcomes[it.dataIndex]; return o.depletion ? 'Depletes in ' + o.depletion : 'Final: ' + usd(o.finalReal); } } }
+          legend: { display: true, position: 'top', labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'rectRounded', boxWidth: 10, padding: 10 } },
+          tooltip: { backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.3)', borderWidth: 1, titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10,
+            callbacks: {
+              title: function (it) { return it.length ? (_sweepRows[it[0].dataIndex] || {}).label || '' : ''; },
+              label: function (it) {
+                var r = _sweepRows[it.dataIndex]; if (!r) return '';
+                if (it.datasetIndex === 0) return 'No crash: ' + usd(r.baseReal);
+                return r.depletion ? 'Depletes in ' + r.depletion : 'Survives: ' + usd(r.crashReal) + ' (' + r.pct + '% smaller)';
+              }
+            } }
         }
       },
-      plugins: [{ id: 'stBaseLine', afterDatasetsDraw: function (c) {
-        var b = c.$base; if (!b || b <= 0) return; var yS = c.scales.y, xS = c.scales.x, yp = yS.getPixelForValue(b);
-        if (yp < yS.top || yp > yS.bottom) return; var ctx = c.ctx; ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = 'rgba(236,228,214,0.5)'; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(xS.left, yp); ctx.lineTo(xS.right, yp); ctx.stroke();
-        ctx.setLineDash([]); ctx.fillStyle = 'rgba(236,228,214,0.7)'; ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'right'; ctx.fillText('no-crash baseline', xS.right - 4, yp - 4); ctx.restore();
-      } }]
+      plugins: [depletionTagPlugin]
     });
-    timingChart.$base = baseFinalReal;
   }
 
-  function renderTimingTable(outcomes, baseFinalReal, baseDepletion) {
+  function renderSweepTable(rows) {
     var tb = document.getElementById('stTimingTableBody');
+    var head = document.getElementById('stTimingHead');
     if (!tb) return;
-    var infl = inflationPct(), annual = realAnnualIncome(infl);
-    var rows = outcomes.map(function (o) {
-      var lost = (baseFinalReal - o.finalReal);
-      var yrsLost = annual > 0 ? lost / annual : 0;
-      var outcome = o.depletion
-        ? '<span class="st-fail">Depletes ' + o.depletion + '</span>'
+    var firstCol = COMPARE_MODE === 'retire' ? 'Retire in' : 'Crash in';
+    if (head) head.innerHTML = '<tr><th>' + firstCol + '</th><th>Crash lands</th><th>Outcome</th><th class="st-num">Final stack</th><th class="st-num">Cost vs no crash</th></tr>';
+    var body = rows.map(function (r) {
+      var outcome = r.depletion
+        ? '<span class="st-fail">Depletes ' + r.depletion + '</span>'
         : 'Survives';
-      return '<tr><td>Year <strong>' + o.timing + '</strong></td><td>' + o.crashYear + '</td><td>' + outcome + '</td><td class="st-num">' + usd(Math.max(0, o.finalReal)) + '</td><td class="st-num">' + (yrsLost > 0.5 ? yearsWord(yrsLost) : '~0') + '</td></tr>';
+      var cost = r.depletion ? '<span class="st-fail">stack gone</span>' : (r.pct > 0 ? r.pct + '% smaller' : 'about even');
+      var lbl = COMPARE_MODE === 'retire'
+        ? '<strong>' + r.label + '</strong>'
+        : 'Year <strong>' + r.label.replace('Year ', '') + '</strong>';
+      var crashYr = r.sub.replace('crash in ', '');
+      return '<tr' + (r.current ? ' class="st-row-current"' : '') + '><td>' + lbl + '</td><td>' + crashYr + '</td><td>' + outcome + '</td><td class="st-num">' + usd(Math.max(0, r.crashReal)) + '</td><td class="st-num">' + cost + '</td></tr>';
     }).join('');
-    tb.innerHTML = rows;
+    tb.innerHTML = body;
+  }
+
+  // Swap the section title, lead, and caption to match the active sweep.
+  function updateCompareCopy() {
+    var title = document.getElementById('stTimingTitle');
+    var lead = document.getElementById('stTimingLead');
+    var cap = document.getElementById('stTimingCaption');
+    if (COMPARE_MODE === 'retire') {
+      if (title) title.textContent = 'The same plan, retiring in different years';
+      if (lead) lead.innerHTML = 'This is the whole point. Hold the stack, the withdrawal, and the crash fixed, and move only <em>when</em> you retire. Retire early and you are selling into the crash before the stack has had years to compound, so the same plan that survives a later start can fail an earlier one. Retire later and the compounding does the cushioning.';
+      if (cap) cap.innerHTML = 'Final stack in today&rsquo;s dollars for each retirement year, same crash throughout. The faint bar is that year&rsquo;s plan with <strong>no crash</strong>; the solid bar is <strong>with the crash</strong>. A <span class="st-fail">✕ depletes</span> tag marks the years the stack runs to zero. The gap between the two bars is the crash&rsquo;s cost; it shrinks the later you retire.';
+    } else {
+      if (title) title.textContent = 'The same crash, at different years of retirement';
+      if (lead) lead.innerHTML = 'Hold the plan and the crash fixed, and move only <em>which year of retirement</em> the bear market lands in. A crash early in retirement can break a plan that the identical crash, late, barely dents. Timing is decisive, and it is unknowable in advance.';
+      if (cap) cap.innerHTML = 'Final stack in today&rsquo;s dollars for the same crash landing in different years of retirement. The faint bar is the plan with <strong>no crash</strong>; the solid bar is <strong>with the crash</strong>. A <span class="st-fail">✕ depletes</span> tag marks the years the stack runs to zero.';
+    }
   }
 
   // ════════ HEADLINE (survive / deplete / years-of-income lost) ════════
@@ -329,8 +425,7 @@
     var el = document.getElementById('stHeadline'); if (!el) return;
     var infl = inflationPct();
     var baseFinal = finalRealStack(base, infl), crashFinal = finalRealStack(crashed, infl);
-    var annual = realAnnualIncome(infl);
-    var yrsLost = annual > 0 ? Math.max(0, (baseFinal - crashFinal) / annual) : 0;
+    var pct = pctSmaller(baseFinal, crashFinal);
     var retN = crash.crashYear - SCENARIO.retirementYear + 1; // which year of retirement the crash hit
 
     var cls, headline, detail;
@@ -347,7 +442,7 @@
     } else {
       cls = 'st-out-ok';
       headline = 'The plan survives this scenario.';
-      detail = 'It holds through the full ' + yearsWord(SCENARIO.yearsInRetirement) + ', but the crash is not free: it leaves you with <strong>' + usd(crashFinal) + '</strong> at the end instead of ' + usd(baseFinal) + " (today's dollars), about " + yearsWord(yrsLost) + ' of income gone.';
+      detail = 'It lasts the full ' + yearsWord(SCENARIO.yearsInRetirement) + ', but the crash still costs you: the terminal stack is about <strong>' + pct + '% smaller</strong> than with no crash, ' + usd(crashFinal) + " versus " + usd(baseFinal) + " in today's dollars. Retire earlier or draw harder and the same crash can tip into depletion.";
     }
     el.className = 'st-headline ' + cls;
     el.innerHTML = '<div class="st-headline-main">' + headline + '</div><p class="st-headline-detail">' + detail + '</p>';
@@ -420,13 +515,12 @@
     var crash = makeCrash(CRASH.timingYear);
     var base = projectStack(SCENARIO, g, infl, null);
     var crashed = projectStack(SCENARIO, g, infl, function (y) { return crashMultiplier(y, crash); });
-    var baseFinalReal = finalRealStack(base, infl);
 
     renderMainChart(base, crashed, crash);
     renderHeadline(base, crashed, crash);
-    var outcomes = timingOutcomes();
-    renderTimingChart(outcomes, baseFinalReal);
-    renderTimingTable(outcomes, baseFinalReal, base.depletionYear);
+    var rows = sweepRows();
+    renderSweepChart(rows);
+    renderSweepTable(rows);
     renderAudit(base, crashed);
     renderAssumptions();
     syncUrl();
@@ -497,6 +591,10 @@
     var rec = document.getElementById('stRecovery');
     if (rec) rec.addEventListener('click', function (e) { var b = e.target.closest('[data-val]'); if (!b) return; CRASH.recoveryPreset = b.getAttribute('data-val'); setSeg('stRecovery', CRASH.recoveryPreset); renderAll(); });
 
+    // Comparison-mode toggle (vary retirement year | crash timing)
+    var cmp = document.getElementById('stCompareMode');
+    if (cmp) cmp.addEventListener('click', function (e) { var b = e.target.closest('[data-val]'); if (!b) return; COMPARE_MODE = b.getAttribute('data-val'); setSeg('stCompareMode', COMPARE_MODE); updateCompareCopy(); renderAll(); });
+
     // Audit accordion
     var at = document.getElementById('stAuditToggle'), ab = document.getElementById('stAuditBody2');
     if (at && ab) at.addEventListener('click', function () { var open = at.getAttribute('aria-expanded') === 'true'; at.setAttribute('aria-expanded', String(!open)); ab.hidden = open; });
@@ -515,6 +613,7 @@
     // reflect initial state on the segmented controls
     setSeg('stIncomeBasis', SCENARIO.incomeBasis);
     setSeg('stDepth', CRASH.depthPreset); setSeg('stTiming', CRASH.timingPreset); setSeg('stRecovery', CRASH.recoveryPreset);
+    setSeg('stCompareMode', COMPARE_MODE); updateCompareCopy();
   }
 
   // ════════ URL STATE (shareable; reuses the retirement param names) ════════
@@ -527,6 +626,7 @@
     if (p.has('cdepth')) { var d = parseInt(p.get('cdepth'), 10); if (isFinite(d)) { CRASH.depthPct = clamp(d, 1, 99) / 100; CRASH.depthPreset = (['40', '60', '77'].indexOf(String(d)) >= 0) ? String(d) : 'custom'; } }
     if (p.has('ctime')) { var t = parseInt(p.get('ctime'), 10); if (isFinite(t)) { CRASH.timingYear = Math.max(1, t); CRASH.timingPreset = (['1', '3', '5', '10'].indexOf(String(t)) >= 0) ? String(t) : 'custom'; } }
     if (p.has('crecov') && RECOVERY[p.get('crecov')]) CRASH.recoveryPreset = p.get('crecov');
+    if (p.has('cmp') && (p.get('cmp') === 'retire' || p.get('cmp') === 'timing')) COMPARE_MODE = p.get('cmp');
   }
   var _urlT = null;
   function syncUrl() {
@@ -539,6 +639,7 @@
       p.set('cdepth', String(Math.round(CRASH.depthPct * 100)));
       p.set('ctime', String(CRASH.timingYear));
       p.set('crecov', CRASH.recoveryPreset);
+      p.set('cmp', COMPARE_MODE);
       window.history.replaceState(null, '', window.location.pathname + '?' + p.toString() + window.location.hash);
     }, 250);
   }
