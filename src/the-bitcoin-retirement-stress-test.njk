@@ -76,11 +76,13 @@ eleventyComputed:
         </span>
         <input type="number" id="stDca" step="100" min="0" aria-label="Monthly DCA">
       </div>
-      <div class="st-field">
-        <span class="st-field-label">Income target is in</span>
+      <div class="st-field st-field-basis">
+        <span class="st-field-label">Income target is in
+          <span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Today&rsquo;s dollars</strong> keeps your spending power constant each year, so the dollar figure rises with inflation. <strong>Fixed future dollars</strong> keeps the dollar figure constant, so its real purchasing power shrinks over time.</span></span>
+        </span>
         <div class="st-seg" id="stIncomeBasis">
-          <button type="button" data-val="today">Today&rsquo;s dollars<span class="help-tip" tabindex="0">?<span class="tip-content">Spend the same purchasing power each year; the dollar figure rises with inflation to keep up.</span></span></button>
-          <button type="button" data-val="fixed">Fixed future dollars<span class="help-tip" tabindex="0">?<span class="tip-content">Spend the same dollar figure each year; its real purchasing power shrinks with inflation.</span></span></button>
+          <button type="button" data-val="today">Today&rsquo;s dollars</button>
+          <button type="button" data-val="fixed">Fixed future dollars</button>
         </div>
       </div>
     </div>
@@ -151,8 +153,15 @@ eleventyComputed:
 
     <!-- Survive/deplete headline + full-width horizontal chart -->
     <div class="st-headline st-out-ok" id="stHeadline">&mdash;</div>
+    <div class="st-chart-head">
+      <div class="st-range-toggle" id="stFocus" role="tablist" aria-label="Chart view">
+        <button type="button" class="st-range-btn active" data-val="full" role="tab">Full retirement</button>
+        <button type="button" class="st-range-btn" data-val="crash" role="tab">Crash period</button>
+      </div>
+    </div>
     <div class="st-chart-wrap" data-chart-copy data-chart-title="Retirement stress test: baseline vs. crashed path" data-chart-filename="retirement-stress-test.png"><canvas id="stChart"></canvas></div>
     <p class="st-chart-caption">Stack value over retirement, log scale, nominal dollars. The <strong style="color:#6db3d4">baseline</strong> is the plan with no crash; the <strong style="color:#e08a7a">crashed path</strong> is the same plan with your bear market. The gap between them is the sequence-of-returns cost. Faint lines are the Power Law trend and floor.</p>
+    <p class="st-chart-caption st-focus-note" id="stFocusNote" hidden>Zoomed to the crash window: these are the years you would actually have to hold through, selling into the low the whole time, not knowing when it ends.</p>
     <p class="st-assumptions" id="stAssumptions">&mdash;</p>
   </section>
 

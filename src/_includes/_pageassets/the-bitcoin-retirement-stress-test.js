@@ -75,6 +75,10 @@
     troughLagYears: 1        // ~1 year peak->trough (Bull & Bear: 100+ days to bottom)
   };
 
+  // Two-path chart view: 'full' (whole retirement) | 'crash' (zoom the crash window, so the
+  // reader feels the trough years they would have to hold through).
+  var CHART_FOCUS = 'full';
+
   // Recovery shapes -> {years, shape, ceiling}. Historical is the default (not Fast).
   // 'never' asymptotes to a ceiling below trend: the honest weak/failed-recovery case.
   var RECOVERY = {
@@ -234,10 +238,20 @@
     };
   }
 
+  // Crash-window bounds: onset through full recovery, padded ~half a year each side.
+  function focusWindow(base, crash) {
+    if (CHART_FOCUS !== 'crash') return { min: undefined, max: undefined };
+    var lo = Math.max(base.startYear, crash.crashYear - 0.5);
+    var hi = Math.min(base.endYear, crash.crashYear + crash.troughLagYears + (crash.recoveryYears || 3) + 0.5);
+    if (hi - lo < 3) hi = Math.min(base.endYear, lo + 3);
+    return { min: lo, max: hi };
+  }
+
   function renderMainChart(base, crashed, crash) {
     var el = document.getElementById('stChart');
     if (!el || typeof Chart === 'undefined') return;
     var bands = buildBands(base.startYear, base.endYear);
+    var win = focusWindow(base, crash);
     var ds = [
       { label: 'Trend', data: bands.trend, borderColor: C_TREND, borderWidth: 1, borderDash: [2, 4], pointRadius: 0, tension: 0.2, order: 5 },
       { label: 'Floor', data: bands.floor, borderColor: C_FLOOR, borderWidth: 1, borderDash: [2, 5], pointRadius: 0, tension: 0.2, order: 5 },
@@ -249,7 +263,9 @@
     if (crashed.depletionYear) markers.push({ x: crashed.depletionYear, color: '#c0392b', label: 'Depleted' });
 
     if (mainChart) {
-      mainChart.data.datasets = ds; mainChart.$markers = markers; mainChart.update('none'); return;
+      mainChart.data.datasets = ds; mainChart.$markers = markers;
+      mainChart.options.scales.x.min = win.min; mainChart.options.scales.x.max = win.max;
+      mainChart.update('none'); return;
     }
     mainChart = new Chart(el.getContext('2d'), {
       type: 'line',
@@ -258,7 +274,7 @@
         responsive: true, maintainAspectRatio: false, parsing: true, animation: { duration: 0 },
         interaction: { intersect: false, mode: 'index' }, layout: { padding: { top: 16, right: 8 } },
         scales: {
-          x: { type: 'linear', grid: { color: 'rgba(224,148,34,0.05)' }, ticks: { color: MUTED, font: { size: 11 }, maxTicksLimit: 9, callback: function (v) { return v; } } },
+          x: { type: 'linear', min: win.min, max: win.max, grid: { color: 'rgba(224,148,34,0.05)' }, ticks: { color: MUTED, font: { size: 11 }, maxTicksLimit: 9, callback: function (v) { return Math.round(v); } } },
           y: { type: 'logarithmic', grid: { color: 'rgba(224,148,34,0.06)' }, ticks: { color: MUTED, font: { size: 11 }, callback: function (v) { return usd(v); } } }
         },
         plugins: {
@@ -418,20 +434,45 @@
     }
   }
 
-  // ════════ HEADLINE (survive / deplete / years-of-income lost) ════════
+  // ════════ STRESS PERIOD (the lived experience, derived from the crashed series) ════════
+  // onset = crashed stack value the year the crash hits (before the drop). trough = its low
+  // afterwards. underwater = years until the crashed stack regains that onset value. All in
+  // nominal USD, the same units the chart shows.
+  function stressPeriod(crashed, crash) {
+    var rows = crashed.rows, onsetY = crash.crashYear, onset = null;
+    for (var i = 0; i < rows.length; i++) { if (rows[i].x === onsetY) { onset = rows[i].usd; break; } }
+    if (onset == null || !(onset > 0)) return null;
+    var troughUsd = onset, troughY = onsetY, recY = null;
+    for (var j = 0; j < rows.length; j++) {
+      var r = rows[j];
+      if (r.x <= onsetY || r.usd == null) continue;
+      if (r.usd < troughUsd) { troughUsd = r.usd; troughY = r.x; }
+      if (recY === null && r.usd >= onset) recY = r.x;
+    }
+    var lastY = rows[rows.length - 1].x, underwater;
+    if (recY !== null) underwater = recY - onsetY;
+    else if (crashed.depletionYear) underwater = crashed.depletionYear - onsetY;
+    else underwater = lastY - onsetY; // survived but never regained the onset value by the end
+    return { onset: onset, troughUsd: troughUsd, troughY: troughY, recY: recY, recovered: recY !== null,
+             underwater: Math.max(0, underwater), dropPct: Math.round(100 * (1 - troughUsd / onset)) };
+  }
+
+  // ════════ HEADLINE (lead with the lived stress period, not the terminal value) ════════
   function renderHeadline(base, crashed, crash) {
     var el = document.getElementById('stHeadline'); if (!el) return;
-    var infl = inflationPct();
-    var baseFinal = finalRealStack(base, infl), crashFinal = finalRealStack(crashed, infl);
-    var pct = pctSmaller(baseFinal, crashFinal);
+    var pct = pctSmaller(base.rows[base.rows.length - 1].usd, crashed.rows[crashed.rows.length - 1].usd);
+    var baseFinalNom = base.rows[base.rows.length - 1].usd, crashFinalNom = crashed.rows[crashed.rows.length - 1].usd;
     var retN = crash.crashYear - SCENARIO.retirementYear + 1; // which year of retirement the crash hit
+    var sp = stressPeriod(crashed, crash);
 
-    var cls, headline, detail;
+    var cls, headline, detail, detailSub = '';
     if (crashed.depletionYear && !base.depletionYear) {
       cls = 'st-out-fail';
       var into = crashed.depletionYear - SCENARIO.retirementYear;
       headline = 'Your plan does not survive this scenario.';
       detail = 'A ' + Math.round(crash.depthPct * 100) + '% crash in year ' + retN + ' of retirement drains the stack to zero in <strong>' + crashed.depletionYear + '</strong>, ' + yearsWord(into) + ' into a planned ' + yearsWord(SCENARIO.yearsInRetirement) + ' retirement. Without the crash, the same plan lasts the full ' + SCENARIO.yearsInRetirement + '.';
+      var toZero = crashed.depletionYear - crash.crashYear;
+      if (toZero > 0) detailSub = 'From the crash hitting to the stack running dry is about ' + yearsWord(toZero) + ', selling more sats every year into a price that has not come back.';
     } else if (crashed.depletionYear && base.depletionYear) {
       cls = 'st-out-fail';
       var earlier = base.depletionYear - crashed.depletionYear;
@@ -440,10 +481,18 @@
     } else {
       cls = 'st-out-ok';
       headline = 'The plan survives this scenario.';
-      detail = 'It lasts the full ' + yearsWord(SCENARIO.yearsInRetirement) + ', but the crash still costs you: the terminal stack is about <strong>' + pct + '% smaller</strong> than with no crash, ' + usd(crashFinal) + " versus " + usd(baseFinal) + " in today's dollars. Retire earlier or draw harder and the same crash can tip into depletion.";
+      if (sp && sp.dropPct >= 5 && sp.underwater >= 1) {
+        var uw = yearsWord(sp.underwater);
+        detail = 'But living it is a long hold. The stack falls to about <strong>' + usd(sp.troughUsd) + '</strong>, roughly <strong>' + sp.dropPct + '% below</strong> where it stood when the crash hit, and stays under that level for about <strong>' + uw + '</strong> before regaining it. The plan holds, but only because the recovery came. For those ' + sp.underwater + ' years you could not have known it would.';
+        detailSub = 'By the end the stack is about ' + pct + '% smaller than with no crash, ' + usd(crashFinalNom) + ' versus ' + usd(baseFinalNom) + ', but that final gap is not what you would feel. The years underwater are.';
+      } else {
+        detail = 'It lasts the full ' + yearsWord(SCENARIO.yearsInRetirement) + ' and this crash barely dents it: the terminal stack is about <strong>' + pct + '% smaller</strong> than with no crash. Deepen the crash or move it earlier to see the stress bite.';
+      }
     }
+    var html = '<div class="st-headline-main">' + headline + '</div><p class="st-headline-detail">' + detail + '</p>';
+    if (detailSub) html += '<p class="st-headline-sub">' + detailSub + '</p>';
     el.className = 'st-headline ' + cls;
-    el.innerHTML = '<div class="st-headline-main">' + headline + '</div><p class="st-headline-detail">' + detail + '</p>';
+    el.innerHTML = html;
   }
 
   // ════════ AUDIT TABLE + CSV ════════
@@ -562,6 +611,18 @@
       b.classList.toggle('is-active', b.getAttribute('data-val') === String(value));
     });
   }
+  // Gallery-style range toggle uses `.active` rather than `.is-active`.
+  function setActive(groupId, value) {
+    var group = document.getElementById(groupId); if (!group) return;
+    group.querySelectorAll('[data-val]').forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-val') === String(value));
+    });
+  }
+  // Crash-period caption note, shown only when the chart is zoomed to the crash window.
+  function updateFocusNote() {
+    var n = document.getElementById('stFocusNote'); if (!n) return;
+    n.hidden = (CHART_FOCUS !== 'crash');
+  }
 
   // ── Two tiers of input ──
   // Tier 1: typed baseline fields (set once; no sliders). Tier 2: the playground sliders
@@ -604,6 +665,8 @@
     setSeg('stDepth', String(Math.round(CRASH.depthPct * 100)));
     setSeg('stTiming', String(CRASH.timingYear));
     setSeg('stCompareMode', COMPARE_MODE);
+    setActive('stFocus', CHART_FOCUS);
+    updateFocusNote();
     updateCompareCopy();
   }
 
@@ -652,6 +715,10 @@
     var rec = document.getElementById('stRecovery');
     if (rec) rec.addEventListener('click', function (e) { var b = e.target.closest('[data-val]'); if (!b) return; CRASH.recoveryPreset = b.getAttribute('data-val'); setSeg('stRecovery', CRASH.recoveryPreset); renderAll(); });
 
+    // Two-path chart view toggle (Full retirement | Crash period)
+    var focus = document.getElementById('stFocus');
+    if (focus) focus.addEventListener('click', function (e) { var b = e.target.closest('[data-val]'); if (!b) return; CHART_FOCUS = b.getAttribute('data-val'); setActive('stFocus', CHART_FOCUS); updateFocusNote(); renderAll(); });
+
     // Comparison-mode toggle (vary retirement year | crash timing)
     var cmp = document.getElementById('stCompareMode');
     if (cmp) cmp.addEventListener('click', function (e) { var b = e.target.closest('[data-val]'); if (!b) return; COMPARE_MODE = b.getAttribute('data-val'); setSeg('stCompareMode', COMPARE_MODE); updateCompareCopy(); renderAll(); });
@@ -685,6 +752,7 @@
     if (p.has('ctime')) { var t = parseInt(p.get('ctime'), 10); if (isFinite(t)) CRASH.timingYear = Math.max(1, t); }
     if (p.has('crecov') && RECOVERY[p.get('crecov')]) CRASH.recoveryPreset = p.get('crecov');
     if (p.has('cmp') && (p.get('cmp') === 'retire' || p.get('cmp') === 'timing')) COMPARE_MODE = p.get('cmp');
+    if (p.has('focus') && (p.get('focus') === 'full' || p.get('focus') === 'crash')) CHART_FOCUS = p.get('focus');
   }
   var _urlT = null;
   function syncUrl() {
@@ -698,6 +766,7 @@
       p.set('ctime', String(CRASH.timingYear));
       p.set('crecov', CRASH.recoveryPreset);
       p.set('cmp', COMPARE_MODE);
+      p.set('focus', CHART_FOCUS);
       window.history.replaceState(null, '', window.location.pathname + '?' + p.toString() + window.location.hash);
     }, 250);
   }

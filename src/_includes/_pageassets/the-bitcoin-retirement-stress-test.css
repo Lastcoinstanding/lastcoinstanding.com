@@ -54,8 +54,11 @@ body { background: var(--bg); color: var(--text); }
 .st-partnote p { font-family: var(--font-b); font-size: 0.9rem; line-height: 1.6; color: var(--text-dim); margin: 0; }
 .st-partnote a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 
+/* Income-basis: full-width row so the two pills sit horizontally, matching Recovery's calm */
+.st-field-basis { grid-column: 1 / -1; }
+
 /* ══════════ TIER 2 — THE PLAYGROUND (year slider + three crash boxes) ══════════ */
-.st-play { margin: 1.4rem 0 1.6rem; }
+.st-play { margin: 1.3rem 0 1rem; }
 
 /* Prominent row: vary the retirement year (slight primacy over the three crash boxes) */
 .st-play-year { background: linear-gradient(135deg, rgba(224,148,34,0.09), rgba(20,18,16,0.4)); border: 1px solid rgba(224,148,34,0.4); border-radius: 12px; padding: 1.1rem 1.4rem; margin: 0 0 1.2rem; }
@@ -78,6 +81,18 @@ body { background: var(--bg); color: var(--text); }
 /* Mini segmented (depth / timing quick-set presets) */
 .st-seg-mini { margin-top: 0.5rem; }
 .st-seg-mini button { font-size: 0.72rem; padding: 0.35rem 0.7rem; }
+
+/* ── Two-path chart view toggle (Full retirement | Crash period), Gallery styling ── */
+.st-chart-head { display: flex; justify-content: flex-end; margin: 0 0 0.5rem; }
+.st-range-toggle { display: inline-flex; gap: 0; background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 6px; padding: 3px; }
+.st-range-btn { background: transparent; border: none; color: var(--text-dim); font-family: var(--font-b); font-size: 0.78rem; font-weight: 500; padding: 0.4rem 0.85rem; border-radius: 4px; cursor: pointer; transition: color 0.18s, background 0.18s; letter-spacing: 0.02em; }
+.st-range-btn:hover { color: var(--text); }
+.st-range-btn.active { background: rgba(224,148,34,0.16); color: var(--amber); }
+.st-focus-note { color: var(--text-dim); border-left: 2px solid rgba(224,148,34,0.4); padding-left: 0.7rem; }
+
+/* ── Headline secondary line (terminal value, demoted below the stress period) ── */
+.st-headline-sub { font-family: var(--font-b); font-size: 0.82rem; line-height: 1.6; color: var(--text-muted); margin: 0.6rem 0 0; padding-top: 0.55rem; border-top: 1px solid rgba(255,255,255,0.06); }
+.st-headline-sub strong { color: var(--text-dim); }
 
 /* ── Comparison summary line (restates the reader's plan) ── */
 .st-compar-summary { font-family: var(--font-b); font-size: 0.86rem; line-height: 1.55; color: var(--text-dim); margin: 0.2rem 0 1rem; padding: 0.6rem 0.95rem; border-radius: 8px; background: rgba(224,148,34,0.05); border: 1px solid rgba(224,148,34,0.24); font-variant-numeric: tabular-nums; }
@@ -123,7 +138,7 @@ body { background: var(--bg); color: var(--text); }
 .st-assumptions strong { color: var(--text-dim); font-weight: 600; }
 
 /* ── Headline (survive / fail) ── */
-.st-headline { border-radius: 12px; padding: 1.3rem 1.5rem; margin: 0 0 1.3rem; }
+.st-headline { border-radius: 12px; padding: 1.05rem 1.4rem; margin: 0 0 0.7rem; }
 .st-headline-main { font-family: var(--font-d); font-size: clamp(1.4rem, 3.4vw, 1.9rem); font-weight: 600; line-height: 1.2; letter-spacing: -.01em; }
 .st-headline-detail { font-family: var(--font-b); font-size: 0.92rem; line-height: 1.65; color: var(--text-dim); margin: 0.55rem 0 0; }
 .st-headline-detail strong { color: #f2eee8; font-weight: 600; }
@@ -133,7 +148,7 @@ body { background: var(--bg); color: var(--text); }
 .st-out-fail .st-headline-main { color: #f0a898; }
 
 /* ── Charts ── */
-.st-chart-wrap { position: relative; height: clamp(300px, 44vh, 400px); margin: 0; }
+.st-chart-wrap { position: relative; height: clamp(260px, 37vh, 350px); margin: 0; }
 .st-timing-chart { height: clamp(240px, 34vh, 300px); }
 .st-chart-caption { font-family: var(--font-b); font-size: 0.78rem; line-height: 1.55; color: var(--text-muted); margin: 0.6rem 0 0; }
 .st-chart-caption strong { color: var(--text-dim); font-weight: 600; }
