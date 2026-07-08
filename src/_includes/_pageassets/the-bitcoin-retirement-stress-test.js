@@ -247,11 +247,65 @@
     return { min: lo, max: hi };
   }
 
+  // The payoff of the Crash-period view: a shaded "years underwater" band from crash onset to
+  // the year the stack regains its pre-crash value (or to depletion), plus a dashed pre-crash
+  // level line. Drawn only in crash focus, so switching views has a visible point.
+  var underwaterPlugin = {
+    id: 'stUnderwater',
+    beforeDatasetsDraw: function (c) {
+      if (CHART_FOCUS !== 'crash') return;
+      var sp = c.$sp; if (!sp) return;
+      var xS = c.scales.x, yS = c.scales.y, ctx = c.ctx;
+      var endY = sp.recovered ? sp.recY : (sp.depletionY || c.$endYear);
+      var x0 = Math.max(xS.getPixelForValue(sp.onsetY), xS.left);
+      var x1 = Math.min(xS.getPixelForValue(endY), xS.right);
+      if (x1 <= x0) return;
+      ctx.save();
+      ctx.fillStyle = 'rgba(192,57,43,0.09)';
+      ctx.fillRect(x0, yS.top, x1 - x0, yS.bottom - yS.top);
+      ctx.restore();
+    },
+    afterDatasetsDraw: function (c) {
+      if (CHART_FOCUS !== 'crash') return;
+      var sp = c.$sp; if (!sp) return;
+      var xS = c.scales.x, yS = c.scales.y, ctx = c.ctx;
+      // pre-crash level line
+      var yp = yS.getPixelForValue(sp.onset);
+      if (yp >= yS.top && yp <= yS.bottom) {
+        ctx.save();
+        ctx.setLineDash([4, 3]); ctx.strokeStyle = 'rgba(236,228,214,0.55)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(xS.left, yp); ctx.lineTo(xS.right, yp); ctx.stroke();
+        ctx.setLineDash([]); ctx.fillStyle = 'rgba(236,228,214,0.8)'; ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText('pre-crash level', xS.left + 4, yp - 4);
+        ctx.restore();
+      }
+      // "N years underwater" label centred over the band
+      var endY = sp.recovered ? sp.recY : (sp.depletionY || c.$endYear);
+      var x0 = Math.max(xS.getPixelForValue(sp.onsetY), xS.left);
+      var x1 = Math.min(xS.getPixelForValue(endY), xS.right);
+      if (x1 > x0 && sp.underwater >= 1) {
+        ctx.save();
+        ctx.fillStyle = '#e08a7a'; ctx.font = '700 11px Inter, sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(yearsWord(sp.underwater) + ' underwater', (x0 + x1) / 2, yS.top + 13);
+        ctx.restore();
+      }
+    }
+  };
+
+  function focusNoteText(crashed, sp) {
+    if (!sp) return '';
+    if (crashed.depletionYear) return 'These are the crash years you would live through: the stack drops below its pre-crash level and never recovers, running dry in <strong>' + crashed.depletionYear + '</strong>.';
+    if (sp.recovered) return 'These are the crash years you would live through: the stack drops below its pre-crash level and stays there until about <strong>' + sp.recY + '</strong>, all while you keep selling into it.';
+    return 'These are the crash years you would live through: the stack drops below its pre-crash level and does not regain it within the projection.';
+  }
+
   function renderMainChart(base, crashed, crash) {
     var el = document.getElementById('stChart');
     if (!el || typeof Chart === 'undefined') return;
     var bands = buildBands(base.startYear, base.endYear);
     var win = focusWindow(base, crash);
+    var sp = stressPeriod(crashed, crash);
+    if (sp) { sp.onsetY = crash.crashYear; sp.depletionY = crashed.depletionYear; }
     var ds = [
       { label: 'Trend', data: bands.trend, borderColor: C_TREND, borderWidth: 1, borderDash: [2, 4], pointRadius: 0, tension: 0.2, order: 5 },
       { label: 'Floor', data: bands.floor, borderColor: C_FLOOR, borderWidth: 1, borderDash: [2, 5], pointRadius: 0, tension: 0.2, order: 5 },
@@ -262,8 +316,11 @@
                    { x: crash.crashYear, color: C_CRASH, label: 'Crash' }];
     if (crashed.depletionYear) markers.push({ x: crashed.depletionYear, color: '#c0392b', label: 'Depleted' });
 
+    var noteEl = document.getElementById('stFocusNote');
+    if (noteEl) noteEl.innerHTML = focusNoteText(crashed, sp);
+
     if (mainChart) {
-      mainChart.data.datasets = ds; mainChart.$markers = markers;
+      mainChart.data.datasets = ds; mainChart.$markers = markers; mainChart.$sp = sp; mainChart.$endYear = base.endYear;
       mainChart.options.scales.x.min = win.min; mainChart.options.scales.x.max = win.max;
       mainChart.update('none'); return;
     }
@@ -275,16 +332,16 @@
         interaction: { intersect: false, mode: 'index' }, layout: { padding: { top: 16, right: 8 } },
         scales: {
           x: { type: 'linear', min: win.min, max: win.max, grid: { color: 'rgba(224,148,34,0.05)' }, ticks: { color: MUTED, font: { size: 11 }, maxTicksLimit: 9, callback: function (v) { return Math.round(v); } } },
-          y: { type: 'logarithmic', grid: { color: 'rgba(224,148,34,0.06)' }, title: { display: true, text: 'Portfolio value (USD)', color: MUTED, font: { size: 10 } }, ticks: { color: MUTED, font: { size: 11 }, callback: function (v) { return usd(v); } } }
+          y: { type: 'logarithmic', grid: { color: 'rgba(224,148,34,0.06)' }, title: { display: true, text: 'Portfolio value (total stack)', color: MUTED, font: { size: 10 } }, ticks: { color: MUTED, font: { size: 11 }, callback: function (v) { return usd(v); } } }
         },
         plugins: {
           legend: { display: true, position: 'top', labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 20, padding: 8, filter: function (it) { return it.text === 'Baseline (no crash)' || it.text === 'With the crash'; } } },
-          tooltip: { backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.3)', borderWidth: 1, titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10, filter: function (it) { return it.parsed.y != null && it.parsed.y > 0; }, callbacks: { title: function (it) { return it.length ? 'Year ' + it[0].parsed.x : ''; }, label: function (it) { return it.dataset.label + ': ' + usd(it.parsed.y); } } }
+          tooltip: { backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.3)', borderWidth: 1, titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10, filter: function (it) { return it.parsed.y != null && it.parsed.y > 0; }, callbacks: { title: function (it) { return it.length ? 'Year ' + it[0].parsed.x : ''; }, label: function (it) { var lbl = it.dataset.label; if (lbl === 'Trend' || lbl === 'Floor') return lbl + ': ' + usd(it.parsed.y) + ' (per BTC)'; return lbl + ', your stack: ' + usd(it.parsed.y); } } }
         }
       },
-      plugins: [verticalLinePlugin]
+      plugins: [verticalLinePlugin, underwaterPlugin]
     });
-    mainChart.$markers = markers;
+    mainChart.$markers = markers; mainChart.$sp = sp; mainChart.$endYear = base.endYear;
   }
 
   // ════════ COMPARISON SWEEP (the core lesson) ════════
@@ -621,10 +678,13 @@
       b.classList.toggle('active', b.getAttribute('data-val') === String(value));
     });
   }
-  // Crash-period caption note, shown only when the chart is zoomed to the crash window.
+  // Crash-period note (below the chart, shown in crash focus) + the "try it" hint (above the
+  // chart, shown in full view to advertise the toggle).
   function updateFocusNote() {
-    var n = document.getElementById('stFocusNote'); if (!n) return;
-    n.hidden = (CHART_FOCUS !== 'crash');
+    var n = document.getElementById('stFocusNote');
+    if (n) n.hidden = (CHART_FOCUS !== 'crash');
+    var hint = document.getElementById('stFocusHint');
+    if (hint) hint.hidden = (CHART_FOCUS === 'crash');
   }
 
   // ── Two tiers of input ──

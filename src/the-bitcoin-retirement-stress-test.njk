@@ -154,9 +154,13 @@ eleventyComputed:
     <!-- Survive/deplete headline + full-width horizontal chart -->
     <div class="st-headline st-out-ok" id="stHeadline">&mdash;</div>
     <div class="st-chart-head">
-      <div class="st-range-toggle" id="stFocus" role="tablist" aria-label="Chart view">
-        <button type="button" class="st-range-btn active" data-val="full" role="tab">Full retirement</button>
-        <button type="button" class="st-range-btn" data-val="crash" role="tab">Crash period</button>
+      <span class="st-focus-hint" id="stFocusHint">Zoom in on the crash years and what you would live through &rarr;</span>
+      <div class="st-focus-control">
+        <span class="st-focus-label">Focus</span>
+        <div class="st-range-toggle" id="stFocus" role="tablist" aria-label="Chart view">
+          <button type="button" class="st-range-btn active" data-val="full" role="tab">Full retirement</button>
+          <button type="button" class="st-range-btn" data-val="crash" role="tab">Crash period</button>
+        </div>
       </div>
     </div>
     <div class="st-chart-wrap" data-chart-copy data-chart-title="Retirement stress test: baseline vs. crashed path" data-chart-filename="retirement-stress-test.png"><canvas id="stChart"></canvas></div>

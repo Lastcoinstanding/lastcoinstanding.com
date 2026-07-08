@@ -85,7 +85,10 @@ body { background: var(--bg); color: var(--text); }
 .st-seg-mini button { font-size: 0.72rem; padding: 0.35rem 0.7rem; }
 
 /* ── Two-path chart view toggle (Full retirement | Crash period), Gallery styling ── */
-.st-chart-head { display: flex; justify-content: flex-end; margin: 0 0 0.5rem; }
+.st-chart-head { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem 0.9rem; flex-wrap: wrap; margin: 0 0 0.5rem; }
+.st-focus-hint { font-family: var(--font-b); font-size: 0.8rem; font-weight: 500; color: var(--amber); }
+.st-focus-control { display: inline-flex; align-items: center; gap: 0.5rem; margin-left: auto; }
+.st-focus-label { font-family: var(--font-b); font-size: 0.64rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
 .st-range-toggle { display: inline-flex; gap: 0; background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 6px; padding: 3px; }
 .st-range-btn { background: transparent; border: none; color: var(--text-dim); font-family: var(--font-b); font-size: 0.78rem; font-weight: 500; padding: 0.4rem 0.85rem; border-radius: 4px; cursor: pointer; transition: color 0.18s, background 0.18s; letter-spacing: 0.02em; }
 .st-range-btn:hover { color: var(--text); }
