@@ -48,14 +48,52 @@ body { background: var(--bg); color: var(--text); }
 .st-lead em { color: var(--amber); font-style: italic; }
 .st-lead strong { color: var(--text); }
 
-/* ── Prominent primary control: retirement year ── */
-.st-primary { background: linear-gradient(135deg, rgba(224,148,34,0.09), rgba(20,18,16,0.4)); border: 1px solid rgba(224,148,34,0.4); border-radius: 12px; padding: 1.3rem 1.5rem; margin: 0 0 1.1rem; }
-.st-primary-label { font-family: var(--font-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-.st-primary-row { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
-.st-primary-row input[type="number"] { font-family: var(--font-d); font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 500; letter-spacing: -.01em; color: #f2eee8; background: rgba(255,255,255,0.03); border: 1px solid rgba(224,148,34,0.3); border-radius: 9px; padding: 0.35rem 0.7rem; width: 8.5rem; text-align: center; }
-.st-primary-row input[type="number"]:focus { outline: none; border-color: rgba(224,148,34,0.7); }
-.st-primary-note { flex: 1 1 260px; font-family: var(--font-b); font-size: 0.84rem; line-height: 1.6; color: var(--text-dim); margin: 0; }
-.st-primary-note strong { color: #f2eee8; }
+/* ── Part 1 / Part 2 call-out ── */
+.st-partnote { max-width: 880px; margin: 0 auto 1.6rem; background: linear-gradient(135deg, rgba(224,148,34,0.06), rgba(20,18,16,0.4)); border: 1px solid rgba(224,148,34,0.22); border-left: 3px solid var(--amber); border-radius: 8px; padding: 0.9rem 1.2rem; }
+.st-partnote-tag { display: inline-block; font-family: var(--font-b); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.35rem; }
+.st-partnote p { font-family: var(--font-b); font-size: 0.9rem; line-height: 1.6; color: var(--text-dim); margin: 0; }
+.st-partnote a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+
+/* ══════════ TIER 2 — THE PLAYGROUND (year slider + three crash boxes) ══════════ */
+.st-play { margin: 1.4rem 0 1.6rem; }
+
+/* Prominent row: vary the retirement year (slight primacy over the three crash boxes) */
+.st-play-year { background: linear-gradient(135deg, rgba(224,148,34,0.09), rgba(20,18,16,0.4)); border: 1px solid rgba(224,148,34,0.4); border-radius: 12px; padding: 1.1rem 1.4rem; margin: 0 0 1.2rem; }
+.st-play-year-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+.st-play-year-label { font-family: var(--font-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); display: inline-flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.st-play-year-val { font-family: var(--font-d); font-size: clamp(1.9rem, 4vw, 2.5rem); font-weight: 600; line-height: 1; letter-spacing: -.01em; color: #f2eee8; font-variant-numeric: tabular-nums; }
+.st-play-year-note { font-family: var(--font-b); font-size: 0.8rem; line-height: 1.5; color: var(--text-dim); margin: 0.65rem 0 0; }
+
+/* Value readout inside a crash box header (right-aligned) */
+.st-control-val { margin-left: auto; font-family: var(--font-b); font-size: 0.98rem; font-weight: 600; color: #f2eee8; font-variant-numeric: tabular-nums; text-transform: none; letter-spacing: 0; }
+.st-control .st-range { margin: 0.15rem 0 0; }
+
+/* Range slider (shared visual with the trilogy sliders) */
+.st-range { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 4px; outline: none; background: linear-gradient(90deg, rgba(122,115,103,0.4) 0%, rgba(224,148,34,0.5) 100%); }
+.st-range-red { background: linear-gradient(90deg, rgba(122,115,103,0.4) 0%, rgba(224,148,34,0.5) 55%, rgba(192,57,43,0.65) 100%); }
+.st-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #f2eee8; border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(255,255,255,0.3), 0 2px 6px rgba(0,0,0,0.5); cursor: grab; }
+.st-range::-webkit-slider-thumb:active { cursor: grabbing; }
+.st-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #f2eee8; border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(255,255,255,0.3); cursor: grab; }
+
+/* Mini segmented (depth / timing quick-set presets) */
+.st-seg-mini { margin-top: 0.5rem; }
+.st-seg-mini button { font-size: 0.72rem; padding: 0.35rem 0.7rem; }
+
+/* ── Comparison summary line (restates the reader's plan) ── */
+.st-compar-summary { font-family: var(--font-b); font-size: 0.86rem; line-height: 1.55; color: var(--text-dim); margin: 0.2rem 0 1rem; padding: 0.6rem 0.95rem; border-radius: 8px; background: rgba(224,148,34,0.05); border: 1px solid rgba(224,148,34,0.24); font-variant-numeric: tabular-nums; }
+.st-compar-summary strong { color: #f2eee8; font-weight: 600; }
+.st-lead-full { max-width: none; }
+
+/* ── Part badge on connect card ── */
+.st-part-badge { display: inline-block; font-family: var(--font-b); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber); border: 1px solid rgba(224,148,34,0.4); border-radius: 3px; padding: 0.08rem 0.3rem; vertical-align: middle; margin-left: 0.4rem; }
+
+/* ── Canonical Style-Guide tooltip (.help-tip / .tip-content) ── */
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; }
+.help-tip:hover, .help-tip:focus { border-color: var(--amber); color: var(--amber); outline: none; }
+.help-tip .tip-content { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 230px; padding: 0.6rem 0.75rem; background: var(--bg-card); border: 1px solid rgba(224,148,34,0.3); border-radius: 4px; font-family: var(--font-b); font-size: 0.78rem; font-weight: 400; color: var(--text); line-height: 1.45; text-align: left; letter-spacing: 0; text-transform: none; pointer-events: none; z-index: 10; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
+.help-tip:hover .tip-content, .help-tip:focus .tip-content { display: block; pointer-events: auto; }
+.st-seg .help-tip { margin-left: 0.35rem; }
+@media (max-width: 480px) { .help-tip .tip-content { width: min(230px, calc(100vw - 32px)); } }
 
 /* ── Baseline plan inputs ── */
 .st-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem 1.3rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.6rem; }

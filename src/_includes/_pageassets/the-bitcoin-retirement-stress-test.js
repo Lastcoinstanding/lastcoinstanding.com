@@ -69,10 +69,8 @@
   // HISTORICAL (reliable-past) recovery: at the default plan this survives at a cost, and
   // switching recovery to Weak is the single tap that tips it into depletion.
   var CRASH = {
-    depthPct: 0.77,          // Bitcoin's historical bear-market characteristic
-    depthPreset: '77',
+    depthPct: 0.77,          // historical worst-case depth (a selectable option, not a forecast)
     timingYear: 1,           // year OF retirement the crash begins (1 = first year)
-    timingPreset: '1',
     recoveryPreset: 'historical',
     troughLagYears: 1        // ~1 year peak->trough (Bull & Bear: 100+ days to bottom)
   };
@@ -509,6 +507,30 @@
     el.innerHTML = 'Recovery assumed: <strong>' + rec.label + '</strong> (' + rec.note + '). Baseline growth is Power Law trend, inflation <strong>' + inflationLabel() + '</strong> (shared with the Retirement page). Past recoveries were reliable; the future is not guaranteed.';
   }
 
+  // Compact BTC formatter for readouts (trims trailing zeros).
+  function fmtBtc(v) { return (Math.round(v * 100) / 100).toString(); }
+
+  // ════════ COMPARISON SUMMARY LINE (restates the reader's plan; B5) ════════
+  function renderComparSummary() {
+    var el = document.getElementById('stComparSummary'); if (!el) return;
+    var rec = (RECOVERY[CRASH.recoveryPreset] || RECOVERY.historical).label;
+    var basis = SCENARIO.incomeBasis === 'fixed' ? 'fixed future $' : "today's $";
+    var varying = COMPARE_MODE === 'retire' ? 'the retirement year' : 'the crash timing';
+    el.innerHTML = 'Your plan: <strong>' + fmtBtc(SCENARIO.btcStack) + ' BTC</strong> &middot; <strong>'
+      + usd(SCENARIO.targetIncomeUSD) + '/yr</strong> (' + basis + ') &middot; <strong>' + SCENARIO.yearsInRetirement + ' yrs</strong> &middot; <strong>'
+      + Math.round(CRASH.depthPct * 100) + '% crash</strong> &middot; <strong>' + rec + '</strong> recovery. Varying only ' + varying + ' below.';
+  }
+
+  // Live readouts for the playground controls (year, depth, timing).
+  function updateReadouts() {
+    var yv = document.getElementById('stRetireVal');
+    if (yv) yv.textContent = SCENARIO.retirementYear;
+    var dv = document.getElementById('stDepthVal');
+    if (dv) dv.innerHTML = '−' + Math.round(CRASH.depthPct * 100) + '%';
+    var tv = document.getElementById('stTimingVal');
+    if (tv) tv.textContent = 'Year ' + CRASH.timingYear;
+  }
+
   // ════════ RENDER ALL ════════
   function renderAll() {
     var infl = inflationPct(), g = growthKey();
@@ -523,6 +545,8 @@
     renderSweepTable(rows);
     renderAudit(base, crashed);
     renderAssumptions();
+    renderComparSummary();
+    updateReadouts();
     syncUrl();
     // stash for CSV
     _last = { base: base, crashed: crashed, crash: crash };
@@ -539,53 +563,90 @@
     });
   }
 
+  // ── Two tiers of input ──
+  // Tier 1: typed baseline fields (set once; no sliders). Tier 2: the playground sliders
+  // (retirement year, depth, timing) plus segmented recovery. Retirement year lives in
+  // BOTH tiers (typed above, slider below), synced to the one SCENARIO value via setYear.
+  var TYPED = [
+    { id: 'stStack',  key: 'btcStack',          min: 0.01, max: 100000,    float: true },
+    { id: 'stIncome', key: 'targetIncomeUSD',   min: 0,    max: 100000000, float: false },
+    { id: 'stYears',  key: 'yearsInRetirement', min: 1,    max: 60,        float: false },
+    { id: 'stDca',    key: 'monthlyDcaUSD',      min: 0,    max: 10000000,  float: false }
+  ];
+
+  // Set the retirement year and reflect it on both tiers (from = 'typed' | 'slider' | 'init'
+  // marks which control the user is touching, so it is not rewritten under them).
+  function setYear(v, from) {
+    if (!isFinite(v)) return;
+    SCENARIO.retirementYear = Math.round(clamp(v, 2026, 2100));
+    var num = document.getElementById('stRetire'), sl = document.getElementById('stRetireSlider'), val = document.getElementById('stRetireVal');
+    if (from !== 'typed' && num) num.value = SCENARIO.retirementYear;
+    if (from !== 'slider' && sl) sl.value = String(clamp(SCENARIO.retirementYear, 2026, 2050));
+    if (val) val.textContent = SCENARIO.retirementYear;
+  }
+
+  // Clamp the timing slider's range to the current retirement length, and keep timingYear valid.
+  function syncTimingRange() {
+    var ts = document.getElementById('stTimingSlider');
+    if (ts) ts.max = String(Math.max(1, SCENARIO.yearsInRetirement));
+    if (CRASH.timingYear > SCENARIO.yearsInRetirement) CRASH.timingYear = SCENARIO.yearsInRetirement;
+    if (ts) ts.value = String(CRASH.timingYear);
+  }
+
+  // Reflect current state onto every control (run once at init).
+  function initControls() {
+    TYPED.forEach(function (t) { var el = document.getElementById(t.id); if (el) el.value = SCENARIO[t.key]; });
+    setYear(SCENARIO.retirementYear, 'init');
+    var ds = document.getElementById('stDepthSlider'); if (ds) ds.value = String(Math.round(CRASH.depthPct * 100));
+    syncTimingRange();
+    setSeg('stIncomeBasis', SCENARIO.incomeBasis);
+    setSeg('stRecovery', CRASH.recoveryPreset);
+    setSeg('stDepth', String(Math.round(CRASH.depthPct * 100)));
+    setSeg('stTiming', String(CRASH.timingYear));
+    setSeg('stCompareMode', COMPARE_MODE);
+    updateCompareCopy();
+  }
+
   function wire() {
-    // Baseline plan number inputs
-    var map = [
-      ['stStack', 'btcStack', 0.01, 100000, true],
-      ['stRetire', 'retirementYear', 2026, 2100, false],
-      ['stYears', 'yearsInRetirement', 1, 60, false],
-      ['stIncome', 'targetIncomeUSD', 0, 100000000, false],
-      ['stDca', 'monthlyDcaUSD', 0, 10000000, false]
-    ];
-    map.forEach(function (m) {
-      var el = document.getElementById(m[0]); if (!el) return;
-      el.value = SCENARIO[m[1]];
+    // Tier 1: typed baseline fields (no sliders).
+    TYPED.forEach(function (t) {
+      var el = document.getElementById(t.id); if (!el) return;
       el.addEventListener('input', function () {
         var v = parseFloat(el.value); if (!isFinite(v)) return;
-        SCENARIO[m[1]] = m[4] ? clamp(v, m[2], m[3]) : Math.round(clamp(v, m[2], m[3]));
+        SCENARIO[t.key] = t.float ? clamp(v, t.min, t.max) : Math.round(clamp(v, t.min, t.max));
+        if (t.key === 'yearsInRetirement') syncTimingRange();
         renderAll();
       });
     });
+
+    // Retirement year: typed field (Tier 1) + playground slider (Tier 2), synced.
+    var yNum = document.getElementById('stRetire'), ySl = document.getElementById('stRetireSlider');
+    if (yNum) yNum.addEventListener('input', function () { setYear(parseFloat(yNum.value), 'typed'); renderAll(); });
+    if (ySl) ySl.addEventListener('input', function () { setYear(parseInt(ySl.value, 10), 'slider'); renderAll(); });
+
     // Income basis segmented
     var ib = document.getElementById('stIncomeBasis');
     if (ib) ib.addEventListener('click', function (e) { var b = e.target.closest('[data-val]'); if (!b) return; SCENARIO.incomeBasis = b.getAttribute('data-val'); setSeg('stIncomeBasis', SCENARIO.incomeBasis); renderAll(); });
 
-    // Crash depth segmented (+ custom)
+    // Crash depth slider (+ quick presets, keeping −77% a one-tap selectable option)
+    var ds = document.getElementById('stDepthSlider');
+    if (ds) ds.addEventListener('input', function () { var v = parseInt(ds.value, 10); if (isFinite(v)) { CRASH.depthPct = clamp(v, 1, 99) / 100; setSeg('stDepth', String(v)); renderAll(); } });
     var depth = document.getElementById('stDepth');
     if (depth) depth.addEventListener('click', function (e) {
       var b = e.target.closest('[data-val]'); if (!b) return;
-      var v = b.getAttribute('data-val'); CRASH.depthPreset = v;
-      var wrap = document.getElementById('stDepthCustomWrap');
-      if (v === 'custom') { if (wrap) wrap.hidden = false; var ci = document.getElementById('stDepthCustom'); if (ci && isFinite(parseFloat(ci.value))) CRASH.depthPct = clamp(parseFloat(ci.value), 1, 99) / 100; }
-      else { if (wrap) wrap.hidden = true; CRASH.depthPct = parseInt(v, 10) / 100; }
-      setSeg('stDepth', v); renderAll();
+      var v = parseInt(b.getAttribute('data-val'), 10);
+      CRASH.depthPct = v / 100; if (ds) ds.value = String(v); setSeg('stDepth', String(v)); renderAll();
     });
-    var dc = document.getElementById('stDepthCustom');
-    if (dc) dc.addEventListener('input', function () { var v = parseFloat(dc.value); if (isFinite(v)) { CRASH.depthPct = clamp(v, 1, 99) / 100; CRASH.depthPreset = 'custom'; renderAll(); } });
 
-    // Crash timing segmented (+ custom)
+    // Crash timing slider (+ quick presets)
+    var ts = document.getElementById('stTimingSlider');
+    if (ts) ts.addEventListener('input', function () { var v = parseInt(ts.value, 10); if (isFinite(v)) { CRASH.timingYear = clamp(v, 1, SCENARIO.yearsInRetirement); setSeg('stTiming', String(v)); renderAll(); } });
     var timing = document.getElementById('stTiming');
     if (timing) timing.addEventListener('click', function (e) {
       var b = e.target.closest('[data-val]'); if (!b) return;
-      var v = b.getAttribute('data-val'); CRASH.timingPreset = v;
-      var wrap = document.getElementById('stTimingCustomWrap');
-      if (v === 'custom') { if (wrap) wrap.hidden = false; var ci = document.getElementById('stTimingCustom'); if (ci && isFinite(parseInt(ci.value, 10))) CRASH.timingYear = clamp(parseInt(ci.value, 10), 1, SCENARIO.yearsInRetirement); }
-      else { if (wrap) wrap.hidden = true; CRASH.timingYear = parseInt(v, 10); }
-      setSeg('stTiming', v); renderAll();
+      var v = clamp(parseInt(b.getAttribute('data-val'), 10), 1, SCENARIO.yearsInRetirement);
+      CRASH.timingYear = v; if (ts) ts.value = String(v); setSeg('stTiming', String(v)); renderAll();
     });
-    var tc = document.getElementById('stTimingCustom');
-    if (tc) tc.addEventListener('input', function () { var v = parseInt(tc.value, 10); if (isFinite(v)) { CRASH.timingYear = clamp(v, 1, SCENARIO.yearsInRetirement); CRASH.timingPreset = 'custom'; renderAll(); } });
 
     // Recovery segmented
     var rec = document.getElementById('stRecovery');
@@ -610,10 +671,7 @@
       var lbl = csvBtn.querySelector('.st-csv-label'); if (lbl) { var o = lbl.textContent; lbl.textContent = 'Downloaded'; setTimeout(function () { lbl.textContent = o; }, 1600); }
     });
 
-    // reflect initial state on the segmented controls
-    setSeg('stIncomeBasis', SCENARIO.incomeBasis);
-    setSeg('stDepth', CRASH.depthPreset); setSeg('stTiming', CRASH.timingPreset); setSeg('stRecovery', CRASH.recoveryPreset);
-    setSeg('stCompareMode', COMPARE_MODE); updateCompareCopy();
+    initControls();
   }
 
   // ════════ URL STATE (shareable; reuses the retirement param names) ════════
@@ -623,8 +681,8 @@
     var p = new URLSearchParams(window.location.search);
     Object.keys(URL_NUM).forEach(function (k) { if (p.has(k)) { var v = parseFloat(p.get(k)); if (isFinite(v)) SCENARIO[URL_NUM[k]] = (k === 'stack') ? v : Math.round(v); } });
     if (p.has('incbasis') && (p.get('incbasis') === 'today' || p.get('incbasis') === 'fixed')) SCENARIO.incomeBasis = p.get('incbasis');
-    if (p.has('cdepth')) { var d = parseInt(p.get('cdepth'), 10); if (isFinite(d)) { CRASH.depthPct = clamp(d, 1, 99) / 100; CRASH.depthPreset = (['40', '60', '77'].indexOf(String(d)) >= 0) ? String(d) : 'custom'; } }
-    if (p.has('ctime')) { var t = parseInt(p.get('ctime'), 10); if (isFinite(t)) { CRASH.timingYear = Math.max(1, t); CRASH.timingPreset = (['1', '3', '5', '10'].indexOf(String(t)) >= 0) ? String(t) : 'custom'; } }
+    if (p.has('cdepth')) { var d = parseInt(p.get('cdepth'), 10); if (isFinite(d)) CRASH.depthPct = clamp(d, 1, 99) / 100; }
+    if (p.has('ctime')) { var t = parseInt(p.get('ctime'), 10); if (isFinite(t)) CRASH.timingYear = Math.max(1, t); }
     if (p.has('crecov') && RECOVERY[p.get('crecov')]) CRASH.recoveryPreset = p.get('crecov');
     if (p.has('cmp') && (p.get('cmp') === 'retire' || p.get('cmp') === 'timing')) COMPARE_MODE = p.get('cmp');
   }

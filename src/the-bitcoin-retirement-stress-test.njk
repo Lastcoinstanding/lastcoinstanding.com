@@ -4,9 +4,9 @@ permalink: /the-bitcoin-retirement-stress-test.html
 slug: the-bitcoin-retirement-stress-test
 related:
   - slug: the-bitcoin-retirement
-    desc: "The baseline this page stress-tests. The Retirement calculator projects the plan on the upside path; this page takes that same plan and drops a bear market into it."
+    desc: "Part 1. The Retirement calculator projects the same plan on the upside path; this exploration takes that plan and drops a bear market into it."
   - slug: bull-and-bear-cycles
-    desc: "The evidence behind the crash severities and recovery shapes here. Bull &amp; Bear documents the historical drawdowns and the caveats on recovery; this page turns them into a what-if."
+    desc: "The evidence behind the crash severities and recovery shapes here. Bull &amp; Bear documents the historical drawdowns and the caveats on recovery; this exploration turns them into a what-if."
   - slug: how-much-bitcoin
     desc: "The sizing question underneath. If a badly-timed crash breaks the plan, the lever is often the allocation itself. How Much Bitcoin owns the Kelly maths."
   - slug: disciplined-rebalancing
@@ -19,102 +19,141 @@ eleventyComputed:
 
 <section class="hero">
   <h1>The Bitcoin Retirement <em>Stress Test</em></h1>
-  <div class="hero-subtitle">The retirement calculator shows the upside path. This one drops a bear market into it, and lets you change the one thing that decides the outcome: <em>when</em> you retire.</div>
-  <p class="subtitle">A lot of Bitcoiners who once assumed a normal retirement age are now weighing an early exit. But the same stack and the same spending can pass or fail on the retirement year alone. Retire early and a deep crash in the <em>first</em> years means selling into the low to fund income, permanently shrinking the base that later has to recover. Retire later, with more years of compounding behind you, and the identical crash is nearly a non-event. When you are withdrawing, the order of returns matters, and the year you start is the lever.</p>
+  <div class="hero-subtitle">The retirement calculator shows the upside path. This one drops a bear market into it, and lets you change the factor that most decides the outcome: <em>when</em> you retire.</div>
+  <p class="subtitle">A lot of Bitcoiners who once assumed a normal retirement age are now weighing an early exit. But the same stack and the same spending can pass or fail on the retirement year alone. Retire early and a deep crash in the first one or two planned years at retirement means selling into the low to fund your later years, permanently shrinking the base that later has to recover. Retire later, with more years of compounding behind you, and the identical crash is nearly a non-event. When you are drawing down, it matters <em>when</em> the bad years fall, not just the average return over time, and the year you start is the main lever.</p>
 </section>
 
 <main class="content-area">
 
   {% include 'components/tool-framing.njk' %}
 
-  <!-- ════════ 1. INTRO ════════ -->
-  <div class="section-intro st-prose">
-    <p>This is <strong>sequence-of-returns risk</strong>, and it is specifically a withdrawal problem. While you are still buying, a crash is a discount. Once you are selling Bitcoin to live, a crash means selling <em>more</em> sats to cover the same bill, and that is stack you never get back even if price fully recovers. For Bitcoin the effect is sharper than for most assets, because its drawdowns are deep (the 77% historical characteristic from <a href="/bull-and-bear-cycles">Bull &amp; Bear Cycles</a>) and its recoveries, while historically reliable, are not guaranteed.</p>
-    <p>The page works for any retirement year, but it leads with the early exit, because that is where sequence risk bites. Set a plan, pick a crash, and change the year you retire. This is a what-if, not a forecast. It assigns no odds, and it is built to show the cases where the plan fails as plainly as the cases where it survives.</p>
+  <!-- ════════ PART 1 / PART 2 CALL-OUT ════════ -->
+  <div class="st-partnote">
+    <span class="st-partnote-tag">Part 2 of 2</span>
+    <p>This exploration builds directly on <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a>. That page projects your plan on the upside path; think of it as Part 1. This is Part 2: it takes the same plan and drops a bear market into it. If you have not yet played with the retirement calculator, start there, this exploration is far more useful once you have.</p>
   </div>
 
-  <!-- ════════ 2. YOUR PLAN ════════ -->
+  <!-- ════════ 1. INTRO ════════ -->
+  <div class="section-intro st-prose">
+    <p>This is <strong>sequence-of-returns risk</strong>, and it is specifically a retirement-income drawdown problem. While you are still DCA&rsquo;ing into bitcoin, a crash is a discount. Once you are selling bitcoin to live, a crash means selling <em>more</em> sats to cover the same bill, and that is stack you never get back even if price fully recovers. For bitcoin the effect is sharper than for most assets, because its drawdowns have historically been deep and its recoveries, while historically reliable, are not guaranteed.</p>
+    <p>The exploration works for any retirement year, but it leads with the early exit, because that is where sequence risk bites most. Set a plan, pick a crash, and change the year you retire, to simulate scenarios. This is a what-if exercise, not a forecast. It assigns no odds, and it is built to show the cases where the plan fails as plainly as the cases where it survives.</p>
+    <p>One implication: you cannot fully lock a retirement date years in advance and assume the market will cooperate. As the date nears, it is worth tempering the plan, keeping enough flexibility that you are not forced to draw down heavily at a low.</p>
+  </div>
+
+  <!-- ════════ TIER 1 — YOUR PLAN (typed baseline, set once) ════════ -->
   <section class="st-section" id="plan">
     <div class="st-eyebrow">Your plan</div>
     <h2 class="st-h2">Start from a retirement plan</h2>
-    <p class="st-lead">The baseline, before any crash. These are the same inputs as the Retirement calculator, so the no-crash path here matches that page.</p>
-
-    <div class="st-primary">
-      <div class="st-primary-label">Retirement year <span class="st-key-tag">the dominant variable</span></div>
-      <div class="st-primary-row">
-        <input type="number" id="stRetire" step="1" min="2026" max="2100">
-        <p class="st-primary-note">The single biggest lever in this tool. Retire earlier and the stack has had fewer years to compound before you start selling into a bear market; retire later and that compounding is your cushion. Change it and watch the comparison further down: the same plan can survive one year and deplete another.</p>
-      </div>
-    </div>
-
+    <p class="st-lead">Let&rsquo;s confirm your baseline assumptions first. These are the same inputs as <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a>, so the no-crash path here matches that page. New here? That page is the natural Part 1 to this Part 2.</p>
     <div class="st-inputs">
-      <label class="st-field"><span>Bitcoin stack (BTC)</span><input type="number" id="stStack" step="0.01" min="0.01"></label>
-      <label class="st-field"><span>Target annual income (USD)</span><input type="number" id="stIncome" step="1000" min="0"></label>
-      <label class="st-field"><span>Years in retirement</span><input type="number" id="stYears" step="1" min="1" max="60"></label>
-      <label class="st-field"><span>Monthly DCA until retirement (USD)</span><input type="number" id="stDca" step="100" min="0"></label>
       <div class="st-field">
-        <span>Income target is in</span>
+        <span class="st-field-label">Retirement year
+          <span class="help-tip" tabindex="0">?<span class="tip-content">When retirement starts and drawdown begins. The single biggest lever here, so it also appears as a slider in the stress test below.</span></span>
+        </span>
+        <input type="number" id="stRetire" step="1" min="2026" max="2100" aria-label="Retirement year">
+      </div>
+      <div class="st-field">
+        <span class="st-field-label">Bitcoin stack (BTC)
+          <span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin you hold or plan to hold at retirement.</span></span>
+        </span>
+        <input type="number" id="stStack" step="0.01" min="0.01" aria-label="Bitcoin stack">
+      </div>
+      <div class="st-field">
+        <span class="st-field-label">Target annual income (USD)
+          <span class="help-tip" tabindex="0">?<span class="tip-content">Annual spending in today&rsquo;s dollars, pretax. Higher income draws the stack down faster.</span></span>
+        </span>
+        <input type="number" id="stIncome" step="1000" min="0" aria-label="Target annual income">
+      </div>
+      <div class="st-field">
+        <span class="st-field-label">Years in retirement
+          <span class="help-tip" tabindex="0">?<span class="tip-content">How long the stack must last. Longer horizons deplete more easily at the same withdrawal.</span></span>
+        </span>
+        <input type="number" id="stYears" step="1" min="1" max="60" aria-label="Years in retirement">
+      </div>
+      <div class="st-field">
+        <span class="st-field-label">Monthly DCA until retirement (USD)
+          <span class="help-tip" tabindex="0">?<span class="tip-content">Dollars added per month between now and retirement, buying bitcoin at the trend price.</span></span>
+        </span>
+        <input type="number" id="stDca" step="100" min="0" aria-label="Monthly DCA">
+      </div>
+      <div class="st-field">
+        <span class="st-field-label">Income target is in</span>
         <div class="st-seg" id="stIncomeBasis">
-          <button type="button" data-val="today">Today&rsquo;s dollars</button>
-          <button type="button" data-val="fixed">Fixed future $</button>
+          <button type="button" data-val="today">Today&rsquo;s dollars<span class="help-tip" tabindex="0">?<span class="tip-content">Spend the same purchasing power each year; the dollar figure rises with inflation to keep up.</span></span></button>
+          <button type="button" data-val="fixed">Fixed future dollars<span class="help-tip" tabindex="0">?<span class="tip-content">Spend the same dollar figure each year; its real purchasing power shrinks with inflation.</span></span></button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ════════ 3. THE STRESS TEST ════════ -->
+  <!-- ════════ TIER 2 — THE STRESS TEST (playground + full-width chart) ════════ -->
   <section class="st-section" id="stress">
     <div class="st-eyebrow">The stress test</div>
     <h2 class="st-h2">Now drop a bear market into it</h2>
-    <p class="st-lead">You pick the crash. The tool never predicts one. Depth and recovery come from the historical record; timing is the variable nobody can know in advance, which is exactly the point.</p>
+    <p class="st-lead">You pick the crash. The tool never predicts one. Depth and recovery draw on the historical record; timing is the variable nobody can know in advance, which is exactly the point. Drag any control below and the graph moves with it.</p>
 
-    <div class="st-controls">
-      <div class="st-control">
-        <div class="st-control-label">Crash depth</div>
-        <div class="st-seg" id="stDepth">
-          <button type="button" data-val="40">&minus;40%</button>
-          <button type="button" data-val="60">&minus;60%</button>
-          <button type="button" data-val="77">&minus;77%</button>
-          <button type="button" data-val="custom">Custom</button>
+    <div class="st-play">
+      <!-- Prominent: vary the retirement year -->
+      <div class="st-play-year">
+        <div class="st-play-year-head">
+          <span class="st-play-year-label">Retirement year <span class="st-key-tag">vary the one thing that most changes the outcome</span></span>
+          <span class="st-play-year-val" id="stRetireVal">2030</span>
         </div>
-        <div class="st-custom" id="stDepthCustomWrap" hidden><input type="number" id="stDepthCustom" min="1" max="99" step="1" placeholder="55"> <span>% peak-to-trough</span></div>
-        <p class="st-control-note">&minus;77% is Bitcoin&rsquo;s historical bear-market characteristic, not a forecast. See the evidence on <a href="/bull-and-bear-cycles">Bull &amp; Bear Cycles</a>.</p>
+        <input type="range" id="stRetireSlider" class="st-range" min="2026" max="2050" step="1" aria-label="Retirement year">
+        <p class="st-play-year-note">Same stack, same spending, same crash. Drag the year and watch the plan pass or fail on the timing alone.</p>
       </div>
 
-      <div class="st-control st-control-key">
-        <div class="st-control-label">Crash timing <span class="st-key-tag">matters too</span></div>
-        <div class="st-seg" id="stTiming">
-          <button type="button" data-val="1">Year 1</button>
-          <button type="button" data-val="3">Year 3</button>
-          <button type="button" data-val="5">Year 5</button>
-          <button type="button" data-val="10">Year 10</button>
-          <button type="button" data-val="custom">Custom</button>
+      <!-- The three crash boxes -->
+      <div class="st-controls">
+        <div class="st-control">
+          <div class="st-control-label">Crash depth
+            <span class="help-tip" tabindex="0">?<span class="tip-content">How far price falls peak-to-trough. Entirely your choice, not a prediction; the tool forecasts nothing.</span></span>
+            <span class="st-control-val" id="stDepthVal">&minus;77%</span>
+          </div>
+          <input type="range" id="stDepthSlider" class="st-range st-range-red" min="20" max="90" step="1" aria-label="Crash depth percent">
+          <div class="st-seg st-seg-mini" id="stDepth">
+            <button type="button" data-val="40">&minus;40%</button>
+            <button type="button" data-val="60">&minus;60%</button>
+            <button type="button" data-val="77">&minus;77%</button>
+          </div>
+          <p class="st-control-note">Stress-test against crashes up to historically deep ones. Bitcoin&rsquo;s past bear markets have run as deep as roughly 70&ndash;80% peak-to-trough, though they have tended to get shallower as the asset matures. See <a href="/bull-and-bear-cycles">Bull &amp; Bear Cycles</a>. The depth is entirely your choice.</p>
         </div>
-        <div class="st-custom" id="stTimingCustomWrap" hidden><input type="number" id="stTimingCustom" min="1" max="60" step="1" placeholder="7"> <span>year of retirement</span></div>
-        <p class="st-control-note">Which year of retirement the bear market begins. Early is brutal, late is nearly harmless. Alongside the retirement year, this is what the comparison below sweeps.</p>
-      </div>
 
-      <div class="st-control">
-        <div class="st-control-label">Recovery</div>
-        <div class="st-seg" id="stRecovery">
-          <button type="button" data-val="fast">Fast</button>
-          <button type="button" data-val="historical">Historical</button>
-          <button type="button" data-val="slow">Slow</button>
-          <button type="button" data-val="weak">Weak</button>
+        <div class="st-control">
+          <div class="st-control-label">Crash timing
+            <span class="help-tip" tabindex="0">?<span class="tip-content">Which year of retirement the crash begins. Early is brutal, late is nearly harmless.</span></span>
+            <span class="st-control-val" id="stTimingVal">Year 1</span>
+          </div>
+          <input type="range" id="stTimingSlider" class="st-range" min="1" max="30" step="1" aria-label="Crash timing year">
+          <div class="st-seg st-seg-mini" id="stTiming">
+            <button type="button" data-val="1">Year 1</button>
+            <button type="button" data-val="3">Year 3</button>
+            <button type="button" data-val="5">Year 5</button>
+            <button type="button" data-val="10">Year 10</button>
+          </div>
+          <p class="st-control-note">Which year of retirement the bear market begins. Early is brutal, late is nearly harmless.</p>
         </div>
-        <p class="st-control-note"><strong>Weak</strong> never fully returns to trend, the failed-recovery case. Historical is the default because past recoveries were reliable, but non-stationarity means the future is not guaranteed.</p>
+
+        <div class="st-control">
+          <div class="st-control-label">Recovery
+            <span class="help-tip" tabindex="0">?<span class="tip-content">How price returns to trend after the low. Weak never fully recovers, the failed-recovery case.</span></span>
+          </div>
+          <div class="st-seg" id="stRecovery">
+            <button type="button" data-val="fast">Fast</button>
+            <button type="button" data-val="historical">Historical</button>
+            <button type="button" data-val="slow">Slow</button>
+            <button type="button" data-val="weak">Weak</button>
+          </div>
+          <p class="st-control-note"><strong>Weak</strong> never fully returns to trend, the failed-recovery case. Historical is the default because past recoveries were reliable, but non-stationarity means the future is not guaranteed.</p>
+        </div>
       </div>
     </div>
-    <p class="st-assumptions" id="stAssumptions">&mdash;</p>
-  </section>
 
-  <!-- ════════ 4. THE TWO PATHS ════════ -->
-  <section class="st-section" id="paths">
-    <div class="st-eyebrow">The two paths</div>
-    <h2 class="st-h2">What the crash costs</h2>
+    <!-- Survive/deplete headline + full-width horizontal chart -->
     <div class="st-headline st-out-ok" id="stHeadline">&mdash;</div>
     <div class="st-chart-wrap" data-chart-copy data-chart-title="Retirement stress test: baseline vs. crashed path" data-chart-filename="retirement-stress-test.png"><canvas id="stChart"></canvas></div>
     <p class="st-chart-caption">Stack value over retirement, log scale, nominal dollars. The <strong style="color:#6db3d4">baseline</strong> is the plan with no crash; the <strong style="color:#e08a7a">crashed path</strong> is the same plan with your bear market. The gap between them is the sequence-of-returns cost. Faint lines are the Power Law trend and floor.</p>
+    <p class="st-assumptions" id="stAssumptions">&mdash;</p>
   </section>
 
   <!-- ════════ 5. COMPARISON (early-vs-late / crash-timing sweep) ════════ -->
@@ -132,7 +171,8 @@ eleventyComputed:
         </div>
       </div>
     </div>
-    <p class="st-lead" id="stTimingLead">This is the whole point. Hold the stack, the withdrawal, and the crash fixed, and move only <em>when</em> you retire. Retire early and you are selling into the crash before the stack has had years to compound, so the same plan that survives a later start can fail an earlier one. Retire later and the compounding does the cushioning.</p>
+    <p class="st-compar-summary" id="stComparSummary">&mdash;</p>
+    <p class="st-lead st-lead-full" id="stTimingLead">This is the whole point. Hold the stack, the withdrawal, and the crash fixed, and move only <em>when</em> you retire. Retire early and you are selling into the crash before the stack has had years to compound, so the same plan that survives a later start can fail an earlier one. Retire later and the compounding does the cushioning.</p>
     <div class="st-timing-grid">
       <div class="st-chart-wrap st-timing-chart" data-chart-copy data-chart-title="Sequence risk: same plan, survive or deplete on the retirement year" data-chart-filename="sequence-risk-comparison.png"><canvas id="stTimingChart"></canvas></div>
       <div class="st-timing-tablewrap">
@@ -170,12 +210,12 @@ eleventyComputed:
     <div class="st-eyebrow">What this means</div>
     <h2 class="st-h2">Reading the result</h2>
     <div class="st-prose st-prose-wide">
-      <p>A plan that survives a mid-severity crash in year 10 tells you little about the same plan meeting a deep crash in year 1. The tool exists to show that spread, including the outcomes where the stack does not make it. If your plan only survives on the assumption of a fast recovery, that is worth knowing now, while you can still change the stack, the income, or the year you retire.</p>
-      <p>Two framings sit side by side here. A badly-timed crash can do real, lasting damage to a Bitcoin retirement. And the same crash, met late or with room to spare, is nearly a non-event. Which one you get turns mostly on two things: <strong>when you retire</strong> and <strong>how much you withdraw relative to your stack</strong>. A larger stack helps, but it is not the deciding lever; retire early and draw hard and even a big stack can run out, while a modest withdrawal a few years later rides the same crash through. Stack size sets the sizing question, and that is where <a href="/how-much-bitcoin">How Much Bitcoin?</a> and the upside baseline on <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a> pick up.</p>
+      <p>A plan that survives a mid-severity crash in year 10 tells you little about the same plan meeting a deep crash in year 1. The exploration exists to show that spread, including the outcomes where the stack does not make it. If your plan only survives on the assumption of a fast recovery, that is worth knowing now, while you can still change the stack, the income, or the year you retire.</p>
+      <p>Two framings sit side by side here. A badly-timed crash can do real, lasting damage to a bitcoin retirement. And the same crash, met late or with room to spare, is nearly a non-event. Which one you get turns mostly on two things: <strong>when you retire</strong> and <strong>how much you withdraw relative to your stack</strong>. A larger stack helps, but it is not the deciding lever; retire early and draw hard and even a big stack can run out, while a modest withdrawal a few years later rides the same crash through. Stack size sets the sizing question, and that is where <a href="/how-much-bitcoin">How Much Bitcoin?</a> and the upside baseline on <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a> pick up.</p>
       <p class="st-v2">There is a lever this version does not yet model: <strong>reducing withdrawals during the crash</strong> rather than selling a fixed amount into the low. A future version will add it, the actionable counterpart to the &ldquo;don&rsquo;t sell into the bottom&rdquo; lesson from Bull &amp; Bear. For now, treat the fixed-withdrawal result as the cautious case.</p>
     </div>
     <div class="st-connect-grid">
-      <a class="st-connect-card" href="/the-bitcoin-retirement"><div class="st-connect-title">The Bitcoin Retirement</div><p>The baseline plan this page stress-tests.</p></a>
+      <a class="st-connect-card" href="/the-bitcoin-retirement"><div class="st-connect-title">The Bitcoin Retirement <span class="st-part-badge">Part 1</span></div><p>The upside baseline this exploration stress-tests. Start here.</p></a>
       <a class="st-connect-card" href="/bull-and-bear-cycles"><div class="st-connect-title">Bull &amp; Bear Cycles</div><p>The evidence behind the crash depths and recovery shapes.</p></a>
       <a class="st-connect-card" href="/how-much-bitcoin"><div class="st-connect-title">How Much Bitcoin?</div><p>If timing can break the plan, sizing is the lever.</p></a>
       <a class="st-connect-card" href="/disciplined-rebalancing"><div class="st-connect-title">Disciplined Rebalancing</div><p>Trimming into highs and rebuying into lows, instead of selling into the bottom.</p></a>
