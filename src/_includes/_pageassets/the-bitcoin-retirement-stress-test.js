@@ -85,7 +85,7 @@
     fast:       { years: 2, shape: 'fast',       label: 'Fast', note: 'back to trend in about 2 years' },
     historical: { years: 3, shape: 'historical', label: 'Historical', note: 'about 3 years to trend, the reliable past pattern' },
     slow:       { years: 6, shape: 'slow',       label: 'Slow', note: 'a long, grinding 6 years to trend' },
-    weak:       { years: 6, shape: 'never', ceiling: 0.6, label: 'Weak', note: 'never fully recovers, settling well below trend' }
+    weak:       { years: 6, shape: 'never', ceiling: 0.6, label: 'Weak', note: 'never fully returns to trend, settling toward the Power Law floor' }
   };
 
   // ── Shared assumptions (parity with the retirement page) ──
@@ -275,7 +275,7 @@
         interaction: { intersect: false, mode: 'index' }, layout: { padding: { top: 16, right: 8 } },
         scales: {
           x: { type: 'linear', min: win.min, max: win.max, grid: { color: 'rgba(224,148,34,0.05)' }, ticks: { color: MUTED, font: { size: 11 }, maxTicksLimit: 9, callback: function (v) { return Math.round(v); } } },
-          y: { type: 'logarithmic', grid: { color: 'rgba(224,148,34,0.06)' }, ticks: { color: MUTED, font: { size: 11 }, callback: function (v) { return usd(v); } } }
+          y: { type: 'logarithmic', grid: { color: 'rgba(224,148,34,0.06)' }, title: { display: true, text: 'Portfolio value (USD)', color: MUTED, font: { size: 10 } }, ticks: { color: MUTED, font: { size: 11 }, callback: function (v) { return usd(v); } } }
         },
         plugins: {
           legend: { display: true, position: 'top', labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 20, padding: 8, filter: function (it) { return it.text === 'Baseline (no crash)' || it.text === 'With the crash'; } } },
@@ -366,9 +366,11 @@
       { label: 'No crash', data: baseData, backgroundColor: 'rgba(122,115,103,0.28)', borderWidth: 0, borderRadius: 3, order: 2 },
       { label: 'With the crash', data: crashData, backgroundColor: colors, borderWidth: 0, borderRadius: 3, order: 1 }
     ];
+    var xTitle = COMPARE_MODE === 'retire' ? 'Retirement start year' : 'Year of retirement the crash hits';
     if (sweepChart) {
       sweepChart.data.labels = labels; sweepChart.data.datasets[0].data = baseData;
       sweepChart.data.datasets[1].data = crashData; sweepChart.data.datasets[1].backgroundColor = colors;
+      sweepChart.options.scales.x.title.text = xTitle;
       sweepChart.update('none'); return;
     }
     sweepChart = new Chart(el.getContext('2d'), {
@@ -378,7 +380,7 @@
         responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
         layout: { padding: { top: 8 } },
         scales: {
-          x: { grid: { display: false }, ticks: { color: DIM, font: { size: 11 } } },
+          x: { grid: { display: false }, ticks: { color: DIM, font: { size: 11 } }, title: { display: true, text: xTitle, color: MUTED, font: { size: 10 } } },
           y: { grid: { color: 'rgba(224,148,34,0.06)' }, ticks: { color: MUTED, font: { size: 11 }, callback: function (v) { return usd(v); } }, title: { display: true, text: "Final stack, today's $", color: MUTED, font: { size: 10 } } }
         },
         plugins: {
@@ -426,7 +428,7 @@
     if (COMPARE_MODE === 'retire') {
       if (title) title.textContent = 'The same plan, retiring in different years';
       if (lead) lead.innerHTML = 'This is the whole point. Hold the stack, the withdrawal, and the crash fixed, and move only <em>when</em> you retire. Retire early and you are selling into the crash before the stack has had years to compound, so the same plan that survives a later start can fail an earlier one. Retire later and the compounding does the cushioning.';
-      if (cap) cap.innerHTML = 'Final stack in today&rsquo;s dollars for each retirement year, same crash throughout. The faint bar is that year&rsquo;s plan with <strong>no crash</strong>; the solid bar is <strong>with the crash</strong>. A <span class="st-fail">✕ depletes</span> tag marks the years the stack runs to zero. The gap between the two bars is the crash&rsquo;s cost; it shrinks the later you retire.';
+      if (cap) cap.innerHTML = 'Each pair is a <strong>separate plan</strong> retiring in that start year, not one plan tracked over time. Final stack in today&rsquo;s dollars, same crash throughout. The faint bar is that year&rsquo;s plan with <strong>no crash</strong>; the solid bar is <strong>with the crash</strong>. A <span class="st-fail">✕ depletes</span> tag marks the years the stack runs to zero. The gap between the two bars is the crash&rsquo;s cost; it shrinks the later you retire.';
     } else {
       if (title) title.textContent = 'The same crash, at different years of retirement';
       if (lead) lead.innerHTML = 'Hold the plan and the crash fixed, and move only <em>which year of retirement</em> the bear market lands in. A crash early in retirement can break a plan that the identical crash, late, barely dents. Timing is decisive, and it is unknowable in advance.';
@@ -463,6 +465,7 @@
     var pct = pctSmaller(base.rows[base.rows.length - 1].usd, crashed.rows[crashed.rows.length - 1].usd);
     var baseFinalNom = base.rows[base.rows.length - 1].usd, crashFinalNom = crashed.rows[crashed.rows.length - 1].usd;
     var retN = crash.crashYear - SCENARIO.retirementYear + 1; // which year of retirement the crash hit
+    var endYear = SCENARIO.retirementYear + SCENARIO.yearsInRetirement;
     var sp = stressPeriod(crashed, crash);
 
     var cls, headline, detail, detailSub = '';
@@ -470,7 +473,7 @@
       cls = 'st-out-fail';
       var into = crashed.depletionYear - SCENARIO.retirementYear;
       headline = 'Your plan does not survive this scenario.';
-      detail = 'A ' + Math.round(crash.depthPct * 100) + '% crash in year ' + retN + ' of retirement drains the stack to zero in <strong>' + crashed.depletionYear + '</strong>, ' + yearsWord(into) + ' into a planned ' + yearsWord(SCENARIO.yearsInRetirement) + ' retirement. Without the crash, the same plan lasts the full ' + SCENARIO.yearsInRetirement + '.';
+      detail = 'A ' + Math.round(crash.depthPct * 100) + '% crash in year ' + retN + ' of retirement drains the stack to zero in <strong>' + crashed.depletionYear + '</strong>, ' + yearsWord(into) + ' into a planned ' + yearsWord(SCENARIO.yearsInRetirement) + ' retirement. Without the crash, the same plan lasts the full ' + SCENARIO.yearsInRetirement + ', to ' + endYear + '.';
       var toZero = crashed.depletionYear - crash.crashYear;
       if (toZero > 0) detailSub = 'From the crash hitting to the stack running dry is about ' + yearsWord(toZero) + ', selling more sats every year into a price that has not come back.';
     } else if (crashed.depletionYear && base.depletionYear) {
@@ -484,7 +487,7 @@
       if (sp && sp.dropPct >= 5 && sp.underwater >= 1) {
         var uw = yearsWord(sp.underwater);
         detail = 'But living it is a long hold. The stack falls to about <strong>' + usd(sp.troughUsd) + '</strong>, roughly <strong>' + sp.dropPct + '% below</strong> where it stood when the crash hit, and stays under that level for about <strong>' + uw + '</strong> before regaining it. The plan holds, but only because the recovery came. For those ' + sp.underwater + ' years you could not have known it would.';
-        detailSub = 'By the end the stack is about ' + pct + '% smaller than with no crash, ' + usd(crashFinalNom) + ' versus ' + usd(baseFinalNom) + ', but that final gap is not what you would feel. The years underwater are.';
+        detailSub = 'By ' + endYear + ' the stack is about ' + pct + '% smaller than with no crash, ' + usd(crashFinalNom) + ' versus ' + usd(baseFinalNom) + ', but that final gap is not what you would feel. The years underwater are.';
       } else {
         detail = 'It lasts the full ' + yearsWord(SCENARIO.yearsInRetirement) + ' and this crash barely dents it: the terminal stack is about <strong>' + pct + '% smaller</strong> than with no crash. Deepen the crash or move it earlier to see the stress bite.';
       }

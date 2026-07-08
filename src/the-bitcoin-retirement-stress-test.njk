@@ -146,7 +146,7 @@ eleventyComputed:
             <button type="button" data-val="slow">Slow</button>
             <button type="button" data-val="weak">Weak</button>
           </div>
-          <p class="st-control-note"><strong>Weak</strong> never fully returns to trend, the failed-recovery case. Historical is the default because past recoveries were reliable, but non-stationarity means the future is not guaranteed.</p>
+          <p class="st-control-note"><strong>Weak</strong> settles toward the Power Law floor and never fully returns to trend, the failed-recovery case. Historical is the default because past recoveries were reliable, but non-stationarity means the future is not guaranteed.</p>
         </div>
       </div>
     </div>
@@ -160,7 +160,7 @@ eleventyComputed:
       </div>
     </div>
     <div class="st-chart-wrap" data-chart-copy data-chart-title="Retirement stress test: baseline vs. crashed path" data-chart-filename="retirement-stress-test.png"><canvas id="stChart"></canvas></div>
-    <p class="st-chart-caption">Stack value over retirement, log scale, nominal dollars. The <strong style="color:#6db3d4">baseline</strong> is the plan with no crash; the <strong style="color:#e08a7a">crashed path</strong> is the same plan with your bear market. The gap between them is the sequence-of-returns cost. Faint lines are the Power Law trend and floor.</p>
+    <p class="st-chart-caption">Your stack&rsquo;s total value over retirement (the portfolio, not the bitcoin price), log scale, nominal dollars. The <strong style="color:#6db3d4">baseline</strong> is the plan with no crash; the <strong style="color:#e08a7a">crashed path</strong> is the same plan with your bear market. The gap between them is the sequence-of-returns cost. Faint lines are the Power Law trend and floor.</p>
     <p class="st-chart-caption st-focus-note" id="stFocusNote" hidden>Zoomed to the crash window: these are the years you would actually have to hold through, selling into the low the whole time, not knowing when it ends.</p>
     <p class="st-assumptions" id="stAssumptions">&mdash;</p>
   </section>

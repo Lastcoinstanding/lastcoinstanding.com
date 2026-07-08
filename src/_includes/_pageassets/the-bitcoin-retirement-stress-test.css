@@ -54,8 +54,10 @@ body { background: var(--bg); color: var(--text); }
 .st-partnote p { font-family: var(--font-b); font-size: 0.9rem; line-height: 1.6; color: var(--text-dim); margin: 0; }
 .st-partnote a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 
-/* Income-basis: full-width row so the two pills sit horizontally, matching Recovery's calm */
+/* Income-basis: full-row cell for horizontal room, but the pill control sizes to its content
+   and left-aligns under the label (a compact two-pill control, not a full-width bar). */
 .st-field-basis { grid-column: 1 / -1; }
+.st-field-basis .st-seg { align-self: flex-start; width: fit-content; }
 
 /* ══════════ TIER 2 — THE PLAYGROUND (year slider + three crash boxes) ══════════ */
 .st-play { margin: 1.3rem 0 1rem; }
