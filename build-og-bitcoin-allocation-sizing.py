@@ -22,8 +22,8 @@ TEMPLATE = "og-synthesis.jpg"
 TITLE_SIZE = 60           # three lines so the full name fits and every line clears the seam (x=620)
 TITLE_LINES = ["Bitcoin", "Allocation", "Sizing"]
 SUBTITLE_LINES = [
-    "What a given slice does to you:",
-    "upside, drawdown, and risk.",
+    "Does it earn its place in a portfolio?",
+    "The extra return, and its cost.",
 ]
 URL_FOOTER = "LASTCOINSTANDING.COM/BITCOIN-ALLOCATION-SIZING"
 TMP = tempfile.gettempdir()

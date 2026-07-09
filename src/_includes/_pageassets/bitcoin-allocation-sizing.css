@@ -105,12 +105,27 @@ body { background: var(--bg); color: var(--text); }
 .as-face-down { border-color: rgba(224,138,122,0.3); }
 .as-face-down .as-face-eyebrow { color: var(--red-soft); }
 .as-face-down .as-face-num { color: #f0a898; }
-/* Risk carries slight primacy — it's the least-intuitive, most honest face */
-.as-face-risk { border-color: rgba(224,148,34,0.42); background: linear-gradient(135deg, rgba(224,148,34,0.08), rgba(20,18,16,0.5)); }
+/* Risk is a peer caveat now (the verdict above is the star), with an amber accent */
+.as-face-risk { border-color: rgba(224,148,34,0.3); }
 .as-face-risk .as-face-eyebrow { color: var(--amber); }
 .as-face-risk .as-face-num { color: var(--amber); }
-.as-faces-note { font-family: var(--font-b); font-size: 0.8rem; line-height: 1.6; color: var(--text-muted); margin: 0.9rem 0 0; text-align: center; }
+.as-faces-note { font-family: var(--font-b); font-size: 0.8rem; line-height: 1.6; color: var(--text-muted); margin: 0.9rem 0 0; }
 .as-faces-note strong { color: var(--text-dim); }
+
+/* ══════════ THE VERDICT (the headline conclusion, upside WITH its cost) ══════════ */
+.as-verdict { border-radius: 12px; padding: 1.3rem 1.6rem; margin: 1.2rem 0; }
+.as-verdict-main { font-family: var(--font-d); font-size: clamp(1.35rem, 3vw, 1.75rem); font-weight: 500; line-height: 1.3; letter-spacing: -.01em; color: #f2eee8; }
+.as-verdict-main strong { font-weight: 600; }
+.as-verdict-detail { font-family: var(--font-b); font-size: 0.92rem; line-height: 1.65; color: var(--text-dim); margin: 0.7rem 0 0; }
+.as-verdict-detail strong { color: #f2eee8; font-weight: 600; }
+.as-verdict-yes { background: rgba(111,174,111,0.06); border: 1px solid rgba(111,174,111,0.3); border-left: 3px solid var(--green); }
+.as-verdict-yes .as-verdict-main strong { color: #d3e6d3; }
+.as-verdict-neutral { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-left: 3px solid rgba(224,148,34,0.5); }
+
+/* ══════════ AFTER YOU CHOOSE (rebalancing tension) ══════════ */
+.as-rebalance { font-family: var(--font-b); font-size: 1rem; line-height: 1.7; color: var(--text-dim); background: rgba(224,148,34,0.05); border: 1px solid rgba(224,148,34,0.24); border-left: 3px solid var(--amber); border-radius: 10px; padding: 1.2rem 1.4rem; }
+.as-rebalance strong { color: #f2eee8; font-weight: 600; }
+.as-rebalance a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 
 /* ══════════ CAN YOU HOLD IT ══════════ */
 .as-hold { font-family: var(--font-b); font-size: 1.02rem; line-height: 1.7; color: var(--text); background: rgba(192,57,43,0.06); border: 1px solid rgba(192,57,43,0.3); border-left: 3px solid var(--red-soft); border-radius: 10px; padding: 1.2rem 1.4rem; }

@@ -287,16 +287,16 @@
     }
   },
   {
-    "_comment": "Lived experience of a portfolio allocation % — upside/drawdown/risk-contribution together, never upside alone. The consequences counterpart to how-much-bitcoin (Kelly/optimal). Reuses Bull & Bear figures; SVG tile at components/calc-tile-icons/bitcoin-allocation-sizing.njk.",
+    "_comment": "Does a bitcoin allocation earn its place? Answers one question (worth it over a long horizon, despite drawdowns) with the three effects as supporting evidence; risk-contribution distinguished from drawdown. Consequences counterpart to how-much-bitcoin (Kelly/optimal). Grounded sourced defaults; reuses Bull & Bear figures. SVG tile at components/calc-tile-icons/bitcoin-allocation-sizing.njk.",
     "slug": "bitcoin-allocation-sizing",
     "title": "Bitcoin Allocation Sizing",
     "category": "numbers",
     "group": "Positioning & Strategy",
     "interactive": true,
     "calculator_tile": {
-      "tagline": "What does 10% in bitcoin actually do to you? See the upside, the drawdown, and the risk it drives &mdash; a 10% slice is about a quarter of your risk.",
+      "tagline": "Does bitcoin earn its place in a portfolio? The extra return over a long hold, the drawdown you would sit through, and the risk it drives, together. A 10% position is about a quarter of your risk.",
       "preview_kind": "svg",
-      "anchor": "#faces",
+      "anchor": "#worth-it",
       "position": 19
     }
   },
