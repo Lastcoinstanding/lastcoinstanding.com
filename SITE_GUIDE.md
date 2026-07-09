@@ -1835,3 +1835,21 @@ A revision pass after JM's content review, in two parts:
 ### Open items (stress test)
 - **Carousel slide** pending (needs a Grok Imagine video) per NEW_PAGE_CHECKLIST §8.
 - **v2 features** (worst-case auto-finder, reduce-withdrawals lever) per the build spec, tracked in TECH_DEBT.
+
+## 37. Bitcoin Allocation Sizing (`/bitcoin-allocation-sizing.html`)
+
+**Added July 2026.** A calculator in **The Numbers** (group *Positioning & Strategy*), the consequences counterpart to §-How Much Bitcoin. `interactive: true`, has a `calculator_tile` (SVG icon at `components/calc-tile-icons/`). Page-scoped classes use the `as-` prefix.
+
+**Thesis.** How Much Bitcoin answers *what fraction is optimal* (Kelly); this page answers *what a given fraction does to you*. The reader sets bitcoin as a percentage of a whole portfolio (rest in a traditional sleeve) and sees **three faces together, never upside alone**: upside captured, drawdown stomached (whole-portfolio hit in a chosen bitcoin bear), and the **risk contribution**, bitcoin's share of total portfolio variance. The honesty core is that upside is structurally never shown without its drawdown and risk cost beside it, and that the risk face is the least intuitive: a 10% dollar allocation is about a quarter of portfolio risk. It makes **no optimal-% recommendation** (that is Kelly / How Much Bitcoin).
+
+**The math (self-contained, matches published figures).** Two portfolios, `w` in BTC and `1−w` in a traditional sleeve, at stated illustrative defaults (BTC vol 45%, sleeve vol 12%, correlation **0.50**, kept on the high side per the post-ETF diversification-weakened note, register §11). `btcRiskShare(w)` = bitcoin's share of portfolio variance; `drawdownHit(w,d)=w·d`; single-hold upside `w·mBtc+(1−w)·mTrad`. QA reference points reproduced exactly: risk share 2%→4%, 5%→11%, **10%→24%**, **20%→48%**, 50%→85%; drawdown @−77% 5%→−4%, 10%→−8%, 20%→−15%, 50%→−38%; upside @5x/1.4x 10%→1.76x, 20%→2.12x. No new research pass; reuses the Bull & Bear register.
+
+**Inputs.** Primary lever: bitcoin allocation % (slider 0–100, presets 1/5/10/20). Scenario knobs: crash depth (−40/−60/−77 + slider, reusing the stress-test look) and bitcoin upside multiple; the traditional sleeve multiple is a stated default, adjustable. Optional total-portfolio $ (default blank → pure %) renders the hits as dollars. URL-encoded (`alloc`/`depth`/`up`/`trad`/`port`) so scenarios are shareable.
+
+**Outputs.** (a) The **three-faces panel** (upside / drawdown / risk, always together, risk given visual primacy); (b) the **comparison** across 1/5/10/20/50% as grouped bars (upside uplift, drawdown, risk contribution) + table, so upside is always plotted next to its costs and the non-linear divergence is visible; (c) a **"can you hold it?"** line translating the drawdown into the lived moment and tying to conviction/loss-aversion (Bull & Bear); (d) two-view audit table + CSV.
+
+### Integration
+`explorations.json` (group *Positioning & Strategy*, `interactive: true`, `calculator_tile` SVG at position 19); `sitemap.xml` @0.9; `llms.txt` (The Numbers); homepage concept card in The Numbers (after How Much Bitcoin) + Latest; `updates.json` (7/9/26); **bidirectional `related:`** with How Much Bitcoin, Bull & Bear Cycles, The Bitcoin Retirement, and Disciplined Rebalancing (reciprocal backlink added to How Much Bitcoin); OG card `og-bitcoin-allocation-sizing.jpg` via `build-og-bitcoin-allocation-sizing.py` (brand-forward §6.15.1, three-line title).
+
+### Open items (allocation sizing)
+- **Carousel slide** pending (needs a Grok Imagine video) per NEW_PAGE_CHECKLIST §8.

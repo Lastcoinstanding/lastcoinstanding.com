@@ -51,6 +51,7 @@ module.exports = function (eleventyConfig) {
     'og-wait-or-deploy-now.jpg',
     'og-bull-and-bear-cycles.jpg',
     'og-the-bitcoin-retirement-stress-test.jpg',
+    'og-bitcoin-allocation-sizing.jpg',
     'og-living-on-bitcoin.jpg',
     'og-paper-bitcoin.jpg',
     'og-risks-to-bitcoin.jpg',

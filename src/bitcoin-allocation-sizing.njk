@@ -1,0 +1,194 @@
+---
+layout: base.njk
+permalink: /bitcoin-allocation-sizing.html
+slug: bitcoin-allocation-sizing
+related:
+  - slug: how-much-bitcoin
+    desc: "The optimal fraction. How Much Bitcoin owns the Kelly maths, the theory of sizing; this page shows what living with a given fraction actually feels like. Start there for what to pick, come here for what it does to you."
+  - slug: bull-and-bear-cycles
+    desc: "Why the drawdowns are this deep, and why volatility is not the same as losing your money. The register behind the crash depths, volatility, and correlation figures this page uses."
+  - slug: the-bitcoin-retirement
+    desc: "What a stack does later, in decumulation. This page owns the accumulation-era allocation choice; the Retirement calculator picks up once you are drawing an income from it."
+  - slug: disciplined-rebalancing
+    desc: "Managing the allocation over time. Once you have chosen a percentage, trimming into highs and rebuying into lows is how you hold it steady through the swings."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/bitcoin-allocation-sizing-head.html' %}"
+  page_styles: "{% include '_pageassets/bitcoin-allocation-sizing.css' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/bitcoin-allocation-sizing.js' %}"
+---
+
+<section class="hero">
+  <h1>Bitcoin Allocation <em>Sizing</em></h1>
+  <div class="hero-subtitle">How Much Bitcoin finds the optimal fraction. This asks a blunter question: what does a given slice actually do to you?</div>
+  <p class="subtitle">Set bitcoin as a percentage of your whole portfolio and see the three faces of that choice at once: the <em>upside</em> you capture, the <em>drawdown</em> you have to stomach, and the <em>risk</em> bitcoin quietly contributes. A 10% slice of your money is closer to a quarter of your risk. This is the lived experience of the allocation, not the formula for it.</p>
+</section>
+
+<main class="content-area">
+
+  {% include 'components/tool-framing.njk' %}
+
+  <!-- ════════ INTRO ════════ -->
+  <div class="section-intro as-prose">
+    <p><a href="/how-much-bitcoin">How Much Bitcoin?</a> answers <em>what fraction is optimal</em>, the Kelly maths of sizing. This page answers a different question: what a given fraction actually <em>does</em> to you. Not the number to pick, but what each number feels like and costs. You hold bitcoin as a slice of a normal portfolio, the rest in a traditional sleeve, and you watch three things move together as you change the slice.</p>
+    <p>The rule here is that upside never appears on its own. Every gain sits beside the drawdown you would have to hold through and the share of your risk bitcoin now drives. The least intuitive of the three is that last one: a small dollar allocation is a large risk allocation. Put in 10% of your money and bitcoin drives about a quarter of your portfolio&rsquo;s ups and downs. That is not a flaw to hide; it is the number to size against.</p>
+    <p>Everything below is computed from stated, illustrative inputs, not forecasts. The page shows the consequences of a choice; it does not tell you which choice to make. That is your risk tolerance, and the optimal-fraction maths on How Much Bitcoin.</p>
+  </div>
+
+  <!-- ════════ CONTROLS: allocation + scenario ════════ -->
+  <section class="as-section" id="allocation">
+    <div class="as-eyebrow">Your allocation</div>
+    <h2 class="as-h2">Set the slice, and the scenario</h2>
+    <p class="as-lead">The primary lever is bitcoin as a percentage of your whole portfolio. Then pick how good the good case is and how deep the bad case is, and pressure-test the slice both ways.</p>
+
+    <div class="as-primary">
+      <div class="as-primary-head">
+        <span class="as-primary-label">Bitcoin allocation
+          <span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin as a share of your whole portfolio. The rest sits in a traditional sleeve (a 60/40-ish mix). This is the one lever the whole page turns on.</span></span>
+        </span>
+        <span class="as-primary-val"><input type="number" id="asAlloc" min="0" max="100" step="1" aria-label="Bitcoin allocation percent"><span class="as-primary-suffix">%</span></span>
+      </div>
+      <input type="range" id="asAllocSlider" class="as-range" min="0" max="100" step="1" aria-label="Bitcoin allocation slider">
+      <div class="as-seg as-seg-mini as-presets" id="asAllocPresets">
+        <button type="button" data-val="1">1%</button>
+        <button type="button" data-val="5">5%</button>
+        <button type="button" data-val="10">10%</button>
+        <button type="button" data-val="20">20%</button>
+      </div>
+      <p class="as-primary-note">The rest of the portfolio is a traditional sleeve. Drag the slice and watch the three faces below move together.</p>
+    </div>
+
+    <div class="as-controls">
+      <div class="as-control">
+        <div class="as-control-label">Bad case: crash depth
+          <span class="help-tip" tabindex="0">?<span class="tip-content">How far bitcoin falls peak-to-trough in a bear market. Your choice, not a prediction. &minus;77% is bitcoin&rsquo;s historical characteristic, not a forecast.</span></span>
+          <span class="as-control-val" id="asDepthVal">&minus;77%</span>
+        </div>
+        <input type="range" id="asDepthSlider" class="as-range as-range-red" min="20" max="90" step="1" aria-label="Crash depth percent">
+        <div class="as-seg as-seg-mini" id="asDepth">
+          <button type="button" data-val="40">&minus;40%</button>
+          <button type="button" data-val="60">&minus;60%</button>
+          <button type="button" data-val="77">&minus;77%</button>
+        </div>
+        <p class="as-control-note">Bitcoin&rsquo;s past bears have run as deep as roughly 70&ndash;80%, shallower as it matures. See <a href="/bull-and-bear-cycles">Bull &amp; Bear Cycles</a>.</p>
+      </div>
+
+      <div class="as-control">
+        <div class="as-control-label">Good case: bitcoin does
+          <span class="help-tip" tabindex="0">?<span class="tip-content">How much bitcoin grows over the hold, as a multiple. Illustrative, not a forecast. The traditional sleeve&rsquo;s own multiple is set below.</span></span>
+          <span class="as-control-val" id="asUpsideVal">5.00x</span>
+        </div>
+        <input type="range" id="asUpside" class="as-range" min="1" max="12" step="0.5" aria-label="Bitcoin upside multiple">
+        <p class="as-control-note">Real but not fantasy, and always shown with its risk cost, never on its own.</p>
+      </div>
+
+      <div class="as-control">
+        <div class="as-control-label">The rest of the portfolio does
+          <span class="help-tip" tabindex="0">?<span class="tip-content">The traditional sleeve&rsquo;s growth over the same hold, as a multiple. A stated default, adjustable if your baseline expectation differs.</span></span>
+          <span class="as-control-val" id="asTradVal">1.40x</span>
+        </div>
+        <input type="range" id="asTrad" class="as-range" min="0.5" max="3" step="0.05" aria-label="Traditional sleeve multiple">
+        <p class="as-control-note">The baseline your bitcoin slice is measured against.</p>
+      </div>
+
+      <div class="as-control">
+        <div class="as-field">
+          <span>Total portfolio (optional)
+            <span class="help-tip" tabindex="0">?<span class="tip-content">Enter a dollar amount to see the drawdown and upside as real dollars, not just percentages. Leave blank to stay in pure percentages.</span></span>
+          </span>
+          <input type="number" id="asPortfolio" min="0" step="1000" placeholder="e.g. 500000" aria-label="Total portfolio in dollars">
+          <p class="as-field-note">Optional. Makes the hit tangible: &minus;15% becomes &minus;$X.</p>
+        </div>
+      </div>
+    </div>
+    <p class="as-assumptions" id="asAssumptions">&mdash;</p>
+  </section>
+
+  <!-- ════════ THE THREE FACES (always together) ════════ -->
+  <section class="as-section" id="faces">
+    <div class="as-eyebrow">The three faces</div>
+    <h2 class="as-h2">What this allocation does to you</h2>
+    <p class="as-lead">The whole trade in one glance. Upside is never shown without the drawdown you would live through and the share of your risk bitcoin drives. All three move as you change the slice.</p>
+    <div class="as-faces">
+      <div class="as-face as-face-up" id="faceUpside">
+        <div class="as-face-eyebrow">Upside captured</div>
+        <div class="as-face-num">&mdash;</div>
+        <div class="as-face-unit">&mdash;</div>
+        <p class="as-face-detail">&mdash;</p>
+      </div>
+      <div class="as-face as-face-down" id="faceDrawdown">
+        <div class="as-face-eyebrow">Drawdown stomached</div>
+        <div class="as-face-num">&mdash;</div>
+        <div class="as-face-unit">&mdash;</div>
+        <p class="as-face-detail">&mdash;</p>
+      </div>
+      <div class="as-face as-face-risk" id="faceRisk">
+        <div class="as-face-eyebrow">Risk contribution</div>
+        <div class="as-face-num">&mdash;</div>
+        <div class="as-face-unit">&mdash;</div>
+        <p class="as-face-detail">&mdash;</p>
+      </div>
+    </div>
+    <p class="as-faces-note">The gut-punch is the <strong>risk</strong> face: the share of your risk always runs well ahead of the share of your money. That gap is the whole reason to size deliberately.</p>
+  </section>
+
+  <!-- ════════ THE COMPARISON ════════ -->
+  <section class="as-section" id="compare">
+    <div class="as-eyebrow">The comparison</div>
+    <h2 class="as-h2">The shape of the trade-off</h2>
+    <p class="as-lead">1% to 50% side by side, so you see the shape rather than one point. As the slice grows, upside rises, but drawdown and risk rise faster. That divergence is the non-linearity of allocation.</p>
+    <div class="as-compare-grid">
+      <div class="as-chart-wrap"><canvas id="asCompareChart"></canvas></div>
+      <div class="as-tablewrap">
+        <table class="as-table">
+          <thead id="asCompareHead"><tr><th>Allocation</th><th class="as-num">Upside</th><th class="as-num">Drawdown</th><th class="as-num">Risk share</th></tr></thead>
+          <tbody id="asCompareBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="as-chart-caption">Each group is a separate allocation, not one portfolio over time. <strong style="color:#6fae6f">Upside uplift</strong> is how much more your portfolio grows than with no bitcoin; <strong style="color:#e08a7a">drawdown</strong> is the whole-portfolio hit in the chosen bear; <strong style="color:#e09422">risk contribution</strong> is bitcoin&rsquo;s share of your portfolio risk. Upside is always plotted next to its costs.</p>
+  </section>
+
+  <!-- ════════ CAN YOU HOLD IT ════════ -->
+  <section class="as-section" id="hold">
+    <div class="as-eyebrow">Can you hold it?</div>
+    <h2 class="as-h2">The number you have to live through</h2>
+    <p class="as-hold" id="asHold">&mdash;</p>
+  </section>
+
+  <!-- ════════ AUDIT ════════ -->
+  <section class="as-section" id="audit">
+    <button class="as-audit-toggle" id="asAuditToggle" aria-expanded="false">
+      <span class="as-audit-label">Verify the math</span>
+      <span class="as-audit-hint">upside, drawdown, and risk contribution for each allocation, computed from the stated inputs.</span>
+    </button>
+    <div id="asAuditBody2" hidden>
+      <div class="as-audit-actions">
+        <button type="button" class="as-csv-btn" id="asCsvBtn"><span class="as-csv-label">Download CSV</span></button>
+      </div>
+      <div class="as-tablewrap">
+        <table class="as-table">
+          <thead id="asAuditHead"><tr><th>Allocation</th><th class="as-num">Portfolio upside</th><th class="as-num">Upside uplift</th><th class="as-num">Drawdown</th><th class="as-num">Risk share</th></tr></thead>
+          <tbody id="asAuditBody"></tbody>
+        </table>
+      </div>
+      <p class="as-chart-caption">Risk contribution is bitcoin&rsquo;s share of total portfolio variance, given bitcoin volatility 45%, the traditional sleeve 12%, and a 0.50 correlation. Drawdown is the allocation times the crash depth. Upside is the weighted single-hold multiple. The figures match the published risk-contribution reference points (10% of capital is about a quarter of risk).</p>
+    </div>
+  </section>
+
+  <!-- ════════ WHERE THIS CONNECTS ════════ -->
+  <section class="as-section" id="connects">
+    <div class="as-eyebrow">Where this connects</div>
+    <h2 class="as-h2">The rest of the chain</h2>
+    <div class="as-prose as-prose-wide">
+      <p>This page owns the accumulation-era allocation choice: what a given slice does to you while you are building the position. It does not tell you the number to pick. The optimal fraction is a maths problem, and it lives on How Much Bitcoin. What a stack does later, once you are drawing an income from it, lives on the Retirement pages. And holding a chosen allocation steady through the swings is the behaviour Disciplined Rebalancing is about.</p>
+      <p>One honest note on the assumptions: bitcoin&rsquo;s diversification benefit has weakened since the ETFs arrived, with its correlation to traditional markets running higher than it once did. This page keeps the correlation on the high side for that reason, so it does not overstate the free-diversification case.</p>
+    </div>
+    <div class="as-connect-grid">
+      <a class="as-connect-card" href="/how-much-bitcoin"><div class="as-connect-title">How Much Bitcoin? <span class="as-part-badge">the optimal fraction</span></div><p>The Kelly maths: what fraction is optimal. This page shows what living with a fraction feels like; that one tells you what to aim for.</p></a>
+      <a class="as-connect-card" href="/bull-and-bear-cycles"><div class="as-connect-title">Bull &amp; Bear Cycles</div><p>Why the drawdowns are this deep, and why volatility is not the same as losing your money.</p></a>
+      <a class="as-connect-card" href="/the-bitcoin-retirement"><div class="as-connect-title">The Bitcoin Retirement</div><p>What the stack does later, in decumulation, once you are drawing an income.</p></a>
+      <a class="as-connect-card" href="/disciplined-rebalancing"><div class="as-connect-title">Disciplined Rebalancing</div><p>Holding a chosen allocation steady: trimming into highs, rebuying into lows.</p></a>
+    </div>
+  </section>
+
+</main>
