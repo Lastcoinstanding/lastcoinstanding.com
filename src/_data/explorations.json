@@ -287,14 +287,14 @@
     }
   },
   {
-    "_comment": "Does a bitcoin allocation earn its place? Answers one question (worth it over a long horizon, despite drawdowns) with the three effects as supporting evidence; risk-contribution distinguished from drawdown. Consequences counterpart to how-much-bitcoin (Kelly/optimal). Grounded sourced defaults; reuses Bull & Bear figures. SVG tile at components/calc-tile-icons/bitcoin-allocation-sizing.njk.",
+    "_comment": "Does a bitcoin allocation earn its place? Answers one question (worth it over a long horizon, despite drawdowns) with three effects as evidence. Reframed to match The Bitcoin Horizon: the third effect is 'portfolio influence' (the neutral engine, NOT risk); true risk is the drawdown you cannot hold through. Bitcoin growth projected from the Power Law, regime-aware. Consequences counterpart to how-much-bitcoin (Kelly/optimal). SVG tile at components/calc-tile-icons/bitcoin-allocation-sizing.njk.",
     "slug": "bitcoin-allocation-sizing",
-    "title": "Bitcoin Allocation Sizing",
+    "title": "Bitcoin Portfolio Allocation",
     "category": "numbers",
     "group": "Positioning & Strategy",
     "interactive": true,
     "calculator_tile": {
-      "tagline": "Does bitcoin earn its place in a portfolio? The extra return over a long hold, the drawdown you would sit through, and the risk it drives, together. A 10% position is about a quarter of your risk.",
+      "tagline": "Does bitcoin earn its place in a portfolio? The extra return over a long hold, the drawdown you must be able to hold through, and how much of the portfolio's movement it drives. Growth projected from the Power Law.",
       "preview_kind": "svg",
       "anchor": "#worth-it",
       "position": 19

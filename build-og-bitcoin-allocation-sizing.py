@@ -20,7 +20,7 @@ SEED = 4113; random.seed(SEED)
 TEMPLATE = "og-synthesis.jpg"
 
 TITLE_SIZE = 60           # three lines so the full name fits and every line clears the seam (x=620)
-TITLE_LINES = ["Bitcoin", "Allocation", "Sizing"]
+TITLE_LINES = ["Bitcoin", "Portfolio", "Allocation"]
 SUBTITLE_LINES = [
     "Does it earn its place in a portfolio?",
     "The extra return, and its cost.",

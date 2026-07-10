@@ -2,7 +2,7 @@
   {
     "display": "7/9/26",
     "page": "/bitcoin-allocation-sizing.html",
-    "summary": "New: Bitcoin Allocation Sizing. How Much Bitcoin finds the optimal fraction; this answers a plainer question: over a long horizon, does adding bitcoin make your portfolio meaningfully better, despite the drawdowns? Set an allocation and get the answer with its cost in the same breath: the extra return over the hold, the one-time drawdown you would have to sit through, and the share of your portfolio's ongoing risk bitcoin drives (a one-time crash hit and a structural risk share are different things, and the page keeps them apart). Grounded, sourced defaults, a 10-year hold, an S&P-like sleeve, and a Power-Law-tempered bitcoin rate, so you are not guessing. A 10% position adds real return over a long hold and is about a quarter of your risk. It makes no recommendation on what to pick."
+    "summary": "New: Bitcoin Portfolio Allocation. How Much Bitcoin finds the optimal fraction; this answers a plainer question: over a long horizon, does adding bitcoin make your portfolio meaningfully better, despite the drawdowns? Set an allocation and get the answer with its cost in the same breath: the extra return, the drawdown you must be able to hold through, and how much of your portfolio's movement bitcoin drives. That movement is the engine of the return, not a hazard: volatility is not risk, and the real danger is being shaken out and selling into the fall. Bitcoin's growth is projected from its Power Law with a regime-aware default, and a transparency line explains why the number is what it is. The assumptions sit above the slider with a reset, and it makes no recommendation on what to pick."
   },
   {
     "display": "7/6/26",

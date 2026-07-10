@@ -1,5 +1,5 @@
 /* =============================================================
-   Bitcoin Allocation Sizing — page styles
+   Bitcoin Portfolio Allocation — page styles
    House tokens; mixed-content width tier (1100 page / 880 prose).
    The discipline is visual too: the three faces render as one panel,
    upside never alone; the risk face carries slight primacy.
@@ -111,6 +111,22 @@ body { background: var(--bg); color: var(--text); }
 .as-face-risk .as-face-num { color: var(--amber); }
 .as-faces-note { font-family: var(--font-b); font-size: 0.8rem; line-height: 1.6; color: var(--text-muted); margin: 0.9rem 0 0; }
 .as-faces-note strong { color: var(--text-dim); }
+
+/* Assumptions header (title + reset) */
+.as-compare-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 0.6rem 1.2rem; flex-wrap: wrap; margin: 0 0 0.2rem; }
+.as-compare-head .as-h2 { margin: 0; }
+.as-reset { font-family: var(--font-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; color: var(--text-dim); background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 999px; padding: 0.4rem 0.9rem; cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s; }
+.as-reset:hover { background: rgba(224,148,34,0.1); color: var(--amber); border-color: rgba(224,148,34,0.4); }
+
+/* Flat-rate override reveal (inside the bitcoin-projection control) */
+.as-flat-wrap { display: flex; align-items: center; gap: 0.7rem; margin-top: 0.55rem; }
+.as-flat-wrap[hidden] { display: none; }
+.as-flat-wrap .as-range { flex: 1; }
+.as-flat-val { font-family: var(--font-b); font-size: 0.85rem; font-weight: 600; color: #f2eee8; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Regime transparency line (why the bitcoin number is what it is) */
+.as-regime { font-family: var(--font-b); font-size: 0.86rem; line-height: 1.6; color: var(--text-muted); margin: 0 0 1.1rem; padding: 0.65rem 0.95rem; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-left: 3px solid rgba(224,148,34,0.5); }
+.as-regime strong { color: var(--text-dim); font-weight: 600; }
 
 /* ══════════ THE VERDICT (the headline conclusion, upside WITH its cost) ══════════ */
 .as-verdict { border-radius: 12px; padding: 1.3rem 1.6rem; margin: 1.2rem 0; }
