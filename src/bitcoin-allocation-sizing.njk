@@ -53,15 +53,14 @@ eleventyComputed:
         <p class="as-control-note">A long enough hold has historically overcome even a surprise drawdown. See <a href="/the-bitcoin-horizon">The Bitcoin Horizon</a>.</p>
       </div>
 
-      <div class="as-control">
+      <div class="as-control as-control-growth">
         <div class="as-control-label">Bitcoin grows by
-          <span class="help-tip" tabindex="0">?<span class="tip-content">Projected from bitcoin&rsquo;s Power Law, not a flat guess. Below trend the default holds today&rsquo;s discount and grows with the trend; at or above trend it assumes a return to trend, not a lasting premium. Return-to-trend and flat-rate are also available.</span></span>
           <span class="as-control-val" id="asBtcModeVal">—</span>
         </div>
-        <div class="as-seg as-seg-mini" id="asBtcMode">
-          <button type="button" data-val="hold">Hold today&rsquo;s ratio</button>
-          <button type="button" data-val="revert">Return to trend</button>
-          <button type="button" data-val="flat">Flat rate</button>
+        <div class="as-seg as-seg-mini as-seg-even" id="asBtcMode">
+          <button type="button" data-val="hold">Hold today&rsquo;s ratio<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin keeps its current position relative to the Power Law trend (about 0.44&times; today) and grows along with the trend from there. Conservative from a discount: it does not assume the discount closes.</span></span></button>
+          <button type="button" data-val="revert">Return to trend<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin converges back to its full Power Law trend by the end of the hold. The more optimistic reading, since today&rsquo;s price sits below trend.</span></span></button>
+          <button type="button" data-val="flat">Flat rate<span class="help-tip" tabindex="0">?<span class="tip-content">A simple constant annual growth rate you set yourself, ignoring the Power Law curve. A manual override for a reader with their own expectation.</span></span></button>
         </div>
         <div class="as-flat-wrap" id="asFlatWrap" hidden>
           <input type="range" id="asFlatRate" class="as-range as-range-red" min="0" max="30" step="1" aria-label="Flat bitcoin rate">
@@ -167,7 +166,7 @@ eleventyComputed:
         </table>
       </div>
     </div>
-    <p class="as-chart-caption">Each group is a separate allocation, not one portfolio over time. <strong style="color:#6fae6f">Extra return</strong> is how much more your portfolio grows than with no bitcoin over the hold; <strong style="color:#e08a7a">drawdown</strong> is the whole-portfolio fall you must hold through in the chosen bear; <strong style="color:#e09422">portfolio influence</strong> is bitcoin&rsquo;s share of the movement. The upside is always plotted next to its costs.</p>
+    <p class="as-chart-caption">Each group is a separate allocation, not one portfolio over time. <strong style="color:#6fae6f">Extra return</strong> and <strong style="color:#e08a7a">drawdown</strong> are uncapped magnitudes, plotted as bars on the left axis. <strong style="color:#e09422">Portfolio influence</strong> is a different kind of thing, a share that runs 0 to 100%, so it rides the <strong style="color:#e09422">line</strong> on the right axis rather than being compared in bar height. Read it as: the position&rsquo;s pull on the whole portfolio climbs fast even while the money in it stays small.</p>
   </section>
 
   <!-- ════════ REBALANCING TEMPTATION ════════ -->
@@ -177,11 +176,20 @@ eleventyComputed:
     <p class="as-rebalance" id="asRebalance">&mdash;</p>
   </section>
 
-  <!-- ════════ CAN YOU HOLD IT ════════ -->
+  <!-- ════════ CAN YOU HOLD IT (dip chart + honest net framing) ════════ -->
   <section class="as-section" id="hold">
     <div class="as-eyebrow">Can you hold it?</div>
-    <h2 class="as-h2">The number you have to live through</h2>
-    <p class="as-hold" id="asHold">&mdash;</p>
+    <h2 class="as-h2">The dip you have to hold through</h2>
+    <div class="as-dip-grid">
+      <div class="as-dip-panel">
+        <div class="as-dip-chart-wrap"><canvas id="asDipChart"></canvas></div>
+        <p class="as-dip-caption">Illustrative: one bear market, held through. The <strong>depth is your computed drawdown</strong>; the timing and recovery are stylized, since this is a single-hold model, not a year-by-year path.</p>
+      </div>
+      <div class="as-dip-copy">
+        <p class="as-net" id="asNet">&mdash;</p>
+        <p class="as-hold" id="asHold">&mdash;</p>
+      </div>
+    </div>
   </section>
 
   <!-- ════════ AUDIT ════════ -->

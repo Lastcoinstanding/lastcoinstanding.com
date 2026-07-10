@@ -32,7 +32,7 @@
   var BTC_VOL = 0.45, TRAD_VOL = 0.12, CORR = 0.50;
 
   // ── Palette ──
-  var MUTED = '#7a7367', DIM = '#9a9080';
+  var MUTED = '#7a7367', DIM = '#9a9080', C_DOWN = '#e08a7a';
 
   // ── Live Power Law context (spot vs trend today) ──
   var spot = TODAY_PRICE;
@@ -191,6 +191,63 @@
     if (d) d.innerHTML = detail;
   }
 
+  // ════════ DRAWDOWN DIP CHART (real depth, illustrative recovery) ════════
+  // Single-hold model, so this conveys SHAPE, not a path: the dip's DEPTH is the reader's
+  // computed drawdown; the timing and recovery are a stylized, labeled illustration.
+  var dipChart = null;
+  var DIP_SHAPE = [0, 0, 0.32, 1, 0.86, 0.56, 0.3, 0.1, 0.02, 0, 0]; // fraction of full depth (1 = trough)
+  var dipPlugin = {
+    id: 'asDip',
+    afterDatasetsDraw: function (c) {
+      var dd = c.$dd; if (dd == null) return;
+      var xS = c.scales.x, yS = c.scales.y, ctx = c.ctx;
+      var y100 = yS.getPixelForValue(100);
+      ctx.save();
+      ctx.setLineDash([4, 3]); ctx.strokeStyle = 'rgba(236,228,214,0.4)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(xS.left, y100); ctx.lineTo(xS.right, y100); ctx.stroke();
+      ctx.setLineDash([]); ctx.fillStyle = 'rgba(236,228,214,0.55)'; ctx.font = '600 9px Inter, sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText('before the bear', xS.left + 4, y100 - 4);
+      var tx = xS.getPixelForValue(3), ty = yS.getPixelForValue(100 - dd * 100);
+      ctx.fillStyle = '#e08a7a'; ctx.font = '700 12px Inter, sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('−' + (dd * 100).toFixed(1) + '%', tx, ty + 15);
+      ctx.fillStyle = 'rgba(236,228,214,0.55)'; ctx.font = '600 9px Inter, sans-serif'; ctx.textAlign = 'right';
+      ctx.fillText('held through, recovered', xS.right - 4, y100 - 4);
+      ctx.restore();
+    }
+  };
+  function renderDipChart() {
+    var el = document.getElementById('asDipChart'); if (!el || typeof Chart === 'undefined') return;
+    var dd = effects(S.allocPct / 100).drawdown;
+    var pts = DIP_SHAPE.map(function (s, i) { return { x: i, y: +(100 - s * dd * 100).toFixed(2) }; });
+    var yMin = Math.min(94, 100 - dd * 100 * 1.5);
+    if (dipChart) {
+      dipChart.data.datasets[0].data = pts; dipChart.options.scales.y.min = yMin; dipChart.$dd = dd; dipChart.update('none'); return;
+    }
+    dipChart = new Chart(el.getContext('2d'), {
+      type: 'line',
+      data: { datasets: [{ data: pts, borderColor: C_DOWN, backgroundColor: 'rgba(224,138,122,0.12)', borderWidth: 2, pointRadius: 0, tension: 0.35, fill: 'origin' }] },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: { duration: 0 }, layout: { padding: { top: 6 } },
+        scales: {
+          x: { type: 'linear', min: 0, max: 10, grid: { display: false }, ticks: { display: false }, title: { display: true, text: 'illustrative timeline, not a modeled path', color: MUTED, font: { size: 9 } } },
+          y: { min: yMin, max: 101.5, grid: { color: 'rgba(224,148,34,0.06)' }, ticks: { color: MUTED, font: { size: 10 }, callback: function (v) { return v + '%'; } } }
+        },
+        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+      },
+      plugins: [dipPlugin]
+    });
+    dipChart.$dd = dd;
+  }
+
+  // ════════ HONEST NET FRAMING (reward for holding through, NOT extra-minus-drawdown) ════════
+  function renderNet() {
+    var el = document.getElementById('asNet'); if (!el) return;
+    var f = effects(S.allocPct / 100);
+    if (S.allocPct <= 0) { el.hidden = true; return; }
+    el.hidden = false;
+    el.innerHTML = 'The <strong>' + signedPct(f.uplift, 1) + '</strong> extra return is the reward for holding through this dip, not a bonus you keep no matter what. It is yours only if you do not sell into the fall. So the question is not whether ' + signedPct(f.uplift, 1) + ' beats a ' + pct(f.drawdown, 1) + ' fall, it is whether you can sit through the <strong>−' + pct(f.drawdown, 1) + '</strong>, and the deeper ones a larger position brings, to earn it.';
+  }
+
   // ════════ "CAN YOU HOLD IT?" ════════
   function renderHold() {
     var el = document.getElementById('asHold'); if (!el) return;
@@ -229,10 +286,13 @@
     var upData = rows.map(function (r) { return +(r.uplift * 100).toFixed(1); });
     var dnData = rows.map(function (r) { return +(r.drawdown * 100).toFixed(1); });
     var inData = rows.map(function (r) { return +(r.influence * 100).toFixed(1); });
+    // Extra return + drawdown are uncapped magnitudes (bars, left axis). Portfolio influence is
+    // a bounded 0–100% share, a different kind of thing, so it rides its own line + right axis
+    // rather than being compared in bar height against the uncapped bars.
     var ds = [
-      { label: 'Extra return', data: upData, backgroundColor: 'rgba(111,174,111,0.75)', borderWidth: 0, borderRadius: 3 },
-      { label: 'Drawdown', data: dnData, backgroundColor: 'rgba(224,138,122,0.8)', borderWidth: 0, borderRadius: 3 },
-      { label: 'Portfolio influence', data: inData, backgroundColor: 'rgba(224,148,34,0.8)', borderWidth: 0, borderRadius: 3 }
+      { type: 'bar', label: 'Extra return', data: upData, backgroundColor: 'rgba(111,174,111,0.75)', borderWidth: 0, borderRadius: 3, yAxisID: 'y', order: 2 },
+      { type: 'bar', label: 'Drawdown', data: dnData, backgroundColor: 'rgba(224,138,122,0.8)', borderWidth: 0, borderRadius: 3, yAxisID: 'y', order: 2 },
+      { type: 'line', label: 'Portfolio influence (share)', data: inData, borderColor: '#e09422', backgroundColor: '#e09422', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#e09422', tension: 0.25, yAxisID: 'y1', order: 1 }
     ];
     if (compareChart) {
       compareChart.data.labels = labels;
@@ -246,7 +306,8 @@
         responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
         scales: {
           x: { grid: { display: false }, ticks: { color: DIM, font: { size: 12 } }, title: { display: true, text: 'Bitcoin allocation (share of your money)', color: MUTED, font: { size: 10 } } },
-          y: { grid: { color: 'rgba(224,148,34,0.06)' }, ticks: { color: MUTED, font: { size: 11 }, callback: function (v) { return v + '%'; } }, title: { display: true, text: 'Percent', color: MUTED, font: { size: 10 } } }
+          y: { position: 'left', grid: { color: 'rgba(224,148,34,0.06)' }, ticks: { color: MUTED, font: { size: 11 }, callback: function (v) { return v + '%'; } }, title: { display: true, text: 'Return / drawdown', color: MUTED, font: { size: 10 } } },
+          y1: { position: 'right', min: 0, max: 100, grid: { drawOnChartArea: false }, ticks: { color: 'rgba(224,148,34,0.8)', font: { size: 11 }, callback: function (v) { return v + '%'; } }, title: { display: true, text: 'Influence (share)', color: 'rgba(224,148,34,0.8)', font: { size: 10 } } }
         },
         plugins: {
           legend: { display: true, position: 'top', labels: { color: DIM, font: { size: 11 }, usePointStyle: true, pointStyle: 'rectRounded', boxWidth: 10, padding: 12 } },
@@ -336,6 +397,8 @@
     renderRegime();
     renderConclusion();
     renderEffects();
+    renderDipChart();
+    renderNet();
     renderHold();
     renderRebalance();
     var rows = compareRows();
