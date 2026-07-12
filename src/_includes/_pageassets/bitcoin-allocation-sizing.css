@@ -226,7 +226,6 @@ body { background: var(--bg); color: var(--text); }
 .as-drift-caption strong { color: #f2eee8; font-weight: 600; }
 .as-drift-caption a, .as-drift-caption a:visited { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 .as-drift-caption a:hover { color: #f2b25a; border-bottom-color: rgba(224,148,34,0.7); }
-.as-drift-model-note { font-family: var(--font-b); font-size: 0.76rem; line-height: 1.55; color: var(--text-muted); margin: 1rem 0 0; }
 .as-audit-subhead { font-family: var(--font-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); margin: 1.6rem 0 0.6rem; }
 @media (max-width: 560px) {
   .as-drift-comp-row { flex-wrap: wrap; }

@@ -58,7 +58,7 @@ eleventyComputed:
           <span class="as-control-val" id="asBtcModeVal">—</span>
         </div>
         <div class="as-seg as-seg-mini as-seg-even" id="asBtcMode">
-          <button type="button" data-val="hold">Hold today&rsquo;s ratio<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin keeps its current position relative to the Power Law trend (about 0.44&times; today) and grows along with the trend from there. Conservative from a discount: it does not assume the discount closes.</span></span></button>
+          <button type="button" data-val="hold">Today&rsquo;s gap to trend persists<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin keeps its current position relative to the Power Law trend (about 0.44&times; today) and grows along with the trend from there. Conservative from a discount: it does not assume the gap to trend closes.</span></span></button>
           <button type="button" data-val="revert">Return to trend<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin converges back to its full Power Law trend by the end of the hold. The more optimistic reading, since today&rsquo;s price sits below trend.</span></span></button>
           <button type="button" data-val="flat">Flat rate<span class="help-tip" tabindex="0">?<span class="tip-content">A simple constant annual growth rate you set yourself, ignoring the Power Law curve. A manual override for a reader with their own expectation.</span></span></button>
         </div>
@@ -200,8 +200,6 @@ eleventyComputed:
         <p class="as-drift-caption">The winner drifts up. Left alone, the faster-growing sleeve takes over the portfolio &mdash; compounding the upside and, with it, the size of the bite a crash takes (the dashed line). Rebalancing annually pins both back to your target. One honest note about this comparison: on a smooth trend path like this projection, rebalancing always trims the faster asset, so it will always show the lower endpoint here. A real, volatile path is where rebalancing earns its keep &mdash; buying weakness, trimming strength. This chart shows the drift trade-off, not a verdict on rebalancing; for the strategy built on volatility itself, see <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>.</p>
       </div>
     </div>
-
-    <p class="as-drift-model-note">The dashed line applies your chosen crash depth to the bitcoin sleeve only, matching this page&rsquo;s drawdown model; in a real crash the rest of the portfolio rarely stands still.</p>
   </section>
 
   <!-- ════════ THE COMPARISON ════════ -->
