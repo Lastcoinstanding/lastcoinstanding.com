@@ -1114,10 +1114,16 @@
     var deepLink = S.crashOn || hash === '#crash' || hash === '#portfolio-over-time';
     wire(); renderAll();
     paritySweep(); // dev self-check: full matrix loop-vs-closed-form parity (silent unless it fails)
-    if (deepLink && window.requestAnimationFrame) {
-      requestAnimationFrame(function () { requestAnimationFrame(function () {
-        var sec = document.getElementById('portfolio-over-time'); if (sec) sec.scrollIntoView({ block: 'start' });
-      }); });
+    if (deepLink) {
+      var scrollToDrift = function () {
+        var sec = document.getElementById('portfolio-over-time');
+        if (sec && sec.scrollIntoView) requestAnimationFrame(function () { sec.scrollIntoView({ block: 'start' }); });
+      };
+      // Fire after full load (survives late layout shifts from the charts above),
+      // and once more shortly after as a fallback — without fighting native hash scroll.
+      if (document.readyState === 'complete') scrollToDrift();
+      else window.addEventListener('load', scrollToDrift);
+      setTimeout(scrollToDrift, 400);
     }
     // Refresh the spot price (and with it the regime + projection) from the live feed.
     try { fetchTodayPrice(function (price) { if (isFinite(price) && price > 0) { spot = price; if (S.btcMode == null) setSeg('asBtcMode', activeMode()); updateReadouts(); renderAll(); } }); } catch (e) {}
