@@ -1,5 +1,10 @@
 [
   {
+    "display": "7/12/26",
+    "page": "/bitcoin-allocation-sizing.html",
+    "summary": "Updated: Bitcoin Portfolio Allocation — a new \"Your portfolio, year by year\" chart. Watch a small bitcoin position drift from a sliver into a dominant share of the portfolio over your horizon, with a dashed crash line that shows how the same-depth bear takes a bigger bite as the position grows. Composition bars read your share today and at the horizon, and an optional comparison asks what annual rebalancing would do — with an honest note that on a smooth trend path rebalancing always shows the lower endpoint, so this is the drift trade-off, not a verdict on rebalancing. The year-by-year path is in the audit table and CSV."
+  },
+  {
     "display": "7/9/26",
     "page": "/bitcoin-allocation-sizing.html",
     "summary": "New: Bitcoin Portfolio Allocation. How Much Bitcoin finds the optimal fraction; this answers a plainer question: over a long horizon, does adding bitcoin make your portfolio meaningfully better, despite the drawdowns? Set an allocation and get the answer with its cost in the same breath: the extra return, the drawdown you must be able to hold through, and how much of your portfolio's movement bitcoin drives. That movement is the engine of the return, not a hazard: volatility is not risk, and the real danger is being shaken out and selling into the fall. Bitcoin's growth is projected from its Power Law with a regime-aware default, and a transparency line explains why the number is what it is. The assumptions sit above the slider with a reset, and it makes no recommendation on what to pick."

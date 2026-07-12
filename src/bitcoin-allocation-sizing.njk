@@ -152,6 +152,46 @@ eleventyComputed:
     <p class="as-faces-note">Two of these are the cost and one is the engine. The <strong>drawdown</strong> is the fall you must be able to hold through; the real risk is selling into it. <strong>Portfolio influence</strong> is not a hazard, it is the movement that does the work, the same coin as the extra return.</p>
   </section>
 
+  <!-- ════════ YOUR PORTFOLIO, YEAR BY YEAR (drift chart) ════════ -->
+  <section class="as-section as-drift" id="portfolio-over-time">
+    <div class="as-eyebrow">Over the horizon</div>
+    <h2 class="as-h2">Your portfolio, year by year</h2>
+    <p class="as-lead as-drift-sub">How the two sleeves grow &mdash; and how the balance between them shifts &mdash; under the assumptions you set above.</p>
+
+    <div class="as-drift-chart chart-wrapper" data-chart-copy data-chart-title="Your portfolio, year by year">
+      <canvas id="asDriftChart"></canvas>
+    </div>
+
+    <div class="as-drift-comp" id="asDriftComp" aria-live="polite">
+      <div class="as-drift-comp-row">
+        <span class="as-drift-comp-when">Today</span>
+        <span class="as-drift-comp-bar"><span class="as-drift-comp-btc" id="asCompBtc0"></span><span class="as-drift-comp-trad" id="asCompTrad0"></span></span>
+        <span class="as-drift-comp-share" id="asCompShare0">&mdash;</span>
+      </div>
+      <div class="as-drift-comp-row">
+        <span class="as-drift-comp-when" id="asCompWhenH">At year 10</span>
+        <span class="as-drift-comp-bar"><span class="as-drift-comp-btc" id="asCompBtcH"></span><span class="as-drift-comp-trad" id="asCompTradH"></span></span>
+        <span class="as-drift-comp-share" id="asCompShareH">&mdash;</span>
+      </div>
+    </div>
+    <p class="as-drift-endnote" id="asDriftEndnote">&mdash;</p>
+
+    <div class="as-drift-rebal">
+      <button type="button" class="as-drift-disclosure" id="asDriftDisclosure" aria-expanded="false" aria-controls="asDriftRebalBody">
+        <span class="as-drift-disclosure-label">What if you rebalanced back to your target each year?</span>
+      </button>
+      <div class="as-drift-rebal-body" id="asDriftRebalBody" hidden>
+        <div class="as-seg as-seg-mini as-drift-strat" id="asDriftStrat" role="group" aria-label="Strategy">
+          <button type="button" data-val="ride" class="is-active">Let it ride</button>
+          <button type="button" data-val="rebal">Rebalance annually</button>
+        </div>
+        <p class="as-drift-caption">The winner drifts up. Left alone, the faster-growing sleeve takes over the portfolio &mdash; compounding the upside and, with it, the size of the bite a crash takes (the dashed line). Rebalancing annually pins both back to your target. One honest note about this comparison: on a smooth trend path like this projection, rebalancing always trims the faster asset, so it will always show the lower endpoint here. A real, volatile path is where rebalancing earns its keep &mdash; buying weakness, trimming strength. This chart shows the drift trade-off, not a verdict on rebalancing; for the strategy built on volatility itself, see <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>.</p>
+      </div>
+    </div>
+
+    <p class="as-drift-model-note">The dashed line applies your chosen crash depth to the bitcoin sleeve only, matching this page&rsquo;s drawdown model; in a real crash the rest of the portfolio rarely stands still.</p>
+  </section>
+
   <!-- ════════ THE COMPARISON ════════ -->
   <section class="as-section" id="compare">
     <div class="as-eyebrow">The comparison</div>
@@ -167,13 +207,6 @@ eleventyComputed:
       </div>
     </div>
     <p class="as-chart-caption">Each group is a separate allocation, not one portfolio over time. <strong style="color:#6fae6f">Extra return</strong> and <strong style="color:#e08a7a">drawdown</strong> are uncapped magnitudes, plotted as bars on the left axis. <strong style="color:#e09422">Portfolio influence</strong> is a different kind of thing, a share that runs 0 to 100%, so it rides the <strong style="color:#e09422">line</strong> on the right axis rather than being compared in bar height. Read it as: the position&rsquo;s pull on the whole portfolio climbs fast even while the money in it stays small.</p>
-  </section>
-
-  <!-- ════════ REBALANCING TEMPTATION ════════ -->
-  <section class="as-section" id="after">
-    <div class="as-eyebrow">After you choose</div>
-    <h2 class="as-h2">The position does not stay put</h2>
-    <p class="as-rebalance" id="asRebalance">&mdash;</p>
   </section>
 
   <!-- ════════ CAN YOU HOLD IT (dip chart + honest net framing) ════════ -->
@@ -209,6 +242,15 @@ eleventyComputed:
         </table>
       </div>
       <p class="as-chart-caption">Portfolio upside is the weighted single-hold multiple from the horizon, the sleeve rate, and bitcoin&rsquo;s Power Law projection. Extra return is that against the no-bitcoin multiple. Drawdown is the allocation times the crash depth. Portfolio influence is bitcoin&rsquo;s share of total portfolio variance, given bitcoin volatility 45%, the sleeve 12%, and a 0.50 correlation, and matches the published reference points (a 10% position drives about a quarter of the movement).</p>
+
+      <h3 class="as-audit-subhead">Your portfolio, year by year</h3>
+      <div class="as-tablewrap">
+        <table class="as-table as-path-table">
+          <thead id="asPathHead"></thead>
+          <tbody id="asPathBody"></tbody>
+        </table>
+      </div>
+      <p class="as-chart-caption">The year-by-year path behind the chart, for your current allocation and strategy. Each row reproduces from its neighbour: last year&rsquo;s sleeve times its growth factor is this year&rsquo;s sleeve, and the crash column is the total minus the bitcoin sleeve times your crash depth. The <strong>return-to-trend</strong> curve is trend-shaped and amortized to close today&rsquo;s gap to trend by the final year &mdash; so you can see how the gap closes, not just that it does. Values follow the chart&rsquo;s basis (dollars if you set a portfolio, otherwise growth of 100).</p>
     </div>
   </section>
 

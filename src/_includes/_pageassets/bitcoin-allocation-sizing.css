@@ -198,6 +198,37 @@ body { background: var(--bg); color: var(--text); }
 .as-csv-btn { font-family: var(--font-b); font-size: 0.78rem; color: var(--text-dim); background: rgba(224,148,34,0.05); border: 1px solid rgba(224,148,34,0.2); border-radius: 999px; padding: 0.45rem 0.95rem; cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s; }
 .as-csv-btn:hover { background: rgba(224,148,34,0.12); color: var(--amber); border-color: rgba(224,148,34,0.4); }
 
+/* ══════════ YOUR PORTFOLIO, YEAR BY YEAR (drift chart) ══════════ */
+.as-drift-sub { margin-bottom: 1.1rem; }
+.as-drift-chart { position: relative; height: clamp(300px, 44vh, 400px); }
+.as-drift-comp { display: flex; flex-direction: column; gap: 0.55rem; margin: 1.2rem 0 0; }
+.as-drift-comp-row { display: flex; align-items: center; gap: 0.85rem; font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); }
+.as-drift-comp-when { flex: 0 0 5rem; font-weight: 600; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.as-drift-comp-bar { flex: 1; display: flex; height: 16px; border-radius: 4px; overflow: hidden; background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+.as-drift-comp-btc { background: #F7931A; transition: width 0.2s; }
+.as-drift-comp-trad { background: #5e7a92; transition: width 0.2s; }
+.as-drift-comp-share { flex: 0 0 auto; min-width: 9rem; text-align: right; font-variant-numeric: tabular-nums; color: #f2eee8; font-weight: 600; }
+.as-drift-endnote { font-family: var(--font-b); font-size: 0.98rem; line-height: 1.65; color: var(--text); margin: 1rem 0 0; }
+.as-drift-endnote strong { color: #f2eee8; font-weight: 600; }
+.as-drift-rebal { margin: 1.4rem 0 0; }
+.as-drift-disclosure { display: flex; align-items: center; width: 100%; text-align: left; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem 1.2rem; cursor: pointer; font-family: var(--font-b); font-size: 0.9rem; color: var(--text-dim); }
+.as-drift-disclosure::before { content: '+'; color: var(--amber); font-weight: 600; margin-right: 0.5rem; }
+.as-drift-disclosure[aria-expanded="true"]::before { content: '\2212'; }
+.as-drift-disclosure:hover { color: var(--text); border-color: rgba(224,148,34,0.35); }
+.as-drift-rebal-body { padding: 1rem 0 0; }
+.as-drift-strat { margin: 0 0 0.9rem; }
+.as-drift-caption { font-family: var(--font-b); font-size: 0.9rem; line-height: 1.7; color: var(--text-dim); background: rgba(224,148,34,0.05); border: 1px solid rgba(224,148,34,0.24); border-left: 3px solid var(--amber); border-radius: 10px; padding: 1.1rem 1.3rem; margin: 0; }
+.as-drift-caption strong { color: #f2eee8; font-weight: 600; }
+.as-drift-caption a, .as-drift-caption a:visited { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+.as-drift-caption a:hover { color: #f2b25a; border-bottom-color: rgba(224,148,34,0.7); }
+.as-drift-model-note { font-family: var(--font-b); font-size: 0.76rem; line-height: 1.55; color: var(--text-muted); margin: 1rem 0 0; }
+.as-audit-subhead { font-family: var(--font-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); margin: 1.6rem 0 0.6rem; }
+@media (max-width: 560px) {
+  .as-drift-comp-row { flex-wrap: wrap; }
+  .as-drift-comp-when { flex-basis: auto; }
+  .as-drift-comp-share { min-width: 0; flex-basis: 100%; text-align: left; }
+}
+
 /* ── Where this connects ── */
 .as-connect-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; margin: 1.6rem 0 0; }
 .as-connect-card { display: block; text-decoration: none; background: linear-gradient(135deg, rgba(224,148,34,0.05), rgba(20,18,16,0.4)); border: 1px solid rgba(224,148,34,0.22); border-radius: 12px; padding: 1.1rem 1.3rem; transition: border-color 0.18s, background 0.18s, transform 0.18s; }
