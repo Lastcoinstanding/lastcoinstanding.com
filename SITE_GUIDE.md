@@ -837,10 +837,12 @@ The calculator uses Porkopolis Power Law coefficients, matching `/the-power-law.
 | Trend | `#e09422` (signature amber) | solid 2.5px | Central case |
 | Upper band | `#e8c820` (gold) | sparse-dashed `[1,6]` 1.2px | Spike envelope |
 | Drawdown | `#ece4d6` (cream) | solid 2px | User stack under sell-as-needed |
-| Current trajectory | `#a89c8a` (muted tan) | dashed `[4,3]` 1.5px | Anchored to live BTC price |
-| Traditional 60/40 | `#5e7a92` (cool blue-gray) | dashed `[5,4]` 1.4px | Real-return benchmark |
+| Current trajectory | `#a89c8a` (muted tan) | dashed `[4,3]` 1.5px | Anchored to live BTC price; plots from current year at mark-to-market |
+| Traditional 60/40 | `#5e7a92` (cool blue-gray) | dashed `[5,4]` 1.4px | Real-return benchmark; plots from current year at mark-to-market |
 
 Trend, drawdown, current-trajectory render with full saturation; floor and upper render with reduced visual weight to emphasize trend as the central case. A `bandFillPlugin` adds subtle amber `rgba(224,148,34,0.05)` fill between floor and upper. The legend has two group labels (`Power Law bands — per bitcoin` for the top three lines, `Portfolio value — total stack` for the bottom three).
+
+**Line-start behavior.** The two portfolio-value comparison lines — current trajectory and Traditional 60/40 — both plot the accumulation phase, beginning at the current year at today's mark-to-market stack value (`btcStack × live BTC price`) and diverging across the window (60/40 compounds slower). The at-trend **drawdown** line keeps a `null` prefix and begins only at the retirement year: starting it earlier would draw it at the Power Law *trend* price and misrepresent the user's actual below-/above-trend position today. In `projectStackOverTime` this asymmetry is a `plotAccumulation` flag passed `true` only for the current-trajectory line; `projectTraditionalPortfolio` emits its running balance during accumulation rather than `null`.
 
 ### Sustainability readout
 
