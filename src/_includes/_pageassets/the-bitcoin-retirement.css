@@ -1776,7 +1776,7 @@ a.powerlaw-link:hover {
 .seg-btn .help-tip { margin-left: 0.05rem; }
 .rt-income-note { margin-top: 0.5rem; }
 /* Basis disclosure next to the Sustainability escape-velocity visual */
-.sust-basis-note { font-family: 'Inter', sans-serif; font-size: 0.75rem; color: var(--ink-dim); margin: 0 0 0.6rem; }
+.sust-basis-note { font-family: 'Inter', sans-serif; font-size: 0.75rem; color: var(--ink-dim); margin: 0.35rem 0 0; }
 .sust-basis-note strong { color: var(--ink); font-weight: 600; }
 /* Second at-retirement sub-line (both price bases) under the input value line */
 .stack-value-line2 { font-family: 'Inter', sans-serif; font-size: 0.68rem; color: var(--ink-faint); line-height: 1.35; margin-top: 2px; }

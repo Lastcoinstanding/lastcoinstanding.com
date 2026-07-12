@@ -380,7 +380,7 @@
   // price scales both the dollar value of remaining stack AND how much BTC
   // gets sold each year to cover the (unchanged) nominal income — so a stack
   // priced below trend depletes faster, as it should.
-  function projectStackOverTime(scenario, growthModelKey, inflationPct, priceMultiplier) {
+  function projectStackOverTime(scenario, growthModelKey, inflationPct, priceMultiplier, plotAccumulation) {
     var today = new Date();
     var startYear = today.getFullYear();
     var endYear = scenario.retirementYear + scenario.yearsInRetirement;
@@ -406,8 +406,10 @@
         }
         // Push null so dataset length matches the band datasets — keeps index-mode
         // interaction aligned across all four series. Chart.js renders null as a
-        // gap (no visible line pre-retirement, same as before).
-        points.push({ x: y, y: null });
+        // gap (no visible line pre-retirement) unless plotAccumulation is set —
+        // the current-trajectory line opts in so it starts at today's
+        // mark-to-market value, matching the 60/40 benchmark's 2026 anchor.
+        points.push({ x: y, y: plotAccumulation ? (stackBtc * price) : null });
         btcPoints.push({ x: y, btc: stackBtc, usd: null, phase: 'accum',
           price: price, income: null, btcSold: null,
           dcaAdded: (scenario.monthlyDcaUSD > 0 && price > 0) ? (12 * scenario.monthlyDcaUSD) / price : 0 });
@@ -646,13 +648,12 @@
 
     for (var y = startYear; y <= endYear; y++) {
       if (y < scenario.retirementYear) {
-        // Pre-retirement: balance compounds + DCA goes into the portfolio
-        // (mirrors the bitcoin DCA flow but into 60/40 instead of BTC)
+        // Plot the accumulation phase so the benchmark visibly starts at TODAY
+        // (startYear) at today's mark-to-market capital, matching the
+        // current-trajectory line. Record this year's opening balance, THEN grow.
+        points.push({ x: y, y: balance });
         var dcaAnnual = (scenario.monthlyDcaUSD || 0) * 12;
         balance = balance * (1 + nominalRate) + dcaAnnual;
-        // Hide pre-retirement segment to match the drawdown line's null prefix —
-        // keeps tooltip-index alignment clean across all five datasets.
-        points.push({ x: y, y: null });
       } else if (y === scenario.retirementYear) {
         // Drawdown line begins here at the carried-forward balance
         points.push({ x: y, y: balance });
@@ -724,7 +725,7 @@
   // retirement-tabular-views-design-doc.md.
   var LAST_STACK = null;
   var LAST_STACK_PAIR = null;                 // { trend: <stack>, current: <stack> } — both bases from the last chart render
-  var RT_BASIS = 'trend';                     // 'trend' (mean-reversion, central case) | 'current' (today's gap to trend holds)
+  var RT_BASIS = 'trend';                     // 'trend' (mean-reversion, central case) | 'current' (today's gap to trend persists)
   var RT_DOLLARS = 'nominal';                 // 'nominal' (default, future $) | 'real' (today's $, uses chosen inflation)
 
   // Real-dollar deflator for a calendar year, using the user's chosen inflation.
@@ -756,7 +757,7 @@
       ', drawing <strong>' + formatCurrencyShort(s.targetIncomeUSD) + '/yr</strong>' +
       (s.monthlyDcaUSD > 0 ? ' · adding ' + formatCurrencyShort(s.monthlyDcaUSD) + '/mo until then' : '') +
       ' · ' + s.yearsInRetirement + ' yrs in retirement.' +
-      ' Price basis: ' + (RT_BASIS === 'current' ? 'today’s ' + todaysBasisPhrase(rtCurrentRatio()) + ' to trend holds' : 'reverts to trend') + '.' +
+      ' Price basis: ' + (RT_BASIS === 'current' ? 'today’s ' + todaysBasisPhrase(rtCurrentRatio()) + ' to trend persists' : 'reverts to trend') + '.' +
       ' Dollars: ' + (RT_DOLLARS === 'real' ? "real (today's, " + window.ModelingAssumptions.get('inflation').value + '% infl)' : 'nominal (future)') + '.' +
       ' Income target: ' + (SCENARIO.incomeBasis === 'fixed' ? 'fixed future $' : "today's dollars") + '.';
   }
@@ -783,12 +784,12 @@
   }
 
   // Live labels on the price-basis buttons: "Reverts to trend (1.0×)" and
-  // "Today's <gap|premium> to trend holds (N.NN×)". Only the .rt-basis-text node
+  // "Today's <gap|premium> to trend persists (N.NN×)". Only the .rt-basis-text node
   // is rewritten so each button's help-tip stays intact.
   function updateRtBasisLabels() {
     var ratio = rtCurrentRatio();
     var trendTxt = 'Reverts to trend (1.0×)';
-    var curTxt = 'Today’s ' + todaysBasisPhrase(ratio) + ' to trend holds (' + ratio.toFixed(2) + '×)';
+    var curTxt = 'Today’s ' + todaysBasisPhrase(ratio) + ' to trend persists (' + ratio.toFixed(2) + '×)';
     document.querySelectorAll('.rt-basis-btn[data-basis="trend"] .rt-basis-text').forEach(function (el) { el.textContent = trendTxt; });
     document.querySelectorAll('.rt-basis-btn[data-basis="current"] .rt-basis-text').forEach(function (el) { el.textContent = curTxt; });
     // Real dollar button shows the live Baseline inflation rate (Part C) — only
@@ -932,7 +933,7 @@
     lines.push('# Monthly DCA,' + s.monthlyDcaUSD);
     lines.push('# Growth model,' + growth.preset);
     lines.push('# Inflation,' + inflation.value + '%');
-    lines.push('# Price assumption,' + (RT_BASIS === 'current' ? "today's " + todaysBasisPhrase(rtCurrentRatio()) + ' to trend holds' : 'reverts to trend'));
+    lines.push('# Price assumption,' + (RT_BASIS === 'current' ? "today's " + todaysBasisPhrase(rtCurrentRatio()) + ' to trend persists' : 'reverts to trend'));
     lines.push('# Dollar basis,' + (RT_DOLLARS === 'real' ? "real (today's dollars, " + inflation.value + '% inflation)' : 'nominal (future dollars)'));
     lines.push('# Income target basis,' + (s.incomeBasis === 'fixed' ? 'fixed future $' : "today's dollars"));
     lines.push('# Live scenario URL,' + window.location.href);
@@ -989,7 +990,7 @@
   }
 
   // Price-assumption toggle — selects which already-computed projection the
-  // tables render (trend vs. today's-gap-to-trend-holds). No new math; just
+  // tables render (trend vs. today's-gap-to-trend-persists). No new math; just
   // re-renders from LAST_STACK_PAIR. Buttons in both panels stay in sync.
   function wireRtBasis() {
     var btns = document.querySelectorAll('.rt-basis-btn');
@@ -1097,7 +1098,7 @@
     // user's actual mark-to-market stack value rather than the at-trend value.
     var trendPriceToday = projPriceForGrowth(dateForYear(startYear), 'powerlaw-trend');
     var currentRatio = (trendPriceToday > 0) ? (liveBtcPrice / trendPriceToday) : 1;
-    var currentTrajectory = projectStackOverTime(SCENARIO, 'powerlaw-trend', inflation.value, currentRatio);
+    var currentTrajectory = projectStackOverTime(SCENARIO, 'powerlaw-trend', inflation.value, currentRatio, true);
 
     // Starting capital for the benchmark line: match the bitcoin drawdown
     // line's anchor (btcStack × trend price today). Apples-to-apples comparison
@@ -1638,6 +1639,13 @@
     return '$' + Math.round(v).toLocaleString();
   }
 
+  // Full-precision spot price for the stack-value hint line — formatCurrencyShort
+  // rounds to $64K, too coarse for a live BTC price.
+  function formatBtcPrice(v) {
+    if (!isFinite(v) || v <= 0) return '$0';
+    return '$' + Math.round(v).toLocaleString('en-US');
+  }
+
   // ─── Escape velocity spectrum positioning (§9.2.6)
   // Returns { position 0..1, achieved bool, detail string }.
   // Left half (0..0.5): stack depletes; position scaled by yearsLasted/window.
@@ -1720,7 +1728,7 @@
     // Disclose which price assumption the Sustainability visual is describing.
     var bw = document.getElementById('sustBasisWord');
     if (bw) bw.textContent = (RT_BASIS === 'current')
-      ? 'today\u2019s ' + todaysBasisPhrase(rtCurrentRatio()) + ' to trend holds (' + rtCurrentRatio().toFixed(2) + '\u00D7)'
+      ? 'today\u2019s ' + todaysBasisPhrase(rtCurrentRatio()) + ' to trend persists (' + rtCurrentRatio().toFixed(2) + '\u00D7)'
       : 'reverts to trend';
     // Projected stack value at retirement — follows BOTH toggles so it can never
     // disagree with the tables' start row: the price-basis toggle (× currentRatio
@@ -1733,25 +1741,29 @@
     var stackEl = document.getElementById('sustStackValue');
     if (stackEl) stackEl.textContent = formatCurrencyShort(atRetShown);
 
-    // Input line: worth $X today → $Y at the start of retirement. Today's value
-    // is basis-invariant (deflator = 1 at year 0); at-retirement follows the toggle.
+    // Line 1: worth $X today, at bitcoin's live spot price. Today's value is
+    // basis-invariant (deflator = 1 at year 0).
     var todayVal = SCENARIO.btcStack * liveBtcPrice;
     var elToday  = document.getElementById('stackValToday');
-    var elAtRet  = document.getElementById('stackValAtRet');
+    var elPrice  = document.getElementById('stackValLivePrice');
     if (elToday) elToday.textContent = formatCurrencyShort(todayVal);
-    if (elAtRet) elAtRet.textContent = formatCurrencyShort(atRetShown);
+    if (elPrice) elPrice.textContent = formatBtcPrice(liveBtcPrice);
 
-    // Second sub-line: at-retirement value under BOTH price bases — trend
-    // (mean-reversion) and today's-gap-to-trend-holds (nominal × currentRatio) —
-    // each respecting the active dollar basis.
+    // Lines 2 & 3: at-retirement value under BOTH price bases — trend
+    // (mean-reversion) and today's-gap-to-trend-persists (nominal × currentRatio) —
+    // each respecting the active dollar basis. Year is the retirement year.
     var trendAtRet   = rtDollars(atRetInfo.nominal, SCENARIO.retirementYear, inflationPct);
     var currentAtRet = rtDollars(atRetInfo.nominal * ratio, SCENARIO.retirementYear, inflationPct);
-    var elTrend = document.getElementById('stackValTrend');
-    var elCur   = document.getElementById('stackValCurrent');
-    var elWord  = document.getElementById('stackValBasisWord');
-    if (elTrend) elTrend.textContent = formatCurrencyShort(trendAtRet);
-    if (elCur)   elCur.textContent = formatCurrencyShort(currentAtRet);
-    if (elWord)  elWord.textContent = todaysBasisPhrase(ratio);
+    var elTrend    = document.getElementById('stackValTrend');
+    var elCur      = document.getElementById('stackValCurrent');
+    var elWord     = document.getElementById('stackValBasisWord');
+    var elYrTrend  = document.getElementById('stackValRetYearTrend');
+    var elYrCur    = document.getElementById('stackValRetYearCurrent');
+    if (elTrend)   elTrend.textContent   = formatCurrencyShort(trendAtRet);
+    if (elCur)     elCur.textContent     = formatCurrencyShort(currentAtRet);
+    if (elWord)    elWord.textContent    = todaysBasisPhrase(ratio);
+    if (elYrTrend) elYrTrend.textContent = SCENARIO.retirementYear;
+    if (elYrCur)   elYrCur.textContent   = SCENARIO.retirementYear;
 
     updateBaselineDollarsNote();
     updateSpectrum(proj, SCENARIO, inflation.value);

@@ -153,7 +153,7 @@ eleventyComputed:
           <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="2"><span class="swatch swatch-upper"></span>Upper band (spikes)</div>
           <div class="legend-group-label">Portfolio value &mdash; total stack</div>
           <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="3"><span class="swatch swatch-stack"></span>Your stack (if price follows trend)<span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Drawdowns are taken against this trend-priced stack to fund retirement income. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></div>
-          <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="4"><span class="swatch swatch-current"></span>Your stack (if today's gap to trend holds)<span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price (currently below trend) and projects forward at the same Power Law growth rate. When this line sits <em>below</em> the drawdown-strategy line, bitcoin is below trend today &mdash; and the vertical gap is the additional gain you&rsquo;d capture if the market mean-reverts to trend over your retirement window. When sitting <em>above</em>, the gap is the premium that trend says will fade. The two lines converge when the market is at trend. Useful as a sanity check on the primary projection: if you want to assume <em>no</em> mean-reversion happens, this line is closer to what you should plan for.</span></span></div>
+          <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="4"><span class="swatch swatch-current"></span>Your stack (if today's gap to trend persists)<span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price (currently below trend) and projects forward at the same Power Law growth rate. When this line sits <em>below</em> the drawdown-strategy line, bitcoin is below trend today &mdash; and the vertical gap is the additional gain you&rsquo;d capture if the market mean-reverts to trend over your retirement window. When sitting <em>above</em>, the gap is the premium that trend says will fade. The two lines converge when the market is at trend. Useful as a sanity check on the primary projection: if you want to assume <em>no</em> mean-reversion happens, this line is closer to what you should plan for.</span></span></div>
           <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="5"><span class="swatch swatch-benchmark"></span>Traditional 60/40 (same starting capital)</div>
         </div>
       </div>
@@ -176,7 +176,7 @@ eleventyComputed:
               <span class="rt-basis-label">Price assumption:</span>
               <div class="seg-control seg-2" role="group" aria-label="Price assumption">
                 <button type="button" class="rt-basis-btn seg-btn is-active" data-basis="trend"><span class="rt-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Drawdowns are taken against this trend-priced stack to fund retirement income. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
-                <button type="button" class="rt-basis-btn seg-btn" data-basis="current"><span class="rt-basis-text">Today&rsquo;s gap to trend holds</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
+                <button type="button" class="rt-basis-btn seg-btn" data-basis="current"><span class="rt-basis-text">Today&rsquo;s gap to trend persists</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
               </div>
             </div>
             <div class="rt-toggle-row">
@@ -221,7 +221,7 @@ eleventyComputed:
               <span class="rt-basis-label">Price assumption:</span>
               <div class="seg-control seg-2" role="group" aria-label="Price assumption">
                 <button type="button" class="rt-basis-btn seg-btn is-active" data-basis="trend"><span class="rt-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Drawdowns are taken against this trend-priced stack to fund retirement income. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
-                <button type="button" class="rt-basis-btn seg-btn" data-basis="current"><span class="rt-basis-text">Today&rsquo;s gap to trend holds</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
+                <button type="button" class="rt-basis-btn seg-btn" data-basis="current"><span class="rt-basis-text">Today&rsquo;s gap to trend persists</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
               </div>
             </div>
             <div class="rt-toggle-row">
@@ -323,13 +323,13 @@ eleventyComputed:
             </div>
             <input type="range" id="slider-btcStack" min="0" max="100" step="0.01" value="1" aria-label="Bitcoin stack">
             <div class="stack-value-line" id="stackValueLine" aria-live="polite">
-              <span class="stack-value-hint">Worth <strong id="stackValToday">&mdash;</strong> today
-              <span class="stack-value-arrow">&rarr;</span>
-              <strong id="stackValAtRet">&mdash;</strong> at the start of your retirement</span>
+              <span class="stack-value-hint">Worth <strong id="stackValToday">&mdash;</strong> today, given bitcoin&rsquo;s price of <strong id="stackValLivePrice">&mdash;</strong></span>
             </div>
             <div class="stack-value-line2" id="stackValueLine2" aria-live="polite">
-              If price reverts to trend: <strong id="stackValTrend">&mdash;</strong>
-              &middot; if today&rsquo;s <span id="stackValBasisWord">gap</span> to trend holds: <strong id="stackValCurrent">&mdash;</strong>
+              Worth <strong id="stackValTrend">&mdash;</strong> at the start of your retirement in <strong id="stackValRetYearTrend">&mdash;</strong>, assuming price reverts to trend, or
+            </div>
+            <div class="stack-value-line2" id="stackValueLine3" aria-live="polite">
+              Worth <strong id="stackValCurrent">&mdash;</strong> at the start of your retirement in <strong id="stackValRetYearCurrent">&mdash;</strong> if today&rsquo;s <span id="stackValBasisWord">gap</span> to trend persists
             </div>
           </div>
 
@@ -393,10 +393,9 @@ eleventyComputed:
             <span class="help-tip" tabindex="0">?<span class="tip-content">In today&rsquo;s dollars (inflation-adjusted), the projected value of your stack the moment retirement begins &mdash; before drawdown. Based on the projected Power Law trend price of bitcoin over time.</span></span>
           </div>
           <div class="value-display" id="sustStackValue">&mdash;</div>
+          <p class="sust-basis-note">Under: <strong id="sustBasisWord">reverts to trend</strong>.</p>
         </div>
       </div>
-
-      <p class="sust-basis-note">Under: <strong id="sustBasisWord">reverts to trend</strong>.</p>
 
       <!-- ESCAPE VELOCITY SPECTRUM BAR — §9.2.6 -->
       <div class="sustainability-spectrum">
