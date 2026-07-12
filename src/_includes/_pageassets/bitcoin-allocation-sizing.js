@@ -217,7 +217,10 @@
 
   // Runtime parity guard (dev): the loop's year-H total must equal the shipped
   // closed-form verdict for the active allocation, or the two are a contradiction.
+  // Parity holds only crash-OFF; with a crash active the loop total intentionally
+  // diverges from the (uncrashed) closed form, so skip the check then.
   function assertParity(paths) {
+    if (paths.crashOn) return;
     var cf = effects(S.allocPct / 100).withBtc;
     var loop = paths.ride.total[paths.H] / paths.P0;
     if (cf > 0 && Math.abs(loop - cf) / cf > 0.005) {
