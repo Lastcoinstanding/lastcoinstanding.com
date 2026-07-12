@@ -200,6 +200,11 @@ body { background: var(--bg); color: var(--text); }
 
 /* ══════════ YOUR PORTFOLIO, YEAR BY YEAR (drift chart) ══════════ */
 .as-drift-sub { margin-bottom: 1.1rem; }
+/* Mirrored allocation lever (second representation of the top slider, above the chart) */
+.as-drift-lever { margin: 0 0 1rem; }
+.as-drift-lever-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 0.4rem; }
+.as-drift-lever-label { font-family: var(--font-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
+.as-drift-lever-val { font-family: var(--font-b); font-size: 0.95rem; font-weight: 600; color: #f2eee8; font-variant-numeric: tabular-nums; }
 .as-drift-chart { position: relative; height: clamp(300px, 44vh, 400px); }
 .as-drift-comp { display: flex; flex-direction: column; gap: 0.55rem; margin: 1.2rem 0 0; }
 .as-drift-comp-row { display: flex; align-items: center; gap: 0.85rem; font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); }

@@ -117,7 +117,7 @@ eleventyComputed:
         </span>
         <span class="as-primary-val"><input type="number" id="asAlloc" min="0" max="100" step="1" aria-label="Bitcoin allocation percent"><span class="as-primary-suffix">%</span></span>
       </div>
-      <input type="range" id="asAllocSlider" class="as-range" min="0" max="100" step="1" aria-label="Bitcoin allocation slider">
+      <input type="range" id="asAllocSlider" class="as-range" min="0" max="100" step="1" aria-label="Bitcoin allocation">
       <div class="as-seg as-seg-mini as-presets" id="asAllocPresets">
         <button type="button" data-val="1">1%</button>
         <button type="button" data-val="5">5%</button>
@@ -157,6 +157,18 @@ eleventyComputed:
     <div class="as-eyebrow">Over the horizon</div>
     <h2 class="as-h2">Your portfolio, year by year</h2>
     <p class="as-lead as-drift-sub">How the two sleeves grow &mdash; and how the balance between them shifts &mdash; under the assumptions you set above.</p>
+
+    <!-- Mirrored allocation lever: a second representation of the primary slider
+         above, so hand and chart-response share a viewport. Same state
+         (S.allocPct), synced via syncAllocControls(); no presets (start-point
+         affordance stays top-only). -->
+    <div class="as-drift-lever">
+      <div class="as-drift-lever-head">
+        <span class="as-drift-lever-label">Bitcoin allocation</span>
+        <span class="as-drift-lever-val" id="asAllocMirrorVal">10%</span>
+      </div>
+      <input type="range" id="asAllocMirror" class="as-range" min="0" max="100" step="1" aria-label="Bitcoin allocation">
+    </div>
 
     <div class="as-drift-chart chart-wrapper" data-chart-copy data-chart-title="Your portfolio, year by year">
       <canvas id="asDriftChart"></canvas>

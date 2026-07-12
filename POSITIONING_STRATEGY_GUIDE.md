@@ -213,6 +213,16 @@ them so future explorations inherit them rather than rediscovering them.
   including mobile users who can't hover. Reserve tooltips for supplementary depth, not for
   caveats a reader needs to interpret the number correctly.
 
+- **Inputs live with the outputs they drive (the playground principle).** A calculator
+  persuades by letting the reader watch the result respond to their hand. Any primary
+  lever must be visible in the same viewport as the output it most directly drives —
+  and when a page grows so that an output section scrolls away from its lever, mirror
+  the control beside the output: **two representations of one state, never two states.**
+  Wait or Deploy Now is the reference implementation (slider, chart, and verdict in one
+  viewport); the allocation drift chart's mirrored slider is the retrofit example.
+  Treat this as a design-time consideration for every new output section, not a
+  post-ship fix. (Implementation recipe: STYLE_GUIDE §6.35.)
+
 ---
 
 ## 4. Reconciliation with the Site Guide (§1)

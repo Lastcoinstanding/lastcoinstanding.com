@@ -1852,6 +1852,45 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 
 Use on any future dark-theme form (the inset shadow repaints over the autofill color; the absurd transition delay defers Chrome's repaint indefinitely).
 
+### 6.35 Mirrored control (one state, many representations)
+
+**When:** any page where a primary lever's output section can scroll out of the lever's viewport (the playground principle — POSITIONING_STRATEGY_GUIDE §3.5). Mirror the control beside the distant output so hand and response share a viewport. **When to skip:** outputs already adjacent to their inputs — do not mirror by default; a duplicate control is only justified by the viewport gap.
+
+**The hard rule: two representations, one state — never two states.** Every representation (each `<input>`, each numeric readout) binds to the **same** state key. There is no "which one wins" logic and the representations never talk to each other — they only read shared state.
+
+**Mechanics** (from the allocation drift chart, `bitcoin-allocation-sizing.js`):
+
+- **One sync function** pushes state → every representation, called from the shared update path (and from init / Reset / URL-restore), never from the individual handlers:
+  ```js
+  function syncAllocControls(from) {
+    var a = byId('asAlloc'), aS = byId('asAllocSlider'),
+        aM = byId('asAllocMirror'), aMV = byId('asAllocMirrorVal');
+    if (from !== 'num'    && a)  a.value  = S.allocPct;   // guard the element the user
+    if (from !== 'slider' && aS) aS.value = String(S.allocPct); // is actively editing —
+    if (from !== 'mirror' && aM) aM.value = String(S.allocPct); // a range is safe to rewrite,
+    if (aMV) aMV.textContent = S.allocPct + '%';          // a text/number input's caret is not
+    setSeg('asAllocPresets', S.allocPct);
+  }
+  ```
+- **Handlers only write state + recompute**, then delegate the sync: `input → setAlloc(v, from)` where `setAlloc` sets `S.allocPct`, calls `syncAllocControls(from)`, then `renderAll()`. The `from` token is the sole "don't clobber my caret" guard — it does **not** encode precedence.
+- **Drag path is shared**: the mirror's `input` goes through the same in-place-dataset-mutation + `chart.update('none')` path as the origin control; no second render path.
+
+**A11y:** every representation of the same control shares the **same accessible name** (both allocation sliders are `aria-label="Bitcoin allocation"`), so a screen reader announces one control, not two. Keyboard arrows on either must drive the identical update.
+
+**No preset chips on the mirror.** Presets are a starting-point affordance; they stay with the origin control. The mirror exists for continuous play, so it carries only the label + live readout + range input.
+
+**Example markup** (the drift-chart mirror, inserted between the section sub-line and the chart):
+```html
+<div class="as-drift-lever">
+  <div class="as-drift-lever-head">
+    <span class="as-drift-lever-label">Bitcoin allocation</span>
+    <span class="as-drift-lever-val" id="asAllocMirrorVal">10%</span>
+  </div>
+  <input type="range" id="asAllocMirror" class="as-range" min="0" max="100" step="1" aria-label="Bitcoin allocation">
+</div>
+```
+Verify Reset and URL-restore visually move **every** representation (they write the one key; the sync pass propagates).
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.

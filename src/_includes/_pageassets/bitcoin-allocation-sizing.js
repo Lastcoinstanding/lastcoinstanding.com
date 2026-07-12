@@ -458,7 +458,13 @@
             title: { display: true, text: hasUSD() ? 'Portfolio value ($)' : 'Growth of 100', color: MUTED, font: { size: 10 } } }
         },
         plugins: {
-          legend: { display: true, position: 'top', labels: { color: DIM, font: { size: narrow ? 10 : 11 }, usePointStyle: true, pointStyle: 'rectRounded', boxWidth: 10, padding: 10 } },
+          legend: { display: true, position: 'top', labels: { color: DIM, font: { size: narrow ? 10 : 11 }, usePointStyle: true, pointStyle: 'rectRounded', boxWidth: 10, padding: 10,
+            // Hide the comparison-overlay (dataset 3) from the legend while the
+            // rebalance disclosure is closed — otherwise Chart.js shows it
+            // struck-through (its default for hidden datasets), which reads as a
+            // bug and leaks an unopened feature. When open it appears normally
+            // and stays click-toggleable.
+            filter: function (item) { return !(item.datasetIndex === 3 && !S.cmp); } } },
           tooltip: {
             mode: 'index', intersect: false, displayColors: false,
             backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.3)', borderWidth: 1,
@@ -677,15 +683,29 @@
     g.querySelectorAll('[data-val]').forEach(function (b) { b.classList.toggle('is-active', b.getAttribute('data-val') === String(value)); });
   }
 
+  // Single sync for the allocation control's THREE representations (top number
+  // input, top slider, mirror slider) + the mirror readout + preset chips — all
+  // bound to the one state key S.allocPct. Called from the alloc-update path
+  // (setAlloc) and from initControls (init + Reset + URL-restore). The `from`
+  // guard skips writing back to the element the user is actively editing (the
+  // number input's caret in particular); range sliders are safe to rewrite.
+  function syncAllocControls(from) {
+    var a = document.getElementById('asAlloc'), aS = document.getElementById('asAllocSlider'),
+        aM = document.getElementById('asAllocMirror'), aMV = document.getElementById('asAllocMirrorVal');
+    if (from !== 'num' && a) a.value = S.allocPct;
+    if (from !== 'slider' && aS) aS.value = String(S.allocPct);
+    if (from !== 'mirror' && aM) aM.value = String(S.allocPct);
+    if (aMV) aMV.textContent = S.allocPct + '%';
+    setSeg('asAllocPresets', S.allocPct);
+  }
+
   function initControls() {
-    var a = document.getElementById('asAlloc'), aS = document.getElementById('asAllocSlider');
-    if (a) a.value = S.allocPct; if (aS) aS.value = String(S.allocPct);
+    syncAllocControls();
     var hz = document.getElementById('asHorizon'); if (hz) hz.value = String(S.horizonYears);
     var tr = document.getElementById('asTradRate'); if (tr) tr.value = String(S.tradRatePct);
     var ds = document.getElementById('asDepthSlider'); if (ds) ds.value = String(S.crashDepthPct);
     var fr = document.getElementById('asFlatRate'); if (fr) fr.value = String(S.btcFlatPct);
     var pf = document.getElementById('asPortfolio'); if (pf && hasUSD()) pf.value = commas(S.portfolioUSD);
-    setSeg('asAllocPresets', S.allocPct);
     setSeg('asDepth', String(S.crashDepthPct));
     setSeg('asBtcMode', activeMode());
     setSeg('asDriftStrat', S.strat);
@@ -708,13 +728,13 @@
     function setAlloc(v, from) {
       if (!isFinite(v)) return;
       S.allocPct = clamp(Math.round(v), 0, 100);
-      if (from !== 'num' && a) a.value = S.allocPct;
-      if (from !== 'slider' && aS) aS.value = String(S.allocPct);
-      setSeg('asAllocPresets', S.allocPct);
+      syncAllocControls(from);
       renderAll();
     }
     if (a) a.addEventListener('input', function () { setAlloc(parseFloat(a.value), 'num'); });
     if (aS) aS.addEventListener('input', function () { setAlloc(parseInt(aS.value, 10), 'slider'); });
+    var aM = document.getElementById('asAllocMirror');
+    if (aM) aM.addEventListener('input', function () { setAlloc(parseInt(aM.value, 10), 'mirror'); });
     var presets = document.getElementById('asAllocPresets');
     if (presets) presets.addEventListener('click', function (e) { var b = e.target.closest('[data-val]'); if (!b) return; setAlloc(parseInt(b.getAttribute('data-val'), 10), 'preset'); });
 
