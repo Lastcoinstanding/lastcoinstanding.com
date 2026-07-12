@@ -49,7 +49,7 @@
   }
 
   // ── State ──
-  var DEFAULTS = { allocPct: 10, horizonYears: 10, tradRatePct: 10, crashDepthPct: 40, btcMode: null, btcFlatPct: 15, strat: 'ride', cmp: false };
+  var DEFAULTS = { allocPct: 10, horizonYears: 10, tradRatePct: 10, crashDepthPct: 40, btcMode: null, btcFlatPct: 15, strat: 'ride', cmp: false, crashOn: false, crashYear: 3, crashRec: 'historical' };
   var S = {
     allocPct: 10,
     horizonYears: 10,
@@ -59,9 +59,46 @@
     btcFlatPct: 15,        // flat-rate override (VanEck base case floor)
     portfolioUSD: null,
     strat: 'ride',         // drift chart: 'ride' (let it ride) | 'rebal' (rebalance annually)
-    cmp: false             // drift chart: rebalance-comparison disclosure open
+    cmp: false,            // drift chart: rebalance-comparison disclosure open
+    crashOn: false,        // drift chart: crash disclosure open (crash active)
+    crashYear: 3,          // years-from-today the crash lands (clamped 1..H-1 on read)
+    crashRec: 'historical' // recovery preset: 'fast' | 'historical' | 'weak'
   };
   var COMPARE_ALLOCS = [1, 5, 10, 20, 50];
+
+  // ── Crash model — ported verbatim from the Stress Test's crashMultiplier +
+  //    recovery presets (the-bitcoin-retirement-stress-test.js). It already IS a
+  //    per-year PRICE multiplier, so it factors directly onto this page's price
+  //    path. Ported (not imported) because it lives inside that page's IIFE, not a
+  //    shared module — duplication logged in TECH_DEBT as an extraction candidate.
+  //    Preset display names ("Fast" / "Historical" / "Weak") are reused verbatim;
+  //    the stress test's middle "Slow" is intentionally omitted (minimal surface).
+  var RECOVERY = {
+    fast:       { years: 2, shape: 'fast',                label: 'Fast' },
+    historical: { years: 3, shape: 'historical',          label: 'Historical' },
+    weak:       { years: 6, shape: 'never', ceiling: 0.6, label: 'Weak' }
+  };
+  function crashMultiplier(year, crash) {
+    if (!crash) return 1;
+    if (year < crash.crashYear) return 1;
+    var trough = 1 - crash.depthPct;
+    var troughYear = crash.crashYear + crash.troughLagYears;
+    if (year <= troughYear) {
+      var f = crash.troughLagYears === 0 ? 1 : (year - crash.crashYear) / crash.troughLagYears;
+      return 1 - f * crash.depthPct;
+    }
+    var into = year - troughYear;
+    var r = Math.min(1, into / Math.max(1, crash.recoveryYears));
+    if (crash.recoveryShape === 'never') {
+      var ceil = (crash.recoveryCeiling != null) ? crash.recoveryCeiling : 0.6;
+      return trough + r * (ceil - trough);
+    }
+    if (crash.recoveryShape === 'slow') r = r * r;
+    else if (crash.recoveryShape === 'fast') r = Math.sqrt(r);
+    return trough + r * (1 - trough);
+  }
+  // Human label for a projection-mode key (CSV + anywhere a readable mode is wanted).
+  function modeLabel(k) { return k === 'hold' ? "Today's gap to trend persists" : (k === 'revert' ? 'Return to trend' : 'Flat rate'); }
 
   function regimeMode() { return belowTrend() ? 'hold' : 'revert'; } // the regime-aware default
   function activeMode() { return S.btcMode || regimeMode(); }
@@ -131,37 +168,51 @@
       return g; // 'hold'
     }
 
+    // Optional crash: a per-year BTC price multiplier on top of the mode path.
+    // crashYear is in years-from-today (t-space), clamped 1..H-1 on read (state kept).
+    // OFF => `crash` is null => crashGrowth === gBtcAt => paths bit-identical to
+    // Phase A (the §8.1 parity guard). Crash hits the BTC price path only.
+    var crash = null;
+    if (st.crashOn) {
+      var rec = RECOVERY[st.crashRec] || RECOVERY.historical;
+      crash = { crashYear: Math.max(1, Math.min(H - 1, st.crashYear || 1)), depthPct: depth,
+        troughLagYears: 1, recoveryYears: rec.years, recoveryShape: rec.shape, recoveryCeiling: rec.ceiling };
+    }
+    function crashGrowth(t) {
+      if (!crash) return gBtcAt(t);
+      // crashed per-year growth = base growth × price-level ratio m(t)/m(t-1).
+      var mPrev = crashMultiplier(t - 1, crash), mCur = crashMultiplier(t, crash);
+      return gBtcAt(t) * (mPrev > 0 ? mCur / mPrev : 1);
+    }
+
     var years = [];
-    // `envelope` (post-crash total = total − btcSleeve·depth) is computed but
-    // currently UNCONSUMED: Phase A removed the dashed crash line it fed. Retained
-    // (cheap) as a likely input for the Phase B crash-path interaction; if Phase B
-    // uses a different crash model, drop these two arrays and the `depth` read.
-    var ride = { btc: [], trad: [], total: [], envelope: [], btcShare: [] };
-    var rebal = { btc: [], trad: [], total: [], envelope: [], btcShare: [], trimmedCum: [] };
+    var ride = { btc: [], trad: [], total: [], btcShare: [] };
+    var rebal = { btc: [], trad: [], total: [], btcShare: [], trimmedCum: [] };
+    var noBtc = []; // 100%-traditional benchmark: P0 × (1+tradr)^t. The "worth it?" baseline.
     var rBtc = P0 * w, rTrad = P0 * (1 - w);
     var bBtc = P0 * w, bTrad = P0 * (1 - w), trimmed = 0;
 
     for (var t = 0; t <= H; t++) {
       if (t > 0) {
-        var g = gBtcAt(t);
+        var g = crashGrowth(t);
         rBtc *= g; rTrad *= gTrad;             // let it ride: sleeves compound independently
-        bBtc *= g; bTrad *= gTrad;             // rebalance: grow, then reset to target below
-        var bTot0 = bBtc + bTrad, target = bTot0 * w;
+        bBtc *= g; bTrad *= gTrad;             // rebalance: grow (incl. crash dip), reset below —
+        var bTot0 = bBtc + bTrad, target = bTot0 * w; //   the reset buys BTC while it is down
         if (bBtc > target) trimmed += (bBtc - target); // only count trims OUT of bitcoin
         bBtc = target; bTrad = bTot0 * (1 - w);
       }
       years.push(t);
+      noBtc.push(P0 * Math.pow(gTrad, t));
       var rTot = rBtc + rTrad;
       ride.btc.push(rBtc); ride.trad.push(rTrad); ride.total.push(rTot);
-      ride.envelope.push(rTot - rBtc * depth);
       ride.btcShare.push(rTot > 0 ? rBtc / rTot : w);
       var bTot = bBtc + bTrad;
       rebal.btc.push(bBtc); rebal.trad.push(bTrad); rebal.total.push(bTot);
-      rebal.envelope.push(bTot - bBtc * depth);
       rebal.btcShare.push(bTot > 0 ? bBtc / bTot : w);
       rebal.trimmedCum.push(trimmed);
     }
-    return { years: years, ride: ride, rebal: rebal, P0: P0, w: w, H: H, depth: depth };
+    return { years: years, ride: ride, rebal: rebal, noBtc: noBtc, P0: P0, w: w, H: H, depth: depth,
+      crashOn: !!crash, crashYear: crash ? crash.crashYear : null };
   }
 
   // Runtime parity guard (dev): the loop's year-H total must equal the shipped
@@ -373,9 +424,34 @@
     assertParity(paths);
     renderDriftComposition(paths);
     renderDriftEndnote(paths);
+    renderCrash(paths);
     renderDriftChart(paths);
     assertDriftBinding();
     renderPathAudit(paths);
+  }
+
+  // Crash verdict vs the no-bitcoin benchmark at year H (the "worth it?" answer).
+  // Positive = ahead of 100%-traditional; negative = behind (must be sayable).
+  function crashVerdictPct(paths) {
+    var totalH = paths[activeStrat()].total[paths.H], noH = paths.noBtc[paths.H];
+    return noH > 0 ? (totalH - noH) / noH * 100 : 0;
+  }
+  function renderCrash(paths) {
+    // Crash-aware rebalance caption shows only when BOTH disclosures are open.
+    var cap = document.getElementById('asDriftCrashCaption');
+    if (cap) cap.hidden = !(S.cmp && S.crashOn);
+    var vEl = document.getElementById('asCrashVerdict'); if (!vEl) return;
+    if (!S.crashOn) { vEl.textContent = ''; return; }
+    var rec = (RECOVERY[S.crashRec] || RECOVERY.historical).label;
+    var cy = paths.crashYear, H = S.horizonYears, depth = S.crashDepthPct, X = crashVerdictPct(paths);
+    var prefix = 'A −' + depth + '% crash landing in year ' + cy + ' with ' + rec + ' recovery ';
+    if (Math.abs(X) < 2) {
+      vEl.innerHTML = prefix + 'ends within <strong>' + Math.abs(X).toFixed(1) + '%</strong> of one with no bitcoin — roughly a wash at this horizon.';
+    } else if (X > 0) {
+      vEl.innerHTML = prefix + 'still leaves this portfolio <strong>' + Math.round(X) + '% ahead</strong> of one with no bitcoin by year ' + H + ', under your assumptions.';
+    } else {
+      vEl.innerHTML = prefix + 'leaves this portfolio <strong>' + Math.round(-X) + '% behind</strong> one with no bitcoin at year ' + H + ', under your assumptions — at this horizon, the crash is not recovered.';
+    }
   }
 
   // Composition bars + endnote read the SINGLE shipped source (the loop's
@@ -423,7 +499,7 @@
     // trad's origin-fill paint over the whole stack (the inverted render). Array
     // order alone gives bottom=trad, top=btc, consistent with the `fill: '-1'`
     // reference. Verified on the chart by assertDriftBinding, not just the arrays.
-    return [
+    var sets = [
       { label: 'Traditional sleeve', data: xy(main.trad), fill: 'origin', stack: 'main',
         borderColor: TRAD_BLUE, backgroundColor: 'rgba(94,122,146,0.5)', borderWidth: 1.5, pointRadius: 0, tension: 0.2 },
       { label: 'Bitcoin sleeve', data: xy(main.btc), fill: '-1', stack: 'main',
@@ -431,6 +507,14 @@
       { label: overlayLabel, data: xy(other.total), fill: false, stack: 'ovl',
         borderColor: DIM, borderWidth: 1.4, pointRadius: 0, tension: 0.2, hidden: !S.cmp }
     ];
+    // No-bitcoin benchmark (100% traditional) — the crash verdict's baseline.
+    // Added only while the crash disclosure is open, so it never leaks into the
+    // legend when closed. Neutral dim dash (NOT danger red — it's a benchmark).
+    if (S.crashOn) {
+      sets.push({ label: 'No-bitcoin portfolio (total)', data: xy(paths.noBtc), fill: false, stack: 'nobtc',
+        borderColor: MUTED, borderWidth: 1.4, borderDash: [6, 4], pointRadius: 0, tension: 0.2 });
+    }
+    return sets;
   }
   function renderDriftChart(paths) {
     var el = document.getElementById('asDriftChart');
@@ -441,6 +525,7 @@
       var needResize = (driftChart._lastH !== paths.H) || (driftChart._lastBasis !== hasUSD());
       driftChart.data.datasets = ds;
       driftChart._main = paths[strat];
+      driftChart._noBtc = S.crashOn ? paths.noBtc : null;
       driftChart.options.scales.x.max = paths.H;
       driftChart.options.scales.x.ticks.stepSize = paths.H <= 12 ? 1 : (paths.H <= 24 ? 2 : 5);
       driftChart.options.scales.y.title.text = hasUSD() ? 'Portfolio value ($)' : 'Growth of 100';
@@ -482,13 +567,15 @@
               title: function (items) { return items.length ? ('Year ' + items[0].parsed.x) : ''; },
               label: function (ctx) {
                 var i = ctx.dataIndex, m = driftChart._main; if (!m) return '';
-                return [
+                var lines = [
                   'Bitcoin sleeve: ' + driftFmt(m.btc[i]),
                   'Traditional: ' + driftFmt(m.trad[i]),
                   'Total: ' + driftFmt(m.total[i]),
-                  'Bitcoin share: ' + pct(m.btcShare[i]),
-                  'expected values under your assumptions — not a forecast'
+                  'Bitcoin share: ' + pct(m.btcShare[i])
                 ];
+                if (driftChart._noBtc) lines.push('No-bitcoin portfolio: ' + driftFmt(driftChart._noBtc[i]));
+                lines.push('expected values under your assumptions — not a forecast');
+                return lines;
               }
             }
           }
@@ -496,6 +583,7 @@
       }
     });
     driftChart._main = paths[strat];
+    driftChart._noBtc = S.crashOn ? paths.noBtc : null;
     driftChart._lastH = paths.H; driftChart._lastBasis = hasUSD();
   }
 
@@ -657,7 +745,7 @@
     var L = [];
     L.push('# Last Coin Standing — Bitcoin portfolio allocation');
     L.push('# Horizon,' + S.horizonYears + ' years');
-    L.push('# Bitcoin projection,' + activeMode() + ' (' + mult(btcMult()) + ' over hold)');
+    L.push('# Bitcoin projection,' + modeLabel(activeMode()) + ' (btc=' + activeMode() + ', ' + mult(btcMult()) + ' over horizon)');
     L.push('# Bitcoin ratio to Power Law trend today,' + currentRatio().toFixed(3));
     L.push('# Traditional sleeve rate,' + S.tradRatePct + '%/yr (' + mult(tradMult()) + ' over hold)');
     L.push('# Bitcoin volatility,' + Math.round(BTC_VOL * 100) + '%');
@@ -667,6 +755,12 @@
     if (hasUSD()) L.push('# Total portfolio,$' + Math.round(S.portfolioUSD));
     L.push('# Drift strategy,' + (S.strat === 'rebal' ? 'rebalance annually' : 'let it ride'));
     L.push('# Rebalance comparison,' + (S.cmp ? 'open' : 'closed'));
+    if (S.crashOn) {
+      var recL = (RECOVERY[S.crashRec] || RECOVERY.historical).label;
+      L.push('# Crash,on — year ' + Math.max(1, Math.min(S.horizonYears - 1, S.crashYear)) + ', −' + S.crashDepthPct + '% depth, ' + recL + ' recovery');
+    } else {
+      L.push('# Crash,off');
+    }
     L.push('# Live scenario URL,' + window.location.href);
     L.push('');
     L.push('Allocation %,Portfolio upside (x),Extra return vs no BTC (%),Drawdown of whole portfolio (%),Portfolio influence (%)' + (hasUSD() ? ',Drawdown ($)' : ''));
@@ -682,9 +776,11 @@
     L.push('');
     L.push('# Year-by-year path,' + (strat === 'rebal' ? 'rebalance annually' : 'let it ride') + ',basis: ' + basis);
     L.push('Year,BTC sleeve,Traditional sleeve,Total'
+      + (S.crashOn ? ',No-bitcoin portfolio' : '')
       + (S.cmp ? ',' + otherLabel + ',BTC trimmed (cumulative)' : ''));
     for (var i = 0; i < paths.years.length; i++) {
       var row = [paths.years[i], Math.round(main.btc[i]), Math.round(main.trad[i]), Math.round(main.total[i])];
+      if (S.crashOn) row.push(Math.round(paths.noBtc[i]));
       if (S.cmp) row.push(Math.round(other.total[i]), Math.round(paths.rebal.trimmedCum[i]));
       L.push(row.join(','));
     }
@@ -746,6 +842,10 @@
     var disc = document.getElementById('asDriftDisclosure'), discBody = document.getElementById('asDriftRebalBody');
     if (disc) disc.setAttribute('aria-expanded', String(S.cmp));
     if (discBody) discBody.hidden = !S.cmp;
+    setSeg('asCrashRec', S.crashRec);
+    var cd = document.getElementById('asCrashDisclosure'), cdBody = document.getElementById('asCrashBody');
+    if (cd) cd.setAttribute('aria-expanded', String(S.crashOn));
+    if (cdBody) cdBody.hidden = !S.crashOn;
     updateReadouts();
   }
   function updateReadouts() {
@@ -755,6 +855,11 @@
     var frWrap = document.getElementById('asFlatWrap'); if (frWrap) frWrap.hidden = (activeMode() !== 'flat');
     var frV = document.getElementById('asFlatRateVal'); if (frV) frV.textContent = S.btcFlatPct + '%/yr';
     var dv = document.getElementById('asDepthVal'); if (dv) dv.innerHTML = '−' + S.crashDepthPct + '%';
+    // Crash-year slider tracks the horizon (max = H−1); keep S.crashYear, clamp display.
+    var cyMax = Math.max(1, S.horizonYears - 1), cyShown = Math.min(S.crashYear, cyMax);
+    var cyS = document.getElementById('asCrashYear'); if (cyS) { cyS.max = String(cyMax); cyS.value = String(cyShown); }
+    var cyV = document.getElementById('asCrashYearVal'); if (cyV) cyV.textContent = 'year ' + cyShown;
+    var de = document.getElementById('asCrashDepthEcho'); if (de) de.textContent = S.crashDepthPct;
   }
 
   function wire() {
@@ -814,12 +919,35 @@
       renderAll();
     });
 
+    // Drift chart: crash disclosure (open = crash active) + crash-year slider + recovery preset
+    var crashDisc = document.getElementById('asCrashDisclosure'), crashBody = document.getElementById('asCrashBody');
+    if (crashDisc && crashBody) crashDisc.addEventListener('click', function () {
+      S.crashOn = !S.crashOn;
+      crashDisc.setAttribute('aria-expanded', String(S.crashOn));
+      crashBody.hidden = !S.crashOn;
+      renderAll();
+    });
+    var cyS = document.getElementById('asCrashYear');
+    if (cyS) cyS.addEventListener('input', function () {
+      var cyMax = Math.max(1, S.horizonYears - 1);
+      S.crashYear = clamp(parseInt(cyS.value, 10), 1, cyMax);
+      var cyV = document.getElementById('asCrashYearVal'); if (cyV) cyV.textContent = 'year ' + S.crashYear;
+      renderAll();
+    });
+    var recSeg = document.getElementById('asCrashRec');
+    if (recSeg) recSeg.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-val]'); if (!b) return;
+      var k = b.getAttribute('data-val');
+      if (RECOVERY[k]) { S.crashRec = k; setSeg('asCrashRec', k); renderAll(); }
+    });
+
     // Reset defaults
     var reset = document.getElementById('asReset');
     if (reset) reset.addEventListener('click', function () {
       S.horizonYears = DEFAULTS.horizonYears; S.tradRatePct = DEFAULTS.tradRatePct; S.crashDepthPct = DEFAULTS.crashDepthPct;
       S.btcMode = null; S.btcFlatPct = DEFAULTS.btcFlatPct;
       S.strat = DEFAULTS.strat; S.cmp = DEFAULTS.cmp;
+      S.crashOn = DEFAULTS.crashOn; S.crashYear = DEFAULTS.crashYear; S.crashRec = DEFAULTS.crashRec;
       initControls(); renderAll();
     });
 
@@ -851,6 +979,8 @@
     if (p.has('port')) { var v = parseFloat(p.get('port')); if (isFinite(v) && v > 0) S.portfolioUSD = v; }
     if (p.has('strat') && ['ride', 'rebal'].indexOf(p.get('strat')) >= 0) S.strat = p.get('strat');
     if (p.has('cmp') && p.get('cmp') === '1') S.cmp = true;
+    if (p.has('cy')) { var cyv = parseInt(p.get('cy'), 10); if (isFinite(cyv)) { S.crashOn = true; S.crashYear = clamp(cyv, 1, 39); } }
+    if (p.has('rec') && RECOVERY[p.get('rec')]) S.crashRec = p.get('rec');
   }
   var _urlT = null;
   function syncUrl() {
@@ -865,6 +995,8 @@
       if (hasUSD()) p.set('port', String(Math.round(S.portfolioUSD))); else p.delete('port');
       if (S.strat === 'rebal') p.set('strat', 'rebal'); else p.delete('strat');
       if (S.cmp) p.set('cmp', '1'); else p.delete('cmp');
+      if (S.crashOn) p.set('cy', String(S.crashYear)); else p.delete('cy');
+      if (S.crashOn && S.crashRec !== 'historical') p.set('rec', S.crashRec); else p.delete('rec');
       window.history.replaceState(null, '', window.location.pathname + '?' + p.toString() + window.location.hash);
     }, 250);
   }

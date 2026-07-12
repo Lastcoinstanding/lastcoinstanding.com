@@ -188,6 +188,32 @@ eleventyComputed:
     </div>
     <p class="as-drift-endnote" id="asDriftEndnote">&mdash;</p>
 
+    <div class="as-drift-crash">
+      <button type="button" class="as-drift-disclosure" id="asCrashDisclosure" aria-expanded="false" aria-controls="asCrashBody">
+        <span class="as-drift-disclosure-label">What if a crash lands along the way?</span>
+      </button>
+      <div class="as-drift-crash-body" id="asCrashBody" hidden>
+        <div class="as-crash-controls">
+          <div class="as-crash-field">
+            <div class="as-crash-field-head"><span class="as-crash-label">Crash lands in</span><span class="as-crash-val" id="asCrashYearVal">year 3</span></div>
+            <input type="range" id="asCrashYear" class="as-range as-range-red" min="1" max="9" step="1" value="3" aria-label="Crash year">
+          </div>
+          <div class="as-crash-field">
+            <span class="as-crash-label">Recovery</span>
+            <div class="as-seg as-seg-mini" id="asCrashRec" role="group" aria-label="Recovery shape">
+              <button type="button" data-val="fast">Fast</button>
+              <button type="button" data-val="historical" class="is-active">Historical</button>
+              <button type="button" data-val="weak">Weak</button>
+            </div>
+          </div>
+        </div>
+        <p class="as-crash-depth-note">Crash depth reuses the <a href="#assumptions">&minus;<span id="asCrashDepthEcho">40</span>% assumption</a> you set above.</p>
+        <p class="as-crash-verdict" id="asCrashVerdict">&mdash;</p>
+        <p class="as-crash-notes">The crash hits the bitcoin sleeve only, matching this page&rsquo;s drawdown model &mdash; in a real crash the rest of the portfolio rarely stands still. Recovery shapes follow historical crash patterns; none of this is a forecast, and the timing is yours, not a prediction.</p>
+        <p class="as-crash-related">For crash timing against a retirement withdrawal plan, see <a href="/the-bitcoin-retirement-stress-test">The Bitcoin Retirement &mdash; Stress Test</a>.</p>
+      </div>
+    </div>
+
     <div class="as-drift-rebal">
       <button type="button" class="as-drift-disclosure" id="asDriftDisclosure" aria-expanded="false" aria-controls="asDriftRebalBody">
         <span class="as-drift-disclosure-label">What if you rebalanced back to your target each year?</span>
@@ -197,7 +223,8 @@ eleventyComputed:
           <button type="button" data-val="ride" class="is-active">Let it ride</button>
           <button type="button" data-val="rebal">Rebalance annually</button>
         </div>
-        <p class="as-drift-caption">The winner drifts up. Left alone, the faster-growing sleeve takes over the portfolio &mdash; compounding the upside and, with it, the size of the bite a crash takes (the dashed line). Rebalancing annually pins both back to your target. One honest note about this comparison: on a smooth trend path like this projection, rebalancing always trims the faster asset, so it will always show the lower endpoint here. A real, volatile path is where rebalancing earns its keep &mdash; buying weakness, trimming strength. This chart shows the drift trade-off, not a verdict on rebalancing; for the strategy built on volatility itself, see <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>.</p>
+        <p class="as-drift-caption">The winner drifts up. Left alone, the faster-growing sleeve takes over the portfolio &mdash; compounding the upside and, with it, the size of the bite a crash takes. Rebalancing annually pins both back to your target. One honest note about this comparison: on a smooth trend path like this projection, rebalancing always trims the faster asset, so it will always show the lower endpoint here. A real, volatile path is where rebalancing earns its keep &mdash; buying weakness, trimming strength. This chart shows the drift trade-off, not a verdict on rebalancing; for the strategy built on volatility itself, see <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>.</p>
+        <p class="as-drift-caption as-drift-crash-caption" id="asDriftCrashCaption" hidden>A crashed path is where annual rebalancing shows its real behavior: the yearly reset buys bitcoin while it is down. Depending on the crash&rsquo;s timing and recovery, that can narrow &mdash; or reverse &mdash; the gap you saw on the smooth path. The numbers above are doing that arithmetic under your settings; neither strategy wins by default.</p>
       </div>
     </div>
   </section>

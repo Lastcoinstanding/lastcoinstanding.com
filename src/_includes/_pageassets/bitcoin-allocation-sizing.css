@@ -227,10 +227,28 @@ body { background: var(--bg); color: var(--text); }
 .as-drift-caption a, .as-drift-caption a:visited { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 .as-drift-caption a:hover { color: #f2b25a; border-bottom-color: rgba(224,148,34,0.7); }
 .as-audit-subhead { font-family: var(--font-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); margin: 1.6rem 0 0.6rem; }
+/* Crash disclosure (Phase B) */
+.as-drift-crash { margin: 1.4rem 0 0; }
+.as-drift-crash-body { padding: 1rem 0 0; }
+.as-crash-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.4rem; align-items: end; margin: 0 0 0.9rem; }
+.as-crash-field-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.4rem; }
+.as-crash-label { font-family: var(--font-b); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 0.4rem; }
+.as-crash-field-head .as-crash-label { margin-bottom: 0; }
+.as-crash-val { font-family: var(--font-b); font-size: 0.92rem; font-weight: 600; color: #f2eee8; font-variant-numeric: tabular-nums; }
+.as-crash-depth-note { font-family: var(--font-b); font-size: 0.76rem; line-height: 1.5; color: var(--text-muted); margin: 0 0 0.9rem; }
+.as-crash-depth-note a, .as-crash-depth-note a:visited { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+.as-crash-verdict { font-family: var(--font-b); font-size: 0.98rem; line-height: 1.65; color: var(--text); background: rgba(224,148,34,0.05); border: 1px solid rgba(224,148,34,0.24); border-left: 3px solid var(--amber); border-radius: 10px; padding: 1.1rem 1.3rem; margin: 0 0 0.9rem; }
+.as-crash-verdict strong { color: #f2eee8; font-weight: 600; }
+.as-crash-notes { font-family: var(--font-b); font-size: 0.76rem; line-height: 1.55; color: var(--text-muted); margin: 0 0 0.6rem; }
+.as-crash-related { font-family: var(--font-b); font-size: 0.8rem; line-height: 1.55; color: var(--text-dim); margin: 0; }
+.as-crash-related a, .as-crash-related a:visited { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+.as-crash-related a:hover { color: #f2b25a; border-bottom-color: rgba(224,148,34,0.7); }
+.as-drift-crash-caption { margin-top: 0.8rem; }
 @media (max-width: 560px) {
   .as-drift-comp-row { flex-wrap: wrap; }
   .as-drift-comp-when { flex-basis: auto; }
   .as-drift-comp-share { min-width: 0; flex-basis: 100%; text-align: left; }
+  .as-crash-controls { grid-template-columns: 1fr; }
 }
 
 /* ── Where this connects ── */
