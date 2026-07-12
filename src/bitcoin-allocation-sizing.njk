@@ -186,9 +186,10 @@ eleventyComputed:
         <span class="as-drift-comp-share" id="asCompShareH">&mdash;</span>
       </div>
     </div>
+    <p class="as-drift-endpoint" id="asDriftEndpoint" aria-live="polite">&mdash;</p>
     <p class="as-drift-endnote" id="asDriftEndnote">&mdash;</p>
 
-    <div class="as-drift-crash">
+    <div class="as-drift-crash" id="crash">
       <button type="button" class="as-drift-disclosure" id="asCrashDisclosure" aria-expanded="false" aria-controls="asCrashBody">
         <span class="as-drift-disclosure-label">What if a crash lands along the way?</span>
       </button>
@@ -287,7 +288,7 @@ eleventyComputed:
           <tbody id="asPathBody"></tbody>
         </table>
       </div>
-      <p class="as-chart-caption">The year-by-year path behind the chart, for your current allocation and strategy. Each row reproduces from its neighbour: last year&rsquo;s sleeve times its growth factor is this year&rsquo;s sleeve, and the crash column is the total minus the bitcoin sleeve times your crash depth. The <strong>return-to-trend</strong> curve is trend-shaped and amortized to close today&rsquo;s gap to trend by the final year &mdash; so you can see how the gap closes, not just that it does. Values follow the chart&rsquo;s basis (dollars if you set a portfolio, otherwise growth of 100).</p>
+      <p class="as-chart-caption">The year-by-year path behind the chart, for your current allocation and strategy. Each row reproduces from its neighbour: last year&rsquo;s sleeve times its growth factor is this year&rsquo;s sleeve. The <strong>return-to-trend</strong> curve is trend-shaped and amortized to close today&rsquo;s gap to trend by the final year &mdash; so you can see how the gap closes, not just that it does. With a crash active, <strong>underwater</strong> means the portfolio total below its level the year the crash lands (before the drop) &mdash; measured on the total, not the bitcoin sleeve. Values follow the chart&rsquo;s basis (dollars if you set a portfolio, otherwise growth of 100).</p>
     </div>
   </section>
 

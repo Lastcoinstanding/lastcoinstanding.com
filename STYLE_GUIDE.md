@@ -1891,6 +1891,31 @@ Use on any future dark-theme form (the inset shadow repaints over the autofill c
 ```
 Verify Reset and URL-restore visually move **every** representation (they write the one key; the sync pass propagates).
 
+### 6.36 Underwater band / pre-crash level (crash-path charts)
+
+**When:** any chart that drops a crash onto a value path and wants to show how long the portfolio stays below where it was — used on the Retirement **Stress Test** (origin, `underwaterPlugin`) and the allocation **drift chart** (`driftUnderwaterPlugin`). Two pages share this now; if a third needs it, extract to a shared module (tracked in TECH_DEBT alongside the crash-engine extraction).
+
+**Technique:** an **inline Chart.js plugin — no external dependency** (do NOT add `chartjs-plugin-annotation`). Draw in `afterDatasetsDraw` (over the fills) when the sleeves are opaque; `beforeDatasetsDraw` (behind) is fine when the datasets are unfilled lines (Stress Test). Read a span object off the chart instance (`c.$uw` / `c.$sp`) set during render, so drag updates flow through the normal `update('none')` path.
+
+**Tint + tokens (reuse verbatim across pages):**
+- Band wash: `rgba(192,57,43,0.09–0.10)` (rose/danger red, very low alpha).
+- Pre-crash level line: dashed `[4,3]`, `rgba(236,228,214,0.55)`; label `pre-crash level` in `rgba(236,228,214,0.8)`, `600 10px Inter`, left-anchored just above the line.
+- Band label: `#e08a7a`, `700 11px Inter`, centered over the band near the top.
+
+**Span math:** `onset` = the value the year the crash lands (the pre-drop level, since the crash multiplier holds year `cy` at 1.0 and dips over `cy→cy+1`). Scan strictly after `cy`: `recY` = first year the value regains `onset`; if the trough never dips below `onset`, draw nothing; if it never regains `onset` by the horizon, run the band to the end and label `not recovered within your horizon`. Grammar via `yearsWord(n)` (`n + (n===1?' year':' years')`).
+
+```js
+var underwaterPlugin = { id: 'asUnderwater', afterDatasetsDraw: function (c) {
+  var sp = c.$uw; if (!sp) return;
+  var xS = c.scales.x, yS = c.scales.y, ctx = c.ctx; ctx.save();
+  var x0 = Math.max(xS.getPixelForValue(sp.onsetY), xS.left), x1 = Math.min(xS.getPixelForValue(sp.endY), xS.right);
+  if (x1 > x0) { ctx.fillStyle = 'rgba(192,57,43,0.10)'; ctx.fillRect(x0, yS.top, x1 - x0, yS.bottom - yS.top); }
+  var yp = yS.getPixelForValue(sp.onset); /* dashed pre-crash line + labels … */ ctx.restore();
+}};
+```
+
+**Pair with a pinned axis** (see the drift chart): while the crash view is open, pin `y.max` to a nice ceiling of the *smooth* path's max so recovery/timing changes are apples-to-apples; recompute only on assumption change, not on crash-year/recovery drag.
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.

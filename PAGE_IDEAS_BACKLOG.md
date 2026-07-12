@@ -13,6 +13,13 @@ Candidate page / exploration ideas surfaced during ongoing work but not yet sche
 
 ## Open ideas
 
+- [ ] **Interactive highlights strip in The Gallery — deep-link cards into the best playgrounds.**
+  Surfaced 2026-07-12 during the drift-chart Phase C build (which shipped the deep-link anchors this depends on).
+  - **Concept:** a 3–4 card strip in The Gallery, each card deep-linking into a preconfigured interaction — e.g. the **allocation crash view** (`/bitcoin-allocation-sizing?…&cy=3&rec=weak#crash`), **Wait or Deploy Now**, the **Retirement Stress Test**, and **The Bitcoin Retirement**. Each card lands the reader on the open, configured playground in one click.
+  - **Why not a nav item:** an alternative to adding a top-nav "Interactions" entry (which worsens the dropdown-overflow problem already flagged). Revisit nav only if the strip earns it.
+  - **Depends on:** Phase C deep-link anchors (**shipped** in `154f84a`-line drift work — the crash view is deep-linkable today; other playgrounds already carry URL state).
+  - **Open design questions:** which 3–4 to feature; whether cards show a static thumbnail or a live mini-preview; copy register for each card.
+
 - [ ] **Bull & bear market cycles — a dedicated exploration (volatility compression over time).**
   Surfaced 2026-06-30 during the deployment-trilogy work, when the page-1 risk shed raised the question of how to present drawdown/bear-market severity. Decided NOT to fold into page 1 (scope/measure-mismatch — see below); captured here as its own page instead.
   - **Concept:** a standalone "exploration"-genre page on Bitcoin's bull/bear cycle structure, centered on the thesis that **each successive bear market is shallower than the last** (volatility compression / maturing market). Bull and bear phases with associated graphs; gets into the weeds on decreasing drawdown severity in a way the trilogy deliberately keeps light.

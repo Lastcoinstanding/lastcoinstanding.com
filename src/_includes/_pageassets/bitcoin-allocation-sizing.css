@@ -213,7 +213,9 @@ body { background: var(--bg); color: var(--text); }
 .as-drift-comp-btc { background: #F7931A; transition: width 0.2s; }
 .as-drift-comp-trad { background: #5e7a92; transition: width 0.2s; }
 .as-drift-comp-share { flex: 0 0 auto; min-width: 9rem; text-align: right; font-variant-numeric: tabular-nums; color: #f2eee8; font-weight: 600; }
-.as-drift-endnote { font-family: var(--font-b); font-size: 0.98rem; line-height: 1.65; color: var(--text); margin: 1rem 0 0; }
+/* Always-visible year-H endpoint readout (one dim line under the composition bars) */
+.as-drift-endpoint { font-family: var(--font-b); font-size: 0.8rem; line-height: 1.5; color: var(--text-muted); font-variant-numeric: tabular-nums; margin: 0.9rem 0 0; }
+.as-drift-endnote { font-family: var(--font-b); font-size: 0.98rem; line-height: 1.65; color: var(--text); margin: 0.5rem 0 0; }
 .as-drift-endnote strong { color: #f2eee8; font-weight: 600; }
 .as-drift-rebal { margin: 1.4rem 0 0; }
 .as-drift-disclosure { display: flex; align-items: center; width: 100%; text-align: left; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem 1.2rem; cursor: pointer; font-family: var(--font-b); font-size: 0.9rem; color: var(--text-dim); }

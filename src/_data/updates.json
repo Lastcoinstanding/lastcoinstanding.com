@@ -2,6 +2,11 @@
   {
     "display": "7/12/26",
     "page": "/bitcoin-allocation-sizing.html",
+    "summary": "Updated: Bitcoin Portfolio Allocation — the crash view now shows how long you're underwater. A shaded band and a dashed pre-crash-level line mark the years the portfolio sits below where it stood when the crash hit, labelled with the number of years (or \"not recovered within your horizon\"). A compact year-by-year results line sits under the composition bars, the chart's vertical scale now stays fixed while you drag the crash year or switch recovery shapes (so scenarios are directly comparable), and you can deep-link straight into a configured crash view. Underwater is measured on the whole portfolio, not the bitcoin sleeve; none of it is a forecast."
+  },
+  {
+    "display": "7/12/26",
+    "page": "/bitcoin-allocation-sizing.html",
     "summary": "Updated: Bitcoin Portfolio Allocation — drop a crash onto the year-by-year chart. A new \"What if a crash lands along the way?\" control lets you place a bitcoin crash on any year and pick its recovery (Fast, Historical, or Weak), then watch the value dip and recover against a no-bitcoin benchmark. The verdict says plainly whether the allocation ends ahead, behind, or roughly even by your horizon — and behind is a real answer for an early crash with a weak recovery at a short horizon. With annual rebalancing also on, you can see the reset buy bitcoin while it's down. The crash hits the bitcoin sleeve only, recovery shapes follow historical patterns, and none of it is a forecast."
   },
   {

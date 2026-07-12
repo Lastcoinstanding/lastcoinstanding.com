@@ -426,11 +426,24 @@
     var paths = computePaths(S);
     assertParity(paths);
     renderDriftComposition(paths);
+    renderDriftEndpoint(paths);
     renderDriftEndnote(paths);
     renderCrash(paths);
     renderDriftChart(paths);
     assertDriftBinding();
     renderPathAudit(paths);
+  }
+
+  // Always-visible year-H results line under the composition bars. Reads the SAME
+  // computePaths result the chart uses (active strategy, crash included) — one
+  // source. Basis-aware via driftFmt (matches the axis formatting).
+  function renderDriftEndpoint(paths) {
+    var el = document.getElementById('asDriftEndpoint'); if (!el) return;
+    var m = paths[activeStrat()], H = paths.H;
+    var txt = 'At year ' + S.horizonYears + ': total ' + driftFmt(m.total[H])
+      + ' — bitcoin ' + driftFmt(m.btc[H]) + ' · traditional ' + driftFmt(m.trad[H]);
+    if (S.crashOn) txt += ' · no-bitcoin ' + driftFmt(paths.noBtc[H]);
+    el.textContent = txt;
   }
 
   // Crash verdict vs the no-bitcoin benchmark at year H (the "worth it?" answer).
@@ -519,24 +532,106 @@
     }
     return sets;
   }
+  // ── Underwater band (ported from the Stress Test's underwaterPlugin) ────────
+  // Same technique (inline Chart.js plugin, no external dependency) and tint
+  // tokens. onset = the active strategy's crashed total AT the crash year: the
+  // crash multiplier keeps year cy at 1.0 and dips over cy→cy+1, so cy is the
+  // last value before the drop (the honest pre-crash level; the Stress Test's
+  // stressPeriod uses the same value-at-onset-year convention).
+  function yearsWord(n) { n = Math.round(n); return n + (n === 1 ? ' year' : ' years'); }
+  function niceCeil(v) {
+    if (!(v > 0)) return v;
+    var mag = Math.pow(10, Math.floor(Math.log10(v))), steps = [1, 1.5, 2, 2.5, 3, 4, 5, 7.5, 10];
+    for (var i = 0; i < steps.length; i++) { if (steps[i] * mag >= v) return steps[i] * mag; }
+    return 10 * mag;
+  }
+  // total below its pre-crash level (the year the crash lands) → underwater.
+  // Measured on the TOTAL, not the bitcoin sleeve.
+  function crashSpan(totals, cy, H) {
+    if (cy == null || cy < 1 || cy >= totals.length) return null;
+    var onset = totals[cy]; if (!(onset > 0)) return null;
+    var troughV = onset, recY = null;
+    for (var t = cy + 1; t <= H && t < totals.length; t++) {
+      if (totals[t] < troughV) troughV = totals[t];
+      if (recY === null && totals[t] >= onset) recY = t;
+    }
+    if (troughV >= onset) return null; // never actually went underwater → no band
+    var recovered = recY !== null;
+    return { onset: onset, onsetY: cy, recY: recY, recovered: recovered,
+      endY: recovered ? recY : H, underwater: recovered ? (recY - cy) : (H - cy) };
+  }
+  var driftUnderwaterPlugin = {
+    id: 'asUnderwater',
+    afterDatasetsDraw: function (c) {
+      var sp = c.$uw; if (!sp) return;
+      var xS = c.scales.x, yS = c.scales.y, ctx = c.ctx;
+      var x0 = Math.max(xS.getPixelForValue(sp.onsetY), xS.left);
+      var x1 = Math.min(xS.getPixelForValue(sp.endY), xS.right);
+      ctx.save();
+      // Rose band drawn OVER the fills at low alpha (the Stress Test draws behind,
+      // but its datasets are unfilled lines; here the opaque sleeves would drown a
+      // behind-band, so we wash over — the spec's primary instruction).
+      if (x1 > x0) { ctx.fillStyle = 'rgba(192,57,43,0.10)'; ctx.fillRect(x0, yS.top, x1 - x0, yS.bottom - yS.top); }
+      // Dashed pre-crash level line + label (Stress Test tokens verbatim).
+      var yp = yS.getPixelForValue(sp.onset);
+      if (yp >= yS.top && yp <= yS.bottom) {
+        ctx.setLineDash([4, 3]); ctx.strokeStyle = 'rgba(236,228,214,0.55)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(xS.left, yp); ctx.lineTo(xS.right, yp); ctx.stroke();
+        ctx.setLineDash([]); ctx.fillStyle = 'rgba(236,228,214,0.8)'; ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText('pre-crash level', xS.left + 4, yp - 4);
+      }
+      if (x1 > x0) {
+        ctx.fillStyle = '#e08a7a'; ctx.font = '700 11px Inter, sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(sp.recovered ? (yearsWord(sp.underwater) + ' underwater') : 'not recovered within your horizon', (x0 + x1) / 2, yS.top + 13);
+      }
+      ctx.restore();
+    }
+  };
+  // Pinned y-axis (crash open): a fixed frame so recovery/crash-year changes are
+  // apples-to-apples. Recomputes only when ASSUMPTIONS change (this key), never on
+  // crash-year/recovery change.
+  function driftPinKey() {
+    return [S.allocPct, S.horizonYears, S.tradRatePct, activeMode(), S.btcFlatPct, S.crashDepthPct, S.portfolioUSD, activeStrat()].join('|');
+  }
+  function driftPinMax(paths) {
+    var smooth = computePaths(Object.assign({}, S, { crashOn: false }));
+    var smoothMax = smooth[activeStrat()].total[smooth.H];                 // the natural ceiling
+    var crashedMax = Math.max.apply(null, paths[activeStrat()].total);     // safety guard (harvesting)
+    return niceCeil(Math.max(smoothMax, crashedMax));
+  }
+
   function renderDriftChart(paths) {
     var el = document.getElementById('asDriftChart');
     if (!el || typeof Chart === 'undefined') return;
     var strat = activeStrat();
     var ds = driftDatasets(paths);
+    var sp = S.crashOn ? crashSpan(paths[strat].total, paths.crashYear, paths.H) : null;
     if (driftChart) {
-      var needResize = (driftChart._lastH !== paths.H) || (driftChart._lastBasis !== hasUSD());
+      var pinChanged = false;
+      if (S.crashOn) {
+        var key = driftPinKey();
+        if (driftChart._pinKey !== key) { driftChart._pinMax = driftPinMax(paths); driftChart._pinKey = key; }
+        if (driftChart.options.scales.y.max !== driftChart._pinMax) pinChanged = true;
+        driftChart.options.scales.y.max = driftChart._pinMax;
+      } else {
+        if (driftChart.options.scales.y.max != null) pinChanged = true;
+        driftChart.options.scales.y.max = undefined; driftChart._pinKey = null;
+      }
+      var needResize = (driftChart._lastH !== paths.H) || (driftChart._lastBasis !== hasUSD())
+        || (driftChart._lastCrashOn !== S.crashOn) || pinChanged;
       driftChart.data.datasets = ds;
       driftChart._main = paths[strat];
       driftChart._noBtc = S.crashOn ? paths.noBtc : null;
+      driftChart.$uw = sp;
       driftChart.options.scales.x.max = paths.H;
       driftChart.options.scales.x.ticks.stepSize = paths.H <= 12 ? 1 : (paths.H <= 24 ? 2 : 5);
       driftChart.options.scales.y.title.text = hasUSD() ? 'Portfolio value ($)' : 'Growth of 100';
-      driftChart._lastH = paths.H; driftChart._lastBasis = hasUSD();
+      driftChart._lastH = paths.H; driftChart._lastBasis = hasUSD(); driftChart._lastCrashOn = S.crashOn;
       driftChart.update(needResize ? 'resize' : 'none');
       return;
     }
     var narrow = typeof matchMedia === 'function' && matchMedia('(max-width: 480px)').matches;
+    var pin0 = S.crashOn ? driftPinMax(paths) : undefined;
     driftChart = new Chart(el.getContext('2d'), {
       type: 'line',
       data: { datasets: ds },
@@ -548,7 +643,7 @@
             grid: { display: false },
             ticks: { color: MUTED, font: { size: 11 }, stepSize: paths.H <= 12 ? 1 : (paths.H <= 24 ? 2 : 5), precision: 0 },
             title: { display: true, text: 'years from today', color: MUTED, font: { size: 10 } } },
-          y: { stacked: true, beginAtZero: true, grid: { color: 'rgba(224,148,34,0.06)' },
+          y: { stacked: true, beginAtZero: true, max: pin0, grid: { color: 'rgba(224,148,34,0.06)' },
             ticks: { color: MUTED, font: { size: 11 }, callback: function (v) { return hasUSD() ? usd(v) : commas(v); } },
             title: { display: true, text: hasUSD() ? 'Portfolio value ($)' : 'Growth of 100', color: MUTED, font: { size: 10 } } }
         },
@@ -583,11 +678,15 @@
             }
           }
         }
-      }
+      },
+      plugins: [driftUnderwaterPlugin]
     });
     driftChart._main = paths[strat];
     driftChart._noBtc = S.crashOn ? paths.noBtc : null;
-    driftChart._lastH = paths.H; driftChart._lastBasis = hasUSD();
+    driftChart.$uw = sp;
+    driftChart._pinKey = S.crashOn ? driftPinKey() : null;
+    driftChart._pinMax = pin0;
+    driftChart._lastH = paths.H; driftChart._lastBasis = hasUSD(); driftChart._lastCrashOn = S.crashOn;
   }
 
   // Visual-binding guard (the Phase-A lesson): assert the ORANGE "Bitcoin sleeve"
@@ -1006,8 +1105,20 @@
 
   // ════════ INIT ════════
   function init() {
-    readUrl(); wire(); renderAll();
+    readUrl();
+    // Deep link: #crash opens the crash disclosure even without crash params;
+    // `cy` already set S.crashOn in readUrl. Scroll the drift section into view
+    // after render settles (rAF) so we don't fight the browser's native hash scroll.
+    var hash = (window.location.hash || '').toLowerCase();
+    if (hash === '#crash') S.crashOn = true;
+    var deepLink = S.crashOn || hash === '#crash' || hash === '#portfolio-over-time';
+    wire(); renderAll();
     paritySweep(); // dev self-check: full matrix loop-vs-closed-form parity (silent unless it fails)
+    if (deepLink && window.requestAnimationFrame) {
+      requestAnimationFrame(function () { requestAnimationFrame(function () {
+        var sec = document.getElementById('portfolio-over-time'); if (sec) sec.scrollIntoView({ block: 'start' });
+      }); });
+    }
     // Refresh the spot price (and with it the regime + projection) from the live feed.
     try { fetchTodayPrice(function (price) { if (isFinite(price) && price > 0) { spot = price; if (S.btcMode == null) setSeg('asBtcMode', activeMode()); updateReadouts(); renderAll(); } }); } catch (e) {}
   }
