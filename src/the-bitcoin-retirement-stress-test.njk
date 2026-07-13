@@ -148,11 +148,27 @@ eleventyComputed:
           </div>
           <p class="st-control-note"><strong>Weak</strong> settles toward the Power Law floor and never fully returns to trend, the failed-recovery case. Historical is the default because past recoveries were reliable, but non-stationarity means the future is not guaranteed.</p>
         </div>
+
+        <div class="st-control">
+          <div class="st-control-label">Spending flexibility
+            <span class="help-tip" tabindex="0">?<span class="tip-content">If the crash lands, cut withdrawals by this much while the market is below its pre-crash level &mdash; the real-world response to a bear market. 0 = off.</span></span>
+            <span class="st-control-val" id="stFlexVal">Off</span>
+          </div>
+          <input type="range" id="stFlexSlider" class="st-range" min="0" max="50" step="5" value="0" aria-label="Spending flexibility percent">
+          <div class="st-seg st-seg-mini" id="stFlex">
+            <button type="button" data-val="0">Off</button>
+            <button type="button" data-val="10">10%</button>
+            <button type="button" data-val="20">20%</button>
+            <button type="button" data-val="30">30%</button>
+          </div>
+          <p class="st-control-note">Cut withdrawals while the market sits below its pre-crash level, the actionable counterpart to &ldquo;don&rsquo;t sell into the bottom.&rdquo; Under a <strong>Weak</strong> recovery the market never fully returns, so the cut runs through the horizon.</p>
+        </div>
       </div>
     </div>
 
     <!-- Survive/deplete headline + full-width horizontal chart -->
     <div class="st-headline st-out-ok" id="stHeadline">&mdash;</div>
+    <div class="st-mitigation" id="stMitigation" hidden></div>
     <div class="st-chart-head">
       <span class="st-focus-hint" id="stFocusHint">Zoom in on the crash years and what you would live through &rarr;</span>
       <div class="st-focus-control">
@@ -214,7 +230,8 @@ eleventyComputed:
           <tbody id="stAuditBody"></tbody>
         </table>
       </div>
-      <p class="st-chart-caption"><span class="st-dot">▼</span> marks years the crash has depressed the price below trend. Notice the <strong>BTC sold</strong> column rise in those years: the same income now costs more sats. That is the mechanism, sequence risk made concrete.</p>
+      <p class="st-flex-summary" id="stFlexSummary" hidden></p>
+      <p class="st-chart-caption"><span class="st-dot">▼</span> marks years the crash has depressed the price below trend. Notice the <strong>BTC sold</strong> column rise in those years: the same income now costs more sats. That is the mechanism, sequence risk made concrete. <span class="st-cut">✂</span> marks years the spending-flexibility lever cut the withdrawal.</p>
     </div>
   </section>
 

@@ -75,6 +75,13 @@
     troughLagYears: 1        // ~1 year peak->trough (Bull & Bear: 100+ days to bottom)
   };
 
+  // ── Spending flexibility (v2 mitigation lever) ──
+  // Cut withdrawals by FLEX% while the market is below its pre-crash level. The cut
+  // window is derived from the PRICE PATH (crashMultiplier(y) < 1), NOT the stack's
+  // underwater span (the stack recovers slower — coins sold cheap are gone — so
+  // binding to it would overstate the mitigation). 0 = off; up to 50.
+  var FLEX = 0;
+
   // Two-path chart view: 'full' (whole retirement) | 'crash' (zoom the crash window, so the
   // reader feels the trough years they would have to hold through).
   var CHART_FOCUS = 'full';
@@ -114,7 +121,7 @@
 
   // ════════ PROJECTION ENGINE (parity with retirement projectStackOverTime) ════════
   // multFn(year) returns the price multiplier for that year (baseline = ()=>1).
-  function projectStack(scn, growth, infl, multFn) {
+  function projectStack(scn, growth, infl, multFn, flexPct) {
     var startYear = (new Date()).getFullYear();
     var endYear = scn.retirementYear + scn.yearsInRetirement;
     var i = infl / 100;
@@ -134,10 +141,15 @@
         var nominalIncome = (scn.incomeBasis === 'fixed')
           ? scn.targetIncomeUSD
           : scn.targetIncomeUSD * Math.pow(1 + i, yearsFromToday);
+        // Spending flexibility: cut this year's withdrawal while the market is below
+        // its pre-crash level — i.e. while the crash multiplier is < 1 (PRICE-PATH
+        // underwater). Not the stack span. flexPct 0/absent → no cut, bit-identical to v1.
+        var cut = false, fullIncome = nominalIncome;
+        if (flexPct > 0 && multFn && multFn(y) < 1) { cut = true; nominalIncome = nominalIncome * (1 - flexPct / 100); }
         var btcNeeded = price > 0 ? nominalIncome / price : 0;
         stackBtc = Math.max(0, stackBtc - btcNeeded);
         if (stackBtc <= 0 && depletionYear === null) depletionYear = y;
-        rows.push({ x: y, phase: 'draw', price: price, btc: stackBtc, usd: stackBtc * price, income: nominalIncome, btcSold: btcNeeded, dcaAdded: 0 });
+        rows.push({ x: y, phase: 'draw', price: price, btc: stackBtc, usd: stackBtc * price, income: nominalIncome, fullIncome: fullIncome, cut: cut, btcSold: btcNeeded, dcaAdded: 0 });
       }
     }
     return { rows: rows, depletionYear: depletionYear, startYear: startYear, endYear: endYear };
@@ -160,6 +172,32 @@
   function pctSmaller(baseReal, crashReal) {
     if (!(baseReal > 0)) return 0;
     return Math.max(0, Math.round(100 * (1 - crashReal / baseReal)));
+  }
+
+  // ── Spending-flexibility helpers ──
+  // Price-path underwater draw years: the years the crash keeps the market below its
+  // pre-crash level (crashMultiplier < 1). The flex lever cuts across exactly these —
+  // NOT the stack's underwater span (which lags because coins sold cheap are gone).
+  // For Fast/Historical/Slow this is recoveryYears; for Weak it runs to the horizon.
+  function priceUnderwaterYears(crash, endYear) {
+    var years = [];
+    for (var y = crash.crashYear + 1; y <= endYear; y++) {
+      if (crashMultiplier(y, crash) < 1) years.push(y);
+    }
+    return years;
+  }
+  // Compare full-spend vs reduced-spend crashed paths: forgone income (nominal+real)
+  // across the cut years, cut-year count, and the two endings.
+  function mitigation(crashedFull, reduced, infl) {
+    var cutYears = 0, foregoneNom = 0, foregoneReal = 0;
+    reduced.rows.forEach(function (r) {
+      if (r.cut) { cutYears++; var f = r.fullIncome - r.income; foregoneNom += f; foregoneReal += (toReal(f, r.x, infl) || 0); }
+    });
+    var fullEnd = crashedFull.rows[crashedFull.rows.length - 1].usd;
+    var redEnd = reduced.rows[reduced.rows.length - 1].usd;
+    return { cutYears: cutYears, foregoneNom: foregoneNom, foregoneReal: foregoneReal,
+      fullDep: crashedFull.depletionYear, redDep: reduced.depletionYear,
+      fullEnd: fullEnd, redEnd: redEnd, flip: !!(crashedFull.depletionYear && !reduced.depletionYear) };
   }
 
   // ════════ FORMATTERS ════════
@@ -244,7 +282,7 @@
     return 'These are the crash years you would live through: the stack drops below its pre-crash level and does not regain it within the projection.';
   }
 
-  function renderMainChart(base, crashed, crash) {
+  function renderMainChart(base, crashed, crash, reduced) {
     var el = document.getElementById('stChart');
     if (!el || typeof Chart === 'undefined') return;
     var bands = buildBands(base.startYear, base.endYear);
@@ -256,9 +294,12 @@
       Object.assign({ label: 'Baseline (no crash)' }, lineFrom(base, C_BASE, 2)),
       Object.assign({ label: 'With the crash' }, lineFrom(crashed, C_CRASH, 2.4))
     ];
+    // Mitigation path: same rose hue family as the crash line, dashed + lighter.
+    if (reduced) ds.push(Object.assign({ label: 'With the crash + ' + FLEX + '% flexibility' }, lineFrom(reduced, '#eab4a2', 2, [6, 3])));
     var markers = [{ x: SCENARIO.retirementYear, color: 'rgba(236,228,214,0.5)', label: 'Retire' },
                    { x: crash.crashYear, color: C_CRASH, label: 'Crash' }];
     if (crashed.depletionYear) markers.push({ x: crashed.depletionYear, color: '#c0392b', label: 'Depleted' });
+    if (reduced && reduced.depletionYear && reduced.depletionYear !== crashed.depletionYear) markers.push({ x: reduced.depletionYear, color: '#eab4a2', label: 'Reduced depleted' });
 
     var noteEl = document.getElementById('stFocusNote');
     if (noteEl) noteEl.innerHTML = focusNoteText(crashed, sp);
@@ -279,7 +320,7 @@
           y: { type: 'logarithmic', grid: { color: 'rgba(224,148,34,0.06)' }, title: { display: true, text: 'Portfolio value (total stack)', color: MUTED, font: { size: 10 } }, ticks: { color: MUTED, font: { size: 11 }, callback: function (v) { return usd(v); } } }
         },
         plugins: {
-          legend: { display: true, position: 'top', labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 20, padding: 8, filter: function (it) { return it.text === 'Baseline (no crash)' || it.text === 'With the crash'; } } },
+          legend: { display: true, position: 'top', labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 20, padding: 8, filter: function (it) { return it.text === 'Baseline (no crash)' || it.text === 'With the crash' || it.text.indexOf('flexibility') >= 0; } } },
           tooltip: { backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.3)', borderWidth: 1, titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10, filter: function (it) { return it.parsed.y != null && it.parsed.y > 0; }, callbacks: { title: function (it) { return it.length ? 'Year ' + it[0].parsed.x : ''; }, label: function (it) { var lbl = it.dataset.label; if (lbl === 'Trend' || lbl === 'Floor') return lbl + ': ' + usd(it.parsed.y) + ' (per BTC)'; return lbl + ', your stack: ' + usd(it.parsed.y); } } }
         }
       },
@@ -306,11 +347,13 @@
       var baseProj = projectStack(SCENARIO, g, infl, null);
       var baseReal = finalRealStack(baseProj, infl);
       return TIMING_YEARS.filter(function (t) { return t <= SCENARIO.yearsInRetirement; }).map(function (t) {
-        var crash = makeCrash(t);
-        var proj = projectStack(SCENARIO, g, infl, function (y) { return crashMultiplier(y, crash); });
+        var crash = makeCrash(t), mult = function (y) { return crashMultiplier(y, crash); };
+        var proj = projectStack(SCENARIO, g, infl, mult);
         var real = finalRealStack(proj, infl);
+        var red = FLEX > 0 ? projectStack(SCENARIO, g, infl, mult, FLEX) : null;
         return { key: t, label: 'Year ' + t, sub: 'crash in ' + crash.crashYear,
                  depletion: proj.depletionYear, crashReal: real, baseReal: baseReal,
+                 crashReducedReal: red ? finalRealStack(red, infl) : null, depletionReduced: red ? red.depletionYear : null,
                  pct: pctSmaller(baseReal, real), current: t === CRASH.timingYear };
       });
     }
@@ -322,12 +365,14 @@
     years = years.filter(function (ry) { return ry >= curYear; }).sort(function (a, b) { return a - b; });
     return years.map(function (ry) {
       var scn = Object.assign({}, SCENARIO, { retirementYear: ry });
-      var crash = makeCrashFor(scn, CRASH.timingYear);
+      var crash = makeCrashFor(scn, CRASH.timingYear), mult = function (y) { return crashMultiplier(y, crash); };
       var baseProj = projectStack(scn, g, infl, null);
-      var proj = projectStack(scn, g, infl, function (y) { return crashMultiplier(y, crash); });
+      var proj = projectStack(scn, g, infl, mult);
+      var red = FLEX > 0 ? projectStack(scn, g, infl, mult, FLEX) : null;
       var baseReal = finalRealStack(baseProj, infl), real = finalRealStack(proj, infl);
       return { key: ry, label: String(ry), sub: 'crash in ' + crash.crashYear,
                depletion: proj.depletionYear, crashReal: real, baseReal: baseReal,
+               crashReducedReal: red ? finalRealStack(red, infl) : null, depletionReduced: red ? red.depletionYear : null,
                pct: pctSmaller(baseReal, real), current: ry === SCENARIO.retirementYear };
     });
   }
@@ -363,14 +408,18 @@
     var baseData = rows.map(function (r) { return Math.max(0, r.baseReal); });
     var crashData = rows.map(function (r) { return Math.max(0, r.crashReal); });
     var colors = rows.map(function (r) { return r.depletion ? '#c0392b' : C_CRASH; });
+    var hasReduced = rows.some(function (r) { return r.crashReducedReal != null; });
     var ds = [
       { label: 'No crash', data: baseData, backgroundColor: 'rgba(122,115,103,0.28)', borderWidth: 0, borderRadius: 3, order: 2 },
       { label: 'With the crash', data: crashData, backgroundColor: colors, borderWidth: 0, borderRadius: 3, order: 1 }
     ];
+    // Paired bar: same rows, reduced-spend crashed ending (only when the lever is on).
+    if (hasReduced) ds.push({ label: 'With the crash + ' + FLEX + '% flexibility',
+      data: rows.map(function (r) { return Math.max(0, r.crashReducedReal || 0); }),
+      backgroundColor: rows.map(function (r) { return r.depletionReduced ? '#c0392b' : '#eab4a2'; }), borderWidth: 0, borderRadius: 3, order: 0 });
     var xTitle = COMPARE_MODE === 'retire' ? 'Retirement start year' : 'Year of retirement the crash hits';
     if (sweepChart) {
-      sweepChart.data.labels = labels; sweepChart.data.datasets[0].data = baseData;
-      sweepChart.data.datasets[1].data = crashData; sweepChart.data.datasets[1].backgroundColor = colors;
+      sweepChart.data.labels = labels; sweepChart.data.datasets = ds;
       sweepChart.options.scales.x.title.text = xTitle;
       sweepChart.update('none'); return;
     }
@@ -392,6 +441,7 @@
               label: function (it) {
                 var r = _sweepRows[it.dataIndex]; if (!r) return '';
                 if (it.datasetIndex === 0) return 'No crash: ' + usd(r.baseReal);
+                if (it.datasetIndex === 2) return r.depletionReduced ? 'With ' + FLEX + '% cut: depletes ' + r.depletionReduced : 'With ' + FLEX + '% cut: ' + usd(r.crashReducedReal);
                 return r.depletion ? 'Depletes in ' + r.depletion : 'Survives: ' + usd(r.crashReal) + ' (' + r.pct + '% smaller)';
               }
             } }
@@ -493,25 +543,84 @@
     el.innerHTML = html;
   }
 
+  // Mitigation result (only when the flex lever is on) — extends the verdict.
+  function renderMitigation(crashedFull, reduced, crash, infl) {
+    var el = document.getElementById('stMitigation'); if (!el) return;
+    if (FLEX <= 0 || !reduced) { el.hidden = true; el.innerHTML = ''; return; }
+    el.hidden = false;
+    var m = mitigation(crashedFull, reduced, infl);
+    var X = FLEX, N = m.cutYears, Y = usd(m.foregoneNom), parts = [];
+    if (m.flip) {
+      parts.push('With a <strong>' + X + '% cut</strong> while underwater, the plan survives this scenario — at full spending it did not. The cut costs about <strong>' + Y + '</strong> of forgone income across ' + yearsWord(N) + '.');
+    } else if (m.redDep && m.fullDep && m.redDep > m.fullDep) {
+      parts.push('The <strong>' + X + '% cut</strong> moves depletion from <strong>' + m.fullDep + '</strong> to <strong>' + m.redDep + '</strong> — ' + yearsWord(m.redDep - m.fullDep) + ' bought for about ' + Y + ' of forgone income.');
+    } else if (!m.redDep && !m.fullDep) {
+      var z = (m.fullEnd > 0) ? Math.round(100 * (m.redEnd / m.fullEnd - 1)) : 0;
+      parts.push('The <strong>' + X + '% cut</strong> leaves the stack about <strong>' + z + '% higher</strong> at the end (' + usd(m.redEnd) + ' vs ' + usd(m.fullEnd) + '), for about ' + Y + ' of forgone income across ' + yearsWord(N) + '.');
+    } else {
+      parts.push('Even with a <strong>' + X + '% cut</strong>, the plan does not survive this scenario — flexibility helps, but this crash at this timing is beyond it.');
+    }
+    if (CRASH.recoveryPreset === 'weak') {
+      parts.push('Under a Weak recovery the market never regains its pre-crash level, so the cut persists through the horizon — ' + yearsWord(N) + ' of reduced spending.');
+    }
+    parts.push('<span class="st-mitigation-note">Spending flexibility is a real lever, but not a free one: these are years of living on less, shown here as arithmetic. Whether the cut is livable is a question this page cannot answer.</span>');
+    el.innerHTML = parts.map(function (p) { return '<p>' + p + '</p>'; }).join('');
+  }
+
+  // QA guard (the added assertion): the cut window MUST be the price-path underwater
+  // (crashMultiplier < 1), never the stack-value span the band measures.
+  function assertFlexWindow(crashedFull, reduced, crash) {
+    if (!reduced) return;
+    var endYear = SCENARIO.retirementYear + SCENARIO.yearsInRetirement;
+    var priceWin = priceUnderwaterYears(crash, endYear).length;
+    var cutYears = reduced.rows.filter(function (r) { return r.cut; }).length;
+    if (cutYears !== priceWin) console.error('[st-flex] cut-years != price-path window', { cutYears: cutYears, priceWindow: priceWin });
+    var sp = stressPeriod(crashedFull, crash);
+    if (sp && sp.underwater !== priceWin && cutYears === sp.underwater) {
+      console.error('[st-flex] cut-years wrongly bound to the STACK span', { cutYears: cutYears, stackSpan: sp.underwater, priceWindow: priceWin });
+    }
+  }
+  if (typeof window !== 'undefined') window.stFlexQA = function () {
+    var infl = inflationPct(), g = growthKey(), crash = makeCrash(CRASH.timingYear);
+    var endYear = SCENARIO.retirementYear + SCENARIO.yearsInRetirement;
+    var mult = function (y) { return crashMultiplier(y, crash); };
+    var reduced = projectStack(SCENARIO, g, infl, mult, FLEX > 0 ? FLEX : 20);
+    var sp = stressPeriod(projectStack(SCENARIO, g, infl, mult), crash);
+    var rec = RECOVERY[CRASH.recoveryPreset] || RECOVERY.historical;
+    return {
+      cutYears: reduced.rows.filter(function (r) { return r.cut; }).length,
+      priceWindow: priceUnderwaterYears(crash, endYear).length,
+      recoveryYears: rec.years, weak: rec.shape === 'never',
+      stackSpanUnderwater: sp ? sp.underwater : null,
+      boundToPricePath: reduced.rows.filter(function (r) { return r.cut; }).length === priceUnderwaterYears(crash, endYear).length
+    };
+  };
+
   // ════════ AUDIT TABLE + CSV ════════
   function renderAudit(base, crashed) {
     var tb = document.getElementById('stAuditBody'); if (!tb) return;
     var infl = inflationPct();
-    var rows = '';
+    var rows = '', cutN = 0, foregoneNom = 0;
     for (var k = 0; k < crashed.rows.length; k++) {
       var r = crashed.rows[k], b = base.rows[k];
       if (r.phase === 'accum') continue; // audit focuses on the drawdown phase
       var crashed_row = (r.price < b.price - 1);
+      if (r.cut) { cutN++; foregoneNom += (r.fullIncome - r.income); }
       rows += '<tr' + (crashed_row ? ' class="st-row-crash"' : '') + '>'
         + '<td>' + r.x + '</td>'
         + '<td class="st-num">' + usdFull(r.price) + (crashed_row ? ' <span class="st-dot">▼</span>' : '') + '</td>'
-        + '<td class="st-num">' + (r.income != null ? usdFull(r.income) : '—') + '</td>'
+        + '<td class="st-num">' + (r.income != null ? usdFull(r.income) : '—') + (r.cut ? ' <span class="st-dot st-cut" title="withdrawal cut">✂</span>' : '') + '</td>'
         + '<td class="st-num">' + (r.btcSold != null ? r.btcSold.toFixed(4) : '—') + '</td>'
         + '<td class="st-num">' + r.btc.toFixed(4) + '</td>'
         + '<td class="st-num">' + usdFull(r.usd) + '</td>'
         + '</tr>';
     }
     tb.innerHTML = rows;
+    var fn = document.getElementById('stFlexSummary');
+    if (fn) {
+      if (cutN > 0) { fn.hidden = false; fn.innerHTML = '<strong>Spending flexibility:</strong> withdrawals cut ' + FLEX + '% in ' + yearsWord(cutN) + ' (marked ✂), while the market sat below its pre-crash level — about <strong>' + usdFull(foregoneNom) + '</strong> of income forgone (nominal).'; }
+      else { fn.hidden = true; fn.innerHTML = ''; }
+    }
   }
 
   function buildCsv(base, crashed, crash) {
@@ -527,17 +636,19 @@
     L.push('# Crash depth,' + Math.round(crash.depthPct * 100) + '%');
     L.push('# Crash year,' + crash.crashYear + ' (year ' + (crash.crashYear - SCENARIO.retirementYear + 1) + ' of retirement)');
     L.push('# Recovery,' + (RECOVERY[CRASH.recoveryPreset] || RECOVERY.historical).label);
+    L.push('# Spending flexibility,' + (FLEX > 0 ? FLEX + '% cut while the market is below its pre-crash level (price-path underwater)' : 'off'));
     L.push('# Baseline depletion,' + (base.depletionYear || 'survives'));
     L.push('# Crashed depletion,' + (crashed.depletionYear || 'survives'));
     L.push('# Live scenario URL,' + window.location.href);
     L.push('');
-    L.push('Year,Phase,BTC price nominal,Baseline price,Income drawn,BTC sold,BTC left,Stack USD (crashed),Stack USD (baseline)');
+    L.push('Year,Phase,BTC price nominal,Baseline price,Income drawn,Spending cut?,BTC sold,BTC left,Stack USD (crashed),Stack USD (baseline)');
     for (var k = 0; k < crashed.rows.length; k++) {
       var r = crashed.rows[k], b = base.rows[k];
       L.push([r.x, r.phase,
         r.price != null ? Math.round(r.price) : '',
         b.price != null ? Math.round(b.price) : '',
         r.income != null ? Math.round(r.income) : '',
+        r.cut ? 'yes' : '',
         r.btcSold != null ? r.btcSold.toFixed(6) : '',
         r.btc != null ? r.btc.toFixed(4) : '',
         r.usd != null ? Math.round(r.usd) : '',
@@ -576,27 +687,34 @@
     if (dv) dv.innerHTML = '−' + Math.round(CRASH.depthPct * 100) + '%';
     var tv = document.getElementById('stTimingVal');
     if (tv) tv.textContent = 'Year ' + CRASH.timingYear;
+    var fv = document.getElementById('stFlexVal');
+    if (fv) fv.textContent = FLEX > 0 ? ('−' + FLEX + '%') : 'Off';
   }
 
   // ════════ RENDER ALL ════════
   function renderAll() {
     var infl = inflationPct(), g = growthKey();
     var crash = makeCrash(CRASH.timingYear);
+    var mult = function (y) { return crashMultiplier(y, crash); };
     var base = projectStack(SCENARIO, g, infl, null);
-    var crashed = projectStack(SCENARIO, g, infl, function (y) { return crashMultiplier(y, crash); });
+    var crashed = projectStack(SCENARIO, g, infl, mult);                       // full spend
+    var reduced = FLEX > 0 ? projectStack(SCENARIO, g, infl, mult, FLEX) : null; // reduced spend (cut while price underwater)
+    var shown = reduced || crashed;   // the actual funded path drives audit/CSV/verdict-context
 
-    renderMainChart(base, crashed, crash);
+    renderMainChart(base, crashed, crash, reduced);
     renderHeadline(base, crashed, crash);
+    renderMitigation(crashed, reduced, crash, infl);
+    assertFlexWindow(crashed, reduced, crash);
     var rows = sweepRows();
     renderSweepChart(rows);
     renderSweepTable(rows);
-    renderAudit(base, crashed);
+    renderAudit(base, shown);
     renderAssumptions();
     renderComparSummary();
     updateReadouts();
     syncUrl();
     // stash for CSV
-    _last = { base: base, crashed: crashed, crash: crash };
+    _last = { base: base, crashed: shown, crashedFull: crashed, reduced: reduced, crash: crash, infl: infl };
   }
   var _last = null;
 
@@ -660,8 +778,10 @@
     TYPED.forEach(function (t) { var el = document.getElementById(t.id); if (el) el.value = SCENARIO[t.key]; });
     setYear(SCENARIO.retirementYear, 'init');
     var ds = document.getElementById('stDepthSlider'); if (ds) ds.value = String(Math.round(CRASH.depthPct * 100));
+    var fsl = document.getElementById('stFlexSlider'); if (fsl) fsl.value = String(FLEX);
     syncTimingRange();
     setSeg('stIncomeBasis', SCENARIO.incomeBasis);
+    setSeg('stFlex', String(FLEX));
     setSeg('stRecovery', CRASH.recoveryPreset);
     setSeg('stDepth', String(Math.round(CRASH.depthPct * 100)));
     setSeg('stTiming', String(CRASH.timingYear));
@@ -716,6 +836,12 @@
     var rec = document.getElementById('stRecovery');
     if (rec) rec.addEventListener('click', function (e) { var b = e.target.closest('[data-val]'); if (!b) return; CRASH.recoveryPreset = b.getAttribute('data-val'); setSeg('stRecovery', CRASH.recoveryPreset); renderAll(); });
 
+    // Spending-flexibility lever (slider 0..50 + presets 0/10/20/30)
+    var fs = document.getElementById('stFlexSlider');
+    if (fs) fs.addEventListener('input', function () { var v = parseInt(fs.value, 10); if (isFinite(v)) { FLEX = clamp(v, 0, 50); setSeg('stFlex', String(FLEX)); updateReadouts(); renderAll(); } });
+    var flexSeg = document.getElementById('stFlex');
+    if (flexSeg) flexSeg.addEventListener('click', function (e) { var b = e.target.closest('[data-val]'); if (!b) return; var v = clamp(parseInt(b.getAttribute('data-val'), 10), 0, 50); FLEX = v; if (fs) fs.value = String(v); setSeg('stFlex', String(v)); updateReadouts(); renderAll(); });
+
     // Two-path chart view toggle (Full retirement | Crash period)
     var focus = document.getElementById('stFocus');
     if (focus) focus.addEventListener('click', function (e) { var b = e.target.closest('[data-val]'); if (!b) return; CHART_FOCUS = b.getAttribute('data-val'); setActive('stFocus', CHART_FOCUS); updateFocusNote(); renderAll(); });
@@ -752,6 +878,7 @@
     if (p.has('cdepth')) { var d = parseInt(p.get('cdepth'), 10); if (isFinite(d)) CRASH.depthPct = clamp(d, 1, 99) / 100; }
     if (p.has('ctime')) { var t = parseInt(p.get('ctime'), 10); if (isFinite(t)) CRASH.timingYear = Math.max(1, t); }
     if (p.has('crecov') && RECOVERY[p.get('crecov')]) CRASH.recoveryPreset = p.get('crecov');
+    if (p.has('flex')) { var fx = parseInt(p.get('flex'), 10); if (isFinite(fx)) FLEX = clamp(fx, 0, 50); }
     if (p.has('cmp') && (p.get('cmp') === 'retire' || p.get('cmp') === 'timing')) COMPARE_MODE = p.get('cmp');
     if (p.has('focus') && (p.get('focus') === 'full' || p.get('focus') === 'crash')) CHART_FOCUS = p.get('focus');
   }
@@ -766,6 +893,7 @@
       p.set('cdepth', String(Math.round(CRASH.depthPct * 100)));
       p.set('ctime', String(CRASH.timingYear));
       p.set('crecov', CRASH.recoveryPreset);
+      if (FLEX > 0) p.set('flex', String(FLEX)); else p.delete('flex');
       p.set('cmp', COMPARE_MODE);
       p.set('focus', CHART_FOCUS);
       window.history.replaceState(null, '', window.location.pathname + '?' + p.toString() + window.location.hash);
