@@ -47,9 +47,9 @@
   // the audience. 5 BTC retiring 2030 on 175k/yr (today's $) is the tuned sweet spot,
   // verified against the live Power Law trend prices:
   //   - baseline (no crash) survives with a wide margin;
-  //   - the default crash (-77% in year 1, HISTORICAL recovery) survives but takes a real
-  //     bite out of the terminal stack;
-  //   - flipping recovery to Weak (one tap) makes the SAME crash deplete the stack by 2034.
+  //   - the default crash (-60% in year 1, HISTORICAL recovery) survives; deepening it toward
+  //     the -77% historical characteristic, or flipping recovery to Weak, is where the bite shows;
+  //   - a deep crash (e.g. -77%) with a Weak recovery depletes the stack — the failure case.
   // The lesson is not "a big stack is safe" (this one depletes if you retire early and the
   // recovery fails) and not "early retirement is dangerous" (the base case is comfortable).
   // The decisive levers are retirement year and withdrawal rate relative to stack.
@@ -65,11 +65,13 @@
   };
 
   // ── Crash defaults ──
-  // Default to the historical -77% depth landing in YEAR 1 of retirement, with a
-  // HISTORICAL (reliable-past) recovery: at the default plan this survives at a cost, and
-  // switching recovery to Weak is the single tap that tips it into depletion.
+  // Default to a -60% depth (a mid-severity crash, deliberately NOT the worst — the page
+  // should not greet readers with the deepest historical crash pre-selected; SITE_GUIDE §36).
+  // It lands in YEAR 1 of retirement with a HISTORICAL (reliable-past) recovery. The -77%
+  // historical characteristic stays one tap away as a preset; deepening the crash or flipping
+  // recovery to Weak is where the stress bites.
   var CRASH = {
-    depthPct: 0.77,          // historical worst-case depth (a selectable option, not a forecast)
+    depthPct: 0.60,          // mid-severity default, NOT the worst (−77% is a selectable preset)
     timingYear: 1,           // year OF retirement the crash begins (1 = first year)
     recoveryPreset: 'historical',
     troughLagYears: 1        // ~1 year peak->trough (Bull & Bear: 100+ days to bottom)

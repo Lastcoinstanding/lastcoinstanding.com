@@ -10,6 +10,11 @@
     "summary": "Updated: The Bitcoin Retirement Stress Test — now shows what you can do about a badly-timed crash, not just diagnose it. A new spending-flexibility lever cuts your withdrawals while the market sits below its pre-crash level, the real-world response to a bear market, and the verdict states plainly what the cut buys and what it costs in forgone income, including the headline case where full spending depletes the stack but the cut lets the plan survive. Under a weak recovery the market never fully returns, so the cut runs to the end, and the tool says so. A \"Find the worst timing\" button scans every crash year under your current settings and jumps to the one that hurts most, so you don't have to hunt for it by hand. It finds the worst timing, not a forecast, and still makes no predictions."
   },
   {
+    "display": "7/13/26",
+    "page": "/the-bitcoin-retirement-stress-test.html",
+    "summary": "Tweak: The Bitcoin Retirement Stress Test now opens on a −60% crash rather than the −77% worst case. A stress test should let you dial up to the deepest historical drawdown, not greet you with it pre-selected — so −60% (a real but mid-severity bear) is the default, and −77%, bitcoin's historical characteristic depth, is still one tap away. Nothing else about the scenario changed; the deeper crash tells the same story, harder."
+  },
+  {
     "display": "7/12/26",
     "page": "/bitcoin-allocation-sizing.html",
     "summary": "Updated: Bitcoin Portfolio Allocation — a clearer results readout. The composition bars under the chart are now scaled to value: each bar's length shows how much the portfolio is worth, its segments show the bitcoin/traditional split, and a third always-on bar shows what the same money does with no bitcoin at all. Values read as multiples of today (or dollars if you enter a portfolio size), so the comparison is immediate. The underwater band's tint and its \"years underwater\" label were also cleaned up so the label never clips at the chart edge, even for a late crash."
