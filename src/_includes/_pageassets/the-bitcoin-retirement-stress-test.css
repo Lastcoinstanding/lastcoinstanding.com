@@ -139,6 +139,13 @@ body { background: var(--bg); color: var(--text); }
 .st-custom input { font-family: var(--font-b); font-size: 0.9rem; color: #f2eee8; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.55rem; width: 5rem; }
 .st-control-note { font-family: var(--font-b); font-size: 0.76rem; line-height: 1.55; color: var(--text-muted); margin: 0.7rem 0 0; }
 .st-control-note strong { color: var(--text-dim); }
+
+/* ── Worst-case timing finder (v2) ── */
+.st-finder-btn { margin-top: 0.75rem; font-family: var(--font-b); font-size: 0.76rem; font-weight: 600; letter-spacing: 0.02em; color: var(--text-dim); background: rgba(192,57,43,0.08); border: 1px solid rgba(192,57,43,0.35); border-radius: 999px; padding: 0.45rem 0.95rem; cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s; }
+.st-finder-btn:hover { background: rgba(192,57,43,0.16); color: #f0a898; border-color: rgba(192,57,43,0.55); }
+.st-finder-btn:focus-visible { outline: 2px solid rgba(224,148,34,0.5); outline-offset: 2px; }
+.st-finder-line { font-family: var(--font-b); font-size: 0.78rem; line-height: 1.55; color: var(--text-dim); margin: 0.6rem 0 0; padding: 0.55rem 0.8rem; border-radius: 8px; background: rgba(192,57,43,0.06); border: 1px solid rgba(192,57,43,0.28); border-left: 3px solid var(--red-soft); }
+.st-finder-line strong { color: #f2eee8; font-weight: 600; }
 .st-assumptions { font-family: var(--font-b); font-size: 0.82rem; line-height: 1.6; color: var(--text-muted); margin: 1.2rem 0 0; padding: 0.8rem 1.05rem; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-left: 3px solid rgba(224,148,34,0.5); }
 .st-assumptions strong { color: var(--text-dim); font-weight: 600; }
 

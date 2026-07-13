@@ -691,8 +691,61 @@
     if (fv) fv.textContent = FLEX > 0 ? ('−' + FLEX + '%') : 'Off';
   }
 
+  // ════════ WORST-CASE TIMING FINDER (v2) ════════
+  // Scan crash timings 1..yearsInRetirement under the CURRENT settings — depth,
+  // recovery, AND the flex lever as set — and pick the worst. "Worst" is scored by
+  // earliest depletion, tie-broken by smallest ending stack (today's $). It finds
+  // the worst *timing*, never a forecast: no probability language anywhere.
+  // The scored path is the actually-funded one (reduced-spend when flex is on).
+  function timingWorse(a, b) {
+    // True if timing `a` is worse than `b`. Depletion beats survival; earlier
+    // depletion beats later; then smaller ending stack; then earliest timing (stable).
+    if (a.dep && !b.dep) return true;
+    if (!a.dep && b.dep) return false;
+    if (a.dep && b.dep) {
+      if (a.dep !== b.dep) return a.dep < b.dep;
+      if (a.end !== b.end) return a.end < b.end;
+      return a.t < b.t;
+    }
+    if (a.end !== b.end) return a.end < b.end;
+    return a.t < b.t;
+  }
+  function findWorstTiming() {
+    var infl = inflationPct(), g = growthKey();
+    var maxT = Math.max(1, SCENARIO.yearsInRetirement);
+    var best = null;
+    for (var t = 1; t <= maxT; t++) {
+      var crash = makeCrash(t);
+      var mult = (function (c) { return function (y) { return crashMultiplier(y, c); }; })(crash);
+      var crashed = projectStack(SCENARIO, g, infl, mult);
+      var funded = FLEX > 0 ? projectStack(SCENARIO, g, infl, mult, FLEX) : crashed;
+      var cand = { t: t, dep: funded.depletionYear, end: finalRealStack(funded, infl) };
+      if (best === null || timingWorse(cand, best)) best = cand;
+    }
+    return best;
+  }
+  function clearFinderLine() {
+    var el = document.getElementById('stFinderLine');
+    if (el) { el.hidden = true; el.innerHTML = ''; }
+  }
+  function runFinder() {
+    var best = findWorstTiming();
+    if (!best) return;
+    CRASH.timingYear = best.t;
+    var ts = document.getElementById('stTimingSlider'); if (ts) ts.value = String(best.t);
+    setSeg('stTiming', String(best.t));
+    renderAll(); // full recompute + URL sync; clears the (now-stale) finder line first
+    var el = document.getElementById('stFinderLine'); if (!el) return;
+    var tail = best.dep
+      ? 'depletes the stack in <strong>' + best.dep + '</strong>'
+      : 'leaves the smallest stack, <strong>' + usd(Math.max(0, best.end)) + '</strong>';
+    el.innerHTML = 'Worst timing under these settings: a crash landing in <strong>year ' + best.t + '</strong> — it ' + tail + '. Worst timing, not a prediction.';
+    el.hidden = false;
+  }
+
   // ════════ RENDER ALL ════════
   function renderAll() {
+    clearFinderLine(); // the finder line describes a scan of a now-stale config; any recompute clears it
     var infl = inflationPct(), g = growthKey();
     var crash = makeCrash(CRASH.timingYear);
     var mult = function (y) { return crashMultiplier(y, crash); };
@@ -831,6 +884,10 @@
       var v = clamp(parseInt(b.getAttribute('data-val'), 10), 1, SCENARIO.yearsInRetirement);
       CRASH.timingYear = v; if (ts) ts.value = String(v); setSeg('stTiming', String(v)); renderAll();
     });
+
+    // Worst-case timing finder (scans 1..years under current settings, sets the winner)
+    var finderBtn = document.getElementById('stFinderBtn');
+    if (finderBtn) finderBtn.addEventListener('click', runFinder);
 
     // Recovery segmented
     var rec = document.getElementById('stRecovery');
