@@ -79,14 +79,10 @@
   // reader feels the trough years they would have to hold through).
   var CHART_FOCUS = 'full';
 
-  // Recovery shapes -> {years, shape, ceiling}. Historical is the default (not Fast).
-  // 'never' asymptotes to a ceiling below trend: the honest weak/failed-recovery case.
-  var RECOVERY = {
-    fast:       { years: 2, shape: 'fast',       label: 'Fast', note: 'back to trend in about 2 years' },
-    historical: { years: 3, shape: 'historical', label: 'Historical', note: 'about 3 years to trend, the reliable past pattern' },
-    slow:       { years: 6, shape: 'slow',       label: 'Slow', note: 'a long, grinding 6 years to trend' },
-    weak:       { years: 6, shape: 'never', ceiling: 0.6, label: 'Weak', note: 'never fully returns to trend, settling toward the Power Law floor' }
-  };
+  // Recovery shapes + crash multiplier now from the shared module
+  // (shared/crash-model.js — extracted from this page's + the allocation page's
+  // identical copies). Historical is this page's default (see CRASH above).
+  var RECOVERY = window.CrashModel.RECOVERY;
 
   // ── Shared assumptions (parity with the retirement page) ──
   function inflationPct() {
@@ -99,29 +95,8 @@
     try { return window.ModelingAssumptions.get('btcGrowthModel').preset; } catch (e) { return 'powerlaw-trend'; }
   }
 
-  // ════════ CRASH MODEL — timed price-path multiplier (the core new logic) ════════
-  // Returns a price multiplier (<= 1) for a given calendar year. Before the crash: 1.
-  // Slides to the trough over troughLagYears, then recovers toward 1 (or a ceiling < 1
-  // for the weak case) over recoveryYears, eased by shape.
-  function crashMultiplier(year, crash) {
-    if (!crash) return 1;
-    if (year < crash.crashYear) return 1;
-    var trough = 1 - crash.depthPct;
-    var troughYear = crash.crashYear + crash.troughLagYears;
-    if (year <= troughYear) {
-      var f = crash.troughLagYears === 0 ? 1 : (year - crash.crashYear) / crash.troughLagYears;
-      return 1 - f * crash.depthPct;
-    }
-    var into = year - troughYear;
-    var r = Math.min(1, into / Math.max(1, crash.recoveryYears));
-    if (crash.recoveryShape === 'never') {
-      var ceil = (crash.recoveryCeiling != null) ? crash.recoveryCeiling : 0.6;
-      return trough + r * (ceil - trough);
-    }
-    if (crash.recoveryShape === 'slow') r = r * r;
-    else if (crash.recoveryShape === 'fast') r = Math.sqrt(r);
-    return trough + r * (1 - trough);
-  }
+  // ════════ CRASH MODEL — timed price-path multiplier (shared module) ════════
+  var crashMultiplier = window.CrashModel.crashMultiplier;
 
   // Build a crash object from CRASH + a scenario's retirement year.
   function makeCrashFor(scn, timingYear) {
@@ -197,7 +172,7 @@
     return '$' + Math.round(v);
   }
   function usdFull(v) { return v == null || !isFinite(v) ? '—' : '$' + Math.round(v).toLocaleString(); }
-  function yearsWord(n) { n = Math.round(n); return n + (n === 1 ? ' year' : ' years'); }
+  var yearsWord = window.CrashModel.yearsWord;
 
   // ════════ CHART: two-path overlay ════════
   var mainChart = null;
@@ -247,65 +222,20 @@
     return { min: lo, max: hi };
   }
 
-  // The payoff of the Crash-period view: a shaded "years underwater" band from crash onset to
-  // the year the stack regains its pre-crash value (or to depletion), plus a dashed pre-crash
-  // level line. Drawn only in crash focus, so switching views has a visible point.
-  // Clamp a band label to the chart area so a late/edge band never clips the text
-  // (identical to the allocation drift chart's drawBandLabel — Phase D fix; both
-  // pages carry it pending the shared crash-model extraction, see TECH_DEBT).
-  function stDrawBandLabel(ctx, text, x0, x1, left, right, topY) {
-    var pad = 4, center = (x0 + x1) / 2, avail = right - left - 2 * pad;
-    function place(t, y) {
-      var w = ctx.measureText(t).width;
-      var cx = Math.max(left + pad + w / 2, Math.min(center, right - pad - w / 2));
-      ctx.textAlign = 'center'; ctx.fillText(t, cx, y);
-    }
-    if (ctx.measureText(text).width <= avail) { place(text, topY); return; }
-    var idx = text.indexOf(' within ');
-    if (idx > 0) { place(text.slice(0, idx), topY); place(text.slice(idx + 1), topY + 12); }
-    else { ctx.textAlign = 'left'; ctx.fillText(text, left + pad, topY); }
-  }
-  var underwaterPlugin = {
-    id: 'stUnderwater',
-    beforeDatasetsDraw: function (c) {
-      if (CHART_FOCUS !== 'crash') return;
-      var sp = c.$sp; if (!sp) return;
-      var xS = c.scales.x, yS = c.scales.y, ctx = c.ctx;
-      var endY = sp.recovered ? sp.recY : (sp.depletionY || c.$endYear);
-      var x0 = Math.max(xS.getPixelForValue(sp.onsetY), xS.left);
-      var x1 = Math.min(xS.getPixelForValue(endY), xS.right);
-      if (x1 <= x0) return;
-      ctx.save();
-      ctx.fillStyle = 'rgba(192,57,43,0.09)';
-      ctx.fillRect(x0, yS.top, x1 - x0, yS.bottom - yS.top);
-      ctx.restore();
-    },
-    afterDatasetsDraw: function (c) {
-      if (CHART_FOCUS !== 'crash') return;
-      var sp = c.$sp; if (!sp) return;
-      var xS = c.scales.x, yS = c.scales.y, ctx = c.ctx;
-      // pre-crash level line
-      var yp = yS.getPixelForValue(sp.onset);
-      if (yp >= yS.top && yp <= yS.bottom) {
-        ctx.save();
-        ctx.setLineDash([4, 3]); ctx.strokeStyle = 'rgba(236,228,214,0.55)'; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(xS.left, yp); ctx.lineTo(xS.right, yp); ctx.stroke();
-        ctx.setLineDash([]); ctx.fillStyle = 'rgba(236,228,214,0.8)'; ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'left';
-        ctx.fillText('pre-crash level', xS.left + 4, yp - 4);
-        ctx.restore();
-      }
-      // "N years underwater" label centred over the band
-      var endY = sp.recovered ? sp.recY : (sp.depletionY || c.$endYear);
-      var x0 = Math.max(xS.getPixelForValue(sp.onsetY), xS.left);
-      var x1 = Math.min(xS.getPixelForValue(endY), xS.right);
-      if (x1 > x0 && sp.underwater >= 1) {
-        ctx.save();
-        ctx.fillStyle = '#e08a7a'; ctx.font = '700 11px Inter, sans-serif';
-        stDrawBandLabel(ctx, yearsWord(sp.underwater) + ' underwater', x0, x1, xS.left, xS.right, yS.top + 13);
-        ctx.restore();
-      }
-    }
-  };
+  // The payoff of the Crash-period view: a shaded "years underwater" band from crash
+  // onset to recovery (or depletion), plus a dashed pre-crash level line. Built from
+  // the shared module (shared/crash-model.js), configured for this page: band BEHIND
+  // the unfilled lines at alpha 0.09, label "{n} years underwater", drawn only in
+  // crash focus. (The span's endY reproduces the old inline recovered?recY:(depletion
+  // ||endYear) — base.endYear === the former c.$endYear.)
+  var underwaterPlugin = window.CrashModel.makeUnderwaterPlugin({
+    id: 'stUnderwater', spKey: '$sp',
+    tint: 'rgba(192,57,43,0.09)', bandBehind: true,
+    levelLineColor: 'rgba(236,228,214,0.55)', levelLabelColor: 'rgba(236,228,214,0.8)', levelLabel: 'pre-crash level',
+    labelColor: '#e08a7a', minUnderwater: 1,
+    label: function (sp) { return window.CrashModel.yearsWord(sp.underwater) + ' underwater'; },
+    active: function () { return CHART_FOCUS === 'crash'; }
+  });
 
   function focusNoteText(crashed, sp) {
     if (!sp) return '';
@@ -320,7 +250,6 @@
     var bands = buildBands(base.startYear, base.endYear);
     var win = focusWindow(base, crash);
     var sp = stressPeriod(crashed, crash);
-    if (sp) { sp.onsetY = crash.crashYear; sp.depletionY = crashed.depletionYear; }
     var ds = [
       { label: 'Trend', data: bands.trend, borderColor: C_TREND, borderWidth: 1, borderDash: [2, 4], pointRadius: 0, tension: 0.2, order: 5 },
       { label: 'Floor', data: bands.floor, borderColor: C_FLOOR, borderWidth: 1, borderDash: [2, 5], pointRadius: 0, tension: 0.2, order: 5 },
@@ -509,26 +438,20 @@
   }
 
   // ════════ STRESS PERIOD (the lived experience, derived from the crashed series) ════════
-  // onset = crashed stack value the year the crash hits (before the drop). trough = its low
-  // afterwards. underwater = years until the crashed stack regains that onset value. All in
-  // nominal USD, the same units the chart shows.
+  // Thin adapter over the shared CrashModel.underwaterSpan. onset = crashed stack
+  // value the year the crash hits (before the drop); underwater = years until it
+  // regains that value (or to depletion / horizon end). All in nominal USD, the
+  // same units the chart shows. `troughUsd` aliases the module's `troughV`; the
+  // span carries onsetY + endY so the plugin needs no external augmentation.
   function stressPeriod(crashed, crash) {
-    var rows = crashed.rows, onsetY = crash.crashYear, onset = null;
-    for (var i = 0; i < rows.length; i++) { if (rows[i].x === onsetY) { onset = rows[i].usd; break; } }
-    if (onset == null || !(onset > 0)) return null;
-    var troughUsd = onset, troughY = onsetY, recY = null;
-    for (var j = 0; j < rows.length; j++) {
-      var r = rows[j];
-      if (r.x <= onsetY || r.usd == null) continue;
-      if (r.usd < troughUsd) { troughUsd = r.usd; troughY = r.x; }
-      if (recY === null && r.usd >= onset) recY = r.x;
-    }
-    var lastY = rows[rows.length - 1].x, underwater;
-    if (recY !== null) underwater = recY - onsetY;
-    else if (crashed.depletionYear) underwater = crashed.depletionYear - onsetY;
-    else underwater = lastY - onsetY; // survived but never regained the onset value by the end
-    return { onset: onset, troughUsd: troughUsd, troughY: troughY, recY: recY, recovered: recY !== null,
-             underwater: Math.max(0, underwater), dropPct: Math.round(100 * (1 - troughUsd / onset)) };
+    if (!crashed.rows || !crashed.rows.length) return null;
+    var byYear = {};
+    crashed.rows.forEach(function (r) { byYear[r.x] = r.usd; });
+    var lastY = crashed.rows[crashed.rows.length - 1].x;
+    var sp = window.CrashModel.underwaterSpan(function (y) { return byYear[y] != null ? byYear[y] : null; },
+      crash.crashYear, lastY, crashed.depletionYear);
+    if (sp) sp.troughUsd = sp.troughV;
+    return sp;
   }
 
   // ════════ HEADLINE (lead with the lived stress period, not the terminal value) ════════

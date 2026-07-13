@@ -66,37 +66,12 @@
   };
   var COMPARE_ALLOCS = [1, 5, 10, 20, 50];
 
-  // ── Crash model — ported verbatim from the Stress Test's crashMultiplier +
-  //    recovery presets (the-bitcoin-retirement-stress-test.js). It already IS a
-  //    per-year PRICE multiplier, so it factors directly onto this page's price
-  //    path. Ported (not imported) because it lives inside that page's IIFE, not a
-  //    shared module — duplication logged in TECH_DEBT as an extraction candidate.
-  //    Preset display names ("Fast" / "Historical" / "Weak") are reused verbatim;
-  //    the stress test's middle "Slow" is intentionally omitted (minimal surface).
-  var RECOVERY = {
-    fast:       { years: 2, shape: 'fast',                label: 'Fast' },
-    historical: { years: 3, shape: 'historical',          label: 'Historical' },
-    weak:       { years: 6, shape: 'never', ceiling: 0.6, label: 'Weak' }
-  };
-  function crashMultiplier(year, crash) {
-    if (!crash) return 1;
-    if (year < crash.crashYear) return 1;
-    var trough = 1 - crash.depthPct;
-    var troughYear = crash.crashYear + crash.troughLagYears;
-    if (year <= troughYear) {
-      var f = crash.troughLagYears === 0 ? 1 : (year - crash.crashYear) / crash.troughLagYears;
-      return 1 - f * crash.depthPct;
-    }
-    var into = year - troughYear;
-    var r = Math.min(1, into / Math.max(1, crash.recoveryYears));
-    if (crash.recoveryShape === 'never') {
-      var ceil = (crash.recoveryCeiling != null) ? crash.recoveryCeiling : 0.6;
-      return trough + r * (ceil - trough);
-    }
-    if (crash.recoveryShape === 'slow') r = r * r;
-    else if (crash.recoveryShape === 'fast') r = Math.sqrt(r);
-    return trough + r * (1 - trough);
-  }
+  // ── Crash model — now from the shared module (shared/crash-model.js). The
+  //    RECOVERY table there carries all four presets; this page exposes only
+  //    Fast / Historical / Weak in its UI (Slow omitted). crashMultiplier is the
+  //    same per-year price multiplier this page ported in Phase B.
+  var RECOVERY = window.CrashModel.RECOVERY;
+  var crashMultiplier = window.CrashModel.crashMultiplier;
   // Human label for a projection-mode key (CSV + anywhere a readable mode is wanted).
   function modeLabel(k) { return k === 'hold' ? "Today's gap to trend persists" : (k === 'revert' ? 'Return to trend' : 'Flat rate'); }
 
@@ -538,71 +513,31 @@
   // crash multiplier keeps year cy at 1.0 and dips over cy→cy+1, so cy is the
   // last value before the drop (the honest pre-crash level; the Stress Test's
   // stressPeriod uses the same value-at-onset-year convention).
-  function yearsWord(n) { n = Math.round(n); return n + (n === 1 ? ' year' : ' years'); }
   function niceCeil(v) {
     if (!(v > 0)) return v;
     var mag = Math.pow(10, Math.floor(Math.log10(v))), steps = [1, 1.5, 2, 2.5, 3, 4, 5, 7.5, 10];
     for (var i = 0; i < steps.length; i++) { if (steps[i] * mag >= v) return steps[i] * mag; }
     return 10 * mag;
   }
-  // total below its pre-crash level (the year the crash lands) → underwater.
-  // Measured on the TOTAL, not the bitcoin sleeve.
+  // Underwater span via the shared module (shared/crash-model.js). onset = total
+  // at the crash year (cy; the multiplier keeps cy at 1.0 and dips cy→cy+1).
+  // Measured on the TOTAL. Allocation-only guard: if the total never dips below
+  // onset, there is no underwater period → no band (null).
   function crashSpan(totals, cy, H) {
     if (cy == null || cy < 1 || cy >= totals.length) return null;
-    var onset = totals[cy]; if (!(onset > 0)) return null;
-    var troughV = onset, recY = null;
-    for (var t = cy + 1; t <= H && t < totals.length; t++) {
-      if (totals[t] < troughV) troughV = totals[t];
-      if (recY === null && totals[t] >= onset) recY = t;
-    }
-    if (troughV >= onset) return null; // never actually went underwater → no band
-    var recovered = recY !== null;
-    return { onset: onset, onsetY: cy, recY: recY, recovered: recovered,
-      endY: recovered ? recY : H, underwater: recovered ? (recY - cy) : (H - cy) };
+    var sp = window.CrashModel.underwaterSpan(function (y) { return totals[y] != null ? totals[y] : null; }, cy, H, null);
+    if (sp && sp.troughV >= sp.onset) return null;
+    return sp;
   }
-  // Draw a band label without clipping at the chart edges: prefer centered over
-  // the band, but CLAMP so the whole text stays within [left,right]; if too wide
-  // for one line, wrap at "…/ within your horizon"; else left-align (extend left,
-  // never clip right). Fixes the late-crash "not recovered…" truncation.
-  function drawBandLabel(ctx, text, x0, x1, left, right, topY) {
-    var pad = 4, center = (x0 + x1) / 2, avail = right - left - 2 * pad;
-    function place(t, y) {
-      var w = ctx.measureText(t).width;
-      var cx = Math.max(left + pad + w / 2, Math.min(center, right - pad - w / 2));
-      ctx.textAlign = 'center'; ctx.fillText(t, cx, y);
-    }
-    if (ctx.measureText(text).width <= avail) { place(text, topY); return; }
-    var idx = text.indexOf(' within ');
-    if (idx > 0) { place(text.slice(0, idx), topY); place(text.slice(idx + 1), topY + 12); }
-    else { ctx.textAlign = 'left'; ctx.fillText(text, left + pad, topY); }
-  }
-  var driftUnderwaterPlugin = {
-    id: 'asUnderwater',
-    afterDatasetsDraw: function (c) {
-      var sp = c.$uw; if (!sp) return;
-      var xS = c.scales.x, yS = c.scales.y, ctx = c.ctx;
-      var x0 = Math.max(xS.getPixelForValue(sp.onsetY), xS.left);
-      var x1 = Math.min(xS.getPixelForValue(sp.endY), xS.right);
-      ctx.save();
-      // Rose band drawn OVER the fills — alpha 0.14 (bumped from the ported 0.09/0.10)
-      // to read clearly over the opaque orange sleeves; the Stress Test keeps its
-      // lower alpha (unfilled-lines context). See STYLE_GUIDE §6.36.
-      if (x1 > x0) { ctx.fillStyle = 'rgba(192,57,43,0.14)'; ctx.fillRect(x0, yS.top, x1 - x0, yS.bottom - yS.top); }
-      // Dashed pre-crash level line + label (Stress Test tokens verbatim).
-      var yp = yS.getPixelForValue(sp.onset);
-      if (yp >= yS.top && yp <= yS.bottom) {
-        ctx.setLineDash([4, 3]); ctx.strokeStyle = 'rgba(236,228,214,0.55)'; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(xS.left, yp); ctx.lineTo(xS.right, yp); ctx.stroke();
-        ctx.setLineDash([]); ctx.fillStyle = 'rgba(236,228,214,0.8)'; ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'left';
-        ctx.fillText('pre-crash level', xS.left + 4, yp - 4);
-      }
-      if (x1 > x0) {
-        ctx.fillStyle = '#e08a7a'; ctx.font = '700 11px Inter, sans-serif';
-        drawBandLabel(ctx, sp.recovered ? (yearsWord(sp.underwater) + ' underwater') : 'not recovered within your horizon', x0, x1, xS.left, xS.right, yS.top + 13);
-      }
-      ctx.restore();
-    }
-  };
+  // Rose band OVER the fills at alpha 0.14 (reads over the opaque orange sleeves;
+  // the Stress Test keeps its lower alpha behind unfilled lines). STYLE_GUIDE §6.36.
+  var driftUnderwaterPlugin = window.CrashModel.makeUnderwaterPlugin({
+    id: 'asUnderwater', spKey: '$uw',
+    tint: 'rgba(192,57,43,0.14)', bandBehind: false,
+    levelLineColor: 'rgba(236,228,214,0.55)', levelLabelColor: 'rgba(236,228,214,0.8)', levelLabel: 'pre-crash level',
+    labelColor: '#e08a7a',
+    label: function (sp) { return sp.recovered ? (window.CrashModel.yearsWord(sp.underwater) + ' underwater') : 'not recovered within your horizon'; }
+  });
   // Pinned y-axis (crash open): a fixed frame so recovery/crash-year changes are
   // apples-to-apples. Recomputes only when ASSUMPTIONS change (this key), never on
   // crash-year/recovery change.

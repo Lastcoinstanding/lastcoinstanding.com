@@ -1895,7 +1895,9 @@ Verify Reset and URL-restore visually move **every** representation (they write 
 
 **When:** any chart that drops a crash onto a value path and wants to show how long the portfolio stays below where it was — used on the Retirement **Stress Test** (origin, `underwaterPlugin`) and the allocation **drift chart** (`driftUnderwaterPlugin`). Two pages share this now; if a third needs it, extract to a shared module (tracked in TECH_DEBT alongside the crash-engine extraction).
 
-**Technique:** an **inline Chart.js plugin — no external dependency** (do NOT add `chartjs-plugin-annotation`). Draw in `afterDatasetsDraw` (over the fills) when the sleeves are opaque; `beforeDatasetsDraw` (behind) is fine when the datasets are unfilled lines (Stress Test). Read a span object off the chart instance (`c.$uw` / `c.$sp`) set during render, so drag updates flow through the normal `update('none')` path.
+**Now shared:** `src/_includes/_pageassets/shared/crash-model.js` exports `underwaterSpan`, `drawBandLabel`, and a `makeUnderwaterPlugin(cfg)` factory (plus `crashMultiplier` + the `RECOVERY` table). Both pages consume it — do NOT re-port. The recipe below documents the technique the module implements.
+
+**Technique:** an **inline Chart.js plugin — no external dependency** (do NOT add `chartjs-plugin-annotation`). The factory draws the band in `beforeDatasetsDraw` when `cfg.bandBehind` (behind unfilled lines, Stress Test) else `afterDatasetsDraw` (over opaque fills, allocation). It reads a span object off the chart instance (`cfg.spKey` → `c.$uw` / `c.$sp`) set during render, so drag updates flow through the normal `update('none')` path.
 
 **Tint + tokens (reuse verbatim across pages):**
 - Band wash: `rgba(192,57,43,α)` (rose/danger red). **α is context-dependent, not a shared constant:** the Stress Test draws *behind* unfilled lines so `0.09` reads; the allocation drift chart draws *over* opaque sleeve fills, so it needs `~0.14` to read over `#F7931A` at full stack height. Tune α to the backdrop; keep the hue/technique shared.
@@ -1914,7 +1916,7 @@ var underwaterPlugin = { id: 'asUnderwater', afterDatasetsDraw: function (c) {
 }};
 ```
 
-**Label clamp (required — the late-crash bug):** a band flush against the right edge, with the label centered at `(x0+x1)/2`, clips the text off the chart — worst for the long `not recovered within your horizon` string. Never center-draw unclamped. Use a `drawBandLabel(ctx, text, x0, x1, left, right, topY)` that: measures the text; if it fits, centers it but **clamps the center so the whole string stays within `[left+pad, right−pad]`**; if too wide for one line, wraps at the natural break (`not recovered` / `within your horizon`); else left-aligns (extend left, never clip right). Apply to the short `{n} years underwater` label too (a 1-year edge band clips). Both pages carry this helper (identical) pending the shared extraction.
+**Label clamp (required — the late-crash bug):** a band flush against the right edge, with the label centered at `(x0+x1)/2`, clips the text off the chart — worst for the long `not recovered within your horizon` string. Never center-draw unclamped. Use a `drawBandLabel(ctx, text, x0, x1, left, right, topY)` that: measures the text; if it fits, centers it but **clamps the center so the whole string stays within `[left+pad, right−pad]`**; if too wide for one line, wraps at the natural break (`not recovered` / `within your horizon`); else left-aligns (extend left, never clip right). Apply to the short `{n} years underwater` label too (a 1-year edge band clips). Lives in `shared/crash-model.js` as `drawBandLabel`, used by the factory.
 
 **Pair with a pinned axis** (see the drift chart): while the crash view is open, pin `y.max` to a nice ceiling of the *smooth* path's max so recovery/timing changes are apples-to-apples; recompute only on assumption change, not on crash-year/recovery drag.
 
