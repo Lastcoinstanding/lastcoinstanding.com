@@ -129,6 +129,13 @@ right cadence; daily samples produce a heavier file with no editorial gain.
 When you add the sample for the current month, also verify the as-of
 caption on the BvSM Power Law chart still reads accurately (see §3).
 
+**Staleness guard (added 2026-07).** `shared/power-law-data.js` warns at load if the
+latest `PL_DATA` sample is more than **45 days** behind today (one missed monthly
+refresh + slack). It is **console-only, once per load, never user-visible**, and reads:
+`[power-law-data] PL_DATA is N days stale (last sample YYYY-MM-DD). Run
+MONTHLY_REFRESH_CHECKLIST §1.` If you see it in the console, the fix is this section —
+append the current month's sample. A correct refresh silences it.
+
 > **Why this refresh matters most when the network is down.** `fetchTodayPrice()`
 > seeds and falls back to the **latest `PL_DATA` sample**. On a normal load the
 > live CoinGecko spot overwrites it within a second, so a stale seed is invisible.
