@@ -438,6 +438,9 @@
     var priceEl = document.getElementById('channelTodayPrice');
     var multEl  = document.getElementById('channelTodayMult');
     if (!priceEl || !multEl) return;
+    // Honest label: 'seed' (pre-resolve) and 'fallback' are non-live.
+    var labelEl = document.getElementById('channelTodayLabel');
+    if (labelEl && typeof todayPriceLabel === 'function') labelEl.textContent = todayPriceLabel(source) + ':';
     var today = (Date.now() / 1000 - GENESIS_TS) / 86400;
     var trend = plPrice(today);
     var mult = price / trend;

@@ -129,6 +129,17 @@ right cadence; daily samples produce a heavier file with no editorial gain.
 When you add the sample for the current month, also verify the as-of
 caption on the BvSM Power Law chart still reads accurately (see §3).
 
+> **Why this refresh matters most when the network is down.** `fetchTodayPrice()`
+> seeds and falls back to the **latest `PL_DATA` sample**. On a normal load the
+> live CoinGecko spot overwrites it within a second, so a stale seed is invisible.
+> But when the fetch fails (CoinGecko 429s; `api.coingecko.com` sits on ad-block
+> lists) the site shows this fallback — now correctly labelled **"latest monthly
+> data"**, never "live" (the 2026-07 honesty fix). **A stale monthly refresh
+> therefore degrades the fallback path first and worst:** in July 2026 the fallback
+> sat ~$10K below spot because the series ended in April. Keeping this sample
+> current is what keeps the fallback honest *and* close. Append at least the
+> current month every refresh; if you can only source one price, source today's.
+
 ## 2. Page-level TODAY constants — none remaining
 
 **Per-cycle (event-driven, not monthly) — Bull & Bear Cycles status framing.** `src/_includes/_pageassets/bull-and-bear-cycles.js` hard-codes the `CYCLES` table of *documented daily-close* peak/trough extremes (register figures, not live-computed) and treats **2025 (peak $126,198, Oct 6 2025) as the ongoing bear**. The live status, table, and overlay all compute off that peak. Two triggers change the framing and need a manual edit: (a) **a new all-time high above $126,198** — the 2025 entry is no longer a bear; add the resolved 2025 trough and open a new ongoing cycle; (b) **the 2025 trough resolving** (a confirmed bottom) — fill `troughDate`/`trough`/`ddPct`/`recovery` for the 2025 row and flip `ongoing` off. Everything else (drawdown-from-peak, days-since-peak, rank, volatility) is computed live from the shared series and needs no edit.

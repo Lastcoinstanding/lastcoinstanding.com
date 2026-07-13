@@ -1041,7 +1041,7 @@
     } else {
       bandLabel = '<span style="color:'+gold+'">above upper band</span>';
     }
-    var src = isLive ? '' : ' <span style="opacity:0.6">(last sample)</span>';
+    var src = isLive ? '' : ' <span style="opacity:0.6">(latest monthly data)</span>';
     statusEl.innerHTML =
       '<strong>Today&rsquo;s bitcoin price:</strong> <span style="color:var(--amber)">' + fmtUSD(currentPrice) + '</span>' + src +
       ' &middot; <span style="color:var(--amber)">' + multiplier.toFixed(2) + '&times; trend</span>' +

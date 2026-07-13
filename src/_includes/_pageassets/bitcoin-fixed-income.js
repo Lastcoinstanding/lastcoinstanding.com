@@ -824,9 +824,13 @@
     return '$' + Math.round(n).toLocaleString();
   }
 
-  function renderTreasuryUsd(){
+  function renderTreasuryUsd(_price, source){
     var valueEl = document.querySelector('.sg-treasury-usd-value');
     if (!valueEl) return;
+    // Honest provenance tag: "live" only on a real CoinGecko resolve; the
+    // pre-resolve seed and the fallback are the latest monthly sample.
+    var tagEl = document.getElementById('sgLiveTag');
+    if (tagEl) tagEl.textContent = (typeof todayPriceIsLive === 'function' && todayPriceIsLive(source)) ? 'live' : 'latest data';
     var price;
     if (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0) {
       price = TODAY_PRICE;

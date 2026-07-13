@@ -334,7 +334,7 @@
       else rec = 'a <b>hybrid or ladder</b> is the more defensible call as a drawdown hedge — read the cautions, it&rsquo;s softer than it sounds.';
       recEl.innerHTML = 'With price ' + posLabel(pos) + ', ' + rec;
     }
-    if (metaEl) metaEl.textContent = 'Live: ' + fmtUSD(price) + ' · ' + ratio.toFixed(2) + '× trend' + (source === 'live' ? '' : ' (latest sample)') + ' · recomputed every page load.';
+    if (metaEl) metaEl.textContent = (todayPriceIsLive(source) ? 'Live: ' : 'Latest monthly data: ') + fmtUSD(price) + ' · ' + ratio.toFixed(2) + '× trend · recomputed every page load.';
     renderTitle();
     updateTimingLink();
     updateChart(); renderRetro(); renderProj(); renderBackstop();

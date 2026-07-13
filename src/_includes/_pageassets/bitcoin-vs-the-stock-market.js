@@ -370,7 +370,9 @@
       if (v >= 1000) return '$' + (v / 1000).toFixed(1) + 'K';
       return '$' + Math.round(v).toLocaleString();
     }
-    function updateBvsmTodayCaption(price) {
+    function updateBvsmTodayCaption(price, source) {
+      var labelEl = document.getElementById('bvsmTodayLabel');
+      if (labelEl && typeof todayPriceNote === 'function') labelEl.textContent = 'Today’s bitcoin price' + todayPriceNote(source) + ':';
       var spotEl  = document.getElementById('bvsmTodaySpot');
       var multEl  = document.getElementById('bvsmTodayMult');
       var zoneEl  = document.getElementById('bvsmTodayZone');
@@ -396,11 +398,11 @@
     // fetchTodayPrice() updates the shared TODAY_PRICE global (read by both the
     // markers plugin and the pulse plugin); here we also move the trailing point
     // of the price line and the today marker, refresh the caption, then re-render.
-    fetchTodayPrice(function(price) {
+    fetchTodayPrice(function(price, source) {
       if (historicalLine.length) historicalLine[historicalLine.length - 1].y = price;
       TODAY_MARKER.p = price;
       TODAY_MARKER.m = price / plPrice(TODAY_DAYS);
-      updateBvsmTodayCaption(price);
+      updateBvsmTodayCaption(price, source);
       plChart.update();
     });
   }

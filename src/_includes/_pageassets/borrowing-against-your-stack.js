@@ -146,10 +146,12 @@
   // typed a value — this is an editable modeling input by design. The fixed
   // "Today (live)" caption below the chart legend always reflects the live
   // spot regardless of user edits, so the reader has a stable factual anchor.
-  function updateTodayCaption(price) {
+  function updateTodayCaption(price, source) {
     var spotEl = document.getElementById('basTodaySpot');
     var multEl = document.getElementById('basTodayMult');
     if (!spotEl || !multEl) return;
+    var labelEl = document.getElementById('basTodayLabel');
+    if (labelEl && typeof todayPriceLabel === 'function') labelEl.textContent = todayPriceLabel(source);
     var fmt = (price >= 1000) ? '$' + (price / 1000).toFixed(1) + 'K'
                               : '$' + Math.round(price).toLocaleString();
     spotEl.textContent = fmt;
@@ -169,10 +171,11 @@
     updateTodayCaption(TODAY_PRICE);
     if (typeof fetchTodayPrice === 'function') {
       priceInput.addEventListener('input', function(){ priceInput.dataset.userEdited = '1'; });
-      fetchTodayPrice(function(price) {
-        // The fixed caption always reflects the live spot — even if the
-        // user has edited the modeling input to a hypothetical.
-        updateTodayCaption(price);
+      fetchTodayPrice(function(price, source) {
+        // The fixed caption always reflects the resolved spot — even if the
+        // user has edited the modeling input to a hypothetical. The label is
+        // honest: "live" only on a real fetch, else "latest monthly data".
+        updateTodayCaption(price, source);
         // Only fill the editable input if the user hasn't touched it.
         if (!priceInput.dataset.userEdited && !userHadValue) {
           priceInput.value = Math.round(price / 100) * 100;

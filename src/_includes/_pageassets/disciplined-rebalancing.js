@@ -1598,10 +1598,12 @@
   })();
 
   // ─── Today (live) caption + range toggle (added with 2026-05-28 rollout)
-  function updateDrTodayCaption(price) {
+  function updateDrTodayCaption(price, source) {
     var spotEl = document.getElementById('drTodaySpot');
     var multEl = document.getElementById('drTodayMult');
     if (!spotEl || !multEl) return;
+    var labelEl = document.getElementById('drTodayLabel');
+    if (labelEl && typeof todayPriceLabel === 'function') labelEl.textContent = todayPriceLabel(source);
     var fmt = (price >= 1000) ? '$' + (price / 1000).toFixed(1) + 'K'
                               : '$' + Math.round(price).toLocaleString();
     spotEl.textContent = fmt;
@@ -1613,9 +1615,9 @@
   // Seed immediately with the latest-sample value, then update on fetch resolve.
   updateDrTodayCaption(TODAY_PRICE);
   if (typeof fetchTodayPrice === 'function') {
-    fetchTodayPrice(function(price) {
+    fetchTodayPrice(function(price, source) {
       liveBtcPrice = price;
-      updateDrTodayCaption(price);
+      updateDrTodayCaption(price, source);
       // Extend the historical-price line to the live "today" anchor so it
       // visibly meets the Today vertical (previously stopped at the last
       // PL_DATA sample, leaving a small but visually awkward gap to Today).

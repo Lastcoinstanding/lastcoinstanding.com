@@ -530,7 +530,8 @@
     var ratio = price / plPrice(TODAY_DAYS);
     var posEl = document.getElementById('lslCtxPos');
     // One declarative live line (B3): "Today (live): $X · 0.XX× trend · <plain label>"
-    if (posEl) posEl.innerHTML = (source === 'live' ? 'Today (live)' : 'Today (latest sample)')
+    // Label via the shared helper so provenance wording is identical site-wide.
+    if (posEl) posEl.innerHTML = todayPriceLabel(source)
       + ': <strong>' + fmtUSD(price) + '</strong> &middot; ' + ratio.toFixed(2) + '× trend &middot; <em>' + posLabel(liveTodayPos) + '</em>';
     // poke the live today marker on the context chart so the dot + pulse track the live spot
     if (channelChart && channelChart.data && channelChart.data.datasets[TODAY_DS]) {

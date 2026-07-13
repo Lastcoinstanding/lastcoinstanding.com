@@ -25,9 +25,13 @@
       copy: 'Bitcoin trades meaningfully above trend. Forward CAGR compresses from elevated entry; consider averaging in or waiting.' };
   }
 
-  function render(){
+  function render(source){
     var card = document.getElementById('eti-card');
     if (!card) return;
+    // Honest liveness tag: the entry multiple is derived from TODAY_PRICE, which
+    // is the latest monthly sample until a real CoinGecko fetch resolves.
+    var tagEl = document.getElementById('etiLiveTag');
+    if (tagEl) tagEl.textContent = (typeof todayPriceIsLive === 'function' && todayPriceIsLive(source)) ? '· Live' : '· Latest monthly data';
 
     // Defensive: shared globals must be present (page_scripts ordering
     // ensures power-law-data.js is concatenated before this file).
@@ -71,9 +75,9 @@
     render(); // first-paint with seeded TODAY_PRICE so nothing is empty
 
     if (typeof fetchTodayPrice === 'function') {
-      fetchTodayPrice(function(){
+      fetchTodayPrice(function(price, source){
         // TODAY_PRICE is updated in place by the shared fetch helper.
-        render();
+        render(source);
       });
     }
   }

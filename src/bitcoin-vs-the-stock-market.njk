@@ -66,7 +66,7 @@ eleventyComputed:
                          every chart render; CSS handles the ring animation. -->
                     <div class="bvsm-you-are-here-pulse" id="bvsmYouAreHerePulse" aria-hidden="true"></div>
                 </div>
-                <div class="bvsm-chart-today" id="bvsmChartToday" aria-live="polite"><strong>Today&rsquo;s bitcoin price:</strong> <span class="bvsm-today-spot" id="bvsmTodaySpot">&mdash;</span> &middot; <span class="bvsm-today-mult" id="bvsmTodayMult">&mdash;&times;</span> trend <span class="bvsm-today-zone" id="bvsmTodayZone"></span> <span class="bvsm-today-trendline">(Power Law trend = <span id="bvsmTodayTrend">&mdash;</span>)</span></div>
+                <div class="bvsm-chart-today" id="bvsmChartToday" aria-live="polite"><strong id="bvsmTodayLabel">Today&rsquo;s bitcoin price (latest monthly data):</strong> <span class="bvsm-today-spot" id="bvsmTodaySpot">&mdash;</span> &middot; <span class="bvsm-today-mult" id="bvsmTodayMult">&mdash;&times;</span> trend <span class="bvsm-today-zone" id="bvsmTodayZone"></span> <span class="bvsm-today-trendline">(Power Law trend = <span id="bvsmTodayTrend">&mdash;</span>)</span></div>
                 <p class="bvsm-chart-caption">Historical BTC price (white) vs. Power Law trend (dashed amber), log-scale Y axis. Numbers next to each marker are the cycle&rsquo;s trend-deviation multiple. Top markers (rust) register at &ge;1.0&times; trend; floor markers (sage) at &le;1.0&times; trend. <em>Price line uses monthly close samples through mid-April&nbsp;2026 with the latest spot appended; the &ldquo;you are here&rdquo; marker shows the live bitcoin price, fetched on page load.</em> Use the time-range toggle above to zoom into the most recent cycle.</p>
             </div>
 

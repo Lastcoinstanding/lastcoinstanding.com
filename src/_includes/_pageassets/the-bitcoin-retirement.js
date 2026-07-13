@@ -1412,6 +1412,8 @@
     var todayTrend = plPriceAtDate(new Date());
     var ratio = (todayTrend > 0) ? currentPrice / todayTrend : 0;
     (function updateChartTodayCaption() {
+      var labelEl = document.getElementById('retireTodayLabel');
+      if (labelEl && typeof todayPriceNote === 'function') labelEl.textContent = 'Today’s bitcoin price' + todayPriceNote(source) + ':';
       var spotEl  = document.getElementById('retireTodaySpot');
       var multEl  = document.getElementById('retireTodayMult');
       var zoneEl  = document.getElementById('retireTodayZone');
