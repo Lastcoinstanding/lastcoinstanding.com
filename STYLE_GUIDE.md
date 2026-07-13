@@ -1898,7 +1898,7 @@ Verify Reset and URL-restore visually move **every** representation (they write 
 **Technique:** an **inline Chart.js plugin — no external dependency** (do NOT add `chartjs-plugin-annotation`). Draw in `afterDatasetsDraw` (over the fills) when the sleeves are opaque; `beforeDatasetsDraw` (behind) is fine when the datasets are unfilled lines (Stress Test). Read a span object off the chart instance (`c.$uw` / `c.$sp`) set during render, so drag updates flow through the normal `update('none')` path.
 
 **Tint + tokens (reuse verbatim across pages):**
-- Band wash: `rgba(192,57,43,0.09–0.10)` (rose/danger red, very low alpha).
+- Band wash: `rgba(192,57,43,α)` (rose/danger red). **α is context-dependent, not a shared constant:** the Stress Test draws *behind* unfilled lines so `0.09` reads; the allocation drift chart draws *over* opaque sleeve fills, so it needs `~0.14` to read over `#F7931A` at full stack height. Tune α to the backdrop; keep the hue/technique shared.
 - Pre-crash level line: dashed `[4,3]`, `rgba(236,228,214,0.55)`; label `pre-crash level` in `rgba(236,228,214,0.8)`, `600 10px Inter`, left-anchored just above the line.
 - Band label: `#e08a7a`, `700 11px Inter`, centered over the band near the top.
 
@@ -1913,6 +1913,8 @@ var underwaterPlugin = { id: 'asUnderwater', afterDatasetsDraw: function (c) {
   var yp = yS.getPixelForValue(sp.onset); /* dashed pre-crash line + labels … */ ctx.restore();
 }};
 ```
+
+**Label clamp (required — the late-crash bug):** a band flush against the right edge, with the label centered at `(x0+x1)/2`, clips the text off the chart — worst for the long `not recovered within your horizon` string. Never center-draw unclamped. Use a `drawBandLabel(ctx, text, x0, x1, left, right, topY)` that: measures the text; if it fits, centers it but **clamps the center so the whole string stays within `[left+pad, right−pad]`**; if too wide for one line, wraps at the natural break (`not recovered` / `within your horizon`); else left-aligns (extend left, never clip right). Apply to the short `{n} years underwater` label too (a 1-year edge band clips). Both pages carry this helper (identical) pending the shared extraction.
 
 **Pair with a pinned axis** (see the drift chart): while the crash view is open, pin `y.max` to a nice ceiling of the *smooth* path's max so recovery/timing changes are apples-to-apples; recompute only on assumption change, not on crash-year/recovery drag.
 

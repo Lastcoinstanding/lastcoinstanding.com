@@ -206,16 +206,17 @@ body { background: var(--bg); color: var(--text); }
 .as-drift-lever-label { font-family: var(--font-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
 .as-drift-lever-val { font-family: var(--font-b); font-size: 0.95rem; font-weight: 600; color: #f2eee8; font-variant-numeric: tabular-nums; }
 .as-drift-chart { position: relative; height: clamp(300px, 44vh, 400px); }
-.as-drift-comp { display: flex; flex-direction: column; gap: 0.55rem; margin: 1.2rem 0 0; }
-.as-drift-comp-row { display: flex; align-items: center; gap: 0.85rem; font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); }
-.as-drift-comp-when { flex: 0 0 5rem; font-weight: 600; color: var(--text-dim); font-variant-numeric: tabular-nums; }
-.as-drift-comp-bar { flex: 1; display: flex; height: 16px; border-radius: 4px; overflow: hidden; background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
-.as-drift-comp-btc { background: #F7931A; transition: width 0.2s; }
-.as-drift-comp-trad { background: #5e7a92; transition: width 0.2s; }
-.as-drift-comp-share { flex: 0 0 auto; min-width: 9rem; text-align: right; font-variant-numeric: tabular-nums; color: #f2eee8; font-weight: 600; }
-/* Always-visible year-H endpoint readout (one dim line under the composition bars) */
-.as-drift-endpoint { font-family: var(--font-b); font-size: 0.8rem; line-height: 1.5; color: var(--text-muted); font-variant-numeric: tabular-nums; margin: 0.9rem 0 0; }
-.as-drift-endnote { font-family: var(--font-b); font-size: 0.98rem; line-height: 1.65; color: var(--text); margin: 0.5rem 0 0; }
+/* Value-scaled bars: length ∝ value on a shared linear scale, segments ∝ composition */
+.as-drift-bars { display: flex; flex-direction: column; gap: 0.6rem; margin: 1.2rem 0 0; }
+.as-drift-bar-row { display: flex; align-items: center; gap: 0.85rem; font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); }
+.as-drift-bar-when { flex: 0 0 7.5rem; font-weight: 600; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.as-drift-bar-track { flex: 1; height: 16px; border-radius: 4px; background: rgba(255,255,255,0.03); overflow: hidden; }
+.as-drift-bar-fill { display: flex; height: 100%; min-width: 2px; border-radius: 4px; overflow: hidden; transition: width 0.2s; }
+.as-drift-bar-btc { background: #F7931A; min-width: 2px; transition: width 0.2s; }
+.as-drift-bar-trad { background: #5e7a92; transition: width 0.2s; }
+.as-drift-bar-fill-nobtc { background: #5e7a92; }
+.as-drift-bar-cap { flex: 0 0 auto; min-width: 9.5rem; text-align: right; font-variant-numeric: tabular-nums; color: #f2eee8; font-weight: 600; }
+.as-drift-endnote { font-family: var(--font-b); font-size: 0.98rem; line-height: 1.65; color: var(--text); margin: 0.9rem 0 0; }
 .as-drift-endnote strong { color: #f2eee8; font-weight: 600; }
 .as-drift-rebal { margin: 1.4rem 0 0; }
 .as-drift-disclosure { display: flex; align-items: center; width: 100%; text-align: left; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem 1.2rem; cursor: pointer; font-family: var(--font-b); font-size: 0.9rem; color: var(--text-dim); }
@@ -247,9 +248,10 @@ body { background: var(--bg); color: var(--text); }
 .as-crash-related a:hover { color: #f2b25a; border-bottom-color: rgba(224,148,34,0.7); }
 .as-drift-crash-caption { margin-top: 0.8rem; }
 @media (max-width: 560px) {
-  .as-drift-comp-row { flex-wrap: wrap; }
-  .as-drift-comp-when { flex-basis: auto; }
-  .as-drift-comp-share { min-width: 0; flex-basis: 100%; text-align: left; }
+  .as-drift-bar-row { flex-wrap: wrap; }
+  .as-drift-bar-when { flex-basis: auto; }
+  .as-drift-bar-track { flex: 1 1 55%; }
+  .as-drift-bar-cap { min-width: 0; flex-basis: 100%; text-align: left; }
   .as-crash-controls { grid-template-columns: 1fr; }
 }
 

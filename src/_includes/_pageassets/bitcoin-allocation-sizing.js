@@ -425,25 +425,12 @@
   function renderDrift() {
     var paths = computePaths(S);
     assertParity(paths);
-    renderDriftComposition(paths);
-    renderDriftEndpoint(paths);
+    renderDriftBars(paths);
     renderDriftEndnote(paths);
     renderCrash(paths);
     renderDriftChart(paths);
     assertDriftBinding();
     renderPathAudit(paths);
-  }
-
-  // Always-visible year-H results line under the composition bars. Reads the SAME
-  // computePaths result the chart uses (active strategy, crash included) — one
-  // source. Basis-aware via driftFmt (matches the axis formatting).
-  function renderDriftEndpoint(paths) {
-    var el = document.getElementById('asDriftEndpoint'); if (!el) return;
-    var m = paths[activeStrat()], H = paths.H;
-    var txt = 'At year ' + S.horizonYears + ': total ' + driftFmt(m.total[H])
-      + ' — bitcoin ' + driftFmt(m.btc[H]) + ' · traditional ' + driftFmt(m.trad[H]);
-    if (S.crashOn) txt += ' · no-bitcoin ' + driftFmt(paths.noBtc[H]);
-    el.textContent = txt;
   }
 
   // Crash verdict vs the no-bitcoin benchmark at year H (the "worth it?" answer).
@@ -470,27 +457,40 @@
     }
   }
 
-  // Composition bars + endnote read the SINGLE shipped source (the loop's
-  // btcShare), never a parallel computation, so they can't drift from the verdict.
-  function setCompBar(btcId, tradId, share) {
-    var b = document.getElementById(btcId), t = document.getElementById(tradId);
-    if (b) b.style.width = (share * 100).toFixed(1) + '%';
-    if (t) t.style.width = ((1 - share) * 100).toFixed(1) + '%';
+  // Value-scaled bars (Phase D) — replaces the fixed-width composition bars AND
+  // the endpoint text line. Three bars on ONE shared LINEAR scale (max of the
+  // three): length ∝ value, internal segments ∝ composition. Reads the SAME
+  // computePaths result as the chart (active strategy + crash), so it can't drift.
+  // Basis-aware value labels: dollars (matching the axis/audit) when portfolio $
+  // is set, else MULTIPLES OF START (Today = 1.0×) — never raw index numbers.
+  function barValLabel(v, startV) {
+    if (hasUSD()) return usd(v);                     // matches the axis + audit formatter
+    return (startV > 0 ? v / startV : 0).toFixed(1) + '×';
   }
-  function renderDriftComposition(paths) {
-    var strat = activeStrat(), w = S.allocPct / 100;
-    var sh0 = paths[strat].btcShare[0], shH = paths[strat].btcShare[paths.H];
-    setCompBar('asCompBtc0', 'asCompTrad0', sh0);
-    var s0 = document.getElementById('asCompShare0'); if (s0) s0.textContent = pct(sh0) + ' bitcoin';
-    var whenH = document.getElementById('asCompWhenH'); if (whenH) whenH.textContent = 'At year ' + S.horizonYears;
-    var sH = document.getElementById('asCompShareH');
-    if (strat === 'rebal') {
-      setCompBar('asCompBtcH', 'asCompTradH', w);
-      if (sH) sH.textContent = 'held at ' + S.allocPct + '% by annual trimming';
-    } else {
-      setCompBar('asCompBtcH', 'asCompTradH', shH);
-      if (sH) sH.textContent = pct(shH) + ' bitcoin';
+  function setValueBar(fillId, frac, share) {
+    var fill = document.getElementById(fillId); if (!fill) return;
+    fill.style.width = (Math.max(0, frac) * 100).toFixed(2) + '%';   // LINEAR — no floor/compress
+    if (share != null) {
+      var btc = fill.querySelector('.as-drift-bar-btc'), trad = fill.querySelector('.as-drift-bar-trad');
+      if (btc) btc.style.width = (share * 100).toFixed(1) + '%';
+      if (trad) trad.style.width = ((1 - share) * 100).toFixed(1) + '%';
     }
+  }
+  function renderDriftBars(paths) {
+    if (!document.getElementById('asDriftBars')) return;
+    var strat = activeStrat(), w = S.allocPct / 100, H = paths.H, m = paths[strat];
+    var startV = m.total[0], endV = m.total[H], noBtcV = paths.noBtc[H];
+    var maxV = Math.max(startV, endV, noBtcV) || 1;
+    var shH = strat === 'rebal' ? w : m.btcShare[H];
+    setValueBar('asBarToday', startV / maxV, m.btcShare[0]);
+    setValueBar('asBarH', endV / maxV, shH);
+    setValueBar('asBarNoBtc', noBtcV / maxV, null);
+    var whenH = document.getElementById('asBarWhenH'); if (whenH) whenH.textContent = 'At year ' + S.horizonYears;
+    var whenNb = document.getElementById('asBarWhenNoBtc'); if (whenNb) whenNb.textContent = 'No bitcoin, year ' + S.horizonYears;
+    var capT = document.getElementById('asCapToday'); if (capT) capT.textContent = barValLabel(startV, startV) + ' · ' + pct(m.btcShare[0]) + ' bitcoin';
+    var capH = document.getElementById('asCapH');
+    if (capH) capH.textContent = barValLabel(endV, startV) + ' · ' + (strat === 'rebal' ? ('held at ' + S.allocPct + '%') : (pct(shH) + ' bitcoin'));
+    var capNb = document.getElementById('asCapNoBtc'); if (capNb) capNb.textContent = barValLabel(noBtcV, startV);
   }
   function renderDriftEndnote(paths) {
     var el = document.getElementById('asDriftEndnote'); if (!el) return;
@@ -560,6 +560,22 @@
     return { onset: onset, onsetY: cy, recY: recY, recovered: recovered,
       endY: recovered ? recY : H, underwater: recovered ? (recY - cy) : (H - cy) };
   }
+  // Draw a band label without clipping at the chart edges: prefer centered over
+  // the band, but CLAMP so the whole text stays within [left,right]; if too wide
+  // for one line, wrap at "…/ within your horizon"; else left-align (extend left,
+  // never clip right). Fixes the late-crash "not recovered…" truncation.
+  function drawBandLabel(ctx, text, x0, x1, left, right, topY) {
+    var pad = 4, center = (x0 + x1) / 2, avail = right - left - 2 * pad;
+    function place(t, y) {
+      var w = ctx.measureText(t).width;
+      var cx = Math.max(left + pad + w / 2, Math.min(center, right - pad - w / 2));
+      ctx.textAlign = 'center'; ctx.fillText(t, cx, y);
+    }
+    if (ctx.measureText(text).width <= avail) { place(text, topY); return; }
+    var idx = text.indexOf(' within ');
+    if (idx > 0) { place(text.slice(0, idx), topY); place(text.slice(idx + 1), topY + 12); }
+    else { ctx.textAlign = 'left'; ctx.fillText(text, left + pad, topY); }
+  }
   var driftUnderwaterPlugin = {
     id: 'asUnderwater',
     afterDatasetsDraw: function (c) {
@@ -568,10 +584,10 @@
       var x0 = Math.max(xS.getPixelForValue(sp.onsetY), xS.left);
       var x1 = Math.min(xS.getPixelForValue(sp.endY), xS.right);
       ctx.save();
-      // Rose band drawn OVER the fills at low alpha (the Stress Test draws behind,
-      // but its datasets are unfilled lines; here the opaque sleeves would drown a
-      // behind-band, so we wash over — the spec's primary instruction).
-      if (x1 > x0) { ctx.fillStyle = 'rgba(192,57,43,0.10)'; ctx.fillRect(x0, yS.top, x1 - x0, yS.bottom - yS.top); }
+      // Rose band drawn OVER the fills — alpha 0.14 (bumped from the ported 0.09/0.10)
+      // to read clearly over the opaque orange sleeves; the Stress Test keeps its
+      // lower alpha (unfilled-lines context). See STYLE_GUIDE §6.36.
+      if (x1 > x0) { ctx.fillStyle = 'rgba(192,57,43,0.14)'; ctx.fillRect(x0, yS.top, x1 - x0, yS.bottom - yS.top); }
       // Dashed pre-crash level line + label (Stress Test tokens verbatim).
       var yp = yS.getPixelForValue(sp.onset);
       if (yp >= yS.top && yp <= yS.bottom) {
@@ -581,8 +597,8 @@
         ctx.fillText('pre-crash level', xS.left + 4, yp - 4);
       }
       if (x1 > x0) {
-        ctx.fillStyle = '#e08a7a'; ctx.font = '700 11px Inter, sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText(sp.recovered ? (yearsWord(sp.underwater) + ' underwater') : 'not recovered within your horizon', (x0 + x1) / 2, yS.top + 13);
+        ctx.fillStyle = '#e08a7a'; ctx.font = '700 11px Inter, sans-serif';
+        drawBandLabel(ctx, sp.recovered ? (yearsWord(sp.underwater) + ' underwater') : 'not recovered within your horizon', x0, x1, xS.left, xS.right, yS.top + 13);
       }
       ctx.restore();
     }

@@ -174,19 +174,23 @@ eleventyComputed:
       <canvas id="asDriftChart"></canvas>
     </div>
 
-    <div class="as-drift-comp" id="asDriftComp" aria-live="polite">
-      <div class="as-drift-comp-row">
-        <span class="as-drift-comp-when">Today</span>
-        <span class="as-drift-comp-bar"><span class="as-drift-comp-btc" id="asCompBtc0"></span><span class="as-drift-comp-trad" id="asCompTrad0"></span></span>
-        <span class="as-drift-comp-share" id="asCompShare0">&mdash;</span>
+    <div class="as-drift-bars" id="asDriftBars" aria-live="polite">
+      <div class="as-drift-bar-row">
+        <span class="as-drift-bar-when">Today</span>
+        <span class="as-drift-bar-track"><span class="as-drift-bar-fill" id="asBarToday"><span class="as-drift-bar-btc"></span><span class="as-drift-bar-trad"></span></span></span>
+        <span class="as-drift-bar-cap" id="asCapToday">&mdash;</span>
       </div>
-      <div class="as-drift-comp-row">
-        <span class="as-drift-comp-when" id="asCompWhenH">At year 10</span>
-        <span class="as-drift-comp-bar"><span class="as-drift-comp-btc" id="asCompBtcH"></span><span class="as-drift-comp-trad" id="asCompTradH"></span></span>
-        <span class="as-drift-comp-share" id="asCompShareH">&mdash;</span>
+      <div class="as-drift-bar-row">
+        <span class="as-drift-bar-when" id="asBarWhenH">At year 10</span>
+        <span class="as-drift-bar-track"><span class="as-drift-bar-fill" id="asBarH"><span class="as-drift-bar-btc"></span><span class="as-drift-bar-trad"></span></span></span>
+        <span class="as-drift-bar-cap" id="asCapH">&mdash;</span>
+      </div>
+      <div class="as-drift-bar-row">
+        <span class="as-drift-bar-when" id="asBarWhenNoBtc">No bitcoin, year 10</span>
+        <span class="as-drift-bar-track"><span class="as-drift-bar-fill as-drift-bar-fill-nobtc" id="asBarNoBtc"></span></span>
+        <span class="as-drift-bar-cap" id="asCapNoBtc">&mdash;</span>
       </div>
     </div>
-    <p class="as-drift-endpoint" id="asDriftEndpoint" aria-live="polite">&mdash;</p>
     <p class="as-drift-endnote" id="asDriftEndnote">&mdash;</p>
 
     <div class="as-drift-crash" id="crash">

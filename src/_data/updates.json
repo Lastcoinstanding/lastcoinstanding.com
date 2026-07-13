@@ -2,6 +2,11 @@
   {
     "display": "7/12/26",
     "page": "/bitcoin-allocation-sizing.html",
+    "summary": "Updated: Bitcoin Portfolio Allocation — a clearer results readout. The composition bars under the chart are now scaled to value: each bar's length shows how much the portfolio is worth, its segments show the bitcoin/traditional split, and a third always-on bar shows what the same money does with no bitcoin at all. Values read as multiples of today (or dollars if you enter a portfolio size), so the comparison is immediate. The underwater band's tint and its \"years underwater\" label were also cleaned up so the label never clips at the chart edge, even for a late crash."
+  },
+  {
+    "display": "7/12/26",
+    "page": "/bitcoin-allocation-sizing.html",
     "summary": "Updated: Bitcoin Portfolio Allocation — the crash view now shows how long you're underwater. A shaded band and a dashed pre-crash-level line mark the years the portfolio sits below where it stood when the crash hit, labelled with the number of years (or \"not recovered within your horizon\"). A compact year-by-year results line sits under the composition bars, the chart's vertical scale now stays fixed while you drag the crash year or switch recovery shapes (so scenarios are directly comparable), and you can deep-link straight into a configured crash view. Underwater is measured on the whole portfolio, not the bitcoin sleeve; none of it is a forecast."
   },
   {

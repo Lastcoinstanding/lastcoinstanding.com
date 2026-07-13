@@ -250,6 +250,21 @@
   // The payoff of the Crash-period view: a shaded "years underwater" band from crash onset to
   // the year the stack regains its pre-crash value (or to depletion), plus a dashed pre-crash
   // level line. Drawn only in crash focus, so switching views has a visible point.
+  // Clamp a band label to the chart area so a late/edge band never clips the text
+  // (identical to the allocation drift chart's drawBandLabel — Phase D fix; both
+  // pages carry it pending the shared crash-model extraction, see TECH_DEBT).
+  function stDrawBandLabel(ctx, text, x0, x1, left, right, topY) {
+    var pad = 4, center = (x0 + x1) / 2, avail = right - left - 2 * pad;
+    function place(t, y) {
+      var w = ctx.measureText(t).width;
+      var cx = Math.max(left + pad + w / 2, Math.min(center, right - pad - w / 2));
+      ctx.textAlign = 'center'; ctx.fillText(t, cx, y);
+    }
+    if (ctx.measureText(text).width <= avail) { place(text, topY); return; }
+    var idx = text.indexOf(' within ');
+    if (idx > 0) { place(text.slice(0, idx), topY); place(text.slice(idx + 1), topY + 12); }
+    else { ctx.textAlign = 'left'; ctx.fillText(text, left + pad, topY); }
+  }
   var underwaterPlugin = {
     id: 'stUnderwater',
     beforeDatasetsDraw: function (c) {
@@ -285,8 +300,8 @@
       var x1 = Math.min(xS.getPixelForValue(endY), xS.right);
       if (x1 > x0 && sp.underwater >= 1) {
         ctx.save();
-        ctx.fillStyle = '#e08a7a'; ctx.font = '700 11px Inter, sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText(yearsWord(sp.underwater) + ' underwater', (x0 + x1) / 2, yS.top + 13);
+        ctx.fillStyle = '#e08a7a'; ctx.font = '700 11px Inter, sans-serif';
+        stDrawBandLabel(ctx, yearsWord(sp.underwater) + ' underwater', x0, x1, xS.left, xS.right, yS.top + 13);
         ctx.restore();
       }
     }
