@@ -210,8 +210,11 @@ body { background: var(--bg); color: var(--text); }
 .as-drift-bars { display: flex; flex-direction: column; gap: 0.6rem; margin: 1.2rem 0 0; }
 .as-drift-bar-row { display: flex; align-items: center; gap: 0.85rem; font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); }
 .as-drift-bar-when { flex: 0 0 7.5rem; font-weight: 600; color: var(--text-dim); font-variant-numeric: tabular-nums; }
-.as-drift-bar-track { flex: 1; height: 16px; border-radius: 4px; background: rgba(255,255,255,0.03); overflow: hidden; }
-.as-drift-bar-fill { display: flex; height: 100%; min-width: 2px; border-radius: 4px; overflow: hidden; transition: width 0.2s; }
+.as-drift-bar-track { position: relative; flex: 1; height: 16px; border-radius: 4px; background: rgba(255,255,255,0.03); overflow: hidden; }
+/* Absolutely positioned so its % width resolves against the track's definite
+   (flex-computed) width — an in-flow child's % width goes indefinite inside a
+   flex-item track and collapses to content sizing. */
+.as-drift-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; display: flex; min-width: 2px; border-radius: 4px; overflow: hidden; transition: width 0.2s; }
 .as-drift-bar-btc { background: #F7931A; min-width: 2px; transition: width 0.2s; }
 .as-drift-bar-trad { background: #5e7a92; transition: width 0.2s; }
 .as-drift-bar-fill-nobtc { background: #5e7a92; }
