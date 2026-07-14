@@ -782,9 +782,22 @@
     setSeg('stTiming', String(best.t));
     renderAll(); // full recompute + URL sync; clears the (now-stale) finder line first
     var el = document.getElementById('stFinderLine'); if (!el) return;
-    el.innerHTML = best.dep
-      ? 'Worst timing under these settings: a crash landing in <strong>year ' + best.t + '</strong> — it depletes the stack in <strong>' + best.dep + '</strong>. Worst timing, not a prediction.'
-      : 'Worst timing under these settings: a crash landing in <strong>year ' + best.t + '</strong> brings the plan closest to failure — the stack falls to <strong>' + usd(Math.max(0, best.minReal)) + '</strong> at its lowest. Worst timing, not a prediction.';
+    if (best.dep) {
+      el.innerHTML = 'Worst timing under these settings: a crash landing in <strong>year ' + best.t + '</strong> — it depletes the stack in <strong>' + best.dep + '</strong>. Worst timing, not a prediction.';
+    } else {
+      // Display-basis fix (v2.2.1): scoring ranks by the today's-$ minimum along the FUNDED
+      // path (cross-year fairness — see findWorstTiming), but the DISPLAYED figure is that
+      // timing's NOMINAL trough, the same currency as the verdict + chart (STYLE_GUIDE §10.3
+      // rule 5). Flex off → the full-spend crashed path, so it equals verdict sentence 1
+      // exactly. Flex on → the reduced path, named "with your X% cut" (its trough is
+      // legitimately higher, and the clause explains the gap vs the full-spend verdict).
+      // Reuse _last (stashed by the renderAll just above) so the path/crash match the verdict.
+      var funded = (FLEX > 0 && _last && _last.reduced) ? _last.reduced : (_last && _last.crashedFull);
+      var sp = (funded && _last) ? stressPeriod(funded, _last.crash) : null;
+      var troughNom = sp ? sp.troughUsd : Math.max(0, best.minReal);
+      var cutClause = FLEX > 0 ? 'with your ' + FLEX + '% cut, ' : '';
+      el.innerHTML = 'Worst timing under these settings: a crash landing in <strong>year ' + best.t + '</strong> brings the plan closest to failure — ' + cutClause + 'the stack falls to <strong>' + usd(troughNom) + '</strong> at its lowest. Worst timing, not a prediction.';
+    }
     el.hidden = false;
   }
 

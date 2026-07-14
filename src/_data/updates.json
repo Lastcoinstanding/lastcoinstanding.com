@@ -2,6 +2,11 @@
   {
     "display": "7/13/26",
     "page": "/the-bitcoin-retirement-stress-test.html",
+    "summary": "Fix: The Bitcoin Retirement Stress Test — the \"worst timing\" finder now reports the stack's low point in the same dollars as the verdict and chart. It was quoting its internal ranking figure (a today's-dollars, spending-cut-adjusted low), which read lower than the ~$1.0M the verdict showed for the same crash and left the two looking inconsistent. The finder still ranks candidate years the same way, but the number it shows is now that year's actual low in plain dollars — and when a spending cut is on it says so (\"with your 30% cut\"), since the cut leaves the low a little higher."
+  },
+  {
+    "display": "7/13/26",
+    "page": "/the-bitcoin-retirement-stress-test.html",
     "summary": "Polish: The Bitcoin Retirement Stress Test — clearer verdict copy and a cleaner chart. The survival verdict now tells the stress in one line, from where the stack stood before the crash to where it fell and by how much (\"from about $2.4M to $1.0M, a 58% fall\"), so the drop, its dollars, and its percentage read together instead of scattered across sentences. When a weak recovery never brings the price back, the verdict says the stack stays below its old level through the horizon rather than implying a return that never comes. And the crash-plus-cut line on the main chart is now amber like the cut bars elsewhere, so at a glance it reads apart from the rose crash line: blue is the plan, rose is the crash, amber is the crash with a spending cut."
   },
   {
