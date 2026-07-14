@@ -404,6 +404,7 @@
       tip.textContent = on ? 'Copying…' : label;
     }
     function flash(text){
+      busy = false; // re-arm so the chart can be re-exported after changing inputs
       btn.classList.remove('is-busy'); glyph.classList.remove('spin');
       btn.classList.add('is-done');
       glyph.innerHTML = CHECK_SVG;
@@ -416,6 +417,7 @@
       }, 1500);
     }
     function fail(){
+      busy = false; // re-arm on failure too
       btn.classList.remove('is-busy'); glyph.classList.remove('spin');
       glyph.innerHTML = CAMERA_SVG; tip.textContent = label;
     }
