@@ -1,6 +1,11 @@
 [
   {
     "display": "7/13/26",
+    "page": "/",
+    "summary": "New: two homepage carousel slides — Bitcoin Portfolio Allocation and The Bitcoin Retirement Stress Test — added as a pair, decision then consequence. The first is an amber ink bloom spreading through dark water (a small position quietly reshaping the whole portfolio); the second is a stone bridge standing in a river at flood (the whole plan under load). Each links straight to its calculator."
+  },
+  {
+    "display": "7/13/26",
     "page": "/the-bitcoin-retirement-stress-test.html",
     "summary": "Fix: The Bitcoin Retirement Stress Test — the \"worst timing\" finder now reports the stack's low point in the same dollars as the verdict and chart. It was quoting its internal ranking figure (a today's-dollars, spending-cut-adjusted low), which read lower than the ~$1.0M the verdict showed for the same crash and left the two looking inconsistent. The finder still ranks candidate years the same way, but the number it shows is now that year's actual low in plain dollars — and when a spending cut is on it says so (\"with your 30% cut\"), since the cut leaves the low a little higher."
   },
