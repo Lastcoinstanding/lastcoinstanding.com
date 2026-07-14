@@ -357,12 +357,28 @@ land in a follow-up PR.
 When the video is ready:
 
 - Strip audio + thumbnail stream with `ffmpeg -c:v copy -an input.mp4 output.mp4`
+  (copies the video stream, drops audio — fast, no re-encode). Re-encode only if
+  size or format needs it (the trilogy's P2 needed a 2-pass re-encode to land in
+  the size band; the raw was ~11 MB).
 - Target file size 3–10 MB, 720p, 10 seconds, silent (verified)
+- **Name by the page's full slug:** `videos/<slug>.mp4` at repo root (e.g.
+  `videos/wait-or-deploy-now.mp4`). Match the existing files.
+- **Label your final picks before hand-off.** Grok downloads are opaque
+  `grok-video-<uuid>.mp4`, and you will usually generate more takes than pages.
+  Either rename raws to slugs yourself, or expect to be asked which take is
+  final — frame content identifies *some* videos, but not near-identical takes
+  of the same scene (June 2026: 5 raws for 3 pages, and the P3 pick needed a
+  human call among 3 sea-sunset takes).
 - Add the slide config to the homepage carousel data
 - Update `SITE_GUIDE §13` to promote the page's entry from "Pending
   additions" into the main inventory table
+- **Eyeball the slide on the branch preview before merging.** Slides are visual
+  and hero-placed; a rendering fault is not something code review catches. Push
+  and review live, don't merge blind.
 
-See `SITE_GUIDE §6` for prompt-craft patterns and tonal-camp guidance.
+See `SITE_GUIDE §6` for prompt-craft patterns and tonal-camp guidance, and
+`SITE_GUIDE §13` for the per-slide iteration records (what each brief cost, and
+why).
 
 ## 9. Documentation
 
