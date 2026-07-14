@@ -304,6 +304,10 @@ eleventyComputed:
       <p>This page owns the accumulation-era allocation choice: whether a bitcoin position earns its place while you are building it, and what it does for and to a portfolio over a long hold. It does not tell you the number to pick. The optimal fraction is a math problem, and it lives on How Much Bitcoin. Why the swing is the engine and not the risk is the whole of The Bitcoin Horizon. What a position does later, once you are drawing an income from it, lives on the Retirement pages. And whether to trim a winning position back to target, once bitcoin has grown past where you started it, is the open question Disciplined Rebalancing works through.</p>
       <p>One note on the assumptions: bitcoin&rsquo;s diversification benefit has weakened since the ETFs arrived, with its correlation to traditional markets running higher than it once did. This page keeps the correlation on the high side for that reason, so it does not overstate the free-diversification case.</p>
     </div>
+    <!-- Carry-the-scenario handoffs: state-carrying links rendered by renderCarry().
+         Line 1 (Retirement) shows only when a portfolio $ is set; line 2 (Stress Test)
+         only while the crash disclosure is open. Hidden until at least one applies. -->
+    <div class="as-carry" id="asCarry" hidden></div>
     <div class="as-connect-grid">
       <a class="as-connect-card" href="/how-much-bitcoin"><div class="as-connect-title">How Much Bitcoin? <span class="as-part-badge">the optimal fraction</span></div><p>The Kelly math: what fraction is optimal. This page shows whether a fraction earns its place; that one tells you what to aim for.</p></a>
       <a class="as-connect-card" href="/the-bitcoin-horizon"><div class="as-connect-title">The Bitcoin Horizon</div><p>Why volatility is not risk, and why no long-enough bitcoin hold has ended in the red.</p></a>

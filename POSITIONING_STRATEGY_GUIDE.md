@@ -223,6 +223,19 @@ them so future explorations inherit them rather than rediscovering them.
   Treat this as a design-time consideration for every new output section, not a
   post-ship fix. (Implementation recipe: STYLE_GUIDE §6.35.)
 
+- **Carry the scenario, don't just cite the page.** Cross-page links between calculators
+  carry the reader's state when — and only when — the quantities mean the same thing on
+  both pages. Handoffs are explicit links that state what they carry and any conversion's
+  arithmetic and price basis; parameters that don't correspond are never translated by
+  guesswork. (Validated in the allocation→retirement/stress-test build, 2026-07: `depth→cdepth`
+  and `rec→crecov` cross as identity maps; the BTC stack crosses as a stated conversion
+  `port × alloc ÷ spot` labeled with its price basis via `todayPriceIsLive`; the allocation
+  crash *year* `cy` — years-from-today — is deliberately NOT sent to the stress test's `ctime`
+  — year-of-retirement — because they are different clocks; and Disciplined Rebalancing gets
+  no carry because its inputs have no allocation-identical quantity. A handoff renders only
+  when its conversion is meaningful — the retirement line needs a portfolio-$ input set,
+  otherwise it hides.)
+
 ---
 
 ## 4. Reconciliation with the Site Guide (§1)

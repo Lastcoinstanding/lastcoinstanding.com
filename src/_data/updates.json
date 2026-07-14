@@ -1,6 +1,11 @@
 [
   {
     "display": "7/13/26",
+    "page": "/bitcoin-allocation-sizing.html",
+    "summary": "New: Bitcoin Portfolio Allocation now carries your scenario forward to the retirement tools. Set a portfolio size and a link converts your allocation into an actual bitcoin stack — your 38% of $1.8M is about 11 BTC at today's price — and hands it to The Bitcoin Retirement so you can see what it retires. Drop a crash on the year-by-year chart and a second link carries that same crash, its depth and recovery, into The Bitcoin Retirement Stress Test. Each link states exactly what it carries and the price it used, and only appears when the numbers behind it are set — no guessing, no silent state transfer."
+  },
+  {
+    "display": "7/13/26",
     "page": "/",
     "summary": "New: two homepage carousel slides — Bitcoin Portfolio Allocation and The Bitcoin Retirement Stress Test — added as a pair, decision then consequence. The first is an amber ink bloom spreading through dark water (a small position quietly reshaping the whole portfolio); the second is a stone bridge standing in a river at flood (the whole plan under load). Each links straight to its calculator."
   },

@@ -39,6 +39,9 @@
 
   // ── Live Power Law context (spot vs trend today) ──
   var spot = TODAY_PRICE;
+  // Price basis for the carry-the-scenario copy: 'fallback' until a real fetch
+  // resolves 'live' (seed = latest monthly sample). Drives todayPriceIsLive().
+  var _priceSource = 'fallback';
   function trendToday() { return plPrice(TODAY_DAYS); }
   function currentRatio() { var t = trendToday(); return t > 0 ? spot / t : 1; }
   function belowTrend() { return currentRatio() < 0.98; }
@@ -841,6 +844,48 @@
   }
 
   // ════════ RENDER ALL ════════
+  // ════════ CARRY THE SCENARIO (explicit cross-page state handoffs) ════════
+  // Principle 1: explicit links, visibly labeled with what they carry. Principle 5:
+  // each line renders only when its inputs are meaningful. Recomputed every render
+  // pass so hrefs + copy never go stale. Only semantically-identical quantities cross
+  // (principle 2): depth→cdepth and rec→crecov are identity maps; the BTC stack is a
+  // stated conversion (principle 3); the allocation crash YEAR (cy, years-from-today)
+  // is deliberately NOT sent to the stress test's ctime (year-of-retirement) — different
+  // clocks. The stress test's reverse link stays prose (mapping a stack back to a %,
+  // total, and traditional side is underdetermined). DR gets no carry: its inputs
+  // (sell/rebuy/tax percentiles) have no allocation-identical quantity.
+  function carriedStack() {
+    if (!hasUSD() || !(spot > 0)) return null;
+    // BTC stack = portfolio $ × allocation fraction ÷ spot. Clamp to the Retirement
+    // page's stack range [0, 99.99]; 2 dp matches its codec precision so the displayed
+    // figure, the href param, and the landed state agree exactly.
+    return Math.min(99.99, Math.max(0, S.portfolioUSD * (S.allocPct / 100) / spot));
+  }
+  function fmtBtcStack(v) { return v.toFixed(2); }
+  function renderCarry() {
+    var el = document.getElementById('asCarry'); if (!el) return;
+    var lines = [], stack = carriedStack();
+    if (stack != null) {
+      var s = fmtBtcStack(stack);
+      // §10.3 rule 5 / principle 3: "at today's price" only when the price is truly live.
+      var pricePhrase = todayPriceIsLive(_priceSource) ? 'at today’s price' : 'at the latest price';
+      lines.push('<p class="as-carry-line"><a class="as-carry-link" href="/the-bitcoin-retirement?stack=' + s + '">'
+        + 'Carry this into <strong>The Bitcoin Retirement</strong>: your ' + S.allocPct + '% of ' + usd(S.portfolioUSD)
+        + ' is about <strong>' + s + ' BTC</strong> ' + pricePhrase + ' — see what it retires. →</a></p>');
+    }
+    if (S.crashOn) {
+      var recL = (RECOVERY[S.crashRec] || RECOVERY.historical).label;
+      // &amp; because this href is written via innerHTML (HTML-attribute encoding);
+      // getAttribute('href') decodes it back to a clean '&' for navigation.
+      var href = '/the-bitcoin-retirement-stress-test?cdepth=' + S.crashDepthPct + '&amp;crecov=' + S.crashRec;
+      if (stack != null) href += '&amp;stack=' + fmtBtcStack(stack); // include the same computed stack when known
+      lines.push('<p class="as-carry-line"><a class="as-carry-link" href="' + href + '">'
+        + 'Or <strong>stress-test a retirement</strong> against this same crash — ' + S.crashDepthPct + '% depth, ' + recL + ' recovery. →</a></p>');
+    }
+    el.innerHTML = lines.join('');
+    el.hidden = lines.length === 0;
+  }
+
   function renderAll() {
     renderRegime();
     renderConclusion();
@@ -854,6 +899,7 @@
     renderCompareTable(rows);
     renderAudit(rows);
     renderAssumptions();
+    renderCarry();
     syncUrl();
     _lastRows = rows;
   }
@@ -1077,7 +1123,7 @@
       setTimeout(scrollToDrift, 400);
     }
     // Refresh the spot price (and with it the regime + projection) from the live feed.
-    try { fetchTodayPrice(function (price) { if (isFinite(price) && price > 0) { spot = price; if (S.btcMode == null) setSeg('asBtcMode', activeMode()); updateReadouts(); renderAll(); } }); } catch (e) {}
+    try { fetchTodayPrice(function (price, source) { _priceSource = (source === 'live') ? 'live' : 'fallback'; if (isFinite(price) && price > 0) { spot = price; if (S.btcMode == null) setSeg('asBtcMode', activeMode()); } updateReadouts(); renderAll(); }); } catch (e) {}
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
