@@ -64,7 +64,7 @@ eleventyComputed:
             <div class="chart-container">
                 <div class="chart-title">Home-Price-to-Income Ratio by Monetary Regime</div>
                 <div class="chart-subtitle">135 years of US housing affordability across five monetary eras · 1890–2025</div>
-                <div class="chart-wrapper" data-chart-copy data-chart-title="Home-Price-to-Income Ratio by Monetary Regime"><canvas id="eraBarChart"></canvas></div>
+                <div class="chart-wrapper" data-chart-copy data-chart-heading="closest:.chart-container .chart-title" data-chart-sub="closest:.chart-container .chart-subtitle" data-chart-title="Home-Price-to-Income Ratio by Monetary Regime"><canvas id="eraBarChart"></canvas></div>
                 <div class="chart-source">Sources: Shiller Home Price Index (1890–), U.S. Census Bureau (MSPUS), BLS, FRED. Pre-1950 ratios derived from historical wage and housing data.</div>
             </div>
 
@@ -85,7 +85,7 @@ eleventyComputed:
             <div class="chart-container">
                 <div class="chart-title">The Divergence: Home Prices vs. Incomes</div>
                 <div class="chart-subtitle">Indexed to 100 in 1985 — nominal growth comparison · Home prices up +403%, incomes up +252%</div>
-                <div class="chart-wrapper" data-chart-copy data-chart-title="The Divergence: Home Prices vs. Incomes"><canvas id="divergenceChart"></canvas></div>
+                <div class="chart-wrapper" data-chart-copy data-chart-heading="closest:.chart-container .chart-title" data-chart-sub="closest:.chart-container .chart-subtitle" data-chart-title="The Divergence: Home Prices vs. Incomes"><canvas id="divergenceChart"></canvas></div>
                 <div class="chart-source">Sources: U.S. Census Bureau, Bureau of Labor Statistics, FRED</div>
             </div>
 
@@ -98,7 +98,7 @@ eleventyComputed:
             <div class="chart-container">
                 <div class="chart-title">Home-Price-to-Income Ratios: Five Major Markets, 2005–2024</div>
                 <div class="chart-subtitle">Median home price divided by median household income · every line started near "affordable" (3.0×) within living memory</div>
-                <div class="chart-wrapper" data-chart-copy data-chart-title="Home-Price-to-Income Ratios: Five Major Markets, 2005–2024"><canvas id="globalAffordabilityChart"></canvas></div>
+                <div class="chart-wrapper" data-chart-copy data-chart-heading="closest:.chart-container .chart-title" data-chart-sub="closest:.chart-container .chart-subtitle" data-chart-title="Home-Price-to-Income Ratios: Five Major Markets, 2005–2024"><canvas id="globalAffordabilityChart"></canvas></div>
                 <div class="chart-source">Source: Demographia International Housing Affordability, annual editions 2006–2025 (each edition reports Q3 of the prior year). Hong Kong was first included in the 2011 edition (Q3 2010 data); earlier values are intentionally absent.</div>
             </div>
 
@@ -118,7 +118,7 @@ eleventyComputed:
                 <div class="stat-card"><div class="stat-value">~5</div><div class="stat-label">BTC for a House · 2025</div></div>
                 <div class="stat-card"><div class="stat-value">?</div><div class="stat-label">BTC for a House · 2030</div></div>
             </div>
-            <div class="chart-container"><div class="chart-title">BTC Required to Buy the Median US House</div><div class="chart-subtitle">Annual average bitcoin price vs. median home sale price · 2013–2025, with projected trend to 2032</div><div class="chart-wrapper" data-chart-copy data-chart-title="BTC Required to Buy the Median US House"><canvas id="btcHouseChart"></canvas></div><div class="chart-source">Sources: FRED (MSPUS), CoinGecko, CoinMarketCap — annual averages. Projected trend based on historical trajectory; not a price prediction.</div></div>
+            <div class="chart-container"><div class="chart-title">BTC Required to Buy the Median US House</div><div class="chart-subtitle">Annual average bitcoin price vs. median home sale price · 2013–2025, with projected trend to 2032</div><div class="chart-wrapper" data-chart-copy data-chart-heading="closest:.chart-container .chart-title" data-chart-sub="closest:.chart-container .chart-subtitle" data-chart-title="BTC Required to Buy the Median US House"><canvas id="btcHouseChart"></canvas></div><div class="chart-source">Sources: FRED (MSPUS), CoinGecko, CoinMarketCap — annual averages. Projected trend based on historical trajectory; not a price prediction.</div></div>
             <div class="narrative"><p>Yes, the line is volatile — Bitcoin is volatile. But look at the <em>direction</em>. In 2013, you needed 367 bitcoin to buy the median US house. By 2025, you needed roughly 5. That's a 98.6% decline in the bitcoin-denominated cost of housing. <strong>No amount of fiat appreciation in home values can disguise what is happening on this chart.</strong> The house is demonetizing — shedding its store-of-value premium — as bitcoin absorbs the monetary energy that was artificially trapped in real estate. The trend line tells you where this is heading, even if the path is jagged.</p></div>
 
             <!-- Houses You Could Buy visual -->
@@ -129,7 +129,7 @@ eleventyComputed:
                 <div class="chart-source">Based on $60,000 at each year's average BTC price, valued at 2025 BTC price of $88,000 vs. 2025 median home of $416,900. Mortgage assumes 20% down, 30-year fixed at prevailing rate.</div>
             </div>
 
-            <div class="chart-container"><div class="chart-title">The Real Opportunity Cost of Buying a House</div><div class="chart-subtitle" id="seesawSubtitle">Growth of $1 invested in 2018 — bitcoin vs. housing (log scale)</div><div class="seesaw-start-row" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin:0.6rem 0 1rem;align-items:center"><span style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-right:0.4rem">Start year:</span><button class="seesaw-start-btn toggle-btn" data-startyear="2014" style="flex:0 0 auto;min-width:64px;padding:0.5rem 0.9rem;font-size:0.78rem">2014</button><button class="seesaw-start-btn toggle-btn" data-startyear="2016" style="flex:0 0 auto;min-width:64px;padding:0.5rem 0.9rem;font-size:0.78rem">2016</button><button class="seesaw-start-btn toggle-btn active" data-startyear="2018" style="flex:0 0 auto;min-width:64px;padding:0.5rem 0.9rem;font-size:0.78rem">2018</button><button class="seesaw-start-btn toggle-btn" data-startyear="2020" style="flex:0 0 auto;min-width:64px;padding:0.5rem 0.9rem;font-size:0.78rem">2020</button><button class="seesaw-start-btn toggle-btn" data-startyear="2022" style="flex:0 0 auto;min-width:64px;padding:0.5rem 0.9rem;font-size:0.78rem">2022</button></div><div class="chart-wrapper" data-chart-copy data-chart-title="The Real Opportunity Cost of Buying a House"><canvas id="seesawChart"></canvas></div><div class="chart-source">Sources: FRED, CoinGecko</div></div>
+            <div class="chart-container"><div class="chart-title">The Real Opportunity Cost of Buying a House</div><div class="chart-subtitle" id="seesawSubtitle">Growth of $1 invested in 2018 — bitcoin vs. housing (log scale)</div><div class="seesaw-start-row" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin:0.6rem 0 1rem;align-items:center"><span style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-right:0.4rem">Start year:</span><button class="seesaw-start-btn toggle-btn" data-startyear="2014" style="flex:0 0 auto;min-width:64px;padding:0.5rem 0.9rem;font-size:0.78rem">2014</button><button class="seesaw-start-btn toggle-btn" data-startyear="2016" style="flex:0 0 auto;min-width:64px;padding:0.5rem 0.9rem;font-size:0.78rem">2016</button><button class="seesaw-start-btn toggle-btn active" data-startyear="2018" style="flex:0 0 auto;min-width:64px;padding:0.5rem 0.9rem;font-size:0.78rem">2018</button><button class="seesaw-start-btn toggle-btn" data-startyear="2020" style="flex:0 0 auto;min-width:64px;padding:0.5rem 0.9rem;font-size:0.78rem">2020</button><button class="seesaw-start-btn toggle-btn" data-startyear="2022" style="flex:0 0 auto;min-width:64px;padding:0.5rem 0.9rem;font-size:0.78rem">2022</button></div><div class="chart-wrapper" data-chart-copy data-chart-heading="closest:.chart-container .chart-title" data-chart-sub="#seesawSubtitle" data-chart-title="The Real Opportunity Cost of Buying a House"><canvas id="seesawChart"></canvas></div><div class="chart-source">Sources: FRED, CoinGecko</div></div>
 
             <!-- Multi-year comparison table -->
             <div class="chart-container" style="padding:1.5rem 2rem">
@@ -384,7 +384,7 @@ eleventyComputed:
             <div class="chart-container">
                 <div class="chart-title">The Ceiling Has Already Been Breached</div>
                 <div class="chart-subtitle">Monthly mortgage payment as % of median household income · 2013–2025, with threshold lines</div>
-                <div class="chart-wrapper" data-chart-copy data-chart-title="The Ceiling Has Already Been Breached"><canvas id="burdenChart"></canvas></div>
+                <div class="chart-wrapper" data-chart-copy data-chart-heading="closest:.chart-container .chart-title" data-chart-sub="closest:.chart-container .chart-subtitle" data-chart-title="The Ceiling Has Already Been Breached"><canvas id="burdenChart"></canvas></div>
                 <div class="chart-source">Sources: FRED (MSPUS, MORTGAGE30US), Census Bureau — assumes 20% down, 30-year fixed at prevailing rate</div>
             </div>
 
@@ -393,7 +393,7 @@ eleventyComputed:
             <div class="chart-container">
                 <div class="chart-title">The True Cost of Homeownership</div>
                 <div class="chart-subtitle">Purchase price vs. total all-in cost — by year of purchase</div>
-                <div class="chart-wrapper" data-chart-copy data-chart-title="The True Cost of Homeownership"><canvas id="totalCostChart"></canvas></div>
+                <div class="chart-wrapper" data-chart-copy data-chart-heading="closest:.chart-container .chart-title" data-chart-sub="closest:.chart-container .chart-subtitle" data-chart-title="The True Cost of Homeownership"><canvas id="totalCostChart"></canvas></div>
                 <div class="chart-source">Calculated using median home price at year of purchase, prevailing 30-year fixed rate, 20% down, 1.2% annual property tax, ~$150/mo insurance, 1% annual maintenance</div>
             </div>
 

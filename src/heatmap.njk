@@ -117,7 +117,7 @@ eleventyComputed:
                    (the sidebar was moved out, above the wrapper).
                    .bvsm-heatmap-main becomes full width. #}
                 <div class="bvsm-heatmap-layout">
-                    <div class="bvsm-heatmap-main" data-chart-copy data-chart-capture="dom" data-chart-title="The Bitcoin outperformance heatmap" data-chart-filename="bitcoin-outperformance-heatmap.png">
+                    <div class="bvsm-heatmap-main" data-chart-copy data-chart-capture="dom" data-chart-heading=".heatmap-hero h1" data-chart-sub=".heatmap-howto" data-chart-title="The Bitcoin outperformance heatmap" data-chart-filename="bitcoin-outperformance-heatmap.png">
                         <div class="bvsm-heatmap-scroll-container" id="bvsmHeatmapScroll">
                             <div class="bvsm-heatmap-sticky-left">
                                 <div class="bvsm-heatmap-yaxis-title"><span>Holding period</span></div>
@@ -192,7 +192,7 @@ eleventyComputed:
 
             <div class="bvsm-chart-wrap">
                 <div class="bvsm-chart-label" id="bvsmChartLabel">Wealth-over-time &mdash; lump sum invested at the chosen start date</div>
-                <div class="bvsm-chart-canvas" data-chart-copy data-chart-title="Bitcoin vs. the S&amp;P 500 and NASDAQ-100">
+                <div class="bvsm-chart-canvas" data-chart-copy data-chart-heading="#bvsmCalcHeading" data-chart-sub="#bvsmChartCaption" data-chart-assump="#bvsmChartLabel" data-chart-title="Bitcoin vs. the S&amp;P 500 and NASDAQ-100">
                     <canvas id="bvsmCalcChart" role="img" aria-label="Chart comparing investment value over time for bitcoin, the S&P 500 total return index, and the NASDAQ-100 total return index, in the chosen mode (lump sum or weekly DCA)."></canvas>
                 </div>
                 <p class="bvsm-chart-caption" id="bvsmChartCaption">Log-scale Y-axis. All three series start at the same dollar amount on the start date and track their respective asset&rsquo;s value through today.</p>

@@ -59,7 +59,7 @@ eleventyComputed:
                     <button class="bvsm-pl-range is-active" data-range="all" role="tab" aria-selected="true">All time</button>
                     <button class="bvsm-pl-range" data-range="recent" role="tab" aria-selected="false">Recent (2y)</button>
                 </div>
-                <div class="bvsm-chart-canvas-tall" data-chart-copy data-chart-title="Bitcoin vs. the Power Law trend">
+                <div class="bvsm-chart-canvas-tall" data-chart-copy data-chart-heading="closest:.bvsm-chart-wrap .bvsm-chart-label" data-chart-title="Bitcoin vs. the Power Law trend">
                     <canvas id="bvsmPowerLawChart" role="img" aria-label="Bitcoin price plotted against the Power Law trend across 16 years, with annotated markers at each cyclical top showing the trend-deviation multiple, each cycle floor showing its trend-deviation multiple, and the current position at 0.59× trend."></canvas>
                     <!-- Pulse halo positioned over the "you are here" marker.
                          JS sets left/top to the marker's pixel coords after
@@ -159,7 +159,7 @@ eleventyComputed:
                      graph the most-visible feedback as the reader drags sliders. -->
                 <div class="bvsm-chart-wrap">
                     <div class="bvsm-chart-label" id="bvsmChartLabel">Wealth-over-time &mdash; lump sum invested at the chosen start date</div>
-                    <div class="bvsm-chart-canvas" data-chart-copy data-chart-title="Bitcoin vs. the S&amp;P 500 and NASDAQ-100">
+                    <div class="bvsm-chart-canvas" data-chart-copy data-chart-heading="#bvsmCalcHeading" data-chart-sub="#bvsmChartCaption" data-chart-assump="#bvsmChartLabel" data-chart-title="Bitcoin vs. the S&amp;P 500 and NASDAQ-100">
                         <canvas id="bvsmCalcChart" role="img" aria-label="Chart comparing investment value over time for bitcoin, the S&P 500 total return index, and the NASDAQ-100 total return index, in the chosen mode (lump sum or weekly DCA)."></canvas>
                     </div>
                     <p class="bvsm-chart-caption" id="bvsmChartCaption">Log-scale Y-axis. All three series start at the same dollar amount on the start date and track their respective asset&rsquo;s value through today.</p>
@@ -236,7 +236,7 @@ eleventyComputed:
                 </div>
 
                 <div class="bvsm-heatmap-layout">
-                    <div class="bvsm-heatmap-main" data-chart-copy data-chart-capture="dom" data-chart-title="The Bitcoin outperformance heatmap" data-chart-filename="bitcoin-outperformance-heatmap.png">
+                    <div class="bvsm-heatmap-main" data-chart-copy data-chart-capture="dom" data-chart-heading="closest:.section .section-intro h2" data-chart-sub="closest:.section .section-intro h2 + p" data-chart-title="The Bitcoin outperformance heatmap" data-chart-filename="bitcoin-outperformance-heatmap.png">
                         <div class="bvsm-heatmap-scroll-container" id="bvsmHeatmapScroll">
                             <div class="bvsm-heatmap-sticky-left">
                                 <div class="bvsm-heatmap-yaxis-title"><span>Holding period</span></div>
@@ -307,7 +307,7 @@ eleventyComputed:
 
                 <div class="bvsm-projection-chart-wrap">
                     <div class="bvsm-chart-label">Projected wealth over the chosen horizon &mdash; trend lines only</div>
-                    <div class="bvsm-chart-canvas-tall" data-chart-copy data-chart-title="Projected wealth — bitcoin vs. the indices">
+                    <div class="bvsm-chart-canvas-tall" data-chart-copy data-chart-heading="closest:.bvsm-projection-chart-wrap .bvsm-chart-label" data-chart-title="Projected wealth — bitcoin vs. the indices">
                         <canvas id="bvsmProjectionChart" role="img" aria-label="Chart projecting the wealth trajectory for a hypothetical investment today in bitcoin, the S&P 500, and the NASDAQ-100 over the chosen horizon, using each asset's long-run trend.">
                         </canvas>
                     </div>

@@ -81,16 +81,137 @@
 
   function exportScale(){ return Math.max(2, window.devicePixelRatio || 1); } // export px per CSS px
 
-  // ── Frame a source bitmap onto an opaque dark canvas with a muted
-  //    caption (title left, lastcoinstanding.com right), at >= 2x CSS res.
-  function buildFramedExport(drawInto, cssW, cssH, title, bg){
+  // ════════ CONTEXT HEADER (v2.3) — resolved from the LIVE DOM at click time ════════
+  // Three optional wrapper attributes carry the on-screen context into the export:
+  //   data-chart-heading → header title (display serif)
+  //   data-chart-sub     → explainer beneath (body, wrapped)
+  //   data-chart-assump  → dimmer assumptions/plan line (body, wrapped)
+  // Each value is a CSS selector resolved at click time — NEVER duplicated copy —
+  // so edited subtitles and dynamic assumption lines always reflect current state.
+  // A leading `closest:<ancestorSel> <innerSel>` form scopes resolution to the
+  // wrapper's nearest matching ancestor (for pages with several charts that reuse
+  // the same title/subtitle class names).
+  function resolveEl(host, sel){
+    sel = (sel || '').replace(/^\s+|\s+$/g, '');
+    if (!sel) return null;
+    if (sel.indexOf('closest:') === 0){
+      var rest = sel.slice(8).replace(/^\s+/, '');
+      var sp = rest.indexOf(' ');
+      var anc = sp < 0 ? rest : rest.slice(0, sp);
+      var inner = sp < 0 ? '' : rest.slice(sp + 1).replace(/^\s+/, '');
+      var scope = host.closest(anc);
+      if (!scope) return null;
+      return inner ? scope.querySelector(inner) : scope;
+    }
+    return document.querySelector(sel);
+  }
+
+  // Tooltip/help-glyph + a11y-hidden containers whose text must NOT enter the export:
+  // the "?" trigger and its hidden explanation, screen-reader-only spans, etc.
+  var TIP_RX = /(^|\s)(help-tip|tip-content|dr-tt|dr-tt-card|tooltip|tip-card|sr-only|visually-hidden)(\s|$)/;
+  function isTipOrHidden(node){
+    var cls = node.getAttribute && node.getAttribute('class');
+    if (cls && TIP_RX.test(cls)) return true;
+    var cs = window.getComputedStyle(node);
+    return cs.display === 'none' || cs.visibility === 'hidden';
+  }
+  // Visible text only: walk text nodes, skipping tooltip/hidden subtrees. This is
+  // what strips the "?" help glyph and its hidden tip-content (no standalone "?" in
+  // exports) while preserving legitimate question marks in the heading itself.
+  function visibleText(root){
+    var out = '';
+    (function walk(node){
+      for (var n = node.firstChild; n; n = n.nextSibling){
+        if (n.nodeType === 3) out += n.nodeValue;
+        else if (n.nodeType === 1 && !isTipOrHidden(n)) walk(n);
+      }
+    })(root);
+    return out;
+  }
+  // Collapse internal whitespace runs (incl. newlines/nbsp), trim ends. Em/en dashes
+  // and · separators are left as-is (assumption lines depend on them).
+  function cleanText(s){ return (s || '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, ''); }
+
+  // Word-wrap `text` in `font` to `maxW` export px via measureText. A single token
+  // wider than maxW is left on its own line (prose subtitles don't hit this).
+  function wrapLines(ctx, text, font, maxW){
+    ctx.font = font;
+    var words = text.split(' '), lines = [], cur = '';
+    for (var i = 0; i < words.length; i++){
+      var test = cur ? cur + ' ' + words[i] : words[i];
+      if (!cur || ctx.measureText(test).width <= maxW) cur = test;
+      else { lines.push(cur); cur = words[i]; }
+    }
+    if (cur) lines.push(cur);
+    return lines;
+  }
+
+  // Per-kind type spec (sizes in export px, pre-scaled).
+  function headerStyles(scale){
+    return {
+      heading: { font: '600 ' + Math.round(scale * 20) + 'px "Cormorant Garamond", Georgia, serif',
+                 color: '#f2eee8', lh: Math.round(scale * 26), gapAfter: Math.round(scale * 5) },
+      sub:     { font: '400 ' + Math.round(scale * 13) + 'px "Inter", -apple-system, sans-serif',
+                 color: 'rgba(203,197,187,0.92)', lh: Math.round(scale * 19), gapAfter: Math.round(scale * 7) },
+      assump:  { font: '400 ' + Math.round(scale * 11.5) + 'px "Inter", -apple-system, sans-serif',
+                 color: 'rgba(150,144,134,0.9)', lh: Math.round(scale * 17), gapAfter: Math.round(scale * 3) }
+    };
+  }
+
+  // Resolve the header blocks from the host's attributes at CLICK time. Per-line
+  // graceful degradation: a missing selector / empty / hidden element is skipped
+  // (console warning), never aborts the export.
+  function resolveHeader(host){
+    var specs = [
+      { attr: 'data-chart-heading', kind: 'heading' },
+      { attr: 'data-chart-sub',     kind: 'sub' },
+      { attr: 'data-chart-assump',  kind: 'assump' }
+    ];
+    var blocks = [];
+    for (var i = 0; i < specs.length; i++){
+      var sel = host.getAttribute(specs[i].attr);
+      if (!sel) continue;
+      var el = null;
+      try { el = resolveEl(host, sel); } catch (e) { el = null; }
+      if (!el){ if (window.console && console.warn) console.warn('[chart-copy] ' + specs[i].attr + ' selector missed: ' + sel); continue; }
+      var cs = window.getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+      var text = cleanText(visibleText(el));
+      // Skip empty or placeholder-only content (many live lines seed as "—" / "-"
+      // before their JS populates them) so a stale dash never becomes a header line.
+      if (!text || /^[\-‒–—―·•\s]*$/.test(text)) continue;
+      blocks.push({ kind: specs[i].kind, text: text });
+    }
+    return blocks;
+  }
+
+  // ── Frame a source bitmap onto an opaque dark canvas: optional context header
+  //    (heading / sub / assump, wrapped to chart width) → chart → caption footer
+  //    (title left, lastcoinstanding.com right), at >= 2x CSS res. With no header
+  //    blocks the layout is identical to v2.2 (the floor). ──
+  function buildFramedExport(drawInto, cssW, cssH, title, bg, headerBlocks){
     var scale = exportScale();
     var pad   = Math.round(scale * 14);
     var capH  = Math.round(scale * 30);
     var chartW = Math.round(cssW * scale);
     var chartH = Math.round(cssH * scale);
     var W = chartW + pad * 2;
-    var H = chartH + pad + capH;
+    var contentW = chartW; // header wraps to the chart width
+
+    var styles = headerStyles(scale);
+    var meas = document.createElement('canvas').getContext('2d');
+    var headerH = 0, laid = [];
+    if (headerBlocks && headerBlocks.length){
+      for (var i = 0; i < headerBlocks.length; i++){
+        var b = headerBlocks[i], st = styles[b.kind];
+        var lines = wrapLines(meas, b.text, st.font, contentW);
+        laid.push({ lines: lines, st: st });
+        headerH += lines.length * st.lh + st.gapAfter;
+      }
+      headerH += Math.round(scale * 10); // gap between header block and chart
+    }
+
+    var H = pad + headerH + chartH + capH;
 
     var off = document.createElement('canvas');
     off.width = W; off.height = H;
@@ -99,10 +220,23 @@
     c.fillRect(0, 0, W, H);
     c.imageSmoothingEnabled = true;
     c.imageSmoothingQuality = 'high';
-    drawInto(c, pad, pad, chartW, chartH);        // caller blits the chart here
+
+    if (laid.length){
+      c.textAlign = 'left';
+      c.textBaseline = 'top';
+      var y = pad;
+      for (var k = 0; k < laid.length; k++){
+        var blk = laid[k], s2 = blk.st;
+        c.font = s2.font; c.fillStyle = s2.color;
+        for (var j = 0; j < blk.lines.length; j++){ c.fillText(blk.lines[j], pad, y); y += s2.lh; }
+        y += s2.gapAfter;
+      }
+    }
+
+    drawInto(c, pad, pad + headerH, chartW, chartH);   // caller blits the chart here
 
     var fs = Math.round(scale * 12);
-    var cy = pad + chartH + Math.round(capH * 0.55);
+    var cy = pad + headerH + chartH + Math.round(capH * 0.55);
     c.textBaseline = 'middle';
     c.font = '500 ' + fs + 'px "Inter", -apple-system, sans-serif';
     if (title) {
@@ -303,8 +437,23 @@
       else if (canvas) src = fromCanvas(canvas);
       else if (svg) src = fromSvg(svg);
       else src = fromDom(host, bg);
-      return src.then(function(s){
-        return buildFramedExport(s.draw, s.cssW, s.cssH, title, bg);
+      // Context header: resolve from the LIVE DOM at click time, and make sure the
+      // display serif is loaded before drawing so the heading doesn't fall back.
+      var headerBlocks = resolveHeader(host);
+      var fontsReady;
+      try {
+        if (headerBlocks.length && document.fonts && document.fonts.load) {
+          fontsReady = Promise.all([
+            document.fonts.load('600 20px "Cormorant Garamond"'),
+            document.fonts.load('400 13px "Inter"')
+          ]).then(function(){ return document.fonts.ready; }, function(){ return document.fonts.ready; });
+        } else if (document.fonts && document.fonts.ready) {
+          fontsReady = document.fonts.ready;
+        } else { fontsReady = Promise.resolve(); }
+      } catch (e) { fontsReady = Promise.resolve(); }
+      return Promise.all([src, fontsReady]).then(function(arr){
+        var s = arr[0];
+        return buildFramedExport(s.draw, s.cssW, s.cssH, title, bg, headerBlocks);
       });
     }
 

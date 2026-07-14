@@ -1688,7 +1688,29 @@ A page can supply its own finished image instead of the standard framed export �
 wrapperEl._chartCopyCapture = function(){ return Promise<canvas|Blob>; };
 ```
 
-**/not-a-bubble** uses this: its export bakes in **today's date and the live BTC price** (the chart's whole point is "today, bitcoin is at \$X vs every historical bubble"), so that richer 1600×900 image — built by `buildBubbleExportCanvas()` in `not-a-bubble.js` — is what the quiet button copies. Every other chart uses the plain framed capture.
+**/not-a-bubble** uses this: its export bakes in **today's date and the live BTC price** (the chart's whole point is "today, bitcoin is at \$X vs every historical bubble"), so that richer 1600×900 image — built by `buildBubbleExportCanvas()` in `not-a-bubble.js` — is what the quiet button copies. Every other chart uses the plain framed capture. (Custom-capture charts own their whole image and therefore **ignore** the context-header attributes below.)
+
+### Context header (v2.3, July 2026) — the export carries what the reader saw
+
+The framed export can prepend a **context header** above the chart so a shared image carries the section title, the how-to-read subtitle, and — on calculator pages — the live assumptions/plan line. Three OPTIONAL wrapper attributes, each a **CSS selector resolved from the LIVE DOM at click time** (never duplicated copy — edited subtitles and dynamic assumption lines must reflect the state at the moment of export; "every figure respects every active assumption" applies to shared images too):
+
+- `data-chart-heading` → header title (display serif, larger).
+- `data-chart-sub` → explainer beneath, body type, **wrapped** to the export width via canvas `measureText` (no truncation; a subtitle over ~5 wrapped lines still exports — flag it for copy tightening rather than cut meaning).
+- `data-chart-assump` → a final **dimmer** line (the "Your plan: …" / assumptions register), same wrap rules.
+
+Compositor order: dark bg → header block (whichever of the three resolve, in order) → chart → the existing caption footer (title + branding — unchanged; it remains the **floor** for charts with none of these attributes, byte-comparable to v2.2).
+
+**Scoping.** A value may take a `closest:<ancestorSel> <innerSel>` form — resolved as `host.closest(ancestorSel).querySelector(innerSel)` — for pages with several charts that reuse the same title/subtitle class names (`closest:.chart-container .chart-title` on Power Law / BvRE, `closest:.dl-chart-container .dl-chart-title` on the Doubling Ladder, `closest:.gallery-section-inner .gallery-section-subtitle` on the gallery). Unique ids (`#title-*`, `#stComparSummary`, `#asDriftEndnote`, `#stAssumptions`) need no scoping.
+
+**Rules (all in the helper, `chart-copy.js`):**
+- Resolve at CLICK time; **skip per-line** any selector that misses / resolves empty / hidden / placeholder-only ("—") — console warning, never abort the export (graceful degradation).
+- `await document.fonts.load(…)` + `document.fonts.ready` before drawing, so the Cormorant Garamond heading renders (fallback stack if the face genuinely isn't loaded).
+- **Visible text only:** tooltip/help-glyph subtrees (`.help-tip` / `.tip-content` / `.dr-tt` …) and `display:none` / `sr-only` descendants are excluded, so the "?" glyph and its hidden explanation never enter the export (a legitimate "?" in a heading is preserved).
+- Collapse internal whitespace, trim; em/en dashes and · separators kept as-is (assumption lines use them).
+- Preserves the DPI/scale approach; export **height** grows by the measured header, **width** unchanged (= chart width).
+- **Zero behavior change** for wrappers carrying none of the three attributes.
+
+**When to wire (the rule):** `heading` + `sub` for **every explainer chart** (a section title and a how-to-read line the reader saw); add `assump` for **every calculator chart with a live plan/assumptions line** (the "Your plan: …" register). Title-only charts get `heading` alone; a chart with genuinely no adjacent context stays caption-only (the floor) and is content-work for a one-line subtitle, not something to invent in the helper. (STYLE_GUIDE has no separate chart-copy recipe, so this canon lives here.) Wired July 2026 across ~59 charts.
 
 ### Coverage & exclusions
 

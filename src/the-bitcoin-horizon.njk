@@ -124,7 +124,7 @@ eleventyComputed:
 
     <div class="chart-panel">
       <div class="chart-title">Rolling CAGR by holding period: full range, Bitcoin vs. S&amp;P 500</div>
-      <div class="chart-holder" data-chart-copy data-chart-title="Rolling CAGR by holding period — bitcoin vs. the S&amp;P 500"><canvas id="cagrCompareChart"></canvas></div>
+      <div class="chart-holder" data-chart-copy data-chart-heading="closest:.chart-panel .chart-title" data-chart-title="Rolling CAGR by holding period — bitcoin vs. the S&amp;P 500"><canvas id="cagrCompareChart"></canvas></div>
       <p class="chart-caption">Each pair of bars shows the range of CAGR outcomes (worst start to best start) at that holding period; the marker shows the median. <em>Stats are deliberately computed from January 2015 onwards</em> &mdash; setting aside the parabolic 2013 run and the 2014 drawdown as unrepresentative of plausible forward outcomes. The same 2015+ window is applied to the S&amp;P 500 for an apples-to-apples comparison. Bitcoin's worst-case at three years and beyond stays positive; the S&amp;P 500's stays in the familiar 10&ndash;15% range. The y-axis is clipped at 200% for legibility &mdash; Bitcoin's best-case 1-year CAGR in the 2015+ window still exceeds 1,300% (a 2016&ndash;2017 entry), but the upper tail isn't where the volatility argument lives.</p>
     </div>
 
@@ -221,7 +221,7 @@ eleventyComputed:
 
       <div class="progression-chart-wrap">
         <div class="pc-title">Portfolio value over time</div>
-        <div class="progression-chart-holder" data-chart-copy data-chart-title="Portfolio value over time"><canvas id="progressionChart"></canvas></div>
+        <div class="progression-chart-holder" data-chart-copy data-chart-heading=".pc-title" data-chart-title="Portfolio value over time"><canvas id="progressionChart"></canvas></div>
       </div>
 
       <div class="output-grid" id="outputs">

@@ -1,6 +1,11 @@
 [
   {
     "display": "7/13/26",
+    "page": "/",
+    "summary": "Improved: the \"copy chart as image\" button now bakes the chart's context into the picture. An exported chart carries the section title and the one-line explainer that sits above it on the page, and on the calculators it also carries your current assumptions — the stress test's \"Your plan:\" line, the allocation drift line, and so on — read live at the moment you export, so a shared image always reflects the state you were looking at. The footer (chart title and lastcoinstanding.com) is unchanged."
+  },
+  {
+    "display": "7/13/26",
     "page": "/bitcoin-allocation-sizing.html",
     "summary": "New: Bitcoin Portfolio Allocation now carries your scenario forward to the retirement tools. Set a portfolio size and a link converts your allocation into an actual bitcoin stack — your 38% of $1.8M is about 11 BTC at today's price — and hands it to The Bitcoin Retirement so you can see what it retires. Drop a crash on the year-by-year chart and a second link carries that same crash, its depth and recovery, into The Bitcoin Retirement Stress Test. Each link states exactly what it carries and the price it used, and only appears when the numbers behind it are set — no guessing, no silent state transfer."
   },

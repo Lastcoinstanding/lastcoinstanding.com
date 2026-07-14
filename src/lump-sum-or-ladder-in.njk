@@ -45,7 +45,7 @@ eleventyComputed:
     <div class="lsl-prose" style="max-width:none;">
       <p>Before the demonstration: here is the Power Law channel, and where Bitcoin sits in it today. The floor sits at <strong>0.42&times;</strong> the trend, the upper band at <strong>3&times;</strong>. Most of the time, price lives somewhere between. This orients you before the slider below asks <em>where in the channel are you buying?</em></p>
     </div>
-    <div class="lsl-ctx-chart" data-chart-copy data-chart-title="The Power Law channel — where Bitcoin sits today">
+    <div class="lsl-ctx-chart" data-chart-copy data-chart-heading=".lsl-context h2" data-chart-sub=".lsl-context .lsl-prose" data-chart-assump="#lslCtxPos" data-chart-title="The Power Law channel — where Bitcoin sits today">
       <canvas id="lslChannelChart" aria-label="Bitcoin price across its history against the Power Law floor, trend, and upper band, with a glowing marker at today's live position and a dashed line for the entry being tested by the slider"></canvas>
       <div id="lslChannelPulse" class="lcs-pulse-halo" aria-hidden="true"></div>
     </div>
@@ -118,7 +118,7 @@ eleventyComputed:
     <!-- Primary chart: the advantage-by-channel-position flip (the novel one) -->
     <div class="lsl-chart-block">
       <p class="lsl-chart-caption">How the lump-sum-vs-ladder edge changed across the channel. Below the line, deploying all at once accumulated more BTC (amber); above it, laddering did (blue). The familiar &ldquo;lump-sum usually wins&rdquo; result holds on average &mdash; but it flips, region by region, once you sort entries by where price sat in the channel.</p>
-      <div class="lsl-chart-wrapper" data-chart-copy data-chart-title="Lump-sum vs. ladder-in advantage by channel position">
+      <div class="lsl-chart-wrapper" data-chart-copy data-chart-heading="#calculator .lsl-calc-head h2" data-chart-sub=".lsl-chart-block .lsl-chart-caption" data-chart-assump="#lslScrubReadout" data-chart-title="Lump-sum vs. ladder-in advantage by channel position">
         <canvas id="lslAdvChart" aria-label="Ladder-in advantage in percent more BTC, plotted across entry channel position from floor to upper band"></canvas>
       </div>
     </div>

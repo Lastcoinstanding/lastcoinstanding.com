@@ -181,7 +181,7 @@ eleventyComputed:
         </div>
       </div>
     </div>
-    <div class="st-chart-wrap" data-chart-copy data-chart-title="Retirement stress test: baseline vs. crashed path" data-chart-filename="retirement-stress-test.png"><canvas id="stChart"></canvas></div>
+    <div class="st-chart-wrap" data-chart-copy data-chart-heading="#stress .st-h2" data-chart-sub="#stress .st-chart-caption" data-chart-assump="#stAssumptions" data-chart-title="Retirement stress test: baseline vs. crashed path" data-chart-filename="retirement-stress-test.png"><canvas id="stChart"></canvas></div>
     <p class="st-chart-caption">Your stack&rsquo;s total value over retirement (the portfolio, not the bitcoin price), log scale, nominal dollars. The <strong style="color:#6db3d4">baseline</strong> is the plan with no crash; the <strong style="color:#e08a7a">crashed path</strong> is the same plan with your bear market. The gap between them is the sequence-of-returns cost. Faint lines are the Power Law trend and floor.</p>
     <p class="st-chart-caption st-focus-note" id="stFocusNote" hidden>Zoomed to the crash window: these are the years you would actually have to hold through, selling into the low the whole time, not knowing when it ends.</p>
     <p class="st-assumptions" id="stAssumptions">&mdash;</p>
@@ -205,7 +205,7 @@ eleventyComputed:
     <p class="st-compar-summary" id="stComparSummary">&mdash;</p>
     <p class="st-lead st-lead-full" id="stTimingLead">This is the whole point. Hold the stack, the withdrawal, and the crash fixed, and move only <em>when</em> you retire. Retire early and you are selling into the crash before the stack has had years to compound, so the same plan that survives a later start can fail an earlier one. Retire later and the compounding does the cushioning.</p>
     <div class="st-timing-grid">
-      <div class="st-chart-wrap st-timing-chart" data-chart-copy data-chart-title="Sequence risk: same plan, survive or deplete on the retirement year" data-chart-filename="sequence-risk-comparison.png"><canvas id="stTimingChart"></canvas></div>
+      <div class="st-chart-wrap st-timing-chart" data-chart-copy data-chart-heading="#stTimingTitle" data-chart-sub="#stTimingCaption" data-chart-assump="#stComparSummary" data-chart-title="Sequence risk: same plan, survive or deplete on the retirement year" data-chart-filename="sequence-risk-comparison.png"><canvas id="stTimingChart"></canvas></div>
       <div class="st-timing-tablewrap">
         <table class="st-table">
           <thead id="stTimingHead"><tr><th>Retire in</th><th>Crash lands</th><th>Outcome</th><th class="st-num">Final stack</th><th class="st-num">Final stack vs no crash</th></tr></thead>

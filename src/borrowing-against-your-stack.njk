@@ -86,7 +86,7 @@ eleventyComputed:
                     <button class="bas-cagr-range-btn active" data-range="all" role="tab" aria-selected="true">All-time</button>
                     <button class="bas-cagr-range-btn"        data-range="2y"  role="tab" aria-selected="false">Recent 2y</button>
                 </div>
-                <div class="bas-calc-chart-canvas" data-chart-copy data-chart-title="Bitcoin CAGR vs. lending rates">
+                <div class="bas-calc-chart-canvas" data-chart-copy data-chart-heading="closest:.bas-calc-chart-wrapper .bas-calc-chart-title" data-chart-title="Bitcoin CAGR vs. lending rates">
                     <canvas id="cagrVsRatesChart"></canvas>
                 </div>
                 <div class="bas-cagr-as-of-callout">
@@ -309,7 +309,7 @@ eleventyComputed:
             <!-- Updates live as the user adjusts stack / price / loan / threshold. -->
             <div class="bas-calc-chart-wrapper">
                 <div class="bas-calc-chart-title">Your liquidation price on the Power Law channel</div>
-                <div class="bas-calc-chart-canvas" data-chart-copy data-chart-title="Liquidation risk on the Power Law channel">
+                <div class="bas-calc-chart-canvas" data-chart-copy data-chart-heading="closest:.bas-calc-chart-wrapper .bas-calc-chart-title" data-chart-title="Liquidation risk on the Power Law channel">
                     <canvas id="basChannelChart"></canvas>
                     <!-- Canonical lcs-pulse-halo (STYLE_GUIDE §6.23). Replaces
                          the static green "Current price" dot — the same data

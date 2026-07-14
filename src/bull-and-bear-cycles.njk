@@ -67,7 +67,7 @@ eleventyComputed:
     <h2 class="bb-h2">Four completed cycles, four brutal drawdowns</h2>
     <p class="bb-lead">Bitcoin has had five bear markets: four are complete, and the current one is the fifth, still unresolved. Every completed cycle has ended in a fall of at least three-quarters from its peak, and every one of those falls was, in hindsight, followed by a new all-time high. Both halves are in the table.</p>
 
-    <div class="bb-table-wrap" data-chart-copy data-chart-title="Bitcoin bull &amp; bear cycles — drawdowns and recoveries" data-chart-filename="bitcoin-bull-bear-cycles.png">
+    <div class="bb-table-wrap" data-chart-copy data-chart-heading="#history .bb-h2" data-chart-sub="#history .bb-lead" data-chart-title="Bitcoin bull &amp; bear cycles — drawdowns and recoveries" data-chart-filename="bitcoin-bull-bear-cycles.png">
       <table class="bb-table">
         <thead>
           <tr>
@@ -92,7 +92,7 @@ eleventyComputed:
         <p class="bb-overlay-intro">Each past bear market re-based to its peak (day&nbsp;0), drawdown-from-peak against days-since-peak. The <strong>bright line is the current cycle, still moving</strong>. Toggle any past cycle on or off.</p>
       </div>
       <div class="bb-overlay-toggles" id="bbOverlayToggles"><!-- populated live --></div>
-      <div class="bb-chart-wrap" data-chart-copy data-chart-title="Every Bitcoin bear, aligned at day zero" data-chart-filename="bitcoin-bear-overlay.png"><canvas id="bbOverlayChart"></canvas></div>
+      <div class="bb-chart-wrap" data-chart-copy data-chart-heading="#overlay .bb-h3" data-chart-sub="#overlay .bb-overlay-intro" data-chart-title="Every Bitcoin bear, aligned at day zero" data-chart-filename="bitcoin-bear-overlay.png"><canvas id="bbOverlayChart"></canvas></div>
       <p class="bb-chart-caption">
         The plotted lines are drawn from the site&rsquo;s shared <strong>~12-day Power-Law price series</strong>, so a peak or trough falling between samples reads slightly shallow. The <strong>annotated depth on each line is the documented daily-close extreme</strong> from the table, the seam where the smooth chart and the headline number are reconciled. See <a href="#measure">how we measure a drawdown</a>.
       </p>
@@ -154,7 +154,7 @@ eleventyComputed:
     <h2 class="bb-h2">Half of what it was, still multiples of everything else</h2>
     <p class="bb-lead">Volatility here means how much price swings around its path over a window, measured as annualised realised volatility of returns. It is <em>not</em> the same as a drawdown (a peak-to-trough fall), and not the same as risk (the next section). Measured that way and computed live from this site&rsquo;s price series, it traces an arc: from <strong id="bbVolEarly">~150%</strong> in the early years toward <strong id="bbVolNow">~40%</strong> now, roughly half of five years ago, and today below Tesla and around Nvidia. It has fallen, but it is still high.</p>
 
-    <div class="bb-chart-wrap bb-vol-chart" data-chart-copy data-chart-title="Bitcoin rolling annualised volatility" data-chart-filename="bitcoin-volatility-trend.png"><canvas id="bbVolChart"></canvas></div>
+    <div class="bb-chart-wrap bb-vol-chart" data-chart-copy data-chart-heading="#volatility .bb-h2" data-chart-sub="#volatility .bb-lead" data-chart-title="Bitcoin rolling annualised volatility" data-chart-filename="bitcoin-volatility-trend.png"><canvas id="bbVolChart"></canvas></div>
     <p class="bb-chart-caption">Rolling annualised realised volatility of log returns, computed from the shared ~12-day series (annualised at ~30.4 periods/yr). Because the series is sampled, treat this as a <strong>trend line, not a point estimate</strong>; a daily series would read somewhat higher.</p>
 
     <div class="bb-vol-anchors">
