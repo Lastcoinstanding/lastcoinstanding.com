@@ -1553,7 +1553,7 @@
       if (!cfg) return;
       var clamped = clamp(num, cfg.min, cfg.max);
       if (entry.isInt) clamped = Math.round(clamped);
-      else clamped = Math.round(clamped * 10) / 10; // 1-decimal step precision
+      else { var _f = Math.pow(10, entry.decimals || 1); clamped = Math.round(clamped * _f) / _f; } // honor the param's DECLARED precision (stack=2dp, withdraw=1dp). Was hardcoded 1dp, which silently truncated the 2dp stack the writer emits — and now the carry-in stack from the allocation page.
       SCENARIO[entry.key] = clamped;
     });
     // Non-numeric string param — handled outside the numeric map machinery.
@@ -2168,11 +2168,18 @@
   };
 
   // Selectors for the teaser links — match by href prefix so we don't
-  // need to add class hooks to the HTML. Both teasers live in the
-  // Strategies tab's strategy-C and strategy-D sections.
+  // need to add class hooks to the HTML. The BAS teaser lives in the
+  // Strategies tab's strategy-C section (BAS consumes `stack`).
+  //
+  // Disciplined Rebalancing was REMOVED from this list (2026-07 carry-the-
+  // scenario pass): DR has no input any scenario param maps to — its inputs
+  // are sell/rebuy/tax percentiles + account type, a genuine principle-2
+  // non-mapping — so appending stack/retire/income/years/dca to DR links was
+  // dead weight that also littered DR's address bar (DR preserves unknown
+  // params). DR is separately shareable in its own vocabulary via its own
+  // readUrl/syncUrl (sell/rebuy/tax/account). See TECH_DEBT (DR receiver, closed).
   var TEASER_SELECTORS = [
-    'a[href^="/borrowing-against-your-stack"]',
-    'a[href^="/disciplined-rebalancing"]'
+    'a[href^="/borrowing-against-your-stack"]'
   ];
 
   function buildQueryString() {
