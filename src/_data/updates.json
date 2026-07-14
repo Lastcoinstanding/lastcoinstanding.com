@@ -1,6 +1,11 @@
 [
   {
     "display": "7/13/26",
+    "page": "/the-bitcoin-retirement-stress-test.html",
+    "summary": "Polish: The Bitcoin Retirement Stress Test — clearer labels and a corrected \"worst timing\" finder. The mitigation lever is now called \"Spending cut\" with −10/−20/−30% presets, and the mitigated bars in the comparison chart are amber so they read apart from the crash bars at a glance. The comparison table's last column is now \"Final stack vs no crash\" with values like −61% and a tooltip explaining it. Most importantly, \"Find the worst timing\" now scores by how close the plan comes to failure along the way (its lowest point), not just where it ends — so it names an early crash, matching the page's own lesson that early is brutal, rather than a final-year dip that only looks bad on paper. A new note explains the honest reading of a recovery: the price returns to trend, but the coins sold while it was down do not — that residual gap is the sequence cost."
+  },
+  {
+    "display": "7/13/26",
     "page": "/borrowing-against-your-stack.html",
     "summary": "Fixed: the \"today's bitcoin price\" readouts across the site now only say \"live\" when the price really is live. When the live fetch is blocked (ad-blockers and rate limits sometimes stop it), pages fall back to the most recent monthly data point — and now they label it honestly as \"latest monthly data\" instead of calling a stale number live. The fetch also retries once before falling back, and the underlying data was brought current, so the fallback is close to spot even when it is used."
   },

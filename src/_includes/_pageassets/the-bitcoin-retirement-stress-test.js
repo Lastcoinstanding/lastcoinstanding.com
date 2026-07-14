@@ -29,6 +29,9 @@
   // ── Palette (retirement/house conventions) ──
   var C_TREND = 'rgba(224,148,34,0.30)', C_FLOOR = 'rgba(176,69,37,0.35)';
   var C_BASE = '#6db3d4', C_CRASH = '#e08a7a', MUTED = '#7a7367', DIM = '#9a9080';
+  // Mitigated ("Spending cut") sweep bars: amber/cream, NOT the rose crash family,
+  // so the three-bar groups read apart at a glance (JM v2.1 review, item D).
+  var C_MIT = '#e6c88f';
 
   // ── Date / price helpers (copied from the retirement engine for parity) ──
   var GENESIS = new Date(GENESIS_TS * 1000);
@@ -77,7 +80,7 @@
     troughLagYears: 1        // ~1 year peak->trough (Bull & Bear: 100+ days to bottom)
   };
 
-  // ── Spending flexibility (v2 mitigation lever) ──
+  // ── Spending cut (v2 mitigation lever; "Spending flexibility" pre-v2.1) ──
   // Cut withdrawals by FLEX% while the market is below its pre-crash level. The cut
   // window is derived from the PRICE PATH (crashMultiplier(y) < 1), NOT the stack's
   // underwater span (the stack recovers slower — coins sold cheap are gone — so
@@ -143,7 +146,7 @@
         var nominalIncome = (scn.incomeBasis === 'fixed')
           ? scn.targetIncomeUSD
           : scn.targetIncomeUSD * Math.pow(1 + i, yearsFromToday);
-        // Spending flexibility: cut this year's withdrawal while the market is below
+        // Spending cut: reduce this year's withdrawal while the market is below
         // its pre-crash level — i.e. while the crash multiplier is < 1 (PRICE-PATH
         // underwater). Not the stack span. flexPct 0/absent → no cut, bit-identical to v1.
         var cut = false, fullIncome = nominalIncome;
@@ -176,7 +179,7 @@
     return Math.max(0, Math.round(100 * (1 - crashReal / baseReal)));
   }
 
-  // ── Spending-flexibility helpers ──
+  // ── Spending-cut helpers ──
   // Price-path underwater draw years: the years the crash keeps the market below its
   // pre-crash level (crashMultiplier < 1). The flex lever cuts across exactly these —
   // NOT the stack's underwater span (which lags because coins sold cheap are gone).
@@ -297,7 +300,7 @@
       Object.assign({ label: 'With the crash' }, lineFrom(crashed, C_CRASH, 2.4))
     ];
     // Mitigation path: same rose hue family as the crash line, dashed + lighter.
-    if (reduced) ds.push(Object.assign({ label: 'With the crash + ' + FLEX + '% flexibility' }, lineFrom(reduced, '#eab4a2', 2, [6, 3])));
+    if (reduced) ds.push(Object.assign({ label: 'With the crash + ' + FLEX + '% cut' }, lineFrom(reduced, '#eab4a2', 2, [6, 3])));
     var markers = [{ x: SCENARIO.retirementYear, color: 'rgba(236,228,214,0.5)', label: 'Retire' },
                    { x: crash.crashYear, color: C_CRASH, label: 'Crash' }];
     if (crashed.depletionYear) markers.push({ x: crashed.depletionYear, color: '#c0392b', label: 'Depleted' });
@@ -322,7 +325,7 @@
           y: { type: 'logarithmic', grid: { color: 'rgba(224,148,34,0.06)' }, title: { display: true, text: 'Portfolio value (total stack)', color: MUTED, font: { size: 10 } }, ticks: { color: MUTED, font: { size: 11 }, callback: function (v) { return usd(v); } } }
         },
         plugins: {
-          legend: { display: true, position: 'top', labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 20, padding: 8, filter: function (it) { return it.text === 'Baseline (no crash)' || it.text === 'With the crash' || it.text.indexOf('flexibility') >= 0; } } },
+          legend: { display: true, position: 'top', labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 20, padding: 8, filter: function (it) { return it.text === 'Baseline (no crash)' || it.text === 'With the crash' || it.text.indexOf('cut') >= 0; } } },
           tooltip: { backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.3)', borderWidth: 1, titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10, filter: function (it) { return it.parsed.y != null && it.parsed.y > 0; }, callbacks: { title: function (it) { return it.length ? 'Year ' + it[0].parsed.x : ''; }, label: function (it) { var lbl = it.dataset.label; if (lbl === 'Trend' || lbl === 'Floor') return lbl + ': ' + usd(it.parsed.y) + ' (per BTC)'; return lbl + ', your stack: ' + usd(it.parsed.y); } } }
         }
       },
@@ -416,9 +419,9 @@
       { label: 'With the crash', data: crashData, backgroundColor: colors, borderWidth: 0, borderRadius: 3, order: 1 }
     ];
     // Paired bar: same rows, reduced-spend crashed ending (only when the lever is on).
-    if (hasReduced) ds.push({ label: 'With the crash + ' + FLEX + '% flexibility',
+    if (hasReduced) ds.push({ label: 'With the crash + ' + FLEX + '% cut',
       data: rows.map(function (r) { return Math.max(0, r.crashReducedReal || 0); }),
-      backgroundColor: rows.map(function (r) { return r.depletionReduced ? '#c0392b' : '#eab4a2'; }), borderWidth: 0, borderRadius: 3, order: 0 });
+      backgroundColor: rows.map(function (r) { return r.depletionReduced ? '#c0392b' : C_MIT; }), borderWidth: 0, borderRadius: 3, order: 0 });
     var xTitle = COMPARE_MODE === 'retire' ? 'Retirement start year' : 'Year of retirement the crash hits';
     if (sweepChart) {
       sweepChart.data.labels = labels; sweepChart.data.datasets = ds;
@@ -458,12 +461,12 @@
     var head = document.getElementById('stTimingHead');
     if (!tb) return;
     var firstCol = COMPARE_MODE === 'retire' ? 'Retire in' : 'Crash in';
-    if (head) head.innerHTML = '<tr><th>' + firstCol + '</th><th>Crash lands</th><th>Outcome</th><th class="st-num">Final stack</th><th class="st-num">Cost vs no crash</th></tr>';
+    if (head) head.innerHTML = '<tr><th>' + firstCol + '</th><th>Crash lands</th><th>Outcome</th><th class="st-num">Final stack</th><th class="st-num">Final stack vs no crash <span class="help-tip" tabindex="0">?<span class="tip-content">How much smaller the plan&rsquo;s final stack is than the same plan with no crash, measured at the end in today&rsquo;s dollars.</span></span></th></tr>';
     var body = rows.map(function (r) {
       var outcome = r.depletion
         ? '<span class="st-fail">Depletes ' + r.depletion + '</span>'
         : 'Survives';
-      var cost = r.depletion ? '<span class="st-fail">stack gone</span>' : (r.pct > 0 ? r.pct + '% smaller' : 'about even');
+      var cost = r.depletion ? '<span class="st-fail">stack gone</span>' : (r.pct > 0 ? '&minus;' + r.pct + '%' : 'about even');
       var lbl = COMPARE_MODE === 'retire'
         ? '<strong>' + r.label + '</strong>'
         : 'Year <strong>' + r.label.replace('Year ', '') + '</strong>';
@@ -473,6 +476,12 @@
     tb.innerHTML = body;
   }
 
+  // The honest mean-reversion reading aid (canon, F): the PRICE reverts to trend,
+  // the STACK does not — the coins sold cheap are gone, and that residual gap IS the
+  // sequence cost. Never phrase this as "the stack reverts". Anchored on the faint
+  // no-crash bar, the closest visual to the undisturbed Power Law path.
+  var NOCRASH_TIP = ' <span class="help-tip" tabindex="0">?<span class="tip-content">The faint bar is the plan on the undisturbed Power Law path. Under a Historical recovery the price finds its way back to that trend &mdash; what does not come back is the coins sold while it was down. The remaining gap is not price damage; it is the sequence cost, priced.</span></span>';
+
   // Swap the section title, lead, and caption to match the active sweep.
   function updateCompareCopy() {
     var title = document.getElementById('stTimingTitle');
@@ -481,11 +490,11 @@
     if (COMPARE_MODE === 'retire') {
       if (title) title.textContent = 'The same plan, retiring in different years';
       if (lead) lead.innerHTML = 'This is the whole point. Hold the stack, the withdrawal, and the crash fixed, and move only <em>when</em> you retire. Retire early and you are selling into the crash before the stack has had years to compound, so the same plan that survives a later start can fail an earlier one. Retire later and the compounding does the cushioning.';
-      if (cap) cap.innerHTML = 'Each pair is a <strong>separate plan</strong> retiring in that start year, not one plan tracked over time. Final stack in today&rsquo;s dollars, same crash throughout. The faint bar is that year&rsquo;s plan with <strong>no crash</strong>; the solid bar is <strong>with the crash</strong>. A <span class="st-fail">✕ depletes</span> tag marks the years the stack runs to zero. The gap between the two bars is the crash&rsquo;s cost; it shrinks the later you retire.';
+      if (cap) cap.innerHTML = 'Each pair is a <strong>separate plan</strong> retiring in that start year, not one plan tracked over time. Final stack in today&rsquo;s dollars, same crash throughout. The faint bar is that year&rsquo;s plan with <strong>no crash</strong>' + NOCRASH_TIP + '; the solid bar is <strong>with the crash</strong>. A <span class="st-fail">✕ depletes</span> tag marks the years the stack runs to zero. The gap between the two bars is the crash&rsquo;s cost; it shrinks the later you retire.';
     } else {
       if (title) title.textContent = 'The same crash, at different years of retirement';
       if (lead) lead.innerHTML = 'Hold the plan and the crash fixed, and move only <em>which year of retirement</em> the bear market lands in. A crash early in retirement can break a plan that the identical crash, late, barely dents. Timing is decisive, and it is unknowable in advance.';
-      if (cap) cap.innerHTML = 'Final stack in today&rsquo;s dollars for the same crash landing in different years of retirement. The faint bar is the plan with <strong>no crash</strong>; the solid bar is <strong>with the crash</strong>. A <span class="st-fail">✕ depletes</span> tag marks the years the stack runs to zero.';
+      if (cap) cap.innerHTML = 'Final stack in today&rsquo;s dollars for the same crash landing in different years of retirement. The faint bar is the plan with <strong>no crash</strong>' + NOCRASH_TIP + '; the solid bar is <strong>with the crash</strong>. A <span class="st-fail">✕ depletes</span> tag marks the years the stack runs to zero.';
     }
   }
 
@@ -560,12 +569,12 @@
       var z = (m.fullEnd > 0) ? Math.round(100 * (m.redEnd / m.fullEnd - 1)) : 0;
       parts.push('The <strong>' + X + '% cut</strong> leaves the stack about <strong>' + z + '% higher</strong> at the end (' + usd(m.redEnd) + ' vs ' + usd(m.fullEnd) + '), for about ' + Y + ' of forgone income across ' + yearsWord(N) + '.');
     } else {
-      parts.push('Even with a <strong>' + X + '% cut</strong>, the plan does not survive this scenario — flexibility helps, but this crash at this timing is beyond it.');
+      parts.push('Even with a <strong>' + X + '% cut</strong>, the plan does not survive this scenario — the cut helps, but this crash at this timing is beyond it.');
     }
     if (CRASH.recoveryPreset === 'weak') {
       parts.push('Under a Weak recovery the market never regains its pre-crash level, so the cut persists through the horizon — ' + yearsWord(N) + ' of reduced spending.');
     }
-    parts.push('<span class="st-mitigation-note">Spending flexibility is a real lever, but not a free one: these are years of living on less, shown here as arithmetic. Whether the cut is livable is a question this page cannot answer.</span>');
+    parts.push('<span class="st-mitigation-note">A spending cut is a real lever, but not a free one: these are years of living on less, shown here as arithmetic. Whether the cut is livable is a question this page cannot answer.</span>');
     el.innerHTML = parts.map(function (p) { return '<p>' + p + '</p>'; }).join('');
   }
 
@@ -620,7 +629,7 @@
     tb.innerHTML = rows;
     var fn = document.getElementById('stFlexSummary');
     if (fn) {
-      if (cutN > 0) { fn.hidden = false; fn.innerHTML = '<strong>Spending flexibility:</strong> withdrawals cut ' + FLEX + '% in ' + yearsWord(cutN) + ' (marked ✂), while the market sat below its pre-crash level — about <strong>' + usdFull(foregoneNom) + '</strong> of income forgone (nominal).'; }
+      if (cutN > 0) { fn.hidden = false; fn.innerHTML = '<strong>Spending cut:</strong> withdrawals cut ' + FLEX + '% in ' + yearsWord(cutN) + ' (marked ✂), while the market sat below its pre-crash level — about <strong>' + usdFull(foregoneNom) + '</strong> of income forgone (nominal).'; }
       else { fn.hidden = true; fn.innerHTML = ''; }
     }
   }
@@ -638,7 +647,7 @@
     L.push('# Crash depth,' + Math.round(crash.depthPct * 100) + '%');
     L.push('# Crash year,' + crash.crashYear + ' (year ' + (crash.crashYear - SCENARIO.retirementYear + 1) + ' of retirement)');
     L.push('# Recovery,' + (RECOVERY[CRASH.recoveryPreset] || RECOVERY.historical).label);
-    L.push('# Spending flexibility,' + (FLEX > 0 ? FLEX + '% cut while the market is below its pre-crash level (price-path underwater)' : 'off'));
+    L.push('# Spending cut,' + (FLEX > 0 ? FLEX + '% while the market is below its pre-crash level (price-path underwater)' : 'off'));
     L.push('# Baseline depletion,' + (base.depletionYear || 'survives'));
     L.push('# Crashed depletion,' + (crashed.depletionYear || 'survives'));
     L.push('# Live scenario URL,' + window.location.href);
@@ -693,24 +702,42 @@
     if (fv) fv.textContent = FLEX > 0 ? ('−' + FLEX + '%') : 'Off';
   }
 
-  // ════════ WORST-CASE TIMING FINDER (v2) ════════
+  // ════════ WORST-CASE TIMING FINDER (v2 · re-scored v2.1) ════════
   // Scan crash timings 1..yearsInRetirement under the CURRENT settings — depth,
-  // recovery, AND the flex lever as set — and pick the worst. "Worst" is scored by
-  // earliest depletion, tie-broken by smallest ending stack (today's $). It finds
-  // the worst *timing*, never a forecast: no probability language anywhere.
-  // The scored path is the actually-funded one (reduced-spend when flex is on).
+  // recovery, AND the flex lever as set — and pick the worst. It finds the worst
+  // *timing*, never a forecast: no probability language anywhere. The scored path
+  // is the actually-funded one (reduced-spend when the cut lever is on).
+  //
+  // "Worst" (v2.1 fix): among survivors, score by the SMALLEST MINIMUM real stack
+  // ALONG the path (the post-crash trough — the closest approach to failure), NOT
+  // the ending stack. The old ending-stack rule handed the title to a year-30 crash
+  // purely on terminal mark-to-market (a final-year drop with no recovery runway),
+  // contradicting sequence risk and the page's own "early is brutal" copy. The
+  // trough measure makes an early crash — sold into for years — score worst, as it
+  // should. Depletion unifies naturally: its trough is zero.
+  //   1. earliest depletion year;  2. survivors: smallest min real stack;
+  //   3. tie-break: earlier crash year.
   function timingWorse(a, b) {
-    // True if timing `a` is worse than `b`. Depletion beats survival; earlier
-    // depletion beats later; then smaller ending stack; then earliest timing (stable).
     if (a.dep && !b.dep) return true;
     if (!a.dep && b.dep) return false;
     if (a.dep && b.dep) {
       if (a.dep !== b.dep) return a.dep < b.dep;
-      if (a.end !== b.end) return a.end < b.end;
       return a.t < b.t;
     }
-    if (a.end !== b.end) return a.end < b.end;
+    if (a.minReal !== b.minReal) return a.minReal < b.minReal;
     return a.t < b.t;
+  }
+  // Minimum inflation-adjusted (today's $) stack value along the funded path — the
+  // trough. Skips the accumulation phase (usd null). A depleted path troughs at 0.
+  function minRealStack(proj, infl) {
+    var m = Infinity;
+    for (var k = 0; k < proj.rows.length; k++) {
+      var r = proj.rows[k];
+      if (r.usd == null) continue;
+      var real = toReal(r.usd, r.x, infl);
+      if (real != null && real < m) m = real;
+    }
+    return isFinite(m) ? m : 0;
   }
   function findWorstTiming() {
     var infl = inflationPct(), g = growthKey();
@@ -721,7 +748,7 @@
       var mult = (function (c) { return function (y) { return crashMultiplier(y, c); }; })(crash);
       var crashed = projectStack(SCENARIO, g, infl, mult);
       var funded = FLEX > 0 ? projectStack(SCENARIO, g, infl, mult, FLEX) : crashed;
-      var cand = { t: t, dep: funded.depletionYear, end: finalRealStack(funded, infl) };
+      var cand = { t: t, dep: funded.depletionYear, minReal: minRealStack(funded, infl) };
       if (best === null || timingWorse(cand, best)) best = cand;
     }
     return best;
@@ -738,10 +765,9 @@
     setSeg('stTiming', String(best.t));
     renderAll(); // full recompute + URL sync; clears the (now-stale) finder line first
     var el = document.getElementById('stFinderLine'); if (!el) return;
-    var tail = best.dep
-      ? 'depletes the stack in <strong>' + best.dep + '</strong>'
-      : 'leaves the smallest stack, <strong>' + usd(Math.max(0, best.end)) + '</strong>';
-    el.innerHTML = 'Worst timing under these settings: a crash landing in <strong>year ' + best.t + '</strong> — it ' + tail + '. Worst timing, not a prediction.';
+    el.innerHTML = best.dep
+      ? 'Worst timing under these settings: a crash landing in <strong>year ' + best.t + '</strong> — it depletes the stack in <strong>' + best.dep + '</strong>. Worst timing, not a prediction.'
+      : 'Worst timing under these settings: a crash landing in <strong>year ' + best.t + '</strong> brings the plan closest to failure — the stack falls to <strong>' + usd(Math.max(0, best.minReal)) + '</strong> at its lowest. Worst timing, not a prediction.';
     el.hidden = false;
   }
 
@@ -895,7 +921,7 @@
     var rec = document.getElementById('stRecovery');
     if (rec) rec.addEventListener('click', function (e) { var b = e.target.closest('[data-val]'); if (!b) return; CRASH.recoveryPreset = b.getAttribute('data-val'); setSeg('stRecovery', CRASH.recoveryPreset); renderAll(); });
 
-    // Spending-flexibility lever (slider 0..50 + presets 0/10/20/30)
+    // Spending-cut lever (slider 0..50 + presets 0/10/20/30)
     var fs = document.getElementById('stFlexSlider');
     if (fs) fs.addEventListener('input', function () { var v = parseInt(fs.value, 10); if (isFinite(v)) { FLEX = clamp(v, 0, 50); setSeg('stFlex', String(FLEX)); updateReadouts(); renderAll(); } });
     var flexSeg = document.getElementById('stFlex');

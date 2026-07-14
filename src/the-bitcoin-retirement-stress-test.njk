@@ -152,16 +152,16 @@ eleventyComputed:
         </div>
 
         <div class="st-control">
-          <div class="st-control-label">Spending flexibility
+          <div class="st-control-label">Spending cut
             <span class="help-tip" tabindex="0">?<span class="tip-content">If the crash lands, cut withdrawals by this much while the market is below its pre-crash level &mdash; the real-world response to a bear market. 0 = off.</span></span>
             <span class="st-control-val" id="stFlexVal">Off</span>
           </div>
-          <input type="range" id="stFlexSlider" class="st-range" min="0" max="50" step="5" value="0" aria-label="Spending flexibility percent">
+          <input type="range" id="stFlexSlider" class="st-range" min="0" max="50" step="5" value="0" aria-label="Spending cut percent">
           <div class="st-seg st-seg-mini" id="stFlex">
             <button type="button" data-val="0">Off</button>
-            <button type="button" data-val="10">10%</button>
-            <button type="button" data-val="20">20%</button>
-            <button type="button" data-val="30">30%</button>
+            <button type="button" data-val="10">&minus;10%</button>
+            <button type="button" data-val="20">&minus;20%</button>
+            <button type="button" data-val="30">&minus;30%</button>
           </div>
           <p class="st-control-note">Cut withdrawals while the market sits below its pre-crash level, the actionable counterpart to &ldquo;don&rsquo;t sell into the bottom.&rdquo; Under a <strong>Weak</strong> recovery the market never fully returns, so the cut runs through the horizon.</p>
         </div>
@@ -208,7 +208,7 @@ eleventyComputed:
       <div class="st-chart-wrap st-timing-chart" data-chart-copy data-chart-title="Sequence risk: same plan, survive or deplete on the retirement year" data-chart-filename="sequence-risk-comparison.png"><canvas id="stTimingChart"></canvas></div>
       <div class="st-timing-tablewrap">
         <table class="st-table">
-          <thead id="stTimingHead"><tr><th>Retire in</th><th>Crash lands</th><th>Outcome</th><th class="st-num">Final stack</th><th class="st-num">Cost vs no crash</th></tr></thead>
+          <thead id="stTimingHead"><tr><th>Retire in</th><th>Crash lands</th><th>Outcome</th><th class="st-num">Final stack</th><th class="st-num">Final stack vs no crash</th></tr></thead>
           <tbody id="stTimingTableBody"></tbody>
         </table>
       </div>
@@ -233,7 +233,7 @@ eleventyComputed:
         </table>
       </div>
       <p class="st-flex-summary" id="stFlexSummary" hidden></p>
-      <p class="st-chart-caption"><span class="st-dot">▼</span> marks years the crash has depressed the price below trend. Notice the <strong>BTC sold</strong> column rise in those years: the same income now costs more sats. That is the mechanism, sequence risk made concrete. <span class="st-cut">✂</span> marks years the spending-flexibility lever cut the withdrawal.</p>
+      <p class="st-chart-caption"><span class="st-dot">▼</span> marks years the crash has depressed the price below trend. Notice the <strong>BTC sold</strong> column rise in those years: the same income now costs more sats. That is the mechanism, sequence risk made concrete. <span class="st-cut">✂</span> marks years the Spending cut lever reduced the withdrawal.</p>
     </div>
   </section>
 
@@ -243,8 +243,8 @@ eleventyComputed:
     <h2 class="st-h2">Reading the result</h2>
     <div class="st-prose st-prose-wide">
       <p>A plan that survives a mid-severity crash in year 10 tells you little about the same plan meeting a deep crash in year 1. The exploration exists to show that spread, including the outcomes where the stack does not make it. If your plan only survives on the assumption of a fast recovery, that is worth knowing now, while you can still change the stack, the income, or the year you retire.</p>
-      <p>Two framings sit side by side here. A badly-timed crash can do real, lasting damage to a bitcoin retirement. And the same crash, met late or with room to spare, is nearly a non-event. Which one you get turns mostly on two things: <strong>when you retire</strong> and <strong>how much you withdraw relative to your stack</strong>. A larger stack helps, but it is not the deciding lever; retire early and draw hard and even a big stack can run out, while a modest withdrawal a few years later rides the same crash through. Stack size sets the sizing question, and that is where <a href="/how-much-bitcoin">How Much Bitcoin?</a> and the upside baseline on <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a> pick up.</p>
-      <p class="st-v2">This version models the main lever you have against a badly-timed crash: <strong>spending flexibility</strong>, cutting withdrawals while the market sits below its pre-crash level rather than selling a fixed amount into the low. It is the actionable counterpart to the &ldquo;don&rsquo;t sell into the bottom&rdquo; lesson from Bull &amp; Bear. Turn it on in the stress test above and the verdict states plainly what the cut buys and what it costs in forgone income. It is a real lever, not a free one: the arithmetic is years of living on less, and whether that is livable is a question this page cannot answer.</p>
+      <p>Two framings sit side by side here. A badly-timed crash can do real, lasting damage to a bitcoin retirement. And the same crash, met late or with room to spare, is nearly a non-event. Which one you get turns mostly on two things: <strong>when you retire</strong> and <strong>how much you withdraw relative to your stack</strong>. A larger stack helps, but it is not the deciding lever; retire early and draw hard and even a big stack can run out, while a modest withdrawal a few years later rides the same crash through. Stack size sets the sizing question, and that is where <a href="/how-much-bitcoin">How Much Bitcoin?</a> and the upside baseline on <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a> pick up. For most readers the stack is what it is &mdash; the levers you actually hold are when you retire, what you draw, and how deeply you can cut for a while. If the stack itself is still the open question &mdash; whether bitcoin belongs in the portfolio at all, and at what size &mdash; that is the allocation question: <a href="/bitcoin-allocation-sizing">Bitcoin Portfolio Allocation</a>.</p>
+      <p class="st-v2">This version models the main lever you have against a badly-timed crash: a <strong>Spending cut</strong>, reducing withdrawals while the market sits below its pre-crash level rather than selling a fixed amount into the low. It is the actionable counterpart to the &ldquo;don&rsquo;t sell into the bottom&rdquo; lesson from Bull &amp; Bear. Turn it on in the stress test above and the verdict states plainly what the cut buys and what it costs in forgone income. It is a real lever, not a free one: the arithmetic is years of living on less, and whether that is livable is a question this page cannot answer.</p>
     </div>
     <div class="st-connect-grid">
       <a class="st-connect-card" href="/the-bitcoin-retirement"><div class="st-connect-title">The Bitcoin Retirement <span class="st-part-badge">Part 1</span></div><p>The upside baseline this exploration stress-tests. Start here.</p></a>
