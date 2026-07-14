@@ -159,15 +159,19 @@ body { background: var(--bg); color: var(--text); }
 .st-out-fail { background: rgba(192,57,43,0.09); border: 1px solid rgba(192,57,43,0.42); }
 .st-out-fail .st-headline-main { color: #f0a898; }
 
-/* ── Spending-cut mitigation (v2) ── */
-.st-mitigation { border-radius: 12px; padding: 0.95rem 1.4rem; margin: 0 0 0.7rem; background: rgba(234,180,162,0.06); border: 1px solid rgba(234,180,162,0.3); border-left: 3px solid #eab4a2; }
+/* ── Spending-cut mitigation (v2) ──
+   Cut identity is amber (C_MIT #e6c88f), matching the sweep bars and the main-chart cut
+   line — NOT the rose crash family (v2.2 item-D closeout: a mitigation message must not be
+   framed in crash-rose). The rose left-accent + tint moved to the amber family here, on
+   .st-flex-summary, and on the ✂ .st-cut glyph so "the cut" reads one colour everywhere. */
+.st-mitigation { border-radius: 12px; padding: 0.95rem 1.4rem; margin: 0 0 0.7rem; background: rgba(230,200,143,0.06); border: 1px solid rgba(230,200,143,0.3); border-left: 3px solid #e6c88f; }
 .st-mitigation p { font-family: var(--font-b); font-size: 0.92rem; line-height: 1.65; color: var(--text-dim); margin: 0 0 0.5rem; }
 .st-mitigation p:last-child { margin-bottom: 0; }
 .st-mitigation strong { color: #f2eee8; font-weight: 600; }
 .st-mitigation-note { color: var(--text-muted); font-size: 0.86rem; font-style: italic; }
-.st-flex-summary { font-family: var(--font-b); font-size: 0.82rem; line-height: 1.6; color: var(--text-dim); margin: 0.6rem 0 0; padding: 0.7rem 1rem; border-radius: 8px; background: rgba(234,180,162,0.06); border: 1px solid rgba(234,180,162,0.24); }
+.st-flex-summary { font-family: var(--font-b); font-size: 0.82rem; line-height: 1.6; color: var(--text-dim); margin: 0.6rem 0 0; padding: 0.7rem 1rem; border-radius: 8px; background: rgba(230,200,143,0.06); border: 1px solid rgba(230,200,143,0.24); }
 .st-flex-summary strong { color: #f2eee8; font-weight: 600; }
-.st-cut { color: #eab4a2; font-size: 0.72em; }
+.st-cut { color: #e6c88f; font-size: 0.72em; }
 
 /* ── Charts ── */
 .st-chart-wrap { position: relative; height: clamp(260px, 37vh, 350px); margin: 0; }

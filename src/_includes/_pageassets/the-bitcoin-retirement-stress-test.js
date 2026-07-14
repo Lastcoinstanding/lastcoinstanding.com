@@ -299,12 +299,14 @@
       Object.assign({ label: 'Baseline (no crash)' }, lineFrom(base, C_BASE, 2)),
       Object.assign({ label: 'With the crash' }, lineFrom(crashed, C_CRASH, 2.4))
     ];
-    // Mitigation path: same rose hue family as the crash line, dashed + lighter.
-    if (reduced) ds.push(Object.assign({ label: 'With the crash + ' + FLEX + '% cut' }, lineFrom(reduced, '#eab4a2', 2, [6, 3])));
+    // Mitigation path: the sweep's amber cut hue (C_MIT), dashed — so the cut reads by
+    // COLOR (amber vs the rose crash) as well as dash. Closes the v2.1 item-D remainder:
+    // blue baseline, rose crash (solid), amber cut (dashed) — three distinguishable hues.
+    if (reduced) ds.push(Object.assign({ label: 'With the crash + ' + FLEX + '% cut' }, lineFrom(reduced, C_MIT, 2, [6, 3])));
     var markers = [{ x: SCENARIO.retirementYear, color: 'rgba(236,228,214,0.5)', label: 'Retire' },
                    { x: crash.crashYear, color: C_CRASH, label: 'Crash' }];
     if (crashed.depletionYear) markers.push({ x: crashed.depletionYear, color: '#c0392b', label: 'Depleted' });
-    if (reduced && reduced.depletionYear && reduced.depletionYear !== crashed.depletionYear) markers.push({ x: reduced.depletionYear, color: '#eab4a2', label: 'Reduced depleted' });
+    if (reduced && reduced.depletionYear && reduced.depletionYear !== crashed.depletionYear) markers.push({ x: reduced.depletionYear, color: C_MIT, label: 'Reduced depleted' });
 
     var noteEl = document.getElementById('stFocusNote');
     if (noteEl) noteEl.innerHTML = focusNoteText(crashed, sp);
@@ -542,8 +544,18 @@
       headline = 'The plan survives this scenario.';
       if (sp && sp.dropPct >= 5 && sp.underwater >= 1) {
         var uw = yearsWord(sp.underwater);
-        detail = 'But living it is a long hold. The stack falls to about <strong>' + usd(sp.troughUsd) + '</strong>, roughly <strong>' + sp.dropPct + '% below</strong> where it stood when the crash hit, and stays under that level for about <strong>' + uw + '</strong> before regaining it. The plan holds, but only because the recovery came. For those ' + sp.underwater + ' years you could not have known it would.';
-        detailSub = 'By ' + endYear + ' the stack is about ' + pct + '% smaller than with no crash, ' + usd(crashFinalNom) + ' versus ' + usd(baseFinalNom) + ', but that final gap is not what you would feel. The years underwater are.';
+        // Origin-first (STYLE_GUIDE "Numbers in verdict prose"): state where the stack
+        // stood BEFORE the fall, then where it fell to, then the % — one clause, dollars
+        // anchored beside the percentage. $preCrash/$trough/dropPct reconcile by
+        // construction: dropPct = round(100·(1 − troughV/onset)), onset = the band's level.
+        if (sp.recovered) {
+          detail = 'But living it is a long hold. The crash takes the stack from about <strong>' + usd(sp.onset) + '</strong> to <strong>' + usd(sp.troughUsd) + '</strong> — a <strong>' + sp.dropPct + '% fall</strong> — and it stays below that pre-crash level for about <strong>' + uw + '</strong> before regaining it. The plan holds, but only because the recovery came. For those ' + sp.underwater + ' years you could not have known it would.';
+        } else {
+          // Not-recovered (e.g. Weak): the pre-crash level is never regained, so the
+          // sentence must not promise a return — no dangling "before regaining it".
+          detail = 'But living it is a long hold. The crash takes the stack from about <strong>' + usd(sp.onset) + '</strong> to <strong>' + usd(sp.troughUsd) + '</strong> — a <strong>' + sp.dropPct + '% fall</strong> — and it stays below that pre-crash level through the horizon, never regaining it within the projection. The plan holds, but the stack never climbs back to where it stood when the crash hit — <strong>' + uw + '</strong> below the line, and you could not have known it would last.';
+        }
+        detailSub = 'By ' + endYear + ' the stack is about ' + pct + '% smaller than with no crash — ' + usd(crashFinalNom) + ' versus ' + usd(baseFinalNom) + ' — but that final gap is not what you would feel. The years underwater are.';
       } else {
         detail = 'It lasts the full ' + yearsWord(SCENARIO.yearsInRetirement) + ' and this crash barely dents it: the terminal stack is about <strong>' + pct + '% smaller</strong> than with no crash. Deepen the crash or move it earlier to see the stress bite.';
       }
@@ -561,13 +573,18 @@
     el.hidden = false;
     var m = mitigation(crashedFull, reduced, infl);
     var X = FLEX, N = m.cutYears, Y = usd(m.foregoneNom), parts = [];
+    // N here is the CUT window (m.cutYears — the years $F was actually spent over). It is
+    // NOT bound to the verdict's underwater span, which is a different quantity (the stack
+    // regains its level slower than the price does): stated self-anchored as "the N years
+    // the cut ran", never "those N years" (STYLE_GUIDE rule #4 corollary; JM ruling 2026-07,
+    // which retracts the spec's "it is the same window" premise).
     if (m.flip) {
-      parts.push('With a <strong>' + X + '% cut</strong> while underwater, the plan survives this scenario — at full spending it did not. The cut costs about <strong>' + Y + '</strong> of forgone income across ' + yearsWord(N) + '.');
+      parts.push('With a <strong>' + X + '% cut</strong> while underwater, the plan survives this scenario — at full spending it did not. The cut costs about <strong>' + Y + '</strong> of income across the ' + yearsWord(N) + ' the cut ran.');
     } else if (m.redDep && m.fullDep && m.redDep > m.fullDep) {
       parts.push('The <strong>' + X + '% cut</strong> moves depletion from <strong>' + m.fullDep + '</strong> to <strong>' + m.redDep + '</strong> — ' + yearsWord(m.redDep - m.fullDep) + ' bought for about ' + Y + ' of forgone income.');
     } else if (!m.redDep && !m.fullDep) {
       var z = (m.fullEnd > 0) ? Math.round(100 * (m.redEnd / m.fullEnd - 1)) : 0;
-      parts.push('The <strong>' + X + '% cut</strong> leaves the stack about <strong>' + z + '% higher</strong> at the end (' + usd(m.redEnd) + ' vs ' + usd(m.fullEnd) + '), for about ' + Y + ' of forgone income across ' + yearsWord(N) + '.');
+      parts.push('The <strong>' + X + '% cut</strong> leaves about <strong>' + z + '% more</strong> at the end — ' + usd(m.redEnd) + ' versus ' + usd(m.fullEnd) + ' — and costs about ' + Y + ' of income across the ' + yearsWord(N) + ' the cut ran.');
     } else {
       parts.push('Even with a <strong>' + X + '% cut</strong>, the plan does not survive this scenario — the cut helps, but this crash at this timing is beyond it.');
     }

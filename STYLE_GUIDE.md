@@ -1991,6 +1991,17 @@ The long em-dash ("—"), especially in pairs bracketing a clause, is a tell of 
 
 This is a house-style preference, not a grammar rule; apply it in new copy and when editing existing pages, without contorting a sentence to avoid a dash that is genuinely the clearest choice.
 
+### 10.3 Numbers in verdict prose
+
+_Added 2026-07, from the Retirement Stress Test v2.2 verdict rationalization. Verdict/headline areas accumulate computed figures across builds and drift into unreadable figure-soup; these rules keep such a passage readable as one piece of writing while preserving hand-checkable reproducibility._
+
+1. Every percentage gets its dollar anchors in the same clause, stated once — "from $2.4M to $1.0M (−58%)", never a % in one clause and its dollars in another.
+2. State the origin before any "falls to" or "% below" claim.
+3. One comparison per sentence.
+4. A repeated value must be bound, not re-introduced — but bind **only when the repeat is structurally the same quantity**. Restate "from $2.4M to $1.0M" as "that $1.0M trough" downstream (same quantity, bound). A **coincidental** numeric match between two *different* quantities must be stated **self-anchored, never bound**: write "across the 3 years the cut ran" (anchored to its own window), not "those 3 years" (which asserts identity with, say, an underwater span named earlier — a different quantity that only sometimes shares the number).
+
+Rationale: these rules keep a passage readable as one piece of writing while preserving hand-checkable reproducibility. A value may appear twice only when it is the hinge of two comparisons (state it both times; hiding one breaks reconciliation). The rule-4 corollary is a correction: the Stress Test's stack-underwater span and its price-path cut window coincide numerically at the default scenario but diverge under most other settings, so "those N lean years" (binding the cut-cost figure to the verdict's span) was retired for the self-anchored "the N years the cut ran". A coincidental match at one scenario is not structural identity.
+
 ---
 
 ## Appendix A: Survey findings (2026-04-26)
