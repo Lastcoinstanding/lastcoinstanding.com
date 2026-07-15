@@ -395,6 +395,13 @@ document:
 - Cross-linking strategy
 - Open enhancements (carousel slide pending, deferred ideas, etc.)
 
+**Closing is part of shipping.** Whenever you ship a feature, sweep `TECH_DEBT.md`
+*and* the touched pages' SITE_GUIDE "Open items" blocks for anything the work
+satisfies, and close them — strike through and record what shipped, per the house
+pattern. Pending-state records outlive their resolution unless closing is part of
+the ship step; a stale "pending" reads as truth and has repeatedly misdirected
+later builds.
+
 Update the **editorial reading order** (§18) to place the page in the
 right position — most accessible / requires-least-personal-context first,
 deepest specialization last.

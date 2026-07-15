@@ -7,7 +7,7 @@ A running list of known issues, inconsistencies, and architectural improvements 
 ## Conventions
 
 - **Status:** `- [ ]` open, `- [x]` closed
-- **When shipping any feature:** sweep this file for items the work satisfies and close them — debt items outlive their resolution unless closing is part of shipping
+- **When shipping any feature:** sweep this file **and the touched pages' SITE_GUIDE "Open items" blocks** for anything the work satisfies, and close them — pending-state records outlive their resolution unless closing is part of shipping
 - **When closing:** move to "Recently closed" with the commit SHA
 - **When adding:** keep entries terse; deep context lives in the relevant commit message (`git log --grep` works well)
 - **Bundles:** when one item is a sub-task of another, indent under the parent
