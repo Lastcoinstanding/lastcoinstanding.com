@@ -1981,3 +1981,59 @@ _(v2 features — the worst-case-timing finder and the Spending cut lever — sh
 ### Open items (doubling ladder)
 - **`related:` is only half-reciprocal.** Bidirectional with **The Power Law** and **Bull & Bear Cycles**; **one-way** to **Disciplined Rebalancing** and **The Bitcoin Horizon** (neither links back). House convention is bidirectional — either add the two backlinks or record the asymmetry as deliberate.
 - **OG card has no committed generator.** `og-the-doubling-ladder.jpg` ships, but there is no `build-og-the-doubling-ladder.py` (9 other pages have one). Not reproducible from the repo — regenerate by cloning a sibling builder if the title/subtitle ever changes.
+
+---
+
+## 39. How Much Cash? (`/how-much-cash.html`)
+
+**Added July 2026** (shipped 7/14/26). A calculator in **The Numbers** (group *Positioning & Strategy*), the mirror-bookend of How Much Bitcoin. `interactive: true`, `calculator_tile` (position 5, anchor `#playground`) — a personal-decision tool, so it earns a tile, and it sits beside How Much Bitcoin and Disciplined Rebalancing to complete the sizing → maintenance → **reserves** run. Page-scoped classes use the `hc-` prefix. Mixed-content width tier (1100/880, taken from the STYLE_GUIDE §4.2 table, not scaffolded). US spelling.
+
+**Thesis.** How Much Bitcoin ends at a *fraction* of Kelly, which means even its ideal reader holds a remainder that is not bitcoin. This page names that remainder's job and prices it. The reader holds bitcoin but owes dollars; a 100%-hot stack has pre-committed to selling at whatever price the market shows on the day life sends a bill. Coin-denominated throughout, because dollars flatter whichever path holds cash.
+
+**The spine (one identity, and the page's whole argument).**
+
+```
+bufferedTotal − allInTotal  ==  coinsSaved + coinsBonus − coinsCost
+
+coinsCost  = B / P(pos) − cashLeft / P(H)     the premium
+coinsSaved = absorbed / troughPrice           the insurance   (absorbed = min(cash at trough, E))
+coinsBonus = deployed / troughPrice           the dry powder  (0 unless enabled)
+```
+
+The three terms are §A's three jobs in the same order. **The stack cancels** — the verdict never depends on stack size, only on the shock, the buffer, and the two prices. Asserted every render by `hcLedgerQA()`; verified across 27,000 states at build (0 failures; identity asserted on 17,172, the rest legitimately clamped).
+
+**The shortcut that is wrong (record this).** "The buffer pays iff `E/trough > B/P`" is true **only when the buffer covers the whole shock**. A buffer smaller than the shock pays the full raise cost but stops only what its cash absorbed, so the shortcut reports a win where the ledger records a loss. It was in the build spec, and in an early draft of this page's audit copy; the identity above replaced it. Do not reintroduce it.
+
+**The default verdict is the honest branch, and that is deliberate (JM ruling, 2026-07-14).** Today sits at ~0.42× trend (*near the floor*), so a 6-month buffer costs ~58% of a 1 BTC stack to raise, and the regime-aware default (`hold`) keeps that multiple for the whole horizon. At first paint the page therefore says **the buffer cost more coins than it saved**. That is the answer, not a bug: it is what the site's own Power Law projection implies about holding 4% cash against trend growth. The page's posture is "this insurance is expensive right now, and here is exactly when it pays", not "buffers are prudent".
+
+**§D's three branches (all mandatory, all reachable).** Un-clamped example settings, verified at build:
+
+- *preserved more* — 3-month buffer, $12K shock, crash year 1, −77% → 0.722 vs 0.548 BTC
+- *roughly a wash* — 3-month buffer, $18K shock, crash year 2, −60% → 0.713 vs 0.708 BTC
+- *cost more than it saved* — 3-month buffer, $12K shock, crash year 1, −40% → 0.827 vs 0.722 BTC
+
+The cost branch's clause reads "Small shocks, shallow drawdowns, and **a buffer raised when coins were expensive**". The build spec said "short horizons"; that term is **inverted and negligible** — longer horizons make the buffer marginally *worse* (5y +0.210 → 30y +0.198 BTC, monotonic), because in a coins-primary ledger terminal coins are nearly horizon-independent. JM approved the replacement. A fourth branch precedes these three: when the shock exceeds the stack at trough prices, the page says so rather than quoting a coin comparison.
+
+**Clamps (both surfaced, never silent).** Coins cannot go negative. A shock larger than the stack at trough prices sells every coin and leaves an unpaid remainder (`wiped`); a buffer larger than the stack can raise is capped at the stack (`raiseCapped` — reachable by dragging the marker into cheap-coin history: a $36K buffer cost 48 BTC in Nov 2016). Both break the identity by construction, so `hcLedgerQA` skips the assertion there rather than reporting a false failure.
+
+**§C — the playground.** Channel chart in WODN's visual language with a **draggable date marker** (today-anchored; `#hcSnapToday` restores). Record this for future work: WODN has **no** draggable marker to reuse — it drives position from a range slider and renders the selection as a line parallel to trend, and it has no URL params at all. The marker here is new; only the visual language is inherited, and the param register comes from the allocation page. **One position state** (design ruling): the marker drives §C's readouts, §B's verdict lead, and §D's ledger start — two representations, never two states. §C's shock readout is a deliberately *different basis* from §B/§D: the shock landing **at the marker** with no drawdown (design §4.1's "same bill costs 2–3× the coins near the floor"), so it names its own basis per STYLE_GUIDE §10.3 rule 5.
+
+**One stress case, three consumers.** The §B verdict, the insurance card, and §D's ledger all resolve "the shock lands in a deep drawdown" through the same always-computed stress ledger (the reader's own crash settings, whether or not the disclosure is open — the allocation page's treatment of crash depth as a ground rule). Without this the page contradicted itself: a −60% trough *today* and a −60% trough in *year 4* are different prices (the trend carries price up ~3.3× in between) and forced 0.727 vs 0.222 BTC under the same label.
+
+**Dry powder (§E) — the canon reconciliation.** Wait-or-Deploy-Now finds that from most channel positions waiting was the wrong call, so this page cannot sell a buffer as a dip-buying fund. Resolution: dry powder is contingent on the insurance job. **Deploy fires only at the crash trough, from what the shock did not need, half, once** (JM ruling — the spec's "when the path enters the floor-adjacent zone" would fire at t=0 and never stop, because today *is* the floor zone and `hold` mode never leaves it). With no crash there is no trough and the readout says so, which is the point.
+
+**§F — the BAS paragraph.** Ships the canon sentence verbatim: *"A loan against your stack is a buffer that can be taken away at the exact moment you need it."* The two options fail at the same trough; only one is still there when it does.
+
+**Params.** `stack` · `exp` · `buf` · `shock` · `hz` (always written) · `yld` · `depth` · `btc` (`hold`|`revert`) · `pos` (marker day since genesis; absent = today) · `dep` (`1`) · `cy` (presence implies crash on — the allocation convention) · `rec`. Allocation's register throughout: lowercase truncations, raw numbers, word enums, defaults deleted, debounced `replaceState`. Round-trip verified.
+
+**Engine + QA hooks.** `window.hcLedgerQA(state?)` → events, replayed-vs-ledger balances, the spine's terms side by side, clamps, `ok`. `window.hcBinding()` → rendered-pixel vs expected terminal coins per series with colors, `null` when unmeasurable. Both have silent render-path twins. Consumes `shared/power-law-data.js` + `shared/crash-model.js`; no new data, no MONTHLY_REFRESH additions. One ledger per render pass and a static channel keep the marker drag at ~17ms/frame (was ~120ms).
+
+### Integration
+`explorations.json` (category *numbers*, group *Positioning & Strategy*, `interactive: true`, `calculator_tile` position 5 + `calc-tile-icons/how-much-cash.njk`); `sitemap.xml` @0.9 + 3 fragments @0.8; `llms.txt` (The Numbers); homepage concept card in The Numbers (two-path coin-ledger SVG icon); `updates.json` (7/14/26); carousel slide **deferred** (see open items); OG card `og-how-much-cash.jpg` **with a committed generator** (`build-og-how-much-cash.py`, cloned from the wait-or-deploy-now sibling — the §38 gap lesson), passthrough wired in `.eleventy.js`. Outbound `related:` to How Much Bitcoin, Wait-or-Deploy-Now, the Stress Test, Borrowing Against Your Stack, and Disciplined Rebalancing — **all five reciprocal**, added in the same commit.
+
+### Open items (how much cash)
+- **Carousel slide pending.** Deferred by the build spec; own brief later. Metaphor seed from the design doc: **the cistern** — a stone water cistern at dusk beside a golden grove, still water held back, the grove beyond; "the water you don't pour out". Structural-observation camp, architectural single-subject.
+- **Carry-the-scenario not wired.** Stack ↔ The Bitcoin Retirement is the natural pair (this page's `stack`/`exp` are the Retirement's inputs). Deferred by the spec; small PR after launch.
+- **`computeLedger(st)` takes a state object but reads the marker from module state.** The QA sweep drives every other input through `st`; `pos` is the one it cannot vary. Harmless today (sweeps run at today's marker) but it is a seam — if a future sweep needs to vary position, thread the marker through `st` rather than adding a second global read.
+- **Not verified locally: the Eleventy build, and the §8.2 screenshot.** No node on the build machine, so the page was QA'd by driving the real markup/CSS/JS through a generated harness rather than a real Eleventy render; base.njk chrome (nav, footer, related strip, feedback widget) was not exercised offline. The harness's live canvases also time out the screenshotter, so the honest-branch screenshot is a live-QA item.
+- **Dropdown capacity.** Positioning & Strategy is now **10 items**, all with tiles, under a 21-item Numbers menu. §30's table still reads "The Numbers (15 items)" and predates the trilogy, the Stress Test, the allocation page, and Bull & Bear. The design doc predicted this page would force the conversation; it does not solve it.

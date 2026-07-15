@@ -20,16 +20,6 @@ Candidate page / exploration ideas surfaced during ongoing work but not yet sche
   - **Depends on:** Phase C deep-link anchors (**shipped** in `154f84a`-line drift work — the crash view is deep-linkable today; other playgrounds already carry URL state).
   - **Open design questions:** which 3–4 to feature; whether cards show a static thumbnail or a live mini-preview; copy register for each card.
 
-- [ ] **"How Much Cash?" — the cash-buffer question for the fully-allocated. PRIORITY: NEXT BUILD.**
-  Surfaced 2026-07-14. New page.
-  - **Concept:** how much fiat buffer to hold alongside a stack, and why. Three arguments, in order of weight:
-    - **(a) Never be forced to sell into a drawdown** — the sequence-risk argument. Historical simulation of expense shocks (job loss, roof, medical) against a 100%-BTC baseline, built on the existing crash / PL machinery rather than new modelling.
-    - **(b) Dry powder at floor-zone entries** — inherits Wait or Deploy Now's historical-not-prediction posture. What a buffer bought you at past floor-zone entries, stated as history, never as a forecast.
-    - **(c) The behavioral case** — the buffer you hold so you can hold the stack.
-  - **Non-negotiable:** the page MUST show the buffer's cost honestly — expected drag versus 100% BTC, presented as the price of insurance, not hidden behind the three arguments for it. Same discipline as the trilogy's risk shed.
-  - **Framing:** the mirror-bookend of **How Much Bitcoin** (`/how-much-bitcoin`). That page is about *entering*; this one is about *de-risking from all-in*. The pair should read as two ends of one question.
-  - **Cross-links:** Disciplined Rebalancing (`/disciplined-rebalancing`), Wait or Deploy Now (`/wait-or-deploy-now`), the Retirement Stress Test (`/the-bitcoin-retirement-stress-test`), allocation sizing (`/bitcoin-allocation-sizing`).
-
 - [ ] **"Sell, Borrow, or Wait?" — funding a real-world goal from a stack.**
   Surfaced 2026-07-14. New page, sequenced after **How Much Cash?**.
   - **Concept:** one concrete goal (house deposit, car), three strategies, all simulated on the channel: **sell at strength** (Disciplined Rebalancing's zone logic), **borrow** (the BAS math), or **delay the purchase** (Wait or Deploy Now's regime logic). The reader brings a goal, not a market view.
@@ -52,6 +42,12 @@ Candidate page / exploration ideas surfaced during ongoing work but not yet sche
 ---
 
 ## Promoted / shipped
+
+- [x] **"How Much Cash?" — the cash-buffer question for the fully-allocated.** → shipped as `how-much-cash` (`/how-much-cash.html`) in `44c4139` (engine + page) + site integration, 2026-07-14. Went spec → build; design doc `HOW_MUCH_CASH_DESIGN_1.md`, build spec `HOW_MUCH_CASH_BUILD_SPEC_1.md`. Full record in **SITE_GUIDE §39**.
+  - **The honest-cost requirement drove the whole page.** The entry insisted the buffer's drag be shown as the price of insurance. Built, it turned out stronger than "a drag": at today's ~0.42×-trend floor a 6-month buffer costs ~58% of a 1 BTC stack to raise, so **the default verdict is that the buffer cost more coins than it saved**. JM ruled to ship that as the first paint rather than tune it away, which moved the page's posture from "here is the price of insurance" to "this insurance is expensive right now, and here is exactly when it pays".
+  - **The mirror-bookend framing held** — the page opens on How Much Bitcoin ending at a fraction of Kelly, and names the remainder's job. All three arguments (a)/(b)/(c) shipped, in the captured order.
+  - **(b) dry powder needed the reconciliation the entry predicted.** WODN's historical-not-prediction posture is inherited, and dry powder ships as contingent on the insurance job — deploy fires only at the crash trough, from what the shock did not need. See §39 for why the spec's floor-zone trigger could not work.
+  - **All four cross-links landed and are reciprocal** (DR, WODN, Stress Test, allocation — plus How Much Bitcoin and BAS).
 
 - [x] **Bull & bear market cycles — a dedicated exploration.** → shipped as `bull-and-bear-cycles` (`/bull-and-bear-cycles.html`) in `c0bea4a`, 2026-07-06.
   Surfaced 2026-06-30 during the deployment-trilogy work, when the page-1 risk shed raised the question of how to present drawdown/bear-market severity. Decided NOT to fold into page 1 (scope/measure-mismatch); built as its own page. Went straight to build — no interim design doc.

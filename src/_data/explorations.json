@@ -328,6 +328,20 @@
     }
   },
   {
+    "slug": "how-much-cash",
+    "title": "How Much Cash?",
+    "category": "numbers",
+    "group": "Positioning & Strategy",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "You went all in. What a cash buffer costs in coins, what it saves in a shock, and when it is not worth holding.",
+      "preview_kind": "svg",
+      "anchor": "#playground",
+      "featured": false,
+      "position": 5
+    }
+  },
+  {
     "slug": "the-bitcoin-horizon",
     "title": "The Bitcoin Horizon",
     "category": "numbers",

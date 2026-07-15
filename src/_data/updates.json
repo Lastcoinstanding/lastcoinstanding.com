@@ -1,5 +1,10 @@
 [
   {
+    "display": "7/14/26",
+    "page": "/how-much-cash",
+    "summary": "New: How Much Cash? asks what a fiat buffer beside a stack is for, and prices it in coins rather than dollars. Drag a marker across the channel to see what the same buffer costs at different moments, and what it saves in a shock. It shows the cost as plainly as the benefit."
+  },
+  {
     "display": "7/13/26",
     "page": "/",
     "summary": "Improved: the \"copy chart as image\" button now bakes the chart's context into the picture. An exported chart carries the section title and the one-line explainer that sits above it on the page, and on the calculators it also carries your current assumptions — the stress test's \"Your plan:\" line, the allocation drift line, and so on — read live at the moment you export, so a shared image always reflects the state you were looking at. The footer (chart title and lastcoinstanding.com) is unchanged."
