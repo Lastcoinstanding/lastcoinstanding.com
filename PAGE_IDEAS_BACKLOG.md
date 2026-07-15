@@ -27,6 +27,13 @@ Candidate page / exploration ideas surfaced during ongoing work but not yet sche
   - **Cross-links:** DR (`/disciplined-rebalancing`), BAS (`/borrowing-against-your-stack`), WODN (`/wait-or-deploy-now`).
   - **Open design question — settle at spec time:** own page (lean) vs. an extension of Disciplined Rebalancing. Decide before drafting; the answer changes the scope substantially.
 
+- [ ] **Tool-hero sweep — apply STYLE_GUIDE §6.10a to the other tool pages.** Small, anytime.
+  Surfaced 2026-07-15 with the How Much Cash v3 rebuild; JM's request, added to the guide as canon in that build and deliberately not swept there.
+  - **The rule:** every tool/exploration hero states declaratively what the tool is and how to use it. No assumed reading order — a hero may not need a sibling page to parse. The failure it fixes: How Much Cash v2 opened *"The other end of the sizing question — for the reader who already went all in"*, legible only to someone who had read How Much Bitcoin.
+  - **The shape that satisfies it:** subtitle names the question the tool answers; the line under it names the audience and the two or three actions. See `/how-much-cash` for the reference implementation.
+  - **Candidates to audit:** every page with a `calculator_tile` (currently 20). Expect most to pass; the ones to check first are those whose subtitle opens on a relationship to another page rather than on their own question.
+  - **Scope note:** copy-only, no engine risk. Natural to bundle with any other hero-touching pass.
+
 - [ ] **Freshness signals — "New" / "Updated" badges, and an honest channel-position chip.**
   Surfaced 2026-07-14. Small, anytime.
   - **Badges:** "New" / "Updated" markers in nav + index, driven by the existing `src/_data/updates.json` on a ~30-day window. Optional per-page "Updated &lt;month&gt;" line, but only where it means something — not stamped site-wide.

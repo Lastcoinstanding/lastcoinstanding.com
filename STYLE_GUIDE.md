@@ -832,6 +832,16 @@ related:
 
 **Migration of older inline ad-hoc related blocks.** Several pages had hand-built related blocks before this component existed (e.g. Half-Life had an inline aside linking to *What Money Has To Be*). The migration pattern: move the destination into `related:` front-matter, copy the description text, delete the inline block. The new component renders a card that does the same work in a consistent visual treatment.
 
+### 6.10a Tool hero: say what it is and how to use it (added July 2026)
+
+**Canon, JM request, applies sitewide.** Every tool or exploration hero states plainly, and declaratively, **what the tool is and how to use it**. No assumed reading order: a hero may not depend on the reader having already read a sibling page, and it may not open on a relationship ("X ends at a fraction; this page is about the rest") where a first-time visitor needs the sibling to parse the sentence.
+
+The failure this fixes: `/how-much-cash` v2 opened with *"The other end of the sizing question — for the reader who already went all in"*, which is only legible to someone who has read How Much Bitcoin. Its v3 hero states the question and the instructions instead: *"How and when can dry powder get you more bitcoin?"* over *"A tool for the all-in holder: pick a cash share, pick a moment in the record, and see how raising it there has historically ended — in coins."* The sibling relationship survives as one sentence of body prose ("a related exploration"), not as the frame.
+
+The shape that satisfies this: **subtitle names the question the tool answers; the line under it names the audience and the two or three actions.** A reader who has never seen the site should be able to work the page from the hero alone.
+
+**Sweep status:** applied to `/how-much-cash` (July 2026). Other tool pages are NOT yet swept — recorded as a backlog item, deliberately not bundled into that page's rebuild. When touching any tool hero, bring it to this rule.
+
 ### 6.11 Tool-framing strip (collapsible disclaimer)
 
 A persistent "for exploration only" disclaimer applied to calculator pages and decision-implying argument pages. Lives between the page hero and the tool/calculator content. Component file: `src/_includes/components/tool-framing.njk`. CSS in `base.njk`.
