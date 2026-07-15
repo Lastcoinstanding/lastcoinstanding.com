@@ -411,6 +411,29 @@ The site uses three canonical width tiers. **Every page must adopt one of these 
 
 **Scaffolding warning (added June 2026).** When building a new page from a sister-page scaffold, take the structure, interaction grammar, and component recipes — but always re-derive container and prose widths from the table above, never from the donor page's CSS. Observed failure mode: Paper Bitcoin initially inherited WMHTB's 1240px/720px values and shipped with visibly compressed prose relative to canonical pages; corrected to the mixed-content tier (1100/880) in the June 2026 pass. The donor page may itself be carrying pre-canonical debt.
 
+**Foundation preamble — the rule the scaffolding warning does not cover (added July 2026).** The warning above says *don't* take widths from the donor's CSS. It is silent on what you *must* take, and that gap shipped a broken page: `/how-much-cash` was built by re-deriving widths from the table, correctly, and in doing so skipped the donor's opening block entirely — so it launched with **no `:root` tokens, no `body { background, color }`, no `.hero`, no `.content-area`, no `.section-intro`, no link rules and no `.help-tip`**. It rendered browser-white with black text and user-agent blue links, and its tooltip body printed inline as visible copy in the middle of the label it annotates.
+
+The trap is that **`base.njk` carries almost nothing**. Its canonical blocks cover only: `html, body { overflow-x: clip }`, the body font invariants, `h1,h2,h3 { text-wrap: balance }`, plus nav, footer and chart-copy. **There is no site-wide palette, no site-wide `body` theme, and — the one that bites hardest — no site-wide link rule.** Every page re-declares all of it in its own `page_styles`. That is by design (§1, §2.3), but it means an omitted rule does not degrade gracefully: it falls back to the user agent.
+
+So: widths come from the table; **the foundation preamble comes from a sibling.** Every calc/explorer-tier page must self-declare these un-prefixed selectors. Diff a new page's stylesheet against two donors and expect zero missing:
+
+| Must declare | Omitting it gives you |
+|---|---|
+| `:root` palette tokens | every `var(--*)` resolves to nothing |
+| `body { background; color }` | browser-white with black text |
+| `.hero`, `.hero h1`, `.hero h1 em`, `.hero .hero-subtitle`, `.hero .subtitle` | unstyled hero, no two-tone |
+| `.content-area` (+ its mobile padding override) | content touching the viewport edge |
+| `.section-intro` | unconstrained intro prose |
+| **body-link treatment**, scoped to every prose container, with `:visited` and `:hover` | user-agent blue/purple, underlined |
+| `.help-tip`, `:hover`/`:focus`, `.tip-content`, `:hover/:focus .tip-content` | tooltip text rendered inline as body copy |
+
+Notes that cost time to learn:
+
+- **Token names are per page, not global.** The trilogy uses `--amber`/`--font-d`; the allocation family uses `--accent`/`--font-h`. Both are valid — pick one set, declare it, and use it consistently. A page mixing donor copy across both families gets silent `var()` failures.
+- **`:visited` is not the bug.** Author rules beat the UA's `a:visited` by origin regardless of specificity, so a plain `.prose a { color }` already covers visited links. Declare `:visited` anyway for legibility (the allocation page's register), but if links are rendering blue the cause is that *no* author rule matches them, not that `:visited` is missing.
+- **Form controls do not inherit `font-family`.** Set it on `button` and text `input` directly, not only on their child spans, or a bare text node renders in the UA's Arial.
+- **A stubbed harness will not catch any of this.** If a page is QA'd outside a real Eleventy render, stubbing the palette so the CSS "works" reproduces exactly the assumption under test and hides every one of these. Test the page stylesheet standing alone, on top of `base.njk`'s blocks and nothing else.
+
 **Editorial tier — 960px (canonical).** The reading-prose width that produces comfortable line-lengths for sustained text. This is the default for any new page that's primarily Inter body prose; deviating wider degrades narrative readability. Prose fills the container naturally; do not apply inner max-widths.
 
 **System-diagrammatic tier — 1140px.** Used by pages that lead with a centered SVG diagram or interactive visual benefiting from horizontal stage-room; the surrounding explanation panels position around the diagram, not on a reading-prose grid. The tier is not used for body prose. New pages of this character target 1140px to harmonize with the existing pages.
