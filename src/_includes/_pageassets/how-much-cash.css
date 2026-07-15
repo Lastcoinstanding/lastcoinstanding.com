@@ -2,6 +2,37 @@
    Width tier: mixed-content, 1100px page / 880px essay block, taken from the
    STYLE_GUIDE §4.2 table directly (not inherited from a donor page). */
 
+/* ─── Foundation: house palette + dark body theme + hero ───
+   base.njk's canonical <body> block sets only font invariants; every page owns
+   its own palette tokens, the `body { background, color }` theme rule, and its
+   hero styling in its page_styles (STYLE_GUIDE §1 / §2.3). This block was absent,
+   so all var(--*) references resolved to nothing — the body fell back to
+   browser-white with default-black text, the disclaimer went light-on-light, and
+   the hero lost its two-tone. These are the same values/structure the sibling
+   pages carry, using this page's token names (--accent, --font-h). */
+:root {
+  --bg: #0a0908;
+  --bg-card: #141210;
+  --accent: #e09422;
+  --text: #e8e0d4;
+  --text-dim: #9a9080;
+  --text-muted: #6a6256;
+  --border: rgba(224,148,34,0.12);
+  --font-h: 'Cormorant Garamond', Georgia, serif;
+  --font-b: 'Inter', -apple-system, sans-serif;
+}
+
+body { background: var(--bg); color: var(--text); }
+
+/* ── Hero (white h1 + amber two-tone accent) ── */
+.hero { position: relative; text-align: center; max-width: 880px; margin: 0 auto; padding: 4.5rem 2rem 2.5rem; }
+.hero h1 { font-family: var(--font-h); font-size: clamp(2.3rem, 5.6vw, 3.5rem); font-weight: 500; letter-spacing: -.01em; line-height: 1.08; color: #f2eee8; margin: 0 0 1rem; }
+.hero h1 em { font-style: italic; color: var(--accent); }
+.hero .hero-subtitle { font-family: var(--font-h); font-style: italic; font-size: clamp(1.1rem, 2.6vw, 1.45rem); color: var(--text-dim); margin: 0 0 0.6rem; }
+.hero .subtitle { font-family: var(--font-b); font-size: 0.98rem; line-height: 1.7; color: var(--text-dim); margin: 0.6rem auto 0; }
+.hero .subtitle a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+.hero .subtitle em { color: var(--accent); font-style: italic; }
+
 .hc-page { max-width: 1100px; margin: 0 auto; }
 .hc-prose { max-width: 880px; margin: 0 auto; }
 
