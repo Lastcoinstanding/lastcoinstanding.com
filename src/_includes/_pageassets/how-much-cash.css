@@ -53,25 +53,21 @@ body { background: var(--bg); color: var(--text); }
 .section-intro a, .section-intro a:visited,
 .hc-lead a, .hc-lead a:visited,
 .hc-control-note a, .hc-control-note a:visited,
-.hc-field-note a, .hc-field-note a:visited,
-.hc-note a, .hc-note a:visited,
 .hc-endnote a, .hc-endnote a:visited,
-.hc-faces-note a, .hc-faces-note a:visited,
-.hc-face-detail a, .hc-face-detail a:visited,
 .hc-readout a, .hc-readout a:visited,
-.hc-readout-block a, .hc-readout-block a:visited,
 .hc-zone-strip a, .hc-zone-strip a:visited,
-.hc-regime a, .hc-regime a:visited,
-.hc-verdict-detail a, .hc-verdict-detail a:visited,
+.hc-verdict a, .hc-verdict a:visited,
+.hc-tax-line a, .hc-tax-line a:visited,
+.hc-tax-rec a, .hc-tax-rec a:visited,
+.hc-alarm a, .hc-alarm a:visited,
 .hc-sharp a, .hc-sharp a:visited,
 .hero .hero-subtitle a, .hero .hero-subtitle a:visited,
 .hero .subtitle a:visited {
   color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4);
 }
 .hc-prose a:hover, .section-intro a:hover, .hc-lead a:hover, .hc-control-note a:hover,
-.hc-field-note a:hover, .hc-note a:hover, .hc-endnote a:hover, .hc-faces-note a:hover,
-.hc-face-detail a:hover, .hc-readout a:hover, .hc-readout-block a:hover, .hc-zone-strip a:hover,
-.hc-regime a:hover, .hc-verdict-detail a:hover, .hc-sharp a:hover,
+.hc-endnote a:hover, .hc-readout a:hover, .hc-zone-strip a:hover, .hc-verdict a:hover,
+.hc-tax-line a:hover, .hc-tax-rec a:hover, .hc-alarm a:hover, .hc-sharp a:hover,
 .hero .hero-subtitle a:hover, .hero .subtitle a:hover {
   color: #f2b25a; border-bottom-color: rgba(224,148,34,0.7);
 }
@@ -92,15 +88,8 @@ body { background: var(--bg); color: var(--text); }
 .hc-section > .hc-eyebrow, .hc-section > .hc-h2 { max-width: 880px; margin-left: auto; margin-right: auto; }
 
 /* ── Controls ── */
-.hc-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.4rem; margin: 1.4rem 0; }
-.hc-control-label { display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-b); font-size: 0.85rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.5rem; }
-.hc-control-val { margin-left: auto; color: var(--accent); font-variant-numeric: tabular-nums; }
 .hc-control-note { font-family: var(--font-b); font-size: 0.75rem; color: var(--text-muted); margin: 0.45rem 0 0; }
 .hc-range { width: 100%; }
-.hc-range-red { accent-color: #b04525; }
-.hc-field { display: flex; flex-direction: column; gap: 0.35rem; font-family: var(--font-b); font-size: 0.85rem; font-weight: 600; color: var(--text-dim); }
-.hc-field input { background: rgba(255,255,255,0.04); border: 1px solid rgba(224,148,34,0.25); border-radius: 4px; color: var(--text); padding: 0.45rem 0.6rem; font-family: var(--font-b); font-variant-numeric: tabular-nums; }
-.hc-field-note { font-family: var(--font-b); font-size: 0.75rem; font-weight: 400; color: var(--text-muted); margin: 0; }
 
 .hc-seg { display: inline-flex; flex-wrap: wrap; gap: 0.3rem; }
 .hc-seg button { background: rgba(255,255,255,0.03); border: 1px solid rgba(224,148,34,0.22); border-radius: 4px; color: var(--text-dim); font-family: var(--font-b); font-size: 0.75rem; padding: 0.3rem 0.6rem; cursor: pointer; transition: all 0.15s; }
@@ -110,36 +99,15 @@ body { background: var(--bg); color: var(--text); }
 .hc-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; max-width: 880px; margin: 0 auto; }
 
 /* ── The primary lever ── */
-.hc-primary { max-width: 880px; margin: 1.6rem auto; padding: 1.1rem 1.2rem; background: rgba(224,148,34,0.05); border: 1px solid rgba(224,148,34,0.2); border-radius: 6px; }
 .hc-primary-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.6rem; }
 .hc-primary-label { font-family: var(--font-b); font-size: 0.9rem; font-weight: 600; color: var(--text); }
 .hc-primary-val { display: inline-flex; align-items: baseline; gap: 0.25rem; }
 .hc-primary-val input { width: 3.4rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(224,148,34,0.3); border-radius: 4px; color: var(--text); font-family: var(--font-b); font-size: 1.1rem; font-weight: 700; text-align: right; padding: 0.2rem 0.35rem; font-variant-numeric: tabular-nums; }
 .hc-primary-suffix { font-family: var(--font-b); font-size: 0.85rem; color: var(--text-dim); }
-.hc-primary-dollars { font-family: var(--font-b); font-size: 0.8rem; color: var(--accent); font-variant-numeric: tabular-nums; margin-top: 0.5rem; }
 
 /* ── Verdict ── */
 .hc-verdict { max-width: 880px; margin: 1.6rem auto 0.6rem; padding: 1.1rem 1.3rem; border-radius: 6px; background: rgba(255,255,255,0.02); }
-.hc-verdict-buys { border-left: 3px solid var(--green, #6fae6f); background: rgba(111,174,111,0.07); }
-.hc-verdict-cost { border-left: 3px solid var(--accent); background: rgba(224,148,34,0.06); }
-.hc-verdict-main { font-family: var(--font-h); font-size: 1.22rem; line-height: 1.5; color: var(--text); }
-.hc-verdict-detail { font-family: var(--font-b); font-size: 0.88rem; line-height: 1.6; color: var(--text-dim); margin: 0.7rem 0 0; }
-.hc-regime { max-width: 880px; margin: 0 auto 1.4rem; padding: 0.7rem 1rem; border-left: 3px solid rgba(224,148,34,0.5); font-family: var(--font-b); font-size: 0.8rem; line-height: 1.6; color: var(--text-muted); }
 
-/* ── Effects cards ── */
-.hc-faces { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; max-width: 880px; margin: 0 auto; }
-.hc-face { padding: 1rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; background: rgba(255,255,255,0.02); }
-.hc-face-eyebrow { font-family: var(--font-b); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.4rem; }
-.hc-face-num { font-family: var(--font-h); font-size: 2rem; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.hc-face-unit { font-family: var(--font-b); font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem; }
-.hc-face-detail { font-family: var(--font-b); font-size: 0.78rem; line-height: 1.55; color: var(--text-dim); margin: 0.6rem 0 0; }
-.hc-face-premium { border-color: rgba(224,148,34,0.3); }
-.hc-face-premium .hc-face-eyebrow, .hc-face-premium .hc-face-num { color: var(--accent); }
-.hc-face-insurance { border-color: rgba(109,179,212,0.3); }
-.hc-face-insurance .hc-face-eyebrow, .hc-face-insurance .hc-face-num { color: #6db3d4; }
-.hc-face-base { border-color: rgba(255,255,255,0.12); }
-.hc-face-base .hc-face-eyebrow, .hc-face-base .hc-face-num { color: var(--text-dim); }
-.hc-faces-note { max-width: 880px; margin: 1rem auto 0; font-family: var(--font-b); font-size: 0.78rem; color: var(--text-muted); }
 
 /* ── Playground ── */
 .hc-chart-wrap { position: relative; height: 380px; margin: 1.2rem 0; }
@@ -147,41 +115,14 @@ body { background: var(--bg); color: var(--text); }
 .hc-pos-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-family: var(--font-b); font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.5rem; }
 .hc-pos-readout { font-variant-numeric: tabular-nums; }
 .hc-snap { font-family: var(--font-b); font-size: 0.75rem; color: var(--accent); background: none; border: 1px solid rgba(224,148,34,0.3); border-radius: 4px; padding: 0.25rem 0.6rem; cursor: pointer; }
-.hc-readouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.8rem; margin: 1rem 0; }
 .hc-readout { padding: 0.8rem 0.9rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 5px; background: rgba(255,255,255,0.02); font-family: var(--font-b); font-size: 0.82rem; line-height: 1.55; color: var(--text-dim); }
 .hc-zone-strip { max-width: 880px; margin: 0.8rem auto 0; padding: 0.6rem 0.9rem; border-left: 2px solid rgba(255,255,255,0.15); font-family: var(--font-b); font-size: 0.78rem; color: var(--text-muted); }
 
-/* Mirrored buffer lever (§6.35): a second representation of the primary lever,
-   so hand and chart-response share a viewport. Same state (S.bufMonths), synced
-   via syncBufControls(); no presets — the start-point affordance stays top-only. */
-.hc-mirror { max-width: 880px; margin: 1rem auto; padding: 0.7rem 0.9rem; border: 1px solid rgba(224,148,34,0.18); border-radius: 5px; background: rgba(224,148,34,0.04); }
-.hc-mirror-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; font-family: var(--font-b); font-size: 0.8rem; }
-.hc-mirror-label { color: var(--text-dim); font-weight: 600; }
-.hc-mirror-val { color: var(--accent); font-variant-numeric: tabular-nums; }
-
-/* ── Ledger ── */
-.hc-ledger-verdict { max-width: 880px; margin: 1.2rem auto; padding: 0.9rem 1.1rem; border-radius: 5px; font-family: var(--font-b); font-size: 0.92rem; line-height: 1.6; color: var(--text); }
-.hc-lv-buys { border-left: 3px solid var(--green, #6fae6f); background: rgba(111,174,111,0.08); }
-.hc-lv-wash { border-left: 3px solid var(--text-muted); background: rgba(255,255,255,0.03); }
-.hc-lv-cost { border-left: 3px solid var(--accent); background: rgba(224,148,34,0.07); }
-.hc-terminal { display: flex; gap: 1.4rem; flex-wrap: wrap; max-width: 880px; margin: 0 auto 0.8rem; }
-.hc-term-row { display: flex; align-items: baseline; gap: 0.5rem; font-family: var(--font-b); font-size: 0.95rem; color: var(--text); font-variant-numeric: tabular-nums; }
-.hc-term-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
-.hc-term-usd { font-size: 0.78rem; color: var(--text-muted); }
 .hc-endnote { max-width: 880px; margin: 0.8rem auto; font-family: var(--font-b); font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
 
-.hc-disclosure { display: block; width: 100%; max-width: 880px; margin: 1.2rem auto 0; text-align: left; background: rgba(255,255,255,0.02); border: 1px solid rgba(224,148,34,0.2); border-radius: 5px; padding: 0.7rem 0.9rem; cursor: pointer; font-family: var(--font-b); font-size: 0.85rem; color: var(--text-dim); }
-.hc-disclosure:hover { border-color: rgba(224,148,34,0.45); color: var(--text); }
-.hc-disclosure[aria-expanded="true"] { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
-.hc-disclosure-body { max-width: 880px; margin: 0 auto; padding: 1rem; border: 1px solid rgba(224,148,34,0.2); border-top: none; border-radius: 0 0 5px 5px; }
-.hc-crash-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-.hc-crash-label { font-family: var(--font-b); font-size: 0.8rem; font-weight: 600; color: var(--text-dim); }
-.hc-crash-val { font-family: var(--font-b); font-size: 0.8rem; color: var(--accent); float: right; font-variant-numeric: tabular-nums; }
 .hc-note { font-family: var(--font-b); font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; margin: 0.8rem 0 0; }
-.hc-toggle-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.9rem; font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); }
 
 /* ── Dry powder / borrowing ── */
-.hc-readout-block { max-width: 880px; margin: 1rem auto; padding: 0.9rem 1.1rem; border-left: 3px solid rgba(109,179,212,0.5); background: rgba(109,179,212,0.05); font-family: var(--font-b); font-size: 0.85rem; line-height: 1.6; color: var(--text-dim); }
 .hc-sharp { max-width: 880px; margin: 1.2rem auto; padding: 0.9rem 1.1rem; border-left: 3px solid #b04525; background: rgba(176,69,37,0.07); font-family: var(--font-h); font-size: 1.05rem; line-height: 1.55; color: var(--text); }
 
 /* ── Audit ── */
@@ -196,14 +137,57 @@ body { background: var(--bg); color: var(--text); }
 .hc-table th, .hc-table td { padding: 0.4rem 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.07); text-align: left; color: var(--text-dim); white-space: nowrap; }
 .hc-table th { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; }
 .hc-num { text-align: right; font-variant-numeric: tabular-nums; }
-.hc-ev { text-align: left; white-space: normal; color: var(--text-muted); font-size: 0.72rem; }
 .hc-csv-btn { background: none; border: 1px solid rgba(224,148,34,0.3); border-radius: 4px; color: var(--text-dim); font-family: var(--font-b); font-size: 0.75rem; padding: 0.35rem 0.7rem; cursor: pointer; margin: 0.8rem 0; }
+
+/* ── Levers (v3: two levers + a tax control; the v2 input grid is gone) ── */
+.hc-levers { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 1rem; max-width: 880px; margin: 1.4rem auto; align-items: start; }
+.hc-lever { padding: 0.9rem 1rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; background: rgba(255,255,255,0.02); }
+.hc-lever-primary { border-color: rgba(224,148,34,0.28); background: rgba(224,148,34,0.05); }
+.hc-lever-label { display: flex; align-items: center; font-family: var(--font-b); font-size: 0.85rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.55rem; }
+.hc-num-input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(224,148,34,0.25); border-radius: 4px; color: var(--text); padding: 0.4rem 0.55rem; font-family: var(--font-b); font-variant-numeric: tabular-nums; }
+.hc-seg-tax button { min-width: 3rem; text-align: center; }
+
+/* ── Range thumb: grab/grabbing, matching The Bitcoin Retirement's treatment.
+   That page's rule is scoped to its own .slider-control, so it is not reusable
+   as-is; this is the same values applied to this page's ranges. Nine pages now
+   carry their own copy of this — see TECH_DEBT for the extraction candidate. ── */
+.hc-range { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 2px; background: rgba(224,148,34,0.18); outline: none; }
+.hc-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.4); cursor: grab; transition: transform 0.1s, box-shadow 0.15s; }
+.hc-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.4); cursor: grab; }
+.hc-range:hover::-webkit-slider-thumb { transform: scale(1.1); box-shadow: 0 0 0 2px rgba(224,148,34,0.5); }
+.hc-range:active::-webkit-slider-thumb { cursor: grabbing; }
+.hc-range:active::-moz-range-thumb { cursor: grabbing; }
+
+/* ── Verdict branches ── */
+.hc-verdict { font-family: var(--font-h); font-size: 1.18rem; line-height: 1.55; color: var(--text); }
+.hc-verdict-pays  { border-left: 3px solid #6fae6f; background: rgba(111,174,111,0.08); }
+.hc-verdict-wash  { border-left: 3px solid var(--text-muted); background: rgba(255,255,255,0.03); }
+.hc-verdict-costs { border-left: 3px solid var(--accent); background: rgba(224,148,34,0.07); }
+.hc-verdict-floor { border-left: 3px solid #b04525; background: rgba(176,69,37,0.09); }
+.hc-alarm-tint { box-shadow: inset 0 0 0 1px rgba(224,148,34,0.35); }
+.hc-hidden { display: none; }
+
+/* ── Tax ── */
+.hc-tax-line { max-width: 880px; margin: 0.6rem auto 0.3rem; padding: 0.6rem 0.9rem; border-left: 3px solid rgba(224,148,34,0.5); font-family: var(--font-b); font-size: 0.82rem; line-height: 1.6; color: var(--text-dim); }
+.hc-tax-rec { max-width: 880px; margin: 0 auto 1.2rem; padding: 0 0.9rem; font-family: var(--font-b); font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; }
+
+/* ── The >80% alarm (informational; the slider still works) ── */
+.hc-alarm { max-width: 880px; margin: 1.2rem auto; padding: 0.9rem 1.1rem; border: 1px solid rgba(224,148,34,0.45); border-left: 3px solid var(--accent); border-radius: 5px; background: rgba(224,148,34,0.08); }
+.hc-alarm-tag { display: inline-block; font-family: var(--font-b); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+.hc-alarm p { font-family: var(--font-b); font-size: 0.85rem; line-height: 1.65; color: var(--text-dim); margin: 0; }
+
+/* ── Readouts ── */
+.hc-readout { max-width: 880px; margin: 0.8rem auto 0; }
+.hc-readout-wide { font-size: 0.88rem; }
+.hc-sample { display: block; margin-top: 0.5rem; font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
+.hc-gain { color: #6fae6f; }
+.hc-loss { color: #e08a7a; }
 
 @media (max-width: 640px) {
   .content-area { padding: 0 1.2rem 4rem; }
   .hc-chart-wrap { height: 300px; }
   .hc-h2 { font-size: 1.5rem; }
-  .hc-terminal { gap: 0.8rem; }
   .hc-head-row { flex-direction: column; }
-  .hc-face-num { font-size: 1.7rem; }
+  .hc-levers { grid-template-columns: 1fr; }
+  .hc-verdict { font-size: 1.05rem; }
 }

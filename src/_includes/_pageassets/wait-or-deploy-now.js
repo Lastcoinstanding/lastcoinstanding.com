@@ -22,85 +22,34 @@
    ============================================================= */
 (function () {
   if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function') return;
+  if (!window.ChannelEntries) return;
 
   // ── Palette (shared trilogy conventions) ──
   var FLOOR_C = '#b04525', TREND_C = '#e09422', UPPER_C = '#e8c820';
   var HIST_C = 'rgba(232,224,210,0.55)', SEL_C = '#6db3d4';
   var MUTED = '#7a7367', DIM = '#9a9080', AMBER = '#e09422';
 
-  // ── Channel-position math (log-space), shared with pages 1–2 ──
-  var LF = Math.log(PL_FLOOR), LC = Math.log(PL_CEIL), SPAN = LC - LF;
-  function posOf(price, days) { return (Math.log(price / plPrice(days)) - LF) / SPAN; }
-  function ratioOf(pos) { return Math.exp(pos * SPAN + LF); }
-
-  var N = PL_DATA.length;
-  var FIRST_D = PL_DATA[0][0], LAST_D = PL_DATA[N - 1][0];
-  var todayD = (Date.now() / 1000 - GENESIS_TS) / 86400;
-  var YEAR_D = 365.25, MONTH_D = 30.44;
-  var TABLE_CUT = (Date.UTC(2014, 0, 1) / 1000 - GENESIS_TS) / 86400;  // pre-$15 curiosity era excluded
-  var WAIT_CAP = 2 * YEAR_D;   // cap the wait at 2 years (if no lower entry, the waiter deploys then)
-  var DROP = 0.15;             // "wait" = wait for channel position ≥0.15 LOWER than entry
-  var DD_THRESH = 0.20;        // a "drawdown" = a ≥20% drop within 2 years
-
-  // ── Precomputed samples ──
-  var S = (function () { var a = new Array(N); for (var i = 0; i < N; i++) a[i] = { d: PL_DATA[i][0], p: PL_DATA[i][1], pos: posOf(PL_DATA[i][1], PL_DATA[i][0]) }; return a; })();
-
-  function realPriceAt(absDay) {
-    if (absDay <= S[0].d) return S[0].p;
-    if (absDay >= S[N - 1].d) return S[N - 1].p;
-    for (var i = 1; i < N; i++) { if (S[i].d >= absDay) { var a = S[i - 1], b = S[i], t = (absDay - a.d) / (b.d - a.d); return a.p * (1 - t) + b.p * t; } }
-    return S[N - 1].p;
-  }
-  function median(arr) { var m = arr.filter(function (x) { return x != null && isFinite(x); }).sort(function (a, b) { return a - b; }); return m.length ? m[Math.floor(m.length * 0.5)] : null; }
-  function monthYear(day) { return new Date(GENESIS_TS * 1000 + day * 86400 * 1000).toLocaleString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
+  // ── Channel-entry method (extracted 2026-07 to shared/channel-entries.js) ──
+  // The position math, the sample prep, the eligible-entry set, entryMetrics and
+  // bandMetrics all used to live here. How Much Cash is the mirror-twin page and
+  // needs the SAME record read with the SAME neighborhood definition, so a second
+  // copy was not an option — the two pages would eventually publish different
+  // numbers for one position. Moved verbatim; aliased to locals so every call
+  // site below is untouched and this page's figures cannot move.
+  var CE = window.ChannelEntries;
+  var SPAN = CE.SPAN, posOf = CE.posOf, ratioOf = CE.ratioOf;
+  var N = CE.N, FIRST_D = CE.FIRST_D, LAST_D = CE.LAST_D, todayD = CE.todayD;
+  var YEAR_D = CE.YEAR_D, MONTH_D = CE.MONTH_D;
+  var TABLE_CUT = CE.TABLE_CUT, WAIT_CAP = CE.WAIT_CAP, DROP = CE.DROP, DD_THRESH = CE.DD_THRESH;
+  var S = CE.S, elig = CE.elig;
+  var realPriceAt = CE.realPriceAt, median = CE.median, monthYear = CE.monthYear;
+  var entryMetrics = CE.entryMetrics, bandMetrics = CE.bandMetrics;
 
   // ── Vocabulary: ×-trend + shared word-label only; the 0–1 coordinate never shows ──
   function posLabel(pos) { return positionLabel(pos); }
   function posDisplay(pos) { return ratioOf(pos).toFixed(2) + '× trend · ' + posLabel(pos); }
   function livePos() { return (liveTodayPos != null) ? liveTodayPos : posOf(TODAY_PRICE, TODAY_DAYS); }
   var liveTodayPrice = null, liveTodayPos = null;
-
-  // ════════ COMPARATOR MATH — position-based waiting, post-2014, live ════════
-  // Only entries with a full 2-year forward window count, so "wait" and "drawdown within
-  // 2 years" are never truncated by the edge of the record.
-  var elig = (function () { var a = []; for (var i = 0; i < N; i++) if (S[i].d >= TABLE_CUT && S[i].d <= LAST_D - WAIT_CAP) a.push(i); return a; })();
-
-  // Per-entry: did waiting for a ≥0.15-lower position (within 2yr) get MORE Bitcoin? how deep
-  // did price fall? "BTC acquired" = 1/price, so a lower price = more coins for the same dollars.
-  function entryMetrics(i) {
-    var d0 = S[i].d, p0 = S[i].p, P = S[i].pos, end = d0 + WAIT_CAP;
-    var waitPrice = null, waitDay = null, arrived = false, j;
-    for (j = i + 1; j < N && S[j].d <= end; j++) { if (S[j].pos <= P - DROP) { waitPrice = S[j].p; waitDay = S[j].d; arrived = true; break; } }
-    if (!arrived) { waitPrice = realPriceAt(end); waitDay = end; }   // waiting failed → deploy at the 2yr price
-    var ratio = p0 / waitPrice;                                      // coins(wait)/coins(now) = (1/waitPrice)/(1/p0)
-    var trough = p0; for (j = i + 1; j < N && S[j].d <= end; j++) if (S[j].p < trough) trough = S[j].p;
-    var depth = trough / p0 - 1;                                     // ≤ 0
-    return { P: P, ratio: ratio, paid: ratio > 1, arrived: arrived, waitLen: arrived ? (waitDay - d0) : null, depth: depth, hadDD: depth <= -DD_THRESH };
-  }
-
-  // Metrics over a sliding band around position P (widen if a high/sparse band is thin).
-  function bandMetrics(P) {
-    var half = 0.075, set = [], t;
-    for (t = 0; t < 8; t++) { set = elig.filter(function (i) { return Math.abs(S[i].pos - P) <= half; }); if (set.length >= 8) break; half += 0.03; }
-    if (!set.length) return null;
-    var M = set.map(entryMetrics), n = M.length;
-    var arrivedLens = M.filter(function (m) { return m.arrived; }).map(function (m) { return m.waitLen; });
-    return {
-      n: n, half: half,
-      paid: M.filter(function (m) { return m.paid; }).length / n * 100,
-      ratio: median(M.map(function (m) { return m.ratio; })),
-      condRatio: (function () {
-        var arr = M.filter(function (m) { return m.arrived; }).map(function (m) { return m.ratio; });
-        return arr.length ? median(arr) : null;
-      })(),
-      nArrived: M.filter(function (m) { return m.arrived; }).length,
-      ddProb: M.filter(function (m) { return m.hadDD; }).length / n * 100,
-      ddDepth: median(M.map(function (m) { return m.depth; })) * 100,
-      never: M.filter(function (m) { return !m.arrived; }).length / n * 100,
-      waitLen: arrivedLens.length ? median(arrivedLens) : null,
-      entries: set
-    };
-  }
 
   // ── State (continuous position; default to today's live position) ──
   var state = { pos: 0.1 };

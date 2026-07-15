@@ -3,240 +3,155 @@ layout: base.njk
 permalink: /how-much-cash.html
 slug: how-much-cash
 related:
-  - slug: how-much-bitcoin
-    desc: "The other end of the same question. How Much Bitcoin sizes the position and lands on a fraction of Kelly, which means even its ideal reader holds a remainder; this page is that remainder's job description."
-  - slug: wait-or-deploy-now
-    desc: "What the dry powder section leans on. Wait-or-Deploy's finding is that from most channel positions, waiting for a lower entry was the wrong call, which is why a buffer here is insurance first and a dip fund never."
-  - slug: the-bitcoin-retirement-stress-test
-    desc: "The same sequence-risk argument, applied to a withdrawal plan. This page asks what a shock costs a stack; the Stress Test asks what a badly-timed crash does when you are already selling to live."
-  - slug: borrowing-against-your-stack
-    desc: "The other answer to never selling. A credit line against bitcoin is the alternative to holding cash, and its failure mode is exactly this page's subject."
   - slug: disciplined-rebalancing
-    desc: "The protocol for the coins themselves. This page prices the cash beside the stack; Disciplined Rebalancing works through trimming and rebuying the stack against the channel's zones."
+    desc: "The protocol this page prices. Disciplined Rebalancing states the discipline — trim strength, rebuy weakness, by zone; this page shows that protocol's historical work: what the trim costs after tax, and where in the channel it has paid."
+  - slug: wait-or-deploy-now
+    desc: "The same record, read through the opposite door. Wait-or-Deploy asks the cash holder whether to deploy or wait; this page asks the all-in holder whether to hold or raise. Mirror twins, one method, one set of numbers."
+  - slug: how-much-bitcoin
+    desc: "A related exploration, examining the fraction of a portfolio that bitcoin might justify occupying. This page comes at the allocation from the other side: how much fiat belongs beside the stack, and what holding it costs."
+  - slug: borrowing-against-your-stack
+    desc: "The other answer to never selling. A loan against the stack is the alternative to raising cash, and its failure mode is exactly this page's subject: the credit line tightens at the same trough where selling hurts most."
+  - slug: the-bitcoin-retirement-stress-test
+    desc: "The withdrawal-era version of the shock absorber. This page asks what a bill costs in coins at a given moment; the Stress Test asks what a badly-timed crash does when you are already selling to live."
 eleventyComputed:
   head_extras: "{% include '_pageassets/how-much-cash-head.html' %}"
   page_styles: "{% include '_pageassets/how-much-cash.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/crash-model.js' %}\n{% include '_pageassets/how-much-cash.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/channel-entries.js' %}\n{% include '_pageassets/how-much-cash.js' %}"
 ---
 
 <section class="hero">
   <h1>How Much <em>Cash?</em></h1>
-  <div class="hero-subtitle">The other end of the sizing question &mdash; for the reader who already went all in.</div>
-  <p class="subtitle"><a href="/how-much-bitcoin">How Much Bitcoin?</a> ends at a fraction. This page is about the rest of it: how much fiat belongs beside a stack, what that fiat is actually for, and what holding it costs you in the only unit that matters here. Everything below is counted in coins.</p>
+  <div class="hero-subtitle">How and when can dry powder get you more bitcoin?</div>
+  <p class="subtitle">A tool for the all-in holder: pick a cash share, pick a moment in the record, and see how raising it there has historically ended &mdash; in coins.</p>
 </section>
 
 <main class="content-area">
 
   {% include 'components/tool-framing.njk' %}
 
-  <!-- ════════ §A THE THREE JOBS ════════ -->
-  <div class="section-intro hc-prose">
-    <p>You hold bitcoin. You owe dollars. Rent, tuition, a new roof, a hospital bill: none of them can be settled in coins, and none of them wait for a good moment. That mismatch is why this page exists. A stack that is 100% hot is not a portfolio with no cash in it, it is a portfolio that has pre-committed to selling bitcoin at whatever price the market happens to be showing on the day life sends a bill.</p>
-    <p>A buffer of fiat beside the stack does three jobs, in descending order of weight. The first is that it is a <strong>shock absorber</strong>: money you can spend without touching a coin, so a surprise expense never becomes a forced sale at a bad price. The second is that whatever the shock absorber does not consume is <strong>dry powder</strong>, and if price happens to visit the floor of the channel while the buffer is still intact, that is a contingent bonus, never the plan. The third is <strong>sleep</strong>: the buffer you hold so that you can hold the stack.</p>
-    <p>None of that is free, and the price is the point of this page. Every dollar in the buffer is a coin you sold to get it, and the coins do not come back. <a href="/how-much-bitcoin">How Much Bitcoin?</a> concludes at a <em>fraction</em> of Kelly rather than the whole of it, which means even that page's ideal reader ends up holding something that is not bitcoin. This page names what that something is for, and what it costs. The Kelly math is not re-derived here.</p>
-  </div>
-
-  <!-- ════════ §B INPUTS + VERDICT + EFFECTS ════════ -->
-  <section class="hc-section" id="the-buffer">
-    <div class="hc-head-row">
-      <div>
-        <div class="hc-eyebrow">Your position</div>
-        <h2 class="hc-h2">Set the ground, then read the trade</h2>
-      </div>
-      <button type="button" class="hc-reset" id="hcReset">Reset defaults</button>
+  <!-- ════════ CASH DOES THREE JOBS (JM's tracked prose = canon) ════════ -->
+  <section class="hc-section" id="three-jobs">
+    <div class="hc-eyebrow">Start here</div>
+    <h2 class="hc-h2">Cash does three jobs</h2>
+    <div class="section-intro hc-prose">
+      <p><a href="/how-much-bitcoin">How Much Bitcoin?</a> is a related exploration, examining the fraction of your portfolio that bitcoin might justify occupying. This page examines the bitcoin allocation strategy from a different angle: how much fiat belongs beside your stack, what that fiat is actually for, and what holding it costs you &mdash; the opportunity cost of not holding that fraction in bitcoin instead.</p>
+      <p>You hold bitcoin, but sometimes cash is needed. Rent, tuition, a new roof, a hospital bill: all of them require cash, and many come as a surprise. That mismatch is why this page exists. A stack that is 100% bitcoin can be a useful strategy, but it is a portfolio that has pre-committed to selling bitcoin at whatever price the market happens to be showing on the day life sends a bill.</p>
+      <p>A buffer of fiat beside the stack does three jobs, in descending order of weight. The first is that it is a shock absorber: money you can spend without touching your stack, so a surprise expense never becomes a forced sale of bitcoin at the lows. The second is that whatever the shock absorber does not consume is <em>dry powder</em>, and if price happens to visit the floor of the channel while the buffer is still intact, that becomes a contingent bonus. The third is sleep: the buffer you hold so that you can hold the stack.</p>
+      <p>That preparedness comes with a cost, and this page examines that cost. Every dollar in the buffer is bitcoin that could have been held, but having dry powder might also mean ending up with more bitcoin.</p>
     </div>
-    <p class="hc-lead">The stack you hold, the life it has to support, and the surprise you want to stress it against. Change any of them; nothing below is fixed.</p>
-
-    <div class="hc-controls hc-prose">
-      <div>
-        <div class="hc-field">
-          <span>Your stack (BTC)</span>
-          <input type="number" id="hcStack" min="0.001" step="0.1" aria-label="Your stack in BTC">
-          <p class="hc-field-note">This page thinks in coins. The verdict does not actually depend on this number, which is itself worth noticing.</p>
-        </div>
-      </div>
-      <div>
-        <div class="hc-field">
-          <span>Monthly expenses ($)</span>
-          <input type="number" id="hcExp" min="100" step="100" aria-label="Monthly expenses in dollars">
-          <p class="hc-field-note">The anchor for the buffer and the shock presets.</p>
-        </div>
-      </div>
-      <div>
-        <div class="hc-field">
-          <span>Surprise expense ($)</span>
-          <input type="number" id="hcShock" min="0" step="1000" aria-label="Surprise expense in dollars">
-          <div class="hc-seg" id="hcShockPresets">
-            <button type="button" data-val="3">3 months</button>
-            <button type="button" data-val="6">6 months</button>
-          </div>
-          <p class="hc-field-note">One shock, landing at the worst moment. How often shocks arrive is your life, not our model.</p>
-        </div>
-      </div>
-      <div>
-        <div class="hc-control-label">Horizon <span class="hc-control-val" id="hcHorizonVal">10 years</span></div>
-        <input type="range" id="hcHorizon" class="hc-range" min="5" max="30" step="1" aria-label="Horizon in years">
-        <p class="hc-control-note">How long you hold from the marker forward.</p>
-      </div>
-      <div>
-        <div class="hc-control-label">Cash yield <span class="hc-control-val" id="hcYieldVal">4%/yr</span></div>
-        <input type="range" id="hcYield" class="hc-range" min="0" max="15" step="0.5" aria-label="Cash yield percent per year">
-        <p class="hc-control-note">The buffer earns this. Measuring the drag against idle cash would overstate it.</p>
-      </div>
-      <div>
-        <div class="hc-control-label">Deep drawdown <span class="hc-control-val" id="hcDepthVal">&minus;60%</span></div>
-        <input type="range" id="hcDepthSlider" class="hc-range hc-range-red" min="20" max="90" step="1" aria-label="Drawdown depth percent">
-        <div class="hc-seg" id="hcDepth">
-          <button type="button" data-val="40">&minus;40%</button>
-          <button type="button" data-val="60">&minus;60%</button>
-          <button type="button" data-val="77">&minus;77%</button>
-        </div>
-        <p class="hc-control-note">The trough the shock lands in. See <a href="/bull-and-bear-cycles">Bull &amp; Bear Cycles</a>.</p>
-      </div>
-      <div>
-        <div class="hc-control-label">Bitcoin grows by <span class="hc-control-val" id="hcPlModeVal">&mdash;</span></div>
-        <div class="hc-seg" id="hcPlMode">
-          <button type="button" data-val="hold">Today&rsquo;s gap to trend persists</button>
-          <button type="button" data-val="revert">Return to trend</button>
-        </div>
-        <p class="hc-control-note">Projected from the Power Law, regime-aware.</p>
-      </div>
-    </div>
-
-    <!-- The primary lever: buffer months. Mirrored beside the chart in §C. -->
-    <div class="hc-primary">
-      <div class="hc-primary-head">
-        <span class="hc-primary-label">Buffer
-          <span class="help-tip" tabindex="0">?<span class="tip-content">How many months of expenses you hold in fiat beside the stack. Months is the native unit; the dollars and the coins it costs are shown beside it.</span></span>
-        </span>
-        <span class="hc-primary-val"><input type="number" id="hcBufNum" min="0" max="36" step="1" aria-label="Buffer in months of expenses"><span class="hc-primary-suffix">months</span></span>
-      </div>
-      <input type="range" id="hcBufSlider" class="hc-range" min="0" max="36" step="1" aria-label="Buffer in months of expenses">
-      <div class="hc-seg" id="hcBufPresets">
-        <button type="button" data-val="3">3</button>
-        <button type="button" data-val="6">6</button>
-        <button type="button" data-val="12">12</button>
-        <button type="button" data-val="24">24</button>
-      </div>
-      <div class="hc-primary-dollars" id="hcBufDollars">&mdash;</div>
-    </div>
-
-    <div class="hc-verdict hc-verdict-cost" id="hcVerdict">&mdash;</div>
-    <p class="hc-regime" id="hcRegime">&mdash;</p>
-
-    <div class="hc-faces">
-      <div class="hc-face hc-face-premium" id="hcFacePremium">
-        <div class="hc-face-eyebrow">The premium</div>
-        <div class="hc-face-num">&mdash;</div>
-        <div class="hc-face-unit">&mdash;</div>
-        <p class="hc-face-detail">&mdash;</p>
-      </div>
-      <div class="hc-face hc-face-insurance" id="hcFaceInsurance">
-        <div class="hc-face-eyebrow">The insurance</div>
-        <div class="hc-face-num">&mdash;</div>
-        <div class="hc-face-unit">&mdash;</div>
-        <p class="hc-face-detail">&mdash;</p>
-      </div>
-      <div class="hc-face hc-face-base" id="hcFaceBase">
-        <div class="hc-face-eyebrow">The base rate</div>
-        <div class="hc-face-num">&mdash;</div>
-        <div class="hc-face-unit">&mdash;</div>
-        <p class="hc-face-detail">&mdash;</p>
-      </div>
-    </div>
-    <p class="hc-faces-note">Two of these are the trade and one is the context. The <strong>premium</strong> is what the buffer costs whether or not you ever claim on it. The <strong>insurance</strong> is what it pays if you do. The <strong>base rate</strong> says how often the market has actually been in the zone where the claim would hurt most; it says nothing about how often your roof leaks.</p>
   </section>
 
-  <!-- ════════ §C THE PLAYGROUND ════════ -->
+  <!-- ════════ Q1 — WHERE YOU ARE DECIDES ════════ -->
   <section class="hc-section" id="playground">
-    <div class="hc-eyebrow">The playground</div>
-    <h2 class="hc-h2">The same buffer, bought at different moments</h2>
-    <p class="hc-lead hc-playground-sub">Drag the marker along the record. A buffer is bought with coins, so what it costs depends entirely on where in the channel you buy it. The marker sets the readouts here and the starting point of the ledger below; they are one position, not two.</p>
+    <div class="hc-eyebrow">Question one</div>
+    <h2 class="hc-h2">Where you are decides</h2>
+    <p class="hc-lead hc-playground-sub">Raising cash is selling. Whether that has historically been a good or a terrible idea depends almost entirely on where in the Power Law channel you did it. Drag the marker to any moment in the record; everything below follows from it.</p>
 
     <div class="hc-pos-bar">
       <span class="hc-pos-readout" id="hcPosReadout">&mdash;</span>
       <button type="button" class="hc-snap" id="hcSnapToday">Back to today</button>
     </div>
 
-    <div class="hc-chart-wrap chart-wrapper" data-chart-copy data-chart-heading="#playground .hc-h2" data-chart-sub="#playground .hc-playground-sub" data-chart-assump="#hcLedgerEndnote" data-chart-title="The same buffer, bought at different moments">
+    <div class="hc-chart-wrap chart-wrapper" data-chart-copy data-chart-heading="#playground .hc-h2" data-chart-sub="#playground .hc-playground-sub" data-chart-assump="#hcEndnote" data-chart-title="Where you are decides">
       <canvas id="hcChannelChart"></canvas>
     </div>
 
-    <div class="hc-mirror">
-      <div class="hc-mirror-head">
-        <span class="hc-mirror-label">Buffer</span>
-        <span class="hc-mirror-val" id="hcBufMirrorVal">6 months</span>
-      </div>
-      <input type="range" id="hcBufMirror" class="hc-range" min="0" max="36" step="1" aria-label="Buffer in months of expenses">
-    </div>
-
-    <div class="hc-readouts">
-      <div class="hc-readout" id="hcRaiseReadout">&mdash;</div>
-      <div class="hc-readout" id="hcShockReadout">&mdash;</div>
-    </div>
+    <p class="hc-readout" id="hcShockRatio">&mdash;</p>
     <p class="hc-zone-strip" id="hcZoneStrip">&mdash;</p>
   </section>
 
-  <!-- ════════ §D THE COIN LEDGER ════════ -->
-  <section class="hc-section" id="ledger">
-    <div class="hc-eyebrow">Over the horizon</div>
-    <h2 class="hc-h2">The ledger, counted in coins</h2>
-    <p class="hc-lead hc-ledger-sub">Two paths from the marker forward: the stack left whole, and the stack with a buffer carved out of it. The y-axis is coins, because dollars are the unit that flatters whichever path holds cash.</p>
-
-    <div class="hc-terminal" id="hcTerminal">&mdash;</div>
-
-    <div class="hc-chart-wrap chart-wrapper" data-chart-copy data-chart-heading="#ledger .hc-h2" data-chart-sub="#ledger .hc-ledger-sub" data-chart-assump="#hcLedgerEndnote" data-chart-title="The ledger, counted in coins">
-      <canvas id="hcLedgerChart"></canvas>
+  <!-- ════════ Q2 — HOW MUCH, AND WHAT THE TAXMAN TAKES ════════ -->
+  <section class="hc-section" id="how-much">
+    <div class="hc-head-row">
+      <div>
+        <div class="hc-eyebrow">Question two</div>
+        <h2 class="hc-h2">How much, and what the taxman takes</h2>
+      </div>
+      <button type="button" class="hc-reset" id="hcReset">Reset defaults</button>
     </div>
 
-    <div class="hc-ledger-verdict hc-lv-cost" id="hcLedgerVerdict">&mdash;</div>
-    <p class="hc-endnote" id="hcLedgerEndnote">&mdash;</p>
+    <div class="hc-levers">
+      <div class="hc-lever hc-lever-primary">
+        <div class="hc-primary-head">
+          <span class="hc-primary-label">Cash share
+            <span class="help-tip" tabindex="0">?<span class="tip-content">The share of your stack you sell to hold as cash. This is the page's primary lever; the verdict is a share of the stack, so it does not depend on how big the stack is.</span></span>
+          </span>
+          <span class="hc-primary-val"><input type="number" id="hcShareNum" min="0" max="100" step="1" aria-label="Cash share, percent of stack"><span class="hc-primary-suffix">% of stack</span></span>
+        </div>
+        <input type="range" id="hcShareSlider" class="hc-range" min="0" max="100" step="1" aria-label="Cash share, percent of stack">
+        <div class="hc-seg" id="hcSharePresets">
+          <button type="button" data-val="10">10%</button>
+          <button type="button" data-val="25">25%</button>
+          <button type="button" data-val="50">50%</button>
+        </div>
+      </div>
 
-    <button type="button" class="hc-disclosure" id="hcCrashDisclosure" aria-expanded="false" aria-controls="hcCrashBody">
-      What if the shock lands in a crash?
-    </button>
-    <div class="hc-disclosure-body" id="hcCrashBody" hidden>
-      <div class="hc-crash-controls">
-        <div>
-          <div class="hc-crash-label">Crash lands in <span class="hc-crash-val" id="hcCrashYearVal">year 3</span></div>
-          <input type="range" id="hcCrashYear" class="hc-range hc-range-red" min="1" max="9" step="1" aria-label="Crash year">
+      <div class="hc-lever">
+        <div class="hc-lever-label">Capital gains rate
+          <span class="help-tip" tabindex="0">?<span class="tip-content">The tax on the sale. Buying back is not a taxable event, so a round trip pays this once.</span></span>
         </div>
-        <div>
-          <div class="hc-crash-label">Recovery</div>
-          <div class="hc-seg" id="hcCrashRec" role="group" aria-label="Recovery shape">
-            <button type="button" data-val="fast">Fast</button>
-            <button type="button" data-val="historical">Historical</button>
-            <button type="button" data-val="weak">Weak</button>
-          </div>
+        <div class="hc-seg hc-seg-tax" id="hcTax">
+          <button type="button" data-val="0">0%</button>
+          <button type="button" data-val="15">15%</button>
+          <button type="button" data-val="20">20%</button>
         </div>
+        <p class="hc-control-note">Assumes a fully appreciated stack, long held. A higher cost basis softens the haircut. Buying back is not taxable &mdash; one haircut per round trip.</p>
       </div>
-      <p class="hc-note">Depth reuses the &minus;<span id="hcDepthEcho">60</span>% assumption you set above. The shock is pinned to the trough: this is the worst moment for it to arrive, by construction, not a claim that it will.</p>
-      <div class="hc-toggle-row">
-        <input type="checkbox" id="hcDeploy">
-        <label for="hcDeploy">Dry powder: at the trough, deploy half of whatever the buffer has left after the shock, once.</label>
+
+      <div class="hc-lever">
+        <div class="hc-lever-label">Your stack (optional)</div>
+        <input type="number" id="hcStack" class="hc-num-input" min="0.001" step="0.1" placeholder="e.g. 1.5" aria-label="Your stack in BTC">
+        <p class="hc-control-note" id="hcStackNote">Optional. Entering a number of bitcoin may help orient you to the potential outcomes; the verdict does not depend on it.</p>
       </div>
-      <p class="hc-note">That rule is the whole of it. There is no optimizer here, and no refill.</p>
+    </div>
+
+    <div class="hc-verdict hc-verdict-costs" id="hcVerdict">&mdash;</div>
+    <p class="hc-tax-line" id="hcTaxLine">&mdash;</p>
+    <p class="hc-tax-rec">In a tax-advantaged account this haircut disappears &mdash; set the rate to 0% to model it; <a href="/disciplined-rebalancing">Disciplined Rebalancing</a> makes the same recommendation.</p>
+
+    <div class="hc-alarm" id="hcAlarm" hidden>
+      <span class="hc-alarm-tag">Past 80%, this is an exit</span>
+      <p>Past 80% this stops being a buffer and starts being an exit. Worth remembering before you go further: a stack this hedged has already given up most of its drawdown risk &mdash; and most of its upside. Selling this much realizes the tax bill in one season. And the Power Law is a floor observed, not a ceiling promised: if bitcoin ever breaks it upward into an S-curve, the coins you sold are the ones that miss it. The default posture of this site is HODL; the opportunity here is a conservative trim, not a departure.</p>
     </div>
   </section>
 
-  <!-- ════════ §E DRY POWDER ════════ -->
+  <!-- ════════ Q3 — AND WHEN TO COME BACK ════════ -->
+  <section class="hc-section" id="come-back">
+    <div class="hc-eyebrow">Question three</div>
+    <h2 class="hc-h2">And when to come back</h2>
+    <p class="hc-lead">The rule is fixed, and it is the same one <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a> uses to measure waiting: <strong>the cash rebuys at the first lower entry if one arrives within two years, and at the two-year price if none does.</strong> No timing, no discretion, no optimizer. If the dip never comes, you buy back at whatever two years later costs &mdash; sometimes more than you sold for.</p>
+    <p class="hc-readout hc-readout-wide" id="hcQ3">&mdash;</p>
+  </section>
+
+  <!-- ════════ THE INSIGHT CHART ════════ -->
+  <section class="hc-section" id="insight">
+    <div class="hc-eyebrow">The whole thesis, in one picture</div>
+    <h2 class="hc-h2">Where the trade has paid</h2>
+    <p class="hc-lead hc-insight-sub">For every position in the channel: the median coins that came back per coin sold, after tax, following the rebuy rule. Above the line the round trip earned coins; below it, it cost them. Change the tax rate and watch the crossing move.</p>
+
+    <div class="hc-chart-wrap chart-wrapper" data-chart-copy data-chart-heading="#insight .hc-h2" data-chart-sub="#insight .hc-insight-sub" data-chart-assump="#hcEndnote" data-chart-title="Where the trade has paid">
+      <canvas id="hcInsightChart"></canvas>
+    </div>
+    <p class="hc-endnote" id="hcEndnote">&mdash;</p>
+  </section>
+
+  <!-- ════════ DRY POWDER HONESTY (WODN reconciliation, mirror-twin) ════════ -->
   <section class="hc-section" id="dry-powder">
-    <div class="hc-eyebrow">The bonus, not the plan</div>
-    <h2 class="hc-h2">Dry powder</h2>
+    <div class="hc-eyebrow">The honest part</div>
+    <h2 class="hc-h2">Dry powder, and its mirror</h2>
     <div class="hc-prose">
-      <p>There is a version of this page that sells a cash buffer as a war chest for buying the bottom. It would contradict a page we have already published. <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a> finds that from most positions in the channel, waiting for a lower entry was the wrong call, and it declines to manufacture a deliberation when the historical answer is to deploy. That page and this one have to agree out loud.</p>
-      <p>So the resolution is the honest ordering rather than a louder claim. The buffer exists for the shock. If the shock never comes, and if price happens to visit the floor while the buffer is still whole, then deploying some of it there has historically bought more coins than deploying the same dollars at trend. That is a contingent bonus and it is downstream of the insurance job, which is why the rule above deploys only what the shock did not need, only at the trough, only once. The moment you deploy it, it stops being a buffer, and the next surprise finds you back where this page started.</p>
+      <p>There is a version of this page that sells cash as a war chest for buying the bottom, and it would contradict a page we have already published. <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a> asks a cash holder whether to deploy now or wait for a better entry, and finds that from most positions in the channel, waiting was the wrong call. This page asks the opposite question of the opposite reader: an all-in holder, deciding whether to hold or raise.</p>
+      <p>They are the same question through opposite doors, and they read the same record with the same machinery, so they cannot disagree. Where Wait-or-Deploy says waiting was foolish, this page says raising cash was foolish, and for the identical reason: no lower entry arrived. Where it says waiting earned its keep, this page says a trim earned its keep. That is why the floor branch here is a warning rather than an opportunity, and why the two pages cite each other as one finding read from two sides.</p>
     </div>
-    <div class="hc-readout-block" id="hcDryReadout">&mdash;</div>
   </section>
 
-  <!-- ════════ §F SLEEP + BORROWING ════════ -->
+  <!-- ════════ SLEEP + BAS (unchanged from the shipped page) ════════ -->
   <section class="hc-section" id="sleep">
     <div class="hc-eyebrow">The last job</div>
     <h2 class="hc-h2">Sleep, and the other way to never sell</h2>
     <div class="hc-prose">
       <p>The third job does not compute. A buffer is also the thing that lets you sit through a drawdown without doing something you will regret, because the bill that would have forced your hand is already covered. The <a href="/bitcoin-allocation-sizing">allocation page</a> puts it as a question worth asking before any of the math: can you hold it? A position you cannot hold through a bad year is not really your position. Some of what a buffer buys is simply the ability to keep the rest.</p>
-      <p>There is another answer to never selling, and it deserves its paragraph. <a href="/borrowing-against-your-stack">Borrowing against your stack</a> gets you dollars without a sale, and on paper it dominates a cash buffer: no coins foregone, no premium, no drag. Its failure mode is the whole subject of this page. A credit line against bitcoin is collateralized by bitcoin, so it tightens exactly when bitcoin falls, and the margin call arrives at the same trough where the forced sale would have hurt most. The two options fail at the same moment, and only one of them is still there when it does.</p>
+      <p>There is another answer to never selling, and it deserves its paragraph. <a href="/borrowing-against-your-stack">Borrowing against your stack</a> gets you dollars without a sale, and on paper it dominates a cash buffer: no coins foregone, no tax, no drag. Its failure mode is the whole subject of this page. A credit line against bitcoin is collateralized by bitcoin, so it tightens exactly when bitcoin falls, and the margin call arrives at the same trough where the forced sale would have hurt most. The two options fail at the same moment, and only one of them is still there when it does.</p>
     </div>
     <p class="hc-sharp">A loan against your stack is a buffer that can be taken away at the exact moment you need it.</p>
     <div class="hc-prose">
@@ -244,11 +159,20 @@ eleventyComputed:
     </div>
   </section>
 
+  <!-- ════════ DR POSITIONING ════════ -->
+  <section class="hc-section" id="dr">
+    <div class="hc-eyebrow">Where this sits</div>
+    <h2 class="hc-h2">This is Disciplined Rebalancing, priced</h2>
+    <div class="hc-prose">
+      <p><a href="/disciplined-rebalancing">Disciplined Rebalancing</a> states the protocol &mdash; trim strength, rebuy weakness, by zone. This page prices it: what the trim costs after tax, where in the channel it has historically paid, and how long the round trip took. Same discipline, with the work shown.</p>
+    </div>
+  </section>
+
   <!-- ════════ VERIFY THE MATH ════════ -->
   <section class="hc-section" id="audit">
     <button class="hc-audit-toggle" id="hcAuditToggle" aria-expanded="false">
       <span class="hc-audit-label">Verify the math</span>
-      <span class="hc-audit-hint">the year-by-year ledger behind the chart: price, coins on each path, cash, and every event that moved them.</span>
+      <span class="hc-audit-hint">every historical entry in this position's neighborhood: what it sold at, what it rebought at, and what came back.</span>
     </button>
     <div id="hcAuditBody2" hidden>
       <button type="button" class="hc-csv-btn" id="hcCsvBtn">Download CSV</button>
@@ -258,8 +182,8 @@ eleventyComputed:
           <tbody id="hcAuditBody"></tbody>
         </table>
       </div>
-      <p class="hc-endnote">Each row reproduces from its neighbour. Coins only ever change at a named event: the buffer being raised, a forced sale, or a deployment. Cash only changes at yield, the shock, or a deployment. The whole verdict is two quantities. What the buffer <strong>cost</strong> you is <em>B / P</em> coins to raise, where <em>B</em> is months times monthly expenses and <em>P</em> is the price at the marker, less whatever the leftover cash grows back into by the end. What it <strong>saved</strong> you is the coins the shock did not force you to sell: the cash it absorbed, divided by the trough price. The buffer pays if and only if the second exceeds the first, and the difference between them is exactly the gap between the two paths above, which is why your stack size never enters the comparison.</p>
-      <p class="hc-endnote">Two limits are worth naming, because they are where that arithmetic stops applying. If the buffer only covers part of the shock, it still cost the full raise but only saved what its cash could absorb, so a buffer smaller than the shock can lose while looking like it should win. And a shock larger than the whole stack at trough prices sells every coin and still leaves a bill: past that point the buffer is not an optimization, and its cost is no longer the interesting question.</p>
+      <p class="hc-endnote">One identity drives the page. Sell a fraction <em>x</em> of the stack at price <em>P</em> with tax <em>t</em>, and rebuy at <em>P_rebuy</em>: you end with <em>(1&minus;x) + x·(1&minus;t)·(P / P_rebuy)</em> of the stack you started with. The round-trip multiple on the sold slice is <em>(1&minus;t)·(P / P_rebuy)</em> &mdash; the number plotted above. Breakeven needs the rebuy more than <em>t</em> below the sale, which is why the tax rate moves the crossing. Your stack size cancels out of all of it, which is why the BTC input changes nothing but the dollar labels. Tax assumes a fully appreciated stack (zero cost basis): a real basis softens the haircut.</p>
+      <p class="hc-endnote">Two limits worth naming. When no dip arrives inside two years the rebuy happens anyway, at the two-year price &mdash; often <em>higher</em> than the sale, which is how a round trip loses coins rather than merely failing to gain them; those rows are in the table marked "no dip". And at the extremes of the channel the record thins out: the neighborhood widens automatically to keep a workable sample, so a figure at the far upper band rests on fewer entries than one near trend. The entry count and band width are stated with every verdict.</p>
     </div>
   </section>
 
