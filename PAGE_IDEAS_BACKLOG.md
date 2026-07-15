@@ -31,6 +31,35 @@ Candidate page / exploration ideas surfaced during ongoing work but not yet sche
   - **Open design questions:** (a) how much to lean on River's table vs. our own live computation — ideally compute our own cycle-drawdown series from PL_DATA and use River as corroboration/credit rather than the spine, to keep the "everything computed live" integrity; (b) does this subsume or duplicate the Deviation Wave's argument? — need to carve a distinct angle (cycles/bull-bear framing vs. the Wave's deviation-from-trend framing) so it's additive, not redundant; (c) anti-timing guardrails — a "bear markets are shrinking" page must not become a "so time the bottom" page, same discipline as the trilogy.
   - **Once the trilogy merges,** this is a natural next build. Promote to a design doc (`BULL_BEAR_CYCLES_DESIGN.md` or similar) when scheduled.
 
+- [ ] **"How Much Cash?" — the cash-buffer question for the fully-allocated. PRIORITY: NEXT BUILD.**
+  Surfaced 2026-07-14. New page.
+  - **Concept:** how much fiat buffer to hold alongside a stack, and why. Three arguments, in order of weight:
+    - **(a) Never be forced to sell into a drawdown** — the sequence-risk argument. Historical simulation of expense shocks (job loss, roof, medical) against a 100%-BTC baseline, built on the existing crash / PL machinery rather than new modelling.
+    - **(b) Dry powder at floor-zone entries** — inherits Wait or Deploy Now's historical-not-prediction posture. What a buffer bought you at past floor-zone entries, stated as history, never as a forecast.
+    - **(c) The behavioral case** — the buffer you hold so you can hold the stack.
+  - **Non-negotiable:** the page MUST show the buffer's cost honestly — expected drag versus 100% BTC, presented as the price of insurance, not hidden behind the three arguments for it. Same discipline as the trilogy's risk shed.
+  - **Framing:** the mirror-bookend of **How Much Bitcoin** (`/how-much-bitcoin`). That page is about *entering*; this one is about *de-risking from all-in*. The pair should read as two ends of one question.
+  - **Cross-links:** Disciplined Rebalancing (`/disciplined-rebalancing`), Wait or Deploy Now (`/wait-or-deploy-now`), the Retirement Stress Test (`/the-bitcoin-retirement-stress-test`), allocation sizing (`/bitcoin-allocation-sizing`).
+
+- [ ] **"Sell, Borrow, or Wait?" — funding a real-world goal from a stack.**
+  Surfaced 2026-07-14. New page, sequenced after **How Much Cash?**.
+  - **Concept:** one concrete goal (house deposit, car), three strategies, all simulated on the channel: **sell at strength** (Disciplined Rebalancing's zone logic), **borrow** (the BAS math), or **delay the purchase** (Wait or Deploy Now's regime logic). The reader brings a goal, not a market view.
+  - **Why this framing:** deliberately reframed from "when to sell" so it **triangulates** Borrowing Against Your Stack (`/borrowing-against-your-stack`) rather than competing with it. A "when to sell" page would duplicate DR and undercut BAS; a "fund this goal" page uses both as inputs.
+  - **Cross-links:** DR (`/disciplined-rebalancing`), BAS (`/borrowing-against-your-stack`), WODN (`/wait-or-deploy-now`).
+  - **Open design question — settle at spec time:** own page (lean) vs. an extension of Disciplined Rebalancing. Decide before drafting; the answer changes the scope substantially.
+
+- [ ] **Freshness signals — "New" / "Updated" badges, and an honest channel-position chip.**
+  Surfaced 2026-07-14. Small, anytime.
+  - **Badges:** "New" / "Updated" markers in nav + index, driven by the existing `src/_data/updates.json` on a ~30-day window. Optional per-page "Updated &lt;month&gt;" line, but only where it means something — not stamped site-wide.
+  - **Channel-position chip (separate, more interesting):** price · trend multiple · zone vocabulary, with a subtle glow **gated on `todayPriceIsLive`**. This is the honest form of the "site is alive" idea: it says where we are in the channel, in the site's own vocabulary. Pilot on 2–3 pages before committing to the layout.
+  - **Rejected:** a raw price ticker. Off-thesis — the site is about the channel, not the tape.
+
+- [ ] **Power law in other metrics — hash rate, energy, addresses. Low priority.**
+  Surfaced 2026-07-14. Extension, not a new page.
+  - **Concept:** additional power laws beyond price — hash rate, energy, active addresses — as **sections on the existing Power Law (`/the-power-law`) or Metcalfe (`/bitcoin-and-metcalfes-law`) pages**. Explicitly not a new page.
+  - **Check first:** what the Metcalfe address scatter already covers — the addresses angle may be substantially done.
+  - **Cost to weigh:** each new series adds monthly-refresh surface. The maintenance tail is the reason this is low priority, not the difficulty.
+
 ---
 
 ## Promoted / shipped
