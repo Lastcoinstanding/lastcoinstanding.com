@@ -59,25 +59,45 @@
   // 2 years" are never truncated by the edge of the record.
   var elig = (function () { var a = []; for (var i = 0; i < N; i++) if (S[i].d >= TABLE_CUT && S[i].d <= LAST_D - WAIT_CAP) a.push(i); return a; })();
 
-  // Per-entry: did waiting for a ≥0.15-lower position (within 2yr) get MORE Bitcoin? how deep
-  // did price fall? "BTC acquired" = 1/price, so a lower price = more coins for the same dollars.
-  function entryMetrics(i) {
+  // ── Rebuy targets (v3.2 — How Much Cash's decision-#2 lever) ──
+  // The DEFAULT ('first', or any falsy value) is the original first-lower-entry rule:
+  // WODN calls bandMetrics/entryMetrics WITHOUT a target and is byte-for-byte unchanged.
+  // 'trend'/'floor' are ABSOLUTE channel-zone thresholds (the canonical positionLabel
+  // boundaries): the rebuy waits until price reaches that zone-or-cheaper within the SAME
+  // two-year window. Deeper targets legitimately arrive less often and later, and the
+  // rebuy is at the first arrival's ACTUAL price — so trend growth during the wait is
+  // embedded, and a deep target hit years out can still cost coins (the honest part).
+  var TARGET_TREND_POS = 0.36;   // 'below trend' zone boundary (positionLabel)
+  var TARGET_FLOOR_POS = 0.18;   // 'near the floor' zone boundary (positionLabel)
+  function targetThreshold(P, target) {
+    if (target === 'trend') return TARGET_TREND_POS;
+    if (target === 'floor') return TARGET_FLOOR_POS;
+    return P - DROP;             // 'first' (default): first lower entry, relative to the sell
+  }
+
+  // Per-entry: did the rebuy target arrive within 2yr, and did the round trip get MORE
+  // Bitcoin? how deep did price fall? "BTC acquired" = 1/price, so a lower price = more
+  // coins for the same dollars. `target` omitted → the pre-v3.2 first-lower-entry rule.
+  function entryMetrics(i, target) {
     var d0 = S[i].d, p0 = S[i].p, P = S[i].pos, end = d0 + WAIT_CAP;
+    var thr = targetThreshold(P, target);
     var waitPrice = null, waitDay = null, arrived = false, j;
-    for (j = i + 1; j < N && S[j].d <= end; j++) { if (S[j].pos <= P - DROP) { waitPrice = S[j].p; waitDay = S[j].d; arrived = true; break; } }
-    if (!arrived) { waitPrice = realPriceAt(end); waitDay = end; }   // waiting failed → deploy at the 2yr price
+    for (j = i + 1; j < N && S[j].d <= end; j++) { if (S[j].pos <= thr) { waitPrice = S[j].p; waitDay = S[j].d; arrived = true; break; } }
+    if (!arrived) { waitPrice = realPriceAt(end); waitDay = end; }   // target never came → deploy at the 2yr price
     var ratio = p0 / waitPrice;                                      // coins(wait)/coins(now) = (1/waitPrice)/(1/p0)
     var trough = p0; for (j = i + 1; j < N && S[j].d <= end; j++) if (S[j].p < trough) trough = S[j].p;
-    var depth = trough / p0 - 1;                                     // ≤ 0
+    var depth = trough / p0 - 1;                                     // ≤ 0 (target-independent)
     return { i: i, d0: d0, p0: p0, P: P, waitPrice: waitPrice, waitDay: waitDay, ratio: ratio, paid: ratio > 1, arrived: arrived, waitLen: arrived ? (waitDay - d0) : null, depth: depth, hadDD: depth <= -DD_THRESH };
   }
 
   // Metrics over a sliding band around position P (widen if a high/sparse band is thin).
-  function bandMetrics(P) {
+  // The neighbourhood SET depends only on the sell position P; the per-entry OUTCOME
+  // depends on the target. Default target reproduces the pre-v3.2 output exactly.
+  function bandMetrics(P, target) {
     var half = 0.075, set = [], t;
     for (t = 0; t < 8; t++) { set = elig.filter(function (i) { return Math.abs(S[i].pos - P) <= half; }); if (set.length >= 8) break; half += 0.03; }
     if (!set.length) return null;
-    var M = set.map(entryMetrics), n = M.length;
+    var M = set.map(function (i) { return entryMetrics(i, target); }), n = M.length;
     var arrivedLens = M.filter(function (m) { return m.arrived; }).map(function (m) { return m.waitLen; });
     return {
       n: n, half: half,

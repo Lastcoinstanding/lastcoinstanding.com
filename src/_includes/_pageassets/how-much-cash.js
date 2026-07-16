@@ -75,8 +75,8 @@
   function spot() { return _spot; }
   function livePos() { return posOf(spot(), todayD); }         // today's TRUE channel position
 
-  var DEFAULTS = { share: 25, tax: 15, pos: null, stack: null };
-  var S_ = { share: 25, tax: 15, pos: null, stack: null };     // pos: null = today; else a channel position
+  var DEFAULTS = { share: 25, tax: 15, pos: null, stack: null, rebuy: 'first' };
+  var S_ = { share: 25, tax: 15, pos: null, stack: null, rebuy: 'first' };  // pos: null = today; rebuy: first|trend|floor
   function curPos() { return (S_.pos == null) ? livePos() : clampPos(S_.pos); }
 
   // ── Format ──
@@ -85,6 +85,7 @@
   function mult(v) { return v.toFixed(2) + '×'; }
   function usdFull(v) { return '$' + Math.round(v).toLocaleString(); }
   function btc(v) { return (Math.abs(v) >= 100 ? v.toFixed(1) : v.toFixed(3)) + ' BTC'; }
+  function stackFmt(v) { return (+v.toFixed(v >= 100 ? 1 : 2)).toString(); }   // "11.6", "10", "1.5"
   function fmtWait(days) {
     if (days == null) return '—';
     if (days < 1.5 * YEAR_D) return Math.max(1, Math.round(days / MONTH_D)) + ' months';
@@ -110,10 +111,10 @@
     var pos = isToday ? livePos() : clampPos(st.pos);
     var P = isToday ? spot() : ratioOf(pos) * trend;   // == spot at the today position
     var mlt = P / trend;                               // == ratioOf(pos)
-    var m = bandMetrics(matchPos(pos));                // ← WODN's machinery, unmodified
+    var m = bandMetrics(matchPos(pos), st.rebuy);      // ← WODN's machinery + v3.2 rebuy target
     var t = st.tax / 100, x = st.share / 100;
 
-    if (!m) return { pos: pos, P: P, trend: trend, mult: mlt, isToday: isToday, m: null, t: t, x: x, tax: st.tax, share: st.share, stack: st.stack };
+    if (!m) return { pos: pos, P: P, trend: trend, mult: mlt, isToday: isToday, m: null, t: t, x: x, tax: st.tax, share: st.share, stack: st.stack, rebuy: st.rebuy };
 
     // Per-entry after-tax outcome. ratio is WODN's P/P_rebuy exactly.
     var outcomes = m.metrics.map(function (e) {
@@ -134,15 +135,22 @@
     var endSharePct = x * medianRT * 100;                       // what the sold slice became
     var medianDisc = m.condRatio != null ? (1 - 1 / m.condRatio) * 100 : null;
     var breakevenDisc = t * 100;                                // rebuy must be >t% lower
+    var arrivalPct = 100 - m.never;                             // % where the target arrived within 2y
+    // Whole-stack outcome: C·(1 + x·(medianRT − 1)) = the coins you end with after the round trip.
+    var hasStack = (st.stack != null && isFinite(st.stack) && st.stack > 0);
+    var newStack = hasStack ? st.stack * (1 + x * (medianRT - 1)) : null;
+    var cardCVal = hasStack ? newStack : medianRT;             // the ONE number Card C displays
 
     return {
       pos: pos, P: P, trend: trend, mult: mlt, isToday: isToday,
-      m: m, t: t, x: x, tax: st.tax, share: st.share, stack: st.stack,
+      m: m, t: t, x: x, tax: st.tax, share: st.share, stack: st.stack, rebuy: st.rebuy,
       n: m.n, half: m.half,
       // Every quantity the page DISPLAYS is a named field here (screenshot-6 discipline).
       hit: hit, missPct: 100 - hit, hitAfterTax: hitAfterTax, never: m.never,
+      arrivalPct: arrivalPct, hasStack: hasStack, newStack: newStack, cardCVal: cardCVal,
       medianRatio: medianRatio, medianRT: medianRT, condRatio: m.condRatio,
-      medianDisc: medianDisc, breakevenDisc: breakevenDisc,
+      medianDisc: medianDisc, medianDiscAbs: (medianDisc == null ? null : Math.abs(medianDisc)),
+      breakevenDisc: breakevenDisc,
       typicalWait: m.waitLen, medianEnd: medianEnd, endSharePct: endSharePct,
       outcomes: outcomes,
       alarm: st.share > ALARM_AT,
@@ -156,25 +164,26 @@
   // The insight chart's curve — same compute() shape, swept across position.
   // Depends ONLY on the tax rate (not the share or the position), so the
   // expensive neighborhood sweep is cached and the tax applied on top.
-  var _rawCurve = null;
-  function rawCurve() {
-    if (_rawCurve) return _rawCurve;
+  var _rawCurve = {};                 // v3.2: cached per rebuy target (still tax-free; tax on top)
+  function rawCurve(target) {
+    var key = target || 'first';
+    if (_rawCurve[key]) return _rawCurve[key];
     var pts = [], p;
     for (p = -0.05; p <= 1.001; p += 0.025) {
-      var m = bandMetrics(p);
+      var m = bandMetrics(p, target);
       if (!m || m.ratio == null) continue;
       pts.push({ x: p, ratio: m.ratio, n: m.n });
     }
-    _rawCurve = pts;
+    _rawCurve[key] = pts;
     return pts;
   }
   function curveFor(st) {
     var f = 1 - st.tax / 100;
-    return rawCurve().map(function (p) { return { x: p.x, y: f * p.ratio, n: p.n }; });
+    return rawCurve(st.rebuy).map(function (p) { return { x: p.x, y: f * p.ratio, n: p.n }; });
   }
   // Today's point on the insight curve — where the pulse/static dot sits.
-  function todayCurvePoint(tax) {
-    var lp = livePos(), m = bandMetrics(matchPos(lp));
+  function todayCurvePoint(tax, target) {
+    var lp = livePos(), m = bandMetrics(matchPos(lp), target);
     if (!m || m.ratio == null) return null;
     return { x: lp, y: (1 - tax / 100) * m.ratio };
   }
@@ -213,11 +222,13 @@
     // e.g. hcMiss only in the floor card) are skipped.
     var live = (st === S_), mism = [], dom = {};
     if (live) {
+      var cardCTol = c.hasStack ? (Math.abs(c.cardCVal) >= 100 ? 0.06 : 0.011) : 0.006;
       var bindings = [
-        { id: 'hcCardA',     field: 'hitAfterTax', round: true },
-        { id: 'hcMiss',      field: 'missPct',     round: true },
-        { id: 'hcCardBDisc', field: 'medianDisc',  round: true },
-        { id: 'hcCardCMult', field: 'medianRT',    tol: 0.006 }
+        { id: 'hcCardA',       field: 'hitAfterTax',  round: true },
+        { id: 'hcMiss',        field: 'missPct',      round: true },
+        { id: 'hcCardBArrival', field: 'arrivalPct',  round: true },
+        { id: 'hcCardBDisc',   field: 'medianDiscAbs', round: true },   // footer, |discount|
+        { id: 'hcCardCValN',   field: 'cardCVal',     tol: cardCTol }    // round-trip × OR new-stack BTC
       ];
       bindings.forEach(function (b) {
         var shown = num(b.id);
@@ -235,6 +246,7 @@
 
     var res = {
       position: +c.pos.toFixed(4), xTrend: +c.mult.toFixed(3), n: c.n, tax: c.tax, share: c.share,
+      rebuy: c.rebuy, arrivalPct: +c.arrivalPct.toFixed(2), newStack: c.newStack,
       hit: +c.hit.toFixed(2), hitAfterTax: +c.hitAfterTax.toFixed(2),
       medianRatio: +c.medianRatio.toFixed(4), medianRT: +c.medianRT.toFixed(4),
       branch: c.branch, alarm: c.alarm,
@@ -275,17 +287,32 @@
       note.innerHTML = txt;
     }
 
-    // Card B — the pair: rebuy discount · typical wait (Question Three's answer).
-    var disc = document.getElementById('hcCardBDisc'), wait = document.getElementById('hcCardBWait');
-    if (disc) disc.innerHTML = (c.medianDisc == null) ? 'no dip' : (Math.round(c.medianDisc) + '%');
+    // Card B — the arrival pair (v3.2): ARRIVAL % · TYPICAL WAIT. The rebuy discount
+    // moves to the footer, sign-aware: a deep target hit years out can rebuy ABOVE the
+    // sale because the trend compounded during the wait — the honesty the feature exists for.
+    var arr = document.getElementById('hcCardBArrival'), wait = document.getElementById('hcCardBWait');
+    if (arr) arr.textContent = Math.round(c.arrivalPct) + '%';
     if (wait) wait.textContent = (c.typicalWait == null) ? '—' : fmtWait(c.typicalWait);
+    var foot = document.getElementById('hcCardBFoot');
+    if (foot) {
+      if (c.medianDisc == null) foot.innerHTML = 'The target rarely arrived here &mdash; historical, not a forecast.';
+      else if (c.medianDisc >= 0) foot.innerHTML = 'When it arrived, the rebuy was typically <strong id="hcCardBDisc">' + Math.round(c.medianDisc) + '</strong>% below your sale &mdash; not a forecast.';
+      else foot.innerHTML = 'When it arrived, the rebuy was typically <strong id="hcCardBDisc">' + Math.round(-c.medianDisc) + '</strong>% <em>above</em> your sale (the trend rose while you waited) &mdash; not a forecast.';
+    }
 
-    // Card C — coins back per coin sold, after tax.
-    var cm = document.getElementById('hcCardCMult');
-    if (cm) cm.textContent = c.medianRT.toFixed(2) + '×';
-    var cl = document.getElementById('hcCardCLine');
-    if (cl) cl.innerHTML = 'per coin sold after ' + c.tax + '% tax &mdash; turning <strong>' + c.share +
-      '%</strong> of the stack into roughly <strong>' + c.endSharePct.toFixed(0) + '%</strong>.';
+    // Card C — NEW STACK when the stack field is set, else ROUND TRIP. hcCardCValN wraps
+    // the ONE outcome number (BTC or ×) so QA reads it clean past the "10 →" prefix.
+    var ccap = document.getElementById('hcCardCCap'), cval = document.getElementById('hcCardCVal'), cl = document.getElementById('hcCardCLine');
+    if (c.hasStack) {
+      if (ccap) ccap.textContent = 'New stack';
+      if (cval) cval.innerHTML = stackFmt(c.stack) + ' &rarr; <span id="hcCardCValN">' + stackFmt(c.newStack) + '</span> BTC';
+      if (cl) cl.innerHTML = 'after ' + c.tax + '% tax, at these settings.';
+    } else {
+      if (ccap) ccap.textContent = 'Round trip';
+      if (cval) cval.innerHTML = '<span id="hcCardCValN">' + c.medianRT.toFixed(2) + '</span>&times;';
+      if (cl) cl.innerHTML = 'coins back per coin sold &mdash; turning <strong>' + c.share +
+        '%</strong> of the stack into roughly <strong>' + c.endSharePct.toFixed(0) + '%</strong>.';
+    }
   }
 
   // One-sentence synthesized verdict above the cards — no number lives here (the
@@ -352,17 +379,22 @@
       ' of this position (post-2014, each with a full two-year forward record). Historical, at this position &mdash; not a prediction.';
   }
 
+  function targetName(rebuy) { return rebuy === 'trend' ? 'below trend' : (rebuy === 'floor' ? 'near the floor' : 'the first lower entry'); }
   function renderEndnote(c) {
     var el = document.getElementById('hcEndnote'); if (!el) return;
-    el.innerHTML = 'Your settings: ' + c.share + '% cash share · ' + c.tax + '% tax · position ' +
+    var tgt = targetName(c.rebuy);
+    var ruleTxt = c.rebuy === 'first' ? 'the first lower entry within two years'
+                : 'the first time price reaches ' + tgt + ' within two years';
+    el.innerHTML = 'Your settings: ' + c.share + '% cash · ' + (100 - c.share) + '% coins · ' + c.tax + '% tax · rebuy at ' + tgt +
+      (c.hasStack ? ' · ' + stackFmt(c.stack) + ' BTC stack' : '') + ' · position ' +
       c.mult.toFixed(2) + '× trend · ' + positionLabel(c.pos) + (c.isToday ? ' (today)' : '') + ' · ' +
-      c.n + ' historical entries. Rebuy rule: the first lower entry within two years, else the two-year price.';
+      c.n + ' historical entries. Rebuy rule: ' + ruleTxt + ', else the two-year price.';
   }
 
   // Insight-chart caption — today-focused, explains the glow/dot.
   function renderInsightNote(c) {
     var el = document.getElementById('hcInsightNote'); if (!el) return;
-    var tp = todayCurvePoint(c.tax);
+    var tp = todayCurvePoint(c.tax, c.rebuy);
     if (!tp) { el.innerHTML = 'Median coins back per coin sold, by channel position, after ' + c.tax + '% tax.'; return; }
     var live = todayPriceIsLive(_priceSource);
     el.innerHTML = (live ? 'The glowing point is <strong>today</strong>' : 'The dot is <strong>today</strong> (latest monthly data)') +
@@ -416,7 +448,7 @@
     id: 'hcInsightPulse',
     afterRender: function (ch) {
       var el = document.getElementById('hcInsightPulse'); if (!el) return;
-      var tp = todayCurvePoint(S_.tax);
+      var tp = todayCurvePoint(S_.tax, S_.rebuy);
       if (!tp || !ch.scales || !ch.scales.x || !ch.scales.y) { el.classList.remove('is-visible'); return; }
       var x = ch.scales.x.getPixelForValue(tp.x), y = ch.scales.y.getPixelForValue(tp.y), area = ch.chartArea;
       if (x < area.left - 4 || x > area.right + 4 || y < area.top - 4 || y > area.bottom + 4) { el.classList.remove('is-visible'); return; }
@@ -462,7 +494,13 @@
             titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10,
             callbacks: {
               title: function (it) { return it.length ? ratioOf(it[0].parsed.x).toFixed(2) + '× trend · ' + positionLabel(it[0].parsed.x) : ''; },
-              label: function (it) { return it.parsed.y.toFixed(2) + '× coins back per coin sold'; }
+              label: function (it) {
+                var base = it.parsed.y.toFixed(2) + '× coins back per coin sold';
+                // Identify the blue dot: its x is chart.$hl.x; the tooltip fires at the
+                // nearest curve sample (≤0.0125 away), which is exactly where the dot sits.
+                if (chart && chart.$hl && Math.abs(it.parsed.x - chart.$hl.x) < 0.014) return [base, '◆ Selected position (the blue dot)'];
+                return base;
+              }
             }
           }
         }
@@ -619,6 +657,8 @@
     var n = document.getElementById('hcShareNum'), s = document.getElementById('hcShareSlider');
     if (from !== 'num' && n) n.value = S_.share;
     if (from !== 'slider' && s) s.value = String(S_.share);
+    var split = document.getElementById('hcSplitReadout');   // one stack, two forms
+    if (split) split.innerHTML = '<strong>' + (100 - S_.share) + '%</strong> coins · <strong>' + S_.share + '%</strong> cash';
     setSeg('hcSharePresets', S_.share);
   }
   function setSeg(groupId, value) {
@@ -639,6 +679,7 @@
       // is out of range — treat it as "today" rather than clamping it to the upper band.
       if (isFinite(v) && v >= POS_MIN - 0.001 && v <= POS_MAX + 0.001) S_.pos = clampPos(v);
     }
+    if (p.has('rebuy')) { var rv = p.get('rebuy'); if (['first', 'trend', 'floor'].indexOf(rv) >= 0) S_.rebuy = rv; }
     if (p.has('stack')) { v = parseFloat(p.get('stack')); if (isFinite(v) && v > 0) S_.stack = v; }
     // v2's params (exp, buf, shock, hz, yld, depth, btc, dep, cy, rec) are retired.
   }
@@ -651,6 +692,7 @@
       p.set('share', String(S_.share));
       if (S_.tax !== DEFAULTS.tax) p.set('tax', String(S_.tax));
       if (S_.pos != null) p.set('pos', String(Math.round(S_.pos * 1000) / 1000));
+      if (S_.rebuy && S_.rebuy !== DEFAULTS.rebuy) p.set('rebuy', S_.rebuy);
       if (S_.stack) p.set('stack', String(S_.stack));
       window.history.replaceState(null, '', window.location.pathname + '?' + p.toString() + window.location.hash);
     }, 250);
@@ -676,6 +718,7 @@
   function initControls() {
     var st = document.getElementById('hcStack'); if (st && S_.stack) st.value = S_.stack;
     setSeg('hcTax', S_.tax);
+    setSeg('hcRebuy', S_.rebuy);
     syncShare();
   }
   function wire() {
@@ -691,6 +734,10 @@
     on('hcTax', 'click', function (e) {
       var b = e.target.closest('[data-val]'); if (!b) return;
       S_.tax = parseInt(b.getAttribute('data-val'), 10); setSeg('hcTax', S_.tax); renderAll();
+    });
+    on('hcRebuy', 'click', function (e) {
+      var b = e.target.closest('[data-val]'); if (!b) return;
+      S_.rebuy = b.getAttribute('data-val'); setSeg('hcRebuy', S_.rebuy); renderAll();
     });
     on('hcStack', 'input', function () { var v = parseFloat(this.value); S_.stack = (isFinite(v) && v > 0) ? v : null; renderAll(); });
     on('hcPosSlider', 'input', function () { S_.pos = sliderToPos(parseInt(this.value, 10)); renderAll(); });

@@ -63,6 +63,7 @@ body { background: var(--bg); color: var(--text); }
 .hc-sharp a, .hc-sharp a:visited,
 .hc-slider-caption a, .hc-slider-caption a:visited,
 .hc-rule-note a, .hc-rule-note a:visited,
+.hc-couple-note a, .hc-couple-note a:visited,
 .hero .hero-subtitle a, .hero .hero-subtitle a:visited,
 .hero .subtitle a:visited {
   color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4);
@@ -70,7 +71,7 @@ body { background: var(--bg); color: var(--text); }
 .hc-prose a:hover, .section-intro a:hover, .hc-lead a:hover, .hc-control-note a:hover,
 .hc-endnote a:hover, .hc-readout a:hover, .hc-zone-strip a:hover, .hc-verdict a:hover,
 .hc-tax-line a:hover, .hc-tax-rec a:hover, .hc-alarm a:hover, .hc-sharp a:hover,
-.hc-slider-caption a:hover, .hc-rule-note a:hover,
+.hc-slider-caption a:hover, .hc-rule-note a:hover, .hc-couple-note a:hover,
 .hero .hero-subtitle a:hover, .hero .subtitle a:hover {
   color: #f2b25a; border-bottom-color: rgba(224,148,34,0.7);
 }
@@ -110,9 +111,9 @@ body { background: var(--bg); color: var(--text); }
 /* ── Chart wrap (non-interactive now — the slider drives position) ── */
 .hc-chart-wrap { position: relative; height: 380px; margin: 1.2rem 0; }
 .hc-readout { padding: 0.8rem 0.9rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 5px; background: rgba(255,255,255,0.02); font-family: var(--font-b); font-size: 0.82rem; line-height: 1.55; color: var(--text-dim); }
-.hc-zone-strip { max-width: 880px; margin: 0.8rem auto 0; padding: 0.6rem 0.9rem; border-left: 2px solid rgba(255,255,255,0.15); font-family: var(--font-b); font-size: 0.78rem; color: var(--text-muted); }
+.hc-zone-strip { max-width: 880px; margin: 0.55rem auto 0; padding: 0.6rem 0.9rem; border-left: 2px solid rgba(255,255,255,0.15); font-family: var(--font-b); font-size: 0.78rem; color: var(--text-muted); }
 
-.hc-endnote { max-width: 880px; margin: 0.8rem auto; font-family: var(--font-b); font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
+.hc-endnote { max-width: 880px; margin: 0.55rem auto; font-family: var(--font-b); font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
 
 .hc-note { font-family: var(--font-b); font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; margin: 0.8rem 0 0; }
 
@@ -166,7 +167,7 @@ body { background: var(--bg); color: var(--text); }
 .hc-alarm p { font-family: var(--font-b); font-size: 0.85rem; line-height: 1.65; color: var(--text-dim); margin: 0; }
 
 /* ── Readouts ── */
-.hc-readout { max-width: 880px; margin: 0.8rem auto 0; }
+.hc-readout { max-width: 880px; margin: 0.55rem auto 0; }
 .hc-sample { display: block; margin-top: 0.5rem; font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
 .hc-gain { color: #6fae6f; }
 .hc-loss { color: #e08a7a; }
@@ -209,29 +210,40 @@ body { background: var(--bg); color: var(--text); }
 .hc-pos-readout em { color: var(--accent); font-style: italic; }
 
 /* ── Channel chart block + caption ── */
-.hc-chart-block { margin: 1.2rem 0 0.6rem; }
+.hc-chart-block { margin: 0.9rem 0 0.5rem; }
 .hc-chart-caption { font-family: var(--font-b); font-size: 0.78rem; color: var(--text-dim); margin: 0.55rem 0 0; line-height: 1.5; text-align: center; }
 .hc-chart-caption strong { color: var(--text); font-weight: 600; }
 
-/* ── The verdict, as blocks (WODN's card row, HMC's quantities) ── */
-.hc-rule-note { font-family: var(--font-b); font-size: 0.8rem; line-height: 1.55; color: var(--text-muted); max-width: 44rem; margin: 1.3rem auto 0; text-align: center; }
+/* ── Decision #2: the rebuy target control + its copy ── */
+.hc-rebuy-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem 0.9rem; margin: 1rem 0 0; }
+.hc-rebuy-label { font-family: var(--font-b); font-size: 0.85rem; font-weight: 600; color: var(--text-dim); display: inline-flex; align-items: center; }
+.hc-seg-rebuy button { min-width: 0; }
+/* v3.2 §5: full-width, small, left-aligned — target ≤2 lines at desktop (not a narrow centered column) */
+.hc-rule-note { font-family: var(--font-b); font-size: 0.76rem; line-height: 1.5; color: var(--text-muted); max-width: none; margin: 0.7rem 0 0; text-align: left; }
 .hc-rule-note strong { color: var(--text-dim); font-weight: 600; }
-.hc-verdict-lead { font-family: var(--font-h); font-size: 1.15rem; line-height: 1.4; color: var(--text); text-align: center; max-width: 40rem; margin: 1rem auto 0.4rem; }
+.hc-couple-note { font-family: var(--font-b); font-size: 0.74rem; line-height: 1.5; color: var(--text-muted); margin: 0.35rem 0 0; text-align: left; }
+
+/* One stack, two forms — the split readout */
+.hc-split-readout { font-family: var(--font-b); font-size: 0.8rem; color: var(--text-dim); margin: 0.5rem 0 0.2rem; font-variant-numeric: tabular-nums; }
+.hc-split-readout strong { color: var(--text); font-weight: 600; }
+
+/* ── The verdict, as blocks (WODN's card row, HMC's quantities) — v3.2 tightened ── */
+.hc-verdict-lead { font-family: var(--font-h); font-size: 1.08rem; line-height: 1.4; color: var(--text); text-align: center; max-width: 40rem; margin: 0.8rem auto 0.3rem; }
 .hc-verdict-lead-floor { color: #e6b8b0; }
 .hc-verdict-lead-costs { color: #f0c8a0; }
 .hc-verdict-lead-pays  { color: #cfe0cf; }
 .hc-verdict-lead-wash  { color: var(--text-dim); }
 
-.hc-cards { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.3fr) minmax(0, 0.9fr); gap: 1rem; align-items: stretch; margin: 0.8rem 0 0.4rem; }
-.hc-card { background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem 1.1rem; display: flex; flex-direction: column; justify-content: center; }
+.hc-cards { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.3fr) minmax(0, 0.9fr); gap: 0.8rem; align-items: stretch; margin: 0.4rem 0 0.3rem; }
+.hc-card { background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 10px; padding: 0.7rem 0.9rem; display: flex; flex-direction: column; justify-content: center; }
 
 /* Card A — the big one */
 .hc-card-hero { text-align: center; }
-.hc-card-num { font-family: var(--font-h); font-size: clamp(2.4rem, 5.5vw, 3.4rem); font-weight: 600; line-height: 1; letter-spacing: -.02em; color: #f2eee8; font-variant-numeric: tabular-nums; }
-.hc-card-num-sm { font-size: clamp(1.9rem, 4.5vw, 2.6rem); }
-.hc-card-lead { font-family: var(--font-b); font-size: 0.82rem; line-height: 1.5; color: var(--text-dim); margin: 0.5rem auto 0; }
+.hc-card-num { font-family: var(--font-h); font-size: clamp(2.1rem, 5vw, 3rem); font-weight: 600; line-height: 1; letter-spacing: -.02em; color: #f2eee8; font-variant-numeric: tabular-nums; }
+.hc-card-num-sm { font-size: clamp(1.7rem, 4vw, 2.3rem); }
+.hc-card-lead { font-family: var(--font-b); font-size: 0.8rem; line-height: 1.45; color: var(--text-dim); margin: 0.4rem auto 0; }
 .hc-card-lead strong { color: var(--text); font-weight: 600; }
-.hc-card-note { font-family: var(--font-h); font-size: 1.02rem; line-height: 1.4; margin: 0.6rem auto 0; color: var(--text); }
+.hc-card-note { font-family: var(--font-h); font-size: 1.0rem; line-height: 1.38; margin: 0.5rem auto 0; color: var(--text); }
 .hc-card-note strong { font-weight: 600; }
 .hc-card-hero-pays  { border-color: rgba(111,174,111,0.4);  background: rgba(111,174,111,0.06); }
 .hc-card-hero-wash  { border-color: var(--text-muted); }
@@ -242,26 +254,29 @@ body { background: var(--bg); color: var(--text); }
 .hc-card-note-floor { color: #e6b8b0; }
 .hc-card-note-wash  { color: var(--text-dim); }
 
-/* Card B — the pair (rebuy discount · typical wait) */
+/* Card B — the arrival pair (v3.2 tightened) */
 .hc-card-pair { padding: 0; overflow: hidden; }
 .hc-card-pair-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; flex: 1; }
-.hc-card-half { padding: 0.85rem 1rem; text-align: center; display: flex; flex-direction: column; justify-content: center; }
-.hc-card-divider { width: 1px; background: var(--border); margin: 0.7rem 0; }
-.hc-card-cap { font-family: var(--font-b); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.35rem; }
-.hc-card-half-num { font-family: var(--font-h); font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 600; line-height: 1; letter-spacing: -.01em; color: #f2eee8; font-variant-numeric: tabular-nums; }
-.hc-card-half-sub { font-family: var(--font-b); font-size: 0.72rem; line-height: 1.45; color: var(--text-dim); margin: 0.35rem auto 0; max-width: 15rem; }
+.hc-card-half { padding: 0.6rem 0.8rem; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+.hc-card-divider { width: 1px; background: var(--border); margin: 0.55rem 0; }
+.hc-card-cap { font-family: var(--font-b); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.3rem; }
+.hc-card-half-num { font-family: var(--font-h); font-size: clamp(1.5rem, 3.8vw, 2rem); font-weight: 600; line-height: 1; letter-spacing: -.01em; color: #f2eee8; font-variant-numeric: tabular-nums; }
+.hc-card-half-sub { font-family: var(--font-b); font-size: 0.72rem; line-height: 1.42; color: var(--text-dim); margin: 0.3rem auto 0; max-width: 15rem; }
 .hc-card-half-sub strong { color: var(--text); font-weight: 600; }
-.hc-card-foot { font-family: var(--font-b); font-size: 0.72rem; line-height: 1.5; color: var(--text-muted); margin: 0; padding: 0.5rem 1rem; border-top: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+.hc-card-foot { font-family: var(--font-b); font-size: 0.72rem; line-height: 1.45; color: var(--text-muted); margin: 0; padding: 0.45rem 0.85rem; border-top: 1px solid var(--border); background: rgba(255,255,255,0.02); }
 .hc-card-foot strong { color: var(--text-dim); font-weight: 600; }
+.hc-card-foot em { color: var(--accent); font-style: italic; }
 
-/* Card C — coins back */
+/* Card C — round trip / new stack */
 .hc-card-c { text-align: center; }
+.hc-card-c .hc-card-cap { margin-bottom: 0.35rem; }
 .hc-card-c .hc-card-half-sub { max-width: 17rem; }
 
 /* Provenance caption + secondary reads */
-.hc-provenance { font-family: var(--font-b); font-size: 0.76rem; color: var(--text-muted); line-height: 1.55; margin: 0.9rem auto 0; max-width: 880px; text-align: center; }
+.hc-provenance { font-family: var(--font-b); font-size: 0.76rem; color: var(--text-muted); line-height: 1.5; margin: 0.6rem auto 0; max-width: 880px; text-align: center; }
 .hc-provenance strong { color: var(--text-dim); font-weight: 600; }
 .hc-endnote-insight { text-align: center; }
+.hc-insight-caption { margin-top: 0.5rem; }
 
 /* ═══ Canonical "you are here" pulse halo (STYLE_GUIDE §6.23, lcs-pulse-halo) ═══
    Lifted verbatim from the Gallery. Marks TODAY's channel position on the insight

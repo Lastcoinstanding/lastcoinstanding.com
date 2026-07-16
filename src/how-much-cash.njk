@@ -54,7 +54,7 @@ eleventyComputed:
   <section class="hc-section" id="playground">
     <div class="hc-eyebrow">The tool</div>
     <h2 class="hc-h2">Where you are decides</h2>
-    <p class="hc-lead hc-playground-sub">Raising cash is selling. Whether that has historically been a good or a terrible idea depends almost entirely on where in the <a href="/the-power-law">Power Law channel</a> you did it. Set a cash share and a tax rate, then drag the slider to any position &mdash; the dashed line and blue dots on the chart move with it, and the verdict below follows from it.</p>
+    <p class="hc-lead hc-playground-sub">Raising cash is selling &mdash; converting part of one stack into its other form, not setting money aside from it. Whether that has historically been a good or a terrible idea depends almost entirely on where in the <a href="/the-power-law">Power Law channel</a> you did it. Set the split and a tax rate, then drag the slider to any sell position &mdash; the dashed line and blue dots on the chart move with it, and the verdict below follows from it.</p>
 
     <div class="hc-calc">
       <!-- 1 ── INPUTS ROW (moved above everything interactive) ── -->
@@ -66,17 +66,19 @@ eleventyComputed:
       <div class="hc-levers">
         <div class="hc-lever hc-lever-primary">
           <div class="hc-primary-head">
-            <span class="hc-primary-label">Cash share
-              <span class="help-tip" tabindex="0">?<span class="tip-content">The share of your stack you sell to hold as cash. This is the page's primary lever; the verdict is a share of the stack, so it does not depend on how big the stack is.</span></span>
+            <span class="hc-primary-label">Your stack, split
+              <span class="help-tip" tabindex="0">?<span class="tip-content">One stack, two forms: the share you convert to cash for the round trip; the rest stays coins. The verdict is a share of the stack, so it does not depend on how big the stack is.</span></span>
             </span>
-            <span class="hc-primary-val"><input type="number" id="hcShareNum" min="0" max="100" step="1" aria-label="Cash share, percent of stack"><span class="hc-primary-suffix">% of stack</span></span>
+            <span class="hc-primary-val"><input type="number" id="hcShareNum" min="0" max="100" step="1" aria-label="Share of the stack converted to cash, percent"><span class="hc-primary-suffix">% to cash</span></span>
           </div>
-          <input type="range" id="hcShareSlider" class="hc-range" min="0" max="100" step="1" aria-label="Cash share, percent of stack">
+          <input type="range" id="hcShareSlider" class="hc-range" min="0" max="100" step="1" aria-label="Share of the stack converted to cash, percent">
+          <div class="hc-split-readout" id="hcSplitReadout">&mdash;</div>
           <div class="hc-seg" id="hcSharePresets">
             <button type="button" data-val="10">10%</button>
             <button type="button" data-val="25">25%</button>
             <button type="button" data-val="50">50%</button>
           </div>
+          <p class="hc-control-note">One stack, two forms: the share you hold as cash, ready &mdash; the rest stays coins. Same monetary energy, split for the round trip.</p>
         </div>
 
         <div class="hc-lever">
@@ -113,6 +115,20 @@ eleventyComputed:
         <p class="hc-slider-caption">Drag to explore other positions, or <a href="#" id="hcSnapToday">snap back to today</a>. Every figure is <strong>historical, at this position</strong> &mdash; not a prediction. <span class="hc-pos-readout" id="hcPosReadout">&mdash;</span></p>
       </div>
 
+      <!-- decision #2: the rebuy target (the redeploy side of the round trip) -->
+      <div class="hc-rebuy-row">
+        <span class="hc-rebuy-label">Then rebuy at
+          <span class="help-tip" tabindex="0">?<span class="tip-content">The redeploy &mdash; decision two of the round trip. How far you wait for the cash to come back into coins. Deeper targets pay bigger multiples when they arrive, arrive less often, and take longer; the stats carry all of it.</span></span>
+        </span>
+        <div class="hc-seg hc-seg-rebuy" id="hcRebuy">
+          <button type="button" data-val="first">First lower entry</button>
+          <button type="button" data-val="trend">Below trend</button>
+          <button type="button" data-val="floor">Near the floor</button>
+        </div>
+      </div>
+      <p class="hc-rule-note">The rebuy side is yours to set: the default is <a href="/wait-or-deploy-now">Wait-or-Deploy</a>&rsquo;s rule &mdash; the first lower entry within two years, no timing, no discretion. Choose a deeper target and the stats change honestly: bigger multiples when it arrives, arriving less often, after longer waits &mdash; while the trend compounds under the cash. If the target never comes, the cash rebuys at the two-year price, sometimes higher than you sold.</p>
+      <p class="hc-couple-note">Deciding the redeploy on its own &mdash; cash in hand, no round trip &mdash; is <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a>&rsquo;s question; this page couples the two ends of the same trade.</p>
+
       <!-- 3 ── THE CHANNEL CHART (dashed selected line + blue entry dots) ── -->
       <div class="hc-chart-block">
         <div class="hc-chart-wrap chart-wrapper" data-chart-copy data-chart-heading="#playground .hc-h2" data-chart-sub="#playground .hc-playground-sub" data-chart-assump="#hcEndnote" data-chart-title="Where you are decides">
@@ -122,7 +138,6 @@ eleventyComputed:
       </div>
 
       <!-- 4 ── THE VERDICT, AS BLOCKS ── -->
-      <p class="hc-rule-note">The rebuy rule is fixed, the same one <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a> uses to measure waiting: the cash rebuys at the <strong>first lower entry within two years</strong>, and at the two-year price if none arrives &mdash; no timing, no discretion. If the dip never comes, you buy back at whatever two years later costs, sometimes more than you sold for.</p>
       <p class="hc-verdict-lead" id="hcVerdictLead">&mdash;</p>
 
       <div class="hc-cards">
@@ -133,28 +148,28 @@ eleventyComputed:
           <p class="hc-card-note" id="hcCardANote">&mdash;</p>
         </div>
 
-        <!-- Card B — the pair (rebuy discount · typical wait) = Question Three's answer -->
+        <!-- Card B — the arrival pair (arrival % · typical wait); discount in the footer -->
         <div class="hc-card hc-card-pair">
           <div class="hc-card-pair-row">
             <div class="hc-card-half">
-              <div class="hc-card-cap">Rebuy discount</div>
-              <div class="hc-card-half-num" id="hcCardBDisc">&mdash;</div>
-              <p class="hc-card-half-sub">median below the entry, when a dip came.</p>
+              <div class="hc-card-cap">Arrival</div>
+              <div class="hc-card-half-num" id="hcCardBArrival">&mdash;</div>
+              <p class="hc-card-half-sub">of sells here saw the target within two years.</p>
             </div>
             <div class="hc-card-divider" aria-hidden="true"></div>
             <div class="hc-card-half">
               <div class="hc-card-cap">Typical wait</div>
               <div class="hc-card-half-num" id="hcCardBWait">&mdash;</div>
-              <p class="hc-card-half-sub">to that first lower entry, if one arrived.</p>
+              <p class="hc-card-half-sub">to the target, when it arrived.</p>
             </div>
           </div>
-          <p class="hc-card-foot">Both drawn from history at this position, <strong>not a forecast</strong>.</p>
+          <p class="hc-card-foot" id="hcCardBFoot">&mdash;</p>
         </div>
 
-        <!-- Card C — coins back per coin sold, after tax -->
+        <!-- Card C — NEW STACK when the stack is set, else ROUND TRIP (both from compute()) -->
         <div class="hc-card hc-card-c">
-          <div class="hc-card-cap">Coins back</div>
-          <div class="hc-card-num hc-card-num-sm"><span id="hcCardCMult">&mdash;</span></div>
+          <div class="hc-card-cap" id="hcCardCCap">Round trip</div>
+          <div class="hc-card-num hc-card-num-sm" id="hcCardCVal">&mdash;</div>
           <p class="hc-card-half-sub" id="hcCardCLine">&mdash;</p>
         </div>
       </div>
@@ -183,6 +198,7 @@ eleventyComputed:
       <canvas id="hcInsightChart"></canvas>
       <div class="lcs-pulse-halo" id="hcInsightPulse"></div>
     </div>
+    <p class="hc-chart-caption hc-insight-caption">The <strong>blue point</strong> is the position you&rsquo;re exploring &mdash; the same blue as the dashed line on the channel chart above; the <strong>glowing point</strong> is today.</p>
     <p class="hc-endnote hc-endnote-insight" id="hcInsightNote">&mdash;</p>
   </section>
 

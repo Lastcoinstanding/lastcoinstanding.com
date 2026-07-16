@@ -2,6 +2,11 @@
   {
     "display": "7/16/26",
     "page": "/how-much-cash",
+    "summary": "Added: How Much Cash? now lets you set the rebuy target — the second half of the round trip. Leave it on Wait-or-Deploy's default (the first lower entry), or aim deeper: below trend, or near the floor. Deeper targets pay bigger multiples when they arrive, but they arrive less often, take longer, and the trend keeps rising while your cash waits — so the stats can show a deep target that, after tax, still comes back with fewer coins. Enter your stack and the last card shows the whole-stack outcome (10 → 11.6 BTC); leave it blank and it shows the round-trip multiple. The primary lever is now framed as one stack split two ways — the share you hold as cash, the rest in coins."
+  },
+  {
+    "display": "7/16/26",
+    "page": "/how-much-cash",
     "summary": "Reworked: How Much Cash? is now one continuous instrument. Set a cash share and a tax rate, then drag a position slider — the same slider Wait-or-Deploy uses — along the Power Law channel; a dashed line and the blue dots of the historical entries move with it, and the verdict reads out as three cards: how often a trim here left you with more bitcoin, the typical rebuy discount and wait, and the coins that came back per coin sold after tax. The old drag-on-the-chart control is gone. Today's spot now glows on the summary chart when the price is live."
   },
   {
