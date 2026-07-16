@@ -1,5 +1,10 @@
 [
   {
+    "display": "7/16/26",
+    "page": "/how-much-cash",
+    "summary": "Reworked: How Much Cash? is now one continuous instrument. Set a cash share and a tax rate, then drag a position slider — the same slider Wait-or-Deploy uses — along the Power Law channel; a dashed line and the blue dots of the historical entries move with it, and the verdict reads out as three cards: how often a trim here left you with more bitcoin, the typical rebuy discount and wait, and the coins that came back per coin sold after tax. The old drag-on-the-chart control is gone. Today's spot now glows on the summary chart when the price is live."
+  },
+  {
     "display": "7/15/26",
     "page": "/how-much-cash",
     "summary": "Rebuilt: How Much Cash? now answers a sharper question. Raising cash is selling, so pick a share of your stack and a moment in the channel, and see how that trade actually ended across the whole record — how often a cheaper rebuy arrived, and what it bought back after tax."

@@ -1,5 +1,5 @@
 /* =============================================================
-   How Much Cash? — page script (v3 rebuild)
+   How Much Cash? — page script (v3.1: WODN's interaction grammar)
 
    The question: what share of a stack to hold as cash, and where in the
    channel raising it has historically meant MORE bitcoin, not less.
@@ -12,21 +12,29 @@
    page and WODN ever printed different hit rates for one position, one of
    them would be lying.
 
-   SINGLE SOURCE (the screenshot-6 lesson). The shipped v2 page had a verdict
-   quoting 0.109 BTC while its terminal readout showed 0.000, because the
-   verdict re-derived a quantity the ledger had capped. Here EVERY displayed
-   number — verdict, Q3 stats, insight-chart curve and highlight, audit rows,
-   CSV — comes from one compute(state) call per render. Nothing recomputes
-   anything downstream. hcQA() asserts exactly that: it reads the DOM back and
-   compares it to compute()'s own return, so a second source of truth cannot
-   be added without failing QA.
+   v3.1 (JM production review, round 2) — THE INTERACTION now matches WODN too.
+   The undiscoverable drag-the-marker-on-canvas is retired (removed, not hidden).
+   In its place, WODN's actual components, lifted (hc- prefixed, hc token names;
+   the site's convention is per-page CSS/JS, so a shared partial would fight the
+   grain — the shared MATH already lives in channel-entries.js):
+     • the horizontal position slider, ▲ TODAY tick, zone labels, snap-to-today;
+     • the dashed selected-position line on the channel chart;
+     • the blue neighbourhood-entry dots (WODN's selDotPlugin, verbatim shape);
+     • the verdict card row (WODN's card grammar, HMC's quantities).
+   `pos` is now a CHANNEL POSITION (0–1 coord), like WODN's slider state — not
+   the v3 marker-day. Two representations, one state: slider ⇄ dashed line.
+
+   SINGLE SOURCE (the screenshot-6 lesson). EVERY displayed number — the three
+   cards, the insight-chart curve/highlight/pulse, audit rows, CSV — comes from
+   one compute(state) call per render. hcQA() reads the DOM back and compares it
+   to compute()'s own return, so a second source of truth fails QA.
 
    THE OUTCOME IDENTITY (hand-checkable, asserted by hcQA):
      sell fraction x of stack C at price P, tax t, rebuy at P_rebuy
      net cash          = x·C·P·(1−t)                (zero-basis assumption)
      coins back        = netCash / P_rebuy
      end coins         = (1−x)·C + x·C·(1−t)·(P/P_rebuy)
-     round-trip mult   = (1−t)·(P/P_rebuy)     ← the insight chart's Y
+     round-trip mult   = (1−t)·(P/P_rebuy)     ← the insight chart's Y, Card C
      breakeven         = rebuy below P·(1−t), i.e. ratio > 1/(1−t)
    P/P_rebuy is WODN's `ratio` exactly. The stack C cancels out of every
    reported figure; the BTC input is orientation only.
@@ -38,9 +46,9 @@
 
   var CE = window.ChannelEntries;
   var posOf = CE.posOf, ratioOf = CE.ratioOf, bandMetrics = CE.bandMetrics;
-  var median = CE.median, monthYear = CE.monthYear, realPriceAt = CE.realPriceAt;
+  var median = CE.median, monthYear = CE.monthYear;
   var S = CE.S, N = CE.N, todayD = CE.todayD, YEAR_D = CE.YEAR_D, MONTH_D = CE.MONTH_D;
-  var FIRST_D = CE.FIRST_D, TABLE_CUT = CE.TABLE_CUT, WAIT_CAP = CE.WAIT_CAP;
+  var FIRST_D = CE.FIRST_D, TABLE_CUT = CE.TABLE_CUT;
 
   // ── Palette ──
   var FLOOR_C = '#b04525', TREND_C = '#e09422', UPPER_C = '#e8c820';
@@ -50,42 +58,38 @@
 
   var ZONE_MULT = 0.60;
   var ALARM_AT = 80;              // past this the cash share stops being a buffer
-  var MARKER_MIN = TABLE_CUT;     // the model's entries start post-2014; the marker matches
+  var MARKER_MIN = TABLE_CUT;     // the model's entries start post-2014; the chart matches
+
+  // ── Position-slider machinery (lifted from WODN) ──
+  // The slider spans slightly BELOW the floor (so today's sub-floor ~0.40× is reachable
+  // and the "today" marker sits at its true position) up to the upper band. The reader-
+  // facing label always shows the TRUE position; entry-matching clamps sub-floor to the
+  // floor INTERNALLY only (stability), never leaking into what the reader sees.
+  var POS_MIN = -0.08, POS_MAX = 1.0, POS_RANGE = POS_MAX - POS_MIN;
+  function clampPos(p) { return Math.max(POS_MIN, Math.min(POS_MAX, p)); }
+  function sliderToPos(v) { return POS_MIN + (v / 1000) * POS_RANGE; }
+  function posToSlider(p) { return Math.round((clampPos(p) - POS_MIN) / POS_RANGE * 1000); }
+  function matchPos(p) { return Math.max(0, p); }   // internal entry-match clamp (display untouched)
 
   var _spot = TODAY_PRICE, _priceSource = 'seed';
   function spot() { return _spot; }
+  function livePos() { return posOf(spot(), todayD); }         // today's TRUE channel position
 
   var DEFAULTS = { share: 25, tax: 15, pos: null, stack: null };
-  var S_ = { share: 25, tax: 15, pos: null, stack: null };
+  var S_ = { share: 25, tax: 15, pos: null, stack: null };     // pos: null = today; else a channel position
+  function curPos() { return (S_.pos == null) ? livePos() : clampPos(S_.pos); }
 
   // ── Format ──
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
   function pct0(v) { return Math.round(v) + '%'; }
-  function pct1(v) { return (Math.round(v * 10) / 10) + '%'; }
   function mult(v) { return v.toFixed(2) + '×'; }
   function usdFull(v) { return '$' + Math.round(v).toLocaleString(); }
-  function usd(v) {
-    var a = Math.abs(v);
-    if (a >= 1e6) return '$' + (v / 1e6).toFixed(2) + 'M';
-    if (a >= 1e3) return '$' + Math.round(v / 1e3) + 'K';
-    return '$' + Math.round(v);
-  }
   function btc(v) { return (Math.abs(v) >= 100 ? v.toFixed(1) : v.toFixed(3)) + ' BTC'; }
   function fmtWait(days) {
     if (days == null) return '—';
     if (days < 1.5 * YEAR_D) return Math.max(1, Math.round(days / MONTH_D)) + ' months';
     return (days / YEAR_D).toFixed(1) + ' years';
   }
-
-  // ── The marker: a date on the record. Everything positional derives from it. ──
-  function markerDay() { return S_.pos == null ? todayD : clamp(S_.pos, MARKER_MIN, todayD); }
-  function markerIsToday() { return S_.pos == null || S_.pos >= todayD - 0.5; }
-  function markerPrice() { return markerIsToday() ? spot() : realPriceAt(markerDay()); }
-  function markerTrend() { return plPrice(markerDay()); }
-  function markerMult() { return markerPrice() / markerTrend(); }
-  function markerPos() { return posOf(markerPrice(), markerDay()); }
-  function priceWord() { return markerIsToday() ? (todayPriceIsLive(_priceSource) ? 'today’s price' : 'the latest price') : 'the price then'; }
-  function todayNote() { return markerIsToday() ? todayPriceNote(_priceSource) : ''; }
 
   // Zone-time base rate (survives from v2; historical fact, counted live).
   var zoneTime = (function () {
@@ -95,19 +99,21 @@
   })();
 
   // ════════ THE ONE COMPUTATION ════════
-  // Every displayed quantity on this page comes from here. Takes a state object
-  // (not the module's S_) so QA can drive it at pinned positions.
+  // Every displayed quantity on this page comes from here. Position-first now
+  // (WODN's model): a channel position in, a representative dollar price derived
+  // from TODAY's trend so the abstract position still reads in dollars for the
+  // stack orientation. At the today position, P is the live spot exactly.
   function compute(st) {
     st = st || S_;
-    var day = st.pos == null ? todayD : clamp(st.pos, MARKER_MIN, todayD);
-    var isToday = st.pos == null || st.pos >= todayD - 0.5;
-    var P = isToday ? spot() : realPriceAt(day);
-    var trend = plPrice(day);
-    var pos = posOf(P, day);
-    var m = bandMetrics(pos);            // ← WODN's machinery, unmodified
+    var trend = plPrice(todayD);
+    var isToday = (st.pos == null);
+    var pos = isToday ? livePos() : clampPos(st.pos);
+    var P = isToday ? spot() : ratioOf(pos) * trend;   // == spot at the today position
+    var mlt = P / trend;                               // == ratioOf(pos)
+    var m = bandMetrics(matchPos(pos));                // ← WODN's machinery, unmodified
     var t = st.tax / 100, x = st.share / 100;
 
-    if (!m) return { day: day, P: P, pos: pos, mult: P / trend, m: null, t: t, x: x };
+    if (!m) return { pos: pos, P: P, trend: trend, mult: mlt, isToday: isToday, m: null, t: t, x: x, tax: st.tax, share: st.share, stack: st.stack };
 
     // Per-entry after-tax outcome. ratio is WODN's P/P_rebuy exactly.
     var outcomes = m.metrics.map(function (e) {
@@ -122,25 +128,18 @@
 
     var medianRatio = m.ratio;                                  // median P/P_rebuy, ALL entries
     var medianRT = (1 - t) * medianRatio;                       // median round-trip multiple
-    var hit = m.paid;                                           // % where a lower PRICE arrived
+    var hit = m.paid;                                           // % where a lower PRICE arrived (WODN's headline)
     var hitAfterTax = outcomes.filter(function (o) { return o.rt > 1; }).length / outcomes.length * 100;
     var medianEnd = median(outcomes.map(function (o) { return o.end; }));
     var endSharePct = x * medianRT * 100;                       // what the sold slice became
-    // "median discount at the rebuy when a dip did arrive" — conditional on
-    // `arrived`, which is WODN's own conditional for condRatio.
     var medianDisc = m.condRatio != null ? (1 - 1 / m.condRatio) * 100 : null;
     var breakevenDisc = t * 100;                                // rebuy must be >t% lower
 
     return {
-      day: day, isToday: isToday, P: P, trend: trend, pos: pos, mult: P / trend,
+      pos: pos, P: P, trend: trend, mult: mlt, isToday: isToday,
       m: m, t: t, x: x, tax: st.tax, share: st.share, stack: st.stack,
       n: m.n, half: m.half,
-      // Every quantity the page DISPLAYS is a named field here. The floor branch
-      // shows the complement of the hit rate, so the complement is computed here
-      // rather than derived in the renderer — the first version of this page put
-      // `100 - hit` inline in the markup and bound it to the hit-rate element,
-      // which is precisely the screenshot-6 defect (a displayed number that is
-      // not the computed one). hcQA caught it; this shape makes it unsayable.
+      // Every quantity the page DISPLAYS is a named field here (screenshot-6 discipline).
       hit: hit, missPct: 100 - hit, hitAfterTax: hitAfterTax, never: m.never,
       medianRatio: medianRatio, medianRT: medianRT, condRatio: m.condRatio,
       medianDisc: medianDisc, breakevenDisc: breakevenDisc,
@@ -155,11 +154,8 @@
   }
 
   // The insight chart's curve — same compute() shape, swept across position.
-  // The curve sweeps bandMetrics across the whole channel (~43 neighborhoods ×
-  // 30-80 entries each) and depends ONLY on the tax rate — not on the share or
-  // the marker. So the expensive half is computed once and the tax applied on
-  // top: dragging the primary lever then costs nothing. Still one source — the
-  // cache holds WODN's ratios, not a second derivation of them.
+  // Depends ONLY on the tax rate (not the share or the position), so the
+  // expensive neighborhood sweep is cached and the tax applied on top.
   var _rawCurve = null;
   function rawCurve() {
     if (_rawCurve) return _rawCurve;
@@ -176,6 +172,12 @@
     var f = 1 - st.tax / 100;
     return rawCurve().map(function (p) { return { x: p.x, y: f * p.ratio, n: p.n }; });
   }
+  // Today's point on the insight curve — where the pulse/static dot sits.
+  function todayCurvePoint(tax) {
+    var lp = livePos(), m = bandMetrics(matchPos(lp));
+    if (!m || m.ratio == null) return null;
+    return { x: lp, y: (1 - tax / 100) * m.ratio };
+  }
   // Breakeven crossing: first position where the median round trip clears 1.0.
   function crossingOf(pts) {
     for (var i = 1; i < pts.length; i++) {
@@ -188,9 +190,6 @@
   }
 
   // ════════ QA — single-source assertion ════════
-  // Asserts (a) the outcome identity per entry, and (b) that the DOM shows
-  // exactly what compute() returned. (b) is the structural guard: a renderer
-  // that re-derives a displayed quantity fails here.
   function num(id) {
     var e = document.getElementById(id);
     if (!e) return null;
@@ -209,18 +208,16 @@
       return Math.abs(o.rt - wantRT) > 1e-12 || Math.abs(o.end - wantEnd) > 1e-12;
     });
 
-    // (b) the DOM must agree with compute() — one source
-    // Each displayed element is checked against the compute() field it is BOUND
-    // to — never against a value re-derived here, which would just move the
-    // second source into the test. Elements absent in a branch are skipped.
+    // (b) the DOM must agree with compute() — one source. Each element is checked
+    // against the compute() field it is BOUND to; absent elements (branch-specific,
+    // e.g. hcMiss only in the floor card) are skipped.
     var live = (st === S_), mism = [], dom = {};
     if (live) {
       var bindings = [
-        { id: 'hcHit',    field: 'hit',      round: true },
-        { id: 'hcMiss',   field: 'missPct',  round: true },
-        { id: 'hcMult',   field: 'medianRT', tol: 0.006 },
-        { id: 'hcQ3Hit',  field: 'hit',      round: true },
-        { id: 'hcQ3Disc', field: 'medianDisc', round: true }
+        { id: 'hcCardA',     field: 'hitAfterTax', round: true },
+        { id: 'hcMiss',      field: 'missPct',     round: true },
+        { id: 'hcCardBDisc', field: 'medianDisc',  round: true },
+        { id: 'hcCardCMult', field: 'medianRT',    tol: 0.006 }
       ];
       bindings.forEach(function (b) {
         var shown = num(b.id);
@@ -238,7 +235,8 @@
 
     var res = {
       position: +c.pos.toFixed(4), xTrend: +c.mult.toFixed(3), n: c.n, tax: c.tax, share: c.share,
-      hit: +c.hit.toFixed(2), medianRatio: +c.medianRatio.toFixed(4), medianRT: +c.medianRT.toFixed(4),
+      hit: +c.hit.toFixed(2), hitAfterTax: +c.hitAfterTax.toFixed(2),
+      medianRatio: +c.medianRatio.toFixed(4), medianRT: +c.medianRT.toFixed(4),
       branch: c.branch, alarm: c.alarm,
       identityViolations: idBad.length,
       domChecked: live, domMismatches: mism,
@@ -252,36 +250,62 @@
   if (typeof window !== 'undefined') window.hcQA = hcQA;
 
   // ════════ RENDER — every renderer takes `c`, none recompute ════════
-  function renderVerdict(c) {
-    var el = document.getElementById('hcVerdict'); if (!el || !c.m) return;
-    var where = c.isToday ? 'here' : 'there';
-    var posTxt = mult(c.mult).replace('×', '×') + ' trend · ' + positionLabel(c.pos);
-    var main, cls;
 
-    if (c.branch === 'floor') {
-      cls = 'hc-verdict-floor';
-      main = 'A lower entry almost never arrived here. Cash raised at this position historically stayed cash or rebought higher &mdash; fewer coins, <strong id="hcMiss">' +
-        Math.round(c.missPct) + '</strong>% of the time. This is the position where raising a buffer is the trade this page warns about.';
-    } else {
-      cls = c.branch === 'pays' ? 'hc-verdict-pays' : (c.branch === 'wash' ? 'hc-verdict-wash' : 'hc-verdict-costs');
-      var lead = 'Selling <strong>' + c.share + '%</strong> of the stack ' + where + ' (' + posTxt + '): historically a lower rebuy arrived <strong id="hcHit">' +
-        Math.round(c.hit) + '</strong>% of the time, and redeploying at the dip bought about <strong id="hcMult">' + c.medianRT.toFixed(2) +
-        '</strong>× the coins after ' + c.tax + '% tax &mdash; turning ' + c.share + '% into roughly <strong>' + c.endSharePct.toFixed(0) +
-        '%</strong> of your stack.';
-      var tail = ' The other <strong>' + Math.round(100 - c.hit) + '%</strong> of the time no dip came, and the cash bought back fewer coins.';
-      if (c.branch === 'wash') tail += ' At these settings the median round trip is a wash: the tax eats what the dip gives.';
-      if (c.branch === 'costs') tail += ' At these settings the median round trip <strong>loses coins</strong>: the typical rebuy did not come far enough below to beat the tax.';
-      main = lead + tail;
+  // The verdict, as blocks (WODN's card row, HMC's quantities). §2 of the spec.
+  function renderCards(c) {
+    // Card A — the big one: the after-tax "kept more coins" rate + a branch line.
+    var a = document.getElementById('hcCardA');
+    if (a) a.textContent = Math.round(c.hitAfterTax) + '%';
+    var wrap = document.getElementById('hcCardWrap');
+    if (wrap) wrap.className = 'hc-card hc-card-hero hc-card-hero-' + c.branch + (c.alarm ? ' hc-alarm-tint' : '');
+    var note = document.getElementById('hcCardANote');
+    if (note) {
+      var txt;
+      if (c.branch === 'floor') {
+        txt = 'A lower entry almost never arrived here &mdash; cash raised at this position historically stayed cash or rebought higher, fewer coins <strong id="hcMiss">' +
+          Math.round(c.missPct) + '</strong>% of the time. This is the trim this page warns about.';
+      } else if (c.branch === 'costs') {
+        txt = 'The typical rebuy did not clear the tax &mdash; a trim here has cost coins.';
+      } else if (c.branch === 'wash') {
+        txt = 'Roughly a wash here &mdash; the dip and the tax cancel.';
+      } else {
+        txt = 'This is the region where the trim has earned its keep.';
+      }
+      note.className = 'hc-card-note hc-card-note-' + c.branch;
+      note.innerHTML = txt;
     }
-    el.className = 'hc-verdict ' + cls + (c.alarm ? ' hc-alarm-tint' : '');
-    el.innerHTML = main;
+
+    // Card B — the pair: rebuy discount · typical wait (Question Three's answer).
+    var disc = document.getElementById('hcCardBDisc'), wait = document.getElementById('hcCardBWait');
+    if (disc) disc.innerHTML = (c.medianDisc == null) ? 'no dip' : (Math.round(c.medianDisc) + '%');
+    if (wait) wait.textContent = (c.typicalWait == null) ? '—' : fmtWait(c.typicalWait);
+
+    // Card C — coins back per coin sold, after tax.
+    var cm = document.getElementById('hcCardCMult');
+    if (cm) cm.textContent = c.medianRT.toFixed(2) + '×';
+    var cl = document.getElementById('hcCardCLine');
+    if (cl) cl.innerHTML = 'per coin sold after ' + c.tax + '% tax &mdash; turning <strong>' + c.share +
+      '%</strong> of the stack into roughly <strong>' + c.endSharePct.toFixed(0) + '%</strong>.';
+  }
+
+  // One-sentence synthesized verdict above the cards — no number lives here (the
+  // cards carry every figure; §2: no number in prose that isn't in a card).
+  function renderVerdictLead(c) {
+    var el = document.getElementById('hcVerdictLead'); if (!el) return;
+    var t;
+    if (c.branch === 'floor') t = 'At this position, raising cash is the trade this page warns against.';
+    else if (c.branch === 'costs') t = 'At these settings, the trim is under water — the tax outruns the typical dip.';
+    else if (c.branch === 'wash') t = 'At these settings, the round trip is close to a wash.';
+    else t = 'At these settings, the trim has historically earned its keep.';
+    el.className = 'hc-verdict-lead hc-verdict-lead-' + c.branch;
+    el.textContent = t;
   }
 
   function renderStack(c) {
     var el = document.getElementById('hcStackNote'); if (!el) return;
     if (!c.stack || !isFinite(c.stack) || c.stack <= 0) { el.innerHTML = 'Optional. Entering a number of bitcoin may help orient you to the potential outcomes; the verdict does not depend on it.'; return; }
-    var sold = c.stack * c.x;
-    el.innerHTML = 'Selling <strong>' + btc(sold) + '</strong> of ' + btc(c.stack) + ' at ' + usdFull(c.P) + ' raises <strong>' +
+    var sold = c.stack * c.x, at = c.isToday ? '' : ' (at today’s trend)';
+    el.innerHTML = 'Selling <strong>' + btc(sold) + '</strong> of ' + btc(c.stack) + ' at ' + usdFull(c.P) + at + ' raises <strong>' +
       usdFull(sold * c.P * (1 - c.t)) + '</strong> after ' + c.tax + '% tax. The median round trip brings back about <strong>' +
       btc(sold * c.medianRT) + '</strong>.';
   }
@@ -294,39 +318,17 @@
   function renderTax(c) {
     var el = document.getElementById('hcTaxLine'); if (!el) return;
     if (c.tax === 0) {
-      el.innerHTML = 'At <strong>0%</strong> there is no haircut: any rebuy below ' + usdFull(c.P) + ' earns coins. That is the tax-advantaged case.';
+      el.innerHTML = 'At <strong>0%</strong> there is no haircut: any rebuy below the entry earns coins. That is the tax-advantaged case.';
     } else {
       el.innerHTML = 'At <strong>' + c.tax + '%</strong> long-term capital gains on a fully appreciated stack, the rebuy must come more than <strong>' +
         c.tax + '%</strong> lower just to break even in coins &mdash; the dip has to beat the tax before it earns you anything.';
     }
   }
 
-  function renderQ3(c) {
-    var el = document.getElementById('hcQ3'); if (!el || !c.m) return;
-    var disc = c.medianDisc, body;
-    var sample = ' <span class="hc-sample">Drawn from ' + c.n + ' historical entries within ' +
-      (c.half <= 0.08 ? '±' + c.half.toFixed(2) : 'a widened band') +
-      ' of this position (post-2014, each with a full two-year forward record). Historical, at this position &mdash; not a prediction.</span>';
-    if (disc == null) {
-      // No entry in this neighborhood ever saw a lower position inside two
-      // years, so there is no discount to quote — say that, rather than print
-      // an em-dash where a number belongs.
-      body = 'At this position a lower price arrived within two years <strong id="hcQ3Hit">' + Math.round(c.hit) +
-        '</strong>% of the time. No dip arrived here at all within the window, so there is no typical discount or wait to report: the cash simply waited, and bought back at whatever two years later cost.';
-    } else {
-      body = 'At this position a lower price arrived within two years <strong id="hcQ3Hit">' + Math.round(c.hit) +
-        '</strong>% of the time. When a dip did come, the rebuy was typically <strong id="hcQ3Disc">' + disc.toFixed(0) +
-        '</strong>% below the entry, after a typical wait of <strong>' + fmtWait(c.typicalWait) +
-        '</strong>. Breakeven at ' + c.tax + '% tax needs more than ' + c.tax + '% ' +
-        (disc > c.breakevenDisc ? '&mdash; the typical dip cleared it.' : '&mdash; <strong>the typical dip did not clear it</strong>.');
-    }
-    el.innerHTML = body + sample;
-  }
-
   function renderShock(c) {
     var el = document.getElementById('hcShockRatio'); if (!el) return;
     var r = c.trend / c.P;
-    el.innerHTML = 'A surprise bill paid from the stack ' + (c.isToday ? 'here' : 'there') + ' costs <strong>' + r.toFixed(2) +
+    el.innerHTML = 'A surprise bill paid from the stack ' + (c.isToday ? 'here' : 'at this position') + ' costs <strong>' + r.toFixed(2) +
       '×</strong> the coins it would at trend.';
   }
 
@@ -339,22 +341,40 @@
   function renderPos(c) {
     var el = document.getElementById('hcPosReadout'); if (!el) return;
     el.innerHTML = '<strong>' + c.mult.toFixed(2) + '×</strong> trend · <em>' + positionLabel(c.pos) + '</em> · ' +
-      (c.isToday ? 'today' + todayNote() : monthYear(c.day)) + ' · ' + usdFull(c.P);
+      (c.isToday ? 'today' + todayPriceNote(_priceSource) : 'at this position') + ' · ' + usdFull(c.P);
+  }
+
+  // Provenance caption beneath the card row.
+  function renderProvenance(c) {
+    var el = document.getElementById('hcSample'); if (!el || !c.m) return;
+    el.innerHTML = 'Drawn from <strong>' + c.n + '</strong> historical entries within ' +
+      (c.half <= 0.08 ? '±' + c.half.toFixed(2) : 'a widened band') +
+      ' of this position (post-2014, each with a full two-year forward record). Historical, at this position &mdash; not a prediction.';
   }
 
   function renderEndnote(c) {
     var el = document.getElementById('hcEndnote'); if (!el) return;
-    el.innerHTML = 'Your settings: ' + c.share + '% cash share · ' + c.tax + '% tax · marker at ' +
-      (c.isToday ? 'today' : monthYear(c.day)) + ' (' + c.mult.toFixed(2) + '× trend · ' + positionLabel(c.pos) + ') · ' +
+    el.innerHTML = 'Your settings: ' + c.share + '% cash share · ' + c.tax + '% tax · position ' +
+      c.mult.toFixed(2) + '× trend · ' + positionLabel(c.pos) + (c.isToday ? ' (today)' : '') + ' · ' +
       c.n + ' historical entries. Rebuy rule: the first lower entry within two years, else the two-year price.';
+  }
+
+  // Insight-chart caption — today-focused, explains the glow/dot.
+  function renderInsightNote(c) {
+    var el = document.getElementById('hcInsightNote'); if (!el) return;
+    var tp = todayCurvePoint(c.tax);
+    if (!tp) { el.innerHTML = 'Median coins back per coin sold, by channel position, after ' + c.tax + '% tax.'; return; }
+    var live = todayPriceIsLive(_priceSource);
+    el.innerHTML = (live ? 'The glowing point is <strong>today</strong>' : 'The dot is <strong>today</strong> (latest monthly data)') +
+      ' &mdash; ' + ratioOf(tp.x).toFixed(2) + '× trend · ' + positionLabel(tp.x) + ', where the median round trip returns about <strong>' +
+      tp.y.toFixed(2) + '×</strong> per coin sold after ' + c.tax + '% tax. Above the breakeven line the trim earns coins; below it, it costs them.';
   }
 
   // ── Insight chart ──
   var chart = null;
   function chartData(c) {
     var pts = curveFor({ tax: c.tax });
-    var cross = crossingOf(pts);
-    return { pts: pts, cross: cross };
+    return { pts: pts, cross: crossingOf(pts) };
   }
   var crossPlugin = {
     id: 'hcCross',
@@ -379,7 +399,7 @@
         var tx = Math.max(xS.left + ctx.measureText(lbl).width / 2 + 2, Math.min(xc, xS.right - ctx.measureText(lbl).width / 2 - 2));
         ctx.fillText(lbl, tx, yS.top + 11);
       }
-      // marker highlight
+      // selected-position highlight (moves with the slider; ONE source, QA reads $hl)
       if (ch.$hl) {
         var hx = xS.getPixelForValue(ch.$hl.x), hy = yS.getPixelForValue(ch.$hl.y);
         ctx.beginPath(); ctx.arc(hx, hy, 6, 0, Math.PI * 2);
@@ -387,6 +407,22 @@
         ctx.strokeStyle = '#0a0908'; ctx.lineWidth = 1.5; ctx.stroke();
       }
       ctx.restore();
+    }
+  };
+  // Today's live pulse (Gallery/BvSM lcs-pulse-halo). Positions #hcInsightPulse at
+  // today's curve point each render; gated on the live flag — animated when live,
+  // static core dot on fallback (the live-label canon applies to the glow too).
+  var insightPulse = {
+    id: 'hcInsightPulse',
+    afterRender: function (ch) {
+      var el = document.getElementById('hcInsightPulse'); if (!el) return;
+      var tp = todayCurvePoint(S_.tax);
+      if (!tp || !ch.scales || !ch.scales.x || !ch.scales.y) { el.classList.remove('is-visible'); return; }
+      var x = ch.scales.x.getPixelForValue(tp.x), y = ch.scales.y.getPixelForValue(tp.y), area = ch.chartArea;
+      if (x < area.left - 4 || x > area.right + 4 || y < area.top - 4 || y > area.bottom + 4) { el.classList.remove('is-visible'); return; }
+      el.style.left = x + 'px'; el.style.top = y + 'px';
+      el.classList.add('is-visible');
+      el.classList.toggle('hc-pulse-static', !todayPriceIsLive(_priceSource));
     }
   };
   function buildChart(c) {
@@ -411,10 +447,7 @@
             type: 'linear', min: -0.05, max: 1.0,
             title: { display: true, text: 'Where in the channel you sell', color: MUTED, font: { size: 11 } },
             grid: { color: 'rgba(224,148,34,0.05)' },
-            ticks: {
-              color: MUTED, font: { size: 10 }, maxTicksLimit: 7,
-              callback: function (v) { return positionLabel(v); }
-            }
+            ticks: { color: MUTED, font: { size: 10 }, maxTicksLimit: 7, callback: function (v) { return positionLabel(v); } }
           },
           y: {
             title: { display: true, text: 'Coins back per coin sold', color: MUTED, font: { size: 11 } },
@@ -434,7 +467,7 @@
           }
         }
       },
-      plugins: [crossPlugin]
+      plugins: [crossPlugin, insightPulse]
     });
     chart.$cross = d.cross;
     chart.$hl = { x: c.pos, y: c.medianRT };
@@ -461,8 +494,8 @@
   function assertBinding() { var r = chartBinding(); if (r && !r.ok) console.error('[hc-binding] insight-chart highlight is not the computed value', r); }
   if (typeof window !== 'undefined') window.hcBinding = chartBinding;
 
-  // ── Channel chart (position selector) ──
-  var chChart = null, dragging = false;
+  // ── Channel chart (WODN grammar: bands + history + dashed selected line + blue dots) ──
+  var chChart = null;
   function bandLine(m, startD, span) {
     var pts = [], step = Math.max(12, span / 140), d;
     for (d = 0; d <= span + 1e-6; d += step) pts.push({ x: startD + d, y: plPrice(startD + d) * m });
@@ -472,18 +505,21 @@
   function band(label, data, color, dash, w) {
     return { label: label, data: data, borderColor: color, backgroundColor: color, borderWidth: w, borderDash: dash || undefined, pointRadius: 0, tension: 0.2, fill: false, order: 4 };
   }
-  var markerPlugin = {
-    id: 'hcMarker',
-    afterDatasetsDraw: function (ch) {
-      var xS = ch.scales.x, yS = ch.scales.y, ctx = ch.ctx;
-      var x = xS.getPixelForValue(markerDay()), y = yS.getPixelForValue(markerPrice());
-      if (x < xS.left - 2 || x > xS.right + 2) return;
+  // The historical entries the current neighbourhood is built from, rendered exactly
+  // as WODN renders its entries (same 3.2px blue dot, page-bg hairline stroke).
+  var chSelDots = [];
+  var selDotPlugin = {
+    id: 'hcSelDots',
+    afterDatasetsDraw: function (c) {
+      if (!chSelDots.length) return;
+      var xS = c.scales.x, yS = c.scales.y, ctx = c.ctx, area = c.chartArea, i, x, y;
       ctx.save();
-      ctx.setLineDash([3, 3]); ctx.strokeStyle = 'rgba(109,179,212,0.6)'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(x, yS.top); ctx.lineTo(x, yS.bottom); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fillStyle = SEL_C; ctx.fill();
-      ctx.strokeStyle = '#0a0908'; ctx.lineWidth = 1.5; ctx.stroke();
+      for (i = 0; i < chSelDots.length; i++) {
+        x = xS.getPixelForValue(chSelDots[i].x); y = yS.getPixelForValue(chSelDots[i].y);
+        if (x < area.left - 2 || x > area.right + 2) continue;
+        ctx.beginPath(); ctx.arc(x, y, 3.2, 0, Math.PI * 2); ctx.fillStyle = SEL_C; ctx.globalAlpha = 0.8; ctx.fill();
+        ctx.globalAlpha = 1; ctx.strokeStyle = '#0a0908'; ctx.lineWidth = 1.1; ctx.stroke();
+      }
       ctx.restore();
     }
   };
@@ -498,46 +534,54 @@
     for (var i = 0; i < N; i++) if (S[i].d >= startD) price.push({ x: S[i].d, y: S[i].p });
     price.push({ x: todayD, y: spot() });
     ds.push({ label: 'BTC price (history)', data: price, borderColor: HIST_C, borderWidth: 1.3, pointRadius: 0, tension: 0.15, order: 1 });
+    // selected position — a line parallel to trend at the chosen ×-trend multiple
+    var P = curPos();
+    ds.push(band('Selected position', bandLine(ratioOf(P), startD, span), SEL_C, [4, 4], 2));
+    // the historical entries the current band is built from (same internal match-clamp)
+    var m = bandMetrics(matchPos(P));
+    chSelDots = (m && m.entries) ? m.entries.map(function (i) { return { x: S[i].d, y: S[i].p }; }) : [];
     return ds;
   }
-  var _dsSpot = null;
+  function yBounds(ds) {
+    var lo = Infinity, hi = -Infinity, i, j, y;
+    for (i = 0; i < ds.length; i++) for (j = 0; j < ds[i].data.length; j++) { y = ds[i].data[j].y; if (isFinite(y) && y > 0) { if (y < lo) lo = y; if (y > hi) hi = y; } }
+    if (!isFinite(lo)) { lo = 1000; hi = 1e7; }
+    return { min: lo * 0.55, max: hi * 1.9 };
+  }
   function buildChannel() {
     var el = document.getElementById('hcChannelChart'); if (!el || typeof Chart === 'undefined') return;
-    _dsSpot = spot();
+    var ds = chDatasets(), yb = yBounds(ds);
     chChart = new Chart(el.getContext('2d'), {
-      type: 'line', data: { datasets: chDatasets() },
+      type: 'line', data: { datasets: ds },
       options: {
         responsive: true, maintainAspectRatio: false, parsing: false, animation: { duration: 0 },
         interaction: { intersect: false, mode: 'index' }, layout: { padding: { top: 16, right: 10 } },
         scales: {
           x: { type: 'linear', grid: { color: 'rgba(224,148,34,0.05)' }, ticks: { color: MUTED, font: { size: 11 }, maxTicksLimit: 8, callback: function (v) { return new Date(GENESIS_TS * 1000 + v * 86400 * 1000).getUTCFullYear(); } } },
-          y: { type: 'logarithmic', grid: { color: 'rgba(224,148,34,0.06)' }, ticks: { color: MUTED, font: { size: 11 }, callback: function (v) { if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M'; if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K'; return '$' + v.toFixed(0); } } }
+          y: { type: 'logarithmic', min: yb.min, max: yb.max, grid: { color: 'rgba(224,148,34,0.06)' }, ticks: { color: MUTED, font: { size: 11 }, callback: function (v) { if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M'; if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K'; return '$' + v.toFixed(0); } } }
         },
         plugins: {
           legend: { display: true, position: 'top', labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 22, padding: 9 } },
           tooltip: { backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.30)', borderWidth: 1, titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10, callbacks: { title: function (it) { return it.length ? monthYear(it[0].parsed.x) : ''; }, label: function (it) { return it.dataset.label + ': $' + Math.round(it.parsed.y).toLocaleString(); } } }
         }
       },
-      plugins: [markerPlugin]
+      plugins: [selDotPlugin]
     });
-    wireDrag(el);
   }
   function updateChannel() {
     if (!chChart) { buildChannel(); return; }
-    if (_dsSpot !== spot()) { chChart.data.datasets = chDatasets(); _dsSpot = spot(); chChart.update('none'); }
-    else chChart.render();
+    var ds = chDatasets(), yb = yBounds(ds);
+    chChart.data.datasets = ds;
+    chChart.options.scales.y.min = yb.min; chChart.options.scales.y.max = yb.max;
+    chChart.update('none');
   }
-  function wireDrag(canvas) {
-    function dayFromEvent(e) {
-      var r = canvas.getBoundingClientRect();
-      var x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
-      return clamp(chChart.scales.x.getValueForPixel(x), MARKER_MIN, todayD);
-    }
-    function set(e) { var d = dayFromEvent(e); S_.pos = (d >= todayD - 0.5) ? null : d; renderAll(); }
-    canvas.addEventListener('pointerdown', function (e) { dragging = true; try { canvas.setPointerCapture(e.pointerId); } catch (err) {} set(e); });
-    canvas.addEventListener('pointermove', function (e) { if (dragging) set(e); });
-    canvas.addEventListener('pointerup', function (e) { dragging = false; try { canvas.releasePointerCapture(e.pointerId); } catch (err) {} });
-    canvas.addEventListener('pointercancel', function () { dragging = false; });
+
+  // ── The position slider + persistent TODAY tick (lifted from WODN) ──
+  function syncSliderToState() { var sl = document.getElementById('hcPosSlider'); if (sl) sl.value = posToSlider(curPos()); }
+  function placeTodayTick() {
+    var m = document.getElementById('hcTodayTick'); if (!m) return;
+    m.style.left = ((clampPos(livePos()) - POS_MIN) / POS_RANGE * 100) + '%';
+    m.classList.add('is-visible');
   }
 
   // ── Audit ──
@@ -572,11 +616,9 @@
 
   // ── Mirrored share control (§6.35: two representations, one state) ──
   function syncShare(from) {
-    var n = document.getElementById('hcShareNum'), s = document.getElementById('hcShareSlider'),
-        mv = document.getElementById('hcShareVal');
+    var n = document.getElementById('hcShareNum'), s = document.getElementById('hcShareSlider');
     if (from !== 'num' && n) n.value = S_.share;
     if (from !== 'slider' && s) s.value = String(S_.share);
-    if (mv) mv.textContent = S_.share + '%';
     setSeg('hcSharePresets', S_.share);
   }
   function setSeg(groupId, value) {
@@ -585,16 +627,20 @@
     for (var i = 0; i < bs.length; i++) bs[i].classList.toggle('is-active', bs[i].getAttribute('data-val') === String(value));
   }
 
-  // ── URL (allocation register; retired v2 params decode-and-ignore) ──
+  // ── URL (allocation register; pos is now a channel position, 3dp) ──
   function readUrl() {
     if (!window.URLSearchParams) return;
     var p = new URLSearchParams(window.location.search), v;
     if (p.has('share')) { v = parseInt(p.get('share'), 10); if (isFinite(v)) S_.share = clamp(v, 0, 100); }
     if (p.has('tax')) { v = parseInt(p.get('tax'), 10); if ([0, 15, 20].indexOf(v) >= 0) S_.tax = v; }
-    if (p.has('pos')) { v = parseFloat(p.get('pos')); if (isFinite(v)) S_.pos = clamp(v, MARKER_MIN, todayD); }
+    if (p.has('pos')) {
+      v = parseFloat(p.get('pos'));
+      // v3.1: pos is a channel position (≤1.0). A v3-era day-encoded pos (thousands)
+      // is out of range — treat it as "today" rather than clamping it to the upper band.
+      if (isFinite(v) && v >= POS_MIN - 0.001 && v <= POS_MAX + 0.001) S_.pos = clampPos(v);
+    }
     if (p.has('stack')) { v = parseFloat(p.get('stack')); if (isFinite(v) && v > 0) S_.stack = v; }
-    // v2's params (exp, buf, shock, hz, yld, depth, btc, dep, cy, rec) are
-    // retired with the ledger — read and ignored, never rewritten.
+    // v2's params (exp, buf, shock, hz, yld, depth, btc, dep, cy, rec) are retired.
   }
   var _urlT = null;
   function syncUrl() {
@@ -604,7 +650,7 @@
       var p = new URLSearchParams();
       p.set('share', String(S_.share));
       if (S_.tax !== DEFAULTS.tax) p.set('tax', String(S_.tax));
-      if (S_.pos != null) p.set('pos', String(Math.round(S_.pos)));
+      if (S_.pos != null) p.set('pos', String(Math.round(S_.pos * 1000) / 1000));
       if (S_.stack) p.set('stack', String(S_.stack));
       window.history.replaceState(null, '', window.location.pathname + '?' + p.toString() + window.location.hash);
     }, 250);
@@ -614,8 +660,9 @@
   function renderAll() {
     var c = compute(S_);
     if (!c.m) return;
-    renderPos(c); renderVerdict(c); renderStack(c); renderAlarm(c); renderTax(c);
-    renderQ3(c); renderShock(c); renderZone(c); renderEndnote(c);
+    renderPos(c); renderVerdictLead(c); renderCards(c); renderStack(c); renderAlarm(c); renderTax(c);
+    renderShock(c); renderZone(c); renderProvenance(c); renderEndnote(c); renderInsightNote(c);
+    syncSliderToState(); placeTodayTick();
     updateChannel();
     updateChart(c);
     renderAudit(c);
@@ -646,7 +693,8 @@
       S_.tax = parseInt(b.getAttribute('data-val'), 10); setSeg('hcTax', S_.tax); renderAll();
     });
     on('hcStack', 'input', function () { var v = parseFloat(this.value); S_.stack = (isFinite(v) && v > 0) ? v : null; renderAll(); });
-    on('hcSnapToday', 'click', function (e) { e.preventDefault(); S_.pos = null; renderAll(); });
+    on('hcPosSlider', 'input', function () { S_.pos = sliderToPos(parseInt(this.value, 10)); renderAll(); });
+    on('hcSnapToday', 'click', function (e) { e.preventDefault(); S_.pos = null; syncSliderToState(); renderAll(); });
     on('hcReset', 'click', function () { for (var k in DEFAULTS) if (DEFAULTS.hasOwnProperty(k)) S_[k] = DEFAULTS[k]; var st2 = document.getElementById('hcStack'); if (st2) st2.value = ''; initControls(); renderAll(); });
     on('hcAuditToggle', 'click', function () { var b = document.getElementById('hcAuditBody2'); if (!b) return; b.hidden = !b.hidden; this.setAttribute('aria-expanded', String(!b.hidden)); });
     on('hcCsvBtn', 'click', csv);
