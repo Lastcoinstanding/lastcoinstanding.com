@@ -119,6 +119,7 @@
   function pct0(v) { return Math.round(v) + '%'; }
   function mult(v) { return v.toFixed(2) + '×'; }
   function usdFull(v) { return '$' + Math.round(v).toLocaleString(); }
+  function usd(v) { var a = Math.abs(v); if (a >= 1e6) return '$' + (v / 1e6).toFixed(2) + 'M'; if (a >= 1e3) return '$' + Math.round(v / 1e3) + 'K'; return '$' + Math.round(v); }  // compact, for the cash composition
   function btc(v) { return (Math.abs(v) >= 100 ? v.toFixed(1) : v.toFixed(3)) + ' BTC'; }
   function stackFmt(v) { return (+v.toFixed(v >= 100 ? 1 : 2)).toString(); }   // "11.6", "10", "1.5"
   function fmtWait(days) {
@@ -188,7 +189,13 @@
     var noArriveRT = noArrO.length ? median(noArrO.map(function (o) { return o.rt; })) : null;         // m₀
     var noArriveRatio = noArrO.length ? median(noArrO.map(function (o) { return o.ratio; })) : null;   // pre-tax: rebuy above/below sale
     var arriveA = (hasStack && arrivedRT != null) ? st.stack * (1 + x * (arrivedRT - 1)) : null;       // A₁
-    var noArriveA = (hasStack && noArriveRT != null) ? st.stack * (1 + x * (noArriveRT - 1)) : null;   // A₀
+    var noArriveA = (hasStack && noArriveRT != null) ? st.stack * (1 + x * (noArriveRT - 1)) : null;   // A₀ = the marked total
+    // §4: the no-arrival branch is a VALUATION MARK, not a modeled trade — decompose the held
+    // position into kept bitcoin + cash marked to bitcoin at the two-year price. noArriveA already
+    // equals keptBTC + soldBTC·m₀; this exposes the pieces so the composition can render/reconcile.
+    var keptBTC = hasStack ? st.stack * (1 - x) : null;
+    var soldBTC = hasStack ? st.stack * x : null;
+    var cashRaised = hasStack ? soldBTC * P * (1 - t) : null;
 
     return {
       pos: pos, P: P, trend: trend, mult: mlt, isToday: isToday,
@@ -199,6 +206,7 @@
       hit: hit, missPct: 100 - hit, hitAfterTax: hitAfterTax, never: m.never,
       arrivalPct: arrivalPct, hasStack: hasStack, newStack: newStack, cardCVal: cardCVal,
       arrivedRT: arrivedRT, noArriveRT: noArriveRT, noArriveRatio: noArriveRatio, arriveA: arriveA, noArriveA: noArriveA,
+      keptBTC: keptBTC, soldBTC: soldBTC, cashRaised: cashRaised,
       nArrived: arrivedO.length, nNoArrive: noArrO.length,
       medianRatio: medianRatio, medianRT: medianRT, condRatio: m.condRatio,
       medianDisc: medianDisc, medianDiscAbs: (medianDisc == null ? null : Math.abs(medianDisc)),
@@ -313,6 +321,15 @@
     var _m0 = _nar.length ? median(_nar.map(function (o) { return o.rt; })) : null;
     var branchMediansOk = (_m1 === c.arrivedRT && _m0 === c.noArriveRT);
 
+    // (a3) §4: the no-arrival composition reconciles — kept bitcoin + the cash marked to bitcoin at
+    // the two-year price ≈ the marked total (noArriveA). twoYrPrice is the representative implied by m₀.
+    var compositionOk = true;
+    if (c.hasStack && c.noArriveRT != null && c.noArriveRT > 0) {
+      var _twoYr = c.P * (1 - c.t) / c.noArriveRT;
+      var _recon = c.keptBTC + c.cashRaised / _twoYr;
+      compositionOk = Math.abs(_recon - c.noArriveA) <= Math.max(0.01, Math.abs(c.noArriveA) * 0.005);
+    }
+
     // (b) the DOM must agree with compute() — one source. Each element is checked
     // against the compute() field it is BOUND to; absent elements (branch-specific,
     // e.g. hcMiss only in the floor card) are skipped.
@@ -360,13 +377,13 @@
       medianRatio: +c.medianRatio.toFixed(4), medianRT: +c.medianRT.toFixed(4),
       branch: c.branch, alarm: c.alarm,
       identityViolations: idBad.length,
-      branchPartitionOk: branchPartitionOk, branchMediansOk: branchMediansOk,
+      branchPartitionOk: branchPartitionOk, branchMediansOk: branchMediansOk, compositionOk: compositionOk,
       nArrived: c.nArrived, nNoArrive: c.nNoArrive,
       arrivedRT: c.arrivedRT == null ? null : +c.arrivedRT.toFixed(4), noArriveRT: c.noArriveRT == null ? null : +c.noArriveRT.toFixed(4),
       domChecked: live, domMismatches: mism,
       // the WODN cross-check, side by side, so a divergence names itself
       wodn: { paid: +c.m.paid.toFixed(2), ratio: +c.m.ratio.toFixed(4), never: +c.m.never.toFixed(2), n: c.m.n, half: +c.m.half.toFixed(3) },
-      ok: idBad.length === 0 && mism.length === 0 && branchPartitionOk && branchMediansOk
+      ok: idBad.length === 0 && mism.length === 0 && branchPartitionOk && branchMediansOk && compositionOk
     };
     if (!res.ok) console.error('[hc-qa] single-source assertion failed', res);
     return res;
@@ -417,8 +434,16 @@
     var ccap = document.getElementById('hcCardCCap'), cval = document.getElementById('hcCardCVal'), cl = document.getElementById('hcCardCLine');
     if (c.hasStack) {
       if (ccap) ccap.textContent = 'New stack';
-      if (cval) cval.innerHTML = stackFmt(c.stack) + ' &rarr; <span id="hcCardCValN">' + stackFmt(c.newStack) + '</span> BTC';
-      if (cl) cl.innerHTML = 'after ' + c.tax + '% tax, at these settings.';
+      if (c.nArrived === 0 && c.noArriveRT != null) {
+        // §4: ARRIVAL = 0% — the whole outcome is the two-year MARK on held cash (a valuation, not
+        // a trade). Show the composition: kept bitcoin + the cash, marked to bitcoin at the 2yr price.
+        if (cval) cval.innerHTML = stackFmt(c.stack) + ' &rarr; ' + stackFmt(c.keptBTC) + ' BTC + ' + usd(c.cashRaised) + ' cash';
+        if (cl) cl.innerHTML = '&asymp; <span id="hcCardCValN">' + stackFmt(c.newStack) + '</span> BTC at the two-year price, after ' + c.tax +
+          '% tax &mdash; the cash held; bitcoin ' + (c.noArriveRT < 1 ? 'ran' : 'fell') + ' while it waited.';
+      } else {
+        if (cval) cval.innerHTML = stackFmt(c.stack) + ' &rarr; <span id="hcCardCValN">' + stackFmt(c.newStack) + '</span> BTC';
+        if (cl) cl.innerHTML = 'after ' + c.tax + '% tax, at these settings.';
+      }
     } else {
       // Empty-state title is BITCOIN BACK, not "round trip" — that mechanical term stays in
       // prose only, after its defining sentence (addendum A1).
@@ -444,11 +469,11 @@
     if (c.noArriveRT == null) {
       no = 'If it doesn&rsquo;t (' + noH + '%): the target always arrived here.';
     } else {
-      var above = (c.noArriveRatio != null && c.noArriveRatio < 1);   // sign-aware (v3.2 footer logic)
-      no = 'If it doesn&rsquo;t (<strong>' + noH + '%</strong>): the two-year rebuy ' +
-        (above ? 'landed above your sale &mdash; the trend rose while you waited &mdash; and ' : '') +
-        'gave <strong id="hcBranchNoArriveMult">' + c.noArriveRT.toFixed(2) + '</strong>×' +
-        (c.hasStack ? ' &mdash; ' + stackFmt(c.stack) + ' &rarr; <strong id="hcBranchNoArriveBtc">' + stackFmt(c.noArriveA) + '</strong> BTC' : '') + '.';
+      // §4: valuation-mark framing in ALL cases — the cash is HELD (never redeployed at the
+      // target) and marked to bitcoin at the two-year price, not traded far above the sale.
+      no = 'If it doesn&rsquo;t (<strong>' + noH + '%</strong>): the cash was never redeployed at your target &mdash; ' +
+        'held to the two-year mark it&rsquo;s worth <strong id="hcBranchNoArriveMult">' + c.noArriveRT.toFixed(2) + '</strong>× in bitcoin terms' +
+        (c.hasStack ? ': ' + stackFmt(c.keptBTC) + ' BTC + ' + usd(c.cashRaised) + ' cash &asymp; <strong id="hcBranchNoArriveBtc">' + stackFmt(c.noArriveA) + '</strong> BTC' : '') + '.';
     }
     el.innerHTML = '<span class="hc-branch">' + arr + '</span><span class="hc-branch">' + no + '</span>';
 
@@ -457,7 +482,7 @@
     if (H <= 5 && c.hitAfterTax > 40) {
       ex.hidden = false;
       ex.innerHTML = 'The target almost never arrived &mdash; the <strong>' + Math.round(c.hitAfterTax) +
-        '%</strong> came from the two-year fallback rebuying below your sale.';
+        '%</strong> is the two-year mark: the held cash, valued at the two-year price below your sale, was worth more bitcoin.';
     } else { ex.hidden = true; ex.innerHTML = ''; }
   }
 
