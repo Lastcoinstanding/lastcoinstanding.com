@@ -84,7 +84,9 @@
   var REBUY_EPS = 0.004;                                        // ≈ one slider notch
   function atCap(rebuy, sellPos) { return rebuy == null || rebuy >= sellPos - REBUY_EPS; }
   function engineTarget(rebuy, sellPos) { return atCap(rebuy, sellPos) ? undefined : rebuy; }   // undefined → WODN rule
-  function rebuyLinePos(rebuy, sellPos) { return atCap(rebuy, sellPos) ? (sellPos - DROP) : Math.min(rebuy, sellPos); }
+  // v3.7: at the cap the target docks ONTO the sale (was sellPos−DROP) — the green line rides the
+  // sale line, dimmed, narrating "at your sale, the rule is simply any lower entry" (display only).
+  function rebuyLinePos(rebuy, sellPos) { return atCap(rebuy, sellPos) ? sellPos : Math.min(rebuy, sellPos); }
 
   // ── Sticky instrument state — the site's first per-page ACTIVE-state persistence
   // (STYLE_GUIDE §6.37; §3.5 keeps sitewide ASSUMPTIONS separate). Precedence URL > store >
@@ -260,6 +262,18 @@
     sl.$gradCross = (cross == null ? null : cross); // stashed for the QA crossing-identity assertion
     sl.style.background = sellGradientCss(cross, c);
   }
+  // v3.7: slider 2's track — price-colored cheapness gradient LEFT of the ▼ sale tick; beyond the
+  // tick (at/above the sale) it goes inert/desaturated, so the region reads "at your sale = the rule".
+  function rebuyTrackGradient(sellPos) {
+    var tickPct = Math.max(0, Math.min(100, (clampPos(sellPos) - POS_MIN) / POS_RANGE * 100));
+    var GREEN = 'rgba(96,164,150,0.42)', GREEN_FADE = 'rgba(96,164,150,0.15)', INERT = 'rgba(122,115,103,0.12)';
+    return 'linear-gradient(90deg, ' + GREEN + ' 0%, ' + GREEN_FADE + ' ' + Math.max(0, tickPct - 4).toFixed(1) + '%, ' +
+      INERT + ' ' + tickPct.toFixed(1) + '%, ' + INERT + ' 100%)';
+  }
+  function renderRebuyTrack() {
+    var sl = document.getElementById('hcRebuySlider'); if (!sl) return;
+    sl.style.background = rebuyTrackGradient(curPos());
+  }
   // Breakeven crossing: first position where the median round trip clears 1.0.
   function crossingOf(pts) {
     for (var i = 1; i < pts.length; i++) {
@@ -372,8 +386,8 @@
     if (note) {
       var txt;
       if (c.branch === 'floor') {
-        txt = 'A lower entry almost never arrived here &mdash; cash raised at this position historically stayed cash or rebought higher, less bitcoin <strong id="hcMiss">' +
-          Math.round(c.missPct) + '</strong>% of the time. This is the trim this page warns about.';
+        txt = 'A lower entry almost never arrived here &mdash; bitcoin sold at this position historically stayed cash or was rebought higher, less bitcoin <strong id="hcMiss">' +
+          Math.round(c.missPct) + '</strong>% of the time. This is the strategy this page warns against.';
       } else if (c.branch === 'costs') {
         txt = 'The typical rebuy did not clear the tax &mdash; a trim here has cost bitcoin.';
       } else if (c.branch === 'wash') {
@@ -452,7 +466,7 @@
   function renderVerdictLead(c) {
     var el = document.getElementById('hcVerdictLead'); if (!el) return;
     var t;
-    if (c.branch === 'floor') t = 'At this position, raising cash is the strategy this page warns against.';
+    if (c.branch === 'floor') t = 'At this position, selling bitcoin in the hope of rebuying it lower is the strategy this page warns against.';
     else if (c.branch === 'costs') t = 'At these settings, the trim is under water — the tax outruns the typical dip.';
     else if (c.branch === 'wash') t = 'At these settings, the round trip is close to a wash.';
     else t = 'At these settings, the trim has historically earned its keep.';
@@ -767,7 +781,12 @@
     // between the two dashed lines IS the strategy's span.
     var P = curPos();
     ds.push(band('Sell position', bandLine(ratioOf(P), startD, span), SEL_C, [4, 4], 2));
-    ds.push(band('Rebuy target', bandLine(ratioOf(rebuyLinePos(S_.rebuy, P)), startD, span), REBUY_C, [4, 4], 2));
+    // v3.7: when the target is at/above the sale, the green line DOCKS onto the sale line, dimmed
+    // and subordinate, with a self-narrating legend label — it isn't ignoring the thumb, it's riding the sale.
+    var isCap = atCap(S_.rebuy, P);
+    ds.push(band(isCap ? 'Rebuy target — at your sale' : 'Rebuy target',
+      bandLine(ratioOf(rebuyLinePos(S_.rebuy, P)), startD, span),
+      isCap ? 'rgba(111,174,111,0.4)' : REBUY_C, [4, 4], isCap ? 1.4 : 2));
     // the historical entries the current band is built from (same internal match-clamp)
     var m = bandMetrics(matchPos(P));
     chSelDots = (m && m.entries) ? m.entries.map(function (i) { return { x: S[i].d, y: S[i].p }; }) : [];
@@ -935,6 +954,7 @@
     updateChannel();
     updateChart(c);
     renderSellGradient(c);              // §1: data-derived track valence (reads chart.$cross)
+    renderRebuyTrack();                 // v3.7: slider 2 cheapness + inert-beyond-sale track
     renderAudit(c);
     assertBinding();
     syncShare();

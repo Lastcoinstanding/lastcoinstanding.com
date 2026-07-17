@@ -245,10 +245,11 @@ body { background: var(--bg); color: var(--text); }
 /* the one-line settings readout, between Step 2 and the chart */
 .hc-settings-line { text-align: center; margin: 0.9rem auto 0.2rem; }
 
-/* slider 2 (Rebuy): static PRICE-colored cheapness gradient — cool/green deepening LEFTWARD,
-   neutral at the right. Explicitly NOT outcome-colored (deep ≠ better; the ARRIVAL card carries
-   the counterweight). Slider 1 is outcome-colored (data, set in JS); slider 2 is price-colored. */
-.hc-slider2 { background: linear-gradient(90deg, rgba(96,164,150,0.42) 0%, rgba(96,164,150,0.20) 45%, rgba(122,115,103,0.28) 100%); }
+/* slider 2 (Rebuy): PRICE-colored cheapness gradient — cool/green deepening LEFTWARD. v3.7 sets
+   it DATA-aware in JS (renderRebuyTrack): green left of the ▼ sale tick, inert/desaturated beyond
+   it (at/above the sale = the default rule). NOT outcome-colored (deep ≠ better; the ARRIVAL card
+   is the counterweight). This is the neutral fallback before first paint. */
+.hc-slider2 { background: rgba(96,164,150,0.22); }
 /* the ▼ YOUR SALE reference tick — tracks slider 1 (blue, matching the sell line) */
 .hc-sale-tick { position: absolute; bottom: 5px; width: 2px; height: 0; transform: translateX(-50%); background: #6db3d4; box-shadow: 0 0 4px rgba(109,179,212,0.7); pointer-events: none; opacity: 0; transition: opacity 0.3s ease; }
 .hc-sale-tick.is-visible { opacity: 0.95; height: 16px; }
