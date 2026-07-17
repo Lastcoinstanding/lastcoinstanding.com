@@ -224,6 +224,28 @@
     var m = bandMetrics(matchPos(x), c.atCap ? undefined : c.eng);
     return (m && m.ratio != null) ? (1 - c.tax / 100) * m.ratio : null;
   }
+  // §1 v3.4: slider 1's track is DATA-derived — colored by the insight curve's own outcome
+  // (loses-bitcoin red / earns green), transitioning at the SAME breakeven crossing the chart
+  // draws (chart.$cross). Recomputes with tax + rebuy target; the sell zone shrinks as tax
+  // rises. hcQA asserts the gradient's crossing == the chart's. Slider 2 stays price-colored
+  // (static cheapness gradient, in CSS) — outcome vs description, kept apart (§39).
+  function sellGradientCss(cross, c) {
+    var RED = 'rgba(192,57,43,0.30)', RED_E = 'rgba(192,57,43,0.34)';
+    var GRN = 'rgba(111,174,111,0.28)', GRN_E = 'rgba(111,174,111,0.32)';
+    if (cross == null) {                          // no crossing in view — one region; sample the sign
+      var y = curveYAt(0.6, c), up = (y != null && y >= 1);
+      return 'linear-gradient(90deg, ' + (up ? GRN_E : RED_E) + ' 0%, ' + (up ? GRN : RED) + ' 100%)';
+    }
+    var pct = Math.max(0, Math.min(100, (clampPos(cross) - POS_MIN) / POS_RANGE * 100));
+    return 'linear-gradient(90deg, ' + RED_E + ' 0%, ' + RED + ' ' + Math.max(0, pct - 3).toFixed(1) + '%, ' +
+      GRN + ' ' + Math.min(100, pct + 3).toFixed(1) + '%, ' + GRN_E + ' 100%)';
+  }
+  function renderSellGradient(c) {
+    var sl = document.getElementById('hcPosSlider'); if (!sl || !chart) return;
+    var cross = chart.$cross;                      // the SAME crossing the insight chart plots (one computation)
+    sl.$gradCross = (cross == null ? null : cross); // stashed for the QA crossing-identity assertion
+    sl.style.background = sellGradientCss(cross, c);
+  }
   // Breakeven crossing: first position where the median round trip clears 1.0.
   function crossingOf(pts) {
     for (var i = 1; i < pts.length; i++) {
@@ -280,6 +302,12 @@
       // §4/§7: the glow is TODAY and must sit ON the curve (|dot.y − curve(today)| ≈ 0).
       var glow = chart && chart.$glow ? chart.$glow : null;
       if (glow) { var gy = curveYAt(glow.x, c); if (gy != null && Math.abs(glow.y - gy) > 1e-9) mism.push({ f: 'glow off curve', dom: glow.y, computed: gy }); }
+      // §1/§5: the sell-track gradient's breakeven crossing must equal the chart's crossing.
+      var slg = document.getElementById('hcPosSlider');
+      if (slg && chart && slg.$gradCross !== undefined) {
+        var gc = slg.$gradCross, cc = chart.$cross;
+        if (!(gc == null && cc == null) && (gc == null || cc == null || Math.abs(gc - cc) > 1e-9)) mism.push({ f: 'gradient crossing', dom: gc, computed: cc });
+      }
       var rows = (document.getElementById('hcAuditBody') || { rows: [] }).rows.length;
       if (rows !== c.outcomes.length) mism.push({ f: 'audit rows', dom: rows, computed: c.outcomes.length });
     }
@@ -694,25 +722,26 @@
     m.classList.add('is-visible');
   }
 
-  // ── Slider 2 (the rebuy target) — same channel axis, thumb capped at the sale (§2) ──
-  function clampRebuyToSale() { if (S_.rebuy != null && S_.rebuy > curPos() + REBUY_EPS) S_.rebuy = null; }  // slider 1 below slider 2 → clamp to cap
+  // ── Slider 2 (the rebuy target) — v3.4 §2: FULL independence. The thumb holds an ABSOLUTE
+  // channel position; no clamp, no cap-riding. effectiveTarget = min(target, sale) lives in
+  // atCap()/engineTarget(): target ≥ sale ⇒ the default rule (WODN's any-lower-entry). Only
+  // the ▼ tick tracks slider 1. Nothing but the user ever moves a thumb. ──
   function syncSlider2() {
     var sl = document.getElementById('hcRebuySlider'); if (!sl) return;
-    var capV = posToSlider(curPos());
-    sl.value = atCap(S_.rebuy, curPos()) ? capV : Math.min(posToSlider(S_.rebuy), capV);
+    sl.value = posToSlider(S_.rebuy == null ? POS_MAX : S_.rebuy);   // null (at-sale default) rests at the right end
   }
-  function placeSaleTick() {                     // the ▼ YOUR SALE tick, moves with slider 1
+  function placeSaleTick() {                     // the ▼ YOUR SALE reference tick — moves with slider 1
     var m = document.getElementById('hcSaleTick'); if (!m) return;
     m.style.left = ((clampPos(curPos()) - POS_MIN) / POS_RANGE * 100) + '%';
     m.classList.add('is-visible');
   }
   function renderRebuyReadout(c) {
     var el = document.getElementById('hcRebuyReadout'); if (!el) return;
-    if (c.atCap) {
-      el.innerHTML = '<strong>at your sale</strong> &mdash; the first lower entry within two years (Wait-or-Deploy&rsquo;s rule)';
+    if (c.atCap) {   // target at or above the sale — the default rule (also the underwater-manager state)
+      el.innerHTML = '<strong>at your sale</strong> &mdash; Wait-or-Deploy&rsquo;s rule (any lower entry within two years)';
     } else {
       el.innerHTML = '<strong>' + ratioOf(c.rebuyTargetPos).toFixed(2) + '×</strong> trend · <em>' + positionLabel(c.rebuyTargetPos) +
-        '</em> · cap at your sale, ' + c.mult.toFixed(2) + '× trend';
+        '</em>, below your ' + c.mult.toFixed(2) + '× sale';
     }
   }
 
@@ -805,14 +834,14 @@
 
   // ════════ ORCHESTRATOR — one compute, every renderer reads it ════════
   function renderAll() {
-    clampRebuyToSale();                 // slider 1 below slider 2 → target snaps to the cap
-    var c = compute(S_);
+    var c = compute(S_);                // §2: no clamp — slider 2 holds its absolute position independently
     if (!c.m) return;
     renderPos(c); renderRebuyReadout(c); renderVerdictLead(c); renderCards(c); renderStack(c); renderAlarm(c); renderTax(c);
     renderShock(c); renderZone(c); renderProvenance(c); renderEndnote(c); renderInsightNote(c);
     syncSliderToState(); placeTodayTick(); syncSlider2(); placeSaleTick();
     updateChannel();
     updateChart(c);
+    renderSellGradient(c);              // §1: data-derived track valence (reads chart.$cross)
     renderAudit(c);
     assertBinding();
     syncShare();
@@ -843,11 +872,7 @@
     });
     on('hcStack', 'input', function () { var v = parseFloat(this.value); S_.stack = (isFinite(v) && v > 0) ? v : null; renderAll(); });
     on('hcPosSlider', 'input', function () { S_.pos = sliderToPos(parseInt(this.value, 10)); renderAll(); });   // renderAll clamps slider 2 to the new sale
-    on('hcRebuySlider', 'input', function () {
-      var capV = posToSlider(curPos()), v = Math.min(parseInt(this.value, 10), capV);
-      S_.rebuy = (v >= capV) ? null : sliderToPos(v);            // at the cap → null (WODN rule); below → numeric target
-      renderAll();
-    });
+    on('hcRebuySlider', 'input', function () { S_.rebuy = sliderToPos(parseInt(this.value, 10)); renderAll(); });   // §2: absolute, uncapped
     on('hcSnapToday', 'click', function (e) { e.preventDefault(); S_.pos = null; syncSliderToState(); renderAll(); });
     on('hcReset', 'click', function () { for (var k in DEFAULTS) if (DEFAULTS.hasOwnProperty(k)) S_[k] = DEFAULTS[k]; clearStore(); initControls(); renderAll(); });
     on('hcAuditToggle', 'click', function () { var b = document.getElementById('hcAuditBody2'); if (!b) return; b.hidden = !b.hidden; this.setAttribute('aria-expanded', String(!b.hidden)); });

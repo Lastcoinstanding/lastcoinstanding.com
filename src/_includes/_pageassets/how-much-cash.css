@@ -189,12 +189,11 @@ body { background: var(--bg); color: var(--text); }
 .hc-calc-title { font-family: var(--font-h); font-size: 1.4rem; font-weight: 500; letter-spacing: -.01em; color: var(--text); margin: 0; }
 
 /* ── Position slider + persistent TODAY tick (lifted from WODN wd-slider*) ── */
-.hc-slider-block { margin: 1.4rem 0 0.6rem; }
-.hc-cue { font-family: var(--font-b); font-size: 0.86rem; line-height: 1.5; color: var(--text-dim); margin: 0 0 0.7rem; }
-.hc-cue strong { color: var(--text); font-weight: 600; }
 .hc-slider-wrap { position: relative; }
+/* slider 1 (Sell): background is set DATA-DERIVED in JS (renderSellGradient) — colored by the
+   insight curve's loses/earns regions. This is the neutral fallback before first paint. */
 .hc-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 5px; outline: none;
-  background: linear-gradient(90deg, rgba(122,115,103,0.45) 0%, rgba(224,148,34,0.5) 55%, rgba(192,57,43,0.6) 100%); }
+  background: rgba(122,115,103,0.30); }
 .hc-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #f2eee8; border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(255,255,255,0.3), 0 2px 6px rgba(0,0,0,0.5); cursor: grab; }
 .hc-slider::-webkit-slider-thumb:active { cursor: grabbing; }
 .hc-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #f2eee8; border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(255,255,255,0.3); cursor: grab; }
@@ -210,23 +209,37 @@ body { background: var(--bg); color: var(--text); }
 .hc-pos-readout em { color: var(--accent); font-style: italic; }
 
 /* ── Channel chart block + caption ── */
-.hc-chart-block { margin: 0.9rem 0 0.5rem; }
+/* v3.4 §3: the instrument's channel chart is compressed to keep Step 1 + Step 2 + chart +
+   cards in one 1080p view; the insight chart (its own section) keeps the taller default. */
+.hc-chart-block { margin: 0.7rem 0 0.4rem; }
+.hc-chart-block .hc-chart-wrap { height: 288px; }
 .hc-chart-caption { font-family: var(--font-b); font-size: 0.78rem; color: var(--text-dim); margin: 0.55rem 0 0; line-height: 1.5; text-align: center; }
 .hc-chart-caption strong { color: var(--text); font-weight: 600; }
 
-/* ── Decision #2: slider 2 (the rebuy target), mirrored beneath slider 1 (v3.3) ── */
-.hc-slider2-block { margin: 1rem 0 0; }
-.hc-rebuy-headline { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.3rem 1rem; margin-bottom: 0.55rem; }
-.hc-rebuy-label { font-family: var(--font-b); font-size: 0.85rem; font-weight: 600; color: var(--text-dim); display: inline-flex; align-items: center; }
-/* slider 2: same track as slider 1, but a green→neutral gradient (deeper target on the left,
-   pairs with the green rebuy line on the chart). Thumb capped at the sale in JS. */
-.hc-slider2 { background: linear-gradient(90deg, rgba(111,174,111,0.5) 0%, rgba(111,174,111,0.28) 42%, rgba(122,115,103,0.32) 100%); }
-/* the ▼ YOUR SALE tick — the cap, moves with slider 1 (blue, matching the sell line) */
-.hc-sale-tick { position: absolute; bottom: 5px; width: 2px; height: 0; transform: translateX(-50%); background: var(--accent); box-shadow: 0 0 4px rgba(109,179,212,0.7); pointer-events: none; opacity: 0; transition: opacity 0.3s ease; }
-.hc-sale-tick.is-visible { opacity: 0.95; height: 16px; background: #6db3d4; }
+/* ── v3.4 §3: Step 1 / Step 2 as ONE instrument block ── */
+.hc-steps { margin: 1rem 0 0; display: flex; flex-direction: column; gap: 0.9rem; }
+.hc-step .hc-slider-wrap { margin-top: 0.35rem; }
+.hc-step-head { font-family: var(--font-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin: 0 0 0.6rem; display: flex; align-items: center; }
+.hc-step-num { color: var(--accent); font-weight: 700; }
+.hc-step-num::after { content: '·'; color: var(--text-muted); margin: 0 0.45rem; font-weight: 400; }
+.hc-step .hc-slider-caption { margin-top: 0.5rem; }
+.hc-step-rebuy .hc-slider-scale { margin-top: 1.4rem; }   /* room for the ▼ sale flag beneath the track */
+
+/* orientation prose block (v3.4 §3: relocated above the instrument) */
+.hc-orient { max-width: 880px; margin: 0.5rem auto 0; }
+
+/* the one-line settings readout, between Step 2 and the chart */
+.hc-settings-line { text-align: center; margin: 0.9rem auto 0.2rem; }
+
+/* slider 2 (Rebuy): static PRICE-colored cheapness gradient — cool/green deepening LEFTWARD,
+   neutral at the right. Explicitly NOT outcome-colored (deep ≠ better; the ARRIVAL card carries
+   the counterweight). Slider 1 is outcome-colored (data, set in JS); slider 2 is price-colored. */
+.hc-slider2 { background: linear-gradient(90deg, rgba(96,164,150,0.42) 0%, rgba(96,164,150,0.20) 45%, rgba(122,115,103,0.28) 100%); }
+/* the ▼ YOUR SALE reference tick — tracks slider 1 (blue, matching the sell line) */
+.hc-sale-tick { position: absolute; bottom: 5px; width: 2px; height: 0; transform: translateX(-50%); background: #6db3d4; box-shadow: 0 0 4px rgba(109,179,212,0.7); pointer-events: none; opacity: 0; transition: opacity 0.3s ease; }
+.hc-sale-tick.is-visible { opacity: 0.95; height: 16px; }
 .hc-sale-flag { position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: var(--font-b); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #9fd0e4; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
 .hc-sale-tick.is-visible .hc-sale-flag { opacity: 0.95; }
-.hc-slider2-block .hc-slider-scale { margin-top: 1.3rem; }   /* room for the ▼ sale flag beneath the track */
 
 /* v3.2 §5 / v3.3: full-width, small, left-aligned — the rebuy copy sits under the slider */
 .hc-rule-note { font-family: var(--font-b); font-size: 0.76rem; line-height: 1.5; color: var(--text-muted); max-width: none; margin: 0.7rem 0 0; text-align: left; }

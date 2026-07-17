@@ -2,17 +2,7 @@
   {
     "display": "7/16/26",
     "page": "/how-much-cash",
-    "summary": "Reworked: How Much Cash? now has two sliders — where you sell, and where you rebuy — on the same channel, so the gap between them is your strategy at a glance. The rebuy target is now a smooth slider (its ceiling is your own sale, marked on the track), not three fixed buttons; both dashed lines show on the chart. The summary chart's glow was fixed to always sit on today's point, and a shaded band now shows the stretch your strategy spans. A \"Show the work\" link opens the full historical record behind the numbers. The page now says \"bitcoin\" rather than \"coins\" throughout, and remembers your settings on this device between visits (a shared link still shows exactly what it encodes)."
-  },
-  {
-    "display": "7/16/26",
-    "page": "/how-much-cash",
-    "summary": "Added: How Much Cash? now lets you set the rebuy target — the second half of the round trip. Leave it on Wait-or-Deploy's default (the first lower entry), or aim deeper: below trend, or near the floor. Deeper targets pay bigger multiples when they arrive, but they arrive less often, take longer, and the trend keeps rising while your cash waits — so the stats can show a deep target that, after tax, still comes back with fewer coins. Enter your stack and the last card shows the whole-stack outcome (10 → 11.6 BTC); leave it blank and it shows the round-trip multiple. The primary lever is now framed as one stack split two ways — the share you hold as cash, the rest in coins."
-  },
-  {
-    "display": "7/16/26",
-    "page": "/how-much-cash",
-    "summary": "Reworked: How Much Cash? is now one continuous instrument. Set a cash share and a tax rate, then drag a position slider — the same slider Wait-or-Deploy uses — along the Power Law channel; a dashed line and the blue dots of the historical entries move with it, and the verdict reads out as three cards: how often a trim here left you with more bitcoin, the typical rebuy discount and wait, and the coins that came back per coin sold after tax. The old drag-on-the-chart control is gone. Today's spot now glows on the summary chart when the price is live."
+    "summary": "Reworked: How Much Cash? is now a two-step instrument on the Power Law channel. Step 1 — set where you sold; Step 2 — set where you want to rebuy, on the same track, so the gap between the two is your strategy at a glance. The rebuy target is a free slider (its ceiling, your own sale, is marked on the track) that moves independently of the sell slider. The verdict reads out as cards: how often the target arrived, the typical wait, and the bitcoin that came back per bitcoin sold after tax — or, with your stack entered, your whole new stack (10 → 11.6 BTC). The sell slider is now colored by the data itself — red where the round trip has historically lost bitcoin, green where it earned, with the crossing where the numbers put it, shifting as you change the tax. The summary chart shades the stretch your strategy spans, today's point glows on it, and a \"Show the work\" link opens the full historical record behind every number. The page says \"bitcoin\" throughout and remembers your settings on this device between visits (a shared link still shows exactly what it encodes)."
   },
   {
     "display": "7/15/26",

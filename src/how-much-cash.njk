@@ -54,7 +54,17 @@ eleventyComputed:
   <section class="hc-section" id="playground">
     <div class="hc-eyebrow">The tool</div>
     <h2 class="hc-h2">Where you are decides</h2>
-    <p class="hc-lead hc-playground-sub">Raising cash is selling &mdash; converting part of one stack into its other form, not setting money aside from it. The full cycle &mdash; sell, wait, rebuy &mdash; is the <strong>round trip</strong>, and where in the <a href="/the-power-law">Power Law channel</a> you run it decides whether it ends in more bitcoin or less. Set the split and a tax rate, then drag the two sliders below &mdash; where you sell, and where you rebuy &mdash; and the verdict follows from it.</p>
+    <p class="hc-lead hc-playground-sub">Raising cash is selling &mdash; converting part of one stack into its other form, not setting money aside from it. The full cycle &mdash; sell, wait, rebuy &mdash; is the <strong>round trip</strong>, and where in the <a href="/the-power-law">Power Law channel</a> you run it decides whether it ends in more bitcoin or less. Set the split and a tax rate, then work the two sliders below &mdash; Step 1 is where you sell (the <strong>&#9650;</strong> marks today), Step 2 is where you rebuy.</p>
+
+    <!-- Orientation prose, relocated ABOVE the instrument (v3.4 §3): this is orientation, not
+         operation — between Step 2 and the chart there is nothing but the settings line. -->
+    <div class="hc-lead hc-orient">
+      <p class="hc-rule-note">The rebuy side is yours to set. Leave it <strong>at your sale</strong> for <a href="/wait-or-deploy-now">Wait-or-Deploy</a>&rsquo;s rule &mdash; the first lower entry within two years, no timing, no discretion. Slide to a deeper target and the stats change honestly: bigger multiples when it arrives, arriving less often, after longer waits &mdash; while the trend compounds under the cash. If the target never comes, the cash rebuys at the two-year price, sometimes higher than you sold.</p>
+      <p class="hc-couple-note">Deciding the redeploy on its own &mdash; cash in hand, no round trip &mdash; is <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a>&rsquo;s question; this page couples the two ends of the same round trip.</p>
+      <div class="hc-manager-note">
+        <p>Exploring your first split, or tracking one you already made? Set the sell slider to where you actually sold, and the rebuy target to what you&rsquo;re waiting for. Sold, and the price ran past you? You are living the no-arrival branch &mdash; the target never came. This page&rsquo;s honest answer is the two-year rule: at some point the strategy ends and the cash goes back, sometimes above your sale. Deciding when, from here, with cash in hand, is <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a>&rsquo;s question &rarr;</p>
+      </div>
+    </div>
 
     <div class="hc-calc">
       <!-- 1 ── INPUTS ROW (moved above everything interactive) ── -->
@@ -103,44 +113,38 @@ eleventyComputed:
       <p class="hc-tax-line" id="hcTaxLine">&mdash;</p>
       <p class="hc-tax-rec">In a tax-advantaged account this haircut disappears &mdash; set the rate to 0% to model it; <a href="/disciplined-rebalancing">Disciplined Rebalancing</a> makes the same recommendation.</p>
 
-      <!-- 2 ── POSITION SLIDER (WODN's component, lifted) ── -->
-      <div class="hc-slider-block">
-        <p class="hc-cue">Drag the slider to explore any channel position &mdash; the <strong>dashed line and blue dots on the chart move with it</strong>, and the verdict below updates together. The <strong>&#9650; today</strong> marker is where Bitcoin sits right now.</p>
-        <div class="hc-slider-wrap">
-          <input type="range" min="0" max="1000" step="1" value="510" class="hc-slider" id="hcPosSlider"
-                 aria-label="Explore a channel position from below the floor to the upper band">
-          <span class="hc-today-tick" id="hcTodayTick" aria-hidden="true"><span class="hc-today-flag">&#9650; today</span></span>
+      <!-- 2 ── THE TWO SLIDERS, one instrument block: Step 1 (sell) + Step 2 (rebuy), v3.4 §3 -->
+      <div class="hc-steps">
+        <div class="hc-step">
+          <div class="hc-step-head"><span class="hc-step-num">Step 1</span> Sell bitcoin for cash</div>
+          <div class="hc-slider-wrap">
+            <input type="range" min="0" max="1000" step="1" value="510" class="hc-slider" id="hcPosSlider"
+                   aria-label="Sell position: a channel position from below the floor to the upper band">
+            <span class="hc-today-tick" id="hcTodayTick" aria-hidden="true"><span class="hc-today-flag">&#9650; today</span></span>
+          </div>
+          <div class="hc-slider-scale"><span>Below floor &middot; cheapest</span><span>Trend</span><span>Upper band &middot; expensive</span></div>
+          <p class="hc-slider-caption"><a href="#" id="hcSnapToday">snap to today</a> &middot; <span class="hc-pos-readout" id="hcPosReadout">&mdash;</span></p>
         </div>
-        <div class="hc-slider-scale"><span>Below floor &middot; cheapest</span><span>Trend</span><span>Upper band &middot; expensive</span></div>
-        <p class="hc-slider-caption">Drag to explore other positions, or <a href="#" id="hcSnapToday">snap back to today</a>. Every figure is <strong>historical, at this position</strong> &mdash; not a prediction. <span class="hc-pos-readout" id="hcPosReadout">&mdash;</span></p>
+        <div class="hc-step hc-step-rebuy">
+          <div class="hc-step-head"><span class="hc-step-num">Step 2</span> Rebuy bitcoin
+            <span class="help-tip" tabindex="0">?<span class="tip-content">Where the cash comes back into bitcoin. Slide left of the &#9660; your sale tick for a deeper target (cheaper if it arrives); at or above your sale is Wait-or-Deploy&rsquo;s default rule. The thumb is independent &mdash; only the &#9660; tick tracks your sale.</span></span>
+          </div>
+          <div class="hc-slider-wrap">
+            <input type="range" min="0" max="1000" step="1" value="1000" class="hc-slider hc-slider2" id="hcRebuySlider"
+                   aria-label="Rebuy target: an absolute channel position; at or above your sale is the default rule">
+            <span class="hc-sale-tick" id="hcSaleTick" aria-hidden="true"><span class="hc-sale-flag">&#9660; your sale</span></span>
+          </div>
+          <div class="hc-slider-scale"><span>Deeper target &middot; cheaper rebuy</span><span>At / above sale</span></div>
+          <p class="hc-slider-caption"><span class="hc-pos-readout" id="hcRebuyReadout">&mdash;</span></p>
+        </div>
       </div>
 
-      <!-- decision #2: the rebuy target — slider 2, same channel axis, capped at your sale -->
-      <div class="hc-slider-block hc-slider2-block">
-        <div class="hc-rebuy-headline">
-          <span class="hc-rebuy-label">Then rebuy at
-            <span class="help-tip" tabindex="0">?<span class="tip-content">The redeploy &mdash; decision two of the round trip. Slide left for a deeper target (a cheaper rebuy); its ceiling is your own sale, marked &#9660; your sale. Deeper targets pay bigger multiples when they arrive, arrive less often, and take longer &mdash; the stats carry all of it.</span></span>
-          </span>
-          <span class="hc-pos-readout" id="hcRebuyReadout">&mdash;</span>
-        </div>
-        <div class="hc-slider-wrap">
-          <input type="range" min="0" max="1000" step="1" value="510" class="hc-slider hc-slider2" id="hcRebuySlider"
-                 aria-label="Rebuy target channel position, capped at your sale position">
-          <span class="hc-sale-tick" id="hcSaleTick" aria-hidden="true"><span class="hc-sale-flag">&#9660; your sale</span></span>
-        </div>
-        <div class="hc-slider-scale"><span>Deeper target &middot; cheaper rebuy</span><span>At your sale</span></div>
-      </div>
-      <p class="hc-rule-note">The rebuy side is yours to set. Leave it <strong>at your sale</strong> for <a href="/wait-or-deploy-now">Wait-or-Deploy</a>&rsquo;s rule &mdash; the first lower entry within two years, no timing, no discretion. Slide to a deeper target and the stats change honestly: bigger multiples when it arrives, arriving less often, after longer waits &mdash; while the trend compounds under the cash. If the target never comes, the cash rebuys at the two-year price, sometimes higher than you sold.</p>
-      <p class="hc-couple-note">Deciding the redeploy on its own &mdash; cash in hand, no round trip &mdash; is <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a>&rsquo;s question; this page couples the two ends of the same round trip.</p>
+      <!-- between Step 2 and the chart: nothing but the one-line settings readout (v3.4 §3) -->
+      <p class="hc-endnote hc-settings-line" id="hcEndnote">&mdash;</p>
 
-      <!-- both audiences, one passage (§6 + addendum A2/A4): the explorer and the manager -->
-      <div class="hc-manager-note">
-        <p>Exploring your first split, or tracking one you already made? Set the sell slider to where you actually sold, and the rebuy target to what you&rsquo;re waiting for. Sold, and the price ran past you? You are living the no-arrival branch &mdash; the target never came. This page&rsquo;s honest answer is the two-year rule: at some point the strategy ends and the cash goes back, sometimes above your sale. Deciding when, from here, with cash in hand, is <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a>&rsquo;s question &rarr;</p>
-      </div>
-
-      <!-- 3 ── THE CHANNEL CHART (dashed selected line + blue entry dots) ── -->
+      <!-- 3 ── THE CHANNEL CHART (two dashed lines + blue entry dots) ── -->
       <div class="hc-chart-block">
-        <div class="hc-chart-wrap chart-wrapper" data-chart-copy data-chart-heading="#playground .hc-h2" data-chart-sub="#playground .hc-playground-sub" data-chart-assump="#hcEndnote" data-chart-title="Where you are decides">
+        <div class="hc-chart-wrap chart-wrapper" data-chart-copy data-chart-heading="#playground .hc-h2" data-chart-sub="#playground .hc-playground-sub" data-chart-assump="#hcEndnote" data-chart-title="How Much Cash? · Where you are decides">
           <canvas id="hcChannelChart"></canvas>
         </div>
         <p class="hc-chart-caption">The Power Law channel across history. The <strong>blue dashed line</strong> is your sell position &mdash; with its neighbourhood <strong>dots</strong>, the historical entries the answer is built from; the <strong>green dashed line</strong> is your rebuy target. The gap between them is the strategy&rsquo;s span.</p>
@@ -185,7 +189,6 @@ eleventyComputed:
 
       <p class="hc-showwork"><a href="#audit" id="hcShowWork">Show the work &mdash; the record behind these numbers &rarr;</a></p>
       <p class="hc-provenance" id="hcSample">&mdash;</p>
-      <p class="hc-endnote" id="hcEndnote">&mdash;</p>
 
       <!-- the shock-absorber job's one number + the zone-time base rate (survive from v3) -->
       <p class="hc-readout" id="hcShockRatio">&mdash;</p>
@@ -204,7 +207,7 @@ eleventyComputed:
     <h2 class="hc-h2">Where the strategy has paid</h2>
     <p class="hc-lead hc-insight-sub">This chart is the summary, not a control &mdash; it moves with the tax rate AND the rebuy target you set above. For every sell position in the <a href="/the-power-law">channel</a>: the median bitcoin that came back per bitcoin sold, after tax, following your rebuy rule. Above the line the round trip earned bitcoin; below it, it cost it. Change the settings and watch the crossing move.</p>
 
-    <div class="hc-chart-wrap chart-wrapper" data-chart-copy data-chart-heading="#insight .hc-h2" data-chart-sub="#insight .hc-insight-sub" data-chart-assump="#hcEndnote" data-chart-title="Where the strategy has paid">
+    <div class="hc-chart-wrap chart-wrapper" data-chart-copy data-chart-heading="#insight .hc-h2" data-chart-sub="#insight .hc-insight-sub" data-chart-assump="#hcEndnote" data-chart-title="How Much Cash? · Where the strategy has paid">
       <canvas id="hcInsightChart"></canvas>
       <div class="lcs-pulse-halo" id="hcInsightPulse"></div>
     </div>
