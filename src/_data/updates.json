@@ -1,5 +1,10 @@
 [
   {
+    "display": "7/17/26",
+    "page": "/bitcoin-vs-real-estate.html",
+    "summary": "Updated: Bitcoin vs. Real Estate — the down payment is now yours to set. Both the retrospective and projection calculators take a “down payment %” (default 20%), and everything downstream recomputes: the up-front amount, the loan and monthly payment, the equity you would hold and the “% owned” figure, and the rent estimate, which tracks the payment. Set 10% for more leverage or 40% for less; a shared projection link now carries your choice."
+  },
+  {
     "display": "7/16/26",
     "page": "/",
     "summary": "Site-wide: a slim channel barometer now sits under the header on every page — the live ×-trend multiple, where bitcoin sits in the Power Law channel, and the spot price, at a glance (it links through to the channel itself). Alongside it, quiet “New” and “Updated” badges now appear in the menus and on the calculators, so you can see what has changed recently without hunting; they appear and expire on their own."

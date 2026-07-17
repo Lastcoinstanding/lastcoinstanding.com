@@ -792,6 +792,53 @@ Third optional input field "Your interest rate" on Retrospective mode (originall
 - Flows through to: monthly payment, remaining balance, total cost, rent estimate, DCA savings
 - Mobile responsive at 768px and 480px stacks to single column
 
+### Variable down payment % (both modes, added July 2026)
+
+The down-payment fraction, previously hardcoded at 20%, is now a user input in
+**both** calculator modes — following the page's established per-mode input
+duplication (home price, rent, rate each exist as a `custom*` retrospective
+field and a `fwd*` projection field):
+
+- **Retrospective:** `#customDownPct`, appended to `#customInputsRow` (now a
+  4-column grid; collapses to 1 column ≤768px like its row-siblings). DOM-only
+  persistence, matching the other optional retrospective fields (which carry no
+  URL param). Placeholder `20% (standard)`; blank ⇒ default 20.
+- **Projection:** `#fwdDownPct`, a compact field placed directly under the
+  Purchase Method buttons (it parameterizes the "X% Down + Mortgage" method;
+  ignored in cash mode). Carries a URL param + localStorage via the projection
+  SCHEMA (`down`, `type:'float'`, `def:20`), same as `mortgage`/`appr`. Value
+  `20%` in markup.
+
+**Bounds: 3–95% (inclusive), default 20.** Documented choice: 100% is the cash-
+purchase toggle's territory and 0% collapses the bitcoin side to nothing, so
+both are excluded; below ~3% the up-front bitcoin-equivalent is negligible.
+Invalid/out-of-range/blank input falls back to 20.
+
+**Back-compat identity gate.** A paramless / blank-input load reproduces the
+prior 20%-down numbers exactly in both modes: down payment `= price × f`, loan
+`= price × (1 − f)` with `f = 0.20`. This is the regression gate.
+
+**Dynamic prose (§10.3 anchored).** The scenario-toggle / purchase-method labels
+("{X}% Down + Mortgage", via anchored `.retro-dp-pct` / `#fwdDpToggleLabel`
+spans), the retrospective scenario sentence ("{X}% of median home price $Y"),
+and both result-card "{X}% down" sublabels recompute from the input — each
+percentage stays in the same clause as its dollar anchor.
+
+**Rent decision (flagged).** The default rent (~75% of the equivalent mortgage
+payment) **tracks** the down-payment-adjusted payment — that is its stated
+definition, and a bigger down payment ⇒ smaller loan ⇒ smaller payment ⇒ lower
+implied rent. This falls out automatically because the mortgage payment is
+computed from the adjusted loan; no separate handling. A user's explicit rent
+override still wins.
+
+**Left intentionally at 20%:** the *other tabs* (Home Priced in Bitcoin seesaw,
+The Ceiling burden chart, Affordability cost chart) — their `p*0.2` and
+chart-source captions are fixed illustrative assumptions, out of scope. The
+retrospective narrative's "A 20% down payment — the conventional case — gives
+you 5:1 exposure" is kept as a general teaching example (framed as conventional,
+not the live scenario). The equity-fill SVG's `equityPct*0.20` is a pixel-height
+calc, unrelated to down payment.
+
 ### Cross-link role
 
 - BvRE applies the Power Law channel as a forward projection (in Projection mode); BvRE's related-set points to The Channel page (Power Law Tab 4) as the canonical visualization of the bands.

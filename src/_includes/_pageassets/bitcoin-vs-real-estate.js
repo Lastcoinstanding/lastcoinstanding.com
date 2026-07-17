@@ -233,7 +233,15 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         const ey=2025;
         const medianHs=homeData[sy],medianHe=homeData[ey],bs=btcData[sy],be=btcData[ey];const _customRaw=(document.getElementById('customHomePrice')||{}).value||'';const _customNum=parseFloat(_customRaw.replace(/[$,\s]/g,''));const _customValid=!isNaN(_customNum)&&_customNum>=50000&&_customNum<=10000000;const hs=_customValid?_customNum:medianHs;const he=_customValid?Math.round(_customNum*(medianHe/medianHs)):medianHe;const _isCustom=_customValid;
         const _prevailingRate=mortgageRates[sy];const _rateRaw=(document.getElementById('customRate')||{}).value||'';const _rateNum=parseFloat(_rateRaw.replace(/[%\s]/g,''));const _rateValid=!isNaN(_rateNum)&&_rateNum>=0.5&&_rateNum<=15;const rate=_rateValid?_rateNum:_prevailingRate;const _isCustomRate=_rateValid;const yrs=ey-sy;
-        const dp=mode==='cash'?hs:Math.round(hs*0.2);
+        // Optional user-override for down payment %. Default 20 (identity:
+        // a paramless/blank load reproduces the original 20%-down numbers
+        // exactly). Bounds 3–95: below 3 the up-front bitcoin-equivalent is
+        // negligible, and 100 is the cash-purchase toggle's territory (0 would
+        // collapse the bitcoin side to nothing) — both excluded.
+        const _dpRaw=(document.getElementById('customDownPct')||{}).value||'';const _dpNum=parseFloat(_dpRaw.replace(/[%\s]/g,''));const _dpValid=!isNaN(_dpNum)&&_dpNum>=3&&_dpNum<=95;const downPct=_dpValid?_dpNum:20;const dpf=downPct/100;const _dpLabel=(Math.round(downPct*10)/10);
+        // Keep the leverage toggle label in sync with the chosen down payment.
+        var _retroLevPct=document.querySelector('.toggle-group .toggle-btn[data-mode="leverage"] .retro-dp-pct');if(_retroLevPct)_retroLevPct.textContent=_dpLabel;
+        const dp=mode==='cash'?hs:Math.round(hs*dpf);
         const asOf='April 2025';
         const medianRef=_isCustom?('at $'+Math.round(hs).toLocaleString()+' each'):('at $'+he.toLocaleString()+' each (median)');
 
@@ -242,14 +250,14 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         if(mode==='cash'){
             assumeEl.innerHTML='<strong style="color:var(--text-dim)">Scenario:</strong> You had $'+dp.toLocaleString()+' in '+sy+' (median home price). You either bought the house outright in cash, or invested the full amount in bitcoin and continued renting.';
         }else{
-            assumeEl.innerHTML='<strong style="color:var(--text-dim)">Scenario:</strong> You had $'+dp.toLocaleString()+' in '+sy+' (20% of median home price $'+hs.toLocaleString()+'). You either used it as a down payment with a 30-year fixed mortgage at '+rate+'%'+(_isCustomRate?' <span style="font-size:0.78rem;color:var(--text-muted)">(vs. prevailing '+_prevailingRate+'%)</span>':'')+', or invested it in bitcoin and rented instead.';
+            assumeEl.innerHTML='<strong style="color:var(--text-dim)">Scenario:</strong> You had $'+dp.toLocaleString()+' in '+sy+' ('+_dpLabel+'% of median home price $'+hs.toLocaleString()+'). You either used it as a down payment with a 30-year fixed mortgage at '+rate+'%'+(_isCustomRate?' <span style="font-size:0.78rem;color:var(--text-muted)">(vs. prevailing '+_prevailingRate+'%)</span>':'')+', or invested it in bitcoin and rented instead.';
         }
 
         // ── SHARED CALCS ──
         const bb=dp/bs;
         const lumpValue=bb*be;
         const lumpReturn=((lumpValue-dp)/dp*100).toFixed(0);
-        const mortgageMonthly=monthlyPayment(hs*0.8,rate,30);
+        const mortgageMonthly=monthlyPayment(hs*(1-dpf),rate,30);
         const _defaultRent=Math.round(mortgageMonthly*0.75);const _rentRaw=(document.getElementById('customRent')||{}).value||'';const _rentNum=parseFloat(_rentRaw.replace(/[$,\s]/g,''));const _rentValid=!isNaN(_rentNum)&&_rentNum>=100&&_rentNum<=50000;const _isCustomRent=_rentValid;const estRent=_rentValid?Math.round(_rentNum):_defaultRent;
         const totalRentPaid=estRent*yrs*12;
         const lumpNet=lumpValue-totalRentPaid;
@@ -269,7 +277,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
                'Rent paid: $0 <span style="font-size:0.78rem;color:var(--text-muted)">(you live in it)</span><br>'+
                'No debt — but no bitcoin either';
         }else{
-            const la=hs*0.8;monthlyMortgage=monthlyPayment(la,rate,30);
+            const la=hs*(1-dpf);monthlyMortgage=monthlyPayment(la,rate,30);
             const mps=yrs*12;const r=rate/100/12;
             let bal=la;for(let i=0;i<mps;i++)bal=bal*(1+r)-monthlyMortgage;bal=Math.max(0,bal);
             remainingBal=bal;houseEquity=he-bal;equityPct=Math.round((houseEquity/he)*100);debtFreeYear=sy+30;
@@ -289,7 +297,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             '<div class="calc-result-card bitcoin">'+
                 '<h4>\u20BF Bought Bitcoin + Rented ('+sy+')</h4>'+
                 '<div class="period-label">'+sy+' \u00B7 Purchased</div>'+
-                '<div class="invested-line">Invested <strong>$'+dp.toLocaleString()+'</strong>'+(mode==='leverage'?' <span class="note">(20% down)</span>':' <span class="note">(cash equivalent)</span>')+'</div>'+
+                '<div class="invested-line">Invested <strong>$'+dp.toLocaleString()+'</strong>'+(mode==='leverage'?' <span class="note">('+_dpLabel+'% down)</span>':' <span class="note">(cash equivalent)</span>')+'</div>'+
                 '<div class="period-divider"></div>'+
                 '<div class="period-label">'+asOf+' \u00B7 Current Value</div>'+
                 '<div class="result-value">$'+Math.round(lumpNet).toLocaleString()+' <span style="font-size:0.85rem;color:var(--text-muted)">net</span></div>'+
@@ -306,7 +314,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             '<div class="calc-result-card house">'+
                 '<h4>\uD83C\uDFE0 Bought the House ('+sy+')</h4>'+
                 '<div class="period-label">'+sy+' \u00B7 Purchased</div>'+
-                '<div class="invested-line">Invested <strong>$'+dp.toLocaleString()+'</strong>'+(mode==='leverage'?' <span class="note">(20% down of $'+hs.toLocaleString()+')</span>':' <span class="note">(cash, paid in full)</span>')+'</div>'+
+                '<div class="invested-line">Invested <strong>$'+dp.toLocaleString()+'</strong>'+(mode==='leverage'?' <span class="note">('+_dpLabel+'% down of $'+hs.toLocaleString()+')</span>':' <span class="note">(cash, paid in full)</span>')+'</div>'+
                 '<div class="period-divider"></div>'+
                 '<div class="period-label">'+asOf+' \u00B7 Current Value</div>'+
                 '<div class="result-value">'+hL+'</div>'+
@@ -334,7 +342,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             const extraHouses=totalHouses-1;
             const totalInvested=dp+dcaTotalInvested;
             const yrsRemaining=debtFreeYear-2025;
-            const principalRepaid=(hs*0.8)-remainingBal;
+            const principalRepaid=(hs*(1-dpf))-remainingBal;
             const interestPaid=Math.round((mortgageMonthly*yrs*12)-principalRepaid);
             const houseOutflow=Math.round(houseTotalSpent);
             const btcOutflow=Math.round(totalInvested+totalRentPaid);
@@ -430,7 +438,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     // anywhere would strip .active from retrospective method buttons. Each
     // other group has its own scoped click handler defined elsewhere.
     document.querySelectorAll('.toggle-group .toggle-btn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.toggle-group .toggle-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');runCalculator()})});
-    document.getElementById('calcYear').addEventListener('change',function(){var cp=document.getElementById('customHomePrice');if(cp){cp.value='';var y=parseInt(this.value);var m=homeData[y];if(m)cp.placeholder='$'+m.toLocaleString()+' ('+y+' median)';}var cr=document.getElementById('customRent');if(cr){cr.value='';}var crt=document.getElementById('customRate');if(crt){crt.value='';var yr=parseInt(this.value);var mr=mortgageRates&&mortgageRates[yr];if(mr)crt.placeholder=mr+'% ('+yr+' avg)';}runCalculator();});var _cpEl=document.getElementById('customHomePrice');if(_cpEl){_cpEl.addEventListener('input',runCalculator);var _yVal=parseInt(document.getElementById('calcYear').value);if(homeData[_yVal])_cpEl.placeholder='$'+homeData[_yVal].toLocaleString()+' ('+_yVal+' median)';}var _crEl=document.getElementById('customRent');if(_crEl){_crEl.addEventListener('input',runCalculator);}var _crtEl=document.getElementById('customRate');if(_crtEl){_crtEl.addEventListener('input',runCalculator);var _yrInit=parseInt(document.getElementById('calcYear').value);if(mortgageRates[_yrInit])_crtEl.placeholder=mortgageRates[_yrInit]+'% ('+_yrInit+' avg)';}
+    document.getElementById('calcYear').addEventListener('change',function(){var cp=document.getElementById('customHomePrice');if(cp){cp.value='';var y=parseInt(this.value);var m=homeData[y];if(m)cp.placeholder='$'+m.toLocaleString()+' ('+y+' median)';}var cr=document.getElementById('customRent');if(cr){cr.value='';}var crt=document.getElementById('customRate');if(crt){crt.value='';var yr=parseInt(this.value);var mr=mortgageRates&&mortgageRates[yr];if(mr)crt.placeholder=mr+'% ('+yr+' avg)';}runCalculator();});var _cpEl=document.getElementById('customHomePrice');if(_cpEl){_cpEl.addEventListener('input',runCalculator);var _yVal=parseInt(document.getElementById('calcYear').value);if(homeData[_yVal])_cpEl.placeholder='$'+homeData[_yVal].toLocaleString()+' ('+_yVal+' median)';}var _crEl=document.getElementById('customRent');if(_crEl){_crEl.addEventListener('input',runCalculator);}var _crtEl=document.getElementById('customRate');if(_crtEl){_crtEl.addEventListener('input',runCalculator);var _yrInit=parseInt(document.getElementById('calcYear').value);if(mortgageRates[_yrInit])_crtEl.placeholder=mortgageRates[_yrInit]+'% ('+_yrInit+' avg)';}var _dpEl=document.getElementById('customDownPct');if(_dpEl){_dpEl.addEventListener('input',runCalculator);}
     document.getElementById('calcDCA').addEventListener('change',function(){
         document.getElementById('dcaSection').style.display=this.checked?'block':'none';
         runCalculator();
@@ -446,6 +454,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         var hp=document.getElementById('customHomePrice');if(hp) hp.addEventListener('blur',function(){fmtMoney(hp);});
         var rt=document.getElementById('customRent');if(rt) rt.addEventListener('blur',function(){fmtMoney(rt);});
         var rate=document.getElementById('customRate');if(rate) rate.addEventListener('blur',function(){fmtPercent(rate);});
+        var dpp=document.getElementById('customDownPct');if(dpp) dpp.addEventListener('blur',function(){fmtPercent(dpp);});
     })();
     runCalculator();
     
@@ -612,6 +621,17 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     var homeApprNominalPct = window.CalcHelpers.realToNominal(homeApprReal, inflRate);
     var homeAppr = homeApprNominalPct / 100;
     var mortRate = parseNum('fwdMortgageRate');
+    // Optional down payment % (default 20 → identity with prior behavior).
+    // Bounds 3–95, same rationale as retrospective. Drives the up-front
+    // amount, the financed loan, the monthly payment, and (through it) the
+    // 75%-of-mortgage default rent.
+    var _fdpNum = parseNum('fwdDownPct');
+    var _fdpValid = isFinite(_fdpNum) && _fdpNum >= 3 && _fdpNum <= 95;
+    var downPct = _fdpValid ? _fdpNum : 20;
+    var dpf = downPct / 100;
+    var _fdpLabel = (Math.round(downPct * 10) / 10);
+    var _fwdDpToggle = document.getElementById('fwdDpToggleLabel');
+    if(_fwdDpToggle) _fwdDpToggle.textContent = _fdpLabel;
 
     if(btcNow <= 0 || homePrice <= 0) return;
 
@@ -642,10 +662,10 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     var asOf = 'Jan 1, ' + endYear;
 
     // ── Derive investment amount from home price + method ──
-    var amount = (method === 'cash') ? homePrice : homePrice * 0.2;
+    var amount = (method === 'cash') ? homePrice : homePrice * dpf;
 
     // ── Mortgage math (needed for both modes: implied rent = 75% of equivalent mortgage) ──
-    var loanAmt = homePrice * 0.8;
+    var loanAmt = homePrice * (1 - dpf);
     var mr = mortRate / 100 / 12;
     var nPayments = 360;
     var monthlyMort = mr > 0 ? loanAmt * (mr * Math.pow(1+mr, nPayments)) / (Math.pow(1+mr, nPayments) - 1) : loanAmt / nPayments;
@@ -796,7 +816,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         '<div class="calc-card house">' +
           '<h4>&#127968; Bought the House ('+startYear+')</h4>' +
           '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
-          '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(20% down of '+fmt(homePrice)+')</span></div>' +
+          '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">('+_fdpLabel+'% down of '+fmt(homePrice)+')</span></div>' +
           '<div class="period-divider"></div>' +
           '<div class="period-label">'+endYear+' \u00b7 Projected ('+modePeriodLabel()+')</div>' +
           '<div class="big-number">'+fmt(modeVal(equityReal, equity))+'</div>' +
@@ -1030,7 +1050,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   }
 
   // ── Event listeners ──
-  ['fwdBtcNow','fwdHomePrice','fwdHomeAppreciation','fwdMortgageRate','fwdAdvancedRate','fwdMonthlyRent'].forEach(function(id){
+  ['fwdBtcNow','fwdHomePrice','fwdHomeAppreciation','fwdMortgageRate','fwdAdvancedRate','fwdMonthlyRent','fwdDownPct'].forEach(function(id){
     var el = document.getElementById(id);
     if(el) el.addEventListener('input', runFwdCalc);
   });
@@ -1070,6 +1090,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     bindPercent('fwdHomeAppreciation');
     bindPercent('fwdMortgageRate');
     bindPercent('fwdAdvancedRate');
+    bindPercent('fwdDownPct');
   })();
   horizonSel.addEventListener('change', runFwdCalc);
   document.getElementById('fwdAdvancedCheck').addEventListener('change', runFwdCalc);
@@ -1233,6 +1254,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 //     horizon    integer 5|10|15|20       default 10
 //     appr       decimal (home appr %)    default 3.5
 //     mortgage   decimal (mortgage %)     default 6.8
+//     down       decimal (down payment %) default 20
 //     method     'cash' | 'mortgage'      default 'mortgage'
 //     pscenario  'floor'|'trend'|'upper'  default 'trend'
 //     advanced   '1' if checked           omit otherwise
@@ -1267,6 +1289,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     horizon:   { elId: 'fwdHorizon',           type: 'int',       def: 10,      evt: 'change' },
     appr:      { elId: 'fwdHomeAppreciation',  type: 'float',     def: 3.5,     evt: 'input'  },
     mortgage:  { elId: 'fwdMortgageRate',      type: 'float',     def: 6.8,     evt: 'input'  },
+    down:      { elId: 'fwdDownPct',           type: 'float',     def: 20,      evt: 'input'  },
     advanced:  { elId: 'fwdAdvancedCheck',     type: 'bool',                    evt: 'change' },
     advrate:   { elId: 'fwdAdvancedRate',      type: 'float',     def: 7,       evt: 'input'  },
     method:    { type: 'btn-method',    sel: '.purchase-btn',   attr: 'method',   def: 'mortgage' },
