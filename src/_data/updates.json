@@ -2,6 +2,11 @@
   {
     "display": "7/16/26",
     "page": "/how-much-cash",
+    "summary": "Reworked: How Much Cash? now has two sliders — where you sell, and where you rebuy — on the same channel, so the gap between them is your strategy at a glance. The rebuy target is now a smooth slider (its ceiling is your own sale, marked on the track), not three fixed buttons; both dashed lines show on the chart. The summary chart's glow was fixed to always sit on today's point, and a shaded band now shows the stretch your strategy spans. A \"Show the work\" link opens the full historical record behind the numbers. The page now says \"bitcoin\" rather than \"coins\" throughout, and remembers your settings on this device between visits (a shared link still shows exactly what it encodes)."
+  },
+  {
+    "display": "7/16/26",
+    "page": "/how-much-cash",
     "summary": "Added: How Much Cash? now lets you set the rebuy target — the second half of the round trip. Leave it on Wait-or-Deploy's default (the first lower entry), or aim deeper: below trend, or near the floor. Deeper targets pay bigger multiples when they arrive, but they arrive less often, take longer, and the trend keeps rising while your cash waits — so the stats can show a deep target that, after tax, still comes back with fewer coins. Enter your stack and the last card shows the whole-stack outcome (10 → 11.6 BTC); leave it blank and it shows the round-trip multiple. The primary lever is now framed as one stack split two ways — the share you hold as cash, the rest in coins."
   },
   {

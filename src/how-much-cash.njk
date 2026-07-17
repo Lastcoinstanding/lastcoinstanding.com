@@ -8,13 +8,13 @@ related:
   - slug: wait-or-deploy-now
     desc: "The same record, read through the opposite door. Wait-or-Deploy asks the cash holder whether to deploy or wait; this page asks the all-in holder whether to hold or raise. Mirror twins, one method, one set of numbers."
   - slug: the-power-law
-    desc: "The foundational model every figure here reads from. This page scores a trade by where in the Power Law channel you made it — the floor, trend, and upper band, and the evidence behind them, are laid out there. Start here if the channel is new."
+    desc: "The foundational model every figure here reads from. This page scores a strategy by where in the Power Law channel you made it — the floor, trend, and upper band, and the evidence behind them, are laid out there. Start here if the channel is new."
   - slug: how-much-bitcoin
     desc: "A related exploration, examining the fraction of a portfolio that bitcoin might justify occupying. This page comes at the allocation from the other side: how much fiat belongs beside the stack, and what holding it costs."
   - slug: borrowing-against-your-stack
     desc: "The other answer to never selling. A loan against the stack is the alternative to raising cash, and its failure mode is exactly this page's subject: the credit line tightens at the same trough where selling hurts most."
   - slug: the-bitcoin-retirement-stress-test
-    desc: "The withdrawal-era version of the shock absorber. This page asks what a bill costs in coins at a given moment; the Stress Test asks what a badly-timed crash does when you are already selling to live."
+    desc: "The withdrawal-era version of the shock absorber. This page asks what a bill costs in bitcoin at a given moment; the Stress Test asks what a badly-timed crash does when you are already selling to live."
 eleventyComputed:
   head_extras: "{% include '_pageassets/how-much-cash-head.html' %}"
   page_styles: "{% include '_pageassets/how-much-cash.css' %}"
@@ -24,7 +24,7 @@ eleventyComputed:
 <section class="hero">
   <h1>How Much <em>Cash?</em></h1>
   <div class="hero-subtitle">How and when can dry powder get you more bitcoin?</div>
-  <p class="subtitle">A tool for the all-in holder: pick a cash share, drag to any position in the channel, and see how raising it there has historically ended &mdash; in coins.</p>
+  <p class="subtitle">A tool for the all-in holder: pick a cash share, drag to any position in the channel, and see how raising it there has historically ended &mdash; in bitcoin.</p>
 </section>
 
 <main class="content-area">
@@ -54,12 +54,12 @@ eleventyComputed:
   <section class="hc-section" id="playground">
     <div class="hc-eyebrow">The tool</div>
     <h2 class="hc-h2">Where you are decides</h2>
-    <p class="hc-lead hc-playground-sub">Raising cash is selling &mdash; converting part of one stack into its other form, not setting money aside from it. Whether that has historically been a good or a terrible idea depends almost entirely on where in the <a href="/the-power-law">Power Law channel</a> you did it. Set the split and a tax rate, then drag the slider to any sell position &mdash; the dashed line and blue dots on the chart move with it, and the verdict below follows from it.</p>
+    <p class="hc-lead hc-playground-sub">Raising cash is selling &mdash; converting part of one stack into its other form, not setting money aside from it. The full cycle &mdash; sell, wait, rebuy &mdash; is the <strong>round trip</strong>, and where in the <a href="/the-power-law">Power Law channel</a> you run it decides whether it ends in more bitcoin or less. Set the split and a tax rate, then drag the two sliders below &mdash; where you sell, and where you rebuy &mdash; and the verdict follows from it.</p>
 
     <div class="hc-calc">
       <!-- 1 ── INPUTS ROW (moved above everything interactive) ── -->
       <div class="hc-calc-head">
-        <h3 class="hc-calc-title">Your trade</h3>
+        <h3 class="hc-calc-title">Your strategy</h3>
         <button type="button" class="hc-reset" id="hcReset">Reset defaults</button>
       </div>
 
@@ -67,7 +67,7 @@ eleventyComputed:
         <div class="hc-lever hc-lever-primary">
           <div class="hc-primary-head">
             <span class="hc-primary-label">Your stack, split
-              <span class="help-tip" tabindex="0">?<span class="tip-content">One stack, two forms: the share you convert to cash for the round trip; the rest stays coins. The verdict is a share of the stack, so it does not depend on how big the stack is.</span></span>
+              <span class="help-tip" tabindex="0">?<span class="tip-content">One stack, two forms: the share you convert to cash for the round trip; the rest stays bitcoin. The verdict is a share of the stack, so it does not depend on how big the stack is.</span></span>
             </span>
             <span class="hc-primary-val"><input type="number" id="hcShareNum" min="0" max="100" step="1" aria-label="Share of the stack converted to cash, percent"><span class="hc-primary-suffix">% to cash</span></span>
           </div>
@@ -78,7 +78,7 @@ eleventyComputed:
             <button type="button" data-val="25">25%</button>
             <button type="button" data-val="50">50%</button>
           </div>
-          <p class="hc-control-note">One stack, two forms: the share you hold as cash, ready &mdash; the rest stays coins. Same monetary energy, split for the round trip.</p>
+          <p class="hc-control-note">One stack, two forms: the share you hold as cash, ready &mdash; the rest stays bitcoin. Same monetary energy, split for the round trip.</p>
         </div>
 
         <div class="hc-lever">
@@ -115,26 +115,35 @@ eleventyComputed:
         <p class="hc-slider-caption">Drag to explore other positions, or <a href="#" id="hcSnapToday">snap back to today</a>. Every figure is <strong>historical, at this position</strong> &mdash; not a prediction. <span class="hc-pos-readout" id="hcPosReadout">&mdash;</span></p>
       </div>
 
-      <!-- decision #2: the rebuy target (the redeploy side of the round trip) -->
-      <div class="hc-rebuy-row">
-        <span class="hc-rebuy-label">Then rebuy at
-          <span class="help-tip" tabindex="0">?<span class="tip-content">The redeploy &mdash; decision two of the round trip. How far you wait for the cash to come back into coins. Deeper targets pay bigger multiples when they arrive, arrive less often, and take longer; the stats carry all of it.</span></span>
-        </span>
-        <div class="hc-seg hc-seg-rebuy" id="hcRebuy">
-          <button type="button" data-val="first">First lower entry</button>
-          <button type="button" data-val="trend">Below trend</button>
-          <button type="button" data-val="floor">Near the floor</button>
+      <!-- decision #2: the rebuy target — slider 2, same channel axis, capped at your sale -->
+      <div class="hc-slider-block hc-slider2-block">
+        <div class="hc-rebuy-headline">
+          <span class="hc-rebuy-label">Then rebuy at
+            <span class="help-tip" tabindex="0">?<span class="tip-content">The redeploy &mdash; decision two of the round trip. Slide left for a deeper target (a cheaper rebuy); its ceiling is your own sale, marked &#9660; your sale. Deeper targets pay bigger multiples when they arrive, arrive less often, and take longer &mdash; the stats carry all of it.</span></span>
+          </span>
+          <span class="hc-pos-readout" id="hcRebuyReadout">&mdash;</span>
         </div>
+        <div class="hc-slider-wrap">
+          <input type="range" min="0" max="1000" step="1" value="510" class="hc-slider hc-slider2" id="hcRebuySlider"
+                 aria-label="Rebuy target channel position, capped at your sale position">
+          <span class="hc-sale-tick" id="hcSaleTick" aria-hidden="true"><span class="hc-sale-flag">&#9660; your sale</span></span>
+        </div>
+        <div class="hc-slider-scale"><span>Deeper target &middot; cheaper rebuy</span><span>At your sale</span></div>
       </div>
-      <p class="hc-rule-note">The rebuy side is yours to set: the default is <a href="/wait-or-deploy-now">Wait-or-Deploy</a>&rsquo;s rule &mdash; the first lower entry within two years, no timing, no discretion. Choose a deeper target and the stats change honestly: bigger multiples when it arrives, arriving less often, after longer waits &mdash; while the trend compounds under the cash. If the target never comes, the cash rebuys at the two-year price, sometimes higher than you sold.</p>
-      <p class="hc-couple-note">Deciding the redeploy on its own &mdash; cash in hand, no round trip &mdash; is <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a>&rsquo;s question; this page couples the two ends of the same trade.</p>
+      <p class="hc-rule-note">The rebuy side is yours to set. Leave it <strong>at your sale</strong> for <a href="/wait-or-deploy-now">Wait-or-Deploy</a>&rsquo;s rule &mdash; the first lower entry within two years, no timing, no discretion. Slide to a deeper target and the stats change honestly: bigger multiples when it arrives, arriving less often, after longer waits &mdash; while the trend compounds under the cash. If the target never comes, the cash rebuys at the two-year price, sometimes higher than you sold.</p>
+      <p class="hc-couple-note">Deciding the redeploy on its own &mdash; cash in hand, no round trip &mdash; is <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a>&rsquo;s question; this page couples the two ends of the same round trip.</p>
+
+      <!-- both audiences, one passage (§6 + addendum A2/A4): the explorer and the manager -->
+      <div class="hc-manager-note">
+        <p>Exploring your first split, or tracking one you already made? Set the sell slider to where you actually sold, and the rebuy target to what you&rsquo;re waiting for. Sold, and the price ran past you? You are living the no-arrival branch &mdash; the target never came. This page&rsquo;s honest answer is the two-year rule: at some point the strategy ends and the cash goes back, sometimes above your sale. Deciding when, from here, with cash in hand, is <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a>&rsquo;s question &rarr;</p>
+      </div>
 
       <!-- 3 ── THE CHANNEL CHART (dashed selected line + blue entry dots) ── -->
       <div class="hc-chart-block">
         <div class="hc-chart-wrap chart-wrapper" data-chart-copy data-chart-heading="#playground .hc-h2" data-chart-sub="#playground .hc-playground-sub" data-chart-assump="#hcEndnote" data-chart-title="Where you are decides">
           <canvas id="hcChannelChart"></canvas>
         </div>
-        <p class="hc-chart-caption">The Power Law channel across history. The <strong>dashed blue line</strong> is the position you&rsquo;re exploring; the <strong>blue dots</strong> are the historical entries near it the answer is built from.</p>
+        <p class="hc-chart-caption">The Power Law channel across history. The <strong>blue dashed line</strong> is your sell position &mdash; with its neighbourhood <strong>dots</strong>, the historical entries the answer is built from; the <strong>green dashed line</strong> is your rebuy target. The gap between them is the strategy&rsquo;s span.</p>
       </div>
 
       <!-- 4 ── THE VERDICT, AS BLOCKS ── -->
@@ -168,12 +177,13 @@ eleventyComputed:
 
         <!-- Card C — NEW STACK when the stack is set, else ROUND TRIP (both from compute()) -->
         <div class="hc-card hc-card-c">
-          <div class="hc-card-cap" id="hcCardCCap">Round trip</div>
+          <div class="hc-card-cap" id="hcCardCCap">Bitcoin back</div>
           <div class="hc-card-num hc-card-num-sm" id="hcCardCVal">&mdash;</div>
           <p class="hc-card-half-sub" id="hcCardCLine">&mdash;</p>
         </div>
       </div>
 
+      <p class="hc-showwork"><a href="#audit" id="hcShowWork">Show the work &mdash; the record behind these numbers &rarr;</a></p>
       <p class="hc-provenance" id="hcSample">&mdash;</p>
       <p class="hc-endnote" id="hcEndnote">&mdash;</p>
 
@@ -183,7 +193,7 @@ eleventyComputed:
 
       <div class="hc-alarm" id="hcAlarm" hidden>
         <span class="hc-alarm-tag">Past 80%, this is an exit</span>
-        <p>Past 80% this stops being a buffer and starts being an exit. Worth remembering before you go further: a stack this hedged has already given up most of its drawdown risk &mdash; and most of its upside. Selling this much realizes the tax bill in one season. And the Power Law is a floor observed, not a ceiling promised: if bitcoin ever breaks it upward into an S-curve, the coins you sold are the ones that miss it. The default posture of this site is HODL; the opportunity here is a conservative trim, not a departure.</p>
+        <p>Past 80% this stops being a buffer and starts being an exit. Worth remembering before you go further: a stack this hedged has already given up most of its drawdown risk &mdash; and most of its upside. Selling this much realizes the tax bill in one season. And the Power Law is a floor observed, not a ceiling promised: if bitcoin ever breaks it upward into an S-curve, the bitcoin you sold is what misses it. The default posture of this site is HODL; the opportunity here is a conservative trim, not a departure.</p>
       </div>
     </div>
   </section>
@@ -191,14 +201,14 @@ eleventyComputed:
   <!-- ════════ THE INSIGHT CHART ════════ -->
   <section class="hc-section" id="insight">
     <div class="hc-eyebrow">The whole thesis, in one picture</div>
-    <h2 class="hc-h2">Where the trade has paid</h2>
-    <p class="hc-lead hc-insight-sub">This chart is the summary, not a control &mdash; it moves with the tax rate you set above. For every position in the <a href="/the-power-law">channel</a>: the median coins that came back per coin sold, after tax, following the rebuy rule. Above the line the round trip earned coins; below it, it cost them. Today&rsquo;s position glows. Change the tax rate and watch the crossing move.</p>
+    <h2 class="hc-h2">Where the strategy has paid</h2>
+    <p class="hc-lead hc-insight-sub">This chart is the summary, not a control &mdash; it moves with the tax rate AND the rebuy target you set above. For every sell position in the <a href="/the-power-law">channel</a>: the median bitcoin that came back per bitcoin sold, after tax, following your rebuy rule. Above the line the round trip earned bitcoin; below it, it cost it. Change the settings and watch the crossing move.</p>
 
-    <div class="hc-chart-wrap chart-wrapper" data-chart-copy data-chart-heading="#insight .hc-h2" data-chart-sub="#insight .hc-insight-sub" data-chart-assump="#hcEndnote" data-chart-title="Where the trade has paid">
+    <div class="hc-chart-wrap chart-wrapper" data-chart-copy data-chart-heading="#insight .hc-h2" data-chart-sub="#insight .hc-insight-sub" data-chart-assump="#hcEndnote" data-chart-title="Where the strategy has paid">
       <canvas id="hcInsightChart"></canvas>
       <div class="lcs-pulse-halo" id="hcInsightPulse"></div>
     </div>
-    <p class="hc-chart-caption hc-insight-caption">The <strong>blue point</strong> is the position you&rsquo;re exploring &mdash; the same blue as the dashed line on the channel chart above; the <strong>glowing point</strong> is today.</p>
+    <p class="hc-chart-caption hc-insight-caption">The <strong>blue point</strong> is your sell position &mdash; the same blue as the dashed sell line on the channel chart above; the <strong>glowing point</strong> is today. The shaded band is the stretch your strategy spans, from rebuy target to sale.</p>
     <p class="hc-endnote hc-endnote-insight" id="hcInsightNote">&mdash;</p>
   </section>
 
@@ -218,7 +228,7 @@ eleventyComputed:
     <h2 class="hc-h2">Sleep, and the other way to never sell</h2>
     <div class="hc-prose">
       <p>The third job does not compute. A buffer is also the thing that lets you sit through a drawdown without doing something you will regret, because the bill that would have forced your hand is already covered. The <a href="/bitcoin-allocation-sizing">allocation page</a> puts it as a question worth asking before any of the math: can you hold it? A position you cannot hold through a bad year is not really your position. Some of what a buffer buys is simply the ability to keep the rest.</p>
-      <p>There is another answer to never selling, and it deserves its paragraph. <a href="/borrowing-against-your-stack">Borrowing against your stack</a> gets you dollars without a sale, and on paper it dominates a cash buffer: no coins foregone, no tax, no drag. Its failure mode is the whole subject of this page. A credit line against bitcoin is collateralized by bitcoin, so it tightens exactly when bitcoin falls, and the margin call arrives at the same trough where the forced sale would have hurt most. The two options fail at the same moment, and only one of them is still there when it does.</p>
+      <p>There is another answer to never selling, and it deserves its paragraph. <a href="/borrowing-against-your-stack">Borrowing against your stack</a> gets you dollars without a sale, and on paper it dominates a cash buffer: no bitcoin foregone, no tax, no drag. Its failure mode is the whole subject of this page. A credit line against bitcoin is collateralized by bitcoin, so it tightens exactly when bitcoin falls, and the margin call arrives at the same trough where the forced sale would have hurt most. The two options fail at the same moment, and only one of them is still there when it does.</p>
     </div>
     <p class="hc-sharp">A loan against your stack is a buffer that can be taken away at the exact moment you need it.</p>
     <div class="hc-prose">
@@ -250,7 +260,7 @@ eleventyComputed:
         </table>
       </div>
       <p class="hc-endnote">One identity drives the page. Sell a fraction <em>x</em> of the stack at price <em>P</em> with tax <em>t</em>, and rebuy at <em>P_rebuy</em>: you end with <em>(1&minus;x) + x·(1&minus;t)·(P / P_rebuy)</em> of the stack you started with. The round-trip multiple on the sold slice is <em>(1&minus;t)·(P / P_rebuy)</em> &mdash; the number plotted above. Breakeven needs the rebuy more than <em>t</em> below the sale, which is why the tax rate moves the crossing. Your stack size cancels out of all of it, which is why the BTC input changes nothing but the dollar labels. Tax assumes a fully appreciated stack (zero cost basis): a real basis softens the haircut.</p>
-      <p class="hc-endnote">Two limits worth naming. When no dip arrives inside two years the rebuy happens anyway, at the two-year price &mdash; often <em>higher</em> than the sale, which is how a round trip loses coins rather than merely failing to gain them; those rows are in the table marked "no dip". And at the extremes of the channel the record thins out: the neighborhood widens automatically to keep a workable sample, so a figure at the far upper band rests on fewer entries than one near trend. The entry count and band width are stated with every verdict.</p>
+      <p class="hc-endnote">Two limits worth naming. When no dip arrives inside two years the rebuy happens anyway, at the two-year price &mdash; often <em>higher</em> than the sale, which is how a round trip loses bitcoin rather than merely failing to gain it; those rows are in the table marked "no dip". And at the extremes of the channel the record thins out: the neighborhood widens automatically to keep a workable sample, so a figure at the far upper band rests on fewer entries than one near trend. The entry count and band width are stated with every verdict.</p>
     </div>
   </section>
 

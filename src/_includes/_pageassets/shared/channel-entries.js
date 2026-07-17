@@ -70,9 +70,12 @@
   var TARGET_TREND_POS = 0.36;   // 'below trend' zone boundary (positionLabel)
   var TARGET_FLOOR_POS = 0.18;   // 'near the floor' zone boundary (positionLabel)
   function targetThreshold(P, target) {
+    // v3.3: a NUMERIC target is a continuous channel position — the rebuy waits until price
+    // reaches ≤ that position, capped at the sale (you can't target above your own sale).
+    if (typeof target === 'number') return Math.min(target, P);
     if (target === 'trend') return TARGET_TREND_POS;
     if (target === 'floor') return TARGET_FLOOR_POS;
-    return P - DROP;             // 'first' (default): first lower entry, relative to the sell
+    return P - DROP;             // undefined / 'first' / 'cap' (default): first lower entry (WODN's rule)
   }
 
   // Per-entry: did the rebuy target arrive within 2yr, and did the round trip get MORE

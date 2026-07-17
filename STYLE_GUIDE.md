@@ -1953,6 +1953,36 @@ var underwaterPlugin = { id: 'asUnderwater', afterDatasetsDraw: function (c) {
 
 **Pair with a pinned axis** (see the drift chart): while the crash view is open, pin `y.max` to a nice ceiling of the *smooth* path's max so recovery/timing changes are apples-to-apples; recompute only on assumption change, not on crash-year/recovery drag.
 
+### 6.37 Sticky instrument state (per-page `localStorage`)
+
+**When:** a calculator/explorer whose reader has a **tracking or managing** use-case, not only a one-off exploration — where returning to the same page and finding your last settings is a feature, not a surprise. Introduced on **How Much Cash** (v3.3, addendum A3): a reader managing a real position wants the sell/rebuy sliders where they left them. **Do NOT apply by default** — a page that is purely exploratory should start fresh every visit; persistence is a deliberate per-page decision.
+
+**Relationship to §3.5.** §3.5 governs the sitewide **baseline-assumption** store (`lcs.inflation.*` etc. via `shared/modeling-assumptions.js`) and says active/instrument variables are *never sticky*. This recipe is the sanctioned exception: it persists a **page's own active/instrument state**, on-device, **not sitewide**. The two never share keys; a page adopting this owns exactly one key of its own.
+
+**Precedence, strict — URL params (any present) > stored state > defaults.** A shared link must behave exactly as encoded: if ANY instrument param is in the URL, the store is neither read nor allowed to override it. (The URL load MAY then update the store as the user interacts — builder's judgment; document whichever you pick. How Much Cash does update it.)
+
+```js
+function init(){
+  var urlPresent = readUrl();      // returns true iff any instrument param was in the URL
+  if (!urlPresent) loadStore();    // store only when the URL is clean
+  // … defaults are whatever S_ already holds …
+}
+```
+
+**Per-page key convention:** `lcs.<page-slug>.state`, a single JSON blob of the instrument fields. One key per page → cross-page isolation is automatic (no other page reads it).
+
+**Store only a NON-default state; Reset removes the key.** The save routine writes nothing (and removes any existing key) when the state equals defaults. This makes three behaviours fall out for free: a fresh visitor starts clean, "Reset defaults" leaves **no key behind** (verify it's gone), and the store never accumulates a redundant defaults blob.
+
+```js
+function saveState(){ if (isDefaultState()) { clearStore(); return; } writeStore(JSON.stringify(pick(S_))); }
+```
+
+**Degrade silently.** Wrap every `localStorage` call in try/catch and no-op on failure — private-browsing / disabled-storage must fall back to session-only with **zero console errors**. Distinguish *moves* from *wipes*: "snap back to today" (or any normal control change) persists like anything else; only "Reset defaults" clears.
+
+**QA checklist (all verified on How Much Cash):** fresh-visit restore; URL-load ignores the store; Reset wipes the key (assert it's gone); private-mode throws nothing; the key is page-specific (no other page reads it).
+
+**CSS is not involved** — this is pure JS state. Duplicated per page like the other per-page patterns; if a third page adopts it, a `shared/sticky-state.js` (readUrl-aware, key + fields injected) is the obvious extraction.
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.

@@ -13,6 +13,20 @@ Candidate page / exploration ideas surfaced during ongoing work but not yet sche
 
 ## Open ideas
 
+- [ ] **WODN position receiver — enable the underwater-manager handoff from How Much Cash.**
+  Surfaced 2026-07-16 during the How Much Cash v3.3 build (addendum A2).
+  - **Concept:** teach `/wait-or-deploy-now` to read its slider position from a URL param (it currently encodes nothing in URL state). Then How Much Cash's underwater-manager block ("the target never came → deciding when to redeploy is Wait-or-Deploy's question") can carry **today's channel position** into WODN, so the reader lands on the deploy-or-wait question already at their spot — suite carry pattern (senders speak the receiver's vocabulary).
+  - **Why it's blocked today:** WODN has no URL handling, so the handoff link is currently **plain**. This is the receiver half; the sender (HMC) is ready.
+  - **Cross-links:** How Much Cash (`/how-much-cash`, the sender), WODN (`/wait-or-deploy-now`, the receiver). Mirror-twin pair already share `shared/channel-entries.js`.
+  - **Open design question:** WODN's slider is a channel position (0–1) like HMC's — decide the param name/encoding to match HMC's `pos`/`rebuy` convention so the suite reads consistently.
+
+- [ ] **How Much Cash tracking input — enter your actual sell, auto-set the sell slider.**
+  Surfaced 2026-07-16 (v3.3 spec §6, deferred). For the reader **managing** an existing position, not exploring a hypothetical.
+  - **Concept:** a small input — enter the date or price you actually sold at — that auto-positions slider 1 to where you sold, so the manager sees their real round trip's stats without hunting for the position by hand. The v3.3 copy already addresses this reader (the manager/underwater passage); this is the input that serves them directly.
+  - **Why deferred:** v3.3 covered the manager in **copy + routing** (the underwater block + WODN handoff); the dedicated input is the next step, not the same build.
+  - **Cross-links:** builds on `/how-much-cash`'s existing sell slider + sticky-state persistence (STYLE_GUIDE §6.37 — a tracked position would persist naturally).
+  - **Open design question:** date→position vs price→position (price alone is ambiguous without the date, since the trend moves); likely needs both, or date with price as a cross-check.
+
 - [ ] **Interactive highlights strip in The Gallery — deep-link cards into the best playgrounds.**
   Surfaced 2026-07-12 during the drift-chart Phase C build (which shipped the deep-link anchors this depends on).
   - **Concept:** a 3–4 card strip in The Gallery, each card deep-linking into a preconfigured interaction — e.g. the **allocation crash view** (`/bitcoin-allocation-sizing?…&cy=3&rec=weak#crash`), **Wait or Deploy Now**, the **Retirement Stress Test**, and **The Bitcoin Retirement**. Each card lands the reader on the open, configured playground in one click.

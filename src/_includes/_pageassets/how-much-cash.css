@@ -214,14 +214,33 @@ body { background: var(--bg); color: var(--text); }
 .hc-chart-caption { font-family: var(--font-b); font-size: 0.78rem; color: var(--text-dim); margin: 0.55rem 0 0; line-height: 1.5; text-align: center; }
 .hc-chart-caption strong { color: var(--text); font-weight: 600; }
 
-/* ── Decision #2: the rebuy target control + its copy ── */
-.hc-rebuy-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem 0.9rem; margin: 1rem 0 0; }
+/* ── Decision #2: slider 2 (the rebuy target), mirrored beneath slider 1 (v3.3) ── */
+.hc-slider2-block { margin: 1rem 0 0; }
+.hc-rebuy-headline { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.3rem 1rem; margin-bottom: 0.55rem; }
 .hc-rebuy-label { font-family: var(--font-b); font-size: 0.85rem; font-weight: 600; color: var(--text-dim); display: inline-flex; align-items: center; }
-.hc-seg-rebuy button { min-width: 0; }
-/* v3.2 §5: full-width, small, left-aligned — target ≤2 lines at desktop (not a narrow centered column) */
+/* slider 2: same track as slider 1, but a green→neutral gradient (deeper target on the left,
+   pairs with the green rebuy line on the chart). Thumb capped at the sale in JS. */
+.hc-slider2 { background: linear-gradient(90deg, rgba(111,174,111,0.5) 0%, rgba(111,174,111,0.28) 42%, rgba(122,115,103,0.32) 100%); }
+/* the ▼ YOUR SALE tick — the cap, moves with slider 1 (blue, matching the sell line) */
+.hc-sale-tick { position: absolute; bottom: 5px; width: 2px; height: 0; transform: translateX(-50%); background: var(--accent); box-shadow: 0 0 4px rgba(109,179,212,0.7); pointer-events: none; opacity: 0; transition: opacity 0.3s ease; }
+.hc-sale-tick.is-visible { opacity: 0.95; height: 16px; background: #6db3d4; }
+.hc-sale-flag { position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: var(--font-b); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #9fd0e4; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+.hc-sale-tick.is-visible .hc-sale-flag { opacity: 0.95; }
+.hc-slider2-block .hc-slider-scale { margin-top: 1.3rem; }   /* room for the ▼ sale flag beneath the track */
+
+/* v3.2 §5 / v3.3: full-width, small, left-aligned — the rebuy copy sits under the slider */
 .hc-rule-note { font-family: var(--font-b); font-size: 0.76rem; line-height: 1.5; color: var(--text-muted); max-width: none; margin: 0.7rem 0 0; text-align: left; }
 .hc-rule-note strong { color: var(--text-dim); font-weight: 600; }
 .hc-couple-note { font-family: var(--font-b); font-size: 0.74rem; line-height: 1.5; color: var(--text-muted); margin: 0.35rem 0 0; text-align: left; }
+
+/* the manager/underwater passage (one block, both audiences) + the show-the-work link */
+.hc-manager-note { margin: 0.9rem 0 0; padding: 0.7rem 0.95rem; border: 1px solid var(--border); border-left: 3px solid rgba(109,179,212,0.5); border-radius: 6px; background: rgba(109,179,212,0.05); }
+.hc-manager-note p { font-family: var(--font-b); font-size: 0.8rem; line-height: 1.55; color: var(--text-dim); margin: 0; }
+.hc-manager-note a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+.hc-manager-note a:hover { color: #f2b25a; border-bottom-color: rgba(224,148,34,0.7); }
+.hc-showwork { text-align: center; margin: 0.9rem 0 0.2rem; }
+.hc-showwork a { font-family: var(--font-b); font-size: 0.82rem; font-weight: 600; color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+.hc-showwork a:hover { color: #f2b25a; border-bottom-color: rgba(224,148,34,0.7); }
 
 /* One stack, two forms — the split readout */
 .hc-split-readout { font-family: var(--font-b); font-size: 0.8rem; color: var(--text-dim); margin: 0.5rem 0 0.2rem; font-variant-numeric: tabular-nums; }

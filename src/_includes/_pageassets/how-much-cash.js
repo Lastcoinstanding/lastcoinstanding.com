@@ -48,12 +48,12 @@
   var posOf = CE.posOf, ratioOf = CE.ratioOf, bandMetrics = CE.bandMetrics;
   var median = CE.median, monthYear = CE.monthYear;
   var S = CE.S, N = CE.N, todayD = CE.todayD, YEAR_D = CE.YEAR_D, MONTH_D = CE.MONTH_D;
-  var FIRST_D = CE.FIRST_D, TABLE_CUT = CE.TABLE_CUT;
+  var FIRST_D = CE.FIRST_D, TABLE_CUT = CE.TABLE_CUT, DROP = CE.DROP;
 
   // ── Palette ──
   var FLOOR_C = '#b04525', TREND_C = '#e09422', UPPER_C = '#e8c820';
   var HIST_C = 'rgba(232,224,210,0.55)', SEL_C = '#6db3d4';
-  var GAIN_C = '#6fae6f', LOSS_C = '#c0392b';
+  var GAIN_C = '#6fae6f', LOSS_C = '#c0392b', REBUY_C = '#6fae6f';   // rebuy-target line: green, distinct from the blue sell line
   var MUTED = '#7a7367', DIM = '#9a9080';
 
   var ZONE_MULT = 0.60;
@@ -75,9 +75,42 @@
   function spot() { return _spot; }
   function livePos() { return posOf(spot(), todayD); }         // today's TRUE channel position
 
-  var DEFAULTS = { share: 25, tax: 15, pos: null, stack: null, rebuy: 'first' };
-  var S_ = { share: 25, tax: 15, pos: null, stack: null, rebuy: 'first' };  // pos: null = today; rebuy: first|trend|floor
+  var DEFAULTS = { share: 25, tax: 15, pos: null, stack: null, rebuy: null };  // rebuy: null = at the cap (WODN default)
+  var S_ = { share: 25, tax: 15, pos: null, stack: null, rebuy: null };
   function curPos() { return (S_.pos == null) ? livePos() : clampPos(S_.pos); }
+
+  // ── v3.3 rebuy target (slider 2). null = AT THE CAP = your sale = WODN's first-lower-entry
+  // rule (the identity case); a number = a fixed channel-position target BELOW the sale. ──
+  var REBUY_EPS = 0.004;                                        // ≈ one slider notch
+  function atCap(rebuy, sellPos) { return rebuy == null || rebuy >= sellPos - REBUY_EPS; }
+  function engineTarget(rebuy, sellPos) { return atCap(rebuy, sellPos) ? undefined : rebuy; }   // undefined → WODN rule
+  function rebuyLinePos(rebuy, sellPos) { return atCap(rebuy, sellPos) ? (sellPos - DROP) : Math.min(rebuy, sellPos); }
+
+  // ── Sticky instrument state — the site's first per-page ACTIVE-state persistence
+  // (STYLE_GUIDE §6.37; §3.5 keeps sitewide ASSUMPTIONS separate). Precedence URL > store >
+  // defaults; the store holds only a NON-default state, so Reset (→ defaults) removes the key. ──
+  var STORE_KEY = 'lcs.how-much-cash.state';
+  function readStore() { try { return localStorage.getItem(STORE_KEY); } catch (e) { return null; } }
+  function writeStore(v) { try { localStorage.setItem(STORE_KEY, v); } catch (e) {} }
+  function clearStore() { try { localStorage.removeItem(STORE_KEY); } catch (e) {} }
+  function isDefaultState() {
+    for (var k in DEFAULTS) if (DEFAULTS.hasOwnProperty(k) && S_[k] !== DEFAULTS[k]) return false;
+    return true;
+  }
+  function saveState() {
+    if (isDefaultState()) { clearStore(); return; }   // at defaults → no key (fresh + post-Reset both clean)
+    writeStore(JSON.stringify({ share: S_.share, tax: S_.tax, pos: S_.pos, rebuy: S_.rebuy, stack: S_.stack }));
+  }
+  function loadStore() {
+    var raw = readStore(); if (!raw) return;
+    var o; try { o = JSON.parse(raw); } catch (e) { return; }
+    if (!o || typeof o !== 'object') return;
+    if (isFinite(o.share)) S_.share = clamp(o.share, 0, 100);
+    if ([0, 15, 20].indexOf(o.tax) >= 0) S_.tax = o.tax;
+    if (o.pos == null) S_.pos = null; else if (isFinite(o.pos) && o.pos >= POS_MIN - 0.001 && o.pos <= POS_MAX + 0.001) S_.pos = clampPos(o.pos);
+    if (o.rebuy == null) S_.rebuy = null; else if (isFinite(o.rebuy) && o.rebuy >= POS_MIN - 0.001 && o.rebuy <= POS_MAX + 0.001) S_.rebuy = o.rebuy;
+    if (o.stack == null) S_.stack = null; else if (isFinite(o.stack) && o.stack > 0) S_.stack = o.stack;
+  }
 
   // ── Format ──
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
@@ -111,10 +144,12 @@
     var pos = isToday ? livePos() : clampPos(st.pos);
     var P = isToday ? spot() : ratioOf(pos) * trend;   // == spot at the today position
     var mlt = P / trend;                               // == ratioOf(pos)
-    var m = bandMetrics(matchPos(pos), st.rebuy);      // ← WODN's machinery + v3.2 rebuy target
+    var eng = engineTarget(st.rebuy, pos);             // undefined at the cap (WODN rule), else the numeric target
+    var m = bandMetrics(matchPos(pos), eng);           // ← WODN's machinery + v3.3 continuous rebuy target
     var t = st.tax / 100, x = st.share / 100;
+    var isCap = atCap(st.rebuy, pos), rbTargetPos = rebuyLinePos(st.rebuy, pos);
 
-    if (!m) return { pos: pos, P: P, trend: trend, mult: mlt, isToday: isToday, m: null, t: t, x: x, tax: st.tax, share: st.share, stack: st.stack, rebuy: st.rebuy };
+    if (!m) return { pos: pos, P: P, trend: trend, mult: mlt, isToday: isToday, m: null, t: t, x: x, tax: st.tax, share: st.share, stack: st.stack, rebuy: st.rebuy, atCap: isCap, rebuyTargetPos: rbTargetPos };
 
     // Per-entry after-tax outcome. ratio is WODN's P/P_rebuy exactly.
     var outcomes = m.metrics.map(function (e) {
@@ -143,7 +178,8 @@
 
     return {
       pos: pos, P: P, trend: trend, mult: mlt, isToday: isToday,
-      m: m, t: t, x: x, tax: st.tax, share: st.share, stack: st.stack, rebuy: st.rebuy,
+      m: m, t: t, x: x, tax: st.tax, share: st.share, stack: st.stack,
+      rebuy: st.rebuy, atCap: isCap, rebuyTargetPos: rbTargetPos, eng: eng,
       n: m.n, half: m.half,
       // Every quantity the page DISPLAYS is a named field here (screenshot-6 discipline).
       hit: hit, missPct: 100 - hit, hitAfterTax: hitAfterTax, never: m.never,
@@ -164,28 +200,29 @@
   // The insight chart's curve — same compute() shape, swept across position.
   // Depends ONLY on the tax rate (not the share or the position), so the
   // expensive neighborhood sweep is cached and the tax applied on top.
-  var _rawCurve = {};                 // v3.2: cached per rebuy target (still tax-free; tax on top)
-  function rawCurve(target) {
-    var key = target || 'first';
+  // The curve sweeps sell position under the CURRENT tax AND rebuy target. The target is
+  // either the per-position WODN rule (at the cap → engine target undefined) or a FIXED
+  // numeric position; the engine caps it per position via min(target, entryP), so the
+  // effective target at each x is min(target, x) — you can't rebuy above a sale (§4).
+  var _rawCurve = {};                 // cached per rebuy-state key (still tax-free; tax on top)
+  function curveKey(c) { return c.atCap ? 'cap' : ('t' + c.eng.toFixed(3)); }
+  function rawCurve(c) {
+    var key = curveKey(c), eng = c.atCap ? undefined : c.eng;
     if (_rawCurve[key]) return _rawCurve[key];
     var pts = [], p;
     for (p = -0.05; p <= 1.001; p += 0.025) {
-      var m = bandMetrics(p, target);
+      var m = bandMetrics(matchPos(p), eng);           // matchPos → markers seat exactly on the line
       if (!m || m.ratio == null) continue;
       pts.push({ x: p, ratio: m.ratio, n: m.n });
     }
     _rawCurve[key] = pts;
     return pts;
   }
-  function curveFor(st) {
-    var f = 1 - st.tax / 100;
-    return rawCurve(st.rebuy).map(function (p) { return { x: p.x, y: f * p.ratio, n: p.n }; });
-  }
-  // Today's point on the insight curve — where the pulse/static dot sits.
-  function todayCurvePoint(tax, target) {
-    var lp = livePos(), m = bandMetrics(matchPos(lp), target);
-    if (!m || m.ratio == null) return null;
-    return { x: lp, y: (1 - tax / 100) * m.ratio };
+  // The curve's y at any x, under c's tax + rebuy target — used to seat the glow/blue markers
+  // exactly ON the curve (§4 glow-fix; asserted in hcQA).
+  function curveYAt(x, c) {
+    var m = bandMetrics(matchPos(x), c.atCap ? undefined : c.eng);
+    return (m && m.ratio != null) ? (1 - c.tax / 100) * m.ratio : null;
   }
   // Breakeven crossing: first position where the median round trip clears 1.0.
   function crossingOf(pts) {
@@ -240,13 +277,16 @@
       });
       var hlY = chart && chart.$hl ? chart.$hl.y : null;
       if (hlY != null && Math.abs(hlY - c.medianRT) > 1e-9) mism.push({ f: 'chart highlight', dom: hlY, computed: c.medianRT });
+      // §4/§7: the glow is TODAY and must sit ON the curve (|dot.y − curve(today)| ≈ 0).
+      var glow = chart && chart.$glow ? chart.$glow : null;
+      if (glow) { var gy = curveYAt(glow.x, c); if (gy != null && Math.abs(glow.y - gy) > 1e-9) mism.push({ f: 'glow off curve', dom: glow.y, computed: gy }); }
       var rows = (document.getElementById('hcAuditBody') || { rows: [] }).rows.length;
       if (rows !== c.outcomes.length) mism.push({ f: 'audit rows', dom: rows, computed: c.outcomes.length });
     }
 
     var res = {
       position: +c.pos.toFixed(4), xTrend: +c.mult.toFixed(3), n: c.n, tax: c.tax, share: c.share,
-      rebuy: c.rebuy, arrivalPct: +c.arrivalPct.toFixed(2), newStack: c.newStack,
+      rebuy: c.rebuy, atCap: c.atCap, rebuyTargetPos: +c.rebuyTargetPos.toFixed(4), arrivalPct: +c.arrivalPct.toFixed(2), newStack: c.newStack,
       hit: +c.hit.toFixed(2), hitAfterTax: +c.hitAfterTax.toFixed(2),
       medianRatio: +c.medianRatio.toFixed(4), medianRT: +c.medianRT.toFixed(4),
       branch: c.branch, alarm: c.alarm,
@@ -274,10 +314,10 @@
     if (note) {
       var txt;
       if (c.branch === 'floor') {
-        txt = 'A lower entry almost never arrived here &mdash; cash raised at this position historically stayed cash or rebought higher, fewer coins <strong id="hcMiss">' +
+        txt = 'A lower entry almost never arrived here &mdash; cash raised at this position historically stayed cash or rebought higher, less bitcoin <strong id="hcMiss">' +
           Math.round(c.missPct) + '</strong>% of the time. This is the trim this page warns about.';
       } else if (c.branch === 'costs') {
-        txt = 'The typical rebuy did not clear the tax &mdash; a trim here has cost coins.';
+        txt = 'The typical rebuy did not clear the tax &mdash; a trim here has cost bitcoin.';
       } else if (c.branch === 'wash') {
         txt = 'Roughly a wash here &mdash; the dip and the tax cancel.';
       } else {
@@ -308,9 +348,11 @@
       if (cval) cval.innerHTML = stackFmt(c.stack) + ' &rarr; <span id="hcCardCValN">' + stackFmt(c.newStack) + '</span> BTC';
       if (cl) cl.innerHTML = 'after ' + c.tax + '% tax, at these settings.';
     } else {
-      if (ccap) ccap.textContent = 'Round trip';
+      // Empty-state title is BITCOIN BACK, not "round trip" — that mechanical term stays in
+      // prose only, after its defining sentence (addendum A1).
+      if (ccap) ccap.textContent = 'Bitcoin back';
       if (cval) cval.innerHTML = '<span id="hcCardCValN">' + c.medianRT.toFixed(2) + '</span>&times;';
-      if (cl) cl.innerHTML = 'coins back per coin sold &mdash; turning <strong>' + c.share +
+      if (cl) cl.innerHTML = 'per bitcoin sold &mdash; turning <strong>' + c.share +
         '%</strong> of the stack into roughly <strong>' + c.endSharePct.toFixed(0) + '%</strong>.';
     }
   }
@@ -320,7 +362,7 @@
   function renderVerdictLead(c) {
     var el = document.getElementById('hcVerdictLead'); if (!el) return;
     var t;
-    if (c.branch === 'floor') t = 'At this position, raising cash is the trade this page warns against.';
+    if (c.branch === 'floor') t = 'At this position, raising cash is the strategy this page warns against.';
     else if (c.branch === 'costs') t = 'At these settings, the trim is under water — the tax outruns the typical dip.';
     else if (c.branch === 'wash') t = 'At these settings, the round trip is close to a wash.';
     else t = 'At these settings, the trim has historically earned its keep.';
@@ -345,10 +387,10 @@
   function renderTax(c) {
     var el = document.getElementById('hcTaxLine'); if (!el) return;
     if (c.tax === 0) {
-      el.innerHTML = 'At <strong>0%</strong> there is no haircut: any rebuy below the entry earns coins. That is the tax-advantaged case.';
+      el.innerHTML = 'At <strong>0%</strong> there is no haircut: any rebuy below the entry earns bitcoin. That is the tax-advantaged case.';
     } else {
       el.innerHTML = 'At <strong>' + c.tax + '%</strong> long-term capital gains on a fully appreciated stack, the rebuy must come more than <strong>' +
-        c.tax + '%</strong> lower just to break even in coins &mdash; the dip has to beat the tax before it earns you anything.';
+        c.tax + '%</strong> lower just to break even in bitcoin &mdash; the dip has to beat the tax before it earns you anything.';
     }
   }
 
@@ -356,7 +398,7 @@
     var el = document.getElementById('hcShockRatio'); if (!el) return;
     var r = c.trend / c.P;
     el.innerHTML = 'A surprise bill paid from the stack ' + (c.isToday ? 'here' : 'at this position') + ' costs <strong>' + r.toFixed(2) +
-      '×</strong> the coins it would at trend.';
+      '×</strong> the bitcoin it would at trend.';
   }
 
   function renderZone(c) {
@@ -379,13 +421,13 @@
       ' of this position (post-2014, each with a full two-year forward record). Historical, at this position &mdash; not a prediction.';
   }
 
-  function targetName(rebuy) { return rebuy === 'trend' ? 'below trend' : (rebuy === 'floor' ? 'near the floor' : 'the first lower entry'); }
+  function targetName(c) { return c.atCap ? 'the first lower entry' : positionLabel(c.rebuyTargetPos); }
   function renderEndnote(c) {
     var el = document.getElementById('hcEndnote'); if (!el) return;
-    var tgt = targetName(c.rebuy);
-    var ruleTxt = c.rebuy === 'first' ? 'the first lower entry within two years'
-                : 'the first time price reaches ' + tgt + ' within two years';
-    el.innerHTML = 'Your settings: ' + c.share + '% cash · ' + (100 - c.share) + '% coins · ' + c.tax + '% tax · rebuy at ' + tgt +
+    var tgt = targetName(c);
+    var ruleTxt = c.atCap ? 'the first lower entry within two years'
+                : 'the first time price reaches ' + tgt + ' (' + ratioOf(c.rebuyTargetPos).toFixed(2) + '× trend) within two years';
+    el.innerHTML = 'Your settings: ' + c.share + '% cash · ' + (100 - c.share) + '% bitcoin · ' + c.tax + '% tax · rebuy at ' + tgt +
       (c.hasStack ? ' · ' + stackFmt(c.stack) + ' BTC stack' : '') + ' · position ' +
       c.mult.toFixed(2) + '× trend · ' + positionLabel(c.pos) + (c.isToday ? ' (today)' : '') + ' · ' +
       c.n + ' historical entries. Rebuy rule: ' + ruleTxt + ', else the two-year price.';
@@ -394,20 +436,49 @@
   // Insight-chart caption — today-focused, explains the glow/dot.
   function renderInsightNote(c) {
     var el = document.getElementById('hcInsightNote'); if (!el) return;
-    var tp = todayCurvePoint(c.tax, c.rebuy);
-    if (!tp) { el.innerHTML = 'Median coins back per coin sold, by channel position, after ' + c.tax + '% tax.'; return; }
+    var lp = livePos(), ty = curveYAt(lp, c);
+    if (ty == null) { el.innerHTML = 'Median bitcoin back per bitcoin sold, by channel position, after ' + c.tax + '% tax.'; return; }
     var live = todayPriceIsLive(_priceSource);
     el.innerHTML = (live ? 'The glowing point is <strong>today</strong>' : 'The dot is <strong>today</strong> (latest monthly data)') +
-      ' &mdash; ' + ratioOf(tp.x).toFixed(2) + '× trend · ' + positionLabel(tp.x) + ', where the median round trip returns about <strong>' +
-      tp.y.toFixed(2) + '×</strong> per coin sold after ' + c.tax + '% tax. Above the breakeven line the trim earns coins; below it, it costs them.';
+      ' &mdash; ' + ratioOf(lp).toFixed(2) + '× trend · ' + positionLabel(lp) + ', where the median round trip returns about <strong>' +
+      ty.toFixed(2) + '×</strong> per bitcoin sold after ' + c.tax + '% tax. Above the breakeven line the trim earns bitcoin; below it, it costs it.';
   }
 
   // ── Insight chart ──
   var chart = null;
   function chartData(c) {
-    var pts = curveFor({ tax: c.tax });
-    return { pts: pts, cross: crossingOf(pts) };
+    var f = 1 - c.tax / 100;
+    var pts = rawCurve(c).map(function (p) { return { x: p.x, y: f * p.ratio }; });
+    // Seat the glow (today) and blue (sell) markers exactly on the drawn line by inserting
+    // them as vertices; y comes from the same curve function (§4 glow-fix).
+    var tp = livePos(), gy = curveYAt(tp, c);
+    if (gy != null) pts.push({ x: tp, y: gy });
+    pts.push({ x: c.pos, y: c.medianRT });             // curveYAt(c.pos,c) === c.medianRT by construction
+    pts.sort(function (a, b) { return a.x - b.x; });
+    return {
+      pts: pts, cross: crossingOf(pts),
+      glow: (gy != null ? { x: tp, y: gy } : null),    // TODAY, always on the curve
+      hl: { x: c.pos, y: c.medianRT },                 // the sell position, on the curve
+      band: { left: c.rebuyTargetPos, right: c.pos }   // the stretch the strategy spans
+    };
   }
+  // The range band (§4): a subtle neutral vertical fill over x ∈ [rebuy target, sell] — the
+  // stretch of the channel the strategy spans. Draws BEHIND the curve. Tracks both sliders.
+  var rangeBandPlugin = {
+    id: 'hcRangeBand',
+    beforeDatasetsDraw: function (ch) {
+      if (!ch.$band || !ch.scales || !ch.scales.x) return;
+      var xS = ch.scales.x, area = ch.chartArea;
+      var xl = xS.getPixelForValue(ch.$band.left), xr = xS.getPixelForValue(ch.$band.right);
+      var lo = Math.max(area.left, Math.min(xl, xr)), hi = Math.min(area.right, Math.max(xl, xr));
+      if (hi - lo < 1) return;
+      var ctx = ch.ctx;
+      ctx.save();
+      ctx.fillStyle = 'rgba(236,228,214,0.055)';   // neutral cream, not the warning red
+      ctx.fillRect(lo, area.top, hi - lo, area.bottom - area.top);
+      ctx.restore();
+    }
+  };
   var crossPlugin = {
     id: 'hcCross',
     afterDatasetsDraw: function (ch) {
@@ -419,7 +490,7 @@
       ctx.beginPath(); ctx.moveTo(xS.left, y1); ctx.lineTo(xS.right, y1); ctx.stroke();
       ctx.setLineDash([]);
       ctx.fillStyle = 'rgba(236,228,214,0.7)'; ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'left';
-      ctx.fillText('breakeven (1.00× — same coins back)', xS.left + 4, y1 - 5);
+      ctx.fillText('breakeven (1.00× — same bitcoin back)', xS.left + 4, y1 - 5);
       // the crossing
       if (ch.$cross != null) {
         var xc = xS.getPixelForValue(ch.$cross);
@@ -448,7 +519,7 @@
     id: 'hcInsightPulse',
     afterRender: function (ch) {
       var el = document.getElementById('hcInsightPulse'); if (!el) return;
-      var tp = todayCurvePoint(S_.tax, S_.rebuy);
+      var tp = ch.$glow;                                // TODAY, on the curve (§4 glow-fix)
       if (!tp || !ch.scales || !ch.scales.x || !ch.scales.y) { el.classList.remove('is-visible'); return; }
       var x = ch.scales.x.getPixelForValue(tp.x), y = ch.scales.y.getPixelForValue(tp.y), area = ch.chartArea;
       if (x < area.left - 4 || x > area.right + 4 || y < area.top - 4 || y > area.bottom + 4) { el.classList.remove('is-visible'); return; }
@@ -464,7 +535,7 @@
       type: 'line',
       data: {
         datasets: [{
-          label: 'Median coins back per coin sold',
+          label: 'Median bitcoin back per bitcoin sold',
           data: d.pts.map(function (p) { return { x: p.x, y: p.y }; }),
           borderColor: TREND_C, borderWidth: 2.4, pointRadius: 0, tension: 0.25,
           segment: { borderColor: function (ctx) { return ctx.p1.parsed.y >= 1 ? GAIN_C : LOSS_C; } }
@@ -482,7 +553,7 @@
             ticks: { color: MUTED, font: { size: 10 }, maxTicksLimit: 7, callback: function (v) { return positionLabel(v); } }
           },
           y: {
-            title: { display: true, text: 'Coins back per coin sold', color: MUTED, font: { size: 11 } },
+            title: { display: true, text: 'Bitcoin back per bitcoin sold', color: MUTED, font: { size: 11 } },
             grid: { color: 'rgba(224,148,34,0.06)' },
             ticks: { color: MUTED, font: { size: 10 }, callback: function (v) { return v.toFixed(2) + '×'; } }
           }
@@ -495,7 +566,7 @@
             callbacks: {
               title: function (it) { return it.length ? ratioOf(it[0].parsed.x).toFixed(2) + '× trend · ' + positionLabel(it[0].parsed.x) : ''; },
               label: function (it) {
-                var base = it.parsed.y.toFixed(2) + '× coins back per coin sold';
+                var base = it.parsed.y.toFixed(2) + '× bitcoin back per bitcoin sold';
                 // Identify the blue dot: its x is chart.$hl.x; the tooltip fires at the
                 // nearest curve sample (≤0.0125 away), which is exactly where the dot sits.
                 if (chart && chart.$hl && Math.abs(it.parsed.x - chart.$hl.x) < 0.014) return [base, '◆ Selected position (the blue dot)'];
@@ -505,17 +576,15 @@
           }
         }
       },
-      plugins: [crossPlugin, insightPulse]
+      plugins: [rangeBandPlugin, crossPlugin, insightPulse]
     });
-    chart.$cross = d.cross;
-    chart.$hl = { x: c.pos, y: c.medianRT };
+    chart.$cross = d.cross; chart.$hl = d.hl; chart.$glow = d.glow; chart.$band = d.band;
   }
   function updateChart(c) {
     if (!chart) { buildChart(c); return; }
     var d = chartData(c);
     chart.data.datasets[0].data = d.pts.map(function (p) { return { x: p.x, y: p.y }; });
-    chart.$cross = d.cross;
-    chart.$hl = { x: c.pos, y: c.medianRT };   // ← the ONE source; QA reads this back
+    chart.$cross = d.cross; chart.$hl = d.hl; chart.$glow = d.glow; chart.$band = d.band;   // ← one source; QA reads $hl/$glow
     chart.update('none');
   }
   function chartBinding() {
@@ -566,15 +635,18 @@
     var ds = [
       band('Floor (0.42× trend)', bandLine(PL_FLOOR, startD, span), FLOOR_C, [6, 3], 1.4),
       band('Trend', bandLine(1, startD, span), TREND_C, null, 2),
-      band('Upper (3× trend)', bandLine(PL_CEIL, startD, span), UPPER_C, [1, 6], 1.1)
+      // upper band thinned/ghosted (§3) so the two strategy lines read clearly against it
+      band('Upper (3× trend)', bandLine(PL_CEIL, startD, span), UPPER_C, [1, 6], 0.8)
     ];
     var price = [];
     for (var i = 0; i < N; i++) if (S[i].d >= startD) price.push({ x: S[i].d, y: S[i].p });
     price.push({ x: todayD, y: spot() });
     ds.push({ label: 'BTC price (history)', data: price, borderColor: HIST_C, borderWidth: 1.3, pointRadius: 0, tension: 0.15, order: 1 });
-    // selected position — a line parallel to trend at the chosen ×-trend multiple
+    // BOTH strategy ends (§3): the sell position (blue) and the rebuy target (green). The gap
+    // between the two dashed lines IS the strategy's span.
     var P = curPos();
-    ds.push(band('Selected position', bandLine(ratioOf(P), startD, span), SEL_C, [4, 4], 2));
+    ds.push(band('Sell position', bandLine(ratioOf(P), startD, span), SEL_C, [4, 4], 2));
+    ds.push(band('Rebuy target', bandLine(ratioOf(rebuyLinePos(S_.rebuy, P)), startD, span), REBUY_C, [4, 4], 2));
     // the historical entries the current band is built from (same internal match-clamp)
     var m = bandMetrics(matchPos(P));
     chSelDots = (m && m.entries) ? m.entries.map(function (i) { return { x: S[i].d, y: S[i].p }; }) : [];
@@ -622,12 +694,34 @@
     m.classList.add('is-visible');
   }
 
+  // ── Slider 2 (the rebuy target) — same channel axis, thumb capped at the sale (§2) ──
+  function clampRebuyToSale() { if (S_.rebuy != null && S_.rebuy > curPos() + REBUY_EPS) S_.rebuy = null; }  // slider 1 below slider 2 → clamp to cap
+  function syncSlider2() {
+    var sl = document.getElementById('hcRebuySlider'); if (!sl) return;
+    var capV = posToSlider(curPos());
+    sl.value = atCap(S_.rebuy, curPos()) ? capV : Math.min(posToSlider(S_.rebuy), capV);
+  }
+  function placeSaleTick() {                     // the ▼ YOUR SALE tick, moves with slider 1
+    var m = document.getElementById('hcSaleTick'); if (!m) return;
+    m.style.left = ((clampPos(curPos()) - POS_MIN) / POS_RANGE * 100) + '%';
+    m.classList.add('is-visible');
+  }
+  function renderRebuyReadout(c) {
+    var el = document.getElementById('hcRebuyReadout'); if (!el) return;
+    if (c.atCap) {
+      el.innerHTML = '<strong>at your sale</strong> &mdash; the first lower entry within two years (Wait-or-Deploy&rsquo;s rule)';
+    } else {
+      el.innerHTML = '<strong>' + ratioOf(c.rebuyTargetPos).toFixed(2) + '×</strong> trend · <em>' + positionLabel(c.rebuyTargetPos) +
+        '</em> · cap at your sale, ' + c.mult.toFixed(2) + '× trend';
+    }
+  }
+
   // ── Audit ──
   var _lastC = null;
   function renderAudit(c) {
     var head = document.getElementById('hcAuditHead'), body = document.getElementById('hcAuditBody');
     if (!head || !body || !c.m) return;
-    head.innerHTML = '<tr><th>Entry</th><th class="hc-num">Position</th><th class="hc-num">Price</th><th class="hc-num">Rebuy</th><th class="hc-num">Rebuy price</th><th class="hc-num">Discount</th><th class="hc-num">Coins back / coin sold</th></tr>';
+    head.innerHTML = '<tr><th>Entry</th><th class="hc-num">Position</th><th class="hc-num">Price</th><th class="hc-num">Rebuy</th><th class="hc-num">Rebuy price</th><th class="hc-num">Discount</th><th class="hc-num">Bitcoin back / bitcoin sold</th></tr>';
     var rows = '';
     c.outcomes.forEach(function (o) {
       rows += '<tr><td>' + monthYear(o.d0) + '</td><td class="hc-num">' + ratioOf(o.P).toFixed(2) + '×</td><td class="hc-num">' +
@@ -640,7 +734,7 @@
   }
   function csv() {
     var c = _lastC; if (!c) return;
-    var lines = ['entry_date,position_x_trend,entry_price_usd,rebuy_date,rebuy_price_usd,dip_arrived,discount_pct,after_tax_coins_multiple'];
+    var lines = ['entry_date,position_x_trend,entry_price_usd,rebuy_date,rebuy_price_usd,dip_arrived,discount_pct,after_tax_bitcoin_multiple'];
     c.outcomes.forEach(function (o) {
       lines.push([monthYear(o.d0), ratioOf(o.P).toFixed(3), Math.round(o.p0),
         o.arrived ? monthYear(o.waitDay) : 'no-dip-2y', Math.round(o.waitPrice),
@@ -658,7 +752,7 @@
     if (from !== 'num' && n) n.value = S_.share;
     if (from !== 'slider' && s) s.value = String(S_.share);
     var split = document.getElementById('hcSplitReadout');   // one stack, two forms
-    if (split) split.innerHTML = '<strong>' + (100 - S_.share) + '%</strong> coins · <strong>' + S_.share + '%</strong> cash';
+    if (split) split.innerHTML = '<strong>' + (100 - S_.share) + '%</strong> bitcoin · <strong>' + S_.share + '%</strong> cash';
     setSeg('hcSharePresets', S_.share);
   }
   function setSeg(groupId, value) {
@@ -668,20 +762,31 @@
   }
 
   // ── URL (allocation register; pos is now a channel position, 3dp) ──
+  // Returns true if ANY instrument param is present — the store precedence gate (A3):
+  // URL params (any) > stored state > defaults. A URL-parameterized load ignores the store.
   function readUrl() {
-    if (!window.URLSearchParams) return;
+    if (!window.URLSearchParams) return false;
     var p = new URLSearchParams(window.location.search), v;
+    var present = ['share', 'tax', 'pos', 'rebuy', 'stack'].some(function (k) { return p.has(k); });
     if (p.has('share')) { v = parseInt(p.get('share'), 10); if (isFinite(v)) S_.share = clamp(v, 0, 100); }
     if (p.has('tax')) { v = parseInt(p.get('tax'), 10); if ([0, 15, 20].indexOf(v) >= 0) S_.tax = v; }
     if (p.has('pos')) {
       v = parseFloat(p.get('pos'));
-      // v3.1: pos is a channel position (≤1.0). A v3-era day-encoded pos (thousands)
-      // is out of range — treat it as "today" rather than clamping it to the upper band.
+      // pos is a channel position (≤1.0). A v3-era day-encoded pos (thousands) is out of
+      // range — treat it as "today" rather than clamping it to the upper band.
       if (isFinite(v) && v >= POS_MIN - 0.001 && v <= POS_MAX + 0.001) S_.pos = clampPos(v);
     }
-    if (p.has('rebuy')) { var rv = p.get('rebuy'); if (['first', 'trend', 'floor'].indexOf(rv) >= 0) S_.rebuy = rv; }
+    if (p.has('rebuy')) {
+      var rv = p.get('rebuy');
+      // v3.3: numeric channel-position target. Legacy tokens map: first→cap(null), trend→0.36, floor→0.18.
+      if (rv === 'first') S_.rebuy = null;
+      else if (rv === 'trend') S_.rebuy = 0.36;
+      else if (rv === 'floor') S_.rebuy = 0.18;
+      else { v = parseFloat(rv); if (isFinite(v) && v >= POS_MIN - 0.001 && v <= POS_MAX + 0.001) S_.rebuy = v; }
+    }
     if (p.has('stack')) { v = parseFloat(p.get('stack')); if (isFinite(v) && v > 0) S_.stack = v; }
     // v2's params (exp, buf, shock, hz, yld, depth, btc, dep, cy, rec) are retired.
+    return present;
   }
   var _urlT = null;
   function syncUrl() {
@@ -692,7 +797,7 @@
       p.set('share', String(S_.share));
       if (S_.tax !== DEFAULTS.tax) p.set('tax', String(S_.tax));
       if (S_.pos != null) p.set('pos', String(Math.round(S_.pos * 1000) / 1000));
-      if (S_.rebuy && S_.rebuy !== DEFAULTS.rebuy) p.set('rebuy', S_.rebuy);
+      if (S_.rebuy != null) p.set('rebuy', String(Math.round(S_.rebuy * 1000) / 1000));  // numeric target; cap (null) omitted
       if (S_.stack) p.set('stack', String(S_.stack));
       window.history.replaceState(null, '', window.location.pathname + '?' + p.toString() + window.location.hash);
     }, 250);
@@ -700,25 +805,26 @@
 
   // ════════ ORCHESTRATOR — one compute, every renderer reads it ════════
   function renderAll() {
+    clampRebuyToSale();                 // slider 1 below slider 2 → target snaps to the cap
     var c = compute(S_);
     if (!c.m) return;
-    renderPos(c); renderVerdictLead(c); renderCards(c); renderStack(c); renderAlarm(c); renderTax(c);
+    renderPos(c); renderRebuyReadout(c); renderVerdictLead(c); renderCards(c); renderStack(c); renderAlarm(c); renderTax(c);
     renderShock(c); renderZone(c); renderProvenance(c); renderEndnote(c); renderInsightNote(c);
-    syncSliderToState(); placeTodayTick();
+    syncSliderToState(); placeTodayTick(); syncSlider2(); placeSaleTick();
     updateChannel();
     updateChart(c);
     renderAudit(c);
     assertBinding();
     syncShare();
     syncUrl();
+    saveState();                        // sticky settings (A3) — no-op key-removal when at defaults
     var q = hcQA(S_);
     if (!q.ok) console.error('[hc-qa] render failed the single-source assertion', q);
   }
 
   function initControls() {
-    var st = document.getElementById('hcStack'); if (st && S_.stack) st.value = S_.stack;
+    var st = document.getElementById('hcStack'); if (st && S_.stack) st.value = S_.stack; else if (st) st.value = '';
     setSeg('hcTax', S_.tax);
-    setSeg('hcRebuy', S_.rebuy);
     syncShare();
   }
   function wire() {
@@ -735,21 +841,28 @@
       var b = e.target.closest('[data-val]'); if (!b) return;
       S_.tax = parseInt(b.getAttribute('data-val'), 10); setSeg('hcTax', S_.tax); renderAll();
     });
-    on('hcRebuy', 'click', function (e) {
-      var b = e.target.closest('[data-val]'); if (!b) return;
-      S_.rebuy = b.getAttribute('data-val'); setSeg('hcRebuy', S_.rebuy); renderAll();
-    });
     on('hcStack', 'input', function () { var v = parseFloat(this.value); S_.stack = (isFinite(v) && v > 0) ? v : null; renderAll(); });
-    on('hcPosSlider', 'input', function () { S_.pos = sliderToPos(parseInt(this.value, 10)); renderAll(); });
+    on('hcPosSlider', 'input', function () { S_.pos = sliderToPos(parseInt(this.value, 10)); renderAll(); });   // renderAll clamps slider 2 to the new sale
+    on('hcRebuySlider', 'input', function () {
+      var capV = posToSlider(curPos()), v = Math.min(parseInt(this.value, 10), capV);
+      S_.rebuy = (v >= capV) ? null : sliderToPos(v);            // at the cap → null (WODN rule); below → numeric target
+      renderAll();
+    });
     on('hcSnapToday', 'click', function (e) { e.preventDefault(); S_.pos = null; syncSliderToState(); renderAll(); });
-    on('hcReset', 'click', function () { for (var k in DEFAULTS) if (DEFAULTS.hasOwnProperty(k)) S_[k] = DEFAULTS[k]; var st2 = document.getElementById('hcStack'); if (st2) st2.value = ''; initControls(); renderAll(); });
+    on('hcReset', 'click', function () { for (var k in DEFAULTS) if (DEFAULTS.hasOwnProperty(k)) S_[k] = DEFAULTS[k]; clearStore(); initControls(); renderAll(); });
     on('hcAuditToggle', 'click', function () { var b = document.getElementById('hcAuditBody2'); if (!b) return; b.hidden = !b.hidden; this.setAttribute('aria-expanded', String(!b.hidden)); });
+    on('hcShowWork', 'click', function () {   // surface the receipts (§5): expand the audit, anchor scrolls
+      var b = document.getElementById('hcAuditBody2'), t = document.getElementById('hcAuditToggle');
+      if (b && b.hidden) { b.hidden = false; if (t) t.setAttribute('aria-expanded', 'true'); }
+    });
     on('hcCsvBtn', 'click', csv);
     initControls();
   }
 
   function init() {
-    readUrl(); wire(); buildChannel(); renderAll();
+    var urlPresent = readUrl();       // A3 precedence: URL params (any) > stored state > defaults
+    if (!urlPresent) loadStore();     // a URL-parameterized load neither reads nor is overridden by the store
+    wire(); buildChannel(); renderAll();
     try {
       fetchTodayPrice(function (price, source) {
         _priceSource = (source === 'live') ? 'live' : 'fallback';
