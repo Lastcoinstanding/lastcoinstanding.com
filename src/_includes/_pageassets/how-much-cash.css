@@ -280,7 +280,8 @@ body { background: var(--bg); color: var(--text); }
 .hc-verdict-lead-pays  { color: #cfe0cf; }
 .hc-verdict-lead-wash  { color: var(--text-dim); }
 
-.hc-cards { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.3fr) minmax(0, 0.9fr); gap: 0.8rem; align-items: stretch; margin: 0.4rem 0 0.3rem; }
+/* v3.6 §2: order is ARRIVAL/WAIT pair → blend → NEW STACK. The pair (widest) is now first. */
+.hc-cards { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.95fr) minmax(0, 0.9fr); gap: 0.8rem; align-items: stretch; margin: 0.4rem 0 0.3rem; }
 .hc-card { background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 10px; padding: 0.7rem 0.9rem; display: flex; flex-direction: column; justify-content: center; }
 
 /* Card A — the big one */

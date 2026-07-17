@@ -147,20 +147,17 @@ eleventyComputed:
         <div class="hc-chart-wrap chart-wrapper" data-chart-copy data-chart-heading="#playground .hc-h2" data-chart-sub="#playground .hc-playground-sub" data-chart-assump="#hcEndnote" data-chart-title="How Much Cash? · Where you are decides">
           <canvas id="hcChannelChart"></canvas>
         </div>
-        <p class="hc-chart-caption">The Power Law channel across history. The <strong>blue dashed line</strong> is your sell position &mdash; with its neighbourhood <strong>dots</strong>, the historical entries the answer is built from; the <strong>green dashed line</strong> is your rebuy target. The gap between them is the strategy&rsquo;s span.</p>
+        <p class="hc-chart-caption">The Power Law channel across history. The <strong>blue dashed line</strong> is your sell position &mdash; with its neighbourhood <strong>dots</strong>, the historical entries the answer is built from; the <strong>green dashed line</strong> is your rebuy target. The gap between them is the strategy&rsquo;s span. The record before 2014 is dimmed: the model draws its entries only from 2014 on.</p>
       </div>
 
       <!-- 4 ── THE VERDICT, AS BLOCKS ── -->
       <p class="hc-verdict-lead" id="hcVerdictLead">&mdash;</p>
 
+      <!-- v3.6 §2: order is likelihood → blend → closer. ARRIVAL/WAIT (the pair the blend is
+           built from) · the blend card (counting both branches; its qualitative line + tint ride
+           with THIS card) · NEW STACK closes in the reader's units. renderCards() keys every
+           value by element id, not grid position, so the DOM order is free to change. -->
       <div class="hc-cards">
-        <!-- Card A — the big one -->
-        <div class="hc-card hc-card-hero" id="hcCardWrap">
-          <div class="hc-card-num"><span id="hcCardA">&mdash;</span></div>
-          <p class="hc-card-lead">historically, selling here and rebuying lower left you with <strong>more bitcoin</strong> this often &mdash; counting both branches.</p>
-          <p class="hc-card-note" id="hcCardANote">&mdash;</p>
-        </div>
-
         <!-- Card B — the arrival pair (arrival % · typical wait); discount in the footer -->
         <div class="hc-card hc-card-pair">
           <div class="hc-card-pair-row">
@@ -179,7 +176,14 @@ eleventyComputed:
           <p class="hc-card-foot" id="hcCardBFoot">&mdash;</p>
         </div>
 
-        <!-- Card C — NEW STACK when the stack is set, else ROUND TRIP (both from compute()) -->
+        <!-- Card A — the blend (both branches), the qualitative line + tint live here -->
+        <div class="hc-card hc-card-hero" id="hcCardWrap">
+          <div class="hc-card-num"><span id="hcCardA">&mdash;</span></div>
+          <p class="hc-card-lead">historically, selling here and rebuying lower left you with <strong>more bitcoin</strong> this often &mdash; counting both branches.</p>
+          <p class="hc-card-note" id="hcCardANote">&mdash;</p>
+        </div>
+
+        <!-- Card C — the closer: NEW STACK when the stack is set, else BITCOIN BACK -->
         <div class="hc-card hc-card-c">
           <div class="hc-card-cap" id="hcCardCCap">Bitcoin back</div>
           <div class="hc-card-num hc-card-num-sm" id="hcCardCVal">&mdash;</div>

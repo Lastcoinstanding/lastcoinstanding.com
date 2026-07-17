@@ -520,7 +520,7 @@
     el.innerHTML = 'Your settings: ' + c.share + '% cash · ' + (100 - c.share) + '% bitcoin · ' + c.tax + '% tax · rebuy at ' + tgt +
       (c.hasStack ? ' · ' + stackFmt(c.stack) + ' BTC stack' : '') + ' · position ' +
       c.mult.toFixed(2) + '× trend · ' + positionLabel(c.pos) + (c.isToday ? ' (today)' : '') + ' · ' +
-      c.n + ' historical entries since 2014. Rebuy rule: ' + ruleTxt + ', else the two-year price.';
+      c.n + ' historical entries since 2014<span class="help-tip" tabindex="0">?<span class="tip-content">Entries start in 2014: earlier data is thin and patchy &mdash; a tiny market in the exchange-collapse era &mdash; and every entry must carry a full two-year forward record.</span></span>. Rebuy rule: ' + ruleTxt + ', else the two-year price.';
   }
 
   // Insight-chart caption — today-focused, explains the glow/dot.
@@ -720,8 +720,35 @@
       ctx.restore();
     }
   };
+  // v3.6: recess the pre-2014 era — a subtle dark wash over the region (dims the bands passing
+  // through it too, which reads clearer than dimming the price line alone; documented in §39) and
+  // a thin boundary rule/label at exactly 2014-01-01 (TABLE_CUT) in data coordinates. Drawn on the
+  // canvas, so the chart-copy export (a canvas blit) carries the dimming.
+  var eraDimPlugin = {
+    id: 'hcEraDim',
+    afterDatasetsDraw: function (c) {
+      var xS = c.scales.x, area = c.chartArea, ctx = c.ctx;
+      var xb = xS.getPixelForValue(TABLE_CUT), right = Math.min(area.right, xb);
+      ctx.save();
+      if (right > area.left + 1) {
+        ctx.fillStyle = 'rgba(10,9,8,0.4)';
+        ctx.fillRect(area.left, area.top, right - area.left, area.bottom - area.top);
+      }
+      if (xb > area.left && xb < area.right) {
+        ctx.strokeStyle = 'rgba(232,224,210,0.35)'; ctx.setLineDash([3, 3]); ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(xb, area.top); ctx.lineTo(xb, area.bottom); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = 'rgba(232,224,210,0.55)'; ctx.font = '600 9px Inter, sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText('2014 · entries start', xb + 4, area.top + 10);
+      }
+      ctx.restore();
+    }
+  };
   function chDatasets() {
-    var startD = Math.max(FIRST_D, MARKER_MIN - YEAR_D), span = todayD - startD;
+    // v3.6: render the FULL existing price series (no new data plumbing) so the pre-2014 era
+    // shows, dimmed. The channel bands render normally through it — the Power Law applies to all
+    // history; it is the ENTRY data (the neighbourhood) we exclude before 2014, not the model.
+    var startD = FIRST_D, span = todayD - startD;
     var ds = [
       band('Floor (0.42× trend)', bandLine(PL_FLOOR, startD, span), FLOOR_C, [6, 3], 1.4),
       band('Trend', bandLine(1, startD, span), TREND_C, null, 2),
@@ -731,7 +758,11 @@
     var price = [];
     for (var i = 0; i < N; i++) if (S[i].d >= startD) price.push({ x: S[i].d, y: S[i].p });
     price.push({ x: todayD, y: spot() });
-    ds.push({ label: 'BTC price (history)', data: price, borderColor: HIST_C, borderWidth: 1.3, pointRadius: 0, tension: 0.15, order: 1 });
+    ds.push({
+      label: 'BTC price (history)', data: price, borderColor: HIST_C, borderWidth: 1.3, pointRadius: 0, tension: 0.15, order: 1,
+      // the pre-2014 record is dimmed — the model draws its entries only from 2014 on
+      segment: { borderColor: function (ctx) { return ctx.p0.parsed.x < TABLE_CUT ? 'rgba(232,224,210,0.16)' : HIST_C; } }
+    });
     // BOTH strategy ends (§3): the sell position (blue) and the rebuy target (green). The gap
     // between the two dashed lines IS the strategy's span.
     var P = curPos();
@@ -765,7 +796,7 @@
           tooltip: { backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.30)', borderWidth: 1, titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10, callbacks: { title: function (it) { return it.length ? monthYear(it[0].parsed.x) : ''; }, label: function (it) { return it.dataset.label + ': $' + Math.round(it.parsed.y).toLocaleString(); } } }
         }
       },
-      plugins: [selDotPlugin]
+      plugins: [eraDimPlugin, selDotPlugin]
     });
   }
   function updateChannel() {
