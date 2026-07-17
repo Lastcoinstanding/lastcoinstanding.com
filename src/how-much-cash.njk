@@ -157,7 +157,7 @@ eleventyComputed:
         <!-- Card A — the big one -->
         <div class="hc-card hc-card-hero" id="hcCardWrap">
           <div class="hc-card-num"><span id="hcCardA">&mdash;</span></div>
-          <p class="hc-card-lead">historically, selling here and rebuying lower left you with <strong>more bitcoin</strong> this often.</p>
+          <p class="hc-card-lead">historically, selling here and rebuying lower left you with <strong>more bitcoin</strong> this often &mdash; counting both branches.</p>
           <p class="hc-card-note" id="hcCardANote">&mdash;</p>
         </div>
 
@@ -186,6 +186,10 @@ eleventyComputed:
           <p class="hc-card-half-sub" id="hcCardCLine">&mdash;</p>
         </div>
       </div>
+
+      <!-- v3.5 §1: the branch decomposition — likelihood ÷ impact, beneath the card row -->
+      <div class="hc-branch-strip" id="hcBranchStrip">&mdash;</div>
+      <p class="hc-branch-explainer" id="hcBranchExplainer" hidden></p>
 
       <p class="hc-showwork"><a href="#audit" id="hcShowWork">Show the work &mdash; the record behind these numbers &rarr;</a></p>
       <p class="hc-provenance" id="hcSample">&mdash;</p>
@@ -252,7 +256,7 @@ eleventyComputed:
   <section class="hc-section" id="audit">
     <button class="hc-audit-toggle" id="hcAuditToggle" aria-expanded="false">
       <span class="hc-audit-label">Verify the math</span>
-      <span class="hc-audit-hint">every historical entry in this position's neighborhood: what it sold at, what it rebought at, and what came back.</span>
+      <span class="hc-audit-hint">every historical entry in this position's neighborhood &mdash; drawn from the modern era, since 2014, and only entries with a full two-year forward record: what each sold at, what it rebought at, and what came back.</span>
     </button>
     <div id="hcAuditBody2" hidden>
       <button type="button" class="hc-csv-btn" id="hcCsvBtn">Download CSV</button>

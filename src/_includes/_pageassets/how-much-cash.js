@@ -176,6 +176,18 @@
     var newStack = hasStack ? st.stack * (1 + x * (medianRT - 1)) : null;
     var cardCVal = hasStack ? newStack : medianRT;             // the ONE number Card C displays
 
+    // v3.5 §1: the branch decomposition — likelihood ÷ impact. Card A/C are the UNCONDITIONAL
+    // blend; these split it into the two branches, each median computed from its OWN subset (the
+    // subsets partition the neighborhood exactly — hcQA asserts this; medians don't decompose
+    // arithmetically like means).
+    var arrivedO = outcomes.filter(function (o) { return o.arrived; });
+    var noArrO = outcomes.filter(function (o) { return !o.arrived; });
+    var arrivedRT = arrivedO.length ? median(arrivedO.map(function (o) { return o.rt; })) : null;      // m₁
+    var noArriveRT = noArrO.length ? median(noArrO.map(function (o) { return o.rt; })) : null;         // m₀
+    var noArriveRatio = noArrO.length ? median(noArrO.map(function (o) { return o.ratio; })) : null;   // pre-tax: rebuy above/below sale
+    var arriveA = (hasStack && arrivedRT != null) ? st.stack * (1 + x * (arrivedRT - 1)) : null;       // A₁
+    var noArriveA = (hasStack && noArriveRT != null) ? st.stack * (1 + x * (noArriveRT - 1)) : null;   // A₀
+
     return {
       pos: pos, P: P, trend: trend, mult: mlt, isToday: isToday,
       m: m, t: t, x: x, tax: st.tax, share: st.share, stack: st.stack,
@@ -184,6 +196,8 @@
       // Every quantity the page DISPLAYS is a named field here (screenshot-6 discipline).
       hit: hit, missPct: 100 - hit, hitAfterTax: hitAfterTax, never: m.never,
       arrivalPct: arrivalPct, hasStack: hasStack, newStack: newStack, cardCVal: cardCVal,
+      arrivedRT: arrivedRT, noArriveRT: noArriveRT, noArriveRatio: noArriveRatio, arriveA: arriveA, noArriveA: noArriveA,
+      nArrived: arrivedO.length, nNoArrive: noArrO.length,
       medianRatio: medianRatio, medianRT: medianRT, condRatio: m.condRatio,
       medianDisc: medianDisc, medianDiscAbs: (medianDisc == null ? null : Math.abs(medianDisc)),
       breakevenDisc: breakevenDisc,
@@ -276,6 +290,15 @@
       return Math.abs(o.rt - wantRT) > 1e-12 || Math.abs(o.end - wantEnd) > 1e-12;
     });
 
+    // (a2) v3.5 §1: the branch subsets partition the neighborhood exactly, and each branch median
+    // is the median of its OWN subset. Medians don't decompose arithmetically like means — this
+    // subset-partition check is the correct assertion, not H·m₁+(1−H)·m₀ ≈ blend.
+    var _arr = c.outcomes.filter(function (o) { return o.arrived; }), _nar = c.outcomes.filter(function (o) { return !o.arrived; });
+    var branchPartitionOk = (_arr.length + _nar.length === c.outcomes.length) && (c.nArrived === _arr.length) && (c.nNoArrive === _nar.length);
+    var _m1 = _arr.length ? median(_arr.map(function (o) { return o.rt; })) : null;
+    var _m0 = _nar.length ? median(_nar.map(function (o) { return o.rt; })) : null;
+    var branchMediansOk = (_m1 === c.arrivedRT && _m0 === c.noArriveRT);
+
     // (b) the DOM must agree with compute() — one source. Each element is checked
     // against the compute() field it is BOUND to; absent elements (branch-specific,
     // e.g. hcMiss only in the floor card) are skipped.
@@ -287,7 +310,11 @@
         { id: 'hcMiss',        field: 'missPct',      round: true },
         { id: 'hcCardBArrival', field: 'arrivalPct',  round: true },
         { id: 'hcCardBDisc',   field: 'medianDiscAbs', round: true },   // footer, |discount|
-        { id: 'hcCardCValN',   field: 'cardCVal',     tol: cardCTol }    // round-trip × OR new-stack BTC
+        { id: 'hcCardCValN',   field: 'cardCVal',     tol: cardCTol },   // round-trip × OR new-stack BTC
+        { id: 'hcBranchArriveMult',   field: 'arrivedRT',  tol: 0.006 },  // v3.5 branch strip
+        { id: 'hcBranchNoArriveMult', field: 'noArriveRT', tol: 0.006 },
+        { id: 'hcBranchArriveBtc',    field: 'arriveA',    tol: 0.06 },
+        { id: 'hcBranchNoArriveBtc',  field: 'noArriveA',  tol: 0.06 }
       ];
       bindings.forEach(function (b) {
         var shown = num(b.id);
@@ -319,10 +346,13 @@
       medianRatio: +c.medianRatio.toFixed(4), medianRT: +c.medianRT.toFixed(4),
       branch: c.branch, alarm: c.alarm,
       identityViolations: idBad.length,
+      branchPartitionOk: branchPartitionOk, branchMediansOk: branchMediansOk,
+      nArrived: c.nArrived, nNoArrive: c.nNoArrive,
+      arrivedRT: c.arrivedRT == null ? null : +c.arrivedRT.toFixed(4), noArriveRT: c.noArriveRT == null ? null : +c.noArriveRT.toFixed(4),
       domChecked: live, domMismatches: mism,
       // the WODN cross-check, side by side, so a divergence names itself
       wodn: { paid: +c.m.paid.toFixed(2), ratio: +c.m.ratio.toFixed(4), never: +c.m.never.toFixed(2), n: c.m.n, half: +c.m.half.toFixed(3) },
-      ok: idBad.length === 0 && mism.length === 0
+      ok: idBad.length === 0 && mism.length === 0 && branchPartitionOk && branchMediansOk
     };
     if (!res.ok) console.error('[hc-qa] single-source assertion failed', res);
     return res;
@@ -383,6 +413,38 @@
       if (cl) cl.innerHTML = 'per bitcoin sold &mdash; turning <strong>' + c.share +
         '%</strong> of the stack into roughly <strong>' + c.endSharePct.toFixed(0) + '%</strong>.';
     }
+  }
+
+  // v3.5 §1: the branch decomposition strip — likelihood ÷ impact, separated. Card A is the
+  // blend of both branches; this shows the branches. Every value from compute(); QA binds them.
+  function renderStrip(c) {
+    var el = document.getElementById('hcBranchStrip'); if (!el || !c.m) return;
+    var H = Math.round(c.arrivalPct), noH = 100 - H;
+    var arr, no;
+    if (c.arrivedRT == null) {
+      arr = 'If the target arrives (' + H + '%): <em>it never did, here</em>.';
+    } else {
+      arr = 'If the target arrives (<strong>' + H + '%</strong>): median <strong id="hcBranchArriveMult">' + c.arrivedRT.toFixed(2) + '</strong>×' +
+        (c.hasStack ? ' &mdash; ' + stackFmt(c.stack) + ' &rarr; <strong id="hcBranchArriveBtc">' + stackFmt(c.arriveA) + '</strong> BTC' : '') + '.';
+    }
+    if (c.noArriveRT == null) {
+      no = 'If it doesn&rsquo;t (' + noH + '%): the target always arrived here.';
+    } else {
+      var above = (c.noArriveRatio != null && c.noArriveRatio < 1);   // sign-aware (v3.2 footer logic)
+      no = 'If it doesn&rsquo;t (<strong>' + noH + '%</strong>): the two-year rebuy ' +
+        (above ? 'landed above your sale &mdash; the trend rose while you waited &mdash; and ' : '') +
+        'gave <strong id="hcBranchNoArriveMult">' + c.noArriveRT.toFixed(2) + '</strong>×' +
+        (c.hasStack ? ' &mdash; ' + stackFmt(c.stack) + ' &rarr; <strong id="hcBranchNoArriveBtc">' + stackFmt(c.noArriveA) + '</strong> BTC' : '') + '.';
+    }
+    el.innerHTML = '<span class="hc-branch">' + arr + '</span><span class="hc-branch">' + no + '</span>';
+
+    // branch-aware explainer: ARRIVAL ≈ 0 but the blend is materially > 0 (JM's screenshot state)
+    var ex = document.getElementById('hcBranchExplainer'); if (!ex) return;
+    if (H <= 5 && c.hitAfterTax > 40) {
+      ex.hidden = false;
+      ex.innerHTML = 'The target almost never arrived &mdash; the <strong>' + Math.round(c.hitAfterTax) +
+        '%</strong> came from the two-year fallback rebuying below your sale.';
+    } else { ex.hidden = true; ex.innerHTML = ''; }
   }
 
   // One-sentence synthesized verdict above the cards — no number lives here (the
@@ -458,7 +520,7 @@
     el.innerHTML = 'Your settings: ' + c.share + '% cash · ' + (100 - c.share) + '% bitcoin · ' + c.tax + '% tax · rebuy at ' + tgt +
       (c.hasStack ? ' · ' + stackFmt(c.stack) + ' BTC stack' : '') + ' · position ' +
       c.mult.toFixed(2) + '× trend · ' + positionLabel(c.pos) + (c.isToday ? ' (today)' : '') + ' · ' +
-      c.n + ' historical entries. Rebuy rule: ' + ruleTxt + ', else the two-year price.';
+      c.n + ' historical entries since 2014. Rebuy rule: ' + ruleTxt + ', else the two-year price.';
   }
 
   // Insight-chart caption — today-focused, explains the glow/dot.
@@ -836,7 +898,7 @@
   function renderAll() {
     var c = compute(S_);                // §2: no clamp — slider 2 holds its absolute position independently
     if (!c.m) return;
-    renderPos(c); renderRebuyReadout(c); renderVerdictLead(c); renderCards(c); renderStack(c); renderAlarm(c); renderTax(c);
+    renderPos(c); renderRebuyReadout(c); renderVerdictLead(c); renderCards(c); renderStrip(c); renderStack(c); renderAlarm(c); renderTax(c);
     renderShock(c); renderZone(c); renderProvenance(c); renderEndnote(c); renderInsightNote(c);
     syncSliderToState(); placeTodayTick(); syncSlider2(); placeSaleTick();
     updateChannel();
