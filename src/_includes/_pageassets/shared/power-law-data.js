@@ -104,12 +104,75 @@ function todayPriceNote(source){ return source === 'live' ? '' : ' (latest month
 // fresh after the monthly refresh — rather than a separately-maintained
 // constant that can drift on its own. onResult(price, source) where source is
 // 'live' | 'fallback'; the retry simply calls back late with 'live'.
+//
+// ═══ sessionStorage cache + in-flight dedupe (Channel Ribbon rider, 2026-07) ═══
+// The ribbon (base.njk, every page) made the live-price path a per-PAGEVIEW
+// consumer, so a naive site now hits CoinGecko once per page navigation and,
+// on chart pages that ALSO call this from page_scripts, twice per load. Two
+// guards keep the network contract polite without touching the retry/fallback/
+// source semantics above:
+//   1. Cross-page cache (sessionStorage, ~10-min TTL): stores {price,source,ts}.
+//      A FRESH 'live' value short-circuits with zero network — so navigating N
+//      pages in one tab is one fetch. A cached 'fallback' is NEVER short-
+//      circuited: it must not mask a later successful live fetch (QA §3), so an
+//      expired-or-fallback cache always re-attempts the network. An expired
+//      'live' also refetches.
+//   2. Same-page in-flight dedupe (window-scoped queue): the ribbon and a
+//      chart page's own call fire near-simultaneously on first load; both would
+//      miss the not-yet-written cache and each start a request. The queue lets
+//      the first call own the network and fans its result out to every waiting
+//      caller — so first load is ONE fetch even with two consumers. It is
+//      window-scoped (not a closure var) on purpose: power-law-data.js is
+//      double-included on chart pages (site-wide for the ribbon + page_scripts),
+//      and a closure var would be reset by the second copy, splitting the queue.
+// Cache key + TTL are documented in SITE_GUIDE's live-price section.
+var LCS_PRICE_CACHE_KEY = 'lcs.todayPrice';
+var LCS_PRICE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+function lcsReadPriceCache(){
+  try {
+    var raw = sessionStorage.getItem(LCS_PRICE_CACHE_KEY);
+    if (!raw) return null;
+    var c = JSON.parse(raw);
+    if (c && typeof c.price === 'number' && isFinite(c.price) && c.price > 0
+          && typeof c.ts === 'number' && (c.source === 'live' || c.source === 'fallback')) {
+      return c;
+    }
+  } catch (e) { /* private mode / disabled storage — behave as uncached */ }
+  return null;
+}
+function lcsWritePriceCache(price, source){
+  try {
+    sessionStorage.setItem(LCS_PRICE_CACHE_KEY,
+      JSON.stringify({ price: price, source: source, ts: Date.now() }));
+  } catch (e) { /* storage unavailable — cache is a best-effort optimization */ }
+}
+
 function fetchTodayPrice(onResult){
   var fallback = PL_DATA[PL_DATA.length - 1][1];
   var URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd';
+
+  // (1) Fresh 'live' cache → no network. Fallback caches deliberately fall
+  // through so a later live fetch is never masked.
+  var cached = lcsReadPriceCache();
+  if (cached && cached.source === 'live' && (Date.now() - cached.ts) < LCS_PRICE_TTL_MS) {
+    TODAY_PRICE = cached.price;
+    if (onResult) onResult(cached.price, 'live');
+    return;
+  }
+
+  // (2) In-flight dedupe: if a request this page-load is already running,
+  // queue this caller's callback instead of starting a second request.
+  if (window.__lcsPriceQueue) { if (onResult) window.__lcsPriceQueue.push(onResult); return; }
+  window.__lcsPriceQueue = onResult ? [onResult] : [];
+  function flush(price, source){
+    var q = window.__lcsPriceQueue; window.__lcsPriceQueue = null;
+    if (q) for (var i = 0; i < q.length; i++) { if (q[i]) q[i](price, source); }
+  }
+
   function done(retriesLeft){
     if (retriesLeft > 0) { setTimeout(function(){ attempt(retriesLeft - 1); }, 3000); }
-    else if (onResult) { onResult(fallback, 'fallback'); }
+    else { lcsWritePriceCache(fallback, 'fallback'); flush(fallback, 'fallback'); }
   }
   function attempt(retriesLeft){
     fetch(URL, { cache: 'no-store' })
@@ -118,7 +181,8 @@ function fetchTodayPrice(onResult){
         var p = d && d.bitcoin && d.bitcoin.usd;
         if (typeof p === 'number' && isFinite(p) && p > 0) {
           TODAY_PRICE = p;
-          if (onResult) onResult(p, 'live');
+          lcsWritePriceCache(p, 'live');
+          flush(p, 'live');
         } else { done(retriesLeft); }
       })
       .catch(function(){ done(retriesLeft); });

@@ -1,0 +1,42 @@
+{#
+  Channel Ribbon — site-wide barometer strip (NOT a ticker).
+  Documented in SITE_GUIDE (Channel Ribbon section) and STYLE_GUIDE §6.38.
+
+  A slim, one-line, full-width strip directly beneath the sticky site header
+  on every content page. Reads, in editorial order (position leads, price
+  follows):
+
+      ● {0.43}× trend · {near the floor} · {$64,144}
+
+  — a pulse dot (live-gated), the live trend multiple, the canonical channel
+  zone word (positionLabel), and the spot price. On live-fetch fallback the dot
+  goes static and a register suffix " · latest monthly data" is appended. The
+  whole strip links to /the-power-law for newcomer orientation.
+
+  Layout-level like the related strip (base.njk includes it once, after the
+  mobile overlay and before page content). Self-guards on a front-matter flag:
+  set `channel_ribbon: false` to opt a page out (currently the homepage — its
+  own bitcoin-ticker already carries this read directly under the hero — and
+  /the-gallery, whose hero Power Law chart shows the same channel position).
+
+  All values are filled at runtime by shared/channel-ribbon.js reading the same
+  shared power-law-data.js helpers (plPrice / positionLabel / fetchTodayPrice)
+  the trilogy pages use, so the ribbon can never disagree with a page's own
+  "today" readout. Explicitly excluded by design: sticky positioning, number
+  animation, 24h deltas, red/green coloring — it is a barometer, and it scrolls
+  away with the page.
+#}
+{%- if channel_ribbon is not defined or channel_ribbon -%}
+<a class="channel-ribbon" href="/the-power-law.html" data-channel-ribbon aria-label="Bitcoin relative to the Power Law channel — open The Power Law">
+  <span class="cr-dot" aria-hidden="true"></span>
+  <span class="cr-metric cr-mult"><span class="cr-mult-value">&mdash;</span><span class="cr-trend-word">&nbsp;trend</span></span>
+  <span class="cr-sep" aria-hidden="true">&middot;</span>
+  <span class="cr-metric cr-zone">&mdash;</span>
+  <span class="cr-sep" aria-hidden="true">&middot;</span>
+  <span class="cr-metric cr-price">&mdash;</span>
+  {#- Register suffix shown only on live-fetch fallback; JS toggles [hidden].
+      Wording matches the shared todayPriceLabel/todayPriceNote helpers'
+      "latest monthly data" so the ribbon can't drift from the page readouts. -#}
+  <span class="cr-register" hidden>&nbsp;&middot; latest monthly data</span>
+</a>
+{%- endif -%}

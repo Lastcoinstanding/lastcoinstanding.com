@@ -2103,3 +2103,98 @@ sell fraction x of stack C at price P, tax t, rebuy at P_rebuy
 - **Carry-the-scenario not wired.** Stack ↔ The Bitcoin Retirement remains the natural pair.
 - **Not verified locally: the Eleventy build, and screenshots.** No node (and, on the v3.1 machine, no Python) on the build machine, so QA stitches the real page CSS + shared JS + page JS + page HTML into a standalone harness and drives it in a real browser over a localhost server. In v3.1 this ran the actual shipped code: `hcQA()` across the channel (all four branches, zero identity violations, live DOM single-source pass), the pulse live/fallback gate both ways, 375px reflow (no horizontal overflow, cards/pair/levers collapse to one column), and a WODN-harness regression spot-check (numbers bit-identical to §39). **Screenshots still time out** in this environment — any image capture (full page, region-zoom, canvases hidden, animations off) hangs — so branch verification is by rendered-text assertion + accessibility tree, as before. The card-form "screenshots" JM asked for are captured as rendered-text snapshots per branch.
 - **Dropdown capacity** unchanged: Positioning & Strategy is 10 items under a 21-item Numbers menu; §30's table still says 15.
+
+## 40. The Channel Ribbon + Freshness Badges (site-wide chrome)
+
+**Added July 2026.** Two bundled site-chrome features. Both are layout-level
+(base.njk), not page-scoped — the related-strip centralization precedent.
+
+### 40.1 The Channel Ribbon
+
+A slim, one-line, **non-sticky** barometer strip directly beneath the sticky
+nav on every content page. It is a barometer, not a ticker. Content, in
+editorial order (**position leads, price follows**):
+
+```
+●  0.43× trend  ·  near the floor  ·  $64,144
+```
+
+pulse dot · live trend multiple · canonical zone word (`positionLabel`) · spot
+price. The whole strip links to `/the-power-law` (newcomer orientation, subtle
+house-link hover, no button styling).
+
+- **One source, no drift.** The renderer (`shared/channel-ribbon.js`) reads the
+  same `power-law-data.js` helpers the trilogy pages use — `plPrice`,
+  `positionLabel`, `TODAY_DAYS`, `fetchTodayPrice` — so the ribbon can never
+  disagree with a page's own "today" readout. The zone word comes from mapping
+  the ×-trend multiple back to the shared log-space channel position and calling
+  `positionLabel`, the identical vocabulary used everywhere else.
+- **Live gating (canon).** The dot pulses (`.channel-ribbon.is-live .cr-dot`,
+  `@keyframes lcsRibbonPulse`) only when the fetched source is `live`; on
+  fallback the dot is static (`.cr-dot-static`) and the register suffix
+  ` · latest monthly data` is revealed — the same honest wording as
+  `todayPriceLabel`/`todayPriceNote`. First paint uses the seeded `TODAY_PRICE`
+  (latest-monthly) with the static dot, so the strip is never empty.
+- **Explicitly excluded:** sticky positioning, number animation/counting, 24h
+  deltas, red/green price coloring. It scrolls away with the page.
+- **Placement / plumbing.** `components/channel-ribbon.njk`, included by base.njk
+  after `#mobileOverlay` and before `{{ content }}`. Styling is a canonical
+  `<style id="canonical-ribbon-css">` block in base.njk head (site chrome beside
+  the nav), colors hardcoded rgba/hex so it is dark-foundation safe on every
+  palette (the §4.2 lesson). The renderer + `power-law-data.js` load site-wide
+  in base.njk (the chart-copy.js pattern), gated on the same opt-out flag.
+- **375px** (≤480px): same single line, smaller type, the word "trend" is
+  dropped (the `×` stays) — the documented graceful degradation before any wrap.
+- **Opt-out.** Front matter `channel_ribbon: false` renders nothing and skips the
+  site-wide script load. Currently the **homepage** (its own `bitcoin-ticker`
+  already carries this read under the hero) and **/the-gallery** (opens on the
+  full Power Law channel chart, which shows today's position directly). All other
+  content pages inherit it.
+
+### 40.2 The live-price cache (infra rider)
+
+Because the ribbon makes `fetchTodayPrice` a **per-pageview** consumer, two
+guards were added to the shared `power-law-data.js` so the site stays polite to
+the CoinGecko rate limit. **The retry / fallback / `source`-flag contract is
+unchanged** — only the transport around it:
+
+- **Cross-page cache** (`sessionStorage`, key `lcs.todayPrice`, ~10-min TTL):
+  stores `{price, source, ts}`. A **fresh `live`** value short-circuits with zero
+  network, so navigating N pages in one tab is **one fetch**. A cached
+  `fallback` is **never** short-circuited (it must not mask a later successful
+  live fetch); an expired `live` refetches.
+- **Same-page in-flight dedupe** (`window.__lcsPriceQueue`): on a chart page the
+  ribbon and the page's own call fire together on first load; the queue lets the
+  first own the network and fans the result to all waiters, so first load is one
+  fetch even with two consumers. Window-scoped on purpose — `power-law-data.js`
+  is double-included on chart pages (site-wide + page_scripts), and a closure var
+  would be reset by the second copy.
+
+Build-time note: none of this is verifiable in the (node-less) local harness's
+Eleventy layer; the cache/dedupe JS **is** harness-testable against a localhost
+server (three-page/one-fetch, TTL expiry, fallback-then-live recovery).
+
+### 40.3 Freshness badges
+
+Quiet `NEW` / `UPDATED` chips computed **at build** from `updates.json` only —
+no client JS, no manual flags, self-expiring by construction.
+
+- **Source of truth & rules** (`_data/freshness.js`, exposes the `freshness`
+  map): **NEW** = the slug's FIRST `updates.json` entry is within 30 days;
+  **UPDATED** = its LATEST entry is within 30 days and it is not NEW (NEW
+  suppresses UPDATED). Windows are measured from the build clock (`new Date()`),
+  so a badge expires at the first deploy after its window closes — acceptable
+  staleness for a constantly-deploying site.
+- **Documented caveat:** "first entry" means first entry *in updates.json*, not
+  original launch. A long-standing page whose only logged history is a recent
+  rework reads NEW for 30 days rather than UPDATED. `updates.json` is the only
+  machine-readable signal (explorations.json has no launch date), and a heavy
+  rework arguably earns the louder badge — accepted, not worked around.
+- **Surfaces:** (a) nav dropdown items + mobile overlay — a small chip after the
+  label, via the `freshnessBadge(slug)` macro in base.njk (`.nav-badge`,
+  amber-family NEW / dimmer UPDATED, **never red**, STYLE_GUIDE §6.39); (b)
+  `/calculators` tiles — a corner chip (`.calc-tile-badge`, calculators.css).
+  An on-page eyebrow chip was **skipped** by builder judgment (it would fight
+  each page's hero register; nav + tiles carry the signal).
+- **The standing rule** (NEW_PAGE_CHECKLIST + this guide): *the `updates.json`
+  entry you already write IS the badge — never hand-place one.*

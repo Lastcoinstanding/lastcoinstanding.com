@@ -105,6 +105,7 @@ eleventyComputed:
           {% set ct = ex.calculator_tile %}
           {% set anchor = ct.anchor if ct.anchor is defined else "#calculator" %}
           <a href="/{{ ex.slug }}.html{{ anchor }}" class="calc-tile calc-tile-featured" aria-label="Open {{ ex.title | safe }} calculator">
+            {% if freshness[ex.slug] == 'new' %}<span class="calc-tile-badge calc-tile-badge-new">New</span>{% elif freshness[ex.slug] == 'updated' %}<span class="calc-tile-badge calc-tile-badge-updated">Updated</span>{% endif %}
             <div class="calc-tile-preview">
               {% if ct.preview_kind == "live-chart" %}
                 <div id="{{ ct.preview_id }}"></div>
@@ -137,6 +138,7 @@ eleventyComputed:
           {% set ct = ex.calculator_tile %}
           {% set anchor = ct.anchor if ct.anchor is defined else "#calculator" %}
           <a href="/{{ ex.slug }}.html{{ anchor }}" class="calc-tile">
+            {% if freshness[ex.slug] == 'new' %}<span class="calc-tile-badge calc-tile-badge-new">New</span>{% elif freshness[ex.slug] == 'updated' %}<span class="calc-tile-badge calc-tile-badge-updated">Updated</span>{% endif %}
             <div class="calc-tile-preview">
               {% if ct.preview_kind == "live-chart" %}
                 <div id="{{ ct.preview_id }}"></div>

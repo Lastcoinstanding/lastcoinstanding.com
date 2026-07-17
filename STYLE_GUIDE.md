@@ -1983,6 +1983,52 @@ function saveState(){ if (isDefaultState()) { clearStore(); return; } writeStore
 
 **CSS is not involved** — this is pure JS state. Duplicated per page like the other per-page patterns; if a third page adopts it, a `shared/sticky-state.js` (readUrl-aware, key + fields injected) is the obvious extraction.
 
+### 6.38 Channel Ribbon (site-wide barometer strip)
+
+**What:** a slim, one-line, **non-sticky** strip beneath the sticky nav on every
+content page — `● 0.43× trend · near the floor · $64,144` (dot · multiple · zone
+word · price). Layout-level, not page-scoped: `components/channel-ribbon.njk`
+included by base.njk, styled in the canonical `<style id="canonical-ribbon-css">`
+block, filled by `shared/channel-ribbon.js`. Full framework: SITE_GUIDE §40.1.
+
+**Tokens minted (this build):**
+- `.channel-ribbon` — flex, one line, `white-space: nowrap`, hardcoded rgba/hex
+  colors (dark-foundation safe on every palette; **never** `var(--…)`, since the
+  strip renders before any page `:root` and on pages that define none).
+- `.cr-dot` + `@keyframes lcsRibbonPulse` — the live-gated pulse dot. Pulses only
+  under `.channel-ribbon.is-live`; `.cr-dot-static` on fallback. This is a NEW
+  keyframe (the existing `lcs-pulse-halo`/§6.23 is an absolutely-positioned
+  expanding-ring halo for a chart point — wrong shape for an inline dot; the
+  homepage ticker's `ticker-pulse` animates `text-shadow`, also not a dot). Kept
+  in the ribbon's canonical block, respects `prefers-reduced-motion`.
+- `.cr-mult-value` / `.cr-trend-word` / `.cr-zone` / `.cr-price` / `.cr-sep` /
+  `.cr-register` — the value spans. `.cr-trend-word` is `display:none` ≤480px
+  (the documented 375px degradation: drop "trend", keep the `×`).
+
+**Reuse, not fork:** the numbers come from the shared `power-law-data.js`
+(`plPrice`/`positionLabel`/`fetchTodayPrice`); only the chrome is new. **When to
+skip:** pages whose hero already shows the channel read (homepage ticker, the
+Gallery's channel chart) — opt out with `channel_ribbon: false`.
+
+### 6.39 Freshness badges (`NEW` / `UPDATED` chips)
+
+**What:** quiet build-time chips marking recently-shipped pages, computed from
+`updates.json` only (`_data/freshness.js`), self-expiring. Framework and rules:
+SITE_GUIDE §40.3. Surfaced in the nav (`freshnessBadge` macro, base.njk) and on
+`/calculators` tiles.
+
+**Tokens minted:**
+- `.nav-badge` / `.nav-badge-new` / `.nav-badge-updated` (canonical-nav-css) — a
+  tiny uppercase letterspaced chip after a nav label.
+- `.calc-tile-badge` / `-new` / `-updated` (calculators.css) — a corner chip on a
+  tile (its `.calc-tile` gains `position: relative`).
+
+**Palette (house rule): quiet amber-family NEW, dimmer neutral UPDATED, never
+badge-red.** NEW = amber `#e5a63a`/`#f0b45a` on a low-alpha amber wash; UPDATED =
+muted white on a near-transparent neutral. Red is reserved for loss/danger
+elsewhere on the site and must not leak into a freshness signal. **Never
+hand-place** a badge — see the standing rule in NEW_PAGE_CHECKLIST.
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.

@@ -79,6 +79,10 @@ body {
 .nav-dropdown-legend { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.7rem; font-style: italic; color: rgba(255,255,255,0.4); padding: 8px 24px 4px; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.06); white-space: nowrap; }
 .mobile-legend { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.78rem; font-style: italic; color: rgba(255,255,255,0.42); padding: 1.6rem 32px 0; margin-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.06); }
 .nav-interactive-marker { color: #e09422; font-size: 0.7em; opacity: 0.7; margin-left: 2px; line-height: 1; vertical-align: 0.05em; }
+/* ─── Freshness badges (STYLE_GUIDE §6.39) — quiet amber NEW, dimmer UPDATED, never red ─── */
+.nav-badge { display: inline-block; font-family: 'Inter', -apple-system, sans-serif; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 1px 5px; border-radius: 3px; margin-left: 6px; vertical-align: 0.1em; line-height: 1.5; }
+.nav-badge-new { color: #e5a63a; background: rgba(224,148,34,0.14); border: 1px solid rgba(224,148,34,0.30); }
+.nav-badge-updated { color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.12); }
 /* ─── Dropdown sub-headers (non-clickable group labels) — see SITE_GUIDE §30 ─── */
 /* Visually quiet: small letterspaced muted caps in the footer-nav-label / mobile-
    section-label register. pointer-events:none guarantees they never read as links. */
@@ -90,6 +94,51 @@ body {
 @media (max-width: 768px) {
   .site-nav .nav-links { display: none; }
   .hamburger { display: block; }
+}
+</style>
+<style id="canonical-ribbon-css">
+/* ─── Channel Ribbon — site-wide barometer strip (STYLE_GUIDE §6.38) ─── */
+/* Site chrome, so it lives here beside the nav rather than in page CSS.
+   Colors are hardcoded rgba/hex (never var(--…)) so the strip is dark-
+   foundation safe on every page palette — the §4.2 lesson. NON-sticky by
+   design (static flow): it sits under the sticky nav and scrolls away with the
+   page. Injected by base.njk from components/channel-ribbon.njk; filled at
+   runtime by shared/channel-ribbon.js. */
+.channel-ribbon {
+  display: flex; align-items: baseline; justify-content: center; flex-wrap: nowrap;
+  gap: 0.5rem; width: 100%; box-sizing: border-box; padding: 0.55rem 1.5rem;
+  background: rgba(247,147,26,0.02);
+  border-bottom: 1px solid rgba(224,148,34,0.08);
+  font-family: 'Inter', -apple-system, sans-serif; font-size: 0.9rem; line-height: 1.4;
+  text-decoration: none; color: #9a938a; white-space: nowrap;
+  transition: color 0.2s, background 0.2s;
+}
+.channel-ribbon:hover { color: #b8b0a5; background: rgba(247,147,26,0.035); }
+.channel-ribbon .cr-dot {
+  flex: 0 0 auto; width: 7px; height: 7px; border-radius: 50%;
+  background: #F7931A; box-shadow: 0 0 5px rgba(247,147,26,0.5); align-self: center;
+}
+.channel-ribbon.is-live .cr-dot { animation: lcsRibbonPulse 2.8s ease-in-out infinite; }
+.channel-ribbon .cr-dot.cr-dot-static { animation: none; box-shadow: 0 0 4px rgba(247,147,26,0.28); opacity: 0.8; }
+.channel-ribbon .cr-mult-value { color: #e09422; font-weight: 600; font-variant-numeric: tabular-nums; }
+.channel-ribbon .cr-trend-word { color: #8c857c; }
+.channel-ribbon .cr-zone { color: #a89f93; font-style: italic; }
+.channel-ribbon .cr-price { color: #cbc3b7; font-variant-numeric: tabular-nums; letter-spacing: 0.2px; }
+.channel-ribbon .cr-sep { color: #55504a; }
+.channel-ribbon .cr-register { color: #8c857c; font-style: italic; font-size: 0.82em; }
+.channel-ribbon:hover .cr-dot { box-shadow: 0 0 8px rgba(247,147,26,0.65); }
+@keyframes lcsRibbonPulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(247,147,26,0.30); }
+  50%      { box-shadow: 0 0 9px rgba(247,147,26,0.60); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .channel-ribbon.is-live .cr-dot { animation: none; box-shadow: 0 0 6px rgba(247,147,26,0.42); }
+}
+/* 375px: same single line, smaller type, drop the "trend" word (keeps the ×) —
+   the documented graceful degradation before any wrap. */
+@media (max-width: 480px) {
+  .channel-ribbon { font-size: 0.8rem; gap: 0.4rem; padding: 0.5rem 0.9rem; }
+  .channel-ribbon .cr-trend-word { display: none; }
 }
 </style>
 <style id="canonical-typography-css">
@@ -264,6 +313,18 @@ h1, h2, h3 {
         match one of these strings exactly, or that page silently drops out of the dropdown. -#}
     {%- set numbersGroups = ["Models & Trends", "Bitcoin vs. Other Assets", "Positioning & Strategy", "Living on Bitcoin"] -%}
     {%- set argumentsGroups = ["Why Fiat Fails", "Why Bitcoin Endures", "Objections, Answered", "Holding & Spending"] -%}
+    {#- Freshness badge (STYLE_GUIDE §6.39). Reads the build-time `freshness` map
+        (_data/freshness.js, computed from updates.json). NEW suppresses UPDATED;
+        both self-expire. One macro, reused across every nav surface below. -#}
+    {#- Takes the RESOLVED state string (freshness[slug]) as an argument rather
+        than reading the `freshness` global inside the macro — Nunjucks macros do
+        not reliably see data-cascade globals from their own scope, only their
+        arguments. Call as {{ freshnessBadge(freshness[e.slug]) }}. -#}
+    {%- macro freshnessBadge(state) -%}
+    {%- if state == 'new' %} <span class="nav-badge nav-badge-new">New</span>
+    {%- elif state == 'updated' %} <span class="nav-badge nav-badge-updated">Updated</span>
+    {%- endif -%}
+    {%- endmacro -%}
     <nav class="site-nav">
         <a href="/" class="brand">Last Coin Standing</a>
             <div class="nav-links">
@@ -273,7 +334,7 @@ h1, h2, h3 {
             <a class="nav-dropdown-btn{% if currentCat == 'foundations' %} active{% endif %}" href="#">Foundations &#9662;</a>
             <div class="nav-dropdown-menu">
 {%- for e in explorations %}{% if e.category == 'foundations' %}
-        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}</a>
+        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
             </div>
@@ -284,7 +345,7 @@ h1, h2, h3 {
 {%- for g in argumentsGroups %}
                 <div class="nav-dropdown-group-label">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'arguments' and e.group == g %}
-        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}</a>
+        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
 {%- endfor %}
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
@@ -296,7 +357,7 @@ h1, h2, h3 {
 {%- for g in numbersGroups %}
                 <div class="nav-dropdown-group-label">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'numbers' and e.group == g %}
-        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}</a>
+        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
 {%- endfor %}
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
@@ -311,20 +372,20 @@ h1, h2, h3 {
     <div class="mobile-overlay" id="mobileOverlay">
         <div class="mobile-section-label">Foundations</div>
 {%- for e in explorations %}{% if e.category == 'foundations' %}
-        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}</a>
+        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
         <div class="mobile-section-label">The Arguments</div>
 {%- for g in argumentsGroups %}
         <div class="mobile-section-sublabel">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'arguments' and e.group == g %}
-        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}</a>
+        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
 {%- endfor %}
         <div class="mobile-section-label">The Numbers</div>
 {%- for g in numbersGroups %}
         <div class="mobile-section-sublabel">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'numbers' and e.group == g %}
-        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}</a>
+        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
 {%- endfor %}
         <a href="/the-gallery.html"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
@@ -332,6 +393,11 @@ h1, h2, h3 {
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
         <div class="mobile-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
     </div>
+
+{# Channel Ribbon — layout-level barometer strip (STYLE_GUIDE §6.38). Sits
+   under the sticky nav, non-sticky so it scrolls away. Self-guards: renders
+   nothing when `channel_ribbon: false` (homepage, /the-gallery). #}
+{% include 'components/channel-ribbon.njk' %}
 
 {{ content | safe }}
 
@@ -428,6 +494,23 @@ h1, h2, h3 {
     <div class="footer-line"></div>
     <div class="footer-copy">&copy; 2026 Last Coin Standing &mdash; Bitcoin education through contrast and clarity</div>
 </footer>
+
+{# Channel Ribbon data + renderer — loaded site-wide (the chart-copy.js pattern)
+   so the strip works on every content page, not just chart pages. Loaded only
+   when the ribbon is present (skipped on channel_ribbon:false pages). Order:
+   power-law-data.js first (defines the shared plPrice / positionLabel /
+   fetchTodayPrice), then the renderer. On chart pages power-law-data.js is ALSO
+   in page_scripts below; the re-include is a harmless var/function redeclare in
+   non-strict mode, and the sessionStorage cache + window-scoped in-flight
+   dedupe in that file keep the whole site to one live fetch per session. #}
+{%- if channel_ribbon is not defined or channel_ribbon %}
+<script>
+{% include '_pageassets/shared/power-law-data.js' %}
+</script>
+<script>
+{% include '_pageassets/shared/channel-ribbon.js' %}
+</script>
+{%- endif %}
 
 {%- if page_scripts %}
     <script>

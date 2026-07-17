@@ -3,6 +3,10 @@ layout: base.njk
 permalink: /index.html
 slug: index
 feedback: false
+# Channel Ribbon opt-out: the homepage's own bitcoin-ticker strip (below the
+# hero) already carries the price · ×trend · zone read, so the ribbon would
+# stack a near-identical strip under it. See STYLE_GUIDE §6.38.
+channel_ribbon: false
 eleventyComputed:
   head_extras: "{% include '_pageassets/index-head.html' %}"
   page_styles: "{% include '_pageassets/index.css' %}"

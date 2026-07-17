@@ -94,6 +94,7 @@
 
 /* ─── Tile base ─── */
 .calc-tile {
+  position: relative;
   display: flex;
   flex-direction: column;
   background: #15130f;
@@ -112,6 +113,16 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   outline: none;
 }
+
+/* ─── Freshness badges (STYLE_GUIDE §6.39) — corner chip, quiet amber NEW,
+   dimmer UPDATED, never red. Computed at build from updates.json; self-expiring. */
+.calc-tile-badge {
+  position: absolute; top: 10px; right: 10px; z-index: 3;
+  font-family: 'Inter', -apple-system, sans-serif; font-size: 0.56rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; line-height: 1.5;
+}
+.calc-tile-badge-new { color: #f0b45a; background: rgba(224,148,34,0.16); border: 1px solid rgba(224,148,34,0.40); }
+.calc-tile-badge-updated { color: rgba(255,255,255,0.55); background: rgba(20,18,15,0.85); border: 1px solid rgba(255,255,255,0.15); }
 
 /* ─── Preview area ─── */
 .calc-tile-preview {
