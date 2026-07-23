@@ -754,6 +754,32 @@ eleventyComputed:
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- COMMON QUESTIONS — outside the tab containers so it renders on
+       every tab. Matching FAQPage JSON-LD lives in the page head file;
+       if you edit an answer here, mirror the edit there. -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="faq" aria-label="Common questions">
+    <div class="essay-prose">
+      <h2 class="section-title">Common questions</h2>
+
+      <h3 class="faq-q">How much bitcoin do I need to retire?</h3>
+      <p class="prose">There is no single number &mdash; it depends on your target income, your retirement year, and what you assume about bitcoin&rsquo;s price path. This calculator lets you set all three and shows whether a given stack sustains your income year by year, including the scenarios where it depletes. The honest answer is a range you explore, not a figure anyone can hand you.</p>
+
+      <h3 class="faq-q">Can you really retire on bitcoin alone?</h3>
+      <p class="prose">Under some assumptions yes, under others no &mdash; and the difference is visible in the projection. A stack that reaches escape velocity under one price model can deplete under a harsher one, and a bear market early in retirement changes the picture more than one that comes late. The companion <a href="/the-bitcoin-retirement-stress-test.html">Stress Test</a> models exactly that risk.</p>
+
+      <h3 class="faq-q">How does the calculator project bitcoin&rsquo;s future price?</h3>
+      <p class="prose">It uses the Power Law trend &mdash; a regression of bitcoin&rsquo;s full price history against time, with coefficients credited to Porkopolis Economics &mdash; as a central-tendency assumption, not a forecast. You choose the price basis and inflation assumptions yourself, and every projected number is reproducible from the adjacent ones. The model&rsquo;s limits are stated on the page, not hidden.</p>
+
+      <h3 class="faq-q">What withdrawal strategies does it model?</h3>
+      <p class="prose">Three: selling bitcoin as needed, borrowing against the stack, and disciplined rebalancing. Each has a different shape of risk &mdash; tax events, liquidation exposure, sequence risk &mdash; and each links to a dedicated page that treats it in depth.</p>
+
+      <h3 class="faq-q">Is this financial advice?</h3>
+      <p class="prose">No. It is an educational tool: you choose the assumptions, the math runs live, and you can export the full projection to CSV and check every number in your own spreadsheet. What you decide is yours; what we owe you is arithmetic you can verify.</p>
+    </div>
+  </section>
+
   {% include 'components/companion-content.njk' %}
 
 </div>
