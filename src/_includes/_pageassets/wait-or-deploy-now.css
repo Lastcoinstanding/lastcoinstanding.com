@@ -189,3 +189,10 @@ body { background: var(--bg); color: var(--text); }
   .wd-dd-divider { width: auto; height: 1px; margin: 0 1.4rem; }
   .wd-caution-grid, .wd-link-grid { grid-template-columns: 1fr; }
 }
+
+/* ── Common-questions FAQ (#faq) ── */
+#faq { max-width: 880px; margin: 3rem auto 0; padding: 0 1rem; }
+#faq h2 { font-family: var(--font-d); font-size: 1.6rem; font-weight: 500; letter-spacing: -.01em; color: #f2eee8; margin: 0 0 0.4rem; }
+#faq .faq-q { font-family: 'Inter', sans-serif; font-size: 1.02rem; font-weight: 600; color: var(--text); margin: 1.6rem 0 0.4rem; line-height: 1.4; }
+#faq .faq-a { font-family: 'Inter', sans-serif; font-size: 0.93rem; line-height: 1.68; color: var(--text-dim); margin: 0; }
+#faq .faq-a em { color: var(--amber); font-style: italic; }

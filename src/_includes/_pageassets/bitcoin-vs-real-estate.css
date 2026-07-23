@@ -475,3 +475,7 @@
     border-color: rgba(247,147,26,0.3);
     font-weight: 600;
 }
+
+/* ── Common-questions FAQ (#faq) ── */
+#faq { max-width: 880px; margin: 3rem auto 0; padding: 0 1rem; }
+#faq .narrative { margin: 1.2rem 0; }
