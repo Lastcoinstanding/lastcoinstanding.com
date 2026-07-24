@@ -139,7 +139,11 @@ body { background: var(--bg); color: var(--text); }
 .dp-never-tag { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-right: 0.5rem; }
 
 /* ══ THE HONESTY BACKTEST ══════════════════════════════════ */
-.dp-table-wrap { overflow-x: auto; margin: 0 0 0.9rem; }
+/* Reserve a top band for the chart-copy camera button (absolute, top-right of
+   this host) so it floats above the header instead of overlapping the "3 years"
+   cell once the full table is visible at wide viewports. Mirrors the top padding
+   the chart canvas already gives that same button. */
+.dp-table-wrap { overflow-x: auto; margin: 0 0 0.9rem; padding-top: 2.5rem; }
 .dp-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 0.88rem; min-width: 520px; }
 .dp-table th { text-align: right; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); padding: 0 0.6rem 0.5rem; border-bottom: 1px solid var(--border); }
 .dp-table thead th { vertical-align: bottom; }
@@ -147,7 +151,12 @@ body { background: var(--bg); color: var(--text); }
 /* Spanning group header over the three horizon columns. */
 .dp-table th.dp-th-span { text-align: center; font-style: normal; color: var(--text-dim); padding-bottom: 0.4rem; border-bottom: 1px solid rgba(224,148,34,0.18); }
 .dp-table th[title] { cursor: help; }
-.dp-table th:first-child, .dp-table td:first-child { text-align: left; }
+/* Only the Moment column is left-aligned. Scoped to the first header row's
+   first cell (the rowspan-2 "Moment") + every body first cell — NOT a bare
+   th:first-child, which would also catch "1 year" (the first th of the second
+   header row) and drag it left, out of line with its data column. */
+.dp-table thead tr:first-child th:first-child,
+.dp-table td:first-child { text-align: left; }
 /* Subtle rule between the cyclical tops and the cyclical lows. */
 .dp-table tr.dp-group-sep td { padding: 0; height: 0; border-bottom: 1px solid rgba(224,148,34,0.2); }
 .dp-table td { text-align: right; padding: 0.6rem; border-bottom: 1px solid rgba(224,148,34,0.07); color: var(--text-dim); font-variant-numeric: tabular-nums; }
