@@ -315,16 +315,36 @@
   }
   function fromDom(el, bg){
     var box = el.getBoundingClientRect();
-    var cssW = box.width, cssH = box.height;
+    // Capture the FULL content width, not the visible (possibly scrolled) width, so
+    // an overflow-x table exports whole. Pinning the width on an off-screen clone
+    // also stops html2canvas from ever shrink-wrapping the element to min-content.
+    var fullW = Math.max(Math.ceil(box.width), el.scrollWidth || 0);
     return ensureHtml2Canvas().then(function(h2c){
-      return h2c(el, {
+      var clone = el.cloneNode(true);
+      // Drop our own camera button(s) from the clone so they never enter the image.
+      var btns = clone.querySelectorAll('.chart-copy-btn');
+      for (var i = 0; i < btns.length; i++){ if (btns[i].parentNode) btns[i].parentNode.removeChild(btns[i]); }
+      clone.style.width = fullW + 'px';
+      clone.style.maxWidth = 'none';
+      clone.style.margin = '0';
+      clone.style.overflow = 'visible';   // show the whole table, not a scroll window
+      clone.style.position = 'fixed';
+      clone.style.left = '-100000px';
+      clone.style.top = '0';
+      document.body.appendChild(clone);
+      var cb = clone.getBoundingClientRect();
+      var cssW = Math.max(1, Math.ceil(cb.width));
+      var cssH = Math.max(1, Math.ceil(cb.height));
+      function cleanup(){ if (clone.parentNode) clone.parentNode.removeChild(clone); }
+      return h2c(clone, {
         backgroundColor: bg || '#111110', scale: exportScale(), logging: false, useCORS: true,
-        // The copy button lives inside the captured host — keep it out of the image.
-        ignoreElements: function(node){ return node.classList && node.classList.contains('chart-copy-btn'); }
-      });
-    }).then(function(raster){
-      return { cssW: cssW, cssH: cssH,
-        draw: function(ctx, x, y, w, h){ ctx.drawImage(raster, 0, 0, raster.width, raster.height, x, y, w, h); } };
+        width: cssW, height: cssH,
+        windowWidth: Math.max(document.documentElement.clientWidth || 0, cssW)
+      }).then(function(raster){
+        cleanup();
+        return { cssW: cssW, cssH: cssH,
+          draw: function(ctx, x, y, w, h){ ctx.drawImage(raster, 0, 0, raster.width, raster.height, x, y, w, h); } };
+      }, function(err){ cleanup(); throw err; });
     });
   }
 
@@ -369,6 +389,20 @@
 
   function slugify(s){
     return (s || 'chart').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'chart';
+  }
+
+  // First <canvas>/<svg> that is CHART CONTENT — i.e. NOT the camera button's own
+  // 16px icon, which attach() injects inside this same host. Without this guard a
+  // host with no canvas (a table / text block) auto-detects the button's <svg> and
+  // routes to the SVG path, rasterizing the 16px icon into an ~88px-wide,
+  // one-word-per-line min-content export instead of the DOM path. (Canvas hosts
+  // were unaffected — canvas is checked first; heatmaps set data-chart-capture="dom".)
+  function contentEl(host, tag){
+    var list = host.getElementsByTagName(tag);
+    for (var i = 0; i < list.length; i++){
+      if (!(list[i].closest && list[i].closest('.chart-copy-btn'))) return list[i];
+    }
+    return null;
   }
 
   // ── Attach a button to one [data-chart-copy] host. ──
@@ -430,8 +464,8 @@
       // Capture path: explicit data-chart-capture wins, else auto-detect by
       // contents (canvas → svg → DOM-raster).
       var mode = host.getAttribute('data-chart-capture');
-      var canvas = host.querySelector('canvas');
-      var svg = host.querySelector('svg');
+      var canvas = contentEl(host, 'canvas');
+      var svg = contentEl(host, 'svg');
       var src;
       if (mode === 'dom') src = fromDom(host, bg);
       else if (mode === 'svg' && svg) src = fromSvg(svg);
