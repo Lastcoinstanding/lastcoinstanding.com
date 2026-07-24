@@ -62,6 +62,19 @@ body { background: var(--bg); color: var(--text); }
    on the sign of m; near-trend says "roughly at trend" (guardrail). */
 .dp-status { margin: 2.6rem auto 0; max-width: 1100px; background: linear-gradient(135deg, rgba(224,148,34,0.06), rgba(20,18,16,0.4)); border: 1px solid rgba(224,148,34,0.22); border-radius: 12px; padding: 1.5rem 1.6rem 1.3rem; }
 .dp-status-label { font-family: 'Inter', sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); margin: 0 0 1rem; }
+/* Live pulse dot — canonical channel-ribbon treatment (base.njk .cr-dot),
+   replicated dp-prefixed. Honesty guardrail: rendered ONLY while the live
+   fetch resolved (JS clears [hidden] only when todayPriceIsLive), so the
+   pulse never appears on the monthly-data fallback. */
+.dp-live-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #F7931A; box-shadow: 0 0 5px rgba(247,147,26,0.5); margin-right: 0.5rem; vertical-align: middle; position: relative; top: -0.06em; animation: dpLivePulse 2.8s ease-in-out infinite; }
+.dp-live-dot[hidden] { display: none; }
+@keyframes dpLivePulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(247,147,26,0.30); }
+  50%      { box-shadow: 0 0 9px rgba(247,147,26,0.60); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dp-live-dot { animation: none; box-shadow: 0 0 6px rgba(247,147,26,0.42); }
+}
 .dp-status-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem 1.4rem; align-items: end; }
 .dp-stat-cap { font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 0.3rem; }
 .dp-stat-num { font-family: var(--font-d); font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 600; line-height: 1; letter-spacing: -.02em; color: #f2eee8; font-variant-numeric: tabular-nums; }
@@ -129,7 +142,14 @@ body { background: var(--bg); color: var(--text); }
 .dp-table-wrap { overflow-x: auto; margin: 0 0 0.9rem; }
 .dp-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 0.88rem; min-width: 520px; }
 .dp-table th { text-align: right; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); padding: 0 0.6rem 0.5rem; border-bottom: 1px solid var(--border); }
+.dp-table thead th { vertical-align: bottom; }
+.dp-table th[rowspan] { padding-bottom: 0.5rem; }
+/* Spanning group header over the three horizon columns. */
+.dp-table th.dp-th-span { text-align: center; font-style: normal; color: var(--text-dim); padding-bottom: 0.4rem; border-bottom: 1px solid rgba(224,148,34,0.18); }
+.dp-table th[title] { cursor: help; }
 .dp-table th:first-child, .dp-table td:first-child { text-align: left; }
+/* Subtle rule between the cyclical tops and the cyclical lows. */
+.dp-table tr.dp-group-sep td { padding: 0; height: 0; border-bottom: 1px solid rgba(224,148,34,0.2); }
 .dp-table td { text-align: right; padding: 0.6rem; border-bottom: 1px solid rgba(224,148,34,0.07); color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .dp-table td:first-child { color: var(--text); font-weight: 500; }
 .dp-table .dp-neg { color: var(--red); }
@@ -137,6 +157,9 @@ body { background: var(--bg); color: var(--text); }
 .dp-table tr.dp-today-row td { background: rgba(224,148,34,0.05); color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(224,148,34,0.2); }
 .dp-table tr.dp-today-row td:first-child { color: var(--amber); }
 .dp-table-note { font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; margin: 0; }
+/* Worked-example line — sits between the table and its methodology note. */
+.dp-table-example { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--text-dim); line-height: 1.6; margin: 0 0 0.6rem; padding: 0.6rem 0.85rem; background: rgba(255,255,255,0.02); border-left: 3px solid rgba(224,148,34,0.4); border-radius: 6px; }
+.dp-table-example a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 
 /* ══ WHY CAGR FALLS — designed to grow (merge point for the
    "Bitcoin's CAGR head-on" lens per design doc §3.5) ══ */

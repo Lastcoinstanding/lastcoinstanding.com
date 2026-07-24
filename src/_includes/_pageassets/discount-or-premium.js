@@ -112,6 +112,12 @@
         + moneyFull(p) + ' · ' + m.toFixed(2) + '× trend · recomputed every page load.';
     }
 
+    // Live pulse dot — honesty guardrail, not decoration: shown ONLY when the
+    // fetch actually resolved to a live spot price, hidden on the monthly-data
+    // fallback so the pulse can never imply liveness it doesn't have.
+    var liveDot = document.getElementById('dpLiveDot');
+    if (liveDot) liveDot.hidden = !todayPriceIsLive(liveSource);
+
     // At-the-floor honesty line — conditional, self-removing.
     var floorNote = document.getElementById('dpFloorNote');
     if (floorNote) floorNote.hidden = !(m <= PL_FLOOR * 1.05);
@@ -132,7 +138,7 @@
     if (elRev) elRev.textContent = signPct0(rev);
     if (elTr) elTr.textContent = signPct0(tr);
     if (elRevSub) elRevSub.textContent = 'per year, if price returns to trend by ' + horizonDateLabel();
-    if (elTrSub) elTrSub.textContent = 'per year for someone who bought AT trend — the model’s own growth rate.';
+    if (elTrSub) elTrSub.textContent = 'per year for someone who bought AT trend — the trend’s own growth, annualized from today to ' + horizonDateLabel() + '. This rate declines as the horizon extends.';
 
     // Uplift (below trend) / drag (above trend) — same subtraction both ways.
     var elDelta = document.getElementById('dpDelta');
@@ -143,10 +149,10 @@
         txt = 'Price is roughly at trend, so reversion adds <strong>almost nothing</strong> either way — the two figures above are essentially the same number.';
       } else if (delta > 0) {
         cls += 'dp-delta-up';
-        txt = 'The discount is worth an <strong>uplift of ' + signPct0(delta) + '/yr</strong> over the at-trend baseline — that gap is the whole of what reversion buys you.';
+        txt = 'The discount is worth an <strong>additional uplift of ' + signPct0(delta) + '/yr</strong> over the at-trend baseline for your chosen horizon — this is what makes buying below trend buying at a <strong>discount</strong>.';
       } else {
         cls += 'dp-delta-down';
-        txt = 'The premium is a <strong>drag of ' + signPct0(delta) + '/yr</strong> against the at-trend baseline — reverting from a premium means giving return back.';
+        txt = 'The premium is a <strong>drag of ' + signPct0(delta) + '/yr</strong> against the at-trend baseline — reverting from a premium means a lower CAGR than the trend’s own, over your chosen horizon.';
       }
       elDelta.className = cls;
       elDelta.innerHTML = txt;
@@ -158,7 +164,7 @@
     if (elNever) {
       elNever.innerHTML = '<span class="dp-never-tag">And if it never reverts</span> '
         + 'If the multiple simply stays where it is, you earn the trend’s own slope — about <strong>'
-        + signPct0(tr) + '/yr</strong> over this horizon, declining as bitcoin matures. That is the assumption-free case. '
+        + signPct0(tr) + '/yr</strong> annualized over this horizon, a rate that itself declines as bitcoin matures (see below). That is the assumption-free case. '
         + 'The multiple can also <em>fall further</em>: the ' + PL_FLOOR.toFixed(2)
         + '× floor has held for the length of the record, which is evidence, not a law.';
     }
@@ -211,7 +217,7 @@
       data: {
         datasets: [
           { label: 'Implied CAGR if it reverts to trend', data: c.rev, borderColor: AMBER, backgroundColor: AMBER, borderWidth: 2.2, pointRadius: 0, tension: 0.25, fill: false },
-          { label: 'At-trend baseline (never reverts)', data: c.tr, borderColor: BLUE, backgroundColor: BLUE, borderWidth: 1.8, borderDash: [5, 4], pointRadius: 0, tension: 0.25, fill: false }
+          { label: 'At-trend implied CAGR (never reverts)', data: c.tr, borderColor: BLUE, backgroundColor: BLUE, borderWidth: 1.8, borderDash: [5, 4], pointRadius: 0, tension: 0.25, fill: false }
         ]
       },
       options: {
@@ -265,6 +271,14 @@
     { d: 4694, p: 69000, lbl: 'Nov 2021 top' },
     { d: 6121, p: 126200, lbl: 'Oct 2025 ATH' }
   ];
+  // Cyclical-low anchors — the site's canonical troughs, the same set Bull &
+  // Bear Cycles uses, so the two pages can never disagree on what a low was
+  // worth. Computed here, not asserted, exactly like the tops.
+  var LOWS = [
+    { d: 2202, p: 180, lbl: 'Jan 2015 low' },
+    { d: 3633, p: 3183, lbl: 'Dec 2018 low' },
+    { d: 5070, p: 15476, lbl: 'Nov 2022 low' }
+  ];
   var BT_YEARS = [1, 2, 3];
 
   function backtestRow(d, p, label, isToday) {
@@ -283,7 +297,10 @@
   function renderBacktest() {
     var body = document.getElementById('dpBacktestBody');
     if (!body) return;
+    // Render order: four tops, a subtle group separator, three lows, then Today.
     var html = TOPS.map(function (t) { return backtestRow(t.d, t.p, t.lbl, false); }).join('');
+    html += '<tr class="dp-group-sep"><td colspan="5"></td></tr>';
+    html += LOWS.map(function (t) { return backtestRow(t.d, t.p, t.lbl, false); }).join('');
     html += backtestRow(TODAY_DAYS, price(), 'Today', true);
     body.innerHTML = html;
   }

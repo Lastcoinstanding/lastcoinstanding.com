@@ -163,6 +163,31 @@ Reversion CAGRs 1–5y: 228.5 / 110.9 / 81.0 / 67.1 / 58.9%. At-trend 1–5y: 37
 2017-12-17 6.46× (−71/−30/−6); 2021-11-10 2.82× (−45/−10/+6); 2025-10-06 1.12× (+25/+31/+32).
 Trend-slope decline: 2026→30 34.5%, 2030→34 27.8%, 2034→38 23.3%.
 
+## 9. Phase 1 (2026-07-24)
+
+Post-launch review revisions, shipped on branch `discount-or-premium`. Copy, table, and JS only — no
+change to the model, the guardrails (§5), or the FAQ text/FAQPage schema (verified untouched and still
+mirrored verbatim). All figures remain computed, never asserted.
+
+- **Framing.** Hero and intro re-centred on the two-part question — *where in the trend is bitcoin now,
+  and if it reverts, by when* — and on the power law as (perhaps uniquely) bitcoin's whole-history
+  growth shape. The "instrument, not a pitch" / "harsh things" self-description is cut; the backtest now
+  carries that argument by showing it rather than asserting it.
+- **Interactive copy.** H2 → "If — or when — it returns to trend…". The cue gains a concrete precedent
+  (Nov 2022 low at 0.41× back to trend in ~16 months). Slider/chart captions, the at-trend sub-line, the
+  delta lines, and the never-reverts line all now name CAGR explicitly and state that the baseline itself
+  declines as the horizon extends. Chart legend: dashed series → "At-trend implied CAGR (never reverts)".
+- **Backtest table.** Extended from four tops to **four tops + three lows + Today** (Jan 2015 / Dec 2018
+  / Nov 2022 lows — the site-canonical troughs shared with Bull & Bear Cycles), with a subtle group
+  separator between tops and lows. New spanning header "Implied CAGR if trend is reached within…", a
+  "Multiple of trend" column label, per-horizon `title` tooltips, and a worked-example line. Verified at
+  build: 2015 0.58× (+318/+200/+161); 2018 0.57× (+205/+125/+100); 2022 0.41× (+269/+132/+97) — reconciles.
+- **Live pulse.** A dp-prefixed pulse dot (canonical channel-ribbon `.cr-dot` treatment) beside the
+  "Where bitcoin sits right now" label, rendered **only** when `todayPriceIsLive(liveSource)` — an
+  honesty guardrail, hidden on the monthly-data fallback.
+- **Site docs.** `NEW_PAGE_CHECKLIST.md` §10 title-tag item now notes that the title carries the searched
+  phrase incl. "Bitcoin" while the H1 may stay evocative per the house question-title family.
+
 ---
 
 # Appendix — Pilot content (create-once-distribute-everywhere)

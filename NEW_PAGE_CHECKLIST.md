@@ -459,7 +459,9 @@ the following. Copy from a complete reference (e.g.
   `G-WNGLLPPR5M`. Two `<script>` tags: async loader + inline config.
   Missing GA = the page produces no analytics signal, period.
 - **Title tag** — `<title>Page Name — Last Coin Standing</title>`.
-  Under 60 characters where possible.
+  Under 60 characters where possible. Title tag carries the searched
+  phrase including "Bitcoin"; the H1 may stay evocative per the house
+  question-title family.
 - **Meta description** — single declarative sentence, 140-155
   characters, no marketing language. Should read as a useful summary
   even out of context.
