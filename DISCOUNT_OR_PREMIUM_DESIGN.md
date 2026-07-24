@@ -187,6 +187,36 @@ mirrored verbatim). All figures remain computed, never asserted.
   honesty guardrail, hidden on the monthly-data fallback.
 - **Site docs.** `NEW_PAGE_CHECKLIST.md` §10 title-tag item now notes that the title carries the searched
   phrase incl. "Bitcoin" while the H1 may stay evocative per the house question-title family.
+- **Status.** **Merged to `main` and live** at `/discount-or-premium` (2026-07-24), plus a follow-up fix
+  aligning the backtest year-column headers (the spanning-header row had dragged "1 year" left) and
+  reserving a top band so the chart-copy button clears the header at wide viewports. Known gap: the OG
+  image `og-discount-or-premium.jpg` was never generated at page creation, so the `og:image` URL currently
+  serves the Cloudflare HTML fallback — tracked as a separate follow-up (needs the §6.15 Python pipeline).
+
+### Phase 2 (2026-07-24) — optional holdings lens
+
+On branch `dp-phase-2` (off `main`). Adds an optional holdings input and per-dollar context around the
+existing figures. No change to the model, the guardrails (§5), the tool-framing strip, or the FAQ; no
+"you should" language; every $ figure inherits the live/fallback provenance of the price it derives from.
+
+- **Holdings input (optional).** A small row in the interactive section — "Your stack (optional):" + a
+  numeric BTC input (min 0, cap 21,000,000, any decimals) + the note "Stays on this page — never stored
+  or sent." **Privacy fence (hard requirement):** the value lives in a single JS closure variable and is
+  **never** written to the URL, `sessionStorage`, `localStorage`, or any network call; `syncUrl()` still
+  only ever writes `?y=`; the page's only fetch remains the CoinGecko spot. `autocomplete=off` keeps the
+  browser from remembering it.
+- **Per-coin gap.** Beneath the multiple verdict, with no holdings needed: below trend → "That's ≈ $X per
+  coin below what the trend puts bitcoin at today.", above trend mirrors with "above". `gap = |trend −
+  price|`, `moneyFull` formatting, hidden inside the 0.95–1.05× dead band (same boundary as the verdict).
+- **Card dollar lines (holdings > 0 only).** Implied-CAGR card gains "Your stack: $today → $at-trend on
+  {date}."; at-trend card gains "→ $never-changes if the multiple never changes." Empty state leaves both
+  cards exactly as before. Recompute on slider + input events.
+- **Chart tooltip.** Adds "Trend price then: $…" always, plus "Your stack at trend: $…" only when a stack
+  is set.
+- **Self-consistency gate (passed before push).** For every horizon, `(stack-at-trend ÷ stack-today)^(1/y)
+  − 1` equals the displayed implied CAGR and `(never-changes ÷ stack-today)^(1/y) − 1` equals the at-trend
+  baseline — the holding cancels, so they cannot disagree. Verified across all 55 horizons (both
+  assertions) and again with dollar-rounded displayed values across holdings 0.01–1000 BTC: zero mismatches.
 
 ---
 

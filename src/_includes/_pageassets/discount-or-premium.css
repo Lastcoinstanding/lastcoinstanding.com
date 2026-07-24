@@ -82,6 +82,10 @@ body { background: var(--bg); color: var(--text); }
 .dp-stat-sub { font-family: 'Inter', sans-serif; font-size: 0.78rem; line-height: 1.5; color: var(--text-dim); margin: 0.35rem 0 0; }
 .dp-stat-sub strong { color: var(--text); font-weight: 600; }
 .dp-status-meta { font-family: 'Inter', sans-serif; font-size: 0.74rem; color: var(--text-muted); margin: 1.1rem 0 0; }
+/* Per-coin dollar gap beneath the multiple verdict. Hidden in the dead band. */
+.dp-gap-line { font-family: 'Inter', sans-serif; font-size: 0.8rem; line-height: 1.5; color: var(--text-dim); margin: 0.4rem 0 0; }
+.dp-gap-line[hidden] { display: none; }
+.dp-gap-line strong { color: var(--amber); font-weight: 600; font-variant-numeric: tabular-nums; }
 
 /* At-the-floor conditional line (guardrail §5) — renders only when
    m <= PL_FLOOR*1.05, and disappears on its own when the state does. */
@@ -111,6 +115,16 @@ body { background: var(--bg); color: var(--text); }
 .dp-slider-caption { font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; margin: 0.7rem 0 0; }
 .dp-slider-caption strong { color: var(--text-dim); font-weight: 600; }
 
+/* Optional holdings row — small, unobtrusive, sits between the slider and the
+   readout pair. The input value never leaves this page (privacy fence §9 P2). */
+.dp-holdings { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem 0.7rem; margin: 0 0 1.3rem; padding: 0.7rem 0.9rem; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 8px; }
+.dp-holdings-label { font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600; color: var(--text-dim); }
+.dp-holdings-field { position: relative; display: inline-flex; align-items: center; }
+.dp-holdings-input { width: 8.5rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: var(--text); background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 6px; padding: 0.35rem 2.7rem 0.35rem 0.6rem; font-variant-numeric: tabular-nums; }
+.dp-holdings-input:focus { outline: none; border-color: rgba(224,148,34,0.5); }
+.dp-holdings-unit { position: absolute; right: 0.55rem; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); pointer-events: none; }
+.dp-holdings-note { font-family: 'Inter', sans-serif; font-size: 0.74rem; color: var(--text-muted); font-style: italic; }
+
 /* The paired readout — implied CAGR beside the at-trend baseline, SAME SIZE.
    Never render one without the other (design doc §5). */
 .dp-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 0 0 0.9rem; }
@@ -120,6 +134,11 @@ body { background: var(--bg); color: var(--text); }
 .dp-cell-num { font-family: var(--font-d); font-size: clamp(2.1rem, 5vw, 3rem); font-weight: 600; line-height: 1; letter-spacing: -.02em; color: #f2eee8; font-variant-numeric: tabular-nums; }
 .dp-cell-primary .dp-cell-num { color: var(--amber); }
 .dp-cell-sub { font-family: 'Inter', sans-serif; font-size: 0.78rem; line-height: 1.5; color: var(--text-dim); margin: 0.4rem 0 0; }
+/* Per-holdings dollar line inside each readout card — shown only with a stack. */
+.dp-cell-money { font-family: 'Inter', sans-serif; font-size: 0.8rem; line-height: 1.45; color: var(--text-dim); margin: 0.55rem 0 0; padding-top: 0.5rem; border-top: 1px solid var(--border); }
+.dp-cell-money[hidden] { display: none; }
+.dp-cell-money strong { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.dp-cell-primary .dp-cell-money strong { color: var(--amber); }
 
 .dp-delta { font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.6; text-align: center; color: var(--text-dim); margin: 0 0 1.1rem; padding: 0.7rem 1rem; border-radius: 8px; background: rgba(255,255,255,0.015); border: 1px solid var(--border); }
 .dp-delta strong { font-weight: 600; }

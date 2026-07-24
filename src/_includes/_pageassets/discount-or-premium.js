@@ -43,6 +43,12 @@
   var state = { months: 36 };
   var livePrice = null, liveSource = 'seed';
 
+  // Optional holdings (BTC). Privacy fence (design doc §9 Phase 2): this value
+  // lives HERE and nowhere else — never written to the URL, sessionStorage,
+  // localStorage, or any network request. syncUrl() below only ever writes ?y=.
+  var holdings = 0;
+  var MAX_BTC = 21000000;
+
   function price() { return livePrice != null ? livePrice : TODAY_PRICE; }
   function trendToday() { return plPrice(TODAY_DAYS); }
   function multiple() { return price() / trendToday(); }
@@ -107,6 +113,21 @@
       }
     }
 
+    // Per-coin dollar gap beneath the multiple verdict. No holdings needed.
+    // Hidden inside the near-trend dead band — same 0.95–1.05× boundary as the
+    // verdict. gap = |trend − price|; its provenance is the price's (live/fallback).
+    var elGap = document.getElementById('dpGapLine');
+    if (elGap) {
+      if (s === 'at-trend') {
+        elGap.hidden = true;
+      } else {
+        var gap = Math.abs(t - p);
+        elGap.innerHTML = 'That’s ≈ <strong>' + moneyFull(gap) + '</strong> per coin '
+          + (p < t ? 'below' : 'above') + ' what the trend puts bitcoin at today.';
+        elGap.hidden = false;
+      }
+    }
+
     if (elMeta) {
       elMeta.textContent = (todayPriceIsLive(liveSource) ? 'Live: ' : 'Latest monthly data: ')
         + moneyFull(p) + ' · ' + m.toFixed(2) + '× trend · recomputed every page load.';
@@ -139,6 +160,33 @@
     if (elTr) elTr.textContent = signPct0(tr);
     if (elRevSub) elRevSub.textContent = 'per year, if price returns to trend by ' + horizonDateLabel();
     if (elTrSub) elTrSub.textContent = 'per year for someone who bought AT trend — the trend’s own growth, annualized from today to ' + horizonDateLabel() + '. This rate declines as the horizon extends.';
+
+    // Per-holdings dollar lines — shown only when a stack is entered; the empty
+    // state leaves both cards exactly as before. Values are algebraically the
+    // same ratios the CAGRs above are built from, so they can't disagree (the
+    // self-consistency gate, design doc §9 Phase 2, verifies this). Their $
+    // provenance is the live/fallback price they derive from.
+    var elRevMoney = document.getElementById('dpRevMoney');
+    var elTrMoney = document.getElementById('dpTrendMoney');
+    if (holdings > 0) {
+      var hzTrend = plPrice(TODAY_DAYS + YEAR_D * y); // trend price at the horizon
+      var stackToday = holdings * price();
+      var stackAtTrend = holdings * hzTrend;                 // reverts to trend
+      var stackNeverChanges = holdings * m * hzTrend;        // multiple held fixed
+      if (elRevMoney) {
+        elRevMoney.innerHTML = 'Your stack: <strong>' + moneyFull(stackToday) + '</strong> today &rarr; <strong>'
+          + moneyFull(stackAtTrend) + '</strong> at trend on ' + horizonDateLabel() + '.';
+        elRevMoney.hidden = false;
+      }
+      if (elTrMoney) {
+        elTrMoney.innerHTML = '&rarr; <strong>' + moneyFull(stackNeverChanges)
+          + '</strong> if the multiple never changes.';
+        elTrMoney.hidden = false;
+      }
+    } else {
+      if (elRevMoney) { elRevMoney.hidden = true; elRevMoney.textContent = ''; }
+      if (elTrMoney) { elTrMoney.hidden = true; elTrMoney.textContent = ''; }
+    }
 
     // Uplift (below trend) / drag (above trend) — same subtraction both ways.
     var elDelta = document.getElementById('dpDelta');
@@ -243,7 +291,17 @@
             titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10,
             callbacks: {
               title: function (it) { return it.length ? 'Reverting over ' + it[0].parsed.x.toFixed(1) + ' years' : ''; },
-              label: function (it) { return it.dataset.label + ': ' + Math.round(it.parsed.y) + '%/yr'; }
+              label: function (it) { return it.dataset.label + ': ' + Math.round(it.parsed.y) + '%/yr'; },
+              // The trend price at the hovered horizon (always), and the stack's
+              // value at trend then (only when a stack is entered). $ provenance
+              // is the live/fallback spot the reversion figures derive from.
+              afterBody: function (items) {
+                if (!items || !items.length) return '';
+                var tp = plPrice(TODAY_DAYS + YEAR_D * items[0].parsed.x);
+                var lines = ['Trend price then: ' + moneyFull(tp)];
+                if (holdings > 0) lines.push('Your stack at trend: ' + moneyFull(holdings * tp));
+                return lines;
+              }
             }
           }
         }
@@ -347,6 +405,18 @@
       sl.value = state.months;
       sl.addEventListener('input', function () {
         state.months = parseInt(this.value, 10);
+        renderCalc();
+      });
+    }
+    // Holdings input. Clamp to [0, MAX_BTC], accept any decimals. The value is
+    // held only in the `holdings` closure variable — never persisted or sent.
+    var stackInput = document.getElementById('dpStack');
+    if (stackInput) {
+      stackInput.addEventListener('input', function () {
+        var v = parseFloat(this.value);
+        if (!isFinite(v) || v < 0) v = 0;
+        if (v > MAX_BTC) { v = MAX_BTC; this.value = MAX_BTC; }
+        holdings = v;
         renderCalc();
       });
     }

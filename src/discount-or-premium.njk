@@ -50,6 +50,7 @@ eleventyComputed:
         <div class="dp-stat-cap">Multiple of trend</div>
         <div class="dp-stat-num" id="dpMult">&mdash;</div>
         <p class="dp-stat-sub" id="dpMultSub">&nbsp;</p>
+        <p class="dp-gap-line" id="dpGapLine" hidden></p>
       </div>
     </div>
     <p class="dp-status-meta" id="dpStatusMeta"></p>
@@ -74,6 +75,21 @@ eleventyComputed:
       <p class="dp-slider-caption">A shorter horizon means the <strong>same gap closes in less time</strong>, so the implied CAGR is higher. That is just arithmetic, not a forecast.</p>
     </div>
 
+    <!-- Optional holdings. Privacy fence (design doc §9 Phase 2): the value lives
+         in a JS variable only — never written to the URL, sessionStorage,
+         localStorage, or any network call. The page's only fetch stays the
+         CoinGecko spot. autocomplete=off keeps the browser from remembering it. -->
+    <div class="dp-holdings">
+      <label class="dp-holdings-label" for="dpStack">Your stack (optional):</label>
+      <span class="dp-holdings-field">
+        <input type="number" class="dp-holdings-input" id="dpStack" min="0" max="21000000" step="any"
+               inputmode="decimal" autocomplete="off" placeholder="0.00"
+               aria-label="Your bitcoin holdings in BTC (optional)">
+        <span class="dp-holdings-unit">BTC</span>
+      </span>
+      <span class="dp-holdings-note">Stays on this page &mdash; never stored or sent.</span>
+    </div>
+
     <!-- The paired readout. These two figures ALWAYS render together —
          the implied CAGR is meaningless without its baseline. -->
     <div class="dp-pair">
@@ -81,11 +97,13 @@ eleventyComputed:
         <div class="dp-cell-cap">Implied CAGR if it reverts</div>
         <div class="dp-cell-num" id="dpRevNum">&mdash;</div>
         <p class="dp-cell-sub" id="dpRevSub">&nbsp;</p>
+        <p class="dp-cell-money" id="dpRevMoney" hidden></p>
       </div>
       <div class="dp-cell">
         <div class="dp-cell-cap">At-trend baseline</div>
         <div class="dp-cell-num" id="dpTrendNum">&mdash;</div>
         <p class="dp-cell-sub" id="dpTrendSub">&nbsp;</p>
+        <p class="dp-cell-money" id="dpTrendMoney" hidden></p>
       </div>
     </div>
 
