@@ -226,8 +226,14 @@
     return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
   }
 
-  // ════════ CHART — implied CAGR vs horizon, with the baseline beneath ════════
+  // ════════ CHART — two views (design doc §9 Phase 3) ════════
+  // Rate view: implied CAGR vs horizon (Phase 1/2 behaviour, unchanged). Price
+  // view: price on a log axis over the whole channel, with the glide path the
+  // slider implies. The Chart.js instance is rebuilt on toggle; the slider state
+  // is shared across both views. `view` is NOT URL-persisted (default Rate).
   var chart = null;
+  var view = 'rate';                      // 'rate' | 'price'
+  var PULSE = '#F7931A', RED = '#c0392b'; // live-price accent + floor/low red
   function curves() {
     var rev = [], tr = [], mo;
     for (mo = MIN_M; mo <= MAX_M; mo++) {
@@ -256,7 +262,7 @@
       }
     };
   }
-  function buildChart() {
+  function buildRateChart() {
     var el = document.getElementById('dpChart');
     if (!el || typeof Chart === 'undefined') return;
     var c = curves();
@@ -309,12 +315,166 @@
       plugins: [markerPlugin()]
     });
   }
-  function updateChart() {
-    if (!chart) { buildChart(); return; }
+  function updateRateChart() {
     var c = curves();
     chart.data.datasets[0].data = c.rev;
     chart.data.datasets[1].data = c.tr;
     chart.update('none');
+  }
+
+  // ---- PRICE VIEW ----
+  // Canonical cycle lows (same anchors as the backtest) and the days where price
+  // later regained trend (≈May 2017 / May 2019 / Mar 2024) — subtle highlights.
+  var LOW_MARKERS = [{ d: 2202, p: 180 }, { d: 3633, p: 3183 }, { d: 5070, p: 15476 }];
+  var REGAIN_DAYS = [3062, 3784, 5548];
+
+  function dayToDate(d) {
+    return new Date((GENESIS_TS + d * 86400) * 1000)
+      .toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+  }
+  function priceTick(v) {
+    if (v >= 1e6) return '$' + (v / 1e6) + 'M';
+    if (v >= 1e3) return '$' + (v / 1e3) + 'K';
+    return '$' + v;
+  }
+  // Static channel series over the full record + 5 years, so every slider horizon
+  // fits without a rescale. x = days since genesis; y = USD (log axis).
+  function priceStatic() {
+    var minD = PL_DATA[0][0], maxD = TODAY_DAYS + YEAR_D * 5, i;
+    var hist = [];
+    for (i = 0; i < PL_DATA.length; i++) hist.push({ x: PL_DATA[i][0], y: PL_DATA[i][1] });
+    var trend = [], floor = [], ceil = [], N = 160;
+    for (i = 0; i <= N; i++) {
+      var d = minD + (maxD - minD) * i / N;
+      trend.push({ x: d, y: plPrice(d) });
+      floor.push({ x: d, y: PL_FLOOR * plPrice(d) });
+      ceil.push({ x: d, y: PL_CEIL * plPrice(d) });
+    }
+    var lows = LOW_MARKERS.map(function (o) { return { x: o.d, y: o.p }; });
+    var regains = REGAIN_DAYS.map(function (d) { return { x: d, y: plPrice(d) }; });
+    return { hist: hist, trend: trend, floor: floor, ceil: ceil, lows: lows, regains: regains, minD: minD, maxD: maxD };
+  }
+  // Dynamic paths that track the slider. A straight line between two points on a
+  // log y-axis IS straight in log space, so two points each suffice.
+  function pricePaths() {
+    var y = state.months / 12, hd = TODAY_DAYS + YEAR_D * y, p0 = price();
+    return {
+      dot: [{ x: TODAY_DAYS, y: p0 }],
+      glide: [{ x: TODAY_DAYS, y: p0 }, { x: hd, y: plPrice(hd) }],
+      never: [{ x: TODAY_DAYS, y: p0 }, { x: hd, y: multiple() * plPrice(hd) }]
+    };
+  }
+  function dotColor() { return todayPriceIsLive(liveSource) ? PULSE : MUTED; }
+
+  // Small on-canvas "illustrative" tag at the glide endpoint (honesty, not decoration).
+  function priceAnnoPlugin() {
+    return {
+      id: 'dpPriceAnno',
+      afterDatasetsDraw: function (c) {
+        var hd = TODAY_DAYS + YEAR_D * state.months / 12;
+        var px = c.scales.x.getPixelForValue(hd), py = c.scales.y.getPixelForValue(plPrice(hd)), ctx = c.ctx;
+        if (!isFinite(px) || !isFinite(py)) return;
+        ctx.save();
+        ctx.font = '600 10px "Inter", sans-serif';
+        ctx.fillStyle = 'rgba(224,148,34,0.9)';
+        ctx.textBaseline = 'bottom'; ctx.textAlign = 'right';
+        ctx.fillText('illustrative', Math.min(px, c.chartArea.right) - 4, Math.max(py - 6, c.chartArea.top + 10));
+        ctx.restore();
+      }
+    };
+  }
+
+  function buildPriceChart() {
+    var el = document.getElementById('dpChart');
+    if (!el || typeof Chart === 'undefined') return;
+    var s = priceStatic(), pp = pricePaths();
+    chart = new Chart(el.getContext('2d'), {
+      type: 'line',
+      data: {
+        // Array order = draw order (index 0 at the back). Highlight markers, the
+        // two paths, and the current-position dot sit on top of the channel lines.
+        datasets: [
+          { label: 'Price history', data: s.hist, borderColor: MUTED, borderWidth: 1, pointRadius: 0, tension: 0, fill: false },
+          { label: '3.0× upper band', data: s.ceil, borderColor: 'rgba(224,148,34,0.28)', borderWidth: 1, borderDash: [3, 4], pointRadius: 0, tension: 0, fill: false },
+          { label: '0.42× floor — historical', data: s.floor, borderColor: 'rgba(192,57,43,0.55)', borderWidth: 1.2, borderDash: [6, 4], pointRadius: 0, tension: 0, fill: false },
+          { label: 'Trend', data: s.trend, borderColor: AMBER, borderWidth: 2, pointRadius: 0, tension: 0, fill: false },
+          { label: 'Regained trend', data: s.regains, showLine: false, pointRadius: 3, borderColor: BLUE, backgroundColor: 'rgba(109,179,212,0.55)', _noLegend: true },
+          { label: 'Cycle low', data: s.lows, showLine: false, pointRadius: 3, borderColor: RED, backgroundColor: 'rgba(192,57,43,0.6)', _noLegend: true },
+          { label: 'If it never reverts', data: pp.never, borderColor: 'rgba(109,179,212,0.55)', borderWidth: 1.5, borderDash: [4, 4], pointRadius: 0, tension: 0, fill: false },
+          { label: 'Your chosen glide path', data: pp.glide, borderColor: AMBER, borderWidth: 2, borderDash: [6, 4], pointRadius: 0, tension: 0, fill: false },
+          { label: 'Bitcoin now', data: pp.dot, showLine: false, pointRadius: 5, borderColor: '#0a0908', borderWidth: 1.5, backgroundColor: dotColor(), _noLegend: true }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, parsing: false, animation: { duration: 0 },
+        interaction: { intersect: false, mode: 'nearest' },
+        layout: { padding: { top: 14, right: 10 } },
+        scales: {
+          x: {
+            type: 'linear', min: s.minD, max: s.maxD,
+            grid: { color: 'rgba(224,148,34,0.05)' },
+            ticks: { color: MUTED, maxTicksLimit: 9, autoSkip: true, font: { family: 'Inter, sans-serif', size: 11 },
+              callback: function (v) { return new Date((GENESIS_TS + v * 86400) * 1000).getUTCFullYear(); } }
+          },
+          y: {
+            type: 'logarithmic',
+            grid: { color: 'rgba(224,148,34,0.06)' },
+            ticks: { color: MUTED, font: { family: 'Inter, sans-serif', size: 11 },
+              callback: function (v) { var l = Math.log(v) / Math.LN10; if (Math.abs(l - Math.round(l)) > 0.01) return ''; return priceTick(v); } }
+          }
+        },
+        plugins: {
+          legend: { display: true, position: 'top',
+            labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 22, padding: 8,
+              filter: function (item, data) { return !data.datasets[item.datasetIndex]._noLegend; } } },
+          tooltip: {
+            backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.30)', borderWidth: 1,
+            titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10,
+            callbacks: {
+              title: function (it) { return it.length ? dayToDate(it[0].parsed.x) : ''; },
+              label: function (it) { return it.dataset.label + ': ' + moneyFull(it.parsed.y); }
+            }
+          }
+        }
+      },
+      plugins: [priceAnnoPlugin()]
+    });
+  }
+  function updatePriceChart() {
+    var pp = pricePaths();
+    chart.data.datasets[6].data = pp.never;
+    chart.data.datasets[7].data = pp.glide;
+    chart.data.datasets[8].data = pp.dot;
+    chart.data.datasets[8].backgroundColor = dotColor();
+    chart.update('none');
+  }
+
+  // ---- View dispatch ----
+  function buildChart() { if (view === 'price') buildPriceChart(); else buildRateChart(); }
+  function updateChart() {
+    if (!chart) { buildChart(); return; }
+    if (view === 'price') updatePriceChart(); else updateRateChart();
+  }
+  function setView(v) {
+    if ((v !== 'rate' && v !== 'price') || v === view) return;
+    view = v;
+    var rb = document.getElementById('dpViewRate'), pb = document.getElementById('dpViewPrice');
+    if (rb) { rb.classList.toggle('is-active', v === 'rate'); rb.setAttribute('aria-pressed', v === 'rate' ? 'true' : 'false'); }
+    if (pb) { pb.classList.toggle('is-active', v === 'price'); pb.setAttribute('aria-pressed', v === 'price' ? 'true' : 'false'); }
+    var capR = document.getElementById('dpCaptionRate'), capP = document.getElementById('dpCaptionPrice');
+    if (capR) capR.hidden = (v !== 'rate');
+    if (capP) capP.hidden = (v !== 'price');
+    // Keep the chart-copy export self-labelled to the active view.
+    var host = document.querySelector('.dp-chart-block');
+    if (host) {
+      host.setAttribute('data-chart-title', v === 'price'
+        ? 'Bitcoin price vs. the Power Law channel, with the chosen glide path'
+        : 'Implied CAGR if bitcoin reverts to trend, by horizon');
+      host.setAttribute('data-chart-filename', v === 'price'
+        ? 'bitcoin-price-view-glide-path.png' : 'bitcoin-implied-reversion-cagr.png');
+    }
+    if (chart) { chart.destroy(); chart = null; }
+    buildChart();
   }
 
   // ════════ THE HONESTY BACKTEST ════════
@@ -419,6 +579,11 @@
         holdings = v;
         renderCalc();
       });
+    }
+    // Rate / Price segmented toggle. Rebuilds the chart; slider state is shared.
+    var viewBtns = document.querySelectorAll('.dp-view-btn');
+    for (var i = 0; i < viewBtns.length; i++) {
+      viewBtns[i].addEventListener('click', function () { setView(this.getAttribute('data-view')); });
     }
   }
 

@@ -218,6 +218,34 @@ existing figures. No change to the model, the guardrails (§5), the tool-framing
   baseline — the holding cancels, so they cannot disagree. Verified across all 55 horizons (both
   assertions) and again with dollar-rounded displayed values across holdings 0.01–1000 BTC: zero mismatches.
 
+### Phase 3 (2026-07-24) — channel / price view
+
+On branch `dp-phase-2` (after merging main for the chart-copy fix + OG card). Adds a second way to read
+the same numbers: the reversion figures drawn as a glide path on the price/channel chart. No change to
+the model, guardrails (§5, still no buy zones, floor labelled historical), tool-framing, or the FAQ.
+
+- **Segmented toggle.** "Rate view | Price view" above the chart block — dp-prefixed, `aria-pressed`
+  toggle-button semantics, cribbing the house `.channel-axis-toggle` idiom from /the-power-law (inline-flex,
+  bordered, amber-tint active). Default Rate; **not** URL-persisted; the slider state is shared and
+  preserved across toggles both directions. The Chart.js instance is destroyed and rebuilt per view.
+- **Price view (log y, USD).** PL_DATA history as a thin muted line; trend in amber; the 0.42× floor as a
+  red dashed line labelled "0.42× floor — historical"; the 3.0× upper band as a faint dashed line.
+  x-domain spans the full record through today + 5 years, so every slider horizon fits without a rescale.
+  A current-position dot at (today, price), coloured with the live-pulse accent only when the price is
+  live (muted on the monthly fallback). The **glide path** is a dashed amber segment from (today, price)
+  to (today + y, trend at that horizon) — straight in log space, tracking the slider, with an on-canvas
+  "illustrative" tag. The **never-reverts path** is a fainter dashed segment to (today + y,
+  multiple × trend) rendered by default (not hover-only). Subtle markers flag the three canonical cycle
+  lows and their trend-regain points (≈May 2017 / May 2019 / Mar 2024). Tooltip shows the hovered series'
+  date + price.
+- **Shared, unchanged.** Slider, readouts, holdings $ lines, and the backtest are identical across views;
+  the chart-copy camera captures whichever view is active (the export title/filename switch with the view).
+- **QA gates (passed before push).** Glide endpoint = the Rate tooltip's "Trend price then" at the same
+  horizon (both are `plPrice(today + y)`). Never-reverts endpoint × holdings = the baseline card's "if the
+  multiple never changes" $ line. Rate view is regression-identical to `8b3fa23` (its build/update paths
+  were preserved verbatim). No console errors through toggle → slide → hover → toggle; no new network
+  calls (price view reads only the already-loaded PL_DATA + plPrice).
+
 ---
 
 # Appendix — Pilot content (create-once-distribute-everywhere)

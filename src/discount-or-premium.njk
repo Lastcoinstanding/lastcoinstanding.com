@@ -109,9 +109,19 @@ eleventyComputed:
 
     <p class="dp-delta" id="dpDelta">&mdash;</p>
 
+    <!-- Rate / Price segmented toggle (design doc §9 Phase 3). Cribs the house
+         .channel-axis-toggle idiom from /the-power-law; aria-pressed toggle-button
+         semantics. Default Rate, NOT URL-persisted; the slider state is shared
+         across both views. -->
+    <div class="dp-view-toggle" role="group" aria-label="Chart view">
+      <button type="button" class="dp-view-btn is-active" id="dpViewRate" data-view="rate" aria-pressed="true">Rate view</button>
+      <button type="button" class="dp-view-btn" id="dpViewPrice" data-view="price" aria-pressed="false">Price view</button>
+    </div>
+
     <div class="dp-chart-block" data-chart-copy data-chart-heading="#explore .dp-h2" data-chart-sub="#explore .dp-cue" data-chart-title="Implied CAGR if bitcoin reverts to trend, by horizon" data-chart-filename="bitcoin-implied-reversion-cagr.png">
       <div class="dp-chart-wrapper"><canvas id="dpChart"></canvas></div>
-      <p class="dp-chart-caption">The full curve, so the slider is always read <strong>in context</strong>. The <strong>amber line</strong> is the implied CAGR at every horizon; the <strong>dashed blue line</strong> is the at-trend implied CAGR. Neither line is flat: the baseline itself declines gently as the horizon extends &mdash; see &ldquo;Why the baseline itself keeps falling&rdquo; below. The curve flattens toward the baseline as the horizon lengthens &mdash; the further out you push reversion, the less of an impact it has.</p>
+      <p class="dp-chart-caption" id="dpCaptionRate">The full curve, so the slider is always read <strong>in context</strong>. The <strong>amber line</strong> is the implied CAGR at every horizon; the <strong>dashed blue line</strong> is the at-trend implied CAGR. Neither line is flat: the baseline itself declines gently as the horizon extends &mdash; see &ldquo;Why the baseline itself keeps falling&rdquo; below. The curve flattens toward the baseline as the horizon lengthens &mdash; the further out you push reversion, the less of an impact it has.</p>
+      <p class="dp-chart-caption" id="dpCaptionPrice" hidden>Price on a <strong>log axis</strong> over the whole record: the thin <strong>muted line</strong> is price history, the <strong>amber line</strong> is the trend, the <strong>dashed red line</strong> is the 0.42&times; floor (historical), and the <strong>faint dashed line</strong> is the 3.0&times; upper band. The dashed amber path is the assumption you chose, drawn as a line &mdash; illustrative, not a forecast. The fainter path is the never-reverts case: the multiple stays where it is. Markers flag the three canonical cycle lows and the points where price later regained trend. Past returns to trend took about 5 months (from the Dec 2018 low), 16 months (from Nov 2022), and 28 months (from Jan 2015) &mdash; the slider&rsquo;s range brackets all three.</p>
     </div>
 
     <!-- The never-reverts case is permanent UI, not a footnote (design doc §4). -->

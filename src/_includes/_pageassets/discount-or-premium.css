@@ -150,6 +150,16 @@ body { background: var(--bg); color: var(--text); }
 .dp-chart-wrapper { position: relative; height: 320px; }
 .dp-chart-caption { font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; margin: 0.7rem 0 0; }
 .dp-chart-caption strong { color: var(--text-dim); font-weight: 600; }
+.dp-chart-caption[hidden] { display: none; }
+
+/* Rate / Price segmented toggle — cribs the house .channel-axis-toggle idiom
+   from /the-power-law (inline-flex, bordered, amber-tint active). */
+.dp-view-toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 5px; overflow: hidden; margin: 0 0 0.9rem; }
+.dp-view-btn { background: rgba(255,255,255,0.02); border: none; border-right: 1px solid var(--border); color: var(--text-muted); font-family: var(--font-b); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.01em; padding: 0.5rem 1.1rem; cursor: pointer; transition: background 0.18s, color 0.18s; }
+.dp-view-btn:last-child { border-right: none; }
+.dp-view-btn:hover { color: var(--text-dim); }
+.dp-view-btn:focus-visible { outline: 2px solid rgba(224,148,34,0.5); outline-offset: 2px; }
+.dp-view-btn.is-active { background: rgba(224,148,34,0.1); color: var(--amber); }
 
 /* The never-reverts case — PERMANENT UI, not a footnote (design doc §4/§5) */
 .dp-never { font-family: 'Inter', sans-serif; font-size: 0.92rem; line-height: 1.65; color: var(--text-dim); margin: 0; padding: 0.95rem 1.2rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-left: 3px solid rgba(109,179,212,0.5); border-radius: 8px; }
