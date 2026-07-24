@@ -1090,6 +1090,7 @@ For a reader new to the site landing on the calculators:
 4. **BvRE — Projection mode** — the same question forward; introduces the channel framing without going deep
 5. **The Power Law — The Channel tab** — the foundational visualization; readers arrive ready to grok the framework
 6. **The Power Law — other tabs** — the deeper conceptual case (Theory, In Nature)
+6b. **Discount, or Premium?** — the Power Law converted into the unit readers already think in. Sits immediately after the Channel tab because it needs the trend and nothing else, and because it answers the question a reader almost always asks on first seeing the channel ("so is it cheap right now?") — two-sidedly, and without becoming a timing signal. Reads before the applied sizing/deployment pages, which assume the reader can already place price against trend.
 6a. **Bitcoin & Metcalfe's Law** — the network-effect engine *under* the Power Law: where the Power Law models price-vs-time, this measures price-vs-adoption and shows why that on-chain signal is going blind in the ETF era. Reads naturally right after the Power Law's conceptual case, before the applied sizing/maintenance pages.
 7. **How Much Bitcoin?** — the sizing question every applied page eventually meets, answered descriptively through the Kelly criterion; reads naturally after the Power Law (which supplies its scenario inputs) and immediately before Disciplined Rebalancing, its sister page (sizing → maintenance)
 8. **Disciplined Rebalancing** — applies the channel as a sell-and-rebuy protocol; deepest specialization on the *selling* side
@@ -2248,3 +2249,38 @@ no client JS, no manual flags, self-expiring by construction.
   each page's hero register; nav + tiles carry the signal).
 - **The standing rule** (NEW_PAGE_CHECKLIST + this guide): *the `updates.json`
   entry you already write IS the badge — never hand-place one.*
+
+## 41. Discount, or Premium? (`/discount-or-premium.html`)
+
+**Added July 2026.** A **Models & Trends** page in The Numbers (`interactive: true`, **no `calculator_tile`** — a market-state explorer with no personal inputs, the same posture as the Doubling Ladder / Heatmap / Bull & Bear). Page-scoped classes use the `dp-` prefix; reads the shared `power-law-data.js` globals and the mixed-content width tier (1100 page / 880 prose). Promoted from the backlog's "reversion CAGR" idea; full design doc at `DISCOUNT_OR_PREMIUM_DESIGN.md`, which also carries the pilot content appendix (X thread + video script) for the content pipeline.
+
+**Thesis.** Most people think in CAGR; the Power Law doesn't — it implies a *declining* growth rate along a rising trend, with price oscillating around it. The page supplies one two-sided lens: the **multiple of trend** (`m = P₀ / T(d₀)`) as the central number, and the CAGR that *returning to trend* would imply at a horizon the reader picks. Below trend, reversion implies an elevated rate; above trend, the identical formula implies a depressed or negative one. **No branching** — the symmetry is the editorial point, and it is what makes the page evergreen: it stays truthful at 0.4× and at 3×.
+
+**Zero new model.** `PL_A`, `PL_B`, `PL_FLOOR`, `GENESIS_TS`, `plPrice`, `TODAY_DAYS/PRICE`, `fetchTodayPrice` all come from the shared module. No new coefficients, no new data dependency, nothing added to the monthly refresh beyond the automatic.
+
+### Structure
+Hero → **live status strip** (price · trend today · multiple, the emblem) → **the interactive** (horizon slider 6mo–5y, paired readout, CAGR-vs-horizon chart, never-reverts line) → **honesty backtest** → **why the baseline keeps falling** → FAQ → sources.
+
+### Guardrails (design doc §5 — build requirements, not suggestions)
+- **The implied CAGR never renders without its at-trend baseline.** The two figures are the same size in the same grid (`.dp-pair`), written in one render pass. Making the implied figure larger would turn an instrument into a pitch. The 1-year row (an extreme number at a deep discount) is only ever seen inside the full curve.
+- **The never-reverts case is permanent UI** (`.dp-never`), not a footnote — and it states both halves honestly: the multiple can hold (you earn the trend slope) *and* it can fall further (the floor is historical, not a law).
+- **Boundary discipline.** `stance()` is the single place discount/premium words are chosen: *discount* only when `m < 0.95`, *premium* only when `m > 1.05`, and **"roughly at trend"** in between, where the delta row reads ~0 rather than manufacturing drama.
+- **At-the-floor line** (`#dpFloorNote`) renders only while `m <= PL_FLOOR * 1.05`, links the Power Law caveats, and removes itself when the state changes. It was live at build (m ≈ 0.42).
+- **Backtest is computed, not asserted** — from the site's canonical cyclical-top anchors, reused verbatim from `bitcoin-vs-the-stock-market.js` so the two pages can never disagree about what a top was worth.
+- **Fallback labelling** per the 2026-07 honesty fix: "latest monthly data", never "live".
+
+### Build reconciliations worth keeping
+- **Backtest horizons are 1y/2y/3y, not 1y/3y/5y.** The design doc's triples (−76/−23/+9 etc.) were unlabelled; recomputation showed they are one-, two- and three-year figures. Three of the four rows then matched the doc exactly.
+- **Top multiples follow the site, not the doc.** The doc cited 12.0×/6.46×, the published canonical set says **12.13×/6.41×/2.82×/1.11×**. Per the doc's own §5 instruction ("match whichever the site already publishes"), the published anchors win. The 2025 ATH computes to 1.11× against the 1.12× asserted in the older table — a rounding artefact of that table, not a disagreement about the data; this page computes rather than asserts, so it shows 1.11×.
+- **Dec-2030 illustration.** The doc's $536,977 / 63.4% assumed a slightly earlier December date than year-end; year-end 2030 computes $543,191 / 63.1%. Immaterial — the page computes live and hard-codes neither.
+
+### Not
+Not a forecast (reversion is a *user-selected assumption*), not an entry-timing signal (**no buy zones, no green/red on the multiple itself** — the tool-framing strip carries the standard language), not a new model.
+
+### Open items
+- **OG card** — `og-discount-or-premium.jpg` **not yet generated**; the authoring machine has no working Python (Windows Store stub only), so the §6.15.1 generator could not run. Meta tags are wired to the final URL; the image **and** its `.eleventy.js` passthrough entry both still need adding before merge. Product-forward is the intended register (the live status strip *is* the argument) → register in MONTHLY_REFRESH §6 regen list when it lands.
+- **Carousel slide** pending per house norm — deferred by design; tonal direction TBD (candidate register: structural observation, oscillation around a persistent line). Brief it separately.
+- **§5 "why CAGR falls" is designed to grow** — it is the intended merge point for the backlog's "Bitcoin's CAGR head-on" lens (declining-but-still-superior vs other assets) when that gets built.
+
+### Integration
+`explorations.json` (group *Models & Trends*, `interactive: true`, no tile); `sitemap.xml` @0.9; `llms.txt` (The Numbers); homepage concept card (trend-line-with-oscillating-price-and-gap-bracket SVG) in The Numbers + Latest (rolled *Wait, or Deploy Now?* out of Latest); `updates.json` (7/23/26); **bidirectional `related:`** with The Power Law, Bull & Bear Cycles, Wait-or-Deploy-Now, and The Doubling Ladder; tool-framing strip (decision-implying); `WebApplication` + `FAQPage` JSON-LD in the head file. **URL state:** `?y=<horizon-years>` only — the multiple is market state, not user state.

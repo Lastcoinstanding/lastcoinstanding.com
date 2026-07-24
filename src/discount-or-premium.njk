@@ -1,0 +1,160 @@
+---
+layout: base.njk
+permalink: /discount-or-premium.html
+slug: discount-or-premium
+related:
+  - slug: the-power-law
+    desc: "The model this page re-expresses. The Channel lays out the trend, the floor, and the upper band and the evidence behind them; this page takes that same trend and asks what the distance from it implies in CAGR terms."
+  - slug: bull-and-bear-cycles
+    desc: "The cycle around the line. This page measures how far price sits from trend right now; Bull &amp; Bear Cycles frames the whole oscillation — why the swings happen and why the volatility is the price of the returns."
+  - slug: wait-or-deploy-now
+    desc: "The entry lens to this page&rsquo;s return lens. Wait-or-Deploy asks whether to buy from a given channel position; this page asks what returning to trend from that position would be worth. Same channel, two different questions."
+  - slug: the-doubling-ladder
+    desc: "The same oscillation, read peak-to-peak. The Doubling Ladder maps the trend&rsquo;s own steps and the deviation wave around it, where this page reads the single current deviation."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/discount-or-premium-head.html' %}"
+  page_styles: "{% include '_pageassets/discount-or-premium.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/discount-or-premium.js' %}"
+---
+
+<section class="hero">
+  <h1>Discount, or <em>Premium?</em></h1>
+  <div class="hero-subtitle">Bitcoin runs above and below its long-run trend &mdash; sometimes far above, sometimes far below.</div>
+  <p class="subtitle">This page tells you, live, <em>which one is true right now</em> &mdash; and what returning to trend would mean.</p>
+</section>
+
+<main class="content-area">
+
+  {% include 'components/tool-framing.njk' %}
+
+  <div class="section-intro dp-prose">
+    <p>Most people think in CAGR. The Power Law doesn&rsquo;t: it describes a <em>declining</em> growth rate along a rising trend, with price oscillating around that trend rather than tracking it. So the useful question is not &ldquo;what return does bitcoin give&rdquo; but a two-part one: <strong>where is price relative to trend right now</strong>, and <strong>what would returning to that trend imply</strong>?</p>
+    <p>Below trend, reversion implies an elevated near-term CAGR &mdash; the &ldquo;discount&rdquo; case. Above trend, the identical arithmetic implies a depressed or negative one. Both come out of the same formula with no special-casing, which is the point: this is an instrument, not a pitch. It would have said harsh things at every past top, and <a href="#backtest">it still does</a>.</p>
+  </div>
+
+  <!-- ════════ THE EMBLEM — live status strip ════════ -->
+  <section class="dp-status" aria-label="Where bitcoin sits right now">
+    <div class="dp-status-label">Where bitcoin sits right now</div>
+    <div class="dp-status-grid">
+      <div>
+        <div class="dp-stat-cap">Price</div>
+        <div class="dp-stat-num" id="dpPrice">&mdash;</div>
+        <p class="dp-stat-sub" id="dpPriceSub">&nbsp;</p>
+      </div>
+      <div>
+        <div class="dp-stat-cap">Trend today</div>
+        <div class="dp-stat-num" id="dpTrend">&mdash;</div>
+        <p class="dp-stat-sub">What the Power Law puts the trend price at today.</p>
+      </div>
+      <div class="dp-stat-central">
+        <div class="dp-stat-cap">Multiple of trend</div>
+        <div class="dp-stat-num" id="dpMult">&mdash;</div>
+        <p class="dp-stat-sub" id="dpMultSub">&nbsp;</p>
+      </div>
+    </div>
+    <p class="dp-status-meta" id="dpStatusMeta"></p>
+    <p class="dp-floor-note" id="dpFloorNote" hidden>Bitcoin is currently at the bottom of its historical channel. The floor has held for the length of the record &mdash; <em>which is evidence, not a law.</em> See <a href="/the-power-law#caveats">the Power Law caveats</a> for what would falsify the model.</p>
+  </section>
+
+  <!-- ════════ THE INTERACTIVE ════════ -->
+  <section class="dp-calc" id="explore">
+    <div class="dp-calc-head">
+      <h2 class="dp-h2">If it returns to trend&hellip;</h2>
+      <span class="dp-readout" id="dpHorizonReadout">&mdash;</span>
+    </div>
+
+    <p class="dp-cue">Drag to choose <strong>how fast</strong> the return happens. Nothing here predicts that it will &mdash; the speed is <em>your</em> assumption, and the arithmetic below is its consequence. Fast reversions look extreme because they <strong>are</strong> extreme.</p>
+
+    <div class="dp-slider-block">
+      <div class="dp-slider-wrap">
+        <input type="range" min="6" max="60" step="1" value="36" class="dp-slider" id="dpSlider"
+               aria-label="Years for price to revert to trend, from six months to five years">
+      </div>
+      <div class="dp-slider-scale"><span>6 months &middot; fastest</span><span>2.5 years</span><span>5 years &middot; slowest</span></div>
+      <p class="dp-slider-caption">A shorter horizon means the <strong>same gap closes in less time</strong>, so the implied annual rate is higher. That is arithmetic, not a forecast.</p>
+    </div>
+
+    <!-- The paired readout. These two figures ALWAYS render together —
+         the implied CAGR is meaningless without its baseline. -->
+    <div class="dp-pair">
+      <div class="dp-cell dp-cell-primary">
+        <div class="dp-cell-cap">Implied CAGR if it reverts</div>
+        <div class="dp-cell-num" id="dpRevNum">&mdash;</div>
+        <p class="dp-cell-sub" id="dpRevSub">&nbsp;</p>
+      </div>
+      <div class="dp-cell">
+        <div class="dp-cell-cap">At-trend baseline</div>
+        <div class="dp-cell-num" id="dpTrendNum">&mdash;</div>
+        <p class="dp-cell-sub" id="dpTrendSub">&nbsp;</p>
+      </div>
+    </div>
+
+    <p class="dp-delta" id="dpDelta">&mdash;</p>
+
+    <div class="dp-chart-block" data-chart-copy data-chart-heading="#explore .dp-h2" data-chart-sub="#explore .dp-cue" data-chart-title="Implied CAGR if bitcoin reverts to trend, by horizon" data-chart-filename="bitcoin-implied-reversion-cagr.png">
+      <div class="dp-chart-wrapper"><canvas id="dpChart"></canvas></div>
+      <p class="dp-chart-caption">The full curve, so the slider is always read <strong>in context</strong>. The <strong>amber line</strong> is the implied CAGR at every horizon; the <strong>dashed blue line</strong> is the at-trend baseline. The curve flattens toward the baseline as the horizon lengthens &mdash; the further out you push reversion, the less it adds.</p>
+    </div>
+
+    <!-- The never-reverts case is permanent UI, not a footnote (design doc §4). -->
+    <p class="dp-never" id="dpNever">&mdash;</p>
+  </section>
+
+  <!-- ════════ THE HONESTY BACKTEST ════════ -->
+  <section class="dp-section" id="backtest">
+    <div class="dp-eyebrow">The test any &ldquo;cheap or expensive&rdquo; claim should pass</div>
+    <h2 class="dp-h2">What this lens said at past extremes</h2>
+    <p class="dp-lead">Every figure below is computed by the same code that drives the slider above, run against the market&rsquo;s four cyclical tops. The same arithmetic that reads high today read <strong>deeply negative at every major top</strong>. That is what an instrument, rather than a pitch, looks like.</p>
+
+    <div class="dp-table-wrap" data-chart-copy data-chart-heading="#backtest .dp-h2" data-chart-sub="#backtest .dp-lead" data-chart-title="What reverting to trend implied at bitcoin's cyclical tops" data-chart-filename="bitcoin-reversion-cagr-backtest.png">
+      <table class="dp-table">
+        <thead>
+          <tr>
+            <th scope="col">Moment</th>
+            <th scope="col">Multiple</th>
+            <th scope="col">1&nbsp;year</th>
+            <th scope="col">2&nbsp;years</th>
+            <th scope="col">3&nbsp;years</th>
+          </tr>
+        </thead>
+        <tbody id="dpBacktestBody"></tbody>
+      </table>
+    </div>
+    <p class="dp-table-note">Implied CAGR of a return to trend from each moment, at one-, two- and three-year horizons. Top anchors are the site&rsquo;s canonical cyclical-top set, shared with <a href="/bitcoin-vs-the-stock-market">Bitcoin vs. The Stock Market</a>; multiples and rates are computed from the model, not asserted.</p>
+  </section>
+
+  <!-- ════════ WHY CAGR FALLS OVER TIME ════════ -->
+  <section class="dp-section" id="declining">
+    <div class="dp-eyebrow">Before you extrapolate</div>
+    <h2 class="dp-h2">Why the baseline itself keeps falling</h2>
+    <p class="dp-lead">The at-trend baseline above is not a constant. The Power Law describes growth that is <em>proportional but decelerating</em> &mdash; each doubling takes longer than the last &mdash; so the trend&rsquo;s own annual rate declines by construction, whatever price does around it. Taking today&rsquo;s number and extending it across decades overstates the case badly.</p>
+    <div class="dp-slope-grid" id="dpSlopeGrid"></div>
+    <p class="dp-table-note" style="margin-top:0.9rem;">Annualised growth of the trend line itself across successive four-year windows, computed live. This is the rate you earn if the multiple never changes &mdash; and it is the reason a single &ldquo;bitcoin&rsquo;s CAGR&rdquo; figure is always incomplete without a date attached. For the trend structure behind it, see <a href="/the-doubling-ladder">The Doubling Ladder</a>.</p>
+  </section>
+
+  <!-- ═══ COMMON QUESTIONS — FAQPage schema lives in the head file; edits here must be mirrored there ═══ -->
+  <section id="faq" aria-label="Common questions">
+    <h2>Common questions</h2>
+    <h3 class="faq-q">Is bitcoin at a discount or a premium right now?</h3>
+    <p class="faq-a">The page computes it live: bitcoin&rsquo;s price divided by its long-run Power Law trend. Below 1.0&times; is a discount to trend, above is a premium &mdash; and the answer changes over time, which is why this page computes rather than asserts it.</p>
+    <h3 class="faq-q">What is mean reversion in bitcoin terms?</h3>
+    <p class="faq-a">Bitcoin&rsquo;s price has oscillated around a remarkably steady long-run trend for its entire history &mdash; running far above it in manias and far below it in bear markets. Mean reversion is the tendency to return toward that trend; this page shows what a return would imply mathematically, at whatever speed you assume. It is a historical pattern, not a guarantee.</p>
+    <h3 class="faq-q">What CAGR does reverting to trend imply?</h3>
+    <p class="faq-a">That depends on where price sits and how fast it reverts &mdash; which is exactly what the slider explores. From a deep discount, reversion implies returns well above the trend&rsquo;s own growth rate; from a premium, it implies returns below it, sometimes sharply negative. The same arithmetic, both directions.</p>
+    <h3 class="faq-q">Is a big discount a buy signal?</h3>
+    <p class="faq-a">No &mdash; and this page refuses to treat it as one. A discount can persist or deepen, the floor is historical rather than guaranteed, and reversion timing is unknowable. What the page offers is honest arithmetic about the possibilities, including the one where nothing reverts at all.</p>
+  </section>
+
+  <!-- ════════ SOURCES & DISCLOSURES ════════ -->
+  <div class="dp-sources">
+    <div class="dp-sources-label">Sources &amp; disclosures</div>
+    <ul>
+      <li><strong>The model.</strong> Every figure is the canonical Power Law trend re-expressed in CAGR terms &mdash; no new coefficients, no second model. The trend, the channel, and the credit to Porkopolis Economics for the coefficients all live on <a href="/the-power-law">The Channel</a>.</li>
+      <li><strong>A model, not destiny.</strong> The Power Law is an empirical regularity that has held across bitcoin&rsquo;s history. It is not a law of nature and it can break. The <a href="/the-power-law#caveats">caveats</a> set out what would falsify it.</li>
+      <li><strong>Reversion is your assumption.</strong> Nothing here predicts that price returns to trend, or when. The page computes the arithmetic consequence of a speed <em>you</em> choose, and shows the never-reverts case alongside it at all times.</li>
+      <li><strong>Not an entry signal.</strong> A discount is not a buy signal and a premium is not a sell signal. There are no buy zones on this page by design; for the entry question, see <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a></li>
+      <li><strong>Price data.</strong> Live spot from CoinGecko, falling back to the latest monthly sample in the shared series &mdash; labelled honestly as &ldquo;latest monthly data&rdquo; whenever the live fetch does not resolve.</li>
+    </ul>
+  </div>
+
+</main>

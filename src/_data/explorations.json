@@ -175,6 +175,14 @@
     "interactive": true
   },
   {
+    "_comment": "Discount, or Premium? — the Power Law re-expressed in CAGR terms: today's multiple of trend, and what reverting to trend would imply at a horizon the reader picks. Interactive (live status strip + horizon slider + computed backtest) but a market-state explorer with no personal inputs, so no calculator_tile — same posture as the-doubling-ladder / heatmap / bull-and-bear-cycles. Two-sided by construction: the same arithmetic reads negative at premiums, which the backtest section shows.",
+    "slug": "discount-or-premium",
+    "title": "Discount, or Premium?",
+    "category": "numbers",
+    "group": "Models & Trends",
+    "interactive": true
+  },
+  {
     "slug": "bitcoin-vs-the-stock-market",
     "title": "Bitcoin vs. The Stock Market",
     "category": "numbers",

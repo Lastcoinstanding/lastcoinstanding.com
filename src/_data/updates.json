@@ -1,6 +1,11 @@
 [
   {
     "display": "7/23/26",
+    "page": "/discount-or-premium.html",
+    "summary": "New: Discount, or Premium? — bitcoin spends its life swinging above and below one long-run trend, and this page tells you which side it is on right now. It shows the current price, the trend price, and the multiple between them, then lets you pick how fast a return to trend might happen and shows what that would mean as an annual return — always beside the return you would get if the multiple never moved at all. It also runs the same arithmetic against the past four cycle tops, where it reads sharply negative: the lens is deliberately two-sided, and it is not a buy signal."
+  },
+  {
+    "display": "7/23/26",
     "page": "/",
     "summary": "New: common-questions sections added to Bitcoin Portfolio Allocation, Wait-or-Deploy-Now, and Bitcoin vs. Real Estate — the key questions each page answers, stated plainly and up front, with links through to the sibling pages that treat them in depth."
   },

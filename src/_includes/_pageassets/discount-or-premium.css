@@ -1,0 +1,176 @@
+/* =============================================================
+   Discount, or Premium? — page styles
+
+   Models & Trends analytical page. Reuses the trilogy :root tokens,
+   the mixed-content width tier (1100 page / 880 prose), the slider
+   conventions from wait-or-deploy-now, and the live-status strip
+   posture from bull-and-bear-cycles. Page-scoped classes use `dp-`.
+
+   Layout note on the readout pair (.dp-pair): the implied CAGR and
+   the at-trend baseline are deliberately the SAME size. The comparison
+   is the content — rendering the implied figure larger would turn an
+   instrument into a pitch (design doc §5 guardrail).
+   ============================================================= */
+
+:root {
+  --bg: #0a0908;
+  --bg-card: #141210;
+  --amber: #e09422;
+  --amber-dim: #b8791c;
+  --text: #e8e0d4;
+  --text-dim: #9a9080;
+  --text-muted: #6a6256;
+  --red: #c0392b;
+  --red-dim: rgba(192,57,43,0.6);
+  --green: #6fae6f;
+  --blue: #6db3d4;
+  --border: rgba(224,148,34,0.12);
+  --font-d: 'Cormorant Garamond', Georgia, serif;
+  --font-b: 'Inter', -apple-system, sans-serif;
+}
+
+body { background: var(--bg); color: var(--text); }
+
+/* ── Hero ── */
+.hero { position: relative; text-align: center; max-width: 880px; margin: 0 auto; padding: 4.5rem 2rem 2.5rem; }
+.hero h1 { font-family: var(--font-d); font-size: clamp(2.4rem, 6vw, 3.6rem); font-weight: 500; letter-spacing: -.01em; line-height: 1.08; color: #f2eee8; margin: 0 0 1rem; }
+.hero h1 em { font-style: italic; color: var(--amber); }
+.hero .hero-subtitle { font-family: var(--font-d); font-style: italic; font-size: clamp(1.1rem, 2.6vw, 1.45rem); color: var(--text-dim); margin: 0 0 0.6rem; }
+.hero .subtitle { font-family: 'Inter', sans-serif; font-size: 0.98rem; line-height: 1.7; color: var(--text-dim); margin: 0.6rem auto 0; }
+.hero .subtitle em { color: var(--amber); font-style: italic; }
+
+/* ── Container (mixed-content: page 1100, prose 880) ── */
+.content-area { position: relative; max-width: 1100px; margin: 0 auto; padding: 0 2rem 5rem; }
+.section-intro { max-width: 880px; margin: 0 auto 2.4rem; }
+.dp-prose { max-width: 880px; margin: 0 auto; font-size: 1.02rem; line-height: 1.75; color: var(--text); }
+.dp-prose p { margin: 0 0 1.1rem; }
+.dp-prose em { color: var(--amber); font-style: italic; }
+.dp-prose a, .section-intro a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+
+.dp-section { max-width: 1100px; margin: 3.5rem auto 0; }
+.dp-section-narrow { max-width: 880px; }
+.dp-eyebrow { font-family: 'Inter', sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin: 0 0 0.6rem; }
+.dp-h2 { font-family: var(--font-d); font-size: clamp(1.5rem, 3.4vw, 2rem); font-weight: 500; letter-spacing: -.01em; color: #f2eee8; margin: 0 0 0.7rem; line-height: 1.2; }
+.dp-lead { font-family: 'Inter', sans-serif; font-size: 0.97rem; line-height: 1.7; color: var(--text-dim); margin: 0 0 1.1rem; }
+.dp-lead strong { color: var(--text); font-weight: 600; }
+.dp-lead em { color: var(--amber); font-style: italic; }
+.dp-lead a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+
+/* ══ THE EMBLEM — live status strip ══════════════════════════
+   Three figures: price, trend today, multiple. The multiple cell is
+   the page's central number, so it carries the emphasis. Copy flips
+   on the sign of m; near-trend says "roughly at trend" (guardrail). */
+.dp-status { margin: 2.6rem auto 0; max-width: 1100px; background: linear-gradient(135deg, rgba(224,148,34,0.06), rgba(20,18,16,0.4)); border: 1px solid rgba(224,148,34,0.22); border-radius: 12px; padding: 1.5rem 1.6rem 1.3rem; }
+.dp-status-label { font-family: 'Inter', sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); margin: 0 0 1rem; }
+.dp-status-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem 1.4rem; align-items: end; }
+.dp-stat-cap { font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 0.3rem; }
+.dp-stat-num { font-family: var(--font-d); font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 600; line-height: 1; letter-spacing: -.02em; color: #f2eee8; font-variant-numeric: tabular-nums; }
+.dp-stat-central .dp-stat-num { color: var(--amber); font-size: clamp(2rem, 5vw, 2.9rem); }
+.dp-stat-sub { font-family: 'Inter', sans-serif; font-size: 0.78rem; line-height: 1.5; color: var(--text-dim); margin: 0.35rem 0 0; }
+.dp-stat-sub strong { color: var(--text); font-weight: 600; }
+.dp-status-meta { font-family: 'Inter', sans-serif; font-size: 0.74rem; color: var(--text-muted); margin: 1.1rem 0 0; }
+
+/* At-the-floor conditional line (guardrail §5) — renders only when
+   m <= PL_FLOOR*1.05, and disappears on its own when the state does. */
+.dp-floor-note { font-family: 'Inter', sans-serif; font-size: 0.88rem; line-height: 1.6; color: var(--text-dim); margin: 1rem 0 0; padding: 0.85rem 1.1rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-left: 3px solid rgba(224,148,34,0.5); border-radius: 8px; }
+.dp-floor-note strong { color: var(--text); font-weight: 600; }
+.dp-floor-note em { color: var(--amber); font-style: italic; }
+.dp-floor-note a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+.dp-floor-note[hidden] { display: none; }
+
+/* ══ THE INTERACTIVE — one viewport: slider, readouts, chart ══ */
+.dp-calc { margin: 3.2rem auto 0; max-width: 1100px; }
+.dp-calc-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.4rem 1rem; margin: 0 0 0.5rem; }
+.dp-readout { font-family: 'Inter', sans-serif; font-size: 0.85rem; color: var(--text-dim); }
+.dp-readout strong { color: var(--amber); font-weight: 600; }
+
+.dp-cue { font-family: 'Inter', sans-serif; font-size: 0.86rem; line-height: 1.5; color: var(--text-dim); margin: 0 0 0.8rem; }
+.dp-cue strong { color: var(--text); font-weight: 600; }
+
+.dp-slider-block { margin: 0 0 1.3rem; }
+.dp-slider-wrap { position: relative; }
+.dp-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 5px; outline: none;
+  background: linear-gradient(90deg, rgba(192,57,43,0.55) 0%, rgba(224,148,34,0.5) 45%, rgba(122,115,103,0.45) 100%); }
+.dp-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #f2eee8; border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(255,255,255,0.3), 0 2px 6px rgba(0,0,0,0.5); cursor: grab; }
+.dp-slider::-webkit-slider-thumb:active { cursor: grabbing; }
+.dp-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #f2eee8; border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(255,255,255,0.3); cursor: grab; }
+.dp-slider-scale { display: flex; justify-content: space-between; font-family: 'Inter', sans-serif; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-top: 0.5rem; }
+.dp-slider-caption { font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; margin: 0.7rem 0 0; }
+.dp-slider-caption strong { color: var(--text-dim); font-weight: 600; }
+
+/* The paired readout — implied CAGR beside the at-trend baseline, SAME SIZE.
+   Never render one without the other (design doc §5). */
+.dp-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 0 0 0.9rem; }
+.dp-cell { text-align: center; padding: 1rem 1.1rem; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 10px; }
+.dp-cell-primary { border-color: rgba(224,148,34,0.28); background: rgba(224,148,34,0.04); }
+.dp-cell-cap { font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 0.4rem; }
+.dp-cell-num { font-family: var(--font-d); font-size: clamp(2.1rem, 5vw, 3rem); font-weight: 600; line-height: 1; letter-spacing: -.02em; color: #f2eee8; font-variant-numeric: tabular-nums; }
+.dp-cell-primary .dp-cell-num { color: var(--amber); }
+.dp-cell-sub { font-family: 'Inter', sans-serif; font-size: 0.78rem; line-height: 1.5; color: var(--text-dim); margin: 0.4rem 0 0; }
+
+.dp-delta { font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.6; text-align: center; color: var(--text-dim); margin: 0 0 1.1rem; padding: 0.7rem 1rem; border-radius: 8px; background: rgba(255,255,255,0.015); border: 1px solid var(--border); }
+.dp-delta strong { font-weight: 600; }
+.dp-delta-up strong { color: var(--green); }
+.dp-delta-down strong { color: var(--red); }
+.dp-delta-flat strong { color: var(--text); }
+
+.dp-chart-block { margin: 0 0 1.1rem; }
+.dp-chart-wrapper { position: relative; height: 320px; }
+.dp-chart-caption { font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; margin: 0.7rem 0 0; }
+.dp-chart-caption strong { color: var(--text-dim); font-weight: 600; }
+
+/* The never-reverts case — PERMANENT UI, not a footnote (design doc §4/§5) */
+.dp-never { font-family: 'Inter', sans-serif; font-size: 0.92rem; line-height: 1.65; color: var(--text-dim); margin: 0; padding: 0.95rem 1.2rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-left: 3px solid rgba(109,179,212,0.5); border-radius: 8px; }
+.dp-never strong { color: var(--text); font-weight: 600; }
+.dp-never em { color: var(--amber); font-style: italic; }
+.dp-never-tag { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-right: 0.5rem; }
+
+/* ══ THE HONESTY BACKTEST ══════════════════════════════════ */
+.dp-table-wrap { overflow-x: auto; margin: 0 0 0.9rem; }
+.dp-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 0.88rem; min-width: 520px; }
+.dp-table th { text-align: right; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); padding: 0 0.6rem 0.5rem; border-bottom: 1px solid var(--border); }
+.dp-table th:first-child, .dp-table td:first-child { text-align: left; }
+.dp-table td { text-align: right; padding: 0.6rem; border-bottom: 1px solid rgba(224,148,34,0.07); color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.dp-table td:first-child { color: var(--text); font-weight: 500; }
+.dp-table .dp-neg { color: var(--red); }
+.dp-table .dp-pos { color: var(--green); }
+.dp-table tr.dp-today-row td { background: rgba(224,148,34,0.05); color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(224,148,34,0.2); }
+.dp-table tr.dp-today-row td:first-child { color: var(--amber); }
+.dp-table-note { font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; margin: 0; }
+
+/* ══ WHY CAGR FALLS — designed to grow (merge point for the
+   "Bitcoin's CAGR head-on" lens per design doc §3.5) ══ */
+.dp-slope-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.9rem; margin: 1.2rem 0 0; }
+.dp-slope-card { padding: 0.9rem 1rem; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 10px; text-align: center; }
+.dp-slope-era { font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 0.3rem; }
+.dp-slope-num { font-family: var(--font-d); font-size: 1.7rem; font-weight: 600; line-height: 1; color: #f2eee8; font-variant-numeric: tabular-nums; }
+
+/* ══ SOURCES & DISCLOSURES ══ */
+.dp-sources { max-width: 880px; margin: 3.5rem auto 0; padding: 1.2rem 1.4rem; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 10px; }
+.dp-sources-label { font-family: 'Inter', sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin: 0 0 0.7rem; }
+.dp-sources ul { margin: 0; padding-left: 1.1rem; }
+.dp-sources li { font-family: 'Inter', sans-serif; font-size: 0.85rem; line-height: 1.65; color: var(--text-dim); margin: 0 0 0.55rem; }
+.dp-sources li:last-child { margin-bottom: 0; }
+.dp-sources strong { color: var(--text); font-weight: 600; }
+.dp-sources a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+
+/* ══ COMMON QUESTIONS (#faq) ══ */
+#faq { max-width: 880px; margin: 3.5rem auto 0; }
+#faq h2 { font-family: var(--font-d); font-size: 1.6rem; font-weight: 500; letter-spacing: -.01em; color: #f2eee8; margin: 0 0 0.4rem; }
+#faq .faq-q { font-family: 'Inter', sans-serif; font-size: 1.02rem; font-weight: 600; color: var(--text); margin: 1.6rem 0 0.4rem; line-height: 1.4; }
+#faq .faq-a { font-family: 'Inter', sans-serif; font-size: 0.93rem; line-height: 1.68; color: var(--text-dim); margin: 0; }
+#faq .faq-a em { color: var(--amber); font-style: italic; }
+#faq .faq-a a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+
+/* ══ RESPONSIVE — the interactive must stay usable at 375px ══ */
+@media (max-width: 760px) {
+  .content-area { padding: 0 1.1rem 3.5rem; }
+  .dp-status { padding: 1.2rem 1.1rem 1rem; }
+  /* The three status figures stack to a single column rather than
+     squeezing three tabular numbers into 375px. */
+  .dp-status-grid { grid-template-columns: 1fr; gap: 1.1rem; text-align: left; }
+  .dp-pair { grid-template-columns: 1fr; gap: 0.8rem; }
+  .dp-chart-wrapper { height: 260px; }
+  .dp-slope-grid { grid-template-columns: 1fr; }
+  .dp-slider-scale { font-size: 0.6rem; }
+}
