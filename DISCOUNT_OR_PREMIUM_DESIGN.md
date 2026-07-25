@@ -292,6 +292,16 @@ end-date, drawn to scale."
   legend regenerates on `chart.update`); the tooltip row uses the same name. The inline "illustrative" tag
   stays on the path. Captions, `data-chart-title`, and the export filenames updated (Your window exports
   `bitcoin-reversion-window.png`).
+- **Crosshair tooltip + chips + dots.** One source of truth — `priceSeriesAt(d)` / `horizonSeriesAt(d)`
+  return every series' value at a date with its colour and dash style. The canvas tooltip is replaced by an
+  HTML tooltip (house-styled: dark bg, amber border, radius, Inter) with a colour chip per row (solid/dashed
+  matching the series), and `hoverDayPlugin` draws a dot on each plotted series at the anchored date plus a
+  subtle vertical guide — all from the same functions, so rows/chips/dots can't disagree. The `line:false`
+  rows (Your stack at trend) get a row + chip but no dot. Guide/dots draw only while `$hoverDay != null`, so
+  camera exports stay clean; the tooltip has `pointer-events:none` and hides on mouseleave / view switch.
+- **"illustrative" collision fix.** The tag moved off the path's terminal point (where it overlapped the
+  endpoint $ label) to ~78% along the reversion path, offset perpendicular from the line and clamped to the
+  chart area, in both views.
 
 ---
 

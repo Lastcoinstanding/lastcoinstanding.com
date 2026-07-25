@@ -369,34 +369,50 @@
   }
   function dotColor() { return todayPriceIsLive(liveSource) ? PULSE : MUTED; }
 
-  // ---- Date-anchored tooltip (shared by Price + Horizon views) ----
-  // Rows are computed analytically from the hovered DATE, not read from the
-  // nearest plotted point, so hovering anywhere shows every applicable series at
-  // one date. beforeEvent resolves the pointer x → a day, ahead of the tooltip's
-  // own event handling, so the rows are never a frame stale.
+  // ---- Date-anchored crosshair (shared by Full history + Your window) ----
+  // One source of truth: priceSeriesAt / horizonSeriesAt compute every series' value
+  // at a date. The HTML tooltip rows, their colour chips, and the on-canvas marker
+  // dots all read from it, so they can never disagree. hoverDayPlugin resolves the
+  // pointer x → a day (ahead of the tooltip's own handling) and forces a re-render so
+  // the crosshair tracks smoothly; it draws the guide line + dots ONLY while hovering
+  // ($hoverDay != null), so camera exports — taken with no hover — stay clean.
   var hoverDayPlugin = {
     id: 'dpHoverDay',
     beforeEvent: function (chart, args) {
       var e = args.event;
       if (e.type === 'mousemove') {
         var ca = chart.chartArea;
-        chart.$hoverDay = (e.x >= ca.left && e.x <= ca.right) ? chart.scales.x.getValueForPixel(e.x) : null;
-      } else if (e.type === 'mouseout') { chart.$hoverDay = null; }
+        var nd = (e.x >= ca.left && e.x <= ca.right) ? chart.scales.x.getValueForPixel(e.x) : null;
+        if (nd !== chart.$hoverDay) { chart.$hoverDay = nd; args.changed = true; }
+      } else if (e.type === 'mouseout') {
+        if (chart.$hoverDay != null) { chart.$hoverDay = null; args.changed = true; }
+      }
+    },
+    afterDatasetsDraw: function (chart) {
+      var d = chart.$hoverDay;
+      if (d == null) return;
+      var xS = chart.scales.x, yS = chart.scales.y, ctx = chart.ctx, ca = chart.chartArea;
+      var px = xS.getPixelForValue(d);
+      if (!isFinite(px) || px < ca.left || px > ca.right) return;
+      var series = (yS.type === 'logarithmic') ? priceSeriesAt(d) : horizonSeriesAt(d);
+      ctx.save();
+      ctx.beginPath(); ctx.moveTo(px, ca.top); ctx.lineTo(px, ca.bottom);
+      ctx.strokeStyle = 'rgba(242,238,232,0.16)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]); ctx.stroke();
+      ctx.setLineDash([]);
+      for (var i = 0; i < series.length; i++) {
+        var s = series[i];
+        if (!s.line) continue;
+        var py = yS.getPixelForValue(s.value);
+        if (!isFinite(py) || py < ca.top - 1 || py > ca.bottom + 1) continue;
+        ctx.beginPath(); ctx.arc(px, py, 3.2, 0, Math.PI * 2);
+        ctx.fillStyle = s.color; ctx.fill();
+        ctx.strokeStyle = '#0a0908'; ctx.lineWidth = 1; ctx.stroke();
+      }
+      ctx.restore();
     }
   };
-  function dateTooltip(getRows) {
-    return {
-      enabled: true,
-      backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.30)', borderWidth: 1,
-      titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10,
-      filter: function (item, i) { return i === 0; }, // one row-set, computed below
-      callbacks: {
-        title: function (items) { var c = items[0].chart, d = (c.$hoverDay != null) ? c.$hoverDay : items[0].parsed.x; return dayToDate(d); },
-        label: function (ctx) { var c = ctx.chart, d = (c.$hoverDay != null) ? c.$hoverDay : ctx.parsed.x; return getRows(d); }
-      }
-    };
-  }
-  // Nearest monthly PL_DATA sample to day d (the "Price (history)" row).
+
+  // Nearest monthly PL_DATA sample to day d (the "Price (history)" row/dot).
   function nearestSample(d) {
     var best = PL_DATA[0], bd = Math.abs(PL_DATA[0][0] - d);
     for (var i = 1; i < PL_DATA.length; i++) { var dd = Math.abs(PL_DATA[i][0] - d); if (dd < bd) { bd = dd; best = PL_DATA[i]; } }
@@ -411,30 +427,96 @@
     var f = (d - d0) / (d1 - d0);
     return Math.exp(Math.log(p0) + (Math.log(p1) - Math.log(p0)) * f);
   }
-  // Fixed-order Price-view rows; rows that don't apply at d are skipped.
-  function priceRows(d) {
-    var rows = [], lastD = PL_DATA[PL_DATA.length - 1][0], t = plPrice(d);
-    if (d <= lastD) rows.push('Price (history): ' + moneyFull(nearestSample(d)));
-    rows.push('Trend: ' + moneyFull(t));
-    rows.push('0.42× floor: ' + moneyFull(PL_FLOOR * t));
-    rows.push('3.0× upper band: ' + moneyFull(PL_CEIL * t));
-    var d1 = TODAY_DAYS + YEAR_D * state.months / 12;
+
+  // Series present at date d, in fixed row order. Each entry: label, value, colour
+  // (chip + dot), dashed (chip/line style), line (has a plotted line → gets a dot).
+  // `line:false` rows (Your stack at trend) get a row + chip but no dot — there is
+  // no stack line on the chart. Colours are the readable form of each series' hue.
+  function priceSeriesAt(d) {
+    var lastD = PL_DATA[PL_DATA.length - 1][0], t = plPrice(d), d1 = TODAY_DAYS + YEAR_D * state.months / 12, out = [];
+    if (d <= lastD) out.push({ label: 'Price (history)', value: nearestSample(d), color: MUTED, dashed: false, line: true });
+    out.push({ label: 'Trend', value: t, color: AMBER, dashed: false, line: true });
+    out.push({ label: '0.42× floor', value: PL_FLOOR * t, color: 'rgba(192,57,43,0.9)', dashed: true, line: true });
+    out.push({ label: '3.0× upper band', value: PL_CEIL * t, color: 'rgba(224,148,34,0.55)', dashed: true, line: true });
     if (d >= TODAY_DAYS && d <= d1) {
-      rows.push(glideLabel() + ': ' + moneyFull(glideAt(d)));
-      rows.push('If it never reverts: ' + moneyFull(multiple() * t));
-      if (holdings > 0) rows.push('Your stack at trend: ' + moneyFull(holdings * t));
+      out.push({ label: glideLabel(), value: glideAt(d), color: AMBER, dashed: true, line: true });
+      out.push({ label: 'If it never reverts', value: multiple() * t, color: 'rgba(109,179,212,0.85)', dashed: true, line: true });
+      if (holdings > 0) out.push({ label: 'Your stack at trend', value: holdings * t, color: AMBER, dashed: false, line: false });
     }
-    return rows;
+    return out;
   }
-  // Horizon view spans only the future window, so fewer rows (glide, never, trend, stack).
-  function horizonRows(d) {
-    var t = plPrice(d), rows = [
-      glideLabel() + ': ' + moneyFull(glideAt(d)),
-      'If it never reverts: ' + moneyFull(multiple() * t),
-      'Trend: ' + moneyFull(t)
+  function horizonSeriesAt(d) {
+    var t = plPrice(d), out = [
+      { label: glideLabel(), value: glideAt(d), color: AMBER, dashed: true, line: true },
+      { label: 'If it never reverts', value: multiple() * t, color: 'rgba(109,179,212,0.85)', dashed: true, line: true },
+      { label: 'Trend', value: t, color: AMBER, dashed: false, line: true }
     ];
-    if (holdings > 0) rows.push('Your stack at trend: ' + moneyFull(holdings * t));
-    return rows;
+    if (holdings > 0) out.push({ label: 'Your stack at trend', value: holdings * t, color: AMBER, dashed: false, line: false });
+    return out;
+  }
+
+  // ---- External (HTML) tooltip with a colour chip per row ----
+  function dpTooltipEl(chart) {
+    var parent = chart.canvas.parentNode, el = parent.querySelector('.dp-tt');
+    if (!el) { el = document.createElement('div'); el.className = 'dp-tt'; parent.appendChild(el); }
+    return el;
+  }
+  function hideDpTooltip() {
+    var els = document.querySelectorAll('.dp-chart-block .dp-tt');
+    for (var i = 0; i < els.length; i++) els[i].style.opacity = '0';
+  }
+  function positionDpTooltip(el, chart) {
+    var px = chart.scales.x.getPixelForValue(chart.$hoverDay), ca = chart.chartArea, tt = chart.tooltip;
+    var w = el.offsetWidth, hgt = el.offsetHeight, cw = chart.width;
+    var x = px + 16;                        // right of the guide by default…
+    if (x + w > ca.right) x = px - 16 - w;  // …flip left if it would run past the plot
+    if (x < ca.left) x = ca.left + 2;
+    if (x + w > cw) x = cw - w - 2;
+    if (x < 0) x = 2;
+    var cy = (tt && isFinite(tt.caretY)) ? tt.caretY : (ca.top + ca.bottom) / 2;
+    var y = Math.max(ca.top, Math.min(cy - hgt / 2, ca.bottom - hgt));
+    el.style.left = Math.round(x) + 'px';
+    el.style.top = Math.round(y) + 'px';
+  }
+  function htmlTooltip(view) {
+    return {
+      enabled: false,
+      external: function (context) {
+        var chart = context.chart, tt = context.tooltip, el = dpTooltipEl(chart);
+        if (!tt || tt.opacity === 0 || chart.$hoverDay == null) { el.style.opacity = '0'; return; }
+        var d = chart.$hoverDay, series = (view === 'horizon') ? horizonSeriesAt(d) : priceSeriesAt(d);
+        var html = '<div class="dp-tt-title">' + dayToDate(d) + '</div>';
+        for (var i = 0; i < series.length; i++) {
+          var s = series[i];
+          html += '<div class="dp-tt-row"><span class="dp-tt-chip" style="border-top-style:' + (s.dashed ? 'dashed' : 'solid')
+            + ';border-top-color:' + s.color + '"></span><span class="dp-tt-label">' + s.label
+            + '</span><span class="dp-tt-val">' + moneyFull(s.value) + '</span></div>';
+        }
+        el.innerHTML = html;
+        positionDpTooltip(el, chart);
+        el.style.opacity = '1';
+      }
+    };
+  }
+
+  // "illustrative" tag drawn ALONG the reversion path (~78% to its end) and offset
+  // perpendicular so it never touches the line or collides with the endpoint $ label.
+  function drawIllustrativeAlong(c, sx, sy, ex, ey) {
+    if (!(isFinite(sx) && isFinite(sy) && isFinite(ex) && isFinite(ey))) return;
+    var ctx = c.ctx, ca = c.chartArea, f = 0.78;
+    var ax = sx + (ex - sx) * f, ay = sy + (ey - sy) * f;
+    var dx = ex - sx, dy = ey - sy, len = Math.sqrt(dx * dx + dy * dy) || 1;
+    var nx = -dy / len, ny = dx / len; if (ny > 0) { nx = -nx; ny = -ny; }
+    var off = 14, tx = ax + nx * off, ty = ay + ny * off;
+    ctx.save();
+    ctx.font = '600 10px "Inter", sans-serif';
+    ctx.fillStyle = 'rgba(224,148,34,0.92)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    var w = ctx.measureText('illustrative').width;
+    tx = Math.max(ca.left + w / 2 + 2, Math.min(tx, ca.right - w / 2 - 2));
+    ty = Math.max(ca.top + 11, Math.min(ty, ca.bottom - 2));
+    ctx.fillText('illustrative', tx, ty);
+    ctx.restore();
   }
 
   // Custom legend labels: Chart.js's default generateLabels reads the POINT style
@@ -465,24 +547,16 @@
     return out;
   }
 
-  // Small on-canvas "illustrative" tag at the glide endpoint (honesty, not decoration).
+  // "illustrative" tag drawn alongside the reversion path (not at its endpoint), so
+  // it can't collide with anything anchored at the terminal point.
   function priceAnnoPlugin() {
     return {
       id: 'dpPriceAnno',
       afterDatasetsDraw: function (c) {
-        var hd = TODAY_DAYS + YEAR_D * state.months / 12;
-        var px = c.scales.x.getPixelForValue(hd), py = c.scales.y.getPixelForValue(plPrice(hd)), ctx = c.ctx;
-        if (!isFinite(px) || !isFinite(py)) return;
-        ctx.save();
-        // Just beyond the reversion path's endpoint: offset up-right of the terminal
-        // point, but clamp to a right-aligned position at the edge so it never clips.
-        ctx.font = '600 10px "Inter", sans-serif';
-        ctx.fillStyle = 'rgba(224,148,34,0.9)';
-        ctx.textBaseline = 'bottom';
-        var ca = c.chartArea, w = ctx.measureText('illustrative').width, ly = Math.max(py - 6, ca.top + 11);
-        if (px + 6 + w <= ca.right - 2) { ctx.textAlign = 'left'; ctx.fillText('illustrative', px + 6, ly); }
-        else { ctx.textAlign = 'right'; ctx.fillText('illustrative', Math.min(px, ca.right) - 2, ly); }
-        ctx.restore();
+        var d0 = TODAY_DAYS, d1 = TODAY_DAYS + YEAR_D * state.months / 12;
+        var xS = c.scales.x, yS = c.scales.y;
+        drawIllustrativeAlong(c, xS.getPixelForValue(d0), yS.getPixelForValue(price()),
+          xS.getPixelForValue(d1), yS.getPixelForValue(plPrice(d1)));
       }
     };
   }
@@ -530,7 +604,7 @@
           legend: { display: true, position: 'top',
             labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 22, padding: 8,
               generateLabels: lineLegendLabels } },
-          tooltip: dateTooltip(priceRows)
+          tooltip: htmlTooltip('price')
         }
       },
       plugins: [priceAnnoPlugin(), hoverDayPlugin]
@@ -587,14 +661,10 @@
           ctx.textBaseline = 'top';
           ctx.fillText(moneyFull(h.nv), ex - 6, Math.min(nY + 4, c.chartArea.bottom - 6));
         }
-        // "illustrative" just beyond the path end — the endpoint sits at the right
-        // edge here, so stack it above the trend-$ label, right-aligned, clamped in.
-        ctx.font = '600 10px "Inter", sans-serif';
-        ctx.fillStyle = 'rgba(224,148,34,0.9)';
-        ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
-        var trendLabelY = Math.max(tY - 4, c.chartArea.top + 12);
-        ctx.fillText('illustrative', Math.min(ex, c.chartArea.right) - 6, Math.max(trendLabelY - 14, c.chartArea.top + 11));
         ctx.restore();
+        // "illustrative" alongside the path (~78% along), offset perpendicular, so it
+        // no longer collides with the endpoint $ label at the terminal point.
+        drawIllustrativeAlong(c, xS.getPixelForValue(h.d0), yS.getPixelForValue(price()), ex, tY);
       }
     };
   }
@@ -634,7 +704,7 @@
           legend: { display: true, position: 'top',
             labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 22, padding: 8,
               generateLabels: lineLegendLabels } },
-          tooltip: dateTooltip(horizonRows)
+          tooltip: htmlTooltip('horizon')
         }
       },
       plugins: [horizonAnnoPlugin(), hoverDayPlugin]
@@ -690,6 +760,7 @@
       host.setAttribute('data-chart-title', VIEW_META[v].title);
       host.setAttribute('data-chart-filename', VIEW_META[v].file);
     }
+    hideDpTooltip(); // don't let a Full-history/Your-window tooltip linger into another view
     if (chart) { chart.destroy(); chart = null; }
     buildChart();
   }

@@ -163,6 +163,18 @@ body { background: var(--bg); color: var(--text); }
 .dp-view-btn:focus-visible { outline: 2px solid rgba(224,148,34,0.5); outline-offset: 2px; }
 .dp-view-btn.is-active { background: rgba(224,148,34,0.1); color: var(--amber); }
 
+/* External HTML tooltip for Full history / Your window — one colour chip per row.
+   Matches the former canvas tooltip: dark bg, amber border, small radius, Inter.
+   pointer-events:none so it never blocks the hover it describes. */
+.dp-tt { position: absolute; z-index: 6; pointer-events: none; opacity: 0; transition: opacity 0.12s ease;
+  background: rgba(20,17,13,0.95); border: 1px solid rgba(224,148,34,0.30); border-radius: 6px;
+  padding: 8px 10px; box-shadow: 0 4px 14px rgba(0,0,0,0.45); font-family: var(--font-b); min-width: 140px; }
+.dp-tt-title { font-size: 0.72rem; font-weight: 600; color: #ece4d6; margin: 0 0 4px; }
+.dp-tt-row { display: flex; align-items: center; gap: 7px; font-size: 0.72rem; line-height: 1.65; color: #ccc6b8; }
+.dp-tt-chip { flex: 0 0 auto; width: 18px; height: 0; border-top: 2px solid transparent; }
+.dp-tt-label { flex: 1 1 auto; white-space: nowrap; }
+.dp-tt-val { flex: 0 0 auto; padding-left: 12px; color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
 /* The never-reverts case — PERMANENT UI, not a footnote (design doc §4/§5) */
 .dp-never { font-family: 'Inter', sans-serif; font-size: 0.92rem; line-height: 1.65; color: var(--text-dim); margin: 0; padding: 0.95rem 1.2rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-left: 3px solid rgba(109,179,212,0.5); border-radius: 8px; }
 .dp-never strong { color: var(--text); font-weight: 600; }
