@@ -128,8 +128,10 @@ peak-focused).
   FAQPage/WebApplication schema in head).
 - **OG card:** product-forward (the live status strip IS the argument) → register in MONTHLY_REFRESH §6
   regen list. If deferring the OG pipeline, brand-forward placeholder first.
-- **Carousel slide:** pending per house norm; tonal direction TBD later (candidate register: structural
-  observation — oscillation around a persistent line — but brief it separately; don't rush it).
+- **Carousel slide:** SHIPPED (July 2026) — homepage slide following the Bull & Bear Cycles idiom
+  (silent looping `videos/discount-or-premium.mp4`, `data-cat="numbers"`, `data-feat="0"`). Structural-
+  observation register: label "Discount, or Premium?"; line "Bitcoin runs above and below one enduring
+  trend — this page tells you, live, *which is true right now*"; CTA to `/discount-or-premium`.
 - **URL state:** `?y=<horizon-years>` only (page-local; the multiple is market state, not user state).
 
 ## 7. FAQ drafts (visible text = FAQPage schema text, verbatim)
