@@ -303,6 +303,25 @@ end-date, drawn to scale."
   endpoint $ label) to ~78% along the reversion path, offset perpendicular from the line and clamped to the
   chart area, in both views.
 
+### Your window → log axis + sampled paths (2026-07-25)
+
+**Your window now uses a logarithmic y-axis** (matching Full history) — JM's call after the earlier linear
+axis proved confusing: on a linear axis the 2-point dashed segments rendered as straight *dollar* lines, so
+the reversion path crossed *above* the concave trend mid-window before reconverging. The range is fitted
+tightly to the window's own values (start price → top endpoint, with ~12% padding), so the window fills the
+plot rather than starting a decade below.
+
+- **Both dashed paths are now sampled curves, not 2-point segments**, in both views, from the same functions
+  the tooltip rows/dots use: reversion = `glideAt` (constant-CAGR, `price · (trend(hz)/price)^(t/y)`, straight
+  in log); never-reverts = `neverAt` (constant-multiple, `multiple · plPrice(d)`, parallel to the trend's
+  curve). This also fixes Full history's never-reverts path, which had been a 2-point segment (straight-in-log
+  = constant-CAGR, subtly wrong for a constant-multiple case). Because plotted paths and tooltip rows now call
+  the same functions, their values coincide at every sampled date.
+- **Shape guarantee:** below trend the constant-CAGR reversion (straight in log) stays strictly below the
+  concave trend for the whole interior and touches it only at the shared endpoint — no crossing. Ride-along
+  elements (endpoint $ labels, the "illustrative" tag, hover dots) all sit on the corrected sampled curves.
+- Caption updated to describe the shared log axis and what a straight path means.
+
 ---
 
 # Appendix — Pilot content (create-once-distribute-everywhere)

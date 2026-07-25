@@ -360,11 +360,11 @@
   // Dynamic paths that track the slider. A straight line between two points on a
   // log y-axis IS straight in log space, so two points each suffice.
   function pricePaths() {
-    var y = state.months / 12, hd = TODAY_DAYS + YEAR_D * y, p0 = price();
+    var hd = TODAY_DAYS + YEAR_D * state.months / 12;
     return {
-      dot: [{ x: TODAY_DAYS, y: p0 }],
-      glide: [{ x: TODAY_DAYS, y: p0 }, { x: hd, y: plPrice(hd) }],
-      never: [{ x: TODAY_DAYS, y: p0 }, { x: hd, y: multiple() * plPrice(hd) }]
+      dot: [{ x: TODAY_DAYS, y: price() }],
+      glide: samplePath(glideAt, TODAY_DAYS, hd),   // constant-CAGR (straight in log)
+      never: samplePath(neverAt, TODAY_DAYS, hd)    // constant-multiple (parallel to trend)
     };
   }
   function dotColor() { return todayPriceIsLive(liveSource) ? PULSE : MUTED; }
@@ -426,6 +426,18 @@
     if (d >= d1) return p1;
     var f = (d - d0) / (d1 - d0);
     return Math.exp(Math.log(p0) + (Math.log(p1) - Math.log(p0)) * f);
+  }
+  // Never-reverts value at day d: the multiple held constant × trend at that date.
+  function neverAt(d) { return multiple() * plPrice(d); }
+  // Sample a path fn(day) at monthly steps across [d0, d1] (endpoint included). This
+  // is what makes the dashed paths correct on a log axis: the constant-CAGR reversion
+  // (glideAt) renders straight, the constant-multiple never-reverts (neverAt) renders
+  // parallel to the trend's curve — instead of both being 2-point straight segments.
+  function samplePath(fn, d0, d1) {
+    var pts = [], step = YEAR_D / 12, d;
+    for (d = d0; d < d1 - 1e-6; d += step) pts.push({ x: d, y: fn(d) });
+    pts.push({ x: d1, y: fn(d1) });
+    return pts;
   }
 
   // Series present at date d, in fixed row order. Each entry: label, value, colour
@@ -624,15 +636,18 @@
   // so the trend / glide / never-reverts gap is visible. Everything re-renders as
   // the slider moves the right edge.
   function horizonData() {
-    var y = state.months / 12, d0 = TODAY_DAYS, d1 = TODAY_DAYS + YEAR_D * y, p0 = price();
+    var d0 = TODAY_DAYS, d1 = TODAY_DAYS + YEAR_D * state.months / 12, p0 = price();
     var Td1 = plPrice(d1), nv = multiple() * Td1;
-    var trend = [], n = 48, i;
-    for (i = 0; i <= n; i++) { var d = d0 + (d1 - d0) * i / n; trend.push({ x: d, y: plPrice(d) }); }
+    var trend = samplePath(plPrice, d0, d1);
+    var glide = samplePath(glideAt, d0, d1);   // constant-CAGR → straight in log
+    var never = samplePath(neverAt, d0, d1);   // constant-multiple → parallel to the trend
+    // Fit the log y-range tightly to the window's own values (start price → top
+    // endpoint) so the window fills the plot instead of starting a decade below.
+    var lo = p0, hi = p0, arrs = [trend, glide, never], a, i;
+    for (a = 0; a < arrs.length; a++) for (i = 0; i < arrs[a].length; i++) { var v = arrs[a][i].y; if (v < lo) lo = v; if (v > hi) hi = v; }
     return {
-      d0: d0, d1: d1, Td1: Td1, nv: nv,
-      trend: trend,
-      glide: [{ x: d0, y: p0 }, { x: d1, y: Td1 }],
-      never: [{ x: d0, y: p0 }, { x: d1, y: nv }],
+      d0: d0, d1: d1, Td1: Td1, nv: nv, lo: lo, hi: hi,
+      trend: trend, glide: glide, never: never,
       dot: [{ x: d0, y: p0 }],
       trendEnd: [{ x: d1, y: Td1 }],
       neverEnd: [{ x: d1, y: nv }]
@@ -696,8 +711,10 @@
               callback: function (v) { return dayToDate(v); } }
           },
           y: {
+            type: 'logarithmic',
+            min: h.lo / 1.12, max: h.hi * 1.12,
             grid: { color: 'rgba(224,148,34,0.06)' },
-            ticks: { color: MUTED, font: { family: 'Inter, sans-serif', size: 11 }, callback: function (v) { return money(v); } }
+            ticks: { color: MUTED, maxTicksLimit: 7, font: { family: 'Inter, sans-serif', size: 11 }, callback: function (v) { return money(v); } }
           }
         },
         plugins: {
@@ -713,6 +730,8 @@
   function updateHorizonChart() {
     var h = horizonData();
     chart.options.scales.x.max = h.d1;
+    chart.options.scales.y.min = h.lo / 1.12;
+    chart.options.scales.y.max = h.hi * 1.12;
     chart.data.datasets[0].data = h.trend;
     chart.data.datasets[1].data = h.never;
     chart.data.datasets[2].data = h.glide;
