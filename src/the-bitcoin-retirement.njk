@@ -415,6 +415,31 @@ eleventyComputed:
       </div>
     </div>
 
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- COMPARE — "what if you…" scenario comparison (rt-compare).
+         Sits directly below the Sustainability readout. Each variant is a
+         RELATIVE rule applied to the live base config and recomputed through
+         the SAME projection engine that draws the chart — zero new math.
+         Chips add/remove variant columns (max 2 + base) and overlay each
+         variant's drawdown curve on the projection chart above. In-memory
+         UI state only; nothing is stored or written to the URL. -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="rt-compare" id="rtCompare">
+      <div class="rt-compare-header">
+        <span class="rt-compare-label">Compare &mdash; what if you&hellip;</span>
+        <span class="rt-compare-help">Tap a change to add a column beside your current scenario &mdash; up to two at once. Each also draws as a line on the chart above. Drag any slider and every column moves together.</span>
+      </div>
+      <div class="rt-compare-chips" id="rtCompareChips" role="group" aria-label="Comparison scenarios">
+        <!-- JS-populated chip buttons (aria-pressed); the DCA chip renders only when Monthly DCA > 0 -->
+      </div>
+      <div class="rt-compare-scroll">
+        <div class="rt-compare-cols" id="rtCompareCols" aria-live="polite">
+          <!-- JS-populated: "Your current scenario" (live base) + up to two variant columns -->
+        </div>
+      </div>
+      <p class="rt-compare-note"><strong>Estimated:</strong> every column is a projection under the same Power Law assumptions as the readout above, shown in today&rsquo;s dollars so the columns compare cleanly across different retirement years &mdash; comparisons to explore, not advice.</p>
+    </div>
+
     <!-- USD methodology callout — see /about.html#why-usd for full reasoning.
          Sits just above the share section, at the calculator's natural pause
          point. Speaks to non-US readers without disrupting US-reader flow. -->

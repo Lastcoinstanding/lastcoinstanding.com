@@ -1211,6 +1211,16 @@
       }
     ];
 
+    // ─── Compare overlays — one thin drawdown line per active variant.
+    //     cmpComputeAll reuses this render's base drawdown proj (`stack`) so
+    //     the base row costs no extra engine run, and stores CMP_LAST for the
+    //     compare columns rendered below. Overlays are appended AFTER the six
+    //     base datasets so their indices (6, 7) fall outside the HTML legend's
+    //     0–5 toggle map and always render when present; they still feed the
+    //     y-axis bounds and visibility loops below.
+    cmpComputeAll(stack);
+    Array.prototype.push.apply(datasets, cmpOverlayDatasets());
+
     // Apply user-selected legend visibility to the freshly rebuilt datasets.
     // Slider changes call renderChart() which rebuilds this array from scratch,
     // so the user's toggle state would reset on every interaction without this
@@ -1778,6 +1788,7 @@
       renderRaf = null;
       renderChart();
       updateSustainability();
+      renderCompare();
     });
   }
 
@@ -1898,6 +1909,281 @@
     });
   }
 
+  /* ════════════════════════════════════════════════════════════════
+     Compare — "what if you…" scenario comparison (rt-compare)
+     Each variant is a RELATIVE rule on the live base config, recomputed
+     through the SAME engine (projectStackOverTime / realStackAtRetirement)
+     that draws the chart — zero new math. Up to two variants (+ base = 3
+     columns); each active variant overlays its drawdown curve on the
+     projection chart. In-memory UI state only — nothing stored, no URL
+     params. Every compare figure tracks the chart's drawdown line
+     (growth-model + inflation basis); the RT_BASIS trend/current display
+     toggle is a table/readout concern the chart drawdown line ignores, so
+     compare ignores it too — overlay, column, and drawdown line stay in
+     lockstep on one basis.
+  ═══════════════════════════════════════════════════════════════════ */
+
+  // Slot-based overlay colors — assigned by ORDER ADDED, never by valence,
+  // so no variant is ever styled as a "winner". Mirrored in the CSS swatches.
+  var CMP_COLORS = ['#f0c987', '#8fb0a0'];   // slot 0 warm gold · slot 1 cool sage
+  var CMP_DASH   = [[6, 4], [3, 3]];         // distinct dash per slot
+  var CMP_MAX = 2;
+
+  // Variant registry. Given the live base scenario, build() returns a clone
+  // with ONE lever changed. `needsDca` gates the chip to Monthly DCA > 0;
+  // `fourPct` flags the one column whose income is rate-derived (4% of its
+  // own stack-at-retirement) rather than the base-income the other columns
+  // carry through. Note: in this engine DCA runs until the retirement year,
+  // so "keep DCA going 2 more years" and "retire 2 years later" are the same
+  // lever (retirementYear + 2) — the DCA-framed chip exists for the user who
+  // arrived via the DCA slider and is gated to DCA > 0.
+  var CMP_VARIANTS = [
+    { id: 'later2',   chip: 'Retired 2 years later',   build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear + 2 }); } },
+    { id: 'later5',   chip: 'Retired 5 years later',   build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear + 5 }); } },
+    { id: 'earlier2', chip: 'Retired 2 years earlier', build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear - 2 }); } },
+    { id: 'incLess',  chip: 'Wanted $25K/yr less',     build: function(b){ return cmpClone(b, { targetIncomeUSD: b.targetIncomeUSD - 25000 }); } },
+    { id: 'incMore',  chip: 'Wanted $25K/yr more',     build: function(b){ return cmpClone(b, { targetIncomeUSD: b.targetIncomeUSD + 25000 }); } },
+    { id: 'rule4',    chip: 'Withdrew 4% (the traditional rule)', fourPct: true,
+      build: function(b){ return cmpClone(b, { targetIncomeUSD: 0.04 * cmpStackReal(b), incomeBasis: 'today' }); } },
+    { id: 'dca2',     chip: 'Kept DCA going 2 more years', needsDca: true,
+      build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear + 2 }); } }
+  ];
+
+  var CMP_ACTIVE = [];    // ordered active variant ids (max CMP_MAX)
+  var CMP_LAST = null;    // { base: <outputs>, variants: [{id,chip,color,dash,outputs}] }
+
+  function cmpVariantById(id) {
+    for (var i = 0; i < CMP_VARIANTS.length; i++) { if (CMP_VARIANTS[i].id === id) return CMP_VARIANTS[i]; }
+    return null;
+  }
+
+  // Shallow clone of the scenario shape with an overlay of changed fields.
+  function cmpClone(base, over) {
+    var s = {
+      btcStack: base.btcStack,
+      targetIncomeUSD: base.targetIncomeUSD,
+      retirementYear: base.retirementYear,
+      yearsInRetirement: base.yearsInRetirement,
+      monthlyDcaUSD: base.monthlyDcaUSD,
+      withdrawalRatePct: base.withdrawalRatePct,
+      incomeBasis: base.incomeBasis
+    };
+    if (over) { for (var k in over) { if (Object.prototype.hasOwnProperty.call(over, k)) s[k] = over[k]; } }
+    return s;
+  }
+
+  // Basis helpers — the chart-drawdown basis (growth model + inflation).
+  function cmpGrowthKey() { return window.ModelingAssumptions.get('btcGrowthModel').preset; }
+  function cmpInfl() { return window.ModelingAssumptions.get('inflation').value; }
+  // Real (today's $) stack value at retirement — same call the Sustainability
+  // readout uses at the default basis, so the base column matches it exactly.
+  function cmpStackReal(scenario) { return realStackAtRetirement(scenario, cmpGrowthKey(), cmpInfl()); }
+
+  // Column outputs for one scenario. years === Infinity ⇒ escape velocity.
+  function cmpOutputs(scenario, isFourPct) {
+    var proj = projectStackOverTime(scenario, cmpGrowthKey(), cmpInfl());
+    var years = (proj.depletionYear === null) ? Infinity : (proj.depletionYear - scenario.retirementYear);
+    return {
+      proj: proj,
+      years: years,
+      depletionYear: proj.depletionYear,
+      stackReal: cmpStackReal(scenario),   // today's $
+      income: scenario.targetIncomeUSD,    // today's-$ target the column draws
+      retYear: scenario.retirementYear,
+      isFourPct: !!isFourPct
+    };
+  }
+
+  // Recompute base + all active variants ONCE per tick. Reuses the chart's
+  // already-computed base drawdown projection (baseStackObj) so the base row
+  // costs no extra engine run; each active variant adds exactly one
+  // projectStackOverTime call (≤ 2 total, within the drag-perf budget).
+  function cmpComputeAll(baseStackObj) {
+    var base = SCENARIO;
+
+    // Prune DCA-gated variants when DCA drops to 0 (chip hidden ⇒ can't stay
+    // active), drop any unknown ids, and hard-cap at CMP_MAX.
+    if (base.monthlyDcaUSD <= 0) {
+      CMP_ACTIVE = CMP_ACTIVE.filter(function(id){ var v = cmpVariantById(id); return v && !v.needsDca; });
+    }
+    CMP_ACTIVE = CMP_ACTIVE.filter(function(id){ return !!cmpVariantById(id); }).slice(0, CMP_MAX);
+
+    var baseProj = baseStackObj || projectStackOverTime(base, cmpGrowthKey(), cmpInfl());
+    var baseOut = {
+      proj: baseProj,
+      depletionYear: baseProj.depletionYear,
+      years: (baseProj.depletionYear === null) ? Infinity : (baseProj.depletionYear - base.retirementYear),
+      stackReal: cmpStackReal(base),
+      income: base.targetIncomeUSD,
+      retYear: base.retirementYear,
+      isFourPct: false
+    };
+
+    var variants = CMP_ACTIVE.map(function(id, slot){
+      var v = cmpVariantById(id);
+      var scen = v.build(base);
+      return { id: id, chip: v.chip, color: CMP_COLORS[slot], dash: CMP_DASH[slot], outputs: cmpOutputs(scen, v.fourPct) };
+    });
+
+    CMP_LAST = { base: baseOut, variants: variants };
+    return CMP_LAST;
+  }
+
+  // Thin overlay drawdown line per active variant. order:3 keeps them behind
+  // the cream base drawdown line (order:2) so the user's actual stack stays
+  // visually primary. Floor/trend band treatment is inherited from the shared
+  // projectStackOverTime output — overlays respect it exactly as the base does.
+  function cmpOverlayDatasets() {
+    if (!CMP_LAST || !CMP_LAST.variants.length) return [];
+    return CMP_LAST.variants.map(function(vr){
+      return {
+        label: 'Compare: ' + vr.chip,
+        data: vr.outputs.proj.points,
+        type: 'line',
+        borderColor: vr.color,
+        backgroundColor: vr.color,
+        borderWidth: 1.5,
+        borderDash: vr.dash,
+        pointRadius: 0,
+        fill: false,
+        tension: 0.2,
+        order: 3
+      };
+    });
+  }
+
+  // Line-style-faithful swatch (house font color is carried by the CSS, never
+  // dark-on-dark). solid=true for the base cream line; dashed for variants.
+  function cmpSwatchSvg(color, dash, solid) {
+    var da = solid ? '' : ' stroke-dasharray="' + dash[0] + ',' + dash[1] + '"';
+    return '<span class="rt-cmp-swatch" aria-hidden="true"><svg width="22" height="10" viewBox="0 0 22 10">'
+      + '<line x1="0" y1="5" x2="22" y2="5" stroke="' + color + '" stroke-width="2"' + da + '/></svg></span>';
+  }
+
+  function cmpFmtYears(out) {
+    if (out.years === Infinity) return { html: '∞ — escape velocity', ev: true };
+    var n = Math.max(0, out.years);
+    return { html: '~' + n + (n === 1 ? ' year' : ' years'), ev: false };
+  }
+
+  // A signed, colored delta chunk. Sign drives the color (site-standard pos/
+  // neg): the direction each metric moved, shown plainly in both directions —
+  // a higher-income or earlier-retirement chip shows its cost in red just as
+  // its mirror shows a gain in green.
+  function cmpSigned(delta, bodyHtml) {
+    var cls = delta > 0 ? 'rt-cmp-pos' : 'rt-cmp-neg';
+    var sign = delta > 0 ? '+' : '−';
+    return '<span class="' + cls + '">' + sign + bodyHtml + '</span>';
+  }
+
+  // Top-two signed differences vs base. Priority (spec §4):
+  //   escape-velocity flip > years-of-stack > income > stack-value,
+  // with a plain retirement-year annotation as the lowest-priority filler.
+  function cmpDeltas(baseOut, out) {
+    var cands = [];
+    var baseEV = (baseOut.years === Infinity), varEV = (out.years === Infinity);
+
+    // 1. Escape-velocity flip — the headline when the two disagree.
+    if (varEV && !baseEV) {
+      cands.push({ pri: 1, html: '<span class="rt-cmp-flip">reaches escape velocity</span> — the base case depletes in ~' + Math.max(0, baseOut.years) + ' years' });
+    } else if (!varEV && baseEV) {
+      cands.push({ pri: 1, html: '<span class="rt-cmp-flip">depletes in ~' + Math.max(0, out.years) + ' years</span> — the base case reaches escape velocity' });
+    }
+
+    // 2. Years-of-stack change — only when both are finite (the flip case
+    //    above already tells the years story when they disagree).
+    if (!varEV && !baseEV) {
+      var dy = out.years - baseOut.years;
+      if (dy !== 0) cands.push({ pri: 2, html: cmpSigned(dy, Math.abs(dy) + ' year' + (Math.abs(dy) === 1 ? '' : 's') + ' of stack') });
+    }
+
+    // 3. Income change (today's $).
+    var di = out.income - baseOut.income;
+    if (Math.round(di) !== 0) cands.push({ pri: 3, html: cmpSigned(di, formatCurrencyShort(Math.abs(di)) + '/yr income') });
+
+    // 4. Stack-value-at-retirement change (today's $).
+    var ds = out.stackReal - baseOut.stackReal;
+    if (Math.abs(ds) >= 1000) cands.push({ pri: 4, html: cmpSigned(ds, formatCurrencyShort(Math.abs(ds)) + ' stack at retirement') });
+
+    // 5. Retirement-year descriptor — neutral annotation, fills a slot.
+    if (out.retYear !== baseOut.retYear) {
+      cands.push({ pri: 5, html: 'retire ' + out.retYear + ' instead of ' + baseOut.retYear });
+    }
+
+    cands.sort(function(a, b){ return a.pri - b.pri; });
+    return cands.slice(0, 2).map(function(c){ return c.html; });
+  }
+
+  function cmpMetricsHtml(yearsFmt, out) {
+    var yDd = '<dd' + (yearsFmt.ev ? ' class="rt-cmp-ev"' : '') + '>' + yearsFmt.html + '</dd>';
+    return '<dl class="rt-cmp-metrics">'
+      + '<div class="rt-cmp-metric"><dt>Years stack lasts</dt>' + yDd + '</div>'
+      + '<div class="rt-cmp-metric"><dt>Stack at retirement (today’s $)</dt><dd>' + formatCurrencyShort(out.stackReal) + '</dd></div>'
+      + '<div class="rt-cmp-metric"><dt>Sustainable income</dt><dd>' + formatCurrencyShort(out.income) + '</dd></div>'
+      + '</dl>';
+  }
+
+  // Render chips (rebuilt each tick so the DCA gate + aria-pressed stay live)
+  // and columns (base first, then active variants in slot order).
+  function renderCompare() {
+    var colsEl = document.getElementById('rtCompareCols');
+    var chipsEl = document.getElementById('rtCompareChips');
+    if (!colsEl || !chipsEl) return;
+    if (!CMP_LAST) cmpComputeAll();
+
+    var chipsHtml = '';
+    CMP_VARIANTS.forEach(function(v){
+      if (v.needsDca && SCENARIO.monthlyDcaUSD <= 0) return;   // DCA chip hidden at DCA = 0
+      var slot = CMP_ACTIVE.indexOf(v.id);
+      var active = slot !== -1;
+      var sw = active ? cmpSwatchSvg(CMP_COLORS[slot], CMP_DASH[slot], false) : '';
+      chipsHtml += '<button type="button" class="rt-cmp-chip" data-cmp-id="' + v.id + '" aria-pressed="' + (active ? 'true' : 'false') + '">' + sw + '<span>' + v.chip + '</span></button>';
+    });
+    chipsEl.innerHTML = chipsHtml;
+
+    var b = CMP_LAST.base;
+    var colsHtml = '<div class="rt-cmp-col rt-cmp-col-base">'
+      + '<div class="rt-cmp-col-head">' + cmpSwatchSvg('#ece4d6', null, true) + '<span class="rt-cmp-col-title">Your current scenario</span></div>'
+      + cmpMetricsHtml(cmpFmtYears(b), b)
+      + '</div>';
+
+    CMP_LAST.variants.forEach(function(vr){
+      var o = vr.outputs;
+      var deltas = cmpDeltas(b, o);
+      var deltaHtml = deltas.length
+        ? '<p class="rt-cmp-delta">' + deltas.join(' <span class="rt-cmp-delta-sep">·</span> ') + '</p>'
+        : '<p class="rt-cmp-delta">No change vs. your current scenario.</p>';
+      var footHtml = o.isFourPct ? '<p class="rt-cmp-foot">at 4% withdrawal</p>' : '';
+      colsHtml += '<div class="rt-cmp-col">'
+        + '<div class="rt-cmp-col-head">' + cmpSwatchSvg(vr.color, vr.dash, false) + '<span class="rt-cmp-col-title">' + vr.chip + '</span></div>'
+        + cmpMetricsHtml(cmpFmtYears(o), o)
+        + deltaHtml + footHtml
+        + '</div>';
+    });
+    colsEl.innerHTML = colsHtml;
+  }
+
+  // Chip clicks (delegated — chips are rebuilt each render): toggle off an
+  // active chip; else add, evicting the OLDEST when over the 2-variant cap.
+  function wireCompareChips() {
+    var chipsEl = document.getElementById('rtCompareChips');
+    if (!chipsEl) return;
+    chipsEl.addEventListener('click', function(e){
+      var btn = e.target.closest('.rt-cmp-chip');
+      if (!btn || !chipsEl.contains(btn)) return;
+      var id = btn.getAttribute('data-cmp-id');
+      if (!id || !cmpVariantById(id)) return;
+      var pos = CMP_ACTIVE.indexOf(id);
+      if (pos !== -1) {
+        CMP_ACTIVE.splice(pos, 1);
+      } else {
+        CMP_ACTIVE.push(id);
+        if (CMP_ACTIVE.length > CMP_MAX) CMP_ACTIVE.shift();
+      }
+      scheduleRender();
+    });
+  }
+
   // ─── Initial run
   // 1. Apply URL params to SCENARIO (if any) — must happen BEFORE wireSliders
   //    so input.value gets the URL-provided values when the DOM syncs from
@@ -1919,6 +2205,8 @@
   updateBaselineDollarsNote();
   wireRtCsv();
   updateSustainability();
+  wireCompareChips();
+  renderCompare();          // renderChart() above already populated CMP_LAST
   fetchLiveBtcPrice();
   // 3. Normalize the URL — drops any out-of-range or unrecognized params,
   //    ensures the address bar reflects the actual rendered state. Runs
