@@ -225,6 +225,9 @@
     var d = new Date((GENESIS_TS + (TODAY_DAYS + YEAR_D * state.months / 12) * 86400) * 1000);
     return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
   }
+  // The reversion path's name — the date it assumes reversion completes by.
+  // Recomputed wherever it appears (legend + tooltip) so it tracks the slider.
+  function glideLabel() { return 'If it reverts by ' + horizonDateLabel(); }
 
   // ════════ CHART — two views (design doc §9 Phase 3) ════════
   // Rate view: implied CAGR vs horizon (Phase 1/2 behaviour, unchanged). Price
@@ -417,7 +420,7 @@
     rows.push('3.0× upper band: ' + moneyFull(PL_CEIL * t));
     var d1 = TODAY_DAYS + YEAR_D * state.months / 12;
     if (d >= TODAY_DAYS && d <= d1) {
-      rows.push('Your glide path: ' + moneyFull(glideAt(d)));
+      rows.push(glideLabel() + ': ' + moneyFull(glideAt(d)));
       rows.push('If it never reverts: ' + moneyFull(multiple() * t));
       if (holdings > 0) rows.push('Your stack at trend: ' + moneyFull(holdings * t));
     }
@@ -426,12 +429,36 @@
   // Horizon view spans only the future window, so fewer rows (glide, never, trend, stack).
   function horizonRows(d) {
     var t = plPrice(d), rows = [
-      'Your glide path: ' + moneyFull(glideAt(d)),
+      glideLabel() + ': ' + moneyFull(glideAt(d)),
       'If it never reverts: ' + moneyFull(multiple() * t),
       'Trend: ' + moneyFull(t)
     ];
     if (holdings > 0) rows.push('Your stack at trend: ' + moneyFull(holdings * t));
     return rows;
+  }
+
+  // Custom legend labels: Chart.js's default generateLabels reads the POINT style
+  // under usePointStyle, which has no borderDash — so dashes were lost and every
+  // marker rendered solid. Read each line dataset's own borderColor/borderDash so
+  // the legend shows the real line style. Skips _noLegend datasets; the reversion
+  // path's label is dynamic (tracks the slider) via the _glide flag.
+  function lineLegendLabels(chart) {
+    var ds = chart.data.datasets, out = [];
+    for (var i = 0; i < ds.length; i++) {
+      if (ds[i]._noLegend) continue;
+      out.push({
+        text: ds[i]._glide ? glideLabel() : ds[i].label,
+        strokeStyle: ds[i].borderColor,
+        fillStyle: ds[i].borderColor,
+        lineWidth: ds[i].borderWidth || 1,
+        lineDash: ds[i].borderDash || [],
+        lineCap: 'butt',
+        pointStyle: 'line',
+        hidden: !chart.isDatasetVisible(i),
+        datasetIndex: i
+      });
+    }
+    return out;
   }
 
   // Small on-canvas "illustrative" tag at the glide endpoint (honesty, not decoration).
@@ -469,7 +496,7 @@
           { label: 'Regained trend', data: s.regains, showLine: false, pointRadius: 3, borderColor: BLUE, backgroundColor: 'rgba(109,179,212,0.55)', _noLegend: true },
           { label: 'Cycle low', data: s.lows, showLine: false, pointRadius: 3, borderColor: RED, backgroundColor: 'rgba(192,57,43,0.6)', _noLegend: true },
           { label: 'If it never reverts', data: pp.never, borderColor: 'rgba(109,179,212,0.55)', borderWidth: 1.5, borderDash: [4, 4], pointRadius: 0, tension: 0, fill: false },
-          { label: 'Your chosen glide path', data: pp.glide, borderColor: AMBER, borderWidth: 2, borderDash: [6, 4], pointRadius: 0, tension: 0, fill: false },
+          { label: glideLabel(), _glide: true, data: pp.glide, borderColor: AMBER, borderWidth: 2, borderDash: [6, 4], pointRadius: 0, tension: 0, fill: false },
           { label: 'Bitcoin now', data: pp.dot, showLine: false, pointRadius: 5, borderColor: '#0a0908', borderWidth: 1.5, backgroundColor: dotColor(), _noLegend: true }
         ]
       },
@@ -494,7 +521,7 @@
         plugins: {
           legend: { display: true, position: 'top',
             labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 22, padding: 8,
-              filter: function (item, data) { return !data.datasets[item.datasetIndex]._noLegend; } } },
+              generateLabels: lineLegendLabels } },
           tooltip: dateTooltip(priceRows)
         }
       },
@@ -575,7 +602,7 @@
         datasets: [
           { label: 'Trend', data: h.trend, borderColor: AMBER, borderWidth: 2, pointRadius: 0, tension: 0, fill: false },
           { label: 'If it never reverts', data: h.never, borderColor: 'rgba(109,179,212,0.55)', borderWidth: 1.5, borderDash: [4, 4], pointRadius: 0, tension: 0, fill: false },
-          { label: 'Your chosen glide path', data: h.glide, borderColor: AMBER, borderWidth: 2, borderDash: [6, 4], pointRadius: 0, tension: 0, fill: false },
+          { label: glideLabel(), _glide: true, data: h.glide, borderColor: AMBER, borderWidth: 2, borderDash: [6, 4], pointRadius: 0, tension: 0, fill: false },
           { label: 'Bitcoin now', data: h.dot, showLine: false, pointRadius: 5, borderColor: '#0a0908', borderWidth: 1.5, backgroundColor: dotColor(), _noLegend: true },
           { label: 'Trend endpoint', data: h.trendEnd, showLine: false, pointRadius: 4, borderColor: '#0a0908', borderWidth: 1.2, backgroundColor: AMBER, _noLegend: true },
           { label: 'Never-reverts endpoint', data: h.neverEnd, showLine: false, pointRadius: 4, borderColor: '#0a0908', borderWidth: 1.2, backgroundColor: BLUE, _noLegend: true }
@@ -600,7 +627,7 @@
         plugins: {
           legend: { display: true, position: 'top',
             labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 22, padding: 8,
-              filter: function (item, data) { return !data.datasets[item.datasetIndex]._noLegend; } } },
+              generateLabels: lineLegendLabels } },
           tooltip: dateTooltip(horizonRows)
         }
       },
@@ -634,8 +661,8 @@
   }
   var VIEW_META = {
     rate: { cap: 'dpCaptionRate', title: 'Implied CAGR if bitcoin reverts to trend, by horizon', file: 'bitcoin-implied-reversion-cagr.png' },
-    price: { cap: 'dpCaptionPrice', title: 'Bitcoin price vs. the Power Law channel, with the chosen glide path', file: 'bitcoin-price-view-glide-path.png' },
-    horizon: { cap: 'dpCaptionHorizon', title: 'Your chosen window — trend, glide path, and the never-reverts case', file: 'bitcoin-horizon-window-glide-path.png' }
+    price: { cap: 'dpCaptionPrice', title: 'Bitcoin full price history in the Power Law channel, with the reversion path', file: 'bitcoin-full-history-channel.png' },
+    horizon: { cap: 'dpCaptionHorizon', title: 'Your chosen window — trend, reversion path, and the never-reverts case', file: 'bitcoin-reversion-window.png' }
   };
   function setView(v) {
     if (!VIEW_META[v] || v === view) return;

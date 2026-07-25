@@ -250,7 +250,8 @@ the model, guardrails (§5, still no buy zones, floor labelled historical), tool
 
 On branch `dp-polish` (off main). Post-ship refinements, no model change.
 
-- **Third view — Horizon.** The segmented toggle is now **Rate | Price | Horizon**. Horizon view is a
+- **Third view — Horizon.** The segmented toggle is now three views (later renamed **Rate view | Full
+  history | Your window** — see the clarity pass below). The window view is a
   linear-y chart of only the chosen window (today → today + y, right edge tracks the slider live): the
   trend segment (amber), the dashed glide path to (today + y, trend) with the "illustrative" tag, the
   fainter never-reverts path to (today + y, multiple × trend), the current-position dot, and endpoint
@@ -273,6 +274,24 @@ On branch `dp-polish` (off main). Post-ship refinements, no model change.
   set. Horizon uses the shorter set (glide, never-reverts, trend, stack). QA: values at today match the
   status strip (price via the glide start, trend via `plPrice`); at the horizon endpoint the stack row
   matches the readout card's at-trend $.
+
+### Phase 3 clarity pass (2026-07-24)
+
+Toggle + legend legibility, no model change. The three views are now named **Rate view | Full history |
+Your window** (internal `data-view` values stay rate/price/horizon). Each button carries a `title` +
+`aria-label`: Rate view — "The implied yearly return (CAGR) at every reversion speed."; Full history —
+"Bitcoin's whole price record inside the power-law channel."; Your window — "Today to your chosen
+end-date, drawn to scale."
+
+- **Legend line styles.** Chart.js's default `generateLabels` reads the *point* style under
+  `usePointStyle`, which has no `borderDash`, so every legend marker rendered solid. A custom
+  `generateLabels` (`lineLegendLabels`) reads each line dataset's own `borderColor`/`borderDash` so the
+  legend shows the real style (solid / dashed / faint dashed, correct colors) in Full history and Your window.
+- **Reversion path renamed.** The former "glide path" is gone from all user-visible copy. Its legend label
+  is now dynamic — "If it reverts by " + the horizon end-date — and updates live with the slider (the
+  legend regenerates on `chart.update`); the tooltip row uses the same name. The inline "illustrative" tag
+  stays on the path. Captions, `data-chart-title`, and the export filenames updated (Your window exports
+  `bitcoin-reversion-window.png`).
 
 ---
 
