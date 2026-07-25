@@ -119,10 +119,22 @@ body { background: var(--bg); color: var(--text); }
 
 /* ══ TIME-TO-TREND RECORD (§9 Phase 4) ══════════════════════
    Slider ticks (record median + longest), a slider caption, and a calendar strip. */
-.dp-dur-ticks { position: absolute; left: 0; right: 0; top: 0; height: 100%; pointer-events: none; }
-.dp-dur-ticks[hidden] { display: none; }
-.dp-dur-tick { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 2px; height: 18px; background: rgba(224,148,34,0.7); border-radius: 1px; pointer-events: auto; cursor: help; }
-.dp-dur-tick::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); border-left: 3px solid transparent; border-right: 3px solid transparent; border-bottom: 4px solid rgba(224,148,34,0.9); }
+/* Record markers row (fastest / median / longest) between the track and the scale.
+   Each is a small amber tick with an always-visible small-caps label beneath it. */
+.dp-dur-marks { position: relative; height: 32px; margin: 3px 0 0; }
+.dp-dur-marks[hidden] { display: none; }
+.dp-dur-mark { position: absolute; top: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: auto; cursor: help; }
+.dp-dur-mark.is-left { transform: none; align-items: flex-start; }
+.dp-dur-mark.is-right { transform: none; align-items: flex-end; }
+.dp-dur-mark-tick { width: 2px; height: 9px; background: rgba(224,148,34,0.75); border-radius: 1px; }
+.dp-dur-mark.is-offscale .dp-dur-mark-tick { width: auto; height: 9px; background: none; font-size: 0.72rem; line-height: 9px; font-weight: 700; color: rgba(224,148,34,0.95); }
+.dp-dur-mark-lbl { margin-top: 3px; font-family: 'Inter', sans-serif; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; }
+.dp-dur-mark.is-row1 .dp-dur-mark-lbl { margin-top: 14px; }
+.dp-dur-mark.is-row2 .dp-dur-mark-lbl { margin-top: 25px; }
+@media (max-width: 480px) {
+  .dp-dur-marks { height: 12px; margin-top: 4px; }
+  .dp-dur-mark-lbl { display: none; }
+}
 .dp-dur-slidercap { font-family: 'Inter', sans-serif; font-size: 0.78rem; line-height: 1.55; color: var(--text-muted); margin: 0.45rem 0 0; }
 .dp-dur-slidercap[hidden] { display: none; }
 .dp-dur-slidercap strong { color: var(--text-dim); font-weight: 600; }

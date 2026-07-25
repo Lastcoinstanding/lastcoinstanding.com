@@ -946,14 +946,30 @@
   function durDate(d) { return new Date((GENESIS_TS + d * 86400) * 1000).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
   var durationLogged = false;
 
+  // Stack marker labels that would overlap horizontally onto a lower row, so
+  // fastest/median/longest never collide (median + longest can sit close).
+  function layoutMarkRows(marks) {
+    var els = [].slice.call(marks.children);
+    els.forEach(function (el) { el.classList.remove('is-row1', 'is-row2'); });
+    els.sort(function (a, b) { return a.querySelector('.dp-dur-mark-lbl').getBoundingClientRect().left - b.querySelector('.dp-dur-mark-lbl').getBoundingClientRect().left; });
+    var rowRight = [];
+    els.forEach(function (el) {
+      var r = el.querySelector('.dp-dur-mark-lbl').getBoundingClientRect(), row = 0;
+      while (row < rowRight.length && r.left <= rowRight[row] + 6) row++;
+      rowRight[row] = r.right;
+      if (row === 1) el.classList.add('is-row1');
+      else if (row >= 2) el.classList.add('is-row2');
+    });
+  }
+
   function renderDuration() {
     var rec = scanDurations();
-    var sec = document.getElementById('dpDuration'), ticks = document.getElementById('dpDurTicks'), scap = document.getElementById('dpDurSliderCap');
+    var sec = document.getElementById('dpDuration'), marks = document.getElementById('dpDurMarks'), scap = document.getElementById('dpDurSliderCap');
     var hidden = rec.state === 'hidden';
     if (sec) sec.hidden = hidden;
-    if (ticks) ticks.hidden = hidden;
+    if (marks) marks.hidden = hidden;
     if (scap) scap.hidden = hidden;
-    if (hidden) { if (ticks) ticks.innerHTML = ''; return; }
+    if (hidden) { if (marks) marks.innerHTML = ''; return; }
 
     if (window.console && console.log) {
       console.log('[dp-duration] band=' + rec.band.toFixed(2) + '× state=' + rec.state
@@ -967,19 +983,28 @@
     var side = rec.state === 'discount' ? 'at or below' : 'at or above';
     var backTo = rec.state === 'discount' ? 'back to trend' : 'back down to trend';
 
-    // ── Slider ticks: record's median + longest, mapped to the 6–60mo track ──
-    if (ticks) {
-      ticks.innerHTML = '';
-      [{ mo: rec.median, lbl: 'median of the record' }, { mo: rec.max, lbl: 'longest in the record' }].forEach(function (t) {
-        if (t.mo < MIN_M || t.mo > MAX_M) return; // off the slider's range
-        var frac = (t.mo - MIN_M) / (MAX_M - MIN_M);
+    // ── Slider markers: fastest / median / longest, each with a visible label ──
+    // Values in range map to the 6–60mo track; a value below the floor (or above
+    // the range) pins to the track edge with an off-scale glyph. Overlapping labels
+    // stack onto a second row.
+    if (marks) {
+      marks.innerHTML = '';
+      [{ mo: rec.min, key: 'fastest' }, { mo: rec.median, key: 'median' }, { mo: rec.max, key: 'longest' }].forEach(function (d) {
+        var below = d.mo < MIN_M, above = d.mo > MAX_M;
+        var frac = below ? 0 : above ? 1 : (d.mo - MIN_M) / (MAX_M - MIN_M);
+        var glyph = below ? '◂' : above ? '▸' : '';
+        var note = below ? ' — quicker than this slider’s floor' : above ? ' — longer than this slider’s range' : '';
         var el = document.createElement('span');
-        el.className = 'dp-dur-tick';
-        el.style.left = 'calc(10px + ' + frac + ' * (100% - 20px))';
-        el.setAttribute('title', t.lbl + ': ~' + fmtMo(t.mo));
-        el.setAttribute('aria-label', t.lbl + ': about ' + fmtMo(t.mo));
-        ticks.appendChild(el);
+        el.className = 'dp-dur-mark' + (below ? ' is-offscale is-left' : above ? ' is-offscale is-right' : '');
+        if (below) { el.style.left = '0'; el.style.transform = 'none'; }
+        else if (above) { el.style.left = 'auto'; el.style.right = '0'; el.style.transform = 'none'; }
+        else { el.style.left = 'calc(10px + ' + frac + ' * (100% - 20px))'; }
+        el.innerHTML = '<span class="dp-dur-mark-tick">' + glyph + '</span><span class="dp-dur-mark-lbl">' + d.key + '</span>';
+        el.setAttribute('title', d.key + ': ~' + fmtMo(d.mo) + note);
+        el.setAttribute('aria-label', d.key + ': about ' + fmtMo(d.mo) + note);
+        marks.appendChild(el);
       });
+      layoutMarkRows(marks);
     }
 
     // ── Slider caption ──

@@ -70,9 +70,9 @@ eleventyComputed:
       <div class="dp-slider-wrap">
         <input type="range" min="6" max="60" step="1" value="36" class="dp-slider" id="dpSlider"
                aria-label="Years for price to revert to trend, from six months to five years">
-        <!-- Record markers (median + longest time-to-trend), placed live by JS (§9 Phase 4). -->
-        <div class="dp-dur-ticks" id="dpDurTicks" hidden></div>
       </div>
+      <!-- Record markers (fastest / median / longest time-to-trend), labelled + placed live by JS (§9 Phase 4). -->
+      <div class="dp-dur-marks" id="dpDurMarks" hidden></div>
       <div class="dp-slider-scale"><span>6 months &middot; fastest</span><span>2.5 years</span><span>5 years &middot; slowest</span></div>
       <p class="dp-slider-caption">A shorter horizon means the <strong>same gap closes in less time</strong>, so the implied CAGR is higher. That is just arithmetic, not a forecast.</p>
       <p class="dp-dur-slidercap" id="dpDurSliderCap" hidden></p>
