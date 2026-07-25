@@ -70,9 +70,12 @@ eleventyComputed:
       <div class="dp-slider-wrap">
         <input type="range" min="6" max="60" step="1" value="36" class="dp-slider" id="dpSlider"
                aria-label="Years for price to revert to trend, from six months to five years">
+        <!-- Record markers (median + longest time-to-trend), placed live by JS (§9 Phase 4). -->
+        <div class="dp-dur-ticks" id="dpDurTicks" hidden></div>
       </div>
       <div class="dp-slider-scale"><span>6 months &middot; fastest</span><span>2.5 years</span><span>5 years &middot; slowest</span></div>
       <p class="dp-slider-caption">A shorter horizon means the <strong>same gap closes in less time</strong>, so the implied CAGR is higher. That is just arithmetic, not a forecast.</p>
+      <p class="dp-dur-slidercap" id="dpDurSliderCap" hidden></p>
     </div>
 
     <!-- Optional holdings. Privacy fence (design doc §9 Phase 2): the value lives
@@ -128,6 +131,17 @@ eleventyComputed:
 
     <!-- The never-reverts case is permanent UI, not a footnote (design doc §4). -->
     <p class="dp-never" id="dpNever">&mdash;</p>
+
+    <!-- ════════ TIME-TO-TREND RECORD (§9 Phase 4) ════════
+         The historical record of how long a return to trend has taken, conditioned
+         on today's multiple — never a forecast. Lives OUTSIDE the chart-copy host so
+         it is excluded from the chart export. Hidden in the near-trend dead band. -->
+    <section class="dp-duration" id="dpDuration" hidden aria-label="How long a return to trend has taken in the record">
+      <div class="dp-dur-head">How long has it taken before?</div>
+      <p class="dp-dur-sub" id="dpDurSub"></p>
+      <div class="dp-dur-track" id="dpDurTrack"></div>
+      <p class="dp-dur-cap" id="dpDurCap"></p>
+    </section>
   </section>
 
   <!-- ════════ THE HONESTY BACKTEST ════════ -->

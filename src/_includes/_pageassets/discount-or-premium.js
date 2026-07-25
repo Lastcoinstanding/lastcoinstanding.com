@@ -885,6 +885,149 @@
     return Math.floor((Date.UTC(y, 6, 23) / 1000 - GENESIS_TS) / 86400);
   }
 
+  // ════════ DURATION RECORD — "How long has it taken before?" (design doc §9 Phase 4) ════════
+  // The historical time-to-trend, conditioned on today's multiple. NEVER a forecast:
+  // it reports what stretches at (discount) or beyond (premium) today's depth actually
+  // took to get back to trend. Two-sided; recomputed whenever the multiple moves.
+  var YEARS_MO = 30.44;
+  function sampleMult(i) { return PL_DATA[i][1] / plPrice(PL_DATA[i][0]); }
+
+  function scanDurations() {
+    var m = multiple();
+    if (m >= NEAR_LO && m <= NEAR_HI) return { state: 'hidden' }; // dead band: whole module hidden
+    var discount = m < NEAR_LO;
+    function regainAfter(i) {
+      for (var j = i + 1; j < PL_DATA.length; j++) {
+        if (discount ? sampleMult(j) >= 1.0 : sampleMult(j) <= 1.0) return j;
+      }
+      return -1;
+    }
+    // Band = today's multiple; widen in 0.05 steps toward 1.0 only if too few completed.
+    var band = m, qi, comp, ong, guard = 0, i, r;
+    while (true) {
+      qi = []; comp = []; ong = [];
+      for (i = 0; i < PL_DATA.length; i++) {
+        if (discount ? sampleMult(i) <= band : sampleMult(i) >= band) {
+          qi.push(i);
+          r = regainAfter(i);
+          if (r >= 0) comp.push({ i: i, months: (PL_DATA[r][0] - PL_DATA[i][0]) / YEARS_MO });
+          else ong.push(i);
+        }
+      }
+      if (comp.length >= 5 || guard >= 12) break;
+      band = discount ? band + 0.05 : band - 0.05; guard++;
+      if (discount ? band >= NEAR_LO : band <= NEAR_HI) break; // never widen into the dead band
+    }
+    // Episodes: a gap > ~100 days between qualifying samples starts a new one.
+    var eps = [], cur = null, k;
+    for (k = 0; k < qi.length; k++) {
+      var idx = qi[k], d = PL_DATA[idx][0];
+      if (!cur || d - PL_DATA[cur.last][0] > 100) { cur = { first: idx, last: idx }; eps.push(cur); }
+      else cur.last = idx;
+    }
+    var episodes = eps.map(function (e) {
+      var rr = regainAfter(e.first), entryD = PL_DATA[e.first][0], regainD = rr >= 0 ? PL_DATA[rr][0] : null;
+      return { entryD: entryD, regainD: regainD, ongoing: rr < 0,
+        months: (regainD != null ? regainD - entryD : TODAY_DAYS - entryD) / YEARS_MO };
+    });
+    var durs = comp.map(function (c) { return c.months; }).sort(function (a, b) { return a - b; });
+    var med = durs.length ? (durs.length % 2 ? durs[(durs.length - 1) / 2] : (durs[durs.length / 2 - 1] + durs[durs.length / 2]) / 2) : 0;
+    var longestEp = episodes.reduce(function (a, b) { return (!b.ongoing && (!a || b.months > a.months)) ? b : a; }, null);
+    return {
+      state: discount ? 'discount' : 'premium', band: band, widened: Math.abs(band - m) > 1e-9,
+      nSamples: qi.length, nCompleted: comp.length, hasOngoing: ong.length > 0,
+      ongMonths: ong.length ? (TODAY_DAYS - PL_DATA[ong[0]][0]) / YEARS_MO : 0,
+      min: durs.length ? durs[0] : 0, median: med, max: durs.length ? durs[durs.length - 1] : 0,
+      episodes: episodes, longestEp: longestEp
+    };
+  }
+
+  function fmtMo(v) { var r = Math.round(v); return r + (r === 1 ? ' month' : ' months'); }
+  function durDate(d) { return new Date((GENESIS_TS + d * 86400) * 1000).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
+  var durationLogged = false;
+
+  function renderDuration() {
+    var rec = scanDurations();
+    var sec = document.getElementById('dpDuration'), ticks = document.getElementById('dpDurTicks'), scap = document.getElementById('dpDurSliderCap');
+    var hidden = rec.state === 'hidden';
+    if (sec) sec.hidden = hidden;
+    if (ticks) ticks.hidden = hidden;
+    if (scap) scap.hidden = hidden;
+    if (hidden) { if (ticks) ticks.innerHTML = ''; return; }
+
+    if (window.console && console.log) {
+      console.log('[dp-duration] band=' + rec.band.toFixed(2) + '× state=' + rec.state
+        + ' samples=' + rec.nSamples + ' completed=' + rec.nCompleted + ' ongoing=' + (rec.hasOngoing ? 1 : 0)
+        + ' min=' + rec.min.toFixed(1) + ' median=' + rec.median.toFixed(1) + ' max=' + rec.max.toFixed(1)
+        + ' episodes=' + rec.episodes.length + (rec.widened ? ' (band widened)' : ''));
+    }
+    durationLogged = true;
+
+    var bandTxt = rec.band.toFixed(2) + '×';
+    var side = rec.state === 'discount' ? 'at or below' : 'at or above';
+    var backTo = rec.state === 'discount' ? 'back to trend' : 'back down to trend';
+
+    // ── Slider ticks: record's median + longest, mapped to the 6–60mo track ──
+    if (ticks) {
+      ticks.innerHTML = '';
+      [{ mo: rec.median, lbl: 'median of the record' }, { mo: rec.max, lbl: 'longest in the record' }].forEach(function (t) {
+        if (t.mo < MIN_M || t.mo > MAX_M) return; // off the slider's range
+        var frac = (t.mo - MIN_M) / (MAX_M - MIN_M);
+        var el = document.createElement('span');
+        el.className = 'dp-dur-tick';
+        el.style.left = 'calc(10px + ' + frac + ' * (100% - 20px))';
+        el.setAttribute('title', t.lbl + ': ~' + fmtMo(t.mo));
+        el.setAttribute('aria-label', t.lbl + ': about ' + fmtMo(t.mo));
+        ticks.appendChild(el);
+      });
+    }
+
+    // ── Slider caption ──
+    if (scap) {
+      var s = 'In the record, stretches ' + side + ' <strong>' + bandTxt + ' trend</strong> took a median of <strong>~'
+        + fmtMo(rec.median) + '</strong> to get ' + backTo + ', and at most <strong>~' + fmtMo(rec.max)
+        + '</strong> &mdash; all inside this slider&rsquo;s left half.';
+      if (rec.min < MIN_M) s += ' The fastest, ~' + fmtMo(rec.min) + ', was quicker than the slider&rsquo;s floor.';
+      scap.innerHTML = s;
+    }
+
+    // ── Strip: one bar per episode on a 2010→now calendar axis ──
+    var sub = document.getElementById('dpDurSub');
+    if (sub) sub.innerHTML = 'Every stretch the record spent ' + side + ' today&rsquo;s multiple ('
+      + bandTxt + ' trend), and how long until price was ' + backTo + '.';
+
+    var track = document.getElementById('dpDurTrack');
+    if (track) {
+      var minD = PL_DATA[0][0], maxD = TODAY_DAYS, span = maxD - minD, html = '', yr;
+      var y0 = new Date((GENESIS_TS + minD * 86400) * 1000).getUTCFullYear() + 1;
+      var y1 = new Date((GENESIS_TS + maxD * 86400) * 1000).getUTCFullYear();
+      for (yr = y0; yr <= y1; yr++) {
+        if ((yr - y0) % 4 !== 0) continue;
+        var yd = Math.floor((Date.UTC(yr, 0, 1) / 1000 - GENESIS_TS) / 86400), yl = (yd - minD) / span * 100;
+        if (yl < 0 || yl > 100) continue;
+        html += '<span class="dp-dur-year" style="left:' + yl.toFixed(1) + '%">' + yr + '</span>';
+      }
+      rec.episodes.forEach(function (e) {
+        var endD = e.regainD != null ? e.regainD : maxD;
+        var left = (e.entryD - minD) / span * 100, width = Math.max((endD - e.entryD) / span * 100, 1.4);
+        var lab = e.ongoing ? 'ongoing' : Math.round(e.months) + ' mo';
+        var tip = e.ongoing ? (durDate(e.entryD) + ' → ongoing (~' + Math.round(e.months) + ' mo so far)')
+          : (durDate(e.entryD) + ' → ' + durDate(e.regainD) + ' (' + Math.round(e.months) + ' mo)');
+        html += '<span class="dp-dur-bar' + (e.ongoing ? ' is-ongoing' : '') + '" style="left:' + left.toFixed(1)
+          + '%;width:' + width.toFixed(1) + '%" title="' + tip + '"><span class="dp-dur-bar-lab">' + lab + '</span></span>';
+      });
+      track.innerHTML = html;
+    }
+
+    // ── Strip caption (house voice) ──
+    var cap = document.getElementById('dpDurCap');
+    if (cap) {
+      var longYear = rec.longestEp ? new Date((GENESIS_TS + rec.longestEp.entryD * 86400) * 1000).getUTCFullYear() : null;
+      cap.innerHTML = 'Monthly samples, so entry and regain snap to the nearest month. A handful of episodes is a <strong>record, not a distribution</strong>'
+        + (longYear ? ' &mdash; and there is no clean shortening trend: the longest wait began in <strong>' + longYear + '</strong>, not at the start.' : '.');
+    }
+  }
+
   // ════════ URL STATE (?y=<horizon-years>) ════════
   function syncUrl() {
     if (!window.history || !window.history.replaceState) return;
@@ -902,7 +1045,7 @@
   }
 
   // ════════ WIRING ════════
-  function renderAll() { renderStatus(); renderCalc(); renderBacktest(); }
+  function renderAll() { renderStatus(); renderCalc(); renderBacktest(); renderDuration(); }
 
   function wire() {
     var sl = document.getElementById('dpSlider');

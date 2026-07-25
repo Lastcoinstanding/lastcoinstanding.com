@@ -330,6 +330,34 @@ plot rather than starting a decade below.
   side outward (higher endpoint above, lower below — flips with the premium's sign), and the chip covers
   any residual crossing.
 
+### Phase 4 (2026-07-25) — "How long has it taken before?" (time-to-trend record)
+
+Answers *how long a return to trend might take* with the historical record, conditioned on today's
+position — **never a forecast, never an ETA**. Two-sided and live-computed like everything else; the whole
+module is hidden inside the 0.95–1.05× near-trend dead band.
+
+- **Duration scan (`scanDurations`, run in `renderAll` → at init and when the live fetch resolves, since
+  the multiple moves).** Discount (m < 0.95): for every PL_DATA monthly sample with multiple ≤ today's
+  multiple, find the first later sample with multiple ≥ 1.0; duration = (d_regain − d_sample)/30.44 months.
+  Samples with no later regain are the ongoing stretch. Premium (m > 1.05) mirrors (samples ≥ band, first
+  later sample ≤ 1.0). If completed observations < 5, the band widens in 0.05 steps toward 1.0 (never into
+  the dead band) and the band actually used is surfaced in the copy. Qualifying samples are grouped into
+  episodes (gap > ~100 days starts a new one).
+- **Slider annotations.** Two subtle ticks on the 6–60mo track at the record's **median** and **longest**
+  durations, each with title + aria-label; a caption beneath the scale states median, longest, the band,
+  and — when the record's fastest is below the 6-month floor — that it was quicker than the slider's floor.
+  Ticks recompute live with the multiple.
+- **The strip** (below the chart block, **outside** the chart-copy host so it is excluded from the export):
+  one bar per episode on a 2010→now calendar axis, band-entry → trend-regain, labelled with its duration;
+  the current stretch is drawn open-ended and dimmer with an "ongoing" tag. Hover gives entry → regain →
+  duration. Caption carries monthly-sample granularity, "a handful of episodes is a record, not a
+  distribution," and the compression honesty (the longest wait began mid-history, not at the start).
+- **Verified 2026-07-25** against the shared PL_DATA (logic reconciles exactly; numbers track the live
+  band): at ≤0.43× — 12 samples, 11 completed + 1 ongoing, min ~4 / median ~14 / max ~21 months, eras
+  2010 (~5) / 2015 (~21) / 2022 (~15) + ongoing; at ≤0.50× — 50 samples, 6 completed episodes, durations
+  2–21, median ~9. Headline property: every completed reversion from at-or-below this depth resolved within
+  ~21 months — inside the slider's left half. No "expected time" language anywhere.
+
 ---
 
 # Appendix — Pilot content (create-once-distribute-everywhere)
