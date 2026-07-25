@@ -1009,9 +1009,11 @@
       }
       rec.episodes.forEach(function (e) {
         var endD = e.regainD != null ? e.regainD : maxD;
-        var left = (e.entryD - minD) / span * 100, width = Math.max((endD - e.entryD) / span * 100, 1.4);
+        var left = (e.entryD - minD) / span * 100, width = Math.max((endD - e.entryD) / span * 100, e.ongoing ? 2.4 : 1.4);
+        if (e.ongoing && left + width > 100) left = 100 - width; // keep the open bar within the axis (ends at today)
+        var soFar = e.months < 1 ? 'under a month' : '~' + Math.round(e.months) + ' months';
         var lab = e.ongoing ? 'ongoing' : Math.round(e.months) + ' mo';
-        var tip = e.ongoing ? (durDate(e.entryD) + ' → ongoing (~' + Math.round(e.months) + ' mo so far)')
+        var tip = e.ongoing ? (durDate(e.entryD) + ' → ongoing (' + soFar + ' so far)')
           : (durDate(e.entryD) + ' → ' + durDate(e.regainD) + ' (' + Math.round(e.months) + ' mo)');
         html += '<span class="dp-dur-bar' + (e.ongoing ? ' is-ongoing' : '') + '" style="left:' + left.toFixed(1)
           + '%;width:' + width.toFixed(1) + '%" title="' + tip + '"><span class="dp-dur-bar-lab">' + lab + '</span></span>';
