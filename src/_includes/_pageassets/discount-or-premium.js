@@ -448,6 +448,10 @@
       if (ds[i]._noLegend) continue;
       out.push({
         text: ds[i]._glide ? glideLabel() : ds[i].label,
+        // fontColor is what the default generator supplies from labels.color; the
+        // custom generator must set it too or the text renders dark-on-dark. Match
+        // the Rate view legend exactly (labels.color: DIM).
+        fontColor: DIM,
         strokeStyle: ds[i].borderColor,
         fillStyle: ds[i].borderColor,
         lineWidth: ds[i].borderWidth || 1,
@@ -470,10 +474,14 @@
         var px = c.scales.x.getPixelForValue(hd), py = c.scales.y.getPixelForValue(plPrice(hd)), ctx = c.ctx;
         if (!isFinite(px) || !isFinite(py)) return;
         ctx.save();
+        // Just beyond the reversion path's endpoint: offset up-right of the terminal
+        // point, but clamp to a right-aligned position at the edge so it never clips.
         ctx.font = '600 10px "Inter", sans-serif';
         ctx.fillStyle = 'rgba(224,148,34,0.9)';
-        ctx.textBaseline = 'bottom'; ctx.textAlign = 'right';
-        ctx.fillText('illustrative', Math.min(px, c.chartArea.right) - 4, Math.max(py - 6, c.chartArea.top + 10));
+        ctx.textBaseline = 'bottom';
+        var ca = c.chartArea, w = ctx.measureText('illustrative').width, ly = Math.max(py - 6, ca.top + 11);
+        if (px + 6 + w <= ca.right - 2) { ctx.textAlign = 'left'; ctx.fillText('illustrative', px + 6, ly); }
+        else { ctx.textAlign = 'right'; ctx.fillText('illustrative', Math.min(px, ca.right) - 2, ly); }
         ctx.restore();
       }
     };
@@ -579,15 +587,13 @@
           ctx.textBaseline = 'top';
           ctx.fillText(moneyFull(h.nv), ex - 6, Math.min(nY + 4, c.chartArea.bottom - 6));
         }
-        // "illustrative" on the glide, ~60% along
-        var mx = xS.getPixelForValue(h.d0 + (h.d1 - h.d0) * 0.55);
-        var my = yS.getPixelForValue(price() + (h.Td1 - price()) * 0.55);
-        if (isFinite(mx) && isFinite(my)) {
-          ctx.font = '600 10px "Inter", sans-serif';
-          ctx.fillStyle = 'rgba(224,148,34,0.9)';
-          ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
-          ctx.fillText('illustrative', mx + 4, my - 4);
-        }
+        // "illustrative" just beyond the path end — the endpoint sits at the right
+        // edge here, so stack it above the trend-$ label, right-aligned, clamped in.
+        ctx.font = '600 10px "Inter", sans-serif';
+        ctx.fillStyle = 'rgba(224,148,34,0.9)';
+        ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+        var trendLabelY = Math.max(tY - 4, c.chartArea.top + 12);
+        ctx.fillText('illustrative', Math.min(ex, c.chartArea.right) - 6, Math.max(trendLabelY - 14, c.chartArea.top + 11));
         ctx.restore();
       }
     };
