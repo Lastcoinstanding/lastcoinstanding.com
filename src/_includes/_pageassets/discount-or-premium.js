@@ -513,21 +513,52 @@
 
   // "illustrative" tag drawn ALONG the reversion path (~78% to its end) and offset
   // perpendicular so it never touches the line or collides with the endpoint $ label.
+  function fillPill(ctx, x, y, w, h, r) {
+    if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill(); return; }
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath(); ctx.fill();
+  }
+  // Draw text with a subtle dark backing pill (house tooltip fill at ~85%) so the
+  // label stays legible when a line passes beneath it — in exports too, since it's
+  // drawn on the canvas in afterDatasetsDraw. Assumes ctx.font/align/baseline are
+  // set; uses the current ctx.fillStyle as the text colour.
+  function drawChipText(ctx, text, x, y, align, baseline, fontPx) {
+    var w = ctx.measureText(text).width, pad = 3.5;
+    var left = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    var top = baseline === 'top' ? y : baseline === 'bottom' ? y - fontPx : y - fontPx / 2;
+    var textColor = ctx.fillStyle;
+    ctx.fillStyle = 'rgba(20,17,13,0.85)';
+    fillPill(ctx, left - pad, top - pad + 1, w + pad * 2, fontPx + pad * 2 - 2, 3);
+    ctx.fillStyle = textColor;
+    ctx.fillText(text, x, y);
+  }
+  // "illustrative" tag ~78% along the reversion path (15–25% before the end),
+  // offset perpendicular onto the path's OPEN side: below when the path rises to
+  // trend (multiple < 1) and above when it descends (multiple > 1), so it always
+  // points at its own line. Backed by a chip; clamped to the chart area.
   function drawIllustrativeAlong(c, sx, sy, ex, ey) {
     if (!(isFinite(sx) && isFinite(sy) && isFinite(ex) && isFinite(ey))) return;
     var ctx = c.ctx, ca = c.chartArea, f = 0.78;
     var ax = sx + (ex - sx) * f, ay = sy + (ey - sy) * f;
     var dx = ex - sx, dy = ey - sy, len = Math.sqrt(dx * dx + dy * dy) || 1;
-    var nx = -dy / len, ny = dx / len; if (ny > 0) { nx = -nx; ny = -ny; }
-    var off = 14, tx = ax + nx * off, ty = ay + ny * off;
+    var nx = -dy / len, ny = dx / len;
+    var wantDown = multiple() < 1;                 // below a rising path, above a descending one
+    if (wantDown ? (ny < 0) : (ny > 0)) { nx = -nx; ny = -ny; }
+    var off = 14, tx = ax + nx * off, ty = ay + ny * off, baseline = wantDown ? 'top' : 'bottom';
     ctx.save();
     ctx.font = '600 10px "Inter", sans-serif';
-    ctx.fillStyle = 'rgba(224,148,34,0.92)';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.textAlign = 'center'; ctx.textBaseline = baseline;
     var w = ctx.measureText('illustrative').width;
-    tx = Math.max(ca.left + w / 2 + 2, Math.min(tx, ca.right - w / 2 - 2));
-    ty = Math.max(ca.top + 11, Math.min(ty, ca.bottom - 2));
-    ctx.fillText('illustrative', tx, ty);
+    tx = Math.max(ca.left + w / 2 + 4, Math.min(tx, ca.right - w / 2 - 4));
+    ty = wantDown ? Math.max(ca.top + 4, Math.min(ty, ca.bottom - 14))
+                  : Math.max(ca.top + 14, Math.min(ty, ca.bottom - 4));
+    ctx.fillStyle = 'rgba(224,148,34,0.95)';
+    drawChipText(ctx, 'illustrative', tx, ty, 'center', baseline, 10);
     ctx.restore();
   }
 
@@ -659,22 +690,29 @@
     return {
       id: 'dpHorizonAnno',
       afterDatasetsDraw: function (c) {
-        var h = horizonData(), xS = c.scales.x, yS = c.scales.y, ctx = c.ctx;
+        var h = horizonData(), xS = c.scales.x, yS = c.scales.y, ctx = c.ctx, ca = c.chartArea;
         var ex = xS.getPixelForValue(h.d1);
         var tY = yS.getPixelForValue(h.Td1), nY = yS.getPixelForValue(h.nv);
         if (!isFinite(ex) || !isFinite(tY)) return;
+        // Side choice, away from the lines that pass between the two endpoints: the
+        // higher endpoint's $ sits above it, the lower one's below. Flips with the
+        // sign of the premium; the chip covers any residual line the side can't dodge.
+        var trendUpper = h.Td1 >= h.nv;
         ctx.save();
         ctx.font = '600 11px "Inter", sans-serif';
         ctx.textAlign = 'right';
-        // Trend / glide endpoint $ (amber)
+        var tBase = trendUpper ? 'bottom' : 'top';
+        var tYc = trendUpper ? Math.max(tY - 4, ca.top + 12) : Math.min(tY + 4, ca.bottom - 6);
+        ctx.textBaseline = tBase;
         ctx.fillStyle = 'rgba(224,148,34,0.95)';
-        ctx.textBaseline = 'bottom';
-        ctx.fillText(moneyFull(h.Td1), ex - 6, Math.max(tY - 4, c.chartArea.top + 12));
+        drawChipText(ctx, moneyFull(h.Td1), ex - 6, tYc, 'right', tBase, 11);
         // Never-reverts endpoint $ (blue) — only when it reads clear of the trend $
         if (isFinite(nY) && Math.abs(nY - tY) > 14) {
+          var nBase = trendUpper ? 'top' : 'bottom';
+          var nYc = trendUpper ? Math.min(nY + 4, ca.bottom - 6) : Math.max(nY - 4, ca.top + 12);
+          ctx.textBaseline = nBase;
           ctx.fillStyle = 'rgba(109,179,212,0.95)';
-          ctx.textBaseline = 'top';
-          ctx.fillText(moneyFull(h.nv), ex - 6, Math.min(nY + 4, c.chartArea.bottom - 6));
+          drawChipText(ctx, moneyFull(h.nv), ex - 6, nYc, 'right', nBase, 11);
         }
         ctx.restore();
         // "illustrative" alongside the path (~78% along), offset perpendicular, so it

@@ -321,6 +321,12 @@ plot rather than starting a decade below.
   concave trend for the whole interior and touches it only at the shared endpoint — no crossing. Ride-along
   elements (endpoint $ labels, the "illustrative" tag, hover dots) all sit on the corrected sampled curves.
 - Caption updated to describe the shared log axis and what a straight path means.
+- **Label legibility (both views).** The "illustrative" tag and each endpoint $ label now draw over a
+  subtle dark backing chip (house tooltip fill at ~85%, small radius) so text stays readable when a line
+  crosses beneath — chips render in camera exports too. The "illustrative" tag sits on the path's open side
+  (below when the reversion path rises to trend, above when it descends). Endpoint $ labels choose their
+  side outward (higher endpoint above, lower below — flips with the premium's sign), and the chip covers
+  any residual crossing.
 
 ---
 
