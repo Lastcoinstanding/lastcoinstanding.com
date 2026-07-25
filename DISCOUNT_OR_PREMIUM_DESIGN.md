@@ -112,7 +112,7 @@ peak-focused).
   copy says *"roughly at trend"* and the uplift row reads ~0 — no manufactured drama at the boundary.
 - **At-the-floor honesty (current state):** when `m` ≤ PL_FLOOR·1.05, a visible one-liner: *"Bitcoin is
   currently at the bottom of its historical channel. The floor has held for the length of the record —
-  which is evidence, not a law."* Link the Power Law caveats. (This also future-proofs: the line
+  which is evidence, not a guarantee."* Link the Power Law caveats. (This also future-proofs: the line
   disappears when the state does.)
 - Backtest table is computed, not asserted; dates/multiples must match the How-Much-Bitcoin preset
   annotations (12.1×/6.4×/2.8×/1.12× family figures — reconcile the 12.0 vs 12.1 rounding at build
@@ -246,6 +246,25 @@ the model, guardrails (§5, still no buy zones, floor labelled historical), tool
   were preserved verbatim). No console errors through toggle → slide → hover → toggle; no new network
   calls (price view reads only the already-loaded PL_DATA + plPrice).
 
+### Phase 3 polish (2026-07-24)
+
+On branch `dp-polish` (off main). Post-ship refinements, no model change.
+
+- **Third view — Horizon.** The segmented toggle is now **Rate | Price | Horizon**. Horizon view is a
+  linear-y chart of only the chosen window (today → today + y, right edge tracks the slider live): the
+  trend segment (amber), the dashed glide path to (today + y, trend) with the "illustrative" tag, the
+  fainter never-reverts path to (today + y, multiple × trend), the current-position dot, and endpoint
+  markers with $ labels. Both endpoints equal the figures used elsewhere (trend endpoint = the Rate
+  tooltip's "Trend price then"; never-reverts endpoint × holdings = the baseline card's never-changes $).
+  Rate and Price views unchanged.
+- **Wording.** "which is evidence, not a law." → "…not a guarantee." in both the floor note (njk) and the
+  never-reverts line (JS), and in this doc's quotes of that copy. The FAQ ("historical rather than
+  guaranteed") and its JSON-LD are untouched; the sources bullet's distinct "not a law of nature" is left
+  as-is (a different, still-correct claim).
+- **Status strip.** Grid columns top-aligned (`align-items: start`) so the three caps share one baseline.
+- **Caption links.** `.dp-table-note a` / `.dp-chart-caption a` were browser-default blue/purple (no rule
+  covered them); now match the house dotted-amber link treatment.
+
 ---
 
 # Appendix — Pilot content (create-once-distribute-everywhere)
@@ -268,7 +287,7 @@ anchors — refresh against the live page on publish day (they move)._
    implied **−71%/yr** over one year. Nov 2021, 2.8×: **−45%**. The arithmetic is symmetric. It says
    harsh things at premiums and generous things at discounts. *(attach: backtest table)*
 5. What it does NOT say: that reversion happens, or when. The discount can persist — you'd earn the
-   trend slope. It can deepen — the floor has held for the whole record, which is evidence, not a law.
+   trend slope. It can deepen — the floor has held for the whole record, which is evidence, not a guarantee.
    All three cases are on the page.
 6. That's the point of building it as an instrument instead of a take: you pick the assumption, the
    math shows its consequence, and every number is reproducible from the model on the page.

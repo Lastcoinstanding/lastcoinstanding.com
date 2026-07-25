@@ -75,7 +75,9 @@ body { background: var(--bg); color: var(--text); }
 @media (prefers-reduced-motion: reduce) {
   .dp-live-dot { animation: none; box-shadow: 0 0 6px rgba(247,147,26,0.42); }
 }
-.dp-status-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem 1.4rem; align-items: end; }
+/* Top-align the three columns so their caps share one baseline (the Multiple
+   column is taller — gap line + longer sub — so end-alignment pushed its cap up). */
+.dp-status-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem 1.4rem; align-items: start; }
 .dp-stat-cap { font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 0.3rem; }
 .dp-stat-num { font-family: var(--font-d); font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 600; line-height: 1; letter-spacing: -.02em; color: #f2eee8; font-variant-numeric: tabular-nums; }
 .dp-stat-central .dp-stat-num { color: var(--amber); font-size: clamp(2rem, 5vw, 2.9rem); }
@@ -198,6 +200,10 @@ body { background: var(--bg); color: var(--text); }
 /* Worked-example line — sits between the table and its methodology note. */
 .dp-table-example { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--text-dim); line-height: 1.6; margin: 0 0 0.6rem; padding: 0.6rem 0.85rem; background: rgba(255,255,255,0.02); border-left: 3px solid rgba(224,148,34,0.4); border-radius: 6px; }
 .dp-table-example a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+/* Caption links (backtest source note, declining-baseline note, chart captions)
+   inherited browser-default blue/purple — no rule covered them. Match the house
+   dotted-amber treatment used by every other dp link. */
+.dp-table-note a, .dp-chart-caption a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 
 /* ══ WHY CAGR FALLS — designed to grow (merge point for the
    "Bitcoin's CAGR head-on" lens per design doc §3.5) ══ */

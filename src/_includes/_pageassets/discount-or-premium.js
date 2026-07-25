@@ -214,7 +214,7 @@
         + 'If the multiple simply stays where it is, you earn the trend’s own slope — about <strong>'
         + signPct0(tr) + '/yr</strong> annualized over this horizon, a rate that itself declines as bitcoin matures (see below). That is the assumption-free case. '
         + 'The multiple can also <em>fall further</em>: the ' + PL_FLOOR.toFixed(2)
-        + '× floor has held for the length of the record, which is evidence, not a law.';
+        + '× floor has held for the length of the record, which is evidence, not a guarantee.';
     }
 
     updateChart();
@@ -449,29 +449,159 @@
     chart.update('none');
   }
 
+  // ---- HORIZON VIEW ----
+  // Just the chosen window (today → today + y) on a LINEAR y-axis, drawn to scale
+  // so the trend / glide / never-reverts gap is visible. Everything re-renders as
+  // the slider moves the right edge.
+  function horizonData() {
+    var y = state.months / 12, d0 = TODAY_DAYS, d1 = TODAY_DAYS + YEAR_D * y, p0 = price();
+    var Td1 = plPrice(d1), nv = multiple() * Td1;
+    var trend = [], n = 48, i;
+    for (i = 0; i <= n; i++) { var d = d0 + (d1 - d0) * i / n; trend.push({ x: d, y: plPrice(d) }); }
+    return {
+      d0: d0, d1: d1, Td1: Td1, nv: nv,
+      trend: trend,
+      glide: [{ x: d0, y: p0 }, { x: d1, y: Td1 }],
+      never: [{ x: d0, y: p0 }, { x: d1, y: nv }],
+      dot: [{ x: d0, y: p0 }],
+      trendEnd: [{ x: d1, y: Td1 }],
+      neverEnd: [{ x: d1, y: nv }]
+    };
+  }
+  // On-canvas annotations: the "illustrative" tag on the glide, plus a $ label at
+  // each endpoint (trend/glide endpoint and the never-reverts endpoint).
+  function horizonAnnoPlugin() {
+    return {
+      id: 'dpHorizonAnno',
+      afterDatasetsDraw: function (c) {
+        var h = horizonData(), xS = c.scales.x, yS = c.scales.y, ctx = c.ctx;
+        var ex = xS.getPixelForValue(h.d1);
+        var tY = yS.getPixelForValue(h.Td1), nY = yS.getPixelForValue(h.nv);
+        if (!isFinite(ex) || !isFinite(tY)) return;
+        ctx.save();
+        ctx.font = '600 11px "Inter", sans-serif';
+        ctx.textAlign = 'right';
+        // Trend / glide endpoint $ (amber)
+        ctx.fillStyle = 'rgba(224,148,34,0.95)';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(moneyFull(h.Td1), ex - 6, Math.max(tY - 4, c.chartArea.top + 12));
+        // Never-reverts endpoint $ (blue) — only when it reads clear of the trend $
+        if (isFinite(nY) && Math.abs(nY - tY) > 14) {
+          ctx.fillStyle = 'rgba(109,179,212,0.95)';
+          ctx.textBaseline = 'top';
+          ctx.fillText(moneyFull(h.nv), ex - 6, Math.min(nY + 4, c.chartArea.bottom - 6));
+        }
+        // "illustrative" on the glide, ~60% along
+        var mx = xS.getPixelForValue(h.d0 + (h.d1 - h.d0) * 0.55);
+        var my = yS.getPixelForValue(price() + (h.Td1 - price()) * 0.55);
+        if (isFinite(mx) && isFinite(my)) {
+          ctx.font = '600 10px "Inter", sans-serif';
+          ctx.fillStyle = 'rgba(224,148,34,0.9)';
+          ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+          ctx.fillText('illustrative', mx + 4, my - 4);
+        }
+        ctx.restore();
+      }
+    };
+  }
+  function buildHorizonChart() {
+    var el = document.getElementById('dpChart');
+    if (!el || typeof Chart === 'undefined') return;
+    var h = horizonData();
+    chart = new Chart(el.getContext('2d'), {
+      type: 'line',
+      data: {
+        datasets: [
+          { label: 'Trend', data: h.trend, borderColor: AMBER, borderWidth: 2, pointRadius: 0, tension: 0, fill: false },
+          { label: 'If it never reverts', data: h.never, borderColor: 'rgba(109,179,212,0.55)', borderWidth: 1.5, borderDash: [4, 4], pointRadius: 0, tension: 0, fill: false },
+          { label: 'Your chosen glide path', data: h.glide, borderColor: AMBER, borderWidth: 2, borderDash: [6, 4], pointRadius: 0, tension: 0, fill: false },
+          { label: 'Bitcoin now', data: h.dot, showLine: false, pointRadius: 5, borderColor: '#0a0908', borderWidth: 1.5, backgroundColor: dotColor(), _noLegend: true },
+          { label: 'Trend endpoint', data: h.trendEnd, showLine: false, pointRadius: 4, borderColor: '#0a0908', borderWidth: 1.2, backgroundColor: AMBER, _noLegend: true },
+          { label: 'Never-reverts endpoint', data: h.neverEnd, showLine: false, pointRadius: 4, borderColor: '#0a0908', borderWidth: 1.2, backgroundColor: BLUE, _noLegend: true }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, parsing: false, animation: { duration: 0 },
+        interaction: { intersect: false, mode: 'nearest' },
+        layout: { padding: { top: 14, right: 10 } },
+        scales: {
+          x: {
+            type: 'linear', min: h.d0, max: h.d1,
+            grid: { color: 'rgba(224,148,34,0.05)' },
+            ticks: { color: MUTED, maxTicksLimit: 6, autoSkip: true, font: { family: 'Inter, sans-serif', size: 11 },
+              callback: function (v) { return dayToDate(v); } }
+          },
+          y: {
+            grid: { color: 'rgba(224,148,34,0.06)' },
+            ticks: { color: MUTED, font: { family: 'Inter, sans-serif', size: 11 }, callback: function (v) { return money(v); } }
+          }
+        },
+        plugins: {
+          legend: { display: true, position: 'top',
+            labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 22, padding: 8,
+              filter: function (item, data) { return !data.datasets[item.datasetIndex]._noLegend; } } },
+          tooltip: {
+            backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.30)', borderWidth: 1,
+            titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10,
+            callbacks: {
+              title: function (it) { return it.length ? dayToDate(it[0].parsed.x) : ''; },
+              label: function (it) { return it.dataset.label + ': ' + moneyFull(it.parsed.y); }
+            }
+          }
+        }
+      },
+      plugins: [horizonAnnoPlugin()]
+    });
+  }
+  function updateHorizonChart() {
+    var h = horizonData();
+    chart.options.scales.x.max = h.d1;
+    chart.data.datasets[0].data = h.trend;
+    chart.data.datasets[1].data = h.never;
+    chart.data.datasets[2].data = h.glide;
+    chart.data.datasets[3].data = h.dot;
+    chart.data.datasets[3].backgroundColor = dotColor();
+    chart.data.datasets[4].data = h.trendEnd;
+    chart.data.datasets[5].data = h.neverEnd;
+    chart.update('none');
+  }
+
   // ---- View dispatch ----
-  function buildChart() { if (view === 'price') buildPriceChart(); else buildRateChart(); }
+  function buildChart() {
+    if (view === 'price') buildPriceChart();
+    else if (view === 'horizon') buildHorizonChart();
+    else buildRateChart();
+  }
   function updateChart() {
     if (!chart) { buildChart(); return; }
-    if (view === 'price') updatePriceChart(); else updateRateChart();
+    if (view === 'price') updatePriceChart();
+    else if (view === 'horizon') updateHorizonChart();
+    else updateRateChart();
   }
+  var VIEW_META = {
+    rate: { cap: 'dpCaptionRate', title: 'Implied CAGR if bitcoin reverts to trend, by horizon', file: 'bitcoin-implied-reversion-cagr.png' },
+    price: { cap: 'dpCaptionPrice', title: 'Bitcoin price vs. the Power Law channel, with the chosen glide path', file: 'bitcoin-price-view-glide-path.png' },
+    horizon: { cap: 'dpCaptionHorizon', title: 'Your chosen window — trend, glide path, and the never-reverts case', file: 'bitcoin-horizon-window-glide-path.png' }
+  };
   function setView(v) {
-    if ((v !== 'rate' && v !== 'price') || v === view) return;
+    if (!VIEW_META[v] || v === view) return;
     view = v;
-    var rb = document.getElementById('dpViewRate'), pb = document.getElementById('dpViewPrice');
-    if (rb) { rb.classList.toggle('is-active', v === 'rate'); rb.setAttribute('aria-pressed', v === 'rate' ? 'true' : 'false'); }
-    if (pb) { pb.classList.toggle('is-active', v === 'price'); pb.setAttribute('aria-pressed', v === 'price' ? 'true' : 'false'); }
-    var capR = document.getElementById('dpCaptionRate'), capP = document.getElementById('dpCaptionPrice');
-    if (capR) capR.hidden = (v !== 'rate');
-    if (capP) capP.hidden = (v !== 'price');
+    var btns = document.querySelectorAll('.dp-view-btn');
+    for (var i = 0; i < btns.length; i++) {
+      var on = btns[i].getAttribute('data-view') === v;
+      btns[i].classList.toggle('is-active', on);
+      btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+    for (var k in VIEW_META) {
+      if (!VIEW_META.hasOwnProperty(k)) continue;
+      var cap = document.getElementById(VIEW_META[k].cap);
+      if (cap) cap.hidden = (k !== v);
+    }
     // Keep the chart-copy export self-labelled to the active view.
     var host = document.querySelector('.dp-chart-block');
     if (host) {
-      host.setAttribute('data-chart-title', v === 'price'
-        ? 'Bitcoin price vs. the Power Law channel, with the chosen glide path'
-        : 'Implied CAGR if bitcoin reverts to trend, by horizon');
-      host.setAttribute('data-chart-filename', v === 'price'
-        ? 'bitcoin-price-view-glide-path.png' : 'bitcoin-implied-reversion-cagr.png');
+      host.setAttribute('data-chart-title', VIEW_META[v].title);
+      host.setAttribute('data-chart-filename', VIEW_META[v].file);
     }
     if (chart) { chart.destroy(); chart = null; }
     buildChart();
