@@ -366,6 +366,74 @@
   }
   function dotColor() { return todayPriceIsLive(liveSource) ? PULSE : MUTED; }
 
+  // ---- Date-anchored tooltip (shared by Price + Horizon views) ----
+  // Rows are computed analytically from the hovered DATE, not read from the
+  // nearest plotted point, so hovering anywhere shows every applicable series at
+  // one date. beforeEvent resolves the pointer x → a day, ahead of the tooltip's
+  // own event handling, so the rows are never a frame stale.
+  var hoverDayPlugin = {
+    id: 'dpHoverDay',
+    beforeEvent: function (chart, args) {
+      var e = args.event;
+      if (e.type === 'mousemove') {
+        var ca = chart.chartArea;
+        chart.$hoverDay = (e.x >= ca.left && e.x <= ca.right) ? chart.scales.x.getValueForPixel(e.x) : null;
+      } else if (e.type === 'mouseout') { chart.$hoverDay = null; }
+    }
+  };
+  function dateTooltip(getRows) {
+    return {
+      enabled: true,
+      backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.30)', borderWidth: 1,
+      titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10,
+      filter: function (item, i) { return i === 0; }, // one row-set, computed below
+      callbacks: {
+        title: function (items) { var c = items[0].chart, d = (c.$hoverDay != null) ? c.$hoverDay : items[0].parsed.x; return dayToDate(d); },
+        label: function (ctx) { var c = ctx.chart, d = (c.$hoverDay != null) ? c.$hoverDay : ctx.parsed.x; return getRows(d); }
+      }
+    };
+  }
+  // Nearest monthly PL_DATA sample to day d (the "Price (history)" row).
+  function nearestSample(d) {
+    var best = PL_DATA[0], bd = Math.abs(PL_DATA[0][0] - d);
+    for (var i = 1; i < PL_DATA.length; i++) { var dd = Math.abs(PL_DATA[i][0] - d); if (dd < bd) { bd = dd; best = PL_DATA[i]; } }
+    return best[1];
+  }
+  // Glide value at day d — straight in LOG space between (today, price) and
+  // (today + y, trend at horizon), exactly how the glide is drawn on the log axis.
+  function glideAt(d) {
+    var d0 = TODAY_DAYS, d1 = TODAY_DAYS + YEAR_D * state.months / 12, p0 = price(), p1 = plPrice(d1);
+    if (d <= d0) return p0;
+    if (d >= d1) return p1;
+    var f = (d - d0) / (d1 - d0);
+    return Math.exp(Math.log(p0) + (Math.log(p1) - Math.log(p0)) * f);
+  }
+  // Fixed-order Price-view rows; rows that don't apply at d are skipped.
+  function priceRows(d) {
+    var rows = [], lastD = PL_DATA[PL_DATA.length - 1][0], t = plPrice(d);
+    if (d <= lastD) rows.push('Price (history): ' + moneyFull(nearestSample(d)));
+    rows.push('Trend: ' + moneyFull(t));
+    rows.push('0.42× floor: ' + moneyFull(PL_FLOOR * t));
+    rows.push('3.0× upper band: ' + moneyFull(PL_CEIL * t));
+    var d1 = TODAY_DAYS + YEAR_D * state.months / 12;
+    if (d >= TODAY_DAYS && d <= d1) {
+      rows.push('Your glide path: ' + moneyFull(glideAt(d)));
+      rows.push('If it never reverts: ' + moneyFull(multiple() * t));
+      if (holdings > 0) rows.push('Your stack at trend: ' + moneyFull(holdings * t));
+    }
+    return rows;
+  }
+  // Horizon view spans only the future window, so fewer rows (glide, never, trend, stack).
+  function horizonRows(d) {
+    var t = plPrice(d), rows = [
+      'Your glide path: ' + moneyFull(glideAt(d)),
+      'If it never reverts: ' + moneyFull(multiple() * t),
+      'Trend: ' + moneyFull(t)
+    ];
+    if (holdings > 0) rows.push('Your stack at trend: ' + moneyFull(holdings * t));
+    return rows;
+  }
+
   // Small on-canvas "illustrative" tag at the glide endpoint (honesty, not decoration).
   function priceAnnoPlugin() {
     return {
@@ -407,7 +475,7 @@
       },
       options: {
         responsive: true, maintainAspectRatio: false, parsing: false, animation: { duration: 0 },
-        interaction: { intersect: false, mode: 'nearest' },
+        interaction: { intersect: false, mode: 'nearest', axis: 'x' },
         layout: { padding: { top: 14, right: 10 } },
         scales: {
           x: {
@@ -427,17 +495,10 @@
           legend: { display: true, position: 'top',
             labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 22, padding: 8,
               filter: function (item, data) { return !data.datasets[item.datasetIndex]._noLegend; } } },
-          tooltip: {
-            backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.30)', borderWidth: 1,
-            titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10,
-            callbacks: {
-              title: function (it) { return it.length ? dayToDate(it[0].parsed.x) : ''; },
-              label: function (it) { return it.dataset.label + ': ' + moneyFull(it.parsed.y); }
-            }
-          }
+          tooltip: dateTooltip(priceRows)
         }
       },
-      plugins: [priceAnnoPlugin()]
+      plugins: [priceAnnoPlugin(), hoverDayPlugin]
     });
   }
   function updatePriceChart() {
@@ -522,7 +583,7 @@
       },
       options: {
         responsive: true, maintainAspectRatio: false, parsing: false, animation: { duration: 0 },
-        interaction: { intersect: false, mode: 'nearest' },
+        interaction: { intersect: false, mode: 'nearest', axis: 'x' },
         layout: { padding: { top: 14, right: 10 } },
         scales: {
           x: {
@@ -540,17 +601,10 @@
           legend: { display: true, position: 'top',
             labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line', boxWidth: 22, padding: 8,
               filter: function (item, data) { return !data.datasets[item.datasetIndex]._noLegend; } } },
-          tooltip: {
-            backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.30)', borderWidth: 1,
-            titleColor: '#ece4d6', bodyColor: '#ccc6b8', padding: 10,
-            callbacks: {
-              title: function (it) { return it.length ? dayToDate(it[0].parsed.x) : ''; },
-              label: function (it) { return it.dataset.label + ': ' + moneyFull(it.parsed.y); }
-            }
-          }
+          tooltip: dateTooltip(horizonRows)
         }
       },
-      plugins: [horizonAnnoPlugin()]
+      plugins: [horizonAnnoPlugin(), hoverDayPlugin]
     });
   }
   function updateHorizonChart() {

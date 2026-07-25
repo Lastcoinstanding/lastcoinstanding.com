@@ -264,6 +264,15 @@ On branch `dp-polish` (off main). Post-ship refinements, no model change.
 - **Status strip.** Grid columns top-aligned (`align-items: start`) so the three caps share one baseline.
 - **Caption links.** `.dp-table-note a` / `.dp-chart-caption a` were browser-default blue/purple (no rule
   covered them); now match the house dotted-amber link treatment.
+- **Date-anchored tooltip (Price + Horizon).** The tooltip no longer shows a single nearest series. A
+  `beforeEvent` plugin resolves the pointer x → a day; the rows are then computed analytically at that
+  date (interaction `mode:'nearest', axis:'x'` so hovering anywhere anchors a date). Price rows, fixed
+  order, skipping any that don't apply at the date: Price (history, nearest monthly sample, only within
+  the record), Trend, 0.42× floor, 3.0× upper band, then in the future window Your glide path
+  (log-linear between its endpoints) and If it never reverts, plus Your stack at trend when holdings are
+  set. Horizon uses the shorter set (glide, never-reverts, trend, stack). QA: values at today match the
+  status strip (price via the glide start, trend via `plPrice`); at the horizon endpoint the stack row
+  matches the readout card's at-trend $.
 
 ---
 
