@@ -2148,7 +2148,7 @@
       + '<div class="rt-cmp-metric"><dt>Years stack lasts</dt>' + yDd + '</div>'
       + '<div class="rt-cmp-metric"><dt>Stack at retirement (today’s $)</dt><dd>' + formatCurrencyShort(out.stackReal) + '</dd></div>'
       + '<div class="rt-cmp-metric rt-cmp-metric-sub"><dt>Stack at retirement (' + out.retYear + ' dollars)</dt><dd>' + formatCurrencyShort(out.stackNominal) + '</dd></div>'
-      + '<div class="rt-cmp-metric"><dt>Sustainable income</dt><dd>' + formatCurrencyShort(out.income) + '</dd></div>'
+      + '<div class="rt-cmp-metric"><dt>Target income</dt><dd>' + formatCurrencyShort(out.income) + '</dd></div>'
       + '</dl>';
   }
 
