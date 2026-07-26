@@ -1,0 +1,32 @@
+{#
+  Page FAQ — layout-level "Common questions" block, single-sourced from the
+  `faq` front-matter array of q/a pairs. Rendered once from base.njk (body),
+  after {{ content }} and BEFORE the related strip. Renders nothing when `faq`
+  is absent (exactly like the related strip and feedback widget — the third
+  member of that layout-level family). See STYLE_GUIDE §6.40.
+
+    faq:
+      - q: "How much bitcoin do I need to retire?"
+        a: "There is no single number …"     # may contain a safe inline <a>
+
+  The matching FAQPage JSON-LD is emitted from components/faq-schema.njk in
+  <head> from the SAME array — edit the front matter only; both follow, so the
+  schema can never drift from the visible text (a Google-policy correctness
+  issue, not just tidiness).
+
+  NOT collapsible: every answer is in the DOM on load (Google policy forbids
+  schema describing click-injected content; also the accessible default). A
+  plain h2 + h3/p stack, per the rules doc.
+
+  Answer markup: `| safe` so a curated inline link renders; the JSON-LD copy
+  strips tags to plain text so the two still match as strings.
+#}
+{%- if faq and faq.length > 0 -%}
+<section class="page-faq" id="faq" aria-label="Common questions">
+  <h2 class="page-faq-title">Common questions</h2>
+{%- for item in faq %}
+  <h3 class="faq-q">{{ item.q | safe }}</h3>
+  <p class="faq-a">{{ item.a | safe }}</p>
+{%- endfor %}
+</section>
+{%- endif -%}

@@ -1,0 +1,33 @@
+{#
+  FAQPage JSON-LD — layout-level, single-sourced from the `faq` front-matter
+  array (the SAME array components/page-faq.njk renders visibly). Emitted once
+  from base.njk's <head>. Renders nothing when `faq` is absent.
+
+  Single-source rationale: Google policy requires the schema to match the
+  visible text exactly; the old pattern kept two hand-synced copies (visible
+  block + JSON-LD in the -head.html file) with a silent drift footgun. Here both
+  representations read the one `faq` array, so they cannot drift.
+
+  Escaping: `| dump` is JSON.stringify — it produces valid JSON strings for the
+  em-dashes, curly apostrophes and quotes the answers contain (a hand-rolled
+  concat would not). `faqStripTags` reduces an answer that carries an inline
+  link to the plain text that matches the visible block's textContent (schema
+  answer text is safest as plain text). See STYLE_GUIDE §6.40.
+#}
+{%- if faq and faq.length > 0 -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+{%- for item in faq %}
+    {
+      "@type": "Question",
+      "name": {{ item.q | faqStripTags | dump | safe }},
+      "acceptedAnswer": { "@type": "Answer", "text": {{ item.a | faqStripTags | dump | safe }} }
+    }{% if not loop.last %},{% endif %}
+{%- endfor %}
+  ]
+}
+</script>
+{%- endif -%}

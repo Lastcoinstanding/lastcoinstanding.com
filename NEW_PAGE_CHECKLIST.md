@@ -496,6 +496,18 @@ Additionally for content-type pages (essays, data-analysis pages):
   than it should have been. Reference: `the-fixed-pie-head.html`,
   `synthesis-head.html`, `index-head.html` — all have working
   JSON-LD to copy from.
+- **FAQ + FAQPage schema (tool/decision pages)** — add a short, honest
+  FAQ (3–5 questions matching real search queries) via a `faq:` array in
+  page front matter. **Automatic — like the related strip (§4):** `base.njk`
+  renders the visible "Common questions" block *and* the matching `FAQPage`
+  JSON-LD from that one array (STYLE_GUIDE §6.40). Do NOT hand-write the
+  block or the schema, and do NOT add FAQPage to the `-head.html` file — the
+  single-source component makes the visible/schema pair match by construction.
+  **⚠️ Quote every `q` and `a` value.** FAQ prose carries colons, apostrophes,
+  em-dashes and quotes; a colon in an *unquoted* YAML scalar makes the front
+  matter invalid, which **aborts the whole Eleventy build** — and on `main`
+  Cloudflare then silently keeps serving the last good deploy (no error page,
+  the site just stops updating). Skip purely conceptual essays.
 
 After creating the head file, two more places to update:
 

@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 {{ head_extras | safe }}
+{# FAQPage JSON-LD — layout-level, single-sourced from the `faq` front matter
+   (same array the visible page-faq.njk block renders in the body). Emitted here
+   in <head> from base.njk, which sees front matter unconditionally; no per-page
+   -head.html edit needed. Renders nothing without `faq`. See STYLE_GUIDE §6.40. #}
+{% include 'components/faq-schema.njk' %}
 <style id="canonical-body-css">
 /* ─── Site-wide horizontal anchor ─── */
 /* Locks the document horizontally so no page can be panned sideways on
@@ -227,6 +232,17 @@ h1, h2, h3 {
 .related-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #F7931A; opacity: 0; transition: opacity 0.25s; }
 .related-card:hover::before { opacity: 1; }
 
+/* ─── Page FAQ (Common questions) — layout-level, see STYLE_GUIDE §6.40 ─── */
+/* Site-wide so every FAQ-bearing page reads identically. Hardcoded colors like
+   the other layout-level blocks (renders before any page :root). */
+.page-faq { max-width: 880px; margin: 3.5rem auto 0; padding: 0 1.25rem; }
+.page-faq-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.7rem; font-weight: 500; letter-spacing: -0.01em; color: #f2eee8; margin: 0 0 0.4rem; }
+.page-faq .faq-q { font-family: 'Inter', sans-serif; font-size: 1.02rem; font-weight: 600; color: rgba(255,255,255,0.86); margin: 1.6rem 0 0.4rem; line-height: 1.4; }
+.page-faq .faq-a { font-family: 'Inter', sans-serif; font-size: 0.93rem; line-height: 1.68; color: rgba(255,255,255,0.62); margin: 0; }
+.page-faq .faq-a a { color: #F7931A; text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+.page-faq .faq-a em { color: #F7931A; font-style: italic; }
+@media (max-width: 480px) { .page-faq { margin-top: 2.5rem; padding: 0 1rem; } }
+
 /* ─── Layout-level "Share this page" — see STYLE_GUIDE §6.26 ─── */
 /* Auto-injected by base.njk between page content and the footer on
    every page (unless frontmatter sets share_in_layout: false). The URL
@@ -432,6 +448,12 @@ h1, h2, h3 {
 {% include 'components/channel-ribbon.njk' %}
 
 {{ content | safe }}
+
+{# Page FAQ — layout-level "Common questions" block, self-guarding on `faq` front
+   matter. Placed after content and BEFORE the related strip (order: content →
+   FAQ → related → feedback). Its FAQPage JSON-LD is emitted in <head> above from
+   the same array. Third member of the layout-level family. STYLE_GUIDE §6.40. #}
+{% include 'components/page-faq.njk' %}
 
 {# Related strip — layout-level (centralized 2026-06-12; was per-page, footgun fired
    twice: how-much-bitcoin pre-launch, bitcoin-vs-rental-property in production).

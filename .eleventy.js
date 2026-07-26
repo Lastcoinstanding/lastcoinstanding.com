@@ -104,6 +104,14 @@ module.exports = function (eleventyConfig) {
     });
   });
 
+  // faqStripTags — reduce an FAQ answer to plain text for the FAQPage JSON-LD
+  // (components/faq-schema.njk). Answers may carry a curated inline <a> in the
+  // visible block; the schema answer text is safest as plain text, and this
+  // makes the schema string match the visible block's textContent (which the
+  // browser also renders tag-free). Tags only — the surrounding text/whitespace
+  // is preserved so the two strings stay identical.
+  eleventyConfig.addFilter('faqStripTags', (s) => String(s == null ? '' : s).replace(/<[^>]*>/g, ''));
+
   return {
     dir: {
       input: "src",

@@ -2041,6 +2041,27 @@ muted white on a near-transparent neutral. Red is reserved for loss/danger
 elsewhere on the site and must not leak into a freshness signal. **Never
 hand-place** a badge — see the standing rule in NEW_PAGE_CHECKLIST.
 
+### 6.40 Page FAQ + FAQPage schema (`page-faq`, layout-level)
+
+Added 2026-07-26. The **third layout-level, front-matter-driven component**, alongside the related strip (§6.10) and the feedback widget (§6.34): declared once in page front matter, rendered by `base.njk` on every page, self-guarding on absence.
+
+**Single-source rationale (the reason it exists).** A page FAQ has *two* representations that Google policy requires to match exactly — the visible "Common questions" block and the `FAQPage` JSON-LD (schema may not describe content that isn't on the page). The old pattern hand-wrote both, in two files (page template + `_pageassets/<slug>-head.html`), so an edit to one and not the other silently shipped non-compliant schema with no error anywhere. This component renders **both from one `faq` array**, so they cannot drift.
+
+```yaml
+faq:
+  - q: "How much bitcoin do I need to retire?"
+    a: "There is no single number — it depends on your target income…"
+  - q: "Lump sum or DCA: which is better for bitcoin?"      # colon in the text → MUST be quoted
+    a: "Historically, deploying earlier has beaten waiting more often than not…"
+```
+
+- **⚠️ REQUIRED: quote every `q` and `a` value** (double quotes, as above). FAQ prose is full of **colons, apostrophes, em-dashes and quotes**, and a colon inside an *unquoted* YAML scalar (`q: Lump sum or DCA: which…`) makes the front matter invalid. **Failure mode is silent and severe:** the whole Eleventy build aborts, and on `main` **Cloudflare keeps serving the last good deploy** — no error page, no visible signal, the site just stops updating. The colon-bearing question in the example is there to be copied correctly. (If a value itself contains a double quote, escape it `\"` or wrap in single quotes.)
+- **Link-handling rule (not incidental — this is the contract):** an answer **may** carry a curated inline `<a href>` (or `<em>`) in the **visible** block, rendered via `| safe`. The **JSON-LD copy is plain text** — `| faqStripTags` (custom filter, `.eleventy.js`) removes the tags, leaving exactly the text the browser also renders. So the schema string equals the visible `textContent`, and the Google "visible text must match schema" policy holds **by construction even when an answer contains a link.** Gate 5 verifies this by extracting both and comparing strings. Keep answer markup to a safe inline `<a>`/`<em>` only — no block elements.
+- **Visible block** — `components/page-faq.njk`, a plain `h2` + `h3`/`p` stack (`.page-faq` / `.faq-q` / `.faq-a`, CSS in `base.njk`). Included in `base.njk` **after content, before the related strip** (order: content → FAQ → related → feedback). **Not collapsible** — every answer is in the DOM on load (Google policy forbids schema describing click-injected content; also the accessible default).
+- **JSON-LD** — `components/faq-schema.njk`, emitted from the **same** `faq` array into `base.njk`'s `<head>` (a second `application/ld+json` block; Google parses it anywhere). Answers use `| dump` (JSON.stringify — correct escaping for the em-dashes, curly apostrophes and quotes; a hand-rolled concat produces invalid JSON) plus `| faqStripTags` per the link rule above.
+- **Feasibility note (why `<head>` from `base.njk`, not the per-page head files):** the per-page `-head.html` files ARE Nunjucks (`htmlTemplateEngine: njk`) and inherit front matter through the `eleventyComputed` `{% include %}`, so they *can* see `faq` — but routing through them would mean editing ~40 head files (or one include per page), which is the per-page-include footgun this change removes. `base.njk`'s own `<head>` sees front matter unconditionally, so the JSON-LD is emitted there once. Verified on preview: the schema renders in `<head>` from `faq`, valid JSON, and matches the visible text programmatically.
+- **When to use / when to skip:** flagship *tool/decision* pages that answer real search queries (3–5 questions, honest, POSITIONING §1.5 — state limits, no manufactured certainty). **Skip** purely conceptual essays. Never more than 5.
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.
