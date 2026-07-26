@@ -49,51 +49,5 @@
   }
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "How much bitcoin do I need to retire?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "There is no single number — it depends on your target income, your retirement year, and what you assume about bitcoin’s price path. This calculator lets you set all three and shows whether a given stack sustains your income year by year, including the scenarios where it depletes. The honest answer is a range you explore, not a figure anyone can hand you."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Can you really retire on bitcoin alone?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Under some assumptions yes, under others no — and the difference is visible in the projection. A stack that reaches escape velocity under one price model can deplete under a harsher one, and a bear market early in retirement changes the picture more than one that comes late. The companion Stress Test models exactly that risk."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How does the calculator project bitcoin’s future price?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "It uses the Power Law trend — a regression of bitcoin’s full price history against time, with coefficients credited to Porkopolis Economics — as a central-tendency assumption, not a forecast. You choose the price basis and inflation assumptions yourself, and every projected number is reproducible from the adjacent ones. The model’s limits are stated on the page, not hidden."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What withdrawal strategies does it model?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Three: selling bitcoin as needed, borrowing against the stack, and disciplined rebalancing. Each has a different shape of risk — tax events, liquidation exposure, sequence risk — and each links to a dedicated page that treats it in depth."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Is this financial advice?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "No. It is an educational tool: you choose the assumptions, the math runs live, and you can export the full projection to CSV and check every number in your own spreadsheet. What you decide is yours; what we owe you is arithmetic you can verify."
-      }
-    }
-  ]
-}
-</script>
+{# FAQPage JSON-LD removed 2026-07-26 — now emitted once from base.njk's <head>
+   (components/faq-schema.njk) from the page's `faq:` front matter. STYLE_GUIDE §6.40. #}

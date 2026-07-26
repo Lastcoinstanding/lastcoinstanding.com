@@ -270,13 +270,8 @@ body { background: var(--bg); color: var(--text); }
 .dp-sources strong { color: var(--text); font-weight: 600; }
 .dp-sources a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 
-/* ══ COMMON QUESTIONS (#faq) ══ */
-#faq { max-width: 880px; margin: 3.5rem auto 0; }
-#faq h2 { font-family: var(--font-d); font-size: 1.6rem; font-weight: 500; letter-spacing: -.01em; color: #f2eee8; margin: 0 0 0.4rem; }
-#faq .faq-q { font-family: 'Inter', sans-serif; font-size: 1.02rem; font-weight: 600; color: var(--text); margin: 1.6rem 0 0.4rem; line-height: 1.4; }
-#faq .faq-a { font-family: 'Inter', sans-serif; font-size: 0.93rem; line-height: 1.68; color: var(--text-dim); margin: 0; }
-#faq .faq-a em { color: var(--amber); font-style: italic; }
-#faq .faq-a a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+/* ══ COMMON QUESTIONS — now the layout-level page-faq component; styling lives
+   site-wide in base.njk (STYLE_GUIDE §6.40). ══ */
 
 /* ══ RESPONSIVE — the interactive must stay usable at 375px ══ */
 @media (max-width: 760px) {

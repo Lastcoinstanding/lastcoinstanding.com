@@ -11,6 +11,15 @@ related:
     desc: "The entry lens to this page&rsquo;s return lens. Wait-or-Deploy asks whether to buy from a given channel position; this page asks what returning to trend from that position would be worth. Same channel, two different questions."
   - slug: the-doubling-ladder
     desc: "The same oscillation, read peak-to-peak. The Doubling Ladder maps the trend&rsquo;s own steps and the deviation wave around it, where this page reads the single current deviation."
+faq:
+  - q: "Is bitcoin at a discount or a premium right now?"
+    a: "The page computes it live: bitcoin’s price divided by its long-run Power Law trend. Below 1.0× is a discount to trend, above is a premium — and the answer changes over time, which is why this page computes rather than asserts it."
+  - q: "What is mean reversion in bitcoin terms?"
+    a: "Bitcoin’s price has oscillated around a remarkably steady long-run trend for its entire history — running far above it in manias and far below it in bear markets. Mean reversion is the tendency to return toward that trend; this page shows what a return would imply mathematically, at whatever speed you assume. It is a historical pattern, not a guarantee."
+  - q: "What CAGR does reverting to trend imply?"
+    a: "That depends on where price sits and how fast it reverts — which is exactly what the slider explores. From a deep discount, reversion implies returns well above the trend’s own growth rate; from a premium, it implies returns below it, sometimes sharply negative. The same arithmetic, both directions."
+  - q: "Is a big discount a buy signal?"
+    a: "No — and this page refuses to treat it as one. A discount can persist or deepen, the floor is historical rather than guaranteed, and reversion timing is unknowable. What the page offers is honest arithmetic about the possibilities, including the one where nothing reverts at all."
 eleventyComputed:
   head_extras: "{% include '_pageassets/discount-or-premium-head.html' %}"
   page_styles: "{% include '_pageassets/discount-or-premium.css' %}"
@@ -180,18 +189,9 @@ eleventyComputed:
     <p class="dp-table-note" style="margin-top:0.9rem;">Annualised growth of the trend line itself across successive four-year windows, computed live. This is the rate you earn if the multiple never changes &mdash; and it is the reason a single &ldquo;bitcoin&rsquo;s CAGR&rdquo; figure is always incomplete without a date attached. For the trend structure behind it, see <a href="/the-doubling-ladder">The Doubling Ladder</a>.</p>
   </section>
 
-  <!-- ═══ COMMON QUESTIONS — FAQPage schema lives in the head file; edits here must be mirrored there ═══ -->
-  <section id="faq" aria-label="Common questions">
-    <h2>Common questions</h2>
-    <h3 class="faq-q">Is bitcoin at a discount or a premium right now?</h3>
-    <p class="faq-a">The page computes it live: bitcoin&rsquo;s price divided by its long-run Power Law trend. Below 1.0&times; is a discount to trend, above is a premium &mdash; and the answer changes over time, which is why this page computes rather than asserts it.</p>
-    <h3 class="faq-q">What is mean reversion in bitcoin terms?</h3>
-    <p class="faq-a">Bitcoin&rsquo;s price has oscillated around a remarkably steady long-run trend for its entire history &mdash; running far above it in manias and far below it in bear markets. Mean reversion is the tendency to return toward that trend; this page shows what a return would imply mathematically, at whatever speed you assume. It is a historical pattern, not a guarantee.</p>
-    <h3 class="faq-q">What CAGR does reverting to trend imply?</h3>
-    <p class="faq-a">That depends on where price sits and how fast it reverts &mdash; which is exactly what the slider explores. From a deep discount, reversion implies returns well above the trend&rsquo;s own growth rate; from a premium, it implies returns below it, sometimes sharply negative. The same arithmetic, both directions.</p>
-    <h3 class="faq-q">Is a big discount a buy signal?</h3>
-    <p class="faq-a">No &mdash; and this page refuses to treat it as one. A discount can persist or deepen, the floor is historical rather than guaranteed, and reversion timing is unknowable. What the page offers is honest arithmetic about the possibilities, including the one where nothing reverts at all.</p>
-  </section>
+  {# Common questions — now the layout-level page-faq component, driven by the
+     `faq:` front matter above (visible block + FAQPage JSON-LD from one source,
+     STYLE_GUIDE §6.40). #}
 
   <!-- ════════ SOURCES & DISCLOSURES ════════ -->
   <div class="dp-sources">

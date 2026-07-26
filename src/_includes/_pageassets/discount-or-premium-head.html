@@ -45,46 +45,8 @@
   }
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Is bitcoin at a discount or a premium right now?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The page computes it live: bitcoin's price divided by its long-run Power Law trend. Below 1.0× is a discount to trend, above is a premium — and the answer changes over time, which is why this page computes rather than asserts it."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What is mean reversion in bitcoin terms?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Bitcoin's price has oscillated around a remarkably steady long-run trend for its entire history — running far above it in manias and far below it in bear markets. Mean reversion is the tendency to return toward that trend; this page shows what a return would imply mathematically, at whatever speed you assume. It is a historical pattern, not a guarantee."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What CAGR does reverting to trend imply?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "That depends on where price sits and how fast it reverts — which is exactly what the slider explores. From a deep discount, reversion implies returns well above the trend's own growth rate; from a premium, it implies returns below it, sometimes sharply negative. The same arithmetic, both directions."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Is a big discount a buy signal?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "No — and this page refuses to treat it as one. A discount can persist or deepen, the floor is historical rather than guaranteed, and reversion timing is unknowable. What the page offers is honest arithmetic about the possibilities, including the one where nothing reverts at all."
-      }
-    }
-  ]
-}
-</script>
+{# FAQPage JSON-LD removed 2026-07-26 — now emitted once from base.njk's <head>
+   (components/faq-schema.njk) from the page's `faq:` front matter. STYLE_GUIDE §6.40. #}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Source+Serif+4:ital,wght@1,400&display=swap" rel="stylesheet">
