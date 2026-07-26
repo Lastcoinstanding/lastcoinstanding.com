@@ -558,6 +558,55 @@ Before announcing the page or sharing the URL externally:
   load.
 - **Feedback widget check** — automatic for any page with `slug` (layout-level, base.njk); verify it renders on the deployed page below the related strip (eyebrow "Feedback or questions?"). Hub/utility pages opt out with `feedback: false`. Do NOT add a per-page include. (SITE_GUIDE §27)
 
+### Verifying a just-pushed change on Cloudflare Pages
+
+- **Don't trust the branch alias for freshness.** The branch alias
+  `<branch>.lastcoinstanding-com.pages.dev` **lags and per-path
+  edge-caches**, and a **force-push may not trigger a rebuild at all** (a
+  normal push does, but even then the alias updates minutes later). Do NOT
+  gate a just-pushed change on whether the alias returns 404/200. Reliable
+  checks instead: the **per-deployment `<hash>.<project>.pages.dev` URL**
+  (never edge-stale), and — authoritative for "did it land / is the old
+  markup gone" — the **source tree** itself
+  (`git ls-tree -r origin/<branch>`, `git show origin/<branch>:<path>`).
+  Prefer normal commits over force-push when you need the alias to reflect
+  the push.
+- **An all-pages 404 on a fresh branch preview is usually one bad file.**
+  A single template/data error — a wrong `layout:` (must be `base.njk`,
+  not `layouts/base.njk`), an unquoted-colon YAML value — **aborts the
+  entire Eleventy build**. On `main`, Cloudflare then silently keeps
+  serving the last good deploy (no error page; the site just stops
+  updating). Suspect one file, not the platform. (Memory:
+  `eleventy-cf-build-preview-gotchas`.)
+
+### Byte-identical migration check (capture → navigate → compare)
+
+When you move already-indexed on-page text to a new mechanism (e.g. lifting
+a hand-rolled FAQ into the §10 `faq:` component), the migration must not
+change a single rendered character — that byte-identity is the only thing
+that lets you tell a *migration bug* from an *intended edit*. Verify it,
+don't eyeball it:
+
+- A cross-origin `fetch()` between the preview and production is blocked,
+  so you cannot diff the two in one call. Instead **capture, navigate,
+  compare**: open the **branch preview**, extract the text into arrays
+  (`[...document.querySelectorAll('.page-faq .faq-q')].map(e=>e.textContent)`
+  and the matching `.faq-a` answers); then open **production**
+  `lastcoinstanding.com/<slug>`, extract the *old* markup's equivalent text
+  (structure may differ — e.g. a question that shipped inside `<strong>`);
+  assert `JSON.stringify(preview) === JSON.stringify(prod)` by embedding the
+  first array as a literal in the second page's snippet.
+- In the same pass, confirm the schema is single-sourced and correct:
+  `JSON.parse` every `application/ld+json` block (don't eyeball validity),
+  assert the parsed `FAQPage` `mainEntity[].name` / `.acceptedAnswer.text`
+  equal the visible `.faq-q` / `.faq-a` arrays, and count blocks with
+  `@type === 'FAQPage'` — it must be **exactly 1**. Two means an orphan
+  schema was left behind in the `-head.html` file (the duplicate-FAQ bug
+  that surfaced this whole migration).
+- **Keep migrations and content edits in separate commits.** A mixed commit
+  destroys the ability to run this check — you can no longer tell whether a
+  text difference is a bug or a deliberate reword.
+
 ---
 
 ## Worked example — BvSM (May 2026)
