@@ -1903,8 +1903,8 @@ a.powerlaw-link:hover {
   background: var(--amber-soft);
   color: var(--ink-bright);
 }
-.rt-cmp-chip .rt-cmp-swatch { display: none; }
-.rt-cmp-chip[aria-pressed="true"] .rt-cmp-swatch { display: inline-block; }
+.rt-cmp-chip .rt-cmp-dot { display: none; }
+.rt-cmp-chip[aria-pressed="true"] .rt-cmp-dot { display: inline-block; }
 /* Unavailable chip — its rule would fall outside the slider bounds. Dimmed,
    non-interactive (aria-disabled, still focusable so touch/keyboard users can
    surface the reason), and never adopts the active amber treatment. */
@@ -1951,8 +1951,7 @@ a.powerlaw-link:hover {
   padding-bottom: 0.5rem;
   border-bottom: 1px dashed var(--border-faint);
 }
-.rt-cmp-swatch { flex: 0 0 auto; width: 22px; height: 10px; }
-.rt-cmp-swatch svg { display: block; }
+.rt-cmp-dot { flex: 0 0 auto; width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 .rt-cmp-col-title {
   font-size: 0.76rem;
   font-weight: 600;
@@ -1982,6 +1981,12 @@ a.powerlaw-link:hover {
   font-style: italic;
   font-size: 1rem;
 }
+/* Nominal (future-dollar) sub-row — tucked under the today's-$ row it belongs
+   to, de-emphasized: it reconciles with the readout above but is never compared
+   across columns. */
+.rt-cmp-metric-sub { margin-top: -0.35rem; }
+.rt-cmp-metric-sub dt { font-size: 0.64rem; color: var(--ink-faint); }
+.rt-cmp-metric-sub dd { font-size: 0.92rem; font-weight: 500; color: var(--ink-dim); }
 
 /* Delta row — top-two signed differences vs base. Pos/neg use the site's
    standard change colors ONLY; the escape-velocity flip uses amber italic

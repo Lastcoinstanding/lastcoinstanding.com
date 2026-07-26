@@ -1211,15 +1211,13 @@
       }
     ];
 
-    // ─── Compare overlays — one thin drawdown line per active variant.
-    //     cmpComputeAll reuses this render's base drawdown proj (`stack`) so
-    //     the base row costs no extra engine run, and stores CMP_LAST for the
-    //     compare columns rendered below. Overlays are appended AFTER the six
-    //     base datasets so their indices (6, 7) fall outside the HTML legend's
-    //     0–5 toggle map and always render when present; they still feed the
-    //     y-axis bounds and visibility loops below.
+    // ─── Compare module recompute. Reuses this render's base drawdown proj
+    //     (`stack`) so the base row costs no extra engine run, and stores
+    //     CMP_LAST for the compare columns rendered below. The chart keeps its
+    //     six datasets — variant overlays were removed (rev2 item 1): the panel
+    //     sits well below the chart, so at tap time the payoff landed off-screen,
+    //     and on a log axis nearby variants overplotted the base curve.
     cmpComputeAll(stack);
-    Array.prototype.push.apply(datasets, cmpOverlayDatasets());
 
     // Apply user-selected legend visibility to the freshly rebuilt datasets.
     // Slider changes call renderChart() which rebuilds this array from scratch,
@@ -1923,11 +1921,16 @@
      lockstep on one basis.
   ═══════════════════════════════════════════════════════════════════ */
 
-  // Slot-based overlay colors — assigned by ORDER ADDED, never by valence,
-  // so no variant is ever styled as a "winner". Mirrored in the CSS swatches.
+  // Slot-based column colors — assigned by ORDER ADDED, never by valence, so no
+  // variant is ever styled as a "winner". Shown as a plain dot per column (and
+  // per active chip) to distinguish columns from one another. (rev2 item 1
+  // removed the chart overlays, so these no longer key to any chart line.)
   var CMP_COLORS = ['#f0c987', '#8fb0a0'];   // slot 0 warm gold · slot 1 cool sage
-  var CMP_DASH   = [[6, 4], [3, 3]];         // distinct dash per slot
   var CMP_MAX = 2;
+
+  // Round to the income slider's $5,000 step, so a proportional income variant
+  // stays exactly reproducible by dragging the base slider (exact-equality gate).
+  function cmpRound5k(v) { return Math.round(v / 5000) * 5000; }
 
   // Availability guards. A variant is offered only when its rule lands inside
   // the slider bounds it would have to be reproduced from (SLIDER_BY_KEY) and
@@ -1940,12 +1943,8 @@
     if (y > b.max) return { ok: false, reason: 'Not available — retirement is already at the ' + b.max + ' maximum.' };
     return { ok: true };
   }
-  function cmpIncomeAvail(base, delta) {
-    var b = SLIDER_BY_KEY.targetIncomeUSD, v = base.targetIncomeUSD + delta;
-    if (v < b.min) return { ok: false, reason: 'Not available — your target is already at the $' + Math.round(b.min / 1000) + 'K minimum.' };
-    if (v > b.max) return { ok: false, reason: 'Not available — your target is already at the $' + Math.round(b.max / 1e6) + 'M maximum.' };
-    return { ok: true };
-  }
+  // Always-available guard for rules that cannot falsify their own label.
+  function cmpAlwaysAvail() { return { ok: true }; }
   // The 4% rule is an ABSOLUTE rule, not a delta: if 4% of the projected stack
   // is $12K then $12K is the truthful answer, and the $20K income-slider floor
   // is a UI constraint, not a modelling one. So — unlike the retire/income delta
@@ -1966,25 +1965,35 @@
     return { ok: true };
   }
 
-  // Variant registry. Given the live base scenario, build() returns a clone
-  // with ONE lever changed (income OR retirement year — never both). `fourPct`
-  // flags the one column whose income is rate-derived (4% of its own real
-  // stack-at-retirement) rather than the base income the other columns carry
-  // through; it still moves only the income lever, so it stays on the base's
-  // income basis and remains apples-to-apples. `available(base)` gates the chip.
+  // Variant registry. Given the live base scenario, build() returns a clone with
+  // ONE lever changed (income OR retirement year — never both). Optional
+  // chipLabel(base) resolves a live label (the income chips show their current
+  // $ figure). `fourPct` flags the one column whose income is rate-derived.
+  //
+  // Availability follows one principle applied consistently (SITE_GUIDE §17):
+  //   • DELTA rules (retire ±N years) state an absolute magnitude that clamping
+  //     to a bound would FALSIFY → bound-gated via cmpRetireAvail.
+  //   • PROPORTIONAL / ABSOLUTE rules (income ±25%, 4%) cannot falsify their
+  //     label ("25% less" is exactly 25% less at any positive income) → no bound
+  //     guards. Multiplying a positive income can't reach zero, so no degeneracy
+  //     guard either. (cmpIncomeAvail was deleted in rev2 item 2.)
   var CMP_VARIANTS = [
     { id: 'later2',   chip: 'Retired 2 years later',   available: function(b){ return cmpRetireAvail(b, 2); },  build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear + 2 }); } },
     { id: 'later5',   chip: 'Retired 5 years later',   available: function(b){ return cmpRetireAvail(b, 5); },  build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear + 5 }); } },
     { id: 'earlier2', chip: 'Retired 2 years earlier', available: function(b){ return cmpRetireAvail(b, -2); }, build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear - 2 }); } },
     { id: 'earlier5', chip: 'Retired 5 years earlier', available: function(b){ return cmpRetireAvail(b, -5); }, build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear - 5 }); } },
-    { id: 'incLess',  chip: 'Wanted $25K/yr less',     available: function(b){ return cmpIncomeAvail(b, -25000); }, build: function(b){ return cmpClone(b, { targetIncomeUSD: b.targetIncomeUSD - 25000 }); } },
-    { id: 'incMore',  chip: 'Wanted $25K/yr more',     available: function(b){ return cmpIncomeAvail(b, 25000); },  build: function(b){ return cmpClone(b, { targetIncomeUSD: b.targetIncomeUSD + 25000 }); } },
+    { id: 'incLess',  available: cmpAlwaysAvail,
+      chipLabel: function(b){ return 'Wanted 25% less (' + formatCurrencyShort(cmpRound5k(b.targetIncomeUSD * 0.75)) + ')'; },
+      build: function(b){ return cmpClone(b, { targetIncomeUSD: cmpRound5k(b.targetIncomeUSD * 0.75) }); } },
+    { id: 'incMore',  available: cmpAlwaysAvail,
+      chipLabel: function(b){ return 'Wanted 25% more (' + formatCurrencyShort(cmpRound5k(b.targetIncomeUSD * 1.25)) + ')'; },
+      build: function(b){ return cmpClone(b, { targetIncomeUSD: cmpRound5k(b.targetIncomeUSD * 1.25) }); } },
     { id: 'rule4',    chip: 'Withdrew 4% (the traditional rule)', fourPct: true, available: cmpRule4Avail,
       build: function(b){ return cmpClone(b, { targetIncomeUSD: 0.04 * cmpStackReal(b) }); } }
   ];
 
   var CMP_ACTIVE = [];    // ordered active variant ids (max CMP_MAX)
-  var CMP_LAST = null;    // { base: <outputs>, variants: [{id,chip,color,dash,outputs}] }
+  var CMP_LAST = null;    // { base: <outputs>, variants: [{id,label,color,outputs}] }
 
   function cmpVariantById(id) {
     for (var i = 0; i < CMP_VARIANTS.length; i++) { if (CMP_VARIANTS[i].id === id) return CMP_VARIANTS[i]; }
@@ -2014,14 +2023,19 @@
   function cmpStackReal(scenario) { return realStackAtRetirement(scenario, cmpGrowthKey(), cmpInfl()); }
 
   // Column outputs for one scenario. years === Infinity ⇒ escape velocity.
+  // stackNominal is the raw value at the scenario's retirement year; stackReal
+  // deflates it to today's $ via the shared rtDeflator (no new deflator). The
+  // panel shows both rows; only stackReal is ever compared across columns.
   function cmpOutputs(scenario, isFourPct) {
     var proj = projectStackOverTime(scenario, cmpGrowthKey(), cmpInfl());
     var years = (proj.depletionYear === null) ? Infinity : (proj.depletionYear - scenario.retirementYear);
+    var nominal = computeStackAtRetirement(scenario, cmpGrowthKey()).nominal;
     return {
       proj: proj,
       years: years,
       depletionYear: proj.depletionYear,
-      stackReal: cmpStackReal(scenario),   // today's $
+      stackNominal: nominal,                                                   // in the retirement year's $
+      stackReal: nominal / rtDeflator(scenario.retirementYear, cmpInfl()),     // today's $
       income: scenario.targetIncomeUSD,    // today's-$ target the column draws
       retYear: scenario.retirementYear,
       isFourPct: !!isFourPct
@@ -2042,11 +2056,13 @@
     CMP_ACTIVE = CMP_ACTIVE.filter(function(id){ var v = cmpVariantById(id); return v && v.available(base).ok; }).slice(0, CMP_MAX);
 
     var baseProj = baseStackObj || projectStackOverTime(base, cmpGrowthKey(), cmpInfl());
+    var baseNominal = computeStackAtRetirement(base, cmpGrowthKey()).nominal;
     var baseOut = {
       proj: baseProj,
       depletionYear: baseProj.depletionYear,
       years: (baseProj.depletionYear === null) ? Infinity : (baseProj.depletionYear - base.retirementYear),
-      stackReal: cmpStackReal(base),
+      stackNominal: baseNominal,
+      stackReal: baseNominal / rtDeflator(base.retirementYear, cmpInfl()),
       income: base.targetIncomeUSD,
       retYear: base.retirementYear,
       isFourPct: false
@@ -2055,42 +2071,17 @@
     var variants = CMP_ACTIVE.map(function(id, slot){
       var v = cmpVariantById(id);
       var scen = v.build(base);
-      return { id: id, chip: v.chip, color: CMP_COLORS[slot], dash: CMP_DASH[slot], outputs: cmpOutputs(scen, v.fourPct) };
+      return { id: id, label: (v.chipLabel ? v.chipLabel(base) : v.chip), color: CMP_COLORS[slot], outputs: cmpOutputs(scen, v.fourPct) };
     });
 
     CMP_LAST = { base: baseOut, variants: variants };
     return CMP_LAST;
   }
 
-  // Thin overlay drawdown line per active variant. order:3 keeps them behind
-  // the cream base drawdown line (order:2) so the user's actual stack stays
-  // visually primary. Floor/trend band treatment is inherited from the shared
-  // projectStackOverTime output — overlays respect it exactly as the base does.
-  function cmpOverlayDatasets() {
-    if (!CMP_LAST || !CMP_LAST.variants.length) return [];
-    return CMP_LAST.variants.map(function(vr){
-      return {
-        label: 'Compare: ' + vr.chip,
-        data: vr.outputs.proj.points,
-        type: 'line',
-        borderColor: vr.color,
-        backgroundColor: vr.color,
-        borderWidth: 1.5,
-        borderDash: vr.dash,
-        pointRadius: 0,
-        fill: false,
-        tension: 0.2,
-        order: 3
-      };
-    });
-  }
-
-  // Line-style-faithful swatch (house font color is carried by the CSS, never
-  // dark-on-dark). solid=true for the base cream line; dashed for variants.
-  function cmpSwatchSvg(color, dash, solid) {
-    var da = solid ? '' : ' stroke-dasharray="' + dash[0] + ',' + dash[1] + '"';
-    return '<span class="rt-cmp-swatch" aria-hidden="true"><svg width="22" height="10" viewBox="0 0 22 10">'
-      + '<line x1="0" y1="5" x2="22" y2="5" stroke="' + color + '" stroke-width="2"' + da + '/></svg></span>';
+  // A plain color dot identifying a column (and its active chip). Purely a
+  // column-vs-column distinguisher now that the chart overlays are gone.
+  function cmpDotHtml(color) {
+    return '<span class="rt-cmp-dot" aria-hidden="true" style="background:' + color + '"></span>';
   }
 
   function cmpFmtYears(out) {
@@ -2149,9 +2140,14 @@
 
   function cmpMetricsHtml(yearsFmt, out) {
     var yDd = '<dd' + (yearsFmt.ev ? ' class="rt-cmp-ev"' : '') + '>' + yearsFmt.html + '</dd>';
+    // Two stack rows: today's $ (the only figure ever compared across columns)
+    // and the raw nominal figure in the column's OWN retirement-year dollars —
+    // labelled with that year, since nominal figures in different columns are in
+    // different years' units and a naive comparison would read inflation as growth.
     return '<dl class="rt-cmp-metrics">'
       + '<div class="rt-cmp-metric"><dt>Years stack lasts</dt>' + yDd + '</div>'
       + '<div class="rt-cmp-metric"><dt>Stack at retirement (today’s $)</dt><dd>' + formatCurrencyShort(out.stackReal) + '</dd></div>'
+      + '<div class="rt-cmp-metric rt-cmp-metric-sub"><dt>Stack at retirement (' + out.retYear + ' dollars)</dt><dd>' + formatCurrencyShort(out.stackNominal) + '</dd></div>'
       + '<div class="rt-cmp-metric"><dt>Sustainable income</dt><dd>' + formatCurrencyShort(out.income) + '</dd></div>'
       + '</dl>';
   }
@@ -2176,23 +2172,24 @@
 
     var chipsHtml = '';
     CMP_VARIANTS.forEach(function(v){
+      var label = v.chipLabel ? v.chipLabel(SCENARIO) : v.chip;   // live label (income chips show their $ figure)
       var avail = v.available(SCENARIO);
       if (!avail.ok) {
         // Disabled + dimmed, focusable (aria-disabled, NOT the native disabled
         // attribute) so touch/keyboard users can surface the reason. No column.
-        chipsHtml += '<button type="button" class="rt-cmp-chip is-unavailable" data-cmp-id="' + v.id + '" aria-disabled="true" aria-pressed="false" title="' + cmpEsc(avail.reason) + '" data-reason="' + cmpEsc(avail.reason) + '"><span>' + v.chip + '</span></button>';
+        chipsHtml += '<button type="button" class="rt-cmp-chip is-unavailable" data-cmp-id="' + v.id + '" aria-disabled="true" aria-pressed="false" title="' + cmpEsc(avail.reason) + '" data-reason="' + cmpEsc(avail.reason) + '"><span>' + label + '</span></button>';
         return;
       }
       var slot = CMP_ACTIVE.indexOf(v.id);
       var active = slot !== -1;
-      var sw = active ? cmpSwatchSvg(CMP_COLORS[slot], CMP_DASH[slot], false) : '';
-      chipsHtml += '<button type="button" class="rt-cmp-chip" data-cmp-id="' + v.id + '" aria-pressed="' + (active ? 'true' : 'false') + '">' + sw + '<span>' + v.chip + '</span></button>';
+      var dot = active ? cmpDotHtml(CMP_COLORS[slot]) : '';
+      chipsHtml += '<button type="button" class="rt-cmp-chip" data-cmp-id="' + v.id + '" aria-pressed="' + (active ? 'true' : 'false') + '">' + dot + '<span>' + label + '</span></button>';
     });
     chipsEl.innerHTML = chipsHtml;
 
     var b = CMP_LAST.base;
     var colsHtml = '<div class="rt-cmp-col rt-cmp-col-base">'
-      + '<div class="rt-cmp-col-head">' + cmpSwatchSvg('#ece4d6', null, true) + '<span class="rt-cmp-col-title">Your current scenario</span></div>'
+      + '<div class="rt-cmp-col-head">' + cmpDotHtml('#ece4d6') + '<span class="rt-cmp-col-title">Your current scenario</span></div>'
       + cmpMetricsHtml(cmpFmtYears(b), b)
       + '</div>';
 
@@ -2204,7 +2201,7 @@
         : '<p class="rt-cmp-delta">No change vs. your current scenario.</p>';
       var footHtml = o.isFourPct ? '<p class="rt-cmp-foot">at 4% withdrawal</p>' : '';
       colsHtml += '<div class="rt-cmp-col">'
-        + '<div class="rt-cmp-col-head">' + cmpSwatchSvg(vr.color, vr.dash, false) + '<span class="rt-cmp-col-title">' + vr.chip + '</span></div>'
+        + '<div class="rt-cmp-col-head">' + cmpDotHtml(vr.color) + '<span class="rt-cmp-col-title">' + vr.label + '</span></div>'
         + cmpMetricsHtml(cmpFmtYears(o), o)
         + deltaHtml + footHtml
         + '</div>';
