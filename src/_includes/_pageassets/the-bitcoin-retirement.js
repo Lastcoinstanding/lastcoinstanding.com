@@ -1956,6 +1956,12 @@
   // Only the no-op guard remains: the base is already withdrawing ~4%.
   function cmpRule4Avail(base) {
     var cand = 0.04 * cmpStackReal(base);
+    // Degeneracy guard (a nonsense case, not the UI floor): with no projected
+    // stack — e.g. btcStack 0 and no DCA, since slider-btcStack min is 0 — 4% is
+    // $0, a zero withdrawal never depletes, and the column would falsely read
+    // "∞ — escape velocity" at $0 income. DCA alone still builds a real stack,
+    // so this only fires when there is genuinely nothing to draw 4% from.
+    if (cand < 1) return { ok: false, reason: 'Not available — you have no projected stack to draw 4% from.' };
     if (Math.abs(cand - base.targetIncomeUSD) < 500) return { ok: false, reason: 'Not available — you’re already withdrawing about 4%.' };
     return { ok: true };
   }
