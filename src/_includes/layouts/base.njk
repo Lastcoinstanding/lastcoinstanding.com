@@ -114,11 +114,36 @@ body {
   transition: color 0.2s, background 0.2s;
 }
 .channel-ribbon:hover { color: #b8b0a5; background: rgba(247,147,26,0.035); }
+/* Dot is 9px (up from 7px). Treatment PORTED from the site's one working
+   scale-travel cue — the Gallery halo (12px core, TWO 2px stroked rings
+   staggered by half-period, scale 1→4, 0.85 peak opacity, 2.6s) — scaled
+   minimally to the ribbon strip rather than derived downward (stacking four
+   reductions lands back at sub-threshold, the defect). Deviations from the
+   reference are only what the strip physically forces: dot 9px (fits the text
+   line-box, so no height/baseline shift — verified) and peak scale capped by the
+   375px ceiling (see below). A stroked ring beats a filled disc over the
+   adjacent text (a thin outline, not a scaling wash) and matches the reference. */
 .channel-ribbon .cr-dot {
-  flex: 0 0 auto; width: 7px; height: 7px; border-radius: 50%;
-  background: #F7931A; box-shadow: 0 0 5px rgba(247,147,26,0.5); align-self: center;
+  position: relative; /* anchors the .is-live ::before / ::after ring layers */
+  flex: 0 0 auto; width: 9px; height: 9px; border-radius: 50%;
+  background: #F7931A; box-shadow: 0 0 8px rgba(247,147,26,0.60); align-self: center;
 }
-.channel-ribbon.is-live .cr-dot { animation: lcsRibbonPulse 2.8s ease-in-out infinite; }
+/* Live state: a beefed constant base glow on the dot (larger radius + higher
+   alpha than before, in the register of the Retirement slider thumb — the
+   static element that reads as the most "alive" of the three, size+brightness
+   doing that work), plus two expanding stroked rings as the motion layer. */
+.channel-ribbon.is-live .cr-dot {
+  animation: none;
+  box-shadow: 0 0 0 1.5px rgba(247,147,26,0.55), 0 0 11px rgba(247,147,26,0.70);
+}
+.channel-ribbon.is-live .cr-dot::before,
+.channel-ribbon.is-live .cr-dot::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  border: 2px solid rgba(247,147,26,0.85);   /* literal — currentColor is the link grey here */
+  pointer-events: none;
+  animation: lcsRibbonPulseRing 2.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+.channel-ribbon.is-live .cr-dot::after { animation-delay: 1.3s; }  /* half-period stagger → always one ring mid-travel */
 .channel-ribbon .cr-dot.cr-dot-static { animation: none; box-shadow: 0 0 4px rgba(247,147,26,0.28); opacity: 0.8; }
 .channel-ribbon .cr-mult-value { color: #e09422; font-weight: 600; font-variant-numeric: tabular-nums; }
 .channel-ribbon .cr-trend-word { color: #8c857c; }
@@ -126,13 +151,20 @@ body {
 .channel-ribbon .cr-price { color: #cbc3b7; font-variant-numeric: tabular-nums; letter-spacing: 0.2px; }
 .channel-ribbon .cr-sep { color: #55504a; }
 .channel-ribbon .cr-register { color: #8c857c; font-style: italic; font-size: 0.82em; }
-.channel-ribbon:hover .cr-dot { box-shadow: 0 0 8px rgba(247,147,26,0.65); }
-@keyframes lcsRibbonPulse {
-  0%, 100% { box-shadow: 0 0 4px rgba(247,147,26,0.30); }
-  50%      { box-shadow: 0 0 9px rgba(247,147,26,0.60); }
+.channel-ribbon:hover .cr-dot { box-shadow: 0 0 10px rgba(247,147,26,0.75); }
+/* Distinct name from the chart pulse's @keyframes lcsPulseRing (CSS keyframes
+   are global per document; four pages carry both the ribbon and a chart pulse,
+   so a shared name would let one clobber the other). scale(4) matches the
+   Gallery; peak diameter 9px×4 = 36px, radial travel ~13.5px vs the reference's
+   18px — the ceiling, set by the 375px left edge (see gate 6 in the report). */
+@keyframes lcsRibbonPulseRing {
+  0%   { transform: scale(1); opacity: 0.72; }  /* start at the dot's edge so travel reads from t=0 (Gallery-style) */
+  100% { transform: scale(4); opacity: 0;    }
 }
 @media (prefers-reduced-motion: reduce) {
-  .channel-ribbon.is-live .cr-dot { animation: none; box-shadow: 0 0 6px rgba(247,147,26,0.42); }
+  .channel-ribbon.is-live .cr-dot::before,
+  .channel-ribbon.is-live .cr-dot::after { animation: none; opacity: 0; }
+  .channel-ribbon.is-live .cr-dot { box-shadow: 0 0 0 1.5px rgba(247,147,26,0.55), 0 0 10px rgba(247,147,26,0.60); }
 }
 /* 375px: same single line, smaller type, drop the "trend" word (keeps the ×) —
    the documented graceful degradation before any wrap. */
