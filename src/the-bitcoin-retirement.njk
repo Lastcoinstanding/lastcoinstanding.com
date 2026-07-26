@@ -430,8 +430,9 @@ eleventyComputed:
         <span class="rt-compare-help">Tap a change to add a column beside your current scenario &mdash; up to two at once. Each also draws as a line on the chart above. Drag any slider and every column moves together.</span>
       </div>
       <div class="rt-compare-chips" id="rtCompareChips" role="group" aria-label="Comparison scenarios">
-        <!-- JS-populated chip buttons (aria-pressed); the DCA chip renders only when Monthly DCA > 0 -->
+        <!-- JS-populated chip buttons (aria-pressed); a chip whose rule would fall outside the slider bounds renders disabled/dimmed -->
       </div>
+      <p class="rt-cmp-reason" id="rtCmpReason" role="status" aria-live="polite"></p>
       <div class="rt-compare-scroll">
         <div class="rt-compare-cols" id="rtCompareCols" aria-live="polite">
           <!-- JS-populated: "Your current scenario" (live base) + up to two variant columns -->

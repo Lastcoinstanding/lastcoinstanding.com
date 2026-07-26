@@ -1929,24 +1929,46 @@
   var CMP_DASH   = [[6, 4], [3, 3]];         // distinct dash per slot
   var CMP_MAX = 2;
 
+  // Availability guards. A variant is offered only when its rule lands inside
+  // the slider bounds it would have to be reproduced from (SLIDER_BY_KEY) and
+  // isn't a no-op. Out of bounds ⇒ the chip renders disabled/dimmed with a
+  // reason; we NEVER silently clamp (a "Retired 5 years earlier" column that is
+  // really 1 year earlier would be a false statement and understate the cost).
+  function cmpRetireAvail(base, delta) {
+    var b = SLIDER_BY_KEY.retirementYear, y = base.retirementYear + delta;
+    if (y < b.min) return { ok: false, reason: 'Not available — retirement is already at the ' + b.min + ' minimum.' };
+    if (y > b.max) return { ok: false, reason: 'Not available — retirement is already at the ' + b.max + ' maximum.' };
+    return { ok: true };
+  }
+  function cmpIncomeAvail(base, delta) {
+    var b = SLIDER_BY_KEY.targetIncomeUSD, v = base.targetIncomeUSD + delta;
+    if (v < b.min) return { ok: false, reason: 'Not available — your target is already at the $' + Math.round(b.min / 1000) + 'K minimum.' };
+    if (v > b.max) return { ok: false, reason: 'Not available — your target is already at the $' + Math.round(b.max / 1e6) + 'M maximum.' };
+    return { ok: true };
+  }
+  function cmpRule4Avail(base) {
+    var b = SLIDER_BY_KEY.targetIncomeUSD, cand = 0.04 * cmpStackReal(base);
+    if (cand < b.min) return { ok: false, reason: 'Not available — 4% of your projected stack is below the $' + Math.round(b.min / 1000) + 'K minimum.' };
+    if (cand > b.max) return { ok: false, reason: 'Not available — 4% of your projected stack exceeds the $' + Math.round(b.max / 1e6) + 'M maximum.' };
+    if (Math.abs(cand - base.targetIncomeUSD) < 500) return { ok: false, reason: 'Not available — you’re already withdrawing about 4%.' };
+    return { ok: true };
+  }
+
   // Variant registry. Given the live base scenario, build() returns a clone
-  // with ONE lever changed. `needsDca` gates the chip to Monthly DCA > 0;
-  // `fourPct` flags the one column whose income is rate-derived (4% of its
-  // own stack-at-retirement) rather than the base-income the other columns
-  // carry through. Note: in this engine DCA runs until the retirement year,
-  // so "keep DCA going 2 more years" and "retire 2 years later" are the same
-  // lever (retirementYear + 2) — the DCA-framed chip exists for the user who
-  // arrived via the DCA slider and is gated to DCA > 0.
+  // with ONE lever changed (income OR retirement year — never both). `fourPct`
+  // flags the one column whose income is rate-derived (4% of its own real
+  // stack-at-retirement) rather than the base income the other columns carry
+  // through; it still moves only the income lever, so it stays on the base's
+  // income basis and remains apples-to-apples. `available(base)` gates the chip.
   var CMP_VARIANTS = [
-    { id: 'later2',   chip: 'Retired 2 years later',   build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear + 2 }); } },
-    { id: 'later5',   chip: 'Retired 5 years later',   build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear + 5 }); } },
-    { id: 'earlier2', chip: 'Retired 2 years earlier', build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear - 2 }); } },
-    { id: 'incLess',  chip: 'Wanted $25K/yr less',     build: function(b){ return cmpClone(b, { targetIncomeUSD: b.targetIncomeUSD - 25000 }); } },
-    { id: 'incMore',  chip: 'Wanted $25K/yr more',     build: function(b){ return cmpClone(b, { targetIncomeUSD: b.targetIncomeUSD + 25000 }); } },
-    { id: 'rule4',    chip: 'Withdrew 4% (the traditional rule)', fourPct: true,
-      build: function(b){ return cmpClone(b, { targetIncomeUSD: 0.04 * cmpStackReal(b), incomeBasis: 'today' }); } },
-    { id: 'dca2',     chip: 'Kept DCA going 2 more years', needsDca: true,
-      build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear + 2 }); } }
+    { id: 'later2',   chip: 'Retired 2 years later',   available: function(b){ return cmpRetireAvail(b, 2); },  build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear + 2 }); } },
+    { id: 'later5',   chip: 'Retired 5 years later',   available: function(b){ return cmpRetireAvail(b, 5); },  build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear + 5 }); } },
+    { id: 'earlier2', chip: 'Retired 2 years earlier', available: function(b){ return cmpRetireAvail(b, -2); }, build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear - 2 }); } },
+    { id: 'earlier5', chip: 'Retired 5 years earlier', available: function(b){ return cmpRetireAvail(b, -5); }, build: function(b){ return cmpClone(b, { retirementYear: b.retirementYear - 5 }); } },
+    { id: 'incLess',  chip: 'Wanted $25K/yr less',     available: function(b){ return cmpIncomeAvail(b, -25000); }, build: function(b){ return cmpClone(b, { targetIncomeUSD: b.targetIncomeUSD - 25000 }); } },
+    { id: 'incMore',  chip: 'Wanted $25K/yr more',     available: function(b){ return cmpIncomeAvail(b, 25000); },  build: function(b){ return cmpClone(b, { targetIncomeUSD: b.targetIncomeUSD + 25000 }); } },
+    { id: 'rule4',    chip: 'Withdrew 4% (the traditional rule)', fourPct: true, available: cmpRule4Avail,
+      build: function(b){ return cmpClone(b, { targetIncomeUSD: 0.04 * cmpStackReal(b) }); } }
   ];
 
   var CMP_ACTIVE = [];    // ordered active variant ids (max CMP_MAX)
@@ -2001,12 +2023,11 @@
   function cmpComputeAll(baseStackObj) {
     var base = SCENARIO;
 
-    // Prune DCA-gated variants when DCA drops to 0 (chip hidden ⇒ can't stay
-    // active), drop any unknown ids, and hard-cap at CMP_MAX.
-    if (base.monthlyDcaUSD <= 0) {
-      CMP_ACTIVE = CMP_ACTIVE.filter(function(id){ var v = cmpVariantById(id); return v && !v.needsDca; });
-    }
-    CMP_ACTIVE = CMP_ACTIVE.filter(function(id){ return !!cmpVariantById(id); }).slice(0, CMP_MAX);
+    // Drop active variants that have become UNAVAILABLE because the user dragged
+    // a base slider (rule now out of bounds), drop any unknown ids, and hard-cap
+    // at CMP_MAX. renderCompare rebuilds the chips from CMP_ACTIVE, so a dropped
+    // variant's chip un-presses in the same tick.
+    CMP_ACTIVE = CMP_ACTIVE.filter(function(id){ var v = cmpVariantById(id); return v && v.available(base).ok; }).slice(0, CMP_MAX);
 
     var baseProj = baseStackObj || projectStackOverTime(base, cmpGrowthKey(), cmpInfl());
     var baseOut = {
@@ -2123,7 +2144,17 @@
       + '</dl>';
   }
 
-  // Render chips (rebuilt each tick so the DCA gate + aria-pressed stay live)
+  function cmpEsc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  // The reason line under the chips (aria-live) — shows why a disabled chip is
+  // unavailable, on tap (touch) and on focus; cleared on any available action.
+  function cmpShowReason(txt) {
+    var el = document.getElementById('rtCmpReason');
+    if (el) el.textContent = txt || '';
+  }
+
+  // Render chips (rebuilt each tick so availability + aria-pressed stay live)
   // and columns (base first, then active variants in slot order).
   function renderCompare() {
     var colsEl = document.getElementById('rtCompareCols');
@@ -2133,7 +2164,13 @@
 
     var chipsHtml = '';
     CMP_VARIANTS.forEach(function(v){
-      if (v.needsDca && SCENARIO.monthlyDcaUSD <= 0) return;   // DCA chip hidden at DCA = 0
+      var avail = v.available(SCENARIO);
+      if (!avail.ok) {
+        // Disabled + dimmed, focusable (aria-disabled, NOT the native disabled
+        // attribute) so touch/keyboard users can surface the reason. No column.
+        chipsHtml += '<button type="button" class="rt-cmp-chip is-unavailable" data-cmp-id="' + v.id + '" aria-disabled="true" aria-pressed="false" title="' + cmpEsc(avail.reason) + '" data-reason="' + cmpEsc(avail.reason) + '"><span>' + v.chip + '</span></button>';
+        return;
+      }
       var slot = CMP_ACTIVE.indexOf(v.id);
       var active = slot !== -1;
       var sw = active ? cmpSwatchSvg(CMP_COLORS[slot], CMP_DASH[slot], false) : '';
@@ -2165,12 +2202,15 @@
 
   // Chip clicks (delegated — chips are rebuilt each render): toggle off an
   // active chip; else add, evicting the OLDEST when over the 2-variant cap.
+  // A disabled (unavailable) chip never toggles — tapping it surfaces its
+  // reason instead (touch has no hover); focus surfaces it too.
   function wireCompareChips() {
     var chipsEl = document.getElementById('rtCompareChips');
     if (!chipsEl) return;
     chipsEl.addEventListener('click', function(e){
       var btn = e.target.closest('.rt-cmp-chip');
       if (!btn || !chipsEl.contains(btn)) return;
+      if (btn.getAttribute('aria-disabled') === 'true') { cmpShowReason(btn.getAttribute('data-reason')); return; }
       var id = btn.getAttribute('data-cmp-id');
       if (!id || !cmpVariantById(id)) return;
       var pos = CMP_ACTIVE.indexOf(id);
@@ -2180,7 +2220,13 @@
         CMP_ACTIVE.push(id);
         if (CMP_ACTIVE.length > CMP_MAX) CMP_ACTIVE.shift();
       }
+      cmpShowReason('');
       scheduleRender();
+    });
+    // Focus surfaces the reason for a disabled chip; clears otherwise.
+    chipsEl.addEventListener('focusin', function(e){
+      var btn = e.target.closest('.rt-cmp-chip');
+      cmpShowReason(btn && btn.getAttribute('aria-disabled') === 'true' ? btn.getAttribute('data-reason') : '');
     });
   }
 

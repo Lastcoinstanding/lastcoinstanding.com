@@ -1905,6 +1905,27 @@ a.powerlaw-link:hover {
 }
 .rt-cmp-chip .rt-cmp-swatch { display: none; }
 .rt-cmp-chip[aria-pressed="true"] .rt-cmp-swatch { display: inline-block; }
+/* Unavailable chip — its rule would fall outside the slider bounds. Dimmed,
+   non-interactive (aria-disabled, still focusable so touch/keyboard users can
+   surface the reason), and never adopts the active amber treatment. */
+.rt-cmp-chip.is-unavailable {
+  opacity: 0.4;
+  cursor: default;
+  border-style: dashed;
+}
+.rt-cmp-chip.is-unavailable:hover {
+  background: rgba(224,148,34,0.04);
+  border-color: var(--border-faint);
+  color: var(--ink-dim);
+}
+.rt-cmp-reason {
+  min-height: 1.1em;
+  margin: -0.5rem 0 1rem;
+  font-size: 0.74rem;
+  font-style: italic;
+  color: var(--ink-dim);
+  line-height: 1.4;
+}
 
 /* ─── Columns: base + up to two variants ─── */
 .rt-compare-scroll { overflow-x: auto; }
