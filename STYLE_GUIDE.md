@@ -1478,7 +1478,7 @@ const pulsePlugin = {
 
 **Third member of the family: the channel-ribbon live dot (`cr-dot` / `@keyframes lcsRibbonPulseRing`, base.njk ~117–164).** Added 2026-07-26. The site-wide channel ribbon's leading dot signals price liveness. It uses its OWN keyframe, `lcsRibbonPulseRing`, deliberately distinct in name **and** parameters from the chart pulse's `lcs-pulse-halo` / `lcsPulseRing`: CSS keyframes are global per document and **four pages carry both** (`/borrowing-against-your-stack`, `/disciplined-rebalancing`, `/how-much-cash`, `/lump-sum-or-ladder-in`), so a shared name would let one clobber the other. The treatment is the Gallery halo *ported*, not re-derived: two 2px stroked rings on `::before`/`::after` staggered by half the 2.6s period, `scale(1)→scale(4)`, peak opacity 0.72, over a beefed constant base glow on a 9px dot (up from 7px — it still fits the text line-box, so ribbon height and text baseline are unchanged). Radial travel lands at ~13.5px vs the Gallery's 18px; the ceiling is the ribbon **strip height** (~35px), not the 375px width (the ribbon centers its content, so the dot sits mid-strip, nowhere near the edge).
 
-- **The sub-threshold lesson (the reason this exists — do not "tidy" it back).** The dot previously used `lcsRibbonPulse`, which modulated only box-shadow blur/alpha — luminance with **no spatial travel**. On a ~7–9px element that does not register as motion, and the ribbon read as static even while a correct `is-live` pulse was running. **Travel is the signal**: the treatments that read as alive here (Gallery halo) animate *scale*; motion perception is far more responsive to scale/translation than to low-contrast alpha on a small element. A future session that "simplifies" this back to a breathing box-shadow re-introduces the defect. (Corollary from the same measurement: the Retirement slider thumb is *static* yet reads as the most alive of the three — size + brightness carry it, which is why the ribbon dot also carries a strong constant base glow, not motion alone.)
+- **The sub-threshold lesson (the reason this exists — do not "tidy" it back).** The dot previously used its own box-shadow keyframe, which modulated only blur/alpha — luminance with **no spatial travel**. On a ~7–9px element that does not register as motion, and the ribbon read as static even while a correct `is-live` pulse was running. **Travel is the signal**: the treatments that read as alive here (Gallery halo) animate *scale*; motion perception is far more responsive to scale/translation than to low-contrast alpha on a small element. A future session that "simplifies" this back to a breathing box-shadow re-introduces the defect. (Corollary from the same measurement: the Retirement slider thumb is *static* yet reads as the most alive of the three — size + brightness carry it, which is why the ribbon dot also carries a strong constant base glow, not motion alone.)
 - **The rule-of-thumb does NOT forbid the ribbon on conceptual pages.** "Pulse on tactical decision tools, plain on conceptual explainers" governs *chart markers*, where a pulse would make a multi-decade structural argument read as real-time performance. The ribbon's entire function is liveness; its dot is a liveness *indicator*, not an annotation on an argument. Different surface, different rule.
 - **Honesty binding.** The animation is a liveness claim in visual form and is gated on `todayPriceIsLive(source)` — it runs ONLY on `source === 'live'`, never on the pre-resolve seed or the `'fallback'` monthly sample (those show a static, muted `.cr-dot-static`). Same canon as SITE_GUIDE §19's "live never labels a non-live value." An always-on animation would violate it.
 
@@ -2001,12 +2001,18 @@ block, filled by `shared/channel-ribbon.js`. Full framework: SITE_GUIDE §40.1.
 - `.channel-ribbon` — flex, one line, `white-space: nowrap`, hardcoded rgba/hex
   colors (dark-foundation safe on every palette; **never** `var(--…)`, since the
   strip renders before any page `:root` and on pages that define none).
-- `.cr-dot` + `@keyframes lcsRibbonPulse` — the live-gated pulse dot. Pulses only
-  under `.channel-ribbon.is-live`; `.cr-dot-static` on fallback. This is a NEW
-  keyframe (the existing `lcs-pulse-halo`/§6.23 is an absolutely-positioned
-  expanding-ring halo for a chart point — wrong shape for an inline dot; the
-  homepage ticker's `ticker-pulse` animates `text-shadow`, also not a dot). Kept
-  in the ribbon's canonical block, respects `prefers-reduced-motion`.
+- `.cr-dot` + `@keyframes lcsRibbonPulseRing` — the live-gated pulse dot. Pulses
+  only under `.channel-ribbon.is-live`; `.cr-dot-static` on fallback. **History:**
+  the dot first shipped with its own box-shadow keyframe, on the reasoning that
+  §6.23's expanding-ring halo was the wrong shape for an inline dot. That treatment
+  proved **sub-threshold at ribbon scale** — blur/alpha modulation on a ~7px dot has
+  no spatial travel and reads as static even while `is-live` — so it was ported to
+  the §6.23 ring family (2026-07-26) with parameters scaled to the strip (9px dot,
+  two staggered 2px stroked rings, `scale(1)→scale(4)`, 2.6s). The keyframe name is
+  kept distinct from the chart pulse's `lcsPulseRing` (four pages carry both, and CSS
+  keyframes are global per document). See **§6.23** for the full treatment and the
+  sub-threshold lesson. Kept in the ribbon's canonical block, respects
+  `prefers-reduced-motion`.
 - `.cr-mult-value` / `.cr-trend-word` / `.cr-zone` / `.cr-price` / `.cr-sep` /
   `.cr-register` — the value spans. `.cr-trend-word` is `display:none` ≤480px
   (the documented 375px degradation: drop "trend", keep the `×`).

@@ -2199,7 +2199,7 @@ house-link hover, no button styling).
   the ×-trend multiple back to the shared log-space channel position and calling
   `positionLabel`, the identical vocabulary used everywhere else.
 - **Live gating (canon).** The dot pulses (`.channel-ribbon.is-live .cr-dot`,
-  `@keyframes lcsRibbonPulse`) only when the fetched source is `live`; on
+  `@keyframes lcsRibbonPulseRing`) only when the fetched source is `live`; on
   fallback the dot is static (`.cr-dot-static`) and the register suffix
   ` · latest monthly data` is revealed — the same honest wording as
   `todayPriceLabel`/`todayPriceNote`. First paint uses the seeded `TODAY_PRICE`
