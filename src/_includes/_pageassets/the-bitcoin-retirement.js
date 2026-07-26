@@ -1946,10 +1946,16 @@
     if (v > b.max) return { ok: false, reason: 'Not available — your target is already at the $' + Math.round(b.max / 1e6) + 'M maximum.' };
     return { ok: true };
   }
+  // The 4% rule is an ABSOLUTE rule, not a delta: if 4% of the projected stack
+  // is $12K then $12K is the truthful answer, and the $20K income-slider floor
+  // is a UI constraint, not a modelling one. So — unlike the retire/income delta
+  // guards, where clamping to a bound would falsify the chip's label — rule4 is
+  // deliberately NOT bound-gated. It stays available in exactly the early-
+  // retirement / small-stack cases where the traditional-rule comparison is most
+  // sobering (disabling it there would go quiet precisely when the news is bad).
+  // Only the no-op guard remains: the base is already withdrawing ~4%.
   function cmpRule4Avail(base) {
-    var b = SLIDER_BY_KEY.targetIncomeUSD, cand = 0.04 * cmpStackReal(base);
-    if (cand < b.min) return { ok: false, reason: 'Not available — 4% of your projected stack is below the $' + Math.round(b.min / 1000) + 'K minimum.' };
-    if (cand > b.max) return { ok: false, reason: 'Not available — 4% of your projected stack exceeds the $' + Math.round(b.max / 1e6) + 'M maximum.' };
+    var cand = 0.04 * cmpStackReal(base);
     if (Math.abs(cand - base.targetIncomeUSD) < 500) return { ok: false, reason: 'Not available — you’re already withdrawing about 4%.' };
     return { ok: true };
   }
