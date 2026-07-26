@@ -19,6 +19,13 @@ related:
     desc: "The same record, read through the opposite door. This page asks a cash holder whether to deploy or wait; How Much Cash asks an all-in holder whether to hold or raise. Mirror twins on one method — same neighborhoods, same numbers, opposite decisions."
   - slug: discount-or-premium
     desc: "The return lens to this page&rsquo;s entry lens. This page asks whether to deploy from today&rsquo;s channel position; Discount-or-Premium asks what returning to trend from that same position would be worth annualised."
+faq:
+  - q: "Should I buy bitcoin now or wait for a dip?"
+    a: "This page’s whole argument is that the question is subtler than it looks: because the Power Law trend rises with time, waiting for a <em>lower fraction of trend</em> can still mean paying a <em>higher price</em> if the wait is long enough. The tool above compares deploying now against waiting, across the historical record, rather than guessing."
+  - q: "Is lump sum or dollar-cost averaging better for bitcoin?"
+    a: "Historically, deploying earlier has beaten waiting more often than not — the same result the lump-sum vs. DCA literature finds for other assets — but the record includes real periods where waiting won, and this page shows both honestly. The trilogy sibling <a href='/lump-sum-or-ladder-in'>Lump Sum or Ladder In?</a> runs that comparison directly."
+  - q: "Can you time the bitcoin bottom?"
+    a: "The record shown here suggests you should not plan on it. Below-trend entries have historically been attractive, but <em>how long</em> the market stays below trend is not predictable — which is precisely the tradeoff this tool makes visible instead of hiding."
 eleventyComputed:
   head_extras: "{% include '_pageassets/wait-or-deploy-now-head.html' %}"
   page_styles: "{% include '_pageassets/wait-or-deploy-now.css' %}"
@@ -159,16 +166,5 @@ eleventyComputed:
       <li><strong>Sample:</strong> post-2014 only (the pre-$15 curiosity era is excluded), and only entries with a full two-year forward record, so &ldquo;wait&rdquo; and &ldquo;drawdown within two years&rdquo; are never truncated by the edge of the data. Figures are recomputed live every page load.</li>
     </ul>
   </div>
-
-  <!-- ═══ COMMON QUESTIONS — FAQPage schema lives in the head file; edits here must be mirrored there ═══ -->
-  <section id="faq" aria-label="Common questions">
-    <h2>Common questions</h2>
-    <h3 class="faq-q">Should I buy bitcoin now or wait for a dip?</h3>
-    <p class="faq-a">This page&rsquo;s whole argument is that the question is subtler than it looks: because the Power Law trend rises with time, waiting for a <em>lower fraction of trend</em> can still mean paying a <em>higher price</em> if the wait is long enough. The tool above compares deploying now against waiting, across the historical record, rather than guessing.</p>
-    <h3 class="faq-q">Is lump sum or dollar-cost averaging better for bitcoin?</h3>
-    <p class="faq-a">Historically, deploying earlier has beaten waiting more often than not &mdash; the same result the lump-sum vs. DCA literature finds for other assets &mdash; but the record includes real periods where waiting won, and this page shows both honestly. The trilogy sibling <a href="/lump-sum-or-ladder-in">Lump Sum or Ladder In?</a> runs that comparison directly.</p>
-    <h3 class="faq-q">Can you time the bitcoin bottom?</h3>
-    <p class="faq-a">The record shown here suggests you should not plan on it. Below-trend entries have historically been attractive, but <em>how long</em> the market stays below trend is not predictable &mdash; which is precisely the tradeoff this tool makes visible instead of hiding.</p>
-  </section>
 
 </main>

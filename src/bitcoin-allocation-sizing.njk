@@ -11,6 +11,15 @@ related:
     desc: "How deep the drawdowns run, and why they have been getting shallower. The register behind the crash depths and the volatility and correlation figures this page uses."
   - slug: disciplined-rebalancing
     desc: "Managing the allocation over time. Once bitcoin outgrows the position you set, whether to trim a winner back to target is a real and open question; this page raises the tension, that one works it through."
+faq:
+  - q: "How much bitcoin should I have in my portfolio?"
+    a: "There is no universal percentage — the honest question is what different allocations <em>do</em> to your portfolio, in both directions. This tool shows the growth and the drawdown consequences of 1%, 5%, 10%, or any allocation you choose, so you can find the size whose bad case you can actually live with."
+  - q: "What happens to my portfolio if bitcoin crashes?"
+    a: "The crash view models exactly that: pick a drawdown depth — including the historical worst cases — and a recovery path, and watch what it does to the whole portfolio at your chosen allocation. A tool that only showed the upside would be marketing; this one lets you stress the downside as hard as you like."
+  - q: "Is a small bitcoin allocation even worth it?"
+    a: "Sometimes yes, and the math is the point: because bitcoin’s historical growth has been so much higher than other assets’, even small allocations can move the long-run outcome materially — while keeping the crash exposure small. Run it both ways and compare; the numbers are all reproducible."
+  - q: "Should I rebalance my bitcoin allocation?"
+    a: "That is a real decision with real tradeoffs — trimming after surges caps both risk and upside, and in a taxable account each trim is a taxable event. The sibling page <a href='/disciplined-rebalancing'>Disciplined Rebalancing</a> treats it fully."
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-allocation-sizing-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-allocation-sizing.css' %}"
@@ -314,20 +323,6 @@ eleventyComputed:
       <a class="as-connect-card" href="/bull-and-bear-cycles"><div class="as-connect-title">Bull &amp; Bear Cycles</div><p>How deep the drawdowns run, and why they have been getting shallower as bitcoin matures.</p></a>
       <a class="as-connect-card" href="/disciplined-rebalancing"><div class="as-connect-title">Disciplined Rebalancing</div><p>Whether to trim a winning position back to target: the case for and against, worked through.</p></a>
     </div>
-  </section>
-
-  <!-- ═══ COMMON QUESTIONS — FAQPage schema lives in the head file; edits here must be mirrored there ═══ -->
-  <section class="as-section" id="faq" aria-label="Common questions">
-    <div class="as-eyebrow">Before you go</div>
-    <h2 class="as-h2">Common questions</h2>
-    <h3 class="faq-q">How much bitcoin should I have in my portfolio?</h3>
-    <p class="as-lead">There is no universal percentage &mdash; the honest question is what different allocations <em>do</em> to your portfolio, in both directions. This tool shows the growth and the drawdown consequences of 1%, 5%, 10%, or any allocation you choose, so you can find the size whose bad case you can actually live with.</p>
-    <h3 class="faq-q">What happens to my portfolio if bitcoin crashes?</h3>
-    <p class="as-lead">The crash view models exactly that: pick a drawdown depth &mdash; including the historical worst cases &mdash; and a recovery path, and watch what it does to the whole portfolio at your chosen allocation. A tool that only showed the upside would be marketing; this one lets you stress the downside as hard as you like.</p>
-    <h3 class="faq-q">Is a small bitcoin allocation even worth it?</h3>
-    <p class="as-lead">Sometimes yes, and the math is the point: because bitcoin&rsquo;s historical growth has been so much higher than other assets&rsquo;, even small allocations can move the long-run outcome materially &mdash; while keeping the crash exposure small. Run it both ways and compare; the numbers are all reproducible.</p>
-    <h3 class="faq-q">Should I rebalance my bitcoin allocation?</h3>
-    <p class="as-lead">That is a real decision with real tradeoffs &mdash; trimming after surges caps both risk and upside, and in a taxable account each trim is a taxable event. The sibling page <a href="/disciplined-rebalancing">Disciplined Rebalancing</a> treats it fully.</p>
   </section>
 
 </main>
