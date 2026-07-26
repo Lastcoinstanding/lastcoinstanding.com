@@ -14,10 +14,12 @@ verify on preview, **JM merges — do NOT self-merge.**_
 - **Phase 2 shipped:** `/the-bitcoin-retirement` (5 Q) and `/discount-or-premium` (4 Q) migrated to
   `faq:` front matter; hand-rolled `<section>`, head-file FAQPage JSON-LD, and per-page `#faq` CSS
   removed on both. All gates passed (see "Phase 2 gates" below).
-- **Phase 3 (LEFT TO DO):** add drafted FAQs to 3 pages — `/bitcoin-allocation-sizing`,
-  `/wait-or-deploy-now`, `/bitcoin-vs-real-estate`. Front matter is pre-written below with the two
-  cannibalization cautions already applied. Then run the Phase-2 gates on all 3 and report each.
-  Slugs verified present in `src/`.
+- **Phase 3 (LEFT TO DO — it's a MIGRATION, see the ⛔ section below):** `/bitcoin-allocation-sizing`,
+  `/wait-or-deploy-now`, `/bitcoin-vs-real-estate` ALREADY have hand-rolled visible FAQs + head
+  FAQPage schema (the July drafts were already shipped). Migrate each to `faq:` front matter derived
+  from its SHIPPED visible text, and remove the hand-rolled section + head FAQPage + per-page CSS —
+  exactly like Phase 2. A first attempt with the July drafts duplicated the FAQs and was reverted;
+  branch tip is clean at Phase 2. Slugs verified present.
 
 ## Component contract (how it works)
 
@@ -104,9 +106,39 @@ identical to the old but not *byte*-identical (curly vs straight) — intended, 
   scaffold gone" — the **source tree** (`git ls-tree -r origin/<branch>`).
 - Prefer normal commits over force-push when you need the alias to reflect the push.
 
-## Phase 3 — READY-TO-WIRE front matter (apply to each page's front matter; nothing else to remove,
-these pages have no existing FAQ). Curly `’`, em-dash `—`, `×` per house style. Single-quoted inner
-`<a>`.
+## ⛔ Phase 3 is a MIGRATION, not a fresh add — SCOPE DISCOVERY (2026-07-26, mid-session)
+
+**The build prompt was wrong that only 2 pages carry FAQs.** All THREE Phase-3 pages already have
+**hand-rolled visible FAQ sections AND head-file FAQPage JSON-LD** (verified: `bitcoin-allocation-sizing`
+4 Q, `wait-or-deploy-now` 3 Q, `bitcoin-vs-real-estate` 3 Q — visible `#faq` section + a `"@type":
+"FAQPage"` block in each `-head.html`). The July drafts in `claude/FAQ_BLOCKS_AND_SCHEMA.md` were
+already shipped by hand (rollout step 2). So Phase 3 is a **migration exactly like Phase 2**, NOT a
+fresh add.
+
+**What I did and reverted:** I wired the July-draft `faq:` front matter (commit `ae53da9`), which
+created **duplicate** visible FAQs + duplicate FAQPage schema on all 3 (gate 6 = 2 blocks). Caught
+via the allocation `faqPageBlocks: 2` check. Reverted those 3 files back to the Phase-2 state in the
+next commit; branch tip is clean (Phase 1+2 only). **Do not re-apply the draft YAML blindly** — it
+may not match the shipped visible text and would re-duplicate.
+
+**Correct Phase-3 method (per page, mirror Phase 2):**
+1. Read the SHIPPED visible FAQ (`#faq` section in the njk) and the head-file FAQPage block.
+2. Derive `faq:` front matter from the **shipped VISIBLE text** (entities → literals, curly `’`,
+   em-dash `—`, `×`; keep any inline `<a>` with its exact href, single-quoted attr). Match the live
+   page, NOT the July draft.
+3. Remove the hand-rolled visible `<section>`, the head-file FAQPage block (keep the other JSON-LD),
+   and any per-page `#faq` CSS.
+4. Verify byte-identical vs production (Phase-2 method) + gates 4/5/6/8/9/10.
+- **Caution 1 (WoD Q2):** check the SHIPPED wait-or-deploy Q2. If it's the "lump sum vs DCA"
+  question, reword off it (owned by `/lump-sum-or-ladder-in`) — a reworded version is drafted below.
+  If the shipped Q2 is already something else, reconcile rather than blindly replacing.
+- **Caution 2 (BvRE):** re-check the SHIPPED BvRE questions vs `/bitcoin-vs-rental-property`
+  (BvRE owns general real-estate/home-buying; rental-property owns rental-as-yield). My earlier read
+  of the *draft* questions found no split needed, but verify against what's actually shipped.
+
+---
+
+### DRAFT reference only (July `FAQ_BLOCKS_AND_SCHEMA.md` text — SUPERSEDED by shipped; reconcile, don't paste blindly). Curly `’`, em-dash `—`, `×`. Single-quoted inner `<a>`.
 
 ### `/bitcoin-allocation-sizing` (src/bitcoin-allocation-sizing.njk)
 ```yaml
@@ -143,15 +175,20 @@ faq:
     a: "Real estate is less volatile year to year; over the long span the comparison inverts. The page shows both facts rather than choosing one — volatility and long-run purchasing power are different questions, and conflating them is how most of this debate goes wrong."
 ```
 
-**Placement:** add `faq:` as a top-level front-matter key (after `related:` / before `eleventyComputed:`,
-matching the Phase-2 pages). Do a voice-pass against each live page; flag anything that reads wrong
-rather than rewriting silently. Then normalize EOL (per-file; these are CRLF), commit, push (normal
-push, not force), and run the gates above. Remove THIS file before merge.
+**Placement:** `faq:` goes as a top-level front-matter key (after `related:`/`companion:`, before
+`eleventyComputed:`). But per the discovery above, **derive the values from each page's SHIPPED
+visible FAQ (byte-identical), not from this draft** — and in the SAME change remove that page's
+hand-rolled `<section>`, its head-file FAQPage block, and its per-page `#faq` CSS. Voice-pass, flag
+don't-rewrite. Normalize EOL (CRLF), commit, **normal push** (not force — alias won't rebuild),
+run the gates. Remove THIS file before merge.
 
-## Progress log (update as you go)
-- [x] Handoff written; cautions applied in the front matter above.
-- [ ] `bitcoin-allocation-sizing` faq wired
-- [ ] `wait-or-deploy-now` faq wired
-- [ ] `bitcoin-vs-real-estate` faq wired
-- [ ] EOL normalized, committed, pushed
-- [ ] Gates 1,4,5,6,8,9,10 verified on all 3 (2/3 byte-compare is N/A — new content)
+## Progress log
+- [x] Phase 1 (component + docs) shipped — `0cb734b`.
+- [x] Phase 2 (retirement + DP migrated) shipped + all gates passed — `40d92d4`.
+- [x] Phase 3 attempted with July drafts (`ae53da9`) → found duplicate FAQs (pages already had them)
+      → **reverted** the 3 front-matters back to Phase-2 state. Branch tip clean (Phase 1+2 only).
+- [ ] **Phase 3 REDO as a migration** of `bitcoin-allocation-sizing`, `wait-or-deploy-now`,
+      `bitcoin-vs-real-estate`: derive `faq:` from each page's shipped visible FAQ; remove the
+      hand-rolled visible section + head FAQPage + per-page `#faq` CSS; verify byte-identical + gates.
+- [ ] Confirm gate 6 = exactly ONE FAQPage per page after migration (the bug that surfaced this).
+- [ ] Remove `FAQ_PHASE3_HANDOFF.md` before merge.
