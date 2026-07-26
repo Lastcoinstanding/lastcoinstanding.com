@@ -759,7 +759,7 @@
       ' · ' + s.yearsInRetirement + ' yrs in retirement.' +
       ' Price basis: ' + (RT_BASIS === 'current' ? 'today’s ' + todaysBasisPhrase(rtCurrentRatio()) + ' to trend persists' : 'reverts to trend') + '.' +
       ' Dollars: ' + (RT_DOLLARS === 'real' ? "real (today's, " + window.ModelingAssumptions.get('inflation').value + '% infl)' : 'nominal (future)') + '.' +
-      ' Income target: ' + (SCENARIO.incomeBasis === 'fixed' ? 'fixed future $' : "today's dollars") + '.';
+      ' Income target: ' + (SCENARIO.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation') + '.';
   }
 
   function renderRtTables(stack) {
@@ -777,8 +777,8 @@
     var incEl = document.getElementById('rtIncomeNote');
     if (incEl) {
       incEl.textContent = (SCENARIO.incomeBasis === 'fixed')
-        ? 'Income drawn is flat here because your $ target is treated as a fixed future amount — the same raw dollars every year; in real (today’s $) mode it shrinks as inflation erodes it. To treat your target as today’s purchasing power instead (nominal grows, real stays flat), switch “Income target” to “Today’s dollars”.'
-        : 'Income drawn rises in nominal mode because your $ target is treated as today’s dollars — it takes more future dollars each year to buy the same goods; in real mode it stays flat at your target. To treat your target as a fixed future amount instead (nominal flat, real lower), switch “Income target” to “Fixed future $”.';
+        ? 'Income drawn is flat here because your $ target is treated as the same raw dollars every year; in real (today’s $) mode it shrinks as inflation erodes it. To treat your target as today’s purchasing power instead (nominal grows, real stays flat), switch “Income target” to “Rises with inflation”.'
+        : 'Income drawn rises in nominal mode because your $ target is treated as today’s dollars — it takes more future dollars each year to buy the same goods; in real mode it stays flat at your target. To keep the same raw dollars every year instead (nominal flat, real lower), switch “Income target” to “Same every year”.';
     }
     updateRtBasisLabels();
   }
@@ -935,7 +935,7 @@
     lines.push('# Inflation,' + inflation.value + '%');
     lines.push('# Price assumption,' + (RT_BASIS === 'current' ? "today's " + todaysBasisPhrase(rtCurrentRatio()) + ' to trend persists' : 'reverts to trend'));
     lines.push('# Dollar basis,' + (RT_DOLLARS === 'real' ? "real (today's dollars, " + inflation.value + '% inflation)' : 'nominal (future dollars)'));
-    lines.push('# Income target basis,' + (s.incomeBasis === 'fixed' ? 'fixed future $' : "today's dollars"));
+    lines.push('# Income target basis,' + (s.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation'));
     lines.push('# Live scenario URL,' + window.location.href);
     lines.push('');
     // BTC price is always nominal; portfolio/income dollars follow the active basis.

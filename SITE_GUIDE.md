@@ -973,6 +973,10 @@ Tax-distinct mechanics surface on the sibling Disciplined Rebalancing page, wher
 
 The illustrative tax line in the income slider tooltip — *"a 20% effective tax would reduce real take-home to roughly 80%"* — is preserved as a one-line magnitude acknowledgment, appropriate in any retirement context.
 
+### Income-basis toggle
+
+The *Interpret my retirement income as* control (`data-incbasis`, values `today` / `fixed`, mirrored on the income slider and both year-by-year tables) is labelled **"Rises with inflation" / "Same every year"** (renamed from "Today's dollars" / "Fixed future $" in Aug 2026 rev2 item 4). The rename is display-only — the `incbasis` value and URL param are unchanged. The old "Fixed future $" named the *unit* when the real distinction is *behavioral* (does the withdrawal rise with inflation or stay flat); the new pair is parallel and behavioral. Deliberately **not** called "nominal" — `RT_DOLLARS = 'nominal' | 'real'` is an independent display-basis toggle, and a user can be in real display with a same-every-year plan, so overloading "nominal" would make that state unexplainable. The existing tooltips already describe the behavior and are unchanged.
+
 ### Print output
 
 `Cmd/Ctrl+P` produces a single-page PDF with: header strip (brand + URL + date) → page title → 9-row inputs table (6 sliders + 3 baseline picker selections) → projection chart → sustainability summary → disclaimer footer. Pattern is reusable for sibling pages — documented in `STYLE_GUIDE` print stylesheet section.
