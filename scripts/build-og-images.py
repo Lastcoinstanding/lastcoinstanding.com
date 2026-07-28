@@ -445,6 +445,30 @@ CARDS = [
         },
         "output_filename": "og-the-gallery.jpg",
     },
+    {
+        # STRC Below Par — product-forward: the lever board is the hero visual.
+        # Added July 2026 with the page; the binary could not be generated in the
+        # build environment (no working Python/node there — see SITE_GUIDE §42
+        # Open items). Run `npm run build-ogs -- --only strc-below-par` once the
+        # branch preview is live, then commit og-strc-below-par.jpg.
+        "name": "strc-below-par",
+        "url": "https://lastcoinstanding.com/strc-below-par",
+        "hero_selector": ".sb-board",
+        "wait_after_navigate_ms": 2000,
+        "wait_after_scroll_ms": 2500,
+        "chrome": {
+            "title": "STRC ",
+            "titleAccent": "Below Par",
+            "titleAfter": "",
+            "subtitle": "A bitcoin-backed preferred built to trade near $100 par — trading below it. Both readings of the discount, with live coverage math and no verdict.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">Discount, or warning?</strong>'
+                '  ·  effective yield  ·  three live coverage ratios  ·  return-to-par'
+            ),
+            "urlText": "lastcoinstanding.com/strc-below-par",
+        },
+        "output_filename": "og-strc-below-par.jpg",
+    },
 ]
 
 
