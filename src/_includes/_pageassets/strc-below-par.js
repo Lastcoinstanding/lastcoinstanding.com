@@ -92,6 +92,10 @@
   //    sourced constant. Adjust with the SOFR level at refresh. ──
   var SOFR_FLOOR_PCT = 4.3;
 
+  // 10-year Treasury yield — reused from the parent page (bitcoin-fixed-income
+  // PATHS.treasury.yield = 0.043). Refresh alongside the parent on the monthly checklist.
+  var TSY_YIELD = 0.043;
+
   // ── Palette (shared house conventions) ──
   var AMBER = '#e09422', BLUE = '#6db3d4', MUTED = '#7a7367', DIM = '#9a9080', PULSE = '#F7931A';
 
@@ -188,6 +192,8 @@
     return (m % 12 === 0) ? (y + (y === 1 ? ' year' : ' years')) : y.toFixed(1) + ' years';
   }
   function fmtBillions(b) { return '$' + b.toFixed(2) + 'B'; }
+  var MONTHS_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function prettyMonth(ym) { var p = ('' + ym).split('-'); return MONTHS_ABBR[parseInt(p[1], 10) - 1] + ' ' + p[0]; }
 
   // ═══════════════════════════════════════════════════════════════
   // RENDER — live status strip
@@ -213,6 +219,21 @@
   }
 
   // ═══════════════════════════════════════════════════════════════
+  // RENDER — the key-insights box ("the page in three numbers")
+  // Bullets 1 & 3 are live; bullet 2 is the static both-ways sentence (in HTML).
+  // ═══════════════════════════════════════════════════════════════
+  function renderKeyInsights() {
+    var p = strcPrice();
+    setHTML('sbKi1', '$' + COUPON.toFixed(0) + ' on $' + p.toFixed(2) + ' is <strong>' + pct2(effYield(p))
+      + '</strong> &mdash; vs ' + pct2(RATE) + ' at par.');
+    var spot = (btcSpot != null ? btcSpot : TODAY_PRICE);
+    var c = coverage(spot), be = breakevens();
+    setHTML('sbKi3', 'Full-waterfall coverage is <strong>' + c.waterfall.toFixed(2)
+      + '&times;</strong> at today&rsquo;s bitcoin &mdash; the one number to watch. It reaches 1.0&times; at about <strong>'
+      + moneyK(be.senior) + '</strong>.');
+  }
+
+  // ═══════════════════════════════════════════════════════════════
   // RENDER — §A the lever board
   // ═══════════════════════════════════════════════════════════════
   function logRows(rows) {
@@ -231,14 +252,17 @@
 
   function renderRateLever() {
     var latest = STRC_DATA.rateHistory[STRC_DATA.rateHistory.length - 1];
+    var priorChanges = STRC_DATA.rateHistory.length - 1;
+    // Visible status carries the latest row so the collapsed 12-row log isn't needed
+    // to read "where the rate is now" (progressive disclosure).
     setHTML('sbRateStatus',
       statusField('Current annualized rate', pct2(RATE) + ' <span class="sb-mini">semi-monthly, $0.50 × 2</span>')
-      + statusField('Since', latest[0] + ' · as of ' + STRC_DATA.asOf));
+      + statusField('History', pct2(RATE) + ' since ' + prettyMonth(latest[0]) + ' · ' + priorChanges + ' prior changes'));
 
     // Bracket dial: framework-says (from prior-month VWAP) vs board-did vs posture.
     var fw;
     if (STRC_DATA.priorMonthVWAP == null) {
-      fw = '<span class="sb-dial-pending">populate at monthly refresh</span>';
+      fw = '<span class="sb-dial-pending">populate at monthly refresh (first refresh: Aug 2026)</span>';
     } else {
       fw = bracketFor(STRC_DATA.priorMonthVWAP);
     }
@@ -274,11 +298,18 @@
   }
 
   function renderBidLever() {
-    var totShares = 0, totUsd = 0, totPar = 0, totSaved = 0;
-    STRC_DATA.buybackLog.forEach(function (b) { totShares += b.shares; totUsd += b.usdM; totPar += b.parRetiredM; totSaved += b.annualDivSavedM; });
-    var avg = totUsd * 1e6 / totShares;
+    var totShares = 0, totUsd = 0, totPar = 0, totSaved = 0, avgNum = 0;
+    STRC_DATA.buybackLog.forEach(function (b) { totShares += b.shares; totUsd += b.usdM; totPar += b.parRetiredM; totSaved += b.annualDivSavedM; avgNum += b.avg * b.shares; });
+    // Display the disclosed (8-K) volume-weighted average price; the $/shares
+    // computation ($25.0M / 288,930 = $86.53) differs by a rounding cent and is
+    // logged as a console reconciliation only, not shown (design §5 discipline).
+    var dispAvg = avgNum / totShares;
+    var compAvg = totUsd * 1e6 / totShares;
+    if (window.console && console.log && Math.abs(dispAvg - compAvg) > 0.005) {
+      console.log('[strc] bid avg: disclosed $' + dispAvg.toFixed(2) + ' (shown) vs computed $' + compAvg.toFixed(2) + ' ($/shares) — rounding');
+    }
     setHTML('sbBidStatus',
-      statusField('Cumulative repurchased', totShares.toLocaleString() + ' sh · $' + totUsd.toFixed(1) + 'M · avg ' + money2(avg))
+      statusField('Cumulative repurchased', totShares.toLocaleString() + ' sh · $' + totUsd.toFixed(1) + 'M · avg ' + money2(dispAvg))
       + statusField('Par retired', '$' + totPar.toFixed(2) + 'M → $' + totSaved.toFixed(1) + 'M/yr of dividends eliminated')
       + statusField('Authorization remaining', '~$' + STRC_DATA.authRemaining.preferredM.toFixed(0) + 'M of $1B preferred repurchase')
       + statusField('Sibling auths', '$' + STRC_DATA.authRemaining.mstrB.toFixed(1) + 'B MSTR (unused) · $' + STRC_DATA.authRemaining.btcMonetizationCapB.toFixed(2) + 'B BTC monetization ($' + STRC_DATA.authRemaining.btcMonetizationUsedM.toFixed(1) + 'M used)'));
@@ -475,27 +506,42 @@
     var m = btcMultiple();
     var upToPar = (PAR / p - 1);
     var btc2y = btcRevCAGR(2);
+    var tsyPct = (TSY_YIELD * 100).toFixed(1) + '%';
+    // Peak-to-trough of the one completed episode, from the record anchors.
+    var ath = 0, atl = Infinity;
+    RECORD_ANCHORS.forEach(function (a) { if (a.price > ath) ath = a.price; if (a.price < atl) atl = a.price; });
+    var ddPct = (atl - ath) / ath;
     document.getElementById('sbColStrc').innerHTML = 'STRC at ' + (p / PAR).toFixed(2) + '× par';
     document.getElementById('sbColBtc').innerHTML = 'Bitcoin at ' + m.toFixed(2) + '× trend';
+    document.getElementById('sbColTsy').innerHTML = '10-year Treasury (~' + tsyPct + ')';
     var rows = [
       ['&ldquo;Wait for recovery&rdquo; upside',
         'capped at par (' + signPct0(upToPar) + ') + coupon',
-        'uncapped; ~' + signPct0(btc2y) + '/yr at a 2-year reversion (live from Discount, or Premium?)'],
+        'uncapped; ~' + signPct0(btc2y) + '/yr at a 2-year reversion',
+        'none beyond its ~' + tsyPct + ' yield to maturity'],
       ['Cash flow while waiting',
         '~' + pct1(effYield(p)) + ' effective yield <strong>if sustained</strong>',
-        'none'],
+        'none',
+        '~' + tsyPct + ', contractual'],
       ['What recovery requires',
         'the same thing: bitcoin recovering',
-        'bitcoin recovering'],
+        'bitcoin recovering',
+        'nothing — independent of bitcoin'],
       ['If bitcoin doesn’t recover',
         'dividend at risk (see the cost accounting); no floor demonstrated ($71.25 low)',
-        'the ' + PL_FLOOR.toFixed(2) + '× floor — held for the record’s length; evidence, not law'],
+        'the ' + PL_FLOOR.toFixed(2) + '× floor — held for the record’s length; evidence, not law',
+        'unaffected — par at maturity, rate risk only'],
+      ['Mark-to-market in a bitcoin drawdown',
+        'the discount opened as bitcoin fell — <strong>' + signPct0(ddPct) + '</strong> peak-to-trough ($' + ath.toFixed(2) + ' → $' + atl.toFixed(2) + ') in the one completed episode',
+        'the drawdown itself',
+        'broadly stable — rate risk only, independent of bitcoin'],
       ['Claim seniority',
         'a preferred claim on a leveraged bitcoin treasury',
-        'the asset itself']
+        'the asset itself',
+        'full faith and credit of the U.S. government']
     ];
     document.getElementById('sbSharpBody').innerHTML = rows.map(function (r) {
-      return '<tr><th scope="row">' + r[0] + '</th><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>';
+      return '<tr><th scope="row">' + r[0] + '</th><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td></tr>';
     }).join('');
   }
 
@@ -592,10 +638,10 @@
   // WIRING
   // ═══════════════════════════════════════════════════════════════
   function renderPriceDependent() {
-    renderStatus(); renderArith(); renderLens(); renderSharp(); renderCost();
+    renderStatus(); renderKeyInsights(); renderArith(); renderLens(); renderSharp(); renderCost();
   }
   function renderCoverageDependent() {
-    renderStatus(); renderCoverage(); renderSharp(); renderCost();
+    renderStatus(); renderKeyInsights(); renderCoverage(); renderSharp(); renderCost();
   }
   function renderAllStatic() {
     renderRateLever(); renderSupplyLever(); renderBidLever(); renderFuelLever(); renderRecord();
