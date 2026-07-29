@@ -64,6 +64,10 @@ body { background: var(--bg); color: var(--text); }
 .sb-latest-badge { flex: 0 0 auto; font-size: 0.56rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); background: rgba(224,148,34,0.12); border: 1px solid rgba(224,148,34,0.3); border-radius: 3px; padding: 0.05rem 0.35rem; align-self: center; }
 .sb-asof-badge { display: inline-block; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 3px; padding: 0.05rem 0.4rem; }
 
+/* Plain-English info icon (native title tooltip + accessible label). Muted → amber. */
+.sb-tip { display: inline-block; font-size: 0.72rem; line-height: 1; color: var(--text-muted); cursor: help; vertical-align: 1px; margin-left: 0.12rem; transition: color 0.15s; }
+.sb-tip:hover, .sb-tip:focus-visible { color: var(--amber); outline: none; }
+
 /* ══ LIVE STATUS STRIP ══ */
 .sb-status { margin: 2.6rem auto 0; max-width: 1100px; background: linear-gradient(135deg, rgba(224,148,34,0.06), rgba(20,18,16,0.4)); border: 1px solid rgba(224,148,34,0.22); border-radius: 12px; padding: 1.5rem 1.6rem 1.3rem; }
 .sb-status-label { font-family: var(--font-b); font-size: 0.66rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); margin: 0 0 1rem; }
@@ -79,6 +83,8 @@ body { background: var(--bg); color: var(--text); }
 .sb-stat-sub strong { color: var(--text); font-weight: 600; }
 .sb-status-meta { font-family: var(--font-b); font-size: 0.78rem; color: var(--text-muted); margin: 1.1rem 0 0.6rem; }
 .sb-asof-line { font-family: var(--font-b); font-size: 0.76rem; color: var(--text-muted); margin: 0; line-height: 1.6; }
+/* Moved to the top of the strip (confidence-first) — needs bottom spacing there. */
+.sb-asof-top { margin: 0 0 1.1rem; }
 
 /* ══ KEY-INSIGHTS BOX — "the page in three numbers" ══════════════
    Reusable pattern piloted here; component-scoped but cleanly extractable
@@ -130,7 +136,8 @@ body { background: var(--bg); color: var(--text); }
 
 /* Coverage three-number block */
 .sb-coverage { margin: 0.5rem 0 0.7rem; }
-.sb-cov-cap { font-family: var(--font-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; color: var(--text-dim); margin-bottom: 0.6rem; }
+.sb-cov-cap { font-family: var(--font-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; color: var(--text-dim); margin-bottom: 0.3rem; }
+.sb-cov-preface { font-family: var(--font-b); font-size: 0.8rem; line-height: 1.5; color: var(--text-dim); margin: 0 0 0.7rem; }
 .sb-cov-live { display: inline-block; font-size: 0.56rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); background: rgba(111,174,111,0.1); border: 1px solid rgba(111,174,111,0.3); border-radius: 3px; padding: 0.05rem 0.35rem; vertical-align: 1px; }
 .sb-cov-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8rem; }
 .sb-cov-cell { text-align: center; padding: 0.8rem 0.7rem; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 8px; }
@@ -236,10 +243,13 @@ body { background: var(--bg); color: var(--text); }
 .sb-table { width: 100%; border-collapse: collapse; font-family: var(--font-b); font-size: 0.88rem; min-width: 560px; }
 .sb-table th, .sb-table td { text-align: left; padding: 0.7rem 0.9rem; border-bottom: 1px solid rgba(224,148,34,0.08); vertical-align: top; line-height: 1.5; }
 .sb-table thead th { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #f2eee8; border-bottom: 1px solid var(--amber); }
-.sb-table-3 { min-width: 680px; }
-.sb-table thead th:nth-child(2) { color: var(--amber); }
-.sb-table thead th:nth-child(3) { color: #F7931A; }
-.sb-table thead th:nth-child(4) { color: var(--blue); }
+.sb-table-3 { min-width: 720px; }
+.sb-table thead th:nth-child(2) { color: #F7931A; }      /* Bitcoin */
+.sb-table thead th:nth-child(4) { color: var(--blue); }  /* Treasury */
+/* STRC (column 3) — the subject, centered and subtly lifted. */
+.sb-table th.sb-col-mid, .sb-table td.sb-col-mid { background: rgba(224,148,34,0.05); border-left: 1px solid rgba(224,148,34,0.22); border-right: 1px solid rgba(224,148,34,0.22); }
+.sb-table thead th.sb-col-mid { color: var(--amber); }
+.sb-table td.sb-col-mid { color: var(--text); }
 .sb-table tbody th { font-weight: 600; color: var(--text); width: 26%; }
 .sb-table td { color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .sb-table td strong { color: var(--text); font-weight: 600; }

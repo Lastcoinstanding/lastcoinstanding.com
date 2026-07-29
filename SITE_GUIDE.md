@@ -2334,6 +2334,7 @@ Unlike the evergreen pages, this examines a **live episode** and says so. The ag
 
 ### Open items
 - **OG card** — `og-strc-below-par.jpg` **not yet generated** (same constraint documented for Discount, or Premium? §41: the build machine has no working Python — Windows Store stub — so the §6.15 generator can't run here; no node either for the product-forward path). Meta tags are wired to the final URL and a `scripts/build-og-images.py` CARDS entry is staged (`--only strc-below-par`). The `.eleventy.js` passthrough entry is present but **commented out** — registering a passthrough for a missing file can fail the Eleventy 3.x build and 404 the whole preview, so it stays commented until the binary lands (uncomment it in the same commit as the image; this mirrors §41's discount-or-premium handling). Generate the binary before the post-deploy §10 curl. Product-forward is the natural register (the lever board *is* the hero).
+- **Coverage-ratio history / trend-over-time** — deferred to the backlog (JM docx review, do not build now). The gauge shows the three ratios at current spot only; a sparkline of how coverage has moved would be a future addition, gated on a stored ratio series.
 - **Carousel slide** pending per house norm — deferred by design; tonal direction TBD (candidate register: a line hovering just under a level it was built to hold). Brief separately.
 - **Substack companion** (design §10) is a parallel track that does not gate the build; no `kind: substack` related entry was added because no article URL exists yet.
 

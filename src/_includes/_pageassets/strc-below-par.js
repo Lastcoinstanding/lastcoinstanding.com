@@ -292,7 +292,7 @@
 
   function renderSupplyLever() {
     setHTML('sbSupplyStatus',
-      statusField('Issuance policy', 'No new STRC below $100 par')
+      statusField('Issuance policy', 'No new STRC issued below $100 par')
       + statusField('As of', STRC_DATA.asOf));
     setHTML('sbSupplyLog', logRows(STRC_DATA.supplyLog));
   }
@@ -309,19 +309,20 @@
       console.log('[strc] bid avg: disclosed $' + dispAvg.toFixed(2) + ' (shown) vs computed $' + compAvg.toFixed(2) + ' ($/shares) — rounding');
     }
     setHTML('sbBidStatus',
-      statusField('Cumulative repurchased', totShares.toLocaleString() + ' sh · $' + totUsd.toFixed(1) + 'M · avg ' + money2(dispAvg))
+      statusField('Cumulative repurchased', totShares.toLocaleString() + ' shares · $' + totUsd.toFixed(1) + 'M · avg ' + money2(dispAvg))
       + statusField('Par retired', '$' + totPar.toFixed(2) + 'M → $' + totSaved.toFixed(1) + 'M/yr of dividends eliminated')
       + statusField('Authorization remaining', '~$' + STRC_DATA.authRemaining.preferredM.toFixed(0) + 'M of $1B preferred repurchase')
       + statusField('Sibling auths', '$' + STRC_DATA.authRemaining.mstrB.toFixed(1) + 'B MSTR (unused) · $' + STRC_DATA.authRemaining.btcMonetizationCapB.toFixed(2) + 'B BTC monetization ($' + STRC_DATA.authRemaining.btcMonetizationUsedM.toFixed(1) + 'M used)'));
     var rows = STRC_DATA.buybackLog.map(function (b) {
-      return { d: b.window, t: b.shares.toLocaleString() + ' sh', v: '$' + b.usdM.toFixed(1) + 'M @ avg ' + money2(b.avg) + ' — $' + b.parRetiredM.toFixed(2) + 'M par retired, ~$' + b.annualDivSavedM.toFixed(1) + 'M/yr saved' };
+      return { d: b.window, t: b.shares.toLocaleString() + ' shares', v: '$' + b.usdM.toFixed(1) + 'M @ avg ' + money2(b.avg) + ' — $' + b.parRetiredM.toFixed(2) + 'M par retired, ~$' + b.annualDivSavedM.toFixed(1) + 'M/yr saved' };
     });
     setHTML('sbBidLog', logRows(rows));
   }
 
   function renderFuelLever() {
     setHTML('sbFuelStatus',
-      statusField('USD reserve', fmtBillions(STRC_DATA.usdReserveB) + ' <span class="sb-mini">≈ 25 months of preferred dividends; cannot fund buybacks</span>')
+      statusField('Constants as of', STRC_DATA.asOf + ' <span class="sb-mini">every figure below is filing-sourced and refreshed monthly (reserve, dividend bill, claim stack, operating cash flow when shown)</span>')
+      + statusField('USD reserve', fmtBillions(STRC_DATA.usdReserveB) + ' <span class="sb-mini">≈ 25 months of preferred dividends; cannot fund buybacks</span>')
       + statusField('STRC dividend bill', fmtBillions(STRC_BILL_B) + '/yr <span class="sb-mini">= ' + STRC_NOTIONAL_B.toFixed(2) + 'B notional × ' + pct2(RATE) + ', computed float × rate</span>')
       + statusField('Total preferred bill', '~' + fmtBillions(RESERVE_IMPLIED_TOTAL_BILL_B) + '/yr <span class="sb-verify-badge">verify</span> <span class="sb-mini">reserve-implied ($3.75B ÷ 25 months); not reconstructible bottom-up from data on hand (STRK/STRD floats absent)</span>')
       + statusField('Senior converts', fmtBillions(SENIOR) + ' <span class="sb-mini">~0.42% avg coupon, 2028–2032, no margin/coverage liquidation triggers</span>')
@@ -352,8 +353,12 @@
     // A par buyer 12 months on: bought at par, collected a year of coupon, marks to p.
     var parHold12 = (p + COUPON - PAR) / PAR;
     setText('sbArithParHold', signPct1(parHold12));
+    // Make the math visible: entry, current mark, coupon collected, total return.
+    setHTML('sbArithParHoldSub', 'Bought at $' + PAR.toFixed(0) + ' a year ago, marked at $' + p.toFixed(2)
+      + ' today (' + (p >= PAR ? '+' : '−') + '$' + Math.abs(p - PAR).toFixed(2) + '), with ~$' + COUPON.toFixed(0)
+      + ' of coupon collected: &asymp; <strong>' + signPct1(parHold12) + '</strong> total return.');
     setHTML('sbArithProse', p < PAR
-      ? 'The coupon is real; at this price the mark-to-market has all but consumed a year of it. A buyer at par a year ago who marks to today is at <strong>' + signPct1(parHold12) + '</strong> total return despite collecting the full coupon throughout &mdash; the discount reading and the warning reading, in one number.'
+      ? 'The coupon is real; at this price the mark-to-market has all but consumed a year of it. A buyer at par a year ago who marks to today is at <strong>' + signPct1(parHold12) + '</strong> total return despite collecting the full coupon throughout &mdash; the discount reading and the warning reading, in one number. The price of that year: recovering today&rsquo;s $' + (PAR - p).toFixed(2) + ' mark through coupon alone would take roughly another <strong>' + dm.toFixed(1) + ' months</strong> &mdash; the entry yield at par looked better than it proved.'
       : 'At or above par, the pull-to-par works in reverse: a return toward par from here would be a capital loss, and the arithmetic below shows it.');
   }
 
@@ -363,7 +368,7 @@
   var DIV_NOTES = {
     sustained: 'The full ' + STRC_DATA.rateAnnualPct.toFixed(2) + '% coupon holds. This is the base case, not a promise &mdash; the dividend is board discretion.',
     cut: 'Illustrative: the coupon is cut toward its 1-month term SOFR floor (shown here as ~' + SOFR_FLOOR_PCT.toFixed(1) + '%). Cuts are capped per month and barred while cumulative arrears exist.',
-    suspended: 'The dividend is suspended; arrears accrue as an unpaid claim, not cash. Modeled as price-return only &mdash; the assumption-free never-case is then 0%/yr, with the claim building unseen.'
+    suspended: 'The dividend is suspended (contractually available at any time; arrears accrue, no default). Arrears build as an unpaid claim, not cash. Modeled as price-return only &mdash; the assumption-free never-case is then 0%/yr, with the claim building unseen.'
   };
 
   function renderLens() {
@@ -511,37 +516,45 @@
     var ath = 0, atl = Infinity;
     RECORD_ANCHORS.forEach(function (a) { if (a.price > ath) ath = a.price; if (a.price < atl) atl = a.price; });
     var ddPct = (atl - ath) / ath;
+    var spot = (btcSpot != null ? btcSpot : TODAY_PRICE);
+    var cov = coverage(spot);
     document.getElementById('sbColStrc').innerHTML = 'STRC at ' + (p / PAR).toFixed(2) + '× par';
     document.getElementById('sbColBtc').innerHTML = 'Bitcoin at ' + m.toFixed(2) + '× trend';
     document.getElementById('sbColTsy').innerHTML = '10-year Treasury (~' + tsyPct + ')';
+    // Column order: Bitcoin | STRC | Treasury — STRC is the subject, in the middle.
+    // Each row is [label, bitcoin, strc, treasury].
     var rows = [
       ['&ldquo;Wait for recovery&rdquo; upside',
+        'uncapped; ~<a href="/discount-or-premium">' + signPct0(btc2y) + '/yr at a 2-year reversion</a>',
         'capped at par (' + signPct0(upToPar) + ') + coupon',
-        'uncapped; ~' + signPct0(btc2y) + '/yr at a 2-year reversion',
         'none beyond its ~' + tsyPct + ' yield to maturity'],
       ['Cash flow while waiting',
-        '~' + pct1(effYield(p)) + ' effective yield <strong>if sustained</strong>',
         'none',
+        '~' + pct1(effYield(p)) + ' effective yield <strong>if sustained</strong>',
         '~' + tsyPct + ', contractual'],
+      ['After inflation',
+        'the appreciation asset itself — the rest of this site&rsquo;s subject',
+        '<strong>' + pct1(effYield(p)) + '</strong> nominal — well above official inflation, if sustained',
+        '~' + tsyPct + ' nominal, near or below many real-world inflation measures — the <a href="/the-half-life">melting ice cube</a>'],
       ['What recovery requires',
-        'the same thing: bitcoin recovering',
         'bitcoin recovering',
+        'the same thing: bitcoin recovering',
         'nothing — independent of bitcoin'],
       ['If bitcoin doesn’t recover',
+        'the ' + PL_FLOOR.toFixed(2) + '× floor has held for the record&rsquo;s length — bitcoin&rsquo;s growth continuing while price sits at the lower bound of the trend',
         'dividend at risk (see the cost accounting); no floor demonstrated ($71.25 low)',
-        'the ' + PL_FLOOR.toFixed(2) + '× floor — held for the record’s length; evidence, not law',
         'unaffected — par at maturity, rate risk only'],
       ['Mark-to-market in a bitcoin drawdown',
-        'the discount opened as bitcoin fell — <strong>' + signPct0(ddPct) + '</strong> peak-to-trough ($' + ath.toFixed(2) + ' → $' + atl.toFixed(2) + ') in the one completed episode',
         'the drawdown itself',
+        'the discount opened as bitcoin fell — <strong>' + signPct0(ddPct) + '</strong> peak-to-trough ($' + ath.toFixed(2) + ' → $' + atl.toFixed(2) + ') in the one completed episode',
         'broadly stable — rate risk only, independent of bitcoin'],
       ['Claim seniority',
-        'a preferred claim on a leveraged bitcoin treasury',
         'the asset itself',
+        'a preferred claim on a bitcoin treasury — over-collateralized (~' + cov.waterfall.toFixed(1) + '× across all senior claims), with modest, covenant-free debt ahead of it',
         'full faith and credit of the U.S. government']
     ];
     document.getElementById('sbSharpBody').innerHTML = rows.map(function (r) {
-      return '<tr><th scope="row">' + r[0] + '</th><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td></tr>';
+      return '<tr><th scope="row">' + r[0] + '</th><td>' + r[1] + '</td><td class="sb-col-mid">' + r[2] + '</td><td>' + r[3] + '</td></tr>';
     }).join('');
   }
 
@@ -560,7 +573,7 @@
     var accretion = COUPON / b.avg;
     setHTML('sbBidCost',
       'Retiring a $100-par share at the log’s average of ' + money2(b.avg) + ' extinguishes a $' + COUPON.toFixed(0) + '/yr perpetual obligation &mdash; about a <strong>' + pct1(accretion) + ' return on the buyback dollar</strong> at that price (the accretion case, the issuer’s framing, credited). '
-      + 'And the funding is disclosed to come from outside the preferred &mdash; common-equity issuance, and conditionally bitcoin sales &mdash; so the par defense is paid for elsewhere on the balance sheet. Both sentences computed; neither softened.');
+      + 'And the funding is disclosed to come from outside the preferred &mdash; common-equity issuance, and conditionally bitcoin sales &mdash; so the par defense is paid for elsewhere on the balance sheet. Both are true at once.');
 
     var be = breakevens();
     document.getElementById('sbBreakevens').innerHTML =
