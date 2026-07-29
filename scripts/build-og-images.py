@@ -453,7 +453,11 @@ CARDS = [
         # branch preview is live, then commit og-strc-below-par.jpg.
         "name": "strc-below-par",
         "url": "https://lastcoinstanding.com/strc-below-par",
-        "hero_selector": ".sb-board",
+        # Hero = the below-par lens chart (single amber return-to-par curve), NOT the
+        # lever board: JM reviewed both and the board is too dense at card scale while
+        # the curve reads at a glance (2026-07-28). Keep this in sync with the shipped
+        # card so monthly regenerations stay consistent.
+        "hero_selector": ".sb-chart-wrapper",
         "wait_after_navigate_ms": 2000,
         "wait_after_scroll_ms": 2500,
         "chrome": {

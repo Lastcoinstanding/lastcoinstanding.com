@@ -48,10 +48,7 @@ module.exports = function (eleventyConfig) {
     'og-borrowing-against-your-stack.jpg',
     'og-bitcoin-backed-mortgages.jpg',
     'og-bitcoin-fixed-income.jpg',
-    // 'og-strc-below-par.jpg',  // ← UNCOMMENT when the OG binary lands (see SITE_GUIDE §42
-    //   open items). Registering a passthrough for a missing file can fail the Eleventy 3.x
-    //   build and 404 the whole preview — so this stays commented until og-strc-below-par.jpg
-    //   exists, exactly as done for og-discount-or-premium.jpg (§41).
+    'og-strc-below-par.jpg',
     'og-lump-sum-or-ladder-in.jpg',
     'og-your-deployment-plan.jpg',
     'og-wait-or-deploy-now.jpg',
