@@ -254,6 +254,11 @@ body { background: var(--bg); color: var(--text); }
 .sb-table td { color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .sb-table td strong { color: var(--text); font-weight: 600; }
 .sb-table-note { font-family: var(--font-b); font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; margin: 0; max-width: 880px; }
+/* In-cell + cost-accounting links — JS-injected table anchors (and the suspension
+   card's #lens anchor) fall outside the prose link selectors, so scope the house
+   amber treatment to them explicitly (otherwise they render browser-default blue). */
+.sb-table td a, .sb-table-note a, .sb-cost-body a, .sb-watch-list a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+.sb-table td.sb-col-mid a { color: var(--amber); }
 
 /* ══ §D COST ACCOUNTING ══ */
 .sb-cost-block { margin: 0 0 1.2rem; padding: 1.1rem 1.3rem; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-left: 3px solid rgba(224,148,34,0.5); border-radius: 8px; max-width: 880px; }

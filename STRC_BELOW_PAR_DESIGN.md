@@ -76,9 +76,13 @@ original center-of-gravity concern:
    episode is live; when the monthly refresh declares it resolved and the page converts to
    post-mortem, the nav slot retires and reachability reverts to parent + related links. The
    site never carries a stale dashboard in its nav.
-Prominence control otherwise unchanged: no Featured carousel, no homepage slide, §6 fences
-hold. §C's "why not simply own bitcoin?" remains the re-centering device. Build-prompt note:
-return utility argues for cheap "what changed" surfacing — latest-log-entry badges per lever.
+Prominence control: **a homepage carousel slide under The Numbers only, NOT Featured**
+(REVISED 2026-07-28, JM — supersedes the original "no homepage slide" line: the slide
+ships in the Numbers category with `data-feat="0"`, so it rotates within The Numbers but
+never enters the ~10-slot Featured rotation; the flagship/financialization fence still holds
+one row back). §6 fences otherwise hold. §C's "why not simply own bitcoin?" remains the
+re-centering device. Build-prompt note: return utility argues for cheap "what changed"
+surfacing — latest-log-entry badges per lever.
 
 ## 3. Page structure (four sections + one interactive)
 
