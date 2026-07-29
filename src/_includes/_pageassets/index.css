@@ -77,8 +77,12 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
     font-family: var(--font-display);
     font-weight: 500;
     font-size: clamp(2.2rem, 5vw, 3.4rem);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    /* Mixed-case Cormorant hero line (STYLE_GUIDE hero convention). Was the
+       uppercase + wide-tracked brand wordmark ("Last Coin Standing"); the brand
+       now lives in the header, and the hero H1 carries the value proposition, so
+       it reads as a sentence, not a wordmark. */
+    letter-spacing: -.01em;
+    line-height: 1.12;
     color: var(--text-bright);
     margin-bottom: 0.75rem;
     text-shadow: 0 2px 20px rgba(0,0,0,0.6);
@@ -91,7 +95,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
     font-size: clamp(1.05rem, 2.2vw, 1.35rem);
     color: #c8c0b4;
     line-height: 1.6;
-    margin-bottom: 1.5rem;
+    max-width: 42rem;
+    margin: 0 auto 1.5rem;
     text-shadow: 0 1px 12px rgba(0,0,0,0.5);
 }
 
@@ -263,7 +268,7 @@ footer a:hover { text-decoration: underline; }
 @media (max-width: 480px) {
     .hero { min-height: 300px; }
     .hero-content { padding: 2.5rem 1.25rem; }
-    .hero h1 { font-size: 1.7rem; letter-spacing: 0.06em; }
+    .hero h1 { font-size: 1.9rem; letter-spacing: -.01em; }
     .hero .tagline { font-size: 0.95rem; }
     .hero .intro { font-size: 0.88rem; }
     .concept-card { padding: 1.5rem 1.25rem; }
