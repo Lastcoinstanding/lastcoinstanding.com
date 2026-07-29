@@ -1,0 +1,390 @@
+---
+layout: base.njk
+permalink: /strc-below-par.html
+slug: strc-below-par
+title: STRC Below Par
+related:
+  - slug: bitcoin-fixed-income
+    desc: "The parent page. STRC is one of the four instruments it weighs; this page is the deeper look at what its below-par price is saying, live."
+  - slug: discount-or-premium
+    desc: "The sibling lens, applied to bitcoin itself. Same two-sided discipline — a low price is either opportunity or information — measured against trend there, against par here."
+  - slug: the-bitcoin-retirement-stress-test
+    desc: "The same clear-eyed treatment of drawdowns: what a plan survives and what it doesn't, shown rather than asserted. STRC's dividend under stress is the analogue here."
+  - slug: the-power-law
+    desc: "The trend model behind the BTC-reversion overlay in the interactive — the arithmetic that reads bitcoin's distance from its long-run trend."
+faq:
+  - q: "Why is STRC trading below par?"
+    a: "STRC is designed to trade near its $100 par, with a monthly dividend-rate mechanism meant to encourage it. A persistent discount despite that mechanism means the market is demanding a higher yield than 12% at par delivers — pricing in some mix of dividend risk, issuer stress from bitcoin's drawdown, and structural doubt. The discount reading is that the same $12 coupon on a lower price is a higher effective yield; the warning reading is that a peg which isn't pinning is itself information. This page shows both with arithmetic rather than choosing between them."
+  - q: "Is STRC's dividend guaranteed?"
+    a: "No. STRC dividends are cumulative but payable only when and if the board declares them — rate-setting is board discretion, and the published rate-bracket framework is management policy that can be modified or abandoned without shareholder consent. There are holder-friendly guardrails on the downside (cuts are capped per month, floored at term SOFR, and legally barred while any cumulative dividends remain unpaid), but none of that makes the dividend a guarantee. Full suspension is also contractually available — arrears would accrue (blocking any rate cut until paid) rather than trigger a default; the Suspended scenario in the interactive models it. The interactive lets you see the sustained, cut, and suspended cases side by side, including where the suspended case turns clearly negative."
+  - q: "What does STRC's buyback program do?"
+    a: "The issuer stood up a repurchase program that buys STRC below par. Retiring a $100-par share for less than $100 extinguishes a perpetual 12% obligation at a discount — at the disclosed average price that is roughly a 13.9% return on each buyback dollar, the accretion case. The same dollars are funded from outside the preferred (common-equity issuance and, conditionally, bitcoin sales), so the par defense is paid for elsewhere on the balance sheet. Both readings are computed on this page; neither is softened."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/strc-below-par-head.html' %}"
+  page_styles: "{% include '_pageassets/strc-below-par.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/strc-below-par.js' %}"
+---
+{#
+  ══════════════════════════════════════════════════════════════════════════════
+  AGING POLICY — READ BEFORE EDITING (design doc STRC_BELOW_PAR_DESIGN.md §7)
+
+  This page is deliberately EPISODIC, not evergreen. It examines a live episode:
+  STRC trading below its $100 par. Two honest states, decided at each monthly
+  refresh (MONTHLY_REFRESH_CHECKLIST → STRC block):
+
+    (a) Episode ONGOING  → the live numbers carry it as-is; append log rows,
+        update STRC_DATA, re-verify the rate. The nav slot (Numbers → Living on
+        Bitcoin → "STRC Below Par") stays live.
+
+    (b) Episode RESOLVED (par regained, or a dividend action taken) → convert the
+        page to a POST-MORTEM — "what below-par was telling you, and how it
+        resolved." At that point the nav slot RETIRES (sunset rule, design §2):
+        reachability reverts to the parent (/bitcoin-fixed-income) + the related
+        strip. The site never carries a stale dashboard in its nav.
+
+  The title's question must always stay answerable by the reader. Every dated
+  figure carries its as-of date in copy; the status strip and coverage block
+  compute live from BTC spot. The dated constants live in one STRC_DATA object at
+  the top of strc-below-par.js — refresh there, not here.
+
+  Register: essayistic + computed, both-sides, de-tell. This page sits closest to
+  the advice line of anything on the site (design §5) — no buy/sell language, no
+  verdicts, no price predictions. Counsel/register review gates the merge.
+  ══════════════════════════════════════════════════════════════════════════════
+#}
+
+<section class="hero">
+  <h1>STRC Below Par: Discount, or <em>Warning?</em></h1>
+  <div class="hero-subtitle">A bitcoin-backed preferred stock, expected to trade near its $100 par value &mdash; yet trading below it.</div>
+  <p class="subtitle">A low price is <em>either</em> opportunity <em>or</em> cautionary information. This page shows you both readings of STRC&rsquo;s discount &mdash; with arithmetic, not adjectives &mdash; and lets you watch the contest between the yield the market demands and the balance sheet the issuer can deploy against it &mdash; live.</p>
+</section>
+
+<main class="content-area">
+
+  {% include 'components/tool-framing.njk' %}
+
+  <div class="section-intro sb-prose">
+    <p>STRC is Strategy&rsquo;s variable-rate perpetual preferred &mdash; dividends in cash, a stated design goal of trading around $100 par, and a rate the board adjusts monthly to encourage it. Today it trades below par, and that cuts two ways: the same $12 coupon on a sub-$100 price is a higher effective yield &mdash; and a mechanism built to hold the price at par that isn&rsquo;t holding it is telling you the market is pricing a risk. This page shows both readings but recommends neither. For where STRC sits among bitcoin-backed income instruments, see <a href="/bitcoin-fixed-income">Bitcoin and Fixed Income</a>, the parent page.</p>
+  </div>
+
+  <!-- ════════ THE LIVE STATUS STRIP ════════ -->
+  <section class="sb-status" aria-label="Where STRC sits right now">
+    <div class="sb-status-label"><span class="sb-live-dot" id="sbLiveDot" aria-hidden="true" hidden></span>Where STRC sits right now</div>
+    <p class="sb-asof-line sb-asof-top">Price, effective yield and coverage ratios recompute live from bitcoin spot on each load; the dated constants below each carry an <span class="sb-asof-badge" id="sbAsOfBadge">as of &mdash;</span> badge.</p>
+    <div class="sb-status-grid">
+      <div>
+        <div class="sb-stat-cap">STRC price</div>
+        <div class="sb-stat-num" id="sbPrice">&mdash;</div>
+        <p class="sb-stat-sub" id="sbPriceSub">Last close, adjustable in the lens below.</p>
+      </div>
+      <div>
+        <div class="sb-stat-cap">Coupon at par</div>
+        <div class="sb-stat-num" id="sbCoupon">&mdash;</div>
+        <p class="sb-stat-sub">The stated annual rate on $100 par, paid semi-monthly.</p>
+      </div>
+      <div class="sb-stat-central">
+        <div class="sb-stat-cap">Effective yield</div>
+        <div class="sb-stat-num" id="sbYield">&mdash;</div>
+        <p class="sb-stat-sub" id="sbYieldSub">&nbsp;</p>
+      </div>
+    </div>
+    <p class="sb-status-meta" id="sbStatusMeta"></p>
+  </section>
+
+  <!-- ════════ KEY INSIGHTS — the page in three numbers ════════ -->
+  <section class="sb-keyinsights" aria-label="The page in three numbers">
+    <div class="sb-ki-label">The page in three numbers</div>
+    <ul class="sb-ki-list">
+      <li id="sbKi1">&mdash;</li>
+      <li id="sbKi2">A discount this persistent is either extra yield or the market pricing a risk. This page examines both interpretations.</li>
+      <li id="sbKi3">&mdash;</li>
+    </ul>
+  </section>
+
+  <!-- ════════ §B — THE BELOW-PAR ARITHMETIC + INTERACTIVE ════════ -->
+  <section class="sb-section" id="arithmetic">
+    <div class="sb-eyebrow">One line of math, both directions</div>
+    <h2 class="sb-h2">The below-par arithmetic</h2>
+    <p class="sb-lead">Every figure here is computed live from the price. The discount is a number; so is what closing it would be worth, and so is the case where it never closes.</p>
+
+    <div class="sb-arith-grid">
+      <div class="sb-arith-cell">
+        <div class="sb-arith-cap">Effective yield</div>
+        <div class="sb-arith-num" id="sbArithYield">&mdash;</div>
+        <p class="sb-arith-sub" id="sbArithYieldSub">Coupon &divide; price, against the coupon at par.</p>
+      </div>
+      <div class="sb-arith-cell">
+        <div class="sb-arith-cap">The discount, in time</div>
+        <div class="sb-arith-num" id="sbArithMonths">&mdash;</div>
+        <p class="sb-arith-sub" id="sbArithMonthsSub">How many months of coupon the gap to par is worth.</p>
+      </div>
+      <div class="sb-arith-cell">
+        <div class="sb-arith-cap">A buyer at par, one year on</div>
+        <div class="sb-arith-num" id="sbArithParHold">&mdash;</div>
+        <p class="sb-arith-sub" id="sbArithParHoldSub">&mdash;</p>
+      </div>
+    </div>
+    <p class="sb-note" id="sbArithProse">&mdash;</p>
+
+    <!-- The interactive -->
+    <div class="sb-lens" id="lens">
+      <div class="sb-lens-head">
+        <h3 class="sb-h3">The below-par lens</h3>
+        <span class="sb-readout" id="sbLensReadout">&mdash;</span>
+      </div>
+      <p class="sb-cue">If &mdash; or when &mdash; STRC returns to par, the annualized return is the coupon plus the pull to par. Drag to choose <strong>how fast</strong>; the speed is <em>your</em> assumption, and the arithmetic is its consequence. Nothing here predicts a return to par.</p>
+
+      <!-- Reader-adjustable price + horizon -->
+      <div class="sb-lens-inputs">
+        <div class="sb-input-row">
+          <label class="sb-input-label" for="sbPriceInput">STRC price</label>
+          <span class="sb-input-field">
+            <span class="sb-input-pre">$</span>
+            <input type="number" class="sb-input-num" id="sbPriceInput" min="1" max="130" step="0.01"
+                   inputmode="decimal" autocomplete="off" aria-label="STRC price to model, in dollars">
+          </span>
+          <span class="sb-input-note" id="sbPriceInputNote">Defaults to the last close; adjust to model any price.</span>
+        </div>
+      </div>
+
+      <div class="sb-slider-block">
+        <div class="sb-slider-wrap">
+          <input type="range" min="6" max="60" step="1" value="24" class="sb-slider" id="sbSlider"
+                 aria-label="Months for STRC to return to par, from six months to five years">
+        </div>
+        <div class="sb-slider-scale"><span>6 months</span><span>2.5 years</span><span>5 years</span></div>
+        <div class="sb-never-row">
+          <label class="sb-never-toggle"><input type="checkbox" id="sbNever"> <span>Never returns to par</span></label>
+          <span class="sb-never-note">The assumption-free case: you earn the effective yield, if the dividend holds.</span>
+        </div>
+      </div>
+
+      <!-- Dividend scenario -->
+      <div class="sb-toggle-block">
+        <div class="sb-toggle-cap">Dividend scenario</div>
+        <div class="sb-div-toggle" role="group" aria-label="Dividend scenario">
+          <button type="button" class="sb-div-btn is-active" data-div="sustained" aria-pressed="true">Sustained</button>
+          <button type="button" class="sb-div-btn" data-div="cut" aria-pressed="false">Cut to floor</button>
+          <button type="button" class="sb-div-btn" data-div="suspended" aria-pressed="false">Suspended</button>
+        </div>
+        <p class="sb-toggle-note" id="sbDivNote">&mdash;</p>
+      </div>
+
+      <!-- Primary readout pair -->
+      <div class="sb-pair">
+        <div class="sb-cell sb-cell-primary">
+          <div class="sb-cell-cap">Estimated: annualized return if it returns to par</div>
+          <div class="sb-cell-num" id="sbLensReturn">&mdash;</div>
+          <p class="sb-cell-sub" id="sbLensReturnSub">&nbsp;</p>
+        </div>
+        <div class="sb-cell">
+          <div class="sb-cell-cap">Estimated: if it never returns to par</div>
+          <div class="sb-cell-num" id="sbLensNever">&mdash;</div>
+          <p class="sb-cell-sub" id="sbLensNeverSub">&nbsp;</p>
+        </div>
+      </div>
+
+      <!-- Overlays -->
+      <div class="sb-overlays">
+        <span class="sb-overlays-cap">Compare against</span>
+        <label class="sb-ov-toggle"><input type="checkbox" id="sbOvBtc"> <span>Bitcoin reverting to trend</span></label>
+        <label class="sb-ov-toggle"><input type="checkbox" id="sbOvTsy"> <span>10-year Treasury</span></label>
+      </div>
+
+      <div class="sb-chart-block">
+        <div class="sb-chart-wrapper"><canvas id="sbChart"></canvas></div>
+        <p class="sb-chart-caption" id="sbChartCaption">Estimated annualized return at every return-to-par horizon. The <strong>amber line</strong> is STRC&rsquo;s implied return under the chosen dividend scenario; overlays are opt-in. The curve flattens toward the effective yield as the horizon lengthens &mdash; the further out the return is pushed, the less the pull-to-par adds. An assumption, not a forecast.</p>
+      </div>
+
+      <!-- Demanded-yield converter (collapsed by default — progressive disclosure) -->
+      <details class="sb-more sb-converter-wrap">
+      <summary>More: demanded-yield &harr; price converter</summary>
+      <div class="sb-converter" id="converter">
+        <div class="sb-conv-cap">Demanded-yield &harr; price converter</div>
+        <p class="sb-conv-lead">Price is simply the annual coupon divided by the yield the market demands. Set either side; the other follows. No scenario is endorsed &mdash; this is pure arithmetic that spans every camp&rsquo;s.</p>
+        <div class="sb-conv-row">
+          <span class="sb-input-field">
+            <input type="number" class="sb-input-num" id="sbDemandYield" min="0.1" max="80" step="0.1" inputmode="decimal" autocomplete="off" aria-label="Demanded yield, percent">
+            <span class="sb-input-post">% demanded</span>
+          </span>
+          <span class="sb-conv-arrow">&harr;</span>
+          <span class="sb-input-field">
+            <span class="sb-input-pre">$</span>
+            <input type="number" class="sb-input-num" id="sbDemandPrice" min="1" max="1200" step="0.01" inputmode="decimal" autocomplete="off" aria-label="Implied STRC price, dollars">
+          </span>
+        </div>
+        <p class="sb-conv-note" id="sbConvNote">&mdash;</p>
+      </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ════════ §A — THE LEVER BOARD ════════ -->
+  <section class="sb-section" id="levers">
+    <div class="sb-eyebrow">The mechanism</div>
+    <h2 class="sb-h2">The levers the issuer holds against a below-par price</h2>
+    <p class="sb-lead">A peg that isn&rsquo;t pinning is information; a below-par preferred with a determined issuer is a measurable contest between the market&rsquo;s demanded yield and the issuer&rsquo;s balance sheet. The board below shows the issuer&rsquo;s side, live &mdash; four levers, each a status readout with its full log and mechanics on demand. Bitcoin&rsquo;s path sets the other side.</p>
+
+    <div class="sb-board">
+      <!-- Rate lever -->
+      <div class="sb-lever">
+        <div class="sb-lever-head">The rate lever <span class="sb-tip" tabindex="0" role="img" aria-label="The dividend rate the board sets each month." title="The dividend rate the board sets each month.">&#9432;</span></div>
+        <div class="sb-lever-status" id="sbRateStatus"></div>
+        <details class="sb-more">
+          <summary>Full log &amp; mechanics</summary>
+          <div class="sb-bracket" id="sbBracketDial"></div>
+          <div class="sb-lever-note">
+            <p><strong>The brackets are management policy</strong> &mdash; non-binding, modifiable or abandonable at any time without shareholder consent. Rate-setting is board sole discretion; dividends are payable only when declared.</p>
+            <p class="sb-guardrail"><span class="sb-guardrail-cap">Downside guardrails (the asymmetry)</span> Max monthly cut is 25 bps plus any intra-month 1-month SOFR decline; the absolute floor is 1-month term SOFR; and cuts are <strong>legally barred while any cumulative dividends remain unpaid.</strong> Rate rises, by contrast, are unlimited and discretionary.</p>
+          </div>
+          <div class="sb-log" id="sbRateLog" aria-label="Rate change log"></div>
+        </details>
+      </div>
+
+      <!-- Supply lever -->
+      <div class="sb-lever">
+        <div class="sb-lever-head">The supply lever <span class="sb-tip" tabindex="0" role="img" aria-label="Whether new STRC shares are sold." title="Whether new STRC shares are sold.">&#9432;</span></div>
+        <div class="sb-lever-status" id="sbSupplyStatus"></div>
+        <details class="sb-more">
+          <summary>Full log &amp; mechanics</summary>
+          <div class="sb-lever-note">
+            <p class="sb-dual"><span class="sb-dual-cap">The same fact, both camps</span> No new STRC issued below $100 is stated discipline (the company&rsquo;s framing) <em>and</em> economic necessity: below par, primary at-the-market issuance is uneconomic and the accumulation flywheel halts on its own (the Cipolaro / NYDIG reading).</p>
+          </div>
+          <div class="sb-log" id="sbSupplyLog" aria-label="Supply policy log"></div>
+        </details>
+      </div>
+
+      <!-- Bid lever -->
+      <div class="sb-lever">
+        <div class="sb-lever-head">The bid lever <span class="sb-tip" tabindex="0" role="img" aria-label="The company buying its own STRC back." title="The company buying its own STRC back.">&#9432;</span></div>
+        <div class="sb-lever-status" id="sbBidStatus"></div>
+        <details class="sb-more">
+          <summary>Full log &amp; mechanics</summary>
+          <div class="sb-lever-note">
+            <p>Retiring a $100-par share below par extinguishes a perpetual 12% obligation at a discount. What that costs and who pays for it is worked out in <a href="#cost">the cost accounting</a> below &mdash; both readings.</p>
+          </div>
+          <div class="sb-log" id="sbBidLog" aria-label="Repurchase log"></div>
+        </details>
+      </div>
+
+      <!-- Fuel gauge -->
+      <div class="sb-lever sb-lever-fuel">
+        <div class="sb-lever-head">The fuel gauge <span class="sb-tip" tabindex="0" role="img" aria-label="What pays for all of it: the bitcoin treasury and the cash reserve." title="What pays for all of it: the bitcoin treasury and the cash reserve.">&#9432;</span></div>
+
+        <div class="sb-coverage" id="sbCoverage">
+          <div class="sb-cov-cap">Asset coverage of STRC <span class="sb-cov-live">live</span></div>
+          <p class="sb-cov-preface">How many times over the treasury covers what&rsquo;s owed &mdash; three ways of counting.</p>
+          <div class="sb-cov-grid">
+            <div class="sb-cov-cell">
+              <div class="sb-cov-num" id="sbCovGross">&mdash;</div>
+              <div class="sb-cov-lbl">Gross BTC &divide; STRC notional <span class="sb-tip" tabindex="0" role="img" aria-label="Just the bitcoin, divided by what STRC alone is owed." title="Just the bitcoin, divided by what STRC alone is owed.">&#9432;</span></div>
+              <p class="sb-cov-sub">The popular &ldquo;dashboard&rdquo; metric &mdash; treats STRC as the sole liability.</p>
+            </div>
+            <div class="sb-cov-cell">
+              <div class="sb-cov-num" id="sbCovStandalone">&mdash;</div>
+              <div class="sb-cov-lbl">Standalone cushion <span class="sb-tip" tabindex="0" role="img" aria-label="Bitcoin plus cash, minus the senior claims, divided by what STRC is owed." title="Bitcoin plus cash, minus the senior claims, divided by what STRC is owed.">&#9432;</span></div>
+              <p class="sb-cov-sub">Net assets after senior claims &divide; STRC notional.</p>
+            </div>
+            <div class="sb-cov-cell">
+              <div class="sb-cov-num" id="sbCovWaterfall">&mdash;</div>
+              <div class="sb-cov-lbl">Full-waterfall coverage <span class="sb-tip" tabindex="0" role="img" aria-label="All liquid assets, divided by every claim senior to and including STRC." title="All liquid assets, divided by every claim senior to and including STRC.">&#9432;</span></div>
+              <p class="sb-cov-sub">Total liquid assets &divide; all claims senior-and-including STRC.</p>
+            </div>
+          </div>
+          <p class="sb-cov-note">The popular metric omits the senior claims that sit ahead of STRC. The three numbers answer three different questions; the page shows all three. Which one to watch for which risk is in <a href="#cost">the cost accounting</a>.</p>
+        </div>
+
+        <details class="sb-more">
+          <summary>Full log &amp; constants</summary>
+          <div class="sb-lever-status" id="sbFuelStatus"></div>
+          <div class="sb-log" id="sbFuelLog" aria-label="Fuel-gauge log"></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ §C — TWO QUESTIONS, ONE FROM EACH SHORE ════════ -->
+  <section class="sb-section" id="sharp">
+    <div class="sb-eyebrow">The two questions</div>
+    <h2 class="sb-h2">Why not simply own bitcoin? And why not simply hold Treasuries?</h2>
+    <p class="sb-lead">STRC sits between two things a holder could otherwise own outright &mdash; bitcoin on one shore, a Treasury on the other. Each shore has its question. If the case for STRC is &ldquo;wait for bitcoin to recover and the price returns to par,&rdquo; then the below-par bull case and the bitcoin bull case are <strong>the same bet with different payoff shapes</strong> &mdash; so why not own bitcoin? And if the case is a steady cash yield, a Treasury already pays one without the issuer or bitcoin risk &mdash; so why STRC? The table answers both, cell by cell. The bitcoin column is the live arithmetic from <a href="/discount-or-premium">Discount, or Premium?</a>; the Treasury column reuses the parent page&rsquo;s 10-year yield.</p>
+
+    <div class="sb-table-wrap">
+      <table class="sb-table sb-table-3" id="sbSharpTable">
+        <thead>
+          <tr>
+            <th scope="col">&nbsp;</th>
+            <th scope="col" id="sbColBtc">Bitcoin below trend</th>
+            <th scope="col" id="sbColStrc" class="sb-col-mid">STRC below par</th>
+            <th scope="col" id="sbColTsy">10-year Treasury</th>
+          </tr>
+        </thead>
+        <tbody id="sbSharpBody"></tbody>
+      </table>
+    </div>
+    <p class="sb-table-note">Every cell that can be computed is computed from the model at current spot, not asserted. This directly interrogates the &ldquo;unique third position&rdquo; framing (Krueger) credited on the parent page &mdash; steelmanned, then examined.</p>
+
+    <p class="sb-note sb-shore-note">The instrument invites one tactical read worth naming plainly: a holder <a href="/disciplined-rebalancing">rebalancing</a> out of bitcoin might treat STRC as a yield-bearing waiting room instead of cash. The record&rsquo;s complication is that the discount widened in the same weather the waiting room would be used for &mdash; the yield earned and the mark-to-market taken arrive correlated, not independent. The page names that; it does not tell you what to do with it.</p>
+  </section>
+
+  <!-- ════════ §D — WHAT EACH LEVER COSTS, AND WHO PAYS ════════ -->
+  <section class="sb-section" id="cost">
+    <div class="sb-eyebrow">The cost accounting</div>
+    <h2 class="sb-h2">What each lever costs, and who pays</h2>
+    <p class="sb-lead">The events live as log rows on the board above. This section carries only the evergreen cost arithmetic of each lever &mdash; computed, dated, never narrated.</p>
+
+    <div class="sb-cost-block">
+      <div class="sb-cost-head">The rate lever</div>
+      <p class="sb-cost-body" id="sbRateCost">&mdash;</p>
+    </div>
+    <div class="sb-cost-block">
+      <div class="sb-cost-head">The bid lever, both ways</div>
+      <p class="sb-cost-body" id="sbBidCost">&mdash;</p>
+    </div>
+    <div class="sb-cost-block">
+      <div class="sb-cost-head">Which number to watch</div>
+      <p class="sb-cost-body">Each failure mode has a figure on the board that would show it happening &mdash; so you can watch the number rather than be told a story. Each breakeven is the bitcoin price below which the treasury no longer covers everything owed at-or-above STRC, on that basis:</p>
+      <ul class="sb-watch-list" id="sbBreakevens"></ul>
+      <p class="sb-cost-body">A breach of that line is a condition, not an event &mdash; no covenant forces sales; what would matter is how long coverage stays impaired while dividends draw the reserve (~25 months at current rates).</p>
+      <p class="sb-cost-foot">These replace the parent page&rsquo;s older $33K / $21K thresholds, which predate the recent bitcoin sales and current holdings &mdash; recomputed here, not inherited. The full failure taxonomy (bitcoin winter, at-the-market closure, coverage erosion, rate spiral) lives on the parent&rsquo;s <a href="/bitcoin-fixed-income">Risks</a> tab.</p>
+    </div>
+
+    <div class="sb-cost-block">
+      <div class="sb-cost-head">The lever not pulled: suspension</div>
+      <p class="sb-cost-body">STRC dividends are non-mandatory &mdash; payable only when, as, and if declared &mdash; so full suspension is contractually available at any time. Because STRC is preferred equity, unpaid cumulative dividends accrue without triggering default or bankruptcy (BitMEX Research&rsquo;s &ldquo;built to bend, not break,&rdquo; credited). Pulling it has a priced structure: arrears accrue as a growing claim, rate cuts become legally barred while any arrears remain unpaid, and the framework&rsquo;s own capital engine depends on preferred markets staying open to the issuer. Against that, roughly 25 months of reserve at current rates makes it unnecessary today. During the June de-anchoring, suspension was openly debated in market coverage &mdash; raise, hold, or suspend were all treated as live possibilities. The <a href="#lens">Suspended toggle in the lens above</a> shows what that case does to the arithmetic.</p>
+    </div>
+  </section>
+
+  <!-- ════════ §E — THE RECORD STRIP ════════ -->
+  <section class="sb-section" id="record">
+    <div class="sb-eyebrow">STRC&rsquo;s own short record</div>
+    <h2 class="sb-h2">Price against par, since issuance</h2>
+    <p class="sb-lead">The lens, run over the instrument&rsquo;s whole history. What it shows: the peg held for months, then broke with bitcoin&rsquo;s drawdown &mdash; par is a magnet in calm and an aspiration in stress, on the evidence so far.</p>
+
+    <div class="sb-record" id="sbRecordStrip" aria-label="STRC price against par, schematic since issuance"></div>
+    <p class="sb-record-cap" id="sbRecordCap">A schematic of shape, not tick data &mdash; anchored to the known points (issuance near par, the all-time high, the all-time low, and today) and annotated with the rate changes and issuer actions along the way.</p>
+    <p class="sb-note"><strong>The record is short &mdash; about one year.</strong> That is itself a risk disclosure, not a footnote: there is not yet enough history to know how STRC behaves across a full bitcoin cycle, and the floor that has held so far is evidence, not law. No instrument like this has existed before, and the entire record is one bitcoin drawdown &mdash; how STRC trades through a bull leg is unobserved, and cycles between discount and premium are plausible and untested.</p>
+  </section>
+
+  {# Common questions — layout-level page-faq component, from the `faq:` front
+     matter above (visible block + FAQPage JSON-LD, single-sourced). #}
+
+  <!-- ════════ SOURCES, CREDITS & DISCLOSURES ════════ -->
+  <div class="sb-sources">
+    <div class="sb-sources-label">Sources, credits &amp; disclosures</div>
+    <ul>
+      <li><strong>Educational, not advice.</strong> This page is for education and information only; nothing here is investment advice or a recommendation to buy, hold, or sell STRC or any security. It is single-security commentary and sits closest to the advice line of anything on this site &mdash; read it as an examination, not a signal. Bitcoin and bitcoin-linked instruments carry significant risk, including total loss. Consult a qualified, licensed advisor before acting.</li>
+      <li><strong>No position, no compensation.</strong> Last Coin Standing holds no position in STRC, MSTR, or any Strategy security, and receives nothing from any issuer, for this page or otherwise.</li>
+      <li><strong>A live episode.</strong> This page examines a live episode and will be revised &mdash; or retired to a post-mortem &mdash; as it resolves.</li>
+      <li><strong>The figures.</strong> STRC price, the effective yield, and the three coverage ratios are computed live from bitcoin spot (CoinGecko, falling back to the latest monthly sample &mdash; labelled honestly whenever the live fetch does not resolve). The dated constants &mdash; par, rate, shares outstanding, the claim stack, holdings, reserve, and the logs &mdash; are drawn from Strategy&rsquo;s 8-K filings as of the badged date and refreshed on the monthly checklist. Any figure that could not be independently reconciled at build carries a visible <span class="sb-verify-badge">verify</span> badge rather than being presented as settled.</li>
+      <li><strong>Assumptions, not predictions.</strong> The return-to-par arithmetic, the dividend scenarios, and the overlays are consequences of assumptions <em>you</em> choose. There are no buy zones, no verdicts, and no price targets on this page by design.</li>
+      <li><strong>Credits.</strong> Power-law overlay coefficients: Mežinskis / Porkopolis Economics, via <a href="/the-power-law">The Channel</a>. The daily-accrual framing is credited to Walton; the total-addressable-market &ldquo;middle seat&rdquo; argument to Krueger. The durability and fragility cases summarized around the board draw on the named analyst roster in the design ledger &mdash; among them Kendrick (Standard Chartered), BitMEX Research, Palmer (Benchmark), Cole &amp; Walton (Strive) on one side; Schiff, Adrangi (Kerrisdale), Cipolaro (NYDIG), and others on the other. Arguments are credited where they appear; no scenario is endorsed.</li>
+    </ul>
+    {# TODO (design doc §10): when the Substack companion ships, surface it here and
+       via the related strip (kind: substack). Placeholder — do NOT enable until the
+       article URL exists.
+    <p class="sb-sources-substack"><a href="__SUBSTACK_URL__">The author&rsquo;s own view of what this discount means is argued separately &rarr;</a></p>
+    #}
+  </div>
+
+</main>

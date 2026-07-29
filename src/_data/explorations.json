@@ -410,6 +410,14 @@
     }
   },
   {
+    "_comment": "STRC Below Par — episodic sub-page of /bitcoin-fixed-income examining STRC trading below its $100 par. category numbers / group 'Living on Bitcoin' (nested under the parent, per design doc §2 — financialization stays one row back, not a top-level flagship). interactive: true (lever board, below-par lens, live coverage). NO calculator_tile by design (prominence control, design §2 — not a personal-decision tool; posture like discount-or-premium / bull-and-bear-cycles). Deliberately episodic with a nav sunset rule (design §7 / aging-policy comment in the .njk): when the monthly refresh declares the episode resolved and the page converts to post-mortem, retire this registry entry and let reachability revert to the parent + related links.",
+    "slug": "strc-below-par",
+    "title": "STRC Below Par",
+    "category": "numbers",
+    "group": "Living on Bitcoin",
+    "interactive": true
+  },
+  {
     "_comment": "Hub-level page. The 'hub' category is intentionally outside the foundations/arguments/numbers nav buckets — base.njk only iterates those three. This entry exists so the related component can render Gallery back-link cards (its slug lookup against explorations.json otherwise silently fails). If a future nav iterator needs to include hub pages, add an explicit check for 'hub' there.",
     "slug": "the-gallery",
     "title": "The Gallery",

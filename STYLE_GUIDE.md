@@ -2123,6 +2123,8 @@ The site's credibility comes from *being* honest, not from *saying* it is honest
 
 The target voice is **frank, direct, and dispassionately descriptive** — the same plain register used in working conversation, not a defensive or reassuring one. Describe Bitcoin's phenomena as they are; the reader draws their own conclusions. Words that flag AI/defensive authorship and should be cut or replaced unless genuinely needed: "honest/honestly," "to be clear," "the truth is," "let's be honest," and similar throat-clearing.
 
+**"honest/honestly" as self-description — cap it hard (JM 2026-07-28, from the STRC docx review).** Using "honest/honestly" to describe *the page's own posture* ("the honest accounting," "what it shows honestly," "the record's honest complication") is the most common form of this tell and reads as coy/self-congratulatory at volume — the balance should be demonstrated by the two-sided structure, not announced. Keep at most one per page, and only where it modifies data provenance rather than the analysis's virtue. The same cap applies to neutrality narration generally ("it picks neither," "no referee," "neither softened," "rather than picking the flattering one," "does not conclude which wins"): state both sides and stop.
+
 ### 10.2 Prefer commas and simple hyphens over em-dashes
 
 The long em-dash ("—"), especially in pairs bracketing a clause, is a tell of AI-generated text and does not match JM's own writing. Default to a **comma** or a **simple hyphen ("-")** where either works. Reserve the em-dash for the rare case where a comma genuinely would not carry the break.

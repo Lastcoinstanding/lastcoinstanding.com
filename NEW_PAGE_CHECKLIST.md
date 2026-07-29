@@ -535,6 +535,15 @@ curl -sL https://lastcoinstanding.com/<slug> | grep -c "application/ld+json"
 
 Each command should return at least `1`. Zero indicates a gap.
 
+### Publish-day habit — resubmit the sitemap + request indexing
+
+Adding the URL to `sitemap.xml` (§3 / above) makes the page *discoverable*; it does not make Google fetch it today. On publish day, once the page is live and the curls above pass, do the two-minute manual step in **Google Search Console**:
+
+- **Resubmit the sitemap** (Sitemaps → re-submit `sitemap.xml`) so the new `<loc>` is picked up on the next crawl.
+- **Request Indexing for the new URL** (URL Inspection → paste the clean URL, e.g. `https://lastcoinstanding.com/<slug>` → Request Indexing). This pushes the page into the crawl queue immediately instead of waiting for organic discovery, which can take days.
+
+This is a per-page publish-day habit, not a monthly task. (Recurring GSC hygiene — the indexed-count glance per episodic page — lives in `MONTHLY_REFRESH_CHECKLIST`.)
+
 ## 11. Verification
 
 Before announcing the page or sharing the URL externally:
