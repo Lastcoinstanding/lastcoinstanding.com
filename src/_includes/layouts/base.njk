@@ -44,6 +44,34 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+/* ─── Site-wide content-link fallback (added 2026-07-30) ───
+   Link styling on this site is opt-in per component, so new components kept
+   re-introducing browser-default blue/purple links wherever a link-styling
+   selector was missed (the §C table cells and the Gallery caption were two such
+   misses in two days). This is the safety net: an UNCLASSED anchor gets the
+   house amber + dotted underline by default, so future components inherit a
+   sane link style instead of the UA default. It is written so it CANNOT fight
+   the chrome or any intentionally-styled link:
+     • `:not([class])` excludes every classed structural anchor — nav `.brand`,
+       `.nav-dropdown-btn`, `.concept-card`, `.insight-cta`, `.card-cta`, etc.
+     • It underlines via `text-decoration` (NOT `border-bottom`), so any anchor
+       whose rule already sets `text-decoration: none` — every nav / footer /
+       CTA / source-link / house content-link rule does — overrides it and shows
+       no stray underline. (The house convention pairs `text-decoration: none`
+       with `border-bottom`, which also prevents any double underline.)
+     • It sits in the FIRST canonical block, so all later CSS — the chrome blocks
+       below AND `page_styles`, which load afterward — wins on a specificity tie.
+       This rule only fills the gap where nothing else styles the anchor.
+   If you ever need a genuinely unstyled inline anchor, give it a class. */
+a:not([class]) {
+    color: #e09422;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: rgba(224, 148, 34, 0.45);
+    text-underline-offset: 2px;
+}
+a:not([class]):hover { text-decoration-color: #e09422; }
 </style>
 <style id="canonical-nav-css">
 /* ─── Canonical nav (mobile + desktop) ─── */

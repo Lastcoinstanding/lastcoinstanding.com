@@ -309,14 +309,16 @@ body {
     color: var(--text-faint);
     margin: 0;
 }
-.gallery-section-source a {
+.gallery-section-source a,
+.gallery-section-prose a {
     color: var(--amber);
     text-decoration: none;
     border-bottom: 1px dotted var(--amber-dim);
     padding-bottom: 1px;
     transition: color 0.18s, border-color 0.18s;
 }
-.gallery-section-source a:hover {
+.gallery-section-source a:hover,
+.gallery-section-prose a:hover {
     color: var(--orange);
     border-bottom-color: var(--orange);
 }
