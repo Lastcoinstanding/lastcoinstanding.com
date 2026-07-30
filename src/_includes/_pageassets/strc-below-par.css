@@ -23,6 +23,7 @@
   --red: #c0392b;
   --green: #6fae6f;
   --blue: #6db3d4;
+  --sage: #7da586;  /* muted sage for the Treasury column — the Middle Seat infographic's "capital preservation" hue (no existing house token; page-scoped) */
   --border: rgba(224,148,34,0.12);
   --font-d: 'Cormorant Garamond', Georgia, serif;
   --font-b: 'Inter', -apple-system, sans-serif;
@@ -242,15 +243,21 @@ body { background: var(--bg); color: var(--text); }
 .sb-table-wrap { overflow-x: auto; margin: 0 0 0.9rem; }
 .sb-table { width: 100%; border-collapse: collapse; font-family: var(--font-b); font-size: 0.88rem; min-width: 560px; }
 .sb-table th, .sb-table td { text-align: left; padding: 0.7rem 0.9rem; border-bottom: 1px solid rgba(224,148,34,0.08); vertical-align: top; line-height: 1.5; }
-.sb-table thead th { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #f2eee8; border-bottom: 1px solid var(--amber); }
+/* Header cells dressed as the Middle Seat infographic's panel tags: small,
+   letter-spaced uppercase, colour-coded per shore. (Restyle only — the header
+   TEXT stays JS-set + live.) */
+.sb-table thead th { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #f2eee8; border-bottom: 1px solid var(--amber); }
 .sb-table-3 { min-width: 720px; }
-.sb-table thead th:nth-child(2) { color: #F7931A; }      /* Bitcoin */
-.sb-table thead th:nth-child(4) { color: var(--blue); }  /* Treasury */
-/* STRC (column 3) — the subject, centered and subtly lifted. */
-.sb-table th.sb-col-mid, .sb-table td.sb-col-mid { background: rgba(224,148,34,0.05); border-left: 1px solid rgba(224,148,34,0.22); border-right: 1px solid rgba(224,148,34,0.22); }
-.sb-table thead th.sb-col-mid { color: var(--amber); }
+.sb-table thead th:nth-child(2) { color: #F7931A; }      /* Bitcoin — brand orange */
+.sb-table thead th:nth-child(4) { color: var(--sage); }  /* Treasury — muted sage */
+/* STRC (column 3) — the subject, centered and lifted so it "holds the light"
+   like the infographic's middle panel: warmer amber tint through the column,
+   side rules, and an amber top edge on the header. */
+.sb-table th.sb-col-mid, .sb-table td.sb-col-mid { background: rgba(224,148,34,0.07); border-left: 1px solid rgba(224,148,34,0.28); border-right: 1px solid rgba(224,148,34,0.28); }
+.sb-table thead th.sb-col-mid { color: var(--amber); border-top: 2px solid var(--amber); }
 .sb-table td.sb-col-mid { color: var(--text); }
-.sb-table tbody th { font-weight: 600; color: var(--text); width: 26%; }
+/* Row labels — the infographic's bold list-item lead treatment. */
+.sb-table tbody th { font-weight: 700; color: #f2eee8; width: 26%; }
 .sb-table td { color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .sb-table td strong { color: var(--text); font-weight: 600; }
 .sb-table-note { font-family: var(--font-b); font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; margin: 0; max-width: 880px; }

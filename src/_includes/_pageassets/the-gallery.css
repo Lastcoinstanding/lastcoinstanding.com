@@ -197,6 +197,30 @@ body {
     width: 100% !important;
     height: 100% !important;
 }
+/* ─── Static-image companion frame (the Middle Seat infographic) ───
+   Same card aesthetic as the chart frames, but the height follows the image.
+   The frame is a link that opens the full-resolution PNG in a new tab. */
+.gallery-image-frame {
+    display: block;
+    width: 100%;
+    background: var(--bg-section);
+    border: 1px solid var(--border-dim);
+    border-radius: 10px;
+    padding: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+.gallery-image-frame:hover,
+.gallery-image-frame:focus-visible {
+    border-color: rgba(224, 148, 34, 0.5);
+    outline: none;
+}
+.gallery-image-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+}
 .gallery-chart-fallback {
     position: absolute;
     inset: 0;
