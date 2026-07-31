@@ -293,6 +293,8 @@ body { background: var(--bg); color: var(--text); }
 .sb-sources strong { color: var(--text); font-weight: 600; }
 .sb-sources em { color: var(--amber); font-style: italic; }
 .sb-sources a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+/* The author's-view Substack line (design §10) — sits below the sources list. */
+.sb-sources-substack { font-family: var(--font-b); font-size: 0.85rem; line-height: 1.6; color: var(--text-dim); margin: 0.9rem 0 0; padding-top: 0.8rem; border-top: 1px solid var(--border); }
 
 /* ══ RESPONSIVE ══ */
 @media (max-width: 860px) {

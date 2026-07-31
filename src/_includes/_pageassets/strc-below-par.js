@@ -228,7 +228,7 @@
       + '</strong> &mdash; vs ' + pct2(RATE) + ' at par.');
     var spot = (btcSpot != null ? btcSpot : TODAY_PRICE);
     var c = coverage(spot), be = breakevens();
-    setHTML('sbKi3', 'Full-waterfall coverage is <strong>' + c.waterfall.toFixed(2)
+    setHTML('sbKi3', 'All-claims coverage is <strong>' + c.waterfall.toFixed(2)
       + '&times;</strong> at today&rsquo;s bitcoin &mdash; the one number to watch. It reaches 1.0&times; at about <strong>'
       + moneyK(be.senior) + '</strong>.');
   }
@@ -578,7 +578,7 @@
     var be = breakevens();
     document.getElementById('sbBreakevens').innerHTML =
       '<li><strong>Gross BTC &divide; STRC notional</strong> falls to 1.0× at bitcoin &asymp; <strong>' + moneyK(be.gross) + '</strong> &mdash; below this, the treasury doesn’t cover STRC’s own notional even before the senior claims.</li>'
-      + '<li><strong>Standalone cushion</strong> and <strong>full-waterfall coverage</strong> both reach 1.0× at bitcoin &asymp; <strong>' + moneyK(be.senior) + '</strong> &mdash; they cross together by construction (each means the pool equals the senior-and-STRC claims). Below this, the treasury no longer covers all claims senior-and-including STRC at once.</li>';
+      + '<li><strong>Standalone cushion</strong> and <strong>all-claims coverage</strong> both reach 1.0× at bitcoin &asymp; <strong>' + moneyK(be.senior) + '</strong> &mdash; they cross together by construction (each means the pool equals the senior-and-STRC claims). Below this, the treasury no longer covers all claims senior-and-including STRC at once.</li>';
   }
 
   // ═══════════════════════════════════════════════════════════════

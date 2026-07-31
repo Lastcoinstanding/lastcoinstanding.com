@@ -149,8 +149,10 @@ _Q3 findings folded (2026-07-28):_ the gauge's **coverage readout is a three-num
 labeled, all live-computed** from BTC spot + claim-stack constants (constants refreshed from
 filings on the monthly checklist): (1) **gross-BTC / STRC notional** — the popular "dashboard"
 metric (~4.6–5.0× in recent windows; the infographic's figure); (2) **standalone cushion** —
-net assets after senior claims ÷ STRC notional (~4.86× at $65.5K spot); (3) **full-waterfall
-coverage** — total liquid assets ÷ all claims senior-and-including STRC (~3.20×). One
+net assets after senior claims ÷ STRC notional (~4.86× at $65.5K spot); (3) **all-claims
+coverage** (a.k.a. full-waterfall; "waterfall" is credit-desk jargon and was retired from the
+page's visible labels 2026-07-30 for the Treasury-shore reader) — total liquid assets ÷ all
+claims senior-and-including STRC (~3.20×). One
 explanation line, de-tell: the popular metric treats STRC as the sole liability, omitting
 $7.98B of senior claims; the three numbers answer three different questions, and the page shows
 all three. Claim-stack constants (per late-Jul 2026 filings, verify at build): converts $6.70B
