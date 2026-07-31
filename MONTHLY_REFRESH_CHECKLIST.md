@@ -17,6 +17,12 @@ as-of date string, add it here in the same commit.
 
 ---
 
+## Standing practice: keep the chat-side doc cache in sync
+
+- **Re-sync project-knowledge copies of repo docs (backlog, design docs, guides) so the chat-side cache tracks the repo truth.** The drafting chat works from project-knowledge snapshots of these docs; when they drift from the committed versions, ideas get re-derived or duplicated and instructions reference stale state. Refresh the project-knowledge copies whenever the repo docs change materially (added 2026-07-30).
+
+---
+
 ## Per-commit: Recent Updates strip on the homepage
 
 The most frequent maintenance task on this list — not monthly. Every
