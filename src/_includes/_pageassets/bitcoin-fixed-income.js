@@ -814,9 +814,9 @@
 // fields in the "Strategy at a glance" indicator are snapshot values updated
 // monthly per MONTHLY_REFRESH_CHECKLIST.
 (function(){
-  // BTC count: snapshot. Verified June 2026 against CoinGecko's
+  // BTC count: snapshot. Verified July 2026 against CoinGecko's
   // /companies/public_treasury/bitcoin endpoint. Update here when Strategy buys more.
-  var BTC_HELD = 845256;
+  var BTC_HELD = 843775;
 
   function formatBigUSD(n){
     if (n >= 1e9) return '$' + (n / 1e9).toFixed(1) + 'B';

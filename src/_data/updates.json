@@ -1,5 +1,15 @@
 [
   {
+    "display": "7/30/26",
+    "page": "/the-gallery.html",
+    "summary": "New Gallery entry — The Middle Seat: a three-panel infographic placing bitcoin (the growth engine), STRC (a bitcoin-backed income instrument trading below its $100 target), and Treasuries (the conservative baseline) on a single asset spectrum, with yields, coverage, and volatility marked to market. It's the companion graphic to the author's Substack essay, \"How Legitimate is STRC?\", now linked from the page — and the live version of every number runs at /strc-below-par."
+  },
+  {
+    "display": "7/28/26",
+    "page": "/",
+    "summary": "Repositioned: the site now leads with the tools. The homepage hero (\"Interactive tools to see Bitcoin clearly\"), the About page, and the page metadata were rewritten tools-forward — the interactive, live-computed, show-your-work explorations up front — while keeping the educational, first-principles framing that sits behind them."
+  },
+  {
     "display": "7/28/26",
     "page": "/strc-below-par.html",
     "summary": "New: STRC Below Par — a bitcoin-backed preferred built to trade near $100 par, trading below it. Both readings of the discount, with live coverage math, the issuer's lever board, and what a return to par would be worth at any speed. No verdict — and the sharp question it keeps returning to: if you're waiting for bitcoin to recover, why not simply own bitcoin?"
