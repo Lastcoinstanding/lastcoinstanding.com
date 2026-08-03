@@ -421,7 +421,8 @@ exponents too, since the ETF-era window lengthens.
 
 ## 10. Claude project mirror refresh
 
-**Mirror currently reflects: main @ f12e099** (update this line each refresh).
+**Last mirror refresh: 2026-08-03** (update this line BEFORE exporting,
+not after — see step 3).
 
 The Claude project holds a copy of the repo's strategy and design docs. That
 copy is what Claude reads at the start of every session — so when it goes
@@ -443,7 +444,21 @@ design doc that changed.
    makes future comparison clean).
 2. In the Claude project, replace each doc AT ITS EXACT EXISTING PATH. Delete
    the old entry first if the UI would otherwise create a duplicate.
-3. Update the "Mirror currently reflects" line above with the merged commit SHA.
+3. Before exporting, set the "Last mirror refresh" line above to
+   today's date and commit it. Sequence matters: update the line,
+   merge, THEN export — so the exported copies carry the correct
+   date. Do not record a commit SHA; a file cannot state the SHA of
+   the commit that contains it.
+
+**Is the mirror current?** Empty output means yes:
+
+```bash
+git log --since=<last refresh date> --oneline -- PAGE_IDEAS_BACKLOG.md \
+  SITE_GUIDE.md STYLE_GUIDE.md TECH_DEBT.md DATA_AUDIT.md \
+  MONTHLY_REFRESH_CHECKLIST.md NEW_PAGE_CHECKLIST.md \
+  POSITIONING_STRATEGY_GUIDE.md TOOLS_FORWARD_LANGUAGE_KIT.md \
+  FEEDBACK_SETUP.md '*_DESIGN.md'
+```
 
 **Naming hazard — this is how the mess starts.** Docs shuttled by hand pick up
 renames: a project doc exported to the repo becomes `claude_NAME.md` (namespace
