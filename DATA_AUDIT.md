@@ -59,6 +59,9 @@ Citations already present on the site as of Stage 1 (commit context: pending).
 |---|---|---|---|---|---|---|
 | PL-1 | Power Law coefficients (a, b) | a=1.6×10⁻¹⁷, b=5.77 | Porkopolis Economics: The Chart | https://www.porkopolis.io/thechart/ | 2026-05-02 | 2026-11-02 |
 | PL-2 | Bitcoin price data (historical) | various | Blockchain.info | https://www.blockchain.com/explorer | 2026-05-02 | 2026-11-02 |
+| PL-3 | Doubling Ladder trendline coefficients (a, b) | a=1.69×10⁻¹⁷, b=5.763 | Porkopolis / Santostasi (on-page attribution); a later refit of the same source as PL-1 | https://www.porkopolis.io/thechart/ | 2026-08-02 | 2026-11-02 |
+
+**PL-3 (added 2026-08-02).** The Doubling Ladder page embeds its own trendline coefficients — `DL_A = 1.69×10⁻¹⁷, DL_B = 5.763` in `the-doubling-ladder.js` (its live stat card rounds the displayed exponent to 5.76) — rather than reading `PL_A`/`PL_B` from the shared module. This is **deliberate self-containment**: the file header states the coefficients are embedded so the page renders its verified figures deterministically. It is an intentional exception of the same kind TECH_DEBT §1 records for `the-melting-ice-cube` (own coefficients, left alone) — note that §1 does not name the Doubling Ladder explicitly, so this row is the registry's record of the exception. Registered per inclusion rule (2): the value carries an explicit on-page Porkopolis/Santostasi attribution. It is the **same source as PL-1 at a later refit**, not a competing source — the two differ by only ~0.66% at today's age and ~1.4% by 2060. **Flag: re-check PL-1's coefficients at its next audit (2026-11-02).** Porkopolis appears to have refit since PL-1 was recorded (2026-05-02), so canonical `a=1.6×10⁻¹⁷, b=5.77` may be due an update; PL-3 is the evidence. No code change made now.
 
 ### the-melting-ice-cube
 
