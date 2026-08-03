@@ -9,6 +9,7 @@ Candidate page / exploration ideas surfaced during ongoing work but not yet sche
 - **When adding:** concept in one line, then sub-bullets for evidence/sources, connections to existing pages, and any open design questions
 - Keep entries terse; deep design lives in the eventual design doc
 - **Verify-at-build flags** are written into the entry, not left to memory. Anything that would cost credibility if stated loosely gets an explicit blocking line.
+- **Where the referenced docs live.** Two homes, and it matters for who can edit them. **Repo-tracked** (Claude Code edits directly): SITE_GUIDE, STYLE_GUIDE, TECH_DEBT, DATA_AUDIT, MONTHLY_REFRESH_CHECKLIST, NEW_PAGE_CHECKLIST, POSITIONING_STRATEGY_GUIDE, TOOLS_FORWARD_LANGUAGE_KIT, FEEDBACK_SETUP, and the design docs. **Project-only, no repo copy** (must be handed over as a file to be edited): `claude/OPEN_ITEMS`, `claude/X_STRATEGY_PLAYBOOK`, `claude/FUNDING_STRATEGY`, `claude/REACH_GROWTH_PLAN`, `claude/CREATOR_CREDIBILITY_KIT`, `claude/PARTNERSHIPS_REFERRALS_POLICY`. **Always cite project-only docs with the `claude/` prefix** — this doc has been inconsistent about it and a bare citation is ambiguous.
 
 _Merge pass 2026-08-03: JM's two-batch idea dump (2026-08-02) folded in — 12 new entries, 6 merges into existing ones, and the open list regrouped into clusters now that it exceeds 30 items. Two phantom cross-references discharged (see MSTR and Owned audience entries)._
 
