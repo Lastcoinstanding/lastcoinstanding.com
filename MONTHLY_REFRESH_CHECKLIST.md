@@ -19,7 +19,7 @@ as-of date string, add it here in the same commit.
 
 ## Standing practice: keep the chat-side doc cache in sync
 
-- **Re-sync project-knowledge copies of repo docs (backlog, design docs, guides) so the chat-side cache tracks the repo truth.** The drafting chat works from project-knowledge snapshots of these docs; when they drift from the committed versions, ideas get re-derived or duplicated and instructions reference stale state. Refresh the project-knowledge copies whenever the repo docs change materially (added 2026-07-30).
+- **Re-sync the Claude project's copies of the repo docs so the chat-side cache tracks repo truth.** The drafting chat works from project snapshots of these docs; when they drift from the committed versions, ideas get re-derived or duplicated and instructions reference stale state. The full procedure — trigger, doc set, steps, and naming hazards — is **§10 (Claude project mirror refresh)**; this note is the standing reminder (added 2026-07-30; procedure moved to §10 2026-08-02).
 
 ---
 
@@ -418,6 +418,49 @@ the §6 product-forward OG-regen list above.
 for a page making a structural (not real-time) argument. If the page ever
 quotes a "today" figure prominently, consider a quarterly re-fit of the era
 exponents too, since the ETF-era window lengthens.
+
+## 10. Claude project mirror refresh
+
+**Mirror currently reflects: main @ f12e099** (update this line each refresh).
+
+The Claude project holds a copy of the repo's strategy and design docs. That
+copy is what Claude reads at the start of every session — so when it goes
+stale, Claude reasons from outdated facts and states them confidently. This
+already happened once: SITE_GUIDE narrated the out-of-sample chart's fit window
+for fifteen months after commit 6604126 changed it.
+
+**Trigger:** after any merge to main that touches the doc set below. Not
+file-by-file when someone notices — as a set, after the merge.
+
+**Doc set:** PAGE_IDEAS_BACKLOG, SITE_GUIDE, STYLE_GUIDE, TECH_DEBT,
+DATA_AUDIT, MONTHLY_REFRESH_CHECKLIST, NEW_PAGE_CHECKLIST,
+POSITIONING_STRATEGY_GUIDE, TOOLS_FORWARD_LANGUAGE_KIT, FEEDBACK_SETUP, and any
+design doc that changed.
+
+**Steps:**
+1. Copy the working-tree versions out of the repo; verify SHA-256 against the
+   repo copy. Leave line endings as-is (CRLF matches the on-disk convention and
+   makes future comparison clean).
+2. In the Claude project, replace each doc AT ITS EXACT EXISTING PATH. Delete
+   the old entry first if the UI would otherwise create a duplicate.
+3. Update the "Mirror currently reflects" line above with the merged commit SHA.
+
+**Naming hazard — this is how the mess starts.** Docs shuttled by hand pick up
+renames: a project doc exported to the repo becomes `claude_NAME.md` (namespace
+slash flattened to underscore), and a re-downloaded file becomes `NAME (1).md`.
+Both happened. Periodic check:
+
+```bash
+git ls-files | grep -E 'claude_| \(1\)'
+```
+
+Should return nothing.
+
+**Direction of truth:** the repo is canonical for everything in the doc set
+above. The `claude/`-prefixed docs (OPEN_ITEMS, X_STRATEGY_PLAYBOOK,
+FUNDING_STRATEGY, REACH_GROWTH_PLAN, CREATOR_CREDIBILITY_KIT,
+PARTNERSHIPS_REFERRALS_POLICY) are project-only and have no repo copy — never
+export those into the repo. See PAGE_IDEAS_BACKLOG conventions.
 
 ## Live BTC price fetch — shipped 2026-05-28
 
