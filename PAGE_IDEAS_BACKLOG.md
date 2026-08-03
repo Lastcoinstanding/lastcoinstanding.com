@@ -8,10 +8,214 @@ Candidate page / exploration ideas surfaced during ongoing work but not yet sche
 - **Status:** `- [ ]` open · `→ promoted` in development (note design doc) · `- [x]` shipped (note slug + SHA)
 - **When adding:** concept in one line, then sub-bullets for evidence/sources, connections to existing pages, and any open design questions
 - Keep entries terse; deep design lives in the eventual design doc
+- **Verify-at-build flags** are written into the entry, not left to memory. Anything that would cost credibility if stated loosely gets an explicit blocking line.
+
+_Merge pass 2026-08-03: JM's two-batch idea dump (2026-08-02) folded in — 12 new entries, 6 merges into existing ones, and the open list regrouped into clusters now that it exceeds 30 items. Two phantom cross-references discharged (see MSTR and Owned audience entries)._
+
+---
+
+## Clusters & sequencing notes (2026-08-03)
+
+Captured during the merge pass, because the backlog is now large enough that the *shape* of it is itself a decision.
+
+- **The collateral/credit cluster is now a pillar, not a scatter** — six related entries (pristine collateral, margin-call calculator, services research, RE wedge, credit in a bitcoin world, plus MSTR's "bitcoin-backed credit" framing). Decide hub-and-spoke vs. six independent builds **before** any one of them is promoted.
+- **Financialization is becoming the site's centre of gravity.** STRC shipped; MSTR, The Big Long and the collateral cluster all sit there. `STRC_BELOW_PAR_DESIGN` §2 deliberately held financialization *one row back from the flagship*. Three-plus more pieces makes that fence load-bearing — a conscious call, not drift.
+- **Essay-to-build ratio is heavy on essays** (~9 Substack pieces vs. ~8 builds). The builds with compounding return — the dashboard and Power Law v2 — should not keep losing sequencing to essays that are read once.
+- **Highest persuasion-per-unit-effort in the whole backlog: Power Law v2.** Mostly build-on-existing-data (the shared PL module, the static out-of-sample chart, the Doubling Ladder's already-computed register) rather than new research.
+- **Three competing "come back here" surfaces now exist** — the dashboard, the freshness channel-position chip, and the Gallery highlights strip. Resolve into one coherent return-visit story before building any of them.
 
 ---
 
 ## Open ideas
+
+### Site & platform
+
+- [ ] **The Bitcoin Dashboard — the site's return-visit surface.** New page. Strategically the answer to the site's structural weakness (explorations are read-once).
+  Surfaced 2026-08-02.
+  - **Concept:** a live, visual, bookmark-worthy dashboard of the dynamics that actually move — so readers come back weekly rather than once. Inspiration is **Clark Moody's dashboard** (`bitcoin.clarkmoody.com/dashboard/`), explicitly as a *foil*: Moody's is purely numeric, no visuals, unengaging, and scoped to **network health** rather than anything personally actionable.
+  - **The differentiator, and it is defensible:** Moody owns network health. Nobody owns **"where are we in the channel, and what does that mean for your position"** — the site's own vocabulary, already built and already live-computed across ~20 tools. Candidate tiles: channel position, trend multiple, zone, drawdown-from-peak, days-to-next-doubling, time-above/below-trend, plus optional personal stack context.
+  - **Engagement mechanics:** remembered settings are feasible — per-page `localStorage` is an established pattern (`STYLE_GUIDE §6.37`, first used on How Much Cash). Interactive/personalised state is the bookmark hook.
+  - **Collision — resolve before building:** the **freshness channel-position chip** below is effectively this dashboard's first tile, and the **Gallery highlights strip** is a third return-visit surface. Pick one story; do not ship three.
+  - **The real cost to weigh:** every tile is monthly-refresh surface — the same maintenance tail that made "power law in other metrics" low priority. Bias tile selection hard toward things that compute live from data already on the site.
+  - **Open design questions:** which tiles; grouping/layout; whether it earns a nav slot or lives as a linked surface; SEO is thin by nature (bookmark magnet, not a search target) so it complements rather than replaces exploration pages.
+
+- [ ] **Owned audience — email capture, honest update-only framing.** Site surface + policy. **Discharges a phantom cross-reference.**
+  Surfaced 2026-08-02 (JM, via the TFTC question).
+  - **Why flagged:** `claude/REACH_GROWTH_PLAN.md` §5 already cites *"(Backlog's email-capture idea — the honest, update-only framing)"* — **but no such entry existed in this backlog.** Second phantom of this kind (cf. MSTR below). This entry closes it.
+  - **Concept:** an explicit, opt-in email surface so the audience is *owned* rather than rented from an algorithm — weekly/periodic updates, new tools, refreshed numbers. Feeds the Reach plan's funnel metric (returning visitors / signups), the OpenSats impact story, and any future partner conversation.
+  - **BLOCKING CONSTRAINT — do not get this wrong.** The site-wide page-feedback widget (`SITE_GUIDE §27`) already collects **optional reply emails** under canon copy promising *"it goes straight to the author, never published"*, with replies as the stated purpose. **Those addresses must never become a newsletter list.** That would be a consent violation and the single most brand-damaging possible move on a site whose entire pitch is "no funnel, nothing for sale." The newsletter needs its own opt-in surface with its own promise.
+  - **Register:** update-only, no drip sequence, no upsell — consistent with `FUNDING_STRATEGY`'s permanently-free/ad-free/no-funnel commitment.
+  - **Cross-links:** `REACH_GROWTH_PLAN` §5, `FUNDING_STRATEGY`, `CREATOR_CREDIBILITY_KIT` (signups are an impact metric).
+
+- [ ] **Audience-mechanics research — TFTC, firebtc, satsvsfiat. Task, not a page.**
+  Surfaced 2026-08-02.
+  - **Scope, deliberately fenced: copy the audience mechanics, NOT the monetization model.** TFTC monetizes via sponsorships/ads/paid newsletter; firebtc.io runs free-vs-paid tiers. **Both are the model `FUNDING_STRATEGY` explicitly excludes** — "corporate sponsorships/affiliates (funnel)" is on the exclude list, and the core is committed *"permanently free, ad-free, independent — never top-of-funnel for a premium service."* Research what they do to *build and hold an audience*; leave the revenue model alone.
+  - **Targets:** **TFTC.io** — email capture, weekly cadence, loyalty/re-engagement mechanics. **firebtc.io** — bitcoin-native FIRE site with calculators; note theirs are *purely numerical, no graphs or trend lines*, which is a direct read on our visual differentiation. **satsvsfiat.com** (Joe Bryan) — **testimonials**, the one concrete import candidate already identified.
+  - **Output:** research notes + a shortlist of specific mechanics worth importing, each mapped to an existing site surface.
+  - **If JM wants to reopen the paid-tier question**, that is a `FUNDING_STRATEGY` amendment and belongs there — not smuggled in via this entry.
+
+- [ ] **Testimonials — credibility surface.** Small build; spun out of the audience research above.
+  Surfaced 2026-08-02. Prior art: satsvsfiat.com.
+  - **Concept:** reader testimonials as a trust signal, in the site's register (no hype, no marketing gloss).
+  - **Source already exists:** the feedback widget's private pipeline is the natural origin — **but every testimonial requires explicit permission to publish**, given the widget's "never published" promise. Ask, don't assume.
+  - **Cross-links:** `CREATOR_CREDIBILITY_KIT` §2 already runs a capture loop for reshares and kind words — this is the public face of that file.
+
+- [ ] **Video register remediation — some shipped videos read dark/creepy.** Task. Audit first.
+  Surfaced 2026-08-02 (JM).
+  - **Concept:** several carousel/exploration videos land in a dark or unsettling register. Target register is **sci-fi, optimistic, inviting, constructive** — mysterious, not menacing.
+  - **The prompt-side learnings are already captured** in `claude/OPEN_ITEMS.md` working notes: *"Grok Imagine: open sky/horizon/scale prevent 'dank' drift; explicit Avoid entries weigh heavily; JM's register is 'mysterious, almost sci-fi,' not creepy."* What's missing is the **remediation sweep of the videos already shipped**.
+  - **Method:** audit first — list every shipped video, rate each against the target register, redo only the offenders. Cheaper than a blanket redo and it produces the reusable prompt pattern.
+
+- [ ] **Freshness signals — "New" / "Updated" badges, and an honest channel-position chip.**
+  Surfaced 2026-07-14. Small, anytime.
+  - **Badges:** "New" / "Updated" markers in nav + index, driven by the existing `src/_data/updates.json` on a ~30-day window. Optional per-page "Updated &lt;month&gt;" line, but only where it means something — not stamped site-wide.
+  - **Channel-position chip (separate, more interesting):** price · trend multiple · zone vocabulary, with a subtle glow **gated on `todayPriceIsLive`**. This is the honest form of the "site is alive" idea: it says where we are in the channel, in the site's own vocabulary. Pilot on 2–3 pages before committing to the layout.
+  - **REVISED 2026-08-03 — collision with the dashboard.** The chip is effectively the dashboard's first tile. Either the chip is the dashboard's pilot, or it retires in the dashboard's favour. Do not build both independently.
+  - **Rejected:** a raw price ticker. Off-thesis — the site is about the channel, not the tape.
+
+- [ ] **Interactive highlights strip in The Gallery — deep-link cards into the best playgrounds.**
+  Surfaced 2026-07-12 during the drift-chart Phase C build (which shipped the deep-link anchors this depends on).
+  - **Concept:** a 3–4 card strip in The Gallery, each card deep-linking into a preconfigured interaction — e.g. the **allocation crash view** (`/bitcoin-allocation-sizing?…&cy=3&rec=weak#crash`), **Wait or Deploy Now**, the **Retirement Stress Test**, and **The Bitcoin Retirement**. Each card lands the reader on the open, configured playground in one click.
+  - **Why not a nav item:** an alternative to adding a top-nav "Interactions" entry (which worsens the dropdown-overflow problem already flagged). Revisit nav only if the strip earns it.
+  - **Depends on:** Phase C deep-link anchors (**shipped** in `154f84a`-line drift work — the crash view is deep-linkable today; other playgrounds already carry URL state).
+  - **REVISED 2026-08-03:** this is the third return-visit surface alongside the dashboard and the freshness chip. Sequence it *after* the dashboard decision, since the dashboard may absorb its job.
+  - **Open design questions:** which 3–4 to feature; whether cards show a static thumbnail or a live mini-preview; copy register for each card.
+
+- [ ] **Tool-hero sweep — apply STYLE_GUIDE §6.10a to the other tool pages.** Small, anytime.
+  Surfaced 2026-07-15 with the How Much Cash v3 rebuild; JM's request, added to the guide as canon in that build and deliberately not swept there.
+  - **The rule:** every tool/exploration hero states declaratively what the tool is and how to use it. No assumed reading order — a hero may not need a sibling page to parse. The failure it fixes: How Much Cash v2 opened *"The other end of the sizing question — for the reader who already went all in"*, legible only to someone who had read How Much Bitcoin.
+  - **The shape that satisfies it:** subtitle names the question the tool answers; the line under it names the audience and the two or three actions. See `/how-much-cash` for the reference implementation.
+  - **Candidates to audit:** every page with a `calculator_tile` (currently 20). Expect most to pass; the ones to check first are those whose subtitle opens on a relationship to another page rather than on their own question.
+  - **Scope note:** copy-only, no engine risk. Natural to bundle with any other hero-touching pass.
+
+- [ ] **Mobile "full-canvas" notice — site UX. Small build.**
+  Surfaced 2026-07-30. Pairs naturally with any future mobile-QA pass.
+  - **Concept:** on canvas-heavy explorations, detect small viewports and show a dismissible one-line invitation — "this exploration rewards a bigger screen." Nudge, never nag, never gate.
+  - **Implementation notes:** per-page front-matter flag (opt-in by page); appears once (dismiss persists per the no-storage constraint as best-effort — session in-memory only, acceptable to reappear per visit); zero SEO impact (content itself never hidden — mobile experience remains fully functional per the checklist QA standard).
+
+### Power Law cluster
+
+- [ ] **Power Law v2 — a consolidated pass on `/the-power-law` and siblings.** Umbrella entry; sub-items are individually promotable.
+  Surfaced 2026-08-02 (JM, across both batches; several sub-items are refinements of the 2026-07-30 CAGR idea, now folded here).
+  **Why one entry:** five separate ideas all land on the same page cluster, all build on data the site already has, and shipping them piecemeal would mean five separate refresh/QA passes. Highest persuasion-per-effort in the backlog.
+
+  - **(a) Dynamic out-of-sample validation — the strongest single build here.** Tab 1 already carries a **static** out-of-sample chart (regression fitted to 2010–2014 only, projected forward, overlaid with actual 2015–present). Make the **fit window draggable** so the reader chooses the training range and watches the extrapolation land. The reader does the convincing themselves.
+    - **Source to verify + cite:** Mežinskis (Porkopolis) shows a fit through **2016** extrapolating to today, off by **~$14K** — statistically near-identical despite omitting the last decade. Locate the original and cite it.
+    - **Anticipate, don't discover:** a draggable window will also surface windows where the fit is *poor* (very early data, or recent-only). On this site that's a feature — say so in the copy up front rather than look caught out.
+  - **(b) Exponent survey + a reader-selectable exponent.** Different power-law proponents use different exponents, yielding materially different results. Document **what each uses and how they justify it**, then let the reader pick and see trend CAGR by decade.
+    - **Known values already on the site:** Porkopolis/Santostasi **5.77** (canonical here), Doubling Ladder fitted **5.76**, naive full-series fit through 2026 **5.63**, BitcoinPower.law **5.68**, b1m.io (Krueger) **5.566**, bitcoinretirement.net **5.82**.
+    - **The payoff framing (better than "here's the CAGR"):** *how much of the long-run return case rests on a parameter that is itself uncertain.* That is a risk-disclosure device in the site's register and exactly what an allocator looks for.
+    - **ARCHITECTURE DECISION — do not skip.** `PL_A`/`PL_B` live in `shared/power-law-data.js` and feed ~20 tools. A reader-selectable exponent **on the Power Law page** is easy; site-wide is not. And JM's "update the exponent month to month" would **move the canonical trend line monthly** — breaking every shared scenario URL, every cached figure, and every as-of callout. **Recommended ruling:** exponent *explorer* on the Power Law page; canonical exponent stays pinned with a slow (annual) review, divergence disclosed.
+    - **Fences:** does not own the fit-window caveat (Doubling Ladder does) and does not own withdrawal implications (retirement cluster does).
+  - **(c) Days-to-double as a headline stat.** Currently days-to-double appears only in the Tab 1 tooltip and the projection widget. Promote it: **bitcoin is 6,420 days old** (genesis 3 Jan 2009; computed 2026-08-02), and at b=5.77 the doubling interval is **12.76% of its age → ~819 days ≈ 2.24 years**.
+    - **The exponent sensitivity makes the point for (b):** 819 days at b=5.77 · 821 at 5.76 · 833 at 5.68 · 841 at 5.63 · 851 at 5.566. A ~4% spread on the headline number.
+    - JM's original framing ("~6,000 days old, ~800 days") was close; use the computed figures.
+  - **(d) Time above vs. below trend — CAUTION, it says the opposite of the intuition.** JM's idea was to show % time above/below trend "to give confidence about expected return to at or above trend." **The figure already exists** on the Doubling Ladder's verification register: over 191 months, **80 above / 111 below = 41.9% / 58.1%.** Bitcoin has spent *more* time below trend than above.
+    - **Used naively as a confidence device this backfires.** The honest reading — already on the Doubling Ladder — is that mean log-deviation is **+0.014 (essentially zero)** because *a few violent overshoots balance many quiet undershoots.*
+    - **The stronger, true framing:** *below trend is the normal condition; the returns arrive in bursts.* Which is a better argument for not selling during the quiet stretch than the one originally intended.
+  - **(e) The power law breaking to the *upside*.** Mežinskis's point: bitcoin could turn exponential and break the power law upward, as the network's size and importance relative to fiat becomes unstable in a good way.
+    - **Why it belongs:** the site already carries the *downside* break (falsifiability via floor breach) and Santostasi's ~2040 horizon warning. An upside-break section is the symmetric counterpart — and a site that will say "the model may break against us" earns the right to say "it may break for us."
+    - **Historical analogues to test at build:** monetary regime transitions generally (JM suggested precious metals eclipsing prior money forms); technology S-curves.
+  - **(f) Consistency sweep on the proportionality constant.** JM cites **~12.9%** (implies b≈5.70); the site variously says ~13%, 12.7%, 12.8%, 13.1%. Resolve into one stated figure or an explicit range tied to the exponent — this is (b)'s natural by-product.
+  - **Also carries forward:** "bitcoin's growth is stable *and* scalable" — it can grow enormously in size and still hold the trend — as an explicit stated claim rather than an implication.
+
+- [ ] **Power law in other metrics — hash rate, energy, addresses. Low priority.**
+  Surfaced 2026-07-14. Extension, not a new page.
+  - **Concept:** additional power laws beyond price — hash rate, energy, active addresses — as **sections on the existing Power Law (`/the-power-law`) or Metcalfe (`/bitcoin-and-metcalfes-law`) pages**. Explicitly not a new page.
+  - **Check first:** what the Metcalfe address scatter already covers — the addresses angle may be substantially done.
+  - **Cost to weigh:** each new series adds monthly-refresh surface. The maintenance tail is the reason this is low priority, not the difficulty.
+  - **Sequencing note (2026-08-03):** if Power Law v2 happens, decide then whether this rides along or stays parked — v2 already adds refresh surface.
+
+### Data & modeling assumptions
+
+- [ ] **Stock-market comparator review — the "15% with dividends" question.** Data/assumptions review. **Contains a correction.**
+  Surfaced 2026-08-02 (JM proposed raising the default stock-growth assumption to as high as 15% if dividends are reinvested).
+  - **The correction, and it matters:** the site's figures **already include reinvested dividends.** BvSM's forward projection uses **S&P 500 TR 10.86%** and **NDQ-100 TR 16.26%** — "TR" *is* total return. `DATA_AUDIT` R-1 carries S&P long-run **real** return ~6.7% (Damodaran 1928–2024), likewise dividend-inclusive. So "we forgot dividends" is not the gap.
+  - **What 15% actually is:** roughly the S&P's *post-2009* total return — a ~16-year window, not a long-run figure. Adopting it as the default would import a cherry-picked era.
+  - **The worthwhile version:** add a selectable **"recent era (2009–present)" comparator** as a *stress test on bitcoin's case*. It's the strongest form of the sceptic's argument, and surfacing it is exactly the site's register. Conservative in the right direction — it makes bitcoin's edge look smaller, not larger.
+  - **Affects:** `/bitcoin-vs-the-stock-market` primarily; check the sitewide real-returns preset (`STYLE_GUIDE §3.5`, `lcs.realReturns.preset`) and `DATA_AUDIT` R-1/R-3/R-4 for consistency.
+  - **Verify at build:** current Damodaran long-run TR figures; the exact post-2009 window figure and its start date; whether NDQ 16.26% needs the same treatment.
+
+- [ ] **The idle $17T — money-market dry powder vs. bitcoin (macro data addition).**
+  Surfaced 2026-07-30.
+  - **Concept:** US+EU money-market funds as parked "monetary energy" — a live/periodic on-site figure ("the sidelines, measured") + a what-if device (X% of MMF assets moving → effect vs bitcoin market cap). A natural section for STRC-persona content (the Treasury-shore reader's neighborhood).
+  - **Verify the figure at build:** ~$17T per JM — US MMF AUM is ~$7T range, EU adds meaningfully; source current numbers (likely ICI + EFAMA).
+  - **Distinct from:** allocation-sizing (personal) — this is macro flows.
+
+- [ ] **The fiscal canary — national debt as the fiat signal (macro data addition).**
+  Surfaced 2026-07-30.
+  - **Concept:** track US national debt (and interest-payments trajectory) as a standing signal of fiat-credit unsustainability — "fiscal dominance's canary" — alongside/within the Power Law exploration, or as a Half-Life-adjacent mini-exploration (melting-ice-cube kinship). Plus an updated **debt-by-president infographic** (JM has a reference image): the trajectory barely depends on who governs.
+  - **Register guardrail (load-bearing):** the entire value of the by-president framing is its bipartisanship — scrupulously even-handed, zero partisan language; the inexorability IS the argument (site political-neutrality rules apply in full).
+  - **Open design question:** overlay on an existing page vs. standalone — decide at promotion.
+  - **Cluster note (2026-08-03):** pairs with *Second-order effects of adoption* and *Deflation without fear* — same neutrality guardrail, adjacent arguments.
+
+### Collateral & credit cluster
+
+- [ ] **Bitcoin as pristine collateral — argument exploration + essay. Anchors the collateral cluster.**
+  Surfaced 2026-07-30. Extended 2026-08-02. Timeliness: live product wave.
+  - **Concept:** the emergent case the market hasn't priced — 24/7 liquidity, fully marked-to-market, fungible (vs real estate), verifiable, securable in multisig → better collateral → structurally lower rates and lender friction/risk.
+  - **The sizing argument (added 2026-08-02):** roughly **80% of loans/debt is collateralized** — this converts "bitcoin is better collateral" from a qualitative claim into a **TAM**: this is the size of the market bitcoin is competing to collateralize.
+    - **Verify at build:** the 80% figure is segment-dependent — US commercial bank lending, corporate bond markets and global secured credit differ wildly. Likely defensible for bank lending, likely *not* for total debt. Say which. Sources to try: Fed H.8, BIS credit statistics, SIFMA.
+  - **The etymology (added 2026-08-02) — good opener:** collateral's pledge concept descends from Greek *hypotheke* (a pledge/deposit) → hypothecation; **rehypothecation** is pledging the same collateral again. Bitcoin's contribution is that a pledge can be *seen*: on-chain, marked to market, liquid, and verifiably not pledged twice.
+  - **BLOCKING HONESTY FLAGS — both load-bearing:**
+    1. **The rate claim runs against today's market.** Bitcoin-backed loans currently price **above** mortgages and often above unsecured corporate credit. The thesis is "lower over time"; the observable fact is "higher today." The page must explain the gap — regulatory capital treatment, rehypothecation/custody risk, lender cost of capital, novelty premium — and name what would have to change. That version survives an asset manager reading it; the assertion-of-endpoint version does not.
+    2. **"Definitely not pledged twice" is conditional.** It holds for on-chain, self-custodied or visible-multisig collateral. It does **not** automatically hold for collateral at a custodian or exchange — which is where most institutional collateral actually sits. And proof-of-reserves without proof-of-liabilities is incomplete. The true claim is *"bitcoin makes verifiability possible,"* not *"bitcoin collateral is verified."*
+  - **Register:** both — site Arguments/Numbers treatment (facts, mechanics, comparisons) + Substack for the "unrecognized-but-inevitable" thesis voice.
+
+- [ ] **Margin-call / borrow-against-stack calculator — site tool (The Numbers).**
+  Surfaced 2026-07-30. Collateral cluster.
+  - **Concept:** loan amount, LTV, lender terms → the bitcoin price that triggers a margin call, stress-tested against house drawdown / power-law paths; compare offerings side-by-side.
+  - **Prior art:** Strike's new borrow product has a calculator to review.
+  - **Guardrails:** facts-not-signals; leverage content = elevated counsel attention; no lender recommendations — computed comparison only, PARTNERSHIPS_REFERRALS_POLICY applies.
+
+- [ ] **Collateral/services company research + freshness pass — task, not a page.**
+  Surfaced 2026-07-30. Collateral cluster.
+  - **Research:** current offerings — AnchorWatch, People's Reserve, Strike borrow-against-bitcoin, **Debify** (L1 multisig — added 2026-08-02), "Horizon" (disambiguate at research — several bitcoin cos use the name).
+  - **Purpose:** (a) keep borrowing/services-adjacent explorations current (freshness = credibility); (b) partner-candidate notes per PARTNERSHIPS_REFERRALS_POLICY (no coverage-for-consideration entanglement; research and partnership tracks stay separate).
+  - **Output:** research notes + a freshness diff for affected pages.
+
+- [ ] **Real estate as the wedge — People's Reserve / REIT angle.**
+  Surfaced 2026-07-30. Collateral cluster; extends the Bitcoin-vs-Real-Estate cluster.
+  - **Source:** CJKonstantinos (People's Reserve founder) on a recent podcast — significant inbound interest from REITs and real-estate syndicates in bitcoin-backed structures.
+  - **Explore:** real-estate holders as a conversion audience (a "wedge" from RE toward bitcoin); possibly an essay angle + a page extension rather than a new page.
+  - **Verify at build:** locate/cite the podcast episode. Partnership-adjacent — same separation discipline as the research task above.
+
+- [ ] **Can there be credit in a bitcoin-denominated world? — essay. The cluster's third leg.**
+  Surfaced 2026-08-02.
+  - **Concept:** whether a credit system can or should exist in a bitcoin-denominated economy. Completes the arc: *pristine collateral* = the asset · *bitcoin-backed credit* = today's market · *this* = the endpoint.
+  - **Why it earns its place:** it directly answers the standard objection that deflation kills lending — the strongest routine critique of the bitcoin monetary thesis. Answering it well is worth more than another bull argument.
+  - **Tightly coupled to:** *Deflation without fear* (below). **Open question: one piece or a deliberate two-parter?** Decide at drafting; written separately they will overlap heavily.
+  - **Terminology:** use **"bitcoin-backed credit"** over Saylor's "digital credit" (see MSTR entry) — more precise, and it links the cluster together.
+
+### Financialization cluster
+
+- [ ] **MSTR / Strategy — the examination. Discharges the STRC scope fence.**
+  Surfaced 2026-08-02 (JM, both batches).
+  - **Why flagged:** `STRC_BELOW_PAR_DESIGN.md` §6 fences *"Not the MSTR/mNAV examination (separate backlog idea; share no more than a cross-link)"* — **but that backlog idea did not exist.** This entry creates it and closes the dangling reference.
+  - **The angles JM named:**
+    - **S&P inclusion as a passive bid.** If/when MSTR enters the major indices, index demand creates a premium and a capital-raising flywheel. **Both-ways treatment required:** index flows are largely one-time rebalance events, not a perpetual bid, and inclusion creates symmetric **forced selling on removal**. *Verify current status* — eligibility has hinged on GAAP earnings under fair-value accounting (ASU 2023-08); do not assume.
+    - **Bear-market criticism is not news.** The pile-on during bitcoin drawdowns is as unremarkable as the drawdown itself. Pairs with `STRC_BELOW_PAR_DESIGN` §10(b), which already makes the criticism-is-bear-correlated point.
+    - **A young strategy, not yet assessable.** It needs a full bull *and* bear before a verdict is fair. **This is the most defensible frame on the page** — same evidence-grading posture Bull & Bear Cycles used.
+    - **Balance-sheet comparison vs. Strive/SATA (ticker to confirm — ASST?).** Strive carries no debt; MSTR does, which may push Strategy toward retiring some. **Honest finding to state:** "no debt" is a *snapshot*, not a structural property — and zero debt also means no leverage-driven BTC-per-share accretion. It's a trade-off (cleaner risk / slower accumulation), not strictly cleaner positioning.
+    - **Terminology:** Saylor calls the space "digital credit"; **"bitcoin-backed credit" is the better term** and links this piece to the collateral cluster.
+  - **BLOCKING VERIFICATION — "the principal never comes due."** The stack has two halves that behave completely differently. **Convertible senior notes have maturities and holder put dates** — principal absolutely can come due. **The perpetual preferreds (STRK/STRF/STRD/STRC) have no maturity**, and dividends are payable only when declared. The accurate claim is *"the preferred stack never matures,"* not *"the principal never comes due."* Stated loosely this costs credibility with exactly the audience the site is built for.
+  - **The analytical device — Hamilton Helmer's Seven Powers on MSTR (credit Helmer by name, house habit).** Preliminary read to test at build: plausible **Counter-Positioning** (incumbents structurally *cannot* hold BTC on balance sheet — accounting, mandate, career risk), **Scale Economies** (cheaper capital at size), **Branding** (Saylor), possibly **Cornered Resource** (index/capital-market access). Almost certainly absent: **Network Economies, Switching Costs, Process Power**. **The finding worth writing:** most of the powers it does have are *conditional on mNAV > 1* — not durable moats but a state. Original, defensible, and neither bull nor bear propaganda.
+  - **Related framing:** MSTR could become the most valuable company in the world while being *a repository of capital*, not a killer app like Apple. Honest, and it's the frame that makes the Seven Powers analysis land.
+  - **MAINTENANCE COLLISION:** BFI Tab II already ships a "Strategy (MSTR) at a glance" card and `MONTHLY_REFRESH_CHECKLIST §7` already maintains BTC held / mNAV / shares outstanding / ATM status. An MSTR page must **relocate or reuse** that card — not duplicate the refresh surface.
+  - **Guardrails:** single-security coverage = counsel attention; no-position / no-compensation disclosure line (reuse the STRC page's, authored fresh there); the flagship/financialization prominence fence applies.
+
+- [ ] **Three-track scenario comparison — extend the BFI calculator, do NOT build a new page.**
+  Surfaced 2026-08-02.
+  - **JM's idea:** compare owning **bitcoin** vs **STRC** vs **Treasuries** over time; bitcoin "wins" over ten years but less reliably over short horizons, and best when entered at the low end of the channel; STRC beats Treasuries but carries real risks (below par, company/management risk, dividend suspension); reader sets risks with sliders and runs scenarios, randomised by which risks hit.
+  - **FINDING — most of this already exists.** `/bitcoin-fixed-income`'s calculator already carries `pa` = incomePath (`strc | sata | treasury | igcorp`), `st` = stressPreset (`base | mild | mreit | winter`), three Power-Law growth scenarios (`sc`), and a dynamic "income path's case is weaker/fair/stronger" verdict that already flips (weaker at 15yr default; stronger at Bitcoin-winter + 4yr).
+  - **The genuinely net-new part, and it's the better idea:**
+    1. **Randomised risk draws** instead of fixed stress presets — dice-roll below-par / dividend-suspension / management-risk events per run and show a *distribution* rather than one path.
+    2. **Entry-point-in-the-channel as an explicit axis** — JM's instinct that entering near the floor changes the ranking is not currently exposed anywhere.
+    3. **Dramatise the short-horizon flip** the calculator already discovers but presents quietly.
+  - **PRECEDENT DECISION — flag before building.** Monte Carlo has been a deliberate site-wide *no*: `RETIREMENT_CALCULATOR_DESIGN_22` §3.6 states the scenario grid *"is **not** a Monte Carlo."* Randomised risk draws would be the first breach. Worth doing — but it's a precedent, not a feature, and it should be decided consciously and then applied consistently.
+  - **Cross-links:** `/bitcoin-fixed-income` (the host), `/strc-below-par`, the retirement stress test.
+
+### Tools & suite plumbing
 
 - [ ] **WODN position receiver — enable the underwater-manager handoff from How Much Cash.**
   Surfaced 2026-07-16 during the How Much Cash v3.3 build (addendum A2).
@@ -27,43 +231,12 @@ Candidate page / exploration ideas surfaced during ongoing work but not yet sche
   - **Cross-links:** builds on `/how-much-cash`'s existing sell slider + sticky-state persistence (STYLE_GUIDE §6.37 — a tracked position would persist naturally).
   - **Open design question:** date→position vs price→position (price alone is ambiguous without the date, since the trend moves); likely needs both, or date with price as a cross-check.
 
-- [ ] **Interactive highlights strip in The Gallery — deep-link cards into the best playgrounds.**
-  Surfaced 2026-07-12 during the drift-chart Phase C build (which shipped the deep-link anchors this depends on).
-  - **Concept:** a 3–4 card strip in The Gallery, each card deep-linking into a preconfigured interaction — e.g. the **allocation crash view** (`/bitcoin-allocation-sizing?…&cy=3&rec=weak#crash`), **Wait or Deploy Now**, the **Retirement Stress Test**, and **The Bitcoin Retirement**. Each card lands the reader on the open, configured playground in one click.
-  - **Why not a nav item:** an alternative to adding a top-nav "Interactions" entry (which worsens the dropdown-overflow problem already flagged). Revisit nav only if the strip earns it.
-  - **Depends on:** Phase C deep-link anchors (**shipped** in `154f84a`-line drift work — the crash view is deep-linkable today; other playgrounds already carry URL state).
-  - **Open design questions:** which 3–4 to feature; whether cards show a static thumbnail or a live mini-preview; copy register for each card.
-
 - [ ] **"Sell, Borrow, or Wait?" — funding a real-world goal from a stack.**
   Surfaced 2026-07-14. New page, sequenced after **How Much Cash?**.
   - **Concept:** one concrete goal (house deposit, car), three strategies, all simulated on the channel: **sell at strength** (Disciplined Rebalancing's zone logic), **borrow** (the BAS math), or **delay the purchase** (Wait or Deploy Now's regime logic). The reader brings a goal, not a market view.
   - **Why this framing:** deliberately reframed from "when to sell" so it **triangulates** Borrowing Against Your Stack (`/borrowing-against-your-stack`) rather than competing with it. A "when to sell" page would duplicate DR and undercut BAS; a "fund this goal" page uses both as inputs.
   - **Cross-links:** DR (`/disciplined-rebalancing`), BAS (`/borrowing-against-your-stack`), WODN (`/wait-or-deploy-now`).
   - **Open design question — settle at spec time:** own page (lean) vs. an extension of Disciplined Rebalancing. Decide before drafting; the answer changes the scope substantially.
-
-- [ ] **Tool-hero sweep — apply STYLE_GUIDE §6.10a to the other tool pages.** Small, anytime.
-  Surfaced 2026-07-15 with the How Much Cash v3 rebuild; JM's request, added to the guide as canon in that build and deliberately not swept there.
-  - **The rule:** every tool/exploration hero states declaratively what the tool is and how to use it. No assumed reading order — a hero may not need a sibling page to parse. The failure it fixes: How Much Cash v2 opened *"The other end of the sizing question — for the reader who already went all in"*, legible only to someone who had read How Much Bitcoin.
-  - **The shape that satisfies it:** subtitle names the question the tool answers; the line under it names the audience and the two or three actions. See `/how-much-cash` for the reference implementation.
-  - **Candidates to audit:** every page with a `calculator_tile` (currently 20). Expect most to pass; the ones to check first are those whose subtitle opens on a relationship to another page rather than on their own question.
-  - **Scope note:** copy-only, no engine risk. Natural to bundle with any other hero-touching pass.
-
-- [ ] **Freshness signals — "New" / "Updated" badges, and an honest channel-position chip.**
-  Surfaced 2026-07-14. Small, anytime.
-  - **Badges:** "New" / "Updated" markers in nav + index, driven by the existing `src/_data/updates.json` on a ~30-day window. Optional per-page "Updated &lt;month&gt;" line, but only where it means something — not stamped site-wide.
-  - **Channel-position chip (separate, more interesting):** price · trend multiple · zone vocabulary, with a subtle glow **gated on `todayPriceIsLive`**. This is the honest form of the "site is alive" idea: it says where we are in the channel, in the site's own vocabulary. Pilot on 2–3 pages before committing to the layout.
-  - **Rejected:** a raw price ticker. Off-thesis — the site is about the channel, not the tape.
-
-- [ ] **Power law in other metrics — hash rate, energy, addresses. Low priority.**
-  Surfaced 2026-07-14. Extension, not a new page.
-  - **Concept:** additional power laws beyond price — hash rate, energy, active addresses — as **sections on the existing Power Law (`/the-power-law`) or Metcalfe (`/bitcoin-and-metcalfes-law`) pages**. Explicitly not a new page.
-  - **Check first:** what the Metcalfe address scatter already covers — the addresses angle may be substantially done.
-  - **Cost to weigh:** each new series adds monthly-refresh surface. The maintenance tail is the reason this is low priority, not the difficulty.
-
-- [ ] **The Bitcoin Exit — Substack essay on conviction vs. the act of stacking.** Substack (opinion/memoir).
-  Surfaced 2026-07-30. Near-term candidate — JM says it's largely written in his head.
-  - **Concept:** why believing and *acting* are different muscles; DCA as conviction made mechanical; JM's firsthand experience moving retirement funds (memoir register — "what I did, what surprised me"). Hook: the $30/day-since-2017 anecdote as the human-brain-vs-exponentials story.
-  - **Pairs with:** the daily-conviction DCA tool below, as its live artifact — same essay↔page pattern as the STRC essay↔page pair.
 
 - [ ] **What Daily Conviction Bought — daily-conviction DCA tool (The Numbers).** Working title.
   Surfaced 2026-07-30. The live artifact for "The Bitcoin Exit" essay.
@@ -76,28 +249,52 @@ Candidate page / exploration ideas surfaced during ongoing work but not yet sche
   - **Why flagged:** the action-steps content ("how to actually move retirement funds") sits closer to the advice line than anything on the site, incl. STRC.
   - **Split:** JM's first-person experience → the Bitcoin Exit essay (memoir). Site version IF ANY = facts-only survey of existing mechanisms (self-directed IRA, ETF-in-IRA, rollover paths, custody trade-offs), US-flagged, heavily disclaimed, hard counsel gate — likely better as an extension of the retirement cluster than a standalone page.
 
-- [ ] **Bitcoin as pristine collateral — argument exploration + essay. Anchors the collateral cluster.**
-  Surfaced 2026-07-30. Timeliness: live product wave.
-  - **Concept:** the emergent case the market hasn't priced — 24/7 liquidity, fully marked-to-market, fungible (vs real estate), verifiable, securable in multisig → better collateral → structurally lower rates and lender friction/risk.
-  - **Register:** both — site Arguments/Numbers treatment (facts, mechanics, comparisons) + Substack for the "unrecognized-but-inevitable" thesis voice.
+### Thesis, arguments & essays
 
-- [ ] **Margin-call / borrow-against-stack calculator — site tool (The Numbers).**
-  Surfaced 2026-07-30. Collateral cluster.
-  - **Concept:** loan amount, LTV, lender terms → the bitcoin price that triggers a margin call, stress-tested against house drawdown / power-law paths; compare offerings side-by-side.
-  - **Prior art:** Strike's new borrow product has a calculator to review.
-  - **Guardrails:** facts-not-signals; leverage content = elevated counsel attention; no lender recommendations — computed comparison only, PARTNERSHIPS_REFERRALS_POLICY applies.
+- [ ] **The Big Long — the paper-vs-physical thesis (Darkside). Substack-first umbrella; multiple pieces.**
+  Surfaced 2026-08-02. Credit **@DarkSide2030** by name — already in the credited macro/philosophy circle (`X_STRATEGY_PLAYBOOK` §6), so crediting is house habit *and* a relationship-layer win.
+  - **The sub-claims, deliberately separated because they are not equally strong:**
+    - **(a) The derivatives complex needs borrowable float.** Futures markets require the underlying to be freely loanable, longable and shortable; as that breaks, the machinery strains.
+    - **(b) Paper → physical flight.** As it breaks, a flood from custodial/paper bitcoin into self-custody. Most participants currently see no difference between physical and paper bitcoin.
+    - **(c) Delivery asymmetry vs gold.** You cannot take delivery of $100M in gold — certainly not in five minutes — but you can in bitcoin. Gold *requires* the paper/IOU layer; bitcoin does not.
+    - **(d) The 2008 counterfactual.** Bitcoin would have been the exit for economic participants in 2008; instead a trillion dollars was printed overnight. In the next crisis, physical bitcoin *is* the exit — because bitcoin is a parallel economy, not merely another asset. **First time everyone has a viable exit.**
+    - **(e) Fiat and bitcoin are ultimately incompatible.** They coexist for a period but not indefinitely; bitcoin's advantages become progressively obvious to people, institutions and governments — game theory does the rest. Bitcoin as the replacement for *both* fiat and gold.
+    - **(f) Perpetual futures should trade at a premium — and sometimes don't.**
+  - **BUILD OUTWARD FROM (f), NOT FROM (a).** Funding rates are publicly measurable and persistently negative episodes are documented (Coinglass and similar) — **(f) is the one sub-claim with a hard empirical spine.** By contrast **(a)/(b) are the weakest empirically** and are load-bearing for everything else:
+    - Gold's paper-to-physical ratio is documented (LBMA/COMEX). **There is no credible published bitcoin equivalent**, and spot ETFs hold audited, *allocated* bitcoin — not the gold-unallocated-claim situation.
+    - **Required discipline:** define "paper bitcoin" precisely; separate ETF (allocated/audited) from custodial IOU and rehypothecated derivative collateral; rest the directional argument on the *demonstrated* custody record — **Mt Gox, Celsius, FTX** — rather than an unverifiable multiple. That version is more persuasive to a sceptic, and it is the only version consistent with the house rule that the case needs no embellishment.
+  - **SPLIT DECISION at drafting:** **(e) is arguably the singularity umbrella's thesis, not this piece's.** Decide the boundary before writing or it gets written twice.
+  - **Check before drafting:** whether the existing bitcoin-vs-gold material already covers (c).
 
-- [ ] **Collateral/services company research + freshness pass — task, not a page.**
-  Surfaced 2026-07-30. Collateral cluster.
-  - **Research:** current offerings — AnchorWatch, People's Reserve, Strike borrow-against-bitcoin, "Horizon" (disambiguate at research — several bitcoin cos use the name).
-  - **Purpose:** (a) keep borrowing/services-adjacent explorations current (freshness = credibility); (b) partner-candidate notes per PARTNERSHIPS_REFERRALS_POLICY (no coverage-for-consideration entanglement; research and partnership tracks stay separate).
-  - **Output:** research notes + a freshness diff for affected pages.
+- [ ] **A new asset class / the paradigm layer — grand-thesis essay (Substack-first). "Singularity" umbrella.**
+  Surfaced 2026-07-30. Extended 2026-08-02.
+  - **Concept:** bitcoin as a category event like oil or electricity — not an asset/investment/speculation but an economy-wide (civilizational) transformation.
+  - **Singularity kinship (per the merge check):** JM flags kinship with a "Bitcoin is a Singularity" idea. **No existing Singularity backlog entry as of 2026-07-30**, so this is created as the umbrella with two angles — the asset-class lens + the singularity framing; fold any future Singularity capture into this entry rather than duplicating.
+  - **Punctuated equilibrium (added 2026-08-02) — more than a merge; it is in TENSION with the site's spine.** The power law says growth is smooth, proportional, sustainable. Punctuated equilibrium (Eldredge/Gould) says change is long stasis then rapid jumps. **Likely resolution to test:** *adoption* is punctuated (individuals → corporations → institutions → nation-states, each a step change) while *price* is smooth. But that is a design question, not a given. Handled well it's a real intellectual contribution; handled loosely it reads as two incompatible metaphors on one site.
+  - **"Bitcoin stands alone" (added 2026-08-02):** the positive claim about bitcoin's uniqueness. This pushes the existing *why altcoins are stillborn* sub-topic toward being **its own piece** — "stands alone" is the affirmative version, "altcoins are stillborn" the negative; they are one argument told two ways.
+  - **Sub-topic (in or out):** *why altcoins are stillborn* — see above; leaning out, decide at drafting.
+  - **May also absorb:** The Big Long's sub-claim (e), fiat/bitcoin incompatibility — settle the boundary at drafting.
 
-- [ ] **Real estate as the wedge — People's Reserve / REIT angle.**
-  Surfaced 2026-07-30. Collateral cluster; extends the Bitcoin-vs-Real-Estate cluster.
-  - **Source:** CJKonstantinos (People's Reserve founder) on a recent podcast — significant inbound interest from REITs and real-estate syndicates in bitcoin-backed structures.
-  - **Explore:** real-estate holders as a conversion audience (a "wedge" from RE toward bitcoin); possibly an essay angle + a page extension rather than a new page.
-  - **Verify at build:** locate/cite the podcast episode. Partnership-adjacent — same separation discipline as the research task above.
+- [ ] **Bitcoin's CAGR as the new hurdle rate.** Arguably the highest-value idea in the backlog **for the asset-management ambition specifically**.
+  Surfaced 2026-08-02.
+  - **Concept:** the corporate-finance framing. If bitcoin's trend CAGR is X%, any project or investment returning less than X% destroys value relative to simply holding bitcoin. **This is how a CFO and an allocator actually think** — it makes the bitcoin case in the audience's own native language, with no ideology required.
+  - **Explanatory power:** it accounts for treasury-company behaviour (why hold cash, why buy back stock, why issue against the stack) without appeal to conviction — and it generalises the opportunity-cost argument that runs implicitly under most of the site.
+  - **Two counters the entry must carry:**
+    1. **Hurdle rates are risk-adjusted.** A naive CAGR comparison overstates the hurdle given bitcoin's volatility — needs a vol- or Sharpe-adjusted treatment to be honest.
+    2. **The hurdle declines over time** by the Doubling Ladder's own structure (trend CAGR ~28% today → ~14% in 2045 → ~10% in 2065, per the retirement calculator's live computation). That is itself the interesting finding, not a caveat to bury.
+  - **Placement — open:** own short piece vs. a section inside an existing page. Natural homes: `/the-power-law` (Power Law v2), `/bitcoin-vs-the-stock-market`, or standalone.
+
+- [ ] **Second-order effects of bitcoin adoption — essay.**
+  Surfaced 2026-08-02.
+  - **Concept:** what follows once adoption is assumed — monetization of debt goes away; government can no longer issue debt at will; reliance shifts to taxation only; the state contracts as a mechanical consequence.
+  - **NEUTRALITY GUARDRAIL — load-bearing, same as the fiscal canary.** "Government naturally gets smaller" is a politically-coded conclusion. The version that survives an institutional reader presents the **mechanism mechanically** (no debt monetization → hard budget constraint) and carries the **counter-case at full strength**: counter-cyclical spending, social safety nets, war finance, and the transition path itself. Absent that, it reads as libertarian advocacy and forfeits the allocator audience the site is built for.
+  - **Clusters with:** the fiscal canary, deflation without fear, credit in a bitcoin-denominated world.
+
+- [ ] **Deflation without fear — Foundations-adjacent essay (Substack).**
+  Surfaced 2026-07-30.
+  - **Concept:** why deflation is not scary in a bitcoin-denominated world; why "money hoarding" fears don't apply.
+  - **Open — JM to brief:** the argument set is deliberately not captured yet; JM to brief the reasons when promoted.
+  - **Coupling note (2026-08-03):** tightly bound to *Can there be credit in a bitcoin-denominated world?* — the "deflation kills lending" objection is the hinge both pieces turn on. Decide one piece vs. two-parter at drafting.
 
 - [ ] **The agentic economy runs on bitcoin — grand-thesis essay (Substack-first).**
   Surfaced 2026-07-30.
@@ -105,37 +302,14 @@ Candidate page / exploration ideas surfaced during ongoing work but not yet sche
   - **Timeliness:** agentic payments are a live industry topic.
   - **Maturation path:** revisit for a site Arguments page if/when concrete rails (Lightning / L2 agent payments) give it an evergreen factual spine.
 
-- [ ] **A new asset class / the paradigm layer — grand-thesis essay (Substack-first). "Singularity" umbrella.**
-  Surfaced 2026-07-30.
-  - **Concept:** bitcoin as a category event like oil or electricity — not an asset/investment/speculation but an economy-wide (civilizational) transformation.
-  - **Singularity kinship (per the merge check):** JM flags kinship with a "Bitcoin is a Singularity" idea. **No existing Singularity backlog entry as of 2026-07-30**, so this is created as the umbrella with two angles — the asset-class lens + the singularity framing; fold any future Singularity capture into this entry rather than duplicating.
-  - **Sub-topic (in or out):** *why altcoins are stillborn* — either a section here or its own piece; decide at drafting.
-
 - [ ] **Value creation vs. value capture — theme essay (Substack).**
   Surfaced 2026-07-30. JM flags as a personally favourite theme; good candidate for the essay cadence between heavier builds.
   - **Concept:** the creation/capture lens applied across bitcoin itself, bitcoin companies, and AI companies (the alternative-investment du jour).
 
-- [ ] **Deflation without fear — Foundations-adjacent essay (Substack).**
-  Surfaced 2026-07-30.
-  - **Concept:** why deflation is not scary in a bitcoin-denominated world; why "money hoarding" fears don't apply.
-  - **Open — JM to brief:** the argument set is deliberately not captured yet; JM to brief the reasons when promoted.
-
-- [ ] **The idle $17T — money-market dry powder vs. bitcoin (macro data addition).**
-  Surfaced 2026-07-30.
-  - **Concept:** US+EU money-market funds as parked "monetary energy" — a live/periodic on-site figure ("the sidelines, measured") + a what-if device (X% of MMF assets moving → effect vs bitcoin market cap). A natural section for STRC-persona content (the Treasury-shore reader's neighborhood).
-  - **Verify the figure at build:** ~$17T per JM — US MMF AUM is ~$7T range, EU adds meaningfully; source current numbers (likely ICI + EFAMA).
-  - **Distinct from:** allocation-sizing (personal) — this is macro flows.
-
-- [ ] **The fiscal canary — national debt as the fiat signal (macro data addition).**
-  Surfaced 2026-07-30.
-  - **Concept:** track US national debt (and interest-payments trajectory) as a standing signal of fiat-credit unsustainability — "fiscal dominance's canary" — alongside/within the Power Law exploration, or as a Half-Life-adjacent mini-exploration (melting-ice-cube kinship). Plus an updated **debt-by-president infographic** (JM has a reference image): the trajectory barely depends on who governs.
-  - **Register guardrail (load-bearing):** the entire value of the by-president framing is its bipartisanship — scrupulously even-handed, zero partisan language; the inexorability IS the argument (site political-neutrality rules apply in full).
-  - **Open design question:** overlay on an existing page vs. standalone — decide at promotion.
-
-- [ ] **Mobile "full-canvas" notice — site UX. Small build.**
-  Surfaced 2026-07-30. Pairs naturally with any future mobile-QA pass.
-  - **Concept:** on canvas-heavy explorations, detect small viewports and show a dismissible one-line invitation — "this exploration rewards a bigger screen." Nudge, never nag, never gate.
-  - **Implementation notes:** per-page front-matter flag (opt-in by page); appears once (dismiss persists per the no-storage constraint as best-effort — session in-memory only, acceptable to reappear per visit); zero SEO impact (content itself never hidden — mobile experience remains fully functional per the checklist QA standard).
+- [ ] **The Bitcoin Exit — Substack essay on conviction vs. the act of stacking.** Substack (opinion/memoir).
+  Surfaced 2026-07-30. Near-term candidate — JM says it's largely written in his head.
+  - **Concept:** why believing and *acting* are different muscles; DCA as conviction made mechanical; JM's firsthand experience moving retirement funds (memoir register — "what I did, what surprised me"). Hook: the $30/day-since-2017 anecdote as the human-brain-vs-exponentials story.
+  - **Pairs with:** the daily-conviction DCA tool above, as its live artifact — same essay↔page pattern as the STRC essay↔page pair.
 
 ---
 
