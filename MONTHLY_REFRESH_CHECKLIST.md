@@ -421,7 +421,7 @@ exponents too, since the ETF-era window lengthens.
 
 ## 10. Claude project mirror refresh
 
-**Last mirror refresh: 2026-08-03** (update this line BEFORE exporting,
+**Last mirror refresh: 2026-08-02** (update this line BEFORE exporting,
 not after — see step 3).
 
 The Claude project holds a copy of the repo's strategy and design docs. That
@@ -453,12 +453,16 @@ design doc that changed.
 **Is the mirror current?** Empty output means yes:
 
 ```bash
-git log --since=<last refresh date> --oneline -- PAGE_IDEAS_BACKLOG.md \
+git log --since="<last refresh date> 00:00" --oneline -- PAGE_IDEAS_BACKLOG.md \
   SITE_GUIDE.md STYLE_GUIDE.md TECH_DEBT.md DATA_AUDIT.md \
   MONTHLY_REFRESH_CHECKLIST.md NEW_PAGE_CHECKLIST.md \
   POSITIONING_STRATEGY_GUIDE.md TOOLS_FORWARD_LANGUAGE_KIT.md \
   FEEDBACK_SETUP.md '*_DESIGN.md'
 ```
+
+Pin the `00:00` — a bare date in `--since` resolves to the current time-of-day,
+not midnight, so it silently drops commits made earlier on the refresh day, and
+an empty result would then read as "all current" when it isn't.
 
 **Naming hazard — this is how the mess starts.** Docs shuttled by hand pick up
 renames: a project doc exported to the repo becomes `claude_NAME.md` (namespace
