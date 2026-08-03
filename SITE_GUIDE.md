@@ -454,7 +454,7 @@ Full credits section lists: Giovanni Santostasi (theory creator), Matthew Mežin
 - CAGR Comparison Chart: bar chart showing Bitcoin's implied CAGR from various purchase years to 2035 vs S&P 500 ~10% baseline
 - S2F Comparison box with sup³ footnote
 - Milestones table: $1K–$10M with "Trend reaches" and "Floor secures" columns, confirmed/in-progress/projected status
-- Out-of-Sample Validation chart: regression fitted to 2010-2014 data only, projected forward, overlaid with actual 2015-present prices
+- Out-of-Sample Validation chart: regression fitted through end-2017 (slope 5.657), projected forward, overlaid with actual 2015-present prices. (Refit from the original end-2014 cutoff in commit `6604126`, 2026-05-07 — see DATA_AUDIT's Architectural change log, "Out-of-sample chart coefficient refit".)
 - Price Projection Widget: year slider (2025-2045) showing Floor/Trend/Ceiling projections with days-to-double
 - Caveats section: empirical not physical law, Santostasi's ~2040 horizon warning, falsifiability via floor breach
 - Credits with links to all primary sources
