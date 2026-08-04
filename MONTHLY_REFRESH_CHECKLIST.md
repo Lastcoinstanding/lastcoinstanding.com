@@ -153,6 +153,23 @@ append the current month's sample. A correct refresh silences it.
 > current is what keeps the fallback honest *and* close. Append at least the
 > current month every refresh; if you can only source one price, source today's.
 
+### Annual: Power Law exponent survey — external pairs (piggyback the PL-1 recheck, due 2026-11-02)
+
+The Tab 1 exponent survey (Power Law v2, item b) plots competing coefficient
+sets from external sources. At the **PL-1 coefficient audit (DATA_AUDIT, next
+due 2026-11-02)**, re-verify these against their live sources in the same pass —
+they were taken from the v2 build prompt + in-repo records at ship, not freshly
+fetched, and the sites are JS-rendered dashboards that move:
+
+- **PL-4 BitcoinPower.law** — `a=10⁻¹⁶·⁴⁹³ (≈3.2×10⁻¹⁷), b=5.68` — https://bitcoinpower.law/
+- **PL-5 bitcoinretirement.net** — `a=1.0117×10⁻¹⁷, b=5.82` — https://bitcoinretirement.net/
+- **PL-6 b1m.io / Fred Krueger** — `b=5.566` (a not published) — https://b1m.io/
+
+If a source has refit, update the `PAIRS` array in `the-power-law.js` (exponent
+survey IIFE) and the matching DATA_AUDIT row. This is **annual**, not monthly —
+listed here because the PL-1 audit is the natural carrier. The canonical
+`PL_A`/`PL_B` stay pinned regardless; the survey is presentation-only.
+
 ## 2. Page-level TODAY constants — none remaining
 
 **Per-cycle (event-driven, not monthly) — Bull & Bear Cycles status framing.** `src/_includes/_pageassets/bull-and-bear-cycles.js` hard-codes the `CYCLES` table of *documented daily-close* peak/trough extremes (register figures, not live-computed) and treats **2025 (peak $126,198, Oct 6 2025) as the ongoing bear**. The live status, table, and overlay all compute off that peak. Two triggers change the framing and need a manual edit: (a) **a new all-time high above $126,198** — the 2025 entry is no longer a bear; add the resolved 2025 trough and open a new ongoing cycle; (b) **the 2025 trough resolving** (a confirmed bottom) — fill `troughDate`/`trough`/`ddPct`/`recovery` for the 2025 row and flip `ongoing` off. Everything else (drawdown-from-peak, days-since-peak, rank, volatility) is computed live from the shared series and needs no edit.
@@ -421,7 +438,7 @@ exponents too, since the ETF-era window lengthens.
 
 ## 10. Claude project mirror refresh
 
-**Last mirror refresh: 2026-08-03** (update this line BEFORE exporting,
+**Last mirror refresh: 2026-08-04** (update this line BEFORE exporting,
 not after — see step 3).
 
 The Claude project holds a copy of the repo's strategy and design docs. That
