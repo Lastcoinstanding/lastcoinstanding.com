@@ -356,7 +356,12 @@
   }
 
   var maxD = PL_DATA[PL_DATA.length-1][0] + 365;
-  var latest = PL_DATA[PL_DATA.length-1]; // [day, actual price] — divergence anchor
+  var latest = PL_DATA[PL_DATA.length-1]; // [day, actual price]
+  // Full-series self-fit (window = 100%): same OLS method, every sample. The
+  // readout compares a window's implied-today trend against THIS, so the delta
+  // isolates "what did the extra years change" (not channel position).
+  var fullFit = fit(latest[0]);
+  var fullImpliedToday = fullFit.a * Math.pow(TODAY_DAYS, fullFit.b);
   var curYm = readFitFromUrl();
   var f = fit(ymToCutoffDays(curYm));
 
@@ -476,19 +481,58 @@
     }
   });
 
-  // ── readout: fitted (a,b), implied trend today, divergence vs latest actual ──
+  // ── readout: fitted (a,b), implied trend today, Δ vs the full-data self-fit,
+  //    plus a live drive-home sentence and a channel-position line. ──
+  function pctStr(v){ return (v>=0?'+':'−') + Math.abs(Math.round(v)) + '%'; }
   function updateReadout(){
-    var impToday  = f.a * Math.pow(TODAY_DAYS, f.b);
-    var impLatest = f.a * Math.pow(latest[0], f.b);
-    var div = (latest[1] / impLatest - 1) * 100;
+    var impToday = f.a * Math.pow(TODAY_DAYS, f.b);
+    var delta = (impToday / fullImpliedToday - 1) * 100;   // trend-vs-trend, not channel
+    var within = Math.abs(delta);
+    var yearsOOS = Math.max(0, Math.round((latest[0] - ymToCutoffDays(curYm)) / 365.25));
+    var mult = (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0) ? (TODAY_PRICE / impToday) : null;
+
     if($('oosB'))       $('oosB').textContent = f.b.toFixed(3);
     if($('oosA'))       $('oosA').innerHTML   = fmtA(f.a);
     if($('oosImplied')) $('oosImplied').textContent = '$' + Math.round(impToday).toLocaleString();
-    if($('oosDiv')){
-      $('oosDiv').textContent = (div>=0?'+':'−') + Math.abs(Math.round(div)) + '%';
-      $('oosDiv').className = 'oos-ro-val ' + (div>=0 ? 'pos' : 'neg');
+    if($('oosDelta')){
+      $('oosDelta').textContent = pctStr(delta);
+      $('oosDelta').className = 'oos-ro-val ' + (within <= 12 ? 'pos' : 'neg'); // small Δ = stable
     }
     if($('oosFitLabel')) $('oosFitLabel').textContent = curYm;
+
+    // A1 detail + A2 drive-home, adaptive so it stays true on the bad windows too
+    if($('oosDrive')){
+      var lead = 'This window\'s trend puts today at <strong>$' + Math.round(impToday).toLocaleString() +
+                 '</strong> — versus <strong>$' + Math.round(fullImpliedToday).toLocaleString() +
+                 '</strong> from the full-data fit (Δ ' + pctStr(delta) + '). ';
+      var yrTxt = yearsOOS <= 1 ? 'the out-of-sample years since' : (yearsOOS + ' years of out-of-sample data');
+      var tail;
+      if(within <= 12){
+        tail = 'A fit that saw nothing after ' + curYm + ' lands ' +
+               (within < 1 ? 'within 1%' : 'within ' + Math.round(within) + '%') +
+               ' of the trend fitted on everything since — ' + yrTxt + ' have barely moved the line.';
+      } else if(within <= 100){
+        tail = 'A fit ending ' + curYm + ' sits ' + pctStr(delta) +
+               ' off the full-data trend — the years since have moved the line materially.';
+      } else {
+        tail = 'A fit ending ' + curYm + ' misses the full-data trend by ' + pctStr(delta) +
+               ' — too little, too-early data to pin the exponent, so the extra years change it enormously.';
+      }
+      $('oosDrive').innerHTML = lead + tail;
+    }
+
+    // A3 channel position, in the site's vocabulary, adapting above/below
+    if($('oosChannel')){
+      if(mult === null){ $('oosChannel').textContent = ''; }
+      else {
+        var where = mult >= 1.2 ? 'well above the line' :
+                    mult >= 1    ? 'just above the line' :
+                    mult >= 0.85 ? 'right around the line' :
+                    'deep in its channel';
+        $('oosChannel').innerHTML = 'Today\'s price sits at <strong>' + mult.toFixed(2) +
+          '×</strong> this fitted trend — ' + where + '.';
+      }
+    }
   }
 
   function highlightPreset(){
@@ -527,6 +571,8 @@
   // first paint reflects the (possibly URL-restored) cutoff
   updateReadout();
   highlightPreset();
+  // refresh the channel-position line when the live spot resolves (A3 is live)
+  if(typeof fetchTodayPrice === 'function'){ fetchTodayPrice(function(){ updateReadout(); }); }
 })();
 
 
@@ -540,8 +586,20 @@
   var a = document.getElementById('statAge');
   var dbl = document.getElementById('statDouble');
   if(a) a.textContent = age.toLocaleString();
-  if(dbl) dbl.innerHTML = Math.round(interval).toLocaleString() +
+  if(dbl) dbl.innerHTML = '~' + Math.round(interval).toLocaleString() +
     ' days <span class="pl-stat-sub">&asymp; ' + (interval/365.25).toFixed(2) + ' yr</span>';
+  // Keep the doubling tooltip honest in both channel states. Default markup is
+  // the below-trend wording; swap the middle clause if price is above trend.
+  var tip = document.getElementById('statDoubleTip');
+  if(tip && typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0){
+    var mult = TODAY_PRICE / plPrice(age);
+    if(mult >= 1){
+      tip.innerHTML = 'The ~820 days is how long the trend line takes to double — not today\'s price. ' +
+        'Price trades above or below the trend at any given moment; from today\'s above-trend price, a ' +
+        'doubling of the trend would take longer than the headline number suggests, and a drift back toward ' +
+        'the line is a scenario, not a schedule.';
+    }
+  }
 })();
 
 
@@ -579,10 +637,10 @@
 
   var CANON = {a:1.6e-17, b:5.77};
   var PAIRS = [
-    {key:'canonical', name:'Porkopolis &mdash; canonical', a:1.6e-17,   b:5.77,
-      just:'The site canonical; Porkopolis &ldquo;The Chart&rdquo; fit.'},
+    {key:'canonical', name:'Porkopolis &mdash; reference', a:1.6e-17,   b:5.77,
+      just:'The site reference fit; Porkopolis &ldquo;The Chart&rdquo; fit.'},
     {key:'refit',     name:'Porkopolis &mdash; later refit', a:1.69e-17,  b:5.763,
-      just:'Same source, refit later (the Doubling Ladder&rsquo;s constants); ~0.7% below canonical today.'},
+      just:'Same source, refit later (the Doubling Ladder&rsquo;s constants); ~0.7% below the reference fit today.'},
     {key:'bpl',       name:'BitcoinPower.law', a:Math.pow(10,-16.493), b:5.68,
       just:'Independent log-log regression over the full price history.'},
     {key:'bret',      name:'bitcoinretirement.net', a:1.0117e-17, b:5.82,
@@ -628,7 +686,7 @@
   var chart = new Chart(ctx, {
     type:'scatter',
     data:{ datasets:[
-      { label:'Canonical (5.77)', data:lineFor(CANON), type:'line',
+      { label:'Reference (5.77)', data:lineFor(CANON), type:'line',
         borderColor:'rgba(224,148,34,0.9)', borderWidth:2.5, pointRadius:0, fill:false, order:2 },
       { label:'selected', data:lineFor(PAIRS[3]), type:'line',
         borderColor:'rgba(76,175,80,0.9)', borderWidth:2.5, borderDash:[6,3], pointRadius:0, fill:false, order:1 }
@@ -658,7 +716,7 @@
           borderColor:'rgba(247,147,26,0.3)',borderWidth:1,padding:12,displayColors:false,
           callbacks:{
             title:function(items){ return String(Math.round(2009+items[0].raw.x/365.25)); },
-            label:function(item){ return (item.datasetIndex===0?'Canonical: ':'Selected: ')+fmtUSD(item.raw.y); }
+            label:function(item){ return (item.datasetIndex===0?'Reference: ':'Selected: ')+fmtUSD(item.raw.y); }
           }
         }
       }
@@ -676,7 +734,7 @@
         if(isSel){ var dev=(v/price(CANON,c.d)-1)*100; cell += ' '+devStr(dev); }
         return '<td>'+cell+'</td>';
       }).join('');
-      return '<tr'+(isSel?' class="exp-sel-row"':'')+'><th scope="row">'+(isSel?p.name:'Canonical (5.77)')+'</th>'+tds+'</tr>';
+      return '<tr'+(isSel?' class="exp-sel-row"':'')+'><th scope="row">'+(isSel?p.name:'Reference (5.77)')+'</th>'+tds+'</tr>';
     }
     impBody.innerHTML = row(CANON,false) + row(p,true);
   }

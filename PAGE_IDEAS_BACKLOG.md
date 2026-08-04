@@ -89,6 +89,12 @@ Captured during the merge pass, because the backlog is now large enough that the
   - **Candidates to audit:** every page with a `calculator_tile` (currently 20). Expect most to pass; the ones to check first are those whose subtitle opens on a relationship to another page rather than on their own question.
   - **Scope note:** copy-only, no engine risk. Natural to bundle with any other hero-touching pass.
 
+- [ ] **Site-wide de-tell sweep — `honest`/`canonical` and similar tells in reader-facing copy.** Small, anytime; copy-only, no engine risk.
+  Surfaced 2026-08-05 during the Power Law v2 polish audit. The power-law page was swept in that pass; this entry carries the rest of the site.
+  - **The rule (now canon):** STYLE_GUIDE §5 "Copy register: show, don't claim" — never call our own copy honest/candid/transparent (the disclosure does the work; deletion beats substitution), and avoid "canonical" in reader-facing copy (say "the reference fit/value"). The STYLE_GUIDE rule prevents *new* imports; this sweep clears the existing ones.
+  - **Candidates:** grep every page's reader-facing copy for `honest`/`honestly`/`candid`/`transparent` and reader-facing `canonical`. Expect most hits in older explorations. Bundleable with the tool-hero sweep above (both copy-only, both hero-/prose-touching).
+  - **Exempt:** first-person Substack/memoir voice ("honestly, I…" is natural speech, not the site describing itself).
+
 - [ ] **Mobile "full-canvas" notice — site UX. Small build.**
   Surfaced 2026-07-30. Pairs naturally with any future mobile-QA pass.
   - **Concept:** on canvas-heavy explorations, detect small viewports and show a dismissible one-line invitation — "this exploration rewards a bigger screen." Nudge, never nag, never gate.

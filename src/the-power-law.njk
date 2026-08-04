@@ -6,7 +6,7 @@ related:
   - slug: your-deployment-plan
     desc: "Applies the channel as a deployment-timing frame: model lump vs ladder vs hybrid for your own sum, both back across history and forward under the Power Law."
   - slug: the-doubling-ladder
-    desc: "The Power Law seen through price doublings — Mezinskis's ladder, the deviation wave, and what the gap reveals."
+    desc: "The Power Law seen through price doublings — Mežinskis's ladder, the deviation wave, and what the gap reveals."
   - slug: bitcoin-and-metcalfes-law
     desc: "The network-effect engine beneath the trend. Where the Power Law models price versus time, this page measures price versus adoption — Metcalfe's Law fitted to on-chain data, and why that signal goes blind as ownership moves into ETFs and custody."
   - slug: start-here
@@ -26,7 +26,7 @@ related:
   - slug: the-gallery
     desc: "The curated visual index. The Power Law channel and its implied CAGR both anchor the Gallery's opening section — a quick way to see how this model frames the rest of the site's arguments."
   - slug: bitcoin-fixed-income
-    desc: "Where the Power Law is applied to an income-instrument decision. The BFI calculator's three bitcoin growth scenarios — stay at current multiple, revert to trend, reach upper channel — share the canonical channel framing documented here."
+    desc: "Where the Power Law is applied to an income-instrument decision. The BFI calculator's three bitcoin growth scenarios — stay at current multiple, revert to trend, reach upper channel — share the reference channel framing documented here."
   - slug: how-much-bitcoin
     desc: "The sizing question: what this trend implies through the Kelly criterion &mdash; and why the honest answer is a fraction of the formula."
   - slug: lump-sum-or-ladder-in
@@ -34,6 +34,17 @@ related:
   - slug: discount-or-premium
     desc: "This trend, re-expressed in CAGR terms. Where price sits against the trend right now &mdash; a discount or a premium &mdash; and what returning to it would imply annualised, at a speed you choose."
 companion: []
+faq:
+  - q: "What is the Bitcoin power law formula?"
+    a: "The trend is price = a × age^b, where age is days since the genesis block. b is the exponent — how steep the curve is — and a is the coefficient that sets its scale. Only the pair (a, b) means anything: the two trade off, so a steeper exponent does not by itself imply a higher price."
+  - q: "Why do Bitcoin power law models use different exponents?"
+    a: "Because different authors fit different windows of data, different price series, and slightly different methods, so reasonable people land on slightly different coefficients. The like-for-like comparison is not the bare exponent but the price each fit implies at a fixed date, since a and b trade off."
+  - q: "Do Bitcoin power law coefficients change over time?"
+    a: "Yes — a fit refreshes as new data arrives. Two Porkopolis snapshots of the same fit differ by well under 2%. That is drift, not revision: the model is re-measured against a few more years, not rewritten."
+  - q: "How much do the different Bitcoin power law fits disagree?"
+    a: "Fitted to the same history they agree within single digits on today's trend, then fan out with the horizon. BitcoinPower.law runs about 9% below the reference fit today but roughly 17% below by 2060. The disagreement is mostly about the far future, not the present — which is the real uncertainty to disclose."
+  - q: "Which Bitcoin power law exponent does this site use, and why?"
+    a: "The Porkopolis reference fit, a = 1.6 × 10⁻¹⁷ and b = 5.77 — the longest-standing published fit with a disclosed methodology, and the one whose structural floor fits tightest. It stays fixed across the site and is reviewed once a year, because a reference line's value is stability: refitting it monthly would move every number on the site and break every saved scenario link."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-power-law-head.html' %}"
   page_styles: "{% include '_pageassets/the-power-law.css' %}"
@@ -63,14 +74,26 @@ eleventyComputed:
     <div class="hero-insight">
       <div class="hero-stat">For every ~13% increase in Bitcoin's age, <em>the trend price doubles.</em></div>
       <p class="hero-body">This relationship &mdash; <em>proportional</em><sup title="The characterization of Bitcoin's power law growth as 'proportional and sustainable' originates from Matthew Mežinskis (Porkopolis Economics).">1</sup>, not exponential &mdash; has held across 15 years and nine orders of magnitude, from $0.01 to $100,000. It describes growth that naturally decelerates as the network matures: fast enough to be transformative, slow enough to be <em>sustainable</em>.<sup title="The characterization of Bitcoin's power law growth as 'proportional and sustainable' originates from Matthew Mežinskis (Porkopolis Economics).">1</sup> It is not an investment thesis. It is an empirical observation about how Bitcoin scales.</p>
-      <p class="hero-body">The model is called the <strong>Power Law</strong>. Its R&sup2; exceeds 95%.<sup title="R² (R-squared) measures how well a statistical model fits observed data. A value of 1.0 means the model explains 100% of the variation; 0 means none. An R² above 0.95 is exceptionally rare for any financial model and indicates the Power Law explains more than 95% of Bitcoin's long-term price variation.">2</sup> Its structural floor &mdash; the boundary below which Bitcoin has never sustained a daily close &mdash; has survived every major stress test of the last decade, including the March 2020 COVID crash and the 2022 FTX collapse. And it has held not only in-sample but out-of-sample: first identified in 2014, every subsequent year has confirmed the trajectory. One honest caveat from the statistical literature: <a href="https://arxiv.org/abs/2605.21316" target="_blank" rel="noopener">a 2026 audit</a> finds the fitted exponent sensitive to the chosen time origin &mdash; the model is stronger as a forecaster than as a physical constant &mdash; which is why this site treats the trend as a scenario to reason from, never a promise.</p>
+      <p class="hero-body">The model is called the <strong>Power Law</strong>. Its R&sup2; exceeds 95%.<sup title="R² (R-squared) measures how well a statistical model fits observed data. A value of 1.0 means the model explains 100% of the variation; 0 means none. An R² above 0.95 is exceptionally rare for any financial model and indicates the Power Law explains more than 95% of Bitcoin's long-term price variation.">2</sup> Its structural floor &mdash; the boundary below which Bitcoin has never sustained a daily close &mdash; has survived every major stress test of the last decade, including the March 2020 COVID crash and the 2022 FTX collapse. And it has held not only in-sample but out-of-sample: first identified in 2014, every subsequent year has confirmed the trajectory. One caveat from the statistical literature: <a href="https://arxiv.org/abs/2605.21316" target="_blank" rel="noopener">a 2026 audit</a> finds the fitted exponent sensitive to the chosen time origin &mdash; the model is stronger as a forecaster than as a physical constant &mdash; which is why this site treats the trend as a scenario to reason from, never a promise.</p>
     </div>
 
     <!-- LIVE DOUBLING STAT STRIP -->
     <div class="pl-stat-strip" id="plStatStrip">
-      <div class="pl-stat"><div class="pl-stat-num" id="statAge">&mdash;</div><div class="pl-stat-cap">days old today</div></div>
-      <div class="pl-stat"><div class="pl-stat-num" id="statDouble">&mdash;</div><div class="pl-stat-cap">for the trend to double from here</div></div>
-      <div class="pl-stat"><div class="pl-stat-num">12.76%</div><div class="pl-stat-cap">more age per doubling &middot; 2<sup>1/5.77</sup></div></div>
+      <div class="pl-stat">
+        <div class="pl-stat-kick">Bitcoin is</div>
+        <div class="pl-stat-num"><span id="statAge">&mdash;</span> days old</div>
+        <div class="pl-stat-cap">since the genesis block, January 3, 2009.</div>
+      </div>
+      <div class="pl-stat">
+        <div class="pl-stat-kick">It takes</div>
+        <div class="pl-stat-num"><span id="statDouble">&mdash;</span> <span class="help-tip" tabindex="0">?<span class="tip-content" id="statDoubleTip">The ~820 days is how long the trend line takes to double &mdash; not today's price. Price trades above or below the trend at any given moment; from today's below-trend price, a doubling would arrive sooner than the trend's if price reverts toward the line &mdash; and that reversion is a scenario, not a schedule.</span></span></div>
+        <div class="pl-stat-cap">for the <em>trend</em> to double from here.</div>
+      </div>
+      <div class="pl-stat">
+        <div class="pl-stat-kick">The constant</div>
+        <div class="pl-stat-num">12.76%</div>
+        <div class="pl-stat-cap">the trend doubles each time bitcoin's age grows by another 12.76% &middot; 2<sup>1/5.77</sup></div>
+      </div>
     </div>
     <p class="pl-stat-note">Computed live from Bitcoin's age. The doubling interval is not a fixed number of years &mdash; it is a constant <em>share</em> of the network's own age, so it lengthens as Bitcoin matures. Across the documented Power Law exponents (5.57&ndash;5.82) it runs roughly 812&ndash;851 days; the <a href="#exponent-survey">exponent survey below</a> shows how little that choice moves where the trend sits today, and how much it moves where the trend goes next.</p>
 
@@ -86,7 +109,7 @@ eleventyComputed:
     <div class="section">
       <h2>What &ldquo;Proportional Growth&rdquo; Means</h2>
       <p class="prose">In exponential models, the price doubles at a fixed calendar interval &mdash; every four years, regardless of how old the system is. This is mathematically unsustainable: it demands the same absolute performance forever, eventually requiring infinite growth in finite time.</p>
-      <p class="prose">In a power law, the doubling time <em>stretches</em>. It requires a constant percentage of the network's existing age &mdash; precisely <strong>12.76%</strong> at the canonical exponent (2<sup>1/5.77</sup>&nbsp;&minus;&nbsp;1), or roughly 12.8% &mdash; not a fixed number of years. This means each successive doubling takes longer in calendar time, even though the proportional relationship stays constant.</p>
+      <p class="prose">In a power law, the doubling time <em>stretches</em>. It requires a constant percentage of the network's existing age &mdash; precisely <strong>12.76%</strong> at the reference exponent (2<sup>1/5.77</sup>&nbsp;&minus;&nbsp;1), or roughly 12.8% &mdash; not a fixed number of years. This means each successive doubling takes longer in calendar time, even though the proportional relationship stays constant.</p>
       <div class="insight-box">
         <p>When Bitcoin was 1,000 days old, it needed 128 more days to double its fair value. At 5,000 days old, it needs 638 more days. At 6,000 days: 766 more days. The growth continues, but the pace naturally decelerates &mdash; which is what makes it sustainable.</p>
       </div>
@@ -146,16 +169,16 @@ eleventyComputed:
 
     <!-- OUT-OF-SAMPLE VALIDATION -->
     <div class="section">
-      <h2>Out-of-Sample Validation</h2>
-      <p class="prose">The strongest evidence for any model is its performance on data it was never fitted to. The Power Law was first identified by Giovanni Santostasi in 2014 and formally published by Matthew Me&#x17E;inskis in 2018. Every year since publication has been an out-of-sample test &mdash; the model was fitted to data that existed at the time, and subsequent prices have continued tracking the trajectory.</p>
-      <p class="prose">Rather than assert this, the chart below hands you the dial. Drag the <strong>fit window</strong> to choose how many years of early data the regression is allowed to see; the green line refits and re-projects live, and the readout reports the fitted exponent, the trend price it implies today, and how far actual price has diverged from it. The default cutoff is end-2017 &mdash; the year before Me&#x17E;inskis's formal publication, so every orange dot after it is a genuine out-of-sample test.</p>
-      <p class="prose">Some windows fit badly, and that is the point of letting you set it: a very early cutoff (drag to end-2014) has too little data and over-projects wildly; a recent-only window mostly re-describes the present and proves little. The interesting range is the middle &mdash; from about 2016 onward the fitted exponent settles near the canonical 5.77 and stays there no matter where you stop, which is the actual out-of-sample claim.</p>
+      <h2>Out-of-Sample Validation <span class="help-tip" tabindex="0">?<span class="tip-content">Out-of-sample means the model was fitted only on data before the cutoff &mdash; everything after it is a test the model never saw.</span></span></h2>
+      <p class="prose">The strongest evidence for any model is its performance on data it was never fitted to. Giovanni Santostasi first identified the Power Law in 2014, and Matthew Me&#x17E;inskis began charting it publicly through his Porkopolis work. Every year since has been an out-of-sample test &mdash; the model was fitted to the data that existed at the time, and subsequent prices have kept tracking the trajectory.</p>
+      <p class="prose">Rather than assert this, the chart below hands you the dial. Drag the <strong>fit window</strong> to choose how many years of early data the regression may see; the green line refits and re-projects live, and the readout reports the fitted exponent, the trend price it implies today, and how far that trend sits from the one you would get by fitting every year of data. The default cutoff is end-2017 &mdash; where the site's own 2026 refit settled, because it brought the out-of-sample bias to near zero and still leaves the better part of a decade as untouched test.</p>
+      <p class="prose">Some windows fit badly, and that is the point of handing you the dial: a very early cutoff (drag to end-2014) has too little data and over-projects the trend roughly four-fold by the mid-2020s &mdash; and the gap only compounds after. A recent-only window mostly re-describes the present and proves little. The interesting range is the middle &mdash; from about 2016 onward the fitted exponent settles near the reference value, 5.77, and stays there no matter where you stop. That stability is the out-of-sample claim.</p>
       <div class="chart-container">
         <div class="chart-title">Early Data Predicts the Future</div>
         <div class="chart-subtitle">You choose the training window &mdash; the regression and projection recompute live</div>
         <div class="oos-controls">
           <div class="oos-slider-row">
-            <label for="oosFit">Fit window ends</label>
+            <label for="oosFit">Fit window ends <span class="help-tip" tabindex="0">?<span class="tip-content">The training window the regression may use &mdash; it always starts at the first price sample and ends where you set this. Everything after is the out-of-sample test.</span></span></label>
             <input type="range" id="oosFit" aria-label="Training window cutoff month">
             <span class="oos-fit-label" id="oosFitLabel">2017-12</span>
           </div>
@@ -168,16 +191,17 @@ eleventyComputed:
             <button type="button" class="oos-preset" data-ym="2023-12">end-2023</button>
           </div>
           <div class="oos-readout">
-            <div class="oos-ro"><span class="oos-ro-label">Fitted exponent <em>b</em></span><span class="oos-ro-val" id="oosB">&mdash;</span></div>
-            <div class="oos-ro"><span class="oos-ro-label">Fitted <em>a</em></span><span class="oos-ro-val" id="oosA">&mdash;</span></div>
-            <div class="oos-ro"><span class="oos-ro-label">Implied trend today</span><span class="oos-ro-val" id="oosImplied">&mdash;</span></div>
-            <div class="oos-ro"><span class="oos-ro-label">Actual vs. fit, latest</span><span class="oos-ro-val" id="oosDiv">&mdash;</span></div>
+            <div class="oos-ro"><span class="oos-ro-label">Fitted exponent <em>b</em> <span class="help-tip" tabindex="0">?<span class="tip-content">The steepness &mdash; how fast the fitted trend grows.</span></span></span><span class="oos-ro-val" id="oosB">&mdash;</span></div>
+            <div class="oos-ro"><span class="oos-ro-label">Fitted <em>a</em> <span class="help-tip" tabindex="0">?<span class="tip-content">The scale &mdash; where the fitted curve starts.</span></span></span><span class="oos-ro-val" id="oosA">&mdash;</span></div>
+            <div class="oos-ro"><span class="oos-ro-label">Implied trend today <span class="help-tip" tabindex="0">?<span class="tip-content">The price this window's trend line puts on today.</span></span></span><span class="oos-ro-val" id="oosImplied">&mdash;</span></div>
+            <div class="oos-ro"><span class="oos-ro-label">&Delta; vs full-data fit <span class="help-tip tip-right" tabindex="0">?<span class="tip-content">How far this window's trend differs from the full-data trend &mdash; small means the projection has been stable.</span></span></span><span class="oos-ro-val" id="oosDelta">&mdash;</span></div>
           </div>
+          <p class="oos-drive" id="oosDrive"></p>
+          <p class="oos-channel" id="oosChannel"></p>
         </div>
         <div class="chart-wrapper" style="height:380px" data-chart-copy data-chart-heading="closest:.chart-container .chart-title" data-chart-sub="closest:.chart-container .chart-subtitle" data-chart-title="The Power Law holds out-of-sample"><canvas id="oosChart"></canvas></div>
-        <div class="chart-source">Green line: log-log regression fitted only to samples up to the chosen cutoff. Grey dots: training data. Orange dots: out-of-sample prices after the cutoff. Fit is recomputed in the browser on every change; the canonical Porkopolis coefficients (a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.77) are never altered by this control.</div>
+        <div class="chart-source">Green line: log-log regression fitted only to samples up to the chosen cutoff. Grey dots: training data. Orange dots: out-of-sample prices after the cutoff. Fit is recomputed in the browser on every change; the reference Porkopolis coefficients (a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.77) are never altered by this control.</div>
       </div>
-      <div class="annotation"><strong>We shipped the bad window ourselves.</strong> Until May 2026 this chart fitted through end-2014 &mdash; slope <strong>6.787</strong>, dominated by the small, rally-heavy early sample &mdash; and it over-projected the trend roughly four-fold by 2025. Drag the handle to end-2014 to see exactly what it got wrong; moving the cutoff to end-2017 (slope <strong>5.657</strong>) brought the out-of-sample bias near zero. The dial is the same experiment we ran on ourselves.</div>
     </div>
 
 
@@ -195,26 +219,27 @@ eleventyComputed:
           <span class="tb-leg"><span class="tb-dot tb-above-dot"></span><strong id="tbAbovePct">&mdash;</strong>&nbsp;above trend</span>
         </div>
       </div>
-      <p class="prose">This is not a sign that price is &ldquo;due&rdquo; to return above trend. The mean log-deviation is essentially zero (<span id="tbMean">&mdash;</span>) &mdash; but that average hides the shape: a handful of violent overshoots balance many long, quiet stretches below the line. Below trend is the ordinary condition; the returns arrive in bursts. Read honestly, that is an argument for holding <em>through</em> the quiet stretch, not for timing a return to trend. The <a href="/the-doubling-ladder.html">Doubling Ladder</a> maps this wave around the trend in depth, using month-end data.</p>
+      <p class="prose">This is not a sign that price is &ldquo;due&rdquo; to return above trend. The mean log-deviation <span class="help-tip" tabindex="0">?<span class="tip-content">The average distance from trend, measured the way the chart is drawn &mdash; in log terms.</span></span> is essentially zero (<span id="tbMean">&mdash;</span>) &mdash; but that average hides the shape: a handful of violent overshoots balance many long, quiet stretches below the line. Below trend is the ordinary condition; the returns arrive in bursts. That is an argument for holding <em>through</em> the quiet stretch, not for timing a return to trend. The <a href="/the-doubling-ladder.html">Doubling Ladder</a> maps this wave around the trend in depth, using month-end data.</p>
     </div>
 
     <!-- EXPONENT SURVEY + EXPLORER (item b) -->
     <div class="section" id="exponent-survey">
       <h2>Whose Exponent? A Survey of the Fits</h2>
-      <p class="prose">The Power Law has more than one author, and they do not all fit the same coefficients. What matters is the pair <em>(a,&nbsp;b)</em> together, never the exponent alone: <em>a</em> and <em>b</em> trade off, so a steeper exponent does not mean a higher price. The only honest comparison is the price each fit <em>implies</em> at a fixed date &mdash; which is how the table and explorer below rank them.</p>
+      <p class="prose"><strong>What are the exponent and the coefficients?</strong> The trend is just <em>price&nbsp;=&nbsp;a&nbsp;&times;&nbsp;age<sup>b</sup></em> &mdash; <em>b</em> sets how steep the curve is, <em>a</em> sets its scale, and only the pair means anything. They trade off, so a steeper exponent does not mean a higher price. The only like-for-like comparison is the price each fit <em>implies</em> at a fixed date &mdash; which is how the table and explorer below rank them.</p>
       <div class="insight-box">
-        <p><strong>Highest exponent, yet below the trend.</strong> bitcoinretirement.net uses the steepest exponent in the set (<em>b</em>&nbsp;=&nbsp;5.82) &mdash; and its trend still sits about 2% <em>below</em> the canonical fit today, because its <em>a</em> is lower. It crosses above canonical only around 2045. Rank these fits by exponent alone and you get the ordering exactly backwards.</p>
+        <p><strong>Highest exponent, yet below the trend.</strong> bitcoinretirement.net uses the steepest exponent in the set (<em>b</em>&nbsp;=&nbsp;5.82) &mdash; and its trend still sits about 2% <em>below</em> the reference fit today, because its <em>a</em> is lower. It crosses above only around 2045. Rank these fits by exponent alone and you get the ordering exactly backwards.</p>
       </div>
+      <p class="prose"><strong>Why do different authors use different ones?</strong> Because they fit different windows of data, different price series, and slightly different methods &mdash; reasonable people fitting the same phenomenon land on slightly different numbers. The <em>How the fit is justified</em> column carries the specifics. The Porkopolis pair every page on this site uses is the one we will call the <strong>reference fit</strong>.</p>
       <div class="exp-table-wrap">
         <table class="exponent-table">
-          <thead><tr><th>Source</th><th><em>a</em></th><th><em>b</em></th><th>Implied trend today</th><th>How the fit is justified</th></tr></thead>
+          <thead><tr><th>Source</th><th><em>a</em> <span class="help-tip" tabindex="0">?<span class="tip-content">The scale &mdash; where the fitted curve starts.</span></span></th><th><em>b</em> <span class="help-tip" tabindex="0">?<span class="tip-content">The steepness &mdash; how fast the fitted trend grows.</span></span></th><th>Implied trend today <span class="help-tip tip-right" tabindex="0">?<span class="tip-content">The price this fit's trend line puts on today.</span></span></th><th>How the fit is justified</th></tr></thead>
           <tbody id="expTableBody"></tbody>
         </table>
         <p class="exp-table-note">Listed but not plotted &mdash; exponent published without its paired <em>a</em>, so no curve can be placed: <strong>b1m.io / Fred Krueger</strong> (<em>b</em>&nbsp;=&nbsp;5.566) and a naive fit through the full series (<em>b</em>&nbsp;=&nbsp;5.63, our own). Saying why they can't be drawn is the point: an exponent without its constant is not a model.</p>
       </div>
       <div class="exp-explorer">
         <div class="exp-explorer-head">
-          <span class="exp-explorer-label">Compare a fit against canonical</span>
+          <span class="exp-explorer-label">Compare a fit against the reference fit</span>
           <div class="exp-chips" id="expChips"></div>
         </div>
         <div class="chart-container">
@@ -227,7 +252,9 @@ eleventyComputed:
           </table>
         </div>
       </div>
-      <p class="prose">Notice the shape of the disagreement. Fitted to the same history, every source agrees within single digits on where the trend sits <em>today</em> &mdash; then they fan out with the horizon. Deviation from canonical widens monotonically: BitcoinPower.law runs about &minus;9% today but roughly &minus;17% by 2060. That is the real disclosure &mdash; how much of the long-run return case rests on a parameter that is itself uncertain. The canonical <em>(a,&nbsp;b)</em> stays pinned site-wide with an annual review; the small gap between the two Porkopolis snapshots is shown, not hidden.</p>
+      <p class="prose"><strong>Do they change over time?</strong> Yes &mdash; fits refresh as new data arrives. The two Porkopolis rows are the same author at two moments, and they differ by well under 2%. That is drift, not revision: the model is not being rewritten, it is being re-measured against a few more years.</p>
+      <p class="prose"><strong>What do the differences imply?</strong> Fitted to the same history, every source agrees within single digits on where the trend sits <em>today</em> &mdash; then they fan out with the horizon. Deviation from the reference fit keeps widening, decade after decade: BitcoinPower.law runs about &minus;9% today but roughly &minus;17% by 2060. That is the real disclosure &mdash; how much of the long-run return case rests on a parameter that is itself uncertain.</p>
+      <p class="prose"><strong>Why do we use the one we use?</strong> The reference fit is the longest-standing published one with a disclosed methodology, and the structural floor derived from it has the tightest fit of any band on the chart. A reference line's chief virtue is stability: refitting it every month would quietly move every number on the site and break every saved scenario link. So it stays fixed across the site, reviewed once a year, with its divergence from the other fits shown above rather than hidden.</p>
     </div>
 
     <!-- PRICE PROJECTION WIDGET -->
@@ -252,8 +279,8 @@ eleventyComputed:
     <div class="caveats">
       <h3>What This Model Is &mdash; and Isn't</h3>
       <p>The Power Law is an empirical observation, not a physical law. It fits 15 years of data with remarkable consistency, but it is not derived from first principles the way gravitational equations are. Its creator, Giovanni Santostasi, describes Bitcoin as a stochastic system that oscillates around its trend &mdash; the model describes the trajectory, not any specific price on any specific day.</p>
-      <p>Projections become less reliable as they extend further into the future. The prediction corridor widens over time &mdash; the model is honest about its own uncertainty. Some econometricians argue that the high R&sup2; could partly reflect the fact that both price and time trend upward. The out-of-sample track record since 2014 is the strongest counter to this critique, but it remains a legitimate statistical concern.</p>
-      <p>There are two ways this model could break, and intellectual honesty requires naming both. <strong>Downward:</strong> a sustained daily close below the structural floor would disprove it outright. This falsifiability is a strength, not a weakness &mdash; the model makes a testable claim rather than an unfalsifiable assertion &mdash; and to date the floor has survived every major stress test, including the COVID crash and the FTX collapse.</p>
+      <p>Projections become less reliable as they extend further into the future. The prediction corridor widens with the horizon, so projections carry more uncertainty the further out they run. Some econometricians argue that the high R&sup2; could partly reflect the fact that both price and time trend upward. The out-of-sample track record since 2014 is the strongest counter to this critique, but it remains a legitimate statistical concern.</p>
+      <p>There are two ways this model could break, and both belong on this page. <strong>Downward:</strong> a sustained daily close below the structural floor would disprove it outright. This falsifiability is a strength, not a weakness &mdash; the model makes a testable claim rather than an unfalsifiable assertion &mdash; and to date the floor has survived every major stress test, including the COVID crash and the FTX collapse.</p>
       <p><strong>Upward:</strong> the model could also break in Bitcoin's favour. Matthew Me&#x17E;inskis has argued that if Bitcoin's size and importance relative to fiat destabilize in a good way, adoption could turn genuinely exponential and pull price <em>above</em> the power-law channel rather than tracking along it. We grade this as speculation, not forecast &mdash; but monetary regime transitions, where a new money supplants an old one, have historically been fast and nonlinear once they tip. A site willing to say the model may break against us has earned the right to say it may break for us; both are stated with the same humility. Past adherence guarantees nothing in either direction. This page presents the Power Law as a structural framework, not as investment advice.</p>
     </div>
 
@@ -539,7 +566,7 @@ eleventyComputed:
     <!-- POROKOPOLIS CREDIT (prominent) -->
     <div class="porkopolis-credit">
       <div class="porkopolis-credit-label">Channel framework &amp; coefficients</div>
-      <p>The Power Law channel framework on this page &mdash; the structural floor at 0.42&times; trend, the upper band at 3&times; trend, and the daily-close-as-stress-test convention &mdash; was developed and refined by <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener"><strong>Matthew Me&zcaron;inskis</strong></a> at <a href="https://www.porkopolis.io" target="_blank" rel="noopener">Porkopolis Economics</a>. This visualization is built on his coefficients (a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.77) and band ratios. For the canonical version with live data and ongoing analysis, see <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">Porkopolis: The Chart</a> directly.</p>
+      <p>The Power Law channel framework on this page &mdash; the structural floor at 0.42&times; trend, the upper band at 3&times; trend, and the daily-close-as-stress-test convention &mdash; was developed and refined by <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener"><strong>Matthew Me&zcaron;inskis</strong></a> at <a href="https://www.porkopolis.io" target="_blank" rel="noopener">Porkopolis Economics</a>. This visualization is built on his coefficients (a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.77) and band ratios. For the live version with ongoing analysis, see <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">Porkopolis: The Chart</a> directly.</p>
     </div>
 
     <!-- INTERACTIVE CHANNEL CHART -->
