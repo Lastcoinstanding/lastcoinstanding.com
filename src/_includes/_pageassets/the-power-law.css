@@ -368,3 +368,88 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   .porkopolis-credit { padding: 1.1rem 1.2rem; }
   .channel-status { font-size: 0.78rem; }
 }
+
+/* ═══════ POWER LAW V2 ADDITIONS ═══════ */
+
+/* (c) live doubling stat strip */
+.pl-stat-strip{display:flex;gap:1rem;flex-wrap:wrap;margin:1.5rem 0 .6rem}
+.pl-stat{flex:1;min-width:150px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1rem 1.2rem;text-align:center}
+.pl-stat-num{font-family:var(--font-d);font-size:clamp(1.5rem,3vw,2rem);font-weight:600;color:var(--amber);line-height:1.1}
+.pl-stat-num sup{font-size:.55em}
+.pl-stat-sub{display:inline-block;font-family:var(--font-b);font-size:.7rem;color:var(--text-muted);font-weight:400;margin-left:.35rem}
+.pl-stat-cap{font-family:var(--font-b);font-size:.75rem;color:var(--text-dim);margin-top:.4rem;line-height:1.4}
+.pl-stat-note{font-size:.85rem;color:var(--text-dim);line-height:1.6;margin:0 0 2rem}
+.pl-stat-note a{color:var(--amber);text-decoration:none;border-bottom:1px dotted var(--orange-dim)}
+.pl-stat-note a:hover{border-bottom-style:solid}
+
+/* (a) out-of-sample fit-window controls + readout */
+.oos-controls{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:6px;padding:1rem 1.2rem;margin-bottom:1.2rem}
+.oos-slider-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.oos-slider-row label{font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+.oos-slider-row input[type="range"]{flex:1;min-width:180px;accent-color:var(--orange);cursor:grab}
+.oos-slider-row input[type="range"]:active{cursor:grabbing}
+.oos-fit-label{font-family:var(--font-d);font-size:1.3rem;font-weight:600;color:var(--amber);min-width:82px;text-align:right}
+.oos-presets{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:.85rem}
+.oos-presets-label{font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.oos-preset{font-family:var(--font-b);font-size:.78rem;color:var(--text-dim);background:none;border:1px solid var(--border-lt);border-radius:14px;padding:.28rem .8rem;cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+.oos-preset:hover{color:var(--text-bright);border-color:var(--orange-dim)}
+.oos-preset.active{color:var(--orange);border-color:var(--orange);background:var(--orange-soft);font-weight:600}
+.oos-readout{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--border)}
+.oos-ro{flex:1;min-width:120px;display:flex;flex-direction:column;gap:.25rem}
+.oos-ro-label{font-size:.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+.oos-ro-label em{color:var(--text-dim);font-style:italic}
+.oos-ro-val{font-family:var(--font-d);font-size:1.35rem;font-weight:600;color:var(--text-bright)}
+.oos-ro-val.pos{color:#6fbf73}
+.oos-ro-val.neg{color:var(--red)}
+
+/* (d) time above/below trend split bar */
+.tb-split{margin:1.5rem 0}
+.tb-bar{display:flex;height:34px;border-radius:6px;overflow:hidden;border:1px solid var(--border)}
+.tb-seg{height:100%;transition:width .4s ease}
+.tb-seg.tb-below{background:rgba(112,104,96,.55)}
+.tb-seg.tb-above{background:var(--amber)}
+.tb-legend{display:flex;gap:1.5rem;margin-top:.7rem;font-size:.85rem;color:var(--text-dim)}
+.tb-leg strong{color:var(--text-bright)}
+.tb-dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:.4rem;vertical-align:middle}
+.tb-below-dot{background:rgba(112,104,96,.55)}
+.tb-above-dot{background:var(--amber)}
+
+/* (b) exponent survey table + explorer */
+.exp-table-wrap{overflow-x:auto;margin:1.5rem 0}
+.exponent-table{width:100%;border-collapse:collapse;min-width:640px}
+.exponent-table th{font-family:var(--font-b);font-size:.7rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);padding:.7rem .8rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.exponent-table td{font-family:var(--font-b);font-size:.86rem;color:var(--text);padding:.7rem .8rem;border-bottom:1px solid rgba(30,28,26,.5);vertical-align:top}
+.exponent-table tr:hover td{background:rgba(247,147,26,.03)}
+.exponent-table .exp-src{font-weight:600;color:var(--amber);white-space:nowrap}
+.exponent-table .exp-just{font-size:.8rem;color:var(--text-dim);line-height:1.5;min-width:200px}
+.exp-dev{font-size:.78rem;font-weight:600}
+.exp-dev.pos{color:#6fbf73}
+.exp-dev.neg{color:#c98b4a}
+.exp-table-note{font-size:.8rem;color:var(--text-muted);line-height:1.6;margin:.9rem 0 0}
+.exp-explorer{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1.3rem;margin:1.5rem 0}
+.exp-explorer-head{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.exp-explorer-label{font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.exp-chips{display:flex;gap:.5rem;flex-wrap:wrap}
+.exp-chip{font-family:var(--font-b);font-size:.78rem;color:var(--text-dim);background:none;border:1px solid var(--border-lt);border-radius:14px;padding:.28rem .8rem;cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+.exp-chip:hover{color:var(--text-bright);border-color:var(--orange-dim)}
+.exp-chip.active{color:var(--orange);border-color:var(--orange);background:var(--orange-soft);font-weight:600}
+.exp-explorer .chart-container{background:none;border:none;padding:0;margin:0}
+.exp-implied-wrap{overflow-x:auto;margin-top:1.1rem}
+.exp-implied{width:100%;border-collapse:collapse;font-family:var(--font-b);min-width:420px}
+.exp-implied th{font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);padding:.55rem .6rem;text-align:right;border-bottom:1px solid var(--border)}
+.exp-implied th:first-child{text-align:left}
+.exp-implied td{font-size:.85rem;color:var(--text);padding:.55rem .6rem;text-align:right;border-bottom:1px solid rgba(30,28,26,.5)}
+.exp-implied th[scope="row"]{text-align:left;font-weight:500;color:var(--text-dim);font-size:.82rem}
+.exp-implied .exp-sel-row th[scope="row"]{color:var(--text-bright)}
+.exp-implied .exp-sel-row td{color:var(--text-bright)}
+
+@media (max-width:640px){
+  .pl-stat-strip{gap:.6rem}
+  .pl-stat{min-width:calc(50% - .3rem);padding:.8rem}
+  .oos-fit-label{min-width:0;font-size:1.15rem}
+  .oos-readout{gap:.5rem}
+  .oos-ro{min-width:calc(50% - .25rem)}
+  .oos-ro-val{font-size:1.15rem}
+  .tb-legend{gap:1rem;font-size:.8rem}
+  .exp-explorer{padding:1rem}
+}

@@ -1,5 +1,10 @@
 [
   {
+    "display": "8/4/26",
+    "page": "/the-power-law.html",
+    "summary": "Power Law v2: the out-of-sample chart is now hands-on — drag the training-window cutoff (or pick a preset year) and the regression, projection, and a live readout of the fitted exponent refit in the browser; the view is deep-linkable via a ?fit= link. New alongside it: an exponent survey that ranks the competing Power-Law fits by the price each one implies rather than by the bare exponent, a live 'days to double' stat computed from Bitcoin's age, and an honest look at how much of its life Bitcoin has spent below trend. The canonical coefficients are unchanged."
+  },
+  {
     "display": "7/30/26",
     "page": "/the-gallery.html",
     "summary": "New Gallery entry — The Middle Seat: a three-panel infographic placing bitcoin (the growth engine), STRC (a bitcoin-backed income instrument trading below its $100 target), and Treasuries (the conservative baseline) on a single asset spectrum, with yields, coverage, and volatility marked to market. It's the companion graphic to the author's Substack essay, \"How Legitimate is STRC?\", now linked from the page — and the live version of every number runs at /strc-below-par."

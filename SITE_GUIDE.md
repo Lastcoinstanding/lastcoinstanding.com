@@ -421,8 +421,8 @@ _See section 14 for latest Chart.js patterns. See section 11 for Power Law page 
 - Floor multiplier: 0.42× trend (R² > 0.99)
 - Ceiling multiplier: 3× trend
 - Key insight: "For every ~13% increase in Bitcoin's age, the trend price doubles"
-- Doubling factor derivation: `2^(1/5.77) ≈ 1.127`, i.e., ~12.7% more days
-- Alternative coefficients exist (BitcoinPower.law: A=10⁻¹⁶·⁴⁹³, n=5.68; b1m.io: b=5.566) — variation across implementations is noted transparently in a footer table for credibility
+- Doubling factor derivation: `2^(1/5.77) ≈ 1.1276`, i.e., **12.76%** more age per doubling (≈ 12.8% in prose; "~13%" is used only as the loosest hero hook). This canonical figure is enforced by the v2 proportionality sweep (below).
+- Alternative coefficients exist and are surveyed openly (Power Law v2): a table + page-local **exponent explorer** ranks the competing fits by the *price each implies* at 2026/2035/2045/2060 — never by the bare exponent, since `a` and `b` trade off. Five documented (a, b) pairs are plotted (canonical Porkopolis 1.6×10⁻¹⁷/5.77; later Porkopolis refit 1.69×10⁻¹⁷/5.763; BitcoinPower.law 10⁻¹⁶·⁴⁹³/5.68; bitcoinretirement.net 1.0117×10⁻¹⁷/5.82; this page's OOS self-fit 3.9×10⁻¹⁷/5.657); b-only sources (b1m.io 5.566, a naive full-series 5.63) are listed but not drawn, because an exponent without its constant cannot be placed. Selecting canonical stays pinned site-wide (annual review); the explorer is presentation-only and moves nothing downstream.
 
 ### Vocabulary introduced on this page
 
@@ -447,6 +447,7 @@ Full credits section lists: Giovanni Santostasi (theory creator), Matthew Mežin
 ### Tab 1: The Power Law (Summary)
 
 - Hero: the ~13% doubling insight with "proportional and sustainable" attribution
+- **Live doubling stat strip (v2, item c):** Bitcoin's age in days and the trend-doubling interval (`age × (2^(1/PL_B) − 1)`), computed live from `TODAY_DAYS` — never hardcoded. Third tile states the canonical 12.76%. §6.10a-declarative.
 - Interactive log-log Chart.js chart: historical BTC price scatter + trend/floor/ceiling corridors
 - Tooltip shows: date, price, trend, floor, position, days-to-double
 - "What Proportional Growth Means" section with concrete doubling examples (1000→128 days, 5000→638, 6000→766)
@@ -454,9 +455,11 @@ Full credits section lists: Giovanni Santostasi (theory creator), Matthew Mežin
 - CAGR Comparison Chart: bar chart showing Bitcoin's implied CAGR from various purchase years to 2035 vs S&P 500 ~10% baseline
 - S2F Comparison box with sup³ footnote
 - Milestones table: $1K–$10M with "Trend reaches" and "Floor secures" columns, confirmed/in-progress/projected status
-- Out-of-Sample Validation chart: regression fitted through end-2017 (slope 5.657), projected forward, overlaid with actual 2015-present prices. (Refit from the original end-2014 cutoff in commit `6604126`, 2026-05-07 — see DATA_AUDIT's Architectural change log, "Out-of-sample chart coefficient refit".)
+- Out-of-Sample Validation chart (**reader-driven since v2, item a**): the training-window cutoff is a drag handle + preset chips (end-2014/2016/2017/2020/2023). Default cutoff **end-2017 (slope 5.657)**; the regression, projection, and a live readout (fitted a, b · implied trend today · divergence vs. latest actual) recompute in-browser on input. Deep-linkable via **`?fit=YYYY-MM`** (restored before first render; the tab handler preserves the query string). The **end-2014 preset reproduces the documented bad fit (slope 6.787)** and the copy owns it. (Original refit to end-2017 from end-2014 in commit `6604126`, 2026-05-07 — see DATA_AUDIT's Architectural change log, "Out-of-sample chart coefficient refit".)
+- **Exponent survey + explorer (v2, item b):** a table of competing Power-Law fits and a page-local explorer that redraws canonical vs. a selected pair and tabulates implied price + deviation at 2026/2035/2045/2060. Ranks by implied price, not exponent. See the Model-parameters "Alternative coefficients" note above for the pair list.
+- **Time above/below trend (v2, item d):** a split bar computed live from `PL_DATA` (~43% above / ~57% below; mean log-deviation ≈ 0), framed as candor — below trend is the normal condition; returns arrive in bursts. Cross-links the Doubling Ladder (which owns the month-end treatment).
 - Price Projection Widget: year slider (2025-2045) showing Floor/Trend/Ceiling projections with days-to-double
-- Caveats section: empirical not physical law, Santostasi's ~2040 horizon warning, falsifiability via floor breach
+- Caveats section: empirical not physical law, Santostasi's ~2040 horizon warning, and **"two ways the model could break" (v2, item e)** — floor breach (down) + Mežinskis's upside break (graded as speculation).
 - Credits with links to all primary sources
 
 ### Tab 2: Power Laws in Nature
@@ -515,7 +518,7 @@ Tab 1 has a small interactive widget — **"Project a Future Date"** (`#projSlid
 ### Planned enhancements
 
 - City growth video for Tab 2: Grok-generated cinematic video of a city growing from village to metropolis, paired with mathematical chart
-- Interactive out-of-sample slider: let user choose regression cutoff date and see how early-fitted model predicts subsequent years
+- ~~Interactive out-of-sample slider: let user choose regression cutoff date and see how early-fitted model predicts subsequent years~~ — **SHIPPED in Power Law v2 (commit `d492650`, 2026-08-04)**, as a drag handle + preset chips + `?fit=` deep-link (Tab 1 OOS chart above).
 - PAGR concept: "Proportional Annual Growth Rate" as alternative to CAGR — concept discussed but not yet coined on the page (risk of premature neologism)
 - ~~Homepage carousel slot for Power Law page~~ — completed (slide 8, video deployed).
 
