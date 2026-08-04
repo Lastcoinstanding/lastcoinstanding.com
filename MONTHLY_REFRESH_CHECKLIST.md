@@ -421,7 +421,7 @@ exponents too, since the ETF-era window lengthens.
 
 ## 10. Claude project mirror refresh
 
-**Last mirror refresh: 2026-08-02** (update this line BEFORE exporting,
+**Last mirror refresh: 2026-08-03** (update this line BEFORE exporting,
 not after — see step 3).
 
 The Claude project holds a copy of the repo's strategy and design docs. That

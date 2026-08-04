@@ -249,11 +249,13 @@ Captured during the merge pass, because the backlog is now large enough that the
   - **Concept:** don't retell the $30/day legend — recompute it live: pick a start date + daily amount → BTC accumulated, total inputs, value today, multiple. The anecdote generalized into an instrument. Full price history, house live-compute conventions.
   - **Verify at build:** source the original anecdote (arithmetic dates it ~2023: $30/day from 2017 ≈ $66K inputs at ~6 yrs; run to 2026 ≈ $105K in — the live recompute IS the upgrade).
   - **Collision fences:** exponential-blindness belongs to the Doubling Ladder; lump-sum-vs-DCA belongs to Wait-or-Deploy — scope to the conviction-DCA computation only, cross-links do the rest.
+  - **Seed exists (2026-08-03):** `scripts/thirty-a-day-chart.ps1` — sim + chart computed from `PL_DATA`, parameterized `-Daily`/`-StartDate`, log-linear daily interpolation. Written for The Bitcoin Exit's one-off chart but built to generalize. The essay is now live and will link the tool when built — the ready-made re-promotion moment.
 
 - [ ] **Retirement-funds-to-bitcoin mechanics — SCOPING QUESTION (counsel-gated).**
   Surfaced 2026-07-30. Open question — decide at promotion time; do not build ahead of the counsel read.
   - **Why flagged:** the action-steps content ("how to actually move retirement funds") sits closer to the advice line than anything on the site, incl. STRC.
   - **Split:** JM's first-person experience → the Bitcoin Exit essay (memoir). Site version IF ANY = facts-only survey of existing mechanisms (self-directed IRA, ETF-in-IRA, rollover paths, custody trade-offs), US-flagged, heavily disclaimed, hard counsel gate — likely better as an extension of the retirement cluster than a standalone page.
+  - **STATUS 2026-08-03 — memoir half discharged.** The first-person half shipped as **The Bitcoin Exit** (published 2026-08-03; see Promoted / shipped). What this entry still tracks is the *facts-only site survey* — which remains the open, counsel-gated question. Publishing the memoir does not move the counsel gate on the site version.
 
 ### Thesis, arguments & essays
 
@@ -312,14 +314,14 @@ Captured during the merge pass, because the backlog is now large enough that the
   Surfaced 2026-07-30. JM flags as a personally favourite theme; good candidate for the essay cadence between heavier builds.
   - **Concept:** the creation/capture lens applied across bitcoin itself, bitcoin companies, and AI companies (the alternative-investment du jour).
 
-- [ ] **The Bitcoin Exit — Substack essay on conviction vs. the act of stacking.** Substack (opinion/memoir).
-  Surfaced 2026-07-30. Near-term candidate — JM says it's largely written in his head.
-  - **Concept:** why believing and *acting* are different muscles; DCA as conviction made mechanical; JM's firsthand experience moving retirement funds (memoir register — "what I did, what surprised me"). Hook: the $30/day-since-2017 anecdote as the human-brain-vs-exponentials story.
-  - **Pairs with:** the daily-conviction DCA tool above, as its live artifact — same essay↔page pattern as the STRC essay↔page pair.
-
 ---
 
 ## Promoted / shipped
+
+- [x] **The Bitcoin Exit** — Substack essay on conviction vs. the act of stacking. → **published on Substack 2026-08-03:** https://lastcoinstanding.substack.com/p/the-bitcoin-exit
+  Shipped as first-person memoir per the counsel-gate split; the generic retirement-mechanics survey remains a separate, still-gated backlog item (see *Retirement-funds-to-bitcoin mechanics* above — its memoir half is now discharged, the site survey is not).
+  - **Recomputed the $30/day story from PL_DATA** — $86,400 in / day 2,880 / $1M crossed 2024-11-19; ~$715K in the drawdown since — which matched the widely-reported legend within rounding (report, don't force). The recompute + chart seed live in `scripts/thirty-a-day-chart.ps1` (see *What Daily Conviction Bought*, its ready-made tool artifact).
+  - **Canonical record + full text:** `claude/THE_BITCOIN_EXIT_PUBLISHED.md` (project-only doc — hand over as a file to edit).
 
 - [x] **"How Much Cash?" — the cash-buffer question for the fully-allocated.** → shipped as `how-much-cash` (`/how-much-cash.html`) in `44c4139` (engine + page) + site integration, 2026-07-14. Went spec → build; design doc `HOW_MUCH_CASH_DESIGN_1.md`, build spec `HOW_MUCH_CASH_BUILD_SPEC_1.md`. Full record in **SITE_GUIDE §39**.
   - **The honest-cost requirement drove the whole page.** The entry insisted the buffer's drag be shown as the price of insurance. Built, it turned out stronger than "a drag": at today's ~0.42×-trend floor a 6-month buffer costs ~58% of a 1 BTC stack to raise, so **the default verdict is that the buffer cost more coins than it saved**. JM ruled to ship that as the first paint rather than tune it away, which moved the page's posture from "here is the price of insurance" to "this insurance is expensive right now, and here is exactly when it pays".
