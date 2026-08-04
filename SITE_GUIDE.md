@@ -2367,8 +2367,14 @@ A daily dollar-cost-averaging backtest. Pick a start date and a daily amount; th
 - **URL state (§17.5):** `?amt=` & `start=`, defaults omitted, decoded before first render, debounced `replaceState`.
 - **OG card:** product-forward, `og-what-daily-conviction-bought.jpg` (1280×720), rendered by `scripts/og-daily-conviction.ps1` (GDI+, not the Playwright pipeline — regenerate via `build-og-images.py` if pixel-true house type is wanted).
 
-### Deferred (v1.1)
-Worst-day / cycle-top start presets were consciously deferred by JM (2026-08-05) — no cycle-top framing anywhere in v1; only neutral convenience presets (Jan 2017 / 5 years ago / 1 year ago). Logged in PAGE_IDEAS_BACKLOG.
+### v1.1 (shipped 2026-08-06) — one forward look, a peak stat, a hover
+- **"If the habit continued" — a banded forward scenario block. This narrows the R1 "retrospective only" ruling:** a three-band forward projection is now *allowed on this page*; income / sustainability analysis remains the retirement cluster's. The block simulates ten more years of the same daily buy from today, along each Power Law band (`plPrice × PL_FLOOR / 1.0 / PL_CEIL`), stacked on the accumulated coins, valued at the band price ten years out. **Three numbers, never one**, each with the BTC accumulated on that path — surfacing the asymmetry: the **upper** path ends worth most but buys the **fewest** new coins; the **floor** path buys the most coins and ends worth least. Register is the `/the-power-law` projection widget's: "scenarios to explore, not a schedule." **Handoff** (carry-the-scenario, POSITIONING §3.5): a state-carrying link into `/the-bitcoin-retirement` via its `?stack=` (2dp) + `?dca=` (monthly = daily × 30.4, int) receivers — both already exist on that page, so no receiver gap.
+- **Peak-value stat card** — highest stack value reached + its date (legend ≈ $1.37M, 2025-10-10), framed "visible only in the rearview mirror" (anti-timing, per house rules; no tax/sell-signal implication).
+- **Chart hover/tap tooltip** — date · contributions · stack value · BTC held · multiple, index-mode + `intersect:false` (touch-friendly), house Chart.js styling.
+- **Consistency:** the FAQ "is this a prediction?" answer and the closing prose were rewritten from "retrospective only" to "retrospective at its core, with one forward band-scenario element — a range of three, not a forecast." Parity gate P1 figures unchanged (the forward block does not touch the retrospective sim). No new external data → DATA_AUDIT unchanged.
+
+### Deferred (still, after v1.1)
+Worst-day / cycle-top start presets remain consciously deferred by JM — no cycle-top framing anywhere; only neutral convenience presets (Jan 2017 / 5 years ago / 1 year ago). The v1.1 candidate in PAGE_IDEAS_BACKLOG.
 
 ### Essay back-link
 The page links the Substack essay; JM edits the essay post-launch to link back (reminder logged at ship).

@@ -15,11 +15,11 @@ faq:
   - q: "What would $30 a day of bitcoin be worth?"
     a: "Computed from bitcoin's real price history, $30 of bitcoin bought every day since January 1, 2017 put in about $105,000 over roughly nine and a half years and accumulated about 11.3 BTC. Its value first crossed $1,000,000 on November 19, 2024 (about $86,400 contributed by then), and at the latest price in the series sits near $715,000 — below the million, in the current drawdown. Change the start date or the daily amount on this page to replay any other version."
   - q: "What is a bitcoin DCA backtest?"
-    a: "Dollar-cost averaging (DCA) is buying a fixed dollar amount on a fixed schedule regardless of price. A backtest replays that habit against real historical prices to show what it would have accumulated, what it cost, and what it is worth. This page is a retrospective backtest — the record of what a past daily habit did, not a forecast of what a future one will do."
+    a: "Dollar-cost averaging (DCA) is buying a fixed dollar amount on a fixed schedule regardless of price. A backtest replays that habit against real historical prices to show what it would have accumulated, what it cost, and what it is worth. This page is primarily a retrospective backtest — the record of what a past daily habit did — with one forward element: a three-band scenario block that shows a range along the Power Law's floor, trend, and upper bands, not a single forecast."
   - q: "How long was a daily bitcoin buyer underwater?"
     a: "Underwater means the stack is worth less than the total put into it. Averaging in keeps the cost basis low, so a $30/day buyer since January 2017 was underwater only for the first few weeks and never again — even through the deepest stack drawdown, which fell about 73% from its peak while still staying well above the amount contributed. A worse-timed start date makes that underwater stretch longer; the tool lets you see how much."
   - q: "Is this page a prediction of future returns?"
-    a: "No. It is retrospective only — it computes what a past habit actually did against real price history, and shows the deep drawdowns along the way. Past results do not predict future ones, and nothing here is a recommendation to buy on any schedule."
+    a: "At its core it is retrospective — it computes what a past habit actually did against real price history, and shows the deep drawdowns along the way. The one forward element is a small scenario block, 'if the habit continued', which projects ten more years of the same daily buy along the Power Law's floor, trend, and upper bands — a range of three, never a single number, because no one can name the number. Past results do not predict future ones, and nothing here is a recommendation to buy on any schedule."
 eleventyComputed:
   head_extras: "{% include '_pageassets/what-daily-conviction-bought-head.html' %}"
   page_styles: "{% include '_pageassets/what-daily-conviction-bought.css' %}"
@@ -100,6 +100,13 @@ eleventyComputed:
         <div class="dc-card-num" id="dcDrawdown">&mdash;</div>
         <div class="dc-card-sub" id="dcDrawdownSub"></div>
       </div>
+      <div class="dc-card">
+        <div class="dc-card-cap">Peak value
+          <span class="help-tip" tabindex="0">?<span class="tip-content">The highest the stack ever reached &mdash; knowable only in hindsight. The record shows no one rings a bell at the top.</span></span>
+        </div>
+        <div class="dc-card-num" id="dcPeak">&mdash;</div>
+        <div class="dc-card-sub" id="dcPeakSub"></div>
+      </div>
     </div>
 
     <div class="dc-chart-wrap chart-wrapper" data-chart-copy
@@ -111,9 +118,40 @@ eleventyComputed:
     <p class="dc-endnote" id="dcEndnote">The inputs are linear; the outcome is not &mdash; that gap is the whole point, so the value axis is linear, not logarithmic. Computed from the site's <code>PL_DATA</code> price series (about 12-day samples, interpolated to a daily price in log space), so figures are close to, but not identical to, true daily closes. The habit auto-updates with each monthly price refresh.</p>
   </section>
 
+  <!-- IF THE HABIT CONTINUES — the one forward element (band scenarios, not a schedule) -->
+  <section class="dc-fwd" id="dcFwd">
+    <h2>If the habit continued</h2>
+    <p class="dc-fwd-lead">Ten more years of the same daily buy, starting today, stacked on top of the coins already accumulated &mdash; priced along each of the Power Law's three bands out to <span id="dcFwdYear">&mdash;</span>. Three paths, never one. <strong>Scenarios to explore, not a schedule.</strong></p>
+    <div class="dc-fwd-cards">
+      <div class="dc-fwd-card dc-fwd-floor">
+        <div class="dc-fwd-band">Floor</div>
+        <div class="dc-fwd-val" id="dcFwdVal-floor">&mdash;</div>
+        <div class="dc-fwd-btc" id="dcFwdBtc-floor">&mdash;</div>
+        <div class="dc-fwd-note">the most new coins, worth the least each</div>
+      </div>
+      <div class="dc-fwd-card dc-fwd-trend">
+        <div class="dc-fwd-band">Trend</div>
+        <div class="dc-fwd-val" id="dcFwdVal-trend">&mdash;</div>
+        <div class="dc-fwd-btc" id="dcFwdBtc-trend">&mdash;</div>
+        <div class="dc-fwd-note">fair value, in between</div>
+      </div>
+      <div class="dc-fwd-card dc-fwd-upper">
+        <div class="dc-fwd-band">Upper band</div>
+        <div class="dc-fwd-val" id="dcFwdVal-upper">&mdash;</div>
+        <div class="dc-fwd-btc" id="dcFwdBtc-upper">&mdash;</div>
+        <div class="dc-fwd-note">worth the most, the fewest new coins</div>
+      </div>
+    </div>
+    <p class="dc-fwd-insight">The trade-off is the point. The <em>upper</em> path ends worth the most &mdash; but every day of the decade it buys the <em>fewest</em> new coins, because prices are highest there. The <em>floor</em> path is the mirror image: it accumulates the most coins and ends worth the least. Same habit, opposite textures &mdash; which is exactly why there are three numbers here and never one.</p>
+    <div class="dc-handoff">
+      <a class="dc-handoff-link" id="dcHandoff" href="/the-bitcoin-retirement.html">Carry this stack into The Bitcoin Retirement &rarr;</a>
+      <p class="dc-handoff-note" id="dcHandoffNote"></p>
+    </div>
+  </section>
+
   <section class="dc-prose-section">
     <h2>The record, not a recommendation</h2>
     <p class="dc-prose">Two of the cards above are the story most retellings skip. <strong>Deepest drawdown</strong> is what the stack did from peak to trough &mdash; for the $30/day run, a fall of about 73%, a paper loss most people never actually sit through. And <strong>longest underwater</strong> is the stretch where the stack was worth less than every dollar put in. Averaging in keeps that second number small: the daily buyer above spends only a few weeks underwater across nine years, because each purchase lowers the average cost. That is the quiet case for a boring habit &mdash; not that it dodges the drawdown, but that it is the vehicle most people can actually hold through one. Start a year ago instead and the stretch runs months, not weeks &mdash; the date input above will show you.</p>
-    <p class="dc-prose">This page deliberately stops at what the habit <em>did</em>. Why the trend keeps pulling away from intuition &mdash; the exponential-blindness that makes these numbers feel impossible &mdash; belongs to <a href="/the-doubling-ladder.html">the Doubling Ladder</a>. Whether to spread buying out at all, versus deploying a lump sum, belongs to <a href="/wait-or-deploy-now.html">Wait or Deploy Now</a>. And the channel these blind daily buys actually land in &mdash; floor, trend, upper band &mdash; is <a href="/the-power-law.html">the Power Law</a>. This page only answers one question: what did the drip buy.</p>
+    <p class="dc-prose">This page is about what the habit <em>did</em> &mdash; with a single glance forward in the bands above, and no further. Why the trend keeps pulling away from intuition &mdash; the exponential-blindness that makes these numbers feel impossible &mdash; belongs to <a href="/the-doubling-ladder.html">the Doubling Ladder</a>. Whether to spread buying out at all, versus deploying a lump sum, belongs to <a href="/wait-or-deploy-now.html">Wait or Deploy Now</a>. And the channel these blind daily buys actually land in &mdash; floor, trend, upper band &mdash; is <a href="/the-power-law.html">the Power Law</a>. Turning the accumulated stack into income &mdash; whether it lasts &mdash; is <a href="/the-bitcoin-retirement.html">The Bitcoin Retirement</a>, where the handoff above lands.</p>
   </section>
 </main>
