@@ -194,7 +194,8 @@
       document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active')});
       var tab = document.getElementById('tab-' + b.dataset.tab);
       if(tab) tab.classList.add('active');
-      history.replaceState(null, '', '#' + b.dataset.tab);
+      // preserve any query state (e.g. the OOS ?fit= param) when rewriting the hash
+      history.replaceState(null, '', location.pathname + location.search + '#' + b.dataset.tab);
     });
   });
   // Init from hash
@@ -295,72 +296,108 @@
   });
 })();
 
-// ═══════ OUT-OF-SAMPLE CHART ═══════
+// ═══════ OUT-OF-SAMPLE CHART (v2: reader-driven fit window) ═══════
+// The reader chooses the training cutoff; the regression, projection, and
+// readout recompute live. Default cutoff = end-2017 (the documented refit,
+// commit 6604126). The fit is always log-log OLS over PL_DATA[first .. cutoff]:
+// unchanged math from v1 — only the cutoff is now a control instead of a
+// hardcoded constant. Nothing here writes to shared state (canonical PL_A/PL_B
+// are untouched); the fitted (a,b) are page-local and presentation-only.
 (function(){
   var ctx = document.getElementById('oosChart');
   if(!ctx) return;
+  function $(id){ return document.getElementById(id); }
 
-  // Split data into training (<=2017) and test (>2017)
-  // Training cutoff is end-of-2017 — the year before Mežinskis's formal
-  // publication. This window produces a slope (~5.66) that lands within
-  // 2% of the canonical Porkopolis exponent (5.77), and the projection
-  // tracks 2018–present prices to within ~50% in either direction.
-  // (Earlier 2010–2014 cutoff produced a slope of ~6.79 that drifted
-  // ~4× above actual prices by 2024 — see commit message for details.)
-  var cutoffDays = (2018 - 2009) * 365.25; // ~3287 days
-  var trainData = PL_DATA.filter(function(d){ return d[0] <= cutoffDays; });
-  var testData = PL_DATA.filter(function(d){ return d[0] > cutoffDays; });
+  // ── URL state: ?fit=YYYY-MM means "train through the end of that month". ──
+  var DEFAULT_FIT = '2017-12';
+  var MIN_YM = '2013-01', MAX_YM = '2024-12'; // bounds keep a visible OOS tail
+  function ymValid(ym){ return /^(\d{4})-(0[1-9]|1[0-2])$/.test(ym||''); }
+  function ymToIndex(ym){ var p=ym.split('-'); return (+p[0])*12 + (+p[1]-1); }
+  function indexToYm(i){ var y=Math.floor(i/12), m=(i%12)+1; return y+'-'+(m<10?'0':'')+m; }
+  function ymToCutoffDays(ym){
+    var p = ym.split('-'), y = +p[0], m = +p[1];
+    // cutoff = first day of the following month, so the whole month is included
+    var secs = Date.UTC(m===12 ? y+1 : y, m===12 ? 0 : m, 1) / 1000;
+    return Math.floor((secs - GENESIS_TS) / 86400);
+  }
+  var MIN_I = ymToIndex(MIN_YM), MAX_I = ymToIndex(MAX_YM);
 
-  // Fit power law to training data only using least squares on log-log
-  // log(price) = log(a) + b*log(days)
-  var sumX=0, sumY=0, sumXY=0, sumX2=0, n=0;
-  trainData.forEach(function(d){
-    if(d[1] > 0){
-      var lx = Math.log(d[0]), ly = Math.log(d[1]);
-      sumX += lx; sumY += ly; sumXY += lx*ly; sumX2 += lx*lx; n++;
-    }
-  });
-  var earlyB = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
-  var earlyLogA = (sumY - earlyB*sumX) / n;
-  var earlyA = Math.exp(earlyLogA);
-
-  function earlyPlPrice(days){ return earlyA * Math.pow(days, earlyB); }
-
-  // Generate early-fit projection line (extending to present + 1yr)
-  var maxD = PL_DATA[PL_DATA.length-1][0] + 365;
-  var earlyLine = [];
-  for(var d = trainData[0][0]; d <= maxD; d += 30){
-    earlyLine.push({x: d, y: earlyPlPrice(d)});
+  function readFitFromUrl(){
+    try{
+      var v = new URLSearchParams(location.search).get('fit');
+      if(v && ymValid(v)){ var i = ymToIndex(v); if(i>=MIN_I && i<=MAX_I) return v; }
+    }catch(e){}
+    return DEFAULT_FIT;
+  }
+  function writeFitToUrl(ym){
+    try{
+      var u = new URL(location.href);
+      if(ym === DEFAULT_FIT) u.searchParams.delete('fit');
+      else u.searchParams.set('fit', ym);
+      history.replaceState(null, '', u.pathname + u.search + u.hash);
+    }catch(e){}
   }
 
-  // Training scatter (dimmer)
-  var trainScatter = trainData.map(function(d){ return {x:d[0], y:d[1]}; });
-  // Test scatter (brighter)
-  var testScatter = testData.map(function(d){ return {x:d[0], y:d[1]}; });
+  // ── log-log least squares over the training window (first sample .. cutoff) ──
+  function fit(cutoffDays){
+    var sumX=0,sumY=0,sumXY=0,sumX2=0,n=0,first=null,lastTrain=null;
+    for(var i=0;i<PL_DATA.length;i++){
+      var d=PL_DATA[i];
+      if(d[0]<=cutoffDays && d[1]>0){
+        var lx=Math.log(d[0]), ly=Math.log(d[1]);
+        sumX+=lx; sumY+=ly; sumXY+=lx*ly; sumX2+=lx*lx; n++;
+        if(first===null) first=d[0];
+        lastTrain=d[0];
+      }
+    }
+    var b=(n*sumXY-sumX*sumY)/(n*sumX2-sumX*sumX);
+    var a=Math.exp((sumY-b*sumX)/n);
+    return {a:a, b:b, n:n, first:first, lastTrain:lastTrain};
+  }
 
-  new Chart(ctx, {
+  var maxD = PL_DATA[PL_DATA.length-1][0] + 365;
+  var latest = PL_DATA[PL_DATA.length-1]; // [day, actual price] — divergence anchor
+  var curYm = readFitFromUrl();
+  var f = fit(ymToCutoffDays(curYm));
+
+  function earlyPlPrice(days){ return f.a * Math.pow(days, f.b); }
+  function buildLine(){ var arr=[]; for(var d=f.first; d<=maxD; d+=30) arr.push({x:d,y:f.a*Math.pow(d,f.b)}); return arr; }
+  function trainScatter(){ var co=ymToCutoffDays(curYm); return PL_DATA.filter(function(d){return d[0]<=co;}).map(function(d){return {x:d[0],y:d[1]};}); }
+  function testScatter(){ var co=ymToCutoffDays(curYm); return PL_DATA.filter(function(d){return d[0]>co;}).map(function(d){return {x:d[0],y:d[1]};}); }
+
+  // exponent 'a' as "m.mm×10⁻ⁿ" using the same superscript style as page prose
+  function fmtA(a){
+    var exp = Math.floor(Math.log10(a));
+    var mant = a / Math.pow(10, exp);
+    var sup = String(exp).replace('-', '−');
+    return mant.toFixed(2) + '×10' + sup.split('').map(function(c){
+      return {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','−':'⁻'}[c]||c;
+    }).join('');
+  }
+
+  var chart = new Chart(ctx, {
     type: 'scatter',
     data: {
       datasets: [
         {
-          label: 'Training data (2010–2017)',
-          data: trainScatter,
+          label: 'Training data (fit window)',
+          data: trainScatter(),
           pointRadius: 2,
           pointBackgroundColor: 'rgba(150,150,150,0.5)',
           pointBorderWidth: 0,
           order: 2
         },
         {
-          label: 'Out-of-sample prices (2018–present)',
-          data: testScatter,
+          label: 'Out-of-sample prices (after cutoff)',
+          data: testScatter(),
           pointRadius: 1.8,
           pointBackgroundColor: 'rgba(247,147,26,0.7)',
           pointBorderWidth: 0,
           order: 2
         },
         {
-          label: 'Regression fitted to 2010–2017 only',
-          data: earlyLine,
+          label: 'Regression fitted to the training window only',
+          data: buildLine(),
           type: 'line',
           borderColor: 'rgba(76,175,80,0.8)',
           borderWidth: 2.5,
@@ -438,6 +475,231 @@
       }
     }
   });
+
+  // ── readout: fitted (a,b), implied trend today, divergence vs latest actual ──
+  function updateReadout(){
+    var impToday  = f.a * Math.pow(TODAY_DAYS, f.b);
+    var impLatest = f.a * Math.pow(latest[0], f.b);
+    var div = (latest[1] / impLatest - 1) * 100;
+    if($('oosB'))       $('oosB').textContent = f.b.toFixed(3);
+    if($('oosA'))       $('oosA').innerHTML   = fmtA(f.a);
+    if($('oosImplied')) $('oosImplied').textContent = '$' + Math.round(impToday).toLocaleString();
+    if($('oosDiv')){
+      $('oosDiv').textContent = (div>=0?'+':'−') + Math.abs(Math.round(div)) + '%';
+      $('oosDiv').className = 'oos-ro-val ' + (div>=0 ? 'pos' : 'neg');
+    }
+    if($('oosFitLabel')) $('oosFitLabel').textContent = curYm;
+  }
+
+  function highlightPreset(){
+    var chips = document.querySelectorAll('.oos-preset');
+    for(var i=0;i<chips.length;i++) chips[i].classList.toggle('active', chips[i].getAttribute('data-ym')===curYm);
+  }
+
+  function apply(ym, fromSlider){
+    if(!ymValid(ym)) return;
+    var i = ymToIndex(ym);
+    if(i<MIN_I) ym = MIN_YM; else if(i>MAX_I) ym = MAX_YM;
+    curYm = ym;
+    f = fit(ymToCutoffDays(curYm));
+    chart.data.datasets[0].data = trainScatter();
+    chart.data.datasets[1].data = testScatter();
+    chart.data.datasets[2].data = buildLine();
+    chart.update('none');
+    updateReadout();
+    writeFitToUrl(curYm);
+    highlightPreset();
+    if(!fromSlider && slider) slider.value = String(ymToIndex(curYm));
+  }
+
+  // ── wire the slider + preset chips ──
+  var slider = $('oosFit');
+  if(slider){
+    slider.min = String(MIN_I); slider.max = String(MAX_I); slider.step = '1';
+    slider.value = String(ymToIndex(curYm));
+    slider.addEventListener('input', function(){ apply(indexToYm(+slider.value), true); });
+  }
+  var chips = document.querySelectorAll('.oos-preset');
+  for(var c=0;c<chips.length;c++){
+    chips[c].addEventListener('click', function(){ apply(this.getAttribute('data-ym'), false); });
+  }
+
+  // first paint reflects the (possibly URL-restored) cutoff
+  updateReadout();
+  highlightPreset();
+})();
+
+
+// ═══════ LIVE DOUBLING STAT STRIP (item c) ═══════
+// Age and doubling interval computed live from TODAY_DAYS at the canonical
+// exponent — never hardcode the age. interval = age × (2^(1/b) − 1).
+(function(){
+  if(!document.getElementById('plStatStrip')) return;
+  var age = TODAY_DAYS;
+  var interval = age * (Math.pow(2, 1/PL_B) - 1);
+  var a = document.getElementById('statAge');
+  var dbl = document.getElementById('statDouble');
+  if(a) a.textContent = age.toLocaleString();
+  if(dbl) dbl.innerHTML = Math.round(interval).toLocaleString() +
+    ' days <span class="pl-stat-sub">&asymp; ' + (interval/365.25).toFixed(2) + ' yr</span>';
+})();
+
+
+// ═══════ TIME ABOVE vs BELOW TREND (item d) ═══════
+// Candor device, not a confidence device: bitcoin has spent MORE time below
+// trend than above; the near-zero mean log-deviation is a few violent
+// overshoots balancing many quiet undershoots. Substrate: the ~12-day PL_DATA
+// samples since mid-2010 (the Doubling Ladder owns the month-end treatment).
+(function(){
+  var el = document.getElementById('tbSplit');
+  if(!el) return;
+  var above=0, total=0, sumLogDev=0;
+  for(var i=0;i<PL_DATA.length;i++){
+    var d=PL_DATA[i];
+    if(d[1]>0){ var tr=plPrice(d[0]); if(d[1]>=tr) above++; total++; sumLogDev+=Math.log(d[1]/tr); }
+  }
+  var pa = above/total*100, pb = 100-pa, mean = sumLogDev/total;
+  function set(id,v){ var n=document.getElementById(id); if(n) n.textContent=v; }
+  function w(id,v){ var n=document.getElementById(id); if(n) n.style.width=v; }
+  set('tbAbovePct', pa.toFixed(0)+'%'); set('tbBelowPct', pb.toFixed(0)+'%');
+  w('tbAboveBar', pa.toFixed(1)+'%'); w('tbBelowBar', pb.toFixed(1)+'%');
+  set('tbSamples', total.toLocaleString());
+  set('tbMean', (mean>=0?'+':'−') + Math.abs(mean).toFixed(3));
+})();
+
+
+// ═══════ EXPONENT SURVEY + EXPLORER (item b) ═══════
+// Compares implied PRICES, never bare exponents: a and b trade off. Only
+// documented (a,b) pairs are plotted; b-only sources are listed, not drawn.
+// Page-local and presentation-only — canonical PL_A/PL_B are never touched.
+(function(){
+  var body = document.getElementById('expTableBody');
+  var ctx  = document.getElementById('expChart');
+  if(!body || !ctx) return;
+
+  var CANON = {a:1.6e-17, b:5.77};
+  var PAIRS = [
+    {key:'canonical', name:'Porkopolis &mdash; canonical', a:1.6e-17,   b:5.77,
+      just:'The site canonical; Porkopolis &ldquo;The Chart&rdquo; fit.'},
+    {key:'refit',     name:'Porkopolis &mdash; later refit', a:1.69e-17,  b:5.763,
+      just:'Same source, refit later (the Doubling Ladder&rsquo;s constants); ~0.7% below canonical today.'},
+    {key:'bpl',       name:'BitcoinPower.law', a:Math.pow(10,-16.493), b:5.68,
+      just:'Independent log-log regression over the full price history.'},
+    {key:'bret',      name:'bitcoinretirement.net', a:1.0117e-17, b:5.82,
+      just:'Retirement-calculator fit: steepest exponent, lower constant.'},
+    {key:'oos',       name:'This page &mdash; OOS self-fit', a:3.9e-17,  b:5.657,
+      just:'Fitted in-browser through end-2017 (the chart above).'}
+  ];
+  function dayOf(y){ return Math.floor((Date.UTC(y,0,1)/1000 - GENESIS_TS)/86400); }
+  var COLS = [{lbl:'2026', d:TODAY_DAYS}, {lbl:'2035', d:dayOf(2035)}, {lbl:'2045', d:dayOf(2045)}, {lbl:'2060', d:dayOf(2060)}];
+  function price(p,d){ return p.a * Math.pow(d, p.b); }
+  function fmtUSD(v){
+    if(v>=1e6) return '$'+(v/1e6).toFixed(v>=1e7?1:2)+'M';
+    if(v>=1e3) return '$'+Math.round(v/1e3).toLocaleString()+'K';
+    return '$'+Math.round(v);
+  }
+  function fmtA(a){
+    var e=Math.floor(Math.log10(a)), m=a/Math.pow(10,e);
+    return m.toFixed(2)+'×10'+String(e).split('').map(function(c){
+      return {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'}[c]||c;
+    }).join('');
+  }
+  function devStr(v){ return '<span class="exp-dev '+(v>=0?'pos':'neg')+'">'+(v>=0?'+':'−')+Math.abs(v).toFixed(1)+'%</span>'; }
+
+  // ── survey table (implied-today + deviation computed live) ──
+  var canonToday = price(CANON, TODAY_DAYS);
+  PAIRS.forEach(function(p){
+    var imp = price(p, TODAY_DAYS), dev = (imp/canonToday - 1)*100;
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="exp-src">'+p.name+'</td>'+
+      '<td>'+fmtA(p.a)+'</td>'+
+      '<td>'+(p.b.toFixed(3).replace(/0$/,'').replace(/\.$/,''))+'</td>'+
+      '<td>'+fmtUSD(imp)+' '+(p.key==='canonical'?'':devStr(dev))+'</td>'+
+      '<td class="exp-just">'+p.just+'</td>';
+    body.appendChild(tr);
+  });
+
+  // ── explorer: canonical reference line + one selected pair ──
+  var xs = [];
+  for(var d=dayOf(2011); d<=dayOf(2060); d+=90) xs.push(d);
+  function lineFor(p){ return xs.map(function(d){ return {x:d, y:price(p,d)}; }); }
+
+  var chart = new Chart(ctx, {
+    type:'scatter',
+    data:{ datasets:[
+      { label:'Canonical (5.77)', data:lineFor(CANON), type:'line',
+        borderColor:'rgba(224,148,34,0.9)', borderWidth:2.5, pointRadius:0, fill:false, order:2 },
+      { label:'selected', data:lineFor(PAIRS[3]), type:'line',
+        borderColor:'rgba(76,175,80,0.9)', borderWidth:2.5, borderDash:[6,3], pointRadius:0, fill:false, order:1 }
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      scales:{
+        x:{ type:'logarithmic',
+          title:{display:true,text:'Year (log scale)',color:'#706860',font:{size:11}},
+          grid:{color:'rgba(255,255,255,0.04)'},
+          ticks:{color:'#706860',font:{size:10},callback:function(v){var y=Math.round(2009+v/365.25);return (y%5===0&&y>=2010&&y<=2060)?y:'';}},
+          afterBuildTicks:function(axis){var t=[];for(var y=2010;y<=2060;y+=5)t.push({value:(y-2009)*365.25});axis.ticks=t;}
+        },
+        y:{ type:'logarithmic',
+          title:{display:true,text:'Trend price USD (log scale)',color:'#706860',font:{size:11}},
+          grid:{color:'rgba(255,255,255,0.04)'},
+          ticks:{color:'#706860',font:{size:10},callback:function(v){
+            if([1000,10000,100000,1000000,10000000,100000000].indexOf(v)>=0) return '$'+(v>=1e6?(v/1e6)+'M':(v/1e3)+'K');
+            return '';
+          }}
+        }
+      },
+      plugins:{
+        legend:{display:true,position:'top',labels:{color:'#908880',font:{size:11,family:'Inter'},boxWidth:12,padding:16,usePointStyle:true}},
+        tooltip:{
+          backgroundColor:'rgba(10,9,8,0.95)',titleColor:'#f2eee8',bodyColor:'#d0c8c0',
+          borderColor:'rgba(247,147,26,0.3)',borderWidth:1,padding:12,displayColors:false,
+          callbacks:{
+            title:function(items){ return String(Math.round(2009+items[0].raw.x/365.25)); },
+            label:function(item){ return (item.datasetIndex===0?'Canonical: ':'Selected: ')+fmtUSD(item.raw.y); }
+          }
+        }
+      }
+    }
+  });
+
+  // ── implied-price table + chip selection ──
+  var impBody = document.getElementById('expImpliedBody');
+  function renderImplied(p){
+    if(!impBody) return;
+    function row(q, isSel){
+      var tds = COLS.map(function(c){
+        var v = price(q, c.d);
+        var cell = fmtUSD(v);
+        if(isSel){ var dev=(v/price(CANON,c.d)-1)*100; cell += ' '+devStr(dev); }
+        return '<td>'+cell+'</td>';
+      }).join('');
+      return '<tr'+(isSel?' class="exp-sel-row"':'')+'><th scope="row">'+(isSel?p.name:'Canonical (5.77)')+'</th>'+tds+'</tr>';
+    }
+    impBody.innerHTML = row(CANON,false) + row(p,true);
+  }
+  function select(p){
+    chart.data.datasets[1].label = p.name.replace(/&mdash;/g,'–').replace(/&[a-z]+;/g,'');
+    chart.data.datasets[1].data = lineFor(p);
+    chart.update('none');
+    renderImplied(p);
+    var chips = document.querySelectorAll('.exp-chip');
+    for(var i=0;i<chips.length;i++) chips[i].classList.toggle('active', chips[i].getAttribute('data-key')===p.key);
+  }
+
+  var chipWrap = document.getElementById('expChips');
+  if(chipWrap){
+    PAIRS.filter(function(p){return p.key!=='canonical';}).forEach(function(p){
+      var b = document.createElement('button');
+      b.type='button'; b.className='exp-chip'; b.setAttribute('data-key',p.key);
+      b.innerHTML = p.name.split('&mdash;').pop().trim();
+      b.addEventListener('click', function(){ select(p); });
+      chipWrap.appendChild(b);
+    });
+  }
+  select(PAIRS[3]); // default: bitcoinretirement.net (matches the worked-example callout)
 })();
 
 
