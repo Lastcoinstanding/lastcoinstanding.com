@@ -251,8 +251,11 @@ Captured during the merge pass, because the backlog is now large enough that the
   - **Cross-links:** DR (`/disciplined-rebalancing`), BAS (`/borrowing-against-your-stack`), WODN (`/wait-or-deploy-now`).
   - **Open design question — settle at spec time:** own page (lean) vs. an extension of Disciplined Rebalancing. Decide before drafting; the answer changes the scope substantially.
 
-- [ ] **What Daily Conviction Bought — daily-conviction DCA tool (The Numbers).** Working title.
-  Surfaced 2026-07-30. The live artifact for "The Bitcoin Exit" essay.
+- [x] **What Daily Conviction Bought — daily-conviction DCA tool (The Numbers).** → shipped as `what-daily-conviction-bought` (`/what-daily-conviction-bought.html`) in `1601a05`, 2026-08-05. Full record in **SITE_GUIDE §43**.
+  - **SHIPPED 2026-08-05.** Retrospective daily-DCA backtest: pick a start date + daily amount → BTC accumulated · total invested · value today · multiple · longest underwater stretch · deepest drawdown, plus a contributions-vs-value chart. Ports `scripts/thirty-a-day-chart.ps1` (log-linear daily interp of `PL_DATA`); parity gate passed exactly (crossing 2024-11-19 / $86,400 / day 2,880; drawdown −73.3%; latest $104,970 in / 11.3447 BTC). All six collision fences honored via cross-links (Doubling Ladder / Wait-or-Deploy / Power Law). Zero added refresh surface (reads shared `PL_DATA`).
+  - **v1.1 candidate — worst-day / cycle-top start presets DEFERRED** by JM (2026-08-05): no cycle-top framing anywhere in v1; only neutral convenience presets shipped (Jan 2017 / 5 years ago / 1 year ago). Adding cycle-top chips (e.g. "started at the Nov-2021 top") is the natural v1.1.
+  - **Essay-edit reminder for JM:** the page links the Bitcoin Exit Substack essay; the essay still needs its reciprocal link back to the tool (edit post-launch — the essay↔page pair, STRC precedent).
+  - **Original capture notes below.**
   - **Concept:** don't retell the $30/day legend — recompute it live: pick a start date + daily amount → BTC accumulated, total inputs, value today, multiple. The anecdote generalized into an instrument. Full price history, house live-compute conventions.
   - **Verify at build:** source the original anecdote (arithmetic dates it ~2023: $30/day from 2017 ≈ $66K inputs at ~6 yrs; run to 2026 ≈ $105K in — the live recompute IS the upgrade).
   - **Collision fences:** exponential-blindness belongs to the Doubling Ladder; lump-sum-vs-DCA belongs to Wait-or-Deploy — scope to the conviction-DCA computation only, cross-links do the rest.

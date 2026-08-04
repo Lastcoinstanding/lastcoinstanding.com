@@ -70,6 +70,14 @@ Citations already present on the site as of Stage 1 (commit context: pending).
 
 **PL-3 (added 2026-08-02).** The Doubling Ladder page embeds its own trendline coefficients — `DL_A = 1.69×10⁻¹⁷, DL_B = 5.763` in `the-doubling-ladder.js` (its live stat card rounds the displayed exponent to 5.76) — rather than reading `PL_A`/`PL_B` from the shared module. This is **deliberate self-containment**: the file header states the coefficients are embedded so the page renders its verified figures deterministically. It is an intentional exception of the same kind TECH_DEBT §1 records for `the-melting-ice-cube` (own coefficients, left alone) — note that §1 does not name the Doubling Ladder explicitly, so this row is the registry's record of the exception. Registered per inclusion rule (2): the value carries an explicit on-page Porkopolis/Santostasi attribution. It is the **same source as PL-1 at a later refit**, not a competing source — the two differ by only ~0.66% at today's age and ~1.4% by 2060. **Flag: re-check PL-1's coefficients at its next audit (2026-11-02).** Porkopolis appears to have refit since PL-1 was recorded (2026-05-02), so canonical `a=1.6×10⁻¹⁷, b=5.77` may be due an update; PL-3 is the evidence. No code change made now.
 
+### what-daily-conviction-bought
+
+| # | Component | Value | Source | URL | Last audited | Next due |
+|---|---|---|---|---|---|---|
+| WDCB-1 | The "$30/day since 2017" legend story | ~$86,370 in over ~7y10m to reach $1M (widely reported) | Benzinga / crypto.news coverage (reuses the Bitcoin Exit essay's verified figures) | (essay Sources block — `claude/THE_BITCOIN_EXIT_PUBLISHED.md`) | 2026-08-05 | 2027-08-05 |
+
+**WDCB-1 (added 2026-08-05).** The page's *default* narrative — $30/day of bitcoin since Jan 2017 first crossing $1,000,000 — is the widely-reported legend. Registered per inclusion rule (2): it carries an explicit source attribution (Benzinga / crypto.news, as cited in the Bitcoin Exit essay). The page **recomputes** the story live rather than restating the reported figures, and its recompute matched the legend within rounding ($86,400 vs the reported ~$86,370; crossing 2024-11-19). **All computed values on the page derive from `PL_DATA`** via the same log-linear daily interpolation as `scripts/thirty-a-day-chart.ps1` — no separate citation rows are needed for the accumulated-BTC / value / drawdown figures; they inherit `PL_DATA`'s provenance (PL-2). **Exact coverage URLs live in the essay's Sources block** (project-only doc); confirm/attach them here at the next audit.
+
 ### the-melting-ice-cube
 
 | # | Component | Value | Source | URL | Last audited | Next due |

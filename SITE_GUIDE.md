@@ -2352,3 +2352,23 @@ Unlike the evergreen pages, this examines a **live episode** and says so. The ag
 
 ### Integration
 `explorations.json` (group *Living on Bitcoin*, `interactive: true`, no tile, with an episodic-sunset comment); `sitemap.xml` @0.9 (weekly changefreq) + three section anchors @0.8; `llms.txt` (The Numbers); homepage concept card (par-line-with-price-dipping-below SVG) in The Numbers (beside Bitcoin and Fixed Income) + Latest (rolled *Bull & Bear Cycles* out of Latest); `updates.json` (7/28/26); **bidirectional `related:`** with Bitcoin and Fixed Income (parent — plus reciprocal prose links in its Instruments and Risks tabs), Discount, or Premium? (sibling), The Bitcoin Retirement Stress Test, and The Power Law; tool-framing strip (decision-implying); `WebPage` + `WebApplication` + `FAQPage` JSON-LD. **URL state:** `?h=<horizon|never>&dv=<sustained|cut|suspended>&ov=<btc,tsy>&p=<price>`. **Docs:** `MONTHLY_REFRESH_CHECKLIST §7.5` (the `STRC_DATA` refresh + episode-state decision), and the publish-day GSC habit added to `NEW_PAGE_CHECKLIST §10`.
+
+## 43. What Daily Conviction Bought (`/what-daily-conviction-bought.html`)
+
+**Added:** August 5, 2026. Category **The Numbers** (group *Positioning & Strategy*), `calculator_tile` position 10, single-scroll (no tabs). The live artifact for the *Bitcoin Exit* Substack essay — the essay↔page pair, STRC precedent. **Retrospective only:** it computes what a past daily buy actually did; it never projects. Forward is the retirement cluster's; lump-vs-DCA is Wait-or-Deploy's; exponential-blindness is the Doubling Ladder's — the related strip names each split.
+
+### What it computes
+A daily dollar-cost-averaging backtest. Pick a start date and a daily amount; the tool buys `$amt` of bitcoin every day from the start through the latest `PL_DATA` sample and reports six stat cards: **BTC accumulated · total invested · value today · multiple on inputs · longest underwater stretch · deepest stack drawdown**. A contributions-vs-stack-value chart (linear Y — the divergence is the point) sits below, with a `$1M` crossing marker and the drawdown trough.
+
+- **Engine:** ports `scripts/thirty-a-day-chart.ps1` — log-linear interpolation of the ~12-day `PL_DATA` samples to a daily price, in `what-daily-conviction-bought.js`. **Reads** the shared module (`PL_DATA`, `GENESIS_TS`, `plPrice`, `TODAY_PRICE`, `fetchTodayPrice`, `todayPriceIsLive`); writes nothing to shared state. Auto-freshens with the monthly `PL_DATA` refresh — **zero added manual refresh surface** (MONTHLY_REFRESH_CHECKLIST confirms nothing to add).
+- **Default = the legend:** `$30`/day from 2017-01-01. Recomputes live: first `$1,000,000` on 2024-11-19 (`$86,400` in, day 2,880, 11.1348 BTC); latest ~`$105K` in / ~`$715K` at the last sample, shown uncropped in the current drawdown. Deepest drawdown −73.3% (trough 2022-11-19).
+- **"Value today"** re-prices the accumulated stack at `TODAY_PRICE` with the `todayPriceIsLive` labelling rule ("at today's price" only on a real live fetch, else "at the latest price").
+- **Longest underwater** = the longest run where stack value < total contributed. For the legend default this is only ~20 days (Jan 2017) — DCA keeps the cost basis low, so even the −73% drawdown never dropped the stack below contributions. A worse-timed start grows it; the interactivity is the point.
+- **URL state (§17.5):** `?amt=` & `start=`, defaults omitted, decoded before first render, debounced `replaceState`.
+- **OG card:** product-forward, `og-what-daily-conviction-bought.jpg` (1280×720), rendered by `scripts/og-daily-conviction.ps1` (GDI+, not the Playwright pipeline — regenerate via `build-og-images.py` if pixel-true house type is wanted).
+
+### Deferred (v1.1)
+Worst-day / cycle-top start presets were consciously deferred by JM (2026-08-05) — no cycle-top framing anywhere in v1; only neutral convenience presets (Jan 2017 / 5 years ago / 1 year ago). Logged in PAGE_IDEAS_BACKLOG.
+
+### Essay back-link
+The page links the Substack essay; JM edits the essay post-launch to link back (reminder logged at ship).
