@@ -180,7 +180,9 @@ function New-Chart {
 
   $W = [int](1600 * $Scale); $H = [int](900 * $Scale)
   $bmp = New-Object System.Drawing.Bitmap($W, $H)
-  $bmp.SetResolution(96.0 * $Scale, 96.0 * $Scale)  # keep point-sized fonts scaling with the canvas
+  # NB: do NOT use SetResolution/DPI to scale type — that scales fonts but not
+  # pixel coordinates, which desyncs the two. The single $Scale factor below
+  # drives canvas, ALL drawing coordinates ($S), AND font point sizes uniformly.
   $g = [System.Drawing.Graphics]::FromImage($bmp)
   $g.SmoothingMode     = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
   $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
@@ -205,15 +207,15 @@ function New-Chart {
   $bBg     = New-Object System.Drawing.SolidBrush($cBg)
   $g.FillRectangle($bBg, 0, 0, $W, $H)
 
-  # ---- fonts (Segoe UI ~ Inter; Georgia ~ Cormorant) ----
-  $fTitle   = New-Object System.Drawing.Font('Georgia',      30, [System.Drawing.FontStyle]::Bold)
-  $fSub     = New-Object System.Drawing.Font('Segoe UI',     13.5, [System.Drawing.FontStyle]::Regular)
-  $fAnnBig  = New-Object System.Drawing.Font('Segoe UI Semibold', 17, [System.Drawing.FontStyle]::Bold)
-  $fAnn     = New-Object System.Drawing.Font('Segoe UI',     12.5, [System.Drawing.FontStyle]::Regular)
-  $fAxis    = New-Object System.Drawing.Font('Segoe UI',     11.5, [System.Drawing.FontStyle]::Regular)
-  $fLegend  = New-Object System.Drawing.Font('Segoe UI Semibold', 13, [System.Drawing.FontStyle]::Bold)
-  $fEnd     = New-Object System.Drawing.Font('Segoe UI Semibold', 13, [System.Drawing.FontStyle]::Bold)
-  $fWmk     = New-Object System.Drawing.Font('Segoe UI',     11, [System.Drawing.FontStyle]::Regular)
+  # ---- fonts (Segoe UI ~ Inter; Georgia ~ Cormorant). Point sizes scale with $Scale. ----
+  $fTitle   = New-Object System.Drawing.Font('Georgia',           [single](30   * $Scale), [System.Drawing.FontStyle]::Bold)
+  $fSub     = New-Object System.Drawing.Font('Segoe UI',          [single](13.5 * $Scale), [System.Drawing.FontStyle]::Regular)
+  $fAnnBig  = New-Object System.Drawing.Font('Segoe UI Semibold', [single](17   * $Scale), [System.Drawing.FontStyle]::Bold)
+  $fAnn     = New-Object System.Drawing.Font('Segoe UI',          [single](12.5 * $Scale), [System.Drawing.FontStyle]::Regular)
+  $fAxis    = New-Object System.Drawing.Font('Segoe UI',          [single](11.5 * $Scale), [System.Drawing.FontStyle]::Regular)
+  $fLegend  = New-Object System.Drawing.Font('Segoe UI Semibold', [single](13   * $Scale), [System.Drawing.FontStyle]::Bold)
+  $fEnd     = New-Object System.Drawing.Font('Segoe UI Semibold', [single](13   * $Scale), [System.Drawing.FontStyle]::Bold)
+  $fWmk     = New-Object System.Drawing.Font('Segoe UI',          [single](11   * $Scale), [System.Drawing.FontStyle]::Regular)
 
   $bInkBr  = New-Object System.Drawing.SolidBrush($cInkBr)
   $bInk    = New-Object System.Drawing.SolidBrush($cInk)
@@ -237,19 +239,24 @@ function New-Chart {
     $exp = [math]::Floor([math]::Log10($x))
     $base = [math]::Pow(10, $exp)
     $f = $x / $base
-    $nf = if ($f -le 1) {1} elseif ($f -le 2){2} elseif ($f -le 2.5){2.5} elseif ($f -le 5){5} else {10}
+    $nf = if ($f -le 1) {1} elseif ($f -le 1.5){1.5} elseif ($f -le 2){2} elseif ($f -le 2.5){2.5} elseif ($f -le 5){5} else {10}
     return $nf * $base
   }
-  $yMax = NiceCeil ($peakStack * 1.08)
+  # modest 5% headroom above the peak; the 1.5x rung keeps a ~1.36M peak at 1.5M
+  # (not 2M) instead of wasting the top quarter of the frame.
+  $yMax = NiceCeil ($peakStack * 1.05)
   # pick a tick step giving ~6-8 lines
   $rawStep = $yMax / 7.0
   $stepExp = [math]::Floor([math]::Log10($rawStep))
   $stepBase= [math]::Pow(10, $stepExp)
   $sf2 = $rawStep / $stepBase
-  $niceStep = $(if ($sf2 -le 1){1} elseif ($sf2 -le 2){2} elseif ($sf2 -le 2.5){2.5} elseif ($sf2 -le 5){5} else {10}) * $stepBase
+  $niceStep = $(if ($sf2 -le 1){1} elseif ($sf2 -le 1.5){1.5} elseif ($sf2 -le 2){2} elseif ($sf2 -le 2.5){2.5} elseif ($sf2 -le 5){5} else {10}) * $stepBase
 
-  $xForDay = { param($d) [single]($plotL + (($d - $startDay) / [double]($endDay - $startDay)) * $plotW) }
-  $yForVal = { param($v) [single]($plotB - ($v / $yMax) * $plotH) }
+  # Both projections emit SCALED device coordinates (via $S), matching the
+  # $S-wrapped plot constants used everywhere else — so data, axes, gridlines
+  # and annotations all live in one coordinate space at any $Scale.
+  $xForDay = { param($d) & $S ($plotL + (($d - $startDay) / [double]($endDay - $startDay)) * $plotW) }
+  $yForVal = { param($v) & $S ($plotB - ($v / $yMax) * $plotH) }
 
   function FmtMoney([double]$v) {
     if ($v -ge 1000000) { return ('${0:0.##}M' -f ($v/1000000.0)) }
@@ -343,7 +350,8 @@ function New-Chart {
     $crossDt = DayToDate $crossDay
     $g.DrawString('$1,000,000 stack', $fAnnBig, $bInkBr, $anchorX, $lby, $sfFar)
     $g.DrawString($crossDt.ToString('MMM d, yyyy'), $fAnn, $bAmber, $anchorX, ($lby + (& $S 26)), $sfFar)
-    $inLbl = '{0:C0} of $30/day in' -f $crossContrib
+    $crossDayNum = ($crossDay - $startDay) + 1
+    $inLbl = '{0:C0} in - day {1:N0}' -f $crossContrib, $crossDayNum
     $g.DrawString($inLbl, $fAnn, $bInkDim, $anchorX, ($lby + (& $S 46)), $sfFar)
   }
 
