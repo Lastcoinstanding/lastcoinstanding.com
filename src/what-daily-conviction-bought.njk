@@ -1,0 +1,119 @@
+---
+layout: base.njk
+permalink: /what-daily-conviction-bought.html
+slug: what-daily-conviction-bought
+related:
+  - slug: the-power-law
+    desc: "The trend this daily drip rides. The habit buys blind; the Power Law is the channel those buys land in — floor, trend, and upper band across bitcoin's whole history."
+  - slug: the-doubling-ladder
+    desc: "Why the trend keeps pulling away. This page shows what a past habit accumulated; the Doubling Ladder owns the deeper point — why human intuition underestimates an exponential, and how the doublings stretch."
+  - slug: wait-or-deploy-now
+    desc: "Drip versus lump sum. This page only replays a daily habit; whether to spread buying out or deploy all at once — and how the two compare across history — is Wait or Deploy Now's question, not this one."
+  - slug: how-much-bitcoin
+    desc: "How much to hold in the first place. The daily habit answers 'what did it buy'; the sizing question — what fraction of a portfolio bitcoin should be — is answered through the Kelly criterion there."
+faq:
+  - q: "What would $30 a day of bitcoin be worth?"
+    a: "Computed from bitcoin's real price history, $30 of bitcoin bought every day since January 1, 2017 put in about $105,000 over roughly nine and a half years and accumulated about 11.3 BTC. Its value first crossed $1,000,000 on November 19, 2024 (about $86,400 contributed by then), and at the latest price in the series sits near $715,000 — below the million, in the current drawdown. Change the start date or the daily amount on this page to replay any other version."
+  - q: "What is a bitcoin DCA backtest?"
+    a: "Dollar-cost averaging (DCA) is buying a fixed dollar amount on a fixed schedule regardless of price. A backtest replays that habit against real historical prices to show what it would have accumulated, what it cost, and what it is worth. This page is a retrospective backtest — the record of what a past daily habit did, not a forecast of what a future one will do."
+  - q: "How long was a daily bitcoin buyer underwater?"
+    a: "Underwater means the stack is worth less than the total put into it. Averaging in keeps the cost basis low, so a $30/day buyer since January 2017 was underwater only for the first few weeks and never again — even through the deepest stack drawdown, which fell about 73% from its peak while still staying well above the amount contributed. A worse-timed start date makes that underwater stretch longer; the tool lets you see how much."
+  - q: "Is this page a prediction of future returns?"
+    a: "No. It is retrospective only — it computes what a past habit actually did against real price history, and shows the deep drawdowns along the way. Past results do not predict future ones, and nothing here is a recommendation to buy on any schedule."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/what-daily-conviction-bought-head.html' %}"
+  page_styles: "{% include '_pageassets/what-daily-conviction-bought.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/what-daily-conviction-bought.js' %}"
+---
+<section class="hero">
+  <h1>What Daily Conviction <em>Bought</em></h1>
+  <div class="hero-subtitle">What did a small bitcoin buy, made every single day, actually add up to?</div>
+  <p class="subtitle">Pick a start date and a daily amount. The page replays that habit against bitcoin's real price history &mdash; what it accumulated, what it cost, what it's worth now, and what the ride felt like along the way.</p>
+</section>
+
+<main class="content-area">
+  {% include 'components/tool-framing.njk' %}
+
+  <section class="section-intro">
+    <p class="dc-lead-prose">The story that gets passed around is a specific one: $30 of bitcoin, bought every single day since January 2017. Rather than retell it, this page recomputes it live &mdash; and lets you change the numbers. The famous run is the starting point (and the coverage that made it a legend is <a href="https://lastcoinstanding.substack.com/p/the-bitcoin-exit" target="_blank" rel="noopener">retold in the essay this tool grew out of</a>); every other start date and amount is one drag away. It is the record of what a habit did, not a recommendation to run one.</p>
+  </section>
+
+  <!-- PLAYGROUND: inputs and outputs share one viewport -->
+  <section class="dc-calc" id="calculator">
+    <div class="dc-inputs">
+      <div class="dc-lever">
+        <label class="dc-lever-label" for="dcStart">Start date
+          <span class="help-tip" tabindex="0">?<span class="tip-content">The first day of the habit. Buying runs from here through the latest price in the series. Bounded to the price history available.</span></span>
+        </label>
+        <input type="date" id="dcStart" class="dc-date" aria-label="Start date of the daily buy">
+        <div class="dc-presets" id="dcPresets">
+          <button type="button" class="dc-preset" data-start="2017-01-01">Jan 2017 &mdash; the $30/day story</button>
+          <button type="button" class="dc-preset" id="dcPreset5y" data-start="">5 years ago</button>
+          <button type="button" class="dc-preset" id="dcPreset1y" data-start="">1 year ago</button>
+        </div>
+      </div>
+      <div class="dc-lever">
+        <label class="dc-lever-label" for="dcAmtNum">Daily amount</label>
+        <div class="dc-amt-row">
+          <span class="dc-amt-prefix">$</span>
+          <input type="number" id="dcAmtNum" class="dc-amt-num" min="1" max="1000" step="1" aria-label="Daily buy amount in dollars">
+          <span class="dc-amt-suffix">/ day</span>
+        </div>
+        <input type="range" id="dcAmtSlider" class="dc-range" min="1" max="1000" step="1" aria-label="Daily buy amount">
+        <button type="button" class="dc-reset" id="dcReset">Reset to the $30/day story</button>
+      </div>
+    </div>
+
+    <p class="dc-lead" id="dcLead">&mdash;</p>
+
+    <div class="dc-cards" id="dcCards">
+      <div class="dc-card">
+        <div class="dc-card-cap">BTC accumulated</div>
+        <div class="dc-card-num dc-card-num-amber" id="dcBtc">&mdash;</div>
+      </div>
+      <div class="dc-card">
+        <div class="dc-card-cap">Total invested</div>
+        <div class="dc-card-num" id="dcInvested">&mdash;</div>
+      </div>
+      <div class="dc-card">
+        <div class="dc-card-cap">Value
+          <span class="help-tip" tabindex="0">?<span class="tip-content">The bitcoin accumulated, re-priced at today's live spot when a fetch succeeds, otherwise at the latest price in the series.</span></span>
+        </div>
+        <div class="dc-card-num dc-card-num-amber" id="dcValue">&mdash;</div>
+        <div class="dc-card-sub" id="dcValueSub"></div>
+      </div>
+      <div class="dc-card">
+        <div class="dc-card-cap">Multiple on inputs
+          <span class="help-tip" tabindex="0">?<span class="tip-content">Value now divided by total invested &mdash; how many times over the contributions have grown.</span></span>
+        </div>
+        <div class="dc-card-num" id="dcMultiple">&mdash;</div>
+      </div>
+      <div class="dc-card">
+        <div class="dc-card-cap">Longest underwater
+          <span class="help-tip" tabindex="0">?<span class="tip-content">The longest unbroken stretch where the stack was worth less than the total put in &mdash; i.e. price sat below the buyer's average cost basis. The psychological price of the habit.</span></span>
+        </div>
+        <div class="dc-card-num" id="dcUnderwater">&mdash;</div>
+        <div class="dc-card-sub" id="dcUnderwaterSub"></div>
+      </div>
+      <div class="dc-card">
+        <div class="dc-card-cap">Deepest drawdown</div>
+        <div class="dc-card-num" id="dcDrawdown">&mdash;</div>
+        <div class="dc-card-sub" id="dcDrawdownSub"></div>
+      </div>
+    </div>
+
+    <div class="dc-chart-wrap chart-wrapper" data-chart-copy
+         data-chart-heading="#calculator .dc-lead"
+         data-chart-assump="#dcEndnote"
+         data-chart-title="What Daily Conviction Bought — contributions vs. stack value">
+      <canvas id="dcChart"></canvas>
+    </div>
+    <p class="dc-endnote" id="dcEndnote">The inputs are linear; the outcome is not &mdash; that gap is the whole point, so the value axis is linear, not logarithmic. Computed from the site's <code>PL_DATA</code> price series (about 12-day samples, interpolated to a daily price in log space), so figures are close to, but not identical to, true daily closes. The habit auto-updates with each monthly price refresh.</p>
+  </section>
+
+  <section class="dc-prose-section">
+    <h2>The record, not a recommendation</h2>
+    <p class="dc-prose">Two of the cards above are the story most retellings skip. <strong>Deepest drawdown</strong> is what the stack did from peak to trough &mdash; for the $30/day run, a fall of about 73%, a paper loss most people never actually sit through. And <strong>longest underwater</strong> is the stretch where the stack was worth less than every dollar put in. Averaging in keeps that second number small: the daily buyer above spends only a few weeks underwater across nine years, because each purchase lowers the average cost. That is the quiet case for a boring habit &mdash; not that it dodges the drawdown, but that it is the vehicle most people can actually hold through one. Move the start date onto a worse day and watch both numbers grow.</p>
+    <p class="dc-prose">This page deliberately stops at what the habit <em>did</em>. Why the trend keeps pulling away from intuition &mdash; the exponential-blindness that makes these numbers feel impossible &mdash; belongs to <a href="/the-doubling-ladder.html">the Doubling Ladder</a>. Whether to spread buying out at all, versus deploying a lump sum, belongs to <a href="/wait-or-deploy-now.html">Wait or Deploy Now</a>. And the channel these blind daily buys actually land in &mdash; floor, trend, upper band &mdash; is <a href="/the-power-law.html">the Power Law</a>. This page only answers one question: what did the drip buy.</p>
+  </section>
+</main>

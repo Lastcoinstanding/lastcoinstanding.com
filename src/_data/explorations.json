@@ -350,6 +350,20 @@
     }
   },
   {
+    "slug": "what-daily-conviction-bought",
+    "title": "What Daily Conviction Bought",
+    "category": "numbers",
+    "group": "Positioning & Strategy",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "$30 a day since 2017, recomputed live &mdash; what a daily bitcoin buy accumulated, what it cost, and how deep the ride went.",
+      "preview_kind": "svg",
+      "anchor": "#calculator",
+      "featured": false,
+      "position": 10
+    }
+  },
+  {
     "slug": "the-bitcoin-horizon",
     "title": "The Bitcoin Horizon",
     "category": "numbers",
