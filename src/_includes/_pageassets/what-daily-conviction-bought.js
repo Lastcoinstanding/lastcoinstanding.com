@@ -81,10 +81,12 @@
   function forwardBands(existingBtc, amt){
     var startFwd = (typeof TODAY_DAYS === 'number' ? TODAY_DAYS : LAST_DAY);
     var endFwd = startFwd + Math.round(FWD_YEARS * 365.25);
+    // Two-band planning range (floor → trend). Upper-band excursions have been
+    // brief spikes, not places price stays (RETIREMENT_CALCULATOR_DESIGN canon),
+    // so upper is demoted to a caption clause — no $ figure computed here.
     var bands = [
       { key: 'floor', label: 'Floor', mult: (typeof PL_FLOOR === 'number' ? PL_FLOOR : 0.42) },
-      { key: 'trend', label: 'Trend', mult: 1.0 },
-      { key: 'upper', label: 'Upper band', mult: (typeof PL_CEIL === 'number' ? PL_CEIL : 3.0) }
+      { key: 'trend', label: 'Trend', mult: 1.0 }
     ];
     return bands.map(function(b){
       var fbtc = 0;
@@ -93,6 +95,27 @@
       var total = existingBtc + fbtc;
       return { key: b.key, label: b.label, mult: b.mult, forwardBtc: fbtc, totalBtc: total, value: total * endPx, endDay: endFwd };
     });
+  }
+
+  // ── annualized return: money-weighted IRR on the actual daily cashflow, and
+  //    the naive lump-sum-on-day-one CAGR-equivalent (tooltip contrast only).
+  //    IRR ≠ (value/invested)^(1/years): that treats every dollar as invested on
+  //    day one and understates a DCA stream. Solve amt·Σ(1+r)^t_i = value; the
+  //    daily flows are evenly spaced, so Σ is a closed-form geometric sum. ──
+  function annualReturns(startDay, amt, currentValue, valDay){
+    var N = LAST_DAY - startDay + 1;
+    var years = N / 365.25;
+    var naive = (currentValue > 0 && amt > 0 && years > 0) ? Math.pow(currentValue / (amt * N), 1 / years) - 1 : 0;
+    function f(r){
+      var g = Math.pow(1 + r, 1 / 365.25);
+      var sum = (Math.abs(g - 1) < 1e-12) ? N : Math.pow(g, valDay - LAST_DAY) * (Math.pow(g, N) - 1) / (g - 1);
+      return amt * sum - currentValue;
+    }
+    var lo = -0.9, hi = 10;
+    if (f(lo) > 0) return { irr: lo, naive: naive };
+    if (f(hi) < 0) return { irr: hi, naive: naive };
+    for (var i = 0; i < 80; i++){ var mid = (lo + hi) / 2; if (f(mid) > 0) hi = mid; else lo = mid; }
+    return { irr: (lo + hi) / 2, naive: naive };
   }
 
   // ── state ──
@@ -135,6 +158,12 @@
     $('dcValueSub').textContent = isLive ? 'at today’s price' : 'at the latest price';
     var mult = r.contrib > 0 ? valueNow / r.contrib : 0;
     setNum('dcMultiple', mult.toFixed(2) + '×');
+
+    // annualized return — money-weighted IRR, with a live CAGR-contrast tooltip
+    var ret = annualReturns(S.startDay, S.amt, valueNow, (typeof TODAY_DAYS === 'number' ? TODAY_DAYS : LAST_DAY));
+    setNum('dcAnnual', (ret.irr * 100).toFixed(1) + '% / yr');
+    var atip = $('dcAnnualTip');
+    if (atip) atip.innerHTML = 'CAGR describes one lump sum growing from day one. This habit’s dollars arrived daily across the whole period — most had far less time to grow. The money-weighted return (IRR) is the single rate that makes every actual daily buy grow to today’s value. For comparison: a lump sum of the same total invested on day one would have needed only ~' + (ret.naive * 100).toFixed(1) + '%/yr (CAGR) to reach the same outcome — that’s the fair use of the simpler number, and why it isn’t the headline here.';
 
     // underwater
     if (!r.uwEver || r.uwLen <= 0){
@@ -186,6 +215,14 @@
     });
     var yr = (typeof TODAY_DAYS === 'number') ? dayToDate(TODAY_DAYS + Math.round(FWD_YEARS*365.25)).getUTCFullYear() : '';
     if ($('dcFwdYear')) $('dcFwdYear').textContent = String(yr);
+    // T4 — the second-decade insight (numbers live from the two paths)
+    var floorB = bands[0], trendB = bands[1];
+    var ratio = trendB.forwardBtc > 0 ? floorB.forwardBtc / trendB.forwardBtc : 0;
+    if ($('dcFwdInsight')) $('dcFwdInsight').innerHTML =
+      'The same habit that accumulated <strong>' + existingBtc.toFixed(2) + ' BTC</strong> in its first decade adds only about <strong>' +
+      trendB.forwardBtc.toFixed(2) + ' BTC</strong> on the trend path in its second &mdash; the trend has moved, and the cheap-coin decade does not repeat. Along the floor path the habit gathers ' +
+      (ratio >= 1.9 ? 'more than twice' : 'about ' + ratio.toFixed(1) + '×') +
+      ' as many coins as along the trend &mdash; lower prices are the accumulator’s friend.';
     // handoff: carry the accumulated stack + this habit as a monthly DCA into Retirement
     var link = $('dcHandoff');
     if (link){
