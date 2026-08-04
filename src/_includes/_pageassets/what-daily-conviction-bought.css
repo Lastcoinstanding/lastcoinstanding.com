@@ -1,0 +1,93 @@
+/* What Daily Conviction Bought — page-local styles.
+   Width tier: mixed-content, 1100px page / 880px prose (STYLE_GUIDE §4.2). */
+
+:root{
+  --bg:#0a0908; --bg-card:#141210; --accent:#e09422; --accent-bright:#F7931A;
+  --muted-line:#8b8375;
+  --text:#e8e0d4; --text-dim:#9a9080; --text-muted:#6a6256;
+  --border:rgba(224,148,34,0.12); --border-strong:rgba(224,148,34,0.30);
+  --font-h:'Cormorant Garamond',Georgia,serif; --font-b:'Inter',-apple-system,sans-serif;
+  --font-s:'Source Serif 4',Georgia,serif;
+}
+body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* ── hero (§6.10a) ── */
+.hero{text-align:center;max-width:820px;margin:0 auto;padding:3rem 1.25rem 1.5rem}
+.hero h1{font-family:var(--font-h);font-size:clamp(2rem,4vw,3.4rem);font-weight:500;color:#f2eee8;line-height:1.1;margin:0 0 .8rem;letter-spacing:-.01em}
+.hero h1 em{color:var(--accent);font-style:italic}
+.hero .hero-subtitle{font-family:var(--font-s);font-style:italic;font-size:clamp(1.05rem,2vw,1.3rem);color:var(--text-dim);line-height:1.5;max-width:680px;margin:0 auto .9rem}
+.hero .subtitle{font-family:var(--font-b);font-size:1rem;color:var(--text-dim);line-height:1.7;max-width:620px;margin:0 auto}
+
+/* ── layout ── */
+.content-area{max-width:1100px;margin:0 auto;padding:0 1.25rem 4rem}
+.section-intro{max-width:880px;margin:1.5rem auto 2rem}
+.dc-lead-prose{font-family:var(--font-b);font-size:1.05rem;color:var(--text);line-height:1.75}
+
+/* body-link treatment (scoped) */
+.section-intro a,.dc-prose a,.dc-endnote a,.dc-lead a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--border-strong)}
+.section-intro a:hover,.dc-prose a:hover,.dc-endnote a:hover,.dc-lead a:hover{border-bottom-style:solid}
+.section-intro a:visited,.dc-prose a:visited{color:var(--accent)}
+
+/* ── help-tip (page-local, cloned verbatim from siblings) ── */
+.help-tip{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;border:1px solid var(--text-muted);color:var(--text-muted);font-size:.65rem;font-style:normal;font-weight:400;cursor:help;position:relative;margin-left:.4rem;vertical-align:middle;text-transform:none;letter-spacing:0}
+.help-tip:hover,.help-tip:focus{border-color:var(--accent);color:var(--accent);outline:none}
+.help-tip .tip-content{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:min(240px,calc(100vw - 32px));padding:.65rem .8rem;background:var(--bg-card);border:1px solid var(--border-strong);border-radius:4px;font-family:var(--font-b);font-size:.8rem;font-weight:400;color:#ece4d6;line-height:1.5;text-align:left;letter-spacing:0;text-transform:none;white-space:normal;word-wrap:break-word;pointer-events:none;z-index:10;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+.help-tip:hover .tip-content,.help-tip:focus .tip-content{display:block;pointer-events:auto}
+.help-tip.tip-right .tip-content{left:auto;right:0;transform:none}
+
+/* ── calculator (playground) ── */
+.dc-calc{max-width:1100px;margin:0 auto}
+.dc-inputs{display:flex;gap:1.5rem;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.4rem 1.5rem;margin-bottom:1.4rem}
+.dc-lever{flex:1;min-width:260px;display:flex;flex-direction:column;gap:.6rem}
+.dc-lever-label{font-family:var(--font-b);font-size:.72rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted)}
+.dc-date{font-family:var(--font-b);font-size:1rem;color:var(--text);background:rgba(255,255,255,.03);border:1px solid var(--border-strong);border-radius:6px;padding:.55rem .7rem;color-scheme:dark}
+.dc-date:focus{outline:none;border-color:var(--accent)}
+.dc-presets{display:flex;gap:.5rem;flex-wrap:wrap}
+.dc-preset{font-family:var(--font-b);font-size:.76rem;color:var(--text-dim);background:none;border:1px solid var(--border-strong);border-radius:14px;padding:.3rem .8rem;cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+.dc-preset:hover{color:#f2eee8;border-color:var(--accent)}
+.dc-preset.is-active{color:var(--accent);border-color:var(--accent);background:rgba(224,148,34,.08);font-weight:600}
+.dc-amt-row{display:flex;align-items:baseline;gap:.35rem}
+.dc-amt-prefix{font-family:var(--font-h);font-size:1.6rem;color:var(--accent)}
+.dc-amt-num{font-family:var(--font-h);font-size:1.6rem;font-weight:600;color:#f2eee8;background:none;border:none;border-bottom:1px solid var(--border-strong);width:5.5rem;padding:.1rem .2rem}
+.dc-amt-num:focus{outline:none;border-bottom-color:var(--accent)}
+.dc-amt-suffix{font-family:var(--font-b);font-size:.85rem;color:var(--text-muted)}
+.dc-range{width:100%;accent-color:var(--accent);cursor:grab}
+.dc-range:active{cursor:grabbing}
+.dc-reset{align-self:flex-start;font-family:var(--font-b);font-size:.76rem;color:var(--text-muted);background:none;border:none;border-bottom:1px dotted var(--text-muted);padding:.1rem 0;cursor:pointer;margin-top:.2rem}
+.dc-reset:hover{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* live sentence readout */
+.dc-lead{font-family:var(--font-b);font-size:1.02rem;color:var(--text-dim);line-height:1.7;max-width:880px;margin:0 auto 1.4rem;text-align:center}
+.dc-lead strong{color:#f2eee8;font-weight:600}
+
+/* ── stat cards ── */
+.dc-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.6rem}
+.dc-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.2rem;text-align:center}
+.dc-card-cap{font-family:var(--font-b);font-size:.7rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);margin-bottom:.5rem}
+.dc-card-num{font-family:var(--font-h);font-size:clamp(1.5rem,2.6vw,2rem);font-weight:600;color:#f2eee8;line-height:1.1}
+.dc-card-num-amber{color:var(--accent)}
+.dc-card-sub{font-family:var(--font-b);font-size:.74rem;color:var(--text-dim);margin-top:.45rem;line-height:1.4}
+
+/* ── chart ── */
+.dc-chart-wrap{position:relative;height:440px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.3rem 1.3rem 1rem;margin-bottom:1rem}
+.dc-endnote{font-family:var(--font-b);font-size:.78rem;color:var(--text-muted);line-height:1.6;max-width:880px;margin:0 auto 2.5rem}
+.dc-endnote code{font-family:'SF Mono',Consolas,monospace;font-size:.9em;color:var(--text-dim)}
+
+/* ── closing prose ── */
+.dc-prose-section{max-width:880px;margin:0 auto}
+.dc-prose-section h2{font-family:var(--font-h);font-size:clamp(1.6rem,3vw,2.2rem);font-weight:500;color:#f2eee8;margin:0 0 1rem}
+.dc-prose{font-family:var(--font-b);font-size:1.05rem;color:var(--text);line-height:1.75;margin:0 0 1.2rem}
+.dc-prose strong{color:#f2eee8;font-weight:600}
+.dc-prose em{color:var(--accent);font-style:italic}
+
+/* ── responsive ── */
+@media(max-width:760px){
+  .dc-cards{grid-template-columns:repeat(2,1fr);gap:.7rem}
+  .dc-inputs{flex-direction:column;gap:1.2rem;padding:1.2rem}
+  .dc-chart-wrap{height:360px;padding:1rem .8rem .8rem}
+  .dc-card-num{font-size:1.4rem}
+}
+@media(max-width:400px){
+  .dc-cards{grid-template-columns:1fr 1fr;gap:.5rem}
+  .dc-card{padding:.85rem .6rem}
+}
