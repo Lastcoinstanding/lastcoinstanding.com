@@ -475,6 +475,14 @@ These have all been observed on the site and need fixing.
 
 12. **Decorative 3px-side or 3px-top accent borders on cards.** Vestigial visual signal that earns no editorial benefit. The structural relationship between cards is what carries meaning, not a colored stripe. Color-coding (Fixed Pie's money-type cards, Half-Life's preset rates) is preserved through colored title text and progress bars; the stripe was redundant. → Drop decorative side/top borders site-wide. Preserve only borders that serve a *structural* role — `.tab-btn.active` indicator (transparent → colored bottom border), `.timeline` 2px structural rail on Half-Life History tab, timeline event dots, card containers' overall 1px border. Sweep applied across 8 page CSS files plus `.tool-framing-expanded` on `base.njk`. If a new page adds a decorative `border-left: 3px` or `border-top: 2px` accent, review against this principle before landing.
 
+### Copy register: show, don't claim (added 2026-08-05)
+
+**Never describe our own copy as honest, candid, or transparent.** The disclosure does the work; naming it "honest" is the site telling the reader how to feel about the site. Put the caveat on the page and let it stand — a page that shows its floor breach, its horizon limit, and its exponent uncertainty has *been* honest without using the word. **Deletion beats substitution:** first try removing the tell and reading the sentence back ("Read honestly, that is an argument…" → "That is an argument…"); reach for a replacement only when the sentence genuinely needs a word ("the only honest comparison" → "the only like-for-like comparison"). First swept on `/the-power-law` in the Power Law v2 polish pass (2026-08-05); a site-wide sweep is logged in PAGE_IDEAS_BACKLOG.
+
+**Avoid "canonical" in reader-facing copy.** It is jargon to a first-time reader; say "the reference fit" / "the reference value" / "the version every page uses". Internal docs (this guide, DATA_AUDIT, code comments) may keep "canonical" — it is precise there.
+
+**Exempt:** first-person Substack/memoir voice, where "honestly, I…" is natural speech rather than the site describing itself.
+
 ### Documented exceptions
 
 These violate one of the rules above (or §2.1's canonical scale) but are kept deliberately because the typographic register-shift is doing real editorial work that the canonical treatment wouldn't. Reviewed and approved 2026-05-01.

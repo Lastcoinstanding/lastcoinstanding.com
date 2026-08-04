@@ -453,3 +453,22 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   .tb-legend{gap:1rem;font-size:.8rem}
   .exp-explorer{padding:1rem}
 }
+
+/* ═══════ POWER LAW V2 POLISH ═══════ */
+
+/* help-tip (ported from the canonical pattern, page tokens) */
+.help-tip{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;border:1px solid var(--text-muted);color:var(--text-muted);font-size:.65rem;font-style:normal;font-weight:400;cursor:help;position:relative;margin-left:.4rem;vertical-align:middle;text-transform:none;letter-spacing:0}
+.help-tip:hover,.help-tip:focus{border-color:var(--amber);color:var(--amber);outline:none}
+.help-tip .tip-content{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:min(240px,calc(100vw - 32px));padding:.65rem .8rem;background:var(--bg-card);border:1px solid var(--border-lt);border-radius:4px;font-family:var(--font-b);font-size:.8rem;font-weight:400;color:var(--text-bright);line-height:1.5;text-align:left;letter-spacing:0;text-transform:none;white-space:normal;word-wrap:break-word;pointer-events:none;z-index:10;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+.help-tip:hover .tip-content,.help-tip:focus .tip-content{display:block;pointer-events:auto}
+.help-tip.tip-right .tip-content{left:auto;right:0;transform:none}
+
+/* OOS drive-home + channel sentences (A2/A3) */
+.oos-drive{font-size:.92rem;color:var(--text-body);line-height:1.6;margin:1rem 0 0;padding-top:.9rem;border-top:1px solid var(--border)}
+.oos-drive strong{color:var(--text-bright);font-weight:600}
+.oos-channel{font-size:.86rem;color:var(--text-dim);line-height:1.6;margin:.5rem 0 0}
+.oos-channel strong{color:var(--amber);font-weight:600}
+
+/* stat strip kicker (c) */
+.pl-stat-kick{font-family:var(--font-b);font-size:.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:.35rem}
+.pl-stat .pl-stat-num{margin-bottom:0}
