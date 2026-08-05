@@ -1,5 +1,10 @@
 [
   {
+    "display": "8/6/26",
+    "page": "/what-daily-conviction-bought.html",
+    "summary": "What Daily Conviction Bought gains one look ahead: an 'if the habit continued' block projects ten more years of the same daily buy along the Power Law's planning range — floor to trend, a range never a number — and hands the accumulated stack off to The Bitcoin Retirement. New stats too: an annualized return computed the money-weighted way (IRR, which honestly accounts for when each dollar arrived — not the flattering lump-sum CAGR), and a peak-value high 'visible only in the rearview mirror'. Plus a chart hover reading out contributions, value, BTC held, and multiple at any date. Still retrospective at its core; the forward look is a range, not a forecast."
+  },
+  {
     "display": "8/5/26",
     "page": "/what-daily-conviction-bought.html",
     "summary": "New: What Daily Conviction Bought — a live dollar-cost-averaging backtest. Pick a start date and a daily amount and the page replays that habit against bitcoin's real price history: BTC accumulated, total invested, value now, the multiple on inputs, the longest stretch spent underwater, and the deepest drawdown. It defaults to the widely-retold $30-a-day-since-2017 run (~$105K in, first past $1M in November 2024) and recomputes it live rather than retelling it — the interactive companion to the Bitcoin Exit essay. Retrospective only; the record of what a habit did, not a recommendation."

@@ -41,7 +41,7 @@
 
   // ── the simulation ──
   function simulate(startDay, amt){
-    var btc = 0, contrib = 0, peak = 0, maxDD = 0, ddDay = startDay, ddVal = 0;
+    var btc = 0, contrib = 0, peak = 0, peakDay = startDay, maxDD = 0, ddDay = startDay, ddVal = 0;
     var crossDay = null, crossContrib = 0, crossBtc = 0;
     var uwLen = 0, curStart = null, uwStart = startDay, uwEnd = startDay, uwEver = false;
     var contribPts = [], valuePts = [];
@@ -52,7 +52,7 @@
       btc += amt / px;
       contrib += amt;
       var val = btc * px;
-      if (val > peak) peak = val;
+      if (val > peak){ peak = val; peakDay = d; }   // running max = peak value ever reached
       var dd = peak > 0 ? (val / peak - 1) : 0;
       if (dd < maxDD){ maxDD = dd; ddDay = d; ddVal = val; }
       if (crossDay === null && val >= 1e6){ crossDay = d; crossContrib = contrib; crossBtc = btc; }
@@ -60,17 +60,62 @@
       else curStart = null;
       if (d === startDay || d === LAST_DAY || (d - startDay) % step === 0){
         contribPts.push({ x: d, y: contrib });
-        valuePts.push({ x: d, y: val });
+        valuePts.push({ x: d, y: val, c: contrib, b: btc });   // c/b for the hover tooltip
       }
     }
     return {
       btc: btc, contrib: contrib, endValue: btc * LAST_PX,
+      peak: peak, peakDay: peakDay,
       maxDD: maxDD, ddDay: ddDay, ddVal: ddVal,
       crossDay: crossDay, crossContrib: crossContrib, crossBtc: crossBtc,
       uwEver: uwEver, uwLen: uwLen, uwStart: uwStart, uwEnd: uwEnd,
       contribPts: contribPts, valuePts: valuePts,
       days: LAST_DAY - startDay + 1
     };
+  }
+
+  // ── forward band scenario: 10 more years of the same daily buy, from today,
+  //    on top of the accumulated stack. Three bands, never one. Presentation-
+  //    only (plPrice × band multiplier); no engine change to the retrospective. ──
+  var FWD_YEARS = 10;
+  function forwardBands(existingBtc, amt){
+    var startFwd = (typeof TODAY_DAYS === 'number' ? TODAY_DAYS : LAST_DAY);
+    var endFwd = startFwd + Math.round(FWD_YEARS * 365.25);
+    // Two-band planning range (floor → trend). Upper-band excursions have been
+    // brief spikes, not places price stays (RETIREMENT_CALCULATOR_DESIGN canon),
+    // so upper is demoted to a caption clause — no $ figure computed here.
+    var bands = [
+      { key: 'floor', label: 'Floor', mult: (typeof PL_FLOOR === 'number' ? PL_FLOOR : 0.42) },
+      { key: 'trend', label: 'Trend', mult: 1.0 }
+    ];
+    return bands.map(function(b){
+      var fbtc = 0;
+      for (var d = startFwd + 1; d <= endFwd; d++){ fbtc += amt / (plPrice(d) * b.mult); }
+      var endPx = plPrice(endFwd) * b.mult;
+      var total = existingBtc + fbtc;
+      return { key: b.key, label: b.label, mult: b.mult, forwardBtc: fbtc, totalBtc: total, value: total * endPx, endDay: endFwd };
+    });
+  }
+
+  // ── annualized return: money-weighted IRR on the actual daily cashflow, and
+  //    the naive lump-sum-on-day-one CAGR-equivalent (tooltip contrast only).
+  //    IRR ≠ (value/invested)^(1/years): that treats every dollar as invested on
+  //    day one and understates a DCA stream. Solve amt·Σ(1+r)^t_i = value; the
+  //    daily flows are evenly spaced, so Σ is a closed-form geometric sum. ──
+  function annualReturns(startDay, amt, currentValue, valDay){
+    var N = LAST_DAY - startDay + 1;
+    var years = N / 365.25;
+    var naive = (currentValue > 0 && amt > 0 && years > 0) ? Math.pow(currentValue / (amt * N), 1 / years) - 1 : 0;
+    function f(r){
+      var g = Math.pow(1 + r, 1 / 365.25);
+      var sum = (Math.abs(g - 1) < 1e-12) ? N : Math.pow(g, valDay - LAST_DAY) * (Math.pow(g, N) - 1) / (g - 1);
+      return amt * sum - currentValue;
+    }
+    var lo = -0.9, hi = 10;
+    if (f(lo) > 0) return { irr: lo, naive: naive };
+    if (f(hi) < 0) return { irr: hi, naive: naive };
+    for (var i = 0; i < 80; i++){ var mid = (lo + hi) / 2; if (f(mid) > 0) hi = mid; else lo = mid; }
+    return { irr: (lo + hi) / 2, naive: naive };
   }
 
   // ── state ──
@@ -114,6 +159,12 @@
     var mult = r.contrib > 0 ? valueNow / r.contrib : 0;
     setNum('dcMultiple', mult.toFixed(2) + '×');
 
+    // annualized return — money-weighted IRR, with a live CAGR-contrast tooltip
+    var ret = annualReturns(S.startDay, S.amt, valueNow, (typeof TODAY_DAYS === 'number' ? TODAY_DAYS : LAST_DAY));
+    setNum('dcAnnual', (ret.irr * 100).toFixed(1) + '% / yr');
+    var atip = $('dcAnnualTip');
+    if (atip) atip.innerHTML = 'CAGR describes one lump sum growing from day one. This habit’s dollars arrived daily across the whole period — most had far less time to grow. The money-weighted return (IRR) is the single rate that makes every actual daily buy grow to today’s value. For comparison: a lump sum of the same total invested on day one would have needed only ~' + (ret.naive * 100).toFixed(1) + '%/yr (CAGR) to reach the same outcome — that’s the fair use of the simpler number, and why it isn’t the headline here.';
+
     // underwater
     if (!r.uwEver || r.uwLen <= 0){
       setNum('dcUnderwater', 'Never');
@@ -126,6 +177,13 @@
     // deepest drawdown
     setNum('dcDrawdown', (r.maxDD*100).toFixed(1).replace('-', '−') + '%');
     $('dcDrawdownSub').innerHTML = 'peak-to-trough on the stack, trough ' + longDate(r.ddDay);
+
+    // peak value — "what might have been", hindsight only
+    setNum('dcPeak', usdCompact(r.peak));
+    if ($('dcPeakSub')) $('dcPeakSub').innerHTML = 'reached ' + longDate(r.peakDay) + ' &mdash; visible only in the rearview mirror';
+
+    // forward band scenario + retirement handoff
+    renderForward(r.btc);
 
     // the sentence readout above the chart
     var lead;
@@ -145,6 +203,37 @@
     syncControls();
   }
   function setNum(id, v){ var e = $(id); if (e) e.textContent = v; }
+
+  // ── forward band cards + retirement handoff ──
+  function renderForward(existingBtc){
+    if (!$('dcFwd')) return;
+    var bands = forwardBands(existingBtc, S.amt);
+    bands.forEach(function(b){
+      var v = $('dcFwdVal-' + b.key), c = $('dcFwdBtc-' + b.key);
+      if (v) v.textContent = usdCompact(b.value);
+      if (c) c.textContent = '+' + b.forwardBtc.toFixed(4) + ' BTC bought';
+    });
+    var yr = (typeof TODAY_DAYS === 'number') ? dayToDate(TODAY_DAYS + Math.round(FWD_YEARS*365.25)).getUTCFullYear() : '';
+    if ($('dcFwdYear')) $('dcFwdYear').textContent = String(yr);
+    // T4 — the second-decade insight (numbers live from the two paths)
+    var floorB = bands[0], trendB = bands[1];
+    var ratio = trendB.forwardBtc > 0 ? floorB.forwardBtc / trendB.forwardBtc : 0;
+    if ($('dcFwdInsight')) $('dcFwdInsight').innerHTML =
+      'The same habit that accumulated <strong>' + existingBtc.toFixed(2) + ' BTC</strong> in its first decade adds only about <strong>' +
+      trendB.forwardBtc.toFixed(2) + ' BTC</strong> on the trend path in its second &mdash; the trend has moved, and the cheap-coin decade does not repeat. Along the floor path the habit gathers ' +
+      (ratio >= 1.9 ? 'more than twice' : 'about ' + ratio.toFixed(1) + '×') +
+      ' as many coins as along the trend &mdash; lower prices are the accumulator’s friend.';
+    // handoff: carry the accumulated stack + this habit as a monthly DCA into Retirement
+    var link = $('dcHandoff');
+    if (link){
+      var stackParam = existingBtc.toFixed(2);
+      var dcaMonthly = Math.round(S.amt * 30.4);
+      link.setAttribute('href', '/the-bitcoin-retirement.html?stack=' + stackParam + '&dca=' + dcaMonthly);
+      if ($('dcHandoffNote')) $('dcHandoffNote').innerHTML =
+        'Carries your <strong>' + existingBtc.toFixed(2) + ' BTC</strong> stack and this habit as a <strong>$' +
+        dcaMonthly.toLocaleString() + '/mo</strong> contribution (≈ $' + S.amt + '/day × 30.4).';
+    }
+  }
 
   // ── chart: contributions (muted) vs stack value (amber), linear Y ──
   function drawChart(r){
@@ -179,14 +268,24 @@
           ticks: { color: '#6a6256', font: { size: 10 }, callback: function(v){ return usdCompact(v); } }
         }
       },
+      interaction: { mode: 'index', intersect: false },   // hover/tap a date → full readout; touch-friendly
       plugins: {
         legend: { display: true, position: 'top', labels: { color: '#9a9080', font: { size: 11, family: 'Inter' }, boxWidth: 12, padding: 14, usePointStyle: true, filter: function(l){ return l.text === 'Stack value' || l.text === 'Contributions'; } } },
         tooltip: {
           backgroundColor: 'rgba(10,9,8,0.95)', titleColor: '#f2eee8', bodyColor: '#d0c8c0',
-          borderColor: 'rgba(224,148,34,0.3)', borderWidth: 1, padding: 10, displayColors: false,
+          borderColor: 'rgba(224,148,34,0.3)', borderWidth: 1, padding: 11, displayColors: false,
+          filter: function(item){ return item.datasetIndex === 0 && item.raw && item.raw.c != null; }, // read the value series only
           callbacks: {
-            title: function(items){ return longDate(items[0].raw.x); },
-            label: function(item){ return item.dataset.label + ': ' + usd(item.raw.y); }
+            title: function(items){ return items.length ? longDate(items[0].raw.x) : ''; },
+            label: function(item){
+              var p = item.raw, m = p.c > 0 ? (p.y / p.c) : 0;
+              return [
+                'Contributions: ' + usd(p.c),
+                'Stack value: ' + usd(p.y),
+                'BTC held: ' + p.b.toFixed(4),
+                'Multiple: ' + m.toFixed(2) + '×'
+              ];
+            }
           }
         }
       }
