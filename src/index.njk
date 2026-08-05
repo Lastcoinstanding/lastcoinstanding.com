@@ -3,6 +3,11 @@ layout: base.njk
 permalink: /index.html
 slug: index
 feedback: false
+# Get Updates opt-out: the homepage suppresses the automatic layout-level
+# footer placement (base.njk) and instead includes the block manually higher
+# up — after the hero/ticker intro, before the main content sections (JM,
+# 2026-08-07). Still exactly one instance. See SITE_GUIDE §44.
+get_updates: false
 # Channel Ribbon opt-out: the homepage's own bitcoin-ticker strip (below the
 # hero) already carries the price · ×trend · zone read, so the ribbon would
 # stack a near-identical strip under it. See STYLE_GUIDE §6.38.
@@ -39,6 +44,13 @@ eleventyComputed:
         <span class="ticker-cta">see the channel &rarr;</span>
     </a>
 </section>
+
+
+{# Get Updates — placed manually here (after the hero/ticker intro, before the
+   main content sections) rather than at the layout-level footer position, which
+   the front-matter `get_updates: false` suppresses for the homepage only. One
+   instance. See SITE_GUIDE §44. #}
+{% include 'components/get-updates.njk' %}
 
 
 <!-- FEATURED INSIGHTS CAROUSEL -->

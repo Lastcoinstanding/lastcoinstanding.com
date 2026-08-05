@@ -2381,3 +2381,31 @@ Worst-day / cycle-top start presets remain consciously deferred by JM — no cyc
 
 ### Essay back-link
 The page links the Substack essay; JM edits the essay post-launch to link back (reminder logged at ship).
+
+
+## 44. Get Updates (site-wide owned-audience component)
+
+**What it is.** A quiet, single-row house block on every slugged page channeling readers to the newsletter. **Substack-first** (JM approved the shape 2026-08-07): the list lives on Substack — exportable, so still *owned* — and the site's only job is to send readers there. It is the site's answer to the structural weakness that explorations are read once: a way to make the audience returnable without renting it from an algorithm.
+
+**Where it lives.** `src/_includes/components/get-updates.njk` (markup + self-contained `.gu-*` styles, no JS), included once from `base.njk` **above** the page-feedback widget, gated `{% if slug and get_updates != false %}`. Every slugged page inherits it automatically at that layout-level position. Opt a page out with `get_updates: false` front matter. Rendered order in the layout tail: content → FAQ → related → **Get Updates** → feedback → share → footer.
+
+**Homepage exception (JM, 2026-08-07).** The homepage sets `get_updates: false` to suppress the automatic footer placement, then includes the component *manually* higher up — in `src/index.njk`, after the hero/ticker intro and **before** the main content sections (the carousel and the concept-card grid). Still exactly one instance; just positioned where a landing page wants the subscribe prompt rather than at the tail. The homepage also opts out of the feedback widget (`feedback: false`), so it carries Get Updates and no feedback block.
+
+**No third-party assets (R1 — the defining constraint).** It is a styled house block with a single button/link to the Substack subscribe page — **NOT the Substack iframe embed.** Zero third-party scripts, zero iframes, zero new privacy surface (the QA confirms no third-party network requests are added). One extra click is the price of that, and it fits this site. If the block is ever rebuilt, this no-iframe rule holds.
+
+**The subscribe URL.** `https://lastcoinstanding.substack.com/subscribe?utm_source=site`. The `?utm_source=site` is analytics-lite (B4): it lets Substack's own stats distinguish site-driven subscribers, feeding the Reach plan's funnel metric. Keep the UTM if the URL is ever edited.
+
+**Register copy (canon — reuse verbatim if rebuilt; JM may wordsmith at eyeball but this is the register to hold):**
+- Heading: "Get the essays and tool updates"
+- Body: "A few emails a month when something new ships — an essay, a new tool, a meaningful update. No funnel, nothing for sale, unsubscribe anytime."
+- Button: "Subscribe on Substack →"
+
+Per `claude/FUNDING_STRATEGY`'s no-funnel commitment: promises little and means it — update-only, no drip sequence, no upsell.
+
+**The firewall with the feedback widget (§27) — restated, now moot in practice but load-bearing.** The feedback widget collects **optional reply emails** under a "never published, replies only" promise. Those addresses are **never** used for updates and never become the newsletter list — a consent violation would be the single most brand-damaging move on a "no funnel, nothing for sale" site. Get Updates is the newsletter's own opt-in surface with its own promise; the two channels stay separate by construction (distinct components, distinct destinations — Substack vs. the private KV pipeline).
+
+**Upgrade path (deferred).** A **native on-site list** — own the addresses directly rather than via Substack — is the documented fallback *if Substack ever constrains*. It would reuse the feedback widget's Cloudflare-Function + KV plumbing (`functions/api/feedback.js`). Not needed while Substack export keeps the list owned. Tracked in PAGE_IDEAS_BACKLOG ("Owned audience").
+
+**Refresh surface.** None — the subscribe URL is static. Nothing to add to MONTHLY_REFRESH_CHECKLIST.
+
+**History.** Built Substack-first per the 2026-08-07 build prompt (branch `feat/get-updates-substack`); QA'd at 375px + desktop against a static harness (no Node locally), confirmed single-row → stacked with no horizontal overflow and zero third-party requests. Backlog "Owned audience" entry marked shipped in the same PR; `claude/REACH_GROWTH_PLAN`'s "email capture" line is now live (project-only doc, updated out-of-repo).

@@ -1,0 +1,53 @@
+<!-- ─── Get Updates (owned-audience channel → Substack subscribe) ───
+     Layout-level component (base.njk), gated on front matter, rendered ABOVE the
+     page-feedback widget. A styled HOUSE block — NOT the Substack iframe embed:
+     zero third-party scripts, zero iframes, zero new privacy surface. One extra
+     click is the price of that. The single button links to the Substack subscribe
+     page with ?utm_source=site so Substack's stats can attribute site-driven
+     subscribers (feeds the Reach plan's funnel metric).
+
+     Firewall (restated, now moot in practice): the addresses collected by the
+     page-feedback widget are NEVER used for updates — that widget's "never
+     published, replies only" promise stands untouched. This block owns the
+     newsletter opt-in; the feedback widget owns the private reply channel.
+
+     Register per FUNDING_STRATEGY's no-funnel commitment — promises little and
+     means it. Copy canon lives in SITE_GUIDE (Get Updates section); reuse verbatim
+     if rebuilt. Visually quiet single-row block: heading + body on the left, one
+     button on the right; stacks on narrow viewports. See STYLE_GUIDE and R2. -->
+<style>
+.gu-wrap { max-width: 880px; margin: 3.5rem auto 0; padding: 0 2rem; font-family: 'Inter', -apple-system, sans-serif; }
+.gu-inner {
+  display: flex; align-items: center; justify-content: space-between; gap: 1.6rem;
+  background: rgba(224,148,34,0.04); border: 1px solid rgba(224,148,34,0.18);
+  border-radius: 10px; padding: 1.3rem 1.6rem;
+}
+.gu-text { flex: 1 1 auto; min-width: 0; }
+.gu-heading { font-size: 1rem; font-weight: 600; color: #f2eee8; margin: 0 0 0.3rem; letter-spacing: 0.01em; }
+.gu-body { font-size: 0.85rem; font-weight: 300; line-height: 1.55; color: rgba(255,255,255,0.55); margin: 0; max-width: 54ch; }
+.gu-btn {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 0.45rem;
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: #e09422; background: rgba(224,148,34,0.07); border: 1px solid rgba(224,148,34,0.55);
+  border-radius: 999px; padding: 0.65rem 1.5rem; text-decoration: none; white-space: nowrap;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+.gu-btn:hover, .gu-btn:focus-visible { color: #f2eee8; background: rgba(224,148,34,0.16); border-color: rgba(224,148,34,0.75); outline: none; }
+.gu-btn .gu-arrow { font-size: 0.95em; line-height: 1; }
+@media (max-width: 640px) {
+  .gu-wrap { padding: 0 1rem; margin-top: 3rem; }
+  .gu-inner { flex-direction: column; align-items: flex-start; gap: 1.1rem; padding: 1.2rem 1.3rem; }
+  .gu-btn { align-self: stretch; justify-content: center; }
+}
+</style>
+<section class="gu-wrap" aria-label="Get updates by email">
+  <div class="gu-inner">
+    <div class="gu-text">
+      <p class="gu-heading">Get the essays and tool updates</p>
+      <p class="gu-body">A few emails a month when something new ships &mdash; an essay, a new tool, a meaningful update. No funnel, nothing for sale, unsubscribe anytime.</p>
+    </div>
+    <a class="gu-btn" href="https://lastcoinstanding.substack.com/subscribe?utm_source=site" target="_blank" rel="noopener">
+      Subscribe on Substack <span class="gu-arrow" aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+</section>
