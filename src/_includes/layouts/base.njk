@@ -488,6 +488,15 @@ h1, h2, h3 {
    Component self-guards: renders nothing unless `related:` front matter exists. #}
 {% include 'components/related.njk' %}
 
+{# Get Updates — owned-audience channel to the Substack subscribe page. Default-on
+   for every slugged page (all explorations + homepage), opt out with
+   `get_updates: false` front matter. Rendered ABOVE the feedback widget by design
+   (B1): the newsletter opt-in and the private reply channel are distinct surfaces,
+   and the firewall between them is deliberate — feedback emails are NEVER used for
+   updates. A house block, not the Substack iframe: no third-party assets. See
+   SITE_GUIDE (Get Updates section). #}
+{% if slug and get_updates != false %}{% include 'components/get-updates.njk' %}{% endif %}
+
 {# Page feedback widget — default-on for every page with a slug (all explorations,
    current and future). Hub/utility pages opt out with `feedback: false` front matter.
    Layout-level by design: see SITE_GUIDE §27. #}
