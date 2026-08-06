@@ -224,7 +224,7 @@
     // Personal capital with a deadline — same logic, other lens.
     if (S.lens === 'personal' && S.canWait === 'no'){
       return '<p class="hr-v-lead">The hurdle does not apply to capital with a deadline.</p>' +
-        '<p class="hr-v-body">Bitcoin&rsquo;s trend return is realised only by capital that can hold through a roughly &minus;73% drawdown without being forced to sell. Money that has to be spent on a fixed date can be caught in a drawdown at exactly the wrong moment, so the trend rate is not the benchmark for it. For this use, the certain, dated alternative is the honest comparison &mdash; not bitcoin&rsquo;s trend.</p>';
+        '<p class="hr-v-body">Bitcoin&rsquo;s trend return is realised only by capital that can hold through a roughly &minus;73% drawdown without being forced to sell. Money that has to be spent on a fixed date can be caught in a drawdown at exactly the wrong moment, so the trend rate is not the benchmark for it. For this use, the certain, dated alternative is the comparison that holds &mdash; not bitcoin&rsquo;s trend.</p>';
     }
 
     var cr = crossing();
