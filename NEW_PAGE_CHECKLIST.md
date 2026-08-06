@@ -33,6 +33,17 @@ One check is NOT assumed and must be made explicitly before shipping:
   blocks on mixed-content pages are 880px with `margin: 0 auto`; no
   paragraph-level max-widths anywhere.
 
+- [ ] **The page defines its own `:root` palette AND a dark-canvas
+  mechanism.** base.njk deliberately provides neither a palette nor a page
+  background (a page `:root` renders after its blocks and wins). So a page's
+  CSS must declare `:root { --bg / --text / --amber / --border … }` (copy
+  the canonical set from `the-power-law.css`) **and** paint the dark canvas
+  one of two ways: `body { background: var(--bg); color: var(--text) }` (the
+  majority pattern) **or** `<meta name="color-scheme" content="dark">` in the
+  head (the 11-page pattern). Omit both and var-based colours fall back to
+  canvastext on the browser's light canvas — washed-out hero, black/white
+  var-based borders. Bit the Bitcoin Hurdle Rate page (Aug 2026).
+
 ## 2. Eleventy/build wiring
 
 Verify the page's front-matter has the four expected fields:
