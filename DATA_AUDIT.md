@@ -120,6 +120,14 @@ The Power Law constants (BR-1 through BR-3) duplicate the canonical PL-1 row; do
 
 The Disciplined Rebalancing page applies the same Power Law channel as `/the-bitcoin-retirement` and `/bitcoin-vs-real-estate#projection`. Constants `PL_A`, `PL_B`, `PL_FLOOR`, `PL_CEIL` are copied locally from PL-1 / BR-1 to BR-3 (no separate citation rows needed). Historical price series (`PL_DATA`) is the canonical Power Law dataset, sourced via the shared module `/_pageassets/shared/power-law-data.js`.
 
+### bitcoin-fixed-income
+
+| # | Component | Value | Source | URL | Last audited | Next due |
+|---|---|---|---|---|---|---|
+| BFI-1 | Bitcoin trend-CAGR editorial figure (spectrum card + prose ×2) | ~28%, 10–15yr-forward basis | Derived from PL-1 coefficients via `trendCAGR(t,H)`; 10yr-fwd = 29.7%, 15yr-fwd = 26.8% at t=6,424 (2026-08-06); ~28% ≈ 12.7yr-fwd | (same as PL-1) https://www.porkopolis.io/thechart/ | 2026-08-06 | 2026-11-06 |
+
+**BFI-1 (added 2026-08-06, `/the-bitcoin-hurdle-rate` build).** The `~28%` on the instrument-spectrum card and in two prose passages is **hardcoded static text** — the page's calculator computes scenario CAGRs live off the shared module (correct `PL_B`, no local exponent), but these three headline figures are not injected. Windowed to a "10–15-year-forward" basis in the hurdle-rate build so it names its window and reconciles with that page's live readouts (10yr 29.7% / 15yr 26.8% bracket 28%). Drift is slow and downward (a widening band absorbs it); the "declining" label and this as-of row track it. Not an exponent conflict with PL-1 — verified during the §2.3 reconciliation gate. Re-check the figure at PL-1's next audit; if the window band no longer brackets the stated 28%, restate it.
+
 ---
 
 ## Architectural change log
