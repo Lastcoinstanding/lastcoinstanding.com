@@ -473,6 +473,29 @@ CARDS = [
         },
         "output_filename": "og-strc-below-par.jpg",
     },
+    {
+        "name": "hurdle",
+        "url": "https://lastcoinstanding.com/the-bitcoin-hurdle-rate",
+        "hero_selector": "#hrChart",
+        "wait_after_navigate_ms": 1500,
+        "wait_after_scroll_ms": 3500,
+        "chrome": {
+            "title": "The Bitcoin ",
+            "titleAccent": "Hurdle",
+            "titleAfter": " Rate",
+            "subtitle": "Does it beat bitcoin? The bar any use of capital has to clear — and why it falls as your horizon lengthens.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">Declining hurdle</strong>'
+                '  ·  bitcoin’s trend CAGR, matched to your horizon  ·  candidate return vs. the bar'
+            ),
+            "urlText": "lastcoinstanding.com/the-bitcoin-hurdle-rate",
+        },
+        # NOTE: plain filename, not -v2 — no og-the-bitcoin-hurdle-rate.jpg has
+        # ever existed/deployed (the page is unmerged, PR #40), so there is no
+        # cached card on X to bust. The page head already references this exact
+        # path; regen alone lands the asset. See OG_ASSET_HANDOFF.md.
+        "output_filename": "og-the-bitcoin-hurdle-rate.jpg",
+    },
 ]
 
 
