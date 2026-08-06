@@ -297,14 +297,21 @@ Captured during the merge pass, because the backlog is now large enough that the
   - **Sub-topic (in or out):** *why altcoins are stillborn* — see above; leaning out, decide at drafting.
   - **May also absorb:** The Big Long's sub-claim (e), fiat/bitcoin incompatibility — settle the boundary at drafting.
 
-- [ ] **Bitcoin's CAGR as the new hurdle rate.** Arguably the highest-value idea in the backlog **for the asset-management ambition specifically**.
+- [x] **Bitcoin's CAGR as the new hurdle rate.** **SHIPPED 2026-08-06** as a standalone page — `/the-bitcoin-hurdle-rate` (build commit `1ab4ea4`; merge SHA TBD at merge). Design `HURDLE_RATE_DESIGN.md`, build order `HURDLE_RATE_BUILD_PROMPT.md`, SITE_GUIDE §45. Both counters below were resolved: (1) risk-adjustment → the access-conditioned hurdle (design §4.3c) — floor-path band + verdict-changing "can the capital wait? / is the business cashflow positive?" gates; Sharpe dropped (needs a project vol the reader lacks). (2) The declining hurdle is the page's spine, not a caveat. The §2.3 cross-page CAGR-window leak was closed in the same PR (the bare "~28%" was on `/bitcoin-fixed-income`, not the retirement page as premised — windowed to a 10–15-yr-forward basis; DATA_AUDIT BFI-1). Original entry preserved below.
   Surfaced 2026-08-02.
   - **Concept:** the corporate-finance framing. If bitcoin's trend CAGR is X%, any project or investment returning less than X% destroys value relative to simply holding bitcoin. **This is how a CFO and an allocator actually think** — it makes the bitcoin case in the audience's own native language, with no ideology required.
   - **Explanatory power:** it accounts for treasury-company behaviour (why hold cash, why buy back stock, why issue against the stack) without appeal to conviction — and it generalises the opportunity-cost argument that runs implicitly under most of the site.
   - **Two counters the entry must carry:**
     1. **Hurdle rates are risk-adjusted.** A naive CAGR comparison overstates the hurdle given bitcoin's volatility — needs a vol- or Sharpe-adjusted treatment to be honest.
     2. **The hurdle declines over time** by the Doubling Ladder's own structure (trend CAGR ~28% today → ~14% in 2045 → ~10% in 2065, per the retirement calculator's live computation). That is itself the interesting finding, not a caveat to bury.
-  - **Placement — open:** own short piece vs. a section inside an existing page. Natural homes: `/the-power-law` (Power Law v2), `/bitcoin-vs-the-stock-market`, or standalone.
+  - **Placement — open:** own short piece vs. a section inside an existing page. Natural homes: `/the-power-law` (Power Law v2), `/bitcoin-vs-the-stock-market`, or standalone. **[Resolved: standalone — see the SHIPPED note above.]**
+
+- [ ] **The Bitcoin Hurdle Rate — fuller corporate treatment (v2).**
+  Surfaced 2026-08-06 (deferred from the v1 hurdle-rate build, design §10.3).
+  - **Concept:** the three-way readout v1 deferred — project **IRR vs. WACC vs. the bitcoin hurdle**, the comparison a CFO actually runs (v1 is two-way: candidate vs. hurdle). Adds **funding-source mechanics** (debt- vs. equity-funded decisions differ), **accounting-treatment constraints** under fair-value **ASU 2023-08** (bitcoin's swings hit earnings — a real constraint on decisions, though not an economic cost), and the **second-engine analysis at length** (bitcoin on the balance sheet as a compounding engine alongside operations).
+  - **Limit that must travel with it (load-bearing):** the hurdle applies to *surplus* capital at the margin, **never** to the capital that generates the cashflow — a company that stops maintaining its core business stops producing the cash that buys the bitcoin. Without this the passage is advocacy (design §2.2 blocking limit).
+  - **Fence:** this is the *general corporate principle* extended. The **MSTR entry owns the single-company examination** — one cross-link each way when that page exists; **no single-security analysis here** (it drags counsel attention onto a page that otherwise needs none).
+  - **Home:** most likely a Company-lens deepening of `/the-bitcoin-hurdle-rate` (a third readout or an expanded lens), not a new page — decide at promotion.
 
 - [ ] **Second-order effects of bitcoin adoption — essay.**
   Surfaced 2026-08-02.
