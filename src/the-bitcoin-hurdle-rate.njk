@@ -1,0 +1,201 @@
+---
+layout: base.njk
+permalink: /the-bitcoin-hurdle-rate.html
+slug: the-bitcoin-hurdle-rate
+related:
+  - slug: bitcoin-vs-the-stock-market
+    desc: "Once bitcoin is your benchmark, the equity comparator is the next question. This page sets the bar; that one measures the S&amp;P and NASDAQ against it over the horizon you choose."
+  - slug: the-doubling-ladder
+    desc: "Where the declining hurdle comes from. The trend that sets the bar steps down over time; the Doubling Ladder maps those steps and the wave around them, one horizon at a time."
+  - slug: bitcoin-vs-real-estate
+    desc: "The hurdle applied to the most common personal capital decision. If your candidate is a house, this page compares the mortgage, the ownership costs, and the equity path against holding bitcoin instead."
+  - slug: borrowing-against-your-stack
+    desc: "The other way past the access condition. If the capital can&rsquo;t wait, borrowing against the stack is how holders raise cash without selling into a drawdown &mdash; with its own risks laid out."
+faq:
+  - q: "What is a hurdle rate, and why would bitcoin be one?"
+    a: "A hurdle rate is the minimum return an investment must clear to be worth doing instead of the next-best use of the money. Corporate finance measures projects against the cost of capital; a project that returns less destroys value. For anyone who holds bitcoin or could, bitcoin&rsquo;s trend growth is a candidate hurdle: money put into something returning less than bitcoin&rsquo;s trend has, over that horizon, been the lower-returning choice &mdash; if the trend holds and the capital can wait through a drawdown. It is opportunity cost, not a monetary thesis."
+  - q: "What is the opportunity cost of holding bitcoin &mdash; or of not holding it?"
+    a: "Every capital decision is measured against its next-best alternative. If bitcoin&rsquo;s trend has grown faster than a given use of capital over the relevant horizon, then choosing that use instead of bitcoin has an opportunity cost equal to the gap &mdash; and choosing bitcoin over a use with a deadline or a liquidity need has the opposite cost. The tool computes the gap at a horizon you set; which side it falls on depends entirely on the horizon and on whether the capital can wait."
+  - q: "Is bitcoin a better investment than paying off my mortgage?"
+    a: "It depends on the horizon and on whether the money can wait. Paying down a 6% mortgage returns a guaranteed, after-tax 6%; bitcoin&rsquo;s trend return is higher over most horizons but is realised only by capital that can hold through a roughly &minus;73% drawdown without being forced to sell. Set your mortgage rate and horizon in the Personal lens above and the tool shows where the two cross. It is not advice &mdash; the mortgage is a certain return with no drawdown, which is worth something the arithmetic gap alone does not capture."
+  - q: "Why do companies hold bitcoin instead of cash?"
+    a: "A high hurdle explains it without any appeal to conviction. Cash held at money-market rates returns a few percent; if bitcoin&rsquo;s trend has grown faster over the horizon a treasury is managing, holding cash rather than bitcoin carries an opportunity cost, and behaviours like issuing debt against the stack or buying back stock follow from the same gap. The condition is that the business is cashflow positive &mdash; a company that may be forced to sell into a drawdown to meet obligations does not have capital that can wait, and the hurdle does not apply to it."
+  - q: "Is bitcoin&rsquo;s hurdle rate a single number?"
+    a: "No, and that is the central finding. The hurdle declines with the horizon of the decision, because the power law&rsquo;s growth rate decays with age. On a one-year-forward window bitcoin&rsquo;s trend growth is higher; on a thirty-year-forward window it is much lower. A three-year equipment purchase is measured against a different bar than a thirty-year infrastructure asset. Comparing every decision to one headline CAGR is wrong in a direction that matters &mdash; the tool matches the bar to your horizon."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/the-bitcoin-hurdle-rate-head.html' %}"
+  page_styles: "{% include '_pageassets/the-bitcoin-hurdle-rate.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/the-bitcoin-hurdle-rate.js' %}"
+---
+
+<section class="hero">
+  <h1>The Bitcoin <em>Hurdle Rate</em></h1>
+  <p class="hero-sub">Every capital decision is a comparison against the next-best use of the money. For anyone who holds bitcoin, or could, its trend growth is a candidate benchmark. <strong>Does it beat bitcoin?</strong> &mdash; if the trend holds, and the capital can wait.</p>
+  <p class="hero-lead">A tool for CFOs, treasurers, and individual holders weighing a capital decision: enter the return you&rsquo;re testing and the horizon of the decision, and see bitcoin&rsquo;s trend hurdle matched to that horizon &mdash; and where your number crosses it. The hurdle is derived from bitcoin&rsquo;s long-run <a href="/the-power-law.html">Power Law trend</a>, the same model, read at the horizon you choose.</p>
+</section>
+
+<div class="hr-page">
+
+  {% include 'components/tool-framing.njk' %}
+
+  <section class="hr-calc" id="explore" aria-label="The hurdle-rate calculator">
+
+    <!-- ============ SHARED INPUTS ============ -->
+    <div class="hr-inputs">
+      <div class="hr-field">
+        <label class="hr-label" for="hrReturn">The return you&rsquo;re testing
+          <span class="hr-label-note">the candidate use of capital</span>
+        </label>
+        <div class="hr-field-row">
+          <input type="range" id="hrReturn" class="hr-slider" min="0" max="50" step="0.5" value="12"
+                 aria-label="Candidate annual return, percent">
+          <div class="hr-num-wrap">
+            <input type="number" id="hrReturnNum" class="hr-num" min="0" max="50" step="0.5" value="12"
+                   aria-label="Candidate annual return, numeric entry">
+            <span class="hr-num-unit">%/yr</span>
+          </div>
+        </div>
+        <div class="hr-tax-toggle" role="group" aria-label="Is the candidate return pre-tax or post-tax?">
+          <button type="button" class="hr-seg active" data-tax="pretax" aria-pressed="true">Pre-tax</button>
+          <button type="button" class="hr-seg" data-tax="posttax" aria-pressed="false">Post-tax</button>
+          <span class="hr-seg-help" id="hrTaxNote"></span>
+        </div>
+      </div>
+
+      <div class="hr-field">
+        <label class="hr-label" for="hrHorizon">The horizon of the decision
+          <span class="hr-label-note">how long the capital is committed</span>
+        </label>
+        <div class="hr-field-row">
+          <input type="range" id="hrHorizon" class="hr-slider" min="1" max="40" step="1" value="10"
+                 aria-label="Decision horizon, years">
+          <div class="hr-num-wrap">
+            <input type="number" id="hrHorizonNum" class="hr-num" min="1" max="40" step="1" value="10"
+                   aria-label="Decision horizon, numeric entry">
+            <span class="hr-num-unit">yr</span>
+          </div>
+        </div>
+        <p class="hr-field-cap">The bar falls as the horizon lengthens. A three-year purchase is measured against a higher trend rate than a thirty-year asset &mdash; that is the point of matching the window.</p>
+      </div>
+    </div>
+
+    <!-- ============ LENS TOGGLE (§6.17) ============ -->
+    <div class="calc-mode-toggle hr-lens" data-active-mode="company" role="tablist" aria-label="Choose your lens">
+      <button type="button" class="calc-mode-label company active"
+              data-mode="company" role="tab" aria-selected="true"
+              aria-controls="calc-mode-company">
+        <span class="calc-mode-name">Company</span>
+        <span class="calc-mode-sub">Does this project clear the bar?</span>
+      </button>
+      <button type="button" class="calc-mode-switch" aria-label="Switch lens">
+        <span class="calc-mode-thumb"></span>
+      </button>
+      <button type="button" class="calc-mode-label personal"
+              data-mode="personal" role="tab" aria-selected="false"
+              aria-controls="calc-mode-personal">
+        <span class="calc-mode-name">Personal</span>
+        <span class="calc-mode-sub">Does this use of money clear the bar?</span>
+      </button>
+    </div>
+
+    <!-- ============ LENS-SPECIFIC INPUTS ============ -->
+    <div class="calc-mode-content active hr-lens-panel" id="calc-mode-company" role="tabpanel" aria-label="Company lens inputs">
+      <div class="hr-field-inline">
+        <span class="hr-inline-label">Funding source</span>
+        <div class="hr-seg-group" role="group" aria-label="Funding source">
+          <button type="button" class="hr-seg active" data-funding="cash" aria-pressed="true">Cash</button>
+          <button type="button" class="hr-seg" data-funding="debt" aria-pressed="false">Debt</button>
+          <button type="button" class="hr-seg" data-funding="equity" aria-pressed="false">Equity</button>
+        </div>
+      </div>
+      <div class="hr-field-inline">
+        <span class="hr-inline-label">Is the business cashflow positive?</span>
+        <div class="hr-seg-group" role="group" aria-label="Is the business cashflow positive?">
+          <button type="button" class="hr-seg active" data-cashflow="yes" aria-pressed="true">Yes</button>
+          <button type="button" class="hr-seg" data-cashflow="no" aria-pressed="false">No</button>
+        </div>
+        <p class="hr-inline-cap">This is the corporate form of &ldquo;can the capital wait?&rdquo; A business that may be forced to sell into a drawdown to meet obligations does not have capital that can wait.</p>
+      </div>
+    </div>
+
+    <div class="calc-mode-content hr-lens-panel" id="calc-mode-personal" role="tabpanel" aria-label="Personal lens inputs">
+      <div class="hr-field-inline">
+        <span class="hr-inline-label">Where does the capital come from?</span>
+        <div class="hr-seg-group" role="group" aria-label="Capital source">
+          <button type="button" class="hr-seg active" data-capsrc="savings" aria-pressed="true">New savings</button>
+          <button type="button" class="hr-seg" data-capsrc="sale" aria-pressed="false">Sale from an existing stack</button>
+        </div>
+        <p class="hr-inline-cap" id="hrCapsrcCap">New savings: no switching cost. Selling from an existing stack makes capital-gains tax a real cost of switching, which belongs in the comparison.</p>
+      </div>
+      <div class="hr-field-inline">
+        <span class="hr-inline-label">Can this capital wait &mdash; and through what?</span>
+        <div class="hr-seg-group" role="group" aria-label="Can this capital wait?">
+          <button type="button" class="hr-seg active" data-canwait="yes" aria-pressed="true">Yes, through a drawdown</button>
+          <button type="button" class="hr-seg" data-canwait="limited" aria-pressed="false">Only for a while</button>
+          <button type="button" class="hr-seg" data-canwait="no" aria-pressed="false">No, it has a deadline</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ HERO OUTPUT — THE HURDLE CURVE ============ -->
+    <div class="hr-chart-block">
+      <div class="hr-chart-wrapper"><canvas id="hrChart" aria-label="Bitcoin's trend hurdle by horizon, with your candidate return"></canvas></div>
+      <p class="hr-chart-caption" id="hrChartCap">The <strong>amber curve</strong> is bitcoin&rsquo;s trend hurdle at every horizon &mdash; it declines because the trend&rsquo;s growth rate decays with age. The <strong>shaded band</strong> beneath it is the floor path: what the same capital returns if bitcoin only reaches its historical floor at your horizon rather than trend. Your <strong>candidate return</strong> is the flat line. Where the flat line crosses the curve is the answer. <span id="hrSpotNote" class="hr-spot-note"></span></p>
+    </div>
+
+    <!-- ============ REFRAIN #2 + VERDICT ============ -->
+    <p class="hr-refrain" aria-hidden="false">Does it beat bitcoin?</p>
+    <div class="hr-verdict" id="hrVerdict" role="status" aria-live="polite"><!-- filled by JS --></div>
+
+    <!-- ============ SECONDARY STAT STRIP ============ -->
+    <div class="hr-stats" id="hrStats" aria-label="At your chosen horizon"><!-- filled by JS --></div>
+
+    <!-- ============ PRESETS ============ -->
+    <div class="hr-presets">
+      <div class="hr-preset-group hr-preset-company">
+        <span class="hr-preset-label">Try a benchmark:</span>
+        <button type="button" class="hr-preset" data-preset-return="4.3" data-preset-lens="company">Money-market cash <span class="hr-preset-val">~4.3%</span></button>
+        <button type="button" class="hr-preset" data-preset-return="9" data-preset-lens="company">Typical corporate WACC <span class="hr-preset-val">~9%</span></button>
+        <button type="button" class="hr-preset" data-preset-return="10.86" data-preset-lens="company">S&amp;P 500 long-run TR <span class="hr-preset-val">10.86%</span></button>
+        <button type="button" class="hr-preset" data-preset-return="20" data-preset-lens="company">A strong project <span class="hr-preset-val">20%</span></button>
+      </div>
+      <div class="hr-preset-group hr-preset-personal">
+        <span class="hr-preset-label">Try a benchmark:</span>
+        <button type="button" class="hr-preset" data-preset-return="6" data-preset-lens="personal">Mortgage paydown <span class="hr-preset-val">~6%</span></button>
+        <button type="button" class="hr-preset" data-preset-return="4" data-preset-lens="personal">Savings account <span class="hr-preset-val">~4%</span></button>
+        <button type="button" class="hr-preset" data-preset-return="10.86" data-preset-lens="personal">Index fund <span class="hr-preset-val">10.86%</span></button>
+        <button type="button" class="hr-preset" data-preset-return="8" data-preset-lens="personal">Rental property <span class="hr-preset-val">~8%</span></button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============ THE QUESTION — the argument, on-page ============ -->
+  <section class="hr-essay essay">
+
+    <h2 class="hr-h2">What a hurdle rate is</h2>
+    <p class="hr-prose">Corporate finance already has a name and a machine for the comparison every capital decision makes. The hurdle rate is the minimum return a project must clear to be worth doing: a project that returns less than the cost of capital destroys value and should not be done. It is not a belief. It is opportunity cost &mdash; the recognition that money committed to one thing cannot be committed to another, so the right benchmark for any use of capital is the next-best use available.</p>
+    <p class="hr-prose">Nothing on this page asks the reader to adopt a monetary thesis. It asks only what a CFO and an allocator already accept as binding: that a return has to be measured against the alternative that was given up to earn it.</p>
+
+    <h2 class="hr-h2">Why bitcoin is a candidate benchmark</h2>
+    <p class="hr-prose">Under the <a href="/the-power-law.html">Power Law</a>, bitcoin&rsquo;s trend price scales with time, and its annualised trend growth is high but declining. That trend is a model, not a law: it holds until it doesn&rsquo;t, and every figure on this page inherits its uncertainty in full. What makes it a hurdle rather than a headline is that <strong>the growth rate depends on the horizon</strong>. On a one-year-forward window the trend grows faster; on a thirty-year-forward window it grows much more slowly, because the power law&rsquo;s rate decays with age. Comparing a thirty-year infrastructure decision to a one-year trend rate is the mistake this tool exists to prevent. Every rate the tool shows names the window it was measured over.</p>
+    <p class="hr-prose">The bar also depends on where bitcoin sits relative to trend when the capital is committed. Entering from below trend raises the realised return available; entering from above it lowers it. The floor path on the chart is the conservative reading of that &mdash; what the capital returns if bitcoin reaches only its historical floor at the horizon rather than its trend.</p>
+
+    <h2 class="hr-h2">What this explains</h2>
+    <p class="hr-prose">A high hurdle predicts treasury-company behaviour mechanically, with no appeal to anyone&rsquo;s conviction. If bitcoin&rsquo;s trend has grown faster than the return on cash, holding cash rather than bitcoin carries an opportunity cost &mdash; so a treasury holds bitcoin. If the trend has grown faster than the cost of debt, issuing debt to buy more can be accretive &mdash; so treasuries issue debt against the stack. Buybacks against a bitcoin-per-share metric follow from the same gap. An explanation that predicts behaviour is worth more than an argument that praises it.</p>
+
+    <h2 class="hr-h2">Where the two lenses diverge</h2>
+    <p class="hr-prose">The arithmetic is identical for a company and for a person. The frictions are not, and the divergence is the content.</p>
+    <p class="hr-prose"><strong>The company faces a constraint the individual doesn&rsquo;t.</strong> A CFO who understands the hurdle perfectly may still be unable to act &mdash; fiduciary duty, board tolerance, accounting treatment under fair-value rules that put bitcoin&rsquo;s swings through earnings, and career risk all sit between the arithmetic and the decision.</p>
+    <p class="hr-prose"><strong>The individual faces a constraint the company doesn&rsquo;t.</strong> A company can hold a volatile treasury asset on behalf of shareholders who chose the exposure. A person holding their whole net worth against a roughly &minus;73% drawdown may be forced to sell at the worst moment. The individual&rsquo;s effective hurdle is therefore lower than the arithmetic one, and honestly so.</p>
+    <p class="hr-prose"><strong>The two are the same question in different vocabulary.</strong> The personal lens asks whether the capital can wait. The corporate form of that identical condition is whether the business is cashflow positive. If it is not, bitcoin&rsquo;s volatility eats into survivability &mdash; the company may be forced to realise a drawdown to meet obligations, which is the corporate form of selling at the bottom &mdash; and the hurdle does not apply to it. If it is, volatility eats only into short-term optionality: the ability to act on opportunities during a drawdown, a real cost but a survivable one, and one that compresses over a long enough horizon.</p>
+    <p class="hr-prose">For most companies, bitcoin&rsquo;s trend growth is higher than the return on their own core operations, so bitcoin held on the balance sheet behaves as a second compounding engine running alongside the operating one. The limit is the whole of it: <strong>the hurdle applies to surplus capital at the margin, never to the capital that generates the cashflow in the first place.</strong> A company that stops maintaining its core business stops producing the cash that buys the bitcoin; the strategy is self-consuming past the margin. Stated with that limit, the second engine is a real observation about treasury behaviour. Stated without it, it is the advice this page does not give.</p>
+
+    <h2 class="hr-h2">What would break this</h2>
+    <p class="hr-prose">Two things, both load-bearing. First, the hurdle is only as high as the arithmetic that produced it, and the arithmetic overstates it: bitcoin&rsquo;s trend return is realised only by capital that can hold through the drawdown without being forced to sell. The number the tool shows is the ceiling on the hurdle, not the hurdle. It says nothing about capital with a deadline, a covenant, a payroll, or a liquidity need &mdash; and businesses produce things other than returns.</p>
+    <p class="hr-prose">Second, the hurdle is only as good as the model. Every figure here inherits the <a href="/the-power-law.html">power law</a>&rsquo;s uncertainty, including the possibility of a floor breach or a break in either direction. A hurdle derived from a model has to carry the model&rsquo;s caveats on the same screen as the number. The declining-hurdle finding is itself the most useful humility device available: the page&rsquo;s own arithmetic says the bar falls over time, and keeps falling.</p>
+    <p class="hr-close"><strong>Does it beat bitcoin?</strong> It is a question worth carrying into every capital decision &mdash; asked honestly, with the two conditions attached each time: the trend holds, and the capital can wait.</p>
+
+  </section>
+
+</div>

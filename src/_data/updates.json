@@ -1,6 +1,11 @@
 [
   {
     "display": "8/6/26",
+    "page": "/the-bitcoin-hurdle-rate.html",
+    "summary": "New: The Bitcoin Hurdle Rate — every capital decision is a comparison against the next-best use of the money, and for anyone who holds bitcoin the trend growth is a candidate benchmark. Enter the return you're testing and the horizon of the decision; the page computes bitcoin's trend hurdle matched to that window — higher over short horizons, lower over long ones, because the Power Law's growth rate decays with age — and shows where your number crosses it. Two lenses over one engine: a company asking whether a project clears the bar, and a person asking whether a use of money does. The hurdle applies to capital that can wait, at the margin — not to capital with a deadline, a covenant, or a payroll; where that condition fails, the page says the hurdle does not apply rather than pretending it does."
+  },
+  {
+    "display": "8/6/26",
     "page": "/what-daily-conviction-bought.html",
     "summary": "What Daily Conviction Bought gains one look ahead: an 'if the habit continued' block projects ten more years of the same daily buy along the Power Law's planning range — floor to trend, a range never a number — and hands the accumulated stack off to The Bitcoin Retirement. New stats too: an annualized return computed the money-weighted way (IRR, which honestly accounts for when each dollar arrived — not the flattering lump-sum CAGR), and a peak-value high 'visible only in the rearview mirror'. Plus a chart hover reading out contributions, value, BTC held, and multiple at any date. Still retrospective at its core; the forward look is a range, not a forecast."
   },
