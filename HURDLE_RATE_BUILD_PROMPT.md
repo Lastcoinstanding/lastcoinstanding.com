@@ -93,6 +93,13 @@ Present the hurdle as a band, never a single line (house floor/trend planning as
 - Spot comes from the site's existing live-price path. **`todayPriceIsLive` gating applies** — if
   spot is a stale fallback, the page must not label anything "live" (site-wide fix `9a83a97`).
 
+**BUILD OUTCOME (2026-08-06).** Shipped with the **trend hurdle curve = `trendCAGR(t,H)`** (the §2.2
+fixture) and the **floor-path band beneath = `spot→floor`**; the `spot→trend` "upper edge" above is
+**not** a chart line (it hits ~227%/yr at H=1 with spot on the floor today — breaches §4 flag 1 /
+overclaim and wrecks legibility) but a **secondary stat at the chosen horizon**. The engine computes
+all three series, so the choice is reversible. Full rationale: `HURDLE_RATE_DESIGN.md §4.2` BUILD
+OUTCOME.
+
 ## 3. UI
 
 ### 3.1 Hero (must satisfy §6.10a)

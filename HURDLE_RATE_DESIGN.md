@@ -183,6 +183,25 @@ planning asymmetry (`RETIREMENT_CALCULATOR_DESIGN_22`; reaffirmed in the WDCB v1
 **Upper channel is excluded**, per the WDCB v1.2 precedent — upper excursions are brief spikes and
 a hurdle computed off them would be dishonest in the flattering direction.
 
+**BUILD OUTCOME (2026-08-06) — what shipped, and why the literal `spot→trend` upper edge was not
+drawn.** The chart plots the **trend hurdle as `trendCAGR(t,H)` itself** (trend→trend, the §4.1
+fixture — 37.6%→21%), a single declining curve, with the **floor-path band beneath it drawn as the
+realised CAGR from today's spot to floor-at-horizon** (`spot→floor`). The `spot→trend` realised CAGR
+— the literal "upper edge" described above — is **not** drawn as a chart line: with bitcoin sitting
+on its floor (live spot ≈ 0.43× trend on 2026-08-06; floor is 0.42×), `spot→trend` reaches
+**~227%/yr at a one-year horizon**, because it bundles the entire discount-closing reversion into a
+single year. Rendering that as "the hurdle" would breach the §7 flag-1 overclaim and swamp the
+legible 20–40% band of the y-axis. Instead the reversion upside is surfaced as a **secondary stat at
+the chosen horizon** (`spot→trend`, ≈41%/yr at 10y today), labelled as the optimistic edge. This
+still satisfies §5.2's "declining trend hurdle with the floor-path band beneath it" (the trend curve
+is the upper line; the floor path is the band beneath it) and keeps §4.3(c)'s honesty — the
+conservative floor path is the bar, the reversion is upside, not the headline. The engine computes
+all three series (`trendCAGR`, `spot→trend`, `spot→floor`), so this is a presentation choice, not a
+data limitation. **The band nearly closes when spot sits on the floor:** floor-path ≈ trend curve
+(≈3.4 pts apart at H=1, a hairline beyond H=10 at today's 0.43×), widening as price rises above the
+floor — the entry-position insight this section anticipates, made visible in the band's *width*
+rather than in a runaway upper edge.
+
 ### 4.3 Risk adjustment — the hard part, and the page's credibility test
 
 The naive comparison ("your project returns 12%, bitcoin's trend returns 30%, so the project

@@ -128,6 +128,15 @@ The Disciplined Rebalancing page applies the same Power Law channel as `/the-bit
 
 **BFI-1 (added 2026-08-06, `/the-bitcoin-hurdle-rate` build).** The `~28%` on the instrument-spectrum card and in two prose passages is **hardcoded static text** — the page's calculator computes scenario CAGRs live off the shared module (correct `PL_B`, no local exponent), but these three headline figures are not injected. Windowed to a "10–15-year-forward" basis in the hurdle-rate build so it names its window and reconciles with that page's live readouts (10yr 29.7% / 15yr 26.8% bracket 28%). Drift is slow and downward (a widening band absorbs it); the "declining" label and this as-of row track it. Not an exponent conflict with PL-1 — verified during the §2.3 reconciliation gate. Re-check the figure at PL-1's next audit; if the window band no longer brackets the stated 28%, restate it.
 
+### the-bitcoin-hurdle-rate
+
+| # | Component | Value | Source | URL | Last audited | Next due |
+|---|---|---|---|---|---|---|
+| HR-1 | Money-market cash preset (Company lens) | ~4.3% | US 3-month Treasury yield proxy (preset anchor; user-overridden) | https://fred.stlouisfed.org/series/DGS3MO | 2026-08-06 | 2026-11-06 |
+| HR-2 | Savings-account preset (Personal lens) | ~4% | FDIC national deposit rate, savings (preset anchor; user-overridden) | https://www.fdic.gov/resources/bankers/national-rates/ | 2026-08-06 | 2026-11-06 |
+
+**HR-1 / HR-2 (added 2026-08-06).** The two short-rate-sensitive presets on `/the-bitcoin-hurdle-rate` — approximate starting points the user immediately overrides (slider + numeric entry), labelled "~". Tracking lives in the **Next due** column above: re-check both at the quarterly audit and bump the display if the short-rate regime has moved materially. The page adds **zero** MONTHLY_REFRESH surface by design (the review-date column carries it — no monthly line). The other presets need no rows: WACC ~9% and "a strong project" 20% are illustrative anchors; S&P 500 long-run TR 10.86% reuses the R-1 family (via BvSM); mortgage ~6% and rental ~8% are long-run editorial anchors. Everything else on the page computes live from the shared Power Law module (`PL_A`/`PL_B`/`PL_FLOOR`/`plPrice`) — no rows.
+
 ---
 
 ## Architectural change log
