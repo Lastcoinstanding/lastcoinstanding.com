@@ -37,6 +37,7 @@ module.exports = function (eleventyConfig) {
     'og-the-power-law.jpg',
     'og-bitcoin-and-metcalfes-law.jpg',
     'og-the-doubling-ladder.jpg',
+    'og-the-bitcoin-hurdle-rate.jpg',
     'og-trilemma.jpg',
     'og-what-bitcoin-is.jpg',
     'og-what-money-has-to-be.jpg',

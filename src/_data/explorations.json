@@ -322,6 +322,19 @@
     }
   },
   {
+    "slug": "the-bitcoin-hurdle-rate",
+    "title": "The Bitcoin Hurdle Rate",
+    "category": "numbers",
+    "group": "Positioning & Strategy",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Does this use of capital beat holding bitcoin? Set a return and a horizon &mdash; the trend hurdle, matched to that window and declining with it, for a company or a person.",
+      "preview_kind": "svg",
+      "anchor": "#explore",
+      "position": 20
+    }
+  },
+  {
     "slug": "how-much-bitcoin",
     "title": "How Much Bitcoin?",
     "category": "numbers",
