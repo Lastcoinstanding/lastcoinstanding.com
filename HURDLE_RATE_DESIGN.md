@@ -427,3 +427,34 @@ All six questions closed. Recorded here rather than deleted, because several wer
    decide afterwards whether the group lead-in becomes a `STYLE_GUIDE §6.10` amendment with a sweep.
    Per-card `desc` (already supported) carries the contextualisation requirement in v1, so nothing
    is blocked by this deferral.
+
+## 11. v1.1 revisions (JM review, 2026-08-06)
+
+Applied on `feat/hurdle-rate` (same PR). **Copy (§1.1–1.8):** horizon helper reworded (no
+implied asset-horizons); capital-source relabelled "New capital / Already invested elsewhere"
+("stack" dropped from user-facing copy — internal `capsrc` values `savings`/`sale` unchanged, no
+deep-link break); chart caption now defines the 0.42× floor; "What would break this?" made a
+question; QST-11 "load-bearing" reworded and the **"ceiling" claim rewritten** — the word collided
+with `PL_CEIL` and misstated the claim, so it now reads: the tool shows the smooth trend, the
+realised path lands above or below it, and the hurdle that actually binds a holder is lower than the
+arithmetic one; a new idle-treasury passage (links to `/the-melting-ice-cube`, no company named); a
+closing symmetry passage (no R² figure — a high log-log R² is the standard critique, not
+reassurance). **Layout (§2):** lens toggle moved above the inputs (it gates which inputs render);
+section rhythm tightened; chart legend 10→13; stat numbers use `--text` (captions stay muted); stat
+grid re-flowed to 5-across (no 4+1 orphan); one-sentence help-tip per stat card. **Funding source
+(§3a):** honest framing tooltip — the control relabels the fifth stat card (cash yield / debt cost /
+equity cost) and changes no figure.
+
+**Declined — do not re-propose:**
+- **Colour-coding the cashflow-positive control (red/amber).** Register is facts-not-signals;
+  colouring "No" red turns a neutral business condition into a warning about the reader's own
+  company. The verdict text already changes to "the hurdle does not apply" — that is the signal, in
+  words.
+- **An income-statement / adoption-affects-operations aside.** Considered and dropped: it raises a
+  question the page then declines to answer, which is worse than not raising it. The argument stays
+  narrow.
+
+**Planned v2 (backlog):** channel-position-aware hurdle (HIGH — live channel position drives the
+hurdle rather than decorating the header; opt-in, default off, position-neutral labels) and
+funding-source-drives-arithmetic (MEDIUM — the debt-accretion computation; until it ships the
+control is presentational and removing it is a legitimate alternative). See PAGE_IDEAS_BACKLOG.
