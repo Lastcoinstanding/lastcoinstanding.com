@@ -1,10 +1,12 @@
 # OG asset handoff — BAS v2 + hurdle (branch `og/bas-hurdle-v2`)
 
-**Status: PREP ONLY. Do not merge this branch until the JPEGs exist.**
-A 404 card is worse than a stale one, so the reference bumps below are **written
-here, not applied to the page head files** — they must land in the *same commit*
-as the generated assets. Regeneration is external (needs Python + Pillow /
-Playwright + Chromium — not runnable in the authoring sandbox).
+**Status: PREP. Do not merge this branch until the JPEGs exist.**
+The BAS `-v2` reference bumps are now **applied and committed on this branch** (per JM's "stage the
+bumps" instruction). Safe while *unmerged*: production never sees the bumped reference until this
+branch merges to main, and it will not merge until the generated JPEGs are committed to it — so there
+is no production window pointing at a missing file. (The branch *preview* will 404 the BAS card until
+the JPEG lands; harmless — X scrapes production, not the preview.) Regeneration is external (needs
+Python + Pillow / Playwright + Chromium — not runnable in the authoring sandbox).
 
 **Do NOT use `?cb=` cache-busting.** It creates a second card entry instead of
 refreshing the canonical one. The filename bump (BAS) is the correct mechanism.
@@ -27,30 +29,29 @@ selling it."* The page was repositioned; its `og:image:alt` now reads
   `Bitcoin as collateral instead of selling it — with HODL as the legitimate baseline.`
 - **Output filename:** `og-borrowing-against-your-stack-v2.jpg` (new path forces
   X to re-scrape; the old cached card keeps serving until it does).
-- **Reference bump — apply WITH the new JPEG, in one commit** in
-  `src/_includes/_pageassets/borrowing-against-your-stack-head.html`:
-  - `og:image` → `https://lastcoinstanding.com/og-borrowing-against-your-stack-v2.jpg`
-  - `twitter:image` → `https://lastcoinstanding.com/og-borrowing-against-your-stack-v2.jpg`
-  - (leave `og:image:alt` / `twitter:image:alt` as-is — already current)
+- **Reference bump — DONE (applied on this branch)** in
+  `src/_includes/_pageassets/borrowing-against-your-stack-head.html`: `og:image` and `twitter:image`
+  now point at `og-borrowing-against-your-stack-v2.jpg` (`…:alt` left as-is, already current). Just
+  add the generated `og-borrowing-against-your-stack-v2.jpg` to the branch — the reference awaits it.
 
 ## 2. Hurdle — generate the missing asset (product-forward, §6.15.2)
 
 `og-the-bitcoin-hurdle-rate.jpg` **does not exist** (never tracked, not on disk).
-The hero must be the **chart, not the input board**.
 
-- **CARDS entry added on this branch** (`scripts/build-og-images.py`, `name: "hurdle"`)
-  with `hero_selector: "#hrChart"` and the subtitle
-  *"Does it beat bitcoin? The bar any use of capital has to clear — and why it
-  falls as your horizon lengthens."*
-- **Generate:** `python3 scripts/build-og-images.py --only hurdle`
-  → writes `og-the-bitcoin-hurdle-rate.jpg`.
-- **No reference bump / no `-v2`.** The page head already points at
-  `og-the-bitcoin-hurdle-rate.jpg`, and no v1 ever deployed (PR #40 unmerged), so
-  there is nothing cached on X to bust. Regen alone completes it.
-  *(If you still want `-v2` for consistency, change the CARDS `output_filename`
-  and add the same two-line head bump as BAS — one-line edits, this branch.)*
-- The hurdle page ships on PR #40; sequence this so the asset lands with (or
-  before) that page goes to production.
+- **Hero (v1.2 decision):** the **verdict + stat-strip block (`#hrAnswer`)**, the page's visual
+  centre after the v1.2 reorder moved the chart to last. Two CARDS entries on this branch so JM can
+  compare and pick: `name: "hurdle"` (`hero_selector: "#hrAnswer"` → `og-the-bitcoin-hurdle-rate.jpg`)
+  and `name: "hurdle-chart"` (`hero_selector: "#hrChart"` → `og-the-bitcoin-hurdle-rate-chart.jpg`).
+  Subtitle (both): *"Does it beat bitcoin? The bar any use of capital has to clear — and why it falls
+  as your horizon lengthens."*
+- **Generate:** `python3 scripts/build-og-images.py --only hurdle hurdle-chart` → writes both.
+  **Generate against the feat/hurdle-rate PREVIEW** — the page and its `#hrAnswer`/`#hrChart` elements
+  are on PR #40, not production yet; point the CARDS `url` at the branch-preview URL for the run (or
+  generate from a checkout that has the page). Pick the winner → it takes `og-the-bitcoin-hurdle-rate.jpg`;
+  discard the other file.
+- **No reference bump / no `-v2`** for the hurdle: the head already points at
+  `og-the-bitcoin-hurdle-rate.jpg` and no v1 ever deployed, so nothing is cached to bust. (The hurdle
+  head lives on `feat/hurdle-rate`, not this branch.)
 
 ## Deploy sequence (both)
 
