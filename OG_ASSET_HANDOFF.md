@@ -1,64 +1,66 @@
-# OG asset handoff — BAS v2 + hurdle (branch `og/bas-hurdle-v2`)
+# OG asset handoff — BAS v2 + hurdle
 
-**Status: PREP. Do not merge this branch until the JPEGs exist.**
-The BAS `-v2` reference bumps are now **applied and committed on this branch** (per JM's "stage the
-bumps" instruction). Safe while *unmerged*: production never sees the bumped reference until this
-branch merges to main, and it will not merge until the generated JPEGs are committed to it — so there
-is no production window pointing at a missing file. (The branch *preview* will 404 the BAS card until
-the JPEG lands; harmless — X scrapes production, not the preview.) Regeneration is external (needs
-Python + Pillow / Playwright + Chromium — not runnable in the authoring sandbox).
+**Status: PREP. Split sequencing — hurdle first, BAS second.**
+Both cards are staged and ready to *generate*; generation is external (needs Python + Chromium/Pillow,
+not runnable in the authoring sandbox). Nothing here merges until its JPEG exists.
 
 **Do NOT use `?cb=` cache-busting.** It creates a second card entry instead of
-refreshing the canonical one. The filename bump (BAS) is the correct mechanism.
+refreshing the canonical one. The BAS filename bump (`-v2`) is the correct mechanism.
 
 ---
 
-## 1. BAS — regenerate + `-v2` bump (brand-forward, §6.15.1)
+## 1. HURDLE — product-forward (§6.15.2). Branch: `og/hurdle-card` → main (FIRST)
 
-`og-borrowing-against-your-stack.jpg` bakes the stale subtitle
-*"A supplemental retirement framework — using bitcoin as collateral instead of
-selling it."* The page was repositioned; its `og:image:alt` now reads
-*"…with HODL as the legitimate baseline."* Card on X is fine — the asset is stale.
+`og-the-bitcoin-hurdle-rate.jpg` **does not exist**; the page shipped to production (PR #40) with its
+head already referencing that path, so the card currently unfurls as a bare link. This is the urgent,
+*broken* card — land it first, on its own branch, straight to main.
 
-- **Card type:** brand-forward (atmospheric ₿ + title + italic subtitle). There is
-  **no** `build-og-borrowing-against-your-stack.py`; regenerate via the
-  brand-forward Pillow pipeline (right-half composited from `og-synthesis.jpg`
-  per §6.15.1), or by adding a `build-og-borrowing-against-your-stack.py` in the
-  style of the other `build-og-*.py` scripts.
+- **CARDS entries** live on **`og/hurdle-card`** (moved off this branch so they reach main with the
+  hurdle asset rather than being stranded here). Two entries so JM can compare and pick:
+  `name: "hurdle"` (`#hrAnswer` → `og-the-bitcoin-hurdle-rate.jpg`, the v1.2 hero) and
+  `name: "hurdle-chart"` (`#hrChart` → `og-the-bitcoin-hurdle-rate-chart.jpg`).
+- **Target is PRODUCTION** — both CARDS `url` = `https://lastcoinstanding.com/the-bitcoin-hurdle-rate`.
+  The page is live, so no preview/URL edit is needed.
+- **Generate** (from `og/hurdle-card`, repo root):
+  `python3 scripts/build-og-images.py --only hurdle --only hurdle-chart`
+  Note: `--only` is `action="append"` — pass it **once per card** (not `--only hurdle hurdle-chart`).
+- **Pick the winner** → it must be named `og-the-bitcoin-hurdle-rate.jpg`; if `#hrChart` wins, rename
+  the `-chart.jpg` to that. **Discard** the losing file — only the plain name is referenced/registered.
+- **No reference bump, no `.eleventy.js` edit:** the head reference and the passthrough entry for
+  `og-the-bitcoin-hurdle-rate.jpg` are already on main. Commit the winning JPEG on `og/hurdle-card`
+  (it also carries the CARDS entries) → merge to main. Card + CARDS land together.
+
+## 2. BAS — brand-forward (§6.15.1) `-v2` bump. Branch: `og/bas-hurdle-v2` → main (SECOND)
+
+`og-borrowing-against-your-stack.jpg` bakes the stale subtitle *"A supplemental retirement framework…"*.
+The page was repositioned (HODL as the baseline); the card is stale but *working*, so this waits behind
+the hurdle card.
+
+- **Generator EXISTS on this branch:** `build-og-borrowing-against-your-stack.py` (cloned from
+  `build-og-bull-and-bear-cycles.py`; two-tier composite over `og-synthesis.jpg`). It carries the
+  existing card's title treatment — "Borrowing" in italic amber, "Against Your Stack" bright — and the
+  approved two-line, em-dash-free subtitle.
 - **New subtitle (approved 2026-08-06):**
-  `Bitcoin as collateral instead of selling it — with HODL as the legitimate baseline.`
-- **Output filename:** `og-borrowing-against-your-stack-v2.jpg` (new path forces
-  X to re-scrape; the old cached card keeps serving until it does).
-- **Reference bump — DONE (applied on this branch)** in
-  `src/_includes/_pageassets/borrowing-against-your-stack-head.html`: `og:image` and `twitter:image`
-  now point at `og-borrowing-against-your-stack-v2.jpg` (`…:alt` left as-is, already current). Just
-  add the generated `og-borrowing-against-your-stack-v2.jpg` to the branch — the reference awaits it.
+  `Bitcoin as collateral instead of selling it, / with HODL as the legitimate baseline.`
+- **Generate** (from repo root; needs `pip install pillow requests` and network for the fonts):
+  `python build-og-borrowing-against-your-stack.py` → writes `og-borrowing-against-your-stack-v2.jpg`.
+- **Reference bump — DONE on this branch** in `borrowing-against-your-stack-head.html` (`og:image` +
+  `twitter:image` → `-v2`; `…:alt` already current).
+- **Passthrough — DONE on this branch:** `og-borrowing-against-your-stack-v2.jpg` added to the
+  `.eleventy.js` `staticAssets` array (the `-v2` filename is new, so it needs its own entry).
+- **Old asset kept:** `og-borrowing-against-your-stack.jpg` stays registered and in the repo — already
+  posted/cached cards keep resolving; the `-v2` filename is what forces the re-scrape. Orphan cleanup
+  can be its own later pass.
+- Commit the generated JPEG on this branch → merge to main (after the hurdle card is live).
 
-## 2. Hurdle — generate the missing asset (product-forward, §6.15.2)
+## Verify after each deploy
 
-`og-the-bitcoin-hurdle-rate.jpg` **does not exist** (never tracked, not on disk).
-
-- **Hero (v1.2 decision):** the **verdict + stat-strip block (`#hrAnswer`)**, the page's visual
-  centre after the v1.2 reorder moved the chart to last. Two CARDS entries on this branch so JM can
-  compare and pick: `name: "hurdle"` (`hero_selector: "#hrAnswer"` → `og-the-bitcoin-hurdle-rate.jpg`)
-  and `name: "hurdle-chart"` (`hero_selector: "#hrChart"` → `og-the-bitcoin-hurdle-rate-chart.jpg`).
-  Subtitle (both): *"Does it beat bitcoin? The bar any use of capital has to clear — and why it falls
-  as your horizon lengthens."*
-- **Generate:** `python3 scripts/build-og-images.py --only hurdle hurdle-chart` → writes both.
-  **Generate against the feat/hurdle-rate PREVIEW** — the page and its `#hrAnswer`/`#hrChart` elements
-  are on PR #40, not production yet; point the CARDS `url` at the branch-preview URL for the run (or
-  generate from a checkout that has the page). Pick the winner → it takes `og-the-bitcoin-hurdle-rate.jpg`;
-  discard the other file.
-- **No reference bump / no `-v2`** for the hurdle: the head already points at
-  `og-the-bitcoin-hurdle-rate.jpg` and no v1 ever deployed, so nothing is cached to bust. (The hurdle
-  head lives on `feat/hurdle-rate`, not this branch.)
-
-## Deploy sequence (both)
-
-1. Generate the JPEG(s) externally.
-2. Apply the reference bump(s) above (BAS only; hurdle needs none).
-3. `git add` the JPEG(s) **and** the head-file bump(s) → **one commit**.
-4. Verify `curl -I https://lastcoinstanding.com/og-borrowing-against-your-stack-v2.jpg`
-   returns `Content-Type: image/jpeg`, then poke the Facebook debugger + a draft
-   tweet to force a re-scrape (per `build-og-images.py` footer).
-5. Only then merge.
+Wait for the Cloudflare build to report "Deployed successfully", then:
+```
+curl -I https://lastcoinstanding.com/og-the-bitcoin-hurdle-rate.jpg
+curl -I https://lastcoinstanding.com/og-borrowing-against-your-stack-v2.jpg
+```
+Each **must** return `Content-Type: image/jpeg` — not the `200 text/html` fallback (the tell for a
+missing/unregistered asset). Then force a re-scrape via Facebook's debugger
+(developers.facebook.com/tools/debug/) and the X card validator / a draft tweet. Do not share the
+hurdle URL anywhere until its `image/jpeg` check passes.
