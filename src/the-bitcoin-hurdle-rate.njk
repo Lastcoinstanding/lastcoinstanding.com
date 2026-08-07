@@ -75,7 +75,7 @@ eleventyComputed:
             <span class="hr-num-unit">yr</span>
           </div>
         </div>
-        <p class="hr-field-cap">The bar falls as the horizon lengthens. A three-year purchase is measured against a higher trend rate than a thirty-year asset &mdash; that is the point of matching the window.</p>
+        <p class="hr-field-cap">The bar falls as the horizon lengthens: bitcoin&rsquo;s trend CAGR over three years is higher than over thirty, because the trend&rsquo;s growth rate decays with age. Match the window to how long the capital is committed.</p>
       </div>
     </div>
 
@@ -120,12 +120,12 @@ eleventyComputed:
 
     <div class="calc-mode-content hr-lens-panel" id="calc-mode-personal" role="tabpanel" aria-label="Personal lens inputs">
       <div class="hr-field-inline">
-        <span class="hr-inline-label">Where does the capital come from?</span>
+        <span class="hr-inline-label">Where is this capital now?</span>
         <div class="hr-seg-group" role="group" aria-label="Capital source">
-          <button type="button" class="hr-seg active" data-capsrc="savings" aria-pressed="true">New savings</button>
-          <button type="button" class="hr-seg" data-capsrc="sale" aria-pressed="false">Sale from an existing stack</button>
+          <button type="button" class="hr-seg active" data-capsrc="savings" aria-pressed="true">New capital</button>
+          <button type="button" class="hr-seg" data-capsrc="sale" aria-pressed="false">Already invested elsewhere</button>
         </div>
-        <p class="hr-inline-cap" id="hrCapsrcCap">New savings: no switching cost. Selling from an existing stack makes capital-gains tax a real cost of switching, which belongs in the comparison.</p>
+        <p class="hr-inline-cap" id="hrCapsrcCap">New capital carries no switching cost. Moving capital that&rsquo;s already invested means realising the gain, so capital-gains tax is a real cost of the switch &mdash; unless it sits in a tax-advantaged account, where the switch triggers no taxable event.</p>
       </div>
       <div class="hr-field-inline">
         <span class="hr-inline-label">Can this capital wait &mdash; and through what?</span>
@@ -140,7 +140,7 @@ eleventyComputed:
     <!-- ============ HERO OUTPUT — THE HURDLE CURVE ============ -->
     <div class="hr-chart-block">
       <div class="hr-chart-wrapper"><canvas id="hrChart" aria-label="Bitcoin's trend hurdle by horizon, with your candidate return"></canvas></div>
-      <p class="hr-chart-caption" id="hrChartCap">The <strong>amber curve</strong> is bitcoin&rsquo;s trend hurdle at every horizon &mdash; it declines because the trend&rsquo;s growth rate decays with age. The <strong>shaded band</strong> beneath it is the floor path: what the same capital returns if bitcoin only reaches its historical floor at your horizon rather than trend. Your <strong>candidate return</strong> is the flat line. Where the flat line crosses the curve is the answer. <span id="hrSpotNote" class="hr-spot-note"></span></p>
+      <p class="hr-chart-caption" id="hrChartCap">The <strong>amber curve</strong> is bitcoin&rsquo;s trend hurdle at every horizon &mdash; it declines because the trend&rsquo;s growth rate decays with age. The <strong>shaded band</strong> beneath it is the floor path: what the same capital returns if bitcoin only reaches its historical floor at your horizon rather than trend. Your <strong>candidate return</strong> is the flat line. Where the flat line crosses the curve is the answer. <span id="hrSpotNote" class="hr-spot-note"></span> The floor is the lowest level bitcoin&rsquo;s price has historically held relative to its trend &mdash; 0.42&times; trend. Reading the hurdle off the floor is the most conservative version of the model that still assumes the power law holds.</p>
     </div>
 
     <!-- ============ REFRAIN #2 + VERDICT ============ -->
@@ -190,11 +190,13 @@ eleventyComputed:
     <p class="hr-prose"><strong>The individual faces a constraint the company doesn&rsquo;t.</strong> A company can hold a volatile treasury asset on behalf of shareholders who chose the exposure. A person holding their whole net worth against a roughly &minus;73% drawdown may be forced to sell at the worst moment. The individual&rsquo;s effective hurdle is therefore lower than the arithmetic one, and legitimately so.</p>
     <p class="hr-prose"><strong>The two are the same question in different vocabulary.</strong> The personal lens asks whether the capital can wait. The corporate form of that identical condition is whether the business is cashflow positive. If it is not, bitcoin&rsquo;s volatility eats into survivability &mdash; the company may be forced to realise a drawdown to meet obligations, which is the corporate form of selling at the bottom &mdash; and the hurdle does not apply to it. If it is, volatility eats only into short-term optionality: the ability to act on opportunities during a drawdown, a real cost but a survivable one, and one that compresses over a long enough horizon.</p>
     <p class="hr-prose">For most companies, bitcoin&rsquo;s trend growth is higher than the return on their own core operations, so bitcoin held on the balance sheet behaves as a second compounding engine running alongside the operating one. The limit is the whole of it: <strong>the hurdle applies to surplus capital at the margin, never to the capital that generates the cashflow in the first place.</strong> A company that stops maintaining its core business stops producing the cash that buys the bitcoin; the strategy is self-consuming past the margin. Stated with that limit, the second engine is a real observation about treasury behaviour. Stated without it, it is the advice this page does not give.</p>
+    <p class="hr-prose">The limit cuts both ways. Capital funding operations is earning the return the business exists to produce, and the hurdle has little claim on it. But large mature companies often hold cash well beyond what their reinvestment opportunities can absorb &mdash; parked in treasuries, earning a few percent, waiting for a use that may not arrive. That capital is not funding anything. It is the clearest case the hurdle applies to, precisely because nothing productive is being displaced. And it is not merely underperforming: measured in purchasing power rather than in dollars, an idle treasury balance is a <a href="/the-melting-ice-cube.html">melting ice cube</a> &mdash; the nominal figure holds while what it can buy declines.</p>
 
-    <h2 class="hr-h2">What would break this</h2>
-    <p class="hr-prose">Two things, both load-bearing. First, the hurdle is only as high as the arithmetic that produced it, and the arithmetic overstates it: bitcoin&rsquo;s trend return is realised only by capital that can hold through the drawdown without being forced to sell. The number the tool shows is the ceiling on the hurdle, not the hurdle. It says nothing about capital with a deadline, a covenant, a payroll, or a liquidity need &mdash; and businesses produce things other than returns.</p>
+    <h2 class="hr-h2">What would break this?</h2>
+    <p class="hr-prose">Two things, and the page fails without either. First, the hurdle is only as high as the arithmetic that produced it, and the arithmetic overstates it. The number the tool shows is the smooth trend. The path is not smooth: the realised rate over any particular window can land well above or well below it. And the trend return is only <em>available</em> to capital that can hold through the drawdown without being forced to sell &mdash; so the hurdle that actually binds a given holder is lower than the arithmetic one. It says nothing about capital with a deadline, a covenant, a payroll, or a liquidity need &mdash; and businesses produce things other than returns.</p>
     <p class="hr-prose">Second, the hurdle is only as good as the model. Every figure here inherits the <a href="/the-power-law.html">power law</a>&rsquo;s uncertainty, including the possibility of a floor breach or a break in either direction. A hurdle derived from a model has to carry the model&rsquo;s caveats on the same screen as the number. The declining-hurdle finding is itself the most useful humility device available: the page&rsquo;s own arithmetic says the bar falls over time, and keeps falling.</p>
     <p class="hr-close"><strong>Does it beat bitcoin?</strong> It is a question worth carrying into every capital decision &mdash; asked with the two conditions attached each time: the trend holds, and the capital can wait.</p>
+    <p class="hr-prose">Bitcoin&rsquo;s future growth is uncertain and volatile. So is the return on whatever it&rsquo;s being compared against &mdash; the difference is that one uncertainty is visible daily and the other is written into a plan as a single confident number. The comparison deserves to be made soberly on both sides, and most soberly for surplus capital that carries no operational cost to release.</p>
 
   </section>
 

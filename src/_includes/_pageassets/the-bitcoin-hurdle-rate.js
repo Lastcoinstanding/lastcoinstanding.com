@@ -287,9 +287,8 @@
         : '';
     }
     if (el.hrCapsrcCap && S.lens === 'personal'){
-      el.hrCapsrcCap.innerHTML = (S.capsrc === 'sale')
-        ? 'Selling from an existing stack makes capital-gains tax a real cost of switching into the candidate &mdash; it belongs on the candidate&rsquo;s side of the comparison, and it does not apply to new savings.'
-        : 'New savings: no switching cost. Selling from an existing stack would make capital-gains tax a real cost of switching, which belongs in the comparison.';
+      // v1.1: single combined helper (was per-capsrc) — covers both options plus the tax-advantaged case.
+      el.hrCapsrcCap.innerHTML = 'New capital carries no switching cost. Moving capital that&rsquo;s already invested means realising the gain, so capital-gains tax is a real cost of the switch &mdash; unless it sits in a tax-advantaged account, where the switch triggers no taxable event.';
     }
     if (el.hrSpotNote){
       var ratio = spot / plPrice(tDays());
