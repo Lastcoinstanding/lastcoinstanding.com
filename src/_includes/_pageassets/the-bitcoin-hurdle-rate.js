@@ -123,11 +123,24 @@
     return {
       id: 'hrMarker',
       afterDatasetsDraw: function(c){
+        var ctx = c.ctx;
+        // Horizon marker (v1.2) — always drawn: a dashed vertical at the selected horizon plus a dot carrying the hurdle value where it meets the trend curve, so the horizon slider visibly drives the chart and the "trend hurdle" stat card ties to a point on the curve.
+        var hx = c.scales.x.getPixelForValue(S.h);
+        var hy = c.scales.y.getPixelForValue(trendCAGR(S.h) * 100);
+        ctx.save();
+        ctx.beginPath(); ctx.moveTo(hx, c.chartArea.top); ctx.lineTo(hx, c.chartArea.bottom);
+        ctx.strokeStyle = 'rgba(224,148,34,0.30)'; ctx.lineWidth = 1; ctx.setLineDash([2, 3]); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.beginPath(); ctx.arc(hx, hy, 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = AMBER; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.fillStyle = 'rgba(242,238,232,0.92)'; ctx.font = '600 12px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+        ctx.fillText(pct(trendCAGR(S.h)), hx, hy - 8);
+        ctx.restore();
+        // Crossing marker — only when the candidate line crosses the curve.
         var cr = crossing();
         if (cr.kind !== 'at') return;
         var x = c.scales.x.getPixelForValue(cr.h);
         var y = c.scales.y.getPixelForValue(S.r);
-        var ctx = c.ctx;
         ctx.save();
         ctx.beginPath(); ctx.moveTo(x, c.chartArea.top); ctx.lineTo(x, c.chartArea.bottom);
         ctx.strokeStyle = 'rgba(242,238,232,0.22)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]); ctx.stroke();
@@ -303,7 +316,7 @@
   // ─────────── RENDER ───────────
   function render(){
     if (el.hrVerdict) el.hrVerdict.innerHTML = verdict();
-    if (el.hrStats) el.hrStats.innerHTML = stats();
+    if (el.hrStats) { el.hrStats.innerHTML = stats(); el.hrStats.setAttribute('data-count', el.hrStats.querySelectorAll('.hr-stat').length); }
     notes();
     updateChart();
   }

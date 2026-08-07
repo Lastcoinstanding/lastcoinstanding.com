@@ -77,6 +77,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .hr-field-inline:first-child { border-top: none; }
 .hr-inline-label { display: block; font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 0.55rem; }
 .hr-inline-cap { font-size: 0.78rem; line-height: 1.55; color: var(--text-muted); margin: 0.6rem 0 0; }
+/* §2 compaction: funding source + cashflow-positive side by side (both short segmented controls). */
+.hr-inline-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; align-items: start; }
+.hr-inline-row .hr-field-inline { border-top: none; padding-top: 0; }
+@media (max-width: 640px) { .hr-inline-row { grid-template-columns: 1fr; gap: 0; } .hr-inline-row .hr-field-inline { border-top: 1px solid rgba(255,255,255,0.05); padding: 0.9rem 0; } .hr-inline-row .hr-field-inline:first-child { border-top: none; } }
 
 /* ── Chart ── */
 .hr-chart-block { max-width: 1000px; margin: 1rem auto 0; }
@@ -98,8 +102,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .hr-v-body strong { color: var(--text); font-weight: 600; }
 
 /* ── Stat strip ── */
-/* §2.4b re-grid: 165px min fits 5 cards across at 1000px (company lens, no 4+1 orphan); auto-fit collapses to 4 for the personal lens. */
-.hr-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 0.9rem; max-width: 1000px; margin: 1rem auto 0; }
+/* §2.4 stat grid — 3+2 (v1.2; JS sets data-count). 5 company cards read 3+2 with the 2nd row centred; 4 personal cards read 2+2. Wider cards (~300px) stop "13.4x trend · 13.1x floor" orphaning "floor" and the captions wrapping around the (?) markers that the tight 5-across caused. */
+.hr-stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.9rem; max-width: 940px; margin: 1rem auto 0; }
+.hr-stats .hr-stat { grid-column: span 2; }
+.hr-stats[data-count="5"] .hr-stat:nth-child(4) { grid-column: 2 / span 2; }
+.hr-stats[data-count="5"] .hr-stat:nth-child(5) { grid-column: 4 / span 2; }
+.hr-stats[data-count="4"] { grid-template-columns: 1fr 1fr; max-width: 640px; }
+.hr-stats[data-count="4"] .hr-stat { grid-column: auto; }
+@media (max-width: 640px) { .hr-stats, .hr-stats[data-count="4"] { grid-template-columns: 1fr 1fr; max-width: 100%; } .hr-stats .hr-stat, .hr-stats[data-count="5"] .hr-stat:nth-child(4), .hr-stats[data-count="5"] .hr-stat:nth-child(5) { grid-column: auto; } }
 .hr-stats:empty { display: none; }
 .hr-stat { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 0.95rem 1.1rem; }
 .hr-stat-val { font-family: var(--font-d); font-size: 1.5rem; font-weight: 600; color: var(--text); line-height: 1.15; margin-bottom: 0.35rem; }
@@ -114,7 +124,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 @media (max-width: 480px) { .help-tip .tip-content { width: min(230px, calc(100vw - 32px)); } }
 
 /* ── Presets ── */
-.hr-presets { max-width: 880px; margin: 2rem auto 0; }
+/* #3: match the stat strip's 1000px so the benchmark chips (~910px needed) stop wrapping — they were capped at 880px. */
+.hr-presets { max-width: 1000px; margin: 2rem auto 0; }
 .hr-preset-group { display: none; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 .hr-presets[data-lens="company"] .hr-preset-company,
 .hr-presets:not([data-lens]) .hr-preset-company { display: flex; }

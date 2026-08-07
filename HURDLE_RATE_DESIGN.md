@@ -458,3 +458,22 @@ equity cost) and changes no figure.
 hurdle rather than decorating the header; opt-in, default off, position-neutral labels) and
 funding-source-drives-arithmetic (MEDIUM — the debt-accretion computation; until it ships the
 control is presentational and removing it is a legitimate alternative). See PAGE_IDEAS_BACKLOG.
+
+## 12. v1.2 layout reorder (JM review, 2026-08-06)
+
+**Chart moved BELOW the verdict + stat strip — this reverses §5.2's "chart is the hero output."**
+Rationale: **only the candidate-return slider changes anything on the chart.** Horizon, funding
+source, cashflow-positive, lens and pre/post-tax all move the *verdict and stats* and leave the chart
+untouched. Putting the responsive elements directly under the inputs lets a reader see the answer
+move as they drag; the chart becomes the supporting visual it actually is. **Deliberately departs
+from the WDCB precedent (chart first):** WDCB's chart redraws its whole series on every input change,
+so it earns the hero slot — this one doesn't.
+
+Also v1.2: **funding source + cashflow-positive** compacted onto one row (both short segmented
+controls), for input+verdict+stats co-visibility. **Benchmark strip** widened 880→1000px to match the
+stat strip above it — its ~910px of chips were wrapping into an 880px cap. **Stat grid** changed from
+5-across to **3+2 (company) / 2+2 (personal)** via a JS-set `data-count` attribute; the tight 5-across
+orphaned "floor" in "13.4× trend · 13.1× floor" and wrapped captions around the `(?)` markers.
+**Horizon marker** added to the chart (dashed vertical at the selected horizon + a dot carrying the
+hurdle value where it meets the trend curve) so the horizon slider visibly drives the chart and ties
+the "trend hurdle" stat card to a point on the curve.
