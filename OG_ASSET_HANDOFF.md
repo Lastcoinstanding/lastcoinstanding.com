@@ -51,6 +51,14 @@ the hurdle card.
 - **Old asset kept:** `og-borrowing-against-your-stack.jpg` stays registered and in the repo — already
   posted/cached cards keep resolving; the `-v2` filename is what forces the re-scrape. Orphan cleanup
   can be its own later pass.
+- **⚠️ VERIFY THE TITLE DIDN'T DRIFT — the intended change is the subtitle ONLY.** The title treatment
+  in `build-og-borrowing-against-your-stack.py` is a *reconstruction* from the SITE_GUIDE §1363
+  description ("italic-amber 'Borrowing'"), NOT a copy of the original card's script (there wasn't one).
+  So when you eyeball the output, **compare it side-by-side against the currently-live
+  `og-borrowing-against-your-stack.jpg`** — do not judge it in isolation. The title (wording, the
+  italic-amber "Borrowing" accent, size, placement) should read the SAME as the live card; only the
+  subtitle should have changed to the HODL-baseline line. A title that also shifts is an unintended
+  second change — fix the script (title font/lines/accent) and regenerate before committing.
 - Commit the generated JPEG on this branch → merge to main (after the hurdle card is live).
 
 ## Verify after each deploy
