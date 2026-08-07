@@ -40,6 +40,25 @@ eleventyComputed:
 
   <section class="hr-calc" id="explore" aria-label="The hurdle-rate calculator">
 
+    <!-- ============ LENS TOGGLE (§6.17) — above the inputs (§2.1): the lens choice gates which inputs render ============ -->
+    <div class="calc-mode-toggle hr-lens" data-active-mode="company" role="tablist" aria-label="Choose your lens">
+      <button type="button" class="calc-mode-label company active"
+              data-mode="company" role="tab" aria-selected="true"
+              aria-controls="calc-mode-company">
+        <span class="calc-mode-name">Company</span>
+        <span class="calc-mode-sub">Does this project clear the bar?</span>
+      </button>
+      <button type="button" class="calc-mode-switch" aria-label="Switch lens">
+        <span class="calc-mode-thumb"></span>
+      </button>
+      <button type="button" class="calc-mode-label personal"
+              data-mode="personal" role="tab" aria-selected="false"
+              aria-controls="calc-mode-personal">
+        <span class="calc-mode-name">Personal</span>
+        <span class="calc-mode-sub">Does this use of money clear the bar?</span>
+      </button>
+    </div>
+
     <!-- ============ SHARED INPUTS ============ -->
     <div class="hr-inputs">
       <div class="hr-field">
@@ -79,29 +98,10 @@ eleventyComputed:
       </div>
     </div>
 
-    <!-- ============ LENS TOGGLE (§6.17) ============ -->
-    <div class="calc-mode-toggle hr-lens" data-active-mode="company" role="tablist" aria-label="Choose your lens">
-      <button type="button" class="calc-mode-label company active"
-              data-mode="company" role="tab" aria-selected="true"
-              aria-controls="calc-mode-company">
-        <span class="calc-mode-name">Company</span>
-        <span class="calc-mode-sub">Does this project clear the bar?</span>
-      </button>
-      <button type="button" class="calc-mode-switch" aria-label="Switch lens">
-        <span class="calc-mode-thumb"></span>
-      </button>
-      <button type="button" class="calc-mode-label personal"
-              data-mode="personal" role="tab" aria-selected="false"
-              aria-controls="calc-mode-personal">
-        <span class="calc-mode-name">Personal</span>
-        <span class="calc-mode-sub">Does this use of money clear the bar?</span>
-      </button>
-    </div>
-
     <!-- ============ LENS-SPECIFIC INPUTS ============ -->
     <div class="calc-mode-content active hr-lens-panel" id="calc-mode-company" role="tabpanel" aria-label="Company lens inputs">
       <div class="hr-field-inline">
-        <span class="hr-inline-label">Funding source</span>
+        <span class="hr-inline-label">Funding source <span class="help-tip" tabindex="0">?<span class="tip-content">Framing only, not the maths: Cash labels the fifth stat card&rsquo;s comparison as a cash yield, Debt as a cost of debt, Equity as a cost of equity &mdash; the trend hurdle and every figure stay the same.</span></span></span>
         <div class="hr-seg-group" role="group" aria-label="Funding source">
           <button type="button" class="hr-seg active" data-funding="cash" aria-pressed="true">Cash</button>
           <button type="button" class="hr-seg" data-funding="debt" aria-pressed="false">Debt</button>

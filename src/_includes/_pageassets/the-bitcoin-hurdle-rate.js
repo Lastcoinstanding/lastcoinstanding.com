@@ -185,7 +185,7 @@
         },
         plugins: {
           legend: { display: true, position: 'top',
-                    labels: { color: DIM, font: { size: 10 }, usePointStyle: true, pointStyle: 'line',
+                    labels: { color: DIM, font: { size: 13 }, usePointStyle: true, pointStyle: 'line',
                               boxWidth: 22, padding: 9 } },
           tooltip: {
             backgroundColor: 'rgba(20,17,13,0.95)', borderColor: 'rgba(224,148,34,0.30)', borderWidth: 1,
@@ -249,8 +249,9 @@
   }
 
   // ─────────── STAT STRIP ───────────
-  function tile(val, lab){
-    return '<div class="hr-stat"><div class="hr-stat-val">' + val + '</div><div class="hr-stat-lab">' + lab + '</div></div>';
+  function tile(val, lab, tip){
+    var t = tip ? ' <span class="help-tip" tabindex="0">?<span class="tip-content">' + tip + '</span></span>' : '';
+    return '<div class="hr-stat"><div class="hr-stat-val">' + val + '</div><div class="hr-stat-lab">' + lab + t + '</div></div>';
   }
   function stats(){
     if (S.lens === 'company' && S.cashflow === 'no') return '';
@@ -263,18 +264,20 @@
     var trendTerminal = NOTIONAL * tMult;
     var revUp = spotToTrendCAGR(H);
     var out = '';
-    out += tile(pct(tc), 'Trend hurdle over your ' + H + '-yr window');
-    out += tile(mult(tMult) + ' <span class="hr-stat-sub">trend</span> &middot; ' + mult(fMult) + ' <span class="hr-stat-sub">floor</span>', 'Bitcoin multiple over ' + yrs(H));
+    out += tile(pct(tc), 'Trend hurdle over your ' + H + '-yr window', 'Bitcoin&rsquo;s trend CAGR measured over the next ' + H + ' years &mdash; the bar your candidate return has to clear.');
+    out += tile(mult(tMult) + ' <span class="hr-stat-sub">trend</span> &middot; ' + mult(fMult) + ' <span class="hr-stat-sub">floor</span>', 'Bitcoin multiple over ' + yrs(H), 'How many times your money bitcoin returns over the horizon if it reaches trend, and if it reaches only its historical floor.');
     out += tile(money(candTerminal) + ' <span class="hr-stat-sub">vs</span> ' + money(trendTerminal),
-                money(NOTIONAL) + ' at ' + pctN(S.r) + ' vs at bitcoin&rsquo;s trend');
-    out += tile(pct(revUp), 'If bitcoin reverts to trend over ' + H + ' yr <span class="hr-stat-sub">(optimistic edge)</span>');
+                money(NOTIONAL) + ' at ' + pctN(S.r) + ' vs at bitcoin&rsquo;s trend',
+                'What a fixed starting amount grows to at your candidate return versus at bitcoin&rsquo;s trend, over the horizon.');
+    out += tile(pct(revUp), 'If bitcoin reverts to trend over ' + H + ' yr <span class="hr-stat-sub">(optimistic edge)</span>', 'The higher rate available only if bitcoin is below trend now and returns to trend by your horizon &mdash; an optimistic reading, not the base case.');
     if (S.lens === 'company'){
       var gap = (tc - r) * 100;
       var fundWord = S.funding === 'debt' ? 'debt serviced at ' + pctN(S.r)
                    : S.funding === 'equity' ? 'equity costing ' + pctN(S.r)
                    : 'cash returning ' + pctN(S.r);
       out += tile((gap >= 0 ? '+' : '') + gap.toFixed(1) + ' pts/yr',
-                  'Trend hurdle vs ' + fundWord + ', over ' + yrs(H));
+                  'Trend hurdle vs ' + fundWord + ', over ' + yrs(H),
+                  'The gap between bitcoin&rsquo;s trend hurdle and your candidate return; the funding label (cash/debt/equity) only frames this number and does not change it.');
     }
     return out;
   }
