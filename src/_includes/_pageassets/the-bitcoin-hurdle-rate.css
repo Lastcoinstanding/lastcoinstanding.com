@@ -95,6 +95,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .hr-refrain { text-align: center; font-family: var(--font-d); font-style: italic; font-size: clamp(1.3rem, 3.2vw, 1.7rem); color: var(--amber); margin: 1.3rem auto 0.7rem; }
 
 /* ── Verdict ── */
+/* v1.2: wraps verdict+stats as the product-forward OG hero target; both children keep their own centred max-widths, so no visual shift. */
+.hr-answer { max-width: 1000px; margin: 0 auto; }
 .hr-verdict { max-width: 820px; margin: 0 auto; background: rgba(224,148,34,0.04); border: 1px solid rgba(224,148,34,0.18); border-left: 3px solid var(--amber); border-radius: 8px; padding: 1.3rem 1.5rem; }
 .hr-v-lead { font-family: 'Inter', sans-serif; font-size: 1.06rem; line-height: 1.5; font-weight: 600; color: var(--text); margin: 0 0 0.7rem; }
 .hr-v-lead strong { color: var(--amber); }

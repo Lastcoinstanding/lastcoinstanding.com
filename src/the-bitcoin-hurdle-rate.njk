@@ -139,12 +139,12 @@ eleventyComputed:
       </div>
     </div>
 
-    <!-- ============ REFRAIN #2 + VERDICT ============ -->
+    <!-- ============ REFRAIN + VERDICT + STATS — the visual centre (v1.2); #hrAnswer wraps verdict+stats as the product-forward OG hero target ============ -->
     <p class="hr-refrain" aria-hidden="false">Does it beat bitcoin?</p>
-    <div class="hr-verdict" id="hrVerdict" role="status" aria-live="polite"><!-- filled by JS --></div>
-
-    <!-- ============ SECONDARY STAT STRIP ============ -->
-    <div class="hr-stats" id="hrStats" aria-label="At your chosen horizon"><!-- filled by JS --></div>
+    <div id="hrAnswer" class="hr-answer">
+      <div class="hr-verdict" id="hrVerdict" role="status" aria-live="polite"><!-- filled by JS --></div>
+      <div class="hr-stats" id="hrStats" aria-label="At your chosen horizon"><!-- filled by JS --></div>
+    </div>
 
     <!-- ============ THE HURDLE CURVE (v1.2 §5.2 reversal: chart moved BELOW verdict+stats — only the candidate-return slider redraws it, while horizon/funding/cashflow/lens/tax all move the verdict+stats, which now sit directly under the inputs so the answer moves as you drag; the chart is the supporting visual, not the hero output) ============ -->
     <div class="hr-chart-block">

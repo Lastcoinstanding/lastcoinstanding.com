@@ -577,6 +577,7 @@ Before announcing the page or sharing the URL externally:
 - **Console clean** — open DevTools, verify no JS errors or 404s on page
   load.
 - **Feedback widget check** — automatic for any page with `slug` (layout-level, base.njk); verify it renders on the deployed page below the related strip (eyebrow "Feedback or questions?"). Hub/utility pages opt out with `feedback: false`. Do NOT add a per-page include. (SITE_GUIDE §27)
+- **Deferred integration surfaces are tracked, not dropped.** The **OG card** (§7) and the **carousel slide** (§8) may each ship in a follow-up PR — which is precisely how they drift silently (the stale BAS OG asset; two slide-less pages sitting in `SITE_GUIDE §13` "Pending additions"; same failure class as the missing `:root` palette that §1 now guards). Both need external tooling that is often unavailable at launch (Grok Imagine for the slide; Python + Pillow/Playwright for the OG card), so deferral is legitimate — *untracked* deferral is the bug. If either is deferred, it MUST be logged as a **tracked** pending item recording the page slug: the carousel slide in `SITE_GUIDE §13` "Pending additions", the OG card in `TECH_DEBT` (or the OG handoff note). **A launch is not "done" until every §1–§10 surface is either shipped or on a tracked list.**
 
 ### Verifying a just-pushed change on Cloudflare Pages
 
