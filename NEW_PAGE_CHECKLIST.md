@@ -376,11 +376,22 @@ land in a follow-up PR.
 
 When the video is ready:
 
-- Strip audio + thumbnail stream with `ffmpeg -c:v copy -an input.mp4 output.mp4`
-  (copies the video stream, drops audio — fast, no re-encode). Re-encode only if
-  size or format needs it (the trilogy's P2 needed a 2-pass re-encode to land in
-  the size band; the raw was ~11 MB).
+- Strip audio + thumbnail stream with `ffmpeg -map 0:v:0 -c copy -an input.mp4 output.mp4`
+  (selects *only* the h264 video stream and copies it — fast, no re-encode).
+  Re-encode only if size or format needs it (the trilogy's P2 needed a 2-pass
+  re-encode to land in the size band; the raw was ~11 MB).
+  - **A Grok download carries THREE streams: h264 video, an AAC audio track,
+    AND an embedded mjpeg thumbnail.** The mjpeg cover is itself a *video-type*
+    stream, so `-c:v copy` (or a bare `-c copy`) would copy it through — only an
+    explicit `-map 0:v:0` selects the h264 stream alone and drops both the audio
+    and the thumbnail. This is why the strip must map, not just re-codec.
 - Target file size 3–10 MB, 720p, 10 seconds, silent (verified)
+- **Verify the strip before committing.** Binary-marker check on the output —
+  the file must contain NONE of `soun` (audio handler), `mp4a` (AAC codec), or
+  `mjpeg` (thumbnail stream), and must still contain `avc1` (h264). Grepping for
+  only `soun`/`mp4a` was the old heuristic and passes an audio-stripped file
+  that still carries the mjpeg thumbnail — check all three markers. Committing an
+  audio- or thumbnail-laden master is a known bug class (see `SITE_GUIDE §13`).
 - **Name by the page's full slug:** `videos/<slug>.mp4` at repo root (e.g.
   `videos/wait-or-deploy-now.mp4`). Match the existing files.
 - **Label your final picks before hand-off.** Grok downloads are opaque
