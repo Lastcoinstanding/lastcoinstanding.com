@@ -33,6 +33,17 @@ One check is NOT assumed and must be made explicitly before shipping:
   blocks on mixed-content pages are 880px with `margin: 0 auto`; no
   paragraph-level max-widths anywhere.
 
+- [ ] **The page defines its own `:root` palette AND a dark-canvas
+  mechanism.** base.njk deliberately provides neither a palette nor a page
+  background (a page `:root` renders after its blocks and wins). So a page's
+  CSS must declare `:root { --bg / --text / --amber / --border … }` (copy
+  the canonical set from `the-power-law.css`) **and** paint the dark canvas
+  one of two ways: `body { background: var(--bg); color: var(--text) }` (the
+  majority pattern) **or** `<meta name="color-scheme" content="dark">` in the
+  head (the 11-page pattern). Omit both and var-based colours fall back to
+  canvastext on the browser's light canvas — washed-out hero, black/white
+  var-based borders. Bit the Bitcoin Hurdle Rate page (Aug 2026).
+
 ## 2. Eleventy/build wiring
 
 Verify the page's front-matter has the four expected fields:
@@ -365,11 +376,22 @@ land in a follow-up PR.
 
 When the video is ready:
 
-- Strip audio + thumbnail stream with `ffmpeg -c:v copy -an input.mp4 output.mp4`
-  (copies the video stream, drops audio — fast, no re-encode). Re-encode only if
-  size or format needs it (the trilogy's P2 needed a 2-pass re-encode to land in
-  the size band; the raw was ~11 MB).
+- Strip audio + thumbnail stream with `ffmpeg -map 0:v:0 -c copy -an input.mp4 output.mp4`
+  (selects *only* the h264 video stream and copies it — fast, no re-encode).
+  Re-encode only if size or format needs it (the trilogy's P2 needed a 2-pass
+  re-encode to land in the size band; the raw was ~11 MB).
+  - **A Grok download carries THREE streams: h264 video, an AAC audio track,
+    AND an embedded mjpeg thumbnail.** The mjpeg cover is itself a *video-type*
+    stream, so `-c:v copy` (or a bare `-c copy`) would copy it through — only an
+    explicit `-map 0:v:0` selects the h264 stream alone and drops both the audio
+    and the thumbnail. This is why the strip must map, not just re-codec.
 - Target file size 3–10 MB, 720p, 10 seconds, silent (verified)
+- **Verify the strip before committing.** Binary-marker check on the output —
+  the file must contain NONE of `soun` (audio handler), `mp4a` (AAC codec), or
+  `mjpeg` (thumbnail stream), and must still contain `avc1` (h264). Grepping for
+  only `soun`/`mp4a` was the old heuristic and passes an audio-stripped file
+  that still carries the mjpeg thumbnail — check all three markers. Committing an
+  audio- or thumbnail-laden master is a known bug class (see `SITE_GUIDE §13`).
 - **Name by the page's full slug:** `videos/<slug>.mp4` at repo root (e.g.
   `videos/wait-or-deploy-now.mp4`). Match the existing files.
 - **Label your final picks before hand-off.** Grok downloads are opaque
@@ -566,6 +588,7 @@ Before announcing the page or sharing the URL externally:
 - **Console clean** — open DevTools, verify no JS errors or 404s on page
   load.
 - **Feedback widget check** — automatic for any page with `slug` (layout-level, base.njk); verify it renders on the deployed page below the related strip (eyebrow "Feedback or questions?"). Hub/utility pages opt out with `feedback: false`. Do NOT add a per-page include. (SITE_GUIDE §27)
+- **Deferred integration surfaces are tracked, not dropped.** The **OG card** (§7) and the **carousel slide** (§8) may each ship in a follow-up PR — which is precisely how they drift silently (the stale BAS OG asset; two slide-less pages sitting in `SITE_GUIDE §13` "Pending additions"; same failure class as the missing `:root` palette that §1 now guards). Both need external tooling that is often unavailable at launch (Grok Imagine for the slide; Python + Pillow/Playwright for the OG card), so deferral is legitimate — *untracked* deferral is the bug. If either is deferred, it MUST be logged as a **tracked** pending item recording the page slug: the carousel slide in `SITE_GUIDE §13` "Pending additions", the OG card in `TECH_DEBT` (or the OG handoff note). **A launch is not "done" until every §1–§10 surface is either shipped or on a tracked list.**
 
 ### Verifying a just-pushed change on Cloudflare Pages
 
