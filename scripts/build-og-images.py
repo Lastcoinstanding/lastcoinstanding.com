@@ -485,10 +485,10 @@ CARDS = [
             "title": "The Bitcoin ",
             "titleAccent": "Hurdle",
             "titleAfter": " Rate",
-            "subtitle": "Does it beat bitcoin? The bar any use of capital has to clear — and why it falls as your horizon lengthens.",
+            "subtitle": "Does it beat bitcoin? Bitcoin’s trend growth is the bar any use of capital has to clear, and most bars are set far too low.",
             "statsHTML": (
-                '<strong style="color:#F7931A; font-weight:700;">Declining hurdle</strong>'
-                '  ·  bitcoin’s trend CAGR, matched to your horizon  ·  candidate return vs. the bar'
+                '<strong style="color:#F7931A; font-weight:700;">The bar</strong>'
+                '  ·  bitcoin’s trend CAGR, matched to your horizon'
             ),
             "urlText": "lastcoinstanding.com/the-bitcoin-hurdle-rate",
         },
@@ -511,10 +511,10 @@ CARDS = [
             "title": "The Bitcoin ",
             "titleAccent": "Hurdle",
             "titleAfter": " Rate",
-            "subtitle": "Does it beat bitcoin? The bar any use of capital has to clear — and why it falls as your horizon lengthens.",
+            "subtitle": "Does it beat bitcoin? Bitcoin’s trend growth is the bar any use of capital has to clear, and most bars are set far too low.",
             "statsHTML": (
-                '<strong style="color:#F7931A; font-weight:700;">Declining hurdle</strong>'
-                '  ·  bitcoin’s trend CAGR, matched to your horizon  ·  candidate return vs. the bar'
+                '<strong style="color:#F7931A; font-weight:700;">The bar</strong>'
+                '  ·  bitcoin’s trend CAGR, matched to your horizon'
             ),
             "urlText": "lastcoinstanding.com/the-bitcoin-hurdle-rate",
         },
