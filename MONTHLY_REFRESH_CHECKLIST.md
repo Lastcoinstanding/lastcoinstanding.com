@@ -495,7 +495,7 @@ Should return nothing.
 **Direction of truth:** the repo is canonical for everything in the doc set
 above. The planning/strategy docs (OPEN_ITEMS, X_STRATEGY_PLAYBOOK,
 FUNDING_STRATEGY, REACH_GROWTH_PLAN, CREATOR_CREDIBILITY_KIT,
-PARTNERSHIPS_REFERRALS_POLICY, plus the four migrated with them) are now
+PARTNERSHIPS_REFERRALS_POLICY, plus the rest of the former project-only set) are now
 repo-tracked at root — the `claude/` project-only split was retired 2026-08-08
 (SITE_GUIDE §7); edit them in the repo directly. See PAGE_IDEAS_BACKLOG conventions.
 
