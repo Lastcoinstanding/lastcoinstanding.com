@@ -588,3 +588,53 @@ restore all four); the view joins the per-page localStorage stickiness. One cros
 `/discount-or-premium` (that page owns channel position as a subject; this view applies it to a
 capital decision) — inline on the hurdle page, a related card on DoP, so §6.10 one-placement holds on
 both sides.
+
+### 13.1 Post-review rebuild — the view governs the whole answer (JM review on preview, 2026-08-08)
+
+The first v2 pass (above) built the toggle as a **chart control**: it drove the chart and the
+position-adjustment card, but the verdict and stat cards 1–3 and 5 stayed on the trend basis. On the
+deployed preview that produced a page **whose verdict contradicted its own chart** — at
+`?view=position&r=50` the headline read "clears bitcoin's trend hurdle at every horizon" while the
+position curve directly below showed the 50% candidate not clearing until ~year 6; the body cited a
+one-year-forward rate the position chart (which starts at three years) has no point for; and card 5
+read the trend-basis gap (−20.3 pts) against a position-basis bar. This is the "two surfaces reporting
+one number" failure §4.2 warned about, arriving through the verdict/chart split rather than through
+duplicated numbers. Root cause: the ambiguous §4.0 wording (now corrected in
+`HURDLE_RATE_V2_POSITION_DESIGN.md §4.0` — supplemental *in importance*, not *as a surface*). The
+rebuild makes each view a **complete, internally consistent reading**:
+
+- **Verdict + cards 1, 2, 3, 5 compute on the active view's basis**, not just the chart and card 4.
+  The crossing is computed per view. Because `posCAGR` is **not monotonic above trend** (it rises from
+  a low/negative short-horizon value to a mid-horizon peak, then declines), the candidate can cross it
+  **twice** — the verdict handles 0/1/2 boundaries honestly ("clears up to ~3.5 yr and again beyond
+  ~27.7 yr, but not in between"), which the trend view's monotonic curve never required. Verified: at
+  r=50 the trend view clears everywhere (gap −20.3) while the position view crosses ~year 6.8 (gap
+  −8.6) — a real computation, and the contradiction is gone.
+- **Shared y-axis across both views — REVERSES build prompt §2 ("do not lock a shared axis").** JM's
+  call on preview: per-view autoscale made the two views look identical apart from axis labels,
+  hiding the jump that is the toggle's whole point. The axis is now the max across both curves at the
+  current k (not hardcoded — at low k the position curve exceeds 100% at H=3), applied to both, so the
+  trend curve sits lower in the frame and toggling shows the jump. **Consequence, accepted by JM:
+  "default view pixel-identical to production" (build §8) no longer holds by design** — the trend
+  curve is compressed by the shared scale. The decline is still visible; the jump, which was not, now
+  is.
+- **Toggle moved above the verdict.** It governs the whole reading, so the reader meets the control
+  that determines which answer before the answer itself. (Its previous placement below everything it
+  controlled is what led the first build to treat it as a chart control.)
+- **Bold computed lede atop each chart caption**, dense detail below in normal weight — trend: "high
+  at every horizon, falls… 37.6% / 29.7% / 18.7%"; position: "Bitcoin sits at k× trend today. Reading
+  the bar from there… raises/lowers it from X to Y over your N-year horizon" (sign by position).
+- **Card 4 is now the adjustment *bridge*, not a second level.** Since card 1 carries the level in the
+  position view (and the lede carries it in the trend view), card 4's headline is the signed points
+  the channel moves the bar off trend (`+11.7 pts` / `−5.2 pts`), with the two levels it bridges in
+  the sub-line. Checked for redundancy per JM: it is not redundant — card 1 is the level, card 4 is
+  the delta.
+- **Renames:** view label "From today's price" → **"From the channel"** (price is incidental, the
+  channel is the concept) with a Power-Law tooltip; both floor legends → **"Floor case (0.42× trend)"**
+  in both views (explanation stays in the caption — a Chart.js legend can't host a tooltip).
+- **H<3 in the position view fences the WHOLE block** (verdict + stats + lede), consistent with the
+  card fence (JM: option a — a conditional fallback to the trend basis would recreate the split
+  intermittently, which is worse than a clean fence).
+
+Re-ran the `?k=1.5` neutrality sweep across the rebuilt verdict, lede, and cards — clean (lede
+"lowers", card 4 "lowers it from 29.7% to 24.5%", card 5 sign-carrying). No console errors.

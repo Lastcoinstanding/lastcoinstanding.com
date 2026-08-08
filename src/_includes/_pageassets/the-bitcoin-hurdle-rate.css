@@ -93,8 +93,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .hr-spot-note { display: inline; }
 .hr-spot-note strong { color: var(--amber); }
 
-/* ── View toggle (v2) — §6.22 chart-range-toggle segmented control, above the chart ── */
-.hr-view-wrap { max-width: 880px; margin: 0 auto 0.4rem; text-align: center; }
+/* ── View toggle (v2) — §6.22 segmented control; governs verdict + cards + chart, so it sits above the answer ── */
+.hr-view-wrap { max-width: 760px; margin: 0.4rem auto 1.1rem; text-align: center; }
+/* bold computed lede atop each dense chart caption (JM 2026-08-08) */
+.hr-lede { display: block; font-size: 0.95rem; line-height: 1.5; font-weight: 600; color: var(--text-bright); margin-bottom: 0.5rem; }
+.hr-lede strong { color: var(--amber); font-weight: 700; }
 .hr-view-toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
 .hr-view-btn { background: transparent; color: var(--text-dim); border: none; border-right: 1px solid var(--border); padding: 0.42rem 1rem; font-family: 'Inter', sans-serif; font-size: 0.85rem; cursor: pointer; transition: background 0.14s ease, color 0.14s ease; }
 .hr-view-btn:last-child { border-right: none; }

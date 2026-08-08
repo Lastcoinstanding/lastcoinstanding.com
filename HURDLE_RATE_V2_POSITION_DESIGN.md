@@ -80,8 +80,21 @@ trying to convey both at once conveys neither:
   horizon of the decision. This is a property of the model, true regardless of price today. It is
   the page's primary claim and it leads.
 - **View 2 — the position correction.** The structural answer must be tempered or augmented,
-  sometimes substantially, by where bitcoin currently sits in the channel. Important, but
-  **supplemental and separate** — it modifies insight 1 rather than replacing it.
+  sometimes substantially, by where bitcoin currently sits in the channel.
+
+**Supplemental in what sense — the distinction that matters (JM, 2026-08-08, after the first build
+read it the wrong way).** "Supplemental" here means supplemental *in importance and default
+prominence* — view 1 leads, view 2 is opt-in and off by default. It does **not** mean supplemental
+*as a surface*: view 2 is **not** an annotation layered on a trend-based answer. **When selected, the
+position view is the COMPLETE reading — the verdict, every stat card, and the chart all compute on its
+basis. It is a different answer to the same question, not a footnote on the trend answer.** The
+original §4.0 wording ("modifies insight 1 rather than replacing it") was ambiguous between these two
+readings; the first v2 build reasonably implemented the surface reading (the toggle drove only the
+chart and one card, leaving the verdict on the trend basis), which produced a page whose verdict
+contradicted its own chart at `?view=position&r=50` — the headline said "clears at every horizon"
+while the position curve it sat above showed the candidate not clearing until year six. That
+contradiction is what forced the distinction to be stated explicitly. Each view, when selected, is
+internally complete and self-consistent; the toggle chooses *which whole answer*, not *which chart*.
 
 Each view says one thing. Design decisions below should be tested against that: if a change makes
 a view carry part of the other's argument, it is the wrong change.

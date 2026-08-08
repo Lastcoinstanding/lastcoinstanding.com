@@ -101,21 +101,39 @@
   function posCAGR(H){ var t = tDays(); return Math.pow((1 / chanK()) * Math.pow((t + YEAR_D * H) / t, PL_B), 1 / H) - 1; }
   function trendMultiple(H){ var t = tDays(); return Math.pow((t + YEAR_D * H) / t, PL_B); }
 
-  // Horizon where the candidate return equals the trend hurdle. trendCAGR is
-  // monotonically decreasing in H, so a simple scan finds the crossing.
-  // Returns { kind:'always' } (candidate ≥ hurdle at H=1),
-  //         { kind:'never' } (candidate < hurdle even at H=40),
-  //         { kind:'at', h:<years> }.
-  function crossing(){
-    var r = S.r / 100;
-    if (r >= trendCAGR(1)) return { kind: 'always' };
-    if (r < trendCAGR(40)) return { kind: 'never' };
-    var lo = 1, hi = 40, mid;
-    for (var i = 0; i < 40; i++){
-      mid = (lo + hi) / 2;
-      if (trendCAGR(mid) > r) lo = mid; else hi = mid;
+  // The bar the whole answer is measured against — the ACTIVE VIEW's curve. In the
+  // trend view it's trendCAGR (spot-independent, monotonically decreasing). In the
+  // position view it's posCAGR over H>=3, which is NOT monotonic above trend (it rises
+  // from a low/negative short-horizon value to a mid-horizon peak, then declines), so
+  // the candidate line can cross 0, 1, or 2 times. Everything downstream — verdict,
+  // stat cards, chart marker — reads this, so toggling the view changes the whole
+  // answer, not just the chart (design §4.0: the selected view is the complete reading).
+  function activeCAGR(H){ return isPos() ? posCAGR(H) : trendCAGR(H); }
+  function viewStartH(){ return isPos() ? MIN_POS_H : 1; }
+
+  // Scan the active curve's domain for where the candidate clears the bar (r >= curve).
+  //   { kind:'always' } clears at every plotted horizon
+  //   { kind:'never'  } clears at none
+  //   { kind:'mixed', startClears:bool, bounds:[{h, becomesCleared}] }  — 1 or 2 bounds
+  function crossingInfo(){
+    var r = S.r / 100, startH = viewStartH(), step = 0.1;
+    var prev = (r >= activeCAGR(startH)), startClears = prev, all = prev, none = !prev;
+    var bounds = [];
+    for (var n = 1; ; n++){
+      var H = startH + n * step;
+      if (H > 40 + 1e-9) break;
+      var now = (r >= activeCAGR(H));
+      if (now) none = false; else all = false;
+      if (now !== prev){
+        var h0 = H - step, c0 = activeCAGR(h0) - r, c1 = activeCAGR(H) - r;
+        var denom = Math.abs(c0) + Math.abs(c1);
+        bounds.push({ h: h0 + step * (denom ? Math.abs(c0) / denom : 0.5), becomesCleared: now });
+        prev = now;
+      }
     }
-    return { kind: 'at', h: (lo + hi) / 2 };
+    if (all) return { kind: 'always' };
+    if (none) return { kind: 'never' };
+    return { kind: 'mixed', startClears: startClears, bounds: bounds };
   }
 
   // ─────────── FORMAT ───────────
@@ -135,7 +153,7 @@
   function grab(){
     ['hrReturn','hrReturnNum','hrHorizon','hrHorizonNum','hrTaxNote','hrCapsrcCap',
      'hrChart','hrChartCap','hrChartCapPos','hrSpotNote','hrSpotNotePos','hrNearTouch',
-     'hrVerdict','hrStats'].forEach(function(id){
+     'hrLedeTrend','hrLedePos','hrVerdict','hrStats'].forEach(function(id){
       el[id] = document.getElementById(id);
     });
   }
@@ -143,6 +161,20 @@
   // ─────────── CHART ───────────
   var chart = null;
   function isPos(){ return S.view === 'position'; }
+
+  // Shared y-axis max across BOTH views at the current k (JM, 2026-08-08 — reverses build
+  // §2's per-view axis; recorded in HURDLE_RATE_DESIGN §13). Per-view autoscale made the
+  // two views look identical apart from axis labels, hiding the jump that is the toggle's
+  // whole point. Scaled to the larger (position) curve so the trend curve sits lower in
+  // the frame and the jump is visible on toggle. NOT hardcoded — at low k the position
+  // curve exceeds 100% at H=3. The 50% floor keeps the candidate line (0–50%) always in
+  // frame and the axis stable across return-slider drags (it depends only on k).
+  function computeAxisMax(){
+    var m = trendCAGR(1);
+    for (var H = MIN_POS_H; H <= 40; H++){ var p = posCAGR(H); if (p > m) m = p; }
+    m = Math.max(m, 0.50) * 100 * 1.06;   // headroom above the peak
+    return Math.ceil(m / 10) * 10;        // tidy 10% step
+  }
   // Upper curve = trendCAGR (trend view) or posCAGR (position view); lower band edge
   // = spot→floor in both. Position view starts at H=3 (the fence declines to plot below).
   function curveData(){
@@ -179,29 +211,31 @@
         ctx.fillStyle = 'rgba(242,238,232,0.92)'; ctx.font = '600 12px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
         ctx.fillText(pct(curveFn(mh)), hx, hy - 8);
         ctx.restore();
-        // The candidate-crossing marker is a trend-view feature (the verdict's crossing
-        // horizon is measured against trendCAGR). Suppress it in the position view.
-        if (isPos()) return;
-        // Crossing marker — only when the candidate line crosses the curve.
-        var cr = crossing();
-        if (cr.kind !== 'at') return;
-        var x = c.scales.x.getPixelForValue(cr.h);
-        var y = c.scales.y.getPixelForValue(S.r);
+        // Candidate-crossing marker(s) — where the flat candidate line meets the active
+        // curve. Drawn in BOTH views now (the position view is a full answer that crosses,
+        // not a chart overlay). posCAGR can cross twice above trend, so draw a dot at each
+        // boundary within the plotted domain.
+        var ci = crossingInfo();
+        if (ci.kind !== 'mixed') return;
         ctx.save();
-        ctx.beginPath(); ctx.moveTo(x, c.chartArea.top); ctx.lineTo(x, c.chartArea.bottom);
-        ctx.strokeStyle = 'rgba(242,238,232,0.22)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]); ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2);
-        ctx.fillStyle = AMBER; ctx.fill();
-        ctx.strokeStyle = INK; ctx.lineWidth = 1.5; ctx.stroke();
+        for (var b = 0; b < ci.bounds.length; b++){
+          var x = c.scales.x.getPixelForValue(ci.bounds[b].h);
+          var y = c.scales.y.getPixelForValue(S.r);
+          ctx.beginPath(); ctx.moveTo(x, c.chartArea.top); ctx.lineTo(x, c.chartArea.bottom);
+          ctx.strokeStyle = 'rgba(242,238,232,0.22)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2);
+          ctx.fillStyle = AMBER; ctx.fill();
+          ctx.strokeStyle = INK; ctx.lineWidth = 1.5; ctx.stroke();
+        }
         ctx.restore();
       }
     };
   }
 
   // View-specific legend labels (the band travels with the view).
-  function upperLabel(){ return isPos() ? 'From today’s price (to trend)' : 'Bitcoin’s trend hurdle'; }
-  function floorLabel(){ return isPos() ? 'Floor path (to floor)' : 'Floor path (if bitcoin only reaches its floor)'; }
+  function upperLabel(){ return isPos() ? 'From the channel (to trend)' : 'Bitcoin’s trend hurdle'; }
+  function floorLabel(){ return 'Floor case (0.42× trend)'; } // both views (design §13); caption carries the explanation
   function candStart(){ return isPos() ? MIN_POS_H : 1; }
 
   function buildChart(){
@@ -239,7 +273,7 @@
                      callback: function(v){ return v + 'y'; } }
           },
           y: {
-            min: 0,
+            min: 0, max: computeAxisMax(),
             title: { display: true, text: 'Annualised return', color: MUTED,
                      font: { family: 'Inter, sans-serif', size: 11 } },
             grid: { color: 'rgba(224,148,34,0.06)' },
@@ -273,16 +307,34 @@
     chart.data.datasets[1].data = d.upper;
     chart.data.datasets[1].label = upperLabel();
     chart.data.datasets[2].data = [{ x: candStart(), y: S.r }, { x: 40, y: S.r }];
-    // X-axis starts at the fence in the position view (the view declines to plot < 3yr);
-    // Y-axis is left to autoscale per view — magnitudes differ ~10× so no shared lock (build §2).
+    // X-axis starts at the fence in the position view (the view declines to plot < 3yr).
+    // Y-axis is SHARED across both views (computeAxisMax) so toggling reveals the jump.
     chart.options.scales.x.min = isPos() ? MIN_POS_H : 1;
+    chart.options.scales.y.max = computeAxisMax();
     chart.update('none');
   }
 
   // ─────────── VERDICT (facts-not-signals; both conditions in the sentence) ───────────
+  // Reads the ACTIVE VIEW's bar (design §4.0: the selected view is the complete reading,
+  // not a chart overlay). In the trend view the bar is trendCAGR; in the position view it
+  // is posCAGR, so the same candidate can clear everywhere in one view and cross mid-range
+  // in the other — the toggle changes the answer, which is the point.
+  function crossingPhrase(ci, barName){
+    var b = ci.bounds;
+    if (b.length === 1){
+      return b[0].becomesCleared
+        ? 'clears ' + barName + ' at horizons beyond about <strong>' + yrs(b[0].h) + '</strong>'
+        : 'clears ' + barName + ' only up to about <strong>' + yrs(b[0].h) + '</strong>, not beyond';
+    }
+    // two boundaries: cleared at the ends (startClears) or only in the middle
+    if (ci.startClears){
+      return 'clears ' + barName + ' up to about <strong>' + yrs(b[0].h) + '</strong> and again beyond about <strong>' + yrs(b[1].h) + '</strong>, but not in between';
+    }
+    return 'clears ' + barName + ' only between about <strong>' + yrs(b[0].h) + '</strong> and <strong>' + yrs(b[1].h) + '</strong>';
+  }
+
   function verdict(){
-    var H = S.h, r = S.r;
-    var tc = trendCAGR(H);
+    var H = S.h, r = S.r, pos = isPos();
     var provNote = todayPriceNote(spotSource); // '' when live, ' (latest monthly data)' otherwise
 
     // §3.5 — the not-cashflow-positive company verdict CHANGES, it is not decorated.
@@ -296,23 +348,40 @@
         '<p class="hr-v-body">Bitcoin&rsquo;s trend return is realised only by capital that can hold through a roughly &minus;73% drawdown without being forced to sell. Money that has to be spent on a fixed date can be caught in a drawdown at exactly the wrong moment, so the trend rate is not the benchmark for it. For this use, the certain, dated alternative is the comparison that holds &mdash; not bitcoin&rsquo;s trend.</p>';
     }
 
-    var cr = crossing();
-    var lead, body;
+    // Position view fences the WHOLE answer below three years (JM 2026-08-08, option a) —
+    // a conditional fallback to the trend basis would recreate the split intermittently.
+    if (pos && H < MIN_POS_H){
+      return '<p class="hr-v-lead">This reading starts at a three-year horizon.</p>' +
+        '<p class="hr-v-body">From today&rsquo;s channel position, inside three years the number turns almost entirely on <em>when</em> bitcoin returns to trend rather than <em>whether</em> &mdash; a bet on timing, not a capital plan. Set the horizon to three years or more to read the position-adjusted answer, or switch to <strong>From the trend</strong> for the structural reading, which holds at every horizon.</p>';
+    }
+
+    var barName = pos ? 'the bar from today&rsquo;s channel position' : 'bitcoin&rsquo;s trend hurdle';
+    var barAtH = activeCAGR(H);
+    var windowNote = pos
+      ? ' (from bitcoin&rsquo;s ' + chanK().toFixed(2) + '&times;-trend position today, over that ' + H + '-year window' + provNote + ')'
+      : ' (measured over that ' + H + '-year-forward window' + provNote + ')';
+    var domainWord = pos ? 'from three to forty years' : 'up to 40 years';
     var waitClause = (S.lens === 'company')
       ? 'if the trend holds and the business stays cashflow positive'
       : (S.canWait === 'limited'
           ? 'if the trend holds and the capital can wait &mdash; and a drawdown mid-horizon could force the decision early, which lowers the effective bar'
           : 'if the trend holds and the capital can wait');
 
-    if (cr.kind === 'always'){
-      lead = 'Estimated: at ' + pctN(r) + '/yr, your return clears bitcoin&rsquo;s trend hurdle at every horizon on the chart.';
-      body = 'Even the one-year-forward trend rate (' + pct(trendCAGR(1)) + ') sits below your number, so across the range the candidate has been the higher-returning use of the capital &mdash; at the margin, for capital that could otherwise have waited.';
-    } else if (cr.kind === 'never'){
-      lead = 'Estimated: at ' + pctN(r) + '/yr, your return does not clear bitcoin&rsquo;s trend hurdle at any horizon up to 40 years.';
-      body = 'At your ' + H + '-year horizon the trend hurdle is ' + pct(tc) + ' (measured over that ' + H + '-year-forward window' + provNote + '); across the whole range, holding bitcoin has been the higher-returning use of the same capital &mdash; ' + waitClause + ', at the margin, for a holder who can survive the drawdown.';
+    var ci = crossingInfo();
+    var lead, body;
+
+    if (ci.kind === 'always'){
+      // cite the hardest point to clear — the peak of the active curve over its domain
+      var peakH = viewStartH(), peakV = activeCAGR(peakH);
+      for (var hh = viewStartH(); hh <= 40; hh += 0.5){ var vv = activeCAGR(hh); if (vv > peakV){ peakV = vv; peakH = hh; } }
+      lead = 'Estimated: at ' + pctN(r) + '/yr, your return clears ' + barName + ' at every horizon ' + domainWord + '.';
+      body = 'Even at its highest &mdash; ' + pct(peakV) + (pos ? ' around year ' + Math.round(peakH) : ' at a one-year horizon') + ' &mdash; the bar sits below your number, so across the range the candidate has been the higher-returning use of the capital &mdash; at the margin, for capital that could otherwise have waited.';
+    } else if (ci.kind === 'never'){
+      lead = 'Estimated: at ' + pctN(r) + '/yr, your return does not clear ' + barName + ' at any horizon ' + domainWord + '.';
+      body = 'At your ' + H + '-year horizon the bar is ' + pct(barAtH) + windowNote + '; across the range, holding bitcoin has been the higher-returning use of the same capital &mdash; ' + waitClause + ', at the margin, for a holder who can survive the drawdown.';
     } else {
-      lead = 'Estimated: at ' + pctN(r) + '/yr, your return clears bitcoin&rsquo;s trend hurdle at horizons beyond about <strong>' + yrs(cr.h) + '</strong>.';
-      body = 'Below that, holding bitcoin has been the higher-returning use of the same capital &mdash; ' + waitClause + ', at the margin, for a holder who can survive the drawdown. At your ' + H + '-year horizon the hurdle is ' + pct(tc) + ' over that ' + H + '-year-forward window' + provNote + '.';
+      lead = 'Estimated: at ' + pctN(r) + '/yr, your return ' + crossingPhrase(ci, barName) + '.';
+      body = 'At your ' + H + '-year horizon the bar is ' + pct(barAtH) + windowNote + '. Where your line runs below it, holding bitcoin has been the higher-returning use of the same capital &mdash; ' + waitClause + ', at the margin, for a holder who can survive the drawdown.';
     }
     return '<p class="hr-v-lead">' + lead + '</p><p class="hr-v-body">' + body + '</p>';
   }
@@ -325,47 +394,69 @@
   function stats(){
     if (S.lens === 'company' && S.cashflow === 'no') return '';
     if (S.lens === 'personal' && S.canWait === 'no') return '';
-    var H = S.h, r = S.r / 100;
-    var tc = trendCAGR(H);
-    var tMult = trendMultiple(H);
-    var fMult = floorAtH(H) / spot;
-    var candTerminal = NOTIONAL * Math.pow(1 + r, H);
-    var trendTerminal = NOTIONAL * tMult;
-    var out = '';
-    out += tile(pct(tc), 'Trend hurdle over your ' + H + '-yr window', 'Bitcoin&rsquo;s trend CAGR measured over the next ' + H + ' years &mdash; the bar your candidate return has to clear.');
-    out += tile(mult(tMult) + ' <span class="hr-stat-sub">trend</span> &middot; ' + mult(fMult) + ' <span class="hr-stat-sub">floor</span>', 'Bitcoin multiple over ' + yrs(H), 'How many times your money bitcoin returns over the horizon if it reaches trend, and if it reaches only its historical floor.');
-    out += tile(money(candTerminal) + ' <span class="hr-stat-sub">vs</span> ' + money(trendTerminal),
-                money(NOTIONAL) + ' at ' + pctN(S.r) + ' vs at bitcoin&rsquo;s trend',
-                'What a fixed starting amount grows to at your candidate return versus at bitcoin&rsquo;s trend, over the horizon.');
-    // Card 4 — the position-adjustment card (v2, HURDLE_RATE_DESIGN §13). Reworked from
-    // the old "optimistic edge" card: renders in BOTH views, position-neutral and
-    // sign-carrying, so it reads correctly above and below trend. Below the 3-year fence
-    // (design §4.3) it declines to surface a rate; the ×-trend multiplier stays (always
-    // valid). Provenance rides the sub-line when the price is not live (build §1.3).
+    var H = S.h, r = S.r / 100, pos = isPos();
+    // Position view fences the WHOLE strip below three years (JM: whole block, consistent
+    // with the verdict + card fences) — the verdict carries the fence copy.
+    if (pos && H < MIN_POS_H) return '';
+    var prov = todayPriceNote(spotSource);
     var k = chanK();
-    var prov = todayPriceNote(spotSource); // '' when live, ' (latest monthly data)' otherwise
-    var posTip = 'Bitcoin&rsquo;s return from today&rsquo;s price to trend at your horizon, and how many points that adds to or subtracts from the structural bar &mdash; set by where bitcoin sits in the channel now. Below a 3-year horizon it turns on <em>when</em> bitcoin returns to trend rather than <em>whether</em>, so this reading starts at three years.';
+
+    var barCAGR = activeCAGR(H);                    // card 1: the bar on the active basis
+    var toTrendMult = trendAtH(H) / spot;           // spot→trend multiple (position basis)
+    var fMult = floorAtH(H) / spot;                 // spot→floor multiple (both views)
+    var tMult = trendMultiple(H);                   // trend→trend multiple (trend basis)
+    var candTerminal = NOTIONAL * Math.pow(1 + r, H);
+    var barTerminal = NOTIONAL * (pos ? toTrendMult : tMult);
+    var out = '';
+
+    // Card 1 — the bar at the chosen horizon, on the active view's basis.
+    out += pos
+      ? tile(pct(barCAGR), 'The channel bar over your ' + H + '-yr window',
+          'The bar read from bitcoin&rsquo;s position in the Power&nbsp;Law channel today (' + k.toFixed(2) + '&times; trend) to trend at your horizon &mdash; the number your candidate return has to clear in this view.')
+      : tile(pct(barCAGR), 'Trend hurdle over your ' + H + '-yr window',
+          'Bitcoin&rsquo;s trend CAGR measured over the next ' + H + ' years &mdash; the bar your candidate return has to clear.');
+
+    // Card 2 — bitcoin multiple over the horizon (upper figure on the active basis).
+    out += pos
+      ? tile(mult(toTrendMult) + ' <span class="hr-stat-sub">to trend</span> &middot; ' + mult(fMult) + ' <span class="hr-stat-sub">to floor</span>',
+          'Bitcoin multiple from today&rsquo;s price over ' + yrs(H),
+          'How many times your money bitcoin returns from today&rsquo;s price over the horizon if it reaches trend, and if it reaches only its historical floor.')
+      : tile(mult(tMult) + ' <span class="hr-stat-sub">trend</span> &middot; ' + mult(fMult) + ' <span class="hr-stat-sub">floor</span>',
+          'Bitcoin multiple over ' + yrs(H),
+          'How many times your money bitcoin returns over the horizon if it reaches trend, and if it reaches only its historical floor.');
+
+    // Card 3 — terminal value of a fixed amount, candidate vs bitcoin (active basis).
+    out += tile(money(candTerminal) + ' <span class="hr-stat-sub">vs</span> ' + money(barTerminal),
+                money(NOTIONAL) + ' at ' + pctN(S.r) + (pos ? ' vs at bitcoin from today&rsquo;s price' : ' vs at bitcoin&rsquo;s trend'),
+                'What a fixed starting amount grows to at your candidate return versus ' + (pos ? 'at bitcoin from today&rsquo;s price to trend' : 'at bitcoin&rsquo;s trend') + ', over the horizon.');
+
+    // Card 4 — the adjustment bridge (both views). Headline = the signed points bitcoin's
+    // channel position moves the bar off the structural trend; sub carries the two levels
+    // it bridges (trend → position) + ×-trend, so the position LEVEL is on screen even in
+    // the trend view (design §4.2). In the position view card 1 now carries the level, so
+    // this stays the delta rather than repeating the number. Below 3yr it fences (in the
+    // trend view; the whole strip is already gone below 3yr in the position view).
+    var posTip = 'How many points bitcoin&rsquo;s channel position today moves the bar off the structural trend, and the two levels it bridges &mdash; set by where bitcoin sits in the Power&nbsp;Law channel now. Below a 3-year horizon the position reading turns on <em>when</em> bitcoin returns to trend rather than <em>whether</em>, so it starts at three years.';
     if (H < MIN_POS_H){
-      out += tile('&mdash;',
-        'From today&rsquo;s position' + tipSpan(posTip) +
+      out += tile('&mdash;', 'Position adjustment to the bar' + tipSpan(posTip) +
         '<span class="hr-stat-adj">' + k.toFixed(2) + '&times; trend &middot; reads from a 3-year horizon' + prov + '</span>', '');
     } else {
-      var padj = (posCAGR(H) - trendCAGR(H)) * 100;
-      var adjPhrase = padj >= 0
-        ? 'adds ' + padj.toFixed(1) + ' pts to the bar'
-        : 'subtracts ' + Math.abs(padj).toFixed(1) + ' pts from the bar';
-      out += tile(pct(posCAGR(H)),
-        'From today&rsquo;s position over ' + H + ' yr' + tipSpan(posTip) +
-        '<span class="hr-stat-adj">' + k.toFixed(2) + '&times; trend &middot; ' + adjPhrase + prov + '</span>', '');
+      var tcH = trendCAGR(H), pcH = posCAGR(H), padj = (pcH - tcH) * 100;
+      var verb = padj >= 0 ? 'raises' : 'lowers';
+      out += tile((padj >= 0 ? '+' : '') + padj.toFixed(1) + ' pts',
+        'Position adjustment to the bar' + tipSpan(posTip) +
+        '<span class="hr-stat-adj">' + k.toFixed(2) + '&times; trend &middot; ' + verb + ' it from ' + pct(tcH) + ' to ' + pct(pcH) + prov + '</span>', '');
     }
+
+    // Card 5 (company only) — the gap between the bar (active basis) and the candidate.
     if (S.lens === 'company'){
-      var gap = (tc - r) * 100;
+      var gap = (barCAGR - r) * 100;
       var fundWord = S.funding === 'debt' ? 'debt serviced at ' + pctN(S.r)
                    : S.funding === 'equity' ? 'equity costing ' + pctN(S.r)
                    : 'cash returning ' + pctN(S.r);
       out += tile((gap >= 0 ? '+' : '') + gap.toFixed(1) + ' pts/yr',
-                  'Trend hurdle vs ' + fundWord + ', over ' + yrs(H),
-                  'The gap between bitcoin&rsquo;s trend hurdle and your candidate return; the funding label (cash/debt/equity) only frames this number and does not change it.');
+                  (pos ? 'Channel bar' : 'Trend hurdle') + ' vs ' + fundWord + ', over ' + yrs(H),
+                  'The gap between ' + (pos ? 'the channel-adjusted bar' : 'bitcoin&rsquo;s trend hurdle') + ' and your candidate return; the funding label (cash/debt/equity) only frames this number and does not change it.');
     }
     return out;
   }
@@ -414,6 +505,25 @@
         el.hrNearTouch.innerHTML = common + ' Today they sit about <strong>' + Math.abs(gap).toFixed(1) +
           ' pts</strong> apart &mdash; bitcoin is about <strong>' + kk.toFixed(2) + '&times;</strong> trend, ' +
           (gap >= 0 ? 'above' : 'below') + ' its floor.';
+      }
+    }
+    // Bold lede atop each chart caption (JM 2026-08-08) — the one-sentence reading, computed,
+    // with the dense detail below in normal weight. Position-neutral: the position lede says
+    // raises/lowers by the actual sign, and fences below three years like the rest of the block.
+    if (el.hrLedeTrend){
+      el.hrLedeTrend.innerHTML = 'The bar is high at every horizon and falls as the horizon lengthens &mdash; <strong>' +
+        pct(trendCAGR(1)) + '</strong> over one year, <strong>' + pct(trendCAGR(10)) + '</strong> over ten, <strong>' +
+        pct(trendCAGR(40)) + '</strong> over forty.';
+    }
+    if (el.hrLedePos){
+      var Hp = S.h, kp = chanK();
+      if (Hp < MIN_POS_H){
+        el.hrLedePos.innerHTML = 'Bitcoin sits at <strong>' + kp.toFixed(2) + '&times;</strong> its trend today. This reading starts at a three-year horizon &mdash; set the horizon to three years or more to read the bar from the channel.';
+      } else {
+        var tcp = trendCAGR(Hp), pcp = posCAGR(Hp);
+        el.hrLedePos.innerHTML = 'Bitcoin sits at <strong>' + kp.toFixed(2) + '&times;</strong> its trend today. Reading the bar from there rather than from the trend line ' +
+          (pcp >= tcp ? 'raises' : 'lowers') + ' it from <strong>' + pct(tcp) + '</strong> to <strong>' + pct(pcp) +
+          '</strong> over your ' + Hp + '-year horizon.';
       }
     }
   }
