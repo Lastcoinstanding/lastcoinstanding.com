@@ -483,9 +483,9 @@
         '×</strong> its trend' + todayPriceNote(spotSource) + ' &mdash; the position this view reads from.';
     }
     // Near-touch caption (JM 2026-08-08) — computed, not hardcoded, so it stays true as
-    // bitcoin moves: when spot sits near its floor the floor-path edge and the trend
-    // curve nearly coincide (the two views agree at their cautious edge); the gap widens
-    // as bitcoin moves away from its floor. Position-neutral by construction.
+    // bitcoin moves: when spot sits near its floor the floor case and the trend curve
+    // nearly coincide (the two views agree at their cautious end); the gap widens as
+    // bitcoin moves away from its floor. Position-neutral by construction.
     if (el.hrNearTouch){
       var Hn = Math.max(S.h, MIN_POS_H);
       var fe = spotToFloorCAGR(Hn), tcv = trendCAGR(Hn);
@@ -495,7 +495,7 @@
       // the two edges coincide when spot sits on the floor and separate as it moves away.
       // Only when they actually nearly meet (spot near floor) does the copy claim it; above
       // the floor it states the gap plainly, so the caption can't read absurdly at k=1.5.
-      var common = 'The floor-path edge of this view (' + pct(fe) + ' at ' + Hn +
+      var common = 'The floor case of this view (' + pct(fe) + ' at ' + Hn +
         '&nbsp;yr) and the trend view&rsquo;s curve (' + pct(tcv) +
         ') coincide when bitcoin sits on its floor and separate as it moves away.';
       if (Math.abs(gap) < 2){

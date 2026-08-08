@@ -116,16 +116,22 @@ Remaining tail:
 
 ## In flight (undated / JM quick tasks)
 
-- [ ] **BLOCKING PRODUCTION SHIP — Hurdle Rate v2 below-trend-language sweep.** Before the
-  channel-position view (`feat/hurdle-position-view`, HURDLE_RATE_DESIGN §13) goes to production,
-  sweep the **whole** `/the-bitcoin-hurdle-rate` page for below-trend language — "optimistic",
-  "edge", "opportunity" (as advocacy, not "opportunity cost"), "discount", "the upside", "while it
-  lasts" — scoped **beyond the v2 copy** to the v1 strings left in place (design §8.1 ruling 4: the
-  v2 build fenced neutrality to new copy + the reworked card; the v1 strings are the deferred
-  remainder). The feature bakes today's below-trend position into the page the moment it reads as
-  advocacy, and nobody will notice because the numbers stay correct. Added at build time per the
-  `NEW_PAGE_CHECKLIST §11` gate so it cannot be lost between build and ship. Verify at a simulated
-  above-trend position with the `?k=1.5` debug param (SITE_GUIDE §45).
+- [x] **DONE (2026-08-08) — Hurdle Rate v2 below-trend-language sweep, the pre-production gate.**
+  Whole-page grep for the listed advocacy words, judged in context, before merge:
+  - **"optimistic" / "the upside" / "while it lasts"** — absent (the v1 "optimistic edge" card was
+    reworked into the neutral position-adjustment card at build time).
+  - **"opportunity"** — every instance is "opportunity cost" (the page's thesis, explicitly exempted)
+    or neutral ("reinvestment opportunities", "act on opportunities during a drawdown"). Not advocacy.
+  - **"discount"** — sole instance names *both* "a discount or a premium" in the `/discount-or-premium`
+    cross-link. Neutral.
+  - **"edge"** — all geometric (band-edge references in code comments); the one user-facing instance,
+    the near-touch caption's "floor-path edge", was tidied to "floor case" to match the legend rename
+    (removes the literal word too). Not advocacy in any instance.
+  Verified at the simulated above-trend position (`?k=1.5`) across every new/changed string over the
+  build (the sweep caught and fixed one non-neutral near-touch draft, `99a00d9`). Neutral copy fenced
+  from build (`efb958e`); decline-as-headline demoted in meta/JSON-LD/FAQ5/"what would break this?"
+  (`ca43d85`); floor-path-edge tidy shipped with the merge. **Read as written and found genuinely
+  swept — no advocacy language remains.**
 
 - [ ] **The Bitcoin Exit essay → reciprocal link to /what-daily-conviction-bought** — do BEFORE
   Thursday's thread (closes the thread → tool → essay loop).

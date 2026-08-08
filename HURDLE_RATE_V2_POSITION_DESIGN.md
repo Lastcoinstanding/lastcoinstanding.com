@@ -96,6 +96,15 @@ while the position curve it sat above showed the candidate not clearing until ye
 contradiction is what forced the distinction to be stated explicitly. Each view, when selected, is
 internally complete and self-consistent; the toggle chooses *which whole answer*, not *which chart*.
 
+**Default = the trend view — a confirmation of the §4.0 framing, not a new ruling (JM, 2026-08-08).**
+The default is **comprehension order, not caution**. The channel view's figures are a *deviation from a
+baseline*: "79% at three years" means something only once the reader knows the trend bar is ~35%, and
+reads as a pitch without it. So insight 1 leads and insight 2 corrects it — exactly what §4.0 already
+specifies. (Note the earlier live-review worry that defaulting to trend buries the time-sensitive
+position figure is now moot: the live `k` sits in the toggle button itself — "From today (0.43×)" — so
+a reader who never clicks still sees where bitcoin is. That removed the main argument for defaulting to
+the channel view.)
+
 Each view says one thing. Design decisions below should be tested against that: if a change makes
 a view carry part of the other's argument, it is the wrong change.
 
