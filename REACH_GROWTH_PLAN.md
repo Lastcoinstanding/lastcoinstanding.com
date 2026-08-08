@@ -2,7 +2,7 @@
 
 > **Migrated into the repo 2026-08-08.** Previously a project-only doc under the now-retired `claude/` location prefix; moved to repo root — tracked, alongside `TECH_DEBT.md` and `PAGE_IDEAS_BACKLOG.md` — so it can be read and updated directly in-session. Unreadable project-only copies had drifted (OPEN_ITEMS twice), which is why the split was retired. Everything below is the verbatim authoritative export as of the move; not rewritten. Internal `claude/…` cross-references below are pre-migration paths — the migrated planning docs now live at repo root without the prefix.
 
-_Created 2026-07-22. Companion to `claude/FUNDING_STRATEGY.md`. The reach workstream is the
+_Created 2026-07-22. Companion to `FUNDING_STRATEGY.md`. The reach workstream is the
 highest-leverage thing on the whole roadmap, because **reach is the hinge** that converts the
 low-traffic-friendly grant runway (now) into traffic-dependent bridge revenue (later)._
 

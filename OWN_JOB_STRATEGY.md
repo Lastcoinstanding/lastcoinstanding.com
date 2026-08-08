@@ -3,9 +3,9 @@
 > **Migrated into the repo 2026-08-08.** Previously a project-only doc under the now-retired `claude/` location prefix; moved to repo root — tracked, alongside `TECH_DEBT.md` and `PAGE_IDEAS_BACKLOG.md` — so it can be read and updated directly in-session. Unreadable project-only copies had drifted (OPEN_ITEMS twice), which is why the split was retired. Everything below is the verbatim authoritative export as of the move; not rewritten. Internal `claude/…` cross-references below are pre-migration paths — the migrated planning docs now live at repo root without the prefix.
 
 _Created 2026-08-05 (JM's initiative, scoped same day: door-agnostic across all three engagement
-models; both target tiers in one pass). Companion to `claude/FUNDING_STRATEGY.md` (which this doc
-deliberately re-opens in one place — see §1), `claude/REACH_GROWTH_PLAN.md` (reach feeds this),
-and `claude/CREATOR_CREDIBILITY_KIT.md` (the assets this outreach reuses)._
+models; both target tiers in one pass). Companion to `FUNDING_STRATEGY.md` (which this doc
+deliberately re-opens in one place — see §1), `REACH_GROWTH_PLAN.md` (reach feeds this),
+and `CREATOR_CREDIBILITY_KIT.md` (the assets this outreach reuses)._
 
 ---
 

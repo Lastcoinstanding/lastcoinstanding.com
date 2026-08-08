@@ -3,7 +3,7 @@
 > **Migrated into the repo 2026-08-08.** Previously a project-only doc under the now-retired `claude/` location prefix; moved to repo root — tracked, alongside `TECH_DEBT.md` and `PAGE_IDEAS_BACKLOG.md` — so it can be read and updated directly in-session. Unreadable project-only copies had drifted (OPEN_ITEMS twice), which is why the split was retired. Everything below is the verbatim authoritative export as of the move; not rewritten. Internal `claude/…` cross-references below are pre-migration paths — the migrated planning docs now live at repo root without the prefix.
 
 _Created 2026-07-25, on the eve of the first pilot publish (Mon Jul 27). Companion to
-`claude/REACH_GROWTH_PLAN.md` — that doc holds the why (reach is the hinge) and the cross-channel
+`REACH_GROWTH_PLAN.md` — that doc holds the why (reach is the hinge) and the cross-channel
 architecture; this one is the operating manual for the #1 channel. JM's ordering (2026-07-22): X
 outranks YouTube — it's where the Bitcoiner community and the word-of-mouth referrers live, and it
 doubles as the relationship layer that feeds Satos votes, OpenSats reference letters, podcast invites,
@@ -131,7 +131,7 @@ should arrive as natural extensions of visible mutual respect, not as transactio
 a short list in this doc's future revisions of who has engaged back, so warmth is real, not imagined.
 
 **The capture loop:** any notable reshare, kind words from a credible account, or user testimonial
-gets filed into `claude/CREATOR_CREDIBILITY_KIT.md` §2 the same day ("application gold" — feeds
+gets filed into `CREATOR_CREDIBILITY_KIT.md` §2 the same day ("application gold" — feeds
 OpenSats impact, Satos, and every future partner conversation).
 
 ## 7. Publish-day runbook (first run: Monday Jul 27)

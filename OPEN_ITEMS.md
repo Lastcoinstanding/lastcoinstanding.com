@@ -18,10 +18,10 @@ session automatically. Close items here when done; this file is the "what's cook
   anchor with fresh numbers.
 
 - [ ] **OVERDUE (was Jul 26) — Sitemap status recheck.** Formality — JM screenshot already showed
-  "Success" (Jul 24). Close if still green. Detail: `claude/SEO_AUDIT.md`.
+  "Success" (Jul 24). Close if still green. Detail: `SEO_AUDIT.md`.
 
 - [ ] **OVERDUE (was Jul 27) — Satos Awards nomination.** 5-minute procedure; drafted texts in
-  `claude/CREATOR_CREDIBILITY_KIT.md` §7. Confirm the window is still open — if it has closed,
+  `CREATOR_CREDIBILITY_KIT.md` §7. Confirm the window is still open — if it has closed,
   record that and close the item.
 
 - [ ] **OVERDUE (was Jul 27) — Pilot publish (X thread + video script).** Superseded in part: WDCB
@@ -30,8 +30,8 @@ session automatically. Close items here when done; this file is the "what's cook
 
 - [ ] **OVERDUE (was Aug 3) — Open-source decision call (JM).** Still unresolved per JM
   (2026-08-05). Critical path was the two reference letters — check outreach status first.
-  Detail: `claude/OPENSOURCE_DECISION_BRIEF.md`. **New interaction to weigh:** the own-job track
-  (`claude/OWN_JOB_STRATEGY.md` §1) — grants and employment substitute more than they stack.
+  Detail: `OPENSOURCE_DECISION_BRIEF.md`. **New interaction to weigh:** the own-job track
+  (`OWN_JOB_STRATEGY.md` §1) — grants and employment substitute more than they stack.
 
 - [ ] **Aug 10 (Mon) ⏰ — Dashboard build (usage-gated).** Fable 5 limit resets 5:00 AM; JM ruled
   build waits for the reset. Spec is settled: dashboard = anchor destination; v1 = live-computed
@@ -52,11 +52,11 @@ session automatically. Close items here when done; this file is the "what's cook
   append (all figures live-computed, incl. the duration record).
 
 - [ ] **Late Aug — SEO performance re-tune** (first Search Console read; + deferred
-  /the-bitcoin-horizon retitle). Detail: `claude/SEO_AUDIT.md`.
+  /the-bitcoin-horizon retitle). Detail: `SEO_AUDIT.md`.
 
 ## Own-job / industry outreach — status: NEW workstream (2026-08-05)
 
-Strategy doc created: **`claude/OWN_JOB_STRATEGY.md`** — door-agnostic positioning (full-time /
+Strategy doc created: **`OWN_JOB_STRATEGY.md`** — door-agnostic positioning (full-time /
 fractional / licensing), both-tier target map (Fidelity DA, Bitwise, Onramp, Swan, Unchained,
 River, NYDIG, DACFP, bitcoin-native RIAs), the two structural rules (sell the capability never the
 site; the register is the differentiator), compliance notes, outreach gate (~mid-Sept: capability

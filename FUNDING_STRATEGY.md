@@ -3,7 +3,7 @@
 > **Migrated into the repo 2026-08-08.** Previously a project-only doc under the now-retired `claude/` location prefix; moved to repo root — tracked, alongside `TECH_DEBT.md` and `PAGE_IDEAS_BACKLOG.md` — so it can be read and updated directly in-session. Unreadable project-only copies had drifted (OPEN_ITEMS twice), which is why the split was retired. Everything below is the verbatim authoritative export as of the move; not rewritten. Internal `claude/…` cross-references below are pre-migration paths — the migrated planning docs now live at repo root without the prefix.
 
 _Conclusion of the 2026-07-21 grants/awards research pass (NotebookLM + verified web recon).
-Companion to `claude/GRANTS_RESEARCH_KIT.md` (research prompts/sources) and POSITIONING §5.
+Companion to `GRANTS_RESEARCH_KIT.md` (research prompts/sources) and POSITIONING §5.
 **Revised 2026-07-21** to incorporate JM's reframe of the endgame (see Strategic context). This doc
 is the **decision**, so a future session starts here rather than re-deriving it._
 
