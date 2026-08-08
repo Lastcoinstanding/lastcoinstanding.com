@@ -541,12 +541,24 @@ trend · adds 11.4 pts to the bar"* below trend and *"24.5% … 1.50× trend · 
 bar"* above. Below the 3-year fence it shows "—" with the multiplier and "reads from a 3-year
 horizon". No separate readout line — the card is the single carrier.
 
+**Fencing the card below three years closed a live v1 §7-flag-1 breach — a defect fixed, not just a
+v2 fence (JM, 2026-08-08).** The v1 "optimistic edge" card computed `spot→trend` at *any* horizon, so
+in production today, with bitcoin near its floor, it was rendering **~220%/yr at H=1** — exactly the
+overclaim §7 flag 1 exists to prevent, on any screenshot of the live page. The v2 fence removes that
+number from the card (in both views) as a side effect of building the position reading. Recorded here
+as a v1 defect closed so the reasoning survives: had the sub-three-year behaviour been thought through
+at v1, the fence would have been specified then.
+
 **Gating (§1.3, BLOCKING) — resolved to "explicitly labelled", not disabled.** When `todayPriceIsLive`
 is false, the position figures are never silently rendered as live: the card sub-line and both spot
-notes carry " (latest monthly data)" via the shared `todayPriceNote`. Chosen over hard-disabling
-because CoinGecko sits on common ad-block lists (TECH_DEBT §1), so a large cohort would otherwise
-never see the feature; an explicitly-labelled month-old position is more useful than a blank and
-removes the "silently live" defect the rule targets. Disabling is a one-line switch if preferred.
+notes carry " (latest monthly data)" via the shared `todayPriceNote`. **The deciding factor for
+label-over-disable is the ad-block cohort (JM, 2026-08-08):** CoinGecko sits on common ad-block lists
+(TECH_DEBT §1), so those users *always* hit the fallback — hard-disabling would make the whole feature
+invisible to them, whereas an explicitly-labelled month-old position is useful and honest. Recorded
+explicitly because a future reader would otherwise read labelling as the weaker option; it is the
+stronger one here precisely because of who the fallback path serves. An explicitly-labelled month-old
+position also removes the "silently live" defect the rule targets. Disabling is a one-line switch if
+the stricter reading is ever preferred.
 
 **Near-touch caption (JM #4, 2026-08-08) — computed and position-neutral.** States that the position
 view's floor-path edge and the trend view's curve coincide when spot sits on the floor and separate
