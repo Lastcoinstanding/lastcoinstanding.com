@@ -6,7 +6,7 @@
 **Status:** first Substack essay in the essay↔tool pattern. Its live artifact, **What Daily Conviction Bought** (backlog), is seeded by `scripts/thirty-a-day-chart.ps1` in the repo (branch `chart/thirty-a-day`, merged post-publish). When the tool ships, edit the post to embed/link it — the built-in re-promotion moment.
 
 **Assets:**
-- Hero/cover: Grok Imagine "door" image (crowd facing shadows, lone figure walking toward sunrise doorway). Prompt + register notes in `claude/OPEN_ITEMS.md` working notes (open sky/scale, sci-fi-optimistic, never creepy; side-placed door beats aisle composition).
+- Hero/cover: Grok Imagine "door" image (crowd facing shadows, lone figure walking toward sunrise doorway). Prompt + register notes in `OPEN_ITEMS.md` working notes (open sky/scale, sci-fi-optimistic, never creepy; side-placed door beats aisle composition).
 - Chart: "$30/day" contributions-vs-stack-value, computed from `PL_DATA` (log-linear daily interpolation). Regenerate after monthly refresh via the script.
 
 **Verified figures (recomputed from PL_DATA, 2026-08-03):**

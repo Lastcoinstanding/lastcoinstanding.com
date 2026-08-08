@@ -7,7 +7,7 @@
 > they are kept because they explain why the shipped design took the shape it did.
 >
 > **For current behaviour and the reasoning that must not be undone, read
-> `claude/RT_COMPARE_HANDOFF.md` §2 before changing anything in this module.** That document, not
+> `RT_COMPARE_HANDOFF.md` §2 before changing anything in this module.** That document, not
 > this one, is authoritative for how the module works today.
 
 _Created 2026-07-25. Promoted from the backlog's "Side-by-side scenario comparison" idea (JM,
@@ -199,7 +199,7 @@ _All held. Two guardrails were added during the build and are recorded in the ha
 
 Live on `/the-bitcoin-retirement`, verified on production.
 
-**Before changing anything in this module, read `claude/RT_COMPARE_HANDOFF.md` §2.** It records
+**Before changing anything in this module, read `RT_COMPARE_HANDOFF.md` §2.** It records
 eight decisions that each look like an inconsistency and are not — most notably that the income and
 4% chips are deliberately bound-free while the year chips are bound-gated, and that the nominal
 stack row is deliberately never compared across columns.

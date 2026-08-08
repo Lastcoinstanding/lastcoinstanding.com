@@ -45,7 +45,7 @@ Verified (domain property) + sitemap submitted. Performance data begins accumula
 first meaningful read ~late August.
 
 ## Priority 2 — Search-align titles + meta on the flagship pages ✅ SHIPPED (d178c7d)
-Nine pages live with hybrid titles (see `claude/SEO_IMPLEMENTATION_PACK.md` for the exact strings and
+Nine pages live with hybrid titles (see `SEO_IMPLEMENTATION_PACK.md` for the exact strings and
 the how-much-bitcoin vs. allocation-sizing cannibalization split). Later-pass candidates still open:
 `/bull-and-bear-cycles`, `/borrowing-against-your-stack`, `/disciplined-rebalancing` (incl. its
 pre-existing title/og:title mismatch), `/lump-sum-or-ladder-in`, and the `/the-bitcoin-horizon` retitle
@@ -63,7 +63,7 @@ Live today (5 pages): `/the-bitcoin-retirement` (5 Q) · `/discount-or-premium` 
 `/bitcoin-allocation-sizing` (4 Q) · `/wait-or-deploy-now` (3 Q) · `/bitcoin-vs-real-estate` (3 Q).
 
 **SHIPPED 2026-07-26 — the FAQ is now a layout-level component** (branch `faq-component`, merged;
-closes rollout step 4 of `claude/FAQ_BLOCKS_AND_SCHEMA.md`, which had never been done). A `faq:`
+closes rollout step 4 of `FAQ_BLOCKS_AND_SCHEMA.md`, which had never been done). A `faq:`
 front-matter array is rendered once as the visible block and once as the FAQPage JSON-LD from a single
 source in `base.njk`, so the two can no longer drift — which matters, because migrating
 Discount-or-Premium revealed it had been shipping a real mismatch (curly apostrophe in the visible
@@ -84,7 +84,7 @@ no longer exists for anyone, and Google's Rich Results Test **no longer reports 
 behaviour, not a schema fault. Validate FAQ schema at **validator.schema.org** instead.
 
 **This does not weaken the FAQ programme.** The plan never rested on the snippet (see the honest-
-expectations note in `claude/FAQ_BLOCKS_AND_SCHEMA.md`). Query matching and reader value are unchanged,
+expectations note in `FAQ_BLOCKS_AND_SCHEMA.md`). Query matching and reader value are unchanged,
 and AI-answer eligibility — structured Q&A being what AI search lifts and cites — is now the dominant
 SEO argument rather than a secondary one. It pairs with the existing `llms.txt` and with the
 allow-AI-crawling decision in Open Items §3.

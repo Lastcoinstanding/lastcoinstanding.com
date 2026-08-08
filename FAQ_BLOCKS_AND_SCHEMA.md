@@ -23,7 +23,7 @@
 > **Standing rule this incident establishes:** this doc records intent, not repo state. Verify current
 > page state against the repo before acting on anything here.
 
-_Created 2026-07-22. Executes Priority 3 of `claude/SEO_AUDIT.md`: a short, honest FAQ at the bottom of
+_Created 2026-07-22. Executes Priority 3 of `SEO_AUDIT.md`: a short, honest FAQ at the bottom of
 each flagship page, marked up with FAQPage JSON-LD. The Bitcoin Retirement is the fully-worked example
 (visible HTML + matching JSON-LD); the other flagships get drafted Q&As to wire the same way. All
 answers are in the site's register — plain, honest, no hype — and written to match real search queries._

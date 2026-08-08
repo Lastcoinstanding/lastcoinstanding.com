@@ -2,7 +2,7 @@
 
 > **Migrated into the repo 2026-08-08.** Previously a project-only doc under the now-retired `claude/` location prefix; moved to repo root — tracked, alongside `TECH_DEBT.md` and `PAGE_IDEAS_BACKLOG.md` — so it can be read and updated directly in-session. Unreadable project-only copies had drifted (OPEN_ITEMS twice), which is why the split was retired. Everything below is the verbatim authoritative export as of the move; not rewritten. Internal `claude/…` cross-references below are pre-migration paths — the migrated planning docs now live at repo root without the prefix.
 
-_Created 2026-07-22. Executes Priorities 2 and 4 of `claude/SEO_AUDIT.md` as copy-paste blocks. All
+_Created 2026-07-22. Executes Priorities 2 and 4 of `SEO_AUDIT.md` as copy-paste blocks. All
 slugs verified against the live `sitemap.xml`. Edit freely for voice — but keep the searched phrase in
 the title, near the front. H1s on the pages stay evocative and unchanged; only the head changes._
 
@@ -145,5 +145,5 @@ one page in Google's Rich Results Test.
 ## Sequencing note
 Ship titles/metas and schema in one pass per page (same head file, one edit each). Then: Search Console
 (if not yet verified) → wait 4–6 weeks → read the Performance report and re-tune the two or three pages
-where impressions are climbing but clicks lag. The FAQ blocks (`claude/FAQ_BLOCKS_AND_SCHEMA.md`) can
+where impressions are climbing but clicks lag. The FAQ blocks (`FAQ_BLOCKS_AND_SCHEMA.md`) can
 ship in the same pass or separately — they're independent.
