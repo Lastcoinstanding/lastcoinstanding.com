@@ -308,6 +308,15 @@ Run `build-ogs.py` (or its in-repo successor at `scripts/build-og-images.py` onc
 
 Place the file at the repo root (`og-<slug>.jpg`) alongside the other OG images.
 
+**Where to run these generators.** Neither needs JM's machine and neither needs
+a repo checkout — both ran in the Claude chat sandbox on 2026-08-08. The
+product-forward script screenshots live production URLs (reads nothing from the
+repo); the brand-forward script needs only `og-synthesis.jpg` beside it. If the
+sandbox you're in lacks Python/Pillow/Playwright, that's a fact about *that*
+sandbox, not a blocker — upload the script (plus `og-synthesis.jpg` for
+brand-forward) into the chat and run it there. See the *"Where the tooling
+actually runs"* note in `§8` for the full verify-first-then-use rule.
+
 ### Wire the meta tags
 
 In `src/_includes/_pageassets/<slug>-head.html`, add the full social-card
@@ -368,48 +377,152 @@ Test the social card preview with the actual X/LinkedIn debuggers:
 
 Product-forward OGs embed live chart data and go stale when the underlying data refreshes. After this page ships, add an entry to `MONTHLY_REFRESH_CHECKLIST §6` so the OG gets regenerated alongside the data refresh.
 
-## 8. Carousel slide
+## 8. Carousel slide — end-to-end video workflow
 
-A new page doesn't ship with its carousel slide immediately — the slide
-needs a Grok Imagine video that takes iteration. The carousel slide can
-land in a follow-up PR.
+A new page doesn't ship with its carousel slide immediately — the slide needs a
+Grok Imagine video that takes iteration, and it can land in a follow-up PR. What
+follows is the whole procedure, prompt to inventory, written to be followed
+cold. The depth lives elsewhere and this section is the thread that connects it:
+prompt-craft patterns and tonal-camp guidance are `SITE_GUIDE §6`; the slide
+inventory and per-slide iteration records (what each brief cost, and why) are
+`SITE_GUIDE §13`. Follow the five steps in order.
 
-When the video is ready:
+### Where the tooling actually runs — check this FIRST
 
-- Strip audio + thumbnail stream with `ffmpeg -map 0:v:0 -c copy -an input.mp4 output.mp4`
-  (selects *only* the h264 video stream and copies it — fast, no re-encode).
-  Re-encode only if size or format needs it (the trilogy's P2 needed a 2-pass
-  re-encode to land in the size band; the raw was ~11 MB).
-  - **A Grok download carries THREE streams: h264 video, an AAC audio track,
-    AND an embedded mjpeg thumbnail.** The mjpeg cover is itself a *video-type*
-    stream, so `-c:v copy` (or a bare `-c copy`) would copy it through — only an
-    explicit `-map 0:v:0` selects the h264 stream alone and drops both the audio
-    and the thumbnail. This is why the strip must map, not just re-codec.
-- Target file size 3–10 MB, 720p, 10 seconds, silent (verified)
-- **Verify the strip before committing.** Binary-marker check on the output —
-  the file must contain NONE of `soun` (audio handler), `mp4a` (AAC codec), or
-  `mjpeg` (thumbnail stream), and must still contain `avc1` (h264). Grepping for
-  only `soun`/`mp4a` was the old heuristic and passes an audio-stripped file
-  that still carries the mjpeg thumbnail — check all three markers. Committing an
-  audio- or thumbnail-laden master is a known bug class (see `SITE_GUIDE §13`).
+**Steps 3 and 4 do NOT need JM's machine.** They need `ffmpeg`/`ffprobe`, and
+those live in the **Claude *chat* sandbox** (claude.ai) — not in the **Claude
+*Code* sandbox** (this CLI / the win32 dev env), which has neither. These are two
+different environments, and conflating them is the mistake this section exists to
+prevent:
+
+- **The Claude chat sandbox HAS:** `ffmpeg` 6.1.1 and `ffprobe` (extract frames,
+  strip streams, probe stream counts); Python 3.12 with Pillow; Playwright with
+  Chromium installable on demand; and network access to production. Both OG-card
+  pipelines ran there on 2026-08-08.
+- **The Claude Code sandbox has NONE of it,** so Claude Code correctly reports
+  these steps as external to *itself* — and that then gets written down as
+  *"blocked, needs JM's machine."* **That conclusion is wrong.** The actual
+  answer is: **upload the raw files into the chat and run the steps there.**
+  JM's machine is not required for frame-checking, stream-stripping, or OG
+  generation — only Grok generation (step 2) is genuinely JM-external.
+- **Rule: verify availability first, then use it.** Don't pre-declare a step
+  blocked from memory. Probe whatever environment you're in — `ffmpeg -version`,
+  `ffprobe -version`, `python -c "import PIL"`, `python -c "import playwright"` —
+  and if the tool answers, do the work; if it doesn't, move the files to the
+  sandbox that has it. "External to Claude Code" is not "external to JM's
+  workflow."
+- **OG generation carries no repo dependency worth checking out for.** The
+  product-forward generator (`scripts/build-og-images.py`, Playwright)
+  screenshots **live production URLs** — it reads nothing from the repo and runs
+  from any directory. The brand-forward generator
+  (`build-og-borrowing-against-your-stack.py`, Pillow) needs exactly one file
+  beside it: `og-synthesis.jpg` (fonts are fetched from Google Fonts at
+  runtime). So OG generation in the chat sandbox is: upload the one script (plus
+  `og-synthesis.jpg` for brand-forward), run it, download the JPEG. See `§7`
+  above and `STYLE_GUIDE §6.15`.
+
+### 1. Write the prompt
+
+Build it from `SITE_GUIDE §6` — the prompt skeleton (subject + setting +
+lighting + motion + style + avoid-list), the palette and the three tonal camps
+(warm-dark / golden-hour / engineered-luminous), and the negation/quantification
+tools for strong-prior briefs. Three checks before you generate:
+
+- **Palette + register.** Warm amber/gold, rich shadows, found-not-arranged;
+  pick the tonal camp that fits the page's subject (§6's engineered-luminous for
+  the financialized instruments, the meadow/golden-hour register for the
+  living-element comparisons).
+- **Avoid-list.** "No text, no words" in every prompt *and* in the Avoid block,
+  plus the metaphor-specific negatives §6 prescribes (anti-archetypes for strong
+  priors, "no floating disconnected droplets," etc.).
+- **Cross-video distinctness — check against the `SITE_GUIDE §13` inventory
+  before briefing.** Rule out any concept that collides with a shipped slide (the
+  Heatmap already owns "aerial golden fields"; two golden-hour-sun scenes blur in
+  rotation). Differentiate on an axis — stillness vs flow, terrain vs open sea,
+  tabletop vs landscape — *before* you generate, not after.
+
+### 2. Generate in Grok Imagine — JM's account (external), then iterate
+
+Generation is the one genuinely JM-external step: it runs in Grok Imagine under
+JM's account. Iterate on the brief with the §6 tools (negate strong priors,
+quantify spatial bounds, name two object states when the motion is one Grok has
+to invent). **Budget roughly two to four takes.** If the brief still isn't
+landing after that, **accept the best semantically defensible take rather than
+chasing it — the WMHTB precedent.** A take that renders resilience where you
+briefed antifragility, or a half-pour where you briefed a stop-short, is usually
+fine: let the slide headline and caption carry the sharper reading (as How Much
+Bitcoin? and Risks to Bitcoin both did). Chasing a literal render past four
+takes has repeatedly cost more than it returned.
+
+### 3. Verify you have the right take — by content, NOT by filename
+
+Grok downloads are opaque `grok-video-<uuid>.mp4`, and a single session
+routinely produces several near-identical takes of the same scene — they are
+genuinely hard to tell apart later (June 2026: 5 raws for 3 pages, and one pick
+needed a human call among 3 sea-sunset takes). **Do not identify the final take
+by filename or timestamp.** Extract a start frame and an end frame and confirm
+the actual state change is the one you briefed:
+
+```bash
+ffmpeg -i take.mp4 -frames:v 1 start.png              # first frame
+ffmpeg -sseof -0.1 -i take.mp4 -frames:v 1 end.png    # ~last frame
+```
+
+Then look at both. The escarpment's shadow edge either swept the foreground or
+it didn't; the vine either reached the upper-right or it didn't. This is a chat
+sandbox step (see the tooling note above) — `ffmpeg` does the extraction, no
+JM's machine required.
+
+### 4. Strip audio AND the mjpeg thumbnail stream
+
+A Grok download carries THREE streams: h264 video, an AAC audio track, AND an
+embedded mjpeg thumbnail. The mjpeg cover is itself a *video-type* stream, so
+`-c:v copy` (or a bare `-c copy`) copies it through — only an explicit
+`-map 0:v:0` selects the h264 stream alone and drops both the audio and the
+thumbnail:
+
+```bash
+ffmpeg -i take.mp4 -map 0:v:0 -c copy -an -movflags +faststart videos/<slug>.mp4
+```
+
+`+faststart` relocates the moov atom to the front for web streaming. Re-encode
+only if size or format needs it (the deployment trilogy's P2 needed a 2-pass
+re-encode to land in the size band; the raw was ~11 MB). Target 3–10 MB, 720p,
+~10 seconds.
+
+**Verify the strip before committing — zero audio streams must remain.** The
+primary check is `ffprobe`: list audio streams and confirm the output is empty.
+
+```bash
+ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 videos/<slug>.mp4
+```
+
+Empty output = no audio stream. While you're there, confirm exactly one video
+stream (h264) and no mjpeg attachment (`ffprobe -show_streams`). **Fallback
+where `ffprobe` isn't available** (e.g. the Claude Code sandbox, which has
+`grep` but no ffprobe): binary-marker check — the file must contain NONE of
+`soun` (audio handler), `mp4a` (AAC codec), or `mjpeg` (thumbnail stream), and
+must still contain `avc1` (h264). Grepping for only `soun`/`mp4a` was the old
+heuristic and passes an audio-stripped file that still carries the mjpeg
+thumbnail — check all three markers. Committing an audio- or thumbnail-laden
+master is a known bug class (Metcalfe, June 2026; see `SITE_GUIDE §13`).
+
+### 5. Rename, commit, wire, promote
+
 - **Name by the page's full slug:** `videos/<slug>.mp4` at repo root (e.g.
   `videos/wait-or-deploy-now.mp4`). Match the existing files.
-- **Label your final picks before hand-off.** Grok downloads are opaque
-  `grok-video-<uuid>.mp4`, and you will usually generate more takes than pages.
-  Either rename raws to slugs yourself, or expect to be asked which take is
-  final — frame content identifies *some* videos, but not near-identical takes
-  of the same scene (June 2026: 5 raws for 3 pages, and the P3 pick needed a
-  human call among 3 sea-sunset takes).
-- Add the slide config to the homepage carousel data
-- Update `SITE_GUIDE §13` to promote the page's entry from "Pending
-  additions" into the main inventory table
+- **Commit the silent master** — only after step 4 verifies clean.
+- **Wire the slide into `src/index.njk`.** Add the slide config with a
+  `video.carousel-video`; `index.js` plays/pauses whatever video sits in the
+  active slide, so no per-id JS registration is needed.
+- **Promote in `SITE_GUIDE §13`:** move the page's entry out of "Pending
+  additions" into the inventory table, and add an **iteration record** — what
+  each take cost and why, in the voice of the existing records. That record is
+  how the §6 rules earn their evidence (every §6 rule traces to one); don't skip
+  it.
 - **Eyeball the slide on the branch preview before merging.** Slides are visual
   and hero-placed; a rendering fault is not something code review catches. Push
   and review live, don't merge blind.
-
-See `SITE_GUIDE §6` for prompt-craft patterns and tonal-camp guidance, and
-`SITE_GUIDE §13` for the per-slide iteration records (what each brief cost, and
-why).
 
 ## 9. Documentation
 
