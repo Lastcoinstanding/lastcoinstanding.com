@@ -19,7 +19,7 @@ _Merge pass 2026-08-03: JM's two-batch idea dump (2026-08-02) folded in — 12 n
 
 Captured during the merge pass, because the backlog is now large enough that the *shape* of it is itself a decision.
 
-- **The collateral/credit cluster is now a pillar, not a scatter** — six related entries (pristine collateral, margin-call calculator, services research, RE wedge, credit in a bitcoin world, plus MSTR's "bitcoin-backed credit" framing). Decide hub-and-spoke vs. six independent builds **before** any one of them is promoted.
+- **The collateral/credit cluster — RESOLVED 2026-08-08 (JM): filed by type, no hub page.** Six related items (pristine collateral, margin-call calculator, services research, RE wedge, credit in a bitcoin world, plus MSTR's "bitcoin-backed credit" framing). The earlier open question — hub-and-spoke vs. six independent builds — is **decided: no hub.** The six are not six pages; they are roughly two site builds, two essays, a research task and a page extension, and the *Living on Bitcoin* nav group already serves as the hub. Each is filed by what it actually is; consistent "bitcoin-backed credit" vocabulary and neighbour cross-links do the binding a hub page would have. Classifications, sequence and reasoning are recorded in the *Collateral & credit cluster* section below.
 - **Financialization is becoming the site's centre of gravity.** STRC shipped; MSTR, The Big Long and the collateral cluster all sit there. `STRC_BELOW_PAR_DESIGN` §2 deliberately held financialization *one row back from the flagship*. Three-plus more pieces makes that fence load-bearing — a conscious call, not drift.
 - **Essay-to-build ratio is heavy on essays** (~9 Substack pieces vs. ~8 builds). The builds with compounding return — the dashboard and Power Law v2 — should not keep losing sequencing to essays that are read once.
 - **Highest persuasion-per-unit-effort in the whole backlog: Power Law v2.** Mostly build-on-existing-data (the shared PL module, the static out-of-sample chart, the Doubling Ladder's already-computed register) rather than new research.
@@ -167,8 +167,25 @@ Captured during the merge pass, because the backlog is now large enough that the
 
 ### Collateral & credit cluster
 
+> **RULING — no hub page; file by type (JM, 2026-08-08).** A filing/classification decision only — nothing here is promoted, designed or built by this ruling.
+>
+> **Decision: no collateral-hub page.** The "six entries needing an architecture" framing overstated it — the six are not six pages but roughly **two site builds, two essays, a research task and a page extension** (several entries already say so in their own text: "task, not a page"; "possibly an essay angle + a page extension rather than a new page"). And the site already has the hub: the **"Living on Bitcoin" nav group** (Borrowing Against Your Stack, Bitcoin-Backed Mortgages, Living on Bitcoin, Bitcoin and Fixed Income, STRC Below Par). A collateral-hub page would compete with it and stack a second organising layer over the same material. What a hub would have provided is achieved instead by **discipline** — consistent vocabulary ("bitcoin-backed credit" throughout, per the MSTR entry) and each piece cross-linking its neighbours.
+>
+> **Type per item:**
+> - **Bitcoin as pristine collateral — EXPLORATION + ESSAY.** The cluster's intellectual anchor, and the hardest to do well (two blocking honesty flags; the 80% collateralisation figure needs real sourcing).
+> - **Margin-call / borrow-against-stack calculator — SITE TOOL** (with an open new-page-vs-extension question — see the entry).
+> - **Collateral/services company research — TASK,** and a **prerequisite** for the calculator's "compare offerings side-by-side" feature.
+> - **Real estate as the wedge — ESSAY ANGLE + PAGE EXTENSION,** not a new page.
+> - **Can there be credit in a bitcoin-denominated world? — ESSAY,** coupled to *Deflation without fear*; one-piece-vs-two-parter still open at drafting.
+> - **"Bitcoin-backed credit" terminology — RESOLVED, not a work item.** Settled: "bitcoin-backed credit" is the house term (over Saylor's "digital credit"), used throughout the cluster to bind it.
+>
+> **Sequence (set by dependency, not preference):** services research → margin-call calculator (or BAS extension) → pristine-collateral exploration + essay → credit in a bitcoin world → RE-wedge extension.
+>
+> **The financialization prominence fence stays load-bearing.** `STRC_BELOW_PAR_DESIGN §2` deliberately held financialization one row back from the flagship; with five more pieces sitting in this space, that is now a conscious **standing constraint**, not incidental (reaffirms the cluster note at the top of this doc).
+
 - [ ] **Bitcoin as pristine collateral — argument exploration + essay. Anchors the collateral cluster.**
   Surfaced 2026-07-30. Extended 2026-08-02. Timeliness: live product wave.
+  - **Filed as EXPLORATION + ESSAY (JM 2026-08-08)** — the cluster's intellectual anchor, and the hardest to do well: the two blocking honesty flags below, plus the 80% collateralisation figure needs real sourcing.
   - **Concept:** the emergent case the market hasn't priced — 24/7 liquidity, fully marked-to-market, fungible (vs real estate), verifiable, securable in multisig → better collateral → structurally lower rates and lender friction/risk.
   - **The sizing argument (added 2026-08-02):** roughly **80% of loans/debt is collateralized** — this converts "bitcoin is better collateral" from a qualitative claim into a **TAM**: this is the size of the market bitcoin is competing to collateralize.
     - **Verify at build:** the 80% figure is segment-dependent — US commercial bank lending, corporate bond markets and global secured credit differ wildly. Likely defensible for bank lending, likely *not* for total debt. Say which. Sources to try: Fed H.8, BIS credit statistics, SIFMA.
@@ -180,28 +197,33 @@ Captured during the merge pass, because the backlog is now large enough that the
 
 - [ ] **Margin-call / borrow-against-stack calculator — site tool (The Numbers).**
   Surfaced 2026-07-30. Collateral cluster.
-  - **Concept:** loan amount, LTV, lender terms → the bitcoin price that triggers a margin call, stress-tested against house drawdown / power-law paths; compare offerings side-by-side.
+  - **Filed as SITE TOOL (JM 2026-08-08)** — but see the open question below before promotion.
+  - **OPEN — new page vs. extension (verify at promotion, JM 2026-08-08):** this may be an **extension of `/borrowing-against-your-stack`** rather than a new page — BAS already covers bitcoin as collateral and already carries a tool. **Precedent:** the three-track scenario entry rules "extend the BFI calculator, do **not** build a new page." **Verify at promotion:** check what BAS's tool currently computes before deciding new page vs. extension. (Captured so it isn't rediscovered — do not resolve now.)
+  - **Concept:** loan amount, LTV, lender terms → the bitcoin price that triggers a margin call, stress-tested against house drawdown / power-law paths; compare offerings side-by-side (the compare feature depends on the services-research task below).
   - **Prior art:** Strike's new borrow product has a calculator to review.
   - **Guardrails:** facts-not-signals; leverage content = elevated counsel attention; no lender recommendations — computed comparison only, PARTNERSHIPS_REFERRALS_POLICY applies.
 
 - [ ] **Collateral/services company research + freshness pass — task, not a page.**
   Surfaced 2026-07-30. Collateral cluster.
+  - **Filed as TASK (JM 2026-08-08)** — and a **prerequisite** for the margin-call calculator's "compare offerings side-by-side" feature. First in the cluster sequence.
   - **Research:** current offerings — AnchorWatch, People's Reserve, Strike borrow-against-bitcoin, **Debify** (L1 multisig — added 2026-08-02), "Horizon" (disambiguate at research — several bitcoin cos use the name).
   - **Purpose:** (a) keep borrowing/services-adjacent explorations current (freshness = credibility); (b) partner-candidate notes per PARTNERSHIPS_REFERRALS_POLICY (no coverage-for-consideration entanglement; research and partnership tracks stay separate).
   - **Output:** research notes + a freshness diff for affected pages.
 
 - [ ] **Real estate as the wedge — People's Reserve / REIT angle.**
   Surfaced 2026-07-30. Collateral cluster; extends the Bitcoin-vs-Real-Estate cluster.
+  - **Filed as ESSAY ANGLE + PAGE EXTENSION (JM 2026-08-08)** — not a new page (the entry already said as much). Last in the cluster sequence.
   - **Source:** CJKonstantinos (People's Reserve founder) on a recent podcast — significant inbound interest from REITs and real-estate syndicates in bitcoin-backed structures.
   - **Explore:** real-estate holders as a conversion audience (a "wedge" from RE toward bitcoin); possibly an essay angle + a page extension rather than a new page.
   - **Verify at build:** locate/cite the podcast episode. Partnership-adjacent — same separation discipline as the research task above.
 
 - [ ] **Can there be credit in a bitcoin-denominated world? — essay. The cluster's third leg.**
   Surfaced 2026-08-02.
+  - **Filed as ESSAY (JM 2026-08-08)** — coupled to *Deflation without fear*; one-piece-vs-two-parter still open at drafting (see below).
   - **Concept:** whether a credit system can or should exist in a bitcoin-denominated economy. Completes the arc: *pristine collateral* = the asset · *bitcoin-backed credit* = today's market · *this* = the endpoint.
   - **Why it earns its place:** it directly answers the standard objection that deflation kills lending — the strongest routine critique of the bitcoin monetary thesis. Answering it well is worth more than another bull argument.
   - **Tightly coupled to:** *Deflation without fear* (below). **Open question: one piece or a deliberate two-parter?** Decide at drafting; written separately they will overlap heavily.
-  - **Terminology:** use **"bitcoin-backed credit"** over Saylor's "digital credit" (see MSTR entry) — more precise, and it links the cluster together.
+  - **Terminology — RESOLVED, not a work item (JM 2026-08-08):** **"bitcoin-backed credit"** is the settled house term (over Saylor's "digital credit") — more precise, and it is the vocabulary that binds the cluster in place of a hub page. Used throughout; nothing pending.
 
 ### Financialization cluster
 
