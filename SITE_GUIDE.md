@@ -273,6 +273,8 @@ Three slides (Fixed Pie, Money Trees' right tree, Is Bitcoin a Bubble) share the
 
 The site is built by **Eleventy 3.1.5** from `src/` templates, deployed by Cloudflare Pages on every push to `main`. Builds take ~30s; the live URL updates without further action.
 
+**Cloudflare Pages is the sole deploy target — and the only authoritative deploy signal (2026-08-08).** There is no second builder. A misconfigured Netlify integration was previously connected to the repo and posted misleading GitHub commit statuses (`netlify/…/deploy-preview`, `deploy-preview-<PR#>--…netlify.app`) that never ran the Eleventy build — it 404'd all HTML and served only raw repo-root static files, so a green Netlify status meant nothing. **That integration was removed on 2026-08-08** (disconnected from the repo and the site deleted from the Netlify dashboard, JM). Cloudflare Pages posts a check-run named `Cloudflare Pages`; trust that and the source tree, nothing else. If any non-Cloudflare status check ever reappears on a commit or PR, it is noise, not a deploy — do not gate on it. (There is no `netlify.toml`/`_redirects` in the repo; the root `_headers` file is a Cloudflare Pages feature, not a Netlify artifact.)
+
 **Where to edit content:**
 
 | You want to change… | File to edit |

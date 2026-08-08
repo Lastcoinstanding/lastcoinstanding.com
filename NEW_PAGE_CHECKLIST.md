@@ -705,6 +705,12 @@ Before announcing the page or sharing the URL externally:
 
 ### Verifying a just-pushed change on Cloudflare Pages
 
+- **Cloudflare is the only authoritative deploy signal.** The site deploys
+  *only* via Cloudflare Pages — a stray Netlify integration that posted
+  meaningless `deploy-preview` statuses was removed 2026-08-08 (see
+  `SITE_GUIDE §7`). If any non-Cloudflare status check shows up green or red on
+  a commit/PR, ignore it: it does not reflect what production is serving. Trust
+  the `Cloudflare Pages` check-run and the source tree, nothing else.
 - **Don't trust the branch alias for freshness.** The branch alias
   `<branch>.lastcoinstanding-com.pages.dev` **lags and per-path
   edge-caches**, and a **force-push may not trigger a rebuild at all** (a
