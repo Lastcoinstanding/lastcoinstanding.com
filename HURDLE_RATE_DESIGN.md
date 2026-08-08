@@ -373,12 +373,12 @@ precisely because it addresses capital decisions. Facts-not-signals throughout; 
   live. Only §5.4 presets risk adding a tail; keep them few and clearly dated.
 - **SEO (JM ruling 2026-08-06 — hurdle-rate keyword targeting confirmed, FAQ in scope).** Full
   `NEW_PAGE_CHECKLIST §10` baseline; WebApplication JSON-LD; **FAQ block ships with v1** rather than
-  being backfilled (`claude/SEO_AUDIT` Priority 3 lists FAQ backfill as open on ten pages —
+  being backfilled (`SEO_AUDIT` Priority 3 lists FAQ backfill as open on ten pages —
   shipping this one inline avoids adding an eleventh). Query surface to cover across title, meta,
   early H2 and FAQ questions: *hurdle rate* · *opportunity cost of holding bitcoin* · *cost of
   capital bitcoin* · *is bitcoin a better investment than paying off my mortgage* · *why do
   companies hold bitcoin instead of cash*. Note the FAQ rich-result deprecation (Google, May 2026,
-  per `claude/SEO_AUDIT`) — the argument for the block here is query matching and AI-answer
+  per `SEO_AUDIT`) — the argument for the block here is query matching and AI-answer
   eligibility, not the snippet. Validate at validator.schema.org, not Rich Results Test.
   **Cannibalization check at build:** confirm no existing page owns *opportunity cost* in its title
   or meta — BvSM and the Doubling Ladder both run adjacent arguments in prose.
