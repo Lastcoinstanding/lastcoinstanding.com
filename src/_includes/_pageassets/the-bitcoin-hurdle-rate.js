@@ -20,22 +20,39 @@
    window-matched hurdle the verdict is measured against, and the number
    quoted in prose/FAQ. Every rate rendered names its window.
 
-   CHART GEOMETRY NOTE (flagged in the PR): design §2.4 defines the
-   band's upper edge as spot→trend. With bitcoin near its floor today
-   (~0.42× trend), spot→trend spikes to ~227%/yr at H=1, which would
-   breach the §7 overclaim flag and wreck legibility. Resolution kept
-   faithful to §5.2 + the §2.2 fixture + §4.3(c): the primary declining
-   curve is trendCAGR(H); the floor-path band beneath it is spot→floor
-   (the conservative/access-conditioned reading); the spot→trend
-   reversion upside is a secondary stat at the chosen horizon, not a
-   chart line. All three are computed below, so switching to §2.4's
-   literal reading is a one-line change.
+   V2 POSITION VIEW (HURDLE_RATE_V2_POSITION_DESIGN, HURDLE_RATE_DESIGN
+   §13). Second primitive — the return from today's spot to trend at the
+   horizon, given channel position k = spot/trend(t):
+     posCAGR(t,H,k) = ((1/k) * ((t + 365.25*H)/t)^PL_B)^(1/H) - 1
+   Equivalently (trendAtH(H)/spot)^(1/H)-1 with k = spot/plPrice(t); the
+   k form is the one the design specifies, so the fixture reads cleanly.
+   Fixture at t = 6,424, PL_B = 5.77:
+     k=0.43 (today):  H=3 → 79.4%  H=10 → 41.1%  H=30 → 24.6%
+     k=1.5  (above):  H=3 → 18.3%  H=10 → 24.5%  H=1 → -8.3% (NOT a bug:
+       above trend, short horizon, the model expects a loss reverting
+       down to trend — the tool must be able to report that; design §3).
+
+   CHART GEOMETRY — the two views (design §4.1/§4.2 + §13). The band
+   travels with the view; each view owns its own y-axis (magnitudes
+   differ by an order of magnitude, so no shared lock):
+     • "From the trend" (default, = v1): upper curve = trendCAGR(H);
+       floor band beneath = spot→floor. Spot-independent upper curve.
+     • "From today's price" (opt-in): upper curve = posCAGR(H);
+       floor band beneath = spot→floor (SAME lower edge as the trend
+       view — only the upper edge swaps). Plots from H=3 only.
+   Design §4.2 rejected drawing spot→trend in v1 for TWO reasons —
+   (a) it breaches §7 flag 1 (~227%/yr at H=1) and (b) it swamps the
+   20–40% y-axis. Reviving it needs BOTH fixes: the own-axis (clears b)
+   AND the H≥3 fence below (clears a). The fence is load-bearing for
+   §4.2 compatibility, not editorial — dropping it reopens the §4.2
+   rejection (JM, 2026-08-08).
 ============================================================ */
 (function hurdleRate(){
   'use strict';
 
   var YEAR_D = 365.25;
   var NOTIONAL = 100000; // $ used only to make terminal values concrete in the stat strip
+  var MIN_POS_H = 3;     // design §4.3 fence — the position reading declines to surface below 3yr (turns on WHEN reversion happens, not whether; 220%/647% would breach §7 flag 1 on a screenshot). LOAD-BEARING for §4.2 (see header).
 
   // ── Chart palette (canvas can't read CSS vars) ──
   var AMBER = '#e09422', BAND = 'rgba(224,148,34,0.14)', FLOORLINE = 'rgba(224,148,34,0.40)';
@@ -50,23 +67,38 @@
     funding: 'cash',  // company: 'cash' | 'debt' | 'equity'
     cashflow: 'yes',  // company: 'yes' | 'no'  — gates the verdict (§3.5)
     capsrc: 'savings',// personal: 'savings' | 'sale'
-    canWait: 'yes'    // personal: 'yes' | 'limited' | 'no' — gates the verdict
+    canWait: 'yes',   // personal: 'yes' | 'limited' | 'no' — gates the verdict
+    view: 'trend'     // 'trend' (default, structural) | 'position' (opt-in, from today's price) — design §4.1
   };
 
   var spot = (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0)
     ? TODAY_PRICE : PL_DATA[PL_DATA.length - 1][1];
   var spotSource = 'fallback'; // 'live' once fetchTodayPrice resolves
 
+  // Debug override (build §4 / design §5): ?k=1.5 forces channel position for the
+  // pre-ship neutrality review. Not linked from the page, documented in SITE_GUIDE §45.
+  // It overrides spot to k×trend(t) so EVERY position-derived surface (band, card,
+  // ratio note) moves together, and presents as live so the reviewer sees the normal
+  // rendering at the forced position. Guarded against the live fetch in init().
+  var kOverride = null;
+
   // ─────────── MATH ───────────
   function tDays(){ return (typeof TODAY_DAYS === 'number' && TODAY_DAYS > 0) ? TODAY_DAYS : 6424; }
-  // trend→trend, window-matched (the fixture)
+  // trend→trend, window-matched (the fixture) — spot-independent structural hurdle
   function trendCAGR(H){ var t = tDays(); return Math.pow((t + YEAR_D * H) / t, PL_B / H) - 1; }
   function trendAtH(H){ return plPrice(tDays() + YEAR_D * H); }
   function floorAtH(H){ return PL_FLOOR * trendAtH(H); }
-  // realised CAGR from today's spot to floor-at-horizon (conservative / floor path)
+  // Channel position today, k = spot/trend(t). Same derivation the channel ribbon
+  // uses (price / plPrice(TODAY_DAYS)) from the same shared spot — so the two can't
+  // diverge under a stale-price fallback (build §1.2). ?k= overrides spot upstream.
+  function chanK(){ return spot / plPrice(tDays()); }
+  // realised CAGR from today's spot to floor-at-horizon (conservative / floor path).
+  // Lower band edge in BOTH views.
   function spotToFloorCAGR(H){ return Math.pow(floorAtH(H) / spot, 1 / H) - 1; }
-  // realised CAGR from today's spot to trend-at-horizon (optimistic reversion upside)
-  function spotToTrendCAGR(H){ return Math.pow(trendAtH(H) / spot, 1 / H) - 1; }
+  // posCAGR (build §1.1) — return from today's spot to trend at H, via k. Upper edge
+  // of the position view + the position-adjustment card. Identical to trendAtH(H)/spot
+  // form; written in the k form the design specifies so the fixture is legible.
+  function posCAGR(H){ var t = tDays(); return Math.pow((1 / chanK()) * Math.pow((t + YEAR_D * H) / t, PL_B), 1 / H) - 1; }
   function trendMultiple(H){ var t = tDays(); return Math.pow((t + YEAR_D * H) / t, PL_B); }
 
   // Horizon where the candidate return equals the trend hurdle. trendCAGR is
@@ -102,20 +134,26 @@
   var el = {};
   function grab(){
     ['hrReturn','hrReturnNum','hrHorizon','hrHorizonNum','hrTaxNote','hrCapsrcCap',
-     'hrChart','hrChartCap','hrSpotNote','hrVerdict','hrStats'].forEach(function(id){
+     'hrChart','hrChartCap','hrChartCapPos','hrSpotNote','hrSpotNotePos','hrNearTouch',
+     'hrVerdict','hrStats'].forEach(function(id){
       el[id] = document.getElementById(id);
     });
   }
 
   // ─────────── CHART ───────────
   var chart = null;
+  function isPos(){ return S.view === 'position'; }
+  // Upper curve = trendCAGR (trend view) or posCAGR (position view); lower band edge
+  // = spot→floor in both. Position view starts at H=3 (the fence declines to plot below).
   function curveData(){
-    var trend = [], floor = [];
-    for (var H = 1; H <= 40; H++){
-      trend.push({ x: H, y: trendCAGR(H) * 100 });
+    var upper = [], floor = [];
+    var start = isPos() ? MIN_POS_H : 1;
+    var upperFn = isPos() ? posCAGR : trendCAGR;
+    for (var H = start; H <= 40; H++){
+      upper.push({ x: H, y: upperFn(H) * 100 });
       floor.push({ x: H, y: spotToFloorCAGR(H) * 100 });
     }
-    return { trend: trend, floor: floor };
+    return { upper: upper, floor: floor };
   }
 
   // vertical marker at the crossing horizon
@@ -124,9 +162,14 @@
       id: 'hrMarker',
       afterDatasetsDraw: function(c){
         var ctx = c.ctx;
-        // Horizon marker (v1.2) — always drawn: a dashed vertical at the selected horizon plus a dot carrying the hurdle value where it meets the trend curve, so the horizon slider visibly drives the chart and the "trend hurdle" stat card ties to a point on the curve.
-        var hx = c.scales.x.getPixelForValue(S.h);
-        var hy = c.scales.y.getPixelForValue(trendCAGR(S.h) * 100);
+        // Horizon marker (v1.2) — always drawn: a dashed vertical at the selected horizon plus a dot carrying the hurdle value where it meets the upper curve, so the horizon slider visibly drives the chart and the hurdle stat card ties to a point on the curve.
+        // Position view: the curve starts at H=3 (the fence), so clamp the marker to
+        // MIN_POS_H when the slider sits below it — the ever-present fence copy in the
+        // caption explains why the dot won't travel below 3 (build §2.1).
+        var mh = isPos() ? Math.max(S.h, MIN_POS_H) : S.h;
+        var curveFn = isPos() ? posCAGR : trendCAGR;
+        var hx = c.scales.x.getPixelForValue(mh);
+        var hy = c.scales.y.getPixelForValue(curveFn(mh) * 100);
         ctx.save();
         ctx.beginPath(); ctx.moveTo(hx, c.chartArea.top); ctx.lineTo(hx, c.chartArea.bottom);
         ctx.strokeStyle = 'rgba(224,148,34,0.30)'; ctx.lineWidth = 1; ctx.setLineDash([2, 3]); ctx.stroke();
@@ -134,8 +177,11 @@
         ctx.beginPath(); ctx.arc(hx, hy, 4.5, 0, Math.PI * 2);
         ctx.fillStyle = AMBER; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 1.5; ctx.stroke();
         ctx.fillStyle = 'rgba(242,238,232,0.92)'; ctx.font = '600 12px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-        ctx.fillText(pct(trendCAGR(S.h)), hx, hy - 8);
+        ctx.fillText(pct(curveFn(mh)), hx, hy - 8);
         ctx.restore();
+        // The candidate-crossing marker is a trend-view feature (the verdict's crossing
+        // horizon is measured against trendCAGR). Suppress it in the position view.
+        if (isPos()) return;
         // Crossing marker — only when the candidate line crosses the curve.
         var cr = crossing();
         if (cr.kind !== 'at') return;
@@ -153,6 +199,11 @@
     };
   }
 
+  // View-specific legend labels (the band travels with the view).
+  function upperLabel(){ return isPos() ? 'From today’s price (to trend)' : 'Bitcoin’s trend hurdle'; }
+  function floorLabel(){ return isPos() ? 'Floor path (to floor)' : 'Floor path (if bitcoin only reaches its floor)'; }
+  function candStart(){ return isPos() ? MIN_POS_H : 1; }
+
   function buildChart(){
     if (!el.hrChart || typeof Chart === 'undefined') return;
     var d = curveData();
@@ -160,16 +211,16 @@
       type: 'line',
       data: {
         datasets: [
-          // floor path (lower edge) — drawn first; band fills up to the trend curve
-          { label: 'Floor path (if bitcoin only reaches its floor)', data: d.floor,
+          // floor path (lower edge) — drawn first; band fills up to the upper curve
+          { label: floorLabel(), data: d.floor,
             borderColor: FLOORLINE, borderWidth: 1, borderDash: [4, 4], pointRadius: 0,
             tension: 0.2, fill: false, order: 3 },
-          // trend hurdle (upper edge) — the honest window-matched hurdle
-          { label: 'Bitcoin’s trend hurdle', data: d.trend,
+          // upper edge — trendCAGR (trend view) or posCAGR (position view)
+          { label: upperLabel(), data: d.upper,
             borderColor: AMBER, backgroundColor: BAND, borderWidth: 2.4, pointRadius: 0,
             tension: 0.2, fill: '-1', order: 2 },
           // candidate return — flat line
-          { label: 'Your candidate return', data: [{ x: 1, y: S.r }, { x: 40, y: S.r }],
+          { label: 'Your candidate return', data: [{ x: candStart(), y: S.r }, { x: 40, y: S.r }],
             borderColor: CAND, borderWidth: 2, borderDash: [6, 4], pointRadius: 0,
             tension: 0, fill: false, order: 1 }
         ]
@@ -218,8 +269,13 @@
     if (!chart) return;
     var d = curveData();
     chart.data.datasets[0].data = d.floor;
-    chart.data.datasets[1].data = d.trend;
-    chart.data.datasets[2].data = [{ x: 1, y: S.r }, { x: 40, y: S.r }];
+    chart.data.datasets[0].label = floorLabel();
+    chart.data.datasets[1].data = d.upper;
+    chart.data.datasets[1].label = upperLabel();
+    chart.data.datasets[2].data = [{ x: candStart(), y: S.r }, { x: 40, y: S.r }];
+    // X-axis starts at the fence in the position view (the view declines to plot < 3yr);
+    // Y-axis is left to autoscale per view — magnitudes differ ~10× so no shared lock (build §2).
+    chart.options.scales.x.min = isPos() ? MIN_POS_H : 1;
     chart.update('none');
   }
 
@@ -262,9 +318,9 @@
   }
 
   // ─────────── STAT STRIP ───────────
+  function tipSpan(tip){ return ' <span class="help-tip" tabindex="0">?<span class="tip-content">' + tip + '</span></span>'; }
   function tile(val, lab, tip){
-    var t = tip ? ' <span class="help-tip" tabindex="0">?<span class="tip-content">' + tip + '</span></span>' : '';
-    return '<div class="hr-stat"><div class="hr-stat-val">' + val + '</div><div class="hr-stat-lab">' + lab + t + '</div></div>';
+    return '<div class="hr-stat"><div class="hr-stat-val">' + val + '</div><div class="hr-stat-lab">' + lab + (tip ? tipSpan(tip) : '') + '</div></div>';
   }
   function stats(){
     if (S.lens === 'company' && S.cashflow === 'no') return '';
@@ -275,14 +331,33 @@
     var fMult = floorAtH(H) / spot;
     var candTerminal = NOTIONAL * Math.pow(1 + r, H);
     var trendTerminal = NOTIONAL * tMult;
-    var revUp = spotToTrendCAGR(H);
     var out = '';
     out += tile(pct(tc), 'Trend hurdle over your ' + H + '-yr window', 'Bitcoin&rsquo;s trend CAGR measured over the next ' + H + ' years &mdash; the bar your candidate return has to clear.');
     out += tile(mult(tMult) + ' <span class="hr-stat-sub">trend</span> &middot; ' + mult(fMult) + ' <span class="hr-stat-sub">floor</span>', 'Bitcoin multiple over ' + yrs(H), 'How many times your money bitcoin returns over the horizon if it reaches trend, and if it reaches only its historical floor.');
     out += tile(money(candTerminal) + ' <span class="hr-stat-sub">vs</span> ' + money(trendTerminal),
                 money(NOTIONAL) + ' at ' + pctN(S.r) + ' vs at bitcoin&rsquo;s trend',
                 'What a fixed starting amount grows to at your candidate return versus at bitcoin&rsquo;s trend, over the horizon.');
-    out += tile(pct(revUp), 'If bitcoin reverts to trend over ' + H + ' yr <span class="hr-stat-sub">(optimistic edge)</span>', 'The higher rate available only if bitcoin is below trend now and returns to trend by your horizon &mdash; an optimistic reading, not the base case.');
+    // Card 4 — the position-adjustment card (v2, HURDLE_RATE_DESIGN §13). Reworked from
+    // the old "optimistic edge" card: renders in BOTH views, position-neutral and
+    // sign-carrying, so it reads correctly above and below trend. Below the 3-year fence
+    // (design §4.3) it declines to surface a rate; the ×-trend multiplier stays (always
+    // valid). Provenance rides the sub-line when the price is not live (build §1.3).
+    var k = chanK();
+    var prov = todayPriceNote(spotSource); // '' when live, ' (latest monthly data)' otherwise
+    var posTip = 'Bitcoin&rsquo;s return from today&rsquo;s price to trend at your horizon, and how many points that adds to or subtracts from the structural bar &mdash; set by where bitcoin sits in the channel now. Below a 3-year horizon it turns on <em>when</em> bitcoin returns to trend rather than <em>whether</em>, so this reading starts at three years.';
+    if (H < MIN_POS_H){
+      out += tile('&mdash;',
+        'From today&rsquo;s position' + tipSpan(posTip) +
+        '<span class="hr-stat-adj">' + k.toFixed(2) + '&times; trend &middot; reads from a 3-year horizon' + prov + '</span>', '');
+    } else {
+      var padj = (posCAGR(H) - trendCAGR(H)) * 100;
+      var adjPhrase = padj >= 0
+        ? 'adds ' + padj.toFixed(1) + ' pts to the bar'
+        : 'subtracts ' + Math.abs(padj).toFixed(1) + ' pts from the bar';
+      out += tile(pct(posCAGR(H)),
+        'From today&rsquo;s position over ' + H + ' yr' + tipSpan(posTip) +
+        '<span class="hr-stat-adj">' + k.toFixed(2) + '&times; trend &middot; ' + adjPhrase + prov + '</span>', '');
+    }
     if (S.lens === 'company'){
       var gap = (tc - r) * 100;
       var fundWord = S.funding === 'debt' ? 'debt serviced at ' + pctN(S.r)
@@ -307,9 +382,39 @@
       el.hrCapsrcCap.innerHTML = 'New capital carries no switching cost. Moving capital that&rsquo;s already invested means realising the gain, so capital-gains tax is a real cost of the switch &mdash; unless it sits in a tax-advantaged account, where the switch triggers no taxable event.';
     }
     if (el.hrSpotNote){
-      var ratio = spot / plPrice(tDays());
-      el.hrSpotNote.innerHTML = 'Bitcoin is currently about <strong>' + ratio.toFixed(2) +
+      el.hrSpotNote.innerHTML = 'Bitcoin is currently about <strong>' + chanK().toFixed(2) +
         '×</strong> its trend' + todayPriceNote(spotSource) + ', which sets where the band sits.';
+    }
+    // Position-view caption spot note — carries the live/fallback provenance so the
+    // position figures are never silently rendered as live (build §1.3).
+    if (el.hrSpotNotePos){
+      el.hrSpotNotePos.innerHTML = 'Bitcoin is currently about <strong>' + chanK().toFixed(2) +
+        '×</strong> its trend' + todayPriceNote(spotSource) + ' &mdash; the position this view reads from.';
+    }
+    // Near-touch caption (JM 2026-08-08) — computed, not hardcoded, so it stays true as
+    // bitcoin moves: when spot sits near its floor the floor-path edge and the trend
+    // curve nearly coincide (the two views agree at their cautious edge); the gap widens
+    // as bitcoin moves away from its floor. Position-neutral by construction.
+    if (el.hrNearTouch){
+      var Hn = Math.max(S.h, MIN_POS_H);
+      var fe = spotToFloorCAGR(Hn), tcv = trendCAGR(Hn);
+      var gap = (tcv - fe) * 100; // >0 when spot above floor (floor path sits below the trend curve)
+      var kk = chanK();
+      // Position-neutral by construction (JM 2026-08-08): the mechanism is always true —
+      // the two edges coincide when spot sits on the floor and separate as it moves away.
+      // Only when they actually nearly meet (spot near floor) does the copy claim it; above
+      // the floor it states the gap plainly, so the caption can't read absurdly at k=1.5.
+      var common = 'The floor-path edge of this view (' + pct(fe) + ' at ' + Hn +
+        '&nbsp;yr) and the trend view&rsquo;s curve (' + pct(tcv) +
+        ') coincide when bitcoin sits on its floor and separate as it moves away.';
+      if (Math.abs(gap) < 2){
+        el.hrNearTouch.innerHTML = common + ' Today they nearly meet &mdash; bitcoin is about <strong>' +
+          kk.toFixed(2) + '&times;</strong> trend, close to its floor, so the two views agree at their most cautious end: one reading taken two ways.';
+      } else {
+        el.hrNearTouch.innerHTML = common + ' Today they sit about <strong>' + Math.abs(gap).toFixed(1) +
+          ' pts</strong> apart &mdash; bitcoin is about <strong>' + kk.toFixed(2) + '&times;</strong> trend, ' +
+          (gap >= 0 ? 'above' : 'below') + ' its floor.';
+      }
     }
   }
 
@@ -393,6 +498,30 @@
     });
   }
 
+  // ─────────── VIEW TOGGLE ───────────
+  // §6.22 chart-range-toggle segmented control (NOT a second §6.17 yin-yang — two of
+  // those on one page is one too many, and this switches how one chart is read rather
+  // than gating which inputs render). Sits above the chart; the band travels with it.
+  function applyViewUI(){
+    document.querySelectorAll('.hr-view-btn').forEach(function(b){
+      var on = b.getAttribute('data-view') === S.view;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    if (el.hrChartCap) el.hrChartCap.hidden = isPos();
+    if (el.hrChartCapPos) el.hrChartCapPos.hidden = !isPos();
+  }
+  function setView(v, initial){
+    S.view = (v === 'position') ? 'position' : 'trend';
+    applyViewUI();
+    if (!initial){ render(); scheduleSync(); }
+  }
+  function bindView(){
+    document.querySelectorAll('.hr-view-btn').forEach(function(b){
+      b.addEventListener('click', function(){ setView(b.getAttribute('data-view')); });
+    });
+  }
+
   // ─────────── URL STATE (?r= ?h= ?lens=) + STICKINESS ───────────
   var STORAGE_KEY = 'lcs.bhr.calc.v1';
   var _suppress = false, _syncTimer = null;
@@ -408,6 +537,10 @@
     if (S.r === 12) p.delete('r'); else p.set('r', String(S.r));
     if (S.h === 10) p.delete('h'); else p.set('h', String(S.h));
     if (S.lens === 'company') p.delete('lens'); else p.set('lens', S.lens);
+    if (S.view === 'trend') p.delete('view'); else p.set('view', S.view);
+    // ?k= is a review-only debug override; strip it on any sync so it can't leak into a
+    // shared URL. The forced position stays active in memory for the reviewer's session.
+    p.delete('k');
     var qs = p.toString();
     try { window.history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash); } catch(e){}
   }
@@ -415,7 +548,7 @@
     if (typeof localStorage === 'undefined') return;
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify({
       r: S.r, h: S.h, lens: S.lens, tax: S.tax, funding: S.funding,
-      cashflow: S.cashflow, capsrc: S.capsrc, canWait: S.canWait
+      cashflow: S.cashflow, capsrc: S.capsrc, canWait: S.canWait, view: S.view
     })); } catch(e){}
   }
   function readStorage(){
@@ -431,12 +564,17 @@
     if (d.cashflow === 'yes' || d.cashflow === 'no') S.cashflow = d.cashflow;
     if (d.capsrc === 'savings' || d.capsrc === 'sale') S.capsrc = d.capsrc;
     if (['yes','limited','no'].indexOf(d.canWait) >= 0) S.canWait = d.canWait;
+    if (d.view === 'position' || d.view === 'trend') S.view = d.view;
   }
   function readUrl(){
     var p = new URLSearchParams(window.location.search);
     if (p.has('r')) S.r = clampR(p.get('r'));
     if (p.has('h')) S.h = clampH(p.get('h'));
     var l = p.get('lens'); if (l === 'personal' || l === 'company') S.lens = l;
+    var v = p.get('view'); if (v === 'position' || v === 'trend') S.view = v;
+    // Debug override (build §4 / design §5): ?k= forces channel position for the
+    // pre-ship neutrality review only. Clamped to a sane band; not persisted, not linked.
+    if (p.has('k')){ var kv = parseFloat(p.get('k')); if (isFinite(kv) && kv > 0) kOverride = Math.max(0.05, Math.min(5, kv)); }
   }
 
   // Reflect restored state back into the DOM controls
@@ -467,6 +605,7 @@
     }
     document.querySelectorAll('.hr-lens-panel').forEach(function(c){ c.classList.toggle('active', c.id === 'calc-mode-' + S.lens); });
     var presets = document.querySelector('.hr-presets'); if (presets) presets.setAttribute('data-lens', S.lens);
+    applyViewUI();
   }
 
   // ─────────── INIT ───────────
@@ -476,6 +615,12 @@
     readStorage();   // base layer
     readUrl();       // URL overrides
     _suppress = false;
+
+    // Debug ?k= (build §4): substitute spot = k×trend(t) so every position-derived
+    // surface (band, card, ratio note) moves together, and present it as live so the
+    // reviewer sees the normal rendering at the forced position. The live fetch is
+    // skipped below while the override is active, so it can't clobber the forced spot.
+    if (kOverride != null){ spot = kOverride * plPrice(tDays()); spotSource = 'live'; }
 
     // input listeners
     if (el.hrReturn) el.hrReturn.addEventListener('input', function(){ setR(el.hrReturn.value, 'slider'); });
@@ -490,13 +635,15 @@
     segGroup('canwait', 'canWait');
     bindLens();
     bindPresets();
+    bindView();
 
     applyStateToControls();
     buildChart();
     render();
 
-    // live spot — recolour the band once the real price resolves
-    if (typeof fetchTodayPrice === 'function'){
+    // live spot — recolour the band once the real price resolves. Skipped under the
+    // ?k= debug override so it can't clobber the forced position.
+    if (typeof fetchTodayPrice === 'function' && kOverride == null){
       fetchTodayPrice(function(price, source){
         if (typeof price === 'number' && price > 0){ spot = price; spotSource = source; render(); }
       });

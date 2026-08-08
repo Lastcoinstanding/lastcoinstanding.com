@@ -116,6 +116,17 @@ Remaining tail:
 
 ## In flight (undated / JM quick tasks)
 
+- [ ] **BLOCKING PRODUCTION SHIP — Hurdle Rate v2 below-trend-language sweep.** Before the
+  channel-position view (`feat/hurdle-position-view`, HURDLE_RATE_DESIGN §13) goes to production,
+  sweep the **whole** `/the-bitcoin-hurdle-rate` page for below-trend language — "optimistic",
+  "edge", "opportunity" (as advocacy, not "opportunity cost"), "discount", "the upside", "while it
+  lasts" — scoped **beyond the v2 copy** to the v1 strings left in place (design §8.1 ruling 4: the
+  v2 build fenced neutrality to new copy + the reworked card; the v1 strings are the deferred
+  remainder). The feature bakes today's below-trend position into the page the moment it reads as
+  advocacy, and nobody will notice because the numbers stay correct. Added at build time per the
+  `NEW_PAGE_CHECKLIST §11` gate so it cannot be lost between build and ship. Verify at a simulated
+  above-trend position with the `?k=1.5` debug param (SITE_GUIDE §45).
+
 - [ ] **The Bitcoin Exit essay → reciprocal link to /what-daily-conviction-bought** — do BEFORE
   Thursday's thread (closes the thread → tool → essay loop).
 - [ ] **Eyeball the three new FAQ sections** (allocation, wait-or-deploy, BvRE; desktop + 375px).
