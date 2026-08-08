@@ -112,8 +112,7 @@ Remaining tail:
 3. **Geyser page + V4V confirmation (top-10 #4).**
 4. **YouTube pilot video (top-10 #10)** — film from the refreshed script.
 5. **Next build: Retirement scenario comparison (top-10 #8)** — design doc first (after dashboard).
-6. **STRC below-par examination (top-10 #9)** — timely while STRC ~$83.
-- _Tech-debt:_ site-wide Chart.js legend audit (usePointStyle/borderDash defect class).
+6. **STRC below-par examination (top-10 #9)** — ✅ **SHIPPED** as `/strc-below-par`, live in production (carousel slide 36). Was stale in this queue — the page deployed before the 2026-08-05 amend.
 
 ## In flight (undated / JM quick tasks)
 
@@ -133,7 +132,7 @@ Remaining tail:
 - **Real-clock dating, never forward-dating** — resolved 2026-08-05.
 - **Assets land before merge** — bridge-commit binaries pre-merge; missing referenced asset = stop.
 - **Chart.js legend + usePointStyle hides borderDash** — custom generateLabels must also carry
-  fontColor. Site-wide audit queued.
+  fontColor. Site-wide audit now tracked in TECH_DEBT §1 (moved 2026-08-08).
 - **curl verifies the bundle, not the pixels** — "pixel-probe what you visually changed."
 - **CF Pages branch alias lags** — use the per-commit deployment URL for eyeball passes.
 - **Grok Imagine:** open sky/horizon/scale prevent "dank" drift; JM's register is "mysterious,
