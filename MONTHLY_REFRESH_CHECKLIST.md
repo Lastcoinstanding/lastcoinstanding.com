@@ -493,10 +493,11 @@ git ls-files | grep -E 'claude_| \(1\)'
 Should return nothing.
 
 **Direction of truth:** the repo is canonical for everything in the doc set
-above. The `claude/`-prefixed docs (OPEN_ITEMS, X_STRATEGY_PLAYBOOK,
+above. The planning/strategy docs (OPEN_ITEMS, X_STRATEGY_PLAYBOOK,
 FUNDING_STRATEGY, REACH_GROWTH_PLAN, CREATOR_CREDIBILITY_KIT,
-PARTNERSHIPS_REFERRALS_POLICY) are project-only and have no repo copy — never
-export those into the repo. See PAGE_IDEAS_BACKLOG conventions.
+PARTNERSHIPS_REFERRALS_POLICY, plus the four migrated with them) are now
+repo-tracked at root — the `claude/` project-only split was retired 2026-08-08
+(SITE_GUIDE §7); edit them in the repo directly. See PAGE_IDEAS_BACKLOG conventions.
 
 ## Live BTC price fetch — shipped 2026-05-28
 
