@@ -21,7 +21,7 @@ faq:
   - q: "Why do companies hold bitcoin instead of cash?"
     a: "A high hurdle explains it without any appeal to conviction. Cash held at money-market rates returns a few percent; if bitcoin&rsquo;s trend has grown faster over the horizon a treasury is managing, holding cash rather than bitcoin carries an opportunity cost, and behaviours like issuing debt against the stack or buying back stock follow from the same gap. The condition is that the business is cashflow positive &mdash; a company that may be forced to sell into a drawdown to meet obligations does not have capital that can wait, and the hurdle does not apply to it."
   - q: "Is bitcoin&rsquo;s hurdle rate a single number?"
-    a: "No, and that is the central finding. The hurdle declines with the horizon of the decision, because the power law&rsquo;s growth rate decays with age. On a one-year-forward window bitcoin&rsquo;s trend growth is higher; on a thirty-year-forward window it is much lower. A three-year equipment purchase is measured against a different bar than a thirty-year infrastructure asset. Comparing every decision to one headline CAGR is wrong in a direction that matters &mdash; the tool matches the bar to your horizon."
+    a: "No &mdash; it depends on the horizon, because the power law&rsquo;s growth rate decays with age. A three-year purchase is measured against a higher bar than a thirty-year asset, so the tool matches the bar to your horizon. But the variation matters less than the level: even at forty years the bar is around 19% &mdash; still well above money-market cash at ~4%, a typical corporate cost of capital near 9%, or long-run equities at 10.86%. The bar moves; it does not come down to meet them."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-bitcoin-hurdle-rate-head.html' %}"
   page_styles: "{% include '_pageassets/the-bitcoin-hurdle-rate.css' %}"
@@ -139,17 +139,46 @@ eleventyComputed:
       </div>
     </div>
 
-    <!-- ============ REFRAIN + VERDICT + STATS — the visual centre (v1.2); #hrAnswer wraps verdict+stats as the product-forward OG hero target ============ -->
+    <!-- ============ REFRAIN + VIEW TOGGLE + VERDICT + STATS — the visual centre; #hrAnswer wraps verdict+stats as the product-forward OG hero target ============ -->
     <p class="hr-refrain" aria-hidden="false">Does it beat bitcoin?</p>
+
+    <!-- VIEW TOGGLE (v2) — governs the WHOLE reading (verdict + cards + chart), so it sits ABOVE the answer: the reader meets the control that determines which answer before the answer itself (JM 2026-08-08, correcting the v2 first pass where it was a chart-only control). §6.22 segmented control, not a 2nd §6.17 yin-yang. -->
+    <div class="hr-view-wrap">
+      <div class="hr-view-toggle" role="tablist" aria-label="How to read the bar">
+        <button type="button" class="hr-view-btn active" data-view="trend" role="tab" aria-selected="true">From trend <span class="hr-view-knum">(1.0&times;)</span></button>
+        <button type="button" class="hr-view-btn" data-view="position" role="tab" aria-selected="false">From today <span class="hr-view-knum">(<span class="hr-view-k">0.43&times;</span>)</span></button>
+      </div>
+      <p class="hr-view-note">Two readings of the same question, and the verdict, the cards and the chart all switch with your choice &mdash; one calculation at two channel positions, not two calculations. <strong>From trend</strong> is the structural bar at <strong>1.0&times;</strong> trend &mdash; bitcoin&rsquo;s trend growth, matched to your horizon, independent of price today. <strong>From today</strong> reads the bar from where bitcoin actually sits in its Power&nbsp;Law channel now. <span class="help-tip" tabindex="0">?<span class="tip-content">The channel is bitcoin&rsquo;s position relative to its long-run <a href="/the-power-law.html">Power&nbsp;Law</a> trend. &ldquo;From today&rdquo; reads the bar from that position to trend at your horizon, rather than from the trend line itself &mdash; so it starts at three years, where reversion is a plan rather than a bet on timing. The trend view is the same calculation with the position set to 1.0&times;.</span></span></p>
+    </div>
+
     <div id="hrAnswer" class="hr-answer">
       <div class="hr-verdict" id="hrVerdict" role="status" aria-live="polite"><!-- filled by JS --></div>
       <div class="hr-stats" id="hrStats" aria-label="At your chosen horizon"><!-- filled by JS --></div>
     </div>
 
-    <!-- ============ THE HURDLE CURVE (v1.2 §5.2 reversal: chart moved BELOW verdict+stats — only the candidate-return slider redraws it, while horizon/funding/cashflow/lens/tax all move the verdict+stats, which now sit directly under the inputs so the answer moves as you drag; the chart is the supporting visual, not the hero output) ============ -->
+    <!-- ============ THE HURDLE CURVE (chart below verdict+stats per v1.2 §12; the view toggle above now governs all three) ============ -->
     <div class="hr-chart-block">
-      <div class="hr-chart-wrapper"><canvas id="hrChart" aria-label="Bitcoin's trend hurdle by horizon, with your candidate return"></canvas></div>
-      <p class="hr-chart-caption" id="hrChartCap">The <strong>amber curve</strong> is bitcoin&rsquo;s trend hurdle at every horizon &mdash; it declines because the trend&rsquo;s growth rate decays with age. The <strong>shaded band</strong> beneath it is the floor path: what the same capital returns if bitcoin only reaches its historical floor at your horizon rather than trend. Your <strong>candidate return</strong> is the flat line. Where the flat line crosses the curve is the answer. <span id="hrSpotNote" class="hr-spot-note"></span> The floor is the lowest level bitcoin&rsquo;s price has historically held relative to its trend &mdash; 0.42&times; trend. Reading the hurdle off the floor is the most conservative version of the model that still assumes the power law holds.</p>
+
+      <!-- DUPLICATE of the view toggle (JM 2026-08-08) — same control, second render. The chart is
+           the thing whose change matters most and it's furthest from the top toggle; this instance
+           sits right above the curve. ONE piece of state: these buttons share the .hr-view-btn class,
+           so bindView()/applyViewUI() bind and keep BOTH instances in sync — no second state, no
+           second URL param. Top instance is the fork in the road; this is the control you use while
+           looking at the curve. -->
+      <div class="hr-view-wrap hr-view-wrap-chart">
+        <div class="hr-view-toggle" role="tablist" aria-label="How to read the bar (same control as above the answer)">
+          <button type="button" class="hr-view-btn active" data-view="trend" role="tab" aria-selected="true">From trend <span class="hr-view-knum">(1.0&times;)</span></button>
+          <button type="button" class="hr-view-btn" data-view="position" role="tab" aria-selected="false">From today <span class="hr-view-knum">(<span class="hr-view-k">0.43&times;</span>)</span></button>
+        </div>
+      </div>
+
+      <div class="hr-chart-wrapper"><canvas id="hrChart" aria-label="Bitcoin's hurdle by horizon, with your candidate return"></canvas></div>
+
+      <!-- Trend-view caption — bold lede (computed) then the dense detail in normal weight -->
+      <p class="hr-chart-caption" id="hrChartCap"><strong class="hr-lede" id="hrLedeTrend"></strong> The <strong>amber curve</strong> is bitcoin&rsquo;s trend hurdle at every horizon &mdash; it declines because the trend&rsquo;s growth rate decays with age. The <strong>shaded band</strong> beneath it is the floor case: what the same capital returns if bitcoin only reaches its historical floor at your horizon rather than trend. Your <strong>candidate return</strong> is the flat line. Where the flat line crosses the curve is the answer. <span id="hrSpotNote" class="hr-spot-note"></span> The floor is the lowest level bitcoin&rsquo;s price has historically held relative to its trend &mdash; 0.42&times; trend. Reading the hurdle off the floor is the most conservative version of the model that still assumes the power law holds.</p>
+
+      <!-- Position-view caption — bold lede then dense detail; carries the §6.1 assumption, the §4.3 fence, the §6.2 model caveat on the same screen, and the computed near-touch note -->
+      <p class="hr-chart-caption" id="hrChartCapPos" hidden><strong class="hr-lede" id="hrLedePos"></strong> In this view the <strong>amber curve</strong> is the bar read from bitcoin&rsquo;s position in the channel today &mdash; what it returns from here to trend at each horizon, rather than the structural trend. The <strong>shaded band</strong> beneath it is the floor case to the same horizon. <span id="hrSpotNotePos" class="hr-spot-note"></span> This view starts at <strong>three years</strong>: inside that, the number turns almost entirely on <em>when</em> bitcoin returns to trend rather than <em>whether</em> &mdash; a bet on timing, not a capital plan. It assumes only that bitcoin returns to trend at some point within the horizon and tracks it thereafter, which is weaker than assuming it reverts exactly at the horizon &mdash; a path that reaches trend early and then holds ends in the same place. <span id="hrNearTouch" class="hr-neartouch"></span> Because it leans on reversion rather than trend growth alone, it inherits the model&rsquo;s uncertainty with more force, not less: a <a href="/the-power-law.html">floor breach or a break</a> in either direction would move this reading more than the trend view. The bar still applies only to capital that can wait, at the margin.</p>
     </div>
 
     <!-- ============ PRESETS ============ -->
@@ -181,7 +210,7 @@ eleventyComputed:
 
     <h2 class="hr-h2">Why bitcoin is a candidate benchmark</h2>
     <p class="hr-prose">Under the <a href="/the-power-law.html">Power Law</a>, bitcoin&rsquo;s trend price scales with time, and its annualised trend growth is high but declining. That trend is a model, not a law: it holds until it doesn&rsquo;t, and every figure on this page inherits its uncertainty in full. What makes it a hurdle rather than a headline is that <strong>the growth rate depends on the horizon</strong>. On a one-year-forward window the trend grows faster; on a thirty-year-forward window it grows much more slowly, because the power law&rsquo;s rate decays with age. Comparing a thirty-year infrastructure decision to a one-year trend rate is the mistake this tool exists to prevent. Every rate the tool shows names the window it was measured over.</p>
-    <p class="hr-prose">The bar also depends on where bitcoin sits relative to trend when the capital is committed. Entering from below trend raises the realised return available; entering from above it lowers it. The floor path on the chart is the conservative reading of that &mdash; what the capital returns if bitcoin reaches only its historical floor at the horizon rather than its trend.</p>
+    <p class="hr-prose">The bar also depends on where bitcoin sits relative to trend when the capital is committed. Entering from below trend raises the realised return available; entering from above it lowers it. Switch the chart to <strong>&ldquo;From today&rdquo;</strong> to read the bar from where bitcoin actually is rather than from the trend &mdash; whether that position is a discount or a premium is the subject of <a href="/discount-or-premium.html">Discount, or Premium?</a>; this view is that reading applied to a capital decision. The floor case on the chart is the conservative version of it &mdash; what the capital returns if bitcoin reaches only its historical floor at the horizon rather than its trend.</p>
 
     <h2 class="hr-h2">What this explains</h2>
     <p class="hr-prose">A high hurdle predicts treasury-company behaviour mechanically, with no appeal to anyone&rsquo;s conviction. If bitcoin&rsquo;s trend has grown faster than the return on cash, holding cash rather than bitcoin carries an opportunity cost &mdash; so a treasury holds bitcoin. If the trend has grown faster than the cost of debt, issuing debt to buy more can be accretive &mdash; so treasuries issue debt against the stack. Buybacks against a bitcoin-per-share metric follow from the same gap. An explanation that predicts behaviour is worth more than an argument that praises it.</p>
@@ -196,7 +225,7 @@ eleventyComputed:
 
     <h2 class="hr-h2">What would break this?</h2>
     <p class="hr-prose">Two things, and the page fails without either. First, the hurdle is only as high as the arithmetic that produced it, and the arithmetic overstates it. The number the tool shows is the smooth trend. The path is not smooth: the realised rate over any particular window can land well above or well below it. And the trend return is only <em>available</em> to capital that can hold through the drawdown without being forced to sell &mdash; so the hurdle that actually binds a given holder is lower than the arithmetic one. It says nothing about capital with a deadline, a covenant, a payroll, or a liquidity need &mdash; and businesses produce things other than returns.</p>
-    <p class="hr-prose">Second, the hurdle is only as good as the model. Every figure here inherits the <a href="/the-power-law.html">power law</a>&rsquo;s uncertainty, including the possibility of a floor breach or a break in either direction. A hurdle derived from a model has to carry the model&rsquo;s caveats on the same screen as the number. The declining-hurdle finding is itself the most useful humility device available: the page&rsquo;s own arithmetic says the bar falls over time, and keeps falling.</p>
+    <p class="hr-prose">Second, the hurdle is only as good as the model. Every figure here inherits the <a href="/the-power-law.html">power law</a>&rsquo;s uncertainty, including the possibility of a floor breach or a break in either direction. A hurdle derived from a model has to carry the model&rsquo;s caveats on the same screen as the number.</p>
     <p class="hr-close"><strong>Does it beat bitcoin?</strong> It is a question worth carrying into every capital decision &mdash; asked with the two conditions attached each time: the trend holds, and the capital can wait.</p>
     <p class="hr-prose">Bitcoin&rsquo;s future growth is uncertain and volatile. So is the return on whatever it&rsquo;s being compared against &mdash; the difference is that one uncertainty is visible daily and the other is written into a plan as a single confident number. The comparison deserves to be made soberly on both sides, and most soberly for surplus capital that carries no operational cost to release.</p>
 

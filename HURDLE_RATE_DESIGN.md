@@ -477,3 +477,201 @@ orphaned "floor" in "13.4× trend · 13.1× floor" and wrapped captions around t
 **Horizon marker** added to the chart (dashed vertical at the selected horizon + a dot carrying the
 hurdle value where it meets the trend curve) so the horizon slider visibly drives the chart and ties
 the "trend hurdle" stat card to a point on the curve.
+
+## 13. v2 — the channel-position view (branch `feat/hurdle-position-view`, 2026-08-08)
+
+Enhancement to the live page, not a rebuild. Full design in `HURDLE_RATE_V2_POSITION_DESIGN.md` +
+build order `HURDLE_RATE_V2_BUILD_PROMPT.md`; this section is the canonical shipped record. No new
+OG card or carousel slide (both exist and neither is invalidated by adding a view). Refresh surface
+stays **zero** — everything computes live from `PL_DATA` + spot; no new constants, presets, or
+`MONTHLY_REFRESH` rows, and **no new DATA_AUDIT rows** (`PL_B`/`PL_FLOOR` already tracked).
+
+**The two-insight framing (design §4.0).** The toggle exists because there are two separate insights,
+and carrying both in one view conveys neither. **View 1 — the structural insight** (`trendCAGR`):
+bitcoin's trend growth is high and declines with the horizon; a property of the model, true
+regardless of price today. It leads and is the default. **View 2 — the position correction**
+(`posCAGR`): the structural bar is tempered or augmented by where bitcoin sits in the channel now.
+Supplemental — it modifies insight 1 rather than replacing it. The verdict stays trend-based; the
+position reading is carried by the reworked card (always visible) and the opt-in view.
+
+**Engine.** `posCAGR(t,H,k) = ((1/k)·((t+365.25H)/t)^PL_B)^(1/H) − 1`, k = spot/trend(t). Algebraically
+the old `spot→trend` series the v1 engine already computed, so v2 is largely a presentation change.
+Fixture at t=6,424, PL_B=5.77: k=0.43 → H3 79.4% / H10 41.1% / H30 24.6%; k=1.5 → H3 18.3% / H10
+24.5% / **H1 −8.3%** (correct, not a bug — above trend, short horizon, the model expects a loss
+reverting down; the tool must be able to report it). k is derived exactly as the channel ribbon
+derives it (spot/plPrice(TODAY_DAYS)) from the same shared spot, so the two cannot diverge.
+
+**The view toggle** is the §6.22 `chart-range-toggle` segmented control above the chart, **not** a
+second §6.17 yin-yang — two of those on one page is one too many, and this switches how one chart is
+read rather than gating which inputs render. Y-axis autoscales per view (magnitudes differ ~10×; no
+shared lock). The band travels with the view: in **both** views the lower edge is `spot→floor`; only
+the upper curve swaps (trend view `trendCAGR`, position view `posCAGR`). The two views therefore
+share their conservative (lower) edge — visible today because spot sits near the floor (see the
+near-touch note).
+
+**The three-year fence (§4.3) is LOAD-BEARING for §4.2 compatibility, not editorial (JM, 2026-08-08).**
+§4.2 rejected drawing `spot→trend` in v1 for **two** reasons: (a) it breaches §7 flag 1 (~227%/yr at
+H=1) and (b) it swamps the 20–40% y-axis. Reviving the geometry needs **both** fixes — the position
+view owning its own y-axis clears (b), and the H≥3 fence clears (a). Either alone is insufficient: a
+227% number is an overclaim on any axis, so the own-axis change does not by itself clear (a).
+Consequence: **dropping the fence reopens the §4.2 rejection.** The engine still computes below three
+years; the view and the card decline to *surface* a rate there (the ×-trend multiplier stays, always
+valid), and the page states why. Below the fence the position curve plots from H=3, the x-axis starts
+at 3, and the horizon marker clamps to 3 with the ever-present fence copy explaining it.
+
+**§0.1 reconciliation outcome.** No contradiction with §4.2 — that section explicitly framed the
+non-drawing of `spot→trend` as "a presentation choice, not a data limitation," recording that the
+engine computes all three series; SITE_GUIDE §45 and TECH_DEBT §1 both tracked it as "a one-line flip
+pending JM's preview call." v2 is that flip, gated behind an opt-in view. The build prompt's §0.1
+framing ("legible once the position view owns its own y-axis") was **incomplete** — the axis clears
+only the legibility objection (b); the overclaim objection (a) is cleared by the separate H≥3 fence.
+Both together revive the geometry (JM confirmed, 2026-08-08).
+
+**§8.1 CLOSED (JM, 2026-08-08).** The former open question — run the position axis from H=1 with the
+caveat carried in copy instead of fencing at 3 — is **closed, not open**. Taking it would reintroduce
+the ~227%/H=1 figure §4.2 rejected, i.e. it reopens the §4.2 rejection; it is therefore a decision to
+revisit a settled build outcome, **not a copy tweak**, and needs an explicit ruling to reopen. An
+open question that quietly undoes a settled decision is worse than no question.
+
+**The reworked card (§4.2).** The v1 "optimistic edge" card — whose label used two of the §5-banned
+words — is reworked into the **position-adjustment card**: renders in **both** views (so a reader who
+never touches the toggle still sees insight 2), keeps its slot (no sixth card; 3+2/2+2 grid intact),
+position-neutral and sign-carrying. Reads e.g. *"41.1% — from today's position over 10 yr · 0.43×
+trend · adds 11.4 pts to the bar"* below trend and *"24.5% … 1.50× trend · subtracts 5.2 pts from the
+bar"* above. Below the 3-year fence it shows "—" with the multiplier and "reads from a 3-year
+horizon". No separate readout line — the card is the single carrier.
+
+**Fencing the card below three years closed a live v1 §7-flag-1 breach — a defect fixed, not just a
+v2 fence (JM, 2026-08-08).** The v1 "optimistic edge" card computed `spot→trend` at *any* horizon, so
+in production today, with bitcoin near its floor, it was rendering **~220%/yr at H=1** — exactly the
+overclaim §7 flag 1 exists to prevent, on any screenshot of the live page. The v2 fence removes that
+number from the card (in both views) as a side effect of building the position reading. Recorded here
+as a v1 defect closed so the reasoning survives: had the sub-three-year behaviour been thought through
+at v1, the fence would have been specified then.
+
+**Gating (§1.3, BLOCKING) — resolved to "explicitly labelled", not disabled.** When `todayPriceIsLive`
+is false, the position figures are never silently rendered as live: the card sub-line and both spot
+notes carry " (latest monthly data)" via the shared `todayPriceNote`. **The deciding factor for
+label-over-disable is the ad-block cohort (JM, 2026-08-08):** CoinGecko sits on common ad-block lists
+(TECH_DEBT §1), so those users *always* hit the fallback — hard-disabling would make the whole feature
+invisible to them, whereas an explicitly-labelled month-old position is useful and honest. Recorded
+explicitly because a future reader would otherwise read labelling as the weaker option; it is the
+stronger one here precisely because of who the fallback path serves. An explicitly-labelled month-old
+position also removes the "silently live" defect the rule targets. Disabling is a one-line switch if
+the stricter reading is ever preferred.
+
+**Near-touch caption (JM #4, 2026-08-08) — computed and position-neutral.** States that the position
+view's floor-path edge and the trend view's curve coincide when spot sits on the floor and separate
+as it moves away — today they nearly meet because bitcoin is near its floor ("one reading taken two
+ways"). Computed live from the engine, so it stays true as bitcoin moves: near the floor it claims the
+near-coincidence; above the floor it states the gap plainly (e.g. "about 15.5 pts apart … above its
+floor") rather than the false "close to its floor". The `?k=1.5` neutrality sweep caught the first
+draft asserting "close to its floor" unconditionally — a defect, now fixed.
+
+**On-page fences (design §6, all present in the position-view caption, same screen as the number):**
+the reversion assumption stated in its weaker, more defensible form (bitcoin returns to trend at some
+point within the horizon and tracks it thereafter — not "reverts exactly at the horizon"); the model
+uncertainty caveat with a `/the-power-law` link, noting the position view leans on reversion so §7
+flag 2 applies with *more* force; and §7 flag 1 unchanged ("capital that can wait, at the margin").
+
+**Neutrality (§5, BLOCKING) + the `?k=` debug override.** New copy uses only neutral, sign-carrying
+constructions (adds/subtracts, above/below trend, position adjustment); the §5-banned below-trend
+words are absent from new copy. A review-only `?k=` URL param forces channel position (overrides spot
+to k×trend(t) so every position surface moves together, presents as live for review); it is not
+linked from the page, is stripped from the URL on any interaction so it can't leak into a shared link,
+and is documented in SITE_GUIDE §45. Every new string was reviewed at `?k=1.5`; the one defect found
+(near-touch) was fixed. **The whole-page below-trend-language sweep beyond the reworked card is
+tracked in OPEN_ITEMS and blocks production ship — not this build (design §8.1 ruling 4).**
+
+**Integration.** URL state adds `?view=trend|position` to the `?r=`/`?h=`/`?lens=` payload (deep links
+restore all four); the view joins the per-page localStorage stickiness. One cross-link each way with
+`/discount-or-premium` (that page owns channel position as a subject; this view applies it to a
+capital decision) — inline on the hurdle page, a related card on DoP, so §6.10 one-placement holds on
+both sides.
+
+### 13.1 Post-review rebuild — the view governs the whole answer (JM review on preview, 2026-08-08)
+
+The first v2 pass (above) built the toggle as a **chart control**: it drove the chart and the
+position-adjustment card, but the verdict and stat cards 1–3 and 5 stayed on the trend basis. On the
+deployed preview that produced a page **whose verdict contradicted its own chart** — at
+`?view=position&r=50` the headline read "clears bitcoin's trend hurdle at every horizon" while the
+position curve directly below showed the 50% candidate not clearing until ~year 6; the body cited a
+one-year-forward rate the position chart (which starts at three years) has no point for; and card 5
+read the trend-basis gap (−20.3 pts) against a position-basis bar. This is the "two surfaces reporting
+one number" failure §4.2 warned about, arriving through the verdict/chart split rather than through
+duplicated numbers. Root cause: the ambiguous §4.0 wording (now corrected in
+`HURDLE_RATE_V2_POSITION_DESIGN.md §4.0` — supplemental *in importance*, not *as a surface*). The
+rebuild makes each view a **complete, internally consistent reading**:
+
+- **Verdict + cards 1, 2, 3, 5 compute on the active view's basis**, not just the chart and card 4.
+  The crossing is computed per view. Because `posCAGR` is **not monotonic above trend** (it rises from
+  a low/negative short-horizon value to a mid-horizon peak, then declines), the candidate can cross it
+  **twice** — the verdict handles 0/1/2 boundaries honestly ("clears up to ~3.5 yr and again beyond
+  ~27.7 yr, but not in between"), which the trend view's monotonic curve never required. Verified: at
+  r=50 the trend view clears everywhere (gap −20.3) while the position view crosses ~year 6.8 (gap
+  −8.6) — a real computation, and the contradiction is gone.
+- **Shared y-axis across both views — REVERSES build prompt §2 ("do not lock a shared axis").** JM's
+  call on preview: per-view autoscale made the two views look identical apart from axis labels,
+  hiding the jump that is the toggle's whole point. The axis is now the max across both curves at the
+  current k (not hardcoded — at low k the position curve exceeds 100% at H=3), applied to both, so the
+  trend curve sits lower in the frame and toggling shows the jump. **Consequence, accepted by JM:
+  "default view pixel-identical to production" (build §8) no longer holds by design** — the trend
+  curve is compressed by the shared scale. The decline is still visible; the jump, which was not, now
+  is.
+- **Toggle moved above the verdict.** It governs the whole reading, so the reader meets the control
+  that determines which answer before the answer itself. (Its previous placement below everything it
+  controlled is what led the first build to treat it as a chart control.)
+- **Bold computed lede atop each chart caption**, dense detail below in normal weight — trend: "high
+  at every horizon, falls… 37.6% / 29.7% / 18.7%"; position: "Bitcoin sits at k× trend today. Reading
+  the bar from there… raises/lowers it from X to Y over your N-year horizon" (sign by position).
+- **Card 4 is now the adjustment *bridge*, not a second level.** Since card 1 carries the level in the
+  position view (and the lede carries it in the trend view), card 4's headline is the signed points
+  the channel moves the bar off trend (`+11.7 pts` / `−5.2 pts`), with the two levels it bridges in
+  the sub-line. Checked for redundancy per JM: it is not redundant — card 1 is the level, card 4 is
+  the delta.
+- **Renames:** view label "From today's price" → **"From the channel"** (price is incidental, the
+  channel is the concept) with a Power-Law tooltip; both floor legends → **"Floor case (0.42× trend)"**
+  in both views (explanation stays in the caption — a Chart.js legend can't host a tooltip).
+- **H<3 in the position view fences the WHOLE block** (verdict + stats + lede), consistent with the
+  card fence (JM: option a — a conditional fallback to the trend basis would recreate the split
+  intermittently, which is worse than a clean fence).
+
+Re-ran the `?k=1.5` neutrality sweep across the rebuilt verdict, lede, and cards — clean (lede
+"lowers", card 4 "lowers it from 29.7% to 24.5%", card 5 sign-carrying). No console errors.
+
+### 13.2 Second review pass — labels, meta, framing corrections (JM, 2026-08-08)
+
+- **View labels now carry the channel position:** "From trend (1.0×)" / "From today (0.43×)", the
+  second number live from `k`. This makes visible that **the trend view IS the k=1.0 case** —
+  `posCAGR(t,H,1) = trendCAGR(t,H)` exactly — i.e. one calculation at two channel positions, not two
+  calculations. Deliberately **not** "median" for 1.0×: the site has not established 1.0× as bitcoin's
+  median channel position and must not imply a distributional claim. Edge case — when `k` rounds to
+  1.00× the two buttons would read the same, so the position button reads **"From today (at trend)"**
+  instead (factual: spot sits at trend; makes the coincidence the point rather than a glitch).
+- **Renames superseded:** the view label is now "From today", not "From the channel" (§13.1); the
+  floor legend stays "Floor case (0.42× trend)". Stale prose references ("From today's price", "floor
+  path") were swept to match.
+- **Meta tags corrected:** description / og / twitter / og:image:alt / JSON-LD all led with the
+  demoted "declining" framing while the regenerated OG card image leads with the level ("most bars are
+  set far too low"). Rewritten so the **level leads** and the decline is mechanism, not headline —
+  the card and its description now agree.
+- **FAQ 5 and "What would break this?" corrected:** FAQ 5 no longer calls the decline "the central
+  finding"; it leads with the level (even at forty years ~19%, still well above cash ~4% / WACC ~9% /
+  equities 10.86% — "the bar moves; it does not come down to meet them"). The "declining-hurdle
+  finding is itself the most useful humility device" sentence was deleted; that paragraph ends at
+  "…caveats on the same screen as the number."
+- **Verdict-callout whitespace fixed (JM item A).** Root cause: `.hr-verdict` is `box-sizing:
+  content-box`, so the static `min-height: 184px` forced the box to 184 + ~44px padding/border = 228px
+  while the tallest verdict is only ~179px — a **~49px gap on every verdict**, ~99px on the short
+  "clears everywhere" case (JM saw ~⅓ of the box). Replaced with **border-box + a dynamic min-height**
+  (`equalizeVerdict`): each render measures both views' verdicts in a hidden clone at the current
+  inputs and sets the callout's min-height to the taller. Padding now appears **only where the two
+  views genuinely differ** (e.g. "clears everywhere" vs "crosses at year N"); where they share a
+  crossing kind (both "does not clear"), there is no padding at all. Recomputed on resize.
+- **Card 2 mixed basis (JM item B) — flagged, not yet resolved.** In the trend view card 2 reads
+  "13.4× trend · 13.0× floor": the trend figure is trend→trend (the k=1.0 bar), the floor figure is
+  `spot→floor` at the real k=0.43 (mirrors the v1 chart's floor band, §4.2). The new "1.0×" button
+  label exposes the tension — the button says 1.0× but the floor figure reflects 0.43×. Resolving it
+  to a pure k=1.0 reading (floor → trend→floor, ~5.6×) would also change the chart's floor band and
+  cost the near-touch observation (which depends on today's spot≈floor). Left for JM's ruling rather
+  than restructured unilaterally.

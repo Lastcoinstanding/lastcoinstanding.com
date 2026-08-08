@@ -116,6 +116,23 @@ Remaining tail:
 
 ## In flight (undated / JM quick tasks)
 
+- [x] **DONE (2026-08-08) — Hurdle Rate v2 below-trend-language sweep, the pre-production gate.**
+  Whole-page grep for the listed advocacy words, judged in context, before merge:
+  - **"optimistic" / "the upside" / "while it lasts"** — absent (the v1 "optimistic edge" card was
+    reworked into the neutral position-adjustment card at build time).
+  - **"opportunity"** — every instance is "opportunity cost" (the page's thesis, explicitly exempted)
+    or neutral ("reinvestment opportunities", "act on opportunities during a drawdown"). Not advocacy.
+  - **"discount"** — sole instance names *both* "a discount or a premium" in the `/discount-or-premium`
+    cross-link. Neutral.
+  - **"edge"** — all geometric (band-edge references in code comments); the one user-facing instance,
+    the near-touch caption's "floor-path edge", was tidied to "floor case" to match the legend rename
+    (removes the literal word too). Not advocacy in any instance.
+  Verified at the simulated above-trend position (`?k=1.5`) across every new/changed string over the
+  build (the sweep caught and fixed one non-neutral near-touch draft, `99a00d9`). Neutral copy fenced
+  from build (`efb958e`); decline-as-headline demoted in meta/JSON-LD/FAQ5/"what would break this?"
+  (`ca43d85`); floor-path-edge tidy shipped with the merge. **Read as written and found genuinely
+  swept — no advocacy language remains.**
+
 - [ ] **The Bitcoin Exit essay → reciprocal link to /what-daily-conviction-bought** — do BEFORE
   Thursday's thread (closes the thread → tool → essay loop).
 - [ ] **Eyeball the three new FAQ sections** (allocation, wait-or-deploy, BvRE; desktop + 375px).
