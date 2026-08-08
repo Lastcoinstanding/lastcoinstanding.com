@@ -473,6 +473,53 @@ CARDS = [
         },
         "output_filename": "og-strc-below-par.jpg",
     },
+    {
+        "name": "hurdle",
+        "url": "https://lastcoinstanding.com/the-bitcoin-hurdle-rate",
+        # v1.2: hero is the verdict + stat-strip block (#hrAnswer), the page's visual centre after
+        # the chart moved to last. The chart is generated too ("hurdle-chart" below) so JM can pick.
+        "hero_selector": "#hrAnswer",
+        "wait_after_navigate_ms": 1500,
+        "wait_after_scroll_ms": 3500,
+        "chrome": {
+            "title": "The Bitcoin ",
+            "titleAccent": "Hurdle",
+            "titleAfter": " Rate",
+            "subtitle": "Does it beat bitcoin? Bitcoin’s trend growth is the bar any use of capital has to clear, and most bars are set far too low.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">The bar</strong>'
+                '  ·  bitcoin’s trend CAGR, matched to your horizon'
+            ),
+            "urlText": "lastcoinstanding.com/the-bitcoin-hurdle-rate",
+        },
+        # NOTE: plain filename, not -v2 — no og-the-bitcoin-hurdle-rate.jpg has
+        # ever existed/deployed (page shipped to prod via PR #40 with the head
+        # already referencing this path, but the asset itself was never made),
+        # so there is no cached card on X to bust. Regen alone lands the asset.
+        "output_filename": "og-the-bitcoin-hurdle-rate.jpg",
+    },
+    {
+        # v1.2 "capture both" — the chart as an alternative hero, so JM can compare it against
+        # #hrAnswer and pick. Whichever wins takes the plain filename above; this variant file is
+        # then discarded. Requires #hrChart on the deployed page (present in production).
+        "name": "hurdle-chart",
+        "url": "https://lastcoinstanding.com/the-bitcoin-hurdle-rate",
+        "hero_selector": "#hrChart",
+        "wait_after_navigate_ms": 1500,
+        "wait_after_scroll_ms": 3500,
+        "chrome": {
+            "title": "The Bitcoin ",
+            "titleAccent": "Hurdle",
+            "titleAfter": " Rate",
+            "subtitle": "Does it beat bitcoin? Bitcoin’s trend growth is the bar any use of capital has to clear, and most bars are set far too low.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">The bar</strong>'
+                '  ·  bitcoin’s trend CAGR, matched to your horizon'
+            ),
+            "urlText": "lastcoinstanding.com/the-bitcoin-hurdle-rate",
+        },
+        "output_filename": "og-the-bitcoin-hurdle-rate-chart.jpg",
+    },
 ]
 
 
