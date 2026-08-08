@@ -158,6 +158,20 @@ eleventyComputed:
 
     <!-- ============ THE HURDLE CURVE (chart below verdict+stats per v1.2 §12; the view toggle above now governs all three) ============ -->
     <div class="hr-chart-block">
+
+      <!-- DUPLICATE of the view toggle (JM 2026-08-08) — same control, second render. The chart is
+           the thing whose change matters most and it's furthest from the top toggle; this instance
+           sits right above the curve. ONE piece of state: these buttons share the .hr-view-btn class,
+           so bindView()/applyViewUI() bind and keep BOTH instances in sync — no second state, no
+           second URL param. Top instance is the fork in the road; this is the control you use while
+           looking at the curve. -->
+      <div class="hr-view-wrap hr-view-wrap-chart">
+        <div class="hr-view-toggle" role="tablist" aria-label="How to read the bar (same control as above the answer)">
+          <button type="button" class="hr-view-btn active" data-view="trend" role="tab" aria-selected="true">From the trend</button>
+          <button type="button" class="hr-view-btn" data-view="position" role="tab" aria-selected="false">From the channel</button>
+        </div>
+      </div>
+
       <div class="hr-chart-wrapper"><canvas id="hrChart" aria-label="Bitcoin's hurdle by horizon, with your candidate return"></canvas></div>
 
       <!-- Trend-view caption — bold lede (computed) then the dense detail in normal weight -->
