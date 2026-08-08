@@ -528,12 +528,57 @@
     }
   }
 
+  // ─────────── VIEW LABELS (live k in the buttons) ───────────
+  // The buttons carry the channel position (JM 2026-08-08): "From trend (1.0×)" /
+  // "From today (0.43×)" — making visible that the trend view IS the k=1.0 case
+  // (posCAGR(t,H,1) = trendCAGR(t,H)), i.e. one calculation at two positions. The
+  // trend "(1.0×)" is static; the "today" number is live from k. Edge case: when k
+  // rounds to 1.00× the two would read the same, so the position button reads "at trend"
+  // instead — factual (spot sits at trend), and it makes the coincidence the point rather
+  // than a glitch. Not "median" — the site makes no distributional claim about 1.0×.
+  function updateViewLabels(){
+    var k = chanK();
+    var txt = (Math.abs(k - 1) < 0.005) ? 'at trend' : (k.toFixed(2) + '&times;');
+    var nodes = document.querySelectorAll('.hr-view-k');
+    for (var i = 0; i < nodes.length; i++) nodes[i].innerHTML = txt;
+  }
+
+  // ─────────── VERDICT HEIGHT EQUALISER (chart stays put on view switch) ───────────
+  // Dynamic min-height (JM 2026-08-08): measure BOTH views' verdict at the current inputs
+  // in a hidden clone and set the callout's min-height to the taller. This keeps the chart
+  // from jumping when switching WITHOUT the fixed over-padding a static min-height caused
+  // (the earlier static value was a content-box min-height that added ~49px of padding to
+  // every verdict). When both views yield the same crossing kind (e.g. both "does not
+  // clear"), the heights match and there is no padding at all; padding appears only where
+  // the two views genuinely differ (e.g. "clears everywhere" vs "crosses at year N"). The
+  // clone carries the .hr-verdict class (border-box), so its offsetHeight is the real
+  // outer height and min-height is in the same terms.
+  var _vMeasure = null;
+  function equalizeVerdict(){
+    if (!el.hrVerdict) return;
+    if (!_vMeasure){
+      _vMeasure = document.createElement('div');
+      _vMeasure.className = 'hr-verdict';
+      _vMeasure.setAttribute('aria-hidden', 'true');
+      _vMeasure.style.cssText = 'position:absolute; left:-99999px; top:0; visibility:hidden; pointer-events:none; margin:0; min-height:0;';
+      el.hrVerdict.parentNode.appendChild(_vMeasure);
+    }
+    _vMeasure.style.width = el.hrVerdict.offsetWidth + 'px';
+    var save = S.view;
+    S.view = 'trend';    _vMeasure.innerHTML = verdict(); var ht = _vMeasure.offsetHeight;
+    S.view = 'position'; _vMeasure.innerHTML = verdict(); var hp = _vMeasure.offsetHeight;
+    S.view = save;
+    el.hrVerdict.style.minHeight = Math.max(ht, hp) + 'px';
+  }
+
   // ─────────── RENDER ───────────
   function render(){
     if (el.hrVerdict) el.hrVerdict.innerHTML = verdict();
     if (el.hrStats) { el.hrStats.innerHTML = stats(); el.hrStats.setAttribute('data-count', el.hrStats.querySelectorAll('.hr-stat').length); }
     notes();
     updateChart();
+    updateViewLabels();
+    equalizeVerdict();
   }
 
   // ─────────── INPUT WIRING ───────────
@@ -758,6 +803,14 @@
         if (typeof price === 'number' && price > 0){ spot = price; spotSource = source; render(); }
       });
     }
+
+    // Re-equalise the verdict callout on viewport changes (the two views' verdicts wrap to
+    // different heights at different widths, so the min-height must be recomputed).
+    var _rzTimer = null;
+    window.addEventListener('resize', function(){
+      if (_rzTimer) clearTimeout(_rzTimer);
+      _rzTimer = setTimeout(equalizeVerdict, 150);
+    });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

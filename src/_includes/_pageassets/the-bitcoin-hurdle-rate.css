@@ -104,6 +104,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .hr-view-btn:hover { color: var(--text); }
 .hr-view-btn.active { background: rgba(224,148,34,0.12); color: var(--amber); }
 .hr-view-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+/* the ×-trend position carried in each button — one calculation at two positions (JM 2026-08-08) */
+.hr-view-knum { font-variant-numeric: tabular-nums; opacity: 0.75; font-weight: 400; }
 .hr-view-note { font-size: 0.76rem; line-height: 1.5; color: var(--text-muted); margin: 0.5rem auto 0; max-width: 620px; }
 /* compact duplicate toggle above the chart — buttons only, no note */
 .hr-view-wrap-chart { margin: 0 auto 0.7rem; }
@@ -117,12 +119,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 /* ── Verdict ── */
 /* v1.2: wraps verdict+stats as the product-forward OG hero target; both children keep their own centred max-widths, so no visual shift. */
 .hr-answer { max-width: 1000px; margin: 0 auto; }
-/* min-height equalises the verdict callout across views (and across crossing-kinds) so the chart
-   below doesn't jump when switching (JM 2026-08-08). Sized to the tallest verdict (the "never" /
-   "mixed" bodies); the shorter "clears everywhere" case gets some padding inside the callout box.
-   The stats strip gets its own min-height below — both are gate-safe: the §3.5 "does not apply"
-   verdicts blank the stats (display:none via :empty), so no huge gap on those. Viewport-specific. */
-.hr-verdict { max-width: 820px; margin: 0 auto; min-height: 11.5rem; background: rgba(224,148,34,0.04); border: 1px solid rgba(224,148,34,0.18); border-left: 3px solid var(--amber); border-radius: 8px; padding: 1.3rem 1.5rem; }
+/* box-sizing: border-box so the JS-set min-height (equalizeVerdict) is in outer-height terms
+   and doesn't add padding on top (the earlier content-box min-height over-padded every verdict
+   by ~49px — JM's "unfinished panel"). The min-height itself is set dynamically per render to the
+   taller of the two views' verdicts, so the callout only gains height where the views genuinely
+   differ. The stats strip keeps a static min-height below; both are gate-safe (the §3.5 "does not
+   apply" verdicts blank the stats via :empty display:none, so no gap there). */
+.hr-verdict { box-sizing: border-box; max-width: 820px; margin: 0 auto; background: rgba(224,148,34,0.04); border: 1px solid rgba(224,148,34,0.18); border-left: 3px solid var(--amber); border-radius: 8px; padding: 1.3rem 1.5rem; }
 .hr-v-lead { font-family: 'Inter', sans-serif; font-size: 1.06rem; line-height: 1.5; font-weight: 600; color: var(--text); margin: 0 0 0.7rem; }
 .hr-v-lead strong { color: var(--amber); }
 .hr-v-body { font-family: 'Inter', sans-serif; font-size: 0.9rem; line-height: 1.7; color: var(--text-dim); margin: 0; }
@@ -181,11 +184,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
   .hr-page { padding: 0 1.1rem 3.5rem; }
   .hero { padding: 3.2rem 1.2rem 1.2rem; }
   /* keep the view toggle's two segments comfortable at 375px (no wrap, no h-scroll) */
-  .hr-view-btn { padding: 0.4rem 0.7rem; font-size: 0.8rem; }
+  .hr-view-btn { padding: 0.4rem 0.6rem; font-size: 0.78rem; }
   .hr-view-note { font-size: 0.72rem; }
-  /* the verdict wraps much taller on a narrow viewport, so its equalising min-height is larger here
-     (stats are ~equal across views on mobile, so their desktop min-height suffices there) */
-  .hr-verdict { min-height: 25.5rem; }
+  /* verdict min-height is set dynamically in JS (equalizeVerdict), recomputed on resize — no
+     viewport-specific value needed here. */
   .calc-mode-toggle { flex-direction: column; gap: 0.85rem; align-items: center; margin-bottom: 1.6rem; }
   .calc-mode-label { max-width: 100%; padding: 0.4rem 0.5rem; }
   .calc-mode-name { font-size: 1.3rem; margin-bottom: 0.2rem; }

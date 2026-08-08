@@ -638,3 +638,40 @@ rebuild makes each view a **complete, internally consistent reading**:
 
 Re-ran the `?k=1.5` neutrality sweep across the rebuilt verdict, lede, and cards — clean (lede
 "lowers", card 4 "lowers it from 29.7% to 24.5%", card 5 sign-carrying). No console errors.
+
+### 13.2 Second review pass — labels, meta, framing corrections (JM, 2026-08-08)
+
+- **View labels now carry the channel position:** "From trend (1.0×)" / "From today (0.43×)", the
+  second number live from `k`. This makes visible that **the trend view IS the k=1.0 case** —
+  `posCAGR(t,H,1) = trendCAGR(t,H)` exactly — i.e. one calculation at two channel positions, not two
+  calculations. Deliberately **not** "median" for 1.0×: the site has not established 1.0× as bitcoin's
+  median channel position and must not imply a distributional claim. Edge case — when `k` rounds to
+  1.00× the two buttons would read the same, so the position button reads **"From today (at trend)"**
+  instead (factual: spot sits at trend; makes the coincidence the point rather than a glitch).
+- **Renames superseded:** the view label is now "From today", not "From the channel" (§13.1); the
+  floor legend stays "Floor case (0.42× trend)". Stale prose references ("From today's price", "floor
+  path") were swept to match.
+- **Meta tags corrected:** description / og / twitter / og:image:alt / JSON-LD all led with the
+  demoted "declining" framing while the regenerated OG card image leads with the level ("most bars are
+  set far too low"). Rewritten so the **level leads** and the decline is mechanism, not headline —
+  the card and its description now agree.
+- **FAQ 5 and "What would break this?" corrected:** FAQ 5 no longer calls the decline "the central
+  finding"; it leads with the level (even at forty years ~19%, still well above cash ~4% / WACC ~9% /
+  equities 10.86% — "the bar moves; it does not come down to meet them"). The "declining-hurdle
+  finding is itself the most useful humility device" sentence was deleted; that paragraph ends at
+  "…caveats on the same screen as the number."
+- **Verdict-callout whitespace fixed (JM item A).** Root cause: `.hr-verdict` is `box-sizing:
+  content-box`, so the static `min-height: 184px` forced the box to 184 + ~44px padding/border = 228px
+  while the tallest verdict is only ~179px — a **~49px gap on every verdict**, ~99px on the short
+  "clears everywhere" case (JM saw ~⅓ of the box). Replaced with **border-box + a dynamic min-height**
+  (`equalizeVerdict`): each render measures both views' verdicts in a hidden clone at the current
+  inputs and sets the callout's min-height to the taller. Padding now appears **only where the two
+  views genuinely differ** (e.g. "clears everywhere" vs "crosses at year N"); where they share a
+  crossing kind (both "does not clear"), there is no padding at all. Recomputed on resize.
+- **Card 2 mixed basis (JM item B) — flagged, not yet resolved.** In the trend view card 2 reads
+  "13.4× trend · 13.0× floor": the trend figure is trend→trend (the k=1.0 bar), the floor figure is
+  `spot→floor` at the real k=0.43 (mirrors the v1 chart's floor band, §4.2). The new "1.0×" button
+  label exposes the tension — the button says 1.0× but the floor figure reflects 0.43×. Resolving it
+  to a pure k=1.0 reading (floor → trend→floor, ~5.6×) would also change the chart's floor band and
+  cost the near-touch observation (which depends on today's spot≈floor). Left for JM's ruling rather
+  than restructured unilaterally.
