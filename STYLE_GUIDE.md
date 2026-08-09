@@ -848,7 +848,9 @@ The failure this fixes: `/how-much-cash` v2 opened with *"The other end of the s
 
 The shape that satisfies this: **subtitle names the question the tool answers; the line under it names the audience and the two or three actions.** A reader who has never seen the site should be able to work the page from the hero alone.
 
-**Sweep status:** applied to `/how-much-cash` (July 2026). Other tool pages are NOT yet swept — recorded as a backlog item, deliberately not bundled into that page's rebuild. When touching any tool hero, bring it to this rule.
+**Sweep status:** applied to `/how-much-cash` (July 2026), then swept site-wide 2026-08-08 — all 22 `calculator_tile` pages audited, three heroes rewritten: `/wait-or-deploy-now`, `/bitcoin-allocation-sizing`, and `/the-bitcoin-retirement-stress-test`. When touching any tool hero, bring it to this rule; when adding a new one, write it to the rule from the first draft.
+
+**Where this rule breaks — guidance for the next sweep.** In the 2026-08-08 audit, all three failures were **paired or sequel pages** — a trilogy member (`/wait-or-deploy-now`, "the third of the trilogy…the others ask how"), a "Part 2" (`/the-bitcoin-retirement-stress-test`, "the retirement calculator shows the upside path"), and a consequences-counterpart (`/bitcoin-allocation-sizing`, "a companion exploration…finds the optimal fraction"). **No standalone tool tripped.** A hero drifts into sibling-framing precisely when the page's identity is defined against another page — the relationship feels load-bearing, so it migrates into the frame. So: **audit the sequels and companions first.** The fix is always the same shape — lead with this tool's own question and its audience/actions; demote the sibling relationship to one line of body prose (it already lives in the related strip).
 
 ### 6.11 Tool-framing strip (collapsible disclaimer)
 
