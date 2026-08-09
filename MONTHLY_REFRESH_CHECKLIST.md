@@ -384,6 +384,31 @@ The gap ladder and §B cite live institutional positions. Quarterly, verify:
 - GUARD: never reintroduce the retracted "Fidelity 84% continuous Kelly"
   figure (corpus hallucination — see SITE_GUIDE §26 register).
 
+## 8.5. Copy-tell drift re-grep — reader-facing §5 tells (quarterly is fine)
+
+STYLE_GUIDE §5 (show, don't claim) stops *new* imports of self-describing tells
+at authoring time, but nothing catches drift between full sweeps — and the
+2026-08-08 site-wide sweep found ~70 reader-facing breaches against an entry
+that had expected "most hits in older explorations." The tell had spread into
+current pages, homepage cards, FAQ answers, and `/calculators` tile taglines.
+So, quarterly (piggyback any refresh), re-grep reader-facing copy:
+
+```
+grep -rniE 'honest|candid|transparent|canonical' src --include=*.njk --include=*.json --include=*-head.html
+```
+
+- **FIX** only when the site describes *its own* copy/analysis/answer as
+  honest/candid/transparent, or uses data-sense "canonical" in reader copy
+  (→ "reference"). Deletion beats substitution; when a sentence needs a word,
+  describe the action or content, never swap in another self-claim.
+- **Leave** subject-matter uses ("an honest ledger", "transparent on-chain
+  holdings"), first-person/quoted voice, archetypal "canonical" ("the canonical
+  sensory image", "the canonical exhibit"), and all code comments /
+  `<link rel="canonical">` / CSS-token names.
+- New pages and new homepage/tile copy since the last check are the likely
+  carriers. Full method + the last sweep's carve-outs: the de-tell entry in
+  `PAGE_IDEAS_BACKLOG.md`.
+
 ## 9. Bitcoin & Metcalfe's Law — ETF-era time-sensitive figures (`/bitcoin-and-metcalfes-law.html`)
 
 These figures are date-stamped on the page and drift over time; stale numbers
