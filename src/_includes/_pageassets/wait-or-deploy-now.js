@@ -266,11 +266,16 @@
     m.style.left = ((clampPos(livePos()) - POS_MIN) / POS_RANGE * 100) + '%';
     m.classList.add('is-visible');
   }
+  // Carry acknowledgement: shown only on a ?pos= arrival (init), hidden the moment the reader
+  // takes over (drag or snap-to-today). Both snap links share resetToToday.
+  function showCarryNote() { var cn = document.getElementById('wdCarryNote'); if (cn) cn.hidden = false; }
+  function hideCarryNote() { var cn = document.getElementById('wdCarryNote'); if (cn) cn.hidden = true; }
+  function resetToToday(e) { if (e) e.preventDefault(); state.userMoved = false; state.pos = clampPos(livePos()); syncSliderToState(); renderComparator(); syncUrl(); hideCarryNote(); }
   function wire() {
     var sl = document.getElementById('wdSlider');
-    if (sl) sl.addEventListener('input', function () { state.userMoved = true; state.pos = sliderToPos(parseInt(this.value, 10)); renderComparator(); syncUrl(); });
-    var reset = document.getElementById('wdResetToday');
-    if (reset) reset.addEventListener('click', function (e) { e.preventDefault(); state.userMoved = false; state.pos = clampPos(livePos()); syncSliderToState(); renderComparator(); syncUrl(); });
+    if (sl) sl.addEventListener('input', function () { state.userMoved = true; state.pos = sliderToPos(parseInt(this.value, 10)); renderComparator(); syncUrl(); hideCarryNote(); });
+    var reset = document.getElementById('wdResetToday'); if (reset) reset.addEventListener('click', resetToToday);
+    var carryReset = document.getElementById('wdCarryReset'); if (carryReset) carryReset.addEventListener('click', resetToToday);
   }
 
   // ════════ INIT ════════
@@ -278,7 +283,7 @@
     var urlPos = readUrlPos();
     // ?pos= wins over the live default (2-tier precedence). userMoved=true also suppresses the
     // async live-default in renderLive (L~231) — a URL arrival IS a reader-specified position.
-    if (urlPos != null) { state.pos = urlPos; state.userMoved = true; }
+    if (urlPos != null) { state.pos = urlPos; state.userMoved = true; showCarryNote(); }
     else { state.pos = clampPos(livePos()); }
     syncSliderToState();
     buildChart(); wire();
