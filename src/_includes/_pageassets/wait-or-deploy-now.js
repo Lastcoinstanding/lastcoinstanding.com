@@ -63,6 +63,32 @@
   function posToSlider(p) { return Math.round((clampPos(p) - POS_MIN) / POS_RANGE * 1000); }
   function matchPos(p) { return Math.max(0, p); }   // internal entry-matching clamp (display untouched)
 
+  // ── URL state (pos = channel position; receiver + write-back) ──
+  // Suite vocabulary: `pos` is the shared normalized channel-position param (same name,
+  // range and 3dp encoding How Much Cash uses — the twins share this engine). WODN adopts
+  // `pos` only, not HMC's `rebuy` — it is a single-position tool with no rebuy leg.
+  // Precedence is 2-tier by design: a valid ?pos= wins over today's live default on first
+  // load; WODN keeps NO localStorage (its relevance is always "today", so a stored drag
+  // would contradict the page). The URL is therefore the only persistence layer — write-back
+  // on drag is what lets a reload restore the slider.
+  function readUrlPos() {
+    if (!window.URLSearchParams) return null;
+    var v = parseFloat(new URLSearchParams(window.location.search).get('pos'));
+    return (isFinite(v) && v >= POS_MIN - 0.001 && v <= POS_MAX + 0.001) ? clampPos(v) : null;
+  }
+  var _urlT = null;
+  function syncUrl() {
+    if (!window.history || !window.history.replaceState) return;
+    if (_urlT) clearTimeout(_urlT);
+    _urlT = setTimeout(function () {
+      var p = new URLSearchParams(window.location.search);
+      if (state.userMoved) p.set('pos', String(Math.round(clampPos(state.pos) * 1000) / 1000));
+      else p.delete('pos');   // at "today" (reset / never moved) → clean URL, falls back to live default
+      var qs = p.toString();
+      try { window.history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash); } catch (e) {}
+    }, 250);
+  }
+
   // ── Format helpers ──
   function pct0(v) { return Math.round(v) + '%'; }
   function signPct0(v) { return (v > 0 ? '+' : '') + Math.round(v) + '%'; }
@@ -242,14 +268,18 @@
   }
   function wire() {
     var sl = document.getElementById('wdSlider');
-    if (sl) sl.addEventListener('input', function () { state.userMoved = true; state.pos = sliderToPos(parseInt(this.value, 10)); renderComparator(); });
+    if (sl) sl.addEventListener('input', function () { state.userMoved = true; state.pos = sliderToPos(parseInt(this.value, 10)); renderComparator(); syncUrl(); });
     var reset = document.getElementById('wdResetToday');
-    if (reset) reset.addEventListener('click', function (e) { e.preventDefault(); state.userMoved = false; state.pos = clampPos(livePos()); syncSliderToState(); renderComparator(); });
+    if (reset) reset.addEventListener('click', function (e) { e.preventDefault(); state.userMoved = false; state.pos = clampPos(livePos()); syncSliderToState(); renderComparator(); syncUrl(); });
   }
 
   // ════════ INIT ════════
   function init() {
-    state.pos = clampPos(livePos());
+    var urlPos = readUrlPos();
+    // ?pos= wins over the live default (2-tier precedence). userMoved=true also suppresses the
+    // async live-default in renderLive (L~231) — a URL arrival IS a reader-specified position.
+    if (urlPos != null) { state.pos = urlPos; state.userMoved = true; }
+    else { state.pos = clampPos(livePos()); }
     syncSliderToState();
     buildChart(); wire();
     renderLive(TODAY_PRICE, 'seed');

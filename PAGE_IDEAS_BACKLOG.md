@@ -264,12 +264,13 @@ Captured during the merge pass, because the backlog is now large enough that the
 
 ### Tools & suite plumbing
 
-- [ ] **WODN position receiver — enable the underwater-manager handoff from How Much Cash.**
+- [x] **WODN position receiver — enable the underwater-manager handoff from How Much Cash. SHIPPED 2026-08-09 (branch `feat/wodn-position-receiver`, `2d945a7`).**
   Surfaced 2026-07-16 during the How Much Cash v3.3 build (addendum A2).
   - **Concept:** teach `/wait-or-deploy-now` to read its slider position from a URL param (it currently encodes nothing in URL state). Then How Much Cash's underwater-manager block ("the target never came → deciding when to redeploy is Wait-or-Deploy's question") can carry **today's channel position** into WODN, so the reader lands on the deploy-or-wait question already at their spot — suite carry pattern (senders speak the receiver's vocabulary).
   - **Why it's blocked today:** WODN has no URL handling, so the handoff link is currently **plain**. This is the receiver half; the sender (HMC) is ready.
   - **Cross-links:** How Much Cash (`/how-much-cash`, the sender), WODN (`/wait-or-deploy-now`, the receiver). Mirror-twin pair already share `shared/channel-entries.js`.
   - **Open design question:** WODN's slider is a channel position (0–1) like HMC's — decide the param name/encoding to match HMC's `pos`/`rebuy` convention so the suite reads consistently.
+  - **RESOLVED + SHIPPED (`2d945a7`):** param = **`pos`**, adopted verbatim from HMC (same normalized channel-position quantity, `[-0.08, 1.0]`, 3dp; the mirror twins share the engine). WODN takes **only `pos`, not `rebuy`** — it is a single-position tool with no rebuy leg (adopt the half that fits, refuse the half that doesn't). Precedence is **2-tier** (URL > today's live default); WODN adds **no localStorage** by design — its relevance is always "today", so a stored drag would contradict the page. Write-back on drag (`replaceState`, debounced) gives reload/deep-link persistence; reset strips `?pos=`. HMC's underwater-manager link now carries `?pos=<today's livePos>`. Verified end-to-end on the `feat/wodn-position-receiver` preview: deep links at several positions, sub-floor, invalid→fallback, reload, bare-URL→today, mobile 375, no console errors. Suite vocabulary recorded in **SITE_GUIDE §46**; per-page notes in §34 (WODN) and §39 (HMC).
 
 - [ ] **How Much Cash tracking input — enter your actual sell, auto-set the sell slider.**
   Surfaced 2026-07-16 (v3.3 spec §6, deferred). For the reader **managing** an existing position, not exploring a hypothetical.

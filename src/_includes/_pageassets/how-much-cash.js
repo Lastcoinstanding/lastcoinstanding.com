@@ -969,6 +969,14 @@
     }, 250);
   }
 
+  // Underwater-manager handoff: the WODN link carries today's live channel position, so
+  // "deciding when, from here" lands the reader on Wait-or-Deploy at today's spot (the
+  // receiver reads ?pos=). Refreshed each renderAll, so it upgrades seed → live price.
+  function renderHandoff() {
+    var a = document.getElementById('hcManagerWodnLink'); if (!a) return;
+    a.setAttribute('href', '/wait-or-deploy-now?pos=' + (Math.round(clampPos(livePos()) * 1000) / 1000));
+  }
+
   // ════════ ORCHESTRATOR — one compute, every renderer reads it ════════
   function renderAll() {
     var c = compute(S_);                // §2: no clamp — slider 2 holds its absolute position independently
@@ -977,6 +985,7 @@
     renderShock(c); renderZone(c); renderProvenance(c); renderEndnote(c); renderInsightNote(c);
     syncSliderToState(); placeTodayTick(); syncSlider2(); placeSaleTick();
     updateChannel();
+    renderHandoff();
     updateChart(c);
     renderSellGradient(c);              // §1: data-derived track valence (reads chart.$cross)
     renderRebuyTrack();                 // v3.7: slider 2 cheapness + inert-beyond-sale track
