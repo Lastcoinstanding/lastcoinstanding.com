@@ -111,6 +111,12 @@ take-the-site-down-if-it-breaks changes.**
 
 ---
 
+## 0.2 Cite doc entries by name, not line number (standing convention)
+
+Cross-references in these planning docs — and in task prompts — cite an entry by its **name/heading**, never by line number. Line numbers go stale the moment anything above them changes: a single insert higher in a file silently shifts every reference below it. Observed twice in one week (Aug 2026) — a backlog "line 236" reference had drifted to 267, and a "line 88" reference had moved, each after an unrelated sweep added lines above, costing a lookup each time. Say "the *WODN position receiver* backlog entry" or "PAGE_IDEAS_BACKLOG → *Positioning & Strategy* cluster", not "backlog line 236". Applies to every doc here (OPEN_ITEMS, PAGE_IDEAS_BACKLOG, TECH_DEBT, this guide) and to any prompt that hands a reference across.
+
+---
+
 ## 1. Editorial posture
 
 Last Coin Standing is a **statement piece and an investment-education resource — never a monetization funnel**. Its purpose is to explain Bitcoin structurally — through contrast and clarity — so that a thoughtful reader can understand what Bitcoin is by seeing what everything else isn't, and (for some readers) can satisfy themselves that a considered Bitcoin allocation is sound. It earns understanding and allocation decisions through rigor a skeptic can check, never through hype or urgency. See **`POSITIONING_STRATEGY_GUIDE.md`** for the full framing — including the authoritative statement of intent (§1.5) and the no-embellishment principle that governs every tool and page.
