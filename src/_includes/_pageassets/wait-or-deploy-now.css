@@ -85,6 +85,14 @@ body { background: var(--bg); color: var(--text); }
 .wd-slider-caption strong { color: var(--text-dim); font-weight: 600; }
 .wd-slider-caption a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 
+/* Deep-link carry acknowledgement — shown by JS only on a ?pos= arrival, hidden on first drag / snap-to-today */
+.wd-carry-note { font-family: 'Inter', sans-serif; font-size: 0.8rem; line-height: 1.55; color: var(--text-dim);
+  margin: 0 0 0.9rem; padding: 0.55rem 0.85rem; background: rgba(224,148,34,0.05);
+  border: 1px solid rgba(224,148,34,0.22); border-left: 3px solid rgba(224,148,34,0.55); border-radius: 6px; }
+.wd-carry-note strong { color: var(--text); font-weight: 600; }
+.wd-carry-note a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+.wd-carry-note[hidden] { display: none; }
+
 /* Up-front cue tying the slider to the chart */
 .wd-cue { font-family: 'Inter', sans-serif; font-size: 0.86rem; line-height: 1.5; color: var(--text-dim); margin: 0 0 0.7rem; }
 .wd-cue strong { color: var(--text); font-weight: 600; }
