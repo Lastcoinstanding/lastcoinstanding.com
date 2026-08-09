@@ -328,7 +328,7 @@ eleventyComputed:
 
                 <div class="dr-channel-attribution">
                     <span class="dr-channel-attribution-label">Channel framework &amp; coefficients</span>
-                    The Power Law channel &mdash; the floor at 0.42&times; trend, the upper band at 3&times; trend, and the daily-close convention &mdash; was developed by <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener"><strong>Matthew Me&zcaron;inskis</strong></a> at <a href="https://www.porkopolis.io" target="_blank" rel="noopener">Porkopolis Economics</a>. Coefficients used: <code>a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup></code>, <code>b&nbsp;=&nbsp;5.77</code>. See <a href="/the-power-law#channel">The Channel</a> for the canonical view.
+                    The Power Law channel &mdash; the floor at 0.42&times; trend, the upper band at 3&times; trend, and the daily-close convention &mdash; was developed by <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener"><strong>Matthew Me&zcaron;inskis</strong></a> at <a href="https://www.porkopolis.io" target="_blank" rel="noopener">Porkopolis Economics</a>. Coefficients used: <code>a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup></code>, <code>b&nbsp;=&nbsp;5.77</code>. See <a href="/the-power-law#channel">The Channel</a> for the reference view.
                 </div>
             </div>
 
@@ -375,7 +375,7 @@ eleventyComputed:
 
             <p>For each day in <code>PL_DATA</code> (genesis through present, ~5,500+ samples), we compute that day's <em>price/trend ratio</em> &mdash; the closing price divided by the Power Law trend value at that day. We sort all the resulting ratios. The Pth percentile is the ratio level such that historical ratios have been <em>at or below</em> that level P% of the time.</p>
 
-            <p>Computed against current <code>PL_DATA</code>, the canonical thresholds are:</p>
+            <p>Computed against current <code>PL_DATA</code>, the reference thresholds are:</p>
 
             <div class="dr-math-table-wrap">
                 <table class="dr-math-table">
@@ -480,7 +480,7 @@ eleventyComputed:
         <!-- §6: COMPANION CHART -->
         <div class="dr-math-section">
             <h3>6. Historical channel positions</h3>
-            <p>The chart below shows bitcoin's price/trend ratio across all of <code>PL_DATA</code>. Horizontal reference lines mark the canonical percentile thresholds. You can see where each excursion sat, how long it lasted, and how often each percentile boundary was crossed.</p>
+            <p>The chart below shows bitcoin's price/trend ratio across all of <code>PL_DATA</code>. Horizontal reference lines mark the percentile thresholds. You can see where each excursion sat, how long it lasted, and how often each percentile boundary was crossed.</p>
 
             <div class="dr-math-chart-container" data-chart-copy data-chart-heading="closest:.dr-math-section h3" data-chart-title="Price-to-trend ratio with percentile triggers">
                 <canvas id="drMathChart"></canvas>
@@ -500,7 +500,7 @@ eleventyComputed:
                 <li><strong>State-level tax variations.</strong> The tax-rate slider is a single percentage. California's 13.3% state cap-gains rate stacks on federal; a state-aware field is a natural extension we haven't built yet.</li>
                 <li><strong>Retirement-account contribution and withdrawal rules.</strong> Annual contribution limits, RMDs, Roth conversion mechanics, Backdoor / Mega-Backdoor pathways &mdash; none of this is modeled. The page is a cycle protocol calculator, not a retirement-account tax-strategy advisor.</li>
                 <li><strong>Multi-account splits.</strong> A user with bitcoin partly in a retirement account and partly in a regular account would benefit from running the discipline only on the retirement portion. This is a future page, not a feature of this one.</li>
-                <li><strong>Future-cycle uncertainty.</strong> The historical record is one realization. A Monte Carlo treatment with stochastic volatility would surface a distribution of possible outcomes rather than a single line through the past &mdash; but it would also hide the fact that the past is the actual evidence. We treat the historical record as the primary thing worth showing, and the volatility-compression note above as the honest acknowledgment that future cycles will look different.</li>
+                <li><strong>Future-cycle uncertainty.</strong> The historical record is one realization. A Monte Carlo treatment with stochastic volatility would surface a distribution of possible outcomes rather than a single line through the past &mdash; but it would also hide the fact that the past is the actual evidence. We treat the historical record as the primary thing worth showing, and the volatility-compression note above as the acknowledgment that future cycles will look different.</li>
                 <li><strong>Behavioral cost.</strong> The discipline requires action at exactly the moments most users find hardest &mdash; selling into euphoria, rebuying into fear. The calculator assumes perfect execution of the protocol.</li>
             </ul>
         </div>
@@ -509,7 +509,7 @@ eleventyComputed:
         <div class="dr-math-disclosure">
             <p><strong>Methodology disclosure</strong></p>
             <ul>
-                <li>Power Law coefficients used: <code>a = 1.6 &times; 10&minus;&sup1;&#8311;</code>, <code>b = 5.77</code> (canonical Porkopolis values &mdash; see <a href="/the-power-law#channel">The Channel</a> for attribution)</li>
+                <li>Power Law coefficients used: <code>a = 1.6 &times; 10&minus;&sup1;&#8311;</code>, <code>b = 5.77</code> (reference Porkopolis values &mdash; see <a href="/the-power-law#channel">The Channel</a> for attribution)</li>
                 <li><code>PL_DATA</code> window: genesis (Jan 3, 2009) through present</li>
                 <li>Percentile distribution computed from all daily samples in <code>PL_DATA</code></li>
                 <li>Historical backtest: day-by-day pass through <code>PL_DATA</code>, tracking BTC + cash + cost basis from a 1.0 BTC starting position</li>

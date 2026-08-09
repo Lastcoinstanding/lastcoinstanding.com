@@ -104,7 +104,7 @@ eleventyComputed:
     <h3>Verification register</h3>
     <p class="dl-register-note">The audit trail. Every figure on this page is reproducible from the daily Blockchain.info series and the stated coefficients. The deviation statistics below are recomputed in-browser from the embedded month-end series, so what you read is provably what the wave is drawn from.</p>
     <div class="dl-register-stats">
-      <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-exp">5.76</div><div class="dl-stat-label">Fitted exponent <em>b</em><br>(canonical window)</div></div>
+      <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-exp">5.76</div><div class="dl-stat-label">Fitted exponent <em>b</em><br>(reference window)</div></div>
       <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-mean">+0.014</div><div class="dl-stat-label">Mean log-deviation<br>(ln, 191 months)</div></div>
       <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-above">80 / 111</div><div class="dl-stat-label">Months above / below<br>trendline</div></div>
       <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-split">41% / 59%</div><div class="dl-stat-label">Months above / below<br>split</div></div>
@@ -142,7 +142,7 @@ eleventyComputed:
   <div class="dl-caveats">
     <h3>What this is &mdash; and isn&rsquo;t</h3>
     <p>The doubling cadence is arithmetic; the adherence to trend is the empirical claim. Only the second can fail, and it is the one worth exploring. The trend is an observed regularity across fifteen years, not a law of nature, and not any guarantee about the next fifteen. That said, the fit is strong &mdash; the trend has held a ~95% R&sup2; across fifteen years, and the channel floor tighter still &mdash; and the model's value is in projections, not promises. Being far below the trend, as bitcoin periodically is, has historically preceded a more favorable forward setup; being far above it, the reverse. The discipline is to read the ladder as a center of gravity to reason from, not a schedule to count on.</p>
-    <p>The exponent is sensitive to how you fit it. Using the canonical Porkopolis / Santostasi coefficients (<em>a&nbsp;=&nbsp;1.69&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.763</em>), an ordinary least-squares fit through end-2023 reproduces <em>b&nbsp;&asymp;&nbsp;5.77</em>. A naive fit over the <em>entire</em> series through 2026 instead yields <em>b&nbsp;&asymp;&nbsp;5.63</em>, because recent prices have run slightly under the steep early-fitted trend. The cadence shifts with the exponent: 12.8% per doubling at <em>b&nbsp;=&nbsp;5.76</em>, about 13.1% at <em>b&nbsp;=&nbsp;5.63</em>.</p>
+    <p>The exponent is sensitive to how you fit it. Using the reference Porkopolis / Santostasi coefficients (<em>a&nbsp;=&nbsp;1.69&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.763</em>), an ordinary least-squares fit through end-2023 reproduces <em>b&nbsp;&asymp;&nbsp;5.77</em>. A naive fit over the <em>entire</em> series through 2026 instead yields <em>b&nbsp;&asymp;&nbsp;5.63</em>, because recent prices have run slightly under the steep early-fitted trend. The cadence shifts with the exponent: 12.8% per doubling at <em>b&nbsp;=&nbsp;5.76</em>, about 13.1% at <em>b&nbsp;=&nbsp;5.63</em>.</p>
     <p>Future rungs &mdash; everything above today's price &mdash; are projections of the trend, not predictions of when the market will arrive. Past rungs show the market reaching levels years early or, occasionally, late; there is no reason the future will be tidier. Treat the upper ladder as a scenario to reason from, never a timetable.</p>
   </div>
 
@@ -151,7 +151,7 @@ eleventyComputed:
     <h3>Sources &amp; method</h3>
     <div class="dl-credit-entry">
       <strong>Matthew Mezinskis</strong> &mdash; <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">Porkopolis Economics</a>
-      <p>The doubling-cadence framing and the per-doubling progression table this page is built around. The canonical coefficients used here are from his work.</p>
+      <p>The doubling-cadence framing and the per-doubling progression table this page is built around. The reference coefficients used here are from his work.</p>
     </div>
     <div class="dl-credit-entry">
       <strong>Dr. Giovanni Santostasi</strong>

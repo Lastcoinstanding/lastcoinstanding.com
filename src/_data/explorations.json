@@ -216,7 +216,7 @@
     "group": "Bitcoin vs. Other Assets",
     "interactive": true,
     "calculator_tile": {
-      "tagline": "Bitcoin or rental property &mdash; the honest yield comparison once landlord costs and tax leakage are surfaced.",
+      "tagline": "Bitcoin or rental property &mdash; the yield comparison once landlord costs and tax leakage are surfaced.",
       "preview_kind": "svg",
       "position": 7
     }
@@ -341,7 +341,7 @@
     "group": "Positioning & Strategy",
     "interactive": true,
     "calculator_tile": {
-      "tagline": "How much is the question &mdash; the Bell Labs sizing formula's startling answer, and the honest fraction of it.",
+      "tagline": "How much is the question &mdash; the Bell Labs sizing formula's startling answer, and the fraction of it worth taking.",
       "preview_kind": "svg",
       "anchor": "#curve",
       "featured": false,
@@ -430,7 +430,7 @@
     "group": "Living on Bitcoin",
     "interactive": true,
     "calculator_tile": {
-      "tagline": "Bitcoin-backed preferreds vs holding bitcoin &mdash; the bear-case insurance trade, with the actual crossover horizon and stress behavior shown honestly.",
+      "tagline": "Bitcoin-backed preferreds vs holding bitcoin &mdash; the bear-case insurance trade, with the actual crossover horizon and stress behavior shown.",
       "preview_kind": "svg",
       "anchor": "#calculator",
       "position": 8

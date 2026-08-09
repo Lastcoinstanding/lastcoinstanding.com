@@ -20,11 +20,11 @@ related:
   - slug: bitcoin-fixed-income
     desc: "The income-instrument companion. Same audience and Power Law calculator philosophy, but framed around bitcoin-backed preferred dividends (STRC, SATA) instead of sell-as-needed — for readers who want a cashflow stream without the volatility-into-spending mechanic."
   - slug: how-much-bitcoin
-    desc: "Before the retirement math: how large an allocation the growth mathematics can actually justify &mdash; the Kelly criterion, applied honestly."
+    desc: "Before the retirement math: how large an allocation the growth mathematics can actually justify &mdash; the Kelly criterion."
 companion: []
 faq:
   - q: "How much bitcoin do I need to retire?"
-    a: "There is no single number — it depends on your target income, your retirement year, and what you assume about bitcoin’s price path. This calculator lets you set all three and shows whether a given stack sustains your income year by year, including the scenarios where it depletes. The honest answer is a range you explore, not a figure anyone can hand you."
+    a: "There is no single number — it depends on your target income, your retirement year, and what you assume about bitcoin’s price path. This calculator lets you set all three and shows whether a given stack sustains your income year by year, including the scenarios where it depletes. The answer is a range you explore, not a figure anyone can hand you."
   - q: "Can you really retire on bitcoin alone?"
     a: "Under some assumptions yes, under others no — and the difference is visible in the projection. A stack that reaches escape velocity under one price model can deplete under a harsher one, and a bear market early in retirement changes the picture more than one that comes late. The companion <a href='/the-bitcoin-retirement-stress-test.html'>Stress Test</a> models exactly that risk."
   - q: "How does the calculator project bitcoin’s future price?"
@@ -624,9 +624,9 @@ eleventyComputed:
 
       <p class="prose">A few features of the model are worth naming explicitly.</p>
 
-      <p class="prose">We do not try to model sequence-of-returns risk in any rigorous Monte-Carlo sense. We instead show the floor, trend, and upper Power Law bands on the projection chart and let you inspect what each implies for your scenario. This is honest about the model&rsquo;s limits.</p>
+      <p class="prose">We do not try to model sequence-of-returns risk in any rigorous Monte-Carlo sense. We instead show the floor, trend, and upper Power Law bands on the projection chart and let you inspect what each implies for your scenario. This states the model&rsquo;s limits.</p>
 
-      <p class="prose">We do not bake taxes into the projection. The v1 model is pretax throughout, and for the foundational sell-as-needed approach that is honest rather than evasive &mdash; the structural arithmetic of stack value, withdrawal pressure, and real-terms sustainability runs the same regardless of account type. Tax treatment becomes computationally distinct in the supplemental frameworks; sales inside a Traditional IRA or 401(k) avoid the per-sell taxable event a regular account incurs, which materially changes how rebalancing math behaves. That distinction earns its surface on the disciplined-rebalancing canvas, where it belongs. The illustrative line on the income slider&rsquo;s tooltip &mdash; <em>&ldquo;a 20% effective tax would reduce real take-home to roughly 80%&rdquo;</em> &mdash; exists to acknowledge the magnitude of the consideration without inviting the false precision a tax-rate slider would produce.</p>
+      <p class="prose">We do not bake taxes into the projection. The v1 model is pretax throughout, and for the foundational sell-as-needed approach, the structural arithmetic of stack value, withdrawal pressure, and real-terms sustainability runs the same regardless of account type. Tax treatment becomes computationally distinct in the supplemental frameworks; sales inside a Traditional IRA or 401(k) avoid the per-sell taxable event a regular account incurs, which materially changes how rebalancing math behaves. That distinction earns its surface on the disciplined-rebalancing canvas, where it belongs. The illustrative line on the income slider&rsquo;s tooltip &mdash; <em>&ldquo;a 20% effective tax would reduce real take-home to roughly 80%&rdquo;</em> &mdash; exists to acknowledge the magnitude of the consideration without inviting the false precision a tax-rate slider would produce.</p>
 
       <p class="prose">What sell-as-needed requires is structurally minimal: a stack, a target, the willingness to sell. It is the approach that asks the least of the user&rsquo;s time, infrastructure, and conviction.</p>
 
@@ -760,13 +760,13 @@ eleventyComputed:
 
       <p class="prose">The v1 model is pretax throughout. Every dollar shown &mdash; on the slider, in the readout, on the chart &mdash; is gross of taxes.</p>
 
-      <p class="prose">For sell-as-needed, this is computationally honest: the structural math is account-type-agnostic, since each withdrawal is treated identically by the model regardless of what kind of account holds the bitcoin. Tax-distinct mechanics surface on the supplemental frameworks &mdash; notably disciplined rebalancing inside a tax-advantaged account, where internal sells avoid tax events and the rebalancing math materially diverges. The illustrative line in the income slider tooltip &mdash; <em>&ldquo;a 20% effective tax would reduce real take-home to roughly 80%&rdquo;</em> &mdash; exists to acknowledge the magnitude without inviting the false precision a tax-rate slider would produce.</p>
+      <p class="prose">For sell-as-needed, the pretax figure needs no adjustment: the structural math is account-type-agnostic, since each withdrawal is treated identically by the model regardless of what kind of account holds the bitcoin. Tax-distinct mechanics surface on the supplemental frameworks &mdash; notably disciplined rebalancing inside a tax-advantaged account, where internal sells avoid tax events and the rebalancing math materially diverges. The illustrative line in the income slider tooltip &mdash; <em>&ldquo;a 20% effective tax would reduce real take-home to roughly 80%&rdquo;</em> &mdash; exists to acknowledge the magnitude without inviting the false precision a tax-rate slider would produce.</p>
 
       <p class="prose">This is a deliberate choice. Effective tax rates depend on holding period, basis, federal and state brackets, NIIT eligibility, and Social Security crossover effects. A single &ldquo;effective tax rate&rdquo; slider would let users dial in whatever felt comfortable while feeling more precise &mdash; which is worse than not modeling tax at all. The 4% rule and the Trinity Study work in pretax dollars by convention; this calculator follows the same convention.</p>
 
       <h2 class="section-title">What the model does not do</h2>
 
-      <p class="prose">Honest about limits:</p>
+      <p class="prose">The limits:</p>
 
       <ul class="math-list">
         <li><strong>No sequence-of-returns risk (Monte Carlo).</strong> The floor, trend, and upper bands are shown together so users can read what each scenario implies. A stochastic simulation would produce a confidence-interval shape the model cannot truthfully claim.</li>

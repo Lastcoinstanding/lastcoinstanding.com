@@ -392,7 +392,7 @@
     var dollarBit = hasUSD() ? ' (about ' + usd(-S.portfolioUSD * f.drawdown) + ')' : '';
     el.innerHTML = 'A <strong>' + S.allocPct + '%</strong> allocation means watching your whole portfolio fall about <strong>' + pct(f.drawdown, 1) + '</strong>' + dollarBit
       + ' in a ' + S.crashDepthPct + '% bitcoin bear, probably more than once over a ' + S.horizonYears + '-year hold. The return only shows up if you do not sell into that fall. '
-      + 'If the honest answer is that you would sell, the allocation is too big for you, whatever the numbers say. That is the conviction question <a href="/bull-and-bear-cycles">Bull &amp; Bear Cycles</a> is about, and why <a href="/the-bitcoin-horizon">The Bitcoin Horizon</a> argues the swing is only a risk if it shakes you out.';
+      + 'If the answer is that you would sell, the allocation is too big for you, whatever the numbers say. That is the conviction question <a href="/bull-and-bear-cycles">Bull &amp; Bear Cycles</a> is about, and why <a href="/the-bitcoin-horizon">The Bitcoin Horizon</a> argues the swing is only a risk if it shakes you out.';
   }
 
   // ════════ DRIFT CHART — your portfolio, year by year ════════
