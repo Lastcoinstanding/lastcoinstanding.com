@@ -13,7 +13,7 @@ related:
     desc: "Managing the allocation over time. Once bitcoin outgrows the position you set, whether to trim a winner back to target is a real and open question; this page raises the tension, that one works it through."
 faq:
   - q: "How much bitcoin should I have in my portfolio?"
-    a: "There is no universal percentage — the honest question is what different allocations <em>do</em> to your portfolio, in both directions. This tool shows the growth and the drawdown consequences of 1%, 5%, 10%, or any allocation you choose, so you can find the size whose bad case you can actually live with."
+    a: "There is no universal percentage — the question is what different allocations <em>do</em> to your portfolio, in both directions. This tool shows the growth and the drawdown consequences of 1%, 5%, 10%, or any allocation you choose, so you can find the size whose bad case you can actually live with."
   - q: "What happens to my portfolio if bitcoin crashes?"
     a: "The crash view models exactly that: pick a drawdown depth — including the historical worst cases — and a recovery path, and watch what it does to the whole portfolio at your chosen allocation. A tool that only showed the upside would be marketing; this one lets you stress the downside as hard as you like."
   - q: "Is a small bitcoin allocation even worth it?"
@@ -237,7 +237,7 @@ eleventyComputed:
           <button type="button" data-val="ride" class="is-active">Let it ride</button>
           <button type="button" data-val="rebal">Rebalance annually</button>
         </div>
-        <p class="as-drift-caption">The winner drifts up. Left alone, the faster-growing sleeve takes over the portfolio &mdash; compounding the upside and, with it, the size of the bite a crash takes. Rebalancing annually pins both back to your target. One honest note about this comparison: on a smooth trend path like this projection, rebalancing always trims the faster asset, so it will always show the lower endpoint here. A real, volatile path is where rebalancing earns its keep &mdash; buying weakness, trimming strength. This chart shows the drift trade-off, not a verdict on rebalancing; for the strategy built on volatility itself, see <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>.</p>
+        <p class="as-drift-caption">The winner drifts up. Left alone, the faster-growing sleeve takes over the portfolio &mdash; compounding the upside and, with it, the size of the bite a crash takes. Rebalancing annually pins both back to your target. One note about this comparison: on a smooth trend path like this projection, rebalancing always trims the faster asset, so it will always show the lower endpoint here. A real, volatile path is where rebalancing earns its keep &mdash; buying weakness, trimming strength. This chart shows the drift trade-off, not a verdict on rebalancing; for the strategy built on volatility itself, see <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>.</p>
         <p class="as-drift-caption as-drift-crash-caption" id="asDriftCrashCaption" hidden>A crashed path is where annual rebalancing shows its real behavior: the yearly reset buys bitcoin while it is down. Depending on the crash&rsquo;s timing and recovery, that can narrow &mdash; or reverse &mdash; the gap you saw on the smooth path. The numbers above are doing that arithmetic under your settings; neither strategy wins by default.</p>
       </div>
     </div>
