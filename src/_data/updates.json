@@ -2,7 +2,7 @@
   {
     "display": "8/10/26",
     "page": "/dashboard.html",
-    "summary": "New: The Bitcoin Dashboard — a live read of where bitcoin sits in its Power Law channel: the trend multiple and its zone, the trend price today against the channel's floor and upper band, and how often price has historically closed below trend. Deep links carry today's position into the tools. A read of where things stand, not a signal about where they go next."
+    "summary": "New: The Bitcoin Dashboard — a live, in-browser read of where bitcoin sits in its Power Law channel. Nine tiles: the trend multiple and its zone, the trend price today, how often and how long price has sat below trend, the date the trend last matched today's price, the ten-year trend hurdle, and how far below the all-time high it is. Deep links carry today's position into the tools; the site-wide channel ribbon now opens it. A read of where things stand, not a signal about where they go next."
   },
   {
     "display": "8/6/26",

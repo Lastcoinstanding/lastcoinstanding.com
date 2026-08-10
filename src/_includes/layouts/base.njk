@@ -184,6 +184,10 @@ a:not([class]):hover { text-decoration-color: #e09422; }
 .channel-ribbon .cr-price { color: #cbc3b7; font-variant-numeric: tabular-nums; letter-spacing: 0.2px; }
 .channel-ribbon .cr-sep { color: #55504a; }
 .channel-ribbon .cr-register { color: #8c857c; font-style: italic; font-size: 0.82em; }
+/* Trailing CTA — orange accent, matches the /calculators tile + homepage card
+   ("see where we are →"). Nudges brighter on hover with the rest of the strip. */
+.channel-ribbon .cr-cta { color: #e09422; font-weight: 600; white-space: nowrap; }
+.channel-ribbon:hover .cr-cta { color: #f0a838; }
 .channel-ribbon:hover .cr-dot { box-shadow: 0 0 10px rgba(247,147,26,0.75); }
 /* Distinct name from the chart pulse's @keyframes lcsPulseRing (CSS keyframes
    are global per document; four pages carry both the ribbon and a chart pulse,
@@ -204,6 +208,9 @@ a:not([class]):hover { text-decoration-color: #e09422; }
 @media (max-width: 480px) {
   .channel-ribbon { font-size: 0.8rem; gap: 0.4rem; padding: 0.5rem 0.9rem; }
   .channel-ribbon .cr-trend-word { display: none; }
+  /* The data leads on a phone; drop the CTA (and its separator) before any wrap.
+     The whole strip is still the link to /dashboard. */
+  .channel-ribbon .cr-cta, .channel-ribbon .cr-sep-cta { display: none; }
 }
 </style>
 <style id="canonical-typography-css">

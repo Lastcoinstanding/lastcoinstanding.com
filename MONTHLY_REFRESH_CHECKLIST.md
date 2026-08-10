@@ -315,6 +315,16 @@ WMHTB, Half-Life, Money Trees, Synthesis, Migration, Trilemma, etc.)
 do NOT need this. Their composition is conceptual / atmospheric and
 has no data dependency. Leave them alone during refresh.
 
+**Dashboard OG card (`og-dashboard.jpg`) — a manual check, not a script regen.**
+The card bakes in a *position multiple* (currently **0.42×**) and its zone word,
+which drift as price moves — but it is not produced by the product-forward script
+above (it came from the drafting chat, `SITE_GUIDE §47`). Each refresh: eyeball the
+baked multiple against live `/dashboard`. **If the multiple has moved materially or
+the zone word has changed** (e.g. floor → below trend), request a regenerated card
+from the drafting chat, re-commit at the repo root, and re-verify
+`curl -I https://lastcoinstanding.com/og-dashboard.jpg` returns `image/jpeg`. If the
+position is essentially unchanged, leave it.
+
 **Verification after regeneration:**
 
 ```bash

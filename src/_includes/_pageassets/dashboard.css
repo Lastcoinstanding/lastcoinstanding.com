@@ -65,6 +65,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .dash-posbar-tick { position: absolute; top: -3px; width: 1px; height: 14px; background: var(--text-muted); }
 .dash-posbar-trend { background: var(--text-dim); }
 .dash-posbar-marker { position: absolute; top: 50%; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--amber); border: 2px solid #14110d; transform: translate(-50%, -50%); transition: left 0.5s cubic-bezier(.4,0,.2,1); box-shadow: 0 0 10px rgba(224,148,34,0.5); }
+/* Freshness (v2): the position marker gets the ribbon dot's live pulse/glow — the
+   canonical two-ring lcsRibbonPulseRing treatment (base.njk ribbon), copied here per
+   the foundation-preamble discipline (self-declared, not inherited from base). Rings
+   run ONLY when the position tile is live (source === 'live') — the labelling canon
+   binds the animation as much as the words. The two ::before/::after rings are inside
+   the marker (they carry their own scale transform, independent of the marker's
+   centring translate). */
+.dash-posbar-marker::before, .dash-posbar-marker::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(224,148,34,0.85); pointer-events: none; opacity: 0; }
+.dash-tile.is-live .dash-posbar-marker { box-shadow: 0 0 0 1.5px rgba(224,148,34,0.55), 0 0 12px rgba(224,148,34,0.70); }
+.dash-tile.is-live .dash-posbar-marker::before, .dash-tile.is-live .dash-posbar-marker::after { animation: lcsRibbonPulseRing 2.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite; }
+.dash-tile.is-live .dash-posbar-marker::after { animation-delay: 1.3s; }  /* half-period stagger → always one ring mid-travel */
+@keyframes lcsRibbonPulseRing { 0% { transform: scale(1); opacity: 0.72; } 100% { transform: scale(4); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .dash-tile.is-live .dash-posbar-marker::before, .dash-tile.is-live .dash-posbar-marker::after { animation: none; opacity: 0; } }
 .dash-posbar-labels { display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.68rem; color: var(--text-muted); position: relative; }
 .dash-posbar-lab-trend { position: absolute; left: 44%; transform: translateX(-50%); color: var(--text-dim); }
 

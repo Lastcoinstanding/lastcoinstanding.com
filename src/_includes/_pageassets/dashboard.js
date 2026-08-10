@@ -6,8 +6,12 @@
    GENESIS_TS, TODAY_DAYS, TODAY_PRICE, plPrice, positionLabel,
    fetchTodayPrice, todayPriceIsLive/Label/Note.
 
-   V1 fence: ZERO new data sources. Every number below is derived
-   from PL_DATA + spot; nothing is hardcoded. Five tiles:
+   Fence (v1 + v2): ZERO new data sources. Every number below is
+   derived from PL_DATA + spot; nothing is hardcoded. v2 adds four
+   tiles (price-is-where-trend-was, below-trend streak+record,
+   10-year trend hurdle, drawdown-from-ATH), the live price-badge
+   date, and the position-marker pulse — all still live-computed.
+   Original five tiles:
      1  Channel position  — spot ÷ trend, named by the SHARED
         positionLabel() (this page is that vocabulary's 6th consumer;
         no new zone-family wording — TECH_DEBT position-label entry)
@@ -50,7 +54,7 @@
   }
   var share = total ? below / total : 0;
   setText('dashBelowPct', Math.round(share * 100) + '%');
-  setText('dashBelowCount', below.toLocaleString('en-US') + ' of ' + total.toLocaleString('en-US') + ' monthly samples');
+  setText('dashBelowCount', below.toLocaleString('en-US') + ' of ' + total.toLocaleString('en-US') + ' samples');
   var fill = $('dashBelowFill'); if (fill) fill.style.width = (share * 100).toFixed(1) + '%';
 
   // ── TILE 5 — days to double + the age-growth constant (both from PL_B) ──
@@ -67,6 +71,51 @@
     var doubleMs = (GENESIS_TS + (TODAY_DAYS + daysToDouble) * 86400) * 1000;
     setText('dashDoubleDate', 'around ' + new Date(doubleMs).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }));
   } catch (e) { /* toLocaleDateString unsupported — leave the placeholder */ }
+
+  // ═══════ V2 TILES — still all live-computed from the shared globals ═══════
+  var YEAR_D = 365.25, MONTH_D = 30.4375;
+  function fmtMonthYear(days) {
+    try { return new Date((GENESIS_TS + days * 86400) * 1000).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }); }
+    catch (e) { return ''; }
+  }
+  // months → "N.N mo" under 18 months, "N.N yr" beyond, so long records stay legible
+  function fmtMonths(m) { return (m >= 18) ? (m / 12).toFixed(1) + ' yr' : (m < 10 ? m.toFixed(1) : String(Math.round(m))) + ' mo'; }
+
+  // ── TILE c — 10-year structural trend hurdle: (trend(t+10y)/trend(t))^(1/10)-1
+  //    = ((t + 3652.5)/t)^(PL_B/10) - 1 — the Hurdle Rate's trendCAGR(10) primitive,
+  //    so the two pages quote the same structural bar. Spot-independent. ──
+  var hurdle10 = Math.pow((TODAY_DAYS + YEAR_D * 10) / TODAY_DAYS, PL_B / 10) - 1;
+  setText('dashHurdle10', (hurdle10 * 100).toFixed(1) + '%');
+
+  // ── TILE d — all-time high from PL_DATA (the live spot folds into the max at render) ──
+  var athFromData = 0, athDayFromData = 0;
+  for (var ai = 0; ai < PL_DATA.length; ai++) { if (PL_DATA[ai][1] > athFromData) { athFromData = PL_DATA[ai][1]; athDayFromData = PL_DATA[ai][0]; } }
+
+  // ── TILE b — below-trend runs as continuous ELAPSED TIME (day-spans → months),
+  //    NOT sample counts: PL_DATA is ~12-day-spaced despite the module's "monthly"
+  //    comment, so a 72-sample run is ~28 months. Distribution is spot-independent;
+  //    the current open streak folds in the live spot at render. ──
+  var streakStartDay = TODAY_DAYS;
+  (function () {
+    var below = [], i;
+    for (i = 0; i < PL_DATA.length; i++) below.push(PL_DATA[i][1] < plPrice(PL_DATA[i][0]));
+    var durs = [], s = -1;
+    for (i = 0; i < below.length; i++) {
+      if (below[i]) { if (s < 0) s = i; }
+      else if (s >= 0) { durs.push(PL_DATA[i - 1][0] - PL_DATA[s][0]); s = -1; }
+    }
+    if (s >= 0) durs.push(PL_DATA[below.length - 1][0] - PL_DATA[s][0]); // trailing (historical part)
+    durs.sort(function (a, b) { return a - b; });
+    if (durs.length) {
+      var longest = durs[durs.length - 1];
+      var mid = durs.length % 2 ? durs[(durs.length - 1) / 2] : (durs[durs.length / 2 - 1] + durs[durs.length / 2]) / 2;
+      setText('dashStreakLongest', fmtMonths(longest / MONTH_D));
+      setText('dashStreakMedian', fmtMonths(mid / MONTH_D));
+    }
+    var t = -1;
+    for (i = below.length - 1; i >= 0; i--) { if (below[i]) t = i; else break; }
+    if (t >= 0) streakStartDay = PL_DATA[t][0];
+  })();
 
   // ── position bar: place the trend tick + its label at the true 1.0× position ──
   var posTrendPct = clamp01(posFromMult(1)) * 100;
@@ -89,10 +138,39 @@
   function render(price, source) {
     var live = (typeof todayPriceIsLive === 'function') ? todayPriceIsLive(source) : (source === 'live');
 
-    // TILE 2 — price + honest provenance label
+    // TILE 2 — price + badge "<Today (live) | Today (latest monthly data)> · <Month D, YYYY>".
+    // Labeling canon: the date ALWAYS shows; "(live)" only when the fetch actually resolved.
     setText('dashPrice', usd0(price));
-    if (typeof todayPriceLabel === 'function') setText('dashPriceLabel', todayPriceLabel(source));
+    var badge = (typeof todayPriceLabel === 'function') ? todayPriceLabel(source) : (live ? 'Today (live)' : 'Today (latest monthly data)');
+    var today = ''; try { today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }); } catch (e) {}
+    setText('dashPriceLabel', today ? (badge + ' · ' + today) : badge);
     var priceTile = $('dashPriceTile'); if (priceTile) priceTile.classList.toggle('is-live', !!live);
+
+    if (price > 0) {
+      // TILE a — price is where trend was: d* solves A·d^B = price → d* = (price/A)^(1/B).
+      // Below trend → d* in the past; above trend → d* in the future. Both coded; only the
+      // below-trend branch renders while price sits under trend today.
+      var dStar = Math.pow(price / PL_A, 1 / PL_B);
+      var deltaYrs = (dStar - TODAY_DAYS) / YEAR_D;
+      setText('dashTrendWasDate', fmtMonthYear(dStar));
+      if (dStar <= TODAY_DAYS) {
+        setText('dashTrendWasEyebrow', 'Price is where trend was');
+        setText('dashTrendWasAgo', '· ' + Math.abs(deltaYrs).toFixed(1) + ' years ago');
+      } else {
+        setText('dashTrendWasEyebrow', 'Price is ahead of trend');
+        setText('dashTrendWasAgo', '· where the trend is expected to reach it, ~' + deltaYrs.toFixed(1) + ' years ahead');
+      }
+
+      // TILE d — below the all-time high (fold the live spot into the max; descriptive only)
+      var athP = athFromData, athD = athDayFromData;
+      if (price > athP) { athP = price; athD = TODAY_DAYS; }
+      setText('dashAthPct', (athP > 0 ? ((athP - price) / athP * 100) : 0).toFixed(1) + '% below');
+      setText('dashAthWhen', athD === TODAY_DAYS ? 'reached today' : 'reached ' + fmtMonthYear(athD));
+
+      // TILE b — current open streak: how long price has been continuously below trend (spot decides)
+      if (price < trend) setText('dashStreakNow', fmtMonths((TODAY_DAYS - streakStartDay) / MONTH_D));
+      else setText('dashStreakNow', 'none now');
+    }
 
     // TILE 1 — channel position (multiple + shared zone word + bar marker)
     if (trend > 0 && price > 0) {
