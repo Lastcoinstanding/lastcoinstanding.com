@@ -43,12 +43,13 @@ session automatically. Close items here when done; this file is the "what's cook
   new monthly-refresh lines. Full record: `SITE_GUIDE §47`; backlog entry shipped. **One follow-up
   remains: the chip (below); OG handback closed below.**
 
-- [ ] **Dashboard follow-up #1 — the channel-position chip (site-wide entry point).** The doorway to
-  the room just built. Ships AFTER the dashboard per the return-visit ruling. Scope open: the chip is
-  the site-wide entry that reads channel position and links to `/dashboard`; it also becomes the home
-  for the deferred **companion reciprocal back-links** (v1 shipped with none, so the surface count
-  stayed at the ruled two — `/calculators` tile + homepage card). Detail: `PAGE_IDEAS_BACKLOG.md`
-  Dashboard entry; `SITE_GUIDE §47` "Open enhancements".
+- [x] **CLOSED-AS-RESCOPED (2026-08-10) — Dashboard follow-up #1 — the channel-position chip.**
+  Resolved in **dashboard v2** (`feat/dashboard-v2`, PR pending) **without building a separate chip
+  element**: the site-wide **channel ribbon** (§40) was repointed from `/the-power-law` to `/dashboard`
+  with a "see where we are →" CTA — the ribbon already reads channel position on every page, so it IS
+  the site-wide entry the chip would have been. The deferred **companion reciprocal back-links** shipped
+  in the same PR (`/dashboard` added to Wait-or-Deploy + How Much Cash `related:`). Full record:
+  `SITE_GUIDE §47` v2 block.
 
 - [x] **DONE (2026-08-10) — Dashboard OG card handback (`og-dashboard.jpg`).** JM handed back the
   1280×720 JPEG (93 KB); committed (`897fa46`) and registered in `.eleventy.js` `staticAssets`.

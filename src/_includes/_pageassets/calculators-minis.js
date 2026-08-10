@@ -193,7 +193,7 @@
     var x0 = pl, x1 = W - pr;
     var y0 = pt, y1 = H - pb;
 
-    // Compute series — monthly samples from PL_DATA[0] date to today
+    // Compute series — PL_DATA (~12-day) samples from PL_DATA[0] date to today
     var startDays = PL_DATA[0][0];                   // ~592
     var endDays   = PL_DATA[PL_DATA.length - 1][0];  // most recent
     var months = [];                                  // [{days, date, btc, sp, ndq}]
