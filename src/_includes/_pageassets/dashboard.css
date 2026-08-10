@@ -60,7 +60,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .dash-hero-zone { font-family: var(--font-d); font-style: italic; font-size: clamp(1.4rem, 3.5vw, 1.9rem); color: var(--text-bright); margin: 0.15rem 0 1.2rem; }
 
 /* Channel position bar: floor(0%) → trend(computed tick) → upper(100%) */
-.dash-posbar { max-width: 560px; }
+.dash-posbar { max-width: 100%; }   /* v3: track runs the full content width of the hero tile */
 .dash-posbar-track { position: relative; height: 8px; border-radius: 4px; background: linear-gradient(90deg, rgba(192,57,43,0.30) 0%, rgba(224,148,34,0.28) 44%, rgba(212,168,67,0.30) 100%); border: 1px solid var(--border-lt); }
 .dash-posbar-tick { position: absolute; top: -3px; width: 1px; height: 14px; background: var(--text-muted); }
 .dash-posbar-trend { background: var(--text-dim); }
@@ -95,6 +95,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .dash-twin { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; align-items: start; }
 .dash-twin-col { display: flex; flex-direction: column; gap: 0.15rem; }
 @media (max-width: 480px) { .dash-twin { grid-template-columns: 1fr; gap: 1.2rem; } }
+
+/* v3: record-pace projection (streak tile) — "would end around", never a target */
+.dash-projection { font-size: 0.82rem; line-height: 1.55; color: var(--text-dim); margin: 1rem 0 0; padding: 0.7rem 0.9rem; background: rgba(224,148,34,0.05); border-left: 2px solid rgba(224,148,34,0.30); border-radius: 4px; }
+.dash-projection strong { color: var(--amber); font-weight: 600; }
+/* v3: implied-reversion range line (fastest..longest beneath the median headline) */
+.dash-rev-range { font-size: 0.8rem; line-height: 1.5; color: var(--text-muted); margin-top: 0.5rem; }
 
 /* ── Jump-back-in row (absorbs the closed Gallery-highlights idea) ── */
 .dash-jump { margin-top: 2.8rem; }

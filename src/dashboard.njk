@@ -11,20 +11,20 @@ eleventyComputed:
 
 <section class="hero dash-hero">
   <h1>The Bitcoin <em>Dashboard</em></h1>
-  <p class="hero-sub">Where bitcoin sits in its <a href="/the-power-law.html">Power&nbsp;Law</a> channel right now &mdash; and what that has meant for a position. A live read, computed in your browser from the same trend the rest of the site uses.</p>
+  <p class="hero-sub">Key stats on bitcoin&rsquo;s position in its <a href="/the-power-law.html">Power&nbsp;Law</a> channel right now &mdash; live-computed in your browser.</p>
   <p class="dash-framing">A read of where things stand, <strong>not a signal about where they go next</strong>. Every figure below shows its own derivation.</p>
 </section>
 
 <main class="dash-page">
 
-  <!-- ═══════════ THE LIVE READ — five tiles, all computed from PL_DATA + spot ═══════════ -->
+  <!-- ═══════════ THE LIVE READ — all tiles computed from PL_DATA + spot ═══════════ -->
   <section class="dash-grid" aria-label="Live channel read">
 
-    <!-- TILE 1 — CHANNEL POSITION (hero) -->
+    <!-- HERO — CHANNEL POSITION (full width) -->
     <article class="dash-tile dash-tile-hero" id="dashPosTile">
       <div class="dash-tile-head">
         <span class="dash-eyebrow">Channel position</span>
-        <span class="dash-live"><span class="dash-live-dot" aria-hidden="true"></span><span class="dash-live-txt" id="dashPosProv">latest monthly data &divide; trend</span></span>
+        <span class="dash-live"><span class="dash-live-dot" aria-hidden="true"></span><span class="dash-live-txt" id="dashPosProv">latest sample &divide; trend</span></span>
       </div>
       <div class="dash-hero-figure">
         <span class="dash-hero-mult" id="dashMult">&mdash;</span>
@@ -40,20 +40,20 @@ eleventyComputed:
           <span>Floor&nbsp;0.42&times;</span><span class="dash-posbar-lab-trend">Trend&nbsp;1&times;</span><span>Upper&nbsp;3&times;</span>
         </div>
       </div>
-      <p class="dash-tile-note">Today&rsquo;s price divided by the trend, placed on the shared channel scale and named with the site&rsquo;s one <a href="/the-power-law.html">channel</a> vocabulary<span class="help-tip" tabindex="0">?<span class="tip-content">The same graduated label used by the channel ribbon and every position readout on the site &mdash; one scale, so the words never disagree.</span></span>.</p>
+      <p class="dash-tile-note">Today&rsquo;s price divided by the trend price. Below 1&times; is below trend; floor and upper band are the channel&rsquo;s historical edges<span class="help-tip" tabindex="0">?<span class="tip-content">The Power&nbsp;Law channel is bitcoin&rsquo;s long-run trend line and the floor (0.42&times;) and upper band (3&times;) it has historically stayed between. New here? See <a href="/the-power-law.html">The Power&nbsp;Law</a>.</span></span>.</p>
     </article>
 
-    <!-- TILE 2 — LIVE BTC PRICE -->
+    <!-- PRICE (half) -->
     <article class="dash-tile" id="dashPriceTile">
       <div class="dash-tile-head">
         <span class="dash-eyebrow">Bitcoin price</span>
-        <span class="dash-live"><span class="dash-live-dot" aria-hidden="true"></span><span class="dash-live-txt" id="dashPriceLabel">Today (latest monthly data)</span></span>
+        <span class="dash-live"><span class="dash-live-dot" aria-hidden="true"></span><span class="dash-live-txt" id="dashPriceLabel">Today</span></span>
       </div>
       <div class="dash-figure" id="dashPrice">&mdash;</div>
-      <p class="dash-tile-note">Spot from a live fetch when it resolves; until then, and if it fails, the latest monthly sample &mdash; labelled honestly, never &ldquo;live&rdquo; unless it is.</p>
+      <p class="dash-tile-note" id="dashPriceDeriv">&mdash;</p>
     </article>
 
-    <!-- TILE 3 — TREND PRICE TODAY -->
+    <!-- TREND PRICE TODAY (half) -->
     <article class="dash-tile" id="dashTrendTile">
       <div class="dash-tile-head"><span class="dash-eyebrow">Trend price today</span></div>
       <div class="dash-figure" id="dashTrend">&mdash;</div>
@@ -64,37 +64,7 @@ eleventyComputed:
       <p class="dash-tile-note">The Power&nbsp;Law trend at bitcoin&rsquo;s age today &mdash; <span class="dash-mono">A&middot;days<sup>5.77</sup></span>. Floor and upper band are the historical channel edges, 0.42&times; and 3&times; the trend.</p>
     </article>
 
-    <!-- TILE 4 — BELOW-TREND SHARE OF HISTORY -->
-    <article class="dash-tile" id="dashBelowTile">
-      <div class="dash-tile-head"><span class="dash-eyebrow">Below trend, historically</span></div>
-      <div class="dash-figure" id="dashBelowPct">&mdash;</div>
-      <div class="dash-minibar"><span class="dash-minibar-fill" id="dashBelowFill"></span></div>
-      <p class="dash-tile-note"><span id="dashBelowCount">&mdash;</span> have closed below trend. <strong>Below trend is bitcoin&rsquo;s ordinary condition</strong>, not an anomaly &mdash; counted live across every sample since 2010.</p>
-    </article>
-
-    <!-- TILE d — BELOW THE ALL-TIME HIGH (descriptive only; no recovery/signal language) -->
-    <article class="dash-tile" id="dashAthTile">
-      <div class="dash-tile-head"><span class="dash-eyebrow">Below the all-time high</span></div>
-      <div class="dash-figure" id="dashAthPct">&mdash;</div>
-      <p class="dash-tile-note">Where price sits relative to its highest recorded level, <span id="dashAthWhen">&mdash;</span>. <span class="dash-mono">(ATH&nbsp;&minus;&nbsp;today)&nbsp;&divide;&nbsp;ATH</span>, from the max of every sample and the live spot &mdash; a description of position, not a forecast.</p>
-    </article>
-
-    <!-- TILE a — PRICE IS WHERE TREND WAS IN ___ (inverts the trend; both cases coded, below-trend renders today) -->
-    <article class="dash-tile" id="dashTrendWasTile">
-      <div class="dash-tile-head"><span class="dash-eyebrow" id="dashTrendWasEyebrow">Price is where trend was</span></div>
-      <div class="dash-figure" id="dashTrendWasDate">&mdash;</div>
-      <div class="dash-ctx-lab" id="dashTrendWasAgo">&mdash;</div>
-      <p class="dash-tile-note">Inverting the trend &mdash; the age at which <span class="dash-mono">A&middot;days<sup>5.77</sup></span> equalled today&rsquo;s price, mapped to the calendar. Below trend, that date is in the past; above trend, it is where the trend is expected to reach today&rsquo;s price.</p>
-    </article>
-
-    <!-- TILE c — 10-YEAR STRUCTURAL TREND HURDLE (matches the Hurdle Rate structural default, H=10) -->
-    <article class="dash-tile" id="dashHurdleTile">
-      <div class="dash-tile-head"><span class="dash-eyebrow">10-year trend hurdle</span></div>
-      <div class="dash-figure dash-figure-accent" id="dashHurdle10">&mdash;</div>
-      <p class="dash-tile-note">The structural bar &mdash; bitcoin&rsquo;s trend-to-trend growth over ten years, <span class="dash-mono">(trend(t+10y)&divide;trend(t))<sup>1/10</sup>&minus;1</span> from the exponent, independent of today&rsquo;s price. The <a href="/the-bitcoin-hurdle-rate.html">Hurdle Rate</a> reads the same bar from today&rsquo;s position.</p>
-    </article>
-
-    <!-- TILE b — BELOW-TREND STREAK + THE RECORD (continuous time below trend; computed live, not hardcoded) -->
+    <!-- BELOW-TREND STREAK + THE RECORD (full width) — with record-pace projection -->
     <article class="dash-tile dash-tile-wide" id="dashStreakTile">
       <div class="dash-tile-head"><span class="dash-eyebrow">Below-trend streak &middot; the record</span></div>
       <div class="dash-twin">
@@ -107,29 +77,69 @@ eleventyComputed:
           <div class="dash-ctx-lab">longest continuous stretch on record &middot; median <span id="dashStreakMedian">&mdash;</span></div>
         </div>
       </div>
+      <p class="dash-projection" id="dashStreakProj">&mdash;</p>
       <p class="dash-tile-note">Continuous stretches below trend, measured as elapsed time across the Power&nbsp;Law series (not sample counts). This counts <strong>any</strong> unbroken time below the trend line &mdash; broader than the depth-matched wait-to-trend on <a href="/discount-or-premium.html">Discount, or Premium?</a>, so the record here can run longer without contradicting it. Below trend is ordinary; the useful question is how long. <a class="dash-inline-link" data-pos-carry data-href="/wait-or-deploy-now.html#comparator" href="/wait-or-deploy-now.html#comparator">Has waiting paid off from here? &rarr;</a></p>
     </article>
 
-    <!-- TILE 5 — DAYS TO DOUBLE + THE CONSTANT -->
+    <!-- IMPLIED TREND DOUBLING (full width) — retitled; dollar pair -->
     <article class="dash-tile dash-tile-wide" id="dashDoubleTile">
-      <div class="dash-tile-head"><span class="dash-eyebrow">Days to double &middot; the constant</span></div>
+      <div class="dash-tile-head"><span class="dash-eyebrow">Implied trend doubling</span></div>
       <div class="dash-twin">
         <div class="dash-twin-col">
-          <div class="dash-figure" id="dashDoubleDays">&mdash;</div>
-          <div class="dash-subfig" id="dashDoubleYears">&mdash;</div>
-          <div class="dash-ctx-lab">for the trend to double from today &middot; <span id="dashDoubleDate">&mdash;</span></div>
+          <div class="dash-figure" id="dashDoublePair">&mdash;</div>
+          <div class="dash-ctx-lab">the <strong>trend</strong> price doubling from today &middot; <span id="dashDoubleWhen">&mdash;</span></div>
         </div>
         <div class="dash-twin-col">
           <div class="dash-figure dash-figure-accent" id="dashConstant">&mdash;</div>
-          <div class="dash-ctx-lab">the age-growth constant<span class="help-tip" tabindex="0">?<span class="tip-content">The trend doubles every time bitcoin&rsquo;s age grows by this fraction &mdash; 2^(1/5.77) &minus; 1. It is the same at every point on the curve, which is why each doubling takes more days as bitcoin ages.</span></span></div>
+          <div class="dash-ctx-lab">the age-growth constant<span class="help-tip" tabindex="0">?<span class="tip-content">The trend doubles each time bitcoin&rsquo;s age grows by ~12.76% &mdash; 2^(1/5.77) &minus; 1. The same fraction at every point on the curve, so each doubling takes more days as bitcoin ages.</span></span></div>
         </div>
       </div>
-      <p class="dash-tile-note">Both derived from the Power&nbsp;Law exponent alone: the trend doubles when bitcoin&rsquo;s age grows by <span class="dash-mono">2<sup>1/5.77</sup>&minus;1</span>. Later doublings take longer in days because the same fraction of a larger age is more time.</p>
+      <p class="dash-tile-note">The <strong>trend</strong> price (not the market price) doubling from today&rsquo;s trend value &mdash; derived from the Power&nbsp;Law exponent alone: the trend doubles when bitcoin&rsquo;s age grows by <span class="dash-mono">2<sup>1/5.77</sup>&minus;1</span>. Later doublings take longer in days because the same fraction of a larger age is more time.</p>
+    </article>
+
+    <!-- IMPLIED REVERSION RATE (full width) — NEW; ports d-or-p's depth-matched record -->
+    <article class="dash-tile dash-tile-wide" id="dashReversionTile">
+      <div class="dash-tile-head"><span class="dash-eyebrow">Implied reversion rate</span></div>
+      <div class="dash-figure dash-figure-accent" id="dashRevMedian">&mdash;</div>
+      <div class="dash-ctx-lab" id="dashRevMedianSub">&mdash;</div>
+      <div class="dash-rev-range" id="dashRevRange">&mdash;</div>
+      <p class="dash-tile-note">The annual return implied if today&rsquo;s price reached the trend in the time the record shows &mdash; <span class="dash-mono">(trend(t+T)&divide;spot)<sup>1/T</sup>&minus;1</span> for the fastest, median and longest historical waits from a depth like today&rsquo;s. Depth-matched the same way as <a href="/discount-or-premium.html">Discount, or Premium?</a>&rsquo;s record. Not a forecast &mdash; the arithmetic of the record, conditional on reversion happening at all.</p>
+    </article>
+
+    <!-- BELOW-TREND SHARE (half) — samples defined inline -->
+    <article class="dash-tile" id="dashBelowTile">
+      <div class="dash-tile-head"><span class="dash-eyebrow">Below trend, historically</span></div>
+      <div class="dash-figure" id="dashBelowPct">&mdash;</div>
+      <div class="dash-minibar"><span class="dash-minibar-fill" id="dashBelowFill"></span></div>
+      <p class="dash-tile-note"><span id="dashBelowCount">&mdash;</span> have closed below trend. <strong>Below trend is bitcoin&rsquo;s ordinary condition</strong>, not an anomaly.</p>
+    </article>
+
+    <!-- BELOW THE ALL-TIME HIGH (half) — descriptive; ATH figure + basis; at/new-ATH branches -->
+    <article class="dash-tile" id="dashAthTile">
+      <div class="dash-tile-head"><span class="dash-eyebrow">Below the all-time high</span></div>
+      <div class="dash-figure" id="dashAthPct">&mdash;</div>
+      <div class="dash-ctx-lab" id="dashAthWhen">&mdash;</div>
+      <p class="dash-tile-note" id="dashAthNote">&mdash;</p>
+    </article>
+
+    <!-- BEHIND THE TREND'S SCHEDULE (half) — time-first reframe of "price is where trend was" -->
+    <article class="dash-tile" id="dashTrendWasTile">
+      <div class="dash-tile-head"><span class="dash-eyebrow" id="dashTrendWasEyebrow">Behind the trend&rsquo;s schedule</span></div>
+      <div class="dash-figure" id="dashTrendWasYears">&mdash;</div>
+      <div class="dash-ctx-lab" id="dashTrendWasSub">&mdash;</div>
+      <p class="dash-tile-note">Inverting the trend: the age at which the trend line equalled today&rsquo;s price, read as a calendar date. Below trend, that date is behind us; above trend, it is when the trend is expected to reach today&rsquo;s price.</p>
+    </article>
+
+    <!-- 10-YEAR TREND HURDLE RATE (half) -->
+    <article class="dash-tile" id="dashHurdleTile">
+      <div class="dash-tile-head"><span class="dash-eyebrow">10-Year Trend Hurdle Rate</span></div>
+      <div class="dash-figure dash-figure-accent" id="dashHurdle10">&mdash;</div>
+      <p class="dash-tile-note">Trend-to-trend: the trend price ten years from now against the trend price today, <span class="dash-mono">(trend(t+10y)&divide;trend(t))<sup>1/10</sup>&minus;1</span> &mdash; independent of where price sits now. From today&rsquo;s below-trend entry the from-today bar is higher; the <a href="/the-bitcoin-hurdle-rate.html">Hurdle Rate</a> computes that lens.</p>
     </article>
 
   </section>
 
-  <!-- ═══════════ JUMP BACK IN — deep links into the tools (absorbs the closed Gallery-highlights idea) ═══════════ -->
+  <!-- ═══════════ JUMP BACK IN — deep links into the tools ═══════════ -->
   <section class="dash-jump" aria-label="Jump back into the tools">
     <h2 class="dash-jump-head">Take your position into a tool</h2>
     <p class="dash-jump-sub">Where a tool already reads today&rsquo;s channel position, these links carry it in.</p>
