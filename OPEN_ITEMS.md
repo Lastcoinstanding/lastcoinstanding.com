@@ -33,12 +33,15 @@ session automatically. Close items here when done; this file is the "what's cook
   Detail: `OPENSOURCE_DECISION_BRIEF.md`. **New interaction to weigh:** the own-job track
   (`OWN_JOB_STRATEGY.md` §1) — grants and employment substitute more than they stack.
 
-- [x] **DONE (2026-08-10) — Dashboard build (v1, anchor destination).** Built as **`/dashboard`** on
-  `feat/dashboard-v1`, commit `fd00ee2` (fill on merge). Five live-compute-only tiles + a
-  six-link jump-back-in row; `?pos=` carried into the two existing receivers only; no nav slot
-  (`category: hub`, surfaced via `/calculators` tile + homepage Latest card); ribbon suppressed
-  on-page. The v1 fence held: zero new data sources, zero new monthly-refresh lines. Full record:
-  `SITE_GUIDE §47`; backlog entry marked shipped. Two follow-ups opened below (chip + OG handback).
+- [x] **DONE (2026-08-10) — Dashboard build (v1, anchor destination). LIVE IN PRODUCTION.** Built as
+  **`/dashboard`** on `feat/dashboard-v1` (build `fd00ee2`, OG `897fa46`), **merged via PR #43 as
+  `8d184bc`** and auto-deployed. **Post-deploy verified on production:** four §10 curls all pass,
+  canonical clean, OG serves `image/jpeg` (200), tiles compute live in-browser (0.43× / near the
+  floor, "Today (live)"). Five live-compute-only tiles + a six-link jump-back-in row; `?pos=` carried
+  into the two existing receivers only; no nav slot (`category: hub`, surfaced via `/calculators` tile
+  + homepage Latest card); ribbon suppressed on-page. The v1 fence held: zero new data sources, zero
+  new monthly-refresh lines. Full record: `SITE_GUIDE §47`; backlog entry shipped. **One follow-up
+  remains: the chip (below); OG handback closed below.**
 
 - [ ] **Dashboard follow-up #1 — the channel-position chip (site-wide entry point).** The doorway to
   the room just built. Ships AFTER the dashboard per the return-visit ruling. Scope open: the chip is
@@ -48,10 +51,9 @@ session automatically. Close items here when done; this file is the "what's cook
   Dashboard entry; `SITE_GUIDE §47` "Open enhancements".
 
 - [x] **DONE (2026-08-10) — Dashboard OG card handback (`og-dashboard.jpg`).** JM handed back the
-  1280×720 JPEG (93 KB); committed to `feat/dashboard-v1` and registered in `.eleventy.js`
-  `staticAssets`. **Production check still owed after merge:** `curl -I https://lastcoinstanding.com/og-dashboard.jpg`
-  must return `Content-Type: image/jpeg`, NOT `text/html` (the site's most recurrent launch bug),
-  alongside the four §10 curls.
+  1280×720 JPEG (93 KB); committed (`897fa46`) and registered in `.eleventy.js` `staticAssets`.
+  **Production-verified after merge:** `curl -I https://lastcoinstanding.com/og-dashboard.jpg` →
+  `200 · Content-Type: image/jpeg` (95080 bytes) — no phantom-200.
 
 - [ ] **~Aug 11 (early next week) — Substack essay: The Bitcoin Hurdle Rate.** Page is live and
   final (`/the-bitcoin-hurdle-rate`, prod 2026-08-07). JM writes the prose himself — personal
