@@ -129,16 +129,19 @@
     while (true) {
       comp = [];
       for (k = 0; k < PL_DATA.length; k++) {
-        if (sampleMult(k) <= band) { r = regainAfter(k); if (r >= 0) comp.push((PL_DATA[r][0] - PL_DATA[k][0]) / DOP_MONTH); }
+        if (sampleMult(k) <= band) {
+          r = regainAfter(k);
+          if (r >= 0) comp.push({ months: (PL_DATA[r][0] - PL_DATA[k][0]) / DOP_MONTH, year: new Date((GENESIS_TS + PL_DATA[k][0] * 86400) * 1000).getUTCFullYear() });
+        }
       }
       if (comp.length >= 5 || guard >= 12) break;
       band += 0.05; guard++;
       if (band >= 0.95) break;
     }
-    comp.sort(function (a, b) { return a - b; });
     if (!comp.length) return { nCompleted: 0 };
-    var med = comp.length % 2 ? comp[(comp.length - 1) / 2] : (comp[comp.length / 2 - 1] + comp[comp.length / 2]) / 2;
-    return { min: comp[0], median: med, max: comp[comp.length - 1], nCompleted: comp.length, band: band, widened: Math.abs(band - m) > 1e-9 };
+    var durs = comp.map(function (c) { return c.months; }).sort(function (a, b) { return a - b; });
+    var med = durs.length % 2 ? durs[(durs.length - 1) / 2] : (durs[durs.length / 2 - 1] + durs[durs.length / 2]) / 2;
+    return { comp: comp, min: durs[0], median: med, max: durs[durs.length - 1], nCompleted: comp.length, band: band, widened: Math.abs(band - m) > 1e-9 };
   }
   function renderReversion(price) {
     var rec = reversionRecord(price);
@@ -148,15 +151,24 @@
       setText('dashRevRange', '');
       return;
     }
-    // CAGR implied by spot reaching trend(t+T) in time T (years) — for each historical wait.
+    // CAGR implied by spot reaching trend(t+T) in time T (years). The MEDIAN leads and the
+    // SLOWEST is the low end; the fastest is shown as a DURATION only — annualising a
+    // months-long snap-back produces a rate that can't honestly be quoted (JM ruling, v3).
     function cagr(months) { var T = months / 12; return Math.pow(plPrice(TODAY_DAYS + T * YEAR_D) / price, 1 / T) - 1; }
     setText('dashRevMedian', '~' + fmtPct(cagr(rec.median)) + '/yr');
-    setText('dashRevMedianSub', 'if price reached trend at the median pace on record (~' + Math.round(rec.median)
-      + ' months) from a depth like today’s');
-    var range = 'range ~' + fmtPct(cagr(rec.max)) + '/yr (~' + Math.round(rec.max) + ' mo, slowest) to ~'
-      + fmtPct(cagr(rec.min)) + '/yr (~' + Math.round(rec.min) + ' mo, the fastest snap-back) · '
-      + rec.nCompleted + ' completed episodes on record';
-    if (rec.widened) range += ' · few at exactly today’s depth, so widened to ≤' + rec.band.toFixed(2) + '×';
+    setText('dashRevMedianSub', 'over ~' + Math.round(rec.median) + ' months — the median reversion on record from a depth like today’s, and only if it reverts at all');
+    // Era note (data-driven, not a filter): do the quickest resolutions cluster in the early era?
+    var byDur = rec.comp.slice().sort(function (a, b) { return a.months - b.months; });
+    var fastN = Math.max(1, Math.round(byDur.length / 3));
+    var fastAllEarly = byDur.slice(0, fastN).every(function (c) { return c.year < 2016; });
+    var recent = rec.comp.reduce(function (a, b) { return b.year > a.year ? b : a; }, rec.comp[0]);
+    var era = (fastAllEarly && recent.year >= 2020)
+      ? ' The quickest resolutions came in bitcoin’s early era (≤2015); the most recent, in ' + recent.year + ', took ~' + Math.round(recent.months) + ' months.'
+      : '';
+    var range = 'Low end: the slowest reversion, ~' + Math.round(rec.max) + ' months, implies ~' + fmtPct(cagr(rec.max))
+      + '/yr. The quickest resolution from a depth like today’s took ~' + rec.min.toFixed(1) + ' months.' + era
+      + ' ' + rec.nCompleted + ' completed episodes on record.';
+    if (rec.widened) range += ' Few at exactly today’s depth, so widened to ≤' + rec.band.toFixed(2) + '×.';
     setText('dashRevRange', range);
   }
 
