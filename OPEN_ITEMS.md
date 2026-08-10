@@ -34,7 +34,7 @@ session automatically. Close items here when done; this file is the "what's cook
   (`OWN_JOB_STRATEGY.md` §1) — grants and employment substitute more than they stack.
 
 - [x] **DONE (2026-08-10) — Dashboard build (v1, anchor destination).** Built as **`/dashboard`** on
-  `feat/dashboard-v1`, commit `<SHA-PENDING>` (fill on merge). Five live-compute-only tiles + a
+  `feat/dashboard-v1`, commit `fd00ee2` (fill on merge). Five live-compute-only tiles + a
   six-link jump-back-in row; `?pos=` carried into the two existing receivers only; no nav slot
   (`category: hub`, surfaced via `/calculators` tile + homepage Latest card); ribbon suppressed
   on-page. The v1 fence held: zero new data sources, zero new monthly-refresh lines. Full record:
