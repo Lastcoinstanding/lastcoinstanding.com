@@ -1,5 +1,10 @@
 [
   {
+    "display": "8/10/26",
+    "page": "/dashboard.html",
+    "summary": "New: The Bitcoin Dashboard — a live read of where bitcoin sits in its Power Law channel: the trend multiple and its zone, the trend price today against the channel's floor and upper band, and how often price has historically closed below trend. Deep links carry today's position into the tools. A read of where things stand, not a signal about where they go next."
+  },
+  {
     "display": "8/6/26",
     "page": "/the-bitcoin-hurdle-rate.html",
     "summary": "New: The Bitcoin Hurdle Rate — every capital decision is a comparison against the next-best use of the money, and for anyone who holds bitcoin the trend growth is a candidate benchmark. Enter the return you're testing and the horizon of the decision; the page computes bitcoin's trend hurdle matched to that window — higher over short horizons, lower over long ones, because the Power Law's growth rate decays with age — and shows where your number crosses it. Two lenses over one engine: a company asking whether a project clears the bar, and a person asking whether a use of money does. The hurdle applies to capital that can wait, at the margin — not to capital with a deadline, a covenant, or a payroll; where that condition fails, the page says the hurdle does not apply rather than pretending it does."

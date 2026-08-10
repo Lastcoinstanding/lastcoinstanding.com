@@ -1,0 +1,133 @@
+---
+layout: base.njk
+permalink: /dashboard.html
+slug: dashboard
+channel_ribbon: false
+eleventyComputed:
+  head_extras: "{% include '_pageassets/dashboard-head.html' %}"
+  page_styles: "{% include '_pageassets/dashboard.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/dashboard.js' %}"
+---
+
+<section class="hero dash-hero">
+  <h1>The Bitcoin <em>Dashboard</em></h1>
+  <p class="hero-sub">Where bitcoin sits in its <a href="/the-power-law.html">Power&nbsp;Law</a> channel right now &mdash; and what that has meant for a position. A live read, computed in your browser from the same trend the rest of the site uses.</p>
+  <p class="dash-framing">A read of where things stand, <strong>not a signal about where they go next</strong>. Every figure below shows its own derivation.</p>
+</section>
+
+<main class="dash-page">
+
+  <!-- ═══════════ THE LIVE READ — five tiles, all computed from PL_DATA + spot ═══════════ -->
+  <section class="dash-grid" aria-label="Live channel read">
+
+    <!-- TILE 1 — CHANNEL POSITION (hero) -->
+    <article class="dash-tile dash-tile-hero" id="dashPosTile">
+      <div class="dash-tile-head">
+        <span class="dash-eyebrow">Channel position</span>
+        <span class="dash-live"><span class="dash-live-dot" aria-hidden="true"></span><span class="dash-live-txt" id="dashPosProv">latest monthly data &divide; trend</span></span>
+      </div>
+      <div class="dash-hero-figure">
+        <span class="dash-hero-mult" id="dashMult">&mdash;</span>
+        <span class="dash-hero-unit">&times; trend</span>
+      </div>
+      <div class="dash-hero-zone" id="dashZone">&mdash;</div>
+      <div class="dash-posbar">
+        <div class="dash-posbar-track">
+          <span class="dash-posbar-tick dash-posbar-trend" id="dashPosTrendTick"></span>
+          <span class="dash-posbar-marker" id="dashPosMarker"></span>
+        </div>
+        <div class="dash-posbar-labels">
+          <span>Floor&nbsp;0.42&times;</span><span class="dash-posbar-lab-trend">Trend&nbsp;1&times;</span><span>Upper&nbsp;3&times;</span>
+        </div>
+      </div>
+      <p class="dash-tile-note">Today&rsquo;s price divided by the trend, placed on the shared channel scale and named with the site&rsquo;s one <a href="/the-power-law.html">channel</a> vocabulary<span class="help-tip" tabindex="0">?<span class="tip-content">The same graduated label used by the channel ribbon and every position readout on the site &mdash; one scale, so the words never disagree.</span></span>.</p>
+    </article>
+
+    <!-- TILE 2 — LIVE BTC PRICE -->
+    <article class="dash-tile" id="dashPriceTile">
+      <div class="dash-tile-head">
+        <span class="dash-eyebrow">Bitcoin price</span>
+        <span class="dash-live"><span class="dash-live-dot" aria-hidden="true"></span><span class="dash-live-txt" id="dashPriceLabel">Today (latest monthly data)</span></span>
+      </div>
+      <div class="dash-figure" id="dashPrice">&mdash;</div>
+      <p class="dash-tile-note">Spot from a live fetch when it resolves; until then, and if it fails, the latest monthly sample &mdash; labelled honestly, never &ldquo;live&rdquo; unless it is.</p>
+    </article>
+
+    <!-- TILE 3 — TREND PRICE TODAY -->
+    <article class="dash-tile" id="dashTrendTile">
+      <div class="dash-tile-head"><span class="dash-eyebrow">Trend price today</span></div>
+      <div class="dash-figure" id="dashTrend">&mdash;</div>
+      <div class="dash-context">
+        <span class="dash-ctx"><span class="dash-ctx-lab">Floor&nbsp;0.42&times;</span><span class="dash-ctx-val" id="dashFloor">&mdash;</span></span>
+        <span class="dash-ctx"><span class="dash-ctx-lab">Upper&nbsp;3&times;</span><span class="dash-ctx-val" id="dashUpper">&mdash;</span></span>
+      </div>
+      <p class="dash-tile-note">The Power&nbsp;Law trend at bitcoin&rsquo;s age today &mdash; <span class="dash-mono">A&middot;days<sup>5.77</sup></span>. Floor and upper band are the historical channel edges, 0.42&times; and 3&times; the trend.</p>
+    </article>
+
+    <!-- TILE 4 — BELOW-TREND SHARE OF HISTORY -->
+    <article class="dash-tile" id="dashBelowTile">
+      <div class="dash-tile-head"><span class="dash-eyebrow">Below trend, historically</span></div>
+      <div class="dash-figure" id="dashBelowPct">&mdash;</div>
+      <div class="dash-minibar"><span class="dash-minibar-fill" id="dashBelowFill"></span></div>
+      <p class="dash-tile-note"><span id="dashBelowCount">&mdash;</span> have closed below trend. <strong>Below trend is bitcoin&rsquo;s ordinary condition</strong>, not an anomaly &mdash; counted live across every monthly sample since 2010.</p>
+    </article>
+
+    <!-- TILE 5 — DAYS TO DOUBLE + THE CONSTANT -->
+    <article class="dash-tile dash-tile-wide" id="dashDoubleTile">
+      <div class="dash-tile-head"><span class="dash-eyebrow">Days to double &middot; the constant</span></div>
+      <div class="dash-twin">
+        <div class="dash-twin-col">
+          <div class="dash-figure" id="dashDoubleDays">&mdash;</div>
+          <div class="dash-subfig" id="dashDoubleYears">&mdash;</div>
+          <div class="dash-ctx-lab">for the trend to double from today &middot; <span id="dashDoubleDate">&mdash;</span></div>
+        </div>
+        <div class="dash-twin-col">
+          <div class="dash-figure dash-figure-accent" id="dashConstant">&mdash;</div>
+          <div class="dash-ctx-lab">the age-growth constant<span class="help-tip" tabindex="0">?<span class="tip-content">The trend doubles every time bitcoin&rsquo;s age grows by this fraction &mdash; 2^(1/5.77) &minus; 1. It is the same at every point on the curve, which is why each doubling takes more days as bitcoin ages.</span></span></div>
+        </div>
+      </div>
+      <p class="dash-tile-note">Both derived from the Power&nbsp;Law exponent alone: the trend doubles when bitcoin&rsquo;s age grows by <span class="dash-mono">2<sup>1/5.77</sup>&minus;1</span>. Later doublings take longer in days because the same fraction of a larger age is more time.</p>
+    </article>
+
+  </section>
+
+  <!-- ═══════════ JUMP BACK IN — deep links into the tools (absorbs the closed Gallery-highlights idea) ═══════════ -->
+  <section class="dash-jump" aria-label="Jump back into the tools">
+    <h2 class="dash-jump-head">Take your position into a tool</h2>
+    <p class="dash-jump-sub">Where a tool already reads today&rsquo;s channel position, these links carry it in.</p>
+    <div class="dash-jump-grid">
+
+      <a class="dash-jump-card" href="/the-power-law.html#channel">
+        <span class="dash-jump-title">The Power&nbsp;Law channel</span>
+        <span class="dash-jump-desc">See the whole channel the numbers above come from &mdash; floor, trend, upper band.</span>
+      </a>
+
+      <a class="dash-jump-card" data-pos-carry data-href="/wait-or-deploy-now.html#comparator" href="/wait-or-deploy-now.html#comparator">
+        <span class="dash-jump-title">Wait, or Deploy Now?<span class="dash-jump-carry">carries your position</span></span>
+        <span class="dash-jump-desc">Has waiting for a lower entry paid off from a position like today&rsquo;s? Quiet when low, live when high.</span>
+      </a>
+
+      <a class="dash-jump-card" data-pos-carry data-href="/how-much-cash.html#playground" href="/how-much-cash.html#playground">
+        <span class="dash-jump-title">How Much Cash?<span class="dash-jump-carry">carries your position</span></span>
+        <span class="dash-jump-desc">Where in the channel raising cash has bought more bitcoin &mdash; and where it has cost you.</span>
+      </a>
+
+      <a class="dash-jump-card" href="/bitcoin-allocation-sizing.html#worth-it">
+        <span class="dash-jump-title">Portfolio Allocation</span>
+        <span class="dash-jump-desc">Does bitcoin earn its place &mdash; the extra return, and the drawdown you must hold through.</span>
+      </a>
+
+      <a class="dash-jump-card" href="/the-bitcoin-retirement.html">
+        <span class="dash-jump-title">The Bitcoin Retirement</span>
+        <span class="dash-jump-desc">How much you need, when, and on what income &mdash; growth projected from this trend.</span>
+      </a>
+
+      <a class="dash-jump-card" href="/the-bitcoin-retirement-stress-test.html#stress">
+        <span class="dash-jump-title">Retirement Stress Test</span>
+        <span class="dash-jump-desc">Drop a bear market into the plan and see whether it still survives.</span>
+      </a>
+
+    </div>
+  </section>
+
+</main>

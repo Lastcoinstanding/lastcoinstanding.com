@@ -445,6 +445,19 @@
     "interactive": true
   },
   {
+    "_comment": "The Bitcoin Dashboard — the site's return-visit anchor destination (PAGE_IDEAS_BACKLOG dashboard ruling, JM 2026-08-05). category 'hub' by design: NO nav slot in v1 (base.njk iterates only foundations/arguments/numbers), so the page stays out of the dropdowns. It is surfaced two ways only — this calculator_tile on /calculators and a homepage Latest card — until the site-wide channel-position chip (its future doorway) ships. The registry entry is also what lets the related component resolve its slug. channel_ribbon:false on the page itself (it IS the ribbon's destination-grade version). calculator_tile has anchor '' (single-pane, no tab).",
+    "slug": "dashboard",
+    "title": "The Bitcoin Dashboard",
+    "category": "hub",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Where bitcoin sits in its Power Law channel right now &mdash; trend multiple, zone, and what that has meant for a position. A live read, not a signal.",
+      "preview_kind": "svg",
+      "anchor": "",
+      "position": 21
+    }
+  },
+  {
     "_comment": "Hub-level page. The 'hub' category is intentionally outside the foundations/arguments/numbers nav buckets — base.njk only iterates those three. This entry exists so the related component can render Gallery back-link cards (its slug lookup against explorations.json otherwise silently fails). If a future nav iterator needs to include hub pages, add an explicit check for 'hub' there.",
     "slug": "the-gallery",
     "title": "The Gallery",
