@@ -47,12 +47,11 @@ session automatically. Close items here when done; this file is the "what's cook
   stayed at the ruled two — `/calculators` tile + homepage card). Detail: `PAGE_IDEAS_BACKLOG.md`
   Dashboard entry; `SITE_GUIDE §47` "Open enhancements".
 
-- [ ] **Dashboard follow-up #2 — OG card handback (`og-dashboard.jpg`).** The page ships with head
-  meta referencing `/og-dashboard.jpg` but **no image committed** (no Pillow/Playwright in the Code
-  sandbox, NEW_PAGE_CHECKLIST §8). Handback: drafting chat generates the 1280×720 JPEG → JM hands it
-  back → Claude Code adds `'og-dashboard.jpg'` to `.eleventy.js` `staticAssets` + commits the image.
-  Until then the OG URL phantom-200s. **Post-landing check:** `curl -I …/og-dashboard.jpg` must return
-  `Content-Type: image/jpeg`, NOT `text/html` (the site's most recurrent launch bug).
+- [x] **DONE (2026-08-10) — Dashboard OG card handback (`og-dashboard.jpg`).** JM handed back the
+  1280×720 JPEG (93 KB); committed to `feat/dashboard-v1` and registered in `.eleventy.js`
+  `staticAssets`. **Production check still owed after merge:** `curl -I https://lastcoinstanding.com/og-dashboard.jpg`
+  must return `Content-Type: image/jpeg`, NOT `text/html` (the site's most recurrent launch bug),
+  alongside the four §10 curls.
 
 - [ ] **~Aug 11 (early next week) — Substack essay: The Bitcoin Hurdle Rate.** Page is live and
   final (`/the-bitcoin-hurdle-rate`, prod 2026-08-07). JM writes the prose himself — personal
