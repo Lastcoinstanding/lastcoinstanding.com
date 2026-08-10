@@ -33,11 +33,26 @@ session automatically. Close items here when done; this file is the "what's cook
   Detail: `OPENSOURCE_DECISION_BRIEF.md`. **New interaction to weigh:** the own-job track
   (`OWN_JOB_STRATEGY.md` §1) — grants and employment substitute more than they stack.
 
-- [ ] **Aug 10 (Mon) ⏰ — Dashboard build (usage-gated).** Fable 5 limit resets 5:00 AM; JM ruled
-  build waits for the reset. Spec is settled: dashboard = anchor destination; v1 = live-computed
-  tiles only (macro tiles out); Freshness chip = site-wide entry point, ships after; Gallery strip
-  absorbed as the "jump back in" row. Build prompt to be generated Monday. Reminder:
-  trig_01Uy84Voq9BuzWAac2AiFWrJ. Detail: `PAGE_IDEAS_BACKLOG.md` Dashboard entry.
+- [x] **DONE (2026-08-10) — Dashboard build (v1, anchor destination).** Built as **`/dashboard`** on
+  `feat/dashboard-v1`, commit `<SHA-PENDING>` (fill on merge). Five live-compute-only tiles + a
+  six-link jump-back-in row; `?pos=` carried into the two existing receivers only; no nav slot
+  (`category: hub`, surfaced via `/calculators` tile + homepage Latest card); ribbon suppressed
+  on-page. The v1 fence held: zero new data sources, zero new monthly-refresh lines. Full record:
+  `SITE_GUIDE §47`; backlog entry marked shipped. Two follow-ups opened below (chip + OG handback).
+
+- [ ] **Dashboard follow-up #1 — the channel-position chip (site-wide entry point).** The doorway to
+  the room just built. Ships AFTER the dashboard per the return-visit ruling. Scope open: the chip is
+  the site-wide entry that reads channel position and links to `/dashboard`; it also becomes the home
+  for the deferred **companion reciprocal back-links** (v1 shipped with none, so the surface count
+  stayed at the ruled two — `/calculators` tile + homepage card). Detail: `PAGE_IDEAS_BACKLOG.md`
+  Dashboard entry; `SITE_GUIDE §47` "Open enhancements".
+
+- [ ] **Dashboard follow-up #2 — OG card handback (`og-dashboard.jpg`).** The page ships with head
+  meta referencing `/og-dashboard.jpg` but **no image committed** (no Pillow/Playwright in the Code
+  sandbox, NEW_PAGE_CHECKLIST §8). Handback: drafting chat generates the 1280×720 JPEG → JM hands it
+  back → Claude Code adds `'og-dashboard.jpg'` to `.eleventy.js` `staticAssets` + commits the image.
+  Until then the OG URL phantom-200s. **Post-landing check:** `curl -I …/og-dashboard.jpg` must return
+  `Content-Type: image/jpeg`, NOT `text/html` (the site's most recurrent launch bug).
 
 - [ ] **~Aug 11 (early next week) — Substack essay: The Bitcoin Hurdle Rate.** Page is live and
   final (`/the-bitcoin-hurdle-rate`, prod 2026-08-07). JM writes the prose himself — personal
