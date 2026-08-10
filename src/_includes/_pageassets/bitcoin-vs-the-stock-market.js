@@ -19,7 +19,7 @@
 
 
 /* ═══════ §1 — Power Law cautionary-tale viz ═══════
-   Plots BTC price (PL_DATA monthly samples + a current point) on a
+   Plots BTC price (PL_DATA ~12-day samples + a current point) on a
    log Y axis against the Power Law trend across 2010-today, with
    annotated markers at each cyclical top, each cyclical floor, and
    today's position. The viz makes the page's lead editorial argument

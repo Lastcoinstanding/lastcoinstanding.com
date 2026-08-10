@@ -412,7 +412,7 @@
     }
   };
 
-  // Nearest monthly PL_DATA sample to day d (the "Price (history)" row/dot).
+  // Nearest PL_DATA sample to day d (~12-day grid; the "Price (history)" row/dot).
   function nearestSample(d) {
     var best = PL_DATA[0], bd = Math.abs(PL_DATA[0][0] - d);
     for (var i = 1; i < PL_DATA.length; i++) { var dd = Math.abs(PL_DATA[i][0] - d); if (dd < bd) { bd = dd; best = PL_DATA[i]; } }
@@ -1050,7 +1050,7 @@
     var cap = document.getElementById('dpDurCap');
     if (cap) {
       var longYear = rec.longestEp ? new Date((GENESIS_TS + rec.longestEp.entryD * 86400) * 1000).getUTCFullYear() : null;
-      cap.innerHTML = 'Monthly samples, so entry and regain snap to the nearest month. A handful of episodes is a <strong>record, not a distribution</strong>'
+      cap.innerHTML = 'Samples are ~12 days apart, so entry and regain snap to the nearest sample. A handful of episodes is a <strong>record, not a distribution</strong>'
         + (longYear ? ' &mdash; and there is no clean shortening trend: the longest wait began in <strong>' + longYear + '</strong>, not at the start.' : '.');
     }
   }
