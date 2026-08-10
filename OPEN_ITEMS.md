@@ -82,6 +82,11 @@ MONTHLY_REFRESH_CHECKLIST (`346e7bec…`) replaced at their exact project paths 
 date, never forward-dated.** Residual: confirm the date-reset commit is pushed to main.
 
 Remaining tail:
+- [x] **§10 SEO/ship verification — DONE (2026-08-10).** Ran the four `NEW_PAGE_CHECKLIST` §10 curl
+  checks against a live affected page (`/the-bitcoin-hurdle-rate`): `gtag|googletagmanager`=2,
+  `rel="canonical"`=1, `og:image`=5, `application/ld+json`=2 — all ≥1, plus the Get Updates surface
+  itself present (`substack.com/subscribe` link=1). The §10 export/verification tail is closed;
+  nothing outstanding on the ship side.
 - [ ] **First signal check (~mid-Aug):** Substack subscriber dashboard + `utm_source=site` (+ now
   `utm_source=x` from the thread) — the honest baseline for the metrics one-pager, which the
   own-job workstream also needs.
