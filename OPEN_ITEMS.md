@@ -134,7 +134,7 @@ Remaining tail:
 3. **Geyser page + V4V confirmation (top-10 #4).**
 4. **YouTube pilot video (top-10 #10)** — film from the refreshed script.
 5. **Next build: Retirement scenario comparison (top-10 #8)** — design doc first (after dashboard).
-6. **STRC below-par examination (top-10 #9)** — ✅ **SHIPPED** as `/strc-below-par`, live in production (carousel slide 36). Was stale in this queue — the page deployed before the 2026-08-05 amend.
+6. **STRC below-par examination (top-10 #9)** — ✅ **SHIPPED** as `/the-strc-mechanism`, live in production (carousel slide 36). Was stale in this queue — the page deployed before the 2026-08-05 amend.
 
 ## In flight (undated / JM quick tasks)
 
@@ -160,6 +160,17 @@ Remaining tail:
 - [ ] **Eyeball the three new FAQ sections** (allocation, wait-or-deploy, BvRE; desktop + 375px).
 - [ ] **X card re-scrape — four retitled pages:** /bull-and-bear-cycles, /borrowing-against-your-stack,
   /disciplined-rebalancing, /lump-sum-or-ladder-in.
+- [ ] **X card re-scrape — /the-strc-mechanism** (renamed from /strc-below-par, 2026-08-10; do AFTER merge,
+  and after the new OG card lands — see the handback below).
+- [ ] **OG card handback — `og-the-strc-mechanism.jpg`** (STRC overhaul, `feat/strc-mechanism`). The head
+  still points `og:image` at the old `og-strc-below-par.jpg` (kept served — no phantom-200) until the
+  drafting chat generates the new product-forward card for "The STRC Mechanism"; then Claude Code registers
+  it in `.eleventy.js` `staticAssets` and repoints the meta. Post-landing: `curl -I …/og-the-strc-mechanism.jpg`
+  → `image/jpeg`.
+- [ ] **STRC daily-close Action — first live confirmation (post-merge).** `workflow_dispatch` isn't available
+  until the workflow is on `main` (GitHub limitation), so it couldn't run pre-merge. After merge, run one
+  `gh workflow run strc-daily-close.yml` and confirm the green run + the `data(strc):` commit; then the
+  weekday schedule maintains it. Monthly silent-death check is in `MONTHLY_REFRESH §7.6`.
 - [ ] **LinkedIn update (Satmo / Joe Bryan)** — JM personal, timing his call.
 
 ## Working notes (pipeline learnings)
