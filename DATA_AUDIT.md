@@ -139,6 +139,14 @@ The Disciplined Rebalancing page applies the same Power Law channel as `/the-bit
 
 **HR-1 / HR-2 (added 2026-08-06).** The two short-rate-sensitive presets on `/the-bitcoin-hurdle-rate` — approximate starting points the user immediately overrides (slider + numeric entry), labelled "~". Tracking lives in the **Next due** column above: re-check both at the quarterly audit and bump the display if the short-rate regime has moved materially. The page adds **zero** MONTHLY_REFRESH surface by design (the review-date column carries it — no monthly line). The other presets need no rows: WACC ~9% and "a strong project" 20% are illustrative anchors; S&P 500 long-run TR 10.86% reuses the R-1 family (via BvSM); mortgage ~6% and rental ~8% are long-run editorial anchors. Everything else on the page computes live from the shared Power Law module (`PL_A`/`PL_B`/`PL_FLOOR`/`plPrice`) — no rows.
 
+### the-strc-mechanism — STRC daily close (automated)
+
+| # | Component | Value | Source | URL | Last audited | Next due |
+|---|---|---|---|---|---|---|
+| STRC-1 | STRC official daily close | live (e.g. $94.35 @ 2026-08-10) | Yahoo Finance chart endpoint (keyless), last daily-close bar + its ET date | https://query1.finance.yahoo.com/v8/finance/chart/STRC?interval=1d&range=7d | 2026-08-10 | (automated) |
+
+**STRC-1 (added 2026-08-10 — the site's first automated data source).** `/the-strc-mechanism`'s price is STRC's official daily close, refreshed by a GitHub Action (`.github/workflows/strc-daily-close.yml` → `scripts/update-strc-close.mjs`) into `src/_data/strcClose.json` on market weekdays after the US close. **Source change:** the originally-scoped **Stooq CSV** (`strc.us`) is **no longer usable keyless** — as of 2026-08-10 its `q/l/` and `q/d/l/` endpoints return a "page does not exist" / JavaScript anti-bot challenge respectively (verified by hand with a browser UA). Switched to **Yahoo Finance's keyless chart JSON**, which returns the daily-close series + timestamps and identifies the instrument (`shortName` "Strategy Inc - Variable Rate Se…", 52-wk 71.25–100.42 matching filings); `query2` host is the fallback. **Method:** last non-null element of `indicators.quote[0].close`, rounded to 2dp, dated by its `timestamp` in `America/New_York`; cross-checked against `meta.regularMarketPrice`. **Guards (in the script):** aborts (no commit, run goes red) on fetch/parse failure or a >25% day-over-day move (bad-data fuse → hand-verify); writes nothing when the value is unchanged (weekends/holidays). No API key, no secrets. If Yahoo ever blocks keyless access, candidates to evaluate next: Nasdaq's `api.nasdaq.com/api/quote/STRC/info`, or a keyed provider (would need a secret). The **other** STRC constants (rate, claim stack, reserve, holdings) stay manual on `MONTHLY_REFRESH §7.5` — they move on disclosures, not daily.
+
 ---
 
 ## Architectural change log

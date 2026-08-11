@@ -1,8 +1,8 @@
 ---
 layout: base.njk
-permalink: /strc-below-par.html
-slug: strc-below-par
-title: STRC Below Par
+permalink: /the-strc-mechanism.html
+slug: the-strc-mechanism
+title: The STRC Mechanism
 related:
   - slug: bitcoin-fixed-income
     desc: "The parent page. STRC is one of the four instruments it weighs; this page is the deeper look at what its below-par price is saying, live."
@@ -18,16 +18,16 @@ related:
     desc: "The author's own view, argued in long form — is a persistent 12% discount the arbitrage widening, or the thesis leaking? The opinion this page deliberately withholds."
     label: "Read on Substack"
 faq:
-  - q: "Why is STRC trading below par?"
-    a: "STRC is designed to trade near its $100 par, with a monthly dividend-rate mechanism meant to encourage it. A persistent discount despite that mechanism means the market is demanding a higher yield than 12% at par delivers — pricing in some mix of dividend risk, issuer stress from bitcoin's drawdown, and structural doubt. The discount reading is that the same $12 coupon on a lower price is a higher effective yield; the warning reading is that a peg which isn't pinning is itself information. This page shows both with arithmetic rather than choosing between them."
+  - q: "Why does STRC trade away from par?"
+    a: "STRC is designed to trade near its $100 par, with a monthly dividend-rate mechanism meant to encourage it. When it trades below par, the market is demanding a higher yield than the stated rate delivers at par — pricing in some mix of dividend risk, issuer stress from bitcoin's drawdown, and structural doubt; the other side of that is that the same $12 coupon on a lower price is a higher effective yield. When it trades above par, the market is accepting a yield below the stated rate — paying up for the mechanism's credibility. Either way the distance from par is information, and this page shows both readings with arithmetic rather than choosing between them. It has recently traded below par."
   - q: "Is STRC's dividend guaranteed?"
     a: "No. STRC dividends are cumulative but payable only when and if the board declares them — rate-setting is board discretion, and the published rate-bracket framework is management policy that can be modified or abandoned without shareholder consent. There are holder-friendly guardrails on the downside (cuts are capped per month, floored at term SOFR, and legally barred while any cumulative dividends remain unpaid), but none of that makes the dividend a guarantee. Full suspension is also contractually available — arrears would accrue (blocking any rate cut until paid) rather than trigger a default; the Suspended scenario in the interactive models it. The interactive lets you see the sustained, cut, and suspended cases side by side, including where the suspended case turns clearly negative."
   - q: "What does STRC's buyback program do?"
     a: "The issuer stood up a repurchase program that buys STRC below par. Retiring a $100-par share for less than $100 extinguishes a perpetual 12% obligation at a discount — at the disclosed average price that is roughly a 13.9% return on each buyback dollar, the accretion case. The same dollars are funded from outside the preferred (common-equity issuance and, conditionally, bitcoin sales), so the par defense is paid for elsewhere on the balance sheet. Both readings are computed on this page; neither is softened."
 eleventyComputed:
-  head_extras: "{% include '_pageassets/strc-below-par-head.html' %}"
-  page_styles: "{% include '_pageassets/strc-below-par.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/strc-below-par.js' %}"
+  head_extras: "{% include '_pageassets/the-strc-mechanism-head.html' %}"
+  page_styles: "{% include '_pageassets/the-strc-mechanism.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/the-strc-mechanism.js' %}"
 ---
 {#
   ══════════════════════════════════════════════════════════════════════════════
@@ -39,7 +39,7 @@ eleventyComputed:
 
     (a) Episode ONGOING  → the live numbers carry it as-is; append log rows,
         update STRC_DATA, re-verify the rate. The nav slot (Numbers → Living on
-        Bitcoin → "STRC Below Par") stays live.
+        Bitcoin → "The STRC Mechanism") stays live.
 
     (b) Episode RESOLVED (par regained, or a dividend action taken) → convert the
         page to a POST-MORTEM — "what below-par was telling you, and how it
@@ -50,7 +50,7 @@ eleventyComputed:
   The title's question must always stay answerable by the reader. Every dated
   figure carries its as-of date in copy; the status strip and coverage block
   compute live from BTC spot. The dated constants live in one STRC_DATA object at
-  the top of strc-below-par.js — refresh there, not here.
+  the top of the-strc-mechanism.js — refresh there, not here.
 
   Register: essayistic + computed, both-sides, de-tell. This page sits closest to
   the advice line of anything on the site (design §5) — no buy/sell language, no
@@ -58,10 +58,17 @@ eleventyComputed:
   ══════════════════════════════════════════════════════════════════════════════
 #}
 
+{#- Daily official close, injected from the Eleventy data file src/_data/strcClose.json,
+    which .github/workflows/strc-daily-close.yml refreshes each market day. The page
+    script reads window.STRC_CLOSE for the price + its as-of date (the DAILY freshness
+    class), distinct from STRC_DATA.asOf (the filing-sourced constants). Runs before
+    page_scripts (which base.njk appends at end of body). -#}
+<script>window.STRC_CLOSE = {{ strcClose | dump | safe }};</script>
+
 <section class="hero">
-  <h1>STRC Below Par: Discount, or <em>Warning?</em></h1>
-  <div class="hero-subtitle">A bitcoin-backed preferred stock, expected to trade near its $100 par value &mdash; yet trading below it.</div>
-  <p class="subtitle">A low price is <em>either</em> opportunity <em>or</em> cautionary information. This page shows you both readings of STRC&rsquo;s discount &mdash; with arithmetic, not adjectives &mdash; and lets you watch the contest between the yield the market demands and the balance sheet the issuer can deploy against it &mdash; live.</p>
+  <h1>The STRC <em>Mechanism</em></h1>
+  <div class="hero-subtitle">A bitcoin-backed preferred stock built to trade near its $100 par &mdash; and the monthly rate lever meant to hold it there.</div>
+  <p class="subtitle">Price away from par is information, in either direction. Below par, the same coupon is a higher effective yield &mdash; and a mechanism that isn&rsquo;t holding par is pricing a risk. Above par, the market is accepting less than the stated rate &mdash; paying for the mechanism&rsquo;s credibility. This page shows what STRC is, how the lever works, and how to read its price against par &mdash; with arithmetic, not adjectives, and no verdict.</p>
 </section>
 
 <main class="content-area">
@@ -69,13 +76,13 @@ eleventyComputed:
   {% include 'components/tool-framing.njk' %}
 
   <div class="section-intro sb-prose">
-    <p>STRC is Strategy&rsquo;s variable-rate perpetual preferred &mdash; dividends in cash, a stated design goal of trading around $100 par, and a rate the board adjusts monthly to encourage it. Today it trades below par, and that cuts two ways: the same $12 coupon on a sub-$100 price is a higher effective yield &mdash; and a mechanism built to hold the price at par that isn&rsquo;t holding it is telling you the market is pricing a risk. This page shows both readings but recommends neither. For where STRC sits among bitcoin-backed income instruments, see <a href="/bitcoin-fixed-income">Bitcoin and Fixed Income</a>, the parent page.</p>
+    <p>STRC is Strategy&rsquo;s variable-rate perpetual preferred &mdash; dividends in cash, a stated design goal of trading around $100 par, and a rate the board adjusts monthly to steer it there. That mechanism is the subject of this page: how the lever targets par, and what the price is saying whenever it sits away from par. Below par, the same $12 coupon on a sub-$100 price is a higher effective yield &mdash; and a mechanism built to hold par that isn&rsquo;t holding it is pricing a risk. Above par, the market is accepting a yield below the stated rate &mdash; paying up for the mechanism&rsquo;s credibility. This page reads both directions with arithmetic and recommends neither. For where STRC sits among bitcoin-backed income instruments, see <a href="/bitcoin-fixed-income">Bitcoin and Fixed Income</a>, the parent page.</p>
   </div>
 
   <!-- ════════ THE LIVE STATUS STRIP ════════ -->
   <section class="sb-status" aria-label="Where STRC sits right now">
     <div class="sb-status-label"><span class="sb-live-dot" id="sbLiveDot" aria-hidden="true" hidden></span>Where STRC sits right now</div>
-    <p class="sb-asof-line sb-asof-top">Price, effective yield and coverage ratios recompute live from bitcoin spot on each load; the dated constants below each carry an <span class="sb-asof-badge" id="sbAsOfBadge">as of &mdash;</span> badge.</p>
+    <p class="sb-asof-line sb-asof-top">Three freshness classes, kept distinct: the <strong>price</strong> is STRC&rsquo;s official daily close, updated automatically each market day; <strong>effective yield</strong> and the three <strong>coverage ratios</strong> recompute live from bitcoin spot on each load; the <strong>balance-sheet constants</strong> below are filing-sourced and carry an <span class="sb-asof-badge" id="sbAsOfBadge">as of &mdash;</span> badge, refreshed only on disclosures.</p>
     <div class="sb-status-grid">
       <div>
         <div class="sb-stat-cap">STRC price</div>
@@ -101,7 +108,7 @@ eleventyComputed:
     <div class="sb-ki-label">The page in three numbers</div>
     <ul class="sb-ki-list">
       <li id="sbKi1">&mdash;</li>
-      <li id="sbKi2">A discount this persistent is either extra yield or the market pricing a risk. This page examines both interpretations.</li>
+      <li id="sbKi2">Price away from par is information either way &mdash; below par, extra yield and a priced risk; above par, a yield below the stated rate. This page reads both, and chooses neither.</li>
       <li id="sbKi3">&mdash;</li>
     </ul>
   </section>
@@ -109,8 +116,8 @@ eleventyComputed:
   <!-- ════════ §B — THE BELOW-PAR ARITHMETIC + INTERACTIVE ════════ -->
   <section class="sb-section" id="arithmetic">
     <div class="sb-eyebrow">One line of math, both directions</div>
-    <h2 class="sb-h2">The below-par arithmetic</h2>
-    <p class="sb-lead">Every figure here is computed live from the price. The discount is a number; so is what closing it would be worth, and so is the case where it never closes.</p>
+    <h2 class="sb-h2">The arithmetic of price against par</h2>
+    <p class="sb-lead">Every figure here is computed live from the price. The gap to par is a number, whichever way it falls; so is what closing it would be worth, and so is the case where it never closes.</p>
 
     <div class="sb-arith-grid">
       <div class="sb-arith-cell">
@@ -227,8 +234,8 @@ eleventyComputed:
   <!-- ════════ §A — THE LEVER BOARD ════════ -->
   <section class="sb-section" id="levers">
     <div class="sb-eyebrow">The mechanism</div>
-    <h2 class="sb-h2">The levers the issuer holds against a below-par price</h2>
-    <p class="sb-lead">A peg that isn&rsquo;t pinning is information; a below-par preferred with a determined issuer is a measurable contest between the market&rsquo;s demanded yield and the issuer&rsquo;s balance sheet. The board below shows the issuer&rsquo;s side, live &mdash; four levers, each a status readout with its full log and mechanics on demand. Bitcoin&rsquo;s path sets the other side.</p>
+    <h2 class="sb-h2">The levers that steer the price toward par</h2>
+    <p class="sb-lead">A price away from par is a measurable contest between the yield the market demands and the balance sheet the issuer can deploy. The mechanism runs both ways &mdash; the rate can rise to pull a below-par price up, or ease when the price sits above par. The board below shows the issuer&rsquo;s side, live &mdash; four levers, each a status readout with its full log and mechanics on demand. Bitcoin&rsquo;s path sets the other side.</p>
 
     <div class="sb-board">
       <!-- Rate lever -->

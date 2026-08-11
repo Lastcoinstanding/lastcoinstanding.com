@@ -356,17 +356,17 @@ For each value, verify against the source listed and update in the BFI files as 
 
 If the values haven't materially changed (BTC count moved &lt;1%, mNAV moved &lt;0.1&times;, ATM status unchanged, insight prose still accurate), the only required update is the as-of date.
 
-## 7.5. STRC Below Par — the `STRC_DATA` block (`/strc-below-par.html`)
+## 7.5. The STRC Mechanism — the `STRC_DATA` block (`/the-strc-mechanism.html`)
 
-This page is **deliberately episodic** (design doc `STRC_BELOW_PAR_DESIGN.md` §7; aging-policy comment at the top of `src/strc-below-par.njk`). It examines a live episode — STRC trading below its $100 par — and the monthly refresh does more than update constants: it **decides whether the episode is still live**.
+This page is **deliberately episodic** (design doc `STRC_BELOW_PAR_DESIGN.md` §7; aging-policy comment at the top of `src/the-strc-mechanism.njk`). It examines a live episode — STRC trading below its $100 par — and the monthly refresh does more than update constants: it **decides whether the episode is still live**.
 
-All dated constants live in **one object**, `STRC_DATA`, at the top of `src/_includes/_pageassets/strc-below-par.js`. The price, effective yield, and the three coverage ratios recompute live from bitcoin spot; everything else is dated and refreshed here.
+All dated constants live in **one object**, `STRC_DATA`, at the top of `src/_includes/_pageassets/the-strc-mechanism.js`. The price, effective yield, and the three coverage ratios recompute live from bitcoin spot; everything else is dated and refreshed here.
 
 Each month:
 
 1. **Refresh `STRC_DATA`** from the latest 8-Ks / press releases (primary sources, not aggregators):
    - `asOf` — set to the refresh date. This drives every "as of" badge on the page.
-   - `price` — STRC's last close (the reader-adjustable seed in the lens).
+   - `price` — **AUTOMATED, do NOT edit by hand.** STRC's official daily close is refreshed by the `strc-daily-close` GitHub Action into `src/_data/strcClose.json` each market day (see §7.6 and `DATA_AUDIT` STRC-1). The `STRC_DATA.price` constant is only the fallback if the data file is ever absent; leave it.
    - `rateAnnualPct` + append any new `rateHistory` row (one row per change; the latest gets the "latest" badge automatically).
    - `priorMonthVWAP` — **populate this.** While `null`, the bracket dial honestly shows "populate at monthly refresh"; once set, the dial computes framework-recommended vs board-did vs posture.
    - `sharesOutstanding` — from the latest 8-K (net of buybacks). The page derives STRC notional from `sharesOutstanding × par` (single source of truth) and cross-checks the filed `claimStack.strcNotionalB`; keep both current so the console reconciliation gap stays small.
@@ -377,9 +377,16 @@ Each month:
 4. **Decide the episode state** (design §7):
    - **Ongoing** → the live numbers carry it; leave the nav entry and this block in place.
    - **Resolved** (par regained, or a dividend action taken) → convert the page to a **post-mortem**, **retire the `explorations.json` entry** (nav sunset — reachability reverts to the parent + related links), and mark this block "resolved, post-mortem" here.
-5. **GSC glance** — confirm `/strc-below-par` is still indexed (indexed-count didn't drop); the URL is in `sitemap.xml` at weekly changefreq.
+5. **GSC glance** — confirm `/the-strc-mechanism` is still indexed (indexed-count didn't drop); the URL is in `sitemap.xml` at weekly changefreq. (The old `/strc-below-par` 301s to it via `_redirects`.)
 
 `SOFR_FLOOR_PCT` (the illustrative floor for the "cut" dividend scenario in the lens) is a labelled stand-in, not a sourced constant — bump it toward the current 1-month term SOFR level when you refresh.
+
+## 7.6. STRC daily-close Action — silent-death check (`strc-daily-close`)
+
+The STRC price is now maintained by the site's first CI automation (SITE_GUIDE §42; `DATA_AUDIT` STRC-1). It is designed to fail **loudly** (a red run on fetch failure or the >25% fuse) rather than commit bad data — but a silently-broken source (Yahoo returning stale-but-valid data) or a disabled schedule would go unnoticed. **Each monthly refresh, glance at the Action's recent runs:**
+
+- **GitHub → Actions → "STRC daily close"** (or `gh run list --workflow=strc-daily-close.yml`). Confirm it has run on recent market days and that runs are green (or that a red run has a known cause). GitHub disables `schedule` triggers after ~60 days of repo inactivity — if the whole repo has gone quiet, re-enable / re-dispatch once.
+- Cross-check the on-page **"official daily close · as of <date>"** against the true last close; if the date is stale by more than a few market days, the Action has silently stopped — investigate the source (Yahoo keyless access can change) and fall back to a hand-updated `src/_data/strcClose.json` until fixed. Alternative sources are noted in `DATA_AUDIT` STRC-1.
 
 ## 8. Institutional guidance citations — How Much Bitcoin? (quarterly is fine)
 

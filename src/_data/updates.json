@@ -1,6 +1,11 @@
 [
   {
     "display": "8/10/26",
+    "page": "/the-strc-mechanism.html",
+    "summary": "Renamed and reframed: STRC Below Par is now The STRC Mechanism. Instead of taking 'below par' as its premise, the page explains what STRC is, how the board's monthly rate lever targets its $100 par, and how to read the price against par in either direction — below par, a higher effective yield and a priced risk; above par, the market accepting a yield below the stated rate, paying for the mechanism's credibility. The price is now STRC's official daily close, updated automatically each market day. Live coverage math and the both-sides, no-verdict register are unchanged. The old link redirects here."
+  },
+  {
+    "display": "8/10/26",
     "page": "/dashboard.html",
     "summary": "New: The Bitcoin Dashboard — a live, in-browser read of where bitcoin sits in its Power Law channel. Ten stats: the trend multiple and its zone, the trend price today, how long price has been below trend and the historical record, the reversion rate implied if it returns to trend at the speeds the record shows, how far behind the trend's schedule it sits, the ten-year trend hurdle, and how far below the all-time high it is. Deep links carry today's position into the tools; the site-wide channel ribbon opens it. A read of where things stand, not a signal about where they go next."
   },
@@ -27,7 +32,7 @@
   {
     "display": "7/30/26",
     "page": "/the-gallery.html",
-    "summary": "New Gallery entry — The Middle Seat: a three-panel infographic placing bitcoin (the growth engine), STRC (a bitcoin-backed income instrument trading below its $100 target), and Treasuries (the conservative baseline) on a single asset spectrum, with yields, coverage, and volatility marked to market. It's the companion graphic to the author's Substack essay, \"How Legitimate is STRC?\", now linked from the page — and the live version of every number runs at /strc-below-par."
+    "summary": "New Gallery entry — The Middle Seat: a three-panel infographic placing bitcoin (the growth engine), STRC (a bitcoin-backed income instrument trading below its $100 target), and Treasuries (the conservative baseline) on a single asset spectrum, with yields, coverage, and volatility marked to market. It's the companion graphic to the author's Substack essay, \"How Legitimate is STRC?\", now linked from the page — and the live version of every number runs at /the-strc-mechanism."
   },
   {
     "display": "7/28/26",
@@ -36,7 +41,7 @@
   },
   {
     "display": "7/28/26",
-    "page": "/strc-below-par.html",
+    "page": "/the-strc-mechanism.html",
     "summary": "New: STRC Below Par — a bitcoin-backed preferred built to trade near $100 par, trading below it. Both readings of the discount, with live coverage math, the issuer's lever board, and what a return to par would be worth at any speed. No verdict — and the sharp question it keeps returning to: if you're waiting for bitcoin to recover, why not simply own bitcoin?"
   },
   {

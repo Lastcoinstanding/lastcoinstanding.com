@@ -239,6 +239,8 @@ Captured during the merge pass, because the backlog is now large enough that the
 
 ### Financialization cluster
 
+- [ ] **MSTR, Rationalized — the treasury flywheel explained mechanically.** (JM idea, 2026-08-10.) Explain how the flywheel actually works, as a mechanism: **mNAV** (why the premium exists and what closes it), the **preferred stack** (STRD/STRF/STRK/STRC — the last is the parent structure examined on the sibling page **[[the-strc-mechanism]]** / `/the-strc-mechanism`), **leverage in a drawdown** (what forces or doesn't force selling; the no-margin-trigger point), and **dilution** (BTC-per-share accretion vs. share issuance). **Rationalize, don't advocate** — the house register: show why it works when it works, and **risks are first-class content**, not a footnote. Likely overlaps / should be reconciled with the broader **"MSTR / Strategy — the examination"** entry just below (this is the *mechanical explainer* angle of it); decide at build whether they are one page or two. Same financialization prominence fence applies (one row back from the flagship, per the cluster note above).
+
 - [ ] **MSTR / Strategy — the examination. Discharges the STRC scope fence.**
   Surfaced 2026-08-02 (JM, both batches).
   - **Why flagged:** `STRC_BELOW_PAR_DESIGN.md` §6 fences *"Not the MSTR/mNAV examination (separate backlog idea; share no more than a cross-link)"* — **but that backlog idea did not exist.** This entry creates it and closes the dangling reference.
@@ -263,7 +265,7 @@ Captured during the merge pass, because the backlog is now large enough that the
     2. **Entry-point-in-the-channel as an explicit axis** — JM's instinct that entering near the floor changes the ranking is not currently exposed anywhere.
     3. **Dramatise the short-horizon flip** the calculator already discovers but presents quietly.
   - **PRECEDENT DECISION — flag before building.** Monte Carlo has been a deliberate site-wide *no*: `RETIREMENT_CALCULATOR_DESIGN_22` §3.6 states the scenario grid *"is **not** a Monte Carlo."* Randomised risk draws would be the first breach. Worth doing — but it's a precedent, not a feature, and it should be decided consciously and then applied consistently.
-  - **Cross-links:** `/bitcoin-fixed-income` (the host), `/strc-below-par`, the retirement stress test.
+  - **Cross-links:** `/bitcoin-fixed-income` (the host), `/the-strc-mechanism`, the retirement stress test.
 
 ### Tools & suite plumbing
 
