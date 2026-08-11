@@ -115,6 +115,11 @@ Captured during the merge pass, because the backlog is now large enough that the
   - **Concept:** on canvas-heavy explorations, detect small viewports and show a dismissible one-line invitation — "this exploration rewards a bigger screen." Nudge, never nag, never gate.
   - **Implementation notes:** per-page front-matter flag (opt-in by page); appears once (dismiss persists per the no-storage constraint as best-effort — session in-memory only, acceptable to reappear per visit); zero SEO impact (content itself never hidden — mobile experience remains fully functional per the checklist QA standard).
 
+- [ ] **Light-mode toggle — dark/light theme switch, `prefers-color-scheme` default.** (JM idea, 2026-08-11.)
+  - **HONEST SIZING:** largest infra change on the books. Prerequisite is tokenizing all colors to CSS variables across every page CSS + JS chart configs, then a *designed* (not inverted) light palette, then permanent 2-theme QA on every future page.
+  - **Do NOT build speculatively** — trigger is real reader feedback or a partner conversation that asks.
+  - **Interim:** (a) new/touched pages use CSS color variables from now on (add one line to NEW_PAGE_CHECKLIST §CSS), which incrementally retires the prerequisite; (b) the trad-fi palatability need is served per-engagement (artifacts re-skinned to partner palettes — see Fidelity mock).
+
 ### Power Law cluster
 
 - [x] **Power Law v2 — a consolidated pass on `/the-power-law`.** Shipped as one pass; sub-items below are kept as the build record.

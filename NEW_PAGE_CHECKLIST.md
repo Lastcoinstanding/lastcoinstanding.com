@@ -44,6 +44,17 @@ One check is NOT assumed and must be made explicitly before shipping:
   canvastext on the browser's light canvas — washed-out hero, black/white
   var-based borders. Bit the Bitcoin Hurdle Rate page (Aug 2026).
 
+- [ ] **Every colour routes through a CSS variable — no hardcoded hex/rgb in
+  page CSS or JS chart configs.** Beyond the base `:root` set above, any new
+  colour a page introduces gets its own `--var` and is referenced by it
+  (including colours passed into JS chart/canvas configs). This is the
+  incremental path that retires the light-mode toggle's tokenize-everything
+  prerequisite one page at a time, so we never owe a site-wide sweep later.
+  Rationale + trigger fence: see the **Light-mode toggle** entry in
+  PAGE_IDEAS_BACKLOG (Site & platform). Do not build a light palette
+  speculatively — this line only asks that colours be *tokenized*, not that a
+  second theme exist.
+
 ## 2. Eleventy/build wiring
 
 Verify the page's front-matter has the four expected fields:
