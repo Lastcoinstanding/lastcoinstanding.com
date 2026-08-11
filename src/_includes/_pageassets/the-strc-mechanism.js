@@ -1,5 +1,5 @@
 /* =============================================================
-   STRC Below Par — page script
+   The STRC Mechanism — page script
 
    A condition-neutral lens on a bitcoin-backed yield instrument
    against its $100 par: how the monthly rate lever targets par, and
