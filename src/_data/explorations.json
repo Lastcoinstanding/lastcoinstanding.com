@@ -437,9 +437,9 @@
     }
   },
   {
-    "_comment": "STRC Below Par — episodic sub-page of /bitcoin-fixed-income examining STRC trading below its $100 par. category numbers / group 'Living on Bitcoin' (nested under the parent, per design doc §2 — financialization stays one row back, not a top-level flagship). interactive: true (lever board, below-par lens, live coverage). NO calculator_tile by design (prominence control, design §2 — not a personal-decision tool; posture like discount-or-premium / bull-and-bear-cycles). Deliberately episodic with a nav sunset rule (design §7 / aging-policy comment in the .njk): when the monthly refresh declares the episode resolved and the page converts to post-mortem, retire this registry entry and let reachability revert to the parent + related links.",
-    "slug": "strc-below-par",
-    "title": "STRC Below Par",
+    "_comment": "The STRC Mechanism (renamed 2026-08-10 from 'STRC Below Par', slug was /strc-below-par — 301 in _redirects) — condition-neutral examination of STRC against its $100 par, sub-page of /bitcoin-fixed-income. category numbers / group 'Living on Bitcoin' (nested under the parent, per design doc §2 — financialization stays one row back, not a top-level flagship). interactive: true (lever board, par lens, live coverage, daily official-close updater). NO calculator_tile by design (prominence control, design §2 — not a personal-decision tool; posture like discount-or-premium / bull-and-bear-cycles). Deliberately episodic with a nav sunset rule (design §7 / aging-policy comment in the .njk): when the monthly refresh declares the episode resolved, retire this registry entry and let reachability revert to the parent + related links.",
+    "slug": "the-strc-mechanism",
+    "title": "The STRC Mechanism",
     "category": "numbers",
     "group": "Living on Bitcoin",
     "interactive": true

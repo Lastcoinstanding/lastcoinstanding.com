@@ -1,8 +1,8 @@
 ---
 layout: base.njk
-permalink: /strc-below-par.html
-slug: strc-below-par
-title: STRC Below Par
+permalink: /the-strc-mechanism.html
+slug: the-strc-mechanism
+title: The STRC Mechanism
 related:
   - slug: bitcoin-fixed-income
     desc: "The parent page. STRC is one of the four instruments it weighs; this page is the deeper look at what its below-par price is saying, live."
@@ -25,9 +25,9 @@ faq:
   - q: "What does STRC's buyback program do?"
     a: "The issuer stood up a repurchase program that buys STRC below par. Retiring a $100-par share for less than $100 extinguishes a perpetual 12% obligation at a discount — at the disclosed average price that is roughly a 13.9% return on each buyback dollar, the accretion case. The same dollars are funded from outside the preferred (common-equity issuance and, conditionally, bitcoin sales), so the par defense is paid for elsewhere on the balance sheet. Both readings are computed on this page; neither is softened."
 eleventyComputed:
-  head_extras: "{% include '_pageassets/strc-below-par-head.html' %}"
-  page_styles: "{% include '_pageassets/strc-below-par.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/strc-below-par.js' %}"
+  head_extras: "{% include '_pageassets/the-strc-mechanism-head.html' %}"
+  page_styles: "{% include '_pageassets/the-strc-mechanism.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/the-strc-mechanism.js' %}"
 ---
 {#
   ══════════════════════════════════════════════════════════════════════════════
@@ -50,7 +50,7 @@ eleventyComputed:
   The title's question must always stay answerable by the reader. Every dated
   figure carries its as-of date in copy; the status strip and coverage block
   compute live from BTC spot. The dated constants live in one STRC_DATA object at
-  the top of strc-below-par.js — refresh there, not here.
+  the top of the-strc-mechanism.js — refresh there, not here.
 
   Register: essayistic + computed, both-sides, de-tell. This page sits closest to
   the advice line of anything on the site (design §5) — no buy/sell language, no

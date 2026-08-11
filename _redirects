@@ -1,0 +1,4 @@
+# 301 rename 2026-08-10: /strc-below-par → /the-strc-mechanism (STRC Below Par → The STRC Mechanism).
+# Cloudflare Pages preserves query strings on static redirects, so ?h=/&dv=/&ov=/&p= scenario params survive.
+/strc-below-par.html    /the-strc-mechanism    301
+/strc-below-par         /the-strc-mechanism    301

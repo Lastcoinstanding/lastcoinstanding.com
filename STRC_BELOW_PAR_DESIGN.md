@@ -1,5 +1,8 @@
 # Design Doc — STRC Below Par: Discount, or Warning?
 
+> **RENAMED 2026-08-10 → "The STRC Mechanism" (slug `/the-strc-mechanism`; old `/strc-below-par` 301s via `_redirects`).** The page was reframed **condition-neutral**: it now explains the mechanism and reads price against par in *either* direction (below par: higher effective yield *and* a priced risk; above par: the market accepting less than the stated rate — the mechanism's credibility being paid for), rather than taking "below par" as its premise. The page also gained the site's **first CI automation** — a daily official-close updater (see SITE_GUIDE §42). This filename is kept so the design history stays findable; the section numbers and the below-par framing below are the original 2026-07-28 record, not the current page. Current page copy and structure live in `src/the-strc-mechanism.njk`; current documentation is SITE_GUIDE §42.
+
+
 _Created 2026-07-28. Promoted from the backlog's STRC deep-dive block (§ "STRC deep-dive," incl. JM's
 below-par argument of 2026-07-21) and OPEN_ITEMS top-10 #9 ("timely while STRC ~$83"). House workflow:
 this doc → JM review → Claude Code build prompt → JM review on preview → merge._

@@ -8,7 +8,7 @@ eleventyComputed:
   page_styles:  "{% include '_pageassets/bitcoin-fixed-income.css' %}"
   page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}{% include '_pageassets/bitcoin-fixed-income.js' %}"
 related:
-  - slug: strc-below-par
+  - slug: the-strc-mechanism
     desc: "The deeper look at one instrument on this page. STRC now trades below its $100 par — what its discount is saying, tracked live, with the coverage math recomputed from the current balance sheet."
   - slug: the-bitcoin-migration
     desc: "The structural argument for why conventional fixed income destroys purchasing power — the foundation this page rests on."
@@ -358,7 +358,7 @@ related:
 
     <p class="prose">STRC sits in the middle of the preferred stack. Above it: $7.98 billion of senior claims (debt and STRF). Below it: roughly $35.6 billion of subordinate capital absorbing any first losses. <strong>At current bitcoin prices, STRC is over-collateralized at the tranche level — bitcoin would need to fall to approximately $33,000 (a ~47% drawdown from current levels) before STRC's principal coverage begins to erode, and to approximately $21,000 (~67% drawdown) before STRC could face partial impairment in a liquidation scenario.</strong></p>
 
-    <p class="prose">Those threshold figures are a Q1-2026 snapshot and predate the mid-2026 bitcoin sales and the buyback program. <a href="/strc-below-par">STRC Below Par</a> recomputes the coverage — three labelled ratios and their bitcoin-price breakevens — live from current spot and the current claim stack, and examines what STRC&rsquo;s below-par price is telling the market in the first place.</p>
+    <p class="prose">Those threshold figures are a Q1-2026 snapshot and predate the mid-2026 bitcoin sales and the buyback program. <a href="/the-strc-mechanism">The STRC Mechanism</a> recomputes the coverage — three labelled ratios and their bitcoin-price breakevens — live from current spot and the current claim stack, and examines what STRC&rsquo;s below-par price is telling the market in the first place.</p>
 
     <p class="prose">Two structural features of the senior debt above STRC are worth flagging because they're meaningfully different from what makes leveraged-asset preferreds typically fragile in stress. <strong>The $6.7 billion in senior debt is unsecured convertible notes with no margin covenants</strong> — creditors cannot force Strategy to sell its bitcoin no matter how far the price falls. And the <strong>weighted-average coupon on that debt is 0.42%</strong>, with cash interest of roughly $35 million annually. The senior tranche is patient capital with a trivial cash burden — it cannot trigger forced action, and it leaves nearly the entire USD reserve available to support preferred dividends.</p>
 
@@ -756,7 +756,7 @@ related:
 
     <p class="prose">The dividends are cumulative — meaning unpaid dividends accrue and must be paid before common shareholders see anything — but they are also discretionary. The board can skip, reduce, or delay payments without triggering a legal default, an acceleration clause, or a creditor claim. If STRC falls heavily below par and stays there, Strategy's management could in principle stop aggressively defending the $100 par target, cut the rate to preserve cash, and let the shares trade at a permanent discount. Holders who bought treating STRC as a stable income instrument would be left with a depreciated principal, a lower-than-advertised yield, and no maturity date that compels the company to make them whole.</p>
 
-    <p class="prose">This is no longer only hypothetical: STRC now trades below par. <a href="/strc-below-par">STRC Below Par</a> takes up that live episode directly — the discount reading and the warning reading side by side, the issuer&rsquo;s rate, supply, and buyback levers tracked as they move, and what a return to par would (and wouldn&rsquo;t) be worth.</p>
+    <p class="prose">This is no longer only hypothetical: STRC now trades below par. <a href="/the-strc-mechanism">The STRC Mechanism</a> takes up that live episode directly — the discount reading and the warning reading side by side, the issuer&rsquo;s rate, supply, and buyback levers tracked as they move, and what a return to par would (and wouldn&rsquo;t) be worth.</p>
 
     <p class="prose">The instruments' stability is a function of issuer strategy, not contractual protection. There is, however, a meaningful counter-consideration: <strong>Strategy's reputational and strategic incentives are arguably aligned with maintaining instrument health beyond contractual obligation</strong>, because skipping a dividend would destroy the brand value that makes future preferred issuance possible. The instrument's <em>raison d'être</em> is its near-par stability; abandoning that destroys the franchise. Rational self-interest may discipline issuer behavior that the contract does not. But rational self-interest is not a guarantee — changes in management, strategy, or market context can move the calculus, and holders should not rely on it as a hard backstop.</p>
 

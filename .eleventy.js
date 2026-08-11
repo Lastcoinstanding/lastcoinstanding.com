@@ -97,6 +97,7 @@ module.exports = function (eleventyConfig) {
   // Lightning Address endpoint — Cloudflare Pages serves .well-known files; _headers sets Content-Type
   eleventyConfig.addPassthroughCopy({ '.well-known': '.well-known' });
   eleventyConfig.addPassthroughCopy({ '_headers': '_headers' });
+  eleventyConfig.addPassthroughCopy({ '_redirects': '_redirects' });
 
   // Sort helper for the /calculators page (src/calculators.njk).
   // Sorts an explorations.json array by calculator_tile.position ascending.
