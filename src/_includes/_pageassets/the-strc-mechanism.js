@@ -1,10 +1,12 @@
 /* =============================================================
    STRC Below Par — page script
 
-   The two-sided lens applied to a bitcoin-backed yield instrument
-   against its $100 par. The discount reading and the warning reading
-   are the same arithmetic; the page shows both, computes what it can,
-   and never renders a verdict.
+   A condition-neutral lens on a bitcoin-backed yield instrument
+   against its $100 par: how the monthly rate lever targets par, and
+   how to read the price against par in either direction (below par:
+   higher effective yield and a priced risk; above par: a yield below
+   the stated rate — the mechanism's credibility being paid for). The
+   page shows both, computes what it can, and never renders a verdict.
 
    Data architecture — two freshness classes (design doc §data):
      • LIVE-COMPUTED from bitcoin spot: the three coverage ratios and
@@ -359,7 +361,7 @@
       + ' of coupon collected: &asymp; <strong>' + signPct1(parHold12) + '</strong> total return.');
     setHTML('sbArithProse', p < PAR
       ? 'The coupon is real; at this price the mark-to-market has all but consumed a year of it. A buyer at par a year ago who marks to today is at <strong>' + signPct1(parHold12) + '</strong> total return despite collecting the full coupon throughout &mdash; the discount reading and the warning reading, in one number. The price of that year: recovering today&rsquo;s $' + (PAR - p).toFixed(2) + ' mark through coupon alone would take roughly another <strong>' + dm.toFixed(1) + ' months</strong> &mdash; the entry yield at par looked better than it proved.'
-      : 'At or above par, the pull-to-par works in reverse: a return toward par from here would be a capital loss, and the arithmetic below shows it.');
+      : 'At or above par, the reading flips: the market is accepting a yield below the stated rate &mdash; paying up for the mechanism&rsquo;s credibility &mdash; and a return toward par from here would be a capital loss, which the arithmetic below shows.');
   }
 
   // ═══════════════════════════════════════════════════════════════
