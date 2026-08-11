@@ -1,0 +1,50 @@
+name: STRC daily close
+
+# ────────────────────────────────────────────────────────────────────────────
+# The site's FIRST CI data automation. Fetches STRC's official daily close and
+# commits src/_data/strcClose.json, which /the-strc-mechanism reads at runtime
+# ("last close $XX.XX · as of <date>"). Logic + guards: scripts/update-strc-close.mjs.
+# Full record: SITE_GUIDE §42; source/method: DATA_AUDIT ("STRC daily close").
+# ────────────────────────────────────────────────────────────────────────────
+
+on:
+  schedule:
+    # 22:30 UTC on US market weekdays. The US close is 20:00 UTC (EDT, summer) /
+    # 21:00 UTC (EST, winter); cron is fixed UTC and does NOT follow US DST, so
+    # this fires ~2.5h after close in summer and ~1.5h in winter — comfortably
+    # post-close either way, so no DST handling is needed. (US market holidays
+    # that fall on a weekday just return the prior close → the script writes
+    # nothing → no commit.)
+    - cron: '30 22 * * 1-5'
+  workflow_dispatch: {}
+
+# Data-only commits to ONE tracked file. This is the single sanctioned exception
+# to the "JM merges everything" rule (SITE_GUIDE §0 / §42), scoped to
+# src/_data/strcClose.json and guarded by the >25% day-over-day fuse in the
+# script. No new secrets — the default GITHUB_TOKEN with contents:write.
+permissions:
+  contents: write
+
+concurrency:
+  group: strc-daily-close
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Fetch official close + apply guards + write data file
+        id: fetch
+        run: node scripts/update-strc-close.mjs
+      - name: Commit the new close (data-only)
+        if: steps.fetch.outputs.changed == 'true'
+        run: |
+          git config user.name "strc-close-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/_data/strcClose.json
+          git commit -m "data(strc): close ${{ steps.fetch.outputs.close }} as of ${{ steps.fetch.outputs.asof }}"
+          git push

@@ -58,6 +58,13 @@ eleventyComputed:
   ══════════════════════════════════════════════════════════════════════════════
 #}
 
+{#- Daily official close, injected from the Eleventy data file src/_data/strcClose.json,
+    which .github/workflows/strc-daily-close.yml refreshes each market day. The page
+    script reads window.STRC_CLOSE for the price + its as-of date (the DAILY freshness
+    class), distinct from STRC_DATA.asOf (the filing-sourced constants). Runs before
+    page_scripts (which base.njk appends at end of body). -#}
+<script>window.STRC_CLOSE = {{ strcClose | dump | safe }};</script>
+
 <section class="hero">
   <h1>The STRC <em>Mechanism</em></h1>
   <div class="hero-subtitle">A bitcoin-backed preferred stock built to trade near its $100 par &mdash; and the monthly rate lever meant to hold it there.</div>
@@ -75,7 +82,7 @@ eleventyComputed:
   <!-- ════════ THE LIVE STATUS STRIP ════════ -->
   <section class="sb-status" aria-label="Where STRC sits right now">
     <div class="sb-status-label"><span class="sb-live-dot" id="sbLiveDot" aria-hidden="true" hidden></span>Where STRC sits right now</div>
-    <p class="sb-asof-line sb-asof-top">Price, effective yield and coverage ratios recompute live from bitcoin spot on each load; the dated constants below each carry an <span class="sb-asof-badge" id="sbAsOfBadge">as of &mdash;</span> badge.</p>
+    <p class="sb-asof-line sb-asof-top">Three freshness classes, kept distinct: the <strong>price</strong> is STRC&rsquo;s official daily close, updated automatically each market day; <strong>effective yield</strong> and the three <strong>coverage ratios</strong> recompute live from bitcoin spot on each load; the <strong>balance-sheet constants</strong> below are filing-sourced and carry an <span class="sb-asof-badge" id="sbAsOfBadge">as of &mdash;</span> badge, refreshed only on disclosures.</p>
     <div class="sb-status-grid">
       <div>
         <div class="sb-stat-cap">STRC price</div>

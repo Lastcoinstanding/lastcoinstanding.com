@@ -74,13 +74,25 @@
     btcBreakevenArrPct: 2.3
   };
 
+  // ── DAILY OFFICIAL CLOSE — the daily freshness class, distinct from STRC_DATA.asOf
+  //    (the filing-sourced constants, refreshed monthly). Injected as window.STRC_CLOSE
+  //    from the Eleventy data file src/_data/strcClose.json, which the strc-daily-close
+  //    GitHub Action refreshes each market day (scripts/update-strc-close.mjs). It
+  //    overrides the price seed; the STRC_DATA.price constant remains the fallback if
+  //    the data file is ever absent, so the page never renders blank. ──
+  var STRC_CLOSE = (typeof window !== 'undefined' && window.STRC_CLOSE) || null;
+  if (STRC_CLOSE && typeof STRC_CLOSE.close === 'number' && STRC_CLOSE.close > 0) STRC_DATA.price = STRC_CLOSE.close;
+  STRC_DATA.closeAsOf = (STRC_CLOSE && STRC_CLOSE.asOfDate) || null;
+  // "2026-08-10" → "Aug 10, 2026" (UTC noon avoids any TZ date-rollover).
+  function fmtCloseDate(iso) { try { return new Date(iso + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); } catch (e) { return iso || 'recent'; } }
+
   // ── Record-strip anchors (design §E): known points only, drawn as a labeled
   //    schematic ("shape, not tick data"). Never a fabricated tick series. ──
   var RECORD_ANCHORS = [
     { label: "Issuance", date: "Jul 2025", price: 100.00, note: "IPO near par" },
     { label: "ATH",      date: "Jan 13, 2026", price: 100.42, note: "All-time high" },
     { label: "ATL",      date: "Jun 26, 2026", price: 71.25, note: "All-time low, with bitcoin's drawdown" },
-    { label: "Today",    date: "Jul 27, 2026", price: 88.32, note: "Last close" }
+    { label: "Today",    date: (STRC_DATA.closeAsOf ? fmtCloseDate(STRC_DATA.closeAsOf) : "recent"), price: STRC_DATA.price, note: "Last close" }
   ];
   var RECORD_EVENTS = [
     { at: 0.03, txt: "9.00% at IPO" },
@@ -206,6 +218,16 @@
   function renderStatus() {
     var p = strcPrice();
     setText('sbPrice', money2(p));
+    // Price sub-line — carries the DAILY-close provenance (its own freshness class),
+    // and stays honest when the reader overrides the price in the lens.
+    if (state.priceOverride != null) {
+      setHTML('sbPriceSub', 'A price you&rsquo;re modelling &mdash; the official daily close is <strong>' + money2(STRC_DATA.price) + '</strong>'
+        + (STRC_DATA.closeAsOf ? ' as of ' + fmtCloseDate(STRC_DATA.closeAsOf) : '') + '. Reset in the lens.');
+    } else {
+      setHTML('sbPriceSub', 'Official daily close'
+        + (STRC_DATA.closeAsOf ? ' &middot; as of <strong>' + fmtCloseDate(STRC_DATA.closeAsOf) + '</strong>' : '')
+        + ' &middot; updated automatically each market day. Adjustable in the lens below.');
+    }
     setText('sbCoupon', pct2(RATE) + ' · $' + COUPON.toFixed(0) + '/yr');
     setText('sbYield', pct2(effYield(p)));
     setHTML('sbYieldSub', 'The $' + COUPON.toFixed(0) + ' coupon on a $' + p.toFixed(2)
