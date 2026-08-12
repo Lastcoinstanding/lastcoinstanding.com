@@ -1787,6 +1787,8 @@ _Last updated: June 2026. Update this document as editorial decisions crystalliz
 
 **Added June 2026.** The Numbers and The Arguments dropdowns are organized into named **sub-groups** under non-clickable sub-header labels, rather than one flat list each. Foundations stays flat (six items). The grouping renders in both the desktop dropdowns and the mobile overlay, and the footer continues to list each bucket flat (in `explorations.json` array order, which now follows the grouped order so the footer reads sensibly too).
 
+**Updated August 2026 — The Numbers is now a mega-panel; the mobile overlay is a grouped accordion; triggers are disclosure buttons.** See *§30.1 The Numbers mega-panel + mobile accordion* below. The data model in *How it works* is unchanged (still `category` + `group`, same arrays, same footgun); only the desktop layout of The Numbers, the mobile shell, and the trigger semantics changed.
+
 ### How it works
 
 - **Data.** Each `numbers`/`arguments` entry in `src/_data/explorations.json` carries a **`group`** field (a string). Foundations and hub entries have no `group`. The `group` value must match — character-for-character, raw `&` not `&amp;` — one of the group names listed in `base.njk` (below), or that page silently drops out of its dropdown.
@@ -1795,14 +1797,14 @@ _Last updated: June 2026. Update this document as editorial decisions crystalliz
 
 ### The groups (as of June 2026)
 
-**The Numbers** (15 items):
+**The Numbers** (26 items, four columns — the growth that drove the mega-panel; canonical source is `explorations.json`):
 
-| Group | Pages |
+| Group (= panel column) | Pages |
 |---|---|
-| Models & Trends | Bitcoin & The Power Law · Bitcoin & Metcalfe's Law · The Bitcoin Doubling Ladder · The Bitcoin Heatmap |
-| Bitcoin vs. Other Assets | Bitcoin vs. The Stock Market · BTC vs. Real Estate · BTC vs. Rental Property |
-| Positioning & Strategy | The Bitcoin Retirement · Disciplined Rebalancing · How Much Bitcoin? · The Bitcoin Horizon |
-| Living on Bitcoin | Borrowing Against Your Stack · Bitcoin-Backed Mortgages · Living on Bitcoin · Bitcoin and Fixed Income |
+| Models & Trends (6) | Bitcoin & The Power Law · Bitcoin & Metcalfe's Law · The Bitcoin Doubling Ladder · The Bitcoin Heatmap · Bitcoin Bull & Bear Cycles · Discount, or Premium? |
+| Bitcoin vs. Other Assets (3) | Bitcoin vs. The Stock Market · BTC vs. Real Estate · BTC vs. Rental Property |
+| Positioning & Strategy (12) | Lump Sum or Ladder In? · Your Bitcoin Deployment Plan · Wait, or Deploy Now? · The Bitcoin Retirement · The Bitcoin Retirement Stress Test · Bitcoin Portfolio Allocation · Disciplined Rebalancing · The Bitcoin Hurdle Rate · How Much Bitcoin? · How Much Cash? · What Daily Conviction Bought · The Bitcoin Horizon |
+| Living on Bitcoin (5) | Borrowing Against Your Stack · Bitcoin-Backed Mortgages · Living on Bitcoin · Bitcoin and Fixed Income · The STRC Mechanism |
 
 **The Arguments** (9 items):
 
@@ -1821,7 +1823,17 @@ _Last updated: June 2026. Update this document as editorial decisions crystalliz
 
 ### Adding a new page
 
-Set its `category` (`numbers`/`arguments`) **and** a `group` matching one of the arrays in `base.njk`. To introduce a *new* group, add the name to the relevant array in `base.njk` (in the position you want the sub-header to appear) and tag the page(s) with it. Place the JSON entry among its group-mates so item order reads correctly.
+Set its `category` (`numbers`/`arguments`) **and** a `group` matching one of the arrays in `base.njk`. To introduce a *new* group, add the name to the relevant array in `base.njk` (in the position you want the sub-header to appear) and tag the page(s) with it. Place the JSON entry among its group-mates so item order reads correctly. **A new Numbers page appears in the mega-panel automatically** — it lands in its group's column with no layout work; a **new** Numbers *group* becomes a new column (the panel is `flex`, so watch the total column width at ~1024px if a fifth group is ever added).
+
+### 30.1 The Numbers mega-panel + mobile accordion (August 2026)
+
+Built per `NAV_MEGA_MENU_DESIGN.md` (approved). At 26 items the single scrolling column had ~half its tools below the fold; the fix goes horizontal.
+
+- **Desktop — The Numbers only.** The trigger opens a **mega-panel**: the four `numbersGroups` render as **labeled columns** (`.nav-mega-cols` flex row, `.nav-mega-col`), and **Positioning & Strategy (12)** balances into **two sub-columns** under one label via CSS multicol (`.nav-mega-split { column-count: 2 }` — auto-balances, so it stays even as the group grows). All 26 are visible **without scroll at 1280px**. Badges (`freshnessBadge`), the interactive `•` marker, and the legend are unchanged (same item loop). **Foundations and The Arguments keep their single-column dropdowns.**
+- **Anchoring / override-safety.** The Numbers host dropdown is `position: static` (`.nav-mega-host`) so the panel anchors to the sticky `.site-nav` and right-aligns with **`left:16 + right:16 + margin-left:auto + max-width:1040 + box-sizing:border-box`** — percentage-based, so it excludes the scrollbar and **cannot overflow either edge at any width** (an earlier fixed-width + `right` version clipped the left column at 1024px; this is the fix). New `.nav-mega*` / `.m-acc*` classes are used precisely because **per-page CSS restyles `.nav-dropdown-menu a.active` and `.nav-dropdown-btn`** (e.g. Bitcoin vs. Real Estate's `position:fixed` nav) — the panel reuses `.nav-dropdown-menu` only for the show mechanism, and no page touches menu *layout*. Verified un-sheared on the BvRE calc-tier page.
+- **Mobile — grouped accordion.** The overlay's three category buckets (`.m-acc`) collapse; **the current page's bucket is pre-expanded server-side** (`open` class + `aria-expanded="true"` from `currentCat`). Group sub-labels stay inside; Gallery/Calculators/About stay flat.
+- **Disclosure a11y (WAI-ARIA APG).** All three triggers are now `<button aria-expanded aria-controls>` (they never navigated — no bucket landing page). JS keeps `aria-expanded` in sync on click **and** hover; **Escape closes and returns focus to the trigger**; `:focus-visible` rings are amber; the hamburger gained `aria-expanded`/`aria-controls`. Hover-open is retained on pointer devices; click/keyboard is the accessible path. No `role="menu"` — this is the disclosure pattern, not an application menu.
+- **No CLS.** The panel is `position:absolute` (out of flow), so opening it shifts no page content (verified: body height unchanged on open).
 
 ## 31. "Copy chart as image" button (site-wide)
 

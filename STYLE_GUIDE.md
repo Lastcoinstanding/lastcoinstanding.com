@@ -700,7 +700,7 @@ Migration's first paragraph is the canonical case. Use only in essay-mode contex
 
 The site nav (hamburger, mobile overlay, dropdown, brand) is rendered by base.njk and styled by `<style id="canonical-nav-css">` in the same file. Centralized in commit `9937cc5` (Phase 1) with per-page CSS reduced to deliberate-divergence overrides only across `67d7bd8`, `0e69ec6`, and `1780bda`.
 
-When introducing a new page, **don't write nav CSS unless something needs to deliberately diverge.** The canonical block covers structural and typographic properties for `.site-nav`, `.brand`, `.nav-links`, `.hamburger`, `.mobile-overlay`, and `.nav-dropdown*`. Source order: canonical loads BEFORE page_styles in the head, so per-page CSS naturally overrides canonical when needed.
+When introducing a new page, **don't write nav CSS unless something needs to deliberately diverge.** The canonical block covers structural and typographic properties for `.site-nav`, `.brand`, `.nav-links`, `.hamburger`, `.mobile-overlay`, `.nav-dropdown*`, and (added August 2026) the mega-panel / accordion tokens: `.nav-dropdown-btn` (now a `<button>`), `.nav-caret`, `.nav-mega-host`, `.nav-dropdown-menu.nav-mega`, `.nav-mega-cols`, `.nav-mega-col`, `.nav-mega-col--wide`, `.nav-mega-split`, and the mobile accordion `.m-acc` / `.m-acc-btn` / `.m-acc-panel` / `.m-acc-caret`. These are **new class names precisely so per-page overrides can't shear them** — page CSS only ever restyles `.active` colours and `.nav-dropdown-btn`. Source order: canonical loads BEFORE page_styles in the head, so per-page CSS naturally overrides canonical when needed. Full framework: SITE_GUIDE §30.1.
 
 What stays per-page when needed:
 
@@ -749,9 +749,9 @@ A fourth top-level link (Calculators) leads to the standalone calculator constel
 
 **Footer:** mirrors the bucket structure. Four columns on desktop (Foundations, The Arguments, The Numbers, Site), two on mobile. Each column has a `.footer-nav-label` header and the relevant entries below. The Site column has just About for now; future site-utility pages (e.g. methodology, FAQ) would join it.
 
-**Mobile overlay:** the hamburger overlay shows three labeled sections plus About at the bottom. Section labels use `.mobile-section-label` (small caps, dim color) to separate without making each item heavier.
+**Mobile overlay (August 2026 — grouped accordion):** the hamburger overlay's three category buckets are collapsible `.m-acc` sections; the current page's bucket is pre-expanded server-side (`open` + `aria-expanded="true"` from `currentCat`). Group sub-labels (`.mobile-section-sublabel`) stay inside the panels; Gallery/Calculators/About stay flat below. (Previously all items rendered flat and expanded.)
 
-**Multi-dropdown JS:** the canonical nav JS in `base.njk` was updated to handle multiple dropdowns. Each dropdown's button toggles its own dropdown (closing the others first); click-outside closes all. The previous single-dropdown `querySelector` was replaced with iteration over `querySelectorAll('.nav-dropdown')`. Hover-open still works on desktop via CSS; click-toggle is for mobile/touch.
+**Nav JS — disclosure pattern (August 2026):** the canonical nav JS in `base.njk` iterates `querySelectorAll('.nav-dropdown')`; each **`<button>` trigger** toggles its own dropdown (closing the others), and the JS keeps `aria-expanded` in sync on **click and hover**. **Escape closes and returns focus to the trigger** (WAI-ARIA APG). Click-outside closes all; hover-open is retained on pointer devices via CSS. The hamburger carries `aria-expanded`/`aria-controls`; the accordion buttons toggle their own section's `aria-expanded`. No `role="menu"` — this is the disclosure pattern, not an application menu. Rationale + research: `NAV_MEGA_MENU_DESIGN.md` §2/§4.4.
 
 **Adding a new page:** set `category` and `interactive` in the explorations data. The page automatically appears in the right dropdown with the right marker. If the page is also a calculator that should appear on /calculators, add a `calculator_tile` block per §6.9.1. No template changes required for either nav or /calculators.
 
