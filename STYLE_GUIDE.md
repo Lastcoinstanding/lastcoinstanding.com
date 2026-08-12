@@ -2026,6 +2026,16 @@ block, filled by `shared/channel-ribbon.js`. Full framework: SITE_GUIDE §40.1.
 - `.cr-mult-value` / `.cr-trend-word` / `.cr-zone` / `.cr-price` / `.cr-sep` /
   `.cr-register` — the value spans. `.cr-trend-word` is `display:none` ≤480px
   (the documented 375px degradation: drop "trend", keep the `×`).
+- `.cr-primary` / `.cr-cta` / `.cr-secondary` / `.cr-sep-secondary` — the
+  dual-link tokens (added 2026-08-11). The strip is a **container**, not a single
+  anchor: `.cr-primary` is the data + `.cr-cta` ("see the dashboard →", orange)
+  link to `/dashboard`; `.cr-secondary` ("the Power Law →", dim grey / no orange /
+  lighter weight) links to the foundation page. `--cr-gap` (a custom property on
+  `.channel-ribbon`, inherited by `.cr-primary`) carries the one gap value across
+  breakpoints. Hover brightening is scoped to `.cr-primary`/`.cr-secondary`, not
+  the whole strip. `.cr-cta`, `.cr-secondary` and their separators are
+  `display:none` ≤480px (mobile keeps the dashboard link only). Framework +
+  self-link suppression: SITE_GUIDE §40.1.
 
 **Reuse, not fork:** the numbers come from the shared `power-law-data.js`
 (`plPrice`/`positionLabel`/`fetchTodayPrice`); only the chrome is new. **When to

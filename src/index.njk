@@ -34,15 +34,22 @@ eleventyComputed:
 
 <!-- BITCOIN TICKER STRIP — price + ×trend + state, fed by shared/power-law-data.js -->
 <section class="bitcoin-ticker" aria-label="Bitcoin price relative to the Power Law channel">
-    <a class="ticker-inner" href="/the-power-law.html#channel">
-        <span class="ticker-glyph" aria-hidden="true">&#8383;</span>
-        <span class="ticker-price" id="tickerPrice">&mdash;</span>
-        <span class="ticker-sep" aria-hidden="true">&middot;</span>
-        <span class="ticker-multiple" id="tickerMultiple">&mdash;</span>
-        <span class="ticker-sep" aria-hidden="true">&middot;</span>
-        <span class="ticker-state" id="tickerState">&mdash;</span>
-        <span class="ticker-cta">see the channel &rarr;</span>
-    </a>
+    {#- Two-link pattern, aligned with the site-wide ribbon (2026-08-11): the data
+        + primary CTA link to the dashboard (the read); a visually-secondary link
+        points to the Power Law (the foundation). Data content is unchanged. -#}
+    <div class="ticker-inner">
+        <a class="ticker-primary" href="/dashboard.html">
+            <span class="ticker-glyph" aria-hidden="true">&#8383;</span>
+            <span class="ticker-price" id="tickerPrice">&mdash;</span>
+            <span class="ticker-sep" aria-hidden="true">&middot;</span>
+            <span class="ticker-multiple" id="tickerMultiple">&mdash;</span>
+            <span class="ticker-sep" aria-hidden="true">&middot;</span>
+            <span class="ticker-state" id="tickerState">&mdash;</span>
+            <span class="ticker-cta">see the dashboard &rarr;</span>
+        </a>
+        <span class="ticker-sep ticker-sep-secondary" aria-hidden="true">&middot;</span>
+        <a class="ticker-secondary" href="/the-power-law.html#channel">the Power Law &rarr;</a>
+    </div>
 </section>
 
 
