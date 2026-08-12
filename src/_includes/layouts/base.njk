@@ -99,8 +99,39 @@ a:not([class]):hover { text-decoration-color: #e09422; }
 .mobile-overlay a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
 .mobile-overlay a.active { color: #e09422; background: rgba(247,147,26,0.08); font-weight: 600; }
 .nav-dropdown { position: relative; display: inline-block; }
-.nav-dropdown-btn { cursor: pointer; user-select: none; }
+/* Trigger is a real <button> (disclosure pattern, WAI-ARIA APG) — it never
+   navigated (there is no bucket landing page), so a button is the correct,
+   accessible element. Styled to match the sibling nav links since it lost the
+   `.nav-links a` cascade when it stopped being an <a>. */
+.nav-dropdown-btn { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.9rem; font-weight: 500; color: #aaa; background: none; border: 0; cursor: pointer; user-select: none; padding: 8px 16px; border-radius: 4px; display: inline-flex; align-items: center; gap: 0.3rem; line-height: inherit; transition: color 0.2s, background 0.2s; }
+.nav-dropdown-btn:hover { color: #ccc; background: rgba(255,255,255,0.04); }
+.nav-dropdown-btn.active { color: #e09422; background: rgba(247,147,26,0.08); font-weight: 600; }
+.nav-dropdown-btn .nav-caret { font-size: 0.7em; transition: transform 0.2s; }
+.nav-dropdown.open .nav-dropdown-btn .nav-caret { transform: rotate(180deg); }
+/* Visible keyboard focus (a11y) — amber ring, only for keyboard users. */
+.nav-dropdown-btn:focus-visible, .nav-dropdown-menu a:focus-visible, .hamburger:focus-visible, .mobile-overlay a:focus-visible, .m-acc-btn:focus-visible { outline: 2px solid #e09422; outline-offset: 2px; border-radius: 4px; }
 .nav-dropdown-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: rgba(10,9,8,0.97); border: 1px solid rgba(247,147,26,0.15); border-radius: 8px; padding: 8px 0; min-width: 240px; z-index: 200; backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.4); margin-top: 0; max-height: calc(100vh - 72px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(247,147,26,0.35) transparent; }
+/* ─── The Numbers mega-panel (SITE_GUIDE §30; NAV_MEGA_MENU_DESIGN) ─── */
+/* 26 tools in four labeled group-columns, all visible without scroll at 1280px.
+   The host dropdown goes position:static so the absolute panel anchors to the
+   sticky .site-nav (its backdrop-filter is a containing block too) and can
+   right-align to the nav, viewport-clamped, instead of overflowing off a
+   mid-right trigger. New structural classes (.nav-mega*) so no per-page CSS —
+   which only ever restyles .active colours and .nav-dropdown-btn — can shear it. */
+.nav-dropdown.nav-mega-host { position: static; }
+.nav-dropdown-menu.nav-mega { left: auto; right: 16px; transform: none; min-width: 0; width: min(1040px, calc(100vw - 32px)); max-height: none; overflow: visible; padding: 14px 10px 8px; }
+.nav-mega-cols { display: flex; align-items: flex-start; gap: 4px 10px; }
+.nav-mega-col { flex: 1 1 0; min-width: 0; }
+.nav-mega-col--wide { flex: 2 1 0; }
+/* Positioning & Strategy (12) balances into two sub-columns via CSS multicol —
+   auto-balanced, so it stays even if the group grows; break-inside keeps a
+   wrapped title whole. */
+.nav-mega-split { column-count: 2; column-gap: 8px; }
+.nav-mega-split a { break-inside: avoid; }
+.nav-dropdown-menu.nav-mega .nav-dropdown-group-label { padding: 4px 12px 6px; margin: 0 4px 4px; white-space: normal; border-bottom: 1px solid rgba(247,147,26,0.12); }
+.nav-dropdown-menu.nav-mega a { padding: 7px 12px; margin: 0 4px; white-space: normal; line-height: 1.3; border-radius: 5px; }
+.nav-dropdown-menu.nav-mega .nav-dropdown-legend { margin: 8px 4px 2px; padding: 8px 12px 0; white-space: normal; }
+@media (max-width: 1023px) { .nav-dropdown-menu.nav-mega { right: 12px; padding: 10px 6px 6px; } .nav-mega-cols { gap: 2px 6px; } .nav-dropdown-menu.nav-mega a { padding: 6px 8px; } }
 .nav-dropdown-menu::-webkit-scrollbar { width: 8px; }
 .nav-dropdown-menu::-webkit-scrollbar-track { background: transparent; }
 .nav-dropdown-menu::-webkit-scrollbar-thumb { background: rgba(247,147,26,0.30); border-radius: 4px; }
@@ -124,6 +155,19 @@ a:not([class]):hover { text-decoration-color: #e09422; }
 .mobile-section-label { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.65rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.18em; margin: 0.9rem 0 0.2rem; padding: 0 32px; }
 .mobile-section-label:first-child { margin-top: 0; }
 .mobile-section-sublabel { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.56rem; font-weight: 600; color: rgba(255,255,255,0.38); text-transform: uppercase; letter-spacing: 0.16em; margin: 0.65rem 0 0.05rem; }
+/* ─── Mobile accordion (NAV_MEGA_MENU_DESIGN §4.3) ─── */
+/* The overlay's three category buckets collapse; the current page's bucket is
+   pre-expanded server-side. New .m-acc* classes so per-page overlay overrides
+   (which only touch `.mobile-overlay a.active`) can't shear it. */
+.m-acc { width: 100%; max-width: 460px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.m-acc-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; font-family: 'Inter', -apple-system, sans-serif; font-size: 1rem; font-weight: 600; color: #cbc3b7; background: none; border: 0; cursor: pointer; text-align: left; padding: 14px 32px; }
+.m-acc-btn .m-acc-count { color: #6f6a63; font-weight: 500; font-size: 0.75em; margin-left: 0.35rem; }
+.m-acc-btn .m-acc-caret { margin-left: auto; color: #8c857c; font-size: 0.8em; transition: transform 0.2s; }
+.m-acc.open .m-acc-btn { color: #e09422; }
+.m-acc.open .m-acc-btn .m-acc-caret { transform: rotate(180deg); }
+.m-acc-panel { display: none; width: 100%; padding-bottom: 6px; }
+.m-acc.open .m-acc-panel { display: block; }
+.m-acc-panel .mobile-section-sublabel { padding: 0 32px; }
 @media (max-width: 768px) {
   .site-nav .nav-links { display: none; }
   .hamburger { display: block; }
@@ -434,8 +478,8 @@ h1, h2, h3 {
         {%- set currentCat = "" -%}
         {%- for e in explorations -%}{%- if e.slug == slug -%}{%- set currentCat = e.category -%}{%- endif -%}{%- endfor -%}
         <div class="nav-dropdown{% if currentCat == 'foundations' %} active-bucket{% endif %}">
-            <a class="nav-dropdown-btn{% if currentCat == 'foundations' %} active{% endif %}" href="#">Foundations &#9662;</a>
-            <div class="nav-dropdown-menu">
+            <button type="button" class="nav-dropdown-btn{% if currentCat == 'foundations' %} active{% endif %}" aria-expanded="false" aria-controls="nav-menu-foundations">Foundations <span class="nav-caret" aria-hidden="true">&#9662;</span></button>
+            <div class="nav-dropdown-menu" id="nav-menu-foundations">
 {%- for e in explorations %}{% if e.category == 'foundations' %}
         <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
@@ -443,8 +487,8 @@ h1, h2, h3 {
             </div>
         </div>
         <div class="nav-dropdown{% if currentCat == 'arguments' %} active-bucket{% endif %}">
-            <a class="nav-dropdown-btn{% if currentCat == 'arguments' %} active{% endif %}" href="#">The Arguments &#9662;</a>
-            <div class="nav-dropdown-menu">
+            <button type="button" class="nav-dropdown-btn{% if currentCat == 'arguments' %} active{% endif %}" aria-expanded="false" aria-controls="nav-menu-arguments">The Arguments <span class="nav-caret" aria-hidden="true">&#9662;</span></button>
+            <div class="nav-dropdown-menu" id="nav-menu-arguments">
 {%- for g in argumentsGroups %}
                 <div class="nav-dropdown-group-label">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'arguments' and e.group == g %}
@@ -454,15 +498,35 @@ h1, h2, h3 {
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
             </div>
         </div>
-        <div class="nav-dropdown{% if currentCat == 'numbers' %} active-bucket{% endif %}">
-            <a class="nav-dropdown-btn{% if currentCat == 'numbers' %} active{% endif %}" href="#">The Numbers &#9662;</a>
-            <div class="nav-dropdown-menu">
+        {#- The Numbers → mega-panel (NAV_MEGA_MENU_DESIGN, built 2026-08-12). Each
+            numbersGroup is a labeled column; Positioning & Strategy (12) balances
+            into two sub-columns via CSS multicol (.nav-mega-split). Host dropdown
+            is .nav-mega-host so the panel anchors to .site-nav. Same item loop,
+            badges + interactive markers + legend as the simple dropdowns. -#}
+        <div class="nav-dropdown nav-mega-host{% if currentCat == 'numbers' %} active-bucket{% endif %}">
+            <button type="button" class="nav-dropdown-btn{% if currentCat == 'numbers' %} active{% endif %}" aria-expanded="false" aria-controls="nav-menu-numbers">The Numbers <span class="nav-caret" aria-hidden="true">&#9662;</span></button>
+            <div class="nav-dropdown-menu nav-mega" id="nav-menu-numbers">
+                <div class="nav-mega-cols">
 {%- for g in numbersGroups %}
-                <div class="nav-dropdown-group-label">{{ g }}</div>
+{%- if g == "Positioning & Strategy" %}
+                    <div class="nav-mega-col nav-mega-col--wide">
+                        <div class="nav-dropdown-group-label">{{ g }}</div>
+                        <div class="nav-mega-split">
 {%- for e in explorations %}{% if e.category == 'numbers' and e.group == g %}
-        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+                            <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
+                        </div>
+                    </div>
+{%- else %}
+                    <div class="nav-mega-col">
+                        <div class="nav-dropdown-group-label">{{ g }}</div>
+{%- for e in explorations %}{% if e.category == 'numbers' and e.group == g %}
+                        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+{%- endif %}{%- endfor %}
+                    </div>
+{%- endif %}
 {%- endfor %}
+                </div>
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
             </div>
         </div>
@@ -470,27 +534,43 @@ h1, h2, h3 {
         <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
     </div>
-        <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+        <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="mobileOverlay"><span></span><span></span><span></span></button>
     </nav>
+    {#- Mobile nav = grouped accordion (NAV_MEGA_MENU_DESIGN §4.3). Three category
+        buckets collapse; the current page's bucket is pre-expanded server-side
+        (open class + aria-expanded true). Group sub-labels stay inside The
+        Arguments / The Numbers panels. Gallery / Calculators / About stay flat. -#}
     <div class="mobile-overlay" id="mobileOverlay">
-        <div class="mobile-section-label">Foundations</div>
+        <div class="m-acc{% if currentCat == 'foundations' %} open{% endif %}">
+            <button type="button" class="m-acc-btn" aria-expanded="{% if currentCat == 'foundations' %}true{% else %}false{% endif %}" aria-controls="m-sec-foundations">Foundations <span class="m-acc-caret" aria-hidden="true">&#9662;</span></button>
+            <div class="m-acc-panel" id="m-sec-foundations">
 {%- for e in explorations %}{% if e.category == 'foundations' %}
-        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+                <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
-        <div class="mobile-section-label">The Arguments</div>
+            </div>
+        </div>
+        <div class="m-acc{% if currentCat == 'arguments' %} open{% endif %}">
+            <button type="button" class="m-acc-btn" aria-expanded="{% if currentCat == 'arguments' %}true{% else %}false{% endif %}" aria-controls="m-sec-arguments">The Arguments <span class="m-acc-caret" aria-hidden="true">&#9662;</span></button>
+            <div class="m-acc-panel" id="m-sec-arguments">
 {%- for g in argumentsGroups %}
-        <div class="mobile-section-sublabel">{{ g }}</div>
+                <div class="mobile-section-sublabel">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'arguments' and e.group == g %}
-        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+                <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
 {%- endfor %}
-        <div class="mobile-section-label">The Numbers</div>
+            </div>
+        </div>
+        <div class="m-acc{% if currentCat == 'numbers' %} open{% endif %}">
+            <button type="button" class="m-acc-btn" aria-expanded="{% if currentCat == 'numbers' %}true{% else %}false{% endif %}" aria-controls="m-sec-numbers">The Numbers <span class="m-acc-caret" aria-hidden="true">&#9662;</span></button>
+            <div class="m-acc-panel" id="m-sec-numbers">
 {%- for g in numbersGroups %}
-        <div class="mobile-section-sublabel">{{ g }}</div>
+                <div class="mobile-section-sublabel">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'numbers' and e.group == g %}
-        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+                <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
 {%- endfor %}
+            </div>
+        </div>
         <a href="/the-gallery.html"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
         <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
@@ -644,60 +724,89 @@ h1, h2, h3 {
 </script>
 
 <script>
-/* Canonical nav UX — hamburger open/close, dropdown click-toggle, click-outside, Escape, link-click close */
+/* Canonical nav UX — disclosure dropdowns (button + aria-expanded), hover-open,
+   click-toggle, click-outside, Escape-with-focus-return, mobile accordion.
+   WAI-ARIA APG disclosure pattern; see NAV_MEGA_MENU_DESIGN §4.4. */
 (function() {
   var ham = document.getElementById('hamburger');
   var mob = document.getElementById('mobileOverlay');
   var dds = document.querySelectorAll('.nav-dropdown');
-  function closeMobile() {
-    if (ham) ham.classList.remove('open');
-    if (mob) mob.classList.remove('show');
-    document.body.style.overflow = '';
+  // Toggle a dropdown open/closed and keep its button's aria-expanded in sync.
+  function setDropdown(dd, open) {
+    dd.classList.toggle('open', open);
+    var btn = dd.querySelector('.nav-dropdown-btn');
+    if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
   function closeAllDropdowns(except) {
     for (var i = 0; i < dds.length; i++) {
-      if (dds[i] !== except) dds[i].classList.remove('open');
+      if (dds[i] !== except) setDropdown(dds[i], false);
     }
   }
-  // Each dropdown's button toggles its own dropdown and closes the others.
+  // The trigger of the first open dropdown (for Escape focus-return).
+  function openDropdownTrigger() {
+    for (var i = 0; i < dds.length; i++) {
+      if (dds[i].classList.contains('open')) return dds[i].querySelector('.nav-dropdown-btn');
+    }
+    return null;
+  }
+  function closeMobile(restoreFocus) {
+    var wasOpen = mob && mob.classList.contains('show');
+    if (ham) { ham.classList.remove('open'); ham.setAttribute('aria-expanded', 'false'); }
+    if (mob) mob.classList.remove('show');
+    document.body.style.overflow = '';
+    if (restoreFocus && wasOpen && ham) ham.focus();
+  }
+  // Each dropdown: click toggles its own panel and closes the others; hover keeps
+  // aria-expanded honest (the panel is also CSS :hover-openable on pointer).
   for (var j = 0; j < dds.length; j++) {
     (function(dd) {
       var btn = dd.querySelector('.nav-dropdown-btn');
       if (!btn) return;
       btn.addEventListener('click', function(e) {
-        e.preventDefault();
         e.stopPropagation();
         var willOpen = !dd.classList.contains('open');
         closeAllDropdowns(dd);
-        dd.classList.toggle('open', willOpen);
+        setDropdown(dd, willOpen);
       });
+      dd.addEventListener('mouseenter', function() { btn.setAttribute('aria-expanded', 'true'); });
+      dd.addEventListener('mouseleave', function() { if (!dd.classList.contains('open')) btn.setAttribute('aria-expanded', 'false'); });
     })(dds[j]);
   }
   if (mob) {
-    mob.addEventListener('click', function(e) {
-      if (e.target === mob) closeMobile();
-    });
+    mob.addEventListener('click', function(e) { if (e.target === mob) closeMobile(false); });
     var links = mob.querySelectorAll('a');
     for (var i = 0; i < links.length; i++) {
-      links[i].addEventListener('click', closeMobile);
+      links[i].addEventListener('click', function() { closeMobile(false); });
+    }
+    // Accordion: each category button toggles its own section (aria-expanded synced).
+    var accBtns = mob.querySelectorAll('.m-acc-btn');
+    for (var k = 0; k < accBtns.length; k++) {
+      accBtns[k].addEventListener('click', function() {
+        var open = this.parentNode.classList.toggle('open');
+        this.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
     }
   }
   if (ham && mob) {
     ham.addEventListener('click', function() {
       var willOpen = !mob.classList.contains('show');
       ham.classList.toggle('open', willOpen);
+      ham.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
       mob.classList.toggle('show', willOpen);
       document.body.style.overflow = willOpen ? 'hidden' : '';
     });
   }
   document.addEventListener('click', function(e) {
-    // Close any dropdown whose contents the click did not land in
     for (var i = 0; i < dds.length; i++) {
-      if (!dds[i].contains(e.target)) dds[i].classList.remove('open');
+      if (!dds[i].contains(e.target)) setDropdown(dds[i], false);
     }
   });
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') { closeMobile(); closeAllDropdowns(); }
+    if (e.key !== 'Escape') return;
+    var trigger = openDropdownTrigger();
+    closeAllDropdowns();
+    if (trigger) { trigger.focus(); return; }  // APG: return focus to the disclosure button
+    closeMobile(true);
   });
 })();
 
