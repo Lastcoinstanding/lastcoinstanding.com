@@ -2255,13 +2255,28 @@ nav on every content page. It is a barometer, not a ticker. Content, in
 editorial order (**position leads, price follows**):
 
 ```
-●  0.43× trend  ·  near the floor  ·  $64,144
+●  0.43× trend  ·  near the floor  ·  $64,144  ·  see the dashboard →  ·  the Power Law →
 ```
 
 pulse dot · live trend multiple · canonical zone word (`positionLabel`) · spot
-price. The whole strip links to `/the-power-law` (newcomer orientation, subtle
-house-link hover, no button styling).
+price · primary CTA · secondary foundation link.
 
+- **Two links, one strip (dual-link refinement, 2026-08-11).** The strip is a
+  container (`<div class="channel-ribbon">`), not a single anchor, because it now
+  carries two distinct targets. The **data + primary CTA** are one link
+  (`.cr-primary` → `/dashboard`, label **"see the dashboard →"**); a
+  **visually-secondary** link (`.cr-secondary` → `/the-power-law`, label **"the
+  Power Law →"**, dim grey / no orange / lighter weight) follows, preceded by the
+  same `.cr-sep` token. **Rationale (JM ruling 2026-08-11, verbatim):** *the
+  dashboard is the read, the Power Law is the foundation that makes every other
+  page's numbers credible — the ribbon now carries both, artifact-named, because
+  "see where we are" underperformed as a label.* Hover brightening is scoped to
+  the anchor under the cursor (`.cr-primary:hover` / `.cr-secondary:hover`), not
+  the whole strip.
+- **Self-link suppression.** No page links to itself. The **dashboard** opts the
+  whole ribbon out (`channel_ribbon: false`, unchanged — the page *is* the
+  destination-grade read). On **/the-power-law** the secondary link is suppressed
+  by a `slug` guard in the component while the dashboard link still shows.
 - **One source, no drift.** The renderer (`shared/channel-ribbon.js`) reads the
   same `power-law-data.js` helpers the trilogy pages use — `plPrice`,
   `positionLabel`, `TODAY_DAYS`, `fetchTodayPrice` — so the ribbon can never
@@ -2283,7 +2298,10 @@ house-link hover, no button styling).
   palette (the §4.2 lesson). The renderer + `power-law-data.js` load site-wide
   in base.njk (the chart-copy.js pattern), gated on the same opt-out flag.
 - **375px** (≤480px): same single line, smaller type, the word "trend" is
-  dropped (the `×` stays) — the documented graceful degradation before any wrap.
+  dropped (the `×` stays); the **primary CTA text and the secondary foundation
+  link both drop** (each with its separator) so **mobile keeps the dashboard link
+  only** — the `.cr-primary` anchor (the data itself) stays clickable to
+  `/dashboard`. The documented graceful degradation before any wrap.
 - **Opt-out.** Front matter `channel_ribbon: false` renders nothing and skips the
   site-wide script load. Currently the **homepage** (its own `bitcoin-ticker`
   already carries this read under the hero) and **/the-gallery** (opens on the
@@ -2544,6 +2562,8 @@ Not advice (facts-not-signals; no "you should"), not a single-security/MSTR anal
 - **Streak record-pace projection.** *"If this stretch ran as long as the record, it would end around ⟨Month YYYY⟩ — when the trend line will sit near $⟨trend⟩."* Register: **"would end around"**, never "target".
 - **NEW tile — Implied reversion rate.** Ports `/discount-or-premium`'s depth-matched `scanDurations` (discount branch) verbatim — same band-widening in 0.05 steps, `YEARS_MO = 30.44`, per-sample completed times-to-trend — so the tile reads the **identical fastest/median/longest set** the D-or-P page computes at today's multiple (today: band 0.43×, 11 completed, min 3.5 / median 14.2 / max 20.9 months, no widening). It then applies `(trend(t+T)/spot)^(1/T)−1`. **Fastest-case presentation ruling (JM, v3):** the **median leads** as the headline rate, bound to its period and conditional (*"~183%/yr over ~14 months … only if it reverts at all"*); the **slowest** is the low end (*~123%/yr*); the **fastest is a duration only** (*"~3.5 months"*), because annualising a months-long snap-back yields a rate that cannot be honestly quoted. A **data-driven era clause** (not a filter) notes when the quickest resolutions cluster in the early era (today: all in 2010; the most recent episode, 2023, took ~14 months). The episode set is never filtered — it must keep matching D-or-P exactly (an *era toggle* on both pages is a backlog idea).
 - **Layout reorder** (novel reads first): hero → price + trend-price → below-trend streak → implied trend doubling → implied reversion rate → below-trend share + ATH → behind-schedule + hurdle → jump-back-in. 375px: ten tiles, zero horizontal overflow.
+
+**Ribbon dual-link refinement (2026-08-11) — how the dashboard is reached.** The site-wide channel ribbon's CTA was relabelled from **"see where we are →"** to **"see the dashboard →"** (same `/dashboard` target), and a visually-secondary **"the Power Law →"** link to the foundation page was added after it (full record in §40.1). This does not change the dashboard itself — it still opts the ribbon out (`channel_ribbon: false`, no self-link) and remains the ribbon's destination-grade read. It changes only how readers get here: the entry point is now **artifact-named** rather than an outcome phrase (*"see where we are" underperformed as a label* — JM ruling). The v2 bullet above describes the original repoint; this refinement supersedes its **CTA wording** while keeping the repoint intact.
 
 **Thesis and register.** Not an exploration essay; **tiles lead, prose is minimal.** Register is **verification-forward** — every tile carries its own derivation in small text — and **anti-signal**: the hero framing line reads *"a read of where things stand, not a signal about where they go next"* (prose-only anti-timing discipline, per Wait-or-Deploy §34). No tool-framing disclaimer component: the page takes no personal inputs and computes no personal decision, so per NEW_PAGE_CHECKLIST §6 it is a low-risk read, and the always-visible framing line carries the posture instead of the dismissible strip.
 

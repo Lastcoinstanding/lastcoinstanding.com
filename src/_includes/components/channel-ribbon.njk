@@ -9,13 +9,23 @@
       ● {0.43}× trend · {near the floor} · {$64,144}
 
   — a pulse dot (live-gated), the live trend multiple, the canonical channel
-  zone word (positionLabel), and the spot price, closing with a "see where we
-  are →" call to action. On live-fetch fallback the dot goes static and a
-  register suffix " · latest monthly data" is appended. The whole strip links to
-  /dashboard — the destination-grade version of this read (repointed 2026-08-10,
-  dashboard v2: the ribbon IS the rescoped site-wide entry point, so no separate
-  chip element is built). The channel page stays reachable via the dashboard's
-  first jump-back-in tile.
+  zone word (positionLabel), and the spot price, closing with a "see the
+  dashboard →" call to action. On live-fetch fallback the dot goes static and a
+  register suffix " · latest monthly data" is appended.
+
+  TWO LINKS (dual-link refinement 2026-08-11). The data + primary CTA form one
+  link to /dashboard — the destination-grade version of this read (the ribbon IS
+  the rescoped site-wide entry point, so no separate chip element is built). A
+  visually-secondary "the Power Law →" link follows, pointing to the foundation
+  page (/the-power-law) — the dashboard is the read, the Power Law is the
+  foundation that makes every page's numbers credible, so the ribbon now carries
+  both, artifact-named ("see where we are" underperformed as a label — JM ruling
+  2026-08-11). Because two distinct targets can't live in one <a>, the strip is a
+  container with two anchors, not a single link.
+
+  SELF-LINK SUPPRESSION. The dashboard page opts the whole ribbon out
+  (channel_ribbon:false). On /the-power-law the secondary link is suppressed
+  (slug guard) so no page links to itself; the dashboard link still shows.
 
   Layout-level like the related strip (base.njk includes it once, after the
   mobile overlay and before page content). Self-guards on a front-matter flag:
@@ -31,22 +41,31 @@
   away with the page.
 #}
 {%- if channel_ribbon is not defined or channel_ribbon -%}
-<a class="channel-ribbon" href="/dashboard.html" data-channel-ribbon aria-label="Bitcoin relative to the Power Law channel — see where we are, on the dashboard">
-  <span class="cr-dot" aria-hidden="true"></span>
-  <span class="cr-metric cr-mult"><span class="cr-mult-value">&mdash;</span><span class="cr-trend-word">&nbsp;trend</span></span>
-  <span class="cr-sep" aria-hidden="true">&middot;</span>
-  <span class="cr-metric cr-zone">&mdash;</span>
-  <span class="cr-sep" aria-hidden="true">&middot;</span>
-  <span class="cr-metric cr-price">&mdash;</span>
-  {#- Register suffix shown only on live-fetch fallback; JS toggles [hidden].
-      Wording matches the shared todayPriceLabel/todayPriceNote helpers'
-      "latest monthly data" so the ribbon can't drift from the page readouts. -#}
-  <span class="cr-register" hidden>&nbsp;&middot; latest monthly data</span>
-  {#- Trailing CTA — matches the /calculators tile + homepage card wording. The
-      whole strip is the link; this is the visible affordance. Its separator +
-      the CTA hide together on very narrow viewports (the data leads there); the
-      strip stays clickable. -#}
-  <span class="cr-sep cr-sep-cta" aria-hidden="true">&middot;</span>
-  <span class="cr-cta">see where we are&nbsp;&rarr;</span>
-</a>
+<div class="channel-ribbon" data-channel-ribbon>
+  {#- Primary link: the data strip + CTA are one clickable unit → /dashboard. -#}
+  <a class="cr-primary" href="/dashboard.html" aria-label="Bitcoin relative to the Power Law channel — see the dashboard">
+    <span class="cr-dot" aria-hidden="true"></span>
+    <span class="cr-metric cr-mult"><span class="cr-mult-value">&mdash;</span><span class="cr-trend-word">&nbsp;trend</span></span>
+    <span class="cr-sep" aria-hidden="true">&middot;</span>
+    <span class="cr-metric cr-zone">&mdash;</span>
+    <span class="cr-sep" aria-hidden="true">&middot;</span>
+    <span class="cr-metric cr-price">&mdash;</span>
+    {#- Register suffix shown only on live-fetch fallback; JS toggles [hidden].
+        Wording matches the shared todayPriceLabel/todayPriceNote helpers'
+        "latest monthly data" so the ribbon can't drift from the page readouts. -#}
+    <span class="cr-register" hidden>&nbsp;&middot; latest monthly data</span>
+    {#- Primary CTA — the dashboard is the read. Its separator + the CTA hide
+        together on very narrow viewports (the data leads there); the primary
+        anchor stays clickable to /dashboard. -#}
+    <span class="cr-sep cr-sep-cta" aria-hidden="true">&middot;</span>
+    <span class="cr-cta">see the dashboard&nbsp;&rarr;</span>
+  </a>
+  {#- Secondary link: the foundation. Suppressed on /the-power-law (no self-link)
+      and hidden ≤480px (mobile keeps the dashboard link only). Visually dim / no
+      orange; same separator token as the rest of the strip precedes it. -#}
+  {%- if slug != 'the-power-law' -%}
+  <span class="cr-sep cr-sep-secondary" aria-hidden="true">&middot;</span>
+  <a class="cr-secondary" href="/the-power-law.html">the Power Law&nbsp;&rarr;</a>
+  {%- endif -%}
+</div>
 {%- endif -%}
