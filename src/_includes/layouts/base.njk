@@ -171,7 +171,16 @@ a:not([class]):hover { text-decoration-color: #e09422; }
 .m-acc.open .m-acc-btn .m-acc-caret { transform: rotate(180deg); }
 .m-acc-panel { display: none; width: 100%; padding-bottom: 6px; }
 .m-acc.open .m-acc-panel { display: block; }
-.m-acc-panel .mobile-section-sublabel { padding: 0 32px; }
+.m-acc-panel .mobile-section-sublabel { padding: 0 32px; text-align: left; }
+/* Accordion links must set display:block EXPLICITLY. They are no longer flex
+   children of .mobile-overlay (which block-shaped them); inside .m-acc-panel they
+   are plain-block descendants, and `.mobile-overlay a` never declares display, so
+   without this they render inline (paragraph flow, mid-title wrapping — the phone
+   bug JM caught). The `.mobile-overlay .m-acc-panel a` selector outranks per-page
+   `.mobile-overlay a` padding overrides (e.g. /the-power-law) so they can't shear
+   the row shape. Indented one step (44px) under the 32px group sub-labels; the
+   badge/marker stay inline with their own title only. */
+.mobile-overlay .m-acc-panel a { display: block; width: 100%; padding: 11px 32px 11px 44px; font-size: 1rem; text-align: left; border-radius: 6px; }
 @media (max-width: 768px) {
   .site-nav .nav-links { display: none; }
   .hamburger { display: block; }

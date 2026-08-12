@@ -20,6 +20,14 @@
 >   box-sizing:border-box` rather than a fixed `width` + `right` — the fixed-width
 >   version clipped the leftmost column at 1024px (scrollbar + padding weren't
 >   accounted for). See SITE_GUIDE §30.1.
+> - **Mobile accordion links require an explicit `display:block`** (found on JM's
+>   phone review, invisible to DOM audits). They are no longer flex children of
+>   `.mobile-overlay` (which block-shaped them); inside `.m-acc-panel` they are
+>   plain-block descendants and `.mobile-overlay a` never declares `display`, so
+>   they rendered inline (paragraph flow, mid-title wrapping). Fixed with
+>   `.mobile-overlay .m-acc-panel a { display:block }` — a selector that also
+>   outranks per-page `.mobile-overlay a` padding overrides. **A future overlay
+>   refactor must not reintroduce this** by assuming flex still block-shapes them.
 
 _Created 2026-08-12. Trigger: **The Numbers** dropdown has grown to **26 items
 across 4 subgroups** (one column, `overflow-y: auto`, roughly half of it below
