@@ -1,8 +1,33 @@
 # The Numbers Mega-Menu — Design Document
 
-> **STATUS: DESIGN DOC ONLY — awaiting JM approval. No build until this doc is
-> approved.** (2026-08-12.) The build is a separate prompt; this document is the
-> thing under review.
+> **STATUS: BUILT 2026-08-12** (branch `feat/nav-mega-menu`, preview-verified,
+> awaiting JM merge). Approved 2026-08-12; built per this doc + JM's build
+> rulings. The design below stands as written; **as-built deltas** are noted
+> here. Live framework: **SITE_GUIDE §30.1**; tokens: **STYLE_GUIDE §6.9**.
+>
+> **As-built deltas from this doc's open questions (JM rulings on the build):**
+> - **Q1 (Positioning column):** RULED **split into two balanced sub-columns**
+>   under one label (this doc had recommended accepting the tall column). Built
+>   with CSS multicol (`column-count:2`) so it auto-balances — the panel's tallest
+>   column is now ~6 rows, not 12.
+> - **Q2 (hover):** RULED **keep hover-open + add click-toggle** (not click-only).
+> - **Q3 (a11y scope):** RULED apply the `<button>` + `aria-expanded` +
+>   Escape-focus-return fix to **all three** triggers (shared code).
+> - **Q4 (mobile default):** RULED **current page's section pre-expanded**.
+> - **Q5 (alignment):** built **right-aligned to the nav**, viewport-clamped.
+> - **Anchoring fix found in verification (not in this doc):** the panel is
+>   anchored with `left:16 + right:16 + margin-left:auto + max-width:1040 +
+>   box-sizing:border-box` rather than a fixed `width` + `right` — the fixed-width
+>   version clipped the leftmost column at 1024px (scrollbar + padding weren't
+>   accounted for). See SITE_GUIDE §30.1.
+> - **Mobile accordion links require an explicit `display:block`** (found on JM's
+>   phone review, invisible to DOM audits). They are no longer flex children of
+>   `.mobile-overlay` (which block-shaped them); inside `.m-acc-panel` they are
+>   plain-block descendants and `.mobile-overlay a` never declares `display`, so
+>   they rendered inline (paragraph flow, mid-title wrapping). Fixed with
+>   `.mobile-overlay .m-acc-panel a { display:block }` — a selector that also
+>   outranks per-page `.mobile-overlay a` padding overrides. **A future overlay
+>   refactor must not reintroduce this** by assuming flex still block-shapes them.
 
 _Created 2026-08-12. Trigger: **The Numbers** dropdown has grown to **26 items
 across 4 subgroups** (one column, `overflow-y: auto`, roughly half of it below
