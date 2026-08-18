@@ -73,7 +73,7 @@ eleventyComputed:
         <button class="insight-arrow next" id="insightNext" aria-label="Next">&#8250;</button>
 
         <!-- Slide: How Much Bitcoin? (Featured lead, June 2026) -->
-        <div class="insight-slide active" data-cat="numbers" data-feat="1">
+        <div class="insight-slide active" data-cat="numbers" data-feat="0">
             <div class="insight-visual video-visual">
                 <video class="carousel-video" id="vid-howmuch" muted playsinline preload="none">
                     <source src="/videos/how-much-bitcoin.mp4" type="video/mp4">
@@ -97,6 +97,20 @@ eleventyComputed:
                 <div class="insight-label">Paper Bitcoin vs. Real Bitcoin</div>
                 <div class="insight-headline">Same light &mdash; <em>different asset.</em></div>
                 <a href="/paper-bitcoin.html" class="insight-cta">See what you hold &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Slide: Bitcoin as Collateral (added Aug 2026). Placed immediately after Paper Bitcoin — its named companion and its reading-order predecessor: the custody spectrum read from the holder's side, then the same spectrum read from the lender's. data-feat="0" is a HOLD, not a demotion: Featured status is JM's call and undecided at ship (SITE_GUIDE §13). Video v1 accepted; the sub line has no slot in this component, so it rides the headline's <em> per the Risks-slide precedent. -->
+        <div class="insight-slide" data-cat="arguments" data-feat="1">
+            <div class="insight-visual video-visual">
+                <video class="carousel-video" id="vid-bitcoin-as-collateral" muted playsinline preload="none">
+                    <source src="/videos/bitcoin-as-collateral.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="insight-text">
+                <div class="insight-label">Bitcoin as Collateral</div>
+                <div class="insight-headline">The pledge you can see. <em>Four thousand years of collateral &ndash; and the first pledge anyone can verify.</em></div>
+                <a href="/bitcoin-as-collateral.html" class="insight-cta">Read the exploration &rarr;</a>
             </div>
         </div>
 
@@ -650,6 +664,25 @@ eleventyComputed:
     <div class="explore-subsection-label">Latest</div>
     <div class="card-grid">
 
+        <!-- Bitcoin as Collateral -->
+        <a href="/bitcoin-as-collateral.html" class="concept-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- The pledge you can see: a coin whose inside is open to inspection. Muted lines behind are the paper record every earlier system had to trust instead. -->
+                    <line x1="4" y1="12" x2="15" y2="12" stroke="#6a6256" stroke-width="1" opacity="0.5"/>
+                    <line x1="4" y1="17" x2="12" y2="17" stroke="#6a6256" stroke-width="1" opacity="0.35"/>
+                    <line x1="4" y1="36" x2="14" y2="36" stroke="#6a6256" stroke-width="1" opacity="0.35"/>
+                    <circle cx="24" cy="24" r="15" stroke="#e09422" stroke-width="1.6" fill="rgba(224,148,34,0.06)"/>
+                    <path d="M 11 24 Q 24 13.5 37 24 Q 24 34.5 11 24 Z" stroke="#e09422" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+                    <circle cx="24" cy="24" r="4.4" fill="rgba(247,147,26,0.18)" stroke="#F7931A" stroke-width="1.6"/>
+                    <circle cx="24" cy="24" r="1.5" fill="#F7931A"/>
+                </svg>
+            </div>
+            <div class="card-title">Bitcoin as Collateral</div>
+            <div class="card-desc">Four thousand years of lending has turned on one question: is the pledge real? The first collateral anyone can verify &ndash; scored against everything else lenders take.</div>
+            <div class="card-cta">Run the scorecard &rarr;</div>
+        </a>
+
         <!-- The Bitcoin Dashboard -->
         <a href="/dashboard.html" class="concept-card">
             <div class="card-icon">
@@ -730,23 +763,6 @@ eleventyComputed:
             <div class="card-title">Bitcoin Portfolio Allocation</div>
             <div class="card-desc">Over a long horizon, does adding bitcoin make your portfolio meaningfully better despite the crashes? Set an allocation and get the answer with its cost in the same breath: the extra return, the drawdown you must be able to hold through, and how much of the portfolio's movement bitcoin drives. Growth projected from the Power Law.</div>
             <div class="card-cta">See if it earns its place &rarr;</div>
-        </a>
-
-        <!-- The Bitcoin Retirement Stress Test -->
-        <a href="/the-bitcoin-retirement-stress-test.html" class="concept-card">
-            <div class="card-icon">
-                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <!-- A retirement projection (blue, rising) and the same plan with a timed crash (red): a bear market drops it, and it only partly recovers. -->
-                    <line x1="5" y1="42" x2="44" y2="42" stroke="#e09422" stroke-width="1" opacity="0.25"/>
-                    <polyline points="5,34 16,28 27,22 36,17 44,12" stroke="#6db3d4" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                    <polyline points="5,34 16,28 22,24 26,37 30,33 37,29 44,25" stroke="#c0392b" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                    <line x1="26" y1="10" x2="26" y2="42" stroke="#e08a7a" stroke-width="0.9" stroke-dasharray="2 2.5" opacity="0.75"/>
-                    <circle cx="26" cy="37" r="1.8" fill="#e08a7a"/>
-                </svg>
-            </div>
-            <div class="card-title">The Bitcoin Retirement Stress Test</div>
-            <div class="card-desc">The retirement calculator shows the upside path; this one drops a bear market into it. Pick a crash depth, timing, and recovery, and see whether the plan survives. The same crash early can break a plan the same crash late barely dents. A what-if, not a forecast.</div>
-            <div class="card-cta">Stress-test the plan &rarr;</div>
         </a>
 
     </div>
@@ -1003,6 +1019,25 @@ eleventyComputed:
             <div class="card-title">Paper Bitcoin vs. Real Bitcoin</div>
             <div class="card-desc">An ETF, an exchange balance, a multisig vault, a hardware wallet &mdash; each is a different asset wearing bitcoin's price. Gold fell to confiscation in both its forms; bitcoin can fall in only one. A property grid for what each way of holding actually is, and what it costs you.</div>
             <div class="card-cta">See what you hold &rarr;</div>
+        </a>
+
+        <!-- Bitcoin as Collateral -->
+        <a href="/bitcoin-as-collateral.html" class="concept-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- The pledge you can see: a coin whose inside is open to inspection. Muted lines behind are the paper record every earlier system had to trust instead. -->
+                    <line x1="4" y1="12" x2="15" y2="12" stroke="#6a6256" stroke-width="1" opacity="0.5"/>
+                    <line x1="4" y1="17" x2="12" y2="17" stroke="#6a6256" stroke-width="1" opacity="0.35"/>
+                    <line x1="4" y1="36" x2="14" y2="36" stroke="#6a6256" stroke-width="1" opacity="0.35"/>
+                    <circle cx="24" cy="24" r="15" stroke="#e09422" stroke-width="1.6" fill="rgba(224,148,34,0.06)"/>
+                    <path d="M 11 24 Q 24 13.5 37 24 Q 24 34.5 11 24 Z" stroke="#e09422" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+                    <circle cx="24" cy="24" r="4.4" fill="rgba(247,147,26,0.18)" stroke="#F7931A" stroke-width="1.6"/>
+                    <circle cx="24" cy="24" r="1.5" fill="#F7931A"/>
+                </svg>
+            </div>
+            <div class="card-title">Bitcoin as Collateral</div>
+            <div class="card-desc">Four thousand years of lending has turned on one question: is the pledge real? The first collateral anyone can verify &ndash; scored against everything else lenders take.</div>
+            <div class="card-cta">Run the scorecard &rarr;</div>
         </a>
 
         <a href="/risks-to-bitcoin.html" class="concept-card">

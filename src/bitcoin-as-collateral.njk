@@ -1,0 +1,382 @@
+---
+layout: base.njk
+permalink: /bitcoin-as-collateral.html
+slug: bitcoin-as-collateral
+related:
+  - slug: borrowing-against-your-stack
+    desc: "The margin-call arithmetic this page describes, as a working calculator: your stack, your loan, your liquidation price."
+  - slug: bitcoin-backed-mortgages
+    desc: "The housing-specific case: what changes when the collateral is bitcoin and the loan is a mortgage."
+  - slug: the-strc-mechanism
+    desc: "Economic collateral at corporate scale: what happens when the bitcoin backs securities instead of a loan."
+  - slug: paper-bitcoin
+    desc: "The verification argument underneath this whole page: what you hold versus what you&rsquo;re owed."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/bitcoin-as-collateral-head.html' %}"
+  page_styles: "{% include '_pageassets/bitcoin-as-collateral.css' %}"
+  page_scripts: "{% include '_pageassets/bitcoin-as-collateral.js' %}"
+---
+<div id="bacPage">
+
+<section class="hero">
+    <p class="bac-kicker">The Arguments &middot; Bitcoin as Collateral</p>
+    <h1>The pledge you can <em>see</em>.</h1>
+    <p class="hero-subtitle">Collateral is the pledge behind a loan &ndash; and for four thousand years, lending has turned on one question: how do you know the pledge is real?</p>
+    <p class="subtitle">Bitcoin is the first asset where the pledge itself is visible: to the lender, to the borrower, to anyone, without permission. And yet today, lenders offer some of the harshest terms in secured credit against it. This exploration takes both facts seriously.</p>
+</section>
+
+<div class="bac-tabbar">
+    <div class="tab-nav" role="tablist" aria-label="Bitcoin as Collateral sections">
+        <button class="tab-btn active" data-tab="history" role="tab" aria-selected="true" aria-controls="tab-history">
+            <span class="tab-num">I</span>
+            <span class="tab-title">The History</span>
+        </button>
+        <button class="tab-btn" data-tab="scorecard" role="tab" aria-selected="false" aria-controls="tab-scorecard">
+            <span class="tab-num">II</span>
+            <span class="tab-title">The Scorecard</span>
+        </button>
+        <button class="tab-btn" data-tab="gap" role="tab" aria-selected="false" aria-controls="tab-gap">
+            <span class="tab-num">III</span>
+            <span class="tab-title">The Gap</span>
+        </button>
+        <button class="tab-btn" data-tab="practice" role="tab" aria-selected="false" aria-controls="tab-practice">
+            <span class="tab-num">IV</span>
+            <span class="tab-title">The Practice</span>
+        </button>
+    </div>
+</div>
+
+<main class="content-area">
+
+    <!-- ═══════════════ TAB I · THE HISTORY ═══════════════ -->
+    <div class="tab-content active" id="tab-history" role="tabpanel">
+        <p class="bac-thesis">Every collateral system in history is an answer to the same four questions, and every answer has failed the same way.</p>
+
+        <div class="bac-prose">
+            <p>A lender who accepts pledged collateral needs to know four things:</p>
+            <ul class="bac-qlist">
+                <li><span class="bac-qn">1</span><span class="bac-qt">Does it exist?</span></li>
+                <li><span class="bac-qn">2</span><span class="bac-qt">What is it worth right now?</span></li>
+                <li><span class="bac-qn">3</span><span class="bac-qt">Can I take it if the borrower defaults?</span></li>
+                <li><span class="bac-qn">4</span><span class="bac-qt">Has it been promised to anyone else?</span></li>
+            </ul>
+            <p>Everything in the history of secured credit &ndash; registries, receipts, vaults, custodians, clearing houses &ndash; is machinery built to answer those questions, because the borrower&rsquo;s word alone has never been enough. A fifth question, <em>what will it be worth tomorrow?</em>, is about risk rather than verification. Lenders answer it with <span class="bac-term">haircuts</span><span class="help-tip" tabindex="0">?<span class="tip-content">A discount applied to collateral value: post $100, borrow less than $100.</span></span>, and it gets its own treatment in The Gap.</p>
+
+            <p>The vocabulary is older than the machinery. The Greeks called the pledge a <span class="bac-term">hypoth&#275;k&#275;</span><span class="help-tip" tabindex="0">?<span class="tip-content">Greek: a pledge laid down as security.</span></span>, a thing laid down, which survives in <em>hypothecation</em>: the pledging of an asset you keep using. Its shadow-word arrived later. <em>Rehypothecation</em> is the pledging of the same asset twice. The term for lending&rsquo;s oldest safeguard contains, inside it, the name of lending&rsquo;s oldest failure.</p>
+
+            <h2>Three Roman answers</h2>
+            <p>Roman law worked through the whole design space in three steps. Under <em>fiducia</em>, the borrower transferred full ownership to the lender and trusted to get it back: verification was perfect and the borrower was defenceless. Under <em>pignus</em>, the lender held possession but not title. That is the pawn-shop model, still alive today, in which holding the thing <em>is</em> the verification. Under <em>hypotheca</em>, the borrower kept both title and possession, and the lender held only a legal claim. Commerce chose hypotheca, because a farmer cannot farm a field his creditor is holding. But the choice created the modern problem: the lender now had to verify a pledge he could not see.</p>
+
+            <h2>Verification by paper, and what paper permits</h2>
+            <p>The medieval and early-modern answer was the document: title registries, warehouse receipts, goldsmiths&rsquo; notes. Each worked by substituting a claim you could hold for an asset you couldn&rsquo;t watch, and each, in time, demonstrated the substitution&rsquo;s flaw. Goldsmiths discovered that receipts circulate whether or not the gold behind them does, and issued more paper than metal: fractional reserve banking began as a rehypothecation of pledged gold. Warehouse receipts financed centuries of trade, until 1963, when American Express&rsquo;s field warehousing arm certified vast tanks of salad oil that turned out to be mostly seawater with an oil film floating on top. Claims against the warehouses exceeded the oil that existed several times over. The scandal&rsquo;s lesson was not that documents lie. It was that verification had been passed down a chain of parties until everyone assumed someone else had dipped the tanks &ndash; and no one had.</p>
+
+            <div class="bac-callout bac-quiet">
+                <p><strong class="bac-lede">The custody paradox.</strong> Custody was invented to solve verification: give the asset to a trusted keeper, and the keeper&rsquo;s ledger becomes the truth. But every custodial solution reintroduces the original problem one layer up, because now you must verify the keeper. MF Global reached into segregated customer accounts. Lehman&rsquo;s prime brokerage rehypothecated client collateral through London, where no limit applied, and the chains took years to unwind. Celsius did to bitcoin precisely what the goldsmiths did to gold &ndash; and its depositors had granted it the right to do so, in the terms of service, at signup. Custody solves verification by asking you to stop verifying.</p>
+            </div>
+
+            <h2>Gold&rsquo;s forced trade-off</h2>
+            <p>Gold deserves its own section, because it is the closest thing bitcoin has to an ancestor in this story: a monetary asset with no cash flows that has nonetheless collateralized loans for four millennia, and still does. Central banks swap it through the Bank for International Settlements today, and India&rsquo;s regulated gold-loan market is one of the largest secured-lending channels on earth. Gold&rsquo;s problem was never its lack of yield. Its problem is that it forces a choice between two defective modes. Use it as a true <em>bearer</em> asset, in physical possession, and it is operationally miserable at scale: every transfer needs assay, weighing, vaulting, transport, insurance. Or use it <em>practically</em> &ndash; unallocated accounts, paper claims (IOUs), swap receipts &ndash; and you have reintroduced trust, and with trust the entire failure lineage above: one pile of metal, many claims. Bearer but impractical, or practical but requiring trust. For four thousand years, that was the whole menu.</p>
+            <p>Until now.</p>
+            <p>What would an asset look like that escaped the trade-off? It would settle like a bearer instrument, final and with no intermediary, while remaining verifiable like a public ledger: existence, amount, and encumbrance checkable by anyone, continuously, at no cost. Before 2009, no such object existed. The next tab measures the one that now does, against the other collateral lenders already take.</p>
+        </div>
+
+        <p class="bac-continue"><a href="#" data-goto="scorecard">Continue to The Scorecard &rarr;</a></p>
+    </div>
+
+    <!-- ═══════════════ TAB II · THE SCORECARD ═══════════════ -->
+    <div class="tab-content" id="tab-scorecard" role="tabpanel">
+        <p class="bac-thesis">Collateral quality is not one property but a bundle of them. Scored side by side, no asset wins every row &ndash; and that is the point.</p>
+
+        <div class="bac-prose">
+            <p>Below are seven ways of holding five asset classes, scored against ten properties a lender actually prices. Two assets appear twice &ndash; gold and bitcoin &ndash; because for each, how it is held changes what it is. That asymmetry is the argument of this page: gold&rsquo;s two modes are a forced trade-off, and bitcoin&rsquo;s are a choice.</p>
+            <p class="bac-small">Tap any cell for the reasoning. No column is designed to win; where Treasuries deserve the row, they take it.</p>
+        </div>
+
+        <div class="bac-lens" role="group" aria-label="Scorecard lens">
+            <button class="bac-lensbtn active" data-lens="all" aria-pressed="true">All rows</button>
+            <button class="bac-lensbtn" data-lens="lender" aria-pressed="false">The lender&rsquo;s eye</button>
+            <button class="bac-lensbtn" data-lens="borrower" aria-pressed="false">The borrower&rsquo;s eye</button>
+        </div>
+        <p class="bac-lensnote" id="bacLensNote" aria-live="polite"></p>
+
+        <div class="bac-scrollwrap">
+            <table class="bac-score" id="bacScoreTable"></table>
+        </div>
+
+        <div class="bac-legend">
+            <span class="bac-pip bac-s4">Strong</span>
+            <span class="bac-pip bac-s3">Good</span>
+            <span class="bac-pip bac-s2">Mixed</span>
+            <span class="bac-pip bac-s1">Weak</span>
+            <span class="bac-pip bac-s0">Poor</span>
+        </div>
+        <p class="bac-moverkey"><b>&#9650;</b> marks the ratings this page&rsquo;s thesis expects to rise &ndash; if the specific developments named in The Gap arrive: legal recognition spreading state by state, market depth building, and a stress record still being earned. Nothing else on the board is moving.</p>
+
+        <div class="bac-why" id="bacWhy" aria-live="polite">
+            <div class="bac-whyhead">The reasoning</div>
+            <p>Tap any cell above to see why it scores the way it does.</p>
+        </div>
+
+        <p class="bac-stripnote"><b>The bottom row compresses each column:</b> its ten ratings, brightest to darkest. The longer the bright run, the stronger the column overall. <b>Treasuries</b> run warm nearly the whole way. <b>Real estate</b> goes dark almost immediately. <b>Bitcoin (self-custody)</b> is the shape worth noticing: brilliant at one end, unproven at the other, almost nothing in between. It is not &ldquo;strong collateral overall&rdquo;. It is exceptional at verification and settlement while unproven on stress and law. That barbell, and whether its dark end brightens, is what the rest of this page is about.</p>
+
+        <div class="bac-prose">
+            <div class="bac-callout bac-quiet">
+                <p><strong class="bac-lede">Read the two bitcoin columns together.</strong> Self-custodied or multisig bitcoin is the only entry on the board where <em>non-rehypothecation is provable rather than promised</em> &ndash; and custodial bitcoin is among the weakest entries on the same row. The distance between those two columns is the distance between what bitcoin makes possible and how most institutional bitcoin is actually held. This page claims the capability. It does not claim the practice.</p>
+            </div>
+        </div>
+
+        <p class="bac-sig">The grid is a snapshot, and most of it is finished: gold&rsquo;s assay costs and real estate&rsquo;s foreclosure timelines are not in motion. Bitcoin&rsquo;s is the only column still being written. Which cells could move, and what would move them, is the subject of The Gap &ndash; and the thesis of this page.</p>
+
+        <p class="bac-continue"><a href="#" data-goto="gap">Continue to The Gap &rarr;</a></p>
+    </div>
+
+    <!-- ═══════════════ TAB III · THE GAP ═══════════════ -->
+    <div class="tab-content" id="tab-gap" role="tabpanel">
+        <p class="bac-thesis">By the scorecard, bitcoin should be among the cheapest assets to borrow against. Today, lenders offer some of the harshest terms against it. The gap is the story.</p>
+
+        <div class="bac-prose">
+            <h2>What $100 of collateral buys</h2>
+            <p>Start with the observable market. Against $100 of each asset: how much can you borrow, and at what cost?</p>
+
+            <div class="bac-tablewrap">
+                <table class="bac-table">
+                    <thead>
+                        <tr><th scope="col">Collateral</th><th scope="col">You can borrow</th><th scope="col">Typical cost</th><th scope="col">Terms</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>U.S. Treasuries (<span class="bac-term">repo</span><span class="help-tip" tabindex="0">?<span class="tip-content">Repurchase agreement: overnight secured lending between institutions, the plumbing of the Treasury market.</span></span>)</td>
+                            <td><strong>~$99.50</strong></td>
+                            <td>near the policy rate</td>
+                            <td class="bac-dim">&asymp;0.5% haircut; overnight, rolled</td>
+                        </tr>
+                        <tr>
+                            <td>Investment-grade corporate bonds</td>
+                            <td>~$80&ndash;90</td>
+                            <td>small spread over repo</td>
+                            <td class="bac-dim">haircut by rating and tenor</td>
+                        </tr>
+                        <tr>
+                            <td>Residential real estate</td>
+                            <td>~$80&ndash;97</td>
+                            <td>&asymp;6.6% (30-yr fixed)</td>
+                            <td class="bac-fav">+ no margin call; foreclosure takes months</td>
+                        </tr>
+                        <tr>
+                            <td>Equities (<span class="bac-term">Reg T</span><span class="help-tip" tabindex="0">?<span class="tip-content">Regulation T: the Federal Reserve rule setting initial margin for securities loans.</span></span> margin)</td>
+                            <td>$50 at initiation</td>
+                            <td>&asymp;5&ndash;8% (tiered)</td>
+                            <td class="bac-dim">maintenance 25&ndash;40%; intraday calls</td>
+                        </tr>
+                        <tr>
+                            <td>Gold (regulated gold loans)</td>
+                            <td>&le;$75</td>
+                            <td>varies widely</td>
+                            <td class="bac-dim">India caps loan-to-value at 75%</td>
+                        </tr>
+                        <tr class="bac-gaprow">
+                            <td>Bitcoin (market, today)</td>
+                            <td><strong>$40&ndash;60</strong></td>
+                            <td><strong>&asymp;9&ndash;14% APR</strong></td>
+                            <td class="bac-harsh">&minus; 24/7 automated margin calls</td>
+                        </tr>
+                        <tr class="bac-gaprow">
+                            <td>Bitcoin (on a bank balance sheet, under <span class="bac-term">Basel</span><span class="help-tip" tabindex="0">?<span class="tip-content">The Basel framework: the international rulebook setting how much capital banks must hold against the assets they carry.</span></span> rules)</td>
+                            <td><strong>$0</strong></td>
+                            <td>&ndash;</td>
+                            <td class="bac-harsh">&minus; 100% haircut: counted as if the collateral were worthless</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="bac-marklegend">+ unusually favourable term &nbsp;&middot;&nbsp; &minus; unusually harsh term &nbsp;&middot;&nbsp; the shaded rows are the gap this tab explains</p>
+            <p class="bac-small">Figures as of August 2026. The loan-market rows are the fastest-staling numbers on this page and are re-checked quarterly in <a href="#" data-goto="practice">the record, kept in The Practice tab</a>.</p>
+
+            <p>Read the last two rows against the scorecard and the inversion is explicit: lenders advance less against the asset that is continuously priced, instantly settled and publicly verifiable than against assets appraised yearly or <span class="bac-term">priced by estimate</span><span class="help-tip" tabindex="0">?<span class="tip-content">Matrix pricing: a bond&rsquo;s value estimated from similar bonds, because the bond itself rarely trades.</span></span>. And a regulated bank cannot count it at all. Collateral that is stronger by many of the measures above is, on a bank balance sheet, worth zero.</p>
+
+            <h2>Why houses don&rsquo;t get margin calls</h2>
+            <p>The sharpest way to see what bitcoin borrowers are actually paying for is the comparison nobody makes. A homeowner whose house falls 30% below the loan value receives no call, no demand, nothing, so long as the payments continue. A bitcoin borrower at the same shortfall is liquidated automatically, possibly at 3 a.m. Same secured-lending machinery; opposite philosophies.</p>
+            <p>The mortgage&rsquo;s patience is not a kindness. It is a legal construction. Ability-to-repay rules require the lender to underwrite the <em>borrower</em>, not the asset; foreclosure law imposes months of judicial process; several states strip lenders of recourse beyond the house itself. A margin call on a residential mortgage is not unfashionable. It is, in effect, prohibited. The bitcoin loan sits at the other pole: the lender underwrites the <em>asset</em>, and enforcement is continuous and automated because nothing in law slows it down.</p>
+            <div class="bac-callout bac-quiet">
+                <p>Put differently: <strong class="bac-lede">a margin call is continuous verification with nothing softening it.</strong> A bitcoin lender re-verifies the pledge every second, and the contract acts on what it finds &ndash; no legal buffer sits between a shortfall and a sale. A mortgage lender never re-checks the collateral, only the payments. Whether constant marking to market with transparent pricing serves borrowers better than infrequent appraisal with patient enforcement is a genuine question, and lenders, borrowers and regulators would answer it differently.</p>
+            </div>
+
+            <h2>Decomposing the gap</h2>
+            <p>Five forces hold bitcoin&rsquo;s terms where they are. Three are structural: they move only if rules move. Two are market forces that competition and maturity can close.</p>
+            <div class="bac-tablewrap">
+                <table class="bac-table">
+                    <thead>
+                        <tr><th scope="col">Force</th><th scope="col">Kind</th><th scope="col">What it does</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Bank capital treatment</td><td><strong>Structural</strong></td><td class="bac-dim">Banks fund cheaply from sticky deposits and can hold collateral through volatility. The Basel framework applies a 100% haircut to bitcoin, which keeps banks out entirely and leaves the lending to non-banks with costlier, less stable funding.</td></tr>
+                        <tr><td>Legal certainty</td><td><strong>Structural</strong></td><td class="bac-dim">Case law is young, and state commercial-code modernisation (UCC Article 12) is incomplete. The Celsius bankruptcy ruled the coins in its yield-bearing accounts property of the estate: customers became unsecured creditors, recovering partially, years later.</td></tr>
+                        <tr><td>Statutory eligible-collateral lists</td><td><strong>Structural</strong></td><td class="bac-dim">The GENIUS Act&rsquo;s payment-stablecoin reserve rules exclude bitcoin, alongside gold, corporate bonds and secured loans, from the assets allowed to back a dollar. Instant-redemption backing is the strictest collateral test in current law, and the exclusion codifies the same stress-performance concern this tab examines below.</td></tr>
+                        <tr><td>Volatility &rarr; conservative LTVs</td><td>Market</td><td class="bac-dim">Daily volatility several times that of any traditional collateral forces low loan-to-value ratios, which makes each loan capital-inefficient for the lender.</td></tr>
+                        <tr><td>Thin competition, novelty margin</td><td>Market</td><td class="bac-dim">Few lenders, wide spreads, funding models still maturing. The ordinary economics of a young market.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>The serious objection: performance in the wrong state</h2>
+            <p>The strongest case against bitcoin as collateral is not &ldquo;it is volatile.&rdquo; It is that collateral must perform in the exact state of the world where it gets seized, and bitcoin&rsquo;s weakness has historically clustered in precisely that state. In March 2020 it fell roughly 40% in two days, alongside equities, with its correlation to equities spiking to then-record levels, at the very moment lenders everywhere were seizing and selling. The October 2025 cascade rhymed: the largest liquidation event on record began with a tariff headline, and bitcoin fell double digits alongside every other risk asset. Treasuries did the opposite: in a panic, money runs toward them. That risk-off role is one bitcoin has not yet established.</p>
+            <p>Two things belong beside that fact. First, every collateral asset has a state of the world it fails in. Housing collateral failed in 2008, falling furthest exactly when it was seized most. Treasuries met their own failure state in 2022: the worst drawdown in modern bond-market history, arriving precisely when inflation protection was wanted &ndash; a reminder that their safety is nominal, not real. Underwriting collateral is not choosing an asset without a failure state. It is choosing the failure state you can survive.</p>
+            <p>Second, many contend bitcoin will eventually earn a risk-off role of its own. The structural case rests on absolute scarcity, 24/7 liquidity and instant marking to market. But as of the 2026 bear market the record is short, and lenders price the record, not the case. That behaviour is still evolving and maturing: the four completed cycles bottomed 77% to 85% below their peaks, discounting 2011&rsquo;s 93% on an exchange that had no real market infrastructure, while this cycle&rsquo;s deepest reading so far is about 51%. And when regional banks failed in March 2023, bitcoin rose while bank stocks collapsed. In the bank scare a week after the October 2025 cascade, it fell with everything else. One divergence is a hint, not a forecast. It is tracked, quarterly, in <a href="#" data-goto="practice">the record in The Practice tab</a>.</p>
+            <p class="bac-small">Cycle depths are the documented daily-close extremes recorded on <a href="/bull-and-bear-cycles.html">Bitcoin Bull &amp; Bear Cycles</a>. The current-cycle figure is the deepest point of this site&rsquo;s shared ~12-day price series measured against the same 2025 peak, so it reads slightly shallower than a daily-close extreme would.</p>
+
+            <h2>What would have to change: the tripwires</h2>
+            <p>The gap is the thesis. If lenders already offered Treasury-repo terms against bitcoin, there would be nothing here to notice. What follows is not a forecast but a <em>watchlist</em>: the specific, observable things that would mark the gap closing, or refusing to.</p>
+            <div class="bac-tablewrap">
+                <table class="bac-table">
+                    <thead>
+                        <tr><th scope="col">Watch</th><th scope="col">What movement means</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>The Basel haircut schedule</td><td class="bac-dim">Any reduction from 100% would let banks hold bitcoin collateral without a total capital penalty, admitting the lowest-cost lenders in the system.</td></tr>
+                        <tr><td>State commercial-code adoption (UCC Art. 12)</td><td class="bac-dim">State-by-state rules for perfecting a security interest in digital assets. Watch the adoption map.</td></tr>
+                        <tr><td>Federal market-structure law (the CLARITY Act)</td><td class="bac-dim">Passed the House in 2025; at the Senate floor as of August 2026. Its qualified-custodian rules and customer-property bankruptcy protections would directly address the Celsius problem.</td></tr>
+                        <tr><td>The rate &amp; LTV series</td><td class="bac-dim">Logged quarterly in <a href="#" data-goto="practice">the record</a>. Compression means maturity arriving; stasis means it isn&rsquo;t.</td></tr>
+                        <tr><td>Realized volatility &amp; cycle drawdowns</td><td class="bac-dim">The market-side driver of conservative LTVs. Declining volatility should pull LTVs up.</td></tr>
+                        <tr><td>Stress behaviour</td><td class="bac-dim">March 2023: banks failed and bitcoin rose. October 2025: a bank scare, and bitcoin fell with everything else. This row moves when the divergence repeats in a genuine panic.</td></tr>
+                        <tr><td>Statutory eligible-collateral lists</td><td class="bac-dim">Amendment of a reserve-eligibility list, the GENIUS Act&rsquo;s or a successor&rsquo;s, would be among the loudest possible signals of reclassification.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <p class="bac-continue"><a href="#" data-goto="practice">Continue to The Practice &rarr;</a></p>
+    </div>
+
+    <!-- ═══════════════ TAB IV · THE PRACTICE ═══════════════ -->
+    <div class="tab-content" id="tab-practice" role="tabpanel">
+        <p class="bac-thesis">&ldquo;Bitcoin as collateral&rdquo; is not one proposition. It is five, and they differ exactly where the history says they would: in who holds the keys, and what the borrower can still see.</p>
+
+        <div class="bac-prose">
+            <p>Two of the columns below answer different people. The lender verifies that the collateral exists and can be seized. The borrower verifies the opposite risk: that the coins remain unencumbered while pledged &ndash; not lent onward, not reduced to an IOU &ndash; so that repayment ends with their return.</p>
+
+            <div class="bac-tablewrap">
+                <table class="bac-table">
+                    <thead>
+                        <tr><th scope="col">Structure</th><th scope="col">Who holds the keys</th><th scope="col">Rehypothecation</th><th scope="col">What the borrower can verify</th><th scope="col">At liquidation</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Collaborative multisig</strong> <span class="bac-small">(2-of-3: borrower, lender, neutral agent)</span></td>
+                            <td>No single party</td>
+                            <td>Structurally prevented: no one can move the coins alone</td>
+                            <td class="bac-dim">The pledge address itself, on-chain, in real time</td>
+                            <td class="bac-dim">Requires two parties; slower, and visible as it happens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lender-held custody</strong></td>
+                            <td>The lender or its custodian</td>
+                            <td>Whatever the agreement grants &ndash; read it</td>
+                            <td class="bac-dim">Balance statements; the chain, only if addresses are disclosed</td>
+                            <td class="bac-dim">Automated sale at the contractual threshold</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Protocol escrow (DeFi)</strong></td>
+                            <td>A smart contract</td>
+                            <td>None beyond the code &ndash; but most &ldquo;bitcoin DeFi&rdquo; wraps BTC onto other chains, and the bridge is a custodian in disguise</td>
+                            <td class="bac-dim">Everything, continuously</td>
+                            <td class="bac-dim">Automatic, instant, no discretion, no phone call</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ETF shares as margin</strong></td>
+                            <td>The fund&rsquo;s custodian (omnibus)</td>
+                            <td>Broker margin terms typically permit it</td>
+                            <td class="bac-dim">Fund-level attestations, not your claim specifically</td>
+                            <td class="bac-dim">Standard brokerage liquidation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Corporate treasury structure</strong> <span class="bac-small">(bitcoin treasury companies: economic collateral, not pledged)</span></td>
+                            <td>The company; coins unencumbered</td>
+                            <td>Not applicable: the bitcoin backs securities economically, not legally</td>
+                            <td class="bac-dim">Company disclosures; on-chain attestations where published</td>
+                            <td class="bac-dim">No margin call exists. The risk moves into the price of the paper: STRC, designed to hold $100, has traded beneath it even while the company&rsquo;s bitcoin exceeded the claims against it. <a href="/the-strc-mechanism.html">The STRC Mechanism</a> covers why.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="bac-small">Named examples of these structures exist across the market &ndash; collaborative-custody lenders, consumer platforms, and treasury companies &ndash; and are catalogued in the companion research rather than endorsed here.</p>
+
+            <div class="bac-callout bac-quiet">
+                <p><strong class="bac-lede">The Celsius clause.</strong> The largest bitcoin collateral failure to date did not require fraud at the custody layer. Depositors granted the platform the right to rehypothecate their coins in the terms of service, at signup. Whatever structure a borrower chooses, the first verification is not on-chain. It is in the agreement.</p>
+            </div>
+
+            <h2>Run your own numbers</h2>
+            <p>The margin-call arithmetic &ndash; what price triggers a call at what loan-to-value, stress-tested against historical drawdowns &ndash; is a working tool on this site already. Rather than duplicate it here, carry your scenario into it directly:</p>
+            <p class="bac-handoff"><a href="/borrowing-against-your-stack.html?loan=25000&amp;rate=12">Open Borrowing Against Your Stack &rarr;</a></p>
+            <p class="bac-small" style="text-align:center">See also <a href="/bitcoin-backed-mortgages.html">Bitcoin-Backed Mortgages</a> for the housing-specific case.</p>
+
+            <h2 id="record">The record</h2>
+            <p>This exploration is maintained. The tripwires in The Gap and the three series below are refreshed quarterly &ndash; rates and loan-to-values, the collateral panel, the regulatory line &ndash; so a reader can watch bitcoin&rsquo;s standing as collateral become normalized and common, or fail to. The page keeps its own evidence.</p>
+
+            <div class="bac-cards">
+                <div class="bac-card">
+                    <h3>1 &middot; The rate &amp; LTV series</h3>
+                    <p>Representative bitcoin-backed loan terms, logged quarterly with lender composition noted, because the series is only comparable if it compares like quotes. Compression over time is the maturity signal; the spread against mortgage and margin rates is the chart.</p>
+                    <table class="bac-table">
+                        <thead>
+                            <tr><th scope="col">Quarter</th><th scope="col">LTV range</th><th scope="col">Rate range</th><th scope="col">Composition</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>2026 Q3 <span class="bac-small">(first entry)</span></td><td>40&ndash;60%</td><td>&asymp;9&ndash;14% APR</td><td class="bac-dim">consumer and marketplace lenders; composition log begins</td></tr>
+                            <tr><td>2026 Q4</td><td class="bac-dim">next reading</td><td class="bac-dim">scheduled</td><td class="bac-dim">&ndash;</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bac-card">
+                    <h3>2 &middot; The collateral panel</h3>
+                    <p>The whole market cannot be measured: private lenders do not publish their books. So instead of one total, this tracks named sources that do publish &ndash; bitcoin locked in lending protocols (visible on-chain), lender loan books where disclosed, treasury-company holdings where attested. Each is read two ways, how many coins and what they are worth in dollars, because those answer different questions: is usage growing, and is the collateral base becoming economically significant. What cannot be observed is listed as exactly that. First reading at launch.</p>
+                </div>
+                <div class="bac-card">
+                    <h3>3 &middot; The event ledger</h3>
+                    <p>When bitcoin collateral has been liquidated at scale &ndash; including at loan-to-values that had been considered safe. Dated, sourced, kept current. A page arguing the asset is maturing as collateral should be the same page that lists every episode.</p>
+                    <table class="bac-table">
+                        <thead>
+                            <tr><th scope="col">Date</th><th scope="col">Event</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="bac-dim">2020 &middot; Mar</td><td>&ldquo;Black Thursday&rdquo;: ~40% fall in two days; cascading protocol liquidations, some at near-zero bids.</td></tr>
+                            <tr><td class="bac-dim">2021 &middot; May</td><td>Leverage flush: mass exchange liquidations as price halved from the April high.</td></tr>
+                            <tr><td class="bac-dim">2022 &middot; Jun&ndash;Jul</td><td>The credit unwind: Celsius, Three Arrows and the CeFi lending complex; rehypothecated collateral frozen, then consumed in bankruptcy.</td></tr>
+                            <tr><td class="bac-dim">2022 &middot; Nov</td><td>FTX: &ldquo;verified reserves&rdquo; revealed as the salad-oil pattern &ndash; attestation without liabilities.</td></tr>
+                            <tr><td class="bac-dim">2023 &middot; Jan</td><td>The unwind&rsquo;s last casualty: Genesis Global Capital, among the largest crypto lenders, files Chapter 11 after freezing withdrawals in the FTX contagion. Bitcoin creditors ultimately recovered roughly half, in kind.</td></tr>
+                            <tr><td class="bac-dim">2025 &middot; Oct</td><td>The largest liquidation event on record: more than $19 billion in leveraged positions closed in roughly 24 hours after a tariff shock, 1.6 million traders hit. An exchange-margin cascade, not a lender failure &ndash; the distinction this ledger exists to track.</td></tr>
+                            <tr><td class="bac-dim">To date</td><td>No major bitcoin lender has failed since Genesis&rsquo;s filing: the first deep drawdown since 2018 without a credit-system casualty, through the 2026 bear market so far. The cascades that continue are exchange-margin events; the lending system itself has held.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <p class="bac-continue"><a href="#coda">Read the closing &darr;</a></p>
+    </div>
+
+</main>
+
+<!-- ═══════════════ CODA — below the tabs, seen by every reader ═══════════════ -->
+<section class="bac-coda" id="coda">
+    <div class="content-area">
+        <p class="bac-codabig">For four thousand years, the pledge was a promise.<br>Bitcoin is the first collateral where the pledge is a <em>verifiable fact</em>.</p>
+        <div class="bac-prose">
+            <p>Gold never escaped its trade-off: a bearer asset too cumbersome to pledge at scale, or a practical paper claim that quietly reintroduced every trust failure from the goldsmiths to the salad-oil tanks. Bitcoin is the first asset that is both at once. It settles bearer-final within the hour &ndash; six <span class="bac-term">confirmations</span><span class="help-tip" tabindex="0">?<span class="tip-content">Blocks added to the chain after the one containing your transaction, arriving roughly every ten minutes; six is the customary standard for finality.</span></span>, roughly ten minutes apart, is the customary standard &ndash; it divides to eight decimals, and it is verifiable by anyone, anywhere, without permission. A lender can control collateral they cannot steal; a borrower can watch a pledge they no longer hold. No vault, registry, or receipt in the history of secured credit has offered that combination.</p>
+            <p>The claim stops there, and deliberately. This is a capability, not yet the practice. Most institutional bitcoin sits in omnibus custodial accounts, holding the asset in precisely the paper mode it was designed to escape, and lenders price bitcoin collateral accordingly, as The Gap shows in numbers. Whether the gap closes is not asserted here. It is instrumented: the tripwires are named, and <a href="#" data-goto="practice">the record in The Practice tab</a> logs what happens.</p>
+            <p>One thing follows for the patient reader, stated plainly. Collateral value is a use of bitcoin, and today&rsquo;s lending terms show the market barely prices it. If that changes &ndash; if the properties measured above start showing up in rates and loan-to-values &ndash; the benefit lands on whoever already holds the asset when it does. You do not need to borrow against bitcoin today for this to matter: holding it is what keeps the option open. This page does not predict that the option pays. It records, quarterly, whether it has begun to.</p>
+        </div>
+    </div>
+</section>
+
+<div class="bac-companions">
+    <div class="content-area">
+        <p class="bac-complabel">Companion explorations</p>
+        <a href="/borrowing-against-your-stack.html">Borrowing Against Your Stack</a>
+        <a href="/bitcoin-backed-mortgages.html">Bitcoin-Backed Mortgages</a>
+        <a href="/the-strc-mechanism.html">The STRC Mechanism</a>
+        <a href="/paper-bitcoin.html">Paper Bitcoin vs. Real Bitcoin</a>
+        <a href="/risks-to-bitcoin.html">Risks to Bitcoin</a>
+    </div>
+</div>
+
+</div>

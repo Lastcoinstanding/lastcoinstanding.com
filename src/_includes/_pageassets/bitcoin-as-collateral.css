@@ -1,0 +1,766 @@
+/* ───────────────────────────────────────────────
+   BITCOIN AS COLLATERAL — PAGE CSS
+
+   Width tier: mixed-content (STYLE_GUIDE §4.2) — 1100px container,
+   880px centered prose block. Re-derived from the §4.2 table, NOT
+   inherited from the standalone preview (which approximated at
+   1060/780).
+
+   §4.2 foundation preamble is self-declared in full: base.njk carries
+   no palette, no body theme, no link rule, no .hero, no .content-area,
+   no .section-intro and no .help-tip. Every one of those is declared
+   below. Diffed against two donors (borrowing-against-your-stack and
+   paper-bitcoin) with zero missing rows from the §4.2 table.
+
+   Every colour routes through a CSS variable (checklist §1) — no
+   hardcoded hex in this file below the :root block, and none in the
+   page JS.
+
+   Sections:
+    1. Palette tokens
+    2. Page width + dark canvas
+    3. Hero
+    4. Sticky tab bar + tab content
+    5. Prose register (section-intro, prose blocks, links, callouts)
+    6. Help-tip / tooltip (incl. the scroll-container-safe variant)
+    7. Tables ($100 table, forces, tripwires, structures)
+    8. Scorecard (lens control, grid, pips, strips, reasoning box)
+    9. The record (three instrument cards)
+   10. Continue links + coda + companion strip
+   ─────────────────────────────────────────────── */
+
+/* ─── 1. PALETTE TOKENS ─── */
+:root {
+    --bg:            #0a0908;
+    --bg-card:       #141210;
+    --bg-card-2:     #191612;
+    --border:        rgba(150,139,122,0.18);
+    --border-strong: rgba(150,139,122,0.32);
+    --text:          #ece4d6;
+    --text-body:     #ded5c6;
+    --text-bright:   #f2eee8;
+    --text-dim:      #968b7a;
+    --text-muted:    #6a6256;
+    --text-faint:    #5a5247;
+    --amber:         #e09422;
+    --amber-dim:     rgba(224,148,34,0.55);
+    --amber-soft:    rgba(224,148,34,0.13);
+    --amber-hair:    rgba(224,148,34,0.05);
+    --btc:           #F7931A;
+    --btc-soft:      rgba(247,147,26,0.16);
+
+    /* Rating ramp — five steps, poor → strong. Used by both the pips
+       and the compressed strips row, so a rating reads the same colour
+       in both places. */
+    --rate-4:        var(--btc);
+    --rate-3:        var(--amber);
+    --rate-2:        #b8945f;
+    --rate-1:        #55503f;
+    --rate-0:        #2e2a24;
+    --rate-2-soft:   rgba(184,148,95,0.13);
+    --rate-1-soft:   rgba(150,139,122,0.12);
+    --rate-0-soft:   rgba(90,82,71,0.18);
+
+    /* Chrome washes — tokenized so the page owns every colour it paints
+       (checklist §1: no raw hex/rgb outside :root). */
+    --bg-veil:       rgba(10,9,8,0.94);
+    --hover-wash:    rgba(255,255,255,0.02);
+    --shadow-card:   0 6px 18px rgba(0,0,0,0.5);
+
+    --font-display:  'Cormorant Garamond', Georgia, serif;
+    --font-body:     'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ─── 2. PAGE WIDTH + DARK CANVAS ─── */
+/* base.njk paints no background: without this the whole page renders
+   browser-white with var-based borders falling back to canvastext. */
+body {
+    background: var(--bg);
+    color: var(--text-body);
+    font-family: var(--font-body);
+}
+
+.content-area {
+    position: relative;
+    max-width: 1100px;      /* mixed-content tier, STYLE_GUIDE §4.2 */
+    margin: 0 auto;
+    padding: 0 2rem 5rem;
+}
+/* The canonical 880px essay block. Applied to the BLOCK, never to
+   individual paragraphs (§4.2). Centred with margin auto — constraint
+   without centring is worse than no constraint. */
+.bac-prose {
+    max-width: 880px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ─── 3. HERO ─── */
+.hero {
+    position: relative;
+    text-align: center;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 4.5rem 2rem 2.5rem;
+}
+.hero .bac-kicker {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0 0 1.5rem;
+}
+.hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.06;
+    letter-spacing: -0.015em;
+    margin: 0 0 1.1rem;
+}
+.hero h1 em {
+    font-style: italic;
+    color: var(--amber);
+    font-weight: 500;
+}
+.hero .hero-subtitle {
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+    font-style: italic;
+    color: var(--text-dim);
+    max-width: 680px;
+    margin: 0 auto 1.2rem;
+    line-height: 1.5;
+}
+.hero .subtitle {
+    font-size: clamp(0.98rem, 1.8vw, 1.08rem);
+    line-height: 1.7;
+    color: var(--text-dim);
+    max-width: 680px;
+    margin: 0 auto;
+}
+.hero .subtitle em { color: var(--text); font-style: italic; }
+
+@media (max-width: 720px) {
+    .content-area { padding: 0 1.25rem 3rem; }
+    .hero { padding: 3rem 1.25rem 1.75rem; }
+}
+
+/* ─── 4. STICKY TAB BAR + TAB CONTENT ─── */
+/* House multi-tab pattern: sticky bar so the reader can move between
+   tabs from anywhere in a long tab, paired with the end-of-tab continue
+   links (§10 below) that restore the intended sequence. */
+/* Full-bleed sticky rail, constrained button row inside it. If the bar
+   itself were 1100px wide, page content would scroll past unblurred in
+   the gutters on wide viewports. */
+.bac-tabbar {
+    position: sticky;
+    /* .site-nav is itself sticky at top:0, so the tab bar has to park
+       beneath it. The height differs between the desktop link row and the
+       mobile hamburger row, so the page JS measures .site-nav and writes
+       --bac-nav-h; the fallback matches the measured desktop height. */
+    top: var(--bac-nav-h, 65px);
+    z-index: 40;
+    background: var(--bg-veil);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin: 1.5rem 0 2.75rem;
+}
+.tab-nav {
+    display: flex;
+    gap: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+@media (max-width: 720px) {
+    .tab-nav { padding: 0 0.5rem; }
+}
+.tab-btn {
+    flex: 1;
+    padding: 1rem 1rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.25s, border-color 0.25s;
+    font-family: inherit;
+}
+.tab-btn:hover { background: var(--hover-wash); }
+.tab-btn .tab-num {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    transition: color 0.25s;
+}
+.tab-btn .tab-title {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    font-weight: 500;
+    color: var(--text-dim);
+    transition: color 0.25s;
+    letter-spacing: 0.005em;
+}
+.tab-btn.active { border-bottom-color: var(--amber); }
+.tab-btn.active .tab-num { color: var(--amber); }
+.tab-btn.active .tab-title { color: var(--text); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: bacTabIn 0.35s ease; }
+@keyframes bacTabIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 720px) {
+    .tab-btn { padding: 0.8rem 0.4rem; }
+    .tab-btn .tab-num { font-size: 0.58rem; letter-spacing: 0.14em; }
+    .tab-btn .tab-title { font-size: 0.92rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .tab-content.active { animation: none; }
+}
+
+/* ─── 5. PROSE REGISTER ─── */
+.section-intro {
+    margin: 0 auto 2rem;
+    max-width: 880px;
+}
+.section-intro h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.15;
+    margin: 0 0 1rem;
+    letter-spacing: -0.005em;
+}
+.section-intro h2 em { font-style: italic; color: var(--amber); }
+.section-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--text-dim); }
+.section-intro p em { color: var(--text); font-style: italic; }
+.section-intro p strong { color: var(--text); font-weight: 600; }
+
+/* The page thesis line that opens each tab. */
+.bac-thesis {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(1.5rem, 3vw, 1.95rem);
+    line-height: 1.4;
+    text-align: center;
+    color: var(--text);
+    max-width: 760px;
+    margin: 0 auto 3.25rem;
+}
+
+.bac-prose h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 3.2vw, 2.3rem);
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.2;
+    margin: 3rem 0 1rem;
+    letter-spacing: -0.005em;
+}
+.bac-prose h2 em { font-style: italic; color: var(--amber); }
+.bac-prose h3 {
+    font-family: var(--font-display);
+    font-size: clamp(1.3rem, 2.3vw, 1.65rem);
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.25;
+    margin: 2rem 0 0.75rem;
+}
+.bac-prose p {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--text-body);
+    margin: 0 0 1.2rem;
+}
+.bac-prose p em { font-style: italic; color: var(--text-bright); }
+.bac-prose p strong { color: var(--text-bright); font-weight: 600; }
+.bac-prose .bac-small,
+.bac-small {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--text-dim);
+}
+
+/* Body-link treatment, scoped to every prose container on the page.
+   base.njk has NO site-wide link rule — omit this and links render
+   user-agent blue/purple (§4.2). :visited declared for legibility. */
+.bac-prose a,
+.bac-callout a,
+.bac-table a,
+.bac-card a,
+.bac-coda a,
+.bac-note a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid var(--amber-dim);
+    transition: color 0.2s, border-color 0.2s;
+}
+.bac-prose a:visited,
+.bac-callout a:visited,
+.bac-table a:visited,
+.bac-card a:visited,
+.bac-coda a:visited,
+.bac-note a:visited { color: var(--amber); }
+.bac-prose a:hover,
+.bac-callout a:hover,
+.bac-table a:hover,
+.bac-card a:hover,
+.bac-coda a:hover,
+.bac-note a:hover { color: var(--btc); border-bottom-color: var(--btc); }
+
+/* The numbered opening question list on The History. */
+.bac-qlist { list-style: none; margin: 1.6rem 0 0.5rem; padding: 0; }
+.bac-qlist li {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    margin-bottom: 0.75rem;
+}
+.bac-qlist .bac-qn {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: var(--amber);
+    min-width: 22px;
+}
+.bac-qlist .bac-qt { font-size: 1.05rem; color: var(--text); }
+
+/* Callout block — authorial aside, left rule. */
+.bac-callout {
+    border-left: 2px solid var(--amber);
+    background: var(--bg-card);
+    padding: 1.25rem 1.5rem;
+    margin: 1.9rem 0;
+    border-radius: 0 6px 6px 0;
+}
+.bac-callout p { margin: 0; font-size: 1rem; line-height: 1.72; color: var(--text-body); }
+.bac-callout p + p { margin-top: 0.9rem; }
+.bac-callout strong { color: var(--text-bright); font-weight: 600; }
+.bac-callout .bac-lede { color: var(--amber); font-weight: 600; }
+.bac-callout.bac-quiet { border-left-color: var(--text-faint); }
+
+/* The signature line closing The Scorecard. */
+.bac-sig {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.18rem;
+    color: var(--text);
+    max-width: 780px;
+    margin: 2.25rem auto 0.5rem;
+    text-align: center;
+    line-height: 1.5;
+}
+
+/* ─── 6. HELP-TIP / TOOLTIP (STYLE_GUIDE §6.13) ─── */
+/* Two triggers on this page: the `?` circle beside a defined term, and
+   the ▲ mover marker inside the scorecard.
+   ONE rendering mechanism for both — the shared position:fixed card
+   painted by the page JS (§4 there), NOT the usual absolutely-positioned
+   sibling card. Reason: several `?` triggers live inside .bac-tablewrap
+   and every ▲ lives inside .bac-scrollwrap, both overflow-x:auto. A
+   scroll container with one axis auto and the other visible computes
+   BOTH to auto, so an absolute sibling card is clipped vertically as
+   well as horizontally — the tooltip would be cut off exactly where the
+   §6.13 pattern normally works fine. Rather than ship the sibling card
+   for prose tips and the fixed card for table tips (two mechanisms, one
+   of which silently breaks whenever a term later moves into a table),
+   everything on this page goes through the fixed card.
+   .tip-content therefore stays in the markup purely as the copy source
+   and is never displayed in place. */
+.help-tip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid var(--text-muted);
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    font-style: normal;
+    font-weight: 400;
+    cursor: help;
+    position: relative;
+    margin-left: 3px;
+    vertical-align: baseline;
+}
+.help-tip:hover,
+.help-tip:focus {
+    border-color: var(--amber);
+    color: var(--amber);
+    outline: none;
+}
+/* Copy source only — the visible card is .bac-floattip below. */
+.help-tip .tip-content { display: none; }
+
+/* Mover marker (▲) inside the scorecard. */
+.bac-mover {
+    color: var(--btc);
+    font-size: 0.68rem;
+    vertical-align: super;
+    margin-left: 3px;
+    cursor: help;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    line-height: 1;
+}
+.bac-mover:focus { outline: 1px solid var(--amber); outline-offset: 2px; }
+.bac-mover .bac-mover-copy { display: none; }
+
+/* The single floating card, appended to <body> so no scroll container
+   can clip it. */
+.bac-floattip {
+    position: fixed;
+    display: none;
+    width: min(260px, calc(100vw - 32px));
+    padding: 0.6rem 0.75rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--text);
+    line-height: 1.45;
+    text-align: left;
+    z-index: 200;
+    box-shadow: var(--shadow-card);
+    pointer-events: none;
+}
+.bac-floattip.is-open { display: block; }
+
+/* Inline defined term — dotted underline, carries a help-tip sibling. */
+.bac-term {
+    font-style: normal;
+    border-bottom: 1px dotted var(--text-faint);
+}
+
+/* ─── 7. TABLES ─── */
+.bac-tablewrap {
+    overflow-x: auto;
+    margin: 1.6rem 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    -webkit-overflow-scrolling: touch;
+}
+.bac-table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 640px;
+    font-size: 0.92rem;
+}
+.bac-table th {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--amber);
+    text-align: left;
+    padding: 0.8rem 0.9rem;
+    border-bottom: 1px solid var(--border-strong);
+    background: var(--bg-card);
+    font-weight: 600;
+}
+.bac-table td {
+    padding: 0.75rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--text-body);
+}
+.bac-table tr:last-child td { border-bottom: none; }
+.bac-table td.bac-dim { color: var(--text-dim); }
+.bac-table td strong { color: var(--text-bright); font-weight: 600; }
+/* The two shaded rows of the $100 table — the gap the tab explains. */
+.bac-table tr.bac-gaprow td { background: var(--amber-hair); }
+.bac-fav   { color: var(--text); font-weight: 500; }
+.bac-harsh { color: var(--text-dim); }
+.bac-marklegend {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin: -0.6rem 0 1.5rem;
+}
+
+/* ─── 8. SCORECARD ─── */
+.bac-lens {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin: 0.4rem 0 0.5rem;
+    flex-wrap: wrap;
+}
+.bac-lensbtn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+}
+.bac-lensbtn:hover { color: var(--text); }
+.bac-lensbtn.active { border-color: var(--amber); color: var(--amber); }
+.bac-lensnote {
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    min-height: 22px;
+    margin-bottom: 0.9rem;
+}
+
+.bac-scrollwrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 0.5rem 0 0.6rem;
+    -webkit-overflow-scrolling: touch;
+}
+.bac-score {
+    border-collapse: collapse;
+    min-width: 940px;
+    width: 100%;
+    font-size: 0.86rem;
+}
+.bac-score th {
+    text-align: center;
+    vertical-align: bottom;
+    padding: 0.75rem 0.5rem;
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-strong);
+}
+.bac-score th.bac-rowhead { min-width: 190px; text-align: left; color: var(--amber); }
+/* Group separators marking the five asset classes. */
+.bac-score th.bac-grp,
+.bac-score td.bac-grp { border-left: 1px solid var(--border-strong); }
+.bac-score td {
+    text-align: center;
+    cursor: pointer;
+    padding: 0.7rem 0.5rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+}
+.bac-score tr:last-child td { border-bottom: none; }
+.bac-score td.bac-rowname {
+    text-align: left;
+    color: var(--text-dim);
+    font-size: 0.84rem;
+    cursor: default;
+    min-width: 190px;
+}
+.bac-score td:not(.bac-rowname):hover { background: var(--bg-card-2); }
+.bac-score td.is-selected {
+    background: var(--bg-card-2);
+    outline: 1px solid var(--amber);
+    outline-offset: -1px;
+}
+/* Strips summary row — "All ten, compressed". */
+.bac-score tr.bac-sum td {
+    border-top: 2px solid var(--border-strong);
+    background: var(--bg-card);
+    padding: 0.8rem 0.4rem 0.85rem;
+    cursor: default;
+}
+.bac-score tr.bac-sum td:hover { background: var(--bg-card); }
+.bac-score tr.bac-sum td.bac-rowname {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--amber);
+    font-weight: 600;
+}
+.bac-strip { display: inline-flex; gap: 1.5px; }
+.bac-strip span { width: 8.5px; height: 13px; border-radius: 1.5px; display: block; }
+.bac-c4 { background: var(--rate-4); }
+.bac-c3 { background: var(--rate-3); }
+.bac-c2 { background: var(--rate-2); }
+.bac-c1 { background: var(--rate-1); }
+.bac-c0 { background: var(--rate-0); }
+
+.bac-pip {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.76rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+.bac-s4 { background: var(--btc-soft);      color: var(--rate-4); }
+.bac-s3 { background: var(--amber-soft);    color: var(--rate-3); }
+.bac-s2 { background: var(--rate-2-soft);   color: var(--rate-2); }
+.bac-s1 { background: var(--rate-1-soft);   color: var(--text-dim); }
+.bac-s0 { background: var(--rate-0-soft);   color: var(--text-faint); }
+
+.bac-legend {
+    display: flex;
+    gap: 0.9rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 0.9rem 0 0.25rem;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+}
+.bac-moverkey {
+    font-size: 0.86rem;
+    color: var(--text-dim);
+    max-width: 880px;
+    margin: 0.4rem auto;
+}
+.bac-moverkey b { color: var(--btc); font-weight: 600; }
+
+.bac-why {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card);
+    padding: 1.25rem 1.5rem;
+    min-height: 86px;
+    margin-bottom: 0.5rem;
+}
+.bac-why .bac-whyhead {
+    font-family: var(--font-body);
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.5rem;
+}
+.bac-why p { margin: 0; color: var(--text-body); font-size: 0.98rem; line-height: 1.7; }
+
+.bac-stripnote {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    max-width: 880px;
+    margin: 0.5rem auto 0;
+}
+.bac-stripnote b { color: var(--text); font-weight: 600; }
+
+/* ─── 9. THE RECORD ─── */
+.bac-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin: 1.75rem 0;
+}
+.bac-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card);
+    padding: 1.5rem 1.6rem;
+}
+.bac-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.24rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 0.6rem;
+}
+.bac-card p {
+    font-size: 0.94rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin: 0 0 0.75rem;
+}
+.bac-card .bac-table { min-width: 0; font-size: 0.86rem; }
+.bac-card .bac-table th { background: none; padding-top: 0; }
+
+/* The BAS handoff button. */
+.bac-handoff { text-align: center; margin: 1.6rem 0; }
+.bac-handoff a {
+    display: inline-block;
+    border: 1px solid var(--amber);
+    color: var(--amber);
+    padding: 0.75rem 1.6rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.98rem;
+    transition: background 0.2s, color 0.2s;
+}
+.bac-handoff a:hover { background: var(--amber-soft); color: var(--btc); }
+
+/* ─── 10. CONTINUE LINKS + CODA + COMPANIONS ─── */
+/* End-of-tab continue links: the second half of the multi-tab house
+   pattern. Tabs give random access but hide sequence; these restore the
+   intended reading order without taking the random access away. */
+.bac-continue { text-align: center; margin: 3rem 0 0.5rem; }
+.bac-continue a {
+    font-size: 1rem;
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid var(--amber-dim);
+    padding-bottom: 2px;
+    transition: color 0.2s, border-color 0.2s;
+}
+.bac-continue a:hover { color: var(--btc); border-bottom-color: var(--btc); }
+
+.bac-coda {
+    border-top: 1px solid var(--border);
+    margin-top: 4.5rem;
+    padding: 4.5rem 0 3rem;
+    text-align: center;
+}
+.bac-coda .bac-codabig {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.7rem, 3.6vw, 2.5rem);
+    line-height: 1.35;
+    color: var(--text);
+    max-width: 860px;
+    margin: 0 auto 1.9rem;
+}
+.bac-coda .bac-codabig em { font-style: italic; color: var(--amber); }
+.bac-coda .bac-prose { text-align: left; }
+.bac-coda .bac-prose p { color: var(--text-body); }
+
+.bac-companions {
+    border-top: 1px solid var(--border);
+    padding: 3rem 0 1rem;
+    text-align: center;
+}
+.bac-companions .bac-complabel {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 1.1rem;
+}
+.bac-companions a {
+    display: inline-block;
+    margin: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+}
+.bac-companions a:hover { color: var(--amber); border-bottom-color: var(--amber-dim); }
+
+.bac-note {
+    font-size: 0.86rem;
+    color: var(--text-dim);
+    line-height: 1.65;
+    margin: 0.5rem 0 1.2rem;
+}
