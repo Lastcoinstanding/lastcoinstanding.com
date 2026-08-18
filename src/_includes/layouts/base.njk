@@ -552,7 +552,23 @@ h1, h2, h3 {
     {#- Mobile nav = grouped accordion (NAV_MEGA_MENU_DESIGN §4.3). Three category
         buckets collapse; the current page's bucket is pre-expanded server-side
         (open class + aria-expanded true). Group sub-labels stay inside The
-        Arguments / The Numbers panels. Gallery / Calculators / About stay flat. -#}
+        Arguments / The Numbers panels. Dashboard / Gallery / Calculators / About
+        stay flat.
+
+        Dashboard was added here 2026-08-18. It is `category: hub` in
+        explorations.json, and NO category loop renders hub pages, so a hub page
+        reaches the nav only by being hardcoded — exactly how The Gallery does it.
+        Mirrors Gallery's flat-anchor treatment verbatim: same markup shape, same
+        `slug ==` active conditional, no interactive marker, and no
+        `freshnessBadge()` call (Gallery makes none either; freshness is derived
+        from updates.json independently of the nav, so a flat item opting out is
+        supported, not a gap). Styling is inherited from `.mobile-overlay a` with
+        no new CSS.
+
+        NOTE: there is still NO desktop nav entry for the dashboard — this fix is
+        mobile-only, matching the reported gap. On desktop (and on mobile pages
+        that render it) the channel ribbon is the dashboard's entry point, which
+        is why the gap only showed on mobile menus. -#}
     <div class="mobile-overlay" id="mobileOverlay">
         <div class="m-acc{% if currentCat == 'foundations' %} open{% endif %}">
             <button type="button" class="m-acc-btn" aria-expanded="{% if currentCat == 'foundations' %}true{% else %}false{% endif %}" aria-controls="m-sec-foundations">Foundations <span class="m-acc-caret" aria-hidden="true">&#9662;</span></button>
@@ -584,6 +600,7 @@ h1, h2, h3 {
 {%- endfor %}
             </div>
         </div>
+        <a href="/dashboard.html"{% if slug == 'dashboard' %} class="active"{% endif %}>Dashboard</a>
         <a href="/the-gallery.html"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
         <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
