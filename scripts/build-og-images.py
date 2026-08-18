@@ -520,6 +520,37 @@ CARDS = [
         },
         "output_filename": "og-the-bitcoin-hurdle-rate-chart.jpg",
     },
+    {
+        # Product-forward (STYLE_GUIDE §6.15.2): the scorecard IS the argument —
+        # ten properties, seven columns, no winner, bitcoin twice. Hero is the
+        # All-rows view INCLUDING the strips summary row, which is the fastest
+        # read at social-card size.
+        # The grid lives in tab II, so it must be revealed before capture; the
+        # table is JS-rendered, hence the post-click wait. At the 1280px OG
+        # viewport the 940px-min table fits inside .bac-scrollwrap without
+        # horizontal scroll, so the wrap captures the whole grid.
+        # NOTE: the ratings are editorial, not live data — this card does NOT
+        # go stale on a price refresh and needs no MONTHLY_REFRESH regen line.
+        "name": "collateral",
+        "url": "https://lastcoinstanding.com/bitcoin-as-collateral",
+        "hero_selector": ".bac-scrollwrap",
+        "wait_after_navigate_ms": 1500,
+        "click_before_capture": "button.tab-btn[data-tab='scorecard']",
+        "wait_after_scroll_ms": 900,
+        "chrome": {
+            "title": "Bitcoin as ",
+            "titleAccent": "Collateral",
+            "titleAfter": "",
+            "subtitle": "The pledge you can see: scored against everything else lenders take.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">10 properties</strong>'
+                '  ·  <strong style="color:#F7931A; font-weight:700;">7 ways of holding</strong>'
+                '  ·  <strong style="color:#F7931A; font-weight:700;">5 asset classes</strong>'
+            ),
+            "urlText": "lastcoinstanding.com/bitcoin-as-collateral",
+        },
+        "output_filename": "og-bitcoin-as-collateral.jpg",
+    },
 ]
 
 

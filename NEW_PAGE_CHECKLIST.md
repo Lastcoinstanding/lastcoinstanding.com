@@ -93,6 +93,9 @@ Add a new entry to the array:
 
 - **`category`** determines which top-nav dropdown the entry appears under
   (Foundations / The Arguments / The Numbers). See `STYLE_GUIDE §6.9`.
+- **If the new page is in The Numbers**, add its row to **SITE_GUIDE §30's
+  item table** — the nav renders automatically from `explorations.json`, but
+  §30's table is a hand-maintained snapshot.
 - **`interactive`** — `true` if the page has buttons, sliders, scrubbable
   charts, or any user-driven UI. Adds the amber • marker next to the
   nav link.

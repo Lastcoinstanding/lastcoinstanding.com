@@ -234,6 +234,26 @@ the present.
 (±50bp); the month string updates whenever the rate does. The Power Law
 preset inputs need no refresh — they compute live from the shared globals.
 
+**Bitcoin as Collateral — the "as of August 2026" strings and the $100 table.**
+`src/bitcoin-as-collateral.njk` carries two coupled things that stale together
+and must move together:
+
+1. The Gap tab's `Figures as of August 2026.` line, and the same tab's
+   `at the Senate floor as of August 2026` CLARITY Act status.
+2. The **$100-of-collateral table** it labels — the bitcoin loan row
+   (`$40–60` / `≈9–14% APR`), the mortgage `≈6.6%`, the Reg T margin
+   `≈5.5–8%`, the repo `≈0.5%` haircut, and India's 75% LTV cap.
+
+The loan-market rows are the fastest-staling numbers on the page and the page
+says so in print, which means a stale month string here is a broken promise
+rather than cosmetic drift. The **2026 Q3 row of the rate & LTV series** in The
+Practice tab quotes the same LTV and rate ranges — if the table moves and the
+series row does not, the page contradicts itself in two tabs. Check both, always.
+
+```bash
+grep -n "as of August 2026\|as of \[Month\]" src/bitcoin-as-collateral.njk
+```
+
 ## 4. Conditional disclosures and percentile markers
 
 Pages that compute and display a *current* state value — e.g., *"bitcoin
@@ -425,6 +445,41 @@ grep -rniE 'honest|candid|transparent|canonical' src --include=*.njk --include=*
 - New pages and new homepage/tile copy since the last check are the likely
   carriers. Full method + the last sweep's carve-outs: the de-tell entry in
   `PAGE_IDEAS_BACKLOG.md`.
+
+## 8.6. Bitcoin as Collateral — the record (QUARTERLY, `/bitcoin-as-collateral.html`)
+
+The page promises the reader, in print, that "the tripwires in The Gap and the
+three series below are refreshed quarterly." That promise is the whole
+instrument: a page arguing bitcoin is maturing as collateral earns nothing if
+its own evidence goes stale. This is the one recurring obligation the page
+carries, and it is **quarterly, not monthly** — the monthly `as of` strings and
+$100-table figures are §3 above.
+
+Each quarter, in The Practice tab:
+
+- **The rate & LTV series** — add a new quarter row. Record the LTV range, the
+  rate range, **and the lender composition**, because the series is only
+  comparable if it compares like quotes; a compression caused by a different mix
+  of lenders is not the maturity signal the page claims to be watching. Convert
+  the current quarter's placeholder row into a real reading and add the next
+  placeholder.
+- **The collateral panel** — refresh the named publishing sources (lending-protocol
+  BTC visible on-chain, disclosed lender loan books, attested treasury holdings).
+  Read each **both ways**, coins and dollars. Anything that cannot be observed
+  stays listed as exactly that; do not substitute an estimate to fill the gap.
+- **The event ledger** — sweep for any at-scale liquidation since the last check,
+  including at LTVs that had been considered safe. Note the standing
+  "2023 – present: no major bitcoin lender has failed" row is a *scope* claim
+  about credit-system failures, not exchange-margin cascades — if it stops being
+  true, that row is the most consequential edit on the page.
+
+And in The Gap tab:
+
+- **Tripwire status lines** — Basel haircut schedule, UCC Art. 12 adoption map,
+  and especially the **CLARITY Act** status (as shipped: passed the House 2025,
+  at the Senate floor as of August 2026; cloture filed 8 Aug 2026, next
+  procedural step 15 Sep 2026). A moved tripwire is the page's headline event,
+  so this line earns a real check rather than a glance.
 
 ## 9. Bitcoin & Metcalfe's Law — ETF-era time-sensitive figures (`/bitcoin-and-metcalfes-law.html`)
 

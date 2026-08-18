@@ -2095,7 +2095,7 @@ faq:
 
 ## 8. What this guide intentionally doesn't cover
 
-- **Voice and content** — see `SITE_GUIDE.md` (the editorial register, "elegiac seriousness", argument structure, etc.). Exception: two cross-cutting *house-style* conventions (don't announce your own honesty; prefer commas/hyphens over em-dashes) are codified in **§10** below, because they govern phrasing and punctuation on every page and every Claude Code build.
+- **Voice and content** — see `SITE_GUIDE.md` (the editorial register, "elegiac seriousness", argument structure, etc.). Exception: two cross-cutting *house-style* conventions (don't announce your own honesty; prefer commas/full stops/colons over dashes, and a spaced en-dash when one is needed) are codified in **§10** below, because they govern phrasing and punctuation on every page and every Claude Code build.
 - **Page-level information architecture** — what sections each exploration page must have, how charts are framed, etc. Belongs in a future `PAGE_PATTERNS.md` if it becomes worth codifying.
 - **Animation and motion design** — the site is mostly static, but a small, deliberate motion vocabulary exists and is documented in **§6.23** (the "you are here" pulse family: `lcs-pulse-halo` / `lcsPulseRing` chart markers, and the channel-ribbon live dot `cr-dot` / `lcsRibbonPulseRing`). Motion is used only as a liveness/anchor signal, gated on real data; see §6.23 for the honesty binding and the sub-threshold lesson.
 - **Specific chart styling** — chart-specific decisions (colors of BTC vs S&P series, axis treatments, etc.) are page-specific. Codify if patterns emerge.
@@ -2154,6 +2154,12 @@ The long em-dash ("—"), especially in pairs bracketing a clause, is a tell of 
 - Avoid stacking multiple em-dash asides in a single paragraph; if a paragraph has more than one, rewrite at least one with a comma or a full stop.
 
 This is a house-style preference, not a grammar rule; apply it in new copy and when editing existing pages, without contorting a sentence to avoid a dash that is genuinely the clearest choice.
+
+#### 10.2.1 Dashes — the en-dash is the house glyph (tightened 2026-08-18)
+
+**Dashes: prefer commas, full stops, or colons over dashes. Where a dash genuinely earns its place, use a spaced en-dash ( – ), never an em-dash (—), and never a spaced hyphen. Rationale: dash frequency is the tell to avoid; the en-dash is the house glyph when one is needed.**
+
+This tightens §10.2 in two ways and supersedes it where they differ: the first move is now to *remove* the dash (comma, full stop, or colon), not to swap one dash for another; and when a dash does survive that test, the glyph is the spaced en-dash rather than §10.2's "simple hyphen" or a reserved em-dash. Existing pages are not swept by this entry — that is a separate, deliberate job.
 
 ### 10.3 Numbers in verdict prose
 

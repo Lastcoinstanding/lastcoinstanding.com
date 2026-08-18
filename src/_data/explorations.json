@@ -126,6 +126,14 @@
     "group": "Holding & Spending",
     "interactive": false
   },
+  {
+    "_comment": "Bitcoin as Collateral (2026-08-18). category arguments / group 'Holding & Spending' — it sits beside Paper Bitcoin, which is the verification argument underneath it, and the page is about what a pledge IS rather than a personal-decision tool. Its three closest companions (Borrowing Against Your Stack, Bitcoin-Backed Mortgages, The STRC Mechanism) live in The Numbers / 'Living on Bitcoin'; cross-linking carries that relationship, the nav does not. interactive: true (scorecard lens views + tap-for-reasoning). NO calculator_tile by design — the scorecard is comparative, not a personal-decision tool, so it does not belong on /calculators.",
+    "slug": "bitcoin-as-collateral",
+    "title": "Bitcoin as Collateral",
+    "category": "arguments",
+    "group": "Holding & Spending",
+    "interactive": true
+  },
 
   {
     "_comment": "── The Numbers — grouped via the `group` field; see SITE_GUIDE §30 (nav grouping). Group display order is controlled by base.njk's numbersGroups array; item order within a group follows array order here. ──",

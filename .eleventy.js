@@ -62,6 +62,7 @@ module.exports = function (eleventyConfig) {
     'og-bitcoin-allocation-sizing.jpg',
     'og-living-on-bitcoin.jpg',
     'og-paper-bitcoin.jpg',
+    'og-bitcoin-as-collateral.jpg',
     'og-risks-to-bitcoin.jpg',
     'og-how-much-bitcoin.jpg',
     'og-spend-and-replace.jpg',
