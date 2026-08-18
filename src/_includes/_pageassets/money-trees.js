@@ -466,3 +466,40 @@ window.addEventListener('resize', () => {
 
 
 
+
+/* ─── Sticky offset chain (added 2026-08-18) ───────────────────────────────
+   This page stacks two sticky elements under the sticky site nav: <header>
+   parks below the nav, and .toggle-container parks below the header. Both
+   offsets are measured from the viewport top, so each depends on the real
+   rendered height of everything above it — and BOTH of those heights are
+   responsive. Measured: nav 65px desktop / 55px at 380px; header 138px
+   desktop / 148px at 380px. No single hardcoded pair can be correct at both
+   ends, which is why the old 44px/129px values were wrong by ~74px and why
+   replacing them with another pair of constants only moved the error.
+
+   So the offsets are measured, following the Bitcoin as Collateral pattern:
+   write them to custom properties and let CSS consume them with the previous
+   constants as fallbacks (so a JS failure degrades to the old behaviour
+   rather than to zero). ResizeObserver catches the header changing height on
+   rotate or font load, which a resize listener alone misses. */
+(function () {
+  var nav = document.querySelector('.site-nav');
+  var hdr = document.querySelector('header');
+  if (!hdr) return;
+
+  function syncStickyOffsets() {
+    var navH = nav ? Math.round(nav.getBoundingClientRect().height) : 65;
+    var hdrH = Math.round(hdr.getBoundingClientRect().height);
+    var root = document.documentElement.style;
+    root.setProperty('--mt-nav-h', navH + 'px');
+    root.setProperty('--mt-toggle-top', (navH + hdrH) + 'px');
+  }
+
+  syncStickyOffsets();
+  window.addEventListener('resize', syncStickyOffsets);
+  if (typeof ResizeObserver !== 'undefined') {
+    var ro = new ResizeObserver(syncStickyOffsets);
+    ro.observe(hdr);
+    if (nav) ro.observe(nav);
+  }
+})();

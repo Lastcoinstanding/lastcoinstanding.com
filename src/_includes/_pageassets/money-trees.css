@@ -19,14 +19,33 @@ body {
   background: var(--bg-dark);
   color: var(--text-light);
   min-height: 100vh;
-  overflow-x: hidden;
+  /* NO `overflow-x: hidden` here. base.njk's canonical block already sets
+     `overflow-x: clip` on html+body, and it chose `clip` deliberately:
+     `hidden` creates a new scroll container, which silently kills
+     `position: sticky` for EVERY child — including the site nav itself. This
+     page carried `hidden`, so nothing on it stuck: the nav scrolled away, and
+     so did the two sticky elements below. Re-adding `hidden` re-breaks all
+     three. See the canonical-body-css comment in base.njk. */
 }
 
+/* Sticky chain: this header parks under the site nav, and .toggle-container
+   parks under this header. Both offsets are viewport-relative, so each has to
+   clear the real rendered height of everything above it — and both of those
+   heights are RESPONSIVE. Measured: nav 65px desktop / 55px at 380px; this
+   header 138px desktop / 148px at 380px (its h1 and p shrink at ≤768px but the
+   text wraps, so it gets taller, not shorter). No single pair of constants is
+   correct at both ends, which is why the original 44px/129px were wrong by
+   ~74px — invisible only because the `overflow-x: hidden` above had sticky
+   disabled entirely, so nothing on this page ever stuck.
+   Hence measured offsets, set by money-trees.js into --mt-nav-h and
+   --mt-toggle-top (the Bitcoin as Collateral pattern). The fallbacks are the
+   correct desktop constants, so a JS failure degrades to a good desktop
+   layout rather than to top:0. */
 header {
   text-align: center;
   padding: 40px 20px 10px;
   position: sticky;
-  top: 44px;
+  top: var(--mt-nav-h, 65px);
   z-index: 100;
   background: linear-gradient(180deg, var(--bg-dark) 0%, rgba(10,12,15,0.95) 100%);
 }
@@ -52,7 +71,7 @@ header p {
   gap: 15px;
   padding: 15px;
   position: sticky;
-  top: 129px;
+  top: var(--mt-toggle-top, 203px);
   z-index: 100;
   background: linear-gradient(180deg, rgba(10,12,15,0.95) 0%, rgba(10,12,15,0) 100%);
 }
