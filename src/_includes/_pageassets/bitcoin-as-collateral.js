@@ -175,7 +175,7 @@
       goldp:  [3, 'Possession and documented allocated title stand up well; the law of pledged chattels is ancient.'],
       goldpa: [1, 'Unallocated holders are unsecured creditors of the issuer, a status many discover only at the moment it matters.'],
       btcs:   [2, 'Direct on-chain title is clean, but case law is young and commercial-code modernisation is incomplete across states. Improving; not settled.'],
-      btcc:   [1, 'Celsius established that custodied coins can be estate property. "Your" bitcoin may be a claim in a queue.']
+      btcc:   [1, 'Celsius established that coins in its yield-bearing accounts were estate property; holders became unsecured creditors. "Your" bitcoin may be a claim in a queue.']
     },
     settle: {
       tsy:    [3, 'Next-day settlement through mature infrastructure.'],

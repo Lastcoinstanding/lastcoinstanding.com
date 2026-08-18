@@ -137,6 +137,15 @@ Captured during the merge pass, because the backlog is now large enough that the
 
 - [ ] House pattern for multi-tab explorations. Adopt sticky tab bar + end-of-tab continue links (History → Scorecard → … → closing anchor) as the standard for all multi-tab pages, per the Bitcoin as Collateral build. Audit existing tabbed pages (Retirement first) for retrofit. Rationale: tabs hide sequence; continue links restore it without giving up random access.
 
+- [ ] **Em-dash sweep — retire em-dashes from existing reader-facing copy.** The dash rule landed in STYLE_GUIDE §10.2.1 on 2026-08-18 (prefer commas, full stops or colons; where a dash earns its place use a spaced en-dash, never an em-dash, never a spaced hyphen). New copy complies from that date; **existing pages were deliberately not swept** (JM: "a separate, deliberate job"). Bitcoin as Collateral is the first page built fully to the rule and is the reference for what compliant copy reads like.
+  - **Scope it as one decision, not per-page drift:** the sweep covers page body copy, homepage concept-card and carousel copy, `updates.json` summaries, and `related:` descs.
+  - **Metadata title separators — decide once, globally (JM 2026-08-18).** Every page's `<title>` and OG/Twitter title uses ` — Last Coin Standing` with an em-dash, and TECH_DEBT records a past pass that *standardised* on it. Bitcoin as Collateral shipped with the em-dash separator deliberately, for family consistency, rather than becoming a lone en-dash outlier. Whether the separator changes site-wide is a single call to make inside this job; do not let individual page ships decide it.
+  - **Do not contort sentences** to avoid a dash that is genuinely the clearest choice (§10.2.1 says as much), and leave code comments, `<link rel="canonical">` and CSS token names alone.
+
+- [ ] **Queued documentation accuracy fixes — small, batch them.** Found in passing; none worth their own pass, all worth not re-discovering.
+  - **NEW_PAGE_CHECKLIST §5 describes Latest as "a rolling 2–3 card display".** It has actually held **six** cards for some time, and the rotation rule that gets applied is "insert at top, drop the genuinely oldest by ship date". Correct the description to match practice (found during the Bitcoin as Collateral ship, 2026-08-18, where the stale line nearly caused the wrong card to be rotated out).
+  - **SITE_GUIDE §13 slide-inventory table has drifted from `src/index.njk`.** Table and markup agree only for rows 1–9; recent slides were appended to the table rather than inserted at their markup position (Discount, or Premium? and The STRC Mechanism are the clearest, the latter still tabled under its retired name *STRC Below Par*), and markup now carries one more slide than the table lists. Reconciling reorders ~30 rows of hand-written video-concept prose and the row numbers are live citation anchors, so it wants one deliberate pass. Full detail in the ⚠️ note under §13's renumber log.
+
 ### Power Law cluster
 
 - [x] **Power Law v2 — a consolidated pass on `/the-power-law`.** Shipped as one pass; sub-items below are kept as the build record.
