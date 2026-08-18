@@ -251,8 +251,22 @@ a:not([class]):hover { text-decoration-color: #e09422; }
 .channel-ribbon .cr-zone { color: #a89f93; font-style: italic; }
 .channel-ribbon .cr-price { color: #cbc3b7; font-variant-numeric: tabular-nums; letter-spacing: 0.2px; }
 .channel-ribbon .cr-sep { color: #55504a; }
+/* Zone divider — the quiet wall between the data zone and the link zone.
+   Deliberately NOT amber/orange: it fences the two links, so any accent here
+   would compete with the things it is separating. Takes the same #55504a as
+   .cr-sep (the separator family) so it reads as punctuation rather than as a
+   new visual element. 1px wide via border-left rather than a background, so it
+   stays hairline-crisp at any DPR. Height is 0.95em against a 1.4 line-height,
+   i.e. deliberately SHORT of full-height — an inset wall, not a rule dividing
+   the strip in two. align-self:center because the ribbon is baseline-aligned
+   and a zero-content box has no baseline to sit on. */
+.channel-ribbon .cr-divider {
+  flex: 0 0 auto; align-self: center;
+  width: 0; height: 0.95em;
+  border-left: 1px solid #55504a;
+}
 .channel-ribbon .cr-register { color: #8c857c; font-style: italic; font-size: 0.82em; }
-/* Primary CTA — orange accent ("see the dashboard →"). Brightens on hover of the
+/* Primary CTA — orange accent ("the Dashboard →"). Brightens on hover of the
    primary link only (not the whole strip, now that a second link shares it). */
 .channel-ribbon .cr-cta { color: #e09422; font-weight: 600; white-space: nowrap; }
 .channel-ribbon .cr-primary:hover .cr-cta { color: #f0a838; }
@@ -285,8 +299,12 @@ a:not([class]):hover { text-decoration-color: #e09422; }
   .channel-ribbon .cr-trend-word { display: none; }
   /* The data leads on a phone; drop the primary CTA and the secondary foundation
      link (each with its separator) before any wrap. The primary anchor (the data
-     itself) stays clickable to /dashboard — mobile keeps the dashboard link only. */
-  .channel-ribbon .cr-cta, .channel-ribbon .cr-sep-cta,
+     itself) stays clickable to /dashboard — mobile keeps the dashboard link only.
+     The zone divider goes with them: it exists to fence the link zone, so with
+     no link zone it would trail the price as a stray tick. `.cr-sep-cta` is kept
+     in this list although the markup no longer emits it — harmless, and it keeps
+     the rule correct if that separator is ever reinstated. */
+  .channel-ribbon .cr-cta, .channel-ribbon .cr-sep-cta, .channel-ribbon .cr-divider,
   .channel-ribbon .cr-secondary, .channel-ribbon .cr-sep-secondary { display: none; }
 }
 </style>
@@ -543,6 +561,7 @@ h1, h2, h3 {
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
             </div>
         </div>
+        <a href="/dashboard.html"{% if slug == 'dashboard' %} class="active"{% endif %}>The Dashboard</a>
         <a href="/the-gallery.html"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
         <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
@@ -565,10 +584,12 @@ h1, h2, h3 {
         supported, not a gap). Styling is inherited from `.mobile-overlay a` with
         no new CSS.
 
-        NOTE: there is still NO desktop nav entry for the dashboard — this fix is
-        mobile-only, matching the reported gap. On desktop (and on mobile pages
-        that render it) the channel ribbon is the dashboard's entry point, which
-        is why the gap only showed on mobile menus. -#}
+        The desktop row carries the same hardcoded anchor in the same position
+        (added a beat later, same commit series), so the two hub surfaces read as
+        siblings on both breakpoints: … The Dashboard · The Gallery · Calculators
+        · About. Labels must stay identical across the two rows. The channel
+        ribbon remains the dashboard's *contextual* doorway — live data, on the
+        page you happen to be reading — while these are its canonical nav slots. -#}
     <div class="mobile-overlay" id="mobileOverlay">
         <div class="m-acc{% if currentCat == 'foundations' %} open{% endif %}">
             <button type="button" class="m-acc-btn" aria-expanded="{% if currentCat == 'foundations' %}true{% else %}false{% endif %}" aria-controls="m-sec-foundations">Foundations <span class="m-acc-caret" aria-hidden="true">&#9662;</span></button>
@@ -600,7 +621,7 @@ h1, h2, h3 {
 {%- endfor %}
             </div>
         </div>
-        <a href="/dashboard.html"{% if slug == 'dashboard' %} class="active"{% endif %}>Dashboard</a>
+        <a href="/dashboard.html"{% if slug == 'dashboard' %} class="active"{% endif %}>The Dashboard</a>
         <a href="/the-gallery.html"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
         <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>

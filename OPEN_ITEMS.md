@@ -50,6 +50,17 @@ session automatically. Close items here when done; this file is the "what's cook
   the site-wide entry the chip would have been. The deferred **companion reciprocal back-links** shipped
   in the same PR (`/dashboard` added to Wait-or-Deploy + How Much Cash `related:`). Full record:
   `SITE_GUIDE §47` v2 block.
+  - **AMENDED 2026-08-18 — the rescope left a real gap, now closed.** "The ribbon IS the site-wide
+    entry" held on desktop but **not on mobile**: the ribbon `display:none`s its links ≤480px (the
+    documented narrow-viewport degradation), and the dashboard had no nav entry on either breakpoint,
+    so on a phone there was no path to the page from the menu at all, and none from most pages. The
+    dashboard now carries a **hardcoded flat nav anchor on both desktop and mobile** ("The Dashboard",
+    beside The Gallery) — hub-category pages reach the nav only by being hardcoded, which is the
+    detail the original rescope missed. The ribbon stays as the *contextual* live-data doorway; the
+    nav slots are the canonical entry. See `SITE_GUIDE §47`.
+    **Lesson for future rescopes: a surface that degrades responsively cannot be the sole entry point
+    for anything** — check what it looks like at the breakpoint where it sheds elements before
+    accepting it as a replacement for a dedicated one.
 
 - [x] **DONE (2026-08-10) — Dashboard OG card handback (`og-dashboard.jpg`).** JM handed back the
   1280×720 JPEG (93 KB); committed (`897fa46`) and registered in `.eleventy.js` `staticAssets`.

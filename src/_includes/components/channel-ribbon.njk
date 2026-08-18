@@ -43,7 +43,7 @@
 {%- if channel_ribbon is not defined or channel_ribbon -%}
 <div class="channel-ribbon" data-channel-ribbon>
   {#- Primary link: the data strip + CTA are one clickable unit → /dashboard. -#}
-  <a class="cr-primary" href="/dashboard.html" aria-label="Bitcoin relative to the Power Law channel — see the dashboard">
+  <a class="cr-primary" href="/dashboard.html" aria-label="Bitcoin relative to the Power Law channel: open the Dashboard">
     <span class="cr-dot" aria-hidden="true"></span>
     <span class="cr-metric cr-mult"><span class="cr-mult-value">&mdash;</span><span class="cr-trend-word">&nbsp;trend</span></span>
     <span class="cr-sep" aria-hidden="true">&middot;</span>
@@ -54,11 +54,18 @@
         Wording matches the shared todayPriceLabel/todayPriceNote helpers'
         "latest monthly data" so the ribbon can't drift from the page readouts. -#}
     <span class="cr-register" hidden>&nbsp;&middot; latest monthly data</span>
-    {#- Primary CTA — the dashboard is the read. Its separator + the CTA hide
+    {#- Zone divider — the quiet wall between the DATA zone and the LINK zone.
+        Replaces the middot that used to sit here: a middot read as "another
+        item in the list", which is exactly wrong now that what follows is a
+        different kind of thing (destinations, not readings). Muted separator
+        tone, never amber, so it cannot compete with the two links it fences.
+        Hides with the links ≤480px (see the CSS). -#}
+    <span class="cr-divider" aria-hidden="true"></span>
+    {#- Primary CTA — the dashboard is the read. It and the divider hide
         together on very narrow viewports (the data leads there); the primary
-        anchor stays clickable to /dashboard. -#}
-    <span class="cr-sep cr-sep-cta" aria-hidden="true">&middot;</span>
-    <span class="cr-cta">see the dashboard&nbsp;&rarr;</span>
+        anchor stays clickable to /dashboard. Label mirrors the secondary
+        link's artifact-named, lowercase-article form ("the Power Law →"). -#}
+    <span class="cr-cta">the Dashboard&nbsp;&rarr;</span>
   </a>
   {#- Secondary link: the foundation. Suppressed on /the-power-law (no self-link)
       and hidden ≤480px (mobile keeps the dashboard link only). Visually dim / no
