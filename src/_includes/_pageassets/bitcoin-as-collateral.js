@@ -201,7 +201,7 @@
       eq:     [1, 'Falls in the same risk-off states that trigger the margin calls. The collateral and the trigger are the same trade.'],
       goldp:  [3, 'A long crisis record and a real bid in monetary stress, alongside multi-decade drawdowns of its own.'],
       goldpa: [2, 'Tracks the metal, plus an issuer whose own solvency is most doubtful in the same states.'],
-      btcs:   [1, 'March 2020: roughly −40% in two days, correlation to equities near +0.6. Weakness clustered in the exact state where collateral must hold. Recent stress episodes hint at changing behaviour; one cycle is a hint, not a forecast.'],
+      btcs:   [1, 'March 2020: roughly −40% in two days, correlation to equities spiking to then-record levels. Weakness clustered in the exact state where collateral must hold. Recent stress episodes hint at changing behaviour; one cycle is a hint, not a forecast.'],
       btcc:   [1, 'Everything in the previous column, plus a custodian whose solvency is most doubtful in the same state of the world.']
     },
     income: {
