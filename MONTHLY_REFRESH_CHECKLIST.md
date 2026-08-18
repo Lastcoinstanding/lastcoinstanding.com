@@ -242,7 +242,10 @@ and must move together:
    `at the Senate floor as of August 2026` CLARITY Act status.
 2. The **$100-of-collateral table** it labels — the bitcoin loan row
    (`$40–60` / `≈9–14% APR`), the mortgage `≈6.6%`, the Reg T margin
-   `≈5.5–8%`, the repo `≈0.5%` haircut, and India's 75% LTV cap.
+   `≈5–8% (tiered)`, the repo `≈0.5%` haircut, and India's 75% LTV cap.
+   The margin band is **best-commonly-available, matching the repo row's basis** — the
+   "(tiered)" parenthetical is load-bearing, because small retail balances pay 10–11%
+   base under $25K and the band would otherwise read as universal.
 
 The loan-market rows are the fastest-staling numbers on the page and the page
 says so in print, which means a stale month string here is a broken promise

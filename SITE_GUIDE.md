@@ -653,6 +653,14 @@ Copy: label "Bitcoin as Collateral"; headline *"The pledge you can see."* with *
 
 Video (`/videos/bitcoin-as-collateral.mp4`, 6,287,639 bytes, 1280×720, 10.0s, silent, `+faststart` with moov at byte 36): wired the generic `video.carousel-video` way, no per-id JS registration. **Iteration record — three generations, v1 accepted.** The brief offered three takes on one concept (verification replacing concealment): the seal, the boundary stone, and the vault that became glass. The seal won on v1. Two deliberate calls are recorded because both look like defects and are not: the **molten never-cooling seal was kept on purpose** — a cooling seal reads as one-time attestation, a still-molten one as continuous verification, which is the page's actual claim; and **v2 was rejected despite rendering the briefed beat** — it produced the lattice-spread but overshot into engulfing fire and lost the overlay dark zone the text needs. The spread therefore lives in the headline rather than the footage, the same division of labour as the Risks slide, where the antifragility beat never rendered and the headline carried it.
 
+**Featured ruling — JM curation, 2026-08-18.** Bitcoin as Collateral is promoted to `data-feat="1"`, and **How Much Bitcoin is demoted to `0`** to make room (it stays in its Numbers tab, and 0 rather than a removed attribute marks it as a deliberate demotion). JM's stated rationale for the demotion: How Much Bitcoin is *"more of an esoteric page."* **Recorded explicitly because it departs from the nearest-thematic-neighbour default** — that heuristic would have pointed at Paper Bitcoin, the new slide's actual companion and markup neighbour. This is owner's curation overriding the default, not an application of it; do not read it as precedent for the heuristic.
+
+The slide **stays at markup position 3**. JM floated moving it to the front but marked position as low-stakes, and moving it would re-trigger the renumber logged above for no display gain — because of the mechanics below.
+
+**Featured mechanics, since the ruling turned on them** (`_pageassets/index.js`): the carousel filters `dataset.feat === '1'` and otherwise filters by `dataset.cat`, so **Featured membership is the only thing `data-feat` controls — order within the Featured tab is just markup order**, and there is no separate featured-order field. More importantly, `setTab()` picks its entry slide with `Math.floor(Math.random() * slides.length)`, so **a slide's position never determines what a visitor sees first**; the markup `active` class on slide 1 is only the pre-JS fallback. That is why position 3 vs position 1 is genuinely low-stakes, and why promoting to Featured — not repositioning — is what actually changes reach.
+
+> **Count correction:** this swap is deliberately count-neutral, but the set it holds steady is **13 slides, not 10**. The "~10-slot Featured set" figure repeated in this section (and in the STRC prominence note) is stale against markup. Filed with the other §13 accuracy fixes in PAGE_IDEAS_BACKLOG; not corrected inline here because the phrase recurs and wants one pass.
+
 _Otherwise none currently._ (The **STRC Below Par** slide shipped July 2026 — see the inventory table and its iteration record below. Per JM's 2026-07-28 prominence decision it ships under **The Numbers only, `data-feat="0"` — never Featured**, so it rotates within the Numbers category but stays out of the ~10-slot Featured set; the financialization fence holds one row back.) The **deployment-trilogy** slides (Lump Sum or Ladder In?, Your Bitcoin Deployment Plan, Wait, or Deploy Now?) shipped June 2026 and are now in the inventory table below — the videos landed as a tonal arc rather than the literal channel-diagram directions first proposed (firelit two-glass pour → aerial golden river valley → sun emerging from cloud over calm sea). The Bitcoin & Metcalfe's Law slide shipped June 2026 as well (see the slide-added note above and the iteration record below).
 
 **Renumber, August 2026:** the Bitcoin as Collateral slide landed at position 3 to sit adjacent to its companion Paper Bitcoin (slide 2). Slides previously numbered 3–38 are now 4–39. Iteration-record section headers and the BvSM record's internal cross-references were shifted by the same +1 so each keeps whatever row it was tracking.
@@ -2651,5 +2659,43 @@ The page maintains its own evidence rather than asserting a trajectory: (1) the 
 - **No tool-framing strip** &ndash; the page carries no buy/sell inputs; the BAS handoff is the only decision-adjacent surface and BAS itself carries the strip.
 - **No `calculator_tile`** &ndash; the scorecard is comparative, not a personal-decision tool, so it does not belong on `/calculators`.
 - **No FAQ block.** Deliberate, not an omission: the page went through a 66-comment review as a fixed copy-of-record, and a FAQ would introduce unreviewed prose. Revisit as a follow-up if the SEO case is made.
+
+
+### 48.4 Verification record (pre-merge, 2026-08-18)
+
+Recorded because these were checked and passed, and an unrecorded pass is indistinguishable from an unmade one. **The page carries no sources block**; the citations below are held here so that if one is ever added, it is a transcription job rather than a re-verification job. Two claims that *failed* this pass are not listed here — they were corrected in the page and are recorded in §48.5.
+
+| Claim | Status | Citation for a future sources block |
+|---|---|---|
+| Bitcoin loan rates & LTVs, &asymp;9&ndash;14% / 40&ndash;60% | Verified, band holds | Spot-check 2026-08-18: Strike fixed 10.5&ndash;11.25% APR tiered from 9.5%, line of credit 13% variable; Cadena &asymp;13.0% all-in at 50% LTV |
+| Mortgage &asymp;6.6% | Verified | Freddie Mac PMMS 6.67% (2026-08-13); dailies 6.57&ndash;6.73% on 2026-08-18 |
+| Reg T margin band | Verified, copy tightened | IBKR Pro &asymp;5.0&ndash;5.5%, Robinhood Gold 6.75% flat, Fidelity/Schwab &asymp;7&ndash;8% at size |
+| GENIUS Act 93-day figure + exclusion | Verified, no copy change | GENIUS Act §4(a)(1)(A) &ndash; statutory language is exact; six permitted reserve categories, exclusion by enumeration |
+| Salad-oil scandal | Verified | Miller, *The Great Salad Oil Swindle* &ndash; ~$150M of claims against ~$6M of oil |
+| Hypoth&#275;k&#275; / fiducia&ndash;pignus&ndash;hypotheca | Verified | Oxford Classical Dictionary, "Security"; Verhagen, *Security and Credit in Roman Law* (OUP 2022) |
+| March 2020, roughly &minus;40% in two days | Verified | ~39% on daily closes; the page's "roughly 40%" is the conservative form |
+| 2022 worst modern bond drawdown | Verified | Worst calendar year for the US aggregate index in records to 1972; deepest intermediate-Treasury decline in records to 1926 (McQuarrie; Morningstar) |
+| CLARITY Act status line | Re-verified 2026-08-18 | Cloture filed 8 Aug; next procedural step 15 Sep |
+
+Two things follow that are easy to lose:
+
+- **The Reg T cell reads `≈5–8% (tiered)`, and the parenthetical is load-bearing.** The band is *best-commonly-available*, matching the repo row's basis, but small retail balances pay 10&ndash;11% base under $25K. Without "(tiered)" the band reads as universal and quietly flatters the comparison the page is making.
+- **The Q3 record's composition cell says "consumer and marketplace lenders"** because that is the set actually sampled. It originally said "collaborative-custody" and no collaborative-custody lender was checked. The record is the page's evidence; it may only claim what was checked, and this correction is the standing example of that rule.
+
+**Parked for a future refresh, deliberately not this ship (copy is frozen post-review).** The GENIUS Act also amends Title 11 so that issuer reserves are **not** bankruptcy-estate property &ndash; statutory protection stablecoin holders received and Celsius depositors lacked. That is a sharp counterpoint to The Gap's legal-certainty argument and to the Celsius thread running through the page. Worth adding on the next content pass, not as a late edit to reviewed copy.
+
+### 48.5 Claims that failed verification, and what replaced them
+
+Kept as a record because the failures share a shape: **all three were confident, fluent, plausible sentences inherited from the draft corpus, and none survived a source check.** On a page whose entire argument is "verify the pledge rather than trust the claim," shipping any of them would have been the loudest possible own goal.
+
+| Shipped draft claim | Why it failed | What ships instead |
+|---|---|---|
+| "2023 &ndash; present: no major bitcoin lender has failed" | **Factually false.** Genesis Global Capital filed Chapter 11 on 19 Jan 2023 | A dated Genesis row, plus a "To date" row scoped *since Genesis's filing* |
+| "In the 2025 bank-stress episodes bitcoin rose while financial stocks fell" | **Backwards.** In the Oct 2025 Zions / Western Alliance scare bitcoin fell with risk assets. The real divergence episode is March 2023 | March 2023 named as the divergence, October 2025 named as the counter-example, in both the prose and the tripwire row |
+| Celsius "ruled depositors' custodied coins property of the estate" | **Over-scoped.** The ruling covered the yield-bearing accounts, not the Custody product | Rescoped to "the coins in its yield-bearing accounts", in both the Gap row and the scorecard cell |
+
+Two near-misses worth the same memory. The **&plus;0.6 March-2020 correlation figure** was replaced with "spiking to then-record levels" in the prose but initially survived in the scorecard's stress cell &ndash; the same event described two ways in two places, caught only because the grid was re-read against the prose. And the **October 2025 cascade** was added to the objection paragraph precisely so the ledger's new cascade row and the argument's narrative could not drift apart.
+
+The operating lesson, worth applying to the next inherited draft: **a claim's fluency is not evidence.** Stress-and-failure claims in particular arrive pre-formed and read as settled; treat every one as unverified until it has a source, and re-read the interactive/JS-rendered copy against the prose, because a figure fixed in one surface is not fixed in the other.
 
 **Open follow-ups.** The OG image itself (`og-bitcoin-as-collateral.jpg`) &ndash; the CARDS config and the `.eleventy.js` registration are in place, the asset is generated externally (`npm run build-ogs` needs Playwright + Pillow, unavailable in the build sandbox), so the OG URL phantom-200s until it lands. Carousel slide proposed in §13 Pending additions.

@@ -144,6 +144,7 @@ Captured during the merge pass, because the backlog is now large enough that the
 
 - [ ] **Queued documentation accuracy fixes — small, batch them.** Found in passing; none worth their own pass, all worth not re-discovering.
   - **NEW_PAGE_CHECKLIST §5 describes Latest as "a rolling 2–3 card display".** It has actually held **six** cards for some time, and the rotation rule that gets applied is "insert at top, drop the genuinely oldest by ship date". Correct the description to match practice (found during the Bitcoin as Collateral ship, 2026-08-18, where the stale line nearly caused the wrong card to be rotated out).
+  - **SITE_GUIDE §13 calls Featured a "~10-slot" set; markup carries 13.** The phrase recurs (§13 itself and the STRC prominence note), so fix it in one pass rather than inline. Found 2026-08-18 applying JM's Featured swap, which was count-neutral and so unaffected by the error.
   - **SITE_GUIDE §13 slide-inventory table has drifted from `src/index.njk`.** Table and markup agree only for rows 1–9; recent slides were appended to the table rather than inserted at their markup position (Discount, or Premium? and The STRC Mechanism are the clearest, the latter still tabled under its retired name *STRC Below Par*), and markup now carries one more slide than the table lists. Reconciling reorders ~30 rows of hand-written video-concept prose and the row numbers are live citation anchors, so it wants one deliberate pass. Full detail in the ⚠️ note under §13's renumber log.
 
 ### Power Law cluster
