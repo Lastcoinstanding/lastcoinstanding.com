@@ -54,10 +54,13 @@ session automatically. Close items here when done; this file is the "what's cook
     entry" held on desktop but **not on mobile**: the ribbon `display:none`s its links ≤480px (the
     documented narrow-viewport degradation), and the dashboard had no nav entry on either breakpoint,
     so on a phone there was no path to the page from the menu at all, and none from most pages. The
-    dashboard now carries a **hardcoded flat nav anchor on both desktop and mobile** ("The Dashboard",
+    dashboard now carries a **hardcoded flat nav anchor in the mobile overlay** ("The Dashboard",
     beside The Gallery) — hub-category pages reach the nav only by being hardcoded, which is the
-    detail the original rescope missed. The ribbon stays as the *contextual* live-data doorway; the
-    nav slots are the canonical entry. See `SITE_GUIDE §47`.
+    detail the original rescope missed. **Desktop stays ribbon-only for now:** a matching desktop
+    anchor was built and measured, then reverted before merge because the desktop row has no capacity
+    for a 7th item (it wraps the wordmark and grows the nav below ~1150px, and clips "About" below
+    ~919px). That is acceptable on desktop precisely because the ribbon keeps its links there. Filed
+    as *Desktop nav capacity + The Dashboard entry* in PAGE_IDEAS_BACKLOG. See `SITE_GUIDE §47`.
     **Lesson for future rescopes: a surface that degrades responsively cannot be the sole entry point
     for anything** — check what it looks like at the breakpoint where it sheds elements before
     accepting it as a replacement for a dedicated one.

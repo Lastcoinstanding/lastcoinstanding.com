@@ -561,7 +561,15 @@ h1, h2, h3 {
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
             </div>
         </div>
-        <a href="/dashboard.html"{% if slug == 'dashboard' %} class="active"{% endif %}>The Dashboard</a>
+        {#- NO dashboard anchor here — deliberate, see the mobile-overlay note below
+            and PAGE_IDEAS_BACKLOG "Desktop nav capacity + The Dashboard entry".
+            This row is a nowrap flex whose only shrinkable neighbour is .brand, and
+            it has no headroom left: adding a 7th item (115px) wraps the wordmark and
+            grows the nav 65px → 90px below ~1150px, then overflows and clips "About"
+            below ~919px (the hamburger does not take over until ≤768px, and
+            `overflow-x: clip` hides the spill rather than exposing it). The nav
+            height matters beyond looks — several pages hardcode sticky offsets
+            against 65px. Capacity has to be made before this row gains an item. -#}
         <a href="/the-gallery.html"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
         <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
@@ -584,12 +592,15 @@ h1, h2, h3 {
         supported, not a gap). Styling is inherited from `.mobile-overlay a` with
         no new CSS.
 
-        The desktop row carries the same hardcoded anchor in the same position
-        (added a beat later, same commit series), so the two hub surfaces read as
-        siblings on both breakpoints: … The Dashboard · The Gallery · Calculators
-        · About. Labels must stay identical across the two rows. The channel
-        ribbon remains the dashboard's *contextual* doorway — live data, on the
-        page you happen to be reading — while these are its canonical nav slots. -#}
+        MOBILE-ONLY, for now. A matching desktop anchor was built and measured,
+        then reverted before merge: the desktop row has no capacity left for a 7th
+        item (see the note in the .nav-links block above). So the dashboard's
+        canonical nav presence is this overlay item; on desktop the channel ribbon
+        remains its only doorway. That is survivable there precisely because the
+        ribbon keeps its links at desktop widths and only sheds them ≤480px, which
+        is what made the gap mobile-visible in the first place. When the desktop
+        row gains capacity, add the anchor immediately before The Gallery with the
+        label "The Dashboard" — identical to this one; the labels must match. -#}
     <div class="mobile-overlay" id="mobileOverlay">
         <div class="m-acc{% if currentCat == 'foundations' %} open{% endif %}">
             <button type="button" class="m-acc-btn" aria-expanded="{% if currentCat == 'foundations' %}true{% else %}false{% endif %}" aria-controls="m-sec-foundations">Foundations <span class="m-acc-caret" aria-hidden="true">&#9662;</span></button>
