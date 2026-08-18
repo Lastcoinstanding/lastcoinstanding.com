@@ -251,8 +251,22 @@ a:not([class]):hover { text-decoration-color: #e09422; }
 .channel-ribbon .cr-zone { color: #a89f93; font-style: italic; }
 .channel-ribbon .cr-price { color: #cbc3b7; font-variant-numeric: tabular-nums; letter-spacing: 0.2px; }
 .channel-ribbon .cr-sep { color: #55504a; }
+/* Zone divider — the quiet wall between the data zone and the link zone.
+   Deliberately NOT amber/orange: it fences the two links, so any accent here
+   would compete with the things it is separating. Takes the same #55504a as
+   .cr-sep (the separator family) so it reads as punctuation rather than as a
+   new visual element. 1px wide via border-left rather than a background, so it
+   stays hairline-crisp at any DPR. Height is 0.95em against a 1.4 line-height,
+   i.e. deliberately SHORT of full-height — an inset wall, not a rule dividing
+   the strip in two. align-self:center because the ribbon is baseline-aligned
+   and a zero-content box has no baseline to sit on. */
+.channel-ribbon .cr-divider {
+  flex: 0 0 auto; align-self: center;
+  width: 0; height: 0.95em;
+  border-left: 1px solid #55504a;
+}
 .channel-ribbon .cr-register { color: #8c857c; font-style: italic; font-size: 0.82em; }
-/* Primary CTA — orange accent ("see the dashboard →"). Brightens on hover of the
+/* Primary CTA — orange accent ("the Dashboard →"). Brightens on hover of the
    primary link only (not the whole strip, now that a second link shares it). */
 .channel-ribbon .cr-cta { color: #e09422; font-weight: 600; white-space: nowrap; }
 .channel-ribbon .cr-primary:hover .cr-cta { color: #f0a838; }
@@ -285,8 +299,12 @@ a:not([class]):hover { text-decoration-color: #e09422; }
   .channel-ribbon .cr-trend-word { display: none; }
   /* The data leads on a phone; drop the primary CTA and the secondary foundation
      link (each with its separator) before any wrap. The primary anchor (the data
-     itself) stays clickable to /dashboard — mobile keeps the dashboard link only. */
-  .channel-ribbon .cr-cta, .channel-ribbon .cr-sep-cta,
+     itself) stays clickable to /dashboard — mobile keeps the dashboard link only.
+     The zone divider goes with them: it exists to fence the link zone, so with
+     no link zone it would trail the price as a stray tick. `.cr-sep-cta` is kept
+     in this list although the markup no longer emits it — harmless, and it keeps
+     the rule correct if that separator is ever reinstated. */
+  .channel-ribbon .cr-cta, .channel-ribbon .cr-sep-cta, .channel-ribbon .cr-divider,
   .channel-ribbon .cr-secondary, .channel-ribbon .cr-sep-secondary { display: none; }
 }
 </style>
@@ -543,6 +561,15 @@ h1, h2, h3 {
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
             </div>
         </div>
+        {#- NO dashboard anchor here — deliberate, see the mobile-overlay note below
+            and PAGE_IDEAS_BACKLOG "Desktop nav capacity + The Dashboard entry".
+            This row is a nowrap flex whose only shrinkable neighbour is .brand, and
+            it has no headroom left: adding a 7th item (115px) wraps the wordmark and
+            grows the nav 65px → 90px below ~1150px, then overflows and clips "About"
+            below ~919px (the hamburger does not take over until ≤768px, and
+            `overflow-x: clip` hides the spill rather than exposing it). The nav
+            height matters beyond looks — several pages hardcode sticky offsets
+            against 65px. Capacity has to be made before this row gains an item. -#}
         <a href="/the-gallery.html"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
         <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
@@ -552,7 +579,28 @@ h1, h2, h3 {
     {#- Mobile nav = grouped accordion (NAV_MEGA_MENU_DESIGN §4.3). Three category
         buckets collapse; the current page's bucket is pre-expanded server-side
         (open class + aria-expanded true). Group sub-labels stay inside The
-        Arguments / The Numbers panels. Gallery / Calculators / About stay flat. -#}
+        Arguments / The Numbers panels. Dashboard / Gallery / Calculators / About
+        stay flat.
+
+        Dashboard was added here 2026-08-18. It is `category: hub` in
+        explorations.json, and NO category loop renders hub pages, so a hub page
+        reaches the nav only by being hardcoded — exactly how The Gallery does it.
+        Mirrors Gallery's flat-anchor treatment verbatim: same markup shape, same
+        `slug ==` active conditional, no interactive marker, and no
+        `freshnessBadge()` call (Gallery makes none either; freshness is derived
+        from updates.json independently of the nav, so a flat item opting out is
+        supported, not a gap). Styling is inherited from `.mobile-overlay a` with
+        no new CSS.
+
+        MOBILE-ONLY, for now. A matching desktop anchor was built and measured,
+        then reverted before merge: the desktop row has no capacity left for a 7th
+        item (see the note in the .nav-links block above). So the dashboard's
+        canonical nav presence is this overlay item; on desktop the channel ribbon
+        remains its only doorway. That is survivable there precisely because the
+        ribbon keeps its links at desktop widths and only sheds them ≤480px, which
+        is what made the gap mobile-visible in the first place. When the desktop
+        row gains capacity, add the anchor immediately before The Gallery with the
+        label "The Dashboard" — identical to this one; the labels must match. -#}
     <div class="mobile-overlay" id="mobileOverlay">
         <div class="m-acc{% if currentCat == 'foundations' %} open{% endif %}">
             <button type="button" class="m-acc-btn" aria-expanded="{% if currentCat == 'foundations' %}true{% else %}false{% endif %}" aria-controls="m-sec-foundations">Foundations <span class="m-acc-caret" aria-hidden="true">&#9662;</span></button>
@@ -584,6 +632,7 @@ h1, h2, h3 {
 {%- endfor %}
             </div>
         </div>
+        <a href="/dashboard.html"{% if slug == 'dashboard' %} class="active"{% endif %}>The Dashboard</a>
         <a href="/the-gallery.html"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
         <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
         <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>

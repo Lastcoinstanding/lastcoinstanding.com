@@ -2028,7 +2028,7 @@ block, filled by `shared/channel-ribbon.js`. Full framework: SITE_GUIDE §40.1.
   (the documented 375px degradation: drop "trend", keep the `×`).
 - `.cr-primary` / `.cr-cta` / `.cr-secondary` / `.cr-sep-secondary` — the
   dual-link tokens (added 2026-08-11). The strip is a **container**, not a single
-  anchor: `.cr-primary` is the data + `.cr-cta` ("see the dashboard →", orange)
+  anchor: `.cr-primary` is the data + `.cr-cta` ("the Dashboard →", orange)
   link to `/dashboard`; `.cr-secondary` ("the Power Law →", dim grey / no orange /
   lighter weight) links to the foundation page. `--cr-gap` (a custom property on
   `.channel-ribbon`, inherited by `.cr-primary`) carries the one gap value across
@@ -2036,6 +2036,26 @@ block, filled by `shared/channel-ribbon.js`. Full framework: SITE_GUIDE §40.1.
   the whole strip. `.cr-cta`, `.cr-secondary` and their separators are
   `display:none` ≤480px (mobile keeps the dashboard link only). Framework +
   self-link suppression: SITE_GUIDE §40.1.
+- **`.cr-divider` — the zone divider (added 2026-08-18).** A hairline vertical
+  wall fencing the **data zone** from the **link zone**, i.e. sitting between the
+  price and `.cr-cta`. It **replaced the middot** that used to sit there
+  (`.cr-sep-cta`): a middot read as "another item in the list", which is wrong
+  once what follows is a different *kind* of thing — destinations rather than
+  readings. Spec: `border-left: 1px solid #55504a` on a zero-width flex item
+  (border, not a background, so it stays hairline-crisp at any DPR),
+  `height: 0.95em` against the strip's 1.4 line-height so it is deliberately
+  **short of full height** — an inset wall, not a rule cutting the strip in two —
+  and `align-self: center`, because the ribbon is baseline-aligned and a
+  zero-content box has no baseline to sit on. **Tone is the `.cr-sep` grey
+  (`#55504a`), never amber:** the divider fences the two links, so an accent here
+  would compete with the very things it separates. It is `display:none` ≤480px
+  **with** the links it fences — with no link zone it would trail the price as a
+  stray tick.
+- **Label register for the two links.** Both are **artifact-named with a
+  lowercase article** — "the Dashboard →", "the Power Law →" — not outcome
+  phrases. The CTA was "see where we are →" (2026-08-11: underperformed), then
+  "see the dashboard →", and is now aligned to its sibling's form. Keep both
+  arrows: they are the site's affordance grammar, not decoration.
 
 **Reuse, not fork:** the numbers come from the shared `power-law-data.js`
 (`plPrice`/`positionLabel`/`fetchTodayPrice`); only the chrome is new. **When to

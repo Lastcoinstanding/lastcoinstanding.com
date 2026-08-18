@@ -2288,16 +2288,24 @@ nav on every content page. It is a barometer, not a ticker. Content, in
 editorial order (**position leads, price follows**):
 
 ```
-●  0.43× trend  ·  near the floor  ·  $64,144  ·  see the dashboard →  ·  the Power Law →
+●  0.43× trend  ·  near the floor  ·  $64,144  │  the Dashboard →  ·  the Power Law →
 ```
 
 pulse dot · live trend multiple · canonical zone word (`positionLabel`) · spot
-price · primary CTA · secondary foundation link.
+price │ primary CTA · secondary foundation link.
+
+The `│` is the **zone divider** (`.cr-divider`, added 2026-08-18, spec in
+STYLE_GUIDE §6.38): everything to its left is a *reading*, everything to its
+right is a *destination*. It replaced the middot that used to sit there, which
+read as "one more item in the list" when the thing following it is a different
+kind of thing entirely. Muted separator grey, never amber — it fences the two
+links, so an accent would compete with them — and it hides with those links
+≤480px rather than trailing the price as a stray tick.
 
 - **Two links, one strip (dual-link refinement, 2026-08-11).** The strip is a
   container (`<div class="channel-ribbon">`), not a single anchor, because it now
   carries two distinct targets. The **data + primary CTA** are one link
-  (`.cr-primary` → `/dashboard`, label **"see the dashboard →"**); a
+  (`.cr-primary` → `/dashboard`, label **"the Dashboard →"**); a
   **visually-secondary** link (`.cr-secondary` → `/the-power-law`, label **"the
   Power Law →"**, dim grey / no orange / lighter weight) follows, preceded by the
   same `.cr-sep` token. **Rationale (JM ruling 2026-08-11, verbatim):** *the
@@ -2610,7 +2618,11 @@ Not advice (facts-not-signals; no "you should"), not a single-security/MSTR anal
 **Jump-back-in row.** A curated strip of six deep links into the interactive tools (Power Law channel, Wait-or-Deploy, How Much Cash, Portfolio Allocation, Retirement, Stress Test). The two targets that already accept `?pos=` (Wait-or-Deploy, How Much Cash) receive today's channel position at runtime via the **existing** `pos` schema (§46) — no new receiver. The other four are plain anchored deep links. No `localStorage` personalization in v1 (deliberately deferred with the chip).
 
 **Integration decisions (v1).**
-- **No nav slot.** `category: "hub"` in `explorations.json` keeps it out of the three nav dropdowns (base.njk iterates only foundations/arguments/numbers). Surfaced **two ways only**: a `/calculators` tile (the registry `calculator_tile` block, svg icon at `calc-tile-icons/dashboard.njk`, `anchor: ""`) and a homepage **Latest** concept card. The chip becomes the durable site-wide entry later.
+- **~~No nav slot.~~ AMENDED 2026-08-18 — the dashboard now holds a canonical MOBILE nav slot. Desktop is still ribbon-only, deliberately.** `category: "hub"` still keeps it out of the three dropdowns (base.njk iterates only foundations/arguments/numbers), and that is precisely the trap: **a hub page reaches the nav only by being hardcoded**, the way The Gallery always has been. Nothing was wrong with the registry entry; the page simply had no hardcoded anchor, so it silently had no menu presence at all. It is now a flat `<a>` labelled **"The Dashboard"** immediately before The Gallery **in the mobile overlay** — same mechanism, same markup shape, same `slug ==` active conditional, no interactive marker and no freshness badge (Gallery carries none either; freshness derives from `updates.json` independently of the nav, so a flat item opting out is supported rather than a gap).
+  - **The gap was mobile-visible first** because the channel ribbon is the dashboard's *contextual* doorway and the ribbon hides its links ≤480px — so on a phone there was no path to the page at all from most pages, and none from the menu on any. Desktop merely had the ribbon carrying the whole load, which it does adequately: the ribbon keeps both links at desktop widths.
+  - **A matching desktop anchor was built, measured and reverted before merge.** The desktop `.nav-links` row is a `nowrap` flex whose only shrinkable neighbour is `.brand`, and it has no headroom: a 7th item (115px) wraps the wordmark and grows the nav **65px → 90px below ~1150px**, then overflows and clips "About" **below ~919px** — with the hamburger not taking over until ≤768px and `overflow-x: clip` hiding the spill. The nav-height change is the serious half, because several pages hardcode sticky offsets against 65px. Capacity must be made first; the proposed shape (collapse the wordmark to the coin mark, raise the hamburger breakpoint) is filed in PAGE_IDEAS_BACKLOG as *Desktop nav capacity + The Dashboard entry*, with the full measurement table.
+  - **Division of labour now:** the mobile nav slot is the **canonical** entry there; the **ribbon is the contextual live-data doorway** on both breakpoints — it says *where we are right now* on the page you happen to be reading, which a nav item cannot. When the desktop anchor lands, both persist; neither supersedes the other.
+  - Also surfaced by a `/calculators` tile (the registry `calculator_tile` block, svg icon at `calc-tile-icons/dashboard.njk`, `anchor: ""`) and a homepage **Latest** concept card.
 - **No related strip on the dashboard itself** (the jump-back-in row serves that role, so the page carries no `related:` front matter). **Reciprocal back-links: added in v2** — now that the ribbon is the site-wide entry point, `/dashboard` is in the `related:` of Wait-or-Deploy and How Much Cash (the two `?pos=` receivers). v1 deferred these to keep the surface count at the ruled two until the entry point existed.
 - **Channel ribbon suppressed** via `channel_ribbon: false` — the page IS the ribbon's destination-grade version.
 - **Width:** mixed-content tier (1100 outer / 880 prose, STYLE_GUIDE §4.2). Rationale: the tile grid needs the page width; the hero copy and tile notes read at prose width. Hero tile spans full width; the four remaining tiles form a 2×2 that collapses to a single column at ≤640px.
