@@ -100,6 +100,14 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ '.well-known': '.well-known' });
   eleventyConfig.addPassthroughCopy({ '_headers': '_headers' });
   eleventyConfig.addPassthroughCopy({ '_redirects': '_redirects' });
+  // Unlisted outreach demos. Passthrough (not `src/`) on purpose: these are
+  // self-contained one-file artifacts that must ship byte-identical to the
+  // version reviewed and linked in an email, and anything under `src/` would
+  // be run through Nunjucks (htmlTemplateEngine: "njk") on the way out.
+  // Deliberately absent from sitemap.xml, llms.txt, nav, the homepage and
+  // every related strip: reachable only by direct link, and _headers marks
+  // /demo/* noindex, nofollow.
+  eleventyConfig.addPassthroughCopy({ 'demo': 'demo' });
 
   // Sort helper for the /calculators page (src/calculators.njk).
   // Sorts an explorations.json array by calculator_tile.position ascending.
