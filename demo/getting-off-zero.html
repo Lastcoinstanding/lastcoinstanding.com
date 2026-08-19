@@ -254,8 +254,15 @@ function render(){
   const lo=[],hi=[];
   for(let i=0;i<BTC.length-24;i++){const d=fwd(i);if(mult[i]<1)lo.push(d);else if(mult[i]>1.5)hi.push(d);}
   const med=a=>{const s=[...a].sort((x,y)=>x-y);return s[Math.floor(s.length/2)];};
-  $('ebT').textContent='median '+Math.round(med(lo)*100)+'%';
-  $('ebD').textContent='worst decline below entry within 24 months ('+lo.length+' monthly entries) — worst case '+Math.round(Math.min(...lo)*100)+'%';
+  // A median of zero here is a finding, not a missing value: the median
+  // below-trend entry never traded under its entry price in the following
+  // two years. Render it as the result it is. Falls back to the numeric
+  // form if the median ever rounds to something other than zero.
+  const medLo=med(lo);
+  $('ebT').textContent = (Math.round(medLo*100)===0)
+    ? 'No decline below entry'
+    : 'median '+Math.round(medLo*100)+'%';
+  $('ebD').textContent='in the median case — the measure is the worst decline below entry price within 24 months, across '+lo.length+' monthly entries; worst case '+Math.round(Math.min(...lo)*100)+'%';
   $('eaT').textContent='median '+Math.round(med(hi)*100)+'%';
   $('eaD').textContent='the same measure from stretched entries ('+hi.length+' entries) — worst case '+Math.round(Math.min(...hi)*100)+'%';
   const nm=(mult[mult.length-1]).toFixed(2)+'\u00d7';
