@@ -1,3 +1,12 @@
+# Unlisted outreach demos — keep them out of every index.
+# X-Robots-Tag rather than a robots.txt Disallow on purpose: Disallow stops a
+# crawler fetching the page, which also stops it seeing any noindex directive,
+# and URL-only indexing can still happen. The header is served with the file,
+# so a crawler that reaches the link must read the directive to have read the
+# page at all. robots.txt is deliberately left as Allow: / .
+/demo/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
 # Lightning Address JSON endpoint — set Content-Type and allow CORS
 /.well-known/lnurlp/tips
   Content-Type: application/json; charset=utf-8
