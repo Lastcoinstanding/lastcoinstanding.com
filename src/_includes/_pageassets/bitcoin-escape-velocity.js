@@ -838,7 +838,7 @@
      what-if — it never writes back to the plan; Apply does that.
 
      Under this page's escape-year definition the escape YEAR is the first
-     drawdown year or never, so the quantity that carries the page's thesis
+     first withdrawal year or never, so the quantity that carries the page's thesis
      is the line on each axis, not a year. This section is that quantity
      made draggable.
   ═══════════════════════════════════════════════════════════ */
@@ -1113,7 +1113,12 @@
       } else if (v.state === 'deplete') {
         tail = 'Every bar is a year the stack lost ground; it runs out in <strong>' + v.depletionYear + '</strong>.';
       } else {
-        tail = 'Every bar is negative — the stack never outgrows the draw, it just does not run out before ' + v.horizonYear + '.';
+        // Same trap as the verdict copy: a shrinking plan is usually NOT
+        // negative throughout. It runs positive, turns over, and stays
+        // negative from there. Say which shape this one is.
+        tail = v.turnedAtStart
+          ? 'Every bar is negative — the stack never outgrows the withdrawal; it just does not run out before ' + v.horizonYear + '.'
+          : 'The bars run positive until <strong>' + v.turnYear + '</strong>, then turn negative and stay that way through ' + v.horizonYear + '.';
       }
       cap.innerHTML = 'One bar per retirement year, ' + (first.year) + '–' + (last.year)
         + ', in today’s dollars, with price ' + basisLabel(basis) + '. ' + tail;
