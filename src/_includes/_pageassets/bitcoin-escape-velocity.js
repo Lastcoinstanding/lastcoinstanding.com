@@ -56,15 +56,14 @@
   function basisPhrase(ratio) { return ratio < 1 ? 'gap' : 'premium'; }
 
   /* ─── Scenario state — three primary inputs plus the horizon ─── */
-  // Defaults (review round 1 #8). Anchors were 2035 / ~2 BTC / ~$100K, tuned to
-  // land JUST on the failure side under the default trend basis. $100K could not
-  // do that at any stack near 2 BTC — at $100K the stack line sits at 1.11 BTC,
-  // so 2 BTC escapes comfortably — so the withdrawal carries the deviation and
-  // the stack takes JM's own suggested 1.75. The result sits 0.02 BTC under its
-  // line: one click of any of the three steppers flips it.
+  // Defaults: the wholecoiner plan — 1 BTC, $100K a year, retiring 2035 (JM's
+  // call). At $100K the stack line sits at 1.11 BTC, so a whole coin lands on
+  // the failure side by a clean margin rather than by a rounding error.
+  // DEFAULTS below is snapshotted from this object, so the reset link and the
+  // sessionStorage fallback both follow it with no second place to edit.
   var SCENARIO = {
-    btcStack: 1.75,
-    targetIncomeUSD: 160000,
+    btcStack: 1.0,
+    targetIncomeUSD: 100000,
     retirementYear: 2035,
     yearsInRetirement: 30,
     incomeBasis: 'today'   // 'today' = target is in today's dollars (default) | 'fixed' = same raw dollars every year
