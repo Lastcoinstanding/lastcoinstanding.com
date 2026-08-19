@@ -1720,17 +1720,36 @@
     var dock = document.getElementById('evDock');
     var anchor = document.getElementById('inputs');
     if (!dock || !anchor) return;
-    measureDockOffset();
-    window.addEventListener('resize', measureDockOffset);
 
-    if (!('IntersectionObserver' in window)) { return; }   // no observer: bar simply never docks
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        // Dock once the main stepper block has scrolled off the top.
-        dock.classList.toggle('is-docked', !e.isIntersecting && e.boundingClientRect.top < 0);
-      });
-    }, { threshold: 0, rootMargin: '-80px 0px 0px 0px' });
-    io.observe(anchor);
+    // Deliberately a scroll listener, not an IntersectionObserver. IO was the
+    // first implementation and it failed exactly the way sticky fails: built
+    // against a viewport that was not laid out yet, it fired once with
+    // meaningless geometry and then never again, leaving the bar permanently
+    // hidden with nothing in the console. A direct rect comparison has no root,
+    // no thresholds and no construction-time state — it simply reads the truth
+    // on every frame it is asked to. The offset is re-measured in the same
+    // pass, so a nav that changes height (wrap, font load, zoom) cannot leave
+    // the bar sitting at a stale offset.
+    var ticking = false;
+    function evaluate() {
+      ticking = false;
+      measureDockOffset();
+      var top = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ev-dock-top')) || 0;
+      dock.classList.toggle('is-docked', anchor.getBoundingClientRect().bottom < top);
+    }
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(evaluate);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    // Fonts land after first paint and change the nav's height; re-measure
+    // when they do rather than trusting the first reading.
+    if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
+      document.fonts.ready.then(evaluate).catch(function () {});
+    }
+    evaluate();
   }
 
   function wireReset() {
