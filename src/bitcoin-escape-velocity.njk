@@ -8,9 +8,9 @@ faq:
   - q: "Is this a guarantee that a bitcoin retirement works?"
     a: "No. Every figure here is a projection under the Power Law growth model, which is a description of bitcoin's historical trend, not a promise about its future. The model's trend growth rate declines with time, and real markets do not deliver an average every year. Change the price basis or the inflation assumption and the answer can flip — which is the point of letting you change them."
   - q: "What happens if a crash lands early in retirement?"
-    a: "This page does not model one. A bear market in the first years of drawdown sells more bitcoin to cover the same bill, and that stack never comes back even if price recovers — sequence-of-returns risk. The companion <a href='/the-bitcoin-retirement-stress-test.html'>Retirement Stress Test</a> exists to model exactly that, and it is where this page's answer gets tested."
+    a: "This page does not model one. A bear market in the first years of withdrawals sells more bitcoin to cover the same bill, and that stack never comes back even if price recovers — sequence-of-returns risk. The companion <a href='/the-bitcoin-retirement-stress-test.html'>Retirement Stress Test</a> exists to model exactly that, and it is where this page's answer gets tested."
   - q: "Why does the page default to today's dollars?"
-    a: "Because nominal figures flatter the result. Part of any nominal escape is the dollar shrinking rather than the stack growing, so a real-dollar test is the harder and more honest one. You can switch to nominal in the assumptions panel; the verdict relabels itself and says what the switch costs you in honesty."
+    a: "Because nominal figures flatter the result. Part of any nominal escape is the dollar shrinking rather than the stack growing, so a real-dollar test is the harder and more honest one. You can switch to nominal under &quot;Assumptions &mdash; change&quot; below the year-by-year strip; the verdict relabels itself and says what the switch costs you in honesty."
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-escape-velocity-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-escape-velocity.css' %}"
@@ -27,6 +27,41 @@ eleventyComputed:
 
   {% include 'components/tool-framing.njk' %}
 
+  <!-- ════════ DOCKED STEPPER BAR (round 1 #12) ════════
+       Desktop only. `position: fixed` with a MEASURED top offset, not
+       `position: sticky` — sticky depends on every ancestor's overflow and
+       fails silently when one of them changes, which is precisely how it
+       broke on money-trees. Shown once the main stepper block scrolls off.
+       At 375px this cannot hold three values and six 44px arrows in one
+       legible row, so mobile hides it and gets `.ev-steppers-repeat`
+       before the year-by-year section instead. Both drive one state. -->
+  <div class="ev-dock" id="evDock" aria-hidden="false">
+    <div class="ev-dock-inner">
+      <span class="ev-dock-label">Your plan</span>
+      <div class="ev-stepper ev-stepper-compact" data-key="retirementYear">
+        <div class="ev-stepper-row">
+          <button type="button" class="ev-step-btn" data-dir="-1" aria-label="Retirement year, one year earlier">&#9664;</button>
+          <button type="button" class="ev-stepper-value" data-role="value" aria-label="Retirement year">&mdash;</button>
+          <button type="button" class="ev-step-btn" data-dir="1" aria-label="Retirement year, one year later">&#9654;</button>
+        </div>
+      </div>
+      <div class="ev-stepper ev-stepper-compact" data-key="btcStack">
+        <div class="ev-stepper-row">
+          <button type="button" class="ev-step-btn" data-dir="-1" aria-label="Stack, one step smaller">&#9664;</button>
+          <button type="button" class="ev-stepper-value" data-role="value" aria-label="Stack in bitcoin">&mdash;</button>
+          <button type="button" class="ev-step-btn" data-dir="1" aria-label="Stack, one step larger">&#9654;</button>
+        </div>
+      </div>
+      <div class="ev-stepper ev-stepper-compact" data-key="targetIncomeUSD">
+        <div class="ev-stepper-row">
+          <button type="button" class="ev-step-btn" data-dir="-1" aria-label="Annual withdrawal, one step smaller">&#9664;</button>
+          <button type="button" class="ev-stepper-value" data-role="value" aria-label="Annual withdrawal in dollars">&mdash;</button>
+          <button type="button" class="ev-step-btn" data-dir="1" aria-label="Annual withdrawal, one step larger">&#9654;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ════════ STEPPERS — the primary input surface (spec §4.1–4.2) ════════
        Steppers, not sliders. Each click is one human increment, so the input
        surface IS the sensitivity analysis: a reader walks 2035 → 2036 → 2037
@@ -40,7 +75,7 @@ eleventyComputed:
 
       <div class="ev-stepper" data-key="retirementYear">
         <div class="ev-stepper-label">Retirement year
-          <span class="help-tip" tabindex="0">?<span class="tip-content">The year drawdown begins. Before it, the stack is untouched and simply rides the growth model; from it on, bitcoin is sold each year to cover that year&rsquo;s income.</span></span>
+          <span class="help-tip" tabindex="0">?<span class="tip-content">The year withdrawals begin. Before it, the stack is untouched and simply rides the growth model; from it on, bitcoin is sold each year to cover that year&rsquo;s income.</span></span>
         </div>
         <div class="ev-stepper-row">
           <button type="button" class="ev-step-btn" data-dir="-1" aria-label="Retirement year, one year earlier">&#9664;</button>
@@ -53,13 +88,13 @@ eleventyComputed:
 
       <div class="ev-stepper" data-key="btcStack">
         <div class="ev-stepper-label">Stack at retirement
-          <span class="help-tip" tabindex="0">?<span class="tip-content">The bitcoin you expect to hold when drawdown begins. This page models no contributions between now and then &mdash; three numbers is the discipline &mdash; so set this to the stack you expect to <em>arrive</em> at retirement with.</span></span>
+          <span class="help-tip" tabindex="0">?<span class="tip-content">The bitcoin you expect to hold when withdrawals begin. This page models no contributions between now and then &mdash; three numbers is the discipline &mdash; so set this to the stack you expect to <em>arrive</em> at retirement with.</span></span>
         </div>
         <div class="ev-stepper-row">
           <button type="button" class="ev-step-btn" data-dir="-1" aria-label="Stack, one step smaller">&#9664;</button>
           <button type="button" class="ev-stepper-value" data-role="value" aria-label="Stack in bitcoin, click to type a value">&mdash;</button>
           <button type="button" class="ev-step-btn" data-dir="1" aria-label="Stack, one step larger">&#9654;</button>
-          <input type="number" class="ev-stepper-input" data-role="entry" min="0.01" max="21" step="0.01" inputmode="decimal" hidden aria-label="Stack in bitcoin">
+          <input type="number" class="ev-stepper-input" data-role="entry" min="0.01" max="100" step="0.01" inputmode="decimal" hidden aria-label="Stack in bitcoin">
         </div>
         <div class="ev-stepper-foot">
           <span class="ev-grad-label">Step</span>
@@ -72,14 +107,14 @@ eleventyComputed:
       </div>
 
       <div class="ev-stepper" data-key="targetIncomeUSD">
-        <div class="ev-stepper-label">Annual draw
-          <span class="help-tip" tabindex="0">?<span class="tip-content">Pretax annual retirement income, in today&rsquo;s purchasing power. Whether that target rises with inflation or stays the same raw dollars every year is set in the assumptions panel below.</span></span>
+        <div class="ev-stepper-label">Annual withdrawal
+          <span class="help-tip" tabindex="0">?<span class="tip-content">What you draw from the stack each year, in today&rsquo;s dollars. Pretax. Whether that target rises with inflation or stays the same raw dollars every year is set under &ldquo;Assumptions &mdash; change&rdquo;, below the year-by-year strip.</span></span>
         </div>
         <div class="ev-stepper-row">
-          <button type="button" class="ev-step-btn" data-dir="-1" aria-label="Annual draw, one step smaller">&#9664;</button>
-          <button type="button" class="ev-stepper-value" data-role="value" aria-label="Annual draw in dollars, click to type a value">&mdash;</button>
-          <button type="button" class="ev-step-btn" data-dir="1" aria-label="Annual draw, one step larger">&#9654;</button>
-          <input type="number" class="ev-stepper-input" data-role="entry" min="20000" max="500000" step="1000" inputmode="numeric" hidden aria-label="Annual draw in dollars">
+          <button type="button" class="ev-step-btn" data-dir="-1" aria-label="Annual withdrawal, one step smaller">&#9664;</button>
+          <button type="button" class="ev-stepper-value" data-role="value" aria-label="Annual withdrawal in dollars, click to type a value">&mdash;</button>
+          <button type="button" class="ev-step-btn" data-dir="1" aria-label="Annual withdrawal, one step larger">&#9654;</button>
+          <input type="number" class="ev-stepper-input" data-role="entry" min="20000" max="500000" step="1000" inputmode="numeric" hidden aria-label="Annual withdrawal in dollars">
         </div>
         <div class="ev-stepper-foot">
           <span class="ev-grad-label">Step</span>
@@ -92,7 +127,7 @@ eleventyComputed:
       </div>
 
     </div>
-    <p class="ev-stepper-hint">Click a number to type it directly. Hold an arrow to repeat. Arrow keys work once a stepper has focus.</p>
+    <p class="ev-stepper-hint">Click a number to type it directly. Hold an arrow to repeat. Arrow keys work once a stepper has focus. <a href="#" id="evReset" class="ev-reset">Reset to defaults</a></p>
   </section>
 
   <!-- ════════ VERDICT CARD (spec §5.1–5.2) ════════
@@ -105,7 +140,7 @@ eleventyComputed:
 
     <div class="sustainability" id="evVerdictCard">
       <div class="sustainability-header">
-        <span class="sustainability-label">Does it reach escape velocity?</span>
+        <span class="sustainability-label">Does your planned retirement reach escape velocity?</span>
       </div>
 
       <p class="ev-verdict-sentence" id="evVerdictSentence" aria-live="polite">&mdash;</p>
@@ -116,14 +151,14 @@ eleventyComputed:
       <div class="sustainability-values">
         <div class="value-block">
           <div class="value-label">Stack at retirement
-            <span class="help-tip" tabindex="0">?<span class="tip-content">The projected value of your stack the moment drawdown begins, before any withdrawal. Follows the price basis and the dollar basis you have selected.</span></span>
+            <span class="help-tip" tabindex="0">?<span class="tip-content">The projected value of your stack the moment withdrawals begin, before the first one is taken. Follows the price basis and the dollar basis you have selected.</span></span>
           </div>
           <div class="value-display" id="evStackAtRet">&mdash;</div>
           <p class="sust-basis-note">Under: <strong id="evBasisWord">reverts to trend</strong>.</p>
         </div>
         <div class="value-block">
           <div class="value-label">Value at horizon (<span id="evHorizonYearLabel">&mdash;</span>)
-            <span class="help-tip" tabindex="0">?<span class="tip-content">What is left at the end of the modeled horizon &mdash; retirement year plus your years-in-retirement setting. There is no age input on this page, so the horizon is stated as a year rather than an age.</span></span>
+            <span class="help-tip" tabindex="0">?<span class="tip-content">The horizon is your <em>retirement year plus your years-in-retirement setting</em> &mdash; both adjustable, the second under &ldquo;Assumptions &mdash; change&rdquo; below the year-by-year strip. This is what is left at that year. There is no age input on this page, so the horizon is stated as a year rather than an age.</span></span>
           </div>
           <div class="value-display" id="evValueAtHorizon">&mdash;</div>
           <p class="sust-basis-note" id="evHorizonBasisNote">In today&rsquo;s dollars.</p>
@@ -139,7 +174,7 @@ eleventyComputed:
           <div class="spectrum-marker" id="evSpectrumMarker" style="left: 50%"></div>
         </div>
         <div class="spectrum-labels">
-          <span class="spectrum-label-left">Depleting<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack runs out before retirement ends. You&rsquo;d need to extend the horizon, lower target income, or raise the stack to reach sustainability. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
+          <span class="spectrum-label-left">Depleting<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack runs out before retirement ends. You&rsquo;d need to extend the horizon, lower the annual withdrawal, or raise the stack to reach sustainability. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
           <span class="spectrum-label-mid">Threshold<span class="help-tip" tabindex="0">?<span class="tip-content">Break-even &mdash; the stack lasts exactly through retirement, neither growing nor depleting in real terms. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
           <span class="spectrum-label-right">Escape velocity<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack grows faster than you draw it down. Purchasing power increases over retirement instead of being consumed; the stack lasts indefinitely. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
         </div>
@@ -159,21 +194,60 @@ eleventyComputed:
   <section class="ev-section" id="sensitivity" aria-label="Sensitivity">
     <div class="ev-eyebrow">How little it takes</div>
     <h2 class="ev-h2">One step in any direction</h2>
-    <p class="ev-lead">Each row is a single click of the stepper above it, measured from where you are right now. Apply it and the whole page follows.</p>
+    <p class="ev-lead">Each row is a single click of the stepper above it, measured from where you are right now &mdash; a step-from-here instrument. Apply it and the whole page follows. The next section is the other half: start at the line instead.</p>
 
     <div class="ev-deltas" id="evDeltas" aria-live="polite"><!-- JS-populated --></div>
+  </section>
 
-    <!-- WHERE THE LINE IS — the crossing value on each input axis, holding the
-         other two. Added at build time: under this page's escape-year
-         definition the escape YEAR is nearly always the first drawdown year,
-         so the quantity that actually varies — and the one the page's thesis
-         promises ("how little it takes to cross it") — is the threshold on
-         each axis. See the build notes / TECH_DEBT entry. -->
-    <div class="ev-line" id="evLine">
-      <div class="ev-line-head">Where the line is
-        <span class="help-tip" tabindex="0">?<span class="tip-content">The crossing value on each input, holding the other two where you have them. Computed against the same projection engine and the same price basis as the verdict above &mdash; not an approximation.</span></span>
+  <!-- ════════ THE THRESHOLD (round 1 #7) ════════
+       The sibling instrument to "One step in any direction": that one steps
+       out from the plan, this one starts at the line and works back. Scrubbing
+       is a what-if — it never writes back to the plan; Apply does that. The
+       track reuses the spectrum bar's vocabulary so the page has one visual
+       language for the line. -->
+  <section class="ev-section" id="threshold" aria-label="The Threshold">
+    <div class="ev-eyebrow">Find the line</div>
+    <h2 class="ev-h2">The Threshold</h2>
+    <p class="ev-lead">Whether the plan is secure isn&rsquo;t a yes or no &mdash; it&rsquo;s a distance. Fix two of your three numbers and move the third to find exactly where your line sits. Dragging here explores; it doesn&rsquo;t change your plan until you apply it.</p>
+
+    <div class="ev-threshold" id="evThreshold">
+      <div class="ev-axis-row">
+        <span class="ev-axis-label">Move</span>
+        <div class="seg-control ev-axis" role="group" aria-label="Which input to vary">
+          <button type="button" class="ev-axis-btn seg-btn is-active" data-axis="stack">Stack</button>
+          <button type="button" class="ev-axis-btn seg-btn" data-axis="income">Withdrawal</button>
+          <button type="button" class="ev-axis-btn seg-btn" data-axis="retire">Retirement year</button>
+        </div>
+        <span class="ev-axis-hold">the other two hold at your plan</span>
       </div>
-      <div class="ev-line-rows" id="evLineRows"><!-- JS-populated --></div>
+
+      <div class="ev-scrub">
+        <div class="ev-scrub-head">
+          <span class="ev-scrub-value" id="evScrubValue">&mdash;</span>
+          <span class="ev-scrub-verdict" id="evScrubVerdict">&mdash;</span>
+        </div>
+        <div class="ev-scrub-track" id="evScrubTrack">
+          <div class="ev-scrub-tick" id="evScrubTick"></div>
+          <input type="range" class="ev-scrub-input" id="evScrubInput" aria-label="Scrub the chosen input">
+        </div>
+        <div class="ev-scrub-labels">
+          <span id="evScrubMin">&mdash;</span>
+          <span class="ev-scrub-mid" id="evScrubLineLabel">&mdash;</span>
+          <span id="evScrubMax">&mdash;</span>
+        </div>
+        <p class="ev-scrub-note" id="evScrubNote" hidden></p>
+        <div class="ev-scrub-foot">
+          <span class="ev-scrub-plan" id="evScrubPlan">&mdash;</span>
+          <button type="button" class="ev-scrub-apply" id="evScrubApply" disabled>Drag to explore, then apply</button>
+        </div>
+      </div>
+
+      <div class="ev-line">
+        <div class="ev-line-head">Where all three lines sit
+          <span class="help-tip" tabindex="0">?<span class="tip-content">The crossing value on each input, holding the other two where your plan has them. Computed against the same projection engine and the same price basis as the verdict above &mdash; not an approximation. Where a line falls outside this page&rsquo;s input range, it says so rather than showing a clamped number.</span></span>
+        </div>
+        <div class="ev-line-rows" id="evLineRows"><!-- JS-populated --></div>
+      </div>
     </div>
   </section>
 
@@ -181,10 +255,43 @@ eleventyComputed:
        The growing-green-bar treatment kept deliberately from the flagship's
        year-by-year table. Bar length is the residual — growth minus spending —
        so the widening (or narrowing) IS the picture. -->
+  <!-- MOBILE FALLBACK for the docked bar (#12/#13). Shown only where the dock
+       is hidden, so the two can never compete for vertical space. Same
+       `.ev-stepper` markup, so the same wiring drives it. -->
+  <div class="ev-steppers-repeat" aria-label="Your plan, repeated">
+    <span class="ev-dock-label">Your plan</span>
+    <div class="ev-steppers-repeat-row">
+      <div class="ev-stepper ev-stepper-compact" data-key="retirementYear">
+        <div class="ev-stepper-mini-label">Retires</div>
+        <div class="ev-stepper-row">
+          <button type="button" class="ev-step-btn" data-dir="-1" aria-label="Retirement year, one year earlier">&#9664;</button>
+          <button type="button" class="ev-stepper-value" data-role="value" aria-label="Retirement year">&mdash;</button>
+          <button type="button" class="ev-step-btn" data-dir="1" aria-label="Retirement year, one year later">&#9654;</button>
+        </div>
+      </div>
+      <div class="ev-stepper ev-stepper-compact" data-key="btcStack">
+        <div class="ev-stepper-mini-label">Stack</div>
+        <div class="ev-stepper-row">
+          <button type="button" class="ev-step-btn" data-dir="-1" aria-label="Stack, one step smaller">&#9664;</button>
+          <button type="button" class="ev-stepper-value" data-role="value" aria-label="Stack in bitcoin">&mdash;</button>
+          <button type="button" class="ev-step-btn" data-dir="1" aria-label="Stack, one step larger">&#9654;</button>
+        </div>
+      </div>
+      <div class="ev-stepper ev-stepper-compact" data-key="targetIncomeUSD">
+        <div class="ev-stepper-mini-label">Withdraws</div>
+        <div class="ev-stepper-row">
+          <button type="button" class="ev-step-btn" data-dir="-1" aria-label="Annual withdrawal, one step smaller">&#9664;</button>
+          <button type="button" class="ev-stepper-value" data-role="value" aria-label="Annual withdrawal in dollars">&mdash;</button>
+          <button type="button" class="ev-step-btn" data-dir="1" aria-label="Annual withdrawal, one step larger">&#9654;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <section class="ev-section" id="strip" aria-label="Year by year">
     <div class="ev-eyebrow">Year by year</div>
     <h2 class="ev-h2">Growing versus spending</h2>
-    <p class="ev-lead">One bar per retirement year: how much the stack gained or lost that year after the draw. Green is a year the stack outgrew its spending; the negative colour is a year it did not.</p>
+    <p class="ev-lead">One bar per retirement year: how much the stack gained or lost that year after the withdrawal. Green is a year the stack outgrew its spending; the negative colour is a year it did not.</p>
 
     <div class="ev-strip" id="evStrip" role="img" aria-labelledby="evStripCaption"><!-- JS-populated --></div>
     <p class="ev-strip-caption" id="evStripCaption">&mdash;</p>
@@ -219,13 +326,13 @@ eleventyComputed:
           </div>
           <div class="ev-assump-control">
             <div class="seg-control seg-2" role="group" aria-label="Dollar basis">
-              <button type="button" class="ev-dollars-btn seg-btn is-active" data-dollars="real">Real (today&rsquo;s $ &middot; <span class="seg-btn-sub">&mdash;</span>)<span class="help-tip" tabindex="0">?<span class="tip-content">Today&rsquo;s purchasing power &mdash; every figure divided back by your chosen inflation rate (set in Baseline assumptions), so amounts are comparable to money now.</span></span></button>
+              <button type="button" class="ev-dollars-btn seg-btn is-active" data-dollars="real">Real (today&rsquo;s $ &middot; <span class="seg-btn-sub">&mdash;</span>)<span class="help-tip" tabindex="0">?<span class="tip-content">Today&rsquo;s purchasing power &mdash; every figure divided back by your chosen inflation rate (set under &ldquo;Assumptions &mdash; change&rdquo;, below the year-by-year strip), so amounts are comparable to money now.</span></span></button>
               <button type="button" class="ev-dollars-btn seg-btn" data-dollars="nominal">Nominal (future $)<span class="help-tip" tabindex="0">?<span class="tip-content">Raw future dollars &mdash; the actual dollar amounts in each year, inflation included. price &times; BTC = value reconciles exactly in this mode.</span></span></button>
             </div>
           </div>
 
           <div class="ev-assump-label">Interpret my retirement income as
-            <span class="help-tip" tabindex="0">?<span class="tip-content">A behavioral setting on the draw itself, independent of the display basis above. You can be in the real-dollar view with a same-every-year plan.</span></span>
+            <span class="help-tip" tabindex="0">?<span class="tip-content">A behavioral setting on the withdrawal itself, independent of the display basis above. You can be in the real-dollar view with a same-every-year plan.</span></span>
           </div>
           <div class="ev-assump-control">
             <div class="seg-control seg-2" role="group" aria-label="Income basis">

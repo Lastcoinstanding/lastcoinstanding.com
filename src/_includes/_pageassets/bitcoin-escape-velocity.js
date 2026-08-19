@@ -56,9 +56,15 @@
   function basisPhrase(ratio) { return ratio < 1 ? 'gap' : 'premium'; }
 
   /* ─── Scenario state — three primary inputs plus the horizon ─── */
+  // Defaults (review round 1 #8). Anchors were 2035 / ~2 BTC / ~$100K, tuned to
+  // land JUST on the failure side under the default trend basis. $100K could not
+  // do that at any stack near 2 BTC — at $100K the stack line sits at 1.11 BTC,
+  // so 2 BTC escapes comfortably — so the withdrawal carries the deviation and
+  // the stack takes JM's own suggested 1.75. The result sits 0.02 BTC under its
+  // line: one click of any of the three steppers flips it.
   var SCENARIO = {
-    btcStack: 0.25,
-    targetIncomeUSD: 60000,
+    btcStack: 1.75,
+    targetIncomeUSD: 160000,
     retirementYear: 2035,
     yearsInRetirement: 30,
     incomeBasis: 'today'   // 'today' = target is in today's dollars (default) | 'fixed' = same raw dollars every year
@@ -66,9 +72,15 @@
 
   var LIMITS = {
     retirementYear:  { min: 2026, max: 2055 },
-    btcStack:        { min: 0.01, max: 21 },
+    btcStack:        { min: 0.01, max: 100 },
     targetIncomeUSD: { min: 20000, max: 500000 }
   };
+
+  // How far past the horizon the shrink branch is allowed to look when
+  // answering "on pace to deplete when?" (#6). A cap, not a claim: a stack
+  // still shrinking 40 years past the window is reported as shrinking, not
+  // assigned a depletion year the model has no business asserting.
+  var EXTEND_CAP = 40;
 
   var GRAD = { btcStep: 0.25, incStep: 10000 };
   var PRICE_BASIS = 'trend';   // 'trend' (reverts) | 'current' (today's gap persists)
@@ -218,7 +230,22 @@
       if (residuals[k].value < -EPS) lastNegative = residuals[k].year;
     }
     if (lastNegative === null) { out.state = 'escape'; out.escapeYear = residuals[0].year; return out; }
-    if (lastNegative >= horizonYear) { out.state = 'shrink'; return out; }
+    if (lastNegative >= horizonYear) {
+      out.state = 'shrink';
+      // The year the stack turned over for good: the first year of the final
+      // unbroken run of negative residuals. "Shrink" does NOT mean losing
+      // ground every year — a stack can grow for two decades, turn over, and
+      // still be falling at the horizon, ending well above where it started.
+      // Copy that says "loses ground every year" would be plainly false in
+      // that case, so the turn year is computed and named instead.
+      var turn = residuals[residuals.length - 1].year;
+      for (var t = residuals.length - 1; t >= 0; t--) {
+        if (residuals[t].value < -EPS) turn = residuals[t].year; else break;
+      }
+      out.turnYear = turn;
+      out.turnedAtStart = (turn === residuals[0].year);
+      return out;
+    }
     out.state = 'escape';
     out.escapeYear = lastNegative + 1;
     return out;
@@ -324,7 +351,8 @@
 
   function nudge(key, dir) {
     if (setScenarioValue(key, SCENARIO[key] + dir * stepFor(key))) {
-      syncSteppers(); scheduleRender(); scheduleUrlSync();
+      THRESH_VALUE = null;          // the plan moved; the scrubber re-anchors to it
+      syncSteppers(); scheduleRender(); scheduleUrlSync(); saveSession();
     }
   }
 
@@ -404,7 +432,10 @@
         entryOpen = false;
         if (commit) {
           var n = parseFloat(input.value);
-          if (isFinite(n) && setScenarioValue(key, n)) { scheduleRender(); scheduleUrlSync(); }
+          if (isFinite(n) && setScenarioValue(key, n)) {
+            THRESH_VALUE = null;
+            scheduleRender(); scheduleUrlSync(); saveSession();
+          }
         }
         input.hidden = true; valBtn.hidden = false;
         syncSteppers();
@@ -442,9 +473,25 @@
      VERDICT CARD + ROBUSTNESS LINE (§5.1–5.2)
   ═══════════════════════════════════════════════════════════ */
 
-  function verdictSentence(v, basis) {
-    var basisTail = '<span class="ev-verdict-tail">Checked every year through ' + v.horizonYear
-      + ', ' + dollarWord() + ', with price ' + basisLabel(basis) + '.</span>';
+  // The Power Law is the assumption every figure on this page rests on, so it
+  // carries the flagship's disclosure discipline rather than a bare mention
+  // (#2). Rendered inside the verdict explainer, where the reader meets the
+  // claim, not parked in a footnote.
+  var POWER_LAW_TIP = '<span class="help-tip" tabindex="0">?<span class="tip-content">'
+    + 'Every figure on this page is computed against the <strong>Power Law trend</strong> — a regression of '
+    + 'bitcoin’s entire price history against time, used as a central-tendency assumption, not a forecast. '
+    + 'Its implied growth rate <em>declines</em> with time, which is exactly why “permanently” has to be '
+    + 'checked across the whole horizon instead of asserted from a single crossing. '
+    + '<a href="/the-power-law.html">What the Power Law is, and where it breaks →</a>'
+    + '</span></span>';
+
+  function verdictSentence(v, basis, extDepletion) {
+    // Name the arithmetic rather than dropping a bare year on the reader (#3).
+    var basisTail = '<span class="ev-verdict-tail">Checked every year through <strong>' + v.horizonYear
+      + '</strong> — your ' + SCENARIO.retirementYear + ' retirement plus the '
+      + SCENARIO.yearsInRetirement + '-year horizon (set under Assumptions) — '
+      + dollarWord() + ', with price ' + basisLabel(basis) + '.' + POWER_LAW_TIP + '</span>';
+
     if (v.state === 'escape') {
       return 'On these inputs, the stack’s growth permanently exceeds spending from <strong>'
         + v.escapeYear + '</strong>.' + basisTail;
@@ -453,9 +500,17 @@
       return 'Never reaches escape velocity — the stack <strong>depletes in '
         + v.depletionYear + '</strong>.' + basisTail;
     }
-    return 'Never reaches escape velocity — the stack lasts through <strong>'
-      + v.horizonYear + '</strong> but loses ground every year. It does not run out; it runs down.'
-      + basisTail;
+    // Shrink: survives the window, but growth stops covering withdrawals
+    // before it ends. Two shapes — never covered them at all, or covered them
+    // for a while and turned over — and the copy has to tell them apart.
+    var turnClause = v.turnedAtStart
+      ? 'growth never covers your withdrawals'
+      : 'growth stops covering your withdrawals from <strong>' + v.turnYear + '</strong>';
+    var tail = extDepletion
+      ? ' <strong>On pace to deplete around ' + roundApprox(extDepletion) + '</strong>, beyond the window.'
+      : ' It does not run out inside the window; it runs down.';
+    return 'Survives your ' + SCENARIO.yearsInRetirement + '-year window, but ' + turnClause
+      + ' — and it is still falling at <strong>' + v.horizonYear + '</strong>.' + tail + basisTail;
   }
 
   function shortVerdict(v) {
@@ -465,8 +520,9 @@
   }
 
   function renderVerdict(vSel, vOther, basis, otherBasis) {
+    var extDep = (vSel.state === 'shrink') ? extendedDepletion(SCENARIO, basis) : null;
     var sentEl = document.getElementById('evVerdictSentence');
-    if (sentEl) sentEl.innerHTML = verdictSentence(vSel, basis);
+    if (sentEl) sentEl.innerHTML = verdictSentence(vSel, basis, extDep);
 
     // Robustness line. Never hard-codes which basis is conservative —
     // it reports whichever of the two produced the worse answer, and says
@@ -558,22 +614,30 @@
     return Math.min(0.98, Math.max(0.52, p));
   }
 
+  // Every mention of "the window" names the year it ends (#3) — the reader
+  // should never have to hunt for what the horizon actually is.
   function spectrumDetail(v, scenario) {
+    var toYear = ' (to ' + v.horizonYear + ')';
     if (v.state === 'deplete') {
       var n = Math.max(0, v.depletionYear - scenario.retirementYear);
       return 'Stack depletes ' + plural(n, 'year') + ' into retirement at this withdrawal.';
     }
     if (v.state === 'shrink') {
-      return 'Stack outlives the horizon but never stops shrinking — it ends at '
-        + (v.ratio * 100).toFixed(0) + '% of its real value at retirement.';
+      // Not "shrinking throughout" — it may have grown for two decades first.
+      // Name the turn, and give the ending ratio so the reader can see both.
+      return (v.turnedAtStart
+          ? 'Stack outlives the window' + toYear + ' but growth never covers the withdrawal'
+          : 'Stack outlives the window' + toYear + ' but turns over in ' + v.turnYear)
+        + ' — it ends at ' + (v.ratio * 100).toFixed(0) + '% of its real value at retirement, and still falling.';
     }
     if (v.ratio >= 1.05) {
-      return 'Stack grows ' + v.ratio.toFixed(1) + '× in real terms over the window — comfortably above escape velocity.';
+      return 'Stack grows ' + v.ratio.toFixed(1) + '× in real terms over the window' + toYear
+        + ' — comfortably above escape velocity.';
     }
     if (v.ratio >= 0.85) {
-      return 'Stack roughly maintains real value through the window — right at escape velocity.';
+      return 'Stack roughly maintains real value through the window' + toYear + ' — right at escape velocity.';
     }
-    return 'Stack survives the window but loses some real value ('
+    return 'Stack survives the window' + toYear + ' but loses some real value ('
       + (v.ratio * 100).toFixed(0) + '% of starting real value at the end).';
   }
 
@@ -594,24 +658,88 @@
      SENSITIVITY PANEL (§5.3) + AXIS CROSSINGS
   ═══════════════════════════════════════════════════════════ */
 
-  function cloneWith(over) {
+  function cloneWith(over, base) {
+    var src = base || SCENARIO;
     var s = {};
-    for (var k in SCENARIO) if (Object.prototype.hasOwnProperty.call(SCENARIO, k)) s[k] = SCENARIO[k];
+    for (var k in src) if (Object.prototype.hasOwnProperty.call(src, k)) s[k] = src[k];
     for (var o in over) if (Object.prototype.hasOwnProperty.call(over, o)) s[o] = over[o];
     return s;
   }
 
+  /* ─── Shrink-branch extension (#6). A stack that outlives the horizon while
+         still losing ground every year is on a trajectory, and the honest thing
+         is to name where that trajectory ends. Runs the SAME loop with the
+         horizon pushed out by EXTEND_CAP years and reports the depletion year
+         if one lands inside the cap. This is new OUTPUT only — it never feeds
+         computeVerdict, so the escape/deplete boundary is untouched. ─── */
+  function extendedDepletion(scenario, basis) {
+    var ext = cloneWith({ yearsInRetirement: scenario.yearsInRetirement + EXTEND_CAP }, scenario);
+    return projectForBasis(ext, basis, true).depletionYear;   // null = still going at the cap
+  }
+
+  // Displayed to the nearest five years. This is an extrapolation decades past
+  // the horizon the reader chose; quoting it to the year would be false
+  // precision dressed as an answer.
+  function roundApprox(year) { return year === null ? null : Math.round(year / 5) * 5; }
+
   function statePhrase(v) {
     if (v.state === 'escape') return 'reaches escape velocity';
-    if (v.state === 'shrink') return 'lasts to ' + v.horizonYear + ' but keeps shrinking';
+    if (v.state === 'shrink') return 'lasts to ' + v.horizonYear + ' but is falling by the end';
     return 'depletes in ' + v.depletionYear;
   }
 
+  // Each row nudges one axis and reports the movement of a DIFFERENT axis's
+  // line (#15). Reporting the nudged axis's own line would be circular, and
+  // reporting the escape YEAR is vacuous under this model — the escape year is
+  // retirement+1 whenever it exists, so "escape arrives one year later" only
+  // restates the input. The line is the quantity that actually moves.
   var DELTA_ROWS = [
-    { key: 'retirementYear',  dir: 1,  label: function () { return 'Retire one year later'; } },
-    { key: 'targetIncomeUSD', dir: -1, label: function () { return 'Draw ' + formatCurrencyShort(GRAD.incStep) + ' less per year'; } },
-    { key: 'btcStack',        dir: 1,  label: function () { return 'Add ' + formatStep(GRAD.btcStep) + ' BTC'; } }
+    { key: 'retirementYear',  dir: 1,  reports: 'stack',
+      label: function () { return 'Retire one year later'; } },
+    { key: 'targetIncomeUSD', dir: -1, reports: 'stack',
+      label: function () { return 'Withdraw ' + formatCurrencyShort(GRAD.incStep) + ' less per year'; } },
+    { key: 'btcStack',        dir: 1,  reports: 'income',
+      label: function () { return 'Add ' + formatStep(GRAD.btcStep) + ' BTC'; } }
   ];
+
+  // The line on one axis for an arbitrary scenario — the Threshold section and
+  // the sensitivity rows share this, so a line quoted in one place can never
+  // disagree with the same line quoted in the other.
+  function lineFor(axis, scenario) {
+    var infl = MA.get('inflation').value;
+    function escapes(over) {
+      var s = cloneWith(over, scenario);
+      return computeVerdict(projectForBasis(s, PRICE_BASIS, true), s, infl).state === 'escape';
+    }
+    if (axis === 'stack') {
+      var ls = LIMITS.btcStack;
+      if (escapes({ btcStack: ls.min })) return { value: ls.min, bound: 'below' };
+      if (!escapes({ btcStack: ls.max })) return { value: null, bound: 'above' };
+      var lo = ls.min, hi = ls.max;
+      for (var i = 0; i < 22; i++) { var m = (lo + hi) / 2; if (escapes({ btcStack: m })) hi = m; else lo = m; }
+      return { value: Math.ceil(hi * 100) / 100, bound: null };
+    }
+    if (axis === 'income') {
+      var li = LIMITS.targetIncomeUSD;
+      if (escapes({ targetIncomeUSD: li.max })) return { value: li.max, bound: 'above' };
+      if (!escapes({ targetIncomeUSD: li.min })) return { value: null, bound: 'below' };
+      var lo2 = li.min, hi2 = li.max;
+      for (var j = 0; j < 22; j++) { var m2 = (lo2 + hi2) / 2; if (escapes({ targetIncomeUSD: m2 })) lo2 = m2; else hi2 = m2; }
+      return { value: Math.floor(lo2 / 100) * 100, bound: null };
+    }
+    // Retirement year is NOT monotone: the stack a plan needs falls as the
+    // retirement year moves out, then rises again once the horizon reaches the
+    // low-real-growth end of the Power Law. Bisection would be wrong. Scan.
+    var ly = LIMITS.retirementYear;
+    for (var y = ly.min; y <= ly.max; y++) { if (escapes({ retirementYear: y })) return { value: y, bound: null }; }
+    return { value: null, bound: 'above' };
+  }
+
+  function formatLineValue(axis, v) {
+    if (axis === 'stack')  return formatBtc(v) + ' BTC';
+    if (axis === 'income') return formatUsdFull(v);
+    return String(v);
+  }
 
   function renderDeltas(baseVerdict, basis) {
     var host = document.getElementById('evDeltas');
@@ -640,25 +768,34 @@
       var nv = computeVerdict(nudgedProj, nudged, inflationPct);
       var nudgedAtHorizon = realValueAtYear(nudgedProj, baseVerdict.horizonYear, inflationPct);
 
-      // Delta-priority rule inherited from the flagship's compare panel:
-      // an escape-velocity flip is the headline of its row, ahead of
-      // year shifts, ahead of stack value.
-      var lead;
-      if (nv.state !== baseVerdict.state) {
-        lead = '<span class="ev-delta-flip">Now ' + statePhrase(nv) + '</span>';
-      } else if (nv.state === 'escape' && nv.escapeYear !== baseVerdict.escapeYear) {
-        var dy = baseVerdict.escapeYear - nv.escapeYear;
-        lead = 'escape arrives <strong>' + plural(Math.abs(dy), 'year') + (dy > 0 ? ' earlier' : ' later') + '</strong>';
-      } else if (nv.state === 'deplete' && nv.depletionYear !== baseVerdict.depletionYear) {
-        var dd = nv.depletionYear - baseVerdict.depletionYear;
-        lead = 'depletion moves <strong>' + plural(Math.abs(dd), 'year') + (dd > 0 ? ' later' : ' earlier') + '</strong>';
-      } else {
-        lead = 'verdict unchanged';
+      // Order fixed by #15: the verdict flip is the headline in either
+      // direction; otherwise "verdict unchanged". Never escape-year
+      // arithmetic — under this model the escape year is retirement+1
+      // whenever it exists, so "escape arrives one year later" would only
+      // restate the input the row just changed.
+      var lead = (nv.state !== baseVerdict.state)
+        ? '<span class="ev-delta-flip">Now ' + statePhrase(nv) + '</span>'
+        : 'verdict unchanged';
+
+      var body = lead;
+
+      // Then how the nudge moves a line. Reporting the nudged axis's OWN line
+      // would be circular — adding stack does not move the stack line — so
+      // each row reports the line its nudge actually shifts.
+      var axis = row.reports;
+      var axisWord = (axis === 'stack') ? 'stack' : 'withdrawal';
+      var lineBefore = lineFor(axis, SCENARIO);
+      var lineAfter  = lineFor(axis, nudged);
+      if (lineBefore.value !== null && lineAfter.value !== null && lineBefore.value !== lineAfter.value) {
+        body += '<span class="ev-delta-sep">·</span>the ' + axisWord + ' line moves <strong>'
+          + formatLineValue(axis, lineBefore.value) + ' → ' + formatLineValue(axis, lineAfter.value) + '</strong>';
+      } else if (lineBefore.value === null && lineAfter.value !== null) {
+        body += '<span class="ev-delta-sep">·</span>brings the ' + axisWord + ' line into range at <strong>'
+          + formatLineValue(axis, lineAfter.value) + '</strong>';
       }
 
       // The value-at-horizon clause is dropped when both scenarios are
       // already empty by then — "+$0" on every row is noise, not honesty.
-      var body = lead;
       if (baseAtHorizon != null && nudgedAtHorizon != null
           && (baseAtHorizon > 0.5 || nudgedAtHorizon > 0.5)) {
         var dv = nudgedAtHorizon - baseAtHorizon;
@@ -691,113 +828,211 @@
     });
   }
 
-  /* ─── Where the line is.
-         Under this page's escape-year definition the escape YEAR is, for
-         almost every input combination, the first drawdown year or never
-         (verified by sweep at build time — see the build notes). The
-         quantity that actually varies, and the one the page's thesis
-         promises, is the crossing value on each axis. Computed against
-         the same engine and the same price basis as the verdict. ─── */
-  function escapesWith(over) {
-    var s = cloneWith(over);
-    var infl = MA.get('inflation').value;
-    return computeVerdict(projectForBasis(s, PRICE_BASIS, true), s, infl).state === 'escape';
-  }
 
-  function crossingStack() {
-    var lim = LIMITS.btcStack;
-    if (escapesWith({ btcStack: lim.min })) return { value: lim.min, bound: 'below' };
-    if (!escapesWith({ btcStack: lim.max })) return { value: null, bound: 'above' };
-    var lo = lim.min, hi = lim.max;
-    for (var i = 0; i < 22; i++) {
-      var mid = (lo + hi) / 2;
-      if (escapesWith({ btcStack: mid })) hi = mid; else lo = mid;
-    }
-    return { value: Math.ceil(hi * 100) / 100, bound: null };   // round UP: the stated value still escapes
-  }
+  /* ═══════════════════════════════════════════════════════════
+     THE THRESHOLD (review round 1 #7)
 
-  function crossingIncome() {
-    var lim = LIMITS.targetIncomeUSD;
-    if (escapesWith({ targetIncomeUSD: lim.max })) return { value: lim.max, bound: 'above' };
-    if (!escapesWith({ targetIncomeUSD: lim.min })) return { value: null, bound: 'below' };
-    var lo = lim.min, hi = lim.max;
-    for (var i = 0; i < 22; i++) {
-      var mid = (lo + hi) / 2;
-      if (escapesWith({ targetIncomeUSD: mid })) lo = mid; else hi = mid;
-    }
-    return { value: Math.floor(lo / 100) * 100, bound: null };  // round DOWN: the stated value still escapes
-  }
+     "One step in any direction" is a step-from-here instrument. This is a
+     start-at-the-line instrument: fix two of the three numbers, move the
+     third, and watch where the verdict flips. Scrubbing here is a
+     what-if — it never writes back to the plan; Apply does that.
 
-  // NOT bisected. The required stack falls with a later retirement year and
-  // then rises again once the horizon reaches the low-real-growth end of
-  // the Power Law, so escape is not monotone in this input. Scan.
-  function crossingRetireYear() {
-    var lim = LIMITS.retirementYear;
-    for (var y = lim.min; y <= lim.max; y++) {
-      if (escapesWith({ retirementYear: y })) return { value: y, bound: null };
-    }
-    return { value: null, bound: 'above' };
-  }
+     Under this page's escape-year definition the escape YEAR is the first
+     drawdown year or never, so the quantity that carries the page's thesis
+     is the line on each axis, not a year. This section is that quantity
+     made draggable.
+  ═══════════════════════════════════════════════════════════ */
 
-  var LINE_KEY = null;
-  var LINE_CACHE = null;
-  function crossings() {
-    // The three crossings are ~75 projections. They depend only on the
-    // scenario, the basis, and the canonical assumptions — not on the
-    // display toggle — so a key check keeps a nominal/real flip from
-    // re-running them.
+  var AXES = {
+    stack:  { key: 'btcStack',          label: 'Stack',           unit: 'BTC',  higherIsBetter: true  },
+    income: { key: 'targetIncomeUSD',   label: 'Withdrawal',      unit: '$/yr', higherIsBetter: false },
+    retire: { key: 'retirementYear',    label: 'Retirement year', unit: '',     higherIsBetter: true  }
+  };
+  var THRESH_AXIS = 'stack';
+  var THRESH_VALUE = null;      // scrubbed value; null = sitting on the plan
+
+  // Lines depend on the plan, the basis and the canonical assumptions — not on
+  // the display toggle — so a nominal/real flip must not re-run ~75 projections.
+  var LINE_KEY = null, LINE_CACHE = null;
+  function lines() {
     var key = [SCENARIO.btcStack, SCENARIO.targetIncomeUSD, SCENARIO.retirementYear,
                SCENARIO.yearsInRetirement, SCENARIO.incomeBasis, PRICE_BASIS,
                MA.get('inflation').value, MA.get('btcGrowthModel').preset,
                liveBtcPrice].join('|');
     if (key === LINE_KEY) return LINE_CACHE;
     LINE_KEY = key;
-    LINE_CACHE = { stack: crossingStack(), income: crossingIncome(), retire: crossingRetireYear() };
+    LINE_CACHE = { stack: lineFor('stack', SCENARIO),
+                   income: lineFor('income', SCENARIO),
+                   retire: lineFor('retire', SCENARIO) };
     return LINE_CACHE;
   }
 
-  function renderLine() {
+  function planValue(axis) { return SCENARIO[AXES[axis].key]; }
+
+  // The scrub window. Scrubbing the full axis range would bury the interesting
+  // band — a stack line at 1.77 sits 1.7% along a 0.01–100 track — so the
+  // window is framed around the line and the plan, and its real ends are
+  // labelled so it never reads as the whole axis.
+  function scrubWindow(axis) {
+    var lim = LIMITS[AXES[axis].key];
+    var ln = lines()[axis].value;
+    var plan = planValue(axis);
+    if (axis === 'retire') return { lo: lim.min, hi: lim.max, step: 1 };
+    var anchor = (ln === null) ? plan : Math.max(ln, plan);
+    var hi = Math.min(lim.max, Math.max(anchor * 1.8, plan * 1.8, plan + (axis === 'stack' ? 1 : 40000)));
+    var lo = lim.min;
+    var step = (axis === 'stack') ? 0.01 : 1000;
+    return { lo: lo, hi: hi, step: step };
+  }
+
+  function stateAt(axis, value) {
+    var over = {}; over[AXES[axis].key] = value;
+    var s = cloneWith(over);
+    return computeVerdict(projectForBasis(s, PRICE_BASIS, true), s, MA.get('inflation').value);
+  }
+
+  function shortStatePhrase(v) {
+    if (v.state === 'escape') return 'reaches escape velocity';
+    if (v.state === 'shrink') return 'survives to ' + v.horizonYear + ', falling at the end';
+    return 'depletes in ' + v.depletionYear;
+  }
+
+  function renderThreshold() {
+    var host = document.getElementById('evThreshold');
+    if (!host) return;
+    var ln = lines()[THRESH_AXIS];
+    var ax = AXES[THRESH_AXIS];
+    var win = scrubWindow(THRESH_AXIS);
+    var plan = planValue(THRESH_AXIS);
+    var cur = (THRESH_VALUE === null) ? plan : THRESH_VALUE;
+
+    // Chooser state
+    document.querySelectorAll('.ev-axis-btn').forEach(function (b) {
+      b.classList.toggle('is-active', b.getAttribute('data-axis') === THRESH_AXIS);
+    });
+
+    var input = document.getElementById('evScrubInput');
+    var track = document.getElementById('evScrubTrack');
+    var tick  = document.getElementById('evScrubTick');
+    var out   = document.getElementById('evScrubValue');
+    var verd  = document.getElementById('evScrubVerdict');
+    var lblLo = document.getElementById('evScrubMin');
+    var lblHi = document.getElementById('evScrubMax');
+    var lblLine = document.getElementById('evScrubLineLabel');
+    var planEl = document.getElementById('evScrubPlan');
+    var applyEl = document.getElementById('evScrubApply');
+    var noteEl = document.getElementById('evScrubNote');
+
+    // Clamp handling (#7): a line outside the axis range is stated plainly,
+    // never shown as a clamped number pretending to be the line.
+    var outOfRange = (ln.value === null);
+    if (noteEl) {
+      if (outOfRange) {
+        noteEl.hidden = false;
+        noteEl.textContent = ax.label + ': the line is beyond this page’s range — no value between '
+          + formatLineValue(THRESH_AXIS, LIMITS[ax.key].min) + ' and '
+          + formatLineValue(THRESH_AXIS, LIMITS[ax.key].max) + ' crosses it with the other two numbers held.';
+      } else { noteEl.hidden = true; }
+    }
+
+    if (input) {
+      input.min = win.lo; input.max = win.hi; input.step = win.step;
+      input.value = Math.min(win.hi, Math.max(win.lo, cur));
+      input.setAttribute('aria-label', 'Scrub ' + ax.label);
+    }
+
+    var frac = function (v) { return (win.hi > win.lo) ? (v - win.lo) / (win.hi - win.lo) : 0; };
+
+    // Track paints the spectrum bar's vocabulary onto this axis: depleting
+    // side → threshold tick → escape side, oriented by which direction helps.
+    if (track) {
+      var f = (ln.value === null) ? (ax.higherIsBetter ? 1 : 0) : Math.max(0, Math.min(1, frac(ln.value)));
+      var pct = (f * 100).toFixed(2) + '%';
+      track.style.background = ax.higherIsBetter
+        ? 'linear-gradient(to right, rgba(192,57,43,0.45) 0%, rgba(224,148,34,0.35) ' + pct + ', rgba(120,180,90,0.45) 100%)'
+        : 'linear-gradient(to right, rgba(120,180,90,0.45) 0%, rgba(224,148,34,0.35) ' + pct + ', rgba(192,57,43,0.45) 100%)';
+      if (tick) { tick.style.left = pct; tick.hidden = (ln.value === null); }
+    }
+
+    var atV = stateAt(THRESH_AXIS, cur);
+    if (out) out.textContent = formatLineValue(THRESH_AXIS, THRESH_AXIS === 'stack' ? Math.round(cur * 100) / 100 : Math.round(cur));
+    if (verd) {
+      verd.textContent = atV.state === 'escape' ? 'reaches escape velocity'
+        : atV.state === 'shrink' ? 'survives to ' + atV.horizonYear + ', falling at the end'
+        : 'depletes in ' + atV.depletionYear;
+      verd.className = 'ev-scrub-verdict ' + (atV.state === 'escape' ? 'is-escape' : 'is-fail');
+    }
+    if (lblLo) lblLo.textContent = formatLineValue(THRESH_AXIS, win.lo);
+    if (lblHi) lblHi.textContent = formatLineValue(THRESH_AXIS, win.hi);
+    if (lblLine) lblLine.textContent = outOfRange ? 'line out of range'
+      : 'line ' + formatLineValue(THRESH_AXIS, ln.value);
+    if (planEl) planEl.innerHTML = 'Your plan: <strong>' + formatLineValue(THRESH_AXIS, plan) + '</strong>';
+    if (applyEl) {
+      var changed = Math.abs(cur - plan) > (THRESH_AXIS === 'stack' ? 0.005 : 0.5);
+      applyEl.disabled = !changed;
+      applyEl.textContent = changed
+        ? 'Apply ' + formatLineValue(THRESH_AXIS, THRESH_AXIS === 'stack' ? Math.round(cur * 100) / 100 : Math.round(cur)) + ' to the plan ›'
+        : 'Drag to explore, then apply';
+    }
+
+    renderLineRows();
+  }
+
+  // The three line values, each stated as line vs. your plan (#7).
+  function renderLineRows() {
     var host = document.getElementById('evLineRows');
     if (!host) return;
+    var L = lines();
     var rows = [];
-    var cross = crossings();
 
-    var cs = cross.stack;
-    if (cs.value === null) {
-      rows.push({ html: 'No stack up to <strong>21 BTC</strong> crosses at this draw and this date.', past: false });
-    } else {
-      rows.push({
-        html: 'Stack: the line is at <strong>' + formatBtc(cs.value) + ' BTC</strong>'
-          + '<span class="ev-line-you"> — you have ' + formatBtc(SCENARIO.btcStack) + '.</span>',
-        past: SCENARIO.btcStack >= cs.value
-      });
-    }
+    rows.push(L.stack.value === null
+      ? { html: 'Stack: <strong>beyond this page’s range</strong><span class="ev-line-you"> — no stack up to ' + formatBtc(LIMITS.btcStack.max) + ' BTC crosses at this withdrawal and this date.</span>', past: false }
+      : { html: 'Stack: the line is at <strong>' + formatBtc(L.stack.value) + ' BTC</strong>'
+            + '<span class="ev-line-you"> — your plan holds ' + formatBtc(SCENARIO.btcStack) + '.</span>',
+          past: SCENARIO.btcStack >= L.stack.value });
 
-    var ci = cross.income;
-    if (ci.value === null) {
-      rows.push({ html: 'No draw down to <strong>' + formatCurrencyShort(LIMITS.targetIncomeUSD.min) + '</strong> crosses at this stack and this date.', past: false });
-    } else {
-      rows.push({
-        html: 'Draw: the line is at <strong>' + formatUsdFull(ci.value) + '/yr</strong>'
-          + '<span class="ev-line-you"> — you plan ' + formatUsdFull(SCENARIO.targetIncomeUSD) + '.</span>',
-        past: SCENARIO.targetIncomeUSD <= ci.value
-      });
-    }
+    rows.push(L.income.value === null
+      ? { html: 'Withdrawal: <strong>beyond this page’s range</strong><span class="ev-line-you"> — no withdrawal down to ' + formatUsdFull(LIMITS.targetIncomeUSD.min) + ' crosses at this stack and this date.</span>', past: false }
+      : { html: 'Withdrawal: the line is at <strong>' + formatUsdFull(L.income.value) + '/yr</strong>'
+            + '<span class="ev-line-you"> — your plan withdraws ' + formatUsdFull(SCENARIO.targetIncomeUSD) + '.</span>',
+          past: SCENARIO.targetIncomeUSD <= L.income.value });
 
-    var cy = cross.retire;
-    if (cy.value === null) {
-      rows.push({ html: 'No retirement year through <strong>' + LIMITS.retirementYear.max + '</strong> crosses at this stack and this draw.', past: false });
-    } else {
-      rows.push({
-        html: 'Retirement year: the earliest that crosses is <strong>' + cy.value + '</strong>'
-          + '<span class="ev-line-you"> — you plan ' + SCENARIO.retirementYear + '.</span>',
-        past: SCENARIO.retirementYear >= cy.value
-      });
-    }
+    rows.push(L.retire.value === null
+      ? { html: 'Retirement year: <strong>beyond this page’s range</strong><span class="ev-line-you"> — no year through ' + LIMITS.retirementYear.max + ' crosses at this stack and this withdrawal.</span>', past: false }
+      : { html: 'Retirement year: the earliest that crosses is <strong>' + L.retire.value + '</strong>'
+            + '<span class="ev-line-you"> — your plan retires ' + SCENARIO.retirementYear + '.</span>',
+          past: SCENARIO.retirementYear >= L.retire.value });
 
     host.innerHTML = rows.map(function (r) {
       return '<div class="ev-line-row' + (r.past ? ' is-past' : '') + '">' + r.html + '</div>';
     }).join('');
+  }
+
+  function wireThreshold() {
+    document.querySelectorAll('.ev-axis-btn').forEach(function (b) {
+      b.addEventListener('click', function () {
+        THRESH_AXIS = b.getAttribute('data-axis');
+        THRESH_VALUE = null;         // a new axis starts from the plan
+        renderThreshold();
+      });
+    });
+    var input = document.getElementById('evScrubInput');
+    if (input) {
+      input.addEventListener('input', function () {
+        THRESH_VALUE = parseFloat(input.value);
+        renderThreshold();           // scrub is a what-if: no writeback to the plan
+      });
+    }
+    var apply = document.getElementById('evScrubApply');
+    if (apply) {
+      apply.addEventListener('click', function () {
+        if (THRESH_VALUE === null) return;
+        if (setScenarioValue(AXES[THRESH_AXIS].key, THRESH_VALUE)) {
+          THRESH_VALUE = null;
+          syncSteppers(); scheduleRender(); scheduleUrlSync(); saveSession();
+        }
+      });
+    }
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -1182,6 +1417,54 @@
     _urlTimer = setTimeout(syncUrl, 220);
   }
 
+  /* ─── Session stickiness (#11).
+         sessionStorage ONLY. The stack is position data: how much bitcoin a
+         reader holds is the single most sensitive number they will type on
+         this site, and it must not outlive the tab. sessionStorage dies with
+         the tab; localStorage would not. Nothing on this page writes the
+         plan to localStorage — the only localStorage this page touches is
+         ModelingAssumptions (inflation, growth model), which holds no
+         position data.
+         Load precedence: URL params > sessionStorage > defaults. ─── */
+  var SESSION_KEY = 'lcs.ev.plan';
+
+  function saveSession() {
+    try {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+        stack:  SCENARIO.btcStack,
+        income: SCENARIO.targetIncomeUSD,
+        retire: SCENARIO.retirementYear
+      }));
+    } catch (e) { /* private mode — stickiness is a convenience, not a requirement */ }
+  }
+
+  function loadSession() {
+    var raw;
+    try { raw = sessionStorage.getItem(SESSION_KEY); } catch (e) { return; }
+    if (!raw) return;
+    var o;
+    try { o = JSON.parse(raw); } catch (e) { return; }
+    if (!o || typeof o !== 'object') return;
+    if (isFinite(o.stack))  setScenarioValue('btcStack', o.stack);
+    if (isFinite(o.income)) setScenarioValue('targetIncomeUSD', o.income);
+    if (isFinite(o.retire)) setScenarioValue('retirementYear', o.retire);
+  }
+
+  function clearSession() {
+    try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+  }
+
+  // Reset (#10) — the three plan inputs only. Assumptions are sitewide-sticky
+  // and deliberately survive: a reader who set 8% inflation meant it.
+  function resetPlanDefaults() {
+    SCENARIO.btcStack        = DEFAULTS.btcStack;
+    SCENARIO.targetIncomeUSD = DEFAULTS.targetIncomeUSD;
+    SCENARIO.retirementYear  = DEFAULTS.retirementYear;
+    THRESH_VALUE = null;
+    clearSession();
+    syncSteppers(); scheduleRender(); scheduleUrlSync();
+  }
+
   // Cross-link to the flagship's full audit view carries the live scenario.
   function updateFlagshipLink() {
     var a = document.getElementById('evFlagshipLink');
@@ -1216,7 +1499,7 @@
 
     renderVerdict(vSel, vOther, PRICE_BASIS, otherBasis);
     renderDeltas(vSel, PRICE_BASIS);
-    renderLine();
+    renderThreshold();
     renderStrip(vSel, PRICE_BASIS);
     renderVerifyTable(projSel);
     syncAssumptionControls();
@@ -1318,9 +1601,31 @@
             failures.push(tag + ': escape year ' + mine.escapeYear + ' is not the FIRST permanent crossing');
           }
         }
+        // (5) The shrink extension (#6) is new OUTPUT, not a change to the
+        // escape/deplete boundary. Assert that directly: recomputing the
+        // verdict after running the extended loop must return the identical
+        // classification, and any extended depletion year must fall strictly
+        // beyond the original horizon — never inside the window the verdict
+        // already answered for.
+        var ext = extendedDepletion(sc, basis);
+        var recheck = computeVerdict(projectForBasis(sc, basis), sc, infl);
+        if (recheck.state !== mine.state
+            || recheck.escapeYear !== mine.escapeYear
+            || recheck.depletionYear !== mine.depletionYear) {
+          failures.push(tag + ': extension altered the boundary classification ('
+            + mine.state + ' → ' + recheck.state + ')');
+        }
+        if (ext !== null && mine.state !== 'deplete' && ext <= mine.horizonYear) {
+          failures.push(tag + ': extended depletion ' + ext + ' falls inside the horizon '
+            + mine.horizonYear + ', which the verdict already cleared');
+        }
+        if (mine.state === 'deplete' && ext !== mine.depletionYear) {
+          failures.push(tag + ': extended loop moved a depletion year (' + mine.depletionYear + ' → ' + ext + ')');
+        }
+
         rows.push({ basis: basis, scenario: idx, state: mine.state,
                     escapeYear: mine.escapeYear, depletionYear: mine.depletionYear,
-                    flagshipAchieved: flag.achieved });
+                    extendedDepletion: ext, flagshipAchieved: flag.achieved });
       });
     });
 
@@ -1378,7 +1683,65 @@
     });
   }
 
+  /* ═══════════════════════════════════════════════════════════
+     DOCKED STEPPER BAR (#12)
+
+     Deliberately `position: fixed`, not `position: sticky`. Sticky is the
+     exact thing that silently broke on money-trees: it depends on every
+     ancestor's overflow and on offsets that go stale, and it fails by
+     quietly doing nothing. Fixed has no ancestor dependency at all. The
+     top offset is MEASURED from the live nav and ribbon rather than
+     hardcoded, and re-measured on resize, so the bar cannot drift under
+     the chrome the way a hardcoded offset does.
+
+     Desktop only. At 375px three values plus six 44px arrows cannot fit in
+     one legible row, so mobile gets the fallback the brief specifies: a
+     slim repeat of the steppers immediately before the year-by-year
+     section (see `.ev-steppers-repeat` in the template). CSS decides which
+     of the two is visible; both drive the same state through the same
+     `.ev-stepper` wiring.
+  ═══════════════════════════════════════════════════════════ */
+  function measureDockOffset() {
+    var top = 0;
+    var nav = document.querySelector('.site-nav');
+    if (nav) {
+      var cs = getComputedStyle(nav);
+      if (cs.position === 'sticky' || cs.position === 'fixed') top += nav.getBoundingClientRect().height;
+    }
+    var ribbon = document.querySelector('.channel-ribbon');
+    if (ribbon) {
+      var rs = getComputedStyle(ribbon);
+      if (rs.position === 'sticky' || rs.position === 'fixed') top += ribbon.getBoundingClientRect().height;
+    }
+    document.documentElement.style.setProperty('--ev-dock-top', Math.round(top) + 'px');
+  }
+
+  function wireDock() {
+    var dock = document.getElementById('evDock');
+    var anchor = document.getElementById('inputs');
+    if (!dock || !anchor) return;
+    measureDockOffset();
+    window.addEventListener('resize', measureDockOffset);
+
+    if (!('IntersectionObserver' in window)) { return; }   // no observer: bar simply never docks
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        // Dock once the main stepper block has scrolled off the top.
+        dock.classList.toggle('is-docked', !e.isIntersecting && e.boundingClientRect.top < 0);
+      });
+    }, { threshold: 0, rootMargin: '-80px 0px 0px 0px' });
+    io.observe(anchor);
+  }
+
+  function wireReset() {
+    var el = document.getElementById('evReset');
+    if (!el) return;
+    el.addEventListener('click', function (e) { e.preventDefault(); resetPlanDefaults(); });
+  }
+
   function init() {
+    // Precedence: URL params > sessionStorage > defaults (#11).
+    loadSession();
     readUrlParams();
     // Reflect any URL-provided gradation into the segmented controls.
     document.querySelectorAll('.seg-control[data-grad]').forEach(function (group) {
@@ -1390,8 +1753,11 @@
     });
     wireSteppers();
     wireDeltaApply();
+    wireThreshold();
     wireAssumptions();
     wireVerify();
+    wireReset();
+    wireDock();
     syncSteppers();
     render();
     fetchLiveBtcPrice();

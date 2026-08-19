@@ -335,7 +335,150 @@ body { background: var(--bg); color: var(--text); }
   .ev-delta-body { flex: 1 1 100%; }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   THE THRESHOLD (#7) — the start-at-the-line instrument
+═══════════════════════════════════════════════════════════════ */
+
+.ev-threshold { display: flex; flex-direction: column; gap: 1.1rem; }
+.ev-axis-row { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; }
+.ev-axis-label { font-family: var(--font-b); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); }
+.ev-axis-hold { font-family: var(--font-b); font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
+
+.ev-scrub {
+  background: rgba(224,148,34,0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.2rem 0.9rem;
+}
+.ev-scrub-head { display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
+.ev-scrub-value {
+  font-family: var(--font-d); font-size: clamp(1.5rem, 3.4vw, 2rem); font-weight: 500;
+  color: var(--ink-bright); font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+}
+.ev-scrub-verdict { font-family: var(--font-b); font-size: 0.92rem; font-weight: 600; }
+.ev-scrub-verdict.is-escape { color: var(--pos); }
+.ev-scrub-verdict.is-fail { color: var(--neg); }
+
+/* The track carries the spectrum bar's language onto the chosen axis:
+   depleting side → threshold tick → escape side. The gradient is painted
+   from JS because the tick's position moves with the line. */
+.ev-scrub-track { position: relative; height: 8px; border-radius: 4px; margin: 0.2rem 0 0.6rem; }
+.ev-scrub-tick { position: absolute; top: -6px; bottom: -6px; width: 2px; background: var(--ink-bright); opacity: 0.85; pointer-events: none; z-index: 2; }
+.ev-scrub-tick[hidden] { display: none; }
+.ev-scrub-input {
+  position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
+  width: 100%; margin: 0; background: transparent; -webkit-appearance: none; appearance: none;
+  height: 44px;   /* touch target, not visual height */
+  cursor: pointer; z-index: 3;
+}
+.ev-scrub-input:focus-visible { outline: 2px solid var(--amber); outline-offset: 4px; border-radius: 4px; }
+.ev-scrub-input::-webkit-slider-runnable-track { background: transparent; height: 44px; }
+.ev-scrub-input::-moz-range-track { background: transparent; height: 44px; }
+.ev-scrub-input::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--amber); border: 2px solid var(--bg-page);
+  box-shadow: 0 0 0 1px rgba(224,148,34,0.65), 0 2px 6px rgba(0,0,0,0.45);
+  margin-top: 12px;   /* centre the 20px thumb in the 44px track */
+}
+.ev-scrub-input::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--bg-page);
+  background: var(--amber); box-shadow: 0 0 0 1px rgba(224,148,34,0.65), 0 2px 6px rgba(0,0,0,0.45);
+}
+.ev-scrub-labels {
+  display: flex; justify-content: space-between; gap: 0.6rem;
+  font-family: var(--font-b); font-size: 0.75rem; color: var(--ink-faint);
+}
+.ev-scrub-mid { color: var(--ink-bright); font-weight: 600; font-style: italic; }
+.ev-scrub-note {
+  font-family: var(--font-b); font-size: 0.82rem; line-height: 1.6; color: var(--text-muted);
+  border-left: 2px solid rgba(224,148,34,0.25); padding-left: 0.7rem; margin: 0.8rem 0 0;
+}
+.ev-scrub-note[hidden] { display: none; }
+.ev-scrub-foot { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-top: 0.9rem; }
+.ev-scrub-plan { font-family: var(--font-b); font-size: 0.85rem; color: var(--text-dim); }
+.ev-scrub-plan strong { color: var(--ink-bright); font-variant-numeric: tabular-nums; }
+.ev-scrub-apply {
+  min-height: 44px; padding: 0.5rem 1rem;
+  font-family: var(--font-b); font-size: 0.8rem; font-weight: 600;
+  color: var(--amber); background: rgba(224,148,34,0.08);
+  border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
+}
+.ev-scrub-apply:hover:not(:disabled) { background: rgba(224,148,34,0.16); color: var(--ink-bright); }
+.ev-scrub-apply:disabled { opacity: 0.45; cursor: default; color: var(--text-muted); }
+.ev-scrub-apply:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   DOCKED STEPPER BAR (#12) + its mobile fallback
+   Fixed, not sticky — see the JS comment for why. Hidden until the
+   main stepper block scrolls away, and hidden outright below 760px
+   where three values and six 44px arrows stop fitting in one row.
+═══════════════════════════════════════════════════════════════ */
+
+.ev-dock {
+  position: fixed;
+  top: var(--ev-dock-top, 56px);
+  left: 0; right: 0;
+  z-index: 900;
+  background: rgba(10,9,8,0.94);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  transform: translateY(-120%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.22s ease, opacity 0.22s ease;
+}
+.ev-dock.is-docked { transform: translateY(0); opacity: 1; pointer-events: auto; }
+.ev-dock-inner {
+  max-width: 1100px; margin: 0 auto;
+  padding: 0.35rem 2rem;
+  display: flex; align-items: center; gap: 1.2rem;
+}
+.ev-dock-label { font-family: var(--font-b); font-size: 0.66rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); flex: none; }
+
+.ev-stepper-compact { background: none; border: none; padding: 0; gap: 0; flex: 0 1 auto; }
+.ev-stepper-compact .ev-stepper-row { gap: 0.15rem; }
+.ev-stepper-compact .ev-stepper-value {
+  font-size: 1.05rem; min-height: 44px; padding: 0 0.5rem; min-width: 5.5rem;
+}
+.ev-stepper-compact .ev-step-btn { width: 44px; height: 44px; background: none; border-color: transparent; }
+.ev-stepper-compact .ev-step-btn:hover { background: rgba(224,148,34,0.12); border-color: var(--border); }
+
+/* Mobile fallback: the same three steppers, restated just before the
+   year-by-year strip. Hidden on desktop, where the dock does this job. */
+.ev-steppers-repeat { display: none; }
+.ev-steppers-repeat-row { display: flex; gap: 0.5rem; justify-content: space-between; }
+.ev-stepper-mini-label { font-family: var(--font-b); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); text-align: center; margin-bottom: 0.15rem; }
+
+@media (max-width: 760px) {
+  .ev-dock { display: none; }
+  .ev-steppers-repeat {
+    display: block;
+    max-width: 1100px; margin: 2.6rem auto 0;
+    padding: 0.7rem 0.9rem 0.8rem;
+    background: rgba(224,148,34,0.04);
+    border: 1px solid var(--border); border-radius: 8px;
+  }
+  .ev-steppers-repeat .ev-dock-label { display: block; margin-bottom: 0.5rem; }
+  /* One input per row, not three across: three side-by-side steppers spend
+     216px of a 375px viewport on arrows alone and leave the values clipped to
+     a few pixels. Stacked, each value gets the width it needs and every arrow
+     keeps a full 44px target. */
+  .ev-steppers-repeat-row { flex-direction: column; gap: 0.45rem; }
+  .ev-steppers-repeat .ev-stepper-compact { flex: none; width: 100%; flex-direction: row; align-items: center; gap: 0.5rem; }
+  .ev-steppers-repeat .ev-stepper-mini-label {
+    flex: none; width: 5.2rem; text-align: left; margin: 0;
+  }
+  .ev-steppers-repeat .ev-stepper-row { flex: 1 1 auto; min-width: 0; gap: 0.4rem; }
+  .ev-steppers-repeat .ev-stepper-value {
+    font-size: 1.05rem; min-width: 0; padding: 0 0.2rem; text-align: center;
+  }
+  .ev-steppers-repeat .ev-step-btn { width: 44px; height: 44px; border-color: var(--border); }
+}
+
 /* ── Where the line is ── */
+.ev-reset { margin-left: 0.6rem; }
 .ev-line {
   margin-top: 1.4rem;
   border: 1px solid var(--border);
@@ -523,3 +666,13 @@ body { background: var(--bg); color: var(--text); }
   .spectrum-track.escape::after, .spectrum-marker.escape { animation: none; }
   .spectrum-marker, .ev-strip-col .ev-bar { transition: none; }
 }
+
+/* Reset-to-defaults link (#10) — text register, deliberately quiet so it
+   never competes with the stepper arrows for attention. */
+.ev-reset {
+  color: var(--amber); text-decoration: none;
+  border-bottom: 1px dotted rgba(224,148,34,0.4);
+  font-size: 0.78rem;
+}
+.ev-reset:hover { border-bottom-color: var(--amber); color: #f0a838; }
+.ev-reset:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-radius: 3px; }
