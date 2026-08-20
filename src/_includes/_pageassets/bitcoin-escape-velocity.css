@@ -298,116 +298,107 @@ body { background: var(--bg); color: var(--text); }
 .ev-caveat { max-width: 880px; font-family: var(--font-b); font-size: 0.85rem; line-height: 1.65; color: var(--text-muted); margin: 1rem 0 0; }
 
 /* ═══════════════════════════════════════════════════════════════
-   SENSITIVITY PANEL (spec §5.3)
+   THE THRESHOLD (round 2) — three always-visible sliders
+
+   Replaces both the old One-step rows and the single-axis scrubber.
+   Each track carries the spectrum bar's vocabulary — depleting side,
+   threshold tick, escape side — painted from JS because the tick moves
+   with the line. The range input sits transparently over the track so
+   the visual and the control are one object.
 ═══════════════════════════════════════════════════════════════ */
 
-.ev-deltas { display: flex; flex-direction: column; gap: 0.5rem; }
-.ev-delta {
-  display: flex; align-items: center; gap: 0.9rem;
-  width: 100%; text-align: left;
+.ev-sliders { display: flex; flex-direction: column; gap: 1.5rem; }
+.ev-slider {
   background: rgba(224,148,34,0.04);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 0.75rem 0.9rem;
-  min-height: 44px;
-  cursor: pointer;
-  font-family: var(--font-b);
-  transition: background 0.15s, border-color 0.15s;
+  padding: 0.9rem 1.2rem 0.8rem;
 }
-.ev-delta:hover { background: rgba(224,148,34,0.09); border-color: rgba(224,148,34,0.3); }
-.ev-delta:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-.ev-delta:disabled { cursor: default; opacity: 0.55; }
-.ev-delta:disabled:hover { background: rgba(224,148,34,0.04); border-color: var(--border); }
-
-.ev-delta-move { flex: 0 0 13.5rem; font-size: 0.92rem; font-weight: 600; color: var(--ink-bright); }
-.ev-delta-body { flex: 1 1 auto; min-width: 0; font-size: 0.88rem; line-height: 1.55; color: var(--text-dim); }
-.ev-delta-body strong { font-weight: 600; font-variant-numeric: tabular-nums; }
-.ev-delta-flip { color: var(--ink-bright); font-weight: 600; }
-.ev-delta-sep { color: var(--text-muted); margin: 0 0.45rem; }
-.ev-delta-pos { color: var(--pos); }
-.ev-delta-neg { color: var(--neg); }
-.ev-delta-apply { flex: none; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber); white-space: nowrap; }
-.ev-delta:disabled .ev-delta-apply { color: var(--text-muted); }
-
-@media (max-width: 700px) {
-  .ev-delta { flex-wrap: wrap; gap: 0.35rem 0.9rem; }
-  .ev-delta-move { flex: 1 1 100%; }
-  .ev-delta-body { flex: 1 1 100%; }
+.ev-slider-head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+.ev-slider-label {
+  font-family: var(--font-b); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted);
+  display: inline-flex; align-items: center; gap: 0.4rem;
 }
-
-/* ═══════════════════════════════════════════════════════════════
-   THE THRESHOLD (#7) — the start-at-the-line instrument
-═══════════════════════════════════════════════════════════════ */
-
-.ev-threshold { display: flex; flex-direction: column; gap: 1.1rem; }
-.ev-axis-row { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; }
-.ev-axis-label { font-family: var(--font-b); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); }
-.ev-axis-hold { font-family: var(--font-b); font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
-
-.ev-scrub {
-  background: rgba(224,148,34,0.04);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1rem 1.2rem 0.9rem;
+.ev-slider-value {
+  background: none; border: 1px dashed transparent; border-radius: 6px;
+  color: var(--ink-bright); font-family: var(--font-d);
+  font-size: clamp(1.35rem, 3vw, 1.75rem); font-weight: 500;
+  font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  cursor: text; padding: 0 0.25rem; min-height: 40px;
 }
-.ev-scrub-head { display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
-.ev-scrub-value {
-  font-family: var(--font-d); font-size: clamp(1.5rem, 3.4vw, 2rem); font-weight: 500;
-  color: var(--ink-bright); font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+.ev-slider-value:hover { border-color: rgba(224,148,34,0.35); }
+.ev-slider-value:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.ev-slider-entry {
+  background: rgba(0,0,0,0.3); border: 1px solid var(--amber); border-radius: 6px;
+  color: var(--ink-bright); font-family: var(--font-d);
+  font-size: clamp(1.2rem, 2.6vw, 1.5rem); font-weight: 500;
+  font-variant-numeric: tabular-nums; text-align: center;
+  padding: 0 0.4rem; min-height: 40px; max-width: 10rem;
 }
-.ev-scrub-verdict { font-family: var(--font-b); font-size: 0.92rem; font-weight: 600; }
-.ev-scrub-verdict.is-escape { color: var(--pos); }
-.ev-scrub-verdict.is-fail { color: var(--neg); }
+.ev-slider-entry[hidden] { display: none; }
 
-/* The track carries the spectrum bar's language onto the chosen axis:
-   depleting side → threshold tick → escape side. The gradient is painted
-   from JS because the tick's position moves with the line. */
-.ev-scrub-track { position: relative; height: 8px; border-radius: 4px; margin: 0.2rem 0 0.6rem; }
-.ev-scrub-tick { position: absolute; top: -6px; bottom: -6px; width: 2px; background: var(--ink-bright); opacity: 0.85; pointer-events: none; z-index: 2; }
-.ev-scrub-tick[hidden] { display: none; }
-.ev-scrub-input {
+.ev-slider-track { position: relative; height: 8px; border-radius: 4px; margin: 0.9rem 0 0.55rem; }
+.ev-slider-tick {
+  position: absolute; top: -6px; bottom: -6px; width: 2px;
+  background: var(--ink-bright); opacity: 0.9; pointer-events: none; z-index: 2;
+}
+.ev-slider-tick[hidden] { display: none; }
+.ev-slider-input {
   position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
-  width: 100%; margin: 0; background: transparent; -webkit-appearance: none; appearance: none;
-  height: 44px;   /* touch target, not visual height */
+  width: 100%; margin: 0; background: transparent;
+  -webkit-appearance: none; appearance: none;
+  height: 44px;              /* touch target, not visual height */
   cursor: pointer; z-index: 3;
 }
-.ev-scrub-input:focus-visible { outline: 2px solid var(--amber); outline-offset: 4px; border-radius: 4px; }
-.ev-scrub-input::-webkit-slider-runnable-track { background: transparent; height: 44px; }
-.ev-scrub-input::-moz-range-track { background: transparent; height: 44px; }
-.ev-scrub-input::-webkit-slider-thumb {
+.ev-slider-input:focus-visible { outline: 2px solid var(--amber); outline-offset: 4px; border-radius: 4px; }
+.ev-slider-input::-webkit-slider-runnable-track { background: transparent; height: 44px; }
+.ev-slider-input::-moz-range-track { background: transparent; height: 44px; }
+.ev-slider-input::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
-  width: 20px; height: 20px; border-radius: 50%;
+  width: 22px; height: 22px; border-radius: 50%;
   background: var(--amber); border: 2px solid var(--bg-page);
   box-shadow: 0 0 0 1px rgba(224,148,34,0.65), 0 2px 6px rgba(0,0,0,0.45);
-  margin-top: 12px;   /* centre the 20px thumb in the 44px track */
+  margin-top: 11px;          /* centre the thumb in the 44px track */
 }
-.ev-scrub-input::-moz-range-thumb {
-  width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--bg-page);
+.ev-slider-input::-moz-range-thumb {
+  width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--bg-page);
   background: var(--amber); box-shadow: 0 0 0 1px rgba(224,148,34,0.65), 0 2px 6px rgba(0,0,0,0.45);
 }
-.ev-scrub-labels {
-  display: flex; justify-content: space-between; gap: 0.6rem;
-  font-family: var(--font-b); font-size: 0.75rem; color: var(--ink-faint);
+.ev-slider-foot {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem;
+  font-family: var(--font-b); font-size: 0.74rem; color: var(--ink-faint);
 }
-.ev-scrub-mid { color: var(--ink-bright); font-weight: 600; font-style: italic; }
-.ev-scrub-note {
-  font-family: var(--font-b); font-size: 0.82rem; line-height: 1.6; color: var(--text-muted);
-  border-left: 2px solid rgba(224,148,34,0.25); padding-left: 0.7rem; margin: 0.8rem 0 0;
+.ev-slider-linelabel { color: var(--ink-bright); font-weight: 600; font-style: italic; text-align: center; }
+.ev-slider-linelabel.is-out { color: var(--text-muted); font-weight: 400; }
+.ev-slider-hint { font-family: var(--font-b); font-size: 0.78rem; color: var(--text-muted); margin: 0.9rem 0 0; }
+
+/* ── Bidirectional consequences readout ── */
+.ev-consequences { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1.6rem; }
+.ev-conseq {
+  display: flex; align-items: flex-start; gap: 0.9rem;
+  background: rgba(0,0,0,0.18);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.7rem 0.95rem;
+  font-family: var(--font-b);
 }
-.ev-scrub-note[hidden] { display: none; }
-.ev-scrub-foot { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-top: 0.9rem; }
-.ev-scrub-plan { font-family: var(--font-b); font-size: 0.85rem; color: var(--text-dim); }
-.ev-scrub-plan strong { color: var(--ink-bright); font-variant-numeric: tabular-nums; }
-.ev-scrub-apply {
-  min-height: 44px; padding: 0.5rem 1rem;
-  font-family: var(--font-b); font-size: 0.8rem; font-weight: 600;
-  color: var(--amber); background: rgba(224,148,34,0.08);
-  border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
-  transition: background 0.15s, color 0.15s, opacity 0.15s;
+.ev-conseq-var { flex: 0 0 10rem; font-size: 0.86rem; font-weight: 600; color: var(--ink-bright); }
+.ev-conseq-dirs { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.ev-conseq-dir { font-size: 0.85rem; line-height: 1.55; color: var(--text-dim); }
+.ev-conseq-arrow { color: var(--amber); font-weight: 700; font-variant-numeric: tabular-nums; margin-right: 0.4rem; }
+.ev-conseq-dir strong { font-weight: 600; font-variant-numeric: tabular-nums; }
+.ev-conseq-flip { color: var(--ink-bright); font-weight: 600; }
+.ev-conseq-pos { color: var(--pos); }
+.ev-conseq-neg { color: var(--neg); }
+.ev-conseq-sep { color: var(--text-muted); margin: 0 0.4rem; }
+
+@media (max-width: 700px) {
+  .ev-conseq { flex-direction: column; gap: 0.35rem; }
+  .ev-conseq-var { flex: none; }
 }
-.ev-scrub-apply:hover:not(:disabled) { background: rgba(224,148,34,0.16); color: var(--ink-bright); }
-.ev-scrub-apply:disabled { opacity: 0.45; cursor: default; color: var(--text-muted); }
-.ev-scrub-apply:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+/* ── Where the lines sit ── */
 
 /* ═══════════════════════════════════════════════════════════════
    DOCKED STEPPER BAR (#12) + its mobile fallback
@@ -676,3 +667,35 @@ body { background: var(--bg); color: var(--text); }
 }
 .ev-reset:hover { border-bottom-color: var(--amber); color: #f0a838; }
 .ev-reset:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-radius: 3px; }
+
+/* ── Year-by-year hover readout (#20) ──
+   A real element rather than the `title` attribute: the native tooltip's
+   delay makes scrubbing across years feel broken. No transition on
+   appearance — it must be instant. */
+.ev-strip-tip {
+  position: absolute; z-index: 5; pointer-events: none;
+  transform: translate(-50%, -100%);
+  background: var(--bg-card); border: 1px solid rgba(224,148,34,0.35);
+  border-radius: 4px; padding: 0.4rem 0.6rem;
+  font-family: var(--font-b); font-size: 0.76rem; line-height: 1.4;
+  color: var(--text); white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+}
+.ev-strip-tip[hidden] { display: none; }
+.ev-strip-tip .ev-tip-year { color: var(--amber); font-weight: 600; }
+.ev-strip-tip .ev-tip-pos { color: var(--pos); font-weight: 600; }
+.ev-strip-tip .ev-tip-neg { color: var(--neg); font-weight: 600; }
+/* Full-column hit area: the column is already 100% height, so hovering the
+   gap above or below a bar still resolves to that year. */
+.ev-strip-col { cursor: crosshair; }
+.ev-strip-col.is-hovered { background: rgba(255,255,255,0.05); }
+/* Zero baseline, slightly firmer than the old hairline. */
+.ev-strip-zero { background: rgba(255,255,255,0.22); }
+
+/* 44px slider thumbs on touch widths (#3). */
+@media (max-width: 760px) {
+  .ev-slider-input::-webkit-slider-thumb { width: 28px; height: 28px; margin-top: 8px; }
+  .ev-slider-input::-moz-range-thumb { width: 28px; height: 28px; }
+  .ev-slider-input { height: 44px; }
+  .ev-slider { padding: 0.8rem 0.9rem 0.7rem; }
+}

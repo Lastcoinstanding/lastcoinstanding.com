@@ -350,7 +350,6 @@
 
   function nudge(key, dir) {
     if (setScenarioValue(key, SCENARIO[key] + dir * stepFor(key))) {
-      THRESH_VALUE = null;          // the plan moved; the scrubber re-anchors to it
       syncSteppers(); scheduleRender(); scheduleUrlSync(); saveSession();
     }
   }
@@ -432,7 +431,6 @@
         if (commit) {
           var n = parseFloat(input.value);
           if (isFinite(n) && setScenarioValue(key, n)) {
-            THRESH_VALUE = null;
             scheduleRender(); scheduleUrlSync(); saveSession();
           }
         }
@@ -486,10 +484,14 @@
 
   function verdictSentence(v, basis, extDepletion) {
     // Name the arithmetic rather than dropping a bare year on the reader (#3).
+    // The Power Law's first appearance in body copy gets three ways in (#19):
+    // the phrase itself links out, the disclosure tooltip sits beside it, and
+    // the growth-model control and the FAQ carry their own links.
     var basisTail = '<span class="ev-verdict-tail">Checked every year through <strong>' + v.horizonYear
       + '</strong> — your ' + SCENARIO.retirementYear + ' retirement plus the '
       + SCENARIO.yearsInRetirement + '-year horizon (set under Assumptions) — '
-      + dollarWord() + ', with price ' + basisLabel(basis) + '.' + POWER_LAW_TIP + '</span>';
+      + dollarWord() + ', against the <a href="/the-power-law.html">Power Law</a> trend with price '
+      + basisLabel(basis) + '.' + POWER_LAW_TIP + '</span>';
 
     if (v.state === 'escape') {
       return 'On these inputs, the stack’s growth permanently exceeds spending from <strong>'
@@ -512,10 +514,19 @@
       + ' — and it is still falling at <strong>' + v.horizonYear + '</strong>.' + tail + basisTail;
   }
 
-  function shortVerdict(v) {
+  // The robustness line mirrors the shape of the verdict it is reporting (#17).
+  // "No escape, but no depletion either" said nothing a reader could act on;
+  // the shrink state has a turn year and a trajectory, and the line that
+  // reports it should carry both — recomputed for whichever basis it describes.
+  function shortVerdict(v, basis) {
     if (v.state === 'escape') return '<strong>' + v.escapeYear + '</strong>';
     if (v.state === 'deplete') return 'depletion in <strong>' + v.depletionYear + '</strong>';
-    return '<strong>no escape</strong>, but no depletion either';
+    var ext = extendedDepletion(SCENARIO, basis);
+    return ext
+      ? '<strong>no escape</strong> — the stack turns over in <strong>' + v.turnYear
+        + '</strong> and is on pace to deplete around <strong>' + roundApprox(ext) + '</strong>, beyond the window'
+      : '<strong>no escape</strong> — the stack turns over in <strong>' + v.turnYear
+        + '</strong> and is still falling at the horizon';
   }
 
   function renderVerdict(vSel, vOther, basis, otherBasis) {
@@ -540,11 +551,11 @@
       } else if (isWorse(vOther, vSel)) {
         robEl.hidden = false;
         robEl.innerHTML = 'Under the more conservative price basis (' + basisLabel(otherBasis)
-          + '): ' + shortVerdict(vOther) + '.';
+          + '): ' + shortVerdict(vOther, otherBasis) + '.';
       } else {
         robEl.hidden = false;
         robEl.innerHTML = 'You are on the more conservative basis. The less conservative one ('
-          + basisLabel(otherBasis) + ') says: ' + shortVerdict(vOther) + '.';
+          + basisLabel(otherBasis) + ') says: ' + shortVerdict(vOther, otherBasis) + '.';
       }
     }
 
@@ -687,47 +698,65 @@
     return 'depletes in ' + v.depletionYear;
   }
 
-  // Each row nudges one axis and reports the movement of a DIFFERENT axis's
-  // line (#15). Reporting the nudged axis's own line would be circular, and
-  // reporting the escape YEAR is vacuous under this model — the escape year is
-  // retirement+1 whenever it exists, so "escape arrives one year later" only
-  // restates the input. The line is the quantity that actually moves.
-  var DELTA_ROWS = [
-    { key: 'retirementYear',  dir: 1,  reports: 'stack',
-      label: function () { return 'Retire one year later'; } },
-    { key: 'targetIncomeUSD', dir: -1, reports: 'stack',
-      label: function () { return 'Withdraw ' + formatCurrencyShort(GRAD.incStep) + ' less per year'; } },
-    { key: 'btcStack',        dir: 1,  reports: 'income',
-      label: function () { return 'Add ' + formatStep(GRAD.btcStep) + ' BTC'; } }
-  ];
 
-  // The line on one axis for an arbitrary scenario — the Threshold section and
-  // the sensitivity rows share this, so a line quoted in one place can never
-  // disagree with the same line quoted in the other.
-  function lineFor(axis, scenario) {
+  /* ═══════════════════════════════════════════════════════════
+     THE THRESHOLD (review round 2)
+
+     One instrument, replacing both the old One-step rows and the
+     single-axis scrubber. Three full-range sliders, always visible: the
+     thumb is your value, the tick is that axis's LINE, solved live while
+     the other two hold. Fix-two-find-the-third, with all three at once.
+
+     There is no Apply. Every control on the page — steppers, docked bar,
+     mobile fallback, these sliders — reads and writes one shared state.
+
+     One solver, never two: the tick position, the where-the-lines text and
+     the consequences readout all call lineFor(). A slider whose flip point
+     disagreed with its own printed line would be worse than no slider, and
+     the only way to guarantee they agree is for there to be nothing to
+     disagree with. evParityQA asserts it across the vector set anyway.
+  ═══════════════════════════════════════════════════════════ */
+
+  var AXES = {
+    retire: { key: 'retirementYear',  label: 'Retire in',   log: false, higherIsBetter: true  },
+    stack:  { key: 'btcStack',        label: 'Stack',       log: true,  higherIsBetter: true  },
+    income: { key: 'targetIncomeUSD', label: 'Withdrawal',  log: false, higherIsBetter: false }
+  };
+
+  /* ─── THE SOLVER. The single implementation of "where is the line on this
+         axis". The slider ticks, the where-the-lines text, the consequences
+         readout and the QA assertion all call this and nothing else — a
+         second implementation is exactly how a tick and its own caption end
+         up disagreeing. ─── */
+  // `basis` defaults to the live PRICE_BASIS. It is a parameter rather than a
+  // read of the global because the QA pass solves under both bases, and a
+  // solver that silently ignored the basis it was asked for produced 22 false
+  // failures the first time this assertion ran.
+  function lineFor(axis, scenario, basis) {
     var infl = MA.get('inflation').value;
+    var useBasis = basis || PRICE_BASIS;
     function escapes(over) {
       var s = cloneWith(over, scenario);
-      return computeVerdict(projectForBasis(s, PRICE_BASIS, true), s, infl).state === 'escape';
+      return computeVerdict(projectForBasis(s, useBasis, true), s, infl).state === 'escape';
     }
     if (axis === 'stack') {
       var ls = LIMITS.btcStack;
       if (escapes({ btcStack: ls.min })) return { value: ls.min, bound: 'below' };
       if (!escapes({ btcStack: ls.max })) return { value: null, bound: 'above' };
       var lo = ls.min, hi = ls.max;
-      for (var i = 0; i < 22; i++) { var m = (lo + hi) / 2; if (escapes({ btcStack: m })) hi = m; else lo = m; }
-      return { value: Math.ceil(hi * 100) / 100, bound: null };
+      for (var i = 0; i < 26; i++) { var m = (lo + hi) / 2; if (escapes({ btcStack: m })) hi = m; else lo = m; }
+      return { value: Math.ceil(hi * 100) / 100, bound: null };   // round UP: the stated value still escapes
     }
     if (axis === 'income') {
       var li = LIMITS.targetIncomeUSD;
       if (escapes({ targetIncomeUSD: li.max })) return { value: li.max, bound: 'above' };
       if (!escapes({ targetIncomeUSD: li.min })) return { value: null, bound: 'below' };
       var lo2 = li.min, hi2 = li.max;
-      for (var j = 0; j < 22; j++) { var m2 = (lo2 + hi2) / 2; if (escapes({ targetIncomeUSD: m2 })) lo2 = m2; else hi2 = m2; }
-      return { value: Math.floor(lo2 / 100) * 100, bound: null };
+      for (var j = 0; j < 26; j++) { var m2 = (lo2 + hi2) / 2; if (escapes({ targetIncomeUSD: m2 })) lo2 = m2; else hi2 = m2; }
+      return { value: Math.floor(lo2 / 100) * 100, bound: null };  // round DOWN: the stated value still escapes
     }
     // Retirement year is NOT monotone: the stack a plan needs falls as the
-    // retirement year moves out, then rises again once the horizon reaches the
+    // year moves out, then rises again once the horizon reaches the
     // low-real-growth end of the Power Law. Bisection would be wrong. Scan.
     var ly = LIMITS.retirementYear;
     for (var y = ly.min; y <= ly.max; y++) { if (escapes({ retirementYear: y })) return { value: y, bound: null }; }
@@ -736,119 +765,48 @@
 
   function formatLineValue(axis, v) {
     if (axis === 'stack')  return formatBtc(v) + ' BTC';
-    if (axis === 'income') return formatUsdFull(v);
-    return String(v);
+    if (axis === 'income') return formatUsdFull(Math.round(v));
+    return String(Math.round(v));
+  }
+  var SLIDER_RES = 1000;   // range inputs run 0..1000; axis units are mapped
+
+  // Log scale on the stack axis only. Linear over 0.01–100 BTC would put every
+  // interesting value — and almost every line — inside the first 3% of the
+  // track. Log spreads 0.01→1 and 1→100 over half the track each.
+  function axisToPos(axis, v) {
+    var lim = LIMITS[AXES[axis].key];
+    var f;
+    if (AXES[axis].log) {
+      var lo = Math.log(lim.min), hi = Math.log(lim.max);
+      f = (Math.log(Math.max(lim.min, v)) - lo) / (hi - lo);
+    } else {
+      f = (v - lim.min) / (lim.max - lim.min);
+    }
+    return Math.round(Math.max(0, Math.min(1, f)) * SLIDER_RES);
+  }
+  function posToAxis(axis, pos) {
+    var lim = LIMITS[AXES[axis].key];
+    var f = Math.max(0, Math.min(1, pos / SLIDER_RES));
+    if (AXES[axis].log) {
+      var lo = Math.log(lim.min), hi = Math.log(lim.max);
+      return Math.exp(lo + f * (hi - lo));
+    }
+    return lim.min + f * (lim.max - lim.min);
   }
 
-  function renderDeltas(baseVerdict, basis) {
-    var host = document.getElementById('evDeltas');
-    if (!host) return;
-    var inflationPct = MA.get('inflation').value;
-    var baseProj = projectForBasis(SCENARIO, basis);
-    var baseAtHorizon = realValueAtYear(baseProj, baseVerdict.horizonYear, inflationPct);
-    var html = '';
-
-    DELTA_ROWS.forEach(function (row) {
-      var lim = LIMITS[row.key];
-      var next = SCENARIO[row.key] + row.dir * stepFor(row.key);
-      var available = (next >= lim.min - 1e-9) && (next <= lim.max + 1e-9);
-      var label = row.label();
-
-      if (!available) {
-        html += '<button type="button" class="ev-delta" disabled data-key="' + row.key + '" data-dir="' + row.dir + '">'
-          + '<span class="ev-delta-move">' + label + '</span>'
-          + '<span class="ev-delta-body">Already at the end of this stepper’s range.</span>'
-          + '<span class="ev-delta-apply">—</span></button>';
-        return;
-      }
-
-      var nudged = cloneWith((function () { var o = {}; o[row.key] = next; return o; })());
-      var nudgedProj = projectForBasis(nudged, basis);
-      var nv = computeVerdict(nudgedProj, nudged, inflationPct);
-      var nudgedAtHorizon = realValueAtYear(nudgedProj, baseVerdict.horizonYear, inflationPct);
-
-      // Order fixed by #15: the verdict flip is the headline in either
-      // direction; otherwise "verdict unchanged". Never escape-year
-      // arithmetic — under this model the escape year is retirement+1
-      // whenever it exists, so "escape arrives one year later" would only
-      // restate the input the row just changed.
-      var lead = (nv.state !== baseVerdict.state)
-        ? '<span class="ev-delta-flip">Now ' + statePhrase(nv) + '</span>'
-        : 'verdict unchanged';
-
-      var body = lead;
-
-      // Then how the nudge moves a line. Reporting the nudged axis's OWN line
-      // would be circular — adding stack does not move the stack line — so
-      // each row reports the line its nudge actually shifts.
-      var axis = row.reports;
-      var axisWord = (axis === 'stack') ? 'stack' : 'withdrawal';
-      var lineBefore = lineFor(axis, SCENARIO);
-      var lineAfter  = lineFor(axis, nudged);
-      if (lineBefore.value !== null && lineAfter.value !== null && lineBefore.value !== lineAfter.value) {
-        body += '<span class="ev-delta-sep">·</span>the ' + axisWord + ' line moves <strong>'
-          + formatLineValue(axis, lineBefore.value) + ' → ' + formatLineValue(axis, lineAfter.value) + '</strong>';
-      } else if (lineBefore.value === null && lineAfter.value !== null) {
-        body += '<span class="ev-delta-sep">·</span>brings the ' + axisWord + ' line into range at <strong>'
-          + formatLineValue(axis, lineAfter.value) + '</strong>';
-      }
-
-      // The value-at-horizon clause is dropped when both scenarios are
-      // already empty by then — "+$0" on every row is noise, not honesty.
-      if (baseAtHorizon != null && nudgedAtHorizon != null
-          && (baseAtHorizon > 0.5 || nudgedAtHorizon > 0.5)) {
-        var dv = nudgedAtHorizon - baseAtHorizon;
-        var cls = dv >= 0 ? 'ev-delta-pos' : 'ev-delta-neg';
-        var sign = dv >= 0 ? '+' : '−';
-        body += '<span class="ev-delta-sep">·</span>value at ' + baseVerdict.horizonYear
-          + ' <strong class="' + cls + '">' + sign + formatCurrencyShort(Math.abs(dv)) + '</strong>';
-      }
-
-      html += '<button type="button" class="ev-delta" data-key="' + row.key + '" data-dir="' + row.dir + '">'
-        + '<span class="ev-delta-move">' + label + '</span>'
-        + '<span class="ev-delta-body">' + body + '</span>'
-        + '<span class="ev-delta-apply">Apply ›</span></button>';
-    });
-
-    host.innerHTML = html;
-    // Deltas are computed from the today's-dollar series only — a
-    // cross-scenario delta is never taken from nominal figures (flagship
-    // canon, carried over verbatim). realValueAtYear enforces that
-    // regardless of the display toggle.
+  // Step chips act as snap increments on the sliders (#3). Below the first
+  // whole step the axis minimum stays reachable, so the low end of the log
+  // track is not a dead zone.
+  function snapToStep(axis, v) {
+    var lim = LIMITS[AXES[axis].key];
+    if (axis === 'retire') return Math.round(v);
+    var step = (axis === 'stack') ? GRAD.btcStep : GRAD.incStep;
+    var snapped = Math.round(v / step) * step;
+    if (snapped < step) snapped = (v < step / 2) ? lim.min : step;
+    return Math.max(lim.min, Math.min(lim.max, Math.round(snapped * 1e6) / 1e6));
   }
 
-  function wireDeltaApply() {
-    var host = document.getElementById('evDeltas');
-    if (!host) return;
-    host.addEventListener('click', function (e) {
-      var btn = e.target.closest('.ev-delta');
-      if (!btn || btn.disabled) return;
-      nudge(btn.getAttribute('data-key'), parseInt(btn.getAttribute('data-dir'), 10));
-    });
-  }
-
-
-  /* ═══════════════════════════════════════════════════════════
-     THE THRESHOLD (review round 1 #7)
-
-     "One step in any direction" is a step-from-here instrument. This is a
-     start-at-the-line instrument: fix two of the three numbers, move the
-     third, and watch where the verdict flips. Scrubbing here is a
-     what-if — it never writes back to the plan; Apply does that.
-
-     Under this page's escape-year definition the escape YEAR is the first
-     first withdrawal year or never, so the quantity that carries the page's thesis
-     is the line on each axis, not a year. This section is that quantity
-     made draggable.
-  ═══════════════════════════════════════════════════════════ */
-
-  var AXES = {
-    stack:  { key: 'btcStack',          label: 'Stack',           unit: 'BTC',  higherIsBetter: true  },
-    income: { key: 'targetIncomeUSD',   label: 'Withdrawal',      unit: '$/yr', higherIsBetter: false },
-    retire: { key: 'retirementYear',    label: 'Retirement year', unit: '',     higherIsBetter: true  }
-  };
-  var THRESH_AXIS = 'stack';
-  var THRESH_VALUE = null;      // scrubbed value; null = sitting on the plan
+  function planValue(axis) { return SCENARIO[AXES[axis].key]; }
 
   // Lines depend on the plan, the basis and the canonical assumptions — not on
   // the display toggle — so a nominal/real flip must not re-run ~75 projections.
@@ -860,178 +818,209 @@
                liveBtcPrice].join('|');
     if (key === LINE_KEY) return LINE_CACHE;
     LINE_KEY = key;
-    LINE_CACHE = { stack: lineFor('stack', SCENARIO),
+    LINE_CACHE = { stack:  lineFor('stack', SCENARIO),
                    income: lineFor('income', SCENARIO),
                    retire: lineFor('retire', SCENARIO) };
     return LINE_CACHE;
   }
 
-  function planValue(axis) { return SCENARIO[AXES[axis].key]; }
+  function renderSliders() {
+    var L = lines();
+    document.querySelectorAll('.ev-slider').forEach(function (el) {
+      var axis = el.getAttribute('data-axis');
+      var ax = AXES[axis], lim = LIMITS[ax.key], ln = L[axis];
+      var val = planValue(axis);
 
-  // The scrub window. Scrubbing the full axis range would bury the interesting
-  // band — a stack line at 1.77 sits 1.7% along a 0.01–100 track — so the
-  // window is framed around the line and the plan, and its real ends are
-  // labelled so it never reads as the whole axis.
-  function scrubWindow(axis) {
-    var lim = LIMITS[AXES[axis].key];
-    var ln = lines()[axis].value;
-    var plan = planValue(axis);
-    if (axis === 'retire') return { lo: lim.min, hi: lim.max, step: 1 };
-    var anchor = (ln === null) ? plan : Math.max(ln, plan);
-    var hi = Math.min(lim.max, Math.max(anchor * 1.8, plan * 1.8, plan + (axis === 'stack' ? 1 : 40000)));
-    var lo = lim.min;
-    var step = (axis === 'stack') ? 0.01 : 1000;
-    return { lo: lo, hi: hi, step: step };
-  }
+      var valBtn = el.querySelector('[data-role="value"]');
+      if (valBtn && valBtn.hidden !== true) valBtn.textContent = formatLineValue(axis, val);
 
-  function stateAt(axis, value) {
-    var over = {}; over[AXES[axis].key] = value;
-    var s = cloneWith(over);
-    return computeVerdict(projectForBasis(s, PRICE_BASIS, true), s, MA.get('inflation').value);
-  }
+      var range = el.querySelector('[data-role="range"]');
+      if (range && document.activeElement !== range) range.value = axisToPos(axis, val);
+      else if (range && range.value !== String(axisToPos(axis, val))) range.value = axisToPos(axis, val);
 
-  function shortStatePhrase(v) {
-    if (v.state === 'escape') return 'reaches escape velocity';
-    if (v.state === 'shrink') return 'survives to ' + v.horizonYear + ', falling at the end';
-    return 'depletes in ' + v.depletionYear;
-  }
+      // Track paints the spectrum bar's vocabulary onto this axis.
+      var track = el.querySelector('[data-role="track"]');
+      var tick = el.querySelector('[data-role="tick"]');
+      var outOfRange = (ln.value === null);
+      if (track) {
+        var f = outOfRange ? (ax.higherIsBetter ? 1 : 0) : (axisToPos(axis, ln.value) / SLIDER_RES);
+        var pct = (Math.max(0, Math.min(1, f)) * 100).toFixed(2) + '%';
+        track.style.background = ax.higherIsBetter
+          ? 'linear-gradient(to right, rgba(192,57,43,0.45) 0%, rgba(224,148,34,0.35) ' + pct + ', rgba(120,180,90,0.45) 100%)'
+          : 'linear-gradient(to right, rgba(120,180,90,0.45) 0%, rgba(224,148,34,0.35) ' + pct + ', rgba(192,57,43,0.45) 100%)';
+        if (tick) { tick.style.left = pct; tick.hidden = outOfRange; }
+      }
 
-  function renderThreshold() {
-    var host = document.getElementById('evThreshold');
-    if (!host) return;
-    var ln = lines()[THRESH_AXIS];
-    var ax = AXES[THRESH_AXIS];
-    var win = scrubWindow(THRESH_AXIS);
-    var plan = planValue(THRESH_AXIS);
-    var cur = (THRESH_VALUE === null) ? plan : THRESH_VALUE;
-
-    // Chooser state
-    document.querySelectorAll('.ev-axis-btn').forEach(function (b) {
-      b.classList.toggle('is-active', b.getAttribute('data-axis') === THRESH_AXIS);
+      var lo = el.querySelector('[data-role="min"]'), hi = el.querySelector('[data-role="max"]');
+      if (lo) lo.textContent = formatLineValue(axis, lim.min);
+      if (hi) hi.textContent = formatLineValue(axis, lim.max);
+      var lbl = el.querySelector('[data-role="linelabel"]');
+      if (lbl) {
+        lbl.textContent = outOfRange ? 'line beyond this range' : 'line ' + formatLineValue(axis, ln.value);
+        lbl.classList.toggle('is-out', outOfRange);
+      }
     });
-
-    var input = document.getElementById('evScrubInput');
-    var track = document.getElementById('evScrubTrack');
-    var tick  = document.getElementById('evScrubTick');
-    var out   = document.getElementById('evScrubValue');
-    var verd  = document.getElementById('evScrubVerdict');
-    var lblLo = document.getElementById('evScrubMin');
-    var lblHi = document.getElementById('evScrubMax');
-    var lblLine = document.getElementById('evScrubLineLabel');
-    var planEl = document.getElementById('evScrubPlan');
-    var applyEl = document.getElementById('evScrubApply');
-    var noteEl = document.getElementById('evScrubNote');
-
-    // Clamp handling (#7): a line outside the axis range is stated plainly,
-    // never shown as a clamped number pretending to be the line.
-    var outOfRange = (ln.value === null);
-    if (noteEl) {
-      if (outOfRange) {
-        noteEl.hidden = false;
-        noteEl.textContent = ax.label + ': the line is beyond this page’s range — no value between '
-          + formatLineValue(THRESH_AXIS, LIMITS[ax.key].min) + ' and '
-          + formatLineValue(THRESH_AXIS, LIMITS[ax.key].max) + ' crosses it with the other two numbers held.';
-      } else { noteEl.hidden = true; }
-    }
-
-    if (input) {
-      input.min = win.lo; input.max = win.hi; input.step = win.step;
-      input.value = Math.min(win.hi, Math.max(win.lo, cur));
-      input.setAttribute('aria-label', 'Scrub ' + ax.label);
-    }
-
-    var frac = function (v) { return (win.hi > win.lo) ? (v - win.lo) / (win.hi - win.lo) : 0; };
-
-    // Track paints the spectrum bar's vocabulary onto this axis: depleting
-    // side → threshold tick → escape side, oriented by which direction helps.
-    if (track) {
-      var f = (ln.value === null) ? (ax.higherIsBetter ? 1 : 0) : Math.max(0, Math.min(1, frac(ln.value)));
-      var pct = (f * 100).toFixed(2) + '%';
-      track.style.background = ax.higherIsBetter
-        ? 'linear-gradient(to right, rgba(192,57,43,0.45) 0%, rgba(224,148,34,0.35) ' + pct + ', rgba(120,180,90,0.45) 100%)'
-        : 'linear-gradient(to right, rgba(120,180,90,0.45) 0%, rgba(224,148,34,0.35) ' + pct + ', rgba(192,57,43,0.45) 100%)';
-      if (tick) { tick.style.left = pct; tick.hidden = (ln.value === null); }
-    }
-
-    var atV = stateAt(THRESH_AXIS, cur);
-    if (out) out.textContent = formatLineValue(THRESH_AXIS, THRESH_AXIS === 'stack' ? Math.round(cur * 100) / 100 : Math.round(cur));
-    if (verd) {
-      verd.textContent = atV.state === 'escape' ? 'reaches escape velocity'
-        : atV.state === 'shrink' ? 'survives to ' + atV.horizonYear + ', falling at the end'
-        : 'depletes in ' + atV.depletionYear;
-      verd.className = 'ev-scrub-verdict ' + (atV.state === 'escape' ? 'is-escape' : 'is-fail');
-    }
-    if (lblLo) lblLo.textContent = formatLineValue(THRESH_AXIS, win.lo);
-    if (lblHi) lblHi.textContent = formatLineValue(THRESH_AXIS, win.hi);
-    if (lblLine) lblLine.textContent = outOfRange ? 'line out of range'
-      : 'line ' + formatLineValue(THRESH_AXIS, ln.value);
-    if (planEl) planEl.innerHTML = 'Your plan: <strong>' + formatLineValue(THRESH_AXIS, plan) + '</strong>';
-    if (applyEl) {
-      var changed = Math.abs(cur - plan) > (THRESH_AXIS === 'stack' ? 0.005 : 0.5);
-      applyEl.disabled = !changed;
-      applyEl.textContent = changed
-        ? 'Apply ' + formatLineValue(THRESH_AXIS, THRESH_AXIS === 'stack' ? Math.round(cur * 100) / 100 : Math.round(cur)) + ' to the plan ›'
-        : 'Drag to explore, then apply';
-    }
-
-    renderLineRows();
   }
 
-  // The three line values, each stated as line vs. your plan (#7).
+  function wireSliders() {
+    document.querySelectorAll('.ev-slider').forEach(function (el) {
+      var axis = el.getAttribute('data-axis');
+      var ax = AXES[axis];
+      var range = el.querySelector('[data-role="range"]');
+      var valBtn = el.querySelector('[data-role="value"]');
+      var entry = el.querySelector('[data-role="entry"]');
+
+      if (range) {
+        range.addEventListener('input', function () {
+          var raw = posToAxis(axis, parseFloat(range.value));
+          var snapped = snapToStep(axis, raw);
+          // Live state, no Apply: the slider IS the plan.
+          if (setScenarioValue(ax.key, snapped)) {
+            syncSteppers(); scheduleRender(); scheduleUrlSync(); saveSession();
+          }
+          if (valBtn) valBtn.textContent = formatLineValue(axis, SCENARIO[ax.key]);
+        });
+      }
+
+      if (!valBtn || !entry) return;
+      var open = false;
+      function openEntry() {
+        open = true;
+        entry.value = String(SCENARIO[ax.key]);
+        valBtn.hidden = true; entry.hidden = false;
+        entry.focus(); entry.select();
+      }
+      function closeEntry(commit) {
+        if (!open) return;
+        open = false;
+        if (commit) {
+          var n = parseFloat(entry.value);
+          if (isFinite(n) && setScenarioValue(ax.key, n)) {
+            syncSteppers(); scheduleRender(); scheduleUrlSync(); saveSession();
+          }
+        }
+        entry.hidden = true; valBtn.hidden = false;
+        renderSliders();
+      }
+      valBtn.addEventListener('click', openEntry);
+      entry.addEventListener('blur', function () { closeEntry(true); });
+      entry.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); closeEntry(true); valBtn.focus(); }
+        else if (e.key === 'Escape') { e.preventDefault(); closeEntry(false); valBtn.focus(); }
+      });
+    });
+  }
+
+  /* ─── Line phrasing (#12). One place, so the pattern cannot drift.
+         Never "the line moves X → Y" — the sentence has to say what the
+         quantity IS before it says what it did. ─── */
+  function lineMovePhrase(axis, from, to) {
+    var dir = (to > from) ? 'rises' : 'falls';
+    if (axis === 'stack') {
+      return 'the stack needed to escape ' + dir + ' from ' + formatBtc(from) + ' to <strong>' + formatBtc(to) + ' BTC</strong>';
+    }
+    if (axis === 'income') {
+      return 'the withdrawal the plan can sustain ' + dir + ' from ' + formatUsdFull(from) + ' to <strong>' + formatUsdFull(to) + '</strong>';
+    }
+    return 'the earliest retirement year that crosses moves from ' + from + ' to <strong>' + to + '</strong>';
+  }
+  function lineSitPhrase(axis, ln, plan) {
+    if (ln.value === null) {
+      if (axis === 'stack')  return { html: 'The stack needed to escape is <strong>beyond this page&rsquo;s range</strong> &mdash; no stack up to ' + formatBtc(LIMITS.btcStack.max) + ' BTC crosses at this withdrawal and this date.', past: false };
+      if (axis === 'income') return { html: 'The withdrawal the plan can sustain is <strong>below this page&rsquo;s range</strong> &mdash; no withdrawal down to ' + formatUsdFull(LIMITS.targetIncomeUSD.min) + ' crosses at this stack and this date.', past: false };
+      return { html: 'No retirement year through <strong>' + LIMITS.retirementYear.max + '</strong> crosses at this stack and this withdrawal.', past: false };
+    }
+    if (axis === 'stack')  return { html: 'The stack needed to escape is <strong>' + formatBtc(ln.value) + ' BTC</strong><span class="ev-line-you"> &mdash; your plan holds ' + formatBtc(plan) + '.</span>', past: plan >= ln.value };
+    if (axis === 'income') return { html: 'The withdrawal the plan can sustain is <strong>' + formatUsdFull(ln.value) + '/yr</strong><span class="ev-line-you"> &mdash; your plan withdraws ' + formatUsdFull(plan) + '.</span>', past: plan <= ln.value };
+    return { html: 'The earliest retirement year that crosses is <strong>' + ln.value + '</strong><span class="ev-line-you"> &mdash; your plan retires ' + plan + '.</span>', past: plan >= ln.value };
+  }
+
   function renderLineRows() {
     var host = document.getElementById('evLineRows');
     if (!host) return;
     var L = lines();
-    var rows = [];
-
-    rows.push(L.stack.value === null
-      ? { html: 'Stack: <strong>beyond this page’s range</strong><span class="ev-line-you"> — no stack up to ' + formatBtc(LIMITS.btcStack.max) + ' BTC crosses at this withdrawal and this date.</span>', past: false }
-      : { html: 'Stack: the line is at <strong>' + formatBtc(L.stack.value) + ' BTC</strong>'
-            + '<span class="ev-line-you"> — your plan holds ' + formatBtc(SCENARIO.btcStack) + '.</span>',
-          past: SCENARIO.btcStack >= L.stack.value });
-
-    rows.push(L.income.value === null
-      ? { html: 'Withdrawal: <strong>beyond this page’s range</strong><span class="ev-line-you"> — no withdrawal down to ' + formatUsdFull(LIMITS.targetIncomeUSD.min) + ' crosses at this stack and this date.</span>', past: false }
-      : { html: 'Withdrawal: the line is at <strong>' + formatUsdFull(L.income.value) + '/yr</strong>'
-            + '<span class="ev-line-you"> — your plan withdraws ' + formatUsdFull(SCENARIO.targetIncomeUSD) + '.</span>',
-          past: SCENARIO.targetIncomeUSD <= L.income.value });
-
-    rows.push(L.retire.value === null
-      ? { html: 'Retirement year: <strong>beyond this page’s range</strong><span class="ev-line-you"> — no year through ' + LIMITS.retirementYear.max + ' crosses at this stack and this withdrawal.</span>', past: false }
-      : { html: 'Retirement year: the earliest that crosses is <strong>' + L.retire.value + '</strong>'
-            + '<span class="ev-line-you"> — your plan retires ' + SCENARIO.retirementYear + '.</span>',
-          past: SCENARIO.retirementYear >= L.retire.value });
-
+    var rows = [
+      lineSitPhrase('stack',  L.stack,  SCENARIO.btcStack),
+      lineSitPhrase('income', L.income, SCENARIO.targetIncomeUSD),
+      lineSitPhrase('retire', L.retire, SCENARIO.retirementYear)
+    ];
     host.innerHTML = rows.map(function (r) {
       return '<div class="ev-line-row' + (r.past ? ' is-past' : '') + '">' + r.html + '</div>';
     }).join('');
   }
 
-  function wireThreshold() {
-    document.querySelectorAll('.ev-axis-btn').forEach(function (b) {
-      b.addEventListener('click', function () {
-        THRESH_AXIS = b.getAttribute('data-axis');
-        THRESH_VALUE = null;         // a new axis starts from the plan
-        renderThreshold();
-      });
-    });
-    var input = document.getElementById('evScrubInput');
-    if (input) {
-      input.addEventListener('input', function () {
-        THRESH_VALUE = parseFloat(input.value);
-        renderThreshold();           // scrub is a what-if: no writeback to the plan
-      });
-    }
-    var apply = document.getElementById('evScrubApply');
-    if (apply) {
-      apply.addEventListener('click', function () {
-        if (THRESH_VALUE === null) return;
-        if (setScenarioValue(AXES[THRESH_AXIS].key, THRESH_VALUE)) {
-          THRESH_VALUE = null;
-          syncSteppers(); scheduleRender(); scheduleUrlSync(); saveSession();
+  /* ─── Bidirectional consequences (#5).
+         One step each way per variable, verdict flips headlined. Kept to one
+         clause per direction: three rows × two directions is already six
+         outcomes, and any more per clause turns a readout into a paragraph. ─── */
+  var CONSEQ_ROWS = [
+    { axis: 'retire', key: 'retirementYear',  reports: 'stack',
+      title: function () { return 'Retire ±1 year'; },
+      unit: function (d) { return (d > 0 ? '+1 yr' : '−1 yr'); } },
+    { axis: 'stack',  key: 'btcStack',        reports: 'income',
+      title: function () { return 'Stack ±' + formatStep(GRAD.btcStep) + ' BTC'; },
+      unit: function (d) { return (d > 0 ? '+' : '−') + formatStep(GRAD.btcStep) + ' BTC'; } },
+    { axis: 'income', key: 'targetIncomeUSD', reports: 'stack',
+      title: function () { return 'Withdrawal ±' + formatCurrencyShort(GRAD.incStep); },
+      unit: function (d) { return (d > 0 ? '+' : '−') + formatCurrencyShort(GRAD.incStep); } }
+  ];
+
+  function renderConsequences(baseVerdict, basis) {
+    var host = document.getElementById('evConsequences');
+    if (!host) return;
+    var inflationPct = MA.get('inflation').value;
+    var baseProj = projectForBasis(SCENARIO, basis);
+    var baseAtHorizon = realValueAtYear(baseProj, baseVerdict.horizonYear, inflationPct);
+    var L = lines();
+    var html = '';
+
+    CONSEQ_ROWS.forEach(function (row) {
+      var lim = LIMITS[row.key];
+      var step = (row.key === 'retirementYear') ? 1 : (row.key === 'btcStack' ? GRAD.btcStep : GRAD.incStep);
+      var dirs = '';
+
+      [-1, 1].forEach(function (d) {
+        var next = SCENARIO[row.key] + d * step;
+        if (next < lim.min - 1e-9 || next > lim.max + 1e-9) {
+          dirs += '<div class="ev-conseq-dir"><span class="ev-conseq-arrow">' + row.unit(d)
+            + '</span><span class="ev-line-you">end of range</span></div>';
+          return;
         }
+        var over = {}; over[row.key] = next;
+        var nudged = cloneWith(over);
+        var nProj = projectForBasis(nudged, basis);
+        var nv = computeVerdict(nProj, nudged, inflationPct);
+
+        var clause;
+        if (nv.state !== baseVerdict.state) {
+          clause = '<span class="ev-conseq-flip">' + (nv.state === 'escape' ? 'crosses the line' : 'now ' + statePhrase(nv)) + '</span>';
+        } else {
+          var lnBefore = L[row.reports], lnAfter = lineFor(row.reports, nudged);
+          clause = (lnBefore.value !== null && lnAfter.value !== null && lnBefore.value !== lnAfter.value)
+            ? 'no flip &mdash; ' + lineMovePhrase(row.reports, lnBefore.value, lnAfter.value)
+            : 'no flip';
+        }
+        var nAtHorizon = realValueAtYear(nProj, baseVerdict.horizonYear, inflationPct);
+        if (baseAtHorizon != null && nAtHorizon != null && (baseAtHorizon > 0.5 || nAtHorizon > 0.5)) {
+          var dv = nAtHorizon - baseAtHorizon;
+          clause += '<span class="ev-conseq-sep">·</span>value at ' + baseVerdict.horizonYear
+            + ' <strong class="' + (dv >= 0 ? 'ev-conseq-pos' : 'ev-conseq-neg') + '">'
+            + (dv >= 0 ? '+' : '−') + formatCurrencyShort(Math.abs(dv)) + '</strong>';
+        }
+        dirs += '<div class="ev-conseq-dir"><span class="ev-conseq-arrow">' + row.unit(d) + '</span>' + clause + '</div>';
       });
-    }
+
+      html += '<div class="ev-conseq"><span class="ev-conseq-var">' + row.title() + '</span>'
+        + '<span class="ev-conseq-dirs">' + dirs + '</span></div>';
+    });
+
+    host.innerHTML = html;
+  }
+
+  function renderThreshold(baseVerdict, basis) {
+    renderSliders();
+    renderConsequences(baseVerdict, basis);
+    renderLineRows();
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -1084,14 +1073,18 @@
         var word = (v.state === 'deplete') ? 'Depletes ' : 'Escape ';
         mark = '<span class="ev-strip-mark' + right + '"><span>' + word + r.year + '</span></span>';
       }
-      html += '<div class="ev-strip-col" title="' + r.year + ': '
-        + (r.value >= 0 ? '+' : '−') + formatCurrencyShort(Math.abs(r.value)) + ' real">'
+      // No `title` attribute (#20): the native tooltip's ~1s delay makes
+      // scrubbing across years feel broken. Data rides on the column and a
+      // real element renders it instantly.
+      html += '<div class="ev-strip-col" data-year="' + r.year + '" data-residual="' + r.value.toFixed(2) + '">'
         + mark + '<div class="ev-bar ' + cls + '" style="' + style + '"></div></div>';
     });
 
+    var tipEl = document.getElementById('evStripTip');
     host.innerHTML = '<div class="ev-strip-plot">'
       + '<div class="ev-strip-zero" style="bottom:' + zeroPct.toFixed(3) + '%"></div>'
       + html + '</div>';
+    if (tipEl) { tipEl.hidden = true; host.appendChild(tipEl); }
 
     if (cap) {
       var first = res[0], last = res[res.length - 1];
@@ -1464,7 +1457,6 @@
     SCENARIO.btcStack        = DEFAULTS.btcStack;
     SCENARIO.targetIncomeUSD = DEFAULTS.targetIncomeUSD;
     SCENARIO.retirementYear  = DEFAULTS.retirementYear;
-    THRESH_VALUE = null;
     clearSession();
     syncSteppers(); scheduleRender(); scheduleUrlSync();
   }
@@ -1502,8 +1494,7 @@
     var vOther = computeVerdict(projOther, SCENARIO, inflationPct);
 
     renderVerdict(vSel, vOther, PRICE_BASIS, otherBasis);
-    renderDeltas(vSel, PRICE_BASIS);
-    renderThreshold();
+    renderThreshold(vSel, PRICE_BASIS);
     renderStrip(vSel, PRICE_BASIS);
     renderVerifyTable(projSel);
     syncAssumptionControls();
@@ -1626,6 +1617,33 @@
         if (mine.state === 'deplete' && ext !== mine.depletionYear) {
           failures.push(tag + ': extended loop moved a depletion year (' + mine.depletionYear + ' → ' + ext + ')');
         }
+
+        // (6) THE LINE IS THE FLIP POINT (round 2 #7). The sliders place their
+        // ticks with lineFor() and the text quotes lineFor(), so they cannot
+        // disagree by construction — but the line itself still has to be a
+        // real boundary. For each axis: escape AT the reported line, and NOT
+        // escape one increment on the failing side of it. This is what makes
+        // dragging a thumb onto a tick actually flip the verdict.
+        ['stack', 'income', 'retire'].forEach(function (axis) {
+          var ln = lineFor(axis, sc, basis);
+          if (ln.value === null || ln.bound) return;   // out of range is reported, not asserted
+          var keyName = AXES[axis].key;
+          function stateAtValue(v) {
+            var o = {}; o[keyName] = v;
+            var s2 = cloneWith(o, sc);
+            return computeVerdict(projectForBasis(s2, basis, true), s2, infl).state;
+          }
+          if (stateAtValue(ln.value) !== 'escape') {
+            failures.push(tag + '/' + axis + ': reported line ' + ln.value + ' does not itself escape');
+          }
+          var justInside = (axis === 'stack') ? ln.value - 0.01
+                         : (axis === 'income') ? ln.value + 100
+                         : ln.value - 1;
+          var lim = LIMITS[keyName];
+          if (justInside >= lim.min && justInside <= lim.max && stateAtValue(justInside) === 'escape') {
+            failures.push(tag + '/' + axis + ': ' + justInside + ' also escapes — ' + ln.value + ' is not the boundary');
+          }
+        });
 
         rows.push({ basis: basis, scenario: idx, state: mine.state,
                     escapeYear: mine.escapeYear, depletionYear: mine.depletionYear,
@@ -1756,6 +1774,44 @@
     evaluate();
   }
 
+  /* ─── Year-by-year hover readout (#20).
+         Delegated once at wire time rather than rebound on every render, and
+         the hit target is the whole column — a reader hovering the empty space
+         above a short bar still gets that year, which is the difference
+         between a chart you can read and one you have to aim at. ─── */
+  function wireStripHover() {
+    var host = document.getElementById('evStrip');
+    var tip = document.getElementById('evStripTip');
+    if (!host || !tip) return;
+    var current = null;
+
+    host.addEventListener('mousemove', function (e) {
+      var col = e.target.closest('.ev-strip-col');
+      if (!col) { hide(); return; }
+      if (col !== current) {
+        if (current) current.classList.remove('is-hovered');
+        current = col; col.classList.add('is-hovered');
+        var year = col.getAttribute('data-year');
+        var res = parseFloat(col.getAttribute('data-residual'));
+        var sign = res >= 0 ? '+' : '−';
+        tip.innerHTML = '<span class="ev-tip-year">' + year + '</span> &nbsp;'
+          + '<span class="' + (res >= 0 ? 'ev-tip-pos' : 'ev-tip-neg') + '">' + sign
+          + formatCurrencyShort(Math.abs(res)) + '</span> '
+          + (res >= 0 ? 'more than spent' : 'short of spending');
+        tip.hidden = false;
+      }
+      var hostRect = host.getBoundingClientRect();
+      var colRect = col.getBoundingClientRect();
+      tip.style.left = (colRect.left - hostRect.left + colRect.width / 2) + 'px';
+      tip.style.top = Math.max(18, e.clientY - hostRect.top - 12) + 'px';
+    });
+    host.addEventListener('mouseleave', hide);
+    function hide() {
+      if (current) { current.classList.remove('is-hovered'); current = null; }
+      tip.hidden = true;
+    }
+  }
+
   function wireReset() {
     var el = document.getElementById('evReset');
     if (!el) return;
@@ -1775,8 +1831,8 @@
       });
     });
     wireSteppers();
-    wireDeltaApply();
-    wireThreshold();
+    wireSliders();
+    wireStripHover();
     wireAssumptions();
     wireVerify();
     wireReset();
