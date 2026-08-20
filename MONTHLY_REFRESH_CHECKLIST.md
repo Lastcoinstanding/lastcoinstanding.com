@@ -536,6 +536,20 @@ for a page making a structural (not real-time) argument. If the page ever
 quotes a "today" figure prominently, consider a quarterly re-fit of the era
 exponents too, since the ETF-era window lengthens.
 
+## 9.5. Search Console indexing sweep (MONTHLY)
+
+The publish-day habit (`NEW_PAGE_CHECKLIST`) covers a single new page on the day it ships. This is the recurring pass that catches everything the one-click sitemap resubmission does not.
+
+**Why it is a monthly job and not a per-ship one:** Google **retired its sitemap ping endpoint** (404, verified 2026-08-20; Bing returns 410 Gone), so nothing about indexing can be automated any more. And per-URL Request Indexing carries a **~10 requests/day quota**, which a multi-page ship exceeds in one sitting. The sweep is where the overflow lands.
+
+**Steps:**
+
+1. **Indexing → Pages.** Scan the not-indexed reasons for anything **unexpected**. "Crawled – currently not indexed" and "Discovered – currently not indexed" on recent pages are normal and self-resolve; **"Excluded by 'noindex' tag"**, "Redirect error", "Soft 404", or a canonical pointing somewhere surprising are not — those are bugs on the page, not queue latency. Trace any of them back to the page before requesting anything.
+2. **Request Indexing** for pages that are new since the last sweep, or that have been sitting stale-unindexed. Mind the **~10/day quota** — when you hit it, **spill the remainder to the next day rather than skipping them**. A page left unrequested for a month is the failure mode this sweep exists to prevent.
+3. **Sitemaps.** Confirm `sitemap.xml` shows **Success** and that the **discovered URL count matches** the current entry count in the repo's `sitemap.xml`. A count that has drifted below the file's means Google is holding a stale copy — resubmit.
+
+**Never request indexing for `/demo/*` paths.** Those pages are deliberately unlisted and carry `X-Robots-Tag: noindex` (see `SITE_GUIDE`); they exist to be reached by a direct link in an email and nothing else. Seeing them absent from the index is the system working, not a defect to fix. The same applies to any future unlisted outreach artifact.
+
 ## 10. Claude project mirror refresh
 
 **Last mirror refresh: 2026-08-05** (update this line BEFORE exporting,

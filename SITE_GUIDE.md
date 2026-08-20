@@ -252,6 +252,9 @@ Three slides (Fixed Pie, Money Trees' right tree, Is Bitcoin a Bubble) share the
 ## 6. Prompt-craft patterns (for generative video with Grok)
 
 - **16:9 widescreen, 10 seconds, 720p, silent.** Silent means both (a) prompt instruction "no audio component required; video-only" and (b) post-hoc `ffmpeg -c:v copy -an` strip.
+- **Audio strip is now usually unnecessary — but never skip the probe (updated Aug 2026).** Grok's **mute-at-generation** preference means raws now arrive with no audio track at all, so the `-an` strip is typically a no-op. That removes the *need*, not the *check*: **`ffprobe` every download** before committing, because the recurring defect is not audio but a **stray MJPEG thumbnail stream** riding along as a second video track. What you want to see is exactly one stream, `avc1`, one `vide` handler, no `smhd`.
+- **Re-encode when the raw lands heavy (added Aug 2026).** Grok raws now run **~9 Mbps (~11.5 MB for a 10-second clip)** — far above what the carousel needs, and the carousel preloads nothing but still pays on play. Target **CRF 23 with `+faststart`** (moov before mdat, so playback starts without fetching the whole file). The shipped family sits in the **2–8 MB** range; anything materially outside it wants a second look. Escape Velocity: 11.5 MB raw → **5.29 MB** at CRF 23, faststart verified.
+- **Verifying without ffmpeg on the box.** If the working environment has no ffprobe, the three claims are still checkable by reading the MP4 container directly: top-level box order (`moov` before `mdat` ⇒ faststart), `trak` count (should be 1), and handler types (`vide` only; a `soun` handler or an `smhd` box means audio survived). This is how the Escape Velocity clip was cleared.
 - **9s active transition + 1s held tail.** Clean loop when start and end states are near-identical (Bitcoin-argument), held final state when the argument has resolved (decay).
 - **Explicit negation for strong priors.** When Grok's defaults fight your instruction, negate directly: "does not extinguish," "do not show more than six keys," "not an opaque orange ball." Positive specification alone often isn't enough.
 - **"Nothing random or by chance."** Decay and transitions should read as lawful, not turbulent. No wind events, no magic, no storm of leaves — just structural process visible on an observable curve.
@@ -810,6 +813,22 @@ The prompt-craft principle, generalizable: **quantified spatial bounds beat adje
 ### Iteration record — The Bitcoin Retirement Stress Test (July 2026)
 
 The Stress Test slide (a weathered stone bridge spanning a river in flood at dusk) landed on the **first take**. Recorded as a positive data point for the guide's **physics-metaphors-cost-a-revision / single-subjects-land-first-take** pattern: an **architectural single-subject** (a bridge under load) is a **weak-prior request** — the model has no strong competing archetype to override, so a clear structural brief renders cleanly on v1. Consistent with the standing-stone (slide 31), stone basin (slide 35), and headland (Risks to Bitcoin) single-subjects that landed first-take, and in contrast to the metaphor/physics briefs (vessels filling, ink blooming, ember-flame) that each cost a revision. The "ominous and foreboding" quality the take carries is **on-thesis, not a defect**: the page is the sober sibling of The Bitcoin Retirement, and a flicker of unease before the CTA is precisely the frame the page wants — the subtitle's "find out which is yours" resolves it.
+
+### Iteration record — Bitcoin Escape Velocity (August 2026)
+
+Three takes, and the lesson is the one the lock chamber already taught, extended.
+
+**v1 — single pillar with a carved band, static water.** A stone pillar standing in water, a carved band marking the level. Two failures: the carved band read **mystical** rather than structural — an inscribed ring on a monolith looks like a rune, not a measurement — and the water level was **static**, so the one thing the slide exists to show (a threshold being crossed) never happened.
+
+**v2 — two-tone stain plus keyframes.** Replaced the carved band with a two-tone wet/dry stain and asked for keyframed level change. The stain **rendered correctly** — a real gain, and the honest way to mark a waterline on stone. The level was **still static** despite the keyframes, and the band regressed into reading as a **stacked-stone seam**, i.e. masonry rather than a mark.
+
+**v3 — stepping stones. Landed.** Four countable stepping stones with water lapping over them in sequence. The change that worked was replacing a **continuous quantity** (a level rising up one object) with **discrete countable objects** (water covering stone one, then two, then three). The model animates *object state change* reliably and *continuous level change* unreliably.
+
+**The lesson, generalised:** this extends the **lock-chamber object-state-change** finding. When a brief needs "a quantity changes," do not ask for the quantity to move — ask for a **countable set of objects to change state one at a time**. Continuous level-rise has now failed twice across two different pages; discrete state change has succeeded twice. Brief the countable form first, not as the fallback.
+
+**JM's accepted reading:** the water *breathing* over the stones — advancing and receding rather than rising monotonically — is on-thesis rather than a defect. The page's whole subject is a threshold's **sensitivity**: how little it takes to cross, and how easily you fall back. A level that laps across the stones expresses exactly that, where a single decisive flood would have overstated it.
+
+**Fallback noted for reuse:** v1's static level was held as an acceptable *threshold-at-rest* image if the animated versions had all failed — a mark on stone with no motion still reads as "here is the line," which is the minimum the slide owes.
 
 ## 14. Bitcoin vs. Real Estate (`/bitcoin-vs-real-estate.html`)
 
