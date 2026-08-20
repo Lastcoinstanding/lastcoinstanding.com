@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Interactive Bitcoin Education, Built to the Standard Regulators Are Enforcing — John McCabe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  /* Institutional light register, matching the Getting Off Zero companion's
+     structural palette (light ground, cool ink, hairline rules) so the two
+     documents read as a matched pair. Accent is Last Coin Standing amber
+     rather than GOZ's green: this one is our own document, not a companion
+     to someone else's research. Deliberately NOT the site's dark theme. */
+  :root{
+    --ink:#182430; --sub:#44525f; --faint:#7d8b98;
+    --line:#dde5ea; --line-soft:#eaeff2;
+    --bg:#f7f9fa; --card:#ffffff;
+    --amber:#9a6410; --amber-soft:#f4efe4; --amber-rule:#c8912f;
+    --serif:'Cormorant Garamond',Georgia,serif;
+    --sans:'Inter',-apple-system,'Segoe UI',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);
+       font-size:15.5px;line-height:1.62;padding:0 0 56px;
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:840px;margin:0 auto;padding:0 28px}
+
+  /* ── Masthead ── */
+  .masthead{padding:40px 0 0}
+  .brand{font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+         color:var(--amber);text-align:right;margin-bottom:22px}
+  .brand .dot{color:var(--amber-rule)}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,5.4vw,42px);
+     line-height:1.16;letter-spacing:-.005em;margin-bottom:14px}
+  h1 em{font-style:italic;color:var(--amber)}
+  /* Flex-wrap rather than inline: these rows are written without whitespace
+     between the inline elements, which makes them one unbreakable run and
+     overflows a narrow viewport. Flex gives an explicit break opportunity at
+     every item. */
+  .byline{font-size:14px;color:var(--sub);display:flex;flex-wrap:wrap;align-items:baseline;
+          column-gap:0;row-gap:2px;overflow-wrap:anywhere}
+  .byline strong{font-weight:600;color:var(--ink)}
+  .byline .sep{color:var(--faint);padding:0 6px}
+  .rule{height:3px;background:linear-gradient(to right,var(--amber-rule) 0 22%,var(--line) 22% 100%);
+        margin:22px 0 30px;border-radius:2px}
+
+  /* ── Sections ── */
+  h2{font-family:var(--serif);font-weight:600;font-size:20px;letter-spacing:.005em;
+     margin:30px 0 12px;display:flex;align-items:center;gap:9px}
+  h2::before{content:"";flex:none;width:4px;height:17px;background:var(--amber-rule);border-radius:1px}
+  p{margin-bottom:12px}
+  .em-num{font-weight:700;color:var(--amber)}
+  em{font-style:italic}
+  strong{font-weight:600}
+  a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(154,100,16,.32)}
+  a:hover{border-bottom-color:var(--amber)}
+  .muted{color:var(--sub)}
+
+  /* ── Pull quote ── */
+  .quote{background:var(--amber-soft);border-left:3px solid var(--amber-rule);
+         border-radius:0 6px 6px 0;padding:16px 20px;margin:16px 0 4px}
+  .quote p{font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.5;
+           color:#3d3018;margin-bottom:9px}
+  .quote .attrib{font-size:13px;color:var(--sub);font-style:normal}
+
+  /* ── Principle list ── */
+  ul.principles{list-style:none;margin:4px 0 14px}
+  ul.principles li{position:relative;padding-left:20px;margin-bottom:8px}
+  ul.principles li::before{content:"–";position:absolute;left:2px;color:var(--amber-rule);font-weight:600}
+
+  /* ── Engagement cards ── */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0 6px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:15px 17px}
+  .card h3{font-family:var(--serif);font-weight:600;font-size:16px;margin-bottom:6px;
+           display:flex;align-items:center;gap:8px}
+  .card h3::before{content:"";flex:none;width:3px;height:14px;background:var(--amber-rule);border-radius:1px}
+  .card p{font-size:14px;color:var(--sub);margin:0}
+
+  /* ── Footer ── */
+  .foot{border-top:1px solid var(--line);margin-top:34px;padding-top:18px}
+  .foot .proof{font-family:var(--serif);font-size:17px;margin-bottom:8px}
+  .foot .contact{font-size:13.5px;color:var(--sub);display:flex;flex-wrap:wrap;
+                 align-items:baseline;row-gap:4px;overflow-wrap:anywhere}
+  .foot .contact .sep{color:var(--faint);padding:0 5px}
+
+  @media (max-width:640px){
+    body{font-size:15px}
+    .wrap{padding:0 20px}
+    .masthead{padding-top:28px}
+    .brand{text-align:left}
+    .cards{grid-template-columns:1fr;gap:11px}
+    h2{margin-top:26px}
+    .quote{padding:14px 16px}
+    .quote p{font-size:16px}
+  }
+</style></head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="brand"><span class="dot">&bull;</span> Last Coin Standing</div>
+    <h1>Interactive Bitcoin Education,<br>Built to the Standard <em>Regulators Are Enforcing</em></h1>
+    <div class="byline"><strong>John McCabe</strong><span class="sep">&middot;</span>lastcoinstanding.com<span class="sep">&middot;</span>SF Bay Area</div>
+    <div class="rule"></div>
+  </div>
+
+  <h2>The problem, in the industry&rsquo;s own numbers</h2>
+  <p>In its targeted exam of crypto communications, FINRA reviewed 500+ retail communications and found potential Rule 2210 violations in <span class="em-num">roughly 70%</span> &mdash; unbalanced comparisons, misleading protection claims, omitted risks. Meanwhile the advisor channel has moved: <span class="em-num">42%</span> of advisors can now buy bitcoin in client accounts, but only <span class="em-num">32%</span> allocate &mdash; and <span class="em-num">99%</span> of those who do plan to maintain or increase <span class="muted">(Bitwise/VettaFi survey, 2026)</span>. The gap between <em>permitted</em> and <em>practicing</em> is education an advisor can defend and a compliance officer can approve &mdash; and the people who buy advisor training say so themselves:</p>
+
+  <div class="quote">
+    <p>&ldquo;I&rsquo;m not sure I understand what I would put into a formal training program around these assets. That&rsquo;s one of the big problems.&rdquo;</p>
+    <div class="attrib">&mdash; Adam Handler, VP of Product Management, Axtella <span class="muted">(WealthManagement.com)</span></div>
+  </div>
+
+  <h2>What I build</h2>
+  <p>The thing that goes in that box. At <strong>lastcoinstanding.com</strong> I have designed, built, and maintain <strong>34 live-computed interactive tools</strong> &mdash; allocation sizing, retirement sustainability, drawdown stress tests, asset comparisons, market-cycle context &mdash; every one of them:</p>
+
+  <ul class="principles">
+    <li><strong>Both sides, always</strong> &mdash; risks stated unprompted; the honest case, not the embellished one</li>
+    <li><strong>Reproducible by the reader</strong> &mdash; every number recomputes in the browser; nothing asserted that can&rsquo;t be checked</li>
+    <li><strong>Source-substantiated</strong> &mdash; a maintained audit log for every figure (the discipline FINRA Rule 2210(b) requires firms to keep)</li>
+    <li><strong>Educational, never promotional</strong> &mdash; no recommendations, no product steering</li>
+  </ul>
+
+  <p>One person, end-to-end: concept, analytical design, build, editorial, maintenance. Before this: ten years as a Director of Product at Mastercard.</p>
+
+  <h2>Built for your compliance desk, not around it</h2>
+  <p>Non-promotional educational content is the cheapest class of communication a firm can adopt: it can qualify for exemption from prior principal approval (FINRA 2210(b)(1)(D)(iii)), and generic educational content is exempt from FINRA filing (Reg. Notice 16-41). Delivery is self-contained static files your firm hosts &mdash; <strong>interactive for the user, inert for your network</strong>: no system access, no client data, no external dependencies. Vendor onboarding without the security-review tail.</p>
+
+  <h2>How I work</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>Embedded</h3>
+      <p>A senior builder who owns interactive education end-to-end.</p>
+    </div>
+    <div class="card">
+      <h3>Fractional</h3>
+      <p>A retained program: tools plus the editorial spine around them.</p>
+    </div>
+    <div class="card">
+      <h3>Licensed</h3>
+      <p>Proven tools rebuilt under your brand, inside your compliance envelope &mdash; scaled to a network or curriculum.</p>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="proof">The proof is clickable &mdash; <a href="https://lastcoinstanding.com">lastcoinstanding.com</a> &mdash; drag the assumptions and watch the numbers defend themselves.</div>
+    <div class="contact">
+      <a href="mailto:john@lastcoinstanding.com">john@lastcoinstanding.com</a><span class="sep">&middot;</span><a href="https://linkedin.com/in/jmccabe1">linkedin.com/in/jmccabe1</a><span class="sep">&middot;</span><a href="https://x.com/LastCoinStandng">@LastCoinStandng</a>
+    </div>
+  </div>
+
+</div>
+</body></html>
