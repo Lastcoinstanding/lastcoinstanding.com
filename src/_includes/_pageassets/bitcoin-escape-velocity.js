@@ -1752,17 +1752,27 @@
     // on every frame it is asked to. The offset is re-measured in the same
     // pass, so a nav that changes height (wrap, font load, zoom) cannot leave
     // the bar sitting at a stale offset.
-    var ticking = false;
+    // Throttled on a timestamp, NOT requestAnimationFrame. rAF is suspended
+    // whenever the page is not compositing — a background tab, a minimised
+    // window, an embedded viewer — and a dock that quietly stops responding
+    // in those states is the third variant of the same silent failure this
+    // feature has now produced twice. Two getBoundingClientRect calls and a
+    // class toggle are cheap enough to run on a plain timer.
+    var lastRun = 0, trailing = null;
+    var THROTTLE_MS = 80;
     function evaluate() {
-      ticking = false;
+      lastRun = (new Date()).getTime();
+      if (trailing) { clearTimeout(trailing); trailing = null; }
       measureDockOffset();
       var top = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ev-dock-top')) || 0;
       dock.classList.toggle('is-docked', anchor.getBoundingClientRect().bottom < top);
     }
     function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(evaluate);
+      var now = (new Date()).getTime();
+      if (now - lastRun >= THROTTLE_MS) { evaluate(); return; }
+      // Always schedule a trailing run so the final resting position is
+      // evaluated even if the last event lands inside the throttle window.
+      if (!trailing) trailing = setTimeout(evaluate, THROTTLE_MS);
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
