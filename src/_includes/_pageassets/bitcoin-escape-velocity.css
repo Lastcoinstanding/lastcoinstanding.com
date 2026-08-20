@@ -682,6 +682,12 @@ body { background: var(--bg); color: var(--text); }
   box-shadow: 0 6px 18px rgba(0,0,0,0.5);
 }
 .ev-strip-tip[hidden] { display: none; }
+/* Three stacked lines. Each stays nowrap so a line never breaks mid-figure,
+   but the block as a whole is narrow enough to clamp inside the strip at
+   either end — which a single wide row could not do. */
+.ev-strip-tip > span { display: block; white-space: nowrap; }
+.ev-strip-tip .ev-tip-stack { color: var(--text-dim); }
+.ev-strip-tip .ev-tip-res { margin-top: 1px; }
 .ev-strip-tip .ev-tip-year { color: var(--amber); font-weight: 600; }
 .ev-strip-tip .ev-tip-pos { color: var(--pos); font-weight: 600; }
 .ev-strip-tip .ev-tip-neg { color: var(--neg); font-weight: 600; }

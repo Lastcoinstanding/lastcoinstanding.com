@@ -1983,22 +1983,42 @@
         // stack value follows the display basis, so in nominal mode the two
         // sit on different bases in one tooltip; the basis is named there
         // rather than left for the reader to collide with.
-        var stackClause = (stackRaw === '' || stackRaw === null)
+        // Three stacked lines rather than one row: at the strip's ends a wide
+        // single-row tooltip has nowhere to go, and a narrow block clamps
+        // without the reader losing half the reading.
+        var stackLine = (stackRaw === '' || stackRaw === null)
           ? ''
-          : '<span class="ev-tip-sep"> · </span>stack ' + formatCurrencyShort(parseFloat(stackRaw))
-            + (RT_DOLLARS === 'nominal' ? ' <span class="ev-tip-sep">(future $)</span>' : '');
+          : '<span class="ev-tip-stack">stack ' + formatCurrencyShort(parseFloat(stackRaw))
+            + (RT_DOLLARS === 'nominal' ? ' <span class="ev-tip-sep">(future $)</span>' : '') + '</span>';
         tip.innerHTML = '<span class="ev-tip-year">' + year + '</span>'
-          + stackClause
-          + '<span class="ev-tip-sep"> · </span>'
-          + '<span class="' + (res >= 0 ? 'ev-tip-pos' : 'ev-tip-neg') + '">' + sign
-          + formatCurrencyShort(Math.abs(res)) + '</span> '
-          + (res >= 0 ? 'more than spent' : 'short of spending');
+          + stackLine
+          + '<span class="ev-tip-res"><span class="' + (res >= 0 ? 'ev-tip-pos' : 'ev-tip-neg') + '">'
+          + sign + formatCurrencyShort(Math.abs(res)) + '</span> '
+          + (res >= 0 ? 'more than spent' : 'short of spending') + '</span>';
         tip.hidden = false;
       }
       var hostRect = host.getBoundingClientRect();
       var colRect = col.getBoundingClientRect();
-      tip.style.left = (colRect.left - hostRect.left + colRect.width / 2) + 'px';
-      tip.style.top = Math.max(18, e.clientY - hostRect.top - 12) + 'px';
+
+      // Clamp inside the strip. The tooltip is centred on the column and drawn
+      // upward, so at the first and last bars half of it sat outside the
+      // container — and `.ev-strip` is overflow:hidden, so "outside" meant
+      // "clipped away". Measure the rendered box and pull it back in.
+      var EDGE = 6;
+      var tipW = tip.offsetWidth, tipH = tip.offsetHeight;
+      var centre = colRect.left - hostRect.left + colRect.width / 2;
+      var half = tipW / 2;
+      var minC = half + EDGE, maxC = hostRect.width - half - EDGE;
+      // If the tooltip is wider than the strip itself, centre it rather than
+      // letting the clamp invert and pin it off one edge.
+      centre = (minC > maxC) ? hostRect.width / 2 : Math.max(minC, Math.min(maxC, centre));
+      tip.style.left = centre + 'px';
+      // Same clamp vertically. translateY(-100%) draws the box UPWARD from
+      // `top`, so the floor is the box's own height — three stacked lines are
+      // roughly three times the old single row, and the previous fixed 18px
+      // floor would have clipped them against the strip's top edge.
+      var wantTop = e.clientY - hostRect.top - 12;
+      tip.style.top = Math.max(tipH + EDGE, Math.min(hostRect.height - EDGE, wantTop)) + 'px';
     });
     host.addEventListener('mouseleave', hide);
     function hide() {
