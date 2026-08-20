@@ -693,6 +693,22 @@ Adding the URL to `sitemap.xml` (§3 / above) makes the page *discoverable*; it 
 
 This is a per-page publish-day habit, not a monthly task. (Recurring GSC hygiene — the indexed-count glance per episodic page — lives in `MONTHLY_REFRESH_CHECKLIST`.)
 
+## 10.5 Interaction intent (the WHY principle)
+
+Every interactive section opens by stating **the insight it exists to deliver** (why), not only its mechanics (how, or what to click). A section that opens "drag the slider to change the stack" has told the reader what their hands do and nothing about what their mind should get.
+
+Where a page carries multiple interactions, they are framed as **a menu of different ways into the material — never an implied sequence** the reader must complete in order. A reader who lands mid-page and starts at the third instrument should not feel they have skipped a step.
+
+In practice, for each interactive section ask:
+
+- Does the opening copy name the *finding* the section produces, or only the controls?
+- Would a reader who never touches the controls still learn the point from the lede?
+- If the page has two or more instruments, does the copy say how they differ — and does it avoid implying an order?
+
+Canonical example: `/bitcoin-escape-velocity` — "Set the plan" opens on confidence, lifestyle and the risk of running out before it mentions an arrow; "The Threshold" opens on what a threshold *is* and why small changes move it, then explains the mechanics in a second paragraph.
+
+Source: Escape Velocity review rounds, 2026-08-19/20 (JM).
+
 ## 11. Verification
 
 Before announcing the page or sharing the URL externally:

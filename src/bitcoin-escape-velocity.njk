@@ -2,6 +2,13 @@
 layout: base.njk
 permalink: /bitcoin-escape-velocity.html
 slug: bitcoin-escape-velocity
+related:
+  - slug: the-bitcoin-retirement
+    desc: "The flagship calculator and the audit surface this page shares its engine with. Retirement projects the whole plan and holds the full year-by-year table; this page isolates the threshold between depleting and outgrowing your spending, and links any scenario back there to be checked."
+  - slug: the-bitcoin-retirement-stress-test
+    desc: "Where this plan gets hurt on purpose. Escape velocity assumes returns arrive in trend order; the Stress Test drops a timed bear market into the same plan and shows what sequence-of-returns risk does to a stack you are already selling from."
+  - slug: the-power-law
+    desc: "The growth model every projection here is computed against, and its limits. Its implied growth rate decays with time, which is why escape velocity has to be checked across the whole horizon rather than asserted from a single crossing."
 faq:
   - q: "What is bitcoin escape velocity?"
     a: "It is the point where a stack's growth outpaces the money drawn out of it, so the portfolio stops running down and starts running up. This page checks that condition every year from retirement to the end of the modeled horizon: escape velocity is reached only if growth stays ahead for <em>every</em> remaining year, not just the first one."
@@ -453,15 +460,9 @@ eleventyComputed:
       <p>The same caution runs the other way. If bitcoin trades below its long-term trend today, a plan built on the gap-persists basis is planning for a discount that has historically closed. Neither basis is the safe one in every regime, which is why the page reports both.</p>
     </div>
 
-    <div class="ev-related">
-      <div class="ev-related-label">Continue exploring</div>
-      <ul>
-        <li><a href="/the-bitcoin-retirement.html">The Bitcoin Retirement</a> &mdash; the flagship calculator and the audit surface this page borrows its engine from.</li>
-        <li><a href="/the-bitcoin-retirement-stress-test.html">The Bitcoin Retirement Stress Test</a> &mdash; the same plan with a bear market dropped into it.</li>
-        <li><a href="/the-power-law.html">Bitcoin and the Power Law</a> &mdash; the growth model every projection here is computed against, and its limits.</li>
-      </ul>
-      <p class="ev-related-note">Preview build: these are plain in-page links. The <code>related:</code> front-matter strip, nav entry, and homepage card ship with the production package.</p>
-    </div>
   </section>
+  <!-- The related strip is layout-level: base.njk renders components/related.njk
+       from the `related:` front matter above. The preview build.s hand-rolled
+       list and its "Preview build" note went with the production wiring. -->
 
 </main>

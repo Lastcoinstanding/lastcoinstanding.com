@@ -1,0 +1,14 @@
+<svg viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <!-- The page's own subject: a threshold in the input space, and the two paths
+       either side of it. A plan below the threshold runs down (neg colour);
+       one above it turns and runs up (pos colour). The vertical rule is the
+       threshold tick, the same mark the sliders carry. -->
+  <line x1="8" y1="52" x2="72" y2="52" stroke="#e09422" stroke-width="1" opacity="0.25"/>
+  <!-- below the threshold: draws down to nothing -->
+  <polyline points="8,30 22,33 36,38 50,45 64,52" stroke="#c0603a" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- above the threshold: dips, turns over, and runs up -->
+  <polyline points="8,30 22,32 36,31 50,25 64,12" stroke="#7fc47f" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- the threshold tick -->
+  <line x1="36" y1="8" x2="36" y2="56" stroke="#f2eee8" stroke-width="1" stroke-dasharray="2 2.5" opacity="0.75"/>
+  <circle cx="36" cy="31" r="2.1" fill="#f2eee8"/>
+</svg>

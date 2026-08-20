@@ -2102,6 +2102,81 @@ faq:
 - **Feasibility note (why `<head>` from `base.njk`, not the per-page head files):** the per-page `-head.html` files ARE Nunjucks (`htmlTemplateEngine: njk`) and inherit front matter through the `eleventyComputed` `{% include %}`, so they *can* see `faq` — but routing through them would mean editing ~40 head files (or one include per page), which is the per-page-include footgun this change removes. `base.njk`'s own `<head>` sees front matter unconditionally, so the JSON-LD is emitted there once. Verified on preview: the schema renders in `<head>` from `faq`, valid JSON, and matches the visible text programmatically.
 - **When to use / when to skip:** flagship *tool/decision* pages that answer real search queries (3–5 questions, honest, POSITIONING §1.5 — state limits, no manufactured certainty). **Skip** purely conceptual essays. Never more than 5.
 
+### 6.41 Stepper input (`ev-stepper`)
+
+Canonical source: `/bitcoin-escape-velocity`. A mobile-first alternative to a slider for **plan inputs** — values the reader sets deliberately and revisits, as opposed to values they scrub.
+
+Anatomy: a large current value flanked by ◀ ▶ arrows, one human increment per click, plus a small **gradation chip group** (`.seg-btn` register) that sets the step size, plus **click-the-value direct entry** for large jumps.
+
+```
+[◀]   1.00 BTC   [▶]        ← arrows 44×44 at every breakpoint
+Step  0.05 · 0.25* · 1.0    ← gradation chips, quiet register
+```
+
+Rules that make it work:
+
+- **Every arrow is 44×44 at every breakpoint.** This is the whole reason to prefer a stepper over a slider on touch: no fat-finger scrubbing past the value you wanted.
+- **Hold to repeat** at ~4/sec after a 450ms delay, and **swallow the trailing click** so a hold does not fire one extra step on release.
+- **Keyboard arrows** drive the stepper once anything inside it has focus.
+- **Direct entry needs an `entryOpen` guard.** Enter closes the field, which fires `blur`, which would otherwise re-enter the close handler — and after Escape that second pass commits the value the reader just cancelled.
+- **Do not snap on read.** Snapping an incoming value to the gradation grid silently answers a different question than the URL asked. Steps add and subtract from wherever the value is; only float drift is rounded away.
+- The same markup can be reused compactly (no label, no chips, no entry field) for a docked bar or a mobile repeat; the wiring finds every `.ev-stepper` and drives them all.
+
+### 6.42 Threshold slider (`ev-slider`)
+
+Canonical source: `/bitcoin-escape-velocity` §The Threshold. A full-range slider that carries **two** marks: the reader's value (the thumb) and the **solved threshold** for that axis (a tick), computed live while the other inputs hold.
+
+- **One solver, never two.** The tick position, the result sentence, the out-of-range tip and click-to-jump all call the same function. A tick that disagreed with its own caption is worse than no tick — and the QA pass asserts tick == sentence == jump on every axis, both bases.
+- **The solver takes its basis as a parameter**, not as a read of a module global. When it read the global, a QA pass sweeping both bases solved under one and checked under the other, producing 22 false failures.
+- **Log-scale any axis whose interesting region is compressed at one end.** A linear 0.01–100 BTC track puts every realistic plan and nearly every threshold inside the first 3% of the track; log-scaled, the same threshold lands mid-track and is reachable.
+- **Label at the tick, clamped in pixels.** Centring the threshold label under the track makes it compete with the reader's own value. Position it at the tick, then **measure and nudge it back inside the track** — a fractional clamp (`< 0.12` / `> 0.88`) cannot know how wide the label is, and a wide label at 14.6% still hangs off the edge at 375px.
+- **Click-to-jump.** Clicking the tick or its label sets the axis to the exact solver value, **bypassing the step snap**. Without it, a reader on a 0.25 step cannot land on a 1.11 threshold — unable to sit on the thing the section is named after.
+- **Status line.** The result block opens with one dynamic sentence in the verdict's voice: *Above the threshold* / *Below the threshold* / *On the threshold — one step decides it*. Colour alone does not say which side you are on. Scope "on the threshold" to **one snap step**, so it means what the reader's next click would actually do.
+- **Out-of-range copy is directional and computed.** When an axis has no threshold in range, say so and name which *other* variable would bring one back — derived by probing the solver toward each other axis's favourable end. Never a canned direction: a hardcoded one eventually points the wrong way.
+
+### 6.43 No-Apply live-state contract
+
+Where a page carries several controls over one model — steppers, a docked bar, a mobile repeat, sliders — the honest contract is that **every control reads and writes the same state and moving any of them updates everything**. No Apply buttons, no staged edits, no per-section local state.
+
+- Say it in the page's own copy ("Everything on the page moves together — there is nothing to apply"), and then the promise is load-bearing: any silently stale surface is a broken contract, not a cosmetic lag.
+- **QA it.** Assert that a live recompute equals a caches-bypassed recompute across every assumption combination. If a memo key ever stops covering an assumption, this is what catches it.
+- The exception worth keeping is a *what-if* surface that deliberately does not write back — but then it needs an explicit affordance to adopt the value, and the page should not also advertise a no-Apply contract. `/bitcoin-escape-velocity` tried the what-if version in review round 2 and removed it: two interaction models on one page is one too many.
+
+### 6.44 Assumptions card (collapsed summary → aligned grid)
+
+Replaces the stacked, individually-labelled toggle rows that accumulate on calculator pages and read as muddled.
+
+- **Collapsed (default):** one quiet line that keeps the *current state* legible without expanding — `Assumptions: reverts to trend · today's $ · income rises with inflation · 30-yr horizon · 6.5% inflation — change`. No control chrome.
+- **Expanded:** one card, one border, a **label column + control column grid** with consistent widths and even vertical rhythm. Not a stack of ad-hoc rows.
+- Controls, semantics, params and tooltips are inherited from the flagship **verbatim** — this recipe changes presentation only.
+- Collapses to a single column below 700px.
+
+### 6.45 Docked control bar (`ev-dock`) — and three ways it fails silently
+
+A slim fixed bar that re-presents a page's primary inputs once they scroll out of view. **Ship the timestamp-throttled version**; the three failures below all shipped, all did nothing visible, and none reproduced locally.
+
+1. **`position: sticky` is killed by ancestor overflow.** Any ancestor with `overflow-x: hidden` (or a scroll context) disables it. This is the money-trees failure. `overflow-x: clip` is sticky-safe; `hidden` is not.
+2. **`IntersectionObserver` constructed before layout fires once and never again.** Built against a viewport that has not been laid out, it reports meaningless geometry, sets the wrong state, and then sits silent because nothing crosses a threshold afterwards.
+3. **`requestAnimationFrame` is suspended whenever the page is not compositing** — background tab, minimised window, embedded viewer. An rAF-throttled scroll handler simply stops responding in those states.
+
+**What to ship:** `position: fixed`, a **self-measured** top offset (read the live nav/ribbon heights into a CSS custom property; do not hardcode), a **timestamp-throttled passive scroll listener** with a trailing run, re-measuring the offset in the same pass, plus a `document.fonts.ready` re-measure because fonts land after first paint and change the nav's height. Toggle a class by comparing the anchor's rect against the offset — no root, no thresholds, no construction-time state to go stale.
+
+**Verify on the deployed page, not locally.** All three failures above were invisible in a local harness.
+
+Below the width where the bar cannot hold its controls in one legible row (~760px), hide it and give mobile a **slim repeat of the controls** in the page flow instead. Stack that repeat one control per row: three across at 375px spends 216px on arrows and clips each value to a few pixels.
+
+### 6.46 Inherited-preset note (reduced sitewide-picker chip sets)
+
+**Rule: any page that exposes a REDUCED chip set for a sitewide picker must render the inherited value when no chip matches.**
+
+Pages often offer a subset of a canonical picker's presets — `/bitcoin-escape-velocity` shows two growth models where `ModelingAssumptions` has three, and three inflation presets where the canonical also supports Custom. When the stored sitewide value is one of the omitted presets, **no chip lights up**: the maths correctly uses the real value while the control shows nothing selected, and the picker reads as unresponsive. It looks exactly like a page that failed to subscribe to changes.
+
+Render a short note beside the control naming the inherited value and where it came from:
+
+> Set to Linear CAGR with decay on another calculator — the projection is using it. Pick one here to override.
+
+Hide it the moment a chip matches again.
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.

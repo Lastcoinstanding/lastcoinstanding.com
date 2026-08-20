@@ -147,6 +147,22 @@ The Disciplined Rebalancing page applies the same Power Law channel as `/the-bit
 
 **STRC-1 (added 2026-08-10 — the site's first automated data source).** `/the-strc-mechanism`'s price is STRC's official daily close, refreshed by a GitHub Action (`.github/workflows/strc-daily-close.yml` → `scripts/update-strc-close.mjs`) into `src/_data/strcClose.json` on market weekdays after the US close. **Source change:** the originally-scoped **Stooq CSV** (`strc.us`) is **no longer usable keyless** — as of 2026-08-10 its `q/l/` and `q/d/l/` endpoints return a "page does not exist" / JavaScript anti-bot challenge respectively (verified by hand with a browser UA). Switched to **Yahoo Finance's keyless chart JSON**, which returns the daily-close series + timestamps and identifies the instrument (`shortName` "Strategy Inc - Variable Rate Se…", 52-wk 71.25–100.42 matching filings); `query2` host is the fallback. **Method:** last non-null element of `indicators.quote[0].close`, rounded to 2dp, dated by its `timestamp` in `America/New_York`; cross-checked against `meta.regularMarketPrice`. **Guards (in the script):** aborts (no commit, run goes red) on fetch/parse failure or a >25% day-over-day move (bad-data fuse → hand-verify); writes nothing when the value is unchanged (weekends/holidays). No API key, no secrets. If Yahoo ever blocks keyless access, candidates to evaluate next: Nasdaq's `api.nasdaq.com/api/quote/STRC/info`, or a keyed provider (would need a secret). The **other** STRC constants (rate, claim stack, reserve, holdings) stay manual on `MONTHLY_REFRESH §7.5` — they move on disclosures, not daily.
 
+### bitcoin-escape-velocity
+
+**Nothing on this page goes stale independently.** It carries **no page-local hardcoded market data** — no embedded price series, no snapshot constants, no dated figures in copy. Every number it shows is computed at render time from shared modules, so the monthly refresh has nothing to update here.
+
+| # | Component | Source | Refreshed by |
+|---|---|---|---|
+| EV-1 | Power Law coefficients (a=1.6×10⁻¹⁷, b=5.77), floor/ceiling multiples | `shared/power-law-data.js` — see PL-1 | Inherited; audited on the-power-law's row |
+| EV-2 | Monthly price record (`PL_DATA`) + `TODAY_PRICE` seed | `shared/power-law-data.js` | `MONTHLY_REFRESH_CHECKLIST` (shared module) |
+| EV-3 | Live spot price (drives the gap-persists basis and the above-trend footnote) | `fetchTodayPrice()` → CoinGecko, session-cached, falls back to the latest `PL_DATA` sample | Live per page load; no manual step |
+| EV-4 | Inflation presets, bitcoin growth model | `shared/modeling-assumptions.js` (STYLE_GUIDE §3.5 canonical) | Canonical; page subscribes live |
+| EV-5 | Projection math (`daysSince` / `plPriceAtDate` / `dateForYear` / `projPriceForGrowth`, sell-to-cover loop) | Copied from `the-bitcoin-retirement.js` per the stress-test precedent | **Parity-guarded** — `window.evParityQA()` asserts EV and the flagship never disagree about whether a scenario escapes |
+
+**Implication for the monthly refresh:** if `power-law-data.js` or the modeling-assumptions canonical changes, this page follows automatically — but **re-run `evParityQA()` on the live page after any change to the flagship's projection functions**, because EV holds a copy. The parity assertion is the tripwire; it is the only thing standing between a flagship engine edit and two pages quietly giving different answers to the same question.
+
+---
+
 ---
 
 ## Architectural change log
