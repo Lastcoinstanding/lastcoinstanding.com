@@ -71,6 +71,7 @@ module.exports = function (eleventyConfig) {
     'og-the-gallery.jpg',
     'og-start-here.jpg',
     'og-dashboard.jpg',
+    'og-bitcoin-escape-velocity.jpg',
     // Gallery companion graphic (full-res PNG; scaled for display via CSS, full-res on click-through)
     'middle-seat-infographic.png',
     // Bitcoin Defined illustrations (1280x720). Eight Grok-generated

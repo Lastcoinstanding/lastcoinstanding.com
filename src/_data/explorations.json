@@ -303,6 +303,20 @@
     }
   },
   {
+    "_comment": "Third page of the retirement family (Retirement flagship / Stress Test / Escape Velocity). Shares the flagship projection engine and asserts parity against it via evParityQA(). Its payload is the THRESHOLD on each input rather than an escape year: under the shared engine the escape year is retirement+1-or-never, so the quantity that varies is the input-space crossing. One solver places the slider ticks, writes the result sentences, drives the rescue tips and powers click-to-jump. SVG tile at components/calc-tile-icons/bitcoin-escape-velocity.njk.",
+    "slug": "bitcoin-escape-velocity",
+    "title": "Bitcoin Escape Velocity",
+    "category": "numbers",
+    "group": "Positioning & Strategy",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "A retirement portfolio is supposed to draw down. Find the threshold past which a bitcoin stack runs up instead — and how little it takes to cross it.",
+      "preview_kind": "svg",
+      "anchor": "#threshold",
+      "position": 22
+    }
+  },
+  {
     "_comment": "Does a bitcoin allocation earn its place? Answers one question (worth it over a long horizon, despite drawdowns) with three effects as evidence. Reframed to match The Bitcoin Horizon: the third effect is 'portfolio influence' (the neutral engine, NOT risk); true risk is the drawdown you cannot hold through. Bitcoin growth projected from the Power Law, regime-aware. Consequences counterpart to how-much-bitcoin (Kelly/optimal). SVG tile at components/calc-tile-icons/bitcoin-allocation-sizing.njk.",
     "slug": "bitcoin-allocation-sizing",
     "title": "Bitcoin Portfolio Allocation",
