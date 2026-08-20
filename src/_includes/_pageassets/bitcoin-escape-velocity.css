@@ -699,3 +699,71 @@ body { background: var(--bg); color: var(--text); }
   .ev-slider-input { height: 44px; }
   .ev-slider { padding: 0.8rem 0.9rem 0.7rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   ROUND 3 — threshold label at the tick, status line, supplement
+═══════════════════════════════════════════════════════════════ */
+
+/* The threshold label sits AT its tick (#3), quieter than the user's own
+   value above it, and anchored at the ends so it cannot overflow. */
+.ev-slider-tick {
+  border: 0; padding: 0; cursor: pointer;
+  background: var(--ink-bright);
+}
+.ev-slider-tick[hidden] { display: none; }
+.ev-slider-tick:hover, .ev-slider-threshlabel:hover { background: var(--amber); }
+.ev-slider-tick:focus-visible, .ev-slider-threshlabel:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.ev-slider-threshlabel {
+  position: absolute; top: calc(100% + 9px);
+  transform: translateX(-50%);
+  background: none; border: 0; padding: 0 0.15rem; cursor: pointer;
+  font-family: var(--font-b); font-size: 0.72rem; font-weight: 500;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.01em;
+  color: var(--text-dim); white-space: nowrap; z-index: 4;
+}
+.ev-slider-threshlabel:hover { color: var(--amber); background: none; }
+.ev-slider-threshlabel[hidden] { display: none; }
+/* Room for the label under each track. */
+.ev-slider-track { margin-bottom: 1.9rem; }
+.ev-slider-foot { position: relative; }
+
+/* Status line — the result block's opening sentence (#5a). */
+.ev-status {
+  font-family: var(--font-b); font-size: 0.95rem; font-weight: 600;
+  line-height: 1.5; margin: 0 0 0.7rem;
+}
+.ev-status.is-above { color: var(--pos); }
+.ev-status.is-below { color: var(--neg); }
+.ev-status.is-near  { color: var(--amber); }
+
+/* Directional rescue tip inside an out-of-range row (#6). */
+.ev-line-tip { color: var(--amber); font-style: italic; }
+
+/* Supplement — the demoted One-step rows (#5b). Deliberately quieter than
+   the result block above it. */
+.ev-supplement { margin-top: 1.8rem; padding-top: 1.1rem; border-top: 1px dashed var(--border-faint); }
+.ev-supplement-intro {
+  font-family: var(--font-b); font-size: 0.78rem; letter-spacing: 0.04em;
+  color: var(--text-muted); margin: 0 0 0.7rem;
+}
+.ev-supplement .ev-consequences { margin-top: 0; }
+.ev-supplement .ev-conseq { background: transparent; border-color: rgba(224,148,34,0.08); padding: 0.55rem 0.85rem; }
+.ev-supplement .ev-conseq-var { font-size: 0.8rem; color: var(--text-dim); }
+.ev-supplement .ev-conseq-dir { font-size: 0.8rem; }
+
+/* Hidden separator styling for the strip hover readout (#8). */
+.ev-strip-tip .ev-tip-sep { color: var(--text-muted); }
+
+/* Inherited-assumption note: the sitewide pickers can hold a preset this
+   card has no chip for (Custom inflation, Linear CAGR), in which case no
+   chip would light and the control would look unresponsive while the maths
+   quietly used the real value. */
+.ev-assump-inherited {
+  font-family: var(--font-b); font-size: 0.75rem; line-height: 1.5;
+  color: var(--amber); margin: 0.4rem 0 0;
+}
+.ev-assump-inherited[hidden] { display: none; }
+
+@media (max-width: 760px) {
+  .ev-slider-threshlabel { font-size: 0.68rem; }
+}

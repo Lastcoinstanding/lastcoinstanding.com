@@ -204,6 +204,7 @@ eleventyComputed:
     <div class="ev-eyebrow">How little it takes</div>
     <h2 class="ev-h2">The Threshold</h2>
     <p class="ev-lead">The intent here is to find where the threshold sits between depletion and escape velocity &mdash; because even small changes in one variable can shift the whole picture. A strong plan (retiring later, a large stack, a modest income) may have no threshold left to cross; a more tentative plan can be probed to see if and where it breaks.</p>
+    <p class="ev-lead">Move one of the three numbers and watch the other two thresholds move with it &mdash; each shows how much that constraint has to expand or compress to reach the same result. Try setting all three at your intended plan, then move just one to see the stress or relief it puts on the other two.</p>
 
     <div class="ev-sliders" id="evSliders">
 
@@ -214,12 +215,12 @@ eleventyComputed:
           <input type="number" class="ev-slider-entry" data-role="entry" min="2026" max="2055" step="1" inputmode="numeric" hidden aria-label="Retire in">
         </div>
         <div class="ev-slider-track" data-role="track">
-          <div class="ev-slider-tick" data-role="tick"></div>
+          <button type="button" class="ev-slider-tick" data-role="tick" aria-label="Jump to threshold"></button>
           <input type="range" class="ev-slider-input" data-role="range" min="0" max="1000" step="1" aria-label="Retire in">
+          <button type="button" class="ev-slider-threshlabel" data-role="threshlabel" aria-label="Jump to threshold">&mdash;</button>
         </div>
         <div class="ev-slider-foot">
           <span data-role="min">&mdash;</span>
-          <span class="ev-slider-linelabel" data-role="linelabel">&mdash;</span>
           <span data-role="max">&mdash;</span>
         </div>
       </div>
@@ -233,12 +234,12 @@ eleventyComputed:
           <input type="number" class="ev-slider-entry" data-role="entry" min="0.01" max="100" step="0.01" inputmode="decimal" hidden aria-label="Stack in bitcoin">
         </div>
         <div class="ev-slider-track" data-role="track">
-          <div class="ev-slider-tick" data-role="tick"></div>
+          <button type="button" class="ev-slider-tick" data-role="tick" aria-label="Jump to threshold"></button>
           <input type="range" class="ev-slider-input" data-role="range" min="0" max="1000" step="1" aria-label="Stack in bitcoin">
+          <button type="button" class="ev-slider-threshlabel" data-role="threshlabel" aria-label="Jump to threshold">&mdash;</button>
         </div>
         <div class="ev-slider-foot">
           <span data-role="min">&mdash;</span>
-          <span class="ev-slider-linelabel" data-role="linelabel">&mdash;</span>
           <span data-role="max">&mdash;</span>
         </div>
       </div>
@@ -250,12 +251,12 @@ eleventyComputed:
           <input type="number" class="ev-slider-entry" data-role="entry" min="20000" max="500000" step="1000" inputmode="numeric" hidden aria-label="Annual withdrawal in dollars">
         </div>
         <div class="ev-slider-track" data-role="track">
-          <div class="ev-slider-tick" data-role="tick"></div>
+          <button type="button" class="ev-slider-tick" data-role="tick" aria-label="Jump to threshold"></button>
           <input type="range" class="ev-slider-input" data-role="range" min="0" max="1000" step="1" aria-label="Annual withdrawal in dollars">
+          <button type="button" class="ev-slider-threshlabel" data-role="threshlabel" aria-label="Jump to threshold">&mdash;</button>
         </div>
         <div class="ev-slider-foot">
           <span data-role="min">&mdash;</span>
-          <span class="ev-slider-linelabel" data-role="linelabel">&mdash;</span>
           <span data-role="max">&mdash;</span>
         </div>
       </div>
@@ -263,15 +264,23 @@ eleventyComputed:
     </div>
     <p class="ev-slider-hint">Sliders snap to the step size set on each stepper above. Click any value to type it exactly. Everything on the page moves together &mdash; there is nothing to apply.</p>
 
-    <!-- BIDIRECTIONAL CONSEQUENCES (#5) — one step each way, per variable. -->
-    <div class="ev-consequences" id="evConsequences" aria-live="polite"><!-- JS-populated --></div>
-
-    <!-- WHERE THE LINES SIT (#6) — sliders show, text tells. -->
+    <!-- RESULT BLOCK (round 3 #5a) — directly under the sliders, because it is
+         the answer they produce. Opens with a status line in the verdict's own
+         voice: colour alone was not saying which side of the threshold the
+         plan sits on. -->
     <div class="ev-line">
-      <div class="ev-line-head">Where all three lines sit
-        <span class="help-tip" tabindex="0">?<span class="tip-content">The crossing value on each variable, holding the other two where your plan has them. Computed against the same projection engine and the same price basis as the verdict above &mdash; the same solver that places the ticks on the sliders, so the two can never disagree. Where a line falls outside this page&rsquo;s range, it says so rather than showing a clamped number.</span></span>
+      <div class="ev-line-head">Where your thresholds sit
+        <span class="help-tip" tabindex="0">?<span class="tip-content">The crossing value on each variable, holding the other two where your plan has them. Computed against the same projection engine and the same price basis as the verdict above &mdash; the same solver that places the ticks on the sliders, so a tick and its own sentence can never disagree. Where a threshold falls outside this page&rsquo;s range, it says so, and names which other variable would bring one back into range.</span></span>
       </div>
+      <p class="ev-status" id="evStatus" aria-live="polite">&mdash;</p>
       <div class="ev-line-rows" id="evLineRows"><!-- JS-populated --></div>
+    </div>
+
+    <!-- SUPPLEMENT (round 3 #5b) — the old One-step rows, demoted below the
+         result and styled quieter. -->
+    <div class="ev-supplement">
+      <p class="ev-supplement-intro">One step in any direction &mdash; what a single click of each stepper does from here.</p>
+      <div class="ev-consequences" id="evConsequences" aria-live="polite"><!-- JS-populated --></div>
     </div>
   </section>
   <!-- MOBILE FALLBACK for the docked bar (#12/#13). Shown only where the dock
@@ -386,6 +395,7 @@ eleventyComputed:
               <button type="button" class="seg-btn" data-preset="m2-growth">6.5% <span class="seg-btn-sub">M2</span></button>
               <button type="button" class="seg-btn" data-preset="shadow-stats">8% <span class="seg-btn-sub">Shadow</span></button>
             </div>
+            <p class="ev-assump-inherited" data-inherited="inflation" hidden></p>
           </div>
 
           <div class="ev-assump-label">Bitcoin growth model
@@ -396,6 +406,7 @@ eleventyComputed:
               <button type="button" class="seg-btn" data-preset="powerlaw-floor">Floor band</button>
               <button type="button" class="seg-btn" data-preset="powerlaw-trend">Trend line</button>
             </div>
+            <p class="ev-assump-inherited" data-inherited="btcGrowthModel" hidden></p>
           </div>
 
         </div>

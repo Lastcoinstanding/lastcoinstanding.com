@@ -854,12 +854,48 @@
       var lo = el.querySelector('[data-role="min"]'), hi = el.querySelector('[data-role="max"]');
       if (lo) lo.textContent = formatLineValue(axis, lim.min);
       if (hi) hi.textContent = formatLineValue(axis, lim.max);
-      var lbl = el.querySelector('[data-role="linelabel"]');
+
+      // Threshold label rides AT the tick rather than centred under the track
+      // (#3), so it reads as belonging to the mark instead of competing with
+      // the reader's own value above. Clamped to the track ends: a threshold
+      // at 0% or 100% would otherwise hang off the side.
+      var lbl = el.querySelector('[data-role="threshlabel"]');
       if (lbl) {
-        lbl.textContent = outOfRange ? 'line beyond this range' : 'line ' + formatLineValue(axis, ln.value);
-        lbl.classList.toggle('is-out', outOfRange);
+        if (outOfRange) {
+          lbl.hidden = true;
+        } else {
+          lbl.hidden = false;
+          var lf = axisToPos(axis, ln.value) / SLIDER_RES;
+          lbl.style.left = (Math.max(0, Math.min(1, lf)) * 100).toFixed(2) + '%';
+          lbl.textContent = 'threshold ' + formatLineValue(axis, ln.value);
+          lbl.setAttribute('aria-label', 'Jump to threshold, ' + formatLineValue(axis, ln.value));
+          // Clamp in PIXELS, after measuring. A fixed fraction cannot know how
+          // wide the label is: "threshold $90,300" at 14.6% still hung off the
+          // left edge at 375px. Measure against the track and nudge back in.
+          lbl.style.transform = 'translateX(-50%)';
+          if (track) {
+            var lr = lbl.getBoundingClientRect(), tkr = track.getBoundingClientRect();
+            var shift = 0;
+            if (lr.left < tkr.left) shift = tkr.left - lr.left;
+            else if (lr.right > tkr.right) shift = tkr.right - lr.right;
+            if (shift) lbl.style.transform = 'translateX(calc(-50% + ' + Math.round(shift) + 'px))';
+          }
+        }
       }
+      if (tick && !outOfRange) tick.setAttribute('aria-label', 'Jump to threshold, ' + formatLineValue(axis, ln.value));
     });
+  }
+
+  /* ─── Click-to-jump (#4). Sets the axis to the EXACT solver value, bypassing
+         the step snap — which is the whole point: with a 0.25 chip the reader
+         cannot otherwise land on a 1.11 BTC threshold, and being unable to sit
+         on the thing the section is named after was the round-2 friction. ─── */
+  function jumpToThreshold(axis) {
+    var ln = lines()[axis];
+    if (ln.value === null) return;
+    if (setScenarioValue(AXES[axis].key, ln.value)) {
+      syncSteppers(); scheduleRender(); scheduleUrlSync(); saveSession();
+    }
   }
 
   function wireSliders() {
@@ -881,6 +917,11 @@
           if (valBtn) valBtn.textContent = formatLineValue(axis, SCENARIO[ax.key]);
         });
       }
+
+      ['tick', 'threshlabel'].forEach(function (role) {
+        var el2 = el.querySelector('[data-role="' + role + '"]');
+        if (el2) el2.addEventListener('click', function () { jumpToThreshold(axis); });
+      });
 
       if (!valBtn || !entry) return;
       var open = false;
@@ -924,15 +965,73 @@
     }
     return 'the earliest retirement year that crosses moves from ' + from + ' to <strong>' + to + '</strong>';
   }
+  /* ─── Directional out-of-range tip (#6). When an axis has no threshold in
+         range, say which OTHER variable would bring one back — derived from
+         the solver by testing each other axis toward its favourable end, never
+         a canned string. Silence would leave a dead end; a hardcoded direction
+         would eventually be wrong. ─── */
+  var FAVOURABLE = { stack: 'up', income: 'down', retire: 'later' };
+  function rescueTip(deadAxis) {
+    var others = ['stack', 'income', 'retire'].filter(function (a) { return a !== deadAxis; });
+    var found = [];
+    others.forEach(function (b) {
+      var lim = LIMITS[AXES[b].key];
+      var probes = (b === 'retire')
+        ? [2055, 2050, 2045, 2040]                       // non-monotone: sample, don't assume
+        : (b === 'stack' ? [lim.max, lim.max / 4] : [lim.min, lim.min * 2]);
+      for (var i = 0; i < probes.length; i++) {
+        var over = {}; over[AXES[b].key] = probes[i];
+        if (lineFor(deadAxis, cloneWith(over)).value !== null) {
+          found.push(b === 'stack' ? 'raise the stack'
+                   : b === 'income' ? 'lower the withdrawal'
+                   : 'retire later');
+          return;
+        }
+      }
+    });
+    if (!found.length) return '';
+    return ' <span class="ev-line-tip">' + found.join(' or ').replace(/^./, function (c) { return c.toUpperCase(); }) + '.</span>';
+  }
+
   function lineSitPhrase(axis, ln, plan) {
     if (ln.value === null) {
-      if (axis === 'stack')  return { html: 'The stack needed to escape is <strong>beyond this page&rsquo;s range</strong> &mdash; no stack up to ' + formatBtc(LIMITS.btcStack.max) + ' BTC crosses at this withdrawal and this date.', past: false };
-      if (axis === 'income') return { html: 'The withdrawal the plan can sustain is <strong>below this page&rsquo;s range</strong> &mdash; no withdrawal down to ' + formatUsdFull(LIMITS.targetIncomeUSD.min) + ' crosses at this stack and this date.', past: false };
-      return { html: 'No retirement year through <strong>' + LIMITS.retirementYear.max + '</strong> crosses at this stack and this withdrawal.', past: false };
+      var tip = rescueTip(axis);
+      if (axis === 'stack')  return { html: '<strong>No threshold in range</strong> &mdash; at this withdrawal and date, no stack up to ' + formatBtc(LIMITS.btcStack.max) + ' BTC crosses.' + tip, past: false };
+      if (axis === 'income') return { html: '<strong>No threshold in range</strong> &mdash; at this stack and date, no withdrawal down to ' + formatUsdFull(LIMITS.targetIncomeUSD.min) + ' crosses.' + tip, past: false };
+      return { html: '<strong>No threshold in range</strong> &mdash; at this stack and withdrawal, no retirement year through ' + LIMITS.retirementYear.max + ' crosses.' + tip, past: false };
     }
     if (axis === 'stack')  return { html: 'The stack needed to escape is <strong>' + formatBtc(ln.value) + ' BTC</strong><span class="ev-line-you"> &mdash; your plan holds ' + formatBtc(plan) + '.</span>', past: plan >= ln.value };
     if (axis === 'income') return { html: 'The withdrawal the plan can sustain is <strong>' + formatUsdFull(ln.value) + '/yr</strong><span class="ev-line-you"> &mdash; your plan withdraws ' + formatUsdFull(plan) + '.</span>', past: plan <= ln.value };
     return { html: 'The earliest retirement year that crosses is <strong>' + ln.value + '</strong><span class="ev-line-you"> &mdash; your plan retires ' + plan + '.</span>', past: plan >= ln.value };
+  }
+
+  /* ─── Status line (#5a). The result block opens by saying which side of the
+         threshold the plan sits on, in the verdict's voice — colour alone was
+         not carrying it. "On the threshold" is scoped to one snap step, so it
+         means what the reader's next click would actually do. ─── */
+  function renderStatus(verdict) {
+    var el = document.getElementById('evStatus');
+    if (!el) return;
+    var L = lines();
+    var near = false;
+    ['stack', 'income', 'retire'].forEach(function (axis) {
+      var ln = L[axis];
+      if (ln.value === null) return;
+      var plan = SCENARIO[AXES[axis].key];
+      var step = (axis === 'retire') ? 1 : (axis === 'stack' ? GRAD.btcStep : GRAD.incStep);
+      if (Math.abs(plan - ln.value) <= step + 1e-9) near = true;
+    });
+    var escaped = (verdict.state === 'escape');
+    if (near) {
+      el.textContent = 'On the threshold — one step decides it.';
+      el.className = 'ev-status is-near';
+    } else if (escaped) {
+      el.textContent = 'Above the threshold — this plan escapes.';
+      el.className = 'ev-status is-above';
+    } else {
+      el.textContent = 'Below the threshold — this plan does not reach escape velocity.';
+      el.className = 'ev-status is-below';
+    }
   }
 
   function renderLineRows() {
@@ -993,7 +1092,7 @@
 
         var clause;
         if (nv.state !== baseVerdict.state) {
-          clause = '<span class="ev-conseq-flip">' + (nv.state === 'escape' ? 'crosses the line' : 'now ' + statePhrase(nv)) + '</span>';
+          clause = '<span class="ev-conseq-flip">' + (nv.state === 'escape' ? 'crosses the threshold' : 'now ' + statePhrase(nv)) + '</span>';
         } else {
           var lnBefore = L[row.reports], lnAfter = lineFor(row.reports, nudged);
           clause = (lnBefore.value !== null && lnAfter.value !== null && lnBefore.value !== lnAfter.value)
@@ -1019,8 +1118,9 @@
 
   function renderThreshold(baseVerdict, basis) {
     renderSliders();
-    renderConsequences(baseVerdict, basis);
+    renderStatus(baseVerdict);
     renderLineRows();
+    renderConsequences(baseVerdict, basis);
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -1037,6 +1137,9 @@
 
     var res = v.residuals;
     if (!res.length) { host.innerHTML = ''; if (cap) cap.textContent = '—'; return; }
+
+    // Memoised, so this is a cache read, not a second projection.
+    var stripPoints = projectForBasis(SCENARIO, basis).points;
 
     var posMax = 0, negMax = 0;
     res.forEach(function (r) {
@@ -1076,7 +1179,18 @@
       // No `title` attribute (#20): the native tooltip's ~1s delay makes
       // scrubbing across years feel broken. Data rides on the column and a
       // real element renders it instantly.
-      html += '<div class="ev-strip-col" data-year="' + r.year + '" data-residual="' + r.value.toFixed(2) + '">'
+      // The year's stack value rides on the column too (#8), already converted
+      // to the active display basis so the hover can never quote a figure on a
+      // different basis from the one the page is showing.
+      var shownVal = null;
+      for (var q = 0; q < stripPoints.length; q++) {
+        if (stripPoints[q].x === r.year) {
+          shownVal = rtDollars(stripPoints[q].y, r.year, MA.get('inflation').value);
+          break;
+        }
+      }
+      html += '<div class="ev-strip-col" data-year="' + r.year + '" data-residual="' + r.value.toFixed(2) + '"'
+        + ' data-stack="' + (shownVal === null ? '' : Math.round(shownVal)) + '">'
         + mark + '<div class="ev-bar ' + cls + '" style="' + style + '"></div></div>';
     });
 
@@ -1142,11 +1256,30 @@
     document.querySelectorAll('[data-grad="years"] .seg-btn').forEach(function (b) {
       b.classList.toggle('is-active', parseInt(b.getAttribute('data-years'), 10) === SCENARIO.yearsInRetirement);
     });
+    // The sitewide pickers can hold a preset this card has no chip for —
+    // Custom inflation, or the flagship's linear-CAGR growth model. Without
+    // this, no chip lights, and the card reads as unresponsive while the maths
+    // quietly uses the real value: a control that lies about its own state.
+    var INHERITED_NAMES = {
+      'custom': 'a custom rate',
+      'linear-cagr-decay': 'Linear CAGR with decay'
+    };
     ['inflation', 'btcGrowthModel'].forEach(function (dim) {
       var cur = MA.get(dim).preset;
+      var matched = false;
       document.querySelectorAll('[data-dim="' + dim + '"] .seg-btn').forEach(function (b) {
-        b.classList.toggle('is-active', b.getAttribute('data-preset') === cur);
+        var on = b.getAttribute('data-preset') === cur;
+        if (on) matched = true;
+        b.classList.toggle('is-active', on);
       });
+      var note = document.querySelector('[data-inherited="' + dim + '"]');
+      if (!note) return;
+      if (matched) { note.hidden = true; return; }
+      note.hidden = false;
+      var name = INHERITED_NAMES[cur] || cur;
+      note.textContent = (dim === 'inflation')
+        ? 'Set to ' + name + ' (' + MA.get('inflation').value + '%) on another calculator — the projection is using it. Pick one here to override.'
+        : 'Set to ' + name + ' on another calculator — the projection is using it. Pick one here to override.';
     });
     // Live inflation rate on the real-dollars button, flagship pattern.
     var infl = MA.get('inflation').value;
@@ -1673,6 +1806,47 @@
       if (sentence.textContent.indexOf(needle) === -1) failures.push('DOM: verdict sentence does not contain ' + needle);
     }
 
+    /* (7) CLICK-TO-JUMP EXACTNESS (round 3 #9). Jumping must land the solver's
+           value itself, not a snapped approximation — the whole point of the
+           affordance is to reach a threshold the step chips cannot hit. */
+    ['stack', 'income', 'retire'].forEach(function (axis) {
+      var ln = lines()[axis];
+      if (ln.value === null) return;
+      var before = SCENARIO[AXES[axis].key], landed;
+      setScenarioValue(AXES[axis].key, ln.value);
+      landed = SCENARIO[AXES[axis].key];
+      if (Math.abs(landed - ln.value) > 1e-6) {
+        failures.push('jump/' + axis + ': landed on ' + landed + ', threshold is ' + ln.value);
+      }
+      setScenarioValue(AXES[axis].key, before);
+    });
+
+    /* (8) LIVE ASSUMPTION RECOMPUTE == HARD REFRESH (round 3 #9). Nothing may
+           be cached across an assumptions change. Both growth models and all
+           three inflation presets, checked against a projection computed from
+           scratch with the caches bypassed — if a memo key ever stops covering
+           an assumption, this is what catches it. */
+    var savedInfl = MA.get('inflation').preset, savedGrowth = MA.get('btcGrowthModel').preset;
+    ['cpi-official', 'm2-growth', 'shadow-stats'].forEach(function (ip) {
+      ['powerlaw-trend', 'powerlaw-floor'].forEach(function (gm) {
+        MA.set('inflation', ip); MA.set('btcGrowthModel', gm);
+        var iv = MA.get('inflation').value;
+        QA_VECTOR.forEach(function (sc, idx) {
+          ['trend', 'current'].forEach(function (b) {
+            var live = computeVerdict(projectForBasis(sc, b), sc, iv);
+            // Same inputs, caches bypassed — a "hard refresh" of this scenario.
+            var fresh = computeVerdict(projectForBasis(sc, b, true), sc, iv);
+            if (live.state !== fresh.state || live.escapeYear !== fresh.escapeYear
+                || live.depletionYear !== fresh.depletionYear) {
+              failures.push('assump/' + ip + '/' + gm + '/' + b + '#' + idx
+                + ': cached ' + live.state + ' vs fresh ' + fresh.state);
+            }
+          });
+        });
+      });
+    });
+    MA.set('inflation', savedInfl); MA.set('btcGrowthModel', savedGrowth);
+
     var shrinkCount = rows.filter(function (r) { return r.state === 'shrink'; }).length;
     var result = { pass: failures.length === 0, failures: failures, rows: rows,
                    shrinkBandCount: shrinkCount, vectors: QA_VECTOR.length * 2 };
@@ -1804,7 +1978,18 @@
         var year = col.getAttribute('data-year');
         var res = parseFloat(col.getAttribute('data-residual'));
         var sign = res >= 0 ? '+' : '−';
-        tip.innerHTML = '<span class="ev-tip-year">' + year + '</span> &nbsp;'
+        var stackRaw = col.getAttribute('data-stack');
+        // The bars are always the REAL residual — the caption says so. The
+        // stack value follows the display basis, so in nominal mode the two
+        // sit on different bases in one tooltip; the basis is named there
+        // rather than left for the reader to collide with.
+        var stackClause = (stackRaw === '' || stackRaw === null)
+          ? ''
+          : '<span class="ev-tip-sep"> · </span>stack ' + formatCurrencyShort(parseFloat(stackRaw))
+            + (RT_DOLLARS === 'nominal' ? ' <span class="ev-tip-sep">(future $)</span>' : '');
+        tip.innerHTML = '<span class="ev-tip-year">' + year + '</span>'
+          + stackClause
+          + '<span class="ev-tip-sep"> · </span>'
           + '<span class="' + (res >= 0 ? 'ev-tip-pos' : 'ev-tip-neg') + '">' + sign
           + formatCurrencyShort(Math.abs(res)) + '</span> '
           + (res >= 0 ? 'more than spent' : 'short of spending');
