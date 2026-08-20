@@ -1,5 +1,11 @@
 [
   {
+    "display": "8/20/26",
+    "date": "2026-08-20",
+    "page": "/bitcoin-escape-velocity.html",
+    "summary": "New: Bitcoin Escape Velocity — a retirement portfolio is supposed to draw down; under bitcoin's historical growth curve there is a threshold past which it runs up instead. Set three numbers (when you retire, what you retire with, what you withdraw) and the page finds where that threshold sits on each of them: the stack you would need, the withdrawal you could sustain, the earliest year that crosses. Move any one and watch the other two shift. Three answers, all first-class — it escapes, it depletes in a named year, or it survives your window while still losing ground, with the year it turns over. Shares the Bitcoin Retirement calculator's engine and asserts parity with it, so the two pages can never disagree about whether a plan escapes. Real dollars by default; both price bases reported, with whichever is currently the conservative one named."
+  },
+  {
     "display": "8/18/26",
     "page": "/bitcoin-as-collateral.html",
     "summary": "New: Bitcoin as Collateral — four thousand years of the pledge problem, a ten-property scorecard against Treasuries, property and gold, and why lenders still charge more. With a quarterly record that tracks whether the gap closes."

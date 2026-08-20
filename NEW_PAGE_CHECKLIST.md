@@ -686,12 +686,14 @@ Each command should return at least `1`. Zero indicates a gap.
 
 ### Publish-day habit — resubmit the sitemap + request indexing
 
-Adding the URL to `sitemap.xml` (§3 / above) makes the page *discoverable*; it does not make Google fetch it today. On publish day, once the page is live and the curls above pass, do the two-minute manual step in **Google Search Console**:
+Adding the URL to `sitemap.xml` (§3 / above) makes the page *discoverable*; it does not make Google fetch it today. On publish day, once the page is live and the curls above pass, do the manual step in **Google Search Console**:
 
-- **Resubmit the sitemap** (Sitemaps → re-submit `sitemap.xml`) so the new `<loc>` is picked up on the next crawl.
-- **Request Indexing for the new URL** (URL Inspection → paste the clean URL, e.g. `https://lastcoinstanding.com/<slug>` → Request Indexing). This pushes the page into the crawl queue immediately instead of waiting for organic discovery, which can take days.
+- **Resubmit the sitemap** (Sitemaps → re-submit `sitemap.xml`) so the new `<loc>` is picked up on the next crawl. **One click, no quota.** This is the whole publish-day search obligation.
+- **Request Indexing for the new URL** (URL Inspection → paste the clean URL, e.g. `https://lastcoinstanding.com/<slug>` → Request Indexing) **if the daily quota allows** (~10 requests/day). If it does not, this is **not** a publish-day blocker — it rides the monthly Search Console indexing sweep in `MONTHLY_REFRESH_CHECKLIST`. Sitemap resubmission alone gets the page into the crawl queue.
 
-This is a per-page publish-day habit, not a monthly task. (Recurring GSC hygiene — the indexed-count glance per episodic page — lives in `MONTHLY_REFRESH_CHECKLIST`.)
+> **Do not try to automate this.** Google **retired its sitemap ping endpoint** (`google.com/ping?sitemap=`) and Bing has done the same — verified 2026-08-20, returning **404** and **410 Gone** respectively. Any script or checklist step that "pings the sitemap" is now a no-op that reports success. Resubmission is a manual Search Console action, full stop.
+
+This is a per-page publish-day habit, not a monthly task. (Recurring GSC hygiene — the indexing sweep and the indexed-count glance per episodic page — lives in `MONTHLY_REFRESH_CHECKLIST`.)
 
 ## 10.5 Interaction intent (the WHY principle)
 
