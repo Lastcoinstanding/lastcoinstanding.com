@@ -23,6 +23,7 @@ Captured during the merge pass, because the backlog is now large enough that the
 - **Financialization is becoming the site's centre of gravity.** STRC shipped; MSTR, The Big Long and the collateral cluster all sit there. `STRC_BELOW_PAR_DESIGN` §2 deliberately held financialization *one row back from the flagship*. Three-plus more pieces makes that fence load-bearing — a conscious call, not drift.
 - **Essay-to-build ratio is heavy on essays** (~9 Substack pieces vs. ~8 builds). The builds with compounding return — the dashboard and Power Law v2 — should not keep losing sequencing to essays that are read once.
 - **Highest persuasion-per-unit-effort in the whole backlog: Power Law v2.** Mostly build-on-existing-data (the shared PL module, the static out-of-sample chart, the Doubling Ladder's already-computed register) rather than new research.
+- **The retirement family is now a named cluster, and its hub trigger has fired (2026-08-21, JM).** Retirement · Stress Test · Escape Velocity are live and Scenario Comparison is specced — four spokes, which is the threshold the cluster-thesis canon set for earning a hub ("family earns a hub before nav grows", recorded at `SITE_GUIDE §49` when EV deliberately shipped with no nav entry at three). Both are filed under the new *Retirement family* section below and are sequenced **together**: the hub decision lands with or immediately after the Comparison page. Note this cluster resolves the opposite way from the collateral/credit one — that cluster was six items that turned out to be six *different kinds of thing* and correctly got no hub; this is four instances of one thing, which is exactly when a hub pays.
 - **The three competing "come back here" surfaces are now resolved (JM, 2026-08-05).** The **dashboard is the single anchor destination**; the **channel-position chip is its site-wide entry point** (ships after the dashboard); the **Gallery highlights strip is closed**, absorbed as the dashboard's "jump back in" row. See the Dashboard entry for the full ruling. (Was: "resolve into one coherent return-visit story before building any of them" — done.)
 
 ---
@@ -318,6 +319,48 @@ Captured during the merge pass, because the backlog is now large enough that the
   - **PRECEDENT DECISION — flag before building.** Monte Carlo has been a deliberate site-wide *no*: `RETIREMENT_CALCULATOR_DESIGN_22` §3.6 states the scenario grid *"is **not** a Monte Carlo."* Randomised risk draws would be the first breach. Worth doing — but it's a precedent, not a feature, and it should be decided consciously and then applied consistently.
   - **Cross-links:** `/bitcoin-fixed-income` (the host), `/the-strc-mechanism`, the retirement stress test.
 
+### Retirement family
+
+_Cluster opened 2026-08-21 (JM). Three pages live — **The Bitcoin Retirement** (flagship) · **Retirement Stress Test** · **Bitcoin Escape Velocity** — plus the two entries below. `SITE_GUIDE §49` already names the family and its standing rule: "No nav entry: the family earns a hub before nav grows (cluster-thesis canon)." The Comparison page is the fourth spoke that fires that trigger, which is why the two entries below are sequenced together rather than independently._
+
+- [ ] **Retirement Scenario Comparison — two independent plans, side by side. New page.**
+  Surfaced 2026-08-21 (JM).
+  - **Concept:** full-canvas comparison of two (v1: **exactly** two) fully independent retirement scenarios — separate stack / retirement year / withdrawal per column — with aligned verdict rows, per-scenario thresholds, and one overlaid growing-vs-spending chart as the hero.
+  - **NAMING COLLISION — resolve before a design doc is opened.** `RETIREMENT_SCENARIO_COMPARISON_DESIGN.md` **already exists at repo root** and describes a **different, already-shipped** feature: the flagship's on-page `rt-compare` panel (shipped 2026-07-25; current behaviour is authoritative in `RT_COMPARE_HANDOFF.md` §2, catalogued at `SITE_GUIDE §17` → *Scenario comparison — "Compare — what if you…" (rt-compare)*). Do not reuse that filename or that title. Suggested working title to keep the two legible: **"Plan vs. Plan"** — JM to confirm.
+  - **What makes it distinct, stated three ways** (the fence that justifies a page rather than a panel):
+    - the flagship's compare panel = **one plan ± canned relative nudges** ("what if I retire two years later?"), variants derived from a base;
+    - **Escape Velocity** = **one plan, threshold-finding** on three inputs;
+    - this = **plan-vs-plan**, two independently configured scenarios with no base/variant relationship.
+  - **Engine: 100% reuse, no new research.** Flagship projection + EV's threshold solver and consequences engine. This is a composition job, not a modeling job — which is what makes it cheap relative to its payload.
+  - **Shareability is a first-class goal, not a follow-up.** Namespaced URL params per scenario (`a_`/`b_`) so any comparison is a sendable link; carry-over from the other family pages pre-fills scenario A. Note the params must be namespaced from the first commit — retrofitting a namespace breaks every link already shared.
+  - **Open design questions:** list-spine vs. overlay-hero balance; whether assumptions are shared across both scenarios (**recommend: shared, one card** — the page compares *plans*, not *models*); mobile layout (two columns don't fit — stacked with a sticky A/B switcher?); does a third scenario ever earn its cost (**v1: no**).
+  - **VERIFY-AT-BUILD (blocking):** the parity assertion extends to **both** columns, and the two scenarios must run off **one engine instance's constants** — no drift between columns. Extend the existing `evParityQA` tripwire rather than writing a second one.
+  - **Provenance flag — could not verify in repo.** JM cites this as promoting "the EV design doc §5 deferred note (compare-scenarios feature)". **There is no EV design doc in the repo** — Escape Velocity shipped without one, and `SITE_GUIDE §49` is its design record. `TECH_DEBT` (flagship year-by-year deprecation) cites the same missing doc at "verdict #4", so the doc existed in-session and was never committed. Nothing here depends on recovering it — the concept above is self-contained — but do not cite a §5 that no one can open. (Same discipline as the discharged phantom cross-references noted in the 2026-08-03 merge pass.)
+  - **Cross-links:** `/the-bitcoin-retirement`, `/the-bitcoin-retirement-stress-test`, `/bitcoin-escape-velocity`. **Not** to be confused with *Three-track scenario comparison* in the Financialization cluster — that one is bitcoin-vs-STRC-vs-Treasuries, is explicitly scoped as a `/bitcoin-fixed-income` extension, and carries a "do NOT build a new page" ruling. Two live entries now contain the words "scenario comparison"; they are unrelated.
+
+- [ ] **Retirement family hub — the trigger has fired.** Nav/section decision + small landing page.
+  Surfaced 2026-08-21 (JM), per the standing cluster-thesis canon ("family earns a hub before nav grows").
+  - **Concept:** with Retirement, Stress Test and Escape Velocity live and Scenario Comparison specced, the family is **four strong** — carve the navigational grouping (nav subsection, or a grouped block inside The Numbers) plus a short hub landing page: what each tool answers, one sentence each, targeting the **"bitcoin retirement"** head term.
+  - **Sequencing:** decide/build the hub **with or immediately after** the Comparison page ships. Four spokes is the threshold; three was deliberately not — `SITE_GUIDE §49` records EV shipping with no nav entry for exactly this reason, so the rule has already been paid for once and should not be quietly re-litigated at three.
+  - **SEO claim — record the base rate before leaning on it.** JM observes `/the-bitcoin-retirement` already draws the site's organic search traffic, and the hub would compound the site's strongest cluster. True in *share*; the honest qualifier is that `SEO_AUDIT` measures site-wide organic as **near-zero in absolute terms** (~5 users / 84 sessions in its sample). So the hub is a bet on a cluster that leads a very small base — still the right bet on head-term grounds, but the entry should not read as though it is defending existing volume. Re-pull GSC numbers at promotion time rather than inheriting either figure.
+  - **Nav capacity is a hard constraint, not a preference.** The desktop `.nav-links` row has no headroom: a 7th item wraps the wordmark and grows the nav 65px → 90px below ~1150px, then clips "About" below ~919px, with the hamburger not taking over until ≤768px (measured and reverted before merge — `SITE_GUIDE §47`, and the proposed fix is filed in this backlog as *Desktop nav capacity + The Dashboard entry* with the full measurement table). The nav-height change is the serious half, because several pages hardcode sticky offsets against 65px. A "Retirement" nav item therefore **cannot** be added without either the grouped-subsection treatment or making capacity first. Settle which before design.
+  - **Open questions:** hub as a thin landing page vs. the shared-scenario **"your plan travels with you"** surface (params already carry between the family pages — the hub could be where that becomes explicit rather than incidental); nav label (**"Retirement"** vs **"Plan Your Retirement"**).
+  - **Cross-links:** all four family pages; `/calculators` (today's discovery surface for the family) and the dashboard's jump-back-in row.
+
+- [ ] **Retirement-funds-to-bitcoin mechanics — SCOPING QUESTION (counsel-gated).**
+  _Moved here 2026-08-21 from "Tools & suite plumbing" — the entry's own text already predicted this home ("likely better as an extension of the retirement cluster than a standalone page"), and the cluster now exists to hold it. It was never really a plumbing item._
+  Surfaced 2026-07-30. Open question — decide at promotion time; do not build ahead of the counsel read.
+  - **Why flagged:** the action-steps content ("how to actually move retirement funds") sits closer to the advice line than anything on the site, incl. STRC.
+  - **Split:** JM's first-person experience → the Bitcoin Exit essay (memoir). Site version IF ANY = facts-only survey of existing mechanisms (self-directed IRA, ETF-in-IRA, rollover paths, custody trade-offs), US-flagged, heavily disclaimed, hard counsel gate — likely better as an extension of the retirement cluster than a standalone page.
+  - **STATUS 2026-08-03 — memoir half discharged.** The first-person half shipped as **The Bitcoin Exit** (published 2026-08-03; see Promoted / shipped). What this entry still tracks is the *facts-only site survey* — which remains the open, counsel-gated question. Publishing the memoir does not move the counsel gate on the site version.
+  - **If the hub ships first,** this becomes a candidate hub spoke rather than a standalone page — which may also be the lightest way to carry it past the counsel gate (a survey section under a hub reads less like an instruction than a page titled for the action).
+
+**Cross-references — family-adjacent items filed elsewhere, deliberately not moved:**
+- *Three-track scenario comparison* (Financialization cluster) — BFI extension, not a retirement page; see the disambiguation note above.
+- *House pattern for multi-tab explorations* (Site & platform) — names **Retirement first** for the sticky-tab-bar + continue-links retrofit audit.
+- *Retrofit WHY-intros to existing interactive pages* (Site & platform) — lists the flagship's slider clusters among its likely candidates.
+- *Power Law cluster* — its fences already state the Power Law page "does not own withdrawal implications (retirement cluster does)". That fence now points at a named cluster.
+
 ### Tools & suite plumbing
 
 - [x] **WODN position receiver — enable the underwater-manager handoff from How Much Cash. SHIPPED 2026-08-09 (branch `feat/wodn-position-receiver`, `2d945a7`).**
@@ -353,11 +396,7 @@ Captured during the merge pass, because the backlog is now large enough that the
   - **Collision fences:** exponential-blindness belongs to the Doubling Ladder; lump-sum-vs-DCA belongs to Wait-or-Deploy — scope to the conviction-DCA computation only, cross-links do the rest.
   - **Seed exists (2026-08-03):** `scripts/thirty-a-day-chart.ps1` — sim + chart computed from `PL_DATA`, parameterized `-Daily`/`-StartDate`, log-linear daily interpolation. Written for The Bitcoin Exit's one-off chart but built to generalize. The essay is now live and will link the tool when built — the ready-made re-promotion moment.
 
-- [ ] **Retirement-funds-to-bitcoin mechanics — SCOPING QUESTION (counsel-gated).**
-  Surfaced 2026-07-30. Open question — decide at promotion time; do not build ahead of the counsel read.
-  - **Why flagged:** the action-steps content ("how to actually move retirement funds") sits closer to the advice line than anything on the site, incl. STRC.
-  - **Split:** JM's first-person experience → the Bitcoin Exit essay (memoir). Site version IF ANY = facts-only survey of existing mechanisms (self-directed IRA, ETF-in-IRA, rollover paths, custody trade-offs), US-flagged, heavily disclaimed, hard counsel gate — likely better as an extension of the retirement cluster than a standalone page.
-  - **STATUS 2026-08-03 — memoir half discharged.** The first-person half shipped as **The Bitcoin Exit** (published 2026-08-03; see Promoted / shipped). What this entry still tracks is the *facts-only site survey* — which remains the open, counsel-gated question. Publishing the memoir does not move the counsel gate on the site version.
+_(**Retirement-funds-to-bitcoin mechanics** moved 2026-08-21 to the new **Retirement family** cluster above — the entry itself had always flagged that as its likely home.)_
 
 ### Thesis, arguments & essays
 
