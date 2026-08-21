@@ -660,7 +660,9 @@ eleventyComputed:
         <div class="updates-label">Recent updates</div>
         <div class="updates-scroller" tabindex="0">
             {% for u in updates %}{% if loop.index <= 8 %}
-            <a class="update-row" href="{{ u.page }}">
+            {# .html stripped for the same reason as /updates: these hrefs come from
+               updates.json data, so a clean-URL sweep over src/ never touches them. #}
+            <a class="update-row" href="{{ u.page | replace('.html', '') }}">
                 <span class="update-date">{{ u.display }}</span>
                 <span class="update-text">{{ u.summary }}</span>
             </a>
