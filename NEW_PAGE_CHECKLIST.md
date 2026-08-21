@@ -135,10 +135,20 @@ data-driven from this registry; see `STYLE_GUIDE §6.9.1`):
   tile in the top Featured row with the large-card styling. Reserved
   for the two highest-leverage personal-decision tools (currently
   Bitcoin Retirement and BvSM).
-- **`position`** (required) — integer sort key. Featured and grid
-  sections are sorted by position independently, so featured entries
-  should have the lowest positions overall and grid entries should
-  number sequentially from there.
+- **`position`** (required, and **must be unique across every tile**) —
+  integer sort key. Featured and grid sections are sorted by position
+  independently, so featured entries should have the lowest positions
+  overall and grid entries should number up from there. **Positions are
+  sparse, assigned in tens** (10, 20, 30, …): the gaps are insertion
+  room, so a new tile slots between two neighbours by taking a value
+  between them (e.g. `75` between `70` and `80`) without renumbering
+  anything else. **Never reuse a number.** The sort is stable, so two
+  tiles sharing a position render in `explorations.json` source order —
+  which looks fine until someone reorders the file and the hub silently
+  re-ranks. Two such collisions (at 5 and 10) were cleared in the
+  2026-08-21 hygiene pass. Check with:
+  `grep -o '"position": [0-9]*' src/_data/explorations.json | sort | uniq -d`
+  (any output is a collision).
 
 Note: the previous boolean `is_calculator` flag was retired in the June 2026
 data-driven refactor. The flag was dead code (no template read it) and its
@@ -274,6 +284,30 @@ When in doubt, write it long, then cut by half.
 > tiles. Badges self-expire at the next deploy after their window closes.
 > There is no manual flag to set and no chip to remove later. (Framework:
 > SITE_GUIDE §40.3; token styling: STYLE_GUIDE §6.39.)
+
+**The entry ships in the same PR as the page — it is not a follow-up.**
+A page that lands without its `updates.json` entry gets no NEW badge, and
+the miss is invisible: nothing errors, the nav just quietly looks like
+nothing shipped (this is how Escape Velocity went badge-less until the
+2026-08-21 audit). Check that every recently-added page has one:
+
+```
+for f in src/*.njk; do s=$(basename "$f" .njk); \
+  grep -q "\"/$s" src/_data/updates.json || echo "no updates.json entry: $s"; done
+```
+
+> **Do not back-fill entries for old pages to silence that check.**
+> `freshness.js` derives NEW from a slug's *first* entry in this file, not
+> from its launch date (the documented CAVEAT at the top of that module),
+> so adding a 2026 entry for a 2025 page lights a false NEW badge in the
+> nav for 30 days. 19 pages predate the strip and correctly have no entry;
+> leaving them alone is the right call. The check is for pages shipping
+> *now*.
+
+New entries should write `"page"` in the clean form (`"/your-page"`).
+`freshness.js` normalizes either form and `updates.njk` strips a trailing
+`.html` when rendering, so historical `.html` entries stay correct — but
+the clean form is what the rest of the site links to.
 
 ## 6. Tool-framing strip
 
@@ -613,7 +647,13 @@ the following. Copy from a complete reference (e.g.
   question-title family.
 - **Meta description** — single declarative sentence, 140-155
   characters, no marketing language. Should read as a useful summary
-  even out of context.
+  even out of context. **Must be unique across the site** — never copy
+  a sibling page's description as a starting point and leave it. The
+  2026-08-21 hygiene pass found `/about` still carrying the homepage's
+  description verbatim, and 27 descriptions over the 160-character
+  truncation point. Check both with:
+  `grep -h 'name="description"' src/_includes/_pageassets/*-head.html | sort | uniq -d`
+  (any output is a duplicate).
 - **Canonical link** — `<link rel="canonical" href="https://lastcoinstanding.com/<slug>">`.
   Self-referential. Required for every page even if there are no
   duplicates today; protects against future URL parameter drift.
@@ -621,6 +661,35 @@ the following. Copy from a complete reference (e.g.
   to clean form; mismatch between canonical-claimed URL and actually-
   served URL breaks Twitter OG cards. See the IMPORTANT callout under
   §7 above for the full failure mode.
+  **The same clean form is required in `og:url` and in every JSON-LD
+  `url` / `@id`** — all four must name the identical string, and it must
+  be the one that actually serves 200 without a redirect hop. Verify:
+  `curl -s -o /dev/null -w '%{http_code}\n' https://lastcoinstanding.com/<slug>`
+  must print `200`, not `308`.
+  **Internal links to the page use the clean form too** — every
+  `href="/<slug>"`, never `href="/<slug>.html"`. The `.html` form works
+  but costs a 308 on every click and disagrees with the canonical the
+  same page claims. Site-wide check (should print `0`):
+  `grep -roh 'href="[^"]*\.html' src/ | wc -l`
+- **URL params never serialize on load, and never at a default value**
+  (interactive pages with a scenario-URL writer). A bare visit must leave
+  the address bar exactly as the reader arrived with it — no
+  `replaceState` during init, and none from the async live-price render
+  either; the first real *interaction* is what starts writing. The writer
+  then omits any key still sitting at its default (`if (val === def)
+  params.delete(key)`), reads the live query string rather than rebuilding
+  it (so foreign params survive), and always re-appends
+  `window.location.hash`. Three failure modes this prevents, all found in
+  the 2026-08-21 pass: a page greeting every reader with an 11-param URL
+  of its own defaults; a *shared* link silently pinned to whatever the
+  defaults happened to be that day, so it keeps rendering the old scenario
+  after the monthly refresh moves them; and `'?' + params` writes that
+  discarded the fragment, breaking `#anchor` deep links this site
+  publishes in `sitemap.xml`. Where a default comes from a shared
+  canonical (`ModelingAssumptions`), read `def` from it rather than
+  restating the number — a stale hardcoded copy is what produced
+  `?advrate=5` on Bitcoin vs. Real Estate. Verify on the deployed page:
+  load it clean, then check `location.href` is unchanged.
 - **Open Graph tags** — `og:type`, `og:url`, `og:title`,
   `og:description`, `og:image`, `og:image:width`, `og:image:height`,
   `og:image:type`, `og:image:alt`. The image must be 1280×720 JPEG;

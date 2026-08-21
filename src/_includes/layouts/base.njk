@@ -512,7 +512,7 @@ h1, h2, h3 {
             <button type="button" class="nav-dropdown-btn{% if currentCat == 'foundations' %} active{% endif %}" aria-expanded="false" aria-controls="nav-menu-foundations">Foundations <span class="nav-caret" aria-hidden="true">&#9662;</span></button>
             <div class="nav-dropdown-menu" id="nav-menu-foundations">
 {%- for e in explorations %}{% if e.category == 'foundations' %}
-        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+        <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
             </div>
@@ -523,7 +523,7 @@ h1, h2, h3 {
 {%- for g in argumentsGroups %}
                 <div class="nav-dropdown-group-label">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'arguments' and e.group == g %}
-        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+        <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
 {%- endfor %}
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
@@ -544,7 +544,7 @@ h1, h2, h3 {
                         <div class="nav-dropdown-group-label">{{ g }}</div>
                         <div class="nav-mega-split">
 {%- for e in explorations %}{% if e.category == 'numbers' and e.group == g %}
-                            <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+                            <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
                         </div>
                     </div>
@@ -552,7 +552,7 @@ h1, h2, h3 {
                     <div class="nav-mega-col">
                         <div class="nav-dropdown-group-label">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'numbers' and e.group == g %}
-                        <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+                        <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
                     </div>
 {%- endif %}
@@ -570,9 +570,9 @@ h1, h2, h3 {
             `overflow-x: clip` hides the spill rather than exposing it). The nav
             height matters beyond looks — several pages hardcode sticky offsets
             against 65px. Capacity has to be made before this row gains an item. -#}
-        <a href="/the-gallery.html"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
-        <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
-        <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
+        <a href="/the-gallery"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
+        <a href="/calculators"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
+        <a href="/about"{% if slug == 'about' %} class="active"{% endif %}>About</a>
     </div>
         <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="mobileOverlay"><span></span><span></span><span></span></button>
     </nav>
@@ -606,7 +606,7 @@ h1, h2, h3 {
             <button type="button" class="m-acc-btn" aria-expanded="{% if currentCat == 'foundations' %}true{% else %}false{% endif %}" aria-controls="m-sec-foundations">Foundations <span class="m-acc-caret" aria-hidden="true">&#9662;</span></button>
             <div class="m-acc-panel" id="m-sec-foundations">
 {%- for e in explorations %}{% if e.category == 'foundations' %}
-                <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+                <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
             </div>
         </div>
@@ -616,7 +616,7 @@ h1, h2, h3 {
 {%- for g in argumentsGroups %}
                 <div class="mobile-section-sublabel">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'arguments' and e.group == g %}
-                <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+                <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
 {%- endfor %}
             </div>
@@ -627,15 +627,15 @@ h1, h2, h3 {
 {%- for g in numbersGroups %}
                 <div class="mobile-section-sublabel">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'numbers' and e.group == g %}
-                <a href="/{{ e.slug }}.html"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+                <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
 {%- endfor %}
             </div>
         </div>
-        <a href="/dashboard.html"{% if slug == 'dashboard' %} class="active"{% endif %}>The Dashboard</a>
-        <a href="/the-gallery.html"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
-        <a href="/calculators.html"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
-        <a href="/about.html"{% if slug == 'about' %} class="active"{% endif %}>About</a>
+        <a href="/dashboard"{% if slug == 'dashboard' %} class="active"{% endif %}>The Dashboard</a>
+        <a href="/the-gallery"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
+        <a href="/calculators"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
+        <a href="/about"{% if slug == 'about' %} class="active"{% endif %}>About</a>
         <div class="mobile-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
     </div>
 
@@ -718,26 +718,26 @@ h1, h2, h3 {
         <div class="footer-nav-section">
             <div class="footer-nav-label">Foundations</div>
 {%- for e in explorations %}{% if e.category == 'foundations' %}
-            <a href="/{{ e.slug }}.html">{{ e.title | safe }}</a>
+            <a href="/{{ e.slug }}">{{ e.title | safe }}</a>
 {%- endif %}{%- endfor %}
         </div>
         <div class="footer-nav-section">
             <div class="footer-nav-label">The Arguments</div>
 {%- for e in explorations %}{% if e.category == 'arguments' %}
-            <a href="/{{ e.slug }}.html">{{ e.title | safe }}</a>
+            <a href="/{{ e.slug }}">{{ e.title | safe }}</a>
 {%- endif %}{%- endfor %}
         </div>
         <div class="footer-nav-section">
             <div class="footer-nav-label">The Numbers</div>
 {%- for e in explorations %}{% if e.category == 'numbers' %}
-            <a href="/{{ e.slug }}.html">{{ e.title | safe }}</a>
+            <a href="/{{ e.slug }}">{{ e.title | safe }}</a>
 {%- endif %}{%- endfor %}
         </div>
         <div class="footer-nav-section">
             <div class="footer-nav-label">Site</div>
-            <a href="/the-gallery.html">The Gallery</a>
-            <a href="/calculators.html">Calculators</a>
-            <a href="/about.html">About</a>
+            <a href="/the-gallery">The Gallery</a>
+            <a href="/calculators">Calculators</a>
+            <a href="/about">About</a>
         </div>
     </nav>
     <div class="footer-tip">

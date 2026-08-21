@@ -13,9 +13,9 @@ faq:
   - q: "What is bitcoin escape velocity?"
     a: "It is the point where a stack's growth outpaces the money drawn out of it, so the portfolio stops running down and starts running up. This page checks that condition every year from retirement to the end of the modeled horizon: escape velocity is reached only if growth stays ahead for <em>every</em> remaining year, not just the first one."
   - q: "Is this a guarantee that a bitcoin retirement works?"
-    a: "No. Every figure here is a projection under the Power Law growth model, which is a description of bitcoin's historical trend, not a promise about its future (see <a href='/the-power-law.html'>Bitcoin and the Power Law</a>). The model's trend growth rate declines with time, and real markets do not deliver an average every year. Change the price basis or the inflation assumption and the answer can flip — which is the point of letting you change them."
+    a: "No. Every figure here is a projection under the Power Law growth model, which is a description of bitcoin's historical trend, not a promise about its future (see <a href='/the-power-law'>Bitcoin and the Power Law</a>). The model's trend growth rate declines with time, and real markets do not deliver an average every year. Change the price basis or the inflation assumption and the answer can flip — which is the point of letting you change them."
   - q: "What happens if a crash lands early in retirement?"
-    a: "This page does not model one. A bear market in the first years of withdrawals sells more bitcoin to cover the same bill, and that stack never comes back even if price recovers — sequence-of-returns risk. The companion <a href='/the-bitcoin-retirement-stress-test.html'>Retirement Stress Test</a> exists to model exactly that, and it is where this page's answer gets tested."
+    a: "This page does not model one. A bear market in the first years of withdrawals sells more bitcoin to cover the same bill, and that stack never comes back even if price recovers — sequence-of-returns risk. The companion <a href='/the-bitcoin-retirement-stress-test'>Retirement Stress Test</a> exists to model exactly that, and it is where this page's answer gets tested."
   - q: "Why does the page default to today's dollars?"
     a: "Because nominal figures flatter the result. Part of any nominal escape is the dollar shrinking rather than the stack growing, so a real-dollar test is the harder and more honest one. You can switch to nominal under &quot;Assumptions &mdash; change&quot; below the year-by-year strip; the verdict relabels itself and says what the switch costs you in honesty."
 eleventyComputed:
@@ -193,7 +193,7 @@ eleventyComputed:
       </div>
     </div>
 
-    <p class="ev-caveat">Trend growth is a multi-year average, not an annual delivery schedule. The Power Law says nothing about the order in which returns arrive, and the order is what breaks retirement plans &mdash; see the <a href="/the-bitcoin-retirement-stress-test.html">Retirement Stress Test</a>.</p>
+    <p class="ev-caveat">Trend growth is a multi-year average, not an annual delivery schedule. The Power Law says nothing about the order in which returns arrive, and the order is what breaks retirement plans &mdash; see the <a href="/the-bitcoin-retirement-stress-test">Retirement Stress Test</a>.</p>
   </section>
 
   <!-- ════════ THE THRESHOLD (round 2 #1–#7) ════════
@@ -406,7 +406,7 @@ eleventyComputed:
           </div>
 
           <div class="ev-assump-label">Bitcoin growth model
-            <span class="help-tip" tabindex="0">?<span class="tip-content">Saved on this device and shared across every calculator on the site. <a href="/the-power-law.html#summary">What is the Power Law?</a></span></span>
+            <span class="help-tip" tabindex="0">?<span class="tip-content">Saved on this device and shared across every calculator on the site. <a href="/the-power-law#summary">What is the Power Law?</a></span></span>
           </div>
           <div class="ev-assump-control">
             <div class="seg-control" role="group" aria-label="Bitcoin growth model" data-dim="btcGrowthModel">
@@ -447,7 +447,7 @@ eleventyComputed:
             <tbody id="evVerifyRows"><!-- JS-populated --></tbody>
           </table>
         </div>
-        <p class="rt-note"><a href="/the-bitcoin-retirement.html" id="evFlagshipLink">Open this scenario in the full retirement calculator &rarr;</a> &mdash; that page is the audit surface, with the price chart, the accumulation phase, and the comparison columns this one leaves out.</p>
+        <p class="rt-note"><a href="/the-bitcoin-retirement" id="evFlagshipLink">Open this scenario in the full retirement calculator &rarr;</a> &mdash; that page is the audit surface, with the price chart, the accumulation phase, and the comparison columns this one leaves out.</p>
       </div>
     </div>
   </section>
@@ -456,7 +456,7 @@ eleventyComputed:
   <section class="ev-section" id="both-sides" aria-label="The other side">
     <div class="ev-bothsides">
       <div class="ev-bothsides-tag">The other side of this</div>
-      <p>Escape velocity is a property of the model&rsquo;s growth assumption, not of bitcoin. Everything above assumes returns arrive in trend order &mdash; smoothly, on schedule, every year. They do not. A crash early in retirement forces the sale of far more bitcoin to cover the same bill than the trend-relative arithmetic here implies, and that stack does not come back when price does. The <a href="/the-bitcoin-retirement-stress-test.html">Retirement Stress Test</a> is where this plan gets hurt on purpose; run it before you believe a green bar.</p>
+      <p>Escape velocity is a property of the model&rsquo;s growth assumption, not of bitcoin. Everything above assumes returns arrive in trend order &mdash; smoothly, on schedule, every year. They do not. A crash early in retirement forces the sale of far more bitcoin to cover the same bill than the trend-relative arithmetic here implies, and that stack does not come back when price does. The <a href="/the-bitcoin-retirement-stress-test">Retirement Stress Test</a> is where this plan gets hurt on purpose; run it before you believe a green bar.</p>
       <p>The same caution runs the other way. If bitcoin trades below its long-term trend today, a plan built on the gap-persists basis is planning for a discount that has historically closed. Neither basis is the safe one in every regime, which is why the page reports both.</p>
     </div>
 

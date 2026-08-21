@@ -228,7 +228,7 @@
     if (link){
       var stackParam = existingBtc.toFixed(2);
       var dcaMonthly = Math.round(S.amt * 30.4);
-      link.setAttribute('href', '/the-bitcoin-retirement.html?stack=' + stackParam + '&dca=' + dcaMonthly);
+      link.setAttribute('href', '/the-bitcoin-retirement?stack=' + stackParam + '&dca=' + dcaMonthly);
       if ($('dcHandoffNote')) $('dcHandoffNote').innerHTML =
         'Carries your <strong>' + existingBtc.toFixed(2) + ' BTC</strong> stack and this habit as a <strong>$' +
         dcaMonthly.toLocaleString() + '/mo</strong> contribution (≈ $' + S.amt + '/day × 30.4).';

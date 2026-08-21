@@ -1056,11 +1056,25 @@
   }
 
   // ════════ URL STATE (?y=<horizon-years>) ════════
+  // Shipped default, snapshotted at init before readUrl() mutates `state`.
+  var URL_DEFAULTS = null;
+  // No URL write during the initial render (renderCalc → syncUrl, init → renderAll → renderCalc).
+  var _suppressUrlWrite = true;
+  function yParam(months) {
+    var y = months / 12;
+    return (months % 12 === 0) ? String(y) : y.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+  }
   function syncUrl() {
+    if (_suppressUrlWrite) return;
     if (!window.history || !window.history.replaceState) return;
-    var y = (state.months / 12);
-    var v = (state.months % 12 === 0) ? String(y) : y.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
-    try { window.history.replaceState(null, '', '?y=' + v); } catch (e) { /* file:// or blocked */ }
+    if (!URL_DEFAULTS) return;
+    // Read the live query string and carry location.hash through. The old form
+    // ('?y=' + v) discarded every foreign param and the fragment on each write.
+    var p = new URLSearchParams(window.location.search);
+    var v = yParam(state.months);
+    if (v === yParam(URL_DEFAULTS.months)) p.delete('y'); else p.set('y', v);
+    var qs = p.toString();
+    try { window.history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash); } catch (e) { /* file:// or blocked */ }
   }
   function readUrl() {
     var m = /[?&]y=([0-9.]+)/.exec(window.location.search);
@@ -1103,11 +1117,14 @@
   }
 
   function init() {
+    URL_DEFAULTS = JSON.parse(JSON.stringify(state));
     readUrl();
     wire();
     buildChart();
     renderSlope();
     renderAll();
+    // Initial render is done; from here a user change may write the URL.
+    _suppressUrlWrite = false;
     if (typeof fetchTodayPrice === 'function') {
       fetchTodayPrice(function (p, source) {
         livePrice = p; liveSource = source;

@@ -644,17 +644,33 @@
   // ═══════════════════════════════════════════════════════════════
   // URL STATE  (?h=&dv=&ov=&p=)
   // ═══════════════════════════════════════════════════════════════
+  // Shipped defaults, snapshotted at init before readUrl() mutates `state`.
+  var URL_DEFAULTS = null;
+  // No URL write during the initial render (renderLens → syncUrl, and
+  // renderPriceDependent → renderLens on init).
+  var _suppressUrlWrite = true;
   function syncUrl() {
+    if (_suppressUrlWrite) return;
     if (!window.history || !window.history.replaceState) return;
-    var params = [];
-    params.push('h=' + (state.never ? 'never' : (state.months / 12).toFixed(2).replace(/0+$/, '').replace(/\.$/, '')));
-    params.push('dv=' + state.div);
+    if (!URL_DEFAULTS) return;
+    var D = URL_DEFAULTS;
+    // Read the live query string rather than rebuilding from scratch, and carry
+    // location.hash through. The old form ('?' + params) dropped BOTH any foreign
+    // param and the fragment — so landing on /the-strc-mechanism#sharp, a URL this
+    // site publishes in sitemap.xml, silently lost the anchor before the browser
+    // could scroll to it.
+    var p = new URLSearchParams(window.location.search);
+    var h = state.never ? 'never' : (state.months / 12).toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+    var hDef = D.never ? 'never' : (D.months / 12).toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+    if (h === hDef) p.delete('h'); else p.set('h', h);
+    if (state.div === D.div) p.delete('dv'); else p.set('dv', state.div);
     var ov = [];
     if (state.ovBtc) ov.push('btc');
     if (state.ovTsy) ov.push('tsy');
-    if (ov.length) params.push('ov=' + ov.join(','));
-    if (state.priceOverride != null) params.push('p=' + state.priceOverride.toFixed(2));
-    try { window.history.replaceState(null, '', '?' + params.join('&')); } catch (e) { /* file:// */ }
+    if (ov.length) p.set('ov', ov.join(',')); else p.delete('ov');
+    if (state.priceOverride != null) p.set('p', state.priceOverride.toFixed(2)); else p.delete('p');
+    var qs = p.toString();
+    try { window.history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash); } catch (e) { /* file:// */ }
   }
   function readUrl() {
     var q = window.location.search;
@@ -751,6 +767,7 @@
       var be = breakevens();
       console.log('[strc] breakevens: gross=1x@$' + Math.round(be.gross) + '  standalone/waterfall=1x@$' + Math.round(be.senior));
     }
+    URL_DEFAULTS = JSON.parse(JSON.stringify(state));
     readUrl();
     wire();
     syncNeverBox();
@@ -759,6 +776,8 @@
     renderAllStatic();
     renderCoverage();
     renderPriceDependent();
+    // Initial render is done; from here a user change may write the URL.
+    _suppressUrlWrite = false;
     if (typeof fetchTodayPrice === 'function') {
       fetchTodayPrice(function (p, source) {
         btcSpot = p; btcSource = source;

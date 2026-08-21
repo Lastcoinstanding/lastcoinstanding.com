@@ -54,7 +54,7 @@
       "preview_kind": "live-chart",
       "preview_id": "mini-half-life",
       "anchor": "",
-      "position": 13
+      "position": 150
     }
   },
   {
@@ -74,7 +74,7 @@
       "tagline": "Corporate treasuries against monetary debasement &mdash; bitcoin as the dollar-melt antidote.",
       "preview_kind": "svg",
       "anchor": "",
-      "position": 14
+      "position": 160
     }
   },
   {
@@ -88,7 +88,7 @@
       "tagline": "What does owning a piece of 21 million actually mean as a share of all the bitcoin there will ever be?",
       "preview_kind": "svg",
       "anchor": "",
-      "position": 12
+      "position": 140
     }
   },
   {
@@ -148,7 +148,7 @@
       "anchor": "#channel",
       "preview_kind": "live-chart",
       "preview_id": "mini-power-law",
-      "position": 5
+      "position": 50
     }
   },
   {
@@ -202,7 +202,7 @@
       "preview_kind": "live-chart",
       "preview_id": "mini-bvsm-chart",
       "featured": true,
-      "position": 2
+      "position": 20
     }
   },
   {
@@ -214,7 +214,7 @@
     "calculator_tile": {
       "tagline": "Bitcoin or a house &mdash; looking back, or projecting forward? Full mortgage and ownership costs included.",
       "preview_kind": "svg",
-      "position": 6
+      "position": 70
     }
   },
   {
@@ -226,7 +226,7 @@
     "calculator_tile": {
       "tagline": "Bitcoin or rental property &mdash; the yield comparison once landlord costs and tax leakage are surfaced.",
       "preview_kind": "svg",
-      "position": 7
+      "position": 80
     }
   },
   {
@@ -241,7 +241,7 @@
       "preview_id": "mini-lump-vs-dca",
       "anchor": "#calculator",
       "featured": false,
-      "position": 15
+      "position": 170
     }
   },
   {
@@ -256,7 +256,7 @@
       "preview_id": "mini-deployment-plan",
       "anchor": "#calculator",
       "featured": false,
-      "position": 16
+      "position": 180
     }
   },
   {
@@ -271,10 +271,11 @@
       "preview_id": "mini-wait-or-deploy",
       "anchor": "#comparator",
       "featured": false,
-      "position": 17
+      "position": 190
     }
   },
   {
+    "_comment": "CALCULATOR_TILE.POSITION CONVENTION — positions are SPARSE, assigned in tens (10, 20, 30, …). The gaps are insertion room: a new tile slots between two neighbours by taking a value between them (e.g. 75 to land between 70 and 80) with no renumbering of anything else. Positions must be UNIQUE — the /calculators sort is stable, so duplicates render in explorations.json source order, which silently makes intent unrecoverable the moment anyone reorders this file. Two such collisions (at 5 and 10) were resolved in the 2026-08-21 hygiene pass; the ordering they had been producing was preserved exactly. The sort filter lives in .eleventy.js (sortByCalculatorTilePosition); entries with no calculator_tile sort last and are filtered out by the template.",
     "slug": "the-bitcoin-retirement",
     "title": "The Bitcoin Retirement",
     "category": "numbers",
@@ -285,7 +286,7 @@
       "preview_kind": "live-chart",
       "preview_id": "mini-retirement",
       "featured": true,
-      "position": 1
+      "position": 10
     }
   },
   {
@@ -299,7 +300,7 @@
       "tagline": "Drop a bear market into a retirement plan, then change the year you retire. The same plan can survive one year and deplete another.",
       "preview_kind": "svg",
       "anchor": "#stress",
-      "position": 18
+      "position": 200
     }
   },
   {
@@ -313,7 +314,7 @@
       "tagline": "A retirement portfolio is supposed to draw down. Find the threshold past which a bitcoin stack runs up instead — and how little it takes to cross it.",
       "preview_kind": "svg",
       "anchor": "#threshold",
-      "position": 22
+      "position": 240
     }
   },
   {
@@ -327,7 +328,7 @@
       "tagline": "Does bitcoin earn its place in a portfolio? The extra return over a long hold, the drawdown you must be able to hold through, and how much of the portfolio's movement it drives. Growth projected from the Power Law.",
       "preview_kind": "svg",
       "anchor": "#worth-it",
-      "position": 19
+      "position": 210
     }
   },
   {
@@ -340,7 +341,7 @@
       "tagline": "Turn the Power Law channel into a protocol &mdash; sell at upper-band triggers, rebuy at lower.",
       "preview_kind": "live-chart",
       "preview_id": "mini-rebalancing",
-      "position": 3
+      "position": 30
     }
   },
   {
@@ -353,7 +354,7 @@
       "tagline": "Does this use of capital beat holding bitcoin? Set a return and a horizon &mdash; the trend hurdle, matched to that window and declining with it, for a company or a person.",
       "preview_kind": "svg",
       "anchor": "#explore",
-      "position": 20
+      "position": 220
     }
   },
   {
@@ -367,7 +368,7 @@
       "preview_kind": "svg",
       "anchor": "#curve",
       "featured": false,
-      "position": 4
+      "position": 40
     }
   },
   {
@@ -381,7 +382,7 @@
       "preview_kind": "svg",
       "anchor": "#playground",
       "featured": false,
-      "position": 5
+      "position": 60
     }
   },
   {
@@ -395,7 +396,7 @@
       "preview_kind": "svg",
       "anchor": "#calculator",
       "featured": false,
-      "position": 10
+      "position": 110
     }
   },
   {
@@ -409,7 +410,7 @@
       "anchor": "#explorer",
       "preview_kind": "live-chart",
       "preview_id": "mini-horizon",
-      "position": 11
+      "position": 130
     }
   },
   {
@@ -421,7 +422,7 @@
     "calculator_tile": {
       "tagline": "When does borrowing make more sense than selling? Model liquidation distance vs. retained-coin upside.",
       "preview_kind": "svg",
-      "position": 9
+      "position": 100
     }
   },
   {
@@ -433,7 +434,7 @@
     "calculator_tile": {
       "tagline": "Buy the house with bitcoin as collateral &mdash; the structural mortgage trade-off across counterparty tiers.",
       "preview_kind": "svg",
-      "position": 10
+      "position": 120
     }
   },
   {
@@ -455,7 +456,7 @@
       "tagline": "Bitcoin-backed preferreds vs holding bitcoin &mdash; the bear-case insurance trade, with the actual crossover horizon and stress behavior shown.",
       "preview_kind": "svg",
       "anchor": "#calculator",
-      "position": 8
+      "position": 90
     }
   },
   {
@@ -476,7 +477,7 @@
       "tagline": "Where bitcoin sits in its Power Law channel right now &mdash; trend multiple, zone, and what that has meant for a position. A live read, not a signal.",
       "preview_kind": "svg",
       "anchor": "",
-      "position": 21
+      "position": 230
     }
   },
   {
