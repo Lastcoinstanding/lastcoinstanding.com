@@ -954,18 +954,27 @@
     // v2's params (exp, buf, shock, hz, yld, depth, btc, dep, cy, rec) are retired.
     return present;
   }
+  // No URL write until the reader actually touches something. renderAll() calls
+  // syncUrl(), and renderAll() runs on init AND again when the live price lands —
+  // so without this gate a bare visit rewrites the address bar, and a returning
+  // reader has their stored (non-default) settings promoted into a URL they never
+  // asked for. Flipped by the capture-phase listener in wire().
+  var _suppressUrlWrite = true;
   var _urlT = null;
   function syncUrl() {
+    if (_suppressUrlWrite) return;
     if (!window.history || !window.history.replaceState) return;
     if (_urlT) clearTimeout(_urlT);
     _urlT = setTimeout(function () {
-      var p = new URLSearchParams();
-      p.set('share', String(S_.share));
-      if (S_.tax !== DEFAULTS.tax) p.set('tax', String(S_.tax));
-      if (S_.pos != null) p.set('pos', String(Math.round(S_.pos * 1000) / 1000));
-      if (S_.rebuy != null) p.set('rebuy', String(Math.round(S_.rebuy * 1000) / 1000));  // numeric target; cap (null) omitted
-      if (S_.stack) p.set('stack', String(S_.stack));
-      window.history.replaceState(null, '', window.location.pathname + '?' + p.toString() + window.location.hash);
+      // Seed from the live query string so foreign params survive a write.
+      var p = new URLSearchParams(window.location.search);
+      if (S_.share !== DEFAULTS.share) p.set('share', String(S_.share)); else p.delete('share');
+      if (S_.tax !== DEFAULTS.tax) p.set('tax', String(S_.tax)); else p.delete('tax');
+      if (S_.pos != null) p.set('pos', String(Math.round(S_.pos * 1000) / 1000)); else p.delete('pos');
+      if (S_.rebuy != null) p.set('rebuy', String(Math.round(S_.rebuy * 1000) / 1000)); else p.delete('rebuy');  // numeric target; cap (null) omitted
+      if (S_.stack) p.set('stack', String(S_.stack)); else p.delete('stack');
+      var qs = p.toString();
+      window.history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
     }, 250);
   }
 
@@ -1004,6 +1013,12 @@
     syncShare();
   }
   function wire() {
+    // One capture-phase gate rather than a flag flip in every handler below: the
+    // first real interaction anywhere on the page unlocks URL writing, and nothing
+    // that happens during load (initial render, live-price refresh) can slip past it.
+    ['input', 'change', 'click'].forEach(function (ev) {
+      document.addEventListener(ev, function () { _suppressUrlWrite = false; }, { capture: true, once: true });
+    });
     function on(id, ev, fn) { var e = document.getElementById(id); if (e) e.addEventListener(ev, fn); }
     function setShare(v, from) {
       if (!isFinite(v)) return;

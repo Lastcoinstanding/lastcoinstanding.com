@@ -2268,6 +2268,23 @@ _Added 2026-07, from the Retirement Stress Test v2.2 verdict rationalization. Ve
 
 Rationale: these rules keep a passage readable as one piece of writing while preserving hand-checkable reproducibility. A value may appear twice only when it is the hinge of two comparisons (state it both times; hiding one breaks reconciliation). The rule-4 corollary is a correction: the Stress Test's stack-underwater span and its price-path cut window coincide numerically at the default scenario but diverge under most other settings, so "those N lean years" (binding the cut-cost figure to the verdict's span) was retired for the self-anchored "the N years the cut ran". A coincidental match at one scenario is not structural identity.
 
+### 10.4 Toolbox naming: plain, purpose-first titles
+
+**JM ruling, 2026-08-21.** Exploration and tool titles default to **plain, purpose-first names a visitor can parse from a list** — the register of a well-labelled toolbox, not of an essay. The test is a cold one: a reader scanning `/calculators`, a nav dropdown or a search result has no context, no subtitle and about a second. The title has to say what the thing does.
+
+- **Prefer:** *Compare Retirement Plans*, *How Much Cash?*, *Bitcoin vs. Real Estate*, *Wait, or Deploy Now?*
+- **Not:** *Plan vs. Plan* — the shape of the comparison, not its subject. A reader cannot tell what is being compared, which is the whole job of the label.
+
+Verb-first is usually the shortest route to purpose-first, because a verb names what the reader will *do*.
+
+**Creative or evocative titles are exceptions, and carry two costs.** They require **explicit sign-off**, and they must be paired with a **plain subtitle that takes over nav and SEO duty** — the evocative line may own the hero, but something adjacent has to carry the searched phrase and the scan-ability the title gave up.
+
+The precedent is `/bitcoin-as-collateral` (`SITE_GUIDE §48`): H1 *"The pledge you can see."* — evocative, and it earns it — over a hero subtitle opening *"Collateral is the pledge behind a loan…"*, with the `<title>` tag reading plainly *"Bitcoin as Collateral"*. Three surfaces, and only one of them is allowed to be clever. Copy that pattern or don't take the exception.
+
+**Creative license belongs to Substack, not the toolbox.** An essay is read start to finish and its title is part of the writing; a tool is chosen from a list and its title is part of the interface. The same instinct that makes a good Substack headline makes a bad tile label. Keep the evocative version — it is often the right headline for the piece that announces the tool.
+
+Related: `§6.10a` (tool hero: say what it is and how to use it) applies the same principle one layer down, to the hero rather than the title. `NEW_PAGE_CHECKLIST §10` carries the check at build time.
+
 ---
 
 ## Appendix A: Survey findings (2026-04-26)

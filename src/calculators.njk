@@ -104,7 +104,7 @@ eleventyComputed:
         {% if ex.calculator_tile and ex.calculator_tile.featured %}
           {% set ct = ex.calculator_tile %}
           {% set anchor = ct.anchor if ct.anchor is defined else "#calculator" %}
-          <a href="/{{ ex.slug }}.html{{ anchor }}" class="calc-tile calc-tile-featured" aria-label="Open {{ ex.title | safe }} calculator">
+          <a href="/{{ ex.slug }}{{ anchor }}" class="calc-tile calc-tile-featured" aria-label="Open {{ ex.title | safe }} calculator">
             {% if freshness[ex.slug] == 'new' %}<span class="calc-tile-badge calc-tile-badge-new">New</span>{% elif freshness[ex.slug] == 'updated' %}<span class="calc-tile-badge calc-tile-badge-updated">Updated</span>{% endif %}
             <div class="calc-tile-preview">
               {% if ct.preview_kind == "live-chart" %}
@@ -137,7 +137,7 @@ eleventyComputed:
         {% if ex.calculator_tile and not ex.calculator_tile.featured %}
           {% set ct = ex.calculator_tile %}
           {% set anchor = ct.anchor if ct.anchor is defined else "#calculator" %}
-          <a href="/{{ ex.slug }}.html{{ anchor }}" class="calc-tile">
+          <a href="/{{ ex.slug }}{{ anchor }}" class="calc-tile">
             {% if freshness[ex.slug] == 'new' %}<span class="calc-tile-badge calc-tile-badge-new">New</span>{% elif freshness[ex.slug] == 'updated' %}<span class="calc-tile-badge calc-tile-badge-updated">Updated</span>{% endif %}
             <div class="calc-tile-preview">
               {% if ct.preview_kind == "live-chart" %}

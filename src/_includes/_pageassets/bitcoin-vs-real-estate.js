@@ -1018,7 +1018,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
           '<div class="detail-line">Monthly DCA into BTC: <span class="highlight">'+fmt(monthlySavings)+'/mo</span></div>' +
           '<div class="detail-line">BTC accumulated: '+dcaBtc.toFixed(4)+' BTC</div>' +
           '<div class="detail-line">Total invested via DCA: '+fmt(dcaTotalInvested)+' <span style="font-size:.72rem;color:var(--text-muted)">accumulated (\u2248'+fmt(monthlySavings)+'/mo \u00d7 '+totalMonths+' months)</span></div>' +
-          '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">DCA assumes BTC price follows a smooth geometric path from today\u2019s price to the projected endpoint (itself derived from the <a href="/the-power-law.html" style="color:var(--amber)">Power Law</a> scenario above).</div>' +
+          '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">DCA assumes BTC price follows a smooth geometric path from today\u2019s price to the projected endpoint (itself derived from the <a href="/the-power-law" style="color:var(--amber)">Power Law</a> scenario above).</div>' +
         '</div>';
       rightEl.innerHTML = '';
     } else {
@@ -1291,6 +1291,12 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     mortgage:  { elId: 'fwdMortgageRate',      type: 'float',     def: 6.8,     evt: 'input'  },
     down:      { elId: 'fwdDownPct',           type: 'float',     def: 20,      evt: 'input'  },
     advanced:  { elId: 'fwdAdvancedCheck',     type: 'bool',                    evt: 'change' },
+    // `def` is a placeholder — the real default is the canonical realReturns
+    // assumption, and init() overwrites this from ModelingAssumptions before any
+    // write can happen. Hardcoding it here is what produced `?advrate=5` on a bare
+    // load: markup ships value="7%", this said 7, but the canonical 'diversified'
+    // preset (5) overwrites the input on load, so the writer saw 5 !== 7 and
+    // serialized a value nobody chose.
     advrate:   { elId: 'fwdAdvancedRate',      type: 'float',     def: 7,       evt: 'input'  },
     method:    { type: 'btn-method',    sel: '.purchase-btn',   attr: 'method',   def: 'mortgage' },
     pscenario: { type: 'btn-pscenario', sel: '.scenario-btn',   attr: 'scenario', def: 'trend',    persist: false },
@@ -1430,7 +1436,13 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) { /* quota or disabled */ }
   }
 
+  // No URL write until the reader touches something. init() restores localStorage
+  // before the first sync, so an init-time write promoted a returning reader's
+  // stored settings into a URL they never asked for. Flipped by the capture-phase
+  // gate in wireWriters().
+  var _suppressUrlWrite = true;
   function syncUrl() {
+    if (_suppressUrlWrite) return;
     if (!window.history || !window.history.replaceState) return;
     var params = new URLSearchParams(window.location.search);
     Object.keys(SCHEMA).forEach(function(key){
@@ -1471,6 +1483,11 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   }
 
   function wireWriters() {
+    // One capture-phase gate: the first real interaction unlocks URL writing, and
+    // nothing during load (storage restore, initial render) can slip past it.
+    ['input', 'change', 'click'].forEach(function (ev) {
+      document.addEventListener(ev, function () { _suppressUrlWrite = false; }, { capture: true, once: true });
+    });
     Object.keys(SCHEMA).forEach(function(key){
       var spec = SCHEMA[key];
       if (spec.type === 'btn-method' || spec.type === 'btn-pscenario' || spec.type === 'btn-displaymode') {
@@ -1491,6 +1508,13 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   }
 
   function init() {
+    // Single-source the advrate default from the canonical assumption that
+    // actually drives the input, so the writer can recognise an untouched value.
+    try {
+      var _rr = window.ModelingAssumptions && window.ModelingAssumptions.get('realReturns');
+      if (_rr && isFinite(_rr.value)) SCHEMA.advrate.def = _rr.value;
+    } catch (e) { /* shared module absent — markup default stands */ }
+
     // Read order matters: storage is the base layer, URL overrides
     // per-key when present. So a shared link with ?home=420000 wins
     // for that param but leaves storage-restored year/horizon/etc.
@@ -1514,7 +1538,9 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     if (_activeMethodBtn) method = _activeMethodBtn.dataset.method;
 
     wireWriters();
-    syncUrl();
+    // No syncUrl() here by design. A load — fresh or storage-restored — leaves the
+    // address bar exactly as the reader arrived with it; the first interaction is
+    // what starts writing. Storage still syncs, so stickiness is unaffected.
     syncStorage();
   }
 

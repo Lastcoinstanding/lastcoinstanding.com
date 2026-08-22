@@ -997,29 +997,53 @@
     if (p.has('cmp') && (p.get('cmp') === 'retire' || p.get('cmp') === 'timing')) COMPARE_MODE = p.get('cmp');
     if (p.has('focus') && (p.get('focus') === 'full' || p.get('focus') === 'crash')) CHART_FOCUS = p.get('focus');
   }
+  // Shipped defaults, captured at init BEFORE readUrl() mutates anything, so the
+  // writer below can omit any param still sitting at its default. Snapshotting
+  // rather than restating the literals keeps this from drifting when a default
+  // is retuned on the monthly refresh (SITE_GUIDE §36).
+  var URL_DEFAULTS = null;
+  // No URL write during the initial render. renderAll() calls syncUrl(), and init()
+  // calls renderAll(), so without this guard a bare load rewrites the address bar
+  // with the full default scenario — which also pins every shared link to the
+  // defaults that happened to be shipped that day.
+  var _suppressUrlWrite = true;
   var _urlT = null;
   function syncUrl() {
+    if (_suppressUrlWrite) return;
     if (!window.history || !window.history.replaceState) return;
     if (_urlT) clearTimeout(_urlT);
     _urlT = setTimeout(function () {
+      if (!URL_DEFAULTS) return;
+      // Foreign params (and the hash) are preserved: this reads the live query
+      // string and only ever touches the keys this page owns.
       var p = new URLSearchParams(window.location.search);
-      Object.keys(URL_NUM).forEach(function (k) { p.set(k, String(SCENARIO[URL_NUM[k]])); });
-      p.set('incbasis', SCENARIO.incomeBasis);
-      p.set('cdepth', String(Math.round(CRASH.depthPct * 100)));
-      p.set('ctime', String(CRASH.timingYear));
-      p.set('crecov', CRASH.recoveryPreset);
-      if (FLEX > 0) p.set('flex', String(FLEX)); else p.delete('flex');
-      p.set('cmp', COMPARE_MODE);
-      p.set('focus', CHART_FOCUS);
-      window.history.replaceState(null, '', window.location.pathname + '?' + p.toString() + window.location.hash);
+      var D = URL_DEFAULTS;
+      function put(key, val, def) { if (String(val) === String(def)) p.delete(key); else p.set(key, String(val)); }
+      Object.keys(URL_NUM).forEach(function (k) { put(k, SCENARIO[URL_NUM[k]], D.scenario[URL_NUM[k]]); });
+      put('incbasis', SCENARIO.incomeBasis, D.scenario.incomeBasis);
+      put('cdepth', Math.round(CRASH.depthPct * 100), Math.round(D.crash.depthPct * 100));
+      put('ctime', CRASH.timingYear, D.crash.timingYear);
+      put('crecov', CRASH.recoveryPreset, D.crash.recoveryPreset);
+      put('flex', FLEX, D.flex);
+      put('cmp', COMPARE_MODE, D.cmp);
+      put('focus', CHART_FOCUS, D.focus);
+      var qs = p.toString();
+      window.history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
     }, 250);
   }
 
   // ════════ INIT ════════
   function init() {
+    URL_DEFAULTS = {
+      scenario: JSON.parse(JSON.stringify(SCENARIO)),
+      crash: JSON.parse(JSON.stringify(CRASH)),
+      flex: FLEX, cmp: COMPARE_MODE, focus: CHART_FOCUS
+    };
     readUrl();
     wire();
     renderAll();
+    // Initial render is done; from here a user change may write the URL.
+    _suppressUrlWrite = false;
     // Recompute when shared assumptions change on another page/tab (parity).
     try { window.ModelingAssumptions.subscribe && window.ModelingAssumptions.subscribe(renderAll); } catch (e) {}
   }

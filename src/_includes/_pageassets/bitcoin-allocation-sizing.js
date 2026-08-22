@@ -1081,27 +1081,44 @@
     if (p.has('cy')) { var cyv = parseInt(p.get('cy'), 10); if (isFinite(cyv)) { S.crashOn = true; S.crashYear = clamp(cyv, 1, 39); } }
     if (p.has('rec') && RECOVERY[p.get('rec')]) S.crashRec = p.get('rec');
   }
+  // Shipped defaults, snapshotted at init before readUrl() mutates S, so the writer
+  // can omit anything still sitting at its default rather than pinning it into
+  // every shared link.
+  var URL_DEFAULTS = null;
+  // No URL write during the initial render (renderAll → syncUrl, and init → renderAll).
+  var _suppressUrlWrite = true;
   var _urlT = null;
   function syncUrl() {
+    if (_suppressUrlWrite) return;
     if (!window.history || !window.history.replaceState) return;
     if (_urlT) clearTimeout(_urlT);
     _urlT = setTimeout(function () {
+      if (!URL_DEFAULTS) return;
       var p = new URLSearchParams(window.location.search);
-      p.set('alloc', String(S.allocPct)); p.set('hz', String(S.horizonYears));
-      p.set('tradr', String(S.tradRatePct)); p.set('depth', String(S.crashDepthPct));
+      var D = URL_DEFAULTS;
+      function put(key, val, def) { if (String(val) === String(def)) p.delete(key); else p.set(key, String(val)); }
+      put('alloc', S.allocPct, D.allocPct);
+      put('hz', S.horizonYears, D.horizonYears);
+      put('tradr', S.tradRatePct, D.tradRatePct);
+      put('depth', S.crashDepthPct, D.crashDepthPct);
       if (S.btcMode) p.set('btc', S.btcMode); else p.delete('btc');
-      if (activeMode() === 'flat') p.set('flat', String(S.btcFlatPct)); else p.delete('flat');
+      // `flat` only when the flat sleeve is actually in play AND the reader retuned
+      // its rate. activeMode() can land on 'flat' from the regime alone, and writing
+      // the untouched default there would pin a rate nobody chose.
+      if (activeMode() === 'flat' && S.btcFlatPct !== D.btcFlatPct) p.set('flat', String(S.btcFlatPct)); else p.delete('flat');
       if (hasUSD()) p.set('port', String(Math.round(S.portfolioUSD))); else p.delete('port');
       if (S.strat === 'rebal') p.set('strat', 'rebal'); else p.delete('strat');
       if (S.cmp) p.set('cmp', '1'); else p.delete('cmp');
       if (S.crashOn) p.set('cy', String(S.crashYear)); else p.delete('cy');
       if (S.crashOn && S.crashRec !== 'historical') p.set('rec', S.crashRec); else p.delete('rec');
-      window.history.replaceState(null, '', window.location.pathname + '?' + p.toString() + window.location.hash);
+      var qs = p.toString();
+      window.history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
     }, 250);
   }
 
   // ════════ INIT ════════
   function init() {
+    URL_DEFAULTS = JSON.parse(JSON.stringify(S));
     readUrl();
     // Deep link: #crash opens the crash disclosure even without crash params;
     // `cy` already set S.crashOn in readUrl. Scroll the drift section into view
@@ -1110,6 +1127,8 @@
     if (hash === '#crash') S.crashOn = true;
     var deepLink = S.crashOn || hash === '#crash' || hash === '#portfolio-over-time';
     wire(); renderAll();
+    // Initial render is done; from here a user change may write the URL.
+    _suppressUrlWrite = false;
     paritySweep(); // dev self-check: full matrix loop-vs-closed-form parity (silent unless it fails)
     if (deepLink) {
       var scrollToDrift = function () {
