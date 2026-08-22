@@ -43,6 +43,15 @@
   --fl-price: #6db3d4;      /* historical price — cool blue */
   --fl-break: #c0603a;      /* the one real break */
   --fl-graze: #7a7367;      /* the three grazes */
+
+  /* Entry-scatter eras. Four buckets, coloured only so the reader can see that
+     the deep-below points are all one era (2010) — which is the caveat, not a
+     decoration. Deliberately NOT a sequential ramp: these are categories. */
+  --fl-era-1: #c0603a;
+  --fl-era-2: #d9b36b;
+  --fl-era-3: #6db3d4;
+  --fl-era-4: #8fae7f;
+  --fl-axis:  rgba(224,148,34,0.28);
 }
 
 body { background: var(--bg); color: var(--text); }
@@ -165,6 +174,12 @@ body { background: var(--bg); color: var(--text); }
 .fl-honesty-item strong { color: var(--text); }
 .fl-parity-foot { font-family: var(--font-b); font-size: 0.75rem; line-height: 1.7; color: var(--text-muted); margin: 1.2rem 0 0; }
 
+/* ── Entry scatter (inside the parity section) ──────────── */
+.fl-scatter-block { margin-top: 2.6rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+.fl-scatter-lede { margin-bottom: 1.4rem; }
+.fl-scatter-lede em { color: var(--amber); font-style: italic; }
+.fl-scatter-wrapper { height: 420px; }
+
 /* ── Tripwire ───────────────────────────────────────────── */
 .fl-tripwire { background: var(--bg-card); border: 1px solid var(--border-strong); border-radius: 10px; padding: 1.7rem; max-width: 880px; }
 .fl-tripwire-head { font-family: var(--font-b); font-size: 0.66rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.9rem; }
@@ -203,6 +218,7 @@ body { background: var(--bg); color: var(--text); }
   .content-area { padding: 0 1.2rem 3.5rem; }
   .fl-section { margin-top: 3rem; }
   .fl-chart-wrapper { height: 340px; padding: 0.6rem; }
+  .fl-scatter-wrapper { height: 360px; }
   .fl-hero-nums { gap: 1.4rem; }
   .fl-parity-cell-excess { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 1.1rem; }
   .fl-ep-btn { flex: 1 1 100%; }

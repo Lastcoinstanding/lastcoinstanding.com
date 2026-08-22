@@ -159,6 +159,24 @@ eleventyComputed:
 
       <p class="fl-parity-foot">Excess is the median of each entry&rsquo;s own realized-minus-trend difference &mdash; not the difference of the two medians above, which is a different and less meaningful number. Windows run from each entry date to the selected endpoint; CAGRs annualise on a 365.25-day year.</p>
     </div>
+
+    <div class="fl-chart-block fl-scatter-block">
+      <p class="fl-lead fl-scatter-lede">The toggle above shows that <em>when</em> you measure matters. This shows that <em>where</em> you bought matters &mdash; and that it is the only thing in this data that does.</p>
+      <div class="fl-chart-head">
+        <div>
+          <div class="fl-chart-title" id="flScatterTitle">Every entry, by how far below the floor it bought</div>
+          <div class="fl-chart-sub" id="flScatterSub">&mdash;</div>
+        </div>
+      </div>
+      <div class="fl-chart-wrapper fl-scatter-wrapper chart-wrapper" data-chart-copy
+           data-chart-heading="#flScatterTitle"
+           data-chart-sub="#flScatterSub"
+           data-chart-title="The Bitcoin Floor — excess vs. entry depth below the line"
+           data-chart-filename="bitcoin-floor-entry-depth.png">
+        <canvas id="flScatterChart"></canvas>
+      </div>
+      <p class="fl-chart-note" id="flScatterNote">&mdash;</p>
+    </div>
   </section>
 
   <!-- ══════════ 4 · THE TRIPWIRE ══════════ -->

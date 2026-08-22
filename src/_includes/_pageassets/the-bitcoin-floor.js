@@ -96,15 +96,35 @@
   // the long note on that function for why the fixture is pinned to the
   // analysis's endpoint rather than to a live "today".
   var ANALYSIS_PARITY = {
-    endpointDayOffset: 1,   // one day past the last PL_DATA sample
-    endpointDate: '2026-08-01',
+    // Two dates, deliberately, and they differ by one day:
+    //   measuredOn  — the DAY THE MEASUREMENT DESCRIBES, and the only one shown
+    //                 to a reader. It is PL_DATA's last sample, 2026-07-31, when
+    //                 price sat at ×0.423 — on the floor. That is the fact the
+    //                 published 63.8/65.1 is about.
+    //   endpointDay — the internal grading endpoint, one day later. The last
+    //                 sample is ITSELF an entry, so grading to the sample date
+    //                 gives it a zero-length window and drops it (n=25). One day
+    //                 past includes it (n=26), which is what the analysis did.
+    // Surfacing the +1 to a reader would be noise about an implementation
+    // convention; surfacing the wrong one would misdate the finding.
+    endpointDayOffset: 1,
+    measuredOn: '2026-07-31',
     medianRealized: 63.8,
     medianTrend: 65.1,
     entries: 26,
     tolerancePp: 0.1
   };
 
-  // Tripwire parameters — PROPOSED, pending JM's blessing (design doc §2.5).
+  // Tripwire parameters — PUBLISHED CANON as of 2026-08-21 (JM blessed; design
+  // doc §2.5 proposed them, round 1 confirmed them).
+  //
+  // These two numbers are the page's whole reason to exist: they are a
+  // falsification test stated in advance, in public, with a live status line
+  // reporting against them. CHANGING THEM LATER IS A PUBLIC ACT, NOT A TWEAK —
+  // a model whose failure condition moves when it is approached has not been
+  // falsified, it has been rationalised, and that is the specific failure this
+  // page was built to make impossible. If they ever need to move, the move gets
+  // announced with its reasoning, in the box, the same way a firing would.
   var TRIPWIRE = { depthPct: 10, days: 30 };
 
   // ═══════════════════════════════════════════════════════════
@@ -115,6 +135,7 @@
   function floorAt(d) { return PL_FLOOR * trendAt(d); }
   function isoOf(d) { return new Date((GENESIS_TS + d * 86400) * 1000).toISOString().slice(0, 10); }
   function dayOfIso(s) { return (Date.parse(s + 'T00:00:00Z') / 1000 - GENESIS_TS) / 86400; }
+  function seriesAgeDays() { return Math.max(0, Math.round(TODAY_DAYS - PL_DATA[PL_DATA.length - 1][0])); }
   function median(a) {
     var s = a.slice().sort(function (x, y) { return x - y; }), n = s.length;
     if (!n) return NaN;
@@ -479,7 +500,7 @@
       'Entries are the ' + g.n + ' samples in the series priced within 10% of the floor, graded to ' + endLabel + '. ' +
       'That is ' + (g.n / PL_DATA.length * 100).toFixed(1) + '% of the ' + PL_DATA.length + ' samples on record. ' +
       'The published measurement behind this instrument (<code>analysis/2026-08-20-power-law-floor.md</code> §3) graded the ' +
-      'same entries to ' + ANALYSIS_PARITY.endpointDate + ', when price sat on the floor: ' +
+      'same entries to ' + ANALYSIS_PARITY.measuredOn + ', when price sat on the floor: ' +
       ANALYSIS_PARITY.medianRealized.toFixed(1) + '% realized against ' + ANALYSIS_PARITY.medianTrend.toFixed(1) +
       '% trend. Run <code>floorParityQA()</code> in the console to reproduce it.';
 
@@ -511,7 +532,7 @@
           '<strong>That is the endpoint doing the work, not the entry.</strong> Because ' + whereNow + ', ' +
           'these windows are graded from the floor to a point above it — and excess is very nearly the annualised change ' +
           'in the ×-trend ratio between the two ends. Measured on a day when price sat <em>on</em> the floor, the published ' +
-          'analysis found the same entries returned ' + ANALYSIS_PARITY.medianRealized.toFixed(1) + '% against a trend of ' +
+          'analysis (measured ' + ANALYSIS_PARITY.measuredOn + ', when price sat on the floor) found the same entries returned ' + ANALYSIS_PARITY.medianRealized.toFixed(1) + '% against a trend of ' +
           ANALYSIS_PARITY.medianTrend.toFixed(1) + '% — an excess of about zero. Both readings are the same arithmetic ' +
           'seen from different days.';
       } else {
@@ -528,13 +549,14 @@
         (spot / trendAt(d0)).toFixed(3) + '× trend. When price sits on the floor every window is graded floor-to-floor — ' +
         'the least flattering vantage available, and the one the published analysis used. This number is a statement about ' +
         'the <strong>pair</strong> of endpoints, not a durable property of floor entries. Change either and it changes.';
+      renderScatter(endDay, endPrice, 'today');
     } else {
       $('flParityRead').innerHTML =
         'Graded to the last trend touch, the same entries show a positive excess of ' + signedPct1(g.excess) + '. ' +
         '<strong>This is the reversion showing up, not evidence that floor entries beat the market.</strong> ' +
         'It is the historical bonus for having been early to a line price later left behind — and it is measured to an endpoint ' +
         'chosen precisely because it was favourable. The guarantee half is the finding that leads this page: graded at its ' +
-        'worst — with price back down on the floor, as the published analysis measured it — the same entries returned ' +
+        'worst — with price back down on the floor, as the published analysis measured it on ' + ANALYSIS_PARITY.measuredOn + ' — the same entries returned ' +
         ANALYSIS_PARITY.medianRealized.toFixed(1) + '% against the model’s own ' + ANALYSIS_PARITY.medianTrend.toFixed(1) +
         '%, an excess of about zero. Matching the model at the worst vantage is the claim; this tab is the bonus.';
       $('flHonestyEndpoint').innerHTML =
@@ -542,7 +564,180 @@
         '(' + endWhen + ') banks the whole reversion and stops the clock before the drawdown that followed. ' +
         'It is an honest question — what did the entry pay by the time the model was satisfied? — asked with a favourable ruler. ' +
         'Both tabs are true; neither is the answer on its own.';
+      renderScatter(endDay, endPrice, 'the last trend touch (' + endWhen + ')');
     }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // THE ENTRY SCATTER — excess against how far below the line you bought
+  //
+  // The parity card answers "did entering at the floor beat the model?"
+  // with a median. This answers the sharper question underneath it, which
+  // the analysis states and no single number can show: the excess in this
+  // set tracks HOW FAR BELOW the line an entry went, not the fact of
+  // entering near it.
+  //
+  // TWO DELIBERATE CHOICES, both of which change what the reader sees:
+  //
+  // 1. NO FITTED LINE. Not caution — the relationship here is very nearly
+  //    ARITHMETIC rather than estimated. Excess is approximately the
+  //    annualised change in the ×-trend ratio between entry and exit, so
+  //    for a common endpoint it is close to a deterministic function of
+  //    where the entry sat. Drawing a regression through it would dress a
+  //    near-identity as an empirical finding, and would imply 26
+  //    independent observations when these are ~12-day samples drawn from
+  //    four clusters. The scatter shows a mechanism; a fit would claim an
+  //    estimate. Reference lines only: x = 0 is the floor, y = 0 is
+  //    matching the model.
+  //
+  // 2. A MINIMUM WINDOW. Entries whose window is under a year are excluded
+  //    and the exclusion is stated on the chart. Annualising a three-week
+  //    window multiplies its noise by ~17; the three 2026 entries produce
+  //    excesses of −54% and −39% that are artifacts of the exponent, not
+  //    facts about entering at the floor, and plotted raw they compress
+  //    every real point into a band a few pixels tall. The medians in the
+  //    card above KEEP them — a median is robust to exactly this, which is
+  //    why 63.8/65.1 is unaffected — so the counts differ by design and
+  //    the caption says so rather than quietly reconciling.
+  // ═══════════════════════════════════════════════════════════
+  var MIN_WINDOW_YEARS = 1;
+  var scatterChart = null;
+
+  function scatterRows(endDay, endPrice) {
+    var rows = [];
+    entrySet().forEach(function (p) {
+      var yrs = (endDay - p[0]) / YEAR;
+      if (yrs < MIN_WINDOW_YEARS) return;
+      var r = (Math.pow(endPrice / p[1], 1 / yrs) - 1) * 100;
+      var t = (Math.pow(trendAt(endDay) / trendAt(p[0]), 1 / yrs) - 1) * 100;
+      rows.push({
+        day: p[0], date: isoOf(p[0]), years: yrs,
+        x: (p[1] / floorAt(p[0]) - 1) * 100,   // + above the floor, − below
+        y: r - t
+      });
+    });
+    return rows;
+  }
+
+  // Era = a contiguous run of entries; a gap over ~2 years starts a new one.
+  // Derived from the data rather than hardcoded, so the legend cannot mislabel.
+  function groupEras(rows) {
+    var eras = [], cur = null;
+    rows.forEach(function (row) {
+      if (cur && (row.day - cur.lastDay) > 730) { eras.push(cur); cur = null; }
+      if (!cur) cur = { rows: [], firstDate: row.date, lastDay: row.day };
+      cur.rows.push(row); cur.lastDay = row.day; cur.lastDate = row.date;
+    });
+    if (cur) eras.push(cur);
+    return eras.map(function (e) {
+      var a = e.firstDate.slice(0, 4), b = e.lastDate.slice(0, 4);
+      return { label: a === b ? a : a + '–' + b, rows: e.rows };
+    });
+  }
+
+  function renderScatter(endDay, endPrice, endWhen) {
+    var canvas = $('flScatterChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    var all = entrySet().filter(function (p) { return (endDay - p[0]) / YEAR > 0; }).length;
+    var rows = scatterRows(endDay, endPrice);
+    var dropped = all - rows.length;
+    var eras = groupEras(rows);
+    var eraColors = [cssVar('--fl-era-1', '#c0603a'), cssVar('--fl-era-2', '#d9b36b'),
+                     cssVar('--fl-era-3', '#6db3d4'), cssVar('--fl-era-4', '#8fae7f')];
+    var cDim = cssVar('--text-muted', '#6a6256');
+    var cAxis = cssVar('--fl-axis', 'rgba(224,148,34,0.28)');
+
+    var datasets = eras.map(function (era, i) {
+      return {
+        label: era.label,
+        data: era.rows,
+        backgroundColor: eraColors[i % eraColors.length],
+        borderColor: eraColors[i % eraColors.length],
+        pointRadius: 6, pointHoverRadius: 8
+      };
+    });
+
+    var refLines = {
+      id: 'flScatterRefs',
+      beforeDatasetsDraw: function (chart) {
+        var xs = chart.scales.x, ys = chart.scales.y, ctx = chart.ctx;
+        if (!xs || !ys) return;
+        ctx.save();
+        ctx.strokeStyle = cAxis; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+        var x0 = xs.getPixelForValue(0);
+        ctx.beginPath(); ctx.moveTo(x0, ys.top); ctx.lineTo(x0, ys.bottom); ctx.stroke();
+        var y0 = ys.getPixelForValue(0);
+        ctx.beginPath(); ctx.moveTo(xs.left, y0); ctx.lineTo(xs.right, y0); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = cDim; ctx.font = '10px Inter, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('the floor', x0 + 5, ys.top + 12);
+        ctx.fillText('matched the model', xs.left + 5, y0 - 5);
+        ctx.restore();
+      }
+    };
+
+    var cfg = {
+      datasets: datasets,
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+          x: {
+            title: { display: true, text: 'Entry price vs. the floor (%)  —  negative is below the line', color: cDim, font: { size: 11 } },
+            ticks: { color: cDim, font: { size: 10 }, callback: function (v) { return v + '%'; } },
+            grid: { color: 'rgba(224,148,34,0.05)' }
+          },
+          y: {
+            title: { display: true, text: 'Excess over the model (percentage points per year)', color: cDim, font: { size: 11 } },
+            ticks: { color: cDim, font: { size: 10 }, callback: function (v) { return (v > 0 ? '+' : '') + v; } },
+            grid: { color: 'rgba(224,148,34,0.05)' }
+          }
+        },
+        plugins: {
+          legend: { labels: { color: cDim, font: { size: 11 }, usePointStyle: true, boxWidth: 8 } },
+          tooltip: {
+            backgroundColor: '#1a1714', borderColor: 'rgba(224,148,34,0.3)', borderWidth: 1,
+            titleColor: '#f2eee8', bodyColor: '#e8e0d4',
+            callbacks: {
+              title: function (items) { return items.length ? items[0].raw.date : ''; },
+              label: function (c) {
+                var r = c.raw;
+                var where = r.x < 0 ? Math.abs(r.x).toFixed(1) + '% below the floor'
+                                    : r.x.toFixed(1) + '% above the floor';
+                return [ 'Bought at ' + where,
+                         'Excess ' + signedPct1(r.y) + ' per year',
+                         'Held ' + r.years.toFixed(1) + ' years' ];
+              }
+            }
+          }
+        }
+      },
+      plugins: [refLines]
+    };
+
+    if (scatterChart) {
+      scatterChart.data.datasets = datasets;
+      scatterChart.update();
+    } else {
+      cfg.type = 'scatter';
+      scatterChart = new Chart(canvas, cfg);
+    }
+
+    $('flScatterSub').textContent =
+      rows.length + ' entries, each graded to ' + endWhen + '. Left of the dashed vertical is below the floor; ' +
+      'above the dashed horizontal is beating the model.';
+    $('flScatterNote').innerHTML =
+      '<strong>No line is fitted through these points, deliberately.</strong> Excess is very nearly the annualised change ' +
+      'in the ×-trend ratio between entry and exit, so against a common endpoint it is close to arithmetic rather than an ' +
+      'estimated effect — and these are ~12-day samples from four clusters, not 26 independent observations. A regression ' +
+      'would imply both a precision and an independence the data does not have. ' +
+      (dropped > 0
+        ? 'Also excluded: <strong>' + dropped + ' ' + (dropped === 1 ? 'entry' : 'entries') + ' held under a year</strong>, ' +
+          'whose annualised figures are dominated by the exponent rather than by the entry ' +
+          '(a three-week window multiplies its own noise roughly seventeenfold). The medians in the card above keep them — ' +
+          'a median is robust to exactly this — which is why the counts differ.'
+        : 'Every entry here has at least a year of window.');
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -713,6 +908,14 @@
       ['Price series',
        PL_DATA.length + ' samples, ' + isoOf(PL_DATA[0][0]) + ' to ' + isoOf(PL_DATA[PL_DATA.length - 1][0]) + ', on a ~12-day grid. ' +
        'Intraday and daily excursions between samples are invisible to it, so every depth and duration on this page is a <em>lower bound</em>.'],
+      ['Series freshness',
+       // Reader-facing, not just the module's console-only staleness guard: anyone
+       // checking a historical figure on this page is entitled to know how old the
+       // series behind it is without opening a console.
+       'The most recent sample is <strong>' + isoOf(PL_DATA[PL_DATA.length - 1][0]) + '</strong>, ' +
+       seriesAgeDays() + ' days ago. Everything historical on this page — the episodes, the entry set, the parity medians — ' +
+       'stops there. Today’s spot, the hero distance and the tripwire status do not: those are live, and can therefore sit ' +
+       'well away from the last sample, as they do now.'],
       ['Channel coefficients',
        'a = 1.6&times;10<sup>&minus;17</sup>, b = 5.77 (M&#279;zinskis / Porkopolis canonical), floor = 0.42&times; trend, upper band = 3&times; trend. Shared module, unmodified.'],
       ['Live spot',
