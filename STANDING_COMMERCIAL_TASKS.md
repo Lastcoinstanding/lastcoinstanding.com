@@ -60,3 +60,10 @@ request sent, 192-char collateral note. Next: collateral DM on accept · fmr.com
 **2026-08-20 — Bitcoin Escape Velocity live** (PRs #56/57/59); announcement thread posted to X.
 Capability page live at `/demo/capability` (PR #58, 34-tool claim, noindexed) — gates cleared for
 Bessette send Fri 8/21.
+
+**2026-08-22 — Media lane opened.** Kanstein (returning-guest pitch, 3-explorations serial format,
+links + screenshot) and Seyr (STRC-led concrete menu, infographic attached) DM'd on X. Dunworth
+re-engaged same day. Format offered both hosts: three explorations per episode, recurring every
+4–6 months as the site grows. **Next: not set at logging** — three sends with no reply-window or
+bump dates against them; per the conventions above this entry stays incomplete until they are
+added.
