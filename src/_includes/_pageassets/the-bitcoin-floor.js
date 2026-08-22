@@ -531,8 +531,9 @@
         read = 'Graded to today, these entries show an excess of ' + signedPct1(g.excess) + ' over the model. ' +
           '<strong>That is the endpoint doing the work, not the entry.</strong> Because ' + whereNow + ', ' +
           'these windows are graded from the floor to a point above it — and excess is very nearly the annualised change ' +
-          'in the ×-trend ratio between the two ends. Measured on a day when price sat <em>on</em> the floor, the published ' +
-          'analysis (measured ' + ANALYSIS_PARITY.measuredOn + ', when price sat on the floor) found the same entries returned ' + ANALYSIS_PARITY.medianRealized.toFixed(1) + '% against a trend of ' +
+          'in the ×-trend ratio between the two ends. The published analysis, measured <strong>' + ANALYSIS_PARITY.measuredOn +
+          '</strong> — a day when price sat <em>on</em> the floor — found the same entries returned ' +
+          ANALYSIS_PARITY.medianRealized.toFixed(1) + '% against a trend of ' +
           ANALYSIS_PARITY.medianTrend.toFixed(1) + '% — an excess of about zero. Both readings are the same arithmetic ' +
           'seen from different days.';
       } else {
