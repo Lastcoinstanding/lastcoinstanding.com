@@ -190,8 +190,20 @@
   // sell path (zero tax bill, so the sell path is most competitive against
   // borrowing). If the user lowers cost basis, the sell path's tax burden
   // rises and the borrow path's advantage grows accordingly.
+  // data-autofilled marks this value as one WE filled in rather than one the reader
+  // chose. The URL writer (separate IIFE below, hence a DOM attribute rather than a
+  // closure variable) omits `cb` while the mark holds. That is what stopped a bare
+  // load from serializing ?cb=<seed price>: the auto-fill runs against the SEED
+  // price, the live fetch then moves priceInput underneath it, and the writer's
+  // "cb equals current price" default test stopped matching.
   if (costBasisInput && (!costBasisInput.value || costBasisInput.value === '0')) {
     costBasisInput.value = priceInput.value;
+    costBasisInput.dataset.autofilled = '1';
+  }
+  if (costBasisInput) {
+    ['input', 'change'].forEach(function (ev) {
+      costBasisInput.addEventListener(ev, function () { delete costBasisInput.dataset.autofilled; });
+    });
   }
 
   var chart = null;
@@ -584,7 +596,7 @@
       notes.push(
         '<div class="bas-calc-profile-note">' +
         '<span class="bas-calc-profile-note-label">A strategic variant worth knowing about</span>' +
-        '<p>The channel position you\'re originating at is structurally the mirror image of <a href="/disciplined-rebalancing.html">Disciplined Rebalancing</a>. Where Disciplined Rebalancing sells at a high-percentile zone and rebuys at a low-percentile zone, the mirror is to <strong>borrow at a low-percentile zone and repay from appreciated bitcoin at a high-percentile zone</strong>. The destination is the same &mdash; <em>took some off the table at the top</em> &mdash; but the BAS variant gets you liquidity at the bottom along the way, and the psychological framing is sharper: paying off a loan with appreciated bitcoin at the cycle peak feels like <em>releasing an obligation</em> rather than <em>selling</em>. A structured surface for modeling this is on the calculator\'s roadmap.</p>' +
+        '<p>The channel position you\'re originating at is structurally the mirror image of <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>. Where Disciplined Rebalancing sells at a high-percentile zone and rebuys at a low-percentile zone, the mirror is to <strong>borrow at a low-percentile zone and repay from appreciated bitcoin at a high-percentile zone</strong>. The destination is the same &mdash; <em>took some off the table at the top</em> &mdash; but the BAS variant gets you liquidity at the bottom along the way, and the psychological framing is sharper: paying off a loan with appreciated bitcoin at the cycle peak feels like <em>releasing an obligation</em> rather than <em>selling</em>. A structured surface for modeling this is on the calculator\'s roadmap.</p>' +
         '</div>'
       );
     }
@@ -1081,6 +1093,9 @@
       var val = (typeof raw === 'function') ? raw() : raw;
       if (val > 0) {
         costBasisInput.value = val;
+        // A preset click IS a reader choice — drop the auto-fill mark so the URL
+        // writer starts carrying `cb` (these set .value directly, no input event).
+        delete costBasisInput.dataset.autofilled;
         cbPresetBtns.forEach(function(b){ b.classList.remove('bas-calc-bvs-cb-preset-active'); });
         btn.classList.add('bas-calc-bvs-cb-preset-active');
         recompute();
@@ -1542,7 +1557,12 @@
     }
   }
 
+  // No URL write until the reader touches something. The calculator IIFE hydrates
+  // shared inputs from localStorage before this runs, so an init-time write promoted
+  // a returning reader's stored settings into a URL they never asked for.
+  var _suppressUrlWrite = true;
   function syncUrl() {
+    if (_suppressUrlWrite) return;
     if (!window.history || !window.history.replaceState) return;
     var params = new URLSearchParams(window.location.search);
     Object.keys(SCHEMA).forEach(function(key){
@@ -1556,6 +1576,8 @@
       if (key === 'cb') {
         var priceEl = document.getElementById('bvsBtcPrice') || document.getElementById('basBtcPrice');
         var priceVal = priceEl ? parseFloat(priceEl.value) : NaN;
+        // Still the auto-filled value (see the calculator IIFE) → not a reader choice.
+        if (el.dataset && el.dataset.autofilled === '1') { params.delete(key); return; }
         if (!isFinite(val) || (isFinite(priceVal) && Math.abs(val - priceVal) < 1)) {
           params.delete(key);
         } else {
@@ -1612,7 +1634,13 @@
   function init() {
     readUrlIntoInputs();
     wireWriters();
-    syncUrl();
+    // One capture-phase gate: the first real interaction unlocks URL writing, and
+    // nothing during load (storage hydration, live-price fill) can slip past it.
+    ['input', 'change', 'click'].forEach(function (ev) {
+      document.addEventListener(ev, function () { _suppressUrlWrite = false; }, { capture: true, once: true });
+    });
+    // No syncUrl() here by design — a load leaves the address bar as the reader
+    // arrived with it.
   }
 
   // Run AFTER the calculator IIFE's SHARED_PAIRS hydration. The

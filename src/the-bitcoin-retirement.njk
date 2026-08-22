@@ -28,7 +28,7 @@ faq:
   - q: "How much bitcoin do I need to retire?"
     a: "There is no single number — it depends on your target income, your retirement year, and what you assume about bitcoin’s price path. This calculator lets you set all three and shows whether a given stack sustains your income year by year, including the scenarios where it depletes. The answer is a range you explore, not a figure anyone can hand you."
   - q: "Can you really retire on bitcoin alone?"
-    a: "Under some assumptions yes, under others no — and the difference is visible in the projection. A stack that reaches escape velocity under one price model can deplete under a harsher one, and a bear market early in retirement changes the picture more than one that comes late. The companion <a href='/the-bitcoin-retirement-stress-test.html'>Stress Test</a> models exactly that risk."
+    a: "Under some assumptions yes, under others no — and the difference is visible in the projection. A stack that reaches escape velocity under one price model can deplete under a harsher one, and a bear market early in retirement changes the picture more than one that comes late. The companion <a href='/the-bitcoin-retirement-stress-test'>Stress Test</a> models exactly that risk."
   - q: "How does the calculator project bitcoin’s future price?"
     a: "It uses the Power Law trend — a regression of bitcoin’s full price history against time, with coefficients credited to Porkopolis Economics — as a central-tendency assumption, not a forecast. You choose the price basis and inflation assumptions yourself, and every projected number is reproducible from the adjacent ones. The model’s limits are stated on the page, not hidden."
   - q: "What withdrawal strategies does it model?"
@@ -69,7 +69,7 @@ eleventyComputed:
 
       <p class="prose">Retirement planning was built for portfolios that compound at seven percent real per year (target rate) and draw down at four percent per year. The &ldquo;four-percent rule&rdquo; has held up across most thirty-year sequences in the historical record; the <a href="https://www.bogleheads.org/wiki/Trinity_study" target="_blank" rel="noopener">Trinity Study</a> put numbers on what most people had intuited for as long as retirement has existed. Save enough for retirement, withdraw modestly, hope the markets cooperate.</p>
 
-      <p class="prose">Bitcoin doesn&rsquo;t fit that template. Its growth profile under the <a href="/the-power-law.html">Power Law</a> has remained meaningfully above traditional-asset returns for the entire foreseeable retirement window. The gap is the whole problem (and opportunity) that this calculator looks to address.</p>
+      <p class="prose">Bitcoin doesn&rsquo;t fit that template. Its growth profile under the <a href="/the-power-law">Power Law</a> has remained meaningfully above traditional-asset returns for the entire foreseeable retirement window. The gap is the whole problem (and opportunity) that this calculator looks to address.</p>
 
       <p class="prose">There are three legitimate questions a person can ask of their bitcoin position when retirement enters the picture. None has a single answer; each has a defensible range.</p>
 
@@ -150,8 +150,8 @@ eleventyComputed:
 
     <!-- CHART STATUS LINE — current price + Power Law context -->
     <div class="chart-status-line" id="chartStatusLine">
-      <span class="status-prose"><strong>Today:</strong> <span id="statusPrice">$&mdash;</span> / BTC &mdash; sits at <strong><span id="statusRatio">&mdash;</span></strong> the Power Law trend; historically, BTC has traded below this <a href="/the-power-law.html" class="status-trend-link">trend level</a> <strong><span id="statusPercentile">&mdash;</span></strong> of its history.</span>
-      <a href="/the-power-law.html#summary" class="powerlaw-link">What is the Power Law? &rarr;</a>
+      <span class="status-prose"><strong>Today:</strong> <span id="statusPrice">$&mdash;</span> / BTC &mdash; sits at <strong><span id="statusRatio">&mdash;</span></strong> the Power Law trend; historically, BTC has traded below this <a href="/the-power-law" class="status-trend-link">trend level</a> <strong><span id="statusPercentile">&mdash;</span></strong> of its history.</span>
+      <a href="/the-power-law#summary" class="powerlaw-link">What is the Power Law? &rarr;</a>
     </div>
 
     <!-- PROJECTION CHART — the workspace centerpiece -->
@@ -290,7 +290,7 @@ eleventyComputed:
             <div class="derived-readout">
               <span class="derived-label">&equiv;&nbsp;withdrawal rate:</span>
               <span class="derived-val" id="val-withdrawalRatePct">6.0%</span>
-              <span class="help-tip" tabindex="0">?<span class="tip-content">Effective annual withdrawal as a percentage of your projected stack at retirement (in today&rsquo;s dollars). This is a <em>derived</em> readout, not a separate input &mdash; it&rsquo;s computed live as <strong>income &divide; projected stack value</strong>. Traditional &ldquo;safe withdrawal rate&rdquo; guidance (e.g., the <strong>4% rule</strong>) was calibrated against a 60/40 stock-bond portfolio expected to deliver ~7% real returns. Under the <a href="/the-power-law.html" style="color:var(--amber)">Power Law</a>, bitcoin&rsquo;s projected real growth remains meaningfully above that for the foreseeable retirement window, so higher withdrawal rates can be sustained &mdash; the <em>years stack lasts</em> readout below simulates this year-by-year. To explore a specific rate, nudge the income slider until this readout lands on your target.</span></span>
+              <span class="help-tip" tabindex="0">?<span class="tip-content">Effective annual withdrawal as a percentage of your projected stack at retirement (in today&rsquo;s dollars). This is a <em>derived</em> readout, not a separate input &mdash; it&rsquo;s computed live as <strong>income &divide; projected stack value</strong>. Traditional &ldquo;safe withdrawal rate&rdquo; guidance (e.g., the <strong>4% rule</strong>) was calibrated against a 60/40 stock-bond portfolio expected to deliver ~7% real returns. Under the <a href="/the-power-law" style="color:var(--amber)">Power Law</a>, bitcoin&rsquo;s projected real growth remains meaningfully above that for the foreseeable retirement window, so higher withdrawal rates can be sustained &mdash; the <em>years stack lasts</em> readout below simulates this year-by-year. To explore a specific rate, nudge the income slider until this readout lands on your target.</span></span>
             </div>
             <div class="income-basis" role="group" aria-label="Income basis">
               <span class="income-basis-label">Interpret my retirement income as:</span>
@@ -456,7 +456,7 @@ eleventyComputed:
     <!-- USD methodology callout — see /about.html#why-usd for full reasoning.
          Sits just above the share section, at the calculator's natural pause
          point. Speaks to non-US readers without disrupting US-reader flow. -->
-    <p class="usd-footnote">Figures throughout are in USD. Reading from outside the US? <a href="/about.html#why-usd">Read why &rarr;</a></p>
+    <p class="usd-footnote">Figures throughout are in USD. Reading from outside the US? <a href="/about#why-usd">Read why &rarr;</a></p>
 
     <!-- SHARE THIS SCENARIO — discoverable affordance for the shareable URL.
          Sits after the Sustainability readout (the user's "aha moment") and
@@ -565,7 +565,7 @@ eleventyComputed:
               <span class="name">With decay (secondary)</span>
             </button>
           </div>
-          <a href="/the-power-law.html#summary" class="powerlaw-link">What is the Power Law? &rarr;</a>
+          <a href="/the-power-law#summary" class="powerlaw-link">What is the Power Law? &rarr;</a>
         </div>
 
         <div class="picker-group">
@@ -618,7 +618,7 @@ eleventyComputed:
 
       <p class="prose">The mental model is the simplest one available: every year of retirement, sell enough bitcoin at that year&rsquo;s modeled price to cover the annual retirement income you&rsquo;ve targeted, adjusted for inflation. The stack draws down. The math closes &mdash; a starting stack, a retirement window (start year and duration), and either a target income or a withdrawal rate are all the projection requires; the other emerges from the relationship between the three.</p>
 
-      <p class="prose">What makes the bitcoin version distinct from the traditional retirement version is the growth profile of the asset being drawn down. The Trinity Study&rsquo;s 4% rule was calibrated against a portfolio expected to deliver roughly 7% real returns; bitcoin under the <a href="/the-power-law.html">Power Law</a> currently grows at what is estimated at a much higher CAGR, declining over time but remaining meaningfully above traditional-asset returns for the entire foreseeable retirement window, on a trend basis. <em>That gap is the whole reason this calculator exists.</em> Defaulting the withdrawal rate to 4% and labeling anything above as &ldquo;aggressive&rdquo; would quietly endorse a mental model that does not apply here, given the assumptions about how bitcoin is growing subject to the <a href="/the-power-law.html">Power Law</a>.</p>
+      <p class="prose">What makes the bitcoin version distinct from the traditional retirement version is the growth profile of the asset being drawn down. The Trinity Study&rsquo;s 4% rule was calibrated against a portfolio expected to deliver roughly 7% real returns; bitcoin under the <a href="/the-power-law">Power Law</a> currently grows at what is estimated at a much higher CAGR, declining over time but remaining meaningfully above traditional-asset returns for the entire foreseeable retirement window, on a trend basis. <em>That gap is the whole reason this calculator exists.</em> Defaulting the withdrawal rate to 4% and labeling anything above as &ldquo;aggressive&rdquo; would quietly endorse a mental model that does not apply here, given the assumptions about how bitcoin is growing subject to the <a href="/the-power-law">Power Law</a>.</p>
 
       <p class="prose">The default rate on this calculator is 6%, sliderable from 2% to 15%. Six percent is a moderate move above the Trinity anchor &mdash; bitcoin&rsquo;s growth profile permits more than the traditional rule, but we are not being reckless about it. The 15% upper bound is intentionally high &mdash; sufficient to explore aggressive scenarios, yet still within range of Power Law trend CAGR for the foreseeable retirement window.</p>
 
@@ -642,7 +642,7 @@ eleventyComputed:
 
       <p class="prose">The dedicated sibling page handles this strategy with the editorial care it warrants &mdash; including a slider that lets you see what 0% borrowing looks like as the genuinely conservative baseline, and not as a recommendation to do anything else.</p>
 
-      <p class="prose teaser-link"><a href="/borrowing-against-your-stack.html"><strong>Borrowing against your stack &rarr;</strong></a> <span class="phase-tag">Phase 3.5 &mdash; coming soon.</span></p>
+      <p class="prose teaser-link"><a href="/borrowing-against-your-stack"><strong>Borrowing against your stack &rarr;</strong></a> <span class="phase-tag">Phase 3.5 &mdash; coming soon.</span></p>
 
       <h2 class="section-title">Disciplined rebalancing</h2>
 
@@ -652,7 +652,7 @@ eleventyComputed:
 
       <p class="prose">The strategy is not for everyone. It requires bitcoin held inside a retirement account, a tolerance for active rebalancing, and at least soft conviction in the Power Law as a guiding model &mdash; which is why the dedicated sibling page carries its own framing essay rather than being folded into this one.</p>
 
-      <p class="prose teaser-link"><a href="/disciplined-rebalancing.html"><strong>Disciplined rebalancing &rarr;</strong></a> <span class="phase-tag">A sibling page exploring the discipline in detail.</span></p>
+      <p class="prose teaser-link"><a href="/disciplined-rebalancing"><strong>Disciplined rebalancing &rarr;</strong></a> <span class="phase-tag">A sibling page exploring the discipline in detail.</span></p>
 
       <h2 class="section-title">A closing note on selection</h2>
 
@@ -693,7 +693,7 @@ eleventyComputed:
         <div class="math-eq">Upper(t) = 3.0 &times; Price(t)</div>
       </div>
 
-      <p class="prose">The floor is the boundary below which Bitcoin has never sustained a daily close in fifteen years; its R&sup2; against actual lows exceeds 0.99. The upper band is calibrated against historical cycle peaks and is best read as a spike envelope, not a sustained level. For the deeper treatment of why bitcoin follows this model, see <a href="/the-power-law.html">Bitcoin and the Power Law</a>.</p>
+      <p class="prose">The floor is the boundary below which Bitcoin has never sustained a daily close in fifteen years; its R&sup2; against actual lows exceeds 0.99. The upper band is calibrated against historical cycle peaks and is best read as a spike envelope, not a sustained level. For the deeper treatment of why bitcoin follows this model, see <a href="/the-power-law">Bitcoin and the Power Law</a>.</p>
 
       <h2 class="section-title">The stack projection</h2>
 
@@ -774,8 +774,8 @@ eleventyComputed:
         <li><strong>No sequence-of-returns risk (Monte Carlo).</strong> The floor, trend, and upper bands are shown together so users can read what each scenario implies. A stochastic simulation would produce a confidence-interval shape the model cannot truthfully claim.</li>
         <li><strong>No state capital gains.</strong> Federal long-term capital gains framing is the reference; users in higher-tax states will see steeper effective drag than the unmentioned default suggests.</li>
         <li><strong>No holding-period transitions.</strong> Average-cost basis is assumed; long-term capital gains rates apply uniformly to all sales.</li>
-        <li><strong>No leverage.</strong> Borrow-against modeling lives on its own <a href="/borrowing-against-your-stack.html">sibling page</a>.</li>
-        <li><strong>No rebalancing.</strong> Disciplined rebalancing modeling lives on its own <a href="/disciplined-rebalancing.html">sibling page</a>.</li>
+        <li><strong>No leverage.</strong> Borrow-against modeling lives on its own <a href="/borrowing-against-your-stack">sibling page</a>.</li>
+        <li><strong>No rebalancing.</strong> Disciplined rebalancing modeling lives on its own <a href="/disciplined-rebalancing">sibling page</a>.</li>
         <li><strong>No multi-stack split.</strong> Users with bitcoin in different account types (regular plus IRA) can run the calculator twice with different inputs; v1 does not blend them.</li>
       </ul>
 

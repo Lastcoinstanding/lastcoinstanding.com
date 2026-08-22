@@ -479,7 +479,7 @@
     + 'bitcoin’s entire price history against time, used as a central-tendency assumption, not a forecast. '
     + 'Its implied growth rate <em>declines</em> with time, which is exactly why “permanently” has to be '
     + 'checked across the whole horizon instead of asserted from a single crossing. '
-    + '<a href="/the-power-law.html">What the Power Law is, and where it breaks →</a>'
+    + '<a href="/the-power-law">What the Power Law is, and where it breaks →</a>'
     + '</span></span>';
 
   function verdictSentence(v, basis, extDepletion) {
@@ -490,7 +490,7 @@
     var basisTail = '<span class="ev-verdict-tail">Checked every year through <strong>' + v.horizonYear
       + '</strong> — your ' + SCENARIO.retirementYear + ' retirement plus the '
       + SCENARIO.yearsInRetirement + '-year horizon (set under Assumptions) — '
-      + dollarWord() + ', against the <a href="/the-power-law.html">Power Law</a> trend with price '
+      + dollarWord() + ', against the <a href="/the-power-law">Power Law</a> trend with price '
       + basisLabel(basis) + '.' + POWER_LAW_TIP + '</span>';
 
     if (v.state === 'escape') {
@@ -1604,7 +1604,7 @@
     p.set('income', String(Math.round(SCENARIO.targetIncomeUSD)));
     p.set('years', String(SCENARIO.yearsInRetirement));
     if (SCENARIO.incomeBasis !== 'today') p.set('incbasis', SCENARIO.incomeBasis);
-    a.href = '/the-bitcoin-retirement.html?' + p.toString();
+    a.href = '/the-bitcoin-retirement?' + p.toString();
   }
 
   /* ═══════════════════════════════════════════════════════════

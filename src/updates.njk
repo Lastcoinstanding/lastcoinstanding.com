@@ -14,7 +14,11 @@ eleventyComputed:
 
   <div class="updates-list">
     {% for u in updates %}
-    <a class="update-item" href="{{ u.page }}">
+    {# updates.json `page` values are historically written with the .html extension
+       (freshness.js normalizes either form). Strip it here so the rendered link is
+       the clean URL the rest of the site links to — otherwise every row on this page
+       costs a 308 hop. Applies to future entries written either way. #}
+    <a class="update-item" href="{{ u.page | replace('.html', '') }}">
       <span class="update-item-date">{{ u.display }}</span>
       <span class="update-item-text">{{ u.summary }}</span>
     </a>

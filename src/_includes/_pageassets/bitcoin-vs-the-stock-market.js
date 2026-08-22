@@ -1537,7 +1537,7 @@
     // smoothScroll on apply is a no-op since browser jumped there already.
     var slider = document.getElementById('bvsmStartDate');
     if (!slider) {
-      window.location.href = '/bitcoin-vs-the-stock-market.html'
+      window.location.href = '/bitcoin-vs-the-stock-market'
         + '?start=' + encodeURIComponent(startStr)
         + '&mode='  + encodeURIComponent(mode)
         + '#bvsmCalc';

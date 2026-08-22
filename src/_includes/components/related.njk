@@ -60,7 +60,7 @@
       {%- endif -%}
     {%- endfor -%}
     {%- if found -%}
-      <a href="/{{ found.slug }}.html{% if entry.fragment %}#{{ entry.fragment }}{% endif %}" class="related-card internal cat-{{ found.category }}">
+      <a href="/{{ found.slug }}{% if entry.fragment %}#{{ entry.fragment }}{% endif %}" class="related-card internal cat-{{ found.category }}">
         <div class="related-kind-marker">
           <span class="kind-label">
             {%- if found.category == 'foundations' -%}Foundations

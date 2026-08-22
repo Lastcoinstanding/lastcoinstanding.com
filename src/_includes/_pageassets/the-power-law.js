@@ -182,7 +182,7 @@
   // Carry inbound deep-links over so users arriving from old bookmarks
   // or external links still land on the tool.
   if(location.hash === '#calculator'){
-    location.replace('/bitcoin-vs-real-estate.html#projection');
+    location.replace('/bitcoin-vs-real-estate#projection');
     return;
   }
 

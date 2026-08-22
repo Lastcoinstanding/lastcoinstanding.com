@@ -2052,7 +2052,13 @@
     return active ? active.getAttribute('data-account') : ACCOUNT_DEFAULT;
   }
 
+  // No URL write until the reader touches something. This page previously wrote on
+  // init on purpose ("promotes any non-default localStorage values into the URL") —
+  // which meant a returning reader's stored settings appeared as query params on a
+  // bare visit, and any link they then copied carried settings they never chose.
+  var _suppressUrlWrite = true;
   function syncUrl() {
+    if (_suppressUrlWrite) return;
     if (!window.URLSearchParams || !window.history || !window.history.replaceState) return;
     var params = new URLSearchParams(window.location.search);
 
@@ -2104,8 +2110,12 @@
     if (!document.getElementById('drSellPct')) return;
     readUrlIntoInputs();
     wireWriters();
-    syncUrl(); // normalize URL once on init — drops invalid params,
-               // promotes any non-default localStorage values into the URL
+    // One capture-phase gate: the first real interaction unlocks URL writing, and
+    // nothing during load (storage restore, initial render) can slip past it.
+    ['input', 'change', 'click'].forEach(function (ev) {
+      document.addEventListener(ev, function () { _suppressUrlWrite = false; }, { capture: true, once: true });
+    });
+    // No syncUrl() here by design — the address bar stays as the reader found it.
   }
 
   if (document.readyState === 'loading') {

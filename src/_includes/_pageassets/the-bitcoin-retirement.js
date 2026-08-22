@@ -1581,7 +1581,13 @@
   // `?withdraw=6.7` on a fresh page load. The receiver reproduces the rate
   // from income+stack+baselines locally, which is the more honest behavior
   // anyway when baselines may differ between sender and receiver.
+  // No URL write on load. This writer is already default-aware, so a fresh visit
+  // produced a clean URL either way — but an inbound shared link was being
+  // re-normalized (re-rounded, re-ordered) before the reader had done anything, and
+  // the site-wide rule is simpler to keep than to except: loads never write.
+  var _suppressUrlWrite = true;
   function syncUrlFromScenario() {
+    if (_suppressUrlWrite) return;
     if (!window.URLSearchParams || !window.history || !window.history.replaceState) return;
     var params = new URLSearchParams(window.location.search);
     Object.keys(SCENARIO_URL_MAP).forEach(function(p){
@@ -2263,11 +2269,12 @@
   wireCompareChips();
   renderCompare();          // renderChart() above already populated CMP_LAST
   fetchLiveBtcPrice();
-  // 3. Normalize the URL — drops any out-of-range or unrecognized params,
-  //    ensures the address bar reflects the actual rendered state. Runs
-  //    immediately (not via scheduleUrlSync) so the URL is correct from
-  //    the first frame.
-  syncUrlFromScenario();
+  // 3. Unlock URL writing. The address bar is left exactly as the reader arrived
+  //    with it — a bare visit stays bare, an inbound shared link stays verbatim —
+  //    and the first real interaction is what starts writing.
+  ['input', 'change', 'click'].forEach(function (ev) {
+    document.addEventListener(ev, function () { _suppressUrlWrite = false; }, { capture: true, once: true });
+  });
 })();
 
 /* ════════════════════════════════════════════════════════════════
