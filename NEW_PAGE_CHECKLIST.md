@@ -611,6 +611,18 @@ the following. Copy from a complete reference (e.g.
   Under 60 characters where possible. Title tag carries the searched
   phrase including "Bitcoin"; the H1 may stay evocative per the house
   question-title family.
+- **Toolbox naming — plain, purpose-first (`STYLE_GUIDE §10.4`).** The
+  page's name, as it appears in `explorations.json`, the nav and the
+  `/calculators` tile, defaults to a **plain, purpose-first title a
+  visitor can parse cold from a list** — *Compare Retirement Plans*, not
+  *Plan vs. Plan*. Verb-first is usually the shortest route there. An
+  evocative title is an **exception requiring explicit sign-off**, and it
+  must ship with a plain subtitle taking over nav and SEO duty; the
+  pattern to copy is `/bitcoin-as-collateral` (`SITE_GUIDE §48`) — clever
+  H1, plain `<title>`, plain hero subtitle. Creative license belongs to
+  Substack, not the toolbox. Check it the way a reader will: read the
+  title alone, with no page around it, and see whether you could say what
+  the tool does.
 - **Meta description** — single declarative sentence, 140-155
   characters, no marketing language. Should read as a useful summary
   even out of context.
