@@ -370,8 +370,13 @@
     if (!ep) {
       ctx.textContent = 'Showing the full history.';
       btn.hidden = true;
-    } else {
+    } else if (ep.modern) {
       ctx.innerHTML = 'Zoomed to the <strong>' + ep.when + '</strong> approach &mdash; a stretch where the floor held even as price stayed below trend for an extended period.';
+      btn.hidden = false;
+    } else {
+      // The generic "the floor held" line is false for the genesis-era episode,
+      // which is the one time it did not. Say what actually happened.
+      ctx.innerHTML = 'Zoomed to the <strong>' + ep.when + '</strong> episode &mdash; the one stretch where price closed below the floor and stayed there, in the genesis-era market described in the card below.';
       btn.hidden = false;
     }
   }
@@ -527,7 +532,7 @@
       var lt = lastTrendTouch();
       endDay = lt[0]; endPrice = lt[1];
       endWhen = longDate(isoOf(lt[0]));
-      endLabel = 'the last time price touched trend (' + endWhen + ')';
+      endLabel = 'the last time price touched the trend line (' + endWhen + ')';
     } else {
       endDay = todayDays(); endPrice = spot;
       endWhen = 'today';
@@ -603,7 +608,7 @@
       renderScatter(endDay, endPrice, 'today');
     } else {
       $('flParityRead').innerHTML =
-        'Graded to the last trend touch, the same entries show a positive excess of ' + signedPct1(g.excess) + '. ' +
+        'Graded to the last time price touched the trend line, the same entries came out ' + signedPct1(g.excess) + ' per year ahead. ' +
         '<strong>This is the reversion showing up, not evidence that floor entries beat the market.</strong> ' +
         'It is the historical bonus for having been early to a line price later left behind — and it is measured to an endpoint ' +
         'chosen precisely because it was favourable. The guarantee half is the finding that leads this page: graded at its ' +
@@ -615,7 +620,7 @@
         '(' + endWhen + ') banks the whole reversion and stops the clock before the drawdown that followed. ' +
         'It is a fair question — what did the entry pay by the time price had returned to trend? — asked with a favourable ruler. ' +
         'Both tabs are true; neither is the answer on its own.';
-      renderScatter(endDay, endPrice, 'the last trend touch (' + endWhen + ')');
+      renderScatter(endDay, endPrice, 'the last time price touched the trend line (' + endWhen + ')');
     }
   }
 
