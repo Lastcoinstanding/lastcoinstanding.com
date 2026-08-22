@@ -318,6 +318,20 @@
     }
   },
   {
+    "_comment": "The lower edge of the Power Law channel, taken on its own. Grouped with Models & Trends beside the-power-law, which owns the model; this page owns the line it has agreed to be judged against. interactive: true — live distance readout, episode explorer, endpoint-toggled parity instrument, live tripwire status — but it takes NO plan inputs and stores nothing, so there is no sticky state and no URL scenario params: it is a read, not a calculator. Everything historical is measured on the MODERN set (2011 onward, MODERN_FROM in the page JS, the same boundary the tripwire uses); the 2010 genesis samples appear once in the record section and are excluded from every measurement and every chart position, because a position is weight. floorParityQA() asserts three things on every load: the published full-set fixture, the modern-set fixture, and a leak check that no pre-2011 sample reaches the displayed set. Tile anchor is '' — the payload is the live readout at the top of the page. SVG tile at components/calc-tile-icons/the-bitcoin-floor.njk.",
+    "slug": "the-bitcoin-floor",
+    "title": "The Bitcoin Floor",
+    "category": "numbers",
+    "group": "Models & Trends",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "The lower edge of the Power Law channel, at 0.42× trend. Where price sits against it right now, every time it has been tested, and the published criteria that would break the model.",
+      "preview_kind": "svg",
+      "anchor": "",
+      "position": 250
+    }
+  },
+  {
     "_comment": "Does a bitcoin allocation earn its place? Answers one question (worth it over a long horizon, despite drawdowns) with three effects as evidence. Reframed to match The Bitcoin Horizon: the third effect is 'portfolio influence' (the neutral engine, NOT risk); true risk is the drawdown you cannot hold through. Bitcoin growth projected from the Power Law, regime-aware. Consequences counterpart to how-much-bitcoin (Kelly/optimal). SVG tile at components/calc-tile-icons/bitcoin-allocation-sizing.njk.",
     "slug": "bitcoin-allocation-sizing",
     "title": "Bitcoin Portfolio Allocation",

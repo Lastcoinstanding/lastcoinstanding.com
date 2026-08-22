@@ -3,6 +3,13 @@ layout: base.njk
 permalink: /the-bitcoin-floor.html
 slug: the-bitcoin-floor
 feedback: false
+related:
+  - slug: the-power-law
+    desc: "The model this page tests. Power Law owns the channel, the coefficients and the limits stated in full; this page takes the channel's lower edge on its own and asks how well it has held. Read that one for what the model is, this one for where it has agreed to be judged."
+  - slug: dashboard
+    desc: "The same live channel position, read across ten stats rather than one. The Dashboard answers \"where are we\" broadly &mdash; trend multiple, zone, time below trend, reversion rates; this page narrows to the floor and what happens near it."
+  - slug: discount-or-premium
+    desc: "Where price sits against trend right now, and what a return to trend would imply at any speed you pick. Discount or Premium measures the gap to the middle of the channel; this page measures the distance to its lower edge."
 faq:
   - q: "What is the Power Law floor?"
     a: "It is the lower-bound line of bitcoin&rsquo;s price history over the long term &mdash; drawn at 0.42&times; the trend price, using the same exponent, so it runs parallel to the trend rather than converging on it. Nothing enforces it and it is not a support level. What it is, is a lower edge the price has held with remarkable consistency, which is why &ldquo;floor&rdquo; is the accurate description. The upper edge of the same channel is far more volatile, with brief violent spikes."
@@ -261,17 +268,5 @@ eleventyComputed:
     <div class="fl-verify" id="flVerify"></div>
   </section>
 
-  <!-- ══════════ RELATED (preview: plain in-page links) ══════════ -->
-  <section class="fl-section" id="related-preview">
-    <div class="fl-eyebrow">Read next</div>
-    <h2 class="fl-h2">Where this connects</h2>
-    <ul class="fl-related">
-      <li><a href="/the-power-law">Bitcoin &amp; The Power Law</a> &mdash; the model this page tests, the channel it draws, and its limits stated in full.</li>
-      <li><a href="/dashboard">The Bitcoin Dashboard</a> &mdash; the same live channel position, read across ten stats rather than one.</li>
-      <li><a href="/discount-or-premium">Discount or Premium</a> &mdash; where price sits against trend right now, and what reverting to it would imply.</li>
-      <li><a href="/bitcoin-escape-velocity">Bitcoin Escape Velocity</a> &mdash; what the same growth model implies for a stack being drawn down.</li>
-    </ul>
-    <p class="fl-preview-note"><strong>Preview note.</strong> This page is unlisted and carries a <code>noindex</code> guard. Nav, sitemap, <code>llms.txt</code>, homepage, the related strip and the OG card are the production pass, not this one.</p>
-  </section>
 
 </div>
