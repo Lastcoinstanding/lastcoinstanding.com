@@ -22,6 +22,30 @@ fastest and matters most to keep honest._
 
 ---
 
+## Weekly cadence
+
+- **Weekly LinkedIn sweep — Mondays, with the GSC glance.** Three surfaces, all three every
+  time, because they fail differently and only one of them notifies reliably:
+  1. **Notifications** — the shallow pass most people stop at.
+  2. **Comment threads on recent posts** — comments on an older post frequently never surface
+     in notifications at all. This is the one that bit: the **Kirubi comment sat five days
+     before it was seen (surfaced 2026-08-21)**. Inbound engagement is the scarcest thing this
+     account gets; letting it age a week is the one failure this sweep exists to prevent.
+  3. **Connection-request statuses** — accepts are silent. An accepted request with no
+     follow-up is a warm contact going cold, and the ledger's next-action dates depend on
+     catching the accept, not on being told about it.
+- **Anything actionable goes in the Outreach ledger below**, same entry conventions: what, to
+  whom, and the next action with its date. A sweep that finds something and leaves it in the
+  LinkedIn UI has not been done.
+
+> **One thing to settle.** This pairs the sweep with "the GSC glance", but the only GSC glance
+> written down anywhere is a **monthly** item (`MONTHLY_REFRESH_CHECKLIST`, the STRC indexed-count
+> check). If there is a genuine weekly Search Console habit, it is currently undocumented and
+> should get its own line here; if the pairing meant the monthly sweep, this cadence stands alone
+> on Mondays and the phrase should lose the "with".
+
+---
+
 ## Outreach ledger
 
 **2026-08-19 Wed AM — Kuiper (VP Research, FDA; title verified at send).** LinkedIn connection
