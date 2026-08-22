@@ -1,5 +1,11 @@
 [
   {
+    "display": "8/22/26",
+    "date": "2026-08-22",
+    "page": "/the-bitcoin-floor",
+    "summary": "New: The Bitcoin Floor — the lower edge of the Power Law channel, at 0.42× trend, and a live read of where price sits against it. Price has ridden near this line as its ordinary lower bound for fifteen years; the page shows the four closest approaches it has made and what followed each, with every modern one back above trend inside 24 months. It also measures what entering near the floor actually paid, and makes the honest part interactive: the same entries graded to today or to the last time price touched trend, because what the answer means depends entirely on where you stop measuring. And it publishes the criteria that would break the model — more than 10% below the floor, held more than 30 consecutive days — with a live status line reporting against them."
+  },
+  {
     "display": "8/20/26",
     "date": "2026-08-20",
     "page": "/bitcoin-escape-velocity",

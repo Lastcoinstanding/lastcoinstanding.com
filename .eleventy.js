@@ -72,6 +72,7 @@ module.exports = function (eleventyConfig) {
     'og-start-here.jpg',
     'og-dashboard.jpg',
     'og-bitcoin-escape-velocity.jpg',
+    'og-the-bitcoin-floor.jpg',
     // Gallery companion graphic (full-res PNG; scaled for display via CSS, full-res on click-through)
     'middle-seat-infographic.png',
     // Bitcoin Defined illustrations (1280x720). Eight Grok-generated
@@ -127,9 +128,38 @@ module.exports = function (eleventyConfig) {
   // (components/faq-schema.njk). Answers may carry a curated inline <a> in the
   // visible block; the schema answer text is safest as plain text, and this
   // makes the schema string match the visible block's textContent (which the
-  // browser also renders tag-free). Tags only — the surrounding text/whitespace
-  // is preserved so the two strings stay identical.
-  eleventyConfig.addFilter('faqStripTags', (s) => String(s == null ? '' : s).replace(/<[^>]*>/g, ''));
+  // browser also renders tag-free). Whitespace is preserved so the two strings
+  // stay identical.
+  //
+  // ENTITIES ARE DECODED TOO (fix 2026-08-22, the C1 defect from the site-wide
+  // hygiene audit). Stripping tags alone left the schema carrying the SOURCE
+  // text — "bitcoin&rsquo;s trend growth" — while the visible block renders the
+  // decoded character, because the browser decodes entities when it parses the
+  // FAQ markup. Google's FAQPage policy requires the schema text to match what
+  // the reader sees, so the two have to be decoded the same way. Affected 10
+  // FAQ-bearing pages; The Bitcoin Hurdle Rate carried 15 occurrences alone.
+  //
+  // Named set is scoped to what FAQ prose actually uses (audited across every
+  // faq: block: mdash, rsquo, quot, times, rdquo, minus, ldquo), plus ndash,
+  // hellip, nbsp and the structural four for headroom; numeric entities are
+  // handled generically. Deliberately NOT a general-purpose HTML decoder —
+  // `| dump` still JSON-escapes the result, so the output stays valid JSON, and
+  // a narrow table is easier to reason about than a dependency.
+  const FAQ_ENTITIES = {
+    amp: '&', lt: '<', gt: '>', quot: '"', apos: "'",
+    mdash: '—', ndash: '–', minus: '−',
+    lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”',
+    times: '×', hellip: '…', nbsp: ' '
+  };
+  eleventyConfig.addFilter('faqStripTags', (s) =>
+    String(s == null ? '' : s)
+      .replace(/<[^>]*>/g, '')
+      .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(parseInt(n, 10)))
+      .replace(/&#x([0-9a-fA-F]+);/g, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+      // &amp; last would double-decode "&amp;mdash;"; the named pass runs once,
+      // left to right, so each entity is replaced exactly one time.
+      .replace(/&([a-zA-Z]+);/g, (m, name) =>
+        Object.prototype.hasOwnProperty.call(FAQ_ENTITIES, name) ? FAQ_ENTITIES[name] : m));
 
   return {
     dir: {

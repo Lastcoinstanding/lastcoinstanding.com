@@ -202,3 +202,46 @@ function fetchTodayPrice(onResult){
   }
   attempt(1); // 1 retry: two total attempts, then the honest fallback
 }
+
+// ═══════ YEAR-ALIGNED TIME AXIS TICKS (shared, 2026-08-22) ═══════
+// Every chart on this site that plots days-since-genesis on the x-axis labels
+// its ticks with a calendar year. Left to Chart.js's own tick placement, the
+// values do not land on Jan 1 — so two adjacent ticks routinely fall inside the
+// same year and the axis reads "2011 2011" or "2015 2015 2016 2016".
+//
+// /the-power-law's channel chart already carried a fix for this, but it was
+// guarded `if (axis.type !== 'linear') return` — so flipping that chart's own
+// time-axis toggle to LOGARITHMIC dropped straight back to the duplicate
+// labels. The Bitcoin Floor's channel chart is logarithmic always, and had no
+// override at all. Same defect, two pages, one cause.
+//
+// This places ticks ON Jan 1 of each year in range, striding when the window is
+// wide, which makes a duplicate label structurally impossible rather than
+// merely unlikely — there is exactly one tick per labelled year. Works on
+// linear and logarithmic time axes alike: only the tick VALUES are set here,
+// and the scale maps them wherever it likes.
+//
+// Usage on a Chart.js scale:
+//   ticks: { callback: plYearTickLabel },
+//   afterBuildTicks: plYearAxisTicks
+function plYearTickLabel(v){
+  return new Date((GENESIS_TS + v * 86400) * 1000).getUTCFullYear();
+}
+function plYearAxisTicks(axis){
+  if (!axis || !isFinite(axis.min) || !isFinite(axis.max) || axis.max <= axis.min) return;
+  var startYear = new Date((GENESIS_TS + axis.min * 86400) * 1000).getUTCFullYear();
+  var endYear   = new Date((GENESIS_TS + axis.max * 86400) * 1000).getUTCFullYear();
+  var span = endYear - startYear + 1;
+  // Stride so a long window does not crowd; a short window labels every year.
+  var stride = span > 20 ? 5 : (span > 10 ? 2 : 1);
+  var first = Math.ceil(startYear / stride) * stride;
+  var ticks = [];
+  for (var y = first; y <= endYear; y += stride) {
+    var jan1 = (Date.UTC(y, 0, 1) / 1000 - GENESIS_TS) / 86400;
+    if (jan1 >= axis.min && jan1 <= axis.max) ticks.push({ value: jan1 });
+  }
+  // A window narrower than one Jan-1 boundary (deep zoom) would otherwise lose
+  // its axis entirely — fall back to the endpoints so the reader keeps a scale.
+  if (!ticks.length) ticks = [{ value: axis.min }, { value: axis.max }];
+  axis.ticks = ticks;
+}

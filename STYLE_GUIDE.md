@@ -2285,6 +2285,28 @@ The precedent is `/bitcoin-as-collateral` (`SITE_GUIDE §48`): H1 *"The pledge y
 
 Related: `§6.10a` (tool hero: say what it is and how to use it) applies the same principle one layer down, to the hero rather than the title. `NEW_PAGE_CHECKLIST §10` carries the check at build time.
 
+### 10.5 Models and pages are not actors
+
+**JM ruling, 2026-08-22, from The Bitcoin Floor's round-2 walk.** A model does not agree, nominate, decide, promise or admit; a page does not publish, watch, insist or ask. These constructions read as writerly personification, and worse, they smuggle intent into things that have none — a model that "agreed to be judged" sounds like it consented to something, when what actually happened is that someone drew a line and someone else decided to check it.
+
+- **Avoid:** *"the level the model nominates as its own worst case"* · *"the place the Power Law has agreed to be judged"* · *"the page publishes the parameters it is watching"* · *"a thesis that names its falsifier"*.
+- **Prefer:** name the thing and state the fact. *"The floor is the lower-bound line of bitcoin's price history over the long term — a lower edge the price has held with remarkable consistency."* · *"The criteria are published here in advance, with a live status line reporting against them."*
+
+The tell is easy to check: if the sentence has a model, a page, a chart or a number as its **subject** performing a **volitional verb**, rewrite it with the real actor (a person made a choice) or no actor at all (a fact obtains).
+
+### 10.6 Drafting tells — words that mark an unedited draft
+
+A short banned list. Each of these survived into a shipped draft at least once and had to be swept out; they are collected here so the sweep happens before the review round rather than during it.
+
+| Word | Why | Instead |
+|---|---|---|
+| **"canonical"** | Insider jargon for "the one we use". A reader does not know which of several candidates is canonical, or who decided. | *"the published coefficients"*, *"the 5.77 the site uses"*, *"the Porkopolis calibration this site adopts"* |
+| **"honest" / "honestly" as a self-label** | Covered at length in `§10.1` — describing the page's own posture rather than the content. The banned form is *"the honest caveat"*, *"two honest endpoints"*. | State the caveat and stop. *"the caveat that matters"*, *"two defensible endpoints"* |
+| **"load-bearing"** | Engineering metaphor doing editorial work. It signals importance without saying what depends on what. | Say what rests on it, or cut |
+| **"print"** (for a price observation) | Trading-desk jargon. A reader outside markets does not have it. | *"sample"*, *"close"*, *"a single sample"* — and if the sampling interval matters, state it plainly |
+
+The same discipline applies to any term that would make a reader feel outside the room. The test is not whether the word is correct — all four are — but whether a reader who has never traded, modelled or shipped software would parse it on first pass.
+
 ---
 
 ## Appendix A: Survey findings (2026-04-26)
