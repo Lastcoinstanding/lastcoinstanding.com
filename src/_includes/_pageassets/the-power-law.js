@@ -1205,38 +1205,15 @@
           ticks: {
             color: muted,
             maxTicksLimit: 10,
-            // Year-aligned tick override — prevents duplicate-year labels
-            // on zoomed (small-span) views. Chart.js's autoSkip otherwise
-            // picks evenly-spaced ticks that don't land on Jan 1, causing
-            // adjacent ticks to fall in the same calendar year. With this
-            // override, every visible year appears exactly once. For wide
-            // ranges the stride spaces ticks (every 2y on >10y windows,
-            // every 5y on >20y).
-            callback: function(v){
-              var date = new Date(GENESIS_TS*1000 + v*86400*1000);
-              return date.getFullYear();
-            }
+            // Year-aligned tick override — see plYearAxisTicks in
+            // shared/power-law-data.js. Moved to the shared module 2026-08-22:
+            // this copy was guarded `if (axis.type !== 'linear') return`, so
+            // this chart's own time-axis toggle flipped to LOGARITHMIC dropped
+            // straight back to duplicate year labels ("2015 2015 2016 2016").
+            // The shared helper handles both axis types.
+            callback: plYearTickLabel
           },
-          afterBuildTicks: function(axis){
-            if(axis.type !== 'linear') return;
-            var startMs = (GENESIS_TS + axis.min * 86400) * 1000;
-            var endMs   = (GENESIS_TS + axis.max * 86400) * 1000;
-            var startYear = new Date(startMs).getUTCFullYear();
-            var endYear   = new Date(endMs).getUTCFullYear();
-            var span = endYear - startYear + 1;
-            var stride = 1;
-            if (span > 20) stride = 5;
-            else if (span > 10) stride = 2;
-            var firstYear = Math.ceil(startYear / stride) * stride;
-            var ticks = [];
-            for (var y = firstYear; y <= endYear; y += stride) {
-              var jan1Days = (Date.UTC(y, 0, 1) / 1000 - GENESIS_TS) / 86400;
-              if (jan1Days >= axis.min && jan1Days <= axis.max) {
-                ticks.push({ value: jan1Days });
-              }
-            }
-            axis.ticks = ticks;
-          }
+          afterBuildTicks: plYearAxisTicks
         },
         y: {
           type: 'logarithmic',

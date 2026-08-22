@@ -52,6 +52,10 @@
   --fl-era-3: #6db3d4;
   --fl-era-4: #8fae7f;
   --fl-axis:  rgba(224,148,34,0.28);
+  /* Live position marker — the site's position-orange, shared with the dashboard
+     and Gallery position graphs so "where price sits" is one colour site-wide.
+     Deliberately NOT --fl-price (the chart's historical price line stays blue). */
+  --fl-position: #F7931A;
 }
 
 body { background: var(--bg); color: var(--text); }
@@ -85,8 +89,22 @@ body { background: var(--bg); color: var(--text); }
 .fl-bar-tick-trend { background: rgba(224,148,34,0.55); width: 1px; }
 .fl-bar-tick-label { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-family: var(--font-b); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; text-align: center; line-height: 1.4; }
 .fl-bar-tick-label em { font-style: normal; color: var(--text-dim); letter-spacing: 0; text-transform: none; font-size: 0.66rem; }
-.fl-bar-marker { position: absolute; top: 50%; width: 13px; height: 13px; border-radius: 50%; background: var(--fl-price); border: 2px solid var(--bg); transform: translate(-50%, -50%); transition: left .5s ease; }
-.fl-bar-marker-label { position: absolute; bottom: 17px; left: 50%; transform: translateX(-50%); font-family: var(--font-b); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fl-price); white-space: nowrap; }
+/* The live position marker. Position-orange (--fl-position), not the chart's
+   price-line blue: this dot means the same thing as the dashboard's and the
+   Gallery's position markers, so it reads in the same colour across pages.
+   Halo is the canonical "you are here" treatment (STYLE_GUIDE §6.23) — a
+   scale-travelling ring, not a box-shadow breath, which is the sub-threshold
+   pattern §6.23 exists to correct. */
+.fl-bar-marker { position: absolute; top: 50%; width: 13px; height: 13px; border-radius: 50%; background: var(--fl-position); border: 2px solid var(--bg); transform: translate(-50%, -50%); transition: left .5s ease; z-index: 2; }
+.fl-bar-marker::before { content: ''; position: absolute; inset: -2px; border-radius: 50%; background: var(--fl-position); opacity: 0.45; animation: fl-pulse-halo 2.2s ease-out infinite; pointer-events: none; z-index: -1; }
+.fl-bar-marker-label { position: absolute; bottom: 17px; left: 50%; transform: translateX(-50%); font-family: var(--font-b); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fl-position); white-space: nowrap; }
+@keyframes fl-pulse-halo {
+  0%   { transform: scale(0.35); opacity: 0.55; }
+  100% { transform: scale(3.2);  opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fl-bar-marker::before { animation: none; opacity: 0.25; transform: scale(1.8); }
+}
 
 .fl-hero-nums { display: flex; justify-content: center; gap: 2.2rem; flex-wrap: wrap; margin: 3.2rem auto 0; }
 .fl-hero-num { display: flex; flex-direction: column; gap: 0.25rem; }
@@ -225,4 +243,28 @@ body { background: var(--bg); color: var(--text); }
   .fl-verify-k { flex: 1 1 100%; }
   /* The bar's end labels would otherwise clip at the track edges */
   .fl-anchor-bar { padding: 0 1.2rem; }
+}
+
+/* ── Round 2: zoom context, scatter aids, parity arithmetic ─────────── */
+.fl-zoom-bar { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; margin: 1.4rem 0 0.2rem; }
+.fl-zoom-context { font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); line-height: 1.5; }
+.fl-zoom-context strong { color: var(--text); }
+.fl-zoom-reset { font-family: var(--font-b); font-size: 0.76rem; color: var(--text-dim); background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 0.35rem 0.7rem; cursor: pointer; transition: border-color .15s, color .15s; }
+.fl-zoom-reset:hover { border-color: var(--border-strong); color: var(--ink-bright); }
+.fl-zoom-reset[hidden] { display: none; }
+
+/* The declarative result line sits between the toggle and the chart — the
+   sentence the chart is making, before the reader has to read the chart. */
+.fl-scatter-result { max-width: 880px; font-family: var(--font-b); font-size: 1rem; line-height: 1.7; color: var(--text); margin: 0 0 1.3rem; border-left: 2px solid var(--amber); padding-left: 1rem; }
+.fl-scatter-result strong { color: var(--ink-bright); }
+.fl-chart-worked { max-width: 880px; font-family: var(--font-b); font-size: 0.84rem; line-height: 1.7; color: var(--text-dim); margin: 0.8rem 0 0; }
+.fl-chart-worked strong { color: var(--text); }
+.fl-chart-worked em { color: var(--amber); font-style: italic; }
+.fl-endpoint-toggle-scatter { margin-bottom: 1.1rem; }
+
+/* The three parity figures read as an equation: realized − trend = difference. */
+.fl-parity-op { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; font-family: var(--font-d); font-size: 1.7rem; color: var(--text-muted); padding: 0 0.2rem; }
+@media (max-width: 760px) {
+  .fl-parity-op { display: none; }
+  .fl-scatter-result { font-size: 0.95rem; }
 }

@@ -29,7 +29,7 @@
   // Four distinct episodes below 0.42× trend, 10 of 481 samples.
   // `belowPct` is depth below the FLOOR (not below trend). `spanDays`
   // is first-to-last below-floor sample; `bracketDays` is the last
-  // above-floor print before to the first after — the honest outer
+  // above-floor sample before to the first after — the outer
   // bound on duration given a ~12-day sampling grid.
   // gap24 = share of the gap to trend closed 24 months after the touch.
   // ═══════════════════════════════════════════════════════════
@@ -41,9 +41,9 @@
       samples: 5, spanDays: 48, bracketDays: 72,
       deepestXt: 0.241, deepestOn: '2010-10-05', belowPct: 42.6,
       xt24: 0.628, gap24: 39,
-      kind: 'break',
-      kindLabel: 'The one real break',
-      body: 'Price closed <strong>42.6% below the floor</strong> and stayed under for at least 48 days — 72 days if you bracket it by the last print above the line and the first one after. This is the only episode in the record that a sustained-break test would catch, and it is the model’s honest asterisk.<br><br>The context is not an excuse but it is load-bearing: bitcoin traded in cents, on a handful of venues, years before any exchange we would now call mature. A market that thin can put price anywhere. Whether 2010 should count equally against a model of adoption is a real question, and the answer this page takes is that it counts — stated, not buried — while the conditions that produced it are stated too.<br><br><strong>A granularity note specific to this episode.</strong> The shared series samples roughly every 12 days, so it cannot see intraday or daily excursions between samples. The deepest print it contains is <strong>0.241× trend</strong>; the module’s own header comment cites a 2010 low near <strong>0.196×</strong>, which cannot be derived from this series and may come from daily data predating the grid. Every depth and duration on this page is therefore a <em>lower bound</em>.'
+      kind: 'break', modern: false,
+      kindLabel: 'Genesis era — recorded, not weighted',
+      body: 'Price closed <strong>42.6% below the floor</strong> and stayed under for at least 48 days — 72 days measured from the last sample above the line to the first one after.<br><br>This sample sits in bitcoin’s genesis era: no mature exchange, negligible liquidity, a price measured in cents, and a market thin enough for a single participant to move it. It is the same period every careful fit of this model down-weights, for exactly that reason. It is <strong>statistically spurious as evidence about the modern floor; it is recorded here for completeness, not weight.</strong> Nothing else on this page rests on it.<br><br><strong>On the numbers themselves.</strong> The deepest sample here is <strong>0.241× trend</strong>. The shared module’s own header cites a 2010 low near <strong>0.196×</strong>, which cannot be derived from this series and may come from daily data predating the 12-day grid — another reason this era resists clean measurement.'
     },
     {
       id: '2015a',
@@ -52,9 +52,9 @@
       samples: 1, spanDays: 0, bracketDays: 24,
       deepestXt: 0.412, deepestOn: '2015-08-28', belowPct: 1.8,
       xt24: 1.753, gap24: 228,
-      kind: 'graze',
+      kind: 'graze', modern: true,
       kindLabel: 'A graze',
-      body: 'A single print <strong>1.8% below the floor</strong>, bracketed by above-floor samples 24 days apart. On any reading this is a touch, not a break — the line was tested and held within one sampling interval.<br><br>Twenty-four months later price sat at <strong>1.75× trend</strong>: the gap to trend was not merely closed but overshot by a wide margin. This is the deepest reversion in the record and it does a lot of work in the median below, which is a reason to look at the four outcomes individually rather than trusting their midpoint.'
+      body: 'A single sample <strong>1.8% below the floor</strong>, bracketed by above-floor samples 24 days apart — so the true stay below the line was anything under about 24 days. On any reading this is a touch, not a break — the line was tested and held within one sampling interval.<br><br>Twenty-four months later price sat at <strong>1.75× trend</strong>: the gap to trend was not merely closed but overshot by a wide margin. This is the deepest reversion in the record and it does a lot of work in the median below, which is a reason to look at the three modern outcomes individually rather than trusting their midpoint.'
     },
     {
       id: '2015b',
@@ -63,9 +63,9 @@
       samples: 3, spanDays: 24, bracketDays: 48,
       deepestXt: 0.398, deepestOn: '2015-09-21', belowPct: 5.1,
       xt24: 1.381, gap24: 163,
-      kind: 'graze',
+      kind: 'graze', modern: true,
       kindLabel: 'A graze',
-      body: 'Three consecutive samples below the line, the deepest <strong>5.1% under</strong> — the worst of the three grazes, and still nowhere near the 2010 break or the tripwire’s 10%-for-30-days threshold. Price spent about 24 days under by sample span, 48 bracketed.<br><br>Twenty-four months on, price was at <strong>1.38× trend</strong>. Note that this episode and the August one are separate visits, three weeks apart, with an above-floor print between them — collapsing them into a single “2015 event” would turn four episodes into three and quietly change every count on this page.'
+      body: 'Three consecutive samples below the line, the deepest <strong>5.1% under</strong> — the worst of the three modern approaches, and still nowhere near the tripwire’s 10%-for-30-days criteria. Price spent about 24 days under by sample span, 48 bracketed.<br><br>Twenty-four months on, price was at <strong>1.38× trend</strong>. Note that this episode and the August one are separate visits, three weeks apart, with an above-floor sample between them — collapsing them into a single “2015 event” would turn four episodes into three and quietly change every count on this page.'
     },
     {
       id: '2023',
@@ -74,15 +74,15 @@
       samples: 1, spanDays: 0, bracketDays: 24,
       deepestXt: 0.418, deepestOn: '2023-01-06', belowPct: 0.4,
       xt24: 1.175, gap24: 130,
-      kind: 'graze',
+      kind: 'graze', modern: true,
       kindLabel: 'A graze',
-      body: 'The shallowest of the four: a single print <strong>0.4% below the floor</strong>, at the bottom of the 2022 bear market. In practical terms price reached the line and stopped.<br><br>Twenty-four months later it sat at <strong>1.18× trend</strong>, having closed the gap and moved past it. This is also the most recent episode before today, and the one whose conditions most resemble the present market.'
+      body: 'The shallowest of the four: a single sample <strong>0.4% below the floor</strong>, at the bottom of the 2022 bear market. In practical terms price reached the line and stopped.<br><br>Twenty-four months later it sat at <strong>1.18× trend</strong>, having closed the gap and moved past it. This is also the most recent episode before today, and the one whose conditions most resemble the present market.'
     }
   ];
 
   // Quantile regression on log(price) ~ log(days), analysis §1. Each row is
   // an INDEPENDENT fit (slope free); `multAtCanon` is the ×-trend multiple
-  // implied when the slope is instead forced to the canonical 5.77.
+  // implied when the slope is instead forced to the 5.77 the site uses.
   var QUANTILE_FITS = [
     { tau: 0.02, slope: 5.9552, multAtCanon: 0.4209 },
     { tau: 0.05, slope: 5.8834, multAtCanon: 0.4604 },
@@ -247,7 +247,7 @@
     var priceSeries = PL_DATA.map(function (p) { return { x: p[0], y: p[1] }; });
 
     // Episode shading: a Chart.js plugin drawing one translucent vertical
-    // band per episode, bracketed by the last above-floor print before and
+    // band per episode, bracketed by the last above-floor sample before and
     // the first after (the same outer bound the cards report).
     var episodeBands = {
       id: 'flEpisodeBands',
@@ -290,11 +290,11 @@
         scales: {
           x: {
             type: 'logarithmic', min: minD, max: maxD,
-            title: { display: true, text: 'Days since genesis (log)', color: cDim, font: { size: 10 } },
-            ticks: {
-              color: cDim, font: { size: 10 }, maxTicksLimit: 8,
-              callback: function (v) { return isoOf(v).slice(0, 4); }
-            },
+            title: { display: true, text: 'Year (log time)', color: cDim, font: { size: 10 } },
+            // Year-aligned ticks from the shared module: one tick per labelled
+            // year, placed on Jan 1, so "2011 2011" cannot happen.
+            ticks: { color: cDim, font: { size: 10 }, callback: plYearTickLabel },
+            afterBuildTicks: plYearAxisTicks,
             grid: { color: 'rgba(224,148,34,0.05)' }
           },
           y: {
@@ -312,7 +312,33 @@
           }
         },
         plugins: {
-          legend: { labels: { color: cDim, font: { size: 11 }, usePointStyle: true, boxWidth: 8 } },
+          // Legend: pinned to a stable order and given room to wrap. Chart.js
+          // sorts legend items by dataset `order` and will silently drop items
+          // that do not fit the space it allocates itself — which is how a
+          // zoomed view can come back missing a series. maxHeight reserves two
+          // rows so wrapping never costs an entry, and generateLabels fixes the
+          // order to the reading order of the chart (floor first: it is the
+          // page's subject) instead of leaving it to the `order` field.
+          legend: {
+            position: 'top', align: 'start', maxHeight: 60,
+            labels: {
+              color: cDim, font: { size: 11 }, usePointStyle: true,
+              boxWidth: 8, padding: 12,
+              generateLabels: function (chart) {
+                var wanted = ['Floor (0.42× trend)', 'Price', 'Trend', 'Upper band (3× trend)'];
+                return wanted.map(function (name) {
+                  var i = chart.data.datasets.findIndex(function (d) { return d.label === name; });
+                  if (i < 0) return null;
+                  var ds = chart.data.datasets[i];
+                  return {
+                    text: ds.label, datasetIndex: i,
+                    strokeStyle: ds.borderColor, fillStyle: ds.borderColor,
+                    lineWidth: 2, hidden: !chart.isDatasetVisible(i), pointStyle: 'line'
+                  };
+                }).filter(Boolean);
+              }
+            }
+          },
           tooltip: {
             backgroundColor: '#1a1714', borderColor: 'rgba(224,148,34,0.3)', borderWidth: 1,
             titleColor: '#f2eee8', bodyColor: '#e8e0d4',
@@ -338,7 +364,20 @@
     });
   }
 
+  function setZoomContext(ep) {
+    var ctx = $('flZoomContext'), btn = $('flZoomReset');
+    if (!ctx || !btn) return;
+    if (!ep) {
+      ctx.textContent = 'Showing the full history.';
+      btn.hidden = true;
+    } else {
+      ctx.innerHTML = 'Zoomed to the <strong>' + ep.when + '</strong> approach &mdash; a stretch where the floor held even as price stayed below trend for an extended period.';
+      btn.hidden = false;
+    }
+  }
+
   function zoomChartTo(ep) {
+    setZoomContext(ep);
     if (!channelChart) return;
     if (!ep) {
       channelChart.options.scales.x.min = PL_DATA[0][0];
@@ -383,16 +422,26 @@
       b.addEventListener('click', function () { selectEpisode(ep.id); });
       strip.appendChild(b);
     });
-    // Register guard (design doc §4): the one real break leads the section,
-    // so it is the card open on arrival — never a graze, never an average.
-    selectEpisode('2010');
-
-    var gaps = EPISODES.map(function (e) { return e.gap24; });
+    // The reversion stats are reported on the MODERN approaches only. The
+    // genesis-era episode is recorded in its own card and nowhere else — it is
+    // not averaged into a headline (see the section lede).
+    var modern = EPISODES.filter(function (e) { return e.modern; });
+    var gaps = modern.map(function (e) { return e.gap24; });
+    var over = gaps.filter(function (g) { return g > 100; }).length;
     $('flRevMedian').textContent = Math.round(median(gaps)) + '%';
-    $('flRevOvershoot').textContent = gaps.filter(function (g) { return g > 100; }).length + ' of 4';
+    $('flRevOvershoot').textContent = over + ' of ' + gaps.length;
+
+    // Round-2 reframe: the MODERN record leads. The genesis-era episode is
+    // recorded in its own card and given no weight, so it is no longer the card
+    // open on arrival — that would hand it the prominence the reframe removes.
+    // Opens on the most recent modern approach, whose own card notes it is the
+    // one whose conditions most resemble today.
+    // `true` = do not zoom: the chart lands on the full history, and zooming is
+    // something the reader chooses by picking a card.
+    selectEpisode(modern[modern.length - 1].id, true);
   }
 
-  function selectEpisode(id) {
+  function selectEpisode(id, noZoom) {
     var ep = null;
     for (var i = 0; i < EPISODES.length; i++) if (EPISODES[i].id === id) ep = EPISODES[i];
     if (!ep) return;
@@ -406,7 +455,7 @@
     }
 
     var dur = ep.spanDays === 0
-      ? 'a single print'
+      ? 'a single sample (&le;24d)'
       : ep.spanDays + ' days';
     $('flEpCard').innerHTML =
       '<div class="fl-ep-card-h">' + ep.when + '</div>' +
@@ -419,7 +468,8 @@
         metric(ep.gap24 + '%', 'of the gap to trend closed') +
       '</div>' +
       '<p>' + ep.body + '</p>';
-    zoomChartTo(ep);
+    if (noZoom) { setZoomContext(null); }
+    else { zoomChartTo(ep); }
     if (channelChart) channelChart.update();
   }
   function metric(v, k) {
@@ -432,7 +482,7 @@
   // Methodology, from analysis §3, reimplemented here rather than
   // hardcoded so the figures move with the series:
   //   entries  = samples priced within 10% ABOVE the floor (×-floor ≤ 1.10),
-  //              which also picks up genuine sub-floor prints;
+  //              which also picks up genuine sub-floor samples;
   //   realized = CAGR from each entry's price to the endpoint price;
   //   trend    = CAGR of the trend line across the identical window;
   //   excess   = the MEDIAN OF THE PER-ENTRY DIFFERENCES — not the
@@ -523,12 +573,12 @@
 
       var read;
       if (Math.abs(g.excess) < 1.0) {
-        read = '<strong>Buying within 10% of the model’s worst case did not beat the model.</strong> ' +
+        read = '<strong>Entering within 10% of the floor did not beat the trend line.</strong> ' +
           'The median entry returned an enormous absolute CAGR — and its excess over what the trend line itself grew at, ' +
           'across the identical window, is ' + signedPct1(g.excess) + ': indistinguishable from zero. ' +
           'The extra return in this set came from how far <em>below</em> the line an entry went, not from the fact of buying at it.';
       } else if (g.excess > 0) {
-        read = 'Graded to today, these entries show an excess of ' + signedPct1(g.excess) + ' over the model. ' +
+        read = 'Graded to today, these entries came out ' + signedPct1(g.excess) + ' per year ahead of the trend line. ' +
           '<strong>That is the endpoint doing the work, not the entry.</strong> Because ' + whereNow + ', ' +
           'these windows are graded from the floor to a point above it — and excess is very nearly the annualised change ' +
           'in the ×-trend ratio between the two ends. The published analysis, measured <strong>' + ANALYSIS_PARITY.measuredOn +
@@ -537,7 +587,7 @@
           ANALYSIS_PARITY.medianTrend.toFixed(1) + '% — an excess of about zero. Both readings are the same arithmetic ' +
           'seen from different days.';
       } else {
-        read = 'Graded to today, these entries show an excess of ' + signedPct1(g.excess) + ' — they trailed the model. ' +
+        read = 'Graded to today, these entries came out ' + signedPct1(g.excess) + ' per year — they trailed the trend line. ' +
           '<strong>That is the endpoint doing the work, not the entry.</strong> Because ' + whereNow + ', ' +
           'these windows end below where they began in ×-trend terms, and excess is very nearly the annualised change ' +
           'in that ratio. The published analysis, measured with price on the floor, found an excess of about zero.';
@@ -563,7 +613,7 @@
       $('flHonestyEndpoint').innerHTML =
         'This endpoint is <strong>chosen, not neutral</strong>. Measuring to the last moment price touched trend ' +
         '(' + endWhen + ') banks the whole reversion and stops the clock before the drawdown that followed. ' +
-        'It is an honest question — what did the entry pay by the time the model was satisfied? — asked with a favourable ruler. ' +
+        'It is a fair question — what did the entry pay by the time price had returned to trend? — asked with a favourable ruler. ' +
         'Both tabs are true; neither is the answer on its own.';
       renderScatter(endDay, endPrice, 'the last trend touch (' + endWhen + ')');
     }
@@ -572,7 +622,7 @@
   // ═══════════════════════════════════════════════════════════
   // THE ENTRY SCATTER — excess against how far below the line you bought
   //
-  // The parity card answers "did entering at the floor beat the model?"
+  // The parity card answers "did entering at the floor beat the trend line?"
   // with a median. This answers the sharper question underneath it, which
   // the analysis states and no single number can show: the excess in this
   // set tracks HOW FAR BELOW the line an entry went, not the fact of
@@ -680,7 +730,7 @@
         ctx.fillStyle = cDim; ctx.font = '10px Inter, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText('the floor', x0 + 5, ys.top + 12);
-        ctx.fillText('matched the model', xs.left + 5, y0 - 5);
+        ctx.fillText('matched the trend line', xs.left + 5, y0 - 5);
         ctx.restore();
       }
     };
@@ -699,10 +749,10 @@
             // Always frame zero with margin on BOTH sides. When price sits well
             // above the floor every entry shows positive excess, and Chart.js's
             // default framing puts the zero line flush against the axis — where
-            // "matched the model" reads as the chart's frame rather than as the
+            // "matched the trend line" reads as the chart’s frame rather than as the
             // reference the whole panel turns on.
             suggestedMin: yBounds.min, suggestedMax: yBounds.max,
-            title: { display: true, text: 'Excess over the model (percentage points per year)', color: cDim, font: { size: 11 } },
+            title: { display: true, text: 'Excess over the trend line (percentage points per year)', color: cDim, font: { size: 11 } },
             ticks: { color: cDim, font: { size: 10 }, callback: function (v) { return (v > 0 ? '+' : '') + v; } },
             grid: { color: 'rgba(224,148,34,0.05)' }
           }
@@ -741,9 +791,48 @@
       scatterChart = new Chart(canvas, cfg);
     }
 
+    // ── Declarative result line, ENDPOINT-AWARE ────────────────────────
+    // Never an unconditional "these entries never underperformed": whether they
+    // beat the trend line is a fact about the endpoint, not about the entries.
+    // Recomputed with the toggle, and phrased from what the points actually do.
+    var allPositive = rows.every(function (r) { return r.y > 0; });
+    var nearFloorEndpoint = Math.abs((endPrice / floorAt(endDay) - 1) * 100) < 5;
+    var resultEl = $('flScatterResult');
+    if (resultEl) {
+      if (nearFloorEndpoint) {
+        resultEl.innerHTML =
+          'Graded floor-to-floor, these entries <strong>matched the trend line’s growth</strong> — the bonus appears only ' +
+          'when the endpoint sits above the floor.';
+      } else if (allPositive) {
+        resultEl.innerHTML =
+          'Graded to ' + endWhen + ', <strong>every one of these entries beat the trend line’s own growth</strong> — and ' +
+          'the deeper below the line the entry sat, the bigger the bonus.';
+      } else {
+        resultEl.innerHTML =
+          'Graded to ' + endWhen + ', these entries split — some beat the trend line’s own growth and some trailed it, ' +
+          'and where each one landed tracks how far below the line it sat.';
+      }
+    }
+
+    // Worked example, from the deepest MODERN entry — the genesis-era samples
+    // are on the chart but must not be the sentence a reader carries away.
+    var modernRows = rows.filter(function (r) { return r.date >= '2013-01-01'; });
+    var deepestModern = modernRows.slice().sort(function (a, b) { return a.x - b.x; })[0];
+    var workedEl = $('flScatterWorked');
+    if (workedEl && deepestModern) {
+      workedEl.innerHTML =
+        '<strong>Reading one point:</strong> the entry on ' + deepestModern.date + ' sat ' +
+        (deepestModern.x < 0
+          ? Math.abs(deepestModern.x).toFixed(1) + '% <em>below</em> the floor'
+          : deepestModern.x.toFixed(1) + '% above the floor') +
+        ' — the deepest of the modern approaches. Held ' + deepestModern.years.toFixed(1) + ' years to ' + endWhen +
+        ', it came out ' + signedPct1(deepestModern.y) + ' per year against what the trend line grew over the same window.';
+    }
+
     $('flScatterSub').textContent =
-      rows.length + ' entries, each graded to ' + endWhen + '. Left of the dashed vertical is below the floor; ' +
-      'above the dashed horizontal is beating the model.';
+      rows.length + ' entries, each graded to ' + endWhen + ' — all entries within 10% of the floor, above or below it. ' +
+      'Left of the dashed vertical sat below the floor; above the dashed horizontal beat the trend line. ' +
+      'Hover any point for its date and figures.';
     $('flScatterNote').innerHTML =
       '<strong>No line is fitted through these points, deliberately.</strong> Excess is very nearly the annualised change ' +
       'in the ×-trend ratio between entry and exit, so against a common endpoint it is close to arithmetic rather than an ' +
@@ -839,7 +928,7 @@
   }
 
   // Recompute the four episodes from PL_DATA — index-adjacent runs strictly
-  // below the floor, so an above-floor print between two dips separates them
+  // below the floor, so an above-floor sample between two dips separates them
   // (this is what keeps the two September/August 2015 visits distinct).
   function computeEpisodes() {
     var runs = [], cur = null;
@@ -934,7 +1023,7 @@
        'stops there. Today’s spot, the hero distance and the tripwire status do not: those are live, and can therefore sit ' +
        'well away from the last sample, as they do now.'],
       ['Channel coefficients',
-       'a = 1.6&times;10<sup>&minus;17</sup>, b = 5.77 (M&#279;zinskis / Porkopolis canonical), floor = 0.42&times; trend, upper band = 3&times; trend. Shared module, unmodified.'],
+       'a = 1.6&times;10<sup>&minus;17</sup>, b = 5.77 (the published M&#279;zinskis / Porkopolis calibration), floor = 0.42&times; trend, upper band = 3&times; trend. Shared module, unmodified.'],
       ['Live spot',
        spotSource === 'live' ? 'Fetched live this pageload.' : 'The live fetch did not resolve; the latest series sample is standing in, and every figure that depends on it is labelled accordingly.'],
       ['The four episodes',
@@ -954,22 +1043,39 @@
   // ═══════════════════════════════════════════════════════════
   // WIRING + INIT
   // ═══════════════════════════════════════════════════════════
+  // Two endpoint toggles now — one above the parity card, one directly above
+  // the scatter so the control is in reach of the chart it changes. They are
+  // two views of ONE state: any click re-syncs every button on the page, so the
+  // pair can never disagree about which endpoint is selected.
+  function syncEndpointButtons() {
+    var btns = document.querySelectorAll('.fl-seg-btn[data-endpoint]');
+    for (var i = 0; i < btns.length; i++) {
+      var on = btns[i].getAttribute('data-endpoint') === endpointMode;
+      btns[i].classList.toggle('is-active', on);
+      btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+  }
+
   function wire() {
     var btns = document.querySelectorAll('.fl-seg-btn[data-endpoint]');
     for (var i = 0; i < btns.length; i++) {
       btns[i].addEventListener('click', function () {
         endpointMode = this.getAttribute('data-endpoint');
-        for (var j = 0; j < btns.length; j++) {
-          var on = btns[j] === this;
-          btns[j].classList.toggle('is-active', on);
-          btns[j].setAttribute('aria-pressed', on ? 'true' : 'false');
-        }
+        syncEndpointButtons();
         renderParity();
-      }.bind(btns[i]));
+      });
     }
-    // Clicking the chart's whitespace clears the episode zoom.
+    var reset = $('flZoomReset');
+    if (reset) reset.addEventListener('click', function () {
+      activeEpisode = null;
+      zoomChartTo(null);
+      if (channelChart) channelChart.update();
+    });
+    // Double-click the chart also clears the zoom.
     var wrap = $('flChannelChart');
-    if (wrap) wrap.addEventListener('dblclick', function () { activeEpisode = null; zoomChartTo(null); });
+    if (wrap) wrap.addEventListener('dblclick', function () {
+      activeEpisode = null; zoomChartTo(null); if (channelChart) channelChart.update();
+    });
   }
 
   function renderAll() {
