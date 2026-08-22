@@ -97,6 +97,7 @@
   // analysis's endpoint rather than to a live "today".
   var ANALYSIS_PARITY = {
     endpointDayOffset: 1,   // one day past the last PL_DATA sample
+    endpointDate: '2026-08-01',
     medianRealized: 63.8,
     medianTrend: 65.1,
     entries: 26,
@@ -468,29 +469,68 @@
     $('flParityTrend').textContent = g.trend.toFixed(1) + '%';
     $('flParityExcess').textContent = signedPct1(g.excess);
     $('flParityRealizedSub').textContent = 'median across ' + g.n + ' entries';
-    $('flParityMethod').textContent =
+    $('flParityMethod').innerHTML =
       'Entries are the ' + g.n + ' samples in the series priced within 10% of the floor, graded to ' + endLabel + '. ' +
-      'That is ' + (g.n / PL_DATA.length * 100).toFixed(1) + '% of the ' + PL_DATA.length + ' samples on record.';
+      'That is ' + (g.n / PL_DATA.length * 100).toFixed(1) + '% of the ' + PL_DATA.length + ' samples on record. ' +
+      'The published measurement behind this instrument (<code>analysis/2026-08-20-power-law-floor.md</code> §3) graded the ' +
+      'same entries to ' + ANALYSIS_PARITY.endpointDate + ', when price sat on the floor: ' +
+      ANALYSIS_PARITY.medianRealized.toFixed(1) + '% realized against ' + ANALYSIS_PARITY.medianTrend.toFixed(1) +
+      '% trend. Run <code>floorParityQA()</code> in the console to reproduce it.';
 
     if (!toTrend) {
-      $('flParityRead').innerHTML =
-        '<strong>Buying within 10% of the model’s worst case did not beat the model.</strong> ' +
-        'The median entry returned an enormous absolute CAGR — and its excess over what the trend line itself grew at, ' +
-        'across the identical window, is ' + signedPct1(g.excess) + ': indistinguishable from zero. ' +
-        'The extra return in this set came from how far <em>below</em> the line an entry went, not from the fact of buying at it.';
+      // The to-today read is POSITION-DEPENDENT and must be recomputed, never
+      // remembered. The published analysis was written on a day when price sat
+      // on the floor, which made excess ≈ 0 almost by construction. That is a
+      // fact about that day's vantage, not a standing property — when price is
+      // well above the floor these same windows are graded floor-to-higher and
+      // the excess goes positive for exactly the same mechanical reason. The
+      // branch below keeps the sentence true at any distance, and always shows
+      // the published measurement alongside so the two can be reconciled.
+      var d0 = todayDays();
+      var vsFloorNow = (spot / floorAt(d0) - 1) * 100;
+      var whereNow = Math.abs(vsFloorNow) < 3
+        ? 'today sits essentially <em>on</em> the floor'
+        : (vsFloorNow > 0
+            ? 'today sits <em>' + Math.abs(vsFloorNow).toFixed(0) + '% above</em> the floor'
+            : 'today sits <em>' + Math.abs(vsFloorNow).toFixed(0) + '% below</em> the floor');
+
+      var read;
+      if (Math.abs(g.excess) < 1.0) {
+        read = '<strong>Buying within 10% of the model’s worst case did not beat the model.</strong> ' +
+          'The median entry returned an enormous absolute CAGR — and its excess over what the trend line itself grew at, ' +
+          'across the identical window, is ' + signedPct1(g.excess) + ': indistinguishable from zero. ' +
+          'The extra return in this set came from how far <em>below</em> the line an entry went, not from the fact of buying at it.';
+      } else if (g.excess > 0) {
+        read = 'Graded to today, these entries show an excess of ' + signedPct1(g.excess) + ' over the model. ' +
+          '<strong>That is the endpoint doing the work, not the entry.</strong> Because ' + whereNow + ', ' +
+          'these windows are graded from the floor to a point above it — and excess is very nearly the annualised change ' +
+          'in the ×-trend ratio between the two ends. Measured on a day when price sat <em>on</em> the floor, the published ' +
+          'analysis found the same entries returned ' + ANALYSIS_PARITY.medianRealized.toFixed(1) + '% against a trend of ' +
+          ANALYSIS_PARITY.medianTrend.toFixed(1) + '% — an excess of about zero. Both readings are the same arithmetic ' +
+          'seen from different days.';
+      } else {
+        read = 'Graded to today, these entries show an excess of ' + signedPct1(g.excess) + ' — they trailed the model. ' +
+          '<strong>That is the endpoint doing the work, not the entry.</strong> Because ' + whereNow + ', ' +
+          'these windows end below where they began in ×-trend terms, and excess is very nearly the annualised change ' +
+          'in that ratio. The published analysis, measured with price on the floor, found an excess of about zero.';
+      }
+      $('flParityRead').innerHTML = read;
+
       $('flHonestyEndpoint').innerHTML =
-        'Today sits at the floor, so every window here is graded floor-to-floor — the least flattering vantage available, ' +
-        'and close to a tautology: excess is very nearly the annualised change in the ×-trend ratio between entry and exit, ' +
-        'which is about zero when both ends sit on the same line. This number is a statement about the <strong>pair</strong> ' +
-        '(entry near the floor, exit near the floor), not a durable property of floor entries. Change the endpoint and it changes — ' +
-        'which is what the toggle above is for.';
+        'Excess here is very nearly the annualised change in the ×-trend ratio between entry and exit, so <strong>where price ' +
+        'happens to sit on the day you read this decides the answer</strong>. Right now ' + whereNow + ', at ' +
+        (spot / trendAt(d0)).toFixed(3) + '× trend. When price sits on the floor every window is graded floor-to-floor — ' +
+        'the least flattering vantage available, and the one the published analysis used. This number is a statement about ' +
+        'the <strong>pair</strong> of endpoints, not a durable property of floor entries. Change either and it changes.';
     } else {
       $('flParityRead').innerHTML =
         'Graded to the last trend touch, the same entries show a positive excess of ' + signedPct1(g.excess) + '. ' +
         '<strong>This is the reversion showing up, not evidence that floor entries beat the market.</strong> ' +
         'It is the historical bonus for having been early to a line price later left behind — and it is measured to an endpoint ' +
-        'chosen precisely because it was favourable. The guarantee half is the other tab: even graded at its worst, ' +
-        'an entry at the floor still roughly matched the model.';
+        'chosen precisely because it was favourable. The guarantee half is the finding that leads this page: graded at its ' +
+        'worst — with price back down on the floor, as the published analysis measured it — the same entries returned ' +
+        ANALYSIS_PARITY.medianRealized.toFixed(1) + '% against the model’s own ' + ANALYSIS_PARITY.medianTrend.toFixed(1) +
+        '%, an excess of about zero. Matching the model at the worst vantage is the claim; this tab is the bonus.';
       $('flHonestyEndpoint').innerHTML =
         'This endpoint is <strong>chosen, not neutral</strong>. Measuring to the last moment price touched trend ' +
         '(' + endWhen + ') banks the whole reversion and stops the clock before the drawdown that followed. ' +
