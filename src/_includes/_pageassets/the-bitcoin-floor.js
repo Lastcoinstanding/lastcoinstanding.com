@@ -644,13 +644,13 @@
           'in the ×-trend ratio between the two ends. The published analysis, measured <strong>' + ANALYSIS_PARITY.measuredOn +
           '</strong> — a day when price sat <em>on</em> the floor — found the same entries returned ' +
           ANALYSIS_PARITY.medianRealized.toFixed(1) + '% against a trend of ' +
-          ANALYSIS_PARITY.medianTrend.toFixed(1) + '% — an excess of about zero. Both readings are the same arithmetic ' +
+          ANALYSIS_PARITY.medianTrend.toFixed(1) + '% — a difference of about zero. Both readings are the same arithmetic ' +
           'seen from different days.';
       } else {
         read = 'Graded to today, these entries came out ' + signedPct1(g.excess) + ' per year — they trailed the trend line. ' +
           '<strong>That is the endpoint doing the work, not the entry.</strong> Because ' + whereNow + ', ' +
           'these windows end below where they began in ×-trend terms, and that shortfall is very nearly the annualised change ' +
-          'in that ratio. The published analysis, measured with price on the floor, found an excess of about zero.';
+          'in that ratio. The published analysis, measured with price on the floor, found a difference of about zero.';
       }
       $('flParityRead').innerHTML = read;
 
@@ -1121,7 +1121,7 @@
        'stops there. Today’s spot, the hero distance and the tripwire status do not: those are live, and can therefore sit ' +
        'well away from the last sample, as they do now.'],
       ['Channel coefficients',
-       'a = 1.6&times;10<sup>&minus;17</sup>, b = 5.77 (the published M&#279;zinskis / Porkopolis calibration), floor = 0.42&times; trend, upper band = 3&times; trend. Shared module, unmodified.'],
+       'a = 1.6&times;10<sup>&minus;17</sup>, b = 5.77 (the published M&#279;zinskis / <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">Porkopolis</a> calibration), floor = 0.42&times; trend, upper band = 3&times; trend. Shared module, unmodified.'],
       ['Live spot',
        spotSource === 'live' ? 'Fetched live this pageload.' : 'The live fetch did not resolve; the latest series sample is standing in, and every figure that depends on it is labelled accordingly.'],
       ['The four episodes',
