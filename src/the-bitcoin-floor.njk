@@ -1,0 +1,233 @@
+---
+layout: base.njk
+permalink: /the-bitcoin-floor.html
+slug: the-bitcoin-floor
+feedback: false
+faq:
+  - q: "What is the Power Law floor?"
+    a: "It is the lower edge of the Power Law channel &mdash; a line drawn at 0.42&times; the trend price, using the same exponent, so it runs parallel to the trend rather than converging on it. It is not a support level and nothing enforces it. It is the level the model nominates as its own worst case: the place the Power Law has agreed to be judged."
+  - q: "Has the floor ever broken?"
+    a: "Yes &mdash; once seriously, and three times barely. In 2010 price closed 42.6% below the floor and stayed under for 48 days, in an illiquid market that predates every exchange we would now call mature. The other three approaches were grazes: 1.8% under in August 2015, 5.1% under that September, and 0.4% under in January 2023, all of them single prints or a few weeks. Reported as &ldquo;the floor has broken four times&rdquo; those two facts get flattened into one, which is why this page keeps them apart."
+  - q: "Does buying at the floor beat the model?"
+    a: "On this record, no &mdash; and that is the more useful finding. Entries within 10% of the floor returned an enormous absolute CAGR, but their excess over the trend&rsquo;s own growth across the identical window is approximately zero. The extra return came from how far <em>below</em> the line you bought, not from buying at it. The answer also depends entirely on where you stop measuring, which is what the endpoint toggle on this page exists to show."
+  - q: "What would prove the Power Law wrong?"
+    a: "A sustained break of the floor. The page publishes the parameters it is watching &mdash; a close more than 10% below the floor, held for more than 30 consecutive days &mdash; along with a live status line, so the test is stated in advance rather than rationalised afterwards. A break of the ceiling would matter too, for a different reason: it would suggest the denominator, not the model, had changed."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/the-bitcoin-floor-head.html' %}"
+  page_styles: "{% include '_pageassets/the-bitcoin-floor.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/the-bitcoin-floor.js' %}"
+---
+
+<section class="hero">
+  <h1>The Bitcoin <em>Floor</em></h1>
+  <div class="hero-subtitle">Every model needs a place where it can fail. This is bitcoin&rsquo;s &mdash; a line under fifteen years of price history, touched four times, broken once, and watched live every day.</div>
+
+  <div class="fl-hero-readout" id="flHeroReadout">
+    <div class="fl-hero-figure" id="flHeroFigure">&mdash;</div>
+    <div class="fl-hero-caption" id="flHeroCaption">Reading today&rsquo;s position&hellip;</div>
+  </div>
+
+  <div class="fl-anchor-bar" id="flAnchorBar" role="img" aria-label="Where price sits relative to the Power Law floor">
+    <div class="fl-bar-track">
+      <div class="fl-bar-subfloor" id="flBarSubfloor"></div>
+      <div class="fl-bar-tick fl-bar-tick-floor" id="flTickFloor"><span class="fl-bar-tick-label">Floor<br><em>0.42&times;</em></span></div>
+      <div class="fl-bar-tick fl-bar-tick-trend" id="flTickTrend"><span class="fl-bar-tick-label">Trend<br><em>1.00&times;</em></span></div>
+      <div class="fl-bar-marker" id="flBarMarker"><span class="fl-bar-marker-label" id="flBarMarkerLabel">today</span></div>
+    </div>
+  </div>
+
+  <div class="fl-hero-nums" id="flHeroNums">
+    <div class="fl-hero-num"><span class="fl-hero-num-k">Spot</span><span class="fl-hero-num-v" id="flNumSpot">&mdash;</span></div>
+    <div class="fl-hero-num"><span class="fl-hero-num-k">Floor today</span><span class="fl-hero-num-v" id="flNumFloor">&mdash;</span></div>
+    <div class="fl-hero-num"><span class="fl-hero-num-k">Trend today</span><span class="fl-hero-num-v" id="flNumTrend">&mdash;</span></div>
+  </div>
+  <p class="fl-hero-prov" id="flHeroProv"></p>
+</section>
+
+<div class="content-area">
+
+  {% include 'components/tool-framing.njk' %}
+
+  <!-- ══════════ 1 · WHAT THE FLOOR IS ══════════ -->
+  <section class="fl-section" id="what-the-floor-is">
+    <div class="fl-eyebrow">The line</div>
+    <h2 class="fl-h2">What the floor is</h2>
+    <p class="fl-lead">The floor is not a support level and nothing enforces it. It is the level the model nominates as its own worst case &mdash; and a model that names its worst case can be checked against it.</p>
+
+    <div class="fl-prose">
+      <p>The Power Law trend is a line through bitcoin&rsquo;s price history in log-log space. The floor is that same line, shifted down: <strong>0.42&times; the trend price, at the same exponent</strong>. Because the exponent is shared, the two run parallel forever rather than converging &mdash; the floor is a statement about <em>level</em>, not about slope. That is a property of how the channel is defined, not something measured.</p>
+
+      <p>What <em>can</em> be measured is whether the price history&rsquo;s actual lower edge runs parallel to the line we drew. It does, and it sits slightly above it.</p>
+
+      <p>Fitting the lower edge independently &mdash; quantile regressions at the 2nd through 10th percentiles, each free to choose its own slope &mdash; produces exponents clustered in a narrow band of <strong>5.86 to 5.96</strong>, against the canonical trend exponent of <strong>5.77</strong>. Every quantile from the 2nd to the median lands between 5.79 and 5.96, which is real support for the <em>form</em> of the model: a constant-multiple channel, not one that fans open or shut with time.</p>
+
+      <p>The second finding is the one that matters for a reader standing at the floor. Forcing the canonical slope, the 2nd-percentile line implies a multiple of <strong>0.4209&times;</strong> &mdash; almost exactly the 0.42 the site draws. A true 5th-percentile floor on this record would sit near <strong>0.46&times;</strong>, roughly 10% higher than our line. <strong>The floor is stricter than &ldquo;5% of observations below&rdquo;</strong>: it is closer to a 2nd-percentile line. History hugged a line above where we drew ours, and the residual errs in the reader&rsquo;s favour rather than the model&rsquo;s.</p>
+    </div>
+
+    <div class="fl-chart-block">
+      <div class="fl-chart-head">
+        <div>
+          <div class="fl-chart-title" id="flChannelTitle">Bitcoin against the Power Law channel</div>
+          <div class="fl-chart-sub" id="flChannelSub">Log-log. The floor is drawn solid; trend and upper band are secondary. Shaded bands mark the four approaches to the floor.</div>
+        </div>
+      </div>
+      <div class="fl-chart-wrapper chart-wrapper" data-chart-copy
+           data-chart-heading="#flChannelTitle"
+           data-chart-sub="#flChannelSub"
+           data-chart-title="The Bitcoin Floor — the channel, floor emphasised"
+           data-chart-filename="bitcoin-floor-channel.png">
+        <canvas id="flChannelChart"></canvas>
+      </div>
+      <p class="fl-chart-note">Hover any point for trend, floor and price together. <span class="fl-tip" tabindex="0" role="button" aria-describedby="flTipExp">Why the floor&rsquo;s exponent is the trend&rsquo;s<span class="fl-tip-body" id="flTipExp" role="tooltip">The floor is defined as a constant multiple of trend, so its exponent is 5.77 by construction &mdash; not by fit. Fitted independently, the record&rsquo;s lower edge comes out slightly steeper: 5.8834 at the 5th percentile, 5.9552 at the 2nd, and 5.8999 through the eight cycle lows. Three methods, all near 5.88&ndash;5.96. Over sixteen years that gap is small; extrapolated forward it compounds in log space, which is the honest caveat on any long projection.</span></span></p>
+    </div>
+  </section>
+
+  <!-- ══════════ 2 · EPISODE EXPLORER ══════════ -->
+  <section class="fl-section" id="the-four-approaches">
+    <div class="fl-eyebrow">The record</div>
+    <h2 class="fl-h2">Four times price has come here</h2>
+    <p class="fl-lead">Four times price has come to the floor. What happened next is the record &mdash; not a promise. One of the four is not like the others, and averaging them together is the main way this evidence gets misused.</p>
+
+    <div class="fl-prose">
+      <p><strong>One real break, three grazes.</strong> In 2010 price closed <strong>42.6% below the floor</strong> and stayed under for 48 days. The other three went under by 1.8%, 5.1% and 0.4%, and two of those were single prints. A sentence like &ldquo;the floor has broken four times&rdquo; puts a 42.6% break in bitcoin&rsquo;s illiquid infancy in the same bucket as a 0.4% touch in 2023. This page keeps them apart.</p>
+    </div>
+
+    <div class="fl-ep-strip" id="flEpStrip" role="tablist" aria-label="Floor episodes"></div>
+    <div class="fl-ep-card" id="flEpCard" role="tabpanel" aria-live="polite"></div>
+
+    <div class="fl-stat-row" id="flRevStats">
+      <div class="fl-stat">
+        <div class="fl-stat-v" id="flRevMedian">&mdash;</div>
+        <div class="fl-stat-k">median gap to trend closed within 24 months</div>
+      </div>
+      <div class="fl-stat">
+        <div class="fl-stat-v" id="flRevOvershoot">&mdash;</div>
+        <div class="fl-stat-k">of the four closed the gap entirely and overshot past trend</div>
+      </div>
+      <div class="fl-stat">
+        <div class="fl-stat-v">4</div>
+        <div class="fl-stat-k">observations &mdash; an ordering of four numbers, not a distribution</div>
+      </div>
+    </div>
+    <p class="fl-caveat">At <strong>12 months</strong> the four share no shape at all &mdash; the outcomes run from 11% of the gap closed to several hundred percent, and the median of that spread should not be used. At 24 months they agree far better, and that is the most defensible statement available here. It still rests on four observations, in a series where the model&rsquo;s own coefficients were fitted on substantially this same history.</p>
+  </section>
+
+  <!-- ══════════ 3 · THE PARITY INSTRUMENT ══════════ -->
+  <section class="fl-section" id="what-the-floor-paid">
+    <div class="fl-eyebrow">The measurement</div>
+    <h2 class="fl-h2">What entering at the floor has paid</h2>
+    <p class="fl-lead">The same entries, two honest endpoints, two different stories &mdash; and both are true. What &ldquo;did the floor pay&rdquo; means depends entirely on where you stop measuring, so this instrument makes you choose.</p>
+
+    <div class="fl-endpoint-toggle" role="group" aria-label="Measurement endpoint">
+      <span class="fl-endpoint-label">Measure to:</span>
+      <button type="button" class="fl-seg-btn is-active" data-endpoint="today" aria-pressed="true">To today (the floor)</button>
+      <button type="button" class="fl-seg-btn" data-endpoint="trend" aria-pressed="false">To the last trend touch</button>
+    </div>
+
+    <div class="fl-parity-card" id="flParityCard">
+      <div class="fl-parity-grid">
+        <div class="fl-parity-cell">
+          <div class="fl-parity-k">Realized CAGR</div>
+          <div class="fl-parity-v" id="flParityRealized">&mdash;</div>
+          <div class="fl-parity-sub" id="flParityRealizedSub">median across the entries</div>
+        </div>
+        <div class="fl-parity-cell">
+          <div class="fl-parity-k">Trend CAGR, same windows</div>
+          <div class="fl-parity-v" id="flParityTrend">&mdash;</div>
+          <div class="fl-parity-sub">what the model itself grew at</div>
+        </div>
+        <div class="fl-parity-cell fl-parity-cell-excess">
+          <div class="fl-parity-k">Excess over the model</div>
+          <div class="fl-parity-v" id="flParityExcess">&mdash;</div>
+          <div class="fl-parity-sub" id="flParityExcessSub">median of the per-entry differences</div>
+        </div>
+      </div>
+      <p class="fl-parity-method" id="flParityMethod">&mdash;</p>
+
+      <div class="fl-parity-read" id="flParityRead"></div>
+
+      <div class="fl-honesty">
+        <div class="fl-honesty-item">
+          <div class="fl-honesty-k">The vintage caveat</div>
+          <p id="flHonestyVintage">These CAGRs are enormous because the median entry dates from bitcoin&rsquo;s higher-growth past. The model&rsquo;s own arithmetic declines with age: an entry at the floor today implies far less forward growth than an entry at the floor in 2015 did, and nothing here should be read as the rate a floor entry would earn from here.</p>
+        </div>
+        <div class="fl-honesty-item">
+          <div class="fl-honesty-k">The endpoint caveat</div>
+          <p id="flHonestyEndpoint">&mdash;</p>
+        </div>
+      </div>
+
+      <p class="fl-parity-foot">Excess is the median of each entry&rsquo;s own realized-minus-trend difference &mdash; not the difference of the two medians above, which is a different and less meaningful number. Windows run from each entry date to the selected endpoint; CAGRs annualise on a 365.25-day year.</p>
+    </div>
+  </section>
+
+  <!-- ══════════ 4 · THE TRIPWIRE ══════════ -->
+  <section class="fl-section" id="the-tripwire">
+    <div class="fl-eyebrow">The falsifier</div>
+    <h2 class="fl-h2">The tripwire</h2>
+    <p class="fl-lead">A thesis that names its falsifier is a different kind of object than a prediction. These are the numbers, published in advance.</p>
+
+    <div class="fl-tripwire" id="flTripwire">
+      <div class="fl-tripwire-head">The test this model has agreed to</div>
+      <p class="fl-tripwire-crit">The Power Law is failing its own test if price sustains a close <strong>more than 10% below the floor</strong> for <strong>more than 30 consecutive days</strong>.</p>
+      <p class="fl-tripwire-why">Those parameters are chosen to separate the one real break from the three grazes. The grazes never came close to them: the deepest went 5.1% under, and none held. The 2010 break exceeded both, on every measure available in this series.</p>
+
+      <div class="fl-tripwire-status" id="flTripwireStatus">
+        <div class="fl-tripwire-status-k">Status today</div>
+        <div class="fl-tripwire-status-v" id="flTripwireStatusV">&mdash;</div>
+      </div>
+
+      <p class="fl-tripwire-ceiling">Secondary watch, the other direction: a sustained break <em>above</em> the 3&times; ceiling, beyond the brief cyclical visits the record already contains, would not falsify the model so much as suggest the denominator had changed &mdash; that the thing being priced, or the money pricing it, is no longer the same measurement.</p>
+
+      <p class="fl-tripwire-commit">If it fires, this page will say so &mdash; the same day, in this box.</p>
+    </div>
+  </section>
+
+  <!-- ══════════ 5 · THE OTHER SIDE ══════════ -->
+  <section class="fl-section" id="the-other-side">
+    <div class="fl-eyebrow">Both sides</div>
+    <h2 class="fl-h2">The other side of this</h2>
+    <p class="fl-lead">Four reasons to hold everything above more loosely than the precision of the numbers suggests.</p>
+
+    <div class="fl-otherside">
+      <div class="fl-os-item">
+        <div class="fl-os-k">The 2010 break is real, and it is not an asterisk</div>
+        <p>The floor&rsquo;s record starts with a failure: 42.6% under, for 48 days. The honest qualifier is that it happened in a market with no mature exchange, negligible liquidity and a price measured in cents &mdash; conditions that no longer obtain. That qualifier is a reason to weight it differently, not a reason to drop it, which is why every count on this page says &ldquo;four&rdquo; and then immediately says which one was different.</p>
+      </div>
+      <div class="fl-os-item">
+        <div class="fl-os-k">If adoption saturates, the floor breaks before anything else does</div>
+        <p>The strongest argument against the Power Law is that it describes an adoption curve which must eventually flatten &mdash; an S-curve caught mid-rise looks like a power law right up until it doesn&rsquo;t. The tripwire is exactly the instrument that would register saturation as it began to bite, because a flattening adoption curve shows up first as a floor that stops holding. See <a href="/the-power-law">the Power Law page</a> for the model&rsquo;s limits in full.</p>
+      </div>
+      <div class="fl-os-item">
+        <div class="fl-os-k">A floor test can fail for denominator reasons</div>
+        <p>Every figure here is a ratio with dollars underneath it. A break of the floor would be evidence about bitcoin; it could also be evidence about the dollar, or about the price series, or about which exchanges the series draws from. The test is not clean, and no single test of a monetary thesis is.</p>
+      </div>
+      <div class="fl-os-item">
+        <div class="fl-os-k">Nothing here is an entry signal</div>
+        <p>&ldquo;At the floor&rdquo; is a location, not a verdict about value. The measurement above found that entering there did not beat the model, and the sample it found that in is four episodes deep. Position size is the tool that survives being wrong about all of this &mdash; see <a href="/bitcoin-allocation-sizing">Bitcoin Portfolio Allocation</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 6 · VERIFY ══════════ -->
+  <section class="fl-section" id="verify">
+    <div class="fl-eyebrow">Verify</div>
+    <h2 class="fl-h2">Where every number here comes from</h2>
+    <p class="fl-lead">Every figure on this page is either computed in your browser from the shared price series, or copied from a dated analysis note in the repository. Nothing is remembered.</p>
+    <div class="fl-verify" id="flVerify"></div>
+  </section>
+
+  <!-- ══════════ RELATED (preview: plain in-page links) ══════════ -->
+  <section class="fl-section" id="related-preview">
+    <div class="fl-eyebrow">Read next</div>
+    <h2 class="fl-h2">Where this connects</h2>
+    <ul class="fl-related">
+      <li><a href="/the-power-law">Bitcoin &amp; The Power Law</a> &mdash; the model this page tests, the channel it draws, and its limits stated in full.</li>
+      <li><a href="/dashboard">The Bitcoin Dashboard</a> &mdash; the same live channel position, read across ten stats rather than one.</li>
+      <li><a href="/discount-or-premium">Discount or Premium</a> &mdash; where price sits against trend right now, and what reverting to it would imply.</li>
+      <li><a href="/bitcoin-escape-velocity">Bitcoin Escape Velocity</a> &mdash; what the same growth model implies for a stack being drawn down.</li>
+    </ul>
+    <p class="fl-preview-note"><strong>Preview note.</strong> This page is unlisted and carries a <code>noindex</code> guard. Nav, sitemap, <code>llms.txt</code>, homepage, the related strip and the OG card are the production pass, not this one.</p>
+  </section>
+
+</div>
