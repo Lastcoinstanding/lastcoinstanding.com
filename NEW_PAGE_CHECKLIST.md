@@ -233,10 +233,23 @@ one matching the page's `category`). The card has four parts:
 
 ### Latest subsection
 
-`Latest` is a rolling 2–3 card display of the most recent ships. When a
-new page lands, evaluate whether it should bump an older entry. Default
-behavior: insert the new card at the top of Latest; if Latest is already
-at 3 cards, evaluate which to remove (typically the oldest of the three).
+`Latest` is a **rolling six-card** display of the most recent ships,
+newest first. When a new page lands it goes in at the top and the oldest
+card comes off — the row stays at six, so shipping a page is always a
+rotation, never an append.
+
+The card that rotates off is **not delisted**: it keeps its carousel
+slide and its category card further down the homepage, so the only thing
+it loses is the Latest slot. Check that before removing one — if a card
+has no other homepage presence, say so rather than dropping it silently.
+
+> **Corrected 2026-08-22.** This read *"a rolling 2–3 card display… if
+> Latest is already at 3 cards"* while markup had carried **six** for
+> months — the same markup-is-truth drift `SITE_GUIDE §13` documents for
+> the carousel inventory. It surfaced on The Bitcoin Floor's production
+> pass, where following the written rule would have meant cutting the row
+> in half. Markup is the source of truth; when it and this file disagree,
+> fix this file.
 
 ### `src/_data/updates.json` — Recent Updates strip
 
