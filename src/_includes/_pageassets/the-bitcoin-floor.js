@@ -115,6 +115,16 @@
     tolerancePp: 0.1
   };
 
+  // The same measurement re-run on the MODERN set only (2011 onward), at the
+  // same endpoint. This is what the page now displays; the figures above are
+  // what was published. Both are asserted, so neither can drift silently and
+  // the reconciliation line between them stays true.
+  var MODERN_PARITY = {
+    medianRealized: 60.5,
+    medianTrend: 61.9,
+    entries: 20
+  };
+
   // Tripwire parameters — PUBLISHED CANON as of 2026-08-21 (JM blessed; design
   // doc §2.5 proposed them, round 1 confirmed them).
   //
@@ -541,7 +551,7 @@
   //
   // Methodology, from analysis §3, reimplemented here rather than
   // hardcoded so the figures move with the series:
-  //   entries  = samples priced within 10% ABOVE the floor (×-floor ≤ 1.10),
+  //   entries  = MODERN samples (2011 onward) priced within 10% ABOVE the floor,
   //              which also picks up genuine sub-floor samples;
   //   realized = CAGR from each entry's price to the endpoint price;
   //   trend    = CAGR of the trend line across the identical window;
@@ -550,8 +560,24 @@
   //              number (−1.3pp vs −0.5pp on today's series) and would
   //              be the natural misreading of the two figures shown.
   // ═══════════════════════════════════════════════════════════
+  // ── THE MODERN BOUNDARY, one constant for the whole page ────────────
+  // 2011-01-01, the same boundary the tripwire's "modern era (2011–)" uses.
+  // Everything the page MEASURES is drawn from this side of it; the genesis
+  // era appears once, in the record section, and nowhere else — a position on
+  // a chart is weight, so excluding it there is the same ruling as not
+  // averaging it into a headline.
+  //
+  // Worth knowing before reading the era labels: the entry set contains SIX
+  // 2010 samples and then nothing until 2012-05-27. There are no 2011 entries
+  // at all, so the first surviving era bucket is a single 2012 sample and its
+  // derived label is "2012", not "2011–2012".
+  var MODERN_FROM = '2011-01-01';
+
   function entrySet() {
     return PL_DATA.filter(function (p) { return p[1] / floorAt(p[0]) <= 1.10; });
+  }
+  function modernEntrySet() {
+    return entrySet().filter(function (p) { return isoOf(p[0]) >= MODERN_FROM; });
   }
 
   function lastTrendTouch() {
@@ -561,9 +587,12 @@
     return null;
   }
 
-  function gradeTo(endDay, endPrice) {
+  // `set` defaults to the MODERN entries — what the page displays. The QA
+  // fixture passes entrySet() explicitly so it still reproduces the published
+  // full-set measurement, which included the genesis samples.
+  function gradeTo(endDay, endPrice, set) {
     var re = [], tc = [], ex = [];
-    entrySet().forEach(function (p) {
+    (set || modernEntrySet()).forEach(function (p) {
       var yrs = (endDay - p[0]) / YEAR;
       if (yrs <= 0) return;
       var r = (Math.pow(endPrice / p[1], 1 / yrs) - 1) * 100;
@@ -607,12 +636,16 @@
     $('flParityExcess').textContent = signedPct1(g.excess);
     $('flParityRealizedSub').textContent = 'median across ' + g.n + ' entries';
     $('flParityMethod').innerHTML =
-      'Entries are the ' + g.n + ' samples in the series that closed <strong>no more than 10% above the floor</strong> — including the genesis-era samples that sat far below it — graded to ' + endLabel + '. ' +
+      'Entries are the ' + g.n + ' modern-era samples (2011 onward) that closed <strong>no more than 10% above the floor</strong>, graded to ' + endLabel + '. ' +
       'That is ' + (g.n / PL_DATA.length * 100).toFixed(1) + '% of the ' + PL_DATA.length + ' samples on record. ' +
-      'The published measurement behind this instrument (<code>analysis/2026-08-20-power-law-floor.md</code> §3) graded the ' +
-      'same entries to ' + ANALYSIS_PARITY.measuredOn + ', when price sat on the floor: ' +
-      ANALYSIS_PARITY.medianRealized.toFixed(1) + '% realized against ' + ANALYSIS_PARITY.medianTrend.toFixed(1) +
-      '% trend. Run <code>floorParityQA()</code> in the console to reproduce it.';
+      '<br><br><strong>Reconciling to the published figure.</strong> The published measurement ' +
+      '(<code>analysis/2026-08-20-power-law-floor.md</code> §3), taken ' + ANALYSIS_PARITY.measuredOn +
+      ' when price sat on the floor, <strong>included the genesis samples</strong> and found ' +
+      ANALYSIS_PARITY.medianRealized.toFixed(1) + '% against ' + ANALYSIS_PARITY.medianTrend.toFixed(1) +
+      '% — <code>floorParityQA()</code> reproduces it. The same set of dates without the genesis samples, ' +
+      'at that same endpoint, gives ' + MODERN_PARITY.medianRealized.toFixed(1) + '% against ' +
+      MODERN_PARITY.medianTrend.toFixed(1) + '%. The difference is the six 2010 samples, which entered far ' +
+      'below the line and are excluded here for the reason the record section gives.';
 
     if (!toTrend) {
       // The to-today read is POSITION-DEPENDENT and must be recomputed, never
@@ -633,7 +666,7 @@
 
       var read;
       if (Math.abs(g.excess) < 1.0) {
-        read = '<strong>Entering anywhere from just above the floor to far below it did not beat the trend line.</strong> ' +
+        read = '<strong>Entering anywhere at or just above the floor did not beat the trend line.</strong> ' +
           'The median entry returned an enormous absolute CAGR — and its extra return vs the trend line, the excess over what the trend line itself grew at, ' +
           'across the identical window, is ' + signedPct1(g.excess) + ': indistinguishable from zero. ' +
           'The extra return in this set came from how far <em>below</em> the line an entry went, not from the fact of buying at it.';
@@ -716,7 +749,7 @@
 
   function scatterRows(endDay, endPrice) {
     var rows = [];
-    entrySet().forEach(function (p) {
+    modernEntrySet().forEach(function (p) {
       var yrs = (endDay - p[0]) / YEAR;
       if (yrs < MIN_WINDOW_YEARS) return;
       var r = (Math.pow(endPrice / p[1], 1 / yrs) - 1) * 100;
@@ -759,6 +792,7 @@
     var cDim = cssVar('--text-muted', '#6a6256');
     var cText = cssVar('--text', '#e8e0d4');
     var cAxis = cssVar('--fl-axis', 'rgba(224,148,34,0.28)');
+    var cApproach = cssVar('--fl-approach', '#e09422');
 
     // Frame so zero is always inside the plot with breathing room on both sides.
     var ys = rows.map(function (r) { return r.y; });
@@ -771,20 +805,27 @@
     // must not read as equal evidence, because the record section already
     // dismissed them and the result line below is written not to lean on them.
     // The era legend still names them, so the class is visible, not hidden.
-    function isGenesisEra(rows) { return rows.every(function (r) { return r.date < '2013-01-01'; }); }
+    // The three closest approaches get their own marker so the chart ties back
+    // to the record cards: these are the same events, seen from the other side.
+    var APPROACH_DATES = { '2015-08-28': 'Aug 2015', '2015-09-21': 'Sep–Oct 2015', '2023-01-06': 'Jan 2023' };
     var datasets = eras.map(function (era, i) {
       var col = eraColors[i % eraColors.length];
-      var genesis = isGenesisEra(era.rows);
       return {
-        label: era.label + (genesis ? ' (recorded, not weighted)' : ''),
-        data: era.rows,
-        backgroundColor: genesis ? 'transparent' : col,
-        borderColor: col,
-        borderWidth: genesis ? 2 : 1,
-        pointStyle: 'circle',
-        pointRadius: 6, pointHoverRadius: 8
+        label: era.label,
+        data: era.rows.filter(function (r) { return !APPROACH_DATES[r.date]; }),
+        backgroundColor: col, borderColor: col,
+        pointStyle: 'circle', pointRadius: 6, pointHoverRadius: 8
       };
     });
+    var approachRows = rows.filter(function (r) { return APPROACH_DATES[r.date]; });
+    if (approachRows.length) {
+      datasets.push({
+        label: 'The three closest approaches',
+        data: approachRows,
+        backgroundColor: cApproach, borderColor: cApproach,
+        pointStyle: 'triangle', pointRadius: 10, pointHoverRadius: 12
+      });
+    }
 
     var refLines = {
       id: 'flScatterRefs',
@@ -802,6 +843,36 @@
         ctx.textAlign = 'left';
         ctx.fillText('the floor', x0 + 5, ys.top + 12);
         ctx.fillText('matched the trend line', xs.left + 5, y0 - 5);
+        // Faint zone labels flanking the floor line, so the sign of the x-axis
+        // needs no decoding: left of the dashes is below the line, right above.
+        ctx.font = (CHART_FONT.tick - 1) + 'px Inter, sans-serif';
+        ctx.fillStyle = cDim;
+        ctx.textAlign = 'right';
+        ctx.fillText('closed below the floor', x0 - 8, ys.bottom - 8);
+        ctx.textAlign = 'left';
+        ctx.fillText('closed above the floor', x0 + 8, ys.bottom - 8);
+        ctx.restore();
+      }
+    };
+
+    // Small labels on the three approach markers, tying them to the record cards.
+    var approachLabels = {
+      id: 'flApproachLabels',
+      afterDatasetsDraw: function (chart) {
+        var ds = chart.data.datasets.findIndex(function (d) { return d.label === 'The three closest approaches'; });
+        if (ds < 0) return;
+        var meta = chart.getDatasetMeta(ds);
+        if (!meta || !meta.data) return;
+        var ctx = chart.ctx;
+        ctx.save();
+        ctx.font = '600 ' + (CHART_FONT.tick - 1) + 'px Inter, sans-serif';
+        ctx.fillStyle = cApproach;
+        ctx.textAlign = 'center';
+        meta.data.forEach(function (el, i) {
+          var row = chart.data.datasets[ds].data[i];
+          var name = APPROACH_DATES[row.date];
+          if (name) ctx.fillText(name, el.x, el.y - 14);
+        });
         ctx.restore();
       }
     };
@@ -812,7 +883,7 @@
         responsive: true, maintainAspectRatio: false,
         scales: {
           x: {
-            title: { display: true, text: 'Entry price vs. the floor (%)  —  negative is below the line', color: cDim, font: { size: CHART_FONT.title } },
+            title: { display: true, text: "Entry price vs. that day's floor (%) — 0% is the floor itself", color: cDim, font: { size: CHART_FONT.title } },
             ticks: { color: cText, font: { size: CHART_FONT.tick }, callback: function (v) { return v + '%'; } },
             grid: { color: 'rgba(224,148,34,0.05)' }
           },
@@ -847,7 +918,7 @@
           }
         }
       },
-      plugins: [refLines]
+      plugins: [refLines, approachLabels]
     };
 
     if (scatterChart) {
@@ -879,7 +950,10 @@
     // at NEITHER (an above-floor 2022 entry with a short window out-earns the
     // weakest below-floor one). If neither holds, the clause is dropped rather
     // than softened into something unfalsifiable.
-    var modernRowsAll = rows.filter(function (r) { return r.date >= '2013-01-01'; });
+    // Every row is now modern by construction (genesis excluded at the set), so
+    // the split is computed over the whole chart and the copy no longer needs to
+    // say "among the modern approaches alone" — there is nothing else on it.
+    var modernRowsAll = rows;
     var mBelow = modernRowsAll.filter(function (r) { return r.x < 0; }).map(function (r) { return r.y; });
     var mAbove = modernRowsAll.filter(function (r) { return r.x >= 0; }).map(function (r) { return r.y; });
     var clause = '';
@@ -887,9 +961,9 @@
       var cleanSplit = Math.min.apply(null, mBelow) > Math.max.apply(null, mAbove);
       var medianSplit = median(mBelow) > median(mAbove);
       if (cleanSplit) {
-        clause = ' Among the modern approaches alone, <strong>every entry below the line out-earned every entry above it</strong>.';
+        clause = ' <strong>Every entry that closed below the line out-earned every entry that closed above it.</strong>';
       } else if (medianSplit) {
-        clause = ' Among the modern approaches alone, entries below the line <strong>typically out-earned</strong> those above it — ' +
+        clause = ' Entries that closed below the line <strong>typically out-earned</strong> those that closed above it — ' +
                  'a median of ' + signedPct1(median(mBelow)) + ' against ' + signedPct1(median(mAbove)) + ' per year, though the two groups overlap.';
       }
     }
@@ -911,8 +985,7 @@
 
     // Worked example, from the deepest MODERN entry — the genesis-era samples
     // are on the chart but must not be the sentence a reader carries away.
-    var modernRows = rows.filter(function (r) { return r.date >= '2013-01-01'; });
-    var deepestModern = modernRows.slice().sort(function (a, b) { return a.x - b.x; })[0];
+    var deepestModern = rows.slice().sort(function (a, b) { return a.x - b.x; })[0];
     var workedEl = $('flScatterWorked');
     if (workedEl && deepestModern) {
       workedEl.innerHTML =
@@ -920,12 +993,12 @@
         (deepestModern.x < 0
           ? Math.abs(deepestModern.x).toFixed(1) + '% <em>below</em> the floor'
           : deepestModern.x.toFixed(1) + '% above the floor') +
-        ' — the deepest of the modern approaches. Held ' + deepestModern.years.toFixed(1) + ' years to ' + endWhen +
+        ' — the deepest entry on the chart. Held ' + deepestModern.years.toFixed(1) + ' years to ' + endWhen +
         ', it came out ' + signedPct1(deepestModern.y) + ' per year against what the trend line grew over the same window.';
     }
 
     $('flScatterSub').textContent =
-      rows.length + ' entries, each graded to ' + endWhen + ' — every sample that closed no more than 10% above the floor, including the genesis-era samples that sat far below it. ' +
+      rows.length + ' entries, each graded to ' + endWhen + ' — every modern-era sample (2011 onward) that closed no more than 10% above the floor. ' +
       'Left of the dashed vertical sat below the floor; above the dashed horizontal beat the trend line. ' +
       'Hover any point for its date and figures.';
     $('flScatterNote').innerHTML =
@@ -964,7 +1037,14 @@
   function floorParityQA() {
     var last = PL_DATA[PL_DATA.length - 1];
     var fixDay = last[0] + ANALYSIS_PARITY.endpointDayOffset;
-    var fix = gradeTo(fixDay, last[1]);
+    // FULL set, explicitly — this fixture reproduces the published measurement,
+    // which included the genesis samples. It must not follow the page's display
+    // set, or the regression test would drift with an editorial decision.
+    var fix = gradeTo(fixDay, last[1], entrySet());
+    // MODERN set at the same endpoint — the counterpart of the published figure
+    // on the set the page actually displays. Asserted too, so the numbers on
+    // screen are pinned by the same mechanism that pins the published ones.
+    var mod = gradeTo(fixDay, last[1], modernEntrySet());
     var tol = ANALYSIS_PARITY.tolerancePp;
 
     var failures = [];
@@ -977,6 +1057,20 @@
     if (Math.abs(fix.trend - ANALYSIS_PARITY.medianTrend) > tol) {
       failures.push('median trend ' + fix.trend.toFixed(2) + ' vs ' + ANALYSIS_PARITY.medianTrend + ' (±' + tol + ')');
     }
+    // Modern-subset fixture, same endpoint. Pins the displayed medians.
+    if (mod.n !== MODERN_PARITY.entries) {
+      failures.push('modern entry count ' + mod.n + ' ≠ ' + MODERN_PARITY.entries);
+    }
+    if (Math.abs(mod.realized - MODERN_PARITY.medianRealized) > tol) {
+      failures.push('modern median realized ' + mod.realized.toFixed(2) + ' vs ' + MODERN_PARITY.medianRealized + ' (±' + tol + ')');
+    }
+    if (Math.abs(mod.trend - MODERN_PARITY.medianTrend) > tol) {
+      failures.push('modern median trend ' + mod.trend.toFixed(2) + ' vs ' + MODERN_PARITY.medianTrend + ' (±' + tol + ')');
+    }
+    // The exclusion itself is asserted: no sample before the modern boundary may
+    // reach the displayed set or the chart.
+    var leaked = modernEntrySet().filter(function (p) { return isoOf(p[0]) < MODERN_FROM; });
+    if (leaked.length) failures.push(leaked.length + ' pre-' + MODERN_FROM.slice(0, 4) + ' samples leaked into the modern set');
 
     // Episode dataset must still match what the series says. The cards are
     // static prose over static figures; this is what stops a PL_DATA refresh

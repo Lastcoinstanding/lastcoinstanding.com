@@ -56,6 +56,9 @@
      and Gallery position graphs so "where price sits" is one colour site-wide.
      Deliberately NOT --fl-price (the chart's historical price line stays blue). */
   --fl-position: #F7931A;
+  /* The three closest approaches on the entry scatter — same amber the record
+     section uses for an active episode, so the two surfaces read as one story. */
+  --fl-approach: #F7931A;
 }
 
 body { background: var(--bg); color: var(--text); }
