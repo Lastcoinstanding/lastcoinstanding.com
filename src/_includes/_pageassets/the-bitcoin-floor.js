@@ -469,7 +469,7 @@
         metric(ep.belowPct.toFixed(1) + '%', 'deepest, below the floor') +
         metric(ep.deepestXt.toFixed(3) + '×', 'deepest, × trend') +
         metric(dur, 'below the line (' + ep.bracketDays + 'd bracketed)') +
-        metric(ep.xt24.toFixed(2) + '×', 'x trend, 24 months later') +
+        metric(ep.xt24.toFixed(2) + '×', '× trend, 24 months later') +
         metric(ep.gap24 + '%', 'of the gap to trend closed') +
       '</div>' +
       '<p>' + ep.body + '</p>';
