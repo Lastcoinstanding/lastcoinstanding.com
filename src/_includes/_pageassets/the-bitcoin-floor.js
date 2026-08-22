@@ -613,8 +613,8 @@
         'It is the historical bonus for having been early to a line price later left behind — and it is measured to an endpoint ' +
         'chosen precisely because it was favourable. The guarantee half is the finding that leads this page: graded at its ' +
         'worst — with price back down on the floor, as the published analysis measured it on ' + ANALYSIS_PARITY.measuredOn + ' — the same entries returned ' +
-        ANALYSIS_PARITY.medianRealized.toFixed(1) + '% against the model’s own ' + ANALYSIS_PARITY.medianTrend.toFixed(1) +
-        '%, an excess of about zero. Matching the model at the worst vantage is the claim; this tab is the bonus.';
+        ANALYSIS_PARITY.medianRealized.toFixed(1) + '% against the trend line’s own ' + ANALYSIS_PARITY.medianTrend.toFixed(1) +
+        '%, a difference of about zero. Matching the trend line at the worst vantage is the claim; this tab is the bonus.';
       $('flHonestyEndpoint').innerHTML =
         'This endpoint is <strong>chosen, not neutral</strong>. Measuring to the last moment price touched trend ' +
         '(' + endWhen + ') banks the whole reversion and stops the clock before the drawdown that followed. ' +
