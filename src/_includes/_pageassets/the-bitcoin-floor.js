@@ -460,7 +460,13 @@
     } else {
       endDay = todayDays(); endPrice = spot;
       endWhen = 'today';
-      endLabel = 'today, with price at the floor';
+      // Describe where today ACTUALLY is. This label used to assert "with price
+      // at the floor", which was true on the analysis date and false by the
+      // first preview load — the same trap the analysis warns about.
+      var vsF = (spot / floorAt(endDay) - 1) * 100;
+      endLabel = 'today, with price ' + (Math.abs(vsF) < 3
+        ? 'on the floor'
+        : Math.abs(vsF).toFixed(1) + '% ' + (vsF > 0 ? 'above' : 'below') + ' the floor');
     }
 
     var g = gradeTo(endDay, endPrice);
@@ -491,8 +497,8 @@
       var whereNow = Math.abs(vsFloorNow) < 3
         ? 'today sits essentially <em>on</em> the floor'
         : (vsFloorNow > 0
-            ? 'today sits <em>' + Math.abs(vsFloorNow).toFixed(0) + '% above</em> the floor'
-            : 'today sits <em>' + Math.abs(vsFloorNow).toFixed(0) + '% below</em> the floor');
+            ? 'today sits <em>' + Math.abs(vsFloorNow).toFixed(1) + '% above</em> the floor'
+            : 'today sits <em>' + Math.abs(vsFloorNow).toFixed(1) + '% below</em> the floor');
 
       var read;
       if (Math.abs(g.excess) < 1.0) {
