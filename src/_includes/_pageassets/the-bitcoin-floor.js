@@ -648,6 +648,12 @@
     var cDim = cssVar('--text-muted', '#6a6256');
     var cAxis = cssVar('--fl-axis', 'rgba(224,148,34,0.28)');
 
+    // Frame so zero is always inside the plot with breathing room on both sides.
+    var ys = rows.map(function (r) { return r.y; });
+    var lo = Math.min(0, Math.min.apply(null, ys)), hi = Math.max(0, Math.max.apply(null, ys));
+    var padY = Math.max((hi - lo) * 0.12, 0.5);
+    var yBounds = { min: lo - padY, max: hi + padY };
+
     var datasets = eras.map(function (era, i) {
       return {
         label: era.label,
@@ -689,6 +695,12 @@
             grid: { color: 'rgba(224,148,34,0.05)' }
           },
           y: {
+            // Always frame zero with margin on BOTH sides. When price sits well
+            // above the floor every entry shows positive excess, and Chart.js's
+            // default framing puts the zero line flush against the axis — where
+            // "matched the model" reads as the chart's frame rather than as the
+            // reference the whole panel turns on.
+            suggestedMin: yBounds.min, suggestedMax: yBounds.max,
             title: { display: true, text: 'Excess over the model (percentage points per year)', color: cDim, font: { size: 11 } },
             ticks: { color: cDim, font: { size: 10 }, callback: function (v) { return (v > 0 ? '+' : '') + v; } },
             grid: { color: 'rgba(224,148,34,0.05)' }
@@ -718,6 +730,10 @@
 
     if (scatterChart) {
       scatterChart.data.datasets = datasets;
+      // Re-frame too: the two endpoints produce very different excess ranges,
+      // so keeping the first render's bounds would crop or float the points.
+      scatterChart.options.scales.y.suggestedMin = yBounds.min;
+      scatterChart.options.scales.y.suggestedMax = yBounds.max;
       scatterChart.update();
     } else {
       cfg.type = 'scatter';
