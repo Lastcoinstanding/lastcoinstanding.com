@@ -268,3 +268,7 @@ body { background: var(--bg); color: var(--text); }
   .fl-parity-op { display: none; }
   .fl-scatter-result { font-size: 0.95rem; }
 }
+
+/* Genesis-era caveat under the scatter's result line — quieter than the result
+   it qualifies, louder than a footnote, because it changes how the chart reads. */
+.fl-scatter-genesis-note { max-width: 880px; font-family: var(--font-b); font-size: 0.84rem; line-height: 1.65; color: var(--text-muted); margin: -0.6rem 0 1.3rem; padding-left: 1rem; border-left: 2px solid var(--border); }

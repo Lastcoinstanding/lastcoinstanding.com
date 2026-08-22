@@ -9,7 +9,7 @@ faq:
   - q: "Has the floor ever broken?"
     a: "Not in the modern record. Across the whole post-genesis history, price has approached the line three times and never breached it by more than a graze &mdash; 1.8% under in August 2015, 5.1% under that September, 0.4% under in January 2023 &mdash; and every one of those reverted, sitting above trend within 24 months. There is one earlier episode: in autumn 2010 price closed 42.6% below the line for at least 48 days. That is bitcoin&rsquo;s genesis era &mdash; no mature exchange, negligible liquidity, a price in cents &mdash; the same period every careful fit of this model down-weights. Counting it as equal evidence about the floor today would be a statistical error, so this page records it once and gives it no weight."
   - q: "Does entering at the floor beat the trend line?"
-    a: "Graded floor-to-floor, no &mdash; and that is the more useful finding. Entries within 10% of the floor returned an enormous absolute CAGR, but measured to a day when price was back on the floor, the difference between what they earned and what the trend line grew over the identical window was approximately zero. What did move the difference was how far <em>below</em> the line an entry sat, not the fact of entering near it. And the answer depends entirely on where you stop measuring &mdash; the instrument on this page recomputes live and shows both endpoints, so the figure you see may differ from the published one depending on where price sits today."
+    a: "Graded floor-to-floor, no &mdash; and that is the more useful finding. Entries that closed no more than 10% above the floor &mdash; a set that also takes in the genesis-era samples far below it &mdash; returned an enormous absolute CAGR, but measured to a day when price was back on the floor, the difference between what they earned and what the trend line grew over the identical window was approximately zero. What did move the difference was how far <em>below</em> the line an entry sat, not the fact of entering near it. And the answer depends entirely on where you stop measuring &mdash; the instrument on this page recomputes live and shows both endpoints, so the figure you see may differ from the published one depending on where price sits today."
   - q: "What would prove the Power Law wrong?"
     a: "A sustained break of the floor. The criteria are published here in advance &mdash; a close more than 10% below the floor, held for more than 30 consecutive days &mdash; with a live status line reporting against them. They are subjective, but they are defensible and based on the historical record, and from ship date forward they are judged on daily closes. A break of the ceiling would matter too, for a different reason: it would point at the denominator rather than the model &mdash; that the money doing the pricing had changed."
 eleventyComputed:
@@ -54,18 +54,6 @@ eleventyComputed:
     <h2 class="fl-h2">What the floor is</h2>
     <p class="fl-lead">The floor is the lower-bound line of bitcoin&rsquo;s price history over the long term &mdash; a lower edge the price has held with remarkable consistency and fit, to the point where &ldquo;floor&rdquo; is the accurate description. That consistency is in sharp contrast with the upper edge, where price action has been far more volatile, with brief violent spikes.</p>
 
-    <div class="fl-prose">
-      <p>The Power Law trend is a line through bitcoin&rsquo;s price history in log-log space. The floor is that same line, shifted down: <strong>0.42&times; the trend price, at the same exponent</strong>. Because the exponent is shared, the two run parallel forever rather than converging &mdash; the floor is a statement about <em>level</em>, not about slope. That is a property of how the channel is defined, not something measured.</p>
-
-      <p>What <em>can</em> be measured is whether the price history&rsquo;s own lower edge runs parallel to that line. It does &mdash; and it sits slightly above it.</p>
-
-      <p>Fitting the lower edge independently &mdash; quantile regressions at the 2nd through 10th percentiles, each free to choose its own slope &mdash; produces exponents clustered in a narrow band of <strong>5.86 to 5.96</strong>, against the trend exponent of <strong>5.77</strong> that the site uses. Every quantile from the 2nd to the median lands between 5.79 and 5.96: support for the <em>form</em> of the model, a constant-multiple channel rather than one that fans open or shut with time.</p>
-
-      <p>The second finding is the one that matters for a reader standing at the floor. A <strong>5th-percentile line</strong> is a line only 5% of days closed beneath &mdash; the usual way to draw a &ldquo;lower bound&rdquo; that still admits the occasional exception. Fitted on this record, that line would sit near <strong>0.46&times; trend</strong>. The published 0.42&times; ratio sits <em>below</em> it, at roughly the <strong>2nd</strong> percentile: only about 2% of days closed under it.</p>
-
-      <p>So <strong>the published ratio is stricter than its own description</strong>. The 0.42&times; is the Porkopolis calibration this site adopts, not a judgment call made here &mdash; and the data alone would have put a lower bound about 10% higher. Whatever else the floor is, it is not drawn flatteringly.</p>
-    </div>
-
     <div class="fl-chart-block">
       <div class="fl-chart-head">
         <div>
@@ -81,6 +69,18 @@ eleventyComputed:
         <canvas id="flChannelChart"></canvas>
       </div>
       <p class="fl-chart-note">Hover any point for trend, floor and price together. <span class="fl-tip" tabindex="0" role="button" aria-describedby="flTipExp">Why the floor&rsquo;s exponent is the trend&rsquo;s<span class="fl-tip-body" id="flTipExp" role="tooltip">The floor is defined as a constant multiple of trend, so its exponent is 5.77 by construction &mdash; not by fit. Fitted independently, the record&rsquo;s lower edge comes out slightly steeper: 5.8834 at the 5th percentile, 5.9552 at the 2nd, and 5.8999 through the eight cycle lows. Three methods, all near 5.88&ndash;5.96. Over sixteen years that gap is small; extrapolated forward it compounds in log space, which is the caveat that matters on any long projection.</span></span></p>
+    </div>
+
+    <div class="fl-prose">
+      <p>The Power Law trend is a line through bitcoin&rsquo;s price history in log-log space. The floor is that same line, shifted down: <strong>0.42&times; the trend price, at the same exponent</strong>. Because the exponent is shared, the two run parallel forever rather than converging &mdash; the floor is a statement about <em>level</em>, not about slope. That is a property of how the channel is defined, not something measured.</p>
+
+      <p>What <em>can</em> be measured is whether the price history&rsquo;s own lower edge runs parallel to that line. It does &mdash; and it sits slightly above it.</p>
+
+      <p>Fitting the lower edge independently &mdash; quantile regressions at the 2nd through 10th percentiles, each free to choose its own slope &mdash; produces exponents clustered in a narrow band of <strong>5.86 to 5.96</strong>, against the trend exponent of <strong>5.77</strong> that the site uses. Every quantile from the 2nd to the median lands between 5.79 and 5.96: support for the <em>form</em> of the model, a constant-multiple channel rather than one that fans open or shut with time.</p>
+
+      <p>The second finding is the one that matters for a reader standing at the floor. A <strong>5th-percentile line</strong> is a line only 5% of days closed beneath &mdash; the usual way to draw a &ldquo;lower bound&rdquo; that still admits the occasional exception. Fitted on this record, that line would sit near <strong>0.46&times; trend</strong>. The published 0.42&times; ratio sits <em>below</em> it, at roughly the <strong>2nd</strong> percentile: only about 2% of days closed under it.</p>
+
+      <p>So <strong>the published ratio is stricter than its own description</strong>. The 0.42&times; is the <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">Porkopolis</a> calibration this site adopts, not a judgment call made here &mdash; and the data alone would have put a lower bound about 10% higher. Whatever else the floor is, it is not drawn flatteringly.</p>
     </div>
   </section>
 
@@ -164,9 +164,15 @@ eleventyComputed:
         </div>
       </div>
 
-      <p class="fl-parity-foot">Excess is the median of each entry&rsquo;s own realized-minus-trend difference &mdash; not the difference of the two medians above, which is a different and less meaningful number. Windows run from each entry date to the selected endpoint; CAGRs annualise on a 365.25-day year.</p>
+      <p class="fl-parity-foot">The difference &mdash; the extra return vs the trend line &mdash; is the median of each entry&rsquo;s own realized-minus-trend figure &mdash; not the difference of the two medians above, which is a different and less meaningful number. Windows run from each entry date to the selected endpoint; CAGRs annualise on a 365.25-day year.</p>
     </div>
 
+  </section>
+
+  <!-- ══════════ 3b · THE ENTRIES (scatter) ══════════ -->
+  <section class="fl-section" id="the-entries">
+    <div class="fl-eyebrow">The entries</div>
+    <h2 class="fl-h2">Where each entry sat &mdash; and what it earned</h2>
     <div class="fl-chart-block fl-scatter-block">
       <p class="fl-lead fl-scatter-lede">The toggle above shows that <em>when</em> you measure matters. This shows that <em>where</em> the entry sat matters.</p>
 
@@ -177,6 +183,7 @@ eleventyComputed:
       </div>
 
       <p class="fl-scatter-result" id="flScatterResult">&mdash;</p>
+      <p class="fl-scatter-genesis-note">The deep-left cluster is the genesis era, drawn hollow &mdash; the same recorded-not-weighted caveat from the record section applies to it here.</p>
 
       <div class="fl-chart-head">
         <div>
@@ -187,7 +194,7 @@ eleventyComputed:
       <div class="fl-chart-wrapper fl-scatter-wrapper chart-wrapper" data-chart-copy
            data-chart-heading="#flScatterTitle"
            data-chart-sub="#flScatterSub"
-           data-chart-title="The Bitcoin Floor — excess vs. entry depth below the line"
+           data-chart-title="The Bitcoin Floor — extra return vs the trend line, by entry position"
            data-chart-filename="bitcoin-floor-entry-depth.png">
         <canvas id="flScatterChart"></canvas>
       </div>
@@ -205,7 +212,7 @@ eleventyComputed:
     <div class="fl-tripwire" id="flTripwire">
       <div class="fl-tripwire-head">Model break criteria</div>
       <p class="fl-tripwire-crit">The Power Law model is failing its own test if price sustains a close <strong>more than 10% below the floor</strong> for <strong>more than 30 consecutive days</strong>.</p>
-      <p class="fl-tripwire-why">The three modern approaches never came close to either criterion: the deepest went 5.1% under, and none held. The genesis-era 2010 episode exceeded both, on every measure available in the historical series &mdash; which is one reason the criteria are set where they are, and not a reason to treat that episode as evidence about today.</p>
+      <p class="fl-tripwire-why"><strong>Both conditions have to hold at once.</strong> Depth alone is not a break &mdash; a single day 11% under is a wick, not a failure &mdash; and duration alone is not either, since a month spent 2% under the line is the floor doing its job. It is the two together that separate a real break from a graze, and the record is what sets them there: the three modern approaches never met the pair, the deepest going 5.1% under and none of them holding. The genesis-era 2010 episode exceeded both at once, on every measure available in the historical series &mdash; which is one reason the criteria sit where they do, and not a reason to treat that episode as evidence about today.</p>
       <p class="fl-tripwire-why"><strong>A note on what is measured, and how.</strong> The historical record above is read from a series that samples roughly every 12 days, so its durations are lower bounds. The tripwire is not: from ship date forward it is judged on <strong>daily closes</strong>, live. The two are deliberately different instruments &mdash; the history is what can be reconstructed, the tripwire is what can be watched.</p>
 
       <div class="fl-tripwire-status" id="flTripwireStatus">
@@ -215,7 +222,7 @@ eleventyComputed:
 
       <p class="fl-tripwire-ceiling">Secondary watch, the other direction: a sustained break <em>above</em> the 3&times; ceiling, beyond the brief cyclical visits the record already contains, would not falsify the model so much as suggest the denominator had changed &mdash; that the thing being priced, or the money pricing it, is no longer the same measurement.</p>
 
-      <p class="fl-tripwire-commit">If either of the tripwire criteria is met, this page will say so &mdash; the same day, in this box.</p>
+      <p class="fl-tripwire-commit">If the tripwire fires &mdash; a close more than 10% below the floor, held for more than 30 consecutive days &mdash; this page will say so the same day, in this box.</p>
     </div>
   </section>
 

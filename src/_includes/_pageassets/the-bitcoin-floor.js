@@ -226,15 +226,60 @@
   // ═══════════════════════════════════════════════════════════
   // CHANNEL CHART — floor emphasised, episodes marked
   // ═══════════════════════════════════════════════════════════
+  // ── Chart typography, page-local ────────────────────────────────────
+  // Round 3: the default sizes were too small to read comfortably, worst on
+  // the scatter which carries the most axis text. Bumped here ONLY — a
+  // site-wide chart/UI typography review is filed separately as its own pass
+  // (TECH_DEBT), because changing it globally would touch every chart page.
+  var CHART_FONT = { tick: 12, title: 13, legend: 12 };
+
+  // Custom interaction mode: one tooltip item PER DATASET at the hovered x.
+  //
+  // Chart.js's 'nearest' returns a single item across all datasets, which is
+  // why this tooltip was showing only Price — and 'index' matches by array
+  // INDEX, which is wrong here because the band lines are ~240 sampled points
+  // while the price series has 481, so index N is a different date in each.
+  // Matching by x-VALUE gives Floor / Trend / Upper / Price together, which is
+  // what the chart's caption promises. Same fix /the-power-law carries; the
+  // guard means whichever page registers it first wins and the other reuses it.
+  function registerXNearest() {
+    if (typeof Chart === 'undefined' || !Chart.Interaction || !Chart.Interaction.modes) return;
+    if (Chart.Interaction.modes.flXNearest) return;
+    Chart.Interaction.modes.flXNearest = function (chart, e) {
+      var pos = (Chart.helpers && Chart.helpers.getRelativePosition)
+        ? Chart.helpers.getRelativePosition(e, chart) : { x: e.x, y: e.y };
+      var xScale = chart.scales.x;
+      if (!xScale) return [];
+      var cursorX = xScale.getValueForPixel(pos.x);
+      var items = [];
+      chart.data.datasets.forEach(function (dataset, di) {
+        if (!chart.isDatasetVisible(di)) return;
+        var data = dataset.data;
+        if (!data || !data.length) return;
+        var bi = 0, bd = Infinity;
+        for (var i = 0; i < data.length; i++) {
+          var x = data[i].x !== undefined ? data[i].x : i;
+          var d = Math.abs(x - cursorX);
+          if (d < bd) { bd = d; bi = i; }
+        }
+        var meta = chart.getDatasetMeta(di);
+        if (meta && meta.data && meta.data[bi]) items.push({ element: meta.data[bi], datasetIndex: di, index: bi });
+      });
+      return items;
+    };
+  }
+
   function buildChannelChart() {
     var canvas = $('flChannelChart');
     if (!canvas || typeof Chart === 'undefined') return;
+    registerXNearest();
 
     var cFloor = cssVar('--fl-floor', '#c0603a');
     var cTrend = cssVar('--fl-trend', '#e09422');
     var cCeil = cssVar('--fl-ceil', '#d9b36b');
     var cPrice = cssVar('--fl-price', '#6db3d4');
     var cDim = cssVar('--text-muted', '#6a6256');
+    var cText = cssVar('--text', '#e8e0d4');
 
     var minD = PL_DATA[0][0], maxD = todayDays();
     var bandPts = [], step = (maxD - minD) / 240;
@@ -286,22 +331,22 @@
       options: {
         responsive: true, maintainAspectRatio: false,
         animation: { duration: 400 },
-        interaction: { mode: 'nearest', axis: 'x', intersect: false },
+        interaction: { mode: 'flXNearest', axis: 'x', intersect: false },
         scales: {
           x: {
             type: 'logarithmic', min: minD, max: maxD,
-            title: { display: true, text: 'Year (log time)', color: cDim, font: { size: 10 } },
+            title: { display: true, text: 'Year (log time)', color: cDim, font: { size: CHART_FONT.title } },
             // Year-aligned ticks from the shared module: one tick per labelled
             // year, placed on Jan 1, so "2011 2011" cannot happen.
-            ticks: { color: cDim, font: { size: 10 }, callback: plYearTickLabel },
+            ticks: { color: cText, font: { size: CHART_FONT.tick }, callback: plYearTickLabel },
             afterBuildTicks: plYearAxisTicks,
             grid: { color: 'rgba(224,148,34,0.05)' }
           },
           y: {
             type: 'logarithmic',
-            title: { display: true, text: 'Price, USD (log)', color: cDim, font: { size: 10 } },
+            title: { display: true, text: 'Price, USD (log)', color: cDim, font: { size: CHART_FONT.title } },
             ticks: {
-              color: cDim, font: { size: 10 },
+              color: cText, font: { size: CHART_FONT.tick },
               callback: function (v) {
                 var e = Math.log10(v);
                 if (Math.abs(e - Math.round(e)) > 0.01) return '';
@@ -319,23 +364,33 @@
           // rows so wrapping never costs an entry, and generateLabels fixes the
           // order to the reading order of the chart (floor first: it is the
           // page's subject) instead of leaving it to the `order` field.
+          // Legend: fixed reading order (floor first — it is the page's
+          // subject), and legible. Round 2 pinned the order but left the text
+          // at --text-muted/11px, which rendered as swatches with barely-there
+          // labels; each item now carries an explicit fontColor at the page's
+          // body ink, and maxHeight still reserves a second row so wrapping
+          // cannot cost an entry.
           legend: {
-            position: 'top', align: 'start', maxHeight: 60,
+            position: 'top', align: 'start', maxHeight: 64,
             labels: {
-              color: cDim, font: { size: 11 }, usePointStyle: true,
-              boxWidth: 8, padding: 12,
+              color: cText, font: { size: CHART_FONT.legend }, usePointStyle: true,
+              boxWidth: 10, padding: 14,
               generateLabels: function (chart) {
                 var wanted = ['Floor (0.42× trend)', 'Price', 'Trend', 'Upper band (3× trend)'];
-                return wanted.map(function (name) {
-                  var i = chart.data.datasets.findIndex(function (d) { return d.label === name; });
-                  if (i < 0) return null;
+                var out = [];
+                wanted.forEach(function (name) {
+                  var i = -1;
+                  chart.data.datasets.forEach(function (d, k) { if (d.label === name) i = k; });
+                  if (i < 0) return;
                   var ds = chart.data.datasets[i];
-                  return {
+                  out.push({
                     text: ds.label, datasetIndex: i,
                     strokeStyle: ds.borderColor, fillStyle: ds.borderColor,
-                    lineWidth: 2, hidden: !chart.isDatasetVisible(i), pointStyle: 'line'
-                  };
-                }).filter(Boolean);
+                    fontColor: cText, lineWidth: 3,
+                    hidden: !chart.isDatasetVisible(i), pointStyle: 'line'
+                  });
+                });
+                return out;
               }
             }
           },
@@ -552,7 +607,7 @@
     $('flParityExcess').textContent = signedPct1(g.excess);
     $('flParityRealizedSub').textContent = 'median across ' + g.n + ' entries';
     $('flParityMethod').innerHTML =
-      'Entries are the ' + g.n + ' samples in the series priced within 10% of the floor, graded to ' + endLabel + '. ' +
+      'Entries are the ' + g.n + ' samples in the series that closed <strong>no more than 10% above the floor</strong> — including the genesis-era samples that sat far below it — graded to ' + endLabel + '. ' +
       'That is ' + (g.n / PL_DATA.length * 100).toFixed(1) + '% of the ' + PL_DATA.length + ' samples on record. ' +
       'The published measurement behind this instrument (<code>analysis/2026-08-20-power-law-floor.md</code> §3) graded the ' +
       'same entries to ' + ANALYSIS_PARITY.measuredOn + ', when price sat on the floor: ' +
@@ -578,14 +633,14 @@
 
       var read;
       if (Math.abs(g.excess) < 1.0) {
-        read = '<strong>Entering within 10% of the floor did not beat the trend line.</strong> ' +
-          'The median entry returned an enormous absolute CAGR — and its excess over what the trend line itself grew at, ' +
+        read = '<strong>Entering anywhere from just above the floor to far below it did not beat the trend line.</strong> ' +
+          'The median entry returned an enormous absolute CAGR — and its extra return vs the trend line, the excess over what the trend line itself grew at, ' +
           'across the identical window, is ' + signedPct1(g.excess) + ': indistinguishable from zero. ' +
           'The extra return in this set came from how far <em>below</em> the line an entry went, not from the fact of buying at it.';
       } else if (g.excess > 0) {
         read = 'Graded to today, these entries came out ' + signedPct1(g.excess) + ' per year ahead of the trend line. ' +
           '<strong>That is the endpoint doing the work, not the entry.</strong> Because ' + whereNow + ', ' +
-          'these windows are graded from the floor to a point above it — and excess is very nearly the annualised change ' +
+          'these windows are graded from the floor to a point above it — and that extra return is very nearly the annualised change ' +
           'in the ×-trend ratio between the two ends. The published analysis, measured <strong>' + ANALYSIS_PARITY.measuredOn +
           '</strong> — a day when price sat <em>on</em> the floor — found the same entries returned ' +
           ANALYSIS_PARITY.medianRealized.toFixed(1) + '% against a trend of ' +
@@ -594,13 +649,13 @@
       } else {
         read = 'Graded to today, these entries came out ' + signedPct1(g.excess) + ' per year — they trailed the trend line. ' +
           '<strong>That is the endpoint doing the work, not the entry.</strong> Because ' + whereNow + ', ' +
-          'these windows end below where they began in ×-trend terms, and excess is very nearly the annualised change ' +
+          'these windows end below where they began in ×-trend terms, and that shortfall is very nearly the annualised change ' +
           'in that ratio. The published analysis, measured with price on the floor, found an excess of about zero.';
       }
       $('flParityRead').innerHTML = read;
 
       $('flHonestyEndpoint').innerHTML =
-        'Excess here is very nearly the annualised change in the ×-trend ratio between entry and exit, so <strong>where price ' +
+        'Extra return vs the trend line is very nearly the annualised change in the ×-trend ratio between entry and exit, so <strong>where price ' +
         'happens to sit on the day you read this decides the answer</strong>. Right now ' + whereNow + ', at ' +
         (spot / trendAt(d0)).toFixed(3) + '× trend. When price sits on the floor every window is graded floor-to-floor — ' +
         'the least flattering vantage available, and the one the published analysis used. This number is a statement about ' +
@@ -702,6 +757,7 @@
     var eraColors = [cssVar('--fl-era-1', '#c0603a'), cssVar('--fl-era-2', '#d9b36b'),
                      cssVar('--fl-era-3', '#6db3d4'), cssVar('--fl-era-4', '#8fae7f')];
     var cDim = cssVar('--text-muted', '#6a6256');
+    var cText = cssVar('--text', '#e8e0d4');
     var cAxis = cssVar('--fl-axis', 'rgba(224,148,34,0.28)');
 
     // Frame so zero is always inside the plot with breathing room on both sides.
@@ -710,12 +766,22 @@
     var padY = Math.max((hi - lo) * 0.12, 0.5);
     var yBounds = { min: lo - padY, max: hi + padY };
 
+    // Genesis-era points are drawn as HOLLOW, faded markers. They stay on the
+    // chart — removing them would hide the shape of the entry set — but they
+    // must not read as equal evidence, because the record section already
+    // dismissed them and the result line below is written not to lean on them.
+    // The era legend still names them, so the class is visible, not hidden.
+    function isGenesisEra(rows) { return rows.every(function (r) { return r.date < '2013-01-01'; }); }
     var datasets = eras.map(function (era, i) {
+      var col = eraColors[i % eraColors.length];
+      var genesis = isGenesisEra(era.rows);
       return {
-        label: era.label,
+        label: era.label + (genesis ? ' (recorded, not weighted)' : ''),
         data: era.rows,
-        backgroundColor: eraColors[i % eraColors.length],
-        borderColor: eraColors[i % eraColors.length],
+        backgroundColor: genesis ? 'transparent' : col,
+        borderColor: col,
+        borderWidth: genesis ? 2 : 1,
+        pointStyle: 'circle',
         pointRadius: 6, pointHoverRadius: 8
       };
     });
@@ -732,7 +798,7 @@
         var y0 = ys.getPixelForValue(0);
         ctx.beginPath(); ctx.moveTo(xs.left, y0); ctx.lineTo(xs.right, y0); ctx.stroke();
         ctx.setLineDash([]);
-        ctx.fillStyle = cDim; ctx.font = '10px Inter, sans-serif';
+        ctx.fillStyle = cText; ctx.font = CHART_FONT.tick + 'px Inter, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText('the floor', x0 + 5, ys.top + 12);
         ctx.fillText('matched the trend line', xs.left + 5, y0 - 5);
@@ -746,8 +812,8 @@
         responsive: true, maintainAspectRatio: false,
         scales: {
           x: {
-            title: { display: true, text: 'Entry price vs. the floor (%)  —  negative is below the line', color: cDim, font: { size: 11 } },
-            ticks: { color: cDim, font: { size: 10 }, callback: function (v) { return v + '%'; } },
+            title: { display: true, text: 'Entry price vs. the floor (%)  —  negative is below the line', color: cDim, font: { size: CHART_FONT.title } },
+            ticks: { color: cText, font: { size: CHART_FONT.tick }, callback: function (v) { return v + '%'; } },
             grid: { color: 'rgba(224,148,34,0.05)' }
           },
           y: {
@@ -757,13 +823,13 @@
             // "matched the trend line" reads as the chart’s frame rather than as the
             // reference the whole panel turns on.
             suggestedMin: yBounds.min, suggestedMax: yBounds.max,
-            title: { display: true, text: 'Excess over the trend line (percentage points per year)', color: cDim, font: { size: 11 } },
-            ticks: { color: cDim, font: { size: 10 }, callback: function (v) { return (v > 0 ? '+' : '') + v; } },
+            title: { display: true, text: 'Extra return vs the trend line (percentage points per year)', color: cDim, font: { size: CHART_FONT.title } },
+            ticks: { color: cText, font: { size: CHART_FONT.tick }, callback: function (v) { return (v > 0 ? '+' : '') + v; } },
             grid: { color: 'rgba(224,148,34,0.05)' }
           }
         },
         plugins: {
-          legend: { labels: { color: cDim, font: { size: 11 }, usePointStyle: true, boxWidth: 8 } },
+          legend: { labels: { color: cText, font: { size: CHART_FONT.legend }, usePointStyle: true, boxWidth: 10, padding: 14 } },
           tooltip: {
             backgroundColor: '#1a1714', borderColor: 'rgba(224,148,34,0.3)', borderWidth: 1,
             titleColor: '#f2eee8', bodyColor: '#e8e0d4',
@@ -802,20 +868,44 @@
     // Recomputed with the toggle, and phrased from what the points actually do.
     var allPositive = rows.every(function (r) { return r.y > 0; });
     var nearFloorEndpoint = Math.abs((endPrice / floorAt(endDay) - 1) * 100) < 5;
+
+    // ── The below-vs-above clause, COMPUTED, never asserted ──────────────
+    // The claim has to stand on the MODERN entries alone, or the chart is
+    // leaning on the genesis cluster it just told the reader to discount.
+    // Two strengths are tested and only the true one is used:
+    //   clean  — every modern below-floor entry out-earned every above-floor one
+    //   median — the typical below-floor entry out-earned the typical above one
+    // Verified 2026-08-22 at both endpoints: median holds at both, clean holds
+    // at NEITHER (an above-floor 2022 entry with a short window out-earns the
+    // weakest below-floor one). If neither holds, the clause is dropped rather
+    // than softened into something unfalsifiable.
+    var modernRowsAll = rows.filter(function (r) { return r.date >= '2013-01-01'; });
+    var mBelow = modernRowsAll.filter(function (r) { return r.x < 0; }).map(function (r) { return r.y; });
+    var mAbove = modernRowsAll.filter(function (r) { return r.x >= 0; }).map(function (r) { return r.y; });
+    var clause = '';
+    if (mBelow.length && mAbove.length) {
+      var cleanSplit = Math.min.apply(null, mBelow) > Math.max.apply(null, mAbove);
+      var medianSplit = median(mBelow) > median(mAbove);
+      if (cleanSplit) {
+        clause = ' Among the modern approaches alone, <strong>every entry below the line out-earned every entry above it</strong>.';
+      } else if (medianSplit) {
+        clause = ' Among the modern approaches alone, entries below the line <strong>typically out-earned</strong> those above it — ' +
+                 'a median of ' + signedPct1(median(mBelow)) + ' against ' + signedPct1(median(mAbove)) + ' per year, though the two groups overlap.';
+      }
+    }
+
     var resultEl = $('flScatterResult');
     if (resultEl) {
       if (nearFloorEndpoint) {
         resultEl.innerHTML =
-          'Graded floor-to-floor, these entries <strong>matched the trend line’s growth</strong> — the bonus appears only ' +
-          'when the endpoint sits above the floor.';
+          'Graded floor-to-floor, these entries <strong>matched the trend line’s growth</strong> — the extra return appears only ' +
+          'when the endpoint sits above the floor.' + clause;
       } else if (allPositive) {
         resultEl.innerHTML =
-          'Graded to ' + endWhen + ', <strong>every one of these entries beat the trend line’s own growth</strong> — and ' +
-          'the deeper below the line the entry sat, the bigger the bonus.';
+          'Graded to ' + endWhen + ', <strong>every one of these entries beat the trend line’s own growth</strong>.' + clause;
       } else {
         resultEl.innerHTML =
-          'Graded to ' + endWhen + ', these entries split — some beat the trend line’s own growth and some trailed it, ' +
-          'and where each one landed tracks how far below the line it sat.';
+          'Graded to ' + endWhen + ', these entries split — some beat the trend line’s own growth and some trailed it.' + clause;
       }
     }
 
@@ -835,7 +925,7 @@
     }
 
     $('flScatterSub').textContent =
-      rows.length + ' entries, each graded to ' + endWhen + ' — all entries within 10% of the floor, above or below it. ' +
+      rows.length + ' entries, each graded to ' + endWhen + ' — every sample that closed no more than 10% above the floor, including the genesis-era samples that sat far below it. ' +
       'Left of the dashed vertical sat below the floor; above the dashed horizontal beat the trend line. ' +
       'Hover any point for its date and figures.';
     $('flScatterNote').innerHTML =
@@ -1004,9 +1094,12 @@
     var where = t.vsFloorPct >= 0
       ? '<strong>' + t.vsFloorPct.toFixed(1) + '% above the floor</strong>'
       : '<strong>' + Math.abs(t.vsFloorPct).toFixed(1) + '% below the floor</strong>';
+    // "Arms" and "fires" are different events and the wording keeps them apart:
+    // price closing below the depth line ARMS the clock; only depth sustained for
+    // the full duration FIRES the tripwire. The criteria are conjunctive.
     $('flTripwireStatusV').innerHTML =
       where + ' &middot; ' +
-      '<strong>' + Math.round(t.daysBelow) + ' days</strong> below the ' + TRIPWIRE.depthPct + '% line &middot; ' +
+      '<strong>' + Math.round(t.daysBelow) + ' of ' + TRIPWIRE.days + '</strong> consecutive days below the ' + TRIPWIRE.depthPct + '% line &middot; ' +
       'the tripwire has ' + (t.firedModern ? '<strong>fired</strong>' : 'never fired') + ' in the modern era (2011&ndash;). ' +
       'It would arm at ' + usd(t.thresholdPrice) + ' today.';
   }
