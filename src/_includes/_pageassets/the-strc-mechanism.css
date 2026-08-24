@@ -269,6 +269,9 @@ body { background: var(--bg); color: var(--text); }
 
 /* ══ §D COST ACCOUNTING ══ */
 .sb-cost-block { margin: 0 0 1.2rem; padding: 1.1rem 1.3rem; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-left: 3px solid rgba(224,148,34,0.5); border-radius: 8px; max-width: 880px; }
+/* ROC card under the lever board (§B) reuses the cost-block chrome; only the top
+   gap differs, matching .sb-board's own 1.6rem lead-in. */
+.sb-cost-block.sb-taxblock { margin-top: 1.6rem; }
 .sb-cost-head { font-family: var(--font-d); font-size: 1.2rem; font-weight: 500; color: #f2eee8; margin: 0 0 0.5rem; }
 .sb-cost-body { font-family: var(--font-b); font-size: 0.9rem; line-height: 1.65; color: var(--text-dim); margin: 0; }
 .sb-cost-body strong { color: var(--text); font-weight: 600; }
