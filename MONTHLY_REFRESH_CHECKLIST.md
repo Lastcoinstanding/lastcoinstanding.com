@@ -401,6 +401,7 @@ Each month:
    - **Ongoing** → the live numbers carry it; leave the nav entry and this block in place.
    - **Resolved** (par regained, or a dividend action taken) → convert the page to a **post-mortem**, **retire the `explorations.json` entry** (nav sunset — reachability reverts to the parent + related links), and mark this block "resolved, post-mortem" here.
 5. **GSC glance** — confirm `/the-strc-mechanism` is still indexed (indexed-count didn't drop); the URL is in `sitemap.xml` at weekly changefreq. (The old `/strc-below-par` 301s to it via `_redirects`.)
+6. **ROC classification note** (STRC mechanism card + BFI tax paragraph): carries "calendar-2025, 100%, announced Feb 2 2026" — Strategy publishes each year's classification ~early Feb; when the next announcement lands, update both pages' year references and re-verify the IR link. Until then, confirm the claim still reads as a dated historical fact, not a standing promise.
 
 `SOFR_FLOOR_PCT` (the illustrative floor for the "cut" dividend scenario in the lens) is a labelled stand-in, not a sourced constant — bump it toward the current 1-month term SOFR level when you refresh.
 
