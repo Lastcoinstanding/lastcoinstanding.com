@@ -1763,12 +1763,16 @@ _Last updated: June 2026. Update this document as editorial decisions crystalliz
 
 **Where it lives.** `src/_includes/components/page-feedback.njk` (markup + self-contained `.pf-*` styles + vanilla JS), included once from `base.njk` after `{{ content | safe }}`, gated `{% if slug and feedback != false %}`. Every slugged page — all 29 explorations and any future page — inherits it automatically; `index`, `about`, and `calculators` opt out via `feedback: false` front matter. Layout-level by design so the related-strip per-page-include footgun cannot recur here (TECH_DEBT, 2026-06-11). Renders below the related cards, above the footer.
 
+**The utility-page exception — `/work-with-me` keeps the widget on (2026-08-24).** `index`, `about` and `calculators` opt out, but the Work With Me page deliberately does **not**: the widget *is* that page's contact mechanism, and its body copy points readers at "the message box below". Setting `feedback: false` there would delete the thing the page asks people to use. The front matter carries a comment saying so — do not "fix" it to match the other utility pages.
+
+**Standing pointer to `/work-with-me` (2026-08-24).** Below the fine print the widget carries one line: *"I'm also available for one-on-one conversations and open to collaborations — Work with me →"* (`.pf-more`). Two structural constraints, both load-bearing: it sits **outside the `<form>`**, because the success path replaces `form.outerHTML` and the failure path rewrites `.pf-fine` — anything nested in the form is destroyed on submit; and it is **gated off when the page slug is `work-with-me`**, so the page never links to itself. The line is a pointer, not part of the register canon above.
+
 **Register copy (canon — reuse verbatim if rebuilt):**
 - Eyebrow: "Feedback or questions?" (JM decision: direct, not cute; rejected "A question or a quibble?")
 - Lede: "Every page on this site has been improved by someone pushing on it. Ask a question, flag an error, or suggest what's missing — it goes straight to the author, never published."
 - Fine print: "Nothing you write here is posted publicly." (JM trimmed the auto-attach sentence.)
 - Success: "Received — thank you. If you left an email, replies usually land within a few days."
-- Failure: "Something hiccuped. You can email directly instead: [mailto johnmc190@gmail.com] — mention the page you were reading."
+- Failure: "Something hiccuped. You can email directly instead: [mailto john@lastcoinstanding.com] — mention the page you were reading." **(Address updated 2026-08-24.)** This is the **reader-facing fallback only**. The backend destination is unchanged and deliberately different: `functions/api/feedback.js` `DEST_DEFAULT` and the `FEEDBACK_TO` env stay on the Resend account-owner address (`johnmc190@gmail.com`), because the Resend free tier delivers only to the account owner. Public-facing address and delivery address are separate on purpose — do not "reconcile" them.
 
 **Backend.** Cloudflare Pages Function `functions/api/feedback.js`, POST `/api/feedback`: honeypot (silent accept) → validation (length caps, email syntax) → rate limit 5/hour/IP via KV (`rl:` keys, TTL 1h; IP sha256-hashed transiently, never stored with submissions) → optional Turnstile (enforced only when `TURNSTILE_SECRET` env exists; OFF as of rollout) → KV archive (`fb:<ISO-ts>:<id>` → `{page, message, email|null, ts}`; source of truth) → best-effort email. Email path: `NOTIFY` send_email binding if present, else Resend via `RESEND_KEY` env (ACTIVE; account = johnmc190@gmail.com, free tier delivers only to account owner — correct here), else KV-only. `FEEDBACK_TO` env overrides destination. Subject format `[LCS feedback] /<slug>`; reader email becomes Reply-To.
 
@@ -2809,3 +2813,26 @@ Fourth page of the Power Law family (**Bitcoin and The Power Law** · **The Bitc
 **Chart typography is deliberately larger here than site-wide** (ticks 12px, axis titles 13px, tick labels at body ink) following JM's walk. Scoped to this page on purpose; the site-wide review is filed in `TECH_DEBT` as its own pass.
 
 **Register guards.** "Cheapest" appears nowhere; "at the floor" is a location, never an adjective of value. Models and pages are not actors (`STYLE_GUIDE §10.4`). Vintage and endpoint caveats ride in the same card as their numbers, never as footnotes. No colour state changes with distance to the floor — no green far above, no red near it; distance is reported in text and position, never in alarm styling.
+
+
+## 51. Work With Me (`/work-with-me.html`)
+
+**What it is.** A **utility page**, in the `/about` family rather than the exploration family: a short, plain statement of the three ways to engage the person who builds the site — a one-on-one conversation, a collaboration or licensing arrangement, and a podcast/channel appearance — closing with how to make contact. Shipped 2026-08-24. Slug is `work-with-me` and, per house rule, never changes.
+
+**Why it is a utility page, and what that excludes.** It is not an exploration and must not be wired like one. Deliberately absent, each a conscious call rather than an oversight: **no `llms.txt` entry**, **no `updates.json` entry**, **no homepage concept card**, **no `related:` strip**, **no `explorations.json` registration** (so it appears in no nav dropdown), and **no `calculator_tile`**. The whole of its discoverability is the two entry points below. `NEW_PAGE_CHECKLIST` is written for explorations; the sections that do not apply were skipped knowingly.
+
+**Two entry points, and only two.**
+1. **Footer → Site column** (`base.njk`, hardcoded alongside The Gallery / Calculators / About — that column is not data-driven).
+2. **The page feedback widget**, site-wide: one line below the fine print pointing here, suppressed on this page itself. See §27 for the two structural constraints on that line.
+
+**The feedback widget stays ON here — the deliberate exception.** Every other utility page opts out with `feedback: false`. This one does not, because the widget is the page's contact mechanism: the closing paragraph tells the reader to "use the message box below". Recorded in §27 and in a front-matter comment on the page. `get_updates: false` and `share_in_layout: false` are both set — a contact page has nothing to subscribe to and nothing to share onward.
+
+**Two addresses, on purpose.** The page and the widget's failure fallback both show **`john@lastcoinstanding.com`**, the public-facing address. The backend delivery address (`functions/api/feedback.js` `DEST_DEFAULT`, and the `FEEDBACK_TO` env) is unchanged on the Resend account-owner address, because the Resend free tier delivers only to the account owner. Do not reconcile them; see §27.
+
+**Register.** The three offers are **bolded run-in leads inside their own paragraphs** ("A conversation." / "A collaboration." / "A show."), deliberately not headings — three offers of equal weight, read as prose rather than scanned as a menu. The advice line is stated inside the first offer rather than deferred to a disclaimer block: *education, not financial advice; not an investment advisor; no recommendations about securities or any other investment products.* That sentence is load-bearing for a page that solicits paid conversations about money, and must survive any rewrite.
+
+**Styling.** Clones `/about`'s palette and layout approach — `base.njk` carries no site-wide palette, link rules, or page background, so the page declares its own `:root` and paints the dark canvas via `body { background: var(--bg) }` (`NEW_PAGE_CHECKLIST §1`). Classes are `wwm-` prefixed; the shared `.page-title` treatment is reused so the two utility pages read as a pair. Container is 48rem, matching About's editorial width.
+
+**Open items.**
+- **OG card is a placeholder.** `og:image` reuses `og-synthesis.jpg` pending a dedicated Work With Me card (`NEW_PAGE_CHECKLIST §7`). The `og:image:alt` describes the site rather than the Synthesis artwork so it stays honest when the image is swapped.
+- **No `-chrome.html` asset.** The page needs no body chrome, so `body_chrome` is not declared — the fourth file in the usual `_pageassets` quartet would be an empty stub. `/about`'s own chrome file is a single HTML comment.
