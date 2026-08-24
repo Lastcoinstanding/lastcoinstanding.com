@@ -1,0 +1,134 @@
+
+    /* ── PALETTE ──
+       base.njk carries no site-wide palette, link rules, or page background
+       (NEW_PAGE_CHECKLIST §1), so this page declares its own. Cloned from
+       about.css so the two utility pages read as one pair. */
+    :root {
+      --btc-orange: #f7931a;
+      --bg: #0a0c0f;
+      --text: #e8e0d5;
+      --text-muted: #8b8680;
+      --text-dim: #666;
+      --border: #1a1a1a;
+      --surface: rgba(255,255,255,0.03);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+/* ─── NAV palette accents (structure inherited from canonical-nav-css in base.njk) ─── */
+.site-nav .brand:hover { color: var(--orange, #F7931A); }
+.site-nav .nav-links a.active { color: var(--orange, #F7931A); background: rgba(247,147,26,0.08); font-weight: 600; }
+.mobile-overlay a.active { color: var(--orange, #F7931A); background: rgba(247,147,26,0.08); font-weight: 600; }
+.nav-dropdown-menu a.active { color: var(--orange, #F7931A); background: rgba(247,147,26,0.08); font-weight: 600; }
+
+@media (max-width: 480px) {
+    .site-nav { padding: 10px 14px; }
+    .site-nav .brand { font-size: 0.72rem; letter-spacing: 0.14em; }
+}
+
+    /* ── PAGE LAYOUT ── */
+    .wwm-page {
+      max-width: 48rem;
+      margin: 0 auto;
+      padding: 3.5rem 2.5rem 4rem;
+    }
+
+    /* ── PAGE TITLE ── */
+    .page-title {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: center;
+      color: var(--text);
+      margin-bottom: 3.5rem;
+    }
+
+    /* ── SECTION ── */
+    .wwm-section p {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--text);
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+    .wwm-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* The opening paragraph sets up the three offers below it. */
+    .wwm-intro {
+      color: var(--text);
+      margin-bottom: 28px;
+    }
+
+    /* ── RUN-IN LEADS ──
+       "A conversation." / "A collaboration." / "A show." are bolded run-in
+       leads inside their own paragraph, deliberately NOT headings: three
+       offers of equal weight, read as prose rather than scanned as a menu. */
+    .wwm-lead-in {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* ── CLOSING ── */
+    .wwm-closing {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    /* ── INLINE LINK STYLE ── */
+    .wwm-section a {
+      color: var(--btc-orange);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(247, 147, 26, 0.3);
+      transition: border-color 0.2s;
+    }
+    .wwm-section a:hover {
+      border-color: var(--btc-orange);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .wwm-page {
+        padding: 2.5rem 1.5rem 3rem;
+      }
+      .page-title {
+        font-size: 2.4rem;
+        margin-bottom: 44px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .wwm-page {
+        padding: 2rem 1.25rem 2.5rem;
+      }
+      .page-title {
+        font-size: 2rem;
+        margin-bottom: 36px;
+      }
+      .wwm-section p {
+        font-size: 0.95rem;
+      }
+    }

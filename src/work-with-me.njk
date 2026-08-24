@@ -1,0 +1,42 @@
+---
+layout: base.njk
+permalink: /work-with-me.html
+slug: work-with-me
+# Utility page (like /about) — no llms.txt entry, no updates.json entry, no
+# homepage card, no `related:` strip. Two deliberate front-matter calls:
+#
+#   feedback — NOT set to false. Every other utility page opts out
+#   (SITE_GUIDE §27: index, about, calculators), but here the widget IS the
+#   page's contact mechanism: the body copy points readers at "the message
+#   box below". Setting `feedback: false` would remove the thing the page
+#   asks people to use. Leave it on.
+#
+#   get_updates / share_in_layout — both off. This is a contact page, not an
+#   exploration; there is nothing to subscribe to from here and nothing worth
+#   sharing onward.
+get_updates: false
+share_in_layout: false
+eleventyComputed:
+  head_extras: "{% include '_pageassets/work-with-me-head.html' %}"
+  page_styles: "{% include '_pageassets/work-with-me.css' %}"
+  page_scripts: "{% include '_pageassets/work-with-me.js' %}"
+---
+<main class="wwm-page">
+
+  <h1 class="page-title">Work With Me</h1>
+
+  <section class="wwm-section">
+
+    <p class="wwm-intro">This site is built and maintained by one person. If something here is useful to you, these are the ways to reach me.</p>
+
+    <p><strong class="wwm-lead-in">A conversation.</strong> If you&rsquo;re thinking through a bitcoin decision, an allocation you&rsquo;re weighing, a drawdown you&rsquo;re planning for, a conversation you want to have with your family or your advisor, I&rsquo;m available for a one-on-one call. These sessions are education, not financial advice: I&rsquo;m not an investment advisor, and I don&rsquo;t make recommendations about securities or any other investment products. What I can do is walk through the tools on this site with your numbers in them and help you leave with a clearer picture of your own reasoning.</p>
+
+    <p><strong class="wwm-lead-in">A collaboration.</strong> If you&rsquo;re an advisor, a firm, or a platform interested in licensing these tools, adapting them for your clients, or building something together, I&rsquo;d like to hear from you. The tools you see here are live examples of the work.</p>
+
+    <p><strong class="wwm-lead-in">A show.</strong> If you&rsquo;d like to cover any of these explorations on a podcast or channel, get in touch and I&rsquo;ll make it easy.</p>
+
+    <p class="wwm-closing">To reach me, use the message box below &mdash; it goes straight to me and nothing is ever published &mdash; or email me directly at <a href="mailto:john@lastcoinstanding.com">john@lastcoinstanding.com</a>.</p>
+
+  </section>
+
+</main>

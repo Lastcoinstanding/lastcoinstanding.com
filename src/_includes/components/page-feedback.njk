@@ -36,6 +36,8 @@
 .pf-fine { font-size: 0.74rem; font-weight: 300; color: #908880; margin-top: 0.2rem; }
 .pf-done { font-size: 0.95rem; font-weight: 300; color: #d8d2ca; border-left: 2px solid rgba(224,148,34,0.55); background: rgba(224,148,34,0.05); padding: 0.9rem 1.1rem; max-width: 640px; line-height: 1.6; }
 .pf-fail a { color: #e09422; text-decoration: none; border-bottom: 1px solid rgba(224,148,34,0.55); }
+.pf-more { font-size: 0.8rem; font-weight: 300; color: #908880; margin-top: 1.1rem; max-width: 640px; line-height: 1.6; }
+.pf-more a { color: #e09422; text-decoration: none; border-bottom: 1px solid rgba(224,148,34,0.55); }
 @media (max-width: 720px) { .pf-wrap { padding: 0 1rem; margin-top: 3rem; } }
 </style>
 <div class="pf-wrap" id="pfWrap" data-page="{{ slug or page.fileSlug }}">
@@ -51,6 +53,14 @@
       </div>
       <div class="pf-fine">Nothing you write here is posted publicly.</div>
     </form>
+    {#- Standing pointer to the contact page. Sits OUTSIDE the <form> on purpose:
+        the success path replaces form.outerHTML and the failure path rewrites
+        .pf-fine, so anything nested in the form is destroyed on submit. Gated off
+        on /work-with-me itself — no self-link, and that page's own copy already
+        points readers at this box. -#}
+    {%- if (slug or page.fileSlug) != 'work-with-me' %}
+    <p class="pf-more">I&rsquo;m also available for one-on-one conversations and open to collaborations &mdash; <a href="/work-with-me">Work with me &rarr;</a></p>
+    {%- endif %}
   </div>
 </div>
 <script>
@@ -82,8 +92,8 @@
       var fine = form.querySelector('.pf-fine');
       var page = wrap.getAttribute('data-page') || location.pathname;
       fine.className = 'pf-fine pf-fail';
-      fine.innerHTML = 'Something hiccuped. You can email directly instead: <a href="mailto:johnmc190@gmail.com?subject=' +
-        encodeURIComponent('[LCS] ' + page) + '">johnmc190@gmail.com</a> &mdash; mention the page you were reading.';
+      fine.innerHTML = 'Something hiccuped. You can email directly instead: <a href="mailto:john@lastcoinstanding.com?subject=' +
+        encodeURIComponent('[LCS] ' + page) + '">john@lastcoinstanding.com</a> &mdash; mention the page you were reading.';
     });
   });
 })();
