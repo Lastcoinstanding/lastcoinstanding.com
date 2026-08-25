@@ -146,15 +146,38 @@
       }
     }
 
-    // Dual-impact drawdown pair (the why) — likelihood + depth, depth annotated with coins-equivalent
-    var ddProbEl = document.getElementById('wdDdProb'), ddDepthEl = document.getElementById('wdDdDepth'), ddCoins = document.getElementById('wdDdCoins');
+    // Dual-impact pair (the why) — likelihood + depth. BOTH halves are measured against
+    // THE ENTRY PRICE, not peak-to-trough; the copy says so in every line, because the
+    // bare word "drawdown" collides with the site-wide peak-to-trough sense (Stress Test
+    // canon) and that collision is what made the depth box unreadable.
+    //
+    // The depth half BRANCHES on the computed median, the way the verdict cards do:
+    //   A. median materially below zero  → the numeric form (unchanged behaviour)
+    //   B. median rounds to 0 AND most entries never fell → lead with the finding in words
+    //   C. median rounds to 0 but the never-fell share is NOT a majority → neutral
+    //      zero-state wording, so "Most never fell" can never render against a minority.
+    // The B/C split is a guard, not decoration: state B asserts "most", so it must not
+    // fire below a real majority.
+    var NEVER_MAJORITY = 60;      // the "Most never fell" claim needs at least this share
+    var ddProbEl = document.getElementById('wdDdProb'), ddDepthEl = document.getElementById('wdDdDepth'), ddSub = document.getElementById('wdDdSub');
     if (ddProbEl) ddProbEl.textContent = pct0(m.ddProb);
-    if (ddDepthEl) ddDepthEl.textContent = m.ddDepth <= -1 ? signPct0(m.ddDepth) : '~0%';
-    if (ddCoins) {
-      var more = coinsMore(m.ddDepth);
-      ddCoins.innerHTML = more >= 1
-        ? 'the same dollars would buy about <strong>+' + Math.round(more) + '%</strong> more Bitcoin at the trough'
-        : 'price rarely fell far enough here to matter';
+    var zeroish = m.ddDepth > -1;                 // same rounding threshold the old copy used
+    var never = (m.neverFell != null) ? m.neverFell : 0;
+    if (ddDepthEl) {
+      ddDepthEl.textContent = (zeroish && never >= NEVER_MAJORITY) ? 'Most never fell'
+                            : (zeroish ? '~0%' : signPct0(m.ddDepth));
+      ddDepthEl.className = 'wd-dd-num wd-dd-num-red' + ((zeroish && never >= NEVER_MAJORITY) ? ' wd-dd-num-word' : '');
+    }
+    if (ddSub) {
+      if (!zeroish) {
+        var more = coinsMore(m.ddDepth);
+        ddSub.innerHTML = 'median worst dip <strong>below the entry price</strong>' +
+          (more >= 1 ? ' &mdash; the same dollars would buy about <strong>+' + Math.round(more) + '%</strong> more Bitcoin at that trough.' : '.');
+      } else if (never >= NEVER_MAJORITY) {
+        ddSub.innerHTML = '<strong>' + pct0(never) + '</strong> of entries here never fell below their entry price at all &mdash; the median worst dip below entry rounds to 0%.';
+      } else {
+        ddSub.innerHTML = 'the typical entry here barely dipped below its buy price &mdash; <strong>' + pct0(never) + '</strong> never fell below it at all.';
+      }
     }
     var waitDetail = document.getElementById('wdWaitDetail');
     if (waitDetail) waitDetail.innerHTML = m.waitLen != null

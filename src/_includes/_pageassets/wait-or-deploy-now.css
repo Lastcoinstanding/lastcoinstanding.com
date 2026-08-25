@@ -132,6 +132,12 @@ body { background: var(--bg); color: var(--text); }
 .wd-dd-cap { font-family: 'Inter', sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.35rem; }
 .wd-dd-num { font-family: var(--font-d); font-size: clamp(1.7rem, 4.5vw, 2.4rem); font-weight: 600; line-height: 1; letter-spacing: -.01em; color: #f2eee8; font-variant-numeric: tabular-nums; }
 .wd-dd-num-red { color: #e08a7a; }
+/* Word-headline variant of the depth figure — carries a plain-language finding
+   ("Most never fell") instead of a number when the median rounds to 0%. Smaller
+   and un-tabularised because it is a sentence, not a stat; it deliberately does
+   NOT match the left half's numeral size, so the two halves cannot be misread as
+   two comparable percentages. */
+.wd-dd-num-word { font-size: clamp(1.15rem, 3vw, 1.55rem); letter-spacing: 0; font-variant-numeric: normal; line-height: 1.15; }
 .wd-dd-sub { font-family: 'Inter', sans-serif; font-size: 0.74rem; line-height: 1.45; color: var(--text-dim); margin: 0.4rem auto 0; max-width: 15rem; }
 .wd-dd-sub strong { color: var(--text); font-weight: 600; }
 .wd-dd-caveat { font-family: 'Inter', sans-serif; font-size: 0.74rem; line-height: 1.5; color: var(--text-muted); margin: 0; padding: 0.5rem 1rem; border-top: 1px solid rgba(192,57,43,0.3); background: rgba(192,57,43,0.06); }

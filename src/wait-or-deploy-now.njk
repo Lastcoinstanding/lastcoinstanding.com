@@ -102,16 +102,21 @@ eleventyComputed:
           <div class="wd-dd-half">
             <div class="wd-dd-cap">How likely</div>
             <div class="wd-dd-num" id="wdDdProb">&mdash;</div>
-            <p class="wd-dd-sub">of entries here fell at least 20% within two years.</p>
+            <p class="wd-dd-sub">of entries here fell at least 20% <strong>below their entry price</strong> within two years.</p>
           </div>
           <div class="wd-dd-divider" aria-hidden="true"></div>
+          {#- Depth half: headline and sub are BOTH written by the page script, because the
+              box branches on the computed median (see renderComparator). When the median
+              rounds to 0% the headline is the plain-language finding, not the statistic —
+              a bare "~0%" under "How deep" made the reader derive the lineup-and-middle
+              logic for themselves, which is the confusion this rework exists to remove. -#}
           <div class="wd-dd-half">
             <div class="wd-dd-cap">How deep, if it comes</div>
             <div class="wd-dd-num wd-dd-num-red" id="wdDdDepth">&mdash;</div>
-            <p class="wd-dd-sub">median worst drawdown &mdash; <span id="wdDdCoins">&mdash;</span>.</p>
+            <p class="wd-dd-sub" id="wdDdSub">&mdash;</p>
           </div>
         </div>
-        <p class="wd-dd-caveat">Likelihood and depth together &mdash; both drawn from history at this position, <strong>not a forecast</strong>. Past patterns can&rsquo;t predict future prices.</p>
+        <p class="wd-dd-caveat">How often a dip below your entry price came, and how far it went &mdash; both drawn from history at this position, <strong>not a forecast</strong>. Past patterns can&rsquo;t predict future prices.</p>
       </div>
     </div>
 
@@ -167,8 +172,8 @@ eleventyComputed:
       <li><strong>Channel position:</strong> the log-space location between the 0.42&times; floor and the 3&times; upper band, shown only as a &times;-trend multiple and its plain-language label &mdash; the same vocabulary as the rest of the trilogy.</li>
       <li><strong>Waiting (position-based):</strong> from an entry at position P, &ldquo;wait&rdquo; means hold out until channel position drops at least 0.15 below P, capped at two years. If no lower entry arrives in that window, the waiter deploys at the two-year price &mdash; waiting failed. We report two separate things: <strong>how often</strong> a lower entry arrived at all, and &mdash; <strong>only among the entries where one did</strong> &mdash; how much more Bitcoin the same dollars then bought (measured as 1 / price, waiter versus deploy-now). Keeping these separate avoids conflating &ldquo;a dip rarely came&rdquo; with the size of the forward run that followed the rare deep bottoms.</li>
       <li><strong>Waiting-paid rate:</strong> the share of historical entries near a position where waiting ended with more Bitcoin. <strong>Never-arrived:</strong> the share where no lower entry came within two years.</li>
-      <li><strong>Drawdown:</strong> likelihood is the share of entries that fell at least 20% within two years; depth is the median worst drawdown. Its <strong>coins-equivalent</strong> is how much more Bitcoin the same dollars would buy at that trough.</li>
-      <li><strong>Sample:</strong> post-2014 only (the pre-$15 curiosity era is excluded), and only entries with a full two-year forward record, so &ldquo;wait&rdquo; and &ldquo;drawdown within two years&rdquo; are never truncated by the edge of the data. Figures are recomputed live every page load.</li>
+      <li><strong>Dip below your entry:</strong> both halves of the results pair are measured against <em>the entry price</em>, never peak-to-trough. <strong>Likelihood</strong> is the share of entries whose price fell at least 20% below the entry price within two years. <strong>Depth</strong> is the median worst dip below the entry price across those same entries &mdash; an entry whose price never went below its buy price contributes exactly 0%, so when most entries never dipped, the median is 0% and the box says so in words rather than printing a bare &ldquo;~0%&rdquo;. The <strong>coins-equivalent</strong> is how much more Bitcoin the same dollars would buy at that trough. Note the deliberate vocabulary split: elsewhere on this site &ldquo;drawdown&rdquo; means <em>peak-to-trough</em> (see <a href="/the-bitcoin-retirement-stress-test">the Retirement Stress Test</a>); in this row it would mean something different, so the word is not used here.</li>
+      <li><strong>Sample:</strong> post-2014 only (the pre-$15 curiosity era is excluded), and only entries with a full two-year forward record, so &ldquo;wait&rdquo; and &ldquo;a dip below entry within two years&rdquo; are never truncated by the edge of the data. Depth is read off the same sampled price series the rest of the page uses, so a dip shorter than the sampling interval can pass unrecorded &mdash; the never-fell share is therefore a slight over-count, not a claim about every daily close. Figures are recomputed live every page load.</li>
     </ul>
   </div>
 
