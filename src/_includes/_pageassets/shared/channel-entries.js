@@ -113,6 +113,12 @@
       nArrived: M.filter(function (m) { return m.arrived; }).length,
       ddProb: M.filter(function (m) { return m.hadDD; }).length / n * 100,
       ddDepth: median(M.map(function (m) { return m.depth; })) * 100,
+      // Share of entries whose price NEVER went below the entry price in the two-year
+      // window. `trough` starts at p0 and only ever moves down, so depth === 0 is exactly
+      // "no sample in the window came in under the entry price" — no epsilon needed.
+      // Additive: WODN reads it for the zero-median branch of its depth box; nothing
+      // existing changes, so the HMC twin's published figures are untouched.
+      neverFell: M.filter(function (m) { return m.depth >= 0; }).length / n * 100,
       never: M.filter(function (m) { return !m.arrived; }).length / n * 100,
       waitLen: arrivedLens.length ? median(arrivedLens) : null,
       entries: set,
