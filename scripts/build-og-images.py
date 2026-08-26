@@ -564,8 +564,8 @@ CARDS = [
         "wait_after_scroll_ms": 3500,
         "chrome": {
             "title": "Compare ",
-            "titleAccent": "Retirement",
-            "titleAfter": " Plans",
+            "titleAccent": "Bitcoin",
+            "titleAfter": " Retirement Plans",
             "subtitle": "Every plan is a choice against the plan you didn't pick. Two complete plans, side by side, and what the difference actually buys.",
             "statsHTML": (
                 '<strong style="color:#F7931A; font-weight:700;">Plan A vs Plan B</strong>'
@@ -573,7 +573,7 @@ CARDS = [
             ),
             "urlText": "lastcoinstanding.com/compare-retirement-plans",
         },
-        "output_filename": "og-compare-retirement-plans.jpg",
+        "output_filename": "og-compare-retirement-plans-v2.jpg",
     },
 ]
 
