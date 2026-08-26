@@ -72,11 +72,12 @@ Captured during the merge pass, because the backlog is now large enough that the
   - **Source already exists:** the feedback widget's private pipeline is the natural origin — **but every testimonial requires explicit permission to publish**, given the widget's "never published" promise. Ask, don't assume.
   - **Cross-links:** `CREATOR_CREDIBILITY_KIT` §2 already runs a capture loop for reshares and kind words — this is the public face of that file.
 
-- [ ] **Video register remediation — some shipped videos read dark/creepy.** Task. Audit first.
+- [x] **Video register remediation — some shipped videos read dark/creepy. CLOSED 2026-08-26 — canon written, audit run, both offenders replaced.**
   Surfaced 2026-08-02 (JM).
-  - **Concept:** several carousel/exploration videos land in a dark or unsettling register. Target register is **sci-fi, optimistic, inviting, constructive** — mysterious, not menacing.
-  - **The prompt-side learnings are already captured** in `OPEN_ITEMS.md` working notes: *"Grok Imagine: open sky/horizon/scale prevent 'dank' drift; explicit Avoid entries weigh heavily; JM's register is 'mysterious, almost sci-fi,' not creepy."* What's missing is the **remediation sweep of the videos already shipped**.
-  - **Method:** audit first — list every shipped video, rate each against the target register, redo only the offenders. Cheaper than a blanket redo and it produces the reusable prompt pattern.
+  - **Superseded by `SITE_GUIDE §13` "Register canon".** The one-line target this entry carried — *sci-fi, optimistic, inviting, constructive; mysterious, not menacing* — is now written out in full there: the default warm / hopeful / constructive register and the positive vocabulary that produces it, what "sci-fi" means here (**one** engineered-luminous element set against nature — not neon, not cityscapes, not creepy), and the rule that register follows the **page's argument** rather than one site-wide mood. §13 is the canon; treat this line as history, not as the spec.
+  - **The audit ran** — `SITE_GUIDE §13` "Register audit — 2026-08-26". The shipped set was rated against the canon and three ratings moved: The Bitcoin Retirement Stress Test was **cleared** (its foreboding is earned by the subject — navigating risk — and the bridge reads as safe passage), while **Bitcoin vs. Real Estate** and **Bitcoin and The Power Law** were confirmed as offenders, measured, and **replaced**. No offender is left open.
+  - **What carries forward is the gate, not this entry.** §13 now holds a standing acceptance gate for every future slide — mean-luminance floor at or above ~25%, no sustained falling brightness arc, closing frame at least as bright as the opening frame unless the subject justifies otherwise — measured chat-side per `NEW_PAGE_CHECKLIST §8`. That turns register remediation into a pre-ship check rather than a recurring backlog sweep, which is why this closes instead of staying open.
+  - **Prompt-side learnings** stay where they were, in the `OPEN_ITEMS.md` working notes: open sky / horizon / scale prevent "dank" drift, and explicit Avoid entries weigh heavily.
 
 - [ ] **Freshness signals — "New" / "Updated" badges, and an honest channel-position chip.**
   Surfaced 2026-07-14. Small, anytime.
