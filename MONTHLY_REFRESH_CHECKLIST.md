@@ -304,7 +304,7 @@ Quick post-refresh checks to confirm everything's coherent:
 
 The 2026-05-17 OG rollout introduced **product-forward OG cards** that
 embed live chart screenshots in their composition (STYLE_GUIDE §6.15.2).
-Four cards in this family will visibly drift from current data after a
+Five cards in this family will visibly drift from current data after a
 monthly refresh and should be regenerated:
 
 | OG card file | Live visual embedded |
@@ -313,6 +313,7 @@ monthly refresh and should be regenerated:
 | `og-bitcoin-vs-the-stock-market.jpg` | the §2 wealth-curve chart |
 | `og-the-bitcoin-retirement.jpg` | the projection chart with current-state annotations |
 | `og-calculators.jpg` | the featured-row mini-renderers (which themselves embed live data) |
+| `og-compare-retirement-plans.jpg` | the paired balance curves for Plan A and Plan B (added 2026-08-26) |
 
 Each card embeds `weeklyBtc` / `PL_DATA` / projection state, so each monthly
 refresh advances the visible window by one month and changes the embedded
@@ -328,7 +329,7 @@ npm run build-ogs       # or: python3 scripts/build-og-images.py
 
 The script visits each page in headless Chromium, clones or screenshots
 the live visual, composes the editorial chrome, downsamples to 1280×720,
-and writes the four updated JPGs to the repo root. Re-commit alongside
+and writes the five updated JPGs to the repo root. Re-commit alongside
 the monthly refresh commit (or as an immediate follow-up); the same
 filenames are reused so no head-file or `.eleventy.js` changes are
 needed.
