@@ -284,6 +284,16 @@ body { background: var(--bg); color: var(--text); }
   .crp-col[data-editing="false"] { padding-bottom: 0.9rem; }
   .crp-col[data-editing="false"] .crp-col-verdict { margin-top: 0; }
 
+  /* Tap targets. Text-styled controls (the reset link and the two card
+     expanders) render at 16–24px, which is fine for a pointer and under the
+     44px minimum for a finger. The height is added ONLY here: on desktop a
+     44px text link would blow out the card head's baseline row for no gain.
+     Surfaced by the mandated 375px pass, 2026-08-26. */
+  .crp-reset, .crp-expander { min-height: 44px; display: inline-flex; align-items: center; }
+  .crp-shared-head .crp-reset { align-self: center; }
+  /* The A/B switcher shipped at 38px in the original build — six short. */
+  #crpSwitcher .seg-btn { min-height: 44px; }
+
   /* Three columns still fit at 375 — the values are short. Headers go to
      the letter form only. */
   .crp-th-full { display: none; }
