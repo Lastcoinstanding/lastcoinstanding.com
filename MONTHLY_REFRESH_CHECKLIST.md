@@ -313,7 +313,7 @@ monthly refresh and should be regenerated:
 | `og-bitcoin-vs-the-stock-market.jpg` | the §2 wealth-curve chart |
 | `og-the-bitcoin-retirement.jpg` | the projection chart with current-state annotations |
 | `og-calculators.jpg` | the featured-row mini-renderers (which themselves embed live data) |
-| `og-compare-retirement-plans.jpg` | the paired balance curves for Plan A and Plan B (added 2026-08-26) |
+| `og-compare-retirement-plans-v2.jpg` | the paired balance curves for Plan A and Plan B (added 2026-08-26; bumped to `-v2` the same day after the copy review changed the page title and cut the legend to two entries) |
 
 Each card embeds `weeklyBtc` / `PL_DATA` / projection state, so each monthly
 refresh advances the visible window by one month and changes the embedded

@@ -9,6 +9,7 @@ below is the durable half — the conventions and traps the next batch will need
   separation reads clearly at card size, so the explicit-params fallback was not needed; the
   suggested waits (1500 / 3500) worked on the first run with no tuning. The `CARDS` entry
   (`name: "compare-retirement"`) records that capture decision inline, including the explicit-params
+  **RECUT to `og-compare-retirement-plans-v2.jpg` the same day** (SHA-1 `8fa9bb62…`, 61,283 bytes, 1280×720) after the copy review retitled the page and cut the chart legend to two entries — both of which a product-forward card bakes into the image. v1 stays in the repo and stays registered, per the BAS `-v2` precedent, so already-scraped cards keep resolving. **The standing lesson:** a product-forward card depends on page *copy and chrome*, not only page *data* — the monthly refresh covers the data half, and nothing covers the other half, so recut in the same batch as any copy review that touches a titled, charted page. Full record: `SITE_GUIDE §52.1`.
   form to switch to if the separation ever stops reading.
 - `og-bitcoin-retirement.jpg` — **brand-forward (§6.15.1)**, generator committed at repo root as
   `build-og-bitcoin-retirement.py`, cloned from the stress-test sibling and compositing over
