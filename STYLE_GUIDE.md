@@ -2321,7 +2321,7 @@ The following read as AI-generated and are banned from page copy:
 
 **The list is append-only** as new tells are noticed. Check new copy against it as part of the `NEW_PAGE_CHECKLIST §10.5` review — the interaction-intent pass is already reading every new section lede, so it is the cheapest place to catch these.
 
-**Known outstanding violation (2026-08-25):** `/bitcoin-defined`'s subtitle reads *"A single sentence. Eight load-bearing ideas."* It predates this rule and was left in place rather than swept, because the PR that added this section was scoped to copy insertions only. It is the first thing a sweep should fix.
+**Outstanding violations — a sweep is still owed.** The rule landed after most of the page copy did, so the templates carry a backlog: **load-bearing ×6, robust ×6, notably ×4, "at its core" ×4, unpack ×3, "worth noting" ×3, tapestry ×2, elegant ×1, "deep dive" ×1**, plus ~52 raw `leverage` hits that need reading to separate the noun (legitimate, and unavoidable on the mortgage pages) from the banned verb. Counted 2026-08-25. Deliberately **deferred to its own PR** — a sweep of this size is not a rider on a copy change, and several of these sit inside sentences that will need rewriting rather than word-swapping. The `/bitcoin-defined` subtitle, which was the seventh `load-bearing`, was fixed on 2026-08-25 because the same PR was already editing that page.
 
 
 ## Appendix A: Survey findings (2026-04-26)
