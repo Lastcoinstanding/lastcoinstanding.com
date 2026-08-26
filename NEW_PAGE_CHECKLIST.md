@@ -828,6 +828,25 @@ Before announcing the page or sharing the URL externally:
   and image.
 - **Console clean** — open DevTools, verify no JS errors or 404s on page
   load.
+
+- **When a check FAILS, run a control before you believe it.** Re-run the identical check against a **known-good artifact** — one verified working in an earlier PR — under the *same* conditions. If the control fails too, the failure is the environment, not the thing you just built. Established 2026-08-26 across three separate false alarms in one session, each of which would otherwise have been written up as a defect:
+  - **Video playback.** Every carousel video reported `paused: true` and refused `play()` with `AbortError: video-only background media was paused`. Cause: the Browser pane was not displayed, so `document.visibilityState === "hidden"` and Chrome blocks video-only media. The control — a slide verified playing and looping in an earlier PR — failed identically. Diagnostic: read `document.visibilityState` first; `hidden` means playback cannot be checked here at all, and the honest report is *not verified*, never *broken*.
+  - **Layout metrics.** `innerWidth` and `scrollWidth` both read **0** on a pane that is not compositing, which silently turns every overflow assertion into a false pass. Setting an explicit viewport (`resize_window`) restores real numbers — so measure only after fixing a viewport, and treat `innerWidth === 0` as "no measurement", not "no overflow".
+    **This is the only one of the four that fails silently** — the other three announce themselves as errors; this one looks like a clean result, because it compares zero to zero and gets the answer you were hoping for. So it gets a **mechanical guard rather than a warning**: assert the metrics are non-zero as a *precondition*, before any overflow comparison runs, so a non-compositing pane fails at the precondition instead of passing at the comparison.
+    ```js
+    // Precondition — run BEFORE any width/overflow assertion.
+    const vw = window.innerWidth, sw = document.documentElement.scrollWidth;
+    if (!(vw > 0 && sw > 0)) throw new Error('layout metrics unavailable (pane not compositing): innerWidth=' + vw + ' scrollWidth=' + sw);
+    // Per-element too — a zero-width box makes "fits within the viewport" vacuous.
+    const r = el.getBoundingClientRect();
+    if (!(r.width > 0 && r.height > 0)) throw new Error('element has no box — not measurable here');
+    // Only now is this comparison meaningful:
+    const overflows = sw > vw + 1;
+    ```
+    A thrown precondition is the point: it cannot be mistaken for a pass, it names the reason in the message, and it forces the honest report — *not measured here* — instead of an assertion nobody can distinguish from a real one later.
+  - **Console 404s.** The console buffer survives same-tab navigation, so a 404 from an *earlier* wrong URL keeps reappearing on a page that is clean. Re-check on a **fresh tab** before investigating the site; cross-check `performance.getEntriesByType('resource')` for entries with `responseStatus >= 400`, which is per-load rather than cumulative. **Third-strike rule: if the same tab reports the same phantom 404 a third time, kill the tab — do not investigate the site again.**
+  - **Screenshots** time out in this environment for the same root cause as the playback block (pane not compositing). Do not read that as a page fault, and do not claim visual verification you could not perform — hand the eyeball to JM on the preview instead.
+
 - **Feedback widget check** — automatic for any page with `slug` (layout-level, base.njk); verify it renders on the deployed page below the related strip (eyebrow "Feedback or questions?"). Hub/utility pages opt out with `feedback: false`. Do NOT add a per-page include. (SITE_GUIDE §27)
 - **Deferred integration surfaces are tracked, not dropped.** The **OG card** (§7) and the **carousel slide** (§8) may each ship in a follow-up PR — which is precisely how they drift silently (the stale BAS OG asset; two slide-less pages sitting in `SITE_GUIDE §13` "Pending additions"; same failure class as the missing `:root` palette that §1 now guards). Both need external tooling that is often unavailable at launch (Grok Imagine for the slide; Python + Pillow/Playwright for the OG card), so deferral is legitimate — *untracked* deferral is the bug. If either is deferred, it MUST be logged as a **tracked** pending item recording the page slug: the carousel slide in `SITE_GUIDE §13` "Pending additions", the OG card in `TECH_DEBT` (or the OG handoff note). **A launch is not "done" until every §1–§10 surface is either shipped or on a tracked list.**
 
