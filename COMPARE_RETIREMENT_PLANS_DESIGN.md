@@ -1,10 +1,28 @@
 # Compare Retirement Plans — Design
 
+> ## ⚠️ AMENDMENT 2026-08-26 — THIS DOC IS HISTORICAL FROM HERE
+>
+> **The page shipped.** `SITE_GUIDE §52` (and `§52.1` for the OG card) is **authoritative for current state**; this file records the design as it stood before the build, and is kept for the reasoning behind decisions rather than as a description of the page.
+>
+> **§9's four open items were all ratified as recommended:** hero chart **Option 1** (paired balance curves); **delta strip above** the verdict table; **Plan B initialises as Plan A with retirement year +1**; hub slug **`/bitcoin-retirement`** and title **"Plan Your Bitcoin Retirement"**, both as specced.
+>
+> **Where the as-built diverges from this doc**, all from the JM copy review the same day, all recorded in §52's iteration record:
+>
+> - **The title is now *Compare Bitcoin Retirement Plans*** — the H1 accent falls on *Bitcoin*. The **slug is frozen** at `/compare-retirement-plans` because namespaced `a_`/`b_` links were already circulating; the general rule that sets is in `STYLE_GUIDE §10.4`.
+> - **URL params use the family's own short names** (`a_stack` / `a_retire` / `a_income`), not this doc's provisional `a_year` / `a_wd` — §6 delegated exact naming to build, and `SITE_GUIDE §46` says senders speak the receiver's vocabulary.
+> - **A "Ten years in" verdict row** was added after Depletes/holds, anchored at each plan's *own* retirement + 10. Not in this doc; it reads the existing ledger, so it is not new modeling.
+> - **A delta-suppression rule** drops the threshold-margin sentence when the plans differ only in stack, because it then restates an input rather than reporting a finding.
+> - **Orientation copy** above the columns, a **threshold gloss** at first use linking Escape Velocity, the chart **legend cut to two entries** with the marker meanings moved into the curve tooltip, and the **shared card's prose collapsed** behind expanders.
+> - **The engine is a shared module** (`shared/retirement-engine.js`) rather than a fourth in-page copy. §8.2's "extend `evParityQA`" could not be done literally — that function lives inside the EV page's closure — so `crpParityQA` asserts against **golden vectors captured from the deployed EV page**. Repointing the other three family pages at the module is filed in `TECH_DEBT §1` as the family's most important structural debt.
+> - **Both §3 and §6 verify-at-build contingencies did not fire:** the bear path was already single-sourced in `shared/crash-model.js`, and the Stress Test already exposes receiver params, so neither the promotion nor the separate-item fallback was needed.
+> - **§10's hub shipped, then gained two prominence surfaces** it does not describe: a grouped **Retirement** subsection in The Numbers dropdown and the family strip on the homepage (JM ruling, options 1+2). A top-level nav item — option 3 — remains unbuilt and filed with the nav-capacity project, so §10's "not a nav change" fence holds for the **bar**, which is what it was always about.
+
+
 **Page title:** Compare Retirement Plans (JM naming ruling 2026-08-21; verb-first per the toolbox naming canon, `STYLE_GUIDE §10.4`)
 **Slug:** `/compare-retirement-plans`
 **This file:** `COMPARE_RETIREMENT_PLANS_DESIGN.md` — deliberately NOT `RETIREMENT_SCENARIO_COMPARISON_DESIGN.md`, which already exists at repo root and documents a different, shipped feature (the flagship's on-page `rt-compare` panel, 2026-07-25; authoritative behaviour in `RT_COMPARE_HANDOFF.md` §2, catalogued `SITE_GUIDE §17`). The two must never be confused; see §1 for the fence between them.
 **Design session:** 2026-08-26, JM + chat-side. Promotes the backlog entry surfaced 2026-08-21 (`PAGE_IDEAS_BACKLOG` → Retirement family), which itself promotes the deferred note in `ESCAPE_VELOCITY_DESIGN.md` §5.
-**Status:** Approved for build once JM ratifies the four items in §9.
+**Status:** **SHIPPED 2026-08-26** — all four §9 items ratified as recommended. See the amendment above; `SITE_GUIDE §52` is authoritative for current state.
 
 ---
 
