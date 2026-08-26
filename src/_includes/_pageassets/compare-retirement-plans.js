@@ -308,8 +308,10 @@
     var onlyStackDiffers = (PLANS.a.retirementYear === PLANS.b.retirementYear)
       && (PLANS.a.targetIncomeUSD === PLANS.b.targetIncomeUSD)
       && (Math.abs(PLANS.a.btcStack - PLANS.b.btcStack) > 1e-9);
+    var suppressed = false;
     if (ea && eb) {
-      if (!onlyStackDiffers) {
+      if (onlyStackDiffers) suppressed = true;
+      else {
         var ma = ca.scn.btcStack - (L.a.stack.value != null ? L.a.stack.value : ca.scn.btcStack);
         var mb = cb.scn.btcStack - (L.b.stack.value != null ? L.b.stack.value : cb.scn.btcStack);
         var mg = mb - ma;
@@ -340,8 +342,22 @@
         out.push({ html: 'Ten years in, <strong>Plan ' + dead + ' has run out</strong>; Plan ' + (dead === 'A' ? 'B' : 'A') + ' holds ' + formatBtc(alive.btc) + ' BTC (' + formatCurrencyShort(alive.value) + ').' });
       } else if (ta.btc != null && tb.btc != null) {
         var db = tb.btc - ta.btc, dv = (tb.value || 0) - (ta.value || 0);
-        if (Math.abs(db) < 0.005) out.push({ html: 'Ten years in, both plans hold the same stack.' });
-        else out.push({ html: 'Ten years in, <strong>Plan B holds ' + formatBtc(Math.abs(db)) + ' BTC ' + (db > 0 ? 'more' : 'less') + '</strong> &mdash; worth ' + formatCurrencyShort(Math.abs(dv)) + (dv > 0 ? ' more' : ' less') + '.' });
+        if (Math.abs(db) < 0.005) { out.push({ html: 'Ten years in, both plans hold the same stack.' }); return; }
+        // VALUE-LED IN THE SUPPRESSION CASE ONLY. When the plans differ solely
+        // in stack, both sell identical bitcoin every year, so the ten-year BTC
+        // delta IS the stack difference the reader typed — leading with it
+        // would restate the input the suppressed margin sentence restated.
+        // Leading with the value keeps the only genuinely new quantity first.
+        // Everywhere else the BTC delta is NOT the input (the plans drew or
+        // retired differently), so the stack-led shape stays: it is the more
+        // concrete reading when it is actually a finding.
+        if (suppressed) {
+          out.push({ html: db > 0
+            ? 'Ten years in, <strong>Plan B&rsquo;s extra ' + formatBtc(db) + ' BTC is worth ' + formatCurrencyShort(Math.abs(dv)) + '</strong>.'
+            : 'Ten years in, <strong>Plan B&rsquo;s ' + formatBtc(Math.abs(db)) + ' BTC shortfall costs ' + formatCurrencyShort(Math.abs(dv)) + '</strong>.' });
+        } else {
+          out.push({ html: 'Ten years in, <strong>Plan B holds ' + formatBtc(Math.abs(db)) + ' BTC ' + (db > 0 ? 'more' : 'less') + '</strong> &mdash; worth ' + formatCurrencyShort(Math.abs(dv)) + (dv > 0 ? ' more' : ' less') + '.' });
+        }
       }
     })();
 
