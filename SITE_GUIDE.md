@@ -708,6 +708,15 @@ Every slide video is briefed against one default register: **warm, hopeful, cons
 
 Reference take: **The Bitcoin Retirement** (row 32), a 42% floor on a rising arc. Footage that cannot clear the gate does not get a wiring PR; it gets another brief. **Chain of custody:** once footage clears the gate chat-side, the wiring PR verifies that the bytes the preview serves are **identical to the gate-passed files** — SHA-1 of the downloaded file against the committed one, plus the re-encode fingerprint the gate pass leaves behind (video stream only, no mjpeg thumbnail stream, `+faststart`; none of which a raw Grok original carries). That closes the gap between "a file passed the gate" and "this is that file" without needing to re-measure luminance on the deploy.
 
+**How the gate is measured, not just what it requires.** The three criteria above are applied to a **per-frame mean-luminance series**, extracted chat-side with ffmpeg's `signalstats` filter:
+
+```
+ffprobe -f lavfi "movie=<file>,signalstats" …
+```
+
+reading **`YAVG`** — the average luma of each frame — and expressing it as a **percentage of 255**. So "floor ≥ ~25%" means no frame's `YAVG` falls below ~64/255; "no sustained falling arc" and "closing frame at least as bright as the opening" are read off the same series end to end, not off two sampled stills. Recording the method matters as much as the numbers: a floor measured on three hand-picked frames is a different and much weaker claim than one measured on every frame, and a future reader comparing two takes' figures needs to know they were produced the same way. Luma only — this is a brightness gate, not a colour or saturation one.
+
+
 ### Register audit — 2026-08-26 (chat-side visual review)
 
 JM reviewed the shipped set against the canon above and three ratings changed. The corrected verdicts also ride the rows themselves, so the table stands alone.
