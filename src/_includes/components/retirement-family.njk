@@ -1,0 +1,68 @@
+{#-
+  ════════ RETIREMENT FAMILY STRIP ════════
+
+  The four questions of the retirement decision funnel, in order, with the
+  current page marked. Rendered on all four family pages and on the hub.
+
+  WHY THE STYLES LIVE IN THE COMPONENT. Page CSS on this site is a per-page
+  include, so styling this strip the usual way would mean editing four
+  stylesheets to add one shared component — and the batch this shipped in
+  permitted exactly one change to each existing family page. Carrying its own
+  scoped `<style>` keeps the per-page edit to a single include line, which is
+  also what makes the strip safe to add to a fifth page later. Every selector
+  is prefixed `rfam-`; every colour is a var with a literal fallback, because
+  the four host pages declare their palettes independently and a bare var()
+  would fail silently on any page that named a token differently.
+
+  Usage — one line, nothing else:
+      {% include 'components/retirement-family.njk' %}
+
+  The current page is detected from the page's own `slug` front matter. A page
+  whose slug is not in the list renders the strip with nothing marked, which is
+  the correct behaviour for the hub's own "you are here" being the strip
+  itself.
+-#}
+<style>
+.rfam { max-width: 1100px; margin: 3.2rem auto 0; padding: 0; }
+.rfam-tag { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber, #e09422); margin: 0 0 0.7rem; }
+.rfam-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.55rem; }
+.rfam-item { display: flex; flex-direction: column; gap: 0.22rem; padding: 0.7rem 0.8rem; border-radius: 7px; border: 1px solid var(--border-faint, rgba(224,148,34,0.15)); background: rgba(224,148,34,0.035); text-decoration: none; transition: border-color 0.15s, background 0.15s; }
+a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,148,34,0.08); }
+.rfam-item.is-here { border-color: var(--amber, #e09422); background: rgba(224,148,34,0.1); }
+.rfam-step { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber, #e09422); }
+.rfam-item.is-here .rfam-step::after { content: ' — you are here'; letter-spacing: 0.04em; text-transform: none; font-weight: 600; color: var(--text-dim, #9a9080); }
+.rfam-q { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 0.98rem; line-height: 1.25; color: var(--ink-bright, #f2eee8); }
+.rfam-t { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.72rem; line-height: 1.4; color: var(--ink-dim, #9a9080); }
+.rfam-foot { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.76rem; line-height: 1.6; color: var(--ink-dim, #9a9080); margin: 0.7rem 0 0; }
+.rfam-foot a { color: var(--amber, #e09422); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+.rfam-foot a:hover { border-bottom-color: var(--amber, #e09422); }
+@media (max-width: 860px) { .rfam-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 460px) { .rfam-row { grid-template-columns: 1fr; } }
+</style>
+{%- set fam = [
+  { slug: 'the-bitcoin-retirement',            step: 'Build',  q: 'What does my plan look like?',       t: 'One plan in full model context.' },
+  { slug: 'bitcoin-escape-velocity',           step: 'Size',   q: 'How much is enough?',                t: 'The threshold your plan sits on.' },
+  { slug: 'compare-retirement-plans',          step: 'Choose', q: 'Which of my options?',               t: 'Two complete plans, side by side.' },
+  { slug: 'the-bitcoin-retirement-stress-test', step: 'Stress', q: 'Does it survive bad luck?',          t: 'The plan you picked, under a crash.' }
+] -%}
+<nav class="rfam" aria-label="The retirement decision funnel">
+  <p class="rfam-tag">Four questions, in order</p>
+  <div class="rfam-row">
+    {%- for f in fam -%}
+      {%- if f.slug == slug -%}
+    <span class="rfam-item is-here" aria-current="page">
+      <span class="rfam-step">{{ f.step }}</span>
+      <span class="rfam-q">{{ f.q }}</span>
+      <span class="rfam-t">{{ f.t }}</span>
+    </span>
+      {%- else -%}
+    <a class="rfam-item" href="/{{ f.slug }}">
+      <span class="rfam-step">{{ f.step }}</span>
+      <span class="rfam-q">{{ f.q }}</span>
+      <span class="rfam-t">{{ f.t }}</span>
+    </a>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+  <p class="rfam-foot">Your inputs travel between these tools &mdash; the links each page offers carry the plan you are looking at, so you rarely re-type a number. {% if slug != 'bitcoin-retirement' %}<a href="/bitcoin-retirement">Start from the beginning &rarr;</a>{% endif %}</p>
+</nav>

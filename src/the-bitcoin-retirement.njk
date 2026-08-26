@@ -797,6 +797,11 @@ eleventyComputed:
      matter above; base.njk renders the visible block + the FAQPage JSON-LD from
      one source (STYLE_GUIDE §6.40). #}
 
+  {# Retirement family strip — the four questions of the funnel with this page
+     marked. Shared component; it carries its own scoped styles, so adding it
+     to a page is one include and no stylesheet edit. See SITE_GUIDE §53. #}
+  {% include 'components/retirement-family.njk' %}
+
   {% include 'components/companion-content.njk' %}
 
 </div>

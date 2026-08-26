@@ -1,0 +1,95 @@
+---
+layout: base.njk
+permalink: /bitcoin-retirement.html
+slug: bitcoin-retirement
+related:
+  - slug: the-bitcoin-retirement
+    desc: "The flagship calculator, and the first question in the funnel: what one plan actually looks like, with the accumulation phase, the bands, the 60/40 foil and the full year-by-year table."
+  - slug: bitcoin-escape-velocity
+    desc: "The second question: how much is enough. The threshold a plan sits on, on each of its three inputs, and how little it takes to cross."
+  - slug: compare-retirement-plans
+    desc: "The third question: which of your options. Two complete plans side by side under one shared set of assumptions, with the difference stated in plain sentences."
+  - slug: the-bitcoin-retirement-stress-test
+    desc: "The fourth question: whether the plan you picked survives bad luck. A timed bear market dropped into the plan, with crash depth, timing and recovery all varied."
+faq:
+  - q: "Where should I start with a bitcoin retirement?"
+    a: "With one plan, not four tools. Open <a href='/the-bitcoin-retirement'>The Bitcoin Retirement</a>, put in a stack, a retirement year and what you want to draw, and read what comes out. Everything else here sharpens that first answer: how much is enough, which of two options to take, and whether it survives a bad market. The order on this page is the order the questions actually arrive in."
+  - q: "Do I have to re-enter my numbers on each page?"
+    a: "Mostly no. The tools carry your plan between them &mdash; the links each page offers put your stack, retirement year and withdrawal into the next page's inputs, so you are usually adjusting rather than retyping. Each page also writes its state into the address bar, so a link you save or share comes back to the same plan."
+  - q: "Are these forecasts?"
+    a: "No. Every figure across these four tools is a projection under the Power Law growth model &mdash; a description of bitcoin&rsquo;s historical trend, not a promise about its future, and its implied growth rate declines with time. <a href='/the-power-law'>The model and its limits</a> are documented on their own page. The assumptions are yours to change, which is the point of letting you change them."
+  - q: "Why is the crash test a separate page?"
+    a: "Because sequence-of-returns risk is a different question from plan design, and mixing them hides both. The first three tools ask what a plan does when returns arrive in trend order; the <a href='/the-bitcoin-retirement-stress-test'>Stress Test</a> asks what happens when they do not, and it varies crash depth, timing and recovery properly rather than dropping in one canned bad year."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/bitcoin-retirement-head.html' %}"
+  page_styles: "{% include '_pageassets/bitcoin-retirement.css' %}"
+---
+
+<section class="hero">
+  <h1>Plan Your <em>Bitcoin Retirement</em></h1>
+  <div class="hero-subtitle">Four questions, in the order they actually arrive.</div>
+  <p class="subtitle">Not one calculator that tries to answer everything &mdash; four tools, each owning one question and refusing the others. Your plan travels between them.</p>
+</section>
+
+<main class="content-area">
+
+  {% include 'components/retirement-family.njk' %}
+
+  <section class="hub-section" aria-label="The four questions">
+
+    <a class="hub-card" href="/the-bitcoin-retirement">
+      <div class="hub-card-head">
+        <span class="hub-step">Build</span>
+        <span class="hub-q">What does my plan look like?</span>
+      </div>
+      <div class="hub-card-body">
+        <div class="hub-title">The Bitcoin Retirement</div>
+        <p class="hub-desc">Start here. One plan, in full model context: the accumulation years before you retire, the drawdown after, the Power Law bands around it, a 60/40 portfolio as a foil, and a year-by-year table you can reproduce line by line. It is the audit surface the other three are measured against.</p>
+        <span class="hub-cta">Build a plan &rarr;</span>
+      </div>
+    </a>
+
+    <a class="hub-card" href="/bitcoin-escape-velocity">
+      <div class="hub-card-head">
+        <span class="hub-step">Size</span>
+        <span class="hub-q">How much is enough?</span>
+      </div>
+      <div class="hub-card-body">
+        <div class="hub-title">Bitcoin Escape Velocity</div>
+        <p class="hub-desc">A retirement portfolio is supposed to draw down. Under bitcoin&rsquo;s historical growth curve there is a line past which yours runs up instead. This page finds where that line sits on each of your three numbers &mdash; the stack you would need, the withdrawal you could sustain, the earliest year that crosses &mdash; and how far your plan is from it.</p>
+        <span class="hub-cta">Find the threshold &rarr;</span>
+      </div>
+    </a>
+
+    <a class="hub-card" href="/compare-retirement-plans">
+      <div class="hub-card-head">
+        <span class="hub-step">Choose</span>
+        <span class="hub-q">Which of my options do I take?</span>
+      </div>
+      <div class="hub-card-body">
+        <div class="hub-title">Compare Retirement Plans</div>
+        <p class="hub-desc">Every plan is a choice against the plan you didn&rsquo;t pick. Set two complete plans side by side &mdash; each with its own stack, retirement year and withdrawal &mdash; and read what the difference actually buys. Both share one set of assumptions on purpose, so no plan can win by being handed a friendlier market.</p>
+        <span class="hub-cta">Weigh two plans &rarr;</span>
+      </div>
+    </a>
+
+    <a class="hub-card" href="/the-bitcoin-retirement-stress-test">
+      <div class="hub-card-head">
+        <span class="hub-step">Stress</span>
+        <span class="hub-q">Does the winner survive bad luck?</span>
+      </div>
+      <div class="hub-card-body">
+        <div class="hub-title">Retirement Stress Test</div>
+        <p class="hub-desc">The first three tools assume returns arrive in trend order. They do not. A crash early in retirement sells far more bitcoin to cover the same bill, and that stack does not come back when price does. This page drops a timed bear market into your plan and varies its depth, its timing and how it recovers.</p>
+        <span class="hub-cta">Stress-test the plan &rarr;</span>
+      </div>
+    </a>
+
+  </section>
+
+  <section class="hub-note" aria-label="How the tools connect">
+    <p><strong>Your inputs follow you.</strong> Each page hands your plan to the next one &mdash; stack, retirement year and withdrawal land in the next tool&rsquo;s inputs rather than in a blank form. Every page also writes its state into the address bar, so a link you save or send comes back to exactly the plan you were looking at.</p>
+    <p><strong>One model, stated plainly.</strong> All four run on the same projection engine against the same growth path, so they cannot disagree with each other about what a plan does. That growth path is the <a href="/the-power-law">Power Law</a> &mdash; a regression on bitcoin&rsquo;s entire price history, used as a central-tendency assumption and not as a forecast. Its implied growth rate declines with time, which is why the honest version of every answer here is checked across a whole horizon rather than asserted from a single year.</p>
+  </section>
+
+</main>
