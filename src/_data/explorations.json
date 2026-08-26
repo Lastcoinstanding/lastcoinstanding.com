@@ -318,6 +318,20 @@
     }
   },
   {
+    "_comment": "Fourth page of the retirement family (Retirement flagship / Escape Velocity / Compare / Stress Test) and the one that owns 'which of my options do I take?'. Two independently configured plans, three reader-controlled inputs each, and ONE shared set of assumptions — per-column growth paths and per-column stress are refused by design, because a plan that could carry a friendlier world would win comparisons it had not earned (COMPARE_RETIREMENT_PLANS_DESIGN §2). Runs on shared/retirement-engine.js, the flagship/EV engine extracted verbatim, so neither column can drift from the family; crpParityQA() asserts A≡B on identical inputs (bear on and off), agreement with the deployed Escape Velocity page across six captured vectors, and the memo/raw/multFn identities. The bear toggle injects the Retirement Stress Test's own crash definition from shared/crash-model.js into BOTH columns at each plan's own retirement year. URL params are namespaced a_/b_ from the first commit and it also accepts the family's un-namespaced stack/retire/income as Plan A. SVG tile at components/calc-tile-icons/compare-retirement-plans.njk.",
+    "slug": "compare-retirement-plans",
+    "title": "Compare Retirement Plans",
+    "category": "numbers",
+    "group": "Positioning & Strategy",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Every plan is a choice against the plan you didn&rsquo;t pick. Set two side by side and read what the difference actually buys.",
+      "preview_kind": "svg",
+      "anchor": "#plans",
+      "position": 245
+    }
+  },
+  {
     "_comment": "The lower edge of the Power Law channel, taken on its own. Grouped with Models & Trends beside the-power-law, which owns the model; this page owns the line it has agreed to be judged against. interactive: true — live distance readout, episode explorer, endpoint-toggled parity instrument, live tripwire status — but it takes NO plan inputs and stores nothing, so there is no sticky state and no URL scenario params: it is a read, not a calculator. Everything historical is measured on the MODERN set (2011 onward, MODERN_FROM in the page JS, the same boundary the tripwire uses); the 2010 genesis samples appear once in the record section and are excluded from every measurement and every chart position, because a position is weight. floorParityQA() asserts three things on every load: the published full-set fixture, the modern-set fixture, and a leak check that no pre-2011 sample reaches the displayed set. Tile anchor is '' — the payload is the live readout at the top of the page. SVG tile at components/calc-tile-icons/the-bitcoin-floor.njk.",
     "slug": "the-bitcoin-floor",
     "title": "The Bitcoin Floor",
