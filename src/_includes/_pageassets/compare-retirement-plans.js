@@ -162,10 +162,48 @@
     return E.realValueAtYear(p, year, c.infl);
   }
 
+  /* ─── "Ten years in" (JM copy review 2026-08-26). Read at each plan's OWN
+         retirement + 10, not at a shared calendar year: the question is what
+         a decade of this plan looks like, and two plans retiring in different
+         years are ten years into different things.
+
+         Reads the existing year-by-year ledger — no engine change, which is
+         why crpParityQA is untouched by this feature. ─── */
+  function tenYearsIn(c) {
+    var year = c.scn.retirementYear + 10;
+    var out = { year: year, btc: null, value: null, depletedBefore: false, beyondHorizon: false };
+    if (c.v.depletionYear !== null && c.v.depletionYear <= year) {
+      out.depletedBefore = true;
+      out.depletionYear = c.v.depletionYear;
+      return out;
+    }
+    for (var i = 0; i < c.proj.btcPoints.length; i++) {
+      var p = c.proj.btcPoints[i];
+      if (p.x !== year) continue;
+      out.btc = p.btc;
+      out.value = (p.usd == null) ? null : p.usd / Math.pow(1 + c.infl / 100, p.x - c.proj.startYear);
+      return out;
+    }
+    // A horizon shorter than ten years has no row to read; say so rather than
+    // inventing one.
+    out.beyondHorizon = true;
+    return out;
+  }
+
+  function tenYearCell(t) {
+    if (t.depletedBefore) return '<span class="crp-no">&mdash; ran out in ' + t.depletionYear + '</span>';
+    if (t.beyondHorizon || t.btc == null) return '&mdash;';
+    return formatBtc(t.btc) + ' BTC &middot; ' + formatCurrencyShort(t.value);
+  }
+
   /* ═══════════════════════════════════════════════════════════
      VERDICT LANGUAGE — Escape Velocity's vocabulary, so the family
      reads as one system. No winner-crowning: verdicts are facts.
   ═══════════════════════════════════════════════════════════ */
+
+  // One definition of the linked phrase, so the two column-verdict variants
+  // cannot drift apart in how they name the family's shared term.
+  var THRESHOLD_LINK = '<a href="/bitcoin-escape-velocity">crosses the threshold</a>';
 
   function stateWord(v) {
     if (v.state === 'deplete') return 'depletes';
@@ -178,10 +216,14 @@
       return 'Retiring in <strong>' + y + '</strong>, this plan <strong>runs out in ' + v.depletionYear + '</strong> &mdash; ' +
              yearsWord(v.depletionYear - y) + ' into a planned ' + yearsWord(c.scn.yearsInRetirement) + '.';
     }
+    // The threshold is this family's shared term and the page used it cold.
+    // It is defined inline HERE, at first use, and linked to the page that
+    // owns it — after which the table row label and the delta sentences can
+    // use it bare (JM copy review 2026-08-26).
     if (v.state === 'shrink') {
-      return 'Retiring in <strong>' + y + '</strong>, this plan <strong>never crosses the threshold</strong> but outlives the horizon &mdash; it turns over in ' + v.turnYear + ' and is still falling at ' + v.horizonYear + '.';
+      return 'Retiring in <strong>' + y + '</strong>, this plan <strong>never ' + THRESHOLD_LINK + '</strong> &mdash; growth never outruns the draw &mdash; but it outlives the horizon: it turns over in ' + v.turnYear + ' and is still falling at ' + v.horizonYear + '.';
     }
-    return 'Retiring in <strong>' + y + '</strong>, this plan <strong>crosses the threshold</strong> &mdash; from ' + v.escapeYear + ' its growth stays ahead of the draw through ' + v.horizonYear + '.';
+    return 'Retiring in <strong>' + y + '</strong>, this plan <strong>' + THRESHOLD_LINK + '</strong> &mdash; the point where growth outruns the draw, so the stack rises even while paying you &mdash; from ' + v.escapeYear + ', and stays ahead through ' + v.horizonYear + '.';
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -235,10 +277,13 @@
     var lead = '<strong>' + clause + ':</strong> ';
     var pieces = [];
 
+    // Every sentence names its plan. "The plan ends higher" is ambiguous in a
+    // two-column reading — the reader has to work out which plan the sentence
+    // is about, which is the work the delta strip exists to remove.
     if (ca.v.state === 'deplete' && cb.v.state === 'deplete') {
       var dd = cb.v.depletionYear - ca.v.depletionYear;
       pieces.push(dd === 0 ? 'both plans still run out in ' + ca.v.depletionYear
-        : 'the plan holds ' + yearsWord(dd) + (dd > 0 ? ' longer' : ' less') + ', running out in ' + cb.v.depletionYear + ' instead of ' + ca.v.depletionYear);
+        : 'Plan B holds ' + yearsWord(dd) + (dd > 0 ? ' longer' : ' less') + ', running out in ' + cb.v.depletionYear + ' instead of ' + ca.v.depletionYear);
     } else if (ca.v.state === 'deplete' && cb.v.state !== 'deplete') {
       pieces.push('Plan A runs out in ' + ca.v.depletionYear + '; Plan B holds through the horizon');
     } else if (ca.v.state !== 'deplete' && cb.v.state === 'deplete') {
@@ -246,19 +291,32 @@
     } else if (va != null && vb != null) {
       var diff = vb - va;
       if (Math.abs(diff) < 1) pieces.push('the two plans end level at ' + hz);
-      else pieces.push('the plan ends ' + formatCurrencyShort(Math.abs(diff)) + (diff > 0 ? ' higher' : ' lower') + ' at ' + hz);
+      else pieces.push('Plan B ends ' + formatCurrencyShort(Math.abs(diff)) + (diff > 0 ? ' higher' : ' lower') + ' at ' + hz);
     }
     if (pieces.length) out.push({ html: lead + pieces.join(', and ') + '.' });
 
     // 2. The threshold, which is the family's shared vocabulary.
+    //
+    //    SUPPRESSION (JM copy review 2026-08-26): when the two plans differ
+    //    ONLY in stack, the "margin is X BTC wider" sentence is arithmetically
+    //    the stack difference the reader just typed — a restatement of an
+    //    input dressed as a finding. Both thresholds are solved at the same
+    //    retirement year and withdrawal, so they are equal, and the margin gap
+    //    reduces exactly to Δstack. Drop it and spend the slot on something
+    //    the reader cannot see from the inputs.
     var ea = ca.v.state === 'escape', eb = cb.v.state === 'escape';
+    var onlyStackDiffers = (PLANS.a.retirementYear === PLANS.b.retirementYear)
+      && (PLANS.a.targetIncomeUSD === PLANS.b.targetIncomeUSD)
+      && (Math.abs(PLANS.a.btcStack - PLANS.b.btcStack) > 1e-9);
     if (ea && eb) {
-      var ma = ca.scn.btcStack - (L.a.stack.value != null ? L.a.stack.value : ca.scn.btcStack);
-      var mb = cb.scn.btcStack - (L.b.stack.value != null ? L.b.stack.value : cb.scn.btcStack);
-      var mg = mb - ma;
-      out.push({ html: Math.abs(mg) < 0.005
-        ? 'Both plans cross the threshold, by the same margin.'
-        : 'Both plans cross the threshold; <strong>Plan ' + (mg > 0 ? 'B' : 'A') + '&rsquo;s margin is ' + formatBtc(Math.abs(mg)) + ' BTC wider</strong>.' });
+      if (!onlyStackDiffers) {
+        var ma = ca.scn.btcStack - (L.a.stack.value != null ? L.a.stack.value : ca.scn.btcStack);
+        var mb = cb.scn.btcStack - (L.b.stack.value != null ? L.b.stack.value : cb.scn.btcStack);
+        var mg = mb - ma;
+        out.push({ html: Math.abs(mg) < 0.005
+          ? 'Both plans cross the threshold, by the same margin.'
+          : 'Both plans cross the threshold; <strong>Plan ' + (mg > 0 ? 'B' : 'A') + '&rsquo;s margin is ' + formatBtc(Math.abs(mg)) + ' BTC wider</strong>.' });
+      }
     } else if (ea !== eb) {
       out.push({ html: '<strong>Plan ' + (ea ? 'A' : 'B') + ' crosses the threshold and Plan ' + (ea ? 'B' : 'A') + ' does not</strong> &mdash; that is the whole of the difference between them.' });
     } else {
@@ -268,7 +326,26 @@
         : 'Neither plan crosses the threshold; Plan B would need ' + formatBtc(Math.abs(need)) + ' BTC ' + (need > 0 ? 'more' : 'less') + ' than Plan A to get there.' });
     }
 
-    // 3. The bear line, only when the toggle is on — it is the page's own
+    // 3. Ten years in — the decade view, which is where the compounding a
+    //    reader cannot eyeball from the inputs actually shows up. It fills the
+    //    slot the suppression above frees, and is worth saying regardless.
+    (function () {
+      if (out.length >= 3) return;                 // strip stays ≤ 3 sentences
+      var ta = tenYearsIn(ca), tb = tenYearsIn(cb);
+      if (ta.beyondHorizon || tb.beyondHorizon) return;
+      if (ta.depletedBefore && tb.depletedBefore) {
+        out.push({ html: 'Both plans have run out by year ten.' });
+      } else if (ta.depletedBefore || tb.depletedBefore) {
+        var dead = ta.depletedBefore ? 'A' : 'B', alive = ta.depletedBefore ? tb : ta;
+        out.push({ html: 'Ten years in, <strong>Plan ' + dead + ' has run out</strong>; Plan ' + (dead === 'A' ? 'B' : 'A') + ' holds ' + formatBtc(alive.btc) + ' BTC (' + formatCurrencyShort(alive.value) + ').' });
+      } else if (ta.btc != null && tb.btc != null) {
+        var db = tb.btc - ta.btc, dv = (tb.value || 0) - (ta.value || 0);
+        if (Math.abs(db) < 0.005) out.push({ html: 'Ten years in, both plans hold the same stack.' });
+        else out.push({ html: 'Ten years in, <strong>Plan B holds ' + formatBtc(Math.abs(db)) + ' BTC ' + (db > 0 ? 'more' : 'less') + '</strong> &mdash; worth ' + formatCurrencyShort(Math.abs(dv)) + (dv > 0 ? ' more' : ' less') + '.' });
+      }
+    })();
+
+    // 4. The bear line, only when the toggle is on — it is the page's own
     //    question and it does not belong in the copy when nobody asked it.
     if (BEAR) {
       out.push({ html: 'With a ' + Math.round(BEAR_SPEC.depthPct * 100) + '% crash in the first year of <em>each</em> plan&rsquo;s retirement, the comparison above is what survives it.' });
@@ -365,6 +442,26 @@
       rows.push({ label: 'Depletes / holds', a: cell(ca), b: cell(cb), d: d });
     })();
 
+    // Ten years in — anchored at each plan's OWN retirement + 10, so the row
+    // compares a decade of each plan rather than a shared calendar year.
+    (function () {
+      var ta = tenYearsIn(ca), tb = tenYearsIn(cb);
+      var d;
+      if (ta.depletedBefore && tb.depletedBefore) d = 'Both plans have run out by year ten.';
+      else if (ta.depletedBefore || tb.depletedBefore) {
+        var dead = ta.depletedBefore ? 'A' : 'B', live = ta.depletedBefore ? tb : ta;
+        d = (live.btc == null) ? 'One plan has run out by year ten.'
+          : '<strong>Plan ' + dead + ' has run out</strong>; Plan ' + (dead === 'A' ? 'B' : 'A') + ' holds ' + formatBtc(live.btc) + ' BTC (' + formatCurrencyShort(live.value) + ').';
+      } else if (ta.btc == null || tb.btc == null) d = 'One of the plans has no year-ten row inside its horizon.';
+      else {
+        var db = tb.btc - ta.btc, dv = (tb.value || 0) - (ta.value || 0);
+        d = Math.abs(db) < 0.005
+          ? 'Ten years in, both plans hold the same stack.'
+          : 'Ten years in, <strong>Plan B holds ' + formatBtc(Math.abs(db)) + ' BTC ' + (db > 0 ? 'more' : 'less') + '</strong>, worth ' + formatCurrencyShort(Math.abs(dv)) + (dv > 0 ? ' more' : ' less') + '.';
+      }
+      rows.push({ label: 'Ten years in', a: tenYearCell(ta), b: tenYearCell(tb), d: d });
+    })();
+
     // Value at the shared horizon
     (function () {
       var va = realValueAt(ca, hz), vb = realValueAt(cb, hz);
@@ -441,15 +538,30 @@
     var sa = seriesFor(ca), sb = seriesFor(cb);
     function alpha(key, base) { return (EMPHASIS && EMPHASIS !== key) ? 0.22 : 1; }
 
+    // What each plan's marked point means, keyed by column, for the tooltip.
+    function noteFor(c) {
+      if (c.v.state === 'escape') return { year: c.v.escapeYear, text: 'crosses the threshold here' };
+      if (c.v.depletionYear !== null) return { year: c.v.depletionYear, text: 'runs out here' };
+      return null;
+    }
+    var markerNote = { a: noteFor(ca), b: noteFor(cb) };
+
     var data = {
       datasets: [
         { label: 'Plan A', data: sa, borderColor: cA, backgroundColor: cA, borderWidth: 2.2,
           pointRadius: 0, tension: 0.15, order: 2, __key: 'a' },
         { label: 'Plan B', data: sb, borderColor: cB, backgroundColor: cB, borderWidth: 2.2,
           pointRadius: 0, tension: 0.15, order: 2, __key: 'b' },
-        { label: 'Plan A — ' + (ca.v.state === 'escape' ? 'crosses' : 'runs out'), data: markerFor(ca, sa),
+        // Marker datasets are drawn but NOT listed: they are excluded from the
+        // legend and from the tooltip (JM copy review 2026-08-26). Two curves,
+        // two legend entries — the markers are annotations on those curves,
+        // not a third and fourth thing being compared, and listing them made
+        // the legend advertise entries with no data on a shrink verdict. What
+        // the marker means is now said where the reader is already looking:
+        // in the main curve's tooltip, in the marker year.
+        { label: 'Plan A marker', data: markerFor(ca, sa), __marker: true,
           borderColor: cMark, backgroundColor: cA, pointRadius: 5, pointStyle: 'circle', showLine: false, order: 1, __key: 'a' },
-        { label: 'Plan B — ' + (cb.v.state === 'escape' ? 'crosses' : 'runs out'), data: markerFor(cb, sb),
+        { label: 'Plan B marker', data: markerFor(cb, sb), __marker: true,
           borderColor: cMark, backgroundColor: cB, pointRadius: 5, pointStyle: 'circle', showLine: false, order: 1, __key: 'b' }
       ]
     };
@@ -474,13 +586,25 @@
           grid: { color: cGrid } }
       },
       plugins: {
-        legend: { labels: { color: cText, font: { size: CHART_FONT.legend }, usePointStyle: true, boxWidth: 10, padding: 14 },
+        legend: { labels: { color: cText, font: { size: CHART_FONT.legend }, usePointStyle: true, boxWidth: 10, padding: 14,
+            filter: function (item, chartData) { return !chartData.datasets[item.datasetIndex].__marker; } },
+          // datasetIndex still indexes the FULL dataset list, not the filtered
+          // legend, so the __key lookup stays correct after filtering.
           onHover: function (e, item) { setEmphasis(data.datasets[item.datasetIndex].__key); },
           onLeave: function () { setEmphasis(null); } },
         tooltip: {
+          filter: function (item) { return !item.dataset.__marker; },
           callbacks: {
             title: function (items) { return items.length ? String(Math.round(items[0].parsed.x)) : ''; },
-            label: function (item) { return item.dataset.label + ': ' + formatCurrencyShort(item.parsed.y); }
+            label: function (item) {
+              var s = item.dataset.label + ': ' + formatCurrencyShort(item.parsed.y);
+              var note = markerNote[item.dataset.__key];
+              // The marker's meaning, said on the curve the reader is hovering,
+              // in the year it happens — instead of a legend entry they have to
+              // map back onto a dot.
+              if (note && Math.round(item.parsed.x) === note.year) s += '  ← ' + note.text;
+              return s;
+            }
           }
         }
       }
@@ -729,7 +853,10 @@
       });
     });
 
-    [['crpVerifyToggleA', 'crpVerifyBodyA'], ['crpVerifyToggleB', 'crpVerifyBodyB']].forEach(function (pair) {
+    // Shared-card expanders. Same toggle contract as the verify collapsibles,
+    // so there is one behaviour on the page rather than two.
+    [['crpBearMore', 'crpBearBody'], ['crpWhyMore', 'crpWhyBody'],
+     ['crpVerifyToggleA', 'crpVerifyBodyA'], ['crpVerifyToggleB', 'crpVerifyBodyB']].forEach(function (pair) {
       var t = document.getElementById(pair[0]), b = document.getElementById(pair[1]);
       if (!t || !b) return;
       t.addEventListener('click', function () {

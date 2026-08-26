@@ -29,7 +29,7 @@ eleventyComputed:
 ---
 
 <section class="hero">
-  <h1>Compare <em>Retirement Plans</em></h1>
+  <h1>Compare <em>Bitcoin</em> Retirement Plans</h1>
   <div class="hero-subtitle">Every plan is a choice against the plan you didn&rsquo;t pick.</div>
   <p class="subtitle">Retire this year or next, draw more or less, wait for a bigger stack. Set both plans side by side and read what the difference actually buys.</p>
 </section>
@@ -56,6 +56,12 @@ eleventyComputed:
         <button type="button" class="seg-btn" data-editcol="b">Plan B</button>
       </div>
     </div>
+
+    <!-- Orientation copy (JM copy review 2026-08-26). The page opens on two
+         populated columns, which reads as symmetric — but the intended use is
+         asymmetric: A is what you hold, B is what you are weighing against it.
+         Saying so is what turns a symmetric-looking control into a decision. -->
+    <p class="crp-orient">Set <strong>Plan A</strong> to your base case &mdash; the plan you actually hold or intend. Then make <strong>Plan B</strong> the variation you&rsquo;re weighing: retire a year later, draw a different income, arrive with a bigger stack. Both run under the same <a href="#shared">shared assumptions</a>, with <a href="/the-power-law">the Power Law</a> as the growth engine.</p>
 
     <div class="crp-columns">
 
@@ -131,19 +137,30 @@ eleventyComputed:
     <!-- ════════ SHARED ASSUMPTIONS (design §3) ════════
          One card, governing both columns. The bear toggle is the page's
          only environment control and it is deliberately not per-column. -->
-    <div class="crp-shared">
+    <div class="crp-shared" id="shared">
       <div class="crp-shared-head">
         <span class="crp-shared-tag">Both plans</span>
         <span class="crp-shared-summary" id="crpSharedSummary">&mdash;</span>
+        <button type="button" class="crp-reset" id="crpReset">Reset both plans</button>
       </div>
+
+      <!-- The card's prose defaults COLLAPSED (JM copy review 2026-08-26). Both
+           paragraphs are worth reading once and are noise on every later visit,
+           and they were pushing the chart below the fold at 1080p. What stays
+           always-visible is the control itself and the one-line statement of
+           the rule; the reasoning sits behind a plain expander. No storage —
+           a remembered open state would defeat the reclaim on return visits. -->
       <div class="crp-shared-row">
         <label class="crp-bear">
           <input type="checkbox" id="crpBearToggle">
           <span class="crp-bear-text">Test both plans against a bear market at retirement</span>
         </label>
-        <p class="crp-note crp-bear-note">The crash always hits both plans, so the comparison stays about the choice, not the luck. It lands in the first year of <em>each</em> plan&rsquo;s own retirement, using the <a href="/the-bitcoin-retirement-stress-test">Retirement Stress Test</a>&rsquo;s crash definition &mdash; <span id="crpBearSpec">&mdash;</span> &mdash; not a second one. The question it answers: does your option&rsquo;s advantage grow or shrink when the market turns hostile?</p>
+        <button type="button" class="crp-expander" id="crpBearMore" aria-expanded="false" aria-controls="crpBearBody"><span class="crp-caret" aria-hidden="true">&#9656;</span> how this works</button>
+        <p class="crp-note crp-bear-note" id="crpBearBody" hidden>The crash always hits both plans, so the comparison stays about the choice, not the luck. It lands in the first year of <em>each</em> plan&rsquo;s own retirement, using the <a href="/the-bitcoin-retirement-stress-test">Retirement Stress Test</a>&rsquo;s crash definition &mdash; <span id="crpBearSpec">&mdash;</span> &mdash; not a second one. The question it answers: does your option&rsquo;s advantage grow or shrink when the market turns hostile?</p>
       </div>
-      <p class="crp-note crp-shared-foot">Growth path, inflation and horizon are shared and cannot be set per column &mdash; if one plan could carry a friendlier world, every row below would be a model comparison rather than a plan comparison. <a href="/the-bitcoin-retirement">The flagship</a> holds the bands, the 60/40 foil and the gap-persists variant this page leaves out. <button type="button" class="crp-reset" id="crpReset">Reset both plans</button></p>
+
+      <p class="crp-note crp-shared-foot">Growth path, inflation and horizon are shared <button type="button" class="crp-expander" id="crpWhyMore" aria-expanded="false" aria-controls="crpWhyBody"><span class="crp-caret" aria-hidden="true">&#9656;</span> why</button></p>
+      <p class="crp-note crp-shared-why" id="crpWhyBody" hidden>They cannot be set per column &mdash; if one plan could carry a friendlier world, every row below would be a model comparison rather than a plan comparison. <a href="/the-bitcoin-retirement">The flagship</a> holds the bands, the 60/40 foil and the gap-persists variant this page leaves out.</p>
     </div>
 
   </section>

@@ -24,7 +24,8 @@
 -#}
 <style>
 .rfam { max-width: 1100px; margin: 3.2rem auto 0; padding: 0; }
-.rfam-tag { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber, #e09422); margin: 0 0 0.7rem; }
+.rfam-tag { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber, #e09422); margin: 0 0 0.35rem; }
+.rfam-lede { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.86rem; line-height: 1.6; color: var(--text-dim, #9a9080); margin: 0 0 0.8rem; max-width: 68ch; }
 .rfam-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.55rem; }
 .rfam-item { display: flex; flex-direction: column; gap: 0.22rem; padding: 0.7rem 0.8rem; border-radius: 7px; border: 1px solid var(--border-faint, rgba(224,148,34,0.15)); background: rgba(224,148,34,0.035); text-decoration: none; transition: border-color 0.15s, background 0.15s; }
 a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,148,34,0.08); }
@@ -47,6 +48,7 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
 ] -%}
 <nav class="rfam" aria-label="The retirement decision funnel">
   <p class="rfam-tag">Four questions, in order</p>
+  <p class="rfam-lede">Retiring on a bitcoin stack is one decision asked four ways &mdash; each tool below answers one of them, and together they&rsquo;re the complete picture.</p>
   <div class="rfam-row">
     {%- for f in fam -%}
       {%- if f.slug == slug -%}
