@@ -243,33 +243,25 @@ eleventyComputed:
     </div>
   </section>
 
-  <!-- ════════ THE FUNNEL (design §4.7, §6 carry) ════════ -->
+  <!-- ════════ THE FUNNEL (design §4.7, §6 carry) ════════
+       The shared family strip carries the four questions and the "you are
+       here" marker; it is the same component every family page renders, so
+       the funnel reads identically wherever a reader meets it. What the
+       strip CANNOT do is carry state — its hrefs are plain — so the two
+       stateful handoffs this page owns sit beneath it, keeping their ids
+       for the renderer. -->
   <section class="crp-section" id="next" aria-label="Where to go next">
     <p class="crp-eyebrow">The next question</p>
     <h2 class="crp-h2">Four questions, in order</h2>
-    <div class="crp-funnel">
-      <a class="crp-funnel-card" href="/the-bitcoin-retirement">
-        <span class="crp-funnel-q">What does my plan look like?</span>
-        <span class="crp-funnel-t">The Bitcoin Retirement</span>
-        <span class="crp-funnel-d">One plan in full model context &mdash; accumulation, bands, the 60/40 foil, the whole year-by-year table.</span>
-      </a>
-      <a class="crp-funnel-card" href="/bitcoin-escape-velocity" id="crpEvLink">
-        <span class="crp-funnel-q">How much is enough?</span>
-        <span class="crp-funnel-t">Bitcoin Escape Velocity</span>
-        <span class="crp-funnel-d">The threshold one plan sits on, and how little it takes to cross. Size it first, then bring two options here.</span>
-      </a>
-      <span class="crp-funnel-card is-current" aria-current="page">
-        <span class="crp-funnel-q">Which of my options?</span>
-        <span class="crp-funnel-t">Compare Retirement Plans</span>
-        <span class="crp-funnel-d">You are here. Two complete plans, side by side, and what the difference between them buys.</span>
-      </span>
-      <a class="crp-funnel-card" href="/the-bitcoin-retirement-stress-test" id="crpStressLink">
-        <span class="crp-funnel-q">Does the winner survive bad luck?</span>
-        <span class="crp-funnel-t">Retirement Stress Test</span>
-        <span class="crp-funnel-d">Stress-test the plan you pick &mdash; crash depth, timing and recovery, varied properly. <em id="crpStressCarry">Carries Plan A.</em></span>
-      </a>
+
+    {% include 'components/retirement-family.njk' %}
+
+    <div class="crp-carry">
+      <a class="crp-carry-link" href="/the-bitcoin-retirement-stress-test" id="crpStressLink">Stress-test the winner &rarr;</a>
+      <span class="crp-carry-note"><em id="crpStressCarry">Carries Plan A.</em> Crash depth, timing and recovery, varied properly &mdash; the question this page cannot answer.</span>
+      <a class="crp-carry-link" href="/bitcoin-escape-velocity" id="crpEvLink">Size one plan first &rarr;</a>
+      <span class="crp-carry-note">Carries Plan A into the threshold view, if you want to know how far a single plan is from crossing before you weigh two.</span>
     </div>
-    <p class="crp-note">Your inputs follow you between these tools &mdash; the links above carry the plan you are looking at.</p>
   </section>
 
   <!-- ════════ BOTH-SIDES CALLOUT ════════ -->
