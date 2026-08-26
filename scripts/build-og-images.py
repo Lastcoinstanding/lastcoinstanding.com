@@ -551,6 +551,30 @@ CARDS = [
         },
         "output_filename": "og-bitcoin-as-collateral.jpg",
     },
+    {
+        "name": "compare-retirement",
+        # Capture URL: page defaults (A = 1.00 BTC / $100k / 2035, B = same
+        # +1yr). If separation reads too subtle at card size, switch url to
+        # the explicit params form and keep it recorded here per
+        # OG_ASSET_HANDOFF:
+        # ...?a_stack=1&a_retire=2035&a_income=100000&b_stack=1&b_retire=2040&b_income=100000
+        "url": "https://lastcoinstanding.com/compare-retirement-plans",
+        "hero_selector": "#crpChart",
+        "wait_after_navigate_ms": 1500,
+        "wait_after_scroll_ms": 3500,
+        "chrome": {
+            "title": "Compare ",
+            "titleAccent": "Retirement",
+            "titleAfter": " Plans",
+            "subtitle": "Every plan is a choice against the plan you didn't pick. Two complete plans, side by side, and what the difference actually buys.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">Plan A vs Plan B</strong>'
+                '  ·  one shared set of assumptions  ·  the difference in plain sentences'
+            ),
+            "urlText": "lastcoinstanding.com/compare-retirement-plans",
+        },
+        "output_filename": "og-compare-retirement-plans.jpg",
+    },
 ]
 
 
