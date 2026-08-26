@@ -646,7 +646,7 @@ All slides deployed with 16:9 widescreen silent videos, minimalist copy pattern 
 
 ### Pending additions
 
-**The Bitcoin Hurdle Rate — SHIPPED (slide wired 2026-08-07; video committed and confirmed silent 2026-08-26).** Promoted from the pending concept. The shipped slide departs from the proposed stone-step-well idea — it is the v4 falling-light escarpment, the shadow edge sweeping the foreground (see the slide-added note + iteration record below) — and from "not Featured by default": it ships **Featured**, retiring The Bitcoin Migration (JM 2026-08-07). The **no-line-graph / channel-band** rule held (the chart identity stays on the page). Video referenced in `index.njk` but **not yet committed** — pending the external silent strip + marker check.
+**The Bitcoin Hurdle Rate — SHIPPED (slide wired 2026-08-07; video committed and confirmed silent 2026-08-26).** Promoted from the pending concept. The shipped slide departs from the proposed stone-step-well idea — it is the v4 falling-light escarpment, the shadow edge sweeping the foreground (see the slide-added note + iteration record below) — and from "not Featured by default": it ships **Featured**, retiring The Bitcoin Migration (JM 2026-08-07). The **no-line-graph / channel-band** rule held (the chart identity stays on the page).
 
 **The Bitcoin Dashboard (§47, shipped 2026-08-10) — deliberately NO carousel slide.** Recorded here so the absence is a tracked decision, not drift: the dashboard is a return-visit *surface* reached via the Latest card, the `/calculators` tile, and (later) the site-wide chip — not a hero-rotation exploration essay. The carousel rotates exploration pages; a status dashboard does not belong in it. Revisit only if the chip phase changes the page's role.
 
