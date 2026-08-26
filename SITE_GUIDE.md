@@ -1907,9 +1907,9 @@ _Last updated: June 2026. Update this document as editorial decisions crystalliz
 
 | Group (= panel column) | Pages |
 |---|---|
-| Models & Trends (6) | Bitcoin & The Power Law · Bitcoin & Metcalfe's Law · The Bitcoin Doubling Ladder · The Bitcoin Heatmap · Bitcoin Bull & Bear Cycles · Discount, or Premium? |
+| Models & Trends (7) | Bitcoin & The Power Law · Bitcoin & Metcalfe’s Law · The Bitcoin Doubling Ladder · The Bitcoin Heatmap · Bitcoin Bull & Bear Cycles · Discount, or Premium? · The Bitcoin Floor |
 | Bitcoin vs. Other Assets (3) | Bitcoin vs. The Stock Market · BTC vs. Real Estate · BTC vs. Rental Property |
-| Positioning & Strategy (12) | Lump Sum or Ladder In? · Your Bitcoin Deployment Plan · Wait, or Deploy Now? · The Bitcoin Retirement · The Bitcoin Retirement Stress Test · Bitcoin Portfolio Allocation · Disciplined Rebalancing · The Bitcoin Hurdle Rate · How Much Bitcoin? · How Much Cash? · What Daily Conviction Bought · The Bitcoin Horizon |
+| Positioning & Strategy (14) | Lump Sum or Ladder In? · Your Bitcoin Deployment Plan · Wait, or Deploy Now? · The Bitcoin Retirement · Bitcoin Escape Velocity · Compare Retirement Plans · The Bitcoin Retirement Stress Test · Bitcoin Portfolio Allocation · Disciplined Rebalancing · The Bitcoin Hurdle Rate · How Much Bitcoin? · How Much Cash? · What Daily Conviction Bought · The Bitcoin Horizon |
 | Living on Bitcoin (5) | Borrowing Against Your Stack · Bitcoin-Backed Mortgages · Living on Bitcoin · Bitcoin and Fixed Income · The STRC Mechanism |
 
 **The Arguments** (9 items):
