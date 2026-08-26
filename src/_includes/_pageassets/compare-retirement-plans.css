@@ -120,6 +120,13 @@ body { background: var(--bg); color: var(--text); }
    are editable at once and a switcher would be a step backwards. */
 .crp-switcher { display: none; }
 
+/* Orientation copy — sits above the columns and is the first thing read, so it
+   gets prose measure rather than the full 1100 tier. */
+.crp-orient { max-width: 880px; margin: 0 0 1.2rem; font-family: var(--font-b); font-size: 0.95rem; line-height: 1.65; color: var(--text-dim); }
+.crp-orient strong { color: var(--ink-bright); font-weight: 600; }
+.crp-orient a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
+.crp-orient a:hover { border-bottom-color: var(--amber); color: var(--amber-bright); }
+
 .crp-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; align-items: stretch; }
 
 .crp-col { background: var(--bg-card); border: 1px solid var(--border-faint); border-radius: 8px; padding: 1.1rem 1.2rem 1.2rem; display: flex; flex-direction: column; }
@@ -155,6 +162,10 @@ body { background: var(--bg); color: var(--text); }
 /* ── Shared assumptions card ── */
 .crp-shared { margin: 1.2rem 0 0; background: rgba(224,148,34,0.03); border: 1px dashed var(--border-faint); border-radius: 8px; padding: 0.95rem 1.1rem 1rem; }
 .crp-shared-head { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; margin: 0 0 0.6rem; }
+/* Reset lives in the card head, right-aligned — it governs both plans, so it
+   belongs with the "Both plans" tag rather than buried at the end of prose
+   that is now collapsed by default. */
+.crp-shared-head .crp-reset { margin-left: auto; }
 .crp-shared-tag { font-family: var(--font-b); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber); }
 .crp-shared-summary { font-family: var(--font-b); font-size: 0.78rem; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
 .crp-shared-row { margin: 0 0 0.5rem; }
@@ -163,6 +174,18 @@ body { background: var(--bg); color: var(--text); }
 .crp-bear-text { font-family: var(--font-b); font-size: 0.86rem; font-weight: 600; color: var(--ink); }
 .crp-bear-note { margin-top: 0.35rem; }
 .crp-shared-foot { margin-top: 0.6rem; }
+.crp-shared-why { margin-top: 0.35rem; }
+
+/* Plain expanders. Inline with the line they belong to, so a collapsed card
+   reads as one sentence plus an affordance rather than as a stack of
+   controls. `hidden` on the body is what collapses it — no max-height
+   animation, because a link inside a clipped box is a focus trap. */
+.crp-expander { font-family: var(--font-b); font-size: 0.76rem; font-weight: 600; color: var(--amber); background: none; border: none; padding: 0 0 0 0.15rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; min-height: 24px; }
+.crp-expander:hover { color: var(--amber-bright); }
+.crp-expander:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-radius: 3px; }
+.crp-caret { display: inline-block; font-size: 0.65rem; transition: transform 0.18s; }
+.crp-expander[aria-expanded="true"] .crp-caret { transform: rotate(90deg); }
+.crp-note[hidden] { display: none; }
 .crp-reset { font-family: var(--font-b); font-size: 0.78rem; color: var(--amber); background: none; border: none; border-bottom: 1px dotted rgba(224,148,34,0.4); padding: 0; cursor: pointer; }
 .crp-reset:hover { color: var(--amber-bright); border-bottom-color: var(--amber); }
 
@@ -260,6 +283,16 @@ body { background: var(--bg); color: var(--text); }
   .crp-col[data-editing="false"] .crp-copy-btn { display: none; }
   .crp-col[data-editing="false"] { padding-bottom: 0.9rem; }
   .crp-col[data-editing="false"] .crp-col-verdict { margin-top: 0; }
+
+  /* Tap targets. Text-styled controls (the reset link and the two card
+     expanders) render at 16–24px, which is fine for a pointer and under the
+     44px minimum for a finger. The height is added ONLY here: on desktop a
+     44px text link would blow out the card head's baseline row for no gain.
+     Surfaced by the mandated 375px pass, 2026-08-26. */
+  .crp-reset, .crp-expander { min-height: 44px; display: inline-flex; align-items: center; }
+  .crp-shared-head .crp-reset { align-self: center; }
+  /* The A/B switcher shipped at 38px in the original build — six short. */
+  #crpSwitcher .seg-btn { min-height: 44px; }
 
   /* Three columns still fit at 375 — the values are short. Headers go to
      the letter form only. */
