@@ -541,7 +541,7 @@
     // What each plan's marked point means, keyed by column, for the tooltip.
     function noteFor(c) {
       if (c.v.state === 'escape') return { year: c.v.escapeYear, text: 'crosses the threshold here' };
-      if (c.v.depletionYear !== null) return { year: c.v.depletionYear, text: 'runs out here' };
+      if (c.v.depletionYear !== null) return { year: c.v.depletionYear, text: 'runs out here', zeroAtYear: true };
       return null;
     }
     var markerNote = { a: noteFor(ca), b: noteFor(cb) };
@@ -597,12 +597,20 @@
           callbacks: {
             title: function (items) { return items.length ? String(Math.round(items[0].parsed.x)) : ''; },
             label: function (item) {
-              var s = item.dataset.label + ': ' + formatCurrencyShort(item.parsed.y);
               var note = markerNote[item.dataset.__key];
+              var atNote = note && Math.round(item.parsed.x) === note.year;
+              // A depleted stack is worth ZERO. The series clamps it to 1 so a
+              // log axis can plot it, and that clamp used to be invisible —
+              // until this tooltip started naming the run-out year, where it
+              // would read "$1". The clamp is a plotting artifact, so it is
+              // undone for display: the page's register is that depletion
+              // markers do not flinch, and "$1" flinches.
+              var y = (atNote && note.zeroAtYear) ? 0 : item.parsed.y;
+              var s = item.dataset.label + ': ' + (y === 0 ? '$0' : formatCurrencyShort(y));
               // The marker's meaning, said on the curve the reader is hovering,
               // in the year it happens — instead of a legend entry they have to
               // map back onto a dot.
-              if (note && Math.round(item.parsed.x) === note.year) s += '  ← ' + note.text;
+              if (atNote) s += '  ← ' + note.text;
               return s;
             }
           }
