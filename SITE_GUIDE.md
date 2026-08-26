@@ -704,7 +704,7 @@ Every slide video is briefed against one default register: **warm, hopeful, cons
 2. **No sustained falling brightness arc.**
 3. **The closing frame is at least as bright as the opening frame**, unless the page's subject justifies otherwise — the Stress Test exemption above, not a general escape hatch.
 
-Reference take: **The Bitcoin Retirement** (row 32), a 42% floor on a rising arc. Footage that cannot clear the gate does not get a wiring PR; it gets another brief.
+Reference take: **The Bitcoin Retirement** (row 32), a 42% floor on a rising arc. Footage that cannot clear the gate does not get a wiring PR; it gets another brief. **Chain of custody:** once footage clears the gate chat-side, the wiring PR verifies that the bytes the preview serves are **identical to the gate-passed files** — SHA-1 of the downloaded file against the committed one, plus the re-encode fingerprint the gate pass leaves behind (video stream only, no mjpeg thumbnail stream, `+faststart`; none of which a raw Grok original carries). That closes the gap between "a file passed the gate" and "this is that file" without needing to re-measure luminance on the deploy.
 
 ### Register audit — 2026-08-26 (chat-side visual review)
 
@@ -714,7 +714,7 @@ JM reviewed the shipped set against the canon above and three ratings changed. T
 - **Bitcoin vs. Real Estate (row 6) — REPLACE, confirmed and measured.** Opens at 41.9% mean luminance and falls to 14.8%; a window light comes on mid-clip and is out again by the close, so it ends darker than it began. Fails gate items 2 and 3. **CLOSED 2026-08-26** — replaced and wired; the new take clears the gate at a 39.5% floor on a rising arc, closing frame brightest.
 - **Bitcoin and The Power Law (row 10) — pass → REPLACE.** The metaphor survives review — village lights multiplying is the right picture of a network compounding — but the execution never exceeds 18.8% mean luminance and its arc falls. Fails gate items 1 and 2. **CLOSED 2026-08-26** — replaced and wired; the new take clears the gate at a 34.2% floor on a rising arc, closing frame brightest.
 
-**Both replacements were footage-gated, not schedule-gated** — and both cleared. The wiring PR landed 2026-08-26, once the candidate footage had been measured chat-side; rows 6 and 10 carry the retired-take numbers alongside the new ones so the gate has a worked example on each side of it.
+**Both replacements were footage-gated, not schedule-gated** — and both cleared. The wiring PR landed 2026-08-26, once the candidate footage had been measured chat-side; rows 6 and 10 carry the retired-take numbers alongside the new ones so the gate has a worked example on each side of it. On the deploy, the **served bytes were verified identical to the gate-passed files** (SHA-1 match against the committed masters, both carrying the re-encode fingerprint), so the footage the preview played is the footage that passed the gate.
 
 ### Slide inventory
 
