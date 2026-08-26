@@ -2321,7 +2321,7 @@ The following read as AI-generated and are banned from page copy:
 
 **The list is append-only** as new tells are noticed. Check new copy against it as part of the `NEW_PAGE_CHECKLIST §10.5` review — the interaction-intent pass is already reading every new section lede, so it is the cheapest place to catch these.
 
-**Known outstanding violation (2026-08-25):** `/bitcoin-defined`'s subtitle reads *"A single sentence. Eight load-bearing ideas."* It predates this rule and was left in place rather than swept, because the PR that added this section was scoped to copy insertions only. It is the first thing a sweep should fix.
+**Outstanding violations — a sweep is still owed, and it is bigger than the templates.** The rule landed after most of the page copy did. Counted 2026-08-25 across **both** `src/*.njk` **and** `_pageassets/*.js` — reader-facing copy lives in both, as the Stress Test's section lead proves: **robust 15 · load-bearing 11 · notably 4 · unpack 4 · "at its core" 4 · "worth noting" 3 · tapestry 2 · elegant 1 · "deep dive" 1**, plus ~79 raw `leverage` hits. Two caveats on those numbers before anyone works from them: the `leverage` count needs reading to separate the legitimate noun (unavoidable on the mortgage and collateral pages) from the banned verb, and the JS figures are an **upper bound** because this rule exempts code comments and a plain grep cannot tell a comment from a string. **Deliberately deferred to its own PR** — a sweep this size is not a rider on a copy change, and several of these sit in sentences that need rewriting rather than word-swapping. The `/bitcoin-defined` subtitle was fixed on 2026-08-25 only because the same PR was already editing that page.
 
 
 ## Appendix A: Survey findings (2026-04-26)

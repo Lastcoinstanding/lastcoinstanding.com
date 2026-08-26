@@ -803,6 +803,8 @@ In practice, for each interactive section ask:
 
 Canonical example: `/bitcoin-escape-velocity` — "Set the plan" opens on confidence, lifestyle and the risk of running out before it mentions an arrow; "The Threshold" opens on what a threshold *is* and why small changes move it, then explains the mechanics in a second paragraph.
 
+
+**Auditing scope — grep `_pageassets/*.js` alongside `src/*.njk`.** Reader-facing copy lives in both: section ledes, captions and verdict lines are frequently written by the page script rather than the template, and a template-only sweep silently misses them. The Stress Test's "The same plan, retiring in different years" lead is the worked case — its `.njk` paragraph is a placeholder that `updateCompareCopy()` overwrites on load, so editing the template would have changed nothing. The `STYLE_GUIDE §11` recount is the precedent: adding the JS files roughly doubled every count. This applies to any copy audit, not just this checkpoint.
 Source: Escape Velocity review rounds, 2026-08-19/20 (JM).
 
 ## 11. Verification

@@ -491,7 +491,7 @@
     var cap = document.getElementById('stTimingCaption');
     if (COMPARE_MODE === 'retire') {
       if (title) title.textContent = 'The same plan, retiring in different years';
-      if (lead) lead.innerHTML = 'This is the whole point. Hold the stack, the withdrawal, and the crash fixed, and move only <em>when</em> you retire. Retire early and you are selling into the crash before the stack has had years to compound, so the same plan that survives a later start can fail an earlier one. Retire later and the compounding does the cushioning.';
+      if (lead) lead.innerHTML = 'The year you stop earning is the input you control least and it moves the outcome most. Hold the stack, the withdrawal, and the crash fixed, and move only <em>when</em> you retire &mdash; timing is the only thing that varies. Retire early and you are selling into the crash before the stack has had years to compound, so the same plan that survives a later start can fail an earlier one; retire later and the compounding does the cushioning. Then switch what varies &mdash; the crash instead of the year &mdash; and see which one really moves the outcome.';
       if (cap) cap.innerHTML = 'Each pair is a <strong>separate plan</strong> retiring in that start year, not one plan tracked over time. Final stack in today&rsquo;s dollars, same crash throughout. The faint bar is that year&rsquo;s plan with <strong>no crash</strong>' + NOCRASH_TIP + '; the solid bar is <strong>with the crash</strong>. A <span class="st-fail">✕ depletes</span> tag marks the years the stack runs to zero. The gap between the two bars is the crash&rsquo;s cost; it shrinks the later you retire.';
     } else {
       if (title) title.textContent = 'The same crash, at different years of retirement';
