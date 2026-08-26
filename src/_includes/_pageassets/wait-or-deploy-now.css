@@ -93,6 +93,10 @@ body { background: var(--bg); color: var(--text); }
 .wd-carry-note a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 .wd-carry-note[hidden] { display: none; }
 
+/* Section lede (§10.5) — states the finding; .wd-cue below it stays the mechanics
+   line. Deliberately a step up in size and ink from the cue so the order reads. */
+.wd-lede { font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.65; color: var(--text-dim); margin: 0 0 0.9rem; max-width: 820px; }
+.wd-lede strong { color: var(--text); font-weight: 600; }
 /* Up-front cue tying the slider to the chart */
 .wd-cue { font-family: 'Inter', sans-serif; font-size: 0.86rem; line-height: 1.5; color: var(--text-dim); margin: 0 0 0.7rem; }
 .wd-cue strong { color: var(--text); font-weight: 600; }
