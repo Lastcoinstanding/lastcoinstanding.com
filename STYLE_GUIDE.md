@@ -2309,6 +2309,21 @@ The same discipline applies to any term that would make a reader feel outside th
 
 ---
 
+## 11. Words we don't use
+
+The following read as AI-generated and are banned from page copy:
+
+**load-bearing · delve · crucially · notably · robust · leverage (as a verb) · elegant · tapestry · landscape (metaphorical) · deep dive · unpack · testament to · at its core · it's worth noting**
+
+**Scope: page copy only.** Code comments and internal docs (this file, `SITE_GUIDE`, `TECH_DEBT`, commit messages) are exempt.
+
+**Explicitly NOT banned:** em-dashes, semicolons, and "the point is" constructions. These are part of the site's register. **This list bans tells, not voice** — the distinction matters, because a sweep that mistakes one for the other would flatten exactly what makes the copy sound like a person.
+
+**The list is append-only** as new tells are noticed. Check new copy against it as part of the `NEW_PAGE_CHECKLIST §10.5` review — the interaction-intent pass is already reading every new section lede, so it is the cheapest place to catch these.
+
+**Known outstanding violation (2026-08-25):** `/bitcoin-defined`'s subtitle reads *"A single sentence. Eight load-bearing ideas."* It predates this rule and was left in place rather than swept, because the PR that added this section was scoped to copy insertions only. It is the first thing a sweep should fix.
+
+
 ## Appendix A: Survey findings (2026-04-26)
 
 Initial draft was based on a survey of 7 pages with John McCabe noting issues. Anti-patterns §5 are direct outputs of the survey. Pages reviewed:

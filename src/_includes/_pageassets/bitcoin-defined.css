@@ -52,6 +52,17 @@
     font-style: italic;
     margin-bottom: 0.25rem;
 }
+/* Deck lede (§10.5) — the finding before the mechanics. Body register, not the
+   header's italic Cormorant, so it reads as prose rather than a second subtitle. */
+.bd-page .bd-lede {
+    max-width: 640px;
+    margin: 1.6rem auto 0;
+    padding: 0 1.5rem;
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--bd-text-dim);
+}
 .bd-page .bd-header .bd-attribution {
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
