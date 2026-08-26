@@ -156,6 +156,12 @@ a:not([class]):hover { text-decoration-color: #e09422; }
    section-label register. pointer-events:none guarantees they never read as links. */
 .nav-dropdown-group-label { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.16em; color: rgba(255,255,255,0.34); padding: 12px 24px 4px; white-space: nowrap; user-select: none; pointer-events: none; }
 .nav-dropdown-group-label:first-child { padding-top: 6px; }
+/* Entry-point note on a dropdown item (the retirement hub's "start here").
+   Rendered from `nav_note` in explorations.json. The em-dash is CSS so no
+   template has to carry an entity, and it is never the only signal — it
+   annotates a link that is already there and already labelled. */
+.nav-entry-note { font-size: 0.78em; font-style: italic; color: rgba(255,255,255,0.42); white-space: nowrap; }
+.nav-entry-note::before { content: "\2014\00a0"; }
 .mobile-section-label { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.65rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.18em; margin: 0.9rem 0 0.2rem; padding: 0 32px; }
 .mobile-section-label:first-child { margin-top: 0; }
 .mobile-section-sublabel { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.56rem; font-weight: 600; color: rgba(255,255,255,0.38); text-transform: uppercase; letter-spacing: 0.16em; margin: 0.65rem 0 0.05rem; }
@@ -489,7 +495,12 @@ h1, h2, h3 {
         DISPLAY ORDER of the group sub-headers within each dropdown; the item order WITHIN
         a group follows src/_data/explorations.json array order. A page's `group` field must
         match one of these strings exactly, or that page silently drops out of the dropdown. -#}
-    {%- set numbersGroups = ["Models & Trends", "Bitcoin vs. Other Assets", "Positioning & Strategy", "Living on Bitcoin"] -%}
+    {#- "Retirement" added 2026-08-26 (JM prominence ruling, options 1+2). It is a
+        DROPDOWN group, not a nav-bar item — bar geometry is untouched, which was the
+        hard constraint. The five family entries carry group "Retirement" in
+        explorations.json and sit there in funnel order: the hub first (its `nav_note`
+        marks it the entry point), then Build → Size → Choose → Stress. -#}
+    {%- set numbersGroups = ["Models & Trends", "Bitcoin vs. Other Assets", "Positioning & Strategy", "Retirement", "Living on Bitcoin"] -%}
     {%- set argumentsGroups = ["Why Fiat Fails", "Why Bitcoin Endures", "Objections, Answered", "Holding & Spending"] -%}
     {#- Freshness badge (STYLE_GUIDE §6.39). Reads the build-time `freshness` map
         (_data/freshness.js, computed from updates.json). NEW suppresses UPDATED;
@@ -512,7 +523,7 @@ h1, h2, h3 {
             <button type="button" class="nav-dropdown-btn{% if currentCat == 'foundations' %} active{% endif %}" aria-expanded="false" aria-controls="nav-menu-foundations">Foundations <span class="nav-caret" aria-hidden="true">&#9662;</span></button>
             <div class="nav-dropdown-menu" id="nav-menu-foundations">
 {%- for e in explorations %}{% if e.category == 'foundations' %}
-        <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+        <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{% if e.nav_note %}<span class="nav-entry-note">{{ e.nav_note }}</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
             </div>
@@ -523,7 +534,7 @@ h1, h2, h3 {
 {%- for g in argumentsGroups %}
                 <div class="nav-dropdown-group-label">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'arguments' and e.group == g %}
-        <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+        <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{% if e.nav_note %}<span class="nav-entry-note">{{ e.nav_note }}</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
 {%- endfor %}
                 <div class="nav-dropdown-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
@@ -544,7 +555,7 @@ h1, h2, h3 {
                         <div class="nav-dropdown-group-label">{{ g }}</div>
                         <div class="nav-mega-split">
 {%- for e in explorations %}{% if e.category == 'numbers' and e.group == g %}
-                            <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+                            <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{% if e.nav_note %}<span class="nav-entry-note">{{ e.nav_note }}</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
                         </div>
                     </div>
@@ -552,7 +563,7 @@ h1, h2, h3 {
                     <div class="nav-mega-col">
                         <div class="nav-dropdown-group-label">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'numbers' and e.group == g %}
-                        <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+                        <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker" title="Interactive">&bull;</span>{% endif %}{% if e.nav_note %}<span class="nav-entry-note">{{ e.nav_note }}</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
                     </div>
 {%- endif %}
@@ -606,7 +617,7 @@ h1, h2, h3 {
             <button type="button" class="m-acc-btn" aria-expanded="{% if currentCat == 'foundations' %}true{% else %}false{% endif %}" aria-controls="m-sec-foundations">Foundations <span class="m-acc-caret" aria-hidden="true">&#9662;</span></button>
             <div class="m-acc-panel" id="m-sec-foundations">
 {%- for e in explorations %}{% if e.category == 'foundations' %}
-                <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+                <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{% if e.nav_note %}<span class="nav-entry-note">{{ e.nav_note }}</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
             </div>
         </div>
@@ -616,7 +627,7 @@ h1, h2, h3 {
 {%- for g in argumentsGroups %}
                 <div class="mobile-section-sublabel">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'arguments' and e.group == g %}
-                <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+                <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{% if e.nav_note %}<span class="nav-entry-note">{{ e.nav_note }}</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
 {%- endfor %}
             </div>
@@ -627,7 +638,7 @@ h1, h2, h3 {
 {%- for g in numbersGroups %}
                 <div class="mobile-section-sublabel">{{ g }}</div>
 {%- for e in explorations %}{% if e.category == 'numbers' and e.group == g %}
-                <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
+                <a href="/{{ e.slug }}"{% if e.slug == slug %} class="active"{% endif %}>{{ e.title | safe }}{% if e.interactive %} <span class="nav-interactive-marker">&bull;</span>{% endif %}{% if e.nav_note %}<span class="nav-entry-note">{{ e.nav_note }}</span>{% endif %}{{ freshnessBadge(freshness[e.slug]) }}</a>
 {%- endif %}{%- endfor %}
 {%- endfor %}
             </div>

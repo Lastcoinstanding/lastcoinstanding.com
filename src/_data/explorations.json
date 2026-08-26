@@ -275,11 +275,26 @@
     }
   },
   {
+    "_comment": "Plan Your Bitcoin Retirement — the retirement family's hub, fired by the fourth spoke landing (COMPARE_RETIREMENT_PLANS_DESIGN §10; the 'family earns a hub before nav grows' trigger). category 'hub' by design and the DASHBOARD PRECEDENT governs: NO nav slot (base.njk iterates only foundations/arguments/numbers), because the desktop nav has no capacity for a seventh item — it wraps the wordmark and breaks hardcoded sticky offsets (SITE_GUIDE §47). Surfaced three ways only: this calculator_tile on /calculators, a homepage card, and the shared retirement-family strip on all four spoke pages. Targets the 'bitcoin retirement' head term; the slug is deliberately distinct from the flagship's /the-bitcoin-retirement — the article does the disambiguation. Position 235 sits it immediately before its own family's tools (EV 240, Compare 245) and after the other hub (dashboard 230). No page_scripts: it is a landing page, not an instrument. SVG tile at components/calc-tile-icons/bitcoin-retirement.njk.",
+    "slug": "bitcoin-retirement",
+    "title": "Plan Your Bitcoin Retirement",
+    "category": "numbers",
+    "group": "Retirement",
+    "nav_note": "start here",
+    "interactive": false,
+    "calculator_tile": {
+      "tagline": "Four questions, in the order they actually arrive &mdash; build a plan, size it, choose between options, then find out what a crash does to it.",
+      "preview_kind": "svg",
+      "anchor": "",
+      "position": 235
+    }
+  },
+  {
     "_comment": "CALCULATOR_TILE.POSITION CONVENTION — positions are SPARSE, assigned in tens (10, 20, 30, …). The gaps are insertion room: a new tile slots between two neighbours by taking a value between them (e.g. 75 to land between 70 and 80) with no renumbering of anything else. Positions must be UNIQUE — the /calculators sort is stable, so duplicates render in explorations.json source order, which silently makes intent unrecoverable the moment anyone reorders this file. Two such collisions (at 5 and 10) were resolved in the 2026-08-21 hygiene pass; the ordering they had been producing was preserved exactly. The sort filter lives in .eleventy.js (sortByCalculatorTilePosition); entries with no calculator_tile sort last and are filtered out by the template.",
     "slug": "the-bitcoin-retirement",
     "title": "The Bitcoin Retirement",
     "category": "numbers",
-    "group": "Positioning & Strategy",
+    "group": "Retirement",
     "interactive": true,
     "calculator_tile": {
       "tagline": "When can I retire on bitcoin? Drag the sliders &mdash; see how much you need, when, and on what income.",
@@ -290,25 +305,11 @@
     }
   },
   {
-    "_comment": "Sequence-of-returns stress test — reuses the retirement engine and injects a timed crash. Sibling to the-bitcoin-retirement (its sober counterpart). No live-chart mini (SVG tile); the icon lives at components/calc-tile-icons/the-bitcoin-retirement-stress-test.njk.",
-    "slug": "the-bitcoin-retirement-stress-test",
-    "title": "The Bitcoin Retirement Stress Test",
-    "category": "numbers",
-    "group": "Positioning & Strategy",
-    "interactive": true,
-    "calculator_tile": {
-      "tagline": "Drop a bear market into a retirement plan, then change the year you retire. The same plan can survive one year and deplete another.",
-      "preview_kind": "svg",
-      "anchor": "#stress",
-      "position": 200
-    }
-  },
-  {
     "_comment": "Third page of the retirement family (Retirement flagship / Stress Test / Escape Velocity). Shares the flagship projection engine and asserts parity against it via evParityQA(). Its payload is the THRESHOLD on each input rather than an escape year: under the shared engine the escape year is retirement+1-or-never, so the quantity that varies is the input-space crossing. One solver places the slider ticks, writes the result sentences, drives the rescue tips and powers click-to-jump. SVG tile at components/calc-tile-icons/bitcoin-escape-velocity.njk.",
     "slug": "bitcoin-escape-velocity",
     "title": "Bitcoin Escape Velocity",
     "category": "numbers",
-    "group": "Positioning & Strategy",
+    "group": "Retirement",
     "interactive": true,
     "calculator_tile": {
       "tagline": "A retirement portfolio is supposed to draw down. Find the threshold past which a bitcoin stack runs up instead — and how little it takes to cross it.",
@@ -318,30 +319,31 @@
     }
   },
   {
-    "_comment": "Plan Your Bitcoin Retirement — the retirement family's hub, fired by the fourth spoke landing (COMPARE_RETIREMENT_PLANS_DESIGN §10; the 'family earns a hub before nav grows' trigger). category 'hub' by design and the DASHBOARD PRECEDENT governs: NO nav slot (base.njk iterates only foundations/arguments/numbers), because the desktop nav has no capacity for a seventh item — it wraps the wordmark and breaks hardcoded sticky offsets (SITE_GUIDE §47). Surfaced three ways only: this calculator_tile on /calculators, a homepage card, and the shared retirement-family strip on all four spoke pages. Targets the 'bitcoin retirement' head term; the slug is deliberately distinct from the flagship's /the-bitcoin-retirement — the article does the disambiguation. Position 235 sits it immediately before its own family's tools (EV 240, Compare 245) and after the other hub (dashboard 230). No page_scripts: it is a landing page, not an instrument. SVG tile at components/calc-tile-icons/bitcoin-retirement.njk.",
-    "slug": "bitcoin-retirement",
-    "title": "Plan Your Bitcoin Retirement",
-    "category": "hub",
-    "interactive": false,
-    "calculator_tile": {
-      "tagline": "Four questions, in the order they actually arrive &mdash; build a plan, size it, choose between options, then find out what a crash does to it.",
-      "preview_kind": "svg",
-      "anchor": "",
-      "position": 235
-    }
-  },
-  {
     "_comment": "Fourth page of the retirement family (Retirement flagship / Escape Velocity / Compare / Stress Test) and the one that owns 'which of my options do I take?'. Two independently configured plans, three reader-controlled inputs each, and ONE shared set of assumptions — per-column growth paths and per-column stress are refused by design, because a plan that could carry a friendlier world would win comparisons it had not earned (COMPARE_RETIREMENT_PLANS_DESIGN §2). Runs on shared/retirement-engine.js, the flagship/EV engine extracted verbatim, so neither column can drift from the family; crpParityQA() asserts A≡B on identical inputs (bear on and off), agreement with the deployed Escape Velocity page across six captured vectors, and the memo/raw/multFn identities. The bear toggle injects the Retirement Stress Test's own crash definition from shared/crash-model.js into BOTH columns at each plan's own retirement year. URL params are namespaced a_/b_ from the first commit and it also accepts the family's un-namespaced stack/retire/income as Plan A. SVG tile at components/calc-tile-icons/compare-retirement-plans.njk.",
     "slug": "compare-retirement-plans",
     "title": "Compare Retirement Plans",
     "category": "numbers",
-    "group": "Positioning & Strategy",
+    "group": "Retirement",
     "interactive": true,
     "calculator_tile": {
       "tagline": "Every plan is a choice against the plan you didn&rsquo;t pick. Set two side by side and read what the difference actually buys.",
       "preview_kind": "svg",
       "anchor": "#plans",
       "position": 245
+    }
+  },
+  {
+    "_comment": "Sequence-of-returns stress test — reuses the retirement engine and injects a timed crash. Sibling to the-bitcoin-retirement (its sober counterpart). No live-chart mini (SVG tile); the icon lives at components/calc-tile-icons/the-bitcoin-retirement-stress-test.njk.",
+    "slug": "the-bitcoin-retirement-stress-test",
+    "title": "The Bitcoin Retirement Stress Test",
+    "category": "numbers",
+    "group": "Retirement",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Drop a bear market into a retirement plan, then change the year you retire. The same plan can survive one year and deplete another.",
+      "preview_kind": "svg",
+      "anchor": "#stress",
+      "position": 200
     }
   },
   {

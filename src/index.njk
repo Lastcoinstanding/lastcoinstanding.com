@@ -714,6 +714,15 @@ eleventyComputed:
 </section>
 
 
+<!-- RETIREMENT FAMILY STRIP — the component's engineered fifth-surface case
+     (SITE_GUIDE §53.1). One include, no homepage CSS: it carries its own scoped
+     styles, and the homepage slug is not in the family list, so nothing is
+     marked "you are here" and the foot renders "Start from the beginning →"
+     into the hub. Placed immediately above Explore so the funnel is offered
+     before the ungrouped card grid rather than competing with it, and so family
+     discovery no longer depends on the rotating Latest card. -->
+{% include 'components/retirement-family.njk' %}
+
 <!-- CONCEPT CARDS -->
 <div class="explore-section">
     <div class="explore-label">Explore</div>
