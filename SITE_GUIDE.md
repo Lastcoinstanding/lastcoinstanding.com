@@ -543,7 +543,7 @@ Tab 1 has a small interactive widget — **"Project a Future Date"** (`#projSlid
 - City growth video for Tab 2: Grok-generated cinematic video of a city growing from village to metropolis, paired with mathematical chart
 - ~~Interactive out-of-sample slider: let user choose regression cutoff date and see how early-fitted model predicts subsequent years~~ — **SHIPPED in Power Law v2 (commit `d492650`, 2026-08-04)**, as a drag handle + preset chips + `?fit=` deep-link (Tab 1 OOS chart above).
 - PAGR concept: "Proportional Annual Growth Rate" as alternative to CAGR — concept discussed but not yet coined on the page (risk of premature neologism)
-- ~~Homepage carousel slot for Power Law page~~ — completed (slide 8, video deployed).
+- ~~Homepage carousel slot for Power Law page~~ — completed (slide 10, video deployed).
 
 ## 12. What Money Has To Be (`/what-money-has-to-be.html`)
 
@@ -674,9 +674,7 @@ _Otherwise none currently._ (The **STRC Below Par** slide shipped July 2026 — 
 
 **Renumber, August 2026:** the Bitcoin as Collateral slide landed at position 3 to sit adjacent to its companion Paper Bitcoin (slide 2). Slides previously numbered 3–38 are now 4–39. Iteration-record section headers and the BvSM record's internal cross-references were shifted by the same +1 so each keeps whatever row it was tracking.
 
-> ✅ **Drift resolved — full re-derivation, 2026-08-26.** That renumber surfaced a pre-existing divergence: table and markup agreed only for rows 1–9, because several recent slides had been appended to the end of this table instead of inserted at their markup positions. It was left for a deliberate pass rather than half-fixed mid-ship, and this is that pass. The inventory below is rebuilt straight from `src/index.njk` order and now carries **42 rows for 42 slides**. What moved: **The Bitcoin Hurdle Rate** to 9, **The STRC Mechanism** to 16 (tabled until now under its former name *STRC Below Par*, which the page no longer uses), **What Daily Conviction Bought** to 20. Three slides that had no row at all were added at their markup positions: **The Bitcoin Floor** (11), **Discount, or Premium?** (15), **Bitcoin Escape Velocity** (33). Two `data-feat` values were corrected against markup — **How Much Bitcoin?** `1 → 0` and **Bitcoin as Collateral** `0 → 1` — which markup has carried since the 2026-08-18 Featured ruling recorded above; the table had simply not been updated. Iteration-record headers and this section's internal cross-references were re-pointed in the same pass, which also closes the off-by-one the August renumber preserved.
->
-> **Deliberately left open.** Nine slide-number citations *outside* §13 still cite pre-re-derivation rows and were not touched, because this pass is scoped to §13: §11 Power Law (`slide 8`), §19 BvSM (`slide 28`), §23 Bitcoin Defined (`row 33`), §32/§33/§34 the deployment trilogy (`slide #11` / `#12` / `#13`), §36 Stress Test (`slide #15`), §37 Allocation (`slide #14`), §38 Doubling Ladder (`slide #10 of 34`). They want one sweep rather than a half-fix here.
+> ✅ **Drift resolved — full re-derivation, 2026-08-26.** That renumber surfaced a pre-existing divergence: table and markup agreed only for rows 1–9, because several recent slides had been appended to the end of this table instead of inserted at their markup positions. It was left for a deliberate pass rather than half-fixed mid-ship, and this is that pass. The inventory below is rebuilt straight from `src/index.njk` order and now carries **42 rows for 42 slides**. What moved: **The Bitcoin Hurdle Rate** to 9, **The STRC Mechanism** to 16 (tabled until now under its former name *STRC Below Par*, which the page no longer uses), **What Daily Conviction Bought** to 20. Three slides that had no row at all were added at their markup positions: **The Bitcoin Floor** (11), **Discount, or Premium?** (15), **Bitcoin Escape Velocity** (33). Two `data-feat` values were corrected against markup — **How Much Bitcoin?** `1 → 0` and **Bitcoin as Collateral** `0 → 1` — which markup has carried since the 2026-08-18 Featured ruling recorded above; the table had simply not been updated. Iteration-record headers and this section's internal cross-references were re-pointed in the same pass, which also closes the off-by-one the August renumber preserved. **Swept 2026-08-26:** the nine slide-number citations elsewhere in this document — §11 Power Law, §19 BvSM, §23 Bitcoin Defined, the §32–§34 deployment trilogy, §36 Stress Test, §37 Allocation, §38 Doubling Ladder — were re-pointed in the follow-up pass, so no stale slide number remains anywhere in this document.
 
 **Documentation drift resolved (May 2026):** the previously-flagged drift between markup and this inventory was closed when What Money Is For (now slide 34) landed. The three previously-undocumented slides (`vid-heatmap`, `vid-bbm`, `vid-lob`) have had their inventory rows scraped from `src/index.njk` and added to the table below; the prior slide-17 entry (Borrowing Against Your Stack) has been renumbered to 18 to match the live markup. The table below now matches `src/index.njk` slide-for-slide.
 
@@ -1334,7 +1332,7 @@ Dual BTC line treatment — *trend-basis projection* (solid, starting from the P
 
 ### Open enhancements
 
-- **Carousel slide (slide 28) — shipped May 2026.** Trees-in-meadow video landed in the carousel; see `§13` inventory and iteration record.
+- **Carousel slide (slide 36) — shipped May 2026.** Trees-in-meadow video landed in the carousel; see `§13` inventory and iteration record.
 - **Heatmap visualization — shipped May 2026.** Initially deferred; now shipped both as an in-page §2 visualization on BvSM AND as a standalone `/heatmap` marquee page. See §20 below.
 - **Live BTC price fetch (shipped 2026-05-28).** `TODAY_DAYS` and `TODAY_PRICE` now live in `shared/power-law-data.js`. `TODAY_DAYS` is computed at load, `TODAY_PRICE` seeds to the latest `PL_DATA` sample and is overwritten by the live CoinGecko spot via `fetchTodayPrice()` — one shared call across BvSM, the Power Law Channel, the Bitcoin Retirement, and Borrowing Against Your Stack so the four pages can no longer disagree on "today." Fallback is the latest `PL_DATA` sample (always self-fresh after the monthly refresh) rather than a separately-maintained constant. See `MONTHLY_REFRESH_CHECKLIST.md` (the "Why not live fetch" section is preserved in git history as the reasoning that was reversed).
 
@@ -1621,7 +1619,7 @@ All four companions have reciprocal `related:` entries pointing back to Bitcoin 
 ### Recently closed
 
 - **Card 8 image (Absolutely Scarce)** shipped May 2026 (commit `7ea1725`). Moon-over-calm-sea Grok-generated photo wired in; the eight-card set is complete on the photography axis.
-- **Homepage carousel slide** shipped May 2026. 10-second silent embers video animated from Card 7's still composition; caption "Define it. Then debate it." Slide is row 33 in the carousel inventory. Iteration record (candle-simile failure → wood-fire revision) in `SITE_GUIDE §13`.
+- **Homepage carousel slide** shipped May 2026. 10-second silent embers video animated from Card 7's still composition; caption "Define it. Then debate it." Slide is row 41 in the carousel inventory. Iteration record (candle-simile failure → wood-fire revision) in `SITE_GUIDE §13`.
 
 ---
 
@@ -2028,7 +2026,7 @@ Controls: a **channel-position scrubber** (the single star lever, opening at a f
 
 ### Open items
 - **Deferred polish (post-split pass):** tooltips for load-bearing terms (channel position, trend, floor, upper band) will reuse the existing Style-Guide tooltip component verbatim; DCA-footnote wording confirmed against house style; a possible "sit in fiat and wait" third option (evaluate vs. confusion). None built yet.
-- ~~**Carousel slide** pending~~ — **shipped June 2026** (firelit two-glass pour, bold vs. thin; slide #11, `data-feat="1"`; deployment trilogy P1 — see §13 inventory + iteration record).
+- ~~**Carousel slide** pending~~ — **shipped June 2026** (firelit two-glass pour, bold vs. thin; slide #17, `data-feat="1"`; deployment trilogy P1 — see §13 inventory + iteration record).
 
 ### Provenance (how the page got here)
 Built **2A** (core decision surface) → **2B** (projective lens + integration) → **2C-①** (the refocus), all in PR #34. Stage 2C-① split a page that was trying to be both a teaching demonstration *and* a personal calculator, per reviewer direction (`STAGE_2C_REBUILD_SPEC.md` + `Lump_Sum_or_Ladder_In_-_Content_v2_two_pages.docx`, in JM's Downloads — not the repo). The slug, nav slot, OG image, and inbound links were all preserved. What left, and where it went:
@@ -2063,7 +2061,7 @@ Built **2A** (core decision surface) → **2B** (projective lens + integration) 
 `explorations.json` (group *Positioning & Strategy*, `calculator_tile` `mini-deployment-plan` at position 16); `calculators-minis.js` renderer (forward value-range cone); `sitemap.xml` @0.9; `llms.txt`; homepage concept card (value-fork-into-range SVG) in The Numbers + Latest (rolled The Gallery out of Latest); `updates.json`; **bidirectional `related:`** with Lump Sum or Ladder In?, The Bitcoin Retirement, The Power Law, The Bitcoin Horizon, Disciplined Rebalancing, **and The Bitcoin Heatmap** (the holding-period companion — empirical backstop for this page's commitment-first claim); OG card `og-your-deployment-plan.jpg` (§6.15.1 brand-forward).
 
 ### Open items
-- ~~**Carousel slide** pending~~ — **shipped June 2026** (aerial golden river valley, a tributary joining the main river; slide #12, `data-feat="1"`; deployment trilogy P2 — see §13 inventory + iteration record).
+- ~~**Carousel slide** pending~~ — **shipped June 2026** (aerial golden river valley, a tributary joining the main river; slide #18, `data-feat="1"`; deployment trilogy P2 — see §13 inventory + iteration record).
 - **Deferred polish** shared with §32: tooltips for load-bearing terms; final voice pass against the live designed pages.
 - **BvSM cross-link** considered (the entry-at-the-tops stress-test sibling) but left out of the related set to keep it focused on the deployment-decision family; easy to add if wanted.
 
@@ -2101,7 +2099,7 @@ WODN reads its slider position from **`?pos=`** on load — the suite's shared c
 **Carry acknowledgement + the band-vs-slider scope split (shipped `44f425b`).** On a `?pos=` arrival the slider holds a *carried* position that can differ from today, while the live-state band above still describes today — so a small note above the slider names the carry: *"This position came from the link you followed — not today's. Drag to explore, or snap back to today."* It renders only on a valid `?pos=` arrival and hides the moment the reader drags or snaps to today (both snap links share `resetToToday`). **Why the note is enough and the band is deliberately left alone** (this gets re-questioned): the reading order is **band (today) → note (not today's) → slider → verdict**, and the band already closes with *"more applicable when price is higher in the channel, where whether to deploy becomes a real question"* — so it anticipates a carried high position. The note bridges band↔slider by labelling the slider's scope; each element stays truthful about its own scope. A second acknowledgement inside the band would couple a today-focused *live* element to URL-arrival state, muddying its single responsibility — so it was rejected, not overlooked.
 
 ### Open items
-- ~~**Carousel slide** pending~~ — **shipped June 2026** (sun emerging from behind a cloud bank over a calm sea; slide #13, `data-feat="1"`; deployment trilogy P3 — see §13 inventory + iteration record).
+- ~~**Carousel slide** pending~~ — **shipped June 2026** (sun emerging from behind a cloud bank over a calm sea; slide #19, `data-feat="1"`; deployment trilogy P3 — see §13 inventory + iteration record).
 - **Zone-vocabulary divergence** (TECH_DEBT §1): the non-trilogy "zone" pages (`the-power-law`, BvSM, retirement) and the homepage `classifyState` still use their own position-label vocabulary; migrate-vs-document is deferred to the future bull/bear-cycles page (PAGE_IDEAS_BACKLOG).
 
 ## 35. Bull & Bear Cycles (`/bull-and-bear-cycles.html`)
@@ -2166,7 +2164,7 @@ A revision pass after JM's content review, in two parts:
 **Carry-the-scenario receiver (2026-07).** The Stress Test is a **receiver** for the allocation page's second carry line: it already decodes `cdepth` / `crecov` / `stack` (no new receiver code needed), so the allocation page speaks its existing vocabulary (principle 4) — `depth→cdepth` and `rec→crecov` land as identity maps, and the computed `stack` lands when the allocation reader set a portfolio $. The allocation crash *year* is intentionally not carried (its `cy` is years-from-today; the Stress Test's `ctime` is year-of-retirement — the reader picks the retirement-relative timing here). See §37 for the sender.
 
 ### Open items (stress test)
-- ~~**Carousel slide** pending~~ — **shipped July 2026** (stone bridge in a flood at dusk, first-take accept; slide #15, `data-feat="1"`; see §13 inventory + iteration record).
+- ~~**Carousel slide** pending~~ — **shipped July 2026** (stone bridge in a flood at dusk, first-take accept; slide #22, `data-feat="1"`; see §13 inventory + iteration record).
 
 _(v2 features — the worst-case-timing finder and the Spending cut lever — shipped July 2026; see the "v2 (shipped)" + "v2.1 polish" paragraphs above. The v1 placeholder prose in "what this means" was replaced with live prose describing the shipped lever, and its TECH_DEBT entry closed.)_
 
@@ -2196,7 +2194,7 @@ _(v2 features — the worst-case-timing finder and the Spending cut lever — sh
 `explorations.json` (group *Positioning & Strategy*, `interactive: true`, `calculator_tile` SVG at position 19); `sitemap.xml` @0.9; `llms.txt` (The Numbers); homepage concept card in The Numbers (after How Much Bitcoin) + Latest; `updates.json` (7/9/26); **bidirectional `related:`** with How Much Bitcoin, Bull & Bear Cycles, The Bitcoin Retirement, and Disciplined Rebalancing (reciprocal backlink added to How Much Bitcoin); OG card `og-bitcoin-allocation-sizing.jpg` via `build-og-bitcoin-allocation-sizing.py` (brand-forward §6.15.1, three-line title).
 
 ### Open items (allocation sizing)
-- ~~**Carousel slide** pending~~ — **shipped July 2026** (amber ink bloom in dark water, v2 after a quantified-size-budget rewrite; slide #14, promoted to Featured `data-feat="1"` in the July curation swap; see §13 inventory + iteration record).
+- ~~**Carousel slide** pending~~ — **shipped July 2026** (amber ink bloom in dark water, v2 after a quantified-size-budget rewrite; slide #21, promoted to Featured `data-feat="1"` in the July curation swap; see §13 inventory + iteration record).
 
 ## 38. The Bitcoin Doubling Ladder (`/the-doubling-ladder.html`)
 
@@ -2221,7 +2219,7 @@ _(v2 features — the worst-case-timing finder and the Spending cut lever — sh
 **Data + engine (self-contained by design — record this).** Unlike the other Power Law pages, this page **does not read `shared/power-law-data.js`**: its `.njk` includes no shared module, it declares its **own `GENESIS_TS`**, hardcodes the `a`/`b` coefficients, and embeds three static arrays — `LADDER` (26 rungs), `DEVIATION` (191 months), `MONTHLY_HIGH` (191 months). There is **no live price fetch**: the page is retrospective, so a frozen month-end series is the correct substrate and the register recomputes from it. The trade-off is that the genesis constant and coefficients are duplicated here (cf. the `the-melting-ice-cube.js` precedent in TECH_DEBT §1 — intentional divergence, recorded rather than "fixed"). Two Chart.js charts only; both carry `data-chart-copy` with `data-chart-heading`/`data-chart-sub` per §31.
 
 ### Integration
-`explorations.json` (category *numbers*, group *Models & Trends*, `interactive: true`, **no** `calculator_tile`); `sitemap.xml` @0.9; `llms.txt` (The Numbers); homepage concept card in The Numbers (custom log-log staircase SVG icon); `updates.json` (6/16/26); carousel **slide #10 of 34** (`data-cat="numbers"`, `data-feat="0"`) carrying the silent 16:9 video `vid-doublingladder` (`/videos/the-doubling-ladder.mp4`) — **demoted from Featured 2026-06-19** to make room for its network-science sibling Bitcoin & Metcalfe's Law, per the §13 curation rule; OG card `og-the-doubling-ladder.jpg`. Outbound `related:` to The Power Law, Bull & Bear Cycles, Disciplined Rebalancing, and The Bitcoin Horizon.
+`explorations.json` (category *numbers*, group *Models & Trends*, `interactive: true`, **no** `calculator_tile`); `sitemap.xml` @0.9; `llms.txt` (The Numbers); homepage concept card in The Numbers (custom log-log staircase SVG icon); `updates.json` (6/16/26); carousel **slide #13 of 42** (`data-cat="numbers"`, `data-feat="0"`) carrying the silent 16:9 video `vid-doublingladder` (`/videos/the-doubling-ladder.mp4`) — **demoted from Featured 2026-06-19** to make room for its network-science sibling Bitcoin & Metcalfe's Law, per the §13 curation rule; OG card `og-the-doubling-ladder.jpg`. Outbound `related:` to The Power Law, Bull & Bear Cycles, Disciplined Rebalancing, and The Bitcoin Horizon.
 
 ### Open items (doubling ladder)
 - **`related:` is only half-reciprocal.** Bidirectional with **The Power Law** and **Bull & Bear Cycles**; **one-way** to **Disciplined Rebalancing** and **The Bitcoin Horizon** (neither links back). House convention is bidirectional — either add the two backlinks or record the asymmetry as deliberate.
