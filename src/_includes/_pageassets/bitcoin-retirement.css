@@ -59,6 +59,13 @@ body { background: var(--bg); color: var(--text); }
 .hub-card { display: grid; grid-template-columns: 15rem 1fr; gap: 1.4rem; align-items: start; background: var(--bg-card); border: 1px solid var(--border-faint); border-radius: 9px; padding: 1.2rem 1.4rem; text-decoration: none; transition: border-color 0.15s, background 0.15s; }
 .hub-card:hover { border-color: var(--border-strong); background: rgba(224,148,34,0.05); }
 .hub-card-head { display: flex; flex-direction: column; gap: 0.35rem; }
+/* Each card carries its own tool's existing icon — reused, never redrawn. The
+   box is fixed and the SVGs keep their intrinsic aspect ratios (default
+   `xMidYMid meet` letterboxes rather than distorts), which matters because the
+   flagship's is a 48×48 concept-card graphic while the other three are 80×60
+   calc-tile graphics. */
+.hub-icon { display: block; width: 52px; height: 40px; margin: 0 0 0.15rem; }
+.hub-icon svg { width: 100%; height: 100%; display: block; }
 .hub-step { font-family: var(--font-b); font-size: 0.63rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); }
 .hub-q { font-family: var(--font-d); font-style: italic; font-size: clamp(1.15rem, 2.4vw, 1.42rem); line-height: 1.25; color: var(--ink-bright); }
 .hub-card-body { display: flex; flex-direction: column; gap: 0.45rem; }
