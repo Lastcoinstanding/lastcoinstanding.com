@@ -2,29 +2,57 @@
   ════════ RETIREMENT FAMILY STRIP ════════
 
   The four questions of the retirement decision funnel, in order, with the
-  current page marked. Rendered on all four family pages and on the hub.
+  current page marked. Rendered on all four family pages and on the hub, plus
+  the homepage — five surfaces from one file.
 
   WHY THE STYLES LIVE IN THE COMPONENT. Page CSS on this site is a per-page
   include, so styling this strip the usual way would mean editing four
-  stylesheets to add one shared component — and the batch this shipped in
-  permitted exactly one change to each existing family page. Carrying its own
-  scoped `<style>` keeps the per-page edit to a single include line, which is
-  also what makes the strip safe to add to a fifth page later. Every selector
-  is prefixed `rfam-`; every colour is a var with a literal fallback, because
-  the four host pages declare their palettes independently and a bare var()
-  would fail silently on any page that named a token differently.
+  stylesheets to add one shared component. Carrying its own scoped `<style>`
+  keeps the per-page edit to a single include line, which is what makes the
+  strip safe to add to a further page later. Every selector is prefixed
+  `rfam-`; every colour is a var with a literal fallback, because the host
+  pages declare their palettes independently and a bare var() would fail
+  silently on any page that named a token differently.
 
-  Usage — one line, nothing else:
+  Usage — one line:
       {% include 'components/retirement-family.njk' %}
 
-  The current page is detected from the page's own `slug` front matter. A page
-  whose slug is not in the list renders the strip with nothing marked, which is
-  the correct behaviour for the hub's own "you are here" being the strip
-  itself.
+  Optionally set the heading level first, so each surface's document outline
+  stays sane (the strip is an H2 under a page H1 by default; a page that
+  places it inside an existing section may want H3):
+      {% set rfam_level = 'h3' %}
+      {% include 'components/retirement-family.njk' %}
+
+  THE COMPONENT OWNS ITS HEADING. It carries its own eyebrow + title, so host
+  pages must NOT wrap it in one — that produced two stacked headings saying
+  nearly the same thing on the compare page, which is why the wrapper was
+  removed there (2026-08-26).
+
+  TWO VARIANTS, BY SLUG:
+    · on the hub itself the TITLE IS SUPPRESSED — it would restate the H1 a
+      few hundred pixels above it. Eyebrow, framing sentence, row and foot
+      all remain, so the strip still reads as the same object.
+    · everywhere else the title is a LINK to the hub, and is the strip's
+      primary route there. The current page is marked from the page's own
+      `slug`; a slug outside the family (the homepage) marks nothing, which
+      is correct — no card is "you are here".
 -#}
+{%- set rfamLevel = rfam_level | default('h2') -%}
+{%- set onHub = (slug == 'bitcoin-retirement') -%}
 <style>
-.rfam { max-width: 1100px; margin: 3.2rem auto 0; padding: 0; }
-.rfam-tag { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber, #e09422); margin: 0 0 0.35rem; }
+/* One cohesive object containing four. The frame is deliberately LOWER
+   contrast than the tool cards inside it — the cards are the things being
+   chosen between, and a frame competing with them would read as a fifth. */
+.rfam { max-width: 1100px; margin: 3.2rem auto 0; padding: 1.1rem 1.2rem 1.2rem; border: 1px solid rgba(224,148,34,0.09); border-radius: 10px; }
+.rfam-head { display: flex; align-items: center; gap: 0.7rem; margin: 0 0 0.55rem; }
+.rfam-icon { flex: none; width: 40px; height: 30px; display: block; }
+.rfam-icon svg { width: 100%; height: 100%; display: block; }
+.rfam-headtext { min-width: 0; }
+.rfam-tag { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber, #e09422); margin: 0 0 0.1rem; }
+.rfam-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.35rem, 2.6vw, 1.75rem); font-weight: 500; line-height: 1.15; letter-spacing: -.01em; color: var(--ink-bright, #f2eee8); margin: 0; }
+.rfam-title a { color: inherit; text-decoration: none; }
+.rfam-title a:hover { color: var(--amber, #e09422); }
+.rfam-title em { font-style: italic; color: var(--amber, #e09422); }
 .rfam-lede { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.86rem; line-height: 1.6; color: var(--text-dim, #9a9080); margin: 0 0 0.8rem; max-width: 68ch; }
 .rfam-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.55rem; }
 .rfam-item { display: flex; flex-direction: column; gap: 0.22rem; padding: 0.7rem 0.8rem; border-radius: 7px; border: 1px solid var(--border-faint, rgba(224,148,34,0.15)); background: rgba(224,148,34,0.035); text-decoration: none; transition: border-color 0.15s, background 0.15s; }
@@ -38,6 +66,7 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
 .rfam-foot a { color: var(--amber, #e09422); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 .rfam-foot a:hover { border-bottom-color: var(--amber, #e09422); }
 @media (max-width: 860px) { .rfam-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .rfam { padding: 0.9rem 1rem 1rem; } }
 @media (max-width: 460px) { .rfam-row { grid-template-columns: 1fr; } }
 </style>
 {%- set fam = [
@@ -47,7 +76,17 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
   { slug: 'the-bitcoin-retirement-stress-test', step: 'Stress', q: 'Does it survive bad luck?',          t: 'The plan you picked, under a crash.' }
 ] -%}
 <nav class="rfam" aria-label="The retirement decision funnel">
-  <p class="rfam-tag">Four questions, in order</p>
+  <div class="rfam-head">
+    {%- if not onHub %}
+    <span class="rfam-icon" aria-hidden="true">{% include 'components/calc-tile-icons/bitcoin-retirement.njk' %}</span>
+    {%- endif %}
+    <div class="rfam-headtext">
+      <p class="rfam-tag">Four questions, in order</p>
+      {%- if not onHub %}
+      <{{ rfamLevel }} class="rfam-title"><a href="/bitcoin-retirement">Plan Your <em>Bitcoin</em> Retirement</a></{{ rfamLevel }}>
+      {%- endif %}
+    </div>
+  </div>
   <p class="rfam-lede">Retiring on a bitcoin stack is one decision asked four ways &mdash; each tool below answers one of them, and together they&rsquo;re the complete picture.</p>
   <div class="rfam-row">
     {%- for f in fam -%}
@@ -66,5 +105,5 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
       {%- endif -%}
     {%- endfor -%}
   </div>
-  <p class="rfam-foot">Your inputs travel between these tools &mdash; the links each page offers carry the plan you are looking at, so you rarely re-type a number. {% if slug != 'bitcoin-retirement' %}<a href="/bitcoin-retirement">Start from the beginning &rarr;</a>{% endif %}</p>
+  <p class="rfam-foot">Your inputs travel between these tools &mdash; the links each page offers carry the plan you are looking at, so you rarely re-type a number.{% if not onHub %} <a href="/bitcoin-retirement">Start from the beginning &rarr;</a>{% endif %}</p>
 </nav>

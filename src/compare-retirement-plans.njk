@@ -268,9 +268,10 @@ eleventyComputed:
        stateful handoffs this page owns sit beneath it, keeping their ids
        for the renderer. -->
   <section class="crp-section" id="next" aria-label="Where to go next">
-    <p class="crp-eyebrow">The next question</p>
-    <h2 class="crp-h2">Four questions, in order</h2>
-
+    {#- No wrapper heading here. The component owns its own eyebrow and title
+        (2026-08-26); the page's former "The next question" / "Four questions,
+        in order" pair stacked a second heading on top of the strip's, saying
+        nearly the same thing twice. -#}
     {% include 'components/retirement-family.njk' %}
 
     <div class="crp-carry">

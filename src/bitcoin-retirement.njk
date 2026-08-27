@@ -39,6 +39,19 @@ eleventyComputed:
 
     <a class="hub-card" href="/the-bitcoin-retirement">
       <div class="hub-card-head">
+        {#- The flagship has no calc-tile SVG to reuse: its /calculators tile is a
+            live-chart (`preview_kind: "live-chart"`, `mini-retirement`), so there is
+            no file to include. Its homepage concept-card art is reused here instead —
+            existing art from another surface, not new art. -#}
+        <span class="hub-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Time-horizon arrow: short stick now → long projection -->
+          <line x1="8" y1="38" x2="40" y2="10" stroke="#F7931A" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="40" y1="10" x2="34" y2="10" stroke="#F7931A" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="40" y1="10" x2="40" y2="16" stroke="#F7931A" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="14" cy="34" r="2.5" fill="rgba(247,147,26,0.15)" stroke="#F7931A" stroke-width="1.4"/>
+          <circle cx="24" cy="24" r="2" fill="rgba(247,147,26,0.15)" stroke="#F7931A" stroke-width="1.2"/>
+          <circle cx="34" cy="14" r="2.5" fill="rgba(247,147,26,0.15)" stroke="#F7931A" stroke-width="1.4"/>
+        </svg></span>
         <span class="hub-step">Build</span>
         <span class="hub-q">What does my plan look like?</span>
       </div>
@@ -51,6 +64,7 @@ eleventyComputed:
 
     <a class="hub-card" href="/bitcoin-escape-velocity">
       <div class="hub-card-head">
+        <span class="hub-icon" aria-hidden="true">{% include 'components/calc-tile-icons/bitcoin-escape-velocity.njk' %}</span>
         <span class="hub-step">Size</span>
         <span class="hub-q">How much is enough?</span>
       </div>
@@ -63,6 +77,7 @@ eleventyComputed:
 
     <a class="hub-card" href="/compare-retirement-plans">
       <div class="hub-card-head">
+        <span class="hub-icon" aria-hidden="true">{% include 'components/calc-tile-icons/compare-retirement-plans.njk' %}</span>
         <span class="hub-step">Choose</span>
         <span class="hub-q">Which of my options do I take?</span>
       </div>
@@ -75,6 +90,7 @@ eleventyComputed:
 
     <a class="hub-card" href="/the-bitcoin-retirement-stress-test">
       <div class="hub-card-head">
+        <span class="hub-icon" aria-hidden="true">{% include 'components/calc-tile-icons/the-bitcoin-retirement-stress-test.njk' %}</span>
         <span class="hub-step">Stress</span>
         <span class="hub-q">Does the winner survive bad luck?</span>
       </div>
