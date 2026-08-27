@@ -66,7 +66,16 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
 .rfam-foot a { color: var(--amber, #e09422); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 .rfam-foot a:hover { border-bottom-color: var(--amber, #e09422); }
 @media (max-width: 860px) { .rfam-row { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .rfam { padding: 0.9rem 1rem 1rem; } }
+@media (max-width: 560px) {
+  .rfam { padding: 0.9rem 1rem 1rem; }
+  /* Tap targets. Both of these are text links — fine for a pointer, under the
+     44px minimum for a finger. Height is added only here; on desktop a 44px
+     inline link would break the heading's baseline. The title link is new with
+     the heading block; the foot link has been short since the strip shipped,
+     and is fixed alongside it rather than left as a known defect in a
+     component being edited. */
+  .rfam-title a, .rfam-foot a { display: inline-flex; align-items: center; min-height: 44px; }
+}
 @media (max-width: 460px) { .rfam-row { grid-template-columns: 1fr; } }
 </style>
 {%- set fam = [
