@@ -1074,8 +1074,7 @@
       if (viaMult.depletionYear !== viaRaw.depletionYear) failures.push(tag + ': multFn identity broke depletionYear');
       for (var j = 0; j < viaRaw.points.length; j++) {
         var a2 = viaMult.points[j].y, b2 = viaRaw.points[j].y;
-        var a2 = viaMult.points[j].y, b2 = viaRaw.points[j].y;
-        if ((a2 === null) !== (b2 === null) || (a2 !== null && Math.abs(a2 - b2) > 1e-6)) { failures.push('b2/vec' + i + ': multFn identity broke the series'); break; }
+        if ((a2 === null) !== (b2 === null) || (a2 !== null && Math.abs(a2 - b2) > 1e-6)) { failures.push(tag + ': multFn identity broke the series'); break; }
       }
     });
 
@@ -1083,6 +1082,7 @@
     LINE_KEY = null;
     render();
 
+    if (!failures.length) {
       console.log('%ccrpParityQA PASS', 'color:#7fc47f;font-weight:600',
         '(' + VECTORS.length + ' vectors × 2 bear states A≡B; ' + VECTORS.length +
         ' vectors against the shared engine directly; memo/raw/multFn identities hold)');
