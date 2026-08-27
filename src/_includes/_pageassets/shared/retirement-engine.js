@@ -63,28 +63,68 @@
     return (t > 0) ? (TODAY_PRICE / t) : 1;
   }
 
-  /* ─── The projection. The flagship's projectStackOverTime, minus the DCA
-         accumulation branch (this family's three-input pages have no
-         contribution field). The `dcaAdded: 0` field is kept so the audit
-         table's reproduce-any-row identity stays the flagship's. ─── */
-  function projectStackOverTime(scenario, growthModelKey, inflationPct, priceMultiplier) {
+  /* ═══════════════════════════════════════════════════════════
+     THE PROJECTION — ONE LOOP, four optional legs.
+
+     This is the union of what the three family pages were each running.
+     They were NOT identical, which the repoint (2026-08-26) surfaced:
+
+       · Escape Velocity  — exactly this loop with every leg off.
+       · The flagship     — plus pre-retirement DCA accumulation, plus a
+                            `plotAccumulation` flag deciding whether those
+                            pre-retirement years carry a plotted value or
+                            a null (its current-trajectory line opts in so
+                            it starts at today's mark-to-market).
+       · The Stress Test  — plus a per-year price multiplier (the crash
+                            path), plus the spending-cut lever, plus a
+                            `price > 0` guard on the withdrawal division
+                            that the other two did not carry.
+
+     Every leg is OFF by default and each is guarded so that with the
+     options absent this reduces, expression for expression, to what
+     Escape Velocity was running — which is what lets the pages' existing
+     parity assertions pass unchanged.
+
+     THE DIVIDE GUARD IS ADOPTED FROM THE STRESS TEST for all callers.
+     It was a real divergence between the copies, not a stylistic one:
+     flagship and EV computed `nominalIncome / price` unguarded. It is
+     unreachable in practice — the Power Law price is positive for every
+     modelled date — so adopting the safest of the three variants costs
+     nothing and removes the divergence rather than preserving it.
+
+     opts: { multiplier, multFn, plotAccumulation, flexPct }
+       multiplier        scalar price multiplier (default 1)
+       multFn            per-year multiplier fn; overrides `multiplier`
+       plotAccumulation  pre-retirement years carry a value, not null
+       flexPct           cut withdrawals by this % in any year the price
+                         path is below par (multFn(y) < 1)
+  ═══════════════════════════════════════════════════════════ */
+  function projectCore(scenario, growthModelKey, inflationPct, opts) {
+    opts = opts || {};
     var startYear = (new Date()).getFullYear();
     var endYear = scenario.retirementYear + scenario.yearsInRetirement;
     var infl = inflationPct / 100;
-    var multiplier = (priceMultiplier === undefined || priceMultiplier === null || !isFinite(priceMultiplier))
-      ? 1 : priceMultiplier;
+    var scalar = (opts.multiplier === undefined || opts.multiplier === null || !isFinite(opts.multiplier))
+      ? 1 : opts.multiplier;
+    var multFn = opts.multFn || null;
+    var flexPct = opts.flexPct || 0;
 
     var stackBtc = scenario.btcStack;
     var points = [], btcPoints = [], depletionYear = null;
 
     for (var y = startYear; y <= endYear; y++) {
       var d = dateForYear(y);
-      var price = projPriceForGrowth(d, growthModelKey) * multiplier;
+      var price = projPriceForGrowth(d, growthModelKey) * (multFn ? multFn(y) : scalar);
 
       if (y < scenario.retirementYear) {
-        points.push({ x: y, y: null });
+        // Pre-retirement DCA. Year-end approximation, the flagship's:
+        // BTC added = 12 × monthly contribution ÷ year-end price. Zero-guarded,
+        // so a page with no contribution field behaves as if the leg were absent.
+        var added = (scenario.monthlyDcaUSD > 0 && price > 0) ? (12 * scenario.monthlyDcaUSD) / price : 0;
+        stackBtc += added;
+        points.push({ x: y, y: opts.plotAccumulation ? (stackBtc * price) : null });
         btcPoints.push({ x: y, btc: stackBtc, usd: null, phase: 'accum',
-          price: price, income: null, btcSold: null, dcaAdded: 0 });
+          price: price, income: null, btcSold: null, dcaAdded: added });
       } else if (y === scenario.retirementYear) {
         points.push({ x: y, y: stackBtc * price });
         btcPoints.push({ x: y, btc: stackBtc, usd: stackBtc * price, phase: 'retire',
@@ -94,16 +134,28 @@
         var nominalIncome = (scenario.incomeBasis === 'fixed')
           ? scenario.targetIncomeUSD
           : scenario.targetIncomeUSD * Math.pow(1 + infl, yearsFromToday);
-        var btcNeeded = nominalIncome / price;
+        // Spending cut, bound to the PRICE PATH (multFn(y) < 1), not to the
+        // stack's underwater span — the stack recovers slower, because coins
+        // sold cheap are gone, so binding to it would overstate the mitigation.
+        var cut = false, fullIncome = nominalIncome;
+        if (flexPct > 0 && multFn && multFn(y) < 1) { cut = true; nominalIncome = nominalIncome * (1 - flexPct / 100); }
+        var btcNeeded = price > 0 ? nominalIncome / price : 0;
         stackBtc = Math.max(0, stackBtc - btcNeeded);
         if (stackBtc <= 0 && depletionYear === null) depletionYear = y;
         points.push({ x: y, y: stackBtc * price });
         btcPoints.push({ x: y, btc: stackBtc, usd: stackBtc * price, phase: 'draw',
-          price: price, income: nominalIncome, btcSold: btcNeeded, dcaAdded: 0 });
+          price: price, income: nominalIncome, fullIncome: fullIncome, cut: cut,
+          btcSold: btcNeeded, dcaAdded: 0 });
       }
     }
     return { points: points, btcPoints: btcPoints, depletionYear: depletionYear,
              startYear: startYear, endYear: endYear };
+  }
+
+  // The flagship's signature, unchanged, so its call sites need no edit.
+  function projectStackOverTime(scenario, growthModelKey, inflationPct, priceMultiplier, plotAccumulation) {
+    return projectCore(scenario, growthModelKey, inflationPct,
+      { multiplier: priceMultiplier, plotAccumulation: plotAccumulation });
   }
 
   /* ─── Memoised projection. Two columns × (base + threshold probes) is a few
@@ -113,9 +165,13 @@
   var PROJ_CACHE = Object.create(null);
   var PROJ_CACHE_KEYS = [];
   function projectMemo(scenario, growthModelKey, inflationPct, multiplier) {
+    // monthlyDcaUSD joined the key when the DCA leg landed: two scenarios
+    // differing only in contribution would otherwise collide on a cache hit
+    // and the second would silently get the first's projection.
     var key = [scenario.btcStack.toFixed(6), scenario.targetIncomeUSD, scenario.retirementYear,
                scenario.yearsInRetirement, scenario.incomeBasis, growthModelKey,
-               inflationPct, (multiplier || 1).toFixed(6)].join('|');
+               inflationPct, (multiplier || 1).toFixed(6),
+               (scenario.monthlyDcaUSD || 0)].join('|');
     var hit = PROJ_CACHE[key];
     if (hit) return hit;
     var out = projectStackOverTime(scenario, growthModelKey, inflationPct, multiplier);
@@ -125,47 +181,10 @@
     return out;
   }
 
-  /* ─── A per-year price multiplier function cannot go through projectMemo's
-         scalar-multiplier key, so the crash path runs the uncached loop with a
-         multFn. This is the ONLY structural addition to the ported engine, and
-         it changes nothing when multFn is absent: the scalar path is untouched.
-         Mirrors the Stress Test's projectStack(…, multFn, …) signature. ─── */
-  function projectWithMultFn(scenario, growthModelKey, inflationPct, multFn) {
-    var startYear = (new Date()).getFullYear();
-    var endYear = scenario.retirementYear + scenario.yearsInRetirement;
-    var infl = inflationPct / 100;
-
-    var stackBtc = scenario.btcStack;
-    var points = [], btcPoints = [], depletionYear = null;
-
-    for (var y = startYear; y <= endYear; y++) {
-      var d = dateForYear(y);
-      var m = multFn ? multFn(y) : 1;
-      var price = projPriceForGrowth(d, growthModelKey) * (isFinite(m) ? m : 1);
-
-      if (y < scenario.retirementYear) {
-        points.push({ x: y, y: null });
-        btcPoints.push({ x: y, btc: stackBtc, usd: null, phase: 'accum',
-          price: price, income: null, btcSold: null, dcaAdded: 0 });
-      } else if (y === scenario.retirementYear) {
-        points.push({ x: y, y: stackBtc * price });
-        btcPoints.push({ x: y, btc: stackBtc, usd: stackBtc * price, phase: 'retire',
-          price: price, income: null, btcSold: null, dcaAdded: 0 });
-      } else {
-        var yearsFromToday = y - startYear;
-        var nominalIncome = (scenario.incomeBasis === 'fixed')
-          ? scenario.targetIncomeUSD
-          : scenario.targetIncomeUSD * Math.pow(1 + infl, yearsFromToday);
-        var btcNeeded = nominalIncome / price;
-        stackBtc = Math.max(0, stackBtc - btcNeeded);
-        if (stackBtc <= 0 && depletionYear === null) depletionYear = y;
-        points.push({ x: y, y: stackBtc * price });
-        btcPoints.push({ x: y, btc: stackBtc, usd: stackBtc * price, phase: 'draw',
-          price: price, income: nominalIncome, btcSold: btcNeeded, dcaAdded: 0 });
-      }
-    }
-    return { points: points, btcPoints: btcPoints, depletionYear: depletionYear,
-             startYear: startYear, endYear: endYear };
+  // Per-year multiplier path. Kept as a named entry point because a function
+  // has no cache key, so this deliberately bypasses projectMemo.
+  function projectWithMultFn(scenario, growthModelKey, inflationPct, multFn, flexPct) {
+    return projectCore(scenario, growthModelKey, inflationPct, { multFn: multFn, flexPct: flexPct });
   }
 
   /* ─── One place that maps a price basis onto engine arguments, so two
@@ -345,6 +364,7 @@
     projPriceForGrowth: projPriceForGrowth,
     currentRatio: currentRatio,
     // projection
+    projectCore: projectCore,
     projectStackOverTime: projectStackOverTime,
     projectWithMultFn: projectWithMultFn,
     projectForBasis: projectForBasis,
