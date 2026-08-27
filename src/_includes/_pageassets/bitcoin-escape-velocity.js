@@ -649,9 +649,13 @@
                liveBtcPrice].join('|');
     if (key === LINE_KEY) return LINE_CACHE;
     LINE_KEY = key;
-    LINE_CACHE = { stack:  lineFor('stack', SCENARIO),
-                   income: lineFor('income', SCENARIO),
-                   retire: lineFor('retire', SCENARIO) };
+    /* PRICE_BASIS and SCENARIO are passed EXPLICITLY since the repoint. The
+       local lineFor/cloneWith used to default to these page globals; the shared
+       module cannot see them, so every call site that relied on the default now
+       states it. evParityQA did not catch this — it always passed both args. */
+    LINE_CACHE = { stack:  lineFor('stack', SCENARIO, PRICE_BASIS),
+                   income: lineFor('income', SCENARIO, PRICE_BASIS),
+                   retire: lineFor('retire', SCENARIO, PRICE_BASIS) };
     return LINE_CACHE;
   }
 
@@ -812,7 +816,7 @@
         : (b === 'stack' ? [lim.max, lim.max / 4] : [lim.min, lim.min * 2]);
       for (var i = 0; i < probes.length; i++) {
         var over = {}; over[AXES[b].key] = probes[i];
-        if (lineFor(deadAxis, cloneWith(over)).value !== null) {
+        if (lineFor(deadAxis, cloneWith(over, SCENARIO), PRICE_BASIS).value !== null) {
           found.push(b === 'stack' ? 'raise the stack'
                    : b === 'income' ? 'lower the withdrawal'
                    : 'retire later');
@@ -917,7 +921,7 @@
           return;
         }
         var over = {}; over[row.key] = next;
-        var nudged = cloneWith(over);
+        var nudged = cloneWith(over, SCENARIO);
         var nProj = projectForBasis(nudged, basis);
         var nv = computeVerdict(nProj, nudged, inflationPct);
 
@@ -925,7 +929,7 @@
         if (nv.state !== baseVerdict.state) {
           clause = '<span class="ev-conseq-flip">' + (nv.state === 'escape' ? 'crosses the threshold' : 'now ' + statePhrase(nv)) + '</span>';
         } else {
-          var lnBefore = L[row.reports], lnAfter = lineFor(row.reports, nudged);
+          var lnBefore = L[row.reports], lnAfter = lineFor(row.reports, nudged, PRICE_BASIS);
           clause = (lnBefore.value !== null && lnAfter.value !== null && lnBefore.value !== lnAfter.value)
             ? 'no flip &mdash; ' + lineMovePhrase(row.reports, lnBefore.value, lnAfter.value)
             : 'no flip';
