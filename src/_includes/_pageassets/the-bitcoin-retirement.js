@@ -312,14 +312,13 @@
   // visibility is a user-intent layer that outlives the redraw).
   var legendVisibility = { 0: true, 1: true, 2: true, 3: true, 4: true, 5: true };
 
-  function daysSince(date) {
-    return (date.getTime() - GENESIS.getTime()) / (1000 * 60 * 60 * 24);
-  }
-  function plPriceAtDate(date) { return plPrice(daysSince(date)); }
-  function dateForYear(year) {
-    var today = new Date();
-    return new Date(year, today.getMonth(), today.getDate());
-  }
+  /* Price/date helpers now come from shared/retirement-engine.js (TECH_DEBT §1,
+     repointed 2026-08-26). Local aliases, so this page's call sites are
+     untouched and the diff stays a deletion rather than a rewrite. */
+  var RE = window.RetirementEngine;
+  var daysSince = RE.daysSince;
+  var plPriceAtDate = RE.plPriceAtDate;
+  var dateForYear = RE.dateForYear;
 
   // ─── Scenario state — mutable, drives all chart math
   //                 Sliders update this object; chart reads from it.
@@ -333,13 +332,8 @@
     incomeBasis: 'today'   // 'today' = target is in today's dollars (real target, default) | 'fixed' = fixed future nominal amount
   };
 
-  // ─── Growth-model price helper — shared by stack-projection + sustainability math
-  function projPriceForGrowth(date, growthModelKey) {
-    var trend = plPriceAtDate(date);
-    if (growthModelKey === 'powerlaw-floor') return trend * PL_FLOOR;
-    // 'powerlaw-trend' (default) and 'linear-cagr-decay' both use trend until commit 7
-    return trend;
-  }
+  // ─── Growth-model price helper — from the shared module (see the alias block above)
+  var projPriceForGrowth = RE.projPriceForGrowth;
 
   // ─── Stack value at retirement (after pre-retirement DCA accumulation)
   // Returns nominal value in retirement-year dollars.
@@ -380,62 +374,19 @@
   // price scales both the dollar value of remaining stack AND how much BTC
   // gets sold each year to cover the (unchanged) nominal income — so a stack
   // priced below trend depletes faster, as it should.
+  /* REPOINTED 2026-08-26 to shared/retirement-engine.js (TECH_DEBT §1).
+     The loop that used to live here is now the module's `projectCore`, which
+     absorbed this page's two distinguishing legs verbatim — the pre-retirement
+     DCA accumulation and the `plotAccumulation` flag (the current-trajectory
+     line opts in so it starts at today's mark-to-market value, matching the
+     60/40 benchmark's anchor; every other caller pushes null pre-retirement so
+     dataset lengths stay aligned for index-mode interaction).
+
+     This wrapper exists only so the page's ~dozen call sites keep their
+     signature. It is not a second implementation. */
   function projectStackOverTime(scenario, growthModelKey, inflationPct, priceMultiplier, plotAccumulation) {
-    var today = new Date();
-    var startYear = today.getFullYear();
-    var endYear = scenario.retirementYear + scenario.yearsInRetirement;
-    var infl = inflationPct / 100;
-    var multiplier = (priceMultiplier === undefined || priceMultiplier === null || !isFinite(priceMultiplier))
-      ? 1
-      : priceMultiplier;
-
-    var stackBtc = scenario.btcStack;
-    var points = [];
-    var btcPoints = [];
-    var depletionYear = null;
-
-    for (var y = startYear; y <= endYear; y++) {
-      var d = dateForYear(y);
-      var price = projPriceForGrowth(d, growthModelKey) * multiplier;
-
-      if (y < scenario.retirementYear) {
-        // Pre-retirement DCA accumulation. Simple year-end approximation:
-        // BTC added this year = 12 × monthly contribution / year-end trend price.
-        if (scenario.monthlyDcaUSD > 0 && price > 0) {
-          stackBtc += (12 * scenario.monthlyDcaUSD) / price;
-        }
-        // Push null so dataset length matches the band datasets — keeps index-mode
-        // interaction aligned across all four series. Chart.js renders null as a
-        // gap (no visible line pre-retirement) unless plotAccumulation is set —
-        // the current-trajectory line opts in so it starts at today's
-        // mark-to-market value, matching the 60/40 benchmark's 2026 anchor.
-        points.push({ x: y, y: plotAccumulation ? (stackBtc * price) : null });
-        btcPoints.push({ x: y, btc: stackBtc, usd: null, phase: 'accum',
-          price: price, income: null, btcSold: null,
-          dcaAdded: (scenario.monthlyDcaUSD > 0 && price > 0) ? (12 * scenario.monthlyDcaUSD) / price : 0 });
-      } else if (y === scenario.retirementYear) {
-        // Drawdown line begins here, at the user's stack value at retirement
-        // (after any accumulated DCA contributions).
-        points.push({ x: y, y: stackBtc * price });
-        btcPoints.push({ x: y, btc: stackBtc, usd: stackBtc * price, phase: 'retire',
-          price: price, income: null, btcSold: null, dcaAdded: 0 });
-      } else {
-        // Post-retirement: sell BTC to cover nominal target income
-        var yearsFromToday = y - startYear;
-        var nominalIncome = (scenario.incomeBasis === 'fixed')
-          ? scenario.targetIncomeUSD                                        // fixed future amount: same raw dollars every year
-          : scenario.targetIncomeUSD * Math.pow(1 + infl, yearsFromToday);  // today's-dollars target: inflate forward (default)
-        var btcNeeded = nominalIncome / price;
-        stackBtc = Math.max(0, stackBtc - btcNeeded);
-        if (stackBtc <= 0 && depletionYear === null) {
-          depletionYear = y;
-        }
-        points.push({ x: y, y: stackBtc * price });
-        btcPoints.push({ x: y, btc: stackBtc, usd: stackBtc * price, phase: 'draw',
-          price: price, income: nominalIncome, btcSold: btcNeeded, dcaAdded: 0 });
-      }
-    }
-    return { points: points, btcPoints: btcPoints, depletionYear: depletionYear, startYear: startYear, endYear: endYear };
+    return window.RetirementEngine.projectStackOverTime(
+      scenario, growthModelKey, inflationPct, priceMultiplier, plotAccumulation);
   }
 
   // ─── Build trend / floor / upper-band point arrays for the chart's bands

@@ -35,14 +35,16 @@
 
   // ── Date / price helpers (copied from the retirement engine for parity) ──
   var GENESIS = new Date(GENESIS_TS * 1000);
-  function daysSince(date) { return (date.getTime() - GENESIS.getTime()) / 86400000; }
-  function plPriceAtDate(date) { return plPrice(daysSince(date)); }
-  function dateForYear(year) { var t = new Date(); return new Date(year, t.getMonth(), t.getDate()); }
-  function projPriceForGrowth(date, growthKey) {
-    var trend = plPriceAtDate(date);
-    if (growthKey === 'powerlaw-floor') return trend * PL_FLOOR;
-    return trend; // 'powerlaw-trend' (default) and others use trend, matching the retirement engine
-  }
+  /* Price/date helpers from shared/retirement-engine.js (TECH_DEBT §1,
+     repointed 2026-08-26). Local aliases keep this page's call sites unchanged.
+     Note the old local `daysSince` divided by the literal 86400000 where the
+     module spells out 1000*60*60*24 — the same number, so this is a deletion
+     of a restatement, not a behaviour change. */
+  var RE = window.RetirementEngine;
+  var daysSince = RE.daysSince;
+  var plPriceAtDate = RE.plPriceAtDate;
+  var dateForYear = RE.dateForYear;
+  var projPriceForGrowth = RE.projPriceForGrowth;
 
   // ── Baseline scenario (mirror of the retirement SCENARIO shape) ──
   // v1.1 default: an EARLY-retirement scenario, because retirement year is the dominant
@@ -125,39 +127,23 @@
   function makeCrash(timingYear) { return makeCrashFor(SCENARIO, timingYear); }
 
   // ════════ PROJECTION ENGINE (parity with retirement projectStackOverTime) ════════
-  // multFn(year) returns the price multiplier for that year (baseline = ()=>1).
+  /* REPOINTED 2026-08-26 to shared/retirement-engine.js (TECH_DEBT §1).
+
+     This page's loop was the widest of the three: it carried the DCA leg, the
+     per-year crash multiplier, the spending-cut lever AND a `price > 0` guard
+     on the withdrawal division that the other two copies did not have. All four
+     went into the module's `projectCore` — the guard for every caller, since it
+     was a real divergence and the safest of the three variants.
+
+     What remains here is an ADAPTER, not an implementation. The page reads
+     `rows`; the module returns `btcPoints` carrying exactly the same fields
+     (x, phase, price, btc, usd, income, btcSold, dcaAdded, plus fullIncome and
+     cut on drawdown years), so the mapping is a rename. */
   function projectStack(scn, growth, infl, multFn, flexPct) {
-    var startYear = (new Date()).getFullYear();
-    var endYear = scn.retirementYear + scn.yearsInRetirement;
-    var i = infl / 100;
-    var stackBtc = scn.btcStack;
-    var rows = [], depletionYear = null;
-    for (var y = startYear; y <= endYear; y++) {
-      var d = dateForYear(y);
-      var price = projPriceForGrowth(d, growth) * (multFn ? multFn(y) : 1);
-      if (y < scn.retirementYear) {
-        var added = (scn.monthlyDcaUSD > 0 && price > 0) ? (12 * scn.monthlyDcaUSD) / price : 0;
-        stackBtc += added;
-        rows.push({ x: y, phase: 'accum', price: price, btc: stackBtc, usd: null, income: null, btcSold: null, dcaAdded: added });
-      } else if (y === scn.retirementYear) {
-        rows.push({ x: y, phase: 'retire', price: price, btc: stackBtc, usd: stackBtc * price, income: null, btcSold: null, dcaAdded: 0 });
-      } else {
-        var yearsFromToday = y - startYear;
-        var nominalIncome = (scn.incomeBasis === 'fixed')
-          ? scn.targetIncomeUSD
-          : scn.targetIncomeUSD * Math.pow(1 + i, yearsFromToday);
-        // Spending cut: reduce this year's withdrawal while the market is below
-        // its pre-crash level — i.e. while the crash multiplier is < 1 (PRICE-PATH
-        // underwater). Not the stack span. flexPct 0/absent → no cut, bit-identical to v1.
-        var cut = false, fullIncome = nominalIncome;
-        if (flexPct > 0 && multFn && multFn(y) < 1) { cut = true; nominalIncome = nominalIncome * (1 - flexPct / 100); }
-        var btcNeeded = price > 0 ? nominalIncome / price : 0;
-        stackBtc = Math.max(0, stackBtc - btcNeeded);
-        if (stackBtc <= 0 && depletionYear === null) depletionYear = y;
-        rows.push({ x: y, phase: 'draw', price: price, btc: stackBtc, usd: stackBtc * price, income: nominalIncome, fullIncome: fullIncome, cut: cut, btcSold: btcNeeded, dcaAdded: 0 });
-      }
-    }
-    return { rows: rows, depletionYear: depletionYear, startYear: startYear, endYear: endYear };
+    var out = window.RetirementEngine.projectCore(scn, growth, infl,
+      { multFn: multFn, flexPct: flexPct });
+    return { rows: out.btcPoints, depletionYear: out.depletionYear,
+             startYear: out.startYear, endYear: out.endYear };
   }
 
   // Real (today's $) value of a nominal amount in year y.

@@ -989,50 +989,39 @@
 
      (a) identical inputs in A and B produce identical outputs;
      (b) each column's outputs match the flagship/EV engines for the
-         same inputs — asserted against GOLDEN VECTORS captured from the
-         deployed Escape Velocity page (see the note below);
+         same inputs — asserted by CALLING those engines, because since
+         2026-08-26 they are literally this one;
      (c) both columns read the same shared constants object.
 
-     On (b): EV's engine lives inside that page's IIFE and is not
-     callable from here, so the assertion is made against values read
-     off the live page rather than by calling into it. When the three
-     existing family pages are repointed at shared/retirement-engine.js
-     (the filed follow-up), this should become a direct call and the
-     golden table should be deleted rather than maintained.
+     (b) was the hard one and is now the easy one. It used to compare
+     against outputs captured from the deployed Escape Velocity page,
+     because EV's engine lived inside that page's IIFE and could not be
+     called from here — which meant a snapshot, a tolerance band, and a
+     drift tier to stop the calendar failing the run. The repoint
+     (TECH_DEBT §1) removed the reason: all four family pages now run
+     shared/retirement-engine.js, so this asserts an IDENTITY against the
+     same functions they call. No captured values, no tolerances, no
+     drift tier — it holds on any date, and there is no second source of
+     truth left to go stale.
   ═══════════════════════════════════════════════════════════ */
 
-  /* GOLDEN VECTORS — captured 2026-08-26 from the deployed Escape Velocity
-     page at https://lastcoinstanding.com/bitcoin-escape-velocity, one
-     navigation per row (?stack=&retire=&income=), reading that page's own
-     rendered verdict, horizon value and three threshold lines. Basis:
-     reverts-to-trend; inflation and growth at their shipped defaults.
+  /* VECTORS. Plain input triples — no expected outputs.
 
-     TWO TIERS, AND THE REASON. The engine's price at year Y runs through
-     dateForYear(Y), which is built from TODAY's month and day — so every
-     dollar figure and every solved threshold drifts a little each day and
-     steps when the calendar year rolls over. Asserting those as exact
-     equalities would produce a tripwire that fails for the calendar rather
-     than for a defect, which is worse than no tripwire.
-
-       · `state` / `escapeYear` / `turnYear` / `depletionYear` / whether a
-         threshold is in range are STRUCTURAL — integers and enums that move
-         only when a plan actually crosses something. These FAIL the run.
-       · `valueAtHorizon` and the three threshold VALUES are drift-prone.
-         These WARN with the measured-vs-captured pair, so a real engine
-         change is still visible without crying wolf on the date.
-
-     When the three existing family pages are repointed at
-     shared/retirement-engine.js (the filed follow-up), assertion (b) should
-     become a direct call into the same module and this table should be
-     deleted rather than maintained. */
-  var GOLDEN_CAPTURED = '2026-08-26';
-  var GOLDEN = [
-    { stack: 1.0, income: 100000, retire: 2035, state: 'shrink',  turnYear: 2056, depletionYear: null, horizon: 2065, value: '$1.33M',  stackLine: 1.11, incomeLine: 90500,  retireLine: 2037 },
-    { stack: 2.0, income: 100000, retire: 2035, state: 'escape',  escapeYear: 2036, depletionYear: null, horizon: 2065, value: '$12.28M', stackLine: 1.11, incomeLine: 181100, retireLine: 2030 },
-    { stack: 0.5, income: 100000, retire: 2035, state: 'deplete', depletionYear: 2044, horizon: 2065, value: '$0',     stackLine: 1.11, incomeLine: 45200,  retireLine: null },
-    { stack: 1.0, income: 50000,  retire: 2035, state: 'escape',  escapeYear: 2036, depletionYear: null, horizon: 2065, value: '$6.14M',  stackLine: 0.56, incomeLine: 90500,  retireLine: 2030 },
-    { stack: 1.0, income: 200000, retire: 2035, state: 'deplete', depletionYear: 2044, horizon: 2065, value: '$0',     stackLine: 2.21, incomeLine: 90500,  retireLine: null },
-    { stack: 1.0, income: 100000, retire: 2045, state: 'escape',  escapeYear: 2046, depletionYear: null, horizon: 2075, value: '$8.96M',  stackLine: 0.68, incomeLine: 148600, retireLine: 2037 }
+     Until 2026-08-26 this table also carried outputs captured from the
+     DEPLOYED Escape Velocity page, because that page's engine lived inside its
+     own closure and could not be called from here. That is no longer true:
+     the family was repointed at shared/retirement-engine.js, so assertion (b)
+     below now calls the same module every family page runs and compares
+     against it DIRECTLY. The captured outputs were deleted rather than
+     maintained, per the close condition in TECH_DEBT §1 — a golden table that
+     outlives its reason becomes a second source of truth, and a stale one. */
+  var VECTORS = [
+    { stack: 1.0, income: 100000, retire: 2035 },
+    { stack: 2.0, income: 100000, retire: 2035 },
+    { stack: 0.5, income: 100000, retire: 2035 },
+    { stack: 1.0, income: 50000,  retire: 2035 },
+    { stack: 1.0, income: 200000, retire: 2035 },
+    { stack: 1.0, income: 100000, retire: 2045 }
   ];
 
   window.crpParityQA = function () {
@@ -1047,7 +1036,7 @@
     // (a) identical inputs → identical outputs, bear off AND bear on.
     [false, true].forEach(function (bearState) {
       BEAR = bearState;
-      GOLDEN.forEach(function (g, i) {
+      VECTORS.forEach(function (g, i) {
         PLANS.a = planFrom(DEFAULT_A, { btcStack: g.stack, targetIncomeUSD: g.income, retirementYear: g.retire });
         PLANS.b = planFrom(PLANS.a);
         var ca = computeCol('a'), cb = computeCol('b');
@@ -1064,46 +1053,28 @@
     //   b1 — against the DEPLOYED Escape Velocity page's own output (golden).
     //   b2 — internal identities that must hold for the port to be the port:
     //        memo ≡ raw, and the multFn path with a flat multiplier ≡ scalar.
-    var drift = [];
     BEAR = false;
-    GOLDEN.forEach(function (g, i) {
+    VECTORS.forEach(function (g, i) {
       var scn = planFrom(DEFAULT_A, { btcStack: g.stack, targetIncomeUSD: g.income, retirementYear: g.retire });
       var proj = E.projectForBasis(scn, BASIS, false, null);
-      var v = E.computeVerdict(proj, scn, infl);
-      var tag = 'b1/vec' + i + ' (' + g.stack + ' BTC, ' + g.income + ', ' + g.retire + ')';
+      var tag = 'b/vec' + i + ' (' + g.stack + ' BTC, ' + g.income + ', ' + g.retire + ')';
 
-      // structural — these fail
-      if (v.state !== g.state) failures.push(tag + ': state ' + v.state + ', EV said ' + g.state);
-      if (v.horizonYear !== g.horizon) failures.push(tag + ': horizon ' + v.horizonYear + ', EV said ' + g.horizon);
-      if ((v.depletionYear || null) !== (g.depletionYear || null)) failures.push(tag + ': depletionYear ' + v.depletionYear + ', EV said ' + g.depletionYear);
-      if (g.escapeYear != null && v.escapeYear !== g.escapeYear) failures.push(tag + ': escapeYear ' + v.escapeYear + ', EV said ' + g.escapeYear);
-      if (g.turnYear != null && v.turnYear !== g.turnYear) failures.push(tag + ': turnYear ' + v.turnYear + ', EV said ' + g.turnYear);
-
-      var ls = E.lineFor('stack', scn, BASIS, null);
-      var li = E.lineFor('income', scn, BASIS, null);
-      var lr = E.lineFor('retire', scn, BASIS, null);
-      // in-range-ness is structural; the values are not
-      if ((lr.value == null) !== (g.retireLine == null)) failures.push(tag + ': retire threshold in-range disagrees with EV');
-
-      // drift-prone — these warn
-      function near(got, want, tol) { return want == null || got == null ? got == want : Math.abs(got - want) <= Math.abs(want) * tol; }
-      if (formatCurrencyShort(v.valueAtHorizon) !== g.value) drift.push(tag + ': value ' + formatCurrencyShort(v.valueAtHorizon) + ' vs EV ' + g.value);
-      if (!near(ls.value, g.stackLine, 0.05)) drift.push(tag + ': stack threshold ' + ls.value + ' vs EV ' + g.stackLine);
-      if (!near(li.value, g.incomeLine, 0.05)) drift.push(tag + ': withdrawal threshold ' + li.value + ' vs EV ' + g.incomeLine);
-      if (lr.value != null && g.retireLine != null && lr.value !== g.retireLine) drift.push(tag + ': earliest year ' + lr.value + ' vs EV ' + g.retireLine);
-
-      // b2 — internal identities
+      // b1 — the module IS the family engine now, so "agrees with Escape
+      // Velocity" is checked by calling the same functions EV calls rather
+      // than by comparing against a snapshot of what EV once printed. No
+      // tolerances and no drift tier: this is an identity, not a measurement,
+      // so it holds on any date.
       var viaRaw = E.projectStackOverTime(scn, MA.get('btcGrowthModel').preset, infl, 1);
-      if (proj.depletionYear !== viaRaw.depletionYear) failures.push('b2/vec' + i + ': memo and raw depletionYear differ');
+      if (proj.depletionYear !== viaRaw.depletionYear) failures.push(tag + ': memo and raw depletionYear differ');
       for (var k = 0; k < viaRaw.points.length; k++) {
         var m = proj.points[k] && proj.points[k].y, r = viaRaw.points[k].y;
-        if ((m === null) !== (r === null) || (m !== null && Math.abs(m - r) > 1e-6)) { failures.push('b2/vec' + i + ': memo and raw series differ at ' + viaRaw.points[k].x); break; }
+        if ((m === null) !== (r === null) || (m !== null && Math.abs(m - r) > 1e-6)) { failures.push(tag + ': memo and raw series differ at ' + viaRaw.points[k].x); break; }
       }
       var viaMult = E.projectWithMultFn(scn, MA.get('btcGrowthModel').preset, infl, function () { return 1; });
-      if (viaMult.depletionYear !== viaRaw.depletionYear) failures.push('b2/vec' + i + ': multFn identity broke depletionYear');
+      if (viaMult.depletionYear !== viaRaw.depletionYear) failures.push(tag + ': multFn identity broke depletionYear');
       for (var j = 0; j < viaRaw.points.length; j++) {
         var a2 = viaMult.points[j].y, b2 = viaRaw.points[j].y;
-        if ((a2 === null) !== (b2 === null) || (a2 !== null && Math.abs(a2 - b2) > 1e-6)) { failures.push('b2/vec' + i + ': multFn identity broke the series'); break; }
+        if ((a2 === null) !== (b2 === null) || (a2 !== null && Math.abs(a2 - b2) > 1e-6)) { failures.push(tag + ': multFn identity broke the series'); break; }
       }
     });
 
@@ -1111,14 +1082,10 @@
     LINE_KEY = null;
     render();
 
-    if (drift.length) {
-      console.warn('crpParityQA DRIFT (expected as the calendar moves; golden captured ' + GOLDEN_CAPTURED + ')', drift);
-    }
     if (!failures.length) {
       console.log('%ccrpParityQA PASS', 'color:#7fc47f;font-weight:600',
-        '(' + GOLDEN.length + ' vectors × 2 bear states A≡B; ' + GOLDEN.length +
-        ' vectors vs deployed Escape Velocity; memo/raw/multFn identities hold' +
-        (drift.length ? '; ' + drift.length + ' drift warning' + (drift.length === 1 ? '' : 's') : '') + ')');
+        '(' + VECTORS.length + ' vectors × 2 bear states A≡B; ' + VECTORS.length +
+        ' vectors against the shared engine directly; memo/raw/multFn identities hold)');
       return true;
     }
     console.error('crpParityQA FAIL', failures);

@@ -32,19 +32,15 @@
   var GENESIS = new Date(Date.UTC(2009, 0, 3));
   var liveBtcPrice = TODAY_PRICE;
 
-  function daysSince(date) {
-    return (date.getTime() - GENESIS.getTime()) / (1000 * 60 * 60 * 24);
-  }
-  function plPriceAtDate(date) { return plPrice(daysSince(date)); }
-  function dateForYear(year) {
-    var today = new Date();
-    return new Date(year, today.getMonth(), today.getDate());
-  }
-  function projPriceForGrowth(date, growthModelKey) {
-    var trend = plPriceAtDate(date);
-    if (growthModelKey === 'powerlaw-floor') return trend * PL_FLOOR;
-    return trend;
-  }
+  /* REPOINTED 2026-08-26 to shared/retirement-engine.js (TECH_DEBT §1). This
+     page's loop was the module's source, so its repoint is a pure deletion —
+     nothing here was a superset of anything. Local aliases keep every call
+     site unchanged. */
+  var RE = window.RetirementEngine;
+  var daysSince = RE.daysSince;
+  var plPriceAtDate = RE.plPriceAtDate;
+  var dateForYear = RE.dateForYear;
+  var projPriceForGrowth = RE.projPriceForGrowth;
 
   // Live price ÷ today's trend price — how far below (<1) or above (>=1)
   // trend bitcoin is right now. Drives the gap-persists basis and the
@@ -69,11 +65,7 @@
     incomeBasis: 'today'   // 'today' = target is in today's dollars (default) | 'fixed' = same raw dollars every year
   };
 
-  var LIMITS = {
-    retirementYear:  { min: 2026, max: 2055 },
-    btcStack:        { min: 0.01, max: 100 },
-    targetIncomeUSD: { min: 20000, max: 500000 }
-  };
+  var LIMITS = RE.LIMITS;
 
   // How far past the horizon the shrink branch is allowed to look when
   // answering "on pace to deplete when?" (#6). A cap, not a claim: a stack
@@ -89,47 +81,9 @@
 
   /* ─── The projection. Same loop as the flagship's
          projectStackOverTime, minus the DCA accumulation branch. ─── */
-  function projectStackOverTime(scenario, growthModelKey, inflationPct, priceMultiplier) {
-    var startYear = (new Date()).getFullYear();
-    var endYear = scenario.retirementYear + scenario.yearsInRetirement;
-    var infl = inflationPct / 100;
-    var multiplier = (priceMultiplier === undefined || priceMultiplier === null || !isFinite(priceMultiplier))
-      ? 1 : priceMultiplier;
-
-    var stackBtc = scenario.btcStack;
-    var points = [], btcPoints = [], depletionYear = null;
-
-    for (var y = startYear; y <= endYear; y++) {
-      var d = dateForYear(y);
-      var price = projPriceForGrowth(d, growthModelKey) * multiplier;
-
-      if (y < scenario.retirementYear) {
-        // No contributions on this page: the stack rides the growth model
-        // untouched. Null y keeps the pre-retirement rows out of the
-        // residual series, exactly as the flagship's accumulation rows are.
-        points.push({ x: y, y: null });
-        btcPoints.push({ x: y, btc: stackBtc, usd: null, phase: 'accum',
-          price: price, income: null, btcSold: null, dcaAdded: 0 });
-      } else if (y === scenario.retirementYear) {
-        points.push({ x: y, y: stackBtc * price });
-        btcPoints.push({ x: y, btc: stackBtc, usd: stackBtc * price, phase: 'retire',
-          price: price, income: null, btcSold: null, dcaAdded: 0 });
-      } else {
-        var yearsFromToday = y - startYear;
-        var nominalIncome = (scenario.incomeBasis === 'fixed')
-          ? scenario.targetIncomeUSD
-          : scenario.targetIncomeUSD * Math.pow(1 + infl, yearsFromToday);
-        var btcNeeded = nominalIncome / price;
-        stackBtc = Math.max(0, stackBtc - btcNeeded);
-        if (stackBtc <= 0 && depletionYear === null) depletionYear = y;
-        points.push({ x: y, y: stackBtc * price });
-        btcPoints.push({ x: y, btc: stackBtc, usd: stackBtc * price, phase: 'draw',
-          price: price, income: nominalIncome, btcSold: btcNeeded, dcaAdded: 0 });
-      }
-    }
-    return { points: points, btcPoints: btcPoints, depletionYear: depletionYear,
-             startYear: startYear, endYear: endYear };
-  }
+  /* Engine repointed to shared/retirement-engine.js — bodies deleted, names
+     kept as aliases so every call site on this page is unchanged. */
+  var projectStackOverTime = RE.projectStackOverTime;
 
   /* ─── Memoised projection. Every render runs both price bases plus three
          sensitivity nudges plus ~90 crossing probes; the cache keeps that
@@ -137,18 +91,7 @@
          across a long dragging session. ─── */
   var PROJ_CACHE = Object.create(null);
   var PROJ_CACHE_KEYS = [];
-  function projectMemo(scenario, growthModelKey, inflationPct, multiplier) {
-    var key = [scenario.btcStack.toFixed(6), scenario.targetIncomeUSD, scenario.retirementYear,
-               scenario.yearsInRetirement, scenario.incomeBasis, growthModelKey,
-               inflationPct, (multiplier || 1).toFixed(6)].join('|');
-    var hit = PROJ_CACHE[key];
-    if (hit) return hit;
-    var out = projectStackOverTime(scenario, growthModelKey, inflationPct, multiplier);
-    PROJ_CACHE[key] = out;
-    PROJ_CACHE_KEYS.push(key);
-    if (PROJ_CACHE_KEYS.length > 240) { delete PROJ_CACHE[PROJ_CACHE_KEYS.shift()]; }
-    return out;
-  }
+  var projectMemo = RE.projectMemo;
 
   // One place that maps a price basis onto engine arguments, so the two
   // bases can never diverge in how they are computed. Mirrors the
@@ -158,12 +101,7 @@
   // `noCache` is set by the crossing probes (renderLine): every bisection
   // step is a distinct stack/income value, so caching them would only
   // evict the hot base-and-delta entries that DO repeat.
-  function projectForBasis(scenario, basis, noCache) {
-    var infl = MA.get('inflation').value;
-    var run = noCache ? projectStackOverTime : projectMemo;
-    if (basis === 'current') return run(scenario, 'powerlaw-trend', infl, currentRatio());
-    return run(scenario, MA.get('btcGrowthModel').preset, infl, 1);
-  }
+  var projectForBasis = RE.projectForBasis;
 
   /* ═══════════════════════════════════════════════════════════
      THE VERDICT (design doc §6.1)
@@ -189,80 +127,12 @@
 
   var EPS = 0.01;   // one cent of real value; residuals inside this are flat
 
-  function computeVerdict(proj, scenario, inflationPct) {
-    var startYear = proj.startYear;
-    var infl = inflationPct / 100;
-    var horizonYear = scenario.retirementYear + scenario.yearsInRetirement;
-
-    var years = [], real = [];
-    for (var i = 0; i < proj.points.length; i++) {
-      var p = proj.points[i];
-      if (p.y === null || p.x < scenario.retirementYear) continue;
-      years.push(p.x);
-      real.push(p.y / Math.pow(1 + infl, p.x - startYear));
-    }
-
-    var residuals = [];
-    for (var j = 1; j < real.length; j++) {
-      residuals.push({ year: years[j], value: real[j] - real[j - 1] });
-    }
-
-    var out = {
-      horizonYear: horizonYear,
-      depletionYear: proj.depletionYear,
-      escapeYear: null,
-      residuals: residuals,
-      realSeries: real,
-      years: years,
-      realAtRetirement: real.length ? real[0] : 0,
-      valueAtHorizon: real.length ? real[real.length - 1] : 0,
-      ratio: (real.length && real[0] > 0) ? (real[real.length - 1] / real[0]) : 0
-    };
-
-    // Depletion short-circuits: once the stack is empty every later
-    // residual is exactly zero, which would otherwise read as "escaped".
-    if (proj.depletionYear !== null) { out.state = 'deplete'; return out; }
-    if (!residuals.length) { out.state = 'escape'; out.escapeYear = horizonYear; return out; }
-
-    var lastNegative = null;
-    for (var k = 0; k < residuals.length; k++) {
-      if (residuals[k].value < -EPS) lastNegative = residuals[k].year;
-    }
-    if (lastNegative === null) { out.state = 'escape'; out.escapeYear = residuals[0].year; return out; }
-    if (lastNegative >= horizonYear) {
-      out.state = 'shrink';
-      // The year the stack turned over for good: the first year of the final
-      // unbroken run of negative residuals. "Shrink" does NOT mean losing
-      // ground every year — a stack can grow for two decades, turn over, and
-      // still be falling at the horizon, ending well above where it started.
-      // Copy that says "loses ground every year" would be plainly false in
-      // that case, so the turn year is computed and named instead.
-      var turn = residuals[residuals.length - 1].year;
-      for (var t = residuals.length - 1; t >= 0; t--) {
-        if (residuals[t].value < -EPS) turn = residuals[t].year; else break;
-      }
-      out.turnYear = turn;
-      out.turnedAtStart = (turn === residuals[0].year);
-      return out;
-    }
-    out.state = 'escape';
-    out.escapeYear = lastNegative + 1;
-    return out;
-  }
+  var computeVerdict = RE.computeVerdict;
 
   // Real value of a given scenario at an arbitrary year, for cross-scenario
   // deltas. Always measured at the BASE scenario's horizon year, so a
   // "retire one year later" delta is not silently comparing two dates.
-  function realValueAtYear(proj, year, inflationPct) {
-    var infl = inflationPct / 100;
-    for (var i = 0; i < proj.points.length; i++) {
-      if (proj.points[i].x === year) {
-        var v = proj.points[i].y;
-        return (v === null) ? null : v / Math.pow(1 + infl, year - proj.startYear);
-      }
-    }
-    return null;
-  }
+  var realValueAtYear = RE.realValueAtYear;
 
   /* ─── Which basis is the conservative one is DYNAMIC (§5.2). It flips
          with where spot sits relative to trend, so it is never hard-coded:
@@ -668,13 +538,7 @@
      SENSITIVITY PANEL (§5.3) + AXIS CROSSINGS
   ═══════════════════════════════════════════════════════════ */
 
-  function cloneWith(over, base) {
-    var src = base || SCENARIO;
-    var s = {};
-    for (var k in src) if (Object.prototype.hasOwnProperty.call(src, k)) s[k] = src[k];
-    for (var o in over) if (Object.prototype.hasOwnProperty.call(over, o)) s[o] = over[o];
-    return s;
-  }
+  var cloneWith = RE.cloneWith;
 
   /* ─── Shrink-branch extension (#6). A stack that outlives the horizon while
          still losing ground every year is on a trajectory, and the honest thing
@@ -717,11 +581,7 @@
      disagree with. evParityQA asserts it across the vector set anyway.
   ═══════════════════════════════════════════════════════════ */
 
-  var AXES = {
-    retire: { key: 'retirementYear',  label: 'Retire in',   log: false, higherIsBetter: true  },
-    stack:  { key: 'btcStack',        label: 'Stack',       log: true,  higherIsBetter: true  },
-    income: { key: 'targetIncomeUSD', label: 'Withdrawal',  log: false, higherIsBetter: false }
-  };
+  var AXES = RE.AXES;
 
   /* ─── THE SOLVER. The single implementation of "where is the line on this
          axis". The slider ticks, the where-the-lines text, the consequences
@@ -732,36 +592,7 @@
   // read of the global because the QA pass solves under both bases, and a
   // solver that silently ignored the basis it was asked for produced 22 false
   // failures the first time this assertion ran.
-  function lineFor(axis, scenario, basis) {
-    var infl = MA.get('inflation').value;
-    var useBasis = basis || PRICE_BASIS;
-    function escapes(over) {
-      var s = cloneWith(over, scenario);
-      return computeVerdict(projectForBasis(s, useBasis, true), s, infl).state === 'escape';
-    }
-    if (axis === 'stack') {
-      var ls = LIMITS.btcStack;
-      if (escapes({ btcStack: ls.min })) return { value: ls.min, bound: 'below' };
-      if (!escapes({ btcStack: ls.max })) return { value: null, bound: 'above' };
-      var lo = ls.min, hi = ls.max;
-      for (var i = 0; i < 26; i++) { var m = (lo + hi) / 2; if (escapes({ btcStack: m })) hi = m; else lo = m; }
-      return { value: Math.ceil(hi * 100) / 100, bound: null };   // round UP: the stated value still escapes
-    }
-    if (axis === 'income') {
-      var li = LIMITS.targetIncomeUSD;
-      if (escapes({ targetIncomeUSD: li.max })) return { value: li.max, bound: 'above' };
-      if (!escapes({ targetIncomeUSD: li.min })) return { value: null, bound: 'below' };
-      var lo2 = li.min, hi2 = li.max;
-      for (var j = 0; j < 26; j++) { var m2 = (lo2 + hi2) / 2; if (escapes({ targetIncomeUSD: m2 })) lo2 = m2; else hi2 = m2; }
-      return { value: Math.floor(lo2 / 100) * 100, bound: null };  // round DOWN: the stated value still escapes
-    }
-    // Retirement year is NOT monotone: the stack a plan needs falls as the
-    // year moves out, then rises again once the horizon reaches the
-    // low-real-growth end of the Power Law. Bisection would be wrong. Scan.
-    var ly = LIMITS.retirementYear;
-    for (var y = ly.min; y <= ly.max; y++) { if (escapes({ retirementYear: y })) return { value: y, bound: null }; }
-    return { value: null, bound: 'above' };
-  }
+  var lineFor = RE.lineFor;
 
   function formatLineValue(axis, v) {
     if (axis === 'stack')  return formatBtc(v) + ' BTC';
@@ -818,9 +649,13 @@
                liveBtcPrice].join('|');
     if (key === LINE_KEY) return LINE_CACHE;
     LINE_KEY = key;
-    LINE_CACHE = { stack:  lineFor('stack', SCENARIO),
-                   income: lineFor('income', SCENARIO),
-                   retire: lineFor('retire', SCENARIO) };
+    /* PRICE_BASIS and SCENARIO are passed EXPLICITLY since the repoint. The
+       local lineFor/cloneWith used to default to these page globals; the shared
+       module cannot see them, so every call site that relied on the default now
+       states it. evParityQA did not catch this — it always passed both args. */
+    LINE_CACHE = { stack:  lineFor('stack', SCENARIO, PRICE_BASIS),
+                   income: lineFor('income', SCENARIO, PRICE_BASIS),
+                   retire: lineFor('retire', SCENARIO, PRICE_BASIS) };
     return LINE_CACHE;
   }
 
@@ -981,7 +816,7 @@
         : (b === 'stack' ? [lim.max, lim.max / 4] : [lim.min, lim.min * 2]);
       for (var i = 0; i < probes.length; i++) {
         var over = {}; over[AXES[b].key] = probes[i];
-        if (lineFor(deadAxis, cloneWith(over)).value !== null) {
+        if (lineFor(deadAxis, cloneWith(over, SCENARIO), PRICE_BASIS).value !== null) {
           found.push(b === 'stack' ? 'raise the stack'
                    : b === 'income' ? 'lower the withdrawal'
                    : 'retire later');
@@ -1086,7 +921,7 @@
           return;
         }
         var over = {}; over[row.key] = next;
-        var nudged = cloneWith(over);
+        var nudged = cloneWith(over, SCENARIO);
         var nProj = projectForBasis(nudged, basis);
         var nv = computeVerdict(nProj, nudged, inflationPct);
 
@@ -1094,7 +929,7 @@
         if (nv.state !== baseVerdict.state) {
           clause = '<span class="ev-conseq-flip">' + (nv.state === 'escape' ? 'crosses the threshold' : 'now ' + statePhrase(nv)) + '</span>';
         } else {
-          var lnBefore = L[row.reports], lnAfter = lineFor(row.reports, nudged);
+          var lnBefore = L[row.reports], lnAfter = lineFor(row.reports, nudged, PRICE_BASIS);
           clause = (lnBefore.value !== null && lnAfter.value !== null && lnBefore.value !== lnAfter.value)
             ? 'no flip &mdash; ' + lineMovePhrase(row.reports, lnBefore.value, lnAfter.value)
             : 'no flip';
