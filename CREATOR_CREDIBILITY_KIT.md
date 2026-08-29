@@ -46,9 +46,13 @@ vs. Real Estate, The Power Law, Wait-or-Deploy Now, the Heatmap…).
 | Email / Nostr / X followers | → JM |
 | Notable mentions or chart reshares | → JM |
 
-_For OpenSats-style "impact," qualitative signals count too — a respected Bitcoiner sharing a chart, a
-reader saying a tool changed their thinking. Start collecting testimonials and reshares now; they're
-application gold later._
+_**Re-pointed 2026-08-28** (grant lane retired — `FUNDING_STRATEGY.md`, ruling at the head of the doc).
+This capture loop keeps its full value; only the audience for it changed. Qualitative signals count as
+much as counts — a respected Bitcoiner sharing a chart, a reader saying a tool changed their thinking.
+Start collecting testimonials and reshares now; they are **commercial credibility**: the evidence a
+licensing or platform prospect asks for, the traction slide in a pitch, and the diligence answer to
+"who actually uses this." (Previously framed as OpenSats application material; the grant lane closed
+2026-08-28, but nothing about what is worth capturing changed.)_
 
 ## 3. Channel identity (guidance → JM)
 - **Name/handle:** keep it consistent with the site brand across YouTube, X, Nostr, and Substack — the

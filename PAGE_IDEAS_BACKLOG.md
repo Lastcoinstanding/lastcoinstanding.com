@@ -26,16 +26,145 @@ Captured during the merge pass, because the backlog is now large enough that the
 - **The retirement family is now a named cluster, and its hub trigger has fired (2026-08-21, JM).** Retirement · Stress Test · Escape Velocity are live and Scenario Comparison is specced — four spokes, which is the threshold the cluster-thesis canon set for earning a hub ("family earns a hub before nav grows", recorded at `SITE_GUIDE §49` when EV deliberately shipped with no nav entry at three). Both are filed under the new *Retirement family* section below and are sequenced **together**: the hub decision lands with or immediately after the Comparison page. Note this cluster resolves the opposite way from the collateral/credit one — that cluster was six items that turned out to be six *different kinds of thing* and correctly got no hub; this is four instances of one thing, which is exactly when a hub pays.
 - **The three competing "come back here" surfaces are now resolved (JM, 2026-08-05).** The **dashboard is the single anchor destination**; the **channel-position chip is its site-wide entry point** (ships after the dashboard); the **Gallery highlights strip is closed**, absorbed as the dashboard's "jump back in" row. See the Dashboard entry for the full ruling. (Was: "resolve into one coherent return-visit story before building any of them" — done.)
 
+- **The position-conditioning arc has a fixed sequence (2026-08-28): exhibits → assumption toggles → the Rundown.** Four entries landed together on 2026-08-28 (the Rundown and the iOS research task under *Site & platform*; the two exhibits — rolling out-of-sample fits, and the Narrowing Channel — under the *Power Law cluster*). The ordering is deliberate: **the Rundown should not carry the burden of introducing era-filtering and position-conditioning in one page.** The exhibits are the evidence gate for the toggles (assumption rule 4 — no option without its exhibit), and the toggles are what the Rundown's v1.1 adds. **The refinement `RUNDOWN_DESIGN.md` makes to this, and the reason the Rundown can build in parallel:** the exhibits gate the *toggles*, not the page — Rundown v1 ships with no toggles, no user inputs and no personalization, so it depends on nothing that isn't already live, and the exhibits run as parallel lanes gating v1.1.
+
 ---
 
 ## Open ideas
 
 ### Site & platform
-- [ ] **The Floor — entering at the model's worst case.** (Analysis-led, 2026-08-20. Source: `analysis/2026-08-20-power-law-floor.md`.) The Power Law channel's floor is the site's most-used conservative anchor, but no page examines the floor *itself* — how often it has broken, how deep, and what buying there actually bought. The analysis produced a page-shaped set of findings, including one that cuts against the obvious thesis. **Headline numbers:** the floor has been breached in **10 of 481 samples (2.1%), across 4 episodes**, totalling **72 days of a 5,826-day record (1.2%)**; the deepest breach was **42.6% below the floor** (2010-10-05, ×0.241 trend) and the longest lasted **48 days**. Cycle lows typically bottom at **1.32× the floor** (MAD ±1.18× in log space) — the floor is well *below* where bottoms usually happen. Its exponent is the trend's **by construction** (a constant 0.42× multiple), and empirically the lower envelope is close to parallel but slightly steeper — 5th-percentile quantile slope **5.88** vs the canonical **5.77** — which also means **0.42× is nearer a 2nd-percentile line than a 5th** (a true 5th-percentile floor sits at ~0.46×). Within **24 months** of a floor touch, **3 of 4 instances closed the gap to trend completely and overshot** (130–228%). **The honest complication, and the reason this page would be worth building:** entering within 10% of the floor delivered a median **63.8% CAGR** but only **−0.3% excess** over the trend's own CAGR across the same window — buying the model's worst case did *not* beat the model. That result is dominated by today's position being back at the floor (×0.423), so the page must make the terminal-date sensitivity part of the argument rather than a footnote. Register: this is a both-sides page by nature — the floor is stronger than a 5th percentile and cycle lows respect it, yet timing entries to it bought no measured edge. **Caveat the page must carry:** n=4 floor touches and n=8 cycle lows; partly in-sample (the coefficients were fitted on this history); `PL_DATA` is a 12-day grid, so all breach depths and durations are lower bounds.
+- [x] **The Floor — entering at the model's worst case. SHIPPED 2026-08-22** as `/the-bitcoin-floor` (production package `1306435`, **merged to production via PR #67 as `560529c`**). Fourth page of the Power Law family, shipped after a preview build, four review rounds and JM's walk. Full record: **SITE_GUIDE §50**. Record closed 2026-08-29 — the entry had been left open at ship and was caught by the Phase 0 pass's record check (`RUNDOWN_PHASE0_REPORT.md` §B3). **Live relevance:** the page examines exactly where price is standing now — the Phase 0 report proposes it as a route target from the Rundown's position read, since today's ~0.42× is the third floor visit in the record. Original entry preserved below. (Analysis-led, 2026-08-20. Source: `analysis/2026-08-20-power-law-floor.md`.) The Power Law channel's floor is the site's most-used conservative anchor, but no page examines the floor *itself* — how often it has broken, how deep, and what buying there actually bought. The analysis produced a page-shaped set of findings, including one that cuts against the obvious thesis. **Headline numbers:** the floor has been breached in **10 of 481 samples (2.1%), across 4 episodes**, totalling **72 days of a 5,826-day record (1.2%)**; the deepest breach was **42.6% below the floor** (2010-10-05, ×0.241 trend) and the longest lasted **48 days**. Cycle lows typically bottom at **1.32× the floor** (MAD ±1.18× in log space) — the floor is well *below* where bottoms usually happen. Its exponent is the trend's **by construction** (a constant 0.42× multiple), and empirically the lower envelope is close to parallel but slightly steeper — 5th-percentile quantile slope **5.88** vs the canonical **5.77** — which also means **0.42× is nearer a 2nd-percentile line than a 5th** (a true 5th-percentile floor sits at ~0.46×). Within **24 months** of a floor touch, **3 of 4 instances closed the gap to trend completely and overshot** (130–228%). **The honest complication, and the reason this page would be worth building:** entering within 10% of the floor delivered a median **63.8% CAGR** but only **−0.3% excess** over the trend's own CAGR across the same window — buying the model's worst case did *not* beat the model. That result is dominated by today's position being back at the floor (×0.423), so the page must make the terminal-date sensitivity part of the argument rather than a footnote. Register: this is a both-sides page by nature — the floor is stronger than a 5th percentile and cycle lows respect it, yet timing entries to it bought no measured edge. **Caveat the page must carry:** n=4 floor touches and n=8 cycle lows; partly in-sample (the coefficients were fitted on this history); `PL_DATA` is a 12-day grid, so all breach depths and durations are lower bounds.
 - [ ] **Retrofit WHY-intros to existing interactive pages.** Audit live interactive pages against the Interaction-intent checkpoint (`NEW_PAGE_CHECKLIST` §10.5); add one-to-two-sentence intent ledes wherever a section opens with mechanics only ("drag the slider…") rather than the insight it exists to deliver. Where a page carries several instruments, also check the framing reads as a menu of ways in, not an implied sequence. Likely candidates: the flagship Retirement calculator's slider clusters, Disciplined Rebalancing, Lump-Sum-or-Ladder-In, Bitcoin Portfolio Allocation, How Much Cash. Source: Escape Velocity review, 2026-08-19/20.
 
 - [ ] **Discount-or-Premium era toggle — full record vs modern era.** (JM idea, 2026-08-10.) Add a toggle to `/discount-or-premium`'s duration record letting the reader switch the episode set between the **full record** and a **modern era** (cutoff named on the control, e.g. post-2016), with **both sets shown / comparable**. Motivation surfaced building the dashboard's *Implied reversion rate* tile (SITE_GUIDE §47 v3): the quickest depth-matched resolutions all came from bitcoin's 2010 era, so the full-record "fastest" is not representative of recent behaviour. **The dashboard reversion tile inherits whichever set D-or-P computes** — it ports D-or-P's `scanDurations` verbatim and must keep matching it exactly, so the toggle belongs on D-or-P (the source of truth), and the dashboard follows for free. Scope: name the cutoff, show both eras, keep the "record, not a distribution" honesty.
 
+- [ ] **The Rundown — a position-conditioned decision map ("what does this spot in the
+  channel mean for the questions you're carrying?").** → **promoted 2026-08-28 — design doc
+  `RUNDOWN_DESIGN.md`** (v1 spec; all eight open decisions ruled by JM the same day; the
+  Phase 0 verification report is the next artifact, and JM ratifies it before Phase 1
+  builds).
+  Surfaced 2026-08-28 (JM); refined the same day in discussion. This entry is the
+  requirements capture and supersedes the morning's shorter version. Flagship-scale
+  (retirement-hub-class: design doc, register review, counsel-tier pass). Sequencing:
+  the two gating exhibits (separate entries in the Power Law cluster) ship first; the GA4
+  retention baseline lands before the personalization question is decided. **Refinement the
+  design doc makes to that sequencing:** the exhibits gate the *era-filter toggles* (v1.1),
+  not the page — v1 ships with no toggles, no inputs and no personalization, so it depends
+  on nothing that isn't already live.
+  - **Concept:** one page that reads bitcoin's current channel position and lays out, for
+    each major reader decision — deploy vs. wait, lump sum vs. ladder, borrow against the
+    stack vs. sell, rebalance, DCA, retirement timing — what the historical record on
+    this site says about that decision from a position like today's, routing into the
+    existing tools preconfigured with the current position. WODN-register throughout:
+    "here is what the data suggests, based on the history" — clear guidance that stops
+    short of recommendation.
+  - **The shipped proof the fence holds:** Wait, or Deploy Now? already answers "has
+    waiting paid off from a position like today's" with historical distributions and the
+    cases where waiting won — and reads as education, not signals. The Rundown is that
+    pattern generalized across the decision set. The Dashboard's "Take your position into
+    a tool" row is the routing v0; the Rundown adds the decision framing per row, the
+    evidence-graded context at the current position, and (in v2) persistence.
+  - **Structural skeleton — the Playbook's arc, self-serve:** Step 1, is this real (the
+    premise section); Step 2, what would it do to my situation (the position-conditioned
+    rows); Step 3, what do we do when it falls (the drawdown rows). The same method as the
+    advisor-method Playbook with no advisor in the room. Built on that skeleton, the
+    "self-serve sibling of the licensed method" claim becomes literal architecture.
+  - **Premise gate, with off-ramp — not an agreement filter:** everything on the page is
+    conditional on the power law holding, stated in the first paragraph so every row
+    inherits the conditionality. A reader who hasn't examined that claim is routed to
+    the Power Law page first; a reader who has examined it and rejects it is told
+    plainly this page has nothing for them — the page working, not failing.
+  - **THE COMPLIANCE FENCE — load-bearing above everything else.** The word is *map*,
+    never *recommendation*. Every row: conditional, historical, sourced, counter-case
+    carried — "from positions this far below trend, deployed lump sums have beaten
+    waiting X% of the time; the times it lost, it lost because…" Imperative voice
+    banned; second-person directives banned; the reader always the decider (Rule 2;
+    FINRA 2210; the educational-communication posture that makes the tools cheap for
+    firms to adopt). Structural line to keep wide: a general publication stating what
+    the record shows vs. a surface returning individualized position-keyed direction —
+    the publisher/adviser boundary; design so it is never a close call. Counsel-
+    attention tier: same as the funds-mechanics survey. If the fence can't hold at
+    design time, the page doesn't ship.
+  - **Zone semantics:** zones are descriptive position-states with base rates attached —
+    never action-states. Neutral names only (the rainbow chart's sin is naming zones
+    with verbs). Transitions are events in the record: "crossed below 0.5× trend; the
+    previous N times price entered this region, here is the distribution of what
+    followed — including the visit where it kept falling." Small-N honesty is
+    non-negotiable: show the N, show the spread, never the median alone (Discount, or
+    Premium? models the discipline). Zone-transition events are also the natural iOS
+    widget/notification trigger — that question lives in the app research entry, not
+    here.
+  - **Position, not price — state the yardstick claim precisely:** the page measures
+    price against an independent, slow-moving, falsifiable yardstick (the fitted trend)
+    rather than against its own recent pattern. That moves it out of the chartist genre
+    and into the valuation genre (CAPE-vs-forward-returns kin) — which is also what
+    makes it institutionally legible: platforms treat signal-shaped content as
+    radioactive and valuation-discipline content as distributable. Do NOT claim
+    "divorced from price" (position is price ÷ trend; the defensible claim is the
+    independent yardstick). The skeptic's collapse move — "your yardstick is itself a
+    curve fit to the price series" — is answered by the out-of-sample exhibit, which
+    ships first.
+  - **Model concentration — carry the caveats:** single model, every row; the most
+    power-law-dependent page on the site. Carries a what-would-break-this section
+    (hurdle-rate precedent) and, as the differentiating honesty move, per-row
+    sensitivity notes: does this row's answer survive refitting the exponent on
+    subsamples, or moving the zone edges ±10%? Rows that fail perturbation don't ship.
+  - **Assumption options (era filters) — five design rules from the 2026-08-28
+    discussion:**
+    1. *Bias vs. variance, stated on-page.* The full record is biased — it describes a
+       market that no longer exists; the modern era is representative but sparse —
+       two-ish cycles, so every estimate on it is noisier. No setting is simply "more
+       signal"; the toggle is a wager about which error to hold, and saying so on the
+       page turns the control into an education in non-stationarity.
+    2. *Options may trim expectations; they may never soften the stress.* The evidence
+       is asymmetric: upside excursions have compressed markedly, but the floor edge
+       has not lifted — price sits ~0.43× vs. the 0.42× all-time floor as of this
+       writing (2026-08-28). Era-filter peak multiples and exit-zone expectations
+       freely (trimming there is conservative); floors, drawdown depths, and anything
+       feeding stress/survival math use the full record, always. Tails are rare, and
+       old tails are most of the tail sample.
+    3. *The yardstick never toggles.* One trend, fitted on everything. Era options
+       filter which history counts around it — never refit the curve per user, or
+       position-not-price collapses into fit-your-own-model.
+    4. *No option without its exhibit.* Every toggle traces to a documented structural
+       observation with its own page — evidence-gated, never preference-gated. The two
+       gating exhibits are the Power Law cluster entries below.
+    5. *The toggle states its wager.* When flipping it improves the outlook, the page
+       says so in one sentence: "the modern-era setting raises this plan's success rate
+       from X% to Y%; the difference is your bet that the last two cycles describe the
+       future better than the whole record does." Named failure mode this defends
+       against: a user toggling assumptions until the plan says yes.
+  - **Declining volatility:** enters as a documented observation and an optional
+    assumption under the rules above — never a load-bearing default. Defaults stay at
+    the channel as it stands: 0.42× floor, roughly −73% drawdowns in the record.
+  - **Sticky inputs — defer to v2:** current vs. desired stack, horizon, goals
+    (per-page localStorage, STYLE_GUIDE §6.37, sticky-state precedent on How Much Cash /
+    WDCB). The Gilger 20/80 datapoint and the GA4 retention baseline decide whether
+    returners exist to personalize for; v1 ships as the generic position-conditioned
+    map — most of the value at a fraction of the risk.
+  - **Return-visit ruling collision — decided:** the 2026-08-05 ruling made the Dashboard
+    the SINGLE return-visit anchor. The Rundown is a spoke the anchor routes to — it
+    deepens the anchor, never competes with it — and the consider / don't-consider framing
+    never migrates onto the dashboard itself, whose refusal to editorialize ("not a signal
+    about where they go next") is its credibility. Check `/your-deployment-plan` for
+    overlap before scoping: a shipped page may already own part of this ground. **The
+    design doc carries this as a blocking Phase 0 overlap read, together with Discount or
+    Premium and the Heatmap; the dashboard stays untouched except one routing chip, which
+    ships as its own commit after the Rundown is public.**
+  - **Borrowing row — gate or drop in v1:** timing + leverage + individual circumstance
+    is the most dangerous cell in the grid; March 2020 and October 2025 belong in it
+    before anything encouraging does. **Ruled OUT of v1 by the design doc's scope fences;
+    Bitcoin as Collateral appears in Related only, with no position-conditioned borrowing
+    content anywhere on the page.**
+  - **Research at promotion:** precedent scan for position/regime-conditioned decision
+    support and where each draws the advice line — robo next-best-action prompts,
+    valuation-conditioned allocation content (GMO / Research Affiliates style),
+    target-date glidepath framing, tax-loss-harvesting triggers. JM asked specifically
+    whether personalized recommendation-engine precedent exists; the useful output is
+    the *register* each precedent uses, not the mechanics alone.
+  - **Cross-links:** Dashboard, WODN, Lump Sum or Ladder In, Your Deployment Plan, BAS,
+    Disciplined Rebalancing, How Much Cash, Discount or Premium, Bull & Bear Cycles,
+    the Heatmap, the retirement family.
 - [x] **The Bitcoin Dashboard — the site's return-visit surface. SHIPPED + LIVE 2026-08-10** as **`/dashboard`** (slug `dashboard`), build `fd00ee2` / OG `897fa46`, **merged to production via PR #43 as `8d184bc`** (post-deploy verified: §10 curls + OG `image/jpeg` pass). New page. Strategically the answer to the site's structural weakness (explorations are read-once).
   Surfaced 2026-08-02.
   - **What shipped (v1, anchor-destination only — the chip is a SEPARATE follow-up, explicitly out of scope):** five live-compute-only tiles (channel position via the shared `positionLabel()`; live BTC price via `fetchTodayPrice` with honest provenance; trend price today with floor/upper; below-trend share counted live from `PL_DATA`, not hardcoded; days-to-double + the ~12.76% constant, both from `PL_B`) + a six-link jump-back-in row (absorbs the closed Gallery-highlights idea) that carries today's `?pos=` into the two receivers that already accept it (Wait-or-Deploy, How Much Cash) — no new receiver. ZERO new data sources, zero new monthly-refresh lines (the v1 fence held). No nav slot (`category: hub`); surfaced via a `/calculators` tile + a homepage Latest card only. Channel ribbon suppressed on-page (`channel_ribbon:false`). Full record: **SITE_GUIDE §47**. OG card landed via handback (`897fa46`) and is production-verified (`image/jpeg`). The channel-position chip remains the one open follow-up (OPEN_ITEMS).
@@ -65,6 +194,61 @@ Captured during the merge pass, because the backlog is now large enough that the
   - **Targets:** **TFTC.io** — email capture, weekly cadence, loyalty/re-engagement mechanics. **firebtc.io** — bitcoin-native FIRE site with calculators; note theirs are *purely numerical, no graphs or trend lines*, which is a direct read on our visual differentiation. **satsvsfiat.com** (Joe Bryan) — **testimonials**, the one concrete import candidate already identified.
   - **Output:** research notes + a shortlist of specific mechanics worth importing, each mapped to an existing site surface.
   - **If JM wants to reopen the paid-tier question**, that is a `FUNDING_STRATEGY` amendment and belongs there — not smuggled in via this entry.
+
+- [ ] **iOS app — App Store distribution exploration. Research task, not a build.**
+  Surfaced 2026-08-28 (JM).
+  - **Concept:** pros and cons of an app (iOS-first, possibly only) as a second
+    distribution point — a curated subset of tools, and/or app-specific experiences that
+    web can't deliver. Explicitly a research task; a build decision only follows if the
+    app-native value clears the maintenance cost.
+  - **Research questions:**
+    - Delivery path: installable PWA vs. wrapped web (Capacitor) vs. native — and Apple's
+      Guideline 4.2 minimum-functionality bar, which rejects thin web wrappers. What
+      app-native value earns the listing?
+    - The strongest candidates for app-native value, to price honestly: a home-screen /
+      lock-screen **widget showing channel position** (the return-visit mechanic in its
+      purest form — web cannot do this on iOS), push notifications (powerful and
+      register-sensitive: what would the site even notify about without becoming a
+      signal service? The fence from the freshness-chip work applies), offline access.
+    - Discovery: does App Store search ("bitcoin calculator", "bitcoin retirement")
+      produce meaningful volume? Precedent scan of existing bitcoin edu/calculator apps
+      and their apparent traction.
+    - Apple's current crypto app policies (information/price apps are generally
+      permitted; verify the 2026 state).
+    - Costs: $99/yr developer account; the real cost is the second platform's maintenance
+      tail against the monthly refresh cadence — the same tail that keeps "power law in
+      other metrics" low priority. Weigh a subset-scope (dashboard + 3–4 tools) as the
+      tail-limiting shape.
+  - **Bundle with:** the audience-mechanics research task above (TFTC / firebtc /
+    satsvsfiat) — one distribution-research session, one output doc.
+  - **Kinship:** the Rundown's zone-transition events are the natural notification /
+    widget trigger, and that question lives here rather than in the Rundown entry.
+  - **SHARPENED HYPOTHESIS (JM, 2026-08-28) — the Rundown IS the app.** Not the site
+    wrapped: the position surface shipped native. This replaces "a curated subset of
+    tools" as the working shape and answers the Guideline 4.2 minimum-functionality
+    question with something real rather than a thin wrapper.
+    - **Scope:** a home/lock-screen **widget** carrying the position multiple and zone
+      (per the site's canonical `positionLabel` bands — see `RUNDOWN_PHASE0_REPORT.md`),
+      plus an app body rendering the web Rundown, plus routes out to the full tools.
+      iOS widget refresh budgets suit position's slow cadence in a way they do not suit
+      price widgets — the constraint that kills most price widgets is not binding here.
+    - **Architecture principle — non-negotiable: no engine reimplementation.** The site
+      publishes the canonical fit parameters and zone edges as **one versioned JSON**;
+      the widget computes from it; the app views render the web page. Site and app
+      cannot disagree, by construction. A second implementation of the channel math is
+      the one thing this project must never produce — the mirror-twin lesson
+      (`shared/channel-entries.js`) applies across platforms, not just across pages.
+    - **Register fence — NO price/zone push notifications in v1.** Push reads as a
+      signal regardless of wording; the widget delivers aliveness passively, which is
+      the whole point. **Zone-transition push is parked to v2**, pending a register
+      solution and a counsel look.
+    - **Expectation — a retention channel more than an acquisition one.** App Store
+      search is exchange-dominated, so the site converts readers to installs and the
+      widget retains them. Price the project against retention, not downloads.
+    - **Decision gate:** Rundown web v1 shipped, plus a GA mobile-share and retention
+      baseline. Not before both.
+    - **Side value:** App Store presence as a costly signal for the capability story;
+      a white-label widget as a licensing extension SKU.
 
 - [ ] **Testimonials — credibility surface.** Small build; spun out of the audience research above.
   Surfaced 2026-08-02. Prior art: satsvsfiat.com.
@@ -168,6 +352,50 @@ Captured during the merge pass, because the backlog is now large enough that the
 
 ### Power Law cluster
 
+- [ ] **Rolling out-of-sample fits — when did the power law become reliable?**
+  Surfaced 2026-08-28 (JM's observation: a trend fitted only through 2014 does not
+  project to today's data; fitted through 2017 and later, it does).
+  - **Concept:** fit the trend on data only through year X; project forward; measure the
+    miss. Sweep X across the record. One chart holding the model's early fragility and
+    its later stability in the same frame — the years a believer would have been wrong,
+    and the years the fit held out-of-sample.
+  - **Why it matters:** the data answer to the strongest skeptic move against the whole
+    channel framework — "your yardstick is itself a curve fit to the price series."
+    Both-sides by construction, because it displays the failures prominently. It is
+    also the evidence gate for the Rundown's era-filter options (assumption rule 4):
+    no option without its exhibit.
+  - **Register:** name what would count as the fit degrading again — falsifiability
+    forward, not just backward. State the small number of independent eras plainly.
+  - **Placement decision at promotion:** likely a section on the Power Law page rather
+    than a standalone — it strengthens the page every Rundown row depends on.
+  - **Build-on-existing note:** Power Law v2 already shipped a draggable training-cutoff
+    OOS chart with presets (end-2014/2016/2017/2020/2023) and an in-browser refit,
+    deep-linkable via `?fit=YYYY-MM`; the end-2014 preset already reproduces the
+    documented bad fit (b=6.787). This exhibit is the *swept, measured* version of that
+    interaction — the miss quantified across every cutoff rather than explored one at a
+    time — so scope it against what v2 already computes rather than from scratch.
+
+- [ ] **The Narrowing Channel — amplitude compression as an exhibit.**
+  Surfaced 2026-08-28.
+  - **Concept:** residual spread (distance from trend) over time. The visible story:
+    the upside excursions of the early regime have not recurred in years — the tops
+    have compressed. The maturation case stated; the counterpoints carried at equal
+    weight: a small N of cycles, the October 2025 leverage cascade, and the standing
+    rebuttal to overclaiming — the floor edge has NOT lifted, with price at ~0.43× vs.
+    the 0.42× all-time floor as of this writing (2026-08-28).
+  - **The asymmetry IS the finding:** compression is real on the top edge and absent on
+    the bottom edge. This is the evidence behind the Rundown's "options trim
+    expectations, never soften the stress" rule — the exhibit exists so that rule is
+    data, not caution.
+  - **Data note before ship — BLOCKING:** reconcile the historical maximum trend-multiple
+    (JM cites ~5× early spikes) with the channel's stated 3× upper band — likely a
+    definition-window question (which era the band edges were measured over). Resolve
+    in DATA_AUDIT terms so the exhibit and the dashboard tiles agree.
+  - **Feeds:** the Rundown's optional assumptions (evidence gate) and the volatility
+    conversation site-wide. Never feeds softer stress-test defaults.
+  - **Placement decision at promotion:** standalone exhibit vs. a Power Law page
+    section; either way it cross-links Bull & Bear Cycles and the Heatmap, which
+    already show the compression informally.
 - [x] **Power Law v2 — a consolidated pass on `/the-power-law`.** Shipped as one pass; sub-items below are kept as the build record.
   **SHIPPED 2026-08-04 &mdash; commit `d492650` (branch `feat/power-law-v2`), all six sub-items in one pass (JM-approved all-six-in-one).** (a) The out-of-sample chart's training cutoff is now a drag handle + preset chips (end-2014/2016/2017/2020/2023, default end-2017); regression, projection and a live readout recompute in-browser and the view is deep-linkable via `?fit=YYYY-MM`. The end-2014 preset reproduces the documented bad fit (b=6.787) and the copy owns it. (b) Exponent survey table + page-local explorer ranking five plottable (a,b) pairs by implied PRICE at 2026/2035/2045/2060 (never by bare exponent); b-only sources (b1m.io 5.566, naive full-series 5.63) listed-not-plotted. (c) Live days-to-double stat strip from `TODAY_DAYS`. (d) Time above/below-trend split computed live from PL_DATA (~43% / ~57%, mean log-dev ≈ 0), framed as candor not confidence (R4). (e) "Two ways the model could break" caveat &mdash; floor breach (down) folded in + Mežinskis's upside break, graded as speculation (R5). (f) Proportionality constant resolved to 12.76% (2^(1/5.77)) / ~12.8% in prose; ~13% kept only as the hero hook. Canonical `PL_A`/`PL_B` untouched and byte-identical (R1) &mdash; everything is page-local and presentation-only. Bookkeeping in the same PR: SITE_GUIDE §11, DATA_AUDIT (survey-pair rows), MONTHLY_REFRESH_CHECKLIST, updates.json. **Deferred at ship (see TECH_DEBT):** live web re-verification of the external survey pairs (BitcoinPower.law, bitcoinretirement.net, b1m.io) and the Mežinskis OOS / upside-break prior-art cites &mdash; coefficient values were taken from this build prompt + in-repo records rather than freshly fetched; re-verify at the 2026-11-02 PL audit. Original capture + method notes follow.
   Surfaced 2026-08-02 (JM, across both batches; several sub-items are refinements of the 2026-07-30 CAGR idea, now folded here).
@@ -448,7 +676,7 @@ _(**Retirement-funds-to-bitcoin mechanics** moved 2026-08-21 to the new **Retire
   - **Sub-topic (in or out):** *why altcoins are stillborn* — see above; leaning out, decide at drafting.
   - **May also absorb:** The Big Long's sub-claim (e), fiat/bitcoin incompatibility — settle the boundary at drafting.
 
-- [x] **Bitcoin's CAGR as the new hurdle rate.** **SHIPPED 2026-08-06** as a standalone page — `/the-bitcoin-hurdle-rate` (build commit `1ab4ea4`; merge SHA TBD at merge). Design `HURDLE_RATE_DESIGN.md`, build order `HURDLE_RATE_BUILD_PROMPT.md`, SITE_GUIDE §45. Both counters below were resolved: (1) risk-adjustment → the access-conditioned hurdle (design §4.3c) — floor-path band + verdict-changing "can the capital wait? / is the business cashflow positive?" gates; Sharpe dropped (needs a project vol the reader lacks). (2) The declining hurdle is the page's spine, not a caveat. The §2.3 cross-page CAGR-window leak was closed in the same PR (the bare "~28%" was on `/bitcoin-fixed-income`, not the retirement page as premised — windowed to a 10–15-yr-forward basis; DATA_AUDIT BFI-1). Original entry preserved below.
+- [x] **Bitcoin's CAGR as the new hurdle rate.** **SHIPPED 2026-08-06** as a standalone page — `/the-bitcoin-hurdle-rate` (build commit `1ab4ea4`, 2026-08-06; **merged to production via PR #40 as `d6b9609`, 2026-08-07**). **v2 — the channel-position view — merged to production `52fc022`, 2026-08-08** (record written at `587a020`); see the separate *Channel-position-aware hurdle* entry below, now closed. **JM re-confirmed the page live 2026-08-28**; the ship dates above are the git record, the 2026-08-28 date is the confirmation, not the ship. Design `HURDLE_RATE_DESIGN.md` (+ `HURDLE_RATE_V2_POSITION_DESIGN.md`), build order `HURDLE_RATE_BUILD_PROMPT.md`, SITE_GUIDE §45. Both counters below were resolved: (1) risk-adjustment → the access-conditioned hurdle (design §4.3c) — floor-path band + verdict-changing "can the capital wait? / is the business cashflow positive?" gates; Sharpe dropped (needs a project vol the reader lacks). (2) The declining hurdle is the page's spine, not a caveat. The §2.3 cross-page CAGR-window leak was closed in the same PR (the bare "~28%" was on `/bitcoin-fixed-income`, not the retirement page as premised — windowed to a 10–15-yr-forward basis; DATA_AUDIT BFI-1). Original entry preserved below.
   Surfaced 2026-08-02.
   - **Concept:** the corporate-finance framing. If bitcoin's trend CAGR is X%, any project or investment returning less than X% destroys value relative to simply holding bitcoin. **This is how a CFO and an allocator actually think** — it makes the bitcoin case in the audience's own native language, with no ideology required.
   - **Explanatory power:** it accounts for treasury-company behaviour (why hold cash, why buy back stock, why issue against the stack) without appeal to conviction — and it generalises the opportunity-cost argument that runs implicitly under most of the site.
@@ -464,7 +692,7 @@ _(**Retirement-funds-to-bitcoin mechanics** moved 2026-08-21 to the new **Retire
   - **Fence:** this is the *general corporate principle* extended. The **MSTR entry owns the single-company examination** — one cross-link each way when that page exists; **no single-security analysis here** (it drags counsel attention onto a page that otherwise needs none).
   - **Home:** most likely a Company-lens deepening of `/the-bitcoin-hurdle-rate` (a third readout or an expanded lens), not a new page — decide at promotion.
 
-- [ ] **Channel-position-aware hurdle — HIGH PRIORITY (hurdle-rate v2).**
+- [x] **Channel-position-aware hurdle — HIGH PRIORITY (hurdle-rate v2). SHIPPED 2026-08-08** as the **opt-in channel-position view** on `/the-bitcoin-hurdle-rate` — **merged to production `52fc022`**, record written at `587a020`. Built exactly as the entry demanded: `posCAGR` (spot→trend) is computed live from today's channel position, never hardcoded, and the view **governs the whole answer** (verdict, all five stat cards, chart), not just the chart. View buttons carry the live position ("From trend (1.0×)" / "From today (0.43×)"); shared y-axis across views; plots from H=3 as an overclaim fence; `?view=trend|position` joins the URL vocabulary (§46), with `?k=` as a review-only position override. Default stays the trend view on comprehension grounds. Full record: SITE_GUIDE §45 + `HURDLE_RATE_V2_POSITION_DESIGN.md` / `HURDLE_RATE_DESIGN.md` §13–§13.2. **Open, non-blocking:** trend-view card 2 mixes trend→trend with spot→floor — a labeling question flagged in §13.2. Original entry preserved below.
   Surfaced 2026-08-06 (JM, v1.1 review; held out of v1).
   - **The idea:** v1's hurdle is trend-to-trend — it ignores where bitcoin sits in the channel when capital is committed. V2 makes **channel position a live input to the hurdle** rather than a header decoration: the page reads the current position and interprets the gap between it and trend **dynamically, whatever the position happens to be**. The hook already exists — the channel ribbon shows position today (`0.43× trend · near the floor`) but nothing downstream of it consumes that number.
   - **Today's instance, for scale (NOT content):** at 0.43× trend, simple reversion implies **220%/yr** if trend is reached within 1yr, **108%** within 2, **79%** within 3, **58%** within 5, **41.1%** within 10. The 10-yr figure is already the "optimistic edge" stat card; the rest aren't shown. **These are an instance, not content** — the feature computes them from live position, so a build that hardcodes today's numbers has missed the point.

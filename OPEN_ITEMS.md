@@ -28,10 +28,19 @@ session automatically. Close items here when done; this file is the "what's cook
   is now the first anchor thread (Aug 6); Discount-or-Premium becomes the week-2 anchor with
   refreshed numbers. The video script half still needs its own date.
 
-- [ ] **OVERDUE (was Aug 3) — Open-source decision call (JM).** Still unresolved per JM
-  (2026-08-05). Critical path was the two reference letters — check outreach status first.
-  Detail: `OPENSOURCE_DECISION_BRIEF.md`. **New interaction to weigh:** the own-job track
-  (`OWN_JOB_STRATEGY.md` §1) — grants and employment substitute more than they stack.
+- [x] **CLOSED-BY-RULING (2026-08-28) — Open-source decision call (JM), and the OpenSats/grant lane
+  with it.** JM ruled: pursue conventional commercial pathways (licensing / platform, fractional),
+  **not** open-sourcing plus small grants. **The code stays proprietary**, which resolves the pending
+  open-source scope question, and the **OpenSats application drafted 2026-08-11 (Aug 24–28 window) is
+  shelved unsubmitted**. The two reference letters are no longer on the critical path for this
+  decision — Tom (Satsback) and Joe Bryan are owed courtesy release notes (JM's action, tracked
+  project-side, not here). The `OWN_JOB_STRATEGY` §1 grants-vs-employment interaction is **moot**:
+  with the grant lane retired there is nothing for employment to substitute against. Full record:
+  `FUNDING_STRATEGY.md` (ruling at the head of the doc; Path 1 retired, lanes reordered).
+  `OPENSOURCE_DECISION_BRIEF.md` and `GRANTS_RESEARCH_KIT.md` become reference material rather than
+  live lanes. **Unchanged by this ruling:** the reader-facing promise — permanently free, ad-free,
+  no funnel, verifiable in the browser. Free-to-use and open-source were always different
+  commitments and the site only ever made the first.
 
 - [x] **DONE (2026-08-10) — Dashboard build (v1, anchor destination). LIVE IN PRODUCTION.** Built as
   **`/dashboard`** on `feat/dashboard-v1` (build `fd00ee2`, OG `897fa46`), **merged via PR #43 as
@@ -143,9 +152,12 @@ Remaining tail:
 ## Next-steps queue (proposed 2026-07-25; amended 2026-08-05)
 
 1. **X strategy playbook — now RUNNING** (WDCB thread Aug 6 = anchor #1; DoP = anchor #2).
-2. **Reference-letter outreach (JM)** — critical path for the open-source decision; weigh against
-   the own-job track's §1 interaction first.
-3. **Geyser page + V4V confirmation (top-10 #4).**
+2. ~~**Reference-letter outreach (JM)** — critical path for the open-source decision.~~ **CLOSED
+   2026-08-28** with the grant lane (above): no longer critical path. Courtesy release notes to the
+   two referees are JM's, tracked project-side.
+3. **Geyser page + V4V confirmation (top-10 #4).** Still available as a zero-strings channel, but
+   **no longer part of a funding lane the strategy depends on** — the 2026-08-28 ruling made the
+   commercial lanes primary. Do it if wanted, not because the plan needs it.
 4. **YouTube pilot video (top-10 #10)** — film from the refreshed script.
 5. **Next build: Retirement scenario comparison (top-10 #8)** — design doc first (after dashboard).
 6. **STRC below-par examination (top-10 #9)** — ✅ **SHIPPED** as `/the-strc-mechanism`, live in production (carousel slide 36). Was stale in this queue — the page deployed before the 2026-08-05 amend.

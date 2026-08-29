@@ -9,7 +9,53 @@ is the **decision**, so a future session starts here rather than re-deriving it.
 
 ---
 
-## Strategic context — JM's revised preference ordering (2026-07-21)
+## RULING 2026-08-28 — the grant lane is retired; the commercial lanes are primary
+
+**This ruling supersedes the 2026-07-21 preference ordering below and reorders the lanes. Everything
+under it is kept as the record of how the decision was reached, not as live guidance — read this
+section first and treat the ordering below as history.**
+
+**The ruling (JM, 2026-08-28).** JM is pursuing conventional commercial pathways to monetize the
+work, not open-sourcing plus small grants. The OpenSats application drafted 2026-08-11 against the
+Aug 24–28 window is **shelved unsubmitted**. The same decision resolves the pending open-source scope
+question: **the code stays proprietary.**
+
+**The lane order, restated:**
+1. **Commercial — licensing / platform, and fractional work.** Primary. These are the lanes the site's
+   work is now being monetized through.
+2. **The bridge model** (educational bridges to best-of-breed bitcoin-only products; for-profit; full
+   control retained) — still live, still governed by `PARTNERSHIPS_REFERRALS_POLICY.md`, which stays
+   the integrity guardrail that must be written before the first link ships.
+3. **Grant-funded independence — RETIRED.** No longer a path being pursued. Geyser / V4V remain
+   available as zero-strings, no-regret channels if JM wants them, but they are not a lane the
+   strategy depends on.
+4. **Nonprofit conversion — still excluded**, on the unchanged grounds below (the costume objection;
+   it forecloses the bridge model). This ruling strengthens rather than weakens that exclusion.
+5. **Asset-management partnership** — unchanged as the least-preferred contingency.
+
+**WHAT THIS DOES NOT CHANGE — the reader-facing commitment is untouched.** The core stays
+**permanently free, ad-free, independent, and never top-of-funnel for a premium service** — nothing
+for sale to the reader, no funnel, everything verifiable in the browser. **Free-to-use and open-source
+are different commitments, and the site only ever made the first.** Retiring the grant lane retires
+the *open-sourcing* that lane required; it does not touch what readers were promised. Any future
+copy or pitch that blurs the two is wrong.
+
+**Why the closure is strategically clean, not merely a loss.** Proprietary Background IP licenses
+*better*: the Named Background IP schedule (`OWN_JOB_STRATEGY` §5) is stronger when the engines are
+not already MIT-licensed to the world, and the acquisition back-pocket option values higher. The
+closure also dissolves the grants-vs-employment optics interaction — one less constraint on the
+commercial motion.
+
+**Consequences inside this doc, marked in place below:** Path 1 (grant-funded / open-source anchor)
+is retired; the "key tension: open-source ⟷ bridge" section is moot — the tension is resolved by
+staying closed; the Decision summary's "decide deliberately: open-source the foundational calculators"
+line is **decided: no**. `GRANTS_RESEARCH_KIT.md` becomes reference material rather than an active
+research lane.
+
+---
+
+## Strategic context — JM's revised preference ordering (2026-07-21) — SUPERSEDED 2026-08-28
+_Kept as the record of the reasoning; the ordering here no longer governs (see the ruling above)._
 This reframe changes the whole calculus below, so it leads. JM's actual preference ordering:
 
 1. **Grant-funded independence at ~$150k/yr (or more)** → JM would then **relax the AM ambition
@@ -35,7 +81,9 @@ and structural grounds.
 
 ## The two viable primary paths
 
-### Path 1 — Grant-funded (open-source is now the anchor, not a "later call")
+### Path 1 — Grant-funded (open-source is now the anchor, not a "later call") — **RETIRED 2026-08-28**
+_Retired by the ruling at the top of this doc: the OpenSats application is shelved unsubmitted and the
+code stays proprietary. Kept for the record of what the lane would have required._
 - **OpenSats (education track) + Spiral** move from *deliberate-later* to **leading candidate for Goal #1**.
   Rationale: they are the most realistic route to *sustained, Bitcoin-native* grant income (they fund
   education contributors at renewable, living-wage-ish levels), and the only reason they were parked —
@@ -71,7 +119,10 @@ and structural grounds.
   - It's also a poor route to *stable personal income* (project-based, competitive, huge admin: board,
     audits, IRS; you'd be a salaried ED, not an owner).
 
-## The key tension to navigate: open-source ⟷ bridge
+## The key tension to navigate: open-source ⟷ bridge — **MOOT 2026-08-28**
+_Resolved by the ruling at the top: the tools stay closed, so the tension does not arise. The
+bifurcation reasoning below is kept because it is the argument for why closed tools cost the bridge
+model little — bridges monetize trust, traffic and curation, not tool-exclusivity._
 The two paths pull opposite ways on one question: the **grant path (OpenSats) wants your tools OPEN**;
 the **bridge path benefits from DIFFERENTIATED tools** (so bridges are uniquely yours). Reconcile by
 **bifurcation:** open-source the *foundational* calculators (unlocks OpenSats) while your
@@ -97,11 +148,12 @@ figure any one grant hands you.
 **Do now (clean, no strings, no regret):** Geyser crowdfunding + V4V/Lightning tips + build reach.
 Pitch framing: keep the core *permanently free, ad-free, independent* — never "top-of-funnel for a
 premium service."
-**Decide deliberately (now a live decision, not "someday"):** open-source the foundational calculators
-to unlock OpenSats/Spiral as the income anchor — bifurcate to keep differentiated explorations
-proprietary. (OpenSats Q3 window ~Aug 31; Spiral rolling.)
-**Develop in parallel:** the bridge model + its partnerships/referrals policy (Path 2 / preferred
-fallback).
+**~~Decide deliberately (now a live decision, not "someday"):~~ DECIDED 2026-08-28 — NO.** ~~open-source
+the foundational calculators to unlock OpenSats/Spiral as the income anchor~~. The code stays
+proprietary; the OpenSats application is shelved unsubmitted and the Q3 window passes unused.
+**Primary now:** the commercial lanes — licensing / platform, and fractional work.
+**Develop in parallel:** the bridge model + its partnerships/referrals policy (Path 2 — now a
+commercial lane in its own right, not a fallback to grants).
 **Exclude:** nonprofit conversion (kills bridges + costume), corporate sponsorships/affiliates (funnel),
 VC/accelerators (dilutive).
 
