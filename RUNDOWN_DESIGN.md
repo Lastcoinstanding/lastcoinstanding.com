@@ -10,8 +10,16 @@ post-merge; green assertions prove only what they cover; SHA-1 in every handback
 _Revision same day: all eight [JM-n] decisions ruled by JM (recorded in §15); the
 live-position hero added per JM's amendment to JM-1 (§2, §3, §11, §13)._
 
+_**Revision 2 — Phase 0 ratified, v1 scope reframed (ruling 2026-08-28; recorded in §16).**
+`RUNDOWN_PHASE0_REPORT.md` was filed and ratified. §16 is now the authoritative statement of
+v1 scope and supersedes §4's zone-taxonomy default, §5's proposed row set, and the parts of
+§1/§10 that fence v1 to the full record. Sections superseded by §16 are marked in place and
+kept as the record of the reasoning — read §16 first. **The premise gate (§7), the live hero
+(§11), the row anatomy (§5), and every gate in §9/§10/§13 are unchanged.**_
+
 _Why v1 can build now despite the exhibits-first sequencing rule: the rule gates the
-**era-filter toggles**, not the page. v1 ships with no toggles (full record only), no user
+**era-filter toggles**, not the page. v1 ships with no toggles (the source engine's record,
+disclosed — see §1 as amended), no user
 inputs, and no personalization — so it depends on nothing that isn't already live. The two
 exhibits (rolling out-of-sample fits; the Narrowing Channel) build in parallel lanes and
 gate v1.1, not v1._
@@ -37,7 +45,13 @@ position does not change" section; a what-would-break-this section; FAQ block; O
 Related block; NEW_PAGE_CHECKLIST in full.
 
 **OUT — hard fences, no exceptions in v1:**
-- Era-filter / assumption toggles. Full record only. Toggles are v1.1, gated on BOTH
+- Era-filter / assumption toggles. ~~Full record only.~~ **AMENDED 2026-08-28 — "the source
+  engine's record, disclosed."** Phase 0 found the shipped engine is *already* era-filtered:
+  `channel-entries.js` sets `TABLE_CUT` at **2014-01-01** and excludes everything before it
+  as the "pre-$15 curiosity era". The fence as written was contradicted by the only engine
+  v1 can compute from. The row set therefore inherits a post-2014 sample and **must say so
+  on the page** — v1 adds no era filter of its own, and does not claim a full-record basis
+  it does not have. Toggles are v1.1, gated on BOTH
   exhibits shipping (backlog Entries 3–4) and governed by the five design rules in the
   backlog entry.
 - Sticky inputs, personalization, saved state of any kind. v2, gated on the GA4 retention
@@ -59,14 +73,21 @@ Order, top to bottom:
    live hero"), the not-a-recommendation line per SITE_GUIDE §13 register canon.
 2. **Position strip** (§3).
 3. **Step 1 — Is this real?** The premise gate (§7).
-4. **Step 2 — What would it do to my situation?** Decision rows R1–R6 (§5).
-5. **Step 3 — What do we do when it falls?** Drawdown block R7 + holding-through-it
-   paragraph (§5).
+4. **Step 2 — What would it do to my situation?** ~~Decision rows R1–R6 (§5).~~ **Per §16:
+   R0 (where this position is, and how thin the record for it is — the third floor visit,
+   live), then R1 as case studies, then R3.**
+5. **Step 3 — What do we do when it falls?** Drawdown block R7 (reduced to
+   depth-and-frequency, §5) + holding-through-it paragraph (§5).
 6. **What this position does not change** (§6).
-7. **What would break this** (§8).
-8. FAQ block (§9).
-9. Related block: Bitcoin as Collateral, the Dashboard, the Power Law page, Discount or
-   Premium, the Heatmap (final list settled at Phase 0 after overlap reads).
+7. **The roadmap — what is not here yet, and why** (§16.2c): rebalancing, retirement timing
+   and selling named as absent, one line each on what would have to exist. A map, growing —
+   never a matrix, padded.
+8. **What would break this** (§8) — carries the sub-floor-continuation scenario that R1's
+   counter-case cross-links to (§5 anatomy 3, as amended).
+9. FAQ block (§9).
+10. Related block: Bitcoin as Collateral, the Dashboard, the Power Law page, **The Bitcoin
+    Floor** (added at Phase 0 — it examines exactly where price is standing now), Discount
+    or Premium, the Heatmap (slug `/heatmap`, not `/the-bitcoin-heatmap`).
 
 ## 3 · The position strip
 
@@ -88,7 +109,17 @@ computes independently.
 is the likely source; the Heatmap second. If an existing taxonomy is found, ADOPT it — one
 site, one zone vocabulary — and report any tension between it and the default below.
 
-**Default proposal if none exists [JM-5]:** five bands on the trend multiple —
+**PHASE 0 ANSWER — a taxonomy exists; the default below is STRUCK (ratified 2026-08-28).**
+The source is not Discount, or Premium? but `positionLabel()` in
+`shared/power-law-data.js` — **six bands on normalized log-space channel position** (0 = the
+0.42× floor, 1 = the 3× upper band), plus three sub-floor gradings, consumed by the
+dashboard, the ribbon, WODN, How Much Cash and Your Deployment Plan. **It is canon; the
+Rundown adopts it unchanged.** Full table and the reported tensions: `RUNDOWN_PHASE0_REPORT.md`
+§12.2, and §16 below. The five-band proposal that follows is kept only as the record of what
+was proposed — **its edges differ from canon (0.5×/0.8× vs. 0.60×/0.85×), so building to it
+would have made every row's sample set disagree with WODN's for the same position.**
+
+~~**Default proposal if none exists [JM-5]:**~~ **STRUCK — five bands on the trend multiple —**
 - **< 0.5× — "Deep Below Trend"**
 - **0.5–0.8× — "Below Trend"**
 - **0.8–1.25× — "Near Trend"**
@@ -99,9 +130,16 @@ Rules regardless of source: names are descriptive position-states, never action-
 no verbs, no "accumulation/euphoria/danger," nothing the rainbow chart would say. The
 palette must not encode buy/sell semantics: no green-below/red-above; use house-neutral
 accents and the luminance gate. Zone edges are analytical choices and therefore subject to
-the sensitivity gate (§10). "Independent visit" needs a stated definition (proposal: a
+the sensitivity gate (§10). ~~"Independent visit" needs a stated definition (proposal: a
 visit ends when price closes outside the band for 30+ consecutive days; Phase 0 may
-propose better from the data — report it).
+propose better from the data — report it).~~ **RESOLVED — the site already defines it, and
+the 30-day proposal is STRUCK (ratified 2026-08-28).** `discount-or-premium.js` builds
+episodes with a **~100-day gap rule**: a gap greater than ~100 days between qualifying
+samples starts a new episode. The Rundown adopts it, so the two pages cannot publish
+different visit counts for the same history. The 30-day proposal was not merely
+unnecessary but wrong against this data — `PL_DATA` is a ~12-day grid whose gaps *inside* a
+single continuous episode reach 96 days, so a 30-day rule would have split one real visit
+into four.
 
 ## 5 · The decision rows
 
@@ -110,17 +148,41 @@ propose better from the data — report it).
    waiting tend to work out better from positions like this?").
 2. *What the record shows from this zone:* N stated, the distribution shown (an outcome
    strip — compact range/dot visualization of the historical outcomes), the spread always
-   visible, never a median alone. Copy pattern: "From the N prior visits to this zone,
+   visible, never a median alone. ~~Copy pattern: "From the N prior visits to this zone,
    deployed lump sums beat waiting over the following 12 months in X of N cases; the
-   spread ran from …% to …%."
+   spread ran from …% to …%."~~ **CORRECTED 2026-08-28 — this pattern does not match the
+   engine.** `bandMetrics()` uses a **two-year** window (`WAIT_CAP`) and measures **coins
+   acquired** (`ratio = p0 / waitPrice`), not a 12-month percentage return. Rows must adopt
+   the engine's actual window and unit or their numbers will not reproduce on the source
+   page. **And where N < 3 the distribution form is banned outright** — see §16's case-study
+   treatment, which is how R1 actually publishes.
 3. *The counter-case, named:* the visits where it went the other way, and why, in a
    sentence ("the exception entered the zone in [period] and kept falling for …").
+   **AMENDED 2026-08-28 — the unanimous-record case.** Phase 0 found that at today's
+   position the record is one-sided (waiting beat deploying in 0 of 26 samples), so there
+   is no counter-case to name and the "no exceptions" rule would otherwise cut a true row.
+   **Where the in-zone record is unanimous, the counter-case is the thinness itself plus
+   the unsampled scenario** — for R1 that is sub-floor continuation — cross-linked to
+   "what would break this" (§8). This is not a weaker counter-case; it is the honest one.
+   **One sentence is mandatory in that construction:** the engine **clamps sub-floor
+   positions to the floor for entry matching** (`matchPos()` in `wait-or-deploy-now.js`),
+   so the record holds **no example of the floor failing** — and that absence is *risk, not
+   evidence*. A row that reports unanimity without that sentence is misreporting a
+   limitation of the sample as a property of the world.
 4. *The route:* one link into the source tool, preconfigured with the current position,
    labeled as exploration ("run this with your own numbers"), never as confirmation.
 5. *Sensitivity status* (build-time; §10).
 6. *Sources:* the source tool + data provenance per house convention.
 
-**Proposed v1 row set [JM-4]:**
+**SUPERSEDED BY §16 (ratified 2026-08-28).** Phase 0 found that R2's ground is owned
+outright by Your Deployment Plan, and that Disciplined Rebalancing, Discount or Premium and
+the Stress Test contain **zero position-conditioning code** — so R4, R5 and R6 cannot be
+computed from an existing engine and fail this section's own feasibility rule. **R2, R4, R5
+and R6 are cut; R1, R3 and a reduced R7 survive.** R6 therefore cuts itself on feasibility
+before its register question is reached, which discharges the "JM decides in/out at Phase 0"
+line below. The table that follows is kept as the record of what was proposed.
+
+~~**Proposed v1 row set [JM-4]:**~~ **SUPERSEDED — see §16:**
 
 | Row | Question | Source engine (Phase 0 verifies feasibility + slug) |
 |---|---|---|
@@ -138,7 +200,14 @@ reasons people sell (need, risk reduction, plan adherence) at full weight, never
 mistakes. JM decides in/out at Phase 0 report.
 
 **Step 3 rows:**
-- R7 — *The drawdown record from this zone:* depth and duration distributions of what
+- **R7 — REDUCED 2026-08-28 to depth-and-frequency.** Duration is not computed by any
+  shipped engine, so the "duration distributions" half is cut rather than approximated.
+  What ships computes from `bandMetrics()` — `ddProb` (share of entries that saw a ≥20%
+  drawdown within two years), `ddDepth` (median depth) and `neverFell` — all conditioned on
+  position and **all already rendered on WODN** (`wdDdProb` / `wdDdDepth`), so every figure
+  is reproducible on a live source page today. The Stress Test remains the route, as a
+  scenario tool, but is **not** the source of these figures. Original spec follows.
+- ~~R7 — *The drawdown record from this zone:*~~ depth and duration distributions of what
   followed entries into this zone; the worst case named, not averaged away; route into the
   Stress Test preconfigured.
 - Holding-through-it paragraph: brief, register-canon, routes to the Stress Test and the
@@ -272,7 +341,12 @@ ship, not before.
 
 ## 12 · Build phases
 
-**Phase 0 — verify and report. No page code before the report is answered.**
+**Phase 0 — COMPLETE (report filed 2026-08-28, ratified 2026-08-28).** Output:
+`RUNDOWN_PHASE0_REPORT.md`. All six items below were run; findings and deviations are in
+§16. **Phase 1 begins only after the ratification PR merges** — not on ratification alone.
+The gate as originally written follows.
+
+~~**Phase 0 — verify and report. No page code before the report is answered.**~~
 1. Overlap reads: Your Deployment Plan, Discount or Premium, the Heatmap. Report: row-set
    implications, proposed final row set, any taxonomy conflict.
 2. Zone taxonomy: existing vocabulary or the §4 default; the independent-visit definition
@@ -347,3 +421,108 @@ that ruling [JM-7].
   batch as parallel lanes; they gate v1.1's toggles, not v1.
 
 The build is unblocked. The next artifact is the Phase 0 report.
+
+## 16 · Phase 0 ratified — the v1 scope reframe (JM, 2026-08-28)
+
+_This section is the authoritative statement of v1 scope. Where it conflicts with §1, §4,
+§5, §10 or §12, this section governs; those sections are marked in place and kept as the
+record of the reasoning. The premise gate (§7), the live hero (§11), the row anatomy (§5,
+as amended), and every gate in §9, §10 and §13 are unchanged._
+
+### 16.1 · Ratified as found
+
+1. **Zone taxonomy:** adopt `positionLabel`'s six bands as canon (JM-5 as ruled). §4's
+   five-band default is struck.
+2. **Independent visit:** adopt the ~100-day episode gap. The 30-day proposal is struck.
+3. **Row cuts stand** as reported — R2 on overlap, R4/R5/R6 on engine feasibility. The
+   survivors stand. **No new engines in v1.**
+4. **Exhibits:** placement as the Phase 0 report proposes — both as sections on the Power
+   Law page.
+5. **Footer** "free, open, verifiable" stands as-is (a site-wide item, recorded here only
+   because the Phase 0 pass raised it).
+
+### 16.2 · The scope ruling — v1 reframes rather than shrinks
+
+Phase 0 reduced the row set from seven to four, which reads as a diminished page only if
+the page is conceived as a matrix of decisions. It is not. **The organizing fact of v1 is
+that bitcoin is in the third floor visit of the record, and it is happening now.** That is
+not a residue left after the cuts; it is a stronger page than the seven-row version, because
+it is the one thing the site can say from this position that nothing else says.
+
+The reframe has three parts, and all three are requirements, not options.
+
+**(a) R1 publishes as case studies, not as a distribution.** §9's N<3 rule fires at today's
+position: the 26 samples the engine returns are **two independent visits** under the
+100-day rule (Aug 2015 – Oct 2016, 21 samples; Nov 2022 – Jan 2023, 5 samples). So R1 does
+not show a distribution and does not show "0 of 26". It **narrates each prior visit in
+full** — entry, depth, duration, and the deploy outcomes at **1, 2 and 4 years** — and then
+shows **the current visit descriptively, in progress**, with no outcome claimed because
+none exists yet. Three visits on the page: two closed, one open. The reader sees the record
+as a record, which is what two data points can honestly support.
+
+Note for the build: the 1/2/4-year outcome horizons are **wider than `bandMetrics()`'s
+two-year `WAIT_CAP`**. The 1yr and 2yr figures come from the shipped engine; the **4yr
+figure does not exist in it**. Computing a 4-year outcome for two named historical entries
+is a direct lookup against `PL_DATA`, not a new conditioning engine, so it is inside the
+no-new-engines fence — but it must be built as a lookup and labelled as one, and it does
+not reproduce on WODN. Where a figure has no source page, the page's own derivation is
+shown inline (§5 anatomy part 6).
+
+**(b) The counter-case, where the record is unanimous, is the thinness plus the unsampled
+scenario.** Specified in full at §5 anatomy part 3 as amended. The mandatory sentence about
+the engine clamping sub-floor positions is load-bearing and is not a caveat: the record
+holds no example of the floor failing, and **that absence is risk, not evidence.** It
+cross-links to §8, "what would break this," which is where the sub-floor-continuation
+scenario belongs.
+
+**(c) The page states its own roadmap.** The decisions that are **not** yet
+position-conditioned anywhere on the site — **rebalancing, retirement timing, selling** —
+are **named as absent**, with one line each on what would have to exist for them to appear.
+They accrete as engines ship. This is the section that makes the reduced row set legible as
+design rather than as omission, and it is also the honest statement of what the site can
+and cannot currently do.
+
+**The governing phrase, and the test every future addition is measured against: a map,
+growing — never a matrix, padded.** A row is added when an engine exists to compute it from
+and its numbers reproduce on a source page. Never to fill the grid.
+
+### 16.3 · The v1 row set as ratified
+
+| Row | Question | Engine | Route |
+|---|---|---|---|
+| **R0** | Where this position is, and how thin the record for it is — the third floor visit, live | `positionLabel` + the 100-day episode count | The Power Law · The Bitcoin Floor |
+| **R1** | Deploy new capital now, or wait for a lower entry? | `bandMetrics()` — case studies per 16.2(a) | Wait, or Deploy Now? → Your Deployment Plan for *how* |
+| **R3** | How much cash to hold against the position? | How Much Cash via `ChannelEntries` | How Much Cash |
+| **R7** | What has followed entries at this position — how often, how deep? | `bandMetrics()` `ddProb` / `ddDepth` / `neverFell` | Stress Test (as a scenario tool, not as the source) |
+
+Plus the roadmap section of 16.2(c), and the §6 "what this position does not change" block,
+which the reframe makes more load-bearing rather than less.
+
+**Cut, with the reason on the record:** R2 (Your Deployment Plan owns the plan mechanics and
+is today-anchored by design); R4, R5, R6 (no position-conditioning engine exists — R4 would
+additionally need user inputs, which v1 forbids).
+
+**R0 is adopted in substance from the scope ruling** — the ruling makes the third floor
+visit the page's organizing fact and requires the roadmap statement, which is what R0 was
+proposed to carry. It is recorded as a row here for the build's convenience; if JM intends
+it as the page's lede rather than as a row, that is a presentation choice and does not
+change what it contains.
+
+### 16.4 · Carried forward into the build
+
+- **`matchPos()` is the highest-risk line in the reuse path.** WODN clamps sub-floor
+  positions to zero for entry matching while leaving the display sub-floor. Bitcoin is
+  sub-floor on today's live-trend reading, so the Rundown must apply the identical clamp or
+  its numbers diverge from WODN's on day one.
+- **The zone label is knife-edge today** — position sits within ±0.01 of the floor
+  boundary, so the label can flip between "near the floor" and "just below the floor" on a
+  ~1% price move. The page needs an answer for the day it flips; the case-study framing of
+  16.2(a) largely supplies one, because a narrated visit does not stop being the third
+  visit when the label moves.
+- **A second position vocabulary exists site-wide** — Discount-or-Premium's
+  discount/at-trend/premium with a 0.95–1.05× dead band, against `positionLabel`'s at-trend
+  band of 0.85–1.20×. Not resolved here; not blocking v1, which uses `positionLabel` only.
+  Recorded so the Rundown is not blamed for the disagreement when it surfaces.
+- **The 3× upper band is a stipulated constant, not an empirical maximum** (record maximum
+  14.01×, June 2011; 8.1% of samples above the band). Nothing in v1 should describe it as a
+  ceiling. A DATA_AUDIT row is proposed in the Phase 0 report §B.
