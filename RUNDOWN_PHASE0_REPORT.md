@@ -1,5 +1,8 @@
 # THE RUNDOWN — PHASE 0 REPORT
 
+> Dated findings record (2026-08-28). Where this report's proposals and the subsequent
+> rulings differ (e.g., R0-as-row), `RUNDOWN_DESIGN.md` §16 is authoritative.
+
 _2026-08-28. Findings, not fixes. Runs `RUNDOWN_DESIGN.md` §12 Phase 0 in full, plus the
 exhibits scoping commissioned alongside it (§B below). No page code was written and none
 should be until JM ratifies this report — §12's gate. Where this report disagrees with the
