@@ -73,21 +73,26 @@ Order, top to bottom:
    live hero"), the not-a-recommendation line per SITE_GUIDE §13 register canon.
 2. **Position strip** (§3).
 3. **Step 1 — Is this real?** The premise gate (§7).
-4. **Step 2 — What would it do to my situation?** ~~Decision rows R1–R6 (§5).~~ **Per §16:
-   R0 (where this position is, and how thin the record for it is — the third floor visit,
-   live), then R1 as case studies, then R3.**
+4. **Step 2 — What would it do to my situation?** ~~Decision rows R1–R6 (§5).~~ **Per §16,
+   three parts in this order:**
+   1. **Opening block — the third floor visit** (§16.3a). The organizing fact, with the
+      prior two visits named by date, depth and duration. Placed **immediately after the
+      premise gate and before the decision rows**, so the historical framing inherits the
+      gate's conditionality rather than standing on its own. **A framing block, not a row —
+      the six-part anatomy (§5) does not apply to it.**
+   2. **The decision rows:** R1 as case studies, then R3 (§16.3).
+   3. **Coda — the roadmap** (§16.3b). After the last row: what is not here yet, named as
+      absent because nothing on the site yet conditions it on position, accreting as
+      engines ship. A map, growing — never a matrix, padded.
 5. **Step 3 — What do we do when it falls?** Drawdown block R7 (reduced to
    depth-and-frequency, §5) + holding-through-it paragraph (§5).
 6. **What this position does not change** (§6).
-7. **The roadmap — what is not here yet, and why** (§16.2c): rebalancing, retirement timing
-   and selling named as absent, one line each on what would have to exist. A map, growing —
-   never a matrix, padded.
-8. **What would break this** (§8) — carries the sub-floor-continuation scenario that R1's
+7. **What would break this** (§8) — carries the sub-floor-continuation scenario that R1's
    counter-case cross-links to (§5 anatomy 3, as amended).
-9. FAQ block (§9).
-10. Related block: Bitcoin as Collateral, the Dashboard, the Power Law page, **The Bitcoin
-    Floor** (added at Phase 0 — it examines exactly where price is standing now), Discount
-    or Premium, the Heatmap (slug `/heatmap`, not `/the-bitcoin-heatmap`).
+8. FAQ block (§9).
+9. Related block: Bitcoin as Collateral, the Dashboard, the Power Law page, **The Bitcoin
+   Floor** (added at Phase 0 — it examines exactly where price is standing now), Discount
+   or Premium, the Heatmap (slug `/heatmap`, not `/the-bitcoin-heatmap`).
 
 ## 3 · The position strip
 
@@ -374,9 +379,23 @@ that ruling [JM-7].
 ## 13 · Acceptance criteria
 
 1. Zero user inputs anywhere on the page.
-2. Every number reproducible on its source tool's page (test matrix = §5 table).
-3. Every historical claim shows N; every distribution shows spread; no N<3 statistics.
-4. Every row carries its counter-case.
+2. Every number reproducible on its source tool's page (test matrix = §5 table) — **except
+   numbers in the §16.2a exception class, which must satisfy all four of its conditions,
+   appear by name in that section's exception register, and still pass a re-derivation from
+   `PL_DATA` to the displayed precision. The exception is from source-tool reproduction,
+   never from verification. The register holds one entry in v1; a number not named there
+   has no exception.**
+2a. **Method consistency within a row (§16.2a):** all horizon figures in a case study
+   compute by the same entry-anchored lookup — no mixing of `bandMetrics()` outputs and
+   lookups in one narrative. The row states that it answers a different question than
+   WODN's pooled view, and the WODN route is labelled as the pooled exploration, **not** as
+   verification.
+3. Every historical claim shows N; every distribution shows spread; no N<3 statistics —
+   **and where N<3, the case-study treatment of §16.2a replaces the distribution.**
+4. Every row carries its counter-case — **or, where the in-zone record is unanimous, the
+   §5 anatomy-3 substitute (the thinness plus the unsampled scenario), including the
+   mandatory sub-floor-clamp sentence.** The two framing blocks of §16.3 are not rows and
+   this criterion does not apply to them.
 5. No banned words (§11 live list + §9 page-specific list); imperative grep clean.
 6. No additions to MONTHLY_REFRESH_CHECKLIST; no new external data dependencies.
 7. Sensitivity gate run per row; failing rows absent; report filed.
@@ -460,13 +479,42 @@ shows **the current visit descriptively, in progress**, with no outcome claimed 
 none exists yet. Three visits on the page: two closed, one open. The reader sees the record
 as a record, which is what two data points can honestly support.
 
-Note for the build: the 1/2/4-year outcome horizons are **wider than `bandMetrics()`'s
-two-year `WAIT_CAP`**. The 1yr and 2yr figures come from the shipped engine; the **4yr
-figure does not exist in it**. Computing a 4-year outcome for two named historical entries
-is a direct lookup against `PL_DATA`, not a new conditioning engine, so it is inside the
-no-new-engines fence — but it must be built as a lookup and labelled as one, and it does
-not reproduce on WODN. Where a figure has no source page, the page's own derivation is
-shown inline (§5 anatomy part 6).
+**The `WAIT_CAP` exception — accepted and hardened into a rule (JM, 2026-08-28).** The
+1/2/4-year outcome horizons are **wider than `bandMetrics()`'s two-year `WAIT_CAP`**, so the
+4-year figure does not exist in any shipped engine. It is a direct entry-anchored lookup
+against `PL_DATA` — not a new conditioning engine, so it sits inside the no-new-engines
+fence — but it does not reproduce on WODN. Rather than wave it through, it defines an
+exception class with four conditions, ALL of which must hold:
+
+> **(a)** No shipped tool computes the number.
+> **(b)** The derivation is **plain arithmetic on canonical data** — no parameters, no
+> modeling. (A number that needs a fitted parameter or a modeling choice is not in this
+> class and does not ship.)
+> **(c)** The method is **stated on-page**, in the row's sources line (§5 anatomy part 6).
+> **(d)** The consistency test (§10) **applies to the stated method exactly** — re-derive
+> from `PL_DATA` and match to the displayed precision. The exception is from
+> *source-tool reproduction*, never from verification.
+
+**The exception register. v1 holds exactly one entry: this one** — the entry-anchored
+horizon lookup for R1's case studies. Any future exception is added here by name, or it is
+not an exception. An empty-looking register is the point: it is a list, so it can be seen
+to be short.
+
+**Method consistency within a row — the rule that matters more than the exception.** All of
+a case study's horizon figures — **1y, 2y and 4y** — compute by the **same entry-anchored
+lookup**. Never mix `bandMetrics()` outputs and lookups inside one narrative, *even where
+the 1y and 2y figures could legitimately come from WODN.* A visit narrated from its own
+entry date and a pooled band statistic are answers to different questions, and splicing
+them would produce a row whose numbers are individually defensible and collectively
+incoherent.
+
+Two consequences the build must carry on-page:
+
+- **The row states the difference in question**, in its own words: *WODN pools every
+  in-zone sample; this narrates each visit from its entry date.*
+- **The WODN route is labelled as the pooled exploration, not as verification.** It is
+  where the reader goes to see the whole band; it is not the place their eye is sent to
+  check these figures, because it will not match them and should not.
 
 **(b) The counter-case, where the record is unanimous, is the thinness plus the unsampled
 scenario.** Specified in full at §5 anatomy part 3 as amended. The mandatory sentence about
@@ -486,27 +534,44 @@ and cannot currently do.
 growing — never a matrix, padded.** A row is added when an engine exists to compute it from
 and its numbers reproduce on a source page. Never to fill the grid.
 
-### 16.3 · The v1 row set as ratified
+### 16.3 · The v1 row set, and the two blocks that frame it
+
+**R0 does not exist as a row — the wrapper comes off (JM, 2026-08-28).** What was proposed
+as R0 splits into two blocks that bracket the decision rows. **The content is unchanged from
+what R0 carried; placement is the only change**, and neither block is subject to the §5
+six-part anatomy.
+
+**(a) The opening block of Step 2 — the third floor visit.** The organizing fact, with the
+prior two visits named by **date, depth and duration**. It sits **immediately after the
+premise gate and before the first decision row**, so the historical framing **inherits the
+gate's conditionality** instead of standing as an independent claim — the whole reason it is
+a framing block rather than the page's lede. Computed from `positionLabel` + the 100-day
+episode count. Routes: The Power Law · The Bitcoin Floor.
+
+**(b) The coda of Step 2 — the roadmap.** After the last decision row: rebalancing,
+retirement timing and selling **named as absent**, because nothing on the site yet
+conditions them on position, with one line each on what would have to exist. They accrete as
+engines ship. This is what makes the reduced row set legible as design rather than omission.
+**A map, growing — never a matrix, padded.**
+
+**The rows themselves:**
 
 | Row | Question | Engine | Route |
 |---|---|---|---|
-| **R0** | Where this position is, and how thin the record for it is — the third floor visit, live | `positionLabel` + the 100-day episode count | The Power Law · The Bitcoin Floor |
 | **R1** | Deploy new capital now, or wait for a lower entry? | `bandMetrics()` — case studies per 16.2(a) | Wait, or Deploy Now? → Your Deployment Plan for *how* |
 | **R3** | How much cash to hold against the position? | How Much Cash via `ChannelEntries` | How Much Cash |
 | **R7** | What has followed entries at this position — how often, how deep? | `bandMetrics()` `ddProb` / `ddDepth` / `neverFell` | Stress Test (as a scenario tool, not as the source) |
 
-Plus the roadmap section of 16.2(c), and the §6 "what this position does not change" block,
-which the reframe makes more load-bearing rather than less.
+Plus the §6 "what this position does not change" block, which the reframe makes more
+load-bearing rather than less.
 
 **Cut, with the reason on the record:** R2 (Your Deployment Plan owns the plan mechanics and
 is today-anchored by design); R4, R5, R6 (no position-conditioning engine exists — R4 would
 additionally need user inputs, which v1 forbids).
 
-**R0 is adopted in substance from the scope ruling** — the ruling makes the third floor
-visit the page's organizing fact and requires the roadmap statement, which is what R0 was
-proposed to carry. It is recorded as a row here for the build's convenience; if JM intends
-it as the page's lede rather than as a row, that is a presentation choice and does not
-change what it contains.
+**So Step 2 reads: framing block → R1 → R3 → coda.** Two rows, bracketed. The page is a
+position read that opens with the record it is standing in and closes by naming what it
+cannot yet say.
 
 ### 16.4 · Carried forward into the build
 
