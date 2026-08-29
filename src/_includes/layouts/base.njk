@@ -96,20 +96,24 @@ a:not([class]):hover { text-decoration-color: #e09422; }
 .site-nav .brand { display: inline-flex; align-items: center; gap: 0.5em; }
 .site-nav .brand-mark { height: 1.5em; width: auto; flex: none; display: block; }
 .site-nav .brand-word { display: inline-block; }
-/* The tablet band, and why the mark steps aside in it.
-   The desktop nav row has no headroom: the wordmark ALREADY wraps to two lines
-   below ~880px WITHOUT the mark, growing the nav 58px -> 75px, and several
-   pages hardcode sticky offsets against the single-line height (SITE_GUIDE
-   §47). The mark adds ~42px to the brand and so would move that existing
-   break point out to ~920px — a 40px-wider band of broken nav, which is a
+/* The mid-width band, and why the mark steps aside in it.
+   MEASURED ON THE DEPLOYED SITE, not inferred: the desktop nav row has no
+   headroom. The wordmark ALREADY wraps to two lines somewhere between 900px
+   and 1000px WITHOUT the mark, growing the nav 65px -> 90px, and several pages
+   hardcode sticky offsets against the 65px single-line height (SITE_GUIDE §47).
+   Adding the mark costs the brand ~42px and moves that break point out to
+   between 1040px and 1060px — roughly 100px more of broken nav, which is a
    regression this project has no mandate to ship.
-   So between the hamburger breakpoint (769px) and 920px the mark hides and the
-   nav keeps exactly today's geometry. Above 920px there is room; at or below
-   768px the links are already a hamburger and the brand has the row to itself.
-   This is a fence around a KNOWN defect, not a fix for it — the real fix is the
-   nav-capacity project (PAGE_IDEAS_BACKLOG, "Desktop nav capacity"), which owns
-   the collapse-the-wordmark-to-the-mark decision. */
-@media (min-width: 769px) and (max-width: 920px) {
+   So the mark is shown only where it demonstrably fits: at or below 768px the
+   links are already a hamburger and the brand has the row to itself (measured
+   at 375px: no wrap, 75px of clearance to the hamburger), and at 1100px and up
+   there is room with 40px of margin over the measured threshold. Between them
+   it hides, and the nav keeps exactly today's geometry.
+   This fences a KNOWN defect; it does not fix it. The fix — collapsing the
+   wordmark to the mark so both always fit — belongs to the nav-capacity
+   project (PAGE_IDEAS_BACKLOG, "Desktop nav capacity + The Dashboard entry"),
+   which owns that decision and carries the measurement table for it. */
+@media (min-width: 769px) and (max-width: 1099px) {
   .site-nav .brand-mark { display: none; }
 }
 .site-nav .nav-links { display: flex; gap: 8px; align-items: center; }
