@@ -1,0 +1,254 @@
+---
+layout: base.njk
+permalink: /the-rundown.html
+slug: the-rundown
+feedback: false
+related:
+  - slug: the-power-law
+    desc: "The model everything here is conditional on. The channel, the coefficients, the fit and the limits are stated there in full — including what would break it. That examination comes before this page, not after."
+  - slug: the-bitcoin-floor
+    desc: "The lower edge of the channel, examined on its own: how often it has been tested, how deep, and what entering near it actually bought. It owns the floor's own tripwire — the published criterion that would count as the model breaking."
+  - slug: wait-or-deploy-now
+    desc: "The pooled view of the deploy-or-wait record — every sample the engine matches to a position, taken as one set, with the position slider under the reader's own hand."
+  - slug: your-deployment-plan
+    desc: "Once the deploy-or-wait question is settled, this is the page that models how: lump, ladder or hybrid, for a specific sum and horizon. It owns the plan mechanics; this page does not duplicate them."
+  - slug: how-much-cash
+    desc: "The same channel record read from the opposite side — a holder deciding how much cash to carry against the position, rather than a cash holder deciding whether to deploy."
+  - slug: dashboard
+    desc: "The same live channel position read across ten stats rather than one, with no decision framing attached. The dashboard is where the position is reported; this page is where the record for it is."
+faq:
+  - q: "Is this page telling me what to do?"
+    a: "No. Every section shows what the historical record says about a decision from positions like today&rsquo;s &mdash; how often each path worked out, by how much, and the times it didn&rsquo;t. Which path fits a particular situation, horizon and tolerance is the reader&rsquo;s to decide; the tools linked in each section exist so it can be tested with real numbers. The page also takes no inputs at all, which is deliberate: it never knows anything about the reader, so nothing on it can be addressed to one."
+  - q: "How is this different from technical analysis?"
+    a: "Technical analysis reads price against its own recent pattern. This page measures price against an independent yardstick &mdash; the long-run power law trend &mdash; the way equity investors measure price against earnings. The yardstick moves slowly, is fitted on the whole record, and is falsifiable: the Power Law page states what would break it. Whether that yardstick deserves trust is examined there, not assumed here."
+  - q: "Why do some sections show only two past cases?"
+    a: "Because only two exist. Price has come to the floor three times in the modern record, and the third time is happening now, so it has no outcome yet. Two closed cases is not enough to compute a distribution from, and this page does not pretend otherwise: rather than publishing a median or a hit rate over two data points, it narrates each visit in full and says plainly that two visits is not a base rate. Where a pooled figure across many samples is shown, it is labelled as pooled and kept separate from the case studies."
+  - q: "Why does the page say it has nothing for me if I reject the power law?"
+    a: "Because it is accurate rather than dismissive. Every figure here is conditional on the channel being a real long-run structure. A reader who has examined that claim and rejected it is not being told they are wrong &mdash; they are being told this particular map is drawn on a projection they do not accept, which makes it the wrong map for them. That is the page working as designed. The examination itself lives on the Power Law page."
+  - q: "Why is there nothing here about borrowing against bitcoin?"
+    a: "Because timing, leverage and individual circumstance together make the most dangerous combination on the site, and this page deliberately does not condition borrowing on channel position. Bitcoin as Collateral covers what borrowing against a stack involves, on its own terms and without a position attached. That separation is a design decision, not an oversight."
+  - q: "Do the numbers here match the tools they link to?"
+    a: "The pooled figures do, exactly &mdash; they come from the same shared engine Wait-or-Deploy and How Much Cash publish from. The case studies do not, and are not meant to: they follow one named entry date forward through the record, which is a different question from the pooled one those tools answer. Each is labelled where it appears, and the method behind the case studies is stated in full in the sources line beneath them."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/the-rundown-head.html' %}"
+  page_styles: "{% include '_pageassets/the-rundown.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/channel-entries.js' %}\n{% include '_pageassets/the-rundown.js' %}"
+---
+
+<section class="hero">
+  <h1>The <em>Rundown</em></h1>
+
+  {#- §11 THE LIVE HERO. The H1 is static; the standfirst carries the live
+      position. The markup below is the no-JS / pre-hydration fallback and it
+      carries NO NUMBER — never a placeholder, never a loading numeral. The
+      script replaces it whole. The reserved min-height on .rd-standfirst keeps
+      the swap from shifting layout (§13.13). -#}
+  <div class="rd-standfirst" id="rdStandfirst">
+    Bitcoin&rsquo;s position in its long-run channel &mdash; and what positions like it have meant, decision by decision.
+  </div>
+
+  {#- §3 THE POSITION STRIP. One engine call, two render targets: this strip
+      and the standfirst above read the same computation. -#}
+  <div class="rd-strip">
+    <div class="rd-strip-grid">
+      <div class="rd-strip-cell"><span class="rd-strip-k">Price</span><span class="rd-strip-v" id="rdStripPrice">&mdash;</span></div>
+      <div class="rd-strip-cell"><span class="rd-strip-k">Trend price today</span><span class="rd-strip-v" id="rdStripTrend">&mdash;</span></div>
+      <div class="rd-strip-cell"><span class="rd-strip-k">Position</span><span class="rd-strip-v" id="rdStripMult">&mdash;</span></div>
+      <div class="rd-strip-cell"><span class="rd-strip-k">Zone</span><span class="rd-strip-v" id="rdStripZone">&mdash;</span></div>
+      <div class="rd-strip-cell"><span class="rd-strip-k">Floor visit began</span><span class="rd-strip-v" id="rdStripSince">&mdash;</span></div>
+      <div class="rd-strip-cell"><span class="rd-strip-k">Prior visits on record</span><span class="rd-strip-v" id="rdStripVisits">&mdash;</span></div>
+    </div>
+
+    <div class="rd-bar" role="img" aria-label="Where price sits between the channel floor and the trend line">
+      <div class="rd-bar-track">
+        <div class="rd-bar-tick" id="rdTickFloor"><span class="rd-bar-tick-label">Floor<em>0.42&times;</em></span></div>
+        <div class="rd-bar-tick" id="rdTickTrend"><span class="rd-bar-tick-label">Trend<em>1.00&times;</em></span></div>
+        <div class="rd-bar-marker" id="rdBarMarker"><span class="rd-bar-marker-label">today</span></div>
+      </div>
+    </div>
+
+    <p class="rd-prov" id="rdProv"></p>
+  </div>
+</section>
+
+<div class="content-area">
+
+  {% include 'components/tool-framing.njk' %}
+
+  <!-- ══════════ STEP 1 · IS THIS REAL? ══════════ -->
+  <section class="rd-section" id="the-premise">
+    <div class="rd-step">Step one</div>
+    <h2>Is this <em>real</em>?</h2>
+
+    <div class="rd-gate">
+      <p>Everything on this page is conditional, and the condition comes first. What follows reads bitcoin&rsquo;s current position in its long-run power law channel and shows what the historical record has said from positions like it. If the power law does not hold, none of it means anything.</p>
+      <p>The model, its fit, and what would break it are examined on <a href="/the-power-law">the Power Law page</a>. For a reader who has not made that examination, it comes before this page rather than after.</p>
+      <p>For a reader who has made it and rejected the model, this page has nothing to offer &mdash; and that is the page working as designed. A map drawn on a projection you reject is not your map. For a reader who accepts it, holding it loosely is still the better posture: the record below includes the times the pattern bent, and <a href="#what-would-break-this">the section at the bottom</a> names what would break it.</p>
+    </div>
+  </section>
+
+  <!-- ══════════ STEP 2 · WHAT WOULD IT DO TO MY SITUATION? ══════════ -->
+  <section class="rd-section" id="the-record">
+    <div class="rd-step">Step two</div>
+    <h2>What would it do to my <em>situation</em>?</h2>
+
+    {#- §16.3a THE OPENING BLOCK — a framing block, not a row. The six-part
+        anatomy does not apply. It sits after the premise gate and before the
+        first row so the historical framing inherits the gate's conditionality
+        rather than standing as an independent claim. -#}
+    {#- Live-computed lede. It must NOT be static: whether price is at the floor
+        right now is a fact that changes, and the sampled record runs up to a few
+        weeks behind live spot. A hardcoded "price is at the floor" sentence goes
+        false without anyone noticing. The fallback below carries no number and
+        no claim about where price is today. -#}
+    <p class="rd-lede" id="rdVisitLede">The channel&rsquo;s floor is the position this page opens from &mdash; the record of what has happened there comes before any decision taken from it.</p>
+
+    <p>A visit here is counted the way the rest of the site counts one: an episode in which price came within 1% of the 0.42&times; floor or below it, with a gap of more than about 100 days starting a new episode. That gap rule is not invented for this page &mdash; it is the same rule <a href="/discount-or-premium">Discount, or Premium?</a> uses to separate episodes, adopted here so the two pages cannot report different visit counts for the same history. There is a fourth episode, in the autumn of 2010, and it is left out on purpose: no mature exchange, negligible liquidity, a price in cents. <a href="/the-bitcoin-floor">The Bitcoin Floor</a> records it once and gives it no weight, and so does this page.</p>
+
+    <div class="rd-visits" id="rdVisits"></div>
+
+    <p class="rd-note">Durations are lower bounds. The price series behind every figure here is a roughly 12-day grid rather than a daily close, so an episode measured at 48 days was at least 48 days and may have been longer.</p>
+
+    <!-- ── R1 ── -->
+    <div class="rd-row" id="row-deploy">
+      <p class="rd-row-q">There is capital to deploy. Has deploying at a position like this one worked out better than waiting for a lower entry?</p>
+
+      <div class="rd-row-part">
+        <span class="rd-part-k">What the record shows &mdash; the two closed visits</span>
+        <p>Both closed visits are narrated above, each followed forward from its own entry date to one, two and four years. Neither is a distribution and neither is presented as one: two cases cannot support a median, a hit rate, or a spread, and this page does not compute one from them. Where the fourth year has not arrived yet, the table says so rather than estimating it.</p>
+      </div>
+
+      <div class="rd-row-part">
+        <span class="rd-part-k">The pooled view, kept separate</span>
+        <p id="rdR1Pooled"></p>
+        <p class="rd-note">That pooled figure answers a different question from the case studies above: it takes every sample the engine matches to this position as one set, rather than following two named visits forward. The two are kept apart deliberately &mdash; splicing them would produce numbers that are individually defensible and collectively incoherent.</p>
+      </div>
+
+      <div class="rd-row-part">
+        <span class="rd-part-k">The counter-case</span>
+        <p id="rdR1Counter"></p>
+      </div>
+
+      <div class="rd-row-part">
+        <span class="rd-part-k">Sensitivity</span>
+        <p>The pooled reading survives moving the matching band 10% in either direction, and holds at every position tested inside this zone. The visit count survives moving the 1% floor-graze threshold 10% either way. Both checks are recorded in the Phase&nbsp;0 report rather than being asserted here.</p>
+      </div>
+
+      <div class="rd-row-part">
+        <span class="rd-part-k">Where to take it</span>
+        <p><a class="rd-route" href="/wait-or-deploy-now">Wait, or Deploy Now? &rarr;</a></p>
+        <p class="rd-route-note">That page is the pooled record with the position slider under your own hand &mdash; the exploration, not a check on the case studies above. Its figures will not match them, because it is answering the pooled question. For how to deploy once that is settled &mdash; lump, ladder or hybrid &mdash; <a href="/your-deployment-plan">Your Bitcoin Deployment Plan</a> owns that ground.</p>
+      </div>
+
+      <div class="rd-sources">
+        <strong>Sources.</strong> Pooled figures: the shared channel-entry engine, the same one <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a> and <a href="/how-much-cash">How Much Cash?</a> publish from &mdash; matched set of <span id="rdR1N">&mdash;</span> samples, a two-year forward window, measured in coins acquired. That engine excludes everything before 2014 as bitcoin&rsquo;s pre-exchange era, so the pooled figures describe the record from 2014 onward, not the whole of it. <strong>Case studies:</strong> no shipped tool computes these, so the method is stated here instead &mdash; each visit&rsquo;s first qualifying sample is taken as the entry, and the price at one, two and four years after that date is read directly from the shared price series the rest of the site uses, interpolating between samples. Plain arithmetic, no fitted parameters, no modelling. Trend and floor from the shared Power Law module.
+      </div>
+    </div>
+
+    <!-- ── R3 ── -->
+    <div class="rd-row" id="row-cash">
+      <p class="rd-row-q">There is already a position. How much cash has it made sense to hold against it from here?</p>
+
+      <div class="rd-row-part">
+        <span class="rd-part-k">What the record shows</span>
+        <p id="rdR3Body"></p>
+      </div>
+
+      <div class="rd-row-part">
+        <span class="rd-part-k">The counter-case</span>
+        <p>The same thinness applies, from the same cause: the matched set is drawn from a small number of real episodes rather than from that many independent ones, and it contains no instance of the floor giving way. A holder whose reason for raising cash is a bill, a deadline or a tolerance limit is answering a different question entirely &mdash; one about their own circumstances, which the historical record has no view on and this page never sees.</p>
+      </div>
+
+      <div class="rd-row-part">
+        <span class="rd-part-k">Sensitivity</span>
+        <p>Same matching band and the same perturbation as the section above, with the same result.</p>
+      </div>
+
+      <div class="rd-row-part">
+        <span class="rd-part-k">Where to take it</span>
+        <p><a class="rd-route" href="/how-much-cash">How Much Cash? &rarr;</a></p>
+        <p class="rd-route-note">The pooled record with the split, the tax treatment and the rebuy target under your own hand.</p>
+      </div>
+
+      <div class="rd-sources">
+        <strong>Sources.</strong> The shared channel-entry engine, matched on today&rsquo;s position, 2014 onward &mdash; the same figures How Much Cash? publishes for the same position.
+      </div>
+    </div>
+
+    {#- §16.3b THE CODA. After the last row: what is not here yet, named as
+        absent. A map, growing — never a matrix, padded. -#}
+    <div class="rd-roadmap" id="not-here-yet">
+      <h3>What is not here yet</h3>
+      <p>This page covers two decisions, and there are more that a holder carries. They are absent for one reason: nothing on this site conditions them on channel position yet, and a section that guessed would be worse than no section. Each arrives when the engine behind it exists and its numbers can be checked against the tool that owns them.</p>
+      <ul>
+        <li><strong>Rebalancing.</strong> <a href="/disciplined-rebalancing">Disciplined Rebalancing</a> works from bands a reader sets themselves, not from where price sits in the channel. Answering &ldquo;are the bands near triggering from here&rdquo; needs the default bands read against live position &mdash; which does not exist.</li>
+        <li><strong>Retirement timing.</strong> The <a href="/the-bitcoin-retirement">retirement calculator</a> and the <a href="/the-bitcoin-retirement-stress-test">stress test</a> model withdrawals forward from today. Asking what starting from <em>this</em> position has meant for sequence risk needs the same withdrawal loop run from each historical entry in the zone. That is a real piece of work and the most valuable of the three.</li>
+        <li><strong>Selling.</strong> <a href="/discount-or-premium">Discount, or Premium?</a> measures the gap to trend but does not condition outcomes on the position an exit was taken from. It is also the section that would need the most care in the writing: the legitimate reasons people sell &mdash; need, risk reduction, sticking to a plan &mdash; carry full weight, and none of them is a mistake.</li>
+      </ul>
+      <p class="rd-note">A map, growing &mdash; not a matrix, padded. A section is added when an engine exists to compute it from and its figures reproduce on the page that owns them.</p>
+    </div>
+  </section>
+
+  <!-- ══════════ STEP 3 · WHAT DO WE DO WHEN IT FALLS? ══════════ -->
+  <section class="rd-section" id="when-it-falls">
+    <div class="rd-step">Step three</div>
+    <h2>What happens when it <em>falls</em>?</h2>
+
+    <div class="rd-row" id="row-drawdown">
+      <p class="rd-row-q">What has followed entries at this position &mdash; how often did they fall, and how far?</p>
+
+      <div class="rd-row-part">
+        <span class="rd-part-k">What the record shows</span>
+        <p id="rdR7Body"></p>
+      </div>
+
+      <div class="rd-row-part">
+        <span class="rd-part-k">The counter-case</span>
+        <p>The mildness of those figures is a property of where price already is, not a promise about where it goes. An entry near the floor has less room beneath it than an entry near the trend line, so shallow subsequent falls are close to arithmetic. The record also has nothing to say about a fall <em>through</em> the floor, because it contains none.</p>
+      </div>
+
+      <div class="rd-row-part">
+        <span class="rd-part-k">Where to take it</span>
+        <p><a class="rd-route" href="/the-bitcoin-retirement-stress-test">The Retirement Stress Test &rarr;</a></p>
+        <p class="rd-route-note">A what-if rather than a forecast: a crash of a chosen depth, at a chosen year, against a withdrawal plan. It does not compute the figures above and is not where they are checked &mdash; it is where a fall of a size you choose can be put through a plan.</p>
+      </div>
+
+      <div class="rd-sources">
+        <strong>Sources.</strong> The shared channel-entry engine &mdash; drawdown frequency and median depth over a two-year forward window, matched on today&rsquo;s position, 2014 onward. The same figures Wait, or Deploy Now? renders for the same position.
+      </div>
+    </div>
+
+    <h3>Holding through it</h3>
+    <p>The record above is a record of what followed, not of what it felt like. Every one of those episodes was, at the time, a period in which the reasons to sell were articulate and the reasons to wait were not. That is worth knowing in advance of needing to know it, and it is the limit of what a page of historical figures can offer: the figures describe outcomes, and the decision is made by a person with a mortgage, a job, a family and a tolerance the figures cannot see.</p>
+  </section>
+
+  <!-- ══════════ WHAT THIS POSITION DOES NOT CHANGE ══════════ -->
+  <section class="rd-section" id="does-not-change">
+    <h2>What this position does <em>not</em> change</h2>
+    <p>Some decisions are position-insensitive by design, and a page organised around position owes the reader that boundary explicitly. Where price sits in the channel is not an input to any of these.</p>
+    <p><strong>How much to hold at all.</strong> Sizing follows tolerance and horizon, not the channel. A position that is too large at 0.4&times; is too large at 2&times;; the channel does not adjust it. <a href="/bitcoin-allocation-sizing">Portfolio allocation</a> is where that is worked out.</p>
+    <p><strong>Custody and security.</strong> Nothing in this page&rsquo;s subject matter touches how coins are held, and no channel position makes a custody arrangement better or worse.</p>
+    <p><strong>Whether to hold bitcoin at all.</strong> That question is answered by understanding the asset, and it precedes everything here. <a href="/start-here">Start here</a> and <a href="/the-power-law">the Power Law page</a> are where that examination lives. A reader who has not made it is not helped by knowing where price sits relative to a trend they have not yet decided is real.</p>
+  </section>
+
+  <!-- ══════════ WHAT WOULD BREAK THIS ══════════ -->
+  <section class="rd-section" id="what-would-break-this">
+    <h2>What would <em>break</em> this</h2>
+    <p>This is the most model-dependent page on the site, and it is worth saying so plainly rather than in a footnote. Every figure above rests on a single model. There is no second method here quietly agreeing with the first &mdash; if the power law is not a real long-run structure, the zone this page is organised around is not a zone, and the visits it counts are not visits.</p>
+    <p><strong>The trend is smooth and the path is not.</strong> The channel is a fitted line through fifteen years of violent price history. It describes a central tendency, and no individual entry, exit or holding period is obliged to resemble it.</p>
+    <p><strong>The floor is the model&rsquo;s own tripwire.</strong> <a href="/the-bitcoin-floor">The Bitcoin Floor</a> states the criterion in advance &mdash; how far below, for how long &mdash; and reports against it. That criterion is the one this page would fail with, and it is stated there rather than restated here so the criterion has one home rather than two wordings.</p>
+    <p><strong>The unsampled scenario is the important one.</strong> The record behind this page contains no instance of the floor giving way and staying gone, so nothing above is evidence that it cannot. The shared engine goes further and clamps sub-floor positions to the floor before matching entries at all, which means a sustained break is not merely rare in this data &mdash; it is structurally absent from it. An absence in a sample is not a property of the world.</p>
+    <p><strong>Breaks run in both directions.</strong> A model that can fail downward can fail upward, and the same fifteen years that make the channel plausible are a short record by the standards of the claim being made on them.</p>
+  </section>
+
+  {#- The FAQ block and the related strip are rendered by base.njk from the
+      `faq:` and `related:` front matter — layout-level, not page-level. They
+      are deliberately NOT included here; including them would render each
+      twice. -#}
+
+  <!-- ═══ PREVIEW NOTE — REMOVE AT THE PRODUCTION PASS, WITH THE HEAD GUARD ═══ -->
+  <div class="rd-preview-note">
+    <strong>Unlisted preview.</strong> This page is shipped for register review and is not linked from anywhere on the site: it is absent from the navigation, the sitemap, the exploration registry and every related strip, and it carries a <code>noindex</code> directive. Public listing follows a register pass, and the dashboard routing chip is a separate change that comes after that.
+  </div>
+
+</div>
