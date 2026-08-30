@@ -11,6 +11,18 @@ session automatically. Close items here when done; this file is the "what's cook
 
 ## In flight (dated)
 
+- [ ] **MERGE-ORDER RECONCILIATION — `feat-the-rundown` drops its old-pattern icon lines.**
+  Recorded 2026-08-29, before the brand branch merged. `feat-brand-mark-adoption` **landed
+  first** and made `components/head-icons.njk` the single source for the favicon cascade,
+  removing the icon block from all 52 per-page `-head.html` files. `feat-the-rundown` was
+  branched before that and its `the-rundown-head.html` still carries **5 old-pattern icon
+  `<link>` lines**. **Before or at that branch's merge**, delete those 5 lines so the page
+  inherits the shared include like every other page; leaving them renders the cascade twice.
+  Git will not flag it — the Rundown's head file is a new file on its branch, so there is no
+  textual conflict, only a duplicated block in the built page. **Neither branch reverts the
+  other**; the collision is additive. Detail: `SITE_GUIDE` (icon include) and the Rundown's
+  own unlisted-preview record.
+
 - [ ] **Aug 6 (Thu) — WDCB launch thread.** Draft delivered (wdcb-thread-draft.md, 2026-08-05);
   morning-of: verify figures against live page, X-card scrape, essay reciprocal link first, chart
   export, post AM window, pin. Day-3 IRR beat + Day-7 harvest per X_STRATEGY_PLAYBOOK §7. This

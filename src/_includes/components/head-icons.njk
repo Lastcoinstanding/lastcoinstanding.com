@@ -1,0 +1,45 @@
+{#
+  Canonical icon block — the site's favicon / touch-icon set.
+
+  SINGLE SOURCE OF TRUTH. Included once from base.njk's <head>, before
+  {{ head_extras }}, so every page gets the identical set with no per-page
+  edit. Extracted 2026-08-29 from the 52 per-page `-head.html` files that each
+  carried their own copy — 256 duplicated <link> lines across 54 files.
+
+  The extraction fixed three defects by construction rather than by hand:
+    • /bitcoin-fixed-income   — had NO icon block at all
+    • /bitcoin-vs-real-estate — had NO icon block at all
+    • /the-melting-ice-cube   — carried only the SVG line; missing the .ico,
+                                both PNG sizes and the apple-touch-icon
+
+  Kin to the `canonical-nav-css` and `canonical-ribbon-css` blocks in base.njk:
+  site chrome belongs to the layout, not to 54 copies of itself.
+
+  ── ORDER MATTERS ──
+  The SVG is declared first on purpose. Browsers that support SVG favicons
+  prefer the first supported declaration, so the vector wins on modern
+  desktop; the .ico and PNGs are the ladder down for everything else, and
+  Safari takes the apple-touch-icon. A consequence worth stating because it
+  is easy to get wrong: swapping only the PNGs and leaving the SVG stale
+  would leave most desktop users looking at the OLD mark. The whole set is
+  replaced together or not at all.
+
+  ── PROVENANCE ──
+  The raster set is generated from the brand mark and lives in `brand/`
+  (see SITE_GUIDE). Files are served from the site root and registered in
+  `.eleventy.js` staticAssets. `favicon-192x192.png` is deliberately NOT
+  linked here — it is retained at root for any future web-app manifest and
+  has never been part of the <head> set.
+
+  Every entry in the cascade now renders the same 5-coin mark: the SVG and
+  the 16/32/48 + apple-touch rasters at adoption (2026-08-29), and the .ico
+  in the same branch — built from these very rasters, no resampling, so the
+  16/32/48 inside it are the same images served alongside it. There is no
+  longer any width, browser or fallback path that shows the previous icon.
+#}
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
