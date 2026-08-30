@@ -30,6 +30,12 @@
   `.eleventy.js` staticAssets. `favicon-192x192.png` is deliberately NOT
   linked here — it is retained at root for any future web-app manifest and
   has never been part of the <head> set.
+
+  Every entry in the cascade now renders the same 5-coin mark: the SVG and
+  the 16/32/48 + apple-touch rasters at adoption (2026-08-29), and the .ico
+  in the same branch — built from these very rasters, no resampling, so the
+  16/32/48 inside it are the same images served alongside it. There is no
+  longer any width, browser or fallback path that shows the previous icon.
 #}
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
