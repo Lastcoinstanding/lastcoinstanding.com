@@ -1,27 +1,30 @@
 /* =============================================================
-   The Rundown — page styles
+   The Rundown v2 — "The Briefing" — page styles
 
-   Container tier: MIXED-CONTENT (STYLE_GUIDE §4.2) — 1100px page,
-   880px constrained prose. Sustained prose with compact data blocks
-   rather than charts; chosen for this page, not inherited.
+   Container tier: MIXED-CONTENT (STYLE_GUIDE §4.2) — 1100px page for the
+   snack grid, 880px constrained prose for the gate, the coda and the
+   what-would-break-this section.
 
    Foundation preamble self-declared in full (§4.2): base.njk carries no
-   palette and no body theme, so :root and the body background are
-   declared here or the page renders on the browser's light canvas.
+   palette and no body theme, so :root and the body background are declared
+   here or the page renders on the browser's light canvas.
 
    Every colour routes through a var (NEW_PAGE_CHECKLIST §1).
 
-   REGISTER — the load-bearing styling decision on this page
-   (RUNDOWN_DESIGN §4, §9): there is NO colour that encodes an action or
-   a verdict. No green below trend, no red above it, no alarm state as
-   price nears the floor. Position is reported in text and in bar
-   position, never in alarm styling. The zone strip uses ONE neutral
-   accent at every position, because a palette that changes with the
-   channel would be a signal wearing a chart's clothes.
+   REGISTER — the load-bearing styling decision, carried from v1 and still
+   load-bearing under v2's snacks: there is NO colour that encodes an action
+   or a verdict. No green below trend, no red above it, no alarm state as
+   price nears the floor. A snack whose verdict is emphatic and one whose
+   verdict is a shrug are styled identically; the words carry the difference.
+   A palette that changed with the channel would be a signal wearing a
+   chart's clothes.
 
-   The only semantic colour on the page marks a CLOSED historical visit
-   versus the OPEN one (--rd-closed / --rd-open). That is a fact about
-   whether an outcome exists yet, not a judgement about the present.
+   The only categorical colours are FACTS ABOUT STATE, never judgements:
+     --rd-open    an episode with no outcome yet, against --rd-closed
+     --rd-you     the reader's own stated figure, against a computed one
+   The chart ramp (--rd-floor → --rd-trend) is the site's channel
+   vocabulary, shared with the Power Law and Floor pages, and means
+   "position in the channel" everywhere it appears — never "good/bad".
    ============================================================= */
 
 :root {
@@ -42,52 +45,66 @@
   /* Channel vocabulary — shared with the Power Law and Floor pages */
   --rd-floor: #c0603a;
   --rd-trend: #e09422;
-  --rd-position: #F7931A;   /* the live position marker, site-wide orange */
+  --rd-mid: #7a7367;
+  --rd-position: #F7931A;
 
-  /* Visit state — closed (an outcome exists) vs open (it does not yet).
-     Categorical, not a ramp, and not a judgement. */
+  /* State, not judgement */
   --rd-closed: #7a7367;
   --rd-open: #F7931A;
+  --rd-you: #6db3d4;
 }
 
 body { background: var(--bg); color: var(--text); }
-
 .hero, .hero *, .content-area, .content-area * { box-sizing: border-box; }
 
 /* ── Hero ───────────────────────────────────────────────── */
-.hero { position: relative; text-align: center; max-width: 880px; margin: 0 auto; padding: 4.5rem 2rem 1.5rem; }
+.hero { position: relative; text-align: center; max-width: 880px; margin: 0 auto; padding: 4.5rem 2rem 1.2rem; }
 .hero h1 { font-family: var(--font-d); font-size: clamp(2.3rem, 5.6vw, 3.5rem); font-weight: 500; letter-spacing: -.01em; line-height: 1.08; color: var(--ink-bright); margin: 0 0 1rem; }
 .hero h1 em { font-style: italic; color: var(--amber); }
 
-/* The live standfirst (RUNDOWN_DESIGN §11).
-   min-height is reserved so the no-JS sentence and the live sentence occupy
-   the same box — the text swap must not shift layout on mobile (§13.13). */
+/* The live standfirst. min-height is reserved so the no-JS sentence and the
+   live sentence occupy the same box — the swap must not shift layout.
+
+   The centring flex box wraps a SINGLE span, never the text directly. Put
+   inline text straight into a flex container and every inline child — the
+   <strong> carrying the multiple included — becomes its own flex item, which
+   lays the sentence out as scattered columns rather than as a sentence. Both
+   the no-JS fallback and the script's replacement carry that span. */
 .rd-standfirst {
+  margin: 0 auto 0.4rem; max-width: 720px; min-height: 3.7em;
+  display: flex; align-items: center; justify-content: center;
+}
+.rd-standfirst > span {
   font-family: var(--font-d); font-style: italic;
   font-size: clamp(1.1rem, 2.6vw, 1.4rem);
-  color: var(--text-dim); margin: 0 auto 0.4rem; line-height: 1.35;
-  max-width: 720px; min-height: 3.7em;
-  display: flex; align-items: center; justify-content: center;
+  color: var(--text-dim); line-height: 1.35; text-align: center;
 }
 .rd-standfirst strong { font-style: normal; font-weight: 500; color: var(--amber); }
 
-/* ── Position strip (§3) ─────────────────────────────────
-   One engine call, two render targets — the strip and the hero standfirst
-   read the same computation, never their own. */
-.rd-strip { max-width: 900px; margin: 2.4rem auto 0; }
-.rd-strip-grid {
+/* ── Context header — a labelled ECHO of the Dashboard (§2.2) ──
+   It carries only what the site-wide channel ribbon above it cannot. The
+   ribbon already shows price, multiple and zone; repeating them here is the
+   duplication the one-canonical-home rule exists to prevent. */
+.rd-hdr { max-width: 900px; margin: 2rem auto 0; }
+.rd-hdr-tag {
+  font-family: var(--font-b); font-size: 0.64rem; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--text-muted); text-align: center; margin-bottom: 0.7rem;
+}
+.rd-hdr-tag a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--border-strong); }
+.rd-hdr-grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
   background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
 }
-.rd-strip-cell { background: var(--bg-card); padding: 0.85rem 0.9rem; text-align: left; }
-.rd-strip-k { font-family: var(--font-b); font-size: 0.66rem; letter-spacing: .09em; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.3rem; }
-.rd-strip-v { font-family: var(--font-d); font-size: 1.35rem; color: var(--ink-bright); line-height: 1.1; }
-.rd-strip-v em { font-style: italic; color: var(--amber); }
-.rd-strip-sub { font-family: var(--font-b); font-size: 0.72rem; color: var(--text-dim); margin-top: 0.2rem; }
-.rd-prov { font-family: var(--font-b); font-size: 0.75rem; color: var(--text-muted); text-align: center; margin: 0.8rem 0 0; }
+.rd-hdr-cell { background: var(--bg-card); padding: 0.85rem 0.9rem; text-align: left; }
+.rd-hdr-k { font-family: var(--font-b); font-size: 0.64rem; letter-spacing: .09em; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.3rem; }
+.rd-hdr-v { font-family: var(--font-d); font-size: 1.3rem; color: var(--ink-bright); line-height: 1.1; }
+.rd-prov { font-family: var(--font-b); font-size: 0.74rem; color: var(--text-muted); text-align: center; margin: 0.8rem 0 0; }
 
 /* The channel bar — position within the channel, one neutral accent. */
-.rd-bar { max-width: 700px; margin: 1.5rem auto 0; padding: 0 0.5rem; }
+/* The tick labels and the marker label are absolutely positioned outside the
+   track, so the bar has to reserve room for both or they collide with the
+   heading above and the provenance line below. */
+.rd-bar { max-width: 700px; margin: 2.4rem auto 0; padding: 0 0.5rem 2.4rem; }
 .rd-bar-track { position: relative; height: 12px; border-radius: 6px; background: linear-gradient(90deg, rgba(122,115,103,0.18), rgba(224,148,34,0.16)); border: 1px solid var(--border); }
 .rd-bar-tick { position: absolute; top: -5px; bottom: -5px; width: 2px; background: var(--border-strong); }
 .rd-bar-tick-label { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: var(--font-b); font-size: 0.62rem; color: var(--text-muted); text-align: center; line-height: 1.25; }
@@ -98,87 +115,172 @@ body { background: var(--bg); color: var(--text); }
 /* ── Sections ────────────────────────────────────────────── */
 .rd-section { max-width: 880px; margin: 0 auto; padding: 3rem 0 0; }
 .rd-section-wide { max-width: 1100px; }
-.rd-eyebrow { font-family: var(--font-b); font-size: 0.68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.6rem; }
 .rd-section h2 { font-family: var(--font-d); font-size: clamp(1.6rem, 3.6vw, 2.1rem); font-weight: 500; color: var(--ink-bright); margin: 0 0 1rem; line-height: 1.15; }
 .rd-section h2 em { font-style: italic; color: var(--amber); }
 .rd-section h3 { font-family: var(--font-d); font-size: 1.3rem; font-weight: 500; color: var(--ink-bright); margin: 1.8rem 0 0.7rem; }
 .rd-section p { font-family: var(--font-b); font-size: 0.96rem; line-height: 1.72; color: var(--text); margin: 0 0 1rem; }
-.rd-section p.rd-lede { font-size: 1.05rem; color: var(--text); }
-
-/* The step markers — the Playbook's three-part arc, self-serve. */
 .rd-step { font-family: var(--font-b); font-size: 0.7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.5rem; }
 
-/* ── The premise gate (§7) ───────────────────────────────── */
+/* ── The premise gate, compressed (§2.3) ─────────────────── */
 .rd-gate {
   border-left: 2px solid var(--border-strong);
   background: var(--bg-card); border-radius: 0 10px 10px 0;
-  padding: 1.4rem 1.5rem; margin: 1.2rem 0 0;
+  padding: 1.3rem 1.5rem; margin: 1.2rem 0 0;
 }
 .rd-gate p:last-child { margin-bottom: 0; }
 
-/* ── The framing block: the floor visits (§16.3a) ─────────
-   A framing block, not a row — the six-part anatomy does not apply. */
-.rd-visits { display: grid; gap: 1rem; margin: 1.4rem 0 0; }
-.rd-visit {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-left: 3px solid var(--rd-closed); border-radius: 0 10px 10px 0; padding: 1.1rem 1.25rem;
+/* ── The briefing setup (§3) ─────────────────────────────── */
+.rd-setup { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.6rem; margin: 1.2rem 0 0; }
+.rd-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.3rem; }
+.rd-field label { display: block; font-family: var(--font-b); font-size: 0.72rem; letter-spacing: .07em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.45rem; }
+.rd-field-out { font-family: var(--font-d); font-size: 1.5rem; color: var(--ink-bright); display: block; margin-bottom: 0.3rem; line-height: 1.1; }
+.rd-field input[type="range"] { width: 100%; accent-color: var(--amber); }
+.rd-field input[type="number"] {
+  width: 100%; background: var(--bg); border: 1px solid var(--border-strong); border-radius: 6px;
+  color: var(--ink-bright); font-family: var(--font-b); font-size: 1rem; padding: 0.55rem 0.7rem;
 }
-.rd-visit-open { border-left-color: var(--rd-open); }
-.rd-visit-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.6rem; margin-bottom: 0.6rem; }
-.rd-visit-n { font-family: var(--font-b); font-size: 0.66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
-.rd-visit-when { font-family: var(--font-d); font-size: 1.2rem; color: var(--ink-bright); }
-.rd-visit-state { font-family: var(--font-b); font-size: 0.66rem; letter-spacing: .06em; text-transform: uppercase; color: var(--rd-closed); border: 1px solid var(--border); border-radius: 999px; padding: 0.12rem 0.5rem; }
-.rd-visit-open .rd-visit-state { color: var(--rd-open); border-color: var(--border-strong); }
-.rd-visit-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.7rem 1.1rem; margin-bottom: 0.75rem; }
-.rd-fact-k { font-family: var(--font-b); font-size: 0.63rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); display: block; }
-.rd-fact-v { font-family: var(--font-d); font-size: 1.05rem; color: var(--text); }
-.rd-visit p { font-size: 0.9rem; margin-bottom: 0; }
+.rd-field input[type="number"]::placeholder { color: var(--text-muted); }
 
-/* Outcome table inside a case study. Every figure here is the entry-anchored
-   lookup of RUNDOWN_DESIGN §16.2a — one method per row, never mixed. */
-.rd-outcomes { width: 100%; border-collapse: collapse; margin: 0.8rem 0 0.6rem; font-family: var(--font-b); font-size: 0.86rem; }
-.rd-outcomes th, .rd-outcomes td { text-align: left; padding: 0.42rem 0.6rem 0.42rem 0; border-bottom: 1px solid var(--border); }
-.rd-outcomes th { font-size: 0.63rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); font-weight: 400; }
-.rd-outcomes td { color: var(--text); }
-.rd-outcomes td strong { color: var(--ink-bright); font-weight: 500; }
-.rd-outcomes .rd-none { color: var(--text-muted); font-style: italic; }
+/* The remember toggle. Deliberately plain: it is a fact about storage, not a
+   feature to sell. */
+.rd-remember { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; font-family: var(--font-b); font-size: 0.72rem; color: var(--text-muted); cursor: pointer; }
+.rd-remember input { accent-color: var(--amber); }
 
-/* ── Rows (§5 anatomy) ───────────────────────────────────── */
-.rd-row { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.6rem; margin: 1.4rem 0 0; }
-.rd-row-q { font-family: var(--font-d); font-size: 1.25rem; color: var(--ink-bright); margin: 0 0 0.9rem; line-height: 1.3; }
-.rd-row-part { margin-top: 1.1rem; }
-.rd-row-part:first-of-type { margin-top: 0; }
-.rd-part-k { font-family: var(--font-b); font-size: 0.63rem; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); display: block; margin-bottom: 0.35rem; }
-.rd-row p { font-size: 0.92rem; margin-bottom: 0; }
-.rd-row p + p { margin-top: 0.7rem; }
+/* The stack field's own promise line — Discount-or-Premium's, verbatim, and
+   it must stay next to the field it describes. */
+.rd-stack-note { font-family: var(--font-b); font-size: 0.72rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic; }
 
-/* The route — labelled as exploration, never as verification (§16.2a). */
+.rd-privacy { font-family: var(--font-b); font-size: 0.8rem; color: var(--text-dim); line-height: 1.65; margin: 1.2rem 0 0; padding-top: 1rem; border-top: 1px solid var(--border); }
+.rd-privacy strong { color: var(--text); font-weight: 500; }
+.rd-clear {
+  background: transparent; border: 1px solid var(--border-strong); border-radius: 6px;
+  color: var(--text-dim); font-family: var(--font-b); font-size: 0.76rem; padding: 0.4rem 0.8rem;
+  cursor: pointer; margin-top: 0.8rem;
+}
+.rd-clear:hover { color: var(--ink-bright); border-color: var(--amber); }
+.rd-cleared { font-family: var(--font-b); font-size: 0.76rem; color: var(--amber); margin-top: 0.5rem; }
+
+/* Intent chips — a display router, styled as a filter and never as advice. */
+.rd-intent { margin-top: 1.4rem; padding-top: 1.2rem; border-top: 1px solid var(--border); }
+.rd-intent-k { font-family: var(--font-b); font-size: 0.68rem; letter-spacing: .11em; text-transform: uppercase; color: var(--amber); display: block; margin-bottom: 0.7rem; }
+.rd-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.rd-chip {
+  background: transparent; border: 1px solid var(--border); border-radius: 999px;
+  color: var(--text-dim); font-family: var(--font-b); font-size: 0.82rem;
+  padding: 0.42rem 0.9rem; cursor: pointer; transition: border-color .18s, color .18s, background .18s;
+}
+.rd-chip:hover { color: var(--ink-bright); border-color: var(--border-strong); }
+.rd-chip.is-active { color: var(--bg); background: var(--amber); border-color: var(--amber); font-weight: 500; }
+
+/* ── The snack grid (§2.5) ───────────────────────────────── */
+.rd-cluster-k { font-family: var(--font-b); font-size: 0.68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--text-muted); margin: 2.4rem 0 0.9rem; }
+/* Two columns at the 1100px tier, one below ~880px. The minimum is set at
+   420px deliberately: a third column fits the width arithmetically but not the
+   content — a snack carrying a slider, three stat cards and a chart at ~350px
+   stacks into a tower and stops reading as a compact module. */
+.rd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.2rem; align-items: start; }
+.rd-snack {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 1.3rem 1.4rem; display: flex; flex-direction: column;
+}
+.rd-snack-wide { grid-column: 1 / -1; }
+.rd-snack[hidden] { display: none; }
+
+/* 1 · the question line — second person conditional, as the reader carries it */
+.rd-q { font-family: var(--font-d); font-size: 1.2rem; color: var(--ink-bright); margin: 0 0 0.7rem; line-height: 1.3; }
+/* 2 · the verdict line — the source tool's own, never softened or strengthened */
+.rd-verdict { font-family: var(--font-b); font-size: 0.93rem; line-height: 1.65; color: var(--text); margin: 0 0 1rem; }
+.rd-verdict strong { color: var(--ink-bright); font-weight: 600; }
+/* 3 · stat cards — labels and values, not prose */
+.rd-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 1rem; }
+.rd-card { background: var(--bg-card-2); padding: 0.7rem 0.8rem; }
+.rd-card-k { display: block; font-family: var(--font-b); font-size: 0.6rem; letter-spacing: .07em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem; line-height: 1.3; }
+.rd-card-v { display: block; font-family: var(--font-d); font-size: 1.5rem; color: var(--ink-bright); line-height: 1.05; }
+.rd-card-sub { display: block; font-family: var(--font-b); font-size: 0.68rem; color: var(--text-dim); margin-top: 0.22rem; line-height: 1.35; }
+/* 4 · one compact interaction or chart */
+.rd-viz { margin-bottom: 0.9rem; }
+.rd-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.rd-slider { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.9rem; }
+.rd-slider label { flex: 0 0 auto; font-family: var(--font-b); font-size: 0.7rem; letter-spacing: .07em; text-transform: uppercase; color: var(--text-muted); }
+.rd-slider input[type="range"] { flex: 1; accent-color: var(--amber); }
+.rd-slider output { flex: 0 0 auto; font-family: var(--font-d); font-size: 1.05rem; color: var(--amber); min-width: 5.5em; text-align: right; }
+/* 5 · the register line */
+.rd-register { font-family: var(--font-b); font-size: 0.76rem; color: var(--text-muted); line-height: 1.6; margin: auto 0 0.7rem; font-style: italic; }
+/* 6 · the route to the canonical home */
 .rd-route { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-b); font-size: 0.86rem; color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--border-strong); padding-bottom: 1px; }
 .rd-route:hover { color: var(--amber-bright); }
-.rd-route-note { font-family: var(--font-b); font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem; }
+.rd-route-line { margin: 0; }
+.rd-sources { font-family: var(--font-b); font-size: 0.72rem; color: var(--text-muted); line-height: 1.55; margin-top: 0.9rem; padding-top: 0.7rem; border-top: 1px solid var(--border); }
 
-/* Sources line — carries the derivation where a figure has no source tool. */
-.rd-sources { font-family: var(--font-b); font-size: 0.76rem; color: var(--text-muted); line-height: 1.6; margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--border); }
+/* A snack whose engine declines to answer (R2 inside the dead band). */
+.rd-snack.is-empty .rd-viz, .rd-snack.is-empty .rd-cards { display: none; }
 
-/* ── The coda: the roadmap (§16.3b) ──────────────────────── */
-.rd-roadmap { border: 1px dashed var(--border-strong); border-radius: 12px; padding: 1.4rem 1.6rem; margin: 1.6rem 0 0; background: transparent; }
+/* ── SVG element classes. No colour here encodes a verdict; the ramp is the
+      site's channel vocabulary and means position, everywhere. ── */
+.rd-ax { stroke: rgba(224,148,34,0.28); stroke-width: 1; }
+.rd-tick { stroke: rgba(224,148,34,0.28); stroke-width: 1; }
+.rd-axlbl { fill: #6a6256; font-family: 'Inter', sans-serif; font-size: 10px; }
+.rd-barlbl { fill: #9a9080; font-family: 'Inter', sans-serif; font-size: 11px; }
+.rd-barlbl2 { fill: #9a9080; font-family: 'Inter', sans-serif; font-size: 11px; }
+.rd-barval { fill: #e8e0d4; font-family: 'Inter', sans-serif; font-size: 11.5px; }
+.rd-line { fill: none; stroke: var(--rd-trend); stroke-width: 2.2; }
+.rd-line-trend { stroke: rgba(224,148,34,0.45); stroke-width: 1.6; }
+.rd-line-never { stroke: rgba(154,144,128,0.65); stroke-width: 1.6; stroke-dasharray: 2 3; }
+.rd-line-glide { stroke: var(--amber); stroke-width: 2.2; stroke-dasharray: 6 4; }
+.rd-dot { fill: var(--rd-position); }
+.rd-today { stroke: var(--rd-position); stroke-width: 1.6; }
+.rd-todaylbl { fill: var(--rd-position); font-family: 'Inter', sans-serif; font-size: 10.5px; }
+.rd-endlbl { fill: #9a9080; font-family: 'Inter', sans-serif; font-size: 10px; }
+.rd-endlbl.is-never { fill: #6a6256; }
+/* §5 element 2 — drawn on the chart, never in the caption. */
+.rd-illus { fill: #9a9080; font-family: 'Inter', sans-serif; font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+.rd-ep { fill: rgba(122,115,103,0.55); }
+.rd-ep-open { fill: rgba(247,147,26,0.5); }
+.rd-eplbl { fill: #9a9080; font-family: 'Inter', sans-serif; font-size: 10.5px; }
+.rd-eplbl.is-open { fill: var(--rd-position); }
+.rd-epsub { fill: #6a6256; font-family: 'Inter', sans-serif; font-size: 9.5px; }
+.rd-split-a { fill: rgba(224,148,34,0.55); }
+.rd-split-b { fill: rgba(122,115,103,0.28); }
+.rd-splitlbl { fill: #f2eee8; font-family: 'Inter', sans-serif; font-size: 12px; }
+.rd-splitlbl.is-b { fill: #9a9080; }
+.rd-bar-floor { fill: rgba(192,96,58,0.55); }
+.rd-bar-mid { fill: rgba(122,115,103,0.5); }
+.rd-bar-trend { fill: rgba(224,148,34,0.5); }
+.rd-bar-open { fill: rgba(247,147,26,0.45); }
+.rd-bar-you { fill: rgba(109,179,212,0.5); }
+.rd-ladder { stroke: rgba(224,148,34,0.2); stroke-width: 1; }
+.rd-band-sell { stroke: rgba(224,148,34,0.55); stroke-width: 1.6; }
+.rd-band-trend { stroke: rgba(224,148,34,0.3); stroke-width: 1; stroke-dasharray: 3 3; }
+.rd-band-rebuy { stroke: rgba(109,179,212,0.55); stroke-width: 1.6; }
+
+/* ── The coda (§2.6) ─────────────────────────────────────── */
+.rd-roadmap { border: 1px dashed var(--border-strong); border-radius: 12px; padding: 1.4rem 1.6rem; margin: 2rem 0 0; background: transparent; }
 .rd-roadmap ul { list-style: none; padding: 0; margin: 1rem 0 0; }
 .rd-roadmap li { font-family: var(--font-b); font-size: 0.9rem; line-height: 1.65; color: var(--text-dim); padding: 0.6rem 0; border-top: 1px solid var(--border); }
 .rd-roadmap li strong { color: var(--text); font-weight: 500; }
+/* Intent-aware: the item this reader's own question has no snack for is
+   marked, not hidden — an absence named is the point of the section. */
+.rd-roadmap li.is-relevant { border-left: 2px solid var(--amber); padding-left: 0.8rem; color: var(--text); }
+.rd-roadmap li.is-relevant strong { color: var(--ink-bright); }
 
 /* ── Utility ─────────────────────────────────────────────── */
 .rd-note { font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); line-height: 1.65; }
+.rd-snack .rd-note { font-size: 0.76rem; margin: 0 0 0.7rem; }
 .rd-preview-note { max-width: 880px; margin: 3rem auto 0; border: 1px dashed var(--border-strong); border-radius: 10px; padding: 1rem 1.2rem; font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); }
 
 /* ── Mobile ──────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .rd-grid { grid-template-columns: 1fr; }
+}
 @media (max-width: 720px) {
   .hero { padding: 3.2rem 1.2rem 1.2rem; }
-  .rd-strip-grid { grid-template-columns: 1fr 1fr; }
+  .rd-hdr-grid { grid-template-columns: 1fr; }
   .rd-section { padding-left: 1.2rem; padding-right: 1.2rem; }
-  .rd-row, .rd-roadmap { padding: 1.2rem 1.1rem; }
-  .rd-visit { padding: 1rem 1rem; }
+  .rd-setup, .rd-snack, .rd-roadmap { padding: 1.2rem 1.1rem; }
   .rd-standfirst { min-height: 6.2em; }
+  .rd-cards { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+  .rd-card-v { font-size: 1.3rem; }
 }
-@media (max-width: 420px) {
-  .rd-strip-grid { grid-template-columns: 1fr; }
+@media (prefers-reduced-motion: reduce) {
+  .rd-chip { transition: none; }
 }
