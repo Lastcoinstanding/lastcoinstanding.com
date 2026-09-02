@@ -23,6 +23,7 @@
    ============================================================= */
 (function () {
   if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function') return;
+  if (!window.LadderAdvantage) return;   // shared/ladder-advantage.js must load first
 
   // ── Palette ──
   var AMBER = '#e09422', BLUE = '#6db3d4', RUST = '#c0392b';
@@ -44,11 +45,15 @@
   var MIN_D = S[0].d, LAST_D = S[N - 1].d;
   var todayD = (Date.now() / 1000 - GENESIS_TS) / 86400;
 
-  function eraStartDay(era) {
-    if (era === 'post-2017') return (Date.UTC(2017, 0, 1) / 1000 - GENESIS_TS) / 86400;
-    if (era === 'post-2020') return (Date.UTC(2020, 0, 1) / 1000 - GENESIS_TS) / 86400;
-    return MIN_D - 1; // full
-  }
+  // ── The position-conditioned advantage record now lives in a shared module ──
+  // Extracted 2026-09-01 (Rundown v2, JM ruling 3) to shared/ladder-advantage.js
+  // so this page and The Rundown's D2 snack read ONE copy and cannot drift.
+  // The local names below are thin delegations: every call site on this page is
+  // unchanged, and the arithmetic is byte-for-byte what it was — the shared
+  // module builds the same S from the same PL_DATA with the same posOf.
+  var LA = window.LadderAdvantage;
+
+  function eraStartDay(era) { return LA.eraStartDay(era); }
 
   // ── State ──
   var state = {
@@ -62,43 +67,19 @@
   };
   var userMoved = false;     // true once the reader drags the slider — stops the live-position auto-sync
   var CTX_PAD_Y = 0.4;       // years of channel drawn past today so the "today" marker isn't at the edge
-  var WIN = 0.075;           // channel-position window for binning entries
+  var WIN = LA.WIN;          // channel-position window for binning entries (shared)
   var liveTodayPos = null, liveTodayPrice = null;
 
   // ── Core backtest: ladder-in advantage at one entry index ──
   // returns (ladder_BTC / lump_BTC - 1) * 100  (positive = laddering got MORE BTC)
-  function ladderAdvantage(i, ladderN) {
-    if (i + ladderN - 1 > N - 1) return null;
-    var lumpBtc = 1 / S[i].p;            // sum cancels in the ratio — amount-invariant
-    var each = 1 / ladderN, dca = 0;
-    for (var k = 0; k < ladderN; k++) dca += each / S[i + k].p;
-    return (dca / lumpBtc - 1) * 100;
-  }
+  // Shared since 2026-09-01 — see the delegation note above.
+  function ladderAdvantage(i, ladderN) { return LA.ladderAdvantage(i, ladderN); }
 
   // mean ladder-advantage + win-rate over entries within WIN of position p
-  function bucketAt(era, ladderN, p) {
-    var startD = eraStartDay(era), vals = [];
-    for (var i = 0; i < N; i++) {
-      if (S[i].d < startD) continue;
-      if (Math.abs(S[i].pos - p) > WIN) continue;
-      var a = ladderAdvantage(i, ladderN);
-      if (a !== null) vals.push(a);
-    }
-    if (!vals.length) return { n: 0 };
-    var m = 0, wins = 0;
-    for (var v = 0; v < vals.length; v++) { m += vals[v]; if (vals[v] > 0) wins++; }
-    return { n: vals.length, mean: m / vals.length, win: 100 * wins / vals.length };
-  }
+  function bucketAt(era, ladderN, p) { return LA.bucketAt(era, ladderN, p); }
 
   // advantage curve across channel position (binned, sliding window)
-  function advantageCurve(era, ladderN) {
-    var pts = [];
-    for (var g = -0.10; g <= 1.151; g += 0.025) {
-      var b = bucketAt(era, ladderN, g);
-      if (b.n >= 4) pts.push({ x: +g.toFixed(4), y: b.mean });
-    }
-    return pts;
-  }
+  function advantageCurve(era, ladderN) { return LA.advantageCurve(era, ladderN); }
 
   // ── §4.3 commitment backstop: mean value-multiple by entry bucket & hold length ──
   function bucketName(pos) { return pos < 0.33 ? 'lower' : (pos < 0.66 ? 'mid' : 'upper'); }

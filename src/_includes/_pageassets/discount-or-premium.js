@@ -30,6 +30,7 @@
    ============================================================= */
 (function () {
   if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function') return;
+  if (!window.ReversionDurations) return;   // shared/reversion-durations.js must load first
 
   // ── Palette (shared conventions) ──
   var AMBER = '#e09422', BLUE = '#6db3d4', MUTED = '#7a7367', DIM = '#9a9080';
@@ -38,7 +39,9 @@
   var MIN_M = 6, MAX_M = 60, YEAR_D = 365.25;
 
   // ── Near-trend dead-band: no "discount"/"premium" language inside it ──
-  var NEAR_LO = 0.95, NEAR_HI = 1.05;
+  // Read from the shared module since the duration scan was extracted, so the
+  // word this page prints and the band that scan hides inside cannot diverge.
+  var NEAR_LO = window.ReversionDurations.NEAR_LO, NEAR_HI = window.ReversionDurations.NEAR_HI;
 
   var state = { months: 36 };
   var livePrice = null, liveSource = 'seed';
@@ -889,58 +892,16 @@
   // The historical time-to-trend, conditioned on today's multiple. NEVER a forecast:
   // it reports what stretches at (discount) or beyond (premium) today's depth actually
   // took to get back to trend. Two-sided; recomputed whenever the multiple moves.
-  var YEARS_MO = 30.44;
-  function sampleMult(i) { return PL_DATA[i][1] / plPrice(PL_DATA[i][0]); }
+  // EXTRACTED 2026-09-01 (Rundown v2, JM ruling 3) to
+  // shared/reversion-durations.js, so this page and The Rundown's R2 snack read
+  // ONE copy of the scan and cannot drift. The local names below are thin
+  // delegations; every call site on this page is unchanged and the arithmetic is
+  // byte-for-byte what it was.
+  var RD = window.ReversionDurations;
+  var YEARS_MO = RD.YEARS_MO;
+  function sampleMult(i) { return RD.sampleMult(i); }
+  function scanDurations() { return RD.scan(multiple()); }
 
-  function scanDurations() {
-    var m = multiple();
-    if (m >= NEAR_LO && m <= NEAR_HI) return { state: 'hidden' }; // dead band: whole module hidden
-    var discount = m < NEAR_LO;
-    function regainAfter(i) {
-      for (var j = i + 1; j < PL_DATA.length; j++) {
-        if (discount ? sampleMult(j) >= 1.0 : sampleMult(j) <= 1.0) return j;
-      }
-      return -1;
-    }
-    // Band = today's multiple; widen in 0.05 steps toward 1.0 only if too few completed.
-    var band = m, qi, comp, ong, guard = 0, i, r;
-    while (true) {
-      qi = []; comp = []; ong = [];
-      for (i = 0; i < PL_DATA.length; i++) {
-        if (discount ? sampleMult(i) <= band : sampleMult(i) >= band) {
-          qi.push(i);
-          r = regainAfter(i);
-          if (r >= 0) comp.push({ i: i, months: (PL_DATA[r][0] - PL_DATA[i][0]) / YEARS_MO });
-          else ong.push(i);
-        }
-      }
-      if (comp.length >= 5 || guard >= 12) break;
-      band = discount ? band + 0.05 : band - 0.05; guard++;
-      if (discount ? band >= NEAR_LO : band <= NEAR_HI) break; // never widen into the dead band
-    }
-    // Episodes: a gap > ~100 days between qualifying samples starts a new one.
-    var eps = [], cur = null, k;
-    for (k = 0; k < qi.length; k++) {
-      var idx = qi[k], d = PL_DATA[idx][0];
-      if (!cur || d - PL_DATA[cur.last][0] > 100) { cur = { first: idx, last: idx }; eps.push(cur); }
-      else cur.last = idx;
-    }
-    var episodes = eps.map(function (e) {
-      var rr = regainAfter(e.first), entryD = PL_DATA[e.first][0], regainD = rr >= 0 ? PL_DATA[rr][0] : null;
-      return { entryD: entryD, regainD: regainD, ongoing: rr < 0,
-        months: (regainD != null ? regainD - entryD : TODAY_DAYS - entryD) / YEARS_MO };
-    });
-    var durs = comp.map(function (c) { return c.months; }).sort(function (a, b) { return a - b; });
-    var med = durs.length ? (durs.length % 2 ? durs[(durs.length - 1) / 2] : (durs[durs.length / 2 - 1] + durs[durs.length / 2]) / 2) : 0;
-    var longestEp = episodes.reduce(function (a, b) { return (!b.ongoing && (!a || b.months > a.months)) ? b : a; }, null);
-    return {
-      state: discount ? 'discount' : 'premium', band: band, widened: Math.abs(band - m) > 1e-9,
-      nSamples: qi.length, nCompleted: comp.length, hasOngoing: ong.length > 0,
-      ongMonths: ong.length ? (TODAY_DAYS - PL_DATA[ong[0]][0]) / YEARS_MO : 0,
-      min: durs.length ? durs[0] : 0, median: med, max: durs.length ? durs[durs.length - 1] : 0,
-      episodes: episodes, longestEp: longestEp
-    };
-  }
 
   function fmtMo(v) { var r = Math.round(v); return r + (r === 1 ? ' month' : ' months'); }
   function durDate(d) { return new Date((GENESIS_TS + d * 86400) * 1000).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
