@@ -11,17 +11,38 @@ session automatically. Close items here when done; this file is the "what's cook
 
 ## In flight (dated)
 
-- [ ] **MERGE-ORDER RECONCILIATION — `feat-the-rundown` drops its old-pattern icon lines.**
-  Recorded 2026-08-29, before the brand branch merged. `feat-brand-mark-adoption` **landed
-  first** and made `components/head-icons.njk` the single source for the favicon cascade,
-  removing the icon block from all 52 per-page `-head.html` files. `feat-the-rundown` was
-  branched before that and its `the-rundown-head.html` still carries **5 old-pattern icon
-  `<link>` lines**. **Before or at that branch's merge**, delete those 5 lines so the page
-  inherits the shared include like every other page; leaving them renders the cascade twice.
-  Git will not flag it — the Rundown's head file is a new file on its branch, so there is no
-  textual conflict, only a duplicated block in the built page. **Neither branch reverts the
-  other**; the collision is additive. Detail: `SITE_GUIDE` (icon include) and the Rundown's
-  own unlisted-preview record.
+- [ ] **THE RUNDOWN v2 — LIVE UNLISTED; JM REGISTER REVIEW PENDING, NO CLOCK.**
+  Merged to production 2026-09-02 (PR #97, merge `fc773b6`) carrying v2 "The Briefing" and
+  the site-wide unified floor-visit definition. **`/the-rundown` is live but unlisted** —
+  `noindex, nofollow`, and absent from `sitemap.xml`, `llms.txt`, `explorations.json` and the
+  nav, each verified individually on production after the merge.
+
+  **Status of the review, stated plainly because the record needs it.** The **JM register
+  review of v2 has not happened.** An earlier "Reviewed both surfaces" instruction went out
+  with the review still to come, and the merge proceeded on it. **Nothing public shipped
+  unauthorized:** the Floor-page changes were separately and explicitly ruled on their own
+  before/after table (JM ruling 6, `FLOOR_VISIT_DEFINITION_MINIREPORT.md`), and the Rundown
+  itself is unlisted, so no unreviewed surface is reachable by a reader who is not handed the
+  URL. **There is no clock on the review** — it happens when JM gets to it.
+
+  **Gated on that review, in order:** the **listing pass** (nav group, `sitemap.xml`,
+  `llms.txt`, `explorations.json`, related strips, removing the `noindex` and the two preview
+  blocks) and then the **JM-3 dashboard routing chip**, which was always specified to follow
+  public listing rather than accompany it. **The counsel pass sits at JM's election between
+  the two** — after the register review, before or alongside listing, as he decides.
+
+  Detail: `RUNDOWN_DESIGN.md` Part I §8 (ship gate) and §12, `RUNDOWN_PHASE0_V2_REPORT.md`.
+
+- [x] **MERGE-ORDER RECONCILIATION — the Rundown's old-pattern icon lines. DONE**
+  (`6f67dfe`, 2026-09-02.) Recorded 2026-08-29, before the brand branch merged, and it played
+  out exactly as predicted: `feat-brand-mark-adoption` landed first and made
+  `components/head-icons.njk` the single source for the favicon cascade; the Rundown's
+  `-head.html` was a new file on its own branch, so git had nothing to conflict with and the
+  duplicate survived the merge of main silently. Caught by measuring the built page rather
+  than reading the diff — **11 icon `<link>`s on `/the-rundown` against 6 on
+  `/discount-or-premium` as a control** — and the local copy was also the *pre-adoption* set,
+  missing `favicon-48x48.png`. The block is deleted; both pages now read 6. The one merge item
+  `RUNDOWN_DESIGN` Part I §9 warned git would not surface, and it was right.
 
 - [ ] **Aug 6 (Thu) — WDCB launch thread.** Draft delivered (wdcb-thread-draft.md, 2026-08-05);
   morning-of: verify figures against live page, X-card scrape, essay reciprocal link first, chart
