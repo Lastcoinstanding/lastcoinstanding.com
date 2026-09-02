@@ -175,7 +175,7 @@ eleventyComputed:
         <div class="rd-viz" id="rdA4Viz"></div>
         <p class="rd-register">Both figures are conditional arithmetic on the model, not a forecast. Neither says the floor will be reached. <a href="#what-would-break-this">What would break this &rarr;</a></p>
         <p class="rd-route-line"><a class="rd-route" href="/the-bitcoin-hurdle-rate">The full instrument &rarr;</a></p>
-        <div class="rd-sources"><strong>Sources.</strong> The shared Power Law module, at today&rsquo;s live price. The floor case is the rate from spot to 0.42&times; trend at the chosen horizon; the trend case is the trend&rsquo;s own slope over the same window. <a href="/the-bitcoin-hurdle-rate">The Bitcoin Hurdle Rate</a> publishes both, alongside the position read this module deliberately leaves to the reversion module below.</div>
+        <div class="rd-sources"><strong>Sources.</strong> The shared Power Law module at today&rsquo;s live price. <a href="/the-bitcoin-hurdle-rate">The Bitcoin Hurdle Rate</a> <strong>prints the trend bar</strong> at each horizon in its default view, so that figure reproduces there exactly. It <strong>draws</strong> the floor case as a curve rather than printing it &mdash; read it off that chart at the same horizon. The rate from today&rsquo;s actual position is the third line on that page, and it is the same arithmetic as the reversion module in the Deploy cluster, which is why it is published once rather than in both places.</div>
       </article>
     </div>
 
@@ -202,7 +202,7 @@ eleventyComputed:
         <div class="rd-viz" id="rdD2Viz"></div>
         <p class="rd-register">Historical, at this position &mdash; not a prediction. No engine conditions a DCA&rsquo;s <em>start date</em> on position; a ladder begun today is the nearest honest read.</p>
         <p class="rd-route-line"><a class="rd-route" href="/lump-sum-or-ladder-in">The full instrument &rarr;</a></p>
-        <div class="rd-sources"><strong>Sources.</strong> The shared ladder-advantage module, the same one <a href="/lump-sum-or-ladder-in">Lump Sum or Ladder In</a> draws its curve from, at that page&rsquo;s own defaults: the whole record and a ~1-year ladder. Read on the unclamped channel position, because that page does not clamp. Its neighbourhood is a fixed &plusmn;0.075 of position and does not widen when thin, unlike the pooled engine above &mdash; two modules, two neighbourhoods, said here rather than assumed.</div>
+        <div class="rd-sources"><strong>Sources.</strong> The shared ladder-advantage module, the same one <a href="/lump-sum-or-ladder-in">Lump Sum or Ladder In</a> draws its curve from, at that page&rsquo;s own defaults &mdash; the <strong>post-2020 era</strong> and a ~1-year ladder &mdash; so these figures are what that page shows on arrival. Widen the era there and they move. Read on the unclamped channel position, because that page does not clamp. Its neighbourhood is a fixed &plusmn;0.075 of position and does not widen when thin, unlike the pooled engine above &mdash; two modules, two neighbourhoods, said here rather than assumed.</div>
       </article>
 
       <!-- ── D3 · the reversion window (§5 pattern) ── -->
@@ -229,7 +229,7 @@ eleventyComputed:
         <div class="rd-viz" id="rdR1Viz"></div>
         <p class="rd-register">Historical, at this position &mdash; not a prediction. Raising cash for a bill or a deadline is a different question, and the record has no view on it.</p>
         <p class="rd-route-line"><a class="rd-route" href="/how-much-cash">The full instrument &rarr;</a></p>
-        <div class="rd-sources"><strong>Sources.</strong> The shared channel-entry engine at its default rebuy rule &mdash; the first lower entry within two years, which is where <a href="/how-much-cash">How Much Cash?</a> sits with its own slider untouched. Matched on today&rsquo;s clamped position, 2014 onward, measured in coins. The split, the tax treatment and a deeper rebuy target are at the destination.</div>
+        <div class="rd-sources"><strong>Sources.</strong> The shared channel-entry engine at its default rebuy rule &mdash; the first lower entry within two years, which is where <a href="/how-much-cash">How Much Cash?</a> sits with its own slider untouched. Matched on today&rsquo;s clamped position, 2014 onward, measured in coins. The win rate is the figure <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a> prints as its headline for the same position. The median coins-back figure is the engine&rsquo;s own, <strong>before</strong> the share of stack sold and the tax rate are applied &mdash; How Much Cash applies both and prints a lower number at its defaults, which is the point of going there.</div>
       </article>
 
       <!-- ── R2 · how long stretches like this have lasted ── -->

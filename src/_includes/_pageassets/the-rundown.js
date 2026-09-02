@@ -381,12 +381,17 @@
   function renderA4(spot) {
     var H = a4Horizon, r = hurdle(H, spot);
     setText('rdA4HzOut', H + (H === 1 ? ' year' : ' years'));
+    /* The trend bar leads because the Hurdle Rate page PRINTS it at each
+       horizon; its floor case is drawn as a curve and never written as a
+       number, so it renders here as the conservative companion and the sources
+       line says where to read it. */
     setHTML('rdA4Verdict',
-      'Over ' + H + ' years, a bitcoin that only ever reached the <strong>floor</strong> of its channel would compound at <strong>' +
-      pct1(r.floor * 100) + '</strong> a year from today&rsquo;s price. Buying at trend instead sets the bar at ' + pct1(r.trend * 100) + '.');
+      'Bitcoin&rsquo;s trend sets a bar of <strong>' + pct1(r.trend * 100) + '</strong> a year over ' + H +
+      ' years. The conservative version &mdash; capital deployed at today&rsquo;s price reaching only the channel floor by then &mdash; still clears ' +
+      pct1(r.floor * 100) + '.');
     setHTML('rdA4Cards', cards([
-      { k: 'If it only reaches the floor', v: pct1(r.floor * 100), sub: 'a year, from today’s price' },
-      { k: 'If you had bought at trend', v: pct1(r.trend * 100), sub: 'a year — the trend’s own slope' }
+      { k: 'The trend’s own bar', v: pct1(r.trend * 100), sub: 'a year over ' + H + ' years' },
+      { k: 'Floor case, from today’s price', v: pct1(r.floor * 100), sub: 'if it only reaches 0.42× trend' }
     ]));
 
     var W = 700, H2 = 150, PADL = 120, PADR = 40, TOP = 26, BH = 30, GAP = 26;
@@ -443,23 +448,41 @@
      Carries the DCA question too (JM ruling 9): no position-conditioned DCA
      engine exists, and a ladder started today is the nearest honest read.
      ═══════════════════════════════════════════════════════════ */
-  var D2_ERA = 'full', D2_N = 30;   // LSLI's own defaults: whole record, ~1yr of samples
+  /* LSLI's OWN DEFAULTS, and they are not the obvious ones: the era defaults to
+     post-2020, not to the whole record. Reading this snack on the full record
+     would quote a different bucket — a different n and a different mean — than
+     the page it routes to shows on arrival, which is exactly the failure the
+     consistency test exists to catch. Caught by checking the shipped page
+     rather than by assuming.
+     LSLI also reports the WINNER's margin and the WINNER's rate, so this snack
+     does the same: quoting the ladder's own 0% win rate beside that page's
+     100% would read as a contradiction between two true statements. */
+  var D2_ERA = 'post-2020', D2_N = 30;
   function renderD2(rawPos) {
     var b = LA.bucketAt(D2_ERA, D2_N, rawPos);
-    if (!b.n) { setHTML('rdD2Verdict', 'No historical entry sits close enough to this position to read a ladder result from.'); return; }
+    if (!b.n || b.n < 4) {
+      setHTML('rdD2Verdict', 'Bitcoin has rarely sat at this position since 2020 &mdash; too few entries here to read a ladder result from. The full instrument can widen the window.');
+      setHTML('rdD2Cards', ''); setHTML('rdD2Viz', '');
+      return;
+    }
+    var ladderWon = b.mean > 0;
+    var winName = ladderWon ? 'laddering in' : 'a single purchase';
+    var loseName = ladderWon ? 'a single purchase' : 'laddering in';
+    var winRate = ladderWon ? b.win : (100 - b.win);
     setHTML('rdD2Verdict',
-      'From entries at this position, laddering in over the following year ended with <strong>' +
-      pct0(Math.abs(b.mean)) + (b.mean > 0 ? ' more' : ' fewer') +
-      ' coins</strong> than a single purchase &mdash; and it came out ahead in ' + pct0(b.win) + ' of them.');
+      'From entries at this position, <strong>' + winName + '</strong> ended with <strong>' +
+      pct0(Math.abs(b.mean)) + ' more coins</strong> than ' + loseName +
+      ' on average, and won in ' + pct0(winRate) + ' of them.');
     setHTML('rdD2Cards', cards([
-      { k: 'Ladder vs one purchase', v: signPct0(b.mean), sub: 'mean difference in coins' },
-      { k: 'Laddering came out ahead', v: pct0(b.win), sub: 'of ' + b.n + ' matched entries' },
+      { k: 'How much it won by', v: '+' + pct0(Math.abs(b.mean)), sub: 'more coins accumulated' },
+      { k: 'How often', v: pct0(winRate), sub: 'of ' + b.n + ' entries here since 2020' },
       { k: 'Ladder length', v: '~1 year', sub: D2_N + ' buys, evenly spaced' }
     ]));
 
     // The advantage curve across the whole channel, with today marked. This is
     // the instrument test (§0): the curve is general, the marker is not.
     var curve = LA.advantageCurve(D2_ERA, D2_N);
+    if (curve.length < 2) { setHTML('rdD2Viz', ''); return; }
     var W = 700, H = 190, PADL = 46, PADR = 14, TOP = 14, BOT = 34;
     var xs = curve.map(function (p) { return p.x; }), ys = curve.map(function (p) { return p.y; });
     var xmin = Math.min.apply(null, xs), xmax = Math.max.apply(null, xs);
@@ -551,18 +574,24 @@
   /* ═══════════════════════════════════════════════════════════
      R1 — selling here to rebuy lower   [CLAMPED position]
      ═══════════════════════════════════════════════════════════ */
+  /* The HEADLINE figure is the win rate, not the median round-trip ratio, and
+     that is a consistency-test decision rather than an editorial one: Wait-or-
+     Deploy prints the win rate as its hero, so it reproduces exactly. The
+     median ratio is a real output of the same shared engine but neither source
+     page prints it raw — How Much Cash applies its own split and tax to it
+     first — so it renders as a supporting card that says what it is and what
+     that page does to it. Caught by reading both destinations, not by assuming. */
   function renderR1(m) {
     if (!m) return;
-    var lost = (1 - m.ratio) * 100;
     setHTML('rdR1Verdict',
-      'Selling here and rebuying at the first lower entry came back with <strong>' + m.ratio.toFixed(2) +
-      '&times;</strong> the coins in the median case &mdash; ' + pct0(lost) + ' fewer than simply holding.');
+      'Selling here in the hope of rebuying lower left you with more coins in <strong>' + pct0(m.paid) +
+      '</strong> of matched entries. In ' + pct0(m.never) + ' of them the lower price never arrived within two years.');
     var cs = [
-      { k: 'Median round trip', v: m.ratio.toFixed(2) + '×', sub: 'the coins it started with' },
-      { k: 'The round trip won', v: pct0(m.paid), sub: 'of ' + m.n + ' matched entries' }
+      { k: 'The round trip won', v: pct0(m.paid), sub: 'of ' + m.n + ' matched entries' },
+      { k: 'Median coins back', v: m.ratio.toFixed(2) + '×', sub: 'per coin sold — before any split or tax' }
     ];
     if (stackBTC) {
-      cs.push({ k: 'Your stack, round-tripped', v: btc(stackBTC * m.ratio) + ' BTC', sub: 'from ' + btc(stackBTC) + ' BTC, at the median' });
+      cs.push({ k: 'Your stack, round-tripped', v: btc(stackBTC * m.ratio) + ' BTC', sub: 'from ' + btc(stackBTC) + ' BTC, before split or tax' });
     }
     setHTML('rdR1Cards', cards(cs));
 
