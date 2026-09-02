@@ -1,8 +1,11 @@
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="icon" type="image/x-icon" href="/favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+{#- ICON BLOCK REMOVED 2026-09-01 — the OPEN_ITEMS reconciliation (v2 §9).
+    base.njk includes `components/head-icons.njk` for every page; this file's
+    own copy was written before that extraction landed and survived the merge
+    of main because git had nothing to conflict with — a file added on this
+    branch cannot collide with an edit made on another. The result was 11 icon
+    links on this page against 6 everywhere else, and the local copy was the
+    PRE-ADOPTION set: it was missing favicon-48x48.png. Nothing replaces it
+    here; the layout already carries the canonical set. -#}
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WNGLLPPR5M"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-WNGLLPPR5M');</script>
 
