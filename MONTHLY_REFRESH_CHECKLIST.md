@@ -299,6 +299,63 @@ Quick post-refresh checks to confirm everything's coherent:
 5. **Cross-check pages** — Bitcoin Retirement, Disciplined Rebalancing,
    BvRE, and any future page that uses the shared Power Law model
    should all show the same "you are here" position.
+6. **Load The Bitcoin Floor live and read the console** — see §5.1. This one
+   is not cosmetic: it is the only check here that can tell you the historical
+   record itself has changed shape.
+
+### 5.1 The Bitcoin Floor — `[floor-qa]` after a PL_DATA refresh
+
+`/the-bitcoin-floor` logs a single line to the console on every load:
+
+```
+[floor-qa] pass — parity fixture …, 4 episodes verified against the series.
+```
+
+The episode half of that assertion compares the page's four hand-authored
+approach cards against `computeEpisodes()`, which derives them live from
+`PL_DATA` under the unified visit definition (within 1% of the floor or below,
+>100-day gap starts a new episode — the page's method note states it, and The
+Rundown echoes it). A refresh can therefore turn this red, and **what the
+failure means depends on which assertion broke.**
+
+**An `open` failure is the tripwire working, not a regression.**
+
+```
+episode 2026 open false ≠ true
+```
+
+means the July 2026 approach **has closed** — the new samples put price back
+outside the band, so the episode now has an "after" and, in time, an outcome.
+The page is correctly refusing to keep showing a card that says *no outcome
+yet* about an episode that has one. Do this, in order:
+
+1. Set `open: false` on the `2026` entry in `EPISODES`.
+2. Fill in `to`, `samples`, `spanDays` and `bracketDays` from the failure text
+   and the derivation (`computeEpisodes()` returns all four).
+3. `xt24` / `gap24` stay `null` until **24 months after the episode's deepest
+   close** have actually elapsed — the parity check enforces this, and a closed
+   episode with no outcome is a legitimate state for up to two years. Do not
+   estimate one. When the window arrives, derive it **by the FL-1 method in
+   `DATA_AUDIT.md`** — that row is an open item precisely because the published
+   outcomes do not reproduce by naive interpolation.
+4. Rewrite the card body: it currently opens *"the only one on this page with
+   no outcome"*, which becomes false the moment step 1 lands.
+5. Update the dependents the same commit changes them in every time — the FAQ,
+   the section lede's *"two out of two"*, the *"third is still running"* clause,
+   the reversion stats' exclusion note, and the tripwire paragraph. Grep
+   `two out of two` and `still open` to find them.
+6. Reload; the line must read `pass` again.
+
+**Any other episode failure is a real finding.** A changed `from`, `to`,
+`belowPct` or `spanDays` on a *closed* episode means the historical series moved
+underneath a published card — investigate the data before touching the card.
+An `episode count` failure means a **new approach has begun**, which is a page
+event worth its own commit and its own card, not a number to bump.
+
+**The Rundown's A3 module echoes this same set.** It computes its own timeline
+from the same rule, so it follows automatically — but its copy claims *"same
+rule, same episodes, same count"*, so if you edit the Floor cards, load
+`/the-rundown` and confirm the timeline agrees before you close the refresh.
 
 ## 6. OG image regeneration (product-forward cards)
 
