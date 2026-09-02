@@ -26,13 +26,54 @@
 
   // ═══════════════════════════════════════════════════════════
   // STATIC — from analysis/2026-08-20-power-law-floor.md §2
-  // Four distinct episodes below 0.42× trend, 10 of 481 samples.
-  // `belowPct` is depth below the FLOOR (not below trend). `spanDays`
-  // is first-to-last below-floor sample; `bracketDays` is the last
-  // above-floor sample before to the first after — the outer
-  // bound on duration given a ~12-day sampling grid.
-  // gap24 = share of the gap to trend closed 24 months after the touch.
+  //
+  // ── THE VISIT DEFINITION (unified 2026-09-01, JM ruling 6) ──
+  // An approach is an episode in which price came WITHIN 1% OF the 0.42×
+  // floor or below it, with a gap of more than about 100 DAYS starting a new
+  // one. This page is the canonical home of that definition; The Rundown and
+  // Discount, or Premium? echo it rather than each carrying their own.
+  //
+  // It formalizes this page's own long-standing language. "Approached the
+  // line" was always the phenomenon of interest here — the strip labels each
+  // episode a graze or a break — and the 1% band is that phrase made numeric.
+  // The 100-day gap is the site's existing independent-visit rule, already
+  // shared with `shared/reversion-durations.js`.
+  //
+  // ── THE SENSITIVITY, STATED BECAUSE IT IS ASYMMETRIC ──
+  // The 100-day gap is INSENSITIVE: every value from 30 to 200 days yields
+  // the same four episodes. The ~1% graze band is LOAD-BEARING at exactly one
+  // place — below about 0.9% the open 2026 approach disappears, because its
+  // deepest sample sits 0.7% ABOVE the floor and never breached it. Both
+  // swept in FLOOR_VISIT_DEFINITION_MINIREPORT.md; the page states this in
+  // the method note beside the strip.
+  //
+  // ── WHAT THE UNIFICATION CHANGED, AND WHAT IT DELIBERATELY DID NOT ──
+  // Changed: the two 2015 episodes MERGE (24 days apart, one approach under
+  // the 100-day rule); January 2023 gains a December 2022 approach sample and
+  // becomes a 12-day episode; a fourth, OPEN episode appears in July 2026.
+  // NOT changed: no published figure was recomputed. Every depth and every
+  // 24-month outcome below is a number this page already published, carried
+  // across unchanged — the merged 2015 card takes its depth AND its outcome
+  // from the deeper September half, because the outcome anchors on the
+  // episode's deepest close, which is that half's. The only new numbers are
+  // structural (dates, sample counts, spans) and are read straight off
+  // PL_DATA, not modelled.
+  //
+  // `belowPct` is depth below the FLOOR (not below trend), and is NEGATIVE
+  // for an approach that never breached — the strip and card say "came within
+  // X% of the floor" rather than printing a negative depth.
+  // `spanDays` is first-to-last qualifying sample; `bracketDays` is the last
+  // sample outside the band before to the first after — the outer bound on
+  // duration given a ~12-day sampling grid. It is NULL while an episode is
+  // still open, because there is no "after" yet.
+  // gap24 = share of the gap to trend closed 24 months after the deepest
+  // close. NULL on an open episode: no outcome exists, and none is estimated.
   // ═══════════════════════════════════════════════════════════
+  // The two constants of the unified visit definition. Named once, used by the
+  // live derivation below and quoted in the method note on the page.
+  var EPISODE_GRAZE = 1.01;   // within 1% of the floor counts as an approach
+  var EPISODE_GAP_D = 100;    // a gap longer than this starts a new episode
+
   var EPISODES = [
     {
       id: '2010',
@@ -40,43 +81,43 @@
       from: '2010-08-30', to: '2010-10-17',
       samples: 5, spanDays: 48, bracketDays: 72,
       deepestXt: 0.241, deepestOn: '2010-10-05', belowPct: 42.6,
-      xt24: 0.628, gap24: 39,
+      xt24: 0.628, gap24: 39, open: false,
       kind: 'break', modern: false,
       kindLabel: 'Genesis era — recorded, not weighted',
       body: 'Price closed <strong>42.6% below the floor</strong> and stayed under for at least 48 days — 72 days measured from the last sample above the line to the first one after.<br><br>This sample sits in bitcoin’s genesis era: no mature exchange, negligible liquidity, a price measured in cents, and a market thin enough for a single participant to move it. It is the same period every careful fit of this model down-weights, for exactly that reason. It is <strong>statistically spurious as evidence about the modern floor; it is recorded here for completeness, not weight.</strong> Nothing else on this page rests on it.<br><br><strong>On the numbers themselves.</strong> The deepest sample here is <strong>0.241× trend</strong>. The shared module’s own header cites a 2010 low near <strong>0.196×</strong>, which cannot be derived from this series and may come from daily data predating the 12-day grid — another reason this era resists clean measurement.'
     },
     {
-      id: '2015a',
-      when: 'August 2015',
-      from: '2015-08-28', to: '2015-08-28',
-      samples: 1, spanDays: 0, bracketDays: 24,
-      deepestXt: 0.412, deepestOn: '2015-08-28', belowPct: 1.8,
-      xt24: 1.753, gap24: 228,
-      kind: 'graze', modern: true,
-      kindLabel: 'A graze',
-      body: 'A single sample <strong>1.8% below the floor</strong>, bracketed by above-floor samples 24 days apart — so the true stay below the line was anything under about 24 days. On any reading this is a touch, not a break — the line was tested and held within one sampling interval.<br><br>Twenty-four months later price sat at <strong>1.75× trend</strong>: the gap to trend was not merely closed but overshot by a wide margin. This is the deepest reversion in the record and it does a lot of work in the median below, which is a reason to look at the three modern outcomes individually rather than trusting their midpoint.'
-    },
-    {
-      id: '2015b',
-      when: 'Sep–Oct 2015',
-      from: '2015-09-21', to: '2015-10-15',
-      samples: 3, spanDays: 24, bracketDays: 48,
+      id: '2015',
+      when: 'Aug–Oct 2015',
+      from: '2015-08-28', to: '2015-10-15',
+      samples: 4, spanDays: 48, bracketDays: 72,
       deepestXt: 0.398, deepestOn: '2015-09-21', belowPct: 5.1,
-      xt24: 1.381, gap24: 163,
+      xt24: 1.381, gap24: 163, open: false,
       kind: 'graze', modern: true,
       kindLabel: 'A graze',
-      body: 'Three consecutive samples below the line, the deepest <strong>5.1% under</strong> — the worst of the three modern approaches, and still nowhere near the tripwire’s 10%-for-30-days criteria. Price spent about 24 days under by sample span, 48 bracketed.<br><br>Twenty-four months on, price was at <strong>1.38× trend</strong>. Note that this episode and the August one are separate visits, three weeks apart, with an above-floor sample between them — collapsing them into a single “2015 event” would turn four episodes into three and quietly change every count on this page.'
+      body: 'The deepest modern approach: four samples in the band across seven weeks, the lowest <strong>5.1% below the floor</strong> on 21 September, and still nowhere near the tripwire’s 10%-for-30-days criteria. Price spent about 48 days at or under the line by sample span, 72 bracketed — and the line held throughout.<br><br>Twenty-four months on from that low, price was at <strong>1.38× trend</strong>: the gap to trend closed and overshot.<br><br><strong>On the grouping.</strong> This card was two cards until 2026-09-01 — a single-sample touch in August and a three-sample stretch in September, 24 days apart. Under the site-wide 100-day rule they are one approach, which is the more faithful description of what happened: one visit to the line lasting seven weeks, not two unrelated events three weeks apart. The August low of 1.8% under and its own 24-month reading of 1.75× trend are no longer reported separately; the episode is measured from its deepest close, as every other card here is.'
     },
     {
       id: '2023',
-      when: 'January 2023',
-      from: '2023-01-06', to: '2023-01-06',
-      samples: 1, spanDays: 0, bracketDays: 24,
+      when: 'Dec 2022 – Jan 2023',
+      from: '2022-12-25', to: '2023-01-06',
+      samples: 2, spanDays: 12, bracketDays: 36,
       deepestXt: 0.418, deepestOn: '2023-01-06', belowPct: 0.4,
-      xt24: 1.175, gap24: 130,
+      xt24: 1.175, gap24: 130, open: false,
       kind: 'graze', modern: true,
       kindLabel: 'A graze',
-      body: 'The shallowest of the four: a single sample <strong>0.4% below the floor</strong>, at the bottom of the 2022 bear market. In practical terms price reached the line and stopped.<br><br>Twenty-four months later it sat at <strong>1.18× trend</strong>, having closed the gap and moved past it. This is also the most recent episode before today, and the one whose conditions most resemble the present market.'
+      body: 'The shallowest of the closed approaches: price came to the line on 25 December at <strong>0.424× trend</strong> — inside the band without breaching it — and went <strong>0.4% below the floor</strong> twelve days later, at the bottom of the 2022 bear market. In practical terms price reached the line and stopped.<br><br>Twenty-four months after that low it sat at <strong>1.18× trend</strong>, having closed the gap and moved past it. Until July 2026 this was the most recent approach in the record.'
+    },
+    {
+      id: '2026',
+      when: 'July 2026 – open',
+      from: '2026-07-13', to: '2026-07-31',
+      samples: 2, spanDays: 18, bracketDays: null,
+      deepestXt: 0.423, deepestOn: '2026-07-13', belowPct: -0.7,
+      xt24: null, gap24: null, open: true,
+      kind: 'graze', modern: true,
+      kindLabel: 'An approach, still open',
+      body: 'The current approach, and the only one on this page with <strong>no outcome</strong>: it is described, not scored. Two samples sit in the band and neither has breached the line — the deeper of them came <strong>within 0.7% of the floor</strong> without going under. The record’s newest sample is one of them, so there is no “after” to measure a duration or a reversion against, and none is estimated here.<br><br>It is also the episode that the visit definition is doing the most work for. Under a rule counting only closes strictly below the floor, this approach would not appear on this page at all; under the 1% band it does. That is stated rather than buried, because it is the one place where a reasonable change to the definition would change what this page reports.'
     }
   ];
 
@@ -312,7 +353,9 @@
         ctx.save();
         EPISODES.forEach(function (ep) {
           var a = dayOfIso(ep.from), b = dayOfIso(ep.to);
-          var half = (ep.bracketDays - ep.spanDays) / 2;
+          // An open episode has no bracketing sample after it, so there is no
+          // outer bound to widen the band by. Draw it at its sample span.
+          var half = ep.bracketDays == null ? 0 : (ep.bracketDays - ep.spanDays) / 2;
           var x0 = xs.getPixelForValue(Math.max(a - half, xs.min));
           var x1 = xs.getPixelForValue(Math.min(b + half, xs.max));
           var w = Math.max(x1 - x0, 3);
@@ -435,6 +478,10 @@
     if (!ep) {
       ctx.textContent = 'Showing the full history.';
       btn.hidden = true;
+    } else if (ep.open) {
+      // "The floor held" is a past-tense claim and this episode is not past.
+      ctx.innerHTML = 'Zoomed to the <strong>' + ep.when + '</strong> approach &mdash; the one still running, shown as far as the record goes and with no outcome attached to it.';
+      btn.hidden = false;
     } else if (ep.modern) {
       ctx.innerHTML = 'Zoomed to the <strong>' + ep.when + '</strong> approach &mdash; a stretch where the floor held even as price stayed below trend for an extended period.';
       btn.hidden = false;
@@ -488,24 +535,32 @@
       b.innerHTML =
         '<span class="fl-ep-btn-when">' + ep.when + '</span>' +
         '<span class="fl-ep-btn-kind ' + (ep.kind === 'break' ? 'is-break' : 'is-graze') + '">' + ep.kindLabel + '</span>' +
-        '<span class="fl-ep-btn-depth">' + ep.belowPct.toFixed(1) + '% below the floor</span>';
+        '<span class="fl-ep-btn-depth">' + depthLabel(ep) + '</span>';
       b.addEventListener('click', function () { selectEpisode(ep.id); });
       strip.appendChild(b);
     });
-    // The reversion stats are reported on the MODERN approaches only. The
-    // genesis-era episode is recorded in its own card and nowhere else — it is
-    // not averaged into a headline (see the section lede).
+    // The reversion stats are reported on the MODERN approaches only, and only
+    // on CLOSED ones. The genesis-era episode is recorded in its own card and
+    // nowhere else — it is not averaged into a headline (see the section lede).
+    // An OPEN episode has no 24-month window, so it is excluded rather than
+    // counted as a zero, which would drag the median toward a number no
+    // episode produced.
     var modern = EPISODES.filter(function (e) { return e.modern; });
-    var gaps = modern.map(function (e) { return e.gap24; });
+    var settled = modern.filter(function (e) { return !e.open && e.gap24 != null; });
+    var gaps = settled.map(function (e) { return e.gap24; });
     var over = gaps.filter(function (g) { return g > 100; }).length;
-    $('flRevMedian').textContent = Math.round(median(gaps)) + '%';
+    $('flRevMedian').textContent = gaps.length ? Math.round(median(gaps)) + '%' : '—';
     $('flRevOvershoot').textContent = over + ' of ' + gaps.length;
 
     // Round-2 reframe: the MODERN record leads. The genesis-era episode is
     // recorded in its own card and given no weight, so it is no longer the card
     // open on arrival — that would hand it the prominence the reframe removes.
-    // Opens on the most recent modern approach, whose own card notes it is the
-    // one whose conditions most resemble today.
+    // Opens on the most recent modern approach. Since the unification that can
+    // be an OPEN episode, and that is the right card to land on rather than a
+    // problem to route around: the reader arrives on the approach they are
+    // currently living through, and its card says in its first line that it has
+    // no outcome. The intent is unchanged — the conditions that most resemble
+    // today are now literally today's.
     // `true` = do not zoom: the chart lands on the full history, and zooming is
     // something the reader chooses by picking a card.
     selectEpisode(modern[modern.length - 1].id, true);
@@ -527,16 +582,24 @@
     var dur = ep.spanDays === 0
       ? 'a single sample (&le;24d)'
       : ep.spanDays + ' days';
+    // An open episode has no "after" sample, so no bracketed bound and no
+    // 24-month outcome. Those metrics are omitted rather than rendered empty:
+    // a tile reading "—× trend, 24 months later" invites the reader to think a
+    // measurement was attempted and failed, when none is possible yet.
+    var durKey = ep.bracketDays == null
+      ? 'in the band so far — still open'
+      : 'in the band (' + ep.bracketDays + 'd bracketed)';
+    var metrics =
+      metric(depthValue(ep), depthKey(ep)) +
+      metric(ep.deepestXt.toFixed(3) + '×', 'deepest, × trend') +
+      metric(dur, durKey);
+    if (ep.xt24 != null) metrics += metric(ep.xt24.toFixed(2) + '×', '× trend, 24 months later');
+    if (ep.gap24 != null) metrics += metric(ep.gap24 + '%', 'of the gap to trend closed');
+    if (ep.open) metrics += metric('no outcome yet', 'described, not scored');
     $('flEpCard').innerHTML =
       '<div class="fl-ep-card-h">' + ep.when + '</div>' +
       '<div class="fl-ep-card-kind ' + (ep.kind === 'break' ? 'is-break' : 'is-graze') + '">' + ep.kindLabel + '</div>' +
-      '<div class="fl-ep-metrics">' +
-        metric(ep.belowPct.toFixed(1) + '%', 'deepest, below the floor') +
-        metric(ep.deepestXt.toFixed(3) + '×', 'deepest, × trend') +
-        metric(dur, 'below the line (' + ep.bracketDays + 'd bracketed)') +
-        metric(ep.xt24.toFixed(2) + '×', '× trend, 24 months later') +
-        metric(ep.gap24 + '%', 'of the gap to trend closed') +
-      '</div>' +
+      '<div class="fl-ep-metrics">' + metrics + '</div>' +
       '<p>' + ep.body + '</p>';
     if (noZoom) { setZoomContext(null); }
     else { zoomChartTo(ep); }
@@ -544,6 +607,24 @@
   }
   function metric(v, k) {
     return '<div class="fl-ep-metric"><div class="fl-ep-metric-v">' + v + '</div><div class="fl-ep-metric-k">' + k + '</div></div>';
+  }
+
+  /* Depth wording. `belowPct` is negative for an approach that entered the 1%
+     band without ever closing under the line, and "−0.7% below the floor" is
+     not English — it reads as a measurement error rather than as the fact that
+     the floor was never breached. These three helpers are the only place the
+     sign is interpreted, so the strip and the card cannot drift apart. */
+  function neverBreached(ep) { return ep.belowPct < 0; }
+  function depthValue(ep) {
+    return Math.abs(ep.belowPct).toFixed(1) + '%';
+  }
+  function depthKey(ep) {
+    return neverBreached(ep) ? 'closest, above the floor' : 'deepest, below the floor';
+  }
+  function depthLabel(ep) {
+    return neverBreached(ep)
+      ? 'came within ' + Math.abs(ep.belowPct).toFixed(1) + '% of the floor'
+      : ep.belowPct.toFixed(1) + '% below the floor';
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -1085,6 +1166,12 @@
         if (c.to !== e.to) failures.push('episode ' + e.id + ' end ' + c.to + ' ≠ ' + e.to);
         if (Math.abs(c.belowPct - e.belowPct) > 0.05) failures.push('episode ' + e.id + ' depth ' + c.belowPct + ' ≠ ' + e.belowPct);
         if (Math.abs(c.spanDays - e.spanDays) > 0.5) failures.push('episode ' + e.id + ' span ' + c.spanDays + ' ≠ ' + e.spanDays);
+        // Openness is asserted too. It decides whether a card shows a 24-month
+        // outcome and whether the episode enters the reversion median, so a
+        // PL_DATA refresh that closes the open episode must fail loudly here
+        // rather than leave a stale "no outcome yet" tile on the page.
+        if (!!c.open !== !!e.open) failures.push('episode ' + e.id + ' open ' + !!c.open + ' ≠ ' + !!e.open);
+        if (!c.open && e.gap24 == null) failures.push('episode ' + e.id + ' is closed but carries no 24-month outcome');
       });
     }
 
@@ -1119,16 +1206,25 @@
   // Recompute the four episodes from PL_DATA — index-adjacent runs strictly
   // below the floor, so an above-floor sample between two dips separates them
   // (this is what keeps the two September/August 2015 visits distinct).
+  /* The derivation behind the EPISODES cards above, kept live so the cards can
+     be checked against the series rather than trusted. It implements the
+     unified visit definition (see the EPISODES header): within 1% of the floor
+     or below, with a >100-day gap starting a new episode. Before 2026-09-01
+     this counted only closes strictly below the floor and split on sample
+     contiguity, which produced a different grouping from the rest of the site. */
   function computeEpisodes() {
-    var runs = [], cur = null;
+    var runs = [], cur = null, thr = PL_FLOOR * EPISODE_GRAZE;
     for (var i = 0; i < PL_DATA.length; i++) {
       var p = PL_DATA[i], xt = p[1] / trendAt(p[0]);
-      if (xt < PL_FLOOR) {
-        if (!cur) cur = { s: i, rows: [] };
-        cur.rows.push(p);
-      } else if (cur) { cur.e = i - 1; runs.push(cur); cur = null; }
+      if (xt <= thr) {
+        if (!cur || p[0] - cur.rows[cur.rows.length - 1][0] > EPISODE_GAP_D) {
+          if (cur) { cur.e = cur.lastI; runs.push(cur); }
+          cur = { s: i, rows: [] };
+        }
+        cur.rows.push(p); cur.lastI = i;
+      }
     }
-    if (cur) { cur.e = PL_DATA.length - 1; runs.push(cur); }
+    if (cur) { cur.e = cur.lastI; runs.push(cur); }
     return runs.map(function (r) {
       var deepest = null;
       r.rows.forEach(function (p) {
@@ -1137,10 +1233,17 @@
       });
       var span = r.rows[r.rows.length - 1][0] - r.rows[0][0];
       var before = PL_DATA[Math.max(r.s - 1, 0)][0];
-      var after = PL_DATA[Math.min(r.e + 1, PL_DATA.length - 1)][0];
+      // OPEN = the episode's last qualifying sample is the last sample in the
+      // record. There is no bracketing sample after it, so bracketDays is null
+      // rather than a number computed against the episode's own last sample —
+      // which is what `Math.min(r.e + 1, len - 1)` would silently produce.
+      var isOpen = (r.e === PL_DATA.length - 1);
+      var after = isOpen ? null : PL_DATA[r.e + 1][0];
       return {
         from: isoOf(r.rows[0][0]), to: isoOf(r.rows[r.rows.length - 1][0]),
-        samples: r.rows.length, spanDays: span, bracketDays: after - before,
+        samples: r.rows.length, spanDays: span,
+        bracketDays: isOpen ? null : after - before,
+        open: isOpen,
         deepestXt: +deepest.xt.toFixed(3), deepestOn: isoOf(deepest.day),
         belowPct: +((1 - deepest.xt / PL_FLOOR) * 100).toFixed(1)
       };
