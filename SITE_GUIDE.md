@@ -3013,3 +3013,59 @@ Fourth page of the Power Law family (**Bitcoin and The Power Law** · **The Bitc
 **Future spoke slot.** The counsel-gated retirement-funds-mechanics survey, if it ever clears counsel, lands as a **hub section** rather than a standalone page — the backlog already notes a hub section is also the lightest way past the gate, and now that the hub exists that option is real. Nothing is built for it; the layout simply leaves room. Two further candidate fifth spokes (Reach Your Number; Flexible Spending) are captured in `PAGE_IDEAS_BACKLOG` → Retirement family, **none promoted**.
 
 **Open &mdash; RESOLVED 2026-08-26.** The hub now has its own brand-forward card, `og-bitcoin-retirement.jpg`, composited over `og-synthesis.jpg`'s right half by `build-og-bitcoin-retirement.py` (committed at repo root beside its siblings). Title "Plan Your" / italic-amber "Bitcoin" / "Retirement"; the two-line subtitle verbatim from the handoff. **Diagnostic note, so a future rerun is not misread:** the generator prints a `** WIDE` advisory when a line ends past x=600, and subtitle line 2 ends at **x=672**. It was visually verified clean &mdash; dark ground, well left of the template glyph &mdash; so the flag is expected output on every regeneration, not a defect. The head's `og:image` / `twitter:image` and both `:alt` values moved off the flagship filename in the same PR.
+
+---
+
+## 54. The Rundown (`/the-rundown.html`) — UNLISTED PREVIEW
+
+**Shipped unlisted 2026-08-29** for JM's register review, per `RUNDOWN_DESIGN.md` §9 [JM-6]: build to done → unlisted → register review → public. **It is absent from `explorations.json`, `sitemap.xml`, `llms.txt`, `updates.json`, the homepage, the nav and every other page's related strip**, and carries a `noindex, nofollow` preview guard in its head. The guard block and the in-page preview note are both marked "REMOVE AT THE PRODUCTION PASS" and come off together. Design at `RUNDOWN_DESIGN.md`; the Phase 0 verification that shaped it at `RUNDOWN_PHASE0_REPORT.md`. Page-scoped classes use the `rd-` prefix; mixed-content width tier (1100 page / 880 prose).
+
+**What the page is.** A position read: where bitcoin sits in its long-run channel, the record of the times it has been at this position before, and what followed — routed into the tools that own each decision. The Playbook's three-step arc, self-serve: is this real → what would it do to my situation → what happens when it falls. The word is *map*, never *recommendation*, and the page takes **zero user inputs**, which is the structural guarantee that nothing on it is individualized (the publisher/adviser line, kept wide by construction rather than by wording).
+
+**Zero new engines, zero new data, zero refresh burden.** Everything computes live at load from `shared/power-law-data.js` and `shared/channel-entries.js`. **No line was added to `MONTHLY_REFRESH_CHECKLIST`** and no new external dependency exists — the v1 fence held, same discipline as the dashboard.
+
+### The two methods, and why they are never mixed
+
+This is the page's one genuinely unusual mechanic, and `RUNDOWN_DESIGN §16.2a` governs it.
+
+- **Pooled** — `ChannelEntries.bandMetrics(P)`. Every eligible sample matched to a position, as one set. These figures reproduce **exactly** on Wait-or-Deploy-Now and How Much Cash, because it is the same engine call.
+- **Entry-anchored** — `visitOutcomes()`. One named historical entry followed forward to 1, 2 and 4 years by direct lookup against `PL_DATA`. **This reproduces on no source tool**, because no source tool asks the question. It is the design doc's single sanctioned exception to "every number reproducible on its source page", and all four of its conditions are met — including that the method is stated on-page in the row's sources line and re-derives from `PL_DATA` to the displayed precision.
+
+**All of a case study's horizons use the entry-anchored method, including 1y and 2y, which the pooled engine could have supplied.** Splicing a pooled band statistic into a narrated visit would give figures individually defensible and collectively incoherent. The row says so in its own words, and **the WODN route is labelled as the pooled exploration, not as verification** — it will not match the case studies and should not.
+
+### Structure
+
+Hero (static H1, **live standfirst** carrying the trend multiple only — no zone adjective, no action flavour; the no-JS fallback carries **no number**, never a placeholder) → position strip → **Step 1** premise gate with off-ramp → **Step 2**: the floor-visit framing block, then R1 (deploy or wait) and R3 (how much cash), then the roadmap coda → **Step 3**: R7 (drawdown frequency and depth) + holding-through-it → what this position does not change → what would break this → FAQ (6) → Related (6).
+
+**The framing block and the coda are not rows** and the §5 six-part anatomy does not apply to them. The block sits *after* the premise gate deliberately, so the historical framing inherits the gate's conditionality rather than standing as an independent claim.
+
+### Definitions the page owns, both adopted rather than invented
+
+- **Zone vocabulary: `positionLabel()`**, the site's existing six-band channel vocabulary. Phase 0 found it and the design doc's own five-band proposal was struck — its edges differed (0.5×/0.8× vs 0.60×/0.85×), which would have made every row disagree with WODN for the same position.
+- **Independent visit: the ~100-day episode gap**, lifted from `discount-or-premium.js` so the two pages cannot publish different visit counts for the same history. The design doc's proposed 30-day rule was struck: `PL_DATA` is a ~12-day grid whose gaps *inside* one continuous episode reach 96 days, so 30 days would have split one real visit into four.
+- **Floor visit: within 1% of the 0.42× floor or below**, which is the Floor page's published "approached the line" made numeric. Sensitivity-checked: ±10% on that threshold leaves the visit count unchanged.
+- **The 2010 episode is recorded once and given no weight**, exactly as `/the-bitcoin-floor` treats it — and it is also the era the shared engine's own `TABLE_CUT` excludes.
+
+### The honesty mechanics — the reason the page reads as it does
+
+- **N is two, and the page says so rather than computing around it.** At the floor, the record holds two *closed* visits. The design doc's own N<3 rule bans distribution statistics on that, so R1 **narrates each visit** — entry, depth, duration, outcomes at 1/2/4 years — instead of publishing a median or a hit rate. Where the fourth year has not arrived, the table says so rather than estimating.
+- **The counter-case, where the record is unanimous, is the thinness plus the unsampled scenario.** Both closed visits ran the same way. The mandatory sentence: the shared engine treats any sub-floor position as sitting *on* the floor when matching entries, so **no sustained break appears in this data even in principle** — structurally absent, not merely rare. That absence is a limit of the sample, not evidence about the world.
+- **The 2014 cut is disclosed, not hidden.** `channel-entries.js` excludes everything before 2014. The design doc's original "full record only" fence was contradicted by the only engine v1 could compute from, so the fence was amended to "the source engine's record, disclosed" and the sources line states it.
+- **The lede is live, not static.** Whether price is *at* the floor right now is a fact that changes, and `PL_DATA` can run weeks behind live spot — a hardcoded "price is at the floor" sentence goes false without anyone noticing. The lede is assembled from both facts and states whichever is true, including the case where the record's last sample is still at the floor while spot has moved up off it. **This was caught in the build**, not in review: spot was 0.51× against a most-recent sample of 0.42×.
+- **Durations are lower bounds and the page says why** — a ~12-day sampling grid cannot resolve an episode more finely than its own interval.
+
+### Register
+
+No colour on this page encodes an action or a verdict — no green below trend, no red above it, no alarm state near the floor. The one semantic colour marks a **closed** visit versus the **open** one, which is a fact about whether an outcome exists yet. Banned-word sweep run against STYLE_GUIDE §11 plus the page-specific list in `RUNDOWN_DESIGN §9` ("signal", "buy zone", "opportunity", "time to", "should" at the reader): clean. Imperative grep: clean. The two second-person uses are the ratified premise-gate copy and route notes that put the tool "under your own hand" — the reader as decider, which is the register working.
+
+### Not
+
+Not advice and not a signal service. **Not a seven-row decision matrix** — four of the seven proposed rows were cut at Phase 0, three because no engine on the site conditions them on position and one because Your Deployment Plan already owns it. The page names those absences in its roadmap coda rather than padding: *a map, growing — never a matrix, padded*. Not a borrowing surface (Bitcoin as Collateral appears in Related only, with no position-conditioned borrowing content anywhere). No era toggles, no sticky inputs, no personalization — all v1.1/v2, gated.
+
+### Open at the unlisted ship
+
+- **OG card — not yet generated.** No image tooling on the authoring machine (the `HURDLE_RATE` §45 precedent). **No `og:image` / `twitter:image` tag is wired yet, deliberately** — a tag pointing at a file that does not exist is worse than no tag, because scrapers cache the 404. At generation: register in `.eleventy.js` `staticAssets`, add both tags with real alt text, run the §52.1 watchlist check. Hero selector = the position strip plus the first visit card. The card carries **no live figure** (§11) — a baked number goes stale in scraper caches the day it ships.
+- **Listing surfaces** — `explorations.json`, `sitemap.xml`, `llms.txt`, `updates.json`, homepage and nav entries all deferred to the production pass, by design. Nav recommendation is **The Numbers** group, no new top-level item (the 919px capacity constraint stands).
+- **Counsel pass** at JM's election before public listing.
+- **The dashboard routing chip [JM-3]** is a separate later commit that ships only **after** this page is public. The dashboard is untouched by this build.
+- **Carousel slide** — not proposed; a position read is arguably the same case the dashboard made for having no slide (§13). JM's call at the production pass.

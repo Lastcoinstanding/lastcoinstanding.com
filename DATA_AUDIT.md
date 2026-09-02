@@ -139,6 +139,46 @@ The Disciplined Rebalancing page applies the same Power Law channel as `/the-bit
 
 **HR-1 / HR-2 (added 2026-08-06).** The two short-rate-sensitive presets on `/the-bitcoin-hurdle-rate` — approximate starting points the user immediately overrides (slider + numeric entry), labelled "~". Tracking lives in the **Next due** column above: re-check both at the quarterly audit and bump the display if the short-rate regime has moved materially. The page adds **zero** MONTHLY_REFRESH surface by design (the review-date column carries it — no monthly line). The other presets need no rows: WACC ~9% and "a strong project" 20% are illustrative anchors; S&P 500 long-run TR 10.86% reuses the R-1 family (via BvSM); mortgage ~6% and rental ~8% are long-run editorial anchors. Everything else on the page computes live from the shared Power Law module (`PL_A`/`PL_B`/`PL_FLOOR`/`plPrice`) — no rows.
 
+### the-bitcoin-floor
+
+The Bitcoin Floor computes everything on-page from the shared Power Law module
+(`PL_A` / `PL_B` / `PL_FLOOR` / `plPrice` / `PL_DATA`, all inherited from PL-1)
+with one exception, which is the row below.
+
+| # | Component | Value | Source | URL | Last audited | Next due |
+|---|---|---|---|---|---|---|
+| FL-1 | Episode 24-month outcomes (`xt24`, `gap24` on the four approach cards) | 2010: 0.628× / 39% · 2015: 1.381× / 163% · 2022–23: 1.175× / 130% · 2026: open, none | `analysis/2026-08-20-power-law-floor.md` §2 — an in-repo analysis, not an external source | — | 2026-08-20 | **2026-11-20** |
+
+**FL-1 — OUTCOME PROVENANCE, OPEN ITEM (raised 2026-09-02, JM, at the visit-definition
+unification).** These four figures are the only numbers on the page that do not recompute
+live from `PL_DATA`. They are carried from the analysis doc, and **a naive re-derivation
+does not reproduce them.** Measured at the unification: interpolating price 730.5 days
+after each episode's deepest close and taking `(xt24 − xtDeep) / (1 − xtDeep)` gives
+2023 = 130% (matches), 2015a = 229% vs 228% (near), 2015b = 170% vs 163% (2.8% out on
+`xt24`), and **2010 = 53% vs the published 39% — about 14pp out.** So the analysis used a
+convention this repo does not currently record: a different anchor, a calendar +24 months
+rather than 730.5 days, a nearest-sample read rather than interpolation, or daily data
+predating the 12-day grid.
+
+**Reconcile one of two ways, and do not let it evaporate:**
+1. **Document the exact derivation** — the anchor, the date arithmetic and the sampling
+   rule — such that it reproduces all four published figures, and add it to this row; or
+2. **Re-derive and republish** with the method stated on-page and the changed figures
+   attributed as a correction.
+
+**Why it was not done at the unification:** the ruling that merged the 2015 episodes was
+a grouping change, and re-deriving outcomes at the same time would have moved published
+figures by an amount unattributable to the ruling. Every surviving figure is one the page
+had already published, re-attributed — which is what kept the two changes separable, and
+is why this is a clean open item rather than a defect. Full record:
+`FLOOR_VISIT_DEFINITION_MINIREPORT.md`.
+
+**Scope note.** The unification did not touch these values; it changed which card carries
+which. The merged 2015 card took the September half's outcome because the outcome anchors
+on the episode's deepest close and that is the September half's — so `1.753× / 228%` (the
+August half's) is no longer published anywhere, and only three of the four values above
+are on the page today.
+
 ### the-strc-mechanism — STRC daily close (automated)
 
 | # | Component | Value | Source | URL | Last audited | Next due |

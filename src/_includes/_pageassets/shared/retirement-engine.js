@@ -191,9 +191,21 @@
          scenarios can never diverge in HOW they are computed — only in what
          they are. `multFn` (optional) injects the shared crash path; it forces
          the uncached loop because a function has no cache key. ─── */
-  function projectForBasis(scenario, basis, noCache, multFn) {
+  /* `growthKey` (optional, added 2026-09-01 for The Rundown's P1 snack) overrides
+     the growth model this call runs under, WITHOUT touching the site-wide
+     ModelingAssumptions store. That distinction is the whole point: a consumer
+     that wants one floor-case read should not have to mutate a setting every
+     retirement page on the site shares. Omitted, it reads MA exactly as before,
+     so every existing caller is unchanged — and projectMemo's key already
+     carries growthModelKey, so an override cannot collide in the cache.
+
+     It has no effect on `basis: 'current'`, deliberately: that basis IS
+     "today's gap to trend persists", which is defined as the trend model scaled
+     by today's ratio. A floor read is `basis: 'trend'` with growthKey
+     'powerlaw-floor'. */
+  function projectForBasis(scenario, basis, noCache, multFn, growthKey) {
     var infl = MA.get('inflation').value;
-    var growth = (basis === 'current') ? 'powerlaw-trend' : MA.get('btcGrowthModel').preset;
+    var growth = (basis === 'current') ? 'powerlaw-trend' : (growthKey || MA.get('btcGrowthModel').preset);
     if (multFn) {
       var ratio = (basis === 'current') ? currentRatio() : 1;
       return projectWithMultFn(scenario, growth, infl, function (y) { return multFn(y) * ratio; });
@@ -322,11 +334,14 @@
   // moves the retirement year, and a fixed multiplier would leave the crash
   // sitting at the original year while the plan walked away from it, solving
   // for a world nobody is being shown.
-  function lineFor(axis, scenario, basis, multFor) {
+  // `growthKey` (optional) threads straight through to projectForBasis — see the
+  // note there. Omitted, this solves under the site-wide growth model exactly as
+  // it always has.
+  function lineFor(axis, scenario, basis, multFor, growthKey) {
     var infl = MA.get('inflation').value;
     function escapes(over) {
       var s = cloneWith(over, scenario);
-      return computeVerdict(projectForBasis(s, basis, true, multFor && multFor(s)), s, infl).state === 'escape';
+      return computeVerdict(projectForBasis(s, basis, true, multFor && multFor(s), growthKey), s, infl).state === 'escape';
     }
     if (axis === 'stack') {
       var ls = LIMITS.btcStack;
