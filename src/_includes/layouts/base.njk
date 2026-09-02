@@ -3,6 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{# Canonical icon block — site chrome, so it lives here rather than in 54
+   copies of itself. Extracted 2026-08-29; see components/head-icons.njk for
+   what the extraction fixed. Emitted BEFORE head_extras so a page could still
+   override an icon after it if one ever needed to. #}
+{% include 'components/head-icons.njk' %}
 {{ head_extras | safe }}
 {# FAQPage JSON-LD — layout-level, single-sourced from the `faq` front matter
    (same array the visible page-faq.njk block renders in the body). Emitted here
@@ -83,6 +88,34 @@ a:not([class]):hover { text-decoration-color: #e09422; }
 .site-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; background: rgba(10,9,8,0.95); border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 .site-nav .brand { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #999; text-decoration: none; transition: color 0.2s; }
 .site-nav .brand:hover { color: #e09422; }
+/* Brand mark (adopted 2026-08-29). Sized in `em` deliberately, NOT px: ten
+   pages override `.brand` font-size to 0.72rem at mobile, so an em-sized mark
+   tracks the wordmark on every page without needing to know which. The mark's
+   own aspect (130x70) is preserved by width:auto. flex:none stops it being
+   squeezed when the nav row gets tight. */
+.site-nav .brand { display: inline-flex; align-items: center; gap: 0.5em; }
+.site-nav .brand-mark { height: 1.5em; width: auto; flex: none; display: block; }
+.site-nav .brand-word { display: inline-block; }
+/* The mid-width band, and why the mark steps aside in it.
+   MEASURED ON THE DEPLOYED SITE, not inferred: the desktop nav row has no
+   headroom. The wordmark ALREADY wraps to two lines somewhere between 900px
+   and 1000px WITHOUT the mark, growing the nav 65px -> 90px, and several pages
+   hardcode sticky offsets against the 65px single-line height (SITE_GUIDE §47).
+   Adding the mark costs the brand ~42px and moves that break point out to
+   between 1040px and 1060px — roughly 100px more of broken nav, which is a
+   regression this project has no mandate to ship.
+   So the mark is shown only where it demonstrably fits: at or below 768px the
+   links are already a hamburger and the brand has the row to itself (measured
+   at 375px: no wrap, 75px of clearance to the hamburger), and at 1100px and up
+   there is room with 40px of margin over the measured threshold. Between them
+   it hides, and the nav keeps exactly today's geometry.
+   This fences a KNOWN defect; it does not fix it. The fix — collapsing the
+   wordmark to the mark so both always fit — belongs to the nav-capacity
+   project (PAGE_IDEAS_BACKLOG, "Desktop nav capacity + The Dashboard entry"),
+   which owns that decision and carries the measurement table for it. */
+@media (min-width: 769px) and (max-width: 1099px) {
+  .site-nav .brand-mark { display: none; }
+}
 .site-nav .nav-links { display: flex; gap: 8px; align-items: center; }
 .site-nav .nav-links a { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.9rem; font-weight: 500; color: #aaa; text-decoration: none; padding: 8px 16px; border-radius: 4px; transition: color 0.2s, background 0.2s; }
 .site-nav .nav-links a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
@@ -515,7 +548,12 @@ h1, h2, h3 {
     {%- endif -%}
     {%- endmacro -%}
     <nav class="site-nav">
-        <a href="/" class="brand">Last Coin Standing</a>
+        {#- The brand mark, adopted 2026-08-29. Links home (ruled: home, never
+            LinkedIn — the personal-brand pointer lives in the footer and on
+            Work With Me). alt="" because the wordmark beside it already names
+            the link; giving the image alt text would make a screen reader
+            announce the name twice. -#}
+        <a href="/" class="brand"><img class="brand-mark" src="/lcs-mark.svg" alt="" width="130" height="70" decoding="async"><span class="brand-word">Last Coin Standing</span></a>
             <div class="nav-links">
         {%- set currentCat = "" -%}
         {%- for e in explorations -%}{%- if e.slug == slug -%}{%- set currentCat = e.category -%}{%- endif -%}{%- endfor -%}
@@ -750,6 +788,14 @@ h1, h2, h3 {
             <a href="/calculators">Calculators</a>
             <a href="/about">About</a>
             <a href="/work-with-me">Work With Me</a>
+        </div>
+        {#- The personal-brand pointer, added 2026-08-29. Ruled to the footer
+            and Work With Me only — deliberately NOT the logo, which links home.
+            Its own column rather than an entry under "Site", because every
+            other link there is internal and this one leaves. -#}
+        <div class="footer-nav-section">
+            <div class="footer-nav-label">Elsewhere</div>
+            <a href="https://www.linkedin.com/in/jmccabe1/" target="_blank" rel="noopener">John McCabe on LinkedIn</a>
         </div>
     </nav>
     <div class="footer-tip">

@@ -14,7 +14,14 @@ module.exports = function (eleventyConfig) {
     'favicon.svg',
     'favicon-16x16.png',
     'favicon-32x32.png',
+    // 48px added 2026-08-29 with the brand-mark favicon set. The 16/32/48 +
+    // apple-touch-icon rasters and favicon.svg all render the same 5-coin mark
+    // (sources in brand/); 192 predates them and is NOT in the <head> set —
+    // it is retained for a future web-app manifest only.
+    'favicon-48x48.png',
     'favicon-192x192.png',
+    // The header mark (nav, left of the wordmark). Source: brand/lcs-mark-5.svg.
+    'lcs-mark.svg',
     'sitemap.xml',
     'llms.txt',
     'robots.txt',
