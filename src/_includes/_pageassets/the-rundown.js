@@ -329,14 +329,85 @@
       { k: 'Slowest return to trend', v: slowest ? slowest.toFixed(1) + ' yrs' : '—', sub: 'from that entry' }
     ]));
 
-    // ── The timeline. Position-current by construction: today's marker is on
-    //    it, which is what makes it an instrument rather than an exhibit (§0).
-    var W = 700, H = 132, PADL = 10, PADR = 10, AXY = 84;
+    /* ── The timeline. Position-current by construction: today's marker is on
+          it, which is what makes it an instrument rather than an exhibit (§0).
+
+       LABEL PLACEMENT IS COMPUTED, NOT ALTERNATED (JM register review, pass 1).
+       The previous version tiered labels by index parity, which is not
+       collision handling at all — it happens to work until two markers land
+       near each other, and today's live state is exactly that case: the open
+       July 2026 episode sits at the right-hand end of the axis and today's
+       marker is pinned there permanently, so their labels overlapped.
+
+       Three mechanisms, in order:
+         1. MERGE. An episode whose marker is within MERGE_X of today's is not
+            a separate thing to label — it IS where we are. The pair collapses
+            into one label carrying both facts.
+         2. CLAMP. A label's centre is pulled inside the plot area so it can
+            never hang off the edge, which is what pushed "Aug 2015" against
+            the left tick.
+         3. TIER. Anything still overlapping drops to the next row, measured
+            against every label already placed rather than against its own
+            index.
+       Widths are estimated from character count and font size; the viewBox is
+       fixed so those units are stable at every viewport. The estimate is
+       deliberately generous — over-reserving costs a little vertical space,
+       under-reserving costs a collision. Verified against measured getBBox
+       extents at 375, 768 and 1280. */
+    var W = 700, PADL = 34, PADR = 34, ROW_H = 21, GUTTER = 8, MERGE_X = 46;
     var y0 = 2014, y1 = yearOf(S[N - 1].d) + 1;
     function xOf(day) {
       var yr = yearOf(day) + (dayToDate(day).getUTCMonth() / 12);
       return PADL + (yr - y0) / (y1 - y0) * (W - PADL - PADR);
     }
+    function estW(t, size) { return String(t).length * size * 0.58; }
+    var xt = W - PADR;
+
+    // 1 · build the label set, merging any episode coincident with today
+    var labels = [], mergedWith = null;
+    modern.forEach(function (v) {
+      var xa = xOf(v.firstD), xb = Math.max(xOf(v.lastD), xa + 3);
+      var cx = (xa + xb) / 2;
+      if (mergedWith === null && Math.abs(xt - cx) <= MERGE_X) {
+        mergedWith = v;
+        var moved = Math.abs(liveMult - v.lowM) >= 0.005;
+        labels.push({
+          cx: (cx + xt) / 2, open: true,
+          main: fmtMonthShort(v.firstD) + ' · today',
+          sub: moved ? v.lowM.toFixed(2) + '× → ' + liveMult.toFixed(2) + '×' : liveMult.toFixed(2) + '×'
+        });
+      } else {
+        labels.push({ cx: cx, open: !!v.open, main: fmtMonthShort(v.firstD), sub: v.lowM.toFixed(2) + '×' });
+      }
+    });
+    if (mergedWith === null) {
+      labels.push({ cx: xt, open: true, today: true, main: 'today', sub: liveMult.toFixed(2) + '×' });
+    }
+
+    // 2 · clamp inside the plot area, then 3 · tier against everything placed
+    var rows = [];
+    labels.forEach(function (L) {
+      var half = Math.max(estW(L.main, 10.5), estW(L.sub, 9.5)) / 2;
+      L.x = Math.max(PADL + half, Math.min(W - PADR - half, L.cx));
+      var lo = L.x - half, hi = L.x + half, r = 0;
+      for (;;) {
+        var clash = false, seg = rows[r] || [];
+        for (var q = 0; q < seg.length; q++) {
+          if (!(hi + GUTTER < seg[q][0] || lo - GUTTER > seg[q][1])) { clash = true; break; }
+        }
+        if (!clash) break;
+        r++;
+      }
+      (rows[r] = rows[r] || []).push([lo, hi]);
+      L.row = r;
+    });
+
+    // The axis sits below whatever stack of label rows was needed, so the
+    // chart grows downward rather than clipping at the top.
+    var maxRow = rows.length - 1;
+    var AXY = 30 + (maxRow + 1) * ROW_H + 24;
+    var H = AXY + 26;
+
     var s = svgOpen(W, H, 'Timeline of the channel-floor visits since 2014, with today marked');
     s += '<line class="rd-ax" x1="' + PADL + '" y1="' + AXY + '" x2="' + (W - PADR) + '" y2="' + AXY + '"/>';
     for (var yr = y0; yr <= y1; yr += 2) {
@@ -344,18 +415,20 @@
       s += '<line class="rd-tick" x1="' + x + '" y1="' + AXY + '" x2="' + x + '" y2="' + (AXY + 5) + '"/>';
       s += '<text class="rd-axlbl" x="' + x + '" y="' + (AXY + 18) + '" text-anchor="middle">' + yr + '</text>';
     }
-    modern.forEach(function (v, i) {
+    modern.forEach(function (v) {
       var xa = xOf(v.firstD), xb = Math.max(xOf(v.lastD), xa + 3);
-      var cls = v.open ? 'rd-ep rd-ep-open' : 'rd-ep';
-      s += '<rect class="' + cls + '" x="' + xa + '" y="' + (AXY - 22) + '" width="' + (xb - xa) + '" height="22" rx="2"/>';
-      var lab = fmtMonthShort(v.firstD);
-      var ty = (i % 2 === 0) ? AXY - 30 : AXY - 48;
-      s += '<text class="rd-eplbl' + (v.open ? ' is-open' : '') + '" x="' + ((xa + xb) / 2) + '" y="' + ty + '" text-anchor="middle">' + lab + '</text>';
-      s += '<text class="rd-epsub" x="' + ((xa + xb) / 2) + '" y="' + (ty + 11) + '" text-anchor="middle">' + v.lowM.toFixed(2) + '×</text>';
+      s += '<rect class="rd-ep' + (v.open ? ' rd-ep-open' : '') + '" x="' + xa + '" y="' + (AXY - 20) + '" width="' + (xb - xa) + '" height="20" rx="2"/>';
     });
-    var xt = W - PADR;
-    s += '<line class="rd-today" x1="' + xt + '" y1="' + (AXY - 34) + '" x2="' + xt + '" y2="' + (AXY + 3) + '"/>';
-    s += '<text class="rd-todaylbl" x="' + xt + '" y="' + (AXY - 38) + '" text-anchor="end">today ' + liveMult.toFixed(2) + '×</text>';
+    s += '<line class="rd-today" x1="' + xt + '" y1="' + (AXY - 28) + '" x2="' + xt + '" y2="' + (AXY + 3) + '"/>';
+    labels.forEach(function (L) {
+      var ty = AXY - 30 - L.row * ROW_H;
+      var cls = L.open ? ' is-open' : '';
+      // 12, not 11: at 11 the two lines' glyph boxes just touch, which reads
+      // fine but makes an automated overlap check ambiguous about whether a
+      // label has collided with its own subtitle or with a neighbour.
+      s += '<text class="rd-eplbl' + cls + '" x="' + L.x.toFixed(1) + '" y="' + ty + '" text-anchor="middle">' + L.main + '</text>';
+      s += '<text class="rd-epsub' + cls + '" x="' + L.x.toFixed(1) + '" y="' + (ty + 12) + '" text-anchor="middle">' + L.sub + '</text>';
+    });
     s += '</svg>';
     setHTML('rdA3Viz', s);
 

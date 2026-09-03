@@ -52,13 +52,36 @@
   --rd-closed: #7a7367;
   --rd-open: #F7931A;
   --rd-you: #6db3d4;
+
+  /* ── ONE MODULE WIDTH (JM register review, pass 1, 2026-09-02) ──
+     Every module on this page — the context header, the setup panel, every
+     snack, the coda and what-would-break-this — shares this width and no
+     other. The page previously ran three: 880px prose, 900px header and a
+     1100px snack grid, which read as three different pages stacked.
+     Change it here and every module moves together; that is the point of the
+     token. Sub-elements inside a module (the channel bar, an SVG) may be
+     narrower, but no module's own edge may be. */
+  --rd-w: 880px;
+
+  /* The gutter every full-width container reserves outside the module width.
+     One token, because the hero and the sections MUST reserve the same amount
+     or their content boxes diverge below --rd-w + 2 gutters — which is exactly
+     what put the context header 32px inside every other module at 768px while
+     looking correct at 1280. */
+  --rd-gutter: 2rem;
 }
 
 body { background: var(--bg); color: var(--text); }
 .hero, .hero *, .content-area, .content-area * { box-sizing: border-box; }
 
 /* ── Hero ───────────────────────────────────────────────── */
-.hero { position: relative; text-align: center; max-width: 880px; margin: 0 auto; padding: 4.5rem 2rem 1.2rem; }
+/* Every full-width container carries the module width PLUS the shared gutter,
+   so its CONTENT box — and therefore whatever module is nested in it —
+   measures --rd-w at wide viewports and shrinks in step with every other
+   container below that. Setting these to --rd-w directly is the
+   obvious-looking mistake: it makes the nested module a gutter narrower than
+   its neighbours, and only at some viewports. */
+.hero { position: relative; text-align: center; max-width: calc(var(--rd-w) + var(--rd-gutter) * 2); margin: 0 auto; padding: 4.5rem var(--rd-gutter) 1.2rem; }
 .hero h1 { font-family: var(--font-d); font-size: clamp(2.3rem, 5.6vw, 3.5rem); font-weight: 500; letter-spacing: -.01em; line-height: 1.08; color: var(--ink-bright); margin: 0 0 1rem; }
 .hero h1 em { font-style: italic; color: var(--amber); }
 
@@ -85,7 +108,7 @@ body { background: var(--bg); color: var(--text); }
    It carries only what the site-wide channel ribbon above it cannot. The
    ribbon already shows price, multiple and zone; repeating them here is the
    duplication the one-canonical-home rule exists to prevent. */
-.rd-hdr { max-width: 900px; margin: 2rem auto 0; }
+.rd-hdr { max-width: var(--rd-w); margin: 2rem auto 0; }
 .rd-hdr-tag {
   font-family: var(--font-b); font-size: 0.64rem; letter-spacing: .13em; text-transform: uppercase;
   color: var(--text-muted); text-align: center; margin-bottom: 0.7rem;
@@ -113,8 +136,15 @@ body { background: var(--bg); color: var(--text); }
 .rd-bar-marker-label { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: var(--font-b); font-size: 0.66rem; color: var(--rd-position); }
 
 /* ── Sections ────────────────────────────────────────────── */
-.rd-section { max-width: 880px; margin: 0 auto; padding: 3rem 0 0; }
-.rd-section-wide { max-width: 1100px; }
+.rd-section { max-width: calc(var(--rd-w) + var(--rd-gutter) * 2); margin: 0 auto; padding: 3rem var(--rd-gutter) 0; }
+/* `.rd-section-wide` is retained in the markup but now sets NOTHING. It used
+   to be the page's second width (1100px). Giving it `max-width: var(--rd-w)`
+   looked like the right retirement and was not: `.rd-section` reserves the
+   gutter on top of the module width, so an override of the bare token silently
+   made wide sections a gutter narrower in their content box — the snacks came
+   out 64px inside the header and the gate. Same value, different box. The rule
+   is left declaring nothing rather than deleted, so the next person to reach
+   for the class finds this note instead of re-adding a width. */
 .rd-section h2 { font-family: var(--font-d); font-size: clamp(1.6rem, 3.6vw, 2.1rem); font-weight: 500; color: var(--ink-bright); margin: 0 0 1rem; line-height: 1.15; }
 .rd-section h2 em { font-style: italic; color: var(--amber); }
 .rd-section h3 { font-family: var(--font-d); font-size: 1.3rem; font-weight: 500; color: var(--ink-bright); margin: 1.8rem 0 0.7rem; }
@@ -174,14 +204,23 @@ body { background: var(--bg); color: var(--text); }
 
 /* ── The snack grid (§2.5) ───────────────────────────────── */
 .rd-cluster-k { font-family: var(--font-b); font-size: 0.68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--text-muted); margin: 2.4rem 0 0.9rem; }
-/* Two columns at the 1100px tier, one below ~880px. The minimum is set at
-   420px deliberately: a third column fits the width arithmetically but not the
-   content — a snack carrying a slider, three stat cards and a chart at ~350px
-   stacks into a tower and stops reading as a compact module. */
-.rd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.2rem; align-items: start; }
+/* SINGLE COLUMN AT EVERY VIEWPORT (JM register review, pass 1).
+   Not a responsive simplification — a structural one. The intent router makes
+   the rendered snack count variable (2, 3, 4 or 5 depending on the chosen
+   question), so any multi-column grid orphans a card in some states and not
+   others: the always-on cluster alone leaves a half-width snack beside empty
+   space. A stack has no such state. It also lets every snack share the one
+   module width, which is the whole point of --rd-w. */
+.rd-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; align-items: start; }
 .rd-snack {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
   padding: 1.3rem 1.4rem; display: flex; flex-direction: column;
+  /* A grid item's automatic minimum size is its content's min-content width,
+     so a snack whose stat-card grid demands three 110px tracks refuses to
+     shrink below ~365px and pushes its own right edge past the module width at
+     375. This is the standard release valve, and it is why the snacks measured
+     23px wider than every other module on mobile. */
+  min-width: 0;
 }
 .rd-snack-wide { grid-column: 1 / -1; }
 .rd-snack[hidden] { display: none; }
@@ -192,7 +231,10 @@ body { background: var(--bg); color: var(--text); }
 .rd-verdict { font-family: var(--font-b); font-size: 0.93rem; line-height: 1.65; color: var(--text); margin: 0 0 1rem; }
 .rd-verdict strong { color: var(--ink-bright); font-weight: 600; }
 /* 3 · stat cards — labels and values, not prose */
-.rd-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 1rem; }
+/* `min(130px, 100%)` rather than a bare 130px: auto-fit will otherwise insist
+   on a full track even when the container is narrower than one, which
+   overflows instead of dropping to fewer columns. */
+.rd-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(130px, 100%), 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 1rem; }
 .rd-card { background: var(--bg-card-2); padding: 0.7rem 0.8rem; }
 .rd-card-k { display: block; font-family: var(--font-b); font-size: 0.6rem; letter-spacing: .07em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem; line-height: 1.3; }
 .rd-card-v { display: block; font-family: var(--font-d); font-size: 1.5rem; color: var(--ink-bright); line-height: 1.05; }
@@ -239,6 +281,10 @@ body { background: var(--bg); color: var(--text); }
 .rd-eplbl { fill: #9a9080; font-family: 'Inter', sans-serif; font-size: 10.5px; }
 .rd-eplbl.is-open { fill: var(--rd-position); }
 .rd-epsub { fill: #6a6256; font-family: 'Inter', sans-serif; font-size: 9.5px; }
+/* The open/today label carries the live accent on both of its lines, so the
+   merged "Jul 2026 · today" pair reads as one label rather than as a tinted
+   line above a grey one. */
+.rd-epsub.is-open { fill: var(--rd-position); opacity: .85; }
 .rd-split-a { fill: rgba(224,148,34,0.55); }
 .rd-split-b { fill: rgba(122,115,103,0.28); }
 .rd-splitlbl { fill: #f2eee8; font-family: 'Inter', sans-serif; font-size: 12px; }
@@ -266,19 +312,21 @@ body { background: var(--bg); color: var(--text); }
 /* ── Utility ─────────────────────────────────────────────── */
 .rd-note { font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); line-height: 1.65; }
 .rd-snack .rd-note { font-size: 0.76rem; margin: 0 0 0.7rem; }
-.rd-preview-note { max-width: 880px; margin: 3rem auto 0; border: 1px dashed var(--border-strong); border-radius: 10px; padding: 1rem 1.2rem; font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); }
+/* This one carries its own border, so its BORDER edge is the module edge —
+   it takes the gutter as a width reduction rather than as padding. */
+.rd-preview-note { max-width: var(--rd-w); width: calc(100% - var(--rd-gutter) * 2); margin: 3rem auto 0; border: 1px dashed var(--border-strong); border-radius: 10px; padding: 1rem 1.2rem; font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); }
 
 /* ── Mobile ──────────────────────────────────────────────── */
-@media (max-width: 860px) {
-  .rd-grid { grid-template-columns: 1fr; }
-}
+/* No column-count breakpoint any more — the grid is one column everywhere. */
 @media (max-width: 720px) {
-  .hero { padding: 3.2rem 1.2rem 1.2rem; }
+  /* One change moves the hero, every section and the preview note together —
+     they all read the gutter from the same token. */
+  :root { --rd-gutter: 1.2rem; }
+  .hero { padding-top: 3.2rem; }
   .rd-hdr-grid { grid-template-columns: 1fr; }
-  .rd-section { padding-left: 1.2rem; padding-right: 1.2rem; }
   .rd-setup, .rd-snack, .rd-roadmap { padding: 1.2rem 1.1rem; }
   .rd-standfirst { min-height: 6.2em; }
-  .rd-cards { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+  .rd-cards { grid-template-columns: repeat(auto-fit, minmax(min(110px, 100%), 1fr)); }
   .rd-card-v { font-size: 1.3rem; }
 }
 @media (prefers-reduced-motion: reduce) {
