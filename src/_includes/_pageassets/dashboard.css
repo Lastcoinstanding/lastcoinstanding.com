@@ -11,7 +11,7 @@
    the-power-law.css / the-bitcoin-hurdle-rate.css.
 ============================================================ */
 
-:root{--bg:#0a0908;--bg-card:#111110;--border:#1e1c1a;--border-lt:#2a2826;--orange:#F7931A;--orange-dim:rgba(247,147,26,.45);--orange-glow:rgba(247,147,26,.12);--orange-soft:rgba(247,147,26,.08);--gold:#d4a843;--gold-dim:rgba(212,168,67,.35);--gold-soft:rgba(212,168,67,.10);--red:#c0392b;--amber:#e09422;--text:#d8d2ca;--text-dim:#908880;--text-bright:#f2eee8;--text-body:#d0c8c0;--text-muted:#706860;--font-d:'Cormorant Garamond',Georgia,serif;--font-b:'Inter',-apple-system,sans-serif}
+:root{--bg:#0a0908;--bg-card:#111110;--bg-card-2:#1a1917;--border:#1e1c1a;--border-lt:#2a2826;--orange:#F7931A;--orange-dim:rgba(247,147,26,.45);--orange-glow:rgba(247,147,26,.12);--orange-soft:rgba(247,147,26,.08);--gold:#d4a843;--gold-dim:rgba(212,168,67,.35);--gold-soft:rgba(212,168,67,.10);--red:#c0392b;--amber:#e09422;--text:#d8d2ca;--text-dim:#908880;--text-bright:#f2eee8;--text-body:#d0c8c0;--text-muted:#706860;--font-d:'Cormorant Garamond',Georgia,serif;--font-b:'Inter',-apple-system,sans-serif}
 body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:1.05rem;line-height:1.7;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
 /* ── Hero ── */
@@ -22,6 +22,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .hero .hero-sub a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 .dash-framing { font-family: 'Inter', sans-serif; font-size: 0.86rem; line-height: 1.6; color: var(--text-muted); margin: 0 auto; max-width: 620px; }
 .dash-framing strong { color: var(--text-dim); font-weight: 600; }
+
+/* ── Sister-page control (JM ruling, 2026-09-04) ──
+   The same control as on The Rundown, and it must READ the same on both — but
+   the two pages do not share token names (this page has --text-bright and
+   --border-lt where that one has --ink-bright and --border-strong), so the
+   rules are written against this palette rather than copied across. If the
+   control's shape changes, it changes in both stylesheets or it is wrong in
+   one. Deliberately not the nav's styling: this is a page-level statement of
+   what you are looking at, not a site-level menu. */
+.sister-tabs {
+  display: inline-flex; gap: 1px; margin: 0 auto 1.4rem;
+  background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+}
+.sister-tab {
+  display: block; padding: 0.55rem 1.1rem; text-decoration: none;
+  background: var(--bg-card); color: var(--text-dim); text-align: center; min-width: 8.5rem;
+}
+.sister-tab-n { display: block; font-family: var(--font-b); font-size: 0.84rem; font-weight: 500; }
+.sister-tab-d { display: block; font-family: var(--font-b); font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
+.sister-tab:hover { color: var(--text-bright); }
+.sister-tab.is-active { background: var(--bg-card-2); color: var(--text-bright); }
+.sister-tab.is-active .sister-tab-d { color: var(--amber); }
 
 /* ── Page container (mixed-content 1100) ── */
 .dash-page { max-width: 1100px; margin: 0 auto; padding: 0 2rem 5rem; }
