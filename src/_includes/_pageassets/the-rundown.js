@@ -92,6 +92,54 @@
   function matchPos(p) { return Math.max(0, p); }   // see the header note
 
   /* ═══════════════════════════════════════════════════════════
+     THE STATE MATRIX (B6 — JM review round 1, C7/C21/C28 as ONE rule)
+
+     Three separate review comments were three symptoms of one defect: the
+     page was written from where price happened to be standing. "Floor visit
+     began" has no answer when no visit is open; talking about the floor
+     reads oddly at 0.52×; "reaching only the channel floor" is incoherent
+     read from above trend. Patching each string where it was noticed would
+     have left the next state to be discovered by a reader.
+
+     So every position-dependent string on this page now branches through
+     ONE function. Five states, and each boundary is an EXISTING site
+     constant rather than a number invented here:
+
+       below-floor   mult <  PL_FLOOR                      under the line
+       at-floor      PL_FLOOR ≤ mult ≤ PL_FLOOR × GRAZE    inside the graze
+                     band — i.e. inside a floor approach as The Bitcoin
+                     Floor now defines one
+       below-trend   above the graze band, below NEAR_LO
+       near-trend    NEAR_LO ≤ mult ≤ NEAR_HI              Discount-or-
+                     Premium's dead band, where it declines to use the words
+                     "discount" and "premium" at all
+       above-trend   mult > NEAR_HI
+
+     The matrix of string × state is reported in the handback. The rule for
+     adding to it: a string that names the floor, names a direction, or says
+     "below"/"above" is position-dependent and belongs here.
+     ═══════════════════════════════════════════════════════════ */
+  /* The epsilon is not decoration. PL_FLOOR * GRAZE evaluates to
+     0.42419999999999997, so a multiple sitting exactly on the documented "1%
+     above the floor" boundary classifies as below-trend and the page quietly
+     stops calling it an approach — the one input most likely to be used to
+     test this very boundary. Compare with a tolerance so the published
+     definition and the code agree at the edge. */
+  var GRAZE_BAND = PL_FLOOR * GRAZE, EPS = 1e-9;
+  function positionState(mult) {
+    if (mult < PL_FLOOR - EPS) return 'below-floor';
+    if (mult <= GRAZE_BAND + EPS) return 'at-floor';
+    if (mult < RD.NEAR_LO) return 'below-trend';
+    if (mult <= RD.NEAR_HI) return 'near-trend';
+    return 'above-trend';
+  }
+  // In a floor approach at all — the two states the Floor page would count.
+  function inApproach(state) { return state === 'below-floor' || state === 'at-floor'; }
+  // Direction words, so no call site writes "below" as a literal.
+  function gapWord(mult) { return mult < 1 ? 'below' : 'above'; }
+  function gapPct(mult) { return Math.abs(1 - mult) * 100; }
+
+  /* ═══════════════════════════════════════════════════════════
      STATE — the briefing setup
      ═══════════════════════════════════════════════════════════ */
   var DEFAULTS = {
@@ -135,18 +183,23 @@
     if (r.intent) blob.intent = st.intent;
     writeStore(JSON.stringify(blob));
   }
+  // Returns true when the store actually supplied a VALUE (not merely a
+  // remembered set of toggles) — B2 uses that to decide whether the setup
+  // panel opens or shows its summary chip.
   function loadState() {
-    var raw = readStore(); if (!raw) return;
-    var o; try { o = JSON.parse(raw); } catch (e) { return; }
-    if (!o || o.v !== 1) return;
+    var raw = readStore(); if (!raw) return false;
+    var o; try { o = JSON.parse(raw); } catch (e) { return false; }
+    if (!o || o.v !== 1) return false;
     if (o.remember) {
       st.remember.retirementYear = !!o.remember.retirementYear;
       st.remember.targetIncomeUSD = !!o.remember.targetIncomeUSD;
       st.remember.intent = !!o.remember.intent;
     }
-    if (typeof o.retirementYear === 'number') st.retirementYear = clampYear(o.retirementYear);
-    if (typeof o.targetIncomeUSD === 'number') st.targetIncomeUSD = clampIncome(o.targetIncomeUSD);
-    if (typeof o.intent === 'string' && INTENTS.indexOf(o.intent) >= 0) st.intent = o.intent;
+    var any = false;
+    if (typeof o.retirementYear === 'number') { st.retirementYear = clampYear(o.retirementYear); any = true; }
+    if (typeof o.targetIncomeUSD === 'number') { st.targetIncomeUSD = clampIncome(o.targetIncomeUSD); any = true; }
+    if (typeof o.intent === 'string' && INTENTS.indexOf(o.intent) >= 0) { st.intent = o.intent; any = true; }
+    return any;
   }
 
   /* ── URL: ?ry= &ti= &intent= — and NEVER the stack ────────────
@@ -264,26 +317,59 @@
     // numeral is ever visible and the reserved min-height absorbs the swap.
     // The single wrapping span is load-bearing, not decorative — see the
     // .rd-standfirst note in the stylesheet.
+    // A1 (C3), candidate 1 as adopted. The register point behind the change:
+    // "implications for your situation" leans forward — what the record
+    // predicts — and the page's spine is what a position HAS MEANT. Past
+    // tense, second person, no forward claim.
     setHTML('rdStandfirst',
       '<span>Bitcoin is at <strong>' + mult.toFixed(2) + '&times;</strong> its long-run trend. ' +
-      'Tell the page your situation and it lays out what a position like this one has meant for it.</span>');
+      'What has a position like this meant for <em>your</em> situation?</span>');
   }
 
   /* The header is an ECHO of the Dashboard and is fenced as one (§2.2): it
      never grows tiles. It carries only what the site-wide channel ribbon
      above it cannot — the ribbon already shows price, multiple and zone, and
      repeating them here is the duplication §0 exists to prevent. */
-  function renderHeader(pos, visits) {
+  function renderHeader(pos, visits, mult, spot) {
+    var state = positionState(mult);
+
+    // ── Cards 1 and 2 — the pair, so the multiple is checkable by eye.
+    setHTML('rdHdrPrice', fmtUSD(spot));
+    setText('rdHdrPriceSub', todayPriceIsLive(priceSource) ? 'live' : 'latest monthly data');
     setHTML('rdHdrTrend', fmtUSD(plPrice(TODAY_DAYS)));
+
+    // ── Card 3 — position, with the gap spelled out in the reader's terms.
+    setHTML('rdHdrPos', '<em>' + mult.toFixed(2) + '&times;</em>');
+    // "0% above trend" is what the arithmetic says and not what the reader
+    // wants; at the rounding boundary the honest phrase is the plain one.
+    var gp = Math.round(gapPct(mult));
+    setText('rdHdrPosSub', gp === 0 ? 'at trend' : gp + '% ' + gapWord(mult) + ' trend');
+
+    // ── Card 4 — STATE-AWARE (B6). The old card asserted a visit was open.
     var modern = visits.filter(function (v) { return v.modern; });
-    var open = visits.length ? visits[visits.length - 1] : null;
-    if (open && open.open) {
-      setHTML('rdHdrSince', fmtMonth(open.firstD));
-      setHTML('rdHdrVisits', String(modern.length - 1));
+    var last = modern.length ? modern[modern.length - 1] : null;
+    var completed = modern.filter(function (v) { return !v.open; }).length;
+    if (!last) {
+      setHTML('rdHdrFloor', 'none since 2014');
+      setText('rdHdrFloorSub', '');
+    } else if (last.open && inApproach(state)) {
+      // The record shows an open approach AND price is still in the band.
+      setHTML('rdHdrFloor', fmtMonth(last.firstD) + ' &middot; <span class="rd-hdr-state is-open">open</span>');
+      setText('rdHdrFloorSub', modern.length + ' since 2014 · ' + completed + ' completed');
+    } else if (last.open) {
+      // The sampled record's last approach is still open, but live price has
+      // walked out of the band. Saying "open" flat would be false to the
+      // reader looking at today's number; saying "closed" would be false to
+      // the record, which has no sample above the band yet. Both, stated.
+      setHTML('rdHdrFloor', fmtMonth(last.firstD) + ' &middot; <span class="rd-hdr-state">price has since moved off</span>');
+      setText('rdHdrFloorSub', modern.length + ' since 2014 · ' + completed + ' completed');
     } else {
-      setHTML('rdHdrSince', 'not in one');
-      setHTML('rdHdrVisits', String(modern.length));
+      setHTML('rdHdrFloor', fmtMonth(last.firstD) + ' &middot; <span class="rd-hdr-state">closed</span>');
+      setText('rdHdrFloorSub', modern.length + ' since 2014 · ' + completed + ' completed');
     }
+
+    // ── The mini-bar (B5): larger labels, clearance, and today's value on
+    //    the marker so the bar is readable without the cards.
     var trendPos = (Math.log(1.0) - Math.log(PL_FLOOR)) / (Math.log(PL_CEIL) - Math.log(PL_FLOOR));
     var MIN = -0.08, MAX = 1.0, RANGE = MAX - MIN;
     function place(p) { return ((Math.max(MIN, Math.min(MAX, p)) - MIN) / RANGE * 100) + '%'; }
@@ -291,7 +377,22 @@
     if (tf) tf.style.left = place(0);
     if (tt) tt.style.left = place(trendPos);
     if (mk) mk.style.left = place(pos);
-    setText('rdProv', todayPriceLabel(priceSource) + ' · trend from the shared Power Law module');
+    setHTML('rdBarMarkerLbl', 'today &middot; ' + mult.toFixed(2) + '&times;');
+    // Pull the marker label inside the track when it would hang off an end.
+    if (mk) {
+      var frac = (Math.max(MIN, Math.min(MAX, pos)) - MIN) / RANGE;
+      mk.classList.toggle('is-nearleft', frac < 0.12);
+      mk.classList.toggle('is-nearright', frac > 0.88);
+    }
+
+    // B1: the provenance line routes to the model and carries the §6.13 tip.
+    setHTML('rdProv',
+      todayPriceLabel(priceSource) + ' &middot; trend from the shared ' +
+      '<a href="/the-power-law">Power Law module</a>' +
+      '<span class="help-tip" tabindex="0">?<span class="tip-content">' +
+      'The trend is a power law fitted to bitcoin&rsquo;s whole price history, and the floor is a fixed multiple of it. ' +
+      'It is a model of the record rather than a law of the world &mdash; the Power Law page states its fit, its limits and what would break it.' +
+      '</span></span>');
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -307,7 +408,14 @@
        spot can be weeks ahead of the last sample — price can walk off the
        floor while the newest sample is still sitting on it. A static "price is
        at the floor" would go silently false the day that happens. */
-    var atFloor = liveMult <= PL_FLOOR * GRAZE;
+    var state = positionState(liveMult);
+    var atFloor = inApproach(state);
+
+    /* A4 (C20): the question line carries the live multiple, so "here" is a
+       number rather than a gesture. It is set from the script for the same
+       reason the standfirst is — a static "here" cannot be checked. */
+    setHTML('rdA3Q', 'Price is at <strong>' + liveMult.toFixed(2) + '&times;</strong> trend. When has it been here before?');
+
     var v = 'Price has come to the floor <strong>' +
             (modern.length === 3 ? 'three times' : modern.length + ' times') + '</strong> since 2014. ';
     if (open) {
@@ -318,13 +426,24 @@
     } else if (closed.length) {
       v += 'None is open: the newest sample sits above the band, and price today is at ' + liveMult.toFixed(2) + '× trend.';
     }
+    /* B6 (C21): "why are we talking about the floor at 0.52×?" — because the
+       floor is where this module's record is, and the honest answer is to say
+       how far away it is rather than to leave the reader to notice. The full
+       fix is the state-aware module identity now under proposal; this is the
+       bridge, and it is a sentence rather than a silence. */
+    if (!atFloor) {
+      var aboveFloorPct = (liveMult / PL_FLOOR - 1) * 100;
+      v += ' Today is <strong>' + Math.round(aboveFloorPct) + '% above the floor</strong>' +
+           (state === 'above-trend' ? ' and above trend' : '') +
+           ', so this is the record of a place price is not currently standing.';
+    }
     setHTML('rdA3Verdict', v);
 
     var recs = closed.map(function (v) { var b = backToTrend(v); return b ? (b - v.firstD) / YEAR_D : null; })
                      .filter(function (x) { return x != null; });
     var slowest = recs.length ? Math.max.apply(null, recs) : null;
     setHTML('rdA3Cards', cards([
-      { k: 'Visits since 2014', v: String(modern.length), sub: closed.length + ' closed' },
+      { k: 'Floor approaches since 2014', v: String(modern.length), sub: closed.length + ' completed' },
       { k: 'Deepest of them', v: Math.min.apply(null, modern.map(function (v) { return v.lowM; })).toFixed(3) + '×', sub: 'of trend' },
       { k: 'Slowest return to trend', v: slowest ? slowest.toFixed(1) + ' yrs' : '—', sub: 'from that entry' }
     ]));
@@ -458,20 +577,38 @@
        horizon; its floor case is drawn as a curve and never written as a
        number, so it renders here as the conservative companion and the sources
        line says where to read it. */
-    setHTML('rdA4Verdict',
-      'Bitcoin&rsquo;s trend sets a bar of <strong>' + pct1(r.trend * 100) + '</strong> a year over ' + H +
-      ' years. The conservative version &mdash; capital deployed at today&rsquo;s price reaching only the channel floor by then &mdash; still clears ' +
-      pct1(r.floor * 100) + '.');
+    /* A5 (C28): "reaching ONLY the channel floor" is written from below and
+       reads as nonsense from above trend, where ending at the floor is a long
+       fall rather than a modest outcome. The conservative case is now stated
+       direction-neutrally — price ENDS at the floor by then — and the sentence
+       around it branches on state (B6). The arithmetic is untouched. */
+    var mult = spot / plPrice(TODAY_DAYS), state = positionState(mult);
+    var floorTxt = 'if price only <em>ends</em> at the floor by then';
+    var lead;
+    if (state === 'above-trend') {
+      lead = 'Bitcoin&rsquo;s trend sets a bar of <strong>' + pct1(r.trend * 100) + '</strong> a year over ' + H +
+        ' years. From a premium, the floor case is not a mild outcome but a long unwinding: ' +
+        'capital deployed at today&rsquo;s price and ending at the floor returns ' + pct1(r.floor * 100) + ' a year.';
+    } else if (state === 'near-trend') {
+      lead = 'Bitcoin&rsquo;s trend sets a bar of <strong>' + pct1(r.trend * 100) + '</strong> a year over ' + H +
+        ' years. Buying at roughly today&rsquo;s price is buying at roughly that bar; ' +
+        'the floor case &mdash; price ending at 0.42&times; trend by then &mdash; returns ' + pct1(r.floor * 100) + '.';
+    } else {
+      lead = 'Bitcoin&rsquo;s trend sets a bar of <strong>' + pct1(r.trend * 100) + '</strong> a year over ' + H +
+        ' years. The conservative version &mdash; capital deployed at today&rsquo;s price and only <em>ending</em> at the channel floor by then &mdash; still clears ' +
+        pct1(r.floor * 100) + '.';
+    }
+    setHTML('rdA4Verdict', lead);
     setHTML('rdA4Cards', cards([
       { k: 'The trend’s own bar', v: pct1(r.trend * 100), sub: 'a year over ' + H + ' years' },
-      { k: 'Floor case, from today’s price', v: pct1(r.floor * 100), sub: 'if it only reaches 0.42× trend' }
+      { k: 'Floor case, from today’s price', v: pct1(r.floor * 100), sub: 'if price ends at 0.42× trend' }
     ]));
 
     var W = 700, H2 = 150, PADL = 120, PADR = 40, TOP = 26, BH = 30, GAP = 26;
     var maxv = Math.max(r.floor, r.trend) * 1.25;
     function bw(v) { return Math.max(2, v / maxv * (W - PADL - PADR)); }
     var s = svgOpen(W, H2, 'The annual rate each case implies from today’s price, over ' + H + ' years');
-    [['If it only reaches the floor', r.floor, 'rd-bar-floor'], ['If you had bought at trend', r.trend, 'rd-bar-trend']].forEach(function (row, i) {
+    [['If price ends at the floor', r.floor, 'rd-bar-floor'], ['If you had bought at trend', r.trend, 'rd-bar-trend']].forEach(function (row, i) {
       var y = TOP + i * (BH + GAP);
       s += '<text class="rd-barlbl" x="' + (PADL - 10) + '" y="' + (y + BH / 2 + 4) + '" text-anchor="end">' + row[0] + '</text>';
       s += '<rect class="' + row[2] + '" x="' + PADL + '" y="' + y + '" width="' + bw(row[1]) + '" height="' + BH + '" rx="3"/>';
@@ -534,7 +671,7 @@
   function renderD2(rawPos) {
     var b = LA.bucketAt(D2_ERA, D2_N, rawPos);
     if (!b.n || b.n < 4) {
-      setHTML('rdD2Verdict', 'Bitcoin has rarely sat at this position since 2020 &mdash; too few entries here to read a ladder result from. The full instrument can widen the window.');
+      setHTML('rdD2Verdict', 'Bitcoin has rarely sat at this position since 2020 &mdash; too few entries here to read a ladder result from. Lump Sum or Ladder In can widen the window.');
       setHTML('rdD2Cards', ''); setHTML('rdD2Viz', '');
       return;
     }
@@ -826,7 +963,7 @@
     var floor = fmtLine(RE.lineFor('stack', scn, 'trend', null, 'powerlaw-floor'));
 
     if (here == null) {
-      setHTML('rdP1Verdict', 'No stack inside the engine’s range covers that plan from here. The full instrument shows where the limit sits.');
+      setHTML('rdP1Verdict', 'No stack inside the engine’s range covers that plan from here. Bitcoin Escape Velocity shows where the limit sits.');
       setHTML('rdP1Cards', ''); setHTML('rdP1Viz', ''); return;
     }
     setHTML('rdP1Verdict',
@@ -899,18 +1036,60 @@
      recommendation, never alters a verdict's wording, and never touches a
      computed figure. Every snack computes the same numbers whatever is chosen.
      ═══════════════════════════════════════════════════════════ */
+  var INTENT_LABEL = {
+    deploy: 'deploying new capital', dca: 'starting or continuing a DCA',
+    cash: 'raising cash', rebalance: 'rebalancing',
+    retire: 'planning retirement', looking: 'just looking'
+  };
+
   function applyIntent() {
     var snacks = document.querySelectorAll('[data-intent]');
+    var always = 0, mine = 0, shown = [];
     for (var i = 0; i < snacks.length; i++) {
       var list = snacks[i].getAttribute('data-intent').split(/\s+/);
-      var show = list.indexOf('always') >= 0 || list.indexOf(st.intent) >= 0;
+      var isAlways = list.indexOf('always') >= 0;
+      var show = isAlways || list.indexOf(st.intent) >= 0;
       snacks[i].hidden = !show;
+      if (show) { shown.push(snacks[i]); if (isAlways) always++; else mine++; }
     }
     var btns = document.querySelectorAll('.rd-chip');
     for (var j = 0; j < btns.length; j++) {
       var on = btns[j].getAttribute('data-intent-set') === st.intent;
       btns[j].classList.toggle('is-active', on);
       btns[j].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+
+    /* B3 (C33): every rendered module carries "n of N", numbered across the
+       whole page rather than within its cluster — the reader is counting one
+       list, and the router has already changed what is in it. The chip is
+       injected rather than authored into ten articles so the numbering cannot
+       drift out of step with what is actually on screen. */
+    var total = shown.length;
+    shown.forEach(function (el, k) {
+      var chip = el.querySelector('.rd-mchip');
+      if (!chip) {
+        chip = document.createElement('span');
+        chip.className = 'rd-mchip';
+        el.insertBefore(chip, el.firstChild);
+      }
+      chip.textContent = (k + 1) + ' of ' + total;
+    });
+
+    /* B3 (C16): say what the choice just did, in counts. */
+    var exp = document.getElementById('rdExpect');
+    if (exp) {
+      exp.innerHTML = st.intent === 'looking'
+        ? '<strong>' + always + '</strong> module' + (always === 1 ? '' : 's') + ' below — the position read, shown for every question. Pick one of the others and the modules that answer it join them.'
+        : '<strong>' + total + '</strong> modules below — <strong>' + always + '</strong> for every question, <strong>' + mine + '</strong> for yours.';
+    }
+
+    /* A3 (C18): "Always on" was jargon; the cluster headers now say what they
+       are and, for the chosen cluster, what it is for and how much of it. */
+    var head = document.getElementById('rdIntentHead');
+    if (head) {
+      head.hidden = (st.intent === 'looking');
+      head.innerHTML = 'For <em>' + INTENT_LABEL[st.intent] + '</em> ' +
+        '<span class="rd-cluster-sub">&middot; ' + mine + ' module' + (mine === 1 ? '' : 's') + '</span>';
     }
     var none = document.getElementById('rdIntentNone');
     if (none) none.hidden = (st.intent !== 'looking');
@@ -931,7 +1110,8 @@
     var m = bandMetrics(matchPos(rawPos));   // CLAMPED — D1, R1, P2 only
 
     renderHero(mult);
-    renderHeader(rawPos, visits);
+    renderHeader(rawPos, visits, mult, spot);
+    renderSetupChip();
     renderA3(visits, mult);
     renderA4(spot);
     renderD1(m);
@@ -942,6 +1122,34 @@
     renderB1(spot);
     renderP1();
     renderP2(m);
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     B2 (C15) — the setup panel collapses to a summary once it has been told
+     something. "Told something" means the URL or the store carried a value on
+     THIS load, not that the sliders have defaults in them: a reader who has
+     never touched the panel should see the panel, not a chip reporting
+     numbers they never chose.
+
+     The stack is deliberately absent from the chip even when entered. It is
+     session-only and never enters the URL or the store, so listing it beside
+     two remembered values would tell the reader it is held the same way. It
+     is not.
+     ═══════════════════════════════════════════════════════════ */
+  var setupSeeded = false;   // set by init() when the URL or store supplied a value
+  function setupOpen(open) {
+    var body = document.getElementById('rdSetupBody');
+    var chip = document.getElementById('rdSetupChip');
+    if (!body || !chip) return;
+    body.hidden = !open;
+    chip.hidden = open;
+    chip.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  function renderSetupChip() {
+    var el = document.getElementById('rdSetupChipText');
+    if (!el) return;
+    el.innerHTML = st.retirementYear + ' &middot; ' + fmtUSDshort(st.targetIncomeUSD) +
+      ' &middot; ' + INTENT_LABEL[st.intent].replace(/^./, function (c) { return c.toUpperCase(); });
   }
 
   function syncInputs() {
@@ -990,6 +1198,10 @@
       st.intent = DEFAULTS.intent;
       st.remember = { retirementYear: false, targetIncomeUSD: false, intent: false };
       stackBTC = null;
+      // Nothing is set any more, so the panel comes back rather than leaving
+      // a summary chip describing values the reader just cleared.
+      setupSeeded = false;
+      setupOpen(true);
       syncInputs(); applyIntent(); syncUrl(); renderAll();
       var say = document.getElementById('rdClearedNote');
       if (say) { say.hidden = false; setTimeout(function () { say.hidden = true; }, 4000); }
@@ -999,16 +1211,46 @@
     if (h3) h3.addEventListener('input', function () { d3Months = parseInt(h3.value, 10); renderD3(livePrice()); });
     var h4 = document.getElementById('rdA4Hz');
     if (h4) h4.addEventListener('input', function () { a4Horizon = parseInt(h4.value, 10); renderA4(livePrice()); });
+
+    /* B1 — the premise-gate disclosure. A real <button> with aria-expanded and
+       aria-controls, Escape closing and returning focus to the trigger, per
+       the nav's documented disclosure pattern. Not <details>: the site does
+       not use it anywhere, and matching the existing mechanic matters more
+       than saving the handful of lines. */
+    var gb = document.getElementById('rdGateBtn'), gbody = document.getElementById('rdGateBody');
+    if (gb && gbody) {
+      gb.addEventListener('click', function () {
+        var open = gb.getAttribute('aria-expanded') === 'true';
+        gb.setAttribute('aria-expanded', open ? 'false' : 'true');
+        gbody.hidden = open;
+      });
+      gbody.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { gb.setAttribute('aria-expanded', 'false'); gbody.hidden = true; gb.focus(); }
+      });
+    }
+
+    // B2 — the summary chip reopens the panel it replaced.
+    var chip = document.getElementById('rdSetupChip');
+    if (chip) chip.addEventListener('click', function () {
+      setupOpen(true);
+      var first = document.getElementById('rdInYear');
+      if (first) first.focus();
+    });
   }
 
   function init() {
     // §6.37 precedence, strictly: URL params (any present) > stored state > defaults.
     var fromUrl = readUrl();
-    if (!fromUrl) loadState();
+    var fromStore = false;
+    if (!fromUrl) fromStore = loadState();
+    // B2: the panel starts collapsed only when something actually supplied a
+    // value on this load. Defaults sitting in the sliders are not an answer.
+    setupSeeded = !!(fromUrl || fromStore);
     syncInputs();
     setText('rdYearOut', String(st.retirementYear));
     wire();
     applyIntent();
+    setupOpen(!setupSeeded);
     renderAll();
 
     if (typeof fetchTodayPrice === 'function') {

@@ -55,27 +55,55 @@ eleventyComputed:
     <span>Bitcoin&rsquo;s position in its long-run channel &mdash; and what a position like it has meant for the question you came with.</span>
   </div>
 
-  {#- THE CONTEXT HEADER (§2.2). A compact echo of the Dashboard, labelled as
-      one, and fenced: it never grows tiles. It carries only what the
-      site-wide channel ribbon above it cannot — the ribbon already reports
-      price, multiple and zone, and repeating them here is exactly the
-      duplication the one-canonical-home rule exists to prevent. -#}
+  {#- THE CONTEXT HEADER (§2.2). A compact echo of the Dashboard, and still
+      fenced: it never grows tiles. AMENDED at review round 1 (C6) — the
+      earlier rule was "carry only what the site-wide ribbon cannot", which
+      kept today's price off the page. JM overruled it: a trend price with
+      nothing beside it is a number the reader cannot use, and the position
+      read is the page's organising fact rather than a duplicate of the
+      strip. The fence that remains is the one that matters — four cards,
+      each a fact about position, and no tile that answers a question a
+      module should be answering. -#}
   <div class="rd-hdr">
-    <p class="rd-hdr-tag">Reading from the strip above &mdash; the full position read lives on <a href="/dashboard">the Dashboard</a></p>
+    {#- B4 (C6): JM overrules the earlier "slim to what the ribbon can't
+        carry" — today's price returns, beside the trend price it is being
+        measured against. Four cards, and the fourth is STATE-AWARE (B6): it
+        reports the last floor approach and whether one is open, rather than
+        assuming one is. "Approach" is the Floor page's own public term
+        (A6's vocabulary check: 10 uses there against 2 of "touch"), so the
+        noun is that page's, not this page's. -#}
     <div class="rd-hdr-grid">
-      <div class="rd-hdr-cell"><span class="rd-hdr-k">Trend price today</span><span class="rd-hdr-v" id="rdHdrTrend">&mdash;</span></div>
-      <div class="rd-hdr-cell"><span class="rd-hdr-k">Floor visit began</span><span class="rd-hdr-v" id="rdHdrSince">&mdash;</span></div>
-      <div class="rd-hdr-cell"><span class="rd-hdr-k">Prior visits on record</span><span class="rd-hdr-v" id="rdHdrVisits">&mdash;</span></div>
+      <div class="rd-hdr-cell">
+        <span class="rd-hdr-k">Today&rsquo;s price</span>
+        <span class="rd-hdr-v" id="rdHdrPrice">&mdash;</span>
+        <span class="rd-hdr-sub" id="rdHdrPriceSub"></span>
+      </div>
+      <div class="rd-hdr-cell">
+        <span class="rd-hdr-k">Trend price today<span class="help-tip" tabindex="0">?<span class="tip-content">What the long-run power law puts bitcoin at today. It moves slowly and with time, not with the market &mdash; it is the yardstick, not a target.</span></span></span>
+        <span class="rd-hdr-v" id="rdHdrTrend">&mdash;</span>
+      </div>
+      <div class="rd-hdr-cell">
+        <span class="rd-hdr-k">Position<span class="help-tip" tabindex="0">?<span class="tip-content">Today&rsquo;s price as a multiple of that trend price, and the gap between them. Everything on this page is read from this one number.</span></span></span>
+        <span class="rd-hdr-v" id="rdHdrPos">&mdash;</span>
+        <span class="rd-hdr-sub" id="rdHdrPosSub"></span>
+      </div>
+      <div class="rd-hdr-cell">
+        <span class="rd-hdr-k">Last floor approach<span class="help-tip" tabindex="0">?<span class="tip-content">An episode in which price came within 1% of the 0.42&times; floor or below it, with a gap of more than about 100 days starting a new one. The definition and the full record are <a href="/the-bitcoin-floor">The Bitcoin Floor</a>&rsquo;s.</span></span></span>
+        <span class="rd-hdr-v" id="rdHdrFloor">&mdash;</span>
+        <span class="rd-hdr-sub" id="rdHdrFloorSub"></span>
+      </div>
     </div>
 
     <div class="rd-bar" role="img" aria-label="Where price sits between the channel floor and the trend line">
       <div class="rd-bar-track">
         <div class="rd-bar-tick" id="rdTickFloor"><span class="rd-bar-tick-label">Floor<em>0.42&times;</em></span></div>
         <div class="rd-bar-tick" id="rdTickTrend"><span class="rd-bar-tick-label">Trend<em>1.00&times;</em></span></div>
-        <div class="rd-bar-marker" id="rdBarMarker"><span class="rd-bar-marker-label">today</span></div>
+        <div class="rd-bar-marker" id="rdBarMarker"><span class="rd-bar-marker-label" id="rdBarMarkerLbl">today</span></div>
       </div>
     </div>
 
+    {#- B1: the provenance line now routes to the Power Law page and carries
+        the §6.13 help-tip describing the model in two sentences. -#}
     <p class="rd-prov" id="rdProv"></p>
   </div>
 </section>
@@ -84,13 +112,27 @@ eleventyComputed:
 
   {% include 'components/tool-framing.njk' %}
 
-  <!-- ══════════ THE PREMISE GATE, COMPRESSED (§2.3) ══════════ -->
+  {#- ══════════ THE PREMISE GATE (§2.3), AS A DISCLOSURE RIBBON ══════════
+      B1 (C10/C13): the ruling that conditionality is stated BEFORE the record
+      stands and is unchanged — what was never ruled was the gate's length.
+      The condition itself is now always visible in one line; the reasoning
+      lives behind a collapsed expander using the site's disclosure mechanic
+      (a real <button> carrying aria-expanded/aria-controls, Escape closes,
+      per the nav's documented pattern). Nothing was cut: every sentence that
+      was on the page is still on the page. -#}
   <section class="rd-section" id="the-premise">
-    <div class="rd-step">Before anything else</div>
-    <h2>Is this <em>real</em>?</h2>
-    <div class="rd-gate">
-      <p>Everything below is conditional on the power law holding &mdash; the model, its fit, and what would break it live on <a href="/the-power-law">the Power Law page</a>, and that examination comes before this one.</p>
-      <p>Reject the model and this page has nothing for you; accept it and hold it loosely. <a href="#what-would-break-this">What would break this</a> is at the foot of the page rather than in a footnote.</p>
+    <div class="rd-ribbon">
+      <p class="rd-ribbon-line">
+        Everything below is conditional on the power law holding
+        <span class="rd-ribbon-sep">&middot;</span>
+        <a href="/the-power-law">examined on the Power Law page &rarr;</a>
+        <span class="rd-ribbon-sep">&middot;</span>
+        <button type="button" class="rd-ribbon-btn" id="rdGateBtn" aria-expanded="false" aria-controls="rdGateBody">why this matters</button>
+      </p>
+      <div class="rd-ribbon-body" id="rdGateBody" hidden>
+        <p>The model, its fit, and what would break it live on <a href="/the-power-law">the Power Law page</a>, and that examination comes before this one.</p>
+        <p>Reject the model and this page has nothing for you; accept it and hold it loosely. <a href="#what-would-break-this">What would break this</a> is at the foot of the page rather than in a footnote.</p>
+      </div>
     </div>
   </section>
 
@@ -100,7 +142,17 @@ eleventyComputed:
     <h2>Your <em>situation</em>, and your question</h2>
     <p>Two numbers and one question. They stay in your browser, they change which record is read and how it is read, and they never turn a record into advice.</p>
 
-    <div class="rd-setup">
+    {#- B2 (C15): once values exist — from storage OR the URL, URL winning —
+        the panel collapses to a one-line summary and the reader gets the page
+        rather than the form. The stack is NEVER in the chip: it is
+        session-only and never in the URL, so putting it in a persistent-
+        looking summary would misdescribe how it is held. -#}
+    <button type="button" class="rd-chipsum" id="rdSetupChip" aria-expanded="false" aria-controls="rdSetupBody" hidden>
+      <span class="rd-chipsum-v" id="rdSetupChipText"></span>
+      <span class="rd-chipsum-a">change</span>
+    </button>
+
+    <div class="rd-setup" id="rdSetupBody">
       <div class="rd-fields">
         <div class="rd-field">
           <label for="rdInYear">Retirement year <output id="rdYearOut" class="rd-field-out" for="rdInYear">2035</output></label>
@@ -142,29 +194,32 @@ eleventyComputed:
         <p class="rd-note" style="margin-top:0.5rem">This filters which modules render. It changes no figure and issues no recommendation.</p>
       </div>
     </div>
+
+    {#- B3 (C16): tell the reader what the choice just did, in counts. -#}
+    <p class="rd-expect" id="rdExpect"></p>
   </section>
 
   <!-- ══════════ THE SNACK GRID (§2.5) ══════════ -->
   <section class="rd-section rd-section-wide" id="the-grid">
 
-    <p class="rd-cluster-k">Always on &mdash; where this position sits</p>
+    <p class="rd-cluster-k">Where this position sits <span class="rd-cluster-sub">&middot; shown for every question</span></p>
     <div class="rd-grid">
 
       <!-- ── A3 · the floor-visit timeline ── -->
       <article class="rd-snack rd-snack-wide" id="snack-a3" data-intent="always">
-        <p class="rd-q">Price is here. When has it been here before?</p>
+        <p class="rd-q" id="rdA3Q">When has price been here before?</p>
         <p class="rd-verdict" id="rdA3Verdict"></p>
         <div id="rdA3Cards"></div>
         <div class="rd-viz" id="rdA3Viz"></div>
         <p class="rd-note" id="rdA3Note"></p>
         <p class="rd-register">Historical, at this position &mdash; not a prediction.</p>
-        <p class="rd-route-line"><a class="rd-route" href="/the-bitcoin-floor">The full instrument &rarr;</a></p>
+        <p class="rd-route-line"><a class="rd-route" href="/the-bitcoin-floor">The Bitcoin Floor &rarr;</a></p>
         <div class="rd-sources"><strong>Method.</strong> The visit definition is <a href="/the-bitcoin-floor">The Bitcoin Floor</a>&rsquo;s, and that page is its canonical home: an episode in which price came within 1% of the 0.42&times; floor or below it, with a gap of more than about 100 days starting a new one. This timeline is an echo of the set that page narrates in full &mdash; same rule, same episodes, same count &mdash; and that page also states which of the two constants is load-bearing and owns the floor&rsquo;s published tripwire. A fourth episode, in the autumn of 2010, is left out here for the reason it gives: no mature exchange, negligible liquidity, a price in cents. Durations are lower bounds &mdash; the price series is a roughly 12-day grid, not a daily close.</div>
       </article>
 
       <!-- ── A4 · the bar this position sets ── -->
       <article class="rd-snack" id="snack-a4" data-intent="always">
-        <p class="rd-q">What bar does buying at this position set?</p>
+        <p class="rd-q">What return does buying here imply, if the trend holds?</p>
         <p class="rd-verdict" id="rdA4Verdict"></p>
         <div id="rdA4Cards"></div>
         <div class="rd-slider">
@@ -174,12 +229,13 @@ eleventyComputed:
         </div>
         <div class="rd-viz" id="rdA4Viz"></div>
         <p class="rd-register">Both figures are conditional arithmetic on the model, not a forecast. Neither says the floor will be reached. <a href="#what-would-break-this">What would break this &rarr;</a></p>
-        <p class="rd-route-line"><a class="rd-route" href="/the-bitcoin-hurdle-rate">The full instrument &rarr;</a></p>
+        <p class="rd-route-line"><a class="rd-route" href="/the-bitcoin-hurdle-rate">The Bitcoin Hurdle Rate &rarr;</a></p>
         <div class="rd-sources"><strong>Sources.</strong> The shared Power Law module at today&rsquo;s live price. <a href="/the-bitcoin-hurdle-rate">The Bitcoin Hurdle Rate</a> <strong>prints the trend bar</strong> at each horizon in its default view, so that figure reproduces there exactly. It <strong>draws</strong> the floor case as a curve rather than printing it &mdash; read it off that chart at the same horizon. The rate from today&rsquo;s actual position is the third line on that page, and it is the same arithmetic as the reversion module in the Deploy cluster, which is why it is published once rather than in both places.</div>
       </article>
     </div>
 
-    <p class="rd-cluster-k" id="rdIntentNone" hidden>Pick a question above to see what the record says about it</p>
+    <p class="rd-cluster-k" id="rdIntentHead" hidden></p>
+    <p class="rd-cluster-k rd-cluster-none" id="rdIntentNone" hidden>Pick a question above to see what the record says about it</p>
 
     <div class="rd-grid">
 
@@ -190,7 +246,7 @@ eleventyComputed:
         <div id="rdD1Cards"></div>
         <div class="rd-viz" id="rdD1Viz"></div>
         <p class="rd-register">Historical, at this position &mdash; not a prediction. The record contains no instance of the floor giving way: a limit of the sample, not evidence about the world.</p>
-        <p class="rd-route-line"><a class="rd-route" href="/wait-or-deploy-now">The full instrument &rarr;</a></p>
+        <p class="rd-route-line"><a class="rd-route" href="/wait-or-deploy-now">Wait, or Deploy Now? &rarr;</a></p>
         <div class="rd-sources"><strong>Sources.</strong> The shared channel-entry engine &mdash; the same one <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a> and <a href="/how-much-cash">How Much Cash?</a> publish from. Matched on today&rsquo;s position with the sub-floor clamp that engine applies before matching, a two-year forward window, measured in coins acquired. It excludes everything before 2014 as bitcoin&rsquo;s pre-exchange era. The counter-case, the sensitivity and the position slider are at the destination.</div>
       </article>
 
@@ -201,7 +257,7 @@ eleventyComputed:
         <div id="rdD2Cards"></div>
         <div class="rd-viz" id="rdD2Viz"></div>
         <p class="rd-register">Historical, at this position &mdash; not a prediction. No engine conditions a DCA&rsquo;s <em>start date</em> on position; a ladder begun today is the nearest honest read.</p>
-        <p class="rd-route-line"><a class="rd-route" href="/lump-sum-or-ladder-in">The full instrument &rarr;</a></p>
+        <p class="rd-route-line"><a class="rd-route" href="/lump-sum-or-ladder-in">Lump Sum or Ladder In &rarr;</a></p>
         <div class="rd-sources"><strong>Sources.</strong> The shared ladder-advantage module, the same one <a href="/lump-sum-or-ladder-in">Lump Sum or Ladder In</a> draws its curve from, at that page&rsquo;s own defaults &mdash; the <strong>post-2020 era</strong> and a ~1-year ladder &mdash; so these figures are what that page shows on arrival. Widen the era there and they move. Read on the unclamped channel position, because that page does not clamp. Its neighbourhood is a fixed &plusmn;0.075 of position and does not widen when thin, unlike the pooled engine above &mdash; two modules, two neighbourhoods, said here rather than assumed.</div>
       </article>
 
@@ -217,7 +273,7 @@ eleventyComputed:
         </div>
         <div class="rd-viz" id="rdD3Viz"></div>
         <p class="rd-register">A conditional projection, not a forecast: the reverting path is illustrative, with the baseline and never-reverts paths beside it. <a href="#what-would-break-this">What would break this &rarr;</a><span id="rdD3HzOut" hidden></span></p>
-        <p class="rd-route-line"><a class="rd-route" href="/discount-or-premium">The full instrument &rarr;</a></p>
+        <p class="rd-route-line"><a class="rd-route" href="/discount-or-premium">Discount, or Premium? &rarr;</a></p>
         <div class="rd-sources"><strong>Sources.</strong> The shared Power Law module at today&rsquo;s live price &mdash; the reverting rate is the trend price at your chosen date over today&rsquo;s price, annualised; the baseline is the trend&rsquo;s own slope over the same window. <a href="/discount-or-premium">Discount, or Premium?</a> publishes both, and owns the full chart, the dollar framing and the caveats.</div>
       </article>
 
@@ -228,7 +284,7 @@ eleventyComputed:
         <div id="rdR1Cards"></div>
         <div class="rd-viz" id="rdR1Viz"></div>
         <p class="rd-register">Historical, at this position &mdash; not a prediction. Raising cash for a bill or a deadline is a different question, and the record has no view on it.</p>
-        <p class="rd-route-line"><a class="rd-route" href="/how-much-cash">The full instrument &rarr;</a></p>
+        <p class="rd-route-line"><a class="rd-route" href="/how-much-cash">How Much Cash? &rarr;</a></p>
         <div class="rd-sources"><strong>Sources.</strong> The shared channel-entry engine at its default rebuy rule &mdash; the first lower entry within two years, which is where <a href="/how-much-cash">How Much Cash?</a> sits with its own slider untouched. Matched on today&rsquo;s clamped position, 2014 onward, measured in coins. The win rate is the figure <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a> prints as its headline for the same position. The median coins-back figure is the engine&rsquo;s own, <strong>before</strong> the share of stack sold and the tax rate are applied &mdash; How Much Cash applies both and prints a lower number at its defaults, which is the point of going there.</div>
       </article>
 
@@ -239,7 +295,7 @@ eleventyComputed:
         <div id="rdR2Cards"></div>
         <div class="rd-viz" id="rdR2Viz"></div>
         <p class="rd-register">Historical, at this depth &mdash; not a prediction. Below three completed episodes, they are named rather than averaged.</p>
-        <p class="rd-route-line"><a class="rd-route" href="/discount-or-premium">The full instrument &rarr;</a></p>
+        <p class="rd-route-line"><a class="rd-route" href="/discount-or-premium">Discount, or Premium? &rarr;</a></p>
         <div class="rd-sources"><strong>Sources.</strong> The shared reversion-duration module, the same scan <a href="/discount-or-premium">Discount, or Premium?</a> publishes its duration record from: every sample at or below today&rsquo;s multiple of trend, grouped into episodes by the 100-day rule, measured to the first sample back at trend. Where a spread is shown, it is that page&rsquo;s own figure and is computed across samples, which is why the episode count is stated beside it &mdash; a handful of samples can be one episode.</div>
       </article>
 
@@ -250,7 +306,7 @@ eleventyComputed:
         <div id="rdB1Cards"></div>
         <div class="rd-viz" id="rdB1Viz"></div>
         <p class="rd-register">Where price sits now against the tool&rsquo;s own standard settings &mdash; not a prediction, and not your bands unless you have set them there.</p>
-        <p class="rd-route-line"><a class="rd-route" href="/disciplined-rebalancing">Set your own &rarr;</a></p>
+        <p class="rd-route-line"><a class="rd-route" href="/disciplined-rebalancing">Disciplined Rebalancing &rarr;</a></p>
         <div class="rd-sources"><strong>Sources.</strong> <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>&rsquo;s standard preset &mdash; sell at the 80th percentile of the historical price-to-trend ratio, rebuy at the 50th &mdash; computed from the same record that page ranks, and priced against today&rsquo;s trend. Move either slider there and these lines move with it. Nothing here reads or changes what you have set on that page.</div>
       </article>
 
@@ -262,7 +318,7 @@ eleventyComputed:
         <div class="rd-viz" id="rdP1Viz"></div>
         <p class="rd-note" id="rdP1Basis"></p>
         <p class="rd-register">A conditional projection, not a forecast: each figure names the case it assumes, with the alternative beside it. <a href="#what-would-break-this">What would break this &rarr;</a></p>
-        <p class="rd-route-line"><a class="rd-route" href="/bitcoin-escape-velocity">The full instrument &rarr;</a></p>
+        <p class="rd-route-line"><a class="rd-route" href="/bitcoin-escape-velocity">Bitcoin Escape Velocity &rarr;</a></p>
         <div class="rd-sources"><strong>Sources.</strong> The shared retirement engine&rsquo;s own threshold solver &mdash; the smallest stack whose real value stops falling for every year of the plan. <a href="/bitcoin-escape-velocity">Bitcoin Escape Velocity</a> is where it is published; the retirement flagship does not compute it. To reproduce these figures there, set the same year and income and switch the price basis to &ldquo;today&rsquo;s gap to trend persists&rdquo; for the first, or set the site-wide growth model to the floor case for the second. The horizon is fixed here at 30 years and is adjustable there.</div>
       </article>
 
@@ -273,7 +329,7 @@ eleventyComputed:
         <div id="rdP2Cards"></div>
         <div class="rd-viz" id="rdP2Viz"></div>
         <p class="rd-register">Historical, at this position &mdash; not a prediction. Shallow falls from here are close to arithmetic: an entry near the floor has less room beneath it than one near the trend line.</p>
-        <p class="rd-route-line"><a class="rd-route" href="/the-bitcoin-retirement-stress-test">Put a fall through a plan &rarr;</a></p>
+        <p class="rd-route-line"><a class="rd-route" href="/the-bitcoin-retirement-stress-test">The Retirement Stress Test &rarr;</a></p>
         <div class="rd-sources"><strong>Sources.</strong> The shared channel-entry engine &mdash; drawdown frequency, median depth and the never-fell share over a two-year forward window, matched on today&rsquo;s clamped position, 2014 onward. A &ldquo;drawdown&rdquo; here is a fall of 20% or more, and the window is two years; both are the engine&rsquo;s own constants. <a href="/the-bitcoin-retirement-stress-test">The Stress Test</a> is a what-if tool for a fall of a size you choose, not the source of these figures and not where they are checked.</div>
       </article>
     </div>

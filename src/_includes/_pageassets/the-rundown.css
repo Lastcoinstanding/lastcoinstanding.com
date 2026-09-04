@@ -1,9 +1,9 @@
 /* =============================================================
    The Rundown v2 — "The Briefing" — page styles
 
-   Container tier: MIXED-CONTENT (STYLE_GUIDE §4.2) — 1100px page for the
-   snack grid, 880px constrained prose for the gate, the coda and the
-   what-would-break-this section.
+   Container tier: ONE MODULE WIDTH (--rd-w, see below). The page shipped as
+   MIXED-CONTENT — a 1100px snack grid against 880px prose — and JM ruled at
+   register review that the three widths read as three pages stacked.
 
    Foundation preamble self-declared in full (§4.2): base.njk carries no
    palette and no body theme, so :root and the body background are declared
@@ -105,35 +105,53 @@ body { background: var(--bg); color: var(--text); }
 .rd-standfirst strong { font-style: normal; font-weight: 500; color: var(--amber); }
 
 /* ── Context header — a labelled ECHO of the Dashboard (§2.2) ──
-   It carries only what the site-wide channel ribbon above it cannot. The
-   ribbon already shows price, multiple and zone; repeating them here is the
-   duplication the one-canonical-home rule exists to prevent. */
+   AMENDED at review round 1 (C6): the earlier rule was "carry only what the
+   site-wide ribbon cannot", which left a trend price with nothing beside it.
+   Four cards now, each a fact about position. The fence that remains is the
+   one that matters — no tile here answers a question a module should. */
 .rd-hdr { max-width: var(--rd-w); margin: 2rem auto 0; }
-.rd-hdr-tag {
-  font-family: var(--font-b); font-size: 0.64rem; letter-spacing: .13em; text-transform: uppercase;
-  color: var(--text-muted); text-align: center; margin-bottom: 0.7rem;
-}
-.rd-hdr-tag a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--border-strong); }
+/* Four cards since review round 1 (C6). `min()` on the track floor so the
+   grid drops to two columns rather than overflowing — the same release valve
+   the stat cards needed. */
 .rd-hdr-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr)); gap: 1px;
   background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
 }
 .rd-hdr-cell { background: var(--bg-card); padding: 0.85rem 0.9rem; text-align: left; }
-.rd-hdr-k { font-family: var(--font-b); font-size: 0.64rem; letter-spacing: .09em; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.3rem; }
-.rd-hdr-v { font-family: var(--font-d); font-size: 1.3rem; color: var(--ink-bright); line-height: 1.1; }
-.rd-prov { font-family: var(--font-b); font-size: 0.74rem; color: var(--text-muted); text-align: center; margin: 0.8rem 0 0; }
+.rd-hdr-k {
+  font-family: var(--font-b); font-size: 0.64rem; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.3rem;
+}
+.rd-hdr-v { font-family: var(--font-d); font-size: 1.3rem; color: var(--ink-bright); line-height: 1.1; display: block; }
+.rd-hdr-v em { font-style: normal; color: var(--rd-position); }
+.rd-hdr-sub { display: block; font-family: var(--font-b); font-size: 0.7rem; color: var(--text-muted); margin-top: 0.3rem; }
+/* State words, not judgements — an open approach is a fact about the record. */
+.rd-hdr-state { font-family: var(--font-b); font-size: 0.68rem; color: var(--text-dim); }
+.rd-hdr-state.is-open { color: var(--rd-open); }
+.rd-prov { font-family: var(--font-b); font-size: 0.74rem; color: var(--text-muted); text-align: center; margin: 0.8rem 0 0; display: flex; align-items: center; justify-content: center; gap: 0.35rem; flex-wrap: wrap; }
+.rd-prov a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--border-strong); }
 
 /* The channel bar — position within the channel, one neutral accent. */
 /* The tick labels and the marker label are absolutely positioned outside the
    track, so the bar has to reserve room for both or they collide with the
    heading above and the provenance line below. */
-.rd-bar { max-width: 700px; margin: 2.4rem auto 0; padding: 0 0.5rem 2.4rem; }
+/* B5 (C9/C11): the labels were colliding with the bar and were too quiet to
+   read. More vertical room above and below the track, a step up in size, and
+   the marker now carries today's value so the bar states its own reading
+   instead of relying on the cards. */
+.rd-bar { max-width: 700px; margin: 3rem auto 0; padding: 0 0.5rem 3rem; }
 .rd-bar-track { position: relative; height: 12px; border-radius: 6px; background: linear-gradient(90deg, rgba(122,115,103,0.18), rgba(224,148,34,0.16)); border: 1px solid var(--border); }
 .rd-bar-tick { position: absolute; top: -5px; bottom: -5px; width: 2px; background: var(--border-strong); }
-.rd-bar-tick-label { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: var(--font-b); font-size: 0.62rem; color: var(--text-muted); text-align: center; line-height: 1.25; }
-.rd-bar-tick-label em { font-style: normal; color: var(--text-dim); display: block; }
-.rd-bar-marker { position: absolute; top: -7px; width: 3px; height: 26px; border-radius: 2px; background: var(--rd-position); box-shadow: 0 0 0 3px rgba(247,147,26,0.14); }
-.rd-bar-marker-label { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: var(--font-b); font-size: 0.66rem; color: var(--rd-position); }
+.rd-bar-tick-label { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: var(--font-b); font-size: 0.72rem; color: var(--text-dim); text-align: center; line-height: 1.3; }
+.rd-bar-tick-label em { font-style: normal; color: var(--text-muted); display: block; font-size: 0.68rem; }
+.rd-bar-marker { position: absolute; top: -8px; width: 3px; height: 28px; border-radius: 2px; background: var(--rd-position); box-shadow: 0 0 0 3px rgba(247,147,26,0.14); }
+.rd-bar-marker-label {
+  position: absolute; bottom: 34px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+  font-family: var(--font-b); font-size: 0.78rem; font-weight: 500; color: var(--rd-position);
+}
+/* Near either end the centred label would hang off the track; anchor it. */
+.rd-bar-marker.is-nearleft .rd-bar-marker-label { left: 0; transform: none; }
+.rd-bar-marker.is-nearright .rd-bar-marker-label { left: auto; right: 0; transform: none; }
 
 /* ── Sections ────────────────────────────────────────────── */
 .rd-section { max-width: calc(var(--rd-w) + var(--rd-gutter) * 2); margin: 0 auto; padding: 3rem var(--rd-gutter) 0; }
@@ -151,13 +169,58 @@ body { background: var(--bg); color: var(--text); }
 .rd-section p { font-family: var(--font-b); font-size: 0.96rem; line-height: 1.72; color: var(--text); margin: 0 0 1rem; }
 .rd-step { font-family: var(--font-b); font-size: 0.7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.5rem; }
 
-/* ── The premise gate, compressed (§2.3) ─────────────────── */
-.rd-gate {
+/* ── The premise gate as a disclosure ribbon (§2.3, B1) ──── */
+.rd-ribbon {
   border-left: 2px solid var(--border-strong);
   background: var(--bg-card); border-radius: 0 10px 10px 0;
-  padding: 1.3rem 1.5rem; margin: 1.2rem 0 0;
+  padding: 0.9rem 1.2rem; margin: 0;
 }
-.rd-gate p:last-child { margin-bottom: 0; }
+.rd-ribbon-line {
+  font-family: var(--font-b); font-size: 0.86rem; line-height: 1.6;
+  color: var(--text-dim); margin: 0 !important;
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem;
+}
+.rd-ribbon-sep { color: var(--text-muted); }
+.rd-ribbon-line a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--border-strong); }
+.rd-ribbon-btn {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font-family: var(--font-b); font-size: 0.86rem; color: var(--text-dim);
+  border-bottom: 1px dotted var(--border-strong);
+}
+.rd-ribbon-btn::after { content: ' ▾'; font-size: 0.7em; }
+.rd-ribbon-btn[aria-expanded="true"]::after { content: ' ▴'; }
+.rd-ribbon-btn:hover, .rd-ribbon-btn:focus { color: var(--amber); outline: none; }
+.rd-ribbon-body { margin-top: 0.9rem; border-top: 1px solid var(--border); padding-top: 0.9rem; }
+.rd-ribbon-body p { font-size: 0.92rem; }
+.rd-ribbon-body p:last-child { margin-bottom: 0; }
+
+/* ── B2 · the setup summary chip ─────────────────────────── */
+.rd-chipsum {
+  display: flex; align-items: center; gap: 0.7rem; width: 100%;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 0.85rem 1.1rem; cursor: pointer; text-align: left;
+  font-family: var(--font-b); font-size: 0.92rem; color: var(--ink-bright);
+}
+.rd-chipsum:hover, .rd-chipsum:focus { border-color: var(--border-strong); outline: none; }
+.rd-chipsum-v { flex: 1; }
+.rd-chipsum-a { font-size: 0.8rem; color: var(--amber); white-space: nowrap; }
+.rd-chipsum-a::after { content: ' ▾'; font-size: 0.8em; }
+
+/* ── B3 · the expectation line and the module counter ────── */
+.rd-expect {
+  font-family: var(--font-b); font-size: 0.9rem; color: var(--text-dim);
+  margin: 1.1rem 0 0 !important;
+}
+.rd-expect strong { color: var(--ink-bright); font-weight: 500; }
+.rd-mchip {
+  align-self: flex-start;
+  font-family: var(--font-b); font-size: 0.64rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-muted); border: 1px solid var(--border); border-radius: 20px;
+  padding: 0.15rem 0.6rem; margin-bottom: 0.8rem;
+}
+.rd-cluster-sub { text-transform: none; letter-spacing: 0; color: var(--text-muted); font-size: 0.72rem; }
+.rd-cluster-k em { font-style: normal; color: var(--amber); text-transform: none; letter-spacing: 0; font-size: 0.78rem; }
+.rd-cluster-none { color: var(--text-dim); text-transform: none; letter-spacing: 0; font-size: 0.9rem; font-family: var(--font-b); }
 
 /* ── The briefing setup (§3) ─────────────────────────────── */
 .rd-setup { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.6rem; margin: 1.2rem 0 0; }
@@ -309,6 +372,37 @@ body { background: var(--bg); color: var(--text); }
 .rd-roadmap li.is-relevant { border-left: 2px solid var(--amber); padding-left: 0.8rem; color: var(--text); }
 .rd-roadmap li.is-relevant strong { color: var(--ink-bright); }
 
+/* ── §6.13 help-tip, ported from the-bitcoin-retirement.css ──
+   B4 asks for "the site's documented treatment", so this is that CSS rather
+   than a new one: 14px circle, muted → amber on hover/focus, 240px card,
+   capped on narrow viewports. The one rule worth not losing on the way over
+   is `display: none` for the hidden state rather than `opacity: 0` — an
+   opacity-hidden card stays in layout and causes horizontal page overflow
+   whenever a trigger sits within its own width of the right edge. That
+   lesson was paid for once already on the Retirement page. */
+.help-tip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 1px solid var(--text-muted); color: var(--text-muted);
+  font-size: 0.65rem; font-style: normal; font-weight: 400;
+  cursor: help; position: relative; flex: none;
+  letter-spacing: 0; text-transform: none;
+}
+.help-tip:hover, .help-tip:focus { border-color: var(--amber); color: var(--amber); outline: none; }
+.help-tip .tip-content {
+  display: none; position: absolute; bottom: calc(100% + 8px); left: 50%;
+  transform: translateX(-50%); width: 240px; padding: 0.6rem 0.75rem;
+  background: var(--bg-card-2); border: 1px solid var(--border-strong); border-radius: 4px;
+  font-family: var(--font-b); font-size: 0.8rem; font-weight: 400; color: var(--text);
+  line-height: 1.45; text-align: left; letter-spacing: 0; text-transform: none;
+  z-index: 10; box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+}
+.help-tip:hover .tip-content, .help-tip:focus .tip-content { display: block; }
+.help-tip .tip-content a { color: var(--amber); }
+@media (max-width: 480px) {
+  .help-tip .tip-content { width: min(240px, calc(100vw - 32px)); }
+}
+
 /* ── Utility ─────────────────────────────────────────────── */
 .rd-note { font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); line-height: 1.65; }
 .rd-snack .rd-note { font-size: 0.76rem; margin: 0 0 0.7rem; }
@@ -323,7 +417,7 @@ body { background: var(--bg); color: var(--text); }
      they all read the gutter from the same token. */
   :root { --rd-gutter: 1.2rem; }
   .hero { padding-top: 3.2rem; }
-  .rd-hdr-grid { grid-template-columns: 1fr; }
+  .rd-hdr-grid { grid-template-columns: repeat(2, 1fr); }
   .rd-setup, .rd-snack, .rd-roadmap { padding: 1.2rem 1.1rem; }
   .rd-standfirst { min-height: 6.2em; }
   .rd-cards { grid-template-columns: repeat(auto-fit, minmax(min(110px, 100%), 1fr)); }
