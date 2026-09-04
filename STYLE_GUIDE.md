@@ -2288,19 +2288,40 @@ annual rate lifted out of its module is indistinguishable from a price
 prediction. §5-style conditional framing governs what the page says; it cannot
 govern what a screenshot says.
 
-**This codifies an existing precedent rather than inventing one.** The Bitcoin
-Hurdle Rate reached the same conclusion independently and fences harder: its
-position view declines to render below **three years** (`MIN_POS_H = 3`), with
-the reason stated inline — the sub-three-year figures "would breach §7 flag 1
-on a screenshot". A page may fence tighter than this rule; none may fence
-looser.
+**This codifies existing practice rather than inventing it. Two pages reached
+the same conclusion independently, before the rule existed:**
 
-**Known non-compliance, recorded not hidden.** `discount-or-premium.js` runs
-its horizon slider from **6 months** (`MIN_M = 6`) and annualises across the
-whole range, so at a floor-adjacent position it prints **~411% a year** at the
-slider's minimum. That page is public and is not changed from a page-local
-pass; the fix — raise `MIN_M` to 12, or switch the sub-year readout to a total
-— needs its own branch, preview and merge. Logged in `TECH_DEBT.md`.
+- **The Bitcoin Hurdle Rate** fences hardest: its position view declines to
+  render below **three years** (`MIN_POS_H = 3`), with the reason stated
+  inline — the sub-three-year figures "would breach §7 flag 1 on a
+  screenshot".
+- **The Dashboard** shows its *fastest* reversion as a **duration only**,
+  its code carrying the reasoning almost verbatim: "annualising a months-long
+  snap-back produces a rate that can't honestly be quoted (JM ruling, v3)".
+
+A page may fence tighter than this rule; none may fence looser.
+
+**Known non-compliance, recorded not hidden.** Both are public pages, so
+neither is changed from a page-local pass; each needs its own branch, preview
+and merge. Logged in `TECH_DEBT.md`.
+
+- **`discount-or-premium.js`** runs its horizon slider from **6 months**
+  (`MIN_M = 6`) and annualises across the whole range, printing **~411% a
+  year** at the slider's minimum from a floor-adjacent position. Fix: raise
+  `MIN_M` to 12, or keep the range and switch the sub-year readout to a total.
+- **`dashboard.js`** is *partially* compliant — the exemption it wrote is
+  "the fastest", not "under twelve months", so its **median** reversion is
+  still annualised whenever that median is under a year. Today it prints
+  **~228%/yr over ~9 months**, where the compliant reading is **+145% over 9.1
+  months**. Its slowest (23.7 months) is fine. Fix: change the test from
+  *is-fastest* to *is-under-12-months*, which is a smaller change than it
+  looks because the branch already exists.
+
+**Where the rule is implemented in full.** `the-rundown.js` `windowRead()` is
+the reference: one function decides date, price, total, and whether an
+annualised figure is permitted at all, so no call site can choose differently.
+Copy that shape rather than re-deciding per call site — the Dashboard's
+partial compliance is exactly what per-call-site judgement produces.
 
 **Where the rule is already implemented.** `the-rundown.js` `windowRead()` is
 the reference implementation: one function decides date, price, total and
