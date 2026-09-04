@@ -398,7 +398,12 @@
   /* ═══════════════════════════════════════════════════════════
      A3 — the floor-visit timeline
      ═══════════════════════════════════════════════════════════ */
-  function renderA3(visits, liveMult) {
+  /* IDENTITY 1 of 3 — the floor-approach module. Rendered only when price is
+     inside a floor approach, which is when the approach is the occasion. */
+  function renderFloorApproach(visits, liveMult) {
+    setHTML('rdA3Register', 'Historical, at this position &mdash; not a prediction.');
+    setHTML('rdA3Route', '<a class="rd-route" href="/the-bitcoin-floor">The Bitcoin Floor &rarr;</a>');
+    setHTML('rdA3Sources', '<strong>Method.</strong> The approach definition is <a href="/the-bitcoin-floor">The Bitcoin Floor</a>&rsquo;s, and that page is its canonical home: an episode in which price came within 1% of the 0.42&times; floor or below it, with a gap of more than about 100 days starting a new one. This timeline is an echo of the set that page narrates in full &mdash; same rule, same episodes, same count. A fourth episode, in the autumn of 2010, is left out here for the reason it gives: no mature exchange, negligible liquidity, a price in cents. Durations are lower bounds &mdash; the price series is a roughly 12-day grid, not a daily close.');
     var modern = visits.filter(function (v) { return v.modern; });
     var open = modern.length && modern[modern.length - 1].open ? modern[modern.length - 1] : null;
     var closed = modern.filter(function (v) { return !v.open; });
@@ -552,8 +557,146 @@
     setHTML('rdA3Viz', s);
 
     setHTML('rdA3Note', open
-      ? 'The open visit is described, not scored &mdash; it has no outcome yet.'
-      : 'Every visit shown is closed, so every one has an outcome.');
+      ? 'The open approach is described, not scored &mdash; it has no outcome yet.'
+      : 'Every approach shown is closed, so every one has an outcome.');
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     THE RATE CONVENTION (JM ruling, 2026-09-04)
+
+     Lead with the DATE and the trend price at it. Annualise ONLY windows of
+     twelve months or more; below a year, report the TOTAL move over the
+     window. The reason is not arithmetic — every one of these annualisations
+     is correct — it is that a short window makes the annualised figure
+     enormous, and the enormous figure is the one that survives being
+     screenshotted out of its module. At today's depth a 4.3-month reversion
+     annualises to 745% a year while being a 92% move; the second number is
+     the one a reader can carry away without being misled by it.
+
+     Recorded site-wide in STYLE_GUIDE. The Hurdle Rate reached the same rule
+     independently and fences harder (its position view declines to render
+     below three years); Discount-or-Premium does NOT yet comply and is
+     flagged in the handback rather than changed from here.
+     ═══════════════════════════════════════════════════════════ */
+  var MO_D = 30.44;
+  function windowRead(months, spot) {
+    var d = TODAY_DAYS + months * MO_D, tp = plPrice(d);
+    var total = (tp / spot - 1) * 100;
+    var ann = months >= 12 ? (Math.pow(tp / spot, 12 / months) - 1) * 100 : null;
+    return {
+      months: months, date: fmtMonthShort(d), trendPrice: tp, total: total, annualised: ann,
+      // The sub-line the cards print. One rule, one place.
+      rateLine: ann != null
+        ? signPct0(ann) + ' a year over ' + (months / 12).toFixed(1) + ' years'
+        : signPct0(total) + ' over ' + months.toFixed(1) + ' months'
+    };
+  }
+
+  /* IDENTITY 2 of 3 — at trend (Discount-or-Premium's dead band).
+     The engine returns nothing here, correctly: near trend there is no gap to
+     close and a duration computed from one would be noise. JM's condition was
+     that a permanent module never renders "nothing to show", so this identity
+     reports the LAST STRETCH EACH WAY, read from the same scan at the dead
+     band's own published edges (0.95× and 1.05×). No new computation: those
+     are the multiples at which Discount-or-Premium itself starts reporting. */
+  function renderAtTrend(visits, liveMult, spot) {
+    var lo = RD.scan(RD.NEAR_LO - 1e-9), hi = RD.scan(RD.NEAR_HI + 1e-9);
+    function lastClosed(rec) {
+      if (!rec || rec.state === 'hidden' || !rec.episodes) return null;
+      var c = rec.episodes.filter(function (e) { return !e.ongoing; });
+      return c.length ? c[c.length - 1] : null;
+    }
+    var dLast = lastClosed(lo), pLast = lastClosed(hi);
+
+    setHTML('rdA3Q', 'Price is at <strong>' + liveMult.toFixed(2) + '&times;</strong> trend. What happens from here?');
+    setHTML('rdA3Verdict',
+      'Price is <strong>at trend</strong> &mdash; neither a discount nor a premium. ' +
+      'There is no gap to close, so there is no reversion to time. What the record has is the last stretch in each direction.');
+
+    var list = [];
+    if (dLast) list.push({ k: 'Last stretch below ' + RD.NEAR_LO.toFixed(2) + '×',
+      v: Math.round(dLast.months) + ' mo', sub: 'from ' + fmtMonthShort(dLast.entryD) + ' back to trend' });
+    if (pLast) list.push({ k: 'Last stretch above ' + RD.NEAR_HI.toFixed(2) + '×',
+      v: Math.round(pLast.months) + ' mo', sub: 'from ' + fmtMonthShort(pLast.entryD) + ' back to trend' });
+    var modern = visits.filter(function (v) { return v.modern; });
+    if (modern.length) {
+      var lastA = modern[modern.length - 1];
+      list.push({ k: 'Last floor approach', v: fmtMonthShort(lastA.firstD), sub: modern.length + ' since 2014' });
+    }
+    setHTML('rdA3Cards', cards(list));
+    setHTML('rdA3Viz', '');
+    setHTML('rdA3Note', 'Both stretches are measured from the first sample past the band to the first sample back at trend.');
+    setHTML('rdA3Register', 'Historical, at this position &mdash; not a prediction. At trend the reversion record has nothing to say, which is itself the reading.');
+    setHTML('rdA3Route', '<a class="rd-route" href="/discount-or-premium">Discount, or Premium? &rarr;</a>');
+    setHTML('rdA3Sources', '<strong>Sources.</strong> The shared reversion-duration scan, the same one <a href="/discount-or-premium">Discount, or Premium?</a> publishes its duration record from, read at the two edges of that page&rsquo;s own near-trend band &mdash; ' + RD.NEAR_LO.toFixed(2) + '&times; and ' + RD.NEAR_HI.toFixed(2) + '&times;. Inside that band neither page reports a duration, because there is no gap to measure; these are the nearest stretches on either side of it. The floor line is <a href="/the-bitcoin-floor">The Bitcoin Floor</a>&rsquo;s count.');
+  }
+
+  /* IDENTITY 3 of 3 — the reversion module, off the floor and off trend.
+     Two-sided by construction: below trend it reads stretches at or below
+     this depth, above trend at or above it, and the only thing that changes
+     is the direction word. */
+  function renderReversion(visits, liveMult, spot, state) {
+    var rec = RD.scan(liveMult);
+    var premium = (state === 'above-trend');
+    var dirWord = premium ? 'at or above' : 'at or below';
+
+    setHTML('rdA3Q', 'Price is at <strong>' + liveMult.toFixed(2) + '&times;</strong> trend, ' +
+      Math.round(gapPct(liveMult)) + '% ' + gapWord(liveMult) + ' it. How long have stretches like this taken to get back?');
+
+    var closed = rec.episodes.filter(function (e) { return !e.ongoing; }).map(function (e) { return e.months; })
+                             .sort(function (a, b) { return a - b; });
+    var ongoing = rec.episodes.filter(function (e) { return e.ongoing; });
+
+    if (!closed.length) {
+      // Structurally possible: every stretch at this depth is still open.
+      setHTML('rdA3Verdict', 'No stretch ' + dirWord + ' this depth has yet returned to trend, so the record has no completed duration to report from here.');
+      setHTML('rdA3Cards', '');
+    } else {
+      var med = closed.length % 2 ? closed[(closed.length - 1) / 2]
+                                  : (closed[closed.length / 2 - 1] + closed[closed.length / 2]) / 2;
+      var thin = closed.length < 3;   // the N<3 rule, counted in EPISODES
+      setHTML('rdA3Verdict',
+        '<strong>' + closed.length + '</strong> completed stretch' + (closed.length === 1 ? '' : 'es') +
+        ' ' + dirWord + ' this depth since 2010. ' +
+        (thin
+          ? 'That is too few to read a spread from, so they are named rather than averaged: ' +
+            closed.map(function (m) { return m.toFixed(1) + ' months'; }).join(' and ') + '.'
+          : 'They took between <strong>' + closed[0].toFixed(1) + '</strong> and <strong>' +
+            closed[closed.length - 1].toFixed(1) + '</strong> months, median <strong>' + med.toFixed(1) + '</strong>.'));
+
+      // Cards lead with the DATE and the trend price at it; the rate is the
+      // sub-line and is annualised only at twelve months or more.
+      var picks = thin
+        ? closed.map(function (m, i) { return { label: closed.length === 1 ? 'The one on record' : (i === 0 ? 'Faster of the two' : 'Slower of the two'), m: m }; })
+        : [{ label: 'Fastest', m: closed[0] }, { label: 'Median', m: med }, { label: 'Slowest', m: closed[closed.length - 1] }];
+      setHTML('rdA3Cards', cards(picks.map(function (p) {
+        var w = windowRead(p.m, spot);
+        return { k: p.label + ' · ' + p.m.toFixed(1) + ' mo', v: fmtUSD(w.trendPrice), sub: 'trend price by ' + w.date + ' · ' + w.rateLine };
+      })));
+    }
+
+    setHTML('rdA3Viz', '');
+    var notes = [];
+    if (rec.widened) notes.push('Too few completed stretches at exactly this depth, so the band was widened to ' + rec.band.toFixed(2) + '× to reach five &mdash; these describe that band, not today&rsquo;s multiple exactly.');
+    if (ongoing.length) notes.push('One stretch is still open, running ' + ongoing[0].months.toFixed(1) + ' months so far; it is excluded from the figures above because it has no end yet.');
+    var modernV = visits.filter(function (v) { return v.modern; });
+    if (modernV.length) {
+      var la = modernV[modernV.length - 1];
+      notes.push('Last floor approach ' + fmtMonthShort(la.firstD) + ', the ' +
+        (modernV.length === 3 ? 'third' : modernV.length + 'th') + ' since 2014 &mdash; <a href="/the-bitcoin-floor">The Bitcoin Floor &rarr;</a>');
+    }
+    setHTML('rdA3Note', notes.join(' '));
+    setHTML('rdA3Register', 'A conditional projection, not a forecast: each card assumes price returns to trend by that date and states the trend price it would return to. Whether it returns, and when, is exactly what is not known. <a href="#what-would-break-this">What would break this &rarr;</a>');
+    setHTML('rdA3Route', '<a class="rd-route" href="/discount-or-premium">Discount, or Premium? &rarr;</a>');
+    setHTML('rdA3Sources', '<strong>Sources.</strong> The shared reversion-duration scan, the same one <a href="/discount-or-premium">Discount, or Premium?</a> publishes its duration record from: every sample ' + dirWord + ' today&rsquo;s multiple of trend, grouped into episodes by the 100-day rule, measured to the first sample back at trend. <strong>Episodes are counted, not samples</strong> &mdash; ' + rec.nSamples + ' samples here fall into ' + rec.episodes.length + ' episodes, and it is the episode count the thinness rule reads. Trend prices are the shared Power Law module at each date. Rates are annualised only where the window is a year or more; shorter windows are shown as the total move, per the site convention.');
+  }
+
+  /* The dispatcher. One permanent module, three identities. */
+  function renderPositionModule(visits, liveMult, spot) {
+    var state = positionState(liveMult);
+    if (inApproach(state)) return renderFloorApproach(visits, liveMult);
+    if (state === 'near-trend') return renderAtTrend(visits, liveMult, spot);
+    return renderReversion(visits, liveMult, spot, state);
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -563,11 +706,19 @@
      page's position-view CAGR and D-or-P's reversion CAGR are the same
      expression — is why neither may headline the other's number.
      ═══════════════════════════════════════════════════════════ */
+  /* C2: three bars, not two. The third — "returns to trend by then" — is the
+     figure Phase 0 proved identical to D-or-P's reversion CAGR, and moving it
+     here is JM's reslice: A4 shows the trio COMPARATIVELY, D3 shows the same
+     rate OVER TIME with the never-reverts path and the stack dollars. A bar
+     in a trio is read against its neighbours; a headline number is read as a
+     promise. That is the whole of why the same figure can sit on both pages
+     without either duplicating the other. */
   function hurdle(H, spot) {
     var t = TODAY_DAYS;
     return {
       floor: Math.pow((PL_FLOOR * plPrice(t + YEAR_D * H)) / spot, 1 / H) - 1,
-      trend: Math.pow(plPrice(t + YEAR_D * H) / plPrice(t), 1 / H) - 1
+      trend: Math.pow(plPrice(t + YEAR_D * H) / plPrice(t), 1 / H) - 1,
+      revert: Math.pow(plPrice(t + YEAR_D * H) / spot, 1 / H) - 1
     };
   }
   function renderA4(spot) {
@@ -600,21 +751,37 @@
     }
     setHTML('rdA4Verdict', lead);
     setHTML('rdA4Cards', cards([
-      { k: 'The trend’s own bar', v: pct1(r.trend * 100), sub: 'a year over ' + H + ' years' },
-      { k: 'Floor case, from today’s price', v: pct1(r.floor * 100), sub: 'if price ends at 0.42× trend' }
+      { k: 'If price ends at the floor', v: pct1(r.floor * 100), sub: 'a year over ' + H + ' years' },
+      { k: 'If you had bought at trend', v: pct1(r.trend * 100), sub: 'the trend’s own growth' },
+      { k: 'If price returns to trend', v: pct1(r.revert * 100), sub: 'by ' + (new Date(Date.UTC(new Date().getUTCFullYear() + H, new Date().getUTCMonth(), 1))).toLocaleString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }) }
     ]));
 
-    var W = 700, H2 = 150, PADL = 120, PADR = 40, TOP = 26, BH = 30, GAP = 26;
-    var maxv = Math.max(r.floor, r.trend) * 1.25;
-    function bw(v) { return Math.max(2, v / maxv * (W - PADL - PADR)); }
+    /* The bars are drawn on a signed axis. Above trend the third case goes
+       NEGATIVE on short horizons — returning to trend from a premium is a
+       fall — and that is the risk read the trio exists to deliver. A chart
+       that could only draw rightwards would hide it. */
+    var W = 700, H2 = 196, PADL = 150, PADR = 52, TOP = 22, BH = 30, GAP = 26;
+    var rows = [['If price ends at the floor', r.floor, 'rd-bar-floor'],
+                ['If you had bought at trend', r.trend, 'rd-bar-trend'],
+                ['If price returns to trend', r.revert, 'rd-bar-revert']];
+    var vals = rows.map(function (x) { return x[1]; });
+    var vmax = Math.max.apply(null, vals.concat([0])) * 1.2;
+    var vmin = Math.min.apply(null, vals.concat([0])) * 1.2;
+    if (vmax - vmin < 1e-6) vmax = 0.01;
+    var plotW = W - PADL - PADR;
+    function X(v) { return PADL + (v - vmin) / (vmax - vmin) * plotW; }
+    var zx = X(0);
     var s = svgOpen(W, H2, 'The annual rate each case implies from today’s price, over ' + H + ' years');
-    [['If price ends at the floor', r.floor, 'rd-bar-floor'], ['If you had bought at trend', r.trend, 'rd-bar-trend']].forEach(function (row, i) {
-      var y = TOP + i * (BH + GAP);
-      s += '<text class="rd-barlbl" x="' + (PADL - 10) + '" y="' + (y + BH / 2 + 4) + '" text-anchor="end">' + row[0] + '</text>';
-      s += '<rect class="' + row[2] + '" x="' + PADL + '" y="' + y + '" width="' + bw(row[1]) + '" height="' + BH + '" rx="3"/>';
-      s += '<text class="rd-barval" x="' + (PADL + bw(row[1]) + 8) + '" y="' + (y + BH / 2 + 4) + '">' + pct1(row[1] * 100) + '</text>';
+    s += '<line class="rd-ax" x1="' + zx + '" y1="' + (TOP - 6) + '" x2="' + zx + '" y2="' + (TOP + 3 * BH + 2 * GAP + 4) + '"/>';
+    rows.forEach(function (row, i) {
+      var y = TOP + i * (BH + GAP), x = X(row[1]);
+      var x0 = Math.min(zx, x), w = Math.max(2, Math.abs(x - zx));
+      s += '<text class="rd-barlbl" x="' + (PADL - 12) + '" y="' + (y + BH / 2 + 4) + '" text-anchor="end">' + row[0] + '</text>';
+      s += '<rect class="' + row[2] + '" x="' + x0 + '" y="' + y + '" width="' + w + '" height="' + BH + '" rx="3"/>';
+      var lx = row[1] >= 0 ? x + 8 : x - 8;
+      s += '<text class="rd-barval" x="' + lx + '" y="' + (y + BH / 2 + 4) + '"' + (row[1] >= 0 ? '' : ' text-anchor="end"') + '>' + pct1(row[1] * 100) + '</text>';
     });
-    s += illustrativeTag(PADL, H2 - 12);
+    s += illustrativeTag(PADL, H2 - 10);
     s += '</svg>';
     setHTML('rdA4Viz', s);
   }
@@ -725,6 +892,71 @@
     return dayToDate(TODAY_DAYS + YEAR_D * months / 12)
       .toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
   }
+  /* C2 — the reversion ticks. Marks on the reverts-by slider at how long
+     stretches at this depth actually took, from the same scan the position
+     module reads, so the reader can put the slider where the record has been
+     rather than only where they guess.
+
+     A tick outside the slider's 6–60 range is NAMED but not drawn. At today's
+     depth the fastest completed stretch is under six months, and the honest
+     move is to say so rather than to widen a control past the range its
+     canonical home offers. */
+  var D3_MIN = 6, D3_MAX = 60;
+  function renderD3Ticks(spot) {
+    var host = document.getElementById('rdD3TickStrip');
+    var dl = document.getElementById('rdD3Ticks');
+    if (!host) return;
+    var mult = spot / plPrice(TODAY_DAYS);
+    var rec = RD.scan(mult);
+    if (!rec || rec.state === 'hidden' || !rec.episodes) { host.innerHTML = ''; return; }
+    var closed = rec.episodes.filter(function (e) { return !e.ongoing; }).map(function (e) { return e.months; })
+                             .sort(function (a, b) { return a - b; });
+    if (!closed.length) { host.innerHTML = ''; return; }
+    var med = closed.length % 2 ? closed[(closed.length - 1) / 2]
+                                : (closed[closed.length / 2 - 1] + closed[closed.length / 2]) / 2;
+    var marks = closed.length < 3
+      ? closed.map(function (m, i) { return { lbl: 'on record', m: m }; })
+      : [{ lbl: 'fastest', m: closed[0] }, { lbl: 'median', m: med }, { lbl: 'slowest', m: closed[closed.length - 1] }];
+
+    var inRange = marks.filter(function (k) { return k.m >= D3_MIN && k.m <= D3_MAX; });
+    var below = marks.filter(function (k) { return k.m < D3_MIN; });
+    var above = marks.filter(function (k) { return k.m > D3_MAX; });
+
+    var html = '<div class="rd-ticks-rail">';
+    inRange.forEach(function (k) {
+      var pctPos = (k.m - D3_MIN) / (D3_MAX - D3_MIN) * 100;
+      html += '<span class="rd-tick-mark" style="left:' + pctPos.toFixed(2) + '%">' +
+              '<span class="rd-tick-lbl">' + k.lbl + ' · ' + k.m.toFixed(1) + 'mo</span></span>';
+    });
+    html += '</div>';
+    var say = ['Where stretches at this depth actually ended.'];
+    if (below.length) say.push('The ' + below.map(function (k) { return k.lbl; }).join(' and ') +
+      ' (' + below.map(function (k) { return k.m.toFixed(1) + ' months'; }).join(', ') +
+      ') is shorter than this slider goes — it matches the range on Discount, or Premium?, and is not widened past it.');
+    if (above.length) say.push('The ' + above.map(function (k) { return k.lbl; }).join(' and ') + ' runs past the slider’s end.');
+    html += '<p class="rd-ticks-note">' + say.join(' ') + '</p>';
+    host.innerHTML = html;
+
+    /* Tier any tick labels that overlap, measured after insertion rather than
+       alternated by index. Two marks that are far apart at 1280 can sit on
+       top of each other at 375, and which pair collides depends on the
+       durations the record happens to hold today — so this has to be measured
+       every render, not decided once. Same lesson as the A3 timeline. */
+    var lbls = [].slice.call(host.querySelectorAll('.rd-tick-mark'));
+    var placed = [];
+    lbls.forEach(function (mk) {
+      var el = mk.querySelector('.rd-tick-lbl');
+      mk.classList.remove('is-row2');
+      var r = el.getBoundingClientRect(), row = 0;
+      for (var i = 0; i < placed.length; i++) {
+        if (placed[i].row === 0 && !(r.right + 6 < placed[i].L || r.left - 6 > placed[i].R)) { row = 1; break; }
+      }
+      if (row === 1) mk.classList.add('is-row2');
+      placed.push({ L: r.left, R: r.right, row: row });
+    });
+    host.classList.toggle('has-row2', placed.some(function (p) { return p.row === 1; }));
+  }
+
   function renderD3(spot) {
     var y = d3Months / 12;
     var trendNow = plPrice(TODAY_DAYS), trendThen = plPrice(TODAY_DAYS + YEAR_D * y);
@@ -736,18 +968,27 @@
 
     setText('rdD3HzOut', d3Months < 12 ? d3Months + ' months' : (d3Months / 12) + (d3Months === 12 ? ' year' : ' years'));
     setText('rdD3When', when);
+    /* C2: D3 no longer HEADLINES the rate — that figure is now A4's third
+       bar, and the same number may not headline twice. D3 keeps what is
+       uniquely its own: the reverts-by date, the path chart with the
+       never-reverts line, and the stack dollars. The rate is referenced as
+       "the rate above" and shown under the convention: annualised only at a
+       year or more, total move below that. */
+    var w3 = windowRead(d3Months, spot);
     setHTML('rdD3Verdict',
-      'If price returns to trend by <strong>' + when + '</strong>, that is <strong>' + signPct0(rev * 100) +
-      '</strong> a year &mdash; ' + signPct0(delta * 100) + ' more than the trend’s own slope over the same window. That is just arithmetic, not a forecast.');
+      'If price returns to trend by <strong>' + when + '</strong>, the trend price then is <strong>' +
+      fmtUSD(trendThen) + '</strong> &mdash; <strong>' + w3.rateLine + '</strong> from today. ' +
+      'That is the rate above, seen over time rather than as a bar. It is arithmetic, not a forecast.');
 
     var cs = [
-      { k: 'If it reverts by ' + when, v: signPct0(rev * 100), sub: 'a year' },
+      { k: 'Trend price by ' + when, v: fmtUSD(trendThen), sub: w3.rateLine },
       { k: 'If you had bought at trend', v: signPct0(tr * 100), sub: 'a year — the baseline' }
     ];
     if (stackBTC) {
       cs.push({ k: 'Your stack at trend then', v: fmtUSDshort(stackBTC * trendThen), sub: 'from ' + fmtUSDshort(stackBTC * spot) + ' today' });
     }
     setHTML('rdD3Cards', cards(cs));
+    renderD3Ticks(spot);
 
     // Log-price paths from today to the horizon: the reversion glide (labelled
     // illustrative, §5 element 2) and the never-reverts path beside it
@@ -817,73 +1058,6 @@
     setHTML('rdR1Viz', s);
   }
 
-  /* ═══════════════════════════════════════════════════════════
-     R2 — how long have stretches like this lasted?
-     The N<3 rule fires on EPISODES, not samples (the shared module's own
-     header says so). At today's depth the record holds two episodes and only
-     one since 2014 — so this snack narrates and refuses the median.
-     ═══════════════════════════════════════════════════════════ */
-  function renderR2(spot) {
-    var rec = RD.scan(spot / plPrice(TODAY_DAYS));
-    var host = document.getElementById('snack-r2');
-    if (rec.state === 'hidden') {
-      // The dead band. The module declines to answer and so does the snack —
-      // an empty state, not a silent gap (JM ruling 11; Phase 0 had no
-      // recommendation, so this is the build's call and it is stated).
-      setHTML('rdR2Verdict', 'Price is close enough to trend that there is no stretch like this one to measure. This snack returns when it is not.');
-      setHTML('rdR2Cards', '');
-      setHTML('rdR2Viz', '');
-      if (host) host.classList.add('is-empty');
-      return;
-    }
-    if (host) host.classList.remove('is-empty');
-    var eps = rec.episodes.slice();
-    var modern = eps.filter(function (e) { return e.entryD >= MODERN_D; });
-    var closed = eps.filter(function (e) { return !e.ongoing; });
-    var closedModern = closed.filter(function (e) { return e.entryD >= MODERN_D; });
-
-    /* The N<3 rule, applied to EPISODES rather than samples. How deep price
-       is decides which branch fires, so both are live: at a shallow depth the
-       record holds enough independent episodes to support a spread, and at a
-       deep one it does not. The rule is the same either way — the page does not
-       publish a distribution it cannot stand behind. */
-    var thin = closedModern.length < 3;
-    var cs;
-    if (thin) {
-      setHTML('rdR2Verdict',
-        'The record holds <strong>' + (closedModern.length === 1 ? 'one completed stretch' : closedModern.length + ' completed stretches') +
-        '</strong> this far below trend since 2014. That is not a base rate, so each is named rather than averaged.');
-      cs = closed.slice(-3).map(function (e) {
-        return { k: fmtMonthShort(e.entryD), v: Math.round(e.months) + ' mo', sub: 'to get back to trend' };
-      });
-    } else {
-      setHTML('rdR2Verdict',
-        'Stretches this far below trend took a median of <strong>' + Math.round(rec.median) +
-        ' months</strong> to get back to it &mdash; the fastest ' + Math.round(rec.min) + ', the slowest ' + Math.round(rec.max) +
-        '. That is ' + closedModern.length + ' completed episodes since 2014, not a forecast of this one.');
-      cs = [
-        { k: 'Median', v: Math.round(rec.median) + ' mo', sub: 'across ' + rec.nCompleted + ' samples' },
-        { k: 'Fastest', v: Math.round(rec.min) + ' mo', sub: 'back to trend' },
-        { k: 'Slowest', v: Math.round(rec.max) + ' mo', sub: 'back to trend' }
-      ];
-    }
-    if (rec.widened) cs.push({ k: 'Band widened to', v: rec.band.toFixed(2) + '×', sub: 'too few samples at today’s exact depth' });
-    if (rec.hasOngoing) cs.push({ k: 'One is still open', v: Math.round(rec.ongMonths) + ' mo', sub: 'and counting — no outcome yet' });
-    setHTML('rdR2Cards', cards(cs));
-
-    var W = 700, H = 40 + eps.length * 34, PADL = 96, PADR = 60, TOP = 14, BH = 20;
-    var maxMo = Math.max.apply(null, eps.map(function (e) { return e.months; })) * 1.1;
-    var s = svgOpen(W, H, 'How long each stretch this far below trend took to return to trend');
-    eps.forEach(function (e, i) {
-      var y = TOP + i * 34;
-      var w = Math.max(3, e.months / maxMo * (W - PADL - PADR));
-      s += '<text class="rd-barlbl" x="' + (PADL - 10) + '" y="' + (y + BH / 2 + 4) + '" text-anchor="end">' + fmtMonthShort(e.entryD) + '</text>';
-      s += '<rect class="' + (e.ongoing ? 'rd-bar-open' : 'rd-bar-trend') + '" x="' + PADL + '" y="' + y + '" width="' + w + '" height="' + BH + '" rx="3"/>';
-      s += '<text class="rd-barval" x="' + (PADL + w + 8) + '" y="' + (y + BH / 2 + 4) + '">' + Math.round(e.months) + ' mo' + (e.ongoing ? ' so far' : '') + '</text>';
-    });
-    s += '</svg>';
-    setHTML('rdR2Viz', s);
-  }
 
   /* ═══════════════════════════════════════════════════════════
      B1 — how far are the rebalancing bands from triggering?
@@ -1112,13 +1286,12 @@
     renderHero(mult);
     renderHeader(rawPos, visits, mult, spot);
     renderSetupChip();
-    renderA3(visits, mult);
+    renderPositionModule(visits, mult, spot);   // C1 — three identities, one module
     renderA4(spot);
     renderD1(m);
     renderD2(rawPos);                        // RAW — LSLI does not clamp
     renderD3(spot);
     renderR1(m);
-    renderR2(spot);
     renderB1(spot);
     renderP1();
     renderP2(m);

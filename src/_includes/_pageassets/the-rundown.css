@@ -372,6 +372,42 @@ body { background: var(--bg); color: var(--text); }
 .rd-roadmap li.is-relevant { border-left: 2px solid var(--amber); padding-left: 0.8rem; color: var(--text); }
 .rd-roadmap li.is-relevant strong { color: var(--ink-bright); }
 
+/* ── C3 · sister-page control ─────────────────────────────
+   Shared shape with the Dashboard's copy of this control; if either moves,
+   both move. Deliberately NOT the nav's styling — it is a page-level
+   statement of what you are looking at, not a site-level menu. */
+.sister-tabs {
+  display: inline-flex; gap: 1px; margin: 0 auto 1.4rem;
+  background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+}
+.sister-tab {
+  display: block; padding: 0.55rem 1.1rem; text-decoration: none;
+  background: var(--bg-card); color: var(--text-dim); text-align: center; min-width: 8.5rem;
+}
+.sister-tab-n { display: block; font-family: var(--font-b); font-size: 0.84rem; font-weight: 500; }
+.sister-tab-d { display: block; font-family: var(--font-b); font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
+.sister-tab:hover { color: var(--ink-bright); }
+.sister-tab.is-active { background: var(--bg-card-2); color: var(--ink-bright); }
+.sister-tab.is-active .sister-tab-d { color: var(--amber); }
+
+/* ── C2 · the reversion ticks under the reverts-by slider ── */
+.rd-ticks { margin: 0.2rem 0 1rem; }
+.rd-ticks-rail { position: relative; height: 26px; margin: 0 0.4rem; }
+/* A second row is only reserved when one is actually needed — measured at
+   render, not assumed from the breakpoint. */
+.rd-ticks.has-row2 .rd-ticks-rail { height: 42px; }
+.rd-tick-mark { position: absolute; top: 0; width: 1px; height: 8px; background: var(--border-strong); }
+.rd-tick-lbl {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+  font-family: var(--font-b); font-size: 0.64rem; color: var(--text-muted);
+}
+.rd-tick-mark.is-row2 { height: 24px; }
+.rd-tick-mark.is-row2 .rd-tick-lbl { top: 26px; }
+.rd-ticks-note { font-family: var(--font-b); font-size: 0.72rem; color: var(--text-muted); margin: 0.2rem 0 0 !important; line-height: 1.5; }
+
+/* The third A4 bar. Same channel vocabulary, no verdict colour. */
+.rd-bar-revert { fill: rgba(109,179,212,0.45); }
+
 /* ── §6.13 help-tip, ported from the-bitcoin-retirement.css ──
    B4 asks for "the site's documented treatment", so this is that CSS rather
    than a new one: 14px circle, muted → amber on hover/focus, 240px card,

@@ -2268,6 +2268,45 @@ _Added 2026-07, from the Retirement Stress Test v2.2 verdict rationalization. Ve
 
 Rationale: these rules keep a passage readable as one piece of writing while preserving hand-checkable reproducibility. A value may appear twice only when it is the hinge of two comparisons (state it both times; hiding one breaks reconciliation). The rule-4 corollary is a correction: the Stress Test's stack-underwater span and its price-path cut window coincide numerically at the default scenario but diverge under most other settings, so "those N lean years" (binding the cut-cost figure to the verdict's span) was retired for the self-anchored "the N years the cut ran". A coincidental match at one scenario is not structural identity.
 
+### 10.3.1 Annualise only a year or more; below that, state the total move
+
+_Ruled by JM 2026-09-04 during The Rundown's v2.1 review. Site-wide, not page-local._
+
+**The rule.** An annualised rate (CAGR, "% a year", implied return) may only be
+published for a window of **twelve months or more**. For anything shorter,
+publish the **total move over the window** — "+92% over 8.5 months", never
+"+745% a year". Where a conditional projection names a date, **lead with the
+date and the price at it**; the rate is a sub-line, not the headline.
+
+**Why, given the arithmetic is correct either way.** Annualising compounds a
+short window into a very large number: the same reversion reads +92% over 8.5
+months or +248% a year, and a four-month version of it reads +745% a year.
+Every one of those is a correct annualisation and the largest is the one
+resting on the *least* evidence — the shortest window. Worse, it is the figure
+that survives being screenshotted away from its caveats, and a three-figure
+annual rate lifted out of its module is indistinguishable from a price
+prediction. §5-style conditional framing governs what the page says; it cannot
+govern what a screenshot says.
+
+**This codifies an existing precedent rather than inventing one.** The Bitcoin
+Hurdle Rate reached the same conclusion independently and fences harder: its
+position view declines to render below **three years** (`MIN_POS_H = 3`), with
+the reason stated inline — the sub-three-year figures "would breach §7 flag 1
+on a screenshot". A page may fence tighter than this rule; none may fence
+looser.
+
+**Known non-compliance, recorded not hidden.** `discount-or-premium.js` runs
+its horizon slider from **6 months** (`MIN_M = 6`) and annualises across the
+whole range, so at a floor-adjacent position it prints **~411% a year** at the
+slider's minimum. That page is public and is not changed from a page-local
+pass; the fix — raise `MIN_M` to 12, or switch the sub-year readout to a total
+— needs its own branch, preview and merge. Logged in `TECH_DEBT.md`.
+
+**Where the rule is already implemented.** `the-rundown.js` `windowRead()` is
+the reference implementation: one function decides date, price, total and
+whether an annualised figure is permitted, so no call site can choose
+differently.
+
 ### 10.4 Toolbox naming: plain, purpose-first titles
 
 **JM ruling, 2026-08-21.** Exploration and tool titles default to **plain, purpose-first names a visitor can parse from a list** — the register of a well-labelled toolbox, not of an essay. The test is a cold one: a reader scanning `/calculators`, a nav dropdown or a search result has no context, no subtitle and about a second. The title has to say what the thing does.

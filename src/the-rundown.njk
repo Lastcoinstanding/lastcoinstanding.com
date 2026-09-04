@@ -46,6 +46,27 @@ eleventyComputed:
 <section class="hero">
   <h1>The <em>Rundown</em></h1>
 
+  {#- C3 · THE SISTER-PAGE CONTROL. §0's taxonomy rendered as UI rather than
+      described in prose: the Dashboard is the glance, this is your situation.
+      It sits below the H1 and above the standfirst because it says what this
+      page IS, which belongs with the title; above the H1 would give the page
+      two competing first elements. It replaces the "Reading from the strip
+      above…" line, which was doing this job wordily.
+
+      The Gallery is deliberately not here. Two tabs, not three: this control
+      is for the two live-position pages, and adding a timeless exhibits page
+      to a positional pair would undo the taxonomy it exists to show. -#}
+  <nav class="sister-tabs" aria-label="Two ways into the numbers">
+    <a href="/dashboard" class="sister-tab">
+      <span class="sister-tab-n">The Dashboard</span>
+      <span class="sister-tab-d">the glance</span>
+    </a>
+    <a href="/the-rundown" class="sister-tab is-active" aria-current="page">
+      <span class="sister-tab-n">The Rundown</span>
+      <span class="sister-tab-d">your situation</span>
+    </a>
+  </nav>
+
   {#- THE LIVE HERO (§2.1, carried from v1 unchanged). The H1 is static; the
       standfirst carries the live position. The markup below is the no-JS /
       pre-hydration fallback and it carries NO NUMBER — never a placeholder,
@@ -206,15 +227,24 @@ eleventyComputed:
     <div class="rd-grid">
 
       <!-- ── A3 · the floor-visit timeline ── -->
+      {#- ── A3 · THE POSITION MODULE — STATE-AWARE IN IDENTITY (C1) ──
+          One permanent module, three identities, chosen by where price is:
+            in a floor approach  → the floor-approach module (the timeline)
+            at trend (dead band) → the last-stretch-each-way module
+            otherwise            → the reversion module
+          Everything below the question line is written by the script, route
+          and sources included, because those differ per identity. R2 was
+          merged into this module and deleted: same engine, same figures, and
+          the same-number-never-headlines-twice rule forbids both. -#}
       <article class="rd-snack rd-snack-wide" id="snack-a3" data-intent="always">
         <p class="rd-q" id="rdA3Q">When has price been here before?</p>
         <p class="rd-verdict" id="rdA3Verdict"></p>
         <div id="rdA3Cards"></div>
         <div class="rd-viz" id="rdA3Viz"></div>
         <p class="rd-note" id="rdA3Note"></p>
-        <p class="rd-register">Historical, at this position &mdash; not a prediction.</p>
-        <p class="rd-route-line"><a class="rd-route" href="/the-bitcoin-floor">The Bitcoin Floor &rarr;</a></p>
-        <div class="rd-sources"><strong>Method.</strong> The visit definition is <a href="/the-bitcoin-floor">The Bitcoin Floor</a>&rsquo;s, and that page is its canonical home: an episode in which price came within 1% of the 0.42&times; floor or below it, with a gap of more than about 100 days starting a new one. This timeline is an echo of the set that page narrates in full &mdash; same rule, same episodes, same count &mdash; and that page also states which of the two constants is load-bearing and owns the floor&rsquo;s published tripwire. A fourth episode, in the autumn of 2010, is left out here for the reason it gives: no mature exchange, negligible liquidity, a price in cents. Durations are lower bounds &mdash; the price series is a roughly 12-day grid, not a daily close.</div>
+        <p class="rd-register" id="rdA3Register"></p>
+        <p class="rd-route-line" id="rdA3Route"></p>
+        <div class="rd-sources" id="rdA3Sources"></div>
       </article>
 
       <!-- ── A4 · the bar this position sets ── -->
@@ -266,11 +296,19 @@ eleventyComputed:
         <p class="rd-q">What is the discount worth, if it reverts?</p>
         <p class="rd-verdict" id="rdD3Verdict"></p>
         <div id="rdD3Cards"></div>
+        {#- C2: the reversion tick marks live on THIS slider, not A4's — the
+            durations are months and A4's horizon is whole years. The range
+            stays 6–60 to match Discount-or-Premium's own slider, so any
+            position set here reproduces there; a stretch shorter than six
+            months is named in the ticks strip rather than made reachable,
+            because widening this control past its canonical home would put
+            the reader somewhere that page will not go. -#}
         <div class="rd-slider">
           <label for="rdD3Hz">Reverts by</label>
-          <input type="range" id="rdD3Hz" min="6" max="60" step="1" value="36">
+          <input type="range" id="rdD3Hz" min="6" max="60" step="1" value="36" list="rdD3Ticks">
           <output id="rdD3When" for="rdD3Hz">&mdash;</output>
         </div>
+        <div class="rd-ticks" id="rdD3TickStrip"></div>
         <div class="rd-viz" id="rdD3Viz"></div>
         <p class="rd-register">A conditional projection, not a forecast: the reverting path is illustrative, with the baseline and never-reverts paths beside it. <a href="#what-would-break-this">What would break this &rarr;</a><span id="rdD3HzOut" hidden></span></p>
         <p class="rd-route-line"><a class="rd-route" href="/discount-or-premium">Discount, or Premium? &rarr;</a></p>
@@ -288,16 +326,6 @@ eleventyComputed:
         <div class="rd-sources"><strong>Sources.</strong> The shared channel-entry engine at its default rebuy rule &mdash; the first lower entry within two years, which is where <a href="/how-much-cash">How Much Cash?</a> sits with its own slider untouched. Matched on today&rsquo;s clamped position, 2014 onward, measured in coins. The win rate is the figure <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a> prints as its headline for the same position. The median coins-back figure is the engine&rsquo;s own, <strong>before</strong> the share of stack sold and the tax rate are applied &mdash; How Much Cash applies both and prints a lower number at its defaults, which is the point of going there.</div>
       </article>
 
-      <!-- ── R2 · how long stretches like this have lasted ── -->
-      <article class="rd-snack" id="snack-r2" data-intent="cash">
-        <p class="rd-q">If you are waiting this out &mdash; how long have stretches like this lasted?</p>
-        <p class="rd-verdict" id="rdR2Verdict"></p>
-        <div id="rdR2Cards"></div>
-        <div class="rd-viz" id="rdR2Viz"></div>
-        <p class="rd-register">Historical, at this depth &mdash; not a prediction. Below three completed episodes, they are named rather than averaged.</p>
-        <p class="rd-route-line"><a class="rd-route" href="/discount-or-premium">Discount, or Premium? &rarr;</a></p>
-        <div class="rd-sources"><strong>Sources.</strong> The shared reversion-duration module, the same scan <a href="/discount-or-premium">Discount, or Premium?</a> publishes its duration record from: every sample at or below today&rsquo;s multiple of trend, grouped into episodes by the 100-day rule, measured to the first sample back at trend. Where a spread is shown, it is that page&rsquo;s own figure and is computed across samples, which is why the episode count is stated beside it &mdash; a handful of samples can be one episode.</div>
-      </article>
 
       <!-- ── B1 · the rebalancing bands ── -->
       <article class="rd-snack" id="snack-b1" data-intent="rebalance">
