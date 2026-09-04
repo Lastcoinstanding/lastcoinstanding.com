@@ -11,6 +11,34 @@ eleventyComputed:
 
 <section class="hero dash-hero">
   <h1>The Bitcoin <em>Dashboard</em></h1>
+
+  {#- THE SISTER-PAGE CONTROL (JM ruling, 2026-09-04). The site's §0 taxonomy
+      rendered as UI rather than described: the Dashboard is the glance, the
+      Rundown is your situation. Same markup and same styling on both pages;
+      only `is-active` and `aria-current` differ, so if the shape changes it
+      changes in both places or it is wrong in one.
+
+      The Gallery is deliberately not a third tab: this control pairs the two
+      LIVE-POSITION pages, and adding a timeless exhibits page to a positional
+      pair would undo the distinction the control exists to draw.
+
+      NOTE for whoever removes the Rundown's unlisted guard: this link points
+      at a page that is currently noindex and unlisted. It is a deliberate,
+      reviewed exception — a direct link from one anchor page is not the same
+      as listing the page in the nav, the sitemap or the registry — but it is
+      the one inbound link that exists, so it goes live with JM's merge and
+      not before. -#}
+  <nav class="sister-tabs" aria-label="Two ways into the numbers">
+    <a href="/dashboard" class="sister-tab is-active" aria-current="page">
+      <span class="sister-tab-n">The Dashboard</span>
+      <span class="sister-tab-d">the glance</span>
+    </a>
+    <a href="/the-rundown" class="sister-tab">
+      <span class="sister-tab-n">The Rundown</span>
+      <span class="sister-tab-d">your situation</span>
+    </a>
+  </nav>
+
   <p class="hero-sub">Key stats on bitcoin&rsquo;s position in its <a href="/the-power-law">Power&nbsp;Law</a> channel right now &mdash; live-computed in your browser.</p>
   <p class="dash-framing">A read of where things stand, <strong>not a signal about where they go next</strong>. Every figure below shows its own derivation.</p>
 </section>
