@@ -40,7 +40,8 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-rundown-head.html' %}"
   page_styles: "{% include '_pageassets/the-rundown.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/channel-entries.js' %}\n{% include '_pageassets/shared/ladder-advantage.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/the-rundown.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/channel-entries.js' %}\n{% include '_pageassets/shared/ladder-advantage.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}
+{% include '_pageassets/shared/return-window.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/the-rundown.js' %}"
 ---
 
 <section class="hero">
@@ -393,7 +394,7 @@ eleventyComputed:
 
   <!-- ═══ PREVIEW NOTE — REMOVE AT THE PRODUCTION PASS, WITH THE HEAD GUARD ═══ -->
   <div class="rd-preview-note">
-    <strong>Unlisted preview.</strong> This page is shipped for register review and is not linked from anywhere on the site: it is absent from the navigation, the sitemap, the exploration registry and every related strip, and it carries a <code>noindex</code> directive. Public listing follows a register pass and the counsel pass, and the dashboard routing chip is a separate change that comes after that.
+    <strong>Unlisted preview.</strong> This page is shipped for register review and is not linked from anywhere on the site: it is absent from the navigation, the sitemap, the exploration registry and every related strip, and it carries a <code>noindex</code> directive. Public listing follows a second register pass and the counsel gate; its first step is the sister-tabs control on the Dashboard, which is built and held on its own branch.
   </div>
 
 </div>

@@ -31,6 +31,8 @@
 (function () {
   if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function') return;
   if (!window.ReversionDurations) return;   // shared/reversion-durations.js must load first
+  if (!window.ReturnWindow) return;         // shared/return-window.js must load first
+  var RW = window.ReturnWindow;
 
   // ── Palette (shared conventions) ──
   var AMBER = '#e09422', BLUE = '#6db3d4', MUTED = '#7a7367', DIM = '#9a9080';
@@ -155,14 +157,37 @@
     var elH = document.getElementById('dpHorizonReadout');
     if (elH) elH.innerHTML = 'Reverting to trend over <strong>' + fmtHorizon(state.months) + '</strong>';
 
+    /* STYLE_GUIDE §10.3.1 — annualise only a year or more; below that report
+       the TOTAL move over the window. The slider still runs from six months,
+       deliberately: the fix is the RENDERING RULE, not a raised floor, so a
+       ?y= link a reader has already shared keeps landing where it landed.
+       What changes is what the card says at those horizons. Before this, at a
+       floor-adjacent position the six-month setting printed ~411% a year —
+       correct arithmetic, and a figure that reads as a forecast the moment it
+       leaves the page in a screenshot. */
+    /* The DECISION comes from shared/return-window.js so this page, the
+       Dashboard and the Rundown cannot drift on it; the WORDING stays here,
+       because each page says it in its own voice. That split is the point of
+       the extraction — the Dashboard's near-miss came from a call site
+       deciding for itself, not from a call site phrasing for itself. */
+    var subYear = !RW.mayAnnualise(state.months);
+    var revTotal = RW.read(state.months, price()).total / 100;
+    var trTotal = RW.read(state.months, trendToday()).total / 100;
+
+    var elCap = document.getElementById('dpRevCap');
     var elRev = document.getElementById('dpRevNum');
     var elRevSub = document.getElementById('dpRevSub');
     var elTr = document.getElementById('dpTrendNum');
     var elTrSub = document.getElementById('dpTrendSub');
-    if (elRev) elRev.textContent = signPct0(rev);
-    if (elTr) elTr.textContent = signPct0(tr);
-    if (elRevSub) elRevSub.textContent = 'per year, if price returns to trend by ' + horizonDateLabel();
-    if (elTrSub) elTrSub.textContent = 'per year for someone who bought AT trend — the trend’s own growth, annualized from today to ' + horizonDateLabel() + '. This rate declines as the horizon extends.';
+    if (elCap) elCap.textContent = subYear ? 'Implied return if it reverts by ' + horizonDateLabel() : 'Implied CAGR if it reverts';
+    if (elRev) elRev.textContent = subYear ? signPct0(revTotal) : signPct0(rev);
+    if (elTr) elTr.textContent = subYear ? signPct0(trTotal) : signPct0(tr);
+    if (elRevSub) elRevSub.textContent = subYear
+      ? 'in total over ' + fmtHorizon(state.months) + ', if price returns to trend by ' + horizonDateLabel() + ' — not an annual rate'
+      : 'per year, if price returns to trend by ' + horizonDateLabel();
+    if (elTrSub) elTrSub.textContent = subYear
+      ? 'in total over the same window for someone who bought AT trend — the trend’s own growth, not annualized'
+      : 'per year for someone who bought AT trend — the trend’s own growth, annualized from today to ' + horizonDateLabel() + '. This rate declines as the horizon extends.';
 
     // Per-holdings dollar lines — shown only when a stack is entered; the empty
     // state leaves both cards exactly as before. Values are algebraically the
@@ -200,10 +225,16 @@
         txt = 'Price is roughly at trend, so reversion adds <strong>almost nothing</strong> either way — the two figures above are essentially the same number.';
       } else if (delta > 0) {
         cls += 'dp-delta-up';
-        txt = 'The discount is worth an <strong>additional uplift of ' + signPct0(delta) + '/yr</strong> over the at-trend baseline for your chosen horizon — this is what makes buying below trend buying at a <strong>discount</strong>.';
+        // §10.3.1 again: the gap between the two cards must be expressed on
+        // the same basis the cards are, or the three numbers do not reconcile.
+        txt = subYear
+          ? 'The discount is worth an <strong>additional ' + signPct0(revTotal - trTotal) + ' in total</strong> over the at-trend baseline for your chosen window — this is what makes buying below trend buying at a <strong>discount</strong>.'
+          : 'The discount is worth an <strong>additional uplift of ' + signPct0(delta) + '/yr</strong> over the at-trend baseline for your chosen horizon — this is what makes buying below trend buying at a <strong>discount</strong>.';
       } else {
         cls += 'dp-delta-down';
-        txt = 'The premium is a <strong>drag of ' + signPct0(delta) + '/yr</strong> against the at-trend baseline — reverting from a premium means a lower CAGR than the trend’s own, over your chosen horizon.';
+        txt = subYear
+          ? 'The premium is a <strong>drag of ' + signPct0(revTotal - trTotal) + ' in total</strong> against the at-trend baseline — reverting from a premium means ending below where the trend’s own growth would have put you, over your chosen window.'
+          : 'The premium is a <strong>drag of ' + signPct0(delta) + '/yr</strong> against the at-trend baseline — reverting from a premium means a lower CAGR than the trend’s own, over your chosen horizon.';
       }
       elDelta.className = cls;
       elDelta.innerHTML = txt;
@@ -240,9 +271,19 @@
   var chart = null;
   var view = 'rate';                      // 'rate' | 'price'
   var PULSE = '#F7931A', RED = '#c0392b'; // live-price accent + floor/low red
+  /* The rate view is a chart OF ANNUALISED RATES, so §10.3.1 binds its domain
+     as much as it binds the cards: a curve running down to six months puts a
+     ~411% point on a public axis, and a data point is published the same way
+     a sentence is. The curve therefore starts at twelve months.
+
+     The SLIDER still runs from six — it is not a raised floor, and below a
+     year the readout switches to a total return. The chart says so rather
+     than silently cropping, because a reader who drags into the sub-year
+     region needs to know why the line does not follow them. */
+  var ANN_MIN_M = RW.MIN_MONTHS;   // the shared floor, so chart and readout cannot disagree
   function curves() {
     var rev = [], tr = [], mo;
-    for (mo = MIN_M; mo <= MAX_M; mo++) {
+    for (mo = ANN_MIN_M; mo <= MAX_M; mo++) {
       var y = mo / 12;
       rev.push({ x: y, y: revCAGR(y) * 100 });
       tr.push({ x: y, y: trendCAGR(y) * 100 });
@@ -286,7 +327,7 @@
         layout: { padding: { top: 14, right: 10 } },
         scales: {
           x: {
-            type: 'linear', min: MIN_M / 12, max: MAX_M / 12,
+            type: 'linear', min: ANN_MIN_M / 12, max: MAX_M / 12,
             title: { display: true, text: 'Years to revert to trend', color: MUTED, font: { family: 'Inter, sans-serif', size: 11 } },
             grid: { color: 'rgba(224,148,34,0.05)' },
             ticks: { color: MUTED, font: { family: 'Inter, sans-serif', size: 11 }, callback: function (v) { return v + 'y'; } }

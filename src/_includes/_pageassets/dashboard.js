@@ -20,6 +20,7 @@
 ============================================================ */
 (function () {
   if (typeof plPrice !== 'function' || typeof TODAY_DAYS !== 'number') return;
+  if (!window.ReturnWindow) return;   // shared/return-window.js must load first
 
   // ── helpers ──
   function $(id) { return document.getElementById(id); }
@@ -151,11 +152,32 @@
       setText('dashRevRange', '');
       return;
     }
-    // CAGR implied by spot reaching trend(t+T) in time T (years). The MEDIAN leads and the
-    // SLOWEST is the low end; the fastest is shown as a DURATION only — annualising a
-    // months-long snap-back produces a rate that can't honestly be quoted (JM ruling, v3).
-    function cagr(months) { var T = months / 12; return Math.pow(plPrice(TODAY_DAYS + T * YEAR_D) / price, 1 / T) - 1; }
-    setText('dashRevMedian', '~' + fmtPct(cagr(rec.median)) + '/yr');
+    /* Implied by spot reaching trend(t+T) in time T. This tile already carried
+       the right instinct — the fastest resolution has always been shown as a
+       duration only, "because annualising a months-long snap-back produces a
+       rate that can't honestly be quoted (JM ruling, v3)" — but the test it
+       used was IS-FASTEST rather than IS-UNDER-A-YEAR. So whenever the median
+       itself fell under twelve months, the tile annualised it anyway: at a
+       floor-adjacent position it printed ~228%/yr over ~9 months.
+
+       STYLE_GUIDE §10.3.1 now states the rule site-wide, and the test moves to
+       the window length. One helper decides for every figure on the tile
+       rather than each call site deciding for itself — that per-call-site
+       judgement is exactly what produced the gap. Same shape as
+       the-rundown.js windowRead(). */
+    /* The DECISION is shared/return-window.js's; the WORDING is this tile's.
+       This tile is why that module exists — it had the rule and its own inline
+       ruling and still tested for the wrong thing, because the decision lived
+       at the call site. It cannot now. */
+    var RW = window.ReturnWindow;
+    function impliedRead(months) {
+      var r = RW.read(months, price);
+      return r.annualised_ok
+        ? { v: '~' + fmtPct(r.annualised / 100) + '/yr', phrase: '~' + fmtPct(r.annualised / 100) + '/yr' }
+        : { v: '~' + fmtPct(r.total / 100) + ' in total', phrase: '~' + fmtPct(r.total / 100) + ' in total, not an annual rate' };
+    }
+    var medRead = impliedRead(rec.median);
+    setText('dashRevMedian', medRead.v);
     setText('dashRevMedianSub', 'over ~' + Math.round(rec.median) + ' months — the median reversion on record from a depth like today’s, and only if it reverts at all');
     // Era note (data-driven, not a filter): do the quickest resolutions cluster in the early era?
     var byDur = rec.comp.slice().sort(function (a, b) { return a.months - b.months; });
@@ -165,9 +187,16 @@
     var era = (fastAllEarly && recent.year >= 2020)
       ? ' The quickest resolutions came in bitcoin’s early era (≤2015); the most recent, in ' + recent.year + ', took ~' + Math.round(recent.months) + ' months.'
       : '';
-    var range = 'Low end: the slowest reversion, ~' + Math.round(rec.max) + ' months, implies ~' + fmtPct(cagr(rec.max))
-      + '/yr. The quickest resolution from a depth like today’s took ~' + rec.min.toFixed(1) + ' months.' + era
-      + ' ' + rec.nCompleted + ' completed episodes on record.';
+    var range = 'Low end: the slowest reversion, ~' + Math.round(rec.max) + ' months, implies ' + impliedRead(rec.max).phrase
+      + '. The quickest resolution from a depth like today’s took ~' + rec.min.toFixed(1) + ' months.' + era
+      /* "samples", not "episodes" — a factual correction, not a style one. This
+         count is per-SAMPLE (~12-day observations), and a handful of samples
+         can be one episode: today's 64 completed samples fall into 6 completed
+         episodes. The shared module's own header states the distinction and
+         warns consumers about exactly this. The tile's statistics are
+         sample-based by design and stay that way; only the noun changes, so
+         the number is no longer described as something it is not. */
+      + ' ' + rec.nCompleted + ' completed samples on record.';
     if (rec.widened) range += ' Few at exactly today’s depth, so widened to ≤' + rec.band.toFixed(2) + '×.';
     setText('dashRevRange', range);
   }

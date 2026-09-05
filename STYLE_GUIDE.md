@@ -2278,6 +2278,16 @@ publish the **total move over the window** — "+92% over 8.5 months", never
 "+745% a year". Where a conditional projection names a date, **lead with the
 date and the price at it**; the rate is a sub-line, not the headline.
 
+**A PLOTTED POINT IS PUBLISHED THE SAME WAY A SENTENCE IS** (JM, 2026-09-04).
+The rule binds charts, axes and data points, not only copy. Discount-or-Premium
+was compliant in its cards and still drew a rate curve down to six months,
+putting a ~411% point on a public axis where anyone could read it off or
+screenshot it; the fix was to start the curve at twelve months and say why in
+the caption rather than let the line stop short without explanation. When a
+control's range extends below what may be annualised, the readout switches
+basis and the chart's domain is clipped — do not silently crop, and do not
+raise the control's floor, which would break links readers have already shared.
+
 **Why, given the arithmetic is correct either way.** Annualising compounds a
 short window into a very large number: the same reversion reads +92% over 8.5
 months or +248% a year, and a four-month version of it reads +745% a year.
@@ -2288,24 +2298,47 @@ annual rate lifted out of its module is indistinguishable from a price
 prediction. §5-style conditional framing governs what the page says; it cannot
 govern what a screenshot says.
 
-**This codifies an existing precedent rather than inventing one.** The Bitcoin
-Hurdle Rate reached the same conclusion independently and fences harder: its
-position view declines to render below **three years** (`MIN_POS_H = 3`), with
-the reason stated inline — the sub-three-year figures "would breach §7 flag 1
-on a screenshot". A page may fence tighter than this rule; none may fence
-looser.
+**This codifies existing practice rather than inventing it. Two pages reached
+the same conclusion independently, before the rule existed:**
 
-**Known non-compliance, recorded not hidden.** `discount-or-premium.js` runs
-its horizon slider from **6 months** (`MIN_M = 6`) and annualises across the
-whole range, so at a floor-adjacent position it prints **~411% a year** at the
-slider's minimum. That page is public and is not changed from a page-local
-pass; the fix — raise `MIN_M` to 12, or switch the sub-year readout to a total
-— needs its own branch, preview and merge. Logged in `TECH_DEBT.md`.
+- **The Bitcoin Hurdle Rate** fences hardest: its position view declines to
+  render below **three years** (`MIN_POS_H = 3`), with the reason stated
+  inline — the sub-three-year figures "would breach §7 flag 1 on a
+  screenshot".
+- **The Dashboard** shows its *fastest* reversion as a **duration only**,
+  its code carrying the reasoning almost verbatim: "annualising a months-long
+  snap-back produces a rate that can't honestly be quoted (JM ruling, v3)".
 
-**Where the rule is already implemented.** `the-rundown.js` `windowRead()` is
-the reference implementation: one function decides date, price, total and
-whether an annualised figure is permitted, so no call site can choose
-differently.
+A page may fence tighter than this rule; none may fence looser.
+
+**Known non-compliance, recorded not hidden.** Both are public pages, so
+neither is changed from a page-local pass; each needs its own branch, preview
+and merge. Logged in `TECH_DEBT.md`.
+
+- **`discount-or-premium.js`** runs its horizon slider from **6 months**
+  (`MIN_M = 6`) and annualises across the whole range, printing **~411% a
+  year** at the slider's minimum from a floor-adjacent position. Fix: raise
+  `MIN_M` to 12, or keep the range and switch the sub-year readout to a total.
+- **`dashboard.js`** is *partially* compliant — the exemption it wrote is
+  "the fastest", not "under twelve months", so its **median** reversion is
+  still annualised whenever that median is under a year. Today it prints
+  **~228%/yr over ~9 months**, where the compliant reading is **+145% over 9.1
+  months**. Its slowest (23.7 months) is fine. Fix: change the test from
+  *is-fastest* to *is-under-12-months*, which is a smaller change than it
+  looks because the branch already exists.
+
+**Where the rule lives: `shared/return-window.js`.** Extracted 2026-09-04 after
+the same rule had been implemented three separate times. One module decides
+date, price, total, and **whether an annualised figure is permitted at all**;
+the Rundown, Discount-or-Premium and the Dashboard read that decision and keep
+only their own wording. `MIN_MONTHS` is exported so a chart's domain and a
+readout's basis cannot disagree about where the floor sits.
+
+**Do not re-decide at a call site.** The Dashboard is the standing evidence: it
+had the rule, wrote its own inline ruling for it, and still tested for the
+wrong thing — "is this the fastest" rather than "is this under twelve months" —
+because the decision lived where the figure was printed instead of in one
+place. Share the decision; keep the voice.
 
 ### 10.4 Toolbox naming: plain, purpose-first titles
 

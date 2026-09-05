@@ -863,6 +863,17 @@ Before announcing the page or sharing the URL externally:
   `SITE_GUIDE §7`). If any non-Cloudflare status check shows up green or red on
   a commit/PR, ignore it: it does not reflect what production is serving. Trust
   the `Cloudflare Pages` check-run and the source tree, nothing else.
+- **KEEP BRANCH NAMES UNDER 28 CHARACTERS — the alias is truncated at 28.**
+  Cloudflare builds the branch subdomain from the sanitized branch name cut
+  at **28 characters**, so a longer branch name gives an alias that 404s at
+  its full name and serves only at the truncated prefix. `feat-video-register-replacements`
+  (32) resolved only as `feat-video-register-replacem`; `fix-dashboard-median-annualisation`
+  (33) only as `fix-dashboard-median-annuali`. Both cost a deploy poll against
+  a URL that was never going to exist. **Name branches short enough to avoid
+  it**, and if a preview 404s, count the characters before concluding the
+  build failed. Recorded here after it was hit twice — 2026-08-26 and
+  2026-09-04 — the second time with the lesson already written down in a
+  session memory and not read.
 - **Don't trust the branch alias for freshness.** The branch alias
   `<branch>.lastcoinstanding-com.pages.dev` **lags and per-path
   edge-caches**, and a **force-push may not trigger a rebuild at all** (a
