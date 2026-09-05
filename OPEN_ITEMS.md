@@ -36,8 +36,9 @@ session automatically. Close items here when done; this file is the "what's cook
   and direct to main; the page stays unlisted. The whole-months, episode-basis and `?mult=`
   branches were merged the same day and their branches deleted.
 
-  **Gated on that review, in order (amended 2026-09-04):** ~~register round two~~ → the
-  **counsel gate** → the **listing pass**, whose *step one* is now merging the branch
+  **Gated on that review, in order (amended 2026-09-05):** ~~register round two~~ →
+  **register round three** → the **counsel pass** → the **listing pass**, whose *step one*
+  is now merging the branch
   `feat-sister-tabs-dashboard`. That branch is built, pushed and **ON HOLD by JM's ruling —
   do not merge it before those gates.** It is the first and only inbound link to
   `/the-rundown`, so merging it is what makes the page reachable; the rest of the listing

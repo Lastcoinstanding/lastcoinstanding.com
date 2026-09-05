@@ -879,6 +879,27 @@ expensive way.
   numbers-only check would have missed a title that stopped matching its
   figure.
 
+### Reproducibility is tested at inputs a reader can actually enter
+
+**JM ruling, 2026-09-05.** When a page cites a figure and says another page is
+where it reproduces, the reproduction has to be checkable **at an input the
+reader can type** — not only at the internal value the citing page happens to
+compute with.
+
+The case that produced the rule: the Rundown's at-trend module reads the shared
+reversion scan at `NEAR_LO − 1e-9`, a hair outside Discount-or-Premium's dead
+band, because the band itself returns nothing. Nobody can enter `0.949999999`.
+The card was only allowed to ship after checking that the answer is the **same
+episode** at `0.94×`, `0.93×` and `0.90×` — and at `1.06×`, `1.07×` and `1.10×`
+on the other side — so the claim survives contact with the multiples a reader
+would try. Had the figure moved between those, the card would have been cut
+rather than published with an unreachable provenance.
+
+Two practical consequences. **Name the reachable input in the sources line**,
+not the internal one, and link to the view that reproduces it. And **state the
+range you checked** in the code comment, so the next person editing the module
+knows the claim was tested rather than assumed.
+
 ### Extraction rule: the module owns the decision, the page owns the wording
 
 **JM ruling, 2026-09-04**, from the annualisation convention's third
