@@ -611,7 +611,7 @@
     setHTML('rdA3Q', 'Price is at <strong>' + liveMult.toFixed(2) + '&times;</strong> trend. What happens from here?');
     setHTML('rdA3Verdict',
       'Price is <strong>at trend</strong> &mdash; neither a discount nor a premium. ' +
-      'There is no gap to close, so there is no reversion to time. What the record has is the last stretch in each direction.');
+      'There is no gap to close, so there is nothing to time. What the record has is the last stretch in each direction.');
 
     var list = [];
     if (dLast) list.push({ k: 'Last stretch below ' + RD.NEAR_LO.toFixed(2) + '×',

@@ -25,13 +25,25 @@ session automatically. Close items here when done; this file is the "what's cook
   itself is unlisted, so no unreviewed surface is reachable by a reader who is not handed the
   URL. **There is no clock on the review** — it happens when JM gets to it.
 
-  **Gated on that review, in order:** the **listing pass** (nav group, `sitemap.xml`,
-  `llms.txt`, `explorations.json`, related strips, removing the `noindex` and the two preview
-  blocks) and then the **JM-3 dashboard routing chip**, which was always specified to follow
-  public listing rather than accompany it. **The counsel pass sits at JM's election between
-  the two** — after the register review, before or alongside listing, as he decides.
+  **Gated on that review, in order (amended 2026-09-04):** **register round two** → the
+  **counsel gate** → the **listing pass**, whose *step one* is now merging the branch
+  `feat-sister-tabs-dashboard`. That branch is built, pushed and **ON HOLD by JM's ruling —
+  do not merge it before those gates.** It is the first and only inbound link to
+  `/the-rundown`, so merging it is what makes the page reachable; the rest of the listing
+  pass (nav group, `sitemap.xml`, `llms.txt`, `explorations.json`, related strips, removing
+  the `noindex` and the two preview blocks) follows it.
+  Preview: `https://feat-sister-tabs-dashboard.lastcoinstanding-com.pages.dev/dashboard`
 
-  Detail: `RUNDOWN_DESIGN.md` Part I §8 (ship gate) and §12, `RUNDOWN_PHASE0_V2_REPORT.md`.
+  **The JM-3 dashboard routing chip is RETIRED, superseded by the sister-tabs control**
+  (JM, 2026-09-04). JM-3 specified one chip added to the Dashboard pointing at the Rundown,
+  as its own commit after public listing. The sister-tabs control does that job better and
+  does it symmetrically — it states the two pages' relationship on both, rather than adding
+  a one-way pointer on one — so the chip is not deferred, it is cancelled. `RUNDOWN_DESIGN.md`
+  still carries the JM-3 ruling in four places; those are historical record and are not
+  amended, but nothing should be built from them.
+
+  Detail: `RUNDOWN_DESIGN.md` Part I §8 (ship gate) and §12, `RUNDOWN_PHASE0_V2_REPORT.md`,
+  `RUNDOWN_V21_CLASS_C_PROPOSALS.md` §6.
 
 - [x] **MERGE-ORDER RECONCILIATION — the Rundown's old-pattern icon lines. DONE**
   (`6f67dfe`, 2026-09-02.) Recorded 2026-08-29, before the brand branch merged, and it played
