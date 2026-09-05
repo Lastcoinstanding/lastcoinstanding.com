@@ -212,13 +212,17 @@ eleventyComputed:
           <button type="button" class="rd-chip" data-intent-set="retire" aria-pressed="false">Plan retirement</button>
           <button type="button" class="rd-chip" data-intent-set="looking" aria-pressed="false">Just looking</button>
         </div>
+        {#- ROUND TWO: the count line sits DIRECTLY under the chips, tied to
+            the selection it describes. It was below the whole panel, where it
+            read as a note about the page rather than as the consequence of the
+            chip just pressed. The remember toggle and the filtering note now
+            follow it, because they are about the control rather than about
+            what the control just did. -#}
+        <p class="rd-expect" id="rdExpect"></p>
         <label class="rd-remember" style="margin-top:0.8rem"><input type="checkbox" data-remember="intent"> remember on this device</label>
         <p class="rd-note" style="margin-top:0.5rem">This filters which modules render. It changes no figure and issues no recommendation.</p>
       </div>
     </div>
-
-    {#- B3 (C16): tell the reader what the choice just did, in counts. -#}
-    <p class="rd-expect" id="rdExpect"></p>
   </section>
 
   <!-- ══════════ THE SNACK GRID (§2.5) ══════════ -->

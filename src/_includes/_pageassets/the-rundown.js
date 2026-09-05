@@ -260,6 +260,24 @@
 
   // Stat cards. Labels and values are NOT prose and do not count against the
   // 75-word budget (§11.1) — which is exactly why the budget survives.
+  /* The render date of the live read, in the house format the Dashboard
+     already uses. It is the DATE THIS PAGE WAS OPENED, not a data date —
+     "today" was ambiguous the moment anyone screenshotted the page, and a
+     reader looking at a saved image had no way to know how old it was. The
+     no-JS fallback stays date-free for the same reason a placeholder numeral
+     is banned: a date baked into markup is stale the day after it ships. */
+  function houseDate() {
+    try { return new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }); }
+    catch (e) { return ''; }
+  }
+
+  /* §6.13 help-tip, built here so every call site gets the same markup and the
+     case-guard the pattern requires. `end` right-anchors the card for triggers
+     near a container's right edge. */
+  function tip(txt, end) {
+    return '<span class="help-tip" tabindex="0">?<span class="tip-content' + (end ? ' tip-end' : '') + '">' + txt + '</span></span>';
+  }
+
   function cards(list) {
     return '<div class="rd-cards">' + list.map(function (c) {
       return '<div class="rd-card"><span class="rd-card-k">' + c.k + '</span>' +
@@ -322,7 +340,7 @@
     // predicts — and the page's spine is what a position HAS MEANT. Past
     // tense, second person, no forward claim.
     setHTML('rdStandfirst',
-      '<span>Bitcoin is at <strong>' + mult.toFixed(2) + '&times;</strong> its long-run trend. ' +
+      '<span>As of ' + houseDate() + ', bitcoin is at <strong>' + mult.toFixed(2) + '&times;</strong> its long-run trend. ' +
       'What has a position like this meant for <em>your</em> situation?</span>');
   }
 
@@ -386,8 +404,11 @@
     }
 
     // B1: the provenance line routes to the model and carries the §6.13 tip.
+    // The date replaces "Today" for the same reason it does in the standfirst:
+    // a screenshot of "Today (live)" carries no information about when.
     setHTML('rdProv',
-      todayPriceLabel(priceSource) + ' &middot; trend from the shared ' +
+      houseDate() + ' (' + (todayPriceIsLive(priceSource) ? 'live' : 'latest monthly data') + ')' +
+      ' &middot; trend from the shared ' +
       '<a href="/the-power-law">Power Law module</a>' +
       '<span class="help-tip" tabindex="0">?<span class="tip-content">' +
       'The trend is a power law fitted to bitcoin&rsquo;s whole price history, and the floor is a fixed multiple of it. ' +
@@ -419,7 +440,9 @@
     /* A4 (C20): the question line carries the live multiple, so "here" is a
        number rather than a gesture. It is set from the script for the same
        reason the standfirst is — a static "here" cannot be checked. */
-    setHTML('rdA3Q', 'Price is at <strong>' + liveMult.toFixed(2) + '&times;</strong> trend. When has it been here before?');
+    // Round two: historical tense, never a forward claim, and stated as the
+    // question the module answers rather than as a reading of the ticker.
+    setHTML('rdA3Q', 'Price is at the floor. When has it been here before?');
 
     var v = 'Price has come to the floor <strong>' +
             (modern.length === 3 ? 'three times' : modern.length + ' times') + '</strong> since 2014. ';
@@ -609,7 +632,7 @@
     }
     var dLast = lastClosed(lo), pLast = lastClosed(hi);
 
-    setHTML('rdA3Q', 'Price is at <strong>' + liveMult.toFixed(2) + '&times;</strong> trend. What happens from here?');
+    setHTML('rdA3Q', 'Price is at trend. What has the record looked like either side?');
     setHTML('rdA3Verdict',
       'Price is <strong>at trend</strong> &mdash; neither a discount nor a premium. ' +
       'There is no gap to close, so there is nothing to time. What the record has is the last stretch in each direction.');
@@ -641,8 +664,12 @@
     var premium = (state === 'above-trend');
     var dirWord = premium ? 'at or above' : 'at or below';
 
-    setHTML('rdA3Q', 'Price is at <strong>' + liveMult.toFixed(2) + '&times;</strong> trend, ' +
-      Math.round(gapPct(liveMult)) + '% ' + gapWord(liveMult) + ' it. How long have stretches like this taken to get back?');
+    // "depth" below trend, "height" above — the same question, and the word
+    // that is true from where the reader is standing. Past tense throughout:
+    // the module reports what a return HAS taken, never what one will.
+    setHTML('rdA3Q', premium
+      ? 'How long has a return to trend taken from this height?'
+      : 'How long has a return to trend taken from this depth?');
 
     var closed = rec.episodes.filter(function (e) { return !e.ongoing; }).map(function (e) { return e.months; })
                              .sort(function (a, b) { return a - b; });
@@ -656,8 +683,13 @@
       var med = closed.length % 2 ? closed[(closed.length - 1) / 2]
                                   : (closed[closed.length / 2 - 1] + closed[closed.length / 2]) / 2;
       var thin = closed.length < 3;   // the N<3 rule, counted in EPISODES
+      // "stretch" is this module's load-bearing noun and it is not
+      // self-explanatory — the tip defines it on first use (§6.13).
+      var stretchTip = tip('A continuous run of samples at or ' + (premium ? 'above' : 'below') +
+        ' today&rsquo;s multiple of trend, measured to the first sample back at trend. ' +
+        'Runs more than about 100 days apart count as separate episodes.');
       setHTML('rdA3Verdict',
-        '<strong>' + closed.length + '</strong> completed stretch' + (closed.length === 1 ? '' : 'es') +
+        '<strong>' + closed.length + '</strong> completed stretch' + (closed.length === 1 ? '' : 'es') + stretchTip +
         ' ' + dirWord + ' this depth since 2010. ' +
         (thin
           ? 'That is too few to read a spread from, so they are named rather than averaged: ' +
@@ -689,7 +721,7 @@
     setHTML('rdA3Note', notes.join(' '));
     setHTML('rdA3Register', 'A conditional projection, not a forecast: each card assumes price returns to trend by that date and states the trend price it would return to. Whether it returns, and when, is exactly what is not known. <a href="#what-would-break-this">What would break this &rarr;</a>');
     setHTML('rdA3Route', '<a class="rd-route" href="/discount-or-premium">Discount, or Premium? &rarr;</a>');
-    setHTML('rdA3Sources', '<strong>Sources.</strong> The shared reversion-duration scan, the same one <a href="/discount-or-premium">Discount, or Premium?</a> publishes its duration record from: every sample ' + dirWord + ' today&rsquo;s multiple of trend, grouped into episodes by the 100-day rule, measured to the first sample back at trend. <strong>Episodes are counted, not samples</strong> &mdash; ' + rec.nSamples + ' samples here fall into ' + rec.episodes.length + ' episodes, and it is the episode count the thinness rule reads. Trend prices are the shared Power Law module at each date. Rates are annualised only where the window is a year or more; shorter windows are shown as the total move, per the site convention.');
+    setHTML('rdA3Sources', '<strong>Sources.</strong> The shared reversion-duration scan, the same one <a href="/discount-or-premium">Discount, or Premium?</a> publishes its duration record from: every sample ' + dirWord + ' today&rsquo;s multiple of trend, grouped into episodes by the 100-day rule, measured to the first sample back at trend. <strong>Episodes are counted, not samples</strong> &mdash; ' + rec.nSamples + ' qualifying samples here fall into <strong>' + rec.episodes.length + ' episodes: ' + rec.episodes.filter(function (e) { return !e.ongoing; }).length + ' completed, ' + (rec.episodes.length - rec.episodes.filter(function (e) { return !e.ongoing; }).length) + ' open</strong>, and it is the COMPLETED episode count the thinness rule reads. The Dashboard states the same split for the same record. Trend prices are the shared Power Law module at each date. Rates are annualised only where the window is a year or more; shorter windows are shown as the total move, per the site convention.');
   }
 
   /* The dispatcher. One permanent module, three identities. */
@@ -724,7 +756,11 @@
   }
   function renderA4(spot) {
     var H = a4Horizon, r = hurdle(H, spot);
-    setText('rdA4HzOut', H + (H === 1 ? ' year' : ' years'));
+    /* Defect, round two: "a year over 1 years". One helper, so no call site
+       can pluralise differently from another — the readout, the card sub-line
+       and the chart's aria-label all read from this. */
+    var yrs = H + (H === 1 ? ' year' : ' years');
+    setText('rdA4HzOut', yrs);
     /* The trend bar leads because the Hurdle Rate page PRINTS it at each
        horizon; its floor case is drawn as a curve and never written as a
        number, so it renders here as the conservative companion and the sources
@@ -738,22 +774,23 @@
     var floorTxt = 'if price only <em>ends</em> at the floor by then';
     var lead;
     if (state === 'above-trend') {
-      lead = 'Bitcoin&rsquo;s trend sets a bar of <strong>' + pct1(r.trend * 100) + '</strong> a year over ' + H +
-        ' years. From a premium, the floor case is not a mild outcome but a long unwinding: ' +
+      lead = 'Bitcoin&rsquo;s trend sets a bar of <strong>' + pct1(r.trend * 100) + '</strong> a year over ' + yrs + '. From a premium, the floor case is not a mild outcome but a long unwinding: ' +
         'capital deployed at today&rsquo;s price and ending at the floor returns ' + pct1(r.floor * 100) + ' a year.';
     } else if (state === 'near-trend') {
-      lead = 'Bitcoin&rsquo;s trend sets a bar of <strong>' + pct1(r.trend * 100) + '</strong> a year over ' + H +
-        ' years. Buying at roughly today&rsquo;s price is buying at roughly that bar; ' +
+      lead = 'Bitcoin&rsquo;s trend sets a bar of <strong>' + pct1(r.trend * 100) + '</strong> a year over ' + yrs + '. Buying at roughly today&rsquo;s price is buying at roughly that bar; ' +
         'the floor case &mdash; price ending at 0.42&times; trend by then &mdash; returns ' + pct1(r.floor * 100) + '.';
     } else {
-      lead = 'Bitcoin&rsquo;s trend sets a bar of <strong>' + pct1(r.trend * 100) + '</strong> a year over ' + H +
-        ' years. The conservative version &mdash; capital deployed at today&rsquo;s price and only <em>ending</em> at the channel floor by then &mdash; still clears ' +
+      lead = 'Bitcoin&rsquo;s trend sets a bar of <strong>' + pct1(r.trend * 100) + '</strong> a year over ' + yrs + '. The conservative version &mdash; capital deployed at today&rsquo;s price and only <em>ending</em> at the channel floor by then &mdash; still clears ' +
         pct1(r.floor * 100) + '.';
     }
     setHTML('rdA4Verdict', lead);
     setHTML('rdA4Cards', cards([
-      { k: 'If price ends at the floor', v: pct1(r.floor * 100), sub: 'a year over ' + H + ' years' },
-      { k: 'If you had bought at trend', v: pct1(r.trend * 100), sub: 'the trend’s own growth' },
+      { k: 'If price ends at the floor' + tip('Capital deployed at today&rsquo;s price, with price sitting at the 0.42&times; channel floor on the horizon date. The conservative case &mdash; not a forecast that it gets there.'),
+        v: pct1(r.floor * 100), sub: 'a year over ' + yrs },
+      // Relabelled round two: "If you had bought at trend" invited the reader
+      // to wonder WHEN they had bought. The card is about today's trend price.
+      { k: 'Bought at today’s trend price' + tip('Buying at today&rsquo;s trend price and ending at the trend price on the horizon date &mdash; the trend&rsquo;s own growth, and the baseline the other two bars are measured against.'),
+        v: pct1(r.trend * 100), sub: 'the trend’s own growth' },
       { k: 'If price returns to trend', v: pct1(r.revert * 100), sub: 'by ' + (new Date(Date.UTC(new Date().getUTCFullYear() + H, new Date().getUTCMonth(), 1))).toLocaleString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }) }
     ]));
 
@@ -772,7 +809,7 @@
     var plotW = W - PADL - PADR;
     function X(v) { return PADL + (v - vmin) / (vmax - vmin) * plotW; }
     var zx = X(0);
-    var s = svgOpen(W, H2, 'The annual rate each case implies from today’s price, over ' + H + ' years');
+    var s = svgOpen(W, H2, 'The annual rate each case implies from today’s price, over ' + yrs);
     s += '<line class="rd-ax" x1="' + zx + '" y1="' + (TOP - 6) + '" x2="' + zx + '" y2="' + (TOP + 3 * BH + 2 * GAP + 4) + '"/>';
     rows.forEach(function (row, i) {
       var y = TOP + i * (BH + GAP), x = X(row[1]);
@@ -806,7 +843,7 @@
     setHTML('rdD1Cards', cards([
       { k: 'Deploying at once won', v: pct0(beat), sub: 'of ' + m.n + ' matched entries' },
       { k: 'Waiting won', v: pct0(m.paid), sub: 'more coins for the same money' },
-      { k: 'The dip never came', v: pct0(m.never), sub: 'within two years' }
+      { k: 'The dip never came' + tip('The waiter is holding out for a channel position 0.15 lower than the entry &mdash; the shared engine&rsquo;s own definition of a lower entry. This is the share of matched entries where that never arrived inside two years, and the waiter deployed at the two-year price instead.', true), v: pct0(m.never), sub: 'within two years' }
     ]));
 
     var W = 700, H = 96, PADL = 10, PADR = 10, BY = 26, BH = 34, BW = W - PADL - PADR;
@@ -1040,7 +1077,7 @@
       '</strong> of matched entries. In ' + pct0(m.never) + ' of them the lower price never arrived within two years.');
     var cs = [
       { k: 'The round trip won', v: pct0(m.paid), sub: 'of ' + m.n + ' matched entries' },
-      { k: 'Median coins back', v: m.ratio.toFixed(2) + '×', sub: 'per coin sold — before any split or tax' }
+      { k: 'Median coins back' + tip('Sell one coin here, buy back at the first lower entry within two years: this is how many coins the median round trip ended with. Below 1.00&times; the round trip cost coins rather than gaining them.', true), v: m.ratio.toFixed(2) + '×', sub: 'per coin sold — before any split or tax' }
     ];
     if (stackBTC) {
       cs.push({ k: 'Your stack, round-tripped', v: btc(stackBTC * m.ratio) + ' BTC', sub: 'from ' + btc(stackBTC) + ' BTC, before split or tax' });
@@ -1088,8 +1125,8 @@
       'Neither band is near. At the standard settings the rebuy line sits <strong>' + pct0((rebuy / k - 1) * 100) +
       '</strong> above spot, which is another way of saying a protocol like this one would be buying here rather than selling.');
     setHTML('rdB1Cards', cards([
-      { k: 'Sell band (80th pctile)', v: sell.toFixed(2) + '×', sub: fmtUSDshort(sellP) + ' — ' + pct0((sell / k - 1) * 100) + ' above spot' },
-      { k: 'Rebuy band (50th pctile)', v: rebuy.toFixed(2) + '×', sub: fmtUSDshort(rebuyP) + ' — ' + pct0((rebuy / k - 1) * 100) + ' above spot' },
+      { k: 'Sell band (80th pctile)' + tip('The price-to-trend ratio at or above which Disciplined Rebalancing&rsquo;s standard preset sells. The 80th percentile means priced higher than 80% of days in the record, relative to trend &mdash; not a percentile of price itself.'), v: sell.toFixed(2) + '×', sub: fmtUSDshort(sellP) + ' — ' + pct0((sell / k - 1) * 100) + ' above spot' },
+      { k: 'Rebuy band (50th pctile)' + tip('The ratio at or below which that preset buys back after a sell. The 50th percentile is the historical median position relative to trend.'), v: rebuy.toFixed(2) + '×', sub: fmtUSDshort(rebuyP) + ' — ' + pct0((rebuy / k - 1) * 100) + ' above spot' },
       { k: 'Today', v: k.toFixed(2) + '×', sub: 'below both' }
     ]));
 
@@ -1146,8 +1183,8 @@
       '</strong> a year needs about <strong>' + btc(here) + ' BTC</strong> if today’s gap to trend persists. That is the model’s arithmetic, not a forecast.');
 
     var cs = [
-      { k: 'If today’s gap persists', v: btc(here) + ' BTC', sub: 'read from today’s price' },
-      { k: 'If price tracks the floor', v: floor == null ? '—' : btc(floor) + ' BTC', sub: 'the 0.42× floor case' }
+      { k: 'If today’s gap persists' + tip('Prices projected forward at the trend&rsquo;s own growth rate, but starting from today&rsquo;s actual price rather than today&rsquo;s trend price &mdash; so the gap between the two never closes.'), v: btc(here) + ' BTC', sub: 'read from today’s price' },
+      { k: 'If price tracks the floor' + tip('The site-wide floor-case growth model: price sits at 0.42&times; the trend for the whole plan. The more conservative of the two, and reachable on Escape Velocity by switching the growth model.'), v: floor == null ? '—' : btc(floor) + ' BTC', sub: 'the 0.42× floor case' }
     ];
     if (stackBTC) {
       var gap = stackBTC - here;
@@ -1190,7 +1227,7 @@
     setHTML('rdP2Cards', cards([
       { k: 'Fell 20%+ within two years', v: pct0(m.ddProb), sub: 'of ' + m.n + ' matched entries' },
       { k: 'Never traded below entry', v: pct0(m.neverFell), sub: 'over the same window' },
-      { k: 'Median deepest fall', v: zeroish ? 'about zero' : Math.round(m.ddDepth) + '%', sub: 'from the entry price' }
+      { k: 'Median deepest fall' + tip('Each matched entry&rsquo;s deepest fall below its own buy price within two years, then the median across them. &ldquo;About zero&rdquo; means the typical entry from here never traded meaningfully below what it paid.', true), v: zeroish ? 'about zero' : Math.round(m.ddDepth) + '%', sub: 'from the entry price' }
     ]));
 
     var W = 700, H = 120, PADL = 210, PADR = 70, TOP = 18, BH = 24, GAP = 18;
@@ -1239,23 +1276,36 @@
        list, and the router has already changed what is in it. The chip is
        injected rather than authored into ten articles so the numbering cannot
        drift out of step with what is actually on screen. */
+    /* ROUND TWO: the question line is a TITLE, not a lead paragraph, and the
+       counter sits beside it rather than above it. Both are wrapped into one
+       header row per module so every module has the same shape — chip, then
+       title — regardless of which cluster it is in or what order the router
+       left it in. The wrapper is built once and reused; only the chip's text
+       changes on re-filter. */
     var total = shown.length;
     shown.forEach(function (el, k) {
-      var chip = el.querySelector('.rd-mchip');
-      if (!chip) {
-        chip = document.createElement('span');
-        chip.className = 'rd-mchip';
-        el.insertBefore(chip, el.firstChild);
+      var head = el.querySelector('.rd-mhead');
+      if (!head) {
+        head = document.createElement('div');
+        head.className = 'rd-mhead';
+        var chipNew = document.createElement('span');
+        chipNew.className = 'rd-mchip';
+        head.appendChild(chipNew);
+        var q = el.querySelector('.rd-q');
+        el.insertBefore(head, el.firstChild);
+        if (q) head.appendChild(q);   // move the title into the header row
       }
-      chip.textContent = (k + 1) + ' of ' + total;
+      head.querySelector('.rd-mchip').textContent = (k + 1) + ' of ' + total;
     });
 
-    /* B3 (C16): say what the choice just did, in counts. */
+    /* Say what the choice just did, in counts. ROUND TWO: "for yours" is
+       replaced by the intent named, so the line reads as a sentence about the
+       thing the reader picked rather than about them. */
     var exp = document.getElementById('rdExpect');
     if (exp) {
       exp.innerHTML = st.intent === 'looking'
         ? '<strong>' + always + '</strong> module' + (always === 1 ? '' : 's') + ' below — the position read, shown for every question. Pick one of the others and the modules that answer it join them.'
-        : '<strong>' + total + '</strong> modules below — <strong>' + always + '</strong> for every question, <strong>' + mine + '</strong> for yours.';
+        : '<strong>' + total + '</strong> modules below — <strong>' + always + '</strong> for every question, <strong>' + mine + '</strong> for ' + INTENT_LABEL[st.intent] + '.';
     }
 
     /* A3 (C18): "Always on" was jargon; the cluster headers now say what they

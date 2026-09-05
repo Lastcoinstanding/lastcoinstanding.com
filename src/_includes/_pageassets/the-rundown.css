@@ -213,10 +213,10 @@ body { background: var(--bg); color: var(--text); }
 }
 .rd-expect strong { color: var(--ink-bright); font-weight: 500; }
 .rd-mchip {
-  align-self: flex-start;
+  flex: none;
   font-family: var(--font-b); font-size: 0.64rem; letter-spacing: .1em; text-transform: uppercase;
   color: var(--text-muted); border: 1px solid var(--border); border-radius: 20px;
-  padding: 0.15rem 0.6rem; margin-bottom: 0.8rem;
+  padding: 0.15rem 0.6rem;
 }
 .rd-cluster-sub { text-transform: none; letter-spacing: 0; color: var(--text-muted); font-size: 0.72rem; }
 .rd-cluster-k em { font-style: normal; color: var(--amber); text-transform: none; letter-spacing: 0; font-size: 0.78rem; }
@@ -289,7 +289,16 @@ body { background: var(--bg); color: var(--text); }
 .rd-snack[hidden] { display: none; }
 
 /* 1 · the question line — second person conditional, as the reader carries it */
-.rd-q { font-family: var(--font-d); font-size: 1.2rem; color: var(--ink-bright); margin: 0 0 0.7rem; line-height: 1.3; }
+/* ROUND TWO: the question line is the module's TITLE, set beside the counter
+   rather than under it. `baseline` alignment, not centre — the chip is small
+   caps and a centred small chip beside a large serif title reads as floating.
+   `min-width: 0` on the title so a long question wraps inside the row instead
+   of pushing the chip off the edge at 375. */
+.rd-mhead { display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 0.8rem; }
+.rd-q {
+  font-family: var(--font-d); font-size: 1.45rem; color: var(--ink-bright);
+  margin: 0; line-height: 1.25; flex: 1; min-width: 0;
+}
 /* 2 · the verdict line — the source tool's own, never softened or strengthened */
 .rd-verdict { font-family: var(--font-b); font-size: 0.93rem; line-height: 1.65; color: var(--text); margin: 0 0 1rem; }
 .rd-verdict strong { color: var(--ink-bright); font-weight: 600; }
