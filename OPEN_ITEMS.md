@@ -25,7 +25,18 @@ session automatically. Close items here when done; this file is the "what's cook
   itself is unlisted, so no unreviewed surface is reachable by a reader who is not handed the
   URL. **There is no clock on the review** — it happens when JM gets to it.
 
-  **Gated on that review, in order (amended 2026-09-04):** **register round two** → the
+  **Register round two is DONE and shipped (2026-09-05).** Both parts ratified by JM:
+  part one (date wording, module-count line, module titles, state-aware title, tooltips,
+  two defects) and part two (the header card recast to "Times at the floor since 2014",
+  the tooltip clipping fix on both grids plus a measured off-screen clamp, inline tip
+  placement per §6.13, and the 2010/2014 era clause). Two further duplications were found
+  and removed under JM's rule that **no card in any state duplicates the header** — the
+  at-trend third card, replaced by the longest stretch away from trend on record, and the
+  floor identity's count card, now carrying only the completed/open split. All page-local
+  and direct to main; the page stays unlisted. The whole-months, episode-basis and `?mult=`
+  branches were merged the same day and their branches deleted.
+
+  **Gated on that review, in order (amended 2026-09-04):** ~~register round two~~ → the
   **counsel gate** → the **listing pass**, whose *step one* is now merging the branch
   `feat-sister-tabs-dashboard`. That branch is built, pushed and **ON HOLD by JM's ruling —
   do not merge it before those gates.** It is the first and only inbound link to
