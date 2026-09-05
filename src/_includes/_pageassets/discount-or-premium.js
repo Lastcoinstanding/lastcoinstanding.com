@@ -54,7 +54,31 @@
   var holdings = 0;
   var MAX_BTC = 21000000;
 
-  function price() { return livePrice != null ? livePrice : TODAY_PRICE; }
+  /* ?mult= — SHAREABLE POSITIONS (JM, 2026-09-05).
+
+     Wait-or-Deploy and How Much Cash already take `?pos=` because they have a
+     position SLIDER to preset. This page has no such control: its position is
+     whatever the market is doing. So the shareable form here is `?mult=`, a
+     hypothetical multiple of trend, and it works by substituting the price the
+     whole page reads from.
+
+     THREE FENCES, because overriding the live price is exactly the thing the
+     labelling canon exists to prevent:
+       1. READ-ONLY. Nothing writes ?mult= back into the URL. It is a link you
+          are given, never a state the page talks you into; dragging the
+          horizon slider still writes ?y= and leaves ?mult= untouched.
+       2. NEVER LABELLED LIVE. `hypothetical` suppresses the live dot and the
+          live wording everywhere they appear, and the status strip states the
+          substitution outright with a route back to today.
+       3. EXPLORATION, NOT RECOMMENDATION. A position is not an argument; the
+          page's verdict language is unchanged and no copy branches on the
+          fact that the multiple was supplied rather than observed. */
+  var hypoMult = null;   // set once, from the URL, before first render
+  function hypothetical() { return hypoMult != null; }
+  function price() {
+    if (hypoMult != null) return hypoMult * plPrice(TODAY_DAYS);
+    return livePrice != null ? livePrice : TODAY_PRICE;
+  }
   function trendToday() { return plPrice(TODAY_DAYS); }
   function multiple() { return price() / trendToday(); }
 
@@ -103,18 +127,27 @@
     if (elMult) elMult.textContent = m.toFixed(2) + '×';
 
     if (elPriceSub) {
-      elPriceSub.textContent = todayPriceIsLive(liveSource)
+      elPriceSub.textContent = hypothetical() ? 'A position you supplied — not the market price today.'
+        : todayPriceIsLive(liveSource)
         ? 'Live spot price.'
         : 'Latest monthly data — the live fetch did not resolve.';
     }
 
     if (elMultSub) {
+      /* "Bitcoin IS TRADING at…" is a claim about the market, and under a
+         supplied ?mult= it would be false — the whole point of the fence.
+         The subject changes to the position itself; the arithmetic does not. */
+      // "a 80% premium" — an 8 or an 11 takes "an". Pre-existing, and more
+      // visible now that a supplied position can land on any multiple.
+      function art(n) { var d = String(Math.round(n * 100)); return (d[0] === '8' || d.slice(0, 2) === '11') ? 'an' : 'a'; }
+      var subj = hypothetical() ? 'This position is ' : 'Bitcoin is trading at ';
       if (s === 'discount') {
-        elMultSub.innerHTML = 'Bitcoin is trading at a <strong>' + pct0(1 - m) + ' discount</strong> to its long-run trend.';
+        elMultSub.innerHTML = subj + art(1 - m) + ' <strong>' + pct0(1 - m) + ' discount</strong> to its long-run trend.';
       } else if (s === 'premium') {
-        elMultSub.innerHTML = 'Bitcoin is trading at a <strong>' + pct0(m - 1) + ' premium</strong> to its long-run trend.';
+        elMultSub.innerHTML = subj + art(m - 1) + ' <strong>' + pct0(m - 1) + ' premium</strong> to its long-run trend.';
       } else {
-        elMultSub.innerHTML = 'Bitcoin is <strong>roughly at trend</strong> — neither a meaningful discount nor a premium.';
+        elMultSub.innerHTML = (hypothetical() ? 'This position is' : 'Bitcoin is') +
+          ' <strong>roughly at trend</strong> — neither a meaningful discount nor a premium.';
       }
     }
 
@@ -134,7 +167,7 @@
     }
 
     if (elMeta) {
-      elMeta.textContent = (todayPriceIsLive(liveSource) ? 'Live: ' : 'Latest monthly data: ')
+      elMeta.textContent = (hypothetical() ? 'Hypothetical: ' : todayPriceIsLive(liveSource) ? 'Live: ' : 'Latest monthly data: ')
         + moneyFull(p) + ' · ' + m.toFixed(2) + '× trend · recomputed every page load.';
     }
 
@@ -142,11 +175,30 @@
     // fetch actually resolved to a live spot price, hidden on the monthly-data
     // fallback so the pulse can never imply liveness it doesn't have.
     var liveDot = document.getElementById('dpLiveDot');
-    if (liveDot) liveDot.hidden = !todayPriceIsLive(liveSource);
+    // The pulse means LIVE. A supplied position is never live, whatever the
+    // fetch did, so the dot is suppressed before the fetch is even consulted.
+    if (liveDot) liveDot.hidden = hypothetical() || !todayPriceIsLive(liveSource);
+
+    // The hypothetical banner — stated, with the route back to the real read.
+    var hypoNote = document.getElementById('dpHypoNote');
+    if (hypoNote) {
+      hypoNote.hidden = !hypothetical();
+      if (hypothetical()) hypoNote.innerHTML =
+        'You are reading this page at a <strong>supplied</strong> position of <strong>' + m.toFixed(2) +
+        '&times; trend</strong>, not at today&rsquo;s market price. Every figure below follows from that ' +
+        'substitution. <a href="/discount-or-premium">See today&rsquo;s actual reading &rarr;</a>';
+    }
 
     // At-the-floor honesty line — conditional, self-removing.
     var floorNote = document.getElementById('dpFloorNote');
-    if (floorNote) floorNote.hidden = !(m <= PL_FLOOR * 1.05);
+    if (floorNote) {
+      floorNote.hidden = !(m <= PL_FLOOR * 1.05);
+      // Same fence as the stance line: the shipped wording asserts that bitcoin
+      // is CURRENTLY at the bottom of the channel, which a supplied position
+      // must not claim. Only the subject changes.
+      var fl = floorNote.querySelector('.dp-floor-subj');
+      if (fl) fl.textContent = hypothetical() ? 'This position sits' : 'Bitcoin is currently';
+    }
   }
 
   // ════════ THE INTERACTIVE ════════
@@ -411,7 +463,7 @@
       never: samplePath(neverAt, TODAY_DAYS, hd)    // constant-multiple (parallel to trend)
     };
   }
-  function dotColor() { return todayPriceIsLive(liveSource) ? PULSE : MUTED; }
+  function dotColor() { return (!hypothetical() && todayPriceIsLive(liveSource)) ? PULSE : MUTED; }
 
   // ---- Date-anchored crosshair (shared by Full history + Your window) ----
   // One source of truth: priceSeriesAt / horizonSeriesAt compute every series' value
@@ -1116,6 +1168,13 @@
     try { window.history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash); } catch (e) { /* file:// or blocked */ }
   }
   function readUrl() {
+    // ?mult= — clamped to the channel the page actually draws, so a link
+    // cannot put the reader somewhere the chart has no axis for.
+    var mm = /[?&]mult=([0-9.]+)/.exec(window.location.search);
+    if (mm) {
+      var mv = parseFloat(mm[1]);
+      if (isFinite(mv) && mv >= PL_FLOOR * 0.5 && mv <= PL_CEIL) hypoMult = mv;
+    }
     var m = /[?&]y=([0-9.]+)/.exec(window.location.search);
     if (!m) return;
     var y = parseFloat(m[1]);
