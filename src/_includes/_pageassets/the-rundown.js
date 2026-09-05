@@ -722,12 +722,16 @@
     var notes = [];
     if (rec.widened) notes.push('Too few completed stretches at exactly this depth, so the band was widened to ' + rec.band.toFixed(2) + '× to reach five &mdash; these describe that band, not today&rsquo;s multiple exactly.');
     if (ongoing.length) notes.push('One stretch is still open, running ' + ongoing[0].months.toFixed(1) + ' months so far; it is excluded from the figures above because it has no end yet.');
-    var modernV = visits.filter(function (v) { return v.modern; });
-    if (modernV.length) {
-      var la = modernV[modernV.length - 1];
-      notes.push('Last floor approach ' + fmtMonthShort(la.firstD) + ', the ' +
-        (modernV.length === 3 ? 'third' : modernV.length + 'th') + ' since 2014 &mdash; <a href="/the-bitcoin-floor">The Bitcoin Floor &rarr;</a>');
-    }
+    /* The floor-approach note that stood here is GONE. It said "Last floor
+       approach Jul 2026, the third since 2014" — which is now, word for word,
+       the header card two screens up, since the round-two recast made the
+       count and date that card's whole content. One screen stating the same
+       two facts twice is exactly what the recast removed from the card, and
+       it had a live ordinal bug behind it: the phrasing hard-coded "third"
+       and fell back to `n + 'th'`, so a first or second approach would have
+       printed "1th" / "2th". The era difference this note used to gesture at
+       is now carried properly by the stretches tooltip, which explains why
+       this module counts from 2010 and the card from 2014, and links out. */
     setHTML('rdA3Note', notes.join(' '));
     setHTML('rdA3Register', 'A conditional projection, not a forecast: each card assumes price returns to trend by that date and states the trend price it would return to. Whether it returns, and when, is exactly what is not known. <a href="#what-would-break-this">What would break this &rarr;</a>');
     setHTML('rdA3Route', '<a class="rd-route" href="/discount-or-premium">Discount, or Premium? &rarr;</a>');
