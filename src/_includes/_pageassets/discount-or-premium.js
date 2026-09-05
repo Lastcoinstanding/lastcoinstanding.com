@@ -967,11 +967,45 @@
   function renderDuration() {
     var rec = scanDurations();
     var sec = document.getElementById('dpDuration'), marks = document.getElementById('dpDurMarks'), scap = document.getElementById('dpDurSliderCap');
+    var bases = document.getElementById('dpDurBases');
     var hidden = rec.state === 'hidden';
     if (sec) sec.hidden = hidden;
     if (marks) marks.hidden = hidden;
     if (scap) scap.hidden = hidden;
+    if (bases) bases.hidden = hidden;
     if (hidden) { if (marks) marks.innerHTML = ''; return; }
+
+    /* THE TWO BASES (JM ruling, 2026-09-04). Both come out of the scan already
+       — `episodes` grouped by the 100-day rule, and the sample statistics — so
+       this is a rendering addition and not new computation. The episode row
+       leads because its count says how much has actually happened; the sample
+       count is an order of magnitude larger for the same record, which is what
+       made "65 completed" misleading on the Dashboard. */
+    (function () {
+      var epClosed = rec.episodes.filter(function (e) { return !e.ongoing; })
+                                 .map(function (e) { return e.months; })
+                                 .sort(function (a, b) { return a - b; });
+      function figs(min, med, max) {
+        return 'fastest <strong>' + fmtMo(min) + '</strong> &middot; median <strong>' + fmtMo(med) +
+               '</strong> &middot; slowest <strong>' + fmtMo(max) + '</strong>';
+      }
+      var epN = document.getElementById('dpDurEpN'), epF = document.getElementById('dpDurEpFigs');
+      var saN = document.getElementById('dpDurSaN'), saF = document.getElementById('dpDurSaFigs');
+      if (epClosed.length) {
+        var epMed = epClosed.length % 2 ? epClosed[(epClosed.length - 1) / 2]
+                                        : (epClosed[epClosed.length / 2 - 1] + epClosed[epClosed.length / 2]) / 2;
+        if (epN) epN.textContent = epClosed.length + (epClosed.length === 1 ? ' episode' : ' episodes');
+        if (epF) epF.innerHTML = epClosed.length < 3
+          // The N<3 rule: below three independent stretches, name them.
+          ? 'too few for a median &mdash; ' + epClosed.map(function (m) { return '<strong>' + fmtMo(m) + '</strong>'; }).join(' and ')
+          : figs(epClosed[0], epMed, epClosed[epClosed.length - 1]);
+      } else {
+        if (epN) epN.textContent = 'none completed';
+        if (epF) epF.textContent = 'every stretch at this depth is still open';
+      }
+      if (saN) saN.textContent = rec.nCompleted + (rec.nCompleted === 1 ? ' sample' : ' samples');
+      if (saF) saF.innerHTML = figs(rec.min, rec.median, rec.max);
+    })();
 
     if (window.console && console.log) {
       console.log('[dp-duration] band=' + rec.band.toFixed(2) + '× state=' + rec.state
