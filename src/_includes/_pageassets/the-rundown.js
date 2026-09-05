@@ -474,7 +474,13 @@
                      .filter(function (x) { return x != null; });
     var slowest = recs.length ? Math.max.apply(null, recs) : null;
     setHTML('rdA3Cards', cards([
-      { k: 'Floor approaches since 2014', v: String(modern.length), sub: closed.length + ' completed' },
+      /* Was "Floor approaches since 2014 · 3 · 2 completed" — the header card
+         verbatim, and the verdict sentence above states the total a third
+         time. Under JM's rule that no card in any state duplicates the
+         header, this card now carries ONLY the split, which is the part the
+         header deliberately gave up and which has to live somewhere. */
+      { k: 'Completed approaches', v: String(closed.length),
+        sub: open ? 'one still open' : 'all closed' },
       { k: 'Deepest of them', v: Math.min.apply(null, modern.map(function (v) { return v.lowM; })).toFixed(3) + '×', sub: 'of trend' },
       { k: 'Slowest return to trend', v: slowest ? slowest.toFixed(1) + ' yrs' : '—', sub: 'from that entry' }
     ]));
@@ -624,8 +630,9 @@
      close and a duration computed from one would be noise. JM's condition was
      that a permanent module never renders "nothing to show", so this identity
      reports the LAST STRETCH EACH WAY, read from the same scan at the dead
-     band's own published edges (0.95× and 1.05×). No new computation: those
-     are the multiples at which Discount-or-Premium itself starts reporting. */
+     band's own published edges (0.95× and 1.05×), plus the LONGEST on record
+     either side. No new computation: those are the multiples at which
+     Discount-or-Premium itself starts reporting. */
   function renderAtTrend(visits, liveMult, spot) {
     var lo = RD.scan(RD.NEAR_LO - 1e-9), hi = RD.scan(RD.NEAR_HI + 1e-9);
     function lastClosed(rec) {
@@ -642,20 +649,41 @@
 
     var list = [];
     if (dLast) list.push({ k: 'Last stretch below ' + RD.NEAR_LO.toFixed(2) + '×',
-      v: Math.round(dLast.months) + ' mo', sub: 'from ' + fmtMonthShort(dLast.entryD) + ' back to trend' });
+      v: RD.fmtMonthsShort(dLast.months), sub: 'from ' + fmtMonthShort(dLast.entryD) + ' back to trend' });
     if (pLast) list.push({ k: 'Last stretch above ' + RD.NEAR_HI.toFixed(2) + '×',
-      v: Math.round(pLast.months) + ' mo', sub: 'from ' + fmtMonthShort(pLast.entryD) + ' back to trend' });
-    var modern = visits.filter(function (v) { return v.modern; });
-    if (modern.length) {
-      var lastA = modern[modern.length - 1];
-      list.push({ k: 'Last floor approach', v: fmtMonthShort(lastA.firstD), sub: modern.length + ' since 2014' });
+      v: RD.fmtMonthsShort(pLast.months), sub: 'from ' + fmtMonthShort(pLast.entryD) + ' back to trend' });
+
+    /* THIRD CARD — the longest stretch away from trend on record, either side.
+       It replaces a "Last floor approach" card that restated the header, under
+       JM's rule that no card in any state duplicates the header.
+
+       His condition was that it only ships if it reproduces on
+       Discount-or-Premium, and it does: that page prints this figure as its
+       "longest" marker, and the answer is the SAME episode at every multiple a
+       reader can actually enter on this side of the dead band. Checked at
+       0.94x, 0.93x and 0.90x below, and 1.06x, 1.07x and 1.10x above — the
+       longest is the identical stretch at all of them, so the card does not
+       depend on a multiple no one can type. `longestEp` is the episode basis,
+       matching how this page counts everywhere else. */
+    var longest = [lo.longestEp, hi.longestEp]
+      .filter(Boolean)
+      .reduce(function (a, b) { return (!a || b.months > a.months) ? b : a; }, null);
+    var longBelow = !!(longest && lo.longestEp && longest === lo.longestEp);
+    if (longest) {
+      list.push({ k: 'Longest away from trend', v: RD.fmtMonthsShort(longest.months),
+        sub: (longBelow ? 'below' : 'above') + ' trend, from ' + fmtMonthShort(longest.entryD) + ' back to trend' });
     }
     setHTML('rdA3Cards', cards(list));
     setHTML('rdA3Viz', '');
-    setHTML('rdA3Note', 'Both stretches are measured from the first sample past the band to the first sample back at trend.');
+    setHTML('rdA3Note', 'Each stretch is measured from the first sample past the band to the first sample back at trend.');
     setHTML('rdA3Register', 'Historical, at this position &mdash; not a prediction. At trend the reversion record has nothing to say, which is itself the reading.');
     setHTML('rdA3Route', '<a class="rd-route" href="/discount-or-premium">Discount, or Premium? &rarr;</a>');
-    setHTML('rdA3Sources', '<strong>Sources.</strong> The shared reversion-duration scan, the same one <a href="/discount-or-premium">Discount, or Premium?</a> publishes its duration record from, read at the two edges of that page&rsquo;s own near-trend band &mdash; ' + RD.NEAR_LO.toFixed(2) + '&times; and ' + RD.NEAR_HI.toFixed(2) + '&times;. Inside that band neither page reports a duration, because there is no gap to measure; these are the nearest stretches on either side of it. The floor line is <a href="/the-bitcoin-floor">The Bitcoin Floor</a>&rsquo;s count.');
+    setHTML('rdA3Sources', '<strong>Sources.</strong> The shared reversion-duration scan, the same one <a href="/discount-or-premium">Discount, or Premium?</a> publishes its duration record from, read at the two edges of that page&rsquo;s own near-trend band &mdash; ' + RD.NEAR_LO.toFixed(2) + '&times; and ' + RD.NEAR_HI.toFixed(2) + '&times;. Inside that band neither page reports a duration, because there is no gap to measure; these are the nearest stretches on either side of it.' +
+      (longest
+        ? ' The longest is that page&rsquo;s own longest stretch ' + (longBelow ? 'below' : 'above') +
+          ' trend, reproducible there at <a href="/discount-or-premium?mult=' + (longBelow ? '0.94' : '1.06') + '">' +
+          (longBelow ? '0.94' : '1.06') + '&times;</a> &mdash; and at every other multiple on that side of the band, since it is the same episode at all of them.'
+        : ''));
   }
 
   /* IDENTITY 3 of 3 — the reversion module, off the floor and off trend.
