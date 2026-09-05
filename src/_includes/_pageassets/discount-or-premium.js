@@ -944,7 +944,10 @@
   function scanDurations() { return RD.scan(multiple()); }
 
 
-  function fmtMo(v) { var r = Math.round(v); return r + (r === 1 ? ' month' : ' months'); }
+  // Shared since 2026-09-05: one precision rule for reversion durations across
+  // this page, the Dashboard and the Rundown, with the sub-month guard that
+  // originated here. Computation is untouched; only the printed string rounds.
+  function fmtMo(v) { return RD.fmtMonths(v); }
   function durDate(d) { return new Date((GENESIS_TS + d * 86400) * 1000).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
   var durationLogged = false;
 
@@ -967,11 +970,45 @@
   function renderDuration() {
     var rec = scanDurations();
     var sec = document.getElementById('dpDuration'), marks = document.getElementById('dpDurMarks'), scap = document.getElementById('dpDurSliderCap');
+    var bases = document.getElementById('dpDurBases');
     var hidden = rec.state === 'hidden';
     if (sec) sec.hidden = hidden;
     if (marks) marks.hidden = hidden;
     if (scap) scap.hidden = hidden;
+    if (bases) bases.hidden = hidden;
     if (hidden) { if (marks) marks.innerHTML = ''; return; }
+
+    /* THE TWO BASES (JM ruling, 2026-09-04). Both come out of the scan already
+       — `episodes` grouped by the 100-day rule, and the sample statistics — so
+       this is a rendering addition and not new computation. The episode row
+       leads because its count says how much has actually happened; the sample
+       count is an order of magnitude larger for the same record, which is what
+       made "65 completed" misleading on the Dashboard. */
+    (function () {
+      var epClosed = rec.episodes.filter(function (e) { return !e.ongoing; })
+                                 .map(function (e) { return e.months; })
+                                 .sort(function (a, b) { return a - b; });
+      function figs(min, med, max) {
+        return 'fastest <strong>' + fmtMo(min) + '</strong> &middot; median <strong>' + fmtMo(med) +
+               '</strong> &middot; slowest <strong>' + fmtMo(max) + '</strong>';
+      }
+      var epN = document.getElementById('dpDurEpN'), epF = document.getElementById('dpDurEpFigs');
+      var saN = document.getElementById('dpDurSaN'), saF = document.getElementById('dpDurSaFigs');
+      if (epClosed.length) {
+        var epMed = epClosed.length % 2 ? epClosed[(epClosed.length - 1) / 2]
+                                        : (epClosed[epClosed.length / 2 - 1] + epClosed[epClosed.length / 2]) / 2;
+        if (epN) epN.textContent = epClosed.length + (epClosed.length === 1 ? ' episode' : ' episodes');
+        if (epF) epF.innerHTML = epClosed.length < 3
+          // The N<3 rule: below three independent stretches, name them.
+          ? 'too few for a median &mdash; ' + epClosed.map(function (m) { return '<strong>' + fmtMo(m) + '</strong>'; }).join(' and ')
+          : figs(epClosed[0], epMed, epClosed[epClosed.length - 1]);
+      } else {
+        if (epN) epN.textContent = 'none completed';
+        if (epF) epF.textContent = 'every stretch at this depth is still open';
+      }
+      if (saN) saN.textContent = rec.nCompleted + (rec.nCompleted === 1 ? ' sample' : ' samples');
+      if (saF) saF.innerHTML = figs(rec.min, rec.median, rec.max);
+    })();
 
     if (window.console && console.log) {
       console.log('[dp-duration] band=' + rec.band.toFixed(2) + '× state=' + rec.state
@@ -1038,10 +1075,10 @@
         var endD = e.regainD != null ? e.regainD : maxD;
         var left = (e.entryD - minD) / span * 100, width = Math.max((endD - e.entryD) / span * 100, e.ongoing ? 2.4 : 1.4);
         if (e.ongoing && left + width > 100) left = 100 - width; // keep the open bar within the axis (ends at today)
-        var soFar = e.months < 1 ? 'under a month' : '~' + Math.round(e.months) + ' months';
-        var lab = e.ongoing ? 'ongoing' : Math.round(e.months) + ' mo';
+        var soFar = e.months < 1 ? RD.fmtMonths(e.months) : '~' + RD.fmtMonths(e.months);
+        var lab = e.ongoing ? 'ongoing' : RD.fmtMonthsShort(e.months);
         var tip = e.ongoing ? (durDate(e.entryD) + ' → ongoing (' + soFar + ' so far)')
-          : (durDate(e.entryD) + ' → ' + durDate(e.regainD) + ' (' + Math.round(e.months) + ' mo)');
+          : (durDate(e.entryD) + ' → ' + durDate(e.regainD) + ' (' + RD.fmtMonthsShort(e.months) + ')');
         html += '<span class="dp-dur-bar' + (e.ongoing ? ' is-ongoing' : '') + '" style="left:' + left.toFixed(1)
           + '%;width:' + width.toFixed(1) + '%" title="' + tip + '"><span class="dp-dur-bar-lab">' + lab + '</span></span>';
       });

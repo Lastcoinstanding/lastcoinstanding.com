@@ -855,6 +855,49 @@ Before announcing the page or sharing the URL externally:
 - **Feedback widget check** — automatic for any page with `slug` (layout-level, base.njk); verify it renders on the deployed page below the related strip (eyebrow "Feedback or questions?"). Hub/utility pages opt out with `feedback: false`. Do NOT add a per-page include. (SITE_GUIDE §27)
 - **Deferred integration surfaces are tracked, not dropped.** The **OG card** (§7) and the **carousel slide** (§8) may each ship in a follow-up PR — which is precisely how they drift silently (the stale BAS OG asset; two slide-less pages sitting in `SITE_GUIDE §13` "Pending additions"; same failure class as the missing `:root` palette that §1 now guards). Both need external tooling that is often unavailable at launch (Grok Imagine for the slide; Python + Pillow/Playwright for the OG card), so deferral is legitimate — *untracked* deferral is the bug. If either is deferred, it MUST be logged as a **tracked** pending item recording the page slug: the carousel slide in `SITE_GUIDE §13` "Pending additions", the OG card in `TECH_DEBT` (or the OG handoff note). **A launch is not "done" until every §1–§10 surface is either shipped or on a tracked list.**
 
+### Verifying a refactor: same-page-load parity
+
+**JM ruling, 2026-09-04.** A refactor that moves a published figure is a defect,
+so a refactor is not done until parity is *proved*. Two rules, both learned the
+expensive way.
+
+- **COMPARE OLD AGAINST NEW INSIDE ONE PAGE LOAD.** Every live figure on this
+  site derives from `TODAY_DAYS`, which advances with the clock, so the
+  depth-matched sets, the trend price and everything read off them move day to
+  day and sometimes hour to hour. **Captures taken minutes apart differ by
+  drift that is indistinguishable from a regression.** That happened during the
+  `return-window` extraction: a Dashboard median read 146% and then 145%, and a
+  sample count 64 then 65, purely because the day ticked over between captures
+  — a false regression that cost a round of investigation. The method that
+  works: paste the **verbatim pre-refactor formula** into the page beside the
+  new one and compare both in the same load, across a probe set that includes
+  the boundaries (for §10.3.1, 11.9 / 12 / 12.1 months). Pin the price with a
+  harness shim so only the code differs.
+- **Compare rendered strings, not just numbers**, where a page's wording
+  branches. Discount-or-Premium's parity check compared the full card title,
+  both figures, both sub-lines and the uplift line at seven horizons; a
+  numbers-only check would have missed a title that stopped matching its
+  figure.
+
+### Extraction rule: the module owns the decision, the page owns the wording
+
+**JM ruling, 2026-09-04**, from the annualisation convention's third
+re-implementation. When the same rule appears on more than one page, extract
+**the decision** — which figure is permitted, what the values are — into a
+shared module, and leave **the wording** with each page. Sharing the phrasing
+too forces several pages into one voice for no safety gain; sharing the
+decision is the whole benefit.
+
+**The standing evidence is the Dashboard.** It had the annualisation rule, had
+written its own inline ruling for it, and still tested for the wrong thing —
+"is this the fastest" rather than "is this under twelve months" — because the
+decision lived at the call site, next to the phrasing, where each site could
+re-derive it slightly differently. `shared/return-window.js` and
+`shared/reversion-durations.js` are the pattern: a page reads the decision and
+supplies its own voice. A local *port* of another page's logic is the
+anti-pattern — the Dashboard's copy of `scanDurations` is what let a
+samples-vs-episodes divergence go unnoticed.
+
 ### Verifying a just-pushed change on Cloudflare Pages
 
 - **Cloudflare is the only authoritative deploy signal.** The site deploys

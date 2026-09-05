@@ -20,7 +20,8 @@
 ============================================================ */
 (function () {
   if (typeof plPrice !== 'function' || typeof TODAY_DAYS !== 'number') return;
-  if (!window.ReturnWindow) return;   // shared/return-window.js must load first
+  if (!window.ReturnWindow || !window.ReversionDurations) return;   // shared modules must load first
+  var RD = window.ReversionDurations;
 
   // ── helpers ──
   function $(id) { return document.getElementById(id); }
@@ -117,32 +118,49 @@
   var lastSampleDate = fmtMonthYear(PL_DATA[PL_DATA.length - 1][0]);
   try { lastSampleDate = new Date((GENESIS_TS + PL_DATA[PL_DATA.length - 1][0] * 86400) * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }); } catch (e) {}
 
-  // ── IMPLIED REVERSION RATE — port of /discount-or-premium's scanDurations
-  //    (discount branch): completed times-to-trend from samples at least as deep as
-  //    today's multiple, band-widened in 0.05 steps toward 1.0 only if <5 completed.
-  //    Returns fastest/median/longest in months (matches the d-or-p record set). ──
-  function sampleMult(idx) { return PL_DATA[idx][1] / plPrice(PL_DATA[idx][0]); }
+  // ── IMPLIED REVERSION RATE — reads shared/reversion-durations.js, the same
+  //    scan Discount-or-Premium and the Rundown use, on the EPISODE basis. ──
+  /* THE EPISODE BASIS (JM ruling, 2026-09-04), and the shared scan.
+
+     Two changes at once, because they are the same change. This function was a
+     local PORT of Discount-or-Premium's scanDurations, and it took its
+     statistics over SAMPLES — every ~12-day observation that qualified. At a
+     floor-adjacent position that reported "65 completed" where the record
+     holds SIX independent stretches: a tenfold overstatement of how much
+     evidence there is, because a long stretch contributes dozens of samples
+     and one episode.
+
+     So the port is retired for `shared/reversion-durations.js` — the same
+     module Discount-or-Premium and the Rundown read — and the statistics move
+     to its `episodes`. Retiring the port is what makes agreement structural
+     rather than coincidental: three pages, one scan, one grouping rule.
+
+     Sample-basis figures are still available on the record (`nSamples`,
+     `sampleMedian`) and Discount-or-Premium publishes both; this tile leads
+     with episodes because its job is to say how much has actually happened. */
   function reversionRecord(price) {
     var m = price / trend;
-    if (m >= 0.95) return { nCompleted: 0, notDiscount: true }; // not a discount (dead band / above trend)
-    function regainAfter(idx) { for (var j = idx + 1; j < PL_DATA.length; j++) { if (sampleMult(j) >= 1.0) return j; } return -1; }
-    var band = m, comp = [], guard = 0, k, r;
-    while (true) {
-      comp = [];
-      for (k = 0; k < PL_DATA.length; k++) {
-        if (sampleMult(k) <= band) {
-          r = regainAfter(k);
-          if (r >= 0) comp.push({ months: (PL_DATA[r][0] - PL_DATA[k][0]) / DOP_MONTH, year: new Date((GENESIS_TS + PL_DATA[k][0] * 86400) * 1000).getUTCFullYear() });
-        }
-      }
-      if (comp.length >= 5 || guard >= 12) break;
-      band += 0.05; guard++;
-      if (band >= 0.95) break;
-    }
-    if (!comp.length) return { nCompleted: 0 };
-    var durs = comp.map(function (c) { return c.months; }).sort(function (a, b) { return a - b; });
+    var rec = RD.scan(m);
+    // The tile is a below-trend read: the dead band and the premium side both
+    // fall out here, as they did before.
+    if (!rec || rec.state !== 'discount') return { nCompleted: 0, notDiscount: true };
+
+    var closedEps = rec.episodes.filter(function (e) { return !e.ongoing; });
+    if (!closedEps.length) return { nCompleted: 0 };
+    var durs = closedEps.map(function (e) { return e.months; }).sort(function (a, b) { return a - b; });
     var med = durs.length % 2 ? durs[(durs.length - 1) / 2] : (durs[durs.length / 2 - 1] + durs[durs.length / 2]) / 2;
-    return { comp: comp, min: durs[0], median: med, max: durs[durs.length - 1], nCompleted: comp.length, band: band, widened: Math.abs(band - m) > 1e-9 };
+    return {
+      comp: closedEps.map(function (e) {
+        return { months: e.months, year: new Date((GENESIS_TS + e.entryD * 86400) * 1000).getUTCFullYear() };
+      }),
+      min: durs[0], median: med, max: durs[durs.length - 1],
+      nCompleted: durs.length,            // EPISODES now, not samples
+      // ALL qualifying samples, not just the completed ones — the Rundown
+      // prints this same figure, and the two must agree.
+      nSamples: rec.nSamples,
+      ongoing: rec.episodes.length - closedEps.length,
+      band: rec.band, widened: rec.widened
+    };
   }
   function renderReversion(price) {
     var rec = reversionRecord(price);
@@ -176,9 +194,35 @@
         ? { v: '~' + fmtPct(r.annualised / 100) + '/yr', phrase: '~' + fmtPct(r.annualised / 100) + '/yr' }
         : { v: '~' + fmtPct(r.total / 100) + ' in total', phrase: '~' + fmtPct(r.total / 100) + ' in total, not an annual rate' };
     }
+    /* THE THINNESS RULE, NOW THAT IT CAN FIRE (JM ruling, ratified as
+       principle: a rule that can never fire has stopped measuring
+       independence). On the sample basis the count was always in the dozens,
+       so this branch was unreachable; on the episode basis it is reachable at
+       shallower depths, and when it fires the tile NAMES the stretches instead
+       of publishing a median over one or two of them — the same rule the
+       Rundown's position module applies.
+
+       Compact form, because this is a tile and not a module: the count, then
+       the durations themselves, then the implied read for the slowest of them
+       so the tile still answers "and what would that be worth". No median, no
+       spread, no range sentence — those are the statistics the rule exists to
+       withhold. */
+    if (rec.nCompleted < 3) {
+      var names = rec.comp.map(function (c) { return RD.fmtMonths(c.months); }).join(' and ');
+      setText('dashRevMedian', impliedRead(rec.max).v);
+      setHTML('dashRevMedianSub',
+        'if it took the longer of the <strong>' + rec.nCompleted + '</strong> completed stretch' +
+        (rec.nCompleted === 1 ? '' : 'es') + ' on record from a depth like today’s — ' + names +
+        '. Too few to read a median from, so they are named rather than averaged.');
+      setText('dashRevRange', rec.widened
+        ? 'Few at exactly today’s depth, so widened to ≤' + rec.band.toFixed(2) + '×.'
+        : '');
+      return;
+    }
+
     var medRead = impliedRead(rec.median);
     setText('dashRevMedian', medRead.v);
-    setText('dashRevMedianSub', 'over ~' + Math.round(rec.median) + ' months — the median reversion on record from a depth like today’s, and only if it reverts at all');
+    setText('dashRevMedianSub', 'over ~' + RD.fmtMonths(rec.median) + ' — the median reversion on record from a depth like today’s, and only if it reverts at all');
     // Era note (data-driven, not a filter): do the quickest resolutions cluster in the early era?
     var byDur = rec.comp.slice().sort(function (a, b) { return a.months - b.months; });
     var fastN = Math.max(1, Math.round(byDur.length / 3));
@@ -187,16 +231,17 @@
     var era = (fastAllEarly && recent.year >= 2020)
       ? ' The quickest resolutions came in bitcoin’s early era (≤2015); the most recent, in ' + recent.year + ', took ~' + Math.round(recent.months) + ' months.'
       : '';
-    var range = 'Low end: the slowest reversion, ~' + Math.round(rec.max) + ' months, implies ' + impliedRead(rec.max).phrase
-      + '. The quickest resolution from a depth like today’s took ~' + rec.min.toFixed(1) + ' months.' + era
-      /* "samples", not "episodes" — a factual correction, not a style one. This
-         count is per-SAMPLE (~12-day observations), and a handful of samples
-         can be one episode: today's 64 completed samples fall into 6 completed
-         episodes. The shared module's own header states the distinction and
-         warns consumers about exactly this. The tile's statistics are
-         sample-based by design and stay that way; only the noun changes, so
-         the number is no longer described as something it is not. */
-      + ' ' + rec.nCompleted + ' completed samples on record.';
+    var range = 'Low end: the slowest reversion, ~' + RD.fmtMonths(rec.max) + ', implies ' + impliedRead(rec.max).phrase
+      + '. The quickest resolution from a depth like today’s took ~' + RD.fmtMonths(rec.min) + '.' + era
+      /* Round two: the two sister pages stated the same record with different
+         totals — this tile counted only CLOSED episodes and COMPLETED samples,
+         the Rundown counted all of both including the open one. Neither was
+         wrong; they were answering different questions under one label. Both
+         now print the same split, so a reader moving between them sees one
+         record rather than two. */
+      + ' ' + (rec.nCompleted + rec.ongoing) + ' episode' + ((rec.nCompleted + rec.ongoing) === 1 ? '' : 's')
+      + ': ' + rec.nCompleted + ' completed, ' + rec.ongoing + ' open'
+      + (rec.nSamples ? ' (' + rec.nSamples + ' qualifying samples grouped by the 100-day rule)' : '') + '.';
     if (rec.widened) range += ' Few at exactly today’s depth, so widened to ≤' + rec.band.toFixed(2) + '×.';
     setText('dashRevRange', range);
   }

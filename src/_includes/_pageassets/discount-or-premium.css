@@ -154,6 +154,22 @@ body { background: var(--bg); color: var(--text); }
 .dp-dur-cap { font-family: 'Inter', sans-serif; font-size: 0.78rem; line-height: 1.55; color: var(--text-muted); margin: 0.5rem 0 0; }
 .dp-dur-cap strong { color: var(--text-dim); font-weight: 600; }
 
+/* ── The two bases (JM ruling, 2026-09-04) ──
+   Two rows, one per population, each with its own count. The episode row
+   leads and is given the stronger ink: it is the read a visitor arrives for,
+   and its count is the honest one. The sample row is deliberately quieter —
+   the finer-grained view, not the headline. */
+.dp-dur-bases { margin: 1rem 0 0; border-top: 1px solid rgba(224,148,34,0.12); }
+.dp-dur-basis { padding: 0.7rem 0; border-bottom: 1px solid rgba(224,148,34,0.08); }
+.dp-dur-basis-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap; }
+.dp-dur-basis-name { font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); }
+.dp-dur-basis-n { font-family: 'Inter', sans-serif; font-size: 0.74rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.dp-dur-basis-figs { font-family: 'Inter', sans-serif; font-size: 0.82rem; line-height: 1.6; color: var(--text-muted); margin-top: 0.2rem; }
+.dp-dur-basis-figs strong { color: var(--text-dim); font-weight: 600; font-variant-numeric: tabular-nums; }
+#dpDurBasisEpisodes .dp-dur-basis-name { color: var(--amber); }
+#dpDurBasisEpisodes .dp-dur-basis-figs strong { color: var(--text); }
+.dp-dur-basis-note { font-family: 'Inter', sans-serif; font-size: 0.72rem; line-height: 1.5; color: var(--text-muted); margin: 0.6rem 0 0; }
+
 /* Optional holdings row — small, unobtrusive, sits between the slider and the
    readout pair. The input value never leaves this page (privacy fence §9 P2). */
 .dp-holdings { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem 0.7rem; margin: 0 0 1.3rem; padding: 0.7rem 0.9rem; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 8px; }

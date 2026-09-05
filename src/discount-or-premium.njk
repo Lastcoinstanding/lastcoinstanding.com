@@ -29,8 +29,7 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/discount-or-premium-head.html' %}"
   page_styles: "{% include '_pageassets/discount-or-premium.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}
-{% include '_pageassets/shared/return-window.js' %}\n{% include '_pageassets/discount-or-premium.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/return-window.js' %}\n{% include '_pageassets/discount-or-premium.js' %}"
 ---
 
 <section class="hero">
@@ -160,6 +159,36 @@ eleventyComputed:
       <div class="dp-dur-head">How long has it taken before?</div>
       <p class="dp-dur-sub" id="dpDurSub"></p>
       <div class="dp-dur-track" id="dpDurTrack"></div>
+
+      {#- BOTH BASES, LABELLED (JM ruling, 2026-09-04). This page is the
+          canonical home of the duration record, so it is the page that carries
+          both populations rather than choosing one. The episode row leads: it
+          answers the question a reader arrives with — if a stretch started
+          now, how long? — and its count is honest about how much independent
+          evidence there is. The sample row is the finer-grained view.
+
+          Each row carries its OWN count, because the counts are the whole
+          point: a long stretch contributes dozens of samples and one episode,
+          and a reader shown "65" without that context will read the record as
+          ten times deeper than it is. -#}
+      <div class="dp-dur-bases" id="dpDurBases" hidden>
+        <div class="dp-dur-basis" id="dpDurBasisEpisodes">
+          <div class="dp-dur-basis-head">
+            <span class="dp-dur-basis-name">From the start of a stretch</span>
+            <span class="dp-dur-basis-n" id="dpDurEpN">&mdash;</span>
+          </div>
+          <div class="dp-dur-basis-figs" id="dpDurEpFigs">&mdash;</div>
+        </div>
+        <div class="dp-dur-basis" id="dpDurBasisSamples">
+          <div class="dp-dur-basis-head">
+            <span class="dp-dur-basis-name">From any point inside one</span>
+            <span class="dp-dur-basis-n" id="dpDurSaN">&mdash;</span>
+          </div>
+          <div class="dp-dur-basis-figs" id="dpDurSaFigs">&mdash;</div>
+        </div>
+        <p class="dp-dur-basis-note">Both read the same record; they differ in what counts as one observation. The markers above are on the episode basis.</p>
+      </div>
+
       <p class="dp-dur-cap" id="dpDurCap"></p>
     </section>
   </section>
