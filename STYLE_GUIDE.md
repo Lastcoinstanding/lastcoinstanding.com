@@ -2327,16 +2327,18 @@ and merge. Logged in `TECH_DEBT.md`.
   *is-fastest* to *is-under-12-months*, which is a smaller change than it
   looks because the branch already exists.
 
-**Where the rule is implemented in full.** `the-rundown.js` `windowRead()` is
-the reference: one function decides date, price, total, and whether an
-annualised figure is permitted at all, so no call site can choose differently.
-Copy that shape rather than re-deciding per call site — the Dashboard's
-partial compliance is exactly what per-call-site judgement produces.
+**Where the rule lives: `shared/return-window.js`.** Extracted 2026-09-04 after
+the same rule had been implemented three separate times. One module decides
+date, price, total, and **whether an annualised figure is permitted at all**;
+the Rundown, Discount-or-Premium and the Dashboard read that decision and keep
+only their own wording. `MIN_MONTHS` is exported so a chart's domain and a
+readout's basis cannot disagree about where the floor sits.
 
-**Where the rule is already implemented.** `the-rundown.js` `windowRead()` is
-the reference implementation: one function decides date, price, total and
-whether an annualised figure is permitted, so no call site can choose
-differently.
+**Do not re-decide at a call site.** The Dashboard is the standing evidence: it
+had the rule, wrote its own inline ruling for it, and still tested for the
+wrong thing — "is this the fastest" rather than "is this under twelve months" —
+because the decision lived where the figure was printed instead of in one
+place. Share the decision; keep the voice.
 
 ### 10.4 Toolbox naming: plain, purpose-first titles
 

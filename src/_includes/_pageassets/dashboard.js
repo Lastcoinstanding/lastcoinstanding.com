@@ -20,6 +20,7 @@
 ============================================================ */
 (function () {
   if (typeof plPrice !== 'function' || typeof TODAY_DAYS !== 'number') return;
+  if (!window.ReturnWindow) return;   // shared/return-window.js must load first
 
   // ── helpers ──
   function $(id) { return document.getElementById(id); }
@@ -164,13 +165,16 @@
        rather than each call site deciding for itself — that per-call-site
        judgement is exactly what produced the gap. Same shape as
        the-rundown.js windowRead(). */
-    var ANN_MIN_M = 12;
-    function cagr(months) { var T = months / 12; return Math.pow(plPrice(TODAY_DAYS + T * YEAR_D) / price, 1 / T) - 1; }
-    function totalRet(months) { return plPrice(TODAY_DAYS + (months / 12) * YEAR_D) / price - 1; }
+    /* The DECISION is shared/return-window.js's; the WORDING is this tile's.
+       This tile is why that module exists — it had the rule and its own inline
+       ruling and still tested for the wrong thing, because the decision lived
+       at the call site. It cannot now. */
+    var RW = window.ReturnWindow;
     function impliedRead(months) {
-      return months >= ANN_MIN_M
-        ? { v: '~' + fmtPct(cagr(months)) + '/yr', phrase: '~' + fmtPct(cagr(months)) + '/yr' }
-        : { v: '~' + fmtPct(totalRet(months)) + ' in total', phrase: '~' + fmtPct(totalRet(months)) + ' in total, not an annual rate' };
+      var r = RW.read(months, price);
+      return r.annualised_ok
+        ? { v: '~' + fmtPct(r.annualised / 100) + '/yr', phrase: '~' + fmtPct(r.annualised / 100) + '/yr' }
+        : { v: '~' + fmtPct(r.total / 100) + ' in total', phrase: '~' + fmtPct(r.total / 100) + ' in total, not an annual rate' };
     }
     var medRead = impliedRead(rec.median);
     setText('dashRevMedian', medRead.v);

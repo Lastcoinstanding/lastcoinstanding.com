@@ -31,6 +31,8 @@
 (function () {
   if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function') return;
   if (!window.ReversionDurations) return;   // shared/reversion-durations.js must load first
+  if (!window.ReturnWindow) return;         // shared/return-window.js must load first
+  var RW = window.ReturnWindow;
 
   // ── Palette (shared conventions) ──
   var AMBER = '#e09422', BLUE = '#6db3d4', MUTED = '#7a7367', DIM = '#9a9080';
@@ -163,9 +165,14 @@
        floor-adjacent position the six-month setting printed ~411% a year —
        correct arithmetic, and a figure that reads as a forecast the moment it
        leaves the page in a screenshot. */
-    var subYear = state.months < 12;
-    var revTotal = plPrice(TODAY_DAYS + YEAR_D * y) / price() - 1;
-    var trTotal = plPrice(TODAY_DAYS + YEAR_D * y) / trendToday() - 1;
+    /* The DECISION comes from shared/return-window.js so this page, the
+       Dashboard and the Rundown cannot drift on it; the WORDING stays here,
+       because each page says it in its own voice. That split is the point of
+       the extraction — the Dashboard's near-miss came from a call site
+       deciding for itself, not from a call site phrasing for itself. */
+    var subYear = !RW.mayAnnualise(state.months);
+    var revTotal = RW.read(state.months, price()).total / 100;
+    var trTotal = RW.read(state.months, trendToday()).total / 100;
 
     var elCap = document.getElementById('dpRevCap');
     var elRev = document.getElementById('dpRevNum');
@@ -273,7 +280,7 @@
      year the readout switches to a total return. The chart says so rather
      than silently cropping, because a reader who drags into the sub-year
      region needs to know why the line does not follow them. */
-  var ANN_MIN_M = 12;
+  var ANN_MIN_M = RW.MIN_MONTHS;   // the shared floor, so chart and readout cannot disagree
   function curves() {
     var rev = [], tr = [], mo;
     for (mo = ANN_MIN_M; mo <= MAX_M; mo++) {

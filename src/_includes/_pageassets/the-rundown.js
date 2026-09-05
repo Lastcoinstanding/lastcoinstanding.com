@@ -64,8 +64,8 @@
   if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function') return;
   var CE = window.ChannelEntries, LA = window.LadderAdvantage,
       RD = window.ReversionDurations, RE = window.RetirementEngine,
-      MA = window.ModelingAssumptions;
-  if (!CE || !LA || !RD || !RE || !MA) return;
+      MA = window.ModelingAssumptions, RW0 = window.ReturnWindow;
+  if (!CE || !LA || !RD || !RE || !MA || !RW0) return;
 
   var posOf = CE.posOf, ratioOf = CE.ratioOf, bandMetrics = CE.bandMetrics;
   var S = CE.S, N = CE.N, YEAR_D = CE.YEAR_D;
@@ -578,17 +578,18 @@
      below three years); Discount-or-Premium does NOT yet comply and is
      flagged in the handback rather than changed from here.
      ═══════════════════════════════════════════════════════════ */
-  var MO_D = 30.44;
+  /* EXTRACTED 2026-09-04 to shared/return-window.js and adopted back, so the
+     convention has one copy across this page, the Dashboard and
+     Discount-or-Premium. This wrapper adds only what is local: the formatted
+     date, and the `rateLine` name every call site here already uses. The
+     DECISION — annualise or not — is the shared module's and nobody else's. */
+  var RW = RW0;
+  var MO_D = RW.MONTH_D;
   function windowRead(months, spot) {
-    var d = TODAY_DAYS + months * MO_D, tp = plPrice(d);
-    var total = (tp / spot - 1) * 100;
-    var ann = months >= 12 ? (Math.pow(tp / spot, 12 / months) - 1) * 100 : null;
+    var r = RW.read(months, spot);
     return {
-      months: months, date: fmtMonthShort(d), trendPrice: tp, total: total, annualised: ann,
-      // The sub-line the cards print. One rule, one place.
-      rateLine: ann != null
-        ? signPct0(ann) + ' a year over ' + (months / 12).toFixed(1) + ' years'
-        : signPct0(total) + ' over ' + months.toFixed(1) + ' months'
+      months: r.months, date: fmtMonthShort(r.day), trendPrice: r.trendPrice,
+      total: r.total, annualised: r.annualised, rateLine: r.line
     };
   }
 

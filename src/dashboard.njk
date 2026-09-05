@@ -6,7 +6,9 @@ channel_ribbon: false
 eleventyComputed:
   head_extras: "{% include '_pageassets/dashboard-head.html' %}"
   page_styles: "{% include '_pageassets/dashboard.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/dashboard.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}
+{% include '_pageassets/shared/return-window.js' %}
+{% include '_pageassets/dashboard.js' %}"
 ---
 
 <section class="hero dash-hero">
