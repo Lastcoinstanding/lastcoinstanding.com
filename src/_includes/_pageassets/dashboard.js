@@ -36,7 +36,29 @@
     try { return new Date((GENESIS_TS + days * 86400) * 1000).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }); }
     catch (e) { return ''; }
   }
-  function fmtMonths(m) { return (m >= 18) ? (m / 12).toFixed(1) + ' yr' : (m < 10 ? m.toFixed(1) : String(Math.round(m))) + ' mo'; }
+  /* BELOW-TREND STREAK DURATIONS — whole months (JM ruling, 2026-09-05:
+     precision follows the series).
+
+     WHICH SERIES THIS IS: the streak is measured as elapsed day-spans across
+     PL_DATA, the ~12-day sampled grid — the same series the reversion
+     durations come from, not daily data. A streak's true start lies somewhere
+     in the ~12-day gap before its first below-trend sample, so the figure is
+     only ever known to within about half a month. "4.9 mo" claimed a
+     twentieth-of-a-month resolution that does not exist.
+
+     The YEARS branch keeps one decimal deliberately and is NOT a violation:
+     0.1 yr is 1.2 months, so a decimal there is COARSER than the grid, not
+     finer. It claims less than it knows rather than more.
+
+     Not routed through ReversionDurations.fmtMonths(): that helper has no
+     years branch, and these spans routinely run past two years. Same rule,
+     different range — so the rule is restated here rather than the shared
+     helper being bent to cover a second display. */
+  function fmtMonths(m) {
+    if (!isFinite(m)) return '—';
+    if (m >= 18) return (m / 12).toFixed(1) + ' yr';
+    return (m < 1 ? '<1' : String(Math.round(m))) + ' mo';
+  }
   var LOG_LO = Math.log(PL_FLOOR), LOG_HI = Math.log(PL_CEIL), LOG_RANGE = LOG_HI - LOG_LO;
   // ×-trend multiple → shared log-space channel position (0 = floor, 1 = upper band)
   function posFromMult(mult) { return (Math.log(mult) - LOG_LO) / LOG_RANGE; }
