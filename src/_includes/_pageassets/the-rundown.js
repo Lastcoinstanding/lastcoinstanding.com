@@ -275,7 +275,10 @@
      case-guard the pattern requires. `end` right-anchors the card for triggers
      near a container's right edge. */
   function tip(txt, end) {
-    return '<span class="help-tip" tabindex="0">?<span class="tip-content' + (end ? ' tip-end' : '') + '">' + txt + '</span></span>';
+    // Thin space before the glyph, page-wide — see the .help-tip note in the
+    // stylesheet. It belongs to the trigger, not to each call site's copy, so
+    // no caller can forget it and no two placements can drift apart.
+    return '&thinsp;<span class="help-tip" tabindex="0">?<span class="tip-content' + (end ? ' tip-end' : '') + '">' + txt + '</span></span>';
   }
 
   function cards(list) {
@@ -367,23 +370,23 @@
     var modern = visits.filter(function (v) { return v.modern; });
     var last = modern.length ? modern[modern.length - 1] : null;
     var completed = modern.filter(function (v) { return !v.open; }).length;
+    /* The COUNT leads; the date is the sub-line. Still state-aware — the
+       reader needs to know whether the latest approach is the one they are
+       standing in — but the open/closed SPLIT is deliberately not here. */
     if (!last) {
-      setHTML('rdHdrFloor', 'none since 2014');
-      setText('rdHdrFloorSub', '');
-    } else if (last.open && inApproach(state)) {
-      // The record shows an open approach AND price is still in the band.
-      setHTML('rdHdrFloor', fmtMonth(last.firstD) + ' &middot; <span class="rd-hdr-state is-open">open</span>');
-      setText('rdHdrFloorSub', modern.length + ' since 2014 · ' + completed + ' completed');
-    } else if (last.open) {
-      // The sampled record's last approach is still open, but live price has
-      // walked out of the band. Saying "open" flat would be false to the
-      // reader looking at today's number; saying "closed" would be false to
-      // the record, which has no sample above the band yet. Both, stated.
-      setHTML('rdHdrFloor', fmtMonth(last.firstD) + ' &middot; <span class="rd-hdr-state">price has since moved off</span>');
-      setText('rdHdrFloorSub', modern.length + ' since 2014 · ' + completed + ' completed');
+      setHTML('rdHdrFloor', '0');
+      setText('rdHdrFloorSub', 'none in the modern record');
     } else {
-      setHTML('rdHdrFloor', fmtMonth(last.firstD) + ' &middot; <span class="rd-hdr-state">closed</span>');
-      setText('rdHdrFloorSub', modern.length + ' since 2014 · ' + completed + ' completed');
+      setHTML('rdHdrFloor', String(modern.length));
+      var when = 'latest began ' + fmtMonth(last.firstD);
+      setHTML('rdHdrFloorSub', last.open && inApproach(state)
+        ? when + ' &middot; <span class="rd-hdr-state is-open">in one now</span>'
+        : last.open
+          // The record's last approach has no sample above the band yet, but
+          // live price has walked out of it. "Open" alone would be false to
+          // the reader's own number; "closed" would be false to the record.
+          ? when + ' &middot; price has since moved off'
+          : when + ' &middot; closed');
     }
 
     // ── The mini-bar (B5): larger labels, clearance, and today's value on
@@ -685,9 +688,16 @@
       var thin = closed.length < 3;   // the N<3 rule, counted in EPISODES
       // "stretch" is this module's load-bearing noun and it is not
       // self-explanatory — the tip defines it on first use (§6.13).
+      /* The era clause is not padding. This module counts from 2010 and the
+         header card counts from 2014, and both are correct: the reversion scan
+         reads the whole price series, while the floor count deliberately drops
+         the pre-2014 genesis era the way The Bitcoin Floor does. Two different
+         year-counts on one screen look like an error unless the page says why. */
       var stretchTip = tip('A continuous run of samples at or ' + (premium ? 'above' : 'below') +
         ' today&rsquo;s multiple of trend, measured to the first sample back at trend. ' +
-        'Runs more than about 100 days apart count as separate episodes.');
+        'Runs more than about 100 days apart count as separate episodes. ' +
+        'These count from <strong>2010</strong>, where the price series begins; the floor count above starts at ' +
+        '<strong>2014</strong> because it drops bitcoin&rsquo;s pre-exchange era, as <a href="/the-bitcoin-floor">The Bitcoin Floor</a> does.');
       setHTML('rdA3Verdict',
         '<strong>' + closed.length + '</strong> completed stretch' + (closed.length === 1 ? '' : 'es') + stretchTip +
         ' ' + dirWord + ' this depth since 2010. ' +
@@ -1452,6 +1462,43 @@
         if (e.key === 'Escape') { gb.setAttribute('aria-expanded', 'false'); gbody.hidden = true; gb.focus(); }
       });
     }
+
+    /* TOOLTIP CLAMP. §6.13 centres the 240px card on its trigger, which is
+       right until the trigger sits within half a card of a viewport edge —
+       then the bubble hangs off-screen and the reader gets half a sentence.
+       At 375 that was ten of the page's tips, all off the LEFT edge, because
+       most triggers follow a short label near the start of a line.
+
+       CSS cannot fix this: it has no way to know where the trigger is. The
+       width cap in §6.13 narrows the card but still centres it. So the shift
+       is measured at the moment the tip opens and written as a transform,
+       leaving the CSS show/hide untouched — the bubble stays attached to its
+       trigger, which the module-relative alternative would have given up. */
+    function clampTip(trigger) {
+      var c = trigger.querySelector('.tip-content');
+      if (!c) return;
+      c.style.transform = '';                      // measure from the CSS default
+      /* Measure even if the card is not painted yet. On touch, `touchstart`
+         fires before the :hover rule applies, so the element can still be
+         display:none when the clamp runs — and a hidden element measures zero,
+         which silently produces the wrong shift rather than no shift. Force it
+         visible for the measurement, then hand control back to the CSS. */
+      var forced = false;
+      if (!c.getClientRects().length) { c.style.display = 'block'; forced = true; }
+      var r = c.getBoundingClientRect(), pad = 10, shift = 0;
+      if (forced) c.style.display = '';
+      if (r.left < pad) shift = pad - r.left;
+      else if (r.right > window.innerWidth - pad) shift = (window.innerWidth - pad) - r.right;
+      if (!shift) return;
+      var base = getComputedStyle(c).getPropertyValue('--tip-base') || '-50%';
+      c.style.transform = 'translateX(calc(' + base + ' + ' + Math.round(shift) + 'px))';
+    }
+    ['pointerenter', 'focusin', 'touchstart'].forEach(function (ev) {
+      document.addEventListener(ev, function (e) {
+        var t = e.target && e.target.closest ? e.target.closest('.help-tip') : null;
+        if (t) clampTip(t);
+      }, true);
+    });
 
     // B2 — the summary chip reopens the panel it replaced.
     var chip = document.getElementById('rdSetupChip');

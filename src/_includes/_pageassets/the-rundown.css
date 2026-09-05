@@ -113,11 +113,24 @@ body { background: var(--bg); color: var(--text); }
 /* Four cards since review round 1 (C6). `min()` on the track floor so the
    grid drops to two columns rather than overflowing — the same release valve
    the stat cards needed. */
+/* NO `overflow: hidden` HERE — it clipped every tooltip in the header.
+   The grid fakes its cell borders with `gap: 1px` over a background, so it
+   needed overflow:hidden to stop the square cell corners painting over the
+   rounded outer border. But an absolutely-positioned tip opens upward out of
+   the grid, and overflow:hidden clipped it to a sliver — which is what showed
+   as "a stray line above the card, no bubble" on the tallest of them.
+
+   The corners are rounded on the CELLS instead. There are exactly four, and
+   only two layouts (four across, or 2×2 below 720px), so the corner cells are
+   deterministic rather than guessed. */
 .rd-hdr-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr)); gap: 1px;
-  background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  background: var(--border); border: 1px solid var(--border); border-radius: 10px;
 }
 .rd-hdr-cell { background: var(--bg-card); padding: 0.85rem 0.9rem; text-align: left; }
+/* Four across: first cell rounds the left edge, last rounds the right. */
+.rd-hdr-cell:first-child { border-radius: 9px 0 0 9px; }
+.rd-hdr-cell:last-child  { border-radius: 0 9px 9px 0; }
 .rd-hdr-k {
   font-family: var(--font-b); font-size: 0.64rem; letter-spacing: .09em; text-transform: uppercase;
   color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.3rem;
@@ -306,7 +319,16 @@ body { background: var(--bg); color: var(--text); }
 /* `min(130px, 100%)` rather than a bare 130px: auto-fit will otherwise insist
    on a full track even when the container is narrower than one, which
    overflows instead of dropping to fewer columns. */
-.rd-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(130px, 100%), 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 1rem; }
+/* Same overflow story as the header grid, same fix: `overflow: hidden` was
+   clipping every stat-card tooltip, so the corners are rounded on the cells.
+   The honest cost, stated rather than discovered later: card COUNT varies
+   (two or three per module) and the grid wraps at 375, so on a wrapped row
+   two inner corners square off against the container's radius. A cosmetic
+   imperfection in one layout is the right trade against tooltips that do not
+   render at all. */
+.rd-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(130px, 100%), 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; }
+.rd-card:first-child { border-radius: 7px 0 0 7px; }
+.rd-card:last-child  { border-radius: 0 7px 7px 0; }
 .rd-card { background: var(--bg-card-2); padding: 0.7rem 0.8rem; }
 .rd-card-k { display: block; font-family: var(--font-b); font-size: 0.6rem; letter-spacing: .07em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem; line-height: 1.3; }
 .rd-card-v { display: block; font-family: var(--font-d); font-size: 1.5rem; color: var(--ink-bright); line-height: 1.05; }
@@ -425,6 +447,16 @@ body { background: var(--bg); color: var(--text); }
    opacity-hidden card stays in layout and causes horizontal page overflow
    whenever a trigger sits within its own width of the right edge. That
    lesson was paid for once already on the Retirement page. */
+/* PLACEMENT, page-wide and identical everywhere (round two, item 3).
+   The glyph sits after a THIN SPACE, not a word space — a full space reads as
+   a gap in the sentence — and is nudged up to sit on the x-height rather than
+   the baseline, where a 14px circle hangs below the letters it annotates.
+   `translateY` rather than `vertical-align` because the trigger is
+   inline-flex: vertical-align moves the box, not the glyph inside it.
+
+   §6.13 documents this inline placement and no superscript variant, so the
+   documented one is what ships; introducing a citation-style superscript here
+   would make this page the only one on the site doing it. */
 .help-tip {
   display: inline-flex; align-items: center; justify-content: center;
   width: 14px; height: 14px; border-radius: 50%;
@@ -432,17 +464,24 @@ body { background: var(--bg); color: var(--text); }
   font-size: 0.65rem; font-style: normal; font-weight: 400;
   cursor: help; position: relative; flex: none;
   letter-spacing: 0; text-transform: none;
+  transform: translateY(-0.28em);
 }
+/* In the header's flex label row the glyph is a flex item on its own line box,
+   so it needs no lift — the row already centres it against the label. */
+.rd-hdr-k .help-tip { transform: none; }
 .help-tip:hover, .help-tip:focus { border-color: var(--amber); color: var(--amber); outline: none; }
 .help-tip .tip-content {
   display: none; position: absolute; bottom: calc(100% + 8px); left: 50%;
-  transform: translateX(-50%); width: 240px; padding: 0.6rem 0.75rem;
+  transform: translateX(-50%); --tip-base: -50%; width: 240px; padding: 0.6rem 0.75rem;
   background: var(--bg-card-2); border: 1px solid var(--border-strong); border-radius: 4px;
   font-family: var(--font-b); font-size: 0.8rem; font-weight: 400; color: var(--text);
   line-height: 1.45; text-align: left; letter-spacing: 0; text-transform: none;
   z-index: 10; box-shadow: 0 6px 18px rgba(0,0,0,0.5);
 }
 .help-tip:hover .tip-content, .help-tip:focus .tip-content { display: block; }
+/* Right-anchored variant (§6.33) for triggers near a container's
+   right edge, so the 240px card opens inward instead of off-screen. */
+.help-tip .tip-content.tip-end { left: auto; right: -6px; transform: none; --tip-base: 0px; }
 .help-tip .tip-content a { color: var(--amber); }
 @media (max-width: 480px) {
   .help-tip .tip-content { width: min(240px, calc(100vw - 32px)); }
@@ -463,6 +502,11 @@ body { background: var(--bg); color: var(--text); }
   :root { --rd-gutter: 1.2rem; }
   .hero { padding-top: 3.2rem; }
   .rd-hdr-grid { grid-template-columns: repeat(2, 1fr); }
+  /* 2x2 below 720: each of the four cells owns one outer corner. */
+  .rd-hdr-cell:first-child { border-radius: 9px 0 0 0; }
+  .rd-hdr-cell:nth-child(2) { border-radius: 0 9px 0 0; }
+  .rd-hdr-cell:nth-child(3) { border-radius: 0 0 0 9px; }
+  .rd-hdr-cell:last-child { border-radius: 0 0 9px 0; }
   .rd-setup, .rd-snack, .rd-roadmap { padding: 1.2rem 1.1rem; }
   .rd-standfirst { min-height: 6.2em; }
   .rd-cards { grid-template-columns: repeat(auto-fit, minmax(min(110px, 100%), 1fr)); }
