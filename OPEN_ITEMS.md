@@ -11,19 +11,20 @@ session automatically. Close items here when done; this file is the "what's cook
 
 ## In flight (dated)
 
-- [ ] **THE RUNDOWN v2 — LIVE UNLISTED; JM REGISTER REVIEW PENDING, NO CLOCK.**
+- [ ] **THE RUNDOWN v2 — LIVE UNLISTED; REGISTER REVIEW COMPLETE, COUNSEL PASS NEXT.**
   Merged to production 2026-09-02 (PR #97, merge `fc773b6`) carrying v2 "The Briefing" and
   the site-wide unified floor-visit definition. **`/the-rundown` is live but unlisted** —
   `noindex, nofollow`, and absent from `sitemap.xml`, `llms.txt`, `explorations.json` and the
   nav, each verified individually on production after the merge.
 
-  **Status of the review, stated plainly because the record needs it.** The **JM register
-  review of v2 has not happened.** An earlier "Reviewed both surfaces" instruction went out
-  with the review still to come, and the merge proceeded on it. **Nothing public shipped
-  unauthorized:** the Floor-page changes were separately and explicitly ruled on their own
-  before/after table (JM ruling 6, `FLOOR_VISIT_DEFINITION_MINIREPORT.md`), and the Rundown
-  itself is unlisted, so no unreviewed surface is reachable by a reader who is not handed the
-  URL. **There is no clock on the review** — it happens when JM gets to it.
+  **Status of the review, kept in the record because the record needed it.** For three days
+  this entry read that the review **had not happened** — an earlier "Reviewed both surfaces"
+  instruction went out with the review still to come, and the merge proceeded on it. Nothing
+  public shipped unauthorized: the Floor-page changes were separately and explicitly ruled on
+  their own before/after table (JM ruling 6, `FLOOR_VISIT_DEFINITION_MINIREPORT.md`), and the
+  Rundown itself was unlisted, so no unreviewed surface was reachable by a reader who was not
+  handed the URL. **The review has since run in full** — visual pass, v2.1 rounds one and
+  two, and round three — and is closed.
 
   **Register round two is DONE and shipped (2026-09-05).** Both parts ratified by JM:
   part one (date wording, module-count line, module titles, state-aware title, tooltips,
@@ -36,8 +37,11 @@ session automatically. Close items here when done; this file is the "what's cook
   and direct to main; the page stays unlisted. The whole-months, episode-basis and `?mult=`
   branches were merged the same day and their branches deleted.
 
-  **Gated on that review, in order (amended 2026-09-05):** ~~register round two~~ →
-  **register round three** → the **counsel pass** → the **listing pass**, whose *step one*
+  **Register round three closed 2026-09-05 with no further edits** (JM). The register
+  review is therefore complete.
+
+  **Gated on it, in order (amended 2026-09-05):** ~~register round two~~ →
+  ~~register round three~~ → the **counsel pass** → the **listing pass**, whose *step one*
   is now merging the branch
   `feat-sister-tabs-dashboard`. That branch is built, pushed and **ON HOLD by JM's ruling —
   do not merge it before those gates.** It is the first and only inbound link to
