@@ -159,6 +159,15 @@ body { background: var(--bg); color: var(--text); }
    leads and is given the stronger ink: it is the read a visitor arrives for,
    and its count is the honest one. The sample row is deliberately quieter —
    the finer-grained view, not the headline. */
+.dp-hypo-note {
+  font-family: 'Inter', sans-serif; font-size: 0.82rem; line-height: 1.55;
+  color: var(--text-dim); background: rgba(224,148,34,0.06);
+  border: 1px solid rgba(224,148,34,0.22); border-radius: 6px;
+  padding: 0.6rem 0.8rem; margin: 0.7rem 0 0;
+}
+.dp-hypo-note strong { color: var(--text); }
+.dp-hypo-note a { color: var(--amber); }
+
 .dp-dur-bases { margin: 1rem 0 0; border-top: 1px solid rgba(224,148,34,0.12); }
 .dp-dur-basis { padding: 0.7rem 0; border-bottom: 1px solid rgba(224,148,34,0.08); }
 .dp-dur-basis-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap; }

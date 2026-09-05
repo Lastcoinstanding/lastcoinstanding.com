@@ -69,7 +69,12 @@ eleventyComputed:
       </div>
     </div>
     <p class="dp-status-meta" id="dpStatusMeta"></p>
-    <p class="dp-floor-note" id="dpFloorNote" hidden>Bitcoin is currently at the bottom of its historical channel. The floor has held for the length of the record &mdash; <em>which is evidence, not a guarantee.</em> See <a href="/the-power-law#caveats">the Power Law caveats</a> for what would falsify the model.</p>
+    {#- Shown only when ?mult= supplied a hypothetical position. It states the
+        substitution in the page's own voice and gives the way back, so a
+        reader who arrives on a shared link is never a click away from the
+        real reading. -#}
+    <p class="dp-hypo-note" id="dpHypoNote" hidden></p>
+    <p class="dp-floor-note" id="dpFloorNote" hidden><span class="dp-floor-subj">Bitcoin is currently</span> at the bottom of its historical channel. The floor has held for the length of the record &mdash; <em>which is evidence, not a guarantee.</em> See <a href="/the-power-law#caveats">the Power Law caveats</a> for what would falsify the model.</p>
   </section>
 
   <!-- ════════ THE INTERACTIVE ════════ -->
