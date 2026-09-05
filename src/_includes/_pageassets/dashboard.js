@@ -206,7 +206,7 @@
        spread, no range sentence — those are the statistics the rule exists to
        withhold. */
     if (rec.nCompleted < 3) {
-      var names = rec.comp.map(function (c) { return Math.round(c.months) + ' mo'; }).join(' and ');
+      var names = rec.comp.map(function (c) { return RD.fmtMonths(c.months); }).join(' and ');
       setText('dashRevMedian', impliedRead(rec.max).v);
       setHTML('dashRevMedianSub',
         'if it took the longer of the <strong>' + rec.nCompleted + '</strong> completed stretch' +
@@ -220,7 +220,7 @@
 
     var medRead = impliedRead(rec.median);
     setText('dashRevMedian', medRead.v);
-    setText('dashRevMedianSub', 'over ~' + Math.round(rec.median) + ' months — the median reversion on record from a depth like today’s, and only if it reverts at all');
+    setText('dashRevMedianSub', 'over ~' + RD.fmtMonths(rec.median) + ' — the median reversion on record from a depth like today’s, and only if it reverts at all');
     // Era note (data-driven, not a filter): do the quickest resolutions cluster in the early era?
     var byDur = rec.comp.slice().sort(function (a, b) { return a.months - b.months; });
     var fastN = Math.max(1, Math.round(byDur.length / 3));
@@ -229,8 +229,8 @@
     var era = (fastAllEarly && recent.year >= 2020)
       ? ' The quickest resolutions came in bitcoin’s early era (≤2015); the most recent, in ' + recent.year + ', took ~' + Math.round(recent.months) + ' months.'
       : '';
-    var range = 'Low end: the slowest reversion, ~' + Math.round(rec.max) + ' months, implies ' + impliedRead(rec.max).phrase
-      + '. The quickest resolution from a depth like today’s took ~' + rec.min.toFixed(1) + ' months.' + era
+    var range = 'Low end: the slowest reversion, ~' + RD.fmtMonths(rec.max) + ', implies ' + impliedRead(rec.max).phrase
+      + '. The quickest resolution from a depth like today’s took ~' + RD.fmtMonths(rec.min) + '.' + era
       /* "samples", not "episodes" — a factual correction, not a style one. This
          count is per-SAMPLE (~12-day observations), and a handful of samples
          can be one episode: today's 64 completed samples fall into 6 completed

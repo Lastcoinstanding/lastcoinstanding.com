@@ -64,9 +64,14 @@
       annualised_ok: ann != null,
       // The one-line expression of the figure. Pages differ in wording around
       // it; none of them re-decides WHICH figure is allowed.
+      /* Whole months on the sub-year branch (JM, 2026-09-05): the series is a
+         ~12-day grid, so a printed "4.3 months" claims a resolution it does
+         not have. The YEARS form on the annualised branch is left alone — it
+         is the annualisation window rather than a measured reversion duration,
+         and "over 24 months" reads worse than "over 2.0 years" for it. */
       line: ann != null
         ? pct0(ann) + ' a year over ' + (months / 12).toFixed(1) + ' years'
-        : pct0(total) + ' over ' + months.toFixed(1) + ' months',
+        : pct0(total) + ' over ' + (months < 1 ? 'under a month' : Math.round(months) + (Math.round(months) === 1 ? ' month' : ' months')),
       // The same, phrased for a sentence rather than a card sub-line.
       phrase: ann != null
         ? '~' + pct0(ann) + '/yr'

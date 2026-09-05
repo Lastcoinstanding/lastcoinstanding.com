@@ -661,9 +661,9 @@
         ' ' + dirWord + ' this depth since 2010. ' +
         (thin
           ? 'That is too few to read a spread from, so they are named rather than averaged: ' +
-            closed.map(function (m) { return m.toFixed(1) + ' months'; }).join(' and ') + '.'
-          : 'They took between <strong>' + closed[0].toFixed(1) + '</strong> and <strong>' +
-            closed[closed.length - 1].toFixed(1) + '</strong> months, median <strong>' + med.toFixed(1) + '</strong>.'));
+            closed.map(function (m) { return RD.fmtMonths(m); }).join(' and ') + '.'
+          : 'They took between <strong>' + RD.fmtMonths(closed[0]) + '</strong> and <strong>' +
+            RD.fmtMonths(closed[closed.length - 1]) + '</strong>, median <strong>' + RD.fmtMonths(med) + '</strong>.'));
 
       // Cards lead with the DATE and the trend price at it; the rate is the
       // sub-line and is annualised only at twelve months or more.
@@ -672,14 +672,14 @@
         : [{ label: 'Fastest', m: closed[0] }, { label: 'Median', m: med }, { label: 'Slowest', m: closed[closed.length - 1] }];
       setHTML('rdA3Cards', cards(picks.map(function (p) {
         var w = windowRead(p.m, spot);
-        return { k: p.label + ' · ' + p.m.toFixed(1) + ' mo', v: fmtUSD(w.trendPrice), sub: 'trend price by ' + w.date + ' · ' + w.rateLine };
+        return { k: p.label + ' · ' + RD.fmtMonthsShort(p.m), v: fmtUSD(w.trendPrice), sub: 'trend price by ' + w.date + ' · ' + w.rateLine };
       })));
     }
 
     setHTML('rdA3Viz', '');
     var notes = [];
     if (rec.widened) notes.push('Too few completed stretches at exactly this depth, so the band was widened to ' + rec.band.toFixed(2) + '× to reach five &mdash; these describe that band, not today&rsquo;s multiple exactly.');
-    if (ongoing.length) notes.push('One stretch is still open, running ' + ongoing[0].months.toFixed(1) + ' months so far; it is excluded from the figures above because it has no end yet.');
+    if (ongoing.length) notes.push('One stretch is still open, running ' + RD.fmtMonths(ongoing[0].months) + ' so far; it is excluded from the figures above because it has no end yet.');
     var modernV = visits.filter(function (v) { return v.modern; });
     if (modernV.length) {
       var la = modernV[modernV.length - 1];
@@ -927,12 +927,12 @@
     inRange.forEach(function (k) {
       var pctPos = (k.m - D3_MIN) / (D3_MAX - D3_MIN) * 100;
       html += '<span class="rd-tick-mark" style="left:' + pctPos.toFixed(2) + '%">' +
-              '<span class="rd-tick-lbl">' + k.lbl + ' · ' + k.m.toFixed(1) + 'mo</span></span>';
+              '<span class="rd-tick-lbl">' + k.lbl + ' · ' + RD.fmtMonthsShort(k.m) + '</span></span>';
     });
     html += '</div>';
     var say = ['Where stretches at this depth actually ended.'];
     if (below.length) say.push('The ' + below.map(function (k) { return k.lbl; }).join(' and ') +
-      ' (' + below.map(function (k) { return k.m.toFixed(1) + ' months'; }).join(', ') +
+      ' (' + below.map(function (k) { return RD.fmtMonths(k.m); }).join(', ') +
       ') is shorter than this slider goes — it matches the range on Discount, or Premium?, and is not widened past it.');
     if (above.length) say.push('The ' + above.map(function (k) { return k.lbl; }).join(' and ') + ' runs past the slider’s end.');
     html += '<p class="rd-ticks-note">' + say.join(' ') + '</p>';

@@ -944,7 +944,10 @@
   function scanDurations() { return RD.scan(multiple()); }
 
 
-  function fmtMo(v) { var r = Math.round(v); return r + (r === 1 ? ' month' : ' months'); }
+  // Shared since 2026-09-05: one precision rule for reversion durations across
+  // this page, the Dashboard and the Rundown, with the sub-month guard that
+  // originated here. Computation is untouched; only the printed string rounds.
+  function fmtMo(v) { return RD.fmtMonths(v); }
   function durDate(d) { return new Date((GENESIS_TS + d * 86400) * 1000).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
   var durationLogged = false;
 
@@ -1072,10 +1075,10 @@
         var endD = e.regainD != null ? e.regainD : maxD;
         var left = (e.entryD - minD) / span * 100, width = Math.max((endD - e.entryD) / span * 100, e.ongoing ? 2.4 : 1.4);
         if (e.ongoing && left + width > 100) left = 100 - width; // keep the open bar within the axis (ends at today)
-        var soFar = e.months < 1 ? 'under a month' : '~' + Math.round(e.months) + ' months';
-        var lab = e.ongoing ? 'ongoing' : Math.round(e.months) + ' mo';
+        var soFar = e.months < 1 ? RD.fmtMonths(e.months) : '~' + RD.fmtMonths(e.months);
+        var lab = e.ongoing ? 'ongoing' : RD.fmtMonthsShort(e.months);
         var tip = e.ongoing ? (durDate(e.entryD) + ' → ongoing (' + soFar + ' so far)')
-          : (durDate(e.entryD) + ' → ' + durDate(e.regainD) + ' (' + Math.round(e.months) + ' mo)');
+          : (durDate(e.entryD) + ' → ' + durDate(e.regainD) + ' (' + RD.fmtMonthsShort(e.months) + ')');
         html += '<span class="dp-dur-bar' + (e.ongoing ? ' is-ongoing' : '') + '" style="left:' + left.toFixed(1)
           + '%;width:' + width.toFixed(1) + '%" title="' + tip + '"><span class="dp-dur-bar-lab">' + lab + '</span></span>';
       });

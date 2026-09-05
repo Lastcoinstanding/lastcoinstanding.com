@@ -96,9 +96,39 @@
     };
   }
 
+  /* THE DISPLAY PRECISION (JM ruling, 2026-09-05) — whole months, everywhere.
+
+     This is a property of the DATA, not a per-page style choice, which is why
+     it lives with the scan rather than in three stylesheets' worth of call
+     sites. The underlying series is a ~12-day grid, so a duration is only ever
+     known to within about half a month: printing "4.3 months" claims a
+     resolution the record does not have, and printing it on one page while
+     another prints "4 months" reads as two pages disagreeing when they are
+     reporting the identical value.
+
+     COMPUTATION STAYS EXACT. Only the printed string rounds — medians,
+     comparisons and rate arithmetic all continue to use the unrounded months.
+
+     The sub-month guard is Discount-or-Premium's, carried over: rounding a
+     0.4-month stretch to "0 months" is worse than the decimal it replaces. */
+  function fmtMonths(v) {
+    if (!isFinite(v)) return '—';
+    if (v < 1) return 'under a month';
+    var r = Math.round(v);
+    return r + (r === 1 ? ' month' : ' months');
+  }
+  // The same rule, abbreviated, for chart ticks and card keys where the word
+  // does not fit. Same rounding, same guard.
+  function fmtMonthsShort(v) {
+    if (!isFinite(v)) return '—';
+    return v < 1 ? '<1 mo' : Math.round(v) + ' mo';
+  }
+
   window.ReversionDurations = {
     NEAR_LO: NEAR_LO, NEAR_HI: NEAR_HI, YEARS_MO: YEARS_MO, EPISODE_D: EPISODE_D,
     sampleMult: sampleMult,
-    scan: scan
+    scan: scan,
+    fmtMonths: fmtMonths,
+    fmtMonthsShort: fmtMonthsShort
   };
 })();
