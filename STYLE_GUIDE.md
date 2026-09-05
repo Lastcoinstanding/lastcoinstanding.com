@@ -2278,6 +2278,16 @@ publish the **total move over the window** — "+92% over 8.5 months", never
 "+745% a year". Where a conditional projection names a date, **lead with the
 date and the price at it**; the rate is a sub-line, not the headline.
 
+**A PLOTTED POINT IS PUBLISHED THE SAME WAY A SENTENCE IS** (JM, 2026-09-04).
+The rule binds charts, axes and data points, not only copy. Discount-or-Premium
+was compliant in its cards and still drew a rate curve down to six months,
+putting a ~411% point on a public axis where anyone could read it off or
+screenshot it; the fix was to start the curve at twelve months and say why in
+the caption rather than let the line stop short without explanation. When a
+control's range extends below what may be annualised, the readout switches
+basis and the chart's domain is clipped — do not silently crop, and do not
+raise the control's floor, which would break links readers have already shared.
+
 **Why, given the arithmetic is correct either way.** Annualising compounds a
 short window into a very large number: the same reversion reads +92% over 8.5
 months or +248% a year, and a four-month version of it reads +745% a year.
