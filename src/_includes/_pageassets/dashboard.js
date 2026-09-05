@@ -155,7 +155,9 @@
       }),
       min: durs[0], median: med, max: durs[durs.length - 1],
       nCompleted: durs.length,            // EPISODES now, not samples
-      nSamples: rec.nCompleted,           // kept for the sources note
+      // ALL qualifying samples, not just the completed ones — the Rundown
+      // prints this same figure, and the two must agree.
+      nSamples: rec.nSamples,
       ongoing: rec.episodes.length - closedEps.length,
       band: rec.band, widened: rec.widened
     };
@@ -231,14 +233,14 @@
       : '';
     var range = 'Low end: the slowest reversion, ~' + RD.fmtMonths(rec.max) + ', implies ' + impliedRead(rec.max).phrase
       + '. The quickest resolution from a depth like today’s took ~' + RD.fmtMonths(rec.min) + '.' + era
-      /* "samples", not "episodes" — a factual correction, not a style one. This
-         count is per-SAMPLE (~12-day observations), and a handful of samples
-         can be one episode: today's 64 completed samples fall into 6 completed
-         episodes. The shared module's own header states the distinction and
-         warns consumers about exactly this. The tile's statistics are
-         sample-based by design and stay that way; only the noun changes, so
-         the number is no longer described as something it is not. */
-      + ' ' + rec.nCompleted + ' completed episode' + (rec.nCompleted === 1 ? '' : 's') + ' on record'
+      /* Round two: the two sister pages stated the same record with different
+         totals — this tile counted only CLOSED episodes and COMPLETED samples,
+         the Rundown counted all of both including the open one. Neither was
+         wrong; they were answering different questions under one label. Both
+         now print the same split, so a reader moving between them sees one
+         record rather than two. */
+      + ' ' + (rec.nCompleted + rec.ongoing) + ' episode' + ((rec.nCompleted + rec.ongoing) === 1 ? '' : 's')
+      + ': ' + rec.nCompleted + ' completed, ' + rec.ongoing + ' open'
       + (rec.nSamples ? ' (' + rec.nSamples + ' qualifying samples grouped by the 100-day rule)' : '') + '.';
     if (rec.widened) range += ' Few at exactly today’s depth, so widened to ≤' + rec.band.toFixed(2) + '×.';
     setText('dashRevRange', range);
