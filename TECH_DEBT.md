@@ -367,15 +367,52 @@ Move items here when shipped, with commit SHA. Keep the last 5–10 for referenc
 
 - [x] **FAQ component is now the THIRD layout-level component (branch `faq-component`, 2026-07-26).** Same footgun class as the related strip and feedback widget, same fix: an FAQ used to keep two hand-synced copies of the same strings — the visible block in the page template and the `FAQPage` JSON-LD in `_pageassets/<slug>-head.html` — which Google policy (schema must match visible text) makes a *correctness* issue, not just tidiness; edit one and forget the other and the page ships non-compliant schema with no error anywhere. Now `base.njk` renders both the visible "Common questions" block (`components/page-faq.njk`, body) and the JSON-LD (`components/faq-schema.njk`, `<head>`) from one `faq:` front-matter array, so they cannot drift. Answers may carry a curated inline `<a>`; the schema copy is tag-stripped to plain text (`faqStripTags`) so the two match by construction. Docs: STYLE_GUIDE §6.40, NEW_PAGE_CHECKLIST §10. (Phase 1: component + docs. Phases 2–3 migrate/add pages — see open item below.)
 
-- [ ] **§6.13 tooltip clipping — audit every page carrying help-tips for `overflow: hidden` ancestors.** Filed 2026-09-05 after the Rundown hit it twice in one session. **The class of bug:** a `.tip-content` is absolutely positioned and opens **upward, out of its container**, so any ancestor with `overflow: hidden` clips it — usually to a sliver, which reads as *"a stray line above the card, no bubble"* rather than as a missing tooltip. Nothing errors, nothing logs, and it is invisible unless someone hovers that particular trigger.
+- [ ] **§6.13 tooltip clipping — AUDITED 2026-09-06, fix as one pass after the listing pass (JM).** Filed 2026-09-05 after the Rundown hit it twice in one session; measured across the site the next day. **This is a live defect on public pages, not a nicety** — nine tooltips currently render for nobody, and a third of the site's tips run off-screen on a phone. **The class of bug:** a `.tip-content` is absolutely positioned and opens **upward, out of its container**, so any ancestor with `overflow: hidden` clips it — usually to a sliver, which reads as *"a stray line above the card, no bubble"* rather than as a missing tooltip. Nothing errors, nothing logs, and it is invisible unless someone hovers that particular trigger.
 
   **Two grid patterns produce it, and both are common here.** (1) A grid that fakes its cell borders with `gap: 1px` over a background needs `overflow: hidden` to stop square cell corners painting over its own rounded outer border — that is what put it on `.rd-hdr-grid`. (2) The same trick on a stat-card row, which is where `.rd-cards` had it; that one had never been reported because nobody had hovered a stat-card tip near the top of a module. **The fix in both cases is to round the corners on the CELLS instead**, which costs a cosmetic imperfection on a wrapped row and buys tooltips that render at all.
 
-  **Scope, measured 2026-09-05 — 18 stylesheets carry both `help-tip` and at least one `overflow: hidden`:** bitcoin-allocation-sizing (3), disciplined-rebalancing (4), your-deployment-plan (4), the-rundown (5, fixed), bitcoin-escape-velocity (2), bitcoin-fixed-income (2), borrowing-against-your-stack (2), the-bitcoin-retirement (2), the-power-law (2), and one each on bitcoin-backed-mortgages, bitcoin-vs-real-estate, compare-retirement-plans, dashboard, how-much-cash, lump-sum-or-ladder-in, the-bitcoin-hurdle-rate, the-bitcoin-retirement-stress-test, wait-or-deploy-now. Co-occurrence is not proof — the rule has to be an *ancestor* of a tip — so each needs checking rather than patching.
+  **AUDITED 2026-09-06 (JM ruling: script it). `scripts/tip-audit.js`, run against PRODUCTION — 26 pages, 263 tips, at 375 and 1280.** The static co-occurrence estimate that stood here (18 stylesheets carrying both ingredients) was a proxy; these are the measured results, and they change the shape of the job.
 
-  **The audit is scriptable and should be, not eyeballed.** The method that found both Rundown instances: for every `.help-tip`, force its `.tip-content` visible, then walk its ancestors and fail on any whose computed `overflow` is not `visible` and whose rect does not contain the tip's. Run it at 375 / 768 / 1280 across every state the page can render. Eyeballing found one of the two; the script found the other immediately.
+  **The framing in this entry was too narrow, and the audit is what showed it.** The heading says `overflow: hidden`. **All three live clip sites are `overflow: auto`** — horizontally scrolling table wrappers, not the rounded-corner grid trick. `auto` clips an out-of-flow child exactly as `hidden` does. The rule to check for is *any* non-visible overflow on an ancestor, and on this site the **scrolling table wrapper is the more common cause than the grid**.
 
-- [ ] **Upstream the §6.13 left-edge clamp into the shared pattern.** Filed 2026-09-05. §6.13 centres a 240px tip card on its trigger, which is right until the trigger sits within half a card of a viewport edge — then the bubble hangs off-screen and the reader gets half a sentence. **At 375px this was ten of the Rundown's fourteen tips**, all off the *left* edge, because most triggers follow a short label near the start of a line. It is not a Rundown-specific bug: any page whose tips sit near the left margin has it, which is most of the 18 above.
+  **Defect 1 — CLIPPED. Three live sites, nine tips. Width-independent: identical at 375 and 1280.**
+
+  | Page | Container | Tips |
+  |---|---|---|
+  | `/bitcoin-backed-mortgages` | `.bbm-advanced` | **5** |
+  | `/the-power-law` | `.exp-table-wrap` (`overflow-x/y: auto`) | **3** |
+  | `/the-bitcoin-retirement-stress-test` | `.st-timing-tablewrap` | **1** |
+
+  These nine tooltips **do not render** for any reader, on any device. `/the-power-law` is a flagship, and the three affected tips are the ones defining `a`, `b` and the implied trend — the page's own coefficients.
+
+  **Defect 2 — OFF-SCREEN AT MOBILE. 86 tips across 18 pages at 375 — a third of every help-tip on the site. Zero at 1280.** Purely a mobile defect, and it is the §6.13 centring rule, not any page's mistake. Worst offenders by count, then by magnitude:
+
+  | Page | Tips off-screen / total | Worst overhang |
+  |---|---|---|
+  | `/paper-bitcoin` | 13 / 15 | 193px |
+  | `/bitcoin-backed-mortgages` | 12 / 13 | 219px |
+  | `/how-much-bitcoin` | 11 / 18 | 113px |
+  | `/the-power-law` | 8 / 11 | 179px |
+  | `/bitcoin-escape-velocity` | 7 / 24 | 61px |
+  | `/the-bitcoin-retirement` | 7 / 28 | 85px |
+  | `/the-bitcoin-hurdle-rate` | 5 / 7 | 76px |
+  | `/bitcoin-allocation-sizing` | 4 / 8 | 103px |
+  | `/what-daily-conviction-bought` | 4 / 9 | 74px |
+  | `/bitcoin-vs-the-stock-market` | 3 / 6 | 86px |
+  | `/borrowing-against-your-stack` | 2 / 21 | 208px |
+  | `/the-bitcoin-retirement-stress-test` | 2 / 12 | **299px** |
+  | `/how-much-cash` · `/lump-sum-or-ladder-in` | 2 each | 58px · 56px |
+  | `/bitcoin-vs-real-estate` · `/dashboard` · `/wait-or-deploy-now` · `/your-deployment-plan` | 1 each | 83 · 49 · 33 · 33px |
+
+  A 299px overhang on a 375px viewport is most of the card off the screen. **Clean at both widths:** `/bitcoin-as-collateral`, `/bitcoin-fixed-income`, `/bitcoin-vs-rental-property`, `/heatmap`, `/living-on-bitcoin`, and `/the-rundown` (fixed, and the only page carrying the clamp).
+
+  **NOT COVERED, and it needs a second pass.** `/compare-retirement-plans` and `/disciplined-rebalancing` returned **zero tips in the DOM** at both widths — their help-tips are built into a UI state this run did not enter (a selected scenario or an opened panel). Both stylesheets carry `.help-tip` rules, so the tips exist. `tip-audit.js` takes a `states` selector for exactly this; those two pages need it named before either can be called clean.
+
+  **The audit is scriptable and should be, not eyeballed** — that is the standing lesson and it held again. On the Rundown, eyeballing found one of two clip sites and the script found the other immediately; across the site, the script found three more that nobody had reported in months of use, because a clipped tooltip looks like a page with no tooltip.
+
+- [ ] **Upstream the §6.13 edge clamp into the shared pattern — now the highest-volume half of the fix.** Filed 2026-09-05; **sized by the 2026-09-06 audit at 86 tips across 18 pages**, a third of every help-tip on the site. §6.13 centres a 240px tip card on its trigger, which is right until the trigger sits within half a card of a viewport edge — then the bubble hangs off-screen and the reader gets half a sentence. **At 375px this was ten of the Rundown's fourteen tips**, all off the *left* edge; site-wide the audit found it running **both** ways, with overhangs up to 299px on a 375px viewport.
+
+  **Upstreaming this fixes 86 of the 95 defects in one edit**, against nine that need per-page container work. It is the cheaper half and the bigger half, and it should land first.
 
   **CSS cannot fix it** — it has no way to know where the trigger is. The `@media` width cap in §6.13 narrows the card and still centres it. The Rundown's fix measures the shift when the tip opens and writes it as a transform, leaving the show/hide rules untouched so the bubble stays attached to its trigger.
 
