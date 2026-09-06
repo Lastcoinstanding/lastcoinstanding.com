@@ -1495,42 +1495,22 @@
       });
     }
 
-    /* TOOLTIP CLAMP. §6.13 centres the 240px card on its trigger, which is
-       right until the trigger sits within half a card of a viewport edge —
-       then the bubble hangs off-screen and the reader gets half a sentence.
-       At 375 that was ten of the page's tips, all off the LEFT edge, because
-       most triggers follow a short label near the start of a line.
+    /* THE TOOLTIP CLAMP THAT STOOD HERE IS GONE — it moved to
+       `shared/tip-clamp.js`, included once from `base.njk`.
 
-       CSS cannot fix this: it has no way to know where the trigger is. The
-       width cap in §6.13 narrows the card but still centres it. So the shift
-       is measured at the moment the tip opens and written as a transform,
-       leaving the CSS show/hide untouched — the bubble stays attached to its
-       trigger, which the module-relative alternative would have given up. */
-    function clampTip(trigger) {
-      var c = trigger.querySelector('.tip-content');
-      if (!c) return;
-      c.style.transform = '';                      // measure from the CSS default
-      /* Measure even if the card is not painted yet. On touch, `touchstart`
-         fires before the :hover rule applies, so the element can still be
-         display:none when the clamp runs — and a hidden element measures zero,
-         which silently produces the wrong shift rather than no shift. Force it
-         visible for the measurement, then hand control back to the CSS. */
-      var forced = false;
-      if (!c.getClientRects().length) { c.style.display = 'block'; forced = true; }
-      var r = c.getBoundingClientRect(), pad = 10, shift = 0;
-      if (forced) c.style.display = '';
-      if (r.left < pad) shift = pad - r.left;
-      else if (r.right > window.innerWidth - pad) shift = (window.innerWidth - pad) - r.right;
-      if (!shift) return;
-      var base = getComputedStyle(c).getPropertyValue('--tip-base') || '-50%';
-      c.style.transform = 'translateX(calc(' + base + ' + ' + Math.round(shift) + 'px))';
-    }
-    ['pointerenter', 'focusin', 'touchstart'].forEach(function (ev) {
-      document.addEventListener(ev, function (e) {
-        var t = e.target && e.target.closest ? e.target.closest('.help-tip') : null;
-        if (t) clampTip(t);
-      }, true);
-    });
+       This page had it first, and running both would DOUBLE-SHIFT every tip
+       near an edge: this one wrote a transform, the shared one writes `left`,
+       and neither can see the other's correction. Deleting it here is part of
+       the same change that adds the shared one, not a follow-up.
+
+       Two things the shared version had to do differently, and they are why it
+       is not a copy. It finds the card by POSITION rather than by
+       `.tip-content`, because three pages name theirs something else; and it
+       shifts `left` rather than `transform`, because the variants disagree
+       about transform and overwriting it broke whichever one the author had
+       not thought of. The `--tip-base` custom property this page's version
+       needed is therefore no longer read by anything — it is left in the
+       stylesheet as harmless documentation of the centring offset. */
 
     // B2 — the summary chip reopens the panel it replaced.
     var chip = document.getElementById('rdSetupChip');
