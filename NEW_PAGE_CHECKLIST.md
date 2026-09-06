@@ -879,6 +879,38 @@ expensive way.
   numbers-only check would have missed a title that stopped matching its
   figure.
 
+### Force a style flush before hit-testing
+
+**JM ruling, 2026-09-06**, from the tooltip fix pass. A probe that changes state
+and hit-tests **in the same tick** measures the old tree. Read a layout property
+after the change and before the test — `void el.offsetHeight` is enough — or the
+answer describes the page as it was a moment ago.
+
+**What makes this one nasty is the asymmetry.** `getBoundingClientRect()` flushes
+layout, so the *geometry* half of a probe is correct while the *hit-test* half is
+stale. The same function call returns a right rectangle and a wrong
+`elementFromPoint`, which reads as a coherent finding rather than a broken probe.
+
+The case: verifying that three Power Law tooltips had stopped being clipped. The
+probe forced `display: block` and immediately called `elementFromPoint` at the
+card's centre, which returned the `<td>` underneath — for all three, identically.
+The obvious reading was that the fix had traded a clipped card for one painting
+*behind* the table, which would have been no better than the bug. **The cards were
+fine.** With a flush, all three report painted and contained. A tidy, repeatable,
+entirely wrong result was one commit away from the record.
+
+**Two rules come out of it, and the second is the one that gets forgotten:**
+
+- **Use both checks, for different questions.** A rect answers *where is it* and
+  ignores clipping entirely — an element clipped to nothing still measures its full
+  box. Hit-testing answers *would a reader see it*. Clipping bugs are invisible to
+  the first and obvious to the second, which is exactly why the tooltip audit needed
+  it.
+- **A hit-test miss is not automatically a defect.** `pointer-events: none` makes an
+  element invisible to `elementFromPoint` while it renders perfectly — and every
+  chart tooltip on this site sets it. Confirm the element is hit-testable at all
+  before concluding it is not painted.
+
 ### Derive an audit's universe from behaviour, not from a class name
 
 **JM ruling, 2026-09-06**, from the §6.13 tooltip sweep. When auditing a
