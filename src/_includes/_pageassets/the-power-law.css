@@ -415,6 +415,19 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .tb-above-dot{background:var(--amber)}
 
 /* (b) exponent survey table + explorer */
+/* A HORIZONTALLY SCROLLING TABLE WRAPPER CLIPS ITS TOOLTIPS, and there is no
+   CSS way around it: a box with `overflow-x: auto` cannot keep `overflow-y:
+   visible` — the spec forces the other axis to a scrolling value — so a tip
+   opening UPWARD out of a header cell is cut off. Measured on production
+   2026-09-06: the three exponent-table header tips overflowed the wrapper's
+   top by 54px and rendered as a sliver for every reader.
+
+   The wrapper has to keep scrolling (`.exponent-table` has `min-width: 640px`
+   and the page is read on phones), so the tip moves instead of the container:
+   `tip-below` opens it DOWNWARD, into the table body, where a 302px-tall
+   wrapper has room to spare. The variant is the one already shipped on
+   /the-bitcoin-retirement; it is copied here rather than invented. */
+.help-tip .tip-content.tip-below{bottom:auto;top:calc(100% + 8px)}
 .exp-table-wrap{overflow-x:auto;margin:1.5rem 0}
 .exponent-table{width:100%;border-collapse:collapse;min-width:640px}
 .exponent-table th{font-family:var(--font-b);font-size:.7rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);padding:.7rem .8rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}

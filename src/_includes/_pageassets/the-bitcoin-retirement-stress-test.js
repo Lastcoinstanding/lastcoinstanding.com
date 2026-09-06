@@ -449,7 +449,7 @@
     var head = document.getElementById('stTimingHead');
     if (!tb) return;
     var firstCol = COMPARE_MODE === 'retire' ? 'Retire in' : 'Crash in';
-    if (head) head.innerHTML = '<tr><th>' + firstCol + '</th><th>Crash lands</th><th>Outcome</th><th class="st-num">Final stack</th><th class="st-num">Final stack vs no crash <span class="help-tip" tabindex="0">?<span class="tip-content">How much smaller the plan&rsquo;s final stack is than the same plan with no crash, measured at the end in today&rsquo;s dollars.</span></span></th></tr>';
+    if (head) head.innerHTML = '<tr><th>' + firstCol + '</th><th>Crash lands</th><th>Outcome</th><th class="st-num">Final stack</th><th class="st-num">Final stack vs no crash <span class="help-tip" tabindex="0">?<span class="tip-content tip-below">How much smaller the plan&rsquo;s final stack is than the same plan with no crash, measured at the end in today&rsquo;s dollars.</span></span></th></tr>';
     var body = rows.map(function (r) {
       var outcome = r.depletion
         ? '<span class="st-fail">Depletes ' + r.depletion + '</span>'
