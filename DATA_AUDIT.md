@@ -201,6 +201,29 @@ are on the page today.
 
 **Implication for the monthly refresh:** if `power-law-data.js` or the modeling-assumptions canonical changes, this page follows automatically — but **re-run `evParityQA()` on the live page after any change to the flagship's projection functions**, because EV holds a copy. The parity assertion is the tripwire; it is the only thing standing between a flagship engine edit and two pages quietly giving different answers to the same question.
 
+### dashboard
+
+**Nothing on this page goes stale independently** — every tile is live-computed from shared modules, which is the page's founding fence (`SITE_GUIDE §47`: zero new data sources, zero new refresh lines). It earns a row here anyway, because **published figures on the site's return-visit anchor changed without any data changing.**
+
+| # | Component | Value | Basis | Source | Changed | Next due |
+|---|---|---|---|---|---|---|
+| DB-1 | Implied reversion rate tile — count, median, quickest | `6 completed episodes` · median `~141% over ~8.5 months` · quickest `~4.3 months` | **Episodes**, not samples — grouped by the site's 100-day independent-visit rule | `shared/reversion-durations.js`, live | 2026-09-05 | live; no manual step |
+
+**DB-1 (2026-09-05, `fix-reversion-basis`) — a published-figure change with no data change behind it.** The tile previously reported the **sample** basis, and the count was the misleading part:
+
+| | before (samples) | after (episodes) |
+|---|---|---|
+| count | 65 completed | **6 completed** |
+| median | ~145% over ~9.1 months | ~141% over ~8.5 months |
+| quickest | ~2.0 months | ~4.3 months |
+| slowest | ~24 months, ~90%/yr | unchanged |
+
+A long stretch contributes dozens of samples and exactly one episode, so *"65 completed"* read as a record about ten times deeper than it is. **Six is the number of independent things that have happened.** Full derivation, the before/after table and the reasoning: `REVERSION_BASIS_MINIREPORT.md`. Recorded in `SITE_GUIDE §47` as v3.1 and in `§41.1` for the Discount-or-Premium side, which now publishes **both** bases with the episode row leading.
+
+**The structural half is the part that matters for future audits.** The tile carried a local **port** of `/discount-or-premium`'s `scanDurations`; that port is **retired**, and the Dashboard now reads `shared/reversion-durations.js` — the same scan `/discount-or-premium` and `/the-rundown` read. The port was correct when written and still allowed a divergence to sit unnoticed across three pages (the Rundown showing 6 episodes / 65 samples against the Dashboard's 7 / 70 — the open episode was the entire difference). **Three pages, one scan, one grouping rule**, so they can no longer drift by being tuned separately.
+
+**What to check, and what not to.** These figures move with `TODAY_DAYS` by design and need no manual step. The tile's **N<3 branch is now reachable** (below ~0.40× it names the individual stretches instead of publishing a median) — a refresh flipping it into or out of that form is the thinness rule firing correctly, **not a finding**; see `MONTHLY_REFRESH_CHECKLIST §5.1a`. **A real finding is the three pages disagreeing** about the episode count or the completed/open split, which the shared scan now makes impossible unless something has broken. Compare them **in one page load** — clock drift across captures is indistinguishable from a regression, and has already cost one round of investigation.
+
 ---
 
 ---

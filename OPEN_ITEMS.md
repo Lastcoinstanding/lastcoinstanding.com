@@ -44,11 +44,115 @@ session automatically. Close items here when done; this file is the "what's cook
   ~~register round three~~ → the **counsel pass** → the **listing pass**, whose *step one*
   is now merging the branch
   `feat-sister-tabs-dashboard`. That branch is built, pushed and **ON HOLD by JM's ruling —
-  do not merge it before those gates.** It is the first and only inbound link to
-  `/the-rundown`, so merging it is what makes the page reachable; the rest of the listing
-  pass (nav group, `sitemap.xml`, `llms.txt`, `explorations.json`, related strips, removing
-  the `noindex` and the two preview blocks) follows it.
+  do not merge it before the counsel pass.** It is the first and only inbound link to
+  `/the-rundown`, so merging it is what makes the page reachable.
   Preview: `https://feat-sister-tabs-dashboard.lastcoinstanding-com.pages.dev/dashboard`
+
+  ---
+
+  #### THE LISTING PASS — written out in full (2026-09-05) so the session is a paste
+
+  **Do not start this before the counsel pass.** Everything below assumes it has cleared.
+  The order matters in two places and is called out where it does; otherwise it is one
+  commit's worth of work. **Nothing here is a page-content change** — the page ships as
+  reviewed.
+
+  **0 · Before anything, get the card in hand.** The OG image comes from the drafting
+  side against `OG_SPEC_THE_RUNDOWN.md` (brand-forward; **no viewport, no selector** — the
+  spec's §0 table answers this). It is **cleared to render**: round three closed the copy
+  gate. If it is not in hand, do steps 1–7 anyway and land the card separately — a missing
+  card does not block listing, but a **tag pointing at a missing file does**, so steps 6a
+  and 6b never separate.
+
+  1. **`noindex` off.** `src/_includes/_pageassets/the-rundown-head.html` — delete
+     `<meta name="robots" content="noindex, nofollow">` **and** the multi-line guard
+     comment above it that explains the hold. Leave the `<title>`, description and canonical
+     untouched; they are register-canonical and static by design.
+
+  2. **The unlisted-preview note.** `src/the-rundown.njk` — remove the
+     `<!-- ═══ PREVIEW NOTE ... ═══ -->` block and its `.rd-preview-note` div (one block,
+     near the foot of the template). Then remove the now-dead `.rd-preview-note` rule from
+     `src/_includes/_pageassets/the-rundown.css`. **Grep `rd-preview-note` afterwards and
+     expect zero hits** — the CSS rule is the half that gets left behind.
+
+  3. **`src/_data/explorations.json`.** Add the entry in the **Models & Trends** group of
+     the **numbers** category, beside `discount-or-premium`:
+     ```json
+     {
+       "slug": "the-rundown",
+       "title": "The Rundown",
+       "category": "numbers",
+       "group": "Models & Trends",
+       "interactive": true
+     }
+     ```
+     **No `calculator_tile`.** The page takes inputs but issues no personal calculation —
+     it filters which record is shown. Same posture as Discount-or-Premium, and the
+     `/calculators` grid is for tools that compute *your* number.
+
+  4. **Nav — The Numbers group, no new top-level item.** Registration in step 3 is what
+     puts it in the dropdown; `base.njk` iterates the registry for the three category
+     menus, so **no hardcoded anchor is needed or wanted.** The desktop nav row has no
+     headroom for a 7th top-level item (measured: the wordmark wraps below ~950px already,
+     `SITE_GUIDE §56`), which is exactly why this goes in a group rather than beside it.
+
+  5. **`sitemap.xml` and `llms.txt`.**
+     - `sitemap.xml`, in The Numbers block beside `discount-or-premium`:
+       `<url><loc>https://lastcoinstanding.com/the-rundown</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>`
+     - `llms.txt`, The Numbers section: one entry in the house shape —
+       `- [The Rundown](https://lastcoinstanding.com/the-rundown): …` — describing the
+       composition (position → question → modules, each routed to the tool that owns it),
+       the thinness rule, and that it is a briefing rather than a recommendation. Write it
+       fresh; do not paste the meta description, which is shorter and aimed elsewhere.
+     - **`updates.json`** — one entry, per the per-commit rule at the head of
+       `MONTHLY_REFRESH_CHECKLIST`. This is the page's public debut.
+
+  6. **The OG card, in one commit, in this order.** (`OG_SPEC_THE_RUNDOWN.md` §4.)
+     a. `og-the-rundown.jpg` at the **repo root**, and `'og-the-rundown.jpg'` added to the
+        `staticAssets` array in `.eleventy.js`. **This is the step that silently fails** —
+        without it Cloudflare serves the page's HTML at the image URL with a 200 and the
+        card breaks everywhere with no build error.
+     b. The `og:image` / `twitter:image` block into `the-rundown-head.html`, replacing
+        the deferred-OG comment so the file stops describing a plan that has happened.
+     c. Validate with `curl -I` → **`Content-Type: image/jpeg`**. A `text/html` at 200 means
+        (a) was missed. Third-party scrape-testing is now safe — the page is public.
+
+  7. **Related strips on the siblings.** The Rundown's own `related:` names eight pages;
+     the house convention is bidirectional (`SITE_GUIDE §41`). Add a `the-rundown` entry
+     with a written `desc:` to: `dashboard`*, `the-power-law`, `the-bitcoin-floor`,
+     `wait-or-deploy-now`, `lump-sum-or-ladder-in`, `discount-or-premium`, `how-much-cash`,
+     `bitcoin-escape-velocity`. **\*The Dashboard is the exception** — it carries no
+     `related:` front matter at all (the jump-back-in row does that job, `SITE_GUIDE §47`),
+     and the sister-tabs control is its link. Leave it out rather than introducing a strip.
+     Each `desc:` is a sentence about what the Rundown gives *that page's* reader, not a
+     generic blurb — a route label names its destination (`STYLE_GUIDE §10.7`).
+
+  8. **`feat-sister-tabs-dashboard` — merge.** Held until here. It is the reciprocal half
+     of the control already live on the Rundown, and merging it is what makes the page
+     reachable from the Dashboard.
+
+  9. **`SITE_GUIDE §54` update.** Deferred to this pass by JM's ruling of 2026-09-05.
+     Two known-stale things to fix while there, both already ruled elsewhere: the
+     **hero-selector clause** (struck 2026-09-05 in place, since the drafting side could
+     have acted on it — but §54's "Open at the unlisted ship" list still needs rewriting as
+     a *shipped* record), and the **[JM-3] routing-chip paragraph**, which describes a
+     commit that is cancelled, not pending. Retitle the section — it is no longer
+     "UNLISTED PREVIEW" — and fold in the register-review history.
+
+  10. **Carousel slide — NO.** Ruled: a position read is the same case the Dashboard made
+      for having no slide (`SITE_GUIDE §13`). Recorded so nobody re-opens it.
+
+  **After deploy, verify each surface individually** — the same discipline used to confirm
+  the page was unlisted, run in reverse: the page appears in the nav dropdown, in
+  `sitemap.xml`, in `llms.txt`, in the exploration registry and on each sibling's strip;
+  `noindex` is gone from the served HTML; the OG image returns `image/jpeg`. Then resubmit
+  the sitemap and request indexing (`NEW_PAGE_CHECKLIST §10`, publish-day habit; the
+  standing sweep is `MONTHLY_REFRESH_CHECKLIST §9.5`).
+
+  **Registry ordering note:** `base.njk` builds the three category menus by iterating
+  `explorations.json` **in array order**, so where the entry sits in the file is where it
+  sits in the dropdown. Placing it beside `discount-or-premium` in step 3 is what puts it
+  next to the page it most resembles; it is not cosmetic.
 
   **The JM-3 dashboard routing chip is RETIRED, superseded by the sister-tabs control**
   (JM, 2026-09-04). JM-3 specified one chip added to the Dashboard pointing at the Rundown,

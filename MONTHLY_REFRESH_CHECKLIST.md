@@ -192,6 +192,36 @@ If a future page introduces a local copy, surface it here and prefer
 deletion in favor of the shared globals — the cross-page consistency
 guarantee depends on a single source.
 
+**`/the-rundown` adds ZERO items after v2 — re-confirmed 2026-09-05.** The
+page's own §1 fence is that it adds nothing to this checklist, and v2 grew it
+by a great deal (reader inputs, an intent router, ten snacks, a live standfirst,
+a state-aware position module) without breaking that. Verified rather than
+assumed, by scanning the template and the page script for baked figures:
+
+- **The inputs are session or device state**, never content. The retirement
+  year, target income and chosen question are the reader's; the stack is
+  session-only and stored nowhere. None of it is authored copy, so none of it
+  can go stale.
+- **Every snack computes at render time** from the shared modules
+  (`power-law-data`, `channel-entries`, `ladder-advantage`,
+  `reversion-durations`, `return-window`, `retirement-engine`). Nothing is
+  transcribed from another page — the §1 "echo, not a copy" rule is what keeps
+  this true, and it is why a figure moving on a source page moves here for free.
+- **The dated standfirst is generated, not written.** It prints the client date
+  and the live multiple on load (`STYLE_GUIDE §10.9`), so it is self-updating
+  by construction — the opposite of the BvSM as-of callouts, which are
+  hand-edited and *do* carry a line in §3.
+- **The only literals in the template are definitional constants** — `0.42×`,
+  `1.00×`, the `1%` graze band, the `20%` drawdown threshold. Each changes by a
+  published act, not by a data refresh. The one static tooltip figure that had
+  crept in was removed on 2026-09-05 under `STYLE_GUIDE §10.8`.
+- **The OG card is brand-forward and carries no figure** (`OG_SPEC_THE_RUNDOWN.md`),
+  so it does not enter §6's regeneration list either.
+
+The A3 timeline agreement check in §5.1 is the page's **only** appearance in
+this document, and it is a confirmation step on someone else's edit rather than
+a refresh task of its own.
+
 Sanity-grep to confirm no copies have crept back in:
 
 ```bash
@@ -356,6 +386,38 @@ event worth its own commit and its own card, not a number to bump.
 from the same rule, so it follows automatically — but its copy claims *"same
 rule, same episodes, same count"*, so if you edit the Floor cards, load
 `/the-rundown` and confirm the timeline agrees before you close the refresh.
+
+### 5.1a The Dashboard's reversion tile changing shape is AUTOMATIC, not a finding
+
+Added 2026-09-05, alongside the Floor note above, because the two look alike
+and only one of them wants your attention.
+
+Since the tile moved to the **episode basis** (`SITE_GUIDE §47` v3.1) its N<3
+branch is reachable: below about **0.40×** there are fewer than three completed
+episodes at that depth, and the tile **stops publishing a median and a spread
+and names the individual stretches instead** — *"the longer of the 2 completed
+stretches on record — 5 mo and 20 mo. Too few to read a median from, so they
+are named rather than averaged."*
+
+**That is the thinness rule firing correctly.** A refresh that moves price
+deeper, or that adds samples changing an episode's grouping, can flip the tile
+into or out of that form with no code change and nothing to fix. Do not open an
+investigation, and do not "restore" the median — a median over two episodes is
+a statistic with the honesty removed, which is the whole reason the branch
+exists.
+
+**What WOULD be a finding, and the difference is worth holding.** The Dashboard,
+`/discount-or-premium` and `/the-rundown` all read one scan
+(`shared/reversion-durations.js`), so they cannot disagree about the count
+unless something is wrong. If a refresh leaves them stating **different episode
+counts or different completed/open splits**, that is a real defect — the local
+port that used to allow it is retired, so a divergence now means the shared
+module or its consumers have broken, not that two pages drifted.
+
+**Check them in ONE page load if you check at all.** Every figure here derives
+from `TODAY_DAYS`, which advances with the clock; captures taken minutes apart
+differ by drift that is indistinguishable from a regression, and that has
+already cost one round of investigation (`NEW_PAGE_CHECKLIST §11`).
 
 ## 6. OG image regeneration (product-forward cards)
 

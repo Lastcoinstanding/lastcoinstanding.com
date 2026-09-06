@@ -2388,6 +2388,44 @@ The same discipline applies to any term that would make a reader feel outside th
 
 ---
 
+### 10.7 Route labels name their destination
+
+**Promoted site-wide 2026-09-05** from the Rundown's register review, where it was ruled page-locally and then found to apply everywhere.
+
+A link out of a module names **the page it goes to**, not the *kind of thing* it goes to. `The Bitcoin Floor →` and `How Much Cash? →` are route labels; **`the full instrument →` is not**, and it is retired everywhere.
+
+Two reasons, and the second is the one that decides it:
+- A reader hovering three modules on one page sees three identical links and cannot tell them apart. The destination is the only thing that distinguishes them, so it is the thing that must be in the label.
+- **A generic label is a promise the site cannot keep.** "The full instrument" tells the reader they are getting *more of the same thing, in depth*. Sometimes the destination is a different question entirely, and the label has then mis-sold it. A page name mis-sells nothing.
+
+Applies to `related:` strips, in-module routes, sources lines and jump-back-in rows alike. The **arrow stays** — it is the site's signal that a link leaves the current surface (`§6.9`).
+
+### 10.8 Static copy beside a live value carries no figure
+
+**JM ruling, 2026-09-05.** Where hand-written copy sits next to a value the page computes at runtime — a tooltip on a live card, a caption under a live chart, a `<meta>` description, an OG card — **the static half states no number.**
+
+The failure is not that the figure is wrong when written. It is right when written, and then the live value moves and the two disagree **on the same screen**, in front of a reader who can see both. The caught instance: a header card computing "times at the floor since 2014" carried a tooltip reading *"three times since 2014"* — correct that day, and guaranteed to contradict the card above it the first time a fourth approach lands.
+
+- **Definitional constants are not figures.** "within 1% of the 0.42× floor", "a gap of more than about 100 days", "capped at two years" are part of what the word *means* and stay. A constant changes by a published act; a statistic changes by Tuesday.
+- **The test:** if the live value moved tomorrow, would this sentence still be true? If no, cut the number and let the value carry it. The prose can still make the point — *"reaching the floor is rare"* survives what *"three times"* does not.
+- **This is also a refresh-burden rule.** Every static figure beside a live one is a line someone has to add to `MONTHLY_REFRESH_CHECKLIST`, and pages that fence themselves at zero refresh lines (`the-rundown`, `discount-or-premium`) break that fence the first time one is written.
+
+### 10.9 A live page states the date, not "today"
+
+**Promoted site-wide 2026-09-05.** A page that recomputes on load says **when** it is speaking: *"As of September 5, 2026, bitcoin is at 0.52× its long-run trend"*, not *"Today, bitcoin is at…"*.
+
+"Today" is true whenever it is read and therefore says nothing. The date is checkable — a reader who lands on a cached or shared view can see immediately whether they are looking at a current read, and a screenshot that travels carries its own timestamp instead of implying it is current forever. The same reasoning already governs the live-price badge (`§26`), which prints the date always and adds "(live)" only on a real fetch; this extends the rule from the badge to the prose.
+
+**Adoption status.** The Rundown states the date. The **Dashboard adopts it at the sister-tabs merge**, not before — the two pages are a stated pair and it would be odd for one to say "today" while its sibling gives the date.
+
+### 10.10 Question titles are in historical tense — never "will"
+
+**Promoted site-wide 2026-09-05.** A module that reads the historical record titles itself in the **past or present perfect**: *"How long has a return to trend taken from this depth?"*, *"When has price been here before?"*, *"What has a position like this meant?"*
+
+Never *"How long will a return to trend take?"* — that is a forecast, and the record cannot issue one. The tense is not decoration: it is the difference between a page reporting what happened and a page predicting what happens, and it is the single cheapest guard against the second reading. A register line saying "historical, not a prediction" under a title written in the future tense loses the argument, because the title is read first and remembered longer.
+
+**Corollary.** A conditional projection titles itself as conditional — *"If price ends at the floor…"*, *"If today's gap persists…"* — and the condition leads. `§10.3` governs the figures inside it.
+
 ## 11. Words we don't use
 
 The following read as AI-generated and are banned from page copy:
@@ -2401,6 +2439,46 @@ The following read as AI-generated and are banned from page copy:
 **The list is append-only** as new tells are noticed. Check new copy against it as part of the `NEW_PAGE_CHECKLIST §10.5` review — the interaction-intent pass is already reading every new section lede, so it is the cheapest place to catch these.
 
 **Outstanding violations — a sweep is still owed, and it is bigger than the templates.** The rule landed after most of the page copy did. Counted 2026-08-25 across **both** `src/*.njk` **and** `_pageassets/*.js` — reader-facing copy lives in both, as the Stress Test's section lead proves: **robust 15 · load-bearing 11 · notably 4 · unpack 4 · "at its core" 4 · "worth noting" 3 · tapestry 2 · elegant 1 · "deep dive" 1**, plus ~79 raw `leverage` hits. Two caveats on those numbers before anyone works from them: the `leverage` count needs reading to separate the legitimate noun (unavoidable on the mortgage and collateral pages) from the banned verb, and the JS figures are an **upper bound** because this rule exempts code comments and a plain grep cannot tell a comment from a string. **Deliberately deferred to its own PR** — a sweep this size is not a rider on a copy change, and several of these sit in sentences that need rewriting rather than word-swapping. The `/bitcoin-defined` subtitle was fixed on 2026-08-25 only because the same PR was already editing that page.
+
+### 11.1 Register bans: the anti-timing vocabulary
+
+**A separate list, and deliberately not folded into §11.** The Rundown's page-specific bans were reviewed on 2026-09-05 for promotion into §11 above. **They do not belong there**, and the reason is the distinction §11 already draws for itself: *that list bans tells, not voice.* A tell is banned because it sounds machine-written. These are banned because of **what they would make the page**, which is a different offence with a different scope and a different test. Merging them would blur a list anyone can apply mechanically with a list that needs judgment.
+
+So they are recorded here as their own list, with their own scope.
+
+**Banned:** *signal · buy zone · opportunity · discount to capture · time to (buy / sell / act) · should* (directed at the reader) · *cheapest · target* (of a price the page did not commit to).
+
+**Scope: decision-adjacent and position-dependent pages** — the Rundown, the Dashboard, the Floor, Discount-or-Premium, Wait-or-Deploy-Now, How Much Cash, Lump Sum or Ladder In, and any page whose copy changes with where price sits in the channel. Not a site-wide ban: an essay may need to *name* the idea of a buy zone in order to argue against it, and the Floor page's own tripwire section discusses signals explicitly. **The ban is on the site using the word about itself, not on the word existing.**
+
+**The tests, in order:**
+1. Would this sentence still be here if price were at the other end of the channel? If the wording only works at a discount, it is a timing claim wearing a description's clothes.
+2. Does the sentence tell the reader what to do, or what happened? Only the second is the site's job.
+3. Is a number being called good or bad? *"At the floor"* is a location. *"Cheapest"* is a verdict on a price, and the site does not issue those.
+
+**Related and already recorded:** models and pages are not actors (`§10.4` / `§10.5`); no colour state changes with distance to the floor — no green far above and no red near it (`SITE_GUIDE §50`); and the anti-signal framing line is prose, never a dismissible strip, on pages that take no inputs (`SITE_GUIDE §47`).
+
+## 12. Position-dependent strings are enumerated, not interpolated
+
+**Promoted site-wide 2026-09-05** from the Rundown's B6 work, where a module had to read correctly at every point in the channel rather than at today's.
+
+**The rule.** When a string's *truth* depends on where price sits, do not write one sentence with the number interpolated into it. Enumerate the **states**, write each one, and choose. A sentence that reads well at 0.52× can be false at 1.6× while still rendering a correct number, and nothing in a template will tell you.
+
+**The site's state matrix, in the order a page should branch on it:**
+
+| State | Test | What the copy must not assume |
+|---|---|---|
+| below floor | `m < PL_FLOOR` | that "the floor" is below the reader |
+| at the floor | `m <= PL_FLOOR × 1.01` | that this is a discount to *something else* |
+| below trend | `PL_FLOOR × 1.01 < m < 0.95` | that the floor is nearby |
+| at trend | `0.95 <= m <= 1.05` | that there is a gap to close — **there is not**, and a duration computed from one is noise |
+| above trend | `m > 1.05` | that reversion means *upward* |
+
+**Three practices that come with it.**
+- **A permanent module never renders "nothing to show."** If a state has no figure to give, that state gets its own identity that says what the record *does* have, in the page's own voice. The at-trend case is the standing example: the reversion engine correctly returns nothing near trend, so the module reports the last stretch each way instead of going blank.
+- **Compare with an epsilon at the boundaries.** `PL_FLOOR × 1.01` evaluates to `0.42419999…`, so a naïve `<=` excluded the documented "within 1%" boundary from itself. Every band edge on the site is a float comparison and needs `1e-9`.
+- **Exactly at a boundary, say the boundary.** At `1.00×` the honest string is *"at trend"*, not *"0% above trend"* — which is arithmetically true and reads as a bug.
+
+**How to verify.** Pin the price with a harness shim (`?px=`) and walk every state end to end, rendering each one, rather than reasoning about which branch would fire. Two of the defects above were invisible to inspection and obvious on the second render.
 
 
 ## Appendix A: Survey findings (2026-04-26)
