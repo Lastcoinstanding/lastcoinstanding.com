@@ -194,6 +194,14 @@ body { background: var(--bg); color: var(--text); }
    height, which is to say it did not render. The wrapper must keep scrolling,
    so the tip opens downward instead; at 302px tall there is room. */
 .help-tip .tip-content.tip-below { bottom: auto; top: calc(100% + 8px); }
+/* And RIGHT-ANCHORED as well, because this tip is on the LAST column. Opening
+   it downward cleared the wrapper's top; centring it on a trigger at the far
+   right of the table still put 158px of the card past the wrapper's right
+   edge — measured on the preview, which is the only reason this second half
+   was caught. Anchoring the card's right edge to the trigger's keeps it
+   inside the wrapper at every scroll position. Same variant as
+   /the-bitcoin-retirement's `tip-align-right`. */
+.help-tip .tip-content.tip-align-right { left: auto; right: 0; transform: none; }
 .st-timing-tablewrap { overflow-x: auto; }
 .st-row-current td { background: rgba(224,148,34,0.07); }
 .st-row-current td:first-child { box-shadow: inset 3px 0 0 var(--amber); }
