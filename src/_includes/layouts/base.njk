@@ -836,6 +836,15 @@ h1, h2, h3 {
     </script>
 {%- endif %}
 
+{# Layout-level §6.13 tooltip clamp — keeps a tip card on screen when its
+   trigger sits near a viewport edge. Site chrome, so it lives here rather
+   than in nineteen page scripts, and it covers the page-local tooltip
+   families (.dr-tt, .fl-tip, .tip) that a per-page fix would have missed.
+   No-op on pages without tips. See TECH_DEBT and shared/tip-clamp.js. #}
+<script>
+{% include '_pageassets/shared/tip-clamp.js' %}
+</script>
+
 {# Layout-level "copy chart as image" utility — scans every page for
    [data-chart-copy] wrappers and attaches a quiet camera button. No-op on
    pages without charts. See SITE_GUIDE §31 and _pageassets/shared/chart-copy.js. #}
