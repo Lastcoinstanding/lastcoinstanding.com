@@ -1076,13 +1076,32 @@ body {
     .bbm-collateral-value { font-size: 1.55rem; }
 }
 
+/* NO `overflow: hidden` HERE — it clipped all five tooltips in this panel.
+   The rule was doing one job: stopping the summary's square hover background
+   painting over the panel's rounded top corners. But a tip card is
+   absolutely positioned and 240px wide, so a trigger anywhere but the middle
+   of the panel opens partly outside it — and `overflow: hidden` cut it off.
+   Measured on production 2026-09-06: five tips, at 375 and at 1280, none of
+   them rendering.
+
+   Note this is NOT the viewport-edge defect the shared clamp fixes. The panel
+   is narrower than the viewport at desktop, so a card can sit comfortably
+   inside the window and still be clipped by this box. Container problems are
+   fixed at the container.
+
+   The corners are rounded on the children instead. `.bbm-advanced-summary`
+   owns the top pair; it is the first child in both states, and when the panel
+   is open its own bottom border separates it from the content, so the bottom
+   pair belongs to the last child rather than to the summary. */
 .bbm-advanced {
     margin-bottom: 1.4rem;
     background: rgba(0,0,0,0.18);
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 8px;
-    overflow: hidden;
 }
+.bbm-advanced > .bbm-advanced-summary { border-radius: 7px 7px 0 0; }
+.bbm-advanced:not([open]) > .bbm-advanced-summary { border-radius: 7px; }
+.bbm-advanced > :last-child { border-bottom-left-radius: 7px; border-bottom-right-radius: 7px; }
 .bbm-advanced[open] {
     border-color: rgba(224,148,34,0.18);
 }

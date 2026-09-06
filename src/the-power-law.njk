@@ -236,7 +236,12 @@ eleventyComputed:
       <p class="prose"><strong>Why do different authors use different ones?</strong> Because they fit different windows of data, different price series, and slightly different methods &mdash; reasonable people fitting the same phenomenon land on slightly different numbers. The <em>How the fit is justified</em> column carries the specifics. The Porkopolis pair every page on this site uses is the one we will call the <strong>reference fit</strong>.</p>
       <div class="exp-table-wrap">
         <table class="exponent-table">
-          <thead><tr><th>Source</th><th><em>a</em> <span class="help-tip" tabindex="0">?<span class="tip-content">The scale &mdash; where the fitted curve starts.</span></span></th><th><em>b</em> <span class="help-tip" tabindex="0">?<span class="tip-content">The steepness &mdash; how fast the fitted trend grows.</span></span></th><th>Implied trend today <span class="help-tip tip-right" tabindex="0">?<span class="tip-content">The price this fit's trend line puts on today.</span></span></th><th>How the fit is justified</th></tr></thead>
+          {#- `tip-below` on all three: these sit in a header row inside
+              .exp-table-wrap, which scrolls horizontally and therefore clips
+              vertically too. Opening upward put them 54px outside the wrapper
+              and they rendered as a sliver. See the .tip-below note in the
+              stylesheet. -#}
+          <thead><tr><th>Source</th><th><em>a</em> <span class="help-tip" tabindex="0">?<span class="tip-content tip-below">The scale &mdash; where the fitted curve starts.</span></span></th><th><em>b</em> <span class="help-tip" tabindex="0">?<span class="tip-content tip-below">The steepness &mdash; how fast the fitted trend grows.</span></span></th><th>Implied trend today <span class="help-tip tip-right" tabindex="0">?<span class="tip-content tip-below">The price this fit's trend line puts on today.</span></span></th><th>How the fit is justified</th></tr></thead>
           <tbody id="expTableBody"></tbody>
         </table>
         <p class="exp-table-note">Listed but not plotted &mdash; exponent published without its paired <em>a</em>, so no curve can be placed: <strong>b1m.io / Fred Krueger</strong> (<em>b</em>&nbsp;=&nbsp;5.566) and a naive fit through the full series (<em>b</em>&nbsp;=&nbsp;5.63, our own). Saying why they can't be drawn is the point: an exponent without its constant is not a model.</p>
