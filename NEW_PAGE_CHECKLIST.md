@@ -879,6 +879,37 @@ expensive way.
   numbers-only check would have missed a title that stopped matching its
   figure.
 
+### Derive an audit's universe from behaviour, not from a class name
+
+**JM ruling, 2026-09-06**, from the §6.13 tooltip sweep. When auditing a
+pattern across the site, the page list must come from **what the thing does**,
+not from what one implementation of it happens to be called. A
+selector-derived page list can only ever confirm what the selector already
+assumed.
+
+The tooltip audit was scoped by grepping `.help-tip`. It found 263 tips on 26
+pages and reported both `/compare-retirement-plans` and
+`/disciplined-rebalancing` as *uncovered — tips behind a UI state*. Neither was
+true, and the real picture only appeared when the universe was re-derived from
+**`cursor: help`** in the stylesheets:
+
+- `/disciplined-rebalancing` has **7 tips** under page-local names
+  (`.dr-tt` / `.dr-tt-card`) and is clean; the `.help-tip` hits in its CSS were
+  *comments*.
+- `/compare-retirement-plans` has **none at all** — five `.help-tip` rules with
+  nothing using them.
+- **Two pages were absent from the list entirely** because they carry no
+  `.help-tip` string: `/the-bitcoin-floor` (`.fl-tip`) and
+  `/bitcoin-and-metcalfes-law` (`.tip`, both broken). One of them is a flagship.
+- `/the-strc-mechanism`'s triggers are native `title=` attributes — genuinely
+  out of scope, which the behavioural query also tells you.
+
+**The query to reach for** is the CSS property that defines the behaviour —
+`cursor: help` for help triggers, `position: sticky` for sticky offsets,
+`overflow` for clipping containers. Then group the results by class family and
+audit each family. **A page that invented its own naming is exactly the page an
+audit needs to reach**, because nobody has looked at it recently either.
+
 ### Reproducibility is tested at inputs a reader can actually enter
 
 **JM ruling, 2026-09-05.** When a page cites a figure and says another page is
