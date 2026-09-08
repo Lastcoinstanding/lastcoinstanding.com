@@ -11,7 +11,7 @@ session automatically. Close items here when done; this file is the "what's cook
 
 ## In flight (dated)
 
-- [x] **THE RUNDOWN v2 — PUBLICLY LISTED. MERGED TO PRODUCTION 2026-09-07** (`ada60b2`).
+- [x] **THE RUNDOWN v2 — PUBLICLY LISTED (2026-09-07, `ada60b2`). RENAMED TO "THE BITCOIN RUNDOWN" ON `feat-rundown-rename`, AWAITING JM'S MERGE.**
   Merged to production 2026-09-02 (PR #97, merge `fc773b6`) carrying v2 "The Briefing" and
   the site-wide unified floor-visit definition. **`/the-rundown` is live but unlisted** —
   `noindex, nofollow`, and absent from `sitemap.xml`, `llms.txt`, `explorations.json` and the
@@ -267,6 +267,65 @@ session automatically. Close items here when done; this file is the "what's cook
 
   Verified on production after deploy: `curl -I` on the new path returns
   **`Content-Type: image/jpeg`**, 65,542 bytes.
+
+  **DISPLAY NAME: "The Rundown" → "THE BITCOIN RUNDOWN" (JM, 2026-09-07).** Matches
+  *The Bitcoin Dashboard*, and follows that page's precedent exactly: **the display name
+  carries "Bitcoin", the slug does not.** `/the-rundown` is unchanged, so **no redirect is
+  owed**, no `_redirects` line is added, and every link already in the wild — including the
+  seven sibling strips, the sitemap, `llms.txt` and the OG card's own URL footer — keeps
+  resolving. On one branch with its own preview; **JM merges.**
+
+  **The registry title is the single source, which is what kept this small.**
+  `explorations.json`'s `title` feeds the nav dropdown, the footer column and **all seven**
+  sibling related strips through `related.njk`'s slug lookup, so one edit moves them all.
+  Checked before relying on it: none of the seven carries a `label:` override, which is the
+  one thing that would have pinned a strip to the old name.
+
+  **The sister-tabs control keeps its short forms** — "The Dashboard" / "The Rundown" — as
+  JM ruled and as that control already did. It names the *pair* rather than titling either
+  page, and "The Bitcoin Dashboard | The Bitcoin Rundown" would read as two products rather
+  than two views of one position. Short-form "the Rundown" in running prose is left alone
+  for the same reason: the sibling `desc:` sentences and the backlog's body text still say
+  it, and that is a short form, not a stale title.
+
+  **The H1 keeps its italic on the second word** — `The Bitcoin <em>Rundown</em>` — so the
+  hero still reads with the emphasis the page shipped with rather than italicising a name
+  that is now three words.
+
+  **Deliberately NOT renamed: internal code comments** that refer to the page by name
+  (about a dozen, in the shared engines, `dashboard.css`, and the two page assets' own
+  headers). They are internal references, they remain unambiguous because the slug is still
+  `/the-rundown`, and rewriting a dozen comment blocks is churn with a real chance of
+  touching a line that matters. Recorded so the inconsistency reads as a decision.
+
+  **THE NEW OG CARD IS INSTALLED — after a failed custody check that turned out to be a
+  hashing convention, not a bad file.** The card now reads **"The Bitcoin Rundown"**, so
+  the image agrees with the renamed page and with both `:alt` texts.
+
+  **What happened, because the lesson is the durable part.** The digest JM quoted
+  (`42c4cd6c…`) matched the file on disk under **none** of MD5, SHA-1 or SHA-256, and
+  Downloads held no other candidate. The card was right in every other respect — 1280×720
+  RGB, brand-forward, correct title, subtitle and URL footer, no multiple/price/date/count
+  — but it was **held rather than committed**, because JM's own instruction gated the
+  commit on the hash and because "it looks right" is not a custody check. The drafting side
+  then re-hashed **after presentation** and the digest matched on the first try:
+
+  - **SHA-1 `1f3aa8ba103ecc12721013d4970a009eb779cd0a`, 68,796 bytes, 1280×720 RGB** —
+    verified against the placed file *before* committing, per the §52.1 / slide-34 pattern.
+
+  **The cause: presentation re-encodes images.** A hash taken *before* presenting names
+  bytes that no longer exist by the time the file reaches Downloads. Recorded as a standing
+  convention in `SITE_GUIDE`'s custody section — take the digest **after** presenting, or
+  **ship the file inside a zip**, which is passed through unmodified. What does not change
+  is that a mismatch still stops the commit: the guard is the same whichever way the bytes
+  moved.
+
+  **The v2 URL had not been scraped**, which is why replacing its bytes in place was safe
+  and no v3 was needed — the day-one bump exists precisely because the **v1** URL was
+  poisoned by a pre-merge scrape (see above). Old files stay on disk per JM: `og-the-rundown.jpg`
+  (v1, poisoned URL) and the previous v2 encode is simply overwritten. Both `:alt` texts
+  name the new title, the `staticAssets` registration and the `-v2` tags were already in
+  place from the bump, and the generator's default stays `-v2`.
   **⏰ STILL TO DO, AND IT NEEDS JM'S ACCOUNT: resubmit the sitemap and request indexing**
   in Google Search Console (`NEW_PAGE_CHECKLIST §10`, publish-day habit; the standing sweep
   is `MONTHLY_REFRESH_CHECKLIST §9.5`). Nothing in this session can do it — it is the one

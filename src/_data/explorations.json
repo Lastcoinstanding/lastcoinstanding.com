@@ -191,9 +191,9 @@
     "interactive": true
   },
   {
-    "_comment": "The Rundown — the briefing: where bitcoin sits in its channel, read against the reader's situation and the question they carry, each module routed to the tool that owns it. Placed beside discount-or-premium deliberately: base.njk iterates this file in array order, so array position IS dropdown position, and this is what puts it next to the page it most resembles. NO calculator_tile — the page takes inputs but issues no personal calculation; it filters which record is shown (same posture as discount-or-premium / bull-and-bear-cycles), and the /calculators grid is for tools that compute *your* number. Listed 2026-09-07 at the listing pass, after the register review and the counsel pass.",
+    "_comment": "The Bitcoin Rundown — the briefing: where bitcoin sits in its channel, read against the reader's situation and the question they carry, each module routed to the tool that owns it. Placed beside discount-or-premium deliberately: base.njk iterates this file in array order, so array position IS dropdown position, and this is what puts it next to the page it most resembles. NO calculator_tile — the page takes inputs but issues no personal calculation; it filters which record is shown (same posture as discount-or-premium / bull-and-bear-cycles), and the /calculators grid is for tools that compute *your* number. Listed 2026-09-07 at the listing pass, after the register review and the counsel pass.",
     "slug": "the-rundown",
-    "title": "The Rundown",
+    "title": "The Bitcoin Rundown",
     "category": "numbers",
     "group": "Models & Trends",
     "interactive": true

@@ -42,7 +42,7 @@ Captured during the merge pass, because the backlog is now large enough that the
 
 - [ ] **Discount-or-Premium era toggle — full record vs modern era.** (JM idea, 2026-08-10.) Add a toggle to `/discount-or-premium`'s duration record letting the reader switch the episode set between the **full record** and a **modern era** (cutoff named on the control, e.g. post-2016), with **both sets shown / comparable**. Motivation surfaced building the dashboard's *Implied reversion rate* tile (SITE_GUIDE §47 v3): the quickest depth-matched resolutions all came from bitcoin's 2010 era, so the full-record "fastest" is not representative of recent behaviour. **The dashboard reversion tile inherits whichever set D-or-P computes** — it ports D-or-P's `scanDurations` verbatim and must keep matching it exactly, so the toggle belongs on D-or-P (the source of truth), and the dashboard follows for free. Scope: name the cutoff, show both eras, keep the "record, not a distribution" honesty.
 
-- [ ] **The Rundown — a position-conditioned decision map ("what does this spot in the
+- [ ] **The Bitcoin Rundown — a position-conditioned decision map ("what does this spot in the
   channel mean for the questions you're carrying?").** → **promoted 2026-08-28 — design doc
   `RUNDOWN_DESIGN.md`** (v1 spec; all eight open decisions ruled by JM the same day; the
   Phase 0 verification report is the next artifact, and JM ratifies it before Phase 1
