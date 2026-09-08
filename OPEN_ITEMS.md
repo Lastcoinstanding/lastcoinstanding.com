@@ -298,26 +298,34 @@ session automatically. Close items here when done; this file is the "what's cook
   `/the-rundown`, and rewriting a dozen comment blocks is churn with a real chance of
   touching a line that matters. Recorded so the inconsistency reads as a decision.
 
-  **⛔ THE NEW OG CARD IS NOT INSTALLED — the custody check failed, and JM's own
-  instruction gates the commit on it** (*"Verify the SHA on disk matches before
-  committing"*). The file in Downloads is the right card by eye — 1280×720 RGB, 68,796
-  bytes, brand-forward, titled **"The Bitcoin Rundown"**, correct subtitle and URL footer,
-  no multiple/price/date/count — but **its hash does not match the `42c4cd6c…` JM quoted**,
-  under any of the three algorithms:
+  **THE NEW OG CARD IS INSTALLED — after a failed custody check that turned out to be a
+  hashing convention, not a bad file.** The card now reads **"The Bitcoin Rundown"**, so
+  the image agrees with the renamed page and with both `:alt` texts.
 
-  - MD5 `692006a7d25f16e2ecfe0b97f6a183e7`
-  - SHA-1 `1f3aa8ba103ecc12721013d4970a009eb779cd0a`
-  - SHA-256 `c127ecf68e68a3f8b79e7804f1084c267e59b13c5ef552dbb0c272d907a10358`
+  **What happened, because the lesson is the durable part.** The digest JM quoted
+  (`42c4cd6c…`) matched the file on disk under **none** of MD5, SHA-1 or SHA-256, and
+  Downloads held no other candidate. The card was right in every other respect — 1280×720
+  RGB, brand-forward, correct title, subtitle and URL footer, no multiple/price/date/count
+  — but it was **held rather than committed**, because JM's own instruction gated the
+  commit on the hash and because "it looks right" is not a custody check. The drafting side
+  then re-hashed **after presentation** and the digest matched on the first try:
 
-  Downloads holds no other candidate. This is exactly what the §52.1 custody pattern exists
-  to catch — *the gate certifies an encode; the wiring certifies this is that encode* — so
-  the bytes were left alone rather than committed on a likeness judgement. **The v2 file on
-  disk and in production is still the old encode, which reads "The Rundown".** Everything
-  around it is ready: both `:alt` texts already name the new title, the `staticAssets`
-  registration and the `-v2` tags are in place from the day-one bump, and the generator's
-  default is `-v2`. **Swapping the bytes is one `cp` and one commit once JM confirms the
-  hash** — either by re-stating it, or by saying the file is right and the digest was
-  mis-transcribed.
+  - **SHA-1 `1f3aa8ba103ecc12721013d4970a009eb779cd0a`, 68,796 bytes, 1280×720 RGB** —
+    verified against the placed file *before* committing, per the §52.1 / slide-34 pattern.
+
+  **The cause: presentation re-encodes images.** A hash taken *before* presenting names
+  bytes that no longer exist by the time the file reaches Downloads. Recorded as a standing
+  convention in `SITE_GUIDE`'s custody section — take the digest **after** presenting, or
+  **ship the file inside a zip**, which is passed through unmodified. What does not change
+  is that a mismatch still stops the commit: the guard is the same whichever way the bytes
+  moved.
+
+  **The v2 URL had not been scraped**, which is why replacing its bytes in place was safe
+  and no v3 was needed — the day-one bump exists precisely because the **v1** URL was
+  poisoned by a pre-merge scrape (see above). Old files stay on disk per JM: `og-the-rundown.jpg`
+  (v1, poisoned URL) and the previous v2 encode is simply overwritten. Both `:alt` texts
+  name the new title, the `staticAssets` registration and the `-v2` tags were already in
+  place from the bump, and the generator's default stays `-v2`.
   **⏰ STILL TO DO, AND IT NEEDS JM'S ACCOUNT: resubmit the sitemap and request indexing**
   in Google Search Console (`NEW_PAGE_CHECKLIST §10`, publish-day habit; the standing sweep
   is `MONTHLY_REFRESH_CHECKLIST §9.5`). Nothing in this session can do it — it is the one
