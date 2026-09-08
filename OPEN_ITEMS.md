@@ -43,7 +43,7 @@ session automatically. Close items here when done; this file is the "what's cook
   **THE COUNSEL PASS IS DONE (2026-09-07) — formal counsel WAIVED for public listing.**
   The decision record is filed **verbatim** at the foot of this tracker, as
   *"Counsel decision record — The Rundown — 2026-09-07"*, on JM's instruction and with its
-  SHA1 verified at filing time (`21a67c9b…`). Headline: no registration attaches at any
+  SHA1 verified at filing time (`c4f19361…`). Headline: no registration attaches at any
   level (federal securities, federal commodities, state, BitLicense); the publisher
   exclusion is satisfied by the page's design rather than by disclaimer; the one live
   exposure is anti-fraud **accuracy**, which the register already governs, closed by five
@@ -93,30 +93,34 @@ session automatically. Close items here when done; this file is the "what's cook
     condition (plus the standard "what would break this" anchor the other conditional
     register lines already carry); the Coda's DCA item drops the "honest read" self-label;
     P1 states that it models bitcoin alone.
+  - **Counsel edit 1 — applied as an exact string, after JM resolved the host.** As first
+    written, edits 1 and 2 had **no target on the site**: edit 1 replaced "the line that
+    reads *not a registered investment advisor*" and no such line existed anywhere, and
+    edit 2 named an **"exploration ribbon"** that is not a component here (the site-wide
+    strip is the **Channel Ribbon**, `§40`, a barometer of live readings that
+    "before fees, spreads and taxes" does not describe; the Rundown's own `.rd-ribbon` is
+    page-local). Rather than guess a host for two boundary statements the counsel decision
+    rests on, the question went back to JM, who **folded edit 2 into edit 1** and put both
+    in **`components/tool-framing.njk`** — the collapsible "For exploration only" strip,
+    which is the site's actual disclaimer surface and renders on **28 pages**, the Rundown
+    among them. The record was reissued to match (see its edit 1, and edit 2 now reading
+    *folded into 1*), and the filed copy below was replaced from the reissued file. The
+    applied string was diffed back against the record: **byte-identical, 662 bytes.**
+    The strip is **extended, not replaced** — the three added clauses are the
+    fee/spread/tax basis, the no-registration line, and the computes-in-your-browser line,
+    which is the one doing the real work: the publisher exclusion is satisfied by what the
+    tools *do*, not by asserting it. A comment above the markup says so, because the
+    "commodity interests" list is a CEA term of art and reads like padding to anyone who
+    does not know that.
 
-  **OPEN, AND NEEDING JM — three things.**
+  **OPEN, AND NEEDING JM — two things, both found while working, neither ruled.**
 
-  1. **Counsel edits 1 and 2 are NOT applied: neither target string exists on the site.**
-     Edit 1 is written as a replacement for "the line that reads *not a registered
-     investment advisor*" — **there is no such line anywhere.** The site's actual site-wide
-     disclaimer is the collapsible tool-framing strip (`components/tool-framing.njk`, on 28
-     pages including the Rundown), which reads *"This tool is for educational and
-     informational purposes; nothing here is financial advice…"*; the footer carries **no**
-     disclaimer at all, only the copyright line; and the only "not an investment advisor"
-     phrasing on the site is a first-person sentence on `/work-with-me` about calls. Edit 2
-     is written for an **"exploration ribbon"**, and no component by that name exists: the
-     site-wide strip is the **Channel Ribbon** (`§40`), a barometer carrying a trend
-     multiple, a zone word and a spot price — figures that "before fees, spreads and taxes"
-     does not describe — while the Rundown's own **premise ribbon** (`.rd-ribbon`) is
-     page-local, which cuts against JM's note that both are site-wide strings. Since both
-     are boundary statements the counsel decision rests on, and both would go out across 28+
-     pages, the host is JM's call rather than a guess. **Nothing was invented for either.**
-  2. **A possible companion to edit 4, not named in the record.** The record's Q4 gives the
+  1. **A possible companion to edit 4, not named in the record.** The record's Q4 gives the
      self-labelling fix as *"honest read"*, and edit 4 fixes the Coda. The identical phrase
      also appears in **D2's register line** — *"a ladder begun today is the nearest honest
      read"* — which the record does not mention. Left as-is rather than silently widening a
      counsel-ruled edit list.
-  3. **A possible basis mislabel found on Discount-or-Premium while checking the
+  2. **A possible basis mislabel found on Discount-or-Premium while checking the
      vocabulary.** Its slider caption reads *"In the record, stretches below X trend took a
      median of ~M…"*, but the figures it prints (`rec.median`, `rec.max`) are the **sample**
      basis, not the episode basis. Calling sample-basis figures "stretches"/"episodes" is
@@ -124,6 +128,13 @@ session automatically. Close items here when done; this file is the "what's cook
      *a long episode contributes dozens of samples and counts once*). **Left unchanged** —
      it is a copy question about which basis the caption should name, not a vocabulary
      swap — and it is the one place the vocabulary change was deliberately not applied.
+     **Measured on the preview, which settles it:** at today's 0.51×, the episode row reads
+     **6 episodes, median 8 months**, while the slider caption reads **median ~9 months** —
+     the sample-basis figure, from **61 samples**. Renaming "stretches" to "episodes" there
+     would have printed "episodes … median ~9 months" directly above a row saying
+     "6 episodes … median 8 months", a visible contradiction on one screen. The Rundown's
+     A3 agrees with the *episode* row exactly (6 completed episodes, median 8 months), which
+     is the cross-page agreement the shared scan exists to guarantee.
 
   **Verification still to run, on the preview and then after the merge.** Each listing
   surface individually, the same discipline used to confirm the page was unlisted, run in
@@ -486,7 +497,7 @@ Remaining tail:
 
 _Filed into this tracker 2026-09-07 at the listing pass, on JM's instruction, as **the**
 counsel-decision record. Source file: `claude_COUNSEL_RECORD_THE_RUNDOWN_2026-09-07.md`
-(Downloads), SHA1 `21a67c9b50fcabe53078c6e144bf007823f81f2b` — verified against the file at
+(Downloads), SHA1 `c4f1936150e170f17808dc0b6139a781951863f6` — verified against the file at
 filing time. **Reproduced verbatim and not to be edited in place**: corrections or
 supersessions go in a dated note beneath, never into the text. Its five public-page edits
 are tracked against the listing pass in the in-flight item above._
@@ -548,13 +559,17 @@ advice: a decision-support pass so that the waiver below is made on findings, no
 
 ## Public-page edits — five, all boundary statements, no voice changes
 
-1. **Disclaimer sentence** (the line that reads "not a registered investment advisor"):
-   "…not a registered investment adviser, broker-dealer, or commodity trading advisor.
-   Everything here is educational and computes in your browser: it does not custody, transfer,
-   or execute transactions in bitcoin or any other asset, and it does not analyze or facilitate
-   transactions in commodity interests — futures, options, swaps, or margined or leveraged
-   positions."
-2. **Exploration ribbon**, one clause: "Figures are before fees, spreads and taxes."
+1. **Site disclaimer body** (`components/tool-framing.njk`, the collapsible "For
+   exploration only" strip on every tool page — extended, not replaced): "This tool is for
+   educational and informational purposes; nothing here is financial advice. Bitcoin involves
+   significant risk, including potential total loss. Figures are before fees, spreads and
+   taxes. Consult a qualified financial adviser before making decisions based on what you see
+   here. Last Coin Standing is not a registered investment adviser, broker-dealer, or
+   commodity trading advisor. Everything here computes in your browser: it does not custody,
+   transfer, or execute transactions in bitcoin or any other asset, and it does not analyze
+   or facilitate transactions in commodity interests — futures, options, swaps, or margined
+   or leveraged positions."
+2. *(folded into 1 — the "before fees, spreads and taxes" clause lives in the same body.)*
 3. **P2 register line:** "Shallow falls from here are close to arithmetic, so long as the
    floor holds: an entry near the floor has less room beneath it than one near the trend line.
    What would break this →"
