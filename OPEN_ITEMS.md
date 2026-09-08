@@ -157,6 +157,55 @@ session automatically. Close items here when done; this file is the "what's cook
        moving the caption to episodes is exactly the change that could have made that
        sentence false without anyone noticing. It now states the reach it measures.
 
+  **THE BRIEFING-SETUP CHIP — RULED AND FIXED, 2026-09-07, same branch before merge.**
+  Two defects, both JM's call, both verified on the preview.
+
+  1. **The chip went stale.** `renderSetupChip()` was called from `renderAll()` only, and
+     `renderAll()` does not run when the year, the income or the intent changes — those
+     handlers render the modules that depend on them and nothing else. A reader could set
+     **2040 / $250K / Raise cash**, collapse the panel, and be left reading a chip that
+     still said **2035 / $100K / Just looking** — the summary of their situation,
+     describing someone else's. It is now re-rendered from every control that can change
+     what it says: both sliders, the six intent chips, and the remember toggles.
+  2. **It was a one-way door.** "change ▾" opened the panel and the chip then vanished, so
+     there was no way back and no summary while editing. It is now a disclosure toggle —
+     **"change ▾" / "done ▴"** — with the chip visible in **both** states. The caret follows
+     `aria-expanded` in CSS and the word is set by the script from that same state, so the
+     two cannot disagree. Focus moves into the form on open and back to the chip on close,
+     so a keyboard reader is never stranded on an element that just became hidden.
+
+  **The state had to be made to survive a reload, which is what "same state" needs.** It
+  could not before: collapse was *derived* from whether the URL or the store had seeded a
+  value, so a reader who collapsed and reloaded got the panel back when nothing was seeded,
+  and one who **expanded** and reloaded had it collapse again. The panel's open/closed state
+  is now kept, deliberately apart from the value store:
+
+  - **sessionStorage, not localStorage** — it lasts a reload and dies with the tab, the same
+    lifetime the stack has, so collapsing a panel leaves nothing on the device.
+  - **Its own key** (`lcs.the-rundown.ui.v1`), so it can never be mistaken for a remembered
+    *value* and the per-field "remember on this device" toggles keep meaning what they say.
+  - **Cleared by "Clear everything"**, and neither that button nor a page load writes it
+    back — only a reader's own click does. So the button's promise (*nothing is left in this
+    browser's storage for this page*) stays literally true, and **a first visit still leaves
+    nothing behind**. Verified: before → `ui:"closed"`, `store:present`; after → both `null`.
+
+  A reader's own choice outranks the seeded rule; with no preference set the seeded rule is
+  unchanged, so a first visit still gets the panel rather than a chip.
+
+  **The retired "numbers they never chose" note was rewritten, not dropped.** That reasoning
+  belonged to the replace-the-panel design, where a chip standing **alone** read as a record
+  of the reader's choices. Sitting directly above the open panel it reads as a live summary
+  of the controls beneath it, which is what it now is. What survives is the part that still
+  holds: the panel still **opens** on a first visit and only starts collapsed when something
+  actually supplied a value.
+
+  **Verified on the preview**, in JM's order: chip tracked `2035 · $100K · Just looking` →
+  `2040 · …` → `… · $250K · …` → `… · Raising cash` live, one control at a time; three
+  toggle clicks round-tripped collapsed → expanded → collapsed with the right label, caret,
+  `aria-expanded` and focus each time; **reload while collapsed → collapsed**, and **reload
+  while expanded with values seeded from the URL → expanded** (the case that previously
+  forced a collapse). Tooltip audit re-run clean at 1280 / 768 / 375, no console errors.
+
   **Verification still to run, on the preview and then after the merge.** Each listing
   surface individually, the same discipline used to confirm the page was unlisted, run in
   reverse; `curl -I` on the OG image expecting **`Content-Type: image/jpeg`** (a `text/html`
