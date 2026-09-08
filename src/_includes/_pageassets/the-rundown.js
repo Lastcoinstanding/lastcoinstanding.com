@@ -629,7 +629,7 @@
      The engine returns nothing here, correctly: near trend there is no gap to
      close and a duration computed from one would be noise. JM's condition was
      that a permanent module never renders "nothing to show", so this identity
-     reports the LAST STRETCH EACH WAY, read from the same scan at the dead
+     reports the LAST EPISODE EACH WAY, read from the same scan at the dead
      band's own published edges (0.95× and 1.05×), plus the LONGEST on record
      either side. No new computation: those are the multiples at which
      Discount-or-Premium itself starts reporting. */
@@ -645,15 +645,15 @@
     setHTML('rdA3Q', 'Price is at trend. What has the record looked like either side?');
     setHTML('rdA3Verdict',
       'Price is <strong>at trend</strong> &mdash; neither a discount nor a premium. ' +
-      'There is no gap to close, so there is nothing to time. What the record has is the last stretch in each direction.');
+      'There is no gap to close, so there is nothing to time. What the record has is the last episode in each direction.');
 
     var list = [];
-    if (dLast) list.push({ k: 'Last stretch below ' + RD.NEAR_LO.toFixed(2) + '×',
+    if (dLast) list.push({ k: 'Last episode below ' + RD.NEAR_LO.toFixed(2) + '×',
       v: RD.fmtMonthsShort(dLast.months), sub: 'from ' + fmtMonthShort(dLast.entryD) + ' back to trend' });
-    if (pLast) list.push({ k: 'Last stretch above ' + RD.NEAR_HI.toFixed(2) + '×',
+    if (pLast) list.push({ k: 'Last episode above ' + RD.NEAR_HI.toFixed(2) + '×',
       v: RD.fmtMonthsShort(pLast.months), sub: 'from ' + fmtMonthShort(pLast.entryD) + ' back to trend' });
 
-    /* THIRD CARD — the longest stretch away from trend on record, either side.
+    /* THIRD CARD — the longest episode away from trend on record, either side.
        It replaces a "Last floor approach" card that restated the header, under
        JM's rule that no card in any state duplicates the header.
 
@@ -662,7 +662,7 @@
        "longest" marker, and the answer is the SAME episode at every multiple a
        reader can actually enter on this side of the dead band. Checked at
        0.94x, 0.93x and 0.90x below, and 1.06x, 1.07x and 1.10x above — the
-       longest is the identical stretch at all of them, so the card does not
+       longest is the identical episode at all of them, so the card does not
        depend on a multiple no one can type. `longestEp` is the episode basis,
        matching how this page counts everywhere else. */
     var longest = [lo.longestEp, hi.longestEp]
@@ -675,19 +675,19 @@
     }
     setHTML('rdA3Cards', cards(list));
     setHTML('rdA3Viz', '');
-    setHTML('rdA3Note', 'Each stretch is measured from the first sample past the band to the first sample back at trend.');
+    setHTML('rdA3Note', 'Each episode is measured from the first sample past the band to the first sample back at trend.');
     setHTML('rdA3Register', 'Historical, at this position &mdash; not a prediction. At trend the reversion record has nothing to say, which is itself the reading.');
     setHTML('rdA3Route', '<a class="rd-route" href="/discount-or-premium">Discount, or Premium? &rarr;</a>');
-    setHTML('rdA3Sources', '<strong>Sources.</strong> The shared reversion-duration scan, the same one <a href="/discount-or-premium">Discount, or Premium?</a> publishes its duration record from, read at the two edges of that page&rsquo;s own near-trend band &mdash; ' + RD.NEAR_LO.toFixed(2) + '&times; and ' + RD.NEAR_HI.toFixed(2) + '&times;. Inside that band neither page reports a duration, because there is no gap to measure; these are the nearest stretches on either side of it.' +
+    setHTML('rdA3Sources', '<strong>Sources.</strong> The shared reversion-duration scan, the same one <a href="/discount-or-premium">Discount, or Premium?</a> publishes its duration record from, read at the two edges of that page&rsquo;s own near-trend band &mdash; ' + RD.NEAR_LO.toFixed(2) + '&times; and ' + RD.NEAR_HI.toFixed(2) + '&times;. Inside that band neither page reports a duration, because there is no gap to measure; these are the nearest episodes on either side of it.' +
       (longest
-        ? ' The longest is that page&rsquo;s own longest stretch ' + (longBelow ? 'below' : 'above') +
+        ? ' The longest is that page&rsquo;s own longest episode ' + (longBelow ? 'below' : 'above') +
           ' trend, reproducible there at <a href="/discount-or-premium?mult=' + (longBelow ? '0.94' : '1.06') + '">' +
           (longBelow ? '0.94' : '1.06') + '&times;</a> &mdash; and at every other multiple on that side of the band, since it is the same episode at all of them.'
         : ''));
   }
 
   /* IDENTITY 3 of 3 — the reversion module, off the floor and off trend.
-     Two-sided by construction: below trend it reads stretches at or below
+     Two-sided by construction: below trend it reads episodes at or below
      this depth, above trend at or above it, and the only thing that changes
      is the direction word. */
   function renderReversion(visits, liveMult, spot, state) {
@@ -707,27 +707,27 @@
     var ongoing = rec.episodes.filter(function (e) { return e.ongoing; });
 
     if (!closed.length) {
-      // Structurally possible: every stretch at this depth is still open.
-      setHTML('rdA3Verdict', 'No stretch ' + dirWord + ' this depth has yet returned to trend, so the record has no completed duration to report from here.');
+      // Structurally possible: every episode at this depth is still open.
+      setHTML('rdA3Verdict', 'No episode ' + dirWord + ' this depth has yet returned to trend, so the record has no completed duration to report from here.');
       setHTML('rdA3Cards', '');
     } else {
       var med = closed.length % 2 ? closed[(closed.length - 1) / 2]
                                   : (closed[closed.length / 2 - 1] + closed[closed.length / 2]) / 2;
       var thin = closed.length < 3;   // the N<3 rule, counted in EPISODES
-      // "stretch" is this module's load-bearing noun and it is not
+      // "episode" is this module's load-bearing noun and it is not
       // self-explanatory — the tip defines it on first use (§6.13).
       /* The era clause is not padding. This module counts from 2010 and the
          header card counts from 2014, and both are correct: the reversion scan
          reads the whole price series, while the floor count deliberately drops
          the pre-2014 genesis era the way The Bitcoin Floor does. Two different
          year-counts on one screen look like an error unless the page says why. */
-      var stretchTip = tip('A continuous run of samples at or ' + (premium ? 'above' : 'below') +
+      var episodeTip = tip('A continuous run of samples at or ' + (premium ? 'above' : 'below') +
         ' today&rsquo;s multiple of trend, measured to the first sample back at trend. ' +
         'Runs more than about 100 days apart count as separate episodes. ' +
         'These count from <strong>2010</strong>, where the price series begins; the floor count above starts at ' +
         '<strong>2014</strong> because it drops bitcoin&rsquo;s pre-exchange era, as <a href="/the-bitcoin-floor">The Bitcoin Floor</a> does.');
       setHTML('rdA3Verdict',
-        '<strong>' + closed.length + '</strong> completed stretch' + (closed.length === 1 ? '' : 'es') + stretchTip +
+        '<strong>' + closed.length + '</strong> completed episode' + (closed.length === 1 ? '' : 's') + episodeTip +
         ' ' + dirWord + ' this depth since 2010. ' +
         (thin
           ? 'That is too few to read a spread from, so they are named rather than averaged: ' +
@@ -748,8 +748,8 @@
 
     setHTML('rdA3Viz', '');
     var notes = [];
-    if (rec.widened) notes.push('Too few completed stretches at exactly this depth, so the band was widened to ' + rec.band.toFixed(2) + '× to reach five &mdash; these describe that band, not today&rsquo;s multiple exactly.');
-    if (ongoing.length) notes.push('One stretch is still open, running ' + RD.fmtMonths(ongoing[0].months) + ' so far; it is excluded from the figures above because it has no end yet.');
+    if (rec.widened) notes.push('Too few completed episodes at exactly this depth, so the band was widened to ' + rec.band.toFixed(2) + '× to reach five &mdash; these describe that band, not today&rsquo;s multiple exactly.');
+    if (ongoing.length) notes.push('One episode is still open, running ' + RD.fmtMonths(ongoing[0].months) + ' so far; it is excluded from the figures above because it has no end yet.');
     /* The floor-approach note that stood here is GONE. It said "Last floor
        approach Jul 2026, the third since 2014" — which is now, word for word,
        the header card two screens up, since the round-two recast made the
@@ -758,7 +758,7 @@
        it had a live ordinal bug behind it: the phrasing hard-coded "third"
        and fell back to `n + 'th'`, so a first or second approach would have
        printed "1th" / "2th". The era difference this note used to gesture at
-       is now carried properly by the stretches tooltip, which explains why
+       is now carried properly by the episodes tooltip, which explains why
        this module counts from 2010 and the card from 2014, and links out. */
     setHTML('rdA3Note', notes.join(' '));
     setHTML('rdA3Register', 'A conditional projection, not a forecast: each card assumes price returns to trend by that date and states the trend price it would return to. Whether it returns, and when, is exactly what is not known. <a href="#what-would-break-this">What would break this &rarr;</a>');
@@ -903,7 +903,7 @@
   /* ═══════════════════════════════════════════════════════════
      D2 — all at once, or ladder in?   [RAW position — LSLI does not clamp]
      Carries the DCA question too (JM ruling 9): no position-conditioned DCA
-     engine exists, and a ladder started today is the nearest honest read.
+     engine exists, and a ladder started today is the closest available comparison.
      ═══════════════════════════════════════════════════════════ */
   /* LSLI's OWN DEFAULTS, and they are not the obvious ones: the era defaults to
      post-2020, not to the whole record. Reading this snack on the full record
@@ -973,12 +973,12 @@
       .toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
   }
   /* C2 — the reversion ticks. Marks on the reverts-by slider at how long
-     stretches at this depth actually took, from the same scan the position
+     episodes at this depth actually took, from the same scan the position
      module reads, so the reader can put the slider where the record has been
      rather than only where they guess.
 
      A tick outside the slider's 6–60 range is NAMED but not drawn. At today's
-     depth the fastest completed stretch is under six months, and the honest
+     depth the fastest completed episode is under six months, and the honest
      move is to say so rather than to widen a control past the range its
      canonical home offers. */
   var D3_MIN = 6, D3_MAX = 60;
@@ -1009,7 +1009,7 @@
               '<span class="rd-tick-lbl">' + k.lbl + ' · ' + RD.fmtMonthsShort(k.m) + '</span></span>';
     });
     html += '</div>';
-    var say = ['Where stretches at this depth actually ended.'];
+    var say = ['Where episodes at this depth actually ended.'];
     if (below.length) say.push('The ' + below.map(function (k) { return k.lbl; }).join(' and ') +
       ' (' + below.map(function (k) { return RD.fmtMonths(k.m); }).join(', ') +
       ') is shorter than this slider goes — it matches the range on Discount, or Premium?, and is not widened past it.');
@@ -1389,27 +1389,80 @@
     renderP1();
     renderP2(m);
   }
-
   /* ═══════════════════════════════════════════════════════════
-     B2 (C15) — the setup panel collapses to a summary once it has been told
-     something. "Told something" means the URL or the store carried a value on
-     THIS load, not that the sliders have defaults in them: a reader who has
-     never touched the panel should see the panel, not a chip reporting
-     numbers they never chose.
+     B2 (C15) — the setup panel and its summary chip.
 
-     The stack is deliberately absent from the chip even when entered. It is
-     session-only and never enters the URL or the store, so listing it beside
-     two remembered values would tell the reader it is held the same way. It
-     is not.
+     ORIGINALLY the chip REPLACED the panel: it appeared only once the URL or
+     the store had supplied a value, and it vanished again the moment the panel
+     opened. Two things were wrong with that and JM ruled both on 2026-09-07.
+
+     1. THE CHIP WENT STALE. It was rendered from `renderAll()` only, and
+        `renderAll()` does not run when the year, the income or the intent
+        changes — those handlers render the modules that depend on them and
+        nothing else. So a reader could set 2040 / $250K / Raise cash, collapse
+        the panel, and be shown a chip still reading 2035 / $100K / Just
+        looking. It is now re-rendered from every control that can change what
+        it says, which is why `renderSetupChip()` is called in each handler
+        rather than left to the render pass.
+
+     2. IT WAS A ONE-WAY DOOR. "change ▾" opened the panel and then the chip
+        disappeared, so there was no way back and no summary while editing. It
+        is now a proper disclosure toggle — "change ▾" / "done ▴" — and the
+        chip is visible in BOTH states, so the reader always has the summary
+        line whether or not the form is open.
+
+     The old note here said a reader who has never touched the panel should not
+     see a chip "reporting numbers they never chose". That reasoning belonged to
+     the replace-the-panel design: a chip standing ALONE reads as a record of
+     the reader's choices. A chip sitting directly above the open panel reads as
+     a live summary of the controls beneath it, which is what it now is. What
+     survives from that rule is the part that still matters: the panel still
+     OPENS on a first visit and only starts collapsed when the URL or the store
+     actually supplied a value.
+
+     THE STACK IS STILL DELIBERATELY ABSENT FROM THE CHIP even when entered. It
+     is session-only and never enters the URL or the store, so listing it beside
+     two remembered values would tell the reader it is held the same way. It is
+     not.
      ═══════════════════════════════════════════════════════════ */
   var setupSeeded = false;   // set by init() when the URL or store supplied a value
-  function setupOpen(open) {
+
+  /* Panel open/closed is UI state, not an answer the reader gave, so it is kept
+     apart from the value store on purpose:
+       - sessionStorage, not localStorage — it lasts a reload and dies with the
+         tab, the same lifetime the stack has, so collapsing the panel leaves
+         nothing behind on this device;
+       - its own key, so it can never be mistaken for a remembered VALUE, and so
+         the per-field "remember on this device" toggles keep meaning exactly
+         what they say;
+       - cleared by "Clear everything", so that button's promise — nothing left
+         in this browser's storage for this page — stays literally true. */
+  var UI_KEY = 'lcs.the-rundown.ui.v1';
+  function readSetupOpenPref() {
+    try {
+      var v = sessionStorage.getItem(UI_KEY);
+      return v === null ? null : v === 'open';
+    } catch (e) { return null; }   // private mode / storage off — behave as unset
+  }
+  function writeSetupOpenPref(open) {
+    try { sessionStorage.setItem(UI_KEY, open ? 'open' : 'closed'); } catch (e) {}
+  }
+  function clearSetupOpenPref() {
+    try { sessionStorage.removeItem(UI_KEY); } catch (e) {}
+  }
+
+  function setupOpen(open, remember) {
     var body = document.getElementById('rdSetupBody');
     var chip = document.getElementById('rdSetupChip');
     if (!body || !chip) return;
     body.hidden = !open;
-    chip.hidden = open;
+    chip.hidden = false;            // the summary stays put in both states
     chip.setAttribute('aria-expanded', open ? 'true' : 'false');
+    var act = chip.querySelector('.rd-chipsum-a');
+    // The caret is the CSS half of this pair (.rd-chipsum[aria-expanded]).
+    if (act) act.textContent = open ? 'done' : 'change';
+    chip.setAttribute('aria-label', (open ? 'Done — collapse' : 'Change') + ' your situation and your question');
+    if (remember !== false) writeSetupOpenPref(open);
   }
   function renderSetupChip() {
     var el = document.getElementById('rdSetupChipText');
@@ -1432,9 +1485,9 @@
 
   function wire() {
     var ry = document.getElementById('rdInYear');
-    if (ry) ry.addEventListener('input', function () { st.retirementYear = clampYear(ry.value); setText('rdYearOut', String(st.retirementYear)); renderP1(); saveState(); syncUrl(); });
+    if (ry) ry.addEventListener('input', function () { st.retirementYear = clampYear(ry.value); setText('rdYearOut', String(st.retirementYear)); renderP1(); renderSetupChip(); saveState(); syncUrl(); });
     var ti = document.getElementById('rdInIncome');
-    if (ti) ti.addEventListener('input', function () { st.targetIncomeUSD = clampIncome(ti.value); setText('rdIncomeOut', fmtUSDshort(st.targetIncomeUSD)); renderP1(); saveState(); syncUrl(); });
+    if (ti) ti.addEventListener('input', function () { st.targetIncomeUSD = clampIncome(ti.value); setText('rdIncomeOut', fmtUSDshort(st.targetIncomeUSD)); renderP1(); renderSetupChip(); saveState(); syncUrl(); });
     var sk = document.getElementById('rdInStack');
     if (sk) sk.addEventListener('input', function () {
       stackBTC = clampStack(sk.value);
@@ -1445,14 +1498,14 @@
     document.querySelectorAll('[data-remember]').forEach(function (t) {
       t.addEventListener('change', function () {
         st.remember[t.getAttribute('data-remember')] = t.checked;
-        saveState();
+        saveState(); renderSetupChip();
       });
     });
 
     document.querySelectorAll('.rd-chip').forEach(function (b) {
       b.addEventListener('click', function () {
         st.intent = b.getAttribute('data-intent-set');
-        applyIntent(); saveState(); syncUrl();
+        applyIntent(); renderSetupChip(); saveState(); syncUrl();
       });
     });
 
@@ -1467,7 +1520,8 @@
       // Nothing is set any more, so the panel comes back rather than leaving
       // a summary chip describing values the reader just cleared.
       setupSeeded = false;
-      setupOpen(true);
+      clearSetupOpenPref();
+      setupOpen(true, false);   // false: do not re-persist what we just cleared
       syncInputs(); applyIntent(); syncUrl(); renderAll();
       var say = document.getElementById('rdClearedNote');
       if (say) { say.hidden = false; setTimeout(function () { say.hidden = true; }, 4000); }
@@ -1512,12 +1566,17 @@
        needed is therefore no longer read by anything — it is left in the
        stylesheet as harmless documentation of the centring offset. */
 
-    // B2 — the summary chip reopens the panel it replaced.
+    /* B2 — the chip is the panel's disclosure toggle (JM, 2026-09-07). It used
+       to only reopen a panel it had replaced; now it opens AND closes, and it
+       stays on screen either way. Focus moves into the form on open, and back
+       to the chip on close, so a keyboard reader is never left on an element
+       that just became hidden. */
     var chip = document.getElementById('rdSetupChip');
     if (chip) chip.addEventListener('click', function () {
-      setupOpen(true);
-      var first = document.getElementById('rdInYear');
-      if (first) first.focus();
+      var open = chip.getAttribute('aria-expanded') === 'true';
+      setupOpen(!open);
+      if (open) { chip.focus(); }
+      else { var first = document.getElementById('rdInYear'); if (first) first.focus(); }
     });
   }
 
@@ -1526,14 +1585,22 @@
     var fromUrl = readUrl();
     var fromStore = false;
     if (!fromUrl) fromStore = loadState();
-    // B2: the panel starts collapsed only when something actually supplied a
-    // value on this load. Defaults sitting in the sliders are not an answer.
+    /* B2: the panel starts collapsed only when something actually supplied a
+       value on this load. Defaults sitting in the sliders are not an answer.
+
+       A panel the reader collapsed or expanded themselves OUTRANKS that, so a
+       reload lands on the state they left (JM, 2026-09-07). The preference is
+       tab-scoped, so this is a reload rule, not a permanent one — a fresh tab
+       falls back to the seeded rule below. Passing `false` means opening the
+       panel here does not itself write a preference: only a reader's own click
+       does, which keeps a first visit from leaving anything behind. */
     setupSeeded = !!(fromUrl || fromStore);
     syncInputs();
     setText('rdYearOut', String(st.retirementYear));
     wire();
     applyIntent();
-    setupOpen(!setupSeeded);
+    var pref = readSetupOpenPref();
+    setupOpen(pref === null ? !setupSeeded : pref, false);
     renderAll();
 
     if (typeof fetchTodayPrice === 'function') {

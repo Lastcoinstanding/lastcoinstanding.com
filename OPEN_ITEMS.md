@@ -11,7 +11,7 @@ session automatically. Close items here when done; this file is the "what's cook
 
 ## In flight (dated)
 
-- [ ] **THE RUNDOWN v2 — LIVE UNLISTED; REGISTER REVIEW COMPLETE, COUNSEL PASS NEXT.**
+- [ ] **THE RUNDOWN v2 — LISTING PASS EXECUTED ON ONE BRANCH; AWAITING JM'S MERGE.**
   Merged to production 2026-09-02 (PR #97, merge `fc773b6`) carrying v2 "The Briefing" and
   the site-wide unified floor-visit definition. **`/the-rundown` is live but unlisted** —
   `noindex, nofollow`, and absent from `sitemap.xml`, `llms.txt`, `explorations.json` and the
@@ -40,19 +40,192 @@ session automatically. Close items here when done; this file is the "what's cook
   **Register round three closed 2026-09-05 with no further edits** (JM). The register
   review is therefore complete.
 
-  **Gated on it, in order (amended 2026-09-05):** ~~register round two~~ →
-  ~~register round three~~ → the **counsel pass** → the **listing pass**, whose *step one*
-  is now merging the branch
-  `feat-sister-tabs-dashboard`. That branch is built, pushed and **ON HOLD by JM's ruling —
-  do not merge it before the counsel pass.** It is the first and only inbound link to
-  `/the-rundown`, so merging it is what makes the page reachable.
-  Preview: `https://feat-sister-tabs-dashboard.lastcoinstanding-com.pages.dev/dashboard`
+  **THE COUNSEL PASS IS DONE (2026-09-07) — formal counsel WAIVED for public listing.**
+  The decision record is filed **verbatim** at the foot of this tracker, as
+  *"Counsel decision record — The Rundown — 2026-09-07"*, on JM's instruction and with its
+  SHA1 verified at filing time (`c4f19361…`). Headline: no registration attaches at any
+  level (federal securities, federal commodities, state, BitLicense); the publisher
+  exclusion is satisfied by the page's design rather than by disclaimer; the one live
+  exposure is anti-fraud **accuracy**, which the register already governs, closed by five
+  boundary edits. Formal review is engaged at the first licensing engagement, where it is
+  needed regardless and is funded within that deal. The licensee-tier versioning spec in
+  that record is **not** applied to the public page and must not leak onto it.
+
+  **THE LISTING PASS IS EXECUTED, ON ONE BRANCH, AWAITING JM'S MERGE (2026-09-07).**
+  Branch `feat-rundown-listing`; `feat-sister-tabs-dashboard` was rebased onto main and
+  merged into it, so there is one branch and one preview, per JM. **The merge to main is
+  JM's.** Status of each item:
+
+  - **Steps 1–7 — done.** `noindex` and the preview guard deleted; the preview note and its
+    dead CSS rule removed (`rd-preview-note` greps to zero); registered in
+    `explorations.json` beside `discount-or-premium` in Models & Trends (array position is
+    dropdown position); no nav anchor added or wanted; `sitemap.xml`, `llms.txt` and
+    `updates.json` each carry one new entry, the `llms.txt` one written fresh; the OG card
+    image, its `staticAssets` registration and both tag blocks landed **in one commit**;
+    reciprocal `related:` entries with written `desc:` lines added to the seven siblings,
+    the Dashboard deliberately excluded.
+  - **Step 8 — done.** `feat-sister-tabs-dashboard` merged (rebased first). It is the first
+    and only inbound link, and the Dashboard tab points at `/the-rundown`, verified.
+  - **Step 9 — done.** `SITE_GUIDE §54` rewritten to the v2 page and retitled (it was
+    "UNLISTED PREVIEW"). The **[JM-3] routing-chip paragraph is struck**, the "Open at the
+    unlisted ship" list is rewritten as a shipped record, and the register-review history
+    and the counsel decision are folded in. Also corrected while there: §54's **"the page
+    takes zero user inputs"** claim, which was v1's structural guarantee and had gone false
+    — v2 takes three inputs plus a question, and the guarantee is now what they *do*
+    (browser-local, filter-only, never advice), which is the basis the counsel pass actually
+    tested the publisher exclusion against.
+  - **Step 10 — nothing to do.** Carousel slide stays ruled out; now recorded in §54 too, so
+    it is not re-opened from the guide either.
+  - **OG card — delivered and shipped, ahead of the note above.** The card *was* in
+    Downloads (`og-the-rundown.jpg`, plus its generator), and `OG_SPEC_THE_RUNDOWN.md` was
+    already in the repo — the "spec still needed" note was stale. Checked against the spec
+    before installing: 1280×720, RGB, 65,542 bytes (§2.1 target 60–100 KB), the four §3
+    strings exact, brand-forward with the bare textured ₿, and **no multiple, price, date or
+    count** (§11.9). The generator is committed as `build-og-the-rundown.py`, beside the
+    other `build-og-*.py` scripts, and it composites from `og-synthesis.jpg` — the template
+    the spec names, not `og-the-power-law.jpg`, which the spec explicitly warns against.
+  - **Vocabulary — done.** "stretches" → "episode(s)" on the Rundown, tooltip kept and now
+    defining the same noun. This makes the visible prose agree with the noun the page was
+    already computing in: the data model, the N<3 thinness rule and the sources lines all
+    counted in **episodes** already. Carried across to Discount-or-Premium, where "stretch"
+    was the visible synonym for the same thing. The one place it was first held back — the slider caption, which was on the sample basis — was ruled by JM the same day and is now on the episode basis with the markers beside it; see the rulings below.
+  - **Counsel edits 3, 4 and 5 — applied as exact strings.** P2 takes the floor-holds
+    condition (plus the standard "what would break this" anchor the other conditional
+    register lines already carry); the Coda's DCA item drops the "honest read" self-label;
+    P1 states that it models bitcoin alone.
+  - **Counsel edit 1 — applied as an exact string, after JM resolved the host.** As first
+    written, edits 1 and 2 had **no target on the site**: edit 1 replaced "the line that
+    reads *not a registered investment advisor*" and no such line existed anywhere, and
+    edit 2 named an **"exploration ribbon"** that is not a component here (the site-wide
+    strip is the **Channel Ribbon**, `§40`, a barometer of live readings that
+    "before fees, spreads and taxes" does not describe; the Rundown's own `.rd-ribbon` is
+    page-local). Rather than guess a host for two boundary statements the counsel decision
+    rests on, the question went back to JM, who **folded edit 2 into edit 1** and put both
+    in **`components/tool-framing.njk`** — the collapsible "For exploration only" strip,
+    which is the site's actual disclaimer surface and renders on **28 pages**, the Rundown
+    among them. The record was reissued to match (see its edit 1, and edit 2 now reading
+    *folded into 1*), and the filed copy below was replaced from the reissued file. The
+    applied string was diffed back against the record: **byte-identical, 662 bytes.**
+    The strip is **extended, not replaced** — the three added clauses are the
+    fee/spread/tax basis, the no-registration line, and the computes-in-your-browser line,
+    which is the one doing the real work: the publisher exclusion is satisfied by what the
+    tools *do*, not by asserting it. A comment above the markup says so, because the
+    "commodity interests" list is a CEA term of art and reads like padding to anyone who
+    does not know that.
+
+  **BOTH OPEN ITEMS RULED BY JM, 2026-09-07, on the same branch before merge.**
+  Each was found while executing the pass and neither was in the counsel record; both are
+  now closed, and the record itself is untouched — these sit beside it, not inside it.
+
+  1. **D2's register line takes the same fix as counsel edit 4 — RULED, applied.** The
+     record's Q4 named the *"honest read"* self-label as the fix but its edit 4 reached
+     only the Coda. The identical phrase was also in **D2's register line**; JM ruled the
+     same wording there: *"…a ladder begun today is the **closest available comparison**."*
+     Recorded beside edit 4 on JM's instruction, because the two are one fix applied in two
+     places, and a future reader comparing the page against the record would otherwise find
+     a string the record does not account for. **`"honest read"` now greps to zero across
+     `src/`** — the only surviving instance is a sentence in `updates.json` about a
+     *different* page (the Stress Test's "honest reading of a recovery"), which is a
+     historical entry in a different sense and is not touched.
+     D2's module header comment was updated in the same commit so the comment and the
+     register line it describes do not disagree.
+
+  2. **The Discount-or-Premium slider caption reads the EPISODE basis — RULED, applied.**
+     JM: read from the episode row, noun *"episodes"*, so the caption agrees with the row
+     beneath it; **the sample basis stays in its labelled row only.** Applied, and that last
+     clause turned out to reach further than the caption:
+     - **The slider markers had the same defect.** `fastest / median / longest` sat
+       immediately above the caption and also read `rec.median` / `rec.max` — the sample
+       basis. Fixing only the caption would have printed *median 8 months* in the caption
+       under a marker tooltip reading *median: ~9 months*, on one control. They are moved
+       to the episode basis too, which is what "sample basis in its labelled row only"
+       requires. **`rec.min/median/max` now appear in exactly two places: the labelled
+       sample row, and the `[dp-duration]` console QA line.**
+     - **Episode stats are hoisted out of the row's closure.** They lived inside the
+       episode row's own IIFE, which is *why* the markers and caption were left on the
+       sample basis — the episode numbers were not in scope where they were needed. Three
+       consumers now read one computation, so they cannot drift apart again.
+     - **The N<3 rule had to come with it.** The caption previously used samples, which are
+       always plentiful, so it never met the thinness rule. Episodes can be thin, and a
+       caption publishing a median off two episodes would break the site's own rule on the
+       page that owns it. Under three completed episodes the caption now names them and
+       says why, and the markers show one per episode rather than averaging a median into
+       existence. The zero-completed case is handled too.
+     - **The "all inside this slider's left half" clause is now computed, not asserted.**
+       It was a hardcoded claim. The longest *episode* can exceed the longest *sample* —
+       an episode is measured from its start, a sample from any point inside it — so
+       moving the caption to episodes is exactly the change that could have made that
+       sentence false without anyone noticing. It now states the reach it measures.
+
+  **THE BRIEFING-SETUP CHIP — RULED AND FIXED, 2026-09-07, same branch before merge.**
+  Two defects, both JM's call, both verified on the preview.
+
+  1. **The chip went stale.** `renderSetupChip()` was called from `renderAll()` only, and
+     `renderAll()` does not run when the year, the income or the intent changes — those
+     handlers render the modules that depend on them and nothing else. A reader could set
+     **2040 / $250K / Raise cash**, collapse the panel, and be left reading a chip that
+     still said **2035 / $100K / Just looking** — the summary of their situation,
+     describing someone else's. It is now re-rendered from every control that can change
+     what it says: both sliders, the six intent chips, and the remember toggles.
+  2. **It was a one-way door.** "change ▾" opened the panel and the chip then vanished, so
+     there was no way back and no summary while editing. It is now a disclosure toggle —
+     **"change ▾" / "done ▴"** — with the chip visible in **both** states. The caret follows
+     `aria-expanded` in CSS and the word is set by the script from that same state, so the
+     two cannot disagree. Focus moves into the form on open and back to the chip on close,
+     so a keyboard reader is never stranded on an element that just became hidden.
+
+  **The state had to be made to survive a reload, which is what "same state" needs.** It
+  could not before: collapse was *derived* from whether the URL or the store had seeded a
+  value, so a reader who collapsed and reloaded got the panel back when nothing was seeded,
+  and one who **expanded** and reloaded had it collapse again. The panel's open/closed state
+  is now kept, deliberately apart from the value store:
+
+  - **sessionStorage, not localStorage** — it lasts a reload and dies with the tab, the same
+    lifetime the stack has, so collapsing a panel leaves nothing on the device.
+  - **Its own key** (`lcs.the-rundown.ui.v1`), so it can never be mistaken for a remembered
+    *value* and the per-field "remember on this device" toggles keep meaning what they say.
+  - **Cleared by "Clear everything"**, and neither that button nor a page load writes it
+    back — only a reader's own click does. So the button's promise (*nothing is left in this
+    browser's storage for this page*) stays literally true, and **a first visit still leaves
+    nothing behind**. Verified: before → `ui:"closed"`, `store:present`; after → both `null`.
+
+  A reader's own choice outranks the seeded rule; with no preference set the seeded rule is
+  unchanged, so a first visit still gets the panel rather than a chip.
+
+  **The retired "numbers they never chose" note was rewritten, not dropped.** That reasoning
+  belonged to the replace-the-panel design, where a chip standing **alone** read as a record
+  of the reader's choices. Sitting directly above the open panel it reads as a live summary
+  of the controls beneath it, which is what it now is. What survives is the part that still
+  holds: the panel still **opens** on a first visit and only starts collapsed when something
+  actually supplied a value.
+
+  **Verified on the preview**, in JM's order: chip tracked `2035 · $100K · Just looking` →
+  `2040 · …` → `… · $250K · …` → `… · Raising cash` live, one control at a time; three
+  toggle clicks round-tripped collapsed → expanded → collapsed with the right label, caret,
+  `aria-expanded` and focus each time; **reload while collapsed → collapsed**, and **reload
+  while expanded with values seeded from the URL → expanded** (the case that previously
+  forced a collapse). Tooltip audit re-run clean at 1280 / 768 / 375, no console errors.
+
+  **Verification still to run, on the preview and then after the merge.** Each listing
+  surface individually, the same discipline used to confirm the page was unlisted, run in
+  reverse; `curl -I` on the OG image expecting **`Content-Type: image/jpeg`** (a `text/html`
+  at 200 is the phantom-200 failure); then resubmit the sitemap and request indexing
+  (`NEW_PAGE_CHECKLIST §10`). **No third-party scrape tests** — JM's instruction, and the
+  spec's sequencing note says the same.
+
+  **Gated on it, in order (amended 2026-09-05; all gates now cleared 2026-09-07):**
+  ~~register round two~~ → ~~register round three~~ → ~~the **counsel pass**~~ →
+  ~~the **listing pass**, whose *step one* is now merging the branch
+  `feat-sister-tabs-dashboard`~~. That branch was **rebased onto main and merged into
+  `feat-rundown-listing`** on 2026-09-07; the hold is lifted, its own preview is
+  superseded, and everything now rides on the one listing branch below. It is the first
+  and only inbound link to `/the-rundown`, so merging it is what makes the page reachable.
 
   ---
 
-  #### THE LISTING PASS — written out in full (2026-09-05) so the session is a paste
+  #### THE LISTING PASS — written out in full (2026-09-05); EXECUTED 2026-09-07 on `feat-rundown-listing`
 
-  **Do not start this before the counsel pass.** Everything below assumes it has cleared.
+  **The counsel pass has cleared, and this was executed on 2026-09-07** — kept below as written, because it is the record of what was specified as well as the instructions that were followed. Deviations and open items are listed in the execution record above; the one substantive addition JM made on the day was a set of page-content edits, which is why the last sentence of this paragraph no longer holds.
   The order matters in two places and is called out where it does; otherwise it is one
   commit's worth of work. **Nothing here is a page-content change** — the page ships as
   reviewed.
@@ -387,3 +560,146 @@ Remaining tail:
 - [x] **Discount, or Premium? — FULL LAUNCH** (2026-07-25).
 - [x] **Chart-copy export bug** (`b0919f5`); **SEO passes 1–2**; **robots.txt + AI-crawler policy**
   (`eccea6a`); **Bull & Bear carousel video** (2026-07-23/24).
+
+---
+
+## Counsel decision record — The Rundown — 2026-09-07 (filed verbatim)
+
+_Filed into this tracker 2026-09-07 at the listing pass, on JM's instruction, as **the**
+counsel-decision record. Source file: `claude_COUNSEL_RECORD_THE_RUNDOWN_2026-09-07.md`
+(Downloads), SHA1 `c4f1936150e170f17808dc0b6139a781951863f6` — verified against the file at
+filing time. **Reproduced verbatim and not to be edited in place**: corrections or
+supersessions go in a dated note beneath, never into the text. Its five public-page edits
+are tracked against the listing pass in the in-flight item above._
+
+# Counsel decision — The Rundown — 2026-09-07
+
+**Method.** Option (c): an internal pass against the project's own compliance reference
+(`claude_COMPLIANCE_REFERENCE_INTERACTIVE_TOOLS`) and claims report
+(`marketing-compliance-claims-report`), plus a 219-source public-rule corpus assembled in
+NotebookLM from six discovery queries, with the live page copy (`RUNDOWN_LIVE_COPY_2026-09-07`,
+all modules, all intents, all engine template branches) and `RUNDOWN_DESIGN_v2` §5/§8
+uploaded as sources. Nine scoped questions, then a citation audit of every authority relied
+on (13 of 13 present, with passages). Reviewed by JM with the drafting chat. Not legal
+advice: a decision-support pass so that the waiver below is made on findings, not by default.
+
+## Findings, by question
+
+- **Q1 Status.** Spot bitcoin is a non-security commodity (*In re Coinflip* 2015; *CFTC v.
+  McDonnell* and *CFTC v. My Big Coin Pay* 2018; SEC Chair statement 2024-01-10). The
+  Advisers Act and state adviser statutes reach *securities* only; the CTA definition (CEA
+  §1a(12)) reaches *commodity interests* only; *Taucher v. Born* protects impersonal
+  publishers under the First Amendment. No licence or registration attaches. Anti-fraud
+  authority over spot markets (CEA §6(c)(1); Reg. 180.1) still applies: **accuracy and
+  balance are the publisher's exposure.**
+- **Q2 Publisher exclusion.** *Lowe* factors satisfied: impersonal (inputs stay in the
+  browser; intent is a display filter; no recommendation), bona fide (no conflict), general
+  circulation. *Lingley v. Seeking Alpha* (S.D.N.Y. 2024): user-directed filters do not make
+  generally available content personal. Strained factor: the stack-conditional lines (P1, R1,
+  D3), mitigated because the underlying figure is identical for everyone and the
+  personalization is arithmetic on a number the reader typed. Public page keeps them;
+  licensee tier makes them removable.
+- **Q3 CTA.** No: spot only. Statutory publisher exclusion (CEA §1a(12)(B)(iv)) plus
+  *Taucher*. Standing fences recorded: no leveraged or margined purchases, no perpetuals, no
+  swaps. (The Collateral and Mortgage pages describe loans against holdings — not commodity
+  interests.)
+- **Q4 Anti-fraud strings.** One impression-level fix (the drawdown line assumed the floor
+  holds without saying so); one self-labelling fix ("honest read"). Verdict lines kept:
+  historical, accurate, with the register line adjacent. The "hit rate" string is a code
+  comment and never renders.
+- **Q5 Licensee lens.** The 2210(d)(1)(F)(i) "mathematical illustration" exception does *not*
+  apply (the page models a specific asset). The Investment Analysis Tool pathway (FINRA 2214;
+  SEC 206(4)-1(e)(8)) does, conditionally, for D3 and P1. The §5 conditional-projection
+  pattern maps onto both safe harbors. Spec below.
+- **Q6 DOL IB 96-1.** ERISA does not reach the publisher (no plan, no fee from plan assets).
+  For a licensee the retirement module is single-asset education, not an allocation model:
+  conditions (ii) and (iv) met, (i) strained by design, (iii) partial, (v) met by the new
+  "models bitcoin alone" line. Licensee wrapper below.
+- **Q7 State / BitLicense.** State adviser statutes are securities-only; state commodity
+  codes exempt spot with delivery; every BitLicense trigger (23 NYCRR 200.2(q)) is custody,
+  transmission, exchange, or issuance — none applies to a page that computes in the reader's
+  browser. (California DFAL software exemption discussed; citation not audited — verify
+  before external use.)
+- **Q8 Customary disclosure.** Gaps are licensee-tier (fee drag, SIPC/custody, universe
+  considered, actuarial block). The publisher's share is one clause ("before fees, spreads
+  and taxes"); the inflation basis is already specified on the page ("today's dollars").
+- **Q9 Synthesis.** **Low risk, with minor string updates.** Drivers: commodity status
+  removes registration; filter-only client-side design preserves the exclusion; the live
+  exposure is accuracy, which the register already governs.
+
+## Public-page edits — five, all boundary statements, no voice changes
+
+1. **Site disclaimer body** (`components/tool-framing.njk`, the collapsible "For
+   exploration only" strip on every tool page — extended, not replaced): "This tool is for
+   educational and informational purposes; nothing here is financial advice. Bitcoin involves
+   significant risk, including potential total loss. Figures are before fees, spreads and
+   taxes. Consult a qualified financial adviser before making decisions based on what you see
+   here. Last Coin Standing is not a registered investment adviser, broker-dealer, or
+   commodity trading advisor. Everything here computes in your browser: it does not custody,
+   transfer, or execute transactions in bitcoin or any other asset, and it does not analyze
+   or facilitate transactions in commodity interests — futures, options, swaps, or margined
+   or leveraged positions."
+2. *(folded into 1 — the "before fees, spreads and taxes" clause lives in the same body.)*
+3. **P2 register line:** "Shallow falls from here are close to arithmetic, so long as the
+   floor holds: an entry near the floor has less room beneath it than one near the trend line.
+   What would break this →"
+4. **Coda, DCA item:** "The ladder module above is the closest available comparison, not a
+   substitute for one."
+5. **P1**, one sentence: "This models bitcoin alone; your other assets and income sit outside
+   it."
+
+**Not adopted on the public page** (accurate voice, register-lined; licensee tier only):
+softened verdicts ("Waiting was almost always the wrong call here" stays); intent-selector
+legalese; "Plan retirement" relabel; SIPC/custody block; fee-drag paragraph; universe block.
+Rule applied throughout: *fix a misleading impression; keep an accurate voice.*
+
+## Licensee tier — versioning spec (never on the public page)
+
+- **Pathway:** Investment Analysis Tool — FINRA 2214 / SEC 206(4)-1(e)(8). Not the
+  mathematical-illustration exception.
+- **Verbatim disclosure** (2214(c)(4); 206(4)-1(e)(8)(A)(4)) in a prominent box at the
+  briefing header: "IMPORTANT: The projections or other information generated by this
+  interactive analysis tool regarding the likelihood of various investment outcomes are
+  hypothetical in nature, do not reflect actual investment results and are not guarantees of
+  future results."
+- **Methodology & universe block** (206(4)-1(e)(8)(A)(1)–(3); 2214(c)(1)–(3)): criteria and
+  methodology; results vary with each use and over time; bitcoin only, and other assets not
+  considered may have similar or superior characteristics.
+- **Fee note:** figures gross of fees; a firm's advisory/platform/custody fees compound and
+  reduce illustrated returns / raise the required stack — or run net of a configured fee.
+- **SIPC / custody line:** bitcoin is not a security and not SIPC-protected; custody risks
+  named; custodian identified.
+- **Retirement wrapper** (IB 96-1 customary): broader-picture statement; actuarial assumptions
+  stated (real dollars, 30-year horizon, growth-rate bounds); fiduciary carve-out; tax and
+  early-withdrawal note. Present as single-asset education, not an allocation model.
+- **Optional relabels:** softened verdict variants; intent-selector wording; stack-conditional
+  lines removable.
+- **Firm-side workflow:** registered-principal pre-use approval; Exchange Act 17a-4 /
+  Advisers Act 204-2 recordkeeping; 2214 filing with FINRA Advertising Regulation within 10
+  days of first use; audience-relevance policies for any hypothetical performance outside
+  the tool carve-out. Pending FINRA projection proposals (SR-FINRA-2023-016 stayed;
+  SR-FINRA-2026-004 proposed) are not relied on.
+
+## Decision
+
+**Formal counsel waived for public listing.** Reasons: no registration attaches at any
+level (federal securities, federal commodities, state, BitLicense); the publisher exclusion is
+satisfied by the page's design rather than by disclaimer; the one live exposure — anti-fraud
+accuracy — is governed by the site's register and closed by five boundary edits; every
+authority relied on was citation-audited. **Formal review engaged at the first licensing
+engagement**, where it is needed regardless (an exemptive-status opinion; B2B licensing
+agreements allocating liability and indemnity), and funded within that deal.
+
+Not carried into this record (asserted in the pass, not verified in the audit): the FINRA
+crypto retail-communications sweep figure; the DOL five-part-test effective date; DFAL/SB 97
+specifics.
+
+## Sources verified (citation audit, 2026-09-07 — all present in corpus with passages)
+
+*Lowe v. SEC*, 472 U.S. 181 (1985) · *Lingley v. Seeking Alpha* (S.D.N.Y. 2024; as
+summarized by Katten and Greenberg Traurig) · *Taucher v. Born* (D.D.C. 1999) · *In re
+Coinflip* (CFTC 2015) · *CFTC v. McDonnell* (E.D.N.Y. 2018) · *CFTC v. My Big Coin Pay*
+(D. Mass. 2018) · SEC Chair statement on spot bitcoin ETPs (2024-01-10) · SEC Marketing Rule
+sweep, nine advisers (2023-09-11) · 17 CFR 275.206(4)-1(e)(8) · FINRA Rules 2210(d)(1)(F) and
+2214 · SR-FINRA-2023-016 / SR-FINRA-2026-004 · DOL Interpretive Bulletin 96-1 · 23 NYCRR
+200.2(q).

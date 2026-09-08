@@ -1035,28 +1035,48 @@
        this is a rendering addition and not new computation. The episode row
        leads because its count says how much has actually happened; the sample
        count is an order of magnitude larger for the same record, which is what
-       made "65 completed" misleading on the Dashboard. */
+       made "65 completed" misleading on the Dashboard.
+
+       EPISODE STATS ARE HOISTED HERE (JM ruling, 2026-09-07) because three
+       things now read them — the episode row, the slider markers and the
+       slider caption — and computing them once is what stops those three
+       disagreeing. They previously lived inside the row's own closure, which
+       is why the markers and the caption were left reading `rec.median` /
+       `rec.max`: the SAMPLE basis. At 0.51× that published "median ~9 months"
+       on the slider directly above a row reading "6 episodes · median 8
+       months". Same record, two numbers, no label saying which was which.
+       The rule now: the sample basis appears in its own labelled row and
+       nowhere else. */
+    var epClosed = rec.episodes.filter(function (e) { return !e.ongoing; })
+                               .map(function (e) { return e.months; })
+                               .sort(function (a, b) { return a - b; });
+    var epN = epClosed.length;
+    var epMin = epN ? epClosed[0] : null;
+    var epMax = epN ? epClosed[epN - 1] : null;
+    var epMed = !epN ? null
+      : epN % 2 ? epClosed[(epN - 1) / 2]
+                : (epClosed[epN / 2 - 1] + epClosed[epN / 2]) / 2;
+    /* The N<3 rule, counted in episodes — the same rule the row applies and the
+       same one The Rundown applies. Below three, a median is a statistic with
+       the honesty removed, so the figures get named instead. */
+    var epThin = epN > 0 && epN < 3;
+
     (function () {
-      var epClosed = rec.episodes.filter(function (e) { return !e.ongoing; })
-                                 .map(function (e) { return e.months; })
-                                 .sort(function (a, b) { return a - b; });
       function figs(min, med, max) {
         return 'fastest <strong>' + fmtMo(min) + '</strong> &middot; median <strong>' + fmtMo(med) +
                '</strong> &middot; slowest <strong>' + fmtMo(max) + '</strong>';
       }
-      var epN = document.getElementById('dpDurEpN'), epF = document.getElementById('dpDurEpFigs');
+      var epNEl = document.getElementById('dpDurEpN'), epF = document.getElementById('dpDurEpFigs');
       var saN = document.getElementById('dpDurSaN'), saF = document.getElementById('dpDurSaFigs');
-      if (epClosed.length) {
-        var epMed = epClosed.length % 2 ? epClosed[(epClosed.length - 1) / 2]
-                                        : (epClosed[epClosed.length / 2 - 1] + epClosed[epClosed.length / 2]) / 2;
-        if (epN) epN.textContent = epClosed.length + (epClosed.length === 1 ? ' episode' : ' episodes');
-        if (epF) epF.innerHTML = epClosed.length < 3
-          // The N<3 rule: below three independent stretches, name them.
+      if (epN) {
+        if (epNEl) epNEl.textContent = epN + (epN === 1 ? ' episode' : ' episodes');
+        if (epF) epF.innerHTML = epThin
+          // The N<3 rule: below three independent episodes, name them.
           ? 'too few for a median &mdash; ' + epClosed.map(function (m) { return '<strong>' + fmtMo(m) + '</strong>'; }).join(' and ')
-          : figs(epClosed[0], epMed, epClosed[epClosed.length - 1]);
+          : figs(epMin, epMed, epMax);
       } else {
-        if (epN) epN.textContent = 'none completed';
-        if (epF) epF.textContent = 'every stretch at this depth is still open';
+        if (epNEl) epNEl.textContent = 'none completed';
+        if (epF) epF.textContent = 'every episode at this depth is still open';
       }
       if (saN) saN.textContent = rec.nCompleted + (rec.nCompleted === 1 ? ' sample' : ' samples');
       if (saF) saF.innerHTML = figs(rec.min, rec.median, rec.max);
@@ -1066,7 +1086,9 @@
       console.log('[dp-duration] band=' + rec.band.toFixed(2) + '× state=' + rec.state
         + ' samples=' + rec.nSamples + ' completed=' + rec.nCompleted + ' ongoing=' + (rec.hasOngoing ? 1 : 0)
         + ' min=' + rec.min.toFixed(1) + ' median=' + rec.median.toFixed(1) + ' max=' + rec.max.toFixed(1)
-        + ' episodes=' + rec.episodes.length + (rec.widened ? ' (band widened)' : ''));
+        + ' episodes=' + rec.episodes.length + ' closed=' + epN
+        + (epN ? ' epMedian=' + epMed.toFixed(1) + ' epMax=' + epMax.toFixed(1) : '')
+        + (rec.widened ? ' (band widened)' : ''));
     }
     durationLogged = true;
 
@@ -1078,9 +1100,15 @@
     // Values in range map to the 6–60mo track; a value below the floor (or above
     // the range) pins to the track edge with an off-scale glyph. Overlapping labels
     // stack onto a second row.
+    // EPISODE BASIS (JM, 2026-09-07), matching the caption below and the row
+    // beneath it. Under the N<3 rule there is no median to mark, so each episode
+    // gets its own marker instead of one being averaged into existence.
     if (marks) {
       marks.innerHTML = '';
-      [{ mo: rec.min, key: 'fastest' }, { mo: rec.median, key: 'median' }, { mo: rec.max, key: 'longest' }].forEach(function (d) {
+      var markSet = !epN ? []
+        : epThin ? epClosed.map(function (m, i) { return { mo: m, key: epN === 1 ? 'the one episode' : (i === 0 ? 'faster' : 'slower') }; })
+                 : [{ mo: epMin, key: 'fastest' }, { mo: epMed, key: 'median' }, { mo: epMax, key: 'longest' }];
+      markSet.forEach(function (d) {
         var below = d.mo < MIN_M, above = d.mo > MAX_M;
         var frac = below ? 0 : above ? 1 : (d.mo - MIN_M) / (MAX_M - MIN_M);
         var glyph = below ? '◂' : above ? '▸' : '';
@@ -1099,17 +1127,49 @@
     }
 
     // ── Slider caption ──
+    // EPISODE BASIS (JM, 2026-09-07): it reads from the episode row so it agrees
+    // with the row directly beneath it. The reach clause is computed rather than
+    // asserted — the longest EPISODE can exceed the longest sample, because an
+    // episode is measured from its start and a sample from any point inside it,
+    // so a hardcoded "inside the left half" is a claim that can go false.
     if (scap) {
-      var s = 'In the record, stretches ' + side + ' <strong>' + bandTxt + ' trend</strong> took a median of <strong>~'
-        + fmtMo(rec.median) + '</strong> to get ' + backTo + ', and at most <strong>~' + fmtMo(rec.max)
-        + '</strong> &mdash; all inside this slider&rsquo;s left half.';
-      if (rec.min < MIN_M) s += ' The fastest, ~' + fmtMo(rec.min) + ', was quicker than the slider&rsquo;s floor.';
+      var s;
+      if (!epN) {
+        s = 'No episode ' + side + ' <strong>' + bandTxt + ' trend</strong> has returned ' + backTo +
+            ' yet, so the record has no completed duration to report from here.';
+      } else {
+        var half = MIN_M + (MAX_M - MIN_M) / 2;
+        if (epThin) {
+          /* Thin: the durations are already named in the sentence, so the reach
+             is a sentence of its own — a second em-dash clause collides with the
+             "too few to read a median from" one — and the off-scale note is
+             dropped, because a value the reader can already see does not need
+             announcing a second time. The marker's own tooltip carries it. */
+          var oneEp = epN === 1;
+          var reachThin = epMax <= half ? (oneEp ? 'It sits' : 'Both sit') + ' inside this slider&rsquo;s left half.'
+                        : epMax <= MAX_M ? (oneEp ? 'It sits' : 'Both sit') + ' inside this slider&rsquo;s range.'
+                        : (oneEp ? 'It runs' : 'The longer of the two runs') + ' past the end of this slider.';
+          s = 'In the record, ' + (oneEp ? 'the one episode' : 'the two episodes') + ' ' + side +
+              ' <strong>' + bandTxt + ' trend</strong> took ' +
+              epClosed.map(function (m) { return '<strong>~' + fmtMo(m) + '</strong>'; }).join(' and ') +
+              ' to get ' + backTo + ' &mdash; too few to read a median from, so they are named rather than ' +
+              'averaged. ' + reachThin;
+        } else {
+          var reach = epMax <= half ? ' &mdash; all inside this slider&rsquo;s left half.'
+                    : epMax <= MAX_M ? ' &mdash; all inside this slider&rsquo;s range.'
+                    : ' &mdash; the longest runs past the end of this slider.';
+          s = 'In the record, episodes ' + side + ' <strong>' + bandTxt + ' trend</strong> took a median of <strong>~'
+            + fmtMo(epMed) + '</strong> to get ' + backTo + ', and at most <strong>~' + fmtMo(epMax)
+            + '</strong>' + reach;
+          if (epMin < MIN_M) s += ' The fastest, ~' + fmtMo(epMin) + ', was quicker than the slider&rsquo;s floor.';
+        }
+      }
       scap.innerHTML = s;
     }
 
     // ── Strip: one bar per episode on a 2010→now calendar axis ──
     var sub = document.getElementById('dpDurSub');
-    if (sub) sub.innerHTML = 'Every stretch the record spent ' + side + ' today&rsquo;s multiple ('
+    if (sub) sub.innerHTML = 'Every episode the record spent ' + side + ' today&rsquo;s multiple ('
       + bandTxt + ' trend), and how long until price was ' + backTo + '.';
 
     var track = document.getElementById('dpDurTrack');

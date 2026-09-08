@@ -868,9 +868,11 @@ A persistent "for exploration only" disclaimer applied to calculator pages and d
 
 **Wording (canonical).**
 
-> **For exploration only.** This tool is for educational and informational purposes; nothing here is financial advice. Bitcoin involves significant risk including potential total loss. Consult a qualified financial advisor before making decisions based on what you see here.
+> **For exploration only.** This tool is for educational and informational purposes; nothing here is financial advice. Bitcoin involves significant risk, including potential total loss. Figures are before fees, spreads and taxes. Consult a qualified financial adviser before making decisions based on what you see here. Last Coin Standing is not a registered investment adviser, broker-dealer, or commodity trading advisor. Everything here computes in your browser: it does not custody, transfer, or execute transactions in bitcoin or any other asset, and it does not analyze or facilitate transactions in commodity interests — futures, options, swaps, or margined or leveraged positions.
 
-The "Bitcoin involves significant risk including potential total loss" sentence is the most consequential — it explicitly names the downside in direct voice. Don't soften.
+**Extended 2026-09-07 by the counsel pass on The Rundown** (decision record filed verbatim in `OPEN_ITEMS.md`). Three clauses were added and **nothing was removed**: the fee/spread/tax basis, the no-registration line, and the computes-in-your-browser line. That last one is the load-bearing one — the publisher exclusion the whole site relies on is satisfied by what these tools *do* (client-side, impersonal, no execution, no commodity interests), so the sentence describes the architecture rather than asserting a conclusion. **"Commodity interests" is a CEA term of art** and the list after it — futures, options, swaps, margined or leveraged positions — is doing legal work, not padding. Because this strip is the site's one disclaimer surface, an edit here is an edit to **28 pages at once**: re-read this section and the comment in the component before touching the wording.
+
+The "Bitcoin involves significant risk, including potential total loss" sentence is the most consequential — it explicitly names the downside in direct voice. Don't soften.
 
 **Visual character.** Amber-tinted background and border (rgba ~0.04 / 0.18). Amber 3px left-edge accent on the expanded state. No red anywhere (per §3 color usage). Reads as "information affordance," not "alert banner."
 

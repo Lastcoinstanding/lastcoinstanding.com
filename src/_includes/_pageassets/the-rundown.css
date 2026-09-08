@@ -218,6 +218,13 @@ body { background: var(--bg); color: var(--text); }
 .rd-chipsum-v { flex: 1; }
 .rd-chipsum-a { font-size: 0.8rem; color: var(--amber); white-space: nowrap; }
 .rd-chipsum-a::after { content: ' ▾'; font-size: 0.8em; }
+/* The chip is a disclosure toggle, not a one-way "open the form" button, so the
+   caret follows aria-expanded rather than being fixed: ▾ to open, ▴ to close.
+   The word beside it ("change" / "done") is set by the script, and the two are
+   driven by the same state, so they cannot disagree. */
+.rd-chipsum[aria-expanded="true"] .rd-chipsum-a::after { content: ' ▴'; }
+/* Sits directly above the panel when expanded, so the pair reads as one unit. */
+.rd-chipsum[aria-expanded="true"] { border-bottom-left-radius: 0; border-bottom-right-radius: 0; margin-bottom: -1px; }
 
 /* ── B3 · the expectation line and the module counter ────── */
 .rd-expect {
@@ -492,7 +499,6 @@ body { background: var(--bg); color: var(--text); }
 .rd-snack .rd-note { font-size: 0.76rem; margin: 0 0 0.7rem; }
 /* This one carries its own border, so its BORDER edge is the module edge —
    it takes the gutter as a width reduction rather than as padding. */
-.rd-preview-note { max-width: var(--rd-w); width: calc(100% - var(--rd-gutter) * 2); margin: 3rem auto 0; border: 1px dashed var(--border-strong); border-radius: 10px; padding: 1rem 1.2rem; font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); }
 
 /* ── Mobile ──────────────────────────────────────────────── */
 /* No column-count breakpoint any more — the grid is one column everywhere. */

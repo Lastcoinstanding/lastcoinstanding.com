@@ -17,6 +17,8 @@ related:
     desc: "The same lens, pointed at a bitcoin-backed preferred against its $100 par instead of bitcoin against its trend. A low price is either opportunity or information &mdash; the sibling question, one instrument over."
   - slug: the-bitcoin-hurdle-rate
     desc: "The same channel position, turned into a capital decision. This page reads what returning to trend is worth; the Hurdle Rate makes that return the bar any use of capital has to clear, matched to the horizon &mdash; and its &ldquo;from today&rsquo;s price&rdquo; view is this reading applied to the bar."
+  - slug: the-rundown
+    desc: "The same distance from trend, read as a decision rather than a rate. This page answers what reverting would be worth at a horizon you choose; the Rundown takes that reading and asks what a position like this one has meant for the question you carry, module by module."
 faq:
   - q: "Is bitcoin at a discount or a premium right now?"
     a: "The page computes it live: bitcoin’s price divided by its long-run Power Law trend. Below 1.0× is a discount to trend, above is a premium — and the answer changes over time, which is why this page computes rather than asserts it."
@@ -168,18 +170,18 @@ eleventyComputed:
       {#- BOTH BASES, LABELLED (JM ruling, 2026-09-04). This page is the
           canonical home of the duration record, so it is the page that carries
           both populations rather than choosing one. The episode row leads: it
-          answers the question a reader arrives with — if a stretch started
+          answers the question a reader arrives with — if an episode started
           now, how long? — and its count is honest about how much independent
           evidence there is. The sample row is the finer-grained view.
 
           Each row carries its OWN count, because the counts are the whole
-          point: a long stretch contributes dozens of samples and one episode,
+          point: a long episode contributes dozens of samples and counts once,
           and a reader shown "65" without that context will read the record as
           ten times deeper than it is. -#}
       <div class="dp-dur-bases" id="dpDurBases" hidden>
         <div class="dp-dur-basis" id="dpDurBasisEpisodes">
           <div class="dp-dur-basis-head">
-            <span class="dp-dur-basis-name">From the start of a stretch</span>
+            <span class="dp-dur-basis-name">From the start of an episode</span>
             <span class="dp-dur-basis-n" id="dpDurEpN">&mdash;</span>
           </div>
           <div class="dp-dur-basis-figs" id="dpDurEpFigs">&mdash;</div>

@@ -15,7 +15,7 @@ related:
   - slug: lump-sum-or-ladder-in
     desc: "The lump-versus-ladder lesson in full: how the advantage curve moves across the channel, with the era and the ladder length under your control."
   - slug: discount-or-premium
-    desc: "The reversion window in full — the implied rate at any horizon you choose, the never-reverts path beside it, and the record of how long past stretches took."
+    desc: "The reversion window in full — the implied rate at any horizon you choose, the never-reverts path beside it, and the record of how long past episodes took."
   - slug: how-much-cash
     desc: "The same channel record read from the opposite side, with the split, the tax treatment and the rebuy target under your own hand."
   - slug: bitcoin-escape-velocity
@@ -179,7 +179,15 @@ eleventyComputed:
         the panel collapses to a one-line summary and the reader gets the page
         rather than the form. The stack is NEVER in the chip: it is
         session-only and never in the URL, so putting it in a persistent-
-        looking summary would misdescribe how it is held. -#}
+        looking summary would misdescribe how it is held.
+
+        The chip is the panel's DISCLOSURE TOGGLE (JM, 2026-09-07) — "change ▾"
+        to open, "done ▴" to close — and it stays on screen in both states, so
+        the reader keeps the summary line while editing. The caret follows
+        `aria-expanded` in CSS and the word is set by the script, from one
+        state, so the two cannot disagree. It starts `hidden` because without
+        the script there is nothing to toggle and the panel is simply open;
+        `setupOpen()` reveals it on init. -#}
     <button type="button" class="rd-chipsum" id="rdSetupChip" aria-expanded="false" aria-controls="rdSetupBody" hidden>
       <span class="rd-chipsum-v" id="rdSetupChipText"></span>
       <span class="rd-chipsum-a">change</span>
@@ -246,7 +254,7 @@ eleventyComputed:
       {#- ── A3 · THE POSITION MODULE — STATE-AWARE IN IDENTITY (C1) ──
           One permanent module, three identities, chosen by where price is:
             in a floor approach  → the floor-approach module (the timeline)
-            at trend (dead band) → the last-stretch-each-way module
+            at trend (dead band) → the last-episode-each-way module
             otherwise            → the reversion module
           Everything below the question line is written by the script, route
           and sources included, because those differ per identity. R2 was
@@ -302,7 +310,7 @@ eleventyComputed:
         <p class="rd-verdict" id="rdD2Verdict"></p>
         <div id="rdD2Cards"></div>
         <div class="rd-viz" id="rdD2Viz"></div>
-        <p class="rd-register">Historical, at this position &mdash; not a prediction. No engine conditions a DCA&rsquo;s <em>start date</em> on position; a ladder begun today is the nearest honest read.</p>
+        <p class="rd-register">Historical, at this position &mdash; not a prediction. No engine conditions a DCA&rsquo;s <em>start date</em> on position; a ladder begun today is the closest available comparison.</p>
         <p class="rd-route-line"><a class="rd-route" href="/lump-sum-or-ladder-in">Lump Sum or Ladder In &rarr;</a></p>
         <div class="rd-sources"><strong>Sources.</strong> The shared ladder-advantage module, the same one <a href="/lump-sum-or-ladder-in">Lump Sum or Ladder In</a> draws its curve from, at that page&rsquo;s own defaults &mdash; the <strong>post-2020 era</strong> and a ~1-year ladder &mdash; so these figures are what that page shows on arrival. Widen the era there and they move. Read on the unclamped channel position, because that page does not clamp. Its neighbourhood is a fixed &plusmn;0.075 of position and does not widen when thin, unlike the pooled engine above &mdash; two modules, two neighbourhoods, said here rather than assumed.</div>
       </article>
@@ -315,7 +323,7 @@ eleventyComputed:
         {#- C2: the reversion tick marks live on THIS slider, not A4's — the
             durations are months and A4's horizon is whole years. The range
             stays 6–60 to match Discount-or-Premium's own slider, so any
-            position set here reproduces there; a stretch shorter than six
+            position set here reproduces there; an episode shorter than six
             months is named in the ticks strip rather than made reachable,
             because widening this control past its canonical home would put
             the reader somewhere that page will not go. -#}
@@ -361,7 +369,7 @@ eleventyComputed:
         <div id="rdP1Cards"></div>
         <div class="rd-viz" id="rdP1Viz"></div>
         <p class="rd-note" id="rdP1Basis"></p>
-        <p class="rd-register">A conditional projection, not a forecast: each figure names the case it assumes, with the alternative beside it. <a href="#what-would-break-this">What would break this &rarr;</a></p>
+        <p class="rd-register">A conditional projection, not a forecast: each figure names the case it assumes, with the alternative beside it. This models bitcoin alone; your other assets and income sit outside it. <a href="#what-would-break-this">What would break this &rarr;</a></p>
         <p class="rd-route-line"><a class="rd-route" href="/bitcoin-escape-velocity">Bitcoin Escape Velocity &rarr;</a></p>
         <div class="rd-sources"><strong>Sources.</strong> The shared retirement engine&rsquo;s own threshold solver &mdash; the smallest stack whose real value stops falling for every year of the plan. <a href="/bitcoin-escape-velocity">Bitcoin Escape Velocity</a> is where it is published; the retirement flagship does not compute it. To reproduce these figures there, set the same year and income and switch the price basis to &ldquo;today&rsquo;s gap to trend persists&rdquo; for the first, or set the site-wide growth model to the floor case for the second. The horizon is fixed here at 30 years and is adjustable there.</div>
       </article>
@@ -372,7 +380,7 @@ eleventyComputed:
         <p class="rd-verdict" id="rdP2Verdict"></p>
         <div id="rdP2Cards"></div>
         <div class="rd-viz" id="rdP2Viz"></div>
-        <p class="rd-register">Historical, at this position &mdash; not a prediction. Shallow falls from here are close to arithmetic: an entry near the floor has less room beneath it than one near the trend line.</p>
+        <p class="rd-register">Historical, at this position &mdash; not a prediction. Shallow falls from here are close to arithmetic, so long as the floor holds: an entry near the floor has less room beneath it than one near the trend line. <a href="#what-would-break-this">What would break this &rarr;</a></p>
         <p class="rd-route-line"><a class="rd-route" href="/the-bitcoin-retirement-stress-test">The Retirement Stress Test &rarr;</a></p>
         <div class="rd-sources"><strong>Sources.</strong> The shared channel-entry engine &mdash; drawdown frequency, median depth and the never-fell share over a two-year forward window, matched on today&rsquo;s clamped position, 2014 onward. A &ldquo;drawdown&rdquo; here is a fall of 20% or more, and the window is two years; both are the engine&rsquo;s own constants. <a href="/the-bitcoin-retirement-stress-test">The Stress Test</a> is a what-if tool for a fall of a size you choose, not the source of these figures and not where they are checked.</div>
       </article>
@@ -385,7 +393,7 @@ eleventyComputed:
     <div class="rd-roadmap">
       <p>Modules appear when an engine exists to compute them from and their figures reproduce on the page that owns them. These do not exist yet, and a module that guessed would be worse than no module. The item bearing on your chosen question is marked.</p>
       <ul>
-        <li data-absent="dca"><strong>Whether to start a DCA now, on its own terms.</strong> <a href="/what-daily-conviction-bought">What Daily Conviction Bought</a> runs a DCA from a start date you choose, but nothing in it varies with where price sits in the channel. The ladder module above is the nearest honest read, not a substitute for one.</li>
+        <li data-absent="dca"><strong>Whether to start a DCA now, on its own terms.</strong> <a href="/what-daily-conviction-bought">What Daily Conviction Bought</a> runs a DCA from a start date you choose, but nothing in it varies with where price sits in the channel. The ladder module above is the closest available comparison, not a substitute for one.</li>
         <li data-absent="rebalance"><strong>What rebalancing from this position has historically done.</strong> The bands module above is a now-read: it says where the lines sit today. Asking whether triggering here has paid needs the protocol run from each historical entry in the zone, which no engine does.</li>
         <li data-absent="retire"><strong>Sequence risk conditioned on this position.</strong> The threshold module asks what a plan needs; it does not ask what starting a withdrawal plan from <em>this</em> position has meant for the order returns arrived in. That needs the withdrawal loop run from each historical entry in the zone &mdash; a real piece of work, and the most valuable of these three.</li>
         <li data-absent="cash"><strong>Selling for a reason that is not timing.</strong> Need, risk reduction and sticking to a plan are legitimate and none of them is a mistake. The record has no view on any of them, and a module built from it would be answering a question nobody asked.</li>
@@ -406,10 +414,5 @@ eleventyComputed:
       `faq:` and `related:` front matter — layout-level, not page-level. They
       are deliberately NOT included here; including them would render each
       twice. -#}
-
-  <!-- ═══ PREVIEW NOTE — REMOVE AT THE PRODUCTION PASS, WITH THE HEAD GUARD ═══ -->
-  <div class="rd-preview-note">
-    <strong>Unlisted preview.</strong> This page is shipped for register review and is not linked from anywhere on the site: it is absent from the navigation, the sitemap, the exploration registry and every related strip, and it carries a <code>noindex</code> directive. Public listing follows a second register pass and the counsel gate; its first step is the sister-tabs control on the Dashboard, which is built and held on its own branch.
-  </div>
 
 </div>
