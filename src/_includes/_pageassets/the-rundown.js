@@ -903,7 +903,7 @@
   /* ═══════════════════════════════════════════════════════════
      D2 — all at once, or ladder in?   [RAW position — LSLI does not clamp]
      Carries the DCA question too (JM ruling 9): no position-conditioned DCA
-     engine exists, and a ladder started today is the nearest honest read.
+     engine exists, and a ladder started today is the closest available comparison.
      ═══════════════════════════════════════════════════════════ */
   /* LSLI's OWN DEFAULTS, and they are not the obvious ones: the era defaults to
      post-2020, not to the whole record. Reading this snack on the full record

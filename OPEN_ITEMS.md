@@ -88,7 +88,7 @@ session automatically. Close items here when done; this file is the "what's cook
     defining the same noun. This makes the visible prose agree with the noun the page was
     already computing in: the data model, the N<3 thinness rule and the sources lines all
     counted in **episodes** already. Carried across to Discount-or-Premium, where "stretch"
-    was the visible synonym for the same thing — **with one deliberate exception**, below.
+    was the visible synonym for the same thing. The one place it was first held back — the slider caption, which was on the sample basis — was ruled by JM the same day and is now on the episode basis with the markers beside it; see the rulings below.
   - **Counsel edits 3, 4 and 5 — applied as exact strings.** P2 takes the floor-holds
     condition (plus the standard "what would break this" anchor the other conditional
     register lines already carry); the Coda's DCA item drops the "honest read" self-label;
@@ -113,28 +113,49 @@ session automatically. Close items here when done; this file is the "what's cook
     "commodity interests" list is a CEA term of art and reads like padding to anyone who
     does not know that.
 
-  **OPEN, AND NEEDING JM — two things, both found while working, neither ruled.**
+  **BOTH OPEN ITEMS RULED BY JM, 2026-09-07, on the same branch before merge.**
+  Each was found while executing the pass and neither was in the counsel record; both are
+  now closed, and the record itself is untouched — these sit beside it, not inside it.
 
-  1. **A possible companion to edit 4, not named in the record.** The record's Q4 gives the
-     self-labelling fix as *"honest read"*, and edit 4 fixes the Coda. The identical phrase
-     also appears in **D2's register line** — *"a ladder begun today is the nearest honest
-     read"* — which the record does not mention. Left as-is rather than silently widening a
-     counsel-ruled edit list.
-  2. **A possible basis mislabel found on Discount-or-Premium while checking the
-     vocabulary.** Its slider caption reads *"In the record, stretches below X trend took a
-     median of ~M…"*, but the figures it prints (`rec.median`, `rec.max`) are the **sample**
-     basis, not the episode basis. Calling sample-basis figures "stretches"/"episodes" is
-     exactly the conflation the two-basis block was built to prevent (JM ruling 2026-09-04:
-     *a long episode contributes dozens of samples and counts once*). **Left unchanged** —
-     it is a copy question about which basis the caption should name, not a vocabulary
-     swap — and it is the one place the vocabulary change was deliberately not applied.
-     **Measured on the preview, which settles it:** at today's 0.51×, the episode row reads
-     **6 episodes, median 8 months**, while the slider caption reads **median ~9 months** —
-     the sample-basis figure, from **61 samples**. Renaming "stretches" to "episodes" there
-     would have printed "episodes … median ~9 months" directly above a row saying
-     "6 episodes … median 8 months", a visible contradiction on one screen. The Rundown's
-     A3 agrees with the *episode* row exactly (6 completed episodes, median 8 months), which
-     is the cross-page agreement the shared scan exists to guarantee.
+  1. **D2's register line takes the same fix as counsel edit 4 — RULED, applied.** The
+     record's Q4 named the *"honest read"* self-label as the fix but its edit 4 reached
+     only the Coda. The identical phrase was also in **D2's register line**; JM ruled the
+     same wording there: *"…a ladder begun today is the **closest available comparison**."*
+     Recorded beside edit 4 on JM's instruction, because the two are one fix applied in two
+     places, and a future reader comparing the page against the record would otherwise find
+     a string the record does not account for. **`"honest read"` now greps to zero across
+     `src/`** — the only surviving instance is a sentence in `updates.json` about a
+     *different* page (the Stress Test's "honest reading of a recovery"), which is a
+     historical entry in a different sense and is not touched.
+     D2's module header comment was updated in the same commit so the comment and the
+     register line it describes do not disagree.
+
+  2. **The Discount-or-Premium slider caption reads the EPISODE basis — RULED, applied.**
+     JM: read from the episode row, noun *"episodes"*, so the caption agrees with the row
+     beneath it; **the sample basis stays in its labelled row only.** Applied, and that last
+     clause turned out to reach further than the caption:
+     - **The slider markers had the same defect.** `fastest / median / longest` sat
+       immediately above the caption and also read `rec.median` / `rec.max` — the sample
+       basis. Fixing only the caption would have printed *median 8 months* in the caption
+       under a marker tooltip reading *median: ~9 months*, on one control. They are moved
+       to the episode basis too, which is what "sample basis in its labelled row only"
+       requires. **`rec.min/median/max` now appear in exactly two places: the labelled
+       sample row, and the `[dp-duration]` console QA line.**
+     - **Episode stats are hoisted out of the row's closure.** They lived inside the
+       episode row's own IIFE, which is *why* the markers and caption were left on the
+       sample basis — the episode numbers were not in scope where they were needed. Three
+       consumers now read one computation, so they cannot drift apart again.
+     - **The N<3 rule had to come with it.** The caption previously used samples, which are
+       always plentiful, so it never met the thinness rule. Episodes can be thin, and a
+       caption publishing a median off two episodes would break the site's own rule on the
+       page that owns it. Under three completed episodes the caption now names them and
+       says why, and the markers show one per episode rather than averaging a median into
+       existence. The zero-completed case is handled too.
+     - **The "all inside this slider's left half" clause is now computed, not asserted.**
+       It was a hardcoded claim. The longest *episode* can exceed the longest *sample* —
+       an episode is measured from its start, a sample from any point inside it — so
+       moving the caption to episodes is exactly the change that could have made that
+       sentence false without anyone noticing. It now states the reach it measures.
 
   **Verification still to run, on the preview and then after the merge.** Each listing
   surface individually, the same discipline used to confirm the page was unlisted, run in
