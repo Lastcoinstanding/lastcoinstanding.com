@@ -11,7 +11,7 @@ session automatically. Close items here when done; this file is the "what's cook
 
 ## In flight (dated)
 
-- [ ] **THE RUNDOWN v2 — LISTING PASS EXECUTED ON ONE BRANCH; AWAITING JM'S MERGE.**
+- [x] **THE RUNDOWN v2 — PUBLICLY LISTED. MERGED TO PRODUCTION 2026-09-07** (`ada60b2`).
   Merged to production 2026-09-02 (PR #97, merge `fc773b6`) carrying v2 "The Briefing" and
   the site-wide unified floor-visit definition. **`/the-rundown` is live but unlisted** —
   `noindex, nofollow`, and absent from `sitemap.xml`, `llms.txt`, `explorations.json` and the
@@ -206,12 +206,30 @@ session automatically. Close items here when done; this file is the "what's cook
   while expanded with values seeded from the URL → expanded** (the case that previously
   forced a collapse). Tooltip audit re-run clean at 1280 / 768 / 375, no console errors.
 
-  **Verification still to run, on the preview and then after the merge.** Each listing
-  surface individually, the same discipline used to confirm the page was unlisted, run in
-  reverse; `curl -I` on the OG image expecting **`Content-Type: image/jpeg`** (a `text/html`
-  at 200 is the phantom-200 failure); then resubmit the sitemap and request indexing
-  (`NEW_PAGE_CHECKLIST §10`). **No third-party scrape tests** — JM's instruction, and the
-  spec's sequencing note says the same.
+  **Verified on production after the merge (2026-09-07).** Each listing surface
+  individually, the same discipline used to confirm the page was unlisted, run in reverse:
+  `noindex` gone; the preview note gone; **`curl -I` on the OG image returns
+  `Content-Type: image/jpeg`, 65,542 bytes** — the phantom-200 was real and is closed (that
+  URL served `200 text/html` right up to the merge); the page in `sitemap.xml`, `llms.txt`,
+  `updates.json`, and in the nav dropdown **between Discount-or-Premium and The Bitcoin
+  Floor**, which is the array position doing its job; reciprocal strips live on 7/7
+  siblings; the Dashboard carrying the sister-tab and still **no** related strip; the
+  extended disclaimer on **28/28** pages; all four counsel edit strings plus the D2
+  companion present; `[floor-qa] pass`; "stretch" gone from the rendered prose (the one
+  remaining hit in the HTML is the CSS value `align-self: stretch`).
+  `NEW_PAGE_CHECKLIST §10` ship checks: clean URL serves **200, not 308**; canonical and
+  `og:url` name the identical clean string; a bare visit writes **no URL params and no
+  storage**, checked past the async live-price render. The site-wide `.html`-href grep
+  prints 2, both **false positives** — they match the literal inside
+  `replace('.html', '')`, which is the filter that strips the extension.
+  **No third-party scrape tests were run** — JM's instruction, and the spec's sequencing
+  note says the same. `feat-sister-tabs-dashboard` deleted local and remote after the merge
+  (pre-rebase tip was `b0bc48f`, recorded here rather than lost).
+
+  **⏰ STILL TO DO, AND IT NEEDS JM'S ACCOUNT: resubmit the sitemap and request indexing**
+  in Google Search Console (`NEW_PAGE_CHECKLIST §10`, publish-day habit; the standing sweep
+  is `MONTHLY_REFRESH_CHECKLIST §9.5`). Nothing in this session can do it — it is the one
+  item of the pass that is not closed.
 
   **Gated on it, in order (amended 2026-09-05; all gates now cleared 2026-09-07):**
   ~~register round two~~ → ~~register round three~~ → ~~the **counsel pass**~~ →
