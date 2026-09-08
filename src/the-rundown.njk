@@ -179,7 +179,15 @@ eleventyComputed:
         the panel collapses to a one-line summary and the reader gets the page
         rather than the form. The stack is NEVER in the chip: it is
         session-only and never in the URL, so putting it in a persistent-
-        looking summary would misdescribe how it is held. -#}
+        looking summary would misdescribe how it is held.
+
+        The chip is the panel's DISCLOSURE TOGGLE (JM, 2026-09-07) — "change ▾"
+        to open, "done ▴" to close — and it stays on screen in both states, so
+        the reader keeps the summary line while editing. The caret follows
+        `aria-expanded` in CSS and the word is set by the script, from one
+        state, so the two cannot disagree. It starts `hidden` because without
+        the script there is nothing to toggle and the panel is simply open;
+        `setupOpen()` reveals it on init. -#}
     <button type="button" class="rd-chipsum" id="rdSetupChip" aria-expanded="false" aria-controls="rdSetupBody" hidden>
       <span class="rd-chipsum-v" id="rdSetupChipText"></span>
       <span class="rd-chipsum-a">change</span>
