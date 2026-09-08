@@ -83,6 +83,7 @@ module.exports = function (eleventyConfig) {
     'og-compare-retirement-plans.jpg',
     'og-compare-retirement-plans-v2.jpg',
     'og-bitcoin-retirement.jpg',
+    'og-the-rundown.jpg',
     // Gallery companion graphic (full-res PNG; scaled for display via CSS, full-res on click-through)
     'middle-seat-infographic.png',
     // Bitcoin Defined illustrations (1280x720). Eight Grok-generated

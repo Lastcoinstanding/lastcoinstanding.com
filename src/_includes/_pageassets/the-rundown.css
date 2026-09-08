@@ -492,7 +492,6 @@ body { background: var(--bg); color: var(--text); }
 .rd-snack .rd-note { font-size: 0.76rem; margin: 0 0 0.7rem; }
 /* This one carries its own border, so its BORDER edge is the module edge —
    it takes the gutter as a width reduction rather than as padding. */
-.rd-preview-note { max-width: var(--rd-w); width: calc(100% - var(--rd-gutter) * 2); margin: 3rem auto 0; border: 1px dashed var(--border-strong); border-radius: 10px; padding: 1rem 1.2rem; font-family: var(--font-b); font-size: 0.82rem; color: var(--text-dim); }
 
 /* ── Mobile ──────────────────────────────────────────────── */
 /* No column-count breakpoint any more — the grid is one column everywhere. */

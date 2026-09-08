@@ -9,27 +9,6 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WNGLLPPR5M"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-WNGLLPPR5M');</script>
 
-<!-- ═══ PREVIEW GUARD — REMOVE AT THE PRODUCTION PASS ═══
-     RUNDOWN_DESIGN §9 [JM-6]: this page ships UNLISTED for JM's register
-     review — absent from explorations.json, sitemap.xml, llms.txt, the
-     homepage, the nav and every related strip. The robots directive is the
-     belt to that braces: nothing links here, but a preview URL pasted into a
-     chat, or a crawler that finds the branch deployment, must not index it.
-     Delete this block (and only this block) in the production pass, together
-     with the preview note at the foot of the page body.
-
-     Public listing only on JM's word, and the gate order is: register round
-     two -> the counsel gate -> the listing pass. STEP ONE of that listing
-     pass is merging the branch `feat-sister-tabs-dashboard`, which is built,
-     pushed and HELD — it carries the first and only inbound link to this
-     page, so merging it is what makes this page reachable at all.
-
-     The [JM-3] dashboard routing chip is RETIRED, superseded by that
-     sister-tabs control (JM, 2026-09-04). RUNDOWN_DESIGN still records the
-     JM-3 ruling as history; nothing should be built from it. OPEN_ITEMS
-     carries the live version of all of this. -->
-<meta name="robots" content="noindex, nofollow">
-
 <!-- §11: the <title> and meta description stay STATIC and register-canonical.
      No live figure reaches them, and none reaches the OG card either — a
      baked number goes stale in scraper caches the day it ships. -->
@@ -44,18 +23,24 @@
 <meta name="twitter:title" content="The Rundown — What This Position Has Meant for Your Situation">
 <meta name="twitter:description" content="The dashboard is the glance and the gallery is the record. This is the briefing: where bitcoin sits in its channel, read against your situation and your question — with the record's thinness stated plainly.">
 
-<!-- OG IMAGE — DEFERRED TO THE PRODUCTION PASS.
-     No og:image / twitter:image tag is wired yet, deliberately: a tag
-     pointing at a file that does not exist is worse than no tag, because
-     scrapers cache the 404. The card is a handback item (no image tooling on
-     the authoring machine — HURDLE_RATE precedent, SITE_GUIDE §45 open
-     items). At generation: register in .eleventy.js staticAssets, add the two
-     tags with real alt text, and run the §52.1 watchlist check.
+<!-- OG IMAGE — brand-forward, wired at the listing pass 2026-09-07
+     (OG_SPEC_THE_RUNDOWN.md §4). The image landed at the repo root and was
+     registered in the .eleventy.js staticAssets array in the SAME commit as
+     these tags: without that registration Cloudflare serves this page's HTML
+     at the image URL with a 200 and the card breaks everywhere with no build
+     error (§6.15.3), so the two halves never separate.
 
-     THERE IS NO HERO SELECTOR, and the line that used to name one here has
-     been removed. It read "the position strip + first visit card" and was
-     written before §11.9 was ruled — it described a PRODUCT-FORWARD capture,
-     which this page is forbidden. Every candidate hero on this page is made
-     of live figures, and §11.9 bars live figures from the card outright, so
-     the card is brand-forward (§6.15.1): composited by the Pillow generator,
-     never screenshotted. Full spec in OG_SPEC_THE_RUNDOWN.md. -->
+     THERE IS NO HERO SELECTOR and nothing here is screenshotted. Every
+     candidate hero on this page is made of live figures, and §11.9 bars live
+     figures from the card outright — so the card is brand-forward (§6.15.1),
+     composited by the Pillow generator (build-og-the-rundown.py) from a
+     procedural left half and the right half of og-synthesis.jpg. It carries
+     no multiple, price, date or count, which is also what keeps this page's
+     §1 fence intact: the card adds zero lines to the refresh checklist. -->
+<meta property="og:image" content="https://lastcoinstanding.com/og-the-rundown.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="720">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:alt" content="The Rundown — what this position in bitcoin's long-run channel has meant for your situation.">
+<meta name="twitter:image" content="https://lastcoinstanding.com/og-the-rundown.jpg">
+<meta name="twitter:image:alt" content="The Rundown — what bitcoin's position in its long-run channel has meant, decision by decision.">

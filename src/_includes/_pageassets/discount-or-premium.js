@@ -1051,12 +1051,12 @@
                                         : (epClosed[epClosed.length / 2 - 1] + epClosed[epClosed.length / 2]) / 2;
         if (epN) epN.textContent = epClosed.length + (epClosed.length === 1 ? ' episode' : ' episodes');
         if (epF) epF.innerHTML = epClosed.length < 3
-          // The N<3 rule: below three independent stretches, name them.
+          // The N<3 rule: below three independent episodes, name them.
           ? 'too few for a median &mdash; ' + epClosed.map(function (m) { return '<strong>' + fmtMo(m) + '</strong>'; }).join(' and ')
           : figs(epClosed[0], epMed, epClosed[epClosed.length - 1]);
       } else {
         if (epN) epN.textContent = 'none completed';
-        if (epF) epF.textContent = 'every stretch at this depth is still open';
+        if (epF) epF.textContent = 'every episode at this depth is still open';
       }
       if (saN) saN.textContent = rec.nCompleted + (rec.nCompleted === 1 ? ' sample' : ' samples');
       if (saF) saF.innerHTML = figs(rec.min, rec.median, rec.max);
@@ -1109,7 +1109,7 @@
 
     // ── Strip: one bar per episode on a 2010→now calendar axis ──
     var sub = document.getElementById('dpDurSub');
-    if (sub) sub.innerHTML = 'Every stretch the record spent ' + side + ' today&rsquo;s multiple ('
+    if (sub) sub.innerHTML = 'Every episode the record spent ' + side + ' today&rsquo;s multiple ('
       + bandTxt + ' trend), and how long until price was ' + backTo + '.';
 
     var track = document.getElementById('dpDurTrack');
