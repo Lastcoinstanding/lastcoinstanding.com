@@ -1139,20 +1139,30 @@
             ' yet, so the record has no completed duration to report from here.';
       } else {
         var half = MIN_M + (MAX_M - MIN_M) / 2;
-        var reach = epMax <= half ? ' &mdash; all inside this slider&rsquo;s left half.'
-                  : epMax <= MAX_M ? ' &mdash; all inside this slider&rsquo;s range.'
-                  : ' &mdash; the longest runs past the end of this slider.';
         if (epThin) {
-          s = 'In the record, ' + (epN === 1 ? 'the one episode' : 'the two episodes') + ' ' + side +
+          /* Thin: the durations are already named in the sentence, so the reach
+             is a sentence of its own — a second em-dash clause collides with the
+             "too few to read a median from" one — and the off-scale note is
+             dropped, because a value the reader can already see does not need
+             announcing a second time. The marker's own tooltip carries it. */
+          var oneEp = epN === 1;
+          var reachThin = epMax <= half ? (oneEp ? 'It sits' : 'Both sit') + ' inside this slider&rsquo;s left half.'
+                        : epMax <= MAX_M ? (oneEp ? 'It sits' : 'Both sit') + ' inside this slider&rsquo;s range.'
+                        : (oneEp ? 'It runs' : 'The longer of the two runs') + ' past the end of this slider.';
+          s = 'In the record, ' + (oneEp ? 'the one episode' : 'the two episodes') + ' ' + side +
               ' <strong>' + bandTxt + ' trend</strong> took ' +
               epClosed.map(function (m) { return '<strong>~' + fmtMo(m) + '</strong>'; }).join(' and ') +
-              ' to get ' + backTo + ' — too few to read a median from, so they are named' + reach;
+              ' to get ' + backTo + ' &mdash; too few to read a median from, so they are named rather than ' +
+              'averaged. ' + reachThin;
         } else {
+          var reach = epMax <= half ? ' &mdash; all inside this slider&rsquo;s left half.'
+                    : epMax <= MAX_M ? ' &mdash; all inside this slider&rsquo;s range.'
+                    : ' &mdash; the longest runs past the end of this slider.';
           s = 'In the record, episodes ' + side + ' <strong>' + bandTxt + ' trend</strong> took a median of <strong>~'
             + fmtMo(epMed) + '</strong> to get ' + backTo + ', and at most <strong>~' + fmtMo(epMax)
             + '</strong>' + reach;
+          if (epMin < MIN_M) s += ' The fastest, ~' + fmtMo(epMin) + ', was quicker than the slider&rsquo;s floor.';
         }
-        if (epMin < MIN_M) s += ' The fastest, ~' + fmtMo(epMin) + ', was quicker than the slider&rsquo;s floor.';
       }
       scap.innerHTML = s;
     }
