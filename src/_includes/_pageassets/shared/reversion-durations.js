@@ -1,5 +1,5 @@
 /* =============================================================
-   shared/reversion-durations.js — how long stretches like today's have lasted
+   shared/reversion-durations.js — how long episodes like today’s have lasted
 
    EXTRACTED FROM `discount-or-premium.js` (2026-09-01, Rundown v2 Phase 2b,
    JM ruling 3: the source page adopts the extracted component back so there is
@@ -11,7 +11,7 @@
    Pure — no DOM, no page state. Exposes window.ReversionDurations.
 
    ── WHAT IT MEASURES ──
-   Given today's multiple of trend, it reports what stretches AT (discount) or
+   Given today's multiple of trend, it reports what episodes AT (discount) or
    BEYOND (premium) that depth actually took to get back to trend. Two-sided by
    construction: the only thing that changes between the discount and premium
    cases is the direction of the comparison, which is why there is no branching
@@ -20,7 +20,7 @@
    ── THE THREE BEHAVIOURS A CONSUMER MUST HANDLE ──
 
    1. THE DEAD BAND. Inside 0.95x-1.05x the module returns {state:'hidden'} and
-      says nothing. Price near trend has no "stretch like this" to measure, and
+      says nothing. Price near trend has no "episode like this" to measure, and
       a number computed there would be noise dressed as a finding. A consumer
       MUST render an empty state rather than assume a record comes back.
 
@@ -110,7 +110,7 @@
      comparisons and rate arithmetic all continue to use the unrounded months.
 
      The sub-month guard is Discount-or-Premium's, carried over: rounding a
-     0.4-month stretch to "0 months" is worse than the decimal it replaces. */
+     0.4-month episode to "0 months" is worse than the decimal it replaces. */
   function fmtMonths(v) {
     if (!isFinite(v)) return '—';
     if (v < 1) return 'under a month';
