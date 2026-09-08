@@ -10,7 +10,10 @@ W, H = 1280, 720
 BASE = (0x10, 0x0D, 0x0A)
 FONT_DIR = "/root/.fonts/"
 TEMPLATE = sys.argv[1] if len(sys.argv) > 1 else None
-OUT = sys.argv[2] if len(sys.argv) > 2 else "og-the-rundown.jpg"
+# Default bumped to -v2 2026-09-07: that is the file the page actually wires, and a
+# re-run that quietly wrote the v1 name would leave the live card untouched.
+# Override with argv[2] if you ever need the v1 name back.
+OUT = sys.argv[2] if len(sys.argv) > 2 else "og-the-rundown-v2.jpg"
 SEED = 20260907  # fresh per card (§2.3)
 random.seed(SEED)
 

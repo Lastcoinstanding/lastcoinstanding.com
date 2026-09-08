@@ -72,7 +72,7 @@ checklist. A product-forward card would break that fence on its first day.
 | Quality | `quality=82` |
 | Encoder flags | `optimize=True, progressive=True` |
 | Target file size | 60–100 KB |
-| Filename | `og-the-rundown.jpg` |
+| Filename | `og-the-rundown.jpg` — **superseded 2026-09-07 by `og-the-rundown-v2.jpg`**, same encode, new URL to escape a poisoned LinkedIn image cache; see `OPEN_ITEMS.md` |
 | Location | **repo root**, not `src/` — see §4 |
 
 ### 2.2 The composite source — get this one right

@@ -36,11 +36,30 @@
      composited by the Pillow generator (build-og-the-rundown.py) from a
      procedural left half and the right half of og-synthesis.jpg. It carries
      no multiple, price, date or count, which is also what keeps this page's
-     §1 fence intact: the card adds zero lines to the refresh checklist. -->
-<meta property="og:image" content="https://lastcoinstanding.com/og-the-rundown.jpg">
+     §1 fence intact: the card adds zero lines to the refresh checklist.
+
+     -v2 ON DAY ONE, AND FOR A DIFFERENT REASON THAN §52.1'S (2026-09-07).
+     The v1 file is FINE — byte-identical to this one. What went wrong is
+     outside the repo: LinkedIn scraped /og-the-rundown.jpg BEFORE the merge,
+     when that path still served the page's own HTML at a 200 (the phantom-200
+     §6.15.3 warns about), and cached the HTML as that URL's image. Its image
+     cache does not refresh when the page is re-scraped, so the poisoned entry
+     survives every fix made at the page level. The filename bump is the only
+     lever that reaches it: a new URL has no cache entry. Note that ?cb= would
+     NOT work — it creates a second entry against the same URL instead of
+     replacing it (§52.1).
+
+     So this is a bump caused by a SCRAPE TAKEN TOO EARLY, not by a card gone
+     stale against its page. The alt texts below are therefore deliberately
+     UNCHANGED: the image is the same image, and the compare-retirement-plans
+     bump rewrote its alts only because that page's title had changed.
+     v1 stays in the repo and stays registered, per §52.1 — anything that
+     scraped it correctly keeps resolving. -->
+
+<meta property="og:image" content="https://lastcoinstanding.com/og-the-rundown-v2.jpg">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="720">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:alt" content="The Rundown — what this position in bitcoin's long-run channel has meant for your situation.">
-<meta name="twitter:image" content="https://lastcoinstanding.com/og-the-rundown.jpg">
+<meta name="twitter:image" content="https://lastcoinstanding.com/og-the-rundown-v2.jpg">
 <meta name="twitter:image:alt" content="The Rundown — what bitcoin's position in its long-run channel has meant, decision by decision.">

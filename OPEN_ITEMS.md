@@ -226,6 +226,47 @@ session automatically. Close items here when done; this file is the "what's cook
   note says the same. `feat-sister-tabs-dashboard` deleted local and remote after the merge
   (pre-rebase tip was `b0bc48f`, recorded here rather than lost).
 
+
+  **THE OG CARD IS `-v2` ON DAY ONE — and for a reason §52.1 does not yet cover
+  (JM, 2026-09-07, after the merge).** Worth reading before anyone concludes the card
+  shipped broken. **It did not: `og-the-rundown-v2.jpg` is byte-identical to v1**
+  (SHA-1 `589c7099800e14c87255a09bc6b43b4d332dc2ce`, 65,542 bytes, 1280×720). Nothing was
+  recut and nothing about the image changed.
+
+  **What actually happened is outside the repo.** LinkedIn scraped
+  `/og-the-rundown.jpg` **before the merge** — while the page was still unlisted and that
+  path still served the page's own HTML at a **200**, which is exactly the phantom-200 the
+  spec and `§6.15.3` warn about. It cached that HTML as the URL's *image*. Once the merge
+  landed, the path started serving a real `image/jpeg` — verified — but **a social
+  platform's image cache does not refresh because the page was re-scraped.** The poisoned
+  entry outlives every fix made at the page level, so the URL had to change.
+
+  **The filename bump is the mechanism, and `?cb=` is not** — that is `§52.1`'s rule and it
+  holds here: a cache-buster creates a *second* entry against the same URL instead of
+  replacing it. A new filename has no entry at all, which is the whole point.
+
+  **How this differs from the §52.1 precedent, which matters for the next person.** There
+  (`og-compare-retirement-plans`) the **page changed underneath a product-forward card** —
+  a retitled H1 and a recut legend were baked into the image, so the card was genuinely
+  stale and its **alt texts were rewritten with it**. Here the card is correct and the
+  **alts are deliberately unchanged**, because the image is the same image. **The bump was
+  caused by a scrape taken too early, not by a card gone stale.** So §52.1's standing
+  lesson — *product-forward cards have a dependency on page copy and chrome* — does not
+  apply to this page at all; this one is brand-forward and depends on neither. The new
+  lesson is separate: **an unlisted page's asset URLs can be scraped and cached wrong
+  before the asset exists**, and nothing done later at the page level reaches that cache.
+  The cheap prevention is the one the spec already gives — do not let a third party touch
+  the URL before listing — and the cure, once it has happened, is a filename bump.
+
+  **What moved, in one commit** (the `staticAssets` array has no existence guard, so the
+  registration cannot precede the file): the JPEG; its passthrough entry, with **v1 left
+  registered** per §52.1 so anything that scraped it correctly keeps resolving; `og:image`
+  and `twitter:image` in the page's head include; the head comment explaining all of the
+  above; and the generator's default output name, so a re-run cannot quietly write the v1
+  filename and leave the live card untouched. **v1 stays on disk** — JM's call.
+
+  Verified on production after deploy: `curl -I` on the new path returns
+  **`Content-Type: image/jpeg`**, 65,542 bytes.
   **⏰ STILL TO DO, AND IT NEEDS JM'S ACCOUNT: resubmit the sitemap and request indexing**
   in Google Search Console (`NEW_PAGE_CHECKLIST §10`, publish-day habit; the standing sweep
   is `MONTHLY_REFRESH_CHECKLIST §9.5`). Nothing in this session can do it — it is the one

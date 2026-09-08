@@ -84,6 +84,9 @@ module.exports = function (eleventyConfig) {
     'og-compare-retirement-plans-v2.jpg',
     'og-bitcoin-retirement.jpg',
     'og-the-rundown.jpg',
+    // -v2 2026-09-07: same encode, new name, to force a re-scrape. v1 above STAYS
+    // registered per §52.1 — already-scraped cards keep resolving. See OPEN_ITEMS.
+    'og-the-rundown-v2.jpg',
     // Gallery companion graphic (full-res PNG; scaled for display via CSS, full-res on click-through)
     'middle-seat-infographic.png',
     // Bitcoin Defined illustrations (1280x720). Eight Grok-generated
