@@ -3045,7 +3045,9 @@ Fourth page of the Power Law family (**Bitcoin and The Power Law** · **The Bitc
 
 ---
 
-## 54. The Rundown (`/the-rundown.html`) — v2, THE BRIEFING
+## 54. The Bitcoin Rundown (`/the-rundown.html`) — v2, THE BRIEFING
+
+**Display name is "The Bitcoin Rundown" (renamed 2026-09-07); the slug stays `/the-rundown`.** That is the Dashboard precedent applied — the display name carries "Bitcoin", the slug does not — so no redirect is owed and every existing link keeps working. The registry `title` is the single source: it feeds the nav dropdown, the footer column and all seven sibling related strips at once. **The sister-tabs control keeps the short forms** "The Dashboard" / "The Rundown", as that control already did, because it names the pair rather than titling either page.
 
 **Publicly listed 2026-09-07**, after a build-to-done → unlisted → register review → counsel pass → listing sequence (`RUNDOWN_DESIGN.md` §9 [JM-6]). It is registered in `explorations.json` (The Numbers → Models & Trends, beside `discount-or-premium`), in `sitemap.xml`, `llms.txt` and `updates.json`, and carries reciprocal `related:` entries on seven sibling pages. The `noindex, nofollow` preview guard and the in-page preview note are gone, together with the now-dead `.rd-preview-note` rule. Design at `RUNDOWN_DESIGN.md`; the Phase 0 verification that shaped v1 at `RUNDOWN_PHASE0_REPORT.md`, the v2 rebuild at `RUNDOWN_PHASE0_V2_REPORT.md`. Page-scoped classes use the `rd-` prefix; mixed-content width tier (1100 page / 880 prose).
 

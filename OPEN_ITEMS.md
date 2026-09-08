@@ -11,7 +11,7 @@ session automatically. Close items here when done; this file is the "what's cook
 
 ## In flight (dated)
 
-- [x] **THE RUNDOWN v2 — PUBLICLY LISTED. MERGED TO PRODUCTION 2026-09-07** (`ada60b2`).
+- [x] **THE RUNDOWN v2 — PUBLICLY LISTED (2026-09-07, `ada60b2`). RENAMED TO "THE BITCOIN RUNDOWN" ON `feat-rundown-rename`, AWAITING JM'S MERGE.**
   Merged to production 2026-09-02 (PR #97, merge `fc773b6`) carrying v2 "The Briefing" and
   the site-wide unified floor-visit definition. **`/the-rundown` is live but unlisted** —
   `noindex, nofollow`, and absent from `sitemap.xml`, `llms.txt`, `explorations.json` and the
@@ -267,6 +267,57 @@ session automatically. Close items here when done; this file is the "what's cook
 
   Verified on production after deploy: `curl -I` on the new path returns
   **`Content-Type: image/jpeg`**, 65,542 bytes.
+
+  **DISPLAY NAME: "The Rundown" → "THE BITCOIN RUNDOWN" (JM, 2026-09-07).** Matches
+  *The Bitcoin Dashboard*, and follows that page's precedent exactly: **the display name
+  carries "Bitcoin", the slug does not.** `/the-rundown` is unchanged, so **no redirect is
+  owed**, no `_redirects` line is added, and every link already in the wild — including the
+  seven sibling strips, the sitemap, `llms.txt` and the OG card's own URL footer — keeps
+  resolving. On one branch with its own preview; **JM merges.**
+
+  **The registry title is the single source, which is what kept this small.**
+  `explorations.json`'s `title` feeds the nav dropdown, the footer column and **all seven**
+  sibling related strips through `related.njk`'s slug lookup, so one edit moves them all.
+  Checked before relying on it: none of the seven carries a `label:` override, which is the
+  one thing that would have pinned a strip to the old name.
+
+  **The sister-tabs control keeps its short forms** — "The Dashboard" / "The Rundown" — as
+  JM ruled and as that control already did. It names the *pair* rather than titling either
+  page, and "The Bitcoin Dashboard | The Bitcoin Rundown" would read as two products rather
+  than two views of one position. Short-form "the Rundown" in running prose is left alone
+  for the same reason: the sibling `desc:` sentences and the backlog's body text still say
+  it, and that is a short form, not a stale title.
+
+  **The H1 keeps its italic on the second word** — `The Bitcoin <em>Rundown</em>` — so the
+  hero still reads with the emphasis the page shipped with rather than italicising a name
+  that is now three words.
+
+  **Deliberately NOT renamed: internal code comments** that refer to the page by name
+  (about a dozen, in the shared engines, `dashboard.css`, and the two page assets' own
+  headers). They are internal references, they remain unambiguous because the slug is still
+  `/the-rundown`, and rewriting a dozen comment blocks is churn with a real chance of
+  touching a line that matters. Recorded so the inconsistency reads as a decision.
+
+  **⛔ THE NEW OG CARD IS NOT INSTALLED — the custody check failed, and JM's own
+  instruction gates the commit on it** (*"Verify the SHA on disk matches before
+  committing"*). The file in Downloads is the right card by eye — 1280×720 RGB, 68,796
+  bytes, brand-forward, titled **"The Bitcoin Rundown"**, correct subtitle and URL footer,
+  no multiple/price/date/count — but **its hash does not match the `42c4cd6c…` JM quoted**,
+  under any of the three algorithms:
+
+  - MD5 `692006a7d25f16e2ecfe0b97f6a183e7`
+  - SHA-1 `1f3aa8ba103ecc12721013d4970a009eb779cd0a`
+  - SHA-256 `c127ecf68e68a3f8b79e7804f1084c267e59b13c5ef552dbb0c272d907a10358`
+
+  Downloads holds no other candidate. This is exactly what the §52.1 custody pattern exists
+  to catch — *the gate certifies an encode; the wiring certifies this is that encode* — so
+  the bytes were left alone rather than committed on a likeness judgement. **The v2 file on
+  disk and in production is still the old encode, which reads "The Rundown".** Everything
+  around it is ready: both `:alt` texts already name the new title, the `staticAssets`
+  registration and the `-v2` tags are in place from the day-one bump, and the generator's
+  default is `-v2`. **Swapping the bytes is one `cp` and one commit once JM confirms the
+  hash** — either by re-stating it, or by saying the file is right and the digest was
+  mis-transcribed.
   **⏰ STILL TO DO, AND IT NEEDS JM'S ACCOUNT: resubmit the sitemap and request indexing**
   in Google Search Console (`NEW_PAGE_CHECKLIST §10`, publish-day habit; the standing sweep
   is `MONTHLY_REFRESH_CHECKLIST §9.5`). Nothing in this session can do it — it is the one
