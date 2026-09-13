@@ -363,11 +363,19 @@ yet* about an episode that has one. Do this, in order:
 2. Fill in `to`, `samples`, `spanDays` and `bracketDays` from the failure text
    and the derivation (`computeEpisodes()` returns all four).
 3. `xt24` / `gap24` stay `null` until **24 months after the episode's deepest
-   close** have actually elapsed — the parity check enforces this, and a closed
-   episode with no outcome is a legitimate state for up to two years. Do not
-   estimate one. When the window arrives, derive it **by the FL-1 method in
-   `DATA_AUDIT.md`** — that row is an open item precisely because the published
-   outcomes do not reproduce by naive interpolation.
+   close** have actually elapsed — a closed episode with no outcome is a
+   legitimate state for up to two years. Do not estimate one. **The parity
+   check enforces this in both directions, measured on the series rather than
+   the clock** (corrected 2026-09-13 — until then this step claimed an
+   enforcement the code did not have: `[floor-qa]` failed *any* closed episode
+   without a `gap24`, so steps 3 and 6 could not both be satisfied). The window
+   has arrived when the last `PL_DATA` sample sits at least `OUTCOME_WINDOW_D`
+   (730.5 days) past `deepestOn`; before that a filled-in outcome fails the
+   check, and after it a missing one does. `samples` and `bracketDays` are
+   asserted too (also added 2026-09-13; neither was checked before). When the
+   window arrives, derive the outcome **by the FL-1 method in `DATA_AUDIT.md`**
+   — that row is an open item precisely because the published outcomes do not
+   reproduce by naive interpolation.
 4. Rewrite the card body: it currently opens *"the only one on this page with
    no outcome"*, which becomes false the moment step 1 lands.
 5. Update the dependents the same commit changes them in every time — the FAQ,
@@ -375,6 +383,12 @@ yet* about an episode that has one. Do this, in order:
    the reversion stats' exclusion note, and the tripwire paragraph. Grep
    `two out of two` and `still open` to find them.
 6. Reload; the line must read `pass` again.
+
+*Fired for the first time at the 2026-09-13 refresh: the July 2026 approach
+closed (`bracketDays` 78; `xt24` / `gap24` due July 2028). Steps 4–5 describe
+the copy as it stood then, since rewritten. The next `open` failure belongs to
+an episode that does not exist yet, so expect an `episode count` failure first
+— and treat it as the page event described below, not a number to bump.*
 
 **Any other episode failure is a real finding.** A changed `from`, `to`,
 `belowPct` or `spanDays` on a *closed* episode means the historical series moved
@@ -488,14 +502,16 @@ For each value, verify against the source listed and update in the BFI files as 
 
 | Field | Where it lives | Source to verify against |
 |---|---|---|
-| **BTC held** | `src/bitcoin-fixed-income.njk` (the `845,256` figure) AND `src/_includes/_pageassets/bitcoin-fixed-income.js` (`var BTC_HELD = 845256`) | CoinGecko `/api/v3/companies/public_treasury/bitcoin` (find Strategy entry by `symbol: "MSTR.US"`). Cross-check against Saylor's latest tweet or Strategy IR page. |
-| **mNAV** | `.njk` (`~1.7&amp;times;`) | SaylorTracker.com headline mNAV figure. Or compute: (MSTR price &times; shares outstanding) &divide; (BTC count &times; BTC price). |
-| **Shares outstanding** | `.njk` (`~282M`) | Latest 10-Q "Diluted shares outstanding" or Yahoo Finance MSTR Statistics page. Basic, all classes. |
+| **BTC held** | `src/bitcoin-fixed-income.njk` (the `845,050` figure) AND `src/_includes/_pageassets/bitcoin-fixed-income.js` (`var BTC_HELD = 845050`) | CoinGecko `/api/v3/companies/public_treasury/bitcoin` (find Strategy entry by `symbol: "MSTR.US"`). Cross-check against Saylor's latest tweet or Strategy IR page. |
+| **mNAV** | `.njk` (`~0.8&amp;times;`) | SaylorTracker.com headline mNAV figure. Or compute: (MSTR price &times; shares outstanding) &divide; (BTC count &times; BTC price). |
+| **Shares outstanding** | `.njk` (`~384M`) | Latest 10-Q "Diluted shares outstanding" or Yahoo Finance MSTR Statistics page. Basic, all classes. |
 | **ATM issuance** | `.njk` (`Active` value cell + sub-text) | Latest 10-Q ATM disclosures + 8-K announcements for new facilities. Phrase as `Active` or `Paused` with a brief structural note. |
 | **Reading right now insight prose** | `.njk` `.sg-insight-text` paragraph | Rewrite when mNAV crosses ~1.0&times; (issuance accretive vs dilutive boundary) or ATM status changes (Active &harr; Paused). Stable otherwise. |
-| **As-of date** | `.njk` footer (`Snapshot as of June 2026`) | Update to the current month/year whenever any other field is refreshed. |
+| **As-of date** | `.njk` footer (`Snapshot as of September 2026`) | Update to the current month/year whenever any other field is refreshed. |
 
-**Critical**: the two BTC count locations (the visible cell text in `.njk` AND the `BTC_HELD` constant in `.js`) MUST stay in sync. Otherwise the displayed BTC count and the live USD value will drift apart.
+**Critical**: the two BTC count locations on this page (the visible cell text in `.njk` AND the `BTC_HELD` constant in `.js`) MUST stay in sync. Otherwise the displayed BTC count and the live USD value will drift apart.
+
+**There is a THIRD location off this page** (found 2026-09-13, when it had drifted to a different figure again): `src/bitcoin-vs-rental-property.njk` states the treasury in prose (“Strategy currently holds **N BTC** as of …”) and repeats it in the sources list at the foot of the page, alongside the USD Reserve figure. Grep the BTC count sitewide rather than trusting this list — `grep -rn "84[0-9],[0-9]\{3\}" src/` — and fix every hit in the same edit.
 
 If the values haven't materially changed (BTC count moved &lt;1%, mNAV moved &lt;0.1&times;, ATM status unchanged, insight prose still accurate), the only required update is the as-of date.
 
@@ -531,6 +547,7 @@ The STRC price is now maintained by the site's first CI automation (SITE_GUIDE �
 
 - **GitHub → Actions → "STRC daily close"** (or `gh run list --workflow=strc-daily-close.yml`). Confirm it has run on recent market days and that runs are green (or that a red run has a known cause). GitHub disables `schedule` triggers after ~60 days of repo inactivity — if the whole repo has gone quiet, re-enable / re-dispatch once.
 - Cross-check the on-page **"official daily close · as of <date>"** against the true last close; if the date is stale by more than a few market days, the Action has silently stopped — investigate the source (Yahoo keyless access can change) and fall back to a hand-updated `src/_data/strcClose.json` until fixed. Alternative sources are noted in `DATA_AUDIT` STRC-1.
+- **Before concluding the Action has stalled, check `git log origin/main -- src/_data/strcClose.json`** (added 2026-09-13, after exactly this false alarm): a local branch behind origin looks identical to a dead scheduler — the bot's commits land on `origin/main` and the local file stays stale until you fast-forward. Also, the early-September runs each recorded the close of the market day *before* the run date, so a one-market-day lag on the page is the Action's normal behaviour, not staleness.
 
 ## 8. Institutional guidance citations — How Much Bitcoin? (quarterly is fine)
 
@@ -615,10 +632,10 @@ table in `src/_includes/_pageassets/bitcoin-and-metcalfes-law.js`.
 
 | Figure on page | Current value (as of) | Source to re-pull | Notes |
 |---|---|---|---|
-| US spot ETF holdings | 1,283,551 BTC (2026-06-17) | walletpilot.com/bitcoin-tracker/etfs (cross-check Farside, Glassnode, The Block, Bitbo) | Credit [8] + §VI prose ("roughly 1.28 million BTC"). Update both the BTC figure AND the "% of circulating supply." |
-| ETF holdings as % of supply | ≈6.5% | = ETF BTC ÷ circulating supply | Appears in §VI prose, the inline holder-growth/ETF visual ("6.5%"), and the visual caption. Recompute when either input moves. |
-| ETF AUM (owner-count basis) | ~$82.5B | same ETF trackers | Credit [9] order-of-magnitude basis for the "millions of owners" claim. |
-| ETF-era on-chain holder growth | ~3.7%/yr | recompute: Coin Metrics `AdrBalCnt` CAGR over 2024–present | §VI prose + the inline visual ("3.7%/yr"). Will drift as the ETF era extends. |
+| US spot ETF holdings | ≈1.25M BTC (2026-09-11) | walletpilot.com/bitcoin-tracker/etfs (cross-check Farside, Glassnode, The Block, Bitbo) | Credit [8] + §VI prose ("roughly 1.25 million BTC"). Update both the BTC figure AND the "% of circulating supply." |
+| ETF holdings as % of supply | ≈6.2% | = ETF BTC ÷ circulating supply | Appears in §VI prose, the inline holder-growth/ETF visual ("6.2%"), and the visual caption. Recompute when either input moves. |
+| ETF AUM (owner-count basis) | ~$96.6B | same ETF trackers | Credit [9] order-of-magnitude basis for the "millions of owners" claim. |
+| ETF-era on-chain holder growth | ~3.6%/yr | recompute: Coin Metrics `AdrBalCnt` CAGR over 2024–present | §VI prose + the inline visual ("3.6%/yr"). Will drift as the ETF era extends. **Trackers disagree** by ≈1% on the BTC figure (2026-09: Wallet Pilot 1.251M vs Bitbo 1.268M, almost all of it IBIT) — quote the headline to three significant figures and name the spread in credit [8] rather than carrying false precision. |
 | Long-term-held supply share | ~67% ("two-thirds today") | Bitcoin Magazine Pro HODL Waves (sum of ≥1yr bands) | §V callout ("roughly two-thirds today"). |
 
 **Re-pull recipes** (so future-you doesn't reconstruct the method):
@@ -673,7 +690,7 @@ The publish-day habit (`NEW_PAGE_CHECKLIST`) covers a single new page on the day
 
 ## 10. Claude project mirror refresh
 
-**Last mirror refresh: 2026-08-05** (update this line BEFORE exporting,
+**Last mirror refresh: 2026-09-13** (update this line BEFORE exporting,
 not after — see step 3).
 
 The Claude project holds a copy of the repo's strategy and design docs. That

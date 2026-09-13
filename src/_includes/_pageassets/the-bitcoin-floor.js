@@ -42,7 +42,7 @@
   // ── THE SENSITIVITY, STATED BECAUSE IT IS ASYMMETRIC ──
   // The 100-day gap is INSENSITIVE: every value from 30 to 200 days yields
   // the same four episodes. The ~1% graze band is LOAD-BEARING at exactly one
-  // place — below about 0.9% the open 2026 approach disappears, because its
+  // place — below about 0.9% the July 2026 approach disappears, because its
   // deepest sample sits 0.7% ABOVE the floor and never breached it. Both
   // swept in FLOOR_VISIT_DEFINITION_MINIREPORT.md; the page states this in
   // the method note beside the strip.
@@ -50,7 +50,8 @@
   // ── WHAT THE UNIFICATION CHANGED, AND WHAT IT DELIBERATELY DID NOT ──
   // Changed: the two 2015 episodes MERGE (24 days apart, one approach under
   // the 100-day rule); January 2023 gains a December 2022 approach sample and
-  // becomes a 12-day episode; a fourth, OPEN episode appears in July 2026.
+  // becomes a 12-day episode; a fourth episode appears in July 2026 (open at
+  // the time; it closed at the 2026-09-13 refresh — see the 2026 entry).
   // NOT changed: no published figure was recomputed. Every depth and every
   // 24-month outcome below is a number this page already published, carried
   // across unchanged — the merged 2015 card takes its depth AND its outcome
@@ -67,12 +68,20 @@
   // duration given a ~12-day sampling grid. It is NULL while an episode is
   // still open, because there is no "after" yet.
   // gap24 = share of the gap to trend closed 24 months after the deepest
-  // close. NULL on an open episode: no outcome exists, and none is estimated.
+  // close. NULL on an open episode, AND on a closed one whose 24-month window
+  // (OUTCOME_WINDOW_D past `deepestOn`, measured on the series) has not yet
+  // arrived: no outcome exists, and none is estimated. CLOSED and SCORED are
+  // different states — the parity check below enforces both directions.
   // ═══════════════════════════════════════════════════════════
   // The two constants of the unified visit definition. Named once, used by the
   // live derivation below and quoted in the method note on the page.
   var EPISODE_GRAZE = 1.01;   // within 1% of the floor counts as an approach
   var EPISODE_GAP_D = 100;    // a gap longer than this starts a new episode
+  // The 24-month outcome window in elapsed days (24 × 365.25 / 12). A closed
+  // episode is SCORED only once the last PL_DATA sample sits at least this far
+  // past its deepest close; until then xt24 / gap24 stay null. Elapsed days off
+  // the series, never sample counts or the wall clock, like every duration here.
+  var OUTCOME_WINDOW_D = 730.5;
 
   var EPISODES = [
     {
@@ -110,14 +119,18 @@
     },
     {
       id: '2026',
-      when: 'July 2026 – open',
+      when: 'July 2026',
       from: '2026-07-13', to: '2026-07-31',
-      samples: 2, spanDays: 18, bracketDays: null,
+      samples: 2, spanDays: 18, bracketDays: 78,
       deepestXt: 0.423, deepestOn: '2026-07-13', belowPct: -0.7,
-      xt24: null, gap24: null, open: true,
+      // Closed at the 2026-09-13 refresh: the 2026-08-31 sample (0.513× trend)
+      // is the first one after the band. xt24 / gap24 stay null until the
+      // window arrives in July 2028 — derive them then by the FL-1 method in
+      // DATA_AUDIT.md, never by interpolation.
+      xt24: null, gap24: null, open: false,
       kind: 'graze', modern: true,
-      kindLabel: 'An approach, still open',
-      body: 'The current approach, and the only one on this page with <strong>no outcome</strong>: it is described, not scored. Two samples sit in the band and neither has breached the line — the deeper of them came <strong>within 0.7% of the floor</strong> without going under. The record’s newest sample is one of them, so there is no “after” to measure a duration or a reversion against, and none is estimated here.<br><br>It is also the episode that the visit definition is doing the most work for. Under a rule counting only closes strictly below the floor, this approach would not appear on this page at all; under the 1% band it does. That is stated rather than buried, because it is the one place where a reasonable change to the definition would change what this page reports.'
+      kindLabel: 'An approach, closed — not yet scored',
+      body: 'The most recent approach, and the only closed one on this page with <strong>no outcome yet</strong>. Two samples sat in the band and neither breached the line — the deeper of them came <strong>within 0.7% of the floor</strong> without going under. Price had left the band by 31 August, when the first sample after it read 0.51× trend, so the approach now has an “after”: 18 days in the band by sample span, 78 bracketed. What it does not yet have is a reversion reading. That is measured 24 months from the deepest close, which falls in <strong>July 2028</strong>; until then this approach is described, not scored, and no outcome is estimated here.<br><br>It is also the episode that the visit definition is doing the most work for. Under a rule counting only closes strictly below the floor, this approach would not appear on this page at all; under the 1% band it does. That is stated rather than buried, because it is the one place where a reasonable change to the definition would change what this page reports.'
     }
   ];
 
@@ -482,6 +495,12 @@
       // "The floor held" is a past-tense claim and this episode is not past.
       ctx.innerHTML = 'Zoomed to the <strong>' + ep.when + '</strong> approach &mdash; the one still running, shown as far as the record goes and with no outcome attached to it.';
       btn.hidden = false;
+    } else if (ep.gap24 == null) {
+      // Closed but not yet scored. The episode IS past — price has left the
+      // band — but its 24-month window has not arrived, so the generic line
+      // below would be describing a roundtrip nobody has measured yet.
+      ctx.innerHTML = 'Zoomed to the <strong>' + ep.when + '</strong> approach &mdash; closed, shown with the samples that bracket it, and with no 24-month outcome attached to it yet.';
+      btn.hidden = false;
     } else if (ep.modern) {
       ctx.innerHTML = 'Zoomed to the <strong>' + ep.when + '</strong> approach &mdash; a stretch where the floor held even as price stayed below trend for an extended period.';
       btn.hidden = false;
@@ -542,7 +561,8 @@
     // The reversion stats are reported on the MODERN approaches only, and only
     // on CLOSED ones. The genesis-era episode is recorded in its own card and
     // nowhere else — it is not averaged into a headline (see the section lede).
-    // An OPEN episode has no 24-month window, so it is excluded rather than
+    // An OPEN episode has no 24-month window, and a CLOSED one may not have
+    // reached it yet (OUTCOME_WINDOW_D); either is excluded rather than
     // counted as a zero, which would drag the median toward a number no
     // episode produced.
     var modern = EPISODES.filter(function (e) { return e.modern; });
@@ -583,9 +603,11 @@
       ? 'a single sample (&le;24d)'
       : ep.spanDays + ' days';
     // An open episode has no "after" sample, so no bracketed bound and no
-    // 24-month outcome. Those metrics are omitted rather than rendered empty:
-    // a tile reading "—× trend, 24 months later" invites the reader to think a
-    // measurement was attempted and failed, when none is possible yet.
+    // 24-month outcome. A CLOSED episode can also have no outcome, for up to
+    // two years, while its 24-month window has not arrived. Those metrics are
+    // omitted rather than rendered empty: a tile reading "—× trend, 24 months
+    // later" invites the reader to think a measurement was attempted and
+    // failed, when none is possible yet.
     var durKey = ep.bracketDays == null
       ? 'in the band so far — still open'
       : 'in the band (' + ep.bracketDays + 'd bracketed)';
@@ -595,7 +617,13 @@
       metric(dur, durKey);
     if (ep.xt24 != null) metrics += metric(ep.xt24.toFixed(2) + '×', '× trend, 24 months later');
     if (ep.gap24 != null) metrics += metric(ep.gap24 + '%', 'of the gap to trend closed');
-    if (ep.open) metrics += metric('no outcome yet', 'described, not scored');
+    // Keyed on the OUTCOME, not on openness: "not scored" is the load-bearing
+    // qualifier on this card and has to survive the episode closing.
+    if (ep.gap24 == null) {
+      metrics += metric('no outcome yet', ep.open
+        ? 'described, not scored'
+        : 'described, not scored &mdash; due ' + outcomeDueLabel(ep));
+    }
     $('flEpCard').innerHTML =
       '<div class="fl-ep-card-h">' + ep.when + '</div>' +
       '<div class="fl-ep-card-kind ' + (ep.kind === 'break' ? 'is-break' : 'is-graze') + '">' + ep.kindLabel + '</div>' +
@@ -607,6 +635,13 @@
   }
   function metric(v, k) {
     return '<div class="fl-ep-metric"><div class="fl-ep-metric-v">' + v + '</div><div class="fl-ep-metric-k">' + k + '</div></div>';
+  }
+  // The month a closed episode's 24-month reading falls due, off its deepest
+  // close — the same window the parity check measures, so the card and the
+  // check cannot disagree about when "not yet" ends.
+  function outcomeDueLabel(ep) {
+    var iso = isoOf(dayOfIso(ep.deepestOn) + OUTCOME_WINDOW_D);
+    return new Date(iso + 'T00:00:00Z').toLocaleString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
   }
 
   /* Depth wording. `belowPct` is negative for an approach that entered the 1%
@@ -1164,14 +1199,37 @@
         var e = EPISODES[i];
         if (c.from !== e.from) failures.push('episode ' + e.id + ' start ' + c.from + ' ≠ ' + e.from);
         if (c.to !== e.to) failures.push('episode ' + e.id + ' end ' + c.to + ' ≠ ' + e.to);
+        // `samples` and `bracketDays` were unasserted until 2026-09-13. Samples
+        // is the first field a regrouping of the visit definition would move;
+        // bracketDays is the one a refresh that closes an episode fills in.
+        if (c.samples !== e.samples) failures.push('episode ' + e.id + ' samples ' + c.samples + ' ≠ ' + e.samples);
         if (Math.abs(c.belowPct - e.belowPct) > 0.05) failures.push('episode ' + e.id + ' depth ' + c.belowPct + ' ≠ ' + e.belowPct);
         if (Math.abs(c.spanDays - e.spanDays) > 0.5) failures.push('episode ' + e.id + ' span ' + c.spanDays + ' ≠ ' + e.spanDays);
+        if ((c.bracketDays == null) !== (e.bracketDays == null) ||
+            (c.bracketDays != null && Math.abs(c.bracketDays - e.bracketDays) > 0.5)) {
+          failures.push('episode ' + e.id + ' bracket ' + c.bracketDays + ' ≠ ' + e.bracketDays);
+        }
         // Openness is asserted too. It decides whether a card shows a 24-month
         // outcome and whether the episode enters the reversion median, so a
         // PL_DATA refresh that closes the open episode must fail loudly here
         // rather than leave a stale "no outcome yet" tile on the page.
         if (!!c.open !== !!e.open) failures.push('episode ' + e.id + ' open ' + !!c.open + ' ≠ ' + !!e.open);
-        if (!c.open && e.gap24 == null) failures.push('episode ' + e.id + ' is closed but carries no 24-month outcome');
+        // CLOSED and SCORED are different states, and the outcome is asserted
+        // in both directions against the SERIES, never the wall clock: the
+        // window has arrived once the last PL_DATA sample sits at least
+        // OUTCOME_WINDOW_D past the episode's deepest close. Before then a
+        // closed episode legitimately carries no outcome (MONTHLY_REFRESH_
+        // CHECKLIST §5.1 step 3) — and an outcome PRESENT before then is the
+        // worse failure, because it publishes an estimate as a measurement.
+        // Until 2026-09-13 this failed every closed episode without a gap24,
+        // which made step 3 and step 6 of §5.1 impossible to satisfy together.
+        var windowArrived = (last[0] - dayOfIso(e.deepestOn)) >= OUTCOME_WINDOW_D;
+        if (windowArrived && !c.open && (e.xt24 == null || e.gap24 == null)) {
+          failures.push('episode ' + e.id + ' 24-month window has arrived but it carries no outcome');
+        }
+        if (!windowArrived && (e.xt24 != null || e.gap24 != null)) {
+          failures.push('episode ' + e.id + ' carries a 24-month outcome before its window has arrived');
+        }
       });
     }
 

@@ -816,7 +816,7 @@
 (function(){
   // BTC count: snapshot. Verified July 2026 against CoinGecko's
   // /companies/public_treasury/bitcoin endpoint. Update here when Strategy buys more.
-  var BTC_HELD = 843775;
+  var BTC_HELD = 845050;
 
   function formatBigUSD(n){
     if (n >= 1e9) return '$' + (n / 1e9).toFixed(1) + 'B';

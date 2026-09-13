@@ -16,6 +16,9 @@ yarn-error.log*
 *.swp
 *.swo
 *~
+# Prompts and rulings handed over from the drafting chat land here; they are
+# working files, never repo content (added 2026-09-13).
+Claude outputs/
 
 # Eleventy
 .cache/

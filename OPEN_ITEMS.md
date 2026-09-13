@@ -11,6 +11,36 @@ session automatically. Close items here when done; this file is the "what's cook
 
 ## In flight (dated)
 
+- [ ] **STRC_DATA REFRESH — BLOCKED ON A FILED SHARE COUNT (2026-09-13).** `asOf` in
+  `src/_includes/_pageassets/the-strc-mechanism.js` is still `2026-07-28`, and the block has
+  drifted materially since: `usdReserveB` 3.75 → **5.10**, `btcHoldings` 843,775 → **845,050**,
+  `authRemaining.preferredM` 975 → **1190** (the digital-credit repurchase program was doubled
+  to $2B, $1.19B remaining), the rate held at 12.00% for Aug and Sep, and roughly **$811.5M** of
+  cumulative STRC buybacks against a `buybackLog` holding one $25M row. It was deliberately
+  **not** updated at the Sep 2026 refresh: `MONTHLY_REFRESH_CHECKLIST §7.5` requires the
+  fuel-gauge constants to move together with `asOf`, and `sharesOutstanding` (104,600,000) is
+  not filed at the weekly cadence — an estimate after the buybacks is ~96.3M. Bumping `asOf`
+  over a stale denominator produces fresh badges on an old number. **Unblocks at the next
+  10-Q.** The stale count errs conservatively: too many shares overstates the dividend bill and
+  understates coverage. `priorMonthVWAP` is also still `null`, and has been since ship.
+
+- [ ] **BvSM §4 HORIZON FIGURES — FOUR MONTHS STALE (2026-09-13).**
+  `src/bitcoin-vs-the-stock-market.njk` carries "Through May 2026" with hardcoded 1y / 5y / 10y
+  returns (+27% S&P, −21% bitcoin at one year). Honestly dated but written in the present
+  tense, and bitcoin has gone from $126K to $77K since. Needs an S&P series and a decision on
+  the measurement convention before the numbers can move.
+
+- [ ] **METCALFE `FITS` RE-FIT + PINNED DATASET RE-PULL (2026-09-13).** The pinned weekly
+  series (`bitcoin-and-metcalfes-law-data.js`) was pulled 2026-06-20 on a quarterly cadence, so
+  it is due. The ETF-era holders cell is β=2.86 at **R²=0.09** — noise either way — so do the
+  re-fit in one pass with the re-pull rather than piecemeal. Confirm the refreshed full-history
+  holders fit still reproduces **β≈1.84 / R²≈0.95** before committing. Detail:
+  `MONTHLY_REFRESH_CHECKLIST §9`.
+
+- [ ] **QUARTERLY ITEMS NOW COMING DUE (2026-09-13).** `MONTHLY_REFRESH_CHECKLIST` §8
+  institutional guidance (BlackRock / Fidelity *Getting Off Zero*), §8.5 copy-tell drift
+  re-grep, §8.6 Bitcoin as Collateral record.
+
 - [x] **THE RUNDOWN v2 — PUBLICLY LISTED (2026-09-07, `ada60b2`). RENAMED TO "THE BITCOIN RUNDOWN" ON `feat-rundown-rename`, AWAITING JM'S MERGE.**
   Merged to production 2026-09-02 (PR #97, merge `fc773b6`) carrying v2 "The Briefing" and
   the site-wide unified floor-visit definition. **`/the-rundown` is live but unlisted** —

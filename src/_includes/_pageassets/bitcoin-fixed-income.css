@@ -1679,8 +1679,10 @@ html, body {
 /* --- Strategy at a glance (Tab II) ---
    Snapshot indicator providing factual ground-truth for the capital-structure
    analysis below. BTC treasury USD value is the one truly live field
-   (computed from shared TODAY_PRICE x 843,775). Other fields are snapshots
-   refreshed monthly per MONTHLY_REFRESH_CHECKLIST. */
+   (computed from shared TODAY_PRICE x the BTC_HELD constant in
+   bitcoin-fixed-income.js — refreshed monthly, so the count is deliberately
+   not repeated here; it had drifted twice). Other fields are snapshots
+   refreshed monthly per MONTHLY_REFRESH_CHECKLIST §7. */
 .strategy-glance {
   margin: 2rem 0 2.5rem;
   padding: 1.4rem 1.5rem 1.15rem;
