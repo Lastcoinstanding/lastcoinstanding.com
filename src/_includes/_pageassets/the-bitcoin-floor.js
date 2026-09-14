@@ -152,10 +152,14 @@
   var ANALYSIS_PARITY = {
     // Two dates, deliberately, and they differ by one day:
     //   measuredOn  — the DAY THE MEASUREMENT DESCRIBES, and the only one shown
-    //                 to a reader. It is PL_DATA's last sample, 2026-07-31, when
-    //                 price sat at ×0.423 — on the floor. That is the fact the
-    //                 published 63.8/65.1 is about.
-    //   endpointDay — the internal grading endpoint, one day later. The last
+    //                 to a reader. It WAS PL_DATA's last sample when the analysis
+    //                 ran — 2026-07-31, price at ×0.423, on the floor — and it is
+    //                 the fixture's ANCHOR: floorParityQA() locates this sample in
+    //                 PL_DATA by exact date and grades to it, never to whatever the
+    //                 newest sample is now. (Until 2026-09-13 it graded to the
+    //                 newest sample, which broke on the first refresh — see the QA
+    //                 hook.) That is the fact the published 63.8/65.1 is about.
+    //   endpointDay — the internal grading endpoint, one day later. The anchor
     //                 sample is ITSELF an entry, so grading to the sample date
     //                 gives it a zero-length window and drops it (n=25). One day
     //                 past includes it (n=26), which is what the analysis did.
@@ -703,6 +707,16 @@
     return null;
   }
 
+  // Exact-date lookup — the sample whose calendar date is `iso`, or null. Exact,
+  // not nearest: the parity fixture must fail loudly if its anchor sample is
+  // gone or renumbered rather than quietly grade against a neighbour.
+  function sampleOnIso(iso) {
+    for (var i = PL_DATA.length - 1; i >= 0; i--) {
+      if (isoOf(PL_DATA[i][0]) === iso) return PL_DATA[i];
+    }
+    return null;
+  }
+
   // `set` defaults to the MODERN entries — what the page displays. The QA
   // fixture passes entrySet() explicitly so it still reproduces the published
   // full-set measurement, which included the genesis samples.
@@ -1144,26 +1158,53 @@
   // that has nothing to do with correctness.
   //
   // So the fixture pins the METHOD, not the calendar: recompute at the
-  // analysis's endpoint (one day past the last PL_DATA sample, 365.25-day
+  // analysis's endpoint (one day past the analysis's own sample, 365.25-day
   // years) and require 63.8 / 65.1 ± 0.1pp with n = 26. That is a true
-  // regression test — it fails if the algorithm drifts, if PL_DATA is
-  // rewritten, or if the entry rule changes — and it stays green
-  // tomorrow. The live figures are reported alongside, unasserted.
+  // regression test — it fails if the algorithm drifts, if the historical
+  // series is rewritten under the anchor, or if the entry rule changes. The
+  // live figures are reported alongside, unasserted.
+  //
+  // THE ANCHOR IS A DATE, NOT "THE NEWEST SAMPLE" (corrected 2026-09-13).
+  // Until then this graded to `PL_DATA[PL_DATA.length - 1]`, which was the
+  // analysis's endpoint only on the day the constants were captured. The
+  // first PL_DATA append after it moved the endpoint 43 days and +22.6% and
+  // took realized from 63.8 to 69.28 against unchanged, correct constants —
+  // the note above used to promise this "stays green tomorrow", and by
+  // construction it could not survive a single refresh. The anchor sample is
+  // located by EXACT date: a missing or renumbered anchor is its own failure
+  // line, never a grade against a neighbour. Never re-pin the constants to
+  // the current month to make this pass; that turns a regression test into a
+  // snapshot with a monthly chore (MONTHLY_REFRESH_CHECKLIST §5.1b).
   // ═══════════════════════════════════════════════════════════
   function floorParityQA() {
+    // `last` is the series' extent — it drives the live, unasserted half below
+    // and the episode outcome window. It is NOT the fixture's endpoint.
     var last = PL_DATA[PL_DATA.length - 1];
-    var fixDay = last[0] + ANALYSIS_PARITY.endpointDayOffset;
+    var failures = [];
+
+    var anchor = sampleOnIso(ANALYSIS_PARITY.measuredOn);
+    if (!anchor) {
+      failures.push('parity fixture anchor ' + ANALYSIS_PARITY.measuredOn + ' is no longer in PL_DATA');
+    }
+    // Grade one day past the anchor sample's OWN day number, exactly as the
+    // analysis did when that sample was the newest. The fallbacks only keep the
+    // rest of the report legible when the anchor is missing — that failure is
+    // already recorded above, and NaN medians cannot satisfy the assertions.
+    var anchorDay = anchor ? anchor[0] : dayOfIso(ANALYSIS_PARITY.measuredOn);
+    var anchorPrice = anchor ? anchor[1] : NaN;
+    var fixDay = anchorDay + ANALYSIS_PARITY.endpointDayOffset;
     // FULL set, explicitly — this fixture reproduces the published measurement,
     // which included the genesis samples. It must not follow the page's display
     // set, or the regression test would drift with an editorial decision.
-    var fix = gradeTo(fixDay, last[1], entrySet());
+    // Samples after the anchor get a non-positive window in gradeTo() and are
+    // skipped, so later appends cannot change n either.
+    var fix = gradeTo(fixDay, anchorPrice, entrySet());
     // MODERN set at the same endpoint — the counterpart of the published figure
     // on the set the page actually displays. Asserted too, so the numbers on
     // screen are pinned by the same mechanism that pins the published ones.
-    var mod = gradeTo(fixDay, last[1], modernEntrySet());
+    var mod = gradeTo(fixDay, anchorPrice, modernEntrySet());
     var tol = ANALYSIS_PARITY.tolerancePp;
 
-    var failures = [];
     if (fix.n !== ANALYSIS_PARITY.entries) {
       failures.push('entry count ' + fix.n + ' ≠ ' + ANALYSIS_PARITY.entries);
     }

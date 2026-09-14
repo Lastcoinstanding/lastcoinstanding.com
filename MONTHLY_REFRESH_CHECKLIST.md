@@ -433,6 +433,36 @@ from `TODAY_DAYS`, which advances with the clock; captures taken minutes apart
 differ by drift that is indistinguishable from a regression, and that has
 already cost one round of investigation (`NEW_PAGE_CHECKLIST §11`).
 
+### 5.1b The parity FIXTURE half of `[floor-qa]` — fix the anchor, never the constants
+
+Added 2026-09-13, the day it first fired. `[floor-qa]` has a second half that
+§5.1 does not cover: `floorParityQA()` re-grades the fixed entry set to the
+published analysis's endpoint and asserts **63.8 / 65.1** (full set, n=26) and
+**60.5 / 61.9** (modern set, n=20) ± 0.1pp. Until 2026-09-13 it computed that
+endpoint from `PL_DATA`'s *newest* sample — which was the analysis's date only
+on the day the constants were captured — so the first append after the analysis
+moved the endpoint 43 days and +22.6% and realized read **69.28 against 63.8**,
+with the constants right all along. It now anchors to
+`ANALYSIS_PARITY.measuredOn` (2026-07-31), located in `PL_DATA` by exact date.
+
+After a refresh, a `median realized` / `median trend` / `entry count` failure
+from the fixture therefore means one of three things, and none of them is
+"bump the constant":
+
+- the anchor sample is missing or renumbered — its own failure line names the
+  date (`parity fixture anchor 2026-07-31 is no longer in PL_DATA`);
+- the historical series was rewritten under the anchor (a §1 edit to samples
+  before 2026-08-01, not an append);
+- `gradeTo()` or the entry rule (`entrySet()`, `MODERN_FROM`) changed.
+
+**Fix the anchor or investigate the data. Never re-pin the four constants to
+this month's numbers** — that converts a regression test into a snapshot and
+adds a re-pinning chore to every refresh, which is the trap the moving endpoint
+already was, one month later. The four figures reach the page through the
+constants (`flParityRead`, the honesty-endpoint copy) as a measurement dated
+2026-07-31, which is exactly what they are; a fixture failure is a broken test,
+not a published error.
+
 ## 6. OG image regeneration (product-forward cards)
 
 The 2026-05-17 OG rollout introduced **product-forward OG cards** that
