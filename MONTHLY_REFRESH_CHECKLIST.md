@@ -153,6 +153,52 @@ append the current month's sample. A correct refresh silences it.
 > current is what keeps the fallback honest *and* close. Append at least the
 > current month every refresh; if you can only source one price, source today's.
 
+### Comparator series — `shared/tr-comparator-data.js` and `shared/btc-monthly-data.js`
+
+Three more series to append each month, alongside `PL_DATA`. Registered as
+`DATA_AUDIT` EQ-1 / EQ-2 / BTC-M-1 on 2026-09-16, the day both files were
+replaced: until then the equity series were straight-line interpolations
+between annual endpoints, `BTC_MONTHLY` was hand-entered with five wrong recent
+months, and neither file was in this procedure — their headers pointed at a
+"§5" that had long since become "Verification after refresh". This subsection
+is what those headers now point to.
+
+| Series | File | Sampling | Source |
+|---|---|---|---|
+| `SP500_TR_DATA` | `tr-comparator-data.js` | **Day-28**: `^SP500TR` close on the last trading day on or before the 28th | Yahoo Finance `^SP500TR` history |
+| `NDQ_TR_DATA` | `tr-comparator-data.js` | **Day-28**: QQQ dividend-adjusted close, rebased so 2010-01-28 = 1886.70 (the NASDAQ-100 level that day). Net of the fund's 0.20% fee — a conservative bias | Yahoo Finance `QQQ` history, *Adj Close* column |
+| `BTC_MONTHLY` | `btc-monthly-data.js` | **Month-end**: last daily close of the calendar month (UTC) | Yahoo Finance `BTC-USD` history |
+
+**Two sampling conventions — never mix them.** The equity series are Day-28
+because the heatmap and BvSM interpolate between samples; the bitcoin series is
+month-end because the Horizon and Gallery rolling-CAGR computations key on
+`YYYY-MM`. A month-end value in the equity series, or a Day-28 value in
+`BTC_MONTHLY`, is a silent error — both would parse and both would be wrong.
+
+**Appending, one row per series per month:**
+
+1. `SP500_TR_DATA` — `["YYYY-MM-28", close]`, the `^SP500TR` close on or
+   before the 28th. The row is always dated the 28th even when the sample is
+   the 26th or 27th; consumers never assume an exact day.
+2. `NDQ_TR_DATA` — same date rule, but **append by ratio, not by level**:
+   Yahoo restates QQQ's *entire* adjusted-close history at every distribution,
+   so a fresh pull will not match the committed levels. Take the new month's
+   and the previous month's adjusted closes *from the same pull* and append
+   `previous committed row × (new adj close ÷ previous adj close)`. Every
+   ratio between two dates is what the pages use; the level is cosmetic.
+3. `BTC_MONTHLY` — `["YYYY-MM", close]`, the last daily close of the month.
+   Sanity check against `PL_DATA`'s nearest sample: a gap beyond ordinary
+   daily movement (10%+) is a finding, not a rounding difference — that is
+   exactly how the 2026 errors were caught.
+4. Bump the row counts and "through" months in each file's header comment.
+
+**The right edge of two charts depends on this.** The heatmap and the BvSM
+wealth chart take their **end date from the last `SP500_TR_DATA` row**, not
+from `PL_DATA` or today's date. A missed append here freezes both charts at
+the last equity sample regardless of how fresh everything else is — they sat
+at 2026-05-28 from May to September 2026 for exactly this reason. If either
+chart's right edge is behind the current month, this is the section.
+
 ### Annual: Power Law exponent survey — external pairs (piggyback the PL-1 recheck, due 2026-11-02)
 
 The Tab 1 exponent survey (Power Law v2, item b) plots competing coefficient
