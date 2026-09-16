@@ -588,9 +588,28 @@
     s += '</svg>';
     setHTML('rdA3Viz', s);
 
-    setHTML('rdA3Note', open
-      ? 'The open approach is described, not scored &mdash; it has no outcome yet.'
-      : 'Every approach shown is closed, so every one has an outcome.');
+    /* Three states, not two. CLOSED and SCORED are different things: an
+       approach is scored 24 months after its deepest close, so a closed one
+       can carry no outcome for up to two years (the Floor page's parity check
+       enforces exactly this — MONTHLY_REFRESH_CHECKLIST §5.1 step 3). The old
+       else-branch, "every one has an outcome", conflated the two and went false
+       the day the July 2026 approach closed (2026-09-13). The window is measured
+       off the series, not the clock, like every other duration on this page. */
+    var unscored = closed.filter(function (v) { return S[N - 1].d - v.lowD < 2 * YEAR_D; });
+    var note;
+    if (open) {
+      note = 'The open approach is described, not scored &mdash; it has no outcome yet.';
+    } else if (unscored.length) {
+      var due = unscored[unscored.length - 1];
+      note = 'Every approach shown is closed, but ' +
+             (unscored.length === 1 ? 'the most recent is' : 'the ' + unscored.length + ' most recent are') +
+             ' not yet scored: an outcome is read 24 months after the deepest close, and for the ' +
+             fmtMonth(due.firstD) + ' approach that falls in <strong>' + fmtMonth(due.lowD + 2 * YEAR_D) + '</strong>. ' +
+             'Until then it is described, not scored.';
+    } else {
+      note = 'Every approach shown is closed and scored &mdash; each one has a 24-month outcome.';
+    }
+    setHTML('rdA3Note', note);
   }
 
   /* ═══════════════════════════════════════════════════════════
