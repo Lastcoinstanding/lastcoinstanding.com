@@ -41,6 +41,25 @@ session automatically. Close items here when done; this file is the "what's cook
   institutional guidance (BlackRock / Fidelity *Getting Off Zero*), §8.5 copy-tell drift
   re-grep, §8.6 Bitcoin as Collateral record.
 
+- [ ] **COMPARATOR SERIES ARE ANNUAL-ENDPOINT INTERPOLATIONS, NOT MONTHLY SAMPLES (found 2026-09-16).**
+  `src/_includes/_pageassets/shared/tr-comparator-data.js` declares `SP500_TR_DATA` and
+  `NDQ_TR_DATA` as "Day 28 sampled month-by-month." They are not: **every calendar year from
+  2010 to 2026, in both series, is a straight line between annual endpoints** — constant monthly
+  increments (S&P: 199.23 through 2024, 179.19 through 2025, 32.42 through 2026; NASDAQ-100:
+  453.68 / 556.47 / 76.79). The 2026 steps are an extrapolation. Multi-year CAGRs are preserved
+  by construction; the intra-year path is fictional, so on the S&P/NASDAQ side no drawdown, no
+  crash and no bad-month entry exists at monthly resolution. Every page comparing bitcoin to
+  equities at monthly grain inherits this: `/heatmap`, `/bitcoin-vs-the-stock-market`,
+  `/the-gallery` (charts 7/8/10), `/the-bitcoin-horizon` §2, and the `/calculators` mini-tiles.
+  **Neither series has a `DATA_AUDIT` row**, and neither series nor `BTC_MONTHLY` (also ending
+  2026-05) is in the monthly refresh procedure — the file header points at a "§5" that is now
+  "Verification after refresh" and no longer says so. Not a refresh item: a dedicated pass to
+  (1) replace both with real monthly total-return data from a named source, (2) re-verify every
+  claim on the affected pages against the real series, (3) register all three series in
+  `DATA_AUDIT`, (4) add them to `MONTHLY_REFRESH_CHECKLIST §1`. Until then `og-heatmap.jpg` and
+  the BvSM card are not regenerated — re-shooting them re-bakes the same data (both came out
+  byte-identical at the 2026-09-16 OG pass, `882160e`).
+
 - [x] **THE RUNDOWN v2 — PUBLICLY LISTED (2026-09-07, `ada60b2`). RENAMED TO "THE BITCOIN RUNDOWN" ON `feat-rundown-rename`, AWAITING JM'S MERGE.**
   Merged to production 2026-09-02 (PR #97, merge `fc773b6`) carrying v2 "The Briefing" and
   the site-wide unified floor-visit definition. **`/the-rundown` is live but unlisted** —
