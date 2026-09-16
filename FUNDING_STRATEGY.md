@@ -41,7 +41,7 @@ the *open-sourcing* that lane required; it does not touch what readers were prom
 copy or pitch that blurs the two is wrong.
 
 **Why the closure is strategically clean, not merely a loss.** Proprietary Background IP licenses
-*better*: the Named Background IP schedule (`OWN_JOB_STRATEGY` §5) is stronger when the engines are
+*better*: the Named Background IP schedule (`OWN_JOB_STRATEGY` §5, project-side) is stronger when the engines are
 not already MIT-licensed to the world, and the acquisition back-pocket option values higher. The
 closure also dissolves the grants-vs-employment optics interaction — one less constraint on the
 commercial motion.

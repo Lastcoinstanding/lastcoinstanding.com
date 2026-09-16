@@ -539,7 +539,7 @@ session automatically. Close items here when done; this file is the "what's cook
   open-source scope question, and the **OpenSats application drafted 2026-08-11 (Aug 24–28 window) is
   shelved unsubmitted**. The two reference letters are no longer on the critical path for this
   decision — Tom (Satsback) and Joe Bryan are owed courtesy release notes (JM's action, tracked
-  project-side, not here). The `OWN_JOB_STRATEGY` §1 grants-vs-employment interaction is **moot**:
+  project-side, not here). The `OWN_JOB_STRATEGY` (project-side) §1 grants-vs-employment interaction is **moot**:
   with the grant lane retired there is nothing for employment to substitute against. Full record:
   `FUNDING_STRATEGY.md` (ruling at the head of the doc; Path 1 retired, lanes reordered).
   `OPENSOURCE_DECISION_BRIEF.md` and `GRANTS_RESEARCH_KIT.md` become reference material rather than
@@ -605,11 +605,9 @@ session automatically. Close items here when done; this file is the "what's cook
 
 ## Own-job / industry outreach — status: NEW workstream (2026-08-05)
 
-Strategy doc created: **`OWN_JOB_STRATEGY.md`** — door-agnostic positioning (full-time /
-fractional / licensing), both-tier target map (Fidelity DA, Bitwise, Onramp, Swan, Unchained,
-River, NYDIG, DACFP, bitcoin-native RIAs), the two structural rules (sell the capability never the
-site; the register is the differentiator), compliance notes, outreach gate (~mid-Sept: capability
-one-pager + real metrics + 4–6 threads running).
+Strategy doc: **`OWN_JOB_STRATEGY.md`** — project-side (canonical copy per the 2026-08-10
+sensitive-docs ruling; the repo copy was removed 2026-09-16). Section references below point at
+the project-side doc.
 
 - [ ] **JM ruling:** parallel track vs FUNDING_STRATEGY reorder + confirm the site-independence
   red line (doc §8.1).

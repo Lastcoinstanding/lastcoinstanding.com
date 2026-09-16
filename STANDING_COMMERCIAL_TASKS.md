@@ -1,6 +1,6 @@
 # Standing Commercial Tasks — Last Coin Standing
 
-> **Created 2026-08-20.** The file did not exist when the first ledger entries were written; created here rather than parking them in chat history. Companion to `OWN_JOB_STRATEGY.md` (the strategy this executes), `REACH_GROWTH_PLAN.md` (reach feeds it), and `CREATOR_CREDIBILITY_KIT.md` (the assets outreach reuses).
+> **Created 2026-08-20.** The file did not exist when the first ledger entries were written; created here rather than parking them in chat history. Companion to `OWN_JOB_STRATEGY.md` (the strategy this executes; project-side, not in the repo), `REACH_GROWTH_PLAN.md` (reach feeds it), and `CREATOR_CREDIBILITY_KIT.md` (the assets outreach reuses).
 
 _Recurring commercial work and the running record of outreach. Strategy lives in the companion
 docs; this file is what was actually done, when, and what happens next — the thing that goes stale
