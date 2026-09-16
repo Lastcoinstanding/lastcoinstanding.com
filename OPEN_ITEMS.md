@@ -573,7 +573,11 @@ session automatically. Close items here when done; this file is the "what's cook
   surplus-capital-at-the-margin limit — it keeps the essay publishable rather than promotional. At
   publish: reciprocal link both ways (essay ↔ page), the Exit precedent nearly missed it.
 
-- [ ] **~Aug 13 — Monthly refresh due.** PL_DATA append + as-of strings + CLARITY check + MSTR/STRC
+- [x] **DONE (2026-09-13) — ~Aug 13 — Monthly refresh due.** Ran 2026-09-13 and shipped as PR #98
+  (merged to `main` 2026-09-16, `b0a4e09`). Open follow-ups from that pass are the four dated
+  items at the top of "In flight".
+
+- [ ] **~Oct 13 — Monthly refresh due.** PL_DATA append + as-of strings + CLARITY check + MSTR/STRC
   snapshots + Bull & Bear triggers. /discount-or-premium needs nothing beyond the shared PL_DATA
   append (all figures live-computed, incl. the duration record).
 
