@@ -766,7 +766,7 @@ The publish-day habit (`NEW_PAGE_CHECKLIST`) covers a single new page on the day
 
 ## 10. Claude project mirror refresh
 
-**Last mirror refresh: 2026-09-13** (update this line BEFORE exporting,
+**Last mirror refresh: 2026-09-17** (update this line BEFORE exporting,
 not after — see step 3).
 
 The Claude project holds a copy of the repo's strategy and design docs. That
