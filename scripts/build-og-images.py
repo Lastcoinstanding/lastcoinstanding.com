@@ -248,10 +248,22 @@ CARDS = [
             "titleAccent": "Bitcoin",
             "titleAfter": " Heatmap",
             "subtitle": "Bitcoin's outperformance vs. the S&P 500 — every monthly entry since 2010, every common holding horizon.",
+            # Re-derive both figures from the live grid before every regeneration
+            # (MONTHLY_REFRESH_CHECKLIST §6). Definitions, as read 2026-09-16 from
+            # the branch preview with data through 2026-08, Period-return view,
+            # lump-sum mode, comparator S&P 500 TR:
+            #   "116 of 116" — valid 84-month cells (data-tier) with outperformance
+            #     multiple >= 1, over all valid 84-month cells. The 60-month row does
+            #     NOT qualify: 7 losses of 140 (2021-top entries), so the former
+            #     "100% wins at 4y+ horizons" was false at five years on either dataset.
+            #   "38×" — the MEDIAN of those 116 cells' outperformance multiples.
+            #     Mean is 1,738× and geometric mean 72× (dominated by 2010–2012
+            #     entries); the former "164.5×" reproduced under no definition.
             "statsHTML": (
-                '<strong style="color:#F7931A; font-weight:700;">100% wins at 4y+ horizons</strong>'
-                '  ·  <strong style="color:#F7931A; font-weight:700;">164.5×</strong>'
-                ' average outperformance at 7-year horizons'
+                '<strong style="color:#F7931A; font-weight:700;">No losing 7-year window</strong>'
+                '  ·  <strong style="color:#F7931A; font-weight:700;">116 of 116</strong>'
+                ' entries since 2010  ·  median <strong style="color:#F7931A; font-weight:700;">38×</strong>'
+                ' outperformance'
             ),
             "urlText": "lastcoinstanding.com/heatmap",
         },
@@ -267,12 +279,12 @@ CARDS = [
             "title": "",
             "titleAccent": "Bitcoin",
             "titleAfter": " vs. The Stock Market",
-            "subtitle": "How $1,000 from 2010 grew under bitcoin, the S&P 500, and the NASDAQ-100 — the wealth-over-time stress test.",
+            "subtitle": "How $10,000 from 2010 grew under bitcoin, the S&P 500, and the NASDAQ-100 — the wealth-over-time stress test.",
             "statsHTML": (
                 '<strong style="color:#F7931A; font-weight:700;">Bitcoin</strong>'
                 '  ·  <strong style="color:#F7931A; font-weight:700;">S&amp;P 500 TR</strong>'
                 '  ·  <strong style="color:#F7931A; font-weight:700;">NASDAQ-100 TR</strong>'
-                '  ·  $1k from 2010 → today'
+                '  ·  $10k from 2010 → today'
             ),
             "urlText": "lastcoinstanding.com/bitcoin-vs-the-stock-market",
         },

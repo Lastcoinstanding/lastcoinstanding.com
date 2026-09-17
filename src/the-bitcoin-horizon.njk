@@ -106,7 +106,7 @@ eleventyComputed:
 
     <p>The counter to Buffett is real and worth naming. The common form it takes: <em>volatility is risk for real people, because real people panic-sell at the bottom.</em> Discipline is easy to prescribe and hard to practice. Most investors cannot watch a portfolio halve and do nothing; <em>"don't just stand there; do something"</em> is a natural instinct. But there are cases where the real lesson is <em>"don't just do something; stand there."</em></p>
 
-    <p>This is an argument against behavior, not an argument against the distinction. And the page's answer to it is structural, not motivational. The next section shows that at a sufficient time horizon, the behavioral problem has no opportunity to become a loss &mdash; because across fifteen years of Bitcoin's history, no such window has ever closed in the red.</p>
+    <p>This is an argument against behavior, not an argument against the distinction. And the page's answer to it is structural, not motivational. The next section shows that at a sufficient time horizon, the behavioral problem has no opportunity to become a loss &mdash; because across fifteen years of Bitcoin's history, no such window has yet closed in the red.</p>
   </div>
 </section>
 
@@ -114,11 +114,13 @@ eleventyComputed:
 <section id="anchor">
   <div class="wrap-narrow">
     <span class="label section-label">§2 &mdash; The empirical anchor</span>
-    <h2>Forty-one months</h2>
+    <h2>Sixty-four months</h2>
 
-    <p class="lead">Across approximately fifteen years of Bitcoin's recorded price history, no rolling holding period of forty-one months or more has ever ended in nominal loss.</p>
+    <p class="lead">Across fifteen years of recorded price history, no rolling holding period of sixty-four months or more has ended in nominal loss.</p>
 
-    <p>The claim is empirical, not theoretical. It is the direct observation of monthly Bitcoin closing prices across the dataset, accessed April 2026, and is consistent with calculations published by Case Bitcoin and by bitcoinisthebettermoney.com, which maintain independent rolling-return analyses.</p>
+    <p>The longest losing window on record is the most recent one: from the 2021 cycle top to the June 2026 low, just over five years. It is also the only one still open. The cycle that produced it has not finished, and a new low would lengthen it.</p>
+
+    <p>The claim is empirical, not theoretical. It is the direct observation of monthly Bitcoin closing prices across the dataset, through August 2026, and is consistent with calculations published by Case Bitcoin and by bitcoinisthebettermoney.com, which maintain independent rolling-return analyses.</p>
 
     <p>Below is the same finding shown two ways. First, against the S&amp;P 500, comparing the full range of outcomes &mdash; worst, median, and best &mdash; available at each holding period. Second, in the calculator that follows, where you can pick your own scenario.</p>
 
@@ -144,6 +146,8 @@ eleventyComputed:
         <div class="s-def"><strong>Realized-volatility ratio of IBIT to SPY, mid-2025</strong>, down from 5.7&times; a year earlier. Bitcoin (via the IBIT ETF) is now only fractionally more volatile day-to-day than the S&amp;P 500 itself. The premise of the volatility objection is itself in retreat.</div>
       </div>
     </div>
+
+    <p class="calc-footnote"><strong>Sources.</strong> Month-end closes: Yahoo Finance BTC-USD from October 2014, blockchain.info's exchange average before. The sixty-three-month window from March 2021 closed under on the first source and over on the second; the fifty-six-month window from October 2021 closed under on both. Until September 2026 this page said forty-one months; the early-2026 closes behind that figure were too high and were replaced.</p>
   </div>
 </section>
 
@@ -175,7 +179,7 @@ eleventyComputed:
               <button type="button" data-custom="1" class="preset" id="customBtn">Custom date</button>
             </div>
             <div class="date-picker" id="datePicker">
-              <input type="month" id="customDate" min="2011-01" max="2026-04" value="2020-03">
+              <input type="month" id="customDate" min="2011-01" value="2020-03">
             </div>
           </div>
         </div>
@@ -211,7 +215,7 @@ eleventyComputed:
           <input type="range" id="periodSlider" min="1" max="120" value="48" step="1">
           <div class="slider-range-marks">
             <span>1 month</span>
-            <span id="midMark">41 months</span>
+            <span id="midMark">64 months</span>
             <span id="endMark">Today</span>
           </div>
         </div>

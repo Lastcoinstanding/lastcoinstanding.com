@@ -239,8 +239,10 @@ function updateSliderMax() {
     slider.value = max;
     document.getElementById('periodMonths').textContent = max;
   }
-  // mid mark stays at 41 months unless dataset is shorter
-  const midMark = Math.min(41, max);
+  // mid mark is the §2 headline figure — the longest horizon at which a
+  // rolling hold has ended in nominal loss, plus one (64 as of 2026-09; was
+  // 41 on the pre-correction BTC_MONTHLY). Re-derive it when the series moves.
+  const midMark = Math.min(64, max);
   document.getElementById('midMark').textContent = midMark + ' months';
   // end mark shows the actual end date — "Today (Apr 2026)"
   const [ey, em] = lastKey.split('-').map(Number);
@@ -559,6 +561,8 @@ document.getElementById('customBtn').addEventListener('click', () => {
   render();
 });
 
+// The custom-date picker's upper bound follows the data, not a static attribute.
+document.getElementById('customDate').max = lastKey;
 document.getElementById('customDate').addEventListener('change', e => {
   state.startDate = e.target.value;
   updateSliderMax();

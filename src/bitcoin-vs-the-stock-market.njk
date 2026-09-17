@@ -60,7 +60,7 @@ eleventyComputed:
                     <button class="bvsm-pl-range" data-range="recent" role="tab" aria-selected="false">Recent (2y)</button>
                 </div>
                 <div class="bvsm-chart-canvas-tall" data-chart-copy data-chart-heading="closest:.bvsm-chart-wrap .bvsm-chart-label" data-chart-title="Bitcoin vs. the Power Law trend">
-                    <canvas id="bvsmPowerLawChart" role="img" aria-label="Bitcoin price plotted against the Power Law trend across 16 years, with annotated markers at each cyclical top showing the trend-deviation multiple, each cycle floor showing its trend-deviation multiple, and the current position at 0.59× trend."></canvas>
+                    <canvas id="bvsmPowerLawChart" role="img" aria-label="Bitcoin price plotted against the Power Law trend across 16 years, with annotated markers at each cyclical top showing the trend-deviation multiple, each cycle floor showing its trend-deviation multiple, and a marker at the current price's position relative to trend."></canvas>
                     <!-- Pulse halo positioned over the "you are here" marker.
                          JS sets left/top to the marker's pixel coords after
                          every chart render; CSS handles the ring animation. -->
@@ -143,7 +143,7 @@ eleventyComputed:
                                 <span class="slider-name">Start date<span class="help-tip" tabindex="0">?<span class="tip-content">The date the position begins. Use the preset buttons above to jump to a cyclical top, or drag the slider for any date from 2010 onwards. In lump-sum mode this is the day the single investment is made; in weekly DCA mode it&rsquo;s the day the weekly buys start.</span></span></span>
                                 <span class="slider-val" id="bvsmStartDateVal">Nov 30, 2013</span>
                             </div>
-                            <input type="range" id="bvsmStartDate" min="0" max="195" step="1" value="46">
+                            <input type="range" id="bvsmStartDate" min="0" step="1" value="46">
                         </div>
                     </div>
                     <div class="slider-control">
@@ -355,7 +355,9 @@ eleventyComputed:
                 <p><em>Tying the historical evidence to the decision a reader is making today.</em></p>
             </div>
 
-            <p class="prose"><strong>Volatility is a horizon-dependent concern.</strong> A 50% drawdown is terrifying at six-month horizons and noise at ten-year horizons. The historical record in &sect;2 above is the empirical version of this claim: every worst-timed lump-sum entry the page tests at horizons of five years or longer produced more wealth than the S&amp;P 500 over the same period. The horizon-dependence shows up sharply when the recent past is sliced at different windows. Through May 2026, at a one-year horizon &mdash; measuring from roughly the October 2025 cycle top &mdash; the S&amp;P 500 has returned about <strong>+27%</strong> and bitcoin about <strong>&minus;21%</strong>. At five years, bitcoin (<strong>+74%</strong>) trails the S&amp;P 500 (<strong>+80%</strong>) modestly. At ten years, bitcoin&rsquo;s roughly <strong>17,000%</strong> total return dwarfs the S&amp;P 500&rsquo;s <strong>264%</strong>. Same asset, same comparator, three completely different stories &mdash; <em>the drama isn&rsquo;t in the asset, it&rsquo;s in the horizon you use to measure it.</em></p>
+            <p class="prose"><strong>Volatility is a horizon-dependent concern.</strong> A 50% drawdown is terrifying at six-month horizons and noise at ten-year horizons. The historical record in &sect;2 above is the empirical version of this claim: every worst-timed lump-sum entry the page tests at horizons of seven years or longer produced more wealth than the S&amp;P 500 over the same period. The 2021 top has not reached that horizon, and at just under five years it trails &mdash; the heatmap&rsquo;s five-year row shows the same for every early-2021 entry.</p>
+
+            <p class="prose">The horizon-dependence shows up sharply when the recent past is sliced at different windows. Through August 2026: at one year, the S&amp;P 500 is up about <strong>20%</strong> and bitcoin down about <strong>27%</strong>. At five years bitcoin trails. At ten, bitcoin&rsquo;s roughly <strong>13,500%</strong> dwarfs the S&amp;P&rsquo;s <strong>320%</strong>. Same asset, same comparator, three completely different stories &mdash; <em>the drama isn&rsquo;t in the asset, it&rsquo;s in the horizon you use to measure it.</em></p>
 
             <p class="prose"><strong>Time in market applies differently at different CAGRs.</strong> A 10%-CAGR asset doubles in about seven years. A 25%-CAGR asset doubles in under three. Compounding advantage over long horizons is exponential, not linear &mdash; which is why a relatively small allocation to a high-trend asset, held across years, can materially shift a portfolio outcome even when most of the portfolio is in conventional assets. <em>The relevant question isn&rsquo;t whether bitcoin is volatile (it is) or risky (it is) or might fail (it might).</em> It&rsquo;s whether a small position, held long enough, with a clear understanding of the trend, compounds to something that materially changes the holder&rsquo;s financial picture. The historical record says yes at every horizon the page tests.</p>
 

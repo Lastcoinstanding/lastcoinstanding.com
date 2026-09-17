@@ -472,7 +472,9 @@
     return closest[1];
   }
 
-  // Map slider index (0-195) to a date string. Index 0 = 2010-01-28, index 195 = 2026-05-28.
+  // Map slider index to a date string. Index 0 = 2010-01-28; the upper bound is
+  // SP500_TR_DATA.length - 1 and is written onto the slider at init (below), so
+  // the reachable range follows the data rather than a static max attribute.
   function sliderIndexToDate(idx) {
     return SP500_TR_DATA[Math.max(0, Math.min(idx, SP500_TR_DATA.length - 1))][0];
   }
@@ -921,6 +923,8 @@
     // setting the slider value) don't trigger the clear.
     var startEl = document.getElementById('bvsmStartDate');
     if (startEl) {
+      // The slider's upper bound follows the data: the last SP500_TR_DATA row.
+      startEl.max = SP500_TR_DATA.length - 1;
       startEl.addEventListener('input', function(e) {
         if (e.isTrusted) {
           document.querySelectorAll('.bvsm-preset.is-active').forEach(function(b){

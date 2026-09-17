@@ -41,7 +41,23 @@ session automatically. Close items here when done; this file is the "what's cook
   institutional guidance (BlackRock / Fidelity *Getting Off Zero*), §8.5 copy-tell drift
   re-grep, §8.6 Bitcoin as Collateral record.
 
-- [ ] **COMPARATOR SERIES ARE ANNUAL-ENDPOINT INTERPOLATIONS, NOT MONTHLY SAMPLES (found 2026-09-16).**
+- [ ] **~Nov 10 — BvSM 2021-top preset reaches five years.** Re-read the §4 sentence against
+  the preset held to that date (bitcoin ×1.18 vs S&P ×1.76 as of 2026-09-10; level requires
+  ~$114K). Update the sentence with whatever the number is. The page no longer announces this;
+  the tracker carries it.
+
+- [x] **RESOLVED (2026-09-16, `data/comparator-series` PR) — COMPARATOR SERIES ARE ANNUAL-ENDPOINT INTERPOLATIONS, NOT MONTHLY SAMPLES (found 2026-09-16).**
+  Both equity series rebuilt from real data (`^SP500TR` close and QQQ adjusted close, Day-28,
+  2010-01 → 2026-08), and `BTC_MONTHLY` rebuilt from month-end closes — which surfaced a second
+  finding: five recent bitcoin months were 10–32% high (2025-10 held the intraday ATH;
+  2026-01 → 04 contradicted `PL_DATA`), a sign flip on the Horizon chart's 1-year CAGR ending
+  2026-02 (+5% shown, −21% real). **Re-measured on the real data, the heatmap's and BvSM's
+  conclusions hold** — win rates move under one point at every horizon, 100% at 7y and 10y stand,
+  mean 7-year outperformance moves ~4%; the case never needed the smoothing. Registered as
+  `DATA_AUDIT` EQ-1 / EQ-2 / BTC-M-1; refresh procedure now in `MONTHLY_REFRESH_CHECKLIST §1`.
+  Hardcoded figures on the consumer pages were flagged in the PR for JM to verify against the
+  branch preview, not rewritten. The heatmap and BvSM OG cards regenerate after merge. Original
+  finding, kept as the record:
   `src/_includes/_pageassets/shared/tr-comparator-data.js` declares `SP500_TR_DATA` and
   `NDQ_TR_DATA` as "Day 28 sampled month-by-month." They are not: **every calendar year from
   2010 to 2026, in both series, is a straight line between annual endpoints** — constant monthly
