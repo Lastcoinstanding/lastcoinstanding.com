@@ -41,6 +41,11 @@ session automatically. Close items here when done; this file is the "what's cook
   institutional guidance (BlackRock / Fidelity *Getting Off Zero*), §8.5 copy-tell drift
   re-grep, §8.6 Bitcoin as Collateral record.
 
+- [ ] **~Nov 10 — BvSM 2021-top preset reaches five years.** Re-read the §4 sentence against
+  the preset held to that date (bitcoin ×1.18 vs S&P ×1.76 as of 2026-09-10; level requires
+  ~$114K). Update the sentence with whatever the number is. The page no longer announces this;
+  the tracker carries it.
+
 - [x] **RESOLVED (2026-09-16, `data/comparator-series` PR) — COMPARATOR SERIES ARE ANNUAL-ENDPOINT INTERPOLATIONS, NOT MONTHLY SAMPLES (found 2026-09-16).**
   Both equity series rebuilt from real data (`^SP500TR` close and QQQ adjusted close, Day-28,
   2010-01 → 2026-08), and `BTC_MONTHLY` rebuilt from month-end closes — which surfaced a second
