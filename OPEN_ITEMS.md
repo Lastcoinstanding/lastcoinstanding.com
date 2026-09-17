@@ -46,7 +46,7 @@ session automatically. Close items here when done; this file is the "what's cook
   ~$114K). Update the sentence with whatever the number is. The page no longer announces this;
   the tracker carries it.
 
-- [x] **RESOLVED (2026-09-16, `data/comparator-series` PR) — COMPARATOR SERIES ARE ANNUAL-ENDPOINT INTERPOLATIONS, NOT MONTHLY SAMPLES (found 2026-09-16).**
+- [x] **RESOLVED (PR #99, merged to production 2026-09-17, `5c5090d`) — COMPARATOR SERIES ARE ANNUAL-ENDPOINT INTERPOLATIONS, NOT MONTHLY SAMPLES (found 2026-09-16).**
   Both equity series rebuilt from real data (`^SP500TR` close and QQQ adjusted close, Day-28,
   2010-01 → 2026-08), and `BTC_MONTHLY` rebuilt from month-end closes — which surfaced a second
   finding: five recent bitcoin months were 10–32% high (2025-10 held the intraday ATH;
