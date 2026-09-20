@@ -11,13 +11,30 @@
 {# Google Analytics (GA4) — site chrome, single-sourced here. Moved out of the
    per-page _pageassets/<slug>-head.html fragments 2026-09-19 (same principle as
    the charset/viewport move). Do NOT add the snippet to a head fragment: a
-   second copy double-counts every page_view. See NEW_PAGE_CHECKLIST §10. #}
+   second copy double-counts every page_view. See NEW_PAGE_CHECKLIST §10.
+   Internal-traffic tagging (2026-09-19): localhost, 127.0.0.1, *.pages.dev
+   previews, and any browser that has visited with ?lcs_internal=1 (persisted in
+   localStorage as lcs.internal; ?lcs_internal=0 clears it) send
+   traffic_type=internal. The tag only labels the hit — GA4's "Internal Traffic"
+   data filter is what excludes it. See SITE_GUIDE "GA4 internal-traffic tagging". #}
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WNGLLPPR5M"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-WNGLLPPR5M');
+  (function () {
+    var cfg = {};
+    try {
+      var q = new URLSearchParams(location.search).get('lcs_internal');
+      if (q === '1') localStorage.setItem('lcs.internal', '1');
+      if (q === '0') localStorage.removeItem('lcs.internal');
+      var h = location.hostname;
+      var internal = h === 'localhost' || h === '127.0.0.1' || /\.pages\.dev$/.test(h)
+                  || localStorage.getItem('lcs.internal') === '1';
+      if (internal) cfg.traffic_type = 'internal';
+    } catch (e) {}
+    gtag('config', 'G-WNGLLPPR5M', cfg);
+  })();
 </script>
 {{ head_extras | safe }}
 {# FAQPage JSON-LD — layout-level, single-sourced from the `faq` front matter

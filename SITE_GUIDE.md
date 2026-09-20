@@ -333,6 +333,16 @@ Short deployment delay (~30-60s) after GitHub push. Retry live URL checks after 
 
 **Avoid rapid-fire commits.** CF Pages free tier allows one concurrent build; pushing 15+ commits in quick succession can jam the queue (a stuck deployment may not recover automatically and can block production deployments for hours or days). For batch changes, prefer **one atomic commit via the Git Tree API** that bundles many file changes into a single push. If the queue does jam, recovery requires cancelling stuck deployments via the CF API (`DELETE /pages/projects/{project}/deployments/{id}`) and triggering a fresh production deployment. After bulk operations, purge the zone cache (`POST /zones/{id}/purge_cache` with `{"purge_everything":true}`) to ensure the new content is what users see.
 
+### GA4 internal-traffic tagging
+
+The GA4 snippet (`G-WNGLLPPR5M`) lives **once**, in `layouts/base.njk`, before `head_extras` (moved out of the per-page head fragments 2026-09-19 — never re-add it to a fragment; a second copy double-counts). Its single `gtag('config', …)` call adds `traffic_type: 'internal'` when the visit is ours, which GA4 sends as `tt=internal` on every collect hit.
+
+- **Auto-tagged hostnames:** `localhost`, `127.0.0.1`, and anything ending `.pages.dev` (every Cloudflare preview). Production `lastcoinstanding.com` is never auto-tagged.
+- **Per-browser switch on production:** visit any page once with `?lcs_internal=1` — it sets `localStorage["lcs.internal"] = "1"` and every later visit from that browser is tagged, no parameter needed. `?lcs_internal=0` removes it. Do this once on each browser/device JM uses (phone included); it does not survive cleared site data or private windows, so redo it after either.
+- **The tag only labels; the GA4 data filter excludes.** Admin → Data collection and modification → Data filters → "Internal Traffic" (matches `traffic_type = internal`). In **Testing** the hits are still reported (visible under the "Test data filter name" dimension); only **Active** drops them, permanently and not retroactively. Dates are logged in `MONTHLY_REFRESH_CHECKLIST` §9.6.
+- **Fails open:** the block is wrapped in try/catch, so blocked storage just means an untagged (counted) hit — GA never breaks.
+- **Verifying:** DevTools → Network → filter `collect` → the request URL carries `tt=internal` (or no `tt` for a normal visitor).
+
 ### Open Graph / Twitter card meta tags — REQUIRED on every shareable page
 
 Every user-facing page must include the full set of social meta tags. Without `og:image` + `twitter:card`, links unfurl as text-only on Twitter and Facebook — visually indistinguishable from broken links. Tags live in `src/_includes/_pageassets/<slug>-head.html`. The standard block is:
