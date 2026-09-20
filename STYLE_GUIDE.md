@@ -913,6 +913,20 @@ companion:
 
 **When the first piece of companion content ships.** Add the entry to the page's `companion:` front-matter array. The component renders immediately — no other markup or CSS changes needed. When you publish a Substack article walking through the Power Law calculator, that's a one-line edit to `the-power-law.njk`'s front-matter. Same for a YouTube video. The component is staged on Power Law and BvRE in commit 5 (empty `companion: []` arrays) so the front-matter slot exists ready for population.
 
+### 6.12a Outbound link tagging (added Sep 2026)
+
+The mirror of Companion: Companion links *off* the site; this governs links coming *back*. Every link from off-site publishing back to lastcoinstanding.com carries UTM parameters.
+
+- `utm_source` = the platform (`substack`, `x`, `youtube`, `linkedin`).
+- `utm_medium` = the format (`essay`, `post`, `podcast`).
+- `utm_campaign` = the essay slug, or the host/episode slug for appearances (e.g. `robin-seyr`).
+
+Append with `&` when the URL already has a query string (`?pos=0.441&utm_source=…`).
+
+**Never put UTMs on links between pages of the site itself** — they would overwrite the visitor's real source.
+
+First applied: the Sep 2026 essays and the Robin Seyr episode.
+
 ### 6.13 Help-tip / inline tooltip
 
 Small `?`-in-circle trigger sitting next to a label or section title; expands a dark tooltip card on hover, focus, or tap. Use whenever an input, output, or label is non-obvious enough to benefit from one or two sentences of explanation, but not important enough to displace into the page's body prose. Inputs on a calculator surface are the canonical case.
