@@ -69,5 +69,5 @@
   <url><loc>https://lastcoinstanding.com/about</loc><priority>0.5</priority><changefreq>yearly</changefreq></url>
   <url><loc>https://lastcoinstanding.com/work-with-me</loc><priority>0.5</priority><changefreq>yearly</changefreq></url>
 
-  <!-- Deep-link section anchors (high-value sub-sections worth indexing) -->
+  <!-- No #fragment URLs in this sitemap: Google ignores fragments and reports them as "Discovered – currently not indexed" (removed Sep 2026, 23 entries). -->
 </urlset>
