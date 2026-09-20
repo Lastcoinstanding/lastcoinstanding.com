@@ -2465,8 +2465,9 @@ links, so an accent would compete with them — and it hides with those links
   only** — the `.cr-primary` anchor (the data itself) stays clickable to
   `/dashboard`. The documented graceful degradation before any wrap.
 - **Opt-out.** Front matter `channel_ribbon: false` renders nothing and skips the
-  site-wide script load. Currently the **homepage** (its own `bitcoin-ticker`
-  already carries this read under the hero) and **/the-gallery** (opens on the
+  site-wide script load. Currently the **homepage** (opt-out kept: its own `bitcoin-ticker`
+  strip was removed 2026-09-20; its dashboard doorway will be the site-wide chip,
+  a separate piece of work) and **/the-gallery** (opens on the
   full Power Law channel chart, which shows today's position directly). All other
   content pages inherit it.
 
@@ -2650,7 +2651,7 @@ The page links the Substack essay; JM edits the essay post-launch to link back (
 
 **Where it lives.** `src/_includes/components/get-updates.njk` (markup + self-contained `.gu-*` styles, no JS), included once from `base.njk` **above** the page-feedback widget, gated `{% if slug and get_updates != false %}`. Every slugged page inherits it automatically at that layout-level position. Opt a page out with `get_updates: false` front matter. Rendered order in the layout tail: content → FAQ → related → **Get Updates** → feedback → share → footer.
 
-**Homepage exception (JM, 2026-08-05).** The homepage sets `get_updates: false` to suppress the automatic footer placement, then includes the component *manually* higher up — in `src/index.njk`, after the hero/ticker intro and **before** the main content sections (the carousel and the concept-card grid). Still exactly one instance; just positioned where a landing page wants the subscribe prompt rather than at the tail. The homepage also opts out of the feedback widget (`feedback: false`), so it carries Get Updates and no feedback block.
+**Homepage exception (JM, 2026-08-05).** The homepage sets `get_updates: false` to suppress the automatic footer placement, then includes the component *manually* higher up — in `src/index.njk`, directly **below the Featured carousel** and above the Recent Updates strip. (Until 2026-09-20 it sat under the hero, ahead of the carousel; it moved down when the hero was rebuilt around two actions — *Plan your bitcoin retirement* and *New to Bitcoin? Start here* — so the subscribe prompt no longer competes with them in the first screen.) Still exactly one instance. The homepage also opts out of the feedback widget (`feedback: false`), so it carries Get Updates and no feedback block.
 
 **No third-party assets (R1 — the defining constraint).** It is a styled house block with a single button/link to the Substack subscribe page — **NOT the Substack iframe embed.** Zero third-party scripts, zero iframes, zero new privacy surface (the QA confirms no third-party network requests are added). One extra click is the price of that, and it fits this site. If the block is ever rebuilt, this no-iframe rule holds.
 

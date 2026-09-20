@@ -2075,8 +2075,8 @@ block, filled by `shared/channel-ribbon.js`. Full framework: SITE_GUIDE §40.1.
 
 **Reuse, not fork:** the numbers come from the shared `power-law-data.js`
 (`plPrice`/`positionLabel`/`fetchTodayPrice`); only the chrome is new. **When to
-skip:** pages whose hero already shows the channel read (homepage ticker, the
-Gallery's channel chart) — opt out with `channel_ribbon: false`.
+skip:** pages whose hero already shows the channel read (the
+Gallery's channel chart) — opt out with `channel_ribbon: false`. The homepage also opts out: its own ticker strip was removed 2026-09-20 and its dashboard doorway is a separate piece of work.
 
 ### 6.39 Freshness badges (`NEW` / `UPDATED` chips)
 
