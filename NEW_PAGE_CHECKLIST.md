@@ -651,9 +651,15 @@ the following. Copy from a complete reference (e.g.
 `bitcoin-vs-the-stock-market-head.html`) when creating a new one:
 
 - **Favicons** — 5 link tags for SVG, ICO, two PNG sizes, apple-touch-icon.
-- **Google Analytics** — the GA4 snippet with measurement ID
-  `G-WNGLLPPR5M`. Two `<script>` tags: async loader + inline config.
-  Missing GA = the page produces no analytics signal, period.
+- **Google Analytics — supplied by `base.njk`; do NOT add it here
+  (2026-09-19).** The GA4 snippet (measurement ID `G-WNGLLPPR5M`, async
+  loader + inline config, plus the internal-traffic flag) is emitted once
+  by `layouts/base.njk` for every page that extends it. A head fragment
+  must NOT carry the snippet: a second copy fires a second `config` and
+  double-counts every page_view. If you copy an old head fragment as a
+  starting point, confirm it has no `gtag`/`googletagmanager` lines.
+  A page that does not extend `base.njk` gets no GA. See `SITE_GUIDE`
+  "GA4 internal-traffic tagging".
 - **Title tag** — `<title>Page Name — Last Coin Standing</title>`.
   Under 60 characters where possible. Title tag carries the searched
   phrase including "Bitcoin"; the H1 may stay evocative per the house
@@ -776,7 +782,11 @@ curl -sL https://lastcoinstanding.com/<slug> | grep -c "og:image"
 curl -sL https://lastcoinstanding.com/<slug> | grep -c "application/ld+json"
 ```
 
-Each command should return at least `1`. Zero indicates a gap.
+Each command should return at least `1`. Zero indicates a gap. For GA
+specifically, more is also a bug: the built page must contain exactly one
+`googletagmanager.com/gtag/js` loader and exactly one `gtag('config'`
+call (both from `base.njk`) — two means a head fragment re-added the
+snippet and the page is double-counting.
 
 ### Publish-day habit — resubmit the sitemap + request indexing
 
