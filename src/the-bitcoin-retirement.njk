@@ -23,7 +23,11 @@ related:
     desc: "The income-instrument companion. Same audience and Power Law calculator philosophy, but framed around bitcoin-backed preferred dividends (STRC, SATA) instead of sell-as-needed — for readers who want a cashflow stream without the volatility-into-spending mechanic."
   - slug: how-much-bitcoin
     desc: "Before the retirement math: how large an allocation the growth mathematics can actually justify &mdash; the Kelly criterion."
-companion: []
+companion:
+  - url: https://www.youtube.com/watch?v=aQhk4KKqMss&t=0s
+    title: "Every 0.2 Bitcoin Retires You 3 Years Faster — The Robin Seyr Podcast"
+    kind: youtube
+    desc: "John and Robin Seyr on the retirement model: what each 0.2 BTC does to the retirement date, on default inputs."
 faq:
   - q: "How much bitcoin do I need to retire?"
     a: "There is no single number — it depends on your target income, your retirement year, and what you assume about bitcoin’s price path. This calculator lets you set all three and shows whether a given stack sustains your income year by year, including the scenarios where it depletes. The answer is a range you explore, not a figure anyone can hand you."
@@ -802,6 +806,5 @@ eleventyComputed:
      to a page is one include and no stylesheet edit. See SITE_GUIDE §53. #}
   {% include 'components/retirement-family.njk' %}
 
-  {% include 'components/companion-content.njk' %}
 
 </div>

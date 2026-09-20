@@ -909,9 +909,9 @@ companion:
 
 **Visual treatment is intentionally quieter than Related.** Companion content is supplementary, not a peer alternative. No Cormorant title at full weight, no card-grid, no orange top-bar on hover. Subtle border, gentle hover-tint.
 
-**Placement.** Insert `{% include 'components/companion-content.njk' %}` near the bottom of the page, AFTER the Related component. Reading order: main content → "Continue exploring" (lateral on-site) → "Going deeper" (vertical off-site). Both blocks lead the user away from the current page; ordering them this way (lateral first, then vertical) gives priority to keeping users on the site.
+**Placement.** Automatic — `base.njk` includes the component once for every page, directly after the Related strip (centralized 2026-09-20: it had been a per-page include carried by only 22 of 55 pages, so a `companion:` entry anywhere else silently rendered nothing — found when the Robin Seyr episode rows were added to seven pages and five did not render). **Never add `{% include 'components/companion-content.njk' %}` to a page template** — a second include renders the block twice; declaring `companion:` front matter is the entire per-page step. At layout level the block takes the same wrapper geometry as Related (same left edge and width at every breakpoint). Print stylesheets that hide `.related-block` must hide `.companion-block` too. Reading order: main content → "Continue exploring" (lateral on-site) → "Going deeper" (vertical off-site). Both blocks lead the user away from the current page; ordering them this way (lateral first, then vertical) gives priority to keeping users on the site.
 
-**When the first piece of companion content ships.** Add the entry to the page's `companion:` front-matter array. The component renders immediately — no other markup or CSS changes needed. When you publish a Substack article walking through the Power Law calculator, that's a one-line edit to `the-power-law.njk`'s front-matter. Same for a YouTube video. The component is staged on Power Law and BvRE in commit 5 (empty `companion: []` arrays) so the front-matter slot exists ready for population.
+**When the first piece of companion content ships.** Add the entry to the page's `companion:` front-matter array. The component renders immediately — no other markup or CSS changes needed. When you publish a Substack article walking through the Power Law calculator, that's a one-line edit to `the-power-law.njk`'s front-matter. Same for a YouTube video. First populated 2026-09-20: the Robin Seyr episode, one chapter-timestamped `kind: youtube` row on each of seven pages. An empty `companion: []` array is harmless but no longer needed as a staging slot.
 
 ### 6.12a Outbound link tagging (added Sep 2026)
 
@@ -925,7 +925,7 @@ Append with `&` when the URL already has a query string (`?pos=0.441&utm_source=
 
 **Never put UTMs on links between pages of the site itself** — they would overwrite the visitor's real source.
 
-First applied: the Sep 2026 essays and the Robin Seyr episode.
+First applied: the Robin Seyr episode (Sep 2026); essays forward-only.
 
 ### 6.13 Help-tip / inline tooltip
 
