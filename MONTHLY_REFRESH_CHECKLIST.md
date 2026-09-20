@@ -768,7 +768,7 @@ The publish-day habit (`NEW_PAGE_CHECKLIST`) covers a single new page on the day
 
 Dated breaks in the GA4 series. Check this list before reading any month-over-month or year-over-year number that spans one of these dates.
 
-- **2026-09-19: Enhanced-measurement history-change page_views turned OFF — views on slider pages are not comparable across this date.** (Pages that rewrite the URL as sliders move were logging a page_view per history change.) **Internal traffic tagged from <merge date>; filter Active from <date>.** Tagging is `traffic_type=internal`, set in `base.njk` — see `SITE_GUIDE` "GA4 internal-traffic tagging". Until the "Internal Traffic" data filter is switched from Testing to Active, internal hits are still IN the reports (labelled, not excluded); from the Active date they are permanently dropped, so sessions/views step down by JM's own usage at that date.
+- **2026-09-19: Enhanced-measurement history-change page_views turned OFF — views on slider pages are not comparable across this date.** (Pages that rewrite the URL as sliders move were logging a page_view per history change.) **Internal traffic tagged from 2026-09-20; filter Active from <date>.** Tagging is `traffic_type=internal`, set in `base.njk` — see `SITE_GUIDE` "GA4 internal-traffic tagging". Until the "Internal Traffic" data filter is switched from Testing to Active, internal hits are still IN the reports (labelled, not excluded); from the Active date they are permanently dropped, so sessions/views step down by JM's own usage at that date.
 
 ## 10. Claude project mirror refresh
 
