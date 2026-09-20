@@ -70,27 +70,4 @@
   <url><loc>https://lastcoinstanding.com/work-with-me</loc><priority>0.5</priority><changefreq>yearly</changefreq></url>
 
   <!-- Deep-link section anchors (high-value sub-sections worth indexing) -->
-  <url><loc>https://lastcoinstanding.com/the-gallery#section-channel</loc><priority>0.7</priority></url>
-  <url><loc>https://lastcoinstanding.com/the-gallery#section-heatmap</loc><priority>0.7</priority></url>
-  <url><loc>https://lastcoinstanding.com/the-gallery#section-horizon</loc><priority>0.7</priority></url>
-  <url><loc>https://lastcoinstanding.com/bitcoin-vs-real-estate#affordability</loc><priority>0.7</priority></url>
-  <url><loc>https://lastcoinstanding.com/bitcoin-vs-real-estate#priced-in-bitcoin</loc><priority>0.7</priority></url>
-  <url><loc>https://lastcoinstanding.com/bitcoin-vs-real-estate#postponed-purchase</loc><priority>0.7</priority></url>
-  <url><loc>https://lastcoinstanding.com/bitcoin-vs-rental-property#reality</loc><priority>0.8</priority></url>
-  <url><loc>https://lastcoinstanding.com/bitcoin-vs-rental-property#bitcoin-case</loc><priority>0.8</priority></url>
-  <url><loc>https://lastcoinstanding.com/bitcoin-vs-rental-property#paths</loc><priority>0.8</priority></url>
-  <url><loc>https://lastcoinstanding.com/bitcoin-vs-rental-property#calculator</loc><priority>0.8</priority></url>
-  <url><loc>https://lastcoinstanding.com/bitcoin-fixed-income#calculator</loc><priority>0.8</priority></url>
-  <url><loc>https://lastcoinstanding.com/the-strc-mechanism#levers</loc><priority>0.8</priority></url>
-  <url><loc>https://lastcoinstanding.com/the-strc-mechanism#arithmetic</loc><priority>0.8</priority></url>
-  <url><loc>https://lastcoinstanding.com/the-strc-mechanism#sharp</loc><priority>0.8</priority></url>
-  <url><loc>https://lastcoinstanding.com/bitcoin-vs-real-estate#the-ceiling</loc><priority>0.7</priority></url>
-  <url><loc>https://lastcoinstanding.com/the-melting-ice-cube#the-ice-cube</loc><priority>0.7</priority></url>
-  <url><loc>https://lastcoinstanding.com/the-melting-ice-cube#treasury-model</loc><priority>0.7</priority></url>
-  <url><loc>https://lastcoinstanding.com/the-melting-ice-cube#real-companies</loc><priority>0.7</priority></url>
-  <url><loc>https://lastcoinstanding.com/the-fixed-pie#your-fixed-share</loc><priority>0.7</priority></url>
-  <url><loc>https://lastcoinstanding.com/the-fixed-pie#network-energy</loc><priority>0.7</priority></url>
-  <url><loc>https://lastcoinstanding.com/how-much-cash#the-buffer</loc><priority>0.8</priority></url>
-  <url><loc>https://lastcoinstanding.com/how-much-cash#playground</loc><priority>0.8</priority></url>
-  <url><loc>https://lastcoinstanding.com/how-much-cash#ledger</loc><priority>0.8</priority></url>
 </urlset>
