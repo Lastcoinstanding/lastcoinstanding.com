@@ -173,8 +173,16 @@
     return Math.pow(1 + inflationPct / 100, Math.max(0, year - startYear));
   }
   // Display basis, applied at RENDER time only — the projection stays
-  // nominal, so switching basis is a re-render, not a recompute. BTC price
-  // is never deflated (flagship reconciliation note).
+  // nominal, so switching basis is a re-render, not a recompute.
+  // Rule (2026-09-20, same as the flagship, commit 30199a0; reverses the earlier
+  // "BTC price is never deflated" display ruling): in the Verify-the-math table
+  // and its CSV the BTC *price* column goes through this conversion too, alongside
+  // stack value and income. A reader reconciliation report on the flagship showed
+  // why: a nominal price beside deflated value/income breaks "price x BTC left =
+  // stack value" and "income / price = BTC sold" by exactly the deflator — and
+  // real is the DEFAULT here, so the default view was the broken one. Dividing
+  // all three by the same factor preserves every identity in both modes.
+  // Display only — the engine and every projection/verdict figure stay nominal.
   function rtDollars(nominalUSD, year, inflationPct) {
     if (nominalUSD == null) return null;
     return (RT_DOLLARS === 'real') ? nominalUSD / rtDeflator(year, inflationPct) : nominalUSD;
@@ -1218,7 +1226,7 @@
       html += '<tr' + rowCls + '>'
         + '<td>' + r.x + '</td>'
         + '<td class="' + phaseCls + '">' + rtPhaseLabel(r.phase) + '</td>'
-        + '<td class="rt-num">' + (r.price   != null ? formatCurrencyShort(r.price) : '—') + '</td>'
+        + '<td class="rt-num">' + (r.price   != null ? formatCurrencyShort(rtDollars(r.price, r.x, inflationPct)) : '—') + '</td>'
         + '<td class="rt-num">' + (held      != null ? held.toFixed(2) : '—') + '</td>'
         + '<td class="rt-num">' + (r.usd     != null ? formatCurrencyShort(rtDollars(r.usd, r.x, inflationPct)) : '—') + '</td>'
         + '<td class="rt-num">' + (r.income  != null ? formatCurrencyShort(rtDollars(r.income, r.x, inflationPct)) : '—') + '</td>'
@@ -1256,13 +1264,16 @@
     lines.push('# Income target basis,' + (s.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation'));
     lines.push('# Live scenario URL,' + window.location.href);
     lines.push('');
-    lines.push('Year,Phase,BTC price (nominal),Starting BTC,Stack value USD,Income drawn USD,BTC sold,BTC left');
+    // Every dollar column — BTC price included — follows the active basis, matching
+    // the on-screen table, so price x BTC left = stack value holds row by row.
+    lines.push('Year,Phase,BTC price (' + (RT_DOLLARS === 'real' ? "today's $" : 'nominal') + '),Starting BTC,Stack value USD,Income drawn USD,BTC sold,BTC left');
     (proj.btcPoints || []).forEach(function (r) {
       var heldStart = r.btc != null ? (r.btc + (r.btcSold || 0) - (r.dcaAdded || 0)) : null;
       var usdShown = rtDollars(r.usd, r.x, inflation.value);
       var incomeShown = rtDollars(r.income, r.x, inflation.value);
+      var priceShown = rtDollars(r.price, r.x, inflation.value);
       lines.push([r.x, r.phase,
-        r.price != null ? Math.round(r.price) : '',
+        priceShown != null ? Math.round(priceShown) : '',
         heldStart != null ? heldStart.toFixed(4) : '',
         usdShown != null ? Math.round(usdShown) : '',
         incomeShown != null ? Math.round(incomeShown) : '',

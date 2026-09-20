@@ -375,7 +375,7 @@ companion:
           <div class="ev-assump-control">
             <div class="seg-control seg-2" role="group" aria-label="Dollar basis">
               <button type="button" class="ev-dollars-btn seg-btn is-active" data-dollars="real">Real (today&rsquo;s $ &middot; <span class="seg-btn-sub">&mdash;</span>)<span class="help-tip" tabindex="0">?<span class="tip-content">Today&rsquo;s purchasing power &mdash; every figure divided back by your chosen inflation rate (set under &ldquo;Assumptions &mdash; change&rdquo;, below the year-by-year strip), so amounts are comparable to money now.</span></span></button>
-              <button type="button" class="ev-dollars-btn seg-btn" data-dollars="nominal">Nominal (future $)<span class="help-tip" tabindex="0">?<span class="tip-content">Raw future dollars &mdash; the actual dollar amounts in each year, inflation included. price &times; BTC = value reconciles exactly in this mode.</span></span></button>
+              <button type="button" class="ev-dollars-btn seg-btn" data-dollars="nominal">Nominal (future $)<span class="help-tip" tabindex="0">?<span class="tip-content">Raw future dollars &mdash; the actual dollar amounts in each year, inflation included.</span></span></button>
             </div>
           </div>
 
@@ -442,7 +442,7 @@ companion:
       <div class="rt-body" id="evVerifyBody" hidden>
         <p class="rt-scenario-summary" id="evVerifySummary"></p>
         <div class="rt-verify-head">
-          <p class="rt-note">Reproduce any row: <strong>Starting BTC &minus; BTC sold = BTC left</strong>; <strong>price &times; BTC left = stack value</strong>; <strong>income &divide; price = BTC sold</strong>. Portfolio dollars follow the dollar basis on the assumptions card; <strong>BTC price is always nominal</strong>. Same projection that draws everything above.</p>
+          <p class="rt-note">Reproduce any row: <strong>Starting BTC &minus; BTC sold = BTC left</strong>; <strong>price &times; BTC left = stack value</strong>; <strong>income &divide; price = BTC sold</strong>. All dollar columns &mdash; BTC price, stack value, income &mdash; follow the dollar basis on the assumptions card, so the identities above hold in either mode. Same projection that draws everything above.</p>
           <button type="button" class="rt-csv-btn" id="evCsvBtn"><span aria-hidden="true">&#8595;</span> Copy as CSV</button>
         </div>
         <p class="rt-note rt-income-note" id="evIncomeNote"></p>
