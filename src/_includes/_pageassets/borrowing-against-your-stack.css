@@ -2055,7 +2055,7 @@
   .footer-cta,
   .related-block, .related-grid,
   .related-set, .related-section, .related-cards,
-  .companion-content, .companion-section { display: none !important; }
+  .companion-block, .companion-content, .companion-section { display: none !important; }
 
   /* ─── Hide BAS-page chrome (audit selectors against rendered HTML) ─── */
   .hero,                            /* page-level title + subtitle + lede paragraph */

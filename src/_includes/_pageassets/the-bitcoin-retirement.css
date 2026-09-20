@@ -1499,7 +1499,7 @@ a.powerlaw-link:hover {
   .footer-cta,                      /* "Continue Exploring" h3 above related cards */
   .related-block, .related-grid,    /* the related-card tiles */
   .related-set, .related-section, .related-cards,
-  .companion-content, .companion-section {
+  .companion-block, .companion-content, .companion-section {
     display: none !important;
   }
 
