@@ -76,7 +76,7 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
    object: no frame, no icon, centered header on the hero's 64rem column, a
    top hairline, and the eyebrow + lede carry the wayfinding. Every rule here
    is scoped to .rfam--home so the five tool-page strips are byte-identical. */
-.rfam.rfam--home { max-width: 64rem; margin: 2rem auto 0; padding: 2rem 3rem 0; border: 0; border-top: 1px solid rgba(247,147,26,0.15); border-radius: 0; }
+.rfam.rfam--home { max-width: 64rem; margin: 2rem auto 2.5rem; padding: 2rem 3rem 0; border: 0; border-top: 1px solid rgba(247,147,26,0.15); border-radius: 0; }
 .rfam--home .rfam-head { display: block; text-align: center; margin: 0 0 0.45rem; }
 .rfam--home .rfam-tag { margin: 0 0 0.35rem; }
 /* One line on desktop: the sentence is 97 characters, so a ~60ch cap wrapped it
@@ -86,7 +86,7 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
 .rfam--home .rfam-lede a { color: var(--amber, #e09422); text-decoration: underline; text-decoration-style: dotted; text-decoration-color: rgba(224,148,34,0.4); text-underline-offset: 2px; }
 .rfam--home .rfam-lede a:hover { text-decoration-color: var(--amber, #e09422); }
 @media (max-width: 768px) { .rfam.rfam--home { padding: 2rem 1.5rem 0; } }
-@media (max-width: 560px) { .rfam.rfam--home { padding: 1.75rem 1.25rem 0; } .rfam--home .rfam-lede a { padding: 0.6rem 0; } }
+@media (max-width: 560px) { .rfam.rfam--home { padding: 1.75rem 1.25rem 0; margin-bottom: 2rem; } .rfam--home .rfam-lede a { padding: 0.6rem 0; } }
 @media (max-width: 860px) { .rfam-row { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) {
   .rfam { padding: 0.9rem 1rem 1rem; }
