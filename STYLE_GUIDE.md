@@ -2193,6 +2193,10 @@ Render a short note beside the control naming the inherited value and where it c
 
 Hide it the moment a chip matches again.
 
+### 6.47 Mobile tap targets on inline text links — pad, never `inline-flex`
+
+Grow the hit area of an inline text link with **vertical padding** (`padding: 0.6rem 0` on the still-inline anchor). Inline vertical padding extends the clickable box without touching line layout, so the text keeps wrapping and nothing around it moves. Never reach for `display: inline-flex` + `min-height: 44px`: flex turns the anchor's children into flex items and **drops the whitespace text nodes between them** — the retirement strip's title rendered "Plan YourBitcoinRetirement" at 375px — and it moves a `border-bottom` underline to the bottom of the 44px box, detached from the text. For an underlined link that needs a tap target, draw the underline with `text-decoration: underline dotted` + `text-underline-offset` (the site's unclassed-link idiom — the `a:not([class])` fallback in `base.njk`), which stays on the text whatever the padding. Instance: the `retirement-family.njk` fix in PR #104 (`2536708`), 2026-09-21.
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.
