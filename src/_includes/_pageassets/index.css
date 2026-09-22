@@ -128,13 +128,17 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
     font-size: 1.05rem;
     font-weight: 600;
     padding: 0.95rem 1.9rem;
-    color: #14100a;
-    background: var(--orange);
+    /* Outlined-pill idiom (2026-09-21): amber border + amber text, no solid fill —
+       the .insight-cta family. Seniority over the secondary comes from size,
+       weight and position. The dark scrim is the same one the secondary carries,
+       for legibility over the hero image. */
+    color: var(--orange);
+    background: rgba(10,9,8,0.45);
     border-color: var(--orange);
-    box-shadow: 0 4px 22px rgba(0,0,0,0.45);
 }
 .hero-btn-primary:hover, .hero-btn-primary:focus-visible {
-    background: #ffa634;
+    color: #ffa634;
+    background: rgba(247,147,26,0.08);
     border-color: #ffa634;
     outline: none;
 }

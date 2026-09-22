@@ -63,18 +63,29 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
 .rfam-q { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 0.98rem; line-height: 1.25; color: var(--ink-bright, #f2eee8); }
 .rfam-t { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.72rem; line-height: 1.4; color: var(--ink-dim, #9a9080); }
 .rfam-foot { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.76rem; line-height: 1.6; color: var(--ink-dim, #9a9080); margin: 0.7rem 0 0; }
-.rfam-foot a { color: var(--amber, #e09422); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
-.rfam-foot a:hover { border-bottom-color: var(--amber, #e09422); }
+/* Underline is text-decoration (the site's unclassed-link idiom), not a
+   border-bottom: a border sits on the box edge, so any padding added for the
+   mobile tap target pushed it off the text (defect fixed 2026-09-21). */
+.rfam-foot a { color: var(--amber, #e09422); text-decoration: underline; text-decoration-style: dotted; text-decoration-color: rgba(224,148,34,0.4); text-underline-offset: 2px; }
+.rfam-foot a:hover { text-decoration-color: var(--amber, #e09422); }
 @media (max-width: 860px) { .rfam-row { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) {
   .rfam { padding: 0.9rem 1rem 1rem; }
   /* Tap targets. Both of these are text links — fine for a pointer, under the
      44px minimum for a finger. Height is added only here; on desktop a 44px
-     inline link would break the heading's baseline. The title link is new with
-     the heading block; the foot link has been short since the strip shipped,
-     and is fixed alongside it rather than left as a known defect in a
-     component being edited. */
-  .rfam-title a, .rfam-foot a { display: inline-flex; align-items: center; min-height: 44px; }
+     inline link would break the heading's baseline.
+     HOW (fixed 2026-09-21): vertical padding on the still-INLINE anchor. Inline
+     vertical padding grows the hit area without touching line layout, so the
+     text keeps wrapping and the underline stays on the text. The earlier
+     `display: inline-flex; min-height: 44px` did two things wrong on the
+     homepage at 375px: flex items drop the whitespace text nodes around the
+     <em>, so the title rendered "Plan YourBitcoinRetirement"; and the foot
+     link's border-bottom underline sat on the 44px box edge, detached from
+     the text. Sizes: title 24.8px line + 2×0.6rem = 44px; foot 19.5px line +
+     0.6rem above (inside the 0.7rem gap to the cards, no overlap) + 1rem
+     below (into the strip's own padding) = 45px. */
+  .rfam-title a { padding: 0.6rem 0; }
+  .rfam-foot a { padding: 0.6rem 0 1rem; }
 }
 @media (max-width: 460px) { .rfam-row { grid-template-columns: 1fr; } }
 </style>
