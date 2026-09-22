@@ -39,6 +39,9 @@
 -#}
 {%- set rfamLevel = rfam_level | default('h2') -%}
 {%- set onHub = (slug == 'bitcoin-retirement') -%}
+{#- Homepage variant: `{% set rfam_home = true %}` before the include. See the
+    .rfam--home rules below. Only the homepage sets it. -#}
+{%- set onHome = (rfam_home == true) -%}
 <style>
 /* One cohesive object containing four. The frame is deliberately LOWER
    contrast than the tool cards inside it — the cards are the things being
@@ -68,6 +71,22 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
    mobile tap target pushed it off the text (defect fixed 2026-09-21). */
 .rfam-foot a { color: var(--amber, #e09422); text-decoration: underline; text-decoration-style: dotted; text-decoration-color: rgba(224,148,34,0.4); text-underline-offset: 2px; }
 .rfam-foot a:hover { text-decoration-color: var(--amber, #e09422); }
+/* HOMEPAGE VARIANT (`rfam_home`, Treatment A 2026-09-21) — the fifth-surface
+   case, SITE_GUIDE §53.1. On the homepage the strip is a section, not a boxed
+   object: no frame, no icon, centered header on the hero's 64rem column, a
+   top hairline, and the eyebrow + lede carry the wayfinding. Every rule here
+   is scoped to .rfam--home so the five tool-page strips are byte-identical. */
+.rfam.rfam--home { max-width: 64rem; margin: 2rem auto 0; padding: 2rem 3rem 0; border: 0; border-top: 1px solid rgba(247,147,26,0.15); border-radius: 0; }
+.rfam--home .rfam-head { display: block; text-align: center; margin: 0 0 0.45rem; }
+.rfam--home .rfam-tag { margin: 0 0 0.35rem; }
+/* One line on desktop: the sentence is 97 characters, so a ~60ch cap wrapped it
+   with an orphaned "from the beginning →". Natural width, centered; wraps
+   cleanly on phones. */
+.rfam--home .rfam-lede { text-align: center; max-width: none; margin: 0 auto 1.1rem; }
+.rfam--home .rfam-lede a { color: var(--amber, #e09422); text-decoration: underline; text-decoration-style: dotted; text-decoration-color: rgba(224,148,34,0.4); text-underline-offset: 2px; }
+.rfam--home .rfam-lede a:hover { text-decoration-color: var(--amber, #e09422); }
+@media (max-width: 768px) { .rfam.rfam--home { padding: 2rem 1.5rem 0; } }
+@media (max-width: 560px) { .rfam.rfam--home { padding: 1.75rem 1.25rem 0; } .rfam--home .rfam-lede a { padding: 0.6rem 0; } }
 @media (max-width: 860px) { .rfam-row { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) {
   .rfam { padding: 0.9rem 1rem 1rem; }
@@ -95,19 +114,28 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
   { slug: 'compare-retirement-plans',          step: 'Choose', q: 'Which of my options?',               t: 'Two complete plans, side by side.' },
   { slug: 'the-bitcoin-retirement-stress-test', step: 'Stress', q: 'Does it survive bad luck?',          t: 'The plan you picked, under a crash.' }
 ] -%}
-<nav class="rfam" aria-label="The retirement decision funnel">
+<nav class="rfam{% if onHome %} rfam--home{% endif %}" aria-label="The retirement decision funnel">
   <div class="rfam-head">
-    {%- if not onHub %}
+    {%- if not onHub and not onHome %}
     <span class="rfam-icon" aria-hidden="true">{% include 'components/calc-tile-icons/bitcoin-retirement.njk' %}</span>
     {%- endif %}
     <div class="rfam-headtext">
+      {%- if onHome %}
+      <p class="rfam-tag">The retirement tools</p>
+      <{{ rfamLevel }} class="rfam-title">Retiring on bitcoin? <em>Four questions</em>, in order.</{{ rfamLevel }}>
+      {%- else %}
       <p class="rfam-tag">Four questions, in order</p>
       {%- if not onHub %}
       <{{ rfamLevel }} class="rfam-title"><a href="/bitcoin-retirement">Plan Your <em>Bitcoin</em> Retirement</a></{{ rfamLevel }}>
       {%- endif %}
+      {%- endif %}
     </div>
   </div>
+  {%- if onHome %}
+  <p class="rfam-lede">Each tool answers one question, and your inputs travel between them &mdash; <a href="/bitcoin-retirement">start from the beginning &rarr;</a></p>
+  {%- else %}
   <p class="rfam-lede">Retiring on a bitcoin stack is one decision asked four ways &mdash; each tool below answers one of them, and together they&rsquo;re the complete picture.</p>
+  {%- endif %}
   <div class="rfam-row">
     {%- for f in fam -%}
       {%- if f.slug == slug -%}
@@ -125,5 +153,7 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
       {%- endif -%}
     {%- endfor -%}
   </div>
+  {%- if not onHome %}
   <p class="rfam-foot">Your inputs travel between these tools &mdash; the links each page offers carry the plan you are looking at, so you rarely re-type a number.{% if not onHub %} <a href="/bitcoin-retirement">Start from the beginning &rarr;</a>{% endif %}</p>
+  {%- endif %}
 </nav>

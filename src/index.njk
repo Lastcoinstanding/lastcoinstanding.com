@@ -30,7 +30,6 @@ eleventyComputed:
             <a class="hero-btn hero-btn-primary" href="/the-bitcoin-retirement">Plan your bitcoin retirement <span aria-hidden="true">&rarr;</span></a>
             <a class="hero-btn hero-btn-secondary" href="/start-here">New to Bitcoin? Start here <span aria-hidden="true">&rarr;</span></a>
         </div>
-        <p class="hero-note">Free, live-computed, every assumption stated &mdash; for Bitcoiners, and for the Bitcoin-curious still deciding.</p>
     </div>
 </section>
 
@@ -38,16 +37,23 @@ eleventyComputed:
 <!-- RETIREMENT FAMILY STRIP — the component's engineered fifth-surface case
      (SITE_GUIDE §53.1). One include, no homepage CSS: it carries its own scoped
      styles, and the homepage slug is not in the family list, so nothing is
-     marked "you are here" and the foot renders "Start from the beginning →"
-     into the hub. Promoted 2026-09-21 from above Explore to directly beneath
-     the hero, ahead of the Featured carousel, so the funnel the hero's primary
-     action points at is the first thing under it; family discovery does not
-     depend on the rotating Latest card. -->
+     marked "you are here". Promoted 2026-09-21 from above Explore to directly
+     beneath the hero, ahead of the Featured carousel, so the funnel the hero's
+     primary action points at is the first thing under it; family discovery
+     does not depend on the rotating Latest card.
+     `rfam_home` (Treatment A, 2026-09-21) selects the component's homepage
+     variant: no frame or icon, centered eyebrow + heading + one-line lede with
+     the "start from the beginning →" link, no foot paragraph, on the hero's
+     64rem column. The five tool-page strips are unaffected. -->
+{% set rfam_home = true %}
 {% include 'components/retirement-family.njk' %}
 
 
 <!-- FEATURED INSIGHTS CAROUSEL -->
 <div class="insight-carousel">
+    {#- Section eyebrow (Treatment A, 2026-09-21): the page's wayfinding idiom,
+        same label style as the strip's eyebrow above it. STYLE_GUIDE §6.48. -#}
+    <p class="insight-eyebrow">All explorations</p>
     <div class="insight-tabs" id="insightTabs" role="tablist" aria-label="Carousel categories">
         <button class="insight-tab active" data-tab="featured">Featured</button>
         <button class="insight-tab" data-tab="foundations">Foundations</button>
