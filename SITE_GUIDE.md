@@ -1186,6 +1186,9 @@ The *Interpret my retirement income as* control (`data-incbasis`, values `today`
 
 ### Scenario carry-over to sibling pages
 
+**AMENDED 2026-09-23 — family carry links (coherence F2).** A "Take this plan to the next question" row sits in the Sustainability card under the verdict: *Size it* → EV, *Weigh it against another plan* → Compare (Plan A), *Stress-test it* → the Stress Test. `updateFamilyCarry()` rewrites the hrefs on every `renderRtTables` call (so it tracks sliders and the price-basis toggle). EV and Compare start at retirement and have no buying leg, so they receive the **BTC at retirement** from the projection's `retire` row; the Stress Test shares this page's model and receives the raw inputs including `dca`. Under "today's gap persists" EV gets the active-path count and `basis=current`, Compare the trend-path count (it runs trend only). `#rtCarryFoot` states whichever of those differences applies. The family strip's own links stay plain (§53.1).
+
+
 The Retirement page is the entry point for two sibling-page strategies — Borrowing Against Your Stack (§21) and Disciplined Rebalancing — and serializes its current scenario state into the URL when the user clicks through to either sibling. The sibling page reads the params on load and pre-populates its inputs, so the user doesn't re-enter what they just configured.
 
 **The canonical schema** (all params optional; missing or invalid params fall back to the sibling page's HTML defaults):
@@ -2195,6 +2198,9 @@ A revision pass after JM's content review, in two parts:
 - **Carousel slide** pending (needs a Grok Imagine video) per NEW_PAGE_CHECKLIST §8.
 
 ## 36. The Bitcoin Retirement Stress Test (`/the-bitcoin-retirement-stress-test.html`)
+
+**AMENDED 2026-09-23 — the fourth question, not "Part 2" (coherence F4, F2).** The two-page-era "Part 2 of 2" framing is retired from the part-note, the inputs panel, the flagship connect card (badge now "Build") and the related cards; the page now places itself as the fourth of Build → Size → Choose → Stress. A "Carry this plan" row under the headline (`renderCarry()`) sends the plan to the flagship (raw inputs, `dca` included; the connect card carries the same href) and to Compare (BTC at retirement from the no-crash projection's `retire` row). Crash settings are not carried: neither receiver models them.
+
 
 **Added July 2026.** A calculator in **The Numbers** (group *Positioning & Strategy*), sibling and sober counterpart to §17 The Bitcoin Retirement. `interactive: true`, has a `calculator_tile` (SVG icon at `components/calc-tile-icons/`). Page-scoped classes use the `st-` prefix.
 

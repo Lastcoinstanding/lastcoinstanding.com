@@ -800,6 +800,7 @@
 
     renderMainChart(base, crashed, crash, reduced);
     renderHeadline(base, crashed, crash);
+    renderCarry(base);
     renderMitigation(crashed, reduced, crash, infl);
     assertFlexWindow(crashed, reduced, crash);
     var rows = sweepRows();
@@ -814,6 +815,27 @@
     _last = { base: base, crashed: shown, crashedFull: crashed, reduced: reduced, crash: crash, infl: infl };
   }
   var _last = null;
+
+  /* ─── Carry this plan onward (coherence F2, 2026-09-23). Until this date the
+         page had no stateful outbound link, so a plan stress-tested here was
+         lost on the way back. The flagship shares this page's model (today's
+         stack + monthly buying) and takes the raw inputs; Compare starts at
+         retirement, so it receives the stack you RETIRE WITH, read off the
+         no-crash projection's `retire` row — no second accumulation loop.
+         The crash settings stay here: neither receiver models them. ─── */
+  function renderCarry(base) {
+    var common = '&retire=' + SCENARIO.retirementYear + '&income=' + Math.round(SCENARIO.targetIncomeUSD)
+      + '&years=' + SCENARIO.yearsInRetirement + '&incbasis=' + SCENARIO.incomeBasis;
+    var raw = '/the-bitcoin-retirement?stack=' + SCENARIO.btcStack + common
+      + (SCENARIO.monthlyDcaUSD > 0 ? '&dca=' + Math.round(SCENARIO.monthlyDcaUSD) : '');
+    ['stCarryFlagship', 'stCarryFlagshipCard'].forEach(function (id) {
+      var a = document.getElementById(id); if (a) a.setAttribute('href', raw);
+    });
+    var atRet = SCENARIO.btcStack;
+    (base && base.rows || []).forEach(function (r) { if (r.phase === 'retire') atRet = r.btc; });
+    var cmp = document.getElementById('stCarryCompare');
+    if (cmp) cmp.setAttribute('href', '/compare-retirement-plans?stack=' + (Math.round(atRet * 10000) / 10000) + common);
+  }
 
   // ════════ INPUTS + WIRING ════════
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
