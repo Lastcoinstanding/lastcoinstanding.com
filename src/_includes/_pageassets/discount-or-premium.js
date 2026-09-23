@@ -297,8 +297,15 @@
     var elNever = document.getElementById('dpNever');
     if (elNever) {
       elNever.innerHTML = '<span class="dp-never-tag">And if it never reverts</span> '
-        + 'If the multiple simply stays where it is, you earn the trend’s own slope — about <strong>'
-        + signPct0(tr) + '/yr</strong> annualized over this horizon, a rate that itself declines as bitcoin matures (see below). That is the assumption-free case. '
+        + 'If the multiple simply stays where it is, you earn the trend’s own slope — '
+        /* §10.3.1 (2026-09-23): below a year this sentence annualised too,
+           two paragraphs after the chart caption tells the reader that below
+           a year the page reports a total instead of a rate. Same basis as
+           the cards and the uplift line above. */
+        + (subYear
+            ? 'about <strong>' + signPct0(trTotal) + ' in total</strong> over this window, a pace that itself slows as bitcoin matures (see below). '
+            : 'about <strong>' + signPct0(tr) + '/yr</strong> annualized over this horizon, a rate that itself declines as bitcoin matures (see below). ')
+        + 'That is the assumption-free case. '
         + 'The multiple can also <em>fall further</em>: the ' + PL_FLOOR.toFixed(2)
         + '× floor has held for the length of the record, which is evidence, not a guarantee.';
     }
