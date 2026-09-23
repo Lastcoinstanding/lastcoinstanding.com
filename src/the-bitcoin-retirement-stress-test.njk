@@ -4,9 +4,11 @@ permalink: /the-bitcoin-retirement-stress-test.html
 slug: the-bitcoin-retirement-stress-test
 related:
   - slug: the-bitcoin-retirement
-    desc: "Part 1. The Retirement calculator projects the same plan on the upside path; this exploration takes that plan and drops a bear market into it."
+    desc: "The first question: what the plan looks like on the upside path. This page takes that plan and drops a bear market into it."
   - slug: bitcoin-escape-velocity
-    desc: "The third page of the family, on the same engine. Where this exploration asks whether a plan survives a badly-timed crash, Escape Velocity asks where the threshold sits between a stack that depletes and one that outgrows its spending &mdash; and how little it takes to cross it."
+    desc: "The second question, on the same engine. Where this exploration asks whether a plan survives a badly-timed crash, Escape Velocity asks where the threshold sits between a stack that depletes and one that outgrows its spending &mdash; and how little it takes to cross it."
+  - slug: compare-retirement-plans
+    desc: "The third question: which of your options. If a crash breaks the plan, the next move is usually a different plan &mdash; retire a year later, draw less &mdash; and Compare puts that alternative beside this one."
   - slug: bull-and-bear-cycles
     desc: "The evidence behind the crash severities and recovery shapes here. Bull &amp; Bear documents the historical drawdowns and the caveats on recovery; this exploration turns them into a what-if."
   - slug: how-much-bitcoin
@@ -31,10 +33,12 @@ eleventyComputed:
 
   {% include 'components/tool-framing.njk' %}
 
-  <!-- ════════ PART 1 / PART 2 CALL-OUT ════════ -->
+  <!-- ════════ WHERE THIS SITS IN THE FAMILY ════════
+       Was a "Part 2 of 2" call-out from the two-page era; the family is four
+       questions now (Build → Size → Choose → Stress), coherence F4 2026-09-23. -->
   <div class="st-partnote">
-    <span class="st-partnote-tag">Part 2 of 2</span>
-    <p>This exploration builds directly on <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a>. That page projects your plan on the upside path; think of it as Part 1. This is Part 2: it takes the same plan and drops a bear market into it. If you have not yet played with the retirement calculator, start there, this exploration is far more useful once you have.</p>
+    <span class="st-partnote-tag">The fourth question</span>
+    <p>The last of the four retirement questions. <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a> builds the plan on the upside path, <a href="/bitcoin-escape-velocity">Escape Velocity</a> sizes it, and <a href="/compare-retirement-plans">Compare Retirement Plans</a> chooses between options; this page takes the plan you chose and drops a bear market into it. If you have not built a plan yet, start with the retirement calculator: this exploration is far more useful once you have, and its link carries your numbers here.</p>
   </div>
 
   <!-- ════════ 1. INTRO ════════ -->
@@ -48,7 +52,7 @@ eleventyComputed:
   <section class="st-section" id="plan">
     <div class="st-eyebrow">Your plan</div>
     <h2 class="st-h2">Start from a retirement plan</h2>
-    <p class="st-lead">Let&rsquo;s confirm your baseline assumptions first. These are the same inputs as <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a>, so the no-crash path here matches that page. New here? That page is the natural Part 1 to this Part 2.</p>
+    <p class="st-lead">Let&rsquo;s confirm your baseline assumptions first. These are the same inputs as <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a>, so the no-crash path here matches that page. New here? Build the plan there first; its link carries your numbers in.</p>
     <div class="st-inputs">
       <div class="st-field">
         <span class="st-field-label">Retirement year
@@ -175,6 +179,13 @@ eleventyComputed:
     <!-- Survive/deplete headline + full-width horizontal chart -->
     <div class="st-headline st-out-ok" id="stHeadline">&mdash;</div>
     <div class="st-mitigation" id="stMitigation" hidden></div>
+    <!-- Carry this plan onward (coherence F2, 2026-09-23). Hrefs are rewritten
+         with the live plan on every render; see renderCarry() in the page JS. -->
+    <p class="st-carry" id="stCarry">
+      <span class="st-carry-tag">Carry this plan</span>
+      <a class="st-carry-link" id="stCarryFlagship" href="/the-bitcoin-retirement">Open it in the full retirement calculator &rarr;</a>
+      <a class="st-carry-link" id="stCarryCompare" href="/compare-retirement-plans">Weigh it against another plan &rarr;</a>
+    </p>
     <div class="st-chart-head">
       <span class="st-focus-hint" id="stFocusHint">Zoom in on the crash years and what you would live through &rarr;</span>
       <div class="st-focus-control">
@@ -251,7 +262,7 @@ eleventyComputed:
       <p class="st-v2">This version models the main lever you have against a badly-timed crash: a <strong>Spending cut</strong>, reducing withdrawals while the market sits below its pre-crash level rather than selling a fixed amount into the low. It is the actionable counterpart to the &ldquo;don&rsquo;t sell into the bottom&rdquo; lesson from Bull &amp; Bear. Turn it on in the stress test above and the verdict states plainly what the cut buys and what it costs in forgone income. It is a real lever, not a free one: the arithmetic is years of living on less, and whether that is livable is a question this page cannot answer.</p>
     </div>
     <div class="st-connect-grid">
-      <a class="st-connect-card" href="/the-bitcoin-retirement"><div class="st-connect-title">The Bitcoin Retirement <span class="st-part-badge">Part 1</span></div><p>The upside baseline this exploration stress-tests. Start here.</p></a>
+      <a class="st-connect-card" href="/the-bitcoin-retirement" id="stCarryFlagshipCard"><div class="st-connect-title">The Bitcoin Retirement <span class="st-part-badge">Build</span></div><p>The upside baseline this exploration stress-tests. Opens with your plan.</p></a>
       <a class="st-connect-card" href="/bull-and-bear-cycles"><div class="st-connect-title">Bull &amp; Bear Cycles</div><p>The evidence behind the crash depths and recovery shapes.</p></a>
       <a class="st-connect-card" href="/how-much-bitcoin"><div class="st-connect-title">How Much Bitcoin?</div><p>If timing can break the plan, sizing is the lever.</p></a>
       <a class="st-connect-card" href="/disciplined-rebalancing"><div class="st-connect-title">Disciplined Rebalancing</div><p>Trimming into highs and rebuying into lows, instead of selling into the bottom.</p></a>

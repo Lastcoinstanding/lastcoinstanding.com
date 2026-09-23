@@ -721,8 +721,68 @@
       ' Income target: ' + (SCENARIO.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation') + '.';
   }
 
+  // ─── Carry the plan to the other three family pages (coherence F2, 2026-09-23).
+  // The strip's links are plain by design (SITE_GUIDE §53.1: the strip is
+  // coherence, a page's own carry links are state); until this date the
+  // flagship offered no stateful link to any sibling, so "your plan travels
+  // between them" was false at the funnel's entrance.
+  //
+  // STACK MEANS TWO THINGS in this family. Here and on the Stress Test it is
+  // today's holdings, grown by monthly buying until retirement; on Escape
+  // Velocity and Compare it is the stack you RETIRE WITH, and those pages have
+  // no buying leg. So EV and Compare receive the BTC at retirement, read off
+  // the SAME projection the page is showing (its `retire`-phase point, under
+  // the active price basis) — no second accumulation loop. The Stress Test has
+  // the same model as this page and receives the raw inputs, dca included.
+  //
+  // EACH RECEIVER GETS THE COUNT FROM THE PRICE PATH IT RUNS. Under "today's
+  // gap persists", monthly buying happens at discounted prices and buys more
+  // coins; EV honours that basis (it is passed along), Compare runs the trend
+  // path only. Sending Compare the discounted-buying count would value those
+  // extra coins on trend prices — a plan that exists on neither path. So EV
+  // reads the active projection and Compare reads the trend one
+  // (LAST_STACK_PAIR holds both).
+  function btcAtRetirement(proj) {
+    var atRet = null;
+    (proj && proj.btcPoints || []).forEach(function (b) { if (b.phase === 'retire') atRet = b.btc; });
+    return (atRet == null) ? SCENARIO.btcStack : atRet;
+  }
+  function updateFamilyCarry(stack) {
+    var ev = document.getElementById('rtCarryEv');
+    if (!ev) return;
+    var atRet = btcAtRetirement(stack);
+    var atRetTrend = btcAtRetirement(LAST_STACK_PAIR && LAST_STACK_PAIR.trend ? LAST_STACK_PAIR.trend : stack);
+    var common = '&retire=' + SCENARIO.retirementYear + '&income=' + Math.round(SCENARIO.targetIncomeUSD)
+      + '&years=' + SCENARIO.yearsInRetirement + '&incbasis=' + SCENARIO.incomeBasis;
+    function stackParam(v) { return 'stack=' + (Math.round(v * 10000) / 10000); }
+    ev.setAttribute('href', '/bitcoin-escape-velocity?' + stackParam(atRet) + common + (RT_BASIS === 'current' ? '&basis=current' : ''));
+    var cmp = document.getElementById('rtCarryCompare');
+    if (cmp) cmp.setAttribute('href', '/compare-retirement-plans?' + stackParam(atRetTrend) + common);
+    var st = document.getElementById('rtCarryStress');
+    if (st) st.setAttribute('href', '/the-bitcoin-retirement-stress-test?stack=' + SCENARIO.btcStack + common
+      + (SCENARIO.monthlyDcaUSD > 0 ? '&dca=' + Math.round(SCENARIO.monthlyDcaUSD) : ''));
+
+    // Say what the receiving pages will do with the plan, only when it differs
+    // from what the reader sees here.
+    var foot = document.getElementById('rtCarryFoot');
+    if (foot) {
+      var notes = [];
+      if (SCENARIO.monthlyDcaUSD > 0) {
+        notes.push('Escape Velocity and Compare start at retirement, so they receive the stack you retire with: <strong>'
+          + atRet.toFixed(2) + ' BTC</strong>, after ' + formatCurrencyShort(SCENARIO.monthlyDcaUSD) + ' a month until ' + SCENARIO.retirementYear
+          + (RT_BASIS === 'current' && Math.abs(atRetTrend - atRet) >= 0.005 ? ' (' + atRetTrend.toFixed(2) + ' BTC on the trend path, which Compare uses)' : '') + '.');
+      }
+      if (RT_BASIS === 'current') {
+        notes.push('Compare and the Stress Test run on the trend price path; Escape Velocity keeps your \u201ctoday\u2019s gap persists\u201d setting.');
+      }
+      foot.innerHTML = notes.join(' ');
+      foot.hidden = !notes.length;
+    }
+  }
+
   function renderRtTables(stack) {
     LAST_STACK = stack;                 // module ref so the CSV button always exports the current scenario
+    updateFamilyCarry(stack);
     var rows = stack.btcPoints || [];
     renderVerifyTable(rows, stack.depletionYear);
     renderGrowTable(rows, stack.depletionYear,

@@ -4,7 +4,9 @@ permalink: /the-bitcoin-retirement.html
 slug: the-bitcoin-retirement
 related:
   - slug: the-bitcoin-retirement-stress-test
-    desc: "The sober counterpart. This page projects the plan on the upside path; the Stress Test drops a timed bear market into the same plan and shows the sequence-of-returns cost, including where it fails, and what cutting spending through the crash can do about it."
+    desc: "The fourth question. This page projects the plan on the upside path; the Stress Test drops a timed bear market into the same plan and shows the sequence-of-returns cost, including where it fails, and what cutting spending through the crash can do about it."
+  - slug: compare-retirement-plans
+    desc: "The third question: which of your options. Two complete plans side by side under one set of assumptions &mdash; retire a year later, draw less &mdash; with the difference stated in plain sentences."
   - slug: bitcoin-escape-velocity
     desc: "The exploration surface for this page's engine. This calculator is the audit surface &mdash; every number inspectable, the full year-by-year table. Escape Velocity isolates one question, the threshold between a stack that depletes and one that outgrows its spending, and makes it draggable on all three inputs at once."
   - slug: your-deployment-plan
@@ -429,6 +431,21 @@ eleventyComputed:
           <span class="spectrum-detail" id="spectrumDetail">&mdash;</span>
           <span class="help-tip spectrum-detail-tip" tabindex="0">?<span class="tip-content">In today&rsquo;s dollars (inflation-adjusted). The multiplier compares your stack value at the END of retirement to its value at the START, after stripping out inflation. Above 1&times; means you finish wealthier than you started.</span></span>
         </div>
+      </div>
+
+      <!-- Take this plan to the next question (coherence F2, 2026-09-23). The
+           family strip's links are plain by design (SITE_GUIDE §53.1); these
+           are this page's own carry links, rewritten with the live plan on
+           every render by updateFamilyCarry(). -->
+      <div class="rt-carry" id="rtCarry">
+        <span class="rt-carry-tag">Take this plan to the next question</span>
+        <a class="rt-carry-link" id="rtCarryEv" href="/bitcoin-escape-velocity">Size it &rarr;</a>
+        <span class="rt-carry-note">How far it sits from escape velocity, on each of its three numbers.</span>
+        <a class="rt-carry-link" id="rtCarryCompare" href="/compare-retirement-plans">Weigh it against another plan &rarr;</a>
+        <span class="rt-carry-note">Opens with this plan as Plan A.</span>
+        <a class="rt-carry-link" id="rtCarryStress" href="/the-bitcoin-retirement-stress-test">Stress-test it &rarr;</a>
+        <span class="rt-carry-note">A bear market dropped into this plan.</span>
+        <p class="rt-carry-foot" id="rtCarryFoot" hidden></p>
       </div>
     </div>
 

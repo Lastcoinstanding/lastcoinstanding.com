@@ -2020,3 +2020,18 @@ a.powerlaw-link:hover {
   .rt-cmp-metric dd { font-size: 1.1rem; }
   .rt-compare { padding: 1rem 1.1rem 1.15rem; }
 }
+
+/* ── Carry links to the other family pages (coherence F2, 2026-09-23).
+      Modelled on Compare's .crp-carry, in this page's tokens. ── */
+.rt-carry { display: grid; grid-template-columns: auto 1fr; gap: 0.45rem 1rem; align-items: baseline; margin: 1.3rem 0 0; padding: 0.9rem 1.1rem; background: rgba(224,148,34,0.04); border: 1px solid var(--border-faint, rgba(255,255,255,0.06)); border-radius: 8px; }
+.rt-carry-tag { grid-column: 1 / -1; font-family: var(--font-body, "Inter", sans-serif); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-dim, #a79d8c); }
+.rt-carry-link { font-family: var(--font-body, "Inter", sans-serif); font-size: 0.88rem; font-weight: 600; color: var(--amber, #e09422); text-decoration: none; white-space: nowrap; padding: 0.25rem 0; }
+.rt-carry-link:hover, .rt-carry-link:focus { color: var(--amber-bright, #f0a83a); }
+.rt-carry-note { font-family: var(--font-body, "Inter", sans-serif); font-size: 0.82rem; line-height: 1.5; color: var(--ink-dim, #a79d8c); }
+.rt-carry-foot { grid-column: 1 / -1; margin: 0.3rem 0 0; font-family: var(--font-body, "Inter", sans-serif); font-size: 0.78rem; line-height: 1.55; color: var(--ink-dim, #a79d8c); }
+.rt-carry-foot strong { color: var(--ink, #ece4d6); font-weight: 600; }
+@media (max-width: 600px) {
+  .rt-carry { grid-template-columns: 1fr; gap: 0.1rem; }
+  .rt-carry-note { margin-bottom: 0.45rem; }
+}
+@media print { .rt-carry { display: none; } }
