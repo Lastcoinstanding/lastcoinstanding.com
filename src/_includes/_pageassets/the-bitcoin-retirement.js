@@ -725,7 +725,8 @@
     LAST_STACK = stack;                 // module ref so the CSV button always exports the current scenario
     var rows = stack.btcPoints || [];
     renderVerifyTable(rows, stack.depletionYear);
-    renderGrowTable(rows, stack.depletionYear);
+    renderGrowTable(rows, stack.depletionYear,
+      flagshipVerdict(stack, SCENARIO, window.ModelingAssumptions.get('inflation').value));
     var summary = rtScenarioSummary();
     var gs = document.getElementById('rtGrowSummary');
     var vs = document.getElementById('rtVerifySummary');
@@ -798,7 +799,7 @@
   // View B — dollar value + year-over-year change + proportional growth bar.
   // Starts at the retirement year (pre-retirement rows have usd===null) so the
   // year-over-year "change" is meaningful.
-  function renderGrowTable(rows, depletionYear) {
+  function renderGrowTable(rows, depletionYear, verdict) {
     var tbody = document.getElementById('rtGrowRows');
     var tfoot = document.getElementById('rtGrowResult');
     if (!tbody) return;
@@ -868,6 +869,11 @@
     if (tfoot) {
       if (depletionYear != null) {
         tfoot.innerHTML = '<tr><td colspan="5" class="rt-result-deplete">Depletes in ' + depletionYear + '</td></tr>';
+      } else if (verdict && verdict.state === 'shrink') {
+        // Outlives the window but still falling at the end: not escape
+        // velocity, whatever the start/end comparison says (coherence F1).
+        tfoot.innerHTML = '<tr><td colspan="5">Lasts to ' + verdict.horizonYear + ' but shrinking '
+          + (verdict.turnedAtStart ? 'throughout' : 'from ' + verdict.turnYear) + ' \u2014 not escape velocity</td></tr>';
       } else {
         var msg = anyShrank ? 'Ended above where it started — escape velocity'
                             : 'Escape velocity — grew every year';
@@ -1623,59 +1629,42 @@
     return '$' + Math.round(v).toLocaleString('en-US');
   }
 
-  // ─── Escape velocity spectrum positioning (§9.2.6)
-  // Returns { position 0..1, achieved bool, detail string }.
-  // Left half (0..0.5): stack depletes; position scaled by yearsLasted/window.
-  // Right half (0.5..1.0): escape velocity; position scaled by tanh of the
-  // ratio of final-to-retirement real stack value (so a stack that grows in
-  // real terms sits further right than one that just survives).
-  function computeEscapeVelocity(proj, scenario, inflationPct) {
-    if (proj.depletionYear !== null) {
-      var depletedAt = Math.max(0, proj.depletionYear - scenario.retirementYear);
-      var pos = 0.5 * (depletedAt / Math.max(1, scenario.yearsInRetirement));
-      return {
-        position: Math.max(0.02, Math.min(0.50, pos)),
-        achieved: false,
-        detail: 'Stack depletes ' + depletedAt + ' year' + (depletedAt === 1 ? '' : 's') + ' into retirement at this withdrawal.'
-      };
-    }
-    // Escape velocity: stack survives the projection window.
-    // Compare real final stack value to real stack-at-retirement.
-    var startYear = (new Date()).getFullYear();
-    var infl = inflationPct / 100;
-    var firstPoint = null;
-    for (var i = 0; i < proj.points.length; i++) {
-      if (proj.points[i].y !== null && proj.points[i].y > 0) { firstPoint = proj.points[i]; break; }
-    }
-    var lastPoint = proj.points[proj.points.length - 1];
-    if (!firstPoint || !lastPoint || lastPoint.y === null || lastPoint.y <= 0) {
-      return { position: 0.55, achieved: true, detail: 'Stack survives the projection window.' };
-    }
-    var realFirst = firstPoint.y / Math.pow(1 + infl, firstPoint.x - startYear);
-    var realLast  = lastPoint.y  / Math.pow(1 + infl, lastPoint.x  - startYear);
-    var ratio = realLast / realFirst;
-    var pos = 0.5 + 0.5 * (Math.tanh(Math.log(Math.max(0.05, ratio))) + 1) / 2;
-    var detail;
-    if (ratio >= 1.05) {
-      detail = 'Stack grows ' + ratio.toFixed(1) + '\u00d7 in real terms over the window \u2014 comfortably above escape velocity.';
-    } else if (ratio >= 0.85) {
-      detail = 'Stack roughly maintains real value through the window \u2014 right at escape velocity.';
-    } else {
-      detail = 'Stack survives the window but loses some real value (' + (ratio * 100).toFixed(0) + '% of starting real value at the end).';
-    }
-    return { position: Math.min(0.98, Math.max(0.52, pos)), achieved: true, detail: detail };
+  // ─── Escape velocity spectrum (§9.2.6) — THREE states, from the shared engine.
+  // Until 2026-09-23 this page ran its own two-state classifier: any plan that
+  // did not deplete inside the window was "escape velocity", graded by a
+  // real end/start ratio measured from TODAY rather than from retirement. EV and
+  // Compare use RetirementEngine.computeVerdict, which calls it escape only when
+  // real value is still rising at the horizon and has a `shrink` state for
+  // plans that outlive the window while falling. Same plan, opposite verdicts,
+  // one click apart (coherence F1). The verdict, the marker position and the
+  // detail sentence now all come from the engine, so they cannot disagree.
+  function flagshipVerdict(proj, scenario, inflationPct) {
+    return window.RetirementEngine.computeVerdict(proj, scenario, inflationPct);
   }
 
-  function updateSpectrum(proj, scenario, inflationPct) {
+  // The short form used by the "years stack lasts" readout and the compare
+  // columns. Deliberately the same shape as EV's statePhrase for `shrink`.
+  function verdictShort(v, scenario) {
+    if (v.state === 'deplete') {
+      var n = Math.max(0, v.depletionYear - scenario.retirementYear);
+      return { text: '~' + n + (n === 1 ? ' year' : ' years'), escape: false };
+    }
+    if (v.state === 'shrink') {
+      return { text: 'Lasts to ' + v.horizonYear + ' \u2014 shrinking ' + (v.turnedAtStart ? 'throughout' : 'from ' + v.turnYear), escape: false };
+    }
+    return { text: '\u221E \u2014 escape velocity', escape: true };
+  }
+
+  function updateSpectrum(v, scenario) {
     var marker = document.getElementById('spectrumMarker');
     var track = document.getElementById('spectrumTrack');
     var detailEl = document.getElementById('spectrumDetail');
     if (!marker || !detailEl) return;
-    var ev = computeEscapeVelocity(proj, scenario, inflationPct);
-    marker.style.left = (ev.position * 100).toFixed(2) + '%';
-    marker.classList.toggle('escape', ev.achieved);
-    if (track) track.classList.toggle('escape', ev.achieved);
-    detailEl.textContent = ev.detail;
+    var RE2 = window.RetirementEngine, achieved = (v.state === 'escape');
+    marker.style.left = (RE2.spectrumPosition(v, scenario) * 100).toFixed(2) + '%';
+    marker.classList.toggle('escape', achieved);
+    if (track) track.classList.toggle('escape', achieved);
+    detailEl.textContent = RE2.spectrumDetail(v, scenario);
   }
 
   function updateSustainability() {
@@ -1691,16 +1680,12 @@
       ? projectStackOverTime(SCENARIO, 'powerlaw-trend', inflation.value, rtCurrentRatio())
       : projectStackOverTime(SCENARIO, growthModel.preset, inflation.value);
 
+    var verdict = flagshipVerdict(proj, SCENARIO, inflationPct);
     var yearsEl = document.getElementById('sustYearsLast');
     if (yearsEl) {
-      if (proj.depletionYear) {
-        var n = proj.depletionYear - SCENARIO.retirementYear;
-        yearsEl.textContent = '~' + n + (n === 1 ? ' year' : ' years');
-        yearsEl.classList.remove('escape-velocity');
-      } else {
-        yearsEl.textContent = '\u221E \u2014 escape velocity';
-        yearsEl.classList.add('escape-velocity');
-      }
+      var vs = verdictShort(verdict, SCENARIO);
+      yearsEl.textContent = vs.text;
+      yearsEl.classList.toggle('escape-velocity', vs.escape);
     }
     // Disclose which price assumption the Sustainability visual is describing.
     var bw = document.getElementById('sustBasisWord');
@@ -1743,7 +1728,7 @@
     if (elYrCur)   elYrCur.textContent   = SCENARIO.retirementYear;
 
     updateBaselineDollarsNote();
-    updateSpectrum(proj, SCENARIO, inflation.value);
+    updateSpectrum(verdict, SCENARIO);
   }
 
   var renderRaf = null;
@@ -2000,6 +1985,7 @@
     return {
       proj: proj,
       years: years,
+      verdict: flagshipVerdict(proj, scenario, cmpInfl()),
       depletionYear: proj.depletionYear,
       stackNominal: nominal,                                                   // in the retirement year's $
       stackReal: nominal / rtDeflator(scenario.retirementYear, cmpInfl()),     // today's $
@@ -2028,6 +2014,7 @@
       proj: baseProj,
       depletionYear: baseProj.depletionYear,
       years: (baseProj.depletionYear === null) ? Infinity : (baseProj.depletionYear - base.retirementYear),
+      verdict: flagshipVerdict(baseProj, base, cmpInfl()),
       stackNominal: baseNominal,
       stackReal: baseNominal / rtDeflator(base.retirementYear, cmpInfl()),
       income: base.targetIncomeUSD,
@@ -2052,6 +2039,9 @@
   }
 
   function cmpFmtYears(out) {
+    // years === Infinity means "did not deplete", which is escape OR shrink —
+    // the verdict decides which (coherence F1).
+    if (out.verdict && out.verdict.state === 'shrink') return { html: 'Lasts to ' + out.verdict.horizonYear + ' — shrinking', ev: false };
     if (out.years === Infinity) return { html: '∞ — escape velocity', ev: true };
     var n = Math.max(0, out.years);
     return { html: '~' + n + (n === 1 ? ' year' : ' years'), ev: false };
@@ -2072,18 +2062,22 @@
   // with a plain retirement-year annotation as the lowest-priority filler.
   function cmpDeltas(baseOut, out) {
     var cands = [];
-    var baseEV = (baseOut.years === Infinity), varEV = (out.years === Infinity);
+    // Three states, from the verdict: escape / shrink / deplete (coherence F1).
+    function st(o) { return o.verdict ? o.verdict.state : (o.years === Infinity ? 'escape' : 'deplete'); }
+    function says(o) { return st(o) === 'escape' ? 'reaches escape velocity'
+                            : st(o) === 'shrink' ? 'lasts the window but is shrinking'
+                            : 'depletes in ~' + Math.max(0, o.years) + ' years'; }
+    var bS = st(baseOut), vS = st(out);
+    var baseEV = (bS === 'escape'), varEV = (vS === 'escape');
 
-    // 1. Escape-velocity flip — the headline when the two disagree.
-    if (varEV && !baseEV) {
-      cands.push({ pri: 1, html: '<span class="rt-cmp-flip">reaches escape velocity</span> — the base case depletes in ~' + Math.max(0, baseOut.years) + ' years' });
-    } else if (!varEV && baseEV) {
-      cands.push({ pri: 1, html: '<span class="rt-cmp-flip">depletes in ~' + Math.max(0, out.years) + ' years</span> — the base case reaches escape velocity' });
+    // 1. State flip — the headline when the two disagree.
+    if (bS !== vS) {
+      cands.push({ pri: 1, html: '<span class="rt-cmp-flip">' + says(out) + '</span> — the base case ' + says(baseOut) });
     }
 
-    // 2. Years-of-stack change — only when both are finite (the flip case
-    //    above already tells the years story when they disagree).
-    if (!varEV && !baseEV) {
+    // 2. Years-of-stack change — only when both deplete (the flip case
+    //    above already tells the story when the states differ).
+    if (bS === 'deplete' && vS === 'deplete') {
       var dy = out.years - baseOut.years;
       if (dy !== 0) cands.push({ pri: 2, html: cmpSigned(dy, Math.abs(dy) + ' year' + (Math.abs(dy) === 1 ? '' : 's') + ' of stack') });
     }

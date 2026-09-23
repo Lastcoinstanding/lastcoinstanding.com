@@ -1155,10 +1155,12 @@ Trend, drawdown, current-trajectory render with full saturation; floor and upper
 
 Single readout card with two values plus a spectrum bar:
 
-- *Projected years stack lasts* (or "∞ — escape velocity")
+- *Projected years stack lasts* ("~N years", "Lasts to YYYY — shrinking from YYYY", or "∞ — escape velocity")
 - *Projected stack value at retirement* (in today's dollars, inflation-adjusted)
 
 Spectrum bar maps the stack's real-terms multiplier (`(stack_end / stack_start) / (1 + inflation)^years`) onto a Depleting → Threshold → Escape velocity continuum. The threshold tick at 1× indicates real-terms break-even.
+
+**AMENDED 2026-09-23 — three states, from the shared engine (coherence F1).** Until this date the page ran its own two-state classifier: any plan that did not deplete inside the window read "∞ — escape velocity", graded by a real end/start ratio whose *start* was today rather than the retirement year. EV and Compare use `RetirementEngine.computeVerdict`, which calls it escape only when real value is still rising at the horizon and has a **`shrink`** state for plans that outlive the window while falling. The same plan therefore read "comfortably above escape velocity" here and "never crosses the threshold" on Compare, one click apart; 6 of 80 grid plans (1 in 7 non-depleting) were affected. **Now:** the readout, the spectrum marker and detail, the year-by-year table's footer and the "Compare — what if you…" columns all read `computeVerdict`, and the spectrum's position/detail come from `RetirementEngine.spectrumPosition` / `spectrumDetail` (moved verbatim from EV, which had already added the `shrink` band). The `shrink` readout is **"Lasts to 2065 — shrinking from 2057"** (JM ruling 2026-09-23; same shape as EV's `statePhrase`). The multiplier still positions the marker within a state; the state comes from the trajectory. The Math tab's table was rewritten to match. Verified: 80/80 grid plans agree across readout, table and spectrum; the TECH_DEBT §1 engine recipe unchanged against `main` (verify/grow-table hashes, EV thresholds on both bases, `evParityQA`, `crpParityQA`, `stFlexQA`, clean consoles).
 
 **Power Law disclosure pattern.** All five tooltip targets on the sustainability surface — *Projected years stack lasts*, *Projected stack value at retirement*, and the three spectrum-bar zones (Depleting, Threshold, Escape velocity) — carry a one-line disclosure that the projection assumes the Power Law trend price. Deliberately repetitive: tooltips are read independently, so each must be honest in isolation. Pattern documented in `STYLE_GUIDE` help-tip section.
 

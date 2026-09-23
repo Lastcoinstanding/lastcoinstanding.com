@@ -721,7 +721,7 @@ eleventyComputed:
 
       <h2 class="section-title">Sustainability and escape velocity</h2>
 
-      <p class="prose">The Sustainability readout reports two figures: <em>projected years stack lasts</em> and <em>projected stack value at retirement</em>. The spectrum bar maps the stack&rsquo;s real-terms multiplier &mdash; the ratio of the stack&rsquo;s purchasing power at the end of retirement to its purchasing power at the start &mdash; onto a continuum:</p>
+      <p class="prose">The Sustainability readout reports two figures: <em>projected years stack lasts</em> and <em>projected stack value at retirement</em>. The spectrum bar places the plan in one of three states, decided by <em>where the stack&rsquo;s real value is heading at the end of the horizon</em>; within a state, the marker&rsquo;s position comes from the real-terms multiplier &mdash; the stack&rsquo;s purchasing power at the end of retirement divided by its purchasing power at retirement:</p>
 
       <div class="math-block">
         <div class="math-eq">real multiplier = (stack<sub>end</sub> &divide; stack<sub>start</sub>) &divide; (1 + inflation)<sup>years in retirement</sup></div>
@@ -731,14 +731,16 @@ eleventyComputed:
 
       <table class="math-table">
         <thead>
-          <tr><th>Real multiplier</th><th>Status</th></tr>
+          <tr><th>State</th><th>What the projection shows</th></tr>
         </thead>
         <tbody>
-          <tr><td>&lt; 1&times;</td><td>Depleting &mdash; finishes with less purchasing power than started</td></tr>
-          <tr><td>= 1&times;</td><td>Threshold &mdash; breaks even after inflation</td></tr>
-          <tr><td>&gt; 1&times;</td><td>Escape velocity &mdash; stack grows faster than it is drawn down</td></tr>
+          <tr><td>Depleting</td><td>The stack runs out inside the horizon</td></tr>
+          <tr><td>Shrinking</td><td>The stack outlasts the horizon, but its real value is still falling at the end &mdash; growth has stopped covering the withdrawal</td></tr>
+          <tr><td>Escape velocity</td><td>The stack&rsquo;s real value is rising through the end of the horizon &mdash; growth covers the withdrawal</td></tr>
         </tbody>
       </table>
+
+      <p class="prose">The state comes from the trajectory, not the multiplier: a plan can finish above its value at retirement and still be <em>shrinking</em>, if it grew for two decades and turned down before the end. The same three states, computed by the same function, appear on <a href="/bitcoin-escape-velocity">Bitcoin Escape Velocity</a> and <a href="/compare-retirement-plans">Compare Retirement Plans</a>, so a plan reads the same on every page of the family.</p>
 
       <p class="prose"><em>Escape velocity</em> means the math closes for an indefinite horizon under the model. It does not mean bitcoin will continue to grow at the rate the model implies, and it does not guarantee any particular year will resemble the projection.</p>
 
