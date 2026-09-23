@@ -367,6 +367,58 @@
     return { value: null, bound: 'above' };
   }
 
+  /* ─── Verdict presentation — shared so every family page says the same
+         thing about the same plan (coherence F1, 2026-09-23). Moved verbatim
+         from bitcoin-escape-velocity.js, which had already added the `shrink`
+         band; the flagship now reads these instead of its own two-state
+         classifier. Wording lives here deliberately: the words ARE the
+         verdict, and a page rewording them is how the family drifted. ─── */
+  function plural(n, word) { return n + ' ' + word + (Math.abs(n) === 1 ? '' : 's'); }
+
+  function spectrumPosition(v, scenario) {
+    if (v.state === 'deplete') {
+      var depletedAt = Math.max(0, v.depletionYear - scenario.retirementYear);
+      var pos = 0.5 * (depletedAt / Math.max(1, scenario.yearsInRetirement));
+      return Math.max(0.02, Math.min(0.46, pos));
+    }
+    if (v.state === 'shrink') {
+      // Survives the window but shrinking: between depleting and escape,
+      // scaled by how much real value is left at the horizon.
+      var keep = Math.max(0, Math.min(1, v.ratio));
+      return 0.46 + 0.04 * keep;
+    }
+    var ratio = v.ratio;
+    var p = 0.5 + 0.5 * (Math.tanh(Math.log(Math.max(0.05, ratio))) + 1) / 2;
+    return Math.min(0.98, Math.max(0.52, p));
+  }
+
+  // Every mention of "the window" names the year it ends (#3) — the reader
+  // should never have to hunt for what the horizon actually is.
+  function spectrumDetail(v, scenario) {
+    var toYear = ' (to ' + v.horizonYear + ')';
+    if (v.state === 'deplete') {
+      var n = Math.max(0, v.depletionYear - scenario.retirementYear);
+      return 'Stack depletes ' + plural(n, 'year') + ' into retirement at this withdrawal.';
+    }
+    if (v.state === 'shrink') {
+      // Not "shrinking throughout" — it may have grown for two decades first.
+      // Name the turn, and give the ending ratio so the reader can see both.
+      return (v.turnedAtStart
+          ? 'Stack outlives the window' + toYear + ' but growth never covers the withdrawal'
+          : 'Stack outlives the window' + toYear + ' but turns over in ' + v.turnYear)
+        + ' — it ends at ' + (v.ratio * 100).toFixed(0) + '% of its real value at retirement, and still falling.';
+    }
+    if (v.ratio >= 1.05) {
+      return 'Stack grows ' + v.ratio.toFixed(1) + '× in real terms over the window' + toYear
+        + ' — comfortably above escape velocity.';
+    }
+    if (v.ratio >= 0.85) {
+      return 'Stack roughly maintains real value through the window' + toYear + ' — right at escape velocity.';
+    }
+    return 'Stack survives the window' + toYear + ' but loses some real value ('
+      + (v.ratio * 100).toFixed(0) + '% of starting real value at the end).';
+  }
+
   window.RetirementEngine = {
     // constants — read, never re-declared by a consumer
     LIMITS: LIMITS,
@@ -385,6 +437,8 @@
     projectForBasis: projectForBasis,
     // verdict + solver
     computeVerdict: computeVerdict,
+    spectrumPosition: spectrumPosition,
+    spectrumDetail: spectrumDetail,
     realValueAtYear: realValueAtYear,
     lineFor: lineFor,
     cloneWith: cloneWith
