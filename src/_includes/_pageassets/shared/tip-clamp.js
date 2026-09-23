@@ -40,8 +40,11 @@
    3. IT RESETS BEFORE EVERY MEASUREMENT. A tip near an edge that is opened,
       closed and reopened after a resize must not accumulate shifts.
 
-   IT DOES NOT FIX CLIPPING. A bubble whose ancestor has non-visible overflow
-   is a container problem and is fixed per page — see TECH_DEBT.
+   IT DOES NOT FIX `overflow: hidden` CLIPPING — that is a container problem
+   and is fixed per page (see TECH_DEBT). The one container it does respect is
+   a horizontally SCROLLING ancestor, whose left/right edges bound the card
+   like the viewport's do, because a wrapper that must scroll cannot be fixed
+   at the container (2026-09-22).
    ───────────────────────────────────────────────────────────────────────── */
 (function () {
   'use strict';
@@ -91,15 +94,34 @@
 
     if (!r.width || !isFinite(usedLeft)) return;
 
+    /* The box the card must land in: the viewport, narrowed by any ancestor
+       that scrolls horizontally. A scrolling table wrapper cannot have visible
+       overflow (the spec forces both axes to scroll once one does), so a card
+       that fits the window can still be cut off at the wrapper's edge — the
+       /the-power-law exponent table did exactly this at phone widths
+       (2026-09-22). Only the horizontal bound is taken, and only from
+       scrolling ancestors: a wrapper that must keep scrolling cannot be fixed
+       at the container, so the card moves. `overflow: hidden` panels are
+       still container problems and are fixed per page. */
+    var lo = PAD, hi = window.innerWidth - PAD;
+    for (var a = c.parentElement; a && a !== document.body; a = a.parentElement) {
+      var ox = getComputedStyle(a).overflowX;
+      if (ox === 'auto' || ox === 'scroll') {
+        var ar = a.getBoundingClientRect();
+        lo = Math.max(lo, ar.left + 1);
+        hi = Math.min(hi, ar.right - 1);
+      }
+    }
+
     var shift = 0;
-    if (r.left < PAD) shift = PAD - r.left;
-    else if (r.right > window.innerWidth - PAD) shift = (window.innerWidth - PAD) - r.right;
+    if (r.left < lo) shift = lo - r.left;
+    else if (r.right > hi) shift = hi - r.right;
     if (!shift) return;
 
     /* Never push the far edge off in the process of rescuing the near one:
-       on a viewport narrower than the card, land it flush and let the §6.13
+       on a box narrower than the card, land it flush left and let the §6.13
        width cap do the rest. */
-    if (r.width > window.innerWidth - PAD * 2) shift = PAD - r.left;
+    if (r.width > hi - lo) shift = lo - r.left;
 
     c.style.right = 'auto';
     c.style.left = Math.round(usedLeft + shift) + 'px';

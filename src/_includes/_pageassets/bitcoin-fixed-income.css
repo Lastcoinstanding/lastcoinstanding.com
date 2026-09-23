@@ -848,14 +848,22 @@ html, body {
    Visual affordance: bordered panel, prominent chevron that rotates on
    open, hover state. The previous styling read as a near-invisible
    collapsed line; this makes the "click to expand" affordance obvious. */
+/* NO `overflow: hidden` HERE — it clipped both tooltips in this panel
+   (capital-gains rate, preferred tax treatment): ~80px of a 267px card at
+   1280, ~29px at 375, measured on production 2026-09-22. The rule only kept
+   the summary's square hover background inside the rounded corners, so the
+   summary rounds its own corners instead — same fix as .bbm-advanced on
+   /bitcoin-backed-mortgages (2026-09-06). The open panel has no filled last
+   child, so the bottom corners need nothing. */
 .advanced-inputs {
   margin-top: 0.75rem;
   border: 1px solid var(--border, rgba(255, 255, 255, 0.10));
   border-radius: 0.4rem;
   background: rgba(255, 255, 255, 0.015);
-  overflow: hidden;
   transition: border-color 0.2s;
 }
+.advanced-inputs > summary { border-radius: calc(0.4rem - 1px) calc(0.4rem - 1px) 0 0; }
+.advanced-inputs:not([open]) > summary { border-radius: calc(0.4rem - 1px); }
 .advanced-inputs:hover {
   border-color: rgba(224, 148, 34, 0.35);
 }
