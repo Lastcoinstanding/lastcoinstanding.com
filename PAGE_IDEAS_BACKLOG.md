@@ -372,6 +372,7 @@ Captured during the merge pass, because the backlog is now large enough that the
 ### Power Law cluster
 
 - [ ] **Rolling out-of-sample fits — when did the power law become reliable?**
+  **MEASURED 2026-09-23 — `ROLLING_OOS_FITS_2026-09-23.md`, script `scripts/measure-rolling-oos.js`; awaiting JM's build ruling.** Headline: cutoffs before 2016 failed badly. An end-2014 fit implies about 7× today's trend, and 78% of the following four years fell outside its channel. All 36 quarterly cutoffs from 2016-Q1 on keep b within 5.48–5.86 and today's trend within 0.68–1.24× canonical, with 83–100% of the next four years inside. That stability is not inertia: two years at the floor would still move the fit about 19%. The limits: roughly two and a half cycles, and a canonical line that is hindsight. Today's full-record refit reads 0.91× canonical. Three falsifiability criteria are proposed for the monthly refresh.
   Surfaced 2026-08-28 (JM's observation: a trend fitted only through 2014 does not
   project to today's data; fitted through 2017 and later, it does).
   - **Concept:** fit the trend on data only through year X; project forward; measure the

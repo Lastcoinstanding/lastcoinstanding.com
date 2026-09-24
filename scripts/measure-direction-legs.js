@@ -53,7 +53,7 @@ function summ(M) {
   let ep = 1; for (let k = 1; k < idx.length; k++) if (idx[k] !== idx[k - 1] + 1) ep++;
   const pct = (f) => Math.round(M.filter(f).length / n * 100);
   return { n, episodes: ep, cycles: cycles(M), paid: pct((m) => m.paid),
-    ratio: +med(M.map((m) => m.ratio)).toFixed(3), dd: pct((m) => m.hadDD),
+    ratio: med(M.map((m) => m.ratio)), dd: pct((m) => m.hadDD),
     never: pct((m) => !m.arrived), depth: Math.round(med(M.map((m) => m.depth)) * 100) };
 }
 

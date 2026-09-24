@@ -16,7 +16,7 @@ At the last sample (Sep 2026, position 0.088, **0.50× trend**), the figures Wai
 |---|---|---|---|---|---|
 | Pooled (published) | 67 | 3 | 7% | 0.17 | 90% |
 | Falling leg | 43 | 3 | 7% | 0.10 | 88% |
-| Rising leg | 24 | 3 | 8% | 0.21 | 92% |
+| Rising leg | 24 | 3 | 8% | 0.20 | 92% |
 
 Near the floor the story is the same on both legs: waiting almost never paid. The pooled number is a fair summary of both. **No published figure needs to change today.**
 
