@@ -227,7 +227,7 @@
     if (v.state === 'shrink') {
       return 'Retiring in <strong>' + y + '</strong>, this plan <strong>never ' + THRESHOLD_LINK + '</strong> &mdash; growth never outruns the draw &mdash; but it outlives the horizon: it turns over in ' + v.turnYear + ' and is still falling at ' + v.horizonYear + '.';
     }
-    return 'Retiring in <strong>' + y + '</strong>, this plan <strong>' + THRESHOLD_LINK + '</strong> &mdash; the point where growth outruns the draw, so the stack rises even while paying you &mdash; from ' + v.escapeYear + ', and stays ahead through ' + v.horizonYear + '.';
+    return 'Retiring in <strong>' + y + '</strong>, this plan <strong>' + THRESHOLD_LINK + '</strong> &mdash; the point where growth outruns the draw, so the stack rises even while you draw on it &mdash; from ' + v.escapeYear + ', and stays ahead through ' + v.horizonYear + '.';
   }
 
   /* ═══════════════════════════════════════════════════════════
