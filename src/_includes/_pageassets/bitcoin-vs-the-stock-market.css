@@ -637,7 +637,6 @@ body {
     background: rgba(224,148,34,0.18);
     border-radius: 2px;
     outline: none;
-    cursor: pointer;
     margin: 4px 0;
 }
 .slider-control input[type="range"]::-webkit-slider-thumb {
@@ -649,7 +648,6 @@ body {
     background: var(--amber);
     border: 2px solid var(--bg);
     box-shadow: 0 0 0 1px rgba(224,148,34,0.4);
-    cursor: grab;
     transition: transform 0.1s, box-shadow 0.15s;
 }
 .slider-control input[type="range"]::-moz-range-thumb {
@@ -659,14 +657,10 @@ body {
     background: var(--amber);
     border: 2px solid var(--bg);
     box-shadow: 0 0 0 1px rgba(224,148,34,0.4);
-    cursor: grab;
 }
 .slider-control input[type="range"]:hover::-webkit-slider-thumb {
     transform: scale(1.1);
     box-shadow: 0 0 0 2px rgba(224,148,34,0.5);
-}
-.slider-control input[type="range"]:active::-webkit-slider-thumb {
-    cursor: grabbing;
 }
 
 /* ─── Mobile breakpoint ─── */

@@ -76,9 +76,8 @@ body { background: var(--bg); color: var(--text); }
 /* Range slider (shared visual with the trilogy sliders) */
 .st-range { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 4px; outline: none; background: linear-gradient(90deg, rgba(122,115,103,0.4) 0%, rgba(224,148,34,0.5) 100%); }
 .st-range-red { background: linear-gradient(90deg, rgba(122,115,103,0.4) 0%, rgba(224,148,34,0.5) 55%, rgba(192,57,43,0.65) 100%); }
-.st-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #f2eee8; border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(255,255,255,0.3), 0 2px 6px rgba(0,0,0,0.5); cursor: grab; }
-.st-range::-webkit-slider-thumb:active { cursor: grabbing; }
-.st-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #f2eee8; border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(255,255,255,0.3); cursor: grab; }
+.st-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #f2eee8; border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(255,255,255,0.3), 0 2px 6px rgba(0,0,0,0.5);}
+.st-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #f2eee8; border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(255,255,255,0.3);}
 
 /* Mini segmented (depth / timing quick-set presets) */
 .st-seg-mini { margin-top: 0.5rem; }

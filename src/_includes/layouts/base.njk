@@ -105,6 +105,23 @@ a:not([class]) {
     text-underline-offset: 2px;
 }
 a:not([class]):hover { text-decoration-color: #e09422; }
+
+/* ─── Slider cursors — one convention site-wide (JM ruling 2026-09-23) ───
+   Pointer over the track (a click jumps the value), open hand over the
+   handle, closed hand while dragging. Before this, 27 slider pages mixed
+   pointer / default / grab on the track and grab / pointer on the handle.
+   Pages style their own thumbs (size, colour, border are per-page design),
+   but must NOT set `cursor` on a range input or its thumb: the build fails
+   if a page stylesheet does (.eleventy.js, slider-cursor lint). */
+input[type="range"] { cursor: pointer; }
+input[type="range"]::-webkit-slider-thumb { cursor: grab; }
+input[type="range"]::-moz-range-thumb { cursor: grab; }
+input[type="range"]:active,
+input[type="range"]:active::-webkit-slider-thumb { cursor: grabbing; }
+input[type="range"]:active::-moz-range-thumb { cursor: grabbing; }
+input[type="range"]:disabled,
+input[type="range"]:disabled::-webkit-slider-thumb { cursor: not-allowed; }
+input[type="range"]:disabled::-moz-range-thumb { cursor: not-allowed; }
 </style>
 <style id="canonical-nav-css">
 /* ─── Canonical nav (mobile + desktop) ─── */

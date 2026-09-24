@@ -77,6 +77,8 @@ eleventyComputed:
 ---
 ```
 
+**Sliders:** style your thumb's size, colour and border in page CSS, but never set `cursor` on a range input or its thumb. base.njk owns slider cursors (pointer on the track, grab on the handle, grabbing while dragging), and the build fails on a page rule that sets one.
+
 If the page uses shared assets (e.g., `power-law-data.js`), include them
 explicitly in `page_scripts` with `\n` between includes — Eleventy renders
 them in order. The build checks this (2026-09-23): `page_scripts`,

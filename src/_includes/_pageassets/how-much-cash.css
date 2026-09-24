@@ -147,11 +147,10 @@ body { background: var(--bg); color: var(--text); }
    as-is; this is the same values applied to this page's ranges. Nine pages now
    carry their own copy of this — see TECH_DEBT for the extraction candidate. ── */
 .hc-range { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 2px; background: rgba(224,148,34,0.18); outline: none; }
-.hc-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.4); cursor: grab; transition: transform 0.1s, box-shadow 0.15s; }
-.hc-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.4); cursor: grab; }
+.hc-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.4);transition: transform 0.1s, box-shadow 0.15s; }
+.hc-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.4);}
 .hc-range:hover::-webkit-slider-thumb { transform: scale(1.1); box-shadow: 0 0 0 2px rgba(224,148,34,0.5); }
-.hc-range:active::-webkit-slider-thumb { cursor: grabbing; }
-.hc-range:active::-moz-range-thumb { cursor: grabbing; }
+
 
 /* ── Card / alarm shared bits ── */
 .hc-alarm-tint { box-shadow: inset 0 0 0 1px rgba(224,148,34,0.35); }
@@ -195,9 +194,8 @@ body { background: var(--bg); color: var(--text); }
 .hc-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 5px; outline: none;
   background: rgba(122,115,103,0.30); }
 /* v3.5 §2: thumb carries the step identity too — Step 1 sell-blue, Step 2 rebuy-green. */
-.hc-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #6db3d4; border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(255,255,255,0.3), 0 2px 6px rgba(0,0,0,0.5); cursor: grab; }
-.hc-slider::-webkit-slider-thumb:active { cursor: grabbing; }
-.hc-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #6db3d4; border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(255,255,255,0.3); cursor: grab; }
+.hc-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #6db3d4; border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(255,255,255,0.3), 0 2px 6px rgba(0,0,0,0.5);}
+.hc-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #6db3d4; border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(255,255,255,0.3);}
 .hc-slider2::-webkit-slider-thumb { background: #6fae6f; }
 .hc-slider2::-moz-range-thumb { background: #6fae6f; }
 .hc-today-tick { position: absolute; top: 5px; width: 2px; height: 0; transform: translateX(-50%); background: #f2eee8; box-shadow: 0 0 4px rgba(242,238,232,0.6); pointer-events: none; opacity: 0; transition: opacity 0.3s ease; }
