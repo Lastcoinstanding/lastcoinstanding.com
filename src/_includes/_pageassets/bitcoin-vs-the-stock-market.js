@@ -383,12 +383,8 @@
       spotEl.textContent = fmtUsdShort(price);
       multEl.textContent = mult.toFixed(2) + '\u00d7';
       if (zoneEl) {
-        var zone;
-        if (mult < 0.42)      zone = '\u00b7 below floor';
-        else if (mult < 1.0)  zone = '\u00b7 within Floor \u2192 Trend zone';
-        else if (mult < 3.0)  zone = '\u00b7 within Trend \u2192 Upper zone';
-        else                  zone = '\u00b7 above upper band';
-        zoneEl.textContent = zone;
+        // Shared vocabulary, matching the ribbon (2026-09-23).
+        zoneEl.textContent = '\u00b7 ' + positionLabelForMultiple(mult);
       }
       if (trendEl) trendEl.textContent = fmtUsdShort(trendNow);
     }
