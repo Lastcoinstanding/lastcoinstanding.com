@@ -20,6 +20,15 @@ related:
   - slug: how-much-cash
     desc: "The other answer to never selling. A loan against the stack is the alternative to raising cash, and How Much Cash prices the two against each other: the credit line tightens at the same trough where selling hurts most."
 companion: []
+faq:
+  - q: "Is it better to borrow against bitcoin or sell it?"
+    a: "It turns on two conditions: whether the need is real, and whether the loan can survive a drawdown. Selling ends your position in the coins sold; borrowing keeps them but adds interest, liquidation risk and the risk that the lender fails. The Borrow vs. Sell tab compares both paths with simply holding over a horizon you choose, and holding always preserves the most wealth because it funds nothing. For most readers, most of the time, the page’s own answer to whether to borrow is probably not."
+  - q: "What is the liquidation price on a bitcoin-backed loan?"
+    a: "It is the bitcoin price at which the lender force-sells your collateral: the loan divided by your stack times the lender’s liquidation LTV. With a typical 80% trigger, a loan opened at 30% LTV can absorb roughly a 60% fall; at 50% LTV the buffer shrinks to roughly 35%, a fall bitcoin has exceeded several times in the past decade. The Loan Health tab places your liquidation price on the Power Law channel, so you can see whether it sits above or below the channel floor."
+  - q: "What is rehypothecation, and why does it matter for bitcoin loans?"
+    a: "It is a lender re-lending your collateral to third parties. It lets a platform advertise lower rates, and it was the common mechanism behind the Celsius, BlockFi, Genesis and Voyager failures of 2022–23, where depositors became unsecured creditors. The page ranks lenders on it: collaborative-custody multisig, where the collateral can be verified on-chain; custodial lenders with a contractual no-rehypothecation policy; and rehypothecating platforms, which fail the standard. The higher rate on the safer structures is the visible cost of avoiding that risk."
+  - q: "Does borrowing against bitcoin avoid capital gains tax?"
+    a: "Under US rules a loan is not a sale, so borrowing itself realizes no gain; tax comes due when coins are sold, including coins sold later to repay the loan. Hedging the loan with offsetting positions can trigger a constructive sale under IRS §1259, and interest is deductible only depending on what the proceeds funded. The calculator models US federal long-term capital gains only, not state tax or short-term gains. This is general information, not tax advice."
 eleventyComputed:
   head_extras: "{% include '_pageassets/borrowing-against-your-stack-head.html' %}"
   page_styles: "{% include '_pageassets/borrowing-against-your-stack.css' %}"

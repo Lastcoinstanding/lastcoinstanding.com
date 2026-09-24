@@ -17,6 +17,15 @@ related:
     desc: "The behaviour that softens sequence risk: trimming into highs and rebuying into lows, rather than selling a fixed amount into the bottom."
   - slug: how-much-cash
     desc: "The withdrawal-era version of the same risk. How Much Cash asks what a bill costs in coins at a given moment in the channel; this page asks what a badly-timed crash does when you are already selling to live."
+faq:
+  - q: "What is sequence-of-returns risk in a bitcoin retirement?"
+    a: "It is the damage a bear market does when it arrives while you are selling to live. Before retirement a crash is a discount; after it, the same withdrawal sells more bitcoin, and those coins are gone even if the price fully recovers. Bitcoin’s completed bear markets have each fallen 77% or more from their peaks (see <a href='/bull-and-bear-cycles'>Bitcoin Bull &amp; Bear Cycles</a>), which makes the effect sharper than for most assets. This page drops a crash of your choosing into a plan and shows what it costs."
+  - q: "Does it matter which year of retirement a crash arrives?"
+    a: "More than almost anything else. The same stack, withdrawal and crash can survive a bear market that arrives late and fail one that arrives in the first year, because early selling happens before the stack has had years to compound. The page holds the plan and the crash fixed and moves only the retirement year, so you can see which start years pass and which fail."
+  - q: "Does the Stress Test predict a crash?"
+    a: "No. You choose the depth, the year of retirement it lands in, and the shape of the recovery; the tool assigns no odds and forecasts nothing. The Historical recovery setting follows past recoveries, which were reliable, and the Weak setting covers the case where price never fully returns to trend. The point is to see the outcomes where the plan fails as clearly as the ones where it survives."
+  - q: "What does cutting spending during a crash change?"
+    a: "The spending cut reduces withdrawals while the market sits below its pre-crash level, instead of selling a fixed amount into the low. The verdict states what the cut buys, extra years or a larger final stack, and what it costs in forgone spending. It is a real lever but not a free one: the arithmetic is years of living on less, and whether that is livable is a question the page cannot answer."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-bitcoin-retirement-stress-test-head.html' %}"
   page_styles: "{% include '_pageassets/the-bitcoin-retirement-stress-test.css' %}"
