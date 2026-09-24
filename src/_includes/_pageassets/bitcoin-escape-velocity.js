@@ -179,7 +179,7 @@
   // and its CSV the BTC *price* column goes through this conversion too, alongside
   // stack value and income. A reader reconciliation report on the flagship showed
   // why: a nominal price beside deflated value/income breaks "price x BTC left =
-  // stack value" and "income / price = BTC sold" by exactly the deflator — and
+  // stack value" and "withdrawal / price = BTC sold" by exactly the deflator — and
   // real is the DEFAULT here, so the default view was the broken one. Dividing
   // all three by the same factor preserves every identity in both modes.
   // Display only — the engine and every projection/verdict figure stay nominal.
@@ -1047,7 +1047,7 @@
   function assumptionsSummary() {
     return basisLabel(PRICE_BASIS)
       + ' · ' + (RT_DOLLARS === 'real' ? 'today’s $' : 'future $')
-      + ' · income ' + (SCENARIO.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation')
+      + ' · withdrawal ' + (SCENARIO.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation')
       + ' · ' + SCENARIO.yearsInRetirement + '-yr horizon'
       + ' · ' + MA.get('inflation').value + '% inflation';
   }
@@ -1170,7 +1170,7 @@
       + ' · ' + SCENARIO.yearsInRetirement + ' yrs in retirement.'
       + ' Price basis: ' + basisLabel(PRICE_BASIS) + '.'
       + ' Dollars: ' + (RT_DOLLARS === 'real' ? 'real (today’s, ' + MA.get('inflation').value + '% infl)' : 'nominal (future)') + '.'
-      + ' Income target: ' + (SCENARIO.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation') + '.';
+      + ' Withdrawal: ' + (SCENARIO.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation') + '.';
   }
 
   var LAST_PROJ = null;
@@ -1208,8 +1208,8 @@
     var incEl = document.getElementById('evIncomeNote');
     if (incEl) {
       incEl.textContent = (SCENARIO.incomeBasis === 'fixed')
-        ? 'Income drawn is flat here because your $ target is treated as the same raw dollars every year; in real (today’s $) mode it shrinks as inflation erodes it. To treat your target as today’s purchasing power instead, switch “Interpret my retirement income as” to “Rises with inflation” on the assumptions card.'
-        : 'Income drawn rises in nominal mode because your $ target is treated as today’s dollars — it takes more future dollars each year to buy the same goods; in real mode it stays flat at your target. To keep the same raw dollars every year instead, switch “Interpret my retirement income as” to “Same every year” on the assumptions card.';
+        ? 'The withdrawal is flat here because your $ target is treated as the same raw dollars every year; in real (today’s $) mode it shrinks as inflation erodes it. To treat your target as today’s purchasing power instead, switch “Interpret my withdrawal as” to “Rises with inflation” on the assumptions card.'
+        : 'The withdrawal rises in nominal mode because your $ target is treated as today’s dollars — it takes more future dollars each year to buy the same goods; in real mode it stays flat at your target. To keep the same raw dollars every year instead, switch “Interpret my withdrawal as” to “Same every year” on the assumptions card.';
     }
   }
 
@@ -1221,18 +1221,18 @@
     lines.push('# Last Coin Standing — Bitcoin Escape Velocity');
     lines.push('# Bitcoin stack,' + s.btcStack + ' BTC');
     lines.push('# Retirement year,' + s.retirementYear);
-    lines.push('# Target annual income,' + s.targetIncomeUSD);
+    lines.push('# Annual withdrawal,' + s.targetIncomeUSD);
     lines.push('# Years in retirement,' + s.yearsInRetirement);
     lines.push('# Growth model,' + growth.preset);
     lines.push('# Inflation,' + inflation.value + '%');
     lines.push('# Price assumption,' + basisLabel(PRICE_BASIS));
     lines.push('# Dollar basis,' + (RT_DOLLARS === 'real' ? 'real (today’s dollars, ' + inflation.value + '% inflation)' : 'nominal (future dollars)'));
-    lines.push('# Income target basis,' + (s.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation'));
+    lines.push('# Withdrawal basis,' + (s.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation'));
     lines.push('# Live scenario URL,' + window.location.href);
     lines.push('');
     // Every dollar column — BTC price included — follows the active basis, matching
     // the on-screen table, so price x BTC left = stack value holds row by row.
-    lines.push('Year,Phase,BTC price (' + (RT_DOLLARS === 'real' ? "today's $" : 'nominal') + '),Starting BTC,Stack value USD,Income drawn USD,BTC sold,BTC left');
+    lines.push('Year,Phase,BTC price (' + (RT_DOLLARS === 'real' ? "today's $" : 'nominal') + '),Starting BTC,Stack value USD,Withdrawal USD,BTC sold,BTC left');
     (proj.btcPoints || []).forEach(function (r) {
       var heldStart = r.btc != null ? (r.btc + (r.btcSold || 0) - (r.dcaAdded || 0)) : null;
       var usdShown = rtDollars(r.usd, r.x, inflation.value);

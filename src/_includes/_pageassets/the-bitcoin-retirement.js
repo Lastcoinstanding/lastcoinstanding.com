@@ -197,7 +197,7 @@
 
       // Inputs table
       var rows = [
-        ['Target annual retirement income', txtById('val-targetIncomeUSD')],
+        ['Annual withdrawal', txtById('val-targetIncomeUSD')],
         ['Retirement year',                 txtById('val-retirementYear')],
         ['Bitcoin stack',                   (function(){ var f = document.getElementById('input-btcStack'); return f && f.value !== '' ? f.value + ' BTC' : '—'; })()],
         ['Withdrawal rate',                 txtById('val-withdrawalRatePct')],
@@ -691,7 +691,7 @@
   // ruling): in the Verify-the-math table and its CSV the BTC *price* column goes
   // through this conversion too, alongside stack value and income. A reader
   // reconciliation bug report showed why: with a nominal price beside deflated
-  // value/income, "price x BTC left = stack value" and "income / price = BTC sold"
+  // value/income, "price x BTC left = stack value" and "withdrawal / price = BTC sold"
   // were off by exactly the deflator in real mode. Dividing price, value and
   // income by the same factor preserves all three identities in both modes.
   // Display only — the engine and every projection/verdict figure stay nominal.
@@ -718,7 +718,7 @@
       ' · ' + s.yearsInRetirement + ' yrs in retirement.' +
       ' Price basis: ' + (RT_BASIS === 'current' ? 'today’s ' + todaysBasisPhrase(rtCurrentRatio()) + ' to trend persists' : 'reverts to trend') + '.' +
       ' Dollars: ' + (RT_DOLLARS === 'real' ? "real (today's, " + window.ModelingAssumptions.get('inflation').value + '% infl)' : 'nominal (future)') + '.' +
-      ' Income target: ' + (SCENARIO.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation') + '.';
+      ' Withdrawal: ' + (SCENARIO.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation') + '.';
   }
 
   // ─── Carry the plan to the other three family pages (coherence F2, 2026-09-23).
@@ -797,8 +797,8 @@
     var incEl = document.getElementById('rtIncomeNote');
     if (incEl) {
       incEl.textContent = (SCENARIO.incomeBasis === 'fixed')
-        ? 'Income drawn is flat here because your $ target is treated as the same raw dollars every year; in real (today’s $) mode it shrinks as inflation erodes it. To treat your target as today’s purchasing power instead (nominal grows, real stays flat), switch “Income target” to “Rises with inflation”.'
-        : 'Income drawn rises in nominal mode because your $ target is treated as today’s dollars — it takes more future dollars each year to buy the same goods; in real mode it stays flat at your target. To keep the same raw dollars every year instead (nominal flat, real lower), switch “Income target” to “Same every year”.';
+        ? 'The withdrawal is flat here because your $ target is treated as the same raw dollars every year; in real (today’s $) mode it shrinks as inflation erodes it. To treat your target as today’s purchasing power instead (nominal grows, real stays flat), switch “Interpret my withdrawal as” to “Rises with inflation”.'
+        : 'The withdrawal rises in nominal mode because your $ target is treated as today’s dollars — it takes more future dollars each year to buy the same goods; in real mode it stays flat at your target. To keep the same raw dollars every year instead (nominal flat, real lower), switch “Interpret my withdrawal as” to “Same every year”.';
     }
     updateRtBasisLabels();
   }
@@ -953,19 +953,19 @@
     lines.push('# Last Coin Standing — Retirement projection');
     lines.push('# Bitcoin stack,' + s.btcStack + ' BTC');
     lines.push('# Retirement year,' + s.retirementYear);
-    lines.push('# Target annual income,' + s.targetIncomeUSD);
+    lines.push('# Annual withdrawal,' + s.targetIncomeUSD);
     lines.push('# Years in retirement,' + s.yearsInRetirement);
     lines.push('# Monthly DCA,' + s.monthlyDcaUSD);
     lines.push('# Growth model,' + growth.preset);
     lines.push('# Inflation,' + inflation.value + '%');
     lines.push('# Price assumption,' + (RT_BASIS === 'current' ? "today's " + todaysBasisPhrase(rtCurrentRatio()) + ' to trend persists' : 'reverts to trend'));
     lines.push('# Dollar basis,' + (RT_DOLLARS === 'real' ? "real (today's dollars, " + inflation.value + '% inflation)' : 'nominal (future dollars)'));
-    lines.push('# Income target basis,' + (s.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation'));
+    lines.push('# Withdrawal basis,' + (s.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation'));
     lines.push('# Live scenario URL,' + window.location.href);
     lines.push('');
     // Every dollar column — BTC price included — follows the active basis, matching
     // the on-screen table, so price x BTC left = stack value holds row by row.
-    lines.push('Year,Phase,BTC price (' + (RT_DOLLARS === 'real' ? "today's $" : 'nominal') + '),Starting BTC,Stack value USD,Income drawn USD,BTC sold,BTC left');
+    lines.push('Year,Phase,BTC price (' + (RT_DOLLARS === 'real' ? "today's $" : 'nominal') + '),Starting BTC,Stack value USD,Withdrawal USD,BTC sold,BTC left');
     (stack.btcPoints || []).forEach(function (r) {
       var heldStart = r.btc != null ? (r.btc + (r.btcSold || 0) - (r.dcaAdded || 0)) : null;
       var usdShown = rtDollars(r.usd, r.x, inflation.value);
@@ -2144,7 +2144,7 @@
 
     // 3. Income change (today's $).
     var di = out.income - baseOut.income;
-    if (Math.round(di) !== 0) cands.push({ pri: 3, html: cmpSigned(di, formatCurrencyShort(Math.abs(di)) + '/yr income') });
+    if (Math.round(di) !== 0) cands.push({ pri: 3, html: cmpSigned(di, formatCurrencyShort(Math.abs(di)) + '/yr withdrawal') });
 
     // 4. Stack-value-at-retirement change (today's $).
     var ds = out.stackReal - baseOut.stackReal;
@@ -2169,7 +2169,7 @@
       + '<div class="rt-cmp-metric"><dt>Years stack lasts</dt>' + yDd + '</div>'
       + '<div class="rt-cmp-metric"><dt>Stack at retirement (today’s $)</dt><dd>' + formatCurrencyShort(out.stackReal) + '</dd></div>'
       + '<div class="rt-cmp-metric rt-cmp-metric-sub"><dt>Stack at retirement (' + out.retYear + ' dollars)</dt><dd>' + formatCurrencyShort(out.stackNominal) + '</dd></div>'
-      + '<div class="rt-cmp-metric"><dt>Target income</dt><dd>' + formatCurrencyShort(out.income) + '</dd></div>'
+      + '<div class="rt-cmp-metric"><dt>Annual withdrawal</dt><dd>' + formatCurrencyShort(out.income) + '</dd></div>'
       + '</dl>';
   }
 

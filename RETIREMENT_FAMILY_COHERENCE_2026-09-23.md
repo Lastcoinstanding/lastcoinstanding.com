@@ -2,6 +2,8 @@
 
 The deliberate one-sitting read that `PAGE_IDEAS_BACKLOG` → *Family coherence pass* called for, run four weeks after Compare and the hub shipped. **Audit only: nothing on the five surfaces was edited.** Findings are filed below and cross-filed to `TECH_DEBT` (defects, mechanical copy) or `PAGE_IDEAS_BACKLOG` (small builds and rulings), per the entry's method.
 
+**Status — all findings resolved 2026-09-23, same day.** F1 → PR #109 (flagship reads the shared verdict). F2 + F4 + F6(d, part) → PR #110 (carry links; "Part 1 / Part 2" retired). F3 + F5 + F6 → `fix/family-withdrawal-horizon` (Compare adopts a carried horizon *and* withdrawal basis; "Annual withdrawal" family-wide, `STYLE_GUIDE §10.11`; F6(b)/(c) closed by ruling). F7 needed no change once F1 shipped. Each fix was verified on production against the check that found it.
+
 **Surfaces read:** `/bitcoin-retirement` (hub) · `/the-bitcoin-retirement` (Build) · `/bitcoin-escape-velocity` (Size) · `/compare-retirement-plans` (Choose) · `/the-bitcoin-retirement-stress-test` (Stress).
 
 **How it was read.** Against production at `0bc5911`, rendered as a reader meets it: every tab's text, every tooltip, every link between family pages as rendered after an input change, and every receiver tested by loading it with a distinctive scenario in the URL (`stack=2.37&retire=2041&income=137000&years=27`). Verdicts were compared on one plan across all four tools, then the disagreement was sized on an 80-plan grid through `window.RetirementEngine` itself. Nothing below rests on reading source alone; each claim was measured on the live page.

@@ -43,7 +43,7 @@ eleventyComputed:
 
   <!-- ════════ 1. INTRO ════════ -->
   <div class="section-intro st-prose">
-    <p>This is <strong>sequence-of-returns risk</strong>, and it is specifically a retirement-income drawdown problem. While you are still DCA&rsquo;ing into bitcoin, a crash is a discount. Once you are selling bitcoin to live, a crash means selling <em>more</em> sats to cover the same bill, and that is stack you never get back even if price fully recovers. For bitcoin the effect is sharper than for most assets, because its drawdowns have historically been deep and its recoveries, while historically reliable, are not guaranteed.</p>
+    <p>This is <strong>sequence-of-returns risk</strong>, and it is specifically a retirement drawdown problem. While you are still DCA&rsquo;ing into bitcoin, a crash is a discount. Once you are selling bitcoin to live, a crash means selling <em>more</em> sats to cover the same bill, and that is stack you never get back even if price fully recovers. For bitcoin the effect is sharper than for most assets, because its drawdowns have historically been deep and its recoveries, while historically reliable, are not guaranteed.</p>
     <p>The exploration works for any retirement year, but it leads with the early exit, because that is where sequence risk bites most. Set a plan, pick a crash, and change the year you retire, to simulate scenarios. This is a what-if exercise, not a forecast. It assigns no odds, and it is built to show the cases where the plan fails as plainly as the cases where it survives.</p>
     <p>One implication: you cannot fully lock a retirement date years in advance and assume the market will cooperate. As the date nears, it is worth tempering the plan, keeping enough flexibility that you are not forced to draw down heavily at a low.</p>
   </div>
@@ -67,10 +67,10 @@ eleventyComputed:
         <input type="number" id="stStack" step="0.01" min="0.01" aria-label="Bitcoin stack">
       </div>
       <div class="st-field">
-        <span class="st-field-label">Target annual income (USD)
-          <span class="help-tip" tabindex="0">?<span class="tip-content">Annual spending in today&rsquo;s dollars, pretax. Higher income draws the stack down faster.</span></span>
+        <span class="st-field-label">Annual withdrawal (USD)
+          <span class="help-tip" tabindex="0">?<span class="tip-content">What you sell from the stack each year to live on, in today&rsquo;s dollars, pretax. A larger withdrawal draws the stack down faster.</span></span>
         </span>
-        <input type="number" id="stIncome" step="1000" min="0" aria-label="Target annual income">
+        <input type="number" id="stIncome" step="1000" min="0" aria-label="Annual withdrawal">
       </div>
       <div class="st-field">
         <span class="st-field-label">Years in retirement
@@ -85,7 +85,7 @@ eleventyComputed:
         <input type="number" id="stDca" step="100" min="0" aria-label="Monthly DCA">
       </div>
       <div class="st-field st-field-basis">
-        <span class="st-field-label">Income target is in
+        <span class="st-field-label">Withdrawal is in
           <span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Today&rsquo;s dollars</strong> keeps your spending power constant each year, so the dollar figure rises with inflation. <strong>Fixed future dollars</strong> keeps the dollar figure constant, so its real purchasing power shrinks over time.</span></span>
         </span>
         <div class="st-seg" id="stIncomeBasis">
@@ -243,12 +243,12 @@ eleventyComputed:
       </div>
       <div class="st-table-scroll">
         <table class="st-table st-audit-table">
-          <thead><tr><th>Year</th><th class="st-num">BTC price</th><th class="st-num">Income drawn</th><th class="st-num">BTC sold</th><th class="st-num">BTC left</th><th class="st-num">Stack USD</th></tr></thead>
+          <thead><tr><th>Year</th><th class="st-num">BTC price</th><th class="st-num">Withdrawal</th><th class="st-num">BTC sold</th><th class="st-num">BTC left</th><th class="st-num">Stack USD</th></tr></thead>
           <tbody id="stAuditBody"></tbody>
         </table>
       </div>
       <p class="st-flex-summary" id="stFlexSummary" hidden></p>
-      <p class="st-chart-caption"><span class="st-dot">▼</span> marks years the crash has depressed the price below trend. Notice the <strong>BTC sold</strong> column rise in those years: the same income now costs more sats. That is the mechanism, sequence risk made concrete. <span class="st-cut">✂</span> marks years the Spending cut lever reduced the withdrawal.</p>
+      <p class="st-chart-caption"><span class="st-dot">▼</span> marks years the crash has depressed the price below trend. Notice the <strong>BTC sold</strong> column rise in those years: the same withdrawal now costs more sats. That is the mechanism, sequence risk made concrete. <span class="st-cut">✂</span> marks years the Spending cut lever reduced the withdrawal.</p>
     </div>
   </section>
 
@@ -257,9 +257,9 @@ eleventyComputed:
     <div class="st-eyebrow">What this means</div>
     <h2 class="st-h2">Reading the result</h2>
     <div class="st-prose st-prose-wide">
-      <p>A plan that survives a mid-severity crash in year 10 tells you little about the same plan meeting a deep crash in year 1. The exploration exists to show that spread, including the outcomes where the stack does not make it. If your plan only survives on the assumption of a fast recovery, that is worth knowing now, while you can still change the stack, the income, or the year you retire.</p>
+      <p>A plan that survives a mid-severity crash in year 10 tells you little about the same plan meeting a deep crash in year 1. The exploration exists to show that spread, including the outcomes where the stack does not make it. If your plan only survives on the assumption of a fast recovery, that is worth knowing now, while you can still change the stack, the withdrawal, or the year you retire.</p>
       <p>Two framings sit side by side here. A badly-timed crash can do real, lasting damage to a bitcoin retirement. And the same crash, met late or with room to spare, is nearly a non-event. Which one you get turns mostly on two things: <strong>when you retire</strong> and <strong>how much you withdraw relative to your stack</strong>. A larger stack helps, but it is not the deciding lever; retire early and draw hard and even a big stack can run out, while a modest withdrawal a few years later rides the same crash through. Stack size sets the sizing question, and that is where <a href="/how-much-bitcoin">How Much Bitcoin?</a> and the upside baseline on <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a> pick up. For most readers the stack is what it is &mdash; the levers you actually hold are when you retire, what you draw, and how deeply you can cut for a while. If the stack itself is still the open question &mdash; whether bitcoin belongs in the portfolio at all, and at what size &mdash; that is the allocation question: <a href="/bitcoin-allocation-sizing">Bitcoin Portfolio Allocation</a>.</p>
-      <p class="st-v2">This version models the main lever you have against a badly-timed crash: a <strong>Spending cut</strong>, reducing withdrawals while the market sits below its pre-crash level rather than selling a fixed amount into the low. It is the actionable counterpart to the &ldquo;don&rsquo;t sell into the bottom&rdquo; lesson from Bull &amp; Bear. Turn it on in the stress test above and the verdict states plainly what the cut buys and what it costs in forgone income. It is a real lever, not a free one: the arithmetic is years of living on less, and whether that is livable is a question this page cannot answer.</p>
+      <p class="st-v2">This version models the main lever you have against a badly-timed crash: a <strong>Spending cut</strong>, reducing withdrawals while the market sits below its pre-crash level rather than selling a fixed amount into the low. It is the actionable counterpart to the &ldquo;don&rsquo;t sell into the bottom&rdquo; lesson from Bull &amp; Bear. Turn it on in the stress test above and the verdict states plainly what the cut buys and what it costs in forgone spending. It is a real lever, not a free one: the arithmetic is years of living on less, and whether that is livable is a question this page cannot answer.</p>
     </div>
     <div class="st-connect-grid">
       <a class="st-connect-card" href="/the-bitcoin-retirement" id="stCarryFlagshipCard"><div class="st-connect-title">The Bitcoin Retirement <span class="st-part-badge">Build</span></div><p>The upside baseline this exploration stress-tests. Opens with your plan.</p></a>

@@ -2452,6 +2452,14 @@ Never *"How long will a return to trend take?"* — that is a forecast, and the 
 
 **Corollary.** A conditional projection titles itself as conditional — *"If price ends at the floor…"*, *"If today's gap persists…"* — and the condition leads. `§10.3` governs the figures inside it.
 
+
+### 10.11 The money a retiree sells is a *withdrawal*, not *income*
+
+**Ruled by JM 2026-09-23 (retirement family coherence, F5).** The amount a plan sells from the stack each year is the **withdrawal**; the input is labelled **"Annual withdrawal"** on every retirement page. *Income* implies someone is paying you, whether an employer, a pension or a coupon, and nothing is: the reader is selling their own bitcoin. Use *withdrawal* in labels, tooltips, toggles ("Interpret my withdrawal as"), table headers ("Withdrawal"), summaries, formulas (withdrawal ÷ price = BTC sold) and CSV headers. Where the subject is what the reader gives up rather than what they sell (the Stress Test's spending cut), say *spending*.
+
+- **Not a rule about prose.** Essays may still discuss *retirement income* as a concept (the flagship's Question and Strategies tabs do), and *fixed income* is an asset class. The rule governs the named quantity, not the English word.
+- **The URL parameter stays `income`.** It is invisible to readers, and renaming it would break every shared link.
+
 ## 11. Words we don't use
 
 The following read as AI-generated and are banned from page copy:
