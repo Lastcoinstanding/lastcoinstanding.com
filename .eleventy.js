@@ -50,7 +50,8 @@ module.exports = function (eleventyConfig) {
     'og-what-money-has-to-be.jpg',
     'og-what-money-is-for.jpg',
     'og-bitcoin-vs-real-estate.jpg',
-    'og-bitcoin-vs-rental-property.jpg',
+    'og-bitcoin-vs-rental-property.jpg',       // kept: already-cached social cards still point here
+    'og-bitcoin-vs-rental-property-v2.jpg',    // 2026-09-23 retitle; the old card had "The honest comparison" printed on it
     'og-bitcoin-vs-the-stock-market.jpg',
     'og-the-bitcoin-retirement.jpg',
     'og-disciplined-rebalancing.jpg',
