@@ -32,7 +32,7 @@ companion:
     desc: "John and Robin Seyr on the retirement model: what each 0.2 BTC does to the retirement date, on default inputs."
 faq:
   - q: "How much bitcoin do I need to retire?"
-    a: "There is no single number — it depends on your target income, your retirement year, and what you assume about bitcoin’s price path. This calculator lets you set all three and shows whether a given stack sustains your income year by year, including the scenarios where it depletes. The answer is a range you explore, not a figure anyone can hand you."
+    a: "There is no single number — it depends on your annual withdrawal, your retirement year, and what you assume about bitcoin’s price path. This calculator lets you set all three and shows whether a given stack sustains your withdrawals year by year, including the scenarios where it depletes. The answer is a range you explore, not a figure anyone can hand you."
   - q: "Can you really retire on bitcoin alone?"
     a: "Under some assumptions yes, under others no — and the difference is visible in the projection. A stack that reaches escape velocity under one price model can deplete under a harsher one, and a bear market early in retirement changes the picture more than one that comes late. The companion <a href='/the-bitcoin-retirement-stress-test'>Stress Test</a> models exactly that risk."
   - q: "How does the calculator project bitcoin’s future price?"
@@ -103,7 +103,7 @@ eleventyComputed:
 
       <p class="prose"><strong>What income can I retire on?</strong> For some people, the answer here may be the least income that will allow them to survive comfortably, and thereby they may prioritize an earlier retirement vs. other people who may be looking for not just a survival-income, but a richer more affluent lifestyle, in which case they may be willing to continue to work longer (or just wait longer, in the case of a static bitcoin stack) to avail of the higher retirement income.</p>
 
-      <p class="prose">The calculator on the next tab does not ask you to pick which question you are solving. The two interactive sliders for <em>Target annual income</em> and <em>Retirement year</em> are both fully draggable; drag whichever one matches the question you&rsquo;re asking, and the rest of the readout updates to stay consistent. The exploration <em>is</em> the answer. You can play with these tradeoffs alongside one another.</p>
+      <p class="prose">The calculator on the next tab does not ask you to pick which question you are solving. The two interactive sliders for <em>Annual withdrawal</em> and <em>Retirement year</em> are both fully draggable; drag whichever one matches the question you&rsquo;re asking, and the rest of the readout updates to stay consistent. The exploration <em>is</em> the answer. You can play with these tradeoffs alongside one another.</p>
 
       <h2 class="section-title">Three strategies, different shapes of risk</h2>
 
@@ -171,7 +171,7 @@ eleventyComputed:
           <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="0"><span class="swatch swatch-floor"></span>Floor band (conservative anchor)</div>
           <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="2"><span class="swatch swatch-upper"></span>Upper band (spikes)</div>
           <div class="legend-group-label">Portfolio value &mdash; total stack</div>
-          <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="3"><span class="swatch swatch-stack"></span>Your stack (if price follows trend)<span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Drawdowns are taken against this trend-priced stack to fund retirement income. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></div>
+          <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="3"><span class="swatch swatch-stack"></span>Your stack (if price follows trend)<span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Withdrawals are taken against this trend-priced stack. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></div>
           <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="4"><span class="swatch swatch-current"></span>Your stack (if today's gap to trend persists)<span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price (currently below trend) and projects forward at the same Power Law growth rate. When this line sits <em>below</em> the drawdown-strategy line, bitcoin is below trend today &mdash; and the vertical gap is the additional gain you&rsquo;d capture if the market mean-reverts to trend over your retirement window. When sitting <em>above</em>, the gap is the premium that trend says will fade. The two lines converge when the market is at trend. Useful as a sanity check on the primary projection: if you want to assume <em>no</em> mean-reversion happens, this line is closer to what you should plan for.</span></span></div>
           <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="5"><span class="swatch swatch-benchmark"></span>Traditional 60/40 (same starting capital)</div>
         </div>
@@ -190,11 +190,11 @@ eleventyComputed:
           </button>
           <div class="rt-body" id="rtGrowBody" hidden>
             <p class="rt-scenario-summary" id="rtGrowSummary"></p>
-            <p class="rt-note">Did your stack outgrow your spending? Green means it grew that year; red means it shrank. Same yearly numbers as the audit view. <span class="rt-note-caveat"><strong>Growth %</strong> is the year-over-year change in portfolio value under your current assumptions (price basis, dollar basis, and income basis) &mdash; driven by the Power Law growth of your stack minus that year&rsquo;s withdrawal, not a fixed bitcoin-price CAGR.</span></p>
+            <p class="rt-note">Did your stack outgrow your spending? Green means it grew that year; red means it shrank. Same yearly numbers as the audit view. <span class="rt-note-caveat"><strong>Growth %</strong> is the year-over-year change in portfolio value under your current assumptions (price basis, dollar basis, and withdrawal basis) &mdash; driven by the Power Law growth of your stack minus that year&rsquo;s withdrawal, not a fixed bitcoin-price CAGR.</span></p>
             <div class="rt-toggle-row">
               <span class="rt-basis-label">Price assumption:</span>
               <div class="seg-control seg-2" role="group" aria-label="Price assumption">
-                <button type="button" class="rt-basis-btn seg-btn is-active" data-basis="trend"><span class="rt-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Drawdowns are taken against this trend-priced stack to fund retirement income. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
+                <button type="button" class="rt-basis-btn seg-btn is-active" data-basis="trend"><span class="rt-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Withdrawals are taken against this trend-priced stack. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
                 <button type="button" class="rt-basis-btn seg-btn" data-basis="current"><span class="rt-basis-text">Today&rsquo;s gap to trend persists</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
               </div>
             </div>
@@ -206,10 +206,10 @@ eleventyComputed:
               </div>
             </div>
             <div class="rt-toggle-row">
-              <span class="rt-basis-label">Interpret my retirement income as:</span>
-              <div class="seg-control seg-2" role="group" aria-label="Income basis">
-                <button type="button" class="seg-btn is-active" data-incbasis="today">Rises with inflation<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>retirement income</strong> target is in today&rsquo;s purchasing power. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
-                <button type="button" class="seg-btn" data-incbasis="fixed">Same every year<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>retirement income</strong> target is a fixed nominal amount &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
+              <span class="rt-basis-label">Interpret my withdrawal as:</span>
+              <div class="seg-control seg-2" role="group" aria-label="Withdrawal basis">
+                <button type="button" class="seg-btn is-active" data-incbasis="today">Rises with inflation<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>withdrawal</strong> is in today&rsquo;s purchasing power. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
+                <button type="button" class="seg-btn" data-incbasis="fixed">Same every year<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>withdrawal</strong> is a fixed nominal amount &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
               </div>
             </div>
             <div class="rt-scroll">
@@ -232,14 +232,14 @@ eleventyComputed:
           <div class="rt-body" id="rtVerifyBody" hidden>
             <p class="rt-scenario-summary" id="rtVerifySummary"></p>
             <div class="rt-verify-head">
-              <p class="rt-note">Reproduce any row: <strong>Starting BTC &minus; BTC sold + any DCA added = BTC left</strong>; <strong>price &times; BTC left = stack value</strong>; <strong>income &divide; price = BTC sold</strong>. Income grows with inflation each year. All dollar columns &mdash; BTC price, stack value, income &mdash; follow the nominal/real toggle, so the identities above hold in either mode. Same projection that draws the chart. <span class="rt-note-caveat">Pre-retirement DCA is approximated once per year at that year&rsquo;s trend price, so accumulation rows may not reconcile to the exact month.</span></p>
+              <p class="rt-note">Reproduce any row: <strong>Starting BTC &minus; BTC sold + any DCA added = BTC left</strong>; <strong>price &times; BTC left = stack value</strong>; <strong>withdrawal &divide; price = BTC sold</strong>. The withdrawal grows with inflation each year. All dollar columns &mdash; BTC price, stack value, withdrawal &mdash; follow the nominal/real toggle, so the identities above hold in either mode. Same projection that draws the chart. <span class="rt-note-caveat">Pre-retirement DCA is approximated once per year at that year&rsquo;s trend price, so accumulation rows may not reconcile to the exact month.</span></p>
               <button type="button" class="rt-csv-btn" id="rtCsvBtn"><span aria-hidden="true">&#8595;</span> Copy as CSV</button>
             </div>
             <p class="rt-note rt-income-note" id="rtIncomeNote"></p>
             <div class="rt-toggle-row">
               <span class="rt-basis-label">Price assumption:</span>
               <div class="seg-control seg-2" role="group" aria-label="Price assumption">
-                <button type="button" class="rt-basis-btn seg-btn is-active" data-basis="trend"><span class="rt-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Drawdowns are taken against this trend-priced stack to fund retirement income. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
+                <button type="button" class="rt-basis-btn seg-btn is-active" data-basis="trend"><span class="rt-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Withdrawals are taken against this trend-priced stack. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
                 <button type="button" class="rt-basis-btn seg-btn" data-basis="current"><span class="rt-basis-text">Today&rsquo;s gap to trend persists</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
               </div>
             </div>
@@ -251,16 +251,16 @@ eleventyComputed:
               </div>
             </div>
             <div class="rt-toggle-row">
-              <span class="rt-basis-label">Interpret my retirement income as:</span>
-              <div class="seg-control seg-2" role="group" aria-label="Income basis">
-                <button type="button" class="seg-btn is-active" data-incbasis="today">Rises with inflation<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>retirement income</strong> target is in today&rsquo;s purchasing power. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
-                <button type="button" class="seg-btn" data-incbasis="fixed">Same every year<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>retirement income</strong> target is a fixed nominal amount &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
+              <span class="rt-basis-label">Interpret my withdrawal as:</span>
+              <div class="seg-control seg-2" role="group" aria-label="Withdrawal basis">
+                <button type="button" class="seg-btn is-active" data-incbasis="today">Rises with inflation<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>withdrawal</strong> is in today&rsquo;s purchasing power. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
+                <button type="button" class="seg-btn" data-incbasis="fixed">Same every year<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>withdrawal</strong> is a fixed nominal amount &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
               </div>
             </div>
             <div class="rt-scroll">
               <table class="rt-table rt-verify-table">
                 <thead>
-                  <tr><th>Year</th><th>Phase</th><th class="rt-num">BTC price</th><th class="rt-num">Starting BTC</th><th class="rt-num">Stack value</th><th class="rt-num">Income drawn</th><th class="rt-num">BTC sold</th><th class="rt-num">BTC left</th></tr>
+                  <tr><th>Year</th><th>Phase</th><th class="rt-num">BTC price</th><th class="rt-num">Starting BTC</th><th class="rt-num">Stack value</th><th class="rt-num">Withdrawal</th><th class="rt-num">BTC sold</th><th class="rt-num">BTC left</th></tr>
                 </thead>
                 <tbody id="rtVerifyRows"><!-- JS-populated --></tbody>
               </table>
@@ -281,28 +281,28 @@ eleventyComputed:
       <div class="slider-cluster cluster-target">
         <div class="cluster-label">
           <span class="cluster-label-main">Target outcomes</span>
-          <span class="cluster-label-help">&mdash; explore your target annual retirement income and retirement year, and the trade-off between them.</span>
+          <span class="cluster-label-help">&mdash; explore your annual withdrawal and retirement year, and the trade-off between them.</span>
         </div>
         <div class="slider-grid grid-target">
 
           <div class="slider-control" data-key="targetIncomeUSD">
             <div class="slider-row">
-              <span class="slider-name">Target annual retirement income
-                <span class="help-tip" tabindex="0">?<span class="tip-content">Annual retirement income in today&rsquo;s dollars, <em>pretax</em>. Drag to explore: more income means the stack lasts fewer years; less income means it lasts longer or reaches escape velocity. <em>For reference: a 20% effective tax would reduce real take-home to roughly 80% of this figure.</em></span></span>
+              <span class="slider-name">Annual withdrawal
+                <span class="help-tip" tabindex="0">?<span class="tip-content">What you sell from the stack each year to live on, in today&rsquo;s dollars, <em>pretax</em>. Drag to explore: a larger withdrawal means the stack lasts fewer years; a smaller one means it lasts longer or reaches escape velocity. <em>For reference: a 20% effective tax would reduce real take-home to roughly 80% of this figure.</em></span></span>
               </span>
               <span class="slider-val" id="val-targetIncomeUSD">$100,000</span>
             </div>
-            <input type="range" id="slider-targetIncomeUSD" min="20000" max="1000000" step="5000" value="100000" aria-label="Target annual retirement income">
+            <input type="range" id="slider-targetIncomeUSD" min="20000" max="1000000" step="5000" value="100000" aria-label="Annual withdrawal">
             <div class="derived-readout">
               <span class="derived-label">&equiv;&nbsp;withdrawal rate:</span>
               <span class="derived-val" id="val-withdrawalRatePct">6.0%</span>
-              <span class="help-tip" tabindex="0">?<span class="tip-content">Effective annual withdrawal as a percentage of your projected stack at retirement (in today&rsquo;s dollars). This is a <em>derived</em> readout, not a separate input &mdash; it&rsquo;s computed live as <strong>income &divide; projected stack value</strong>. Traditional &ldquo;safe withdrawal rate&rdquo; guidance (e.g., the <strong>4% rule</strong>) was calibrated against a 60/40 stock-bond portfolio expected to deliver ~7% real returns. Under the <a href="/the-power-law" style="color:var(--amber)">Power Law</a>, bitcoin&rsquo;s projected real growth remains meaningfully above that for the foreseeable retirement window, so higher withdrawal rates can be sustained &mdash; the <em>years stack lasts</em> readout below simulates this year-by-year. To explore a specific rate, nudge the income slider until this readout lands on your target.</span></span>
+              <span class="help-tip" tabindex="0">?<span class="tip-content">Effective annual withdrawal as a percentage of your projected stack at retirement (in today&rsquo;s dollars). This is a <em>derived</em> readout, not a separate input &mdash; it&rsquo;s computed live as <strong>withdrawal &divide; projected stack value</strong>. Traditional &ldquo;safe withdrawal rate&rdquo; guidance (e.g., the <strong>4% rule</strong>) was calibrated against a 60/40 stock-bond portfolio expected to deliver ~7% real returns. Under the <a href="/the-power-law" style="color:var(--amber)">Power Law</a>, bitcoin&rsquo;s projected real growth remains meaningfully above that for the foreseeable retirement window, so higher withdrawal rates can be sustained &mdash; the <em>years stack lasts</em> readout below simulates this year-by-year. To explore a specific rate, nudge the withdrawal slider until this readout lands on your target.</span></span>
             </div>
-            <div class="income-basis" role="group" aria-label="Income basis">
-              <span class="income-basis-label">Interpret my retirement income as:</span>
+            <div class="income-basis" role="group" aria-label="Withdrawal basis">
+              <span class="income-basis-label">Interpret my withdrawal as:</span>
               <div class="seg-control seg-2">
-                <button type="button" class="seg-btn is-active" data-incbasis="today">Rises with inflation<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>retirement income</strong> target is in today&rsquo;s purchasing power. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
-                <button type="button" class="seg-btn" data-incbasis="fixed">Same every year<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>retirement income</strong> target is a fixed nominal amount &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
+                <button type="button" class="seg-btn is-active" data-incbasis="today">Rises with inflation<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>withdrawal</strong> is in today&rsquo;s purchasing power. Each retirement year draws the same real amount &mdash; so the <em>nominal</em> (future-dollar) figure rises with inflation to preserve what it buys. Standard for retirement planning.</span></span></button>
+                <button type="button" class="seg-btn" data-incbasis="fixed">Same every year<span class="help-tip" tabindex="0">?<span class="tip-content">Your <strong>withdrawal</strong> is a fixed nominal amount &mdash; the same raw dollars every year. Because prices rise, its <em>real</em> (today&rsquo;s-dollars) purchasing power shrinks over time.</span></span></button>
               </div>
             </div>
           </div>
@@ -365,7 +365,7 @@ eleventyComputed:
           <div class="slider-control" data-key="yearsInRetirement">
             <div class="slider-row">
               <span class="slider-name">Years in retirement
-                <span class="help-tip" tabindex="0">?<span class="tip-content">How long the stack needs to support your target income. Longer windows make depletion more likely at the same withdrawal rate.</span></span>
+                <span class="help-tip" tabindex="0">?<span class="tip-content">How long the stack needs to fund your withdrawal. Longer windows make depletion more likely at the same withdrawal rate.</span></span>
               </span>
               <span class="slider-val" id="val-yearsInRetirement">30 yrs</span>
             </div>
@@ -403,7 +403,7 @@ eleventyComputed:
       <div class="sustainability-values">
         <div class="value-block">
           <div class="value-label">Projected years stack lasts
-            <span class="help-tip" tabindex="0">?<span class="tip-content">Projected amount of time your chosen retirement income will last, based on the projected Power Law trend price of bitcoin over time.</span></span>
+            <span class="help-tip" tabindex="0">?<span class="tip-content">Projected number of years the stack can fund your withdrawal, based on the projected Power Law trend price of bitcoin over time.</span></span>
           </div>
           <div class="value-display" id="sustYearsLast">&mdash;</div>
         </div>
@@ -423,7 +423,7 @@ eleventyComputed:
           <div class="spectrum-marker" id="spectrumMarker" style="left: 50%"></div>
         </div>
         <div class="spectrum-labels">
-          <span class="spectrum-label-left">Depleting<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack runs out before retirement ends. You&rsquo;d need to extend the horizon, lower target income, or raise the stack to reach sustainability. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
+          <span class="spectrum-label-left">Depleting<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack runs out before retirement ends. You&rsquo;d need to extend the horizon, lower the withdrawal, or raise the stack to reach sustainability. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
           <span class="spectrum-label-mid">Threshold<span class="help-tip" tabindex="0">?<span class="tip-content">Break-even &mdash; the stack lasts exactly through retirement, neither growing nor depleting in real terms. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
           <span class="spectrum-label-right">Escape velocity<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack grows faster than you draw it down. Purchasing power increases over retirement instead of being consumed; the stack lasts indefinitely. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
         </div>
@@ -649,7 +649,7 @@ eleventyComputed:
 
       <p class="prose">We do not try to model sequence-of-returns risk in any rigorous Monte-Carlo sense. We instead show the floor, trend, and upper Power Law bands on the projection chart and let you inspect what each implies for your scenario. This states the model&rsquo;s limits.</p>
 
-      <p class="prose">We do not bake taxes into the projection. The v1 model is pretax throughout, and for the foundational sell-as-needed approach, the structural arithmetic of stack value, withdrawal pressure, and real-terms sustainability runs the same regardless of account type. Tax treatment becomes computationally distinct in the supplemental frameworks; sales inside a Traditional IRA or 401(k) avoid the per-sell taxable event a regular account incurs, which materially changes how rebalancing math behaves. That distinction earns its surface on the disciplined-rebalancing canvas, where it belongs. The illustrative line on the income slider&rsquo;s tooltip &mdash; <em>&ldquo;a 20% effective tax would reduce real take-home to roughly 80%&rdquo;</em> &mdash; exists to acknowledge the magnitude of the consideration without inviting the false precision a tax-rate slider would produce.</p>
+      <p class="prose">We do not bake taxes into the projection. The v1 model is pretax throughout, and for the foundational sell-as-needed approach, the structural arithmetic of stack value, withdrawal pressure, and real-terms sustainability runs the same regardless of account type. Tax treatment becomes computationally distinct in the supplemental frameworks; sales inside a Traditional IRA or 401(k) avoid the per-sell taxable event a regular account incurs, which materially changes how rebalancing math behaves. That distinction earns its surface on the disciplined-rebalancing canvas, where it belongs. The illustrative line on the withdrawal slider&rsquo;s tooltip &mdash; <em>&ldquo;a 20% effective tax would reduce real take-home to roughly 80%&rdquo;</em> &mdash; exists to acknowledge the magnitude of the consideration without inviting the false precision a tax-rate slider would produce.</p>
 
       <p class="prose">What sell-as-needed requires is structurally minimal: a stack, a target, the willingness to sell. It is the approach that asks the least of the user&rsquo;s time, infrastructure, and conviction.</p>
 
@@ -726,15 +726,15 @@ eleventyComputed:
         <div class="math-eq">stack<sub>y+1</sub> = stack<sub>y</sub> + (12 &times; monthly DCA) &divide; Price(y)</div>
       </div>
 
-      <p class="prose"><strong>Drawdown.</strong> For each retirement year, sell enough bitcoin at that year&rsquo;s modeled price to cover the target income, adjusted for inflation:</p>
+      <p class="prose"><strong>Drawdown.</strong> For each retirement year, sell enough bitcoin at that year&rsquo;s modeled price to cover the annual withdrawal, adjusted for inflation:</p>
 
       <div class="math-block">
-        <div class="math-eq">withdrawal<sub>y</sub> = target income &times; (1 + inflation)<sup>(y &minus; retirement year)</sup></div>
+        <div class="math-eq">withdrawal<sub>y</sub> = annual withdrawal &times; (1 + inflation)<sup>(y &minus; retirement year)</sup></div>
         <div class="math-eq">btc sold<sub>y</sub> = withdrawal<sub>y</sub> &divide; Price(y)</div>
         <div class="math-eq">stack<sub>y+1</sub> = stack<sub>y</sub> &minus; btc sold<sub>y</sub></div>
       </div>
 
-      <p class="prose">When the user is dragging the income slider, the implied withdrawal rate at retirement (income &divide; stack value at retirement) is computed and surfaced as a <em>derived</em> readout beneath the slider. Users who prefer to think in percentage-rate terms can read the implied rate live and nudge income until that readout lands on their target. Showing the rate as derived (rather than as a second slider coupled to income) makes the dependency between the two visible &mdash; they were never independent inputs, even when both looked draggable.</p>
+      <p class="prose">When the user is dragging the withdrawal slider, the implied withdrawal rate at retirement (withdrawal &divide; stack value at retirement) is computed and surfaced as a <em>derived</em> readout beneath the slider. Users who prefer to think in percentage-rate terms can read the implied rate live and nudge the withdrawal until that readout lands on their target. Showing the rate as derived (rather than as a second slider coupled to the withdrawal) makes the dependency between the two visible &mdash; they were never independent inputs, even when both looked draggable.</p>
 
       <h2 class="section-title">Sustainability and escape velocity</h2>
 
@@ -763,7 +763,7 @@ eleventyComputed:
 
       <h2 class="section-title">Inflation and real terms</h2>
 
-      <p class="prose">Every dollar amount on the calculator is in <em>today&rsquo;s dollars</em>. The projection inflation-adjusts the target income so that the user&rsquo;s lifestyle stays constant in purchasing power across retirement. The inflation rate is selectable from the baseline assumptions:</p>
+      <p class="prose">Every dollar amount on the calculator is in <em>today&rsquo;s dollars</em>. The projection inflation-adjusts the withdrawal so that the user&rsquo;s lifestyle stays constant in purchasing power across retirement. The inflation rate is selectable from the baseline assumptions:</p>
 
       <table class="math-table">
         <thead>
@@ -785,7 +785,7 @@ eleventyComputed:
 
       <p class="prose">The v1 model is pretax throughout. Every dollar shown &mdash; on the slider, in the readout, on the chart &mdash; is gross of taxes.</p>
 
-      <p class="prose">For sell-as-needed, the pretax figure needs no adjustment: the structural math is account-type-agnostic, since each withdrawal is treated identically by the model regardless of what kind of account holds the bitcoin. Tax-distinct mechanics surface on the supplemental frameworks &mdash; notably disciplined rebalancing inside a tax-advantaged account, where internal sells avoid tax events and the rebalancing math materially diverges. The illustrative line in the income slider tooltip &mdash; <em>&ldquo;a 20% effective tax would reduce real take-home to roughly 80%&rdquo;</em> &mdash; exists to acknowledge the magnitude without inviting the false precision a tax-rate slider would produce.</p>
+      <p class="prose">For sell-as-needed, the pretax figure needs no adjustment: the structural math is account-type-agnostic, since each withdrawal is treated identically by the model regardless of what kind of account holds the bitcoin. Tax-distinct mechanics surface on the supplemental frameworks &mdash; notably disciplined rebalancing inside a tax-advantaged account, where internal sells avoid tax events and the rebalancing math materially diverges. The illustrative line in the withdrawal slider tooltip &mdash; <em>&ldquo;a 20% effective tax would reduce real take-home to roughly 80%&rdquo;</em> &mdash; exists to acknowledge the magnitude without inviting the false precision a tax-rate slider would produce.</p>
 
       <p class="prose">This is a deliberate choice. Effective tax rates depend on holding period, basis, federal and state brackets, NIIT eligibility, and Social Security crossover effects. A single &ldquo;effective tax rate&rdquo; slider would let users dial in whatever felt comfortable while feeling more precise &mdash; which is worse than not modeling tax at all. The 4% rule and the Trinity Study work in pretax dollars by convention; this calculator follows the same convention.</p>
 

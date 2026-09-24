@@ -565,12 +565,12 @@
     // the cut ran", never "those N years" (STYLE_GUIDE rule #4 corollary; JM ruling 2026-07,
     // which retracts the spec's "it is the same window" premise).
     if (m.flip) {
-      parts.push('With a <strong>' + X + '% cut</strong> while underwater, the plan survives this scenario — at full spending it did not. The cut costs about <strong>' + Y + '</strong> of income across the ' + yearsWord(N) + ' the cut ran.');
+      parts.push('With a <strong>' + X + '% cut</strong> while underwater, the plan survives this scenario — at full spending it did not. The cut costs about <strong>' + Y + '</strong> of spending across the ' + yearsWord(N) + ' the cut ran.');
     } else if (m.redDep && m.fullDep && m.redDep > m.fullDep) {
-      parts.push('The <strong>' + X + '% cut</strong> moves depletion from <strong>' + m.fullDep + '</strong> to <strong>' + m.redDep + '</strong> — ' + yearsWord(m.redDep - m.fullDep) + ' bought for about ' + Y + ' of forgone income.');
+      parts.push('The <strong>' + X + '% cut</strong> moves depletion from <strong>' + m.fullDep + '</strong> to <strong>' + m.redDep + '</strong> — ' + yearsWord(m.redDep - m.fullDep) + ' bought for about ' + Y + ' of forgone spending.');
     } else if (!m.redDep && !m.fullDep) {
       var z = (m.fullEnd > 0) ? Math.round(100 * (m.redEnd / m.fullEnd - 1)) : 0;
-      parts.push('The <strong>' + X + '% cut</strong> leaves about <strong>' + z + '% more</strong> at the end — ' + usd(m.redEnd) + ' versus ' + usd(m.fullEnd) + ' — and costs about ' + Y + ' of income across the ' + yearsWord(N) + ' the cut ran.');
+      parts.push('The <strong>' + X + '% cut</strong> leaves about <strong>' + z + '% more</strong> at the end — ' + usd(m.redEnd) + ' versus ' + usd(m.fullEnd) + ' — and costs about ' + Y + ' of spending across the ' + yearsWord(N) + ' the cut ran.');
     } else {
       parts.push('Even with a <strong>' + X + '% cut</strong>, the plan does not survive this scenario — the cut helps, but this crash at this timing is beyond it.');
     }
@@ -632,7 +632,7 @@
     tb.innerHTML = rows;
     var fn = document.getElementById('stFlexSummary');
     if (fn) {
-      if (cutN > 0) { fn.hidden = false; fn.innerHTML = '<strong>Spending cut:</strong> withdrawals cut ' + FLEX + '% in ' + yearsWord(cutN) + ' (marked ✂), while the market sat below its pre-crash level — about <strong>' + usdFull(foregoneNom) + '</strong> of income forgone (nominal).'; }
+      if (cutN > 0) { fn.hidden = false; fn.innerHTML = '<strong>Spending cut:</strong> withdrawals cut ' + FLEX + '% in ' + yearsWord(cutN) + ' (marked ✂), while the market sat below its pre-crash level — about <strong>' + usdFull(foregoneNom) + '</strong> of spending forgone (nominal).'; }
       else { fn.hidden = true; fn.innerHTML = ''; }
     }
   }
@@ -644,7 +644,7 @@
     L.push('# Bitcoin stack,' + SCENARIO.btcStack + ' BTC');
     L.push('# Retirement year,' + SCENARIO.retirementYear);
     L.push('# Years in retirement,' + SCENARIO.yearsInRetirement);
-    L.push('# Target annual income,' + SCENARIO.targetIncomeUSD + ' (' + (SCENARIO.incomeBasis === 'fixed' ? 'fixed future $' : "today's dollars") + ')');
+    L.push('# Annual withdrawal,' + SCENARIO.targetIncomeUSD + ' (' + (SCENARIO.incomeBasis === 'fixed' ? 'fixed future $' : "today's dollars") + ')');
     L.push('# Monthly DCA,' + SCENARIO.monthlyDcaUSD);
     L.push('# Inflation,' + inflationLabel());
     L.push('# Crash depth,' + Math.round(crash.depthPct * 100) + '%');
@@ -655,7 +655,7 @@
     L.push('# Crashed depletion,' + (crashed.depletionYear || 'survives'));
     L.push('# Live scenario URL,' + window.location.href);
     L.push('');
-    L.push('Year,Phase,BTC price nominal,Baseline price,Income drawn,Spending cut?,BTC sold,BTC left,Stack USD (crashed),Stack USD (baseline)');
+    L.push('Year,Phase,BTC price nominal,Baseline price,Withdrawal,Spending cut?,BTC sold,BTC left,Stack USD (crashed),Stack USD (baseline)');
     for (var k = 0; k < crashed.rows.length; k++) {
       var r = crashed.rows[k], b = base.rows[k];
       L.push([r.x, r.phase,

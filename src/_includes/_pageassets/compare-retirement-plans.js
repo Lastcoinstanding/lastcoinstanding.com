@@ -138,8 +138,12 @@
     return LINE_CACHE;
   }
   function stateKey() {
+    // Horizon and withdrawal basis are in the key since they became settable
+    // by a carried link (coherence F3): without them, Reset after arriving
+    // with years=27 could serve the 27-year result from the memo.
     return ['a', PLANS.a.btcStack, PLANS.a.targetIncomeUSD, PLANS.a.retirementYear,
             'b', PLANS.b.btcStack, PLANS.b.targetIncomeUSD, PLANS.b.retirementYear,
+            'h', PLANS.a.yearsInRetirement, PLANS.a.incomeBasis,
             'bear', BEAR ? 1 : 0].join('|');
   }
 
@@ -693,7 +697,7 @@
     var sm = document.getElementById(summaryId);
     if (sm) {
       sm.innerHTML = '<strong>' + formatBtc(c.scn.btcStack) + ' BTC</strong>, retiring <strong>' + c.scn.retirementYear +
-        '</strong>, drawing <strong>' + formatUsdFull(c.scn.targetIncomeUSD) + '</strong> a year in today&rsquo;s dollars over ' +
+        '</strong>, drawing <strong>' + formatUsdFull(c.scn.targetIncomeUSD) + '</strong> a year ' + (c.scn.incomeBasis === 'fixed' ? 'fixed in future dollars' : 'in today&rsquo;s dollars') + ' over ' +
         yearsWord(c.scn.yearsInRetirement) + '. Inflation ' + MA.get('inflation').value + '%, growth ' +
         MA.get('btcGrowthModel').preset.replace('powerlaw-', 'Power Law ') + (BEAR ? ', with the bear-market test on' : '') + '.';
     }
@@ -767,6 +771,25 @@
       }
     });
     if (p.has('bear')) BEAR = (p.get('bear') === '1' || p.get('bear') === 'true');
+
+    /* Shared settings a sender carries (coherence F3, 2026-09-23). The
+       horizon and the withdrawal basis are one setting for BOTH plans (design
+       §3 — the page compares plans, not models), so an arriving value sets
+       both. Until this date both were ignored: a reader who planned a
+       27-year retirement, or a withdrawal fixed in future dollars, saw
+       Compare run 30 years in today's dollars without saying so, and
+       forward years=30 onward. Clamp matches EV's reader (5–60). */
+    if (p.has('years')) {
+      var yrs = parseInt(p.get('years'), 10);
+      if (isFinite(yrs)) {
+        yrs = Math.max(5, Math.min(60, yrs));
+        PLANS.a.yearsInRetirement = PLANS.b.yearsInRetirement = yrs;
+      }
+    }
+    if (p.has('incbasis')) {
+      var ib = p.get('incbasis');
+      if (ib === 'today' || ib === 'fixed') PLANS.a.incomeBasis = PLANS.b.incomeBasis = ib;
+    }
   }
 
   function syncUrl() {
@@ -781,6 +804,10 @@
         });
       });
       if (BEAR) p.set('bear', '1');
+      // Written only when they differ from the defaults, so an untouched
+      // comparison keeps the short URL it always had.
+      if (PLANS.a.yearsInRetirement !== DEFAULT_A.yearsInRetirement) p.set('years', String(PLANS.a.yearsInRetirement));
+      if (PLANS.a.incomeBasis === 'fixed') p.set('incbasis', 'fixed');
       window.history.replaceState(null, '', window.location.pathname + '?' + p.toString());
     }, 250);
   }
@@ -930,8 +957,12 @@
     // shared card
     var sm = document.getElementById('crpSharedSummary');
     if (sm) {
-      sm.textContent = 'Power Law trend · inflation ' + MA.get('inflation').value + '% · ' +
-        yearsWord(PLANS.a.yearsInRetirement) + ' horizon' + (BEAR ? ' · bear-market test on' : '');
+      // "reverts to trend" is what the flagship and EV call this same path
+      // (multiplier 1: the Power Law trend price throughout) — coherence F6(a).
+      sm.textContent = 'Power Law trend · reverts to trend · inflation ' + MA.get('inflation').value + '% · ' +
+        yearsWord(PLANS.a.yearsInRetirement) + ' horizon' +
+        (PLANS.a.incomeBasis === 'fixed' ? ' · withdrawal fixed in future $' : '') +
+        (BEAR ? ' · bear-market test on' : '');
     }
     var spec = document.getElementById('crpBearSpec');
     if (spec) {
