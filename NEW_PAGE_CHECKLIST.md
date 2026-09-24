@@ -43,6 +43,11 @@ One check is NOT assumed and must be made explicitly before shipping:
   head (the 11-page pattern). Omit both and var-based colours fall back to
   canvastext on the browser's light canvas — washed-out hero, black/white
   var-based borders. Bit the Bitcoin Hurdle Rate page (Aug 2026).
+  **The build now enforces the palette half (2026-09-23):** a `var(--x)` with
+  no fallback that the rendered page never defines fails `eleventy` with the
+  page and variable named. Define it in the page `:root` (or give the `var()`
+  a fallback). There is still no site-wide default palette, on purpose: see
+  TECH_DEBT "base.njk DEFAULT palette" for why.
 
 - [ ] **Every colour routes through a CSS variable — no hardcoded hex/rgb in
   page CSS or JS chart configs.** Beyond the base `:root` set above, any new
@@ -74,7 +79,9 @@ eleventyComputed:
 
 If the page uses shared assets (e.g., `power-law-data.js`), include them
 explicitly in `page_scripts` with `\n` between includes — Eleventy renders
-them in order.
+them in order. The build checks this (2026-09-23): `page_scripts`,
+`page_styles` and `head_extras` must each be one double-quoted line holding
+exactly one `\n` between consecutive includes, or `eleventy` fails.
 
 ## 3. Navigation entry points
 

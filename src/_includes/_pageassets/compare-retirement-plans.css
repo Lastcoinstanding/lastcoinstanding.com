@@ -13,7 +13,7 @@
        own `crp-` components;
      · the flagship family (--bg-page, --ink-bright, --border-faint …)
        so the components lifted verbatim from the retirement page —
-       .seg-control/.seg-btn, .help-tip and the .rt-* audit table —
+       .seg-control/.seg-btn and the .rt-* audit table —
        work with zero edits and cannot drift into silent var() failures.
 
    Every colour routes through a var, including the ones handed to the
@@ -92,17 +92,11 @@ body { background: var(--bg); color: var(--text); }
 .crp-note em { color: var(--amber); font-style: italic; }
 
 /* ── Body-link treatment (scoped to every prose container) ── */
-.crp-lead a, .crp-note a, .crp-bothsides a, .rt-note a, .tip-content a {
+.crp-lead a, .crp-note a, .crp-bothsides a, .rt-note a {
   color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4);
 }
 .crp-lead a:visited, .crp-note a:visited, .crp-bothsides a:visited, .rt-note a:visited { color: var(--amber); }
 .crp-lead a:hover, .crp-note a:hover, .crp-bothsides a:hover, .rt-note a:hover { border-bottom-color: var(--amber); color: var(--amber-bright); }
-
-/* ── Canonical Style-Guide tooltip (§6.13) ── */
-.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; flex: none; }
-.help-tip:hover, .help-tip:focus { border-color: var(--amber); color: var(--amber); outline: none; }
-.help-tip .tip-content { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 230px; padding: 0.6rem 0.75rem; background: var(--bg-card); border: 1px solid var(--border-strong); border-radius: 4px; font-family: var(--font-b); font-size: 0.78rem; font-weight: 400; color: var(--text); line-height: 1.45; text-align: left; letter-spacing: 0; text-transform: none; z-index: 30; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
-.help-tip:hover .tip-content, .help-tip:focus .tip-content { display: block; }
 
 /* ── Segmented control (lifted from the flagship) ── */
 .seg-control { display: inline-flex; border: 1px solid var(--border-faint); border-radius: 6px; }
