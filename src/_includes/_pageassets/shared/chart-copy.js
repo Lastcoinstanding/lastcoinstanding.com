@@ -54,7 +54,7 @@
       '.chart-copy-btn{position:absolute;top:8px;right:8px;z-index:6;width:30px;height:30px;' +
         'display:inline-flex;align-items:center;justify-content:center;padding:0;' +
         'background:rgba(17,17,16,0.5);border:1px solid rgba(255,255,255,0.14);border-radius:6px;' +
-        'color:rgba(220,214,206,0.9);cursor:pointer;opacity:0.55;' +
+        'color:rgba(220,214,206,0.9);font-family:inherit;cursor:pointer;opacity:0.55;' +
         'transition:opacity .2s ease,color .2s,border-color .2s,background .2s;' +
         '-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}' +
       '.chart-copy-host:hover .chart-copy-btn{opacity:0.82;}' +

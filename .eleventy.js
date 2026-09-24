@@ -176,6 +176,73 @@ module.exports = function (eleventyConfig) {
       .replace(/&([a-zA-Z]+);/g, (m, name) =>
         Object.prototype.hasOwnProperty.call(FAQ_ENTITIES, name) ? FAQ_ENTITIES[name] : m));
 
+  // ─── Build lints (2026-09-23; TECH_DEBT "A lint for page_scripts YAML" and
+  // "base.njk could carry a DEFAULT palette"). Both FAIL the build: each
+  // guards a defect that renders without an error and stays invisible until
+  // something else touches the line.
+  const lintFs = require('fs');
+  const lintPath = require('path');
+
+  // (1) Front-matter include lists. page_scripts / page_styles / head_extras
+  // are YAML double-quoted scalars holding {% include %} tags separated by the
+  // two characters \n. A real newline is folded to a space by YAML, so the page
+  // still builds; two includes with no separator at all concatenate the files.
+  // Checked on the raw source, because after YAML parsing the two are
+  // indistinguishable. Rule: the scalar opens and closes on its own line, and
+  // holds exactly one \n between consecutive includes.
+  eleventyConfig.on('eleventy.before', () => {
+    const errs = [];
+    const walk = (dir) => lintFs.readdirSync(dir, { withFileTypes: true }).forEach((d) => {
+      const p = lintPath.join(dir, d.name);
+      if (d.isDirectory()) { if (d.name !== '_includes' && d.name !== '_data') walk(p); return; }
+      if (!p.endsWith('.njk')) return;
+      const src = lintFs.readFileSync(p, 'utf8');
+      const fm = src.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+      if (!fm) return;
+      const re = /^[ \t]*(page_scripts|page_styles|head_extras):[ \t]*(.*)$/gm;
+      let m;
+      while ((m = re.exec(fm[1]))) {
+        const v = m[2].trim();
+        const closed = v.length > 1 && v.startsWith('"') && v.endsWith('"');
+        const inc = (v.match(/\{%\s*include/g) || []).length;
+        const sep = (v.match(/\\n/g) || []).length;
+        if (!closed) errs.push(`${p}: ${m[1]} must be one double-quoted line (a raw newline is folded to a space by YAML)`);
+        else if (inc !== sep + 1) errs.push(`${p}: ${m[1]} has ${inc} includes but ${sep} \\n separators (want ${inc - 1})`);
+      }
+    });
+    walk('src');
+    if (errs.length) throw new Error('Front-matter include lint failed:\n  ' + errs.join('\n  '));
+  });
+
+  // (2) Undefined CSS custom properties. Each page defines its own palette
+  // (there is no site-wide default; one was considered and rejected on
+  // 2026-09-23 because pages rely on var() fallbacks that a default would
+  // silently override). A var(--x) with NO fallback that the page never
+  // defines is invalid at computed-value time: colour quietly inherits,
+  // borders fall to currentColor. Checked on the rendered HTML, so shared
+  // modules and layout CSS are included. Comments are stripped first.
+  eleventyConfig.on('eleventy.after', ({ results }) => {
+    const errs = [];
+    (results || []).forEach((r) => {
+      if (!r.outputPath || !r.outputPath.endsWith('.html') || typeof r.content !== 'string') return;
+      const html = r.content
+        .replace(/<!--[\s\S]*?-->/g, '')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/(^|[\s;{}(,])\/\/[^\n]*/g, '$1');
+      const defined = new Set();
+      let m;
+      const defRe = /(--[\w-]+)\s*:/g;
+      while ((m = defRe.exec(html))) defined.add(m[1]);
+      const setRe = /setProperty\(\s*['"](--[\w-]+)/g;
+      while ((m = setRe.exec(html))) defined.add(m[1]);
+      const missing = new Set();
+      const useRe = /var\(\s*(--[\w-]+)\s*\)/g;
+      while ((m = useRe.exec(html))) if (!defined.has(m[1])) missing.add(m[1]);
+      if (missing.size) errs.push(`${r.outputPath}: ${[...missing].join(', ')}`);
+    });
+    if (errs.length) throw new Error('Undefined CSS variable lint failed (define it in the page :root, or give the var() a fallback):\n  ' + errs.join('\n  '));
+  });
+
   return {
     dir: {
       input: "src",
