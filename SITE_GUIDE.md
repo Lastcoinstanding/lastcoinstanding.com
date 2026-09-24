@@ -2159,7 +2159,7 @@ WODN reads its slider position from **`?pos=`** on load — the suite's shared c
 
 ### Open items
 - ~~**Carousel slide** pending~~ — **shipped June 2026** (sun emerging from behind a cloud bank over a calm sea; slide #19, `data-feat="1"`; deployment trilogy P3 — see §13 inventory + iteration record).
-- **Zone-vocabulary divergence** (TECH_DEBT §1): the non-trilogy "zone" pages (`the-power-law`, BvSM, retirement) and the homepage `classifyState` still use their own position-label vocabulary; migrate-vs-document is deferred to the future bull/bear-cycles page (PAGE_IDEAS_BACKLOG).
+- ~~**Zone-vocabulary divergence**~~ — **closed 2026-09-23**: every position readout on the site, and the ribbon, now names the channel through `positionLabel` / `positionLabelForMultiple` (TECH_DEBT §1).
 
 ## 35. Bull & Bear Cycles (`/bull-and-bear-cycles.html`)
 

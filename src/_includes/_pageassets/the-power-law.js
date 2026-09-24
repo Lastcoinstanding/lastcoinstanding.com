@@ -1328,16 +1328,12 @@
   function updateStatus(currentPrice, isLive){
     if(!statusEl) return;
     var multiplier = currentPrice / todayPrice;
-    var bandLabel;
-    if(multiplier < PL_FLOOR){
-      bandLabel = '<span style="color:'+rust+'">below floor</span>';
-    } else if(multiplier < 1){
-      bandLabel = 'within Floor &rarr; Trend zone';
-    } else if(multiplier < PL_CEIL){
-      bandLabel = '<span style="color:'+amber+'">within Trend &rarr; Upper zone</span>';
-    } else {
-      bandLabel = '<span style="color:'+gold+'">above upper band</span>';
-    }
+    // Shared vocabulary (positionLabel), so this line and the ribbon above it
+    // name the same price the same way. Colour keeps the old regions: rust
+    // below the floor, amber from trend up, gold past the upper band.
+    var word = positionLabelForMultiple(multiplier);
+    var col = multiplier < PL_FLOOR ? rust : multiplier >= PL_CEIL ? gold : multiplier >= 1 ? amber : '';
+    var bandLabel = col ? '<span style="color:'+col+'">'+word+'</span>' : word;
     var src = isLive ? '' : ' <span style="opacity:0.6">(latest monthly data)</span>';
     statusEl.innerHTML =
       '<strong>Today&rsquo;s bitcoin price:</strong> <span style="color:var(--amber)">' + fmtUSD(currentPrice) + '</span>' + src +

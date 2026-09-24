@@ -1462,12 +1462,8 @@
       spotEl.textContent = fmtUsdShort(currentPrice);
       multEl.textContent = ratio.toFixed(2) + '\u00d7';
       if (zoneEl) {
-        var zone;
-        if (ratio < 0.42)     zone = '\u00b7 below floor';
-        else if (ratio < 1.0) zone = '\u00b7 within Floor \u2192 Trend zone';
-        else if (ratio < 3.0) zone = '\u00b7 within Trend \u2192 Upper zone';
-        else                  zone = '\u00b7 above upper band';
-        zoneEl.textContent = zone;
+        // Shared vocabulary, matching the ribbon (2026-09-23).
+        zoneEl.textContent = '\u00b7 ' + positionLabelForMultiple(ratio);
       }
       if (trendEl) trendEl.textContent = fmtUsdShort(todayTrend);
     })();

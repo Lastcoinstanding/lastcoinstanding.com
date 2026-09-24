@@ -44,10 +44,8 @@
   // positionLabel vocabulary. Same transform the trilogy uses, so the zone word
   // here matches "where in the channel" everywhere else on the site.
   function zoneWord(mult){
-    if (!(mult > 0) || typeof positionLabel !== 'function') return '—';
-    var lo = Math.log(PL_FLOOR), hi = Math.log(PL_CEIL);
-    var pos = (Math.log(mult) - lo) / (hi - lo);
-    return positionLabel(pos);
+    if (!(mult > 0) || typeof positionLabelForMultiple !== 'function') return '—';
+    return positionLabelForMultiple(mult);
   }
 
   function render(price, source){

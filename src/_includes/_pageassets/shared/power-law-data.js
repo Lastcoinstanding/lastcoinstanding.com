@@ -68,6 +68,17 @@ function positionLabel(pos){
   return 'near or above the upper band';
 }
 
+// The same label, from a ×-trend multiple rather than a channel position. The
+// ribbon and the "Today's bitcoin price" readouts all hold a multiple, so this
+// is the one transform they share (2026-09-23: retired the older "Floor → Trend
+// zone" wording on the Power Law, BvSM and Retirement readouts, which sat beside
+// the ribbon's word for the same price and disagreed with it).
+function positionLabelForMultiple(mult){
+  if (!(mult > 0)) return '\u2014';
+  var lo = Math.log(PL_FLOOR), hi = Math.log(PL_CEIL);
+  return positionLabel((Math.log(mult) - lo) / (hi - lo));
+}
+
 // ═══════ PRICE DATA ═══════
 // [days_since_genesis, price_usd] pairs on the ~12-day grid described in the
 // header (trailing points are monthly appends). The last pair is the freshest.
