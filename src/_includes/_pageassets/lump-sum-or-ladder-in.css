@@ -72,9 +72,8 @@ body { background: var(--bg); color: var(--text); }
 .lsl-scrubber-readout strong { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
 .lsl-scrub-input { -webkit-appearance: none; appearance: none; width: 100%; height: 10px; border-radius: 6px; outline: none;
   background: linear-gradient(90deg, rgba(224,148,34,0.55) 0%, rgba(224,148,34,0.18) 33%, rgba(109,179,212,0.18) 66%, rgba(109,179,212,0.5) 100%); }
-.lsl-scrub-input::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 26px; height: 26px; border-radius: 50%; background: var(--amber); border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.5), 0 2px 8px rgba(0,0,0,0.5); cursor: grab; }
-.lsl-scrub-input::-webkit-slider-thumb:active { cursor: grabbing; }
-.lsl-scrub-input::-moz-range-thumb { width: 26px; height: 26px; border-radius: 50%; background: var(--amber); border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.5); cursor: grab; }
+.lsl-scrub-input::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 26px; height: 26px; border-radius: 50%; background: var(--amber); border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.5), 0 2px 8px rgba(0,0,0,0.5);}
+.lsl-scrub-input::-moz-range-thumb { width: 26px; height: 26px; border-radius: 50%; background: var(--amber); border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.5);}
 .lsl-scrub-scale { display: flex; justify-content: space-between; font-family: 'Inter', sans-serif; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-top: 0.5rem; }
 
 /* ── Result readout (the verdict at the slider position) ── */
@@ -167,8 +166,8 @@ body { background: var(--bg); color: var(--text); }
 .lsl-field > label { font-family: 'Inter', sans-serif; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 0.45rem; display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
 .lsl-field-val { text-transform: none; letter-spacing: 0; color: var(--text); font-variant-numeric: tabular-nums; font-weight: 600; }
 .lsl-field input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.12); outline: none; }
-.lsl-field input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--amber); border: 2px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.4); cursor: pointer; }
-.lsl-field input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--amber); border: 2px solid var(--bg); cursor: pointer; }
+.lsl-field input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--amber); border: 2px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.4);}
+.lsl-field input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--amber); border: 2px solid var(--bg);}
 .lsl-config-note { grid-column: 1 / -1; font-family: 'Inter', sans-serif; font-size: 0.76rem; color: var(--text-muted); line-height: 1.55; margin: 0; }
 
 /* ── Hand-off card to Page 2 (Your Deployment Plan) ── */

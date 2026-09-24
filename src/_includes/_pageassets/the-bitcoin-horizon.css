@@ -593,7 +593,6 @@ input[type="range"]::-webkit-slider-thumb {
   width: 20px; height: 20px;
   background: var(--amber);
   border-radius: 50%;
-  cursor: pointer;
   border: 2px solid var(--bg);
   box-shadow: 0 0 0 1px var(--amber);
 }
@@ -601,7 +600,6 @@ input[type="range"]::-moz-range-thumb {
   width: 20px; height: 20px;
   background: var(--amber);
   border-radius: 50%;
-  cursor: pointer;
   border: 2px solid var(--bg);
   box-shadow: 0 0 0 1px var(--amber);
 }

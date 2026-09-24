@@ -51,8 +51,7 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .dc-amt-num{font-family:var(--font-h);font-size:1.6rem;font-weight:600;color:#f2eee8;background:none;border:none;border-bottom:1px solid var(--border-strong);width:5.5rem;padding:.1rem .2rem}
 .dc-amt-num:focus{outline:none;border-bottom-color:var(--accent)}
 .dc-amt-suffix{font-family:var(--font-b);font-size:.85rem;color:var(--text-muted)}
-.dc-range{width:100%;accent-color:var(--accent);cursor:grab}
-.dc-range:active{cursor:grabbing}
+.dc-range{width:100%;accent-color:var(--accent);}
 .dc-reset{align-self:flex-start;font-family:var(--font-b);font-size:.76rem;color:var(--text-muted);background:none;border:none;border-bottom:1px dotted var(--text-muted);padding:.1rem 0;cursor:pointer;margin-top:.2rem}
 .dc-reset:hover{color:var(--accent);border-bottom-color:var(--accent)}
 

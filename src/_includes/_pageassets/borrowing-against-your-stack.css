@@ -527,7 +527,6 @@
     background: rgba(224,148,34,0.18);
     border-radius: 2px;
     outline: none;
-    cursor: pointer;
     margin: 8px 0;
 }
 .bas-calc-field input[type="range"]::-webkit-slider-thumb {
@@ -539,7 +538,6 @@
     background: var(--amber);
     border: 2px solid var(--bg);
     box-shadow: 0 0 0 1px rgba(224,148,34,0.4);
-    cursor: grab;
 }
 .bas-calc-field input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
 .bas-calc-field input[type="range"]::-moz-range-thumb {
@@ -548,7 +546,6 @@
     border-radius: 50%;
     background: var(--amber);
     border: 2px solid var(--bg);
-    cursor: grab;
 }
 
 /* Slider label includes inline display value */

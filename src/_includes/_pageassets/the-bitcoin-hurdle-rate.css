@@ -33,8 +33,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .hr-label-note { display: block; font-weight: 400; font-size: 0.76rem; font-style: italic; color: var(--text-muted); margin-top: 0.15rem; }
 .hr-field-row { display: flex; align-items: center; gap: 0.9rem; }
 .hr-slider { flex: 1 1 auto; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; background: rgba(224,148,34,0.22); outline: none; }
-.hr-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--amber); cursor: pointer; border: 2px solid #14110d; }
-.hr-slider::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--amber); cursor: pointer; border: 2px solid #14110d; }
+.hr-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--amber);border: 2px solid #14110d; }
+.hr-slider::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--amber);border: 2px solid #14110d; }
 .hr-slider:focus-visible { outline: 2px solid var(--amber); outline-offset: 4px; }
 .hr-num-wrap { display: flex; align-items: baseline; gap: 0.25rem; flex: 0 0 auto; }
 .hr-num { width: 3.6rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; padding: 0.3rem 0.4rem; text-align: right; }

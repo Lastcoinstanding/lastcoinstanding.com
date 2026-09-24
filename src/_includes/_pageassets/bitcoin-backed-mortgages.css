@@ -717,7 +717,6 @@ body {
 .slider-control input[type="range"] {
     width: 100%;
     accent-color: var(--amber);
-    cursor: pointer;
     height: 4px;
     background: transparent;
     margin: 0;

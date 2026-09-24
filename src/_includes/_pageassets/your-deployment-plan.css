@@ -78,8 +78,8 @@ body { background: var(--bg); color: var(--text); }
 .dp-field > label { font-family: 'Inter', sans-serif; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 0.45rem; display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
 .dp-field-val { text-transform: none; letter-spacing: 0; color: var(--text); font-variant-numeric: tabular-nums; font-weight: 600; }
 .dp-field input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.12); outline: none; }
-.dp-field input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--amber); border: 2px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.4); cursor: pointer; }
-.dp-field input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--amber); border: 2px solid var(--bg); cursor: pointer; }
+.dp-field input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--amber); border: 2px solid var(--bg); box-shadow: 0 0 0 1px rgba(224,148,34,0.4);}
+.dp-field input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--amber); border: 2px solid var(--bg);}
 
 /* Retrospective anchor toggle (item 10) — secondary, lower weight than the style/view controls */
 .dp-anchor-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.45rem 0.8rem; margin: 0 0 1.4rem; }

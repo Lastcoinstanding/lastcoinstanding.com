@@ -211,7 +211,28 @@ module.exports = function (eleventyConfig) {
       }
     });
     walk('src');
-    if (errs.length) throw new Error('Front-matter include lint failed:\n  ' + errs.join('\n  '));
+
+    // Slider cursors (2026-09-23): base.njk owns the cursor for every range
+    // input and its thumb. A page rule that sets `cursor` on a thumb
+    // pseudo-element or on an input[type=range] selector overrides that and
+    // reintroduces the mixed pointer/grab convention. (Class-only selectors
+    // such as `.wd-slider` cannot be told apart from non-slider classes here,
+    // so this covers the two forms 79 of the 83 removed rules used.)
+    const pa = lintPath.join('src', '_includes', '_pageassets');
+    lintFs.readdirSync(pa).filter((f) => f.endsWith('.css')).forEach((f) => {
+      const css = lintFs.readFileSync(lintPath.join(pa, f), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+      const ruleRe = /([^{}]+)\{([^{}]*)\}/g;
+      let r;
+      while ((r = ruleRe.exec(css))) {
+        if (!/(^|;|\s)cursor\s*:/.test(r[2])) continue;
+        const hit = r[1].split(',').some((s) => {
+          const last = s.trim().split(/[\s>+~]+/).pop();
+          return /slider-thumb|range-thumb/.test(s) || /\[type=["']?range/.test(last);
+        });
+        if (hit) errs.push(`${pa}/${f}: sets cursor on a slider (${r[1].trim().slice(0, 60)}); base.njk owns slider cursors`);
+      }
+    });
+    if (errs.length) throw new Error('Source lint failed (front-matter includes / slider cursors):\n  ' + errs.join('\n  '));
   });
 
   // (2) Undefined CSS custom properties. Each page defines its own palette
