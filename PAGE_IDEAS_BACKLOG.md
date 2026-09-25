@@ -694,7 +694,11 @@ _(**Retirement-funds-to-bitcoin mechanics** moved 2026-08-21 to the new **Retire
   - **Check before drafting:** whether the existing bitcoin-vs-gold material already covers (c).
 
 - [ ] **A new asset class / the paradigm layer — grand-thesis essay (Substack-first). "Singularity" umbrella.**
-  Surfaced 2026-07-30. Extended 2026-08-02.
+  Surfaced 2026-07-30. Extended 2026-08-02. **SINGULARITY HALF DISCHARGED 2026-09-24** — published as *Is Bitcoin a Singularity?* (see Promoted / shipped). The **asset-class / category-event angle** (bitcoin as an oil- or electricity-scale transformation) is NOT yet written and is what this entry still tracks. Boundary rulings made at drafting, binding on whatever is written next:
+    - **Both senses of "singularity", layered** (JM ruling): mathematical uniqueness first, then gravitational pull. The AI sense is set aside in one line.
+    - **Altcoins stay out**, one paragraph only ("every one of them exists *relative* to bitcoin"). *Why altcoins are stillborn* / *bitcoin stands alone* remains its own piece, and the affirmative version is now partly spent — a future piece needs a fresh angle, not a restatement.
+    - **The Big Long's sub-claim (e)** (fiat/bitcoin incompatibility) **was absorbed here**, via Gresham vs. Thiers. The Big Long must now stay on paper-vs-physical and not re-argue it.
+    - **Punctuated equilibrium resolved, not dodged:** *who* adopts moves in jumps, *how much* the network is worth moves along the curve. This is the resolution the entry demanded; a future piece that contradicts it creates the two-metaphor problem the entry warned about.
   - **Concept:** bitcoin as a category event like oil or electricity — not an asset/investment/speculation but an economy-wide (civilizational) transformation.
   - **Singularity kinship (per the merge check):** JM flags kinship with a "Bitcoin is a Singularity" idea. **No existing Singularity backlog entry as of 2026-07-30**, so this is created as the umbrella with two angles — the asset-class lens + the singularity framing; fold any future Singularity capture into this entry rather than duplicating.
   - **Punctuated equilibrium (added 2026-08-02) — more than a merge; it is in TENSION with the site's spine.** The power law says growth is smooth, proportional, sustainable. Punctuated equilibrium (Eldredge/Gould) says change is long stasis then rapid jumps. **Likely resolution to test:** *adoption* is punctuated (individuals → corporations → institutions → nation-states, each a step change) while *price* is smooth. But that is a design question, not a given. Handled well it's a real intellectual contribution; handled loosely it reads as two incompatible metaphors on one site.
@@ -776,6 +780,14 @@ _(**Retirement-funds-to-bitcoin mechanics** moved 2026-08-21 to the new **Retire
 ---
 
 ## Promoted / shipped
+
+- [x] **Is Bitcoin a Singularity?** — the singularity half of the "Singularity" umbrella. → **published on Substack 2026-09-24:** https://lastcoinstanding.substack.com/p/is-bitcoin-a-singularity
+  ~2,300 words. Both senses layered (singular → therefore it pulls); the ratchet through individuals → companies → institutions → states; punctuated adoption over a smooth price curve; fiat/bitcoin incompatibility via Gresham vs. Thiers; four falsifiers. Boundary rulings are recorded on the umbrella entry above.
+  - **Its one measured claim is the rolling out-of-sample test** (`ROLLING_OOS_FITS_2026-09-23.md`, `scripts/measure-rolling-oos.js`): pre-2016 fits fail badly, all 36 fits from 2016-Q1 hold b 5.48–5.86 and today 0.68–1.24× canonical. The essay states the limits (≈2.5 cycles; the canonical line is itself hindsight).
+  - **The exhibit is already designed:** `scripts/plot-rolling-oos.py` draws it, shelling out to `measure-rolling-oos.js` so the chart can never disagree with the report. Re-running it reproduced the published image byte-for-byte. If the *Rolling out-of-sample fits* entry is promoted to a Power Law section, the build is a web version of this chart, not new analysis.
+  - **Sizing lesson worth keeping:** the first version was wide with fine print and was illegible in the post at Substack's ~700px column. Judge any re-lay-out at display width, not at full size.
+  - **Companion row added to `/the-power-law` only** (`feat/singularity-companion`). Deliberately NOT added to the hurdle-rate, Migration or risks pages: STYLE_GUIDE §6.12 scopes Companion to content *about that page specifically*, and the essay merely cites those three. The Power Law row is justified because the essay carries original analysis of that page's central claim.
+  - **Links out to four pages** with `utm_campaign=is-bitcoin-a-singularity` (§6.12a).
 
 - [x] **The Bitcoin Exit** — Substack essay on conviction vs. the act of stacking. → **published on Substack 2026-08-03:** https://lastcoinstanding.substack.com/p/the-bitcoin-exit
   Shipped as first-person memoir per the counsel-gate split; the generic retirement-mechanics survey remains a separate, still-gated backlog item (see *Retirement-funds-to-bitcoin mechanics* above — its memoir half is now discharged, the site survey is not).
