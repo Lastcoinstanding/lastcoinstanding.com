@@ -327,7 +327,7 @@
     var year1 = {
       strc: alloc.strc * 0.12,    // ROC; STRC rate 12.00% per 8-K 2026-09-01 (DATA_AUDIT BvRP-5)
       sata: alloc.sata * 0.130,   // ROC
-      ledn: alloc.ledn * 0.080,   // ordinary
+      ledn: alloc.ledn * 0.05,    // ordinary; Ledn USDC Growth Account 5.00% tier (DATA_AUDIT BvRP-18)
       spot: 0
     };
     var pretax = year1.strc + year1.sata + year1.ledn;
@@ -518,7 +518,7 @@
     };
     var strcDist = allocs.strc * 0.12;   // keep in step with calcYieldPortfolio
     var sataDist = allocs.sata * 0.13;
-    var lednDist = allocs.ledn * 0.08;
+    var lednDist = allocs.ledn * 0.05;   // keep in step with calcYieldPortfolio
     var pretax = strcDist + sataDist + lednDist;
     var ordTax = lednDist * (s.federalBracketPct/100);
     var year1AfterTax = pretax - ordTax;
@@ -992,7 +992,7 @@
         '<div class="calc-detail-rows">' +
         '<div><span>STRC (' + p.strc + '%, ' + fmtMoneyFull(yp.allocations.strc) + ' @ 12.0% ROC)</span><strong>' + fmtMoneyFull(yp.year1Distributions.strc) + '</strong></div>' +
         '<div><span>SATA (' + p.sata + '%, ' + fmtMoneyFull(yp.allocations.sata) + ' @ 13.0% ROC)</span><strong>' + fmtMoneyFull(yp.year1Distributions.sata) + '</strong></div>' +
-        '<div><span>Ledn (' + p.ledn + '%, ' + fmtMoneyFull(yp.allocations.ledn) + ' @ 8.0% ord.)</span><strong>' + fmtMoneyFull(yp.year1Distributions.ledn) + '</strong></div>' +
+        '<div><span>Ledn (' + p.ledn + '%, ' + fmtMoneyFull(yp.allocations.ledn) + ' @ 5.0% ord.)</span><strong>' + fmtMoneyFull(yp.year1Distributions.ledn) + '</strong></div>' +
         '<div><span>Spot BTC (' + p.spot + '%, ' + fmtMoneyFull(yp.allocations.spot) + ', no dist.)</span><strong>—</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Year 1 after-tax total</span><strong>' + fmtMoneyFull(yp.year1AfterTax) + '</strong></div>' +
         '<div><span>Spot BTC value at year ' + s.holdingYears + ' (' + scenarioLabel(s.btcScenario) + ')</span><strong>' + fmtMoneyFull(yp.spotFV) + '</strong></div>' +
