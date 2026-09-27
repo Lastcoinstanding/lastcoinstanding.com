@@ -137,9 +137,10 @@
 //   from gross via the §2 waterfall. Slider default ~4.4% nets to the
 //   editorial's $20-24K on a $500K property.
 // - BTC CAGR is flat over the holding period (declining-CAGR in v0.2).
-// - ROC distributions assumed tax-free for the full holding period (true
-//   in practice for ~8-year windows at a 12% yield before basis exhausts;
-//   acceptable approximation for 10-year default).
+// - ROC distributions treated as untaxed for the full holding period. In fact
+//   ROC is tax-deferred: basis runs out after ~8 years at 12-13% yields, then
+//   distributions are capital gains, and the lower basis raises the gain at
+//   sale. Basis exhaustion is logged for PR 5 (Prompt 5).
 // - State tax is a single rate per state, no AMT/local nuances.
 // - HELOC modeled as interest-only with balloon repayment at end of term.
 
@@ -925,7 +926,7 @@
         '<td>Seconds; spread, fees and market risk</td></tr>' +
       '<tr><td>Tax treatment</td>' +
         '<td>Depreciation-shielded</td>' +
-        '<td>' + (s.path === 1 ? 'LTCG on appreciation only' : 'ROC-shielded') + '</td></tr>' +
+        '<td>' + (s.path === 1 ? 'LTCG on appreciation only' : 'Tax-deferred (return of capital, expected)') + '</td></tr>' +
       '<tr class="' + winnerClass + '"><td><strong>' + s.holdingYears + '-year total asset value</strong></td>' +
         '<td class="numeric"><strong>' + fmtMoneyFull(rentalTotal) + '</strong></td>' +
         '<td class="numeric"><strong>' + fmtMoneyFull(bitcoinTotal) + '</strong></td></tr>';
