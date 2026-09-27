@@ -287,7 +287,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             hL='$'+Math.round(houseEquity).toLocaleString();
             var _fh=Math.max(0,Math.min(20,equityPct*0.20));var _ev='<div style=\"display:flex;align-items:center;gap:0.6rem;margin-bottom:0.8rem\"><svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\"><defs><clipPath id=\"ec\"><rect x=\"0\" y=\"'+(24-_fh)+'\" width=\"24\" height=\"'+_fh+'\"/></clipPath></defs><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"'+(equityPct>=100?'#e09422':'#c0392b')+'\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.5\" stroke-linejoin=\"round\" clip-path=\"url(#ec)\"/></svg><span style=\"font-size:0.9rem;color:var(--text)\">'+(equityPct<0?'<span style=\\\'color:var(--red)\\\'>Underwater</span>':equityPct+'% owned')+'</span></div>';hD=_ev+
                'Monthly mortgage: $'+Math.round(monthlyMortgage).toLocaleString()+'/mo<br>'+
-               'Interest paid so far: <span style="color:var(--red)">$'+interestMain.toLocaleString()+'</span> <span style="font-size:0.78rem;color:var(--text-muted)">(dead money)</span><br>'+
+               'Interest paid so far: <span style="color:var(--red)">$'+interestMain.toLocaleString()+'</span> <span style="font-size:0.78rem;color:var(--text-muted)">(not recovered at sale)</span><br>'+
                'Remaining loan: <span style="color:var(--red)">$'+Math.round(bal).toLocaleString()+'</span><br>'+
                'Rent paid: $0 <span style="font-size:0.78rem;color:var(--text-muted)">(you live in it)</span>';
         }
@@ -308,7 +308,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
                     'Est. monthly rent: $'+estRent.toLocaleString()+'/mo'+(mode==='leverage'?(' <span style="font-size:0.78rem;color:var(--text-muted)">(vs. mortgage $'+Math.round(mortgageMonthly).toLocaleString()+')</span>'):'')+'<br>'+
                     'Total rent paid: $'+totalRentPaid.toLocaleString()+'<br>'+
                     '<span style="color:var(--amber);font-weight:500">You could now buy '+lumpHouses.toFixed(1)+' houses <strong>outright</strong></span> <span style="font-size:0.78rem;color:var(--text-muted)">('+medianRef+')</span><br>'+
-                    '<span style="font-size:0.78rem;color:var(--text-muted);display:block;margin-top:0.4rem">No leverage. No interest. No property taxes. No maintenance.</span>'+
+                    '<span style="font-size:0.78rem;color:var(--text-muted);display:block;margin-top:0.4rem">No mortgage, property tax or maintenance on this side; rent is the housing cost.</span>'+
                 '</div>'+
             '</div>'+
             '<div class="calc-result-card house">'+
@@ -390,7 +390,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
                     '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'+
                         '<div style="'+ls+lm+'">Ownership: <span style="color:var(--text)">'+equityPct+'% of 1 home</span></div>'+
                         (mode==='leverage'?'<div style="'+ls+lr+'">Debt outstanding: $'+Math.round(remainingBal).toLocaleString()+'</div>':'')+
-                        (mode==='leverage'?'<div style="'+ls+lr+'">Interest paid: $'+interestPaid.toLocaleString()+' <span style="'+lm+';font-size:0.78rem">(dead money)</span></div>':'')+
+                        (mode==='leverage'?'<div style="'+ls+lr+'">Interest paid: $'+interestPaid.toLocaleString()+' <span style="'+lm+';font-size:0.78rem">(not recovered at sale)</span></div>':'')+
                         (mode==='leverage'?'<div style="'+ls+lr+'">Debt-free: '+debtFreeYear+' <span style="'+lm+'">('+yrsRemaining+' yrs away)</span></div>':'')+
                         '<div style="'+ls+lm+'">Rent paid: $0 <span style="font-size:0.78rem">(you live in it)</span></div>'+
                         '<div style="'+ls+'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: $'+houseOutflow.toLocaleString()+'</div>'+
@@ -806,7 +806,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         '<div class="detail-line">Total real return: <span class="highlight">'+btcReturn+'%</span> <span style="font-size:.72rem;color:var(--text-muted)">in purchasing-power terms</span></div>' +
         (btcCAGR !== '—' ? '<div class="detail-line">Implied real CAGR: <span class="highlight">'+btcCAGR+'%</span></div>' : '') +
         '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> in '+endYear+' <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">\u2014 projected home value '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' each '+modeUnit()+', vs. '+fmt(homePrice)+' today</span></div>' +
-        '<div class="detail-line" style="margin-top:.6rem;font-size:.78rem;color:var(--text-muted)">No leverage. No interest. No property taxes. No maintenance.</div>' +
+        '<div class="detail-line" style="margin-top:.6rem;font-size:.78rem;color:var(--text-muted)">No mortgage, property tax or maintenance on this side; rent is the housing cost.</div>' +
       '</div>';
 
     // ── RENDER: HOUSE CARD (right) ──
@@ -824,7 +824,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
           ownershipVisual +
           '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'; '+houseCAGR+'%/yr real</span></div>' +
           '<div class="detail-line">Monthly mortgage: '+fmt(monthlyMort)+'/mo at '+mortRate+'%</div>' +
-          '<div class="detail-line">Interest paid: <span class="negative">'+fmt(interestPaid)+'</span> <span style="font-size:.78rem;color:var(--text-muted)">(dead money, accumulated)</span></div>' +
+          '<div class="detail-line">Interest paid: <span class="negative">'+fmt(interestPaid)+'</span> <span style="font-size:.78rem;color:var(--text-muted)">(accumulated; not recovered at sale)</span></div>' +
           '<div class="detail-line">Remaining loan: '+(bal > 0 ? '<span class="negative">'+fmt(bal)+'</span>' : 'Paid off')+'</div>' +
           '<div class="detail-line">Rent paid: $0 <span style="font-size:.78rem;color:var(--text-muted)">(you live in it)</span></div>' +
           '<div class="detail-line">Total cost of ownership: <span class="negative">'+fmt(totalHouseCost)+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
@@ -952,7 +952,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
           + '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'
             + '<div style="' + ls + lm + '">Ownership: <span style="color:var(--text)">' + equityPct + '% of 1 home</span></div>'
             + '<div style="' + ls + lr + '">Debt outstanding: ' + fmt(Math.round(bal)) + '</div>'
-            + '<div style="' + ls + lr + '">Interest paid: ' + fmt(Math.round(interestPaid)) + ' <span style="' + lm + ';font-size:0.78rem">(dead money)</span></div>'
+            + '<div style="' + ls + lr + '">Interest paid: ' + fmt(Math.round(interestPaid)) + ' <span style="' + lm + ';font-size:0.78rem">(not recovered at sale)</span></div>'
             + '<div style="' + ls + lr + '">Debt-free: ' + debtFreeLabel + '</div>'
             + '<div style="' + ls + lm + '">Rent paid: $0 <span style="font-size:0.78rem">(you live in it)</span></div>'
             + '<div style="' + ls + 'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: ' + fmt(Math.round(totalHouseCost)) + '</div>'
@@ -1007,7 +1007,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       var dcaValue = dcaBtc * s.futurePrice;
       var dcaValueReal = toReal(dcaValue);
       var dcaTotalInvested = dcaR ? dcaR.dcaInvested : monthlySavings * totalMonths;
-      note.innerHTML = 'If you rent instead of buying, your monthly housing cost is ~75% of a mortgage payment. The difference \u2014 <strong>'+fmt(monthlySavings)+'/mo</strong> \u2014 invested in bitcoin each month compounds the opportunity cost over the horizon.';
+      note.innerHTML = 'If you rent instead of buying, your monthly housing cost is ~75% of a mortgage payment. The difference \u2014 <strong>'+fmt(monthlySavings)+'/mo</strong> \u2014 is invested in bitcoin each month and added to the bitcoin side.';
       leftEl.innerHTML =
         '<div class="calc-card bitcoin" style="border-style:dashed">' +
           '<h4>&#8383; Monthly DCA \u2014 Rent vs. Mortgage Savings</h4>' +
@@ -1558,7 +1558,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 // the calculator tab.
 (function(){
   if (!document.getElementById('shareSection')) return;
-  var SHARE_TITLE = 'Bitcoin vs. Real Estate — what the trend really shows.';
+  var SHARE_TITLE = 'Bitcoin vs. Real Estate: run the comparison for any start year.';
 
   function currentUrl() { return window.location.href; }
   function genericPageUrl() {

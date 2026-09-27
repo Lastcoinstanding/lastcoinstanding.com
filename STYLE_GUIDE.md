@@ -2468,7 +2468,7 @@ The following read as AI-generated and are banned from page copy:
 
 **Scope: page copy only.** Code comments and internal docs (this file, `SITE_GUIDE`, `TECH_DEBT`, commit messages) are exempt.
 
-**Explicitly NOT banned:** em-dashes, semicolons, and "the point is" constructions. These are part of the site's register. **This list bans tells, not voice** — the distinction matters, because a sweep that mistakes one for the other would flatten exactly what makes the copy sound like a person.
+**Explicitly NOT banned:** semicolons and "the point is" constructions. (Em-dashes were listed here; §10.2.1, tightened 2026-08-18, supersedes that: prefer commas, full stops or colons, and use a spaced en-dash where a dash earns its place.) These are part of the site's register. **This list bans tells, not voice** — the distinction matters, because a sweep that mistakes one for the other would flatten exactly what makes the copy sound like a person.
 
 **The list is append-only** as new tells are noticed. Check new copy against it as part of the `NEW_PAGE_CHECKLIST §10.5` review — the interaction-intent pass is already reading every new section lede, so it is the cheapest place to catch these.
 
