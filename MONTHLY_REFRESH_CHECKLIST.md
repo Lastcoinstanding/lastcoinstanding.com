@@ -595,7 +595,7 @@ For each value, verify against the source listed and update in the BFI files as 
 - STRC rate and schedule. The rate is also a constant in `bitcoin-vs-rental-property.js` (`calcYieldPortfolio` and `calcYieldPortfolioAtYearT`, `0.12`) and in the Path 4 detail label (`@ 12.0% ROC`). Change all three, and the $500K table's STRC row, together.
 - Convertible notes outstanding.
 - SATA rate and schedule; Strive BTC holdings and the STRC shares in its reserve.
-- Semiannually: STRC/SATA daily volume (Nasdaq) and the Ledn Growth Account rates, including whether US residents are eligible.
+- Monthly until the Ledn US LLC transition settles (from October 2026), then semiannually: the Ledn Growth Account rates (rendered page, not the HTML placeholders) and whether US residents are eligible. The rate is also `0.05` in `bitcoin-vs-rental-property.js` (`calcYieldPortfolio`, `calcYieldPortfolioAtYearT`), the Path 4 label (`@ 5.0% ord.`) and the $500K table's Ledn row.
 
 If the values haven't materially changed (BTC count moved &lt;1%, mNAV moved &lt;0.1&times;, ATM status unchanged, insight prose still accurate), the only required update is the as-of date.
 
