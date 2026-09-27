@@ -784,6 +784,30 @@ _Cluster opened 2026-09-26 (JM). `/bitcoin-vs-real-estate` (the tenant's side) a
 - [ ] **Real-estate pair revision** → **promoted 2026-09-26** to `REAL_ESTATE_PAIR_DESIGN.md` (build prompts: `REAL_ESTATE_PAIR_CLAUDE_CODE_PROMPTS.md`). Promotes a chat-side backlog capture; the design doc is the entry of record.
   - **Sequence:** PR 0 Phase 0 report (`REAL_ESTATE_PAIR_PHASE0_REPORT.md`) → PR 1 BvRP sourcing fixes → PR 2 register pass → PR 3 shared-engine extraction → PRs 4–8 build (assumptions, tax regime, chart + ledger, sensitivity grid, carry + parity + bookkeeping). PRs 1–2 are the pre-Tuesday 2026-09-29 priority.
   - **Close-out:** PR 8 marks this entry `- [x]` with SHAs and moves it to Promoted / shipped.
+  - **Progress:** PRs 0–2 merged 2026-09-27 (#121, #122, #123) plus the copy follow-up #124. Rulings P7–P9 (results on BvRE's first tab, retrospective to today, series strip) added in design v1.2.
+  - **Next pages:** the pair becomes a series. Two further spokes are captured under **[Real-estate series](#real-estate-series)** below; the series strip (P9) is built to take them.
+
+### Real-estate series
+
+_Opened 2026-09-27 (JM). The pair above plus the pages that extend it, each answering one housing question on the pair's shared engine, linked by the series strip (`components/real-estate-series.njk`, design §11, P9). Standing canon: "a family earns a hub before nav grows" (`SITE_GUIDE §49`). The retirement family built its hub when its fourth spoke shipped (`SITE_GUIDE §53`). With both entries below, this series reaches **four spokes, the same threshold**, so the hub question comes due then, not before._
+
+- [ ] **Compare Housing Plans: two independently configured housing plans, side by side.** Surfaced 2026-09-27 (JM).
+  - **Pattern:** Compare Retirement Plans (`COMPARE_RETIREMENT_PLANS_DESIGN.md`; `SITE_GUIDE §52`), applied to housing:
+    - **namespaced `a_` / `b_` URL names from the first commit**, since retrofitting breaks every shared link (`COMPARE_RETIREMENT_PLANS_DESIGN.md:109`);
+    - **one engine instance** for both columns;
+    - **parity across columns**, in the house of `crpParityQA`: identical plans give identical figures.
+  - **Each plan:** buy, or rent and hold bitcoin; home price; down payment; mortgage rate; purchase year. **Shared assumptions** (appreciation, rent anchor, costs, tax profile, bitcoin scenario) come from the pair's baseline block.
+  - **The questions it answers:**
+    - buy now vs. rent and buy later;
+    - 20% vs. 10% down, with the difference in bitcoin;
+    - this house vs. a cheaper one plus bitcoin.
+  - **Gate:** after PR 8 of the pair (it needs the shared engine, equal cash out, the ledger and the P3 vocabulary).
+  - **Open question:** a third column. Compare Retirement Plans ruled no for v1, and the `a_`/`b_` namespace extends to `c_` if one ever earns its cost.
+- [ ] **The homeowner's side: pay down the mortgage, or hold bitcoin?** Surfaced 2026-09-27 (JM).
+  - **Concept:** for existing owners, the third chair beside the tenant (BvRE) and the landlord (BvRP). Should extra cash go to prepaying principal or to bitcoin? About half of outstanding US mortgages carry rates below 4% (49.9%, FHFA National Mortgage Database, Q1 2026; already cited on BvRP, DATA_AUDIT BvRP-24), so for many owners prepaying earns a low, certain return.
+  - **Connections:** ties to housing research on rate lock-in (the same reader the pair is built for); reuses the pair's amortisation, tax and bitcoin-path math.
+  - **Gate:** after PR 8 of the pair.
+  - **With it the series reaches four spokes** (Buy or rent? · Keep the rental? · Compare housing plans · Pay down or hold?), the retirement family's threshold for a hub. Decide the hub when this entry is promoted.
 
 ---
 

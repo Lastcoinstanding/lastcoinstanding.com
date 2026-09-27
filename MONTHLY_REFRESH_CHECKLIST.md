@@ -758,6 +758,16 @@ for a page making a structural (not real-time) argument. If the page ever
 quotes a "today" figure prominently, consider a quarterly re-fit of the era
 exponents too, since the ETF-era window lengthens.
 
+## 9.4. Case-Shiller National — the retrospective's house end point (MONTHLY, from PR 6)
+
+_Added 2026-09-27 (`REAL_ESTATE_PAIR_DESIGN.md` v1.2, ruling P8). **Not on the page yet:** this applies once PR 6 of the real-estate pair ships the retrospective-to-today end point. Until then there is nothing to refresh._
+
+`/bitcoin-vs-real-estate`'s retrospective calculator grows the house from the start year to the **latest published month** of the S&P CoreLogic Case-Shiller U.S. National Home Price Index (NSA; FRED `CSUSHPINSA`, https://fred.stlouisfed.org/series/CSUSHPINSA). The index publishes on the last Tuesday of each month, with about a two-month lag.
+- Each month, append the newest month's value to the page's Case-Shiller series (location set by PR 4/6), and update the month label shown on the retrospective cards and the ledger's "to date" row.
+- Check the value against FRED (the index is revised; take the current vintage for recent months).
+- Update the DATA_AUDIT row that PR 6 adds for it (value, month, last audited, next due).
+- The static exhibits stay on annual data through the latest full year. Roll them forward once a year, with the January refresh.
+
 ## 9.5. Search Console indexing sweep (MONTHLY)
 
 The publish-day habit (`NEW_PAGE_CHECKLIST`) covers a single new page on the day it ships. This is the recurring pass that catches everything the one-click sitemap resubmission does not.

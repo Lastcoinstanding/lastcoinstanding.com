@@ -6,6 +6,8 @@ _Written chat-side from the live pages (read 2026-09-26) and the project docs, *
 
 _**v1.1, 2026-09-27: amended by `REAL_ESTATE_PAIR_RULINGS.md`** (JM's rulings on `REAL_ESTATE_PAIR_PHASE0_REPORT.md`). Where the rulings and this spec differ, the rulings win. Every change is listed with its ruling number in §14. Ruling IDs used in the text: M1–M11 (model), P1–P6 (presentation), C1–C7 (copy and docs)._
 
+_**v1.2, 2026-09-27: rulings P7–P9** (JM, chat-side, after PRs 1–2 merged): results on BvRE's first tab, the retrospective running to today, and a series strip. They are logged in §14 (v1.1 → v1.2), with two follow-on pages captured in `PAGE_IDEAS_BACKLOG.md` under "Real-estate series"._
+
 ---
 
 ## 1 · Purpose and the frame that binds the pair
@@ -72,6 +74,9 @@ The **Ruled** column is binding. The original recommendation is kept in the amen
 - **M10 · One horizon from today**, in 365.25-day years, for every path.
 - **M11 · Retrospective house path uses Case-Shiller National growth**, not the MSPUS ratio. See §7.
 - **P2–P6:** presentation and plumbing. See §6, §9 and §11.
+- **P7 · Results on BvRE's first tab:** the chart and ledger apply to both BvRE calculators, including the retrospective on the default tab. See §9.
+- **P8 · The retrospective runs to today**, replacing the fixed "April 2025" end point. See §9.
+- **P9 · Series strip** at the top of both pages, carrying the shared inputs; both calculators answer to `#calculator`. See §11.
 
 ## 4 · A — BvRP sourcing and factual fixes (blocking)
 
@@ -195,6 +200,22 @@ A Real/nominal display toggle sits on both pages (BvRE has one; BvRP gains it). 
 - **CSV download** of both tabs (P2): Blob download per the stress test (`the-bitcoin-retirement-stress-test.js:640–673`, `:981–989`), with the retirement family's `#`-prefixed provenance header and unit-labelled columns; `toCsv` lives in the shared module. An analyst checking the arithmetic in a spreadsheet is the strongest credibility signal the pair can earn.
 - Ledger reads from the same engine output as the chart and stat block — one source of truth, verified by the parity check (H).
 
+**Where the results live on BvRE (P7).** The chart and the "Show the calculation" ledger (with CSV) apply to **both** BvRE calculators, explicitly including the **retrospective "Postponed Purchase" calculator on Tab I, the page's default view**, not only the projection. On each, they sit **directly below the result cards and the "renter invests the difference" toggle** (P6), in that order: cards, toggle, chart, ledger disclosure. The chart shows a **per-year tooltip on hover**, as BvRP's does (`interaction: { mode: 'index', intersect: false }`, `rp.js:714`). Its lines are the house path, the bitcoin path and the difference. The retrospective ledger's rows are calendar years from the start year.
+
+**The retrospective runs to today (P8).** The fixed end point (`ey = 2025`, `asOf = 'April 2025'`, `re.js:233`, `:245`) is replaced by **today**:
+- **Bitcoin:** the live price, via the shared `fetchTodayPrice`, with its seeded fallback.
+- **House:** Case-Shiller National growth from the start year to the **latest published month** (M11). The ledger and cards state that month, since Case-Shiller lags by about two months.
+- **Mortgage and rent:** amortisation, rent and equal-cash-out flows run **through the current month**.
+- **Ledger:** the last row is a partial year labelled **"to date"**.
+- **Static exhibits:** the Tab I–IV exhibits (era bars, divergence, BTC-per-house, growth of $1, every starting year, burden, total cost; `re.js:11–220`) may stay on **annual data through the latest full year**, labelled as such.
+- **Refresh:** the Case-Shiller value gets a `MONTHLY_REFRESH_CHECKLIST` line (added with v1.2) and a DATA_AUDIT row when it lands.
+
+This supersedes the earlier "fix the April 2025 label" step (Phase 0 §k-20).
+
+**Copy that a live end point can make stale (P8 check).** Under a fixed 2025 end point, two lines are accurate today. Under a live one, they can flip with bitcoin's price: a 2021 start was about $101K net against about $125K of equity on the page's own formula at 2025 prices. **The PR that ships P8 rewords both:**
+- **FAQ answer 1** (`re.njk:19`, and its FAQPage JSON-LD): "Looking back, bitcoin came out ahead for most of the start years the retrospective calculator covers, though not all…" → *"Looking back, the retrospective calculator shows which path came out ahead for each start year it covers, measured to today; the answer depends on the start year and on today's bitcoin price, and the calculator shows the numbers for each one."* The rest of the answer stays.
+- **Retrospective intro** (`re.njk:180`): "For most start years in the calculator's range, the historical data show that after a few years you could have bought the house outright…" → *"Pick a start year to see whether, by today, the bitcoin path would have bought the house outright, with no mortgage."* The not-advice sentence stays.
+
 ## 10 · G — Sensitivity grid
 
 **A new component** (P1): the 3×3 scenario grid from the retirement design never shipped, so there is nothing to reuse. Build it so the retirement flagship can adopt it later. Layout: a 3×3 grid, reader's configuration in the centre cell, one-click axis-pair toggle (R9). Default axes: **bitcoin scenario (Floor · Stay · Trend) × home appreciation (long run · default · default + 2 points, a housing-boom case)**. Alternative: horizon × mortgage rate (BvRE) / horizon × net rental yield (BvRP). Upper never appears in the grid (M3). Each cell shows the **after-tax difference, If sold** (bitcoin path minus house path) with a sign-neutral colour scale. Caption states what the grid is and is not: a map of how the answer moves with two assumptions, not a probability distribution. Mobile: the grid collapses to a compact table.
@@ -209,6 +230,13 @@ A Real/nominal display toggle sits on both pages (BvRE has one; BvRP gains it). 
   - **Legacy `appr`:** a real value, read once, converted using the sitewide inflation, never written again. The page shows one line saying the link used an older format.
   - **Legacy `pscenario`:** values map to the M3 keys.
   - **Cross-link:** a "Run this on the other side" link on each page carries the shared inputs.
+- **Series strip (P9).** A shared component, `src/_includes/components/real-estate-series.njk`, following `components/retirement-family.njk` (SITE_GUIDE §53.1):
+  - **Styling and heading:** own scoped `<style>` with prefixed selectors and var-with-fallback colours; one include line per page; the component owns its heading; the current page is marked from the page's `slug`.
+  - **Place:** at the **top of both pages**, unlike the retirement strip, which sits at the foot of its spokes.
+  - **Labels:** questions, not page names. *"Buy or rent?"* (BvRE) · *"Keep the rental?"* (BvRP).
+  - **Carries the shared inputs (P3).** The retirement strip's hrefs are plain and can't carry state (§53.1), so this one needs a small script that rewrites its links with the page's current P3 params on load and on input change, via the shared module's URL writer. Without JavaScript the links stay plain. The link targets `#calculator` on the other page.
+  - **Growth:** built so the two backlog spokes (Compare Housing Plans; the homeowner's side) slot in as further items.
+- **One calculator hash (P9).** Both calculators answer to **`#calculator`**. BvRP already does (`rp.js:1341`). BvRE's calculator tab currently writes `#postponed-purchase`, and `#calculator` is **not** in its hash map (`re.js:409–410`); it only works today because that tab is the default. PR 8 makes BvRE write `#calculator` and keeps reading `#postponed-purchase` (and `#projection`, which selects the projection mode) for existing links.
 - **Parity QA:** a tripwire in the house of `evParityQA` / `crpParityQA` (console function on `window`, fixed input-only vectors, identity assertions against the shared module, green PASS / `console.error` FAIL / `console.table`). It asserts:
   1. both pages produce identical house-side and tax figures for identical shared inputs;
   2. ledger totals equal the stat block and chart end-points on each page;
@@ -232,7 +260,9 @@ A Real/nominal display toggle sits on both pages (BvRE has one; BvRP gains it). 
 - Every changed default: before/after figure in its PR, `DATA_AUDIT` row, tooltip stating its basis.
 - The inflation preset changes only the Real display, never which path is ahead (M1).
 - Tax figures verified against IRS primaries and logged.
-- Ledger totals = chart end-points = stat block, on both pages, all scenarios, both valuation bases.
+- Ledger totals = chart end-points = stat block, on both pages, all scenarios, both valuation bases — **including BvRE's retrospective** (P7).
+- The retrospective ends **today**: live bitcoin, latest Case-Shiller month stated, a "to date" ledger row; no fixed-year copy that a live end point can make wrong (P8).
+- The series strip marks the current page, and its links carry the shared inputs to `#calculator` on the other page (P9).
 - CSV opens cleanly in a spreadsheet; columns labelled with units.
 - Mobile 375px: chart, grid, ledger usable; no horizontal page scroll.
 - No console errors; social cards serve `image/jpeg` after deploy; re-scrape done.
@@ -249,9 +279,9 @@ A Real/nominal display toggle sits on both pages (BvRE has one; BvRP gains it). 
 | 3 | Shared engine extraction (C), byte-identical | No | Stretch |
 | 4 | Harmonised assumptions (D: M1, M3–M6, M8, M10, M11, P5, C7) | Yes | No |
 | 5 | Tax regime + pre/post-tax (E: M9, M7 headline) | Yes | No |
-| 6 | Chart + ledger + CSV + equal cash out (F: M2, M7, P2, P4, P6) | Yes (M2) | No |
+| 6 | Chart + ledger + CSV + equal cash out, on both BvRE calculators; retrospective to today (F: M2, M7, P2, P4, P6, P7, P8) | Yes (M2, P8) | No |
 | 7 | Sensitivity grid (G: P1) | No | No |
-| 8 | Pair framing, carry, parity QA, bookkeeping (H: C1 pair lines, P3) | No | No |
+| 8 | Pair framing, carry, series strip, one hash, parity QA, bookkeeping (H: C1 pair lines, P3, P9) | No | No |
 
 PRs 1 and 2 are copy/sourcing only and make both pages safe to share on Tuesday. PRs 3–8 are the build.
 
@@ -285,3 +315,17 @@ Each change is listed with the ruling it applies (`REAL_ESTATE_PAIR_RULINGS.md`)
 | 22 | §11 | Pair lines specified; URL vocabulary (no prefixes, legacy `appr`/`pscenario` handling); parity tripwire shape and third assertion; BvRP SITE_GUIDE section created, not amended. | C1, P3, C6, M2 |
 | 23 | §12 | Acceptance adds equal cash out, inflation-as-display-only and both valuation bases. | M1, M2, M7 |
 | 24 | §13 | Sequence notes rulings dependency; PR rows tagged with the rulings each applies; PR 6 now changes figures (M2). | rulings §1 |
+
+### v1.1 → v1.2 (2026-09-27, rulings P7–P9)
+
+| # | Section | Change | Ruling |
+|---|---|---|---|
+| 25 | Header | v1.2 note added. | P7–P9 |
+| 26 | §3 | P7, P8, P9 added to "Rulings with no R-number". | P7–P9 |
+| 27 | §9 | Chart and ledger (with CSV) apply to **both** BvRE calculators, including the retrospective on the default tab; placed directly below the result cards and the M2 toggle; per-year hover tooltip as on BvRP. | P7 |
+| 28 | §9 | The retrospective runs to **today** (live bitcoin, latest Case-Shiller month, mortgage and rent through the current month, "to date" ledger row); static exhibits may stay annual through the latest full year, labelled. **Supersedes** Phase 0 §k-20's "fix the April 2025 label" (C6). Case-Shiller line added to `MONTHLY_REFRESH_CHECKLIST`. | P8 |
+| 29 | §9 | P8 staleness check: FAQ answer 1's "most, though not all" and the retrospective intro's "For most start years…" can flip under a live end point. Replacement wording recorded, to ship with P8. | P8 |
+| 30 | §11 | Series strip: `components/real-estate-series.njk` after the retirement strip (§53.1), top of both pages, question labels, current page marked. It carries the P3 inputs via a small link-rewriting script, since the retirement strip's plain hrefs can't. | P9 |
+| 31 | §11 | One calculator hash: both calculators answer to `#calculator`. BvRE writes it and keeps reading `#postponed-purchase` and `#projection`. | P9 |
+| 32 | §12 | Acceptance adds: BvRE retrospective in the parity check; retrospective ends today with no stale fixed-year copy; strip carries inputs. | P7–P9 |
+| 33 | §13 | PR 6 row adds P7 and P8 (and now changes figures for P8); PR 8 row adds P9. | P7–P9 |
