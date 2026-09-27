@@ -89,6 +89,42 @@
   }
 })();
 
+// ─── Power Law figures quoted in the prose ───────────────────────────
+// Copy-rendering only (no engine change): fills the growth figures the
+// Bitcoin Case tab and the $500K table quote, so the copy is computed
+// from shared/power-law-data.js instead of hardcoded. All figures use the
+// "stay at today's multiple" case: the multiple-of-trend is held, so the
+// growth factor is plPrice(t1) / plPrice(t0) and doesn't depend on spot.
+// Same formula and 365-day year as the calculator's 'stay' chip
+// (scenarioGrowthFactor below), so the prose and the chip agree.
+//   data-pl-cagr="a,b"      annualised growth from year a to year b, "29%"
+//   data-pl-stay-fv="amt"   amt grown over data-years (default 10), "$813K";
+//                           data-show="gain" prints the gain instead
+(function(){
+  function render(){
+    if (typeof plPrice !== 'function' || typeof GENESIS_TS !== 'number') return;
+    var d = (Date.now() / 1000 - GENESIS_TS) / 86400;
+    function factor(a, b){ return plPrice(d + b * 365) / plPrice(d + a * 365); }
+    document.querySelectorAll('[data-pl-cagr]').forEach(function(el){
+      var p = el.getAttribute('data-pl-cagr').split(',');
+      var a = Number(p[0]), b = Number(p[1]);
+      el.textContent = ((Math.pow(factor(a, b), 1 / (b - a)) - 1) * 100).toFixed(0) + '%';
+    });
+    document.querySelectorAll('[data-pl-stay-fv]').forEach(function(el){
+      var amt = Number(el.getAttribute('data-pl-stay-fv'));
+      var yrs = Number(el.getAttribute('data-years')) || 10;
+      var v = amt * factor(0, yrs);
+      if (el.getAttribute('data-show') === 'gain') v -= amt;
+      el.textContent = '$' + Math.round(v / 1000).toLocaleString('en-US') + 'K';
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', render);
+  } else {
+    render();
+  }
+})();
+
 // ─── Calculator (Phase 2 v0.1) ───────────────────────────────────────
 // Interactive head-to-head between rental property and bitcoin paths.
 // Replaces the Section 7 "Coming Soon" placeholder.
@@ -101,9 +137,10 @@
 //   from gross via the §2 waterfall. Slider default ~4.4% nets to the
 //   editorial's $20-24K on a $500K property.
 // - BTC CAGR is flat over the holding period (declining-CAGR in v0.2).
-// - ROC distributions assumed tax-free for the full holding period (true
-//   in practice for ~9-year windows at 11.5% yield before basis exhausts;
-//   acceptable approximation for 10-year default).
+// - ROC distributions treated as untaxed for the full holding period. In fact
+//   ROC is tax-deferred: basis runs out after ~8 years at 12-13% yields, then
+//   distributions are capital gains, and the lower basis raises the gain at
+//   sale. Basis exhaustion is logged for PR 5 (Prompt 5).
 // - State tax is a single rate per state, no AMT/local nuances.
 // - HELOC modeled as interest-only with balloon repayment at end of term.
 
@@ -289,9 +326,9 @@
     };
     // Year 1 cash distributions
     var year1 = {
-      strc: alloc.strc * 0.115,   // ROC
+      strc: alloc.strc * 0.12,    // ROC; STRC rate 12.00% per 8-K 2026-09-01 (DATA_AUDIT BvRP-5)
       sata: alloc.sata * 0.130,   // ROC
-      ledn: alloc.ledn * 0.080,   // ordinary
+      ledn: alloc.ledn * 0.05,    // ordinary; Ledn USDC Growth Account 5.00% tier (DATA_AUDIT BvRP-18)
       spot: 0
     };
     var pretax = year1.strc + year1.sata + year1.ledn;
@@ -480,9 +517,9 @@
       ledn: amount * p.ledn/100,
       spot: amount * p.spot/100
     };
-    var strcDist = allocs.strc * 0.115;
+    var strcDist = allocs.strc * 0.12;   // keep in step with calcYieldPortfolio
     var sataDist = allocs.sata * 0.13;
-    var lednDist = allocs.ledn * 0.08;
+    var lednDist = allocs.ledn * 0.05;   // keep in step with calcYieldPortfolio
     var pretax = strcDist + sataDist + lednDist;
     var ordTax = lednDist * (s.federalBracketPct/100);
     var year1AfterTax = pretax - ordTax;
@@ -881,15 +918,15 @@
       '<tr><td>' + s.holdingYears + '-year cumulative cash flow</td>' +
         '<td class="numeric">' + fmtMoneyFull(results.keep.cumulativeCash) + '</td>' +
         '<td class="numeric">' + fmtMoneyFull(s.path === 2 ? results.path.retainedRental.cumulativeCash : (results.path.yieldPortfolio ? results.path.yieldPortfolio.cumulativeCashAfterTax : 0)) + '</td></tr>' +
-      '<tr><td>Hassle / operational load</td>' +
-        '<td>96 hrs/yr + mental load</td>' +
-        '<td>~0' + (s.path === 2 ? ' (rental retained)' : '') + (s.path === 3 ? ' on sold portion' : '') + '</td></tr>' +
+      '<tr><td>Operational load</td>' +
+        '<td>Tenants, maintenance, turnover</td>' +
+        '<td>' + (s.path === 2 ? 'Rental retained; plus HELOC servicing' : 'None' + (s.path === 3 ? ' on the sold portion' : '') + '; issuer-credit and market risk instead') + '</td></tr>' +
       '<tr><td>Liquidity</td>' +
-        '<td>Months; 7–33% exit attrition</td>' +
-        '<td>Instant; near-zero spread</td></tr>' +
+        '<td>Months; ~6–9% to sell (orderly)</td>' +
+        '<td>Seconds; spread, fees and market risk</td></tr>' +
       '<tr><td>Tax treatment</td>' +
         '<td>Depreciation-shielded</td>' +
-        '<td>' + (s.path === 1 ? 'LTCG on appreciation only' : 'ROC-shielded') + '</td></tr>' +
+        '<td>' + (s.path === 1 ? 'LTCG on appreciation only' : 'Tax-deferred (return of capital, expected)') + '</td></tr>' +
       '<tr class="' + winnerClass + '"><td><strong>' + s.holdingYears + '-year total asset value</strong></td>' +
         '<td class="numeric"><strong>' + fmtMoneyFull(rentalTotal) + '</strong></td>' +
         '<td class="numeric"><strong>' + fmtMoneyFull(bitcoinTotal) + '</strong></td></tr>';
@@ -954,9 +991,9 @@
         '<div class="calc-detail-portfolio">' +
         '<div class="calc-detail-portfolio-title">Year 1 distributions by instrument</div>' +
         '<div class="calc-detail-rows">' +
-        '<div><span>STRC (' + p.strc + '%, ' + fmtMoneyFull(yp.allocations.strc) + ' @ 11.5% ROC)</span><strong>' + fmtMoneyFull(yp.year1Distributions.strc) + '</strong></div>' +
+        '<div><span>STRC (' + p.strc + '%, ' + fmtMoneyFull(yp.allocations.strc) + ' @ 12.0% ROC)</span><strong>' + fmtMoneyFull(yp.year1Distributions.strc) + '</strong></div>' +
         '<div><span>SATA (' + p.sata + '%, ' + fmtMoneyFull(yp.allocations.sata) + ' @ 13.0% ROC)</span><strong>' + fmtMoneyFull(yp.year1Distributions.sata) + '</strong></div>' +
-        '<div><span>Ledn (' + p.ledn + '%, ' + fmtMoneyFull(yp.allocations.ledn) + ' @ 8.0% ord.)</span><strong>' + fmtMoneyFull(yp.year1Distributions.ledn) + '</strong></div>' +
+        '<div><span>Ledn (' + p.ledn + '%, ' + fmtMoneyFull(yp.allocations.ledn) + ' @ 5.0% ord.)</span><strong>' + fmtMoneyFull(yp.year1Distributions.ledn) + '</strong></div>' +
         '<div><span>Spot BTC (' + p.spot + '%, ' + fmtMoneyFull(yp.allocations.spot) + ', no dist.)</span><strong>—</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Year 1 after-tax total</span><strong>' + fmtMoneyFull(yp.year1AfterTax) + '</strong></div>' +
         '<div><span>Spot BTC value at year ' + s.holdingYears + ' (' + scenarioLabel(s.btcScenario) + ')</span><strong>' + fmtMoneyFull(yp.spotFV) + '</strong></div>' +
