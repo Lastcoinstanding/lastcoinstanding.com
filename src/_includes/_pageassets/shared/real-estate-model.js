@@ -20,7 +20,8 @@
    Harmonisation (one scenario set, nominal house path, costs) is
    PR 4; tax regimes PR 5; the ledger is rendered in PR 6.
 
-   Byte-identity harness: shared/real-estate-qa.js → rePairQA().
+   Byte-identity harness: shared/real-estate-qa.js → rePairQA(),
+   loaded only with ?qa in the URL (shared/real-estate-qa-loader.js).
    ============================================================ */
 (function(){
   'use strict';
