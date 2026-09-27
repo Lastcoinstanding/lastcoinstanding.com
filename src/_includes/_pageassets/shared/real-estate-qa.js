@@ -117,10 +117,16 @@
     a.checked = x.advanced; fire(a, 'change');
   }
   function captureProj(){
-    return { results: html('fwdResults'), total: html('fwdTotalSummary'),
-             totalShown: el('fwdTotalSummaryWrapper').style.display,
-             advShown: el('fwdAdvancedContent').style.display,
-             advNote: html('fwdAdvancedNote'), advLeft: html('fwdAdvancedLeft'), advRight: html('fwdAdvancedRight') };
+    // The advanced panel is hidden, not cleared, when "Go deeper" is off,
+    // so its innerHTML is only captured while it is shown; otherwise the
+    // hash would depend on what an earlier vector left behind.
+    var advShown = el('fwdAdvancedContent').style.display;
+    var adv = advShown === 'none' ? null
+      : { note: html('fwdAdvancedNote'), left: html('fwdAdvancedLeft'), right: html('fwdAdvancedRight') };
+    var totShown = el('fwdTotalSummaryWrapper').style.display;
+    return { results: html('fwdResults'), totalShown: totShown,
+             total: totShown === 'none' ? null : html('fwdTotalSummary'),
+             advShown: advShown, adv: adv };
   }
   function captureBvreStatic(){
     return { houses: html('housesVisual'), returnTable: html('returnTable'), returnEnd: html('returnTableEndPrices'),
