@@ -98,6 +98,56 @@ Citations already present on the site as of Stage 1 (commit context: pending).
 
 **Provenance note for BvRE-4.** Each Demographia edition reports Q3 data for the prior calendar year — i.e., the 2025 edition (released May 2025) contains Q3 2024 figures, which is the most recent data point in the chart. The dataset was assembled by scraping the 20 annual PDFs into text, extracting the per-market median multiples via regex, and manually verifying every value against the source PDF (or, for the 2023 edition's UK figures and a handful of older-edition cells where layout parsing was unreliable, by re-running a targeted grep against the PDF and reading the line by hand). Hong Kong was not included in the survey before the 2011 edition (Q3 2010 data), so HK values for 2005–2009 are intentionally null and render as a gap in the chart. **Annual refresh cadence**: Demographia releases each May; update BvRE-4 within ~4 weeks of release. The new value appended is for `data_year = (publication_year - 1)`; older values are stable and do not require re-checking.
 
+### bitcoin-vs-rental-property
+
+_Section created 2026-09-27 (`fix/bvrp-sourcing`, `REAL_ESTATE_PAIR_DESIGN.md` §4). Every dated or sourced figure on the page has a row; Strategy figures are EDGAR-sourced (strategy.com returns 403 to automated fetches). Refresh cadence: Strategy/Strive rows monthly with `MONTHLY_REFRESH_CHECKLIST` §7; the rest semiannually._
+
+| # | Component | Value | Source | URL | Last audited | Next due |
+|---|---|---|---|---|---|---|
+| BvRP-1 | Strategy BTC holdings (Tab II bear case + Methodology) | 846,000 BTC as of 2026-09-20 | Strategy 8-K filed 2026-09-21 | https://www.sec.gov/Archives/edgar/data/1050446/000119312526396093/mstr-20260914.htm | 2026-09-27 | 2026-10-27 |
+| BvRP-2 | Strategy USD Reserve | $5.04B as of 2026-09-20 (≈3 years of preferred dividends + convert interest); board minimum ≥12 months (policy 2026-06-29) | Strategy 8-K filed 2026-09-21; policy 8-K filed 2026-06-29 | https://www.sec.gov/Archives/edgar/data/1050446/000119312526396093/mstr-20260914.htm · https://www.sec.gov/Archives/edgar/data/1050446/000119312526286871/mstr-20260629.htm | 2026-09-27 | 2026-10-27 |
+| BvRP-3 | Annual preferred dividend obligation (derived) | ≈$1.59B (≈$1.73B at 2026-06-30, before STRC buybacks) | Our arithmetic: 10-Q (2026-06-30) liquidation preference × rate per series, STRC reduced by 11,732,792 shares repurchased 2026-07-20..09-20 (weekly 8-Ks); STRE at Q2 cash paid ×4 | https://www.sec.gov/Archives/edgar/data/1050446/000105044626000044/mstr-20260630.htm | 2026-09-27 | 2026-10-27 |
+| BvRP-4 | Coverage tiles (holdings × price ÷ obligation) | 53 / 27 / 16 yrs at $100K / $50K / $30K | Derived from BvRP-1 and BvRP-3 | (derived) | 2026-09-27 | 2026-10-27 |
+| BvRP-5 | STRC rate and schedule | 12.00%, semi-monthly since 2026-06-30; daily record dates proposed, vote expected 2026-10-28 | Strategy 8-K filed 2026-09-01 (rate held for periods from 2026-09-16); 8-K + PRE 14A filed 2026-09-25 | https://www.sec.gov/Archives/edgar/data/1050446/000119312526377583/mstr-20260831.htm · https://www.sec.gov/Archives/edgar/data/1050446/000119312526401636/mstr-20260924.htm | 2026-09-27 | 2026-10-27 |
+| BvRP-6 | Strategy convertible notes outstanding | $6.714B principal at 2026-06-30 | Strategy 10-Q, Note 6 | https://www.sec.gov/Archives/edgar/data/1050446/000105044626000044/mstr-20260630.htm | 2026-09-27 | 2026-10-27 |
+| BvRP-7 | "$8,000 … five to six years" stress figure | CEO Phong Le, Q4 2025 results webinar, 2026-02-05 | Strategy webinar recording (primary); wording per The Block's report — **exact words not yet checked against the recording** | https://www.strategy.com/video/fourth-quarter-2025-financial-results-webinar-recording | 2026-09-27 | 2027-03-27 |
+| BvRP-8 | STRC / SATA average daily dollar volume (Methodology) | STRC ≈$150M/day; SATA ≈$55M/day (20 sessions to 2026-09-25, close × volume) | Nasdaq historical data | https://www.nasdaq.com/market-activity/stocks/strc/historical · https://www.nasdaq.com/market-activity/stocks/sata/historical | 2026-09-27 | 2027-03-27 |
+| BvRP-9 | St. Paul rent stabilization effect | Rental properties ≈−12% value; $1.57B aggregate loss to residential owners | Ahern & Giacoletti, NBER w30083, p.21 §V.D and p.22 Table VI | https://www.nber.org/system/files/working_papers/w30083/w30083.pdf | 2026-09-27 | 2027-03-27 |
+| BvRP-10 | Seattle registered rental properties | 33,691 (2019) → 26,519 (2022), ≈−21% (our calculation); units at a record | Seattle City Auditor RRIO audit (Dec 2023), Exhibit 1 | https://www.seattle.gov/documents/departments/cityauditor/auditreports/rrioaudit.pdf | 2026-09-27 | 2027-03-27 |
+| BvRP-11 | NYC Local Law 18 | 38,000+ listings on one platform (early 2023) → ≈3,000 registered STRs | NYC Office of Special Enforcement | https://www.nyc.gov/site/specialenforcement/news/new-report-sheds-fresh-light-on-how-local-law-18.page | 2026-09-27 | 2027-03-27 |
+| BvRP-12 | California AB 1154 | JADU rentals must exceed 30 days; Ch. 507, Stats. 2025, in force 2026-01-01 | California Legislative Information | https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260AB1154 | 2026-09-27 | 2027-03-27 |
+| BvRP-13 | New tenant protections since 2021 | 40+ states and 128 localities | NLIHC tenant-protections tracker (advocacy database; attributed on page) | https://nlihc.org/tenant-protections | 2026-09-27 | 2027-03-27 |
+| BvRP-14 | SATA rate and schedule | 13.00% (held for Oct 2026); dividends every business day since 2026-06-16, declared monthly | Strive 8-K filed 2026-09-14; EX-99.1 2026-05-14 | https://www.sec.gov/Archives/edgar/data/0001920406/000162828026061949/asst-20260914.htm | 2026-09-27 | 2026-10-27 |
+| BvRP-15 | Strive BTC holdings; STRC held in SATA reserve | 26,355 BTC as of 2026-09-18; 505,000 STRC shares (~$50M, bought Mar 2026); reserve set at 18 months in Mar 2026 (current months not confirmed) | Strive 8-K filed 2026-09-21; March 2026 release | https://www.sec.gov/Archives/edgar/data/0001920406/000162828026062806/asst-20260921.htm · https://www.sec.gov/Archives/edgar/data/1920406/000162828026016664/a991-strivexmarchsatadivid.htm | 2026-09-27 | 2026-10-27 |
+| BvRP-16 | Return-of-capital treatment | Strategy: 100% of 2025 preferred distributions ROC, expected ≥10 yrs; Strive: SATA expected ROC (Forms 8937 per distribution) | Strategy EX-99.1 2026-02-02; Strive 8-K 2026-09-14 | https://www.sec.gov/Archives/edgar/data/1050446/000119312526033573/mstr-ex99_1.htm | 2026-09-27 | 2027-03-27 |
+| BvRP-17 | YBTC | NAV return −42.63% (1 yr to 2026-06-30); weekly 19a-1 ROC estimates mostly 100%, one 0% (Dec 2025) | Roundhill fact sheet and 19a-1 notices | https://www.roundhillinvestments.com/etf/ybtc/ | 2026-09-27 | 2027-03-27 |
+| BvRP-18 | Ledn Growth Account rate (tooltip, CeFi paragraph); calculator assumes 8% | 6.5% below $100K, 8.5% above (stablecoin account); **US eligibility unconfirmed** | Ledn savings page, read 2026-09-27 | https://www.ledn.io/savings | 2026-09-27 | 2027-03-27 |
+| BvRP-19 | Housing vs equity returns and volatility | US housing 6.03% / US equities 8.39% real, 1891–2015 (Table A.2); 16-country excess-return SD 9.86% / 21.43% (Table 3) | Jordà et al., FRBSF WP 2017-25 | https://www.frbsf.org/wp-content/uploads/wp2017-25.pdf | 2026-09-27 | 2027-09-27 |
+| BvRP-20 | SFR Sharpe 1.14; expenses 36–52% (avg 40%) of gross yield | 30 metros, 1986–2014 | Demers & Eisfeldt, NBER WP 21804 | https://www.nber.org/papers/w21804 | 2026-09-27 | 2027-09-27 |
+| BvRP-21 | Operating expenses, single-unit rentals | ≈45% of rent collected ($6,194 / $13,836, 2020 data) | Census/HUD RHFS 2021 infographic (RHFS 2024 gives ≈44%; 1-unit pairing to be checked visually before switching) | https://www.census.gov/programs-surveys/rhfs.html | 2026-09-27 | 2027-03-27 |
+| BvRP-22 | National rental vacancy | 7.3%, Q2 2026 | Census Housing Vacancy Survey (released 2026-07-28) | https://www.census.gov/housing/hvs/index.html | 2026-09-27 | 2027-03-27 |
+| BvRP-23 | Sale costs (our estimate) and forced-sale discounts | Orderly ≈6–9% (≈5–5.5% commissions + ≈1% title/escrow + 0–2%+ transfer tax); discounts 3% bankruptcy, 5–7% death, 27% foreclosure | Campbell, Giglio & Pathak (AER 2011); Duarte & Zhang (SSRN 5279352, 2025) on post-settlement commissions; commission level from industry surveys | https://www.aeaweb.org/articles?id=10.1257/aer.101.5.2108 · https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5279352 | 2026-09-27 | 2027-03-27 |
+| BvRP-24 | Mortgage-rate context (Path 2) | 49.9% of outstanding loans <4% (Q1 2026); 30-yr fixed 7.03% (2026-09-24); Prime 7.00% (2026-09-21); Bankrate HELOC avg 7.28% (2026-09-23; vendor survey); $607/mo interest on $100K at 7.28% | FHFA NMDB; Freddie Mac PMMS via FRED; FRED DPRIME; Bankrate | https://www.fhfa.gov/data/national-mortgage-database-nmdb · https://fred.stlouisfed.org/series/MORTGAGE30US · https://fred.stlouisfed.org/series/DPRIME | 2026-09-27 | 2027-03-27 |
+| BvRP-25 | Airbnb host fees | Host-only 15.5% (most hosts); split fee 3% | Airbnb Help Center article 1857 | https://www.airbnb.com/help/article/1857 | 2026-09-27 | 2027-03-27 |
+| BvRP-26 | Power Law figures in prose and the $500K table (stay at today's multiple) | Live: ≈29% a yr next 10 yrs, ≈19% the 10 after; $61,650 spot slice → ≈$813K (at 2026-09-27) | Computed in-page from `shared/power-law-data.js` (`data-pl-*` spans, `bitcoin-vs-rental-property.js`) | (same as PL-1) | 2026-09-27 | (live) |
+
+**BvRP cuts (2026-09-27), recorded so they aren't reintroduced from an old draft:**
+- Portland, ME "$500/unit, 40%": an industry-commissioned 4-building study, and the 40% was a rent gap, not a cash-flow drop.
+- Tacoma I-1 delinquency "33%→54%" and "32% removed": a landlord-association survey with no n or method. The $10 late-fee cap was also repealed from 2026-01-01.
+- "29 states and 51 localities": no source.
+- Eviction "$3,500–$10,000+, 7–16 weeks": vendor blogs.
+- "11.7% leveraged ROI": vendor marketing (Arrived via Property Scout 360). The "best rolling 20-yr windows, 4–5× leverage" description is unsupported.
+- "7–9% after-friction": unsourced.
+- "5.8%" effective tax: unsourced.
+- "31 hrs/month": a UK survey.
+- Waterfall bands, "50–63% / 36.8–50.4%" and the high-yield paradox: synthesis only, and the bands didn't sum.
+- "19–33%" / "50%+" attrition: synthesis.
+- STR "15–30% of GBR", management 25–40% and insurance ranges: no source.
+- YBTC "74.7%" and "45–48%": unsourced; "0–96% ROC" was not found.
+- CeFi "6.5–13.9%": the upper bound had no source.
+- "Native bitcoin staking": bitcoin has no native staking.
+- Demers & Eisfeldt comparator "S&P 0.52" and the rolling-window floors: not verified.
+
 ### the-bitcoin-horizon
 
 | # | Component | Value | Source | URL | Last audited | Next due |

@@ -589,6 +589,13 @@ For each value, verify against the source listed and update in the BFI files as 
 
 **There is a THIRD location off this page** (found 2026-09-13, when it had drifted to a different figure again): `src/bitcoin-vs-rental-property.njk` states the treasury in prose (“Strategy currently holds **N BTC** as of …”) and repeats it in the sources list at the foot of the page, alongside the USD Reserve figure. Grep the BTC count sitewide rather than trusting this list — `grep -rn "84[0-9],[0-9]\{3\}" src/` — and fix every hit in the same edit.
 
+**`/bitcoin-vs-rental-property` dated figures (added 2026-09-27; DATA_AUDIT BvRP-1–8, 14–15, 18).** Refresh these with the Strategy block, from EDGAR, and update the as-of dates in the body, the Methodology list and DATA_AUDIT in the same edit:
+- Strategy BTC holdings, USD Reserve, and the derived annual preferred obligation. When the obligation changes, recompute the three coverage tiles: holdings × $100K / $50K / $30K ÷ obligation.
+- STRC rate and schedule. The rate is also a constant in `bitcoin-vs-rental-property.js` (`calcYieldPortfolio` and `calcYieldPortfolioAtYearT`, `0.12`) and in the Path 4 detail label (`@ 12.0% ROC`). Change all three, and the $500K table's STRC row, together.
+- Convertible notes outstanding.
+- SATA rate and schedule; Strive BTC holdings and the STRC shares in its reserve.
+- Semiannually: STRC/SATA daily volume (Nasdaq) and the Ledn Growth Account rates, including whether US residents are eligible.
+
 If the values haven't materially changed (BTC count moved &lt;1%, mNAV moved &lt;0.1&times;, ATM status unchanged, insight prose still accurate), the only required update is the as-of date.
 
 ## 7.5. The STRC Mechanism — the `STRC_DATA` block (`/the-strc-mechanism.html`)
