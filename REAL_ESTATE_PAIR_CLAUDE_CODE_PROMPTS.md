@@ -4,6 +4,8 @@ _2026-09-26. Nine prompts, one per PR, executing `REAL_ESTATE_PAIR_DESIGN.md`. R
 
 _**Updated 2026-09-27 for `REAL_ESTATE_PAIR_RULINGS.md`** (JM's rulings on the Phase 0 report). Prompts 1–8 now carry the rulings that change them; ruling IDs (M1–M11, P1–P6, C1–C7) are cited inline. Prompt 0 is historical (done: PR #121)._
 
+_**Updated again 2026-09-27 for rulings P7–P9** (design v1.2): Prompt 6 now puts the chart and ledger on both BvRE calculators (P7) and runs the retrospective to today (P8); Prompt 8 adds the series strip and the single `#calculator` hash (P9)._
+
 _Shared rules every prompt inherits (restated in each so a prompt can run cold):_
 - _Read the design doc (v1.1) and `REAL_ESTATE_PAIR_RULINGS.md` first. Where they differ, the rulings win; the design doc's §14 logs every amendment._
 - _Branch per PR; open a PR; do not merge. JM merges._
@@ -173,25 +175,27 @@ Report: the verification table; the hand-check table; before/after headline figu
 ## Prompt 6 — Equal cash out, chart with difference line, and the "show the calculation" ledger
 
 ```
-Context: REAL_ESTATE_PAIR_DESIGN.md §9 (v1.1), rulings M2, M7, P2, P4, P6. Figures come from the shared engine. M2 changes figures: report before/after.
+Context: REAL_ESTATE_PAIR_DESIGN.md §9 (v1.2), rulings M2, M7, P2, P4, P6, P7, P8. Figures come from the shared engine. M2 and P8 change figures: report before/after.
 
 Branch: feat/real-estate-results. Preview-first (shared chart config).
 
 Do:
 1. M2 — equal cash out, replacing the "Go deeper" DCA. At purchase the renter's bitcoin receives the buyer's upfront cash (down payment + buyer closing costs). Each month it receives the owner's all-in cost (P&I + property tax + insurance + maintenance) minus rent; when negative, the renter sells bitcoin at that month's scenario price (M3 monthly path, replacing the geometric path; bitcoin transaction cost applies). Cash purchase follows the same rule. Retire the cash-mode S&P leg (re.js:1024–1049). Toggle "The renter invests the difference", on by default; off = only the upfront sum is invested and shortfalls come from income. The toggle sits with the results, not in the baseline block (P6).
 2. M7 — two valuation bases: Held (market value less debt; no selling costs, no tax) and If sold (less selling costs, then less tax). BvRP's current mark-to-market keep-rental line becomes its Held view.
-3. Chart on both pages, built once in the shared module from BvRP's Chart.js chart (P2): wealth over time per path, Held / If sold (after tax) toggle, default If sold. The DIFFERENCE line is the visual hero (new on both, P4). Floor scenario drawn faintly. Full window / first 3 years toggle: already on BvRP; add to BvRE (P4). Keep the existing stat block beneath the chart.
-4. "Show the calculation" disclosure beneath the results on both pages, rendering the engine's ledger rows, one row per year, two tabs:
+3. Chart on both pages, built once in the shared module from BvRP's Chart.js chart (P2): wealth over time per path, Held / If sold (after tax) toggle, default If sold. The DIFFERENCE line is the visual hero (new on both, P4). Floor scenario drawn faintly. Full window / first 3 years toggle: already on BvRP; add to BvRE (P4). Per-year tooltip on hover, as BvRP's (interaction mode 'index', intersect false). Keep the existing stat block beneath the chart.
+   P7: on BvRE the chart and ledger apply to BOTH calculators, explicitly including the retrospective "Postponed Purchase" calculator on Tab I, the default view, not only the projection. On each, place them directly below the result cards and the "renter invests the difference" toggle: cards, toggle, chart, ledger disclosure. Retrospective ledger rows are calendar years from the start year.
+4. "Show the calculation" disclosure beneath the results on both pages (both BvRE calculators, per P7), rendering the engine's ledger rows, one row per year, two tabs:
    - BvRE: "The house" (value, mortgage balance, principal, interest, property tax, insurance, maintenance, equity, cumulative cash out) and "Bitcoin + rent" (scenario price, BTC bought/sold, BTC held, value, rent paid, contributions, cumulative cash out).
    - BvRP: "The rental" (value, balance, net cash flow, depreciation, equity, cumulative cash) and "Bitcoin path" (scenario price, BTC held, value, distributions/contributions, cumulative cash).
    - Final rows per path: market value → selling costs → pre-tax proceeds → tax → after-tax proceeds.
    - Units in every column header; values in the current real/nominal frame, stated above the table.
 5. CSV download of both tabs (P2): Blob download following the-bitcoin-retirement-stress-test.js:640–673 and :981–989, with the retirement family's #-prefixed provenance header and unit-labelled columns; toCsv lives in the shared module. Filename <page-slug>.csv.
-6. Fix the retrospective's hardcoded "April 2025" label (re.js:245) while the ledger surfaces it (C6 / Phase 0 §k-20); log the 2026 data refresh.
+6. P8 — the retrospective runs to TODAY (supersedes the earlier "fix the April 2025 label" step). Replace the fixed end point (re.js:233 `ey=2025`, :245 `asOf='April 2025'`) with today: the live bitcoin price via the shared fetchTodayPrice (seeded fallback); the house grown by Case-Shiller National to the LATEST published month (M11), stated on the cards and ledger because Case-Shiller lags about two months; mortgage, rent and equal-cash-out flows through the current month. The ledger's last row is a partial year labelled "to date". The static Tab I–IV exhibits may stay on annual data through the latest full year, labelled as such. Add a DATA_AUDIT row for the Case-Shiller value; the MONTHLY_REFRESH_CHECKLIST line already exists (v1.2).
+   Staleness check (design §9): under a live end point, rewrite FAQ answer 1 (re.njk:19, and its FAQPage JSON-LD) and the retrospective intro (re.njk:180) to the wording recorded in design §9; both currently say "most" start years, which a live end point can make wrong. Sweep the page for any other fixed-year claim a live end point could falsify.
 7. Mobile: ledger scrolls horizontally inside its own container (no page scroll); chart legible at 375px.
 
-Acceptance: ledger final rows = stat block = chart end-points, all four scenarios, both bases, both pages; cumulative cash out identical on both ledger tabs (add both to the parity harness). CSV opens cleanly in a spreadsheet.
-Report: before/after for M2; screenshots desktop + 375px, both pages; the parity result.
+Acceptance: ledger final rows = stat block = chart end-points, all four scenarios, both bases, both pages AND both BvRE calculators; cumulative cash out identical on both ledger tabs (add both to the parity harness). CSV opens cleanly in a spreadsheet. The retrospective ends today with a "to date" row and the Case-Shiller month stated.
+Report: before/after for M2 and for P8 (retrospective at a fixed 2025 end point vs today, for three start years); screenshots desktop + 375px, both pages, both BvRE calculators; the parity result.
 ```
 
 ---
@@ -216,10 +220,10 @@ Report: screenshots; any performance note; whether the component is ready for th
 
 ---
 
-## Prompt 8 — Pair framing, carry, parity, bookkeeping
+## Prompt 8 — Pair framing, carry, series strip, parity, bookkeeping
 
 ```
-Context: REAL_ESTATE_PAIR_DESIGN.md §11–§12 (v1.1), rulings C1, C6, P3, M2. Close the build.
+Context: REAL_ESTATE_PAIR_DESIGN.md §11–§12 (v1.2), rulings C1, C6, P3, P9, M2. Close the build.
 
 Branch: feat/real-estate-pair-close.
 
@@ -228,6 +232,8 @@ Do:
    - BvRE: "The tenant's side of the decision. For the landlord's side, see Bitcoin vs. Rental Property."
    - BvRP: "The landlord's side of the decision. For the tenant's side, see Bitcoin vs. Real Estate."
 2. Carry (P3): adopt BvRE's existing URL names as the pair vocabulary; BvRP reads them; no prefixes. New quantities get new names (nominal appreciation is new), recorded in SITE_GUIDE §46. A legacy `appr` (real) is read once, converted using the sitewide inflation, never written again, and the page shows one line saying the link used an older format. Legacy `pscenario` values map to the M3 keys. A "Run this on the other side" link on each page carries the shared inputs; share-link buttons include them.
+2a. Series strip (P9): a shared component, src/_includes/components/real-estate-series.njk, following components/retirement-family.njk (SITE_GUIDE §53.1): own scoped <style>, prefixed selectors, var-with-fallback colours, one include line per page, owns its heading, current page marked from `slug`. Place it at the TOP of both pages. Question labels: "Buy or rent?" (BvRE) · "Keep the rental?" (BvRP). It must CARRY the shared inputs (P3): the retirement strip's hrefs are plain and can't (§53.1), so add a small script that rewrites the strip's links with the current P3 params on load and on input change, using the shared module's URL writer, targeting #calculator; without JavaScript the links stay plain. Build it so further spokes (backlog: Compare Housing Plans; the homeowner's side) slot in as items. Record it in SITE_GUIDE beside §53.1.
+2b. One calculator hash (P9): both calculators answer to #calculator. BvRP already does. BvRE's calculator tab writes #postponed-purchase and #calculator is not in its hash map (re.js:409–410): make BvRE write #calculator, and keep reading #postponed-purchase and #projection (projection mode) for existing links. Update SITE_GUIDE §14's hash list.
 3. Parity QA: finalise the tripwire in the style of evParityQA/crpParityQA (console function, input-only vectors, identity assertions against the shared module, green PASS / console.error FAIL / console.table). Assert: (1) house-side and tax figures identical across pages for identical shared inputs; (2) ledger = stat block = chart on each page; (3) cumulative cash out identical on both ledger tabs (M2).
 4. Bookkeeping: SITE_GUIDE §14 amended and a NEW BvRP section (none exists, C6); the stale docs Phase 0 §k-18 lists (SITE_GUIDE §17's BvRE pscenario default and missing params, §46's BvRE entry, DATA_AUDIT BvRE-1–3 year ranges, rp.js header comments); DATA_AUDIT rows complete; MONTHLY_REFRESH_CHECKLIST lines for dated figures; updates.json entries (neutral register); STYLE_GUIDE note if the ledger/CSV or grid becomes a house component; PAGE_IDEAS_BACKLOG "Real-estate pair" entry marked shipped with SHAs; REAL_ESTATE_PAIR_DESIGN.md marked historical-from-ship, with SITE_GUIDE authoritative.
 5. Run the full acceptance list in design §12 and report each item.
