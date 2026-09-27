@@ -103,7 +103,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         const houseFilled32=houseFilled.replace('width="26" height="26"','width="32" height="32"');
         const housePartial32=housePartial.replace('width="26" height="26"','width="32" height="32"');
         const houseHollow='<svg viewBox="0 0 24 24" width="26" height="26" style="margin:1px;opacity:0.35"><path d="M3 13l9-9 9 9" fill="none" stroke="#c0392b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v7a1 1 0 001 1h12a1 1 0 001-1v-7" fill="none" stroke="#c0392b" stroke-width="1.2" stroke-dasharray="3 2"/><path d="M10 20v-5h4v5" fill="none" stroke="#c0392b" stroke-width="1" stroke-dasharray="2 2"/></svg>';
-        function mp(p,r,y){const mr=r/100/12,n=y*12;return p*(mr*Math.pow(1+mr,n))/(Math.pow(1+mr,n)-1)}
+        function mp(p,r,y){return RealEstateModel.mortgagePayment(p,r,y,'none')}
         let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;padding:0 0 0.8rem;border-bottom:1px solid var(--border);margin-bottom:0.2rem"><div style="border-right:1px solid var(--border);padding-right:1.5rem;font-size:0.82rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);font-weight:500">₿ Bought Bitcoin</div><div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--red);font-weight:500">🏠 Bought the House</div></div>';
         scenarios.forEach(s=>{
             const btcBought=invest/s.btcPrice;
@@ -120,7 +120,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             const yrsElapsed=2025-s.year;
             const monthlyPmt=mp(loan,s.rate,30);
             const totalPaid=Math.round(invest+(monthlyPmt*yrsElapsed*12));
-            const mr2=s.rate/100/12;let bal=loan;for(let i=0;i<yrsElapsed*12;i++)bal=bal*(1+mr2)-monthlyPmt;bal=Math.max(0,Math.round(bal));
+            const mr2=s.rate/100/12;let bal=RealEstateModel.amortizeBalance(loan,mr2,yrsElapsed*12,monthlyPmt);bal=Math.max(0,Math.round(bal));
             const equity=endHome-bal;
             const equityPct=Math.round((equity/endHome)*100);
 
@@ -184,7 +184,9 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     })();
 
     // TAB 4: BURDEN - line chart with threshold lines
-    function monthlyPayment(p,r,y){const mr=r/100/12,n=y*12;if(mr===0)return p/n;return p*(mr*Math.pow(1+mr,n))/(Math.pow(1+mr,n)-1)}
+    // Mortgage math lives in shared/real-estate-model.js (PR 3); 'eq0' is
+    // this function's original zero-rate guard.
+    function monthlyPayment(p,r,y){return RealEstateModel.mortgagePayment(p,r,y,'eq0')}
     const burdenYears=btcYears;
     const burdenValues=burdenYears.map(y=>{const p=homeData[y],d=p*0.2,l=p-d,r=mortgageRates[y],m=monthlyPayment(l,r,30),mi=incomeData[y]/12;return+((m/mi)*100).toFixed(1)});
     // Threshold datasets
@@ -241,7 +243,12 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         const _dpRaw=(document.getElementById('customDownPct')||{}).value||'';const _dpNum=parseFloat(_dpRaw.replace(/[%\s]/g,''));const _dpValid=!isNaN(_dpNum)&&_dpNum>=3&&_dpNum<=95;const downPct=_dpValid?_dpNum:20;const dpf=downPct/100;const _dpLabel=(Math.round(downPct*10)/10);
         // Keep the leverage toggle label in sync with the chosen down payment.
         var _retroLevPct=document.querySelector('.toggle-group .toggle-btn[data-mode="leverage"] .retro-dp-pct');if(_retroLevPct)_retroLevPct.textContent=_dpLabel;
-        const dp=mode==='cash'?hs:Math.round(hs*dpf);
+        const _rentRaw=(document.getElementById('customRent')||{}).value||'';const _rentNum=parseFloat(_rentRaw.replace(/[$,\s]/g,''));const _rentValid=!isNaN(_rentNum)&&_rentNum>=100&&_rentNum<=50000;const _isCustomRent=_rentValid;
+        // ── ENGINE: shared/real-estate-model.js (PR 3) ──
+        // All retrospective math; the page parses inputs and renders. ey is
+        // the end point (P8 will pass today).
+        const R=RealEstateModel.bvreRetro({sy:sy,ey:ey,mode:mode,hs:hs,he:he,bs:bs,be:be,rate:rate,dpf:dpf,rentOverride:_rentValid?_rentNum:null,btcData:btcData});
+        const dp=R.dp;
         const asOf='April 2025';
         const medianRef=_isCustom?('at $'+Math.round(hs).toLocaleString()+' each'):('at $'+he.toLocaleString()+' each (median)');
 
@@ -253,23 +260,23 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             assumeEl.innerHTML='<strong style="color:var(--text-dim)">Scenario:</strong> You had $'+dp.toLocaleString()+' in '+sy+' ('+_dpLabel+'% of median home price $'+hs.toLocaleString()+'). You either used it as a down payment with a 30-year fixed mortgage at '+rate+'%'+(_isCustomRate?' <span style="font-size:0.78rem;color:var(--text-muted)">(vs. prevailing '+_prevailingRate+'%)</span>':'')+', or invested it in bitcoin and rented instead.';
         }
 
-        // ── SHARED CALCS ──
-        const bb=dp/bs;
-        const lumpValue=bb*be;
-        const lumpReturn=((lumpValue-dp)/dp*100).toFixed(0);
-        const mortgageMonthly=monthlyPayment(hs*(1-dpf),rate,30);
-        const _defaultRent=Math.round(mortgageMonthly*0.75);const _rentRaw=(document.getElementById('customRent')||{}).value||'';const _rentNum=parseFloat(_rentRaw.replace(/[$,\s]/g,''));const _rentValid=!isNaN(_rentNum)&&_rentNum>=100&&_rentNum<=50000;const _isCustomRent=_rentValid;const estRent=_rentValid?Math.round(_rentNum):_defaultRent;
-        const totalRentPaid=estRent*yrs*12;
-        const lumpNet=lumpValue-totalRentPaid;
-        const lumpHouses=lumpNet/he;
+        // ── SHARED CALCS (from the engine) ──
+        const bb=R.bb;
+        const lumpValue=R.lumpValue;
+        const lumpReturn=R.lumpReturn;
+        const mortgageMonthly=R.mortgageMonthly;
+        const _defaultRent=R._defaultRent;const estRent=R.estRent;
+        const totalRentPaid=R.totalRentPaid;
+        const lumpNet=R.lumpNet;
+        const lumpHouses=R.lumpHouses;
 
         // ── HOUSE SIDE ──
         let houseEquity=0,monthlyMortgage=0,houseTotalSpent=0,remainingBal=0,equityPct=0,debtFreeYear=sy+30;
         let hL,hD;
         if(mode==='cash'){
-            const ha=((he-hs)/hs*100).toFixed(1);
-            houseEquity=he;houseTotalSpent=hs;remainingBal=0;equityPct=100;debtFreeYear=sy;
-            monthlyMortgage=mortgageMonthly;
+            const ha=R.ha;
+            houseEquity=R.houseEquity;houseTotalSpent=R.houseTotalSpent;remainingBal=R.remainingBal;equityPct=R.equityPct;debtFreeYear=R.debtFreeYear;
+            monthlyMortgage=R.monthlyMortgage;
             hL='$'+Math.round(he).toLocaleString();
             var _cv='<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.8rem"><svg viewBox="0 0 24 24" width="32" height="32"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="var(--amber)" fill-opacity="0.18" stroke="#e09422" stroke-width="1.7" stroke-linejoin="round"/></svg><span style="font-size:0.9rem;color:var(--text)">1 house, outright</span></div>';
             hD=_cv+'Home appreciation: '+ha+'%<br>'+
@@ -277,13 +284,11 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
                'Rent paid: $0 <span style="font-size:0.78rem;color:var(--text-muted)">(you live in it)</span><br>'+
                'No debt — but no bitcoin either';
         }else{
-            const la=hs*(1-dpf);monthlyMortgage=monthlyPayment(la,rate,30);
-            const mps=yrs*12;const r=rate/100/12;
-            let bal=la;for(let i=0;i<mps;i++)bal=bal*(1+r)-monthlyMortgage;bal=Math.max(0,bal);
-            remainingBal=bal;houseEquity=he-bal;equityPct=Math.round((houseEquity/he)*100);debtFreeYear=sy+30;
-            const pt=hs*0.012*yrs,ins=150*mps,mnt=hs*0.01*yrs;
-            houseTotalSpent=(monthlyMortgage*mps)+dp+pt+ins+mnt;
-            const interestMain=Math.round((monthlyMortgage*mps)-(la-bal));
+            monthlyMortgage=R.monthlyMortgage;
+            const bal=R.bal;
+            remainingBal=R.remainingBal;houseEquity=R.houseEquity;equityPct=R.equityPct;debtFreeYear=R.debtFreeYear;
+            houseTotalSpent=R.houseTotalSpent;
+            const interestMain=R.interestMain;
             hL='$'+Math.round(houseEquity).toLocaleString();
             var _fh=Math.max(0,Math.min(20,equityPct*0.20));var _ev='<div style=\"display:flex;align-items:center;gap:0.6rem;margin-bottom:0.8rem\"><svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\"><defs><clipPath id=\"ec\"><rect x=\"0\" y=\"'+(24-_fh)+'\" width=\"24\" height=\"'+_fh+'\"/></clipPath></defs><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"'+(equityPct>=100?'#e09422':'#c0392b')+'\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.5\" stroke-linejoin=\"round\" clip-path=\"url(#ec)\"/></svg><span style=\"font-size:0.9rem;color:var(--text)\">'+(equityPct<0?'<span style=\\\'color:var(--red)\\\'>Underwater</span>':equityPct+'% owned')+'</span></div>';hD=_ev+
                'Monthly mortgage: $'+Math.round(monthlyMortgage).toLocaleString()+'/mo<br>'+
@@ -327,25 +332,22 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         const totalWrapper=document.getElementById('totalSummaryWrapper');
 
         if(dca){
-            const monthlySavings=Math.round(mortgageMonthly-estRent);
-            let dcaBtc=0,dcaTotalInvested=0;
-            for(let yr=sy;yr<ey;yr++){
-                const ybp=btcData[yr]||btcData[ey];
-                dcaBtc+=(monthlySavings/ybp)*12;
-                dcaTotalInvested+=monthlySavings*12;
-            }
-            const dcaValue=dcaBtc*be;
-            const totalBtc=bb+dcaBtc;
-            const totalBtcValue=totalBtc*be;
-            const totalBtcNet=totalBtcValue-totalRentPaid;
-            const totalHouses=totalBtcNet/he;
-            const extraHouses=totalHouses-1;
-            const totalInvested=dp+dcaTotalInvested;
-            const yrsRemaining=debtFreeYear-2025;
-            const principalRepaid=(hs*(1-dpf))-remainingBal;
-            const interestPaid=Math.round((mortgageMonthly*yrs*12)-principalRepaid);
-            const houseOutflow=Math.round(houseTotalSpent);
-            const btcOutflow=Math.round(totalInvested+totalRentPaid);
+            // DCA math from the engine (R); yrsRemaining now counts from the
+            // end point ey (2025 today, so unchanged).
+            const monthlySavings=R.monthlySavings;
+            const dcaBtc=R.dcaBtc,dcaTotalInvested=R.dcaTotalInvested;
+            const dcaValue=R.dcaValue;
+            const totalBtc=R.totalBtc;
+            const totalBtcValue=R.totalBtcValue;
+            const totalBtcNet=R.totalBtcNet;
+            const totalHouses=R.totalHouses;
+            const extraHouses=R.extraHouses;
+            const totalInvested=R.totalInvested;
+            const yrsRemaining=R.yrsRemaining;
+            const principalRepaid=R.principalRepaid;
+            const interestPaid=R.interestPaid;
+            const houseOutflow=R.houseOutflow;
+            const btcOutflow=R.btcOutflow;
 
             dcaContainer.innerHTML=
                 '<div class="calc-result-card bitcoin" style="border-style:dashed">'+
@@ -579,24 +581,10 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   // visibility + augmented totals, and by renderAdvanced to populate the
   // DCA card in the "go deeper" panel. Single source of truth so the two
   // surfaces can't drift apart.
+  // Projection DCA — moved to shared/real-estate-model.js (PR 3, verbatim).
+  // Single source of truth for the Total Comparison and renderAdvanced.
   function computeProjectionDca(method, btcNow, futurePrice, monthlyMort, impliedRent, horizonYrs){
-    if(method !== 'mortgage') return null;
-    var monthlySavings = Math.max(0, monthlyMort - impliedRent);
-    if(monthlySavings <= 0 || btcNow <= 0 || futurePrice <= 0) return null;
-    var dcaBtc = 0;
-    var totalMonths = horizonYrs * 12;
-    for(var m = 0; m < totalMonths; m++){
-      // Geometric interpolation of BTC price across the horizon — same
-      // assumption used in the renderAdvanced display logic.
-      var frac = m / totalMonths;
-      var monthPrice = btcNow * Math.pow(futurePrice/btcNow, frac);
-      dcaBtc += monthlySavings / monthPrice;
-    }
-    return {
-      dcaBtc: dcaBtc,
-      dcaInvested: monthlySavings * totalMonths,
-      monthlySavings: monthlySavings
-    };
+    return RealEstateModel.projectionDca(method, btcNow, futurePrice, monthlyMort, impliedRent, horizonYrs);
   }
 
   function runFwdCalc(){
@@ -618,8 +606,6 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     // which produces nominal future values.
     var homeApprReal = parseNum('fwdHomeAppreciation');
     var inflRate = window.ModelingAssumptions.get('inflation').value;
-    var homeApprNominalPct = window.CalcHelpers.realToNominal(homeApprReal, inflRate);
-    var homeAppr = homeApprNominalPct / 100;
     var mortRate = parseNum('fwdMortgageRate');
     // Optional down payment % (default 20 → identity with prior behavior).
     // Bounds 3–95, same rationale as retrospective. Drives the up-front
@@ -661,93 +647,44 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     var endYear = startYear + horizonYrs;
     var asOf = 'Jan 1, ' + endYear;
 
-    // ── Derive investment amount from home price + method ──
-    var amount = (method === 'cash') ? homePrice : homePrice * dpf;
-
-    // ── Mortgage math (needed for both modes: implied rent = 75% of equivalent mortgage) ──
-    var loanAmt = homePrice * (1 - dpf);
-    var mr = mortRate / 100 / 12;
-    var nPayments = 360;
-    var monthlyMort = mr > 0 ? loanAmt * (mr * Math.pow(1+mr, nPayments)) / (Math.pow(1+mr, nPayments) - 1) : loanAmt / nPayments;
-    // Optional user-override for monthly rent. Default = 75% of equivalent
-    // mortgage (the established assumption used elsewhere in the page).
-    // Mirrors the customRent override pattern from retrospective.
+    // ── ENGINE: shared/real-estate-model.js (PR 3) ──
+    // All projection math; the page parses inputs and renders.
     var _fwdRentEl = document.getElementById('fwdMonthlyRent');
     var _fwdRentRaw = _fwdRentEl ? (_fwdRentEl.value || '').replace(/[$,\s]/g, '') : '';
     var _fwdRentNum = parseFloat(_fwdRentRaw);
     var _fwdRentValid = isFinite(_fwdRentNum) && _fwdRentNum >= 100 && _fwdRentNum <= 50000;
-    var impliedRent = _fwdRentValid ? _fwdRentNum : (monthlyMort * 0.75);
+    var P = RealEstateModel.bvreProjection({
+      method: method, scenario: scenario, horizonYrs: horizonYrs, btcNow: btcNow,
+      homePrice: homePrice, homeApprReal: homeApprReal, inflRate: inflRate,
+      mortRate: mortRate, dpf: dpf, rentOverride: _fwdRentValid ? _fwdRentNum : null,
+      endYear: endYear
+    });
+    var homeApprNominalPct = P.homeApprNominalPct, homeAppr = P.homeAppr;
+    var amount = P.amount, loanAmt = P.loanAmt, mr = P.mr, nPayments = P.nPayments;
+    var monthlyMort = P.monthlyMort, impliedRent = P.impliedRent, totalRentPaid = P.totalRentPaid;
     // Update placeholder to reflect the live default
     if (_fwdRentEl && !_fwdRentValid) {
       _fwdRentEl.placeholder = '$' + Math.round(monthlyMort * 0.75).toLocaleString() + ' (75% of mortgage)';
     }
-    var totalRentPaid = impliedRent * 12 * horizonYrs;
-
-    // ── BITCOIN SIDE ──
-    var btcBought = amount / btcNow;
-    var futureDays = (endYear - 2009) * 365.25;
-    var futureTrend = plPrice(futureDays);
-    var futureFloor = futureTrend * PL_FLOOR;
-    var futureCeil = futureTrend * PL_CEIL;
-
-    var futurePrice, scenarioLabel;
-    if(scenario === 'floor'){ futurePrice = futureFloor; scenarioLabel = 'Floor (conservative)'; }
-    else if(scenario === 'trend'){ futurePrice = futureTrend; scenarioLabel = 'Trend (fair value)'; }
-    else { futurePrice = futureCeil; scenarioLabel = 'Upper (cycle peak)'; }
-
-    var btcValue = btcBought * futurePrice;
-    var btcNet = btcValue - totalRentPaid;
-    // Real-terms equivalents (today's purchasing power)
-    var btcValueReal = toReal(btcValue);
-    var futurePriceReal = toReal(futurePrice);
-    // For btcNet: btcValue is a future-dollar amount (deflate to real);
-    // totalRentPaid is accumulated nominal payments — first-order approximation,
-    // we treat its dollar magnitude as today's-equivalent purchasing power
-    // (each monthly payment is in then-dollars, but the user thinks of rent as
-    // a today's-dollar cost; per Approach 3 we don't do per-payment deflation
-    // at this stage). The accumulated totals retain their nominal magnitudes.
-    var btcNetReal = btcValueReal - totalRentPaid;
-    // Returns and CAGRs computed against real values for consistency with the
-    // real-primary display. Real return is the honest "purchasing-power gain"
-    // figure; nominal return would inflate the apparent gain by inflation.
-    var btcReturn = ((btcNetReal - amount) / amount * 100).toFixed(0);
-    var btcCAGR = btcNetReal > 0 ? ((Math.pow(btcNetReal/amount, 1/horizonYrs) - 1) * 100).toFixed(1) : '—';
-
-    // ── HOUSE SIDE ──
-    var futureHomeValue = homePrice * Math.pow(1 + homeAppr, horizonYrs);
-    var futureHomeValueReal = toReal(futureHomeValue);
-    var bal = 0, equity = futureHomeValue, interestPaid = 0, totalMortPaid = 0;
-    if(method === 'mortgage'){
-      var monthsPaid = horizonYrs * 12;
-      bal = loanAmt;
-      for(var i = 0; i < Math.min(monthsPaid, nPayments); i++){
-        bal = bal * (1 + mr) - monthlyMort;
-      }
-      bal = Math.max(0, bal);
-      equity = futureHomeValue - bal;
-      totalMortPaid = monthlyMort * Math.min(monthsPaid, nPayments);
-      interestPaid = totalMortPaid - (loanAmt - bal);
-    }
-    // Real equity: equity = futureHomeValue - bal, both at end-of-horizon
-    // dollars; deflate to today's purchasing power
-    var equityReal = toReal(equity);
-
-    var propTax = homePrice * 0.012 * horizonYrs;
-    var insurance = 150 * 12 * horizonYrs;
-    var maintenance = homePrice * 0.01 * horizonYrs;
-    var totalHouseCost = amount + totalMortPaid + propTax + insurance + maintenance;
+    var btcBought = P.btcBought, futureDays = P.futureDays, futureTrend = P.futureTrend;
+    var futureFloor = P.futureFloor, futureCeil = P.futureCeil, futurePrice = P.futurePrice;
+    var scenarioLabel;
+    if(scenario === 'floor'){ scenarioLabel = 'Floor (conservative)'; }
+    else if(scenario === 'trend'){ scenarioLabel = 'Trend (fair value)'; }
+    else { scenarioLabel = 'Upper (cycle peak)'; }
+    var btcValue = P.btcValue, btcNet = P.btcNet, btcValueReal = P.btcValueReal;
+    var futurePriceReal = P.futurePriceReal, btcNetReal = P.btcNetReal;
+    var btcReturn = P.btcReturn, btcCAGR = P.btcCAGR;
+    var futureHomeValue = P.futureHomeValue, futureHomeValueReal = P.futureHomeValueReal;
+    var bal = P.bal, equity = P.equity, interestPaid = P.interestPaid, totalMortPaid = P.totalMortPaid;
+    var equityReal = P.equityReal;
+    var propTax = P.propTax, insurance = P.insurance, maintenance = P.maintenance;
+    var totalHouseCost = P.totalHouseCost;
     // House CAGR: real appreciation rate is exactly the canonical homeApprReal
     // input (the user picked it). Display that directly rather than recomputing.
     var houseCAGR = homeApprReal.toFixed(1);
-
-    // ── HOUSES SUMMARY ──
-    // Ratio is dimension-independent: btcNet/futureHomeValue (both nominal) =
-    // btcNetReal/futureHomeValueReal. Use real values to keep the result well-
-    // defined when btcNetReal goes near zero.
-    var housesCanBuy = Math.max(0, btcNetReal / futureHomeValueReal);
-
-    // Equity % for the house card ownership visual (mortgage mode only)
-    var equityPct = futureHomeValue > 0 ? Math.round((equity / futureHomeValue) * 100) : 0;
+    var housesCanBuy = P.housesCanBuy;
+    var equityPct = P.equityPct;
 
     // ── House-ownership visual (single house icon, mirrors retrospective pattern) ──
     // Mortgage: red outline with amber fill-overlay scaled to equity %
@@ -1028,9 +965,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       if(spReal <= 0) spReal = 7;
       var inflForSp = window.ModelingAssumptions.get('inflation').value;
       var rate = window.CalcHelpers.realToNominal(spReal, inflForSp) / 100;
-      var monthlyRate = rate / 12;
       var months = s.horizonYrs * 12;
-      var spFV = monthlyRate > 0 ? s.impliedRent * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) : s.impliedRent * months;
+      var spFV = RealEstateModel.imputedRentFV(s.impliedRent, rate, months);
       var spFVReal = toReal(spFV);
       var spInvested = s.impliedRent * months;
       note.innerHTML = 'As a cash buyer, you avoid paying rent \u2014 a real benefit worth roughly <strong>'+fmt(s.impliedRent)+'/mo</strong> (75% of an equivalent mortgage). If invested monthly at '+spReal.toFixed(1)+'%/yr real (sitewide real-return assumption; ~'+(rate*100).toFixed(1)+'%/yr nominal at today\u2019s inflation), those savings compound into:';
