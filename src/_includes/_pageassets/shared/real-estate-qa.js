@@ -4,8 +4,12 @@
    REAL_ESTATE_PAIR_DESIGN.md §6 / §11; Phase 0 report §j vectors.
    Console function in the house of evParityQA / crpParityQA.
 
-   Usage (browser console, on /bitcoin-vs-real-estate or
-   /bitcoin-vs-rental-property):
+   Loading: not part of the pages' bundles. Served at
+   /qa/real-estate-qa.js (.eleventy.js passthrough) and injected only
+   when the URL carries ?qa (shared/real-estate-qa-loader.js).
+
+   Usage (browser console, on /bitcoin-vs-real-estate?qa or
+   /bitcoin-vs-rental-property?qa):
        await rePairQA.run()                 // hashes every vector
        await rePairQA.run({ expect: {...} }) // PASS/FAIL against hashes
        rePairQA.ledgerCheck()               // ledger final row = cards
