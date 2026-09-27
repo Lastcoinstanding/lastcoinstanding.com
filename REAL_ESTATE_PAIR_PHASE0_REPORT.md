@@ -2,6 +2,8 @@
 
 _2026-09-26. Phase 0 (Prompt 0) for `REAL_ESTATE_PAIR_DESIGN.md`. Read-only: no page behaviour changed. Every claim cites file:line on `main` at the branch point of `chore/real-estate-pair-phase0`. Where this report and the spec disagree, the spec says Phase 0 wins; §k lists the proposed amendments for JM to rule on. JM ratifies this report and rules R1–R10 before Prompt 1._
 
+_**Ratified 2026-09-27** with `REAL_ESTATE_PAIR_RULINGS.md`. The rulings are folded into `REAL_ESTATE_PAIR_DESIGN.md` v1.1 (amendment log §14). This report stays as the evidence record; where its §k proposals and the rulings differ, the rulings win._
+
 **Abbreviations.** BvRE = `/bitcoin-vs-real-estate`, BvRP = `/bitcoin-vs-rental-property`. Paths are shortened as follows:
 
 | Short | Full path |
