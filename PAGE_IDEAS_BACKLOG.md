@@ -777,6 +777,14 @@ _(**Retirement-funds-to-bitcoin mechanics** moved 2026-08-21 to the new **Retire
   - **Register flags:** maintain Bitcoin/bitcoin capitalisation; no staccato fragments; avoid "honest/honestly" and "load-bearing" (de-tell discipline); neutral comparative framing in any updates-strip copy.
   - **Connections:** Risks to Bitcoin (§28) — *considered and rejected as the host*; that page is about existential risk to the network in four death-modes, and holder-level custody failures would break its spine. Its "custody concentration" risk is the opposite axis (too few custodians) and is unaffected. If a cross-link is wanted, Paper Bitcoin → Risks to Bitcoin already exists via the Arguments category.
 
+### Real-estate pair
+
+_Cluster opened 2026-09-26 (JM). `/bitcoin-vs-real-estate` (the tenant's side) and `/bitcoin-vs-rental-property` (the landlord's side) revised onto one engine, one assumption surface and one results pattern._
+
+- [ ] **Real-estate pair revision** → **promoted 2026-09-26** to `REAL_ESTATE_PAIR_DESIGN.md` (build prompts: `REAL_ESTATE_PAIR_CLAUDE_CODE_PROMPTS.md`). Promotes a chat-side backlog capture; the design doc is the entry of record.
+  - **Sequence:** PR 0 Phase 0 report (`REAL_ESTATE_PAIR_PHASE0_REPORT.md`) → PR 1 BvRP sourcing fixes → PR 2 register pass → PR 3 shared-engine extraction → PRs 4–8 build (assumptions, tax regime, chart + ledger, sensitivity grid, carry + parity + bookkeeping). PRs 1–2 are the pre-Tuesday 2026-09-29 priority.
+  - **Close-out:** PR 8 marks this entry `- [x]` with SHAs and moves it to Promoted / shipped.
+
 ---
 
 ## Promoted / shipped

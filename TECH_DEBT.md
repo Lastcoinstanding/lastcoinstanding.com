@@ -198,6 +198,10 @@ _(no open items)_
 
 - [ ] **BAS multi-tab print coverage.** Scope follow-up to the print-stylesheet ship above. Tabs III (Borrow vs. Sell vs. HODL) and IV (The Math) currently print whatever's on-screen when global chrome is hidden — functional but lacks the dedicated header + summary table + disclaimer footer treatment that Loan Health gets. Right answer: per-tab print-only blocks (each tab's content gets its own pre+post scaffolding) plus a CSS rule that shows only the active tab's print blocks. Lower priority than the Loan Health surface; trigger is a user wanting to print a Borrow-vs-Sell scenario specifically.
 
+- [ ] **Sitewide real-return conversion: CPI-real presets re-inflated at M2 (logged 2026-09-27, `REAL_ESTATE_PAIR_RULINGS.md` §6).** `realReturns` presets (3 / 5 / 7) are CPI-real (STYLE_GUIDE §3.5's decomposition cites Damodaran), but pages convert them to nominal with the sitewide `inflation` default (6.5%, M2 growth) via `CalcHelpers.realToNominal`. That is the same construction error the real-estate pair's M1 corrects for home appreciation (a 3.5% CPI-real rate became 10.23% nominal). BvRE's cash-mode S&P leg (`bitcoin-vs-real-estate.js:1024–1049`) is one instance and is retired by M2. **Audit separately:** the retirement family's use of `realReturns`, and any other `realToNominal(…, inflation)` call on a CPI-real input. Out of scope for the pair build.
+
+- [ ] **Promote the Bitcoin/bitcoin capitalisation rule to STYLE_GUIDE (logged 2026-09-27, rulings C2).** The only written rule is page-local, `SITE_GUIDE §28` (Risks to Bitcoin): **Bitcoin** = the network/protocol, **bitcoin** = the monetary asset. Build prompts cite §28 for now. Promote it to a sitewide STYLE_GUIDE rule and repoint the citations.
+
 - [x] **`SITE_GUIDE.md` dedicated section for `/borrowing-against-your-stack`.** Closed 2026-05-18. Added §21 covering: editorial frame ("Compared to what?" framing premise), tab structure (4 tabs: Question / Loan Health / Borrow-vs-Sell-vs-HODL / Math), Loan Health calculator inputs + outputs + `basChannelChart`, Borrow-vs-Sell-vs-HODL three-path comparison architecture (and how it exceeds the §4.2 spec by adding the HODL baseline), The Math tab's two-stories `cagrVsRatesChart`, the UX design call (dollar-denominated loan amount + liquidation-LTV slider, vs the spec's %-borrow + LTV slider — same math, more user-honest framing), and the editorial moves (four-lender-category taxonomy, "the cautionary record" naming Celsius/BlockFi/Genesis/Voyager, HODL-as-baseline re-framing, FOR EXPLORATION ONLY disclaimer banner). Also fixed the stale "Three-tab" comment at the top of `borrowing-against-your-stack.js` (was a leftover from the pre-borrow-vs-sell scope; current page is four-tab).
 
 ## 6. Page-specific minor / design judgment
@@ -237,6 +241,8 @@ Items deferred to later phases. Trigger criteria already documented; no schedule
 - [ ] **Sequence-of-returns risk modeling (Monte Carlo).** Out of scope for v1; range bands replace it. Could be a Phase 5+ item if user demand is real.
 
 - [ ] **Marketing one-pager / saved scenarios for retirement page.** Per `RETIREMENT_CALCULATOR_DESIGN_22 §8.2` and §8.3. Ties to the URL-param scenario contract above. Trigger criteria documented.
+
+- [ ] **Zelman companion variant of the real-estate pair (logged 2026-09-27, `REAL_ESTATE_PAIR_RULINGS.md` §6).** A variant of `/bitcoin-vs-real-estate` + `/bitcoin-vs-rental-property` framed for a housing-research reader. Cheap once the pair's shared engine, assumptions, results pattern and tax regime exist (`REAL_ESTATE_PAIR_DESIGN.md` §2 fence). **Separate decision after PR 8**; not in the pair build.
 
 
 ## 8. Audit gaps (process improvements)
