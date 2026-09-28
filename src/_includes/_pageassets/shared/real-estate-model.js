@@ -555,18 +555,30 @@
   }
 
   // Projection — was the math inside runFwdCalc() in re.js.
-  //   i: { method, scenario, horizonYrs, btcNow, homePrice, homeApprReal,
-  //        inflRate, mortRate, dpf, rentOverride (number|null), endYear }
-  // Uses plPrice/PL_FLOOR/PL_CEIL (power-law-data.js) and CalcHelpers.
+  //   i: { method, scenario, horizonYrs, btcNow, homePrice, homeApprNominal,
+  //        inflRate, mortRate, dpf, rentOverride (number|null) }
+  // Uses plPrice/PL_FLOOR/PL_CEIL/GENESIS_TS (power-law-data.js) and CalcHelpers.
+  //
+  // PR 4a (rulings M1, M10):
+  //  - Home appreciation is a NOMINAL input. Everything is computed in
+  //    nominal dollars; inflRate only deflates the Real view, and it
+  //    deflates both paths by the same factor, so it can't change which
+  //    path is ahead. (It used to convert a real rate to nominal at the
+  //    sitewide inflation, and the Real view subtracted nominal rent from
+  //    deflated bitcoin.)
+  //  - Bitcoin runs the same horizon as the house: today + horizonYrs
+  //    365.25-day years (it used to stop at 1 Jan of the end year).
   function bvreProjection(i){
     var o = {};
     var method = i.method, horizonYrs = i.horizonYrs, btcNow = i.btcNow, homePrice = i.homePrice,
-        inflRate = i.inflRate, mortRate = i.mortRate, dpf = i.dpf, endYear = i.endYear;
+        inflRate = i.inflRate, mortRate = i.mortRate, dpf = i.dpf;
     function toReal(nominalFutureValue) {
       return window.CalcHelpers.deflateToToday(nominalFutureValue, inflRate, horizonYrs);
     }
-    var homeApprNominalPct = window.CalcHelpers.realToNominal(i.homeApprReal, inflRate);
+    var homeApprNominalPct = i.homeApprNominal;
     var homeAppr = homeApprNominalPct / 100;
+    // The same rate in today's dollars, for display only.
+    var homeApprRealPct = ((1 + homeAppr) / (1 + inflRate / 100) - 1) * 100;
     var amount = (method === 'cash') ? homePrice : homePrice * dpf;
     var loanAmt = homePrice * (1 - dpf);
     var mr = mortRate / 100 / 12;
@@ -576,8 +588,6 @@
     var totalRentPaid = impliedRent * 12 * horizonYrs;
 
     var btcBought = amount / btcNow;
-    // M10 (PR 4a): bitcoin runs the same horizon as the house, today +
-    // horizonYrs 365.25-day years. It used to stop at 1 Jan of the end year.
     var nowMs = Date.now();
     var futureDays = (nowMs / 1000 - GENESIS_TS) / 86400 + horizonYrs * 365.25;
     var endDateMs = nowMs + horizonYrs * 365.25 * 86400000;
@@ -593,7 +603,10 @@
     var btcNet = btcValue - totalRentPaid;
     var btcValueReal = toReal(btcValue);
     var futurePriceReal = toReal(futurePrice);
-    var btcNetReal = btcValueReal - totalRentPaid;
+    // Same factor as the house (M1): the rent netted off at the end is
+    // deflated with the value it is netted from.
+    var totalRentPaidReal = toReal(totalRentPaid);
+    var btcNetReal = toReal(btcNet);
     var btcReturn = ((btcNetReal - amount) / amount * 100).toFixed(0);
     var btcCAGR = btcNetReal > 0 ? ((Math.pow(btcNetReal/amount, 1/horizonYrs) - 1) * 100).toFixed(1) : '—';
 
@@ -616,9 +629,11 @@
     var housesCanBuy = Math.max(0, btcNetReal / futureHomeValueReal);
     var equityPct = futureHomeValue > 0 ? Math.round((equity / futureHomeValue) * 100) : 0;
 
-    o.homeApprNominalPct = homeApprNominalPct; o.homeAppr = homeAppr; o.amount = amount; o.loanAmt = loanAmt;
+    o.homeApprNominalPct = homeApprNominalPct; o.homeAppr = homeAppr; o.homeApprRealPct = homeApprRealPct;
+    o.amount = amount; o.loanAmt = loanAmt;
     o.mr = mr; o.nPayments = nPayments; o.monthlyMort = monthlyMort; o.impliedRent = impliedRent;
-    o.totalRentPaid = totalRentPaid; o.btcBought = btcBought; o.futureDays = futureDays; o.endDateMs = endDateMs;
+    o.totalRentPaid = totalRentPaid; o.totalRentPaidReal = totalRentPaidReal;
+    o.btcBought = btcBought; o.futureDays = futureDays; o.endDateMs = endDateMs;
     o.futureTrend = futureTrend; o.futureFloor = futureFloor; o.futureCeil = futureCeil; o.futurePrice = futurePrice;
     o.btcValue = btcValue; o.btcNet = btcNet; o.btcValueReal = btcValueReal; o.futurePriceReal = futurePriceReal;
     o.btcNetReal = btcNetReal; o.btcReturn = btcReturn; o.btcCAGR = btcCAGR;

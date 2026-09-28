@@ -17,7 +17,7 @@ companion: []
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-vs-rental-property-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-vs-rental-property.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-qa-loader.js' %}\n{% include '_pageassets/bitcoin-vs-rental-property.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-qa-loader.js' %}\n{% include '_pageassets/bitcoin-vs-rental-property.js' %}"
 ---
 <!-- ─── Hero ─── -->
 <section class="bvrp-hero">
@@ -739,6 +739,24 @@ eleventyComputed:
             <span class="calc-slider-val" id="val-years-held">10 yrs</span>
           </div>
           <input type="range" id="calc-years-held" min="0" max="27" step="1" value="10">
+
+          <!-- Home appreciation (PR 4a, rulings M1): the pair's shared NOMINAL
+               input, lcs.homeApprNominal; was a hardcoded 3.0%. -->
+          <div class="calc-slider-row">
+            <span class="calc-slider-name">Home appreciation <span class="calc-slider-hint">(nominal / yr)</span>
+              <span class="help-tip" tabindex="0">?<span class="tip-content">
+                How fast the property&rsquo;s value rises, in nominal terms. The presets are the recorded US rate to 2025: <strong>Since 2000</strong> 4.68% a year (S&amp;P CoreLogic Case-Shiller National; the default, and the highest of the three windows), <strong>Since 1990</strong> 4.23%, and <strong>Long run</strong> 3.41% (Shiller&rsquo;s series from 1890, chained to Case-Shiller). A national index: your market can differ. The same setting drives Bitcoin vs. Real Estate.
+              </span></span>
+            </span>
+            <input type="text" id="calc-appreciation" class="calc-appr-input" value="4.68%" inputmode="decimal" aria-label="Home appreciation, nominal percent a year">
+          </div>
+          <div class="calc-appr-presets" id="calc-appr-presets" role="group" aria-label="Home appreciation presets">
+            <button type="button" class="calc-appr-preset" data-preset="long-run">Long run<span>3.41%</span></button>
+            <button type="button" class="calc-appr-preset" data-preset="since-1990">Since 1990<span>4.23%</span></button>
+            <button type="button" class="calc-appr-preset active" data-preset="since-2000">Since 2000<span>4.68%</span></button>
+            <button type="button" class="calc-appr-preset" data-preset="custom">Custom<span>your own</span></button>
+          </div>
+          <p class="calc-appr-notice" id="calc-appr-notice" hidden></p>
         </div>
 
         <div class="calc-slider-group calc-path-specific" data-for-path="2">

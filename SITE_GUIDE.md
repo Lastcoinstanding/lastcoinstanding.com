@@ -1006,7 +1006,7 @@ field and a `fwd*` projection field):
 - **Projection:** `#fwdDownPct`, a compact field placed directly under the
   Purchase Method buttons (it parameterizes the "X% Down + Mortgage" method;
   ignored in cash mode). Carries a URL param + localStorage via the projection
-  SCHEMA (`down`, `type:'float'`, `def:20`), same as `mortgage`/`appr`. Value
+  SCHEMA (`down`, `type:'float'`, `def:20`), same as `mortgage`/`happr`. Value
   `20%` in markup.
 
 **Bounds: 3–95% (inclusive), default 20.** Documented choice: 100% is the cash-
@@ -1233,7 +1233,8 @@ Unknown params are preserved on the URL untouched — `URLSearchParams.set/delet
 | `dca` | bool | retro | `#calcDCA` | `'1'` if checked, omitted otherwise |
 | `home` | integer | proj | `#fwdHomePrice` | comma-formatted in DOM; URL strips commas; default 420000 |
 | `horizon` | integer | proj | `#fwdHorizon` | one of `5`/`10`/`15`/`20`, default 10 |
-| `appr` | decimal | proj | `#fwdHomeAppreciation` | real %/yr, default 3.5 |
+| `happr` | decimal | proj | `#fwdHomeAppreciation` | **nominal** %/yr, 2 dp (PR 4a, rulings M1/P3). Omitted when it equals the reader's own `lcs.homeApprNominal` value (4.68 unless changed); a value equal to a preset selects that preset. Not stored in `lcs.bvre.calc.v1`: the sitewide dimension is its storage |
+| `appr` | decimal | proj | — | **legacy, read once.** The pre-4a *real* rate. On load it is converted to nominal at the sitewide inflation, applied as `happr`, announced in one line under the appreciation control, and deleted from the address bar; it is never written. A stored `appr` in `lcs.bvre.calc.v1` is ignored (it was almost always the old default, 3.5) |
 | `mortgage` | decimal | proj | `#fwdMortgageRate` | nominal %, default 6.8 |
 | `method` | enum | proj | `.purchase-btn.active` | `'cash'` or `'mortgage'` (default) |
 | `pscenario` | enum | proj | `.scenario-btn.active` | `'floor'` (default), `'trend'`, or `'upper'` |

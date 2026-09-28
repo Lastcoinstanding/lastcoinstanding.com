@@ -601,10 +601,10 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     var horizonYrs = parseInt(horizonSel.value);
     var btcNow = parseNum('fwdBtcNow');
     var homePrice = parseNum('fwdHomePrice');
-    // Home appreciation input is now in REAL terms (per canonical §3.5).
-    // Combine with sitewide inflation to get nominal rate for the math below,
-    // which produces nominal future values.
-    var homeApprReal = parseNum('fwdHomeAppreciation');
+    // Home appreciation is NOMINAL, like the mortgage rate (rulings M1,
+    // PR 4a). Inflation only deflates the Real view, both paths by the
+    // same factor, so the deflator can't change which path is ahead.
+    var homeApprNominal = parseNum('fwdHomeAppreciation');
     var inflRate = window.ModelingAssumptions.get('inflation').value;
     var mortRate = parseNum('fwdMortgageRate');
     // Optional down payment % (default 20 → identity with prior behavior).
@@ -654,12 +654,12 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     var _fwdRentValid = isFinite(_fwdRentNum) && _fwdRentNum >= 100 && _fwdRentNum <= 50000;
     var P = RealEstateModel.bvreProjection({
       method: method, scenario: scenario, horizonYrs: horizonYrs, btcNow: btcNow,
-      homePrice: homePrice, homeApprReal: homeApprReal, inflRate: inflRate,
-      mortRate: mortRate, dpf: dpf, rentOverride: _fwdRentValid ? _fwdRentNum : null,
-      endYear: endYear
+      homePrice: homePrice, homeApprNominal: homeApprNominal, inflRate: inflRate,
+      mortRate: mortRate, dpf: dpf, rentOverride: _fwdRentValid ? _fwdRentNum : null
     });
     // Both paths end on the same day, horizonYrs from today (M10).
     var asOf = new Date(P.endDateMs).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+    var totalRentPaidReal = P.totalRentPaidReal;
     var homeApprNominalPct = P.homeApprNominalPct, homeAppr = P.homeAppr;
     var amount = P.amount, loanAmt = P.loanAmt, mr = P.mr, nPayments = P.nPayments;
     var monthlyMort = P.monthlyMort, impliedRent = P.impliedRent, totalRentPaid = P.totalRentPaid;
@@ -681,9 +681,11 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     var equityReal = P.equityReal;
     var propTax = P.propTax, insurance = P.insurance, maintenance = P.maintenance;
     var totalHouseCost = P.totalHouseCost;
-    // House CAGR: real appreciation rate is exactly the canonical homeApprReal
-    // input (the user picked it). Display that directly rather than recomputing.
-    var houseCAGR = homeApprReal.toFixed(1);
+    // The house's growth rate in the reader's frame: the nominal input, or
+    // what it is after the deflator in the Real view.
+    var houseRateLabel = _mode === 'real'
+      ? (P.homeApprRealPct.toFixed(1) + '%/yr real')
+      : (parseFloat(homeApprNominal.toFixed(2)) + '%/yr nominal');
     var housesCanBuy = P.housesCanBuy;
     var equityPct = P.equityPct;
 
@@ -740,7 +742,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         '<div class="detail-line">Projected BTC price: <strong>'+fmt(modeVal(futurePriceReal, futurePrice))+'</strong> <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'</span></div>' +
         '<div class="detail-line">Gross BTC value:<span class="help-tip" tabindex="0">?<span class="tip-content">Value of your BTC holdings at the projected future market price, before subtracting rent paid during the holding period.</span></span> '+fmt(modeVal(btcValueReal, btcValue))+' <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'</span></div>' +
         '<div class="detail-line">Est. monthly rent: '+fmt(impliedRent)+'/mo <span style="font-size:.78rem;color:var(--text-muted)">(75% of equivalent mortgage)</span></div>' +
-        '<div class="detail-line">Total rent paid: <span class="negative">'+fmt(totalRentPaid)+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
+        '<div class="detail-line">Total rent paid: <span class="negative">'+fmt(modeVal(totalRentPaidReal, totalRentPaid))+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated'+(_mode === 'real' ? ', deflated like the values above' : '')+'</span></div>' +
         '<div class="detail-line">Total real return: <span class="highlight">'+btcReturn+'%</span> <span style="font-size:.72rem;color:var(--text-muted)">in purchasing-power terms</span></div>' +
         (btcCAGR !== '—' ? '<div class="detail-line">Implied real CAGR: <span class="highlight">'+btcCAGR+'%</span></div>' : '') +
         '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> in '+endYear+' <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">\u2014 projected home value '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' each '+modeUnit()+', vs. '+fmt(homePrice)+' today</span></div>' +
@@ -760,7 +762,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
           '<div class="big-number">'+fmt(modeVal(equityReal, equity))+'</div>' +
           '<div class="big-number-label">'+modeBigLabel('equity')+'</div>' +
           ownershipVisual +
-          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'; '+houseCAGR+'%/yr real</span></div>' +
+          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'; '+houseRateLabel+'</span></div>' +
           '<div class="detail-line">Monthly mortgage: '+fmt(monthlyMort)+'/mo at '+mortRate+'%</div>' +
           '<div class="detail-line">Interest paid: <span class="negative">'+fmt(interestPaid)+'</span> <span style="font-size:.78rem;color:var(--text-muted)">(accumulated; not recovered at sale)</span></div>' +
           '<div class="detail-line">Remaining loan: '+(bal > 0 ? '<span class="negative">'+fmt(bal)+'</span>' : 'Paid off')+'</div>' +
@@ -778,7 +780,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
           '<div class="big-number">'+fmt(modeVal(futureHomeValueReal, futureHomeValue))+'</div>' +
           '<div class="big-number-label">'+modeBigLabel('home value')+'</div>' +
           ownershipVisual +
-          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'; '+houseCAGR+'%/yr real</span></div>' +
+          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'; '+houseRateLabel+'</span></div>' +
           '<div class="detail-line">Mortgage: $0 <span style="font-size:.78rem;color:var(--text-muted)">(no debt)</span></div>' +
           '<div class="detail-line">Interest paid: $0</div>' +
           '<div class="detail-line">Rent paid: $0 <span style="font-size:.78rem;color:var(--text-muted)">(you live in it)</span></div>' +
@@ -820,13 +822,13 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         var totalBtcValueNominal = totalBtcBought * futurePrice;
         var totalBtcValueReal = toReal(totalBtcValueNominal);
         // Component breakdown for the inline math sub-line. The headline
-        // totalBtcNetReal equals btcLumpReal + dcaValueReal − totalRentPaid
-        // (totalRentPaid stays nominal per the established convention for
-        // accumulated payment streams; same mixing used in retrospective).
+        // totalBtcNetReal equals btcLumpReal + dcaValueReal − the deflated rent.
         var btcLumpReal = toReal(btcBought * futurePrice);
         var dcaValueReal = toReal(dcaResult.dcaBtc * futurePrice);
-        var totalBtcNetReal = totalBtcValueReal - totalRentPaid;
         var totalBtcNetNominal = totalBtcValueNominal - totalRentPaid;
+        // One factor for everything in the Real view (M1, PR 4a): the rent
+        // netted off is deflated with the values it is netted from.
+        var totalBtcNetReal = toReal(totalBtcNetNominal);
         var totalInvestedCash = amount + dcaResult.dcaInvested;
         var btcOutflowAugmented = totalInvestedCash + totalRentPaid;
         var housesCanBuyAugmented = Math.max(0, totalBtcNetReal / futureHomeValueReal);
@@ -865,7 +867,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
           '<div style="background:var(--bg-card);border:1px solid var(--amber-dim);border-radius:8px;padding:1.5rem 2rem">'
           + '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);margin-bottom:0.5rem">\u20BF Bitcoin \u2014 Total Position</div>'
           + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.15rem;line-height:1.1">' + fmt(modeVal(totalBtcNetReal, totalBtcNetNominal)) + ' <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400">net</span></div>'
-          + '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.6rem;font-style:italic">= ' + fmt(modeVal(btcLumpReal, btcBought*futurePrice)) + ' gross BTC + ' + fmt(modeVal(dcaValueReal, dcaResult.dcaBtc*futurePrice)) + ' DCA \u2212 ' + fmt(totalRentPaid) + ' rent <span style="font-size:0.72rem">(' + modeUnit() + ')</span></div>'
+          + '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.6rem;font-style:italic">= ' + fmt(modeVal(btcLumpReal, btcBought*futurePrice)) + ' gross BTC + ' + fmt(modeVal(dcaValueReal, dcaResult.dcaBtc*futurePrice)) + ' DCA \u2212 ' + fmt(modeVal(toReal(totalRentPaid), totalRentPaid)) + ' rent <span style="font-size:0.72rem">(' + modeUnit() + ')</span></div>'
           + bhVisual
           + '<div style="font-size:0.78rem;color:var(--amber-dim);margin-bottom:0.6rem">projected to ' + asOf + ' \u2014 ' + scenarioLabel + ' \u00b7 lump sum + DCA</div>'
           + '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'
@@ -1008,9 +1010,10 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         el.value = '$' + Math.round(n).toLocaleString();
       });
     }
-    function bindPercent(id){
+    function bindPercent(id, dp){
       var el = document.getElementById(id);
       if(!el) return;
+      var f = Math.pow(10, dp || 1);
       el.addEventListener('blur', function(){
         var raw = (el.value || '').replace(/[^0-9.\-]/g, '');
         if(!raw){ el.value = ''; return; }
@@ -1018,34 +1021,76 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         if(!isFinite(n)){ el.value = ''; return; }
         // One decimal place — matches the rate-style convention used
         // for retrospective's custom-rate input and the canonical inputs.
-        el.value = (Math.round(n * 10) / 10) + '%';
+        // Home appreciation keeps two (its presets are 3.41 / 4.23 / 4.68).
+        el.value = (Math.round(n * f) / f) + '%';
       });
     }
     bindMoney('fwdHomePrice');
     bindMoney('fwdBtcNow');
     bindMoney('fwdMonthlyRent');
-    bindPercent('fwdHomeAppreciation');
+    bindPercent('fwdHomeAppreciation', 2);
     bindPercent('fwdMortgageRate');
     bindPercent('fwdAdvancedRate');
     bindPercent('fwdDownPct');
+    bindPercent('fwdInflCustom', 2);
   })();
   horizonSel.addEventListener('change', runFwdCalc);
   document.getElementById('fwdAdvancedCheck').addEventListener('change', runFwdCalc);
 
   // ── Canonical integration (per STYLE_GUIDE §3.5) ──
-  // Real estate appreciation input is bound to lcs.realEstate canonical.
-  // S&P advanced rate input is bound to lcs.realReturns canonical.
-  // Both are REAL terms; the math above converts to nominal for the existing
-  // calc (Stage 5b will convert outputs to real-primary display).
+  // Home appreciation is bound to lcs.homeApprNominal (NOMINAL, PR 4a /
+  // rulings M1); the preset chips in the Baseline assumptions block pick
+  // it, and a typed value selects the matching preset or Custom. The
+  // deflator chips there pick lcs.inflation, which drives only the Real
+  // view (P5). The S&P advanced rate stays bound to lcs.realReturns (real;
+  // retired with the cash-mode leg by M2).
+  var MA = window.ModelingAssumptions;
+  var INFL_NAMES = { 'cpi-official': 'CPI', 'm2-growth': 'M2 growth', 'shadow-stats': 'Shadow Stats', 'custom': 'custom' };
+  var APPR_NAMES = { 'long-run': 'long run, since 1890', 'since-1990': 'since 1990', 'since-2000': 'since 2000', 'custom': 'custom' };
+  function pct2(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
 
   function syncFwdHomeApprFromCanonical(){
-    var current = window.ModelingAssumptions.get('realEstate');
+    var current = MA.get('homeApprNominal');
     var input = document.getElementById('fwdHomeAppreciation');
     if(input && parseFloat(input.value) !== current.value) {
-      // Apply % format to match the blur formatter (consistent appearance
-      // whether the value comes from canonical, URL/storage, or user edit).
-      input.value = (Math.round(current.value * 10) / 10) + '%';
+      // Two decimals: the presets are 3.41 / 4.23 / 4.68.
+      input.value = pct2(current.value);
     }
+    syncBaselineChips();
+  }
+
+  // Chips, the Real label and the collapsed block's one-line summary all
+  // read the canonical state, so they can't disagree with the numbers.
+  function syncBaselineChips(){
+    var appr = MA.get('homeApprNominal'), infl = MA.get('inflation');
+    document.querySelectorAll('#fwdApprPresets .re-preset-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-preset') === appr.preset);
+    });
+    document.querySelectorAll('#fwdInflPresets .re-preset-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-preset') === infl.preset);
+    });
+    var customRow = document.getElementById('fwdInflCustomRow');
+    if(customRow) customRow.hidden = infl.preset !== 'custom';
+    var customIn = document.getElementById('fwdInflCustom');
+    if(customIn && infl.preset === 'custom' && document.activeElement !== customIn) customIn.value = pct2(infl.value);
+    var deflLine = document.getElementById('fwdDeflatorLine');
+    if(deflLine) deflLine.textContent = 'Real: today’s dollars, deflated at ' + pct2(infl.value) + ' a year (' + INFL_NAMES[infl.preset] + ').';
+    var hint = document.getElementById('fwdBaselineHint');
+    if(hint) hint.textContent = 'home prices ' + pct2(appr.value) + ' a year nominal (' + APPR_NAMES[appr.preset] + ') · Real view deflated at ' + pct2(infl.value) + ' (' + INFL_NAMES[infl.preset] + ')';
+    var note = document.getElementById('fwdApprNotice');
+    if(note){
+      var n = MA.migrationNote && MA.migrationNote();
+      var msg = legacyLinkNote || (n ? ('Your saved home appreciation, ' + pct2(n.real) + ' a year real, was converted to ' + pct2(n.nominal) + ' nominal at the ' + pct2(n.inflation) + ' inflation assumption. The calculator now takes appreciation in nominal terms.') : '');
+      note.textContent = msg;
+      note.hidden = !msg;
+    }
+  }
+  // Set by the URL reader when a link carried the pre-4a real `appr`.
+  var legacyLinkNote = '';
+  window._bvreLegacyApprNote = function(msg){ legacyLinkNote = msg; syncBaselineChips(); };
+  function clearApprNotes(){
+    legacyLinkNote = '';
+    if(MA.clearMigrationNote) MA.clearMigrationNote();
   }
   function syncFwdAdvancedRateFromCanonical(){
     var current = window.ModelingAssumptions.get('realReturns');
@@ -1058,9 +1103,56 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   var apprInput = document.getElementById('fwdHomeAppreciation');
   if(apprInput){
     apprInput.addEventListener('change', function(){
-      var v = parseFloat(apprInput.value);
+      var v = parseFloat(String(apprInput.value).replace(/[%\s]/g, ''));
       if(isFinite(v)) {
-        window.ModelingAssumptions.set('realEstate', 'custom', v);
+        // A value equal to a preset selects that preset, so restoring a
+        // default never writes a spurious "custom" (the pre-4a trap).
+        var pre = MA.presetFor('homeApprNominal', v);
+        var cur = MA.get('homeApprNominal');
+        if(pre !== cur.preset || (pre === 'custom' && v !== cur.value)) {
+          clearApprNotes();
+          if(pre === 'custom') MA.set('homeApprNominal', 'custom', v); else MA.set('homeApprNominal', pre);
+        }
+      }
+    });
+  }
+  document.querySelectorAll('#fwdApprPresets .re-preset-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var pre = b.getAttribute('data-preset');
+      clearApprNotes();
+      if(pre === 'custom'){
+        // Keep the current value as the custom starting point, then let
+        // the reader type over it.
+        MA.set('homeApprNominal', 'custom', MA.get('homeApprNominal').value);
+        if(apprInput){ apprInput.focus(); apprInput.select && apprInput.select(); }
+      } else {
+        MA.set('homeApprNominal', pre);
+      }
+      // The subscription has already written the value into the input;
+      // this lets the URL writer (which listens on the input) record it.
+      if(apprInput) apprInput.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  });
+  document.querySelectorAll('#fwdInflPresets .re-preset-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var pre = b.getAttribute('data-preset');
+      if(pre === 'custom'){
+        MA.set('inflation', 'custom', MA.get('inflation').value);
+        var ci = document.getElementById('fwdInflCustom');
+        syncBaselineChips();
+        if(ci){ ci.focus(); ci.select && ci.select(); }
+      } else {
+        MA.set('inflation', pre);
+      }
+    });
+  });
+  var inflCustomIn = document.getElementById('fwdInflCustom');
+  if(inflCustomIn){
+    inflCustomIn.addEventListener('change', function(){
+      var v = parseFloat(String(inflCustomIn.value).replace(/[%\s]/g, ''));
+      if(isFinite(v)){
+        var pre = MA.presetFor('inflation', v);
+        if(pre === 'custom') MA.set('inflation', 'custom', v); else MA.set('inflation', pre);
       }
     });
   }
@@ -1081,9 +1173,9 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   // Subscribe to canonical changes (cross-tab, reset events)
   if(window.ModelingAssumptions && window.ModelingAssumptions.subscribe){
     window.ModelingAssumptions.subscribe(function(dim){
-      if(dim === 'realEstate' || dim === '*') syncFwdHomeApprFromCanonical();
+      if(dim === 'homeApprNominal' || dim === '*') syncFwdHomeApprFromCanonical();
       if(dim === 'realReturns' || dim === '*') syncFwdAdvancedRateFromCanonical();
-      if(dim === 'inflation' || dim === '*') runFwdCalc();
+      if(dim === 'inflation' || dim === '*') syncBaselineChips();
       runFwdCalc();
     });
   }
@@ -1189,7 +1281,10 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 //   Projection:
 //     home       integer (USD)            default 420000
 //     horizon    integer 5|10|15|20       default 10
-//     appr       decimal (home appr %)    default 3.5
+//     happr      decimal (NOMINAL home appreciation %, 2dp)  default = the
+//                reader's lcs.homeApprNominal value (4.68 unless changed);
+//                not stored in lcs.bvre.calc.v1 (PR 4a)
+//     appr       legacy, pre-4a REAL rate: read once, converted, never written
 //     mortgage   decimal (mortgage %)     default 6.8
 //     down       decimal (down payment %) default 20
 //     method     'cash' | 'mortgage'      default 'mortgage'
@@ -1224,7 +1319,12 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     dca:       { elId: 'calcDCA',              type: 'bool',                    evt: 'change' },
     home:      { elId: 'fwdHomePrice',         type: 'thousands', def: 420000,  evt: 'input'  },
     horizon:   { elId: 'fwdHorizon',           type: 'int',       def: 10,      evt: 'change' },
-    appr:      { elId: 'fwdHomeAppreciation',  type: 'float',     def: 3.5,     evt: 'input'  },
+    // Nominal home appreciation (PR 4a, rulings M1/P3): a NEW name, because
+    // the quantity is new. The pre-4a `appr` was real; init() reads a legacy
+    // `appr` once, converts it, and never writes it. Not persisted here:
+    // lcs.homeApprNominal (ModelingAssumptions) is its storage, and `def`
+    // is set from it in init().
+    happr:     { elId: 'fwdHomeAppreciation',  type: 'float',     def: 4.68,    evt: 'input', dp: 2, persist: false },
     mortgage:  { elId: 'fwdMortgageRate',      type: 'float',     def: 6.8,     evt: 'input'  },
     down:      { elId: 'fwdDownPct',           type: 'float',     def: 20,      evt: 'input'  },
     advanced:  { elId: 'fwdAdvancedCheck',     type: 'bool',                    evt: 'change' },
@@ -1264,7 +1364,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     if (spec.type === 'bool') return el.checked ? 1 : 0;
     if (spec.type === 'thousands') return parseThousands(el.value);
     if (spec.type === 'int')   return parseInt(el.value, 10);
-    if (spec.type === 'float') return parseFloat(el.value);
+    if (spec.type === 'float') return parseFloat(String(el.value).replace(/[%\s]/g, ''));
     return el.value;
   }
 
@@ -1300,7 +1400,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       if (!isFinite(f)) return;
       // Apply % suffix on rehydration — matches the blur formatter, so
       // first-load appearance is consistent with edited appearance.
-      el.value = (Math.round(f * 10) / 10) + '%';
+      var _p = Math.pow(10, spec.dp || 1);
+      el.value = (Math.round(f * _p) / _p) + '%';
     } else {
       el.value = String(raw);
     }
@@ -1444,20 +1545,49 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     });
   }
 
+  // A link made before PR 4a may carry `appr`, a REAL rate. Read it once:
+  // convert to nominal at the sitewide inflation, apply it as `happr`,
+  // say so in one line, and drop `appr` from the address bar (P3).
+  function readLegacyAppr() {
+    var params = new URLSearchParams(window.location.search);
+    if (!params.has('appr')) return;
+    var real = parseFloat(params.get('appr'));
+    params.delete('appr');
+    if (isFinite(real) && !params.has('happr') && window.ModelingAssumptions) {
+      var infl = window.ModelingAssumptions.get('inflation').value;
+      var nominal = Math.round(((1 + real / 100) * (1 + infl / 100) - 1) * 10000) / 100;
+      _suppressWriter = true;
+      try { applyValue('happr', nominal); } finally { _suppressWriter = false; }
+      var r2 = function(v){ return parseFloat(Number(v).toFixed(2)) + '%'; };
+      if (window._bvreLegacyApprNote) window._bvreLegacyApprNote('This link used an older format: its ' + r2(real) + ' a year real home appreciation was converted to ' + r2(nominal) + ' nominal at the ' + r2(infl) + ' inflation assumption.');
+    }
+    if (window.history && window.history.replaceState) {
+      var qs = params.toString();
+      window.history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
+    }
+  }
+
   function init() {
     // Single-source the advrate default from the canonical assumption that
     // actually drives the input, so the writer can recognise an untouched value.
     try {
       var _rr = window.ModelingAssumptions && window.ModelingAssumptions.get('realReturns');
       if (_rr && isFinite(_rr.value)) SCHEMA.advrate.def = _rr.value;
+      // happr: omitted from links when it equals the reader's own canonical
+      // value, the same way advrate is.
+      var _ha = window.ModelingAssumptions && window.ModelingAssumptions.get('homeApprNominal');
+      if (_ha && isFinite(_ha.value)) SCHEMA.happr.def = _ha.value;
     } catch (e) { /* shared module absent — markup default stands */ }
 
     // Read order matters: storage is the base layer, URL overrides
     // per-key when present. So a shared link with ?home=420000 wins
     // for that param but leaves storage-restored year/horizon/etc.
-    // intact for any param the URL didn't specify.
+    // intact for any param the URL didn't specify. A stored pre-4a `appr`
+    // (real) is simply not in SCHEMA any more, so it is never read, and the
+    // next syncStorage() writes the blob without it.
     readStorageIntoInputs();
     readUrlIntoInputs();
+    readLegacyAppr();
 
     // ── DOM-sync of JS state from active buttons ─────────────────────
     // applyValue() skips btn.click() when the target button is already

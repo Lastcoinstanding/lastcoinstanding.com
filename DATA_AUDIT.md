@@ -42,10 +42,17 @@ Citations behind the sitewide modeling-assumption presets. See `STYLE_GUIDE.md �
 
 ### Real estate appreciation
 
+**Nominal since PR 4a (2026-09-28; REAL_ESTATE_PAIR_RULINGS M1 and §7).** The sitewide dimension is `homeApprNominal` (STYLE_GUIDE §3.5); RE-3–RE-5 are its presets. RE-1 and RE-2 are the real rates, kept for reference and **corrected** here: RE-2's "~3.7% real" did not reproduce, and RE-1's ~0.4% came from a series ending in 2017. Method for all five: compound annual rate on **annual averages** of monthly data, end point = latest full year; computations in `REAL_ESTATE_PAIR_PR4_SOURCES.md` § M1, reproducible with `scripts/verify-real-estate-sources.py`.
+
 | # | Component | Value | Source | URL | Last audited | Next due |
 |---|---|---|---|---|---|---|
-| RE-1 | Case-Shiller US National HPI, real terms, 1890–2024 | ~0.4% real | Robert Shiller online data | http://www.econ.yale.edu/~shiller/data.htm | 2026-05-02 | 2026-11-02 |
-| RE-2 | Case-Shiller US National HPI, real terms, 2000–2024 | ~3.7% real | S&P CoreLogic Case-Shiller US National | https://www.spglobal.com/spdji/en/indices/indicators/sp-corelogic-case-shiller-us-national-home-price-nsa-index/ | 2026-05-02 | 2026-11-02 |
+| RE-1 | US home prices, real (CPI), 1890–2022 | **0.59% real** (was "~0.4%, 1890–2024": that figure ended in 2017) | Shiller, *Irrational Exuberance* housing data, real index (sheet `Data`, col 1) | http://www.econ.yale.edu/~shiller/data/Fig3-1.xls | 2026-09-28 | 2027-03-28 |
+| RE-2 | Case-Shiller US National, real (CPI-U), 2000–2024 | **2.19% real** (was "~3.7%", which does not reproduce); 2.09% to 2025 | FRED `CSUSHPINSA` deflated by FRED `CPIAUCNS` (2025 has 11 months; October 2025 is blank) | https://fred.stlouisfed.org/series/CSUSHPINSA · https://fred.stlouisfed.org/series/CPIAUCNS | 2026-09-28 | 2027-03-28 |
+| RE-3 | Home appreciation preset **Long run** (nominal), 1890–2025 | **3.41%** a year (×92.41 over 135 years) | Shiller nominal index 1890–2022 (sheet `Data`, col 8), chained to FRED `CSUSHPINSA` 2022–2025; splice checked: the two agree to within 0.06% over 1990–2022 | http://www.econ.yale.edu/~shiller/data/Fig3-1.xls · https://fred.stlouisfed.org/series/CSUSHPINSA | 2026-09-28 | 2027-03-28 |
+| RE-4 | Home appreciation preset **Since 1990** (nominal), 1990–2025 | **4.23%** a year (×4.270 over 35 years) | S&P CoreLogic Case-Shiller U.S. National Home Price Index, NSA (FRED `CSUSHPINSA`) | https://fred.stlouisfed.org/series/CSUSHPINSA | 2026-09-28 | 2027-03-28 |
+| RE-5 | Home appreciation preset **Since 2000** (nominal; the default), 2000–2025 | **4.68%** a year (×3.135 over 25 years) | S&P CoreLogic Case-Shiller U.S. National Home Price Index, NSA (FRED `CSUSHPINSA`) | https://fred.stlouisfed.org/series/CSUSHPINSA | 2026-09-28 | 2027-03-28 |
+
+**Refresh (RE-1–RE-5):** once a year, when the latest full year's twelve Case-Shiller months are published (about March). Run `scripts/verify-real-estate-sources.py`, move the end point to the new full year, and update the three preset values in `shared/modeling-assumptions.js` and STYLE_GUIDE §3.5 in the same commit. If Since 2000 stops being the highest of the three windows, the default rule (rulings M1: the judgment call leans against bitcoin's case) needs a fresh ruling rather than a silent change.
 
 ---
 

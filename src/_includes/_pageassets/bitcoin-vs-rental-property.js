@@ -167,7 +167,10 @@
     propertiesRetained: 2,     // derived sold = numProperties - propertiesRetained
     portfolio: { strc: 45, sata: 30, ledn: 10, spot: 15 },
     includeSweatEquity: false,
-    appreciationPct: 3.0       // RE annual appreciation
+    // Nominal home appreciation, %/yr. The pair's shared input,
+    // lcs.homeApprNominal (PR 4a, rulings M1); was a hardcoded 3.0.
+    // bindAppreciation() sets it from ModelingAssumptions before first render.
+    appreciationPct: 4.68
   };
 
   // ─── Engine: shared/real-estate-model.js ───
@@ -803,6 +806,61 @@
     });
   }
 
+  // Home appreciation (PR 4a): chips + a typed value, both writing the
+  // shared nominal dimension. A typed value equal to a preset selects the
+  // preset. The one-line notice shows a pre-4a real value's conversion
+  // (ModelingAssumptions.migrationNote) until the reader next changes it.
+  function bindAppreciation(){
+    var MA = window.ModelingAssumptions;
+    var input = document.getElementById('calc-appreciation');
+    if (!MA || !input) return;
+    function pct2(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
+    function sync(){
+      var a = MA.get('homeApprNominal');
+      state.appreciationPct = a.value;
+      if (document.activeElement !== input) input.value = pct2(a.value);
+      document.querySelectorAll('#calc-appr-presets .calc-appr-preset').forEach(function(b){
+        b.classList.toggle('active', b.dataset.preset === a.preset);
+      });
+      var note = document.getElementById('calc-appr-notice');
+      var n = MA.migrationNote && MA.migrationNote();
+      if (note) {
+        note.textContent = n ? ('Your saved home appreciation, ' + pct2(n.real) + ' a year real, was converted to ' + pct2(n.nominal) + ' nominal at the ' + pct2(n.inflation) + ' inflation assumption. The calculator now takes appreciation in nominal terms.') : '';
+        note.hidden = !n;
+      }
+    }
+    function commit(v){
+      var pre = MA.presetFor('homeApprNominal', v);
+      if (MA.clearMigrationNote) MA.clearMigrationNote();
+      if (pre === 'custom') MA.set('homeApprNominal', 'custom', v); else MA.set('homeApprNominal', pre);
+    }
+    input.addEventListener('input', function(){
+      var v = parseFloat(String(input.value).replace(/[%\s]/g, ''));
+      if (isFinite(v)) { state.appreciationPct = v; rerender(); }
+    });
+    input.addEventListener('change', function(){
+      var v = parseFloat(String(input.value).replace(/[%\s]/g, ''));
+      if (isFinite(v)) commit(v);
+      input.value = pct2(state.appreciationPct);
+    });
+    document.querySelectorAll('#calc-appr-presets .calc-appr-preset').forEach(function(b){
+      b.addEventListener('click', function(){
+        var pre = b.dataset.preset;
+        if (MA.clearMigrationNote) MA.clearMigrationNote();
+        if (pre === 'custom') {
+          MA.set('homeApprNominal', 'custom', MA.get('homeApprNominal').value);
+          input.focus(); if (input.select) input.select();
+        } else {
+          MA.set('homeApprNominal', pre);
+        }
+      });
+    });
+    MA.subscribe(function(dim){
+      if (dim === 'homeApprNominal' || dim === '*') { sync(); rerender(); }
+    });
+    sync();
+  }
+
   function bindPortfolioSliders(){
     // Portfolio composition sliders — must sum to 100
     var keys = ['strc', 'sata', 'ledn', 'spot'];
@@ -874,6 +932,7 @@
     bindPathToggle();
     bindCAGRChips();
     bindZoomToggle();
+    bindAppreciation();
 
     // Initial: show path-4 group, hide others
     document.querySelectorAll('.calc-path-specific').forEach(function(grp){

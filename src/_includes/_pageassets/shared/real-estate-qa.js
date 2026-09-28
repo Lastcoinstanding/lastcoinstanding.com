@@ -19,7 +19,7 @@
    and hashes the rendered output:
      - Date.now → 2026-09-27T12:00Z; BTC → $100,000 (fwdBtcNow on
        BvRE, TODAY_PRICE on BvRP); ModelingAssumptions → inflation
-       m2-growth, realEstate recent-decades, realReturns diversified;
+       m2-growth, homeApprNominal since-2000, realReturns diversified;
      - captures result-container innerHTML and Chart.js dataset arrays
        (labels, data at full precision, hidden flags);
      - hashes each vector's capture (FNV-1a 32) and all of them
@@ -29,6 +29,14 @@
 
    The same file is pasted into the console on the pre-refactor page
    to produce the "before" hashes; the refactor PR records both.
+
+   Vector mapping across PRs (a figure-changing PR compares like with
+   like by vector ID; where a control's meaning changes, it is noted here):
+     PR 4a (M1, M10) — `appr` is now NOMINAL home appreciation. The pinned
+       dimension is homeApprNominal (was the real `realEstate`). E6–E11 and
+       E13 carry the new default, 4.68 (was 3.5 real, 10.23% nominal at
+       M2); E12 keeps its number, 1.0, now nominal. BvRP vectors gain
+       `appr` 4.68 (was a hardcoded 3.0).
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -75,7 +83,7 @@
     { id: 'E5', desc: 'retro 2019, home $750,000, DCA on', year: '2019', home: '750000', dca: true }
   ];
   var PROJ_BASE = { scenario: 'trend', method: 'mortgage', down: '20', home: '420000', horizon: '10',
-                    appr: '3.5', rate: '6.8', rent: '', advanced: false, display: 'real', infl: 'm2-growth' };
+                    appr: '4.68', rate: '6.8', rent: '', advanced: false, display: 'real', infl: 'm2-growth' };
   var PROJ = [
     { id: 'E6',  desc: 'proj defaults ($420K, 10y, trend, mortgage 20%, Real)' },
     { id: 'E7',  desc: 'proj defaults, Nominal display', display: 'nominal' },
@@ -106,7 +114,7 @@
   function applyProj(v){
     var x = Object.assign({}, PROJ_BASE, v);
     var MA = window.ModelingAssumptions;
-    MA.set('inflation', x.infl); MA.set('realEstate', 'recent-decades'); MA.set('realReturns', 'diversified');
+    MA.set('inflation', x.infl); MA.set('homeApprNominal', 'since-2000'); MA.set('realReturns', 'diversified');
     click('.purchase-btn[data-method="' + x.method + '"]');   // also resets the advanced box
     click('.scenario-btn[data-scenario="' + x.scenario + '"]');
     click('.display-mode-btn[data-mode="' + x.display + '"]');
@@ -141,7 +149,7 @@
   // ─── BvRP ──────────────────────────────────────────────────────────
   var RP_BASE = { path: '4', scenario: 'trend', value: '500000', yld: '4.4', hold: '10', basis: '60', held: '10',
                   state: 'OTHER', bracket: '24', ltv: '80', helocRate: '9.5', mortgage: '200000',
-                  props: '3', retained: '2', port: [45, 30, 10, 15] };
+                  props: '3', retained: '2', port: [45, 30, 10, 15], appr: '4.68' };
   var RP = [
     { id: 'P1',  desc: 'defaults (Path 4, trend, $500K, 4.4%, 10y, OTHER, 24%)' },
     { id: 'P2',  desc: 'Path 1', path: '1' },
@@ -162,7 +170,9 @@
   ];
   function applyRp(v){
     var x = Object.assign({}, RP_BASE, v);
+    if (window.ModelingAssumptions) window.ModelingAssumptions.set('homeApprNominal', 'since-2000');
     click('.calc-path-btn[data-path="' + x.path + '"]');
+    setVal('calc-appreciation', x.appr);                      // input only, as on BvRE
     setVal('calc-property-value', x.value); setVal('calc-net-yield', x.yld); setVal('calc-holding-years', x.hold);
     setVal('calc-adjusted-basis', x.basis); setVal('calc-years-held', x.held);
     setVal('calc-state', x.state, ['change']); setVal('calc-bracket', x.bracket, ['change']);
@@ -197,7 +207,7 @@
     // Save state
     var saved = { now: Date.now, url: location.pathname + location.search + location.hash, store: null, ma: {}, today: window.TODAY_PRICE };
     try { saved.store = localStorage.getItem('lcs.bvre.calc.v1'); } catch (e) {}
-    if (window.ModelingAssumptions) ['inflation', 'realEstate', 'realReturns'].forEach(function(d){ saved.ma[d] = window.ModelingAssumptions.get(d); });
+    if (window.ModelingAssumptions) ['inflation', 'homeApprNominal', 'realReturns'].forEach(function(d){ saved.ma[d] = window.ModelingAssumptions.get(d); });
 
     Date.now = function(){ return FIXED_NOW; };
     var rows = [], all = [];
