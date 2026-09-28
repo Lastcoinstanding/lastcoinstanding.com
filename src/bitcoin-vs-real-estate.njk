@@ -253,19 +253,11 @@ eleventyComputed:
                         </div>
                     </div>
 
-                    <!-- Down payment % — parameterizes the "X% Down + Mortgage" method (ignored in cash mode) -->
-                    <div id="fwdDownPctRow" style="margin-bottom:1.2rem;max-width:280px">
-                        <div class="calc-field">
-                            <label>Down Payment <span class="opt">(%)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Share of the home price paid up front; the remainder is financed over a 30-year fixed mortgage. Default 20%. A smaller down payment means more leverage &mdash; a smaller up-front bitcoin-equivalent, but a larger loan and monthly payment; a larger one means less. The default rent estimate (75% of the mortgage payment) tracks this. Range 3&ndash;95%.</span></span></label>
-                            <input type="text" id="fwdDownPct" value="20%" inputmode="decimal">
-                        </div>
-                    </div>
-
                     <!-- Primary Inputs -->
                     <div class="calc-grid">
                         <div class="calc-field">
-                            <label>Home Price Today</label>
-                            <input type="text" id="fwdHomePrice" value="$420,000" inputmode="numeric">
+                            <label>Home Price Today<span class="help-tip" tabindex="0">?<span class="tip-content">The default, $415,000, is the 2025 median price of <strong>new</strong> houses sold in the US (Census/HUD, FRED <em>MSPUS</em>), rounded. Enter your own.</span></span></label>
+                            <input type="text" id="fwdHomePrice" value="$415,000" inputmode="numeric">
                         </div>
                         <div class="calc-field">
                             <label>Time Horizon<span class="help-tip" tabindex="0">?<span class="tip-content">How far into the future to project. Longer horizons give the Power Law model more compounding to work with &mdash; and more uncertainty. Both paths (bitcoin and house) are evaluated at the same future date so the comparison is apples-to-apples.</span></span></label>
@@ -276,22 +268,11 @@ eleventyComputed:
                             <input type="text" id="fwdBtcNow" value="" inputmode="numeric" placeholder="fetching live price&hellip;">
                         </div>
                     </div>
-                    <div class="calc-grid">
-                        <div class="calc-field" id="fwdMortgageRateField">
-                            <label>Mortgage Rate <span class="opt">(nominal)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Annual interest rate on a 30-year fixed mortgage, in <strong>nominal</strong> terms (as quoted by lenders). The calculator assumes a 30-year fixed-rate amortization. The default 6.8% tracks recent US averages; check current quotes for your situation.</span></span></label>
-                            <input type="text" id="fwdMortgageRate" value="6.8%" inputmode="decimal">
-                        </div>
-                        <div class="calc-field" id="fwdMonthlyRentField">
-                            <label>Your Monthly Rent <span class="opt">(optional)</span><span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content">Override the default rent assumption (75% of an equivalent mortgage payment). Leave blank to use the default &mdash; the default updates live as you change home price and mortgage rate. Used to compute &ldquo;total rent paid&rdquo; over the projection horizon for the bitcoin + rent path.</span></span></label>
-                            <input type="text" id="fwdMonthlyRent" value="" inputmode="numeric" placeholder="$3,150 (75% of mortgage)">
-                        </div>
-                    </div>
+                    <div class="footnote-date" id="fwdInvestmentFootnote">Both households pay the same: the buyer&rsquo;s up-front cash goes into bitcoin for the renter, and each month the renter matches the owner&rsquo;s costs with rent plus bitcoin (details under the results). Prices, rates, rent and costs are nominal, as quoted; inflation only converts the results to today&rsquo;s dollars in the Real view. Both paths run the same horizon from today.</div>
 
-                    <div class="footnote-date" id="fwdInvestmentFootnote">Home prices, the mortgage rate and rent are all in nominal dollars, as they are quoted. Inflation only converts the results to today&rsquo;s dollars in the Real view. Your up-front investment comes from the home price and purchase method. Both paths run the same horizon from today.</div>
-
-                    <!-- Baseline assumptions (PR 4a; rulings M1, P5, design §7). BvRP's
-                         two-tier pattern: set once, then ignore. PR 4b adds the cost and
-                         rent inputs here. -->
+                    <!-- Baseline assumptions (PR 4a/4b; rulings M1, M4-M6, P5, design §7).
+                         BvRP's two-tier pattern: set once, then ignore. Blank fields use the
+                         sourced default shown as their placeholder (RealEstateModel.PAIR_DEFAULTS). -->
                     <details class="re-baseline" id="fwdBaseline">
                         <summary><span class="re-baseline-label">Baseline assumptions</span> <span class="re-baseline-hint" id="fwdBaselineHint">home prices 4.68% a year nominal (since 2000) &middot; Real view deflated at 6.5% (M2 growth)</span></summary>
                         <div class="re-baseline-body">
@@ -316,6 +297,66 @@ eleventyComputed:
                                 </div>
                                 <div class="calc-field re-baseline-input" id="fwdInflCustomRow" hidden><input type="text" id="fwdInflCustom" inputmode="decimal" aria-label="Custom inflation, percent a year"></div>
                             </div>
+                            <div class="re-baseline-group">
+                                <div class="re-baseline-group-label">The mortgage</div>
+                                <div class="re-field-grid">
+                                    <div class="calc-field" id="fwdDownPctRow">
+                                        <label for="fwdDownPct">Down payment <span class="opt">(%)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Share of the price paid up front; the rest is a 30-year fixed mortgage. Default 20%. The renter puts the same up-front cash (down payment plus closing costs) into bitcoin. Range 3&ndash;95%.</span></span></label>
+                                        <input type="text" id="fwdDownPct" value="20%" inputmode="decimal">
+                                    </div>
+                                    <div class="calc-field" id="fwdMortgageRateField">
+                                        <label for="fwdMortgageRate">Mortgage rate <span class="opt">(nominal)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Annual rate on a 30-year fixed mortgage, as lenders quote it. The default 6.8% tracks recent US averages; check current quotes for your situation.</span></span></label>
+                                        <input type="text" id="fwdMortgageRate" value="6.8%" inputmode="decimal">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="re-baseline-group">
+                                <div class="re-baseline-group-label">Rent</div>
+                                <div class="re-field-grid">
+                                    <div class="calc-field" id="fwdMonthlyRentField">
+                                        <label for="fwdMonthlyRent">Monthly rent <span class="opt">(year 1)</span><span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content">Blank uses <strong>market rent</strong> for this price: price &divide; 12 &divide; 15.77, the US price-to-rent ratio from Zillow&rsquo;s typical home value (ZHVI) and rent index (ZORI), August 2026. On $415,000 that is $2,193 a month. Enter your own rent to override it.</span></span></label>
+                                        <input type="text" id="fwdMonthlyRent" value="" inputmode="numeric" placeholder="$2,193 default">
+                                    </div>
+                                    <div class="calc-field">
+                                        <label for="fwdRentGrowth">Rent growth <span class="opt">(nominal / yr)</span><span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content">Blank grows rent at the home appreciation rate, so the price-to-rent ratio stays constant. Historically rents have grown more slowly than prices, so this leans against the bitcoin side. Rent steps up once a year.</span></span></label>
+                                        <input type="text" id="fwdRentGrowth" value="" inputmode="decimal" placeholder="4.68% default">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="re-baseline-group">
+                                <div class="re-baseline-group-label">The owner&rsquo;s costs</div>
+                                <div class="re-field-grid">
+                                    <div class="calc-field">
+                                        <label for="fwdClosingPct">Closing costs <span class="opt">(% of price)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Paid by the buyer at purchase. Default 1.04%: LodeStar&rsquo;s national average for 2025 purchase mortgages ($4,528, including recording fees and transfer taxes). The renter invests the same sum.</span></span></label>
+                                        <input type="text" id="fwdClosingPct" value="1.04%" inputmode="decimal">
+                                    </div>
+                                    <div class="calc-field">
+                                        <label for="fwdPropTaxPct">Property tax <span class="opt">(% of value / yr)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Default 0.9% of the home&rsquo;s current value: ATTOM&rsquo;s national effective rate on single-family homes in 2025. It varies a great deal by state and county.</span></span></label>
+                                        <input type="text" id="fwdPropTaxPct" value="0.9%" inputmode="decimal">
+                                    </div>
+                                    <div class="calc-field">
+                                        <label for="fwdInsurance">Insurance <span class="opt">($ / yr, year 1)</span><span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content">Blank scales NerdWallet&rsquo;s national average (Quadrant Information Services, May 2026: about $2,490 a year for $400,000 of dwelling coverage) to the home&rsquo;s price. It grows with the home&rsquo;s value.</span></span></label>
+                                        <input type="text" id="fwdInsurance" value="" inputmode="numeric" placeholder="$2,583 default">
+                                    </div>
+                                    <div class="calc-field">
+                                        <label for="fwdMaintPct">Maintenance <span class="opt">(% of value / yr)</span><span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content">Default 1% of the home&rsquo;s current value a year. A rule of thumb: there is no national primary source for it.</span></span></label>
+                                        <input type="text" id="fwdMaintPct" value="1%" inputmode="decimal">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="re-baseline-group">
+                                <div class="re-baseline-group-label">Selling and trading</div>
+                                <div class="re-field-grid">
+                                    <div class="calc-field">
+                                        <label for="fwdSellPct">Selling costs <span class="opt">(% of price)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Applied when the house is sold at the end. Default 6.6%: a 5.6% agent commission (the midpoint of Clever Real Estate&rsquo;s two 2026 surveys, 5.70% and 5.46%) plus 1% of other seller closing costs, an estimate: there is no national figure, and state transfer taxes dominate it. Range 0&ndash;10%.</span></span></label>
+                                        <input type="text" id="fwdSellPct" value="6.6%" inputmode="decimal">
+                                    </div>
+                                    <div class="calc-field">
+                                        <label for="fwdBtcTxPct">Bitcoin costs <span class="opt">(% per trade)</span><span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content">Spread and fees on every bitcoin purchase and sale, so the house isn&rsquo;t the only side paying to trade. Default 0.5%, an estimate. Range 0&ndash;2%.</span></span></label>
+                                        <input type="text" id="fwdBtcTxPct" value="0.5%" inputmode="decimal">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </details>
 
@@ -332,31 +373,17 @@ eleventyComputed:
                     <!-- Results -->
                     <div id="fwdResults"></div>
 
-                    <!-- Advanced toggle (DCA or S&P) -->
-                    <div class="advanced-section">
-                        <label class="advanced-toggle-label">
-                            <input type="checkbox" id="fwdAdvancedCheck">
-                            <span id="fwdAdvancedText"></span>
-                            <span id="fwdAdvancedRateWrap" style="display:none">at <input type="text" id="fwdAdvancedRate" value="7%" inputmode="decimal"> real / yr</span>
-                        </label>
-                        <div id="fwdAdvancedContent" style="display:none">
-                            <div class="advanced-note" id="fwdAdvancedNote"></div>
-                            <div class="advanced-grid">
-                                <div id="fwdAdvancedLeft"></div>
-                                <div id="fwdAdvancedRight"></div>
-                            </div>
-                        </div>
+                    <!-- Equal cash out (PR 4b, rulings M2, P6): the toggle sits with the
+                         results. Replaces the "Go deeper" DCA / S&P panel and the Total
+                         Comparison block, which the cards above now cover. -->
+                    <div class="re-invest-row">
+                        <label class="re-invest-toggle"><input type="checkbox" id="fwdInvestDiff" checked> <span>The renter invests the difference</span></label><span class="help-tip" tabindex="0">?<span class="tip-content">On (the like-for-like case): both households spend the same every month. The owner pays the mortgage, property tax, insurance and maintenance; the renter pays rent and buys bitcoin with what&rsquo;s left, or sells bitcoin to cover rent when rent costs more. Off: only the up-front sum goes into bitcoin, and the monthly difference is spent, or paid from income when rent costs more. The off setting tests the objection that a mortgage forces saving and renters don&rsquo;t save.</span></span>
+                        <p class="re-cashout-line" id="fwdCashOutLine"></p>
                     </div>
                 </div>
 
-                <!-- Total Comparison — mirrors retrospective layout. Populated by runFwdCalc. -->
-                <div class="calculator" id="fwdTotalSummaryWrapper" style="display:none;margin-top:0;border-top:none;border-radius:0 0 8px 8px;padding:1.5rem 2rem">
-                    <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:1rem;text-align:center">Total Comparison</div>
-                    <div id="fwdTotalSummary" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem"></div>
-                </div>
-
                 <div class="annotation" style="margin-top:1rem;font-size:.85rem;color:var(--text-muted);line-height:1.7">
-                    <strong style="color:var(--text-dim)">How this works:</strong> The bitcoin projection uses the <a href="/the-power-law" style="color:var(--amber)">Power Law model</a> (Porkopolis coefficients). Home appreciation is nominal, like the mortgage rate: the default is the recorded US rate since 2000 (Case-Shiller National, 4.68% a year to 2025), with since-1990 and long-run presets in Baseline assumptions. Mortgage assumes your chosen down payment (default 20%), 30-year fixed. Both paths run the same number of years from today. Property taxes at 1.2% annually, insurance ~$150/mo, maintenance at 1% of home value annually. Rent in the bitcoin + rent path is estimated at 75% of an equivalent mortgage payment. <em>Projected dollar amounts render in your chosen frame &mdash; Real (today&rsquo;s purchasing power) or Nominal (future dollars) &mdash; via the toggle above the results. Real is the default: every end value, and the rent netted from the bitcoin side, is divided by the same inflation factor, so the Real view shows the Nominal result in today&rsquo;s dollars and never changes which path is ahead. Returns and CAGRs are computed on the real values regardless of toggle. Interest and total cost of ownership are shown as their nominal sum.</em>
+                    <strong style="color:var(--text-dim)">How this works:</strong> The bitcoin projection uses the <a href="/the-power-law" style="color:var(--amber)">Power Law model</a> (Porkopolis coefficients). Home appreciation is nominal, like the mortgage rate: the default is the recorded US rate since 2000 (Case-Shiller National, 4.68% a year to 2025), with since-1990 and long-run presets in Baseline assumptions. Mortgage assumes your chosen down payment (default 20%), 30-year fixed. Both paths run the same number of years from today. <strong style="color:var(--text-dim)">Equal cash out:</strong> the renter puts the buyer&rsquo;s up-front cash (down payment plus closing costs) into bitcoin, then each month pays rent and invests the owner&rsquo;s cost minus rent, or sells bitcoin when rent costs more; the owner&rsquo;s cost is the mortgage payment plus property tax (0.9%), insurance and maintenance (1%), the last three following the home&rsquo;s value. Rent defaults to market rent for the price (Zillow&rsquo;s price-to-rent ratio, 15.77) and grows with home prices. Bitcoin&rsquo;s price moves month by month from today&rsquo;s multiple of the Power Law trend to the scenario&rsquo;s at the horizon; each purchase and sale pays 0.5%. Results are shown <em>if sold</em>, before tax: the house less 6.6% selling costs and the loan, bitcoin less its 0.5% sale cost. Every default is in Baseline assumptions, with its source. <em>Projected dollar amounts render in your chosen frame &mdash; Real (today&rsquo;s purchasing power) or Nominal (future dollars) &mdash; via the toggle above the results. Every end value is divided by the same inflation factor in the Real view, so it never changes which path is ahead. Monthly amounts and totals are shown nominal, as paid.</em>
                 </div>
 
             </div><!-- /calc-mode-projection -->

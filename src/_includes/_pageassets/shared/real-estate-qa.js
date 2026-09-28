@@ -24,7 +24,7 @@
        (labels, data at full precision, hidden flags);
      - hashes each vector's capture (FNV-1a 32) and all of them
        together (digest).
-   State it touches (inputs, MA presets, URL, lcs.bvre.calc.v1,
+   State it touches (inputs, MA presets, URL, lcs.bvre.calc.v2,
    Date.now, TODAY_PRICE) is saved and restored at the end.
 
    The same file is pasted into the console on the pre-refactor page
@@ -37,6 +37,15 @@
        E13 carry the new default, 4.68 (was 3.5 real, 10.23% nominal at
        M2); E12 keeps its number, 1.0, now nominal. BvRP vectors gain
        `appr` 4.68 (was a hardcoded 3.0).
+     PR 4b (M2, M4–M6) — the projection's cards are rebuilt for equal
+       cash out and the "Go deeper" panel and Total Comparison are gone, so
+       captureProj() captures the cards and the cash-out line. The default
+       home price is 415000 (was 420000); rent blank = market rent. The
+       `advanced` flag is retired: E10 (was cash + S&P leg) and E11 (was
+       mortgage + DCA, rent 1,500) keep their other inputs and run with
+       the difference invested, the new default. New: E14 (difference not
+       invested), E15 (no closing, selling or bitcoin costs), E16 (rent
+       growth 2%), E17 (the pre-4b tax and insurance: 1.2%, $1,800/yr).
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -82,19 +91,24 @@
     { id: 'E4', desc: 'retro 2021, rate 3%, rent $2,000, 10% down', year: '2021', rate: '3', rent: '2000', down: '10' },
     { id: 'E5', desc: 'retro 2019, home $750,000, DCA on', year: '2019', home: '750000', dca: true }
   ];
-  var PROJ_BASE = { scenario: 'trend', method: 'mortgage', down: '20', home: '420000', horizon: '10',
-                    appr: '4.68', rate: '6.8', rent: '', advanced: false, display: 'real', infl: 'm2-growth' };
+  var PROJ_BASE = { scenario: 'trend', method: 'mortgage', down: '20', home: '415000', horizon: '10',
+                    appr: '4.68', rate: '6.8', rent: '', rentg: '', close: '1.04', ptax: '0.9', ins: '',
+                    maint: '1', sell: '6.6', btctx: '0.5', invest: true, display: 'real', infl: 'm2-growth' };
   var PROJ = [
-    { id: 'E6',  desc: 'proj defaults ($420K, 10y, trend, mortgage 20%, Real)' },
+    { id: 'E6',  desc: 'proj defaults ($415K, 10y, trend, mortgage 20%, Real)' },
     { id: 'E7',  desc: 'proj defaults, Nominal display', display: 'nominal' },
     { id: 'E8a', desc: 'proj floor', scenario: 'floor' },
     { id: 'E8b', desc: 'proj upper', scenario: 'upper' },
     { id: 'E9a', desc: 'proj 5y, trend', horizon: '5' },
     { id: 'E9b', desc: 'proj 20y, trend', horizon: '20' },
-    { id: 'E10', desc: 'proj cash, advanced (index fund at 5%)', method: 'cash', advanced: true },
-    { id: 'E11', desc: 'proj mortgage, advanced DCA, rent $1,500', advanced: true, rent: '1500' },
+    { id: 'E10', desc: 'proj cash purchase', method: 'cash' },
+    { id: 'E11', desc: 'proj mortgage, rent $1,500', rent: '1500' },
     { id: 'E12', desc: 'proj down 3.5%, rate 7.5%, appr 1.0', down: '3.5', rate: '7.5', appr: '1.0' },
-    { id: 'E13', desc: 'proj inflation cpi-official (3.5)', infl: 'cpi-official' }
+    { id: 'E13', desc: 'proj inflation cpi-official (3.5)', infl: 'cpi-official' },
+    { id: 'E14', desc: 'proj, difference not invested', invest: false },
+    { id: 'E15', desc: 'proj, no closing, selling or bitcoin costs', close: '0', sell: '0', btctx: '0' },
+    { id: 'E16', desc: 'proj, rent growth 2%', rentg: '2' },
+    { id: 'E17', desc: 'proj, pre-4b tax 1.2% and insurance $1,800/yr', ptax: '1.2', ins: '1800' }
   ];
 
   function applyRetro(v){
@@ -125,20 +139,13 @@
     setVal('fwdHomeAppreciation', x.appr);                    // input only: 'change' would write the MA custom value
     setVal('fwdMortgageRate', x.rate);
     setVal('fwdMonthlyRent', x.rent);
-    var a = el('fwdAdvancedCheck');
-    a.checked = x.advanced; fire(a, 'change');
+    setVal('fwdRentGrowth', x.rentg); setVal('fwdClosingPct', x.close); setVal('fwdPropTaxPct', x.ptax);
+    setVal('fwdInsurance', x.ins); setVal('fwdMaintPct', x.maint); setVal('fwdSellPct', x.sell); setVal('fwdBtcTxPct', x.btctx);
+    var inv = el('fwdInvestDiff');
+    if (inv) { inv.checked = x.invest; fire(inv, 'change'); }
   }
   function captureProj(){
-    // The advanced panel is hidden, not cleared, when "Go deeper" is off,
-    // so its innerHTML is only captured while it is shown; otherwise the
-    // hash would depend on what an earlier vector left behind.
-    var advShown = el('fwdAdvancedContent').style.display;
-    var adv = advShown === 'none' ? null
-      : { note: html('fwdAdvancedNote'), left: html('fwdAdvancedLeft'), right: html('fwdAdvancedRight') };
-    var totShown = el('fwdTotalSummaryWrapper').style.display;
-    return { results: html('fwdResults'), totalShown: totShown,
-             total: totShown === 'none' ? null : html('fwdTotalSummary'),
-             advShown: advShown, adv: adv };
+    return { results: html('fwdResults'), cashOut: html('fwdCashOutLine') };
   }
   function captureBvreStatic(){
     return { houses: html('housesVisual'), returnTable: html('returnTable'), returnEnd: html('returnTableEndPrices'),
@@ -206,7 +213,7 @@
 
     // Save state
     var saved = { now: Date.now, url: location.pathname + location.search + location.hash, store: null, ma: {}, today: window.TODAY_PRICE };
-    try { saved.store = localStorage.getItem('lcs.bvre.calc.v1'); } catch (e) {}
+    try { saved.store = localStorage.getItem('lcs.bvre.calc.v2'); } catch (e) {}
     if (window.ModelingAssumptions) ['inflation', 'homeApprNominal', 'realReturns'].forEach(function(d){ saved.ma[d] = window.ModelingAssumptions.get(d); });
 
     Date.now = function(){ return FIXED_NOW; };
@@ -238,7 +245,7 @@
         var m = saved.ma[d]; if (m && m.preset === 'custom') window.ModelingAssumptions.set(d, 'custom', m.value); else if (m) window.ModelingAssumptions.set(d, m.preset);
       });
       await sleep(400);                                       // let the debounced URL/storage writer run, then restore
-      try { if (saved.store === null) localStorage.removeItem('lcs.bvre.calc.v1'); else localStorage.setItem('lcs.bvre.calc.v1', saved.store); } catch (e) {}
+      try { if (saved.store === null) localStorage.removeItem('lcs.bvre.calc.v2'); else localStorage.setItem('lcs.bvre.calc.v2', saved.store); } catch (e) {}
       history.replaceState(null, '', saved.url);
     }
 
