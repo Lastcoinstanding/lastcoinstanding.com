@@ -45,6 +45,11 @@ Computed as (V_end / V_start)^(1/n) − 1 on **annual averages** of monthly data
 
 ## M6 · Carrying and transaction costs
 
+> **Corrections, 2026-09-28 (found while implementing PR 4b; DATA_AUDIT RE-8, RE-12).**
+> - **Buyer closing costs.** The $4,661 below comes from LodeStar's *2025* report, on **calendar-2024** purchases, and it **includes** recording fees and transfer taxes ($3,042 without them); LodeStar states it as **1.06% of price**. The "likely excludes transfer taxes" caveat below is wrong. LodeStar's **2026** report (27 Apr 2026, calendar-2025 purchases, 620,000+ quotes) gives **$4,528 = 1.04% of price**, also including transfer taxes. PR 4b implements **1.04%**: the source's own ratio for the latest full year (the same end-point rule as M1), lower than the ruled 1.1%, so it also leans against the thesis. https://www.lodestarss.com/2026/04/27/data-reports-2026-purchase-mortgage-closing-cost-data-report/
+> - **Commission sources.** FastExpert's page reports "roughly 5.5%" from a **2022** survey (1,871 agents), before the August 2024 rule change, so it is not post-2024 data and is dropped. Clever published two 2026 agent surveys: **5.70%** (533 agents, released 24 Mar 2026; listing 2.88%, buyer 2.82%) and **5.46%** (434 agents, August 2026; 2.76% / 2.70%). Their midpoint, 5.58%, still rounds to the ruled **5.6%**, so selling costs stay **6.6%**.
+> - Property tax (ATTOM 0.9%, 2025) and insurance (NerdWallet/Quadrant, $2,490 per $400K, 6 May 2026) re-checked at source: unchanged. ATTOM's sample is "more than 86 million" homes, not 89.6M.
+
 | Item | Page today | **Sourced value** | Source | Moves |
 |---|---|---|---|---|
 | **Property tax** (% of current value) | 1.2% | **0.90%** effective, 2025 | ATTOM 2025 Annual Property Tax Report, 9 Apr 2026: "the effective tax rate for single-family homes in 2025 was 0.9 percent, up from 0.86 percent in 2024" — 89.6M homes | **→ house** |
