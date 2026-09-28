@@ -145,3 +145,15 @@ Every path runs the same horizon from today, in 365.25-day years. The harness pi
 - **Sitewide real-return conversion.** `realReturns` presets are CPI-real (STYLE_GUIDE §3.5's decomposition cites Damodaran), but pages convert them to nominal with the sitewide M2 inflation (e.g. BvRE's cash-mode S&P leg, retired by M2). Check the retirement family's use of `realReturns` for the same pattern; audit separately.
 - **Promote the capitalisation rule** to STYLE_GUIDE (C2).
 - **Zelman companion variant**: separate decision after PR 8.
+
+## 7 · PR 4 source rulings (JM, 2026-09-28)
+
+Sources, computations and reasoning are in **`REAL_ESTATE_PAIR_PR4_SOURCES.md`**; re-derive any figure with `scripts/verify-real-estate-sources.py`. These rulings amend §2 where they differ.
+
+- **M1 presets, verified to the latest full year (2025):** Long run **3.41%** · Since 1990 **4.23%** · **Since 2000 4.68% (default)**. §2's "~3%" and "~4.8%" were approximations; the ~4.8% came from a window ending in 2024. Since 2000 is still the highest of the three, so the default still leans against the thesis. The Shiller/Case-Shiller splice was checked, not assumed (the two agree to within 0.06% over 1990–2022).
+- **DATA_AUDIT RE-2 is wrong** (claims ~3.7% real for 2000–2024; the primary gives **2.19%**). **RE-1** corrects to **0.59%** real, 1890–2022 (Shiller's own real index); state the window.
+- **M4:** P/R **15.77** (Zillow, Aug 2026), unchanged from Phase 0.
+- **Default home price $415,000** — the 2025 MSPUS average ($415,400), the latest full year, the same end-point rule as M1. Default rent on it: **$2,193/mo**. Page states the basis: median price of *new* houses sold (Census/HUD).
+- **M6 costs:** property tax **0.90%** of current value (ATTOM, 2025) · insurance **$2,490/yr** for $400K dwelling, growing with value (Quadrant via NerdWallet, May 2026) · **selling costs 6.6%** (5.6% commission midpoint + 1% seller closing, the 1% stated as an estimate) · **buyer closing costs 1.1%** (Lodestar 2025; transfer-tax caveat stated) · **maintenance 1%** of current value, recorded in DATA_AUDIT as a rule of thumb with no primary.
+- **Item 12 (Prompt 4) — the Ledn slice:** becomes a generic **"Stablecoin lending"** slice at **4.0%** (ordinary income), naming no platform. Ledn is unavailable to US residents today (BvRP-18). A slider tooltip and a short disclosure under the calculator list **the verifiable rates this month** (3-month T-bill as the reference; Sky, Aave and Compound base rates; Ledn marked not-US), carry the line that lending currently pays about the T-bill rate so its extra risks are unpaid, and are refreshed monthly from the script. The $500K example table follows; the CeFi prose that names platforms as examples stays.
+- **Direction, per §0:** property tax and the Ledn slice move results toward the house; insurance, selling and buyer closing costs toward bitcoin. PR 4 reports every one in its before/after table.
