@@ -101,7 +101,8 @@
       ? TODAY_PRICE : PL_DATA[PL_DATA.length - 1][1];
     var currentMult = todaySpot / todayTrend;
 
-    var futureTrend = plPrice(todayDays + t * 365);
+    // 365.25-day years, as on BvRE (M10, PR 4a; was 365).
+    var futureTrend = plPrice(todayDays + t * 365.25);
     var progress = Math.min(t / Math.max(1, holdingYears), 1.0);
 
     var targetMult;
@@ -575,7 +576,11 @@
     var totalRentPaid = impliedRent * 12 * horizonYrs;
 
     var btcBought = amount / btcNow;
-    var futureDays = (endYear - 2009) * 365.25;
+    // M10 (PR 4a): bitcoin runs the same horizon as the house, today +
+    // horizonYrs 365.25-day years. It used to stop at 1 Jan of the end year.
+    var nowMs = Date.now();
+    var futureDays = (nowMs / 1000 - GENESIS_TS) / 86400 + horizonYrs * 365.25;
+    var endDateMs = nowMs + horizonYrs * 365.25 * 86400000;
     var futureTrend = plPrice(futureDays);
     var futureFloor = futureTrend * PL_FLOOR;
     var futureCeil = futureTrend * PL_CEIL;
@@ -613,7 +618,7 @@
 
     o.homeApprNominalPct = homeApprNominalPct; o.homeAppr = homeAppr; o.amount = amount; o.loanAmt = loanAmt;
     o.mr = mr; o.nPayments = nPayments; o.monthlyMort = monthlyMort; o.impliedRent = impliedRent;
-    o.totalRentPaid = totalRentPaid; o.btcBought = btcBought; o.futureDays = futureDays;
+    o.totalRentPaid = totalRentPaid; o.btcBought = btcBought; o.futureDays = futureDays; o.endDateMs = endDateMs;
     o.futureTrend = futureTrend; o.futureFloor = futureFloor; o.futureCeil = futureCeil; o.futurePrice = futurePrice;
     o.btcValue = btcValue; o.btcNet = btcNet; o.btcValueReal = btcValueReal; o.futurePriceReal = futurePriceReal;
     o.btcNetReal = btcNetReal; o.btcReturn = btcReturn; o.btcCAGR = btcCAGR;

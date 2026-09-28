@@ -645,7 +645,6 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 
     var startYear = NOW_YEAR;
     var endYear = startYear + horizonYrs;
-    var asOf = 'Jan 1, ' + endYear;
 
     // ── ENGINE: shared/real-estate-model.js (PR 3) ──
     // All projection math; the page parses inputs and renders.
@@ -659,6 +658,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       mortRate: mortRate, dpf: dpf, rentOverride: _fwdRentValid ? _fwdRentNum : null,
       endYear: endYear
     });
+    // Both paths end on the same day, horizonYrs from today (M10).
+    var asOf = new Date(P.endDateMs).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
     var homeApprNominalPct = P.homeApprNominalPct, homeAppr = P.homeAppr;
     var amount = P.amount, loanAmt = P.loanAmt, mr = P.mr, nPayments = P.nPayments;
     var monthlyMort = P.monthlyMort, impliedRent = P.impliedRent, totalRentPaid = P.totalRentPaid;

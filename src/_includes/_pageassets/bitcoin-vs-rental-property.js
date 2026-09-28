@@ -105,7 +105,8 @@
   function render(){
     if (typeof plPrice !== 'function' || typeof GENESIS_TS !== 'number') return;
     var d = (Date.now() / 1000 - GENESIS_TS) / 86400;
-    function factor(a, b){ return plPrice(d + b * 365) / plPrice(d + a * 365); }
+    // 365.25-day years, as in the shared engine (M10, PR 4a).
+    function factor(a, b){ return plPrice(d + b * 365.25) / plPrice(d + a * 365.25); }
     document.querySelectorAll('[data-pl-cagr]').forEach(function(el){
       var p = el.getAttribute('data-pl-cagr').split(',');
       var a = Number(p[0]), b = Number(p[1]);
