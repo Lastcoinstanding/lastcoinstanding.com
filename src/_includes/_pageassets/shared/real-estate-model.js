@@ -166,9 +166,15 @@
     return { pretax: gross, depreciation: depreciation, tax: tax, afterTax: gross - tax };
   }
 
+  // Selling costs (% of sale price) and bitcoin's purchase factor, read
+  // from state with the pair defaults as fallback (PR 4b, M6). Selling
+  // costs were a hardcoded 8%; bitcoin purchases were free.
+  function sellCostPct(s){ return (s.sellCostPct !== undefined && s.sellCostPct !== null) ? s.sellCostPct : PAIR_DEFAULTS.sellPct; }
+  function btcBuyFactor(s){ return 1 - ((s.btcTxPct !== undefined && s.btcTxPct !== null) ? s.btcTxPct : PAIR_DEFAULTS.btcTxPct) / 100; }
+
   function calcRentalExit(s, yearsToExit){
     var appreciatedValue = s.propertyValue * Math.pow(1 + s.appreciationPct/100, yearsToExit);
-    var transactionCosts = appreciatedValue * 0.08;
+    var transactionCosts = appreciatedValue * sellCostPct(s) / 100;
     var netProceeds = appreciatedValue - transactionCosts;
 
     // Simplified accumulated depreciation across total holding (pre + post)
@@ -236,8 +242,8 @@
     // 10-year cumulative cash (flat yield assumption)
     var cumulativeCash = year1AfterTax * s.holdingYears;
 
-    // Spot BTC FV
-    var spotFV = calcSpotBTCFV(alloc.spot, s.holdingYears, s.btcScenario);
+    // Spot BTC FV (bought net of the bitcoin transaction cost, M6)
+    var spotFV = calcSpotBTCFV(alloc.spot * btcBuyFactor(s), s.holdingYears, s.btcScenario);
     var spotAppreciation = spotFV - alloc.spot;
 
     // Total wealth at year N
@@ -286,7 +292,7 @@
   function calcPath1(s){
     var exitNow = calcRentalExit(s, 0);
     var netCash = exitNow.netCash;
-    var spotFV = calcSpotBTCFV(netCash, s.holdingYears, s.btcScenario);
+    var spotFV = calcSpotBTCFV(netCash * btcBuyFactor(s), s.holdingYears, s.btcScenario);
     return {
       saleAtYear0: exitNow,
       year1CashFlow: 0,  // pure spot, no distributions
@@ -300,7 +306,7 @@
     var helocDraw = Math.max(0, maxCltvDollar - s.existingMortgage);
     var annualCarry = helocDraw * (s.helocRatePct/100);
     var cumulativeCarry = annualCarry * s.holdingYears;
-    var btcFV = calcSpotBTCFV(helocDraw, s.holdingYears, s.btcScenario);
+    var btcFV = calcSpotBTCFV(helocDraw * btcBuyFactor(s), s.holdingYears, s.btcScenario);
 
     // Net wealth gain from leveraged BTC position
     var grossGain = btcFV - helocDraw;  // BTC appreciation
@@ -407,7 +413,7 @@
     var year1AfterTax = pretax - ordTax;
     var cumCash = year1AfterTax * t;
     var scenario = scenarioOverride || s.btcScenario;
-    var spotFV = allocs.spot * scenarioGrowthFactor(scenario, t, s.holdingYears);
+    var spotFV = allocs.spot * btcBuyFactor(s) * scenarioGrowthFactor(scenario, t, s.holdingYears);
     var preserved = allocs.strc + allocs.sata + allocs.ledn;
     return preserved + spotFV + cumCash;
   }
@@ -438,11 +444,11 @@
       var wealthPath;
       if (sUse.path === 1) {
         var exitNow = calcRentalExit(sUse, 0);
-        wealthPath = exitNow.netCash * growth;
+        wealthPath = exitNow.netCash * btcBuyFactor(sUse) * growth;
       } else if (sUse.path === 2) {
         var maxCltv = sUse.propertyValue * (sUse.helocLtv/100);
         var heloc = Math.max(0, maxCltv - sUse.existingMortgage);
-        var btcVal = heloc * growth;
+        var btcVal = heloc * btcBuyFactor(sUse) * growth;
         var carry = heloc * (sUse.helocRatePct/100) * t;
         wealthPath = wealthKeep + btcVal - heloc - carry;
       } else if (sUse.path === 3) {

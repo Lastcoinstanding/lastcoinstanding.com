@@ -170,7 +170,11 @@
     // Nominal home appreciation, %/yr. The pair's shared input,
     // lcs.homeApprNominal (PR 4a, rulings M1); was a hardcoded 3.0.
     // bindAppreciation() sets it from ModelingAssumptions before first render.
-    appreciationPct: 4.68
+    appreciationPct: 4.68,
+    // PR 4b (rulings M6): selling costs, one default on both pages (was a
+    // hardcoded 8%), and the cost of each bitcoin purchase (was free).
+    sellCostPct: window.RealEstateModel.PAIR_DEFAULTS.sellPct,
+    btcTxPct: window.RealEstateModel.PAIR_DEFAULTS.btcTxPct
   };
 
   // ─── Engine: shared/real-estate-model.js ───
@@ -561,13 +565,14 @@
       html = '<div class="calc-detail-title">Path 1 mechanics — outright sale, redeploy to spot bitcoin</div>' +
         '<div class="calc-detail-rows">' +
         '<div><span>Gross sale</span><strong>' + fmtMoneyFull(r.grossSale) + '</strong></div>' +
-        '<div><span>Transaction costs (8%)</span><strong>-' + fmtMoneyFull(r.transactionCosts) + '</strong></div>' +
+        '<div><span>Selling costs (' + parseFloat(s.sellCostPct.toFixed(2)) + '%)</span><strong>-' + fmtMoneyFull(r.transactionCosts) + '</strong></div>' +
         '<div><span>Net proceeds</span><strong>' + fmtMoneyFull(r.netProceeds) + '</strong></div>' +
         '<div><span>Depreciation recapture (25%)</span><strong>-' + fmtMoneyFull(r.recaptureTax) + '</strong></div>' +
         '<div><span>Federal LTCG</span><strong>-' + fmtMoneyFull(r.ltcgTax) + '</strong></div>' +
         '<div><span>State tax (' + (s.stateCode === 'OTHER' ? 'typical ~5%' : s.stateCode) + ')</span><strong>-' + fmtMoneyFull(r.stateTax) + '</strong></div>' +
         '<div><span>NIIT</span><strong>-' + fmtMoneyFull(r.niit) + '</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Net cash deployed to bitcoin</span><strong>' + fmtMoneyFull(r.netCash) + '</strong></div>' +
+        '<div><span>Bitcoin purchase cost (' + parseFloat(s.btcTxPct.toFixed(2)) + '%)</span><strong>-' + fmtMoneyFull(r.netCash * s.btcTxPct / 100) + '</strong></div>' +
         '<div><span>All-in leakage from gross sale</span><strong>' + fmtPct(r.effectiveLeakagePct) + '</strong></div>' +
         '</div>';
     } else if (s.path === 2) {
@@ -577,6 +582,7 @@
         '<div><span>HELOC draw available</span><strong>' + fmtMoneyFull(r2.helocDraw) + '</strong></div>' +
         '<div><span>Annual interest carry</span><strong>' + fmtMoneyFull(r2.annualCarry) + '/yr</strong></div>' +
         '<div><span>Cumulative carry (' + s.holdingYears + ' yrs)</span><strong>' + fmtMoneyFull(r2.cumulativeCarry) + '</strong></div>' +
+        '<div><span>Bitcoin purchase cost (' + parseFloat(s.btcTxPct.toFixed(2)) + '%)</span><strong>-' + fmtMoneyFull(r2.helocDraw * s.btcTxPct / 100) + '</strong></div>' +
         '<div><span>Bitcoin position FV (' + scenarioLabel(s.btcScenario) + ')</span><strong>' + fmtMoneyFull(r2.btcFV) + '</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Net gain from leveraged bitcoin</span><strong>' + fmtMoneyFull(r2.netGainFromLeverage) + '</strong></div>' +
         '<div><span>+ Retained rental wealth at exit</span><strong>' + fmtMoneyFull(r2.retainedRental.totalWealth) + '</strong></div>' +
@@ -897,6 +903,17 @@
       function(v){ return v + '%'; });
     bindSlider('calc-years-held', 'yearsAlreadyHeld',
       function(v){ return v + ' yrs'; });
+    // PR 4b (M6): selling costs and the bitcoin purchase cost.
+    bindSlider('calc-sell-cost', 'sellCostPct',
+      function(v){ return parseFloat(v.toFixed(2)) + '%'; });
+    bindSlider('calc-btc-tx', 'btcTxPct',
+      function(v){ return parseFloat(v.toFixed(2)) + '%'; });
+    // Their defaults come from RealEstateModel.PAIR_DEFAULTS via `state`;
+    // put the thumbs there too, so a refresh edits one place.
+    ['calc-sell-cost', 'calc-btc-tx'].forEach(function(id, i){
+      var el = document.getElementById(id);
+      if (el) el.value = String(i === 0 ? state.sellCostPct : state.btcTxPct);
+    });
     bindSelect('calc-state', 'stateCode');
     bindSelect('calc-bracket', 'federalBracketPct');
 

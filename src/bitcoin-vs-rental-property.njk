@@ -635,7 +635,7 @@ eleventyComputed:
       </div>
       <div class="calc-chart-caveat">
         <p><strong>Mark-to-market framing.</strong> Keep-rental values are cumulative after-tax cash + the property&rsquo;s market value, with the exit tax that would arise on sale <em>not</em> applied. Bitcoin paths show their upfront tax already paid at Y0. Toggle the <em>First 3 years</em> view to see the near-term tax-leakage dip &mdash; this recognizes the near-term adverse consequence of divesting property for the bitcoin path.</p>
-        <p><strong>Tax asymmetry on realization.</strong> If both positions are eventually liquidated at year N, the exit-tax profiles differ: a rental sale incurs depreciation recapture (the calculator applies 25% to accumulated depreciation) and 8% transaction costs (the calculator&rsquo;s assumption; see The Reality tab for our estimate of 6&ndash;9% on an orderly sale) <em>in addition</em> to LTCG + state cap gains. A bitcoin sale faces only LTCG + state cap gains &mdash; a structurally lighter exit-tax profile that this chart&rsquo;s mark-to-market framing doesn&rsquo;t visualize.</p>
+        <p><strong>Tax asymmetry on realization.</strong> If both positions are eventually liquidated at year N, the exit-tax profiles differ: a rental sale incurs depreciation recapture (the calculator applies 25% to accumulated depreciation) and selling costs (6.6% by default, within The Reality tab&rsquo;s 6&ndash;9% range for an orderly sale: a 5.6% agent commission plus about 1% of other seller closing costs; set in Baseline assumptions) <em>in addition</em> to LTCG + state cap gains. A bitcoin sale faces only LTCG + state cap gains &mdash; a structurally lighter exit-tax profile that this chart&rsquo;s mark-to-market framing doesn&rsquo;t visualize.</p>
       </div>
       <div class="calc-chart-legend" id="calc-chart-legend"></div>
     </div>
@@ -757,6 +757,32 @@ eleventyComputed:
             <button type="button" class="calc-appr-preset" data-preset="custom">Custom<span>your own</span></button>
           </div>
           <p class="calc-appr-notice" id="calc-appr-notice" hidden></p>
+        </div>
+
+        <!-- PR 4b (rulings M6): one selling-cost default on both pages of the
+             pair (was a hardcoded 8%), and a cost on each bitcoin purchase. -->
+        <div class="calc-slider-group">
+          <div class="calc-slider-group-label">Selling and trading</div>
+
+          <div class="calc-slider-row">
+            <span class="calc-slider-name">Selling costs <span class="calc-slider-hint">(% of the sale price)</span>
+              <span class="help-tip" tabindex="0">?<span class="tip-content">
+                Agent commission plus other seller closing costs on any property sale. Default 6.6%: a 5.6% commission (the midpoint of Clever Real Estate&rsquo;s two 2026 agent surveys, 5.70% and 5.46%) plus about 1% of other seller closing costs, an estimate: there is no national figure, and state transfer taxes dominate it. The same default as Bitcoin vs. Real Estate.
+              </span></span>
+            </span>
+            <span class="calc-slider-val" id="val-sell-cost">6.6%</span>
+          </div>
+          <input type="range" id="calc-sell-cost" min="0" max="10" step="0.1" value="6.6">
+
+          <div class="calc-slider-row">
+            <span class="calc-slider-name">Bitcoin costs <span class="calc-slider-hint">(% per purchase)</span>
+              <span class="help-tip" tabindex="0">?<span class="tip-content">
+                Spread and fees on each bitcoin purchase, so the rental isn&rsquo;t the only side paying to trade. Default 0.5%, an estimate. Applied when the sale proceeds (or a HELOC draw) buy bitcoin; the chart and table value bitcoin before any sale, as they value the rental.
+              </span></span>
+            </span>
+            <span class="calc-slider-val" id="val-btc-tx">0.5%</span>
+          </div>
+          <input type="range" id="calc-btc-tx" min="0" max="2" step="0.05" value="0.5">
         </div>
 
         <div class="calc-slider-group calc-path-specific" data-for-path="2">

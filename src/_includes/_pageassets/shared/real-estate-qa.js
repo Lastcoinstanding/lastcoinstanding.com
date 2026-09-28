@@ -46,6 +46,8 @@
        the difference invested, the new default. New: E14 (difference not
        invested), E15 (no closing, selling or bitcoin costs), E16 (rent
        growth 2%), E17 (the pre-4b tax and insurance: 1.2%, $1,800/yr).
+       BvRP vectors gain `sell` 6.6 (was a hardcoded 8) and `btctx` 0.5;
+       new P13 runs Path 1 at the old 8% and no bitcoin cost.
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -156,7 +158,7 @@
   // ─── BvRP ──────────────────────────────────────────────────────────
   var RP_BASE = { path: '4', scenario: 'trend', value: '500000', yld: '4.4', hold: '10', basis: '60', held: '10',
                   state: 'OTHER', bracket: '24', ltv: '80', helocRate: '9.5', mortgage: '200000',
-                  props: '3', retained: '2', port: [45, 30, 10, 15], appr: '4.68' };
+                  props: '3', retained: '2', port: [45, 30, 10, 15], appr: '4.68', sell: '6.6', btctx: '0.5' };
   var RP = [
     { id: 'P1',  desc: 'defaults (Path 4, trend, $500K, 4.4%, 10y, OTHER, 24%)' },
     { id: 'P2',  desc: 'Path 1', path: '1' },
@@ -173,13 +175,15 @@
     { id: 'P11a', desc: 'Path 4, portfolio 100/0/0/0', port: [100, 0, 0, 0] },
     { id: 'P11b', desc: 'Path 4, portfolio 0/0/0/100', port: [0, 0, 0, 100] },
     { id: 'P11c', desc: 'Path 4, portfolio 50/30/10/20 (sums to 110)', port: [50, 30, 10, 20] },
-    { id: 'P12', desc: 'basis 20%, held 27y (depreciation cap)', basis: '20', held: '27' }
+    { id: 'P12', desc: 'basis 20%, held 27y (depreciation cap)', basis: '20', held: '27' },
+    { id: 'P13', desc: 'Path 1 at the pre-4b costs (selling 8%, no bitcoin cost)', path: '1', sell: '8', btctx: '0' }
   ];
   function applyRp(v){
     var x = Object.assign({}, RP_BASE, v);
     if (window.ModelingAssumptions) window.ModelingAssumptions.set('homeApprNominal', 'since-2000');
     click('.calc-path-btn[data-path="' + x.path + '"]');
     setVal('calc-appreciation', x.appr);                      // input only, as on BvRE
+    setVal('calc-sell-cost', x.sell); setVal('calc-btc-tx', x.btctx);
     setVal('calc-property-value', x.value); setVal('calc-net-yield', x.yld); setVal('calc-holding-years', x.hold);
     setVal('calc-adjusted-basis', x.basis); setVal('calc-years-held', x.held);
     setVal('calc-state', x.state, ['change']); setVal('calc-bracket', x.bracket, ['change']);
