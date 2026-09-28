@@ -592,10 +592,15 @@ For each value, verify against the source listed and update in the BFI files as 
 **`/bitcoin-vs-rental-property` dated figures (added 2026-09-27; DATA_AUDIT BvRP-1–8, 14–15, 18).** Refresh these with the Strategy block, from EDGAR, and update the as-of dates in the body, the Methodology list and DATA_AUDIT in the same edit:
 - Strategy BTC holdings, USD Reserve, and the published "Annual interest + preferred dividends" from the latest MSTR Investor Briefing (SEC FWP filing). When it changes, recompute the three coverage tiles: holdings × $100K / $50K / $30K ÷ that figure.
 - The convertible-note stress point (paraphrased from the latest quarterly results presentation; currently Q2 2026, p.11). Update it when the Q3 deck lands.
-- STRC rate and schedule. The rate is also a constant in `bitcoin-vs-rental-property.js` (`calcYieldPortfolio` and `calcYieldPortfolioAtYearT`, `0.12`) and in the Path 4 detail label (`@ 12.0% ROC`). Change all three, and the $500K table's STRC row, together.
+- STRC rate and schedule. **Since PR 3 (#126) the rate constant lives in `src/_includes/_pageassets/shared/real-estate-model.js`**, twice: `calcYieldPortfolio` (`strc: alloc.strc * 0.12`) and `calcYieldPortfolioAtYearT` (`var strcDist = allocs.strc * 0.12`). Change both, together with:
+  - the Path 4 detail label in `bitcoin-vs-rental-property.js` (`@ 12.0% ROC`, in `renderPathDetail`);
+  - the STRC slider hint and tooltip in `src/bitcoin-vs-rental-property.njk` ("Strategy, 12%, ROC"; "Paying 12.00% annualized…");
+  - the $500K table's STRC row and the Year 1 / yield / 10-year cells.
+- STRC's next rate announcement is due around **2026-09-30** (DATA_AUDIT BvRP-5).
+- **Verify after any rate change:** open either page with `?qa` and run `await rePairQA.run()` in the console. The hashes will change; that is expected. Record the new ones in the refresh commit.
 - Convertible notes outstanding.
 - SATA rate and schedule; Strive BTC holdings and the STRC shares in its reserve.
-- Monthly until the Ledn US LLC transition settles (from October 2026), then semiannually: the Ledn Growth Account rates (rendered page, not the HTML placeholders) and whether US residents are eligible. The rate is also `0.05` in `bitcoin-vs-rental-property.js` (`calcYieldPortfolio`, `calcYieldPortfolioAtYearT`), the Path 4 label (`@ 5.0% ord.`) and the $500K table's Ledn row.
+- Monthly until the Ledn US LLC transition settles (from October 2026), then semiannually: the Ledn Growth Account rates (rendered page, not the HTML placeholders) and whether US residents are eligible. The rate constant is `0.05` in **`src/_includes/_pageassets/shared/real-estate-model.js`** since PR 3 (#126): `calcYieldPortfolio` (`ledn: alloc.ledn * 0.05`) and `calcYieldPortfolioAtYearT` (`var lednDist = allocs.ledn * 0.05`). Change both, together with the Path 4 label in `bitcoin-vs-rental-property.js` (`@ 5.0% ord.`), the Ledn slider hint and tooltip in `src/bitcoin-vs-rental-property.njk`, and the $500K table's Ledn row.
 
 If the values haven't materially changed (BTC count moved &lt;1%, mNAV moved &lt;0.1&times;, ATM status unchanged, insight prose still accurate), the only required update is the as-of date.
 

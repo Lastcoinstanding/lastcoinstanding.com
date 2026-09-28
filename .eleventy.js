@@ -125,6 +125,10 @@ module.exports = function (eleventyConfig) {
   // every related strip: reachable only by direct link, and _headers marks
   // /demo/* noindex, nofollow.
   eleventyConfig.addPassthroughCopy({ 'demo': 'demo' });
+  // Real-estate pair QA harness (rePairQA). Served as its own file so the
+  // pages load it only with ?qa (shared/real-estate-qa-loader.js); ordinary
+  // visitors never download it. _headers marks /qa/* noindex.
+  eleventyConfig.addPassthroughCopy({ 'src/_includes/_pageassets/shared/real-estate-qa.js': 'qa/real-estate-qa.js' });
 
   // Sort helper for the /calculators page (src/calculators.njk).
   // Sorts an explorations.json array by calculator_tile.position ascending.
