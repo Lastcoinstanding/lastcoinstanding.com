@@ -889,7 +889,7 @@ _Added 2026-09-28 (PR 4b; DATA_AUDIT RE-3–RE-13)._ Every sourced default for `
 - **Semiannual (next ≈ March 2027): price-to-rent (RE-7).** Run `python3 scripts/verify-real-estate-sources.py` and read the M4 section. If the latest ratio differs from `priceToRent` by more than 0.1, update `priceToRent` and `priceToRentAsOf`, and the rent tooltip in `src/bitcoin-vs-real-estate.njk` ("15.77", "August 2026", "$2,193"). The rent default follows the price automatically.
 - **Annual, each spring, with the latest full year:**
   - `homePrice` (RE-6): the new year's average of FRED `MSPUS`, rounded to the nearest $5,000, and the home-price tooltip ("2025", "$415,000"). Keep it a *new-house* median, and say so.
-  - The three home-appreciation presets (RE-3–RE-5): see STYLE_GUIDE §3.5; they live in `shared/modeling-assumptions.js`, not in `PAIR_DEFAULTS`.
+  - The three home-appreciation presets (RE-3–RE-5): see STYLE_GUIDE §3.5; they live in `shared/modeling-assumptions.js`, not in `PAIR_DEFAULTS`. Both pages' preset buttons read them there; the tooltip that quotes them is written once, in `components/real-estate-baseline.njk` (PR 4f).
   - `closingPct` (RE-8) when LodeStar's annual report lands (late April): its "% of the home sales price" figure, and the closing-costs tooltip.
   - `propTaxPct` (RE-9) when ATTOM's annual property-tax analysis lands (April): the national effective rate on single-family homes, and the property-tax tooltip.
   - `insurancePer400K` (RE-10) from NerdWallet's average-cost page (keep the $400K dwelling-coverage basis), and BvRE's insurance tooltip.

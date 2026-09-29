@@ -231,12 +231,19 @@
     includeSweatEquity: false,
     // Nominal home appreciation, %/yr. The pair's shared input,
     // lcs.homeApprNominal (PR 4a, rulings M1); was a hardcoded 3.0.
-    // bindAppreciation() sets it from ModelingAssumptions before first render.
+    // bindBaseline() sets it from ModelingAssumptions before first render.
     appreciationPct: 4.68,
     // PR 4b (rulings M6): selling costs, one default on both pages (was a
     // hardcoded 8%), and the cost of each bitcoin purchase (was free).
     sellCostPct: window.RealEstateModel.PAIR_DEFAULTS.sellPct,
-    btcTxPct: window.RealEstateModel.PAIR_DEFAULTS.btcTxPct
+    btcTxPct: window.RealEstateModel.PAIR_DEFAULTS.btcTxPct,
+    // PR 4f (design §7; rulings M1, P5): the display frame. Everything is
+    // computed in nominal dollars; 'real' divides each year's value by that
+    // year's inflation factor (RealEstateModel.toReal, the deflator Bitcoin
+    // vs. Real Estate uses), at the sitewide rate (lcs.inflation). The
+    // markup's active button must match. Not stored: like BvRE's toggle, a
+    // fresh load shows the default.
+    displayMode: 'real'
   };
 
   // ─── Engine: shared/real-estate-model.js ───
@@ -278,6 +285,24 @@
   function fmtMoneyFull(n){
     if (n === undefined || isNaN(n)) return '—';
     return (n < 0 ? '-' : '') + '$' + Math.round(Math.abs(n)).toLocaleString();
+  }
+
+  // ─── The display frame (PR 4f) ───
+  // Nominal is the engine's own output, untouched. Real divides a value at
+  // year t by (1 + inflation)^t through the shared deflator, so a value, the
+  // difference between the paths and the chart all move by one factor per
+  // year and the Real view can never change which path is ahead. Cash flows
+  // (year 1, cumulative sums) and the sale mechanics stay nominal, as paid,
+  // in both views, as on Bitcoin vs. Real Estate.
+  function isReal(){ return state.displayMode === 'real'; }
+  function inflPct(){
+    var MA = window.ModelingAssumptions;
+    return MA ? MA.get('inflation').value : 6.5;
+  }
+  function inFrame(v, t){ return isReal() ? RE.toReal(v, inflPct(), t) : v; }
+  // "deflated at 6.5% a year (M2 growth)", named as on the Real label (P5).
+  function deflatorPhrase(){
+    return window.RealEstateBaseline ? window.RealEstateBaseline.deflatorPhrase() : 'deflated at ' + inflPct() + '% a year';
   }
 
   // ─── Renderers ───
@@ -329,12 +354,14 @@
     var endIdx = chartZoom === 'first3' ? Math.min(3, s.holdingYears) : s.holdingYears;
     function slice(arr){ return arr.slice(0, endIdx + 1); }
 
+    // Each year's point in the display frame (PR 4f): nominal as computed,
+    // or divided by that year's inflation factor in the Real view.
     var labels = slice(trajTrend).map(function(r){ return 'Y' + r.year; });
-    var keepData  = slice(trajTrend).map(function(r){ return r.wealthKeep; });
-    var pathStay  = slice(trajStay).map(function(r){ return r.wealthPath; });
-    var pathTrend = slice(trajTrend).map(function(r){ return r.wealthPath; });
-    var pathUpper = slice(trajUpper).map(function(r){ return r.wealthPath; });
-    var pathFloor = slice(trajFloor).map(function(r){ return r.wealthPath; });
+    var keepData  = slice(trajTrend).map(function(r){ return inFrame(r.wealthKeep, r.year); });
+    var pathStay  = slice(trajStay).map(function(r){ return inFrame(r.wealthPath, r.year); });
+    var pathTrend = slice(trajTrend).map(function(r){ return inFrame(r.wealthPath, r.year); });
+    var pathUpper = slice(trajUpper).map(function(r){ return inFrame(r.wealthPath, r.year); });
+    var pathFloor = slice(trajFloor).map(function(r){ return inFrame(r.wealthPath, r.year); });
 
     function primary(scenario){ return scenario === s.btcScenario; }
 
@@ -582,7 +609,10 @@
   function renderHeadline(results, s){
     var el = document.getElementById('calc-headline');
     if (!el) return;
-    var delta = results.path.totalWealth - results.keep.totalWealth;
+    // The totals at the horizon in the display frame (PR 4f); nominal as before.
+    var real = isReal(), H = s.holdingYears;
+    var delta = inFrame(results.path.totalWealth, H) - inFrame(results.keep.totalWealth, H);
+    var inToday = real ? ' in today\u2019s dollars' : '';
     var rentalAnn = results.keep.annual.afterTax;
     var bitcoinAnn = results.path.year1CashFlow;
     var ratio = rentalAnn > 0 ? (bitcoinAnn / rentalAnn) : 0;
@@ -604,7 +634,7 @@
     var verdict, color;
     if (delta > 0) {
       verdict = '<strong>' + pathName + ' results in ' + fmtMoney(delta) +
-                ' more asset value</strong> than keeping the rental over ' + s.holdingYears + ' years';
+                ' more asset value</strong>' + inToday + ' than keeping the rental over ' + s.holdingYears + ' years';
       if (ratio >= 1.3 && bitcoinAnn > 0) {
         verdict += ', with about <strong>' + ratio.toFixed(1) + '&times;</strong> the Year 1 cash flow';
       }
@@ -612,12 +642,13 @@
       color = 'positive';
     } else {
       verdict = '<strong>Keeping the rental produces ' + fmtMoney(-delta) +
-                ' more asset value</strong> than ' + pathName + ' under your inputs. The decision is close &mdash; try adjusting the bitcoin scenario, holding period, or path.';
+                ' more asset value</strong>' + inToday + ' than ' + pathName + ' under your inputs. Try adjusting the bitcoin scenario, holding period, or path.';
       color = 'neutral';
     }
     var explainer = '<span class="calc-headline-explainer">' + explainerByPath[s.path] + '</span>';
     var hedge = '<span class="calc-headline-hedge">Under the <strong>' + scenarioLabel(s.btcScenario) +
-                '</strong> bitcoin scenario and your specific inputs.</span>';
+                '</strong> bitcoin scenario and your specific inputs' +
+                (real ? '; values in today\u2019s dollars, ' + deflatorPhrase() : '') + '.</span>';
     el.innerHTML = '<div class="calc-headline-verdict ' + color + '">' + verdict + '</div>' + explainer + hedge;
   }
 
@@ -628,8 +659,11 @@
 
     var rentalY1 = results.keep.annual.afterTax;
     var bitcoinY1 = results.path.year1CashFlow;
-    var rentalTotal = results.keep.totalWealth;
-    var bitcoinTotal = results.path.totalWealth;
+    // The totals follow the display frame (PR 4f); the cash flows and the
+    // mortgage stay nominal, as paid, and say so in the Real view.
+    var real = isReal();
+    var rentalTotal = inFrame(results.keep.totalWealth, s.holdingYears);
+    var bitcoinTotal = inFrame(results.path.totalWealth, s.holdingYears);
     var winnerClass = bitcoinTotal > rentalTotal ? 'win-bitcoin' : 'win-rental';
 
     // The existing mortgage (M8, PR 4d): kept rentals carry it, sales repay it.
@@ -651,10 +685,10 @@
     }
     var anyMortgage = k0.mortgage0 > 0;
     el.innerHTML = '' +
-      '<tr><td>Year 1 cash flow (after tax' + (anyMortgage ? ' and mortgage payments' : '') + ')</td>' +
+      '<tr><td>Year 1 cash flow (after tax' + (anyMortgage ? ' and mortgage payments' : '') + (real ? '; nominal' : '') + ')</td>' +
         '<td class="numeric">' + fmtMoneyFull(rentalY1) + '</td>' +
         '<td class="numeric">' + fmtMoneyFull(bitcoinY1) + '</td></tr>' +
-      '<tr><td>' + s.holdingYears + '-year cumulative cash flow</td>' +
+      '<tr><td>' + s.holdingYears + '-year cumulative cash flow' + (real ? ' (nominal sum)' : '') + '</td>' +
         '<td class="numeric">' + fmtMoneyFull(results.keep.cumulativeCash) + '</td>' +
         '<td class="numeric">' + fmtMoneyFull(s.path === 2 ? results.path.retainedRental.cumulativeCash : (results.path.yieldPortfolio ? results.path.yieldPortfolio.cumulativeCashAfterTax : 0)) + '</td></tr>' +
       (anyMortgage
@@ -671,7 +705,7 @@
       '<tr><td>Tax treatment</td>' +
         '<td>Depreciation-shielded</td>' +
         '<td>' + (s.path === 1 ? 'LTCG on appreciation only' : 'Tax-deferred (return of capital, expected)') + '</td></tr>' +
-      '<tr class="' + winnerClass + '"><td><strong>' + s.holdingYears + '-year total asset value</strong></td>' +
+      '<tr class="' + winnerClass + '"><td><strong>' + s.holdingYears + '-year total asset value' + (real ? ' (today\u2019s&nbsp;$)' : '') + '</strong></td>' +
         '<td class="numeric"><strong>' + fmtMoneyFull(rentalTotal) + '</strong></td>' +
         '<td class="numeric"><strong>' + fmtMoneyFull(bitcoinTotal) + '</strong></td></tr>';
 
@@ -679,6 +713,11 @@
     if (headers) {
       headers.innerHTML = '<tr><th>Metric</th><th>Keep Rental</th><th>' + pathName + '</th></tr>';
     }
+    // What the table's dollars are (PR 4f).
+    var frame = document.getElementById('calc-comparison-frame');
+    if (frame) frame.textContent = real
+      ? ('The ' + s.holdingYears + '-year totals are in today\u2019s dollars, ' + deflatorPhrase() + '. The cash flows and the mortgage are nominal, as paid.')
+      : 'All figures are nominal: future dollars, as paid.';
   }
 
   function renderPathDetail(results, s){
@@ -750,6 +789,15 @@
         '<div><span>Spot BTC value at year ' + s.holdingYears + ' (' + scenarioLabel(s.btcScenario) + ')</span><strong>' + fmtMoneyFull(yp.spotFV) + '</strong></div>' +
         '</div></div>';
     }
+    // The mechanics stay in nominal dollars, as paid, in both views (PR 4f).
+    // In the Real view, say so, and give the factor for the year-N values
+    // Paths 2 and 4 show.
+    if (isReal()) {
+      html += '<div class="calc-detail-frame">' + ((s.path === 2 || s.path === 4)
+        ? 'These mechanics are in nominal dollars, as paid. The year-' + s.holdingYears + ' values are future dollars; in today\u2019s dollars, ' +
+          deflatorPhrase() + ', divide them by ' + RE.deflator(inflPct(), s.holdingYears).toFixed(2) + '.'
+        : 'These mechanics are in nominal dollars, as paid.') + '</div>';
+    }
     el.innerHTML = html;
   }
 
@@ -760,7 +808,8 @@
       if (!chip) return;
       var sCopy = Object.assign({}, s, { btcScenario: sc });
       var r = computeAll(sCopy);
-      var delta = r.path.totalWealth - r.keep.totalWealth;
+      // In the display frame (PR 4f); nominal as before.
+      var delta = inFrame(r.path.totalWealth, s.holdingYears) - inFrame(r.keep.totalWealth, s.holdingYears);
 
       // Effective CAGR display — derived dynamically from Power Law data
       // and the current holding period, so the number recalibrates as
@@ -860,6 +909,40 @@
     soldEl.textContent = sold + ' propert' + (sold === 1 ? 'y' : 'ies');
   }
 
+  // The frame's labels outside the result blocks (PR 4f): the toggle, the
+  // frame line under it (the shared binder writes it: which view is
+  // showing, and what Real means next to Nominal), the chart's title, and
+  // the note under the scenario chips (their growth rates are nominal in
+  // both views; their differences follow the frame).
+  var baselineCtl = null;
+  function renderFrameUI(){
+    var real = isReal();
+    if (baselineCtl) baselineCtl.renderFrame();
+    document.querySelectorAll('.calc-frame-btn').forEach(function(b){
+      var on = b.dataset.mode === state.displayMode;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    var cf = document.getElementById('calc-chart-frame');
+    if (cf) cf.textContent = real ? '(real, today\u2019s $)' : '(nominal, future $)';
+    var chipsNote = document.getElementById('calc-chips-frame');
+    if (chipsNote) chipsNote.hidden = !real;
+  }
+
+  function bindDisplayMode(){
+    document.querySelectorAll('.calc-frame-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if (btn.dataset.mode === state.displayMode) return;
+        state.displayMode = btn.dataset.mode;
+        // Rebuild the chart so its axis fits the new values, as the zoom
+        // toggle does.
+        if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+        rerender();
+      });
+    });
+    // "Change it" beside the frame line is bound by the shared binder.
+  }
+
   function renderSpecificCallout(s){
     var el = document.getElementById('calc-specific-callout');
     if (!el) return;
@@ -884,6 +967,7 @@
 
   function rerender(){
     var results = computeAll(state);
+    renderFrameUI();
     renderPathDescription();
     renderHeadline(results, state);
     renderComparison(results, state);
@@ -945,59 +1029,33 @@
     });
   }
 
-  // Home appreciation (PR 4a): chips + a typed value, both writing the
-  // shared nominal dimension. A typed value equal to a preset selects the
-  // preset. The one-line notice shows a pre-4a real value's conversion
-  // (ModelingAssumptions.migrationNote) until the reader next changes it.
-  function bindAppreciation(){
+  // The shared Baseline assumptions (PR 4f; design §7, rulings M1, P5):
+  // home appreciation (lcs.homeApprNominal, NOMINAL since PR 4a) and the
+  // deflator for the Real view (lcs.inflation) are bound by
+  // shared/real-estate-baseline.js, the binder Bitcoin vs. Real Estate uses
+  // too, so the two pages can't disagree about either. Typed appreciation
+  // updates the calculator at once and is committed to the sitewide store
+  // on 'change' (a value equal to a preset selects that preset); a store
+  // change, from this page, the other page or another tab, re-renders.
+  // The notice shows a pre-4a real value's conversion until the reader next
+  // changes appreciation.
+  function bindBaseline(){
     var MA = window.ModelingAssumptions;
-    var input = document.getElementById('calc-appreciation');
-    if (!MA || !input) return;
-    function pct2(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
-    function sync(){
-      var a = MA.get('homeApprNominal');
-      state.appreciationPct = a.value;
-      if (document.activeElement !== input) input.value = pct2(a.value);
-      document.querySelectorAll('#calc-appr-presets .calc-appr-preset').forEach(function(b){
-        b.classList.toggle('active', b.dataset.preset === a.preset);
-      });
-      var note = document.getElementById('calc-appr-notice');
-      var n = MA.migrationNote && MA.migrationNote();
-      if (note) {
-        note.textContent = n ? ('Your saved home appreciation, ' + pct2(n.real) + ' a year real, was converted to ' + pct2(n.nominal) + ' nominal at the ' + pct2(n.inflation) + ' inflation assumption. The calculator now takes appreciation in nominal terms.') : '';
-        note.hidden = !n;
+    if (!MA || !window.RealEstateBaseline) return;
+    baselineCtl = window.RealEstateBaseline.bind({
+      prefix: 'rp',
+      displayMode: function(){ return state.displayMode; },
+      onInput: function(dim, v){
+        if (dim !== 'homeApprNominal') return;
+        state.appreciationPct = v;
+        rerender();
+      },
+      onChange: function(dim){
+        if (dim === 'homeApprNominal' || dim === '*') state.appreciationPct = MA.get('homeApprNominal').value;
+        rerender();
       }
-    }
-    function commit(v){
-      var pre = MA.presetFor('homeApprNominal', v);
-      if (MA.clearMigrationNote) MA.clearMigrationNote();
-      if (pre === 'custom') MA.set('homeApprNominal', 'custom', v); else MA.set('homeApprNominal', pre);
-    }
-    input.addEventListener('input', function(){
-      var v = parseFloat(String(input.value).replace(/[%\s]/g, ''));
-      if (isFinite(v)) { state.appreciationPct = v; rerender(); }
     });
-    input.addEventListener('change', function(){
-      var v = parseFloat(String(input.value).replace(/[%\s]/g, ''));
-      if (isFinite(v)) commit(v);
-      input.value = pct2(state.appreciationPct);
-    });
-    document.querySelectorAll('#calc-appr-presets .calc-appr-preset').forEach(function(b){
-      b.addEventListener('click', function(){
-        var pre = b.dataset.preset;
-        if (MA.clearMigrationNote) MA.clearMigrationNote();
-        if (pre === 'custom') {
-          MA.set('homeApprNominal', 'custom', MA.get('homeApprNominal').value);
-          input.focus(); if (input.select) input.select();
-        } else {
-          MA.set('homeApprNominal', pre);
-        }
-      });
-    });
-    MA.subscribe(function(dim){
-      if (dim === 'homeApprNominal' || dim === '*') { sync(); rerender(); }
-    });
-    sync();
+    state.appreciationPct = MA.get('homeApprNominal').value;
   }
 
   function bindPortfolioSliders(){
@@ -1092,7 +1150,8 @@
     bindPathToggle();
     bindCAGRChips();
     bindZoomToggle();
-    bindAppreciation();
+    bindBaseline();
+    bindDisplayMode();
 
     // Initial: show path-4 group, hide others
     document.querySelectorAll('.calc-path-specific').forEach(function(grp){
@@ -1105,6 +1164,7 @@
     // cache). The headline / table / chips / detail / callout all
     // render fine in the hidden tab.
     var results = computeAll(state);
+    renderFrameUI();
     renderPathDescription();
     renderHeadline(results, state);
     renderComparison(results, state);

@@ -13,6 +13,8 @@
        await rePairQA.run()                 // hashes every vector
        await rePairQA.run({ expect: {...} }) // PASS/FAIL against hashes
        rePairQA.ledgerCheck()               // ledger final row = cards
+       rePairQA.parityCheck()               // same shared inputs, same
+                                            // house-side figures (PR 4f)
 
    It drives the page's own controls (so the real call paths run,
    not just the engine), pins everything that varies between loads,
@@ -20,7 +22,8 @@
      - Date.now → 2026-09-27T12:00Z; BTC → $100,000 (fwdBtcNow and, for
        the retrospective, TODAY_PRICE on BvRE; TODAY_PRICE on BvRP);
        ModelingAssumptions → inflation
-       m2-growth, homeApprNominal since-2000, realReturns diversified;
+       m2-growth, homeApprNominal since-2000, realReturns diversified (on
+       BvRP too since PR 4f, whose Real view reads the inflation);
      - captures result-container innerHTML and Chart.js dataset arrays
        (labels, data at full precision, hidden flags);
      - hashes each vector's capture (FNV-1a 32) and all of them
@@ -86,6 +89,20 @@
        is comparable with 4d. S-bvre moves because the growth-of-$1 and
        every-starting-year exhibits now grow housing by Case-Shiller (M11).
        ledgerCheck() is rebuilt for the monthly rows. BvRP is unchanged.
+     PR 4f (design §7; rulings M1, P5) — one Baseline assumptions binder
+       for the sitewide inputs on both pages (shared/real-estate-baseline.js).
+       BvRE: every vector is unchanged (the projection's deflator is now
+       RealEstateModel.deflator, the same expression); new E22 (a custom 2.5%
+       deflator) and E23 (Shadow Stats, 8%) exercise the binder's other
+       presets. BvRP's appreciation field is `rpHomeAppreciation` (was
+       `calc-appreciation`). New parityCheck(): the engine's house-side
+       figures for the same shared inputs, as each page computes them.
+       Then BvRP gains the Real view, whose default is Real (BvRE's is too).
+       RP_BASE pins the Nominal display and the deflator, so P1–P16 are
+       byte-comparable with 4e: the Nominal view renders exactly as before.
+       New: P17–P24, the Real view (defaults; Paths 1, 2 and 3; a CPI
+       deflator; a custom 0% deflator, which must equal Nominal in every
+       figure; a 30-year hold; the first-3-years chart).
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -152,9 +169,17 @@
     { id: 'E16', desc: 'proj, rent growth 2%', rentg: '2' },
     { id: 'E17', desc: 'proj, pre-4b tax 1.2% and insurance $1,800/yr', ptax: '1.2', ins: '1800' },
     { id: 'E18', desc: 'proj trend (the pre-4c default)', scenario: 'trend' },
-    { id: 'E19', desc: 'scenario line and Stay button, each scenario at defaults', growth: true }
+    { id: 'E19', desc: 'scenario line and Stay button, each scenario at defaults', growth: true },
+    { id: 'E22', desc: 'proj, custom deflator 2.5% (PR 4f)', infl: 'custom', inflVal: 2.5 },
+    { id: 'E23', desc: 'proj, Shadow Stats deflator 8% (PR 4f)', infl: 'shadow-stats' }
   ];
 
+  // The deflator: a preset, or a custom value (PR 4f).
+  function setInfl(x){
+    var MA = window.ModelingAssumptions;
+    if (!MA) return;
+    if (x.infl === 'custom') MA.set('inflation', 'custom', x.inflVal); else MA.set('inflation', x.infl);
+  }
   function applyRetro(v){
     var x = Object.assign({}, RETRO_BASE, v);
     click('.toggle-group .toggle-btn[data-mode="' + x.mode + '"]');
@@ -174,7 +199,7 @@
   function applyProj(v){
     var x = Object.assign({}, PROJ_BASE, v);
     var MA = window.ModelingAssumptions;
-    MA.set('inflation', x.infl); MA.set('homeApprNominal', 'since-2000'); MA.set('realReturns', 'diversified');
+    setInfl(x); MA.set('homeApprNominal', 'since-2000'); MA.set('realReturns', 'diversified');
     click('.purchase-btn[data-method="' + x.method + '"]');   // also resets the advanced box
     click('.scenario-btn[data-scenario="' + x.scenario + '"]');
     click('.display-mode-btn[data-mode="' + x.display + '"]');
@@ -210,7 +235,7 @@
   var RP_BASE = { path: '4', scenario: 'stay', value: '500000', yld: '4.4', hold: '10', basis: '60', held: '10',
                   state: 'OTHER', bracket: '24', ltv: '80', helocRate: '9.5', mortgage: '200000',
                   props: '3', retained: '2', port: [45, 30, 10, 15], appr: '4.68', sell: '6.6', btctx: '0.5',
-                  mortRate: '4.4', mortYears: '20' };
+                  mortRate: '4.4', mortYears: '20', display: 'nominal', infl: 'm2-growth', zoom: 'full' };
   var RP = [
     { id: 'P1',  desc: 'defaults (Path 4, stay, $500K, 4.4%, 10y, OTHER, 24%)' },
     { id: 'P2',  desc: 'Path 1', path: '1' },
@@ -232,13 +257,25 @@
     { id: 'P13', desc: 'Path 1 at the pre-4b costs (selling 8%, no bitcoin cost)', path: '1', sell: '8', btctx: '0' },
     { id: 'P14', desc: 'Path 4, no existing mortgage', mortgage: '0' },
     { id: 'P15', desc: 'Path 4, mortgage with 5 years left', mortYears: '5' },
-    { id: 'P16', desc: "Path 1, $450K mortgage the sale doesn't cover", path: '1', mortgage: '450000' }
+    { id: 'P16', desc: "Path 1, $450K mortgage the sale doesn't cover", path: '1', mortgage: '450000' },
+    { id: 'P17', desc: 'Real view: defaults (Path 4, stay), M2 growth 6.5% (PR 4f)', display: 'real' },
+    { id: 'P18', desc: 'Real view: Path 1', display: 'real', path: '1' },
+    { id: 'P19', desc: 'Real view: Path 2', display: 'real', path: '2' },
+    { id: 'P20', desc: 'Real view: Path 3', display: 'real', path: '3' },
+    { id: 'P21', desc: 'Real view: CPI deflator 3.5%', display: 'real', infl: 'cpi-official' },
+    { id: 'P22', desc: 'Real view: custom deflator 0% (every figure = Nominal)', display: 'real', infl: 'custom', inflVal: 0 },
+    { id: 'P23', desc: 'Real view: Path 1, hold 30y', display: 'real', path: '1', hold: '30' },
+    { id: 'P24', desc: 'Real view: first 3 years of the chart', display: 'real', zoom: 'first3' }
   ];
   function applyRp(v){
     var x = Object.assign({}, RP_BASE, v);
+    // The sitewide values first: a change there re-renders from the store.
+    setInfl(x);
     if (window.ModelingAssumptions) window.ModelingAssumptions.set('homeApprNominal', 'since-2000');
+    click('.calc-frame-btn[data-mode="' + x.display + '"]');   // PR 4f
+    click('.calc-chart-zoom-btn[data-zoom="' + x.zoom + '"]');
     click('.calc-path-btn[data-path="' + x.path + '"]');
-    setVal('calc-appreciation', x.appr);                      // input only, as on BvRE
+    setVal('rpHomeAppreciation', x.appr);                     // input only, as on BvRE
     setVal('calc-sell-cost', x.sell); setVal('calc-btc-tx', x.btctx);
     setVal('calc-property-value', x.value); setVal('calc-net-yield', x.yld); setVal('calc-holding-years', x.hold);
     setVal('calc-adjusted-basis', x.basis); setVal('calc-years-held', x.held);
@@ -250,10 +287,20 @@
     click('.calc-cagr-chip[data-scenario="' + x.scenario + '"]');
   }
   function captureRp(){
-    return { headline: html('calc-headline'), compHead: html('calc-comparison-headers'), comp: html('calc-comparison-body'),
+    var c = { headline: html('calc-headline'), compHead: html('calc-comparison-headers'), comp: html('calc-comparison-body'),
              detail: html('calc-path-detail'), callout: html('calc-specific-callout'), desc: html('calc-path-description'),
              chips: html('calc-cagr-chips'), multiple: html('calc-current-multiple'), chart: chartData('calc-chart') };
+    // The Real view's own labels (PR 4f). Captured in the Real view only, so
+    // a Nominal capture is the same object as before 4f and P1–P16 stay
+    // byte-comparable.
+    if (state_display() === 'real') {
+      var q = function(id){ var n = el(id); return n ? n.textContent : null; };
+      c.frame = { line: q('rpDeflatorLine'), chart: q('calc-chart-frame'), table: q('calc-comparison-frame'),
+                  chips: el('calc-chips-frame') ? !el('calc-chips-frame').hidden : null };
+    }
+    return c;
   }
+  function state_display(){ var b = document.querySelector('.calc-frame-btn.active'); return b ? b.getAttribute('data-mode') : null; }
   function captureRpStatic(){
     var q = function(sel){ return Array.prototype.map.call(document.querySelectorAll(sel), function(n){ return n.textContent; }); };
     return { plCagr: q('[data-pl-cagr]'), plStay: q('[data-pl-stay-fv]'),
@@ -277,7 +324,7 @@
 
     // Save state
     var saved = { now: Date.now, url: location.pathname + location.search + location.hash, store: null, ma: {}, today: window.TODAY_PRICE,
-                  btcNow: el('fwdBtcNow') ? el('fwdBtcNow').value : null };
+                  btcNow: el('fwdBtcNow') ? el('fwdBtcNow').value : null, display: state_display() };
     try { saved.store = localStorage.getItem('lcs.bvre.calc.v2'); } catch (e) {}
     if (window.ModelingAssumptions) ['inflation', 'homeApprNominal', 'realReturns'].forEach(function(d){ saved.ma[d] = window.ModelingAssumptions.get(d); });
 
@@ -308,6 +355,7 @@
         rows.push({ id: 'S-bvrp', desc: 'Power Law copy spans', hash: fnv(s0), len: s0.length }); all.push(s0);
         RP.forEach(function(v){ applyRp(v); var s = JSON.stringify(captureRp()); rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s); });
         applyRp({});
+        if (saved.display) click('.calc-frame-btn[data-mode="' + saved.display + '"]');   // the reader's frame (PR 4f)
       }
     } finally {
       Date.now = saved.now;
@@ -380,5 +428,71 @@
     return { pass: fails.length === 0, fails: fails, rows: out };
   }
 
-  window.rePairQA = { run: run, ledgerCheck: ledgerCheck, vectors: { retro: RETRO, projection: PROJ, rental: RP } };
+  // ─── Parity: the same shared inputs give the same house-side figures ───
+  // (PR 4f; design §11's parity tripwire, its first half; PR 8 finishes it.)
+  // Each vector is one house described in the pair's shared inputs: price,
+  // nominal appreciation, horizon, selling costs, deflator, and a 30-year
+  // loan. The check computes the house as each page's engine does, BvRE's
+  // projection (bvreProjection) and BvRP's rental (calcRentalExit and
+  // existingLoan, with the Real view's toReal), and asserts they agree:
+  // value, selling costs, value less selling costs, the same in the Real
+  // view, the deflator, and the loan's payment, interest and balance. The
+  // arithmetic is shared, so value and costs must match exactly; the two
+  // loan schedules are written differently and must agree to rounding.
+  // Runs on either page (both load RealEstateModel).
+  var PARITY = [
+    { id: 'H1', desc: 'the BvRE default house: $415K, 4.68%, 10y, 6.6% selling, M2 6.5%, 20% down at 6.8%',
+      price: 415000, appr: 4.68, years: 10, sell: 6.6, infl: 6.5, downPct: 20, rate: 6.8 },
+    { id: 'H2', desc: '$500K, long run 3.41%, 20y, CPI 3.5%, 10% down at 7.5%',
+      price: 500000, appr: 3.41, years: 20, sell: 6.6, infl: 3.5, downPct: 10, rate: 7.5 },
+    { id: 'H3', desc: '$750K cash, 1%, 5y, no selling costs, no inflation',
+      price: 750000, appr: 1, years: 5, sell: 0, infl: 0, downPct: 100, rate: 6.8 },
+    { id: 'H4', desc: '$300K, 6%, 15y, 10% selling, Shadow Stats 8%, 3.5% down at 4%',
+      price: 300000, appr: 6, years: 15, sell: 10, infl: 8, downPct: 3.5, rate: 4 }
+  ];
+  function parityCheck(){
+    var RE = window.RealEstateModel;
+    if (!RE || !RE.bvreProjection || !RE.calcRentalExit) { console.error('rePairQA.parityCheck: needs RealEstateModel'); return null; }
+    var D = RE.PAIR_DEFAULTS, out = [], fails = [], savedNow = Date.now;
+    function near(a, b){ return Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(a), Math.abs(b)); }
+    Date.now = function(){ return FIXED_NOW; };
+    try {
+      PARITY.forEach(function(v){
+        var cash = v.downPct >= 100, loan = cash ? 0 : v.price * (1 - v.downPct / 100);
+        // BvRE, as its projection computes the house.
+        var P = RE.bvreProjection({ method: cash ? 'cash' : 'mortgage', scenario: 'stay', horizonYrs: v.years, btcNow: FIXED_BTC,
+          homePrice: v.price, homeApprNominal: v.appr, inflRate: v.infl, mortRate: v.rate, dpf: v.downPct / 100,
+          rent: null, rentGrowth: null, closingPct: D.closingPct, propTaxPct: D.propTaxPct, insurance: null,
+          maintPct: D.maintPct, sellPct: v.sell, btcTxPct: D.btcTxPct, investDiff: true });
+        // BvRP, as its rental computes the same house and loan.
+        var s = { propertyValue: v.price, appreciationPct: v.appr, sellCostPct: v.sell, yearsAlreadyHeld: 0, adjustedBasisPct: 100,
+                  federalBracketPct: 24, stateCode: 'OTHER', existingMortgage: loan, mortgageRatePct: v.rate, mortgageYearsLeft: 30 };
+        var X = RE.calcRentalExit(s, v.years);
+        var L = RE.existingLoan(s, 1, v.years);
+        var interest = 0; for (var k = 1; k <= v.years; k++) interest += L.interest[k];
+        var checks = {
+          value: P.homeEnd === X.marketValue,
+          sellCosts: P.sellCosts === X.transactionCosts,
+          lessSelling: (P.homeEnd - P.sellCosts) === X.netProceeds,
+          deflator: P.deflator === RE.deflator(v.infl, v.years),
+          realValue: P.real.homeEnd === RE.toReal(X.marketValue, v.infl, v.years),
+          realSellCosts: P.real.sellCosts === RE.toReal(X.transactionCosts, v.infl, v.years),
+          payment: near(P.monthlyPI, L.payment),
+          interest: near(P.totals.interest, interest),
+          balance: near(P.balance, L.balance[v.years]),
+          realBalance: near(P.real.balance, RE.toReal(L.balance[v.years], v.infl, v.years))
+        };
+        var ok = Object.keys(checks).every(function(k){ return checks[k]; });
+        if (!ok) fails.push(v.id);
+        out.push(Object.assign({ id: v.id, ok: ok, homeEnd: Math.round(P.homeEnd), loanEnd: Math.round(P.balance) }, checks));
+      });
+    } finally { Date.now = savedNow; }
+    console.table(out);
+    if (!fails.length) console.log('%crePairQA.parityCheck PASS', 'color:#7fc47f;font-weight:bold', '— ' + out.length + ' houses, the same on both engines');
+    else console.error('rePairQA.parityCheck FAIL', fails);
+    return { pass: fails.length === 0, fails: fails, rows: out };
+  }
+
+  window.rePairQA = { run: run, ledgerCheck: ledgerCheck, parityCheck: parityCheck,
+                      vectors: { retro: RETRO, projection: PROJ, rental: RP, parity: PARITY } };
 })();

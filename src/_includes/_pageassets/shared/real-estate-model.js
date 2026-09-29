@@ -231,6 +231,14 @@
 
   function numOr(v, d){ return (v !== undefined && v !== null && isFinite(v)) ? Number(v) : d; }
 
+  // ─── The Real view's deflator, one for both pages (PR 4f; rulings M1, P5) ───
+  // Everything is computed in nominal dollars; the Real view divides a value
+  // at year t by (1 + inflation)^t, the sitewide deflator. Every value at the
+  // same date is divided by the same factor, so the deflator can never change
+  // which path is ahead. BvRE's projection and BvRP's Real view both call it.
+  function deflator(inflPct, years){ return Math.pow(1 + inflPct / 100, years); }
+  function toReal(v, inflPct, years){ return v / deflator(inflPct, years); }
+
   // ─── Math: rental side ───
   function calcRentalAnnualCF(s){
     // Net cash flow as expressed; user input already nets the waterfall.
@@ -910,8 +918,8 @@
     var rg = ((i.rentGrowth === null || i.rentGrowth === undefined) ? i.homeApprNominal : i.rentGrowth) / 100;
     var tx = i.btcTxPct / 100;
     var invest = i.investDiff !== false;
-    var defl = Math.pow(1 + i.inflRate / 100, horizonYrs);
-    function toReal(v){ return v / defl; }
+    var defl = deflator(i.inflRate, horizonYrs);   // the shared deflator (PR 4f); the same expression as before
+    function real(v){ return v / defl; }
 
     var cash = method === 'cash';
     var loan = cash ? 0 : homePrice * (1 - i.dpf);
@@ -1021,9 +1029,9 @@
     o.homeEnd = homeEnd; o.balance = bal; o.sellCosts = sellCosts; o.houseHeld = houseHeld; o.houseIfSold = houseIfSold;
     o.equityPct = homeEnd > 0 ? Math.round((houseHeld / homeEnd) * 100) : 0;
     o.real = {
-      btcValue: toReal(btcValue), btcIfSold: toReal(btcIfSold), btcSaleCost: toReal(btcSaleCost), priceEnd: toReal(priceEnd),
-      homeEnd: toReal(homeEnd), sellCosts: toReal(sellCosts), balance: toReal(bal),
-      houseHeld: toReal(houseHeld), houseIfSold: toReal(houseIfSold)
+      btcValue: real(btcValue), btcIfSold: real(btcIfSold), btcSaleCost: real(btcSaleCost), priceEnd: real(priceEnd),
+      homeEnd: real(homeEnd), sellCosts: real(sellCosts), balance: real(bal),
+      houseHeld: real(houseHeld), houseIfSold: real(houseIfSold)
     };
     o.deflator = defl;
     o.housesCanBuy = homeEnd > 0 ? Math.max(0, btcIfSold / homeEnd) : 0;
@@ -1047,6 +1055,8 @@
     // shared primitives
     mortgagePayment: mortgagePayment,
     amortizeBalance: amortizeBalance,
+    deflator: deflator,
+    toReal: toReal,
     // BvRE
     bvreRetro: bvreRetro,
     bvreProjection: bvreProjection,

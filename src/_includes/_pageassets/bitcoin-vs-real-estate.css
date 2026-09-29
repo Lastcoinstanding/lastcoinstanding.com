@@ -472,10 +472,16 @@
 .re-baseline-input { max-width: 160px; }
 .re-baseline-input[hidden] { display: none; }  /* .calc-field's display:flex would otherwise override [hidden] */
 .re-baseline-note { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; margin: 0.5rem 0 0; }
-.re-deflator-line { font-size: 0.74rem; color: var(--text-muted); text-align: right; margin: 0 0 1rem; }
+/* PR 4f: the frame line under the Real / Nominal toggle says which view is
+   showing and what Real means next to Nominal (JM, 2026-09-29), as on
+   Bitcoin vs. Rental Property. Two sentences, so they are set left in a box
+   that sits under the right-hand toggle, in the dim ink (the muted ink is
+   too faint to read at this size). */
+.re-deflator-line { font-size: 0.76rem; line-height: 1.5; color: var(--text-dim); text-align: left; width: fit-content; max-width: 40rem; margin: 0 0 1rem auto; }
+.re-deflator-line strong { color: var(--text); font-weight: 600; }
 @media (max-width: 480px) {
   .re-preset-btn { font-size: 0.7rem; padding: 0.45rem 0.15rem; }
-  .re-deflator-line { text-align: left; }
+  .re-deflator-line { margin-left: 0; }
 }
 /* PR 4b: rent and cost inputs in the Baseline assumptions block, and the
    equal-cash-out toggle that sits with the results (rulings M2, P6). */

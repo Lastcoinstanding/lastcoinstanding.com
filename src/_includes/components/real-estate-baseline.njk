@@ -1,0 +1,67 @@
+{#-
+  ════════ REAL-ESTATE PAIR · BASELINE ASSUMPTIONS, THE SHARED PART ════════
+
+  PR 4f (REAL_ESTATE_PAIR_DESIGN.md §7; rulings M1, P5). Bitcoin vs. Real
+  Estate and Bitcoin vs. Rental Property share two assumptions that the site
+  keeps for every calculator (shared/modeling-assumptions.js): nominal home
+  appreciation and the deflator for the Real view. This file is the one
+  source for their words and their preset buttons. Each page lays them out
+  in its own idiom (BvRE's fields, BvRP's slider cards) and binds them with
+  shared/real-estate-baseline.js (window.RealEstateBaseline), which finds
+  them by id: <prefix>ApprPresets, <prefix>HomeAppreciation,
+  <prefix>ApprNotice, <prefix>InflPresets, <prefix>Inflation. Preset values
+  in the markup are first paint only; the binder rewrites them from
+  ModelingAssumptions, so a changed preset is edited in one place (plus the
+  prose below, which quotes them: MONTHLY_REFRESH_CHECKLIST §9.3, annual).
+
+  Usage (macros, so each page keeps its own classes):
+      {% import 'components/real-estate-baseline.njk' as reb %}
+      {{ reb.apprTip('bvre') }}            the help tip, naming the other page
+      {{ reb.apprPresets('fwd', 're-preset-btns', 're-preset-btn', 're-preset-val') }}
+      {{ reb.inflTip('bvre') }}
+      {{ reb.inflPresets('fwd', 're-preset-btns', 're-preset-btn', 're-preset-val') }}
+      {{ reb.frameTip('bvre') }}           the Real / Nominal toggle's help tip
+  `side` is the page the macro is rendered on: 'bvre' or 'bvrp'.
+
+  The line under the toggle (<prefix>DeflatorLine), which says which frame is
+  showing, is written by the binder: its worked example is computed from the
+  deflator in force, so this file's static copy states no figure beside it
+  (STYLE_GUIDE §10.8).
+-#}
+
+{% macro otherPage(side) -%}
+{%- if side == 'bvre' -%}Bitcoin vs. Rental Property{%- else -%}Bitcoin vs. Real Estate{%- endif -%}
+{%- endmacro %}
+
+{% macro apprTip(side, extra) -%}
+<span class="help-tip{% if extra %} {{ extra }}{% endif %}" tabindex="0">?<span class="tip-content">How fast home prices rise, in <strong>nominal</strong> terms, the way house prices and mortgage rates are quoted. The presets are the recorded US rate to 2025: <strong>Since 2000</strong> 4.68% a year (S&amp;P Cotality Case-Shiller National; the default, and the highest of the three windows), <strong>Since 1990</strong> 4.23%, and <strong>Long run</strong> 3.41% (Shiller&rsquo;s series from 1890, chained to Case-Shiller). A national index: your market can differ. When inflation runs higher, home prices tend to rise in nominal terms while a fixed-rate loan balance doesn&rsquo;t. That is the fixed-rate borrower&rsquo;s inflation benefit. To model a higher-inflation future, raise nominal appreciation. The same setting drives {{ otherPage(side) }}.</span></span>
+{%- endmacro %}
+
+{% macro inflTip(side, extra) -%}
+<span class="help-tip{% if extra %} {{ extra }}{% endif %}" tabindex="0">?<span class="tip-content">The inflation rate the <strong>Real</strong> view uses to turn future dollars into today&rsquo;s. It divides both paths by the same factor, so it never changes which one comes out ahead. <strong>CPI</strong> (3.5%) is about the long-run official rate; <strong>M2 growth</strong> (6.5%), the site&rsquo;s default, is about the 50-year growth of the money supply; <strong>Shadow Stats</strong> (8%) follows John Williams&rsquo;s reconstruction of the pre-1980 CPI method, which is disputed. It is the sitewide setting: changing it here changes it on {{ otherPage(side) }}, The Half-Life and every other calculator that uses it.</span></span>
+{%- endmacro %}
+
+{# The Real / Nominal toggle (P5; JM 2026-09-29: say what Real means and how
+   it differs from Nominal). No figure: the line under the toggle carries the
+   deflator and the worked example. #}
+{% macro frameTip(side, extra) -%}
+<span class="help-tip{% if extra %} {{ extra }}{% endif %}" tabindex="0">?<span class="tip-content"><strong>Real</strong> shows each year&rsquo;s dollars in today&rsquo;s purchasing power: divided by the deflator named below, compounded to that year. <strong>Nominal</strong> shows the future dollars themselves, with nothing taken off for inflation. Both paths are divided by the same factor each year, so switching never changes which one is ahead. Money paid or received along the way is nominal in both views, as paid{% if side == 'bvrp' %}, and so are the table&rsquo;s mortgage row and the path card&rsquo;s sale mechanics{% endif %}.</span></span>
+{%- endmacro %}
+
+{% macro apprPresets(prefix, wrapClass, btnClass, valClass) -%}
+<div class="{{ wrapClass }}" id="{{ prefix }}ApprPresets" role="group" aria-label="Home appreciation presets">
+    <button type="button" class="{{ btnClass }}" data-preset="long-run" aria-pressed="false">Long run<span class="{{ valClass }}" data-reb-val>3.41%</span></button>
+    <button type="button" class="{{ btnClass }}" data-preset="since-1990" aria-pressed="false">Since 1990<span class="{{ valClass }}" data-reb-val>4.23%</span></button>
+    <button type="button" class="{{ btnClass }} active" data-preset="since-2000" aria-pressed="true">Since 2000<span class="{{ valClass }}" data-reb-val>4.68%</span></button>
+    <button type="button" class="{{ btnClass }}" data-preset="custom" aria-pressed="false">Custom<span class="{{ valClass }}">your own</span></button>
+</div>
+{%- endmacro %}
+
+{% macro inflPresets(prefix, wrapClass, btnClass, valClass) -%}
+<div class="{{ wrapClass }}" id="{{ prefix }}InflPresets" role="group" aria-label="Deflator presets">
+    <button type="button" class="{{ btnClass }}" data-preset="cpi-official" aria-pressed="false">CPI<span class="{{ valClass }}" data-reb-val>3.5%</span></button>
+    <button type="button" class="{{ btnClass }} active" data-preset="m2-growth" aria-pressed="true">M2 growth<span class="{{ valClass }}" data-reb-val>6.5%</span></button>
+    <button type="button" class="{{ btnClass }}" data-preset="shadow-stats" aria-pressed="false">Shadow Stats<span class="{{ valClass }}" data-reb-val>8%</span></button>
+    <button type="button" class="{{ btnClass }}" data-preset="custom" aria-pressed="false">Custom<span class="{{ valClass }}">your own</span></button>
+</div>
+{%- endmacro %}

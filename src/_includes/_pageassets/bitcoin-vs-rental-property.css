@@ -1575,6 +1575,9 @@ html, body {
   line-height: 1.5;
   margin: 0.5rem 0 0;
 }
+/* PR 4f: `.bvrp-section p` (1.02rem, 0 0 1.1rem) outranks a single class,
+   so the notice was set at body size. Scoped under .calc-wrap. */
+.calc-wrap .calc-appr-notice { font-size: 0.78rem; line-height: 1.5; margin: 0.5rem 0 0; }
 
 /* PR 4c (rulings M3): four scenario chips. "Stay at today's multiple"
    wraps at desktop width; keep the help glyph with the last word. */
@@ -1605,3 +1608,98 @@ html, body {
 .calc-rates-table { font-size: 0.8rem; }
 .calc-rates-table th, .calc-rates-table td { padding: 0.45rem 0.6rem; }
 .calc-rates-sub { display: block; font-size: 0.72rem; color: var(--ink-dim); margin-top: 0.15rem; }
+
+/* PR 4f (design §7; rulings M1, P5): the Real / Nominal toggle and the Real
+   label, as on Bitcoin vs. Real Estate; the pill matches the chart's zoom
+   toggle. The frame notes under the chips, the table and the path card say
+   which figures follow the toggle and which stay nominal, as paid. */
+.calc-frame-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.8rem;
+  margin: 0.2rem 0 0.35rem;
+}
+.calc-frame-label {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.calc-frame-toggle {
+  display: inline-flex;
+  gap: 0.3rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border-faint);
+  border-radius: 0.4rem;
+  padding: 0.15rem;
+}
+.calc-frame-btn {
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  font-weight: 500;
+  padding: 0.35rem 0.7rem;
+  background: transparent;
+  border: none;
+  border-radius: 0.3rem;
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  letter-spacing: 0.02em;
+}
+.calc-frame-btn:hover { color: var(--ink); }
+.calc-frame-btn.active {
+  background: rgba(224,148,34,0.14);
+  color: var(--amber-bright);
+  font-weight: 600;
+}
+/* These notes are <p>s, and `.bvrp-section p` outranks a single class, so
+   they are scoped under .calc-wrap, as the appreciation notice is. The
+   frame line says which view is showing and what Real means next to
+   Nominal (JM, 2026-09-29): two sentences, so they are set left in a box
+   that sits under the right-hand toggle. */
+.calc-wrap .calc-deflator-line {
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--ink-dim);
+  text-align: left;
+  width: fit-content;
+  max-width: 40rem;
+  margin: 0 0 0.2rem auto;
+}
+.calc-wrap .calc-deflator-line strong { color: var(--ink); font-weight: 600; }
+.calc-deflator-change {
+  color: var(--amber);
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(224,148,34,0.5);
+  margin-left: 0.25rem;
+  white-space: nowrap;
+}
+.calc-deflator-change:hover { color: var(--amber-bright); border-bottom-color: var(--amber-bright); }
+.calc-chart-frame {
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  color: var(--ink-dim);
+}
+.calc-wrap .calc-chips-frame,
+.calc-wrap .calc-comparison-frame,
+.calc-detail-frame {
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  font-style: italic;
+  color: var(--ink-dim);
+  line-height: 1.5;
+}
+.calc-wrap .calc-chips-frame { margin: 0.55rem 0 0; }
+.calc-wrap .calc-chips-frame[hidden] { display: none; }
+.calc-wrap .calc-comparison-frame { margin: 0.6rem 0 0; }
+.calc-detail-frame { margin-top: 0.9rem; }
+@media (max-width: 600px) {
+  .calc-frame-row { justify-content: flex-start; }
+  .calc-wrap .calc-deflator-line { margin-left: 0; }
+}
