@@ -197,7 +197,17 @@
     return Math.pow(totalGrowth, 1 / holdingYears) - 1;
   }
 
-  // ─── Rental-page rates (PR 4d) ───
+  // ─── Rental-page defaults and rates (PR 4d) ───
+  // The existing mortgage, per property (rulings M8). $200,000 on the
+  // $500,000 default property is 40% of its value; FHFA's National
+  // Mortgage Database puts the average mark-to-market LTV of outstanding
+  // US mortgages at 45% (2026 Q1, by loan count). The rate is the average
+  // contract rate on outstanding US mortgages, 4.4% (NMDB 2026 Q1, by count
+  // and by balance); loans on rental properties usually cost more. Years
+  // left: a 30-year loan taken when the property was bought, ten years ago
+  // (the page's "years already held" default).
+  var RENTAL_DEFAULTS = { existingMortgage: 200000, mortgageRatePct: 4.4, mortgageYearsLeft: 20 };
+
   // The yield portfolio's rates, and the verifiable rates the stablecoin-
   // lending disclosure lists, in one dated object (rulings §7, item 12), so
   // the monthly refresh is a one-place edit (MONTHLY_REFRESH_CHECKLIST §9.3a).
@@ -216,6 +226,8 @@
     ]
   };
 
+  function numOr(v, d){ return (v !== undefined && v !== null && isFinite(v)) ? Number(v) : d; }
+
   // ─── Math: rental side ───
   function calcRentalAnnualCF(s){
     // Net cash flow as expressed; user input already nets the waterfall.
@@ -224,6 +236,60 @@
     var taxableIncome = Math.max(0, gross - depreciation);
     var tax = taxableIncome * (s.federalBracketPct / 100);
     return { pretax: gross, depreciation: depreciation, tax: tax, afterTax: gross - tax };
+  }
+
+  // The existing mortgage on `units` identical properties (M8), amortized
+  // monthly from today for `years` years. balance[t] is the balance after t
+  // years; paid[k] and interest[k] are the payments made and the interest
+  // paid in year k (1-based). Payments stop when the loan is paid off.
+  function existingLoan(s, units, years){
+    var bal = Math.max(0, numOr(s.existingMortgage, RENTAL_DEFAULTS.existingMortgage)) * (units === undefined ? 1 : units);
+    var ratePct = numOr(s.mortgageRatePct, RENTAL_DEFAULTS.mortgageRatePct);
+    var n = Math.max(0, Math.round(numOr(s.mortgageYearsLeft, RENTAL_DEFAULTS.mortgageYearsLeft) * 12));
+    var mr = ratePct / 100 / 12;
+    var payment = (bal > 0 && n > 0) ? (mr > 0 ? bal * mr / (1 - Math.pow(1 + mr, -n)) : bal / n) : 0;
+    var out = { balance0: bal, payment: payment, balance: [bal], paid: [0], interest: [0] };
+    var m = 0;
+    for (var k = 1; k <= Math.max(1, years); k++) {
+      var paidK = 0, intK = 0;
+      for (var j = 0; j < 12; j++) {
+        m++;
+        if (m > n || bal <= 0) continue;
+        var it = bal * mr;
+        var pr = Math.min(payment - it, bal);
+        bal -= pr; paidK += it + pr; intK += it;
+      }
+      out.balance.push(bal); out.paid.push(paidK); out.interest.push(intK);
+    }
+    return out;
+  }
+
+  // Keep-rental cash flow year by year, with the existing mortgage (M8):
+  // debt service comes off cash flow and interest is deductible against
+  // rental income. Net operating income stays flat, as before; the rest of
+  // the tax model (straight-line depreciation on 80% of value, no state tax
+  // on rental income, losses not carried) changes in PR 5 (M9).
+  function rentalYears(s, units, years){
+    var gross = s.propertyValue * (s.netRentalYield / 100);
+    var depreciation = (s.propertyValue * 0.80) / 27.5;
+    var loan = existingLoan(s, units, years);
+    var rows = [null];
+    for (var k = 1; k <= Math.max(1, years); k++) {
+      var taxable = Math.max(0, gross - depreciation - loan.interest[k]);
+      var tax = taxable * (s.federalBracketPct / 100);
+      rows.push({ pretax: gross, depreciation: depreciation, interest: loan.interest[k], debtService: loan.paid[k],
+                  tax: tax, afterTax: gross - loan.paid[k] - tax });
+    }
+    return { loan: loan, rows: rows };
+  }
+
+  // Cumulative after-tax cash to year t: year 1's times t, plus each year's
+  // difference from year 1. The same sum, arranged so that with no mortgage
+  // (every year alike) it is year 1 x t exactly, as before PR 4d.
+  function cumulativeRentalCash(ry, t){
+    var base = ry.rows[1].afterTax, extra = 0;
+    for (var k = 2; k <= t; k++) extra += ry.rows[k].afterTax - base;
+    return base * t + extra;
   }
 
   // Selling costs (% of sale price) and bitcoin's purchase factor, read
@@ -325,40 +391,58 @@
 
   // ─── Counterfactual: keep rental ───
   // Asset-value (mark-to-market) framing: keep-rental wealth is cumulative
-  // after-tax cash flow + the property's market value at year N. The exit
-  // tax that would arise on sale is NOT applied — we're showing the asset
-  // trajectory of someone who intends to keep holding. The path-detail
-  // card shows the tax waterfall explicitly for users who want to see
-  // the realizable-at-year-N number.
+  // after-tax cash flow + the property's market value at year N, less the
+  // mortgage balance then (M8, PR 4d). The exit tax that would arise on
+  // sale is NOT applied — we're showing the asset trajectory of someone
+  // who intends to keep holding. The path-detail card shows the tax
+  // waterfall explicitly for users who want to see the realizable-at-
+  // year-N number.
   //
   // This matches the visual framing of the chart: bitcoin paths pay their
   // exit tax up front (year 0) so they start lower; keep-rental defers
   // the exit tax indefinitely so it starts higher. The chart honestly
   // shows the "selling has an immediate cost" reality the prior version
   // silently hid by applying exit tax to both sides at year N.
-  function calcKeepRental(s){
-    var annual = calcRentalAnnualCF(s);
-    var cumulativeCash = annual.afterTax * s.holdingYears;
+  //
+  // `units`: how many identical properties (Path 3 keeps all of them); the
+  // existing mortgage is per property. s.propertyValue is already the total.
+  function calcKeepRental(s, units){
+    var ry = rentalYears(s, units === undefined ? 1 : units, s.holdingYears);
+    var cumulativeCash = cumulativeRentalCash(ry, s.holdingYears);
     var exit = calcRentalExit(s, s.holdingYears);
-    var totalWealth = cumulativeCash + exit.marketValue;  // unrealized
+    var mortgageEnd = ry.loan.balance[s.holdingYears] || 0;
+    var totalWealth = cumulativeCash + exit.marketValue - mortgageEnd;  // unrealized
     return {
-      annual: annual,
+      annual: ry.rows[1],
       cumulativeCash: cumulativeCash,
       exit: exit,
+      mortgage0: ry.loan.balance0,
+      mortgagePayment: ry.loan.payment,
+      mortgageEnd: mortgageEnd,
       totalWealth: totalWealth
     };
+  }
+
+  // A sale repays the existing mortgage before anything is redeployed (M8).
+  // If the proceeds after tax don't cover it, nothing is deployed and the
+  // shortfall is paid from other money, so it counts against the path.
+  function afterRepayment(netCash, repay){
+    var left = netCash - repay;
+    return { repaid: repay, deployed: Math.max(0, left), shortfall: Math.max(0, -left) };
   }
 
   // ─── Path-specific calculators ───
   function calcPath1(s){
     var exitNow = calcRentalExit(s, 0);
-    var netCash = exitNow.netCash;
-    var spotFV = calcSpotBTCFV(netCash * btcBuyFactor(s), s.holdingYears, s.btcScenario);
+    var r = afterRepayment(exitNow.netCash, existingLoan(s, 1, 0).balance0);
+    var spotFV = calcSpotBTCFV(r.deployed * btcBuyFactor(s), s.holdingYears, s.btcScenario);
     return {
       saleAtYear0: exitNow,
+      mortgageRepaid: r.repaid,
+      shortfall: r.shortfall,
       year1CashFlow: 0,  // pure spot, no distributions
-      totalWealth: spotFV,
-      netCashDeployed: netCash
+      totalWealth: spotFV - r.shortfall,
+      netCashDeployed: r.deployed
     };
   }
 
@@ -373,8 +457,8 @@
     var grossGain = btcFV - helocDraw;  // BTC appreciation
     var netGainFromLeverage = grossGain - cumulativeCarry;  // after carry cost
 
-    // Retained rental: continues earning
-    var keep = calcKeepRental(s);
+    // Retained rental: continues earning, and keeps its mortgage (M8)
+    var keep = calcKeepRental(s, 1);
 
     var totalWealth = keep.totalWealth + netGainFromLeverage;
     return {
@@ -395,28 +479,32 @@
     var sold = Math.max(0, s.numProperties - s.propertiesRetained);
     var retained = s.propertiesRetained;
 
-    // Per-property economics (assume identical)
+    // Per-property economics (assume identical, each with the same mortgage)
     var perPropertyValue = s.propertyValue;
     var soldPropertiesValue = perPropertyValue * sold;
 
-    // Sale on the sold portion, deploy to yield portfolio
+    // Sale on the sold portion repays their mortgages, then deploys to the
+    // yield portfolio
     var sellS = Object.assign({}, s, { propertyValue: soldPropertiesValue });
     var exitNow = calcRentalExit(sellS, 0);
-    var netCashFromSale = exitNow.netCash;
+    var r = afterRepayment(exitNow.netCash, existingLoan(s, sold, 0).balance0);
+    var netCashFromSale = r.deployed;
 
     var yieldPort = calcYieldPortfolio(netCashFromSale, s);
 
-    // Retained properties keep earning
+    // Retained properties keep earning, and keep their mortgages
     var retainedS = Object.assign({}, s, { propertyValue: perPropertyValue * retained });
-    var keep = calcKeepRental(retainedS);
+    var keep = calcKeepRental(retainedS, retained);
 
-    var totalWealth = yieldPort.totalWealth + keep.totalWealth;
+    var totalWealth = yieldPort.totalWealth + keep.totalWealth - r.shortfall;
     var year1CF = yieldPort.year1AfterTax + keep.annual.afterTax;
     return {
       sold: sold,
       retained: retained,
       soldPropertiesValue: soldPropertiesValue,
       saleResult: exitNow,
+      mortgageRepaid: r.repaid,
+      shortfall: r.shortfall,
       netCashFromSale: netCashFromSale,
       yieldPortfolio: yieldPort,
       retainedRental: keep,
@@ -426,16 +514,18 @@
   }
 
   function calcPath4(s){
-    // Outright sell + deploy net cash to yield portfolio
+    // Outright sell, repay the mortgage, deploy the rest to the yield portfolio
     var exitNow = calcRentalExit(s, 0);
-    var netCash = exitNow.netCash;
-    var yieldPort = calcYieldPortfolio(netCash, s);
+    var r = afterRepayment(exitNow.netCash, existingLoan(s, 1, 0).balance0);
+    var yieldPort = calcYieldPortfolio(r.deployed, s);
     return {
       saleAtYear0: exitNow,
-      netCashDeployed: netCash,
+      mortgageRepaid: r.repaid,
+      shortfall: r.shortfall,
+      netCashDeployed: r.deployed,
       yieldPortfolio: yieldPort,
       year1CashFlow: yieldPort.year1AfterTax,
-      totalWealth: yieldPort.totalWealth
+      totalWealth: yieldPort.totalWealth - r.shortfall
     };
   }
 
@@ -448,7 +538,7 @@
     var keepS = (keepMultiplier !== 1)
       ? Object.assign({}, s, { propertyValue: s.propertyValue * keepMultiplier })
       : s;
-    var keep = calcKeepRental(keepS);
+    var keep = calcKeepRental(keepS, keepMultiplier);
     var pathResult;
     if (s.path === 1) pathResult = calcPath1(s);
     else if (s.path === 2) pathResult = calcPath2(s);
@@ -481,6 +571,7 @@
 
   function calcWealthTrajectory(s, scenarioOverride){
     var sUse = scenarioOverride ? Object.assign({}, s, { btcScenario: scenarioOverride }) : s;
+    var H = sUse.holdingYears;
 
     // Keep-rental counterfactual scales with numProperties for Path 3
     // (compares against keeping ALL properties, not just one). For
@@ -490,22 +581,31 @@
     var keepS = (keepMultiplier !== 1)
       ? Object.assign({}, sUse, { propertyValue: sUse.propertyValue * keepMultiplier })
       : sUse;
-    var rentalAnnual = calcRentalAnnualCF(keepS);
-    var trajectory = [];
+    var keepYears = rentalYears(keepS, keepMultiplier, H);
 
-    for (var t = 0; t <= sUse.holdingYears; t++) {
-      var growth = scenarioGrowthFactor(sUse.btcScenario, t, sUse.holdingYears);
+    // What the sale paths deploy after tax and the mortgage (M8), and the
+    // Path 3 retained rentals' own cash flows and mortgages.
+    var sold = Math.max(0, sUse.numProperties - sUse.propertiesRetained);
+    var sale1 = afterRepayment(calcRentalExit(sUse, 0).netCash, existingLoan(sUse, 1, 0).balance0);
+    var sellS = Object.assign({}, sUse, { propertyValue: sUse.propertyValue * sold });
+    var sale3 = afterRepayment(calcRentalExit(sellS, 0).netCash, existingLoan(sUse, sold, 0).balance0);
+    var retainedS = Object.assign({}, sUse, { propertyValue: sUse.propertyValue * sUse.propertiesRetained });
+    var retainedYears = rentalYears(retainedS, sUse.propertiesRetained, H);
+
+    var trajectory = [];
+    for (var t = 0; t <= H; t++) {
+      var growth = scenarioGrowthFactor(sUse.btcScenario, t, H);
+      var cumKeep = cumulativeRentalCash(keepYears, t);
+      var cumRetained = cumulativeRentalCash(retainedYears, t);
 
       // Keep rental at year t: cumulative after-tax cash + property market
-      // value at year t (mark-to-market, no exit tax applied).
-      var cumCash = rentalAnnual.afterTax * t;
-      var exitAtT = calcRentalExit(keepS, t);
-      var wealthKeep = cumCash + exitAtT.marketValue;
+      // value at year t, less the mortgage balance then (mark-to-market,
+      // no exit tax applied).
+      var wealthKeep = cumKeep + calcRentalExit(keepS, t).marketValue - keepYears.loan.balance[t];
 
       var wealthPath;
       if (sUse.path === 1) {
-        var exitNow = calcRentalExit(sUse, 0);
-        wealthPath = exitNow.netCash * btcBuyFactor(sUse) * growth;
+        wealthPath = sale1.deployed * btcBuyFactor(sUse) * growth - sale1.shortfall;
       } else if (sUse.path === 2) {
         var maxCltv = sUse.propertyValue * (sUse.helocLtv/100);
         var heloc = Math.max(0, maxCltv - sUse.existingMortgage);
@@ -513,21 +613,10 @@
         var carry = heloc * (sUse.helocRatePct/100) * t;
         wealthPath = wealthKeep + btcVal - heloc - carry;
       } else if (sUse.path === 3) {
-        // Derive sold/retained from numProperties - propertiesRetained.
-        var sold = Math.max(0, sUse.numProperties - sUse.propertiesRetained);
-        var soldVal = sUse.propertyValue * sold;
-        var sellS = Object.assign({}, sUse, { propertyValue: soldVal });
-        var exitSell = calcRentalExit(sellS, 0);
-        var ypVal = calcYieldPortfolioAtYearT(exitSell.netCash, sUse, t);
-        var retainedS = Object.assign({}, sUse, {
-          propertyValue: sUse.propertyValue * sUse.propertiesRetained
-        });
-        var retainedAnnual = calcRentalAnnualCF(retainedS);
-        var retainedExit = calcRentalExit(retainedS, t);
-        wealthPath = ypVal + retainedAnnual.afterTax * t + retainedExit.marketValue;
+        var ypVal = calcYieldPortfolioAtYearT(sale3.deployed, sUse, t);
+        wealthPath = ypVal + cumRetained + calcRentalExit(retainedS, t).marketValue - retainedYears.loan.balance[t] - sale3.shortfall;
       } else {
-        var exitNow4 = calcRentalExit(sUse, 0);
-        wealthPath = calcYieldPortfolioAtYearT(exitNow4.netCash, sUse, t);
+        wealthPath = calcYieldPortfolioAtYearT(sale1.deployed, sUse, t) - sale1.shortfall;
       }
       trajectory.push({ year: t, wealthKeep: wealthKeep, wealthPath: wealthPath });
     }
@@ -861,7 +950,8 @@
     bvreProjection: bvreProjection,
     ledgerRetro: ledgerRetro,
     PAIR_DEFAULTS: PAIR_DEFAULTS,
-    // BvRP dated rates (PR 4d, item 12)
+    // BvRP defaults and dated rates (PR 4d: M8, item 12)
+    RENTAL_DEFAULTS: RENTAL_DEFAULTS,
     YIELD_RATES: YIELD_RATES,
     // bitcoin scenarios (M3), shared by both pages
     SCENARIOS: SCENARIOS,
@@ -880,6 +970,8 @@
     effectiveCAGR: effectiveCAGR,
     calcRentalAnnualCF: calcRentalAnnualCF,
     calcRentalExit: calcRentalExit,
+    existingLoan: existingLoan,
+    rentalYears: rentalYears,
     calcSpotBTCFV: calcSpotBTCFV,
     calcYieldPortfolio: calcYieldPortfolio,
     calcKeepRental: calcKeepRental,

@@ -64,7 +64,11 @@
        lending at the dated rate (4.0%; was Ledn at 5%), keyed `lend` (was
        `ledn`), and the $500K example and worked tax example move to 6.6%
        selling costs, so S-bvrp also captures the rate spans and the rates
-       disclosure.
+       disclosure. M8: every path carries or repays the existing mortgage;
+       RP_BASE gains the rate (4.4) and years left (20). New: P14 (no
+       mortgage: every figure as before M8), P15 (5 years left, so payments
+       stop inside the horizon), P16 (Path 1, a $450K mortgage the sale
+       doesn't cover).
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -184,7 +188,8 @@
   // ─── BvRP ──────────────────────────────────────────────────────────
   var RP_BASE = { path: '4', scenario: 'stay', value: '500000', yld: '4.4', hold: '10', basis: '60', held: '10',
                   state: 'OTHER', bracket: '24', ltv: '80', helocRate: '9.5', mortgage: '200000',
-                  props: '3', retained: '2', port: [45, 30, 10, 15], appr: '4.68', sell: '6.6', btctx: '0.5' };
+                  props: '3', retained: '2', port: [45, 30, 10, 15], appr: '4.68', sell: '6.6', btctx: '0.5',
+                  mortRate: '4.4', mortYears: '20' };
   var RP = [
     { id: 'P1',  desc: 'defaults (Path 4, stay, $500K, 4.4%, 10y, OTHER, 24%)' },
     { id: 'P2',  desc: 'Path 1', path: '1' },
@@ -203,7 +208,10 @@
     { id: 'P11b', desc: 'Path 4, portfolio 0/0/0/100', port: [0, 0, 0, 100] },
     { id: 'P11c', desc: 'Path 4, portfolio 50/30/10/20 (sums to 110)', port: [50, 30, 10, 20] },
     { id: 'P12', desc: 'basis 20%, held 27y (depreciation cap)', basis: '20', held: '27' },
-    { id: 'P13', desc: 'Path 1 at the pre-4b costs (selling 8%, no bitcoin cost)', path: '1', sell: '8', btctx: '0' }
+    { id: 'P13', desc: 'Path 1 at the pre-4b costs (selling 8%, no bitcoin cost)', path: '1', sell: '8', btctx: '0' },
+    { id: 'P14', desc: 'Path 4, no existing mortgage', mortgage: '0' },
+    { id: 'P15', desc: 'Path 4, mortgage with 5 years left', mortYears: '5' },
+    { id: 'P16', desc: "Path 1, $450K mortgage the sale doesn't cover", path: '1', mortgage: '450000' }
   ];
   function applyRp(v){
     var x = Object.assign({}, RP_BASE, v);
@@ -215,6 +223,7 @@
     setVal('calc-adjusted-basis', x.basis); setVal('calc-years-held', x.held);
     setVal('calc-state', x.state, ['change']); setVal('calc-bracket', x.bracket, ['change']);
     setVal('calc-heloc-ltv', x.ltv); setVal('calc-heloc-rate', x.helocRate); setVal('calc-existing-mortgage', x.mortgage);
+    setVal('calc-mortgage-rate', x.mortRate); setVal('calc-mortgage-years', x.mortYears);
     setVal('calc-num-properties', x.props); setVal('calc-properties-retained', x.retained);
     ['strc', 'sata', 'lend', 'spot'].forEach(function(k, i){ setVal('calc-port-' + k, String(x.port[i])); });
     click('.calc-cagr-chip[data-scenario="' + x.scenario + '"]');
