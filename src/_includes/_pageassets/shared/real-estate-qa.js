@@ -68,7 +68,9 @@
        RP_BASE gains the rate (4.4) and years left (20). New: P14 (no
        mortgage: every figure as before M8), P15 (5 years left, so payments
        stop inside the horizon), P16 (Path 1, a $450K mortgage the sale
-       doesn't cover).
+       doesn't cover). A fix in the same PR: states with no tax on the gain
+       (TX, FL, NV, WA, TN, NH, AK, WY, SD) were charged the 5% typical rate
+       on the sale; only P8 (TX) moves.
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;

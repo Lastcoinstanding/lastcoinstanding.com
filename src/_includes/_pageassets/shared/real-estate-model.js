@@ -314,7 +314,10 @@
     var recaptureTax = accumulatedDep * 0.25;
     var ltcgBase = Math.max(0, taxableGain - accumulatedDep);
     var ltcgTax = ltcgBase * federalLTCG(s.federalBracketPct);
-    var stateRate = (STATE_CAPGAIN[s.stateCode] || STATE_CAPGAIN.OTHER) / 100;
+    // A state with no tax on the gain has rate 0, so test for a missing
+    // entry, not a falsy one: `|| OTHER` charged TX, FL, NV, WA, TN, NH,
+    // AK, WY and SD the 5% typical rate (fixed in PR 4d).
+    var stateRate = (STATE_CAPGAIN[s.stateCode] !== undefined ? STATE_CAPGAIN[s.stateCode] : STATE_CAPGAIN.OTHER) / 100;
     var stateTax = Math.max(0, taxableGain) * stateRate;
     var niit = niitApplies(s.federalBracketPct) ? Math.max(0, taxableGain) * 0.038 : 0;
 
