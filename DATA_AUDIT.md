@@ -102,6 +102,19 @@ Citations behind the sitewide modeling-assumption presets. See `STYLE_GUIDE.md �
 | RE-21 | The deflator for the Real view, both pages, and the words its tooltip uses for the presets | CPI **3.5%** ("about the long-run official rate") · M2 growth **6.5%**, the default ("about the 50-year growth of the money supply") · Shadow Stats **8%** ("John Williams's reconstruction of the pre-1980 CPI method, which is disputed") · Custom | Canonical: I-1, I-2, I-4 (STYLE_GUIDE §3.5) | n/a (canonical) | 2026-09-29 | with I-1, I-2, I-4 (2026-11-02) |
 ---
 
+### Real-estate pair: federal tax rules (PR 5a)
+
+**Verified 2026-09-29 against IRS primaries (Prompt 5 step 1).** Slice 5a uses TX-3, TX-4 and TX-5 on the rental page (recapture, rental income, the ROC basis); TX-1, TX-2 and TX-6 are for 5b (the home sale and bitcoin gains) and are logged now so 5b starts from verified values. The calculators approximate: the LTCG rate comes from the ordinary bracket (0% at 10–12%, 15% at 22–32%, 20% at 35–37%) and NIIT applies from the 32% bracket, rather than from taxable income and MAGI.
+
+| # | Component | Value | Source | URL | Last audited | Next due |
+|---|---|---|---|---|---|---|
+| TX-1 | Section 121 home-sale exclusion | $250,000 ($500,000 joint); owned and used as a residence 24 months of the last 5 years; not within 2 years of another exclusion; depreciation after May 6, 1997 and nonqualified use after 2008 aren't excludable. Not indexed. Bills to raise or remove the caps (H.R. 4327, H.R. 7034) are in committee: latest actions 2026-01-21 and 2026-01-13 | IRS Topic 701; Publication 523 (2025); govinfo bill status | https://www.irs.gov/taxtopics/tc701 · https://www.irs.gov/publications/p523 · https://www.govinfo.gov/bulkdata/BILLSTATUS/119/hr/BILLSTATUS-119hr4327.xml | 2026-09-29 | 2027-01 (annual, §11) |
+| TX-2 | 2026 long-term capital-gains thresholds (taxable income) | 0% to $98,900 / 15% to $613,700 (MFJ); $49,450 / $545,500 (single); $66,200 / $579,600 (HoH); $49,450 / $306,850 (MFS) | Rev. Proc. 2025-32 §4.03 | https://www.irs.gov/pub/irs-drop/rp-25-32.pdf | 2026-09-29 | 2026-11 (the 2027 Rev. Proc.) |
+| TX-3 | 2026 ordinary brackets (for the bracket-to-LTCG mapping) | MFJ: 10% to $24,800 · 12% to $100,800 · 22% to $211,400 · 24% to $403,550 · 32% to $512,450 · 35% to $768,700 · 37% above. Single: $12,400 · $50,400 · $105,700 · $201,775 · $256,225 · $640,600 | Rev. Proc. 2025-32 §4.01 | https://www.irs.gov/pub/irs-drop/rp-25-32.pdf | 2026-09-29 | 2026-11 |
+| TX-4 | Unrecaptured §1250 gain | taxed at the ordinary rate, at most **25%**; the calculator uses min(bracket, 25%) on the depreciation, never more than the gain | IRS Topic 409 | https://www.irs.gov/taxtopics/tc409 | 2026-09-29 | 2027-01 |
+| TX-5 | Net investment income tax | **3.8%** above MAGI $250,000 (joint), $200,000 (single, HoH), $125,000 (MFS); fixed in statute, not indexed. Includes rental income and gains on rental property; excludes home-sale gain excluded under §121 | IRS NIIT page; Topic 559; CRS IF11820 | https://www.irs.gov/individuals/net-investment-income-tax · https://www.irs.gov/taxtopics/tc559 · https://www.congress.gov/crs-product/IF11820 | 2026-09-29 | 2027-01 |
+| TX-6 | Collectibles rate | 28% maximum for collectibles (coins, art); bitcoin is property (Notice 2014-21), and the IRS hasn't designated it a collectible, so the calculators use the ordinary LTCG rates | IRS Topic 409; Notice 2014-21 | https://www.irs.gov/taxtopics/tc409 | 2026-09-29 | 2027-01 |
+
 ## Existing-page citations
 
 Citations already present on the site as of Stage 1 (commit context: pending).
