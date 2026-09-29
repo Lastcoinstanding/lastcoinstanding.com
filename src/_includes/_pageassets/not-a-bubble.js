@@ -292,7 +292,7 @@ function drawAnnotations(chart) {
     ctx.fill();
 
     // Label box
-    const lines    = [m.label, `$${m.price.toLocaleString()}`];
+    const lines    = [m.label, `$${m.price.toLocaleString()} weekly close`];   // the series is Sunday closes
     const fontSize = 9.5;
     ctx.font       = `500 ${fontSize}px 'Inter', sans-serif`;
     const tw0      = ctx.measureText(lines[0]).width;
@@ -459,7 +459,7 @@ function drawCallout(ctx, chart) {
     '✗  All 7 bubbles → collapsed, never',
     '    recovered',
     '',
-    '✓  Bitcoin → 3 crashes, 3 new ATHs',
+    '✓  Bitcoin → each crash, a new ATH',
     '',
     'This is not bubble behavior.',
   ];
