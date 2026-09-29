@@ -84,7 +84,7 @@
   // The shared module exposes globals: PL_A, PL_B, TODAY_DAYS, TODAY_PRICE,
   // plPrice(days), PL_FLOOR, PL_CEIL. Single-source-of-truth across pages —
   // do not redefine constants here. Monthly refresh of TODAY_PRICE happens
-  // automatically (CoinGecko spot, with latest PL_DATA sample as fallback).
+  // automatically (live spot, with latest PL_DATA sample as fallback).
   //
   // currentTrendPrice = plPrice(TODAY_DAYS)              — Power Law trend at today's days-since-genesis
   // currentMultiple   = TODAY_PRICE / currentTrendPrice  — where bitcoin sits relative to trend
@@ -778,7 +778,7 @@
 
   // The shared power-law-data module seeds window.TODAY_PRICE to the latest
   // PL_DATA sample but does NOT auto-call fetchTodayPrice. We call it ourselves
-  // to swap in the live CoinGecko spot, then re-render. If CoinGecko fails,
+  // to swap in the live spot, then re-render. If no live source answers,
   // the shared fetch helper falls back to the seeded value automatically.
   if (typeof window.fetchTodayPrice === 'function'){
     window.fetchTodayPrice(function(price /*, source: 'live' | 'fallback' */){
@@ -810,7 +810,7 @@
 // ============================================================
 // Computes the live USD value of Strategy's bitcoin treasury by
 // multiplying the snapshot BTC count by the shared module's TODAY_PRICE
-// (which updates from CoinGecko spot once fetchTodayPrice resolves). Other
+// (which updates from the live spot once fetchTodayPrice resolves). Other
 // fields in the "Strategy at a glance" indicator are snapshot values updated
 // monthly per MONTHLY_REFRESH_CHECKLIST.
 (function(){
@@ -827,7 +827,7 @@
   function renderTreasuryUsd(_price, source){
     var valueEl = document.querySelector('.sg-treasury-usd-value');
     if (!valueEl) return;
-    // Honest provenance tag: "live" only on a real CoinGecko resolve; the
+    // Honest provenance tag: "live" only on a real live resolve; the
     // pre-resolve seed and the fallback are the latest monthly sample.
     var tagEl = document.getElementById('sgLiveTag');
     if (tagEl) tagEl.textContent = (typeof todayPriceIsLive === 'function' && todayPriceIsLive(source)) ? 'live' : 'latest data';

@@ -518,7 +518,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   // the status stays "loading" until the quote lands (rePairQA waits on it).
   // The quote replaces the sample unless the reader has typed in the field
   // since, in which case the price is theirs and the status says nothing.
-  // If CoinGecko is unreachable the sample stands (was a hardcoded $84,000).
+  // If no live source answers the sample stands (was a hardcoded $84,000).
   function fetchLiveBtcPrice(){
     var input = document.getElementById('fwdBtcNow');
     var status = document.getElementById('fwdBtcPriceStatus');
@@ -536,7 +536,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     fetchTodayPrice(function(p, source){
       if(typed) return;
       input.value = '$' + Math.round(p).toLocaleString('en-US');
-      if(status) status.textContent = source === 'live' ? '(live)' : todayPriceNote(source).trim();   // "(latest monthly data)", as on the retrospective
+      if(status) status.textContent = source === 'live' ? '(live)' : todayPriceNote(source).trim();   // "(as of Sep 12)", as on the retrospective
       runFwdCalc();
     });
   }

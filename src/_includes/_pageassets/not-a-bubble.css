@@ -138,6 +138,11 @@ header .intro-text strong { color:var(--text-bright); font-weight:600; }
   0%,100% { opacity:1; transform:scale(1);   box-shadow:0 0 0 2px rgba(224,148,34,0.25), 0 0 10px var(--amber); }
   50%      { opacity:0.6; transform:scale(0.8); box-shadow:0 0 0 4px rgba(224,148,34,0.1),  0 0 18px var(--amber); }
 }
+/* Not live (the shared fetch fell back to the latest sample): the dot stops
+   pulsing and dims, the same live-gating the channel ribbon uses. */
+.live-price.is-fallback .live-dot {
+  animation:none; opacity:0.45; box-shadow:none;
+}
 .live-price-text {
   display:flex; flex-direction:column; gap:1px;
 }

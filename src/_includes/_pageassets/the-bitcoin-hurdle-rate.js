@@ -335,7 +335,10 @@
 
   function verdict(){
     var H = S.h, r = S.r, pos = isPos();
-    var provNote = todayPriceNote(spotSource); // '' when live, ' (latest monthly data)' otherwise
+    // '' when live, ', price as of Sep 12' otherwise. Both uses sit inside a
+    // parenthesis, so the note joins with a comma rather than nesting a second
+    // pair (it read "(… window (latest monthly data))" before 2026-09-29).
+    var provNote = todayPriceIsLive(spotSource) ? '' : ', price ' + todayPriceAsOf();
 
     // §3.5 — the not-cashflow-positive company verdict CHANGES, it is not decorated.
     if (S.lens === 'company' && S.cashflow === 'no'){

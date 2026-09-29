@@ -142,7 +142,7 @@
   // Auto-fill current BTC price from the shared live anchor. TODAY_PRICE
   // seeds to the latest PL_DATA sample (used immediately so the page renders
   // with a sensible value) and fetchTodayPrice() then overwrites with the
-  // CoinGecko spot. We only overwrite the input if the user hasn't already
+  // live spot. We only overwrite the input if the user hasn't already
   // typed a value — this is an editable modeling input by design. The fixed
   // "Today (live)" caption below the chart legend always reflects the live
   // spot regardless of user edits, so the reader has a stable factual anchor.
@@ -174,7 +174,7 @@
       fetchTodayPrice(function(price, source) {
         // The fixed caption always reflects the resolved spot — even if the
         // user has edited the modeling input to a hypothetical. The label is
-        // honest: "live" only on a real fetch, else "latest monthly data".
+        // honest: "live" only on a real fetch, else the sample's date.
         updateTodayCaption(price, source);
         // Only fill the editable input if the user hasn't touched it.
         if (!priceInput.dataset.userEdited && !userHadValue) {

@@ -75,9 +75,16 @@ const MILESTONES = [
 // ─── STATE ───────────────────────────────────────────────────────────────────
 let chart;
 let viewMode = '2014';   // '2014' | 'genesis' | 'bubble'
-let livePrice   = 69512.06;
-let liveMult    = 174.2939;
-let liveX       = 8.2437;
+// Today's point on the chart. Seeded from the shared price module
+// (shared/power-law-data.js, loaded on every page that carries the channel
+// ribbon) and replaced by the shared live fetch — see LIVE PRICE below. It
+// was a hardcoded $69,512 until 2026-09-29, which is what the page showed
+// whenever its own CoinGecko request failed.
+const YEAR_MS = 365.25 * 24 * 3600 * 1000;
+let livePrice   = (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0) ? TODAY_PRICE : NaN;
+let liveSource  = 'fallback';               // 'live' once the shared fetch resolves live
+let liveMult    = livePrice / START_PRICE;
+let liveX       = priceX('fallback');
 
 // ─── CHART INIT ──────────────────────────────────────────────────────────────
 function getBtcData() {
@@ -327,10 +334,15 @@ function drawAnnotations(chart) {
     ctx.textAlign    = 'left';
     ctx.textBaseline = 'middle';
     const todayDate  = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const todayText  = `Today  $${Math.round(livePrice).toLocaleString()}`;
+    const todayText  = (liveSource === 'live' || typeof lastSampleDateShort !== 'function')
+      ? `Today  $${Math.round(livePrice).toLocaleString()}`
+      : `${lastSampleDateShort()}  $${Math.round(livePrice).toLocaleString()}`;
     const subText    = `(${liveMult.toFixed(1)}× start)`;
     const tw         = Math.max(ctx.measureText(todayText).width, ctx.measureText(subText).width) + 20;
-    const bx = nowDotX + 10;
+    // The point sits near the right edge (x ≈ 8.8 of a 9.4-year axis), where a
+    // box drawn to its right ran off the canvas ("Today $" and no number).
+    // Flip the box to the left of the point whenever it would not fit.
+    const bx = (nowDotX + 10 + tw > chart.chartArea.right) ? nowDotX - 10 - tw : nowDotX + 10;
     const by = nowDotY - 20;
 
     ctx.fillStyle   = 'rgba(12,11,10,0.94)';
@@ -509,33 +521,46 @@ function setMode(mode) {
 }
 
 // ─── LIVE PRICE ──────────────────────────────────────────────────────────────
-async function fetchLivePrice() {
-  try {
-    const r = await fetch(
-      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
-      { cache: 'no-store' }
-    );
-    if (!r.ok) throw new Error('API error');
-    const d = await r.json();
-    const p = d.bitcoin.usd;
-    livePrice = p;
-    liveMult  = p / START_PRICE;
+// One call path for the whole site (2026-09-29): the shared fetchTodayPrice
+// tries Coinbase, then Kraken, mempool.space and CoinGecko, and otherwise
+// returns the latest sample in the shared series. This page used to call
+// CoinGecko itself and, on failure, show a hardcoded price marked "(cached)".
+// A price that is not live is labelled with its date and plotted at that
+// date, not at today.
+// x on the chart = years since the 2017 peak, at the date the price is from.
+function priceX(source) {
+  if (source === 'live' || typeof PL_DATA === 'undefined') return (Date.now() - PEAK_2017_MS) / YEAR_MS;
+  return ((GENESIS_TS + PL_DATA[PL_DATA.length - 1][0] * 86400) * 1000 - PEAK_2017_MS) / YEAR_MS;
+}
+function applyLivePrice(p, source) {
+  if (!(typeof p === 'number' && isFinite(p) && p > 0)) return;
+  livePrice  = p;
+  liveSource = (source === 'live') ? 'live' : 'fallback';
+  liveMult   = p / START_PRICE;
+  liveX      = priceX(liveSource);
+  const live = liveSource === 'live';
+  const valEl = document.getElementById('livePriceVal');
+  if (valEl) valEl.textContent = '$' + Math.round(p).toLocaleString('en-US') +
+    (live || typeof todayPriceNote !== 'function' ? '' : todayPriceNote('fallback'));
+  const labelEl = document.querySelector('.live-price-label');
+  if (labelEl) labelEl.textContent = live ? 'Current Bitcoin Price' : 'Bitcoin Price';
+  const wrap = document.querySelector('.live-price');
+  if (wrap) wrap.classList.toggle('is-fallback', !live);
 
-    // Compute x for today relative to 2017 peak
-    liveX = (Date.now() - PEAK_2017_MS) / (365.25 * 24 * 3600 * 1000);
+  // Update ATH multiple card
+  const athEl = document.getElementById('athMultiple');
+  if (athEl) athEl.textContent = `~${(123513 / START_PRICE).toFixed(0)}×`;
 
-    document.getElementById('livePriceVal').textContent =
-      `$${p.toLocaleString('en-US', {maximumFractionDigits:0})}`;
-
-    // Update ATH multiple card
-    const athMultiple = (123513 / START_PRICE).toFixed(0);
-    document.getElementById('athMultiple').textContent = `~${athMultiple}×`;
-
-    if (chart) chart.update('none');
-  } catch(e) {
-    document.getElementById('livePriceVal').textContent =
-      `$${Math.round(livePrice).toLocaleString()} (cached)`;
-  }
+  if (chart) chart.update('none');
+}
+// Resolves once the shared fetch has answered (live or fallback). The fetch
+// keeps a 10-minute cache, so the two-minute refresh below and the export's
+// "ensure latest price" cost a network request at most once per 10 minutes.
+function fetchLivePrice() {
+  return new Promise(resolve => {
+    if (typeof fetchTodayPrice !== 'function') { applyLivePrice(livePrice, 'fallback'); resolve(); return; }
+    fetchTodayPrice((p, source) => { applyLivePrice(p, source); resolve(); });
+  });
 }
 
 // ─── DOWNLOAD ─────────────────────────────────────────────────────────────────
@@ -694,34 +719,39 @@ async function buildBubbleExportCanvas() {
     ec.font         = "400 11px 'Inter', -apple-system, sans-serif";
     ec.textBaseline = 'middle';
     ec.textAlign    = 'left';
+    // Items wrap onto a second row when the next one would not fit. (Until
+    // 2026-09-29 the wrap reset x but not y, so the second row was drawn on
+    // top of the first and the legend's opening entries were unreadable.)
     let lx = 32;
-    const ly = legendY + 14;
+    let ly = legendY + 12;
     items.forEach(item => {
+      const txt = item.label;
+      const w = 22 + ec.measureText(txt).width;
+      if (lx > 32 && lx + w > exportW - 32) { lx = 32; ly += 18; }
       ec.strokeStyle = item.color;
       ec.lineWidth   = item.lw;
       ec.beginPath();
       ec.moveTo(lx, ly); ec.lineTo(lx + 18, ly);
       ec.stroke();
       ec.fillStyle = (item.color === '#e09422') ? '#d0c8b8' : '#887878';
-      const txt = item.label;
       ec.fillText(txt, lx + 22, ly);
-      lx += ec.measureText(txt).width + 38;
-      if (lx > exportW - 80) { lx = 32; }
+      lx += w + 16;
     });
 
     // ── Footer ──
     const footerY = exportH - 14;
     const todayStr = new Date().toLocaleDateString('en-US',
       {weekday:'short', month:'short', day:'numeric', year:'numeric'});
+    // A price that is not live carries its own date, not today's.
+    const priceLine = (liveSource === 'live' || typeof lastSampleDateLong !== 'function')
+      ? `Current Bitcoin Price: $${Math.round(livePrice).toLocaleString()}  ·  ${todayStr}`
+      : `Bitcoin Price on ${lastSampleDateLong()}: $${Math.round(livePrice).toLocaleString()}  ·  chart made ${todayStr}`;
 
     ec.font         = "600 14px 'Inter', -apple-system, sans-serif";
     ec.fillStyle    = '#e09422';
     ec.textAlign    = 'right';
     ec.textBaseline = 'bottom';
-    ec.fillText(
-      `Current Bitcoin Price: $${Math.round(livePrice).toLocaleString()}  ·  ${todayStr}`,
-      exportW - 32, footerY
-    );
+    ec.fillText(priceLine, exportW - 32, footerY);
 
     ec.font         = "400 12px 'Inter', -apple-system, sans-serif";
     ec.fillStyle    = '#786e66';

@@ -9,8 +9,8 @@
 //     band) so the marker has visual room across the full channel.
 //
 //     First-paint uses the seeded TODAY_PRICE (current as of the monthly
-//     data refresh); fetchTodayPrice replaces it with the live spot when
-//     CoinGecko resolves. The render path uses display-only DOM updates
+//     data refresh); fetchTodayPrice replaces it with the live spot when a
+//     live source answers. The render path uses display-only DOM updates
 //     to avoid layout thrash on the live-price replacement.
 //
 //     Calculator (Phase 2) will live in a separate IIFE in this file.
@@ -29,9 +29,10 @@
     var card = document.getElementById('eti-card');
     if (!card) return;
     // Honest liveness tag: the entry multiple is derived from TODAY_PRICE, which
-    // is the latest monthly sample until a real CoinGecko fetch resolves.
+    // is the latest PL_DATA sample until a live fetch resolves — tagged with
+    // that sample's date, never "live".
     var tagEl = document.getElementById('etiLiveTag');
-    if (tagEl) tagEl.textContent = (typeof todayPriceIsLive === 'function' && todayPriceIsLive(source)) ? '· Live' : '· Latest monthly data';
+    if (tagEl) tagEl.textContent = (typeof todayPriceIsLive === 'function' && todayPriceIsLive(source)) ? '· Live' : '· As of ' + lastSampleDateShort();
 
     // Defensive: shared globals must be present (page_scripts ordering
     // ensures power-law-data.js is concatenated before this file).
@@ -1133,7 +1134,7 @@
     }
 
     // The shared power-law-data module updates window.TODAY_PRICE in place
-    // once fetchTodayPrice resolves (CoinGecko spot, with PL_DATA fallback).
+    // once fetchTodayPrice resolves (live spot, with PL_DATA fallback).
     // The ETI module above already calls fetchTodayPrice for its own render,
     // but the chip-picker's #calc-current-multiple readout is not subscribed
     // to that callback — so it stays on the first-paint seeded value (the

@@ -240,7 +240,7 @@ eleventyComputed:
       <li>Backtest: a fixed sum deployed all-at-once vs. laddered equally across the chosen window, comparing BTC accumulated, bucketed by entry channel position. The advantage is amount-invariant.</li>
       <li>Commitment backstop: <strong>today-anchored</strong>. For each hold length N, entries deployed ~N years ago (a ~1.8-year window centred N years before today) are bucketed by channel position and valued at <strong>today&rsquo;s live price &divide; entry price</strong> &mdash; what each entry would be worth now, not its value at some historical cycle peak. Recomputes live as the price moves.</li>
       <li id="lslMethodWindow"></li>
-      <li>Today&rsquo;s channel position is computed at load from the latest sample and the live spot (CoinGecko, via the shared fetch) &mdash; never baked in.</li>
+      <li>Today&rsquo;s channel position is computed at load from the latest sample and the live spot (Coinbase first, via the shared fetch) &mdash; never baked in.</li>
     </ul>
   </div>
 

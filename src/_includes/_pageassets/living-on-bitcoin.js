@@ -118,13 +118,15 @@
   // PL_A, PL_B, PL_FLOOR, plPrice() come from shared/power-law-data.js
   // (loaded before this file via njk page_scripts).
   // Pattern matches the-bitcoin-retirement.js: GENESIS as Date object,
-  // local daysSince() helper, plPriceAtDate() composition. Live BTC price
-  // is fetched from CoinGecko on load; falls back to LIVE_BTC_FALLBACK
-  // if the fetch fails (offline, rate-limited, etc.).
+  // local daysSince() helper, plPriceAtDate() composition. The live BTC
+  // price comes from the shared fetch (fetchTodayPrice, below); until it
+  // answers, and if no live source does, the price is the latest PL_DATA
+  // sample, labelled with its date. (Until 2026-09-29 this page called
+  // CoinGecko itself and fell back to a hardcoded $108,000 — about $25K above
+  // the market that day.)
   var GENESIS = new Date(Date.UTC(2009, 0, 3)); // Jan 3, 2009 UTC
-  var LIVE_BTC_FALLBACK = 108000; // periodically updated; matches Retirement
-  var liveBtcPrice = LIVE_BTC_FALLBACK;
-  var liveBtcSource = 'fallback';
+  var liveBtcPrice = TODAY_PRICE;   // shared seed: the latest PL_DATA sample
+  var liveBtcSource = 'fallback';   // 'live' once the shared fetch resolves live
   // Growth-model preset from sitewide modeling-assumptions (default: trend).
   // Honored by projectedTrendPrice() — same as Retirement's growth-model
   // semantics. 'powerlaw-floor' returns trend × PL_FLOOR; the others
@@ -148,7 +150,7 @@
     return trend; // 'powerlaw-trend', 'linear-cagr-decay', or fallback
   }
   // Starting price for the projection — depends on growthScenario.
-  //   'current'  — today's actual spot price (from CoinGecko or fallback).
+  //   'current'  — today's actual spot price (live, or the dated fallback).
   //                Mean-reversion to trend = higher CAGR, higher end value.
   //   'trendline' — today's trend value. No mean-reversion bonus = lower
   //                CAGR, lower end value (more conservative for the user).
@@ -361,7 +363,7 @@
     var modelLabel = growthModel === 'powerlaw-floor' ? 'Power Law floor band' : 'Power Law trend';
     var startLabel = growthScenario === 'trendline'
       ? 'trend value today'
-      : 'today (' + offTrendLabel + ')';
+      : (liveBtcSource === 'live' ? 'today' : 'on ' + lastSampleDateShort()) + ' (' + offTrendLabel + ')';
 
     if (projectionCAGR) {
       projectionCAGR.textContent = (r * 100).toFixed(1) + '%';
@@ -372,7 +374,7 @@
         startLabel + ' ' +
         'to <strong>$' + Math.round(futurePrice).toLocaleString() + '</strong> ' +
         'at ' + modelLabel + ' in year ' + h +
-        ' &middot; <span class="projection-source">' + liveBtcSource + '</span>';
+        ' &middot; <span class="projection-source">' + (liveBtcSource === 'live' ? 'live price' : 'live price unavailable') + '</span>';
     }
   }
 
@@ -592,24 +594,19 @@
     });
   }
 
-  // ─── Live BTC price fetch (CoinGecko, with fallback) ───
-  // Match the pattern from the-bitcoin-retirement.js: fire-and-forget,
-  // re-render on success, silent fallback on failure. Network/CORS/rate-limit
-  // issues all degrade gracefully to LIVE_BTC_FALLBACK.
+  // ─── Live BTC price (the shared fetch, with its dated fallback) ───
+  // Same pattern as the-bitcoin-retirement.js: fire-and-forget, re-render when
+  // the shared fetch answers. On fallback the price stays the latest sample
+  // and the projection line says which day it is from.
   function fetchLiveBtc() {
-    if (typeof fetch !== 'function') return;
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', {
-      mode: 'cors', cache: 'no-store'
-    })
-      .then(function(r){ return r.ok ? r.json() : null; })
-      .then(function(d){
-        if (d && d.bitcoin && typeof d.bitcoin.usd === 'number' && d.bitcoin.usd > 0) {
-          liveBtcPrice = d.bitcoin.usd;
-          liveBtcSource = 'live price';
-          render();
-        }
-      })
-      .catch(function(){ /* keep fallback; render already ran with it */ });
+    if (typeof fetchTodayPrice !== 'function') return;
+    fetchTodayPrice(function(price, source){
+      if (typeof price === 'number' && isFinite(price) && price > 0) {
+        liveBtcPrice = price;
+        liveBtcSource = (source === 'live') ? 'live' : 'fallback';
+        render();
+      }
+    });
   }
   fetchLiveBtc();
 

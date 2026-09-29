@@ -266,7 +266,7 @@
     var pos = liveTodayPos, ratio = price / plPrice(TODAY_DAYS);
     var metaEl = document.getElementById('wdLiveMeta'), introEl = document.getElementById('wdIntroState'), posEl = document.getElementById('wdLivePos');
     if (posEl) posEl.innerHTML = '<strong>' + ratio.toFixed(2) + '×</strong> trend · ' + posLabel(pos);
-    if (metaEl) metaEl.textContent = (todayPriceIsLive(source) ? 'Live: ' : 'Latest monthly data: ') + '$' + Math.round(price).toLocaleString() + ' · ' + ratio.toFixed(2) + '× trend · recomputed every page load.';
+    if (metaEl) metaEl.textContent = (todayPriceIsLive(source) ? 'Live: ' : 'As of ' + lastSampleDateShort() + ': ') + '$' + Math.round(price).toLocaleString() + ' · ' + ratio.toFixed(2) + '× trend · recomputed every page load.';
     if (introEl) {
       if (pos < 0.53) {   // sub-floor / near floor / below trend / at trend → QUIET
         introEl.className = 'wd-intro-state wd-intro-quiet';

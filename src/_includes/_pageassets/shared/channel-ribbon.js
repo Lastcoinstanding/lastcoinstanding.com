@@ -12,13 +12,15 @@
    before this file in base.njk.
 
    Live gating (canon): the dot pulses only when the fetched source is 'live';
-   on fallback the dot is static and the " · latest monthly data" register is
-   revealed. No animation of the numbers, no 24h delta, no red/green — this is
-   a barometer, not a ticker.
+   on fallback the dot is static and the dated register (" · as of Sep 12",
+   from the shared todayPriceAsOf helper, so it names the day the price is
+   from) is revealed. No animation of the numbers, no 24h delta, no red/green —
+   this is a barometer, not a ticker. The price carries a hover title naming
+   its source (live: the provider that answered; fallback: the sample's date).
 
-   First paint uses the seeded TODAY_PRICE (last PL_DATA monthly sample) so the
-   strip is never empty, then fetchTodayPrice replaces it (and the cache/dedupe
-   rider in power-law-data.js keeps the site to one fetch per session).
+   First paint uses the seeded TODAY_PRICE (last PL_DATA sample) so the strip
+   is never empty, then fetchTodayPrice replaces it (and the cache/dedupe rider
+   in power-law-data.js keeps the site to one fetch per 10 minutes per tab).
 ============================================================ */
 (function(){
   var root = document.querySelector('[data-channel-ribbon]');
@@ -63,11 +65,18 @@
       zoneEl.textContent = zoneWord(mult);
     }
 
-    // Live gating: pulse + no register when live; static dot + register on
-    // fallback (and on the pre-fetch seed paint, which is latest-monthly too).
+    // Live gating: pulse + no register when live; static dot + dated register
+    // on fallback (and on the pre-fetch seed paint, which is the same sample).
     root.classList.toggle('is-live', !!live);
     if (dotEl) dotEl.classList.toggle('cr-dot-static', !live);
-    if (registerEl) registerEl.hidden = !!live;
+    if (registerEl) {
+      if (!live && typeof todayPriceAsOf === 'function') registerEl.textContent = '\u00a0\u00b7 ' + todayPriceAsOf();
+      registerEl.hidden = !!live;
+    }
+    var provider = (live && typeof todayPriceProviderName === 'function') ? todayPriceProviderName() : '';
+    priceEl.title = live
+      ? ('Live bitcoin price' + (provider ? ' from ' + provider : ''))
+      : ('Live price unavailable \u2014 the most recent price in the site\u2019s data' + (typeof lastSampleDateLong === 'function' ? ', ' + lastSampleDateLong() : ''));
   }
 
   // First paint from the seed (source is not 'live' yet → static dot +

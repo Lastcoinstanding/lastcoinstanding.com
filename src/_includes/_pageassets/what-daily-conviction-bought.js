@@ -155,7 +155,7 @@
     setNum('dcBtc', r.btc.toFixed(4) + ' BTC');
     setNum('dcInvested', usd(r.contrib));
     setNum('dcValue', usd(valueNow));
-    $('dcValueSub').textContent = isLive ? 'at today’s price' : 'at the latest price';
+    $('dcValueSub').textContent = isLive ? 'at today’s price' : 'at the ' + lastSampleDateShort() + ' price';
     var mult = r.contrib > 0 ? valueNow / r.contrib : 0;
     setNum('dcMultiple', mult.toFixed(2) + '×');
 
@@ -193,7 +193,7 @@
         ' — ' + usd(r.crossContrib) + ' contributed by then, day ' + (r.crossDay - S.startDay + 1).toLocaleString() + ' of the habit.';
     } else {
       lead = '$' + S.amt + '/day from ' + longDate(S.startDay) + ' put in <strong>' + usd(r.contrib) +
-        '</strong> and is worth <strong>' + usd(valueNow) + '</strong> ' + (isLive ? 'today' : 'at the latest price') +
+        '</strong> and is worth <strong>' + usd(valueNow) + '</strong> ' + (isLive ? 'today' : 'at the ' + lastSampleDateShort() + ' price') +
         ' — a ' + mult.toFixed(2) + '× return on what went in.';
     }
     $('dcLead').innerHTML = lead;

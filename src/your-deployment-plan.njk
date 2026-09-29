@@ -221,7 +221,7 @@ eleventyComputed:
       <li>Lump deploys the full sum at once; ladder spreads it equally over the chosen duration; hybrid deploys a chosen share now and ladders the rest. Value is BTC accumulated &times; price along the path; multiples are amount-invariant, the dollar figures just scale with the sum.</li>
       <li>Commitment backstop: <strong>today-anchored</strong>. For each hold length N, entries deployed ~N years ago (a ~1.8-year window centred N years before today) are bucketed by channel position and valued at <strong>today&rsquo;s live price &divide; entry price</strong>. Recomputes live as the price moves.</li>
       <li id="dpMethodWindow">Computed live from the current <code>PL_DATA</code> window.</li>
-      <li>Today&rsquo;s channel position is computed at load from the latest sample and the live spot (CoinGecko, via the shared fetch) &mdash; never baked in.</li>
+      <li>Today&rsquo;s channel position is computed at load from the latest sample and the live spot (Coinbase first, via the shared fetch) &mdash; never baked in.</li>
     </ul>
   </div>
 

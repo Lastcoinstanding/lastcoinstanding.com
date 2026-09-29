@@ -269,7 +269,7 @@
     $('flHeroProv').textContent =
       spotSource === 'live'
         ? 'Spot is live; floor and trend are computed for today from the shared Power Law coefficients.'
-        : 'Spot is the latest sample in the shared price series' + (spotSource === 'fallback' ? ' (the live fetch did not resolve)' : '') + '; floor and trend are computed for today.';
+        : 'Spot is the ' + lastSampleDateLong() + ' price, the most recent in the shared series' + (spotSource === 'fallback' ? ' (the live price did not load)' : '') + '; floor and trend are computed for today.';
 
     renderAnchorBar(xt);
   }
@@ -1419,7 +1419,9 @@
       ['Channel coefficients',
        'a = 1.6&times;10<sup>&minus;17</sup>, b = 5.77 (the published M&#279;zinskis / <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">Porkopolis</a> calibration), floor = 0.42&times; trend, upper band = 3&times; trend. Shared module, unmodified.'],
       ['Live spot',
-       spotSource === 'live' ? 'Fetched live this pageload.' : 'The live fetch did not resolve; the latest series sample is standing in, and every figure that depends on it is labelled accordingly.'],
+       spotSource === 'live'
+         ? ('Live' + (todayPriceProviderName() ? ', from ' + todayPriceProviderName() : '') + ', fetched within the last 10 minutes.')
+         : 'The live price did not load; the ' + lastSampleDateLong() + ' price, the most recent in the series, is standing in, and every figure that depends on it is labelled accordingly.'],
       ['The four episodes',
        'Static, from <code>analysis/2026-08-20-power-law-floor.md</code> §2 &mdash; historical facts that do not refresh. <code>floorParityQA()</code> recomputes them from the series on every load and fails loudly if they no longer match.'],
       ['Quantile fits',

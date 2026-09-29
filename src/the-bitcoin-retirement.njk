@@ -156,7 +156,7 @@ eleventyComputed:
 
     <!-- CHART STATUS LINE — current price + Power Law context -->
     <div class="chart-status-line" id="chartStatusLine">
-      <span class="status-prose"><strong>Today:</strong> <span id="statusPrice">$&mdash;</span> / BTC &mdash; sits at <strong><span id="statusRatio">&mdash;</span></strong> the Power Law trend; historically, BTC has traded below this <a href="/the-power-law" class="status-trend-link">trend level</a> <strong><span id="statusPercentile">&mdash;</span></strong> of its history.</span>
+      <span class="status-prose"><strong>Today:</strong> <span id="statusPrice">$&mdash;</span> / BTC<span id="statusPriceNote"></span> &mdash; sits at <strong><span id="statusRatio">&mdash;</span></strong> the Power Law trend; historically, BTC has traded below this <a href="/the-power-law" class="status-trend-link">trend level</a> <strong><span id="statusPercentile">&mdash;</span></strong> of its history.</span>
       <a href="/the-power-law#summary" class="powerlaw-link">What is the Power Law? &rarr;</a>
     </div>
 
@@ -179,7 +179,7 @@ eleventyComputed:
       <div class="chart-wrapper" data-chart-copy data-chart-heading="#projectionTitle" data-chart-assump="#chartStatusLine" data-chart-title="Projected stack value over time">
         <canvas id="projectionChart"></canvas>
       </div>
-      <div class="retire-chart-today" id="retireChartToday" aria-live="polite"><strong id="retireTodayLabel">Today&rsquo;s bitcoin price (latest monthly data):</strong> <span class="retire-today-spot" id="retireTodaySpot">&mdash;</span> &middot; <span class="retire-today-mult" id="retireTodayMult">&mdash;&times;</span> trend <span class="retire-today-zone" id="retireTodayZone"></span> <span class="retire-today-trendline">(Power Law trend = <span id="retireTodayTrend">&mdash;</span>)</span></div>
+      <div class="retire-chart-today" id="retireChartToday" aria-live="polite"><strong id="retireTodayLabel">Today&rsquo;s bitcoin price:</strong> <span class="retire-today-spot" id="retireTodaySpot">&mdash;</span> &middot; <span class="retire-today-mult" id="retireTodayMult">&mdash;&times;</span> trend <span class="retire-today-zone" id="retireTodayZone"></span> <span class="retire-today-trendline">(Power Law trend = <span id="retireTodayTrend">&mdash;</span>)</span></div>
 
       <section class="rt-tables" aria-label="Year-by-year detail">
 
@@ -807,7 +807,7 @@ eleventyComputed:
       <ul class="math-list">
         <li>Power Law coefficients: <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">Porkopolis Economics &mdash; The Chart</a></li>
         <li>Genesis Block: 3 January 2009 (block 0, &ldquo;Chancellor on brink of second bailout for banks&rdquo;)</li>
-        <li>Live BTC price: <a href="https://www.coingecko.com/" target="_blank" rel="noopener">CoinGecko</a> public API</li>
+        <li>Live BTC price: the <a href="https://www.coinbase.com/price/bitcoin" target="_blank" rel="noopener">Coinbase</a> public spot price, or Kraken, mempool.space or CoinGecko if Coinbase does not answer; if none does, the most recent price in the site&rsquo;s data, labelled with its date</li>
         <li>Trinity Study: <a href="https://www.bogleheads.org/wiki/Trinity_study" target="_blank" rel="noopener">Cooley, Hubbard, &amp; Walz (1998)</a>; William Bengen&rsquo;s 4% rule (1994)</li>
         <li>Inflation presets: BLS CPI, Federal Reserve M2, <a href="https://www.shadowstats.com/" target="_blank" rel="noopener">ShadowStats</a></li>
       </ul>
